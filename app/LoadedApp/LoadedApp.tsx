@@ -11,7 +11,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { useTheme } from '@react-navigation/native';
+import { useTheme } from '../theme';
 import { I18n } from 'i18n-js';
 import * as RNLocalize from 'react-native-localize';
 import { isEqual } from 'lodash';
@@ -78,7 +78,7 @@ import {
 } from '../AppState';
 import Utils from '../utils';
 import { getZingoVersion, substituteZingoName } from '../utils/ZingoAppData';
-import { ThemeType } from '../types';
+import { AppTheme } from '../theme';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
 import { ContextAppLoadedProvider } from '../context';
 import { parseZcashURI, serverUris } from '../uris';
@@ -200,7 +200,7 @@ const SERVER_DEFAULT_0: ServerType = {
 } as ServerType;
 
 export default function LoadedApp(props: LoadedAppProps) {
-  const theme = useTheme() as ThemeType;
+  const theme = useTheme();
   const [language, setLanguage] = useState<LanguageEnum>(LanguageEnum.en);
   const [currency, setCurrency] = useState<CurrencyEnum>(
     CurrencyEnum.USDCurrency,
@@ -725,7 +725,7 @@ type LoadedAppClassProps = {
   // still take effect immediately for snackbars and any RPC error text
   // produced after the change.
   setI18nLocale: (locale: string) => void;
-  theme: ThemeType;
+  theme: AppTheme;
   language: LanguageEnum;
   currency: CurrencyEnum;
   server: ServerType;
@@ -2397,8 +2397,8 @@ export class LoadedAppClass extends Component<
                               <>
                                 {addresses === null ? (
                                   <Loading
-                                    backgroundColor={colors.background}
-                                    spinColor={colors.primary}
+                                    backgroundColor={colors.bgCanvas}
+                                    spinColor={colors.fgAccent}
                                   />
                                 ) : (
                                   <Tab.Navigator

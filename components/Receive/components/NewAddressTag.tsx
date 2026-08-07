@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState } from 'react';
 import { View, TextInput, Keyboard, TouchableOpacity } from 'react-native';
-import { useTheme } from '@react-navigation/native';
+import { useTheme } from '../../../app/theme';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
 
@@ -11,7 +11,6 @@ import {
   ChainNameEnum,
   GlobalConst,
 } from '../../../app/AppState';
-import { ThemeType } from '../../../app/types';
 import RegText from '../../Components/RegText';
 import { ContextAppLoaded } from '../../../app/context';
 import { showConfirm } from '../../../app/showConfirm';
@@ -39,7 +38,7 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, server } = context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
 
   const [label, setLabel] = useState<string>('');
   // The chain is fixed to whatever triggered the save (Send → ZEC; Swap → the
@@ -105,7 +104,7 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
   return (
     <View
       style={{
-        backgroundColor: colors.bottomSheetBackground,
+        backgroundColor: colors.bgSurface,
       }}
     >
       <View style={{ display: 'flex', flexDirection: 'column', margin: 10 }}>
@@ -143,7 +142,7 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
               flexGrow: 1,
               borderWidth: 1,
               borderRadius: 12,
-              borderColor: colors.border,
+              borderColor: colors.borderMuted,
               minWidth: 48,
               minHeight: 48,
               maxHeight: 150,
@@ -153,7 +152,7 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
           >
             <TextInput
               style={{
-                color: colors.text,
+                color: colors.fgDefault,
                 fontWeight: '600',
                 fontSize: 14,
                 flex: 1,
@@ -162,7 +161,7 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
                 backgroundColor: 'transparent',
               }}
               placeholder={translate('addressbook.label-placeholder') as string}
-              placeholderTextColor={colors.placeholder}
+              placeholderTextColor={colors.fgMuted}
               value={label}
               onChangeText={(text: string) => setLabel(text)}
               maxLength={50}
@@ -173,7 +172,7 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
                   style={{ marginRight: 10 }}
                   size={20}
                   icon={faXmark}
-                  color={colors.primaryDisabled}
+                  color={colors.fgAccentDisabled}
                 />
               </TouchableOpacity>
             )}

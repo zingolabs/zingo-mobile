@@ -200,7 +200,7 @@ exports[`AlSummaryLine - snapshots AlSummaryLine address with contact label 1`] 
         }
       >
         <
-          color="#ffffff"
+          color="#c3c3c3"
           icon={
             {
               "icon": [
@@ -491,7 +491,7 @@ exports[`AlSummaryLine - snapshots AlSummaryLine transparent address 1`] = `
         }
       >
         <
-          color="#ffffff"
+          color="#c3c3c3"
           icon={
             {
               "icon": [
@@ -782,7 +782,7 @@ exports[`AlSummaryLine - snapshots AlSummaryLine unified address 1`] = `
         }
       >
         <
-          color="#ffffff"
+          color="#c3c3c3"
           icon={
             {
               "icon": [

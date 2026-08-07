@@ -46,7 +46,7 @@ exports[`Component Address Book Details - test Address Book Datails - Add - snap
       style={
         {
           "alignItems": "center",
-          "borderColor": "#ffffff",
+          "borderColor": "#888888",
           "borderRadius": 12,
           "borderWidth": 1,
           "flexDirection": "row",
@@ -109,7 +109,7 @@ exports[`Component Address Book Details - test Address Book Datails - Add - snap
         testID="addressbook.scan-button"
       >
         <
-          color="#ffffff"
+          color="#888888"
           icon={
             {
               "icon": [
@@ -163,7 +163,7 @@ exports[`Component Address Book Details - test Address Book Datails - Add - snap
       style={
         {
           "alignItems": "center",
-          "borderColor": "#ffffff",
+          "borderColor": "#888888",
           "borderRadius": 12,
           "borderWidth": 1,
           "flexDirection": "row",
@@ -247,7 +247,7 @@ exports[`Component Address Book Details - test Address Book Datails - Add - snap
         style={
           {
             "alignItems": "center",
-            "borderColor": "#ffffff",
+            "borderColor": "#888888",
             "borderRadius": 12,
             "borderWidth": 1,
             "columnGap": 10,
@@ -289,7 +289,7 @@ exports[`Component Address Book Details - test Address Book Datails - Add - snap
           Zcash
         </Text>
         <
-          color="#ffffff"
+          color="#888888"
           icon={
             {
               "icon": [
@@ -443,7 +443,7 @@ exports[`Component Address Book Details - test Address Book Datails - Add - snap
                 },
                 {
                   "backgroundColor": "#011401",
-                  "borderColor": "#ffffff",
+                  "borderColor": "#888888",
                 },
               ]
             }
@@ -3651,7 +3651,7 @@ exports[`Component Address Book Details - test Address Book Datails - Delete - s
       style={
         {
           "alignItems": "center",
-          "borderColor": "#ffffff",
+          "borderColor": "#888888",
           "borderRadius": 12,
           "borderWidth": 1,
           "flexDirection": "row",
@@ -3736,7 +3736,7 @@ exports[`Component Address Book Details - test Address Book Datails - Delete - s
         style={
           {
             "alignItems": "center",
-            "borderColor": "#ffffff",
+            "borderColor": "#888888",
             "borderRadius": 12,
             "borderWidth": 1,
             "columnGap": 10,
@@ -3915,7 +3915,7 @@ exports[`Component Address Book Details - test Address Book Datails - Delete - s
                 },
                 {
                   "backgroundColor": "#011401",
-                  "borderColor": "#ffffff",
+                  "borderColor": "#888888",
                 },
               ]
             }
@@ -4333,7 +4333,7 @@ exports[`Component Address Book Details - test Address Book Datails - Modify - s
       style={
         {
           "alignItems": "center",
-          "borderColor": "#ffffff",
+          "borderColor": "#888888",
           "borderRadius": 12,
           "borderWidth": 1,
           "flexDirection": "row",
@@ -4485,7 +4485,7 @@ exports[`Component Address Book Details - test Address Book Datails - Modify - s
         style={
           {
             "alignItems": "center",
-            "borderColor": "#ffffff",
+            "borderColor": "#888888",
             "borderRadius": 12,
             "borderWidth": 1,
             "columnGap": 10,
@@ -4664,7 +4664,7 @@ exports[`Component Address Book Details - test Address Book Datails - Modify - s
                 },
                 {
                   "backgroundColor": "#011401",
-                  "borderColor": "#ffffff",
+                  "borderColor": "#888888",
                 },
               ]
             }

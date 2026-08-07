@@ -47,7 +47,7 @@ exports[`NewAddress - snapshots NewAddress transparent kind 1`] = `
         style={
           {
             "alignItems": "center",
-            "borderColor": "#ffffff",
+            "borderColor": "#888888",
             "borderRadius": 12,
             "borderWidth": 1,
             "flexDirection": "row",
@@ -477,7 +477,7 @@ exports[`NewAddress - snapshots NewAddress unified kind 1`] = `
         style={
           {
             "alignItems": "center",
-            "borderColor": "#ffffff",
+            "borderColor": "#888888",
             "borderRadius": 12,
             "borderWidth": 1,
             "flexDirection": "row",

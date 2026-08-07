@@ -1,9 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import { TouchableOpacity, Text, View, TextStyle } from 'react-native';
-import { useTheme } from '@react-navigation/native';
+import { useTheme } from '../../app/theme';
 
-import { ThemeType } from '../../app/types';
 import { ButtonTypeEnum } from '../../app/AppState';
 
 type ButtonProps = {
@@ -31,47 +30,42 @@ const Button: React.FunctionComponent<ButtonProps> = ({
   testID,
   twoButtons,
 }) => {
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
 
   const styleButton: TextStyle =
     type === ButtonTypeEnum.Primary
       ? {
-          backgroundColor: disabled ? colors.primaryDisabled : colors.primary,
-          borderColor: disabled ? colors.primaryDisabled : colors.primary,
+          backgroundColor: disabled ? colors.bgAccentDisabled : colors.bgAccent,
+          borderColor: disabled ? colors.borderAccentDisabled : colors.borderAccent,
           borderWidth: 2,
           width: twoButtons ? '40%' : '80%',
         }
       : type === ButtonTypeEnum.Secondary
         ? {
             backgroundColor: disabled
-              ? colors.secondaryDisabled
-              : colors.bottomSheetBackground,
-            borderColor: disabled ? colors.primaryDisabled : colors.primary,
+              ? colors.bgSecondaryDisabled
+              : colors.bgSurface,
+            borderColor: disabled ? colors.borderAccentDisabled : colors.borderAccent,
             borderWidth: 2,
             width: twoButtons ? '40%' : '80%',
           }
-        : type === ButtonTypeEnum.Tertiary
+        : type === ButtonTypeEnum.Ghost
           ? {
-              backgroundColor: colors.tertiary,
-              width: twoButtons ? '40%' : '80%',
+              backgroundColor: 'transparent',
+              color: colors.fgDefault,
             }
-          : type === ButtonTypeEnum.Ghost
+          : type === ButtonTypeEnum.Nym
             ? {
-                backgroundColor: 'transparent',
-                color: colors.money,
+                backgroundColor: disabled ? '#4DAF7C' : '#07FF94',
+                borderColor: disabled ? '#4DAF7C' : '#07FF94',
+                borderWidth: 2,
+                width: twoButtons ? '40%' : '80%',
               }
-            : type === ButtonTypeEnum.Nym
-              ? {
-                  backgroundColor: disabled ? '#4DAF7C' : '#07FF94',
-                  borderColor: disabled ? '#4DAF7C' : '#07FF94',
-                  borderWidth: 2,
-                  width: twoButtons ? '40%' : '80%',
-                }
-              : {
-                  // error
-                  backgroundColor: colors.primary,
-                  width: twoButtons ? '40%' : '80%',
-                };
+            : {
+                // error
+                backgroundColor: colors.bgAccent,
+                width: twoButtons ? '40%' : '80%',
+              };
 
   const styleButtonCommon: TextStyle = {
     padding: 0,
@@ -88,41 +82,33 @@ const Button: React.FunctionComponent<ButtonProps> = ({
   const styleText: TextStyle =
     type === ButtonTypeEnum.Primary
       ? {
-          color: colors.background,
+          color: colors.bgCanvas,
         }
       : type === ButtonTypeEnum.Secondary
         ? {
-            color: disabled ? colors.primaryDisabled : colors.primary,
+            color: disabled ? colors.fgAccentDisabled : colors.fgAccent,
           }
-        : type === ButtonTypeEnum.Tertiary
+        : type === ButtonTypeEnum.Ghost
           ? {
-              color: colors.text,
+              // Ghost carries brand-green (primary) text as its formal
+              // style; instances no longer override the color per call.
+              color: colors.fgAccent,
+              textTransform: 'none',
             }
-          : type === ButtonTypeEnum.Ghost
+          : type === ButtonTypeEnum.Nym
             ? {
-                // Ghost carries brand-green (primary) text as its formal
-                // style; instances no longer override the color per call.
-                color: colors.primary,
-                textTransform: 'none',
+                color: colors.bgCanvas,
               }
-            : type === ButtonTypeEnum.Nym
-              ? {
-                  color: colors.background,
-                }
-              : {
-                  // error
-                  color: colors.background,
-                };
+            : {
+                // error
+                color: colors.bgCanvas,
+              };
   const styleTextCommon: TextStyle = {
     fontWeight: '600',
     textTransform: 'none',
     fontSize: 16,
     textAlign: 'center',
   };
-
-  //if (type === ButtonTypeEnum.Tertiary) {
-  //  console.log(styleText, styleTextCommon);
-  //}
 
   return (
     <TouchableOpacity

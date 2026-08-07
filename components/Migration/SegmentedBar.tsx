@@ -1,10 +1,9 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useEffect, useRef } from 'react';
 import { Animated, Easing, StyleSheet, View } from 'react-native';
-import { useTheme } from '@react-navigation/native';
+import { useTheme } from '../../app/theme';
 
 import useReduceMotion from '../../app/hooks/useReduceMotion';
-import { ThemeType } from '../../app/types';
 
 // A segment lights up where it stands instead of growing across itself, so a
 // confirmation reads as a switch thrown rather than a distance covered. Opacity
@@ -174,13 +173,13 @@ const SegmentedBar: React.FunctionComponent<SegmentedBarProps> = ({
   color,
   height = 6,
 }) => {
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
   const reduceMotion = useReduceMotion();
 
   // A plan whose size is still being fetched renders as one empty segment
   // rather than nothing at all.
   const count = Math.max(1, segments);
-  const fill = color ?? colors.primary;
+  const fill = color ?? colors.fgAccent;
   const radius = height / 2;
 
   // Callers pass exact multiples of one segment, so this is a count and not a

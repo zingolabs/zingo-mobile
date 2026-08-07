@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Dimensions, Keyboard, View } from 'react-native';
-import { useTheme } from '@react-navigation/native';
+import { useTheme } from '../../app/theme';
 import {
   BottomSheetBackdrop,
   BottomSheetBackdropProps,
@@ -13,7 +13,6 @@ import BoldText from './BoldText';
 import RegText from './RegText';
 import Button from './Button';
 import { ButtonTypeEnum } from '../../app/AppState';
-import { ThemeType } from '../../app/types';
 import { ConfirmOptions, registerConfirmListener } from '../../app/showConfirm';
 
 // Vertical lift: pushes the detached sheet up roughly into screen center.
@@ -22,7 +21,7 @@ import { ConfirmOptions, registerConfirmListener } from '../../app/showConfirm';
 const VERTICAL_LIFT = Math.round(Dimensions.get('window').height * 0.32);
 
 const ConfirmBottomSheet: React.FC = () => {
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
   const ref = useRef<BottomSheetModal>(null);
   const [options, setOptions] = useState<ConfirmOptions | null>(null);
   const resolvedRef = useRef<boolean>(false);
@@ -89,7 +88,7 @@ const ConfirmBottomSheet: React.FC = () => {
           paddingTop: 12,
           paddingBottom: 10,
           paddingHorizontal: 16,
-          backgroundColor: colors.bottomSheetBackground,
+          backgroundColor: colors.bgSurface,
           borderBottomWidth: 0.5,
           borderBottomColor: colors.bottomSheetBorder,
         }}
@@ -141,7 +140,7 @@ const ConfirmBottomSheet: React.FC = () => {
         overflow: 'hidden',
       }}
       backgroundStyle={{
-        backgroundColor: colors.bottomSheetBackground,
+        backgroundColor: colors.bgSurface,
         borderRadius: 20,
       }}
       backdropComponent={renderBackdrop}
@@ -149,7 +148,7 @@ const ConfirmBottomSheet: React.FC = () => {
     >
       <BottomSheetView
         style={{
-          backgroundColor: colors.bottomSheetBackground,
+          backgroundColor: colors.bgSurface,
           paddingHorizontal: 6,
           paddingTop: 18,
           paddingBottom: 24,
@@ -211,12 +210,12 @@ const ConfirmBottomSheet: React.FC = () => {
                     title={b.text}
                     style={
                       b.style === 'destructive'
-                        ? { borderColor: colors.danger.text }
+                        ? { borderColor: colors.fgDanger }
                         : undefined
                     }
                     textStyle={
                       b.style === 'destructive'
-                        ? { color: colors.danger.text }
+                        ? { color: colors.fgDanger }
                         : undefined
                     }
                     onPress={() => handleButton(b)}

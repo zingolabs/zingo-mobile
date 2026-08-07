@@ -21,12 +21,8 @@ import {
 import Animated from 'react-native-reanimated';
 import { useOptionsPanelSheetSlide } from '../../app/hooks/useOptionsPanelSheetSlide';
 
-import {
-  NavigationProp,
-  ParamListBase,
-  useNavigation,
-  useTheme,
-} from '@react-navigation/native';
+import { NavigationProp, ParamListBase, useNavigation } from '@react-navigation/native';
+import { useTheme } from '../../app/theme';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faChevronLeft, faAngleDown } from '@fortawesome/free-solid-svg-icons';
 import BottomSheet from '@gorhom/bottom-sheet';
@@ -37,7 +33,7 @@ import {
   ScreenEnum,
   ValueTransferType,
 } from '../../app/AppState';
-import { AppDrawerParamList, ThemeType } from '../../app/types';
+import { AppDrawerParamList } from '../../app/types';
 import FadeText from '../Components/FadeText';
 import BoldText from '../Components/BoldText';
 import Button from '../Components/Button';
@@ -74,7 +70,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
     setPrivacyOption,
     addLastSnackbar,
   } = context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
   const screenName = ScreenEnum.MessagesList;
 
   // With FlatList + `inverted`, the visual bottom (newest messages)
@@ -101,7 +97,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
           paddingTop: 12,
           paddingBottom: 8,
           paddingHorizontal: 16,
-          backgroundColor: colors.bottomSheetBackground,
+          backgroundColor: colors.bgSurface,
           borderTopLeftRadius: 40,
           borderTopRightRadius: 40,
           borderTopWidth: 1,
@@ -128,7 +124,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
               <FontAwesomeIcon
                 icon={faChevronLeft}
                 size={20}
-                color={colors.primary}
+                color={colors.fgAccent}
               />
             </TouchableOpacity>
           ) : (
@@ -266,7 +262,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
     <View
       style={{
         flex: 1,
-        backgroundColor: colors.background,
+        backgroundColor: colors.bgCanvas,
       }}
       onLayout={e => setContainerH(e.nativeEvent.layout.height)}
     >
@@ -295,7 +291,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
           keyboardBlurBehavior={'restore'}
           android_keyboardInputMode={'adjustResize'}
           backgroundStyle={{
-            backgroundColor: colors.bottomSheetBackground,
+            backgroundColor: colors.bgSurface,
             borderTopLeftRadius: 40,
             borderTopRightRadius: 40,
           }}
@@ -310,7 +306,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
             alwaysBounceVertical={false}
             style={{
               flex: 1,
-              backgroundColor: colors.bottomSheetBackground,
+              backgroundColor: colors.bgSurface,
             }}
             contentContainerStyle={{
               flexDirection: 'column',
@@ -321,7 +317,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
               <RefreshControl
                 refreshing={false}
                 onRefresh={() => doRefresh(screenName)}
-                tintColor={colors.text}
+                tintColor={colors.fgDefault}
                 title={translate('history.refreshing') as string}
               />
             }
@@ -329,7 +325,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
             {loading ? (
               <ActivityIndicator
                 size="large"
-                color={colors.primary}
+                color={colors.fgAccent}
                 style={{ marginVertical: 20 }}
               />
             ) : messagesData.length === 0 ? (
@@ -342,7 +338,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
                   marginTop: 30,
                 }}
               >
-                <FadeText style={{ color: colors.primary }}>
+                <FadeText style={{ color: colors.fgAccent }}>
                   {translate('messages.empty') as string}
                 </FadeText>
               </View>
@@ -374,7 +370,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
                       marginBottom: 10,
                     }}
                   >
-                    <FadeText style={{ color: colors.primary }}>
+                    <FadeText style={{ color: colors.fgAccent }}>
                       {translate('history.end') as string}
                     </FadeText>
                   </View>
@@ -407,18 +403,18 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
               right: 10,
               paddingHorizontal: 5,
               paddingVertical: 10,
-              backgroundColor: colors.sideMenuBackground,
+              backgroundColor: colors.bgChrome,
               borderRadius: 50,
               transform: [{ scale: pressed ? 0.9 : 1 }],
               borderWidth: 1,
-              borderColor: colors.zingo,
+              borderColor: colors.borderMuted,
             })}
           >
             <FontAwesomeIcon
               style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
               size={16}
               icon={faAngleDown}
-              color={colors.zingo}
+              color={colors.fgMuted}
             />
           </Pressable>
         )}

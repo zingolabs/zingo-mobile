@@ -424,7 +424,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                   <Text
                     style={
                       {
-                        "color": "#ffffff",
+                        "color": "#c3c3c3",
                         "fontSize": 20,
                         "fontWeight": "700",
                         "marginBottom": 0,
@@ -645,7 +645,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                     <Text
                       style={
                         {
-                          "color": "#ffffff",
+                          "color": "#c3c3c3",
                           "fontSize": 14,
                           "fontWeight": "700",
                         }
@@ -896,7 +896,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
             <View
               style={
                 {
-                  "borderColor": "#ffffff",
+                  "borderColor": "#888888",
                   "borderRadius": 12,
                   "borderWidth": 1,
                   "flex": 1,
@@ -1056,7 +1056,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                     testID="send.scan-button"
                   >
                     <
-                      color="#ffffff"
+                      color="#888888"
                       icon={
                         {
                           "icon": [
@@ -1149,7 +1149,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                   style={
                     {
                       "alignItems": "center",
-                      "borderColor": "#ffffff",
+                      "borderColor": "#888888",
                       "borderRadius": 12,
                       "borderWidth": 1,
                       "flex": 1,
@@ -1306,7 +1306,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                     <Text
                       style={
                         {
-                          "color": "#ffffff",
+                          "color": "#c3c3c3",
                           "fontSize": 14,
                           "fontWeight": "400",
                           "opacity": 1,
@@ -1591,7 +1591,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
       accessible={true}
       style={
         {
-          "borderColor": "#ffffff",
+          "borderColor": "#888888",
           "borderRadius": 12,
           "borderWidth": 1,
           "flexDirection": "row",
@@ -1984,7 +1984,7 @@ memo10"
             },
             {
               "backgroundColor": "#011401",
-              "borderColor": "#ffffff",
+              "borderColor": "#888888",
             },
           ]
         }
@@ -2558,7 +2558,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
             <View
               style={
                 {
-                  "borderColor": "#ffffff",
+                  "borderColor": "#888888",
                   "borderRadius": 12,
                   "borderWidth": 1,
                   "flex": 1,
@@ -2718,7 +2718,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                     testID="send.scan-button"
                   >
                     <
-                      color="#ffffff"
+                      color="#888888"
                       icon={
                         {
                           "icon": [
@@ -2811,7 +2811,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                   style={
                     {
                       "alignItems": "center",
-                      "borderColor": "#ffffff",
+                      "borderColor": "#888888",
                       "borderRadius": 12,
                       "borderWidth": 1,
                       "flex": 1,
@@ -2968,7 +2968,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                     <Text
                       style={
                         {
-                          "color": "#ffffff",
+                          "color": "#c3c3c3",
                           "fontSize": 14,
                           "fontWeight": "400",
                           "opacity": 1,
@@ -3268,7 +3268,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
       accessible={true}
       style={
         {
-          "borderColor": "#ffffff",
+          "borderColor": "#888888",
           "borderRadius": 12,
           "borderWidth": 1,
           "flexDirection": "row",
@@ -3661,7 +3661,7 @@ memo10"
             },
             {
               "backgroundColor": "#011401",
-              "borderColor": "#ffffff",
+              "borderColor": "#888888",
             },
           ]
         }

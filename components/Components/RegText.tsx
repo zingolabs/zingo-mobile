@@ -1,7 +1,6 @@
 import React from 'react';
 import { Text, TextStyle } from 'react-native';
-import { useTheme } from '@react-navigation/native';
-import { ThemeType } from '../../app/types';
+import { useTheme } from '../../app/theme';
 
 type RegTextProps = {
   style?: TextStyle;
@@ -24,10 +23,10 @@ const RegText: React.FunctionComponent<RegTextProps> = ({
   numberOfLines,
   ellipsizeMode,
 }) => {
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
 
   const styleSum: TextStyle = {
-    color: color || colors.text,
+    color: color || colors.fgDefault,
     fontSize: 15,
     fontWeight: '400',
     opacity: 1,

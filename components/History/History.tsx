@@ -18,12 +18,8 @@ import {
   StyleSheet,
 } from 'react-native';
 import Animated from 'react-native-reanimated';
-import {
-  NavigationProp,
-  ParamListBase,
-  useNavigation,
-  useTheme,
-} from '@react-navigation/native';
+import { NavigationProp, ParamListBase, useNavigation } from '@react-navigation/native';
+import { useTheme } from '../../app/theme';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faAngleUp, faXmark } from '@fortawesome/free-solid-svg-icons';
 
@@ -41,7 +37,7 @@ import {
   //ServerType,
   ValueTransferType,
 } from '../../app/AppState';
-import { AppDrawerParamList, ThemeType } from '../../app/types';
+import { AppDrawerParamList } from '../../app/types';
 import FadeText from '../Components/FadeText';
 import BoldText from '../Components/BoldText';
 import ValueTransferLine from './components/ValueTransferLine';
@@ -131,7 +127,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
     readOnly,
     info,
   } = context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
   const screenName = ScreenEnum.History;
 
   const PAGE_SIZE = 50;
@@ -665,7 +661,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
           paddingTop: 8,
           paddingBottom: 6,
           paddingHorizontal: 16,
-          backgroundColor: colors.bottomSheetBackground,
+          backgroundColor: colors.bgSurface,
           borderTopLeftRadius: 40,
           borderTopRightRadius: 40,
           borderTopWidth: 1,
@@ -712,14 +708,14 @@ const History: React.FunctionComponent<HistoryProps> = ({
               paddingVertical: 4,
             }}
           >
-            <FiltersIcon color={colors.zingo} size={20} />
+            <FiltersIcon color={colors.fgMuted} size={20} />
             {(!!filterKind ||
               filterFailed ||
               filterMemos ||
               filterWithFunds) && (
               <View
                 style={{
-                  backgroundColor: colors.text,
+                  backgroundColor: colors.fgDefault,
                   width: 7,
                   height: 7,
                   borderRadius: 7,
@@ -742,7 +738,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
           paddingTop: 8,
           paddingBottom: 6,
           paddingHorizontal: 16,
-          backgroundColor: colors.bottomSheetBackground,
+          backgroundColor: colors.bgSurface,
           borderTopLeftRadius: 40,
           borderTopRightRadius: 40,
           borderTopWidth: 1,
@@ -783,7 +779,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
               paddingVertical: 4,
             }}
           >
-            <FontAwesomeIcon icon={faXmark} size={20} color={colors.zingo} />
+            <FontAwesomeIcon icon={faXmark} size={20} color={colors.fgMuted} />
           </Pressable>
         </View>
       </View>
@@ -868,7 +864,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
           keyboardBlurBehavior={'restore'}
           android_keyboardInputMode={'adjustResize'}
           backgroundStyle={{
-            backgroundColor: colors.bottomSheetBackground,
+            backgroundColor: colors.bgSurface,
             borderTopLeftRadius: 40,
             borderTopRightRadius: 40,
           }}
@@ -879,18 +875,18 @@ const History: React.FunctionComponent<HistoryProps> = ({
               listAreaH != null
                 ? {
                     height: listAreaH,
-                    backgroundColor: colors.bottomSheetBackground,
+                    backgroundColor: colors.bgSurface,
                   }
                 : {
                     flex: 1,
-                    backgroundColor: colors.bottomSheetBackground,
+                    backgroundColor: colors.bgSurface,
                   }
             }
           >
             {loading ? (
               <ActivityIndicator
                 size="large"
-                color={colors.primary}
+                color={colors.fgAccent}
                 style={{ marginVertical: 20 }}
               />
             ) : (
@@ -904,7 +900,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
                         <RefreshControl
                           refreshing={false}
                           onRefresh={() => doRefresh(screenName)}
-                          tintColor={colors.text}
+                          tintColor={colors.fgDefault}
                           title={translate('history.refreshing') as string}
                         />
                       ),
@@ -938,7 +934,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
                         >
                           <ActivityIndicator
                             size="small"
-                            color={colors.primary}
+                            color={colors.fgAccent}
                           />
                         </View>
                       ) : !!valueTransfersSliced &&
@@ -952,7 +948,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
                             marginBottom: 200,
                           }}
                         >
-                          <FadeText style={{ color: colors.primary }}>
+                          <FadeText style={{ color: colors.fgAccent }}>
                             {translate('history.end') as string}
                           </FadeText>
                         </View>
@@ -968,7 +964,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
                       marginTop: 30,
                     }}
                   >
-                    <FadeText style={{ color: colors.primary }}>
+                    <FadeText style={{ color: colors.fgAccent }}>
                       {translate('history.empty') as string}
                     </FadeText>
                   </View>
@@ -996,11 +992,11 @@ const History: React.FunctionComponent<HistoryProps> = ({
               right: 10,
               paddingHorizontal: 5,
               paddingVertical: 10,
-              backgroundColor: colors.sideMenuBackground,
+              backgroundColor: colors.bgChrome,
               borderRadius: 50,
               transform: [{ scale: pressed ? 0.9 : 1 }],
               borderWidth: 1,
-              borderColor: colors.zingo,
+              borderColor: colors.borderMuted,
               opacity: isScrollingToTop ? 0.5 : 1,
             })}
           >
@@ -1008,7 +1004,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
               style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
               size={16}
               icon={faAngleUp}
-              color={colors.zingo}
+              color={colors.fgMuted}
             />
           </Pressable>
         )}
@@ -1031,7 +1027,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
         }}
         handleComponent={renderFiltersHandle}
         backgroundStyle={{
-          backgroundColor: colors.bottomSheetBackground,
+          backgroundColor: colors.bgSurface,
           borderTopLeftRadius: 40,
           borderTopRightRadius: 40,
         }}
@@ -1040,7 +1036,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
       >
         <BottomSheetView
           style={{
-            backgroundColor: colors.bottomSheetBackground,
+            backgroundColor: colors.bgSurface,
             paddingBottom: 30,
           }}
         >

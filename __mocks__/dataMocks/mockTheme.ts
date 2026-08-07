@@ -1,39 +1,47 @@
 import { DefaultTheme } from '@react-navigation/native';
-import { ThemeType } from '../../app/types';
+import type { ThemeColors } from '../../app/theme';
 
-export const mockTheme: ThemeType = {
+// The drifted values (`#18bd18` for the accent, `#c3c3c3` for text) predate the
+// token layer and stay wrong on purpose: the 43 snapshot suites are baselined
+// on them. Reconciling them with the real palette is out of the migration's
+// scope.
+const colors: ThemeColors = {
+  bgCanvas: '#011401',
+  bgSurface: '#031124',
+  bgChrome: '#040C17',
+  bottomSheetBorder: '#05234C',
+
+  fgDefault: '#c3c3c3',
+
+  fgMuted: '#888888',
+  borderMuted: '#888888',
+  bgMuted: '#888888',
+
+  fgAccent: '#18bd18',
+  borderAccent: '#18bd18',
+  bgAccent: '#18bd18',
+
+  fgAccentDisabled: '#5a8c5a',
+  borderAccentDisabled: '#5a8c5a',
+  bgAccentDisabled: '#5a8c5a',
+  bgSecondaryDisabled: '#233623',
+
+  fgSyncing: '#ebff5a',
+  borderSyncing: '#ebff5a',
+
+  fgWarning: '#F99D00',
+  fgWarningEmphasis: '#E1AA1B',
+  fgWarningDark: '#DD7500',
+  borderWarning: '#65491C',
+  bgWarning: '#262527',
+
+  fgDanger: '#FFB972',
+  fgDangerEmphasis: '#dc2626',
+};
+
+export const mockTheme = {
   ...DefaultTheme,
   dark: true,
-  colors: {
-    background: '#011401', //'#010101',
-    card: '#011401', //'#401717',
-    border: '#ffffff',
-    primary: '#18bd18', //'#df4100',
-    primaryDisabled: '#5a8c5a', //'rgba(90, 140, 90, 1)',
-    secondaryDisabled: '#233623',
-    text: '#c3c3c3',
-    zingo: '#888888',
-    placeholder: '#888888',
-    money: '#ffffff',
-    syncing: '#ebff5a',
-    notification: '',
-    sideMenuBackground: '#040C17',
-    bottomSheetBackground: '#031124',
-    bottomSheetBorder: '#05234C',
-    warning: {
-      background: '#262527',
-      border: '#65491C',
-      primary: '#F99D00',
-      primaryDark: '#DD7500',
-      title: '#E1AA1B',
-      text: '#FEE587',
-    },
-    danger: {
-      primary: '#dc2626',
-      background: '#240E0C',
-      border: '#572317',
-      text: '#FFB972',
-    },
-    modal: '#1e293b',
-  },
+  colors,
+  toggleTheme: () => {},
 };

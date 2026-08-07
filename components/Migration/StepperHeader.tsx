@@ -1,18 +1,18 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
 import { Text, View } from 'react-native';
-import { useTheme } from '@react-navigation/native';
+import { useTheme } from '../../app/theme';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
 
-import { ThemeType } from '../../app/types';
+import { AppTheme } from '../../app/theme';
 import { ContextAppLoaded } from '../../app/context';
 
 type StepCircleProps = {
   label: string;
   done: boolean;
   active: boolean;
-  colors: ThemeType['colors'];
+  colors: AppTheme['colors'];
 };
 
 const StepCircle: React.FunctionComponent<StepCircleProps> = ({
@@ -21,7 +21,9 @@ const StepCircle: React.FunctionComponent<StepCircleProps> = ({
   active,
   colors,
 }) => {
-  const color = done || active ? colors.primary : colors.placeholder;
+  const borderColor =
+    done || active ? colors.borderAccent : colors.borderMuted;
+  const fgColor = done || active ? colors.fgAccent : colors.fgMuted;
   return (
     <View
       style={{
@@ -29,15 +31,15 @@ const StepCircle: React.FunctionComponent<StepCircleProps> = ({
         height: 30,
         borderRadius: 15,
         borderWidth: 2,
-        borderColor: color,
+        borderColor,
         alignItems: 'center',
         justifyContent: 'center',
       }}
     >
       {done ? (
-        <FontAwesomeIcon icon={faCheck} size={14} color={color} />
+        <FontAwesomeIcon icon={faCheck} size={14} color={fgColor} />
       ) : (
-        <Text style={{ color, fontSize: 14, fontWeight: '700' }}>{label}</Text>
+        <Text style={{ color: fgColor, fontSize: 14, fontWeight: '700' }}>{label}</Text>
       )}
     </View>
   );
@@ -58,10 +60,10 @@ const StepperHeader: React.FunctionComponent<StepperHeaderProps> = ({
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate } = context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
 
-  const splitColor = colors.primary;
-  const sendColor = sendActive ? colors.primary : colors.placeholder;
+  const splitColor = colors.fgAccent;
+  const sendColor = sendActive ? colors.fgAccent : colors.fgMuted;
 
   return (
     <View

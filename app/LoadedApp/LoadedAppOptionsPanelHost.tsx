@@ -11,7 +11,7 @@ import { MenuItemEnum, ModeEnum, SelectServerEnum } from '../AppState';
 import { sendEmail } from '../sendEmail';
 import { walletBackupExists } from '../walletBackend';
 import { getZingoLogo, getZingoName } from '../utils/ZingoAppData';
-import { advancedTheme, basicTheme } from '../../App';
+import { advancedTokens, basicTokens } from '../theme';
 
 import AddressBookIcon from '../../assets/img/options/address-book.svg';
 import AddressBookBasicIcon from '../../assets/img/options/address-book-basic.svg';
@@ -275,8 +275,8 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
       walletName: getZingoName(),
       targetModeLabel: translate(`settings.value-mode-${target}`) as string,
       targetModeColor: isBasic
-        ? advancedTheme.colors.primary
-        : basicTheme.colors.primary,
+        ? advancedTokens.fgAccent
+        : basicTokens.fgAccent,
       logoSource: getZingoLogo(),
       // Intentionally NOT closing the panel — staying open lets the user
       // see the action grid change as it re-filters by the new mode.

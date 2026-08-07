@@ -1,14 +1,15 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useContext, useRef, useState } from 'react';
 import { ActivityIndicator, ScrollView, Text, View } from 'react-native';
-import { useFocusEffect, useTheme } from '@react-navigation/native';
+import { useFocusEffect } from '@react-navigation/native';
+import { useTheme } from '../../app/theme';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import BoldText from '../Components/BoldText';
 import Button from '../Components/Button';
 import SegmentedBar from '../Migration/SegmentedBar';
 import StepperHeader from '../Migration/StepperHeader';
-import { AppDrawerParamList, ThemeType } from '../../app/types';
+import { AppDrawerParamList } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import Utils from '../../app/utils/Utils';
 import {
@@ -45,7 +46,7 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, info, language } = context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
 
   const [status, setStatus] = useState<RPCMigrationStatusType | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -134,18 +135,18 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
       <View
         style={{
           flex: 1,
-          backgroundColor: colors.background,
+          backgroundColor: colors.bgCanvas,
           alignItems: 'center',
           justifyContent: 'center',
           padding: 24,
         }}
       >
         {loading ? (
-          <ActivityIndicator size="large" color={colors.primary} />
+          <ActivityIndicator size="large" color={colors.fgAccent} />
         ) : (
           <Text
             style={{
-              color: colors.placeholder,
+              color: colors.fgMuted,
               fontSize: 14,
               textAlign: 'center',
             }}
@@ -182,7 +183,7 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
   // to gain any: every entry point refuses while it exists. Offer the one exit.
   if (status?.phase?.kind === 'parts_scheduled' && partsTotal === 0) {
     return (
-      <View style={{ flex: 1, backgroundColor: colors.background }}>
+      <View style={{ flex: 1, backgroundColor: colors.bgCanvas }}>
         <StepperHeader splitDone={true} sendActive={true} />
         <View
           style={{
@@ -199,7 +200,7 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
           </BoldText>
           <Text
             style={{
-              color: colors.placeholder,
+              color: colors.fgMuted,
               fontSize: 15,
               lineHeight: 22,
               textAlign: 'center',
@@ -322,7 +323,7 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
         );
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background }}>
+    <View style={{ flex: 1, backgroundColor: colors.bgCanvas }}>
       <StepperHeader splitDone={true} sendActive={true} />
       <ScrollView
         style={{ flex: 1 }}
@@ -342,12 +343,12 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
             progress={notesConfirmed / notesTotal}
             active={broadcasting ? notesConfirmed : undefined}
             activeSpan={status?.parts_broadcast ?? 0}
-            activeColor={colors.syncing}
+            activeColor={colors.fgSyncing}
           />
         </View>
         <Text
           style={{
-            color: colors.placeholder,
+            color: colors.fgMuted,
             fontSize: 15,
             marginBottom: 20,
           }}
@@ -360,7 +361,7 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
           style={{
             borderWidth: 1,
             borderColor: colors.bottomSheetBorder,
-            backgroundColor: colors.bottomSheetBackground,
+            backgroundColor: colors.bgSurface,
             borderRadius: 12,
             paddingHorizontal: 16,
             paddingVertical: 14,
@@ -368,11 +369,11 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
           }}
         >
           <Text
-            style={{ color: colors.placeholder, fontSize: 14, lineHeight: 21 }}
+            style={{ color: colors.fgMuted, fontSize: 14, lineHeight: 21 }}
           >
             {nextLine.split('**').map((part: string, i: number) =>
               i % 2 === 1 ? (
-                <Text key={i} style={{ color: colors.text, fontWeight: '700' }}>
+                <Text key={i} style={{ color: colors.fgDefault, fontWeight: '700' }}>
                   {part}
                 </Text>
               ) : (
@@ -383,7 +384,7 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
           {wakes.length > 0 && (
             <Text
               style={{
-                color: colors.placeholder,
+                color: colors.fgMuted,
                 fontSize: 14,
                 lineHeight: 21,
               }}
@@ -402,7 +403,7 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
               style={{
                 borderWidth: 1,
                 borderColor: colors.bottomSheetBorder,
-                backgroundColor: colors.bottomSheetBackground,
+                backgroundColor: colors.bgSurface,
                 borderRadius: 14,
                 padding: 16,
                 marginBottom: 14,
@@ -418,7 +419,7 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
               >
                 <Text
                   style={{
-                    color: colors.text,
+                    color: colors.fgDefault,
                     fontSize: 17,
                     fontWeight: '700',
                   }}
@@ -433,7 +434,7 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
                   style={{
                     borderWidth: 1,
                     borderColor: open
-                      ? colors.primary
+                      ? colors.borderAccent
                       : colors.bottomSheetBorder,
                     borderRadius: 20,
                     paddingHorizontal: 12,
@@ -442,7 +443,7 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
                 >
                   <Text
                     style={{
-                      color: open ? colors.primary : colors.placeholder,
+                      color: open ? colors.fgAccent : colors.fgMuted,
                       fontSize: 12,
                       fontWeight: '600',
                     }}
@@ -473,7 +474,7 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
                       marginBottom: 8,
                     }}
                   >
-                    <Text style={{ color: colors.text, fontSize: 14 }}>
+                    <Text style={{ color: colors.fgDefault, fontSize: 14 }}>
                       {fmt(denomination)}
                     </Text>
                   </View>
@@ -482,7 +483,7 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
               {/* Wall-clock is irrelevant here; the batch is gated by height. */}
               <Text
                 style={{
-                  color: colors.placeholder,
+                  color: colors.fgMuted,
                   fontSize: 12,
                   fontStyle: 'italic',
                 }}
@@ -497,7 +498,7 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
 
         <Text
           style={{
-            color: colors.placeholder,
+            color: colors.fgMuted,
             fontSize: 14,
             lineHeight: 21,
             marginTop: 6,

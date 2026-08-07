@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import { Keyboard, TextInput, TouchableOpacity, View } from 'react-native';
-import { useTheme } from '@react-navigation/native';
+import { useTheme } from '../../theme';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
   faBolt,
@@ -16,7 +16,6 @@ import {
   GlobalConst,
   TranslateType,
 } from '../../AppState';
-import { ThemeType } from '../../types';
 import Button from '../../../components/Components/Button';
 import FadeText from '../../../components/Components/FadeText';
 import ChainTypeToggle from '../../../components/Components/ChainTypeToggle';
@@ -50,7 +49,7 @@ const CustomServer: React.FunctionComponent<CustomServerProps> = ({
   closeSheet,
   translate,
 }) => {
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
 
   // The three mutually-exclusive modes. "Custom" is the fallback when neither
   // Offline nor Automatic is active — it reveals the URI + chain inputs.
@@ -64,7 +63,7 @@ const CustomServer: React.FunctionComponent<CustomServerProps> = ({
       label: translate('settings.server-offline') as string,
       icon: faWifi,
       selected: customServerOffline,
-      iconColor: customServerOffline ? 'red' : colors.zingo,
+      iconColor: customServerOffline ? 'red' : colors.fgMuted,
       disabled: isRegtest,
       onPress: () => onPressServerOffline(true),
     },
@@ -73,7 +72,7 @@ const CustomServer: React.FunctionComponent<CustomServerProps> = ({
       label: translate('settings.server-auto') as string,
       icon: faBolt,
       selected: customServerAuto,
-      iconColor: customServerAuto ? colors.primary : colors.zingo,
+      iconColor: customServerAuto ? colors.fgAccent : colors.fgMuted,
       disabled: isRegtest,
       onPress: () => onPressServerAuto(true),
     },
@@ -82,7 +81,7 @@ const CustomServer: React.FunctionComponent<CustomServerProps> = ({
       label: translate('settings.server-custom') as string,
       icon: faServer,
       selected: isCustom,
-      iconColor: isCustom ? colors.primary : colors.zingo,
+      iconColor: isCustom ? colors.fgAccent : colors.fgMuted,
       disabled: false,
       onPress: () => {
         onPressServerOffline(false);
@@ -96,7 +95,7 @@ const CustomServer: React.FunctionComponent<CustomServerProps> = ({
       style={{
         display: 'flex',
         flexDirection: 'column',
-        backgroundColor: colors.bottomSheetBackground,
+        backgroundColor: colors.bgSurface,
         paddingHorizontal: 16,
         paddingTop: 12,
       }}
@@ -123,7 +122,7 @@ const CustomServer: React.FunctionComponent<CustomServerProps> = ({
                 alignItems: 'center',
                 paddingHorizontal: 10,
                 paddingVertical: 5,
-                borderColor: m.selected ? colors.primary : colors.zingo,
+                borderColor: m.selected ? colors.borderAccent : colors.borderMuted,
                 borderWidth: m.selected ? 2 : 1,
                 borderRadius: 10,
                 opacity: m.disabled ? 0.4 : 1,
@@ -139,7 +138,7 @@ const CustomServer: React.FunctionComponent<CustomServerProps> = ({
       {isCustom && (
         <View
           style={{
-            borderColor: colors.border,
+            borderColor: colors.borderMuted,
             borderWidth: 1,
             borderRadius: 12,
             marginHorizontal: 5,
@@ -151,9 +150,9 @@ const CustomServer: React.FunctionComponent<CustomServerProps> = ({
         >
           <TextInput
             placeholder={GlobalConst.serverPlaceHolder}
-            placeholderTextColor={colors.placeholder}
+            placeholderTextColor={colors.fgMuted}
             style={{
-              color: colors.text,
+              color: colors.fgDefault,
               fontWeight: '600',
               fontSize: 18,
               flex: 1,
@@ -177,7 +176,7 @@ const CustomServer: React.FunctionComponent<CustomServerProps> = ({
                 style={{ marginRight: 10 }}
                 size={20}
                 icon={faXmark}
-                color={colors.primaryDisabled}
+                color={colors.fgAccentDisabled}
               />
             </TouchableOpacity>
           )}

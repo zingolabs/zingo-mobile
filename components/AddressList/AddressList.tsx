@@ -17,7 +17,8 @@ import {
   TouchableOpacity,
 } from 'react-native';
 
-import { useTheme, useScrollToTop } from '@react-navigation/native';
+import { useScrollToTop } from '@react-navigation/native';
+import { useTheme } from '../../app/theme';
 import {
   AddressKindEnum,
   ButtonTypeEnum,
@@ -26,7 +27,7 @@ import {
   TransparentAddressClass,
   UnifiedAddressClass,
 } from '../../app/AppState';
-import { AppDrawerParamList, ThemeType } from '../../app/types';
+import { AppDrawerParamList } from '../../app/types';
 import FadeText from '../Components/FadeText';
 import BoldText from '../Components/BoldText';
 import Button from '../Components/Button';
@@ -55,7 +56,7 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
       : () => {};
   const context = useContext(ContextAppLoaded);
   const { translate, addresses } = context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
   const screenName = ScreenEnum.AddressList;
 
   const [numAl, setNumAl] = useState<number>(50);
@@ -107,7 +108,7 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
           paddingTop: 12,
           paddingBottom: 8,
           paddingHorizontal: 16,
-          backgroundColor: colors.bottomSheetBackground,
+          backgroundColor: colors.bgSurface,
           borderTopLeftRadius: 40,
           borderTopRightRadius: 40,
           borderTopWidth: 1,
@@ -133,7 +134,7 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
             <FontAwesomeIcon
               icon={faChevronLeft}
               size={20}
-              color={colors.primary}
+              color={colors.fgAccent}
             />
           </TouchableOpacity>
           <BoldText
@@ -245,7 +246,7 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
     <View
       style={{
         flex: 1,
-        backgroundColor: colors.background,
+        backgroundColor: colors.bgCanvas,
       }}
       onLayout={e => setContainerH(e.nativeEvent.layout.height)}
     >
@@ -271,7 +272,7 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
         keyboardBlurBehavior={'restore'}
         android_keyboardInputMode={'adjustResize'}
         backgroundStyle={{
-          backgroundColor: colors.bottomSheetBackground,
+          backgroundColor: colors.bgSurface,
           borderTopLeftRadius: 40,
           borderTopRightRadius: 40,
         }}
@@ -287,7 +288,7 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
           alwaysBounceVertical={false}
           style={{
             flex: 1,
-            backgroundColor: colors.bottomSheetBackground,
+            backgroundColor: colors.bgSurface,
           }}
           contentContainerStyle={{
             flexDirection: 'column',
@@ -305,7 +306,7 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
                 marginTop: 30,
               }}
             >
-              <FadeText style={{ color: colors.primary }}>
+              <FadeText style={{ color: colors.fgAccent }}>
                 {translate('addressbook.empty') as string}
               </FadeText>
             </View>
@@ -314,7 +315,7 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
             <ActivityIndicator
               style={{ marginTop: 7, marginRight: 7 }}
               size={20}
-              color={colors.primaryDisabled}
+              color={colors.fgAccentDisabled}
             />
           ) : (
             <>
@@ -367,7 +368,7 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
                     marginBottom: 30,
                   }}
                 >
-                  <FadeText style={{ color: colors.primary }}>
+                  <FadeText style={{ color: colors.fgAccent }}>
                     {translate('addressbook.end') as string}
                   </FadeText>
                 </View>
@@ -386,11 +387,11 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
             right: 10,
             paddingHorizontal: 5,
             paddingVertical: 10,
-            backgroundColor: colors.sideMenuBackground,
+            backgroundColor: colors.bgChrome,
             borderRadius: 50,
             transform: [{ scale: pressed ? 0.9 : 1 }],
             borderWidth: 1,
-            borderColor: colors.zingo,
+            borderColor: colors.borderMuted,
             opacity: isScrollingToTop ? 0.5 : 1,
           })}
         >
@@ -398,7 +399,7 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
             style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
             size={16}
             icon={faAngleUp}
-            color={colors.zingo}
+            color={colors.fgMuted}
           />
         </Pressable>
       )}

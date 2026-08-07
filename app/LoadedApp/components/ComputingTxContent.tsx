@@ -15,12 +15,8 @@ import Animated, {
   withSequence,
   withTiming,
 } from 'react-native-reanimated';
-import {
-  NavigationProp,
-  ParamListBase,
-  useNavigation,
-  useTheme,
-} from '@react-navigation/native';
+import { NavigationProp, ParamListBase, useNavigation } from '@react-navigation/native';
+import { useTheme } from '../../theme';
 import BottomSheet, {
   BottomSheetFooter,
   BottomSheetFooterProps,
@@ -37,7 +33,7 @@ const RING_RED = '#822929';
 import RegText from '../../../components/Components/RegText';
 import BoldText from '../../../components/Components/BoldText';
 import Button from '../../../components/Components/Button';
-import { AppDrawerParamList, ThemeType } from '../../types';
+import { AppDrawerParamList } from '../../types';
 import { ContextAppLoaded } from '../../context';
 import Header from '../../../components/Header';
 import { ButtonTypeEnum, RouteEnum, ScreenEnum } from '../../AppState';
@@ -120,7 +116,7 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const context = useContext(ContextAppLoaded);
   const { translate } = context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
   const screenName = ScreenEnum.ComputingTxContext;
 
   const [containerH, setContainerH] = useState<number>(0);
@@ -160,7 +156,7 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
           paddingTop: 12,
           paddingBottom: 8,
           paddingHorizontal: 16,
-          backgroundColor: colors.bottomSheetBackground,
+          backgroundColor: colors.bgSurface,
           borderTopLeftRadius: 40,
           borderTopRightRadius: 40,
           borderTopWidth: 1,
@@ -184,7 +180,7 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
       <BottomSheetFooter {...props} bottomInset={0}>
         <View
           style={{
-            backgroundColor: colors.bottomSheetBackground,
+            backgroundColor: colors.bgSurface,
             paddingTop: 10,
             paddingBottom: 24,
             minHeight: 82,
@@ -210,7 +206,7 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
     <View
       style={{
         flex: 1,
-        backgroundColor: colors.background,
+        backgroundColor: colors.bgCanvas,
       }}
       onLayout={e => setContainerH(e.nativeEvent.layout.height)}
     >
@@ -236,7 +232,7 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
         keyboardBlurBehavior={'restore'}
         android_keyboardInputMode={'adjustResize'}
         backgroundStyle={{
-          backgroundColor: colors.bottomSheetBackground,
+          backgroundColor: colors.bgSurface,
           borderTopLeftRadius: 40,
           borderTopRightRadius: 40,
         }}
@@ -246,7 +242,7 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
         <BottomSheetView
           style={{
             flex: 1,
-            backgroundColor: colors.bottomSheetBackground,
+            backgroundColor: colors.bgSurface,
             paddingHorizontal: 24,
             // Footer floats absolutely on top of the sheet (it doesn't
             // shrink the BottomSheetView), so we mirror its height on top
@@ -285,7 +281,7 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
               // visible footprint up to ~100px to match the terminal ring.
               <ActivityIndicator
                 size="large"
-                color={colors.primary}
+                color={colors.fgAccent}
                 style={{ transform: [{ scale: 2.8 }] }}
               />
             )}
@@ -311,7 +307,7 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
             style={{
               marginTop: 12,
               textAlign: 'center',
-              color: colors.placeholder,
+              color: colors.fgMuted,
             }}
           >
             {
@@ -334,9 +330,9 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
                 gap: 12,
               }}
             >
-              <TypingDot delay={0} color={colors.placeholder} />
-              <TypingDot delay={DOT_OFFSET_MS} color={colors.placeholder} />
-              <TypingDot delay={DOT_OFFSET_MS * 2} color={colors.placeholder} />
+              <TypingDot delay={0} color={colors.bgMuted} />
+              <TypingDot delay={DOT_OFFSET_MS} color={colors.bgMuted} />
+              <TypingDot delay={DOT_OFFSET_MS * 2} color={colors.bgMuted} />
             </View>
           )}
           {isFailed && !!errorMessage && (
@@ -359,7 +355,7 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
                   style={{
                     marginTop: 10,
                     textAlign: 'center',
-                    color: colors.placeholder,
+                    color: colors.fgMuted,
                     fontSize: 12,
                   }}
                 >

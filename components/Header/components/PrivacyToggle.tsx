@@ -1,11 +1,10 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import { TouchableOpacity, View } from 'react-native';
-import { useTheme } from '@react-navigation/native';
+import { useTheme } from '../../../app/theme';
 import { faLock, faLockOpen } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { SnackbarDurationEnum, TranslateType } from '../../../app/AppState';
-import { ThemeType } from '../../../app/types';
 
 type PrivacyToggleProps = {
   privacy: boolean;
@@ -16,7 +15,7 @@ type PrivacyToggleProps = {
 
 const PrivacyToggle: React.FC<PrivacyToggleProps> = React.memo(
   ({ privacy, setPrivacyOption, addLastSnackbar, translate }) => {
-    const { colors } = useTheme() as ThemeType;
+    const { colors } = useTheme();
 
     return (
       <TouchableOpacity
@@ -45,19 +44,19 @@ const PrivacyToggle: React.FC<PrivacyToggleProps> = React.memo(
               flexDirection: 'row',
               alignItems: 'center',
               justifyContent: 'center',
-              backgroundColor: colors.card,
+              backgroundColor: colors.bgCanvas,
               padding: 0,
               minWidth: 25,
               minHeight: 25,
             }}
           >
             {privacy ? (
-              <FontAwesomeIcon icon={faLock} size={20} color={colors.primary} />
+              <FontAwesomeIcon icon={faLock} size={20} color={colors.fgAccent} />
             ) : (
               <FontAwesomeIcon
                 icon={faLockOpen}
                 size={20}
-                color={colors.primaryDisabled}
+                color={colors.fgAccentDisabled}
               />
             )}
           </View>

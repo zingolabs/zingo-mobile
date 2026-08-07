@@ -8,7 +8,7 @@ import React, {
 } from 'react';
 import { Text, View, ActivityIndicator, Image, Pressable } from 'react-native';
 import { showConfirm } from '../../showConfirm';
-import { useTheme } from '@react-navigation/native';
+import { useTheme } from '../../theme';
 
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faEllipsisV } from '@fortawesome/free-solid-svg-icons';
@@ -23,7 +23,6 @@ import ActionMenuBottomSheet, {
   ActionMenuBottomSheetAction,
 } from '../../../components/Components/ActionMenuBottomSheet';
 
-import { ThemeType } from '../../types';
 import { ButtonTypeEnum, ModeEnum, SelectServerEnum } from '../../AppState';
 import Button from '../../../components/Components/Button';
 import { ContextAppLoading } from '../../context';
@@ -64,7 +63,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
 }) => {
   const context = useContext(ContextAppLoading);
   const { netInfo, mode, translate, server, selectServer } = context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
 
   const [containerH, setContainerH] = useState<number>(0);
   const [headerH, setHeaderH] = useState<number>(0);
@@ -140,7 +139,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
           paddingTop: 12,
           paddingBottom: 8,
           paddingHorizontal: 16,
-          backgroundColor: colors.bottomSheetBackground,
+          backgroundColor: colors.bgSurface,
           borderTopLeftRadius: 40,
           borderTopRightRadius: 40,
           borderTopWidth: 1,
@@ -194,14 +193,14 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
     <View
       style={{
         flex: 1,
-        backgroundColor: colors.background,
+        backgroundColor: colors.bgCanvas,
       }}
       onLayout={e => setContainerH(e.nativeEvent.layout.height)}
     >
       <View onLayout={e => setHeaderH(e.nativeEvent.layout.height)}>
         <View
           style={{
-            backgroundColor: colors.card,
+            backgroundColor: colors.bgCanvas,
             padding: 10,
             position: 'absolute',
             top: 0,
@@ -226,11 +225,11 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
           }}
         >
           <Text
-            style={{ color: colors.zingo, fontSize: 40, fontWeight: 'bold' }}
+            style={{ color: colors.fgMuted, fontSize: 40, fontWeight: 'bold' }}
           >
             {getZingoName()}
           </Text>
-          <Text style={{ color: colors.zingo, fontSize: 15 }}>
+          <Text style={{ color: colors.fgMuted, fontSize: 15 }}>
             {getZingoVersion()}
           </Text>
           <Image
@@ -256,7 +255,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
         keyboardBlurBehavior={'restore'}
         android_keyboardInputMode={'adjustResize'}
         backgroundStyle={{
-          backgroundColor: colors.bottomSheetBackground,
+          backgroundColor: colors.bgSurface,
           borderTopLeftRadius: 40,
           borderTopRightRadius: 40,
         }}
@@ -268,7 +267,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
           alwaysBounceVertical={false}
           style={{
             flex: 1,
-            backgroundColor: colors.bottomSheetBackground,
+            backgroundColor: colors.bgSurface,
           }}
           contentContainerStyle={{
             flexDirection: 'column',
@@ -378,14 +377,14 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
                     display: 'flex',
                     flexDirection: 'column',
                     marginTop: 10,
-                    borderColor: colors.primary,
+                    borderColor: colors.borderAccent,
                     borderWidth: 1,
                     borderRadius: 5,
                     padding: 5,
                   }}
                 >
                   <BoldText
-                    style={{ fontSize: 15, color: colors.primaryDisabled }}
+                    style={{ fontSize: 15, color: colors.fgAccentDisabled }}
                   >
                     {translate('loadingapp.noopenwallet-message') as string}
                   </BoldText>
@@ -478,14 +477,14 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
                   display: 'flex',
                   flexDirection: 'column',
                   marginTop: 20,
-                  borderColor: colors.primary,
+                  borderColor: colors.borderAccent,
                   borderWidth: 1,
                   borderRadius: 5,
                   padding: 5,
                 }}
               >
                 <BoldText
-                  style={{ fontSize: 15, color: colors.primaryDisabled }}
+                  style={{ fontSize: 15, color: colors.fgAccentDisabled }}
                 >
                   {translate('loadingapp.nointernet-message') as string}
                 </BoldText>
@@ -507,14 +506,14 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
                   display: 'flex',
                   flexDirection: 'column',
                   marginTop: 20,
-                  borderColor: colors.primary,
+                  borderColor: colors.borderAccent,
                   borderWidth: 1,
                   borderRadius: 5,
                   padding: 5,
                 }}
               >
                 <BoldText
-                  style={{ fontSize: 15, color: colors.primaryDisabled }}
+                  style={{ fontSize: 15, color: colors.fgAccentDisabled }}
                 >
                   {translate('loadingapp.offline-message') as string}
                 </BoldText>
@@ -525,7 +524,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
           {actionButtonsDisabled && (
             <ActivityIndicator
               size="large"
-              color={colors.primary}
+              color={colors.fgAccent}
               style={{ marginVertical: 20 }}
             />
           )}

@@ -11,12 +11,8 @@ import { showConfirm } from '../../../app/showConfirm';
 
 import Clipboard from '@react-native-clipboard/clipboard';
 
-import {
-  NavigationProp,
-  ParamListBase,
-  useNavigation,
-  useTheme,
-} from '@react-navigation/native';
+import { NavigationProp, ParamListBase, useNavigation } from '@react-navigation/native';
+import { useTheme } from '../../../app/theme';
 
 import {
   AddressBookFileClass,
@@ -38,7 +34,7 @@ import Utils from '../../../app/utils';
 import RegText from '../../Components/RegText';
 import ZecAmount from '../../Components/ZecAmount';
 import FadeText from '../../Components/FadeText';
-import { AppDrawerParamList, ThemeType } from '../../../app/types';
+import { AppDrawerParamList } from '../../../app/types';
 import { ContextAppLoaded } from '../../../app/context';
 import Header from '../../Header';
 import BoldText from '../../Components/BoldText';
@@ -89,7 +85,7 @@ const ValueTransferDetail: React.FunctionComponent<
     setPrivacyOption,
     blockExplorer,
   } = context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
   const screenName = ScreenEnum.ValueTransferDetail;
 
   const [valueTransfer, setValueTransfer] = useState<ValueTransferType>(
@@ -112,7 +108,7 @@ const ValueTransferDetail: React.FunctionComponent<
       ? route.params.totalLength
       : 0,
   );
-  const [spendColor, setSpendColor] = useState<string>(colors.primaryDisabled);
+  const [spendColor, setSpendColor] = useState<string>(colors.fgAccentDisabled);
   const [expandTxid, setExpandTxid] = useState<boolean>(false);
   const [showNavigator, setShowNavigator] = useState<boolean>(true);
   const [addressProtected, setAddressProtected] = useState<boolean>(true);
@@ -139,7 +135,7 @@ const ValueTransferDetail: React.FunctionComponent<
           paddingTop: 12,
           paddingBottom: 8,
           paddingHorizontal: 16,
-          backgroundColor: colors.bottomSheetBackground,
+          backgroundColor: colors.bgSurface,
           borderTopLeftRadius: 40,
           borderTopRightRadius: 40,
           borderTopWidth: 1,
@@ -165,7 +161,7 @@ const ValueTransferDetail: React.FunctionComponent<
             <FontAwesomeIcon
               icon={faChevronLeft}
               size={20}
-              color={colors.primary}
+              color={colors.fgAccent}
             />
           </TouchableOpacity>
           <BoldText
@@ -221,20 +217,20 @@ const ValueTransferDetail: React.FunctionComponent<
   useEffect(() => {
     const spendCo =
       valueTransfer.status === RPCValueTransfersStatusEnum.failed
-        ? colors.zingo
+        ? colors.fgMuted
         : valueTransfer.confirmations >= 0 &&
             valueTransfer.confirmations < GlobalConst.minConfirmations
-          ? colors.primaryDisabled
+          ? colors.fgAccentDisabled
           : valueTransfer.kind === ValueTransferKindEnum.Received ||
               valueTransfer.kind === ValueTransferKindEnum.Shield
-            ? colors.primary
-            : colors.text;
+            ? colors.fgAccent
+            : colors.fgDefault;
     setSpendColor(spendCo);
   }, [
-    colors.primary,
-    colors.primaryDisabled,
-    colors.text,
-    colors.zingo,
+    colors.fgAccent,
+    colors.fgAccentDisabled,
+    colors.fgDefault,
+    colors.fgMuted,
     valueTransfer.confirmations,
     valueTransfer.kind,
     valueTransfer.status,
@@ -383,7 +379,7 @@ const ValueTransferDetail: React.FunctionComponent<
     <View
       style={{
         flex: 1,
-        backgroundColor: colors.background,
+        backgroundColor: colors.bgCanvas,
       }}
       onLayout={e => setContainerH(e.nativeEvent.layout.height)}
     >
@@ -410,7 +406,7 @@ const ValueTransferDetail: React.FunctionComponent<
         keyboardBlurBehavior={'restore'}
         android_keyboardInputMode={'adjustResize'}
         backgroundStyle={{
-          backgroundColor: colors.bottomSheetBackground,
+          backgroundColor: colors.bgSurface,
           borderTopLeftRadius: 40,
           borderTopRightRadius: 40,
         }}
@@ -424,7 +420,7 @@ const ValueTransferDetail: React.FunctionComponent<
               alignItems: 'center',
               marginRight: 30,
               marginTop: 5,
-              backgroundColor: colors.bottomSheetBackground,
+              backgroundColor: colors.bgSurface,
             }}
           >
             <TouchableOpacity
@@ -436,8 +432,8 @@ const ValueTransferDetail: React.FunctionComponent<
                 icon={faChevronUp}
                 color={
                   valueTransferIndex === 0
-                    ? colors.primaryDisabled
-                    : colors.primary
+                    ? colors.fgAccentDisabled
+                    : colors.fgAccent
                 }
                 size={24}
               />
@@ -452,8 +448,8 @@ const ValueTransferDetail: React.FunctionComponent<
                 icon={faChevronDown}
                 color={
                   valueTransferIndex === valueTransfersSliced.length - 1
-                    ? colors.primaryDisabled
-                    : colors.primary
+                    ? colors.fgAccentDisabled
+                    : colors.fgAccent
                 }
                 size={24}
               />
@@ -468,7 +464,7 @@ const ValueTransferDetail: React.FunctionComponent<
           alwaysBounceVertical={false}
           style={{
             flex: 1,
-            backgroundColor: colors.bottomSheetBackground,
+            backgroundColor: colors.bgSurface,
           }}
           contentContainerStyle={{
             flexDirection: 'column',
@@ -488,7 +484,7 @@ const ValueTransferDetail: React.FunctionComponent<
               borderColor:
                 valueTransfer.status === RPCValueTransfersStatusEnum.failed
                   ? 'coral'
-                  : colors.border,
+                  : colors.borderMuted,
             }}
           >
             <BoldText
@@ -649,7 +645,7 @@ const ValueTransferDetail: React.FunctionComponent<
                   <FontAwesomeIcon
                     style={{ marginRight: 5 }}
                     icon={faTriangleExclamation}
-                    color={colors.syncing}
+                    color={colors.fgSyncing}
                     size={12}
                   />
                 )}
@@ -671,8 +667,8 @@ const ValueTransferDetail: React.FunctionComponent<
                                 RPCValueTransfersStatusEnum.transmitted ||
                               valueTransfer.status ===
                                 RPCValueTransfersStatusEnum.calculated
-                            ? colors.primary
-                            : colors.primaryDisabled,
+                            ? colors.fgAccent
+                            : colors.fgAccentDisabled,
                       fontSize: 12,
                       opacity: 1,
                       fontWeight: '700',
@@ -704,7 +700,7 @@ const ValueTransferDetail: React.FunctionComponent<
                     GlobalConst.minConfirmations && (
                     <FadeText
                       style={{
-                        color: colors.primaryDisabled,
+                        color: colors.fgAccentDisabled,
                         fontSize: 12,
                         opacity: 1,
                         fontWeight: '700',
@@ -843,7 +839,7 @@ const ValueTransferDetail: React.FunctionComponent<
                         >
                           <Text
                             style={{
-                              color: colors.text,
+                              color: colors.fgDefault,
                               textDecorationLine: 'underline',
                               margin: 15,
                             }}
@@ -1024,7 +1020,7 @@ const ValueTransferDetail: React.FunctionComponent<
                     )}
                     {!contactFound(memoUA) && thisWalletAddress(memoUA) && (
                       <View style={{ flexDirection: 'row' }}>
-                        <RegText color={colors.primaryDisabled}>
+                        <RegText color={colors.fgAccentDisabled}>
                           {translate('addressbook.thiswalletaddress') as string}
                         </RegText>
                       </View>

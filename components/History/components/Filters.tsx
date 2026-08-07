@@ -1,10 +1,9 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState } from 'react';
 import { View, TouchableOpacity, ScrollView } from 'react-native';
-import { useTheme } from '@react-navigation/native';
+import { useTheme } from '../../../app/theme';
 
 import { ButtonTypeEnum, FilterEnum } from '../../../app/AppState';
-import { ThemeType } from '../../../app/types';
 import { ContextAppLoaded } from '../../../app/context';
 import Button from '../../Components/Button';
 import FadeText from '../../Components/FadeText';
@@ -33,7 +32,7 @@ const Filters: React.FunctionComponent<FiltersProps> = ({
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate } = context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
 
   const [filterWithFundsLocal, setFilterWithFundsLocal] =
     useState<boolean>(filterWithFunds);
@@ -57,7 +56,7 @@ const Filters: React.FunctionComponent<FiltersProps> = ({
   return (
     <View
       style={{
-        backgroundColor: colors.bottomSheetBackground,
+        backgroundColor: colors.bgSurface,
       }}
     >
       <View style={{ display: 'flex', flexDirection: 'column', margin: 10 }}>
@@ -90,13 +89,13 @@ const Filters: React.FunctionComponent<FiltersProps> = ({
                 style={{
                   backgroundColor:
                     filterKindLocal === FilterEnum.sent
-                      ? colors.primary
-                      : colors.sideMenuBackground,
+                      ? colors.bgAccent
+                      : colors.bgChrome,
                   borderRadius: 15,
                   borderColor:
                     filterKindLocal === FilterEnum.sent
-                      ? colors.primary
-                      : colors.zingo,
+                      ? colors.borderAccent
+                      : colors.borderMuted,
                   borderWidth: 1,
                   paddingHorizontal: 10,
                   paddingVertical: 5,
@@ -107,8 +106,8 @@ const Filters: React.FunctionComponent<FiltersProps> = ({
                   style={{
                     color:
                       filterKindLocal === FilterEnum.sent
-                        ? colors.sideMenuBackground
-                        : colors.zingo,
+                        ? colors.bgChrome
+                        : colors.fgMuted,
                     fontWeight: 'bold',
                   }}
                 >
@@ -129,13 +128,13 @@ const Filters: React.FunctionComponent<FiltersProps> = ({
                 style={{
                   backgroundColor:
                     filterKindLocal === FilterEnum.received
-                      ? colors.primary
-                      : colors.sideMenuBackground,
+                      ? colors.bgAccent
+                      : colors.bgChrome,
                   borderRadius: 15,
                   borderColor:
                     filterKindLocal === FilterEnum.received
-                      ? colors.primary
-                      : colors.zingo,
+                      ? colors.borderAccent
+                      : colors.borderMuted,
                   borderWidth: 1,
                   paddingHorizontal: 10,
                   paddingVertical: 5,
@@ -146,8 +145,8 @@ const Filters: React.FunctionComponent<FiltersProps> = ({
                   style={{
                     color:
                       filterKindLocal === FilterEnum.received
-                        ? colors.sideMenuBackground
-                        : colors.zingo,
+                        ? colors.bgChrome
+                        : colors.fgMuted,
                     fontWeight: 'bold',
                   }}
                 >
@@ -168,13 +167,13 @@ const Filters: React.FunctionComponent<FiltersProps> = ({
                 style={{
                   backgroundColor:
                     filterKindLocal === FilterEnum.shielded
-                      ? colors.primary
-                      : colors.sideMenuBackground,
+                      ? colors.bgAccent
+                      : colors.bgChrome,
                   borderRadius: 15,
                   borderColor:
                     filterKindLocal === FilterEnum.shielded
-                      ? colors.primary
-                      : colors.zingo,
+                      ? colors.borderAccent
+                      : colors.borderMuted,
                   borderWidth: 1,
                   paddingHorizontal: 10,
                   paddingVertical: 5,
@@ -185,8 +184,8 @@ const Filters: React.FunctionComponent<FiltersProps> = ({
                   style={{
                     color:
                       filterKindLocal === FilterEnum.shielded
-                        ? colors.sideMenuBackground
-                        : colors.zingo,
+                        ? colors.bgChrome
+                        : colors.fgMuted,
                     fontWeight: 'bold',
                   }}
                 >
@@ -202,12 +201,12 @@ const Filters: React.FunctionComponent<FiltersProps> = ({
               <View
                 style={{
                   backgroundColor: filterFailedLocal
-                    ? colors.primary
-                    : colors.sideMenuBackground,
+                    ? colors.bgAccent
+                    : colors.bgChrome,
                   borderRadius: 15,
                   borderColor: filterFailedLocal
-                    ? colors.primary
-                    : colors.zingo,
+                    ? colors.borderAccent
+                    : colors.borderMuted,
                   borderWidth: 1,
                   paddingHorizontal: 10,
                   paddingVertical: 5,
@@ -217,8 +216,8 @@ const Filters: React.FunctionComponent<FiltersProps> = ({
                 <FadeText
                   style={{
                     color: filterFailedLocal
-                      ? colors.sideMenuBackground
-                      : colors.zingo,
+                      ? colors.bgChrome
+                      : colors.fgMuted,
                     fontWeight: 'bold',
                   }}
                 >
@@ -234,10 +233,10 @@ const Filters: React.FunctionComponent<FiltersProps> = ({
               <View
                 style={{
                   backgroundColor: filterMemosLocal
-                    ? colors.primary
-                    : colors.sideMenuBackground,
+                    ? colors.bgAccent
+                    : colors.bgChrome,
                   borderRadius: 15,
-                  borderColor: filterMemosLocal ? colors.primary : colors.zingo,
+                  borderColor: filterMemosLocal ? colors.borderAccent : colors.borderMuted,
                   borderWidth: 1,
                   paddingHorizontal: 10,
                   paddingVertical: 5,
@@ -247,8 +246,8 @@ const Filters: React.FunctionComponent<FiltersProps> = ({
                 <FadeText
                   style={{
                     color: filterMemosLocal
-                      ? colors.sideMenuBackground
-                      : colors.zingo,
+                      ? colors.bgChrome
+                      : colors.fgMuted,
                     fontWeight: 'bold',
                   }}
                 >
@@ -264,12 +263,12 @@ const Filters: React.FunctionComponent<FiltersProps> = ({
               <View
                 style={{
                   backgroundColor: filterWithFundsLocal
-                    ? colors.primary
-                    : colors.sideMenuBackground,
+                    ? colors.bgAccent
+                    : colors.bgChrome,
                   borderRadius: 15,
                   borderColor: filterWithFundsLocal
-                    ? colors.primary
-                    : colors.zingo,
+                    ? colors.borderAccent
+                    : colors.borderMuted,
                   borderWidth: 1,
                   paddingHorizontal: 10,
                   paddingVertical: 5,
@@ -278,8 +277,8 @@ const Filters: React.FunctionComponent<FiltersProps> = ({
                 <FadeText
                   style={{
                     color: filterWithFundsLocal
-                      ? colors.sideMenuBackground
-                      : colors.zingo,
+                      ? colors.bgChrome
+                      : colors.fgMuted,
                     fontWeight: 'bold',
                   }}
                 >

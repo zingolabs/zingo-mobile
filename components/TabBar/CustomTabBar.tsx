@@ -5,13 +5,13 @@ import {
   BottomTabBarHeightCallbackContext,
   BottomTabBarProps,
 } from '@react-navigation/bottom-tabs';
-import { TabActions, useTheme } from '@react-navigation/native';
+import { TabActions } from '@react-navigation/native';
+import { useTheme, advancedTokens } from '../../app/theme';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faRefresh } from '@fortawesome/free-solid-svg-icons';
 import { ModeEnum, RouteEnum } from '../../app/AppState';
 import { ContextAppLoaded } from '../../app/context';
 import TotalBalanceClass from '../../app/AppState/classes/TotalBalanceClass';
-import { ThemeType } from '../../app/types';
 import { HouseFilledIcon } from '../Components/Icons/HouseFilledIcon';
 import { HouseOutlineIcon } from '../Components/Icons/HouseOutlineIcon';
 import { SendFilledIcon } from '../Components/Icons/SendFilledIcon';
@@ -24,7 +24,9 @@ const SEND_SIZE = 25;
 const BUBBLE_V_MARGIN = 4;
 const TAB_H_PADDING = 30;
 const TAB_V_PADDING = 10;
-const PILL_BG = '#040C17';
+// bgChrome is mode-independent, so a module-level read is safe for the
+// StyleSheet below
+const PILL_BG = advancedTokens.bgChrome;
 const PILL_BORDER = '#071A35';
 
 function renderNavIcon(
@@ -82,7 +84,7 @@ const CustomTabBar = ({
   // The active-tab bubble used to be hardcoded to the advanced-theme green
   // (#149D05), so basic mode showed an off-palette green. Pull from the
   // active theme's primary so it follows the mode switch.
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
 
   const bubbleAnimsRef = useRef<Record<string, Animated.Value> | null>(null);
   if (!bubbleAnimsRef.current) {
@@ -200,7 +202,7 @@ const CustomTabBar = ({
                 <Animated.View
                   style={[
                     styles.bubble,
-                    { backgroundColor: colors.primary },
+                    { backgroundColor: colors.bgAccent },
                     { transform: [{ scale: bubbleAnims[route.key] }] },
                   ]}
                 />

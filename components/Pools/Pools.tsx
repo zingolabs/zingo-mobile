@@ -2,12 +2,12 @@
 import React, { useCallback, useContext, useRef, useState } from 'react';
 import { View, ActivityIndicator, TouchableOpacity } from 'react-native';
 
-import { useTheme } from '@react-navigation/native';
+import { useTheme } from '../../app/theme';
 
 import ZecAmount from '../Components/ZecAmount';
 import BoldText from '../Components/BoldText';
 import DetailLine from '../Components/DetailLine';
-import { AppDrawerParamList, ThemeType } from '../../app/types';
+import { AppDrawerParamList } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -36,7 +36,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
     transparentPool,
     setPrivacyOption,
   } = context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
   const screenName = ScreenEnum.Pools;
 
   const [containerH, setContainerH] = useState<number>(0);
@@ -58,7 +58,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
           paddingTop: 12,
           paddingBottom: 8,
           paddingHorizontal: 16,
-          backgroundColor: colors.bottomSheetBackground,
+          backgroundColor: colors.bgSurface,
           borderTopLeftRadius: 40,
           borderTopRightRadius: 40,
           borderTopWidth: 1,
@@ -84,7 +84,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
             <FontAwesomeIcon
               icon={faChevronLeft}
               size={20}
-              color={colors.primary}
+              color={colors.fgAccent}
             />
           </TouchableOpacity>
           <BoldText
@@ -109,7 +109,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
     <View
       style={{
         flex: 1,
-        backgroundColor: colors.background,
+        backgroundColor: colors.bgCanvas,
       }}
       onLayout={e => setContainerH(e.nativeEvent.layout.height)}
     >
@@ -136,7 +136,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
         keyboardBlurBehavior={'restore'}
         android_keyboardInputMode={'adjustResize'}
         backgroundStyle={{
-          backgroundColor: colors.bottomSheetBackground,
+          backgroundColor: colors.bgSurface,
           borderTopLeftRadius: 40,
           borderTopRightRadius: 40,
         }}
@@ -147,7 +147,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
           alwaysBounceVertical={false}
           style={{
             flex: 1,
-            backgroundColor: colors.bottomSheetBackground,
+            backgroundColor: colors.bgSurface,
           }}
           contentContainerStyle={{
             flexDirection: 'column',
@@ -161,7 +161,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
                 {!orchardPool && !saplingPool && !transparentPool && (
                   <ActivityIndicator
                     size="large"
-                    color={colors.primary}
+                    color={colors.fgAccent}
                     style={{ marginVertical: 20 }}
                   />
                 )}
@@ -206,7 +206,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
                           totalBalance.confirmedIronwoodBalance > 0 &&
                           totalBalance.confirmedIronwoodBalance ===
                             totalBalance.totalIronwoodBalance
-                            ? colors.primary
+                            ? colors.fgAccent
                             : 'red'
                         }
                         privacy={privacy}
@@ -265,7 +265,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
                             totalBalance.confirmedOrchardBalance > 0 &&
                             totalBalance.confirmedOrchardBalance ===
                               totalBalance.totalOrchardBalance
-                              ? colors.primary
+                              ? colors.fgAccent
                               : 'red'
                           }
                           privacy={privacy}
@@ -325,7 +325,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
                             totalBalance.confirmedSaplingBalance > 0 &&
                             totalBalance.confirmedSaplingBalance ===
                               totalBalance.totalSaplingBalance
-                              ? colors.syncing
+                              ? colors.fgSyncing
                               : 'red'
                           }
                           privacy={privacy}
@@ -393,7 +393,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
                         display: 'flex',
                         flexDirection: 'row',
                         marginTop: 5,
-                        backgroundColor: colors.bottomSheetBackground,
+                        backgroundColor: colors.bgSurface,
                         padding: 5,
                         borderRadius: 10,
                       }}
@@ -401,7 +401,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
                       <FontAwesomeIcon
                         icon={faInfoCircle}
                         size={16}
-                        color={colors.primary}
+                        color={colors.fgAccent}
                         style={{ marginRight: 5 }}
                       />
                       <FadeText>{translate('pools.dust') as string}</FadeText>
@@ -414,7 +414,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
                       display: 'flex',
                       flexDirection: 'row',
                       marginTop: 5,
-                      backgroundColor: colors.bottomSheetBackground,
+                      backgroundColor: colors.bgSurface,
                       padding: 5,
                       borderRadius: 10,
                     }}
@@ -422,7 +422,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
                     <FontAwesomeIcon
                       icon={faInfoCircle}
                       size={16}
-                      color={colors.primary}
+                      color={colors.fgAccent}
                       style={{ marginRight: 5 }}
                     />
                     <FadeText>{translate('send.somefunds') as string}</FadeText>
