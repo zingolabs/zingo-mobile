@@ -1,12 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useContext, useEffect, useRef } from 'react';
 import { Animated, View, TouchableOpacity } from 'react-native';
-import {
-  NavigationProp,
-  ParamListBase,
-  useNavigation,
-  useTheme,
-} from '@react-navigation/native';
+import { NavigationProp, ParamListBase, useNavigation } from '@react-navigation/native';
+import { useTheme } from '../../../app/theme';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
   faArrowDown,
@@ -33,7 +29,6 @@ import {
   SelectServerEnum,
   ScreenEnum,
 } from '../../../app/AppState';
-import { ThemeType } from '../../../app/types';
 
 import { ContextAppLoaded } from '../../../app/context';
 import AddressItem from '../../Components/AddressItem';
@@ -79,7 +74,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
     selectServer,
     setSendPageState,
   } = context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
 
   // When RecyclerListView reuses this row for a different transfer, the
   // Swipeable's internal open/closed state stays pinned to the recycled view
@@ -100,13 +95,13 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
 
   const amountColor =
     vt.status === RPCValueTransfersStatusEnum.failed
-      ? colors.zingo
+      ? colors.fgMuted
       : vt.confirmations >= 0 && vt.confirmations < GlobalConst.minConfirmations
-        ? colors.primaryDisabled
+        ? colors.fgAccentDisabled
         : vt.kind === ValueTransferKindEnum.Received ||
             vt.kind === ValueTransferKindEnum.Shield
-          ? colors.primary
-          : colors.text;
+          ? colors.fgAccent
+          : colors.fgDefault;
 
   const icon =
     vt.confirmations >= 0 &&
@@ -142,7 +137,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
               justifyContent: 'center',
               alignItems: 'center',
               transform: [{ translateX: trans }],
-              backgroundColor: colors.sideMenuBackground,
+              backgroundColor: colors.bgChrome,
             }}
           >
             <View
@@ -163,7 +158,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                   style={{ opacity: 0.8 }}
                   size={24}
                   icon={faFileLines}
-                  color={colors.money}
+                  color={colors.fgDefault}
                 />
               </TouchableOpacity>
             </View>
@@ -196,7 +191,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                     <FontAwesomeIcon
                       size={24}
                       icon={faPaperPlane}
-                      color={colors.primary}
+                      color={colors.fgAccent}
                     />
                   </TouchableOpacity>
                 </View>
@@ -250,7 +245,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
             paddingLeft: 15,
             paddingTop: 10,
             paddingBottom: 0,
-            backgroundColor: colors.bottomSheetBackground,
+            backgroundColor: colors.bgSurface,
           }}
         >
           <FadeText>{month}</FadeText>
@@ -307,7 +302,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                   color={
                     vt.status === RPCValueTransfersStatusEnum.transmitted ||
                     vt.status === RPCValueTransfersStatusEnum.calculated
-                      ? colors.syncing
+                      ? colors.fgSyncing
                       : amountColor
                   }
                 />
@@ -350,11 +345,11 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                       fontWeight: 'bold',
                       color:
                         vt.status === RPCValueTransfersStatusEnum.failed
-                          ? colors.zingo
+                          ? colors.fgMuted
                           : vt.kind === ValueTransferKindEnum.Received ||
                               vt.kind === ValueTransferKindEnum.Shield
-                            ? colors.primary
-                            : colors.text,
+                            ? colors.fgAccent
+                            : colors.fgDefault,
                       fontSize:
                         vt.confirmations >= 0 &&
                         vt.confirmations < GlobalConst.minConfirmations
@@ -467,8 +462,8 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                         icon={faComment}
                         color={
                           vt.status === RPCValueTransfersStatusEnum.failed
-                            ? colors.zingo
-                            : colors.primaryDisabled
+                            ? colors.fgMuted
+                            : colors.fgAccentDisabled
                         }
                       />
                     )}
@@ -488,7 +483,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                 currencyName={info.currencyName}
                 color={
                   vt.status === RPCValueTransfersStatusEnum.failed
-                    ? colors.zingo
+                    ? colors.fgMuted
                     : amountColor
                 }
                 amtZec={vt.amount}
@@ -510,7 +505,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                   <FontAwesomeIcon
                     style={{ marginRight: 5 }}
                     icon={faTriangleExclamation}
-                    color={colors.syncing}
+                    color={colors.fgSyncing}
                     size={12}
                   />
                 )}
@@ -522,8 +517,8 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                         : vt.status ===
                               RPCValueTransfersStatusEnum.transmitted ||
                             vt.status === RPCValueTransfersStatusEnum.calculated
-                          ? colors.primary
-                          : colors.primaryDisabled,
+                          ? colors.fgAccent
+                          : colors.fgAccentDisabled,
                     fontSize: 12,
                     opacity: 1,
                     fontWeight: '700',

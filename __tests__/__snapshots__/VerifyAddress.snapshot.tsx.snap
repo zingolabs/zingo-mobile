@@ -28,7 +28,7 @@ exports[`VerifyAddress - snapshot VerifyAddress initial (empty, no result) 1`] =
       <View
         style={
           {
-            "borderColor": "#ffffff",
+            "borderColor": "#888888",
             "borderRadius": 12,
             "borderWidth": 1,
             "marginTop": 5,
@@ -118,7 +118,7 @@ exports[`VerifyAddress - snapshot VerifyAddress initial (empty, no result) 1`] =
               testID="send.scan-button"
             >
               <
-                color="#ffffff"
+                color="#888888"
                 icon={
                   {
                     "icon": [

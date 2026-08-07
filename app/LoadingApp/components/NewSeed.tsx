@@ -8,7 +8,7 @@ import React, {
 } from 'react';
 import { View, TouchableOpacity, Text, Platform } from 'react-native';
 
-import { useTheme } from '@react-navigation/native';
+import { useTheme } from '../../theme';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
@@ -22,7 +22,6 @@ import RegText from '../../../components/Components/RegText';
 import FadeText from '../../../components/Components/FadeText';
 import BoldText from '../../../components/Components/BoldText';
 import Button from '../../../components/Components/Button';
-import { ThemeType } from '../../types';
 import { ContextAppLoading } from '../../context';
 import WalletType from '../../AppState/types/WalletType';
 import {
@@ -62,7 +61,7 @@ const NewSeed: React.FunctionComponent<NewSeedProps> = ({
     addLastSnackbar,
     setPrivacyOption,
   } = context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
   const screenName = ScreenEnum.Seed;
 
   const clipboardTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -191,7 +190,7 @@ const NewSeed: React.FunctionComponent<NewSeedProps> = ({
           paddingTop: 12,
           paddingBottom: 8,
           paddingHorizontal: 16,
-          backgroundColor: colors.bottomSheetBackground,
+          backgroundColor: colors.bgSurface,
           borderTopLeftRadius: 40,
           borderTopRightRadius: 40,
           borderTopWidth: 1,
@@ -217,7 +216,7 @@ const NewSeed: React.FunctionComponent<NewSeedProps> = ({
             <FontAwesomeIcon
               icon={faChevronLeft}
               size={20}
-              color={colors.primary}
+              color={colors.fgAccent}
             />
           </TouchableOpacity>
           <BoldText
@@ -244,7 +243,7 @@ const NewSeed: React.FunctionComponent<NewSeedProps> = ({
       <BottomSheetFooter {...props} bottomInset={0}>
         <View
           style={{
-            backgroundColor: colors.bottomSheetBackground,
+            backgroundColor: colors.bgSurface,
             paddingTop: 10,
             paddingBottom: 24,
             flexDirection: 'row',
@@ -278,7 +277,7 @@ const NewSeed: React.FunctionComponent<NewSeedProps> = ({
     <View
       style={{
         flex: 1,
-        backgroundColor: colors.background,
+        backgroundColor: colors.bgCanvas,
       }}
       onLayout={e => setContainerH(e.nativeEvent.layout.height)}
     >
@@ -309,7 +308,7 @@ const NewSeed: React.FunctionComponent<NewSeedProps> = ({
         keyboardBlurBehavior={'restore'}
         android_keyboardInputMode={'adjustResize'}
         backgroundStyle={{
-          backgroundColor: colors.bottomSheetBackground,
+          backgroundColor: colors.bgSurface,
           borderTopLeftRadius: 40,
           borderTopRightRadius: 40,
         }}
@@ -322,7 +321,7 @@ const NewSeed: React.FunctionComponent<NewSeedProps> = ({
           alwaysBounceVertical={false}
           style={{
             flex: 1,
-            backgroundColor: colors.bottomSheetBackground,
+            backgroundColor: colors.bgSurface,
           }}
           contentContainerStyle={{
             flexDirection: 'column',
@@ -347,12 +346,12 @@ const NewSeed: React.FunctionComponent<NewSeedProps> = ({
               padding: 10,
               borderWidth: 1,
               borderRadius: 10,
-              borderColor: colors.text,
+              borderColor: colors.fgDefault,
             }}
           >
             <TouchableOpacity onPress={() => copySeedToClipboard(true)}>
               <RegText
-                color={colors.text}
+                color={colors.fgDefault}
                 style={{
                   textAlign: 'center',
                 }}
@@ -367,7 +366,7 @@ const NewSeed: React.FunctionComponent<NewSeedProps> = ({
               <TouchableOpacity onPress={() => copySeedToClipboard(false)}>
                 <Text
                   style={{
-                    color: colors.text,
+                    color: colors.fgDefault,
                     textDecorationLine: 'underline',
                     padding: 10,
                     marginTop: 0,
@@ -405,7 +404,7 @@ const NewSeed: React.FunctionComponent<NewSeedProps> = ({
                 }
               }}
             >
-              <RegText color={colors.text} style={{ textAlign: 'center' }}>
+              <RegText color={colors.fgDefault} style={{ textAlign: 'center' }}>
                 {!expandBirthday
                   ? Utils.trimToSmall(birthdayNumber, 1)
                   : birthdayNumber}

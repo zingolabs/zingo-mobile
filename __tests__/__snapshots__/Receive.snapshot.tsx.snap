@@ -436,7 +436,7 @@ exports[`Component Receive - test Receive - snapshot 1`] = `
                 <Text
                   style={
                     {
-                      "color": "#ffffff",
+                      "color": "#c3c3c3",
                       "fontSize": 20,
                       "fontWeight": "700",
                       "marginBottom": 0,

@@ -2,14 +2,9 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
 import { View, ScrollView, TouchableOpacity, Text } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
-import {
-  NavigationProp,
-  ParamListBase,
-  useNavigation,
-  useTheme,
-} from '@react-navigation/native';
+import { NavigationProp, ParamListBase, useNavigation } from '@react-navigation/native';
+import { useTheme } from '../../app/theme';
 
-import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import {
   AddressKindEnum,
@@ -53,7 +48,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const context = useContext(ContextAppLoaded);
   const { translate, privacy, addLastSnackbar, mode, addressBook } = context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
 
   const [expandQRAddress, setExpandQRAddress] = useState<boolean>(true);
   const scrollViewRef = useRef<ScrollView>(null);
@@ -121,7 +116,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                   flexDirection: 'row',
                   alignItems: 'center',
                   justifyContent: 'flex-start',
-                  backgroundColor: colors.bottomSheetBackground,
+                  backgroundColor: colors.bgSurface,
                   borderRadius: 10,
                   borderColor: colors.bottomSheetBorder,
                   borderWidth: 1,
@@ -172,7 +167,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                     }}
                   >
                     <ShieldIcon
-                      color={colors.primary}
+                      color={colors.fgAccent}
                       size={20}
                       style={{ marginRight: 10 }}
                     />
@@ -219,7 +214,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                     }}
                   >
                     <EyeIcon
-                      color={colors.warning.primaryDark}
+                      color={colors.fgWarningDark}
                       size={20}
                       style={{ marginRight: 10 }}
                     />
@@ -262,7 +257,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                 marginTop: 10,
                 marginHorizontal: 20,
                 padding: 10,
-                backgroundColor: colors.text,
+                backgroundColor: colors.fgDefault,
               }}
             >
               {ufvk ? (
@@ -272,10 +267,10 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                       value={ufvk}
                       size={200}
                       ecl="L"
-                      backgroundColor={colors.text}
+                      backgroundColor={colors.fgDefault}
                       logo={getZingoLogo()}
                       logoSize={30}
-                      logoBackgroundColor={colors.text}
+                      logoBackgroundColor={colors.fgDefault}
                       logoBorderRadius={7} /* android not soported */
                       logoMargin={3}
                     />
@@ -287,7 +282,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                         justifyContent: 'center',
                         alignItems: 'center',
                         borderWidth: 1,
-                        borderColor: colors.text,
+                        borderColor: colors.fgDefault,
                       }}
                     >
                       <TouchableOpacity
@@ -300,7 +295,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                       >
                         <Text
                           style={{
-                            color: colors.zingo,
+                            color: colors.fgMuted,
                             textDecorationLine: 'underline',
                             marginTop: 15,
                             minHeight: 48,
@@ -317,10 +312,10 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                   value={address ? address.address : ''}
                   size={200}
                   ecl="L"
-                  backgroundColor={colors.text}
+                  backgroundColor={colors.fgDefault}
                   logo={getZingoLogo()}
                   logoSize={30}
-                  logoBackgroundColor={colors.text}
+                  logoBackgroundColor={colors.fgDefault}
                   logoBorderRadius={7} /* android not soported */
                   logoMargin={3}
                 />
@@ -348,14 +343,14 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                   <View
                     style={{
                       borderRadius: 30,
-                      borderColor: colors.zingo,
+                      borderColor: colors.borderMuted,
                       paddingHorizontal: 5,
                       paddingVertical: 5,
                       marginHorizontal: 10,
                     }}
                   >
                     <CopyIcon
-                      color={colors.money}
+                      color={colors.fgDefault}
                       size={20}
                       opacity={0.9}
                       style={{ margin: 3 }}
@@ -368,7 +363,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                       <View
                         style={{
                           borderRadius: 30,
-                          borderColor: colors.zingo,
+                          borderColor: colors.borderMuted,
                           paddingHorizontal: 5,
                           paddingVertical: 5,
                           marginHorizontal: 10,
@@ -378,7 +373,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                           style={{ margin: 5, opacity: 0.9 }}
                           size={20}
                           icon={faCircleCheck}
-                          color={colors.money}
+                          color={colors.fgDefault}
                         />
                       </View>
                     </TouchableOpacity>
@@ -387,14 +382,14 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                         <View
                           style={{
                             borderRadius: 30,
-                            borderColor: colors.zingo,
+                            borderColor: colors.borderMuted,
                             paddingHorizontal: 5,
                             paddingVertical: 5,
                             marginHorizontal: 10,
                           }}
                         >
                           <ListIcon
-                            color={colors.money}
+                            color={colors.fgDefault}
                             size={20}
                             opacity={0.9}
                             style={{ margin: 3 }}
@@ -409,7 +404,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
             {ufvk && (
               <Address
                 address={ufvk}
-                style={{ color: colors.money, fontSize: 18, opacity: 0.8 }}
+                style={{ color: colors.fgDefault, fontSize: 18, opacity: 0.8 }}
                 onPress={() => show('EA')}
               />
             )}
@@ -426,7 +421,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                 {contactFromAddress() ? (
                   <Text
                     style={{
-                      color: colors.zingo,
+                      color: colors.fgMuted,
                       fontSize: 16,
                     }}
                   >
@@ -436,7 +431,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                   <TouchableOpacity onPress={() => show('NAT')}>
                     <Text
                       style={{
-                        color: colors.zingo,
+                        color: colors.fgMuted,
                         textDecorationLine: 'underline',
                         fontSize: 16,
                       }}
@@ -447,7 +442,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                 )}
                 <Address
                   address={address.address}
-                  style={{ color: colors.money, fontSize: 18, opacity: 0.8 }}
+                  style={{ color: colors.fgDefault, fontSize: 18, opacity: 0.8 }}
                   onPress={() => show('EA')}
                   testID={
                     address.addressKind === AddressKindEnum.u

@@ -1,14 +1,15 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { BackHandler, ScrollView, Text, View } from 'react-native';
-import { useFocusEffect, useTheme } from '@react-navigation/native';
+import { useFocusEffect } from '@react-navigation/native';
+import { useTheme } from '../../app/theme';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useKeepAwake } from '@sayem314/react-native-keep-awake';
 
 import BoldText from '../Components/BoldText';
 import Button from '../Components/Button';
 import ProgressBar from '../Migration/ProgressBar';
-import { AppDrawerParamList, ThemeType } from '../../app/types';
+import { AppDrawerParamList } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import { ButtonTypeEnum, RouteEnum } from '../../app/AppState';
 import Utils from '../../app/utils';
@@ -77,7 +78,7 @@ const MigrationSending: React.FunctionComponent<MigrationSendingProps> = ({
 
   const context = useContext(ContextAppLoaded);
   const { translate, addLastSnackbar, info } = context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
 
   const transactions = route.params?.transactions ?? [];
   const txCount = transactions.length;
@@ -207,23 +208,23 @@ const MigrationSending: React.FunctionComponent<MigrationSendingProps> = ({
   const statusMeta: Record<TxStatus, { key: string; color: string }> = {
     queued: {
       key: 'migrationsending.status-queued',
-      color: colors.placeholder,
+      color: colors.fgMuted,
     },
     calculating: {
       key: 'migrationsending.status-calculating',
-      color: colors.primary,
+      color: colors.fgAccent,
     },
     calculated: {
       key: 'migrationsending.status-calculated',
-      color: colors.text,
+      color: colors.fgDefault,
     },
     sending: {
       key: 'migrationsending.status-sending',
-      color: colors.primary,
+      color: colors.fgAccent,
     },
     sent: {
       key: 'migrationsending.status-sent',
-      color: colors.primary,
+      color: colors.fgAccent,
     },
   };
 
@@ -236,7 +237,7 @@ const MigrationSending: React.FunctionComponent<MigrationSendingProps> = ({
   // ----- Error -----
   if (errorMsg) {
     return (
-      <View style={{ flex: 1, backgroundColor: colors.background }}>
+      <View style={{ flex: 1, backgroundColor: colors.bgCanvas }}>
         <ScrollView
           contentContainerStyle={{ padding: 24, paddingTop: 40, flexGrow: 1 }}
         >
@@ -246,7 +247,7 @@ const MigrationSending: React.FunctionComponent<MigrationSendingProps> = ({
           >
             <Text
               style={{
-                color: colors.text,
+                color: colors.fgDefault,
                 fontSize: 17,
                 fontWeight: '700',
                 marginBottom: 10,
@@ -257,7 +258,7 @@ const MigrationSending: React.FunctionComponent<MigrationSendingProps> = ({
             </Text>
             <Text
               style={{
-                color: colors.placeholder,
+                color: colors.fgMuted,
                 fontSize: 14,
                 textAlign: 'center',
               }}
@@ -285,7 +286,7 @@ const MigrationSending: React.FunctionComponent<MigrationSendingProps> = ({
 
   // ----- Sending -----
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background }}>
+    <View style={{ flex: 1, backgroundColor: colors.bgCanvas }}>
       <ScrollView
         contentContainerStyle={{
           paddingHorizontal: 24,
@@ -296,7 +297,7 @@ const MigrationSending: React.FunctionComponent<MigrationSendingProps> = ({
         {title}
         <Text
           style={{
-            color: colors.placeholder,
+            color: colors.fgMuted,
             fontSize: 15,
             lineHeight: 22,
             marginBottom: 18,
@@ -314,10 +315,10 @@ const MigrationSending: React.FunctionComponent<MigrationSendingProps> = ({
             marginBottom: 28,
           }}
         >
-          <Text style={{ color: colors.placeholder, fontSize: 14 }}>
+          <Text style={{ color: colors.fgMuted, fontSize: 14 }}>
             {translate('migrationsending.total') as string}
           </Text>
-          <Text style={{ color: colors.text, fontSize: 16, fontWeight: '700' }}>
+          <Text style={{ color: colors.fgDefault, fontSize: 16, fontWeight: '700' }}>
             {totalTransferredStr}
           </Text>
         </View>
@@ -334,7 +335,7 @@ const MigrationSending: React.FunctionComponent<MigrationSendingProps> = ({
                 alignItems: 'center',
                 borderWidth: 1,
                 borderColor: colors.bottomSheetBorder,
-                backgroundColor: colors.bottomSheetBackground,
+                backgroundColor: colors.bgSurface,
                 borderRadius: 12,
                 paddingHorizontal: 16,
                 paddingVertical: 16,
@@ -352,7 +353,7 @@ const MigrationSending: React.FunctionComponent<MigrationSendingProps> = ({
               />
               <Text
                 style={{
-                  color: colors.text,
+                  color: colors.fgDefault,
                   fontSize: 15,
                   fontWeight: '700',
                   marginRight: 12,
@@ -364,7 +365,7 @@ const MigrationSending: React.FunctionComponent<MigrationSendingProps> = ({
                 )}
               </Text>
               <Text
-                style={{ color: colors.primary, fontSize: 14, flexShrink: 1 }}
+                style={{ color: colors.fgAccent, fontSize: 14, flexShrink: 1 }}
                 numberOfLines={1}
               >
                 {value}
@@ -390,7 +391,7 @@ const MigrationSending: React.FunctionComponent<MigrationSendingProps> = ({
         <ProgressBar progress={trickle.progress} />
         <Text
           style={{
-            color: colors.placeholder,
+            color: colors.fgMuted,
             fontSize: 13,
             marginTop: 14,
             textAlign: 'center',

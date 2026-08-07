@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { forwardRef, useCallback } from 'react';
 import { Keyboard, Pressable, View } from 'react-native';
-import { useTheme } from '@react-navigation/native';
+import { useTheme } from '../../theme';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import {
@@ -12,7 +12,6 @@ import {
 } from '@gorhom/bottom-sheet';
 
 import { ChainNameEnum, TranslateType } from '../../AppState';
-import { ThemeType } from '../../types';
 import BoldText from '../../../components/Components/BoldText';
 import CustomServer from './CustomServer';
 import { useKeyboardHeight } from '../../hooks/useKeyboardHeight';
@@ -51,7 +50,7 @@ const CustomServerModalHost = forwardRef<
     },
     ref,
   ) => {
-    const { colors } = useTheme() as ThemeType;
+    const { colors } = useTheme();
     const keyboardHeight = useKeyboardHeight();
 
     const dismiss = useCallback(() => {
@@ -79,7 +78,7 @@ const CustomServerModalHost = forwardRef<
             paddingTop: 8,
             paddingBottom: 6,
             paddingHorizontal: 16,
-            backgroundColor: colors.bottomSheetBackground,
+            backgroundColor: colors.bgSurface,
             borderTopLeftRadius: 40,
             borderTopRightRadius: 40,
             borderTopWidth: 1,
@@ -119,7 +118,7 @@ const CustomServerModalHost = forwardRef<
               hitSlop={8}
               style={{ paddingHorizontal: 14, paddingVertical: 4 }}
             >
-              <FontAwesomeIcon icon={faXmark} size={20} color={colors.zingo} />
+              <FontAwesomeIcon icon={faXmark} size={20} color={colors.fgMuted} />
             </Pressable>
           </View>
         </View>
@@ -146,7 +145,7 @@ const CustomServerModalHost = forwardRef<
         }}
         handleComponent={renderHandle}
         backgroundStyle={{
-          backgroundColor: colors.bottomSheetBackground,
+          backgroundColor: colors.bgSurface,
           borderTopLeftRadius: 40,
           borderTopRightRadius: 40,
         }}
@@ -154,7 +153,7 @@ const CustomServerModalHost = forwardRef<
       >
         <BottomSheetView
           style={{
-            backgroundColor: colors.bottomSheetBackground,
+            backgroundColor: colors.bgSurface,
             paddingBottom: keyboardHeight > 0 ? keyboardHeight + 20 : 30,
           }}
         >

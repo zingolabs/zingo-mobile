@@ -8,6 +8,8 @@ import {
 } from '../../AppState';
 import { RPCSyncStatusType } from '../types/RPCSyncStatusType';
 import { RPCPerformanceLevelEnum } from '../enums/RPCPerformanceLevelEnum';
+import { StartMixnetTransport } from '../modules/MixnetCoordinator';
+import { MixnetView } from '../transforms/mixnetPresenter';
 
 /**
  * All callbacks and settings required by WalletBackend and its sub-services.
@@ -36,6 +38,22 @@ export type WalletBackendConfig = {
   onBirthdayChanged: (birthday: number) => void;
   /** Called on any non-fatal RPC error; display or log in the consumer. */
   onError: (error: string) => void;
+  /** Called with each new screen-facing Mixnet Mode projection. */
+  onMixnetViewChanged: (view: MixnetView) => void;
+  /**
+   * Starts the platform-hosted mixnet transport (the UniFFI proxy shim on
+   * Android) and yields its local SOCKS5 address. Injected because the
+   * platform owns the transport; tests supply a stub.
+   */
+  startMixnetTransport: StartMixnetTransport;
+  /**
+   * Whether this platform runs the Mixnet Mode policy. False on iOS until
+   * the Mac-gated step lands its native transport; the coordinator is then
+   * never started and no mixnet view is ever published.
+   */
+  mixnetSupported: boolean;
+  /** i18n helper — must be bound to the active locale in the consumer. */
+  translate: (key: string) => TranslateType;
   /** Prevent device sleep while true (e.g. during active sync/send). */
   keepAwake: (keep: boolean) => void;
   /** When true, only the UFVK is available; no seed phrase operations. */

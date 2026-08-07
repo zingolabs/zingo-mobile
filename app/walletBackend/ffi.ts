@@ -30,6 +30,7 @@ const FFI_ERROR_CODES = [
   'MigrationCadenceFixed',
   'MigrationSplit',
   'Migration',
+  'Mixnet',
 ] as const;
 
 export type FfiErrorCode = (typeof FFI_ERROR_CODES)[number] | 'Unknown';
@@ -40,8 +41,7 @@ export type FfiError = {
 };
 
 export type FfiResult<T> =
-  | { ok: true; value: T }
-  | { ok: false; error: FfiError };
+  { ok: true; value: T } | { ok: false; error: FfiError };
 
 const KNOWN_CODES: ReadonlySet<string> = new Set(FFI_ERROR_CODES);
 
@@ -57,8 +57,7 @@ export function toFfiError(rejection: unknown): FfiError {
       code !== undefined && KNOWN_CODES.has(code)
         ? (code as FfiErrorCode)
         : 'Unknown',
-    message:
-      rejection instanceof Error ? rejection.message : String(rejection),
+    message: rejection instanceof Error ? rejection.message : String(rejection),
   };
 }
 

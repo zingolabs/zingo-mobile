@@ -13,7 +13,8 @@ import {
   Text,
   View,
 } from 'react-native';
-import { useFocusEffect, useTheme } from '@react-navigation/native';
+import { useFocusEffect } from '@react-navigation/native';
+import { useTheme } from '../../app/theme';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useKeepAwake } from '@sayem314/react-native-keep-awake';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -23,7 +24,7 @@ import BoldText from '../Components/BoldText';
 import Button from '../Components/Button';
 import ProgressBar from '../Migration/ProgressBar';
 import StepperHeader from '../Migration/StepperHeader';
-import { AppDrawerParamList, ThemeType } from '../../app/types';
+import { AppDrawerParamList } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import { ButtonTypeEnum, RouteEnum } from '../../app/AppState';
 import useTrickleProgress from '../../app/hooks/useTrickleProgress';
@@ -88,7 +89,7 @@ const MigrationSplitting: React.FunctionComponent<MigrationSplittingProps> = ({
 
   const context = useContext(ContextAppLoaded);
   const { translate } = context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
 
   const plan = route.params?.plan;
   const roundCount = plan?.split_rounds?.length ?? 0;
@@ -322,26 +323,26 @@ const MigrationSplitting: React.FunctionComponent<MigrationSplittingProps> = ({
   const statusMeta: Record<TxStatus, { key: string; color: string }> = {
     queued: {
       key: 'migrationsplitting.status-queued',
-      color: colors.placeholder,
+      color: colors.fgMuted,
     },
     creating: {
       key: 'migrationsplitting.status-creating',
-      color: colors.primary,
+      color: colors.fgAccent,
     },
     sent: {
       key: 'migrationsplitting.status-sent',
-      color: colors.text,
+      color: colors.fgDefault,
     },
     confirmed: {
       key: 'migrationsplitting.status-confirmed',
-      color: colors.primary,
+      color: colors.fgAccent,
     },
   };
 
   // ----- Error -----
   if (errorMsg) {
     return (
-      <View style={{ flex: 1, backgroundColor: colors.background }}>
+      <View style={{ flex: 1, backgroundColor: colors.bgCanvas }}>
         <ScrollView
           contentContainerStyle={{ padding: 24, paddingTop: 40, flexGrow: 1 }}
         >
@@ -353,7 +354,7 @@ const MigrationSplitting: React.FunctionComponent<MigrationSplittingProps> = ({
           >
             <Text
               style={{
-                color: colors.text,
+                color: colors.fgDefault,
                 fontSize: 17,
                 fontWeight: '700',
                 marginBottom: 10,
@@ -364,7 +365,7 @@ const MigrationSplitting: React.FunctionComponent<MigrationSplittingProps> = ({
             </Text>
             <Text
               style={{
-                color: colors.placeholder,
+                color: colors.fgMuted,
                 fontSize: 14,
                 textAlign: 'center',
                 marginBottom: 10,
@@ -374,7 +375,7 @@ const MigrationSplitting: React.FunctionComponent<MigrationSplittingProps> = ({
             </Text>
             <Text
               style={{
-                color: colors.placeholder,
+                color: colors.fgMuted,
                 fontSize: 13,
                 textAlign: 'center',
               }}
@@ -412,7 +413,7 @@ const MigrationSplitting: React.FunctionComponent<MigrationSplittingProps> = ({
   // ----- Terminal: split complete (mock 2) -----
   if (complete) {
     return (
-      <View style={{ flex: 1, backgroundColor: colors.background }}>
+      <View style={{ flex: 1, backgroundColor: colors.bgCanvas }}>
         <StepperHeader splitDone={true} sendActive={false} />
         <ScrollView
           style={{ flex: 1 }}
@@ -427,7 +428,7 @@ const MigrationSplitting: React.FunctionComponent<MigrationSplittingProps> = ({
           </BoldText>
           <Text
             style={{
-              color: colors.placeholder,
+              color: colors.fgMuted,
               fontSize: 15,
               lineHeight: 22,
               marginBottom: 20,
@@ -443,7 +444,7 @@ const MigrationSplitting: React.FunctionComponent<MigrationSplittingProps> = ({
                 alignItems: 'center',
                 borderWidth: 1,
                 borderColor: colors.bottomSheetBorder,
-                backgroundColor: colors.bottomSheetBackground,
+                backgroundColor: colors.bgSurface,
                 borderRadius: 12,
                 paddingHorizontal: 16,
                 paddingVertical: 16,
@@ -453,11 +454,11 @@ const MigrationSplitting: React.FunctionComponent<MigrationSplittingProps> = ({
               <FontAwesomeIcon
                 icon={faCheck}
                 size={16}
-                color={colors.primary}
+                color={colors.fgAccent}
               />
               <Text
                 style={{
-                  color: colors.text,
+                  color: colors.fgDefault,
                   fontSize: 15,
                   fontWeight: '700',
                   marginLeft: 14,
@@ -470,7 +471,7 @@ const MigrationSplitting: React.FunctionComponent<MigrationSplittingProps> = ({
                 )}
               </Text>
               <Text
-                style={{ color: colors.primary, fontSize: 14, flexShrink: 1 }}
+                style={{ color: colors.fgAccent, fontSize: 14, flexShrink: 1 }}
                 numberOfLines={1}
               >
                 {row.label}
@@ -478,7 +479,7 @@ const MigrationSplitting: React.FunctionComponent<MigrationSplittingProps> = ({
               <Text
                 style={{
                   marginLeft: 'auto',
-                  color: colors.primary,
+                  color: colors.fgAccent,
                   fontSize: 12,
                   fontWeight: '600',
                 }}
@@ -532,7 +533,7 @@ const MigrationSplitting: React.FunctionComponent<MigrationSplittingProps> = ({
   })();
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background }}>
+    <View style={{ flex: 1, backgroundColor: colors.bgCanvas }}>
       <StepperHeader splitDone={false} sendActive={false} />
       <ScrollView
         contentContainerStyle={{
@@ -546,7 +547,7 @@ const MigrationSplitting: React.FunctionComponent<MigrationSplittingProps> = ({
         </BoldText>
         <Text
           style={{
-            color: colors.placeholder,
+            color: colors.fgMuted,
             fontSize: 15,
             lineHeight: 22,
             marginBottom: 18,
@@ -562,10 +563,10 @@ const MigrationSplitting: React.FunctionComponent<MigrationSplittingProps> = ({
             marginBottom: 20,
           }}
         >
-          <ActivityIndicator size="small" color={colors.primary} />
+          <ActivityIndicator size="small" color={colors.fgAccent} />
           <Text
             style={{
-              color: colors.text,
+              color: colors.fgDefault,
               fontSize: 15,
               fontWeight: '600',
               marginLeft: 10,
@@ -589,7 +590,7 @@ const MigrationSplitting: React.FunctionComponent<MigrationSplittingProps> = ({
                 alignItems: 'center',
                 borderWidth: 1,
                 borderColor: colors.bottomSheetBorder,
-                backgroundColor: colors.bottomSheetBackground,
+                backgroundColor: colors.bgSurface,
                 borderRadius: 12,
                 paddingHorizontal: 16,
                 paddingVertical: 16,
@@ -607,7 +608,7 @@ const MigrationSplitting: React.FunctionComponent<MigrationSplittingProps> = ({
               />
               <Text
                 style={{
-                  color: colors.text,
+                  color: colors.fgDefault,
                   fontSize: 15,
                   fontWeight: '700',
                   marginRight: 12,
@@ -619,7 +620,7 @@ const MigrationSplitting: React.FunctionComponent<MigrationSplittingProps> = ({
                 )}
               </Text>
               <Text
-                style={{ color: colors.primary, fontSize: 14, flexShrink: 1 }}
+                style={{ color: colors.fgAccent, fontSize: 14, flexShrink: 1 }}
                 numberOfLines={1}
               >
                 {row.label}
@@ -645,7 +646,7 @@ const MigrationSplitting: React.FunctionComponent<MigrationSplittingProps> = ({
         <ProgressBar progress={trickle.progress} />
         <Text
           style={{
-            color: colors.placeholder,
+            color: colors.fgMuted,
             fontSize: 13,
             marginTop: 14,
             textAlign: 'center',

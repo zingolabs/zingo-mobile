@@ -1,11 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState, useEffect } from 'react';
 import { View, TextInput, Keyboard, TouchableOpacity } from 'react-native';
-import {
-  NavigationProp,
-  ParamListBase,
-  useTheme,
-} from '@react-navigation/native';
+import { NavigationProp, ParamListBase } from '@react-navigation/native';
+import { useTheme } from '../../../app/theme';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCheck, faQrcode, faXmark } from '@fortawesome/free-solid-svg-icons';
 
@@ -19,7 +16,6 @@ import {
   ScreenEnum,
   //SecurityType,
 } from '../../../app/AppState';
-import { ThemeType } from '../../../app/types';
 import RegText from '../../Components/RegText';
 import ErrorText from '../../Components/ErrorText';
 import { ContextAppLoaded } from '../../../app/context';
@@ -69,7 +65,7 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, server, addressBook } = context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
 
   const [label, setLabel] = useState<string>(item.label);
   const [address, setAddress] = useState<string>(item.address);
@@ -266,7 +262,7 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
       style={{
         display: 'flex',
         flexDirection: 'column',
-        backgroundColor: colors.bottomSheetBackground,
+        backgroundColor: colors.bgSurface,
         paddingBottom: 5,
       }}
     >
@@ -281,7 +277,7 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
           >
             <RegText>{translate('send.toaddress') as string}</RegText>
             {validAddress === 1 && (
-              <FontAwesomeIcon icon={faCheck} color={colors.primary} />
+              <FontAwesomeIcon icon={faCheck} color={colors.fgAccent} />
             )}
             {validAddress === -1 && (
               <ErrorText>
@@ -295,7 +291,7 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
               alignItems: 'center',
               borderWidth: 1,
               borderRadius: 12,
-              borderColor: colors.border,
+              borderColor: colors.borderMuted,
               marginTop: 5,
             }}
           >
@@ -304,10 +300,10 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
               placeholder={
                 translate('addressbook.address-placeholder') as string
               }
-              placeholderTextColor={colors.placeholder}
+              placeholderTextColor={colors.fgMuted}
               style={{
                 flex: 1,
-                color: colors.text,
+                color: colors.fgDefault,
                 fontWeight: '600',
                 fontSize: 14,
                 padding: 10,
@@ -324,7 +320,7 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
                   style={{ marginRight: 5 }}
                   size={20}
                   icon={faXmark}
-                  color={colors.primaryDisabled}
+                  color={colors.fgAccentDisabled}
                 />
               </TouchableOpacity>
             ) : null}
@@ -337,7 +333,7 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
                 style={{ marginRight: 5 }}
                 size={28}
                 icon={faQrcode}
-                color={colors.border}
+                color={colors.fgMuted}
               />
             </TouchableOpacity>
           </View>
@@ -373,7 +369,7 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
             flexGrow: 1,
             borderWidth: 1,
             borderRadius: 12,
-            borderColor: colors.border,
+            borderColor: colors.borderMuted,
             minWidth: 48,
             minHeight: 48,
             maxHeight: 150,
@@ -384,7 +380,7 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
           <TextInput
             testID="addressbook.label-field"
             style={{
-              color: colors.text,
+              color: colors.fgDefault,
               fontWeight: '600',
               fontSize: 14,
               flex: 1,
@@ -393,7 +389,7 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
               backgroundColor: 'transparent',
             }}
             placeholder={translate('addressbook.label-placeholder') as string}
-            placeholderTextColor={colors.placeholder}
+            placeholderTextColor={colors.fgMuted}
             value={label}
             onChangeText={(text: string) => setLabel(text)}
             editable={action !== AddressBookActionEnum.Delete}
@@ -405,7 +401,7 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
                 style={{ marginRight: 10 }}
                 size={20}
                 icon={faXmark}
-                color={colors.primaryDisabled}
+                color={colors.fgAccentDisabled}
               />
             </TouchableOpacity>
           )}
@@ -433,7 +429,7 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
             marginVertical: 5,
           }}
         >
-          <FadeText style={{ color: colors.primary }}>
+          <FadeText style={{ color: colors.fgAccent }}>
             {error + errorAddress}
           </FadeText>
         </View>
@@ -468,12 +464,12 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
           title={translate(`addressbook.${action.toLowerCase()}`) as string}
           style={
             action === AddressBookActionEnum.Delete
-              ? { borderColor: colors.danger.text }
+              ? { borderColor: colors.fgDanger }
               : undefined
           }
           textStyle={
             action === AddressBookActionEnum.Delete
-              ? { color: colors.danger.text }
+              ? { color: colors.fgDanger }
               : undefined
           }
           onPress={() => {

@@ -65,6 +65,7 @@ enum FfiOutcome {
     case .MigrationCadenceFixed(let message): return ("MigrationCadenceFixed", message)
     case .MigrationSplit(let message): return ("MigrationSplit", message)
     case .Migration(let message): return ("Migration", message)
+    case .Mixnet(let message): return ("Mixnet", message)
     }
   }
 

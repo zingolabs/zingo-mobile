@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { forwardRef, useCallback } from 'react';
 import { Keyboard, Pressable, StyleSheet, View } from 'react-native';
-import { useTheme } from '@react-navigation/native';
+import { useTheme } from '../../../app/theme';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCircleInfo, faXmark } from '@fortawesome/free-solid-svg-icons';
 import {
@@ -11,7 +11,6 @@ import {
   BottomSheetScrollView,
 } from '@gorhom/bottom-sheet';
 
-import { ThemeType } from '../../../app/types';
 import { ButtonTypeEnum, TranslateType } from '../../../app/AppState';
 import BoldText from '../../Components/BoldText';
 import FadeText from '../../Components/FadeText';
@@ -55,7 +54,7 @@ const SendErrorSheet = forwardRef<BottomSheetModal, SendErrorSheetProps>(
     },
     ref,
   ) => {
-    const { colors } = useTheme() as ThemeType;
+    const { colors } = useTheme();
 
     const t = useCallback(
       (key: string, fallback: string): string =>
@@ -91,7 +90,7 @@ const SendErrorSheet = forwardRef<BottomSheetModal, SendErrorSheetProps>(
             paddingTop: 8,
             paddingBottom: 6,
             paddingHorizontal: 16,
-            backgroundColor: colors.bottomSheetBackground,
+            backgroundColor: colors.bgSurface,
             borderTopLeftRadius: 40,
             borderTopRightRadius: 40,
             borderTopWidth: 1,
@@ -112,7 +111,7 @@ const SendErrorSheet = forwardRef<BottomSheetModal, SendErrorSheetProps>(
             <View style={{ width: 48 }} />
             <BoldText
               numberOfLines={1}
-              style={{ flex: 1, textAlign: 'center', color: colors.text }}
+              style={{ flex: 1, textAlign: 'center', color: colors.fgDefault }}
             >
               {title}
             </BoldText>
@@ -122,7 +121,7 @@ const SendErrorSheet = forwardRef<BottomSheetModal, SendErrorSheetProps>(
               hitSlop={8}
               style={{ padding: 14 }}
             >
-              <FontAwesomeIcon icon={faXmark} size={20} color={colors.text} />
+              <FontAwesomeIcon icon={faXmark} size={20} color={colors.fgDefault} />
             </Pressable>
           </View>
         </View>
@@ -138,19 +137,19 @@ const SendErrorSheet = forwardRef<BottomSheetModal, SendErrorSheetProps>(
             style={[
               styles.infoRow,
               {
-                backgroundColor: colors.background,
-                borderColor: colors.border,
+                backgroundColor: colors.bgCanvas,
+                borderColor: colors.borderMuted,
               },
             ]}
           >
             <FontAwesomeIcon
               icon={faCircleInfo}
               size={16}
-              color={colors.danger.text}
+              color={colors.fgDanger}
             />
             <RegText
               style={{
-                color: colors.text,
+                color: colors.fgDefault,
                 flex: 1,
                 marginLeft: 10,
                 fontSize: 13,
@@ -182,14 +181,14 @@ const SendErrorSheet = forwardRef<BottomSheetModal, SendErrorSheetProps>(
         }}
         handleComponent={renderHandle}
         backgroundStyle={{
-          backgroundColor: colors.bottomSheetBackground,
+          backgroundColor: colors.bgSurface,
           borderTopLeftRadius: 40,
           borderTopRightRadius: 40,
         }}
         backdropComponent={renderBackdrop}
       >
         <BottomSheetScrollView
-          style={{ backgroundColor: colors.bottomSheetBackground }}
+          style={{ backgroundColor: colors.bgSurface }}
           contentContainerStyle={{
             paddingHorizontal: 20,
             paddingBottom: 24,

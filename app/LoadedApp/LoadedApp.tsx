@@ -11,7 +11,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { useTheme } from '@react-navigation/native';
+import { useTheme } from '../theme';
 import { I18n } from 'i18n-js';
 import * as RNLocalize from 'react-native-localize';
 import { isEqual } from 'lodash';
@@ -78,7 +78,7 @@ import {
 } from '../AppState';
 import Utils from '../utils';
 import { getZingoVersion, substituteZingoName } from '../utils/ZingoAppData';
-import { ThemeType } from '../types';
+import { AppTheme } from '../theme';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
 import { ContextAppLoadedProvider } from '../context';
 import { parseZcashURI, serverUris } from '../uris';
@@ -122,6 +122,11 @@ import LoadedAppOptionsPanelHost from './LoadedAppOptionsPanelHost';
 import { MessageList } from '../../components/Messages';
 import { RPCSyncStatusType } from '../walletBackend/types/RPCSyncStatusType';
 import { RPCUfvkType } from '../walletBackend/types/RPCUfvkType';
+import {
+  INITIAL_MIXNET_VIEW,
+  MixnetView,
+} from '../walletBackend/transforms/mixnetPresenter';
+import { startMixnetTransport } from '../walletBackend/utils/nymTransport';
 import { RPCPerformanceLevelEnum } from '../walletBackend/enums/RPCPerformanceLevelEnum';
 import { AddressList } from '../../components/AddressList';
 import ValueTransferDetail from '../../components/History/components/ValueTransferDetail';
@@ -195,7 +200,7 @@ const SERVER_DEFAULT_0: ServerType = {
 } as ServerType;
 
 export default function LoadedApp(props: LoadedAppProps) {
-  const theme = useTheme() as ThemeType;
+  const theme = useTheme();
   const [language, setLanguage] = useState<LanguageEnum>(LanguageEnum.en);
   const [currency, setCurrency] = useState<CurrencyEnum>(
     CurrencyEnum.USDCurrency,
@@ -720,7 +725,7 @@ type LoadedAppClassProps = {
   // still take effect immediately for snackbars and any RPC error text
   // produced after the change.
   setI18nLocale: (locale: string) => void;
-  theme: ThemeType;
+  theme: AppTheme;
   language: LanguageEnum;
   currency: CurrencyEnum;
   server: ServerType;
@@ -832,6 +837,16 @@ export class LoadedAppClass extends Component<
       blockExplorer: props.blockExplorer,
       nym: props.nym,
 
+      // Mixnet Mode: fail-closed initial view where the policy runs
+      // (Android); null where the platform transport has not landed yet
+      // (iOS until the Mac-gated step), which leaves the send gate open.
+      mixnetView:
+        Platform.OS === GlobalConst.platformOSandroid
+          ? INITIAL_MIXNET_VIEW
+          : null,
+      disableMixnet: this.disableMixnet,
+      reenableMixnet: this.reenableMixnet,
+
       // state
       appStateStatus:
         Platform.OS === GlobalConst.platformOSios
@@ -860,6 +875,9 @@ export class LoadedAppClass extends Component<
       onZingolibVersionChanged: this.setZingolibVersion,
       onBirthdayChanged: this.setBirthday,
       onError: this.setLastError,
+      onMixnetViewChanged: this.setMixnetView,
+      startMixnetTransport: startMixnetTransport,
+      mixnetSupported: Platform.OS === GlobalConst.platformOSandroid,
       readOnly: props.readOnly,
       server: props.server,
       performanceLevel: props.performanceLevel,
@@ -969,7 +987,9 @@ export class LoadedAppClass extends Component<
           // resultBio:
           // - true      -> authenticated (biometric, or device passcode via allowDeviceCredentials)
           // - false     -> user cancelled or failed the prompt
-          // - undefined -> device has no auth method at all; allow (cannot lock the user out)
+          // - undefined -> the gate cannot run here (no auth method, or a keychain
+          //                entry the OS refuses to serve); allow, since it guards
+          //                nothing and blocking locks the user out of the wallet
           if (resultBio === false) {
             this.navigateToLoadingApp({
               startingApp: true,
@@ -1097,6 +1117,7 @@ export class LoadedAppClass extends Component<
 
   componentWillUnmount = async () => {
     await this.rpc.clearTimers();
+    this.rpc.stopMixnetPolling();
     const safeRemove = (listener: unknown, name: string) => {
       try {
         if (
@@ -1230,6 +1251,22 @@ export class LoadedAppClass extends Component<
     this.setState({
       isSeedViewModalOpen: value,
     });
+  };
+
+  setMixnetView = (mixnetView: MixnetView) => {
+    if (!isEqual(this.state.mixnetView, mixnetView)) {
+      this.setState({ mixnetView });
+    }
+  };
+
+  // The user's deliberate per-session consent to clearnet.
+  disableMixnet = async (): Promise<void> => {
+    await this.rpc.disableMixnet();
+  };
+
+  // Recover a died or failed mixnet transport by starting it afresh.
+  reenableMixnet = async (): Promise<void> => {
+    await this.rpc.reenableMixnet();
   };
 
   setValueTransfersList = async (
@@ -2202,6 +2239,9 @@ export class LoadedAppClass extends Component<
       performanceLevel: this.state.performanceLevel,
       blockExplorer: this.state.blockExplorer,
       nym: this.state.nym,
+      mixnetView: this.state.mixnetView,
+      disableMixnet: this.disableMixnet,
+      reenableMixnet: this.reenableMixnet,
       foregroundEpoch: this.state.foregroundEpoch,
     };
 
@@ -2337,8 +2377,8 @@ export class LoadedAppClass extends Component<
                               <>
                                 {addresses === null ? (
                                   <Loading
-                                    backgroundColor={colors.background}
-                                    spinColor={colors.primary}
+                                    backgroundColor={colors.bgCanvas}
+                                    spinColor={colors.fgAccent}
                                   />
                                 ) : (
                                   <Tab.Navigator

@@ -29,7 +29,7 @@ env:
 
 jobs:
   android-apk-build:
-    name: Android APK build
+    name: Andr APK build
     runs-on: zingo-android-gradle-16
     env:
       RUSTFLAGS: -D warnings

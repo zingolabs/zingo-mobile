@@ -5,12 +5,11 @@ import {
   ActivityIndicator,
   ViewStyle,
 } from 'react-native';
-import { useTheme } from '@react-navigation/native';
+import { useTheme } from '../../app/theme';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faRotateRight } from '@fortawesome/free-solid-svg-icons';
 import { ContextAppLoaded } from '../../app/context';
 import RegText from './RegText';
-import { ThemeType } from '../../app/types';
 import { ModeEnum } from '../../app/AppState';
 import { showConfirm, ConfirmButton } from '../../app/showConfirm';
 import QuoteRefreshRing from './QuoteRefreshRing';
@@ -38,8 +37,8 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, zecPrice, addLastSnackbar, mode } = context;
-  const { colors } = useTheme() as ThemeType;
-  const bg = backgroundColor ?? colors.card;
+  const { colors } = useTheme();
+  const bg = backgroundColor ?? colors.bgCanvas;
 
   // Shared state across every mounted PriceFetcher.
   const { started, loading, coolingDown } = usePriceFetcherStore();
@@ -99,9 +98,9 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
     return (
       <View style={containerStyle}>
         {textBefore && (
-          <RegText style={{ color: colors.text }}>{textBefore}</RegText>
+          <RegText style={{ color: colors.fgDefault }}>{textBefore}</RegText>
         )}
-        <ActivityIndicator size="small" color={colors.primary} />
+        <ActivityIndicator size="small" color={colors.fgAccent} />
       </View>
     );
   }
@@ -109,12 +108,12 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
   return (
     <View style={containerStyle}>
       {textBefore && (
-        <RegText style={{ color: colors.text }}>{textBefore}</RegText>
+        <RegText style={{ color: colors.fgDefault }}>{textBefore}</RegText>
       )}
       {started ? (
         <QuoteRefreshRing
           size={22}
-          color={colors.primary}
+          color={colors.fgAccent}
           ringColor={'rgba(255,255,255,0.55)'}
           trackColor={'rgba(255,255,255,0.12)'}
           durationMs={PRICE_AUTO_REFRESH_MS}
@@ -132,7 +131,7 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
           <FontAwesomeIcon
             icon={faRotateRight}
             size={16}
-            color={colors.primary}
+            color={colors.fgAccent}
           />
         </TouchableOpacity>
       )}

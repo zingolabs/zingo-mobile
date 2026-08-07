@@ -7,13 +7,13 @@ import React, {
   useState,
 } from 'react';
 import { ActivityIndicator, ScrollView, Text, View } from 'react-native';
-import { useTheme } from '@react-navigation/native';
+import { useTheme } from '../../app/theme';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import BoldText from '../Components/BoldText';
 import Button from '../Components/Button';
 import StepperHeader from '../Migration/StepperHeader';
-import { AppDrawerParamList, ThemeType } from '../../app/types';
+import { AppDrawerParamList } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import {
   ButtonTypeEnum,
@@ -54,7 +54,7 @@ const MigrationSchedule: React.FunctionComponent<MigrationScheduleProps> = ({
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, language, addLastSnackbar, info } = context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
 
   // The payload's unix estimates assume mainnet spacing; re-derive each
   // target's wall-clock moment from its block distance and the spacing the
@@ -228,18 +228,18 @@ const MigrationSchedule: React.FunctionComponent<MigrationScheduleProps> = ({
       <View
         style={{
           flex: 1,
-          backgroundColor: colors.background,
+          backgroundColor: colors.bgCanvas,
           alignItems: 'center',
           justifyContent: 'center',
           padding: 24,
         }}
       >
         {loading ? (
-          <ActivityIndicator size="large" color={colors.primary} />
+          <ActivityIndicator size="large" color={colors.fgAccent} />
         ) : (
           <Text
             style={{
-              color: colors.placeholder,
+              color: colors.fgMuted,
               fontSize: 14,
               textAlign: 'center',
             }}
@@ -252,7 +252,7 @@ const MigrationSchedule: React.FunctionComponent<MigrationScheduleProps> = ({
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background }}>
+    <View style={{ flex: 1, backgroundColor: colors.bgCanvas }}>
       <StepperHeader splitDone={true} sendActive={true} />
       <ScrollView
         style={{ flex: 1 }}
@@ -267,7 +267,7 @@ const MigrationSchedule: React.FunctionComponent<MigrationScheduleProps> = ({
         </BoldText>
         <Text
           style={{
-            color: colors.placeholder,
+            color: colors.fgMuted,
             fontSize: 15,
             lineHeight: 22,
             marginBottom: 20,
@@ -277,7 +277,7 @@ const MigrationSchedule: React.FunctionComponent<MigrationScheduleProps> = ({
             .split('**')
             .map((part: string, i: number) =>
               i % 2 === 1 ? (
-                <Text key={i} style={{ color: colors.text, fontWeight: '700' }}>
+                <Text key={i} style={{ color: colors.fgDefault, fontWeight: '700' }}>
                   {part}
                 </Text>
               ) : (
@@ -292,7 +292,7 @@ const MigrationSchedule: React.FunctionComponent<MigrationScheduleProps> = ({
             style={{
               borderWidth: 1,
               borderColor: colors.bottomSheetBorder,
-              backgroundColor: colors.bottomSheetBackground,
+              backgroundColor: colors.bgSurface,
               borderRadius: 14,
               padding: 16,
               marginBottom: 14,
@@ -307,7 +307,7 @@ const MigrationSchedule: React.FunctionComponent<MigrationScheduleProps> = ({
               }}
             >
               <Text
-                style={{ color: colors.text, fontSize: 17, fontWeight: '700' }}
+                style={{ color: colors.fgDefault, fontSize: 17, fontWeight: '700' }}
               >
                 {(translate('migrationschedule.batch') as string).replace(
                   '{n}',
@@ -316,7 +316,7 @@ const MigrationSchedule: React.FunctionComponent<MigrationScheduleProps> = ({
               </Text>
               {/* Wall-clock time leads; block heights are the metadata. */}
               <Text
-                style={{ color: colors.text, fontSize: 14, fontWeight: '600' }}
+                style={{ color: colors.fgDefault, fontSize: 14, fontWeight: '600' }}
               >
                 {card.when}
               </Text>
@@ -341,7 +341,7 @@ const MigrationSchedule: React.FunctionComponent<MigrationScheduleProps> = ({
                     marginBottom: 8,
                   }}
                 >
-                  <Text style={{ color: colors.text, fontSize: 14 }}>
+                  <Text style={{ color: colors.fgDefault, fontSize: 14 }}>
                     {fmt(denomination)}
                   </Text>
                 </View>
@@ -349,7 +349,7 @@ const MigrationSchedule: React.FunctionComponent<MigrationScheduleProps> = ({
             </View>
             <Text
               style={{
-                color: colors.placeholder,
+                color: colors.fgMuted,
                 fontSize: 12,
                 fontStyle: 'italic',
               }}

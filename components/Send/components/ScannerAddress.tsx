@@ -1,13 +1,13 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useEffect, useState } from 'react';
 import { Pressable, View } from 'react-native';
-import { useTheme } from '@react-navigation/native';
+import { useTheme } from '../../../app/theme';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
 
 import Scanner from '../../Scanner';
 import { GlobalConst, RouteEnum } from '../../../app/AppState';
-import { AppStackParamList, ThemeType } from '../../../app/types';
+import { AppStackParamList } from '../../../app/types';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 type ScannerAddressProps = NativeStackScreenProps<
@@ -23,7 +23,7 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({
     !!route.params && route.params.setAddress !== undefined
       ? route.params.setAddress
       : () => {};
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
 
   const [active, setActive] = useState<boolean>(
     !!route.params && route.params.active !== undefined
@@ -76,7 +76,7 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({
     <View
       style={{
         flex: 1,
-        backgroundColor: colors.background,
+        backgroundColor: colors.bgCanvas,
       }}
     >
       <Scanner active={active} onRead={onRead} onClose={onCloseScreen} />

@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { useTheme } from '@react-navigation/native';
+import { useTheme } from '../../app/theme';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
   faCheck,
@@ -24,7 +24,6 @@ import {
   BottomSheetScrollView,
 } from '@gorhom/bottom-sheet';
 
-import { ThemeType } from '../../app/types';
 import { TranslateType } from '../../app/AppState';
 import Utils from '../../app/utils';
 import { useKeyboardHeight } from '../../app/hooks/useKeyboardHeight';
@@ -106,7 +105,7 @@ const ChainSelect: React.FunctionComponent<ChainSelectProps> = ({
   translate,
   disabled,
 }) => {
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
   const keyboardHeight = useKeyboardHeight();
   const sheetRef = useRef<BottomSheetModal>(null);
   const [query, setQuery] = useState<string>('');
@@ -178,7 +177,7 @@ const ChainSelect: React.FunctionComponent<ChainSelectProps> = ({
           paddingHorizontal: 10,
           borderWidth: 1,
           borderRadius: 12,
-          borderColor: colors.border,
+          borderColor: colors.borderMuted,
           marginTop: 10,
         }}
       >
@@ -186,7 +185,7 @@ const ChainSelect: React.FunctionComponent<ChainSelectProps> = ({
         <RegText
           style={{
             flex: 1,
-            color: colors.text,
+            color: colors.fgDefault,
             fontWeight: '600',
             fontSize: 14,
           }}
@@ -197,7 +196,7 @@ const ChainSelect: React.FunctionComponent<ChainSelectProps> = ({
           <FontAwesomeIcon
             icon={faChevronDown}
             size={16}
-            color={colors.border}
+            color={colors.fgMuted}
           />
         ) : null}
       </TouchableOpacity>
@@ -222,7 +221,7 @@ const ChainSelect: React.FunctionComponent<ChainSelectProps> = ({
         onChange={onSheetChange}
         handleComponent={null}
         backgroundStyle={{
-          backgroundColor: colors.bottomSheetBackground,
+          backgroundColor: colors.bgSurface,
           borderTopLeftRadius: 40,
           borderTopRightRadius: 40,
         }}
@@ -235,7 +234,7 @@ const ChainSelect: React.FunctionComponent<ChainSelectProps> = ({
             style={{
               paddingTop: 8,
               paddingHorizontal: 16,
-              backgroundColor: colors.bottomSheetBackground,
+              backgroundColor: colors.bgSurface,
               borderTopLeftRadius: 40,
               borderTopRightRadius: 40,
               borderTopWidth: 1,
@@ -257,7 +256,7 @@ const ChainSelect: React.FunctionComponent<ChainSelectProps> = ({
               <View style={{ width: 48 }} />
               <BoldText
                 numberOfLines={1}
-                style={{ flex: 1, textAlign: 'center', color: colors.text }}
+                style={{ flex: 1, textAlign: 'center', color: colors.fgDefault }}
               >
                 {translate('addressbook.select-chain-placeholder') as string}
               </BoldText>
@@ -267,7 +266,7 @@ const ChainSelect: React.FunctionComponent<ChainSelectProps> = ({
                 hitSlop={8}
                 style={{ padding: 14 }}
               >
-                <FontAwesomeIcon icon={faXmark} size={20} color={colors.text} />
+                <FontAwesomeIcon icon={faXmark} size={20} color={colors.fgDefault} />
               </Pressable>
             </View>
 
@@ -276,25 +275,25 @@ const ChainSelect: React.FunctionComponent<ChainSelectProps> = ({
               style={[
                 styles.searchRow,
                 {
-                  backgroundColor: colors.background,
-                  borderColor: colors.border,
+                  backgroundColor: colors.bgCanvas,
+                  borderColor: colors.borderMuted,
                 },
               ]}
             >
               <FontAwesomeIcon
                 icon={faMagnifyingGlass}
                 size={14}
-                color={colors.placeholder}
+                color={colors.fgMuted}
               />
               <TextInput
                 value={query}
                 onChangeText={setQuery}
                 placeholder={t('addressbook.search-placeholder', 'Search')}
-                placeholderTextColor={colors.placeholder}
+                placeholderTextColor={colors.fgMuted}
                 autoCapitalize="none"
                 autoCorrect={false}
                 spellCheck={false}
-                style={[styles.searchInput, { color: colors.text }]}
+                style={[styles.searchInput, { color: colors.fgDefault }]}
                 testID="chainselect.search"
               />
               {query.length > 0 && (
@@ -306,7 +305,7 @@ const ChainSelect: React.FunctionComponent<ChainSelectProps> = ({
                   <FontAwesomeIcon
                     icon={faXmark}
                     size={14}
-                    color={colors.placeholder}
+                    color={colors.fgMuted}
                   />
                 </Pressable>
               )}
@@ -315,7 +314,7 @@ const ChainSelect: React.FunctionComponent<ChainSelectProps> = ({
           </View>
 
           <BottomSheetScrollView
-            style={{ backgroundColor: colors.bottomSheetBackground }}
+            style={{ backgroundColor: colors.bgSurface }}
             contentContainerStyle={{
               paddingBottom: keyboardHeight > 0 ? keyboardHeight + 20 : 30,
             }}
@@ -347,7 +346,7 @@ const ChainSelect: React.FunctionComponent<ChainSelectProps> = ({
                     <RegText
                       style={{
                         fontSize: 16,
-                        color: selected ? colors.primary : colors.text,
+                        color: selected ? colors.fgAccent : colors.fgDefault,
                         fontWeight: selected ? '600' : '500',
                       }}
                     >
@@ -361,7 +360,7 @@ const ChainSelect: React.FunctionComponent<ChainSelectProps> = ({
                     <FontAwesomeIcon
                       icon={faCheck}
                       size={16}
-                      color={colors.primary}
+                      color={colors.fgAccent}
                     />
                   )}
                 </Pressable>

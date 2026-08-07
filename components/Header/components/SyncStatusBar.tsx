@@ -5,8 +5,8 @@ import {
   NavigationProp,
   ParamListBase,
   useNavigation,
-  useTheme,
 } from '@react-navigation/native';
+import { useTheme } from '../../../app/theme';
 import {
   faCheck,
   faCloudDownload,
@@ -22,11 +22,9 @@ import {
   SnackbarDurationEnum,
   TranslateType,
 } from '../../../app/AppState';
-import BackgroundType from '../../../app/AppState/types/BackgroundType';
 import NetInfoType from '../../../app/AppState/types/NetInfoType';
-import { ThemeType } from '../../../app/types';
+import { MixnetView } from '../../../app/walletBackend/transforms/mixnetPresenter';
 import FadeText from '../../Components/FadeText';
-import { TriangleAlert } from '../../Components/Icons/TriangleAlert';
 import NymOn from '../../../assets/img/nym-on.svg';
 import PrivacyToggle from './PrivacyToggle';
 
@@ -40,7 +38,7 @@ type SyncStatusBarProps = {
   viewSyncStatus: boolean;
   opacityValue: Animated.Value;
   nym: boolean;
-  backgroundSyncInfo: BackgroundType;
+  mixnetView: MixnetView | null;
   translate: (key: string) => TranslateType;
   privacy: boolean;
   noPrivacy: boolean | undefined;
@@ -61,7 +59,7 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
     viewSyncStatus,
     opacityValue,
     nym,
-    backgroundSyncInfo,
+    mixnetView,
     translate,
     privacy,
     noPrivacy,
@@ -70,7 +68,7 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
     noBalance,
   }) => {
     const navigation = useNavigation<NavigationProp<ParamListBase>>();
-    const { colors } = useTheme() as ThemeType;
+    const { colors } = useTheme();
 
     return (
       <View
@@ -102,7 +100,7 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
                       alignItems: 'center',
                       justifyContent: 'center',
                       padding: 1,
-                      borderColor: colors.primary,
+                      borderColor: colors.borderAccent,
                       borderWidth: 1,
                       borderRadius: 10,
                       minWidth: 25,
@@ -120,7 +118,7 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
                     >
                       <FontAwesomeIcon
                         icon={faCheck}
-                        color={colors.primary}
+                        color={colors.fgAccent}
                         size={16}
                       />
                       {viewSyncStatus && (
@@ -137,7 +135,7 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
                       alignItems: 'center',
                       justifyContent: 'center',
                       padding: 1,
-                      borderColor: colors.syncing,
+                      borderColor: colors.borderSyncing,
                       borderWidth: 1,
                       borderRadius: 10,
                       minWidth: 25,
@@ -163,7 +161,7 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
                         >
                           <FontAwesomeIcon
                             icon={faPlay}
-                            color={colors.syncing}
+                            color={colors.fgSyncing}
                             size={16}
                           />
                           {viewSyncStatus && (
@@ -198,7 +196,7 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
                           >
                             <FontAwesomeIcon
                               icon={faPlay}
-                              color={colors.syncing}
+                              color={colors.fgSyncing}
                               size={16}
                             />
                             {viewSyncStatus && (
@@ -231,7 +229,7 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
                       alignItems: 'center',
                       justifyContent: 'center',
                       padding: 1,
-                      borderColor: colors.primaryDisabled,
+                      borderColor: colors.borderAccentDisabled,
                       borderWidth: 1,
                       borderRadius: 10,
                       minWidth: 25,
@@ -254,7 +252,7 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
                       >
                         <FontAwesomeIcon
                           icon={faWifi}
-                          color={colors.primaryDisabled}
+                          color={colors.fgAccentDisabled}
                           size={16}
                         />
                       </View>
@@ -307,7 +305,7 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
               marginHorizontal: 2.5,
               paddingHorizontal: 5,
               paddingVertical: 1,
-              borderColor: colors.zingo,
+              borderColor: colors.borderMuted,
               borderWidth: 1,
               borderRadius: 10,
               minWidth: 25,
@@ -343,6 +341,46 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
           </View>
         )}
 
+        {/* Mixnet Mode (send-over-nym): the per-session transport status.
+            Rendered only where the policy runs (mixnetView is null on
+            platforms whose transport has not landed). The mixnet icon alone
+            means ready; any other state carries its status text so a
+            not-ready transport is never mistaken for a working one. */}
+        {mixnetView !== null && (
+          <View
+            testID="header.mixnet-status"
+            style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: 0,
+              marginHorizontal: 2.5,
+              paddingHorizontal: 5,
+              paddingVertical: 1,
+              borderColor: colors.borderMuted,
+              borderWidth: 1,
+              borderRadius: 10,
+              minWidth: 25,
+              minHeight: 25,
+            }}
+          >
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'center',
+                alignItems: 'center',
+                paddingHorizontal: 3,
+              }}
+            >
+              <NymOn width={14} height={14} />
+              {mixnetView.statusKey !== 'mixnet.status.ready' && (
+                <FadeText style={{ fontSize: 10, marginLeft: 2 }}>
+                  {translate(mixnetView.statusKey) as string}
+                </FadeText>
+              )}
+            </View>
+          </View>
+        )}
+
         {mode !== ModeEnum.basic &&
           !noPrivacy &&
           setPrivacyOption &&
@@ -354,30 +392,6 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
               addLastSnackbar={addLastSnackbar}
               translate={translate}
             />
-          )}
-
-        {!noSyncingStatus &&
-          !!backgroundSyncInfo.error &&
-          mode === ModeEnum.advanced && (
-            <View
-              style={{
-                alignItems: 'center',
-                justifyContent: 'center',
-                margin: 0,
-                marginHorizontal: 5,
-                padding: 0,
-                minWidth: 25,
-                minHeight: 25,
-              }}
-            >
-              <TouchableOpacity
-                onPress={() => {
-                  navigation.navigate(RouteEnum.SyncReport);
-                }}
-              >
-                <TriangleAlert color={colors.warning.primary} size={20} />
-              </TouchableOpacity>
-            </View>
           )}
       </View>
     );

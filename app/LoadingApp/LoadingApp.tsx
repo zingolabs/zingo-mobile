@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 
 import Clipboard from '@react-native-clipboard/clipboard';
-import { useTheme } from '@react-navigation/native';
+import { useTheme } from '../theme';
 import { I18n } from 'i18n-js';
 import * as RNLocalize from 'react-native-localize';
 import { StackScreenProps } from '@react-navigation/stack';
@@ -70,7 +70,7 @@ import {
 import { parseServerURI, serverUris, fetchServerList } from '../uris';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
 import { fetchWallet } from '../walletBackend';
-import { ThemeType } from '../types';
+import { AppTheme } from '../theme';
 import { ContextAppLoadingProvider } from '../context';
 import BackgroundFileImpl from '../../components/Background';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -82,7 +82,7 @@ import Toast from 'react-native-toast-message';
 import { toastConfig } from '../toastConfig';
 import { RPCSeedType } from '../walletBackend/types/RPCSeedType';
 import Launching from './components/Launching';
-import simpleBiometrics from '../simpleBiometrics';
+import simpleBiometrics, { getLastGateFailure } from '../simpleBiometrics';
 import selectingServer from '../selectingServer';
 import { isEqual } from 'lodash';
 import {
@@ -130,7 +130,7 @@ const activationHeight = {
 };
 
 export default function LoadingApp(props: LoadingAppProps) {
-  const theme = useTheme() as ThemeType;
+  const theme = useTheme();
   const [language, setLanguage] = useState<LanguageEnum>(LanguageEnum.en);
   const [currency, setCurrency] = useState<CurrencyEnum>(
     CurrencyEnum.USDCurrency,
@@ -460,7 +460,7 @@ type LoadingAppClassProps = {
   route: StackScreenProps<AppStackParamList, RouteEnum.LoadingApp>['route'];
   toggleTheme: (mode: ModeEnum) => void;
   translate: (key: string) => TranslateType;
-  theme: ThemeType;
+  theme: AppTheme;
   language: LanguageEnum;
   currency: CurrencyEnum;
   server: ServerType;
@@ -590,7 +590,9 @@ export class LoadingAppClass extends Component<
         // resultBio:
         // - true      -> authenticated (biometric, or device passcode via allowDeviceCredentials)
         // - false     -> user cancelled or failed the prompt
-        // - undefined -> device has no auth method at all; allow (cannot lock the user out)
+        // - undefined -> the gate cannot run here (no auth method, or a keychain
+        //                entry the OS refuses to serve); allow, since it guards
+        //                nothing and blocking locks the user out of the wallet
         if (resultBio === false) {
           this.setState({ biometricsFailed: true });
           return;
@@ -2033,6 +2035,7 @@ export class LoadingAppClass extends Component<
                   translate={translate}
                   firstLaunchingMessage={firstLaunchingMessage}
                   biometricsFailed={biometricsFailed}
+                  message={biometricsFailed ? getLastGateFailure() : undefined}
                   tryAgain={() => {
                     this.setState({ biometricsFailed: false }, () =>
                       this.componentDidMount(),

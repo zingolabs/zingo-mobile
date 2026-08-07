@@ -339,7 +339,7 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
               <Text
                 style={
                   {
-                    "color": "#ffffff",
+                    "color": "#c3c3c3",
                     "fontSize": 20,
                     "fontWeight": "700",
                     "marginBottom": 0,
@@ -585,7 +585,7 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
     <Text
       style={
         {
-          "color": "#ffffff",
+          "color": "#c3c3c3",
           "fontSize": 18,
           "fontWeight": "bold",
           "opacity": 0.87,
@@ -768,7 +768,7 @@ exports[`Component Header - test Header Simple - snapshot 1`] = `
     <Text
       style={
         {
-          "color": "#ffffff",
+          "color": "#c3c3c3",
           "fontSize": 18,
           "fontWeight": "bold",
           "opacity": 0.87,

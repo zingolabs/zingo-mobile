@@ -2,12 +2,8 @@
 import React, { useContext } from 'react';
 import { View, TouchableOpacity } from 'react-native';
 import { showConfirm } from '../../../app/showConfirm';
-import {
-  NavigationProp,
-  ParamListBase,
-  useNavigation,
-  useTheme,
-} from '@react-navigation/native';
+import { NavigationProp, ParamListBase, useNavigation } from '@react-navigation/native';
+import { useTheme } from '../../../app/theme';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
   faAddressCard,
@@ -31,7 +27,6 @@ import {
   SelectServerEnum,
 } from '../../../app/AppState';
 import Utils from '../../../app/utils';
-import { ThemeType } from '../../../app/types';
 import { ContextAppLoaded } from '../../../app/context';
 import { ChainLogo } from '../../Components/ChainSelect';
 
@@ -68,7 +63,7 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
     selectServer,
     setSendPageState,
   } = context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
 
   const displayAddress: string = item.address
     ? Utils.trimToSmall(item.address, 7)
@@ -160,10 +155,10 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
                   icon={item.own ? faWallet : faAddressCard}
                   color={
                     addressProtected || item.own
-                      ? colors.zingo
+                      ? colors.fgMuted
                       : item.color
                         ? item.color
-                        : colors.primarydisabled
+                        : colors.borderAccentDisabled
                   }
                 />
                 {/* Chain badge: a small circle pinned to the bottom-right
@@ -178,8 +173,8 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
                       bottom: -4,
                       borderRadius: 10,
                       borderWidth: 1.5,
-                      borderColor: colors.background,
-                      backgroundColor: colors.background,
+                      borderColor: colors.bgCanvas,
+                      backgroundColor: colors.bgCanvas,
                     }}
                   >
                     <ChainLogo
@@ -193,7 +188,7 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
                 style={{
                   fontSize: 18,
                   marginHorizontal: 10,
-                  color: addressProtected ? colors.zingo : colors.primary,
+                  color: addressProtected ? colors.fgMuted : colors.fgAccent,
                   opacity: 1,
                   fontWeight: 'bold',
                 }}
@@ -206,7 +201,7 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
                 style={{ marginHorizontal: 10 }}
                 size={20}
                 icon={faQrcode}
-                color={colors.zingo}
+                color={colors.fgMuted}
               />
               <FadeText
                 style={{
@@ -240,7 +235,7 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
                 style={{ opacity: 0.8 }}
                 size={20}
                 icon={faPencil}
-                color={colors.money}
+                color={colors.fgDefault}
               />
             </TouchableOpacity>
           </View>
@@ -281,7 +276,7 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
                 <FontAwesomeIcon
                   size={24}
                   icon={faPaperPlane}
-                  color={colors.primary}
+                  color={colors.fgAccent}
                 />
               </TouchableOpacity>
             </View>
@@ -302,7 +297,7 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
                 style={{ opacity: 0.8 }}
                 size={20}
                 icon={faTrashCan}
-                color={colors.money}
+                color={colors.fgDefault}
               />
             </TouchableOpacity>
           </View>

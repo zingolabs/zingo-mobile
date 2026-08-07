@@ -1,7 +1,6 @@
 import React from 'react';
 import { Text, TextStyle } from 'react-native';
-import { useTheme } from '@react-navigation/native';
-import { ThemeType } from '../../app/types';
+import { useTheme } from '../../app/theme';
 
 type BoldTextProps = {
   style?: TextStyle;
@@ -18,9 +17,9 @@ const BoldText: React.FunctionComponent<BoldTextProps> = ({
   selectable,
   numberOfLines,
 }) => {
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
   const totalStyle: TextStyle = {
-    color: colors.text,
+    color: colors.fgDefault,
     fontSize: 16,
     fontWeight: 'bold',
     opacity: 0.87,

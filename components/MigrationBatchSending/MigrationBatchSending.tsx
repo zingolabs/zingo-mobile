@@ -1,17 +1,27 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useContext, useEffect, useState } from 'react';
-import { ActivityIndicator, BackHandler, ScrollView, Text, View } from 'react-native';
-import { useFocusEffect, useTheme } from '@react-navigation/native';
+import {
+  ActivityIndicator,
+  BackHandler,
+  ScrollView,
+  Text,
+  View,
+} from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
+import { useTheme } from '../../app/theme';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useKeepAwake } from '@sayem314/react-native-keep-awake';
 
 import BoldText from '../Components/BoldText';
 import Button from '../Components/Button';
 import SegmentedBar from '../Migration/SegmentedBar';
-import { AppDrawerParamList, ThemeType } from '../../app/types';
+import { AppDrawerParamList } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import { ButtonTypeEnum, RouteEnum } from '../../app/AppState';
-import { executeDueParts, executeDuePartsStatus } from '../../app/walletBackend';
+import {
+  executeDueParts,
+  executeDuePartsStatus,
+} from '../../app/walletBackend';
 import { RPCBatchReportType } from '../../app/walletBackend/types/RPCBatchReportType';
 import { RPCBatchStatusType } from '../../app/walletBackend/types/RPCBatchStatusType';
 
@@ -45,7 +55,7 @@ const MigrationBatchSending: React.FunctionComponent<
 
   const context = useContext(ContextAppLoaded);
   const { translate, addLastSnackbar } = context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
 
   const denominations = route.params?.denominations ?? [];
 
@@ -163,17 +173,19 @@ const MigrationBatchSending: React.FunctionComponent<
       <View
         style={{
           flex: 1,
-          backgroundColor: colors.background,
+          backgroundColor: colors.bgCanvas,
           padding: 24,
           justifyContent: 'center',
         }}
       >
-        <BoldText style={{ fontSize: 20, marginBottom: 12, textAlign: 'center' }}>
+        <BoldText
+          style={{ fontSize: 20, marginBottom: 12, textAlign: 'center' }}
+        >
           {translate('migrationbatchsending.slid-title') as string}
         </BoldText>
         <Text
           style={{
-            color: colors.placeholder,
+            color: colors.fgMuted,
             fontSize: 14,
             lineHeight: 21,
             textAlign: 'center',
@@ -200,17 +212,19 @@ const MigrationBatchSending: React.FunctionComponent<
       <View
         style={{
           flex: 1,
-          backgroundColor: colors.background,
+          backgroundColor: colors.bgCanvas,
           padding: 24,
           justifyContent: 'center',
         }}
       >
-        <BoldText style={{ fontSize: 20, marginBottom: 12, textAlign: 'center' }}>
+        <BoldText
+          style={{ fontSize: 20, marginBottom: 12, textAlign: 'center' }}
+        >
           {translate('migrationbatchsending.error-title') as string}
         </BoldText>
         <Text
           style={{
-            color: colors.placeholder,
+            color: colors.fgMuted,
             fontSize: 14,
             textAlign: 'center',
             marginBottom: 28,
@@ -243,7 +257,7 @@ const MigrationBatchSending: React.FunctionComponent<
     <View
       style={{
         flex: 1,
-        backgroundColor: colors.background,
+        backgroundColor: colors.bgCanvas,
         padding: 24,
         justifyContent: 'center',
       }}
@@ -252,12 +266,14 @@ const MigrationBatchSending: React.FunctionComponent<
         contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}
         scrollEnabled={false}
       >
-        <BoldText style={{ fontSize: 22, marginBottom: 10, textAlign: 'center' }}>
+        <BoldText
+          style={{ fontSize: 22, marginBottom: 10, textAlign: 'center' }}
+        >
           {translate('migrationbatchsending.title') as string}
         </BoldText>
         <Text
           style={{
-            color: colors.placeholder,
+            color: colors.fgMuted,
             fontSize: 15,
             lineHeight: 22,
             textAlign: 'center',
@@ -289,7 +305,7 @@ const MigrationBatchSending: React.FunctionComponent<
                   marginBottom: 8,
                 }}
               >
-                <Text style={{ color: colors.text, fontSize: 14 }}>
+                <Text style={{ color: colors.fgDefault, fontSize: 14 }}>
                   {fmt(denomination)}
                 </Text>
               </View>
@@ -303,7 +319,7 @@ const MigrationBatchSending: React.FunctionComponent<
             segments={total}
             progress={total > 0 ? done / total : 0}
             active={done < total ? done : undefined}
-            activeColor={colors.syncing}
+            activeColor={colors.fgSyncing}
           />
         </View>
 
@@ -314,8 +330,10 @@ const MigrationBatchSending: React.FunctionComponent<
             justifyContent: 'center',
           }}
         >
-          <ActivityIndicator size="small" color={colors.primary} />
-          <Text style={{ color: colors.text, fontSize: 15, marginLeft: 10 }}>
+          <ActivityIndicator size="small" color={colors.fgAccent} />
+          <Text
+            style={{ color: colors.fgDefault, fontSize: 15, marginLeft: 10 }}
+          >
             {progressLine}
           </Text>
         </View>

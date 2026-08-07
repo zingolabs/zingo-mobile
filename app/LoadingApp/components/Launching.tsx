@@ -2,9 +2,8 @@
 import React from 'react';
 import { Text, View, ActivityIndicator } from 'react-native';
 
-import { useTheme } from '@react-navigation/native';
+import { useTheme } from '../../theme';
 
-import { ThemeType } from '../../types';
 import {
   ButtonTypeEnum,
   LaunchingModeEnum,
@@ -22,13 +21,13 @@ type LaunchingProps = {
 };
 
 const Launching: React.FunctionComponent<LaunchingProps> = props => {
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
 
   return (
     <View
       style={{
         flex: 1,
-        backgroundColor: colors.background,
+        backgroundColor: colors.bgCanvas,
         alignItems: 'center',
         justifyContent: 'center',
       }}
@@ -54,11 +53,11 @@ const Launching: React.FunctionComponent<LaunchingProps> = props => {
           }}
         >
           <Text
-            style={{ color: colors.zingo, fontSize: 40, fontWeight: 'bold' }}
+            style={{ color: colors.fgMuted, fontSize: 40, fontWeight: 'bold' }}
           >
             {getZingoName()}
           </Text>
-          <Text style={{ color: colors.zingo, fontSize: 15 }}>
+          <Text style={{ color: colors.fgMuted, fontSize: 15 }}>
             {getZingoVersion()}
           </Text>
         </View>
@@ -76,7 +75,7 @@ const Launching: React.FunctionComponent<LaunchingProps> = props => {
           {!!props.message && (
             <Text
               style={{
-                color: colors.primaryDisabled,
+                color: colors.fgAccentDisabled,
                 fontSize: 15,
                 marginTop: 10,
               }}
@@ -89,7 +88,7 @@ const Launching: React.FunctionComponent<LaunchingProps> = props => {
             <>
               <Text
                 style={{
-                  color: colors.text,
+                  color: colors.fgDefault,
                   fontSize: 20,
                   fontWeight: 'bold',
                   marginTop: 10,
@@ -101,7 +100,7 @@ const Launching: React.FunctionComponent<LaunchingProps> = props => {
               </Text>
               <Text
                 style={{
-                  color: colors.text,
+                  color: colors.fgDefault,
                   fontSize: 15,
                   marginTop: 10,
                   textAlign: 'center',
@@ -112,7 +111,7 @@ const Launching: React.FunctionComponent<LaunchingProps> = props => {
               </Text>
               <Text
                 style={{
-                  color: colors.text,
+                  color: colors.fgDefault,
                   fontSize: 15,
                   marginTop: 10,
                   marginBottom: 10,
@@ -136,13 +135,13 @@ const Launching: React.FunctionComponent<LaunchingProps> = props => {
                 color={
                   props.firstLaunchingMessage === LaunchingModeEnum.updating ||
                   props.firstLaunchingMessage === LaunchingModeEnum.installing
-                    ? colors.primary
+                    ? colors.fgAccent
                     : 'transparent'
                 }
               />
               <Text
                 style={{
-                  color: colors.text,
+                  color: colors.fgDefault,
                   fontSize: 20,
                   fontWeight: 'bold',
                   marginTop: 10,
@@ -169,7 +168,7 @@ const Launching: React.FunctionComponent<LaunchingProps> = props => {
               </Text>
               <Text
                 style={{
-                  color: colors.text,
+                  color: colors.fgDefault,
                   fontSize: 15,
                   marginTop: 10,
                   opacity:
@@ -195,7 +194,7 @@ const Launching: React.FunctionComponent<LaunchingProps> = props => {
               </Text>
               <Text
                 style={{
-                  color: colors.text,
+                  color: colors.fgDefault,
                   fontSize: 15,
                   marginTop: 10,
                   marginBottom: 10,

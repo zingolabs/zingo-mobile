@@ -11,11 +11,11 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-import { useFocusEffect, useTheme } from '@react-navigation/native';
+import { useFocusEffect } from '@react-navigation/native';
+import { useTheme } from '../../../app/theme';
 
 import SegmentedBar from '../../Migration/SegmentedBar';
 import { ContextAppLoaded } from '../../../app/context';
-import { ThemeType } from '../../../app/types';
 import Utils from '../../../app/utils';
 import { RouteEnum } from '../../../app/AppState';
 import {
@@ -164,7 +164,7 @@ const IronwoodMigrationBanner: React.FunctionComponent<
 > = ({ amount, currencyName, onStart, onResume }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, info } = context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
 
   const [migration, setMigration] = useState<RPCMigrationStatusType | null>(
     null,
@@ -285,10 +285,10 @@ const IronwoodMigrationBanner: React.FunctionComponent<
           : 'pending';
     const statusColor =
       statusKind === 'ready'
-        ? colors.primary
+        ? colors.fgAccent
         : statusKind === 'splitting' || statusKind === 'confirming'
-          ? colors.syncing
-          : colors.warning.primary;
+          ? colors.fgSyncing
+          : colors.fgWarning;
     const statusLabel = translate(
       `ironwoodbanner.status-${statusKind}`,
     ) as string;
@@ -314,10 +314,10 @@ const IronwoodMigrationBanner: React.FunctionComponent<
                 .replace('{blocks}', String(blocksUntil));
     const nextActionActive = !splitting && (ready || !nextWake);
     const nextActionColor = confirming
-      ? colors.syncing
+      ? colors.fgSyncing
       : nextActionActive
-        ? colors.primary
-        : colors.warning.primary;
+        ? colors.fgAccent
+        : colors.fgWarning;
 
     return (
       <Animated.View
@@ -332,7 +332,7 @@ const IronwoodMigrationBanner: React.FunctionComponent<
             testID="ironwoodbanner.resume"
             onPress={() => onResume(resumeRoute)}
             style={{
-              backgroundColor: colors.bottomSheetBackground,
+              backgroundColor: colors.bgSurface,
               borderColor: colors.bottomSheetBorder,
               borderWidth: 1,
               borderRadius: 16,
@@ -351,7 +351,7 @@ const IronwoodMigrationBanner: React.FunctionComponent<
             >
               <Text
                 style={{
-                  color: colors.placeholder,
+                  color: colors.fgMuted,
                   fontSize: 14,
                   fontWeight: '700',
                 }}
@@ -360,7 +360,7 @@ const IronwoodMigrationBanner: React.FunctionComponent<
               </Text>
               <Text
                 style={{
-                  color: colors.placeholder,
+                  color: colors.fgMuted,
                   fontSize: 12,
                   textDecorationLine: 'underline',
                 }}
@@ -385,13 +385,13 @@ const IronwoodMigrationBanner: React.FunctionComponent<
                   progress={notesConfirmed / notesTotal}
                   active={broadcasting ? notesConfirmed : undefined}
                   activeSpan={migration.parts_broadcast}
-                  activeColor={colors.syncing}
+                  activeColor={colors.fgSyncing}
                   height={8}
                 />
               </View>
               <Text
                 style={{
-                  color: colors.primary,
+                  color: colors.fgAccent,
                   fontSize: 17,
                   fontWeight: '800',
                 }}
@@ -417,7 +417,7 @@ const IronwoodMigrationBanner: React.FunctionComponent<
                 marginBottom: 8,
               }}
             >
-              <Text style={{ color: colors.placeholder, fontSize: 13 }}>
+              <Text style={{ color: colors.fgMuted, fontSize: 13 }}>
                 {translate('ironwoodbanner.next-action-label') as string}
               </Text>
               <StatusPill color={nextActionColor} label={nextActionText} />
@@ -435,7 +435,7 @@ const IronwoodMigrationBanner: React.FunctionComponent<
                 <StatusDot color={statusColor} size={10} />
                 <Text
                   style={{
-                    color: colors.text,
+                    color: colors.fgDefault,
                     fontSize: 14,
                     fontWeight: '700',
                   }}
@@ -443,7 +443,7 @@ const IronwoodMigrationBanner: React.FunctionComponent<
                   {statusLabel}
                 </Text>
               </View>
-              <Text style={{ color: colors.text, fontSize: 14 }}>
+              <Text style={{ color: colors.fgDefault, fontSize: 14 }}>
                 {orchardLeftStr}
               </Text>
             </View>
@@ -467,7 +467,7 @@ const IronwoodMigrationBanner: React.FunctionComponent<
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'space-between',
-            backgroundColor: colors.bottomSheetBackground,
+            backgroundColor: colors.bgSurface,
             borderColor: colors.bottomSheetBorder,
             borderWidth: 1,
             borderRadius: 12,
@@ -488,19 +488,19 @@ const IronwoodMigrationBanner: React.FunctionComponent<
                   width: 9,
                   height: 9,
                   borderRadius: 5,
-                  backgroundColor: colors.warning.primary,
+                  backgroundColor: colors.fgWarning,
                   marginRight: 8,
                 }}
               />
               <Text
-                style={{ color: colors.text, fontSize: 15, fontWeight: '700' }}
+                style={{ color: colors.fgDefault, fontSize: 15, fontWeight: '700' }}
               >
                 {translate('ironwoodbanner.pool') as string}
               </Text>
             </View>
-            <Text style={{ color: colors.placeholder, fontSize: 13 }}>
+            <Text style={{ color: colors.fgMuted, fontSize: 13 }}>
               {translate('ironwoodbanner.balance') as string}{' '}
-              <Text style={{ color: colors.text, fontWeight: '700' }}>
+              <Text style={{ color: colors.fgDefault, fontWeight: '700' }}>
                 {Utils.parseNumberFloatToStringLocale(amount, 4)}
               </Text>{' '}
               {currencyName}
@@ -511,7 +511,7 @@ const IronwoodMigrationBanner: React.FunctionComponent<
             testID="ironwoodbanner.start"
             onPress={onStart}
             style={{
-              backgroundColor: colors.primary,
+              backgroundColor: colors.bgAccent,
               borderRadius: 24,
               paddingHorizontal: 22,
               paddingVertical: 10,
@@ -519,7 +519,7 @@ const IronwoodMigrationBanner: React.FunctionComponent<
           >
             <Text
               style={{
-                color: colors.background,
+                color: colors.bgCanvas,
                 fontSize: 15,
                 fontWeight: '700',
               }}

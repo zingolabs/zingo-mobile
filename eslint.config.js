@@ -42,6 +42,11 @@ module.exports = [
             'Core modules take no translate callback. Return an ErrorKey and let the display edge translate it (docs/adr/0002-error-keys-not-prose.md).',
         },
       ],
+    files: ['**/*.mjs'],
+    languageOptions: {
+      parser: require('espree'),
+      ecmaVersion: 2022,
+      sourceType: 'module',
     },
   },
 ];

@@ -7,7 +7,11 @@ import React, {
   useState,
 } from 'react';
 import { BackHandler, Text, useWindowDimensions, View } from 'react-native';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import {
+  Gesture,
+  GestureDetector,
+  ScrollView,
+} from 'react-native-gesture-handler';
 import Animated, {
   cancelAnimation,
   Extrapolation,
@@ -23,7 +27,8 @@ import Animated, {
   withSpring,
 } from 'react-native-reanimated';
 import Svg, { Circle } from 'react-native-svg';
-import { useFocusEffect, useTheme } from '@react-navigation/native';
+import { useFocusEffect } from '@react-navigation/native';
+import { useTheme } from '../../app/theme';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faArrowRightLong } from '@fortawesome/free-solid-svg-icons';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -31,7 +36,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import BoldText from '../Components/BoldText';
 import Button from '../Components/Button';
 import SettingsFileImpl from '../Settings/SettingsFileImpl';
-import { AppDrawerParamList, ThemeType } from '../../app/types';
+import { AppDrawerParamList } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import {
   ButtonTypeEnum,
@@ -306,7 +311,12 @@ const Phase1Graphic: React.FunctionComponent<{
         style={{ width: 104, flexDirection: 'row', flexWrap: 'wrap', gap: 7 }}
       >
         {Array.from({ length: sources }, (_, i: number) => (
-          <MiniCard key={i} size={30} color={ORCHARD_ACCENT} fill={ORCHARD_BG} />
+          <MiniCard
+            key={i}
+            size={30}
+            color={ORCHARD_ACCENT}
+            fill={ORCHARD_BG}
+          />
         ))}
       </View>
     )}
@@ -367,7 +377,7 @@ const MeetIronwood: React.FunctionComponent<MeetIronwoodProps> = ({
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate } = context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
   const { width } = useWindowDimensions();
 
   // One shared value drives everything: the strip position, the per-page
@@ -528,7 +538,7 @@ const MeetIronwood: React.FunctionComponent<MeetIronwoodProps> = ({
         <FontAwesomeIcon
           icon={faArrowRightLong}
           size={26}
-          color={colors.text}
+          color={colors.fgDefault}
           style={{ marginHorizontal: 22, marginTop: 25 }}
         />
         <View style={{ alignItems: 'center' }}>
@@ -539,10 +549,10 @@ const MeetIronwood: React.FunctionComponent<MeetIronwoodProps> = ({
         </View>
       </View>
       <View style={{ alignSelf: 'stretch' }}>
-        <BodyText dimColor={colors.placeholder} boldColor={colors.text}>
+        <BodyText dimColor={colors.fgMuted} boldColor={colors.fgDefault}>
           {translate('meetironwood.step1-body-1') as string}
         </BodyText>
-        <BodyText dimColor={colors.placeholder} boldColor={colors.text}>
+        <BodyText dimColor={colors.fgMuted} boldColor={colors.fgDefault}>
           {translate('meetironwood.step1-body-2') as string}
         </BodyText>
       </View>
@@ -554,8 +564,8 @@ const MeetIronwood: React.FunctionComponent<MeetIronwoodProps> = ({
           note on the next ordinary spend. */}
       <View style={{ marginBottom: 16 }}>
         <Phase1Graphic
-          green={colors.primary}
-          arrowColor={colors.text}
+          green={colors.borderAccent}
+          arrowColor={colors.fgDefault}
           count={1}
         />
       </View>
@@ -563,8 +573,8 @@ const MeetIronwood: React.FunctionComponent<MeetIronwoodProps> = ({
         {translate('meetironwood.option1-label') as string}
       </OptionTitle>
       <BodyText
-        dimColor={colors.placeholder}
-        boldColor={colors.text}
+        dimColor={colors.fgMuted}
+        boldColor={colors.fgDefault}
         marginBottom={0}
       >
         {translate('meetironwood.option1-body') as string}
@@ -582,8 +592,8 @@ const MeetIronwood: React.FunctionComponent<MeetIronwoodProps> = ({
           single Ironwood note. */}
       <View style={{ marginBottom: 16 }}>
         <Phase1Graphic
-          green={colors.primary}
-          arrowColor={colors.text}
+          green={colors.borderAccent}
+          arrowColor={colors.fgDefault}
           sources={6}
           count={1}
         />
@@ -592,8 +602,8 @@ const MeetIronwood: React.FunctionComponent<MeetIronwoodProps> = ({
         {translate('meetironwood.option2-label') as string}
       </OptionTitle>
       <BodyText
-        dimColor={colors.placeholder}
-        boldColor={colors.text}
+        dimColor={colors.fgMuted}
+        boldColor={colors.fgDefault}
         marginBottom={0}
       >
         {translate('meetironwood.option2-body') as string}
@@ -624,8 +634,8 @@ const MeetIronwood: React.FunctionComponent<MeetIronwoodProps> = ({
           <SoonTag>{translate('meetironwood.option3-soon') as string}</SoonTag>
         </View>
         <BodyText
-          dimColor={colors.placeholder}
-          boldColor={colors.text}
+          dimColor={colors.fgMuted}
+          boldColor={colors.fgDefault}
           marginBottom={0}
         >
           {translate('meetironwood.option3-body') as string}
@@ -635,20 +645,20 @@ const MeetIronwood: React.FunctionComponent<MeetIronwoodProps> = ({
   ];
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background }}>
+    <View style={{ flex: 1, backgroundColor: colors.bgCanvas }}>
       <GestureDetector gesture={pan}>
         <Animated.View
           entering={FadeInUp.duration(420)
             .withInitialValues({ opacity: 0, transform: [{ translateY: 14 }] })
             .reduceMotion(ReduceMotion.System)}
-          style={{ marginTop: 24, overflow: 'hidden' }}
+          style={{ flex: 1, marginTop: 24, overflow: 'hidden' }}
         >
           <Animated.View
             style={[
               {
+                flex: 1,
                 flexDirection: 'row',
                 width: width * STEP_COUNT,
-                alignItems: 'flex-start',
               },
               stripStyle,
             ]}
@@ -661,10 +671,6 @@ const MeetIronwood: React.FunctionComponent<MeetIronwoodProps> = ({
           </Animated.View>
         </Animated.View>
       </GestureDetector>
-
-      {/* Spacer pushes the pager down so the dots + buttons sit at the bottom
-          at a fixed level, independent of each page's content height. */}
-      <View style={{ flex: 1 }} />
 
       <Animated.View
         entering={FadeInUp.duration(420)
@@ -683,8 +689,8 @@ const MeetIronwood: React.FunctionComponent<MeetIronwoodProps> = ({
             key={i}
             i={i}
             progress={progress}
-            activeColor={colors.primary}
-            inactiveColor={colors.placeholder}
+            activeColor={colors.fgAccent}
+            inactiveColor={colors.bgMuted}
           />
         ))}
       </Animated.View>
@@ -765,8 +771,15 @@ const PagerPage: React.FunctionComponent<PagerPageProps> = ({
     };
   });
   return (
-    <Animated.View style={[{ width, paddingHorizontal: 30 }, style]}>
-      {children}
+    <Animated.View style={[{ width }, style]}>
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={{ paddingHorizontal: 30, paddingBottom: 12 }}
+        showsVerticalScrollIndicator={false}
+        bounces={false}
+      >
+        {children}
+      </ScrollView>
     </Animated.View>
   );
 };

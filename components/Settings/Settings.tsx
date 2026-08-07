@@ -21,7 +21,7 @@ import {
 import Animated from 'react-native-reanimated';
 import { useOptionsPanelSheetSlide } from '../../app/hooks/useOptionsPanelSheetSlide';
 
-import { useTheme } from '@react-navigation/native';
+import { useTheme } from '../../app/theme';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
   IconDefinition,
@@ -44,7 +44,7 @@ import {
   serverUris,
 } from '../../app/uris';
 import Button from '../Components/Button';
-import { AppDrawerParamList, ThemeType } from '../../app/types';
+import { AppDrawerParamList } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 
 import Header from '../Header';
@@ -69,6 +69,7 @@ import {
   BlockExplorerEnum,
 } from '../../app/AppState';
 import { getLatestBlockServerInfo } from '../../app/walletBackend';
+import { getMixnetIpCorrelationDisclaimer } from '../../app/walletBackend/utils/mixnetUtils';
 import { isEqual } from 'lodash';
 import ChainTypeToggle from '../Components/ChainTypeToggle';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
@@ -164,6 +165,9 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     performanceLevel: performanceLevelContext,
     blockExplorer: blockExplorerContext,
     nym: nymContext,
+    mixnetView,
+    disableMixnet,
+    reenableMixnet,
     foregroundEpoch,
     readOnly,
     setPrivacyOption,
@@ -229,7 +233,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     BLOCKEXPLORERMENU = blockExplorersArray as Options[];
   }
 
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
   const screenName = ScreenEnum.Settings;
 
   // Audit Issue D — single source of truth for security.settingsScreen.
@@ -244,6 +248,25 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
 
   const [autoServerUri, setAutoServerUri] = useState<string>('');
   const [autoServerChainName, setAutoServerChainName] = useState<string>('');
+  // The canonical ZIP-0318 IP-correlation disclaimer, fetched once from the
+  // FFI wherever the Mixnet Mode section renders; null until it arrives (or
+  // when the native layer rejects, in which case nothing renders).
+  const [mixnetDisclaimer, setMixnetDisclaimer] = useState<string | null>(null);
+  const mixnetSupported = mixnetView !== null;
+  useEffect(() => {
+    if (!mixnetSupported) {
+      return;
+    }
+    let alive = true;
+    getMixnetIpCorrelationDisclaimer().then((text: string | null) => {
+      if (alive) {
+        setMixnetDisclaimer(text);
+      }
+    });
+    return () => {
+      alive = false;
+    };
+  }, [mixnetSupported]);
   const [listServerUri, setListServerUri] = useState<string>('');
   const [listServerChainName, setListServerChainName] = useState<string>('');
   const [customServerUri, setCustomServerUri] = useState<string>('');
@@ -1130,7 +1153,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                 typeOption(item.value) === valueOption ? faDotCircle : farCircle
               }
               size={16}
-              color={colors.border}
+              color={colors.fgMuted}
             />
             <RegText key={'text-' + item.value} style={{ marginLeft: 10 }}>
               {translate(`settings.value-${label}-${item.value}`) as string}
@@ -1261,7 +1284,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
           paddingTop: 12,
           paddingBottom: 8,
           paddingHorizontal: 16,
-          backgroundColor: colors.bottomSheetBackground,
+          backgroundColor: colors.bgSurface,
           borderTopLeftRadius: 40,
           borderTopRightRadius: 40,
           borderTopWidth: 1,
@@ -1291,7 +1314,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
             <FontAwesomeIcon
               icon={faChevronLeft}
               size={20}
-              color={colors.primary}
+              color={colors.fgAccent}
             />
           </TouchableOpacity>
           <BoldText
@@ -1317,7 +1340,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       <BottomSheetFooter {...props} bottomInset={0}>
         <View
           style={{
-            backgroundColor: colors.bottomSheetBackground,
+            backgroundColor: colors.bgSurface,
             paddingTop: 10,
             paddingBottom: 24,
             flexDirection: 'row',
@@ -1351,7 +1374,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
           paddingTop: 8,
           paddingBottom: 6,
           paddingHorizontal: 16,
-          backgroundColor: colors.bottomSheetBackground,
+          backgroundColor: colors.bgSurface,
           borderTopLeftRadius: 40,
           borderTopRightRadius: 40,
           borderTopWidth: 1,
@@ -1390,7 +1413,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
             hitSlop={8}
             style={{ paddingHorizontal: 14, paddingVertical: 4 }}
           >
-            <FontAwesomeIcon icon={faXmark} size={20} color={colors.zingo} />
+            <FontAwesomeIcon icon={faXmark} size={20} color={colors.fgMuted} />
           </Pressable>
         </View>
       </View>
@@ -1405,7 +1428,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
           paddingTop: 8,
           paddingBottom: 6,
           paddingHorizontal: 16,
-          backgroundColor: colors.bottomSheetBackground,
+          backgroundColor: colors.bgSurface,
           borderTopLeftRadius: 40,
           borderTopRightRadius: 40,
           borderTopWidth: 1,
@@ -1444,7 +1467,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
             hitSlop={8}
             style={{ paddingHorizontal: 14, paddingVertical: 4 }}
           >
-            <FontAwesomeIcon icon={faXmark} size={20} color={colors.zingo} />
+            <FontAwesomeIcon icon={faXmark} size={20} color={colors.fgMuted} />
           </Pressable>
         </View>
       </View>
@@ -1508,8 +1531,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
           isChecked={value}
           useBuiltInState={false}
           onPress={() => setValue(!value)}
-          unFillColor={colors.card}
-          fillColor={colors.primary}
+          unFillColor={colors.bgCanvas}
+          fillColor={colors.bgAccent}
           style={{
             marginRight: 10,
           }}
@@ -1561,7 +1584,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   );
 
   if (!authPassed) {
-    return <View style={{ flex: 1, backgroundColor: colors.background }} />;
+    return <View style={{ flex: 1, backgroundColor: colors.bgCanvas }} />;
   }
 
   return (
@@ -1574,13 +1597,13 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       }
       style={{
         flex: 1,
-        backgroundColor: colors.background,
+        backgroundColor: colors.bgCanvas,
       }}
     >
       <View
         style={{
           flex: 1,
-          backgroundColor: colors.background,
+          backgroundColor: colors.bgCanvas,
         }}
         onLayout={e => setContainerH(e.nativeEvent.layout.height)}
       >
@@ -1610,7 +1633,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
             keyboardBlurBehavior={'restore'}
             android_keyboardInputMode={'adjustResize'}
             backgroundStyle={{
-              backgroundColor: colors.bottomSheetBackground,
+              backgroundColor: colors.bgSurface,
               borderTopLeftRadius: 40,
               borderTopRightRadius: 40,
             }}
@@ -1624,7 +1647,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
               alwaysBounceVertical={false}
               style={{
                 flex: 1,
-                backgroundColor: colors.bottomSheetBackground,
+                backgroundColor: colors.bgSurface,
               }}
               contentContainerStyle={{
                 flexDirection: 'column',
@@ -1653,7 +1676,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                     )}
                     <View style={{ flex: 1, marginLeft: 10 }}>
                       <BoldText
-                        style={{ color: nym ? '#07FF94' : colors.text }}
+                        style={{ color: nym ? '#07FF94' : colors.fgDefault }}
                       >
                         {translate('settings.nym-network') as string}
                       </BoldText>
@@ -1669,6 +1692,90 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                       )}
                     </TouchableOpacity>
                   </View>
+                </View>
+              )}
+
+              {/* Mixnet Mode (send-over-nym): a live per-session control,
+                  never persisted — forced on at wallet load, turning it off
+                  is this session's deliberate clearnet consent, and a died
+                  or failed transport recovers only through the re-enable
+                  here or on the send screen. Rendered only where the
+                  policy runs (mixnetView is null on platforms whose
+                  transport has not landed). */}
+              {mixnetView !== null && (
+                <View
+                  style={{ marginHorizontal: 25, marginVertical: 15 }}
+                  testID="settings.mixnet"
+                >
+                  <BoldText>
+                    {translate('settings.nym-privacy-network') as string}
+                  </BoldText>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      marginTop: 5,
+                    }}
+                  >
+                    {mixnetView.statusKey === 'mixnet.status.ready' ? (
+                      <NymOn width={22} height={22} />
+                    ) : (
+                      <NymOff width={22} height={22} />
+                    )}
+                    <View style={{ flex: 1, marginLeft: 10 }}>
+                      <BoldText
+                        style={{
+                          color:
+                            mixnetView.statusKey === 'mixnet.status.ready'
+                              ? '#07FF94'
+                              : colors.fgDefault,
+                        }}
+                      >
+                        {translate(mixnetView.statusKey) as string}
+                      </BoldText>
+                      <FadeText>
+                        {mixnetView.narration !== null
+                          ? mixnetView.narration
+                          : (translate(
+                              'settings.nym-enhanced-privacy',
+                            ) as string)}
+                      </FadeText>
+                    </View>
+                    <TouchableOpacity
+                      testID="settings.mixnet-toggle"
+                      onPress={() => {
+                        if (
+                          mixnetView.sendBlocked === false &&
+                          mixnetView.statusKey === 'mixnet.status.off'
+                        ) {
+                          reenableMixnet();
+                        } else if (
+                          mixnetView.statusKey === 'mixnet.status.ready' ||
+                          mixnetView.statusKey === 'mixnet.status.bootstrapping'
+                        ) {
+                          disableMixnet();
+                        } else {
+                          // died / unknown: the only way up is a fresh start.
+                          reenableMixnet();
+                        }
+                      }}
+                    >
+                      {mixnetView.statusKey === 'mixnet.status.off' ? (
+                        <SwitchOff width={40} height={19} />
+                      ) : (
+                        <NymSwitchOn width={40} height={19} />
+                      )}
+                    </TouchableOpacity>
+                  </View>
+                  {/* The canonical disclaimer renders verbatim (one string
+                      from zingolib, deliberately untranslated) so every
+                      frontend names the same residual exposure: sync stays
+                      on the ordinary connection even while the mode is on. */}
+                  {mixnetDisclaimer !== null && (
+                    <FadeText style={{ marginTop: 8 }}>
+                      {mixnetDisclaimer}
+                    </FadeText>
+                  )}
                 </View>
               )}
 
@@ -1696,7 +1803,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                       style={{
                         marginRight: 5,
                         fontWeight: '400',
-                        color: colors.zingo,
+                        color: colors.fgMuted,
                       }}
                     >
                       {
@@ -1708,7 +1815,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                     <FontAwesomeIcon
                       icon={faChevronRight}
                       size={12}
-                      color={colors.zingo}
+                      color={colors.fgMuted}
                     />
                   </View>
                 </TouchableOpacity>
@@ -1736,7 +1843,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                     <FontAwesomeIcon
                       icon={faInfoCircle}
                       size={14}
-                      color={colors.text}
+                      color={colors.fgDefault}
                     />
                   </TouchableOpacity>
                 </View>
@@ -1745,7 +1852,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                     flexDirection: 'row',
                     alignItems: 'center',
                     borderWidth: 1,
-                    borderColor: colors.primary,
+                    borderColor: colors.borderAccent,
                     borderRadius: 8,
                   }}
                 >
@@ -1762,18 +1869,18 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                           paddingVertical: 8,
                           alignItems: 'center',
                           backgroundColor: selected
-                            ? colors.primary
+                            ? colors.bgAccent
                             : 'transparent',
                           borderRadius: 8,
                           borderWidth: selected ? 1 : 0,
-                          borderColor: colors.primary,
+                          borderColor: colors.borderAccent,
                         }}
                       >
                         <RegText
                           style={{
                             color: selected
-                              ? colors.background
-                              : colors.primary,
+                              ? colors.bgCanvas
+                              : colors.fgAccent,
                             fontSize: 12,
                           }}
                         >
@@ -1833,7 +1940,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                         <FontAwesomeIcon
                           icon={faInfoCircle}
                           size={14}
-                          color={colors.text}
+                          color={colors.fgDefault}
                         />
                       </TouchableOpacity>
                     </View>
@@ -1895,7 +2002,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                         <FontAwesomeIcon
                           icon={faInfoCircle}
                           size={14}
-                          color={colors.text}
+                          color={colors.fgDefault}
                         />
                       </TouchableOpacity>
                     </View>
@@ -1930,7 +2037,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                       {hasRecoveryWalletInfoSaved && (
                         <FadeText
                           style={{
-                            color: colors.primary,
+                            color: colors.fgAccent,
                             textAlign: 'center',
                             marginTop: 6,
                           }}
@@ -1974,7 +2081,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                           style={{
                             marginRight: 5,
                             fontWeight: '400',
-                            color: colors.zingo,
+                            color: colors.fgMuted,
                           }}
                         >
                           {securityLabel}
@@ -1982,7 +2089,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                         <FontAwesomeIcon
                           icon={faChevronRight}
                           size={12}
-                          color={colors.zingo}
+                          color={colors.fgMuted}
                         />
                       </View>
                     </TouchableOpacity>
@@ -2042,8 +2149,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                               fontSize: 11,
                               lineHeight: 13,
                               color: customServerIncomplete
-                                ? colors.danger.primary
-                                : colors.zingo,
+                                ? colors.fgDangerEmphasis
+                                : colors.fgMuted,
                             }}
                           >
                             {currentServerKindLabel}
@@ -2055,8 +2162,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                           style={{
                             fontWeight: '400',
                             color: customServerIncomplete
-                              ? colors.danger.primary
-                              : colors.zingo,
+                              ? colors.fgDangerEmphasis
+                              : colors.fgMuted,
                           }}
                         >
                           {currentServerLabel}
@@ -2067,8 +2174,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                         size={16}
                         color={
                           customServerIncomplete
-                            ? colors.danger.primary
-                            : colors.zingo
+                            ? colors.fgDangerEmphasis
+                            : colors.fgMuted
                         }
                       />
                     </View>
@@ -2101,7 +2208,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                         style={{
                           marginRight: 5,
                           fontWeight: '400',
-                          color: colors.zingo,
+                          color: colors.fgMuted,
                         }}
                       >
                         {
@@ -2113,7 +2220,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                       <FontAwesomeIcon
                         icon={faChevronRight}
                         size={12}
-                        color={colors.zingo}
+                        color={colors.fgMuted}
                       />
                     </View>
                   </TouchableOpacity>
@@ -2144,7 +2251,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                         <FontAwesomeIcon
                           icon={faInfoCircle}
                           size={14}
-                          color={colors.text}
+                          color={colors.fgDefault}
                         />
                       </TouchableOpacity>
                     </View>
@@ -2198,7 +2305,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                         <FontAwesomeIcon
                           icon={faInfoCircle}
                           size={14}
-                          color={colors.text}
+                          color={colors.fgDefault}
                         />
                       </TouchableOpacity>
                     </View>
@@ -2257,7 +2364,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                         <FontAwesomeIcon
                           icon={faInfoCircle}
                           size={14}
-                          color={colors.text}
+                          color={colors.fgDefault}
                         />
                       </TouchableOpacity>
                     </View>
@@ -2303,7 +2410,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                 <FontAwesomeIcon
                   icon={faChevronRight}
                   size={12}
-                  color={colors.zingo}
+                  color={colors.fgMuted}
                 />
               </TouchableOpacity>
 
@@ -2372,7 +2479,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         }}
         handleComponent={renderSecurityHandle}
         backgroundStyle={{
-          backgroundColor: colors.bottomSheetBackground,
+          backgroundColor: colors.bgSurface,
           borderTopLeftRadius: 40,
           borderTopRightRadius: 40,
         }}
@@ -2380,7 +2487,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       >
         <BottomSheetView
           style={{
-            backgroundColor: colors.bottomSheetBackground,
+            backgroundColor: colors.bgSurface,
             paddingBottom: 30,
           }}
         >
@@ -2462,7 +2569,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         }}
         handleComponent={renderServerHandle}
         backgroundStyle={{
-          backgroundColor: colors.bottomSheetBackground,
+          backgroundColor: colors.bgSurface,
           borderTopLeftRadius: 40,
           borderTopRightRadius: 40,
         }}
@@ -2471,7 +2578,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         <BottomSheetScrollView
           bounces={false}
           alwaysBounceVertical={false}
-          style={{ backgroundColor: colors.bottomSheetBackground }}
+          style={{ backgroundColor: colors.bgSurface }}
           contentContainerStyle={{
             paddingHorizontal: 16,
             paddingTop: 12,
@@ -2502,7 +2609,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                   style={{
                     marginRight: 5,
                     fontWeight: '400',
-                    color: colors.zingo,
+                    color: colors.fgMuted,
                   }}
                 >
                   {
@@ -2514,7 +2621,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                 <FontAwesomeIcon
                   icon={faChevronRight}
                   size={12}
-                  color={colors.zingo}
+                  color={colors.fgMuted}
                 />
               </View>
             </TouchableOpacity>
@@ -2525,9 +2632,9 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
             <View
               style={{
                 borderWidth: 1,
-                borderColor: colors.primary,
+                borderColor: colors.borderAccent,
                 borderRadius: 10,
-                backgroundColor: '#031124',
+                backgroundColor: colors.bgSurface,
                 paddingHorizontal: 12,
                 paddingVertical: 6,
                 marginBottom: 16,
@@ -2628,7 +2735,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                   <FontAwesomeIcon
                     icon={offlineIcon}
                     size={16}
-                    color={colors.border}
+                    color={colors.fgMuted}
                   />
                 )}
                 <RegText style={{ marginLeft: 10 }}>
@@ -2696,7 +2803,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                   <FontAwesomeIcon
                     icon={autoIcon}
                     size={16}
-                    color={colors.border}
+                    color={colors.fgMuted}
                   />
                 )}
                 <RegText style={{ marginLeft: 10 }}>
@@ -2759,7 +2866,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                   <FontAwesomeIcon
                     icon={listIcon}
                     size={16}
-                    color={colors.border}
+                    color={colors.fgMuted}
                   />
                 )}
                 <RegText
@@ -2822,7 +2929,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                   <FontAwesomeIcon
                     icon={customIcon}
                     size={16}
-                    color={colors.border}
+                    color={colors.fgMuted}
                   />
                 )}
                 <RegText style={{ marginLeft: 10 }}>
@@ -2861,7 +2968,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                       <>
                         <ActivityIndicator
                           size="small"
-                          color={colors.primary}
+                          color={colors.fgAccent}
                         />
                         <FadeText style={{ fontSize: 12 }}>
                           {translate('settings.server-checking') as string}
@@ -2873,8 +2980,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                         size={14}
                         color={
                           selectedServerActive
-                            ? colors.primary
-                            : colors.danger.text
+                            ? colors.fgAccent
+                            : colors.fgDanger
                         }
                       />
                     )}
@@ -2886,7 +2993,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                     translate('settings.server-acc') as string
                   }
                   style={{
-                    borderColor: colors.border,
+                    borderColor: colors.borderMuted,
                     borderWidth: 1,
                     borderRadius: 12,
                     marginHorizontal: 5,
@@ -2902,13 +3009,13 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                   <TextInput
                     testID="settings.custom-server-field"
                     placeholder={GlobalConst.serverPlaceHolder}
-                    placeholderTextColor={colors.placeholder}
+                    placeholderTextColor={colors.fgMuted}
                     style={{
                       // Coral when the check settled as unreachable/invalid.
                       color:
                         !checkingServer && selectedServerActive === false
-                          ? colors.danger.text
-                          : colors.text,
+                          ? colors.fgDanger
+                          : colors.fgDefault,
                       fontWeight: '600',
                       fontSize: 18,
                       flex: 1,
@@ -2932,7 +3039,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                         style={{ marginRight: 10 }}
                         size={20}
                         icon={faXmark}
-                        color={colors.primaryDisabled}
+                        color={colors.fgAccentDisabled}
                       />
                     </TouchableOpacity>
                   )}

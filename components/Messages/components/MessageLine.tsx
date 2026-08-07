@@ -6,7 +6,7 @@ import {
   ActivityIndicator,
   Platform,
 } from 'react-native';
-import { useTheme } from '@react-navigation/native';
+import { useTheme } from '../../../app/theme';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
   faTriangleExclamation,
@@ -29,7 +29,6 @@ import {
   TransparentAddressClass,
   ScreenEnum,
 } from '../../../app/AppState';
-import { ThemeType } from '../../../app/types';
 
 import { ContextAppLoaded } from '../../../app/context';
 import AddressItem from '../../Components/AddressItem';
@@ -63,15 +62,15 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
     addresses,
     addLastSnackbar,
   } = context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
 
   const { memo, memoUA } = Utils.splitMemo(vt.memos);
 
   const getAmountColor = (_vt: ValueTransferType) => {
     return _vt.kind === ValueTransferKindEnum.Received ||
       _vt.kind === ValueTransferKindEnum.Shield
-      ? colors.primary
-      : colors.text;
+      ? colors.fgAccent
+      : colors.fgDefault;
   };
 
   const contactFound = (add: string) => {
@@ -124,8 +123,8 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
             paddingBottom: 5,
             borderTopWidth: 1,
             borderBottomWidth: 1,
-            borderColor: colors.card,
-            backgroundColor: colors.bottomSheetBackground,
+            borderColor: colors.bgCanvas,
+            backgroundColor: colors.bgSurface,
           }}
         >
           <FadeText>{month}</FadeText>
@@ -154,8 +153,8 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
               vt.kind === ValueTransferKindEnum.Received ? 0 : 20,
             backgroundColor:
               vt.kind === ValueTransferKindEnum.Received
-                ? colors.primaryDisabled
-                : colors.secondaryDisabled,
+                ? colors.bgAccentDisabled
+                : colors.bgSecondaryDisabled,
             opacity: vt.status === RPCValueTransfersStatusEnum.failed ? 0.5 : 1,
           }}
         >
@@ -247,7 +246,7 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
             {vt.status === RPCValueTransfersStatusEnum.failed && (
               <FadeText
                 style={{
-                  color: colors.danger.primary,
+                  color: colors.fgDangerEmphasis,
                   alignSelf: 'center',
                   fontSize: 12,
                   opacity: 1,
@@ -306,7 +305,7 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
                     style={{ marginLeft: 5, marginRight: 1, marginTop: 2 }}
                     size={12}
                     icon={faCircleXmark}
-                    color={colors.danger.primary}
+                    color={colors.fgDangerEmphasis}
                   />
                 )}
                 {(vt.status === RPCValueTransfersStatusEnum.calculated ||
@@ -315,7 +314,7 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
                     style={{ marginLeft: 5, marginRight: 1, marginTop: 2 }}
                     size={12}
                     icon={faCircleCheckRegular}
-                    color={colors.primary}
+                    color={colors.fgAccent}
                   />
                 )}
                 {(vt.status === RPCValueTransfersStatusEnum.mempool ||
@@ -324,7 +323,7 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
                     style={{ marginLeft: 5, marginRight: 1, marginTop: 2 }}
                     size={12}
                     icon={faCircleCheckSolid}
-                    color={colors.primary}
+                    color={colors.fgAccent}
                   />
                 )}
                 {vt.status !== RPCValueTransfersStatusEnum.confirmed &&
@@ -333,7 +332,7 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
                       style={{ marginLeft: 1, marginRight: 0, marginTop: 2 }}
                       size={12}
                       icon={faCircleCheckRegular}
-                      color={colors.primary}
+                      color={colors.fgAccent}
                     />
                   )}
                 {vt.status === RPCValueTransfersStatusEnum.confirmed && (
@@ -341,7 +340,7 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
                     style={{ marginLeft: 1, marginRight: 0, marginTop: 2 }}
                     size={12}
                     icon={faCircleCheckSolid}
-                    color={colors.primary}
+                    color={colors.fgAccent}
                   />
                 )}
                 {vt.status !== RPCValueTransfersStatusEnum.confirmed &&
@@ -353,7 +352,7 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
                             ? 'small'
                             : 12
                         }
-                        color={colors.primary}
+                        color={colors.fgAccent}
                       />
                     </View>
                   )}

@@ -17,13 +17,13 @@ import {
 } from 'react-native';
 import { showConfirm } from '../../app/showConfirm';
 
-import { useTheme } from '@react-navigation/native';
+import { useTheme } from '../../app/theme';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 
 import Button from '../Components/Button';
-import { AppDrawerParamList, ThemeType } from '../../app/types';
+import { AppDrawerParamList } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import { useBiometricGate } from '../../app/hooks/useBiometricGate';
 import Header from '../Header';
@@ -93,7 +93,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
     security,
     foregroundEpoch,
   } = context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
   const screenName = ScreenEnum.ShowUfvk;
 
   // Audit Issue D — single source of truth for the seed/UFVK biometric
@@ -352,7 +352,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
           paddingTop: 12,
           paddingBottom: 8,
           paddingHorizontal: 16,
-          backgroundColor: colors.bottomSheetBackground,
+          backgroundColor: colors.bgSurface,
           borderTopLeftRadius: 40,
           borderTopRightRadius: 40,
           borderTopWidth: 1,
@@ -378,7 +378,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
             <FontAwesomeIcon
               icon={faChevronLeft}
               size={20}
-              color={colors.primary}
+              color={colors.fgAccent}
             />
           </TouchableOpacity>
           <BoldText
@@ -405,7 +405,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
       <BottomSheetFooter {...props} bottomInset={0}>
         <View
           style={{
-            backgroundColor: colors.bottomSheetBackground,
+            backgroundColor: colors.bgSurface,
             paddingTop: 10,
             paddingBottom: 24,
             flexDirection: 'row',
@@ -450,7 +450,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
   );
 
   if (!authPassed) {
-    return <View style={{ flex: 1, backgroundColor: colors.background }} />;
+    return <View style={{ flex: 1, backgroundColor: colors.bgCanvas }} />;
   }
 
   return (
@@ -458,7 +458,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
       <View
         style={{
           flex: 1,
-          backgroundColor: colors.background,
+          backgroundColor: colors.bgCanvas,
         }}
         onLayout={e => setContainerH(e.nativeEvent.layout.height)}
       >
@@ -485,7 +485,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
           keyboardBlurBehavior={'restore'}
           android_keyboardInputMode={'adjustResize'}
           backgroundStyle={{
-            backgroundColor: colors.bottomSheetBackground,
+            backgroundColor: colors.bgSurface,
             borderTopLeftRadius: 40,
             borderTopRightRadius: 40,
           }}
@@ -508,7 +508,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
                 marginVertical: 20,
               }}
             >
-              <ActivityIndicator size="large" color={colors.primary} />
+              <ActivityIndicator size="large" color={colors.fgAccent} />
               {ufvkSource !== null && mode !== ModeEnum.basic && (
                 <RegText style={{ marginTop: 12, textAlign: 'center' }}>
                   {
@@ -528,7 +528,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
                 alwaysBounceVertical={false}
                 style={{
                   flex: 1,
-                  backgroundColor: colors.bottomSheetBackground,
+                  backgroundColor: colors.bgSurface,
                 }}
                 contentContainerStyle={{
                   flexDirection: 'column',
@@ -575,7 +575,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
                       >
                         <Text
                           style={{
-                            color: colors.text,
+                            color: colors.fgDefault,
                             textDecorationLine: 'underline',
                             padding: 10,
                             textAlign: 'center',
@@ -633,7 +633,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
         }}
         handleStyle={{ display: 'none' }}
         backgroundStyle={{
-          backgroundColor: colors.bottomSheetBackground,
+          backgroundColor: colors.bgSurface,
           borderTopLeftRadius: 40,
           borderTopRightRadius: 40,
         }}
@@ -641,7 +641,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
       >
         <BottomSheetView
           style={{
-            backgroundColor: colors.bottomSheetBackground,
+            backgroundColor: colors.bgSurface,
             paddingBottom: 30,
           }}
         >
