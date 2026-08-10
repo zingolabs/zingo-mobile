@@ -883,7 +883,6 @@ export class LoadedAppClass extends Component<
       startMixnetTransport: startMixnetTransport,
       mixnetSupported: true,
       nymEnabled: props.nym,
-      translate: props.translate,
       readOnly: props.readOnly,
       server: props.server,
       performanceLevel: props.performanceLevel,

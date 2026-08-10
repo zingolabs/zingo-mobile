@@ -17,10 +17,7 @@ module.exports = [
   },
   ...compat.extends('@react-native'),
   {
-    // Translate-free zone: core modules report failures as ErrorKeys and
-    // never resolve them to prose; the display edge translates. serverUris
-    // is exempt because it translates region display names, not errors.
-    // See docs/adr/0002-error-keys-not-prose.md.
+    // TODO: Undo once this string-based approach gets removed
     files: ['app/uris/**', 'app/walletBackend/**'],
     ignores: ['app/uris/serverUris.ts'],
     rules: {
@@ -42,6 +39,9 @@ module.exports = [
             'Core modules take no translate callback. Return an ErrorKey and let the display edge translate it (docs/adr/0002-error-keys-not-prose.md).',
         },
       ],
+    },
+  },
+  {
     files: ['**/*.mjs'],
     languageOptions: {
       parser: require('espree'),

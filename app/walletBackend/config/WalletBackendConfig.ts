@@ -5,7 +5,6 @@ import {
   UnifiedAddressClass,
   TransparentAddressClass,
   ServerType,
-  TranslateType,
 } from '../../AppState';
 import { RPCSyncStatusType } from '../types/RPCSyncStatusType';
 import { RPCPerformanceLevelEnum } from '../enums/RPCPerformanceLevelEnum';
@@ -65,8 +64,6 @@ export type WalletBackendConfig = {
    * (setNymOption) drives enable/disable thereafter.
    */
   nymEnabled: boolean;
-  /** i18n helper — must be bound to the active locale in the consumer. */
-  translate: (key: string) => TranslateType;
   /** Prevent device sleep while true (e.g. during active sync/send). */
   keepAwake: (keep: boolean) => void;
   /** When true, only the UFVK is available; no seed phrase operations. */
