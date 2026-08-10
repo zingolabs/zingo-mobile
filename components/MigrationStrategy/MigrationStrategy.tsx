@@ -139,8 +139,6 @@ type OptionCardProps = {
   selected: boolean;
   onPress: () => void;
   colors: AppTheme['colors'];
-  disabled?: boolean;
-  badge?: string;
   accent?: string;
 };
 
@@ -150,13 +148,10 @@ const OptionCard: React.FunctionComponent<OptionCardProps> = ({
   selected,
   onPress,
   colors,
-  disabled = false,
-  badge,
   accent,
 }) => (
   <TouchableOpacity
-    activeOpacity={disabled ? 1 : 0.8}
-    disabled={disabled}
+    activeOpacity={0.8}
     onPress={onPress}
     style={{
       borderWidth: 1.5,
@@ -164,7 +159,6 @@ const OptionCard: React.FunctionComponent<OptionCardProps> = ({
       backgroundColor: colors.bgSurface,
       borderRadius: 14,
       padding: 18,
-      opacity: disabled ? 0.5 : 1,
     }}
   >
     <View
@@ -178,24 +172,11 @@ const OptionCard: React.FunctionComponent<OptionCardProps> = ({
       <View
         style={{ flexDirection: 'row', alignItems: 'center', flexShrink: 1 }}
       >
-        <Text style={{ color: colors.fgDefault, fontSize: 17, fontWeight: '700' }}>
+        <Text
+          style={{ color: colors.fgDefault, fontSize: 17, fontWeight: '700' }}
+        >
           {title}
         </Text>
-        {badge ? (
-          <View
-            style={{
-              marginLeft: 8,
-              paddingHorizontal: 8,
-              paddingVertical: 2,
-              borderRadius: 6,
-              backgroundColor: 'rgba(255, 255, 255, 0.08)',
-            }}
-          >
-            <Text style={{ color: colors.fgMuted, fontSize: 12 }}>
-              {badge}
-            </Text>
-          </View>
-        ) : null}
       </View>
       <RadioDot
         selected={selected}
@@ -348,10 +329,8 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
             title={translate('migrationstrategy.private-label') as string}
             body={translate('migrationstrategy.private-body') as string}
             selected={selected === 'private'}
-            onPress={() => {}}
+            onPress={() => setSelected('private')}
             colors={colors}
-            disabled={true}
-            badge={translate('migrationstrategy.coming-soon') as string}
           />
         </ScrollView>
 
@@ -376,12 +355,14 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
             type={ButtonTypeEnum.Primary}
             title={translate('migrationstrategy.start') as string}
             onPress={() => {
-              if (selected !== 'now') {
+              if (selected === 'none') {
                 closeMigration();
                 return;
               }
-              // Migration broadcasts cross the pool boundary, so recommend nym
-              // first unless it is already enabled.
+              if (selected === 'private') {
+                navigation.navigate(RouteEnum.MigrationSplitPlan);
+                return;
+              }
               if (nym) {
                 startMigrationNow();
                 return;
