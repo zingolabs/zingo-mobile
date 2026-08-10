@@ -46,7 +46,7 @@ const parseZcashURI = async (
   const t = new ZcashURITargetClass();
   if (address) {
     t.address = address;
-    const validAddress: { isValid: boolean; onlyOrchardUA: string } =
+    const validAddress: { isValid: boolean; shieldedOnlyUA: string } =
       await Utils.isValidAddress(address, server.chainName);
 
     if (!validAddress.isValid) {
@@ -88,7 +88,7 @@ const parseZcashURI = async (
           errors.push(`${translate('uris.duplicateparameter')} "${qName}"`);
           break;
         }
-        const validAddress: { isValid: boolean; onlyOrchardUA: string } =
+        const validAddress: { isValid: boolean; shieldedOnlyUA: string } =
           await Utils.isValidAddress(value, server.chainName);
 
         if (!validAddress.isValid) {

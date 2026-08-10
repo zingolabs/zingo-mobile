@@ -35,7 +35,7 @@ describe('parseZcashURI — Issue H: errors must yield empty target', () => {
     mockIsValidAddress.mockReset();
     mockIsValidAddress.mockResolvedValue({
       isValid: true,
-      onlyOrchardUA: '',
+      shieldedOnlyUA: '',
     });
   });
 
@@ -65,7 +65,7 @@ describe('parseZcashURI — Issue H: errors must yield empty target', () => {
   test('invalid path-as-address → empty target, error present', async () => {
     mockIsValidAddress.mockResolvedValue({
       isValid: false,
-      onlyOrchardUA: '',
+      shieldedOnlyUA: '',
     });
     const r = await parseZcashURI(
       `zcash:${INVALID_ADDR}`,
@@ -81,7 +81,7 @@ describe('parseZcashURI — Issue H: errors must yield empty target', () => {
   test('invalid query-string address → empty target', async () => {
     mockIsValidAddress.mockResolvedValue({
       isValid: false,
-      onlyOrchardUA: '',
+      shieldedOnlyUA: '',
     });
     const r = await parseZcashURI(
       `zcash:?address=${INVALID_ADDR}`,

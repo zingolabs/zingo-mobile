@@ -90,7 +90,7 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
   navigation,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, info } = context;
+  const { translate, info, totalBalance } = context;
   const { colors } = useTheme() as ThemeType;
 
   const [plan, setPlan] = useState<RPCMigrationPlanType | null>(null);
@@ -160,7 +160,10 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
   const roundCount = splitRounds.length;
   const txCount = splitRounds.reduce((sum, round) => sum + round.length, 0);
   const noteCount = plan?.parts?.length ?? 0;
-  const isEmpty = !loading && !errorMsg && txCount === 0 && noteCount === 0;
+  const orchardHeld = totalBalance ? totalBalance.confirmedOrchardBalance : 0;
+  const noPlan = !loading && !errorMsg && txCount === 0 && noteCount === 0;
+  const isPending = noPlan && (plan?.residual ?? 0) === 0 && orchardHeld > 0;
+  const isEmpty = noPlan && !isPending;
   // Notes already the right size: nothing to split, but there is value to move.
   const noSplitNeeded = !loading && !errorMsg && txCount === 0 && noteCount > 0;
 
@@ -243,6 +246,67 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
             type={ButtonTypeEnum.Ghost}
             title={translate('migrationsplitplan.back') as string}
             onPress={() => navigation.goBack()}
+          />
+        </View>
+      </View>
+    );
+  }
+
+  if (isPending) {
+    return (
+      <View style={{ flex: 1, backgroundColor: colors.background }}>
+        <ScrollView
+          contentContainerStyle={{ padding: 24, paddingTop: 40, flexGrow: 1 }}
+        >
+          {title}
+          <View
+            style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
+          >
+            <Text
+              style={{
+                color: colors.text,
+                fontSize: 17,
+                fontWeight: '700',
+                marginBottom: 10,
+                textAlign: 'center',
+              }}
+            >
+              {translate('migrationsplitplan.pending-title') as string}
+            </Text>
+            <Text
+              style={{
+                color: colors.placeholder,
+                fontSize: 14,
+                textAlign: 'center',
+              }}
+            >
+              {translate('migrationsplitplan.pending-body') as string}
+            </Text>
+          </View>
+        </ScrollView>
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-evenly',
+            alignItems: 'center',
+            paddingTop: 24,
+            paddingBottom: 24,
+            paddingHorizontal: 24,
+          }}
+        >
+          <Button
+            testID="migrationsplitplan.pending-back"
+            type={ButtonTypeEnum.Ghost}
+            title={translate('migrationsplitplan.back') as string}
+            onPress={() => navigation.goBack()}
+            twoButtons={true}
+          />
+          <Button
+            testID="migrationsplitplan.retry"
+            type={ButtonTypeEnum.Primary}
+            title={translate('migrationsplitplan.retry') as string}
+            onPress={fetchPlan}
+            twoButtons={true}
           />
         </View>
       </View>

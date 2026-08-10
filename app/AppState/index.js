@@ -20,6 +20,7 @@ import SecurityType from './types/SecurityType';
 import ServerUrisType from './types/ServerUrisType';
 import { SetServerResult } from './types/SetServerResult';
 import ValueTransferType from './types/ValueTransferType';
+import ProposalPoolsType from './types/ProposalPoolsType';
 import TransactionType from './types/TransactionType';
 import TxDetailType from './types/TxDetailType';
 
@@ -44,7 +45,6 @@ import { CurrencyNameEnum } from './enums/CurrencyNameEnum';
 import { ButtonTypeEnum } from './enums/ButtonTypeEnum';
 import { AddressKindEnum } from './enums/AddressKindEnum';
 import { ReceiverEnum } from './enums/ReceiverEnum';
-import { PrivacyLevelFromEnum } from './enums/PrivacyLevelFromEnum';
 import { SecurityTypeEnum } from './enums/SecurityTypeEnum';
 import { EventListenerEnum } from './enums/EventListenerEnum';
 import { ValueTransferKindEnum } from './enums/ValueTransferKindEnum';
@@ -96,6 +96,7 @@ export {
   ServerUrisType,
   SetServerResult,
   ValueTransferType,
+  ProposalPoolsType,
   TransactionType,
   TxDetailType,
   AddressBookActionEnum,
@@ -119,7 +120,6 @@ export {
   ButtonTypeEnum,
   AddressKindEnum,
   ReceiverEnum,
-  PrivacyLevelFromEnum,
   SecurityTypeEnum,
   EventListenerEnum,
   ValueTransferKindEnum,

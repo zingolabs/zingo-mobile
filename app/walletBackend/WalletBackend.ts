@@ -30,11 +30,12 @@ export default class WalletBackend {
   private transactionService: TransactionService;
   private walletLifecycle: WalletLifecycleService;
   private mixnetCoordinator: MixnetCoordinator;
-  // The forced-on policy runs once per WalletBackend instance (one loaded
+  // The session gets its route once per WalletBackend instance (one loaded
   // session): configure() is re-run on every server or wallet change, and
   // each transport start is a full mixnet re-bootstrap, so repeats are for
-  // the user's deliberate re-enable only.
-  private mixnetEnsured: boolean = false;
+  // the user's deliberate re-enable only. The route is one of two — arm the
+  // mixnet (nym on) or record the clearnet consent (nym off).
+  private mixnetRouteSet: boolean = false;
 
   constructor(config: WalletBackendConfig) {
     this.config = config;
@@ -61,16 +62,15 @@ export default class WalletBackend {
 
   // Sync lifecycle
   async configure() {
-    if (
-      this.config.mixnetSupported &&
-      this.config.nymEnabled &&
-      !this.mixnetEnsured
-    ) {
-      this.mixnetEnsured = true;
-      // Deliberately not awaited: the mixnet bootstrap takes tens of
-      // seconds and must not delay sync configuration. The coordinator
-      // never rejects — failures arrive as the typed failure view.
-      this.mixnetCoordinator.ensureForConnectedSession();
+    if (this.config.mixnetSupported && !this.mixnetRouteSet) {
+      this.mixnetRouteSet = true;
+      if (this.config.nymEnabled) {
+        // Deliberately not awaited: the mixnet bootstrap takes tens of
+        // seconds and must not delay sync configuration.
+        this.mixnetCoordinator.ensureForConnectedSession();
+      } else {
+        this.mixnetCoordinator.disable();
+      }
     }
     return this.syncCoordinator.configure();
   }
