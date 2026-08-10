@@ -8,12 +8,8 @@ import React, {
 } from 'react';
 import { View, TouchableOpacity, TextInput, Keyboard } from 'react-native';
 
-import {
-  NavigationProp,
-  ParamListBase,
-  useNavigation,
-  useTheme,
-} from '@react-navigation/native';
+import { NavigationProp, ParamListBase, useNavigation } from '@react-navigation/native';
+import { useTheme } from '../../theme';
 import {
   faChevronLeft,
   faQrcode,
@@ -30,7 +26,6 @@ import FadeText from '../../../components/Components/FadeText';
 import RegText from '../../../components/Components/RegText';
 import BoldText from '../../../components/Components/BoldText';
 import Button from '../../../components/Components/Button';
-import { ThemeType } from '../../types';
 import { ContextAppLoading } from '../../context';
 import Header from '../../../components/Header';
 import { getLatestBlockServerInfo } from '../../walletBackend';
@@ -63,7 +58,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
   const context = useContext(ContextAppLoading);
   const { translate, netInfo, server, mode, addLastSnackbar, selectServer } =
     context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
   const screenName = ScreenEnum.ImportUfvk;
 
   const [seedufvkText, setSeedufvkText] = useState<string>('');
@@ -164,7 +159,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
           paddingTop: 12,
           paddingBottom: 8,
           paddingHorizontal: 16,
-          backgroundColor: colors.bottomSheetBackground,
+          backgroundColor: colors.bgSurface,
           borderTopLeftRadius: 40,
           borderTopRightRadius: 40,
           borderTopWidth: 1,
@@ -190,7 +185,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
             <FontAwesomeIcon
               icon={faChevronLeft}
               size={20}
-              color={colors.primary}
+              color={colors.fgAccent}
             />
           </TouchableOpacity>
           <BoldText
@@ -216,7 +211,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
       <BottomSheetFooter {...props} bottomInset={keyboardHeight}>
         <View
           style={{
-            backgroundColor: colors.bottomSheetBackground,
+            backgroundColor: colors.bgSurface,
             paddingTop: 10,
             paddingBottom: 24,
             flexDirection: 'row',
@@ -243,7 +238,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
     <View
       style={{
         flex: 1,
-        backgroundColor: colors.background,
+        backgroundColor: colors.bgCanvas,
       }}
       onLayout={e => setContainerH(e.nativeEvent.layout.height)}
     >
@@ -272,7 +267,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
         keyboardBlurBehavior={'restore'}
         android_keyboardInputMode={'adjustResize'}
         backgroundStyle={{
-          backgroundColor: colors.bottomSheetBackground,
+          backgroundColor: colors.bgSurface,
           borderTopLeftRadius: 40,
           borderTopRightRadius: 40,
         }}
@@ -285,7 +280,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
           alwaysBounceVertical={false}
           style={{
             flex: 1,
-            backgroundColor: colors.bottomSheetBackground,
+            backgroundColor: colors.bgSurface,
           }}
           contentContainerStyle={{
             flexDirection: 'column',
@@ -303,7 +298,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
               padding: 10,
               borderWidth: 1,
               borderRadius: 12,
-              borderColor: colors.border,
+              borderColor: colors.borderMuted,
               flexDirection: 'row',
               justifyContent: 'space-between',
             }}
@@ -327,7 +322,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
                 textContentType="none"
                 keyboardType="visible-password"
                 style={{
-                  color: colors.text,
+                  color: colors.fgDefault,
                   fontWeight: '600',
                   fontSize: 16,
                   minHeight: 100,
@@ -349,7 +344,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
                   style={{ margin: 0 }}
                   size={20}
                   icon={faXmark}
-                  color={colors.primaryDisabled}
+                  color={colors.fgAccentDisabled}
                 />
               </TouchableOpacity>
             )}
@@ -361,7 +356,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
               <FontAwesomeIcon
                 size={28}
                 icon={faQrcode}
-                color={colors.border}
+                color={colors.fgMuted}
               />
             </TouchableOpacity>
           </View>
@@ -383,7 +378,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
                 margin: 10,
                 borderWidth: 1,
                 borderRadius: 12,
-                borderColor: colors.border,
+                borderColor: colors.borderMuted,
                 width: '30%',
                 maxWidth: '40%',
                 maxHeight: 48,
@@ -396,9 +391,9 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
               <TextInput
                 testID="import.birthdayinput"
                 placeholder={'#'}
-                placeholderTextColor={colors.placeholder}
+                placeholderTextColor={colors.fgMuted}
                 style={{
-                  color: colors.text,
+                  color: colors.fgDefault,
                   fontWeight: '600',
                   fontSize: 18,
                   flex: 1,
@@ -439,7 +434,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
                       style={{ marginRight: 5 }}
                       size={20}
                       icon={faXmark}
-                      color={colors.primaryDisabled}
+                      color={colors.fgAccentDisabled}
                     />
                   </TouchableOpacity>
                 )}

@@ -1,12 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import { TouchableOpacity, View } from 'react-native';
-import {
-  NavigationProp,
-  ParamListBase,
-  useNavigation,
-  useTheme,
-} from '@react-navigation/native';
+import { NavigationProp, ParamListBase, useNavigation } from '@react-navigation/native';
+import { useTheme } from '../../../app/theme';
 import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
@@ -22,7 +18,6 @@ import {
 import TotalBalanceClass from '../../../app/AppState/classes/TotalBalanceClass';
 import InfoType from '../../../app/AppState/types/InfoType';
 import ZecPriceType from '../../../app/AppState/types/ZecPriceType';
-import { ThemeType } from '../../../app/types';
 import Utils from '../../../app/utils';
 import Button from '../../Components/Button';
 import CurrencyAmount from '../../Components/CurrencyAmount';
@@ -86,7 +81,7 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
     onManualFetchPrice,
   }) => {
     const navigation = useNavigation<NavigationProp<ParamListBase>>();
-    const { colors } = useTheme() as ThemeType;
+    const { colors } = useTheme();
 
     return (
       <>
@@ -112,7 +107,7 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
               )}
             <ZecAmount
               currencyName={info.currencyName}
-              color={colors.text}
+              color={colors.fgDefault}
               size={36}
               amtZec={
                 totalBalance
@@ -143,7 +138,7 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
                       flexDirection: 'row',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      backgroundColor: colors.card,
+                      backgroundColor: colors.bgCanvas,
                       borderRadius: 10,
                       margin: 0,
                       marginLeft: 5,
@@ -155,7 +150,7 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
                     <FontAwesomeIcon
                       icon={faInfoCircle}
                       size={20}
-                      color={colors.primary}
+                      color={colors.fgAccent}
                     />
                   </View>
                 </TouchableOpacity>
@@ -177,12 +172,12 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
                 margin: 0,
               }}
             >
-              <RegText color={colors.primary}>
+              <RegText color={colors.fgAccent}>
                 {translate('seed.youreceived') as string}
               </RegText>
               <ZecAmount
                 currencyName={info.currencyName}
-                color={colors.primary}
+                color={colors.fgAccent}
                 size={14}
                 amtZec={
                   totalBalance.totalIronwoodBalance +
@@ -191,7 +186,7 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
                 }
                 privacy={privacy}
               />
-              <RegText color={colors.primary}>!!!</RegText>
+              <RegText color={colors.fgAccent}>!!!</RegText>
             </View>
           )}
 

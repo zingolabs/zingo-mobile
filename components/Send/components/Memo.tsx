@@ -9,7 +9,7 @@ import {
   TextInputEndEditingEventData,
   NativeSyntheticEvent,
 } from 'react-native';
-import { useTheme } from '@react-navigation/native';
+import { useTheme } from '../../../app/theme';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
 
@@ -18,7 +18,6 @@ import {
   GlobalConst,
   TranslateType,
 } from '../../../app/AppState';
-import { ThemeType } from '../../../app/types';
 import Utils from '../../../app/utils';
 import FadeText from '../../Components/FadeText';
 import Button from '../../Components/Button';
@@ -40,7 +39,7 @@ const Memo: React.FunctionComponent<MemoProps> = ({
   setMemoText,
   translate,
 }) => {
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
 
   const inputRef = useRef<TextInput>(null);
 
@@ -71,7 +70,7 @@ const Memo: React.FunctionComponent<MemoProps> = ({
   return (
     <View
       style={{
-        backgroundColor: colors.bottomSheetBackground,
+        backgroundColor: colors.bgSurface,
       }}
     >
       <View
@@ -81,7 +80,7 @@ const Memo: React.FunctionComponent<MemoProps> = ({
           flexGrow: 1,
           borderWidth: 1,
           borderRadius: 12,
-          borderColor: colors.border,
+          borderColor: colors.borderMuted,
           minWidth: 48,
           minHeight: 48,
           maxHeight: Dimensions.get('window').height * 0.4,
@@ -93,10 +92,10 @@ const Memo: React.FunctionComponent<MemoProps> = ({
           testID="send.memo-field"
           multiline
           placeholder={translate('send.memo-placeholder') as string}
-          placeholderTextColor={colors.placeholder}
+          placeholderTextColor={colors.fgMuted}
           style={{
             flex: 1,
-            color: colors.text,
+            color: colors.fgDefault,
             fontWeight: '600',
             fontSize: 15,
             minWidth: 48,
@@ -118,7 +117,7 @@ const Memo: React.FunctionComponent<MemoProps> = ({
               style={{ margin: 10 }}
               size={20}
               icon={faXmark}
-              color={colors.primaryDisabled}
+              color={colors.fgAccentDisabled}
             />
           </TouchableOpacity>
         ) : null}
@@ -135,7 +134,7 @@ const Memo: React.FunctionComponent<MemoProps> = ({
           style={{
             marginTop: 0,
             fontWeight: 'bold',
-            color: memoDisabled ? 'red' : colors.text,
+            color: memoDisabled ? 'red' : colors.fgDefault,
             opacity: 1,
           }}
         >{`${Utils.countMemoBytes(memo, includeUAMemoBoolean, defaultUnifiedAddress)} `}</FadeText>

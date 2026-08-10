@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 
 import Clipboard from '@react-native-clipboard/clipboard';
-import { useTheme } from '@react-navigation/native';
+import { useTheme } from '../theme';
 import { I18n } from 'i18n-js';
 import * as RNLocalize from 'react-native-localize';
 import { StackScreenProps } from '@react-navigation/stack';
@@ -70,7 +70,7 @@ import {
 import { parseServerURI, serverUris, fetchServerList } from '../uris';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
 import { fetchWallet } from '../walletBackend';
-import { ThemeType } from '../types';
+import { AppTheme } from '../theme';
 import { ContextAppLoadingProvider } from '../context';
 import BackgroundFileImpl from '../../components/Background';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -130,7 +130,7 @@ const activationHeight = {
 };
 
 export default function LoadingApp(props: LoadingAppProps) {
-  const theme = useTheme() as ThemeType;
+  const theme = useTheme();
   const [language, setLanguage] = useState<LanguageEnum>(LanguageEnum.en);
   const [currency, setCurrency] = useState<CurrencyEnum>(
     CurrencyEnum.USDCurrency,
@@ -460,7 +460,7 @@ type LoadingAppClassProps = {
   route: StackScreenProps<AppStackParamList, RouteEnum.LoadingApp>['route'];
   toggleTheme: (mode: ModeEnum) => void;
   translate: (key: string) => TranslateType;
-  theme: ThemeType;
+  theme: AppTheme;
   language: LanguageEnum;
   currency: CurrencyEnum;
   server: ServerType;
@@ -1375,19 +1375,17 @@ export class LoadingAppClass extends Component<
       });
       this.customServerModalRef.current?.dismiss();
     } else {
-      const uri: string = parseServerURI(
-        this.state.customServerUri,
-        this.state.translate,
-      );
+      const parsed = parseServerURI(this.state.customServerUri);
       const chainName = this.state.customServerChainName;
-      if (uri && uri.toLowerCase().startsWith(GlobalConst.error)) {
+      if (parsed.kind === 'error') {
         // Surface the parser's specific message (bad URI, plaintext
         // HTTP not allowed, etc.) instead of the generic "fill out a
         // valid Server URI" snackbar so the user can fix the input.
-        this.addLastSnackbar(uri);
+        this.addLastSnackbar(this.state.translate(parsed.errorKey) as string);
         this.setState({ actionButtonsDisabled: false });
         return;
       }
+      const uri = parsed.uri;
 
       this.addLastSnackbar(
         this.state.translate('loadedapp.tryingnewserver') as string,

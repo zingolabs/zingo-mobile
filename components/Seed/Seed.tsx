@@ -16,12 +16,8 @@ import {
 } from 'react-native';
 import { showConfirm } from '../../app/showConfirm';
 
-import {
-  NavigationProp,
-  ParamListBase,
-  useNavigation,
-  useTheme,
-} from '@react-navigation/native';
+import { NavigationProp, ParamListBase, useNavigation } from '@react-navigation/native';
+import { useTheme } from '../../app/theme';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
@@ -36,7 +32,7 @@ import FadeText from '../Components/FadeText';
 import BoldText from '../Components/BoldText';
 import Button from '../Components/Button';
 import { useFullSheetSnapPoints } from '../../app/hooks/useFullSheetSnapPoints';
-import { AppDrawerParamList, ThemeType } from '../../app/types';
+import { AppDrawerParamList } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import { useBiometricGate } from '../../app/hooks/useBiometricGate';
 import {
@@ -97,7 +93,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
     security,
     foregroundEpoch,
   } = context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
   // when this screen is open from LoadingApp (new wallet)
   // is using the standard modal from react-native
   const screenName = ScreenEnum.Seed;
@@ -433,7 +429,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
           paddingTop: 12,
           paddingBottom: 8,
           paddingHorizontal: 16,
-          backgroundColor: colors.bottomSheetBackground,
+          backgroundColor: colors.bgSurface,
           borderTopLeftRadius: 40,
           borderTopRightRadius: 40,
           borderTopWidth: 1,
@@ -459,7 +455,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
             <FontAwesomeIcon
               icon={faChevronLeft}
               size={20}
-              color={colors.primary}
+              color={colors.fgAccent}
             />
           </TouchableOpacity>
           <BoldText
@@ -486,7 +482,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
       <BottomSheetFooter {...props} bottomInset={0}>
         <View
           style={{
-            backgroundColor: colors.bottomSheetBackground,
+            backgroundColor: colors.bgSurface,
             paddingTop: 10,
             paddingBottom: 24,
             flexDirection: 'row',
@@ -544,14 +540,14 @@ const Seed: React.FunctionComponent<SeedProps> = ({
   );
 
   if (!authPassed) {
-    return <View style={{ flex: 1, backgroundColor: colors.background }} />;
+    return <View style={{ flex: 1, backgroundColor: colors.bgCanvas }} />;
   }
 
   return (
     <View
       style={{
         flex: 1,
-        backgroundColor: colors.background,
+        backgroundColor: colors.bgCanvas,
       }}
       onLayout={e => setContainerH(e.nativeEvent.layout.height)}
     >
@@ -585,7 +581,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
         keyboardBlurBehavior={'restore'}
         android_keyboardInputMode={'adjustResize'}
         backgroundStyle={{
-          backgroundColor: colors.bottomSheetBackground,
+          backgroundColor: colors.bgSurface,
           borderTopLeftRadius: 40,
           borderTopRightRadius: 40,
         }}
@@ -600,7 +596,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
               marginVertical: 20,
             }}
           >
-            <ActivityIndicator size="large" color={colors.primary} />
+            <ActivityIndicator size="large" color={colors.fgAccent} />
             {seedSource !== null && mode !== ModeEnum.basic && (
               <RegText style={{ marginTop: 12, textAlign: 'center' }}>
                 {
@@ -621,7 +617,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
               alwaysBounceVertical={false}
               style={{
                 flex: 1,
-                backgroundColor: colors.bottomSheetBackground,
+                backgroundColor: colors.bgSurface,
               }}
               contentContainerStyle={{
                 flexDirection: 'column',
@@ -650,13 +646,13 @@ const Seed: React.FunctionComponent<SeedProps> = ({
                   padding: 10,
                   borderWidth: 1,
                   borderRadius: 10,
-                  borderColor: colors.text,
+                  borderColor: colors.fgDefault,
                   maxHeight: '45%',
                 }}
               >
                 <TouchableOpacity onPress={() => copySeedToClipboard(true)}>
                   <RegText
-                    color={colors.text}
+                    color={colors.fgDefault}
                     style={{
                       textAlign: 'center',
                     }}
@@ -676,7 +672,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
                   <TouchableOpacity onPress={() => copySeedToClipboard(false)}>
                     <Text
                       style={{
-                        color: colors.text,
+                        color: colors.fgDefault,
                         textDecorationLine: 'underline',
                         padding: 10,
                         marginTop: 0,
@@ -732,7 +728,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
                     }
                   }}
                 >
-                  <RegText color={colors.text} style={{ textAlign: 'center' }}>
+                  <RegText color={colors.fgDefault} style={{ textAlign: 'center' }}>
                     {!expandBirthday
                       ? Utils.trimToSmall(birthdayNumber, 1)
                       : birthdayNumber}
@@ -779,7 +775,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
                     }}
                   >
                     <RegText
-                      color={colors.text}
+                      color={colors.fgDefault}
                       style={{ textAlign: 'center' }}
                     >
                       {Utils.trimToSmall(ufvk, 8)}

@@ -118,6 +118,10 @@ without losing meaning, the "so" was decorative. Delete it.
 - Don't reach for `useEffect` to compute derived state. Derive it during render.
 - No `console.log` narrating execution.
 - Don't over-componentize trivial markup, and don't prop-drill where composition or context fits.
+- No `null` in new or touched code. We aim to eliminate `null` from this codebase in favor of the strictest named types available: model absence and outcomes as discriminated unions that say what the value is. Shrink the null count with every touch, never grow it.
+- Never signal errors in-band through string content: no sentinel prefixes, no empty-string-means-success, no error prose returned where data is expected. An error channel carries an `ErrorKey` (a string-literal union of translation-catalog keys), never translated prose.
+- Call `translate()` only at the display edge, in the component about to render the text. Core modules (`app/uris/`, `app/walletBackend/`) neither accept nor call `translate`. ESLint enforces the zone.
+- Model operation outcomes as discriminated unions with domain-named success tags and a shared `'error'` failure tag (`{ kind: 'canonicalUri'; uri } | ErrorKeyed<'uris.baduri'>`). The shared pieces (`ErrorKeyed<K>`, `Done`) live in `app/AppState/types/Result.ts`.
 
 ### HTML / CSS
 

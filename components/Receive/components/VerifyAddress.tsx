@@ -1,11 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState } from 'react';
 import { View, Keyboard } from 'react-native';
-import {
-  NavigationProp,
-  ParamListBase,
-  useTheme,
-} from '@react-navigation/native';
+import { NavigationProp, ParamListBase } from '@react-navigation/native';
+import { useTheme } from '../../../app/theme';
 
 import {
   ButtonTypeEnum,
@@ -13,11 +10,11 @@ import {
   ScreenEnum,
   SnackbarDurationEnum,
 } from '../../../app/AppState';
-import { ThemeType } from '../../../app/types';
 import { ContextAppLoaded } from '../../../app/context';
 import Button from '../../Components/Button';
 import { checkMyAddress } from '../../../app/walletBackend';
 import { parseZcashURI } from '../../../app/uris';
+import Utils from '../../../app/utils';
 import TextInputAddress from '../../Components/TextInputAddress';
 import FadeText from '../../Components/FadeText';
 import { RPCCheckAddressType } from '../../../app/walletBackend/types/RPCCheckAddressType';
@@ -38,7 +35,7 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, addLastSnackbar, server } = context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
 
   const [address, setAddress] = useState<string>('');
   const [errorAddress, setErrorAddress] = useState<string>('');
@@ -76,17 +73,17 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
       addr.toLowerCase().startsWith(GlobalConst.zcash) ||
       addr.toLowerCase().includes(':')
     ) {
-      const { error, target } = await parseZcashURI(addr, translate, server);
+      const parsed = await parseZcashURI(addr, server);
 
       // Audit Issue H — surface the parser error and abort before any
-      // address-state mutation. parseZcashURI returns an empty target
-      // when error is non-empty, but the explicit guard keeps intent
-      // obvious here and protects against future contract changes.
-      if (error) {
-        addLastSnackbar(error);
+      // address-state mutation. A failure result carries no target, so a
+      // malformed URI cannot reach the state updates below.
+      if (parsed.kind === 'error') {
+        addLastSnackbar(Utils.renderErrorKeyed(parsed, translate));
         return;
       }
 
+      const target = parsed.target;
       if (target) {
         // redo the to addresses
         [target].forEach(tgt => {
@@ -103,7 +100,7 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
   return (
     <View
       style={{
-        backgroundColor: colors.bottomSheetBackground,
+        backgroundColor: colors.bgSurface,
       }}
     >
       <TextInputAddress
@@ -125,7 +122,7 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
             marginVertical: 5,
           }}
         >
-          <FadeText style={{ color: colors.primary }}>{errorAddress}</FadeText>
+          <FadeText style={{ color: colors.fgAccent }}>{errorAddress}</FadeText>
         </View>
       )}
       {verifyOK !== null && (
@@ -148,10 +145,10 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
               }}
             >
               <VerifyCheckIcon
-                color={colors.primary}
+                color={colors.fgAccent}
                 style={{ marginRight: 10 }}
               />
-              <FadeText style={{ color: colors.text }}>
+              <FadeText style={{ color: colors.fgDefault }}>
                 {translate('receive.verification-success') as string}
               </FadeText>
             </View>
@@ -165,10 +162,10 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
               }}
             >
               <VerifyXIcon
-                color={colors.danger.primary}
+                color={colors.fgDangerEmphasis}
                 style={{ marginRight: 10 }}
               />
-              <FadeText style={{ color: colors.text }}>
+              <FadeText style={{ color: colors.fgDefault }}>
                 {translate('receive.verification-failure') as string}
               </FadeText>
             </View>

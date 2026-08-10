@@ -1,13 +1,14 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { ActivityIndicator, ScrollView, Text, View } from 'react-native';
-import { useTheme } from '@react-navigation/native';
+import { useTheme } from '../../app/theme';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import BoldText from '../Components/BoldText';
 import Button from '../Components/Button';
 import StepperHeader from '../Migration/StepperHeader';
-import { AppDrawerParamList, ThemeType } from '../../app/types';
+import { AppDrawerParamList } from '../../app/types';
+import { AppTheme } from '../../app/theme';
 import { ContextAppLoaded } from '../../app/context';
 import { ButtonTypeEnum, RouteEnum } from '../../app/AppState';
 import Utils from '../../app/utils';
@@ -28,7 +29,7 @@ const ZATS_PER_ZEC = 10 ** 8;
 const Row: React.FunctionComponent<{
   label: string;
   value: React.ReactNode;
-  colors: ThemeType['colors'];
+  colors: AppTheme['colors'];
   bold?: boolean;
 }> = ({ label, value, colors, bold = false }) => (
   <View
@@ -39,14 +40,14 @@ const Row: React.FunctionComponent<{
       paddingVertical: 8,
     }}
   >
-    <Text style={{ color: colors.placeholder, fontSize: 14, marginRight: 12 }}>
+    <Text style={{ color: colors.fgMuted, fontSize: 14, marginRight: 12 }}>
       {label}
     </Text>
     <View style={{ flexShrink: 1, alignItems: 'flex-end' }}>
       {typeof value === 'string' ? (
         <Text
           style={{
-            color: colors.text,
+            color: colors.fgDefault,
             fontSize: 14,
             fontWeight: bold ? '700' : '400',
             textAlign: 'right',
@@ -62,14 +63,14 @@ const Row: React.FunctionComponent<{
 );
 
 const Card: React.FunctionComponent<{
-  colors: ThemeType['colors'];
+  colors: AppTheme['colors'];
   children: React.ReactNode;
 }> = ({ colors, children }) => (
   <View
     style={{
       borderWidth: 1,
       borderColor: colors.bottomSheetBorder,
-      backgroundColor: colors.bottomSheetBackground,
+      backgroundColor: colors.bgSurface,
       borderRadius: 12,
       paddingHorizontal: 16,
       paddingVertical: 6,
@@ -91,7 +92,7 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, info, totalBalance } = context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
 
   const [plan, setPlan] = useState<RPCMigrationPlanType | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -179,16 +180,16 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
       <View
         style={{
           flex: 1,
-          backgroundColor: colors.background,
+          backgroundColor: colors.bgCanvas,
           alignItems: 'center',
           justifyContent: 'center',
           padding: 24,
         }}
       >
-        <ActivityIndicator size="large" color={colors.primary} />
+        <ActivityIndicator size="large" color={colors.fgAccent} />
         <Text
           style={{
-            color: colors.placeholder,
+            color: colors.fgMuted,
             fontSize: 15,
             marginTop: 16,
             textAlign: 'center',
@@ -203,7 +204,7 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
   // ----- Error -----
   if (errorMsg) {
     return (
-      <View style={{ flex: 1, backgroundColor: colors.background }}>
+      <View style={{ flex: 1, backgroundColor: colors.bgCanvas }}>
         <ScrollView
           contentContainerStyle={{ padding: 24, paddingTop: 40, flexGrow: 1 }}
         >
@@ -213,7 +214,7 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
           >
             <Text
               style={{
-                color: colors.text,
+                color: colors.fgDefault,
                 fontSize: 17,
                 fontWeight: '700',
                 marginBottom: 10,
@@ -224,7 +225,7 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
             </Text>
             <Text
               style={{
-                color: colors.placeholder,
+                color: colors.fgMuted,
                 fontSize: 14,
                 textAlign: 'center',
               }}
@@ -254,7 +255,7 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
 
   if (isPending) {
     return (
-      <View style={{ flex: 1, backgroundColor: colors.background }}>
+      <View style={{ flex: 1, backgroundColor: colors.bgCanvas }}>
         <ScrollView
           contentContainerStyle={{ padding: 24, paddingTop: 40, flexGrow: 1 }}
         >
@@ -264,7 +265,7 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
           >
             <Text
               style={{
-                color: colors.text,
+                color: colors.fgDefault,
                 fontSize: 17,
                 fontWeight: '700',
                 marginBottom: 10,
@@ -275,7 +276,7 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
             </Text>
             <Text
               style={{
-                color: colors.placeholder,
+                color: colors.fgMuted,
                 fontSize: 14,
                 textAlign: 'center',
               }}
@@ -316,7 +317,7 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
   // ----- Nothing to migrate -----
   if (isEmpty) {
     return (
-      <View style={{ flex: 1, backgroundColor: colors.background }}>
+      <View style={{ flex: 1, backgroundColor: colors.bgCanvas }}>
         <ScrollView
           contentContainerStyle={{ padding: 24, paddingTop: 40, flexGrow: 1 }}
         >
@@ -326,7 +327,7 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
           >
             <Text
               style={{
-                color: colors.text,
+                color: colors.fgDefault,
                 fontSize: 17,
                 fontWeight: '700',
                 marginBottom: 10,
@@ -337,7 +338,7 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
             </Text>
             <Text
               style={{
-                color: colors.placeholder,
+                color: colors.fgMuted,
                 fontSize: 14,
                 textAlign: 'center',
               }}
@@ -375,7 +376,7 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
         : 'migrationsplitplan.notes',
     ) as string;
     return (
-      <View style={{ flex: 1, backgroundColor: colors.background }}>
+      <View style={{ flex: 1, backgroundColor: colors.bgCanvas }}>
         <StepperHeader splitDone={true} sendActive={false} />
         <ScrollView
           style={{ flex: 1 }}
@@ -390,7 +391,7 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
           </BoldText>
           <Text
             style={{
-              color: colors.placeholder,
+              color: colors.fgMuted,
               fontSize: 15,
               lineHeight: 22,
               marginBottom: 24,
@@ -421,7 +422,7 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
           {stranded > 0 ? (
             <Text
               style={{
-                color: colors.placeholder,
+                color: colors.fgMuted,
                 fontSize: 13,
                 lineHeight: 19,
               }}
@@ -493,7 +494,7 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
   let txNumber = 0;
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background }}>
+    <View style={{ flex: 1, backgroundColor: colors.bgCanvas }}>
       <StepperHeader splitDone={false} sendActive={false} />
       <ScrollView
         style={{ flex: 1 }}
@@ -506,7 +507,7 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
         {title}
         <Text
           style={{
-            color: colors.placeholder,
+            color: colors.fgMuted,
             fontSize: 15,
             lineHeight: 22,
             marginBottom: roundCount > 1 ? 10 : 24,
@@ -514,7 +515,10 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
         >
           {subtitle.split('**').map((part: string, i: number) =>
             i % 2 === 1 ? (
-              <Text key={i} style={{ color: colors.text, fontWeight: '700' }}>
+              <Text
+                key={i}
+                style={{ color: colors.fgDefault, fontWeight: '700' }}
+              >
                 {part}
               </Text>
             ) : (
@@ -525,7 +529,7 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
         {roundCount > 1 ? (
           <Text
             style={{
-              color: colors.placeholder,
+              color: colors.fgMuted,
               fontSize: 15,
               lineHeight: 22,
               marginBottom: 24,
@@ -543,7 +547,7 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
             {roundCount > 1 ? (
               <Text
                 style={{
-                  color: colors.placeholder,
+                  color: colors.fgMuted,
                   fontSize: 13,
                   fontWeight: '600',
                   marginBottom: 8,
@@ -561,7 +565,7 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
                 <Card key={i} colors={colors}>
                   <Text
                     style={{
-                      color: colors.text,
+                      color: colors.fgDefault,
                       fontSize: 15,
                       fontWeight: '700',
                       paddingVertical: 4,
@@ -626,7 +630,7 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
         {(plan?.residual ?? 0) > 0 ? (
           <Text
             style={{
-              color: colors.placeholder,
+              color: colors.fgMuted,
               fontSize: 13,
               lineHeight: 19,
               marginBottom: 10,
@@ -638,7 +642,7 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
 
         <Text
           style={{
-            color: colors.placeholder,
+            color: colors.fgMuted,
             fontSize: 14,
             lineHeight: 21,
           }}

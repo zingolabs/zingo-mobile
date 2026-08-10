@@ -1,12 +1,13 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { ActivityIndicator, ScrollView, Text, View } from 'react-native';
-import { useTheme } from '@react-navigation/native';
+import { useTheme } from '../../app/theme';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import BoldText from '../Components/BoldText';
 import Button from '../Components/Button';
-import { AppDrawerParamList, ThemeType } from '../../app/types';
+import { AppDrawerParamList } from '../../app/types';
+import { AppTheme } from '../../app/theme';
 import { ContextAppLoaded } from '../../app/context';
 import { ButtonTypeEnum, RouteEnum } from '../../app/AppState';
 import Utils from '../../app/utils';
@@ -25,7 +26,7 @@ const ZATS_PER_ZEC = 10 ** 8;
 const Row: React.FunctionComponent<{
   label: string;
   value: React.ReactNode;
-  colors: ThemeType['colors'];
+  colors: AppTheme['colors'];
   bold?: boolean;
 }> = ({ label, value, colors, bold = false }) => (
   <View
@@ -38,7 +39,7 @@ const Row: React.FunctionComponent<{
   >
     <Text
       style={{
-        color: bold ? colors.text : colors.placeholder,
+        color: bold ? colors.fgDefault : colors.fgMuted,
         fontSize: 14,
         fontWeight: bold ? '700' : '400',
         marginRight: 12,
@@ -50,7 +51,7 @@ const Row: React.FunctionComponent<{
       {typeof value === 'string' ? (
         <Text
           style={{
-            color: colors.text,
+            color: colors.fgDefault,
             fontSize: 14,
             fontWeight: bold ? '700' : '400',
             textAlign: 'right',
@@ -70,7 +71,7 @@ const Row: React.FunctionComponent<{
 const TX_CARD_BACKGROUND = '#020D1C';
 
 const Card: React.FunctionComponent<{
-  colors: ThemeType['colors'];
+  colors: AppTheme['colors'];
   background?: string;
   children: React.ReactNode;
 }> = ({ colors, background, children }) => (
@@ -78,7 +79,7 @@ const Card: React.FunctionComponent<{
     style={{
       borderWidth: 1,
       borderColor: colors.bottomSheetBorder,
-      backgroundColor: background ?? colors.bottomSheetBackground,
+      backgroundColor: background ?? colors.bgSurface,
       borderRadius: 12,
       paddingHorizontal: 16,
       paddingVertical: 12,
@@ -94,7 +95,7 @@ const MigrationTransactions: React.FunctionComponent<
 > = ({ navigation }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, info, totalBalance } = context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
 
   const [plan, setPlan] = useState<RPCDrainPlanType | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -175,16 +176,16 @@ const MigrationTransactions: React.FunctionComponent<
       <View
         style={{
           flex: 1,
-          backgroundColor: colors.background,
+          backgroundColor: colors.bgCanvas,
           alignItems: 'center',
           justifyContent: 'center',
           padding: 24,
         }}
       >
-        <ActivityIndicator size="large" color={colors.primary} />
+        <ActivityIndicator size="large" color={colors.fgAccent} />
         <Text
           style={{
-            color: colors.placeholder,
+            color: colors.fgMuted,
             fontSize: 15,
             marginTop: 16,
             textAlign: 'center',
@@ -199,7 +200,7 @@ const MigrationTransactions: React.FunctionComponent<
   // ----- Error -----
   if (errorMsg) {
     return (
-      <View style={{ flex: 1, backgroundColor: colors.background }}>
+      <View style={{ flex: 1, backgroundColor: colors.bgCanvas }}>
         <ScrollView
           contentContainerStyle={{ padding: 24, paddingTop: 40, flexGrow: 1 }}
         >
@@ -213,7 +214,7 @@ const MigrationTransactions: React.FunctionComponent<
           >
             <Text
               style={{
-                color: colors.text,
+                color: colors.fgDefault,
                 fontSize: 17,
                 fontWeight: '700',
                 marginBottom: 10,
@@ -224,7 +225,7 @@ const MigrationTransactions: React.FunctionComponent<
             </Text>
             <Text
               style={{
-                color: colors.placeholder,
+                color: colors.fgMuted,
                 fontSize: 14,
                 textAlign: 'center',
               }}
@@ -253,7 +254,7 @@ const MigrationTransactions: React.FunctionComponent<
 
   if (isPending) {
     return (
-      <View style={{ flex: 1, backgroundColor: colors.background }}>
+      <View style={{ flex: 1, backgroundColor: colors.bgCanvas }}>
         <ScrollView
           contentContainerStyle={{ padding: 24, paddingTop: 40, flexGrow: 1 }}
         >
@@ -263,7 +264,7 @@ const MigrationTransactions: React.FunctionComponent<
           >
             <Text
               style={{
-                color: colors.text,
+                color: colors.fgDefault,
                 fontSize: 17,
                 fontWeight: '700',
                 marginBottom: 10,
@@ -274,7 +275,7 @@ const MigrationTransactions: React.FunctionComponent<
             </Text>
             <Text
               style={{
-                color: colors.placeholder,
+                color: colors.fgMuted,
                 fontSize: 14,
                 textAlign: 'center',
               }}
@@ -314,7 +315,7 @@ const MigrationTransactions: React.FunctionComponent<
   // ----- Nothing to migrate -----
   if (isEmpty) {
     return (
-      <View style={{ flex: 1, backgroundColor: colors.background }}>
+      <View style={{ flex: 1, backgroundColor: colors.bgCanvas }}>
         <ScrollView
           contentContainerStyle={{ padding: 24, paddingTop: 40, flexGrow: 1 }}
         >
@@ -324,7 +325,7 @@ const MigrationTransactions: React.FunctionComponent<
           >
             <Text
               style={{
-                color: colors.text,
+                color: colors.fgDefault,
                 fontSize: 17,
                 fontWeight: '700',
                 marginBottom: 10,
@@ -335,7 +336,7 @@ const MigrationTransactions: React.FunctionComponent<
             </Text>
             <Text
               style={{
-                color: colors.placeholder,
+                color: colors.fgMuted,
                 fontSize: 14,
                 textAlign: 'center',
               }}
@@ -374,7 +375,7 @@ const MigrationTransactions: React.FunctionComponent<
   const totalOutput = transactions.reduce((sum, tx) => sum + tx.output, 0);
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background }}>
+    <View style={{ flex: 1, backgroundColor: colors.bgCanvas }}>
       <ScrollView
         style={{ flex: 1 }}
         contentContainerStyle={{
@@ -386,7 +387,7 @@ const MigrationTransactions: React.FunctionComponent<
         {title}
         <Text
           style={{
-            color: colors.placeholder,
+            color: colors.fgMuted,
             fontSize: 15,
             lineHeight: 22,
             textAlign: 'center',
@@ -395,7 +396,10 @@ const MigrationTransactions: React.FunctionComponent<
         >
           {subtitle.split('**').map((part: string, i: number) =>
             i % 2 === 1 ? (
-              <Text key={i} style={{ color: colors.text, fontWeight: '700' }}>
+              <Text
+                key={i}
+                style={{ color: colors.fgDefault, fontWeight: '700' }}
+              >
                 {part}
               </Text>
             ) : (
@@ -449,7 +453,7 @@ const MigrationTransactions: React.FunctionComponent<
           <Card key={i} colors={colors} background={TX_CARD_BACKGROUND}>
             <Text
               style={{
-                color: colors.text,
+                color: colors.fgDefault,
                 fontSize: 15,
                 fontWeight: '700',
                 paddingVertical: 4,

@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { forwardRef, useCallback } from 'react';
 import { Keyboard, Pressable, View } from 'react-native';
-import { useTheme } from '@react-navigation/native';
+import { useTheme } from '../../app/theme';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import {
@@ -13,7 +13,6 @@ import {
 
 import BoldText from './BoldText';
 import RegText from './RegText';
-import { ThemeType } from '../../app/types';
 
 export type ActionMenuBottomSheetAction = {
   label: string;
@@ -31,7 +30,7 @@ const ActionMenuBottomSheet = forwardRef<
   BottomSheetModal,
   ActionMenuBottomSheetProps
 >(({ title, actions, testID }, ref) => {
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
 
   const dismiss = useCallback(() => {
     (ref as React.RefObject<BottomSheetModal>)?.current?.dismiss();
@@ -56,7 +55,7 @@ const ActionMenuBottomSheet = forwardRef<
           paddingTop: 8,
           paddingBottom: 6,
           paddingHorizontal: 16,
-          backgroundColor: colors.bottomSheetBackground,
+          backgroundColor: colors.bgSurface,
           borderTopLeftRadius: 40,
           borderTopRightRadius: 40,
           borderTopWidth: 1,
@@ -91,7 +90,7 @@ const ActionMenuBottomSheet = forwardRef<
             hitSlop={8}
             style={{ paddingHorizontal: 14, paddingVertical: 4 }}
           >
-            <FontAwesomeIcon icon={faXmark} size={20} color={colors.zingo} />
+            <FontAwesomeIcon icon={faXmark} size={20} color={colors.fgMuted} />
           </Pressable>
         </View>
       </View>
@@ -119,7 +118,7 @@ const ActionMenuBottomSheet = forwardRef<
       }}
       handleComponent={renderHandle}
       backgroundStyle={{
-        backgroundColor: colors.bottomSheetBackground,
+        backgroundColor: colors.bgSurface,
         borderTopLeftRadius: 40,
         borderTopRightRadius: 40,
       }}
@@ -127,7 +126,7 @@ const ActionMenuBottomSheet = forwardRef<
     >
       <BottomSheetScrollView
         testID={testID}
-        style={{ backgroundColor: colors.bottomSheetBackground }}
+        style={{ backgroundColor: colors.bgSurface }}
         contentContainerStyle={{ paddingBottom: 30 }}
       >
         {actions.map((action, idx) => (
@@ -148,7 +147,7 @@ const ActionMenuBottomSheet = forwardRef<
             <RegText
               style={{
                 fontSize: 16,
-                color: action.destructive ? colors.danger.primary : colors.text,
+                color: action.destructive ? colors.fgDangerEmphasis : colors.fgDefault,
                 fontWeight: '400',
               }}
             >

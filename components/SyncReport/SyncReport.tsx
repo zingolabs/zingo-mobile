@@ -9,9 +9,9 @@ import React, {
 } from 'react';
 import { View, Text, ActivityIndicator, TouchableOpacity } from 'react-native';
 
-import { useTheme } from '@react-navigation/native';
+import { useTheme } from '../../app/theme';
 
-import { AppDrawerParamList, ThemeType } from '../../app/types';
+import { AppDrawerParamList } from '../../app/types';
 import DetailLine from '../Components/DetailLine';
 import { ContextAppLoaded } from '../../app/context';
 
@@ -60,7 +60,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
     addLastSnackbar,
     setBackgroundSyncErrorInfo,
   } = context; //mode
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
   const screenName = ScreenEnum.SyncReport;
 
   const [maxBlocks, setMaxBlocks] = useState<number>(0);
@@ -89,7 +89,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
           paddingTop: 12,
           paddingBottom: 8,
           paddingHorizontal: 16,
-          backgroundColor: colors.bottomSheetBackground,
+          backgroundColor: colors.bgSurface,
           borderTopLeftRadius: 40,
           borderTopRightRadius: 40,
           borderTopWidth: 1,
@@ -115,7 +115,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
             <FontAwesomeIcon
               icon={faChevronLeft}
               size={20}
-              color={colors.primary}
+              color={colors.fgAccent}
             />
           </TouchableOpacity>
           <BoldText
@@ -255,7 +255,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
     <View
       style={{
         flex: 1,
-        backgroundColor: colors.background,
+        backgroundColor: colors.bgCanvas,
       }}
       onLayout={e => setContainerH(e.nativeEvent.layout.height)}
     >
@@ -281,7 +281,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
         keyboardBlurBehavior={'restore'}
         android_keyboardInputMode={'adjustResize'}
         backgroundStyle={{
-          backgroundColor: colors.bottomSheetBackground,
+          backgroundColor: colors.bgSurface,
           borderTopLeftRadius: 40,
           borderTopRightRadius: 40,
         }}
@@ -293,7 +293,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
           alwaysBounceVertical={false}
           style={{
             flex: 1,
-            backgroundColor: colors.bottomSheetBackground,
+            backgroundColor: colors.bgSurface,
           }}
           contentContainerStyle={{
             flexDirection: 'column',
@@ -416,7 +416,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                                   <Text
                                     key={label}
                                     style={{
-                                      color: colors.primary,
+                                      color: colors.fgAccent,
                                       fontSize,
                                       marginLeft: needsShift ? shift : 0,
                                     }}
@@ -439,9 +439,9 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                                 key={point}
                                 style={{
                                   height: 10,
-                                  borderRightColor: colors.primary,
+                                  borderRightColor: colors.borderAccent,
                                   borderRightWidth: 1,
-                                  borderLeftColor: colors.primary,
+                                  borderLeftColor: colors.borderAccent,
                                   borderLeftWidth: 1,
                                   width: `${row.tickWidthPct}%`,
                                 }}
@@ -454,7 +454,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                               flexDirection: 'row',
                               justifyContent: 'flex-start',
                               width: '100%',
-                              borderBottomColor: colors.primary,
+                              borderBottomColor: colors.borderAccent,
                               borderBottomWidth: 2,
                               marginBottom: 0,
                             }}
@@ -464,7 +464,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                                 style={{
                                   height: 10,
                                   backgroundColor: 'blue',
-                                  borderLeftColor: colors.primary,
+                                  borderLeftColor: colors.borderAccent,
                                   borderLeftWidth: 1,
                                   borderRightColor: 'blue',
                                   borderRightWidth: 1,
@@ -490,7 +490,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                                 style={{
                                   height: 10,
                                   backgroundColor: '#333333',
-                                  borderRightColor: colors.primary,
+                                  borderRightColor: colors.borderAccent,
                                   borderRightWidth: 1,
                                   width: `${row.serv3Percent}%`,
                                 }}
@@ -511,7 +511,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                           marginTop: 5,
                         }}
                       >
-                        <Text style={{ color: colors.primary }}>
+                        <Text style={{ color: colors.fgAccent }}>
                           {translate('report.server-title') as string}
                         </Text>
                         <View
@@ -525,7 +525,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                             margin: 5,
                           }}
                         />
-                        <Text style={{ color: colors.text }}>
+                        <Text style={{ color: colors.fgDefault }}>
                           {serverServer +
                             (translate('report.blocks') as string)}
                         </Text>
@@ -542,7 +542,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                           marginTop: 5,
                         }}
                       >
-                        <Text style={{ color: colors.primary }}>
+                        <Text style={{ color: colors.fgAccent }}>
                           {translate('report.wallet') as string}
                         </Text>
                         <View
@@ -558,7 +558,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                         />
                         <Text
                           testID="syncreport.wallettotalblocks"
-                          style={{ color: colors.text }}
+                          style={{ color: colors.fgDefault }}
                         >
                           {serverWallet +
                             (translate('report.blocks') as string)}
@@ -591,8 +591,8 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                         }}
                       >
                         <>
-                          <Text style={{ color: colors.text }}>{birthday}</Text>
-                          <Text style={{ color: colors.text }}>
+                          <Text style={{ color: colors.fgDefault }}>{birthday}</Text>
+                          <Text style={{ color: colors.fgDefault }}>
                             {info.latestBlock}
                           </Text>
                         </>
@@ -609,14 +609,14 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                           <View
                             style={{
                               height: 10,
-                              borderLeftColor: colors.primary,
+                              borderLeftColor: colors.borderAccent,
                               borderLeftWidth: 1,
                             }}
                           />
                           <View
                             style={{
                               height: 10,
-                              borderRightColor: colors.primary,
+                              borderRightColor: colors.borderAccent,
                               borderRightWidth: 1,
                             }}
                           />
@@ -710,7 +710,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                               margin: 5,
                             }}
                           />
-                          <Text style={{ color: colors.text, marginRight: 10 }}>
+                          <Text style={{ color: colors.fgDefault, marginRight: 10 }}>
                             {translate('report.scanned') as string}
                           </Text>
                         </View>
@@ -732,7 +732,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                               margin: 5,
                             }}
                           />
-                          <Text style={{ color: colors.text, marginRight: 10 }}>
+                          <Text style={{ color: colors.fgDefault, marginRight: 10 }}>
                             {translate('report.scanning') as string}
                           </Text>
                         </View>
@@ -754,7 +754,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                               margin: 5,
                             }}
                           />
-                          <Text style={{ color: colors.text, marginRight: 10 }}>
+                          <Text style={{ color: colors.fgDefault, marginRight: 10 }}>
                             {translate('report.refetching') as string}
                           </Text>
                         </View>
@@ -776,7 +776,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                               margin: 5,
                             }}
                           />
-                          <Text style={{ color: colors.text, marginRight: 10 }}>
+                          <Text style={{ color: colors.fgDefault, marginRight: 10 }}>
                             {translate('report.lowpriority') as string}
                           </Text>
                         </View>
@@ -798,7 +798,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                               margin: 5,
                             }}
                           />
-                          <Text style={{ color: colors.text, marginRight: 10 }}>
+                          <Text style={{ color: colors.fgDefault, marginRight: 10 }}>
                             {translate('report.highpriority') as string}
                           </Text>
                         </View>
@@ -816,7 +816,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                 marginTop: 20,
               }}
             >
-              <ActivityIndicator size="large" color={colors.primary} />
+              <ActivityIndicator size="large" color={colors.fgAccent} />
             </View>
           )}
           {(Number(backgroundSyncInfo.date) > 0 ||
@@ -878,7 +878,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                 }
               />
               {!!backgroundSyncInfo.message && (
-                <RegText style={{ marginBottom: 20 }} color={colors.text}>
+                <RegText style={{ marginBottom: 20 }} color={colors.fgDefault}>
                   {backgroundSyncInfo.message}
                 </RegText>
               )}

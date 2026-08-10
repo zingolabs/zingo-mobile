@@ -1,11 +1,11 @@
 import {
   TotalBalanceClass,
   InfoType,
-  TranslateType,
   ValueTransferType,
   UnifiedAddressClass,
   TransparentAddressClass,
   ServerType,
+  TranslateType,
 } from '../../AppState';
 import { RPCSyncStatusType } from '../types/RPCSyncStatusType';
 import { RPCPerformanceLevelEnum } from '../enums/RPCPerformanceLevelEnum';

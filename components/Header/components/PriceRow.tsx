@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import { Image, View } from 'react-native';
-import { useTheme } from '@react-navigation/native';
+import { useTheme } from '../../../app/theme';
 
 import {
   ChainNameEnum,
@@ -11,7 +11,6 @@ import {
 } from '../../../app/AppState';
 import InfoType from '../../../app/AppState/types/InfoType';
 import ZecPriceType from '../../../app/AppState/types/ZecPriceType';
-import { ThemeType } from '../../../app/types';
 import BoldText from '../../Components/BoldText';
 import CurrencyAmount from '../../Components/CurrencyAmount';
 import FadeText from '../../Components/FadeText';
@@ -46,7 +45,7 @@ const formatLastUpdate = (date: number): string => {
 
 const PriceRow: React.FC<PriceRowProps> = React.memo(
   ({ translate, currency, zecPrice, info, selectServer, onLayout }) => {
-    const { colors } = useTheme() as ThemeType;
+    const { colors } = useTheme();
 
     const isUsd = currency === CurrencyEnum.USDCurrency;
     if (
@@ -74,7 +73,7 @@ const PriceRow: React.FC<PriceRowProps> = React.memo(
           paddingHorizontal: 12,
           paddingVertical: 6,
           borderRadius: 10,
-          backgroundColor: '#031124',
+          backgroundColor: colors.bgSurface,
           borderWidth: 1,
           borderColor: colors.bottomSheetBorder,
           gap: 12,
@@ -85,7 +84,7 @@ const PriceRow: React.FC<PriceRowProps> = React.memo(
           style={{ width: 32, height: 32, resizeMode: 'contain' }}
         />
         <View style={{ flex: 1 }}>
-          <BoldText style={{ color: colors.text, fontSize: 14 }}>
+          <BoldText style={{ color: colors.fgDefault, fontSize: 14 }}>
             Zcash
           </BoldText>
           <FadeText style={{ fontSize: 12 }}>ZEC</FadeText>

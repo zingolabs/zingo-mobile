@@ -2,9 +2,8 @@
 import React from 'react';
 import { View } from 'react-native';
 import { Svg, Circle, Text as SVGText } from 'react-native-svg';
-import { useTheme } from '@react-navigation/native';
+import { useTheme } from '../../app/theme';
 
-import { ThemeType } from '../../app/types';
 
 type circularProgressProps = {
   bgColor?: string;
@@ -20,7 +19,7 @@ type circularProgressProps = {
 const CircularProgress: React.FunctionComponent<
   circularProgressProps
 > = props => {
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
   const { size, strokeWidth, text, progressPercent } = props;
   const radius = (size - strokeWidth) / 2;
   const circum = radius * 2 * Math.PI;
@@ -30,7 +29,7 @@ const CircularProgress: React.FunctionComponent<
     <View style={{ margin: 10 }}>
       <Svg width={size} height={size}>
         <Circle
-          stroke={props.bgColor ? props.bgColor : colors.card}
+          stroke={props.bgColor ? props.bgColor : colors.bgCanvas}
           fill="none"
           cx={size / 2}
           cy={size / 2}
@@ -39,7 +38,7 @@ const CircularProgress: React.FunctionComponent<
         />
 
         <Circle
-          stroke={props.pgColor ? props.pgColor : colors.primary}
+          stroke={props.pgColor ? props.pgColor : colors.fgAccent}
           fill="none"
           cx={size / 2}
           cy={size / 2}
@@ -56,7 +55,7 @@ const CircularProgress: React.FunctionComponent<
           x={size / 2}
           y={size / 2 + (props.textSize ? props.textSize / 2 - 1 : 5)}
           textAnchor="middle"
-          fill={props.textColor ? props.textColor : colors.text}
+          fill={props.textColor ? props.textColor : colors.fgDefault}
         >
           {text}
         </SVGText>

@@ -27,14 +27,14 @@ import BoldText from '../../Components/BoldText';
 import ZecAmount from '../../Components/ZecAmount';
 import CurrencyAmount from '../../Components/CurrencyAmount';
 import Button from '../../Components/Button';
-import { useTheme } from '@react-navigation/native';
+import { useTheme } from '../../../app/theme';
 import { ContextAppLoaded } from '../../../app/context';
 import Header from '../../Header';
 import AddressItem from '../../Components/AddressItem';
 import { useBiometricGate } from '../../../app/hooks/useBiometricGate';
 import { useFullSheetSnapPoints } from '../../../app/hooks/useFullSheetSnapPoints';
 
-import { AppDrawerParamList, ThemeType } from '../../../app/types';
+import { AppDrawerParamList } from '../../../app/types';
 import Utils from '../../../app/utils';
 import {
   ButtonTypeEnum,
@@ -92,7 +92,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     security,
     foregroundEpoch,
   } = context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
   const screenName = ScreenEnum.Confirm;
   const isMainChain = server.chainName === ChainNameEnum.mainChainName;
 
@@ -171,7 +171,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
           paddingTop: 12,
           paddingBottom: 8,
           paddingHorizontal: 16,
-          backgroundColor: colors.bottomSheetBackground,
+          backgroundColor: colors.bgSurface,
           borderTopLeftRadius: 40,
           borderTopRightRadius: 40,
           borderTopWidth: 1,
@@ -197,7 +197,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
             <FontAwesomeIcon
               icon={faChevronLeft}
               size={20}
-              color={colors.primary}
+              color={colors.fgAccent}
             />
           </TouchableOpacity>
           <BoldText
@@ -299,7 +299,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
       <BottomSheetFooter {...props} bottomInset={0}>
         <View
           style={{
-            backgroundColor: colors.bottomSheetBackground,
+            backgroundColor: colors.bgSurface,
             paddingTop: 10,
             paddingBottom: 24,
             flexDirection: 'row',
@@ -324,7 +324,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
   );
 
   if (!authPassed) {
-    return <View style={{ flex: 1, backgroundColor: colors.background }} />;
+    return <View style={{ flex: 1, backgroundColor: colors.bgCanvas }} />;
   }
 
   return (
@@ -332,7 +332,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
       <View
         style={{
           flex: 1,
-          backgroundColor: colors.background,
+          backgroundColor: colors.bgCanvas,
         }}
         onLayout={e => setContainerH(e.nativeEvent.layout.height)}
       >
@@ -358,7 +358,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
           keyboardBlurBehavior={'restore'}
           android_keyboardInputMode={'adjustResize'}
           backgroundStyle={{
-            backgroundColor: colors.bottomSheetBackground,
+            backgroundColor: colors.bgSurface,
             borderTopLeftRadius: 40,
             borderTopRightRadius: 40,
           }}
@@ -374,7 +374,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
             alwaysBounceVertical={false}
             style={{
               flex: 1,
-              backgroundColor: colors.bottomSheetBackground,
+              backgroundColor: colors.bgSurface,
             }}
             contentContainerStyle={{
               flexDirection: 'column',
@@ -391,7 +391,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                 padding: 10,
                 borderWidth: 1,
                 borderRadius: 10,
-                borderColor: nym ? '#07FF94' : colors.border,
+                borderColor: nym ? '#07FF94' : colors.borderMuted,
               }}
             >
               <RegText
@@ -433,7 +433,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                       size={
                         Platform.OS === GlobalConst.platformOSios ? 'small' : 12
                       }
-                      color={colors.primary}
+                      color={colors.fgAccent}
                     />
                   ) : (
                     <RegText>{privacyLevel}</RegText>

@@ -19,6 +19,7 @@ import ZecPriceType from './types/ZecPriceType';
 import SecurityType from './types/SecurityType';
 import ServerUrisType from './types/ServerUrisType';
 import { SetServerResult } from './types/SetServerResult';
+import { ErrorKeyed, Done, DONE } from './types/Result';
 import ValueTransferType from './types/ValueTransferType';
 import ProposalPoolsType from './types/ProposalPoolsType';
 import TransactionType from './types/TransactionType';
@@ -95,6 +96,9 @@ export {
   SecurityType,
   ServerUrisType,
   SetServerResult,
+  ErrorKeyed,
+  Done,
+  DONE,
   ValueTransferType,
   ProposalPoolsType,
   TransactionType,

@@ -1,10 +1,9 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState, useEffect } from 'react';
 import { Text, View, TextStyle, TouchableOpacity } from 'react-native';
-import { useTheme } from '@react-navigation/native';
+import { useTheme } from '../../app/theme';
 import { getNumberFormatSettings } from 'react-native-localize';
 
-import { ThemeType } from '../../app/types';
 import Utils from '../../app/utils';
 import { CurrencyEnum } from '../../app/AppState';
 
@@ -27,7 +26,7 @@ const CurrencyAmount: React.FunctionComponent<CurrencyAmountProps> = ({
 }) => {
   const [privacyHigh, setPrivacyHigh] = useState<boolean>(privacy || false);
   const [currencyString, setCurrencyString] = useState<string>('');
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
   const { decimalSeparator } = getNumberFormatSettings();
 
   useEffect(() => {
@@ -73,7 +72,7 @@ const CurrencyAmount: React.FunctionComponent<CurrencyAmountProps> = ({
             {privacyHigh ? (
               <Text
                 style={{
-                  color: colors.money,
+                  color: colors.fgDefault,
                   fontSize: 20,
                   fontWeight: '700',
                   ...style,
@@ -84,7 +83,7 @@ const CurrencyAmount: React.FunctionComponent<CurrencyAmountProps> = ({
             ) : (
               <Text
                 style={{
-                  color: colors.money,
+                  color: colors.fgDefault,
                   fontSize: 20,
                   fontWeight: '700',
                   ...style,

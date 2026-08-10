@@ -3,6 +3,7 @@ import { View, Text, Pressable, ScrollView, StyleSheet } from 'react-native';
 import RNRestart from 'react-native-restart';
 
 import RPCModule from '../../app/RPCModule';
+import { advancedTokens } from '../../app/theme';
 import { sendEmail } from '../../app/sendEmail';
 import { TranslateType } from '../../app/AppState';
 import { sanitizePaths } from '../../app/utils/sanitizePaths';
@@ -134,13 +135,13 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   title: {
-    color: '#dadfe1',
+    color: advancedTokens.fgDefault,
     fontSize: 22,
     fontWeight: 'bold',
     marginBottom: 12,
   },
   message: {
-    color: '#7c8494',
+    color: advancedTokens.fgMuted,
     fontSize: 15,
     textAlign: 'center',
     marginBottom: 8,
@@ -151,7 +152,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   versionLine: {
-    color: '#7c8494',
+    color: advancedTokens.fgMuted,
     fontSize: 13,
   },
   detailsBox: {
@@ -167,13 +168,13 @@ const styles = StyleSheet.create({
     paddingBottom: 4,
   },
   detailsHeader: {
-    color: '#dadfe1',
+    color: advancedTokens.fgDefault,
     fontSize: 13,
     fontFamily: 'monospace',
     marginBottom: 6,
   },
   detailsStack: {
-    color: '#7c8494',
+    color: advancedTokens.fgMuted,
     fontSize: 11,
     fontFamily: 'monospace',
     lineHeight: 14,
@@ -185,7 +186,9 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   button: {
-    backgroundColor: '#43a637',
+    // The boundary renders when the tree (and its providers) may be broken, so
+    // it reads the advanced accent statically instead of following the mode.
+    backgroundColor: advancedTokens.bgAccent,
     paddingHorizontal: 18,
     paddingVertical: 14,
     borderRadius: 8,
@@ -194,7 +197,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#37548a',
   },
   buttonText: {
-    color: '#dadfe1',
+    color: advancedTokens.fgDefault,
     fontSize: 16,
     fontWeight: 'bold',
   },

@@ -37,8 +37,8 @@ import {
   NavigationProp,
   ParamListBase,
   useNavigation,
-  useTheme,
 } from '@react-navigation/native';
+import { useTheme } from '../../app/theme';
 import { getNumberFormatSettings } from 'react-native-localize';
 import SelectBottomSheet from '../Components/SelectBottomSheet';
 
@@ -88,7 +88,7 @@ import {
 } from '../../app/walletBackend/transforms/sendFailureTransform';
 import Utils from '../../app/utils';
 import { safeSnapToIndex } from '../../app/utils/safeSnapToIndex';
-import { AppDrawerParamList, ThemeType } from '../../app/types';
+import { AppDrawerParamList } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import PriceFetcher from '../Components/PriceFetcher';
 import { usePriceFetcherStore } from '../Components/priceFetcherStore';
@@ -177,7 +177,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     nym,
     setNymOption,
   } = context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
 
   const [enabling, setEnabling] = useState<boolean>(false);
   const nymPhase =
@@ -375,7 +375,7 @@ const Send: React.FunctionComponent<SendProps> = ({
           paddingTop: 8,
           paddingBottom: 6,
           paddingHorizontal: 16,
-          backgroundColor: colors.bottomSheetBackground,
+          backgroundColor: colors.bgSurface,
           borderTopLeftRadius: 40,
           borderTopRightRadius: 40,
           borderTopWidth: 1,
@@ -660,21 +660,17 @@ const Send: React.FunctionComponent<SendProps> = ({
         addressPar.toLowerCase().startsWith(GlobalConst.zcash) ||
         addressPar.toLowerCase().includes(':')
       ) {
-        const { error, target } = await parseZcashURI(
-          addressPar,
-          translate,
-          server,
-        );
+        const parsed = await parseZcashURI(addressPar, server);
 
         // Audit Issue H — surface the parser error and abort before any
-        // Send-state mutation. parseZcashURI now returns an empty target
-        // when error is non-empty, but the explicit guard keeps intent
-        // obvious here and protects against future contract changes.
-        if (error) {
-          addLastSnackbar(error);
+        // Send-state mutation. A failure result carries no target, so a
+        // malformed URI cannot reach the state updates below.
+        if (parsed.kind === 'error') {
+          addLastSnackbar(Utils.renderErrorKeyed(parsed, translate));
           return;
         }
 
+        const target = parsed.target;
         if (target) {
           // redo the to addresses
           [target].forEach(tgt => {
@@ -1111,7 +1107,7 @@ const Send: React.FunctionComponent<SendProps> = ({
           paddingTop: 8,
           paddingBottom: 6,
           paddingHorizontal: 16,
-          backgroundColor: colors.bottomSheetBackground,
+          backgroundColor: colors.bgSurface,
           borderTopLeftRadius: 40,
           borderTopRightRadius: 40,
           borderTopWidth: 1,
@@ -1148,7 +1144,7 @@ const Send: React.FunctionComponent<SendProps> = ({
             hitSlop={8}
             style={{ paddingHorizontal: 14, paddingVertical: 4 }}
           >
-            <FontAwesomeIcon icon={faXmark} size={20} color={colors.zingo} />
+            <FontAwesomeIcon icon={faXmark} size={20} color={colors.fgMuted} />
           </Pressable>
         </View>
       </View>
@@ -1247,7 +1243,7 @@ const Send: React.FunctionComponent<SendProps> = ({
           keyboardBlurBehavior={'restore'}
           android_keyboardInputMode={'adjustResize'}
           backgroundStyle={{
-            backgroundColor: colors.bottomSheetBackground,
+            backgroundColor: colors.bgSurface,
             borderTopLeftRadius: 40,
             borderTopRightRadius: 40,
           }}
@@ -1304,13 +1300,13 @@ const Send: React.FunctionComponent<SendProps> = ({
                   </View>
                   {validAddress === 1 && (
                     <View testID="send.address.check">
-                      <FontAwesomeIcon icon={faCheck} color={colors.primary} />
+                      <FontAwesomeIcon icon={faCheck} color={colors.fgAccent} />
                     </View>
                   )}
                   {validAddress === -1 && (
                     <ErrorText
                       testID="send.address.error"
-                      style={{ color: colors.danger.text }}
+                      style={{ color: colors.fgDanger }}
                     >
                       {translate('send.invalidaddress') as string}
                     </ErrorText>
@@ -1321,7 +1317,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                     flex: 1,
                     borderWidth: 1,
                     borderRadius: 12,
-                    borderColor: colors.border,
+                    borderColor: colors.borderMuted,
                     marginTop: 5,
                     minHeight: 48,
                     justifyContent: 'center',
@@ -1343,12 +1339,12 @@ const Send: React.FunctionComponent<SendProps> = ({
                         placeholder={
                           translate('send.addressplaceholder') as string
                         }
-                        placeholderTextColor={colors.placeholder}
+                        placeholderTextColor={colors.fgMuted}
                         style={{
                           color:
                             validAddress === -1
-                              ? colors.danger.text
-                              : colors.text,
+                              ? colors.fgDanger
+                              : colors.fgDefault,
                           fontWeight: '600',
                           fontSize: 15,
                           padding: 12,
@@ -1379,7 +1375,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                             style={{ marginRight: 5 }}
                             size={20}
                             icon={faXmark}
-                            color={colors.primaryDisabled}
+                            color={colors.fgAccentDisabled}
                           />
                         </TouchableOpacity>
                       )}
@@ -1404,8 +1400,8 @@ const Send: React.FunctionComponent<SendProps> = ({
                                 icon={faUserPlus}
                                 color={
                                   updatingToField
-                                    ? colors.primaryDisabled
-                                    : colors.primary
+                                    ? colors.fgAccentDisabled
+                                    : colors.fgAccent
                                 }
                               />
                             </TouchableOpacity>
@@ -1422,7 +1418,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                                 style={{ marginRight: 5 }}
                                 size={28}
                                 icon={faAddressCard}
-                                color={colors.primary}
+                                color={colors.fgAccent}
                               />
                             </TouchableOpacity>
                           ) : (
@@ -1430,7 +1426,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                               style={{ marginRight: 5 }}
                               size={28}
                               icon={faAddressCard}
-                              color={colors.primaryDisabled}
+                              color={colors.fgAccentDisabled}
                             />
                           );
                         }
@@ -1450,7 +1446,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           style={{ marginRight: 5 }}
                           size={28}
                           icon={faQrcode}
-                          color={colors.border}
+                          color={colors.fgMuted}
                         />
                       </TouchableOpacity>
                     </View>
@@ -1482,12 +1478,12 @@ const Send: React.FunctionComponent<SendProps> = ({
                     </View>
                   </View>
                   {validAmount === -1 && (
-                    <ErrorText style={{ color: colors.danger.text }}>
+                    <ErrorText style={{ color: colors.fgDanger }}>
                       {translate('send.invalidnumber') as string}
                     </ErrorText>
                   )}
                   {validAmount === -2 && (
-                    <ErrorText style={{ color: colors.danger.text }}>
+                    <ErrorText style={{ color: colors.fgDanger }}>
                       {translate('send.invalidamount') as string}
                     </ErrorText>
                   )}
@@ -1514,7 +1510,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                         alignItems: 'center',
                         borderWidth: 1,
                         borderRadius: 12,
-                        borderColor: colors.border,
+                        borderColor: colors.borderMuted,
                         minWidth: 48,
                         minHeight: 48,
                       }}
@@ -1524,7 +1520,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           width={12}
                           height={20}
                           xml={zecIconXml}
-                          fill={colors.text}
+                          fill={colors.fgDefault}
                           style={{ marginLeft: 10 }}
                         />
                       ) : (
@@ -1532,7 +1528,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           style={{
                             marginLeft: 10,
                             fontSize: 22,
-                            color: colors.text,
+                            color: colors.fgDefault,
                           }}
                         >
                           $
@@ -1542,14 +1538,14 @@ const Send: React.FunctionComponent<SendProps> = ({
                         <TextInput
                           testID="send.amount"
                           placeholder={`0${decimalSeparator}00000`}
-                          placeholderTextColor={colors.placeholder}
+                          placeholderTextColor={colors.fgMuted}
                           keyboardType="numeric"
                           style={{
                             flex: 1,
                             color:
                               validAmount === -1 || validAmount === -2
-                                ? colors.danger.text
-                                : colors.text,
+                                ? colors.fgDanger
+                                : colors.fgDefault,
                             fontWeight: '600',
                             fontSize: 16,
                             minHeight: 48,
@@ -1572,14 +1568,14 @@ const Send: React.FunctionComponent<SendProps> = ({
                       ) : (
                         <TextInput
                           placeholder={`0${decimalSeparator}00`}
-                          placeholderTextColor={colors.placeholder}
+                          placeholderTextColor={colors.fgMuted}
                           keyboardType="numeric"
                           style={{
                             flex: 1,
                             color:
                               validAmount === -1 || validAmount === -2
-                                ? colors.danger.text
-                                : colors.text,
+                                ? colors.fgDanger
+                                : colors.fgDefault,
                             fontWeight: '600',
                             fontSize: 16,
                             minHeight: 48,
@@ -1612,7 +1608,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                             style={{ marginRight: 5 }}
                             size={20}
                             icon={faXmark}
-                            color={colors.primaryDisabled}
+                            color={colors.fgAccentDisabled}
                           />
                         </TouchableOpacity>
                       ) : null}
@@ -1641,7 +1637,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                         >
                           <BoldText
                             style={{
-                              color: colors.primary,
+                              color: colors.fgAccent,
                               fontSize: 20,
                               lineHeight: 20,
                               letterSpacing: -1.5,
@@ -1689,8 +1685,8 @@ const Send: React.FunctionComponent<SendProps> = ({
                               height={28}
                               color={
                                 !zecPrice.zecPrice || zecPrice.zecPrice <= 0
-                                  ? colors.primaryDisabled
-                                  : colors.primary
+                                  ? colors.fgAccentDisabled
+                                  : colors.fgAccent
                               }
                             />
                           </TouchableOpacity>
@@ -1714,7 +1710,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                             <ZecAmount
                               style={{ marginLeft: 0 }}
                               currencyName={info.currencyName}
-                              color={colors.text}
+                              color={colors.fgDefault}
                               size={16}
                               amtZec={
                                 Utils.parseStringLocaleToNumberFloat(
@@ -1727,7 +1723,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           <View style={{ marginLeft: inputZec ? 5 : 2 }}>
                             <PriceFetcher
                               setZecPrice={setZecPrice}
-                              backgroundColor={colors.bottomSheetBackground}
+                              backgroundColor={colors.bgSurface}
                               onManualFetch={revealPrice}
                             />
                           </View>
@@ -1762,8 +1758,8 @@ const Send: React.FunctionComponent<SendProps> = ({
                             color:
                               spendableBalanceLastError &&
                               mode === ModeEnum.advanced
-                                ? colors.danger.text
-                                : colors.money,
+                                ? colors.fgDanger
+                                : colors.fgDefault,
                           }}
                         >
                           {translate('send.spendable') as string}
@@ -1778,8 +1774,8 @@ const Send: React.FunctionComponent<SendProps> = ({
                               negativeMaxAmount ||
                               (spendableBalanceLastError &&
                                 mode === ModeEnum.advanced)
-                                ? colors.danger.text
-                                : colors.money
+                                ? colors.fgDanger
+                                : colors.fgDefault
                             }
                             size={14}
                             amtZec={maxAmount}
@@ -1804,7 +1800,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                             display: 'flex',
                             flexDirection: 'row',
                             marginTop: 0,
-                            backgroundColor: colors.bottomSheetBackground,
+                            backgroundColor: colors.bgSurface,
                             padding: 5,
                             borderRadius: 10,
                             alignSelf: 'flex-start',
@@ -1813,7 +1809,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           <FontAwesomeIcon
                             icon={faInfoCircle}
                             size={16}
-                            color={colors.primary}
+                            color={colors.fgAccent}
                             style={{ marginRight: 5 }}
                           />
                           <FadeText>{'( '}</FadeText>
@@ -1838,7 +1834,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                             display: 'flex',
                             flexDirection: 'row',
                             marginTop: 0,
-                            backgroundColor: colors.bottomSheetBackground,
+                            backgroundColor: colors.bgSurface,
                             padding: 5,
                             borderRadius: 10,
                           }}
@@ -1846,7 +1842,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           <FontAwesomeIcon
                             icon={faInfoCircle}
                             size={16}
-                            color={colors.primary}
+                            color={colors.fgAccent}
                             style={{ marginRight: 5 }}
                           />
                           <FadeText style={{ fontSize: 12.5 }}>
@@ -1867,7 +1863,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                             display: 'flex',
                             flexDirection: 'row',
                             marginTop: 0,
-                            backgroundColor: colors.bottomSheetBackground,
+                            backgroundColor: colors.bgSurface,
                             padding: 5,
                             borderRadius: 10,
                           }}
@@ -1875,7 +1871,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           <FontAwesomeIcon
                             icon={faInfoCircle}
                             size={16}
-                            color={colors.primary}
+                            color={colors.fgAccent}
                             style={{ marginRight: 5 }}
                           />
                           <FadeText>
@@ -1917,7 +1913,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           flexDirection: 'row',
                           borderWidth: 1,
                           borderRadius: 12,
-                          borderColor: colors.border,
+                          borderColor: colors.borderMuted,
                           minWidth: 48,
                           minHeight: 48,
                           maxHeight: 130,
@@ -1928,14 +1924,14 @@ const Send: React.FunctionComponent<SendProps> = ({
                           placeholder={
                             translate('send.memo-placeholder') as string
                           }
-                          placeholderTextColor={colors.placeholder}
+                          placeholderTextColor={colors.fgMuted}
                           multiline
                           style={{
                             flex: 1,
                             color:
                               validMemo === -1
-                                ? colors.danger.text
-                                : colors.text,
+                                ? colors.fgDanger
+                                : colors.fgDefault,
                             fontWeight: '600',
                             fontSize: 15,
                             minWidth: 48,
@@ -2028,7 +2024,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                               }}
                               size={20}
                               icon={faXmark}
-                              color={colors.primaryDisabled}
+                              color={colors.fgAccentDisabled}
                             />
                           </TouchableOpacity>
                         )}
@@ -2042,7 +2038,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                               style={{ margin: 7 }}
                               size={24}
                               icon={faMagnifyingGlassPlus}
-                              color={colors.border}
+                              color={colors.fgMuted}
                             />
                           </TouchableOpacity>
                         )}
@@ -2061,7 +2057,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                             marginTop: 0,
                             fontWeight: 'bold',
                             fontSize: 12.5,
-                            color: colors.danger.text,
+                            color: colors.fgDanger,
                           }}
                         >{`${Utils.countMemoBytes(memoText, includeUAMemoBoolean, defaultUnifiedAddress)} `}</FadeText>
                         <FadeText style={{ marginTop: 0, fontSize: 12.5 }}>
@@ -2131,7 +2127,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                     )}
                     <View style={{ flex: 1, marginLeft: 10 }}>
                       <BoldText
-                        style={{ color: nymOn ? '#07FF94' : colors.text }}
+                        style={{ color: nymOn ? '#07FF94' : colors.fgDefault }}
                       >
                         {translate('settings.nym-network') as string}
                       </BoldText>
@@ -2264,11 +2260,11 @@ const Send: React.FunctionComponent<SendProps> = ({
                             paddingHorizontal: 4,
                             paddingBottom: 2,
                             borderWidth: 1,
-                            borderColor: colors.primary,
+                            borderColor: colors.borderAccent,
                             borderRadius: 5,
                           }}
                         >
-                          <Text style={{ fontSize: 13, color: colors.border }}>
+                          <Text style={{ fontSize: 13, color: colors.fgMuted }}>
                             {translate('donation-legend') as string}
                           </Text>
                         </View>
@@ -2314,12 +2310,12 @@ const Send: React.FunctionComponent<SendProps> = ({
                               paddingHorizontal: 4,
                               paddingBottom: 2,
                               borderWidth: 1,
-                              borderColor: colors.primary,
+                              borderColor: colors.borderAccent,
                               borderRadius: 5,
                             }}
                           >
                             <Text
-                              style={{ fontSize: 13, color: colors.border }}
+                              style={{ fontSize: 13, color: colors.fgMuted }}
                             >
                               {translate('donation-button') as string}
                             </Text>
@@ -2327,7 +2323,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                               style={{ marginTop: 3 }}
                               size={16}
                               icon={faMoneyCheckDollar}
-                              color={colors.primary}
+                              color={colors.fgAccent}
                             />
                           </View>
                         </TouchableOpacity>
@@ -2349,7 +2345,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         android_keyboardInputMode={'adjustResize'}
         handleComponent={renderMemoHandle}
         backgroundStyle={{
-          backgroundColor: colors.bottomSheetBackground,
+          backgroundColor: colors.bgSurface,
           borderTopLeftRadius: 40,
           borderTopRightRadius: 40,
         }}
@@ -2357,7 +2353,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       >
         <BottomSheetView
           style={{
-            backgroundColor: colors.bottomSheetBackground,
+            backgroundColor: colors.bgSurface,
             paddingHorizontal: 20,
             paddingTop: 12,
             paddingBottom: keyboardHeight > 0 ? keyboardHeight + 20 : 30,

@@ -3,77 +3,83 @@
  *
  * Every method calls syncCoordinator.pauseSyncProcess() first to ensure no
  * sync task is running while the wallet file is being replaced. All methods
- * return an empty string on success or a translated error string on failure.
+ * return DONE on success or an ErrorKeyed failure the display edge
+ * translates (docs/adr/0002-error-keys-not-prose.md).
  */
-import { GlobalConst } from '../../AppState';
+import { GlobalConst, Done, DONE, ErrorKeyed } from '../../AppState';
 import RPCModule from '../../RPCModule';
-import { WalletBackendConfig } from '../config/WalletBackendConfig';
 import { SyncCoordinator } from './SyncCoordinator';
 import { doSaveBackup } from '../utils/walletUtils';
 
+export type WalletLifecycleErrorKey =
+  | 'rpc.backupwallet-error'
+  | 'rpc.deletewallet-error'
+  | 'rpc.walletnotfound-error'
+  | 'rpc.backupnotfound-error';
+
+export type WalletLifecycleResult = Done | ErrorKeyed<WalletLifecycleErrorKey>;
+
+const err = (
+  errorKey: WalletLifecycleErrorKey,
+): ErrorKeyed<WalletLifecycleErrorKey> => ({ kind: 'error', errorKey });
+
 export class WalletLifecycleService {
-  config: WalletBackendConfig;
   syncCoordinator: SyncCoordinator;
 
-  constructor(config: WalletBackendConfig, syncCoordinator: SyncCoordinator) {
-    this.config = config;
+  constructor(syncCoordinator: SyncCoordinator) {
     this.syncCoordinator = syncCoordinator;
   }
 
-  async changeWallet() {
+  async changeWallet(): Promise<WalletLifecycleResult> {
     const exists = await RPCModule.walletExists();
 
-    if (exists && exists !== GlobalConst.false) {
-      await this.syncCoordinator.pauseSyncProcess();
-
-      // doSaveBackup classifies the trimodal native resolution and contains
-      // rejections, so failure — including a rejected bridge promise — always
-      // lands on this branch instead of escaping changeWallet.
-      if (!(await doSaveBackup())) {
-        return this.config.translate('rpc.backupwallet-error');
-      }
-
-      const result = await RPCModule.deleteExistingWallet();
-      if (!(result && result !== GlobalConst.false)) {
-        return this.config.translate('rpc.deletewallet-error');
-      }
-    } else {
-      return this.config.translate('rpc.walletnotfound-error');
+    if (!(exists && exists !== GlobalConst.false)) {
+      return err('rpc.walletnotfound-error');
     }
-    return '';
+    await this.syncCoordinator.pauseSyncProcess();
+
+    // doSaveBackup classifies the trimodal native resolution and contains
+    // rejections, so failure — including a rejected bridge promise — always
+    // lands on this branch instead of escaping changeWallet.
+    if (!(await doSaveBackup())) {
+      return err('rpc.backupwallet-error');
+    }
+
+    const result = await RPCModule.deleteExistingWallet();
+    if (!(result && result !== GlobalConst.false)) {
+      return err('rpc.deletewallet-error');
+    }
+    return DONE;
   }
 
-  async changeWalletNoBackup() {
+  async changeWalletNoBackup(): Promise<WalletLifecycleResult> {
     const exists = await RPCModule.walletExists();
 
-    if (exists && exists !== GlobalConst.false) {
-      await this.syncCoordinator.pauseSyncProcess();
-      const result = await RPCModule.deleteExistingWallet();
-
-      if (!(result && result !== GlobalConst.false)) {
-        return this.config.translate('rpc.deletewallet-error');
-      }
-    } else {
-      return this.config.translate('rpc.walletnotfound-error');
+    if (!(exists && exists !== GlobalConst.false)) {
+      return err('rpc.walletnotfound-error');
     }
-    return '';
+    await this.syncCoordinator.pauseSyncProcess();
+    const result = await RPCModule.deleteExistingWallet();
+
+    if (!(result && result !== GlobalConst.false)) {
+      return err('rpc.deletewallet-error');
+    }
+    return DONE;
   }
 
-  async restoreBackup() {
+  async restoreBackup(): Promise<WalletLifecycleResult> {
     const existsBackup = await RPCModule.walletBackupExists();
 
-    if (existsBackup && existsBackup !== GlobalConst.false) {
-      const existsWallet = await RPCModule.walletExists();
-
-      if (existsWallet && existsWallet !== GlobalConst.false) {
-        await this.syncCoordinator.pauseSyncProcess();
-        await RPCModule.restoreExistingWalletBackup();
-      } else {
-        return this.config.translate('rpc.walletnotfound-error');
-      }
-    } else {
-      return this.config.translate('rpc.backupnotfound-error');
+    if (!(existsBackup && existsBackup !== GlobalConst.false)) {
+      return err('rpc.backupnotfound-error');
     }
-    return '';
+    const existsWallet = await RPCModule.walletExists();
+
+    if (!(existsWallet && existsWallet !== GlobalConst.false)) {
+      return err('rpc.walletnotfound-error');
+    }
+    await this.syncCoordinator.pauseSyncProcess();
+    await RPCModule.restoreExistingWalletBackup();
+    return DONE;
   }
 }

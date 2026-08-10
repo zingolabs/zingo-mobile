@@ -14,7 +14,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { useTheme } from '@react-navigation/native';
+import { useTheme } from '../../app/theme';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
@@ -29,7 +29,8 @@ import Svg, { Defs, LinearGradient, Path, Stop } from 'react-native-svg';
 import BoldText from '../Components/BoldText';
 import Button from '../Components/Button';
 import MixnetIcon, { mixnetPhase } from '../Header/components/MixnetIcon';
-import { AppDrawerParamList, ThemeType } from '../../app/types';
+import { AppDrawerParamList } from '../../app/types';
+import { AppTheme } from '../../app/theme';
 import { ContextAppLoaded } from '../../app/context';
 import { ButtonTypeEnum, RouteEnum } from '../../app/AppState';
 import Utils from '../../app/utils';
@@ -137,7 +138,7 @@ type OptionCardProps = {
   body: string;
   selected: boolean;
   onPress: () => void;
-  colors: ThemeType['colors'];
+  colors: AppTheme['colors'];
   disabled?: boolean;
   badge?: string;
   accent?: string;
@@ -159,8 +160,8 @@ const OptionCard: React.FunctionComponent<OptionCardProps> = ({
     onPress={onPress}
     style={{
       borderWidth: 1.5,
-      borderColor: selected ? colors.primary : colors.bottomSheetBorder,
-      backgroundColor: colors.bottomSheetBackground,
+      borderColor: selected ? colors.borderAccent : colors.bottomSheetBorder,
+      backgroundColor: colors.bgSurface,
       borderRadius: 14,
       padding: 18,
       opacity: disabled ? 0.5 : 1,
@@ -177,7 +178,7 @@ const OptionCard: React.FunctionComponent<OptionCardProps> = ({
       <View
         style={{ flexDirection: 'row', alignItems: 'center', flexShrink: 1 }}
       >
-        <Text style={{ color: colors.text, fontSize: 17, fontWeight: '700' }}>
+        <Text style={{ color: colors.fgDefault, fontSize: 17, fontWeight: '700' }}>
           {title}
         </Text>
         {badge ? (
@@ -190,7 +191,7 @@ const OptionCard: React.FunctionComponent<OptionCardProps> = ({
               backgroundColor: 'rgba(255, 255, 255, 0.08)',
             }}
           >
-            <Text style={{ color: colors.placeholder, fontSize: 12 }}>
+            <Text style={{ color: colors.fgMuted, fontSize: 12 }}>
               {badge}
             </Text>
           </View>
@@ -198,14 +199,14 @@ const OptionCard: React.FunctionComponent<OptionCardProps> = ({
       </View>
       <RadioDot
         selected={selected}
-        activeColor={colors.primary}
-        inactiveColor={colors.placeholder}
+        activeColor={colors.fgAccent}
+        inactiveColor={colors.borderMuted}
       />
     </View>
     <BoldSplitText
       text={body}
-      color={colors.placeholder}
-      highlight={colors.text}
+      color={colors.fgMuted}
+      highlight={colors.fgDefault}
       accent={accent}
       fontSize={14}
       lineHeight={21}
@@ -219,7 +220,7 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
   const context = useContext(ContextAppLoaded);
   const { translate, totalBalance, info, nym, setNymOption, mixnetView } =
     context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
   const [selected, setSelected] = useState<StrategyOption>('none');
 
   const nymSheetRef = useRef<BottomSheetModal>(null);
@@ -278,7 +279,7 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
 
   return (
     <>
-      <View style={{ flex: 1, backgroundColor: colors.background }}>
+      <View style={{ flex: 1, backgroundColor: colors.bgCanvas }}>
         {/* Escape hatch: exit the migration flow back to Home. */}
         <TouchableOpacity
           testID="migrationstrategy.close"
@@ -297,11 +298,7 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
             justifyContent: 'center',
           }}
         >
-          <FontAwesomeIcon
-            icon={faXmark}
-            size={22}
-            color={colors.placeholder}
-          />
+          <FontAwesomeIcon icon={faXmark} size={22} color={colors.fgMuted} />
         </TouchableOpacity>
         <ScrollView
           style={{ flex: 1 }}
@@ -319,8 +316,8 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
 
           <BoldSplitText
             text={translate('migrationstrategy.intro') as string}
-            color={colors.placeholder}
-            highlight={colors.text}
+            color={colors.fgMuted}
+            highlight={colors.fgDefault}
             fontSize={16}
             lineHeight={24}
             marginBottom={28}
@@ -340,7 +337,7 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
             selected={selected === 'now'}
             onPress={() => setSelected('now')}
             colors={colors}
-            accent={colors.warning.primary}
+            accent={colors.fgWarning}
           />
           <View style={{ height: 14 }} />
           <OptionCard
@@ -399,7 +396,7 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
         handleComponent={null}
         stackBehavior="push"
         backgroundStyle={{
-          backgroundColor: colors.bottomSheetBackground,
+          backgroundColor: colors.bgSurface,
           borderTopLeftRadius: 40,
           borderTopRightRadius: 40,
         }}
@@ -408,7 +405,7 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
       >
         <BottomSheetView
           style={{
-            backgroundColor: colors.bottomSheetBackground,
+            backgroundColor: colors.bgSurface,
             borderTopLeftRadius: 40,
             borderTopRightRadius: 40,
             paddingHorizontal: 28,
@@ -464,7 +461,7 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
               fontSize: 24,
               fontWeight: '700',
               textAlign: 'center',
-              color: colors.text,
+              color: colors.fgDefault,
               marginBottom: 18,
             }}
           >
@@ -486,7 +483,7 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
               lineHeight: 24,
               textAlign: 'left',
               alignSelf: 'stretch',
-              color: colors.placeholder,
+              color: colors.fgMuted,
               marginBottom: 28,
             }}
           >

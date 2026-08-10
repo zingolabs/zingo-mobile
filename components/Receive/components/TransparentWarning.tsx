@@ -1,9 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
 import { useContext } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
-import { useTheme } from '@react-navigation/native';
+import { useTheme } from '../../../app/theme';
 
-import { ThemeType } from '../../../app/types';
 import { ContextAppLoaded } from '../../../app/context';
 import { TriangleAlert } from '../../Components/Icons/TriangleAlert';
 
@@ -16,13 +15,13 @@ const TransparentWarning = ({
   onSuccess,
   closeSheet,
 }: TransparentWarningProps) => {
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
   const { translate } = useContext(ContextAppLoaded);
 
   return (
     <View
       style={{
-        backgroundColor: colors.bottomSheetBackground,
+        backgroundColor: colors.bgSurface,
       }}
     >
       <View
@@ -30,15 +29,15 @@ const TransparentWarning = ({
           width: '90%',
           padding: 16,
           borderRadius: 8,
-          backgroundColor: colors.bottomSheetBackground,
+          backgroundColor: colors.bgSurface,
           alignSelf: 'center',
         }}
       >
         <View>
-          <Text style={{ color: colors.money, fontSize: 16, marginBottom: 12 }}>
+          <Text style={{ color: colors.fgDefault, fontSize: 16, marginBottom: 12 }}>
             {translate('receive.modal-transparent.message') as string}
           </Text>
-          <Text style={{ color: colors.zingo, fontSize: 16, marginBottom: 16 }}>
+          <Text style={{ color: colors.fgMuted, fontSize: 16, marginBottom: 16 }}>
             {translate('receive.modal-transparent.recommendation') as string}
           </Text>
           <TouchableOpacity
@@ -47,10 +46,10 @@ const TransparentWarning = ({
               flexDirection: 'row',
               justifyContent: 'center',
               alignItems: 'center',
-              backgroundColor: colors.warning.background,
+              backgroundColor: colors.bgWarning,
               padding: 12,
               borderRadius: 8,
-              borderColor: colors.warning.border,
+              borderColor: colors.borderWarning,
               borderWidth: 2,
             }}
             onPress={() => {
@@ -61,10 +60,10 @@ const TransparentWarning = ({
             <TriangleAlert
               size={12}
               style={{ marginRight: 8 }}
-              color={colors.warning.title}
+              color={colors.fgWarningEmphasis}
             />
 
-            <Text style={{ color: colors.warning.title, fontSize: 12 }}>
+            <Text style={{ color: colors.fgWarningEmphasis, fontSize: 12 }}>
               {translate('receive.modal-transparent.button') as string}
             </Text>
           </TouchableOpacity>

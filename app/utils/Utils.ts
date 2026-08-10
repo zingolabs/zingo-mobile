@@ -16,6 +16,7 @@ import {
 import { ZecAmountSplitType } from './types/ZecAmountSplitType';
 import {
   ChainNameEnum,
+  ErrorKeyed,
   GlobalConst,
   LanguageEnum,
   SendJsonToTypeType,
@@ -515,5 +516,19 @@ export default class Utils {
       /\b(main|test|regtest)\b/g,
       token => translate(`settings.value-chainname-${token}`) as string,
     );
+  }
+
+  /**
+   * Renders an ErrorKeyed failure for display: the translated catalog
+   * entry, followed by the offending fragment when the error carries one.
+   * This is the display-edge counterpart of the ErrorKey convention
+   * (docs/adr/0002-error-keys-not-prose.md).
+   */
+  static renderErrorKeyed(
+    failure: ErrorKeyed<string>,
+    translate: (key: string) => TranslateType,
+  ): string {
+    const text = translate(failure.errorKey) as string;
+    return failure.param ? `${text} "${failure.param}"` : text;
   }
 }

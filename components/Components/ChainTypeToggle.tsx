@@ -1,9 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import { TouchableOpacity, View } from 'react-native';
-import { useTheme } from '@react-navigation/native';
+import { useTheme } from '../../app/theme';
 
-import { ThemeType } from '../../app/types';
 import { ChainNameEnum, TranslateType } from '../../app/AppState';
 import RegText from './RegText';
 
@@ -26,7 +25,7 @@ const ChainTypeToggle: React.FunctionComponent<ChainTypeToggleProps> = ({
   translate,
   disabled,
 }) => {
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
 
   return (
     <View
@@ -34,7 +33,7 @@ const ChainTypeToggle: React.FunctionComponent<ChainTypeToggleProps> = ({
         flexDirection: 'row',
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: colors.primary,
+        borderColor: colors.borderAccent,
         borderRadius: 8,
         marginBottom: 10,
       }}
@@ -51,15 +50,15 @@ const ChainTypeToggle: React.FunctionComponent<ChainTypeToggleProps> = ({
               flex: 1,
               paddingVertical: 8,
               alignItems: 'center',
-              backgroundColor: selected ? colors.primary : 'transparent',
+              backgroundColor: selected ? colors.bgAccent : 'transparent',
               borderRadius: 8,
               borderWidth: selected ? 1 : 0,
-              borderColor: colors.primary,
+              borderColor: colors.borderAccent,
             }}
           >
             <RegText
               style={{
-                color: selected ? colors.background : colors.primary,
+                color: selected ? colors.bgCanvas : colors.fgAccent,
                 fontSize: 12,
               }}
             >
