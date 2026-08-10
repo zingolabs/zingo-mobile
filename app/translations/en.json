@@ -681,6 +681,7 @@
     "sending": "...Sending... ",
     "receiving": "...Receiving... ",
     "sendingtoself": "...Sending-to-Self... ",
+    "sendingmemotoself": "...Sending Memo-to-Self... ",
     "shielding": "...Shielding... ",
     "rejection": "Rejection ",
     "migration": "Migration ",
