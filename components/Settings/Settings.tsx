@@ -1636,95 +1636,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                 paddingBottom: 100,
               }}
             >
-              {mixnetView !== null && (
-                <View
-                  style={{ marginHorizontal: 25, marginTop: 15 }}
-                  testID="settings.mixnet"
-                >
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                    }}
-                  >
-                    {nym ? (
-                      <NymOn width={22} height={22} />
-                    ) : (
-                      <NymOff width={22} height={22} />
-                    )}
-                    <View style={{ flex: 1, marginLeft: 10 }}>
-                      <View
-                        style={{
-                          flexDirection: 'row',
-                          alignItems: 'center',
-                          gap: 8,
-                        }}
-                      >
-                        <BoldText
-                          style={{ color: nym ? '#07FF94' : colors.fgDefault }}
-                        >
-                          {translate('settings.nym-network') as string}
-                        </BoldText>
-                        <TouchableOpacity
-                          testID="settings.mixnet-doctor"
-                          accessibilityLabel={
-                            translate('settings.nym-diagnostics') as string
-                          }
-                          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                          onPress={() =>
-                            navigation.navigate(RouteEnum.MixnetDoctor)
-                          }
-                        >
-                          <FontAwesomeIcon
-                            icon={faBug}
-                            color={colors.zingo}
-                            size={16}
-                          />
-                        </TouchableOpacity>
-                      </View>
-                      <FadeText>
-                        {translate('settings.nym-enhanced-privacy') as string}
-                      </FadeText>
-                    </View>
-                    <TouchableOpacity
-                      testID="settings.mixnet-toggle"
-                      onPress={() => {
-                        // Enabling is immediate; disabling warns first, since
-                        // it drops send and price to the clearnet. Committed on
-                        // save.
-                        if (!nym) {
-                          setNym(true);
-                          return;
-                        }
-                        showConfirm({
-                          title: translate('settings.nym-network') as string,
-                          message: translate(
-                            'settings.nym-disable-warning',
-                          ) as string,
-                          messageAlign: 'left',
-                          buttons: [
-                            {
-                              text: translate('cancel') as string,
-                              style: 'cancel',
-                            },
-                            {
-                              text: translate('confirm') as string,
-                              onPress: () => setNym(false),
-                            },
-                          ],
-                        });
-                      }}
-                    >
-                      {nym ? (
-                        <NymSwitchOn width={40} height={19} />
-                      ) : (
-                        <SwitchOff width={40} height={19} />
-                      )}
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              )}
-
               {/* SECTION: Preferences */}
               {sectionHeader('settings.section-preferences')}
 
@@ -2055,6 +1966,92 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
               {/* SECTION: Network & Advanced */}
               {mode !== ModeEnum.basic &&
                 sectionHeader('settings.section-networkadvanced')}
+
+              {mode !== ModeEnum.basic && mixnetView !== null && (
+                <View
+                  style={{ marginHorizontal: 25, marginTop: 15 }}
+                  testID="settings.mixnet"
+                >
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                    }}
+                  >
+                    {nym ? (
+                      <NymOn width={22} height={22} />
+                    ) : (
+                      <NymOff width={22} height={22} />
+                    )}
+                    <View style={{ flex: 1, marginLeft: 10 }}>
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          gap: 8,
+                        }}
+                      >
+                        <BoldText
+                          style={{ color: nym ? '#07FF94' : colors.fgDefault }}
+                        >
+                          {translate('settings.nym-network') as string}
+                        </BoldText>
+                        <TouchableOpacity
+                          testID="settings.mixnet-doctor"
+                          accessibilityLabel={
+                            translate('settings.nym-diagnostics') as string
+                          }
+                          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                          onPress={() =>
+                            navigation.navigate(RouteEnum.MixnetDoctor)
+                          }
+                        >
+                          <FontAwesomeIcon
+                            icon={faBug}
+                            color={colors.fgMuted}
+                            size={16}
+                          />
+                        </TouchableOpacity>
+                      </View>
+                      <FadeText>
+                        {translate('settings.nym-enhanced-privacy') as string}
+                      </FadeText>
+                    </View>
+                    <TouchableOpacity
+                      testID="settings.mixnet-toggle"
+                      onPress={() => {
+                        if (!nym) {
+                          setNym(true);
+                          return;
+                        }
+                        showConfirm({
+                          title: translate('settings.nym-network') as string,
+                          message: translate(
+                            'settings.nym-disable-warning',
+                          ) as string,
+                          messageAlign: 'left',
+                          buttons: [
+                            {
+                              text: translate('cancel') as string,
+                              style: 'cancel',
+                            },
+                            {
+                              text: translate('confirm') as string,
+                              onPress: () => setNym(false),
+                            },
+                          ],
+                        });
+                      }}
+                    >
+                      {nym ? (
+                        <NymSwitchOn width={40} height={19} />
+                      ) : (
+                        <SwitchOff width={40} height={19} />
+                      )}
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              )}
 
               {mode !== ModeEnum.basic && (
                 <View
