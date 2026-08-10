@@ -221,19 +221,23 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
     navigation.reset({ index: 0, routes: [{ name: RouteEnum.HomeStack }] });
   }, [navigation]);
 
-  const startMigrationNow = useCallback(() => {
-    navigation.navigate(RouteEnum.MigrationTransactions);
-  }, [navigation]);
+  const startMigration = useCallback(() => {
+    navigation.navigate(
+      selected === 'private'
+        ? RouteEnum.MigrationSplitPlan
+        : RouteEnum.MigrationTransactions,
+    );
+  }, [navigation, selected]);
 
   // Once the transport the user just enabled reaches ready, close the gate and
-  // advance to the transactions screen.
+  // advance to the chosen migration path.
   useEffect(() => {
     if (enabling && nymPhase === 'ready') {
       setEnabling(false);
       nymSheetRef.current?.dismiss();
-      startMigrationNow();
+      startMigration();
     }
-  }, [enabling, nymPhase, startMigrationNow]);
+  }, [enabling, nymPhase, startMigration]);
 
   const renderNymBackdrop = useCallback(
     (props: BottomSheetBackdropProps) => (
@@ -359,12 +363,8 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
                 closeMigration();
                 return;
               }
-              if (selected === 'private') {
-                navigation.navigate(RouteEnum.MigrationSplitPlan);
-                return;
-              }
               if (nym) {
-                startMigrationNow();
+                startMigration();
                 return;
               }
               nymSheetRef.current?.present();
@@ -486,7 +486,7 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
             onPress={() => {
               setEnabling(false);
               nymSheetRef.current?.dismiss();
-              startMigrationNow();
+              startMigration();
             }}
             style={{ marginBottom: 10 }}
           />
