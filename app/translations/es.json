@@ -874,7 +874,6 @@
     "now-body": "Una sola transferencia, lista en minutos. Todo tu saldo de **{amount}** queda visible públicamente en la cadena, y tu IP quedará asociada a él a menos que uses ##NYM/Tor##.",
     "private-label": "Migrar en privado",
     "private-body": "Reparte las transferencias a lo largo de ~3 días en cantidades estándar, mezclándose con otros usuarios. Requiere abrir la app varias veces.",
-    "coming-soon": "Próximamente",
     "back": "Atrás",
     "start": "Aceptar",
     "close": "Cerrar",
