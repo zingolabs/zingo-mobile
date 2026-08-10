@@ -80,7 +80,7 @@ import {
 import {
   classifySendFailure,
   retryOnAnotherServer,
-  sendFailureMessage,
+  sendFailureText,
 } from '../../app/walletBackend/transforms/sendFailureTransform';
 import Utils from '../../app/utils';
 import { safeSnapToIndex } from '../../app/utils/safeSnapToIndex';
@@ -1058,9 +1058,13 @@ const Send: React.FunctionComponent<SendProps> = ({
         }
       }
 
+      const failureText = sendFailureText(failure);
       navigation.navigate(RouteEnum.Computing, {
         phase: 'failed',
-        errorMessage: sendFailureMessage(failure, translate),
+        errorMessage:
+          failureText.kind === 'key'
+            ? (translate(failureText.errorKey) as string)
+            : failureText.text,
       });
     }
   };

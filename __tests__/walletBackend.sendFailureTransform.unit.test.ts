@@ -2,7 +2,7 @@ import {
   SendFailureClass,
   classifySendFailure,
   retryOnAnotherServer,
-  sendFailureMessage,
+  sendFailureText,
 } from '../app/walletBackend/transforms/sendFailureTransform';
 
 /**
@@ -123,34 +123,35 @@ describe('retryOnAnotherServer is exhaustive over the enumeration', () => {
   });
 });
 
-describe('sendFailureMessage', () => {
-  const translate = (key: string): unknown => `t(${key})`;
-
-  it('translates the wallet verdicts', () => {
-    expect(sendFailureMessage(classifySendFailure('64: dust'), translate)).toBe(
-      't(send.dust-error)',
-    );
+describe('sendFailureText', () => {
+  it('carries a catalog key for the wallet verdicts', () => {
+    expect(sendFailureText(classifySendFailure('64: dust'))).toEqual({
+      kind: 'key',
+      errorKey: 'send.dust-error',
+    });
     expect(
-      sendFailureMessage(
+      sendFailureText(
         classifySendFailure('18: bad-txns-orchard-duplicate-nullifier'),
-        translate,
       ),
-    ).toBe('t(send.duplicate-nullifier-error)');
+    ).toEqual({ kind: 'key', errorKey: 'send.duplicate-nullifier-error' });
   });
 
-  it('shows a mixnet refusal verbatim, untranslated', () => {
-    expect(
-      sendFailureMessage(classifySendFailure(DIED_REFUSAL), translate),
-    ).toBe(DIED_REFUSAL);
+  it('carries a mixnet refusal verbatim, untranslated', () => {
+    expect(sendFailureText(classifySendFailure(DIED_REFUSAL))).toEqual({
+      kind: 'verbatim',
+      text: DIED_REFUSAL,
+    });
   });
 
-  it('shows internal and server-suspect errors verbatim', () => {
-    expect(
-      sendFailureMessage(classifySendFailure(INTERNAL_CONFIRM), translate),
-    ).toBe(INTERNAL_CONFIRM);
-    expect(
-      sendFailureMessage(classifySendFailure(CONNECTION_REFUSED), translate),
-    ).toBe(CONNECTION_REFUSED);
+  it('carries internal and server-suspect errors verbatim', () => {
+    expect(sendFailureText(classifySendFailure(INTERNAL_CONFIRM))).toEqual({
+      kind: 'verbatim',
+      text: INTERNAL_CONFIRM,
+    });
+    expect(sendFailureText(classifySendFailure(CONNECTION_REFUSED))).toEqual({
+      kind: 'verbatim',
+      text: CONNECTION_REFUSED,
+    });
   });
 });
 
