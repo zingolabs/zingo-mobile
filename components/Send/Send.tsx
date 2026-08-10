@@ -69,11 +69,12 @@ import {
   RouteEnum,
   SecurityType,
   ScreenEnum,
+  ProposalPoolsType,
 } from '../../app/AppState';
+import { hasUnconfirmedFunds } from '../../app/AppState/classes/TotalBalanceClass';
 import { parseZcashURI, serverUris, fetchServerList } from '../../app/uris';
 import {
   getSpendableBalanceWithAddress,
-  parseAddress,
   sendPropose,
 } from '../../app/walletBackend';
 import {
@@ -105,7 +106,6 @@ import Memo from './components/Memo';
 import SendErrorSheet from './components/SendErrorSheet';
 import { sendEmail } from '../../app/sendEmail';
 import selectingServer from '../../app/selectingServer';
-import { RPCParseAddressType } from '../../app/walletBackend/types/RPCParseAddressType';
 import { RPCSpendablebalanceType } from '../../app/walletBackend/types/RPCSpendablebalanceType';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
@@ -206,6 +206,10 @@ const Send: React.FunctionComponent<SendProps> = ({
   const [maxAmount, setMaxAmount] = useState<number>(0);
   const [spendable, setSpendable] = useState<number>(0);
   const [fee, setFee] = useState<number>(0);
+  const [proposalPools, setProposalPools] = useState<ProposalPoolsType>({
+    source: [],
+    destination: [],
+  });
   const [stillConfirming, setStillConfirming] = useState<boolean>(false);
   const [showShieldInfo, setShowShieldInfo] = useState<boolean>(false);
   const [updatingToField, setUpdatingToField] = useState<boolean>(false);
@@ -406,6 +410,7 @@ const Send: React.FunctionComponent<SendProps> = ({
 
   const defaultValueFee = (): void => {
     setFee(0);
+    setProposalPools({ source: [], destination: [] });
     setProposeSendLastError('');
   };
 
@@ -485,6 +490,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       );
       // fee
       let proposeFee = 0;
+      let proposePools: ProposalPoolsType = { source: [], destination: [] };
       const runPropose = await sendPropose(JSON.stringify(sendJson));
 
       // discard result if a newer calculation (or a clear) has superseded this one
@@ -508,6 +514,10 @@ const Send: React.FunctionComponent<SendProps> = ({
               proposeFee = runProposeJson.fee / 10 ** 8;
               setProposeSendLastError('');
             }
+            proposePools = {
+              source: runProposeJson.source_pools ?? [],
+              destination: runProposeJson.destination_pools ?? [],
+            };
             if (runProposeJson.amount !== undefined) {
               const newAmount =
                 runProposeJson.amount / 10 ** 8 -
@@ -534,6 +544,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         }
       }
       setFee(proposeFee);
+      setProposalPools(proposePools);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [
@@ -724,25 +735,13 @@ const Send: React.FunctionComponent<SendProps> = ({
 
   useEffect(() => {
     const stillConf =
-      (totalBalance ? totalBalance.totalOrchardBalance : 0) !==
-        (totalBalance ? totalBalance.confirmedOrchardBalance : 0) ||
-      (totalBalance ? totalBalance.totalSaplingBalance : 0) !==
-        (totalBalance ? totalBalance.confirmedSaplingBalance : 0) ||
-      somePending;
+      (!!totalBalance && hasUnconfirmedFunds(totalBalance)) || somePending;
     const showShield = (somePending ? 0 : shieldingAmount) > 0;
     //const showUpgrade =
     //  (somePending ? 0 : totalBalance.transparentBal) === 0 && totalBalance.spendablePrivate > fee;
     setStillConfirming(stillConf);
     setShowShieldInfo(showShield);
-  }, [
-    shieldingAmount,
-    somePending,
-    totalBalance,
-    totalBalance?.totalOrchardBalance,
-    totalBalance?.totalSaplingBalance,
-    totalBalance?.confirmedOrchardBalance,
-    totalBalance?.confirmedSaplingBalance,
-  ]);
+  }, [shieldingAmount, somePending, totalBalance]);
 
   useEffect(() => {
     calculateFeeWithPropose(
@@ -1149,12 +1148,10 @@ const Send: React.FunctionComponent<SendProps> = ({
     [colors, translate],
   );
 
-  const setConfirmModalShow = async (
-    parseAddressInfoJSON: RPCParseAddressType,
-  ) => {
+  const setConfirmModalShow = async () => {
     navigation.navigate(RouteEnum.Confirm, {
       calculatedFee: fee,
-      parseAddressInfoJSON: parseAddressInfoJSON,
+      proposalPools: proposalPools,
       donationAmount:
         donation &&
         server.chainName === ChainNameEnum.mainChainName &&
@@ -2240,27 +2237,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           setMemoText('');
                           updateToField(null, null, null, '', false);
                         }
-                        // Prefetch the parsed address for the Confirm screen
-                        // so its Privacy Level badge renders without waiting on
-                        // an RPC round-trip there. The address itself was
-                        // already validated upstream — any failure here (RPC
-                        // error string, non-JSON output, transient network)
-                        // degrades gracefully to a '-' badge in Confirm.tsx;
-                        // the validated address string is what actually drives
-                        // the transaction, so no Send state is corrupted.
-                        let parseAddressInfoJSON: RPCParseAddressType =
-                          {} as RPCParseAddressType;
-                        try {
-                          const parseResult = await parseAddress(addressText);
-                          if (parseResult.ok) {
-                            parseAddressInfoJSON = JSON.parse(
-                              parseResult.value,
-                            );
-                          }
-                        } catch (_) {
-                          // best-effort prefetch; fall through to {}
-                        }
-                        setConfirmModalShow(parseAddressInfoJSON);
+                        setConfirmModalShow();
                         Keyboard.dismiss();
                         setSendButtonEnabled(true);
                       }}

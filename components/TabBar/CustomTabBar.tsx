@@ -11,7 +11,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faRefresh } from '@fortawesome/free-solid-svg-icons';
 import { ModeEnum, RouteEnum } from '../../app/AppState';
 import { ContextAppLoaded } from '../../app/context';
-import TotalBalanceClass from '../../app/AppState/classes/TotalBalanceClass';
+import TotalBalanceClass, {
+  hasFullyUnconfirmedPool,
+} from '../../app/AppState/classes/TotalBalanceClass';
 import { HouseFilledIcon } from '../Components/Icons/HouseFilledIcon';
 import { HouseOutlineIcon } from '../Components/Icons/HouseOutlineIcon';
 import { SendFilledIcon } from '../Components/Icons/SendFilledIcon';
@@ -48,14 +50,7 @@ function renderNavIcon(
     const isPending =
       mode === ModeEnum.basic &&
       !!totalBalance &&
-      ((totalBalance.totalIronwoodBalance > 0 &&
-        totalBalance.confirmedIronwoodBalance === 0) ||
-        (totalBalance.totalOrchardBalance > 0 &&
-          totalBalance.confirmedOrchardBalance === 0) ||
-        (totalBalance.totalSaplingBalance > 0 &&
-          totalBalance.confirmedSaplingBalance === 0) ||
-        (totalBalance.totalTransparentBalance > 0 &&
-          totalBalance.confirmedTransparentBalance === 0)) &&
+      hasFullyUnconfirmedPool(totalBalance) &&
       somePending;
     if (isPending) {
       return (

@@ -7,8 +7,8 @@ import {
   SendPageStateClass,
   UfvkActionEnum,
   ValueTransferType,
+  ProposalPoolsType,
 } from '../AppState';
-import { RPCParseAddressType } from '../walletBackend/types/RPCParseAddressType';
 import { RPCDrainTxType } from '../walletBackend/types/RPCDrainPlanType';
 import { RPCMigrationPlanType } from '../walletBackend/types/RPCMigrationPlanType';
 
@@ -141,7 +141,7 @@ export type ValueTransferDetailNavigationState = {
 
 export type ConfirmNavigationState = {
   calculatedFee: number;
-  parseAddressInfoJSON: RPCParseAddressType;
+  proposalPools: ProposalPoolsType;
   donationAmount: number;
   confirmSend: (s: SendPageStateClass) => Promise<void>;
   sendAllAmount: boolean;

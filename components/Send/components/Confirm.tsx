@@ -39,23 +39,33 @@ import Utils from '../../../app/utils';
 import {
   ButtonTypeEnum,
   ChainNameEnum,
-  PrivacyLevelFromEnum,
   GlobalConst,
   ScreenEnum,
   RouteEnum,
   SendPageStateClass,
-  isIronwoodActive,
+  ProposalPoolsType,
 } from '../../../app/AppState';
-import { RPCAddressKindEnum } from '../../../app/walletBackend/enums/RPCAddressKindEnum';
-import { RPCReceiversEnum } from '../../../app/walletBackend/enums/RPCReceiversEnum';
-import { RPCParseAddressStatusEnum } from '../../../app/walletBackend/enums/RPCParseAddressStatusEnum';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { RPCParseAddressType } from '../../../app/walletBackend/types/RPCParseAddressType';
 
 type ConfirmProps = NativeStackScreenProps<
   AppDrawerParamList,
   RouteEnum.Confirm
 >;
+
+const poolCrossingKey = ({
+  source,
+  destination,
+}: ProposalPoolsType): string | null => {
+  if (source.length === 0 || destination.length === 0) {
+    return null;
+  }
+  if (destination.includes('transparent')) {
+    return 'send.deshielded';
+  }
+  return new Set([...source, ...destination]).size === 1
+    ? 'send.private'
+    : 'send.amountrevealed';
+};
 
 const Confirm: React.FunctionComponent<ConfirmProps> = ({
   navigation,
@@ -77,7 +87,6 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     zecPrice,
     defaultUnifiedAddress,
     privacy,
-    totalBalance,
     addLastSnackbar,
     server,
     security,
@@ -102,7 +111,6 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     foregroundEpoch,
   });
 
-  const [privacyLevel, setPrivacyLevel] = useState<string | null>(null);
   const [sendingTotal, setSendingTotal] = useState<number>(0);
 
   const [calculatedFee, setCalculatedFee] = useState<number>(
@@ -110,12 +118,11 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
       ? route.params.calculatedFee
       : 0,
   );
-  const [parseAddressInfoJSON, setParseAddressInfoJSON] =
-    useState<RPCParseAddressType>(
-      !!route.params && route.params.parseAddressInfoJSON !== undefined
-        ? route.params.parseAddressInfoJSON
-        : ({} as RPCParseAddressType),
-    );
+  const [proposalPools, setProposalPools] = useState<ProposalPoolsType>(
+    !!route.params && route.params.proposalPools !== undefined
+      ? route.params.proposalPools
+      : { source: [], destination: [] },
+  );
   const [donationAmount, setDonationAmount] = useState<number>(
     !!route.params && route.params.donationAmount !== undefined
       ? route.params.donationAmount
@@ -224,10 +231,10 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
       !!route.params && route.params?.calculatedFee !== undefined
         ? route.params.calculatedFee
         : 0;
-    const _parseAddressInfoJSON =
-      !!route.params && route.params.parseAddressInfoJSON !== undefined
-        ? route.params.parseAddressInfoJSON
-        : ({} as RPCParseAddressType);
+    const _proposalPools =
+      !!route.params && route.params.proposalPools !== undefined
+        ? route.params.proposalPools
+        : { source: [], destination: [] };
     const _donationAmount =
       !!route.params && route.params.donationAmount !== undefined
         ? route.params.donationAmount
@@ -246,7 +253,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
       defaultUnifiedAddress,
     );
     setCalculatedFee(_calculatedFee);
-    setParseAddressInfoJSON(_parseAddressInfoJSON);
+    setProposalPools(_proposalPools);
     setDonationAmount(_donationAmount);
     setSendAllAmount(_sendAllAmount);
     setSendPageState(_sendPageState);
@@ -255,7 +262,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     route,
     route.params,
     route.params?.calculatedFee,
-    route.params?.parseAddressInfoJSON,
+    route.params?.proposalPools,
     route.params?.donationAmount,
     route.params?.sendAllAmount,
     sendPageState,
@@ -264,162 +271,10 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     defaultUnifiedAddress,
   ]);
 
-  /**
-   * Returns the privacy level for the transaction.
-   * It will try to parse the address and determine the privacy level
-   * based on the address kind and the senders balance.
-   * @returns {string} The privacy level.
-   */
-  const getPrivacyLevel = useCallback(async () => {
-    let from: PrivacyLevelFromEnum = PrivacyLevelFromEnum.nonePrivacyLevel;
-    const totalAmount: number = Utils.parseStringLocaleToNumberFloat(
-      Utils.parseNumberFloatToStringLocale(
-        Utils.parseStringLocaleToNumberFloat(sendPageState.toaddr.amount) +
-          calculatedFee,
-        8,
-      ),
-    );
-
-    const totalSpendable: number = Utils.parseStringLocaleToNumberFloat(
-      Utils.parseNumberFloatToStringLocale(
-        totalBalance ? totalBalance.totalSpendableBalance : 0,
-        8,
-      ),
-    );
-
-    // amount + fee
-    if (
-      totalAmount <= (totalBalance ? totalBalance.confirmedOrchardBalance : 0)
-    ) {
-      from = PrivacyLevelFromEnum.orchardPrivacyLevel;
-    } else if (
-      (totalBalance ? totalBalance.confirmedOrchardBalance : 0) > 0 &&
-      totalAmount <= totalSpendable
-    ) {
-      from = PrivacyLevelFromEnum.orchardAndSaplingPrivacyLevel;
-    } else if (
-      totalAmount <= (totalBalance ? totalBalance.confirmedSaplingBalance : 0)
-    ) {
-      from = PrivacyLevelFromEnum.saplingPrivacyLevel;
-    }
-
-    if (from === PrivacyLevelFromEnum.nonePrivacyLevel) {
-      return '-';
-    }
-
-    if (
-      parseAddressInfoJSON.status !==
-        RPCParseAddressStatusEnum.successAddressParse ||
-      parseAddressInfoJSON.chain_name !== server.chainName
-    ) {
-      return '-';
-    }
-
-    // Private -> orchard to orchard (UA with orchard receiver)
-    if (
-      from === PrivacyLevelFromEnum.orchardPrivacyLevel &&
-      parseAddressInfoJSON.address_kind ===
-        RPCAddressKindEnum.unifiedAddressKind &&
-      parseAddressInfoJSON.receivers_available?.includes(
-        RPCReceiversEnum.orchardRPCReceiver,
-      )
-    ) {
-      // Post-NU6.3 the Orchard pool is legacy. Spending an Orchard note drains
-      // it through the Orchard->Ironwood turnstile, which reveals the value
-      // moved, so an otherwise-private all-Orchard send is no longer private
-      // once Ironwood is active.
-      return isIronwoodActive(info)
-        ? (translate('send.amountrevealed') as string)
-        : (translate('send.private') as string);
-    }
-
-    // Private -> sapling to sapling (ZA or UA with sapling receiver and NO orchard receiver)
-    if (
-      from === PrivacyLevelFromEnum.saplingPrivacyLevel &&
-      (parseAddressInfoJSON.address_kind ===
-        RPCAddressKindEnum.saplingAddressKind ||
-        (parseAddressInfoJSON.address_kind ===
-          RPCAddressKindEnum.unifiedAddressKind &&
-          parseAddressInfoJSON.receivers_available?.includes(
-            RPCReceiversEnum.saplingRPCReceiver,
-          ) &&
-          !parseAddressInfoJSON.receivers_available?.includes(
-            RPCReceiversEnum.orchardRPCReceiver,
-          )))
-    ) {
-      return translate('send.private') as string;
-    }
-
-    // Amount Revealed -> orchard to sapling (ZA or UA with sapling receiver)
-    if (
-      from === PrivacyLevelFromEnum.orchardPrivacyLevel &&
-      (parseAddressInfoJSON.address_kind ===
-        RPCAddressKindEnum.saplingAddressKind ||
-        (parseAddressInfoJSON.address_kind ===
-          RPCAddressKindEnum.unifiedAddressKind &&
-          parseAddressInfoJSON.receivers_available?.includes(
-            RPCReceiversEnum.saplingRPCReceiver,
-          )))
-    ) {
-      return translate('send.amountrevealed') as string;
-    }
-
-    // Amount Revealed -> sapling to orchard (UA with orchard receiver)
-    if (
-      from === PrivacyLevelFromEnum.saplingPrivacyLevel &&
-      parseAddressInfoJSON.address_kind ===
-        RPCAddressKindEnum.unifiedAddressKind &&
-      parseAddressInfoJSON.receivers_available?.includes(
-        RPCReceiversEnum.orchardRPCReceiver,
-      )
-    ) {
-      return translate('send.amountrevealed') as string;
-    }
-
-    // Amount Revealed -> sapling+orchard to orchard or sapling (UA with orchard receiver or ZA or
-    // UA with sapling receiver)
-    if (
-      from === PrivacyLevelFromEnum.orchardAndSaplingPrivacyLevel &&
-      (parseAddressInfoJSON.address_kind ===
-        RPCAddressKindEnum.saplingAddressKind ||
-        (parseAddressInfoJSON.address_kind ===
-          RPCAddressKindEnum.unifiedAddressKind &&
-          (parseAddressInfoJSON.receivers_available?.includes(
-            RPCReceiversEnum.orchardRPCReceiver,
-          ) ||
-            parseAddressInfoJSON.receivers_available?.includes(
-              RPCReceiversEnum.saplingRPCReceiver,
-            ))))
-    ) {
-      return translate('send.amountrevealed') as string;
-    }
-
-    // Deshielded -> orchard or sapling or orchard+sapling to transparent
-    if (
-      (from === PrivacyLevelFromEnum.orchardPrivacyLevel ||
-        from === PrivacyLevelFromEnum.saplingPrivacyLevel ||
-        from === PrivacyLevelFromEnum.orchardAndSaplingPrivacyLevel) &&
-      (parseAddressInfoJSON.address_kind ===
-        RPCAddressKindEnum.transparentAddressKind ||
-        parseAddressInfoJSON.address_kind === RPCAddressKindEnum.texAddressKind)
-    ) {
-      return translate('send.deshielded') as string;
-    }
-
-    // whatever else
-    return '-';
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    calculatedFee,
-    info,
-    sendPageState.toaddr.amount,
-    sendPageState.toaddr.to,
-    server.chainName,
-    totalBalance,
-    totalBalance?.confirmedOrchardBalance,
-    totalBalance?.confirmedSaplingBalance,
-    translate,
-  ]);
+  const privacyLevelKey = poolCrossingKey(proposalPools);
+  const privacyLevel = privacyLevelKey
+    ? (translate(privacyLevelKey) as string)
+    : '-';
 
   useEffect(() => {
     const sendingTot =
@@ -428,12 +283,6 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
       donationAmount;
     setSendingTotal(sendingTot);
   }, [calculatedFee, donationAmount, sendPageState.toaddr.amount]);
-
-  useEffect(() => {
-    (async () => {
-      setPrivacyLevel(await getPrivacyLevel());
-    })();
-  }, [getPrivacyLevel]);
 
   useEffect(() => {
     calculateFeeWithPropose(
