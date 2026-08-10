@@ -681,6 +681,7 @@
     "sending": "...Отправка... ",
     "receiving": "...Получение... ",
     "sendingtoself": "...Отправка себе... ",
+    "sendingmemotoself": "...Отправка заметки себе... ",
     "shielding": "...экранирование... ",
     "rejection": "Отклонение ",
     "migration": "Миграция ",
