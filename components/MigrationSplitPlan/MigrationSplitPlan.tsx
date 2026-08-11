@@ -69,7 +69,7 @@ const Card: React.FunctionComponent<{
   <View
     style={{
       borderWidth: 1,
-      borderColor: colors.bottomSheetBorder,
+      borderColor: colors.borderMuted,
       backgroundColor: colors.bgSurface,
       borderRadius: 12,
       paddingHorizontal: 16,
@@ -255,7 +255,7 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
 
   if (isPending) {
     return (
-      <View style={{ flex: 1, backgroundColor: colors.background }}>
+      <View style={{ flex: 1, backgroundColor: colors.bgCanvas }}>
         <ScrollView
           contentContainerStyle={{ padding: 24, paddingTop: 40, flexGrow: 1 }}
         >
@@ -265,7 +265,7 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
           >
             <Text
               style={{
-                color: colors.text,
+                color: colors.fgDefault,
                 fontSize: 17,
                 fontWeight: '700',
                 marginBottom: 10,
@@ -276,7 +276,7 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
             </Text>
             <Text
               style={{
-                color: colors.placeholder,
+                color: colors.fgMuted,
                 fontSize: 14,
                 textAlign: 'center',
               }}

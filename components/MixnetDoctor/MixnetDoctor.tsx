@@ -13,7 +13,6 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-import { useTheme } from '@react-navigation/native';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
@@ -21,7 +20,8 @@ import FadeText from '../Components/FadeText';
 import RegText from '../Components/RegText';
 import Button from '../Components/Button';
 import Header from '../Header';
-import { AppDrawerParamList, ThemeType } from '../../app/types';
+import { AppDrawerParamList } from '../../app/types';
+import { useTheme } from '../../app/theme';
 import { ContextAppLoaded } from '../../app/context';
 import { ButtonTypeEnum, RouteEnum, ScreenEnum } from '../../app/AppState';
 import {
@@ -119,7 +119,7 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, server, addLastSnackbar } = context;
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme();
 
   const [run, setRun] = useState<MixnetDoctorRun | null>(null);
   const [running, setRunning] = useState<boolean>(false);
@@ -165,7 +165,7 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
     <View
       accessible={true}
       accessibilityLabel={translate('mixnetdoctor.title-acc') as string}
-      style={{ flex: 1, backgroundColor: colors.background }}
+      style={{ flex: 1, backgroundColor: colors.bgCanvas }}
     >
       <Header
         title={translate('mixnetdoctor.title') as string}
@@ -181,8 +181,8 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
         <Animated.View
           layout={boxMorph()}
           style={{
-            backgroundColor: colors.bottomSheetBackground,
-            borderColor: colors.bottomSheetBorder,
+            backgroundColor: colors.bgSurface,
+            borderColor: colors.borderMuted,
             borderWidth: 1,
             borderRadius: 12,
             padding: 20,
@@ -196,7 +196,7 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
               entering={contentEnter()}
               layout={boxMorph()}
               style={{
-                backgroundColor: colors.background,
+                backgroundColor: colors.bgCanvas,
                 borderRadius: 12,
                 paddingHorizontal: 16,
                 paddingVertical: 4,
@@ -215,14 +215,14 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
                       key={i}
                       row={row}
                       last={i === rows.length - 1}
-                      labelColor={colors.placeholder}
-                      valueColor={colors.text}
-                      dividerColor={colors.bottomSheetBorder}
+                      labelColor={colors.fgMuted}
+                      valueColor={colors.fgDefault}
+                      dividerColor={colors.borderMuted}
                     />
                   ))}
                 </Animated.View>
               ) : (
-                <ReportSkeleton color={colors.bottomSheetBorder} />
+                <ReportSkeleton color={colors.borderMuted} />
               )}
             </Animated.View>
           )}

@@ -78,7 +78,7 @@ const Card: React.FunctionComponent<{
   <View
     style={{
       borderWidth: 1,
-      borderColor: colors.bottomSheetBorder,
+      borderColor: colors.borderMuted,
       backgroundColor: background ?? colors.bgSurface,
       borderRadius: 12,
       paddingHorizontal: 16,
@@ -248,7 +248,7 @@ const MigrationTransactions: React.FunctionComponent<
 
   if (isPending) {
     return (
-      <View style={{ flex: 1, backgroundColor: colors.background }}>
+      <View style={{ flex: 1, backgroundColor: colors.bgCanvas }}>
         <ScrollView
           contentContainerStyle={{ padding: 24, paddingTop: 40, flexGrow: 1 }}
         >
@@ -258,7 +258,7 @@ const MigrationTransactions: React.FunctionComponent<
           >
             <Text
               style={{
-                color: colors.text,
+                color: colors.fgDefault,
                 fontSize: 17,
                 fontWeight: '700',
                 marginBottom: 10,
@@ -269,7 +269,7 @@ const MigrationTransactions: React.FunctionComponent<
             </Text>
             <Text
               style={{
-                color: colors.placeholder,
+                color: colors.fgMuted,
                 fontSize: 14,
                 textAlign: 'center',
               }}
@@ -435,7 +435,7 @@ const MigrationTransactions: React.FunctionComponent<
         <View
           style={{
             height: 1,
-            backgroundColor: colors.bottomSheetBorder,
+            backgroundColor: colors.borderMuted,
             marginBottom: 14,
           }}
         />

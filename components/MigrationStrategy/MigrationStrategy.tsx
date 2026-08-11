@@ -155,7 +155,7 @@ const OptionCard: React.FunctionComponent<OptionCardProps> = ({
     onPress={onPress}
     style={{
       borderWidth: 1.5,
-      borderColor: selected ? colors.borderAccent : colors.bottomSheetBorder,
+      borderColor: selected ? colors.borderAccent : colors.borderMuted,
       backgroundColor: colors.bgSurface,
       borderRadius: 14,
       padding: 18,
@@ -286,7 +286,7 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
           <FontAwesomeIcon
             icon={faXmark}
             size={22}
-            color={colors.placeholder}
+            color={colors.fgMuted}
           />
         </TouchableOpacity>
         <ScrollView
@@ -305,7 +305,7 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
 
           <BoldSplitText
             text={translate('migrationstrategy.intro') as string}
-            color={colors.placeholder}
+            color={colors.fgMuted}
             highlight={colors.fgDefault}
             fontSize={16}
             lineHeight={24}
@@ -326,7 +326,7 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
             selected={selected === 'now'}
             onPress={() => setSelected('now')}
             colors={colors}
-            accent={colors.warning.primary}
+            accent={colors.fgWarning}
           />
           <View style={{ height: 14 }} />
           <OptionCard
@@ -409,22 +409,22 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
               <LinearGradient id="sheetRim" x1="0" y1="0" x2="1" y2="0">
                 <Stop
                   offset="0"
-                  stopColor={colors.bottomSheetBorder}
+                  stopColor={colors.borderMuted}
                   stopOpacity={0}
                 />
                 <Stop
                   offset={RIM_CORNER}
-                  stopColor={colors.bottomSheetBorder}
+                  stopColor={colors.borderMuted}
                   stopOpacity={1}
                 />
                 <Stop
                   offset={1 - RIM_CORNER}
-                  stopColor={colors.bottomSheetBorder}
+                  stopColor={colors.borderMuted}
                   stopOpacity={1}
                 />
                 <Stop
                   offset="1"
-                  stopColor={colors.bottomSheetBorder}
+                  stopColor={colors.borderMuted}
                   stopOpacity={0}
                 />
               </LinearGradient>
@@ -468,7 +468,7 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
               lineHeight: 24,
               textAlign: 'left',
               alignSelf: 'stretch',
-              color: colors.placeholder,
+              color: colors.fgMuted,
               marginBottom: 28,
             }}
           >
