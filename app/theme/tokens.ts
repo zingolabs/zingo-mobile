@@ -35,12 +35,11 @@ export type ThemeColors = {
 };
 
 const base = {
-  bgCanvas: '#010A17',
-  bgSurface: '#031124',
+  bgCanvas: '#060B12',
+  bgSurface: '#05101E',
   bgChrome: '#040C17',
   bottomSheetBorder: '#05234C',
-
-  fgDefault: '#dadfe1',
+  fgDefault: '#c0cbdc',
 
   fgSyncing: '#ebff5a',
   borderSyncing: '#ebff5a',
@@ -59,6 +58,7 @@ export const advancedTokens: ThemeColors = {
   ...base,
   fgAccent: '#43a637',
   borderAccent: '#43a637',
+  // TODO: 1AD007
   bgAccent: '#43a637',
   fgAccentDisabled: '#23692f',
   borderAccentDisabled: '#23692f',

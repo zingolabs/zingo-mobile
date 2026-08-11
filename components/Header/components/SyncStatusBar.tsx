@@ -363,9 +363,6 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
               marginHorizontal: 2.5,
               paddingHorizontal: 5,
               paddingVertical: 1,
-              borderColor: colors.borderMuted,
-              borderWidth: 1,
-              borderRadius: 10,
               minWidth: 25,
               minHeight: 25,
             }}

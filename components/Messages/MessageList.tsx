@@ -37,6 +37,7 @@ import { AppDrawerParamList } from '../../app/types';
 import FadeText from '../Components/FadeText';
 import BoldText from '../Components/BoldText';
 import Button from '../Components/Button';
+import SheetRim from '../Components/SheetRim';
 import MessageLine from './components/MessageLine';
 import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
@@ -100,14 +101,9 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
           backgroundColor: colors.bgSurface,
           borderTopLeftRadius: 40,
           borderTopRightRadius: 40,
-          borderTopWidth: 1,
-          borderLeftWidth: 0.5,
-          borderRightWidth: 0.5,
-          borderTopColor: colors.bottomSheetBorder,
-          borderLeftColor: colors.bottomSheetBorder,
-          borderRightColor: colors.bottomSheetBorder,
         }}
       >
+        <SheetRim />
         <View
           style={{
             flexDirection: 'row',

@@ -26,6 +26,7 @@ import FadeText from '../../../components/Components/FadeText';
 import RegText from '../../../components/Components/RegText';
 import BoldText from '../../../components/Components/BoldText';
 import Button from '../../../components/Components/Button';
+import SheetRim from '../../../components/Components/SheetRim';
 import { ContextAppLoading } from '../../context';
 import Header from '../../../components/Header';
 import { getLatestBlockServerInfo } from '../../walletBackend';
@@ -162,14 +163,9 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
           backgroundColor: colors.bgSurface,
           borderTopLeftRadius: 40,
           borderTopRightRadius: 40,
-          borderTopWidth: 1,
-          borderLeftWidth: 0.5,
-          borderRightWidth: 0.5,
-          borderTopColor: colors.bottomSheetBorder,
-          borderLeftColor: colors.bottomSheetBorder,
-          borderRightColor: colors.bottomSheetBorder,
         }}
       >
+        <SheetRim />
         <View
           style={{
             flexDirection: 'row',

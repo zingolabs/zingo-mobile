@@ -7,7 +7,6 @@ import React, {
   useState,
 } from 'react';
 import {
-  Dimensions,
   Image,
   ScrollView,
   Text,
@@ -24,9 +23,8 @@ import {
   BottomSheetModal,
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
-import Svg, { Defs, LinearGradient, Path, Stop } from 'react-native-svg';
-
 import BoldText from '../Components/BoldText';
+import SheetRim from '../Components/SheetRim';
 import Button from '../Components/Button';
 import MixnetIcon, { mixnetPhase } from '../Header/components/MixnetIcon';
 import { AppDrawerParamList } from '../../app/types';
@@ -36,17 +34,6 @@ import { ButtonTypeEnum, RouteEnum } from '../../app/AppState';
 import Utils from '../../app/utils';
 
 const NYM_GREEN = '#07FF94';
-
-// The sheet's top rim: the rounded top edge as a gradient-stroked path, full
-// across the flat top and fading through the corners so it never stops abruptly
-// at the sides like a plain borderTop would (full-width modal, so screen width
-// is the sheet width).
-const SHEET_W = Dimensions.get('window').width;
-const SHEET_RADIUS = 40;
-const RIM_STROKE = 1.5;
-const RIM_INSET = RIM_STROKE / 2;
-const RIM_CORNER = SHEET_RADIUS / SHEET_W;
-const RIM_PATH = `M 0 ${SHEET_RADIUS + RIM_INSET} A ${SHEET_RADIUS} ${SHEET_RADIUS} 0 0 1 ${SHEET_RADIUS} ${RIM_INSET} L ${SHEET_W - SHEET_RADIUS} ${RIM_INSET} A ${SHEET_RADIUS} ${SHEET_RADIUS} 0 0 1 ${SHEET_W} ${SHEET_RADIUS + RIM_INSET}`;
 
 type MigrationStrategyProps = NativeStackScreenProps<
   AppDrawerParamList,
@@ -395,43 +382,7 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
             alignItems: 'center',
           }}
         >
-          <Svg
-            width={SHEET_W}
-            height={SHEET_RADIUS + RIM_STROKE}
-            style={{ position: 'absolute', top: 0, left: 0 }}
-            pointerEvents="none"
-          >
-            <Defs>
-              <LinearGradient id="sheetRim" x1="0" y1="0" x2="1" y2="0">
-                <Stop
-                  offset="0"
-                  stopColor={colors.bottomSheetBorder}
-                  stopOpacity={0}
-                />
-                <Stop
-                  offset={RIM_CORNER}
-                  stopColor={colors.bottomSheetBorder}
-                  stopOpacity={1}
-                />
-                <Stop
-                  offset={1 - RIM_CORNER}
-                  stopColor={colors.bottomSheetBorder}
-                  stopOpacity={1}
-                />
-                <Stop
-                  offset="1"
-                  stopColor={colors.bottomSheetBorder}
-                  stopOpacity={0}
-                />
-              </LinearGradient>
-            </Defs>
-            <Path
-              d={RIM_PATH}
-              stroke="url(#sheetRim)"
-              strokeWidth={RIM_STROKE}
-              fill="none"
-            />
-          </Svg>
+          <SheetRim />
           <Image
             source={require('../../assets/img/nym-mixnet.png')}
             style={{ width: 95, height: 95, marginBottom: 24 }}

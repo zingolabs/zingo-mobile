@@ -34,6 +34,7 @@ import { AppDrawerParamList } from '../../app/types';
 import FadeText from '../Components/FadeText';
 import BoldText from '../Components/BoldText';
 import Button from '../Components/Button';
+import SheetRim from '../Components/SheetRim';
 import AbDetail from './components/AbDetail';
 import AbSummaryLine from './components/AbSummaryLine';
 import { ContextAppLoaded } from '../../app/context';
@@ -392,14 +393,9 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
           backgroundColor: colors.bgSurface,
           borderTopLeftRadius: 40,
           borderTopRightRadius: 40,
-          borderTopWidth: 1,
-          borderLeftWidth: 0.5,
-          borderRightWidth: 0.5,
-          borderTopColor: colors.bottomSheetBorder,
-          borderLeftColor: colors.bottomSheetBorder,
-          borderRightColor: colors.bottomSheetBorder,
         }}
       >
+        <SheetRim />
         <View
           style={{
             flexDirection: 'row',
@@ -492,14 +488,9 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
           backgroundColor: colors.bgSurface,
           borderTopLeftRadius: 40,
           borderTopRightRadius: 40,
-          borderTopWidth: 1,
-          borderLeftWidth: 0.5,
-          borderRightWidth: 0.5,
-          borderTopColor: colors.bottomSheetBorder,
-          borderLeftColor: colors.bottomSheetBorder,
-          borderRightColor: colors.bottomSheetBorder,
         }}
       >
+        <SheetRim />
         <View
           style={{
             flexDirection: 'row',

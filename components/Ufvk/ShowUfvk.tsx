@@ -31,6 +31,7 @@ import SingleAddress from '../Components/SingleAddress';
 import RegText from '../Components/RegText';
 import FadeText from '../Components/FadeText';
 import BoldText from '../Components/BoldText';
+import SheetRim from '../Components/SheetRim';
 import {
   ButtonTypeEnum,
   ChainNameEnum,
@@ -355,14 +356,9 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
           backgroundColor: colors.bgSurface,
           borderTopLeftRadius: 40,
           borderTopRightRadius: 40,
-          borderTopWidth: 1,
-          borderLeftWidth: 0.5,
-          borderRightWidth: 0.5,
-          borderTopColor: colors.bottomSheetBorder,
-          borderLeftColor: colors.bottomSheetBorder,
-          borderRightColor: colors.bottomSheetBorder,
         }}
       >
+        <SheetRim />
         <View
           style={{
             flexDirection: 'row',

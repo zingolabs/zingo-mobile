@@ -17,6 +17,7 @@ import {
 
 import BoldText from './BoldText';
 import RegText from './RegText';
+import SheetRim from './SheetRim';
 import { useKeyboardHeight } from '../../app/hooks/useKeyboardHeight';
 
 export type SelectBottomSheetItem = {
@@ -102,14 +103,9 @@ const SelectBottomSheet = forwardRef<BottomSheetModal, SelectBottomSheetProps>(
             backgroundColor: colors.bgSurface,
             borderTopLeftRadius: 40,
             borderTopRightRadius: 40,
-            borderTopWidth: 1,
-            borderLeftWidth: 0.5,
-            borderRightWidth: 0.5,
-            borderTopColor: colors.bottomSheetBorder,
-            borderLeftColor: colors.bottomSheetBorder,
-            borderRightColor: colors.bottomSheetBorder,
           }}
         >
+          <SheetRim />
           <View
             style={{
               flexDirection: 'row',
@@ -232,14 +228,9 @@ const SelectBottomSheet = forwardRef<BottomSheetModal, SelectBottomSheetProps>(
                 backgroundColor: colors.bgSurface,
                 borderTopLeftRadius: 40,
                 borderTopRightRadius: 40,
-                borderTopWidth: 1,
-                borderLeftWidth: 0.5,
-                borderRightWidth: 0.5,
-                borderTopColor: colors.bottomSheetBorder,
-                borderLeftColor: colors.bottomSheetBorder,
-                borderRightColor: colors.bottomSheetBorder,
               }}
             >
+              <SheetRim />
               <View
                 style={{
                   flexDirection: 'row',
