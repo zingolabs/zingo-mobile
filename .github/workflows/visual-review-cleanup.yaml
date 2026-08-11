@@ -1,0 +1,66 @@
+name: Visual review cleanup
+
+# When a PR closes (merged or not), delete every Cloudflare Pages preview
+# deployment on its pr-<n> branch — all per-commit deploys, latest included.
+
+on:
+  pull_request:
+    types: [closed]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: visual-review-cleanup-${{ github.event.number }}
+  cancel-in-progress: false
+
+jobs:
+  cleanup:
+    name: Delete PR previews
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Delete Cloudflare Pages deployments for this PR
+        env:
+          CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          PROJECT: zingo-visual
+          BRANCH: pr-${{ github.event.number }}
+        run: |
+          set -euo pipefail
+          api="https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/pages/projects/${PROJECT}/deployments"
+          auth="Authorization: Bearer ${CF_API_TOKEN}"
+
+          # Collect matching ids across all pages first; deleting mid-paginate
+          # shifts the list and skips entries.
+          ids=""
+          page=1
+          while :; do
+            resp=$(curl -sS -H "$auth" "${api}?page=${page}&per_page=25")
+            if [ "$(echo "$resp" | jq -r '.success')" != "true" ]; then
+              echo "::error::Cloudflare list failed: $(echo "$resp" | jq -c '.errors')"
+              exit 1
+            fi
+            [ "$(echo "$resp" | jq '.result | length')" -eq 0 ] && break
+            match=$(echo "$resp" | jq -r --arg b "$BRANCH" \
+              '.result[] | select(.deployment_trigger.metadata.branch == $b) | .id')
+            ids="${ids} ${match}"
+            page=$((page + 1))
+          done
+
+          deleted=0
+          failed=0
+          for id in $ids; do
+            code=$(curl -sS -o /dev/null -w '%{http_code}' -X DELETE \
+              -H "$auth" "${api}/${id}?force=true")
+            if [ "$code" = "200" ]; then
+              deleted=$((deleted + 1))
+            else
+              echo "::warning::delete ${id} returned HTTP ${code}"
+              failed=$((failed + 1))
+            fi
+          done
+
+          echo "Deleted ${deleted} preview deployment(s) for ${BRANCH} (${failed} failed)."
+          [ "$failed" -eq 0 ]

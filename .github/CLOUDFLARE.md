@@ -33,4 +33,5 @@ Do these steps one time.
 - Keep the token secret. Do not put the token in a file.
 - A fork pull request cannot read the secrets. The deploy step stops, but you
   still get the report as an artifact.
+- When a pull request closes, a workflow deletes all its preview deployments.
 - To make the pages private, use Cloudflare Access.
