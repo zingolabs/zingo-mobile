@@ -12,6 +12,7 @@ import {
 } from 'node:fs';
 import { join, dirname, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { advancedTokens } from '../app/theme/tokens';
 
 type Sample = { t: number; offset: number };
 type Timeline = { story: string; step: number; samples: Sample[] };
@@ -40,6 +41,31 @@ const reportDir = dirname(indexPage);
 const diffDir = join(reportDir, '__diff__');
 const regReport = join(reportDir, 'report.html');
 mkdirSync(reportDir, { recursive: true });
+
+// A local-only styled variant driven by the app design tokens. `yarn
+// visual:styled` sets this; the default gating report stays plain. The palette
+// feeds both the CSS vars (report.css) and the generated SVG colours below.
+const styled = process.env.VISUAL_STYLE === 'tokens';
+const T = advancedTokens;
+const palette = styled
+  ? {
+      bg: T.bgCanvas, surface: T.bgSurface, border: T.bottomSheetBorder,
+      fg: T.fgDefault, muted: T.fgMuted, figcap: T.fgMuted, accent: T.fgAccent,
+      passBg: T.bgSecondaryDisabled, passFg: T.fgAccent,
+      newBg: T.bottomSheetBorder, newFg: T.fgDefault,
+      dangerBg: T.bgWarning, dangerFg: T.fgDanger,
+    }
+  : {
+      bg: '#060b12', surface: '#0d1520', border: '#1c2634',
+      fg: '#e6edf3', muted: '#8b98a5', figcap: '#6b7684', accent: '#07ff94',
+      passBg: '#123524', passFg: '#3fb950',
+      newBg: '#1c2a3a', newFg: '#58a6ff',
+      dangerBg: '#3d1d1d', dangerFg: '#ff7b72',
+    };
+const ACCENT = palette.accent;
+const MUTED = styled ? T.fgMuted : '#5b6b7f';
+const CHART_BG = styled ? T.bgCanvas : '#0b1220';
+const reportSrc = join(dir, 'report');
 
 const TOLERANCE = 2; // px; above run-to-run jitter, below a real curve change
 
@@ -140,9 +166,9 @@ function curveSvg(base: Timeline | undefined, cur: Timeline): string {
       dash ? ` stroke-dasharray="4 3"` : ''
     } points="${s.samples.map(p => `${x(p.t)},${y(p.offset)}`).join(' ')}" />`;
   return `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}">
-    <rect width="${W}" height="${H}" fill="#0b1220" rx="6" />
-    ${base ? line(base, '#5b6b7f', true) : ''}
-    ${line(cur, '#07ff94', false)}
+    <rect width="${W}" height="${H}" fill="${CHART_BG}" rx="6" />
+    ${base ? line(base, MUTED, true) : ''}
+    ${line(cur, ACCENT, false)}
   </svg>`;
 }
 
@@ -184,14 +210,14 @@ function replaySvg(...arcs: string[]): string {
 }
 
 function replays(t: Entry): string {
-  const cur = replaySvg(replayArc(t.cur.samples, '#07ff94'));
+  const cur = replaySvg(replayArc(t.cur.samples, ACCENT));
   if (!t.base) {
     return `<figure>${cur}<figcaption>current</figcaption></figure>`;
   }
-  const base = replaySvg(replayArc(t.base.samples, '#5b6b7f'));
+  const base = replaySvg(replayArc(t.base.samples, MUTED));
   const overlay = replaySvg(
-    replayArc(t.base.samples, '#5b6b7f'),
-    replayArc(t.cur.samples, '#07ff94'),
+    replayArc(t.base.samples, MUTED),
+    replayArc(t.cur.samples, ACCENT),
   );
   // Separate replays kept alongside the overlay so you can read each alone.
   return `<figure>${base}<figcaption>baseline</figcaption></figure>
@@ -245,53 +271,153 @@ function renderReport(
   const currentPanel = storybook
     ? `<div class="panel" id="current"><iframe src="${storybook}"></iframe></div>`
     : '';
-  return `<!doctype html><meta charset="utf8"><title>visual review</title>
-  <style>
-    *{box-sizing:border-box}
-    body{background:#060b12;color:#e6edf3;font:14px system-ui,sans-serif;margin:0;height:100vh;display:flex;flex-direction:column;overflow:hidden}
-    .tabs{flex:none;display:flex;gap:4px;padding:10px 16px 0;border-bottom:1px solid #1c2634}
-    .tab{background:none;border:0;color:#8b98a5;font:inherit;padding:8px 14px;border-radius:8px 8px 0 0;cursor:pointer;display:flex;gap:8px;align-items:center}
-    .tab.current{background:#0d1520;color:#e6edf3;border:1px solid #1c2634;border-bottom-color:#0d1520;margin-bottom:-1px}
-    .tstat{font-size:11px;padding:1px 7px;border-radius:999px}
-    .tstat.pass{background:#123524;color:#3fb950}
-    .tstat.fail{background:#3d1d1d;color:#ff7b72}
-    .panel{flex:1;display:none;min-height:0}
-    .panel.current{display:flex;flex-direction:column}
-    #animations.current{display:block;overflow:auto;padding:20px}
-    #images,#current{overflow:hidden}
-    #images iframe,#current iframe{flex:1;width:100%;border:0;background:#fff}
-    .card{background:#0d1520;border:1px solid #1c2634;border-radius:10px;padding:16px;margin-bottom:16px}
-    .card header{display:flex;align-items:center;gap:12px;margin-bottom:12px}
-    h2{font-size:15px;margin:0;font-weight:600}
-    .badge{font-size:12px;padding:2px 8px;border-radius:999px}
-    .badge.pass{background:#123524;color:#3fb950}
-    .badge.new{background:#1c2a3a;color:#58a6ff}
-    .badge.changed{background:#3d1d1d;color:#ff7b72}
-    .replays{display:flex;gap:20px;margin-bottom:14px}
-    .replay{background:#060b12;border:1px solid #1c2634;border-radius:6px}
-    .curve{display:flex;align-items:center;gap:16px;margin-bottom:12px}
-    .legend .s{margin-right:12px;font-size:12px}
-    .legend .base{color:#5b6b7f}.legend .cur{color:#07ff94}
-    figure{margin:0;text-align:center}
-    .strip figure img{width:52px;height:52px;image-rendering:pixelated;border:1px solid #1c2634;border-radius:4px;background:#060b12}
-    figcaption{font-size:10px;color:#6b7684;margin-top:4px}
-    .row{display:flex;align-items:center;gap:8px;margin:4px 0}
-    .lbl{width:56px;color:#8b98a5;font-size:12px}
-  </style>
-  <nav class="tabs">
-    ${currentTab}
-    <button class="tab" data-tab="animations">Animations ${stat(animStatus)}</button>
-    <button class="tab" data-tab="images">Image diffs ${stat(imgStatus)}</button>
-  </nav>
-  ${currentPanel}
-  <div class="panel" id="animations">${cards || '<p>No animated stories.</p>'}</div>
-  <div class="panel" id="images"><iframe src="report.html"></iframe></div>
-  <script>
-    const show = name => {
-      for (const p of document.querySelectorAll('.panel')) p.classList.toggle('current', p.id === name);
-      for (const b of document.querySelectorAll('.tab')) b.classList.toggle('current', b.dataset.tab === name);
-    };
-    for (const b of document.querySelectorAll('.tab')) b.onclick = () => show(b.dataset.tab);
-    show(${JSON.stringify(first)});
-  </script>`;
+  const tabs = [
+    currentTab,
+    `<button class="tab" data-tab="animations">Animations ${stat(animStatus)}</button>`,
+    `<button class="tab" data-tab="images">Image diffs ${stat(imgStatus)}</button>`,
+  ].join('');
+  const panels = [
+    currentPanel,
+    `<div class="panel" id="animations">${cards || '<p>No animated stories.</p>'}</div>`,
+    `<div class="panel ${styled ? 'viewer' : 'iframe'}" id="images">${
+      styled ? imagePanel() : '<iframe src="report.html"></iframe>'
+    }</div>`,
+  ].join('\n  ');
+  const styles =
+    rootVars() + '\n' + readFileSync(join(reportSrc, 'report.css'), 'utf8');
+  const script = readFileSync(join(reportSrc, 'report.js'), 'utf8');
+  const tpl = readFileSync(join(reportSrc, 'report.html'), 'utf8');
+  // Function replacers so `$` in the assets is never read as a replace pattern.
+  return tpl
+    .replace('{{styles}}', () => styles)
+    .replace('{{first}}', () => first)
+    .replace('{{tabs}}', () => tabs)
+    .replace('{{panels}}', () => panels)
+    .replace('{{script}}', () => script);
+}
+
+// The palette maps to the CSS custom properties report.css reads.
+function rootVars(): string {
+  const p = palette;
+  return `:root{--bg:${p.bg};--surface:${p.surface};--border:${p.border};--fg:${p.fg};--muted:${p.muted};--figcap:${p.figcap};--accent:${p.accent};--pass-bg:${p.passBg};--pass-fg:${p.passFg};--new-bg:${p.newBg};--new-fg:${p.newFg};--danger-bg:${p.dangerBg};--danger-fg:${p.dangerFg}}`;
+}
+
+type RegReport = {
+  failedItems: string[];
+  newItems: string[];
+  deletedItems: string[];
+  passedItems: string[];
+  actualDir: string;
+  expectedDir: string;
+  diffDir: string;
+};
+
+function slug(f: string): string {
+  return f.replace(/[^\w]+/g, '-').replace(/^-|-$/g, '');
+}
+
+type NavLeaf = { label: string; id: string; cls: string; rank: number };
+type NavNode = { dirs: Map<string, NavNode>; leaves: NavLeaf[] };
+
+// Builds the left-nav file tree from reg item names. A name is the Storybook id
+// `section-component--story__step.png`; the dash-separated head becomes folders,
+// the story__step tail a leaf. Failing branches and leaves sort first.
+function tree(entries: { f: string; cls: string; rank: number }[]): string {
+  const root: NavNode = { dirs: new Map(), leaves: [] };
+  for (const e of entries) {
+    const base = e.f.replace(/\.png$/i, '');
+    const dd = base.indexOf('--');
+    const head = dd >= 0 ? base.slice(0, dd) : base;
+    const tail = dd >= 0 ? base.slice(dd + 2) : '';
+    const segs = head.split('-');
+    const label = (tail || segs[segs.length - 1]).replace(/__/g, ' · ');
+    let node = root;
+    for (const s of segs) {
+      let next = node.dirs.get(s);
+      if (!next) {
+        next = { dirs: new Map(), leaves: [] };
+        node.dirs.set(s, next);
+      }
+      node = next;
+    }
+    node.leaves.push({ label, id: slug(e.f), cls: e.cls, rank: e.rank });
+  }
+  const nodeRank = (n: NavNode): number => {
+    let r = 9;
+    for (const l of n.leaves) r = Math.min(r, l.rank);
+    for (const [, c] of n.dirs) r = Math.min(r, nodeRank(c));
+    return r;
+  };
+  const render = (n: NavNode, depth: number): string => {
+    const dirs = [...n.dirs.entries()].sort(
+      (a, b) => nodeRank(a[1]) - nodeRank(b[1]) || a[0].localeCompare(b[0]),
+    );
+    const leaves = [...n.leaves].sort(
+      (a, b) => a.rank - b.rank || a.label.localeCompare(b.label),
+    );
+    const dirsHtml = dirs
+      .map(
+        ([name, c]) =>
+          `<details open><summary>${name}</summary>${render(c, depth + 1)}</details>`,
+      )
+      .join('');
+    const leavesHtml = leaves
+      .map(
+        x =>
+          `<a class="navitem ${x.cls}" href="#${x.id}"><span class="dot"></span><span class="navname">${x.label}</span></a>`,
+      )
+      .join('');
+    const inner = dirsHtml + leavesHtml;
+    return depth === 0 ? inner : `<div class="branch">${inner}</div>`;
+  };
+  return `<div class="branch">${render(root, 0)}</div>`;
+}
+
+// Renders the image diffs from reg-cli's report.json rather than embedding its
+// page: a left nav, a layout switch and baseline/current/diff tiles per story.
+// Failing rows come first; the nav and rows share the same order.
+function imagePanel(): string {
+  const rj = JSON.parse(
+    readFileSync(join(reportDir, 'report.json'), 'utf8'),
+  ) as RegReport;
+  const src = (d: string, f: string) => `${d}/${f}`.replace(/^\.\//, '');
+  const tile = (label: string, d: string, f: string) =>
+    `<figure class="tile"><figcaption>${label}</figcaption><img class="zoom" loading="lazy" src="${src(d, f)}"></figure>`;
+  const row = (f: string, badge: string, cls: string, tiles: string) =>
+    `<div class="imgrow" id="${slug(f)}"><div class="imghd"><a class="anchor" href="#${slug(f)}" title="link">#</a><span class="name" title="${f}">${f}</span><span class="badge ${cls}">${badge}</span></div><div class="tiles">${tiles}</div></div>`;
+  const groups = [
+    {
+      items: rj.failedItems, badge: 'CHANGED', cls: 'changed',
+      tiles: (f: string) =>
+        tile('baseline', rj.expectedDir, f) +
+        tile('current', rj.actualDir, f) +
+        tile('diff', rj.diffDir, f),
+    },
+    {
+      items: rj.deletedItems, badge: 'DELETED', cls: 'changed',
+      tiles: (f: string) => tile('baseline', rj.expectedDir, f),
+    },
+    {
+      items: rj.newItems, badge: 'NEW', cls: 'new',
+      tiles: (f: string) => tile('current', rj.actualDir, f),
+    },
+  ];
+  const rows = groups
+    .flatMap(g => g.items.map(f => row(f, g.badge, g.cls, g.tiles(f))))
+    .join('');
+  // Nav is a file tree keyed on the Storybook id: `section-component--story`.
+  // Failing branches and leaves sort first (rank 0 changed/deleted, 2 new).
+  const entries = groups.flatMap(g =>
+    g.items.map(f => ({ f, cls: g.cls, rank: g.cls === 'new' ? 2 : 0 })),
+  );
+  const nav = entries.length ? tree(entries) : '<p class="navempty">no diffs</p>';
+  const passed = rj.passedItems.length
+    ? `<div class="imgbar"><span class="passline">${rj.passedItems.length} unchanged</span></div>`
+    : '';
+  return `<aside class="imgnav">${nav}</aside>
+    <div class="imgmain">
+      ${passed}
+      <div class="imgviewer">${rows || '<p>No image differences.</p>'}</div>
+    </div>
+    <div class="lightbox" id="lb"><div class="lb-bg"></div><img alt=""></div>`;
 }
