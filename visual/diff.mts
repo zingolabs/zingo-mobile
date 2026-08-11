@@ -32,6 +32,10 @@ const dir = dirname(fileURLToPath(import.meta.url));
 const currentDir = process.env.VISUAL_CURRENT ?? join(dir, '__current__');
 const baselineDir = process.env.VISUAL_BASELINE ?? join(dir, '__baseline__');
 const indexPage = process.env.VISUAL_REPORT ?? join(dir, 'index.html');
+// Optional URL (relative to the report) of the current interactive Storybook.
+// When set, the report gains a "Current" tab that embeds it — the browse view
+// for a designer. Omitted locally where there's nothing to embed.
+const storybookUrl = process.env.VISUAL_STORYBOOK;
 const reportDir = dirname(indexPage);
 const diffDir = join(reportDir, '__diff__');
 const regReport = join(reportDir, 'report.html');
@@ -93,8 +97,11 @@ const timelines: Entry[] = timelineFiles.map(file => {
 
 const timelineChanged = timelines.some(t => t.verdict === 'changed');
 
-// --- unified report (animation tab + embedded image report tab) ---
-writeFileSync(indexPage, renderReport(timelines, imagesChanged, timelineChanged));
+// --- unified report (optional Current tab + animation + image tabs) ---
+writeFileSync(
+  indexPage,
+  renderReport(timelines, imagesChanged, timelineChanged, storybookUrl),
+);
 
 // --- summary + gate ---
 for (const t of timelines) {
@@ -196,6 +203,7 @@ function renderReport(
   entries: Entry[],
   imagesChangedFlag: boolean,
   timelineChangedFlag: boolean,
+  storybook?: string,
 ): string {
   const cards = entries
     .map(t => {
@@ -220,14 +228,23 @@ function renderReport(
     .join('');
   const animStatus: 'pass' | 'fail' = timelineChangedFlag ? 'fail' : 'pass';
   const imgStatus: 'pass' | 'fail' = imagesChangedFlag ? 'fail' : 'pass';
-  // Open on a failing tab so a change is never a click away.
+  // Open on a failing tab so a change is never a click away; otherwise land on
+  // Current (the browse view) when present, else Animations.
   const first = timelineChangedFlag
     ? 'animations'
     : imagesChangedFlag
       ? 'images'
-      : 'animations';
+      : storybook
+        ? 'current'
+        : 'animations';
   const stat = (s: 'pass' | 'fail') =>
     `<span class="tstat ${s}">${s === 'fail' ? 'CHANGED' : 'pass'}</span>`;
+  const currentTab = storybook
+    ? `<button class="tab" data-tab="current">Current</button>`
+    : '';
+  const currentPanel = storybook
+    ? `<div class="panel" id="current"><iframe src="${storybook}"></iframe></div>`
+    : '';
   return `<!doctype html><meta charset="utf8"><title>visual review</title>
   <style>
     *{box-sizing:border-box}
@@ -241,8 +258,8 @@ function renderReport(
     .panel{flex:1;display:none;min-height:0}
     .panel.current{display:flex;flex-direction:column}
     #animations.current{display:block;overflow:auto;padding:20px}
-    #images{overflow:hidden}
-    #images iframe{flex:1;width:100%;border:0;background:#fff}
+    #images,#current{overflow:hidden}
+    #images iframe,#current iframe{flex:1;width:100%;border:0;background:#fff}
     .card{background:#0d1520;border:1px solid #1c2634;border-radius:10px;padding:16px;margin-bottom:16px}
     .card header{display:flex;align-items:center;gap:12px;margin-bottom:12px}
     h2{font-size:15px;margin:0;font-weight:600}
@@ -262,9 +279,11 @@ function renderReport(
     .lbl{width:56px;color:#8b98a5;font-size:12px}
   </style>
   <nav class="tabs">
+    ${currentTab}
     <button class="tab" data-tab="animations">Animations ${stat(animStatus)}</button>
     <button class="tab" data-tab="images">Image diffs ${stat(imgStatus)}</button>
   </nav>
+  ${currentPanel}
   <div class="panel" id="animations">${cards || '<p>No animated stories.</p>'}</div>
   <div class="panel" id="images"><iframe src="report.html"></iframe></div>
   <script>

@@ -30,6 +30,9 @@ const main: StorybookConfig = {
     options: {},
   },
   viteFinal: async config => {
+    // Relative asset paths so the static build works served from any subpath
+    // (gh-pages root for dev, /pr/<n>/storybook/ inside a PR report).
+    config.base = './';
     config.plugins = [svgAsSvgXml(), ...(config.plugins ?? [])];
     config.resolve = config.resolve ?? {};
     config.resolve.alias = {

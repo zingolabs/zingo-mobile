@@ -2,6 +2,11 @@
 #
 .DS_Store
 
+# Secrets
+.env
+.env.*
+!.env.example
+
 # Xcode
 #
 build/
