@@ -338,6 +338,35 @@ androidComponents {
     }
 }
 
+// rustls-platform-verifier's Kotlin component is not on Maven; cargo ships
+// the maven artifact inside the crate checkout and the shim's lockfile pins
+// its version, so gradle asks cargo where that checkout lives (the crate's
+// README, "Android"; docs/adr/0004).
+fun RepositoryHandler.rustlsPlatformVerifier(): MavenArtifactRepository {
+    val manifestPath = run {
+        val dependencyJson = providers.exec {
+            workingDir = File(project.rootDir, "../")
+            commandLine(
+                "cargo", "metadata", "--format-version", "1",
+                "--filter-platform", "aarch64-linux-android",
+                "--manifest-path", "rust/nym-proxy-ffi/Cargo.toml",
+            )
+        }.standardOutput.asText.get()
+        val parsed = groovy.json.JsonSlurper().parseText(dependencyJson)
+        @Suppress("UNCHECKED_CAST")
+        val packages = (parsed as Map<String, Any?>)["packages"] as List<Map<String, Any?>>
+        File(packages.first { it["name"] == "rustls-platform-verifier-android" }["manifest_path"] as String)
+    }
+    return maven {
+        url = uri(File(manifestPath.parentFile, "maven"))
+        metadataSources { artifact() }
+    }
+}
+
+repositories {
+    rustlsPlatformVerifier()
+}
+
 dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
@@ -351,6 +380,12 @@ dependencies {
         exclude(group = "com.android.installreferrer")
     }
     implementation("com.facebook.soloader:soloader:0.10.5")
+
+    // The Kotlin half of rustls-platform-verifier inside the nym shim .so;
+    // NymTlsInit hands it the app Context (docs/adr/0004). `latest.release`
+    // is correct here: cargo keeps the maven artifact in lockstep with the
+    // crate version the shim's lockfile pins.
+    implementation("rustls:rustls-platform-verifier:latest.release")
 
     // Detox tests getAttributes() reaches this by reflection at runtime, so
     // it is runtime-only: no source references exist for compile analysis.
