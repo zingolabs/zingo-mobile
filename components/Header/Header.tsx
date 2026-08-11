@@ -33,13 +33,13 @@ import { ContextAppLoaded } from '../../app/context';
 import { getZingoLogo } from '../../app/utils/ZingoAppData';
 import { useShieldFunds } from '../../app/hooks/useShieldFunds';
 import { useSyncStatus } from '../../app/hooks/useSyncStatus';
-import BoldText from '../Components/BoldText';
+import BoldText from '../ui/BoldText';
 import SyncStatusBar from './components/SyncStatusBar';
 import BalanceRow from './components/BalanceRow';
 import PriceRow from './components/PriceRow';
-import { MessagesIcon } from '../Components/Icons/MessagesIcon';
-import { MessagesIcon as BoltIcon } from '../Components/Icons/BoltIcon';
-import { MenuMorphIcon } from '../Components/Icons/MenuMorphIcon';
+import { MessagesIcon } from '../ui/Icons/MessagesIcon';
+import { MessagesIcon as BoltIcon } from '../ui/Icons/BoltIcon';
+import { MenuMorphIcon } from '../ui/Icons/MenuMorphIcon';
 
 type HeaderProps = {
   // general

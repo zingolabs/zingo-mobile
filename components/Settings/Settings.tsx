@@ -35,17 +35,17 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { faCircle as farCircle } from '@fortawesome/free-regular-svg-icons';
 
-import RegText from '../Components/RegText';
-import FadeText from '../Components/FadeText';
-import BoldText from '../Components/BoldText';
-import SheetRim from '../Components/SheetRim';
+import RegText from '../ui/RegText';
+import FadeText from '../ui/FadeText';
+import BoldText from '../ui/BoldText';
+import SheetRim from '../ui/SheetRim';
 import {
   checkServerURI,
   fetchServerList,
   parseServerURI,
   serverUris,
 } from '../../app/uris';
-import Button from '../Components/Button';
+import Button from '../ui/Button';
 import { AppDrawerParamList } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 
@@ -72,11 +72,11 @@ import {
 } from '../../app/AppState';
 import { getLatestBlockServerInfo } from '../../app/walletBackend';
 import { isEqual } from 'lodash';
-import ChainTypeToggle from '../Components/ChainTypeToggle';
+import ChainTypeToggle from '../ui/ChainTypeToggle';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
 import { hasDeviceSecurity } from '../../app/simpleBiometrics';
 import { useBiometricGate } from '../../app/hooks/useBiometricGate';
-import SelectBottomSheet from '../Components/SelectBottomSheet';
+import SelectBottomSheet from '../ui/SelectBottomSheet';
 import BottomSheet, {
   BottomSheetBackdrop,
   BottomSheetBackdropProps,

@@ -23,9 +23,9 @@ import {
   BottomSheetModal,
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
-import BoldText from '../Components/BoldText';
-import SheetRim from '../Components/SheetRim';
-import Button from '../Components/Button';
+import BoldText from '../ui/BoldText';
+import SheetRim from '../ui/SheetRim';
+import Button from '../ui/Button';
 import MixnetIcon, { mixnetPhase } from '../Header/components/MixnetIcon';
 import { AppDrawerParamList } from '../../app/types';
 import { AppTheme } from '../../app/theme';

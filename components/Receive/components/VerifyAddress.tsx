@@ -11,15 +11,15 @@ import {
   SnackbarDurationEnum,
 } from '../../../app/AppState';
 import { ContextAppLoaded } from '../../../app/context';
-import Button from '../../Components/Button';
+import Button from '../../ui/Button';
 import { checkMyAddress } from '../../../app/walletBackend';
 import { parseZcashURI } from '../../../app/uris';
 import Utils from '../../../app/utils';
-import TextInputAddress from '../../Components/TextInputAddress';
-import FadeText from '../../Components/FadeText';
+import TextInputAddress from '../../ui/TextInputAddress';
+import FadeText from '../../ui/FadeText';
 import { RPCCheckAddressType } from '../../../app/walletBackend/types/RPCCheckAddressType';
-import { VerifyCheckIcon } from '../../Components/Icons/VerifyCheckIcon';
-import { VerifyXIcon } from '../../Components/Icons/VerifyXIcon';
+import { VerifyCheckIcon } from '../../ui/Icons/VerifyCheckIcon';
+import { VerifyXIcon } from '../../ui/Icons/VerifyXIcon';
 
 type VerifyAddressProps = {
   closeSheet: () => void;

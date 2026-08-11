@@ -24,7 +24,7 @@ import {
 } from '../../../app/AppState';
 import NetInfoType from '../../../app/AppState/types/NetInfoType';
 import { MixnetView } from '../../../app/walletBackend/transforms/mixnetPresenter';
-import FadeText from '../../Components/FadeText';
+import FadeText from '../../ui/FadeText';
 import NymOn from '../../../assets/img/nym-on.svg';
 import MixnetIcon, { mixnetPhase } from './MixnetIcon';
 import PrivacyToggle from './PrivacyToggle';

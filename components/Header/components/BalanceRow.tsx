@@ -19,12 +19,12 @@ import TotalBalanceClass from '../../../app/AppState/classes/TotalBalanceClass';
 import InfoType from '../../../app/AppState/types/InfoType';
 import ZecPriceType from '../../../app/AppState/types/ZecPriceType';
 import Utils from '../../../app/utils';
-import Button from '../../Components/Button';
-import CurrencyAmount from '../../Components/CurrencyAmount';
-import FadeText from '../../Components/FadeText';
-import PriceFetcher from '../../Components/PriceFetcher';
-import RegText from '../../Components/RegText';
-import ZecAmount from '../../Components/ZecAmount';
+import Button from '../../ui/Button';
+import CurrencyAmount from '../../ui/CurrencyAmount';
+import FadeText from '../../ui/FadeText';
+import PriceFetcher from '../../ui/PriceFetcher';
+import RegText from '../../ui/RegText';
+import ZecAmount from '../../ui/ZecAmount';
 import PrivacyToggle from './PrivacyToggle';
 
 type BalanceRowProps = {

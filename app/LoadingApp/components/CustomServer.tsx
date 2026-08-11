@@ -16,9 +16,9 @@ import {
   GlobalConst,
   TranslateType,
 } from '../../AppState';
-import Button from '../../../components/Components/Button';
-import FadeText from '../../../components/Components/FadeText';
-import ChainTypeToggle from '../../../components/Components/ChainTypeToggle';
+import Button from '../../../components/ui/Button';
+import FadeText from '../../../components/ui/FadeText';
+import ChainTypeToggle from '../../../components/ui/ChainTypeToggle';
 
 type CustomServerProps = {
   actionButtonsDisabled: boolean;

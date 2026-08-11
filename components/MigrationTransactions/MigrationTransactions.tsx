@@ -4,8 +4,8 @@ import { ActivityIndicator, ScrollView, Text, View } from 'react-native';
 import { useTheme } from '../../app/theme';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-import BoldText from '../Components/BoldText';
-import Button from '../Components/Button';
+import BoldText from '../ui/BoldText';
+import Button from '../ui/Button';
 import { AppDrawerParamList } from '../../app/types';
 import { AppTheme } from '../../app/theme';
 import { ContextAppLoaded } from '../../app/context';

@@ -11,7 +11,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import Clipboard from '@react-native-clipboard/clipboard';
 
-import FadeText from '../../Components/FadeText';
+import FadeText from '../../ui/FadeText';
 import {
   UnifiedAddressClass,
   TransparentAddressClass,

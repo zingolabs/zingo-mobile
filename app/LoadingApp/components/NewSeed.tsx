@@ -18,11 +18,11 @@ import BottomSheet, {
   BottomSheetScrollView,
 } from '@gorhom/bottom-sheet';
 
-import RegText from '../../../components/Components/RegText';
-import FadeText from '../../../components/Components/FadeText';
-import BoldText from '../../../components/Components/BoldText';
-import Button from '../../../components/Components/Button';
-import SheetRim from '../../../components/Components/SheetRim';
+import RegText from '../../../components/ui/RegText';
+import FadeText from '../../../components/ui/FadeText';
+import BoldText from '../../../components/ui/BoldText';
+import Button from '../../../components/ui/Button';
+import SheetRim from '../../../components/ui/SheetRim';
 import { ContextAppLoading } from '../../context';
 import WalletType from '../../AppState/types/WalletType';
 import {

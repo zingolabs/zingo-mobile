@@ -5,8 +5,8 @@ import { useFocusEffect } from '@react-navigation/native';
 import { useTheme } from '../../app/theme';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-import BoldText from '../Components/BoldText';
-import Button from '../Components/Button';
+import BoldText from '../ui/BoldText';
+import Button from '../ui/Button';
 import SegmentedBar from '../Migration/SegmentedBar';
 import StepperHeader from '../Migration/StepperHeader';
 import { AppDrawerParamList } from '../../app/types';

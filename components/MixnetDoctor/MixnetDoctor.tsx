@@ -17,9 +17,9 @@ import { useTheme } from '../../app/theme';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-import FadeText from '../Components/FadeText';
-import RegText from '../Components/RegText';
-import Button from '../Components/Button';
+import FadeText from '../ui/FadeText';
+import RegText from '../ui/RegText';
+import Button from '../ui/Button';
 import Header from '../Header';
 import { AppDrawerParamList } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';

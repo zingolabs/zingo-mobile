@@ -16,11 +16,11 @@ import {
   ScreenEnum,
   //SecurityType,
 } from '../../../app/AppState';
-import RegText from '../../Components/RegText';
-import ErrorText from '../../Components/ErrorText';
+import RegText from '../../ui/RegText';
+import ErrorText from '../../ui/ErrorText';
 import { ContextAppLoaded } from '../../../app/context';
 import { showConfirm } from '../../../app/showConfirm';
-import ChainSelect from '../../Components/ChainSelect';
+import ChainSelect from '../../ui/ChainSelect';
 import { chainDisplayName } from '../../Swap/components/chainDisplayName';
 import Utils from '../../../app/utils';
 import { parseZcashURI } from '../../../app/uris';
@@ -30,8 +30,8 @@ import {
   extractPlainAddress,
   SWAP_ADDRESS_CHAINS,
 } from '../../../app/swap';
-import Button from '../../Components/Button';
-import FadeText from '../../Components/FadeText';
+import Button from '../../ui/Button';
+import FadeText from '../../ui/FadeText';
 
 type AbDetailProps = {
   index: number;

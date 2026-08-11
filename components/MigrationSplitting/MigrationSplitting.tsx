@@ -20,8 +20,8 @@ import { useKeepAwake } from '@sayem314/react-native-keep-awake';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
 
-import BoldText from '../Components/BoldText';
-import Button from '../Components/Button';
+import BoldText from '../ui/BoldText';
+import Button from '../ui/Button';
 import ProgressBar from '../Migration/ProgressBar';
 import StepperHeader from '../Migration/StepperHeader';
 import { AppDrawerParamList } from '../../app/types';

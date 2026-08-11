@@ -7,13 +7,13 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 import BottomSheet, { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 
-import FadeText from '../Components/FadeText';
-import BoldText from '../Components/BoldText';
-import SheetRim from '../Components/SheetRim';
+import FadeText from '../ui/FadeText';
+import BoldText from '../ui/BoldText';
+import SheetRim from '../ui/SheetRim';
 import { AppDrawerParamList } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
-import DetailLine from '../Components/DetailLine';
+import DetailLine from '../ui/DetailLine';
 import { RouteEnum, ScreenEnum } from '../../app/AppState';
 import { getZingoName, getZingoVersion } from '../../app/utils/ZingoAppData';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';

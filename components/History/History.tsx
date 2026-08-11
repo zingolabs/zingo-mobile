@@ -42,10 +42,10 @@ import {
   ValueTransferType,
 } from '../../app/AppState';
 import { AppDrawerParamList } from '../../app/types';
-import FadeText from '../Components/FadeText';
-import BoldText from '../Components/BoldText';
-import SheetRim from '../Components/SheetRim';
-import RingBorder from '../Components/RingBorder';
+import FadeText from '../ui/FadeText';
+import BoldText from '../ui/BoldText';
+import SheetRim from '../ui/SheetRim';
+import RingBorder from '../ui/RingBorder';
 import ValueTransferLine from './components/ValueTransferLine';
 import IronwoodMigrationBanner from './components/IronwoodMigrationBanner';
 import { ContextAppLoaded } from '../../app/context';
@@ -73,7 +73,7 @@ import BottomSheet, {
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import Filters from './components/Filters';
-import { FiltersIcon } from '../Components/Icons/FiltersIcon';
+import { FiltersIcon } from '../ui/Icons/FiltersIcon';
 
 const ViewTypes = {
   WITH_MONTH: 0,

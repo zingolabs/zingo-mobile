@@ -6,18 +6,18 @@ import 'react-native';
 import React from 'react';
 import { render } from '@testing-library/react-native';
 
-import { BiohazardIcon } from '../components/Components/Icons/BiohazardIcon';
-import { ChevronUp, ChevronDown } from '../components/Components/Icons/Chevron';
-import { CopyIcon } from '../components/Components/Icons/CopyIcon';
-import { EyeIcon } from '../components/Components/Icons/EyeIcon';
-import { FiltersIcon } from '../components/Components/Icons/FiltersIcon';
-import { ListIcon } from '../components/Components/Icons/ListIcon';
-import { ShieldIcon } from '../components/Components/Icons/ShieldIcon';
-import { SkullIcon } from '../components/Components/Icons/SkullIcon';
-import { TriangleAlert } from '../components/Components/Icons/TriangleAlert';
-import { VerifyCheckIcon } from '../components/Components/Icons/VerifyCheckIcon';
-import { VerifyXIcon } from '../components/Components/Icons/VerifyXIcon';
-import { XIcon } from '../components/Components/Icons/XIcon';
+import { BiohazardIcon } from '../components/ui/Icons/BiohazardIcon';
+import { ChevronUp, ChevronDown } from '../components/ui/Icons/Chevron';
+import { CopyIcon } from '../components/ui/Icons/CopyIcon';
+import { EyeIcon } from '../components/ui/Icons/EyeIcon';
+import { FiltersIcon } from '../components/ui/Icons/FiltersIcon';
+import { ListIcon } from '../components/ui/Icons/ListIcon';
+import { ShieldIcon } from '../components/ui/Icons/ShieldIcon';
+import { SkullIcon } from '../components/ui/Icons/SkullIcon';
+import { TriangleAlert } from '../components/ui/Icons/TriangleAlert';
+import { VerifyCheckIcon } from '../components/ui/Icons/VerifyCheckIcon';
+import { VerifyXIcon } from '../components/ui/Icons/VerifyXIcon';
+import { XIcon } from '../components/ui/Icons/XIcon';
 
 const iconProps = { size: 24, color: '#000000' };
 

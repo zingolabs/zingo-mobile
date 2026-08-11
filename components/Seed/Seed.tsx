@@ -27,11 +27,11 @@ import BottomSheet, {
   BottomSheetScrollView,
 } from '@gorhom/bottom-sheet';
 
-import RegText from '../Components/RegText';
-import FadeText from '../Components/FadeText';
-import BoldText from '../Components/BoldText';
-import Button from '../Components/Button';
-import SheetRim from '../Components/SheetRim';
+import RegText from '../ui/RegText';
+import FadeText from '../ui/FadeText';
+import BoldText from '../ui/BoldText';
+import Button from '../ui/Button';
+import SheetRim from '../ui/SheetRim';
 import { useFullSheetSnapPoints } from '../../app/hooks/useFullSheetSnapPoints';
 import { AppDrawerParamList } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';

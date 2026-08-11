@@ -113,7 +113,7 @@ import {
 } from '@gorhom/bottom-sheet';
 import AddTagModalHost from '../../components/AddressBook/components/AddTagModalHost';
 import { BottomSheetBackHandler } from '../hooks/useBottomSheetBackHandler';
-import ConfirmBottomSheet from '../../components/Components/ConfirmBottomSheet';
+import ConfirmBottomSheet from '../../components/ui/ConfirmBottomSheet';
 import { showConfirm } from '../showConfirm';
 import RootNavigator from '../../components/RootNavigator';
 import {

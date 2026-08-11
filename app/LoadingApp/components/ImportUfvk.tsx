@@ -22,11 +22,11 @@ import BottomSheet, {
   BottomSheetScrollView,
 } from '@gorhom/bottom-sheet';
 
-import FadeText from '../../../components/Components/FadeText';
-import RegText from '../../../components/Components/RegText';
-import BoldText from '../../../components/Components/BoldText';
-import Button from '../../../components/Components/Button';
-import SheetRim from '../../../components/Components/SheetRim';
+import FadeText from '../../../components/ui/FadeText';
+import RegText from '../../../components/ui/RegText';
+import BoldText from '../../../components/ui/BoldText';
+import Button from '../../../components/ui/Button';
+import SheetRim from '../../../components/ui/SheetRim';
 import { ContextAppLoading } from '../../context';
 import Header from '../../../components/Header';
 import { getLatestBlockServerInfo } from '../../walletBackend';

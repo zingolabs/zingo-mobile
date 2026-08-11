@@ -30,10 +30,10 @@ import TransactionFailedIcon from '../../../assets/img/transaction-failed.svg';
 const RING_GREEN = '#149D05';
 const RING_RED = '#822929';
 
-import RegText from '../../../components/Components/RegText';
-import BoldText from '../../../components/Components/BoldText';
-import Button from '../../../components/Components/Button';
-import SheetRim from '../../../components/Components/SheetRim';
+import RegText from '../../../components/ui/RegText';
+import BoldText from '../../../components/ui/BoldText';
+import Button from '../../../components/ui/Button';
+import SheetRim from '../../../components/ui/SheetRim';
 import { AppDrawerParamList } from '../../types';
 import { ContextAppLoaded } from '../../context';
 import Header from '../../../components/Header';

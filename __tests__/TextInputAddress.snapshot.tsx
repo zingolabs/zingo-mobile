@@ -10,7 +10,7 @@ import {
   defaultAppContextLoaded,
 } from '../app/context';
 
-import TextInputAddress from '../components/Components/TextInputAddress';
+import TextInputAddress from '../components/ui/TextInputAddress';
 import { RouteEnum, ScreenEnum } from '../app/AppState';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockServer } from '../__mocks__/dataMocks/mockServer';

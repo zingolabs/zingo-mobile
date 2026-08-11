@@ -28,10 +28,10 @@ import {
   UnifiedAddressClass,
 } from '../../app/AppState';
 import { AppDrawerParamList } from '../../app/types';
-import FadeText from '../Components/FadeText';
-import BoldText from '../Components/BoldText';
-import Button from '../Components/Button';
-import SheetRim from '../Components/SheetRim';
+import FadeText from '../ui/FadeText';
+import BoldText from '../ui/BoldText';
+import Button from '../ui/Button';
+import SheetRim from '../ui/SheetRim';
 import AlSummaryLine from './components/AlSummaryLine';
 import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';

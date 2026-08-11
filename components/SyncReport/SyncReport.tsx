@@ -12,14 +12,14 @@ import { View, Text, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { useTheme } from '../../app/theme';
 
 import { AppDrawerParamList } from '../../app/types';
-import DetailLine from '../Components/DetailLine';
+import DetailLine from '../ui/DetailLine';
 import { ContextAppLoaded } from '../../app/context';
 
 import Header from '../Header';
 import { NetInfoStateType } from '@react-native-community/netinfo/src/index';
-import RegText from '../Components/RegText';
-import BoldText from '../Components/BoldText';
-import SheetRim from '../Components/SheetRim';
+import RegText from '../ui/RegText';
+import BoldText from '../ui/BoldText';
+import SheetRim from '../ui/SheetRim';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
   faChevronLeft,
@@ -32,7 +32,7 @@ import { RPCSyncScanRangeStatusType } from '../../app/walletBackend/types/RPCSyn
 import { RPCSyncScanRangePriorityStatusEnum } from '../../app/walletBackend/enums/RPCSyncScanRangePriorityStatusEnum';
 import { ButtonTypeEnum, RouteEnum, ScreenEnum } from '../../app/AppState';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import Button from '../Components/Button';
+import Button from '../ui/Button';
 import { createAlert } from '../../app/createAlert';
 import { sendEmail } from '../../app/sendEmail';
 import Utils from '../../app/utils';

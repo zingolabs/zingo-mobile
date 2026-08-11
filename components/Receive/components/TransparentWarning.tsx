@@ -4,7 +4,7 @@ import { Text, TouchableOpacity, View } from 'react-native';
 import { useTheme } from '../../../app/theme';
 
 import { ContextAppLoaded } from '../../../app/context';
-import { TriangleAlert } from '../../Components/Icons/TriangleAlert';
+import { TriangleAlert } from '../../ui/Icons/TriangleAlert';
 
 type TransparentWarningProps = {
   onSuccess: () => void;

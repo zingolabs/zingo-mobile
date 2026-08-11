@@ -6,7 +6,7 @@ import 'react-native';
 import React from 'react';
 
 import { render } from '@testing-library/react-native';
-import PriceFetcher from '../components/Components/PriceFetcher';
+import PriceFetcher from '../components/ui/PriceFetcher';
 // test suite
 describe('Component PriceFetcher - test', () => {
   //snapshot test

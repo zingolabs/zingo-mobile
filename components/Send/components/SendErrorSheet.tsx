@@ -12,11 +12,11 @@ import {
 } from '@gorhom/bottom-sheet';
 
 import { ButtonTypeEnum, TranslateType } from '../../../app/AppState';
-import BoldText from '../../Components/BoldText';
-import FadeText from '../../Components/FadeText';
-import RegText from '../../Components/RegText';
-import Button from '../../Components/Button';
-import SheetRim from '../../Components/SheetRim';
+import BoldText from '../../ui/BoldText';
+import FadeText from '../../ui/FadeText';
+import RegText from '../../ui/RegText';
+import Button from '../../ui/Button';
+import SheetRim from '../../ui/SheetRim';
 
 /**
  * Informational sheet that surfaces the raw error(s) returned by the fee

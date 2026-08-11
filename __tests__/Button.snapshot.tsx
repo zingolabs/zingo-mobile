@@ -6,7 +6,7 @@ import 'react-native';
 import React from 'react';
 
 import { render } from '@testing-library/react-native';
-import Button from '../components/Components/Button';
+import Button from '../components/ui/Button';
 import { ButtonTypeEnum } from '../app/AppState';
 
 // test suite
