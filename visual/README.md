@@ -109,7 +109,7 @@ yarn visual:compare <ref>     # e.g. origin/dev, a tag, a commit sha
 
 This command captures the working tree. It builds and captures `<ref>` on a
 temporary worktree, which shares `node_modules`. It diffs the two captures. It
-writes the report to `visual/.ci/index.html`. This is the same mechanism as CI,
+writes the report to `visual/ci/index.html`. This is the same mechanism as CI,
 but with the base that you choose.
 
 The reference must contain this harness. If you compare against an older commit
@@ -120,7 +120,7 @@ that has no harness, every story reads as new.
 The `.github/workflows/visual-review.yaml` workflow builds and captures the PR
 head and its base branch. It uses the same runner for both, so the pixel
 rendering is identical and there is no cross-machine drift. Then it diffs them,
-uploads `visual/.ci` as an artifact, and adds the result as a comment on the
+uploads `visual/ci` as an artifact, and adds the result as a comment on the
 PR.
 
 The workflow uses the base branch, not the committed `__baseline__`. Therefore
