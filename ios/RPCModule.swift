@@ -669,6 +669,62 @@ class RPCModule: NSObject {
       }
   }
 
+  // Mixnet Mode (send-over-nym). The wallet-side FFI seam, bridged on both
+  // platforms; the local proxy is hosted separately by NymTransportModule.
+  @objc(attachMixnet:resolve:reject:)
+  func attachMixnet(_ socks5Addr: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      DispatchQueue.global(qos: .userInitiated).async {
+        FfiOutcome.of {
+          try Zingo.attachMixnet(socks5Addr: socks5Addr)
+        }.settle(resolve: resolve, reject: reject)
+      }
+  }
+
+  @objc(enableMixnet:resolve:reject:)
+  func enableMixnet(_ proxyPath: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      DispatchQueue.global(qos: .userInitiated).async {
+        FfiOutcome.of {
+          try Zingo.enableMixnet(proxyPath: proxyPath)
+        }.settle(resolve: resolve, reject: reject)
+      }
+  }
+
+  @objc(disableMixnet:reject:)
+  func disableMixnet(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      DispatchQueue.global(qos: .userInitiated).async {
+        FfiOutcome.of {
+          try Zingo.disableMixnet()
+        }.settle(resolve: resolve, reject: reject)
+      }
+  }
+
+  @objc(mixnetModeInfo:reject:)
+  func mixnetModeInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      DispatchQueue.global(qos: .userInitiated).async {
+        FfiOutcome.of {
+          try mixnetMode()
+        }.settle(resolve: resolve, reject: reject)
+      }
+  }
+
+  @objc(mixnetBootstrapDetailInfo:reject:)
+  func mixnetBootstrapDetailInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      DispatchQueue.global(qos: .userInitiated).async {
+        FfiOutcome.of {
+          try mixnetBootstrapDetail()
+        }.settle(resolve: resolve, reject: reject)
+      }
+  }
+
+  @objc(mixnetIpCorrelationDisclaimerInfo:reject:)
+  func mixnetIpCorrelationDisclaimerInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      DispatchQueue.global(qos: .userInitiated).async {
+        FfiOutcome.of {
+          mixnetIpCorrelationDisclaimer()
+        }.settle(resolve: resolve, reject: reject)
+      }
+  }
+
   @objc(pollSyncInfo:reject:)
   func pollSyncInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
       DispatchQueue.global(qos: .userInitiated).async {

@@ -26,6 +26,9 @@ COPY workbench/ /opt/zingo/rust/workbench/
 ARG ZINGO_MOBILE_GIT_DESCRIBE
 ENV ZINGO_MOBILE_GIT_DESCRIBE=${ZINGO_MOBILE_GIT_DESCRIBE}
 
+COPY nym-proxy-ffi/ /opt/zingo/rust/nym-proxy-ffi/
+
+
 RUN rustup default stable
 
 RUN cargo install --force --locked bindgen-cli
@@ -91,4 +94,49 @@ RUN llvm-objcopy \
     --remove-section .comment \
     ../target/x86_64-linux-android/release/libzingo.so
 RUN sha256sum ../target/x86_64-linux-android/release/libzingo.so
+
+# ===== Nym proxy shim (nym-proxy-ffi) =====
+# Cross-compile the shim per ABI in its own workspace (nym-sdk resolves only in
+# nym-proxy-ffi's lock), mirroring the wallet's per-ABI CC/env above. Kotlin bindings
+# come from library mode against a built .so (proc-macro uniffi, no UDL).
+WORKDIR /opt/zingo/rust/nym-proxy-ffi
+ENV SHIM=libzingo_nym_proxy_ffi.so
+
+# aarch64
+ENV CARGO_FEATURE_STD=true
+ENV CC=aarch64-linux-android26-clang
+RUN cargo ndk --target aarch64-linux-android build --release --package zingo-nym-proxy-ffi
+RUN llvm-strip --strip-all target/aarch64-linux-android/release/$SHIM
+RUN llvm-objcopy --remove-section .comment target/aarch64-linux-android/release/$SHIM
+RUN sha256sum target/aarch64-linux-android/release/$SHIM
+
+# armv7
+ENV CARGO_FEATURE_STD=false
+ENV CC=armv7a-linux-androideabi26-clang
+RUN cargo ndk --target armv7-linux-androideabi build --release --package zingo-nym-proxy-ffi
+RUN llvm-strip --strip-all target/armv7-linux-androideabi/release/$SHIM
+RUN llvm-objcopy --remove-section .comment target/armv7-linux-androideabi/release/$SHIM
+RUN sha256sum target/armv7-linux-androideabi/release/$SHIM
+
+# i686 - x86
+ENV CC=i686-linux-android26-clang
+RUN cargo ndk --target i686-linux-android build --release --package zingo-nym-proxy-ffi
+RUN llvm-strip --strip-all target/i686-linux-android/release/$SHIM
+RUN llvm-objcopy --remove-section .comment target/i686-linux-android/release/$SHIM
+RUN sha256sum target/i686-linux-android/release/$SHIM
+
+# x86_64
+ENV CC=x86_64-linux-android26-clang
+RUN cargo ndk --target x86_64-linux-android build --release --package zingo-nym-proxy-ffi
+RUN llvm-strip --strip-all target/x86_64-linux-android/release/$SHIM
+RUN llvm-objcopy --remove-section .comment target/x86_64-linux-android/release/$SHIM
+RUN sha256sum target/x86_64-linux-android/release/$SHIM
+
+# Kotlin bindings, library mode from the built aarch64 cdylib (metadata is
+# static). zingo-uniffi-bindgen lives in the main workspace, not the shim's,
+# so point cargo at the parent manifest.
+RUN cargo run --release --manifest-path /opt/zingo/rust/Cargo.toml \
+    --package zingo-uniffi-bindgen -- generate \
+    --library target/aarch64-linux-android/release/$SHIM \
+    --language kotlin --out-dir generated-kotlin
 

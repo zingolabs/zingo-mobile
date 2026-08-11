@@ -445,9 +445,11 @@
     "walletkeyssaved": "Son Cüzdan Kurtarma Bilgisi cihazda güvenli bir şekilde saklandı.",
     "walletkeyswarning": "Bu, kurtarma ifadesi'inizi saklamak için denetlenmemiş kodun güvenliğine bağlı olan deneysel bir özelliktir. Lütfen önemli miktarda fon içeren seed'lerle kullanmayın!",
     "value-language-tr": "Türkçe",
-    "nym-privacy-network": "Gizlilik Ağı",
+    "nym-privacy-network": "İşlemleri yayınlamak için NYM kullan",
+    "nym-disable-warning": "Mixnet Modunu kapatmak işlemlerinizi ve fiyat sorgularınızı açık ağ üzerinden yönlendirir. O zaman IP adresiniz cüzdan etkinliğinizle ilişkilendirilebilir.",
     "nym-network": "NYM Ağı",
-    "nym-enhanced-privacy": "Gelişmiş Gizlilik"
+    "nym-enhanced-privacy": "Gelişmiş Gizlilik",
+    "nym-diagnostics": "Mixnet tanılamasını çalıştır"
   },
   "mixnet": {
     "status": {
@@ -459,6 +461,15 @@
     },
     "send-blocked": "Mixnet hazır olana kadar gönderim duraklatıldı",
     "reenable": "Mixnet'i yeniden etkinleştir"
+  },
+  "mixnetdoctor": {
+    "title": "Mixnet Doktoru",
+    "title-acc": "Mixnet Doktoru tanılama ekranı",
+    "intro": "Mixnet taşımasını bu cihazdan yoklar ve bulduğunu bildirir. Her yoklama ağa gerçek IP adresinizden bağlanır, bu yüzden yalnızca gerektiğinde çalıştırın.",
+    "run": "Tanılamayı çalıştır",
+    "running": "Çalışıyor…",
+    "copy-report": "Raporu kopyala",
+    "report-copied": "Rapor panoya kopyalandı"
   },
   "header": {
     "lastupdate": "Son güncelleme:"

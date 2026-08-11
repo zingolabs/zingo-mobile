@@ -30,9 +30,11 @@ android/app/beta/release/
 *.aab
 *.apk
 ios/Zingolib.xcframework/
+ios/ZingoNymProxyFFI.xcframework/
 ios/zingo.swift
 rust/lib/Generated/zingo.swift
 rust/lib/Generated/zingoFFI.h
+rust/nym-proxy-ffi/Generated/
 rust/lib/Generated/zingoFFI.modulemap
 
 # Android/IntelliJ
@@ -99,5 +101,9 @@ buck-out/
 
 # Claude Code
 .claude/
+
+# Wayfinder Agent Skill
+.wayfinder
+
 # Jest coverage output
 coverage/

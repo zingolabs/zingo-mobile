@@ -445,9 +445,11 @@
     "walletkeyssaved": "The last Wallet Recovery Info stored safely in the device.",
     "walletkeyswarning": "This is an experimental feature, that depends on the security of unaudited code to store your seed-phrase. Please do not use it with seeds that control significant funds!",
     "value-language-tr": "Turkish",
-    "nym-privacy-network": "Privacy Network",
+    "nym-privacy-network": "Use NYM for broadcasts",
+    "nym-disable-warning": "Turning off Mixnet Mode routes your transactions and price lookups over the clearnet. Your IP address can then be linked to your wallet activity.",
     "nym-network": "NYM Network",
-    "nym-enhanced-privacy": "Enhanced Privacy"
+    "nym-enhanced-privacy": "Enhanced Privacy",
+    "nym-diagnostics": "Run mixnet diagnostics"
   },
   "mixnet": {
     "status": {
@@ -459,6 +461,15 @@
     },
     "send-blocked": "Sending is paused until the mixnet is ready",
     "reenable": "Re-enable mixnet"
+  },
+  "mixnetdoctor": {
+    "title": "Mixnet Doctor",
+    "title-acc": "Mixnet Doctor diagnostics screen",
+    "intro": "Probes the mixnet transport from this device and reports what it found. Each probe contacts the network from your real IP, so run it only when you need it.",
+    "run": "Run diagnostics",
+    "running": "Running…",
+    "copy-report": "Copy report",
+    "report-copied": "Report copied to clipboard"
   },
   "header": {
     "lastupdate": "Last update:"

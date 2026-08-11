@@ -2,9 +2,9 @@ import { NativeModules } from 'react-native';
 
 import { StartMixnetTransport } from '../modules/MixnetCoordinator';
 
-// One-to-one mirror of the @ReactMethod functions exposed by the native
-// NymTransportModule (Android: org.ZingoLabs.Zingo.NymTransportModule; the
-// iOS module lands with the Mac-gated iOS step). This is the platform half
+// One-to-one mirror of the native NymTransportModule, exposed on both
+// platforms (Android: org.ZingoLabs.Zingo.NymTransportModule; iOS:
+// NymTransportModule.swift). This is the platform half
 // of Mixnet Mode: the module hosts the UniFFI proxy shim in-process and
 // offers its local SOCKS5 endpoint, which the MixnetCoordinator hands to
 // the wallet's attach seam. Failures arrive only as rejections (the typed

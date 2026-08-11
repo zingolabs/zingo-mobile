@@ -124,6 +124,7 @@ import { RPCSyncStatusType } from '../walletBackend/types/RPCSyncStatusType';
 import { RPCUfvkType } from '../walletBackend/types/RPCUfvkType';
 import {
   INITIAL_MIXNET_VIEW,
+  OFF_MIXNET_VIEW,
   MixnetView,
 } from '../walletBackend/transforms/mixnetPresenter';
 import { startMixnetTransport } from '../walletBackend/utils/nymTransport';
@@ -136,6 +137,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RPCValueTransfersStatusEnum } from '../walletBackend/enums/RPCValueTransfersStatusEnum';
 
 const About = React.lazy(() => import('../../components/About'));
+const MixnetDoctor = React.lazy(() => import('../../components/MixnetDoctor'));
 const Seed = React.lazy(() => import('../../components/Seed'));
 const SyncReport = React.lazy(() => import('../../components/SyncReport'));
 const Rescan = React.lazy(() => import('../../components/Rescan'));
@@ -837,13 +839,11 @@ export class LoadedAppClass extends Component<
       blockExplorer: props.blockExplorer,
       nym: props.nym,
 
-      // Mixnet Mode: fail-closed initial view where the policy runs
-      // (Android); null where the platform transport has not landed yet
-      // (iOS until the Mac-gated step), which leaves the send gate open.
-      mixnetView:
-        Platform.OS === GlobalConst.platformOSandroid
-          ? INITIAL_MIXNET_VIEW
-          : null,
+      // Mixnet Mode initial view from the persisted setting: enabled starts
+      // fail-closed (bootstrapping) so the send gate is shut until the
+      // transport attaches; disabled starts off (clearnet, ungated). The
+      // coordinator republishes on any change.
+      mixnetView: props.nym ? INITIAL_MIXNET_VIEW : OFF_MIXNET_VIEW,
       disableMixnet: this.disableMixnet,
       reenableMixnet: this.reenableMixnet,
 
@@ -877,7 +877,8 @@ export class LoadedAppClass extends Component<
       onError: this.setLastError,
       onMixnetViewChanged: this.setMixnetView,
       startMixnetTransport: startMixnetTransport,
-      mixnetSupported: Platform.OS === GlobalConst.platformOSandroid,
+      mixnetSupported: true,
+      nymEnabled: props.nym,
       readOnly: props.readOnly,
       server: props.server,
       performanceLevel: props.performanceLevel,
@@ -1947,6 +1948,13 @@ export class LoadedAppClass extends Component<
     this.setState({
       nym: value,
     });
+    // The merged switch: enabling arms Mixnet Mode (start transport + attach),
+    // disabling drops to clearnet. The coordinator publishes the resulting view.
+    if (value) {
+      await this.rpc.reenableMixnet();
+    } else {
+      await this.rpc.disableMixnet();
+    }
   };
 
   navigateToLoadingApp = async (state: LoadingAppNavigationState) => {
@@ -2443,6 +2451,10 @@ export class LoadedAppClass extends Component<
                     <RootNavigator.Screen
                       name={RouteEnum.About}
                       component={About}
+                    />
+                    <RootNavigator.Screen
+                      name={RouteEnum.MixnetDoctor}
+                      component={MixnetDoctor}
                     />
                     <RootNavigator.Screen name={RouteEnum.Rescan}>
                       {props => <Rescan {...props} doRescan={this.doRescan} />}
