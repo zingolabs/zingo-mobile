@@ -3,6 +3,28 @@ import { readFile } from 'fs/promises';
 import type { Plugin } from 'vite';
 import type { StorybookConfig } from '@storybook/react-native-web-vite';
 
+const WORKLET_DEP = /react-native-(reanimated|worklets)[/\\].*\.[cm]?js$/;
+
+// Transform reanimated and worklets with the Worklets Babel plugin
+const workletsBabel = (): Plugin => ({
+  name: 'worklets-babel',
+  async transform(code, id) {
+    if (!WORKLET_DEP.test(id.split('?')[0])) {
+      return null;
+    }
+    const babel = await import('@babel/core');
+    const result = await babel.transformAsync(code, {
+      filename: id.split('?')[0],
+      babelrc: false,
+      configFile: false,
+      sourceMaps: true,
+      // disableSourceMaps stops the plugin from reading inputMap sources
+      plugins: [['react-native-worklets/plugin', { disableSourceMaps: true }]],
+    });
+    return result?.code ? { code: result.code, map: result.map } : null;
+  },
+});
+
 // Mirror metro's svgXmlTransformer on web: a `.svg` import becomes a
 // component that renders <SvgXml xml={...} />, so web and native draw the
 // same asset through react-native-svg.
@@ -27,13 +49,30 @@ const main: StorybookConfig = {
   addons: [],
   framework: {
     name: '@storybook/react-native-web-vite',
-    options: {},
+    options: {
+      // The Worklets Babel plugin
+      pluginReactOptions: {
+        babel: {
+          plugins: [
+            ['react-native-worklets/plugin', { disableSourceMaps: true }],
+          ],
+        },
+      },
+    },
   },
   viteFinal: async config => {
     // Relative asset paths so the static build works served from any subpath
     // (gh-pages root for dev, /pr/<n>/storybook/ inside a PR report).
     config.base = './';
     config.plugins = [svgAsSvgXml(), ...(config.plugins ?? [])];
+    // Keep reanimated pre-bundled for correct interop, and run the worklet transform in the rolldown dep optimizer.
+    config.optimizeDeps = config.optimizeDeps ?? {};
+    config.optimizeDeps.rollupOptions = config.optimizeDeps.rollupOptions ?? {};
+    const depPlugins = config.optimizeDeps.rollupOptions.plugins;
+    config.optimizeDeps.rollupOptions.plugins = [
+      ...(Array.isArray(depPlugins) ? depPlugins : []),
+      workletsBabel(),
+    ];
     config.resolve = config.resolve ?? {};
     config.resolve.alias = {
       ...config.resolve.alias,
@@ -42,6 +81,7 @@ const main: StorybookConfig = {
         __dirname,
         './shims/react-native-localize.ts',
       ),
+      'react-native-fs': path.resolve(__dirname, './shims/react-native-fs.ts'),
     };
     return config;
   },

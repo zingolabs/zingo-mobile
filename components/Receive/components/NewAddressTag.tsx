@@ -166,7 +166,7 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
               onChangeText={(text: string) => setLabel(text)}
               maxLength={50}
             />
-            {label && (
+            {!!label && (
               <TouchableOpacity onPress={() => setLabel('')}>
                 <FontAwesomeIcon
                   style={{ marginRight: 10 }}

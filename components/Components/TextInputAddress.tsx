@@ -150,7 +150,7 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
                 justifyContent: 'center',
               }}
             >
-              {address && !disabled && (
+              {!!address && !disabled && (
                 <TouchableOpacity
                   onPress={() => {
                     setAddress('');

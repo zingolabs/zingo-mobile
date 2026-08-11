@@ -42,6 +42,9 @@ for (const entry of entries) {
     await page.waitForTimeout(250); // real settle for fonts/svg paint
     await page.screenshot({ path: shot(entry.id, 'default') });
 
+    // The `static` tag skips the interaction pass for modal-sheet stories, whose backdrop swallows pointer events.
+    if (entry.tags?.includes('static')) return;
+
     // Interaction states, only where the story renders something pressable.
     const pressable = root.getByRole('button').first();
     if ((await pressable.count()) === 0) return;
