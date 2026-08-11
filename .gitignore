@@ -107,3 +107,18 @@ buck-out/
 
 # Jest coverage output
 coverage/
+
+# Storybook web static build
+storybook-static/
+
+# Visual regression (review artifacts. baselines are committed)
+visual/__current__/
+visual/__baseline__/
+visual/__diff__/
+visual/__video__/
+visual/report.html
+visual/report.json
+visual/index.html
+visual/.ci/
+test-results/
+playwright-report/

@@ -1,4 +1,5 @@
 const { getDefaultConfig, mergeConfig } = require('@react-native/metro-config');
+const withStorybook = require('@storybook/react-native/metro/withStorybook');
 
 /**
  * Metro configuration
@@ -30,4 +31,10 @@ const config = {
   },
 };
 
-module.exports = mergeConfig(defaultConfig, config);
+module.exports = withStorybook(mergeConfig(defaultConfig, config), {
+  enabled: process.env.STORYBOOK_ENABLED === 'true',
+  configPath: require('path').resolve(__dirname, './.storybook'),
+  // When disabled, stub every storybook/@storybook import to an empty
+  // module so production bundles carry no Storybook runtime.
+  onDisabledRemoveStorybook: true,
+});
