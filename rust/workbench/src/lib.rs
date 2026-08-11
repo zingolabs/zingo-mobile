@@ -10,9 +10,10 @@
 use std::path::PathBuf;
 use std::process::{exit, Command};
 
-/// Run a tool `body`, reporting diagnostics as `"{prog}: {line}"` to stderr and
-/// exiting `1` on error; on success runs `on_ok` (e.g. to print a result) and
-/// exits `0`. This is the single `main()` shape shared by every binary.
+/// Run a tool `body` — the single `main()` shape shared by every binary —
+/// reporting diagnostics as `"{prog}: {line}"` to stderr and exiting `1` on
+/// error, while on success running `on_ok` (e.g. to print a result) and
+/// exiting `0`.
 pub fn run<T>(
     prog: &str,
     body: impl FnOnce() -> Result<T, Vec<String>>,

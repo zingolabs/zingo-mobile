@@ -38,14 +38,14 @@
 use std::path::{Path, PathBuf};
 
 /// The ABIs zingo-mobile ships (`reactNativeArchitectures` in
-/// `android/gradle.properties`); must stay in step with zingolib's
-/// `bundle-android-shim` SHIPPED_ABIS.
+/// `android/gradle.properties`), which must stay in step with
+/// `bundle-android-shim`'s `SHIPPED_ABIS`.
 const SHIPPED_ABIS: [&str; 4] = ["arm64-v8a", "armeabi-v7a", "x86", "x86_64"];
 
 const SHIM_SO: &str = "libzingo_nym_proxy_ffi.so";
 
-/// Which shipped ABIs a bundle tree carries and which it lacks. Pure, so the
-/// partition is unit-testable without a real bundle on disk.
+/// Which shipped ABIs a bundle tree carries and which it lacks, computed
+/// purely so the partition is unit-testable without a real bundle on disk.
 fn partition_abis(has_so: impl Fn(&str) -> bool) -> (Vec<&'static str>, Vec<&'static str>) {
     SHIPPED_ABIS.iter().partition(|abi| has_so(abi))
 }
