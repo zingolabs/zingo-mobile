@@ -22,16 +22,16 @@ import Clipboard from '@react-native-clipboard/clipboard';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 
-import Button from '../ui/Button';
+import Button from '../../ui/primitives/Button';
 import { AppDrawerParamList } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import { useBiometricGate } from '../../app/hooks/useBiometricGate';
-import Header from '../Header';
-import SingleAddress from '../ui/SingleAddress';
-import RegText from '../ui/RegText';
-import FadeText from '../ui/FadeText';
-import BoldText from '../ui/BoldText';
-import SheetRim from '../ui/SheetRim';
+import Header from '../../ui/widgets/Header';
+import SingleAddress from '../../ui/widgets/SingleAddress';
+import RegText from '../../ui/primitives/RegText';
+import FadeText from '../../ui/primitives/FadeText';
+import BoldText from '../../ui/primitives/BoldText';
+import SheetRim from '../../ui/primitives/SheetRim';
 import {
   ButtonTypeEnum,
   ChainNameEnum,

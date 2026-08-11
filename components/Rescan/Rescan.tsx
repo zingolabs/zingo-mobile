@@ -11,14 +11,14 @@ import BottomSheet, {
   BottomSheetScrollView,
 } from '@gorhom/bottom-sheet';
 
-import RegText from '../ui/RegText';
-import BoldText from '../ui/BoldText';
-import Button from '../ui/Button';
-import SheetRim from '../ui/SheetRim';
+import RegText from '../../ui/primitives/RegText';
+import BoldText from '../../ui/primitives/BoldText';
+import Button from '../../ui/primitives/Button';
+import SheetRim from '../../ui/primitives/SheetRim';
 import { AppDrawerParamList } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import { useBiometricGate } from '../../app/hooks/useBiometricGate';
-import Header from '../Header';
+import Header from '../../ui/widgets/Header';
 import {
   ButtonTypeEnum,
   RouteEnum,

@@ -6,7 +6,7 @@ import 'react-native';
 import React from 'react';
 
 import { render } from '@testing-library/react-native';
-import Header from '../components/Header';
+import Header from '../ui/widgets/Header';
 import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,

@@ -17,8 +17,8 @@ import { faCircleCheck as faCircleCheckRegular } from '@fortawesome/free-regular
 
 import Clipboard from '@react-native-clipboard/clipboard';
 
-import ZecAmount from '../../ui/ZecAmount';
-import FadeText from '../../ui/FadeText';
+import ZecAmount from '../../../ui/widgets/ZecAmount';
+import FadeText from '../../../ui/primitives/FadeText';
 import {
   ValueTransferType,
   ValueTransferKindEnum,
@@ -31,8 +31,8 @@ import {
 } from '../../../app/AppState';
 
 import { ContextAppLoaded } from '../../../app/context';
-import AddressItem from '../../ui/AddressItem';
-import RegText from '../../ui/RegText';
+import AddressItem from '../../../ui/widgets/AddressItem';
+import RegText from '../../../ui/primitives/RegText';
 import Utils from '../../../app/utils';
 import { RPCValueTransfersStatusEnum } from '../../../app/walletBackend/enums/RPCValueTransfersStatusEnum';
 

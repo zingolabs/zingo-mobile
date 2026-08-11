@@ -19,8 +19,8 @@ import {
   TranslateType,
 } from '../../../app/AppState';
 import Utils from '../../../app/utils';
-import FadeText from '../../ui/FadeText';
-import Button from '../../ui/Button';
+import FadeText from '../../../ui/primitives/FadeText';
+import Button from '../../../ui/primitives/Button';
 
 type MemoProps = {
   closeSheet: () => void;

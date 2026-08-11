@@ -28,13 +28,13 @@ import {
   UnifiedAddressClass,
 } from '../../app/AppState';
 import { AppDrawerParamList } from '../../app/types';
-import FadeText from '../ui/FadeText';
-import BoldText from '../ui/BoldText';
-import Button from '../ui/Button';
-import SheetRim from '../ui/SheetRim';
+import FadeText from '../../ui/primitives/FadeText';
+import BoldText from '../../ui/primitives/BoldText';
+import Button from '../../ui/primitives/Button';
+import SheetRim from '../../ui/primitives/SheetRim';
 import AlSummaryLine from './components/AlSummaryLine';
 import { ContextAppLoaded } from '../../app/context';
-import Header from '../Header';
+import Header from '../../ui/widgets/Header';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faAngleUp, faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 import BottomSheet from '@gorhom/bottom-sheet';

@@ -21,18 +21,18 @@ import BottomSheet, {
 } from '@gorhom/bottom-sheet';
 import ActionMenuBottomSheet, {
   ActionMenuBottomSheetAction,
-} from '../../../components/ui/ActionMenuBottomSheet';
+} from '../../../ui/widgets/ActionMenuBottomSheet';
 
 import { ButtonTypeEnum, ModeEnum, SelectServerEnum } from '../../AppState';
-import Button from '../../../components/ui/Button';
-import SheetRim from '../../../components/ui/SheetRim';
+import Button from '../../../ui/primitives/Button';
+import SheetRim from '../../../ui/primitives/SheetRim';
 import { ContextAppLoading } from '../../context';
 import {
   getZingoLogo,
   getZingoName,
   getZingoVersion,
 } from '../../utils/ZingoAppData';
-import BoldText from '../../../components/ui/BoldText';
+import BoldText from '../../../ui/primitives/BoldText';
 import { useFullSheetSnapPoints } from '../../hooks/useFullSheetSnapPoints';
 
 type StartMenuProps = {

@@ -42,10 +42,10 @@ import {
   ValueTransferType,
 } from '../../app/AppState';
 import { AppDrawerParamList } from '../../app/types';
-import FadeText from '../ui/FadeText';
-import BoldText from '../ui/BoldText';
-import SheetRim from '../ui/SheetRim';
-import RingBorder from '../ui/RingBorder';
+import FadeText from '../../ui/primitives/FadeText';
+import BoldText from '../../ui/primitives/BoldText';
+import SheetRim from '../../ui/primitives/SheetRim';
+import RingBorder from '../../ui/primitives/RingBorder';
 import ValueTransferLine from './components/ValueTransferLine';
 import IronwoodMigrationBanner from './components/IronwoodMigrationBanner';
 import { ContextAppLoaded } from '../../app/context';
@@ -53,7 +53,7 @@ import { useDismissSheetsOnBlur } from '../../app/hooks/useDismissSheetsOnBlur';
 import { useOptionsPanelSheetSlide } from '../../app/hooks/useOptionsPanelSheetSlide';
 import { usePriceSnapAutoClose } from '../../app/hooks/usePriceSnapAutoClose';
 import { safeSnapToIndex } from '../../app/utils/safeSnapToIndex';
-import Header from '../Header';
+import Header from '../../ui/widgets/Header';
 import Utils from '../../app/utils';
 import {
   DataProvider,
@@ -73,7 +73,7 @@ import BottomSheet, {
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import Filters from './components/Filters';
-import { FiltersIcon } from '../ui/Icons/FiltersIcon';
+import { FiltersIcon } from '../../ui/primitives/Icons/FiltersIcon';
 
 const ViewTypes = {
   WITH_MONTH: 0,

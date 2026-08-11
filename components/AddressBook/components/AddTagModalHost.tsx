@@ -12,8 +12,8 @@ import {
 } from '@gorhom/bottom-sheet';
 
 import { AddressBookFileClass, TranslateType } from '../../../app/AppState';
-import BoldText from '../../ui/BoldText';
-import SheetRim from '../../ui/SheetRim';
+import BoldText from '../../../ui/primitives/BoldText';
+import SheetRim from '../../../ui/primitives/SheetRim';
 import NewAddressTag from '../../Receive/components/NewAddressTag';
 import { useKeyboardHeight } from '../../../app/hooks/useKeyboardHeight';
 

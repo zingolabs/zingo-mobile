@@ -17,8 +17,8 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 
-import ZecAmount from '../../ui/ZecAmount';
-import FadeText from '../../ui/FadeText';
+import ZecAmount from '../../../ui/widgets/ZecAmount';
+import FadeText from '../../../ui/primitives/FadeText';
 import {
   ValueTransferType,
   ValueTransferKindEnum,
@@ -31,7 +31,7 @@ import {
 } from '../../../app/AppState';
 
 import { ContextAppLoaded } from '../../../app/context';
-import AddressItem from '../../ui/AddressItem';
+import AddressItem from '../../../ui/widgets/AddressItem';
 import { RPCValueTransfersStatusEnum } from '../../../app/walletBackend/enums/RPCValueTransfersStatusEnum';
 import Utils from '../../../app/utils';
 //import Utils from '../../../app/utils';

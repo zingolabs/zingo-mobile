@@ -11,12 +11,12 @@ import {
   ChainNameEnum,
   GlobalConst,
 } from '../../../app/AppState';
-import RegText from '../../ui/RegText';
+import RegText from '../../../ui/primitives/RegText';
 import { ContextAppLoaded } from '../../../app/context';
 import { showConfirm } from '../../../app/showConfirm';
-import Button from '../../ui/Button';
-import ChainSelect from '../../ui/ChainSelect';
-import { chainDisplayName } from '../../Swap/components/chainDisplayName';
+import Button from '../../../ui/primitives/Button';
+import ChainSelect from '../../../ui/widgets/ChainSelect';
+import { chainDisplayName } from '../../../ui/widgets/chainDisplayName';
 import Utils from '../../../app/utils';
 import { AddressBookFileImpl } from '../../AddressBook';
 

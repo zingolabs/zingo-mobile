@@ -14,7 +14,7 @@ import Animated, {
 import { useFocusEffect } from '@react-navigation/native';
 import { useTheme } from '../../../app/theme';
 
-import SegmentedBar from '../../Migration/SegmentedBar';
+import SegmentedBar from '../../../ui/primitives/SegmentedBar';
 import { ContextAppLoaded } from '../../../app/context';
 import Utils from '../../../app/utils';
 import { RouteEnum } from '../../../app/AppState';

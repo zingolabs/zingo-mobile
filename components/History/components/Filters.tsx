@@ -5,8 +5,8 @@ import { useTheme } from '../../../app/theme';
 
 import { ButtonTypeEnum, FilterEnum } from '../../../app/AppState';
 import { ContextAppLoaded } from '../../../app/context';
-import Button from '../../ui/Button';
-import FadeText from '../../ui/FadeText';
+import Button from '../../../ui/primitives/Button';
+import FadeText from '../../../ui/primitives/FadeText';
 
 type FiltersProps = {
   closeSheet: () => void;

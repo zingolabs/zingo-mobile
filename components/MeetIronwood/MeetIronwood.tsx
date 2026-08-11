@@ -33,8 +33,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faArrowRightLong } from '@fortawesome/free-solid-svg-icons';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-import BoldText from '../ui/BoldText';
-import Button from '../ui/Button';
+import BoldText from '../../ui/primitives/BoldText';
+import Button from '../../ui/primitives/Button';
 import SettingsFileImpl from '../Settings/SettingsFileImpl';
 import { AppDrawerParamList } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';

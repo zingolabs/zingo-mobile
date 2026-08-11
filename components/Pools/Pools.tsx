@@ -4,15 +4,15 @@ import { View, ActivityIndicator, TouchableOpacity } from 'react-native';
 
 import { useTheme } from '../../app/theme';
 
-import ZecAmount from '../ui/ZecAmount';
-import BoldText from '../ui/BoldText';
-import SheetRim from '../ui/SheetRim';
-import DetailLine from '../ui/DetailLine';
+import ZecAmount from '../../ui/widgets/ZecAmount';
+import BoldText from '../../ui/primitives/BoldText';
+import SheetRim from '../../ui/primitives/SheetRim';
+import DetailLine from '../../ui/widgets/DetailLine';
 import { AppDrawerParamList } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
-import Header from '../Header';
+import Header from '../../ui/widgets/Header';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import FadeText from '../ui/FadeText';
+import FadeText from '../../ui/primitives/FadeText';
 import { faChevronLeft, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import BottomSheet, { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import { RouteEnum, ScreenEnum } from '../../app/AppState';

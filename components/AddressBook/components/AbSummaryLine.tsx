@@ -14,7 +14,7 @@ import {
   faWallet,
 } from '@fortawesome/free-solid-svg-icons';
 
-import FadeText from '../../ui/FadeText';
+import FadeText from '../../../ui/primitives/FadeText';
 import {
   AddressBookActionEnum,
   AddressBookFileClass,
@@ -28,7 +28,7 @@ import {
 } from '../../../app/AppState';
 import Utils from '../../../app/utils';
 import { ContextAppLoaded } from '../../../app/context';
-import { ChainLogo } from '../../ui/ChainSelect';
+import { ChainLogo } from '../../../ui/widgets/ChainSelect';
 
 type AbSummaryLineProps = {
   index: number;

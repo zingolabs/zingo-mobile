@@ -12,11 +12,11 @@ import {
 import Clipboard from '@react-native-clipboard/clipboard';
 import { useTheme } from '../../app/theme';
 
-import BoldText from '../ui/BoldText';
-import FadeText from '../ui/FadeText';
-import RegText from '../ui/RegText';
+import BoldText from '../../ui/primitives/BoldText';
+import FadeText from '../../ui/primitives/FadeText';
+import RegText from '../../ui/primitives/RegText';
 
-import { MenuMorphIcon } from '../ui/Icons/MenuMorphIcon';
+import { MenuMorphIcon } from '../../ui/primitives/Icons/MenuMorphIcon';
 import XSocial from '../../assets/img/options/x.svg';
 import Github from '../../assets/img/options/github.svg';
 import Mail from '../../assets/img/options/mail.svg';

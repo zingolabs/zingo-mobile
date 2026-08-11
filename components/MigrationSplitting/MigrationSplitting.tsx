@@ -20,10 +20,10 @@ import { useKeepAwake } from '@sayem314/react-native-keep-awake';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
 
-import BoldText from '../ui/BoldText';
-import Button from '../ui/Button';
-import ProgressBar from '../Migration/ProgressBar';
-import StepperHeader from '../Migration/StepperHeader';
+import BoldText from '../../ui/primitives/BoldText';
+import Button from '../../ui/primitives/Button';
+import ProgressBar from '../../ui/primitives/ProgressBar';
+import StepperHeader from '../../ui/widgets/StepperHeader';
 import { AppDrawerParamList } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import { ButtonTypeEnum, RouteEnum } from '../../app/AppState';

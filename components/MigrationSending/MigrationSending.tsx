@@ -6,9 +6,9 @@ import { useTheme } from '../../app/theme';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useKeepAwake } from '@sayem314/react-native-keep-awake';
 
-import BoldText from '../ui/BoldText';
-import Button from '../ui/Button';
-import ProgressBar from '../Migration/ProgressBar';
+import BoldText from '../../ui/primitives/BoldText';
+import Button from '../../ui/primitives/Button';
+import ProgressBar from '../../ui/primitives/ProgressBar';
 import { AppDrawerParamList } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import { ButtonTypeEnum, RouteEnum } from '../../app/AppState';

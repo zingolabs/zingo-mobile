@@ -16,15 +16,15 @@ import {
   faPlus,
   faXmark,
 } from '@fortawesome/free-solid-svg-icons';
-import SelectBottomSheet from '../ui/SelectBottomSheet';
+import SelectBottomSheet from '../../ui/widgets/SelectBottomSheet';
 
 import Clipboard from '@react-native-clipboard/clipboard';
-import SingleAddress from '../ui/SingleAddress';
+import SingleAddress from '../../ui/widgets/SingleAddress';
 import { AppDrawerParamList } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
-import Header from '../Header';
-import BoldText from '../ui/BoldText';
-import SheetRim from '../ui/SheetRim';
+import Header from '../../ui/widgets/Header';
+import BoldText from '../../ui/primitives/BoldText';
+import SheetRim from '../../ui/primitives/SheetRim';
 
 import {
   AddressKindEnum,

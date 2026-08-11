@@ -31,16 +31,16 @@ import {
   ScreenEnum,
 } from '../../../app/AppState';
 import Utils from '../../../app/utils';
-import RegText from '../../ui/RegText';
-import ZecAmount from '../../ui/ZecAmount';
-import FadeText from '../../ui/FadeText';
+import RegText from '../../../ui/primitives/RegText';
+import ZecAmount from '../../../ui/widgets/ZecAmount';
+import FadeText from '../../../ui/primitives/FadeText';
 import { AppDrawerParamList } from '../../../app/types';
 import { ContextAppLoaded } from '../../../app/context';
-import Header from '../../Header';
-import BoldText from '../../ui/BoldText';
-import SheetRim from '../../ui/SheetRim';
-import CurrencyAmount from '../../ui/CurrencyAmount';
-import AddressItem from '../../ui/AddressItem';
+import Header from '../../../ui/widgets/Header';
+import BoldText from '../../../ui/primitives/BoldText';
+import SheetRim from '../../../ui/primitives/SheetRim';
+import CurrencyAmount from '../../../ui/widgets/CurrencyAmount';
+import AddressItem from '../../../ui/widgets/AddressItem';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 // this is for http. (red)
 import {
@@ -52,7 +52,7 @@ import {
 import BottomSheet, { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import { useFullSheetSnapPoints } from '../../../app/hooks/useFullSheetSnapPoints';
 import { RPCValueTransfersStatusEnum } from '../../../app/walletBackend/enums/RPCValueTransfersStatusEnum';
-import Button from '../../ui/Button';
+import Button from '../../../ui/primitives/Button';
 import { removeTransaction } from '../../../app/walletBackend';
 import { createAlert } from '../../../app/createAlert';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';

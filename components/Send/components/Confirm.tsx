@@ -12,7 +12,7 @@ import {
   Platform,
   TouchableOpacity,
 } from 'react-native';
-import { TriangleAlert } from '../../ui/Icons/TriangleAlert';
+import { TriangleAlert } from '../../../ui/primitives/Icons/TriangleAlert';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 import BottomSheet, {
@@ -21,17 +21,17 @@ import BottomSheet, {
   BottomSheetScrollView,
 } from '@gorhom/bottom-sheet';
 
-import FadeText from '../../ui/FadeText';
-import RegText from '../../ui/RegText';
-import BoldText from '../../ui/BoldText';
-import ZecAmount from '../../ui/ZecAmount';
-import CurrencyAmount from '../../ui/CurrencyAmount';
-import Button from '../../ui/Button';
-import SheetRim from '../../ui/SheetRim';
+import FadeText from '../../../ui/primitives/FadeText';
+import RegText from '../../../ui/primitives/RegText';
+import BoldText from '../../../ui/primitives/BoldText';
+import ZecAmount from '../../../ui/widgets/ZecAmount';
+import CurrencyAmount from '../../../ui/widgets/CurrencyAmount';
+import Button from '../../../ui/primitives/Button';
+import SheetRim from '../../../ui/primitives/SheetRim';
 import { useTheme } from '../../../app/theme';
 import { ContextAppLoaded } from '../../../app/context';
-import Header from '../../Header';
-import AddressItem from '../../ui/AddressItem';
+import Header from '../../../ui/widgets/Header';
+import AddressItem from '../../../ui/widgets/AddressItem';
 import { useBiometricGate } from '../../../app/hooks/useBiometricGate';
 import { useFullSheetSnapPoints } from '../../../app/hooks/useFullSheetSnapPoints';
 

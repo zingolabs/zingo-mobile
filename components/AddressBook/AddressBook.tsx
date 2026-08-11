@@ -31,14 +31,14 @@ import {
   ScreenEnum,
 } from '../../app/AppState';
 import { AppDrawerParamList } from '../../app/types';
-import FadeText from '../ui/FadeText';
-import BoldText from '../ui/BoldText';
-import Button from '../ui/Button';
-import SheetRim from '../ui/SheetRim';
+import FadeText from '../../ui/primitives/FadeText';
+import BoldText from '../../ui/primitives/BoldText';
+import Button from '../../ui/primitives/Button';
+import SheetRim from '../../ui/primitives/SheetRim';
 import AbDetail from './components/AbDetail';
 import AbSummaryLine from './components/AbSummaryLine';
 import { ContextAppLoaded } from '../../app/context';
-import Header from '../Header';
+import Header from '../../ui/widgets/Header';
 import AddressBookFileImpl from './AddressBookFileImpl';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {

@@ -27,11 +27,11 @@ import BottomSheet, {
   BottomSheetScrollView,
 } from '@gorhom/bottom-sheet';
 
-import RegText from '../ui/RegText';
-import FadeText from '../ui/FadeText';
-import BoldText from '../ui/BoldText';
-import Button from '../ui/Button';
-import SheetRim from '../ui/SheetRim';
+import RegText from '../../ui/primitives/RegText';
+import FadeText from '../../ui/primitives/FadeText';
+import BoldText from '../../ui/primitives/BoldText';
+import Button from '../../ui/primitives/Button';
+import SheetRim from '../../ui/primitives/SheetRim';
 import { useFullSheetSnapPoints } from '../../app/hooks/useFullSheetSnapPoints';
 import { AppDrawerParamList } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
@@ -46,7 +46,7 @@ import {
   ScreenEnum,
   RouteEnum,
 } from '../../app/AppState';
-import Header from '../Header';
+import Header from '../../ui/widgets/Header';
 import Utils from '../../app/utils';
 import SettingsFileImpl from '../Settings/SettingsFileImpl';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';

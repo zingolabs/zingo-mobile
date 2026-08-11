@@ -21,21 +21,21 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import Clipboard from '@react-native-clipboard/clipboard';
 import BottomSheet, { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 
-import RegText from '../ui/RegText';
-import BoldText from '../ui/BoldText';
-import SheetRim from '../ui/SheetRim';
-import ZecAmount from '../ui/ZecAmount';
+import RegText from '../../ui/primitives/RegText';
+import BoldText from '../../ui/primitives/BoldText';
+import SheetRim from '../../ui/primitives/SheetRim';
+import ZecAmount from '../../ui/widgets/ZecAmount';
 import { AppDrawerParamList } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import Utils from '../../app/utils';
-import FadeText from '../ui/FadeText';
-import Header from '../Header';
+import FadeText from '../../ui/primitives/FadeText';
+import Header from '../../ui/widgets/Header';
 import {
   getTotalMemobytesToAddress,
   getTotalSpendsToAddress,
   getTotalValueToAddress,
 } from '../../app/walletBackend';
-import AddressItem from '../ui/AddressItem';
+import AddressItem from '../../ui/widgets/AddressItem';
 import {
   RouteEnum,
   ScreenEnum,

@@ -40,24 +40,24 @@ import {
 } from '@react-navigation/native';
 import { useTheme } from '../../app/theme';
 import { getNumberFormatSettings } from 'react-native-localize';
-import SelectBottomSheet from '../ui/SelectBottomSheet';
+import SelectBottomSheet from '../../ui/widgets/SelectBottomSheet';
 
 import { SvgXml } from 'react-native-svg';
-import FadeText from '../ui/FadeText';
-import BoldText from '../ui/BoldText';
+import FadeText from '../../ui/primitives/FadeText';
+import BoldText from '../../ui/primitives/BoldText';
 import Swap from '../../assets/img/swap.svg';
 import NymOn from '../../assets/img/nym-on.svg';
 import NymOff from '../../assets/img/nym-off.svg';
 import NymSwitchOn from '../../assets/img/nym-switch-on.svg';
 import SwitchOff from '../../assets/img/switch-off.svg';
 import { showConfirm } from '../../app/showConfirm';
-import MixnetIcon, { mixnetPhase } from '../Header/components/MixnetIcon';
-import ErrorText from '../ui/ErrorText';
-import RegText from '../ui/RegText';
-import ZecAmount from '../ui/ZecAmount';
-import CurrencyAmount from '../ui/CurrencyAmount';
-import Button from '../ui/Button';
-import SheetRim from '../ui/SheetRim';
+import MixnetIcon, { mixnetPhase } from '../../ui/primitives/Icons/MixnetIcon';
+import ErrorText from '../../ui/primitives/ErrorText';
+import RegText from '../../ui/primitives/RegText';
+import ZecAmount from '../../ui/widgets/ZecAmount';
+import CurrencyAmount from '../../ui/widgets/CurrencyAmount';
+import Button from '../../ui/primitives/Button';
+import SheetRim from '../../ui/primitives/SheetRim';
 import {
   AddressBookFileClass,
   SendPageStateClass,
@@ -91,9 +91,9 @@ import Utils from '../../app/utils';
 import { safeSnapToIndex } from '../../app/utils/safeSnapToIndex';
 import { AppDrawerParamList } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
-import PriceFetcher from '../ui/PriceFetcher';
-import { usePriceFetcherStore } from '../ui/priceFetcherStore';
-import Header from '../Header';
+import PriceFetcher from '../../ui/widgets/PriceFetcher';
+import { usePriceFetcherStore } from '../../ui/widgets/priceFetcherStore';
+import Header from '../../ui/widgets/Header';
 import BottomSheet, {
   BottomSheetBackdrop,
   BottomSheetBackdropProps,
@@ -104,7 +104,7 @@ import { useKeyboardHeight } from '../../app/hooks/useKeyboardHeight';
 import { useDismissSheetsOnBlur } from '../../app/hooks/useDismissSheetsOnBlur';
 import { useOptionsPanelSheetSlide } from '../../app/hooks/useOptionsPanelSheetSlide';
 import { usePriceSnapAutoClose } from '../../app/hooks/usePriceSnapAutoClose';
-import AddressItem from '../ui/AddressItem';
+import AddressItem from '../../ui/widgets/AddressItem';
 import { RPCSendProposeType } from '../../app/walletBackend/types/RPCSendProposeType';
 import ShowAddressAlertAsync from './components/ShowAddressAlertAsync';
 import Memo from './components/Memo';

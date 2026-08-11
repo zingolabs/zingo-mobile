@@ -23,10 +23,10 @@ import {
   BottomSheetModal,
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
-import BoldText from '../ui/BoldText';
-import SheetRim from '../ui/SheetRim';
-import Button from '../ui/Button';
-import MixnetIcon, { mixnetPhase } from '../Header/components/MixnetIcon';
+import BoldText from '../../ui/primitives/BoldText';
+import SheetRim from '../../ui/primitives/SheetRim';
+import Button from '../../ui/primitives/Button';
+import MixnetIcon, { mixnetPhase } from '../../ui/primitives/Icons/MixnetIcon';
 import { AppDrawerParamList } from '../../app/types';
 import { AppTheme } from '../../app/theme';
 import { ContextAppLoaded } from '../../app/context';

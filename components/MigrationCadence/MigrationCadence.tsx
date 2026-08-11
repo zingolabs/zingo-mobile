@@ -10,9 +10,9 @@ import {
 import { useTheme } from '../../app/theme';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-import BoldText from '../ui/BoldText';
-import Button from '../ui/Button';
-import StepperHeader from '../Migration/StepperHeader';
+import BoldText from '../../ui/primitives/BoldText';
+import Button from '../../ui/primitives/Button';
+import StepperHeader from '../../ui/widgets/StepperHeader';
 import { AppDrawerParamList } from '../../app/types';
 import { AppTheme } from '../../app/theme';
 import { ContextAppLoaded } from '../../app/context';

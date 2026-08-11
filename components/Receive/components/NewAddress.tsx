@@ -17,14 +17,14 @@ import {
   ScreenEnum,
   SnackbarDurationEnum,
 } from '../../../app/AppState';
-import RegText from '../../ui/RegText';
+import RegText from '../../../ui/primitives/RegText';
 import { ContextAppLoaded } from '../../../app/context';
-import Button from '../../ui/Button';
+import Button from '../../../ui/primitives/Button';
 import { AddressUnifiedTypeEnum } from '../../../app/AppState';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faChevronDown, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import SelectBottomSheet from '../../ui/SelectBottomSheet';
+import SelectBottomSheet from '../../../ui/widgets/SelectBottomSheet';
 import {
   createNewTransparentAddress,
   createNewUnifiedAddress,
