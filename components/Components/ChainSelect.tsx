@@ -30,6 +30,7 @@ import { useKeyboardHeight } from '../../app/hooks/useKeyboardHeight';
 import BoldText from './BoldText';
 import FadeText from './FadeText';
 import RegText from './RegText';
+import SheetRim from './SheetRim';
 import { chainDisplayName } from '../Swap/components/chainDisplayName';
 import { getChainIcon } from '../Swap/components/chainIcons';
 
@@ -237,14 +238,9 @@ const ChainSelect: React.FunctionComponent<ChainSelectProps> = ({
               backgroundColor: colors.bgSurface,
               borderTopLeftRadius: 40,
               borderTopRightRadius: 40,
-              borderTopWidth: 1,
-              borderLeftWidth: 0.5,
-              borderRightWidth: 0.5,
-              borderTopColor: colors.bottomSheetBorder,
-              borderLeftColor: colors.bottomSheetBorder,
-              borderRightColor: colors.bottomSheetBorder,
             }}
           >
+            <SheetRim />
             <View
               style={{
                 flexDirection: 'row',
