@@ -1,10 +1,10 @@
-import { RPCMixnetModeEnum } from '../app/walletBackend/enums/RPCMixnetModeEnum';
+import { RPCMixnetModeEnum } from '@app/walletBackend/enums/RPCMixnetModeEnum';
 import {
   describeRejection,
   parseMixnetMode,
   transformMixnetDetail,
   transformMixnetStatus,
-} from '../app/walletBackend/transforms/mixnetTransform';
+} from '@app/walletBackend/transforms/mixnetTransform';
 
 describe('describeRejection', () => {
   it('carries an Error message from the error channel', () => {

@@ -2,21 +2,21 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { BackHandler, ScrollView, Text, View } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-import { useTheme } from '../../app/theme';
+import { useTheme } from '@app/theme';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useKeepAwake } from '@sayem314/react-native-keep-awake';
 
-import BoldText from '../../ui/primitives/BoldText';
-import Button from '../../ui/primitives/Button';
-import ProgressBar from '../../ui/primitives/ProgressBar';
-import { AppDrawerParamList } from '../../app/types';
-import { ContextAppLoaded } from '../../app/context';
-import { ButtonTypeEnum, RouteEnum } from '../../app/AppState';
-import Utils from '../../app/utils';
-import useTrickleProgress from '../../app/hooks/useTrickleProgress';
-import { drainOrchard, drainStatus } from '../../app/walletBackend';
-import { RPCDrainType } from '../../app/walletBackend/types/RPCDrainType';
-import { RPCDrainStatusType } from '../../app/walletBackend/types/RPCDrainStatusType';
+import BoldText from '@ui/primitives/BoldText';
+import Button from '@ui/primitives/Button';
+import ProgressBar from '@ui/primitives/ProgressBar';
+import { AppDrawerParamList } from '@app/types';
+import { ContextAppLoaded } from '@app/context';
+import { ButtonTypeEnum, RouteEnum } from '@app/AppState';
+import Utils from '@app/utils';
+import useTrickleProgress from '@app/hooks/useTrickleProgress';
+import { drainOrchard, drainStatus } from '@app/walletBackend';
+import { RPCDrainType } from '@app/walletBackend/types/RPCDrainType';
+import { RPCDrainStatusType } from '@app/walletBackend/types/RPCDrainStatusType';
 
 type MigrationSendingProps = NativeStackScreenProps<
   AppDrawerParamList,

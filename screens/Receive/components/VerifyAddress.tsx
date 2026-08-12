@@ -2,24 +2,24 @@
 import React, { useContext, useState } from 'react';
 import { View, Keyboard } from 'react-native';
 import { NavigationProp, ParamListBase } from '@react-navigation/native';
-import { useTheme } from '../../../app/theme';
+import { useTheme } from '@app/theme';
 
 import {
   ButtonTypeEnum,
   GlobalConst,
   ScreenEnum,
   SnackbarDurationEnum,
-} from '../../../app/AppState';
-import { ContextAppLoaded } from '../../../app/context';
-import Button from '../../../ui/primitives/Button';
-import { checkMyAddress } from '../../../app/walletBackend';
-import { parseZcashURI } from '../../../app/uris';
-import Utils from '../../../app/utils';
-import TextInputAddress from '../../../ui/widgets/TextInputAddress';
-import FadeText from '../../../ui/primitives/FadeText';
-import { RPCCheckAddressType } from '../../../app/walletBackend/types/RPCCheckAddressType';
-import { VerifyCheckIcon } from '../../../ui/primitives/Icons/VerifyCheckIcon';
-import { VerifyXIcon } from '../../../ui/primitives/Icons/VerifyXIcon';
+} from '@app/AppState';
+import { ContextAppLoaded } from '@app/context';
+import Button from '@ui/primitives/Button';
+import { checkMyAddress } from '@app/walletBackend';
+import { parseZcashURI } from '@app/uris';
+import Utils from '@app/utils';
+import TextInputAddress from '@ui/widgets/TextInputAddress';
+import FadeText from '@ui/primitives/FadeText';
+import { RPCCheckAddressType } from '@app/walletBackend/types/RPCCheckAddressType';
+import { VerifyCheckIcon } from '@ui/primitives/Icons/VerifyCheckIcon';
+import { VerifyXIcon } from '@ui/primitives/Icons/VerifyXIcon';
 
 type VerifyAddressProps = {
   closeSheet: () => void;

@@ -7,12 +7,12 @@ import {
   TextStyle,
   TouchableOpacity,
 } from 'react-native';
-import { useTheme } from '../../app/theme';
+import { useTheme } from '@app/theme';
 import { getNumberFormatSettings } from 'react-native-localize';
 
-import Utils from '../../app/utils';
+import Utils from '@app/utils';
 import { SvgXml } from 'react-native-svg';
-import { CurrencyNameEnum, GlobalConst } from '../../app/AppState';
+import { CurrencyNameEnum, GlobalConst } from '@app/AppState';
 
 type ZecAmountProps = {
   color?: string;

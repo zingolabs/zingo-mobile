@@ -12,9 +12,9 @@ import {
 } from '@gorhom/bottom-sheet';
 
 import { AddressBookFileClass, TranslateType } from '../../AppState';
-import BoldText from '../../../ui/primitives/BoldText';
-import SheetRim from '../../../ui/primitives/SheetRim';
-import NewAddressTag from '../../../screens/Receive/components/NewAddressTag';
+import BoldText from '@ui/primitives/BoldText';
+import SheetRim from '@ui/primitives/SheetRim';
+import NewAddressTag from '@screens/Receive/components/NewAddressTag';
 import { useKeyboardHeight } from '../../hooks/useKeyboardHeight';
 
 type AddTagModalHostProps = {

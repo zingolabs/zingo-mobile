@@ -1,11 +1,11 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState, useEffect } from 'react';
 import { Text, View, TextStyle, TouchableOpacity } from 'react-native';
-import { useTheme } from '../../app/theme';
+import { useTheme } from '@app/theme';
 import { getNumberFormatSettings } from 'react-native-localize';
 
-import Utils from '../../app/utils';
-import { CurrencyEnum } from '../../app/AppState';
+import Utils from '@app/utils';
+import { CurrencyEnum } from '@app/AppState';
 
 type CurrencyAmountProps = {
   price?: number;

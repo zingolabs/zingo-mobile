@@ -12,8 +12,8 @@ import {
 } from '@gorhom/bottom-sheet';
 
 import { ChainNameEnum, TranslateType } from '../../AppState';
-import BoldText from '../../../ui/primitives/BoldText';
-import SheetRim from '../../../ui/primitives/SheetRim';
+import BoldText from '@ui/primitives/BoldText';
+import SheetRim from '@ui/primitives/SheetRim';
 import CustomServer from './CustomServer';
 import { useKeyboardHeight } from '../../hooks/useKeyboardHeight';
 

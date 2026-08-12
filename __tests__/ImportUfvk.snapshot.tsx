@@ -6,11 +6,11 @@ import 'react-native';
 import React from 'react';
 
 import { render } from '@testing-library/react-native';
-import { ImportUfvk } from '../app/LoadingApp';
+import { ImportUfvk } from '@app/LoadingApp';
 import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
-} from '../app/context';
+} from '@app/context';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';

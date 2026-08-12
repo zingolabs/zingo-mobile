@@ -7,31 +7,31 @@ import React, {
   useState,
 } from 'react';
 import { ActivityIndicator, ScrollView, Text, View } from 'react-native';
-import { useTheme } from '../../app/theme';
+import { useTheme } from '@app/theme';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-import BoldText from '../../ui/primitives/BoldText';
-import Button from '../../ui/primitives/Button';
-import StepperHeader from '../../ui/widgets/StepperHeader';
-import { AppDrawerParamList } from '../../app/types';
-import { ContextAppLoaded } from '../../app/context';
+import BoldText from '@ui/primitives/BoldText';
+import Button from '@ui/primitives/Button';
+import StepperHeader from '@ui/widgets/StepperHeader';
+import { AppDrawerParamList } from '@app/types';
+import { ContextAppLoaded } from '@app/context';
 import {
   ButtonTypeEnum,
   RouteEnum,
   TARGET_BLOCK_SPACING_SECONDS,
   estimatedTimestampMs,
   windowTargetHeight,
-} from '../../app/AppState';
-import Utils from '../../app/utils';
-import { migrationStatus } from '../../app/walletBackend';
+} from '@app/AppState';
+import Utils from '@app/utils';
+import { migrationStatus } from '@app/walletBackend';
 import {
   RPCMigrationStatusType,
   RPCBroadcastWindowType,
-} from '../../app/walletBackend/types/RPCMigrationStatusType';
+} from '@app/walletBackend/types/RPCMigrationStatusType';
 import {
   armBatchReminders,
   requestReminderPermission,
-} from '../../app/notifications/reminders';
+} from '@app/notifications/reminders';
 
 type MigrationScheduleProps = NativeStackScreenProps<
   AppDrawerParamList,

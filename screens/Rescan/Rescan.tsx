@@ -2,7 +2,7 @@
 import React, { useCallback, useContext, useRef, useState } from 'react';
 import { View, TouchableOpacity } from 'react-native';
 
-import { useTheme } from '../../app/theme';
+import { useTheme } from '@app/theme';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 import BottomSheet, {
@@ -11,23 +11,23 @@ import BottomSheet, {
   BottomSheetScrollView,
 } from '@gorhom/bottom-sheet';
 
-import RegText from '../../ui/primitives/RegText';
-import BoldText from '../../ui/primitives/BoldText';
-import Button from '../../ui/primitives/Button';
-import SheetRim from '../../ui/primitives/SheetRim';
-import { AppDrawerParamList } from '../../app/types';
-import { ContextAppLoaded } from '../../app/context';
-import { useBiometricGate } from '../../app/hooks/useBiometricGate';
-import Header from '../../ui/widgets/Header';
+import RegText from '@ui/primitives/RegText';
+import BoldText from '@ui/primitives/BoldText';
+import Button from '@ui/primitives/Button';
+import SheetRim from '@ui/primitives/SheetRim';
+import { AppDrawerParamList } from '@app/types';
+import { ContextAppLoaded } from '@app/context';
+import { useBiometricGate } from '@app/hooks/useBiometricGate';
+import Header from '@ui/widgets/Header';
 import {
   ButtonTypeEnum,
   RouteEnum,
   ScreenEnum,
   SelectServerEnum,
   SnackbarDurationEnum,
-} from '../../app/AppState';
+} from '@app/AppState';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { useFullSheetSnapPoints } from '../../app/hooks/useFullSheetSnapPoints';
+import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
 
 type RescanProps = NativeStackScreenProps<
   AppDrawerParamList,

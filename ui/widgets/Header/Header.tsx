@@ -6,7 +6,7 @@ import {
   ParamListBase,
   useNavigation,
 } from '@react-navigation/native';
-import { useTheme } from '../../../app/theme';
+import { useTheme } from '@app/theme';
 import React, { useContext, useEffect } from 'react';
 import { Image, TouchableOpacity, View } from 'react-native';
 import Animated, {
@@ -15,7 +15,7 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-import { useOptionsPanel } from '../../../app/context/optionsPanel';
+import { useOptionsPanel } from '@app/context/optionsPanel';
 
 // Mirror the panel host's fade duration so the header dissolves in lockstep
 // with the panel that's appearing over it.
@@ -28,11 +28,11 @@ import {
   SnackbarDurationEnum,
   TranslateType,
   UfvkActionEnum,
-} from '../../../app/AppState';
-import { ContextAppLoaded } from '../../../app/context';
-import { getZingoLogo } from '../../../app/utils/ZingoAppData';
-import { useShieldFunds } from '../../../app/hooks/useShieldFunds';
-import { useSyncStatus } from '../../../app/hooks/useSyncStatus';
+} from '@app/AppState';
+import { ContextAppLoaded } from '@app/context';
+import { getZingoLogo } from '@app/utils/ZingoAppData';
+import { useShieldFunds } from '@app/hooks/useShieldFunds';
+import { useSyncStatus } from '@app/hooks/useSyncStatus';
 import BoldText from '../../primitives/BoldText';
 import SyncStatusBar from './components/SyncStatusBar';
 import BalanceRow from './components/BalanceRow';

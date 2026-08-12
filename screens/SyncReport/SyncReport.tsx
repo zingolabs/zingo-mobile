@@ -9,17 +9,17 @@ import React, {
 } from 'react';
 import { View, Text, ActivityIndicator, TouchableOpacity } from 'react-native';
 
-import { useTheme } from '../../app/theme';
+import { useTheme } from '@app/theme';
 
-import { AppDrawerParamList } from '../../app/types';
-import DetailLine from '../../ui/widgets/DetailLine';
-import { ContextAppLoaded } from '../../app/context';
+import { AppDrawerParamList } from '@app/types';
+import DetailLine from '@ui/widgets/DetailLine';
+import { ContextAppLoaded } from '@app/context';
 
-import Header from '../../ui/widgets/Header';
+import Header from '@ui/widgets/Header';
 import { NetInfoStateType } from '@react-native-community/netinfo/src/index';
-import RegText from '../../ui/primitives/RegText';
-import BoldText from '../../ui/primitives/BoldText';
-import SheetRim from '../../ui/primitives/SheetRim';
+import RegText from '@ui/primitives/RegText';
+import BoldText from '@ui/primitives/BoldText';
+import SheetRim from '@ui/primitives/SheetRim';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
   faChevronLeft,
@@ -27,17 +27,17 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { isEqual } from 'lodash';
 import BottomSheet, { BottomSheetScrollView } from '@gorhom/bottom-sheet';
-import { RPCSyncStatusType } from '../../app/walletBackend/types/RPCSyncStatusType';
-import { RPCSyncScanRangeStatusType } from '../../app/walletBackend/types/RPCSyncScanRangeStatusType';
-import { RPCSyncScanRangePriorityStatusEnum } from '../../app/walletBackend/enums/RPCSyncScanRangePriorityStatusEnum';
-import { ButtonTypeEnum, RouteEnum, ScreenEnum } from '../../app/AppState';
+import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
+import { RPCSyncScanRangeStatusType } from '@app/walletBackend/types/RPCSyncScanRangeStatusType';
+import { RPCSyncScanRangePriorityStatusEnum } from '@app/walletBackend/enums/RPCSyncScanRangePriorityStatusEnum';
+import { ButtonTypeEnum, RouteEnum, ScreenEnum } from '@app/AppState';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import Button from '../../ui/primitives/Button';
-import { createAlert } from '../../app/services/createAlert';
-import { sendEmail } from '../../app/services/sendEmail';
-import Utils from '../../app/utils';
-import { useFullSheetSnapPoints } from '../../app/hooks/useFullSheetSnapPoints';
-//import { ModeEnum } from '../../app/AppState';
+import Button from '@ui/primitives/Button';
+import { createAlert } from '@app/services/createAlert';
+import { sendEmail } from '@app/services/sendEmail';
+import Utils from '@app/utils';
+import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
+//import { ModeEnum } from '@app/AppState';
 
 type SyncReportProps = NativeStackScreenProps<
   AppDrawerParamList,

@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
-import { ButtonTypeEnum } from '../../app/AppState';
+import { ButtonTypeEnum } from '@app/AppState';
 import Button from './Button';
 
 const meta: Meta<typeof Button> = {

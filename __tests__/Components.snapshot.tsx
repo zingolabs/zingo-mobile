@@ -6,13 +6,13 @@ import 'react-native';
 import React from 'react';
 
 import { render } from '@testing-library/react-native';
-import CurrencyAmount from '../ui/widgets/CurrencyAmount';
-import ZecAmount from '../ui/widgets/ZecAmount';
-import BoldText from '../ui/primitives/BoldText';
-import FadeText from '../ui/primitives/FadeText';
-import ErrorText from '../ui/primitives/ErrorText';
-import RegText from '../ui/primitives/RegText';
-import { CurrencyEnum, CurrencyNameEnum } from '../app/AppState';
+import CurrencyAmount from '@ui/widgets/CurrencyAmount';
+import ZecAmount from '@ui/widgets/ZecAmount';
+import BoldText from '@ui/primitives/BoldText';
+import FadeText from '@ui/primitives/FadeText';
+import ErrorText from '@ui/primitives/ErrorText';
+import RegText from '@ui/primitives/RegText';
+import { CurrencyEnum, CurrencyNameEnum } from '@app/AppState';
 
 // test suite
 describe('Component Components - test', () => {

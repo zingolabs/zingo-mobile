@@ -13,7 +13,7 @@ import {
   Dimensions,
 } from 'react-native';
 
-import { useTheme } from '../../app/theme';
+import { useTheme } from '@app/theme';
 import { PieChart, pieDataItem } from 'react-native-gifted-charts';
 import { Text as SvgText } from 'react-native-svg';
 import { faChevronLeft, faQrcode } from '@fortawesome/free-solid-svg-icons';
@@ -21,28 +21,28 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import Clipboard from '@react-native-clipboard/clipboard';
 import BottomSheet, { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 
-import RegText from '../../ui/primitives/RegText';
-import BoldText from '../../ui/primitives/BoldText';
-import SheetRim from '../../ui/primitives/SheetRim';
-import ZecAmount from '../../ui/widgets/ZecAmount';
-import { AppDrawerParamList } from '../../app/types';
-import { ContextAppLoaded } from '../../app/context';
-import Utils from '../../app/utils';
-import FadeText from '../../ui/primitives/FadeText';
-import Header from '../../ui/widgets/Header';
+import RegText from '@ui/primitives/RegText';
+import BoldText from '@ui/primitives/BoldText';
+import SheetRim from '@ui/primitives/SheetRim';
+import ZecAmount from '@ui/widgets/ZecAmount';
+import { AppDrawerParamList } from '@app/types';
+import { ContextAppLoaded } from '@app/context';
+import Utils from '@app/utils';
+import FadeText from '@ui/primitives/FadeText';
+import Header from '@ui/widgets/Header';
 import {
   getTotalMemobytesToAddress,
   getTotalSpendsToAddress,
   getTotalValueToAddress,
-} from '../../app/walletBackend';
-import AddressItem from '../../ui/widgets/AddressItem';
+} from '@app/walletBackend';
+import AddressItem from '@ui/widgets/AddressItem';
 import {
   RouteEnum,
   ScreenEnum,
   SnackbarDurationEnum,
-} from '../../app/AppState';
+} from '@app/AppState';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { useFullSheetSnapPoints } from '../../app/hooks/useFullSheetSnapPoints';
+import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
 
 type DataType = {
   svg: {

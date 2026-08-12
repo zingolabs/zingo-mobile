@@ -1,9 +1,9 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
 import { View, TouchableOpacity } from 'react-native';
-import { showConfirm } from '../../../app/services/showConfirm';
+import { showConfirm } from '@app/services/showConfirm';
 import { NavigationProp, ParamListBase, useNavigation } from '@react-navigation/native';
-import { useTheme } from '../../../app/theme';
+import { useTheme } from '@app/theme';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
   faAddressCard,
@@ -14,7 +14,7 @@ import {
   faWallet,
 } from '@fortawesome/free-solid-svg-icons';
 
-import FadeText from '../../../ui/primitives/FadeText';
+import FadeText from '@ui/primitives/FadeText';
 import {
   AddressBookActionEnum,
   AddressBookFileClass,
@@ -25,10 +25,10 @@ import {
   ModeEnum,
   RouteEnum,
   SelectServerEnum,
-} from '../../../app/AppState';
-import Utils from '../../../app/utils';
-import { ContextAppLoaded } from '../../../app/context';
-import { ChainLogo } from '../../../ui/widgets/ChainSelect';
+} from '@app/AppState';
+import Utils from '@app/utils';
+import { ContextAppLoaded } from '@app/context';
+import { ChainLogo } from '@ui/widgets/ChainSelect';
 
 type AbSummaryLineProps = {
   index: number;

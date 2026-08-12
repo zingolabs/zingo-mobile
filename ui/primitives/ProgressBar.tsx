@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import { Animated, StyleSheet, View } from 'react-native';
-import { useTheme } from '../../app/theme';
+import { useTheme } from '@app/theme';
 
 
 type ProgressBarProps = {

@@ -20,7 +20,7 @@ import {
 } from 'react-native';
 
 import { useScrollToTop } from '@react-navigation/native';
-import { useTheme } from '../../app/theme';
+import { useTheme } from '@app/theme';
 import {
   AddressBookActionEnum,
   AddressBookFileClass,
@@ -29,17 +29,17 @@ import {
   FilterEnum,
   RouteEnum,
   ScreenEnum,
-} from '../../app/AppState';
-import { AppDrawerParamList } from '../../app/types';
-import FadeText from '../../ui/primitives/FadeText';
-import BoldText from '../../ui/primitives/BoldText';
-import Button from '../../ui/primitives/Button';
-import SheetRim from '../../ui/primitives/SheetRim';
+} from '@app/AppState';
+import { AppDrawerParamList } from '@app/types';
+import FadeText from '@ui/primitives/FadeText';
+import BoldText from '@ui/primitives/BoldText';
+import Button from '@ui/primitives/Button';
+import SheetRim from '@ui/primitives/SheetRim';
 import AbDetail from './components/AbDetail';
 import AbSummaryLine from './components/AbSummaryLine';
-import { ContextAppLoaded } from '../../app/context';
-import Header from '../../ui/widgets/Header';
-import AddressBookFileImpl from '../../app/services/AddressBookFileImpl';
+import { ContextAppLoaded } from '@app/context';
+import Header from '@ui/widgets/Header';
+import AddressBookFileImpl from '@app/services/AddressBookFileImpl';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
   faAngleUp,
@@ -55,11 +55,11 @@ import BottomSheet, {
   BottomSheetModal,
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
-import Utils from '../../app/utils';
-import { isWalletAddress } from '../../app/walletBackend';
+import Utils from '@app/utils';
+import { isWalletAddress } from '@app/walletBackend';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { useFullSheetSnapPoints } from '../../app/hooks/useFullSheetSnapPoints';
-import { useKeyboardHeight } from '../../app/hooks/useKeyboardHeight';
+import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
+import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
 
 type AddressBookProps = NativeStackScreenProps<
   AppDrawerParamList,

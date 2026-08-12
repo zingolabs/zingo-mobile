@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
 import React from 'react';
-import { useTheme } from '../../../app/theme';
+import { useTheme } from '@app/theme';
 import { MenuMorphIcon } from './MenuMorphIcon';
 import {
   OptionsPanelProvider,
   useOptionsPanel,
-} from '../../../app/context/optionsPanel';
+} from '@app/context/optionsPanel';
 
 const Driver: React.FunctionComponent<{ open: boolean; size: number }> = ({
   open,

@@ -8,10 +8,10 @@ import { render } from '@testing-library/react-native';
 import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
-} from '../app/context';
+} from '@app/context';
 
-import AbSummaryLine from '../screens/AddressBook/components/AbSummaryLine';
-import { AddressBookActionEnum, ModeEnum } from '../app/AppState';
+import AbSummaryLine from '@screens/AddressBook/components/AbSummaryLine';
+import { AddressBookActionEnum, ModeEnum } from '@app/AppState';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockAddressBook } from '../__mocks__/dataMocks/mockAddressBook';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';

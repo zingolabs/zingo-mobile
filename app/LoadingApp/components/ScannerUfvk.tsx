@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-import Scanner from '../../../ui/widgets/Scanner';
+import Scanner from '@ui/widgets/Scanner';
 import { RouteEnum } from '../../AppState';
 import { AppStackParamList } from '../../types';
 

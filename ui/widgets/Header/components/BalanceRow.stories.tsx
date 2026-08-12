@@ -3,7 +3,7 @@ import {
   CurrencyEnum,
   ModeEnum,
   SelectServerEnum,
-} from '../../../../app/AppState';
+} from '@app/AppState';
 import BalanceRow from './BalanceRow';
 import {
   mockTranslate,

@@ -2,23 +2,23 @@
 import React, { useCallback, useContext, useRef, useState } from 'react';
 import { View, ActivityIndicator, TouchableOpacity } from 'react-native';
 
-import { useTheme } from '../../app/theme';
+import { useTheme } from '@app/theme';
 
-import ZecAmount from '../../ui/widgets/ZecAmount';
-import BoldText from '../../ui/primitives/BoldText';
-import SheetRim from '../../ui/primitives/SheetRim';
-import DetailLine from '../../ui/widgets/DetailLine';
-import { AppDrawerParamList } from '../../app/types';
-import { ContextAppLoaded } from '../../app/context';
-import Header from '../../ui/widgets/Header';
+import ZecAmount from '@ui/widgets/ZecAmount';
+import BoldText from '@ui/primitives/BoldText';
+import SheetRim from '@ui/primitives/SheetRim';
+import DetailLine from '@ui/widgets/DetailLine';
+import { AppDrawerParamList } from '@app/types';
+import { ContextAppLoaded } from '@app/context';
+import Header from '@ui/widgets/Header';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import FadeText from '../../ui/primitives/FadeText';
+import FadeText from '@ui/primitives/FadeText';
 import { faChevronLeft, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import BottomSheet, { BottomSheetScrollView } from '@gorhom/bottom-sheet';
-import { RouteEnum, ScreenEnum } from '../../app/AppState';
+import { RouteEnum, ScreenEnum } from '@app/AppState';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-import { useFullSheetSnapPoints } from '../../app/hooks/useFullSheetSnapPoints';
+import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
 
 type PoolsProps = NativeStackScreenProps<AppDrawerParamList, RouteEnum.Pools>;
 

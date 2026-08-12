@@ -1,9 +1,9 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useEffect, useRef } from 'react';
 import { Animated, Easing, StyleSheet, View } from 'react-native';
-import { useTheme } from '../../app/theme';
+import { useTheme } from '@app/theme';
 
-import useReduceMotion from '../../app/hooks/useReduceMotion';
+import useReduceMotion from '@app/hooks/useReduceMotion';
 
 // A segment lights up where it stands instead of growing across itself, so a
 // confirmation reads as a switch thrown rather than a distance covered. Opacity

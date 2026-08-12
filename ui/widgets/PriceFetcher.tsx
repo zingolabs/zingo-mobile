@@ -5,13 +5,13 @@ import {
   ActivityIndicator,
   ViewStyle,
 } from 'react-native';
-import { useTheme } from '../../app/theme';
+import { useTheme } from '@app/theme';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faRotateRight } from '@fortawesome/free-solid-svg-icons';
-import { ContextAppLoaded } from '../../app/context';
+import { ContextAppLoaded } from '@app/context';
 import RegText from '../primitives/RegText';
-import { ModeEnum } from '../../app/AppState';
-import { showConfirm, ConfirmButton } from '../../app/services/showConfirm';
+import { ModeEnum } from '@app/AppState';
+import { showConfirm, ConfirmButton } from '@app/services/showConfirm';
 import QuoteRefreshRing from '../primitives/QuoteRefreshRing';
 import {
   PRICE_AUTO_REFRESH_MS,

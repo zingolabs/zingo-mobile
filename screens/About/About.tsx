@@ -2,22 +2,22 @@
 import React, { useCallback, useContext, useRef, useState } from 'react';
 import { View, TouchableOpacity } from 'react-native';
 
-import { useTheme } from '../../app/theme';
+import { useTheme } from '@app/theme';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 import BottomSheet, { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 
-import FadeText from '../../ui/primitives/FadeText';
-import BoldText from '../../ui/primitives/BoldText';
-import SheetRim from '../../ui/primitives/SheetRim';
-import { AppDrawerParamList } from '../../app/types';
-import { ContextAppLoaded } from '../../app/context';
-import Header from '../../ui/widgets/Header';
-import DetailLine from '../../ui/widgets/DetailLine';
-import { RouteEnum, ScreenEnum } from '../../app/AppState';
-import { getZingoName, getZingoVersion } from '../../app/utils/ZingoAppData';
+import FadeText from '@ui/primitives/FadeText';
+import BoldText from '@ui/primitives/BoldText';
+import SheetRim from '@ui/primitives/SheetRim';
+import { AppDrawerParamList } from '@app/types';
+import { ContextAppLoaded } from '@app/context';
+import Header from '@ui/widgets/Header';
+import DetailLine from '@ui/widgets/DetailLine';
+import { RouteEnum, ScreenEnum } from '@app/AppState';
+import { getZingoName, getZingoVersion } from '@app/utils/ZingoAppData';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { useFullSheetSnapPoints } from '../../app/hooks/useFullSheetSnapPoints';
+import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
 
 type AboutProps = NativeStackScreenProps<AppDrawerParamList, RouteEnum.About>;
 

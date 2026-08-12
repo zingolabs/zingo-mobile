@@ -2,9 +2,9 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { ActivityIndicator, TouchableOpacity, View } from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
-import { ContextAppLoaded } from '../../app/context';
+import { ContextAppLoaded } from '@app/context';
 import RegText from '../primitives/RegText';
-import Utils from '../../app/utils';
+import Utils from '@app/utils';
 import {
   AddressBookFileClass,
   SendPageStateClass,
@@ -14,9 +14,9 @@ import {
   RouteEnum,
   SelectServerEnum,
   ScreenEnum,
-} from '../../app/AppState';
+} from '@app/AppState';
 import { NavigationProp, ParamListBase, useNavigation } from '@react-navigation/native';
-import { useTheme } from '../../app/theme';
+import { useTheme } from '@app/theme';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faUserPlus, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
 

@@ -9,7 +9,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 
 import { LoadedApp } from './LoadedApp';
 import { LoadingApp } from './LoadingApp';
-import ScannerAddress from '../screens/Send/components/ScannerAddress';
+import ScannerAddress from '@screens/Send/components/ScannerAddress';
 import ScannerUfvk from './LoadingApp/components/ScannerUfvk';
 import { AppStackParamList } from './types';
 import { RouteEnum } from './AppState';

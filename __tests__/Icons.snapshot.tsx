@@ -6,18 +6,18 @@ import 'react-native';
 import React from 'react';
 import { render } from '@testing-library/react-native';
 
-import { BiohazardIcon } from '../ui/primitives/Icons/BiohazardIcon';
-import { ChevronUp, ChevronDown } from '../ui/primitives/Icons/Chevron';
-import { CopyIcon } from '../ui/primitives/Icons/CopyIcon';
-import { EyeIcon } from '../ui/primitives/Icons/EyeIcon';
-import { FiltersIcon } from '../ui/primitives/Icons/FiltersIcon';
-import { ListIcon } from '../ui/primitives/Icons/ListIcon';
-import { ShieldIcon } from '../ui/primitives/Icons/ShieldIcon';
-import { SkullIcon } from '../ui/primitives/Icons/SkullIcon';
-import { TriangleAlert } from '../ui/primitives/Icons/TriangleAlert';
-import { VerifyCheckIcon } from '../ui/primitives/Icons/VerifyCheckIcon';
-import { VerifyXIcon } from '../ui/primitives/Icons/VerifyXIcon';
-import { XIcon } from '../ui/primitives/Icons/XIcon';
+import { BiohazardIcon } from '@ui/primitives/Icons/BiohazardIcon';
+import { ChevronUp, ChevronDown } from '@ui/primitives/Icons/Chevron';
+import { CopyIcon } from '@ui/primitives/Icons/CopyIcon';
+import { EyeIcon } from '@ui/primitives/Icons/EyeIcon';
+import { FiltersIcon } from '@ui/primitives/Icons/FiltersIcon';
+import { ListIcon } from '@ui/primitives/Icons/ListIcon';
+import { ShieldIcon } from '@ui/primitives/Icons/ShieldIcon';
+import { SkullIcon } from '@ui/primitives/Icons/SkullIcon';
+import { TriangleAlert } from '@ui/primitives/Icons/TriangleAlert';
+import { VerifyCheckIcon } from '@ui/primitives/Icons/VerifyCheckIcon';
+import { VerifyXIcon } from '@ui/primitives/Icons/VerifyXIcon';
+import { XIcon } from '@ui/primitives/Icons/XIcon';
 
 const iconProps = { size: 24, color: '#000000' };
 

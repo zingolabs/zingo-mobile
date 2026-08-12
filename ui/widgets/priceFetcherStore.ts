@@ -1,5 +1,5 @@
 import { useEffect, useReducer } from 'react';
-import { getZecPrice } from '../../app/walletBackend';
+import { getZecPrice } from '@app/walletBackend';
 
 /**
  * Shared, singleton state for every <PriceFetcher/> on screen.

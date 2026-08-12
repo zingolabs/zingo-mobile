@@ -7,25 +7,25 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { useTheme } from '../../app/theme';
+import { useTheme } from '@app/theme';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-import BoldText from '../../ui/primitives/BoldText';
-import Button from '../../ui/primitives/Button';
-import StepperHeader from '../../ui/widgets/StepperHeader';
-import { AppDrawerParamList } from '../../app/types';
-import { AppTheme } from '../../app/theme';
-import { ContextAppLoaded } from '../../app/context';
-import { ButtonTypeEnum, RouteEnum } from '../../app/AppState';
+import BoldText from '@ui/primitives/BoldText';
+import Button from '@ui/primitives/Button';
+import StepperHeader from '@ui/widgets/StepperHeader';
+import { AppDrawerParamList } from '@app/types';
+import { AppTheme } from '@app/theme';
+import { ContextAppLoaded } from '@app/context';
+import { ButtonTypeEnum, RouteEnum } from '@app/AppState';
 import {
   migrationStatus,
   planIronwoodMigration,
   routeCadencePlan,
   routeStartMigration,
   startIronwoodMigration,
-} from '../../app/walletBackend';
-import { RPCMigrationStatusType } from '../../app/walletBackend/types/RPCMigrationStatusType';
-import { RPCMigrationPlanType } from '../../app/walletBackend/types/RPCMigrationPlanType';
+} from '@app/walletBackend';
+import { RPCMigrationStatusType } from '@app/walletBackend/types/RPCMigrationStatusType';
+import { RPCMigrationPlanType } from '@app/walletBackend/types/RPCMigrationPlanType';
 
 type MigrationCadenceProps = NativeStackScreenProps<
   AppDrawerParamList,

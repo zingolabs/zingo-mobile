@@ -30,13 +30,13 @@ import TransactionFailedIcon from '../../../assets/img/transaction-failed.svg';
 const RING_GREEN = '#149D05';
 const RING_RED = '#822929';
 
-import RegText from '../../../ui/primitives/RegText';
-import BoldText from '../../../ui/primitives/BoldText';
-import Button from '../../../ui/primitives/Button';
-import SheetRim from '../../../ui/primitives/SheetRim';
+import RegText from '@ui/primitives/RegText';
+import BoldText from '@ui/primitives/BoldText';
+import Button from '@ui/primitives/Button';
+import SheetRim from '@ui/primitives/SheetRim';
 import { AppDrawerParamList } from '../../types';
 import { ContextAppLoaded } from '../../context';
-import Header from '../../../ui/widgets/Header';
+import Header from '@ui/widgets/Header';
 import { ButtonTypeEnum, RouteEnum, ScreenEnum } from '../../AppState';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useFullSheetSnapPoints } from '../../hooks/useFullSheetSnapPoints';

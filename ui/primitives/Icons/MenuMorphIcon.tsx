@@ -7,11 +7,11 @@ import Animated, {
 } from 'react-native-reanimated';
 import Svg, { Path } from 'react-native-svg';
 
-import { useOptionsPanel } from '../../../app/context/optionsPanel';
+import { useOptionsPanel } from '@app/context/optionsPanel';
 import {
   SLIDE_DURATION_MS,
   SLIDE_EASING,
-} from '../../../app/hooks/useOptionsPanelSheetSlide';
+} from '@app/hooks/useOptionsPanelSheetSlide';
 
 const AnimatedPath = Animated.createAnimatedComponent(Path);
 

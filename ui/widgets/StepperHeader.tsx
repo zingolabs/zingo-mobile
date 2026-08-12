@@ -1,12 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
 import { Text, View } from 'react-native';
-import { useTheme } from '../../app/theme';
+import { useTheme } from '@app/theme';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
 
-import { AppTheme } from '../../app/theme';
-import { ContextAppLoaded } from '../../app/context';
+import { AppTheme } from '@app/theme';
+import { ContextAppLoaded } from '@app/context';
 
 type StepCircleProps = {
   label: string;

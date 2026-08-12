@@ -2,12 +2,12 @@
 import React, { ReactNode, useContext } from 'react';
 import { TouchableOpacity, View } from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
-import { useTheme } from '../../app/theme';
+import { useTheme } from '@app/theme';
 
 import FadeText from '../primitives/FadeText';
 import RegText from '../primitives/RegText';
-import { ContextAppLoaded } from '../../app/context';
-import { SnackbarDurationEnum } from '../../app/AppState';
+import { ContextAppLoaded } from '@app/context';
+import { SnackbarDurationEnum } from '@app/AppState';
 
 type DetailLineProps = {
   label: string;

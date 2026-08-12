@@ -2,7 +2,7 @@
 import React, { useCallback, useContext, useEffect, useRef } from 'react';
 import { Animated, View, TouchableOpacity } from 'react-native';
 import { NavigationProp, ParamListBase, useNavigation } from '@react-navigation/native';
-import { useTheme } from '../../../app/theme';
+import { useTheme } from '@app/theme';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
   faArrowDown,
@@ -17,8 +17,8 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 
-import ZecAmount from '../../../ui/widgets/ZecAmount';
-import FadeText from '../../../ui/primitives/FadeText';
+import ZecAmount from '@ui/widgets/ZecAmount';
+import FadeText from '@ui/primitives/FadeText';
 import {
   ValueTransferType,
   ValueTransferKindEnum,
@@ -28,13 +28,13 @@ import {
   RouteEnum,
   SelectServerEnum,
   ScreenEnum,
-} from '../../../app/AppState';
+} from '@app/AppState';
 
-import { ContextAppLoaded } from '../../../app/context';
-import AddressItem from '../../../ui/widgets/AddressItem';
-import { RPCValueTransfersStatusEnum } from '../../../app/walletBackend/enums/RPCValueTransfersStatusEnum';
-import Utils from '../../../app/utils';
-//import Utils from '../../../app/utils';
+import { ContextAppLoaded } from '@app/context';
+import AddressItem from '@ui/widgets/AddressItem';
+import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
+import Utils from '@app/utils';
+//import Utils from '@app/utils';
 
 type ValueTransferLineProps = {
   index: number;

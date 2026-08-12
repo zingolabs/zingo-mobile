@@ -7,7 +7,7 @@ import {
   Pressable,
   TouchableOpacity,
 } from 'react-native';
-import { useTheme } from '../../../app/theme';
+import { useTheme } from '@app/theme';
 
 import {
   AddressBookFileClass,
@@ -16,23 +16,23 @@ import {
   ReceiverEnum,
   ScreenEnum,
   SnackbarDurationEnum,
-} from '../../../app/AppState';
-import RegText from '../../../ui/primitives/RegText';
-import { ContextAppLoaded } from '../../../app/context';
-import Button from '../../../ui/primitives/Button';
-import { AddressUnifiedTypeEnum } from '../../../app/AppState';
+} from '@app/AppState';
+import RegText from '@ui/primitives/RegText';
+import { ContextAppLoaded } from '@app/context';
+import Button from '@ui/primitives/Button';
+import { AddressUnifiedTypeEnum } from '@app/AppState';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faChevronDown, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import SelectBottomSheet from '../../../ui/widgets/SelectBottomSheet';
+import SelectBottomSheet from '@ui/widgets/SelectBottomSheet';
 import {
   createNewTransparentAddress,
   createNewUnifiedAddress,
-} from '../../../app/walletBackend';
-import { RPCUnifiedAddressType } from '../../../app/walletBackend/types/RPCUnifiedAddressType';
-import { RPCTransparentAddressType } from '../../../app/walletBackend/types/RPCTransparentAddressType';
-import Utils from '../../../app/utils';
-import AddressBookFileImpl from '../../../app/services/AddressBookFileImpl';
+} from '@app/walletBackend';
+import { RPCUnifiedAddressType } from '@app/walletBackend/types/RPCUnifiedAddressType';
+import { RPCTransparentAddressType } from '@app/walletBackend/types/RPCTransparentAddressType';
+import Utils from '@app/utils';
+import AddressBookFileImpl from '@app/services/AddressBookFileImpl';
 
 type NewAddressProps = {
   addressKind: AddressKindEnum;

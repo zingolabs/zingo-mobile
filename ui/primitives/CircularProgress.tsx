@@ -2,7 +2,7 @@
 import React from 'react';
 import { View } from 'react-native';
 import { Svg, Circle, Text as SVGText } from 'react-native-svg';
-import { useTheme } from '../../app/theme';
+import { useTheme } from '@app/theme';
 
 
 type circularProgressProps = {

@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
-import { ChainNameEnum } from '../../app/AppState';
+import { ChainNameEnum } from '@app/AppState';
 import ChainTypeToggle from './ChainTypeToggle';
 import { mockTranslate } from '../../.storybook/storyDecorators';
 

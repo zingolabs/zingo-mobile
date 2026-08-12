@@ -13,7 +13,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { useTheme } from '../../app/theme';
+import { useTheme } from '@app/theme';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
@@ -23,15 +23,15 @@ import {
   BottomSheetModal,
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
-import BoldText from '../../ui/primitives/BoldText';
-import SheetRim from '../../ui/primitives/SheetRim';
-import Button from '../../ui/primitives/Button';
-import MixnetIcon, { mixnetPhase } from '../../ui/primitives/Icons/MixnetIcon';
-import { AppDrawerParamList } from '../../app/types';
-import { AppTheme } from '../../app/theme';
-import { ContextAppLoaded } from '../../app/context';
-import { ButtonTypeEnum, RouteEnum } from '../../app/AppState';
-import Utils from '../../app/utils';
+import BoldText from '@ui/primitives/BoldText';
+import SheetRim from '@ui/primitives/SheetRim';
+import Button from '@ui/primitives/Button';
+import MixnetIcon, { mixnetPhase } from '@ui/primitives/Icons/MixnetIcon';
+import { AppDrawerParamList } from '@app/types';
+import { AppTheme } from '@app/theme';
+import { ContextAppLoaded } from '@app/context';
+import { ButtonTypeEnum, RouteEnum } from '@app/AppState';
+import Utils from '@app/utils';
 
 const NYM_GREEN = '#07FF94';
 

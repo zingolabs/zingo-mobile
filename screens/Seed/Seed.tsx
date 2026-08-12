@@ -14,10 +14,10 @@ import {
   ActivityIndicator,
   Platform,
 } from 'react-native';
-import { showConfirm } from '../../app/services/showConfirm';
+import { showConfirm } from '@app/services/showConfirm';
 
 import { NavigationProp, ParamListBase, useNavigation } from '@react-navigation/native';
-import { useTheme } from '../../app/theme';
+import { useTheme } from '@app/theme';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
@@ -27,15 +27,15 @@ import BottomSheet, {
   BottomSheetScrollView,
 } from '@gorhom/bottom-sheet';
 
-import RegText from '../../ui/primitives/RegText';
-import FadeText from '../../ui/primitives/FadeText';
-import BoldText from '../../ui/primitives/BoldText';
-import Button from '../../ui/primitives/Button';
-import SheetRim from '../../ui/primitives/SheetRim';
-import { useFullSheetSnapPoints } from '../../app/hooks/useFullSheetSnapPoints';
-import { AppDrawerParamList } from '../../app/types';
-import { ContextAppLoaded } from '../../app/context';
-import { useBiometricGate } from '../../app/hooks/useBiometricGate';
+import RegText from '@ui/primitives/RegText';
+import FadeText from '@ui/primitives/FadeText';
+import BoldText from '@ui/primitives/BoldText';
+import Button from '@ui/primitives/Button';
+import SheetRim from '@ui/primitives/SheetRim';
+import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
+import { AppDrawerParamList } from '@app/types';
+import { ContextAppLoaded } from '@app/context';
+import { useBiometricGate } from '@app/hooks/useBiometricGate';
 import {
   ModeEnum,
   ChainNameEnum,
@@ -45,17 +45,17 @@ import {
   ButtonTypeEnum,
   ScreenEnum,
   RouteEnum,
-} from '../../app/AppState';
-import Header from '../../ui/widgets/Header';
-import Utils from '../../app/utils';
-import SettingsFileImpl from '../../app/services/SettingsFileImpl';
+} from '@app/AppState';
+import Header from '@ui/widgets/Header';
+import Utils from '@app/utils';
+import SettingsFileImpl from '@app/services/SettingsFileImpl';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import {
   getRecoveryWalletInfo,
   saveRecoveryWalletInfo,
-} from '../../app/services/recoveryWalletInfo';
-import WalletType from '../../app/AppState/types/WalletType';
-import { fetchWallet } from '../../app/walletBackend';
+} from '@app/services/recoveryWalletInfo';
+import WalletType from '@app/AppState/types/WalletType';
+import { fetchWallet } from '@app/walletBackend';
 
 type TextsType = {
   new: string[];

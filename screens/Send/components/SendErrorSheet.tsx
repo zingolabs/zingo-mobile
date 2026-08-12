@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { forwardRef, useCallback } from 'react';
 import { Keyboard, Pressable, StyleSheet, View } from 'react-native';
-import { useTheme } from '../../../app/theme';
+import { useTheme } from '@app/theme';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCircleInfo, faXmark } from '@fortawesome/free-solid-svg-icons';
 import {
@@ -11,12 +11,12 @@ import {
   BottomSheetScrollView,
 } from '@gorhom/bottom-sheet';
 
-import { ButtonTypeEnum, TranslateType } from '../../../app/AppState';
-import BoldText from '../../../ui/primitives/BoldText';
-import FadeText from '../../../ui/primitives/FadeText';
-import RegText from '../../../ui/primitives/RegText';
-import Button from '../../../ui/primitives/Button';
-import SheetRim from '../../../ui/primitives/SheetRim';
+import { ButtonTypeEnum, TranslateType } from '@app/AppState';
+import BoldText from '@ui/primitives/BoldText';
+import FadeText from '@ui/primitives/FadeText';
+import RegText from '@ui/primitives/RegText';
+import Button from '@ui/primitives/Button';
+import SheetRim from '@ui/primitives/SheetRim';
 
 /**
  * Informational sheet that surfaces the raw error(s) returned by the fee

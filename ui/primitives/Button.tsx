@@ -1,9 +1,9 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import { TouchableOpacity, Text, View, TextStyle } from 'react-native';
-import { useTheme } from '../../app/theme';
+import { useTheme } from '@app/theme';
 
-import { ButtonTypeEnum } from '../../app/AppState';
+import { ButtonTypeEnum } from '@app/AppState';
 
 type ButtonProps = {
   type: ButtonTypeEnum;

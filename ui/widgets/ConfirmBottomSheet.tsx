@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Dimensions, Keyboard, View } from 'react-native';
-import { useTheme } from '../../app/theme';
+import { useTheme } from '@app/theme';
 import {
   BottomSheetBackdrop,
   BottomSheetBackdropProps,
@@ -12,8 +12,8 @@ import {
 import BoldText from '../primitives/BoldText';
 import RegText from '../primitives/RegText';
 import Button from '../primitives/Button';
-import { ButtonTypeEnum } from '../../app/AppState';
-import { ConfirmOptions, registerConfirmListener } from '../../app/services/showConfirm';
+import { ButtonTypeEnum } from '@app/AppState';
+import { ConfirmOptions, registerConfirmListener } from '@app/services/showConfirm';
 
 // Vertical lift: pushes the detached sheet up roughly into screen center.
 // Dynamic sizing measures height after render, so this is a heuristic

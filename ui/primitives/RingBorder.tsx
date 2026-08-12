@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
-import { useTheme } from '../../app/theme';
+import { useTheme } from '@app/theme';
 
 // The round-button analog of SheetRim: a full bottomSheetBorder ring.
 const STROKE = 1;

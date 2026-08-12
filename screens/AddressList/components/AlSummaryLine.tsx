@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
 import { View, TouchableOpacity } from 'react-native';
-import { useTheme } from '../../../app/theme';
+import { useTheme } from '@app/theme';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
   faQrcode,
@@ -11,15 +11,15 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import Clipboard from '@react-native-clipboard/clipboard';
 
-import FadeText from '../../../ui/primitives/FadeText';
+import FadeText from '@ui/primitives/FadeText';
 import {
   UnifiedAddressClass,
   TransparentAddressClass,
   AddressBookFileClass,
   SnackbarDurationEnum,
-} from '../../../app/AppState';
-import Utils from '../../../app/utils';
-import { ContextAppLoaded } from '../../../app/context';
+} from '@app/AppState';
+import Utils from '@app/utils';
+import { ContextAppLoaded } from '@app/context';
 
 type AlSummaryLineProps = {
   index: number;

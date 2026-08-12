@@ -2,7 +2,7 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { View, TextInput, Keyboard, TouchableOpacity } from 'react-native';
 import { NavigationProp, ParamListBase } from '@react-navigation/native';
-import { useTheme } from '../../../app/theme';
+import { useTheme } from '@app/theme';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCheck, faQrcode, faXmark } from '@fortawesome/free-solid-svg-icons';
 
@@ -15,23 +15,23 @@ import {
   RouteEnum,
   ScreenEnum,
   //SecurityType,
-} from '../../../app/AppState';
-import RegText from '../../../ui/primitives/RegText';
-import ErrorText from '../../../ui/primitives/ErrorText';
-import { ContextAppLoaded } from '../../../app/context';
-import { showConfirm } from '../../../app/services/showConfirm';
-import ChainSelect from '../../../ui/widgets/ChainSelect';
-import { chainDisplayName } from '../../../ui/widgets/chainDisplayName';
-import Utils from '../../../app/utils';
-import { parseZcashURI } from '../../../app/uris';
+} from '@app/AppState';
+import RegText from '@ui/primitives/RegText';
+import ErrorText from '@ui/primitives/ErrorText';
+import { ContextAppLoaded } from '@app/context';
+import { showConfirm } from '@app/services/showConfirm';
+import ChainSelect from '@ui/widgets/ChainSelect';
+import { chainDisplayName } from '@ui/widgets/chainDisplayName';
+import Utils from '@app/utils';
+import { parseZcashURI } from '@app/uris';
 import {
   possibleChainsForAddress,
   validateAddressForChain,
   extractPlainAddress,
   SWAP_ADDRESS_CHAINS,
-} from '../../../app/swap';
-import Button from '../../../ui/primitives/Button';
-import FadeText from '../../../ui/primitives/FadeText';
+} from '@app/swap';
+import Button from '@ui/primitives/Button';
+import FadeText from '@ui/primitives/FadeText';
 
 type AbDetailProps = {
   index: number;

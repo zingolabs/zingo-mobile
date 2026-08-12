@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
-import { ScreenEnum } from '../../app/AppState';
+import { ScreenEnum } from '@app/AppState';
 import TextInputAddress from './TextInputAddress';
 import { withAppContext, withNavigation } from '../../.storybook/storyDecorators';
 

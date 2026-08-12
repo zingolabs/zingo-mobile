@@ -12,20 +12,20 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { useFocusEffect } from '@react-navigation/native';
-import { useTheme } from '../../../app/theme';
+import { useTheme } from '@app/theme';
 
-import SegmentedBar from '../../../ui/primitives/SegmentedBar';
-import { ContextAppLoaded } from '../../../app/context';
-import Utils from '../../../app/utils';
-import { RouteEnum } from '../../../app/AppState';
+import SegmentedBar from '@ui/primitives/SegmentedBar';
+import { ContextAppLoaded } from '@app/context';
+import Utils from '@app/utils';
+import { RouteEnum } from '@app/AppState';
 import {
   migrationStatus,
   reconcileMigration,
-} from '../../../app/walletBackend';
+} from '@app/walletBackend';
 import {
   RPCMigrationStatusType,
   RPCBroadcastWindowType,
-} from '../../../app/walletBackend/types/RPCMigrationStatusType';
+} from '@app/walletBackend/types/RPCMigrationStatusType';
 
 const ZATS_PER_ZEC = 10 ** 8;
 

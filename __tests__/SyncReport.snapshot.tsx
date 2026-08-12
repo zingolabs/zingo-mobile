@@ -6,11 +6,11 @@ import 'react-native';
 import React from 'react';
 
 import { render } from '@testing-library/react-native';
-import SyncReport from '../screens/SyncReport';
+import SyncReport from '@screens/SyncReport';
 import {
   defaultAppContextLoaded,
   ContextAppLoadedProvider,
-} from '../app/context';
+} from '@app/context';
 import { mockWallet } from '../__mocks__/dataMocks/mockWallet';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
@@ -18,8 +18,8 @@ import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import mockSyncingStatus from '../__mocks__/dataMocks/mockSyncingStatus';
 import { mockNetInfo } from '../__mocks__/dataMocks/mockNetInfo';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { AppDrawerParamList } from '../app/types';
-import { RouteEnum } from '../app/AppState';
+import { AppDrawerParamList } from '@app/types';
+import { RouteEnum } from '@app/AppState';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
 function makeDrawerProps(): NativeStackScreenProps<

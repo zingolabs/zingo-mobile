@@ -5,12 +5,12 @@ import {
   AddressKindEnum,
   InfoType,
   ZecPriceType,
-} from '../app/AppState';
-import TotalBalanceClass from '../app/AppState/classes/TotalBalanceClass';
-import UnifiedAddressClass from '../app/AppState/classes/UnifiedAddressClass';
-import TransparentAddressClass from '../app/AppState/classes/TransparentAddressClass';
-import AddressBookFileClass from '../app/AppState/classes/AddressBookFileClass';
-import { RPCAddressScopeEnum } from '../app/walletBackend/enums/RPCAddressScopeEnum';
+} from '@app/AppState';
+import TotalBalanceClass from '@app/AppState/classes/TotalBalanceClass';
+import UnifiedAddressClass from '@app/AppState/classes/UnifiedAddressClass';
+import TransparentAddressClass from '@app/AppState/classes/TransparentAddressClass';
+import AddressBookFileClass from '@app/AppState/classes/AddressBookFileClass';
+import { RPCAddressScopeEnum } from '@app/walletBackend/enums/RPCAddressScopeEnum';
 
 export const mockZecPrice: ZecPriceType = {
   zecPrice: 33.75,

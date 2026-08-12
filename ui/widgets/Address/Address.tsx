@@ -2,7 +2,7 @@
 import React from 'react';
 import { TextStyle } from 'react-native';
 import Button from '../../primitives/Button';
-import { ButtonTypeEnum } from '../../../app/AppState';
+import { ButtonTypeEnum } from '@app/AppState';
 
 type AddressProps = {
   address: string;

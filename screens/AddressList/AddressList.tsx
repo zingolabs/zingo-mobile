@@ -18,7 +18,7 @@ import {
 } from 'react-native';
 
 import { useScrollToTop } from '@react-navigation/native';
-import { useTheme } from '../../app/theme';
+import { useTheme } from '@app/theme';
 import {
   AddressKindEnum,
   ButtonTypeEnum,
@@ -26,21 +26,21 @@ import {
   ScreenEnum,
   TransparentAddressClass,
   UnifiedAddressClass,
-} from '../../app/AppState';
-import { AppDrawerParamList } from '../../app/types';
-import FadeText from '../../ui/primitives/FadeText';
-import BoldText from '../../ui/primitives/BoldText';
-import Button from '../../ui/primitives/Button';
-import SheetRim from '../../ui/primitives/SheetRim';
+} from '@app/AppState';
+import { AppDrawerParamList } from '@app/types';
+import FadeText from '@ui/primitives/FadeText';
+import BoldText from '@ui/primitives/BoldText';
+import Button from '@ui/primitives/Button';
+import SheetRim from '@ui/primitives/SheetRim';
 import AlSummaryLine from './components/AlSummaryLine';
-import { ContextAppLoaded } from '../../app/context';
-import Header from '../../ui/widgets/Header';
+import { ContextAppLoaded } from '@app/context';
+import Header from '@ui/widgets/Header';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faAngleUp, faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 import BottomSheet from '@gorhom/bottom-sheet';
-import { RPCAddressScopeEnum } from '../../app/walletBackend/enums/RPCAddressScopeEnum';
+import { RPCAddressScopeEnum } from '@app/walletBackend/enums/RPCAddressScopeEnum';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { useFullSheetSnapPoints } from '../../app/hooks/useFullSheetSnapPoints';
+import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
 
 type AddressListProps = NativeStackScreenProps<
   AppDrawerParamList,

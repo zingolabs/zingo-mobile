@@ -8,10 +8,10 @@ import { render } from '@testing-library/react-native';
 import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
-} from '../app/context';
+} from '@app/context';
 
-import { ChainNameEnum } from '../app/AppState';
-import AlSummaryLine from '../screens/AddressList/components/AlSummaryLine';
+import { ChainNameEnum } from '@app/AppState';
+import AlSummaryLine from '@screens/AddressList/components/AlSummaryLine';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockAddresses } from '../__mocks__/dataMocks/mockAddresses';
 import { mockAddressBook } from '../__mocks__/dataMocks/mockAddressBook';

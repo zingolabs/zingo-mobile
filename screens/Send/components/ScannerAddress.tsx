@@ -1,13 +1,13 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useEffect, useState } from 'react';
 import { Pressable, View } from 'react-native';
-import { useTheme } from '../../../app/theme';
+import { useTheme } from '@app/theme';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
 
-import Scanner from '../../../ui/widgets/Scanner';
-import { GlobalConst, RouteEnum } from '../../../app/AppState';
-import { AppStackParamList } from '../../../app/types';
+import Scanner from '@ui/widgets/Scanner';
+import { GlobalConst, RouteEnum } from '@app/AppState';
+import { AppStackParamList } from '@app/types';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 type ScannerAddressProps = NativeStackScreenProps<

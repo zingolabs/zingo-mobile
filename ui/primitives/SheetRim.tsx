@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { LayoutChangeEvent, StyleSheet, View } from 'react-native';
 import Svg, { Defs, LinearGradient, Path, Stop } from 'react-native-svg';
-import { useTheme } from '../../app/theme';
+import { useTheme } from '@app/theme';
 
 const SHEET_RADIUS = 40;
 const RIM_STROKE = 1.5;

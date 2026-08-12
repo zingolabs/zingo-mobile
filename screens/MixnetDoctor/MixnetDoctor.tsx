@@ -13,27 +13,27 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-import { useTheme } from '../../app/theme';
+import { useTheme } from '@app/theme';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-import FadeText from '../../ui/primitives/FadeText';
-import RegText from '../../ui/primitives/RegText';
-import Button from '../../ui/primitives/Button';
-import Header from '../../ui/widgets/Header';
-import { AppDrawerParamList } from '../../app/types';
-import { ContextAppLoaded } from '../../app/context';
-import { ButtonTypeEnum, RouteEnum, ScreenEnum } from '../../app/AppState';
+import FadeText from '@ui/primitives/FadeText';
+import RegText from '@ui/primitives/RegText';
+import Button from '@ui/primitives/Button';
+import Header from '@ui/widgets/Header';
+import { AppDrawerParamList } from '@app/types';
+import { ContextAppLoaded } from '@app/context';
+import { ButtonTypeEnum, RouteEnum, ScreenEnum } from '@app/AppState';
 import {
   getMixnetBootstrapDetail,
   getMixnetStatus,
-} from '../../app/walletBackend/utils/mixnetUtils';
+} from '@app/walletBackend/utils/mixnetUtils';
 import {
   MixnetDoctorRow,
   MixnetDoctorRun,
   mixnetDoctorReport,
   mixnetDoctorRows,
-} from '../../app/walletBackend/transforms/mixnetDoctorReport';
+} from '@app/walletBackend/transforms/mixnetDoctorReport';
 
 type MixnetDoctorProps = NativeStackScreenProps<
   AppDrawerParamList,

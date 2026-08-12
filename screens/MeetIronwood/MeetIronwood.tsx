@@ -28,21 +28,21 @@ import Animated, {
 } from 'react-native-reanimated';
 import Svg, { Circle } from 'react-native-svg';
 import { useFocusEffect } from '@react-navigation/native';
-import { useTheme } from '../../app/theme';
+import { useTheme } from '@app/theme';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faArrowRightLong } from '@fortawesome/free-solid-svg-icons';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-import BoldText from '../../ui/primitives/BoldText';
-import Button from '../../ui/primitives/Button';
-import SettingsFileImpl from '../../app/services/SettingsFileImpl';
-import { AppDrawerParamList } from '../../app/types';
-import { ContextAppLoaded } from '../../app/context';
+import BoldText from '@ui/primitives/BoldText';
+import Button from '@ui/primitives/Button';
+import SettingsFileImpl from '@app/services/SettingsFileImpl';
+import { AppDrawerParamList } from '@app/types';
+import { ContextAppLoaded } from '@app/context';
 import {
   ButtonTypeEnum,
   RouteEnum,
   SettingsNameEnum,
-} from '../../app/AppState';
+} from '@app/AppState';
 
 // Pool artwork palette — Orchard teal and Ironwood gold are one-off brand
 // accents for this onboarding, not part of the app theme.

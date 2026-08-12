@@ -1,10 +1,10 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 
-import { OptionsPanelHost } from '../../screens/OptionsPanel';
+import { OptionsPanelHost } from '@screens/OptionsPanel';
 import type {
   OptionsPanelAction,
   OptionsPanelSocial,
-} from '../../screens/OptionsPanel';
+} from '@screens/OptionsPanel';
 import { closeOptionsPanel, useOptionsPanel } from '../context/optionsPanel';
 import { ContextAppLoaded } from '../context';
 import { MenuItemEnum, ModeEnum, SelectServerEnum } from '../AppState';

@@ -9,7 +9,7 @@ import {
   useCodeScanner,
 } from 'react-native-vision-camera';
 import { Text } from 'react-native-svg';
-import { useTheme } from '../../../app/theme';
+import { useTheme } from '@app/theme';
 import { View } from 'react-native';
 
 type ScannerProps = {

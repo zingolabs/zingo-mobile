@@ -10,16 +10,16 @@
  * These tests pin both save sites inside runTaskPromises: the save after a
  * performance-level reconfiguration, and the periodic save-required save.
  */
-jest.mock('../app/RPCModule', () =>
+jest.mock('@app/RPCModule', () =>
   require('../__mocks__/rpcModuleProxy').rpcModuleProxyMock(),
 );
 
-import RPCModule from '../app/RPCModule';
-import * as walletUtils from '../app/walletBackend/utils/walletUtils';
-import { SyncCoordinator } from '../app/walletBackend/modules/SyncCoordinator';
-import { RPCPerformanceLevelEnum } from '../app/walletBackend/enums/RPCPerformanceLevelEnum';
-import type { WalletBackendConfig } from '../app/walletBackend/config/WalletBackendConfig';
-import type { DataService } from '../app/walletBackend/modules/DataService';
+import RPCModule from '@app/RPCModule';
+import * as walletUtils from '@app/walletBackend/utils/walletUtils';
+import { SyncCoordinator } from '@app/walletBackend/modules/SyncCoordinator';
+import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
+import type { WalletBackendConfig } from '@app/walletBackend/config/WalletBackendConfig';
+import type { DataService } from '@app/walletBackend/modules/DataService';
 
 const mockedDoSave = RPCModule.doSave as jest.Mock;
 const mockedSetConfigWalletToProd =

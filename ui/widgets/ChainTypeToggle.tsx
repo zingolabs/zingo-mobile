@@ -1,9 +1,9 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import { TouchableOpacity, View } from 'react-native';
-import { useTheme } from '../../app/theme';
+import { useTheme } from '@app/theme';
 
-import { ChainNameEnum, TranslateType } from '../../app/AppState';
+import { ChainNameEnum, TranslateType } from '@app/AppState';
 import RegText from '../primitives/RegText';
 
 type ChainTypeToggleProps = {

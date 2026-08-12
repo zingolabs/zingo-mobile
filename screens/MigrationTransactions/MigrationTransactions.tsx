@@ -1,18 +1,18 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { ActivityIndicator, ScrollView, Text, View } from 'react-native';
-import { useTheme } from '../../app/theme';
+import { useTheme } from '@app/theme';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-import BoldText from '../../ui/primitives/BoldText';
-import Button from '../../ui/primitives/Button';
-import { AppDrawerParamList } from '../../app/types';
-import { AppTheme } from '../../app/theme';
-import { ContextAppLoaded } from '../../app/context';
-import { ButtonTypeEnum, RouteEnum } from '../../app/AppState';
-import Utils from '../../app/utils';
-import { planOrchardDrain } from '../../app/walletBackend';
-import { RPCDrainPlanType } from '../../app/walletBackend/types/RPCDrainPlanType';
+import BoldText from '@ui/primitives/BoldText';
+import Button from '@ui/primitives/Button';
+import { AppDrawerParamList } from '@app/types';
+import { AppTheme } from '@app/theme';
+import { ContextAppLoaded } from '@app/context';
+import { ButtonTypeEnum, RouteEnum } from '@app/AppState';
+import Utils from '@app/utils';
+import { planOrchardDrain } from '@app/walletBackend';
+import { RPCDrainPlanType } from '@app/walletBackend/types/RPCDrainPlanType';
 
 type MigrationTransactionsProps = NativeStackScreenProps<
   AppDrawerParamList,

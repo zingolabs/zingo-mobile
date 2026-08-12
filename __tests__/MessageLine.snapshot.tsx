@@ -8,10 +8,10 @@ import { render } from '@testing-library/react-native';
 import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
-} from '../app/context';
+} from '@app/context';
 
-import MessageLine from '../screens/Messages/components/MessageLine';
-import { ModeEnum, ScreenEnum } from '../app/AppState';
+import MessageLine from '@screens/Messages/components/MessageLine';
+import { ModeEnum, ScreenEnum } from '@app/AppState';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockValueTransfers } from '../__mocks__/dataMocks/mockValueTransfers';

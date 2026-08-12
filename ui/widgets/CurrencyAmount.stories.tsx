@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
-import { CurrencyEnum } from '../../app/AppState';
+import { CurrencyEnum } from '@app/AppState';
 import CurrencyAmount from './CurrencyAmount';
 
 const meta: Meta<typeof CurrencyAmount> = {

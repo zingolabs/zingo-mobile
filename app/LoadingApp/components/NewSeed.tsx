@@ -18,11 +18,11 @@ import BottomSheet, {
   BottomSheetScrollView,
 } from '@gorhom/bottom-sheet';
 
-import RegText from '../../../ui/primitives/RegText';
-import FadeText from '../../../ui/primitives/FadeText';
-import BoldText from '../../../ui/primitives/BoldText';
-import Button from '../../../ui/primitives/Button';
-import SheetRim from '../../../ui/primitives/SheetRim';
+import RegText from '@ui/primitives/RegText';
+import FadeText from '@ui/primitives/FadeText';
+import BoldText from '@ui/primitives/BoldText';
+import Button from '@ui/primitives/Button';
+import SheetRim from '@ui/primitives/SheetRim';
 import { ContextAppLoading } from '../../context';
 import WalletType from '../../AppState/types/WalletType';
 import {
@@ -31,7 +31,7 @@ import {
   ButtonTypeEnum,
   ScreenEnum,
 } from '../../AppState';
-import Header from '../../../ui/widgets/Header';
+import Header from '@ui/widgets/Header';
 import Utils from '../../utils';
 import { useFullSheetSnapPoints } from '../../hooks/useFullSheetSnapPoints';
 import { showConfirm } from '../../services/showConfirm';

@@ -17,10 +17,10 @@ import { I18n } from 'i18n-js';
 import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
-} from '../app/context/contextAppLoaded';
-import { AppContextLoaded } from '../app/AppState';
-import { substituteZingoName } from '../app/utils/ZingoAppData';
-import en from '../app/translations/en.json';
+} from '@app/context/contextAppLoaded';
+import { AppContextLoaded } from '@app/AppState';
+import { substituteZingoName } from '@app/utils/ZingoAppData';
+import en from '@app/translations/en.json';
 
 // Resolve the real English catalog so stories read like the app, not raw keys.
 const i18n = new I18n({ en });

@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
-import { CurrencyEnum, SelectServerEnum } from '../../../../app/AppState';
+import { CurrencyEnum, SelectServerEnum } from '@app/AppState';
 import PriceRow from './PriceRow';
 import { mockInfo, mockZecPrice } from '../../../../.storybook/storyMocks';
 import { mockTranslate } from '../../../../.storybook/storyDecorators';

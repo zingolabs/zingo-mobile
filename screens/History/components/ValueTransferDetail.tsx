@@ -7,12 +7,12 @@ import React, {
   useState,
 } from 'react';
 import { View, TouchableOpacity, Linking, Text } from 'react-native';
-import { showConfirm } from '../../../app/services/showConfirm';
+import { showConfirm } from '@app/services/showConfirm';
 
 import Clipboard from '@react-native-clipboard/clipboard';
 
 import { NavigationProp, ParamListBase, useNavigation } from '@react-navigation/native';
-import { useTheme } from '../../../app/theme';
+import { useTheme } from '@app/theme';
 
 import {
   AddressBookFileClass,
@@ -29,18 +29,18 @@ import {
   UnifiedAddressClass,
   TransparentAddressClass,
   ScreenEnum,
-} from '../../../app/AppState';
-import Utils from '../../../app/utils';
-import RegText from '../../../ui/primitives/RegText';
-import ZecAmount from '../../../ui/widgets/ZecAmount';
-import FadeText from '../../../ui/primitives/FadeText';
-import { AppDrawerParamList } from '../../../app/types';
-import { ContextAppLoaded } from '../../../app/context';
-import Header from '../../../ui/widgets/Header';
-import BoldText from '../../../ui/primitives/BoldText';
-import SheetRim from '../../../ui/primitives/SheetRim';
-import CurrencyAmount from '../../../ui/widgets/CurrencyAmount';
-import AddressItem from '../../../ui/widgets/AddressItem';
+} from '@app/AppState';
+import Utils from '@app/utils';
+import RegText from '@ui/primitives/RegText';
+import ZecAmount from '@ui/widgets/ZecAmount';
+import FadeText from '@ui/primitives/FadeText';
+import { AppDrawerParamList } from '@app/types';
+import { ContextAppLoaded } from '@app/context';
+import Header from '@ui/widgets/Header';
+import BoldText from '@ui/primitives/BoldText';
+import SheetRim from '@ui/primitives/SheetRim';
+import CurrencyAmount from '@ui/widgets/CurrencyAmount';
+import AddressItem from '@ui/widgets/AddressItem';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 // this is for http. (red)
 import {
@@ -50,11 +50,11 @@ import {
   faChevronUp,
 } from '@fortawesome/free-solid-svg-icons';
 import BottomSheet, { BottomSheetScrollView } from '@gorhom/bottom-sheet';
-import { useFullSheetSnapPoints } from '../../../app/hooks/useFullSheetSnapPoints';
-import { RPCValueTransfersStatusEnum } from '../../../app/walletBackend/enums/RPCValueTransfersStatusEnum';
-import Button from '../../../ui/primitives/Button';
-import { removeTransaction } from '../../../app/walletBackend';
-import { createAlert } from '../../../app/services/createAlert';
+import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
+import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
+import Button from '@ui/primitives/Button';
+import { removeTransaction } from '@app/walletBackend';
+import { createAlert } from '@app/services/createAlert';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 // this is for https. (primary)
 //import { faLock } from '@fortawesome/free-solid-svg-icons';

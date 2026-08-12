@@ -24,7 +24,7 @@ import {
 } from '@gorhom/bottom-sheet';
 import CustomServerModalHost from './components/CustomServerModalHost';
 import { BottomSheetBackHandler } from '../hooks/useBottomSheetBackHandler';
-import ConfirmBottomSheet from '../../ui/widgets/ConfirmBottomSheet';
+import ConfirmBottomSheet from '@ui/widgets/ConfirmBottomSheet';
 import { showConfirm } from '../services/showConfirm';
 
 import {

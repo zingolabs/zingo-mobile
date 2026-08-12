@@ -8,9 +8,9 @@ import { render } from '@testing-library/react-native';
 import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
-} from '../app/context';
+} from '@app/context';
 
-import TransparentWarning from '../screens/Receive/components/TransparentWarning';
+import TransparentWarning from '@screens/Receive/components/TransparentWarning';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 
 describe('TransparentWarning - snapshot', () => {

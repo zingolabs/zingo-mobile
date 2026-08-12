@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
-import { FilterEnum } from '../../../app/AppState';
+import { FilterEnum } from '@app/AppState';
 import Filters from './Filters';
 import { withAppContext } from '../../../.storybook/storyDecorators';
 

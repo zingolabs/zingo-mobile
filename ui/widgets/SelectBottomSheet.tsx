@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { forwardRef, useCallback, useMemo, useState } from 'react';
 import { Keyboard, Pressable, StyleSheet, TextInput, View } from 'react-native';
-import { useTheme } from '../../app/theme';
+import { useTheme } from '@app/theme';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
   faCheck,
@@ -18,7 +18,7 @@ import {
 import BoldText from '../primitives/BoldText';
 import RegText from '../primitives/RegText';
 import SheetRim from '../primitives/SheetRim';
-import { useKeyboardHeight } from '../../app/hooks/useKeyboardHeight';
+import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
 
 export type SelectBottomSheetItem = {
   label: string;

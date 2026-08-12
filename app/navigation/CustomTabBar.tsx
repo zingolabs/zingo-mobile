@@ -14,12 +14,12 @@ import { ContextAppLoaded } from '../context';
 import TotalBalanceClass, {
   hasFullyUnconfirmedPool,
 } from '../AppState/classes/TotalBalanceClass';
-import { HouseFilledIcon } from '../../ui/primitives/Icons/HouseFilledIcon';
-import { HouseOutlineIcon } from '../../ui/primitives/Icons/HouseOutlineIcon';
-import { SendFilledIcon } from '../../ui/primitives/Icons/SendFilledIcon';
-import { SendOutlineIcon } from '../../ui/primitives/Icons/SendOutlineIcon';
-import { ReceiveIcon } from '../../ui/primitives/Icons/ReceiveIcon';
-import { ReceiveFilledIcon } from '../../ui/primitives/Icons/ReceiveFilledIcon';
+import { HouseFilledIcon } from '@ui/primitives/Icons/HouseFilledIcon';
+import { HouseOutlineIcon } from '@ui/primitives/Icons/HouseOutlineIcon';
+import { SendFilledIcon } from '@ui/primitives/Icons/SendFilledIcon';
+import { SendOutlineIcon } from '@ui/primitives/Icons/SendOutlineIcon';
+import { ReceiveIcon } from '@ui/primitives/Icons/ReceiveIcon';
+import { ReceiveFilledIcon } from '@ui/primitives/Icons/ReceiveFilledIcon';
 
 const ICON_SIZE = 28;
 const SEND_SIZE = 25;

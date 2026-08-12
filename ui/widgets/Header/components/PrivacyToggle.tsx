@@ -1,10 +1,10 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import { TouchableOpacity, View } from 'react-native';
-import { useTheme } from '../../../../app/theme';
+import { useTheme } from '@app/theme';
 import { faLock, faLockOpen } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { SnackbarDurationEnum, TranslateType } from '../../../../app/AppState';
+import { SnackbarDurationEnum, TranslateType } from '@app/AppState';
 
 type PrivacyToggleProps = {
   privacy: boolean;

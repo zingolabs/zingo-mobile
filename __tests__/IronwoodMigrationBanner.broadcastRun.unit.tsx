@@ -6,19 +6,19 @@ import 'react-native';
 import React from 'react';
 
 import { render, waitFor } from '@testing-library/react-native';
-import IronwoodMigrationBanner from '../screens/History/components/IronwoodMigrationBanner';
-import SegmentedBar from '../ui/primitives/SegmentedBar';
+import IronwoodMigrationBanner from '@screens/History/components/IronwoodMigrationBanner';
+import SegmentedBar from '@ui/primitives/SegmentedBar';
 import {
   defaultAppContextLoaded,
   ContextAppLoadedProvider,
-} from '../app/context';
-import { InfoType } from '../app/AppState';
+} from '@app/context';
+import { InfoType } from '@app/AppState';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
-import { migrationStatus, reconcileMigration } from '../app/walletBackend';
-import { RPCMigrationStatusType } from '../app/walletBackend/types/RPCMigrationStatusType';
+import { migrationStatus, reconcileMigration } from '@app/walletBackend';
+import { RPCMigrationStatusType } from '@app/walletBackend/types/RPCMigrationStatusType';
 
-jest.mock('../app/walletBackend', () => ({
+jest.mock('@app/walletBackend', () => ({
   migrationStatus: jest.fn(),
   reconcileMigration: jest.fn(),
 }));

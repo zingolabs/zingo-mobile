@@ -1,16 +1,16 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import { Image, View } from 'react-native';
-import { useTheme } from '../../../../app/theme';
+import { useTheme } from '@app/theme';
 
 import {
   ChainNameEnum,
   CurrencyEnum,
   SelectServerEnum,
   TranslateType,
-} from '../../../../app/AppState';
-import InfoType from '../../../../app/AppState/types/InfoType';
-import ZecPriceType from '../../../../app/AppState/types/ZecPriceType';
+} from '@app/AppState';
+import InfoType from '@app/AppState/types/InfoType';
+import ZecPriceType from '@app/AppState/types/ZecPriceType';
 import BoldText from '../../../primitives/BoldText';
 import CurrencyAmount from '../../CurrencyAmount';
 import FadeText from '../../../primitives/FadeText';

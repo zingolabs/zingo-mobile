@@ -1,17 +1,17 @@
-import { RPCMixnetModeEnum } from '../app/walletBackend/enums/RPCMixnetModeEnum';
+import { RPCMixnetModeEnum } from '@app/walletBackend/enums/RPCMixnetModeEnum';
 import {
   MixnetCoordinator,
   RECONNECT_BASE_MILLIS,
   STEADY_POLL_MILLIS,
-} from '../app/walletBackend/modules/MixnetCoordinator';
-import { deriveMixnetView } from '../app/walletBackend/transforms/mixnetPresenter';
-import { MixnetView } from '../app/walletBackend/transforms/mixnetPresenter';
+} from '@app/walletBackend/modules/MixnetCoordinator';
+import { deriveMixnetView } from '@app/walletBackend/transforms/mixnetPresenter';
+import { MixnetView } from '@app/walletBackend/transforms/mixnetPresenter';
 
-jest.mock('../app/RPCModule', () =>
+jest.mock('@app/RPCModule', () =>
   require('../__mocks__/rpcModuleProxy').rpcModuleProxyMock(),
 );
 
-import RPCModule from '../app/RPCModule';
+import RPCModule from '@app/RPCModule';
 
 const mockedBridge = RPCModule as unknown as Record<string, jest.Mock>;
 

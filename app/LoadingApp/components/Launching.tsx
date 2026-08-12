@@ -9,7 +9,7 @@ import {
   LaunchingModeEnum,
   TranslateType,
 } from '../../AppState';
-import Button from '../../../ui/primitives/Button';
+import Button from '@ui/primitives/Button';
 import { getZingoName, getZingoVersion } from '../../utils/ZingoAppData';
 
 type LaunchingProps = {

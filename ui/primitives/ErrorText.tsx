@@ -1,6 +1,6 @@
 import React from 'react';
 import { Text, TextStyle } from 'react-native';
-import { useTheme } from '../../app/theme';
+import { useTheme } from '@app/theme';
 
 type ErrorTextProps = {
   style?: TextStyle;

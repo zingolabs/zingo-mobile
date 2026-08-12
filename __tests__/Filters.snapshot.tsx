@@ -8,10 +8,10 @@ import { render } from '@testing-library/react-native';
 import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
-} from '../app/context';
+} from '@app/context';
 
-import Filters from '../screens/History/components/Filters';
-import { FilterEnum } from '../app/AppState';
+import Filters from '@screens/History/components/Filters';
+import { FilterEnum } from '@app/AppState';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 
 describe('Filters - snapshots', () => {

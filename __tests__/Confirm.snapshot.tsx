@@ -8,10 +8,10 @@ import { render } from '@testing-library/react-native';
 import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
-} from '../app/context';
+} from '@app/context';
 
-import Confirm from '../screens/Send/components/Confirm';
-import { CurrencyEnum, ModeEnum, RouteEnum } from '../app/AppState';
+import Confirm from '@screens/Send/components/Confirm';
+import { CurrencyEnum, ModeEnum, RouteEnum } from '@app/AppState';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
@@ -20,7 +20,7 @@ import { mockServer } from '../__mocks__/dataMocks/mockServer';
 import { mockSecurity } from '../__mocks__/dataMocks/mockSecurity';
 import mockSendPageState from '../__mocks__/dataMocks/mockSendPageState';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { AppDrawerParamList } from '../app/types';
+import { AppDrawerParamList } from '@app/types';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
 function makeProps(): NativeStackScreenProps<

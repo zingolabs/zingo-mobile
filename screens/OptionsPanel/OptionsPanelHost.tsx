@@ -11,7 +11,7 @@ import Animated, {
 import { useBottomSheetModal } from '@gorhom/bottom-sheet';
 
 import OptionsPanel, { OptionsPanelProps } from './OptionsPanel';
-import { useOptionsPanel } from '../../app/context/optionsPanel';
+import { useOptionsPanel } from '@app/context/optionsPanel';
 
 const FADE_DURATION_MS = 125;
 // Open sequence (total ≈ 250ms = slide duration):

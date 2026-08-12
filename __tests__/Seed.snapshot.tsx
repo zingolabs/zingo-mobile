@@ -6,22 +6,22 @@ import 'react-native';
 import React from 'react';
 
 import { render } from '@testing-library/react-native';
-import Seed from '../screens/Seed';
+import Seed from '@screens/Seed';
 import {
   ContextAppLoadedProvider,
   ContextAppLoadingProvider,
   defaultAppContextLoaded,
   defaultAppContextLoading,
-} from '../app/context';
-import { RouteEnum, SeedActionEnum } from '../app/AppState';
+} from '@app/context';
+import { RouteEnum, SeedActionEnum } from '@app/AppState';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockWallet } from '../__mocks__/dataMocks/mockWallet';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { AppDrawerParamList } from '../app/types';
+import { AppDrawerParamList } from '@app/types';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
-import NewSeed from '../app/LoadingApp/components/NewSeed';
+import NewSeed from '@app/LoadingApp/components/NewSeed';
 
 function makeDrawerProps(
   a: SeedActionEnum,

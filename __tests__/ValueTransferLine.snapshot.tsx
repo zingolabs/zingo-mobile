@@ -8,15 +8,15 @@ import { render } from '@testing-library/react-native';
 import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
-} from '../app/context';
+} from '@app/context';
 
-import ValueTransferLine from '../screens/History/components/ValueTransferLine';
-import { ModeEnum, ScreenEnum, ValueTransferKindEnum } from '../app/AppState';
+import ValueTransferLine from '@screens/History/components/ValueTransferLine';
+import { ModeEnum, ScreenEnum, ValueTransferKindEnum } from '@app/AppState';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockValueTransfers } from '../__mocks__/dataMocks/mockValueTransfers';
 import { mockAddressBook } from '../__mocks__/dataMocks/mockAddressBook';
-import { RPCValueTransfersStatusEnum } from '../app/walletBackend/enums/RPCValueTransfersStatusEnum';
+import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
 
 const FIXED_TIME = 1704067200; // 2024-01-01 00:00:00 UTC (seconds)
 const fixedValueTransfers = mockValueTransfers.map(vt => ({

@@ -6,7 +6,7 @@ import {
   ActivityIndicator,
   Platform,
 } from 'react-native';
-import { useTheme } from '../../../app/theme';
+import { useTheme } from '@app/theme';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
   faTriangleExclamation,
@@ -17,8 +17,8 @@ import { faCircleCheck as faCircleCheckRegular } from '@fortawesome/free-regular
 
 import Clipboard from '@react-native-clipboard/clipboard';
 
-import ZecAmount from '../../../ui/widgets/ZecAmount';
-import FadeText from '../../../ui/primitives/FadeText';
+import ZecAmount from '@ui/widgets/ZecAmount';
+import FadeText from '@ui/primitives/FadeText';
 import {
   ValueTransferType,
   ValueTransferKindEnum,
@@ -28,13 +28,13 @@ import {
   UnifiedAddressClass,
   TransparentAddressClass,
   ScreenEnum,
-} from '../../../app/AppState';
+} from '@app/AppState';
 
-import { ContextAppLoaded } from '../../../app/context';
-import AddressItem from '../../../ui/widgets/AddressItem';
-import RegText from '../../../ui/primitives/RegText';
-import Utils from '../../../app/utils';
-import { RPCValueTransfersStatusEnum } from '../../../app/walletBackend/enums/RPCValueTransfersStatusEnum';
+import { ContextAppLoaded } from '@app/context';
+import AddressItem from '@ui/widgets/AddressItem';
+import RegText from '@ui/primitives/RegText';
+import Utils from '@app/utils';
+import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
 
 type MessageLineProps = {
   index: number;

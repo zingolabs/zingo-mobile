@@ -6,7 +6,7 @@ import 'react-native';
 import React from 'react';
 
 import { render } from '@testing-library/react-native';
-import SingleAddress from '../ui/widgets/SingleAddress';
+import SingleAddress from '@ui/widgets/SingleAddress';
 import { mockAddresses } from '../__mocks__/dataMocks/mockAddresses';
 
 // test suite

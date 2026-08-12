@@ -2,7 +2,7 @@
 import React from 'react';
 import { TouchableOpacity, View } from 'react-native';
 import { NavigationProp, ParamListBase, useNavigation } from '@react-navigation/native';
-import { useTheme } from '../../../../app/theme';
+import { useTheme } from '@app/theme';
 import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
@@ -14,11 +14,11 @@ import {
   SelectServerEnum,
   SnackbarDurationEnum,
   TranslateType,
-} from '../../../../app/AppState';
-import TotalBalanceClass from '../../../../app/AppState/classes/TotalBalanceClass';
-import InfoType from '../../../../app/AppState/types/InfoType';
-import ZecPriceType from '../../../../app/AppState/types/ZecPriceType';
-import Utils from '../../../../app/utils';
+} from '@app/AppState';
+import TotalBalanceClass from '@app/AppState/classes/TotalBalanceClass';
+import InfoType from '@app/AppState/types/InfoType';
+import ZecPriceType from '@app/AppState/types/ZecPriceType';
+import Utils from '@app/utils';
 import Button from '../../../primitives/Button';
 import CurrencyAmount from '../../CurrencyAmount';
 import FadeText from '../../../primitives/FadeText';

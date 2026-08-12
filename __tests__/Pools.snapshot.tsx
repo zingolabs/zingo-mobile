@@ -6,17 +6,17 @@ import 'react-native';
 import React from 'react';
 
 import { render } from '@testing-library/react-native';
-import Pools from '../screens/Pools';
+import Pools from '@screens/Pools';
 import {
   defaultAppContextLoaded,
   ContextAppLoadedProvider,
-} from '../app/context';
+} from '@app/context';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { AppDrawerParamList } from '../app/types';
-import { RouteEnum } from '../app/AppState';
+import { AppDrawerParamList } from '@app/types';
+import { RouteEnum } from '@app/AppState';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
 function makeDrawerProps(): NativeStackScreenProps<

@@ -14,6 +14,10 @@ module.exports = {
     '\\.svg$': '<rootDir>/__mocks__/svgMock.js',
     // See __mocks__/appTheme.ts
     '^(\\.{1,2}/)+(app/)?theme$': '<rootDir>/__mocks__/appTheme.ts',
+    '^@app/theme$': '<rootDir>/__mocks__/appTheme.ts',
+    '^@app/(.*)$': '<rootDir>/app/$1',
+    '^@screens/(.*)$': '<rootDir>/screens/$1',
+    '^@ui/(.*)$': '<rootDir>/ui/$1',
   },
   setupFiles: ['./node_modules/react-native-gesture-handler/jestSetup.js'],
   setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],

@@ -12,7 +12,7 @@ import {
 } from 'node:fs';
 import { join, dirname, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { advancedTokens } from '../app/theme/tokens';
+import { advancedTokens } from '@app/theme/tokens';
 
 type Sample = { t: number; offset: number };
 type Timeline = { story: string; step: number; samples: Sample[] };

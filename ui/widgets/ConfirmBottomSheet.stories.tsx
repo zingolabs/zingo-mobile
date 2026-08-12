@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
 import React from 'react';
 import ConfirmBottomSheet from './ConfirmBottomSheet';
-import { showConfirm } from '../../app/services/showConfirm';
+import { showConfirm } from '@app/services/showConfirm';
 import { withBottomSheet } from '../../.storybook/storyDecorators';
 
 const ConfirmDemo: React.FunctionComponent = () => {

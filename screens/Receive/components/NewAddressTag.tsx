@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState } from 'react';
 import { View, TextInput, Keyboard, TouchableOpacity } from 'react-native';
-import { useTheme } from '../../../app/theme';
+import { useTheme } from '@app/theme';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
 
@@ -10,15 +10,15 @@ import {
   ButtonTypeEnum,
   ChainNameEnum,
   GlobalConst,
-} from '../../../app/AppState';
-import RegText from '../../../ui/primitives/RegText';
-import { ContextAppLoaded } from '../../../app/context';
-import { showConfirm } from '../../../app/services/showConfirm';
-import Button from '../../../ui/primitives/Button';
-import ChainSelect from '../../../ui/widgets/ChainSelect';
-import { chainDisplayName } from '../../../ui/widgets/chainDisplayName';
-import Utils from '../../../app/utils';
-import AddressBookFileImpl from '../../../app/services/AddressBookFileImpl';
+} from '@app/AppState';
+import RegText from '@ui/primitives/RegText';
+import { ContextAppLoaded } from '@app/context';
+import { showConfirm } from '@app/services/showConfirm';
+import Button from '@ui/primitives/Button';
+import ChainSelect from '@ui/widgets/ChainSelect';
+import { chainDisplayName } from '@ui/widgets/chainDisplayName';
+import Utils from '@app/utils';
+import AddressBookFileImpl from '@app/services/AddressBookFileImpl';
 
 type NewAddressTagProps = {
   address: string;

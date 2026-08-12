@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { useTheme } from '../../app/theme';
+import { useTheme } from '@app/theme';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
   faCheck,
@@ -24,9 +24,9 @@ import {
   BottomSheetScrollView,
 } from '@gorhom/bottom-sheet';
 
-import { TranslateType } from '../../app/AppState';
-import Utils from '../../app/utils';
-import { useKeyboardHeight } from '../../app/hooks/useKeyboardHeight';
+import { TranslateType } from '@app/AppState';
+import Utils from '@app/utils';
+import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
 import BoldText from '../primitives/BoldText';
 import FadeText from '../primitives/FadeText';
 import RegText from '../primitives/RegText';

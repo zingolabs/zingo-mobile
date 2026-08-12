@@ -19,9 +19,9 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import Animated from 'react-native-reanimated';
-import { useOptionsPanelSheetSlide } from '../../app/hooks/useOptionsPanelSheetSlide';
+import { useOptionsPanelSheetSlide } from '@app/hooks/useOptionsPanelSheetSlide';
 
-import { useTheme } from '../../app/theme';
+import { useTheme } from '@app/theme';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
   IconDefinition,
@@ -35,21 +35,21 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { faCircle as farCircle } from '@fortawesome/free-regular-svg-icons';
 
-import RegText from '../../ui/primitives/RegText';
-import FadeText from '../../ui/primitives/FadeText';
-import BoldText from '../../ui/primitives/BoldText';
-import SheetRim from '../../ui/primitives/SheetRim';
+import RegText from '@ui/primitives/RegText';
+import FadeText from '@ui/primitives/FadeText';
+import BoldText from '@ui/primitives/BoldText';
+import SheetRim from '@ui/primitives/SheetRim';
 import {
   checkServerURI,
   fetchServerList,
   parseServerURI,
   serverUris,
-} from '../../app/uris';
-import Button from '../../ui/primitives/Button';
-import { AppDrawerParamList } from '../../app/types';
-import { ContextAppLoaded } from '../../app/context';
+} from '@app/uris';
+import Button from '@ui/primitives/Button';
+import { AppDrawerParamList } from '@app/types';
+import { ContextAppLoaded } from '@app/context';
 
-import Header from '../../ui/widgets/Header';
+import Header from '@ui/widgets/Header';
 import {
   LanguageEnum,
   SecurityType,
@@ -69,14 +69,14 @@ import {
   RouteEnum,
   ScreenEnum,
   BlockExplorerEnum,
-} from '../../app/AppState';
-import { getLatestBlockServerInfo } from '../../app/walletBackend';
+} from '@app/AppState';
+import { getLatestBlockServerInfo } from '@app/walletBackend';
 import { isEqual } from 'lodash';
-import ChainTypeToggle from '../../ui/widgets/ChainTypeToggle';
+import ChainTypeToggle from '@ui/widgets/ChainTypeToggle';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
-import { hasDeviceSecurity } from '../../app/services/simpleBiometrics';
-import { useBiometricGate } from '../../app/hooks/useBiometricGate';
-import SelectBottomSheet from '../../ui/widgets/SelectBottomSheet';
+import { hasDeviceSecurity } from '@app/services/simpleBiometrics';
+import { useBiometricGate } from '@app/hooks/useBiometricGate';
+import SelectBottomSheet from '@ui/widgets/SelectBottomSheet';
 import BottomSheet, {
   BottomSheetBackdrop,
   BottomSheetBackdropProps,
@@ -86,15 +86,15 @@ import BottomSheet, {
   BottomSheetScrollView,
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
-import { hasRecoveryWalletInfo } from '../../app/services/recoveryWalletInfo';
-import { useFullSheetSnapPoints } from '../../app/hooks/useFullSheetSnapPoints';
-import { useKeyboardHeight } from '../../app/hooks/useKeyboardHeight';
-import { useDismissSheetsOnBlur } from '../../app/hooks/useDismissSheetsOnBlur';
-import { RPCPerformanceLevelEnum } from '../../app/walletBackend/enums/RPCPerformanceLevelEnum';
+import { hasRecoveryWalletInfo } from '@app/services/recoveryWalletInfo';
+import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
+import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
+import { useDismissSheetsOnBlur } from '@app/hooks/useDismissSheetsOnBlur';
+import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { createAlert } from '../../app/services/createAlert';
-import { showConfirm } from '../../app/services/showConfirm';
-import { sendEmail } from '../../app/services/sendEmail';
+import { createAlert } from '@app/services/createAlert';
+import { showConfirm } from '@app/services/showConfirm';
+import { sendEmail } from '@app/services/sendEmail';
 import NymOn from '../../assets/img/nym-on.svg';
 import NymOff from '../../assets/img/nym-off.svg';
 import NymSwitchOn from '../../assets/img/nym-switch-on.svg';

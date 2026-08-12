@@ -6,7 +6,7 @@ import {
   ParamListBase,
   useNavigation,
 } from '@react-navigation/native';
-import { useTheme } from '../../../../app/theme';
+import { useTheme } from '@app/theme';
 import {
   faCheck,
   faCloudDownload,
@@ -21,9 +21,9 @@ import {
   SelectServerEnum,
   SnackbarDurationEnum,
   TranslateType,
-} from '../../../../app/AppState';
-import NetInfoType from '../../../../app/AppState/types/NetInfoType';
-import { MixnetView } from '../../../../app/walletBackend/transforms/mixnetPresenter';
+} from '@app/AppState';
+import NetInfoType from '@app/AppState/types/NetInfoType';
+import { MixnetView } from '@app/walletBackend/transforms/mixnetPresenter';
 import FadeText from '../../../primitives/FadeText';
 import NymOn from '../../../../assets/img/nym-on.svg';
 import MixnetIcon, { mixnetPhase } from '../../../primitives/Icons/MixnetIcon';

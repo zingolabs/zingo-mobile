@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
 import React from 'react';
-import { useTheme } from '../../app/theme';
+import { useTheme } from '@app/theme';
 import QuoteRefreshRing from './QuoteRefreshRing';
 
 const meta: Meta<typeof QuoteRefreshRing> = {

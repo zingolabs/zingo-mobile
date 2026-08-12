@@ -2,7 +2,7 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
 import React from 'react';
 import { View, Text } from 'react-native';
-import { useTheme } from '../../../app/theme';
+import { useTheme } from '@app/theme';
 
 import { BiohazardIcon } from './BiohazardIcon';
 import { ChevronDown, ChevronUp } from './Chevron';

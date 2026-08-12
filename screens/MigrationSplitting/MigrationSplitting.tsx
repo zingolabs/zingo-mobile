@@ -14,23 +14,23 @@ import {
   View,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-import { useTheme } from '../../app/theme';
+import { useTheme } from '@app/theme';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useKeepAwake } from '@sayem314/react-native-keep-awake';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
 
-import BoldText from '../../ui/primitives/BoldText';
-import Button from '../../ui/primitives/Button';
-import ProgressBar from '../../ui/primitives/ProgressBar';
-import StepperHeader from '../../ui/widgets/StepperHeader';
-import { AppDrawerParamList } from '../../app/types';
-import { ContextAppLoaded } from '../../app/context';
-import { ButtonTypeEnum, RouteEnum } from '../../app/AppState';
-import useTrickleProgress from '../../app/hooks/useTrickleProgress';
-import { planIronwoodMigration, quickSplit } from '../../app/walletBackend';
-import { RPCSplitOutcomeType } from '../../app/walletBackend/types/RPCSplitOutcomeType';
-import { RPCMigrationPlanType } from '../../app/walletBackend/types/RPCMigrationPlanType';
+import BoldText from '@ui/primitives/BoldText';
+import Button from '@ui/primitives/Button';
+import ProgressBar from '@ui/primitives/ProgressBar';
+import StepperHeader from '@ui/widgets/StepperHeader';
+import { AppDrawerParamList } from '@app/types';
+import { ContextAppLoaded } from '@app/context';
+import { ButtonTypeEnum, RouteEnum } from '@app/AppState';
+import useTrickleProgress from '@app/hooks/useTrickleProgress';
+import { planIronwoodMigration, quickSplit } from '@app/walletBackend';
+import { RPCSplitOutcomeType } from '@app/walletBackend/types/RPCSplitOutcomeType';
+import { RPCMigrationPlanType } from '@app/walletBackend/types/RPCMigrationPlanType';
 
 type MigrationSplittingProps = NativeStackScreenProps<
   AppDrawerParamList,

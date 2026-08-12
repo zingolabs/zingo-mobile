@@ -23,7 +23,7 @@ import {
   ParamListBase,
   useNavigation,
 } from '@react-navigation/native';
-import { useTheme } from '../../app/theme';
+import { useTheme } from '@app/theme';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faAngleUp, faXmark } from '@fortawesome/free-solid-svg-icons';
 
@@ -40,21 +40,21 @@ import {
   //SendPageStateClass,
   //ServerType,
   ValueTransferType,
-} from '../../app/AppState';
-import { AppDrawerParamList } from '../../app/types';
-import FadeText from '../../ui/primitives/FadeText';
-import BoldText from '../../ui/primitives/BoldText';
-import SheetRim from '../../ui/primitives/SheetRim';
-import RingBorder from '../../ui/primitives/RingBorder';
+} from '@app/AppState';
+import { AppDrawerParamList } from '@app/types';
+import FadeText from '@ui/primitives/FadeText';
+import BoldText from '@ui/primitives/BoldText';
+import SheetRim from '@ui/primitives/SheetRim';
+import RingBorder from '@ui/primitives/RingBorder';
 import ValueTransferLine from './components/ValueTransferLine';
 import IronwoodMigrationBanner from './components/IronwoodMigrationBanner';
-import { ContextAppLoaded } from '../../app/context';
-import { useDismissSheetsOnBlur } from '../../app/hooks/useDismissSheetsOnBlur';
-import { useOptionsPanelSheetSlide } from '../../app/hooks/useOptionsPanelSheetSlide';
-import { usePriceSnapAutoClose } from '../../app/hooks/usePriceSnapAutoClose';
-import { safeSnapToIndex } from '../../app/utils/safeSnapToIndex';
-import Header from '../../ui/widgets/Header';
-import Utils from '../../app/utils';
+import { ContextAppLoaded } from '@app/context';
+import { useDismissSheetsOnBlur } from '@app/hooks/useDismissSheetsOnBlur';
+import { useOptionsPanelSheetSlide } from '@app/hooks/useOptionsPanelSheetSlide';
+import { usePriceSnapAutoClose } from '@app/hooks/usePriceSnapAutoClose';
+import { safeSnapToIndex } from '@app/utils/safeSnapToIndex';
+import Header from '@ui/widgets/Header';
+import Utils from '@app/utils';
 import {
   DataProvider,
   RecyclerListView,
@@ -65,7 +65,7 @@ import { ScrollEvent } from 'recyclerlistview/dist/reactnative/core/scrollcompon
 import { RecyclerListViewState } from 'recyclerlistview/dist/reactnative/core/RecyclerListView';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Swipeable } from 'react-native-gesture-handler';
-import { RPCValueTransfersStatusEnum } from '../../app/walletBackend/enums/RPCValueTransfersStatusEnum';
+import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
 import BottomSheet, {
   BottomSheetBackdrop,
   BottomSheetBackdropProps,
@@ -73,7 +73,7 @@ import BottomSheet, {
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import Filters from './components/Filters';
-import { FiltersIcon } from '../../ui/primitives/Icons/FiltersIcon';
+import { FiltersIcon } from '@ui/primitives/Icons/FiltersIcon';
 
 const ViewTypes = {
   WITH_MONTH: 0,

@@ -3,9 +3,9 @@ import React, { useContext, useState, useEffect, useRef } from 'react';
 import { View, ScrollView, TouchableOpacity, Text } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import { NavigationProp, ParamListBase, useNavigation } from '@react-navigation/native';
-import { useTheme } from '../../app/theme';
+import { useTheme } from '@app/theme';
 
-import { ContextAppLoaded } from '../../app/context';
+import { ContextAppLoaded } from '@app/context';
 import {
   AddressKindEnum,
   ModeEnum,
@@ -13,7 +13,7 @@ import {
   SnackbarDurationEnum,
   TransparentAddressClass,
   UnifiedAddressClass,
-} from '../../app/AppState';
+} from '@app/AppState';
 import RegText from '../primitives/RegText';
 import FadeText from '../primitives/FadeText';
 import Clipboard from '@react-native-clipboard/clipboard';
@@ -25,7 +25,7 @@ import { ListIcon } from '../primitives/Icons/ListIcon';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCircleCheck } from '@fortawesome/free-regular-svg-icons';
 import Address from './Address/Address';
-import { getZingoLogo } from '../../app/utils/ZingoAppData';
+import { getZingoLogo } from '@app/utils/ZingoAppData';
 
 type SingleAddressProps = {
   address?: UnifiedAddressClass | TransparentAddressClass;

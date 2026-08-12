@@ -19,10 +19,10 @@ import {
   StyleSheet,
 } from 'react-native';
 import Animated from 'react-native-reanimated';
-import { useOptionsPanelSheetSlide } from '../../app/hooks/useOptionsPanelSheetSlide';
+import { useOptionsPanelSheetSlide } from '@app/hooks/useOptionsPanelSheetSlide';
 
 import { NavigationProp, ParamListBase, useNavigation } from '@react-navigation/native';
-import { useTheme } from '../../app/theme';
+import { useTheme } from '@app/theme';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faChevronLeft, faAngleDown } from '@fortawesome/free-solid-svg-icons';
 import BottomSheet from '@gorhom/bottom-sheet';
@@ -32,17 +32,17 @@ import {
   RouteEnum,
   ScreenEnum,
   ValueTransferType,
-} from '../../app/AppState';
-import { AppDrawerParamList } from '../../app/types';
-import FadeText from '../../ui/primitives/FadeText';
-import BoldText from '../../ui/primitives/BoldText';
-import Button from '../../ui/primitives/Button';
-import SheetRim from '../../ui/primitives/SheetRim';
+} from '@app/AppState';
+import { AppDrawerParamList } from '@app/types';
+import FadeText from '@ui/primitives/FadeText';
+import BoldText from '@ui/primitives/BoldText';
+import Button from '@ui/primitives/Button';
+import SheetRim from '@ui/primitives/SheetRim';
 import MessageLine from './components/MessageLine';
-import { ContextAppLoaded } from '../../app/context';
-import Header from '../../ui/widgets/Header';
-import { useFullSheetSnapPoints } from '../../app/hooks/useFullSheetSnapPoints';
-import Utils from '../../app/utils';
+import { ContextAppLoaded } from '@app/context';
+import Header from '@ui/widgets/Header';
+import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
+import Utils from '@app/utils';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 type MessageListProps = NativeStackScreenProps<

@@ -1,12 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState } from 'react';
 import { View, TouchableOpacity, ScrollView } from 'react-native';
-import { useTheme } from '../../../app/theme';
+import { useTheme } from '@app/theme';
 
-import { ButtonTypeEnum, FilterEnum } from '../../../app/AppState';
-import { ContextAppLoaded } from '../../../app/context';
-import Button from '../../../ui/primitives/Button';
-import FadeText from '../../../ui/primitives/FadeText';
+import { ButtonTypeEnum, FilterEnum } from '@app/AppState';
+import { ContextAppLoaded } from '@app/context';
+import Button from '@ui/primitives/Button';
+import FadeText from '@ui/primitives/FadeText';
 
 type FiltersProps = {
   closeSheet: () => void;
