@@ -25,13 +25,16 @@ ios/vendor/
 
 # Exclude compiled libs
 android/app/src/main/jniLibs
+android/app/src/main/java/uniffi/zingo_nym_proxy_ffi/
 android/app/release/
 android/app/beta/release/
 *.aab
 *.apk
 ios/Zingolib.xcframework/
 ios/ZingoNymProxyFFI.xcframework/
+ios/NymHost.xcframework/
 ios/zingo.swift
+ios/zingo_nym_proxy_ffi.swift
 rust/lib/Generated/zingo.swift
 rust/lib/Generated/zingoFFI.h
 rust/nym-proxy-ffi/Generated/
@@ -107,3 +110,6 @@ buck-out/
 
 # Jest coverage output
 coverage/
+
+# Local env
+.env

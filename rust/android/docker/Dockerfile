@@ -21,6 +21,7 @@ COPY Cargo.lock /opt/zingo/rust/Cargo.lock
 COPY Cargo.toml /opt/zingo/rust/Cargo.toml
 COPY zingomobile_utils/ /opt/zingo/rust/zingomobile_utils/
 COPY workbench/ /opt/zingo/rust/workbench/
+COPY uniffi-bindgen/ /opt/zingo/rust/uniffi-bindgen/
 
 # The build context has no .git; the host passes git describe output through.
 ARG ZINGO_MOBILE_GIT_DESCRIBE
@@ -106,6 +107,11 @@ ENV SHIM=libzingo_nym_proxy_ffi.so
 ENV CARGO_FEATURE_STD=true
 ENV CC=aarch64-linux-android26-clang
 RUN cargo ndk --target aarch64-linux-android build --release --package zingo-nym-proxy-ffi
+
+RUN cargo run --release --manifest-path /opt/zingo/rust/Cargo.toml \
+    --package zingo-uniffi-bindgen -- generate \
+    --library target/aarch64-linux-android/release/$SHIM \
+    --language kotlin --out-dir generated-kotlin
 RUN llvm-strip --strip-all target/aarch64-linux-android/release/$SHIM
 RUN llvm-objcopy --remove-section .comment target/aarch64-linux-android/release/$SHIM
 RUN sha256sum target/aarch64-linux-android/release/$SHIM
@@ -131,12 +137,4 @@ RUN cargo ndk --target x86_64-linux-android build --release --package zingo-nym-
 RUN llvm-strip --strip-all target/x86_64-linux-android/release/$SHIM
 RUN llvm-objcopy --remove-section .comment target/x86_64-linux-android/release/$SHIM
 RUN sha256sum target/x86_64-linux-android/release/$SHIM
-
-# Kotlin bindings, library mode from the built aarch64 cdylib (metadata is
-# static). zingo-uniffi-bindgen lives in the main workspace, not the shim's,
-# so point cargo at the parent manifest.
-RUN cargo run --release --manifest-path /opt/zingo/rust/Cargo.toml \
-    --package zingo-uniffi-bindgen -- generate \
-    --library target/aarch64-linux-android/release/$SHIM \
-    --language kotlin --out-dir generated-kotlin
 
