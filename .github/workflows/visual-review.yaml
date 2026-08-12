@@ -8,7 +8,8 @@ name: Visual review
 on:
   pull_request:
     paths:
-      - 'components/**'
+      - 'screens/**'
+      - 'ui/**'
       - 'app/theme/**'
       - 'app/AppState/**'
       - '.storybook-web/**'
