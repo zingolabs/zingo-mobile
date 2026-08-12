@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
 import ActionMenuBottomSheet from './ActionMenuBottomSheet';
-import { SheetHost, withBottomSheet } from '../../components/storyDecorators';
+import { SheetHost, withBottomSheet } from '../../.storybook/storyDecorators';
 
 const meta: Meta<typeof ActionMenuBottomSheet> = {
   title: 'Components/ActionMenuBottomSheet',

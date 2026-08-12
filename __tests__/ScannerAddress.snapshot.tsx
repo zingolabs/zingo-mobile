@@ -10,7 +10,7 @@ import {
   defaultAppContextLoaded,
 } from '../app/context';
 
-import ScannerAddress from '../components/Send/components/ScannerAddress';
+import ScannerAddress from '../screens/Send/components/ScannerAddress';
 import { RouteEnum } from '../app/AppState';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';

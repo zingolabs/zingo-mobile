@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
 import SelectBottomSheet from './SelectBottomSheet';
-import { SheetHost, withBottomSheet } from '../../components/storyDecorators';
+import { SheetHost, withBottomSheet } from '../../.storybook/storyDecorators';
 
 const meta: Meta<typeof SelectBottomSheet> = {
   title: 'Components/SelectBottomSheet',

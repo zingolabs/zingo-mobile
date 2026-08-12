@@ -80,48 +80,48 @@ import {
 import Utils from '../utils';
 import { getZingoVersion, substituteZingoName } from '../utils/ZingoAppData';
 import { AppTheme } from '../theme';
-import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
+import SettingsFileImpl from '../services/SettingsFileImpl';
 import { ContextAppLoadedProvider } from '../context';
 import { parseZcashURI, serverUris, fetchServerList } from '../uris';
-import selectingServer from '../selectingServer';
-import BackgroundFileImpl from '../../components/Background';
+import selectingServer from '../services/selectingServer';
+import BackgroundFileImpl from '../services/BackgroundFileImpl';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { createAlert } from '../createAlert';
-import { sendEmail } from '../sendEmail';
+import { createAlert } from '../services/createAlert';
+import { sendEmail } from '../services/sendEmail';
 import Toast from 'react-native-toast-message';
 import { toastConfig } from '../toastConfig';
 import { RPCSeedType } from '../walletBackend/types/RPCSeedType';
 import { Launching } from '../LoadingApp';
-import { AddressBook } from '../../components/AddressBook';
-import { AddressBookFileImpl } from '../../components/AddressBook';
-import simpleBiometrics from '../simpleBiometrics';
-import ShowAddressAlertAsync from '../../components/Send/components/ShowAddressAlertAsync';
+import { AddressBook } from '../../screens/AddressBook';
+import AddressBookFileImpl from '../services/AddressBookFileImpl';
+import simpleBiometrics from '../services/simpleBiometrics';
+import ShowAddressAlertAsync from '../../screens/Send/components/ShowAddressAlertAsync';
 import {
   createUpdateRecoveryWalletInfo,
   removeRecoveryWalletInfo,
-} from '../recoveryWalletInfo';
+} from '../services/recoveryWalletInfo';
 
-import History from '../../components/History';
-import Send from '../../components/Send';
-import Receive from '../../components/Receive';
-import Settings from '../../components/Settings';
-import CustomTabBar from '../../components/TabBar/CustomTabBar';
+import History from '../../screens/History';
+import Send from '../../screens/Send';
+import Receive from '../../screens/Receive';
+import Settings from '../../screens/Settings';
+import CustomTabBar from '../navigation/CustomTabBar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import {
   BottomSheetModal,
   BottomSheetModalProvider,
 } from '@gorhom/bottom-sheet';
-import AddTagModalHost from '../../components/AddressBook/components/AddTagModalHost';
+import AddTagModalHost from './components/AddTagModalHost';
 import { BottomSheetBackHandler } from '../hooks/useBottomSheetBackHandler';
 import ConfirmBottomSheet from '../../ui/widgets/ConfirmBottomSheet';
-import { showConfirm } from '../showConfirm';
-import RootNavigator from '../../components/RootNavigator';
+import { showConfirm } from '../services/showConfirm';
+import RootNavigator from '../navigation/RootNavigator';
 import {
   OptionsPanelProvider,
   toggleOptionsPanel,
 } from '../context/optionsPanel';
 import LoadedAppOptionsPanelHost from './LoadedAppOptionsPanelHost';
-import { MessageList } from '../../components/Messages';
+import { MessageList } from '../../screens/Messages';
 import { RPCSyncStatusType } from '../walletBackend/types/RPCSyncStatusType';
 import { RPCUfvkType } from '../walletBackend/types/RPCUfvkType';
 import {
@@ -131,49 +131,49 @@ import {
 } from '../walletBackend/transforms/mixnetPresenter';
 import { startMixnetTransport } from '../walletBackend/utils/nymTransport';
 import { RPCPerformanceLevelEnum } from '../walletBackend/enums/RPCPerformanceLevelEnum';
-import { AddressList } from '../../components/AddressList';
-import ValueTransferDetail from '../../components/History/components/ValueTransferDetail';
-import Confirm from '../../components/Send/components/Confirm';
+import { AddressList } from '../../screens/AddressList';
+import ValueTransferDetail from '../../screens/History/components/ValueTransferDetail';
+import Confirm from '../../screens/Send/components/Confirm';
 import { AppStackParamList } from '../types';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RPCValueTransfersStatusEnum } from '../walletBackend/enums/RPCValueTransfersStatusEnum';
 
-const About = React.lazy(() => import('../../components/About'));
-const MixnetDoctor = React.lazy(() => import('../../components/MixnetDoctor'));
-const Seed = React.lazy(() => import('../../components/Seed'));
-const SyncReport = React.lazy(() => import('../../components/SyncReport'));
-const Rescan = React.lazy(() => import('../../components/Rescan'));
-const Pools = React.lazy(() => import('../../components/Pools'));
-const MeetIronwood = React.lazy(() => import('../../components/MeetIronwood'));
+const About = React.lazy(() => import('../../screens/About'));
+const MixnetDoctor = React.lazy(() => import('../../screens/MixnetDoctor'));
+const Seed = React.lazy(() => import('../../screens/Seed'));
+const SyncReport = React.lazy(() => import('../../screens/SyncReport'));
+const Rescan = React.lazy(() => import('../../screens/Rescan'));
+const Pools = React.lazy(() => import('../../screens/Pools'));
+const MeetIronwood = React.lazy(() => import('../../screens/MeetIronwood'));
 const MigrationStrategy = React.lazy(
-  () => import('../../components/MigrationStrategy'),
+  () => import('../../screens/MigrationStrategy'),
 );
 const MigrationTransactions = React.lazy(
-  () => import('../../components/MigrationTransactions'),
+  () => import('../../screens/MigrationTransactions'),
 );
 const MigrationSending = React.lazy(
-  () => import('../../components/MigrationSending'),
+  () => import('../../screens/MigrationSending'),
 );
 const MigrationSplitPlan = React.lazy(
-  () => import('../../components/MigrationSplitPlan'),
+  () => import('../../screens/MigrationSplitPlan'),
 );
 const MigrationSplitting = React.lazy(
-  () => import('../../components/MigrationSplitting'),
+  () => import('../../screens/MigrationSplitting'),
 );
 const MigrationCadence = React.lazy(
-  () => import('../../components/MigrationCadence'),
+  () => import('../../screens/MigrationCadence'),
 );
 const MigrationSchedule = React.lazy(
-  () => import('../../components/MigrationSchedule'),
+  () => import('../../screens/MigrationSchedule'),
 );
 const MigrationStatus = React.lazy(
-  () => import('../../components/MigrationStatus'),
+  () => import('../../screens/MigrationStatus'),
 );
 const MigrationBatchSending = React.lazy(
-  () => import('../../components/MigrationBatchSending'),
+  () => import('../../screens/MigrationBatchSending'),
 );
-const Insight = React.lazy(() => import('../../components/Insight'));
-const ShowUfvk = React.lazy(() => import('../../components/Ufvk/ShowUfvk'));
+const Insight = React.lazy(() => import('../../screens/Insight'));
+const ShowUfvk = React.lazy(() => import('../../screens/Ufvk/ShowUfvk'));
 const ComputingTxContent = React.lazy(
   () => import('./components/ComputingTxContent'),
 );

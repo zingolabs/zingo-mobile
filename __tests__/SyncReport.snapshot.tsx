@@ -6,7 +6,7 @@ import 'react-native';
 import React from 'react';
 
 import { render } from '@testing-library/react-native';
-import SyncReport from '../components/SyncReport';
+import SyncReport from '../screens/SyncReport';
 import {
   defaultAppContextLoaded,
   ContextAppLoadedProvider,

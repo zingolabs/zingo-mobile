@@ -9,8 +9,8 @@ import {
   mockTranslate,
   withAppContext,
   withNavigation,
-} from '../../../../components/storyDecorators';
-import { mockInfo, mockTotalBalance, mockZecPrice } from '../../../../components/storyMocks';
+} from '../../../../.storybook/storyDecorators';
+import { mockInfo, mockTotalBalance, mockZecPrice } from '../../../../.storybook/storyMocks';
 
 // BalanceRow nests PriceFetcher (context) and navigates on tap (navigation). It needs both decorators
 const meta: Meta<typeof BalanceRow> = {

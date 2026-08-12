@@ -6,7 +6,7 @@ import 'react-native';
 import React from 'react';
 
 import { render, waitFor } from '@testing-library/react-native';
-import IronwoodMigrationBanner from '../components/History/components/IronwoodMigrationBanner';
+import IronwoodMigrationBanner from '../screens/History/components/IronwoodMigrationBanner';
 import SegmentedBar from '../ui/primitives/SegmentedBar';
 import {
   defaultAppContextLoaded,

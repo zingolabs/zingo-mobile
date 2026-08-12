@@ -13,7 +13,7 @@ import BoldText from '../primitives/BoldText';
 import RegText from '../primitives/RegText';
 import Button from '../primitives/Button';
 import { ButtonTypeEnum } from '../../app/AppState';
-import { ConfirmOptions, registerConfirmListener } from '../../app/showConfirm';
+import { ConfirmOptions, registerConfirmListener } from '../../app/services/showConfirm';
 
 // Vertical lift: pushes the detached sheet up roughly into screen center.
 // Dynamic sizing measures height after render, so this is a heuristic

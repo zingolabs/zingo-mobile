@@ -11,7 +11,7 @@ import { faRotateRight } from '@fortawesome/free-solid-svg-icons';
 import { ContextAppLoaded } from '../../app/context';
 import RegText from '../primitives/RegText';
 import { ModeEnum } from '../../app/AppState';
-import { showConfirm, ConfirmButton } from '../../app/showConfirm';
+import { showConfirm, ConfirmButton } from '../../app/services/showConfirm';
 import QuoteRefreshRing from '../primitives/QuoteRefreshRing';
 import {
   PRICE_AUTO_REFRESH_MS,

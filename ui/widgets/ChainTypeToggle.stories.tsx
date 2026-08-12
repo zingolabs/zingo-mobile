@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
 import { ChainNameEnum } from '../../app/AppState';
 import ChainTypeToggle from './ChainTypeToggle';
-import { mockTranslate } from '../../components/storyDecorators';
+import { mockTranslate } from '../../.storybook/storyDecorators';
 
 const meta: Meta<typeof ChainTypeToggle> = {
   title: 'Components/ChainTypeToggle',

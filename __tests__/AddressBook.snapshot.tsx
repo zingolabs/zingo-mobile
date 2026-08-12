@@ -10,7 +10,7 @@ import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
 } from '../app/context';
-import { AddressBook } from '../components/AddressBook';
+import { AddressBook } from '../screens/AddressBook';
 import { mockAddressBook } from '../__mocks__/dataMocks/mockAddressBook';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';

@@ -25,7 +25,7 @@ import {
 import CustomServerModalHost from './components/CustomServerModalHost';
 import { BottomSheetBackHandler } from '../hooks/useBottomSheetBackHandler';
 import ConfirmBottomSheet from '../../ui/widgets/ConfirmBottomSheet';
-import { showConfirm } from '../showConfirm';
+import { showConfirm } from '../services/showConfirm';
 
 import {
   createNewWallet,
@@ -68,13 +68,13 @@ import {
   BlockExplorerEnum,
 } from '../AppState';
 import { parseServerURI, serverUris, fetchServerList } from '../uris';
-import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
+import SettingsFileImpl from '../services/SettingsFileImpl';
 import { fetchWallet } from '../walletBackend';
 import { AppTheme } from '../theme';
 import { ContextAppLoadingProvider } from '../context';
-import BackgroundFileImpl from '../../components/Background';
+import BackgroundFileImpl from '../services/BackgroundFileImpl';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { createAlert } from '../createAlert';
+import { createAlert } from '../services/createAlert';
 import { getZingoVersion, substituteZingoName } from '../utils/ZingoAppData';
 import Utils from '../utils';
 import { RPCWalletKindType } from '../walletBackend/types/RPCWalletKindType';
@@ -82,19 +82,19 @@ import Toast from 'react-native-toast-message';
 import { toastConfig } from '../toastConfig';
 import { RPCSeedType } from '../walletBackend/types/RPCSeedType';
 import Launching from './components/Launching';
-import simpleBiometrics, { getLastGateFailure } from '../simpleBiometrics';
-import selectingServer from '../selectingServer';
+import simpleBiometrics, { getLastGateFailure } from '../services/simpleBiometrics';
+import selectingServer from '../services/selectingServer';
 import { isEqual } from 'lodash';
 import {
   createUpdateRecoveryWalletInfo,
   getRecoveryWalletInfo,
   hasRecoveryWalletInfo,
   removeRecoveryWalletInfo,
-} from '../recoveryWalletInfo';
+} from '../services/recoveryWalletInfo';
 
 // no lazy load because slowing down screens.
 import ImportUfvk from './components/ImportUfvk';
-import { sendEmail } from '../sendEmail';
+import { sendEmail } from '../services/sendEmail';
 import { RPCWalletKindEnum } from '../walletBackend/enums/RPCWalletKindEnum';
 import StartMenu from './components/StartMenu';
 import { RPCUfvkType } from '../walletBackend/types/RPCUfvkType';

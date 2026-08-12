@@ -10,7 +10,7 @@ import {
   defaultAppContextLoaded,
 } from '../app/context';
 
-import ValueTransferLine from '../components/History/components/ValueTransferLine';
+import ValueTransferLine from '../screens/History/components/ValueTransferLine';
 import { ModeEnum, ScreenEnum, ValueTransferKindEnum } from '../app/AppState';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';

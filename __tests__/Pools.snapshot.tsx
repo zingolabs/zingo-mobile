@@ -6,7 +6,7 @@ import 'react-native';
 import React from 'react';
 
 import { render } from '@testing-library/react-native';
-import Pools from '../components/Pools';
+import Pools from '../screens/Pools';
 import {
   defaultAppContextLoaded,
   ContextAppLoadedProvider,

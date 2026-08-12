@@ -6,7 +6,7 @@ import 'react-native';
 import React from 'react';
 import { render } from '@testing-library/react-native';
 
-import ExpandedAddress from '../components/Receive/components/ExpandedAddress';
+import ExpandedAddress from '../ui/widgets/ExpandedAddress';
 
 describe('ExpandedAddress - snapshots', () => {
   const onFn = jest.fn();

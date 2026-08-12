@@ -7,7 +7,7 @@ import React, {
   useState,
 } from 'react';
 import { Text, View, ActivityIndicator, Image, Pressable } from 'react-native';
-import { showConfirm } from '../../showConfirm';
+import { showConfirm } from '../../services/showConfirm';
 import { useTheme } from '../../theme';
 
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';

@@ -10,7 +10,7 @@ import {
   defaultAppContextLoaded,
 } from '../app/context';
 
-import Filters from '../components/History/components/Filters';
+import Filters from '../screens/History/components/Filters';
 import { FilterEnum } from '../app/AppState';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 

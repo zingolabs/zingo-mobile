@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
 import { CurrencyEnum, SelectServerEnum } from '../../../../app/AppState';
 import PriceRow from './PriceRow';
-import { mockInfo, mockZecPrice } from '../../../../components/storyMocks';
-import { mockTranslate } from '../../../../components/storyDecorators';
+import { mockInfo, mockZecPrice } from '../../../../.storybook/storyMocks';
+import { mockTranslate } from '../../../../.storybook/storyDecorators';
 
 const meta: Meta<typeof PriceRow> = {
   title: 'Header/PriceRow',

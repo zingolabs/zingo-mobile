@@ -6,7 +6,7 @@ import 'react-native';
 import React from 'react';
 
 import { fireEvent, render } from '@testing-library/react-native';
-import MeetIronwood from '../components/MeetIronwood';
+import MeetIronwood from '../screens/MeetIronwood';
 import {
   defaultAppContextLoaded,
   ContextAppLoadedProvider,
@@ -18,7 +18,7 @@ import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 // The screen owns the persisted "already onboarded" flag now, so the file
 // layer is stubbed rather than reaching for RNFS.
 const mockWriteSettings = jest.fn();
-jest.mock('../components/Settings/SettingsFileImpl', () => ({
+jest.mock('../app/services/SettingsFileImpl', () => ({
   __esModule: true,
   default: {
     readSettings: jest.fn(),

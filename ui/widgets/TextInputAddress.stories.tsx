@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
 import { ScreenEnum } from '../../app/AppState';
 import TextInputAddress from './TextInputAddress';
-import { withAppContext, withNavigation } from '../../components/storyDecorators';
+import { withAppContext, withNavigation } from '../../.storybook/storyDecorators';
 
 // Keep the address empty so the native on-mount validator never runs under the web harness.
 const meta: Meta<typeof TextInputAddress> = {

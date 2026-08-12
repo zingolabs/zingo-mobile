@@ -10,7 +10,7 @@ import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
 } from '../app/context';
-import { AddressList } from '../components/AddressList';
+import { AddressList } from '../screens/AddressList';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockAddresses } from '../__mocks__/dataMocks/mockAddresses';
 import { AddressKindEnum, RouteEnum } from '../app/AppState';

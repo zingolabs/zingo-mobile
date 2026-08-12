@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
 import DetailLine from './DetailLine';
-import { withAppContext } from '../../components/storyDecorators';
+import { withAppContext } from '../../.storybook/storyDecorators';
 
 const meta: Meta<typeof DetailLine> = {
   title: 'Components/DetailLine',

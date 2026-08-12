@@ -6,7 +6,7 @@ import 'react-native';
 import React from 'react';
 
 import { render, screen } from '@testing-library/react-native';
-import ValueTransferDetail from '../components/History/components/ValueTransferDetail';
+import ValueTransferDetail from '../screens/History/components/ValueTransferDetail';
 import {
   defaultAppContextLoaded,
   ContextAppLoadedProvider,

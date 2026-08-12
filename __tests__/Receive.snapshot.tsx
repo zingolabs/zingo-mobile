@@ -6,7 +6,7 @@ import 'react-native';
 import React from 'react';
 
 import { render } from '@testing-library/react-native';
-import Receive from '../components/Receive';
+import Receive from '../screens/Receive';
 import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,

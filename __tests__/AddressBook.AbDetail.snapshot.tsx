@@ -10,7 +10,7 @@ import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
 } from '../app/context';
-import AbDetail from '../components/AddressBook/components/AbDetail';
+import AbDetail from '../screens/AddressBook/components/AbDetail';
 import {
   AddressBookActionEnum,
   AddressBookFileClass,

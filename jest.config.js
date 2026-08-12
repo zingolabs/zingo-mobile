@@ -20,7 +20,7 @@ module.exports = {
   coverageReporters: ['lcov', 'text'],
   collectCoverageFrom: [
     'app/**/*.{ts,tsx}',
-    'components/**/*.{ts,tsx}',
+    'screens/**/*.{ts,tsx}',
     'ui/**/*.{ts,tsx}',
     '!**/__tests__/**',
     '!**/node_modules/**',

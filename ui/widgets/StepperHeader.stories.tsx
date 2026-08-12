@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
 import StepperHeader from './StepperHeader';
-import { withAppContext } from '../../components/storyDecorators';
+import { withAppContext } from '../../.storybook/storyDecorators';
 
 const meta: Meta<typeof StepperHeader> = {
   title: 'Migration/StepperHeader',

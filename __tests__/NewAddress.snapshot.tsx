@@ -10,7 +10,7 @@ import {
   defaultAppContextLoaded,
 } from '../app/context';
 
-import NewAddress from '../components/Receive/components/NewAddress';
+import NewAddress from '../screens/Receive/components/NewAddress';
 import { AddressKindEnum, ScreenEnum } from '../app/AppState';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockAddressBook } from '../__mocks__/dataMocks/mockAddressBook';

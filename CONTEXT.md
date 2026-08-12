@@ -168,6 +168,41 @@ The pre-migration vocabulary: `primary`, `secondary`, `text`, `money`,
 `zingo`, `placeholder`, `border`, `card`, and friends. Dead — use only
 when reading history.
 
+## UI tiers
+
+Vocabulary of the shared component tree in `components/ui`.
+
+**Primitive**:
+A shared component that is domain-free and leaf-level: it composes no other
+shared UI module and would ship unchanged in any React Native app. Home:
+`ui/primitives`.
+_Avoid_: atom
+
+**Widget**:
+Any other shared component — it knows a wallet concept or composes shared
+modules. Home: `ui/widgets`. A widget may keep private parts in its own
+`components/` subfolder, the same convention screens use.
+_Avoid_: molecule, organism, composed component
+
+**Screen**:
+A routed top-level UI surface, one per navigation destination. Home:
+`screens/`. A screen keeps private parts in its own `components/` subfolder.
+_Avoid_: view
+
+## App boundary
+
+**Runtime**:
+Domain, services, and the wiring that mounts screens (`App.tsx`, navigation,
+the error boundary). Home: `app/`. The runtime may import screens, since it
+mounts them. Screens never import the runtime's wiring. They reach it via
+navigation and context. Where a component is mounted does not decide where
+its file lives. The repo root holds only `index.js` and config.
+_Avoid_: shell
+
+**Service**:
+A module that renders nothing and is called by the runtime or screens: file
+IO, alerts, email, biometrics. Home: `app/services`.
+
 ## CI
 
 **Blocking check** — a PR CI job whose failure fails the pull request.

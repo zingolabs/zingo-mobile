@@ -6,7 +6,7 @@ import 'react-native';
 import React from 'react';
 
 import { render } from '@testing-library/react-native';
-import { ShowUfvk } from '../components/Ufvk';
+import { ShowUfvk } from '../screens/Ufvk';
 import {
   defaultAppContextLoaded,
   ContextAppLoadedProvider,

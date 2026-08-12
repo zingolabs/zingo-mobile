@@ -34,7 +34,7 @@ import {
 import Header from '../../../ui/widgets/Header';
 import Utils from '../../utils';
 import { useFullSheetSnapPoints } from '../../hooks/useFullSheetSnapPoints';
-import { showConfirm } from '../../showConfirm';
+import { showConfirm } from '../../services/showConfirm';
 
 type TextsType = {
   new: string[];

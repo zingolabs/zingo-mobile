@@ -1,14 +1,14 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 
-import { OptionsPanelHost } from '../../components/OptionsPanel';
+import { OptionsPanelHost } from '../../screens/OptionsPanel';
 import type {
   OptionsPanelAction,
   OptionsPanelSocial,
-} from '../../components/OptionsPanel';
+} from '../../screens/OptionsPanel';
 import { closeOptionsPanel, useOptionsPanel } from '../context/optionsPanel';
 import { ContextAppLoaded } from '../context';
 import { MenuItemEnum, ModeEnum, SelectServerEnum } from '../AppState';
-import { sendEmail } from '../sendEmail';
+import { sendEmail } from '../services/sendEmail';
 import { walletBackupExists } from '../walletBackend';
 import { getZingoLogo, getZingoName } from '../utils/ZingoAppData';
 import { advancedTokens, basicTokens } from '../theme';

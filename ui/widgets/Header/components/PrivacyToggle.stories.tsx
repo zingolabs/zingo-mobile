@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
 import PrivacyToggle from './PrivacyToggle';
-import { mockTranslate } from '../../../../components/storyDecorators';
+import { mockTranslate } from '../../../../.storybook/storyDecorators';
 
 const meta: Meta<typeof PrivacyToggle> = {
   title: 'Header/PrivacyToggle',

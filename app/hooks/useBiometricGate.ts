@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
-import simpleBiometrics from '../simpleBiometrics';
+import simpleBiometrics from '../services/simpleBiometrics';
 import { SnackbarDurationEnum, TranslateType } from '../AppState';
 
 type UseBiometricGateArgs = {

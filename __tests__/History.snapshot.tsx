@@ -6,7 +6,7 @@ import 'react-native';
 import React from 'react';
 
 import { render } from '@testing-library/react-native';
-import History from '../components/History';
+import History from '../screens/History';
 import {
   defaultAppContextLoaded,
   ContextAppLoadedProvider,

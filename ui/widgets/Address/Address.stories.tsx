@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
 import Address from './Address';
-import { uAddress } from '../../../components/storyMocks';
+import { uAddress } from '../../../.storybook/storyMocks';
 
 const meta: Meta<typeof Address> = {
   title: 'Components/Address',
