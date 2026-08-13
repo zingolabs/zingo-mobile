@@ -43,6 +43,7 @@ export default class WalletBackend {
     this.syncCoordinator = new SyncCoordinator(config, this.dataService);
     this.mixnetCoordinator = new MixnetCoordinator(
       config.startMixnetTransport,
+      config.stopMixnetTransport,
       config.onMixnetViewChanged,
     );
     // Wire the sync-restart callback after SyncCoordinator exists

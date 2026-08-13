@@ -28,6 +28,8 @@ async function flushPromises(): Promise<void> {
   await Promise.resolve();
 }
 
+const noopStop = () => Promise.resolve();
+
 describe('deriveMixnetView', () => {
   const noDetail = null;
 
@@ -157,7 +159,7 @@ describe('MixnetCoordinator', () => {
     );
     const startTransport = jest.fn().mockResolvedValue('127.0.0.1:1080');
     const published: MixnetView[] = [];
-    const coordinator = new MixnetCoordinator(startTransport, view =>
+    const coordinator = new MixnetCoordinator(startTransport, noopStop, view =>
       published.push(view),
     );
 
@@ -178,7 +180,7 @@ describe('MixnetCoordinator', () => {
       .fn()
       .mockRejectedValue(new Error('shim missing'));
     const published: MixnetView[] = [];
-    const coordinator = new MixnetCoordinator(startTransport, view =>
+    const coordinator = new MixnetCoordinator(startTransport, noopStop, view =>
       published.push(view),
     );
 
@@ -198,7 +200,7 @@ describe('MixnetCoordinator', () => {
       .fn()
       .mockRejectedValue(new Error('shim missing'));
     const published: MixnetView[] = [];
-    const coordinator = new MixnetCoordinator(startTransport, view =>
+    const coordinator = new MixnetCoordinator(startTransport, noopStop, view =>
       published.push(view),
     );
     await coordinator.ensureForConnectedSession();
@@ -230,7 +232,7 @@ describe('MixnetCoordinator', () => {
     mockedBridge.disableMixnet.mockResolvedValue(statusPayload('off'));
     const startTransport = jest.fn().mockResolvedValue('127.0.0.1:1080');
     const published: MixnetView[] = [];
-    const coordinator = new MixnetCoordinator(startTransport, view =>
+    const coordinator = new MixnetCoordinator(startTransport, noopStop, view =>
       published.push(view),
     );
 
@@ -253,7 +255,7 @@ describe('MixnetCoordinator', () => {
     mockedBridge.disableMixnet.mockResolvedValue(statusPayload('off'));
     const startTransport = jest.fn().mockResolvedValue('127.0.0.1:1080');
     const published: MixnetView[] = [];
-    const coordinator = new MixnetCoordinator(startTransport, view =>
+    const coordinator = new MixnetCoordinator(startTransport, noopStop, view =>
       published.push(view),
     );
     await coordinator.ensureForConnectedSession();
@@ -275,6 +277,7 @@ describe('MixnetCoordinator', () => {
     const published: MixnetView[] = [];
     const coordinator = new MixnetCoordinator(
       jest.fn().mockResolvedValue('127.0.0.1:1080'),
+      noopStop,
       view => published.push(view),
     );
 
@@ -287,6 +290,22 @@ describe('MixnetCoordinator', () => {
     coordinator.stop();
   });
 
+  it('disable tears down the platform transport', async () => {
+    mockedBridge.disableMixnet.mockResolvedValue(statusPayload('off'));
+    const stopTransport = jest.fn().mockResolvedValue(undefined);
+    const coordinator = new MixnetCoordinator(
+      jest.fn().mockResolvedValue('127.0.0.1:1080'),
+      stopTransport,
+      () => {},
+    );
+
+    await coordinator.disable();
+    await flushPromises();
+
+    expect(stopTransport).toHaveBeenCalledTimes(1);
+    coordinator.stop();
+  });
+
   it('polls while running and never overlaps a slow poll', async () => {
     mockedBridge.attachMixnet.mockResolvedValue(
       statusPayload('ready', '127.0.0.1:1080'),
@@ -295,6 +314,7 @@ describe('MixnetCoordinator', () => {
     mockedBridge.mixnetModeInfo.mockReturnValue(new Promise(() => {}));
     const coordinator = new MixnetCoordinator(
       jest.fn().mockResolvedValue('127.0.0.1:1080'),
+      noopStop,
       () => {},
     );
 
@@ -317,6 +337,7 @@ describe('MixnetCoordinator', () => {
     );
     const coordinator = new MixnetCoordinator(
       jest.fn().mockResolvedValue('127.0.0.1:1080'),
+      noopStop,
       () => {},
     );
 
@@ -334,7 +355,7 @@ describe('MixnetCoordinator', () => {
       .mockResolvedValueOnce(statusPayload('ready', '127.0.0.1:1080'));
     const startTransport = jest.fn().mockResolvedValue('127.0.0.1:1080');
     const published: MixnetView[] = [];
-    const coordinator = new MixnetCoordinator(startTransport, view =>
+    const coordinator = new MixnetCoordinator(startTransport, noopStop, view =>
       published.push(view),
     );
 
@@ -361,7 +382,7 @@ describe('MixnetCoordinator', () => {
       .mockResolvedValueOnce(statusPayload('ready', '127.0.0.1:1080'));
     const startTransport = jest.fn().mockResolvedValue('127.0.0.1:1080');
     const published: MixnetView[] = [];
-    const coordinator = new MixnetCoordinator(startTransport, view =>
+    const coordinator = new MixnetCoordinator(startTransport, noopStop, view =>
       published.push(view),
     );
 
@@ -384,7 +405,7 @@ describe('MixnetCoordinator', () => {
     mockedBridge.disableMixnet.mockResolvedValue(statusPayload('off'));
     const startTransport = jest.fn().mockResolvedValue('127.0.0.1:1080');
     const published: MixnetView[] = [];
-    const coordinator = new MixnetCoordinator(startTransport, view =>
+    const coordinator = new MixnetCoordinator(startTransport, noopStop, view =>
       published.push(view),
     );
 
@@ -407,7 +428,7 @@ describe('MixnetCoordinator', () => {
   it('backs off exponentially while the transport stays down', async () => {
     mockedBridge.attachMixnet.mockResolvedValue(statusPayload('died'));
     const startTransport = jest.fn().mockResolvedValue('127.0.0.1:1080');
-    const coordinator = new MixnetCoordinator(startTransport, () => {});
+    const coordinator = new MixnetCoordinator(startTransport, noopStop, () => {});
 
     await coordinator.ensureForConnectedSession();
     await flushPromises();

@@ -25,7 +25,6 @@ ios/vendor/
 
 # Exclude compiled libs
 android/app/src/main/jniLibs
-android/app/src/main/java/uniffi/zingo_nym_proxy_ffi/
 android/app/release/
 android/app/beta/release/
 *.aab

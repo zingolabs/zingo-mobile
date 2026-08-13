@@ -129,7 +129,10 @@ import {
   OFF_MIXNET_VIEW,
   MixnetView,
 } from '../walletBackend/transforms/mixnetPresenter';
-import { startMixnetTransport } from '../walletBackend/utils/nymTransport';
+import {
+  startMixnetTransport,
+  stopMixnetTransport,
+} from '../walletBackend/utils/nymTransport';
 import { RPCPerformanceLevelEnum } from '../walletBackend/enums/RPCPerformanceLevelEnum';
 import { AddressList } from '../../components/AddressList';
 import ValueTransferDetail from '../../components/History/components/ValueTransferDetail';
@@ -881,6 +884,7 @@ export class LoadedAppClass extends Component<
       onPersistentSyncFailure: this.recoverServer,
       onMixnetViewChanged: this.setMixnetView,
       startMixnetTransport: startMixnetTransport,
+      stopMixnetTransport: stopMixnetTransport,
       mixnetSupported: true,
       nymEnabled: props.nym,
       readOnly: props.readOnly,
@@ -1816,6 +1820,41 @@ export class LoadedAppClass extends Component<
     };
   };
 
+  // Dials each candidate in order and activates the first that connects.
+  activateReachableServer = async (
+    candidates: ServerUrisType[],
+  ): Promise<boolean> => {
+    for (const candidate of candidates) {
+      if (!candidate.uri) {
+        continue;
+      }
+      const next: ServerType = {
+        uri: candidate.uri,
+        chainName: candidate.chainName,
+      };
+      // Cap each dial: a dead candidate's changeServer can otherwise block for
+      // minutes (see checkServerURI), stalling the whole rotation.
+      const changed = await Promise.race([
+        changeServer(next.uri).then(result => result.ok),
+        new Promise<boolean>(resolve => setTimeout(() => resolve(false), 15_000)),
+      ]);
+      if (!changed) {
+        continue;
+      }
+      await SettingsFileImpl.writeSettings(SettingsNameEnum.server, next);
+      this.setState({ server: next });
+      this.rpc.setServer(next);
+      if (this.state.mode === ModeEnum.advanced) {
+        this.addLastSnackbar(
+          `${this.state.translate('loadedapp.selectingserverbest') as string} ${next.uri}`,
+          SnackbarDurationEnum.long,
+        );
+      }
+      return true;
+    }
+    return false;
+  };
+
   // The runtime half of the old boot-time server rescue: after repeated
   // sync-launch failures, silently activate a working server (live registry
   // first, then the static list by latency) and reattach the client to it.
@@ -1836,38 +1875,19 @@ export class LoadedAppClass extends Component<
       const live = (await fetchServerList(current.chainName)).filter(
         (s: ServerUrisType) => s.uri !== current.uri,
       );
-      let picked: ServerUrisType | null = live.length > 0 ? live[0] : null;
-      if (!picked) {
-        picked = await selectingServer(
-          serverUris(this.state.translate).filter(
-            (s: ServerUrisType) =>
-              !s.obsolete &&
-              s.chainName === current.chainName &&
-              s.uri !== current.uri,
-          ),
-        );
-      }
-      if (!picked || !picked.uri) {
+      if (await this.activateReachableServer(live)) {
         return;
       }
-      const next: ServerType = {
-        uri: picked.uri,
-        chainName: picked.chainName,
-      };
-      const changed = await changeServer(next.uri);
-      if (!changed.ok) {
-        // The pick is dead too. Keep the current server; the failure streak
-        // rebuilds and this retries with the next candidate.
-        return;
-      }
-      await SettingsFileImpl.writeSettings(SettingsNameEnum.server, next);
-      this.setState({ server: next });
-      this.rpc.setServer(next);
-      if (this.state.mode === ModeEnum.advanced) {
-        this.addLastSnackbar(
-          `${this.state.translate('loadedapp.selectingserverbest') as string} ${next.uri}`,
-          SnackbarDurationEnum.long,
-        );
+      const fallback = await selectingServer(
+        serverUris(this.state.translate).filter(
+          (s: ServerUrisType) =>
+            !s.obsolete &&
+            s.chainName === current.chainName &&
+            s.uri !== current.uri,
+        ),
+      );
+      if (fallback) {
+        await this.activateReachableServer([fallback]);
       }
     } finally {
       this.recoveringServer = false;

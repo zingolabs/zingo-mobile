@@ -172,6 +172,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     mixnetView,
     nym,
     setNymOption,
+    reenableMixnet,
   } = context;
   const { colors } = useTheme();
 
@@ -181,7 +182,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       ? mixnetPhase(mixnetView.statusKey, mixnetView.reconnecting)
       : null;
   const nymLoading = enabling || nymPhase === 'connecting';
-  const nymOn = nym && !nymLoading;
+  const nymOn = nym;
 
   useEffect(() => {
     if (enabling && nymPhase !== null) {
@@ -1172,7 +1173,7 @@ const Send: React.FunctionComponent<SendProps> = ({
           Utils.parseStringLocaleToNumberFloat(maxAmount.toFixed(8)),
       calculateFeeWithPropose: calculateFeeWithPropose,
       sendPageState: buildSendState(),
-      nym: false,
+      nym,
     });
   };
 
@@ -2120,6 +2121,8 @@ const Send: React.FunctionComponent<SendProps> = ({
                   >
                     {nymLoading ? (
                       <MixnetIcon phase="connecting" />
+                    ) : nymPhase === 'lost' || nymPhase === 'reconnecting' ? (
+                      <MixnetIcon phase={nymPhase} />
                     ) : nymOn ? (
                       <NymOn width={22} height={22} />
                     ) : (
@@ -2141,6 +2144,32 @@ const Send: React.FunctionComponent<SendProps> = ({
                       <SwitchOff width={40} height={19} />
                     )}
                   </TouchableOpacity>
+                )}
+                {mixnetView !== null && mixnetView.sendBlocked && (
+                  <View
+                    style={{
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      marginBottom: 10,
+                    }}
+                    testID="send.mixnet-blocked"
+                  >
+                    <FadeText style={{ textAlign: 'center' }}>
+                      {`${translate('mixnet.send-blocked') as string} (${translate(mixnetView.statusKey) as string})`}
+                    </FadeText>
+                    {mixnetView.narration !== null && (
+                      <FadeText style={{ textAlign: 'center' }}>
+                        {mixnetView.narration}
+                      </FadeText>
+                    )}
+                    {mixnetView.recovery === 'reenable' && (
+                      <TouchableOpacity onPress={() => reenableMixnet()}>
+                        <RegText color={colors.fgAccent}>
+                          {translate('mixnet.reenable') as string}
+                        </RegText>
+                      </TouchableOpacity>
+                    )}
+                  </View>
                 )}
                 <View
                   style={{

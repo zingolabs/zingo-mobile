@@ -84,6 +84,7 @@ class NymTransportModule internal constructor(reactContext: ReactApplicationCont
         var watched: MixnetProxyHandle? = null
 
         override fun onDeath(reason: ProxyDeathReason) {
+            android.util.Log.w("NymTransportModule", "mixnet proxy died: $reason")
             synchronized(handleLock) {
                 when (verdictOnDeath(handle, watched)) {
                     HandleDeathVerdict.ClearStored -> handle = null

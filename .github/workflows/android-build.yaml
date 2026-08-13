@@ -222,11 +222,39 @@ jobs:
         working-directory: ./rust/target/${{ env.TARGET }}/release
         run: mv ./libzingo.so ./libuniffi_zingo.so
 
+      - name: Cargo build nym proxy shim
+        working-directory: ./rust/nym-proxy-ffi
+        run: |
+          cargo ndk \
+          --target ${{ env.TARGET }} build \
+          --release
+        env:
+          AR: llvm-ar
+          LD: ld
+          RANLIB: llvm-ranlib
+          CC: ${{ env.CC }}26-clang
+          CARGO_FEATURE_STD: ${{ env.CARGO_FEATURE_STD }}
+          LIBCLANG_PATH: /usr/lib/llvm-18/lib
+          CARGO_NDK_PLATFORM: 26
+          CARGO_NDK_ANDROID_PLATFORM: 26
+
+      - name: LLVM Strip nym proxy shim
+        working-directory: ./rust/nym-proxy-ffi/target
+        run: |
+          llvm-strip --strip-all ./${{ env.TARGET }}/release/libzingo_nym_proxy_ffi.so
+          llvm-objcopy --remove-section .comment ./${{ env.TARGET }}/release/libzingo_nym_proxy_ffi.so
+
+      - name: Stage native libraries
+        run: |
+          mkdir -p rust/native-out
+          cp rust/target/${{ env.TARGET }}/release/libuniffi_zingo.so rust/native-out/
+          cp rust/nym-proxy-ffi/target/${{ env.TARGET }}/release/libzingo_nym_proxy_ffi.so rust/native-out/
+
       - name: Upload native rust
         uses: actions/upload-artifact@v7
         with:
           name: native-android-uniffi-${{ env.ARCH }}-${{ env.CACHE-KEY }}
-          path: rust/target/${{ env.TARGET }}/release/libuniffi_zingo.so
+          path: rust/native-out/
           retention-days: 3
 
       - name: Cancel the run on failure (fail-all)

@@ -182,7 +182,7 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
           layout={boxMorph()}
           style={{
             backgroundColor: colors.bgSurface,
-            borderColor: colors.borderMuted,
+            borderColor: colors.bottomSheetBorder,
             borderWidth: 1,
             borderRadius: 12,
             padding: 20,
@@ -217,12 +217,12 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
                       last={i === rows.length - 1}
                       labelColor={colors.fgMuted}
                       valueColor={colors.fgDefault}
-                      dividerColor={colors.borderMuted}
+                      dividerColor={colors.bottomSheetBorder}
                     />
                   ))}
                 </Animated.View>
               ) : (
-                <ReportSkeleton color={colors.borderMuted} />
+                <ReportSkeleton color={colors.bottomSheetBorder} />
               )}
             </Animated.View>
           )}

@@ -727,15 +727,6 @@ class RPCModule: NSObject {
       }
   }
 
-  @objc(mixnetIpCorrelationDisclaimerInfo:reject:)
-  func mixnetIpCorrelationDisclaimerInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      DispatchQueue.global(qos: .userInitiated).async {
-        FfiOutcome.of {
-          mixnetIpCorrelationDisclaimer()
-        }.settle(resolve: resolve, reject: reject)
-      }
-  }
-
   @objc(pollSyncInfo:reject:)
   func pollSyncInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
       DispatchQueue.global(qos: .userInitiated).async {

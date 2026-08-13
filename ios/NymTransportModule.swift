@@ -62,6 +62,7 @@ class NymTransportModule: NSObject {
     weak var watched: MixnetProxyHandle?
 
     func onDeath(reason: ProxyDeathReason) {
+      NSLog("[Native] mixnet proxy died: \(reason)")
       NymTransportModule.handleLock.lock()
       defer { NymTransportModule.handleLock.unlock() }
       switch verdictOnDeath(stored: NymTransportModule.handle, watched: watched) {
