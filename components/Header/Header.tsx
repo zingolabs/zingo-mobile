@@ -1,6 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
 import { faChevronLeft, faSnowflake } from '@fortawesome/free-solid-svg-icons';
-import BurgerIcon from '../../assets/img/options/burger.svg';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { NavigationProp, ParamListBase, useNavigation } from '@react-navigation/native';
 import { useTheme } from '../../app/theme';
@@ -30,12 +29,16 @@ import { ContextAppLoaded } from '../../app/context';
 import { getZingoLogo } from '../../app/utils/ZingoAppData';
 import { useShieldFunds } from '../../app/hooks/useShieldFunds';
 import { useSyncStatus } from '../../app/hooks/useSyncStatus';
+import { useAtomValue } from 'jotai';
+import { syncStatusAtom } from '../../app/AppState/syncAtoms';
+import { usePrice } from '../../app/AppState/priceAtoms';
 import BoldText from '../Components/BoldText';
 import SyncStatusBar from './components/SyncStatusBar';
 import BalanceRow from './components/BalanceRow';
 import PriceRow from './components/PriceRow';
 import { MessagesIcon } from '../Components/Icons/MessagesIcon';
 import { MessagesIcon as BoltIcon } from '../Components/Icons/BoltIcon';
+import { MenuMorphIcon } from '../Components/Icons/MenuMorphIcon';
 
 type HeaderProps = {
   // general
@@ -111,18 +114,22 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   const {
     totalBalance,
     info,
-    syncingStatus,
     currency,
-    zecPrice,
     readOnly,
     valueTransfersTotal,
     somePending,
     shieldingAmount,
     selectServer,
-    setZecPrice,
     nym,
     mixnetView,
   } = context;
+
+  // The sync slice reads from its own atom, so a scan tick wakes the
+  // header without re-rendering the wider context tree.
+  const syncingStatus = useAtomValue(syncStatusAtom);
+  // The price slice reads from its own atom, stable while the displayed
+  // price holds, so the memoized rows below hold across unrelated commits.
+  const zecPrice = usePrice();
 
   const translate = translateProp ?? context.translate;
   const netInfo = netInfoProp ?? context.netInfo;
@@ -131,8 +138,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
 
   const { colors } = useTheme();
 
-  // Fade the entire screen header out when the Options panel is open so
-  // its content doesn't shine through the (fading-in) panel overlay.
   const { isOpen: optionsPanelOpen } = useOptionsPanel();
   const headerOpacity = useSharedValue(1);
   useEffect(() => {
@@ -184,17 +189,20 @@ const Header: React.FunctionComponent<HeaderProps> = ({
 
   return (
     <>
-      <Animated.View style={headerAnimatedStyle}>
-        <View
+      <View>
+        <Animated.View
           testID="header"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            backgroundColor: colors.bgCanvas,
-            paddingTop: 0,
-            paddingBottom: 10,
-            minHeight: 50,
-          }}
+          style={[
+            headerAnimatedStyle,
+            {
+              display: 'flex',
+              alignItems: 'center',
+              backgroundColor: colors.bgCanvas,
+              paddingTop: 0,
+              paddingBottom: 10,
+              minHeight: 50,
+            },
+          ]}
         >
           <SyncStatusBar
             noSyncingStatus={noSyncingStatus}
@@ -227,7 +235,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             info={info}
             currency={currency}
             zecPrice={zecPrice}
-            setZecPrice={setZecPrice}
             selectServer={selectServer}
             showShieldButton={showShieldButton}
             shieldingFee={shieldingFee}
@@ -251,7 +258,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               onLayout={onPriceRowLayout}
             />
           )}
-        </View>
+        </Animated.View>
 
         <View
           style={{
@@ -272,11 +279,11 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                 accessibilityLabel={translate('menudrawer-acc') as string}
                 onPress={toggleMenuDrawer}
               >
-                <BurgerIcon width={25} height={25} />
+                <MenuMorphIcon />
               </TouchableOpacity>
             )}
             {readOnly && !noUfvkIcon && (
-              <>
+              <Animated.View style={headerAnimatedStyle}>
                 {!(
                   mode === ModeEnum.basic &&
                   valueTransfersTotal !== null &&
@@ -304,18 +311,21 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                     color={colors.fgMuted}
                   />
                 )}
-              </>
+              </Animated.View>
             )}
           </View>
         </View>
 
-        <View
-          style={{
-            padding: 13,
-            position: 'absolute',
-            right: 0,
-            top: 0,
-          }}
+        <Animated.View
+          style={[
+            headerAnimatedStyle,
+            {
+              padding: 13,
+              position: 'absolute',
+              right: 0,
+              top: 0,
+            },
+          ]}
         >
           {!noDrawMenu && screenName !== ScreenEnum.Settings ? (
             <View
@@ -352,8 +362,8 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               }}
             />
           )}
-        </View>
-      </Animated.View>
+        </Animated.View>
+      </View>
 
       {!!title && (
         <View

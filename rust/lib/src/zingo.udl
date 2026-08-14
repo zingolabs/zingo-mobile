@@ -30,6 +30,9 @@ namespace zingo {
   string init_logging();
 
   [Throws=ZingolibError]
+  string set_broadcast_candidates(string candidates_json);
+
+  [Throws=ZingolibError]
   string init_new(
       string serveruri,
       u32 birthday,
@@ -293,6 +296,4 @@ namespace zingo {
 
   [Throws=ZingolibError]
   string mixnet_bootstrap_detail();
-
-  string mixnet_ip_correlation_disclaimer();
 };

@@ -1,124 +1,1036 @@
 // Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`Component LoadedApp - test LoadedApp - snapshot 1`] = `
-<View
-  style={
-    {
-      "alignItems": "center",
-      "backgroundColor": "#011401",
-      "flex": 1,
-      "justifyContent": "center",
-    }
-  }
->
+[
   <View
     style={
       {
         "alignItems": "center",
-        "flex": 1,
-        "flexDirection": "column",
+        "flexDirection": "row",
+        "gap": 10,
         "justifyContent": "center",
-        "width": "95%",
+      }
+    }
+  />,
+  <View
+    style={
+      {
+        "flex": 1,
       }
     }
   >
     <View
       style={
         {
-          "alignItems": "center",
-          "flexDirection": "column",
-          "height": "40%",
-          "justifyContent": "flex-end",
-          "marginTop": 20,
-          "padding": 10,
-          "width": "80%",
+          "bottom": 0,
+          "left": 0,
+          "position": "absolute",
+          "right": 0,
+          "top": 0,
         }
       }
     >
-      <Text
-        style={
-          {
-            "color": "#888888",
-            "fontSize": 40,
-            "fontWeight": "bold",
-          }
-        }
+      <MockNavRoute
+        focused={true}
+        name="HomeStack"
+        testID="nav-route-HomeStack"
       >
-        Zingo
-      </Text>
-      <Text
-        style={
-          {
-            "color": "#888888",
-            "fontSize": 15,
-          }
-        }
-      >
-        2.0.19 (307)
-      </Text>
+        <MockNavRoute
+          focused={true}
+          name="History"
+          testID="nav-route-History"
+        >
+          <MockHistoryScreen
+            navigation={
+              {
+                "addListener": [MockFunction],
+                "canGoBack": [MockFunction],
+                "dispatch": [MockFunction],
+                "getParent": [MockFunction],
+                "getState": [MockFunction],
+                "goBack": [MockFunction],
+                "isFocused": [MockFunction],
+                "navigate": [MockFunction],
+                "removeListener": [MockFunction],
+                "reset": [MockFunction],
+                "setOptions": [MockFunction],
+                "setParams": [MockFunction],
+              }
+            }
+            route={
+              {
+                "key": "History",
+                "name": "History",
+                "params": {},
+              }
+            }
+            scrollToTop={false}
+            setScrollToBottom={[Function]}
+            setScrollToTop={[Function]}
+            setShieldingAmount={[Function]}
+            toggleMenuDrawer={[Function]}
+          />
+        </MockNavRoute>
+        <MockNavRoute
+          focused={false}
+          name="Send"
+          testID="nav-route-Send"
+        />
+        <MockNavRoute
+          focused={false}
+          name="Receive"
+          testID="nav-route-Receive"
+        />
+      </MockNavRoute>
+      <MockNavRoute
+        focused={false}
+        name="Settings"
+        testID="nav-route-Settings"
+      />
+      <MockNavRoute
+        focused={false}
+        name="About"
+        testID="nav-route-About"
+      />
+      <MockNavRoute
+        focused={false}
+        name="MixnetDoctor"
+        testID="nav-route-MixnetDoctor"
+      />
+      <MockNavRoute
+        focused={false}
+        name="Rescan"
+        testID="nav-route-Rescan"
+      />
+      <MockNavRoute
+        focused={false}
+        name="Insight"
+        testID="nav-route-Insight"
+      />
+      <MockNavRoute
+        focused={false}
+        name="Ufvk"
+        testID="nav-route-Ufvk"
+      />
+      <MockNavRoute
+        focused={false}
+        name="Seed"
+        testID="nav-route-Seed"
+      />
+      <MockNavRoute
+        focused={false}
+        name="SyncReport"
+        testID="nav-route-SyncReport"
+      />
+      <MockNavRoute
+        focused={false}
+        name="Pools"
+        testID="nav-route-Pools"
+      />
+      <MockNavRoute
+        focused={false}
+        name="MeetIronwood"
+        testID="nav-route-MeetIronwood"
+      />
+      <MockNavRoute
+        focused={false}
+        name="MigrationStrategy"
+        testID="nav-route-MigrationStrategy"
+      />
+      <MockNavRoute
+        focused={false}
+        name="MigrationTransactions"
+        testID="nav-route-MigrationTransactions"
+      />
+      <MockNavRoute
+        focused={false}
+        name="MigrationSending"
+        testID="nav-route-MigrationSending"
+      />
+      <MockNavRoute
+        focused={false}
+        name="MigrationSplitPlan"
+        testID="nav-route-MigrationSplitPlan"
+      />
+      <MockNavRoute
+        focused={false}
+        name="MigrationSplitting"
+        testID="nav-route-MigrationSplitting"
+      />
+      <MockNavRoute
+        focused={false}
+        name="MigrationCadence"
+        testID="nav-route-MigrationCadence"
+      />
+      <MockNavRoute
+        focused={false}
+        name="MigrationSchedule"
+        testID="nav-route-MigrationSchedule"
+      />
+      <MockNavRoute
+        focused={false}
+        name="MigrationStatus"
+        testID="nav-route-MigrationStatus"
+      />
+      <MockNavRoute
+        focused={false}
+        name="MigrationBatchSending"
+        testID="nav-route-MigrationBatchSending"
+      />
+      <MockNavRoute
+        focused={false}
+        name="AddressBook"
+        testID="nav-route-AddressBook"
+      />
+      <MockNavRoute
+        focused={false}
+        name="ValueTransferDetail"
+        testID="nav-route-ValueTransferDetail"
+      />
+      <MockNavRoute
+        focused={false}
+        name="AddressList"
+        testID="nav-route-AddressList"
+      />
+      <MockNavRoute
+        focused={false}
+        name="Messages"
+        testID="nav-route-Messages"
+      />
+      <MockNavRoute
+        focused={false}
+        name="Confirm"
+        testID="nav-route-Confirm"
+      />
+      <MockNavRoute
+        focused={false}
+        name="Computing"
+        testID="nav-route-Computing"
+      />
     </View>
     <View
+      pointerEvents="none"
       style={
-        {
-          "alignItems": "center",
-          "flexDirection": "column",
-          "height": "60%",
-          "justifyContent": "flex-start",
-          "marginTop": 20,
-          "padding": 10,
-          "width": "80%",
-        }
+        [
+          {
+            "bottom": 0,
+            "left": 0,
+            "position": "absolute",
+            "right": 0,
+            "top": 0,
+          },
+          {},
+        ]
       }
     >
-      <ActivityIndicator
-        color="transparent"
-        size="large"
-      />
-      <Text
-        selectable={true}
+      <View
         style={
           {
-            "color": "#c3c3c3",
-            "fontSize": 20,
-            "fontWeight": "bold",
-            "marginTop": 10,
-            "opacity": 0,
-            "textAlign": "center",
+            "backgroundColor": "#011401",
+            "flex": 1,
           }
         }
       >
-        updating.firstlaunchingmessage-title
-      </Text>
-      <Text
-        selectable={true}
-        style={
-          {
-            "color": "#c3c3c3",
-            "fontSize": 15,
-            "marginTop": 10,
-            "opacity": 0,
-            "textAlign": "center",
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "paddingBottom": 8,
+              "paddingHorizontal": 16,
+              "paddingTop": 12,
+            }
           }
-        }
-      >
-        updating.firstlaunchingmessage-body
-      </Text>
-      <Text
-        selectable={true}
-        style={
-          {
-            "color": "#c3c3c3",
-            "fontSize": 15,
-            "marginBottom": 10,
-            "marginTop": 10,
-            "opacity": 0,
-            "textAlign": "center",
+        >
+          <View
+            accessibilityState={
+              {
+                "busy": undefined,
+                "checked": undefined,
+                "disabled": undefined,
+                "expanded": undefined,
+                "selected": undefined,
+              }
+            }
+            accessibilityValue={
+              {
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
+              }
+            }
+            accessible={true}
+            collapsable={false}
+            focusable={true}
+            hitSlop={12}
+            onBlur={[Function]}
+            onClick={[Function]}
+            onFocus={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              {
+                "padding": 4,
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "height": 25,
+                  "justifyContent": "center",
+                  "width": 25,
+                }
+              }
+            />
+          </View>
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "flex": 1,
+                "justifyContent": "center",
+              }
+            }
+          >
+            <Text
+              style={
+                {
+                  "color": "#c3c3c3",
+                  "fontSize": 18,
+                  "fontWeight": "bold",
+                  "opacity": 0.87,
+                }
+              }
+            >
+              loadedapp.options
+            </Text>
+          </View>
+          <View
+            style={
+              {
+                "width": 27,
+              }
+            }
+          />
+        </View>
+        <RCTScrollView
+          contentContainerStyle={
+            {
+              "paddingBottom": 24,
+              "paddingHorizontal": 8,
+              "paddingTop": 28,
+            }
           }
-        }
-      >
-        updating.firstlaunchingmessage-footer
-      </Text>
+        >
+          <View>
+            <View
+              style={
+                {
+                  "flexDirection": "row",
+                  "flexWrap": "wrap",
+                }
+              }
+            >
+              <View
+                accessibilityState={
+                  {
+                    "busy": undefined,
+                    "checked": undefined,
+                    "disabled": undefined,
+                    "expanded": undefined,
+                    "selected": undefined,
+                  }
+                }
+                accessibilityValue={
+                  {
+                    "max": undefined,
+                    "min": undefined,
+                    "now": undefined,
+                    "text": undefined,
+                  }
+                }
+                accessible={true}
+                collapsable={false}
+                focusable={true}
+                onBlur={[Function]}
+                onClick={[Function]}
+                onFocus={[Function]}
+                onResponderGrant={[Function]}
+                onResponderMove={[Function]}
+                onResponderRelease={[Function]}
+                onResponderTerminate={[Function]}
+                onResponderTerminationRequest={[Function]}
+                onStartShouldSetResponder={[Function]}
+                style={
+                  {
+                    "alignItems": "center",
+                    "opacity": 1,
+                    "paddingVertical": 12,
+                    "width": "25%",
+                  }
+                }
+                testID="menu.addressbook"
+              >
+                <View
+                  style={
+                    {
+                      "alignItems": "center",
+                      "backgroundColor": "#111c2c",
+                      "borderRadius": 12,
+                      "height": 56,
+                      "justifyContent": "center",
+                      "marginBottom": 6,
+                      "width": 56,
+                    }
+                  }
+                >
+                  <View
+                    height={28}
+                    width={28}
+                  />
+                </View>
+                <Text
+                  numberOfLines={2}
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 12,
+                      "fontWeight": "400",
+                      "opacity": 1,
+                      "paddingHorizontal": 4,
+                      "textAlign": "center",
+                    }
+                  }
+                >
+                  loadedapp.addressbook
+                </Text>
+              </View>
+              <View
+                accessibilityState={
+                  {
+                    "busy": undefined,
+                    "checked": undefined,
+                    "disabled": undefined,
+                    "expanded": undefined,
+                    "selected": undefined,
+                  }
+                }
+                accessibilityValue={
+                  {
+                    "max": undefined,
+                    "min": undefined,
+                    "now": undefined,
+                    "text": undefined,
+                  }
+                }
+                accessible={true}
+                collapsable={false}
+                focusable={true}
+                onBlur={[Function]}
+                onClick={[Function]}
+                onFocus={[Function]}
+                onResponderGrant={[Function]}
+                onResponderMove={[Function]}
+                onResponderRelease={[Function]}
+                onResponderTerminate={[Function]}
+                onResponderTerminationRequest={[Function]}
+                onStartShouldSetResponder={[Function]}
+                style={
+                  {
+                    "alignItems": "center",
+                    "opacity": 1,
+                    "paddingVertical": 12,
+                    "width": "25%",
+                  }
+                }
+                testID="menu.walletseedufvk"
+              >
+                <View
+                  style={
+                    {
+                      "alignItems": "center",
+                      "backgroundColor": "#111c2c",
+                      "borderRadius": 12,
+                      "height": 56,
+                      "justifyContent": "center",
+                      "marginBottom": 6,
+                      "width": 56,
+                    }
+                  }
+                >
+                  <View
+                    height={28}
+                    width={28}
+                  />
+                </View>
+                <Text
+                  numberOfLines={2}
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 12,
+                      "fontWeight": "400",
+                      "opacity": 1,
+                      "paddingHorizontal": 4,
+                      "textAlign": "center",
+                    }
+                  }
+                >
+                  loadedapp.walletseed
+                </Text>
+              </View>
+              <View
+                accessibilityState={
+                  {
+                    "busy": undefined,
+                    "checked": undefined,
+                    "disabled": undefined,
+                    "expanded": undefined,
+                    "selected": undefined,
+                  }
+                }
+                accessibilityValue={
+                  {
+                    "max": undefined,
+                    "min": undefined,
+                    "now": undefined,
+                    "text": undefined,
+                  }
+                }
+                accessible={true}
+                collapsable={false}
+                focusable={true}
+                onBlur={[Function]}
+                onClick={[Function]}
+                onFocus={[Function]}
+                onResponderGrant={[Function]}
+                onResponderMove={[Function]}
+                onResponderRelease={[Function]}
+                onResponderTerminate={[Function]}
+                onResponderTerminationRequest={[Function]}
+                onStartShouldSetResponder={[Function]}
+                style={
+                  {
+                    "alignItems": "center",
+                    "opacity": 1,
+                    "paddingVertical": 12,
+                    "width": "25%",
+                  }
+                }
+                testID="menu.syncreport"
+              >
+                <View
+                  style={
+                    {
+                      "alignItems": "center",
+                      "backgroundColor": "#111c2c",
+                      "borderRadius": 12,
+                      "height": 56,
+                      "justifyContent": "center",
+                      "marginBottom": 6,
+                      "width": 56,
+                    }
+                  }
+                >
+                  <View
+                    height={30}
+                    width={30}
+                  />
+                </View>
+                <Text
+                  numberOfLines={2}
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 12,
+                      "fontWeight": "400",
+                      "opacity": 1,
+                      "paddingHorizontal": 4,
+                      "textAlign": "center",
+                    }
+                  }
+                >
+                  loadedapp.report
+                </Text>
+              </View>
+              <View
+                accessibilityState={
+                  {
+                    "busy": undefined,
+                    "checked": undefined,
+                    "disabled": undefined,
+                    "expanded": undefined,
+                    "selected": undefined,
+                  }
+                }
+                accessibilityValue={
+                  {
+                    "max": undefined,
+                    "min": undefined,
+                    "now": undefined,
+                    "text": undefined,
+                  }
+                }
+                accessible={true}
+                collapsable={false}
+                focusable={true}
+                onBlur={[Function]}
+                onClick={[Function]}
+                onFocus={[Function]}
+                onResponderGrant={[Function]}
+                onResponderMove={[Function]}
+                onResponderRelease={[Function]}
+                onResponderTerminate={[Function]}
+                onResponderTerminationRequest={[Function]}
+                onStartShouldSetResponder={[Function]}
+                style={
+                  {
+                    "alignItems": "center",
+                    "opacity": 1,
+                    "paddingVertical": 12,
+                    "width": "25%",
+                  }
+                }
+                testID="menu.fundpools"
+              >
+                <View
+                  style={
+                    {
+                      "alignItems": "center",
+                      "backgroundColor": "#111c2c",
+                      "borderRadius": 12,
+                      "height": 56,
+                      "justifyContent": "center",
+                      "marginBottom": 6,
+                      "width": 56,
+                    }
+                  }
+                >
+                  <View
+                    height={30}
+                    width={30}
+                  />
+                </View>
+                <Text
+                  numberOfLines={2}
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 12,
+                      "fontWeight": "400",
+                      "opacity": 1,
+                      "paddingHorizontal": 4,
+                      "textAlign": "center",
+                    }
+                  }
+                >
+                  loadedapp.fundpools
+                </Text>
+              </View>
+              <View
+                accessibilityState={
+                  {
+                    "busy": undefined,
+                    "checked": undefined,
+                    "disabled": undefined,
+                    "expanded": undefined,
+                    "selected": undefined,
+                  }
+                }
+                accessibilityValue={
+                  {
+                    "max": undefined,
+                    "min": undefined,
+                    "now": undefined,
+                    "text": undefined,
+                  }
+                }
+                accessible={true}
+                collapsable={false}
+                focusable={true}
+                onBlur={[Function]}
+                onClick={[Function]}
+                onFocus={[Function]}
+                onResponderGrant={[Function]}
+                onResponderMove={[Function]}
+                onResponderRelease={[Function]}
+                onResponderTerminate={[Function]}
+                onResponderTerminationRequest={[Function]}
+                onStartShouldSetResponder={[Function]}
+                style={
+                  {
+                    "alignItems": "center",
+                    "opacity": 1,
+                    "paddingVertical": 12,
+                    "width": "25%",
+                  }
+                }
+                testID="menu.insight"
+              >
+                <View
+                  style={
+                    {
+                      "alignItems": "center",
+                      "backgroundColor": "#111c2c",
+                      "borderRadius": 12,
+                      "height": 56,
+                      "justifyContent": "center",
+                      "marginBottom": 6,
+                      "width": 56,
+                    }
+                  }
+                >
+                  <View
+                    height={30}
+                    width={30}
+                  />
+                </View>
+                <Text
+                  numberOfLines={2}
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 12,
+                      "fontWeight": "400",
+                      "opacity": 1,
+                      "paddingHorizontal": 4,
+                      "textAlign": "center",
+                    }
+                  }
+                >
+                  loadedapp.insight
+                </Text>
+              </View>
+              <View
+                accessibilityState={
+                  {
+                    "busy": undefined,
+                    "checked": undefined,
+                    "disabled": undefined,
+                    "expanded": undefined,
+                    "selected": undefined,
+                  }
+                }
+                accessibilityValue={
+                  {
+                    "max": undefined,
+                    "min": undefined,
+                    "now": undefined,
+                    "text": undefined,
+                  }
+                }
+                accessible={true}
+                collapsable={false}
+                focusable={true}
+                onBlur={[Function]}
+                onClick={[Function]}
+                onFocus={[Function]}
+                onResponderGrant={[Function]}
+                onResponderMove={[Function]}
+                onResponderRelease={[Function]}
+                onResponderTerminate={[Function]}
+                onResponderTerminationRequest={[Function]}
+                onStartShouldSetResponder={[Function]}
+                style={
+                  {
+                    "alignItems": "center",
+                    "opacity": 1,
+                    "paddingVertical": 12,
+                    "width": "25%",
+                  }
+                }
+                testID="menu.changewallet"
+              >
+                <View
+                  style={
+                    {
+                      "alignItems": "center",
+                      "backgroundColor": "#111c2c",
+                      "borderRadius": 12,
+                      "height": 56,
+                      "justifyContent": "center",
+                      "marginBottom": 6,
+                      "width": 56,
+                    }
+                  }
+                >
+                  <View
+                    height={30}
+                    width={30}
+                  />
+                </View>
+                <Text
+                  numberOfLines={2}
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 12,
+                      "fontWeight": "400",
+                      "opacity": 1,
+                      "paddingHorizontal": 4,
+                      "textAlign": "center",
+                    }
+                  }
+                >
+                  loadedapp.changewallet
+                </Text>
+              </View>
+            </View>
+          </View>
+        </RCTScrollView>
+        <View
+          style={
+            {
+              "paddingBottom": 24,
+              "paddingHorizontal": 24,
+            }
+          }
+        >
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "gap": 28,
+                "justifyContent": "center",
+                "paddingBottom": 20,
+                "paddingTop": 16,
+              }
+            }
+          >
+            <View
+              accessibilityState={
+                {
+                  "busy": undefined,
+                  "checked": undefined,
+                  "disabled": undefined,
+                  "expanded": undefined,
+                  "selected": undefined,
+                }
+              }
+              accessibilityValue={
+                {
+                  "max": undefined,
+                  "min": undefined,
+                  "now": undefined,
+                  "text": undefined,
+                }
+              }
+              accessible={true}
+              collapsable={false}
+              focusable={true}
+              hitSlop={8}
+              onBlur={[Function]}
+              onClick={[Function]}
+              onFocus={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                {
+                  "padding": 4,
+                }
+              }
+            >
+              <View
+                height={22}
+                width={22}
+              />
+            </View>
+            <View
+              accessibilityState={
+                {
+                  "busy": undefined,
+                  "checked": undefined,
+                  "disabled": undefined,
+                  "expanded": undefined,
+                  "selected": undefined,
+                }
+              }
+              accessibilityValue={
+                {
+                  "max": undefined,
+                  "min": undefined,
+                  "now": undefined,
+                  "text": undefined,
+                }
+              }
+              accessible={true}
+              collapsable={false}
+              focusable={true}
+              hitSlop={8}
+              onBlur={[Function]}
+              onClick={[Function]}
+              onFocus={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                {
+                  "padding": 4,
+                }
+              }
+            >
+              <View
+                height={27}
+                width={27}
+              />
+            </View>
+            <View
+              accessibilityState={
+                {
+                  "busy": undefined,
+                  "checked": undefined,
+                  "disabled": undefined,
+                  "expanded": undefined,
+                  "selected": undefined,
+                }
+              }
+              accessibilityValue={
+                {
+                  "max": undefined,
+                  "min": undefined,
+                  "now": undefined,
+                  "text": undefined,
+                }
+              }
+              accessible={true}
+              collapsable={false}
+              focusable={true}
+              hitSlop={8}
+              onBlur={[Function]}
+              onClick={[Function]}
+              onFocus={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                {
+                  "padding": 4,
+                }
+              }
+            >
+              <View
+                height={29}
+                width={29}
+              />
+            </View>
+          </View>
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "borderColor": "#888888",
+                "borderRadius": 10,
+                "borderWidth": 1,
+                "flexDirection": "row",
+                "padding": 10,
+              }
+            }
+          >
+            <Image
+              source={
+                {
+                  "testUri": "../../../assets/img/logobig-zingo.png",
+                }
+              }
+              style={
+                {
+                  "borderRadius": 7,
+                  "height": 32,
+                  "marginRight": 12,
+                  "resizeMode": "contain",
+                  "width": 32,
+                }
+              }
+            />
+            <View
+              accessibilityState={
+                {
+                  "busy": undefined,
+                  "checked": undefined,
+                  "disabled": undefined,
+                  "expanded": undefined,
+                  "selected": undefined,
+                }
+              }
+              accessibilityValue={
+                {
+                  "max": undefined,
+                  "min": undefined,
+                  "now": undefined,
+                  "text": undefined,
+                }
+              }
+              accessible={true}
+              collapsable={false}
+              focusable={true}
+              onBlur={[Function]}
+              onClick={[Function]}
+              onFocus={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                {
+                  "alignItems": "center",
+                  "flex": 1,
+                  "flexDirection": "row",
+                  "opacity": 1,
+                }
+              }
+            >
+              <Text
+                style={
+                  {
+                    "color": "#c3c3c3",
+                    "flex": 1,
+                    "fontSize": 16,
+                    "fontWeight": "bold",
+                  }
+                }
+              >
+                Zingo   
+                <Text
+                  style={
+                    {
+                      "color": "#18bd18",
+                      "fontSize": 14,
+                      "fontWeight": "bold",
+                    }
+                  }
+                >
+                  settings.value-mode-basic
+                </Text>
+              </Text>
+              <View
+                height={18}
+                width={18}
+              />
+            </View>
+          </View>
+        </View>
+      </View>
     </View>
-  </View>
-</View>
+  </View>,
+]
 `;

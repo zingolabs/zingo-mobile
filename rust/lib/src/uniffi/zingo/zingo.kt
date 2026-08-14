@@ -952,8 +952,6 @@ fun uniffi_zingo_checksum_func_migration_status(
 ): Short
 fun uniffi_zingo_checksum_func_mixnet_bootstrap_detail(
 ): Short
-fun uniffi_zingo_checksum_func_mixnet_ip_correlation_disclaimer(
-): Short
 fun uniffi_zingo_checksum_func_mixnet_mode(
 ): Short
 fun uniffi_zingo_checksum_func_parse_address(
@@ -983,6 +981,8 @@ fun uniffi_zingo_checksum_func_run_sync(
 fun uniffi_zingo_checksum_func_save_wallet_bytes(
 ): Short
 fun uniffi_zingo_checksum_func_send(
+): Short
+fun uniffi_zingo_checksum_func_set_broadcast_candidates(
 ): Short
 fun uniffi_zingo_checksum_func_set_config_wallet_to_prod(
 ): Short
@@ -1137,8 +1137,6 @@ fun uniffi_zingo_fn_func_migration_status(uniffi_out_err: UniffiRustCallStatus,
 ): RustBuffer.ByValue
 fun uniffi_zingo_fn_func_mixnet_bootstrap_detail(uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
-fun uniffi_zingo_fn_func_mixnet_ip_correlation_disclaimer(uniffi_out_err: UniffiRustCallStatus, 
-): RustBuffer.ByValue
 fun uniffi_zingo_fn_func_mixnet_mode(uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
 fun uniffi_zingo_fn_func_parse_address(`address`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
@@ -1168,6 +1166,8 @@ fun uniffi_zingo_fn_func_run_sync(uniffi_out_err: UniffiRustCallStatus,
 fun uniffi_zingo_fn_func_save_wallet_bytes(uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
 fun uniffi_zingo_fn_func_send(`sendJson`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+): RustBuffer.ByValue
+fun uniffi_zingo_fn_func_set_broadcast_candidates(`candidatesJson`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
 fun uniffi_zingo_fn_func_set_config_wallet_to_prod(`performancelevel`: RustBuffer.ByValue,`minconfirmations`: Int,uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
@@ -1446,9 +1446,6 @@ private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
     if (lib.uniffi_zingo_checksum_func_mixnet_bootstrap_detail() != 12980.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_zingo_checksum_func_mixnet_ip_correlation_disclaimer() != 47567.toShort()) {
-        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
-    }
     if (lib.uniffi_zingo_checksum_func_mixnet_mode() != 29476.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
@@ -1492,6 +1489,9 @@ private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if (lib.uniffi_zingo_checksum_func_send() != 12451.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if (lib.uniffi_zingo_checksum_func_set_broadcast_candidates() != 16427.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if (lib.uniffi_zingo_checksum_func_set_config_wallet_to_prod() != 27284.toShort()) {
@@ -2409,15 +2409,6 @@ public object FfiConverterOptionalByteArray: FfiConverterRustBuffer<kotlin.ByteA
     )
     }
     
- fun `mixnetIpCorrelationDisclaimer`(): kotlin.String {
-            return FfiConverterString.lift(
-    uniffiRustCall() { _status ->
-    UniffiLib.INSTANCE.uniffi_zingo_fn_func_mixnet_ip_correlation_disclaimer(
-        _status)
-}
-    )
-    }
-    
 
     @Throws(ZingolibException::class) fun `mixnetMode`(): kotlin.String {
             return FfiConverterString.lift(
@@ -2564,6 +2555,16 @@ public object FfiConverterOptionalByteArray: FfiConverterRustBuffer<kotlin.ByteA
     uniffiRustCallWithError(ZingolibException) { _status ->
     UniffiLib.INSTANCE.uniffi_zingo_fn_func_send(
         FfiConverterString.lower(`sendJson`),_status)
+}
+    )
+    }
+    
+
+    @Throws(ZingolibException::class) fun `setBroadcastCandidates`(`candidatesJson`: kotlin.String): kotlin.String {
+            return FfiConverterString.lift(
+    uniffiRustCallWithError(ZingolibException) { _status ->
+    UniffiLib.INSTANCE.uniffi_zingo_fn_func_set_broadcast_candidates(
+        FfiConverterString.lower(`candidatesJson`),_status)
 }
     )
     }

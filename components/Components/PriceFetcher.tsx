@@ -1,26 +1,27 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext } from 'react';
 import {
   TouchableOpacity,
   View,
   ActivityIndicator,
   ViewStyle,
 } from 'react-native';
+import { useAtomValue } from 'jotai';
 import { useTheme } from '../../app/theme';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faRotateRight } from '@fortawesome/free-solid-svg-icons';
 import { ContextAppLoaded } from '../../app/context';
 import RegText from './RegText';
 import { ModeEnum } from '../../app/AppState';
-import { showConfirm, ConfirmButton } from '../../app/showConfirm';
-import QuoteRefreshRing from './QuoteRefreshRing';
 import {
   PRICE_AUTO_REFRESH_MS,
-  priceFetcherStore,
-  usePriceFetcherStore,
-} from './priceFetcherStore';
+  priceLaneAtom,
+  usePrice,
+  usePriceFetcher,
+} from '../../app/AppState/priceAtoms';
+import { showConfirm, ConfirmButton } from '../../app/showConfirm';
+import QuoteRefreshRing from './QuoteRefreshRing';
 
 type PriceFetcherProps = {
-  setZecPrice: (p: number, d: number) => void;
   textBefore?: string;
   backgroundColor?: string;
   // Fired on a manual (user) tap only — not on the 60 s auto-refresh. Lets the
@@ -30,30 +31,26 @@ type PriceFetcherProps = {
 };
 
 const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
-  setZecPrice,
   textBefore,
   backgroundColor,
   onManualFetch,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, zecPrice, addLastSnackbar, mode } = context;
+  const { translate, mode } = context;
   const { colors } = useTheme();
   const bg = backgroundColor ?? colors.bgCanvas;
 
-  // Shared state across every mounted PriceFetcher.
-  const { started, loading, coolingDown } = usePriceFetcherStore();
-
-  // Feed the shared store the latest context-bound callbacks (identical across
-  // instances, so the last writer wins harmlessly).
-  useEffect(() => {
-    priceFetcherStore.setDeps({ setZecPrice, translate, addLastSnackbar });
-  });
+  const price = usePrice();
+  // Subscribes this fetcher to the lane, gating the 60 s auto-refresh on ≥1
+  // mounted consumer.
+  const { started, loading, coolingDown } = usePriceFetcher();
+  const lane = useAtomValue(priceLaneAtom);
 
   const onPressFetchAlert = () => {
     const buttons: ConfirmButton[] = [
       {
         text: translate('send.fetch-button') as string,
-        onPress: () => priceFetcherStore.fetch(),
+        onPress: () => lane.fetch(),
       },
       { text: translate('cancel') as string, style: 'cancel' },
     ];
@@ -69,12 +66,12 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
     // No-ops on screens that don't wire a reveal callback.
     onManualFetch?.();
     // Confirm only on the very first request in advanced mode; afterwards a tap
-    // fetches straight away. Basic mode never confirms. The store swallows the
-    // tap while loading / within the 5 s cooldown, so this can't be spammed.
+    // fetches straight away. Basic mode never confirms. The lane swallows the
+    // tap while fetching / within the 5 s cooldown, so this can't be spammed.
     if (!started && mode === ModeEnum.advanced) {
       onPressFetchAlert();
     } else {
-      priceFetcherStore.fetch();
+      lane.fetch();
     }
   };
 
@@ -117,7 +114,7 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
           ringColor={'rgba(255,255,255,0.55)'}
           trackColor={'rgba(255,255,255,0.12)'}
           durationMs={PRICE_AUTO_REFRESH_MS}
-          resetKey={zecPrice.date}
+          resetKey={price.date}
           onPress={onManualPress}
           disabled={loading || coolingDown}
           testID="pricefetcher.ring"

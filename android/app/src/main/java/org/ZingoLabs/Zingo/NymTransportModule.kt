@@ -84,6 +84,7 @@ class NymTransportModule internal constructor(reactContext: ReactApplicationCont
         var watched: MixnetProxyHandle? = null
 
         override fun onDeath(reason: ProxyDeathReason) {
+            android.util.Log.w("NymTransportModule", "mixnet proxy died: $reason")
             synchronized(handleLock) {
                 when (verdictOnDeath(handle, watched)) {
                     HandleDeathVerdict.ClearStored -> handle = null
@@ -109,6 +110,9 @@ class NymTransportModule internal constructor(reactContext: ReactApplicationCont
         FfiOutcome.settling(promise, "start_mixnet_transport") {
             guardingLinkage {
                 synchronized(handleLock) {
+                    // TLS first: the platform verifier must hold the app
+                    // Context before the shim opens any connection (ADR 0004).
+                    NymTlsInit.initPlatformVerifier(reactApplicationContext.applicationContext)
                     handle?.stop()
                     val observer = HandleClearingObserver()
                     val started = MixnetProxyHandle.start(observer)

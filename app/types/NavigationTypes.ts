@@ -7,8 +7,8 @@ import {
   SendPageStateClass,
   UfvkActionEnum,
   ValueTransferType,
+  ProposalPoolsType,
 } from '../AppState';
-import { RPCParseAddressType } from '../walletBackend/types/RPCParseAddressType';
 import { RPCDrainTxType } from '../walletBackend/types/RPCDrainPlanType';
 import { RPCMigrationPlanType } from '../walletBackend/types/RPCMigrationPlanType';
 
@@ -66,6 +66,7 @@ export type AppDrawerParamList = {
   [RouteEnum.Messages]: undefined;
   [RouteEnum.Settings]: undefined;
   [RouteEnum.About]: undefined;
+  [RouteEnum.MixnetDoctor]: undefined;
   [RouteEnum.Rescan]: undefined;
   [RouteEnum.Insight]: undefined;
   [RouteEnum.Computing]:
@@ -140,7 +141,7 @@ export type ValueTransferDetailNavigationState = {
 
 export type ConfirmNavigationState = {
   calculatedFee: number;
-  parseAddressInfoJSON: RPCParseAddressType;
+  proposalPools: ProposalPoolsType;
   donationAmount: number;
   confirmSend: (s: SendPageStateClass) => Promise<void>;
   sendAllAmount: boolean;

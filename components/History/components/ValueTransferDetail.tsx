@@ -521,7 +521,9 @@ const ValueTransferDetail: React.FunctionComponent<
                             : valueTransfer.kind ===
                                   ValueTransferKindEnum.MemoToSelf &&
                                 valueTransfer.confirmations === 0
-                              ? (translate('history.sendingtoself') as string)
+                              ? (translate(
+                                  'history.sendingmemotoself',
+                                ) as string)
                               : valueTransfer.kind ===
                                     ValueTransferKindEnum.MemoToSelf &&
                                   valueTransfer.confirmations !== 0

@@ -78,7 +78,7 @@ const Card: React.FunctionComponent<{
   <View
     style={{
       borderWidth: 1,
-      borderColor: colors.bottomSheetBorder,
+      borderColor: colors.borderMuted,
       backgroundColor: background ?? colors.bgSurface,
       borderRadius: 12,
       paddingHorizontal: 16,
@@ -94,7 +94,7 @@ const MigrationTransactions: React.FunctionComponent<
   MigrationTransactionsProps
 > = ({ navigation }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, info } = context;
+  const { translate, info, totalBalance } = context;
   const { colors } = useTheme();
 
   const [plan, setPlan] = useState<RPCDrainPlanType | null>(null);
@@ -115,35 +115,31 @@ const MigrationTransactions: React.FunctionComponent<
     navigation.reset({ index: 0, routes: [{ name: RouteEnum.HomeStack }] });
   }, [navigation]);
 
-  // Fetch the drain plan on mount. Pure preview: nothing is broadcast here.
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      const planResult = await planOrchardDrain();
-      if (cancelled) {
-        return;
-      }
-      if (!planResult.ok) {
-        setErrorMsg(planResult.error.message);
-        setLoading(false);
-        return;
-      }
-      try {
-        const parsed: RPCDrainPlanType = JSON.parse(planResult.value);
-        if (parsed.error) {
-          setErrorMsg(parsed.error);
-        } else {
-          setPlan(parsed);
-        }
-      } catch (e) {
-        setErrorMsg(`${e}`);
-      }
+  const fetchPlan = useCallback(async () => {
+    setLoading(true);
+    setErrorMsg(null);
+    const planResult = await planOrchardDrain();
+    if (!planResult.ok) {
+      setErrorMsg(planResult.error.message);
       setLoading(false);
-    })();
-    return () => {
-      cancelled = true;
-    };
+      return;
+    }
+    try {
+      const parsed: RPCDrainPlanType = JSON.parse(planResult.value);
+      if (parsed.error) {
+        setErrorMsg(parsed.error);
+      } else {
+        setPlan(parsed);
+      }
+    } catch (e) {
+      setErrorMsg(`${e}`);
+    }
+    setLoading(false);
   }, []);
+
+  useEffect(() => {
+    fetchPlan();
+  }, [fetchPlan]);
 
   // Accepting hands off to the dedicated sending screen, which owns the
   // broadcast and its live progress. We pass the previewed transactions so its
@@ -157,7 +153,10 @@ const MigrationTransactions: React.FunctionComponent<
   const transactions = plan?.transactions ?? [];
   const txCount = transactions.length;
   const noteCount = transactions.reduce((sum, tx) => sum + tx.inputs.length, 0);
-  const isEmpty = !loading && !errorMsg && txCount === 0;
+  const orchardHeld = totalBalance ? totalBalance.confirmedOrchardBalance : 0;
+  const noPlan = !loading && !errorMsg && txCount === 0;
+  const isPending = noPlan && (plan?.residual ?? 0) === 0 && orchardHeld > 0;
+  const isEmpty = noPlan && !isPending;
 
   const title = (
     <BoldText style={{ fontSize: 22, textAlign: 'center', marginBottom: 8 }}>
@@ -241,6 +240,66 @@ const MigrationTransactions: React.FunctionComponent<
             type={ButtonTypeEnum.Ghost}
             title={translate('migrationtransactions.back') as string}
             onPress={() => navigation.goBack()}
+          />
+        </View>
+      </View>
+    );
+  }
+
+  if (isPending) {
+    return (
+      <View style={{ flex: 1, backgroundColor: colors.bgCanvas }}>
+        <ScrollView
+          contentContainerStyle={{ padding: 24, paddingTop: 40, flexGrow: 1 }}
+        >
+          {title}
+          <View
+            style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
+          >
+            <Text
+              style={{
+                color: colors.fgDefault,
+                fontSize: 17,
+                fontWeight: '700',
+                marginBottom: 10,
+                textAlign: 'center',
+              }}
+            >
+              {translate('migrationtransactions.pending-title') as string}
+            </Text>
+            <Text
+              style={{
+                color: colors.fgMuted,
+                fontSize: 14,
+                textAlign: 'center',
+              }}
+            >
+              {translate('migrationtransactions.pending-body') as string}
+            </Text>
+          </View>
+        </ScrollView>
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-evenly',
+            alignItems: 'center',
+            paddingBottom: 24,
+            paddingHorizontal: 24,
+          }}
+        >
+          <Button
+            testID="migrationtransactions.pending-back"
+            type={ButtonTypeEnum.Ghost}
+            title={translate('migrationtransactions.back') as string}
+            onPress={() => navigation.goBack()}
+            twoButtons={true}
+          />
+          <Button
+            testID="migrationtransactions.retry"
+            type={ButtonTypeEnum.Primary}
+            title={translate('migrationtransactions.retry') as string}
+            onPress={fetchPlan}
+            twoButtons={true}
           />
         </View>
       </View>
@@ -376,7 +435,7 @@ const MigrationTransactions: React.FunctionComponent<
         <View
           style={{
             height: 1,
-            backgroundColor: colors.bottomSheetBorder,
+            backgroundColor: colors.borderMuted,
             marginBottom: 14,
           }}
         />

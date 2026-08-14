@@ -4,7 +4,6 @@ import SendPageStateClass from './classes/SendPageStateClass';
 import AddressBookFileClass from './classes/AddressBookFileClass';
 
 import InfoType from './types/InfoType';
-import ZecPriceType from './types/ZecPriceType';
 import BackgroundType from './types/BackgroundType';
 import { TranslateType } from './types/TranslateType';
 import NetInfoType from './types/NetInfoType';
@@ -20,7 +19,6 @@ import { ChainNameEnum } from './enums/ChainNameEnum';
 import { SnackbarDurationEnum } from './enums/SnackbarDurationEnum';
 import { LoadedAppNavigationState } from '../types';
 import ValueTransferType from './types/ValueTransferType';
-import { RPCSyncStatusType } from '../walletBackend/types/RPCSyncStatusType';
 import TransparentAddressClass from './classes/TransparentAddressClass';
 import { ScreenEnum } from './enums/ScreenEnum';
 import { RPCPerformanceLevelEnum } from '../walletBackend/enums/RPCPerformanceLevelEnum';
@@ -51,17 +49,11 @@ export default interface AppContextLoaded {
   // getinfo and getblockchaininfo result
   info: InfoType;
 
-  // syncing Info about the status of the process
-  syncingStatus: RPCSyncStatusType;
-
   // wallet birthday block height
   birthday: number;
 
   // active UA in the wallet
   defaultUnifiedAddress: string;
-
-  // zec price in USD from internet
-  zecPrice: ZecPriceType;
 
   // helper to get text tranalated to the active language
   translate: (key: string) => TranslateType;
@@ -111,9 +103,6 @@ export default interface AppContextLoaded {
   // refresh the different list in the App: history & messages
   doRefresh: (s: ScreenEnum) => void;
 
-  // fetch the ZEC price in USD
-  setZecPrice: (p: number, d: number) => void;
-
   // donation address
   zenniesDonationAddress: string;
 
@@ -135,8 +124,8 @@ export default interface AppContextLoaded {
   selectServer: SelectServerEnum;
   // The loaded wallet's OWN chain (main/test/regtest). Reliable even Offline,
   // unlike `server.chainName` which is empty in Offline mode. Empty when no
-  // wallet / unknown. Used to decide, on a server change, whether to open the
-  // wallet directly or launch a chain switch.
+  // wallet / unknown. Decides, on a server change, whether to open the wallet
+  // directly or launch a chain switch.
   walletChainName: ChainNameEnum;
   rescanMenu: boolean;
   recoveryWalletInfoOnDevice: boolean;
@@ -146,10 +135,10 @@ export default interface AppContextLoaded {
   setNymOption: (value: boolean) => Promise<void>;
 
   // Mixnet Mode (send-over-nym step 5). The screen-facing projection of the
-  // per-session policy, or null on a platform whose transport has not
-  // landed (iOS until the Mac-gated step) — screens render nothing and the
-  // send gate stays open when null. Disable is the deliberate per-session
-  // clearnet consent; re-enable recovers a died or failed transport.
+  // per-session policy, or null where the policy is not run (tests inject
+  // mixnetSupported false) — screens render nothing and the send gate stays
+  // open when null. Disable is the deliberate per-session clearnet consent;
+  // re-enable recovers a died or failed transport.
   mixnetView: MixnetView | null;
   disableMixnet: () => Promise<void>;
   reenableMixnet: () => Promise<void>;

@@ -67,6 +67,11 @@ Native mode requires these extras on the host (NDK is already listed above):
 - `cargo install --version 4.0.1 cargo-ndk`
 - `cargo install --force --locked bindgen-cli`
 - `rustup target add aarch64-linux-android armv7-linux-androideabi i686-linux-android x86_64-linux-android`
+- protoc (must be on `PATH`). The Rust build regenerates the lightwalletd
+  protos, and the generator calls protoc.
+  - **macOS**: `brew install protobuf`
+  - **Linux**: `sudo apt install protobuf-compiler`
+  - **Windows**: `winget install Google.Protobuf`
 
 ## Launching the app
 ### Android Studio

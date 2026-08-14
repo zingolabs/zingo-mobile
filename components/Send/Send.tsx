@@ -41,11 +41,13 @@ import SelectBottomSheet from '../Components/SelectBottomSheet';
 import { SvgXml } from 'react-native-svg';
 import FadeText from '../Components/FadeText';
 import BoldText from '../Components/BoldText';
+import Swap from '../../assets/img/swap.svg';
 import NymOn from '../../assets/img/nym-on.svg';
 import NymOff from '../../assets/img/nym-off.svg';
-import SwitchOn from '../../assets/img/nym-switch-on.svg';
+import NymSwitchOn from '../../assets/img/nym-switch-on.svg';
 import SwitchOff from '../../assets/img/switch-off.svg';
-import Swap from '../../assets/img/swap.svg';
+import { showConfirm } from '../../app/showConfirm';
+import MixnetIcon, { mixnetPhase } from '../Header/components/MixnetIcon';
 import ErrorText from '../Components/ErrorText';
 import RegText from '../Components/RegText';
 import ZecAmount from '../Components/ZecAmount';
@@ -67,24 +69,25 @@ import {
   RouteEnum,
   SecurityType,
   ScreenEnum,
+  ProposalPoolsType,
 } from '../../app/AppState';
+import { hasUnconfirmedFunds } from '../../app/AppState/classes/TotalBalanceClass';
 import { parseZcashURI, serverUris, fetchServerList } from '../../app/uris';
 import {
   getSpendableBalanceWithAddress,
-  parseAddress,
   sendPropose,
 } from '../../app/walletBackend';
 import {
   classifySendFailure,
   retryOnAnotherServer,
-  sendFailureMessage,
+  sendFailureText,
 } from '../../app/walletBackend/transforms/sendFailureTransform';
 import Utils from '../../app/utils';
 import { safeSnapToIndex } from '../../app/utils/safeSnapToIndex';
 import { AppDrawerParamList } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import PriceFetcher from '../Components/PriceFetcher';
-import { usePriceFetcherStore } from '../Components/priceFetcherStore';
+import { usePrice, usePriceFetcher } from '../../app/AppState/priceAtoms';
 import Header from '../Header';
 import BottomSheet, {
   BottomSheetBackdrop,
@@ -103,7 +106,6 @@ import Memo from './components/Memo';
 import SendErrorSheet from './components/SendErrorSheet';
 import { sendEmail } from '../../app/sendEmail';
 import selectingServer from '../../app/selectingServer';
-import { RPCParseAddressType } from '../../app/walletBackend/types/RPCParseAddressType';
 import { RPCSpendablebalanceType } from '../../app/walletBackend/types/RPCSpendablebalanceType';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
@@ -144,7 +146,6 @@ const Send: React.FunctionComponent<SendProps> = ({
     info,
     totalBalance,
     sendPageState,
-    zecPrice,
     sendAll,
     netInfo,
     privacy,
@@ -161,24 +162,38 @@ const Send: React.FunctionComponent<SendProps> = ({
     defaultUnifiedAddress,
     shieldingAmount,
     selectServer,
-    setZecPrice,
     zenniesDonationAddress,
     //security,
     currency,
     zingolibVersion,
     setPrivacyOption,
-    nym: nymContext,
     mixnetView,
+    nym,
+    setNymOption,
     reenableMixnet,
   } = context;
   const { colors } = useTheme();
+  const zecPrice = usePrice();
+
+  const [enabling, setEnabling] = useState<boolean>(false);
+  const nymPhase =
+    mixnetView !== null
+      ? mixnetPhase(mixnetView.statusKey, mixnetView.reconnecting)
+      : null;
+  const nymLoading = enabling || nymPhase === 'connecting';
+  const nymOn = nym;
+
+  useEffect(() => {
+    if (enabling && nymPhase !== null) {
+      setEnabling(false);
+    }
+  }, [enabling, nymPhase]);
   const screenName = ScreenEnum.Send;
   const zecIconXml = `<?xml version="1.0" encoding="UTF-8"?>
   <svg viewBox="0 0 88.03 147.85">
     <polygon points="34.44 107.62 34.44 106.98 87.19 34.17 87.19 20.12 56.09 20.12 56.09 0 35.98 0 35.98 20.12 5.04 20.12 5.04 40.24 53.93 40.24 53.93 40.88 0 114.64 0 127.73 35.98 127.73 35.98 147.85 56.09 147.85 56.09 127.73 88.03 127.73 88.03 107.62 34.44 107.62"/>
   </svg>`;
 
-  const [nym, setNym] = useState<boolean>(nymContext);
   const [memoEnabled, setMemoEnabled] = useState<boolean>(false);
   const [validAddress, setValidAddress] = useState<number>(0); // 1 - OK, 0 - Empty, -1 - KO
   const [validAmount, setValidAmount] = useState<number>(0); // 1 - OK, 0 - Empty, -1 - Invalid number, -2 - Invalid Amount
@@ -191,6 +206,10 @@ const Send: React.FunctionComponent<SendProps> = ({
   const [maxAmount, setMaxAmount] = useState<number>(0);
   const [spendable, setSpendable] = useState<number>(0);
   const [fee, setFee] = useState<number>(0);
+  const [proposalPools, setProposalPools] = useState<ProposalPoolsType>({
+    source: [],
+    destination: [],
+  });
   const [stillConfirming, setStillConfirming] = useState<boolean>(false);
   const [showShieldInfo, setShowShieldInfo] = useState<boolean>(false);
   const [updatingToField, setUpdatingToField] = useState<boolean>(false);
@@ -242,7 +261,7 @@ const Send: React.FunctionComponent<SendProps> = ({
 
   // Price-fetch state shared with the PriceFetcher ring; drives the CTA's
   // transient "Refreshing price" label.
-  const { loading: priceLoading } = usePriceFetcherStore();
+  const { loading: priceLoading } = usePriceFetcher();
 
   // Fee (`sendPropose`) and/or spendable-balance RPC error → the CTA turns into
   // a tappable "calculation error" button that opens SendErrorSheet, which
@@ -391,6 +410,7 @@ const Send: React.FunctionComponent<SendProps> = ({
 
   const defaultValueFee = (): void => {
     setFee(0);
+    setProposalPools({ source: [], destination: [] });
     setProposeSendLastError('');
   };
 
@@ -470,6 +490,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       );
       // fee
       let proposeFee = 0;
+      let proposePools: ProposalPoolsType = { source: [], destination: [] };
       const runPropose = await sendPropose(JSON.stringify(sendJson));
 
       // discard result if a newer calculation (or a clear) has superseded this one
@@ -493,6 +514,10 @@ const Send: React.FunctionComponent<SendProps> = ({
               proposeFee = runProposeJson.fee / 10 ** 8;
               setProposeSendLastError('');
             }
+            proposePools = {
+              source: runProposeJson.source_pools ?? [],
+              destination: runProposeJson.destination_pools ?? [],
+            };
             if (runProposeJson.amount !== undefined) {
               const newAmount =
                 runProposeJson.amount / 10 ** 8 -
@@ -519,6 +544,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         }
       }
       setFee(proposeFee);
+      setProposalPools(proposePools);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [
@@ -708,30 +734,14 @@ const Send: React.FunctionComponent<SendProps> = ({
   };
 
   useEffect(() => {
-    setNym(nymContext);
-  }, [nymContext]);
-
-  useEffect(() => {
     const stillConf =
-      (totalBalance ? totalBalance.totalOrchardBalance : 0) !==
-        (totalBalance ? totalBalance.confirmedOrchardBalance : 0) ||
-      (totalBalance ? totalBalance.totalSaplingBalance : 0) !==
-        (totalBalance ? totalBalance.confirmedSaplingBalance : 0) ||
-      somePending;
+      (!!totalBalance && hasUnconfirmedFunds(totalBalance)) || somePending;
     const showShield = (somePending ? 0 : shieldingAmount) > 0;
     //const showUpgrade =
     //  (somePending ? 0 : totalBalance.transparentBal) === 0 && totalBalance.spendablePrivate > fee;
     setStillConfirming(stillConf);
     setShowShieldInfo(showShield);
-  }, [
-    shieldingAmount,
-    somePending,
-    totalBalance,
-    totalBalance?.totalOrchardBalance,
-    totalBalance?.totalSaplingBalance,
-    totalBalance?.confirmedOrchardBalance,
-    totalBalance?.confirmedSaplingBalance,
-  ]);
+  }, [shieldingAmount, somePending, totalBalance]);
 
   useEffect(() => {
     calculateFeeWithPropose(
@@ -865,7 +875,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         // Mixnet Mode fail-closed verdict: while the transport is
         // bootstrapping, died, or unknowable, sending stays blocked; only
         // `ready` or the user's explicit clearnet consent (`off`) opens it.
-        // Null means the platform runs no mixnet policy yet (iOS).
+        // Null means no mixnet policy runs (mixnetSupported injected false).
         (mixnetView === null || !mixnetView.sendBlocked),
     );
   }, [
@@ -948,7 +958,6 @@ const Send: React.FunctionComponent<SendProps> = ({
     clearToAddr();
     setSpendable(0);
     setSpendableBalanceLastError('');
-    setNym(nymContext);
   };
 
   const buildSendState = () => {
@@ -1049,9 +1058,13 @@ const Send: React.FunctionComponent<SendProps> = ({
         }
       }
 
+      const failureText = sendFailureText(failure);
       navigation.navigate(RouteEnum.Computing, {
         phase: 'failed',
-        errorMessage: sendFailureMessage(failure, translate),
+        errorMessage:
+          failureText.kind === 'key'
+            ? (translate(failureText.errorKey) as string)
+            : failureText.text,
       });
     }
   };
@@ -1139,12 +1152,10 @@ const Send: React.FunctionComponent<SendProps> = ({
     [colors, translate],
   );
 
-  const setConfirmModalShow = async (
-    parseAddressInfoJSON: RPCParseAddressType,
-  ) => {
+  const setConfirmModalShow = async () => {
     navigation.navigate(RouteEnum.Confirm, {
       calculatedFee: fee,
-      parseAddressInfoJSON: parseAddressInfoJSON,
+      proposalPools: proposalPools,
       donationAmount:
         donation &&
         server.chainName === ChainNameEnum.mainChainName &&
@@ -1161,7 +1172,7 @@ const Send: React.FunctionComponent<SendProps> = ({
           Utils.parseStringLocaleToNumberFloat(maxAmount.toFixed(8)),
       calculateFeeWithPropose: calculateFeeWithPropose,
       sendPageState: buildSendState(),
-      nym: nym,
+      nym,
     });
   };
 
@@ -1711,7 +1722,6 @@ const Send: React.FunctionComponent<SendProps> = ({
                           )}
                           <View style={{ marginLeft: inputZec ? 5 : 2 }}>
                             <PriceFetcher
-                              setZecPrice={setZecPrice}
                               backgroundColor={colors.bgSurface}
                               onManualFetch={revealPrice}
                             />
@@ -2060,39 +2070,6 @@ const Send: React.FunctionComponent<SendProps> = ({
                   </>
                 )}
               </View>
-              {/* NYM feature hidden for now — will be enabled in the future */}
-              {false && (
-                <TouchableOpacity
-                  onPress={() => setNym(!nym)}
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    marginHorizontal: 20,
-                    marginTop: 15,
-                    marginBottom: 20,
-                  }}
-                >
-                  {nym ? (
-                    <NymOn width={22} height={22} />
-                  ) : (
-                    <NymOff width={22} height={22} />
-                  )}
-                  <View style={{ flex: 1, marginLeft: 10 }}>
-                    <BoldText style={{ color: nym ? '#07FF94' : colors.fgDefault }}>
-                      {translate('settings.nym-network') as string}
-                    </BoldText>
-                    <FadeText>
-                      {translate('settings.nym-enhanced-privacy') as string}
-                    </FadeText>
-                  </View>
-                  {nym ? (
-                    <SwitchOn width={40} height={19} />
-                  ) : (
-                    <SwitchOff width={40} height={19} />
-                  )}
-                </TouchableOpacity>
-              )}
-
               <View
                 style={{
                   flexGrow: 1,
@@ -2102,6 +2079,70 @@ const Send: React.FunctionComponent<SendProps> = ({
                   marginVertical: 0,
                 }}
               >
+                {mixnetView !== null && (
+                  <TouchableOpacity
+                    testID="send.nym-toggle"
+                    disabled={nymLoading}
+                    onPress={() => {
+                      if (!nym) {
+                        setEnabling(true);
+                        setNymOption(true);
+                        return;
+                      }
+                      showConfirm({
+                        title: translate('settings.nym-network') as string,
+                        message: translate(
+                          'settings.nym-disable-warning',
+                        ) as string,
+                        messageAlign: 'left',
+                        buttons: [
+                          {
+                            text: translate('cancel') as string,
+                            style: 'cancel',
+                          },
+                          {
+                            text: translate('confirm') as string,
+                            onPress: () => setNymOption(false),
+                          },
+                        ],
+                      });
+                    }}
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      alignSelf: 'stretch',
+                      marginHorizontal: 25,
+                      marginTop: 16,
+                      marginBottom: 28,
+                      opacity: nymLoading ? 0.4 : 1,
+                    }}
+                  >
+                    {nymLoading ? (
+                      <MixnetIcon phase="connecting" />
+                    ) : nymPhase === 'lost' || nymPhase === 'reconnecting' ? (
+                      <MixnetIcon phase={nymPhase} />
+                    ) : nymOn ? (
+                      <NymOn width={22} height={22} />
+                    ) : (
+                      <NymOff width={22} height={22} />
+                    )}
+                    <View style={{ flex: 1, marginLeft: 10 }}>
+                      <BoldText
+                        style={{ color: nymOn ? '#07FF94' : colors.fgDefault }}
+                      >
+                        {translate('settings.nym-network') as string}
+                      </BoldText>
+                      <FadeText>
+                        {translate('settings.nym-enhanced-privacy') as string}
+                      </FadeText>
+                    </View>
+                    {nymOn ? (
+                      <NymSwitchOn width={40} height={19} />
+                    ) : (
+                      <SwitchOff width={40} height={19} />
+                    )}
+                  </TouchableOpacity>
+                )}
                 {mixnetView !== null && mixnetView.sendBlocked && (
                   <View
                     style={{
@@ -2227,27 +2268,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           setMemoText('');
                           updateToField(null, null, null, '', false);
                         }
-                        // Prefetch the parsed address for the Confirm screen
-                        // so its Privacy Level badge renders without waiting on
-                        // an RPC round-trip there. The address itself was
-                        // already validated upstream — any failure here (RPC
-                        // error string, non-JSON output, transient network)
-                        // degrades gracefully to a '-' badge in Confirm.tsx;
-                        // the validated address string is what actually drives
-                        // the transaction, so no Send state is corrupted.
-                        let parseAddressInfoJSON: RPCParseAddressType =
-                          {} as RPCParseAddressType;
-                        try {
-                          const parseResult = await parseAddress(addressText);
-                          if (parseResult.ok) {
-                            parseAddressInfoJSON = JSON.parse(
-                              parseResult.value,
-                            );
-                          }
-                        } catch (_) {
-                          // best-effort prefetch; fall through to {}
-                        }
-                        setConfirmModalShow(parseAddressInfoJSON);
+                        setConfirmModalShow();
                         Keyboard.dismiss();
                         setSendButtonEnabled(true);
                       }}

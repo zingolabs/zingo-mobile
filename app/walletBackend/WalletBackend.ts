@@ -30,11 +30,12 @@ export default class WalletBackend {
   private transactionService: TransactionService;
   private walletLifecycle: WalletLifecycleService;
   private mixnetCoordinator: MixnetCoordinator;
-  // The forced-on policy runs once per WalletBackend instance (one loaded
+  // The session gets its route once per WalletBackend instance (one loaded
   // session): configure() is re-run on every server or wallet change, and
   // each transport start is a full mixnet re-bootstrap, so repeats are for
-  // the user's deliberate re-enable only.
-  private mixnetEnsured: boolean = false;
+  // the user's deliberate re-enable only. The route is one of two — arm the
+  // mixnet (nym on) or record the clearnet consent (nym off).
+  private mixnetRouteSet: boolean = false;
 
   constructor(config: WalletBackendConfig) {
     this.config = config;
@@ -42,13 +43,9 @@ export default class WalletBackend {
     this.syncCoordinator = new SyncCoordinator(config, this.dataService);
     this.mixnetCoordinator = new MixnetCoordinator(
       config.startMixnetTransport,
+      config.stopMixnetTransport,
       config.onMixnetViewChanged,
     );
-    // Wire the sync-restart callback after SyncCoordinator exists
-    this.dataService.onSyncError = async () => {
-      await this.syncCoordinator.clearTimers();
-      await this.syncCoordinator.configure();
-    };
     this.transactionService = new TransactionService(
       config,
       this.syncCoordinator,
@@ -58,12 +55,15 @@ export default class WalletBackend {
 
   // Sync lifecycle
   async configure() {
-    if (this.config.mixnetSupported && !this.mixnetEnsured) {
-      this.mixnetEnsured = true;
-      // Deliberately not awaited: the mixnet bootstrap takes tens of
-      // seconds and must not delay sync configuration. The coordinator
-      // never rejects — failures arrive as the typed failure view.
-      this.mixnetCoordinator.ensureForConnectedSession();
+    if (this.config.mixnetSupported && !this.mixnetRouteSet) {
+      this.mixnetRouteSet = true;
+      if (this.config.nymEnabled) {
+        // Deliberately not awaited: the mixnet bootstrap takes tens of
+        // seconds and must not delay sync configuration.
+        this.mixnetCoordinator.ensureForConnectedSession();
+      } else {
+        this.mixnetCoordinator.disable();
+      }
     }
     return this.syncCoordinator.configure();
   }
@@ -141,13 +141,13 @@ export default class WalletBackend {
     return this.config.readOnly;
   }
 
-  // Active server. Mutates the shared config reference so all sub-services
-  // (DataService etc.) pick up the new URI on their next call without having
-  // to recreate the WalletBackend instance. Without this, switching server
-  // without changing wallets left DataService.getLatestBlockServerInfo
-  // talking to the stale URI captured at construction time.
+  // Active server. Routes through the coordinator's changeServer so the switch
+  // bumps the controller epoch (ADR 0005): a status read or poll begun under the
+  // old server drops rather than applying its stale snapshot. It still
+  // mutates the shared config reference, so every sub-service picks up the new
+  // URI on its next call without recreating the WalletBackend instance.
   setServer(server: ServerType) {
-    this.config.server = server;
+    this.syncCoordinator.changeServer(server);
   }
 
   // Active performance level. Same shared-reference pattern as setServer.
@@ -158,5 +158,4 @@ export default class WalletBackend {
   setPerformanceLevel(performanceLevel: RPCPerformanceLevelEnum) {
     this.config.performanceLevel = performanceLevel;
   }
-
 }

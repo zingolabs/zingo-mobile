@@ -6,11 +6,13 @@ import 'react-native';
 import React from 'react';
 
 import { render } from '@testing-library/react-native';
+import { Provider, createStore } from 'jotai';
 import SyncReport from '../components/SyncReport';
 import {
   defaultAppContextLoaded,
   ContextAppLoadedProvider,
 } from '../app/context';
+import { syncStatusAtom } from '../app/AppState/syncAtoms';
 import { mockWallet } from '../__mocks__/dataMocks/mockWallet';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
@@ -43,14 +45,18 @@ describe('Component SyncReport - test', () => {
   state.info = mockInfo;
   state.totalBalance = mockTotalBalance;
   state.birthday = mockWallet.birthday || 0;
-  state.syncingStatus = mockSyncingStatus;
   state.netInfo = mockNetInfo;
   const props = makeDrawerProps();
   test('SyncReport - snapshot', () => {
+    // The sync snapshot rides the sync atom now, not the context.
+    const store = createStore();
+    store.set(syncStatusAtom, mockSyncingStatus);
     const sync = render(
-      <ContextAppLoadedProvider value={state}>
-        <SyncReport {...props} />
-      </ContextAppLoadedProvider>,
+      <Provider store={store}>
+        <ContextAppLoadedProvider value={state}>
+          <SyncReport {...props} />
+        </ContextAppLoadedProvider>
+      </Provider>,
     );
     expect(sync.toJSON()).toMatchSnapshot();
   });

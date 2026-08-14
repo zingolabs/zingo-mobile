@@ -382,7 +382,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                                         ValueTransferKindEnum.MemoToSelf &&
                                       vt.confirmations === 0
                                     ? (translate(
-                                        'history.sendingtoself',
+                                        'history.sendingmemotoself',
                                       ) as string)
                                     : vt.kind ===
                                           ValueTransferKindEnum.MemoToSelf &&
