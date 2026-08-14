@@ -36,8 +36,6 @@ function serviceFor(server: ServerType) {
     server,
   });
   const service = new DataService(config);
-  // The reconfigure the error path triggers is out of scope here.
-  service.onSyncError = jest.fn();
   return { service, onValueTransfersChanged, onInfoChanged, onError };
 }
 

@@ -1,4 +1,12 @@
-import React, { Component, useState, useMemo, useEffect } from 'react';
+import React, {
+  Component,
+  useState,
+  useMemo,
+  useEffect,
+  memo,
+  forwardRef,
+} from 'react';
+import { Provider, createStore, useAtomValue } from 'jotai';
 import {
   I18nManager,
   EmitterSubscription,
@@ -74,6 +82,28 @@ import {
 import Utils from '@app/utils';
 import { getZingoVersion, substituteZingoName } from '@app/utils/ZingoAppData';
 import { AppTheme } from '@app/theme';
+import {
+  walletViewSourceAtom,
+  walletViewAtom,
+} from '@app/AppState/walletViewAtoms';
+import type { WalletViewSource } from '@app/AppState/walletView';
+import {
+  syncStatusAtom,
+  syncMachineAtom,
+  observeAtom,
+  snapshotObservation,
+} from '@app/AppState/syncAtoms';
+import { initialMachine } from '@app/walletBackend/controller/syncController';
+import {
+  callbackEpochAtom,
+  boundaryDispatchAtom,
+} from '@app/AppState/callbackBoundary';
+import {
+  appStateStatusAtom,
+  seedModalOpenAtom,
+  addTagModalAtom,
+} from '@app/AppState/uiAtoms';
+import { classifyLifecycle } from '@app/AppState/lifecycle';
 import SettingsFileImpl from '@app/services/SettingsFileImpl';
 import { PriceTrafficDriver } from '@ui/widgets/PriceFetcher';
 import { priceFetcherStore } from '@ui/widgets/priceFetcherStore';
@@ -652,6 +682,14 @@ export class LoadedAppClass extends Component<
   screenName = ScreenEnum.LoadedApp;
   private drawerNav: NativeStackNavigationProp<AppDrawerParamList> | null =
     null;
+  // The per-instance controller store. Holds the view slice, the sync slice,
+  // and the price slice: the class publishes each field here and the derived
+  // atoms gate re-renders to the slice that actually changed.
+  private controllerStore = createStore();
+  // The callback-boundary epoch this instance was wired under. Every
+  // backend-callback write carries it; componentWillUnmount bumps the store's
+  // epoch past it, so a callback resolving after teardown drops.
+  private boundaryEpoch = this.controllerStore.get(callbackEpochAtom);
   constructor(props: LoadedAppClassProps) {
     super(props);
 
@@ -667,7 +705,6 @@ export class LoadedAppClass extends Component<
       sendPageState: new SendPageStateClass(new ToAddrClass(0)),
       setSendPageState: this.setSendPageState,
       info: {} as InfoType,
-      syncingStatus: {} as RPCSyncStatusType,
       birthday: 0,
       defaultUnifiedAddress: '',
       zecPrice: {
@@ -711,16 +748,10 @@ export class LoadedAppClass extends Component<
       reenableMixnet: this.reenableMixnet,
 
       // state
-      appStateStatus:
-        Platform.OS === GlobalConst.platformOSios
-          ? AppStateStatusEnum.active
-          : AppState.currentState,
       newServer: {} as ServerType,
       newSelectServer: null,
       scrollToTop: false,
       scrollToBottom: false,
-      isSeedViewModalOpen: false,
-      addTagModalTarget: null,
     };
 
     this.rpc = new WalletBackend({
@@ -748,6 +779,14 @@ export class LoadedAppClass extends Component<
     this.linking = {} as EmitterSubscription;
     this.unsubscribeNetInfo = {} as NetInfoSubscription;
     this.addTagModalRef = React.createRef();
+    this.controllerStore.set(syncMachineAtom, initialMachine(props.server.uri));
+    this.controllerStore.set(
+      appStateStatusAtom,
+      Platform.OS === GlobalConst.platformOSios
+        ? AppStateStatusEnum.active
+        : (AppState.currentState as AppStateStatusEnum),
+    );
+    this.publishWalletView();
   }
 
   componentDidMount = async () => {
@@ -792,47 +831,18 @@ export class LoadedAppClass extends Component<
     this.appstate = AppState.addEventListener(
       EventListenerEnum.change,
       async nextAppState => {
-        // let's catch the prior value
-        const priorAppState = this.state.appStateStatus;
-        if (Platform.OS === GlobalConst.platformOSios) {
-          if (
-            (priorAppState === AppStateStatusEnum.inactive &&
-              nextAppState === AppStateStatusEnum.active) ||
-            (priorAppState === AppStateStatusEnum.active &&
-              nextAppState === AppStateStatusEnum.inactive)
-          ) {
-            this.setState({ appStateStatus: nextAppState });
-            return;
-          }
-          if (
-            priorAppState === AppStateStatusEnum.inactive &&
-            nextAppState === AppStateStatusEnum.background
-          ) {
-            console.log('App LOADED IOS is gone to the background!');
-            this.setState({ appStateStatus: nextAppState });
-            // setting value for background task Android
-            await AsyncStorage.setItem(GlobalConst.background, GlobalConst.yes);
-            await this.rpc.clearTimers();
-            this.setSyncingStatus({} as RPCSyncStatusType);
-            // We need to save the wallet file here because
-            // sometimes the App can lose the last synced chunk
-            await doSave();
-            return;
-          }
+        const prior = this.controllerStore.get(appStateStatusAtom);
+        const next = nextAppState as AppStateStatusEnum;
+        const transition = classifyLifecycle(Platform.OS, prior, next);
+        if (transition === 'ignore') {
+          return;
         }
-        if (Platform.OS === GlobalConst.platformOSandroid) {
-          if (priorAppState !== nextAppState) {
-            this.setState({ appStateStatus: nextAppState });
-          }
-        }
-        if (
-          (priorAppState === AppStateStatusEnum.inactive ||
-            priorAppState === AppStateStatusEnum.background) &&
-          nextAppState === AppStateStatusEnum.active
-        ) {
-          if (Platform.OS === GlobalConst.platformOSios) {
-            this.setState({ appStateStatus: nextAppState });
-          }
+        // The fg/bg edge writes the UI atom; the container never reads it, so
+        // recording the status here does not re-render the container.
+        this.controllerStore.set(appStateStatusAtom, next);
+        if (transition === 'suspend') {
+          await this.suspendForBackground();
+        } else if (transition === 'resume') {
           // A parked earlier pass resumes with this same event and acts
           // once; a second concurrent actor would double-run the restore
           // work or the navigation reset.
@@ -844,28 +854,6 @@ export class LoadedAppClass extends Component<
             await this.runForegroundGate();
           } finally {
             this.foregroundGateBusy = false;
-          }
-        } else if (
-          priorAppState === AppStateStatusEnum.active &&
-          (nextAppState === AppStateStatusEnum.inactive ||
-            nextAppState === AppStateStatusEnum.background)
-        ) {
-          console.log('App LOADED is gone to the background!');
-          // setting value for background task Android
-          await AsyncStorage.setItem(GlobalConst.background, GlobalConst.yes);
-          await this.rpc.clearTimers();
-          this.setSyncingStatus({} as RPCSyncStatusType);
-          // We need to save the wallet file here because
-          // sometimes the App can lose the last synced chunk
-          await doSave();
-          if (Platform.OS === GlobalConst.platformOSios) {
-            this.setState({ appStateStatus: nextAppState });
-          }
-        } else {
-          if (Platform.OS === GlobalConst.platformOSios) {
-            if (priorAppState !== nextAppState) {
-              this.setState({ appStateStatus: nextAppState });
-            }
           }
         }
       },
@@ -930,6 +918,16 @@ export class LoadedAppClass extends Component<
     );
   };
 
+  // The single suspend path, driven by the fg/bg listener's `suspend`
+  // outcome. Pause the sync tasks, blank the live status, and save so a
+  // background kill cannot lose the last synced chunk.
+  private suspendForBackground = async () => {
+    await AsyncStorage.setItem(GlobalConst.background, GlobalConst.yes);
+    await this.rpc.clearTimers();
+    this.setSyncingStatus({} as RPCSyncStatusType);
+    await doSave();
+  };
+
   // Sync the externally-rebuilt `translate` (the outer functional
   // LoadedApp rebuilds its memoized translate on every language change)
   // into `state.translate`. Without this, memoized children whose
@@ -941,6 +939,7 @@ export class LoadedAppClass extends Component<
     if (prevProps.translate !== this.props.translate) {
       this.setState({ translate: this.props.translate });
     }
+    this.publishWalletView();
   };
 
   foregroundGateBusy = false;
@@ -996,6 +995,11 @@ export class LoadedAppClass extends Component<
   };
 
   componentWillUnmount = async () => {
+    // Close the async-unmount gap: bump the callback-boundary epoch
+    // synchronously, before the awaits below, so a backend callback that fires
+    // while teardown is in flight drops its write; it cannot reach this
+    // dead instance.
+    this.controllerStore.set(callbackEpochAtom, this.boundaryEpoch + 1);
     await this.rpc.clearTimers();
     this.rpc.stopMixnetPolling();
     const safeRemove = (listener: unknown, name: string) => {
@@ -1091,15 +1095,27 @@ export class LoadedAppClass extends Component<
   fetchBackgroundSyncInfo = async () => {
     const backgroundSyncInfoJson: BackgroundType =
       await BackgroundFileImpl.readBackground();
-    if (!isEqual(this.state.backgroundSyncInfo, backgroundSyncInfoJson)) {
-      this.setState({ backgroundSyncInfo: backgroundSyncInfoJson });
-    }
+    this.commit(() => {
+      if (!isEqual(this.state.backgroundSyncInfo, backgroundSyncInfoJson)) {
+        this.setState({ backgroundSyncInfo: backgroundSyncInfoJson });
+      }
+    });
   };
 
   setBackgroundSyncErrorInfo = async (error: string) => {
     const newBackgroundSyncInfo = { ...this.state.backgroundSyncInfo, error };
     this.setState({ backgroundSyncInfo: newBackgroundSyncInfo });
     await BackgroundFileImpl.writeBackground(newBackgroundSyncInfo);
+  };
+
+  // Run a backend-callback write through the boundary guard: it lands only while
+  // this instance's wiring epoch is still current, so a callback resolving after
+  // teardown drops; it cannot setState a dead instance.
+  private commit = (write: () => void) => {
+    this.controllerStore.set(boundaryDispatchAtom, {
+      issuedEpoch: this.boundaryEpoch,
+      write,
+    });
   };
 
   setShieldingAmount = (value: number) => {
@@ -1112,31 +1128,41 @@ export class LoadedAppClass extends Component<
   };
 
   setTotalBalance = (totalBalance: TotalBalanceClass) => {
-    if (!isEqual(this.state.totalBalance, totalBalance)) {
-      //const start = Date.now();
-      this.setState({ totalBalance });
-    }
+    this.commit(() => {
+      if (!isEqual(this.state.totalBalance, totalBalance)) {
+        this.setState({ totalBalance });
+      }
+    });
   };
 
   setSyncingStatus = (syncingStatus: RPCSyncStatusType) => {
     // here is a good place to fetch the background task info
     this.fetchBackgroundSyncInfo();
-    if (!isEqual(this.state.syncingStatus, syncingStatus)) {
-      //const start = Date.now();
-      this.setState({ syncingStatus });
+    const store = this.controllerStore;
+    if (isEqual(store.get(syncStatusAtom), syncingStatus)) {
+      return;
     }
+    // The sync slice, isolated: publish the detailed snapshot the two sync
+    // consumers read, and route it through reconcile so the held machine tracks
+    // the live scan. Neither wakes the wider context tree.
+    store.set(syncStatusAtom, syncingStatus);
+    const machine = store.get(syncMachineAtom);
+    store.set(
+      observeAtom,
+      snapshotObservation(machine.epoch, machine.saveRequired, syncingStatus),
+    );
   };
 
   setIsSeedViewModalOpen = (value: boolean) => {
-    this.setState({
-      isSeedViewModalOpen: value,
-    });
+    this.controllerStore.set(seedModalOpenAtom, value);
   };
 
   setMixnetView = (mixnetView: MixnetView) => {
-    if (!isEqual(this.state.mixnetView, mixnetView)) {
-      this.setState({ mixnetView });
-    }
+    this.commit(() => {
+      if (!isEqual(this.state.mixnetView, mixnetView)) {
+        this.setState({ mixnetView });
+      }
+    });
   };
 
   reenableMixnet = async (): Promise<void> => {
@@ -1314,11 +1340,13 @@ export class LoadedAppClass extends Component<
       //const start = Date.now();
       setTimeout(
         () => {
-          this.setState({
-            valueTransfers,
-            somePending: pending > 0,
-            valueTransfersTotal,
-          });
+          this.commit(() =>
+            this.setState({
+              valueTransfers,
+              somePending: pending > 0,
+              valueTransfersTotal,
+            }),
+          );
         },
         pending === 0 ? 250 : 0,
       );
@@ -1329,36 +1357,40 @@ export class LoadedAppClass extends Component<
   };
 
   setMessagesList = (messages: ValueTransferType[], messagesTotal: number) => {
-    if (
-      !isEqual(this.state.messages, messages) ||
-      this.state.messagesTotal !== messagesTotal
-    ) {
-      //const start = Date.now();
-      this.setState({ messages, messagesTotal });
-    }
+    this.commit(() => {
+      if (
+        !isEqual(this.state.messages, messages) ||
+        this.state.messagesTotal !== messagesTotal
+      ) {
+        //const start = Date.now();
+        this.setState({ messages, messagesTotal });
+      }
+    });
   };
 
   setAllAddresses = (
     addresses: (UnifiedAddressClass | TransparentAddressClass)[],
   ) => {
-    if (!isEqual(this.state.addresses, addresses)) {
-      //const start = Date.now();
-      this.setState({ addresses });
-    }
-    if (addresses.length > 0) {
-      // the last Unified Address created.
-      const defaultUAArray = addresses.filter(
-        (a: UnifiedAddressClass | TransparentAddressClass) =>
-          a.addressKind === AddressKindEnum.u,
-      );
-      const defaultUA: string =
-        defaultUAArray[defaultUAArray.length - 1].address;
-      if (this.state.defaultUnifiedAddress !== defaultUA) {
-        this.setState({ defaultUnifiedAddress: defaultUA });
+    this.commit(() => {
+      if (!isEqual(this.state.addresses, addresses)) {
+        //const start = Date.now();
+        this.setState({ addresses });
       }
-    } else {
-      this.setState({ defaultUnifiedAddress: '' });
-    }
+      if (addresses.length > 0) {
+        // the last Unified Address created.
+        const defaultUAArray = addresses.filter(
+          (a: UnifiedAddressClass | TransparentAddressClass) =>
+            a.addressKind === AddressKindEnum.u,
+        );
+        const defaultUA: string =
+          defaultUAArray[defaultUAArray.length - 1].address;
+        if (this.state.defaultUnifiedAddress !== defaultUA) {
+          this.setState({ defaultUnifiedAddress: defaultUA });
+        }
+      } else {
+        this.setState({ defaultUnifiedAddress: '' });
+      }
+    });
   };
 
   setSendPageState = (sendPageState: SendPageStateClass) => {
@@ -1417,15 +1449,17 @@ export class LoadedAppClass extends Component<
         newInfo.serverUri = this.state.server.uri;
       }
       //const start = Date.now();
-      this.setState({ info: newInfo });
+      this.commit(() => this.setState({ info: newInfo }));
     }
   };
 
   setZingolibVersion = (newZingolibVersion: string) => {
-    if (!this.state.zingolibVersion) {
-      //const start = Date.now();
-      this.setState({ zingolibVersion: newZingolibVersion });
-    }
+    this.commit(() => {
+      if (!this.state.zingolibVersion) {
+        //const start = Date.now();
+        this.setState({ zingolibVersion: newZingolibVersion });
+      }
+    });
   };
 
   sendTransaction = async (
@@ -1466,10 +1500,12 @@ export class LoadedAppClass extends Component<
   };
 
   setBirthday = async (birthday: number) => {
-    if (!isEqual(this.state.birthday, birthday)) {
-      //const start = Date.now();
-      this.setState({ birthday });
-    }
+    this.commit(() => {
+      if (!isEqual(this.state.birthday, birthday)) {
+        //const start = Date.now();
+        this.setState({ birthday });
+      }
+    });
   };
 
   onMenuItemSelected = async (item: MenuItemEnum) => {
@@ -1960,7 +1996,7 @@ export class LoadedAppClass extends Component<
     ) {
       return;
     }
-    this.setState({ lastError: error });
+    this.commit(() => this.setState({ lastError: error }));
   };
 
   // Determines `own` via RPC, then opens the shared modal so the user can
@@ -1976,12 +2012,14 @@ export class LoadedAppClass extends Component<
     // Tagging an own address is the Receive flow, which renders NewAddressTag
     // with own={true} directly. So this modal is always a contact (own=false),
     // "Add contact", not "Add tag".
-    this.setState(
-      { addTagModalTarget: { address, own: false, swapChain, initialLabel } },
-      () => {
-        this.addTagModalRef.current?.present();
-      },
-    );
+    this.controllerStore.set(addTagModalAtom, {
+      kind: 'shown',
+      address,
+      own: false,
+      swapChain,
+      initialLabel,
+    });
+    this.addTagModalRef.current?.present();
   };
 
   setScrollToTop = (value: boolean) => {
@@ -2004,8 +2042,16 @@ export class LoadedAppClass extends Component<
     }
   };
 
+  private publishWalletView = () => {
+    const source: WalletViewSource = {
+      readOnly: this.state.readOnly,
+      selectServer: this.state.selectServer,
+    };
+    this.controllerStore.set(walletViewSourceAtom, source);
+  };
+
   render() {
-    const { readOnly, scrollToTop, scrollToBottom, selectServer } = this.state;
+    const { scrollToTop, scrollToBottom } = this.state;
 
     const context = {
       //context
@@ -2017,7 +2063,6 @@ export class LoadedAppClass extends Component<
       valueTransfersTotal: this.state.valueTransfersTotal,
       messages: this.state.messages,
       messagesTotal: this.state.messagesTotal,
-      syncingStatus: this.state.syncingStatus,
       info: this.state.info,
       zecPrice: this.state.zecPrice,
       defaultUnifiedAddress: this.state.defaultUnifiedAddress,
@@ -2060,7 +2105,7 @@ export class LoadedAppClass extends Component<
     };
 
     return (
-      <>
+      <Provider store={this.controllerStore}>
         <ContextAppLoadedProvider value={context}>
           <PriceTrafficDriver />
           <GestureHandlerRootView>
@@ -2074,92 +2119,20 @@ export class LoadedAppClass extends Component<
                 >
                   <RootNavigator initialRouteName={RouteEnum.HomeStack}>
                     <RootNavigator.Screen name={RouteEnum.HomeStack}>
-                      {props => {
-                        useEffect(() => {
-                          this.setNavigationHome(props.navigation);
-                        });
-                        return (
-                          <>
-                            <Tab.Navigator
-                              detachInactiveScreens={true}
-                              initialRouteName={RouteEnum.History}
-                              backBehavior="initialRoute"
-                              tabBar={renderTabBar}
-                              screenOptions={{
-                                headerShown: false,
-                              }}
-                            >
-                              <Tab.Screen name={RouteEnum.History}>
-                                {propsTab => (
-                                  <History
-                                    {...propsTab}
-                                    toggleMenuDrawer={
-                                      () => toggleOptionsPanel() /* header */
-                                    }
-                                    setShieldingAmount={
-                                      this.setShieldingAmount /* header */
-                                    }
-                                    setScrollToTop={
-                                      this.setScrollToTop /* header & history */
-                                    }
-                                    scrollToTop={scrollToTop /* history */}
-                                    setScrollToBottom={
-                                      this
-                                        .setScrollToBottom /* header & messages */
-                                    }
-                                  />
-                                )}
-                              </Tab.Screen>
-                              {!readOnly &&
-                                selectServer !== SelectServerEnum.offline && (
-                                  <Tab.Screen name={RouteEnum.Send}>
-                                    {propsTab => (
-                                      <Send
-                                        {...propsTab}
-                                        toggleMenuDrawer={
-                                          () =>
-                                            toggleOptionsPanel() /* header */
-                                        }
-                                        setShieldingAmount={
-                                          this.setShieldingAmount /* header */
-                                        }
-                                        setScrollToTop={
-                                          this
-                                            .setScrollToTop /* header & send */
-                                        }
-                                        setScrollToBottom={
-                                          this
-                                            .setScrollToBottom /* header & send */
-                                        }
-                                        sendTransaction={
-                                          this.sendTransaction /* send */
-                                        }
-                                        setServerOption={
-                                          this.setServerOption /* send */
-                                        }
-                                        clearToAddr={
-                                          this.clearToAddr /* send */
-                                        }
-                                      />
-                                    )}
-                                  </Tab.Screen>
-                                )}
-                              <Tab.Screen name={RouteEnum.Receive}>
-                                {propsTab => (
-                                  <Receive
-                                    {...propsTab}
-                                    toggleMenuDrawer={
-                                      () => toggleOptionsPanel() /* header */
-                                    }
-                                    alone={false /* receive */}
-                                    setAddressBook={this.setAddressBook}
-                                  />
-                                )}
-                              </Tab.Screen>
-                            </Tab.Navigator>
-                          </>
-                        );
-                      }}
+                      {props => (
+                        <HomeStackBody
+                          navigation={props.navigation}
+                          onHomeNavigation={this.setNavigationHome}
+                          scrollToTop={scrollToTop}
+                          setShieldingAmount={this.setShieldingAmount}
+                          setScrollToTop={this.setScrollToTop}
+                          setScrollToBottom={this.setScrollToBottom}
+                          sendTransaction={this.sendTransaction}
+                          setServerOption={this.setServerOption}
+                          clearToAddr={this.clearToAddr}
+                          setAddressBook={this.setAddressBook}
+                        />
+                      )}
                     </RootNavigator.Screen>
                     <RootNavigator.Screen name={RouteEnum.Settings}>
                       {props => (
@@ -2414,9 +2387,8 @@ export class LoadedAppClass extends Component<
                   </RootNavigator>
                 </LoadedAppOptionsPanelHost>
               </OptionsPanelProvider>
-              <AddTagModalHost
+              <AddTagModalSlice
                 ref={this.addTagModalRef}
-                target={this.state.addTagModalTarget}
                 setAddressBook={this.setAddressBook}
                 translate={this.state.translate}
               />
@@ -2424,7 +2396,123 @@ export class LoadedAppClass extends Component<
           </GestureHandlerRootView>
         </ContextAppLoadedProvider>
         <Toast config={toastConfig} />
-      </>
+      </Provider>
     );
   }
 }
+
+type AddTagModalSliceProps = Omit<
+  React.ComponentProps<typeof AddTagModalHost>,
+  'target'
+>;
+
+// The add-tag modal, isolated. It reads its target from addTagModalAtom, so
+// launchAddTagModal writes the atom and opening the sheet wakes only that atom's
+// readers, without committing container state or re-rendering the context tree. The ref forwards
+// to the underlying modal so the container can present() it.
+const AddTagModalSlice = forwardRef<
+  React.ComponentRef<typeof BottomSheetModal>,
+  AddTagModalSliceProps
+>(function AddTagModalSlice({ setAddressBook, translate }, ref) {
+  const modal = useAtomValue(addTagModalAtom);
+  const target = modal.kind === 'shown' ? modal : null;
+  return (
+    <AddTagModalHost
+      ref={ref}
+      target={target}
+      setAddressBook={setAddressBook}
+      translate={translate}
+    />
+  );
+});
+
+type HomeStackBodyProps = {
+  navigation: NativeStackNavigationProp<AppDrawerParamList>;
+  onHomeNavigation: LoadedAppClass['setNavigationHome'];
+  scrollToTop: boolean;
+} & Pick<
+  LoadedAppClass,
+  | 'setShieldingAmount'
+  | 'setScrollToTop'
+  | 'setScrollToBottom'
+  | 'sendTransaction'
+  | 'setServerOption'
+  | 'clearToAddr'
+  | 'setAddressBook'
+>;
+
+// The view slice, isolated. It reads its outcome from walletViewAtom, so a
+// change to an unread container field wakes no re-render here; a memo boundary
+// over stable props stops the container's own commit from cascading in. The
+// setNavigationHome effect keys on `navigation`, so it runs once, not on every
+// commit.
+const HomeStackBody = memo(function HomeStackBody({
+  navigation,
+  onHomeNavigation,
+  scrollToTop,
+  setShieldingAmount,
+  setScrollToTop,
+  setScrollToBottom,
+  sendTransaction,
+  setServerOption,
+  clearToAddr,
+  setAddressBook,
+}: HomeStackBodyProps) {
+  const view = useAtomValue(walletViewAtom);
+
+  useEffect(() => {
+    onHomeNavigation(navigation);
+  }, [navigation, onHomeNavigation]);
+
+  const showSend = view === 'fullWithSend';
+  return (
+    <Tab.Navigator
+      detachInactiveScreens={true}
+      initialRouteName={RouteEnum.History}
+      backBehavior="initialRoute"
+      tabBar={renderTabBar}
+      screenOptions={{
+        headerShown: false,
+      }}
+    >
+      <Tab.Screen name={RouteEnum.History}>
+        {propsTab => (
+          <History
+            {...propsTab}
+            toggleMenuDrawer={() => toggleOptionsPanel() /* header */}
+            setShieldingAmount={setShieldingAmount /* header */}
+            setScrollToTop={setScrollToTop /* header & history */}
+            scrollToTop={scrollToTop /* history */}
+            setScrollToBottom={setScrollToBottom /* header & messages */}
+          />
+        )}
+      </Tab.Screen>
+      {showSend && (
+        <Tab.Screen name={RouteEnum.Send}>
+          {propsTab => (
+            <Send
+              {...propsTab}
+              toggleMenuDrawer={() => toggleOptionsPanel() /* header */}
+              setShieldingAmount={setShieldingAmount /* header */}
+              setScrollToTop={setScrollToTop /* header & send */}
+              setScrollToBottom={setScrollToBottom /* header & send */}
+              sendTransaction={sendTransaction /* send */}
+              setServerOption={setServerOption /* send */}
+              clearToAddr={clearToAddr /* send */}
+            />
+          )}
+        </Tab.Screen>
+      )}
+      <Tab.Screen name={RouteEnum.Receive}>
+        {propsTab => (
+          <Receive
+            {...propsTab}
+            toggleMenuDrawer={() => toggleOptionsPanel() /* header */}
+            alone={false /* receive */}
+            setAddressBook={setAddressBook}
+          />
+        )}
+      </Tab.Screen>
+    </Tab.Navigator>
+  );
+});

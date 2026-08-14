@@ -64,7 +64,7 @@ Don't use "so," "which means," "therefore," or "as a result" unless the
 second clause is a genuine, non-obvious consequence of the first. Don't
 use "not just X, but Y" or "it's not merely A, it's B" as a rhetorical
 crutch. When two clauses are just parallel facts, write them as
-parallel facts — don't dress them up as an inference.
+parallel facts. Don't dress them up as an inference.
 
 Rule of thumb: if you can delete "so" and replace it with a period
 without losing meaning, the "so" was decorative. Delete it.
@@ -72,6 +72,7 @@ without losing meaning, the "so" was decorative. Delete it.
 #### Openers and closers
 - No throat-clearing: "It's important to note", "It's worth noting", restating the question before answering.
 - No grandiose closers or zoom-outs: "In conclusion", "Ultimately", "At the end of the day", "in an ever-evolving world". Stop when the point is made.
+- No epigram closers. Don't end a section or paragraph with a line that restates its point as a quotable maxim ("a convention the compiler cannot see is a convention every call site can violate"). The tell is an unlabeled aphorism that adds cadence, not information. Stop at the last concrete point.
 - Don't chain connectives: "Moreover", "Furthermore", "Additionally", "That said".
 
 #### Tone
@@ -80,14 +81,14 @@ without losing meaning, the "so" was decorative. Delete it.
 - Assert plainly. Cut reflexive hedging and over-qualification.
 
 #### Vocabulary to avoid
-- delve, tapestry, realm, landscape, navigate/navigating, leverage, robust, seamless, crucial, vital, pivotal, testament, boasts, nestled, foster, harness, unlock, elevate, embark, showcase, underscore, spearhead, treasure trove, game-changer, cheap, liveness, gap, shape, correctness, alive, honest, simple, probe, contact, stay, stranger.
+- Flat ban: delve, tapestry, realm, landscape, navigate/navigating, leverage, robust, seamless, crucial, vital, pivotal, testament, boasts, nestled, foster, harness, unlock, elevate, embark, showcase, underscore, spearhead, treasure trove, game-changer.
+- Avoid as filler, keep when technically precise: cheap, liveness, gap, shape, correctness, alive, honest, simple, probe, contact, stay, stranger.
 
 #### Formatting
 - Don't bold the lead phrase of every bullet.
 - Don't bullet what should be prose.
 - No headers on two-sentence sections.
 - No emoji as section markers.
-- Vary sentence length deliberately.
 
 #### Articles and determiners
 
@@ -111,7 +112,7 @@ without losing meaning, the "so" was decorative. Delete it.
 - No docstrings that just restate the signature.
 - Names: concise and domain-specific. Avoid generic placeholders (`data`, `result`, `output`, `item`, `value`, `temp`, `handleData`, a helper named `helper`) and avoid over-long descriptive names where a short one is idiomatic.
 - No completeness theater: no unrequested demo/usage blocks, no logs narrating execution ("Starting...", "Done!"), no emoji in output, no unprompted complexity analysis in comments.
-- Don't add guards for conditions that can't occur. Don't wrap non-throwing code in try/catch. Don't swallow-and-log errors; let them propagate.
+- Don't add guards for conditions that can't occur. Don't wrap non-throwing code in try/catch. Don't swallow-and-log errors. Let them propagate.
 - Match the surrounding codebase's idioms and conventions over textbook-uniform formatting.
 
 ### Documentation in code

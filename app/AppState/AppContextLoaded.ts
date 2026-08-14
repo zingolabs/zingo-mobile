@@ -17,7 +17,6 @@ import { ChainNameEnum } from './enums/ChainNameEnum';
 import { SnackbarDurationEnum } from './enums/SnackbarDurationEnum';
 import { LoadedAppNavigationState } from '@app/types';
 import ValueTransferType from './types/ValueTransferType';
-import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
 import TransparentAddressClass from './classes/TransparentAddressClass';
 import { ScreenEnum } from './enums/ScreenEnum';
 import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
@@ -47,9 +46,6 @@ export default interface AppContextLoaded {
 
   // getinfo and getblockchaininfo result
   info: InfoType;
-
-  // syncing Info about the status of the process
-  syncingStatus: RPCSyncStatusType;
 
   // wallet birthday block height
   birthday: number;
@@ -129,8 +125,8 @@ export default interface AppContextLoaded {
   selectServer: SelectServerEnum;
   // The loaded wallet's OWN chain (main/test/regtest). Reliable even Offline,
   // unlike `server.chainName` which is empty in Offline mode. Empty when no
-  // wallet / unknown. Used to decide, on a server change, whether to open the
-  // wallet directly or launch a chain switch.
+  // wallet / unknown. Decides, on a server change, whether to open the wallet
+  // directly or launch a chain switch.
   walletChainName: ChainNameEnum;
   performanceLevel: RPCPerformanceLevelEnum;
   blockExplorer: BlockExplorerEnum;

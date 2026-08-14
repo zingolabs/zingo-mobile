@@ -388,6 +388,13 @@ export class LoadingAppClass extends Component<
     typeof BottomSheetModal
   > | null>;
   screenName = ScreenEnum.LoadingApp;
+  // Boot precedes the wallet load, so no controller epoch exists yet. A hand-call
+  // restart relaunches the boot chain on the same live instance, so the
+  // unmounted flag alone cannot tell a stale chain from the fresh one. runBoot
+  // bumps this at its head; a continuation whose generation moved, or whose
+  // instance unmounted, drops its setState. The named divergence from ADR
+  // 0017's controller epoch.
+  bootGeneration = 0;
 
   constructor(props: LoadingAppClassProps) {
     super(props);
@@ -447,8 +454,18 @@ export class LoadingAppClass extends Component<
     this.customServerModalRef = React.createRef();
   }
 
-  componentDidMount = async () => {
+  componentDidMount = () => {
+    this.subscribe();
+    this.runBoot();
+  };
+
+  private bootAborted = (generation: number): boolean =>
+    this.unmounted || generation !== this.bootGeneration;
+
+  runBoot = async () => {
+    const generation = ++this.bootGeneration;
     const netInfoState = await NetInfo.fetch();
+    if (this.bootAborted(generation)) return;
     this.setState({
       netInfo: {
         isConnected: netInfoState.isConnected,
@@ -483,6 +500,7 @@ export class LoadingAppClass extends Component<
         this.state.biometrics,
         { translate: this.state.translate },
       );
+      if (this.bootAborted(generation)) return;
       const proceed = enactGateAnswer(
         startGate,
         {
@@ -501,6 +519,7 @@ export class LoadingAppClass extends Component<
 
     // has the device the Wallet Keys stored?
     const has = await hasRecoveryWalletInfo();
+    if (this.bootAborted(generation)) return;
     this.setState({ hasRecoveryWalletInfoSaved: has });
 
     // Boot-time server selection. `auto` refetches the live list and activates
@@ -521,13 +540,14 @@ export class LoadingAppClass extends Component<
     await AsyncStorage.setItem(GlobalConst.background, GlobalConst.no);
     const exists = await rpcWalletExists();
     const backupExists = await walletBackupExists();
+    if (this.bootAborted(generation)) return;
     if (backupExists) {
       this.setState({ hasBackupWallet: true });
     }
 
     if (exists) {
       this.setState({ walletExists: true });
-      await this.loadExistingWalletOnBoot();
+      await this.loadExistingWalletOnBoot(generation);
     } else {
       // no wallet file -> go to the initial menu.
       this.setState(state => ({
@@ -539,15 +559,9 @@ export class LoadingAppClass extends Component<
         actionButtonsDisabled: false,
       }));
     }
+  };
 
-    if (this.unmounted) {
-      // The boot chain outlived this instance; attaching listeners here
-      // would subscribe a dead component forever.
-      return;
-    }
-    // Re-entry via the locked screen's tryAgain must not stack another
-    // subscription pair on the one this mount already holds.
-    this.detachListeners();
+  subscribe = () => {
     this.appstate = AppState.addEventListener(
       EventListenerEnum.change,
       async nextAppState => {
@@ -843,13 +857,16 @@ export class LoadingAppClass extends Component<
   };
 
   // Loads the wallet file found on disk. Also the retry after a file repair.
-  loadExistingWalletOnBoot = async () => {
+  loadExistingWalletOnBoot = async (
+    generation: number = this.bootGeneration,
+  ) => {
     const result = await loadExistingWallet(
       this.state.server.uri,
       this.state.server.chainName,
       this.state.performanceLevel,
       GlobalConst.minConfirmations.toString(),
     );
+    if (this.bootAborted(generation)) return;
 
     let error = false;
     let errorText = '';
@@ -894,6 +911,7 @@ export class LoadingAppClass extends Component<
             // store this wallet's recovery info in the Keychain/Keystore; if
             // it can't be read, whatever the device holds is removed.
             await createUpdateRecoveryWalletInfo(await fetchWallet(readOnly));
+            if (this.bootAborted(generation)) return;
             this.setState({
               readOnly,
               orchardPool,
@@ -902,6 +920,7 @@ export class LoadingAppClass extends Component<
               actionButtonsDisabled: false,
             });
           } catch (e) {
+            if (this.bootAborted(generation)) return;
             this.setState({
               readOnly,
               orchardPool,
@@ -943,6 +962,7 @@ export class LoadingAppClass extends Component<
       errorText = result.ok ? result.value : result.error.message;
     }
     if (error) {
+      if (this.bootAborted(generation)) return;
       await this.walletLoadFailed(
         Utils.humanizeChainTokens(errorText, this.state.translate),
       );
@@ -1262,7 +1282,7 @@ export class LoadingAppClass extends Component<
               this.setState(
                 { startingApp: false, serverErrorTries: 1, screen },
                 () => {
-                  this.componentDidMount();
+                  this.runBoot();
                 },
               );
             } else {
@@ -1882,7 +1902,7 @@ export class LoadingAppClass extends Component<
     await new Promise<void>(resolve => {
       this.setState({ biometricGate: { kind: 'passed' } }, resolve);
     });
-    await this.componentDidMount();
+    await this.runBoot();
   });
 
   addLastSnackbar = (message: string, duration?: SnackbarDurationEnum) => {
@@ -1973,7 +1993,7 @@ export class LoadingAppClass extends Component<
     this.setState({
       startingApp: false,
     });
-    this.componentDidMount();
+    this.runBoot();
   };
 
   restoreLastBackup = async () => {
