@@ -1,7 +1,9 @@
 /**
  * Drives the wallet sync lifecycle.
  *
- * A single 5 s setInterval (updateTimerID) calls runTaskPromises() which:
+ * A self-rescheduling single-flight loop (updateTimerID) runs runTaskPromises()
+ * every 5 s, re-arming only after the prior tick resolves so two ticks can
+ * never overlap. Each tick:
  *   1. Adjusts performance level if it drifted from config.
  *   2. Calls fetchSyncPoll() to check whether a sync task is running.
  *   3. If save_required, also fetches all wallet state and persists to disk.
@@ -10,9 +12,18 @@
  * fetchSyncPollLock) and on DataService are checked before scheduling
  * new work so no operation is enqueued twice.
  *
+ * The controller epoch (ADR 0005) bumps on every invalidating boundary. Reset,
+ * teardown, foreground resume, and wallet change reach clearTimers(); a server
+ * switch bumps through changeServer() without tearing the loop down, because the
+ * running sync finishes its catch-up on the old server. A deferred poll
+ * follow-up and an in-flight fetchSyncStatus each capture the epoch and drop
+ * once a boundary has passed, so neither a launch nor a status read applies
+ * against the new server/wallet.
+ *
  * To add a new periodic task, push it into taskPromises inside runTaskPromises.
  */
-import { TotalBalanceClass, GlobalConst } from '../../AppState';
+import { Epoch } from '../controller/syncController';
+import { TotalBalanceClass, GlobalConst, ServerType } from '../../AppState';
 import RPCModule from '../../RPCModule';
 import { RPCSyncStatusType } from '../types/RPCSyncStatusType';
 import { RPCSyncPollType } from '../types/RPCSyncPollType';
@@ -39,6 +50,15 @@ export class SyncCoordinator {
   fetchSyncStatusLock: boolean = false;
   fetchSyncPollLock: boolean = false;
 
+  // The controller epoch (ADR 0005): a monotonic counter bumped on every
+  // invalidating boundary, all of which reach clearTimers(). A deferred poll
+  // follow-up drops when the epoch it captured no longer matches.
+  controllerEpoch: Epoch = 0;
+
+  // Single-flight lane: a tick arriving while one is in flight does
+  // not re-enter, so overlapping ticks cannot both read the save-required gate.
+  tickInFlight: boolean = false;
+
   syncLaunchFailures: number = 0;
 
   walletConfigPerformanceLevel: RPCPerformanceLevelEnum | undefined;
@@ -58,15 +78,50 @@ export class SyncCoordinator {
     await this.dataService.fetchWalletHeight();
     await this.dataService.fetchWalletBirthdaySeedUfvk();
 
-    if (!this.updateTimerID) {
-      this.updateTimerID = setInterval(() => this.runTaskPromises(), 5 * 1000);
-      this.timers.push(this.updateTimerID);
+    if (this.updateTimerID === undefined) {
+      this.armNextTick();
     }
 
     await this.sanitizeTimers();
   }
 
+  // Arms the next tick as one tracked setTimeout. The loop re-arms itself only
+  // after a tick's work resolves, so a slow tick cannot be overlapped by the
+  // next. No setInterval.
+  armNextTick(): void {
+    this.updateTimerID = setTimeout(() => this.loopTick(), 5 * 1000);
+    this.timers.push(this.updateTimerID);
+  }
+
+  async loopTick(): Promise<void> {
+    const armedHandle = this.updateTimerID;
+    await this.runTaskPromises();
+    // Re-arm only while this loop is still the live one. A boundary landing
+    // during the tick (clearTimers) sets updateTimerID undefined and stops it.
+    if (this.updateTimerID !== armedHandle) {
+      return;
+    }
+    this.timers = this.timers.filter(t => t !== armedHandle);
+    this.updateTimerID = undefined;
+    this.armNextTick();
+  }
+
   async runTaskPromises(): Promise<void> {
+    // Single-flight lane: a tick arriving while one is in flight does
+    // not re-enter. The self-rescheduling loop keeps the scheduled path from
+    // overlapping; this guard also covers a direct re-entrant call.
+    if (this.tickInFlight) {
+      return;
+    }
+    this.tickInFlight = true;
+    try {
+      await this.runTick();
+    } finally {
+      this.tickInFlight = false;
+    }
+  }
+
+  private async runTick(): Promise<void> {
     this.sanitizeTimers();
 
     if (this.walletConfigPerformanceLevel !== this.config.performanceLevel) {
@@ -168,15 +223,28 @@ export class SyncCoordinator {
     }
   }
 
+  // A server switch is an invalidating boundary (ADR 0005): bump the epoch so a
+  // status read or deferred poll begun under the old server drops instead of
+  // applying its stale snapshot. The loop keeps running — the launched
+  // sync finishes its catch-up on the old server, the next launch binds the new.
+  changeServer(server: ServerType): void {
+    this.controllerEpoch += 1;
+    this.config.server = server;
+  }
+
   async clearTimers(): Promise<void> {
-    if (this.updateTimerID) {
-      clearInterval(this.updateTimerID);
+    // A boundary passed (reset, teardown, foreground resume, wallet change):
+    // invalidate any deferred poll follow-up issued under the old epoch.
+    this.controllerEpoch += 1;
+
+    if (this.updateTimerID !== undefined) {
+      clearTimeout(this.updateTimerID);
       this.updateTimerID = undefined;
     }
 
     while (this.timers.length > 0) {
       const inter = this.timers.pop();
-      clearInterval(inter);
+      clearTimeout(inter);
     }
   }
 
@@ -186,7 +254,7 @@ export class SyncCoordinator {
       if (this.updateTimerID && this.timers[i] === this.updateTimerID) {
         // keep
       } else {
-        clearInterval(this.timers[i]);
+        clearTimeout(this.timers[i]);
         deleted.push(i);
       }
     }
@@ -196,7 +264,11 @@ export class SyncCoordinator {
   }
 
   async refreshSync(fullRescan?: boolean) {
-    if (this.refreshSyncLock && !fullRescan) {
+    // Single in-flight command (ADR 0005): a launch and a rescan share one lane.
+    // A rescan issued while a sync is in flight is dropped, not run beside it,
+    // so its finally can no longer release the launch's lock. The caller
+    // re-issues once the lane clears.
+    if (this.refreshSyncLock) {
       return;
     }
     this.refreshSyncLock = true;
@@ -264,9 +336,17 @@ export class SyncCoordinator {
       return;
     }
     this.fetchSyncStatusLock = true;
+    // Capture the epoch before the read: a server switch during the await bumps
+    // it, and a snapshot begun under the old server must drop, not apply.
+    const issuedEpoch = this.controllerEpoch;
     try {
       const start = Date.now();
       const returnStatus: string = await RPCModule.statusSyncInfo();
+      // A boundary during the read (a server switch) bumped the epoch: this
+      // snapshot was begun under the old server, drop it unread.
+      if (issuedEpoch !== this.controllerEpoch) {
+        return;
+      }
       if (Date.now() - start > 4000) {
         console.log(
           '=========================================== > sync status command - ',
@@ -338,6 +418,9 @@ export class SyncCoordinator {
       return;
     }
     this.fetchSyncPollLock = true;
+    // Capture the epoch before the poll: a boundary during the await, or before
+    // a deferred follow-up fires, invalidates this poll's scheduled work.
+    const issuedEpoch = this.controllerEpoch;
     try {
       const start = Date.now();
       const returnPoll: string = await RPCModule.pollSyncInfo();
@@ -355,6 +438,7 @@ export class SyncCoordinator {
       ) {
         console.log('SYNC POLL -> RUN SYNC', returnPoll);
         setTimeout(async () => {
+          if (issuedEpoch !== this.controllerEpoch) return;
           await this.refreshSync();
         }, 0);
         return;
@@ -363,10 +447,12 @@ export class SyncCoordinator {
       if (returnPoll.toLowerCase().startsWith('sync task is not complete')) {
         console.log('SYNC POLL -> FETCH STATUS', returnPoll);
         setTimeout(async () => {
+          if (issuedEpoch !== this.controllerEpoch) return;
           await this.fetchSyncStatus();
         }, 0);
         console.log('SYNC POLL -> RUN SYNC', returnPoll);
         setTimeout(async () => {
+          if (issuedEpoch !== this.controllerEpoch) return;
           await this.refreshSync();
         }, 0);
         return;
@@ -407,6 +493,7 @@ export class SyncCoordinator {
 
       console.log('SYNC POLL -> FETCH STATUS');
       setTimeout(async () => {
+        if (issuedEpoch !== this.controllerEpoch) return;
         await this.fetchSyncStatus();
       }, 0);
     } catch (error) {

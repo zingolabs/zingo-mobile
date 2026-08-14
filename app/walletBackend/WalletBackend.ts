@@ -46,11 +46,6 @@ export default class WalletBackend {
       config.stopMixnetTransport,
       config.onMixnetViewChanged,
     );
-    // Wire the sync-restart callback after SyncCoordinator exists
-    this.dataService.onSyncError = async () => {
-      await this.syncCoordinator.clearTimers();
-      await this.syncCoordinator.configure();
-    };
     this.transactionService = new TransactionService(
       config,
       this.syncCoordinator,
@@ -146,13 +141,13 @@ export default class WalletBackend {
     return this.config.readOnly;
   }
 
-  // Active server. Mutates the shared config reference so all sub-services
-  // (DataService etc.) pick up the new URI on their next call without having
-  // to recreate the WalletBackend instance. Without this, switching server
-  // without changing wallets left DataService.getLatestBlockServerInfo
-  // talking to the stale URI captured at construction time.
+  // Active server. Routes through the coordinator's changeServer so the switch
+  // bumps the controller epoch (ADR 0005): a status read or poll begun under the
+  // old server drops rather than applying its stale snapshot. It still
+  // mutates the shared config reference, so every sub-service picks up the new
+  // URI on its next call without recreating the WalletBackend instance.
   setServer(server: ServerType) {
-    this.config.server = server;
+    this.syncCoordinator.changeServer(server);
   }
 
   // Active performance level. Same shared-reference pattern as setServer.
@@ -163,5 +158,4 @@ export default class WalletBackend {
   setPerformanceLevel(performanceLevel: RPCPerformanceLevelEnum) {
     this.config.performanceLevel = performanceLevel;
   }
-
 }

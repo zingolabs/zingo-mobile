@@ -18,7 +18,6 @@ import { mockValueTransfers } from '../__mocks__/dataMocks/mockValueTransfers';
 import { mockAddressBook } from '../__mocks__/dataMocks/mockAddressBook';
 import { mockAddresses } from '../__mocks__/dataMocks/mockAddresses';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
-import { mockZecPrice } from '../__mocks__/dataMocks/mockZecPrice';
 import { mockServer } from '../__mocks__/dataMocks/mockServer';
 import { mockNetInfo } from '../__mocks__/dataMocks/mockNetInfo';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -58,7 +57,6 @@ describe('ValueTransferDetail - snapshots', () => {
   state.addressBook = mockAddressBook;
   state.addresses = mockAddresses;
   state.totalBalance = mockTotalBalance;
-  state.zecPrice = mockZecPrice;
   state.server = mockServer;
   state.netInfo = mockNetInfo;
   state.mode = ModeEnum.advanced;

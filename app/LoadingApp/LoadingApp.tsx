@@ -493,6 +493,13 @@ export class LoadingAppClass extends Component<
     typeof BottomSheetModal
   > | null>;
   screenName = ScreenEnum.LoadingApp;
+  mounted = false;
+  // Boot precedes the wallet load, so no controller epoch exists yet. A hand-call
+  // restart relaunches the boot chain on the same live instance, so a bare mounted
+  // flag cannot tell a stale chain from the fresh one. runBoot bumps this at its
+  // head; a continuation whose generation moved, or whose instance unmounted,
+  // drops its setState. The named divergence from ADR 0005's controller epoch.
+  bootGeneration = 0;
 
   constructor(props: LoadingAppClassProps) {
     super(props);
@@ -564,8 +571,19 @@ export class LoadingAppClass extends Component<
     this.customServerModalRef = React.createRef();
   }
 
-  componentDidMount = async () => {
+  componentDidMount = () => {
+    this.mounted = true;
+    this.subscribe();
+    this.runBoot();
+  };
+
+  private bootAborted = (generation: number): boolean =>
+    !this.mounted || generation !== this.bootGeneration;
+
+  runBoot = async () => {
+    const generation = ++this.bootGeneration;
     const netInfoState = await NetInfo.fetch();
+    if (this.bootAborted(generation)) return;
     this.setState({
       netInfo: {
         isConnected: netInfoState.isConnected,
@@ -587,6 +605,7 @@ export class LoadingAppClass extends Component<
         const resultBio = this.state.security.startApp
           ? await simpleBiometrics({ translate: this.state.translate })
           : true;
+        if (this.bootAborted(generation)) return;
         // resultBio:
         // - true      -> authenticated (biometric, or device passcode via allowDeviceCredentials)
         // - false     -> user cancelled or failed the prompt
@@ -615,6 +634,7 @@ export class LoadingAppClass extends Component<
 
     // has the device the Wallet Keys stored?
     const has = await hasRecoveryWalletInfo();
+    if (this.bootAborted(generation)) return;
     this.setState({ hasRecoveryWalletInfoSaved: has });
 
     // Boot-time server selection. `auto` refetches the live list and activates
@@ -635,6 +655,7 @@ export class LoadingAppClass extends Component<
     await AsyncStorage.setItem(GlobalConst.background, GlobalConst.no);
     const exists = await rpcWalletExists();
     const backupExists = await walletBackupExists();
+    if (this.bootAborted(generation)) return;
     if (backupExists) {
       this.setState({ hasBackupWallet: true });
     }
@@ -647,6 +668,7 @@ export class LoadingAppClass extends Component<
         this.state.performanceLevel,
         GlobalConst.minConfirmations.toString(),
       );
+      if (this.bootAborted(generation)) return;
 
       let error = false;
       let errorText = '';
@@ -700,6 +722,7 @@ export class LoadingAppClass extends Component<
                   await removeRecoveryWalletInfo();
                 }
               }
+              if (this.bootAborted(generation)) return;
               this.setState({
                 readOnly,
                 orchardPool,
@@ -708,6 +731,7 @@ export class LoadingAppClass extends Component<
                 actionButtonsDisabled: false,
               });
             } catch (e) {
+              if (this.bootAborted(generation)) return;
               this.setState({
                 readOnly,
                 orchardPool,
@@ -749,6 +773,7 @@ export class LoadingAppClass extends Component<
         errorText = result.ok ? result.value : result.error.message;
       }
       if (error) {
+        if (this.bootAborted(generation)) return;
         // Wallet-open failures are local and deterministic (undecodable
         // file, chain mismatch, bad settings): the native layer opens
         // Indexerless when only the server dial fails, so no open failure
@@ -779,9 +804,11 @@ export class LoadingAppClass extends Component<
           SettingsNameEnum.basicFirstViewSeed,
           false,
         );
+        if (this.bootAborted(generation)) return;
         if (this.state.hasRecoveryWalletInfoSaved) {
           // but first we need to check if exists some key stored in the device from a previous installation (IOS)
           await this.recoverRecoveryWalletInfo(false);
+          if (this.bootAborted(generation)) return;
           // go to the initial menu, giving the opportunity to the user
           // to use the seed & birthday recovered from the device.
           this.setState({
@@ -803,6 +830,7 @@ export class LoadingAppClass extends Component<
             });
           } else {
             await this.createNewWallet(false);
+            if (this.bootAborted(generation)) return;
             this.setState({ actionButtonsDisabled: false });
             this.navigateToLoadedApp(
               false,
@@ -822,6 +850,7 @@ export class LoadingAppClass extends Component<
           SettingsNameEnum.basicFirstViewSeed,
           true,
         );
+        if (this.bootAborted(generation)) return;
         this.setState(state => ({
           screen:
             state.screen === RouteEnum.ImportUfvk
@@ -832,7 +861,9 @@ export class LoadingAppClass extends Component<
         }));
       }
     }
+  };
 
+  subscribe = () => {
     this.appstate = AppState.addEventListener(
       EventListenerEnum.change,
       async nextAppState => {
@@ -925,6 +956,7 @@ export class LoadingAppClass extends Component<
   };
 
   componentWillUnmount = () => {
+    this.mounted = false;
     this.dim && typeof this.dim.remove === 'function' && this.dim.remove();
     this.appstate &&
       typeof this.appstate.remove === 'function' &&
@@ -1232,7 +1264,7 @@ export class LoadingAppClass extends Component<
               this.setState(
                 { startingApp: false, serverErrorTries: 1, screen },
                 () => {
-                  this.componentDidMount();
+                  this.runBoot();
                 },
               );
             } else {
@@ -1868,7 +1900,7 @@ export class LoadingAppClass extends Component<
     // and then the user wants to go to basic mode in the first screen
     // the result will be the same -> create a new wallet.
     this.setState({ mode, screen: RouteEnum.Launching }, () => {
-      this.componentDidMount();
+      this.runBoot();
     });
   };
 
@@ -1949,7 +1981,7 @@ export class LoadingAppClass extends Component<
     this.setState({
       startingApp: false,
     });
-    this.componentDidMount();
+    this.runBoot();
   };
 
   restoreLastBackup = async () => {
@@ -2053,7 +2085,7 @@ export class LoadingAppClass extends Component<
                   message={biometricsFailed ? getLastGateFailure() : undefined}
                   tryAgain={() => {
                     this.setState({ biometricsFailed: false }, () =>
-                      this.componentDidMount(),
+                      this.runBoot(),
                     );
                   }}
                 />

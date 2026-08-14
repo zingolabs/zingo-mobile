@@ -16,45 +16,39 @@ import { callFfi, FfiResult } from '../ffi';
 import { serverUris } from '../../uris';
 import { RPCZecPriceType } from '../types/RPCZecPriceType';
 import { RPCSeedType } from '../types/RPCSeedType';
+import type { ZecPriceFetch } from '../../AppState/price';
 
 /**
- * Fetches the current ZEC/USD price from the zingolib price oracle.
- *
- * Price sentinel values:
- *   0   — initial/default (no price data yet)
- *  -1   — error inside zingolib (a typed FFI rejection, or an oracle error)
- *  -2   — malformed/empty success payload
- *  > 0  — real USD price
+ * Fetches the current ZEC/USD price from the zingolib price oracle as a
+ * discriminated union (ADR 0002 error keys, not prose). The old 0/-1/-2
+ * sentinels map straight across:
+ *   unpriced         — the oracle answered with no price field (was 0)
+ *   error gemini     — a typed FFI rejection or an oracle-reported error (-1)
+ *   error rpcmodule  — a malformed or empty success payload (-2)
+ *   priced           — a real USD price (> 0)
  */
-export async function getZecPrice(): Promise<{
-  price: number;
-  error: string;
-}> {
+export async function getZecPrice(): Promise<ZecPriceFetch> {
   const result = await callFfi(RPCModule.zecPriceInfo());
   if (!result.ok) {
-    return { price: -1, error: result.error.message };
+    return { kind: 'error', errorKey: 'price.gemini' };
   }
   if (!result.value) {
-    return { price: -2, error: 'Internal Error fetching price' };
+    return { kind: 'error', errorKey: 'price.rpcmodule' };
   }
   try {
     const resultJSON: RPCZecPriceType = JSON.parse(result.value);
     if (resultJSON.error) {
-      return { price: -1, error: resultJSON.error };
+      return { kind: 'error', errorKey: 'price.gemini' };
     }
     if (!resultJSON.current_price) {
-      // if no exists the field or is empty
-      return { price: 0, error: '' };
+      return { kind: 'unpriced' };
     }
     if (isNaN(resultJSON.current_price)) {
-      return {
-        price: -1,
-        error: `Error fetching price ${resultJSON.current_price}`,
-      };
+      return { kind: 'error', errorKey: 'price.gemini' };
     }
-    return { price: resultJSON.current_price, error: '' };
-  } catch (error) {
-    return { price: -2, error: `Critical Error fetching price ${error}` };
+    return { kind: 'priced', usd: resultJSON.current_price };
+  } catch {
+    return { kind: 'error', errorKey: 'price.rpcmodule' };
   }
 }
 

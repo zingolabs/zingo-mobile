@@ -91,22 +91,26 @@ describe('the existence probes contain rejections as false', () => {
   });
 });
 
-describe('getZecPrice maps outcomes to its documented sentinels', () => {
+describe('getZecPrice maps outcomes to the price discriminated union', () => {
   it.each([
-    ['a typed rejection', typedRejection('Indexer', 'oracle down'), -1],
-    ['an empty resolution', Promise.resolve(''), -2],
-    ['an { error } body', Promise.resolve('{"error":"no feed"}'), -1],
-    ['a body without a price', Promise.resolve('{}'), 0],
-    ['an unparseable body', Promise.resolve('not json'), -2],
-  ])('%s', async (_case, native, sentinel) => {
+    ['a typed rejection', typedRejection('Indexer', 'oracle down'), 'price.gemini'],
+    ['an empty resolution', Promise.resolve(''), 'price.rpcmodule'],
+    ['an { error } body', Promise.resolve('{"error":"no feed"}'), 'price.gemini'],
+    ['a non-numeric price', Promise.resolve('{"current_price":"x"}'), 'price.gemini'],
+    ['an unparseable body', Promise.resolve('not json'), 'price.rpcmodule'],
+  ])('%s reads as an error key', async (_case, native, errorKey) => {
     bridge.zecPriceInfo.mockReturnValueOnce(native);
-    const { price } = await getZecPrice();
-    expect(price).toBe(sentinel);
+    await expect(getZecPrice()).resolves.toEqual({ kind: 'error', errorKey });
+  });
+
+  it('a body without a price reads as unpriced', async () => {
+    bridge.zecPriceInfo.mockResolvedValueOnce('{}');
+    await expect(getZecPrice()).resolves.toEqual({ kind: 'unpriced' });
   });
 
   it('a real price crosses the data channel', async () => {
     bridge.zecPriceInfo.mockResolvedValueOnce('{"current_price": 42.5}');
-    await expect(getZecPrice()).resolves.toEqual({ price: 42.5, error: '' });
+    await expect(getZecPrice()).resolves.toEqual({ kind: 'priced', usd: 42.5 });
   });
 });
 

@@ -16,28 +16,61 @@ import {
 import { serverUris } from '../../app/uris';
 import { isEqual } from 'lodash';
 import { RPCPerformanceLevelEnum } from '../../app/walletBackend/enums/RPCPerformanceLevelEnum';
+import {
+  Done,
+  DONE,
+  ErrorKeyed,
+} from '../../app/AppState/types/Result';
+
+export type SettingsWriteResult = Done | ErrorKeyed<'settings.save-error'>;
+
+const SAVE_FAILED: ErrorKeyed<'settings.save-error'> = {
+  kind: 'error',
+  errorKey: 'settings.save-error',
+};
 
 export default class SettingsFileImpl {
+  // writeSettings is read-whole-file / merge one key / write-whole-file over the
+  // single settings file. Concurrent calls to different keys would each read the
+  // pre-write file and the later write would drop the earlier key. Chain every
+  // read-merge-write behind one queue so they land in order. A failed write
+  // must not stall the queue for the next writer.
+  private static writeQueue: Promise<unknown> = Promise.resolve();
+
   static async getFileName() {
     return RNFS.DocumentDirectoryPath + '/settings.json';
   }
 
-  // Write the server setting
-  static async writeSettings(
+  // Write one setting. Serialized against every other writeSettings; the
+  // returned promise resolves once the bytes have landed.
+  static writeSettings(
     name: SettingsNameEnum,
     value: string | boolean | ServerType | SecurityType,
-  ) {
+  ): Promise<SettingsWriteResult> {
+    const landed = this.writeQueue.then(() => this.persist(name, value));
+    this.writeQueue = landed.then(
+      () => undefined,
+      () => undefined,
+    );
+    return landed;
+  }
+
+  private static async persist(
+    name: SettingsNameEnum,
+    value: string | boolean | ServerType | SecurityType,
+  ): Promise<SettingsWriteResult> {
     const fileName = await this.getFileName();
     const settings = await this.readSettings();
     const newSettings: SettingsFileClass = { ...settings, [name]: value };
 
-    RNFS.writeFile(fileName, JSON.stringify(newSettings), GlobalConst.utf8)
-      .then(() => {
-        //console.log('FILE WRITTEN!')
-      })
-      .catch(err => {
-        console.log('settings write file:', err.message);
-      });
+    return RNFS.writeFile(
+      fileName,
+      JSON.stringify(newSettings),
+      GlobalConst.utf8,
+    ).then(
+      () => DONE,
+      () => SAVE_FAILED,
+    );
   }
 
   // Read the server setting

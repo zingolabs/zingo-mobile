@@ -29,6 +29,9 @@ import { ContextAppLoaded } from '../../app/context';
 import { getZingoLogo } from '../../app/utils/ZingoAppData';
 import { useShieldFunds } from '../../app/hooks/useShieldFunds';
 import { useSyncStatus } from '../../app/hooks/useSyncStatus';
+import { useAtomValue } from 'jotai';
+import { syncStatusAtom } from '../../app/AppState/syncAtoms';
+import { usePrice } from '../../app/AppState/priceAtoms';
 import BoldText from '../Components/BoldText';
 import SyncStatusBar from './components/SyncStatusBar';
 import BalanceRow from './components/BalanceRow';
@@ -111,18 +114,22 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   const {
     totalBalance,
     info,
-    syncingStatus,
     currency,
-    zecPrice,
     readOnly,
     valueTransfersTotal,
     somePending,
     shieldingAmount,
     selectServer,
-    setZecPrice,
     nym,
     mixnetView,
   } = context;
+
+  // The sync slice reads from its own atom, so a scan tick wakes the
+  // header without re-rendering the wider context tree.
+  const syncingStatus = useAtomValue(syncStatusAtom);
+  // The price slice reads from its own atom, stable while the displayed
+  // price holds, so the memoized rows below hold across unrelated commits.
+  const zecPrice = usePrice();
 
   const translate = translateProp ?? context.translate;
   const netInfo = netInfoProp ?? context.netInfo;
@@ -228,7 +235,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             info={info}
             currency={currency}
             zecPrice={zecPrice}
-            setZecPrice={setZecPrice}
             selectServer={selectServer}
             showShieldButton={showShieldButton}
             shieldingFee={shieldingFee}

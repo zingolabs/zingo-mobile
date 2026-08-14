@@ -87,7 +87,7 @@ import { safeSnapToIndex } from '../../app/utils/safeSnapToIndex';
 import { AppDrawerParamList } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import PriceFetcher from '../Components/PriceFetcher';
-import { usePriceFetcherStore } from '../Components/priceFetcherStore';
+import { usePrice, usePriceFetcher } from '../../app/AppState/priceAtoms';
 import Header from '../Header';
 import BottomSheet, {
   BottomSheetBackdrop,
@@ -146,7 +146,6 @@ const Send: React.FunctionComponent<SendProps> = ({
     info,
     totalBalance,
     sendPageState,
-    zecPrice,
     sendAll,
     netInfo,
     privacy,
@@ -163,7 +162,6 @@ const Send: React.FunctionComponent<SendProps> = ({
     defaultUnifiedAddress,
     shieldingAmount,
     selectServer,
-    setZecPrice,
     zenniesDonationAddress,
     //security,
     currency,
@@ -175,6 +173,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     reenableMixnet,
   } = context;
   const { colors } = useTheme();
+  const zecPrice = usePrice();
 
   const [enabling, setEnabling] = useState<boolean>(false);
   const nymPhase =
@@ -262,7 +261,7 @@ const Send: React.FunctionComponent<SendProps> = ({
 
   // Price-fetch state shared with the PriceFetcher ring; drives the CTA's
   // transient "Refreshing price" label.
-  const { loading: priceLoading } = usePriceFetcherStore();
+  const { loading: priceLoading } = usePriceFetcher();
 
   // Fee (`sendPropose`) and/or spendable-balance RPC error → the CTA turns into
   // a tappable "calculation error" button that opens SendErrorSheet, which
@@ -1723,7 +1722,6 @@ const Send: React.FunctionComponent<SendProps> = ({
                           )}
                           <View style={{ marginLeft: inputZec ? 5 : 2 }}>
                             <PriceFetcher
-                              setZecPrice={setZecPrice}
                               backgroundColor={colors.bgSurface}
                               onManualFetch={revealPrice}
                             />

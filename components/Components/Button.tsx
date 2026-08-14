@@ -61,11 +61,18 @@ const Button: React.FunctionComponent<ButtonProps> = ({
                 borderWidth: 2,
                 width: twoButtons ? '40%' : '80%',
               }
-            : {
-                // error
-                backgroundColor: colors.bgAccent,
-                width: twoButtons ? '40%' : '80%',
-              };
+            : type === ButtonTypeEnum.Warning
+              ? {
+                  backgroundColor: disabled ? colors.bgSecondaryDisabled : colors.bgWarning,
+                  borderColor: disabled ? colors.borderAccentDisabled : colors.borderWarning,
+                  borderWidth: 2,
+                  width: twoButtons ? '40%' : '80%',
+                }
+              : {
+                  // error
+                  backgroundColor: colors.bgAccent,
+                  width: twoButtons ? '40%' : '80%',
+                };
 
   const styleButtonCommon: TextStyle = {
     padding: 0,
@@ -99,10 +106,14 @@ const Button: React.FunctionComponent<ButtonProps> = ({
             ? {
                 color: colors.bgCanvas,
               }
-            : {
-                // error
-                color: colors.bgCanvas,
-              };
+            : type === ButtonTypeEnum.Warning
+              ? {
+                  color: disabled ? colors.fgAccentDisabled : colors.fgWarning,
+                }
+              : {
+                  // error
+                  color: colors.bgCanvas,
+                };
   const styleTextCommon: TextStyle = {
     fontWeight: '600',
     textTransform: 'none',

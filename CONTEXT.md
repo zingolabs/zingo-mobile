@@ -218,3 +218,86 @@ part and a zingo-mobile part (`zl_…-zm_…`), each derived from git
 describe against that repo's release tags. The commit count and
 5-character hash fields are elided when a part sits exactly on its
 release tag, and `_dirty` marks a part built from an uncommitted tree.
+
+## State machine
+
+Vocabulary of the frontend state model (`app/LoadedApp`, `app/LoadingApp`, and the
+Jotai controller that replaces their scattered state).
+
+**Native runtime**:
+The zingolib worker behind `RPCModule`, the authoritative holder of sync, wallet, and
+send state. JS observes it by polling and drives it by command; it does not take orders
+to stop.
+_Avoid_: the backend (ambiguous), the RPC.
+
+**Fake native runtime**:
+A dev-only stand-in for the Native runtime behind the `RPCModule` seam. It holds an authored
+in-memory state the app observes by polling, exactly as it observes the real worker. Selected
+by `__DEV__ && FAKE_RUNTIME`, dead-stripped from release. Driven by `set(patch)`, by hand
+through a dev panel or by a scripted timeline. Reproduces the real wire shapes by hand until
+the FFI-to-TS typing effort types the boundary.
+_Avoid_: fake backend (the glossary bans "backend"), mock (it holds state, not a call log).
+
+**Controller machine**:
+The JS-side state machine, Jotai-held, that models intent plus the last observed native
+state plus the derived views. A reflection-and-command layer over the native runtime,
+never the owner of native work.
+_Avoid_: the store (it is a machine, not a bag), app state.
+
+**Cancellability class**:
+Which of four behaviors a native command has when JS stops wanting its result:
+*JS-ignorable* (runs to completion, JS discards the result by epoch), *native-pausable*
+(`pauseSyncProcess` interrupts it), *must-complete* (never interrupted, e.g. the wallet
+save), and *fire-and-forget-until-poll* (no handle, state learned only by polling). Every
+async fix names the class it acts on.
+
+**Epoch**:
+A generation token the controller stamps on a command and its observations. A result
+whose epoch is stale is discarded, not applied. The cure for JS-ignorable staleness: the
+after-unmount write and the torn server-switch read.
+_Avoid_: token (overloaded), version.
+
+**Reconciliation**:
+Updating the controller from a poll result, closing the window where JS intent and native
+reality disagreed.
+
+**WalletView**:
+The derived render state — spinner, receive-only, full with Send, full without Send — as a
+total function of the controller's source union. One value at a time.
+_Avoid_: screen (that is navigation), mode.
+
+**Faulted**:
+The lifecycle state the controller enters when the native runtime returns an error that makes
+it unusable: a corrupt wallet on load, or an invariant-break rejection mid-session. Recovered
+only by a reset or a restore, never by a retry. Distinct from a sync failure, where the wallet
+is intact and a poll retries it, and from Stalled, where the bridge is unreachable, not broken.
+_Avoid_: crash (that is the RNRestart phase), corrupt (only one of its causes).
+
+**Stalled**:
+The observed condition where an issued command stays outstanding past a threshold, so the
+native bridge is unreachable. Names the reality that one lock-holding command with no timeout
+freezes every caller. Derived from how long the command has been in flight, never stored. It
+does not cancel the native call.
+_Avoid_: frozen, hung, timeout (nothing times out natively).
+
+**Command scheduler**:
+The single JS-side caller of the native runtime. It runs one native call at a time, poll and command
+alike, mirroring the one write lock the native side serializes on. A self-rescheduling loop, not a
+fixed interval, so a second tick cannot start while one runs. Stopping it clears its one timer and
+bumps the epoch.
+_Avoid_: sync loop (it owns commands too), poll loop.
+
+**In-flight command**:
+The one native command the scheduler has in flight, its slice of the single-flight lane. At most one
+exists at a time, which serializes commands on the JS side. Carries the epoch the command was issued
+under, so a stale result is discarded on return, and clears when the command's ack resolves. A native
+call that never returns reads as Stalled, not a stuck in-flight command. Named `inFlight` in the model
+(ADR 0005).
+_Avoid_: overlay (a UI word, names nothing it holds), queue (there is at most one), pending state,
+awaiting-confirmation (every command confirms on its ack).
+
+**Configured server / Bound server**:
+The configured server is the one the next sync launch will use. The bound server is the one the
+running sync captured at its launch. A server switch changes the configured server at once,
+while the running sync keeps the bound server until it finishes its catch-up and relaunches.
+_Avoid_: current server (ambiguous between the two).

@@ -1,11 +1,12 @@
 import ServerType from './types/ServerType';
 
-import { AppStateStatus } from 'react-native';
 import { SelectServerEnum } from './enums/SelectServerEnum';
 
+// The container's own bookkeeping, kept off the shared AppContextLoaded read
+// surface: the transient server-switch handoff, coupled to the server/selectServer
+// commit and read only inside the container. The lifecycle field and the modal
+// gates live in app/AppState/uiAtoms.ts.
 export default interface AppStateLoaded {
-  appStateStatus: AppStateStatus;
-
   // change server helper
   newServer: ServerType;
   newSelectServer: SelectServerEnum | null;
@@ -15,15 +16,4 @@ export default interface AppStateLoaded {
 
   // to do scroll to bottom in messages
   scrollToBottom: boolean;
-
-  // to know if the modal is open or not
-  isSeedViewModalOpen: boolean;
-
-  // Address+ownership pair for the shared "Add Tag/Contact" BottomSheetModal
-  // hosted at LoadedApp level. `null` while hidden.
-  addTagModalTarget: {
-    address: string;
-    own: boolean;
-    swapChain: string;
-  } | null;
 }

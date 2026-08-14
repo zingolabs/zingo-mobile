@@ -3,7 +3,6 @@ import { useShallowMemo } from './useShallowMemo';
 
 import {
   InfoType,
-  ZecPriceType,
   BackgroundType,
   SendPageStateClass,
   ToAddrClass,
@@ -20,12 +19,10 @@ import {
   BlockExplorerEnum,
 } from '../AppState';
 
-import { RPCSyncStatusType } from '../walletBackend/types/RPCSyncStatusType';
 import { RPCPerformanceLevelEnum } from '../walletBackend/enums/RPCPerformanceLevelEnum';
 
 export const defaultAppContextLoaded: AppContextLoaded = {
   netInfo: {} as NetInfoType,
-  syncingStatus: {} as RPCSyncStatusType,
   totalBalance: null,
   addresses: null,
   valueTransfers: null,
@@ -40,10 +37,6 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   server: {} as ServerType,
   currency: CurrencyEnum.USDCurrency,
   language: LanguageEnum.en,
-  zecPrice: {
-    zecPrice: 0,
-    date: 0,
-  } as ZecPriceType,
   sendAll: false,
   donation: false,
   privacy: false,
@@ -77,7 +70,6 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   shieldingAmount: 0,
   showSwipeableIcons: true,
   doRefresh: () => {},
-  setZecPrice: () => {},
   zenniesDonationAddress: '',
   zingolibVersion: '',
   performanceLevel: RPCPerformanceLevelEnum.Medium,

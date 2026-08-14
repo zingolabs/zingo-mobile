@@ -6,11 +6,13 @@ import 'react-native';
 import React from 'react';
 
 import { render } from '@testing-library/react-native';
+import { Provider, createStore } from 'jotai';
 import Send from '../components/Send';
 import {
   defaultAppContextLoaded,
   ContextAppLoadedProvider,
 } from '../app/context';
+import { priceAtom } from '../app/AppState/priceAtoms';
 import { ModeEnum, CurrencyEnum, RouteEnum } from '../app/AppState';
 import { mockValueTransfers } from '../__mocks__/dataMocks/mockValueTransfers';
 import { mockAddresses } from '../__mocks__/dataMocks/mockAddresses';
@@ -44,10 +46,18 @@ describe('Component Send - test', () => {
   state.addresses = mockAddresses;
   state.translate = mockTranslate;
   state.info = mockInfo;
-  state.zecPrice = mockZecPrice;
   state.totalBalance = mockTotalBalance;
   state.sendPageState = mockSendPageState;
   const onFunction = jest.fn();
+
+  // The live price reads from its own atom, so seed it in the store the Provider
+  // hands the tree, not on the context.
+  const store = createStore();
+  store.set(priceAtom, {
+    kind: 'priced',
+    usd: mockZecPrice.zecPrice,
+    at: mockZecPrice.date,
+  });
 
   test('Send no currency, privacy normal & mode basic - snapshot', () => {
     // no currency
@@ -58,19 +68,21 @@ describe('Component Send - test', () => {
     state.mode = ModeEnum.basic;
     const props = makeDrawerProps();
     const send = render(
-      <ContextAppLoadedProvider value={state}>
-        <Send
-          {...props}
-          sendTransaction={onFunction}
-          clearToAddr={onFunction}
-          toggleMenuDrawer={onFunction}
-          setShieldingAmount={onFunction}
-          setScrollToTop={onFunction}
-          setScrollToBottom={onFunction}
-          setServerOption={onFunction}
-          setSecurityOption={onFunction}
-        />
-      </ContextAppLoadedProvider>,
+      <Provider store={store}>
+        <ContextAppLoadedProvider value={state}>
+          <Send
+            {...props}
+            sendTransaction={onFunction}
+            clearToAddr={onFunction}
+            toggleMenuDrawer={onFunction}
+            setShieldingAmount={onFunction}
+            setScrollToTop={onFunction}
+            setScrollToBottom={onFunction}
+            setServerOption={onFunction}
+            setSecurityOption={onFunction}
+          />
+        </ContextAppLoadedProvider>
+      </Provider>,
     );
     expect(send.toJSON()).toMatchSnapshot();
   });
@@ -84,19 +96,21 @@ describe('Component Send - test', () => {
     state.mode = ModeEnum.advanced;
     const props = makeDrawerProps();
     const send = render(
-      <ContextAppLoadedProvider value={state}>
-        <Send
-          {...props}
-          sendTransaction={onFunction}
-          clearToAddr={onFunction}
-          toggleMenuDrawer={onFunction}
-          setShieldingAmount={onFunction}
-          setScrollToTop={onFunction}
-          setScrollToBottom={onFunction}
-          setServerOption={onFunction}
-          setSecurityOption={onFunction}
-        />
-      </ContextAppLoadedProvider>,
+      <Provider store={store}>
+        <ContextAppLoadedProvider value={state}>
+          <Send
+            {...props}
+            sendTransaction={onFunction}
+            clearToAddr={onFunction}
+            toggleMenuDrawer={onFunction}
+            setShieldingAmount={onFunction}
+            setScrollToTop={onFunction}
+            setScrollToBottom={onFunction}
+            setServerOption={onFunction}
+            setSecurityOption={onFunction}
+          />
+        </ContextAppLoadedProvider>
+      </Provider>,
     );
     expect(send.toJSON()).toMatchSnapshot();
   });

@@ -5672,6 +5672,11 @@ joi@^17.2.1:
     "@sideway/formula" "^3.0.1"
     "@sideway/pinpoint" "^2.0.0"
 
+jotai@^2.20.2:
+  version "2.20.2"
+  resolved "https://registry.yarnpkg.com/jotai/-/jotai-2.20.2.tgz#fccdc02ee68b314c2a723a8b9c35de6fcca5e644"
+  integrity sha512-aHB4CNb9qRcyf0mwSB6EO5bCGAjx8cTwFgOFCE2leOnTzqACbnSWG8XoWB3LxCT1Qoj03I1OWAHszDmN4uHb/w==
+
 js-base64@^3.8.1:
   version "3.8.1"
   resolved "https://registry.yarnpkg.com/js-base64/-/js-base64-3.8.1.tgz#b04bf95d803cc924d0831e5a7790519567ef1c8a"

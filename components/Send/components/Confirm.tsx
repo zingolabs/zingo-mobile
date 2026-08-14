@@ -29,6 +29,7 @@ import CurrencyAmount from '../../Components/CurrencyAmount';
 import Button from '../../Components/Button';
 import { useTheme } from '../../../app/theme';
 import { ContextAppLoaded } from '../../../app/context';
+import { usePrice } from '../../../app/AppState/priceAtoms';
 import Header from '../../Header';
 import AddressItem from '../../Components/AddressItem';
 import { useBiometricGate } from '../../../app/hooks/useBiometricGate';
@@ -84,7 +85,6 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     info,
     translate,
     currency,
-    zecPrice,
     defaultUnifiedAddress,
     privacy,
     addLastSnackbar,
@@ -92,6 +92,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     security,
     foregroundEpoch,
   } = context;
+  const zecPrice = usePrice();
   const { colors } = useTheme();
   const screenName = ScreenEnum.Confirm;
   const isMainChain = server.chainName === ChainNameEnum.mainChainName;
