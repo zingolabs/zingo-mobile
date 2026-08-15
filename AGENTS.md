@@ -99,6 +99,17 @@ without losing meaning, the "so" was decorative. Delete it.
 - Don't add guards for conditions that can't occur. Don't wrap non-throwing code in try/catch. Don't swallow-and-log errors; let them propagate.
 - Match the surrounding codebase's idioms and conventions over textbook-uniform formatting.
 
+### Documentation in code
+
+The one-sentence documentation rule, ratified 2026-08-10: every item
+doc-comment — Rust `///`, and the KDoc or doc-comment on a Kotlin or Swift
+item — is exactly one sentence. That sentence must not reference ADRs,
+issues, or any other document. Module headers (Rust `//!`, a file- or
+class-level header block) are exempt, and test doc-comments that follow a
+ratified convention (for example HYPOTHESIS falsifiers) keep that
+convention's shape. Apply the rule to every unmerged doc-comment before
+merge.
+
 ### Rust
 
 - Don't reach for `.clone()` to satisfy the borrow checker. Borrow or restructure first.

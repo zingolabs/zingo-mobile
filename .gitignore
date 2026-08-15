@@ -104,6 +104,9 @@ buck-out/
 # Claude Code
 .claude/
 
+# Per-agent instruction scratch; the tracked instructions live in AGENTS.md
+.agents/
+
 # Wayfinder Agent Skill
 .wayfinder
 
