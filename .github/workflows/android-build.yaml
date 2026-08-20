@@ -121,15 +121,17 @@ jobs:
 
           TOML="rust/Cargo.toml"
           REV="${GITHUB_SHA}"
+          PINS='^(zingolib|pepper-sync|zingolib_testutils|zingo-price)[[:space:]]*='
 
-          sed -i -E "/^zingolib[[:space:]]*=/ s/(rev[[:space:]]*=[[:space:]]*\")[^\"]*(\")/\1${REV}\2/" "$TOML"
+          sed -i -E "/${PINS}/ s/(rev[[:space:]]*=[[:space:]]*\")[^\"]*(\")/\1${REV}\2/" "$TOML"
 
-          sed -i -E "/^zingolib[[:space:]]*=/ s/(branch|tag)[[:space:]]*=[[:space:]]*\"[^\"]*\"/rev = \"${REV}\"/" "$TOML"
+          sed -i -E "/${PINS}/ s/(branch|tag)[[:space:]]*=[[:space:]]*\"[^\"]*\"/rev = \"${REV}\"/" "$TOML"
 
-          first_line="$(grep -E '^zingolib[[:space:]]*=' "$TOML")"
-          echo "zingolib first line => $first_line"
-          echo "$first_line" | grep -q "rev = \"${REV}\""
-          echo "$first_line" | grep -vqE '\b(branch|tag)[[:space:]]*='
+          pinned="$(grep -E "$PINS" "$TOML")"
+          echo "zingolib pins =>"
+          echo "$pinned"
+          test "$(echo "$pinned" | wc -l)" -eq "$(echo "$pinned" | grep -c "rev = \"${REV}\"")"
+          ! echo "$pinned" | grep -qE '\b(branch|tag)[[:space:]]*='
 
           cd rust
           rustup default stable
