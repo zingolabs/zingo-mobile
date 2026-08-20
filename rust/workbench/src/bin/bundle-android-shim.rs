@@ -68,7 +68,10 @@ fn bundle(args: &[String]) -> Result<PathBuf, Vec<String>> {
             .join("release")
             .join(SHIM_SO);
         if !source.is_file() {
-            return Err(vec![format!("built {abi} shim missing at {}", source.display())]);
+            return Err(vec![format!(
+                "built {abi} shim missing at {}",
+                source.display()
+            )]);
         }
         let abi_dir = dest.join("jniLibs").join(abi);
         std::fs::create_dir_all(&abi_dir)
@@ -126,7 +129,11 @@ mod tests {
 
     #[test]
     fn abi_args_select_and_order() {
-        let args = vec!["--abi".to_string(), "x86_64".to_string(), "--abi=arm64-v8a".to_string()];
+        let args = vec![
+            "--abi".to_string(),
+            "x86_64".to_string(),
+            "--abi=arm64-v8a".to_string(),
+        ];
         let abis = requested_abis(&args).unwrap();
         assert_eq!(
             abis.iter().map(|(abi, _)| *abi).collect::<Vec<_>>(),

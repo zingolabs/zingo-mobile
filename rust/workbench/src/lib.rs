@@ -47,7 +47,9 @@ pub fn git(args: &[&str]) -> Result<String, Vec<String>> {
 
 /// Repository root via `git rev-parse --show-toplevel`.
 pub fn repo_root() -> Result<PathBuf, Vec<String>> {
-    Ok(PathBuf::from(git(&["rev-parse", "--show-toplevel"])?.trim()))
+    Ok(PathBuf::from(
+        git(&["rev-parse", "--show-toplevel"])?.trim(),
+    ))
 }
 
 /// The value of a `--dest <dir>` or `--dest=<dir>` argument, if present.
