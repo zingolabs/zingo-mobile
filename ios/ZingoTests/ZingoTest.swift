@@ -552,12 +552,16 @@ final class UpdateCurrentPriceAndValueTransfersFromSeed: XCTestCase {
           return
         }
 
+        // Price rides the mixnet or does not happen (ADR 0011). This wallet
+        // never attached one, so the fetch must refuse. A price here would
+        // mean the wallet reached an oracle over clearnet, which is the
+        // leak the mixnet-only rule exists to prevent.
         do {
           let price = try zecPrice()
-          print("\nPrice:\n\(price)")
-        } catch {
-          XCTFail("\nInit from seed error:\n\(error.localizedDescription)")
+          XCTFail("\nThe price fetch answered without a mixnet:\n\(price)")
           return
+        } catch {
+          print("\nPrice refused without a mixnet:\n\(error.localizedDescription)")
         }
         
         do {
