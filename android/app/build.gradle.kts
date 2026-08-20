@@ -342,29 +342,34 @@ androidComponents {
 // the maven artifact inside the crate checkout and the shim's lockfile pins
 // its version, so gradle asks cargo where that checkout lives (the crate's
 // README, "Android"; docs/adr/0004).
-fun RepositoryHandler.rustlsPlatformVerifier(): MavenArtifactRepository {
-    val manifestPath = run {
-        val dependencyJson = providers.exec {
-            workingDir = File(project.rootDir, "../")
-            commandLine(
-                "cargo", "metadata", "--format-version", "1",
-                "--filter-platform", "aarch64-linux-android",
-                "--manifest-path", "rust/nym-proxy-ffi/Cargo.toml",
-            )
-        }.standardOutput.asText.get()
-        val parsed = groovy.json.JsonSlurper().parseText(dependencyJson)
-        @Suppress("UNCHECKED_CAST")
-        val packages = (parsed as Map<String, Any?>)["packages"] as List<Map<String, Any?>>
-        File(packages.first { it["name"] == "rustls-platform-verifier-android" }["manifest_path"] as String)
-    }
-    return maven {
-        url = uri(File(manifestPath.parentFile, "maven"))
-        metadataSources { artifact() }
-    }
+val rustlsPlatformVerifierCrate: Map<String, Any?> = run {
+    val dependencyJson = providers.exec {
+        workingDir = File(project.rootDir, "../")
+        commandLine(
+            "cargo", "metadata", "--format-version", "1",
+            "--filter-platform", "aarch64-linux-android",
+            "--manifest-path", "rust/nym-proxy-ffi/Cargo.toml",
+        )
+    }.standardOutput.asText.get()
+    val parsed = groovy.json.JsonSlurper().parseText(dependencyJson)
+    @Suppress("UNCHECKED_CAST")
+    val packages = (parsed as Map<String, Any?>)["packages"] as List<Map<String, Any?>>
+    packages.first { it["name"] == "rustls-platform-verifier-android" }
 }
 
+val rustlsPlatformVerifierMaven =
+    File(File(rustlsPlatformVerifierCrate["manifest_path"] as String).parentFile, "maven")
+
+val rustlsPlatformVerifierVersion = rustlsPlatformVerifierCrate["version"] as String
+
 repositories {
-    rustlsPlatformVerifier()
+    maven {
+        url = uri(rustlsPlatformVerifierMaven)
+        // The crate ships a POM beside the artifact, and only that POM says
+        // the packaging is `aar`. Reading it is what stops gradle looking for
+        // a jar that was never published.
+        metadataSources { mavenPom() }
+    }
 }
 
 dependencies {
@@ -382,10 +387,12 @@ dependencies {
     implementation("com.facebook.soloader:soloader:0.10.5")
 
     // The Kotlin half of rustls-platform-verifier inside the nym shim .so;
-    // NymTlsInit hands it the app Context (docs/adr/0004). `latest.release`
-    // is correct here: cargo keeps the maven artifact in lockstep with the
-    // crate version the shim's lockfile pins.
-    implementation("rustls:rustls-platform-verifier:latest.release")
+    // NymTlsInit hands it the app Context (docs/adr/0004). The version comes
+    // from the same cargo query as the repository, which keeps the artifact
+    // in lockstep with the crate the shim's lockfile pins. A dynamic version
+    // cannot work here: the checkout publishes no maven-metadata.xml, so
+    // gradle has no version listing to resolve one against.
+    implementation("rustls:rustls-platform-verifier:$rustlsPlatformVerifierVersion")
 
     // Detox tests getAttributes() reaches this by reflection at runtime, so
     // it is runtime-only: no source references exist for compile analysis.
