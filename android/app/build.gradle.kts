@@ -387,12 +387,15 @@ dependencies {
     implementation("com.facebook.soloader:soloader:0.10.5")
 
     // The Kotlin half of rustls-platform-verifier inside the nym shim .so;
-    // NymTlsInit hands it the app Context (docs/adr/0004). The version comes
-    // from the same cargo query as the repository, which keeps the artifact
-    // in lockstep with the crate the shim's lockfile pins. A dynamic version
-    // cannot work here: the checkout publishes no maven-metadata.xml, so
-    // gradle has no version listing to resolve one against.
-    implementation("rustls:rustls-platform-verifier:$rustlsPlatformVerifierVersion")
+    // NymTlsInit hands it the app Context (docs/adr/0004). Runtime-only: the
+    // shim's Rust reaches these classes over JNI, so no Kotlin source
+    // references them and compile analysis reads the dependency as unused.
+    // The version comes from the same cargo query as the repository, which
+    // keeps the artifact in lockstep with the crate the shim's lockfile pins.
+    // A dynamic version cannot work here: the checkout publishes no
+    // maven-metadata.xml, so gradle has no version listing to resolve one
+    // against.
+    runtimeOnly("rustls:rustls-platform-verifier:$rustlsPlatformVerifierVersion")
 
     // Detox tests getAttributes() reaches this by reflection at runtime, so
     // it is runtime-only: no source references exist for compile analysis.
