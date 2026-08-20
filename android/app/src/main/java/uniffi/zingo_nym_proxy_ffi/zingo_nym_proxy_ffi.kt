@@ -741,6 +741,8 @@ internal open class UniffiVTableCallbackInterfaceProxyDeathObserver(
 
 
 
+
+
 // A JNA Library to expose the extern-C FFI definitions.
 // This is an implementation detail which will be called internally by the public API.
 
@@ -767,6 +769,8 @@ internal interface UniffiLib : Library {
     ): Unit
     fun uniffi_zingo_nym_proxy_ffi_fn_constructor_mixnetproxyhandle_start(`observer`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
     ): Pointer
+    fun uniffi_zingo_nym_proxy_ffi_fn_method_mixnetproxyhandle_exit_node(`ptr`: Pointer,uniffi_out_err: UniffiRustCallStatus, 
+    ): RustBuffer.ByValue
     fun uniffi_zingo_nym_proxy_ffi_fn_method_mixnetproxyhandle_socks5_endpoint(`ptr`: Pointer,uniffi_out_err: UniffiRustCallStatus, 
     ): RustBuffer.ByValue
     fun uniffi_zingo_nym_proxy_ffi_fn_method_mixnetproxyhandle_stop(`ptr`: Pointer,uniffi_out_err: UniffiRustCallStatus, 
@@ -885,6 +889,8 @@ internal interface UniffiLib : Library {
     ): Unit
     fun ffi_zingo_nym_proxy_ffi_rust_future_complete_void(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
     ): Unit
+    fun uniffi_zingo_nym_proxy_ffi_checksum_method_mixnetproxyhandle_exit_node(
+    ): Short
     fun uniffi_zingo_nym_proxy_ffi_checksum_method_mixnetproxyhandle_socks5_endpoint(
     ): Short
     fun uniffi_zingo_nym_proxy_ffi_checksum_method_mixnetproxyhandle_stop(
@@ -910,16 +916,19 @@ private fun uniffiCheckContractApiVersion(lib: UniffiLib) {
 
 @Suppress("UNUSED_PARAMETER")
 private fun uniffiCheckApiChecksums(lib: UniffiLib) {
+    if (lib.uniffi_zingo_nym_proxy_ffi_checksum_method_mixnetproxyhandle_exit_node() != 20035.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
     if (lib.uniffi_zingo_nym_proxy_ffi_checksum_method_mixnetproxyhandle_socks5_endpoint() != 21713.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_zingo_nym_proxy_ffi_checksum_method_mixnetproxyhandle_stop() != 26147.toShort()) {
+    if (lib.uniffi_zingo_nym_proxy_ffi_checksum_method_mixnetproxyhandle_stop() != 2708.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_zingo_nym_proxy_ffi_checksum_constructor_mixnetproxyhandle_start() != 64163.toShort()) {
+    if (lib.uniffi_zingo_nym_proxy_ffi_checksum_constructor_mixnetproxyhandle_start() != 6896.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_zingo_nym_proxy_ffi_checksum_method_proxydeathobserver_on_death() != 24440.toShort()) {
+    if (lib.uniffi_zingo_nym_proxy_ffi_checksum_method_proxydeathobserver_on_death() != 8036.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
 }
@@ -972,6 +981,29 @@ object NoPointer
 /**
  * @suppress
  */
+public object FfiConverterUByte: FfiConverter<UByte, Byte> {
+    override fun lift(value: Byte): UByte {
+        return value.toUByte()
+    }
+
+    override fun read(buf: ByteBuffer): UByte {
+        return lift(buf.get())
+    }
+
+    override fun lower(value: UByte): Byte {
+        return value.toByte()
+    }
+
+    override fun allocationSize(value: UByte) = 1UL
+
+    override fun write(value: UByte, buf: ByteBuffer) {
+        buf.put(value.toByte())
+    }
+}
+
+/**
+ * @suppress
+ */
 public object FfiConverterUShort: FfiConverter<UShort, Short> {
     override fun lift(value: Short): UShort {
         return value.toUShort()
@@ -989,6 +1021,29 @@ public object FfiConverterUShort: FfiConverter<UShort, Short> {
 
     override fun write(value: UShort, buf: ByteBuffer) {
         buf.putShort(value.toShort())
+    }
+}
+
+/**
+ * @suppress
+ */
+public object FfiConverterULong: FfiConverter<ULong, Long> {
+    override fun lift(value: Long): ULong {
+        return value.toULong()
+    }
+
+    override fun read(buf: ByteBuffer): ULong {
+        return lift(buf.getLong())
+    }
+
+    override fun lower(value: ULong): Long {
+        return value.toLong()
+    }
+
+    override fun allocationSize(value: ULong) = 8UL
+
+    override fun write(value: ULong, buf: ByteBuffer) {
+        buf.putLong(value.toLong())
     }
 }
 
@@ -1212,11 +1267,16 @@ private class JavaLangRefCleanable(
     override fun clean() = cleanable.clean()
 }
 /**
- * A running mixnet proxy the mobile host owns. Holds the tokio runtime that
- * keeps the [`NymProxy`] client and its SOCKS5 listener alive; dropping the
- * handle (or calling [`Self::stop`]) tears both down.
+ * A running mixnet proxy the mobile host owns, holding the tokio runtime
+ * that keeps the [`NymProxy`] client and its SOCKS5 listener alive until
+ * [`Self::stop`] or a drop of the handle tears both down.
  */
 public interface MixnetProxyHandleInterface {
+    
+    /**
+     * The Exit Node identity the running proxy bound, `None` once stopped.
+     */
+    fun `exitNode`(): kotlin.String?
     
     /**
      * The local SOCKS5 endpoint the app hands to `attach_mixnet`.
@@ -1224,10 +1284,9 @@ public interface MixnetProxyHandleInterface {
     fun `socks5Endpoint`(): Socks5Endpoint
     
     /**
-     * Disconnect the mixnet client and stop the local SOCKS5 proxy. Idempotent:
-     * a second call after the proxy is already stopped is a no-op. Deliberate
-     * stop is not death: the liveness monitor is cancelled before the listener
-     * goes down, so the observer never fires for it.
+     * Disconnect the mixnet client and stop the local SOCKS5 proxy,
+     * idempotently, cancelling the liveness monitor before the listener goes
+     * down so a deliberate stop never fires the death observer.
      */
     fun `stop`()
     
@@ -1235,9 +1294,9 @@ public interface MixnetProxyHandleInterface {
 }
 
 /**
- * A running mixnet proxy the mobile host owns. Holds the tokio runtime that
- * keeps the [`NymProxy`] client and its SOCKS5 listener alive; dropping the
- * handle (or calling [`Self::stop`]) tears both down.
+ * A running mixnet proxy the mobile host owns, holding the tokio runtime
+ * that keeps the [`NymProxy`] client and its SOCKS5 listener alive until
+ * [`Self::stop`] or a drop of the handle tears both down.
  */
 open class MixnetProxyHandle: Disposable, AutoCloseable, MixnetProxyHandleInterface {
 
@@ -1322,6 +1381,21 @@ open class MixnetProxyHandle: Disposable, AutoCloseable, MixnetProxyHandleInterf
 
     
     /**
+     * The Exit Node identity the running proxy bound, `None` once stopped.
+     */override fun `exitNode`(): kotlin.String? {
+            return FfiConverterOptionalString.lift(
+    callWithPointer {
+    uniffiRustCall() { _status ->
+    UniffiLib.INSTANCE.uniffi_zingo_nym_proxy_ffi_fn_method_mixnetproxyhandle_exit_node(
+        it, _status)
+}
+    }
+    )
+    }
+    
+
+    
+    /**
      * The local SOCKS5 endpoint the app hands to `attach_mixnet`.
      */override fun `socks5Endpoint`(): Socks5Endpoint {
             return FfiConverterTypeSocks5Endpoint.lift(
@@ -1337,10 +1411,9 @@ open class MixnetProxyHandle: Disposable, AutoCloseable, MixnetProxyHandleInterf
 
     
     /**
-     * Disconnect the mixnet client and stop the local SOCKS5 proxy. Idempotent:
-     * a second call after the proxy is already stopped is a no-op. Deliberate
-     * stop is not death: the liveness monitor is cancelled before the listener
-     * goes down, so the observer never fires for it.
+     * Disconnect the mixnet client and stop the local SOCKS5 proxy,
+     * idempotently, cancelling the liveness monitor before the listener goes
+     * down so a deliberate stop never fires the death observer.
      */override fun `stop`()
         = 
     callWithPointer {
@@ -1358,13 +1431,10 @@ open class MixnetProxyHandle: Disposable, AutoCloseable, MixnetProxyHandleInterf
     companion object {
         
     /**
-     * Bring up a mixnet proxy and return a handle once its SOCKS5 listener is
-     * up. The returned handle's [`Self::socks5_endpoint`] is what the app hands
-     * to the wallet's `attach_mixnet`; readiness is verified there (the
-     * increment-17 health round trip), so this returns as soon as the proxy
-     * has an endpoint to offer. When `observer` is given, a liveness monitor
-     * probes the local listener and reports through it, at most once, if the
-     * running proxy is lost.
+     * Bring up a mixnet proxy and return, once its SOCKS5 listener is up, a
+     * handle whose [`Self::socks5_endpoint`] the app hands to the wallet's
+     * `attach_mixnet`, with a listener monitor that reports through
+     * `observer`, at most once, if the proxy is lost.
      */
     @Throws(ProxyFfiException::class) fun `start`(`observer`: ProxyDeathObserver?): MixnetProxyHandle {
             return FfiConverterTypeMixnetProxyHandle.lift(
@@ -1455,20 +1525,66 @@ public object FfiConverterTypeSocks5Endpoint: FfiConverterRustBuffer<Socks5Endpo
 
 
 /**
- * Why a running proxy was lost. A typed cause the host can match on for
- * policy (retry, narrate, escalate); each variant carries the underlying
- * diagnostic for logs.
+ * Why a running proxy was lost, named as the liveness probe observed it.
  */
 sealed class ProxyDeathReason {
     
     /**
-     * The mixnet client's connection to its gateway ended.
+     * The TCP connect to the listener failed.
      */
-    data class MixnetDisconnected(
+    data class ListenerRefused(
         /**
-         * The underlying disconnect diagnostic.
+         * The underlying connect failure.
          */
         val `detail`: kotlin.String) : ProxyDeathReason() {
+        companion object
+    }
+    
+    /**
+     * The SOCKS5 greeting could not be written to the listener.
+     */
+    data class GreetingUnwritable(
+        /**
+         * The underlying write failure.
+         */
+        val `detail`: kotlin.String) : ProxyDeathReason() {
+        companion object
+    }
+    
+    /**
+     * The listener's method selection could not be read.
+     */
+    data class MethodSelectionUnreadable(
+        /**
+         * The underlying read failure.
+         */
+        val `detail`: kotlin.String) : ProxyDeathReason() {
+        companion object
+    }
+    
+    /**
+     * The listener answered a method selection other than no-auth.
+     */
+    data class MethodSelectionRefused(
+        /**
+         * The version byte the listener answered.
+         */
+        val `version`: kotlin.UByte, 
+        /**
+         * The method byte the listener answered.
+         */
+        val `method`: kotlin.UByte) : ProxyDeathReason() {
+        companion object
+    }
+    
+    /**
+     * The liveness round trip missed its budget.
+     */
+    data class CheckTimedOut(
+        /**
+         * The budget the round trip missed, in milliseconds.
+         */
+        val `budgetMillis`: kotlin.ULong) : ProxyDeathReason() {
         companion object
     }
     
@@ -1483,28 +1599,91 @@ sealed class ProxyDeathReason {
 public object FfiConverterTypeProxyDeathReason : FfiConverterRustBuffer<ProxyDeathReason>{
     override fun read(buf: ByteBuffer): ProxyDeathReason {
         return when(buf.getInt()) {
-            1 -> ProxyDeathReason.MixnetDisconnected(
+            1 -> ProxyDeathReason.ListenerRefused(
                 FfiConverterString.read(buf),
+                )
+            2 -> ProxyDeathReason.GreetingUnwritable(
+                FfiConverterString.read(buf),
+                )
+            3 -> ProxyDeathReason.MethodSelectionUnreadable(
+                FfiConverterString.read(buf),
+                )
+            4 -> ProxyDeathReason.MethodSelectionRefused(
+                FfiConverterUByte.read(buf),
+                FfiConverterUByte.read(buf),
+                )
+            5 -> ProxyDeathReason.CheckTimedOut(
+                FfiConverterULong.read(buf),
                 )
             else -> throw RuntimeException("invalid enum value, something is very wrong!!")
         }
     }
 
     override fun allocationSize(value: ProxyDeathReason) = when(value) {
-        is ProxyDeathReason.MixnetDisconnected -> {
+        is ProxyDeathReason.ListenerRefused -> {
             // Add the size for the Int that specifies the variant plus the size needed for all fields
             (
                 4UL
                 + FfiConverterString.allocationSize(value.`detail`)
             )
         }
+        is ProxyDeathReason.GreetingUnwritable -> {
+            // Add the size for the Int that specifies the variant plus the size needed for all fields
+            (
+                4UL
+                + FfiConverterString.allocationSize(value.`detail`)
+            )
+        }
+        is ProxyDeathReason.MethodSelectionUnreadable -> {
+            // Add the size for the Int that specifies the variant plus the size needed for all fields
+            (
+                4UL
+                + FfiConverterString.allocationSize(value.`detail`)
+            )
+        }
+        is ProxyDeathReason.MethodSelectionRefused -> {
+            // Add the size for the Int that specifies the variant plus the size needed for all fields
+            (
+                4UL
+                + FfiConverterUByte.allocationSize(value.`version`)
+                + FfiConverterUByte.allocationSize(value.`method`)
+            )
+        }
+        is ProxyDeathReason.CheckTimedOut -> {
+            // Add the size for the Int that specifies the variant plus the size needed for all fields
+            (
+                4UL
+                + FfiConverterULong.allocationSize(value.`budgetMillis`)
+            )
+        }
     }
 
     override fun write(value: ProxyDeathReason, buf: ByteBuffer) {
         when(value) {
-            is ProxyDeathReason.MixnetDisconnected -> {
+            is ProxyDeathReason.ListenerRefused -> {
                 buf.putInt(1)
                 FfiConverterString.write(value.`detail`, buf)
+                Unit
+            }
+            is ProxyDeathReason.GreetingUnwritable -> {
+                buf.putInt(2)
+                FfiConverterString.write(value.`detail`, buf)
+                Unit
+            }
+            is ProxyDeathReason.MethodSelectionUnreadable -> {
+                buf.putInt(3)
+                FfiConverterString.write(value.`detail`, buf)
+                Unit
+            }
+            is ProxyDeathReason.MethodSelectionRefused -> {
+                buf.putInt(4)
+                FfiConverterUByte.write(value.`version`, buf)
+                FfiConverterUByte.write(value.`method`, buf)
+                Unit
+            }
+            is ProxyDeathReason.CheckTimedOut -> {
+                buf.putInt(5)
+                FfiConverterULong.write(value.`budgetMillis`, buf)
                 Unit
             }
         }.let { /* this makes the `when` an expression, which ensures it is exhaustive */ }
@@ -1518,7 +1697,7 @@ public object FfiConverterTypeProxyDeathReason : FfiConverterRustBuffer<ProxyDea
 
 
 /**
- * Why starting or driving the mixnet proxy failed. Crosses the FFI as a
+ * Why starting or driving the mixnet proxy failed, crossing the FFI as a
  * UniFFI error the host language can match on.
  */
 sealed class ProxyFfiException: kotlin.Exception() {
@@ -1551,21 +1730,6 @@ sealed class ProxyFfiException: kotlin.Exception() {
             get() = "reason=${ `reason` }"
     }
     
-    /**
-     * The proxy came up but reported a listener address that did not parse
-     * as a socket address, so no endpoint can be offered.
-     */
-    class Address(
-        
-        /**
-         * The unparseable address text and the parse failure.
-         */
-        val `reason`: kotlin.String
-        ) : ProxyFfiException() {
-        override val message
-            get() = "reason=${ `reason` }"
-    }
-    
 
     companion object ErrorHandler : UniffiRustCallStatusErrorHandler<ProxyFfiException> {
         override fun lift(error_buf: RustBuffer.ByValue): ProxyFfiException = FfiConverterTypeProxyFfiError.lift(error_buf)
@@ -1588,9 +1752,6 @@ public object FfiConverterTypeProxyFfiError : FfiConverterRustBuffer<ProxyFfiExc
             2 -> ProxyFfiException.Connect(
                 FfiConverterString.read(buf),
                 )
-            3 -> ProxyFfiException.Address(
-                FfiConverterString.read(buf),
-                )
             else -> throw RuntimeException("invalid error enum value, something is very wrong!!")
         }
     }
@@ -1603,11 +1764,6 @@ public object FfiConverterTypeProxyFfiError : FfiConverterRustBuffer<ProxyFfiExc
                 + FfiConverterString.allocationSize(value.`reason`)
             )
             is ProxyFfiException.Connect -> (
-                // Add the size for the Int that specifies the variant plus the size needed for all fields
-                4UL
-                + FfiConverterString.allocationSize(value.`reason`)
-            )
-            is ProxyFfiException.Address -> (
                 // Add the size for the Int that specifies the variant plus the size needed for all fields
                 4UL
                 + FfiConverterString.allocationSize(value.`reason`)
@@ -1627,11 +1783,6 @@ public object FfiConverterTypeProxyFfiError : FfiConverterRustBuffer<ProxyFfiExc
                 FfiConverterString.write(value.`reason`, buf)
                 Unit
             }
-            is ProxyFfiException.Address -> {
-                buf.putInt(3)
-                FfiConverterString.write(value.`reason`, buf)
-                Unit
-            }
         }.let { /* this makes the `when` an expression, which ensures it is exhaustive */ }
     }
 
@@ -1642,15 +1793,15 @@ public object FfiConverterTypeProxyFfiError : FfiConverterRustBuffer<ProxyFfiExc
 
 
 /**
- * The host implements this to learn that the proxy died after it was running,
- * so the app can redraw a fresh path and re-attach (the proxy-owner-remediates
- * contract). The shim invokes it at most once per proxy.
+ * The host implements this to learn — at most once per proxy — that the
+ * proxy died after it was running, so the app can redraw a fresh path and
+ * re-attach under the proxy-owner-remediates contract.
  */
 public interface ProxyDeathObserver {
     
     /**
-     * Called once when the running proxy is lost. The endpoint previously
-     * reported is dead after this.
+     * Called at most once when the running proxy is lost, after which the
+     * previously reported endpoint is dead.
      */
     fun `onDeath`(`reason`: ProxyDeathReason)
     
@@ -1729,6 +1880,38 @@ internal object uniffiCallbackInterfaceProxyDeathObserver {
  * @suppress
  */
 public object FfiConverterTypeProxyDeathObserver: FfiConverterCallbackInterface<ProxyDeathObserver>()
+
+
+
+
+/**
+ * @suppress
+ */
+public object FfiConverterOptionalString: FfiConverterRustBuffer<kotlin.String?> {
+    override fun read(buf: ByteBuffer): kotlin.String? {
+        if (buf.get().toInt() == 0) {
+            return null
+        }
+        return FfiConverterString.read(buf)
+    }
+
+    override fun allocationSize(value: kotlin.String?): ULong {
+        if (value == null) {
+            return 1UL
+        } else {
+            return 1UL + FfiConverterString.allocationSize(value)
+        }
+    }
+
+    override fun write(value: kotlin.String?, buf: ByteBuffer) {
+        if (value == null) {
+            buf.put(0)
+        } else {
+            buf.put(1)
+            FfiConverterString.write(value, buf)
+        }
+    }
+}
 
 
 
