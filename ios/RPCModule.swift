@@ -682,11 +682,11 @@ class RPCModule: NSObject {
 
   // Mixnet Mode (send-over-nym). The wallet-side FFI seam, bridged on both
   // platforms; the local proxy is hosted separately by NymTransportModule.
-  @objc(attachMixnet:resolve:reject:)
-  func attachMixnet(_ socks5Addr: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+  @objc(attachMixnet:exitNode:resolve:reject:)
+  func attachMixnet(_ socks5Addr: String, exitNode: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
       DispatchQueue.global(qos: .userInitiated).async {
         FfiOutcome.of {
-          try Zingo.attachMixnet(socks5Addr: socks5Addr)
+          try Zingo.attachMixnet(socks5Addr: socks5Addr, exitNode: exitNode)
         }.settle(resolve: resolve, reject: reject)
       }
   }
@@ -709,11 +709,11 @@ class RPCModule: NSObject {
       }
   }
 
-  @objc(mixnetModeInfo:reject:)
-  func mixnetModeInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+  @objc(mixnetIndicatorInfo:reject:)
+  func mixnetIndicatorInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
       DispatchQueue.global(qos: .userInitiated).async {
         FfiOutcome.of {
-          try mixnetMode()
+          try mixnetIndicator()
         }.settle(resolve: resolve, reject: reject)
       }
   }

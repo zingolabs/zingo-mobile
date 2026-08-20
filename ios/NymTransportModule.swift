@@ -8,8 +8,10 @@
 //  it to the wallet's `attach_mixnet` seam. The loopback socket, not a shared
 //  compile unit, is the boundary between the two lockfile-incompatible stacks.
 //
-//  Lifecycle: `startMixnetTransport` (re)starts the proxy and resolves the
-//  endpoint as `host:port`; `stopMixnetTransport` is the deliberate teardown.
+//  Lifecycle: `startMixnetTransport` (re)starts the proxy and resolves its
+//  binding — the `host:port` endpoint and the Exit Node it bound, both of
+//  which the wallet's attach seam requires; `stopMixnetTransport` is the
+//  deliberate teardown.
 //  A proxy that dies on its own is caught by the shim's liveness monitor; the
 //  observer clears the stored handle so a later re-enable starts afresh, while
 //  the wallet's own probe surfaces the `died` mode the app polls.
@@ -90,7 +92,14 @@ class NymTransportModule: NSObject {
         NymTransportModule.handle = started
         let endpoint = started.socks5Endpoint()
         let address = "\(endpoint.host):\(endpoint.port)"
-        DispatchQueue.main.async { resolve(address) }
+        guard let exitNode = started.exitNode() else {
+          throw NSError(domain: "start_mixnet_transport", code: 1, userInfo: [
+            NSLocalizedDescriptionKey: "the started proxy reported no exit node",
+          ])
+        }
+        DispatchQueue.main.async {
+          resolve(["socks5Addr": address, "exitNode": exitNode])
+        }
       } catch {
         NSLog("[Native] nym start_mixnet_transport rejected. \(error)")
         DispatchQueue.main.async { reject("start_mixnet_transport", "\(error)", error) }

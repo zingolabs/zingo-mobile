@@ -1,4 +1,4 @@
-import { RPCMixnetModeEnum } from '../enums/RPCMixnetModeEnum';
+import { RPCMixnetIndicatorEnum } from '../enums/RPCMixnetIndicatorEnum';
 import { MixnetDetailReport, MixnetStatusReport } from './mixnetTransform';
 
 /**
@@ -83,8 +83,8 @@ export function deriveMixnetView(
     };
   }
 
-  switch (status.mode) {
-    case RPCMixnetModeEnum.off:
+  switch (status.indicator) {
+    case RPCMixnetIndicatorEnum.off:
       return {
         statusKey: 'mixnet.status.off',
         socks5Addr: null,
@@ -93,7 +93,7 @@ export function deriveMixnetView(
         recovery: 'reenable',
         reconnecting: false,
       };
-    case RPCMixnetModeEnum.bootstrapping:
+    case RPCMixnetIndicatorEnum.bootstrapping:
       return {
         statusKey: 'mixnet.status.bootstrapping',
         socks5Addr: null,
@@ -102,7 +102,7 @@ export function deriveMixnetView(
         recovery: 'wait',
         reconnecting,
       };
-    case RPCMixnetModeEnum.ready:
+    case RPCMixnetIndicatorEnum.ready:
       return {
         statusKey: 'mixnet.status.ready',
         socks5Addr: status.socks5Addr,
@@ -111,7 +111,7 @@ export function deriveMixnetView(
         recovery: 'none',
         reconnecting: false,
       };
-    case RPCMixnetModeEnum.died:
+    case RPCMixnetIndicatorEnum.died:
       return {
         statusKey: 'mixnet.status.died',
         socks5Addr: null,

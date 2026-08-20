@@ -1,4 +1,4 @@
-import { RPCMixnetModeEnum } from '../enums/RPCMixnetModeEnum';
+import { RPCMixnetIndicatorEnum } from '../enums/RPCMixnetIndicatorEnum';
 import {
   MixnetDetailReport,
   MixnetFailure,
@@ -38,8 +38,8 @@ export function failureCause(failure: MixnetFailure): string {
       return `native rejection: ${failure.message}`;
     case 'malformedPayload':
       return `malformed payload: ${failure.payload}`;
-    case 'unrecognizedMode':
-      return `unrecognized mode: ${failure.claimed}`;
+    case 'unrecognizedIndicator':
+      return `unrecognized indicator: ${failure.claimed}`;
     case 'unconsentedOff':
       return 'reported off without this session consent';
   }
@@ -50,17 +50,19 @@ function statusLine(status: MixnetStatusReport, millis: number): string {
     return `- status probe: FAILED in ${millis} ms — ${failureCause(status.failure)}`;
   }
   const addr =
-    status.mode === RPCMixnetModeEnum.ready && status.socks5Addr !== null
+    status.indicator === RPCMixnetIndicatorEnum.ready &&
+    status.socks5Addr !== null
       ? `, socks5 ${status.socks5Addr}`
       : '';
-  return `- status probe: ok in ${millis} ms — mode ${status.mode}${addr}`;
+  return `- status probe: ok in ${millis} ms — indicator ${status.indicator}${addr}`;
 }
 
 function detailLine(detail: MixnetDetailReport, millis: number): string {
   if (detail.kind === 'failure') {
     return `- bootstrap probe: FAILED in ${millis} ms — ${failureCause(detail.failure)}`;
   }
-  const narration = detail.detail === '' ? 'no narration' : `"${detail.detail}"`;
+  const narration =
+    detail.detail === '' ? 'no narration' : `"${detail.detail}"`;
   return `- bootstrap probe: ok in ${millis} ms — ${narration}`;
 }
 
@@ -88,9 +90,12 @@ function statusRows(
   const rows: MixnetDoctorRow[] = [
     { label: 'Status', value: 'ok' },
     { label: 'Latency', value: `${millis} ms` },
-    { label: 'Mode', value: status.mode },
+    { label: 'Indicator', value: status.indicator },
   ];
-  if (status.mode === RPCMixnetModeEnum.ready && status.socks5Addr !== null) {
+  if (
+    status.indicator === RPCMixnetIndicatorEnum.ready &&
+    status.socks5Addr !== null
+  ) {
     rows.push({ label: 'Socks5', value: status.socks5Addr });
   }
   return rows;

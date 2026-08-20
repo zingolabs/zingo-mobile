@@ -814,10 +814,10 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
-    fun attachMixnet(socks5Addr: String, promise: Promise) {
+    fun attachMixnet(socks5Addr: String, exitNode: String, promise: Promise) {
         FfiOutcome.settling(promise, "attach_mixnet") {
             uniffi.zingo.initLogging()
-            uniffi.zingo.attachMixnet(socks5Addr)
+            uniffi.zingo.attachMixnet(socks5Addr, exitNode)
         }
     }
 
@@ -838,10 +838,10 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
-    fun mixnetModeInfo(promise: Promise) {
-        FfiOutcome.settling(promise, "mixnet_mode") {
+    fun mixnetIndicatorInfo(promise: Promise) {
+        FfiOutcome.settling(promise, "mixnet_indicator") {
             uniffi.zingo.initLogging()
-            uniffi.zingo.mixnetMode()
+            uniffi.zingo.mixnetIndicator()
         }
     }
 

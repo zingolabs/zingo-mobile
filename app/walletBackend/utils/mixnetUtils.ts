@@ -26,13 +26,14 @@ async function statusCall(
 
 /**
  * Attach Mixnet Mode to an already-running, platform-hosted SOCKS5 endpoint
- * (the proxy shim's address). Poll [`getMixnetStatus`] for
- * `bootstrapping` -> `ready`, or `died`.
+ * (the proxy shim's address) that bound `exitNode`. Poll [`getMixnetStatus`]
+ * for `bootstrapping` -> `ready`, or `died`.
  */
 export async function attachMixnet(
   socks5Addr: string,
+  exitNode: string,
 ): Promise<MixnetStatusReport> {
-  return statusCall(() => RPCModule.attachMixnet(socks5Addr));
+  return statusCall(() => RPCModule.attachMixnet(socks5Addr, exitNode));
 }
 
 /**
@@ -53,9 +54,9 @@ export async function disableMixnet(): Promise<MixnetStatusReport> {
   return statusCall(() => RPCModule.disableMixnet());
 }
 
-/** The current Mixnet Mode, with the local SOCKS5 address when ready. */
+/** The current Mixnet Mode indicator, with the local SOCKS5 address when ready. */
 export async function getMixnetStatus(): Promise<MixnetStatusReport> {
-  return statusCall(() => RPCModule.mixnetModeInfo());
+  return statusCall(() => RPCModule.mixnetIndicatorInfo());
 }
 
 /** The live bootstrap narration line, empty outside of bootstrapping. */

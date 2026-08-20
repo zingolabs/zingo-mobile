@@ -19,7 +19,7 @@
  * a slow poll is never enqueued twice, and an onChange callback that
  * publishes the latest view to the context layer.
  */
-import { RPCMixnetModeEnum } from '../enums/RPCMixnetModeEnum';
+import { RPCMixnetIndicatorEnum } from '../enums/RPCMixnetIndicatorEnum';
 import {
   ClearnetConsent,
   MixnetStatusReport,
@@ -35,10 +35,20 @@ import {
 } from '../utils/mixnetUtils';
 
 /**
- * Starts the platform-hosted mixnet transport and yields its local SOCKS5
- * address. Rejections propagate to the caller.
+ * What a started platform transport reports back: its local SOCKS5 address
+ * and the Exit Node the proxy bound, both of which the wallet's attach seam
+ * requires.
  */
-export type StartMixnetTransport = () => Promise<string>;
+export type MixnetTransportBinding = {
+  socks5Addr: string;
+  exitNode: string;
+};
+
+/**
+ * Starts the platform-hosted mixnet transport and yields its binding.
+ * Rejections propagate to the caller.
+ */
+export type StartMixnetTransport = () => Promise<MixnetTransportBinding>;
 
 /** Tears down the platform-hosted mixnet transport. */
 export type StopMixnetTransport = () => Promise<void>;
@@ -106,11 +116,11 @@ export class MixnetCoordinator {
     const epoch = ++this.enableEpoch;
     this.consent = 'none';
     try {
-      const socks5Addr = await this.startTransport();
+      const { socks5Addr, exitNode } = await this.startTransport();
       if (this.enableEpoch !== epoch) {
         return;
       }
-      const status = await attachMixnet(socks5Addr);
+      const status = await attachMixnet(socks5Addr, exitNode);
       if (this.enableEpoch !== epoch) {
         return;
       }
@@ -164,7 +174,7 @@ export class MixnetCoordinator {
     if (this.consent === 'disabledThisSession') {
       return false;
     }
-    return status.kind === 'failure' || status.mode === RPCMixnetModeEnum.died;
+    return status.kind === 'failure' || status.indicator === RPCMixnetIndicatorEnum.died;
   }
 
   private scheduleReconnect(): void {
@@ -206,7 +216,7 @@ export class MixnetCoordinator {
     const recovered =
       this.lastStatus !== null &&
       this.lastStatus.kind === 'status' &&
-      this.lastStatus.mode === RPCMixnetModeEnum.ready;
+      this.lastStatus.indicator === RPCMixnetIndicatorEnum.ready;
     if (!recovered) {
       this.reconnectDelayMillis = Math.min(
         this.reconnectDelayMillis * 2,
@@ -251,7 +261,7 @@ export class MixnetCoordinator {
     return (
       this.lastStatus !== null &&
       this.lastStatus.kind === 'status' &&
-      this.lastStatus.mode === RPCMixnetModeEnum.bootstrapping
+      this.lastStatus.indicator === RPCMixnetIndicatorEnum.bootstrapping
     );
   }
 
@@ -268,8 +278,8 @@ export class MixnetCoordinator {
     // stays flagged as it comes back up.
     const settled =
       status.kind === 'status' &&
-      (status.mode === RPCMixnetModeEnum.ready ||
-        status.mode === RPCMixnetModeEnum.off);
+      (status.indicator === RPCMixnetIndicatorEnum.ready ||
+        status.indicator === RPCMixnetIndicatorEnum.off);
     if (settled) {
       this.reconnectActive = false;
       this.resetReconnectBackoff();
