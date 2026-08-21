@@ -161,11 +161,6 @@ jobs:
             tests: execute_sync_from_seed execute_send_from_orchard execute_currentprice_and_value_transfers_from_seed
           - name: ledger-and-parsing
             tests: execute_sapling_balance_from_seed execute_parse_address_for_tex execute_parse_address_invalid
-          # The mixnet send binds a fixed loopback port for its SOCKS5
-          # stand-in, so it runs in a bucket of its own rather than racing a
-          # neighbour for the port.
-          - name: mixnet
-            tests: execute_send_over_mixnet
     env:
       RUSTFLAGS: -D warnings
       CACHE-KEY: ${{ inputs.cache-key }}

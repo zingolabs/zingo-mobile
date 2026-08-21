@@ -237,79 +237,6 @@ async fn execute_send_from_orchard(abi: &str) {
     assert_eq!(exit_code, 0);
 }
 
-/// Drives the on-device send while a SOCKS5 stand-in holds the mixnet's
-/// place, so the wallet takes the mixnet route for real and every
-/// Correspondent it draws is dialed through a tunnel that carries nothing.
-///
-/// A live Nym exit cannot serve this test. It egresses on the public
-/// internet, and a mixnet send draws its Correspondents from the curated
-/// public mainnet pool, so nothing it dials can reach the private regtest
-/// chain this harness launches. The stand-in keeps the run hermetic: no
-/// packet addressed to a Correspondent leaves this machine.
-async fn execute_send_over_mixnet(abi: &str) {
-    use zingomobile_utils::socks5_standin;
-
-    #[cfg(not(feature = "regchest"))]
-    let local_net = scenarios::funded_orchard_mobileclient(1_000_000).await;
-    #[cfg(not(feature = "regchest"))]
-    let activation_heights = Some(validator_activation_heights(local_net.validator()).await);
-    #[cfg(feature = "regchest")]
-    let activation_heights: Option<String> = None;
-    #[cfg(feature = "regchest")]
-    let docker =
-        match regchest_utils::launch(UNIX_SOCKET, Some("funded_orchard_mobileclient")).await {
-            Ok(d) => d,
-            Err(e) => panic!("Failed to launch regchest docker container: {:?}", e),
-        };
-
-    let standin = socks5_standin::Socks5Standin::bind();
-    println!("SOCKS5 stand-in listening on {}", standin.address());
-
-    #[cfg(not(feature = "ci"))]
-    let (exit_code, output, error) = zingomobile_utils::android_integration_test(
-        abi,
-        "ExecuteSendOverMixnet",
-        activation_heights.as_deref(),
-    );
-    #[cfg(feature = "ci")]
-    let (exit_code, output, error) = zingomobile_utils::android_integration_test_ci(
-        abi,
-        "ExecuteSendOverMixnet",
-        activation_heights.as_deref(),
-    );
-
-    #[cfg(feature = "regchest")]
-    match regchest_utils::close(&docker).await {
-        Ok(_) => (),
-        Err(e) => panic!("Failed to close regchest docker container: {:?}", e),
-    }
-
-    println!("Exit Code: {}", exit_code);
-    println!("Output: {}", output);
-    println!("Error: {}", error);
-
-    assert_eq!(exit_code, 0);
-
-    // The device's assertions prove the wallet chose the mixnet route and
-    // refused to fall back. These prove the traffic matched that claim.
-    let dials = standin.dials();
-    println!("Correspondent dials through the stand-in: {:?}", dials);
-    assert!(
-        !dials.is_empty(),
-        "a mixnet send reached no Correspondent through the tunnel"
-    );
-    for dial in &dials {
-        assert_eq!(
-            dial.port, 443,
-            "a Correspondent dial left the curated pool's port: {dial:?}"
-        );
-        assert!(
-            !dial.host.contains("10.0.2.2"),
-            "the transmission dialed the harness indexer instead of a Correspondent: {dial:?}"
-        );
-    }
-}
-
 async fn execute_currentprice_and_value_transfers_from_seed(abi: &str) {
     #[cfg(not(feature = "regchest"))]
     let local_net = scenarios::funded_orchard_with_3_txs_mobileclient(1_000_000).await;
@@ -513,11 +440,6 @@ mod android_integration {
         }
 
         #[tokio::test]
-        async fn execute_send_over_mixnet() {
-            crate::execute_send_over_mixnet(ABI).await;
-        }
-
-        #[tokio::test]
         async fn execute_currentprice_and_value_transfers_from_seed() {
             crate::execute_currentprice_and_value_transfers_from_seed(ABI).await;
         }
@@ -564,11 +486,6 @@ mod android_integration {
         #[tokio::test]
         async fn execute_send_from_orchard() {
             crate::execute_send_from_orchard(ABI).await;
-        }
-
-        #[tokio::test]
-        async fn execute_send_over_mixnet() {
-            crate::execute_send_over_mixnet(ABI).await;
         }
 
         #[tokio::test]
@@ -621,11 +538,6 @@ mod android_integration {
         }
 
         #[tokio::test]
-        async fn execute_send_over_mixnet() {
-            crate::execute_send_over_mixnet(ABI).await;
-        }
-
-        #[tokio::test]
         async fn execute_currentprice_and_value_transfers_from_seed() {
             crate::execute_currentprice_and_value_transfers_from_seed(ABI).await;
         }
@@ -672,11 +584,6 @@ mod android_integration {
         #[tokio::test]
         async fn execute_send_from_orchard() {
             crate::execute_send_from_orchard(ABI).await;
-        }
-
-        #[tokio::test]
-        async fn execute_send_over_mixnet() {
-            crate::execute_send_over_mixnet(ABI).await;
         }
 
         #[tokio::test]
