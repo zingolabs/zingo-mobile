@@ -6,13 +6,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import {
-  Image,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { useTheme } from '../../app/theme';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -142,7 +136,7 @@ const OptionCard: React.FunctionComponent<OptionCardProps> = ({
     onPress={onPress}
     style={{
       borderWidth: 1.5,
-      borderColor: selected ? colors.borderAccent : colors.borderMuted,
+      borderColor: selected ? colors.borderAccent : colors.bottomSheetBorder,
       backgroundColor: colors.bgSurface,
       borderRadius: 14,
       padding: 18,

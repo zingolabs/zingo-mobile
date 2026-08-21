@@ -78,7 +78,7 @@ const Card: React.FunctionComponent<{
   <View
     style={{
       borderWidth: 1,
-      borderColor: colors.borderMuted,
+      borderColor: colors.bottomSheetBorder,
       backgroundColor: background ?? colors.bgSurface,
       borderRadius: 12,
       paddingHorizontal: 16,
@@ -438,7 +438,7 @@ const MigrationTransactions: React.FunctionComponent<
         <View
           style={{
             height: 1,
-            backgroundColor: colors.borderMuted,
+            backgroundColor: colors.bottomSheetBorder,
             marginBottom: 14,
           }}
         />
