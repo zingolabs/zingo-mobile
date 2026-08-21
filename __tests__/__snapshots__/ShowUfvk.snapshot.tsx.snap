@@ -188,14 +188,8 @@ exports[`Component ShowUfvk - test ShowUfvk Backup - snapshot 1`] = `
       style={
         {
           "backgroundColor": "#031124",
-          "borderLeftColor": "#05234C",
-          "borderLeftWidth": 0.5,
-          "borderRightColor": "#05234C",
-          "borderRightWidth": 0.5,
-          "borderTopColor": "#05234C",
           "borderTopLeftRadius": 40,
           "borderTopRightRadius": 40,
-          "borderTopWidth": 1,
           "paddingBottom": 8,
           "paddingHorizontal": 16,
           "paddingTop": 12,
@@ -513,14 +507,8 @@ exports[`Component ShowUfvk - test ShowUfvk Change - snapshot 1`] = `
       style={
         {
           "backgroundColor": "#031124",
-          "borderLeftColor": "#05234C",
-          "borderLeftWidth": 0.5,
-          "borderRightColor": "#05234C",
-          "borderRightWidth": 0.5,
-          "borderTopColor": "#05234C",
           "borderTopLeftRadius": 40,
           "borderTopRightRadius": 40,
-          "borderTopWidth": 1,
           "paddingBottom": 8,
           "paddingHorizontal": 16,
           "paddingTop": 12,
@@ -838,14 +826,8 @@ exports[`Component ShowUfvk - test ShowUfvk Server - snapshot 1`] = `
       style={
         {
           "backgroundColor": "#031124",
-          "borderLeftColor": "#05234C",
-          "borderLeftWidth": 0.5,
-          "borderRightColor": "#05234C",
-          "borderRightWidth": 0.5,
-          "borderTopColor": "#05234C",
           "borderTopLeftRadius": 40,
           "borderTopRightRadius": 40,
-          "borderTopWidth": 1,
           "paddingBottom": 8,
           "paddingHorizontal": 16,
           "paddingTop": 12,
@@ -1163,14 +1145,8 @@ exports[`Component ShowUfvk - test ShowUfvk View - snapshot 1`] = `
       style={
         {
           "backgroundColor": "#031124",
-          "borderLeftColor": "#05234C",
-          "borderLeftWidth": 0.5,
-          "borderRightColor": "#05234C",
-          "borderRightWidth": 0.5,
-          "borderTopColor": "#05234C",
           "borderTopLeftRadius": 40,
           "borderTopRightRadius": 40,
-          "borderTopWidth": 1,
           "paddingBottom": 8,
           "paddingHorizontal": 16,
           "paddingTop": 12,
