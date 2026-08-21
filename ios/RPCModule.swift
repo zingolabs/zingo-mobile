@@ -672,7 +672,7 @@ class RPCModule: NSObject {
   // The app-supplied migration broadcast candidate pool (its indexer
   // registry); zingolib embeds no default set.
   @objc(setBroadcastCandidates:resolve:reject:)
-  func setBroadcastCandidates(_ candidatesJson: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+  func setBroadcastCandidatesProcess(_ candidatesJson: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
       DispatchQueue.global(qos: .userInitiated).async {
         FfiOutcome.of {
           try setBroadcastCandidates(candidatesJson: candidatesJson)
@@ -683,7 +683,7 @@ class RPCModule: NSObject {
   // Mixnet Mode (send-over-nym). The wallet-side FFI seam, bridged on both
   // platforms; the local proxy is hosted separately by NymTransportModule.
   @objc(attachMixnet:exitNode:resolve:reject:)
-  func attachMixnet(_ socks5Addr: String, exitNode: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+  func attachMixnetProcess(_ socks5Addr: String, exitNode: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
       DispatchQueue.global(qos: .userInitiated).async {
         FfiOutcome.of {
           try attachMixnet(socks5Addr: socks5Addr, exitNode: exitNode)
@@ -692,7 +692,7 @@ class RPCModule: NSObject {
   }
 
   @objc(enableMixnet:resolve:reject:)
-  func enableMixnet(_ proxyPath: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+  func enableMixnetProcess(_ proxyPath: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
       DispatchQueue.global(qos: .userInitiated).async {
         FfiOutcome.of {
           try enableMixnet(proxyPath: proxyPath)
@@ -701,7 +701,7 @@ class RPCModule: NSObject {
   }
 
   @objc(disableMixnet:reject:)
-  func disableMixnet(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+  func disableMixnetProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
       DispatchQueue.global(qos: .userInitiated).async {
         FfiOutcome.of {
           try disableMixnet()
