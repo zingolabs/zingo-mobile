@@ -106,7 +106,7 @@ for (const target of [DEVICE_TARGET, ...SIM_TARGETS]) {
 rmSync(NYM_GENERATED, { recursive: true, force: true });
 mkdirSync(NYM_GENERATED, { recursive: true });
 run('cargo', [
-  'run', '--release', '-p', 'zingo-uniffi-bindgen', '--',
+  'run', '--release', '-p', 'zingo-uniffi-bindgen', '--bin', 'zingo-uniffi-bindgen', '--',
   'generate', '--library', NYM_DEVICE_LIB, '--language', 'swift', '--out-dir', NYM_GENERATED,
 ], { env, cwd: RUST_DIR });
 

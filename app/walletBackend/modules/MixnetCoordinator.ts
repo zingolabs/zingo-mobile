@@ -195,7 +195,10 @@ export class MixnetCoordinator {
     if (this.consent === 'disabledThisSession') {
       return false;
     }
-    return status.kind === 'failure' || status.indicator === RPCMixnetIndicatorEnum.died;
+    return (
+      status.kind === 'failure' ||
+      status.indicator === RPCMixnetIndicatorEnum.died
+    );
   }
 
   private scheduleReconnect(): void {

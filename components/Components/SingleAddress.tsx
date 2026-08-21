@@ -2,7 +2,11 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
 import { View, ScrollView, TouchableOpacity, Text } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
-import { NavigationProp, ParamListBase, useNavigation } from '@react-navigation/native';
+import {
+  NavigationProp,
+  ParamListBase,
+  useNavigation,
+} from '@react-navigation/native';
 import { useTheme } from '../../app/theme';
 
 import { ContextAppLoaded } from '../../app/context';
@@ -442,7 +446,11 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                 )}
                 <Address
                   address={address.address}
-                  style={{ color: colors.fgDefault, fontSize: 18, opacity: 0.8 }}
+                  style={{
+                    color: colors.fgDefault,
+                    fontSize: 18,
+                    opacity: 0.8,
+                  }}
                   onPress={() => show('EA')}
                   testID={
                     address.addressKind === AddressKindEnum.u

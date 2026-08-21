@@ -1735,9 +1735,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                       >
                         <RegText
                           style={{
-                            color: selected
-                              ? colors.bgCanvas
-                              : colors.fgAccent,
+                            color: selected ? colors.bgCanvas : colors.fgAccent,
                             fontSize: 12,
                           }}
                         >

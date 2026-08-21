@@ -33,7 +33,11 @@ import {
   faXmark,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { NavigationProp, ParamListBase, useNavigation } from '@react-navigation/native';
+import {
+  NavigationProp,
+  ParamListBase,
+  useNavigation,
+} from '@react-navigation/native';
 import { useTheme } from '../../app/theme';
 import { getNumberFormatSettings } from 'react-native-localize';
 import SelectBottomSheet from '../Components/SelectBottomSheet';

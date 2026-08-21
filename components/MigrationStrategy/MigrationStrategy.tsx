@@ -289,11 +289,7 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
             justifyContent: 'center',
           }}
         >
-          <FontAwesomeIcon
-            icon={faXmark}
-            size={22}
-            color={colors.fgMuted}
-          />
+          <FontAwesomeIcon icon={faXmark} size={22} color={colors.fgMuted} />
         </TouchableOpacity>
         <ScrollView
           style={{ flex: 1 }}

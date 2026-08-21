@@ -163,5 +163,4 @@ export default class WalletBackend {
   setPerformanceLevel(performanceLevel: RPCPerformanceLevelEnum) {
     this.config.performanceLevel = performanceLevel;
   }
-
 }

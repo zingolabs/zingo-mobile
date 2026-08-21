@@ -601,7 +601,12 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
               autoCapitalize="none"
               autoCorrect={false}
               spellCheck={false}
-              style={{ flex: 1, fontSize: 14, padding: 0, color: colors.fgDefault }}
+              style={{
+                flex: 1,
+                fontSize: 14,
+                padding: 0,
+                color: colors.fgDefault,
+              }}
               testID="addressbook.search"
             />
             {search.length > 0 && (
@@ -653,7 +658,9 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
                           ? colors.bgAccent
                           : colors.bgChrome,
                         borderRadius: 15,
-                        borderColor: selected ? colors.borderAccent : colors.borderMuted,
+                        borderColor: selected
+                          ? colors.borderAccent
+                          : colors.borderMuted,
                         borderWidth: 1,
                         paddingHorizontal: 10,
                         paddingVertical: 5,
@@ -662,9 +669,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
                     >
                       <FadeText
                         style={{
-                          color: selected
-                            ? colors.bgChrome
-                            : colors.fgMuted,
+                          color: selected ? colors.bgChrome : colors.fgMuted,
                           fontWeight: 'bold',
                         }}
                       >
@@ -712,7 +717,9 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
                       : colors.bgChrome,
                   borderRadius: 15,
                   borderColor:
-                    filter === FilterEnum.all ? colors.borderAccent : colors.borderMuted,
+                    filter === FilterEnum.all
+                      ? colors.borderAccent
+                      : colors.borderMuted,
                   borderWidth: 1,
                   paddingHorizontal: 10,
                   paddingVertical: 5,

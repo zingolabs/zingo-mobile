@@ -135,7 +135,11 @@ const SelectBottomSheet = forwardRef<BottomSheetModal, SelectBottomSheetProps>(
               hitSlop={8}
               style={{ paddingHorizontal: 14, paddingVertical: 4 }}
             >
-              <FontAwesomeIcon icon={faXmark} size={20} color={colors.fgMuted} />
+              <FontAwesomeIcon
+                icon={faXmark}
+                size={20}
+                color={colors.fgMuted}
+              />
             </Pressable>
           </View>
         </View>
@@ -251,7 +255,11 @@ const SelectBottomSheet = forwardRef<BottomSheetModal, SelectBottomSheetProps>(
                 <View style={{ width: 48 }} />
                 <BoldText
                   numberOfLines={1}
-                  style={{ flex: 1, textAlign: 'center', color: colors.fgDefault }}
+                  style={{
+                    flex: 1,
+                    textAlign: 'center',
+                    color: colors.fgDefault,
+                  }}
                 >
                   {title}
                 </BoldText>

@@ -148,7 +148,11 @@ const AlSummaryLine: React.FunctionComponent<AlSummaryLineProps> = ({
               doQr();
             }}
           >
-            <FontAwesomeIcon size={24} icon={faQrcode} color={colors.fgDefault} />
+            <FontAwesomeIcon
+              size={24}
+              icon={faQrcode}
+              color={colors.fgDefault}
+            />
           </TouchableOpacity>
         </View>
       </View>

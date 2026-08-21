@@ -16,7 +16,11 @@ import {
 } from 'react-native';
 import { showConfirm } from '../../app/showConfirm';
 
-import { NavigationProp, ParamListBase, useNavigation } from '@react-navigation/native';
+import {
+  NavigationProp,
+  ParamListBase,
+  useNavigation,
+} from '@react-navigation/native';
 import { useTheme } from '../../app/theme';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -728,7 +732,10 @@ const Seed: React.FunctionComponent<SeedProps> = ({
                     }
                   }}
                 >
-                  <RegText color={colors.fgDefault} style={{ textAlign: 'center' }}>
+                  <RegText
+                    color={colors.fgDefault}
+                    style={{ textAlign: 'center' }}
+                  >
                     {!expandBirthday
                       ? Utils.trimToSmall(birthdayNumber, 1)
                       : birthdayNumber}

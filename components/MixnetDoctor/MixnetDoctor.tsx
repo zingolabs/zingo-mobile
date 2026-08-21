@@ -78,8 +78,10 @@ const DoctorRow = ({
 // the box and its skeleton/report swap fade in place while the box and the
 // buttons below it morph to the new layout in sync, so nothing snaps ahead of
 // the frame. Fades survive reduced motion; the layout shift does not.
-const contentEnter = () => FadeIn.duration(200).reduceMotion(ReduceMotion.Never);
-const contentExit = () => FadeOut.duration(140).reduceMotion(ReduceMotion.Never);
+const contentEnter = () =>
+  FadeIn.duration(200).reduceMotion(ReduceMotion.Never);
+const contentExit = () =>
+  FadeOut.duration(140).reduceMotion(ReduceMotion.Never);
 const boxMorph = () =>
   LinearTransition.duration(260).reduceMotion(ReduceMotion.System);
 

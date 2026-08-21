@@ -43,7 +43,11 @@ describe('deriveMixnetView', () => {
     expect(
       blocked(
         deriveMixnetView(
-          { kind: 'status', indicator: RPCMixnetIndicatorEnum.off, socks5Addr: null },
+          {
+            kind: 'status',
+            indicator: RPCMixnetIndicatorEnum.off,
+            socks5Addr: null,
+          },
           noDetail,
         ),
       ),
@@ -75,7 +79,11 @@ describe('deriveMixnetView', () => {
     expect(
       blocked(
         deriveMixnetView(
-          { kind: 'status', indicator: RPCMixnetIndicatorEnum.died, socks5Addr: null },
+          {
+            kind: 'status',
+            indicator: RPCMixnetIndicatorEnum.died,
+            socks5Addr: null,
+          },
           noDetail,
         ),
       ),
@@ -96,7 +104,11 @@ describe('deriveMixnetView', () => {
   it('offers the right recovery per state', () => {
     expect(
       deriveMixnetView(
-        { kind: 'status', indicator: RPCMixnetIndicatorEnum.died, socks5Addr: null },
+        {
+          kind: 'status',
+          indicator: RPCMixnetIndicatorEnum.died,
+          socks5Addr: null,
+        },
         noDetail,
       ).recovery,
     ).toBe('reenable');

@@ -1,7 +1,11 @@
 /* eslint-disable react-native/no-inline-styles */
 import { faChevronLeft, faSnowflake } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { NavigationProp, ParamListBase, useNavigation } from '@react-navigation/native';
+import {
+  NavigationProp,
+  ParamListBase,
+  useNavigation,
+} from '@react-navigation/native';
 import { useTheme } from '../../app/theme';
 import React, { useContext, useEffect } from 'react';
 import { Image, TouchableOpacity, View } from 'react-native';

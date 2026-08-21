@@ -1836,7 +1836,9 @@ export class LoadedAppClass extends Component<
       // minutes (see checkServerURI), stalling the whole rotation.
       const changed = await Promise.race([
         changeServer(next.uri).then(result => result.ok),
-        new Promise<boolean>(resolve => setTimeout(() => resolve(false), 15_000)),
+        new Promise<boolean>(resolve =>
+          setTimeout(() => resolve(false), 15_000),
+        ),
       ]);
       if (!changed) {
         continue;
