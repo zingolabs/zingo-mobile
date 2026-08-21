@@ -2157,11 +2157,6 @@ const Send: React.FunctionComponent<SendProps> = ({
                     <FadeText style={{ textAlign: 'center' }}>
                       {`${translate('mixnet.send-blocked') as string} (${translate(mixnetView.statusKey) as string})`}
                     </FadeText>
-                    {mixnetView.narration !== null && (
-                      <FadeText style={{ textAlign: 'center' }}>
-                        {mixnetView.narration}
-                      </FadeText>
-                    )}
                     {mixnetView.recovery === 'reenable' && (
                       <TouchableOpacity onPress={() => reenableMixnet()}>
                         <RegText color={colors.fgAccent}>
