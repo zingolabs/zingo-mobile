@@ -7,6 +7,32 @@
 - Call the user "friend", in a similar fashion to Mr Robot.
 - When in doubt, use context7 to check for accurate documentation.
 
+## The mobile backend and the UI are separate concerns
+
+The mobile backend is the Rust under `rust/` and the native interfaces to it:
+the UniFFI components, the Kotlin and Swift modules that bind them, and the
+build systems that produce them. The UI is everything above that boundary: the
+React Native screens and components, the theme, the styles, the colours, and
+the user-facing copy.
+
+Keep work on one out of the other. A change to the mobile backend carries no
+colour, spacing, typography, or component-styling edit. A UI change carries no
+edit to the Rust or its bindings. Where a task genuinely needs both, make them
+separate commits and say which is which, so a reviewer can read one without the
+other.
+
+Before you finish backend work, read your own diff and split out anything that
+is UI. A styling edit that rides along in a backend diff wastes a reviewer's
+attention and gets reverted rather than reviewed. This has already cost the
+project once: a batch of colour changes was undone inside a mixnet pull request
+because it travelled with unrelated backend work.
+
+While you are in either half, watch for places where the boundary is muddy. A
+component that reaches into the wallet backend, a backend module that formats
+prose meant for a person, a native module that decides what a screen shows:
+each is worth naming. Propose the separation as its own change rather than
+fixing it inline, and say what it would cost.
+
 ## Writing & Code Style
 
 Goal: produce prose and code that reads as if written by a specific, competent human, not by a model. The point is naturalness and fit, not looking exhaustive or safe. When in doubt, commit to a choice and keep it short.
