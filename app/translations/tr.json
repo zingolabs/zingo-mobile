@@ -458,7 +458,6 @@
       "died": "Mixnet bağlantısı koptu",
       "unknown": "Mixnet kullanılamıyor"
     },
-    "send-blocked": "Mixnet hazır olana kadar gönderim duraklatıldı",
     "reenable": "Mixnet'i yeniden etkinleştir"
   },
   "mixnetdoctor": {

@@ -2145,27 +2145,23 @@ const Send: React.FunctionComponent<SendProps> = ({
                     )}
                   </TouchableOpacity>
                 )}
-                {mixnetView !== null && mixnetView.sendBlocked && (
-                  <View
-                    style={{
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      marginBottom: 10,
-                    }}
-                    testID="send.mixnet-blocked"
-                  >
-                    <FadeText style={{ textAlign: 'center' }}>
-                      {`${translate('mixnet.send-blocked') as string} (${translate(mixnetView.statusKey) as string})`}
-                    </FadeText>
-                    {mixnetView.recovery === 'reenable' && (
+                {mixnetView !== null &&
+                  mixnetView.sendBlocked &&
+                  mixnetView.recovery === 'reenable' && (
+                    <View
+                      style={{
+                        alignItems: 'center',
+                        marginBottom: 10,
+                      }}
+                      testID="send.mixnet-reenable"
+                    >
                       <TouchableOpacity onPress={() => reenableMixnet()}>
                         <RegText color={colors.fgAccent}>
                           {translate('mixnet.reenable') as string}
                         </RegText>
                       </TouchableOpacity>
-                    )}
-                  </View>
-                )}
+                    </View>
+                  )}
                 <View
                   style={{
                     flexGrow: 1,
