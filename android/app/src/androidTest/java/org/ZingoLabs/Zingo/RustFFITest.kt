@@ -427,9 +427,31 @@ class ExecuteSendFromOrchard {
         println("\nPropose:")
         println(proposeJson)
 
-        val confirmJson: String = uniffi.zingo.confirm()
-        println("\nConfirm Txid:")
-        println(confirmJson)
+        // The transmission rides the mixnet or does not happen (ADR 0011).
+        // This wallet never attached one, so the confirm must refuse. A txid
+        // here would mean the transaction reached an indexer over clearnet,
+        // which is the leak the mixnet-only rule exists to prevent.
+        val refusal: String? = try {
+            val txid = uniffi.zingo.confirm()
+            throw AssertionError("the transmission answered without a mixnet: $txid")
+        } catch (e: uniffi.zingo.ZingolibException.Mixnet) {
+            e.message
+        }
+        println("\nTransmission refused without a mixnet:")
+        println(refusal)
+        // The refusal names the unattached state, because waiting out a
+        // bootstrap and restarting a dead proxy are different remedies.
+        assertThat(refusal).contains("the Nym mixnet is not enabled")
+
+        // The refusal is a decision, not a partial transmission, so a second
+        // confirm refuses identically rather than finding torn state.
+        val secondRefusal: String? = try {
+            val txid = uniffi.zingo.confirm()
+            throw AssertionError("the retried transmission answered without a mixnet: $txid")
+        } catch (e: uniffi.zingo.ZingolibException.Mixnet) {
+            e.message
+        }
+        assertThat(secondRefusal).isEqualTo(refusal)
 
         // A second launch while the first sync still runs is idempotent:
         // the bridge answers with status on the data channel ("Sync task
@@ -462,13 +484,130 @@ class ExecuteSendFromOrchard {
         }
 
         balanceJson = uniffi.zingo.getBalance()
-        println("\nBalance post-send:")
+        println("\nBalance post-refusal:")
         println(balanceJson)
-        val balancePostSend: Balance = mapper.readValue(balanceJson)
-        assertThat(balancePostSend.total_orchard_balance).isEqualTo(885000)
-        // the transparent funds are unconfirmed...
-        assertThat(balancePostSend.confirmed_transparent_balance).isEqualTo(0)
-        assertThat(balancePostSend.unconfirmed_transparent_balance).isEqualTo(100000)
+        val balancePostRefusal: Balance = mapper.readValue(balanceJson)
+        // Nothing reached the chain, so the transparent recipient holds no
+        // confirmed funds. The unconfirmed side is deliberately unasserted:
+        // the proposal is still Calculated, and a Calculated transaction
+        // counts as pending whether or not it was ever transmitted.
+        assertThat(balancePostRefusal.confirmed_transparent_balance).isEqualTo(0)
+    }
+}
+
+class ExecuteSendOverMixnet {
+    @Test
+    fun executeSendOverMixnet() {
+        val mapper = testMapper()
+
+        val serveruri = "http://10.0.2.2:20000"
+        val chainhint = regtestChainHint()
+        val seed = Seeds.HOSPITAL
+
+        val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
+        println(setCrytoProvider)
+
+        val initFromSeedJson: String = uniffi.zingo.initFromSeed(seed, 1u, serveruri, chainhint, "Medium", 1u)
+        println("\nInit from seed:")
+        println(initFromSeedJson)
+        val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
+
+        assertThat(initFromSeed.seed_phrase).isEqualTo(seed)
+        assertThat(initFromSeed.birthday).isEqualTo(1)
+
+        val syncJson: String = uniffi.zingo.runSync()
+        println("\nSync:")
+        println(syncJson)
+
+        var syncStatusBefore: SyncStatus
+        while (true) {
+            val syncStatusBeforeJson: String = uniffi.zingo.statusSync()
+            println("\nSync status:")
+            println(syncStatusBeforeJson)
+            if (syncStatusBeforeJson.lowercase().startsWith("error")) {
+                println("Sync Error!:")
+                break
+            }
+            syncStatusBefore = mapper.readValue(syncStatusBeforeJson)
+
+            val progress = syncStatusBefore.percentage_total_outputs_scanned
+               ?: syncStatusBefore.percentage_total_blocks_scanned
+
+            if (progress != null && progress >= 100.0) {
+                println("Sync completed!")
+                break
+            }
+
+            Thread.sleep(1000)
+        }
+
+        val balanceJson: String = uniffi.zingo.getBalance()
+        println("\nBalance pre-send:")
+        println(balanceJson)
+        val balancePreSend: Balance = mapper.readValue(balanceJson)
+        assertThat(balancePreSend.confirmed_orchard_balance).isEqualTo(1000000)
+
+        // The harness runs a SOCKS5 stand-in on the host at this address. It
+        // answers the handshake, accepts every CONNECT, and then carries
+        // nothing, so Mixnet Mode reaches ready while each Correspondent dial
+        // arrives at a tunnel that reaches no indexer. A real Nym exit cannot
+        // serve this test: it egresses on the public internet and the chain
+        // under test is a private regtest chain on the harness host.
+        val attachJson: String = uniffi.zingo.attachMixnet("10.0.2.2:21000", "ci-stand-in-exit")
+        println("\nAttach mixnet:")
+        println(attachJson)
+
+        val indicatorJson: String = uniffi.zingo.mixnetIndicator()
+        println("\nMixnet indicator:")
+        println(indicatorJson)
+        assertThat(indicatorJson).contains("ready")
+        assertThat(indicatorJson).contains("10.0.2.2:21000")
+
+        val taddressesJson: String = uniffi.zingo.getTransparentAddresses()
+        println("\nT Addresses:")
+        println(taddressesJson)
+        val taddresses: List<TransparentAddress> = mapper.readValue(taddressesJson)
+
+        val send = taddresses[0].encoded_address?.let { Send(it, 100000, null) }
+
+        val proposeJson: String = uniffi.zingo.send(mapper.writeValueAsString(listOf(send)))
+        println("\nPropose:")
+        println(proposeJson)
+
+        // A ready mixnet routes the transmission over the Correspondents, and
+        // every one of them is reached through the stand-in, which delivers
+        // nothing. The escalation therefore exhausts and the failure is a Send
+        // failure. A Mixnet failure would mean the route refused instead of
+        // being taken, and a txid would mean the wallet reached an indexer
+        // some other way, which on this chain can only be clearnet.
+        val exhaustion: String? = try {
+            val txid = uniffi.zingo.confirm()
+            throw AssertionError("the transmission answered through a tunnel that carries nothing: $txid")
+        } catch (e: uniffi.zingo.ZingolibException.Mixnet) {
+            throw AssertionError("a ready mixnet refused the route instead of taking it: ${e.message}")
+        } catch (e: uniffi.zingo.ZingolibException.Send) {
+            e.message
+        }
+        println("\nTransmission exhausted the Correspondents:")
+        println(exhaustion)
+
+        // The indicator is deliberately not asserted after the escalation. A
+        // failed mixnet transmission raises the suspicion that the standing
+        // exit is dead and spawns an arbiter probe to adjudicate it. That
+        // probe reaches the same stand-in and may well convict, which is the
+        // right verdict for an exit that carries nothing, so both a surviving
+        // ready and a demotion are correct and the race between them decides
+        // which one a read here would see.
+        println("\nMixnet indicator after the escalation:")
+        println(uniffi.zingo.mixnetIndicator())
+
+        // Nothing reached the chain, so the transparent recipient holds no
+        // confirmed funds.
+        val balanceAfterJson: String = uniffi.zingo.getBalance()
+        println("\nBalance post-escalation:")
+        println(balanceAfterJson)
+        val balanceAfter: Balance = mapper.readValue(balanceAfterJson)
+        assertThat(balanceAfter.confirmed_transparent_balance).isEqualTo(0)
     }
 }
 

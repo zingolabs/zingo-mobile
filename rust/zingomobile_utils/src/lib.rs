@@ -1,3 +1,7 @@
+#![forbid(unsafe_code)]
+
+pub mod socks5_standin;
+
 use std::process::Command;
 
 /// Runs one on-device instrumented test class.
