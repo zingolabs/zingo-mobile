@@ -4,7 +4,10 @@ Date: 2026-08-10
 
 ## Status
 
-Accepted. Ratified by the maintainer during the PR #1276 review. The
+Superseded by ADR 0006 on 2026-08-21. Android's platform verifier reports
+Nym's own API certificate as revoked, for carrying no OCSP responder, on
+every image tested, so the mixnet proxy never starts. Accepted before that,
+ratified by the maintainer during the PR #1276 review. The
 counterpart decision for the desktop workspace is zingolib ADR 0021,
 whose 2026-08-10 amendment delegates the shim's verifier to this
 repository.

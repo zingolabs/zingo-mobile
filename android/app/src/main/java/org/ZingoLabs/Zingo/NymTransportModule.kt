@@ -113,9 +113,6 @@ class NymTransportModule internal constructor(reactContext: ReactApplicationCont
         FfiOutcome.settling(promise, "start_mixnet_transport") {
             guardingLinkage {
                 synchronized(handleLock) {
-                    // TLS first: the platform verifier must hold the app
-                    // Context before the shim opens any connection (ADR 0004).
-                    NymTlsInit.initPlatformVerifier(reactApplicationContext.applicationContext)
                     handle?.stop()
                     val observer = HandleClearingObserver()
                     val started = MixnetProxyHandle.start(observer)
