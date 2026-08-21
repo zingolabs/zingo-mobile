@@ -176,10 +176,34 @@ describe('MixnetCoordinator', () => {
       '127.0.0.1:1080',
       'test-exit',
     );
+    // The first view is the start. The second view comes from the wallet
+    // and has the detail line.
+    expect(published).toHaveLength(2);
+    expect(published[0].statusKey).toBe('mixnet.status.bootstrapping');
+    expect(published[0].narration).toBeNull();
+    expect(published[1].statusKey).toBe('mixnet.status.bootstrapping');
+    expect(published[1].narration).toBe('attempt 1/10');
+    expect(published[1].sendBlocked).toBe(true);
+    coordinator.stop();
+  });
+
+  it('publishes the bootstrapping view immediately, before the transport answers', () => {
+    const startTransport = jest.fn().mockReturnValue(new Promise(() => {}));
+    const published: MixnetView[] = [];
+    const coordinator = new MixnetCoordinator(startTransport, noopStop, view =>
+      published.push(view),
+    );
+
+    coordinator.ensureForConnectedSession();
+
     expect(published).toHaveLength(1);
     expect(published[0].statusKey).toBe('mixnet.status.bootstrapping');
-    expect(published[0].narration).toBe('attempt 1/10');
     expect(published[0].sendBlocked).toBe(true);
+    expect(published[0].recovery).toBe('wait');
+    expect(published[0].reconnecting).toBe(false);
+    // The wallet is not attached yet. The coordinator does not ask it for
+    // a detail line.
+    expect(mockedBridge.mixnetBootstrapDetailInfo).not.toHaveBeenCalled();
     coordinator.stop();
   });
 
@@ -195,11 +219,39 @@ describe('MixnetCoordinator', () => {
     await coordinator.ensureForConnectedSession();
     await flushPromises();
 
-    expect(published).toHaveLength(1);
-    expect(published[0].statusKey).toBe('mixnet.status.unknown');
-    expect(published[0].sendBlocked).toBe(true);
-    expect(published[0].recovery).toBe('reenable');
+    expect(published).toHaveLength(2);
+    expect(published[0].statusKey).toBe('mixnet.status.bootstrapping');
+    expect(published[1].statusKey).toBe('mixnet.status.unknown');
+    expect(published[1].sendBlocked).toBe(true);
+    expect(published[1].recovery).toBe('reenable');
     expect(mockedBridge.attachMixnet).not.toHaveBeenCalled();
+    coordinator.stop();
+  });
+
+  it('does not poll while a re-enable is in progress', async () => {
+    mockedBridge.attachMixnet.mockResolvedValue(statusPayload('died'));
+    const startTransport = jest
+      .fn()
+      .mockResolvedValueOnce(transportBinding)
+      .mockReturnValue(new Promise(() => {}));
+    const published: MixnetView[] = [];
+    const coordinator = new MixnetCoordinator(startTransport, noopStop, view =>
+      published.push(view),
+    );
+
+    await coordinator.ensureForConnectedSession();
+    await flushPromises();
+    expect(published[published.length - 1].statusKey).toBe(
+      'mixnet.status.died',
+    );
+
+    coordinator.reenable();
+    await jest.advanceTimersByTimeAsync(STEADY_POLL_MILLIS * 3);
+
+    expect(mockedBridge.mixnetIndicatorInfo).not.toHaveBeenCalled();
+    const latest = published[published.length - 1];
+    expect(latest.statusKey).toBe('mixnet.status.bootstrapping');
+    expect(latest.reconnecting).toBe(true);
     coordinator.stop();
   });
 
@@ -291,6 +343,25 @@ describe('MixnetCoordinator', () => {
 
     await coordinator.disable();
     await flushPromises();
+
+    // The first view is the off view. The second view is the wallet's confirmation.
+    expect(published).toHaveLength(2);
+    expect(published[0].statusKey).toBe('mixnet.status.off');
+    expect(published[0].sendBlocked).toBe(false);
+    expect(published[1]).toEqual(published[0]);
+    coordinator.stop();
+  });
+
+  it('disable publishes the off view immediately, before the wallet answers', () => {
+    mockedBridge.disableMixnet.mockReturnValue(new Promise(() => {}));
+    const published: MixnetView[] = [];
+    const coordinator = new MixnetCoordinator(
+      jest.fn().mockResolvedValue(transportBinding),
+      noopStop,
+      view => published.push(view),
+    );
+
+    coordinator.disable();
 
     expect(published).toHaveLength(1);
     expect(published[0].statusKey).toBe('mixnet.status.off');

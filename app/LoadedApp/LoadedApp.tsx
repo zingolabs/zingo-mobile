@@ -2026,17 +2026,16 @@ export class LoadedAppClass extends Component<
   };
 
   setNymOption = async (value: boolean): Promise<void> => {
-    await SettingsFileImpl.writeSettings(SettingsNameEnum.nym, value);
     this.setState({
       nym: value,
     });
     // The merged switch: enabling arms Mixnet Mode (start transport + attach),
-    // disabling drops to clearnet. The coordinator publishes the resulting view.
-    if (value) {
-      await this.rpc.reenableMixnet();
-    } else {
-      await this.rpc.disableMixnet();
-    }
+    // disabling drops to clearnet. The coordinator publishes its first view
+    // immediately. The disk write runs in parallel.
+    await Promise.all([
+      SettingsFileImpl.writeSettings(SettingsNameEnum.nym, value),
+      value ? this.rpc.reenableMixnet() : this.rpc.disableMixnet(),
+    ]);
   };
 
   navigateToLoadingApp = async (state: LoadingAppNavigationState) => {

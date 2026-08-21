@@ -17,7 +17,9 @@
  *
  * Cadence follows the SyncCoordinator idiom: one interval, a lock flag so
  * a slow poll is never enqueued twice, and an onChange callback that
- * publishes the latest view to the context layer.
+ * publishes the latest view to the context layer. A start or a disable
+ * publishes its view immediately, before the transport or the wallet
+ * answers.
  */
 import { RPCMixnetIndicatorEnum } from '../enums/RPCMixnetIndicatorEnum';
 import {
@@ -61,6 +63,20 @@ export type StopMixnetTransport = () => Promise<void>;
 export function isCurrentPublication(seq: number, latest: number): boolean {
   return seq === latest;
 }
+
+/** The report published immediately when a start begins. */
+const STARTING_REPORT: MixnetStatusReport = {
+  kind: 'status',
+  indicator: RPCMixnetIndicatorEnum.bootstrapping,
+  socks5Addr: null,
+};
+
+/** The report published immediately when the user disables Mixnet Mode. */
+const OFF_REPORT: MixnetStatusReport = {
+  kind: 'status',
+  indicator: RPCMixnetIndicatorEnum.off,
+  socks5Addr: null,
+};
 
 /** How often the coordinator polls while the transport is bootstrapping. */
 export const BOOTSTRAP_POLL_MILLIS = 2_000;
@@ -115,6 +131,10 @@ export class MixnetCoordinator {
   async ensureForConnectedSession(): Promise<void> {
     const epoch = ++this.enableEpoch;
     this.consent = 'none';
+    // No poll and no reconnect runs while this start is in progress.
+    this.clearPolling();
+    this.clearReconnectTimer();
+    this.publishStarting();
     try {
       const { socks5Addr, exitNode } = await this.startTransport();
       if (this.enableEpoch !== epoch) {
@@ -141,6 +161,7 @@ export class MixnetCoordinator {
     this.reconnectActive = false;
     this.clearReconnect();
     this.clearPolling();
+    this.publish(OFF_REPORT);
     this.publish(await disableMixnet());
     // Best-effort proxy teardown: consent is already recorded and the off view
     // published, so a stop failure must not surface as a disable error.
@@ -300,6 +321,18 @@ export class MixnetCoordinator {
     } else {
       this.clearReconnectTimer();
     }
+  }
+
+  // This view does not ask the wallet for a detail line.
+  private publishStarting(): void {
+    if (this.stopped) {
+      return;
+    }
+    this.lastStatus = STARTING_REPORT;
+    this.publishSeq += 1;
+    this.onChange(
+      deriveMixnetView(STARTING_REPORT, null, this.reconnectActive),
+    );
   }
 
   private async publishView(
