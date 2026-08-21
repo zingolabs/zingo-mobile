@@ -21,7 +21,7 @@ runs:
       shell: bash
       run: rustup default stable
 
-    - name: Cache the bindgen and shim builds
+    - name: Cache the bindgen and proxy builds
       uses: actions/cache@v4
       with:
         path: |

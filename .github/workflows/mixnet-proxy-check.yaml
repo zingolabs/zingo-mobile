@@ -1,4 +1,4 @@
-name: Mixnet mixnet proxy checks
+name: Mixnet proxy checks
 
 on:
   workflow_call:
@@ -12,7 +12,7 @@ on:
 
 jobs:
   mixnet-proxy-check:
-    name: shim check, clippy, fmt, tests
+    name: proxy check, clippy, fmt, tests
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout repository
