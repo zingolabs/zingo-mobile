@@ -244,14 +244,23 @@ android {
         fatal += "NewApi"
     }
 
+    sourceSets {
+        getByName("test") {
+            // The nym proxy shim's Kotlin wire-contract test, read from the
+            // crate itself. No copy lives under src/test.
+            java.srcDir("../../rust/nym-proxy-ffi/contract-tests/kotlin")
+        }
+    }
+
     testOptions {
         unitTests.all {
-            // The golden wire-contract pins for the nym proxy shim
-            // (GoldenWireContractTest); the canonical copies live in
-            // zingolib's zingo-netutils/nym-proxy-ffi/test-data/golden.
+            // The golden wire-contract pins for GoldenWireContractTest, read
+            // from the crate itself.
             it.systemProperty(
                 "zingo.golden.dir",
-                layout.projectDirectory.dir("src/test/golden").asFile.absolutePath
+                layout.projectDirectory
+                    .dir("../../rust/nym-proxy-ffi/test-data/golden")
+                    .asFile.absolutePath
             )
         }
         managedDevices {
