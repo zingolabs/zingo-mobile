@@ -25,6 +25,9 @@ ios/vendor/
 
 # Exclude compiled libs
 android/app/src/main/jniLibs
+# Generated UniFFI Kotlin bindings (scripts/generate_kotlin_bindings.mjs)
+android/app/src/main/java/uniffi/
+rust/lib/src/uniffi/
 android/app/release/
 android/app/beta/release/
 *.aab
