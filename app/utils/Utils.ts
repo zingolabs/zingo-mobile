@@ -366,20 +366,20 @@ export default class Utils {
   static async isValidAddress(
     address: string,
     serverChainName: string,
-  ): Promise<{ isValid: boolean; onlyOrchardUA: string }> {
+  ): Promise<{ isValid: boolean; shieldedOnlyUA: string }> {
     const result = await parseAddress(address);
     let isValid: boolean = false;
     let isFullUA: boolean = false;
-    let onlyOrchardUA: string = '';
+    let shieldedOnlyUA: string = '';
 
     if (!result.ok || !result.value) {
-      return { isValid, onlyOrchardUA };
+      return { isValid, shieldedOnlyUA };
     }
     let resultJSON = {} as RPCParseAddressType;
     try {
       resultJSON = await JSON.parse(result.value);
     } catch (e) {
-      return { isValid, onlyOrchardUA };
+      return { isValid, shieldedOnlyUA };
     }
 
     isValid =
@@ -400,13 +400,13 @@ export default class Utils {
         );
       if (isFullUA) {
         // the only use case for this is: if the UA is full (3 receivers)
-        onlyOrchardUA = resultJSON.only_orchard_ua
-          ? resultJSON.only_orchard_ua
+        shieldedOnlyUA = resultJSON.shielded_only_ua
+          ? resultJSON.shielded_only_ua
           : '';
       }
     }
 
-    return { isValid, onlyOrchardUA };
+    return { isValid, shieldedOnlyUA };
   }
 
   static async isValidOrchardOrSaplingAddress(

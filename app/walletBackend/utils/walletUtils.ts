@@ -13,6 +13,7 @@
 import { WalletType, GlobalConst } from '../../AppState';
 import RPCModule from '../../RPCModule';
 import { callFfi, FfiResult } from '../ffi';
+import { serverUris } from '../../uris';
 import { RPCZecPriceType } from '../types/RPCZecPriceType';
 import { RPCSeedType } from '../types/RPCSeedType';
 
@@ -78,6 +79,30 @@ export async function walletExists(): Promise<boolean> {
   return resolvedTrue(await callFfi(RPCModule.walletExists()));
 }
 
+// Runs before every wallet init. A custom (off-registry) server pins migration
+// transmission to itself, since no registry pool applies. A registry server
+// leaves it unset so the library's curated Correspondent pool, which excludes
+// the sync operator, routes instead.
+async function applyBroadcastCandidates(
+  serverUri: string,
+  chainHint: string,
+): Promise<void> {
+  const chain = chainHint.split(':')[0];
+  const registry = serverUris(() => '')
+    .filter(s => (s.chainName as string) === chain && !s.obsolete)
+    .map(s => s.uri);
+  const strip = (uri: string) => uri.replace(/\/+$/, '');
+  const isCustom =
+    serverUri !== '' && !registry.some(uri => strip(uri) === strip(serverUri));
+  const payload = isCustom ? { transmissionUri: serverUri } : {};
+  try {
+    await RPCModule.setBroadcastCandidates(JSON.stringify(payload));
+  } catch {
+    // Best-effort pre-init: migration-over-mixnet refuses explicitly if unset,
+    // so a failure here must not block wallet creation.
+  }
+}
+
 // Bootstraps a brand-new wallet for the given server/chain. The success value
 // is the raw JSON (parseable as RPCWalletInfoType).
 //
@@ -90,6 +115,7 @@ export async function createNewWallet(
   performanceLevel: string,
   minConfirmations: string,
 ): Promise<FfiResult<string>> {
+  await applyBroadcastCandidates(serverUri, chainHint);
   return callFfi(
     RPCModule.createNewWallet(
       serverUri,
@@ -110,6 +136,7 @@ export async function restoreWalletFromSeed(
   performanceLevel: string,
   minConfirmations: string,
 ): Promise<FfiResult<string>> {
+  await applyBroadcastCandidates(serverUri, chainHint);
   return callFfi(
     RPCModule.restoreWalletFromSeed(
       seed,
@@ -131,6 +158,7 @@ export async function restoreWalletFromUfvk(
   performanceLevel: string,
   minConfirmations: string,
 ): Promise<FfiResult<string>> {
+  await applyBroadcastCandidates(serverUri, chainHint);
   return callFfi(
     RPCModule.restoreWalletFromUfvk(
       ufvk,
@@ -150,6 +178,7 @@ export async function loadExistingWallet(
   performanceLevel: string,
   minConfirmations: string,
 ): Promise<FfiResult<string>> {
+  await applyBroadcastCandidates(serverUri, chainHint);
   return callFfi(
     RPCModule.loadExistingWallet(
       serverUri,

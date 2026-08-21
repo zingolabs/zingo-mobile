@@ -99,25 +99,28 @@ export function retryOnAnotherServer(failure: SendFailureClass): boolean {
 }
 
 /**
- * The message the failed screen shows for a classified failure — the one
- * place presentation meets classification, so display never leaks into the
- * pure decisions above. `translate` is passed in, keeping this function pure
- * over its inputs. The wallet's own verdicts have translated texts; the
- * remaining families surface verbatim, because their raw diagnostics name
- * the actual failure better than any paraphrase.
+ * What the failed screen shows for a classified failure.
  */
-export function sendFailureMessage(
-  failure: SendFailureClass,
-  translate: (key: string) => unknown,
-): string {
+export type SendFailureText =
+  | {
+      readonly kind: 'key';
+      readonly errorKey: 'send.duplicate-nullifier-error' | 'send.dust-error';
+    }
+  | { readonly kind: 'verbatim'; readonly text: string };
+
+/**
+ * Map a classified failure to its display directive — the one place
+ * presentation meets classification.
+ */
+export function sendFailureText(failure: SendFailureClass): SendFailureText {
   switch (failure.kind) {
     case 'duplicateNullifier':
-      return translate('send.duplicate-nullifier-error') as string;
+      return { kind: 'key', errorKey: 'send.duplicate-nullifier-error' };
     case 'dust':
-      return translate('send.dust-error') as string;
+      return { kind: 'key', errorKey: 'send.dust-error' };
     case 'mixnetRefusal':
     case 'internalRpcFailure':
     case 'serverSuspect':
-      return failure.error;
+      return { kind: 'verbatim', text: failure.error };
   }
 }

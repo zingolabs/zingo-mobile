@@ -118,7 +118,11 @@ const CustomServerModalHost = forwardRef<
               hitSlop={8}
               style={{ paddingHorizontal: 14, paddingVertical: 4 }}
             >
-              <FontAwesomeIcon icon={faXmark} size={20} color={colors.fgMuted} />
+              <FontAwesomeIcon
+                icon={faXmark}
+                size={20}
+                color={colors.fgMuted}
+              />
             </Pressable>
           </View>
         </View>

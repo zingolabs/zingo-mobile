@@ -20,19 +20,20 @@ exports[`Component ShowUfvk - test ShowUfvk Backup - snapshot 1`] = `
     <View
       onLayout={[Function]}
     >
-      <View
-        style={{}}
-      >
+      <View>
         <View
           style={
-            {
-              "alignItems": "center",
-              "backgroundColor": "#011401",
-              "display": "flex",
-              "minHeight": 50,
-              "paddingBottom": 10,
-              "paddingTop": 0,
-            }
+            [
+              {},
+              {
+                "alignItems": "center",
+                "backgroundColor": "#011401",
+                "display": "flex",
+                "minHeight": 50,
+                "paddingBottom": 10,
+                "paddingTop": 0,
+              },
+            ]
           }
           testID="header"
         >
@@ -154,12 +155,15 @@ exports[`Component ShowUfvk - test ShowUfvk Backup - snapshot 1`] = `
         </View>
         <View
           style={
-            {
-              "padding": 13,
-              "position": "absolute",
-              "right": 0,
-              "top": 0,
-            }
+            [
+              {},
+              {
+                "padding": 13,
+                "position": "absolute",
+                "right": 0,
+                "top": 0,
+              },
+            ]
           }
         >
           <Image
@@ -341,19 +345,20 @@ exports[`Component ShowUfvk - test ShowUfvk Change - snapshot 1`] = `
     <View
       onLayout={[Function]}
     >
-      <View
-        style={{}}
-      >
+      <View>
         <View
           style={
-            {
-              "alignItems": "center",
-              "backgroundColor": "#011401",
-              "display": "flex",
-              "minHeight": 50,
-              "paddingBottom": 10,
-              "paddingTop": 0,
-            }
+            [
+              {},
+              {
+                "alignItems": "center",
+                "backgroundColor": "#011401",
+                "display": "flex",
+                "minHeight": 50,
+                "paddingBottom": 10,
+                "paddingTop": 0,
+              },
+            ]
           }
           testID="header"
         >
@@ -475,12 +480,15 @@ exports[`Component ShowUfvk - test ShowUfvk Change - snapshot 1`] = `
         </View>
         <View
           style={
-            {
-              "padding": 13,
-              "position": "absolute",
-              "right": 0,
-              "top": 0,
-            }
+            [
+              {},
+              {
+                "padding": 13,
+                "position": "absolute",
+                "right": 0,
+                "top": 0,
+              },
+            ]
           }
         >
           <Image
@@ -662,19 +670,20 @@ exports[`Component ShowUfvk - test ShowUfvk Server - snapshot 1`] = `
     <View
       onLayout={[Function]}
     >
-      <View
-        style={{}}
-      >
+      <View>
         <View
           style={
-            {
-              "alignItems": "center",
-              "backgroundColor": "#011401",
-              "display": "flex",
-              "minHeight": 50,
-              "paddingBottom": 10,
-              "paddingTop": 0,
-            }
+            [
+              {},
+              {
+                "alignItems": "center",
+                "backgroundColor": "#011401",
+                "display": "flex",
+                "minHeight": 50,
+                "paddingBottom": 10,
+                "paddingTop": 0,
+              },
+            ]
           }
           testID="header"
         >
@@ -796,12 +805,15 @@ exports[`Component ShowUfvk - test ShowUfvk Server - snapshot 1`] = `
         </View>
         <View
           style={
-            {
-              "padding": 13,
-              "position": "absolute",
-              "right": 0,
-              "top": 0,
-            }
+            [
+              {},
+              {
+                "padding": 13,
+                "position": "absolute",
+                "right": 0,
+                "top": 0,
+              },
+            ]
           }
         >
           <Image
@@ -983,19 +995,20 @@ exports[`Component ShowUfvk - test ShowUfvk View - snapshot 1`] = `
     <View
       onLayout={[Function]}
     >
-      <View
-        style={{}}
-      >
+      <View>
         <View
           style={
-            {
-              "alignItems": "center",
-              "backgroundColor": "#011401",
-              "display": "flex",
-              "minHeight": 50,
-              "paddingBottom": 10,
-              "paddingTop": 0,
-            }
+            [
+              {},
+              {
+                "alignItems": "center",
+                "backgroundColor": "#011401",
+                "display": "flex",
+                "minHeight": 50,
+                "paddingBottom": 10,
+                "paddingTop": 0,
+              },
+            ]
           }
           testID="header"
         >
@@ -1117,12 +1130,15 @@ exports[`Component ShowUfvk - test ShowUfvk View - snapshot 1`] = `
         </View>
         <View
           style={
-            {
-              "padding": 13,
-              "position": "absolute",
-              "right": 0,
-              "top": 0,
-            }
+            [
+              {},
+              {
+                "padding": 13,
+                "position": "absolute",
+                "right": 0,
+                "top": 0,
+              },
+            ]
           }
         >
           <Image

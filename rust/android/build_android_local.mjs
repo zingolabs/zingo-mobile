@@ -21,15 +21,26 @@ const REPO_DIR = resolve(RUST_DIR, '..');
 const LIB_DIR = join(RUST_DIR, 'lib');
 const TARGET_DIR = join(RUST_DIR, 'target');
 const JNI_PATH = join(REPO_DIR, 'android', 'app', 'src', 'main', 'jniLibs');
-const UNIFFI_PATH = join(REPO_DIR, 'android', 'app', 'build', 'generated', 'source', 'uniffi');
 const NDK_VERSION = '28.2.13676358';
 const CARGO_NDK_VERSION = '4.0.1';
 
 const ABI_TABLE = {
-  arm64:  { triple: 'aarch64-linux-android',   jniDir: 'arm64-v8a',   featureStd: true  },
-  armv7:  { triple: 'armv7-linux-androideabi', jniDir: 'armeabi-v7a', featureStd: false },
-  x86:    { triple: 'i686-linux-android',      jniDir: 'x86',         featureStd: false },
-  x86_64: { triple: 'x86_64-linux-android',    jniDir: 'x86_64',      featureStd: false },
+  arm64: {
+    triple: 'aarch64-linux-android',
+    jniDir: 'arm64-v8a',
+    featureStd: true,
+  },
+  armv7: {
+    triple: 'armv7-linux-androideabi',
+    jniDir: 'armeabi-v7a',
+    featureStd: false,
+  },
+  x86: { triple: 'i686-linux-android', jniDir: 'x86', featureStd: false },
+  x86_64: {
+    triple: 'x86_64-linux-android',
+    jniDir: 'x86_64',
+    featureStd: false,
+  },
 };
 const ALL_ABIS = Object.keys(ABI_TABLE);
 
@@ -41,7 +52,9 @@ if (args.length === 0) {
 } else if (args.length === 1 && ALL_ABIS.includes(args[0])) {
   abis = [args[0]];
 } else {
-  console.error(`ERROR: invalid args. Usage: build_android_local.mjs [${ALL_ABIS.join('|')}]`);
+  console.error(
+    `ERROR: invalid args. Usage: build_android_local.mjs [${ALL_ABIS.join('|')}]`,
+  );
   process.exit(1);
 }
 
@@ -67,8 +80,8 @@ function sha256File(path) {
 // --- Detect host OS -> NDK toolchain dir candidates ---
 const NDK_HOST_DIRS = {
   darwin: ['darwin-x86_64', 'darwin-aarch64'],
-  linux:  ['linux-x86_64'],
-  win32:  ['windows-x86_64'],
+  linux: ['linux-x86_64'],
+  win32: ['windows-x86_64'],
 }[process.platform];
 
 if (!NDK_HOST_DIRS) {
@@ -89,17 +102,28 @@ let NDK_TOOLCHAIN = null;
 if (ANDROID_HOME) {
   NDK_PATH = join(ANDROID_HOME, 'ndk', NDK_VERSION);
   if (!existsSync(NDK_PATH)) {
-    missing.push(`NDK ${NDK_VERSION}: install via Android Studio SDK Manager (SDK Tools -> NDK Side-by-side)`);
+    missing.push(
+      `NDK ${NDK_VERSION}: install via Android Studio SDK Manager (SDK Tools -> NDK Side-by-side)`,
+    );
   } else {
     for (const hostDir of NDK_HOST_DIRS) {
-      const candidate = join(NDK_PATH, 'toolchains', 'llvm', 'prebuilt', hostDir, 'bin');
+      const candidate = join(
+        NDK_PATH,
+        'toolchains',
+        'llvm',
+        'prebuilt',
+        hostDir,
+        'bin',
+      );
       if (existsSync(candidate)) {
         NDK_TOOLCHAIN = candidate;
         break;
       }
     }
     if (!NDK_TOOLCHAIN) {
-      missing.push(`NDK toolchain bin not found under ${NDK_PATH}/toolchains/llvm/prebuilt/`);
+      missing.push(
+        `NDK toolchain bin not found under ${NDK_PATH}/toolchains/llvm/prebuilt/`,
+      );
     }
   }
 }
@@ -108,13 +132,24 @@ if (!capture('cargo', ['--version'])) {
   missing.push('cargo: install Rust toolchain from https://rustup.rs');
 }
 if (!capture('cargo', ['ndk', '--version'])) {
-  missing.push(`cargo-ndk ${CARGO_NDK_VERSION}: cargo install --version ${CARGO_NDK_VERSION} cargo-ndk`);
+  missing.push(
+    `cargo-ndk ${CARGO_NDK_VERSION}: cargo install --version ${CARGO_NDK_VERSION} cargo-ndk`,
+  );
 }
 if (!capture('bindgen', ['--version'])) {
   missing.push('bindgen-cli: cargo install --force --locked bindgen-cli');
 }
+// lightwallet-protocol's `rebuild-proto` feature (enabled by both zingolib and
+// nym-proxy-ffi) runs tonic-prost-build, which shells out to protoc from PATH.
+if (!capture('protoc', ['--version'])) {
+  missing.push(
+    'protoc: apt install protobuf-compiler (Linux), brew install protobuf (macOS), winget install Google.Protobuf (Windows)',
+  );
+}
 
-const installedTargets = (capture('rustup', ['target', 'list', '--installed']) ?? '').split('\n');
+const installedTargets = (
+  capture('rustup', ['target', 'list', '--installed']) ?? ''
+).split('\n');
 for (const abi of abis) {
   const t = ABI_TABLE[abi].triple;
   if (!installedTargets.includes(t)) {
@@ -146,18 +181,7 @@ const env = {
   CXXFLAGS_aarch64_linux_android: '-mno-outline-atomics',
 };
 
-// --- Output dirs ---
-for (const variant of ['debug', 'release']) {
-  mkdirSync(join(UNIFFI_PATH, variant, 'java', 'uniffi', 'zingo'), { recursive: true });
-}
-
-// --- Generate Kotlin bindings ---
-console.log('=== Generating Kotlin bindings ===');
 process.chdir(LIB_DIR);
-run('cargo', [
-  'run', '--release', '--features=uniffi/cli', '--bin', 'uniffi-bindgen',
-  'generate', './src/zingo.udl', '--language', 'kotlin', '--out-dir', './src',
-], { env });
 
 // --- Build per ABI ---
 const exe = process.platform === 'win32' ? '.exe' : '';
@@ -167,11 +191,19 @@ for (const abi of abis) {
 
   const abiEnv = { ...env, CARGO_FEATURE_STD: featureStd ? 'true' : 'false' };
 
-  run('cargo', ['ndk', '--target', triple, 'build', '--release'], { env: abiEnv });
+  run('cargo', ['ndk', '--target', triple, 'build', '--release'], {
+    env: abiEnv,
+  });
 
   const soPath = join(TARGET_DIR, triple, 'release', 'libzingo.so');
-  run(join(NDK_TOOLCHAIN, `llvm-strip${exe}`), ['--strip-all', soPath], { env: abiEnv });
-  run(join(NDK_TOOLCHAIN, `llvm-objcopy${exe}`), ['--remove-section', '.comment', soPath], { env: abiEnv });
+  run(join(NDK_TOOLCHAIN, `llvm-strip${exe}`), ['--strip-all', soPath], {
+    env: abiEnv,
+  });
+  run(
+    join(NDK_TOOLCHAIN, `llvm-objcopy${exe}`),
+    ['--remove-section', '.comment', soPath],
+    { env: abiEnv },
+  );
 
   console.log(`sha256  ${sha256File(soPath)}  ${soPath}`);
 
@@ -180,10 +212,65 @@ for (const abi of abis) {
   copyFileSync(soPath, join(dstDir, 'libuniffi_zingo.so'));
 }
 
-// --- Export Kotlin bindings ---
-const kotlinSrc = join(LIB_DIR, 'src', 'uniffi', 'zingo', 'zingo.kt');
-for (const variant of ['debug', 'release']) {
-  copyFileSync(kotlinSrc, join(UNIFFI_PATH, variant, 'java', 'uniffi', 'zingo', 'zingo.kt'));
+console.log('\n=== Building Nym proxy shim (nym-proxy-ffi) ===');
+const NYM_BUNDLE = join(RUST_DIR, 'nym-proxy-ffi', 'target', 'android-shim');
+const SHIM_SO = 'libzingo_nym_proxy_ffi.so';
+const shimAbiFlags = abis.flatMap(abi => ['--abi', ABI_TABLE[abi].jniDir]);
+
+run(
+  'cargo',
+  [
+    'run',
+    '-p',
+    'workbench',
+    '--bin',
+    'bundle-android-shim',
+    '--',
+    ...shimAbiFlags,
+  ],
+  { env, cwd: RUST_DIR },
+);
+run(
+  'cargo',
+  [
+    'run',
+    '-p',
+    'workbench',
+    '--bin',
+    'consume-android-shim',
+    '--',
+    '--bundle',
+    NYM_BUNDLE,
+  ],
+  { env, cwd: RUST_DIR },
+);
+
+// --- Kotlin bindings: the wallet from the UDL, the shim from the unstripped
+// bundle library ---
+run(
+  process.execPath,
+  [
+    join(REPO_DIR, 'scripts', 'generate_kotlin_bindings.mjs'),
+    '--variants',
+    'debug,release',
+    '--shim-library',
+    join(NYM_BUNDLE, 'jniLibs', ABI_TABLE[abis[0]].jniDir, SHIM_SO),
+  ],
+  { env, cwd: REPO_DIR },
+);
+
+// Strip the staged shim .so, matching the wallet .so treatment above.
+for (const abi of abis) {
+  const staged = join(JNI_PATH, ABI_TABLE[abi].jniDir, SHIM_SO);
+  run(join(NDK_TOOLCHAIN, `llvm-strip${exe}`), ['--strip-all', staged], {
+    env,
+  });
+  run(
+    join(NDK_TOOLCHAIN, `llvm-objcopy${exe}`),
+    ['--remove-section', '.comment', staged],
+    { env },
+  );
+  console.log(`sha256  ${sha256File(staged)}  ${staged}`);
 }
 
-console.log(`\nDone. ABIs built: ${abis.join(', ')}`);
+console.log(`\nDone. ABIs built: ${abis.join(', ')} (wallet + nym-proxy-ffi)`);

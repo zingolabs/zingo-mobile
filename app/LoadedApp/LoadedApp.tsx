@@ -46,6 +46,7 @@ import {
   BackgroundType,
   TranslateType,
   ServerType,
+  ServerUrisType,
   SetServerResult,
   AddressBookFileClass,
   SecurityType,
@@ -81,7 +82,8 @@ import { getZingoVersion, substituteZingoName } from '../utils/ZingoAppData';
 import { AppTheme } from '../theme';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
 import { ContextAppLoadedProvider } from '../context';
-import { parseZcashURI, serverUris } from '../uris';
+import { parseZcashURI, serverUris, fetchServerList } from '../uris';
+import selectingServer from '../selectingServer';
 import BackgroundFileImpl from '../../components/Background';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createAlert } from '../createAlert';
@@ -124,9 +126,13 @@ import { RPCSyncStatusType } from '../walletBackend/types/RPCSyncStatusType';
 import { RPCUfvkType } from '../walletBackend/types/RPCUfvkType';
 import {
   INITIAL_MIXNET_VIEW,
+  OFF_MIXNET_VIEW,
   MixnetView,
 } from '../walletBackend/transforms/mixnetPresenter';
-import { startMixnetTransport } from '../walletBackend/utils/nymTransport';
+import {
+  startMixnetTransport,
+  stopMixnetTransport,
+} from '../walletBackend/utils/nymTransport';
 import { RPCPerformanceLevelEnum } from '../walletBackend/enums/RPCPerformanceLevelEnum';
 import { AddressList } from '../../components/AddressList';
 import ValueTransferDetail from '../../components/History/components/ValueTransferDetail';
@@ -136,6 +142,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RPCValueTransfersStatusEnum } from '../walletBackend/enums/RPCValueTransfersStatusEnum';
 
 const About = React.lazy(() => import('../../components/About'));
+const MixnetDoctor = React.lazy(() => import('../../components/MixnetDoctor'));
 const Seed = React.lazy(() => import('../../components/Seed'));
 const SyncReport = React.lazy(() => import('../../components/SyncReport'));
 const Rescan = React.lazy(() => import('../../components/Rescan'));
@@ -762,6 +769,7 @@ export class LoadedAppClass extends Component<
   LoadedAppClassState
 > {
   rpc: WalletBackend;
+  recoveringServer: boolean = false;
   appstate: NativeEventSubscription;
   linking: EmitterSubscription;
   unsubscribeNetInfo: NetInfoSubscription;
@@ -837,13 +845,11 @@ export class LoadedAppClass extends Component<
       blockExplorer: props.blockExplorer,
       nym: props.nym,
 
-      // Mixnet Mode: fail-closed initial view where the policy runs
-      // (Android); null where the platform transport has not landed yet
-      // (iOS until the Mac-gated step), which leaves the send gate open.
-      mixnetView:
-        Platform.OS === GlobalConst.platformOSandroid
-          ? INITIAL_MIXNET_VIEW
-          : null,
+      // Mixnet Mode initial view from the persisted setting: enabled starts
+      // fail-closed (bootstrapping) so the send gate is shut until the
+      // transport attaches; disabled starts off (clearnet, ungated). The
+      // coordinator republishes on any change.
+      mixnetView: props.nym ? INITIAL_MIXNET_VIEW : OFF_MIXNET_VIEW,
       disableMixnet: this.disableMixnet,
       reenableMixnet: this.reenableMixnet,
 
@@ -875,9 +881,12 @@ export class LoadedAppClass extends Component<
       onZingolibVersionChanged: this.setZingolibVersion,
       onBirthdayChanged: this.setBirthday,
       onError: this.setLastError,
+      onPersistentSyncFailure: this.recoverServer,
       onMixnetViewChanged: this.setMixnetView,
       startMixnetTransport: startMixnetTransport,
-      mixnetSupported: Platform.OS === GlobalConst.platformOSandroid,
+      stopMixnetTransport: stopMixnetTransport,
+      mixnetSupported: true,
+      nymEnabled: props.nym,
       readOnly: props.readOnly,
       server: props.server,
       performanceLevel: props.performanceLevel,
@@ -1811,6 +1820,82 @@ export class LoadedAppClass extends Component<
     };
   };
 
+  // Dials each candidate in order and activates the first that connects.
+  activateReachableServer = async (
+    candidates: ServerUrisType[],
+  ): Promise<boolean> => {
+    for (const candidate of candidates) {
+      if (!candidate.uri) {
+        continue;
+      }
+      const next: ServerType = {
+        uri: candidate.uri,
+        chainName: candidate.chainName,
+      };
+      // Cap each dial: a dead candidate's changeServer can otherwise block for
+      // minutes (see checkServerURI), stalling the whole rotation.
+      const changed = await Promise.race([
+        changeServer(next.uri).then(result => result.ok),
+        new Promise<boolean>(resolve =>
+          setTimeout(() => resolve(false), 15_000),
+        ),
+      ]);
+      if (!changed) {
+        continue;
+      }
+      await SettingsFileImpl.writeSettings(SettingsNameEnum.server, next);
+      this.setState({ server: next });
+      this.rpc.setServer(next);
+      if (this.state.mode === ModeEnum.advanced) {
+        this.addLastSnackbar(
+          `${this.state.translate('loadedapp.selectingserverbest') as string} ${next.uri}`,
+          SnackbarDurationEnum.long,
+        );
+      }
+      return true;
+    }
+    return false;
+  };
+
+  // The runtime half of the old boot-time server rescue: after repeated
+  // sync-launch failures, silently activate a working server (live registry
+  // first, then the static list by latency) and reattach the client to it.
+  // Custom and offline modes are exempt: custom users opted out of automatic
+  // selection (Audit Issue S) and offline has no server at all.
+  recoverServer = async (): Promise<void> => {
+    if (
+      this.recoveringServer ||
+      !this.state.netInfo.isConnected ||
+      (this.state.selectServer !== SelectServerEnum.auto &&
+        this.state.selectServer !== SelectServerEnum.list)
+    ) {
+      return;
+    }
+    this.recoveringServer = true;
+    try {
+      const current = this.state.server;
+      const live = (await fetchServerList(current.chainName)).filter(
+        (s: ServerUrisType) => s.uri !== current.uri,
+      );
+      if (await this.activateReachableServer(live)) {
+        return;
+      }
+      const fallback = await selectingServer(
+        serverUris(this.state.translate).filter(
+          (s: ServerUrisType) =>
+            !s.obsolete &&
+            s.chainName === current.chainName &&
+            s.uri !== current.uri,
+        ),
+      );
+      if (fallback) {
+        await this.activateReachableServer([fallback]);
+      }
+    } finally {
+      this.recoveringServer = false;
+    }
+  };
+
   setCurrencyOption = async (value: CurrencyEnum): Promise<void> => {
     await SettingsFileImpl.writeSettings(SettingsNameEnum.currency, value);
     this.setState({
@@ -1943,10 +2028,16 @@ export class LoadedAppClass extends Component<
   };
 
   setNymOption = async (value: boolean): Promise<void> => {
-    await SettingsFileImpl.writeSettings(SettingsNameEnum.nym, value);
     this.setState({
       nym: value,
     });
+    // The merged switch: enabling arms Mixnet Mode (start transport + attach),
+    // disabling drops to clearnet. The coordinator publishes its first view
+    // immediately. The disk write runs in parallel.
+    await Promise.all([
+      SettingsFileImpl.writeSettings(SettingsNameEnum.nym, value),
+      value ? this.rpc.reenableMixnet() : this.rpc.disableMixnet(),
+    ]);
   };
 
   navigateToLoadingApp = async (state: LoadingAppNavigationState) => {
@@ -2443,6 +2534,10 @@ export class LoadedAppClass extends Component<
                     <RootNavigator.Screen
                       name={RouteEnum.About}
                       component={About}
+                    />
+                    <RootNavigator.Screen
+                      name={RouteEnum.MixnetDoctor}
+                      component={MixnetDoctor}
                     />
                     <RootNavigator.Screen name={RouteEnum.Rescan}>
                       {props => <Rescan {...props} doRescan={this.doRescan} />}

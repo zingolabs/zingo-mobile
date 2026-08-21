@@ -15,7 +15,11 @@ import Animated, {
   withSequence,
   withTiming,
 } from 'react-native-reanimated';
-import { NavigationProp, ParamListBase, useNavigation } from '@react-navigation/native';
+import {
+  NavigationProp,
+  ParamListBase,
+  useNavigation,
+} from '@react-navigation/native';
 import { useTheme } from '../../theme';
 import BottomSheet, {
   BottomSheetFooter,

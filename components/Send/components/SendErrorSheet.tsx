@@ -121,7 +121,11 @@ const SendErrorSheet = forwardRef<BottomSheetModal, SendErrorSheetProps>(
               hitSlop={8}
               style={{ padding: 14 }}
             >
-              <FontAwesomeIcon icon={faXmark} size={20} color={colors.fgDefault} />
+              <FontAwesomeIcon
+                icon={faXmark}
+                size={20}
+                color={colors.fgDefault}
+              />
             </Pressable>
           </View>
         </View>

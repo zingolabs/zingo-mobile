@@ -368,12 +368,13 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
             marginBottom: 20,
           }}
         >
-          <Text
-            style={{ color: colors.fgMuted, fontSize: 14, lineHeight: 21 }}
-          >
+          <Text style={{ color: colors.fgMuted, fontSize: 14, lineHeight: 21 }}>
             {nextLine.split('**').map((part: string, i: number) =>
               i % 2 === 1 ? (
-                <Text key={i} style={{ color: colors.fgDefault, fontWeight: '700' }}>
+                <Text
+                  key={i}
+                  style={{ color: colors.fgDefault, fontWeight: '700' }}
+                >
                   {part}
                 </Text>
               ) : (

@@ -218,3 +218,24 @@ part and a zingo-mobile part (`zl_…-zm_…`), each derived from git
 describe against that repo's release tags. The commit count and
 5-character hash fields are elided when a part sits exactly on its
 release tag, and `_dirty` marks a part built from an uncommitted tree.
+
+## Mixnet Mode
+
+Vocabulary for the mixnet transport surface. Type names follow zingolib's
+`mixnet/mode.rs` and `mixnet/route.rs`.
+
+**Mixnet Mode**:
+The feature: carrying the send and price surfaces over the Nym mixnet. A
+persisted user opt-in, default off and sticky.
+
+**Indicator**:
+The state Mixnet Mode reports: `off`, `bootstrapping`, `ready`, or `died`.
+It crosses the FFI as the `mixnet_indicator` payload key and reaches the app
+as `RPCMixnetIndicatorEnum`.
+_Avoid_: mode (names the feature, not the state it reports)
+
+**Route**:
+The network path a mixnet-only surface resolves to, either the Standing
+Client's tunnel or clearnet. zingolib derives it from the indicator, and the
+app never sees it. A price fetch that resolves to clearnet is refused, never
+sent.

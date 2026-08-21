@@ -32,7 +32,7 @@ describe('parseZcashURI — Issue H: failures carry no target', () => {
     mockIsValidAddress.mockReset();
     mockIsValidAddress.mockResolvedValue({
       isValid: true,
-      onlyOrchardUA: '',
+      shieldedOnlyUA: '',
     });
   });
 
@@ -59,7 +59,7 @@ describe('parseZcashURI — Issue H: failures carry no target', () => {
   test('invalid path-as-address → error, and no target key at all', async () => {
     mockIsValidAddress.mockResolvedValue({
       isValid: false,
-      onlyOrchardUA: '',
+      shieldedOnlyUA: '',
     });
     const r = await parseZcashURI(`zcash:${INVALID_ADDR}`, mainnetServer);
     expect(r).toEqual({ kind: 'error', errorKey: 'uris.notvalid' });
@@ -69,7 +69,7 @@ describe('parseZcashURI — Issue H: failures carry no target', () => {
   test('invalid query-string address → error', async () => {
     mockIsValidAddress.mockResolvedValue({
       isValid: false,
-      onlyOrchardUA: '',
+      shieldedOnlyUA: '',
     });
     const r = await parseZcashURI(
       `zcash:?address=${INVALID_ADDR}`,

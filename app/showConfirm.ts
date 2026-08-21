@@ -16,6 +16,7 @@ export type ConfirmButton = {
 export type ConfirmOptions = {
   title: string;
   message?: string;
+  messageAlign?: 'left' | 'center' | 'right';
   buttons: ConfirmButton[];
 };
 

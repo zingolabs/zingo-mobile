@@ -256,7 +256,11 @@ const ChainSelect: React.FunctionComponent<ChainSelectProps> = ({
               <View style={{ width: 48 }} />
               <BoldText
                 numberOfLines={1}
-                style={{ flex: 1, textAlign: 'center', color: colors.fgDefault }}
+                style={{
+                  flex: 1,
+                  textAlign: 'center',
+                  color: colors.fgDefault,
+                }}
               >
                 {translate('addressbook.select-chain-placeholder') as string}
               </BoldText>
@@ -266,7 +270,11 @@ const ChainSelect: React.FunctionComponent<ChainSelectProps> = ({
                 hitSlop={8}
                 style={{ padding: 14 }}
               >
-                <FontAwesomeIcon icon={faXmark} size={20} color={colors.fgDefault} />
+                <FontAwesomeIcon
+                  icon={faXmark}
+                  size={20}
+                  color={colors.fgDefault}
+                />
               </Pressable>
             </View>
 

@@ -18,7 +18,11 @@ import {
   StyleSheet,
 } from 'react-native';
 import Animated from 'react-native-reanimated';
-import { NavigationProp, ParamListBase, useNavigation } from '@react-navigation/native';
+import {
+  NavigationProp,
+  ParamListBase,
+  useNavigation,
+} from '@react-navigation/native';
 import { useTheme } from '../../app/theme';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faAngleUp, faXmark } from '@fortawesome/free-solid-svg-icons';

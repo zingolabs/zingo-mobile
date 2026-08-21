@@ -2,8 +2,10 @@
 
 ## MUST DO ALWAYS
 
+- When reporting information to me, be extremely concise and use ASD-STE100 for the sake of concision.
+- If you need a paragraph-long comment to justify why a workaround is OK, the code is wrong: Fix the code!
 - Call the user "friend", in a similar fashion to Mr Robot.
-- When reporting information to me, be extremely concise and sacrifice grammar for the sake of concision.
+- When in doubt, use context7 to check for accurate documentation.
 
 ## Writing & Code Style
 
@@ -96,6 +98,17 @@ without losing meaning, the "so" was decorative. Delete it.
 - No completeness theater: no unrequested demo/usage blocks, no logs narrating execution ("Starting...", "Done!"), no emoji in output, no unprompted complexity analysis in comments.
 - Don't add guards for conditions that can't occur. Don't wrap non-throwing code in try/catch. Don't swallow-and-log errors; let them propagate.
 - Match the surrounding codebase's idioms and conventions over textbook-uniform formatting.
+
+### Documentation in code
+
+The one-sentence documentation rule, ratified 2026-08-10: every item
+doc-comment — Rust `///`, and the KDoc or doc-comment on a Kotlin or Swift
+item — is exactly one sentence. That sentence must not reference ADRs,
+issues, or any other document. Module headers (Rust `//!`, a file- or
+class-level header block) are exempt, and test doc-comments that follow a
+ratified convention (for example HYPOTHESIS falsifiers) keep that
+convention's shape. Apply the rule to every unmerged doc-comment before
+merge.
 
 ### Rust
 

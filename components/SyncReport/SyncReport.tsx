@@ -591,7 +591,9 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                         }}
                       >
                         <>
-                          <Text style={{ color: colors.fgDefault }}>{birthday}</Text>
+                          <Text style={{ color: colors.fgDefault }}>
+                            {birthday}
+                          </Text>
                           <Text style={{ color: colors.fgDefault }}>
                             {info.latestBlock}
                           </Text>
@@ -710,7 +712,9 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                               margin: 5,
                             }}
                           />
-                          <Text style={{ color: colors.fgDefault, marginRight: 10 }}>
+                          <Text
+                            style={{ color: colors.fgDefault, marginRight: 10 }}
+                          >
                             {translate('report.scanned') as string}
                           </Text>
                         </View>
@@ -732,7 +736,9 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                               margin: 5,
                             }}
                           />
-                          <Text style={{ color: colors.fgDefault, marginRight: 10 }}>
+                          <Text
+                            style={{ color: colors.fgDefault, marginRight: 10 }}
+                          >
                             {translate('report.scanning') as string}
                           </Text>
                         </View>
@@ -754,7 +760,9 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                               margin: 5,
                             }}
                           />
-                          <Text style={{ color: colors.fgDefault, marginRight: 10 }}>
+                          <Text
+                            style={{ color: colors.fgDefault, marginRight: 10 }}
+                          >
                             {translate('report.refetching') as string}
                           </Text>
                         </View>
@@ -776,7 +784,9 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                               margin: 5,
                             }}
                           />
-                          <Text style={{ color: colors.fgDefault, marginRight: 10 }}>
+                          <Text
+                            style={{ color: colors.fgDefault, marginRight: 10 }}
+                          >
                             {translate('report.lowpriority') as string}
                           </Text>
                         </View>
@@ -798,7 +808,9 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                               margin: 5,
                             }}
                           />
-                          <Text style={{ color: colors.fgDefault, marginRight: 10 }}>
+                          <Text
+                            style={{ color: colors.fgDefault, marginRight: 10 }}
+                          >
                             {translate('report.highpriority') as string}
                           </Text>
                         </View>

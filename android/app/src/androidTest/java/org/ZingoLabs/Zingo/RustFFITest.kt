@@ -498,16 +498,18 @@ class UpdateCurrentPriceAndValueTransfersFromSeed {
         val info: Info = mapper.readValue(infoJson)
         assertThat(info.latest_block_height).isGreaterThan(0)
 
-        // The price fetch dials api.gemini.com, which the CI emulator
-        // cannot reach, so the typed Read failure is as valid an outcome
-        // here as a price. Any other exception type still fails the test.
-        val price: String = try {
-            uniffi.zingo.zecPrice()
-        } catch (e: uniffi.zingo.ZingolibException.Read) {
-            "price unavailable: ${e.message}"
+        // Price rides the mixnet or does not happen (ADR 0011). This wallet
+        // never attached one, so the fetch must refuse. A price here would
+        // mean the wallet reached an oracle over clearnet, which is the
+        // leak the mixnet-only rule exists to prevent.
+        val refusal: String? = try {
+            val price = uniffi.zingo.zecPrice()
+            throw AssertionError("the price fetch answered without a mixnet: $price")
+        } catch (e: uniffi.zingo.ZingolibException.Mixnet) {
+            e.message
         }
-        println("\nPrice:")
-        println(price)
+        println("\nPrice refused without a mixnet:")
+        println(refusal)
 
         val syncJson: String = uniffi.zingo.runSync()
         println("\nSync:")
@@ -544,12 +546,12 @@ class UpdateCurrentPriceAndValueTransfersFromSeed {
         // the value transfers have 3 items for 3 different txs
         // 1. Received - 1_000_000 - orchard (1 item)
         // 2. Sent - 110_000 - uregtest1az7w9w3t... (1 item)
-        // 3. memoToSelf - 10_000 (1 item)
+        // 3. memoToSelf - 870_000 (1 item)
         assertThat(valueTranfers.value_transfers.size).isEqualTo(3)
         // third item have to be a `fee` from the last `Sent` with the same txid
         assertThat(valueTranfers.value_transfers[0].kind).isEqualTo("memo-to-self")
         assertThat(valueTranfers.value_transfers[0].status).isEqualTo("confirmed")
-        assertThat(valueTranfers.value_transfers[0].value).isEqualTo(0)
+        assertThat(valueTranfers.value_transfers[0].value).isEqualTo(870000)
         assertThat(valueTranfers.value_transfers[0].transaction_fee).isEqualTo(20000)
         // second item have to be a `Sent`
         assertThat(valueTranfers.value_transfers[1].kind).isEqualTo("sent")

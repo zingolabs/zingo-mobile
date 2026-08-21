@@ -16,7 +16,7 @@ import BoldText from '../Components/BoldText';
 import FadeText from '../Components/FadeText';
 import RegText from '../Components/RegText';
 
-import ChevronsUp from '../../assets/img/options/chevrons-up.svg';
+import { MenuMorphIcon } from '../Components/Icons/MenuMorphIcon';
 import XSocial from '../../assets/img/options/x.svg';
 import Github from '../../assets/img/options/github.svg';
 import Mail from '../../assets/img/options/mail.svg';
@@ -114,10 +114,6 @@ const OptionsPanel: React.FC<OptionsPanelProps> = ({
     [onLinkCopied],
   );
 
-  // Triple chevron centered inside a 25×25 box — same footprint as the
-  // burger icon in the Header, so when the user toggles the panel both
-  // glyphs appear at exactly the same screen position (their boxes
-  // overlap), giving a clean morph from one to the other.
   const tripleChevron = useMemo(
     () => (
       <Pressable onPress={onClose} hitSlop={12} style={{ padding: 4 }}>
@@ -129,7 +125,7 @@ const OptionsPanel: React.FC<OptionsPanelProps> = ({
             justifyContent: 'center',
           }}
         >
-          <ChevronsUp width={17.474} height={22.079} />
+          <MenuMorphIcon />
         </View>
       </Pressable>
     ),

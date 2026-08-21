@@ -8,7 +8,10 @@ import {
 } from '../../AppState';
 import { RPCSyncStatusType } from '../types/RPCSyncStatusType';
 import { RPCPerformanceLevelEnum } from '../enums/RPCPerformanceLevelEnum';
-import { StartMixnetTransport } from '../modules/MixnetCoordinator';
+import {
+  StartMixnetTransport,
+  StopMixnetTransport,
+} from '../modules/MixnetCoordinator';
 import { MixnetView } from '../transforms/mixnetPresenter';
 
 /**
@@ -38,6 +41,12 @@ export type WalletBackendConfig = {
   onBirthdayChanged: (birthday: number) => void;
   /** Called on any non-fatal RPC error; display or log in the consumer. */
   onError: (error: string) => void;
+  /**
+   * Called after several consecutive sync-launch failures. The consumer owns
+   * the policy (e.g. silently activating a working server); the coordinator
+   * only reports the streak and resets its count.
+   */
+  onPersistentSyncFailure?: () => void;
   /** Called with each new screen-facing Mixnet Mode projection. */
   onMixnetViewChanged: (view: MixnetView) => void;
   /**
@@ -47,13 +56,22 @@ export type WalletBackendConfig = {
    */
   startMixnetTransport: StartMixnetTransport;
   /**
-   * Whether this platform runs the Mixnet Mode policy. False on iOS until
-   * the Mac-gated step lands its native transport; the coordinator is then
-   * never started and no mixnet view is ever published.
+   * Tears down the platform-hosted mixnet transport on the user's clearnet
+   * consent. Injected for the same reason as the start seam.
+   */
+  stopMixnetTransport: StopMixnetTransport;
+  /**
+   * Whether this platform runs the Mixnet Mode policy. Android and iOS both
+   * host the native transport, so it is on for each; tests inject false to
+   * keep the coordinator unstarted and publish no mixnet view.
    */
   mixnetSupported: boolean;
-  /** i18n helper — must be bound to the active locale in the consumer. */
-  translate: (key: string) => TranslateType;
+  /**
+   * The persisted user setting (default false, sticky). When true, the
+   * coordinator auto-starts Mixnet Mode at wallet load; the runtime toggle
+   * (setNymOption) drives enable/disable thereafter.
+   */
+  nymEnabled: boolean;
   /** Prevent device sleep while true (e.g. during active sync/send). */
   keepAwake: (keep: boolean) => void;
   /** When true, only the UFVK is available; no seed phrase operations. */
