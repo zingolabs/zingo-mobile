@@ -1,13 +1,13 @@
 #![forbid(unsafe_code)]
 
-//! consume-android-shim: stage the Nym proxy shim bundle into the app.
+//! consume-android-proxy: stage the mixnet proxy bundle into the app.
 //!
-//! zingolib's `makers bundle-android-shim` (its workbench crate) cross-compiles
-//! the UniFFI proxy shim `zingo-nym-proxy-ffi` for every shipped ABI and lays
+//! zingolib's `makers bundle-android-proxy` (its workbench crate) cross-compiles
+//! the mixnet proxy `mixnet-proxy` for every shipped ABI and lays
 //! out a bundle tree:
 //!
 //! ```text
-//! <bundle>/jniLibs/<abi>/libzingo_nym_proxy_ffi.so   (one per ABI)
+//! <bundle>/jniLibs/<abi>/libmixnet_proxy.so   (one per ABI)
 //! ```
 //!
 //! This tool consumes that tree (send-over-nym step 3, zingolib#2513):
@@ -17,13 +17,13 @@
 //!   like the wallet's `libuniffi_zingo.so`.
 //! - The Kotlin bindings are not staged here. `scripts/generate_kotlin_bindings.mjs`
 //!   generates them into `android/app/build/generated/source/uniffi/` from an
-//!   unstripped shim library; pass the bundle's `.so` with `--shim-library`.
+//!   unstripped proxy library; pass the bundle's `.so` with `--proxy-library`.
 //!
 //! A `kotlin/` tree in the bundle (produced by older zingolib versions that
 //! generated bindings on their side) is ignored.
 //!
-//! Usage: `cargo run -p workbench --bin consume-android-shim -- --bundle <dir>`
-//! where `<dir>` is the bundle root (zingolib's `target/android-shim` by
+//! Usage: `cargo run -p workbench --bin consume-android-proxy -- --bundle <dir>`
+//! where `<dir>` is the bundle root (zingolib's `target/android-proxy` by
 //! default on that side). A bundle built with a subset of ABIs (via that
 //! tool's `--abi`) stages only what it carries; missing ABIs are reported.
 
@@ -31,10 +31,10 @@ use std::path::{Path, PathBuf};
 
 /// The ABIs zingo-mobile ships (`reactNativeArchitectures` in
 /// `android/gradle.properties`), which must stay in step with
-/// `bundle-android-shim`'s `SHIPPED_ABIS`.
+/// `bundle-android-proxy`'s `SHIPPED_ABIS`.
 const SHIPPED_ABIS: [&str; 4] = ["arm64-v8a", "armeabi-v7a", "x86", "x86_64"];
 
-const SHIM_SO: &str = "libzingo_nym_proxy_ffi.so";
+const PROXY_SO: &str = "libmixnet_proxy.so";
 
 /// Which shipped ABIs a bundle tree carries and which it lacks, computed
 /// purely so the partition is unit-testable without a real bundle on disk.
@@ -76,11 +76,11 @@ fn stage(bundle: &Path) -> Result<(), String> {
     let root = repo_root();
 
     let (present, missing) =
-        partition_abis(|abi| bundle.join("jniLibs").join(abi).join(SHIM_SO).is_file());
+        partition_abis(|abi| bundle.join("jniLibs").join(abi).join(PROXY_SO).is_file());
     if present.is_empty() {
         return Err(format!(
-            "no {SHIM_SO} for any shipped ABI under {}/jniLibs; \
-             run zingolib's `makers bundle-android-shim` first",
+            "no {PROXY_SO} for any shipped ABI under {}/jniLibs; \
+             run zingolib's `makers bundle-android-proxy` first",
             bundle.display()
         ));
     }
@@ -88,13 +88,13 @@ fn stage(bundle: &Path) -> Result<(), String> {
         let target_dir = root.join("android/app/src/main/jniLibs").join(abi);
         std::fs::create_dir_all(&target_dir)
             .map_err(|e| format!("cannot create {}: {e}", target_dir.display()))?;
-        let source = bundle.join("jniLibs").join(abi).join(SHIM_SO);
-        std::fs::copy(&source, target_dir.join(SHIM_SO))
+        let source = bundle.join("jniLibs").join(abi).join(PROXY_SO);
+        std::fs::copy(&source, target_dir.join(PROXY_SO))
             .map_err(|e| format!("cannot copy {}: {e}", source.display()))?;
-        println!("staged {abi}/{SHIM_SO}");
+        println!("staged {abi}/{PROXY_SO}");
     }
     for abi in &missing {
-        println!("note: bundle carries no {abi} shim; that ABI will not embed it");
+        println!("note: bundle carries no {abi} library; that ABI will not embed it");
     }
     Ok(())
 }
@@ -102,7 +102,7 @@ fn stage(bundle: &Path) -> Result<(), String> {
 fn main() {
     let result = parse_bundle_arg().and_then(|bundle| stage(&bundle));
     if let Err(message) = result {
-        eprintln!("consume-android-shim: {message}");
+        eprintln!("consume-android-proxy: {message}");
         std::process::exit(1);
     }
 }

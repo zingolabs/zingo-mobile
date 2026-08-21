@@ -27,7 +27,7 @@ COPY uniffi-bindgen/ /opt/zingo/rust/uniffi-bindgen/
 ARG ZINGO_MOBILE_GIT_DESCRIBE
 ENV ZINGO_MOBILE_GIT_DESCRIBE=${ZINGO_MOBILE_GIT_DESCRIBE}
 
-COPY nym-proxy-ffi/ /opt/zingo/rust/nym-proxy-ffi/
+COPY mixnet-proxy/ /opt/zingo/rust/mixnet-proxy/
 
 
 RUN rustup default stable
@@ -96,45 +96,45 @@ RUN llvm-objcopy \
     ../target/x86_64-linux-android/release/libzingo.so
 RUN sha256sum ../target/x86_64-linux-android/release/libzingo.so
 
-# ===== Nym proxy shim (nym-proxy-ffi) =====
-# Cross-compile the shim per ABI in its own workspace (nym-sdk resolves only in
-# nym-proxy-ffi's lock), mirroring the wallet's per-ABI CC/env above. Kotlin bindings
+# ===== mixnet proxy (mixnet-proxy) =====
+# Cross-compile the proxy per ABI in its own workspace (nym-sdk resolves only in
+# mixnet-proxy's lock), mirroring the wallet's per-ABI CC/env above. Kotlin bindings
 # come from library mode against a built .so (proc-macro uniffi, no UDL).
-WORKDIR /opt/zingo/rust/nym-proxy-ffi
-ENV SHIM=libzingo_nym_proxy_ffi.so
+WORKDIR /opt/zingo/rust/mixnet-proxy
+ENV PROXY=libmixnet_proxy.so
 
 # aarch64
 ENV CARGO_FEATURE_STD=true
 ENV CC=aarch64-linux-android26-clang
-RUN cargo ndk --target aarch64-linux-android build --release --package zingo-nym-proxy-ffi
+RUN cargo ndk --target aarch64-linux-android build --release --package mixnet-proxy
 
 RUN cargo run --release --manifest-path /opt/zingo/rust/Cargo.toml \
     --package zingo-uniffi-bindgen -- generate \
-    --library target/aarch64-linux-android/release/$SHIM \
+    --library target/aarch64-linux-android/release/$PROXY \
     --language kotlin --out-dir generated-kotlin
-RUN llvm-strip --strip-all target/aarch64-linux-android/release/$SHIM
-RUN llvm-objcopy --remove-section .comment target/aarch64-linux-android/release/$SHIM
-RUN sha256sum target/aarch64-linux-android/release/$SHIM
+RUN llvm-strip --strip-all target/aarch64-linux-android/release/$PROXY
+RUN llvm-objcopy --remove-section .comment target/aarch64-linux-android/release/$PROXY
+RUN sha256sum target/aarch64-linux-android/release/$PROXY
 
 # armv7
 ENV CARGO_FEATURE_STD=false
 ENV CC=armv7a-linux-androideabi26-clang
-RUN cargo ndk --target armv7-linux-androideabi build --release --package zingo-nym-proxy-ffi
-RUN llvm-strip --strip-all target/armv7-linux-androideabi/release/$SHIM
-RUN llvm-objcopy --remove-section .comment target/armv7-linux-androideabi/release/$SHIM
-RUN sha256sum target/armv7-linux-androideabi/release/$SHIM
+RUN cargo ndk --target armv7-linux-androideabi build --release --package mixnet-proxy
+RUN llvm-strip --strip-all target/armv7-linux-androideabi/release/$PROXY
+RUN llvm-objcopy --remove-section .comment target/armv7-linux-androideabi/release/$PROXY
+RUN sha256sum target/armv7-linux-androideabi/release/$PROXY
 
 # i686 - x86
 ENV CC=i686-linux-android26-clang
-RUN cargo ndk --target i686-linux-android build --release --package zingo-nym-proxy-ffi
-RUN llvm-strip --strip-all target/i686-linux-android/release/$SHIM
-RUN llvm-objcopy --remove-section .comment target/i686-linux-android/release/$SHIM
-RUN sha256sum target/i686-linux-android/release/$SHIM
+RUN cargo ndk --target i686-linux-android build --release --package mixnet-proxy
+RUN llvm-strip --strip-all target/i686-linux-android/release/$PROXY
+RUN llvm-objcopy --remove-section .comment target/i686-linux-android/release/$PROXY
+RUN sha256sum target/i686-linux-android/release/$PROXY
 
 # x86_64
 ENV CC=x86_64-linux-android26-clang
-RUN cargo ndk --target x86_64-linux-android build --release --package zingo-nym-proxy-ffi
-RUN llvm-strip --strip-all target/x86_64-linux-android/release/$SHIM
-RUN llvm-objcopy --remove-section .comment target/x86_64-linux-android/release/$SHIM
-RUN sha256sum target/x86_64-linux-android/release/$SHIM
+RUN cargo ndk --target x86_64-linux-android build --release --package mixnet-proxy
+RUN llvm-strip --strip-all target/x86_64-linux-android/release/$PROXY
+RUN llvm-objcopy --remove-section .comment target/x86_64-linux-android/release/$PROXY
+RUN sha256sum target/x86_64-linux-android/release/$PROXY
 

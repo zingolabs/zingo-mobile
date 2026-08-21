@@ -7,24 +7,24 @@
 // test-data/golden/ are never-regenerate contract artifacts.
 //
 // Execution: this file compiles against the generated bindings
-// (uniffi.zingo_nym_proxy_ffi) and JUnit 4; zingo-mobile's test suite wires
+// (uniffi.mixnet_proxy) and JUnit 4; zingo-mobile's test suite wires
 // it in during step-4/step-3 packaging (#2513/#2505). Point
 // -Dzingo.golden.dir at the crate's test-data/golden directory if the
 // working directory is not the crate root.
 
-package uniffi.zingo_nym_proxy_ffi.contract
+package uniffi.mixnet_proxy.contract
 
 import java.io.File
 import java.nio.ByteBuffer
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import uniffi.zingo_nym_proxy_ffi.FfiConverterTypeProxyDeathReason
-import uniffi.zingo_nym_proxy_ffi.FfiConverterTypeProxyFfiError
-import uniffi.zingo_nym_proxy_ffi.FfiConverterTypeSocks5Endpoint
-import uniffi.zingo_nym_proxy_ffi.ProxyDeathReason
-import uniffi.zingo_nym_proxy_ffi.ProxyFfiException
-import uniffi.zingo_nym_proxy_ffi.Socks5Endpoint
+import uniffi.mixnet_proxy.FfiConverterTypeProxyDeathReason
+import uniffi.mixnet_proxy.FfiConverterTypeProxyFfiError
+import uniffi.mixnet_proxy.FfiConverterTypeSocks5Endpoint
+import uniffi.mixnet_proxy.ProxyDeathReason
+import uniffi.mixnet_proxy.ProxyFfiException
+import uniffi.mixnet_proxy.Socks5Endpoint
 
 class GoldenWireContractTest {
     private val goldenDir = File(System.getProperty("zingo.golden.dir") ?: "test-data/golden")

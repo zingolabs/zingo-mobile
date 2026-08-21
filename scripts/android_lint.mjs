@@ -20,7 +20,7 @@ const variant = process.argv[2] ?? 'prodRelease';
 const task = `:app:lint${variant[0].toUpperCase()}${variant.slice(1)}`;
 
 // The app module compiles the UniFFI bindings. Generate them first. The
-// shim builds for the host; no NDK.
+// the proxy builds for the host; no NDK.
 console.log('\nGenerating UniFFI bindings...');
 const generated = spawnSync(
   process.execPath,

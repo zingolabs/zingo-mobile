@@ -217,8 +217,8 @@ jobs:
         working-directory: ./rust/target/${{ env.TARGET }}/release
         run: mv ./libzingo.so ./libuniffi_zingo.so
 
-      - name: Cargo build nym proxy shim
-        working-directory: ./rust/nym-proxy-ffi
+      - name: Cargo build nym mixnet proxy
+        working-directory: ./rust/mixnet-proxy
         run: |
           cargo ndk \
           --target ${{ env.TARGET }} build \
@@ -235,12 +235,12 @@ jobs:
 
       # Library mode reads the UniFFI metadata from the symbol table, so this
       # runs before the strip.
-      - name: Kotlin bindings for nym proxy shim
-        working-directory: ./rust/nym-proxy-ffi
+      - name: Kotlin bindings for nym mixnet proxy
+        working-directory: ./rust/mixnet-proxy
         run: |
           cargo run --release --locked --manifest-path ../Cargo.toml \
             --package zingo-uniffi-bindgen --bin zingo-uniffi-bindgen -- \
-            generate --library target/${{ env.TARGET }}/release/libzingo_nym_proxy_ffi.so \
+            generate --library target/${{ env.TARGET }}/release/libmixnet_proxy.so \
             --language kotlin --no-format --metadata-no-deps \
             --out-dir ../../android/app/build/generated/source/uniffi/release/java
 
@@ -251,17 +251,17 @@ jobs:
           path: android/app/build/generated/source/uniffi/release/java/uniffi
           retention-days: 3
 
-      - name: LLVM Strip nym proxy shim
-        working-directory: ./rust/nym-proxy-ffi/target
+      - name: LLVM Strip nym mixnet proxy
+        working-directory: ./rust/mixnet-proxy/target
         run: |
-          llvm-strip --strip-all ./${{ env.TARGET }}/release/libzingo_nym_proxy_ffi.so
-          llvm-objcopy --remove-section .comment ./${{ env.TARGET }}/release/libzingo_nym_proxy_ffi.so
+          llvm-strip --strip-all ./${{ env.TARGET }}/release/libmixnet_proxy.so
+          llvm-objcopy --remove-section .comment ./${{ env.TARGET }}/release/libmixnet_proxy.so
 
       - name: Stage native libraries
         run: |
           mkdir -p rust/native-out
           cp rust/target/${{ env.TARGET }}/release/libuniffi_zingo.so rust/native-out/
-          cp rust/nym-proxy-ffi/target/${{ env.TARGET }}/release/libzingo_nym_proxy_ffi.so rust/native-out/
+          cp rust/mixnet-proxy/target/${{ env.TARGET }}/release/libmixnet_proxy.so rust/native-out/
 
       - name: Upload native rust
         uses: actions/upload-artifact@v7

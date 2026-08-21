@@ -140,7 +140,7 @@ if (!capture('bindgen', ['--version'])) {
   missing.push('bindgen-cli: cargo install --force --locked bindgen-cli');
 }
 // lightwallet-protocol's `rebuild-proto` feature (enabled by both zingolib and
-// nym-proxy-ffi) runs tonic-prost-build, which shells out to protoc from PATH.
+// mixnet-proxy) runs tonic-prost-build, which shells out to protoc from PATH.
 if (!capture('protoc', ['--version'])) {
   missing.push(
     'protoc: apt install protobuf-compiler (Linux), brew install protobuf (macOS), winget install Google.Protobuf (Windows)',
@@ -212,10 +212,10 @@ for (const abi of abis) {
   copyFileSync(soPath, join(dstDir, 'libuniffi_zingo.so'));
 }
 
-console.log('\n=== Building Nym proxy shim (nym-proxy-ffi) ===');
-const NYM_BUNDLE = join(RUST_DIR, 'nym-proxy-ffi', 'target', 'android-shim');
-const SHIM_SO = 'libzingo_nym_proxy_ffi.so';
-const shimAbiFlags = abis.flatMap(abi => ['--abi', ABI_TABLE[abi].jniDir]);
+console.log('\n=== Building mixnet proxy (mixnet-proxy) ===');
+const PROXY_BUNDLE = join(RUST_DIR, 'mixnet-proxy', 'target', 'android-proxy');
+const PROXY_SO = 'libmixnet_proxy.so';
+const proxyAbiFlags = abis.flatMap(abi => ['--abi', ABI_TABLE[abi].jniDir]);
 
 run(
   'cargo',
@@ -224,9 +224,9 @@ run(
     '-p',
     'workbench',
     '--bin',
-    'bundle-android-shim',
+    'bundle-android-proxy',
     '--',
-    ...shimAbiFlags,
+    ...proxyAbiFlags,
   ],
   { env, cwd: RUST_DIR },
 );
@@ -237,15 +237,15 @@ run(
     '-p',
     'workbench',
     '--bin',
-    'consume-android-shim',
+    'consume-android-proxy',
     '--',
     '--bundle',
-    NYM_BUNDLE,
+    PROXY_BUNDLE,
   ],
   { env, cwd: RUST_DIR },
 );
 
-// --- Kotlin bindings: the wallet from the UDL, the shim from the unstripped
+// --- Kotlin bindings: the wallet from the UDL, the proxy from the unstripped
 // bundle library ---
 run(
   process.execPath,
@@ -253,15 +253,15 @@ run(
     join(REPO_DIR, 'scripts', 'generate_kotlin_bindings.mjs'),
     '--variants',
     'debug,release',
-    '--shim-library',
-    join(NYM_BUNDLE, 'jniLibs', ABI_TABLE[abis[0]].jniDir, SHIM_SO),
+    '--proxy-library',
+    join(PROXY_BUNDLE, 'jniLibs', ABI_TABLE[abis[0]].jniDir, PROXY_SO),
   ],
   { env, cwd: REPO_DIR },
 );
 
-// Strip the staged shim .so, matching the wallet .so treatment above.
+// Strip the staged proxy .so, matching the wallet .so treatment above.
 for (const abi of abis) {
-  const staged = join(JNI_PATH, ABI_TABLE[abi].jniDir, SHIM_SO);
+  const staged = join(JNI_PATH, ABI_TABLE[abi].jniDir, PROXY_SO);
   run(join(NDK_TOOLCHAIN, `llvm-strip${exe}`), ['--strip-all', staged], {
     env,
   });
@@ -273,4 +273,4 @@ for (const abi of abis) {
   console.log(`sha256  ${sha256File(staged)}  ${staged}`);
 }
 
-console.log(`\nDone. ABIs built: ${abis.join(', ')} (wallet + nym-proxy-ffi)`);
+console.log(`\nDone. ABIs built: ${abis.join(', ')} (wallet + mixnet-proxy)`);

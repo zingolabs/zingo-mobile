@@ -1,17 +1,17 @@
 #!/usr/bin/env node
 // Generates the Android Kotlin UniFFI bindings for the wallet (rust/lib) and
-// the Nym proxy shim (rust/nym-proxy-ffi) into
+// the mixnet proxy (rust/mixnet-proxy) into
 // android/app/build/generated/source/uniffi/<variant>/java, the source dir
 // the app module compiles. Neither binding is checked in.
 //
-// The wallet binding comes from the UDL and needs no wallet build. The shim
+// The wallet binding comes from the UDL and needs no wallet build. The proxy
 // binding comes from library mode, which reads the UniFFI metadata from an
-// unstripped shim library: pass one with --shim-library, or this script
-// builds the shim for the host.
+// unstripped proxy library: pass one with --proxy-library, or this script
+// builds the proxy for the host.
 //
 // Usage: node scripts/generate_kotlin_bindings.mjs
 //          [--variants release|debug,release,...]  (default: release)
-//          [--shim-library <path to unstripped libzingo_nym_proxy_ffi.*>]
+//          [--proxy-library <path to unstripped libmixnet_proxy.*>]
 
 import { spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync } from 'node:fs';
@@ -21,33 +21,33 @@ import { fileURLToPath } from 'node:url';
 const SCRIPTS_DIR = dirname(fileURLToPath(import.meta.url));
 const REPO_DIR = resolve(SCRIPTS_DIR, '..');
 const RUST_DIR = join(REPO_DIR, 'rust');
-const SHIM_DIR = join(RUST_DIR, 'nym-proxy-ffi');
+const PROXY_DIR = join(RUST_DIR, 'mixnet-proxy');
 const UDL = join(RUST_DIR, 'lib', 'src', 'zingo.udl');
 const OUT_ROOT = join(REPO_DIR, 'android', 'app', 'build', 'generated', 'source', 'uniffi');
 
 const exe = process.platform === 'win32' ? '.exe' : '';
 const WALLET_BINDGEN = join(RUST_DIR, 'target', 'release', `zingo-wallet-uniffi-bindgen${exe}`);
-const SHIM_BINDGEN = join(RUST_DIR, 'target', 'release', `zingo-uniffi-bindgen${exe}`);
+const PROXY_BINDGEN = join(RUST_DIR, 'target', 'release', `zingo-uniffi-bindgen${exe}`);
 
 function parseArgs(argv) {
   let variants = ['release'];
-  let shimLibrary;
+  let proxyLibrary;
   for (let i = 0; i < argv.length; i++) {
     const flag = argv[i];
     if (flag === '--variants') {
       variants = argv[++i].split(',').filter(Boolean);
     } else if (flag.startsWith('--variants=')) {
       variants = flag.slice('--variants='.length).split(',').filter(Boolean);
-    } else if (flag === '--shim-library') {
-      shimLibrary = resolve(argv[++i]);
-    } else if (flag.startsWith('--shim-library=')) {
-      shimLibrary = resolve(flag.slice('--shim-library='.length));
+    } else if (flag === '--proxy-library') {
+      proxyLibrary = resolve(argv[++i]);
+    } else if (flag.startsWith('--proxy-library=')) {
+      proxyLibrary = resolve(flag.slice('--proxy-library='.length));
     } else {
       console.error(`unknown flag: ${flag}`);
       process.exit(2);
     }
   }
-  return { variants, shimLibrary };
+  return { variants, proxyLibrary };
 }
 
 function run(cmd, args, cwd) {
@@ -58,29 +58,29 @@ function run(cmd, args, cwd) {
   }
 }
 
-function hostShimLibrary() {
+function hostProxyLibrary() {
   const name =
     process.platform === 'win32'
-      ? 'zingo_nym_proxy_ffi.dll'
+      ? 'mixnet_proxy.dll'
       : process.platform === 'darwin'
-        ? 'libzingo_nym_proxy_ffi.dylib'
-        : 'libzingo_nym_proxy_ffi.so';
-  return join(SHIM_DIR, 'target', 'debug', name);
+        ? 'libmixnet_proxy.dylib'
+        : 'libmixnet_proxy.so';
+  return join(PROXY_DIR, 'target', 'debug', name);
 }
 
-const { variants, shimLibrary } = parseArgs(process.argv.slice(2));
+const { variants, proxyLibrary } = parseArgs(process.argv.slice(2));
 
 console.log('=== Building the bindgen binaries ===');
 run('cargo', ['build', '--release', '--locked', '--package', 'zingo-uniffi-bindgen'], RUST_DIR);
 
-let shimLib = shimLibrary;
-if (shimLib === undefined) {
-  console.log('=== Building the Nym proxy shim for the host ===');
-  run('cargo', ['build', '--locked', '--package', 'zingo-nym-proxy-ffi'], SHIM_DIR);
-  shimLib = hostShimLibrary();
+let proxyLib = proxyLibrary;
+if (proxyLib === undefined) {
+  console.log('=== Building the mixnet proxy for the host ===');
+  run('cargo', ['build', '--locked', '--package', 'mixnet-proxy'], PROXY_DIR);
+  proxyLib = hostProxyLibrary();
 }
-if (!existsSync(shimLib)) {
-  console.error(`shim library not found: ${shimLib}`);
+if (!existsSync(proxyLib)) {
+  console.error(`proxy library not found: ${proxyLib}`);
   process.exit(1);
 }
 
@@ -93,14 +93,14 @@ for (const variant of variants) {
     ['generate', UDL, '--language', 'kotlin', '--no-format', '--out-dir', outDir],
     RUST_DIR,
   );
-  // Library mode resolves the crate through `cargo metadata` in the shim's
+  // Library mode resolves the crate through `cargo metadata` in the proxy's
   // own workspace. `--metadata-no-deps` keeps that offline.
   run(
-    SHIM_BINDGEN,
+    PROXY_BINDGEN,
     [
       'generate',
       '--library',
-      shimLib,
+      proxyLib,
       '--language',
       'kotlin',
       '--no-format',
@@ -108,6 +108,6 @@ for (const variant of variants) {
       '--out-dir',
       outDir,
     ],
-    SHIM_DIR,
+    PROXY_DIR,
   );
 }

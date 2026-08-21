@@ -8,7 +8,7 @@ import {
 // One-to-one mirror of the native NymTransportModule, exposed on both
 // platforms (Android: org.ZingoLabs.Zingo.NymTransportModule; iOS:
 // NymTransportModule.swift). This is the platform half
-// of Mixnet Mode: the module hosts the UniFFI proxy shim in-process and
+// of Mixnet Mode: the module hosts the mixnet proxy in-process and
 // offers its binding — the local SOCKS5 endpoint as a bare `host:port` and
 // the Exit Node the proxy bound — which the MixnetCoordinator hands to
 // the wallet's attach seam. Failures arrive only as rejections (the typed
@@ -31,7 +31,7 @@ export const startMixnetTransport: StartMixnetTransport = () =>
 
 /**
  * Deliberate teardown of the platform-hosted proxy (app shutdown or the
- * user's per-session clearnet consent). A stop is not a death: the shim
+ * user's per-session clearnet consent). A stop is not a death: the proxy
  * cancels its liveness monitor before the listener goes down.
  */
 export async function stopMixnetTransport(): Promise<void> {

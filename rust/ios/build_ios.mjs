@@ -84,23 +84,23 @@ run('lipo', [
   '-output', SIM_FAT_LIB,
 ]);
 
-// 4. Build the Nym proxy shim (nym-proxy-ffi) libraries + Swift bindings. The shim
-//    links nym-sdk, which resolves only in rust/nym-proxy-ffi's own lock, so it
+// 4. Build the mixnet proxy (mixnet-proxy) libraries + Swift bindings. The proxy
+//    links nym-sdk, which resolves only in rust/mixnet-proxy's own lock, so it
 //    builds apart from the wallet library above. Both static libraries link
 //    into the same app and share ONE module map (step 5), so there is never a
 //    second include/module.modulemap to collide with the wallet's.
-console.log('\n=== Building Nym proxy shim (nym-proxy-ffi) ===');
-const NYM_DIR = join(RUST_DIR, 'nym-proxy-ffi');
-const NYM_TARGET_DIR = join(NYM_DIR, 'target');
-const NYM_GENERATED = join(NYM_DIR, 'Generated');
-const SHIM_LIB = 'libzingo_nym_proxy_ffi.a';
-const NYM_DEVICE_LIB = join(NYM_TARGET_DIR, DEVICE_TARGET, 'release', SHIM_LIB);
+console.log('\n=== Building mixnet proxy (mixnet-proxy) ===');
+const PROXY_DIR = join(RUST_DIR, 'mixnet-proxy');
+const NYM_TARGET_DIR = join(PROXY_DIR, 'target');
+const NYM_GENERATED = join(PROXY_DIR, 'Generated');
+const PROXY_LIB = 'libmixnet_proxy.a';
+const NYM_DEVICE_LIB = join(NYM_TARGET_DIR, DEVICE_TARGET, 'release', PROXY_LIB);
 const NYM_SIM_FAT_DIR = join(NYM_TARGET_DIR, 'universal-sim', 'release');
-const NYM_SIM_FAT_LIB = join(NYM_SIM_FAT_DIR, SHIM_LIB);
-const NYM_XCFRAMEWORK_OUT = join(REPO_IOS_DIR, 'ZingoNymProxyFFI.xcframework');
+const NYM_SIM_FAT_LIB = join(NYM_SIM_FAT_DIR, PROXY_LIB);
+const PROXY_XCFRAMEWORK_OUT = join(REPO_IOS_DIR, 'MixnetProxy.xcframework');
 
 for (const target of [DEVICE_TARGET, ...SIM_TARGETS]) {
-  run('cargo', ['build', '--release', '--target', target, '-p', 'zingo-nym-proxy-ffi'], { env, cwd: NYM_DIR });
+  run('cargo', ['build', '--release', '--target', target, '-p', 'mixnet-proxy'], { env, cwd: PROXY_DIR });
 }
 
 rmSync(NYM_GENERATED, { recursive: true, force: true });
@@ -113,24 +113,24 @@ run('cargo', [
 mkdirSync(NYM_SIM_FAT_DIR, { recursive: true });
 run('lipo', [
   '-create',
-  join(NYM_TARGET_DIR, 'aarch64-apple-ios-sim', 'release', SHIM_LIB),
-  join(NYM_TARGET_DIR, 'x86_64-apple-ios', 'release', SHIM_LIB),
+  join(NYM_TARGET_DIR, 'aarch64-apple-ios-sim', 'release', PROXY_LIB),
+  join(NYM_TARGET_DIR, 'x86_64-apple-ios', 'release', PROXY_LIB),
   '-output', NYM_SIM_FAT_LIB,
 ]);
 
 // 5. Headers for the wallet xcframework: both FFI headers plus ONE module map
 //    declaring both modules. Two static-library xcframeworks each shipping
 //    Headers/module.modulemap would both copy to $BUILT_PRODUCTS_DIR/include/
-//    module.modulemap ("Multiple commands produce"), so the shim rides here and
+//    module.modulemap ("Multiple commands produce"), so the proxy rides here and
 //    its own xcframework ships libraries only (step 7).
 rmSync(XCF_HEADERS_DIR, { recursive: true, force: true });
 mkdirSync(XCF_HEADERS_DIR, { recursive: true });
 const generated = join(LIB_DIR, 'Generated');
 copyFileSync(join(generated, 'zingoFFI.h'),                   join(XCF_HEADERS_DIR, 'zingoFFI.h'));
-copyFileSync(join(NYM_GENERATED, 'zingo_nym_proxy_ffiFFI.h'), join(XCF_HEADERS_DIR, 'zingo_nym_proxy_ffiFFI.h'));
+copyFileSync(join(NYM_GENERATED, 'mixnet_proxyFFI.h'), join(XCF_HEADERS_DIR, 'mixnet_proxyFFI.h'));
 const combinedModulemap =
   readFileSync(join(generated, 'zingoFFI.modulemap'), 'utf8') + '\n' +
-  readFileSync(join(NYM_GENERATED, 'zingo_nym_proxy_ffiFFI.modulemap'), 'utf8');
+  readFileSync(join(NYM_GENERATED, 'mixnet_proxyFFI.modulemap'), 'utf8');
 writeFileSync(join(XCF_HEADERS_DIR, 'module.modulemap'), combinedModulemap);
 
 // 6. Wallet xcframework carries both headers + the combined module map.
@@ -144,20 +144,20 @@ run('xcodebuild', [
   '-output', XCFRAMEWORK_OUT,
 ]);
 
-// 7. Shim xcframework: libraries only. Its headers/module live in the wallet
+// 7. Proxy xcframework: libraries only. Its headers/module live in the wallet
 //    xcframework above, so nothing here writes a second include/module.modulemap.
-if (existsSync(NYM_XCFRAMEWORK_OUT)) {
-  rmSync(NYM_XCFRAMEWORK_OUT, { recursive: true, force: true });
+if (existsSync(PROXY_XCFRAMEWORK_OUT)) {
+  rmSync(PROXY_XCFRAMEWORK_OUT, { recursive: true, force: true });
 }
 run('xcodebuild', [
   '-create-xcframework',
   '-library', NYM_DEVICE_LIB,
   '-library', NYM_SIM_FAT_LIB,
-  '-output', NYM_XCFRAMEWORK_OUT,
+  '-output', PROXY_XCFRAMEWORK_OUT,
 ]);
 
 // 8. Copy both Swift bindings to the app (compiled as normal Swift sources).
 copyFileSync(join(generated, 'zingo.swift'),                   join(REPO_IOS_DIR, 'zingo.swift'));
-copyFileSync(join(NYM_GENERATED, 'zingo_nym_proxy_ffi.swift'), join(REPO_IOS_DIR, 'zingo_nym_proxy_ffi.swift'));
+copyFileSync(join(NYM_GENERATED, 'mixnet_proxy.swift'), join(REPO_IOS_DIR, 'mixnet_proxy.swift'));
 
-console.log(`\nDone. XCFrameworks at ${XCFRAMEWORK_OUT} + ${NYM_XCFRAMEWORK_OUT}`);
+console.log(`\nDone. XCFrameworks at ${XCFRAMEWORK_OUT} + ${PROXY_XCFRAMEWORK_OUT}`);

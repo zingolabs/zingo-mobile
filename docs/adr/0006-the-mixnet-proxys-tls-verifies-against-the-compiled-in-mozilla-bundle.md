@@ -6,7 +6,7 @@ Date: 2026-08-21
 
 Accepted. Supersedes ADR 0004, which chose Android's platform verifier.
 This decision returns the mixnet proxy to zingolib ADR 0021 and restates
-that ADR's patch inside this repository's shim workspace.
+that ADR's patch inside this repository's proxy workspace.
 
 ## Context
 
@@ -36,15 +36,15 @@ which is why the fault presented for weeks as a wallet stuck bootstrapping.
 
 ## Decision
 
-The shim workspace carries its own `[patch.crates-io]` substituting
+The proxy workspace carries its own `[patch.crates-io]` substituting
 `rustls-platform-verifier` with zingolib's `webpki-verifier-shim`, which
 verifies against the compiled-in Mozilla root bundle. The patch is
 necessary here because Cargo honours `[patch]` only from the workspace
-being built, and `rust/nym-proxy-ffi` is a separate workspace from
+being built, and `rust/mixnet-proxy` is a separate workspace from
 `zingo-netutils`, so zingolib's stanza never reaches it.
 
 Three parts of ADR 0004 are deleted rather than disabled. The JNI seam
-`rust/nym-proxy-ffi/tls-init` and its export are gone, which removes the
+`rust/mixnet-proxy/tls-init` and its export are gone, which removes the
 repository's only hand-written `#[no_mangle]`. The Kotlin `NymTlsInit`
 object and its call in `NymTransportModule.startMixnetTransport` are gone.
 The gradle `cargo metadata` query, the maven repository it derived, and the

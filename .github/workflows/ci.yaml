@@ -61,8 +61,8 @@ jobs:
     with:
       fail-all: true
 
-  nym-proxy-ffi-check:
-    uses: ./.github/workflows/nym-proxy-ffi-check.yaml
+  mixnet-proxy-check:
+    uses: ./.github/workflows/mixnet-proxy-check.yaml
     with:
       fail-all: true
 

@@ -26,7 +26,7 @@ async function statusCall(
 
 /**
  * Attach Mixnet Mode to an already-running, platform-hosted SOCKS5 endpoint
- * (the proxy shim's address) that bound `exitNode`. Poll [`getMixnetStatus`]
+ * (the mixnet proxy's address) that bound `exitNode`. Poll [`getMixnetStatus`]
  * for `bootstrapping` -> `ready`, or `died`.
  */
 export async function attachMixnet(
@@ -38,7 +38,7 @@ export async function attachMixnet(
 
 /**
  * Enable Mixnet Mode by spawning a bundled nym-proxy binary (the exec
- * fallback; the shim-hosted path uses [`attachMixnet`] instead).
+ * fallback; the proxy-hosted path uses [`attachMixnet`] instead).
  */
 export async function enableMixnet(
   proxyPath: string,

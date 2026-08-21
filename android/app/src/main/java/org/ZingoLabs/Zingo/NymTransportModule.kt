@@ -5,15 +5,15 @@ import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
-import uniffi.zingo_nym_proxy_ffi.MixnetProxyHandle
-import uniffi.zingo_nym_proxy_ffi.ProxyDeathObserver
-import uniffi.zingo_nym_proxy_ffi.ProxyDeathReason
+import uniffi.mixnet_proxy.MixnetProxyHandle
+import uniffi.mixnet_proxy.ProxyDeathObserver
+import uniffi.mixnet_proxy.ProxyDeathReason
 
 /**
  * The platform half of Mixnet Mode on Android (send-over-nym step 3,
- * zingolib#2513): hosts the UniFFI proxy shim (`uniffi.zingo_nym_proxy_ffi`)
+ * zingolib#2513): hosts the mixnet proxy (`uniffi.mixnet_proxy`)
  * inside the app process and offers its local SOCKS5 endpoint to the app
- * layer, which hands it to the wallet's `attach_mixnet` seam. The shim is a
+ * layer, which hands it to the wallet's `attach_mixnet` seam. The proxy is a
  * UniFFI component distinct from the wallet's (`uniffi.zingo`) by ratified
  * decision — the loopback socket, not a shared compile unit, is the boundary
  * between the two lockfile-incompatible stacks.
@@ -22,14 +22,14 @@ import uniffi.zingo_nym_proxy_ffi.ProxyDeathReason
  * binding — the `host:port` endpoint and the Exit Node it bound, both of
  * which the wallet's attach seam requires; `stopMixnetTransport` is the
  * deliberate teardown.
- * A proxy that dies on its own is observed by the shim's liveness monitor;
+ * A proxy that dies on its own is observed by the proxy's liveness monitor;
  * the observer clears the stored handle so a later re-enable starts afresh,
  * while the wallet's own probe surfaces the `died` mode the app polls.
  *
  * Failures settle out of band in the error channel (zingo-mobile ADRs 0002
  * and 0003): the promise rejects under this module's name, never prose in
- * the data payload. JVM `Error`s from shim linkage are converted to
- * exceptions at this boundary because a build whose APK carries no shim
+ * the data payload. JVM `Error`s from proxy linkage are converted to
+ * exceptions at this boundary because a build whose APK carries no proxy
  * library must degrade fail-closed — an `UnsatisfiedLinkError` becomes a
  * rejected start, sends stay blocked, and the app survives to offer
  * re-enable or the clearnet consent path.
@@ -98,14 +98,14 @@ class NymTransportModule internal constructor(reactContext: ReactApplicationCont
     }
 
     /**
-     * Runs `call`, converting JVM `Error`s (a missing or mismatched shim
+     * Runs `call`, converting JVM `Error`s (a missing or mismatched proxy
      * library) into exceptions so [FfiOutcome] settles them as rejections
      * instead of the process dying.
      */
     private fun <T> guardingLinkage(call: () -> T): T = try {
         call()
     } catch (error: Error) {
-        throw IllegalStateException("the nym proxy shim is unavailable", error)
+        throw IllegalStateException("the nym mixnet proxy is unavailable", error)
     }
 
     @ReactMethod

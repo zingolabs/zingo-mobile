@@ -4,9 +4,12 @@ Date: 2026-08-19
 
 ## Status
 
-Accepted, ruled by the maintainer on 2026-08-19. The rename itself is
-deferred to a follow-on pull request, because its scope reaches every
-build system in the repository and does not belong inside PR #1276.
+Accepted, ruled by the maintainer on 2026-08-19. The rename was deferred
+to a follow-on pull request, because its scope reaches every build system
+in the repository and does not belong inside PR #1276. That pull request
+carried it out on 2026-08-21, and this ADR's Consequences overstate the
+work in one respect: PR #1291 had already stopped checking the generated
+bindings into git, so those paths no longer existed to move.
 
 ## Context
 

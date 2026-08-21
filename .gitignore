@@ -33,13 +33,13 @@ android/app/beta/release/
 *.aab
 *.apk
 ios/Zingolib.xcframework/
-ios/ZingoNymProxyFFI.xcframework/
+ios/MixnetProxy.xcframework/
 ios/NymHost.xcframework/
 ios/zingo.swift
-ios/zingo_nym_proxy_ffi.swift
+ios/mixnet_proxy.swift
 rust/lib/Generated/zingo.swift
 rust/lib/Generated/zingoFFI.h
-rust/nym-proxy-ffi/Generated/
+rust/mixnet-proxy/Generated/
 rust/lib/Generated/zingoFFI.modulemap
 
 # Android/IntelliJ

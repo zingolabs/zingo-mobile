@@ -14,7 +14,7 @@
 //! preserve `#![forbid(unsafe_code)]`: uniffi's proc-macros generate the FFI
 //! `unsafe` scaffolding with macro hygiene that the lint does not fire on,
 //! while any hand-written `unsafe` in this crate would still be rejected. So
-//! this shim carries zero hand-written unsafe and keeps the workspace-wide
+//! this crate carries zero hand-written unsafe and keeps the workspace-wide
 //! safety invariant intact — see the ADR amendment for the empirical check.
 #![forbid(unsafe_code)]
 
