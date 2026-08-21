@@ -584,7 +584,7 @@ final class UpdateCurrentPriceAndValueTransfersFromSeed: XCTestCase {
             // Orden y valores como en Kotlin
             XCTAssertEqual(vts.value_transfers[0].kind, "memo-to-self")
             XCTAssertEqual(vts.value_transfers[0].status, "confirmed")
-            XCTAssertEqual(vts.value_transfers[0].value, 0)
+            XCTAssertEqual(vts.value_transfers[0].value, 870_000)
             XCTAssertEqual(vts.value_transfers[0].transaction_fee, 20_000)
 
             XCTAssertEqual(vts.value_transfers[1].kind, "sent")
