@@ -443,15 +443,22 @@ class ExecuteSendFromOrchard {
         // bootstrap and restarting a dead proxy are different remedies.
         assertThat(refusal).contains("the Nym mixnet is not enabled")
 
-        // The refusal is a decision, not a partial transmission, so a second
-        // confirm refuses identically rather than finding torn state.
-        val secondRefusal: String? = try {
+        // The refusal consumed the stored proposal. A confirm takes the
+        // proposal before it attempts the transmission, so a refusal discards
+        // it exactly as any other failure does. A retry therefore reports no
+        // stored proposal rather than repeating the refusal, and an app that
+        // wants the send after the user enables Mixnet Mode must propose it
+        // again. A repeated Mixnet refusal here would mean the proposal
+        // survived, and a txid would mean the retry transmitted one that the
+        // first call had already taken.
+        val retry: String? = try {
             val txid = uniffi.zingo.confirm()
-            throw AssertionError("the retried transmission answered without a mixnet: $txid")
-        } catch (e: uniffi.zingo.ZingolibException.Mixnet) {
+            throw AssertionError("a consumed proposal confirmed on retry: $txid")
+        } catch (e: uniffi.zingo.ZingolibException.Send) {
             e.message
         }
-        assertThat(secondRefusal).isEqualTo(refusal)
+        println("\nRetry after the refusal:")
+        println(retry)
 
         // A second launch while the first sync still runs is idempotent:
         // the bridge answers with status on the data channel ("Sync task
