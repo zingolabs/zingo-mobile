@@ -195,4 +195,4 @@ the shared JS bundle was prepped against.
 ### Known caveats
 - **Bundle ID case sensitivity**: both iOS and Android use `.Beta` (capital B). The `applicationIdSuffix` in `build.gradle.kts` is intentionally capital to match what's registered in App Store Connect and Play Console.
 - **AAB / APK never committed**: gitignored (`*.aab`, `*.apk`, `android/app/beta/release/`, `android/app/release/`).
-- **UniFFI bindings refresh**: `rust/lib/src/uniffi/zingo/zingo.kt` is the source of truth; `yarn rust:android` copies it into `android/app/build/generated/source/uniffi/{debug,release}/...`. If you `gradle clean` without re-running `yarn rust:android`, you'll see `Unresolved reference 'initLogging'` errors at Kotlin compile — re-run `yarn rust:android` to refresh.
+- **UniFFI bindings refresh**: the Kotlin bindings are generated, not checked in. `yarn rust:android` writes them into `android/app/build/generated/source/uniffi/{debug,release}/...`, and `node scripts/generate_kotlin_bindings.mjs` writes them on their own. After a `gradle clean`, run one of the two before the Kotlin compile.

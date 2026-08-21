@@ -21,15 +21,6 @@ const REPO_DIR = resolve(RUST_DIR, '..');
 const LIB_DIR = join(RUST_DIR, 'lib');
 const TARGET_DIR = join(RUST_DIR, 'target');
 const JNI_PATH = join(REPO_DIR, 'android', 'app', 'src', 'main', 'jniLibs');
-const UNIFFI_PATH = join(
-  REPO_DIR,
-  'android',
-  'app',
-  'build',
-  'generated',
-  'source',
-  'uniffi',
-);
 const NDK_VERSION = '28.2.13676358';
 const CARGO_NDK_VERSION = '4.0.1';
 
@@ -190,33 +181,7 @@ const env = {
   CXXFLAGS_aarch64_linux_android: '-mno-outline-atomics',
 };
 
-// --- Output dirs ---
-for (const variant of ['debug', 'release']) {
-  mkdirSync(join(UNIFFI_PATH, variant, 'java', 'uniffi', 'zingo'), {
-    recursive: true,
-  });
-}
-
-// --- Generate Kotlin bindings ---
-console.log('=== Generating Kotlin bindings ===');
 process.chdir(LIB_DIR);
-run(
-  'cargo',
-  [
-    'run',
-    '--release',
-    '--features=uniffi/cli',
-    '--bin',
-    'uniffi-bindgen',
-    'generate',
-    './src/zingo.udl',
-    '--language',
-    'kotlin',
-    '--out-dir',
-    './src',
-  ],
-  { env },
-);
 
 // --- Build per ABI ---
 const exe = process.platform === 'win32' ? '.exe' : '';
@@ -245,15 +210,6 @@ for (const abi of abis) {
   const dstDir = join(JNI_PATH, jniDir);
   mkdirSync(dstDir, { recursive: true });
   copyFileSync(soPath, join(dstDir, 'libuniffi_zingo.so'));
-}
-
-// --- Export Kotlin bindings ---
-const kotlinSrc = join(LIB_DIR, 'src', 'uniffi', 'zingo', 'zingo.kt');
-for (const variant of ['debug', 'release']) {
-  copyFileSync(
-    kotlinSrc,
-    join(UNIFFI_PATH, variant, 'java', 'uniffi', 'zingo', 'zingo.kt'),
-  );
 }
 
 console.log('\n=== Building Nym proxy shim (nym-proxy-ffi) ===');
@@ -287,6 +243,20 @@ run(
     NYM_BUNDLE,
   ],
   { env, cwd: RUST_DIR },
+);
+
+// --- Kotlin bindings: the wallet from the UDL, the shim from the unstripped
+// bundle library ---
+run(
+  process.execPath,
+  [
+    join(REPO_DIR, 'scripts', 'generate_kotlin_bindings.mjs'),
+    '--variants',
+    'debug,release',
+    '--shim-library',
+    join(NYM_BUNDLE, 'jniLibs', ABI_TABLE[abis[0]].jniDir, SHIM_SO),
+  ],
+  { env, cwd: REPO_DIR },
 );
 
 // Strip the staged shim .so, matching the wallet .so treatment above.
