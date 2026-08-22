@@ -10,51 +10,43 @@
  * rejection channel (typed FFI errors); resolved values are data, never
  * inspected for an error sentinel.
  */
-import { WalletType, GlobalConst } from '../../AppState';
+import { WalletType, GlobalConst, ErrorKeyed } from '../../AppState';
 import RPCModule from '../../RPCModule';
 import { callFfi, FfiResult } from '../ffi';
 import { serverUris } from '../../uris';
 import { RPCZecPriceType } from '../types/RPCZecPriceType';
 import { RPCSeedType } from '../types/RPCSeedType';
 
-/**
- * Fetches the current ZEC/USD price from the zingolib price oracle.
- *
- * Price sentinel values:
- *   0   — initial/default (no price data yet)
- *  -1   — error inside zingolib (a typed FFI rejection, or an oracle error)
- *  -2   — malformed/empty success payload
- *  > 0  — real USD price
- */
-export async function getZecPrice(): Promise<{
-  price: number;
-  error: string;
-}> {
+export type ZecPriceErrorKey = 'info.errorgemini' | 'info.errorrpcmodule';
+
+export type ZecPriceOutcome =
+  { kind: 'zecPrice'; usd: number } | ErrorKeyed<ZecPriceErrorKey>;
+
+const priceErr = (
+  errorKey: ZecPriceErrorKey,
+  param?: string,
+): ErrorKeyed<ZecPriceErrorKey> => ({ kind: 'error', errorKey, param });
+
+/** Fetches the current ZEC/USD price, which zingolib carries over the mixnet. */
+export async function getZecPrice(): Promise<ZecPriceOutcome> {
   const result = await callFfi(RPCModule.zecPriceInfo());
   if (!result.ok) {
-    return { price: -1, error: result.error.message };
+    return priceErr('info.errorgemini', result.error.message);
   }
   if (!result.value) {
-    return { price: -2, error: 'Internal Error fetching price' };
+    return priceErr('info.errorrpcmodule');
   }
   try {
-    const resultJSON: RPCZecPriceType = JSON.parse(result.value);
-    if (resultJSON.error) {
-      return { price: -1, error: resultJSON.error };
+    const payload: RPCZecPriceType = JSON.parse(result.value);
+    const usd = payload.current_price;
+    // A quote is a positive, finite number. Absent, NaN and non-positive are
+    // all malformed payloads, not prices, and none can reach a caller as one.
+    if (usd === undefined || !Number.isFinite(usd) || usd <= 0) {
+      return priceErr('info.errorrpcmodule', String(usd));
     }
-    if (!resultJSON.current_price) {
-      // if no exists the field or is empty
-      return { price: 0, error: '' };
-    }
-    if (isNaN(resultJSON.current_price)) {
-      return {
-        price: -1,
-        error: `Error fetching price ${resultJSON.current_price}`,
-      };
-    }
-    return { price: resultJSON.current_price, error: '' };
+    return { kind: 'zecPrice', usd };
   } catch (error) {
-    return { price: -2, error: `Critical Error fetching price ${error}` };
+    return priceErr('info.errorrpcmodule', String(error));
   }
 }
 
