@@ -481,8 +481,8 @@
     "zecprice": "ZEC Price",
     "unknown": "Unknown",
     "title": "Server Info",
-    "errorgemini": "Error fetching the price from the Internet.",
-    "errorrpcmodule": "Internal Error fetching the price from the Internet",
+    "errorgemini": "Could not fetch the price from the Internet.",
+    "errorrpcmodule": "The price arrived in a form the app could not read.",
     "zingolib": "Zingolib Version"
   },
   "rescan": {

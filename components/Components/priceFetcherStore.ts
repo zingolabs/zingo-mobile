@@ -55,7 +55,7 @@ function scheduleAuto(): void {
   clearAuto();
   if (listeners.size === 0 || !started) return;
   autoTimer = setTimeout(() => {
-    doFetch().catch(() => {});
+    doFetch();
   }, PRICE_AUTO_REFRESH_MS);
 }
 
@@ -74,28 +74,33 @@ async function doFetch(): Promise<void> {
   if (cooldownTimer) clearTimeout(cooldownTimer);
   cooldownTimer = setTimeout(emit, COOLDOWN_MS);
 
-  const outcome = await getZecPrice();
-  if (outcome.kind === 'error') {
-    // A failed refresh leaves the last good price on screen. Overwriting it
-    // would trade a stale number for no number at all.
-    const detail = outcome.param === undefined ? '' : ` - ${outcome.param}`;
-    d.addLastSnackbar(`${d.translate(outcome.errorKey) as string}${detail}`);
-  } else {
-    d.setZecPrice(outcome.usd, Date.now());
-    started = true;
-  }
+  try {
+    const outcome = await getZecPrice();
+    if (outcome.kind === 'error') {
+      // A failed refresh leaves the last good price on screen. Overwriting it
+      // would trade a stale number for no number at all.
+      const detail = outcome.param === undefined ? '' : ` - ${outcome.param}`;
+      d.addLastSnackbar(`${d.translate(outcome.errorKey) as string}${detail}`);
+    } else {
+      d.setZecPrice(outcome.usd, Date.now());
+      started = true;
+    }
 
-  // Floor the visible loading time so the CTA/ring state doesn't flash by.
-  const elapsed = Date.now() - now;
-  if (elapsed < MIN_VISIBLE_MS) {
-    await new Promise<void>(resolve =>
-      setTimeout(resolve, MIN_VISIBLE_MS - elapsed),
-    );
+    // Floor the visible loading time so the CTA/ring state doesn't flash by.
+    const elapsed = Date.now() - now;
+    if (elapsed < MIN_VISIBLE_MS) {
+      await new Promise<void>(resolve =>
+        setTimeout(resolve, MIN_VISIBLE_MS - elapsed),
+      );
+    }
+  } finally {
+    // The three injected callbacks above belong to the host screen and can
+    // throw. Leaving `loading` set would strand every later fetch at the gate
+    // while the ring kept spinning against a loop that had stopped.
+    loading = false;
+    emit();
+    scheduleAuto();
   }
-
-  loading = false;
-  emit();
-  scheduleAuto();
 }
 
 export const priceFetcherStore = {
@@ -105,7 +110,7 @@ export const priceFetcherStore = {
   },
   /** User- or timer-initiated fetch. No-ops while loading / cooling down. */
   fetch(): void {
-    doFetch().catch(() => {});
+    doFetch();
   },
   hasStarted(): boolean {
     return started;

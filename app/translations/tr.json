@@ -481,8 +481,8 @@
     "zecprice": "ZEC Fiyatı ",
     "unknown": "Bilinmeyen ",
     "title": "Sunucu Bilgisi",
-    "errorgemini": "Error İnternetten fiyat alınırken hata oluştu.",
-    "errorrpcmodule": "İnternetten fiyat alınırken iç hata oluştu ",
+    "errorgemini": "Fiyat İnternet'ten alınamadı.",
+    "errorrpcmodule": "Fiyat, uygulamanın okuyamadığı bir biçimde geldi.",
     "zingolib": "Zingolib Sürümü"
   },
   "rescan": {
