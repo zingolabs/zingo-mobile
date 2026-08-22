@@ -675,7 +675,7 @@ class RPCModule: NSObject {
   func setBroadcastCandidates(_ candidatesJson: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
       DispatchQueue.global(qos: .userInitiated).async {
         FfiOutcome.of {
-          try Zingo.setBroadcastCandidates(candidatesJson: candidatesJson)
+          try setBroadcastCandidates(candidatesJson: candidatesJson)
         }.settle(resolve: resolve, reject: reject)
       }
   }
@@ -686,7 +686,7 @@ class RPCModule: NSObject {
   func attachMixnet(_ socks5Addr: String, exitNode: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
       DispatchQueue.global(qos: .userInitiated).async {
         FfiOutcome.of {
-          try Zingo.attachMixnet(socks5Addr: socks5Addr, exitNode: exitNode)
+          try attachMixnet(socks5Addr: socks5Addr, exitNode: exitNode)
         }.settle(resolve: resolve, reject: reject)
       }
   }
@@ -695,7 +695,7 @@ class RPCModule: NSObject {
   func enableMixnet(_ proxyPath: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
       DispatchQueue.global(qos: .userInitiated).async {
         FfiOutcome.of {
-          try Zingo.enableMixnet(proxyPath: proxyPath)
+          try enableMixnet(proxyPath: proxyPath)
         }.settle(resolve: resolve, reject: reject)
       }
   }
@@ -704,7 +704,7 @@ class RPCModule: NSObject {
   func disableMixnet(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
       DispatchQueue.global(qos: .userInitiated).async {
         FfiOutcome.of {
-          try Zingo.disableMixnet()
+          try disableMixnet()
         }.settle(resolve: resolve, reject: reject)
       }
   }
