@@ -481,8 +481,8 @@
     "zecprice": "Precio del ZEC",
     "unknown": "Desconocido",
     "title": "Información del Servidor",
-    "errorgemini": "Error extrayendo el precio de Internet.",
-    "errorrpcmodule": "Fallo interno al obtener el precio de Internet",
+    "errorgemini": "No se pudo obtener el precio de Internet.",
+    "errorrpcmodule": "El precio llegó en un formato que la aplicación no pudo leer.",
     "zingolib": "Versión de Zingolib"
   },
   "rescan": {
