@@ -423,13 +423,21 @@ class ExecuteSendFromOrchard {
 
         val send = taddresses[0].encoded_address?.let { Send(it, 100000, null) }
 
-        val proposeJson: String = uniffi.zingo.send(mapper.writeValueAsString(listOf(send)))
-        println("\nPropose:")
-        println(proposeJson)
-
-        val confirmJson: String = uniffi.zingo.confirm()
-        println("\nConfirm Txid:")
-        println(confirmJson)
+        // A send rides the mixnet or does not happen (ADR 0011). This wallet
+        // never attached one, so the send must refuse. A transaction here
+        // would mean the wallet reached the network over clearnet, which is
+        // the leak the mixnet-only rule exists to prevent.
+        val refusal: String? = try {
+            val proposeJson: String = uniffi.zingo.send(mapper.writeValueAsString(listOf(send)))
+            val confirmJson: String = uniffi.zingo.confirm()
+            throw AssertionError(
+                "the send answered without a mixnet: propose=$proposeJson confirm=$confirmJson"
+            )
+        } catch (e: uniffi.zingo.ZingolibException.Mixnet) {
+            e.message
+        }
+        println("\nSend refused without a mixnet:")
+        println(refusal)
 
         // A second launch while the first sync still runs is idempotent:
         // the bridge answers with status on the data channel ("Sync task
@@ -462,13 +470,13 @@ class ExecuteSendFromOrchard {
         }
 
         balanceJson = uniffi.zingo.getBalance()
-        println("\nBalance post-send:")
+        println("\nBalance after the refused send:")
         println(balanceJson)
-        val balancePostSend: Balance = mapper.readValue(balanceJson)
-        assertThat(balancePostSend.total_orchard_balance).isEqualTo(885000)
-        // the transparent funds are unconfirmed...
-        assertThat(balancePostSend.confirmed_transparent_balance).isEqualTo(0)
-        assertThat(balancePostSend.unconfirmed_transparent_balance).isEqualTo(100000)
+        val balanceAfterRefusal: Balance = mapper.readValue(balanceJson)
+        // A refused send leaves no trace: no fee taken, no pending output.
+        assertThat(balanceAfterRefusal.confirmed_orchard_balance).isEqualTo(1000000)
+        assertThat(balanceAfterRefusal.confirmed_transparent_balance).isEqualTo(0)
+        assertThat(balanceAfterRefusal.unconfirmed_transparent_balance).isEqualTo(0)
     }
 }
 
