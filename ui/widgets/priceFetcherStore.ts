@@ -1,6 +1,7 @@
 import { useEffect, useReducer, useSyncExternalStore } from 'react';
 import { AppState, NativeEventSubscription } from 'react-native';
-import { getZecPrice } from '@app/walletBackend';
+import { errorKeyed } from '@app/AppState';
+import { getZecPrice, ZecPriceOutcome } from '@app/walletBackend';
 import { MixnetStatusKey } from '@app/walletBackend/transforms/mixnetView';
 
 export const PRICE_REFRESH_MIN_MS = 45_000;
@@ -37,9 +38,13 @@ type NativeFlight =
   | { state: 'none' }
   | {
       state: 'inFlight';
-      call: Promise<{ price: number; error: string }>;
+      call: Promise<ZecPriceOutcome>;
       startedAt: number;
     };
+
+type PriceAttempt = ZecPriceOutcome | { kind: 'timeout' };
+
+const TIMED_OUT: PriceAttempt = { kind: 'timeout' };
 
 let loading = false;
 let entryPending = false;
@@ -105,34 +110,32 @@ function scheduleAuto(): void {
 }
 
 // A wedged native call is reused until its TTL, then replaced.
-function startNativeCall(): Promise<{ price: number; error: string }> {
+function startNativeCall(): Promise<ZecPriceOutcome> {
   if (
     nativeFlight.state === 'inFlight' &&
     Date.now() - nativeFlight.startedAt <= NATIVE_CALL_TTL_MS
   ) {
     return nativeFlight.call;
   }
-  const launched: Promise<{ price: number; error: string }> =
-    getZecPrice().finally(() => {
-      if (nativeFlight.state === 'inFlight' && nativeFlight.call === launched) {
-        nativeFlight = { state: 'none' };
-      }
-    });
+  const launched: Promise<ZecPriceOutcome> = getZecPrice().finally(() => {
+    if (nativeFlight.state === 'inFlight' && nativeFlight.call === launched) {
+      nativeFlight = { state: 'none' };
+    }
+  });
   nativeFlight = { state: 'inFlight', call: launched, startedAt: Date.now() };
   return launched;
 }
 
-// Resolves -3 on timeout and -2 on a rejected native call.
-async function boundedPrice(): Promise<number> {
+// A rejected native call becomes an error outcome; a slow one times out.
+async function boundedAttempt(): Promise<PriceAttempt> {
   let bound: ReturnType<typeof setTimeout> | undefined;
-  const expiry = new Promise<{ price: number }>(resolve => {
-    bound = setTimeout(() => resolve({ price: -3 }), PRICE_FETCH_TIMEOUT_MS);
+  const expiry = new Promise<PriceAttempt>(resolve => {
+    bound = setTimeout(() => resolve(TIMED_OUT), PRICE_FETCH_TIMEOUT_MS);
   });
   try {
-    const { price } = await Promise.race([startNativeCall(), expiry]);
-    return price;
-  } catch {
-    return -2;
+    return await Promise.race<PriceAttempt>([startNativeCall(), expiry]);
+  } catch (thrown: unknown) {
+    return errorKeyed('info.error-price-fetch', String(thrown));
   } finally {
     clearTimeout(bound);
   }
@@ -149,23 +152,22 @@ async function doFetch(): Promise<void> {
   lastFetchStartAt = Date.now();
   emit();
   try {
-    let price = await boundedPrice();
+    let attempt = await boundedAttempt();
     if (
-      price <= 0 &&
-      price !== -3 &&
+      attempt.kind === 'error' &&
       epoch === sessionEpoch &&
       surfaceMayFetch()
     ) {
-      price = await boundedPrice();
+      attempt = await boundedAttempt();
     }
 
     if (epoch !== sessionEpoch) {
       return;
     }
-    if (price > 0) {
+    if (attempt.kind === 'zecPrice') {
       entryPending = false;
       lastSuccessAt = Date.now();
-      d.setZecPrice(price, lastSuccessAt);
+      d.setZecPrice(attempt.usd, lastSuccessAt);
     }
   } finally {
     if (epoch === sessionEpoch) {

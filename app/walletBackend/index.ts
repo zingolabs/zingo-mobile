@@ -69,6 +69,7 @@ export {
   walletExists,
   windowTimeline,
 } from './utils/walletUtils';
+export type { ZecPriceOutcome } from './utils/walletUtils';
 export {
   hasRepairableWalletFile,
   repairDoubleWrappedWallet,

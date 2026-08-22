@@ -425,6 +425,8 @@
     "lastupdate": "Última actualización:"
   },
   "info": {
+    "error-price-fetch": "No se pudo obtener el precio de ZEC.",
+    "error-price-payload": "El precio de ZEC llegó con un formato incorrecto.",
     "version": "Versión",
     "serverversion": "Versión del Servidor",
     "zainod": "URL del servidor",
