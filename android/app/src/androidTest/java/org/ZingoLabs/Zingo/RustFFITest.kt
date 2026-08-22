@@ -29,6 +29,15 @@ fun regtestChainHint(): String {
 inline fun <reified T> ObjectMapper.readValue(src: String): T =
     readValue(src, object : TypeReference<T>() {})
 
+/** Returns the mixnet refusal [attempt] raises, and fails the test if it answers instead. */
+fun <T> refusedWithoutMixnet(what: String, attempt: () -> T): String? =
+    try {
+        val answered = attempt()
+        throw AssertionError("the $what answered without a mixnet: $answered")
+    } catch (e: uniffi.zingo.ZingolibException.Mixnet) {
+        e.message
+    }
+
 object Seeds {
     const val HOSPITAL = "hospital museum valve antique skate museum unfold vocal weird milk scale social vessel identify crowd hospital control album rib bulb path oven civil tank"
 }
@@ -427,14 +436,10 @@ class ExecuteSendFromOrchard {
         // never attached one, so the send must refuse. A transaction here
         // would mean the wallet reached the network over clearnet, which is
         // the leak the mixnet-only rule exists to prevent.
-        val refusal: String? = try {
+        val refusal: String? = refusedWithoutMixnet("send") {
             val proposeJson: String = uniffi.zingo.send(mapper.writeValueAsString(listOf(send)))
             val confirmJson: String = uniffi.zingo.confirm()
-            throw AssertionError(
-                "the send answered without a mixnet: propose=$proposeJson confirm=$confirmJson"
-            )
-        } catch (e: uniffi.zingo.ZingolibException.Mixnet) {
-            e.message
+            "propose=$proposeJson confirm=$confirmJson"
         }
         println("\nSend refused without a mixnet:")
         println(refusal)
@@ -510,12 +515,7 @@ class UpdateCurrentPriceAndValueTransfersFromSeed {
         // never attached one, so the fetch must refuse. A price here would
         // mean the wallet reached an oracle over clearnet, which is the
         // leak the mixnet-only rule exists to prevent.
-        val refusal: String? = try {
-            val price = uniffi.zingo.zecPrice()
-            throw AssertionError("the price fetch answered without a mixnet: $price")
-        } catch (e: uniffi.zingo.ZingolibException.Mixnet) {
-            e.message
-        }
+        val refusal: String? = refusedWithoutMixnet("price fetch") { uniffi.zingo.zecPrice() }
         println("\nPrice refused without a mixnet:")
         println(refusal)
 
