@@ -16,7 +16,11 @@ import {
 } from 'react-native';
 import { showConfirm } from '../../app/showConfirm';
 
-import { NavigationProp, ParamListBase, useNavigation } from '@react-navigation/native';
+import {
+  NavigationProp,
+  ParamListBase,
+  useNavigation,
+} from '@react-navigation/native';
 import { useTheme } from '../../app/theme';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -31,6 +35,7 @@ import RegText from '../Components/RegText';
 import FadeText from '../Components/FadeText';
 import BoldText from '../Components/BoldText';
 import Button from '../Components/Button';
+import SheetRim from '../Components/SheetRim';
 import { useFullSheetSnapPoints } from '../../app/hooks/useFullSheetSnapPoints';
 import { AppDrawerParamList } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
@@ -432,14 +437,9 @@ const Seed: React.FunctionComponent<SeedProps> = ({
           backgroundColor: colors.bgSurface,
           borderTopLeftRadius: 40,
           borderTopRightRadius: 40,
-          borderTopWidth: 1,
-          borderLeftWidth: 0.5,
-          borderRightWidth: 0.5,
-          borderTopColor: colors.bottomSheetBorder,
-          borderLeftColor: colors.bottomSheetBorder,
-          borderRightColor: colors.bottomSheetBorder,
         }}
       >
+        <SheetRim />
         <View
           style={{
             flexDirection: 'row',
@@ -728,7 +728,10 @@ const Seed: React.FunctionComponent<SeedProps> = ({
                     }
                   }}
                 >
-                  <RegText color={colors.fgDefault} style={{ textAlign: 'center' }}>
+                  <RegText
+                    color={colors.fgDefault}
+                    style={{ textAlign: 'center' }}
+                  >
                     {!expandBirthday
                       ? Utils.trimToSmall(birthdayNumber, 1)
                       : birthdayNumber}

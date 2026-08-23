@@ -277,7 +277,10 @@ const MigrationSchedule: React.FunctionComponent<MigrationScheduleProps> = ({
             .split('**')
             .map((part: string, i: number) =>
               i % 2 === 1 ? (
-                <Text key={i} style={{ color: colors.fgDefault, fontWeight: '700' }}>
+                <Text
+                  key={i}
+                  style={{ color: colors.fgDefault, fontWeight: '700' }}
+                >
                   {part}
                 </Text>
               ) : (
@@ -307,7 +310,11 @@ const MigrationSchedule: React.FunctionComponent<MigrationScheduleProps> = ({
               }}
             >
               <Text
-                style={{ color: colors.fgDefault, fontSize: 17, fontWeight: '700' }}
+                style={{
+                  color: colors.fgDefault,
+                  fontSize: 17,
+                  fontWeight: '700',
+                }}
               >
                 {(translate('migrationschedule.batch') as string).replace(
                   '{n}',
@@ -316,7 +323,11 @@ const MigrationSchedule: React.FunctionComponent<MigrationScheduleProps> = ({
               </Text>
               {/* Wall-clock time leads; block heights are the metadata. */}
               <Text
-                style={{ color: colors.fgDefault, fontSize: 14, fontWeight: '600' }}
+                style={{
+                  color: colors.fgDefault,
+                  fontSize: 14,
+                  fontWeight: '600',
+                }}
               >
                 {card.when}
               </Text>

@@ -317,14 +317,8 @@ exports[`Component Address Book Details - test Address Book Datails - Add - snap
           style={
             {
               "backgroundColor": "#031124",
-              "borderLeftColor": "#05234C",
-              "borderLeftWidth": 0.5,
-              "borderRightColor": "#05234C",
-              "borderRightWidth": 0.5,
-              "borderTopColor": "#05234C",
               "borderTopLeftRadius": 40,
               "borderTopRightRadius": 40,
-              "borderTopWidth": 1,
               "paddingHorizontal": 16,
               "paddingTop": 8,
             }
@@ -3789,14 +3783,8 @@ exports[`Component Address Book Details - test Address Book Datails - Delete - s
           style={
             {
               "backgroundColor": "#031124",
-              "borderLeftColor": "#05234C",
-              "borderLeftWidth": 0.5,
-              "borderRightColor": "#05234C",
-              "borderRightWidth": 0.5,
-              "borderTopColor": "#05234C",
               "borderTopLeftRadius": 40,
               "borderTopRightRadius": 40,
-              "borderTopWidth": 1,
               "paddingHorizontal": 16,
               "paddingTop": 8,
             }
@@ -4538,14 +4526,8 @@ exports[`Component Address Book Details - test Address Book Datails - Modify - s
           style={
             {
               "backgroundColor": "#031124",
-              "borderLeftColor": "#05234C",
-              "borderLeftWidth": 0.5,
-              "borderRightColor": "#05234C",
-              "borderRightWidth": 0.5,
-              "borderTopColor": "#05234C",
               "borderTopLeftRadius": 40,
               "borderTopRightRadius": 40,
-              "borderTopWidth": 1,
               "paddingHorizontal": 16,
               "paddingTop": 8,
             }

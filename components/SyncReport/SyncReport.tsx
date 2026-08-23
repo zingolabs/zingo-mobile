@@ -19,6 +19,7 @@ import Header from '../Header';
 import { NetInfoStateType } from '@react-native-community/netinfo/src/index';
 import RegText from '../Components/RegText';
 import BoldText from '../Components/BoldText';
+import SheetRim from '../Components/SheetRim';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
   faChevronLeft,
@@ -92,14 +93,9 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
           backgroundColor: colors.bgSurface,
           borderTopLeftRadius: 40,
           borderTopRightRadius: 40,
-          borderTopWidth: 1,
-          borderLeftWidth: 0.5,
-          borderRightWidth: 0.5,
-          borderTopColor: colors.bottomSheetBorder,
-          borderLeftColor: colors.bottomSheetBorder,
-          borderRightColor: colors.bottomSheetBorder,
         }}
       >
+        <SheetRim />
         <View
           style={{
             flexDirection: 'row',
@@ -591,7 +587,9 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                         }}
                       >
                         <>
-                          <Text style={{ color: colors.fgDefault }}>{birthday}</Text>
+                          <Text style={{ color: colors.fgDefault }}>
+                            {birthday}
+                          </Text>
                           <Text style={{ color: colors.fgDefault }}>
                             {info.latestBlock}
                           </Text>
@@ -710,7 +708,9 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                               margin: 5,
                             }}
                           />
-                          <Text style={{ color: colors.fgDefault, marginRight: 10 }}>
+                          <Text
+                            style={{ color: colors.fgDefault, marginRight: 10 }}
+                          >
                             {translate('report.scanned') as string}
                           </Text>
                         </View>
@@ -732,7 +732,9 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                               margin: 5,
                             }}
                           />
-                          <Text style={{ color: colors.fgDefault, marginRight: 10 }}>
+                          <Text
+                            style={{ color: colors.fgDefault, marginRight: 10 }}
+                          >
                             {translate('report.scanning') as string}
                           </Text>
                         </View>
@@ -754,7 +756,9 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                               margin: 5,
                             }}
                           />
-                          <Text style={{ color: colors.fgDefault, marginRight: 10 }}>
+                          <Text
+                            style={{ color: colors.fgDefault, marginRight: 10 }}
+                          >
                             {translate('report.refetching') as string}
                           </Text>
                         </View>
@@ -776,7 +780,9 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                               margin: 5,
                             }}
                           />
-                          <Text style={{ color: colors.fgDefault, marginRight: 10 }}>
+                          <Text
+                            style={{ color: colors.fgDefault, marginRight: 10 }}
+                          >
                             {translate('report.lowpriority') as string}
                           </Text>
                         </View>
@@ -798,7 +804,9 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                               margin: 5,
                             }}
                           />
-                          <Text style={{ color: colors.fgDefault, marginRight: 10 }}>
+                          <Text
+                            style={{ color: colors.fgDefault, marginRight: 10 }}
+                          >
                             {translate('report.highpriority') as string}
                           </Text>
                         </View>

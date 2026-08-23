@@ -23,19 +23,20 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
     <View
       onLayout={[Function]}
     >
-      <View
-        style={{}}
-      >
+      <View>
         <View
           style={
-            {
-              "alignItems": "center",
-              "backgroundColor": "#011401",
-              "display": "flex",
-              "minHeight": 50,
-              "paddingBottom": 10,
-              "paddingTop": 0,
-            }
+            [
+              {},
+              {
+                "alignItems": "center",
+                "backgroundColor": "#011401",
+                "display": "flex",
+                "minHeight": 50,
+                "paddingBottom": 10,
+                "paddingTop": 0,
+              },
+            ]
           }
           testID="header"
         >
@@ -716,22 +717,20 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                 }
               }
               testID="header.drawmenu"
-            >
-              <View
-                height={25}
-                width={25}
-              />
-            </View>
+            />
           </View>
         </View>
         <View
           style={
-            {
-              "padding": 13,
-              "position": "absolute",
-              "right": 0,
-              "top": 0,
-            }
+            [
+              {},
+              {
+                "padding": 13,
+                "position": "absolute",
+                "right": 0,
+                "top": 0,
+              },
+            ]
           }
         >
           <View
@@ -1858,14 +1857,8 @@ memo10"
       style={
         {
           "backgroundColor": "#031124",
-          "borderLeftColor": "#05234C",
-          "borderLeftWidth": 0.5,
-          "borderRightColor": "#05234C",
-          "borderRightWidth": 0.5,
-          "borderTopColor": "#05234C",
           "borderTopLeftRadius": 40,
           "borderTopRightRadius": 40,
-          "borderTopWidth": 1,
           "paddingHorizontal": 16,
           "paddingTop": 8,
         }
@@ -2152,19 +2145,20 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
     <View
       onLayout={[Function]}
     >
-      <View
-        style={{}}
-      >
+      <View>
         <View
           style={
-            {
-              "alignItems": "center",
-              "backgroundColor": "#011401",
-              "display": "flex",
-              "minHeight": 50,
-              "paddingBottom": 10,
-              "paddingTop": 0,
-            }
+            [
+              {},
+              {
+                "alignItems": "center",
+                "backgroundColor": "#011401",
+                "display": "flex",
+                "minHeight": 50,
+                "paddingBottom": 10,
+                "paddingTop": 0,
+              },
+            ]
           }
           testID="header"
         >
@@ -2378,22 +2372,20 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                 }
               }
               testID="header.drawmenu"
-            >
-              <View
-                height={25}
-                width={25}
-              />
-            </View>
+            />
           </View>
         </View>
         <View
           style={
-            {
-              "padding": 13,
-              "position": "absolute",
-              "right": 0,
-              "top": 0,
-            }
+            [
+              {},
+              {
+                "padding": 13,
+                "position": "absolute",
+                "right": 0,
+                "top": 0,
+              },
+            ]
           }
         >
           <View
@@ -3535,14 +3527,8 @@ memo10"
       style={
         {
           "backgroundColor": "#031124",
-          "borderLeftColor": "#05234C",
-          "borderLeftWidth": 0.5,
-          "borderRightColor": "#05234C",
-          "borderRightWidth": 0.5,
-          "borderTopColor": "#05234C",
           "borderTopLeftRadius": 40,
           "borderTopRightRadius": 40,
-          "borderTopWidth": 1,
           "paddingHorizontal": 16,
           "paddingTop": 8,
         }

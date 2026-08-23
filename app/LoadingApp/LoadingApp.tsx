@@ -749,12 +749,27 @@ export class LoadingAppClass extends Component<
         errorText = result.ok ? result.value : result.error.message;
       }
       if (error) {
-        await this.walletErrorHandle(
-          Utils.humanizeChainTokens(errorText, this.state.translate),
+        // Wallet-open failures are local and deterministic (undecodable
+        // file, chain mismatch, bad settings): the native layer opens
+        // Indexerless when only the server dial fails, so no open failure
+        // is server-caused. walletErrorHandle would diagnose this local
+        // error by probing the server, racing against its current state,
+        // and pick the alert text from whatever it happens to answer.
+        createAlert(
+          this.setBackgroundError,
+          this.addLastSnackbar,
           this.state.translate('loadingapp.readingwallet-label') as string,
-          RouteEnum.StartMenu,
-          true,
+          Utils.humanizeChainTokens(errorText, this.state.translate),
+          false,
+          this.state.translate,
+          sendEmail,
+          this.state.zingolibVersion,
         );
+        this.setState({
+          actionButtonsDisabled: false,
+          serverErrorTries: 0,
+          screen: RouteEnum.StartMenu,
+        });
       }
     } else {
       if (this.state.mode === ModeEnum.basic) {

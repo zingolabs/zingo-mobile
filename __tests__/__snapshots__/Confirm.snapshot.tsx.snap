@@ -20,19 +20,20 @@ exports[`Confirm - snapshots Confirm USD currency, privacy on 1`] = `
     <View
       onLayout={[Function]}
     >
-      <View
-        style={{}}
-      >
+      <View>
         <View
           style={
-            {
-              "alignItems": "center",
-              "backgroundColor": "#011401",
-              "display": "flex",
-              "minHeight": 50,
-              "paddingBottom": 10,
-              "paddingTop": 0,
-            }
+            [
+              {},
+              {
+                "alignItems": "center",
+                "backgroundColor": "#011401",
+                "display": "flex",
+                "minHeight": 50,
+                "paddingBottom": 10,
+                "paddingTop": 0,
+              },
+            ]
           }
           testID="header"
         >
@@ -76,12 +77,15 @@ exports[`Confirm - snapshots Confirm USD currency, privacy on 1`] = `
         </View>
         <View
           style={
-            {
-              "padding": 13,
-              "position": "absolute",
-              "right": 0,
-              "top": 0,
-            }
+            [
+              {},
+              {
+                "padding": 13,
+                "position": "absolute",
+                "right": 0,
+                "top": 0,
+              },
+            ]
           }
         >
           <Image
@@ -311,10 +315,18 @@ exports[`Confirm - snapshots Confirm USD currency, privacy on 1`] = `
             }
           }
         >
-          <ActivityIndicator
-            color="#18bd18"
-            size="small"
-          />
+          <Text
+            style={
+              {
+                "color": "#c3c3c3",
+                "fontSize": 15,
+                "fontWeight": "400",
+                "opacity": 1,
+              }
+            }
+          >
+            text translated
+          </Text>
         </View>
       </View>
     </View>
@@ -843,19 +855,20 @@ exports[`Confirm - snapshots Confirm no currency, privacy off 1`] = `
     <View
       onLayout={[Function]}
     >
-      <View
-        style={{}}
-      >
+      <View>
         <View
           style={
-            {
-              "alignItems": "center",
-              "backgroundColor": "#011401",
-              "display": "flex",
-              "minHeight": 50,
-              "paddingBottom": 10,
-              "paddingTop": 0,
-            }
+            [
+              {},
+              {
+                "alignItems": "center",
+                "backgroundColor": "#011401",
+                "display": "flex",
+                "minHeight": 50,
+                "paddingBottom": 10,
+                "paddingTop": 0,
+              },
+            ]
           }
           testID="header"
         >
@@ -899,12 +912,15 @@ exports[`Confirm - snapshots Confirm no currency, privacy off 1`] = `
         </View>
         <View
           style={
-            {
-              "padding": 13,
-              "position": "absolute",
-              "right": 0,
-              "top": 0,
-            }
+            [
+              {},
+              {
+                "padding": 13,
+                "position": "absolute",
+                "right": 0,
+                "top": 0,
+              },
+            ]
           }
         >
           <Image
@@ -1070,10 +1086,18 @@ exports[`Confirm - snapshots Confirm no currency, privacy off 1`] = `
             }
           }
         >
-          <ActivityIndicator
-            color="#18bd18"
-            size="small"
-          />
+          <Text
+            style={
+              {
+                "color": "#c3c3c3",
+                "fontSize": 15,
+                "fontWeight": "400",
+                "opacity": 1,
+              }
+            }
+          >
+            text translated
+          </Text>
         </View>
       </View>
     </View>

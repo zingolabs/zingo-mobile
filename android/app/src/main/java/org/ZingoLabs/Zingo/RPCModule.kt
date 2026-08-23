@@ -814,10 +814,17 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     // is ever encoded as error prose inside the success channel.
 
     @ReactMethod
-    fun attachMixnet(socks5Addr: String, promise: Promise) {
+    fun setBroadcastCandidates(candidatesJson: String, promise: Promise) {
+        FfiOutcome.settling(promise, "set_broadcast_candidates") {
+            uniffi.zingo.setBroadcastCandidates(candidatesJson)
+        }
+    }
+
+    @ReactMethod
+    fun attachMixnet(socks5Addr: String, exitNode: String, promise: Promise) {
         FfiOutcome.settling(promise, "attach_mixnet") {
             uniffi.zingo.initLogging()
-            uniffi.zingo.attachMixnet(socks5Addr)
+            uniffi.zingo.attachMixnet(socks5Addr, exitNode)
         }
     }
 
@@ -838,10 +845,10 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
-    fun mixnetModeInfo(promise: Promise) {
-        FfiOutcome.settling(promise, "mixnet_mode") {
+    fun mixnetIndicatorInfo(promise: Promise) {
+        FfiOutcome.settling(promise, "mixnet_indicator") {
             uniffi.zingo.initLogging()
-            uniffi.zingo.mixnetMode()
+            uniffi.zingo.mixnetIndicator()
         }
     }
 
@@ -850,14 +857,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         FfiOutcome.settling(promise, "mixnet_bootstrap_detail") {
             uniffi.zingo.initLogging()
             uniffi.zingo.mixnetBootstrapDetail()
-        }
-    }
-
-    @ReactMethod
-    fun mixnetIpCorrelationDisclaimerInfo(promise: Promise) {
-        FfiOutcome.settling(promise, "mixnet_ip_correlation_disclaimer") {
-            uniffi.zingo.initLogging()
-            uniffi.zingo.mixnetIpCorrelationDisclaimer()
         }
     }
 

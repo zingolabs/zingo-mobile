@@ -146,10 +146,10 @@ export default interface AppContextLoaded {
   setNymOption: (value: boolean) => Promise<void>;
 
   // Mixnet Mode (send-over-nym step 5). The screen-facing projection of the
-  // per-session policy, or null on a platform whose transport has not
-  // landed (iOS until the Mac-gated step) — screens render nothing and the
-  // send gate stays open when null. Disable is the deliberate per-session
-  // clearnet consent; re-enable recovers a died or failed transport.
+  // per-session policy, or null where the policy is not run (tests inject
+  // mixnetSupported false) — screens render nothing and the send gate stays
+  // open when null. Disable is the deliberate per-session clearnet consent;
+  // re-enable recovers a died or failed transport.
   mixnetView: MixnetView | null;
   disableMixnet: () => Promise<void>;
   reenableMixnet: () => Promise<void>;

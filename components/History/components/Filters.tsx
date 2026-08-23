@@ -215,9 +215,7 @@ const Filters: React.FunctionComponent<FiltersProps> = ({
               >
                 <FadeText
                   style={{
-                    color: filterFailedLocal
-                      ? colors.bgChrome
-                      : colors.fgMuted,
+                    color: filterFailedLocal ? colors.bgChrome : colors.fgMuted,
                     fontWeight: 'bold',
                   }}
                 >
@@ -236,7 +234,9 @@ const Filters: React.FunctionComponent<FiltersProps> = ({
                     ? colors.bgAccent
                     : colors.bgChrome,
                   borderRadius: 15,
-                  borderColor: filterMemosLocal ? colors.borderAccent : colors.borderMuted,
+                  borderColor: filterMemosLocal
+                    ? colors.borderAccent
+                    : colors.borderMuted,
                   borderWidth: 1,
                   paddingHorizontal: 10,
                   paddingVertical: 5,
@@ -245,9 +245,7 @@ const Filters: React.FunctionComponent<FiltersProps> = ({
               >
                 <FadeText
                   style={{
-                    color: filterMemosLocal
-                      ? colors.bgChrome
-                      : colors.fgMuted,
+                    color: filterMemosLocal ? colors.bgChrome : colors.fgMuted,
                     fontWeight: 'bold',
                   }}
                 >

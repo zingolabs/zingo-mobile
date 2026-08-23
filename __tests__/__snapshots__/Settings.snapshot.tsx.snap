@@ -27,19 +27,20 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
     <View
       onLayout={[Function]}
     >
-      <View
-        style={{}}
-      >
+      <View>
         <View
           style={
-            {
-              "alignItems": "center",
-              "backgroundColor": "#011401",
-              "display": "flex",
-              "minHeight": 50,
-              "paddingBottom": 10,
-              "paddingTop": 0,
-            }
+            [
+              {},
+              {
+                "alignItems": "center",
+                "backgroundColor": "#011401",
+                "display": "flex",
+                "minHeight": 50,
+                "paddingBottom": 10,
+                "paddingTop": 0,
+              },
+            ]
           }
           testID="header"
         >
@@ -115,22 +116,20 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
                 }
               }
               testID="header.drawmenu"
-            >
-              <View
-                height={25}
-                width={25}
-              />
-            </View>
+            />
           </View>
         </View>
         <View
           style={
-            {
-              "padding": 13,
-              "position": "absolute",
-              "right": 0,
-              "top": 0,
-            }
+            [
+              {},
+              {
+                "padding": 13,
+                "position": "absolute",
+                "right": 0,
+                "top": 0,
+              },
+            ]
           }
         >
           <Image

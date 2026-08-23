@@ -16,6 +16,7 @@ import BoldText from '../../Components/BoldText';
 import FadeText from '../../Components/FadeText';
 import RegText from '../../Components/RegText';
 import Button from '../../Components/Button';
+import SheetRim from '../../Components/SheetRim';
 
 /**
  * Informational sheet that surfaces the raw error(s) returned by the fee
@@ -93,14 +94,9 @@ const SendErrorSheet = forwardRef<BottomSheetModal, SendErrorSheetProps>(
             backgroundColor: colors.bgSurface,
             borderTopLeftRadius: 40,
             borderTopRightRadius: 40,
-            borderTopWidth: 1,
-            borderLeftWidth: 0.5,
-            borderRightWidth: 0.5,
-            borderTopColor: colors.bottomSheetBorder,
-            borderLeftColor: colors.bottomSheetBorder,
-            borderRightColor: colors.bottomSheetBorder,
           }}
         >
+          <SheetRim />
           <View
             style={{
               flexDirection: 'row',
@@ -121,7 +117,11 @@ const SendErrorSheet = forwardRef<BottomSheetModal, SendErrorSheetProps>(
               hitSlop={8}
               style={{ padding: 14 }}
             >
-              <FontAwesomeIcon icon={faXmark} size={20} color={colors.fgDefault} />
+              <FontAwesomeIcon
+                icon={faXmark}
+                size={20}
+                color={colors.fgDefault}
+              />
             </Pressable>
           </View>
         </View>

@@ -19,7 +19,11 @@ mockSyncingStatus.session_sapling_outputs_scanned = 0;
 mockSyncingStatus.total_sapling_outputs_scanned = 0;
 mockSyncingStatus.session_orchard_outputs_scanned = 0;
 mockSyncingStatus.total_orchard_outputs_scanned = 0;
+mockSyncingStatus.session_ironwood_outputs_scanned = 0;
+mockSyncingStatus.total_ironwood_outputs_scanned = 0;
 mockSyncingStatus.percentage_session_outputs_scanned = 0;
 mockSyncingStatus.percentage_total_outputs_scanned = 100;
+mockSyncingStatus.total_outputs_scanned = 0;
+mockSyncingStatus.total_outputs = 0;
 
 export default mockSyncingStatus;

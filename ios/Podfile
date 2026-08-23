@@ -5,7 +5,11 @@ require Pod::Executable.execute_command('node', ['-p',
   {paths: [process.argv[1]]},
 )', __dir__]).strip
 
-platform :ios, min_ios_version_supported
+# Must match IPHONEOS_DEPLOYMENT_TARGET in Zingo.xcodeproj. Higher than the
+# 15.1 React Native declares, so the pods cannot be left on the RN default.
+IOS_DEPLOYMENT_TARGET = '16.0'
+
+platform :ios, IOS_DEPLOYMENT_TARGET
 prepare_react_native_project!
  
 linkage = ENV['USE_FRAMEWORKS']
@@ -32,11 +36,10 @@ target 'Zingo' do
   end
 
   post_install do |installer|
-    min = min_ios_version_supported.to_s
     installer.pods_project.targets.each do |t|
       t.build_configurations.each do |cfg|
-        cfg.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = min
-        cfg.build_settings['IPHONEOS_DEPLOYMENT_TARGET[sdk=iphonesimulator*]'] = min
+        cfg.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = IOS_DEPLOYMENT_TARGET
+        cfg.build_settings['IPHONEOS_DEPLOYMENT_TARGET[sdk=iphonesimulator*]'] = IOS_DEPLOYMENT_TARGET
       end
     end
 

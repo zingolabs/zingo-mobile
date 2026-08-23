@@ -373,11 +373,11 @@
     "currency-title": "Precio de la Moneda",
     "language-title": "Idioma",
     "islanguage": "Necesitas escoger un Idioma para poder guardar.",
-    "sendall-title": "El Botón 'MÁX'",
+    "sendall-title": "Habilitar el envío de todos los fondos",
     "donation-title": "Propina para ZingoLabs",
     "privacy-title": "High Privacy",
     "mode-title": "Cambiar entre Modo Básico o Avanzado",
-    "rescanmenu-title": "La Opción de Menú Re-Escanear",
+    "rescanmenu-title": "Mostrar el botón de reescaneo",
     "recoverywalletinfoondevice-title": "Almacenar la información de recuperación del monedero",
     "performancelevel-title": "Zingolib Performance Level",
     "blockexplorer-title": "Block Explorer",
@@ -445,9 +445,10 @@
     "walletkeyssaved": "La ultima información de recuperacion del Monedero almacenada de forma segura en el dispositivo.",
     "walletkeyswarning": "Esta es una función experimental que depende de la seguridad de código no auditado para almacenar tu frase semilla. ¡Por favor, no la utilices con semillas que controlen fondos significativos!",
     "value-language-tr": "Turco",
-    "nym-privacy-network": "Red de Privacidad",
-    "nym-network": "Red NYM",
-    "nym-enhanced-privacy": "Privacidad Mejorada"
+    "nym-disable-warning": "Desactivar el modo Mixnet enruta tus transacciones y consultas de precio por la red abierta y vincula tu actividad con tu dirección IP.",
+    "nym-network": "NYM Mixnet",
+    "nym-enhanced-privacy": "Privacidad Mejorada",
+    "nym-diagnostics": "Ejecutar diagnóstico de mixnet"
   },
   "mixnet": {
     "status": {
@@ -457,8 +458,16 @@
       "died": "Conexión mixnet perdida",
       "unknown": "Mixnet no disponible"
     },
-    "send-blocked": "El envío está pausado hasta que la mixnet esté lista",
     "reenable": "Reactivar mixnet"
+  },
+  "mixnetdoctor": {
+    "title": "Doctor de Mixnet",
+    "title-acc": "Pantalla de diagnóstico del Doctor de Mixnet",
+    "intro": "Comprueba si el mixnet es accesible desde tu dispositivo usando tu dirección IP real.",
+    "run": "Ejecutar diagnóstico",
+    "running": "Ejecutando…",
+    "copy-report": "Copiar informe",
+    "report-copied": "Informe copiado al portapapeles"
   },
   "header": {
     "lastupdate": "Última actualización:"
@@ -609,9 +618,9 @@
     "danger-zone": "ZONA DE RIESGO",
     "go-to-transparent": "Ir a dirección transparente expuesta",
     "title-acc": "Pantalla de Recibir",
-    "shielded-orchard": "Solo Orchard",
+    "shielded-orchard": "Solo Orchard (Ironwood)",
     "shielded-sapling": "Solo Sapling",
-    "shielded-orchard-sapling": "Orchard+Sapling",
+    "shielded-orchard-sapling": "Orchard (Ironwood) + Sapling",
     "verify": "Verificar direcciones",
     "copy-address-button": "Copiar direccion",
     "modal-transparent": {
@@ -651,9 +660,9 @@
     "shield-title-all": "Blindar Todos los fondos",
     "shield-title-transparent": "Blindar fondos",
     "shield-title-sapling": "Asignar fondos a la última versión",
-    "shield-alert-all": "Confirmar para asignar todos tus fondos al último pool blindado Orchard.",
-    "shield-alert-transparent": "Confirmar para blindar tus fondos al último pool blindado Orchard.",
-    "shield-alert-sapling": "Confirmar para asignar tus fondos al último pool blindado Orchard",
+    "shield-alert-all": "Confirmar para asignar todos tus fondos al último pool blindado Ironwood.",
+    "shield-alert-transparent": "Confirmar para blindar tus fondos al último pool blindado Ironwood.",
+    "shield-alert-sapling": "Confirmar para asignar tus fondos al último pool blindado Ironwood",
     "title": "Histórico",
     "more": "ver más...",
     "refreshing": "Refrescando",
@@ -671,6 +680,7 @@
     "sending": "...Enviando... ",
     "receiving": "...Recibiendo... ",
     "sendingtoself": "...Auto-Enviando... ",
+    "sendingmemotoself": "...Memo-Auto-Enviando... ",
     "shielding": "...Blindando... ",
     "rejection": "Rechazo ",
     "migration": "Migración ",
@@ -799,10 +809,10 @@
   },
   "pools": {
     "title": "Agrupaciones de Fondos",
-    "ironwood-title": "IRONWOOD",
+    "ironwood-title": "IRONWOOD (UA)",
     "ironwood-balance": "Cantidad Total",
     "ironwood-confirmed-balance": "Cantidad confirmada",
-    "orchard-title": "ORCHARD (UA)",
+    "orchard-title": "ORCHARD (heredado)",
     "orchard-balance": "Cantidad Total",
     "orchard-confirmed-balance": "Cantidad confirmada",
     "sapling-title": "SAPLING (Privada)",
@@ -863,10 +873,14 @@
     "now-body": "Una sola transferencia, lista en minutos. Todo tu saldo de **{amount}** queda visible públicamente en la cadena, y tu IP quedará asociada a él a menos que uses ##NYM/Tor##.",
     "private-label": "Migrar en privado",
     "private-body": "Reparte las transferencias a lo largo de ~3 días en cantidades estándar, mezclándose con otros usuarios. Requiere abrir la app varias veces.",
-    "coming-soon": "Próximamente",
     "back": "Atrás",
     "start": "Aceptar",
-    "close": "Cerrar"
+    "close": "Cerrar",
+    "nym-gate-title": "Privacidad con NYM",
+    "nym-gate-body": "Recomendamos usar la mixnet NYM para evitar la correlación entre tu IP y tu saldo.",
+    "nym-gate-enable": "Activar NYM",
+    "nym-gate-continue": "Continuar sin NYM",
+    "nym-gate-connecting": "Conectando…"
   },
   "migrationsending": {
     "title": "Enviando transacciones",
@@ -916,6 +930,9 @@
     "replanned": "Tus notas cambiaron — revisa el plan actualizado.",
     "nothing-title": "Nada que migrar",
     "nothing-body": "Tu pool de Orchard no tiene fondos que valga la pena migrar ahora mismo.",
+    "pending-title": "Las notas no están listas",
+    "pending-body": "La cartera tiene fondos Orchard, pero no se pueden gastar ahora. Espere más bloques. Después intente otra vez.",
+    "retry": "Intentar otra vez",
     "nosplit-title": "No hace falta dividir",
     "nosplit-body": "Tus notas de Orchard ya tienen el tamaño correcto, así que no hay nada que dividir. Puedes pasar directamente a programar la migración.",
     "nosplit-ready": "Listas para migrar",
@@ -1034,6 +1051,9 @@
     "broadcast-error-title": "No se pudo iniciar la migración",
     "nothing-title": "Nada que migrar",
     "nothing-body": "Tu pool de Orchard no tiene fondos que valga la pena migrar ahora mismo.",
+    "pending-title": "Las notas no están listas",
+    "pending-body": "La cartera tiene fondos Orchard, pero no se pueden gastar ahora. Espere más bloques. Después intente otra vez.",
+    "retry": "Intentar otra vez",
     "success": "Transacciones de migración transmitidas.",
     "submitting": "Enviando…",
     "back": "Atrás",

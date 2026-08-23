@@ -1,0 +1,103 @@
+name: Mixnet proxy shim checks
+
+on:
+  workflow_call:
+    inputs:
+      # Fail-all (see CONTEXT.md): when true, a failure here cancels the
+      # whole run. PR CI opts in; ci-nightly does not.
+      fail-all:
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  nym-proxy-ffi-check:
+    name: shim check, clippy, fmt, tests
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      # zingo-netutils reaches lightwallet-protocol, whose build script
+      # generates its prost bindings and refuses to run without protoc. The
+      # Android lanes install it for the same reason.
+      - name: Install protobuf-compiler
+        run: sudo apt-get update && sudo apt-get install -y protobuf-compiler
+
+      # The shim is excluded from the main workspace (own lockfile, see
+      # rust/Cargo.toml), so workspace-wide jobs never touch it. This job
+      # is its only host-side verdict.
+      - name: Cache the shim build
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            rust/nym-proxy-ffi/target
+          key: nym-proxy-ffi-${{ runner.os }}-${{ hashFiles('rust/nym-proxy-ffi/Cargo.lock') }}
+
+      - name: Install cargo-nextest
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-nextest@0.9.98
+
+      - name: Format check
+        working-directory: ./rust/nym-proxy-ffi
+        run: cargo fmt --check
+
+      # --workspace covers the tls-init member; its JNI body is
+      # Android-gated, so the host lanes prove the workspace shape and the
+      # release cross-build proves the JNI code.
+      - name: Check
+        working-directory: ./rust/nym-proxy-ffi
+        run: cargo check --locked --workspace --all-targets
+
+      - name: Clippy
+        working-directory: ./rust/nym-proxy-ffi
+        run: cargo clippy --locked --workspace --all-targets -- -D warnings
+
+      - name: Tests
+        working-directory: ./rust/nym-proxy-ffi
+        run: cargo nextest run --locked --workspace
+
+      - name: Cancel the run on failure (fail-all)
+        if: ${{ failure() && inputs.fail-all }}
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.actions.cancelWorkflowRun({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.runId,
+            });
+
+  # Starts the real proxy against the mixnet, handshakes its SOCKS5 listener,
+  # and stops it. Not part of the fail-all job above.
+  nym-proxy-ffi-live:
+    name: live mixnet start
+    needs: nym-proxy-ffi-check
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Install protobuf-compiler
+        run: sudo apt-get update && sudo apt-get install -y protobuf-compiler
+
+      - name: Cache the shim build
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            rust/nym-proxy-ffi/target
+          key: nym-proxy-ffi-${{ runner.os }}-${{ hashFiles('rust/nym-proxy-ffi/Cargo.lock') }}
+
+      - name: Install cargo-nextest
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-nextest@0.9.98
+
+      - name: Live mixnet start
+        working-directory: ./rust/nym-proxy-ffi
+        run: cargo nextest run --locked --features live-mixnet --test live_mixnet

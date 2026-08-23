@@ -12,5 +12,5 @@ export type RPCParseAddressType = {
     | RPCAddressKindEnum.transparentAddressKind
     | RPCAddressKindEnum.texAddressKind;
   receivers_available?: RPCReceiversEnum[];
-  only_orchard_ua?: string;
+  shielded_only_ua?: string;
 };

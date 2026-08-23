@@ -18,7 +18,11 @@ import {
   StyleSheet,
 } from 'react-native';
 import Animated from 'react-native-reanimated';
-import { NavigationProp, ParamListBase, useNavigation } from '@react-navigation/native';
+import {
+  NavigationProp,
+  ParamListBase,
+  useNavigation,
+} from '@react-navigation/native';
 import { useTheme } from '../../app/theme';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faAngleUp, faXmark } from '@fortawesome/free-solid-svg-icons';
@@ -40,6 +44,8 @@ import {
 import { AppDrawerParamList } from '../../app/types';
 import FadeText from '../Components/FadeText';
 import BoldText from '../Components/BoldText';
+import SheetRim from '../Components/SheetRim';
+import RingBorder from '../Components/RingBorder';
 import ValueTransferLine from './components/ValueTransferLine';
 import IronwoodMigrationBanner from './components/IronwoodMigrationBanner';
 import { ContextAppLoaded } from '../../app/context';
@@ -664,14 +670,9 @@ const History: React.FunctionComponent<HistoryProps> = ({
           backgroundColor: colors.bgSurface,
           borderTopLeftRadius: 40,
           borderTopRightRadius: 40,
-          borderTopWidth: 1,
-          borderLeftWidth: 0.5,
-          borderRightWidth: 0.5,
-          borderTopColor: colors.bottomSheetBorder,
-          borderLeftColor: colors.bottomSheetBorder,
-          borderRightColor: colors.bottomSheetBorder,
         }}
       >
+        <SheetRim />
         <View
           style={{
             flexDirection: 'row',
@@ -741,14 +742,9 @@ const History: React.FunctionComponent<HistoryProps> = ({
           backgroundColor: colors.bgSurface,
           borderTopLeftRadius: 40,
           borderTopRightRadius: 40,
-          borderTopWidth: 1,
-          borderLeftWidth: 0.5,
-          borderRightWidth: 0.5,
-          borderTopColor: colors.bottomSheetBorder,
-          borderLeftColor: colors.bottomSheetBorder,
-          borderRightColor: colors.bottomSheetBorder,
         }}
       >
+        <SheetRim />
         <View
           style={{
             flexDirection: 'row',
@@ -990,18 +986,23 @@ const History: React.FunctionComponent<HistoryProps> = ({
               // previous `30` left it visually overlapping the tabs.
               bottom: 105,
               right: 10,
-              paddingHorizontal: 5,
-              paddingVertical: 10,
+              width: 36,
+              height: 36,
+              alignItems: 'center',
+              justifyContent: 'center',
               backgroundColor: colors.bgChrome,
               borderRadius: 50,
               transform: [{ scale: pressed ? 0.9 : 1 }],
-              borderWidth: 1,
-              borderColor: colors.borderMuted,
               opacity: isScrollingToTop ? 0.5 : 1,
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 3 },
+              shadowOpacity: 0.8,
+              shadowRadius: 14,
+              elevation: 9,
             })}
           >
+            <RingBorder size={36} />
             <FontAwesomeIcon
-              style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
               size={16}
               icon={faAngleUp}
               color={colors.fgMuted}

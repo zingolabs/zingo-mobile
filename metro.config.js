@@ -1,4 +1,6 @@
 const { getDefaultConfig, mergeConfig } = require('@react-native/metro-config');
+const exclusionList =
+  require('metro-config/private/defaults/exclusionList').default;
 
 /**
  * Metro configuration
@@ -27,6 +29,10 @@ const config = {
   resolver: {
     assetExts: assetExts.filter(ext => ext !== 'svg'),
     sourceExts: [...sourceExts, 'svg'],
+    // Cargo creates and deletes temp files under the Rust target directories
+    // while a build runs. Without watchman, Metro's fallback watcher follows
+    // one, then exits on ENOENT.
+    blockList: exclusionList([/\/rust\/(?:[^/]+\/)?target\/.*/]),
   },
 };
 
