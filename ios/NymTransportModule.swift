@@ -3,7 +3,7 @@
 //  Zingo
 //
 //  The iOS half of Mixnet Mode, a mirror of the Android NymTransportModule.
-//  It hosts the UniFFI proxy shim (`zingo_nym_proxy_ffi`) inside the app
+//  It hosts the mixnet proxy (`mixnet_proxy`) inside the app
 //  process and offers its local SOCKS5 endpoint to the app layer, which hands
 //  it to the wallet's `attach_mixnet` seam. The loopback socket, not a shared
 //  compile unit, is the boundary between the two lockfile-incompatible stacks.
@@ -12,7 +12,7 @@
 //  binding — the `host:port` endpoint and the Exit Node it bound, both of
 //  which the wallet's attach seam requires; `stopMixnetTransport` is the
 //  deliberate teardown.
-//  A proxy that dies on its own is caught by the shim's liveness monitor; the
+//  A proxy that dies on its own is caught by the proxy's liveness monitor; the
 //  observer clears the stored handle so a later re-enable starts afresh, while
 //  the wallet's own probe surfaces the `died` mode the app polls.
 //

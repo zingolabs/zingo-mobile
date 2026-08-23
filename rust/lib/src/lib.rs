@@ -3405,13 +3405,13 @@ fn mixnet_indicator_string(indicator: zingolib::mixnet::Indicator) -> &'static s
 }
 
 /// Attach Mixnet Mode to an already-running, platform-hosted SOCKS5 endpoint
-/// (the UniFFI proxy shim's address) that bound `exit_node`. Readiness is
+/// (the mixnet proxy's address) that bound `exit_node`. Readiness is
 /// validated by a data round trip; poll [`mixnet_indicator`] for
 /// `bootstrapping` -> `ready`, or `died`.
 pub fn attach_mixnet(socks5_addr: String, exit_node: String) -> Result<String, ZingolibError> {
     with_panic_guard(|| {
         let exit = zingolib::mixnet::ExitNodeId::parse(&exit_node)
-            .map_err(|_| ZingolibError::Mixnet("the shim reported no exit node".to_string()))?;
+            .map_err(|_| ZingolibError::Mixnet("the proxy reported no exit node".to_string()))?;
         let mut guard = LIGHTCLIENT
             .write()
             .map_err(|_| ZingolibError::LightclientLockPoisoned)?;

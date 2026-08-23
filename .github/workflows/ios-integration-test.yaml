@@ -51,8 +51,8 @@ jobs:
           path: |
             ios/Zingolib.xcframework
             ios/zingo.swift
-            ios/ZingoNymProxyFFI.xcframework
-            ios/zingo_nym_proxy_ffi.swift
+            ios/MixnetProxy.xcframework
+            ios/mixnet_proxy.swift
           key: native-ios-xcframework-${{ env.CACHE-KEY }}
           fail-on-cache-miss: true
 

@@ -246,9 +246,9 @@ android {
 
     sourceSets {
         getByName("test") {
-            // The nym proxy shim's Kotlin wire-contract test, read from the
+            // The nym mixnet proxy's Kotlin wire-contract test, read from the
             // crate itself. No copy lives under src/test.
-            java.srcDir("../../rust/nym-proxy-ffi/contract-tests/kotlin")
+            java.srcDir("../../rust/mixnet-proxy/contract-tests/kotlin")
         }
     }
 
@@ -259,7 +259,7 @@ android {
             it.systemProperty(
                 "zingo.golden.dir",
                 layout.projectDirectory
-                    .dir("../../rust/nym-proxy-ffi/test-data/golden")
+                    .dir("../../rust/mixnet-proxy/test-data/golden")
                     .asFile.absolutePath
             )
         }

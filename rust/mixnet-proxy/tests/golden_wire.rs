@@ -19,8 +19,8 @@
 
 use std::{fs, path::PathBuf};
 
+use mixnet_proxy::{ProxyDeathReason, ProxyFfiError, Socks5Endpoint, UniFfiTag};
 use uniffi::{Lift, Lower};
-use zingo_nym_proxy_ffi::{ProxyDeathReason, ProxyFfiError, Socks5Endpoint, UniFfiTag};
 
 /// The canonical endpoint values, shared verbatim with the Kotlin and Swift
 /// suites, changed only together with all three suites while minting new

@@ -90,23 +90,23 @@ try {
     ]);
   }
 
-  console.log('\n=== Extracting Nym shim .so artifacts ===');
+  console.log('\n=== Extracting mixnet proxy .so artifacts ===');
   for (const { triple, jniDir } of ABIS) {
     run('docker', [
       'cp',
-      `${containerId}:/opt/zingo/rust/nym-proxy-ffi/target/${triple}/release/libzingo_nym_proxy_ffi.so`,
-      join(JNI_PATH, jniDir, 'libzingo_nym_proxy_ffi.so'),
+      `${containerId}:/opt/zingo/rust/mixnet-proxy/target/${triple}/release/libmixnet_proxy.so`,
+      join(JNI_PATH, jniDir, 'libmixnet_proxy.so'),
     ]);
   }
 
-  console.log('\n=== Extracting Nym shim Kotlin bindings ===');
+  console.log('\n=== Extracting mixnet proxy Kotlin bindings ===');
   for (const variant of ['debug', 'release']) {
-    const shimKtDir = join(UNIFFI_PATH, variant, 'java', 'uniffi', 'zingo_nym_proxy_ffi');
-    mkdirSync(shimKtDir, { recursive: true });
+    const proxyKtDir = join(UNIFFI_PATH, variant, 'java', 'uniffi', 'mixnet_proxy');
+    mkdirSync(proxyKtDir, { recursive: true });
     run('docker', [
       'cp',
-      `${containerId}:/opt/zingo/rust/nym-proxy-ffi/generated-kotlin/uniffi/zingo_nym_proxy_ffi/zingo_nym_proxy_ffi.kt`,
-      join(shimKtDir, 'zingo_nym_proxy_ffi.kt'),
+      `${containerId}:/opt/zingo/rust/mixnet-proxy/generated-kotlin/uniffi/mixnet_proxy/mixnet_proxy.kt`,
+      join(proxyKtDir, 'mixnet_proxy.kt'),
     ]);
   }
 } finally {

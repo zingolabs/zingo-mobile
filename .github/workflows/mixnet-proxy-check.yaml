@@ -1,4 +1,4 @@
-name: Mixnet proxy shim checks
+name: Mixnet proxy checks
 
 on:
   workflow_call:
@@ -11,8 +11,8 @@ on:
         default: false
 
 jobs:
-  nym-proxy-ffi-check:
-    name: shim check, clippy, fmt, tests
+  mixnet-proxy-check:
+    name: proxy check, clippy, fmt, tests
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout repository
@@ -24,17 +24,17 @@ jobs:
       - name: Install protobuf-compiler
         run: sudo apt-get update && sudo apt-get install -y protobuf-compiler
 
-      # The shim is excluded from the main workspace (own lockfile, see
+      # The proxy is excluded from the main workspace (own lockfile, see
       # rust/Cargo.toml), so workspace-wide jobs never touch it. This job
       # is its only host-side verdict.
-      - name: Cache the shim build
+      - name: Cache the proxy build
         uses: actions/cache@v4
         with:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
-            rust/nym-proxy-ffi/target
-          key: nym-proxy-ffi-${{ runner.os }}-${{ hashFiles('rust/nym-proxy-ffi/Cargo.lock') }}
+            rust/mixnet-proxy/target
+          key: mixnet-proxy-${{ runner.os }}-${{ hashFiles('rust/mixnet-proxy/Cargo.lock') }}
 
       - name: Install cargo-nextest
         uses: taiki-e/install-action@v2
@@ -42,22 +42,22 @@ jobs:
           tool: cargo-nextest@0.9.98
 
       - name: Format check
-        working-directory: ./rust/nym-proxy-ffi
+        working-directory: ./rust/mixnet-proxy
         run: cargo fmt --check
 
       # --workspace covers the tls-init member; its JNI body is
       # Android-gated, so the host lanes prove the workspace shape and the
       # release cross-build proves the JNI code.
       - name: Check
-        working-directory: ./rust/nym-proxy-ffi
+        working-directory: ./rust/mixnet-proxy
         run: cargo check --locked --workspace --all-targets
 
       - name: Clippy
-        working-directory: ./rust/nym-proxy-ffi
+        working-directory: ./rust/mixnet-proxy
         run: cargo clippy --locked --workspace --all-targets -- -D warnings
 
       - name: Tests
-        working-directory: ./rust/nym-proxy-ffi
+        working-directory: ./rust/mixnet-proxy
         run: cargo nextest run --locked --workspace
 
       - name: Cancel the run on failure (fail-all)
@@ -73,9 +73,9 @@ jobs:
 
   # Starts the real proxy against the mixnet, handshakes its SOCKS5 listener,
   # and stops it. Not part of the fail-all job above.
-  nym-proxy-ffi-live:
+  mixnet-proxy-live:
     name: live mixnet start
-    needs: nym-proxy-ffi-check
+    needs: mixnet-proxy-check
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout repository
@@ -84,14 +84,14 @@ jobs:
       - name: Install protobuf-compiler
         run: sudo apt-get update && sudo apt-get install -y protobuf-compiler
 
-      - name: Cache the shim build
+      - name: Cache the proxy build
         uses: actions/cache@v4
         with:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
-            rust/nym-proxy-ffi/target
-          key: nym-proxy-ffi-${{ runner.os }}-${{ hashFiles('rust/nym-proxy-ffi/Cargo.lock') }}
+            rust/mixnet-proxy/target
+          key: mixnet-proxy-${{ runner.os }}-${{ hashFiles('rust/mixnet-proxy/Cargo.lock') }}
 
       - name: Install cargo-nextest
         uses: taiki-e/install-action@v2
@@ -99,5 +99,5 @@ jobs:
           tool: cargo-nextest@0.9.98
 
       - name: Live mixnet start
-        working-directory: ./rust/nym-proxy-ffi
+        working-directory: ./rust/mixnet-proxy
         run: cargo nextest run --locked --features live-mixnet --test live_mixnet

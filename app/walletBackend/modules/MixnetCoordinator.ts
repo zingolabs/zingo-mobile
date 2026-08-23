@@ -10,7 +10,7 @@
  * and only a deliberate disable stops the reconnect loop.
  *
  * The transport start is an injected seam (`StartMixnetTransport`) because
- * the platform owns it: on Android the UniFFI proxy shim (step 3 of the
+ * the platform owns it: on Android the mixnet proxy (step 3 of the
  * critical path) supplies it; tests supply a stub. This coordinator owns
  * cadence and policy only — every payload decision lives in the pure
  * transforms, and every screen projection in the pure presenter.

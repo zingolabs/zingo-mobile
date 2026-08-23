@@ -50,7 +50,7 @@ export type WalletBackendConfig = {
   /** Called with each new screen-facing Mixnet Mode projection. */
   onMixnetViewChanged: (view: MixnetView) => void;
   /**
-   * Starts the platform-hosted mixnet transport (the UniFFI proxy shim on
+   * Starts the platform-hosted mixnet transport (the mixnet proxy on
    * Android) and yields its local SOCKS5 address. Injected because the
    * platform owns the transport; tests supply a stub.
    */

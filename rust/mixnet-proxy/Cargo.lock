@@ -3514,6 +3514,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "mixnet-proxy"
+version = "0.1.0"
+dependencies = [
+ "android_logger",
+ "log",
+ "thiserror 2.0.20",
+ "tokio",
+ "tracing",
+ "tracing-subscriber",
+ "uniffi",
+ "zingo-netutils",
+]
+
+[[package]]
 name = "ml-dsa"
 version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -9128,20 +9142,6 @@ dependencies = [
  "tonic",
  "tower",
  "zingo-net-diag",
-]
-
-[[package]]
-name = "zingo-nym-proxy-ffi"
-version = "0.1.0"
-dependencies = [
- "android_logger",
- "log",
- "thiserror 2.0.20",
- "tokio",
- "tracing",
- "tracing-subscriber",
- "uniffi",
- "zingo-netutils",
 ]
 
 [[package]]

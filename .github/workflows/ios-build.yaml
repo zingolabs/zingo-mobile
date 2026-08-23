@@ -42,8 +42,8 @@ jobs:
           path: |
             ios/Zingolib.xcframework
             ios/zingo.swift
-            ios/ZingoNymProxyFFI.xcframework
-            ios/zingo_nym_proxy_ffi.swift
+            ios/MixnetProxy.xcframework
+            ios/mixnet_proxy.swift
           key: native-ios-xcframework-${{ env.CACHE-KEY }}
           lookup-only: true
 
@@ -156,8 +156,8 @@ jobs:
           path: |
             ios/Zingolib.xcframework
             ios/zingo.swift
-            ios/ZingoNymProxyFFI.xcframework
-            ios/zingo_nym_proxy_ffi.swift
+            ios/MixnetProxy.xcframework
+            ios/mixnet_proxy.swift
           retention-days: 3
 
   cache-native-ios-uniffi:
@@ -187,6 +187,6 @@ jobs:
           path: |
             ios/Zingolib.xcframework
             ios/zingo.swift
-            ios/ZingoNymProxyFFI.xcframework
-            ios/zingo_nym_proxy_ffi.swift
+            ios/MixnetProxy.xcframework
+            ios/mixnet_proxy.swift
           key: native-ios-xcframework-${{ env.CACHE-KEY }}

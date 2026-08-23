@@ -222,7 +222,7 @@ describe('MixnetCoordinator', () => {
   it('a transport-start failure publishes the failure view and offers re-enable, never clearnet', async () => {
     const startTransport = jest
       .fn()
-      .mockRejectedValue(new Error('shim missing'));
+      .mockRejectedValue(new Error('proxy missing'));
     const published: MixnetView[] = [];
     const coordinator = new MixnetCoordinator(startTransport, noopStop, view =>
       published.push(view),
@@ -270,7 +270,7 @@ describe('MixnetCoordinator', () => {
   it('keeps sends blocked when the first poll after a transport failure reports off (#1226)', async () => {
     const startTransport = jest
       .fn()
-      .mockRejectedValue(new Error('shim missing'));
+      .mockRejectedValue(new Error('proxy missing'));
     const published: MixnetView[] = [];
     const coordinator = new MixnetCoordinator(startTransport, noopStop, view =>
       published.push(view),

@@ -1,8 +1,8 @@
 name: Kotlin UniFFI bindings
 description: >
-  Generates the wallet and Nym proxy shim Kotlin bindings into
+  Generates the wallet and mixnet proxy Kotlin bindings into
   android/app/build/generated/source/uniffi/<variant>/java with
-  scripts/generate_kotlin_bindings.mjs. Builds the shim for the host.
+  scripts/generate_kotlin_bindings.mjs. Builds the proxy for the host.
 
 inputs:
   variants:
@@ -21,15 +21,15 @@ runs:
       shell: bash
       run: rustup default stable
 
-    - name: Cache the bindgen and shim builds
+    - name: Cache the bindgen and proxy builds
       uses: actions/cache@v4
       with:
         path: |
           ~/.cargo/registry
           ~/.cargo/git
           rust/target
-          rust/nym-proxy-ffi/target
-        key: kotlin-bindings-${{ runner.os }}-${{ hashFiles('rust/Cargo.lock', 'rust/nym-proxy-ffi/Cargo.lock') }}
+          rust/mixnet-proxy/target
+        key: kotlin-bindings-${{ runner.os }}-${{ hashFiles('rust/Cargo.lock', 'rust/mixnet-proxy/Cargo.lock') }}
 
     - name: Generate Kotlin bindings
       shell: bash

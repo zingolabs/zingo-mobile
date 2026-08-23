@@ -1,21 +1,21 @@
-//! Cross-compile the mixnet proxy shim for Android and lay out its package.
+//! Cross-compile the mixnet proxy for Android and lay out its package.
 //!
-//! The shim (`zingo-nym-proxy-ffi`, ADR 0011 mobile amendment) lives at
-//! `rust/nym-proxy-ffi`, excluded from the workspace with its own lockfile, so ordinary wallet
+//! The proxy (`mixnet-proxy`, ADR 0011 mobile amendment) lives at
+//! `rust/mixnet-proxy`, excluded from the workspace with its own lockfile, so ordinary wallet
 //! builds never produce it (nym-sdk's `crypto-common` cannot share the wallet
 //! lock). This tool release-builds it with cargo-ndk for every Android ABI
 //! zingo-mobile ships (`reactNativeArchitectures` in `android/gradle.properties`)
 //! and lays out:
 //!
 //! ```text
-//! <dest>/jniLibs/<abi>/libzingo_nym_proxy_ffi.so   (one per ABI)
+//! <dest>/jniLibs/<abi>/libmixnet_proxy.so   (one per ABI)
 //! ```
 //!
-//! `consume-android-shim` stages that tree into the app and regenerates the
+//! `consume-android-proxy` stages that tree into the app and regenerates the
 //! Kotlin bindings (library mode against a staged `.so`), so this tool never
-//! needs a host cdylib. Usage: `bundle-android-shim [--abi <name>]… [--dest
+//! needs a host cdylib. Usage: `bundle-android-proxy [--abi <name>]… [--dest
 //! <dir>]`. Without `--abi` every shipped ABI is built; without `--dest` the
-//! tree lands in `rust/nym-proxy-ffi/target/android-shim`. Requires cargo-ndk, an
+//! tree lands in `rust/mixnet-proxy/target/android-proxy`. Requires cargo-ndk, an
 //! NDK, and the matching `rustup target`s.
 
 #![forbid(unsafe_code)]
@@ -33,12 +33,12 @@ const SHIPPED_ABIS: [(&str, &str); 4] = [
     ("x86_64", "x86_64-linux-android"),
 ];
 
-const SHIM_SO: &str = "libzingo_nym_proxy_ffi.so";
+const PROXY_SO: &str = "libmixnet_proxy.so";
 
 fn main() {
     let args: Vec<String> = std::env::args().skip(1).collect();
     run(
-        "bundle-android-shim",
+        "bundle-android-proxy",
         || bundle(&args),
         |dest| println!("{}", dest.display()),
     )
@@ -49,35 +49,35 @@ fn main() {
 fn bundle(args: &[String]) -> Result<PathBuf, Vec<String>> {
     let abis = requested_abis(args)?;
     let root = repo_root()?;
-    let shim_workspace = root.join("rust/nym-proxy-ffi");
-    let dest = parse_dest(args)?.unwrap_or_else(|| shim_workspace.join("target/android-shim"));
+    let proxy_workspace = root.join("rust/mixnet-proxy");
+    let dest = parse_dest(args)?.unwrap_or_else(|| proxy_workspace.join("target/android-proxy"));
 
     for (abi, triple) in &abis {
         let status = Command::new("cargo")
-            .current_dir(&shim_workspace)
+            .current_dir(&proxy_workspace)
             .args(["ndk", "-t", abi, "build", "--release"])
-            .args(["--package", "zingo-nym-proxy-ffi"])
+            .args(["--package", "mixnet-proxy"])
             .status()
             .map_err(|e| vec![format!("failed to run cargo ndk: {e}")])?;
         if !status.success() {
             return Err(vec![format!("cargo ndk build for {abi} failed ({status})")]);
         }
-        let source = shim_workspace
+        let source = proxy_workspace
             .join("target")
             .join(triple)
             .join("release")
-            .join(SHIM_SO);
+            .join(PROXY_SO);
         if !source.is_file() {
             return Err(vec![format!(
-                "built {abi} shim missing at {}",
+                "built {abi} proxy missing at {}",
                 source.display()
             )]);
         }
         let abi_dir = dest.join("jniLibs").join(abi);
         std::fs::create_dir_all(&abi_dir)
             .map_err(|e| vec![format!("cannot create {}: {e}", abi_dir.display())])?;
-        std::fs::copy(&source, abi_dir.join(SHIM_SO))
-            .map_err(|e| vec![format!("cannot copy {abi} shim: {e}")])?;
+        std::fs::copy(&source, abi_dir.join(PROXY_SO))
+            .map_err(|e| vec![format!("cannot copy {abi} library: {e}")])?;
     }
 
     Ok(dest)

@@ -7,6 +7,6 @@
          three NewApi errors. Scoped to this generated file so NewApi stays
          enforced everywhere we write Kotlin by hand. -->
     <issue id="NewApi">
-        <ignore path="src/main/java/uniffi/zingo_nym_proxy_ffi/zingo_nym_proxy_ffi.kt" />
+        <ignore path="src/main/java/uniffi/mixnet_proxy/mixnet_proxy.kt" />
     </issue>
 </lint>

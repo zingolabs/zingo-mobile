@@ -1,4 +1,4 @@
-# zingo-nym-proxy-ffi
+# mixnet-proxy
 
 The Nym mixnet proxy as a UniFFI library for the mobile app.
 
@@ -7,7 +7,7 @@ root workspace in `rust/` excludes it.
 
 ## Crates
 
-- `zingo-nym-proxy-ffi` (`src/lib.rs`): wraps `NymProxy` from zingolib's
+- `mixnet-proxy` (`src/lib.rs`): wraps `NymProxy` from zingolib's
   `zingo-netutils`. `MixnetProxyHandle::start` joins the Nym network and
   opens a local SOCKS5 listener. `socks5_endpoint` and `exit_node` report
   what it bound. `stop` tears it down. A listener monitor calls
@@ -17,10 +17,10 @@ root workspace in `rust/` excludes it.
 ## Consumers
 
 - Android: `android/app/src/main/java/org/ZingoLabs/Zingo/NymTransportModule.kt`
-  loads `libzingo_nym_proxy_ffi.so` through the generated Kotlin bindings
+  loads `libmixnet_proxy.so` through the generated Kotlin bindings
   (`scripts/generate_kotlin_bindings.mjs`, not checked in).
-  `rust/workbench` has `bundle-android-shim` and `consume-android-shim`.
-- iOS: `ios/NymTransportModule.swift` links `ZingoNymProxyFFI.xcframework`
+  `rust/workbench` has `bundle-android-proxy` and `consume-android-proxy`.
+- iOS: `ios/NymTransportModule.swift` links `MixnetProxy.xcframework`
   and the generated Swift bindings. `rust/ios/build_ios.mjs` builds both.
 - The app hands the endpoint to the wallet FFI's `attachMixnet`.
 

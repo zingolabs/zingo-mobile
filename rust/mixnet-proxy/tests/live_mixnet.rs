@@ -11,10 +11,8 @@ use std::{
     time::Duration,
 };
 
+use mixnet_proxy::{MixnetProxyHandle, ProxyDeathObserver, ProxyDeathReason, Socks5Endpoint};
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
-use zingo_nym_proxy_ffi::{
-    MixnetProxyHandle, ProxyDeathObserver, ProxyDeathReason, Socks5Endpoint,
-};
 
 /// The wall-clock budget for bringing up a proxy against the live mixnet.
 const START_BOUND: Duration = Duration::from_secs(180);

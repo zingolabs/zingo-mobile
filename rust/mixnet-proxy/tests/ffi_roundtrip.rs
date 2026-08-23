@@ -6,8 +6,8 @@
 //! coherence the host-language bindings depend on — in safe Rust, hermetically.
 //! Live start/stop semantics stay on the device-smoke rung (#2507).
 
+use mixnet_proxy::{ProxyDeathReason, ProxyFfiError, Socks5Endpoint, UniFfiTag};
 use uniffi::{Lift, Lower};
-use zingo_nym_proxy_ffi::{ProxyDeathReason, ProxyFfiError, Socks5Endpoint, UniFfiTag};
 
 /// Send `value` through the wire encoding both directions and hand back what
 /// the far side would see.
