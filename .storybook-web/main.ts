@@ -74,15 +74,37 @@ const main: StorybookConfig = {
       workletsBabel(),
     ];
     config.resolve = config.resolve ?? {};
-    config.resolve.alias = {
-      ...config.resolve.alias,
+    const existing = config.resolve.alias;
+    config.resolve.alias = [
+      ...(Array.isArray(existing)
+        ? existing
+        : Object.entries(existing ?? {}).map(([find, replacement]) => ({
+            find,
+            replacement,
+          }))),
       // No web build; serve the storybook stub instead.
-      'react-native-localize': path.resolve(
-        __dirname,
-        './shims/react-native-localize.ts',
-      ),
-      'react-native-fs': path.resolve(__dirname, './shims/react-native-fs.ts'),
-    };
+      {
+        find: 'react-native-localize',
+        replacement: path.resolve(
+          __dirname,
+          './shims/react-native-localize.ts',
+        ),
+      },
+      {
+        find: 'react-native-fs',
+        replacement: path.resolve(__dirname, './shims/react-native-fs.ts'),
+      },
+      {
+        find: '@notifee/react-native',
+        replacement: path.resolve(__dirname, './shims/notifee.ts'),
+      },
+      // The native bridge: walletBackend reaches it as '../../RPCModule'.
+      // Screens then run their real wrappers against story fixtures.
+      {
+        find: /^(?:\.\.\/)+RPCModule$/,
+        replacement: path.resolve(__dirname, './shims/rpcModule.ts'),
+      },
+    ];
     return config;
   },
 };
