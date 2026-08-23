@@ -86,8 +86,12 @@ struct SyncStatus: Codable {
     let total_sapling_outputs_scanned: UInt64?
     let session_orchard_outputs_scanned: UInt64?
     let total_orchard_outputs_scanned: UInt64?
+    let session_ironwood_outputs_scanned: UInt64?
+    let total_ironwood_outputs_scanned: UInt64?
     let percentage_session_outputs_scanned: Double?
     let percentage_total_outputs_scanned: Double?
+    let total_outputs_scanned: UInt64?
+    let total_outputs: UInt64?
 }
 
 struct Balance: Codable {
