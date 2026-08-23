@@ -28,6 +28,9 @@ ignores:
   # majors. Removing them breaks `yarn lint`.
   - 'eslint-plugin-ft-flow'
   - 'eslint-plugin-react-native'
+  # Spawned by path in visual/diff.mts (node_modules/.bin/reg-cli), which
+  # depcheck does not trace.
+  - 'reg-cli'
 
 # Phantom-dependency detection stays off until the three currently
 # transitive tools (@eslint/eslintrc, jest-environment-node,
