@@ -60,7 +60,7 @@
     "react-native-bouncy-checkbox": "^4.1.2",
     "react-native-device-info": "^15.0.2",
     "react-native-fs": "^2.20.0",
-    "react-native-gesture-handler": "2.31.2",
+    "react-native-gesture-handler": "3.2.1",
     "react-native-gifted-charts": "^1.4.78",
     "react-native-keyboard-controller": "^1.21.14",
     "react-native-keychain": "^10.0.0",
