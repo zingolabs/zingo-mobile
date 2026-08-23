@@ -6,6 +6,11 @@ import { AppRegistry } from 'react-native';
 import App from './App';
 import { name as appName } from './app.json';
 
+// STORYBOOK_ENABLED is inlined by Metro (withStorybook) at bundle time.
+const Root = process.env.STORYBOOK_ENABLED === 'true'
+  ? require('./.storybook').default
+  : App;
+
 // Audit Issue K — single-point logging facade. Release builds silence
 // console.log/debug/info so RPC payloads, wallet state, and other
 // potentially sensitive values never reach logcat in production. This is
@@ -23,4 +28,4 @@ if (!__DEV__) {
   console.info = () => {};
 }
 
-AppRegistry.registerComponent(appName, () => App);
+AppRegistry.registerComponent(appName, () => Root);

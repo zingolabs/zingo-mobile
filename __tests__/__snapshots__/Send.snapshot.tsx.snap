@@ -1496,6 +1496,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
             >
               <View
                 accessibilityLabel="title text translated"
+                accessibilityRole="button"
                 accessibilityState={
                   {
                     "busy": undefined,
@@ -1768,6 +1769,7 @@ memo10"
         }
       >
         <View
+          accessibilityRole="button"
           accessibilityState={
             {
               "busy": undefined,
@@ -1864,6 +1866,18 @@ memo10"
         }
       }
     >
+      <View
+        onLayout={[Function]}
+        pointerEvents="none"
+        style={
+          {
+            "left": 0,
+            "position": "absolute",
+            "right": 0,
+            "top": 0,
+          }
+        }
+      />
       <View
         style={
           {
@@ -2042,6 +2056,7 @@ memo10"
     }
   >
     <View
+      accessibilityRole="button"
       accessibilityState={
         {
           "busy": undefined,
@@ -3166,6 +3181,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
             >
               <View
                 accessibilityLabel="title text translated"
+                accessibilityRole="button"
                 accessibilityState={
                   {
                     "busy": undefined,
@@ -3438,6 +3454,7 @@ memo10"
         }
       >
         <View
+          accessibilityRole="button"
           accessibilityState={
             {
               "busy": undefined,
@@ -3534,6 +3551,18 @@ memo10"
         }
       }
     >
+      <View
+        onLayout={[Function]}
+        pointerEvents="none"
+        style={
+          {
+            "left": 0,
+            "position": "absolute",
+            "right": 0,
+            "top": 0,
+          }
+        }
+      />
       <View
         style={
           {
@@ -3712,6 +3741,7 @@ memo10"
     }
   >
     <View
+      accessibilityRole="button"
       accessibilityState={
         {
           "busy": undefined,

@@ -118,6 +118,7 @@ const Button: React.FunctionComponent<ButtonProps> = ({
     <TouchableOpacity
       testID={testID}
       accessible={accessible}
+      accessibilityRole="button"
       accessibilityLabel={accessibilityLabel}
       style={{
         ...styleButton,

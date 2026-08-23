@@ -168,6 +168,7 @@ exports[`VerifyAddress - snapshot VerifyAddress initial (empty, no result) 1`] =
       }
     >
       <View
+        accessibilityRole="button"
         accessibilityState={
           {
             "busy": undefined,
@@ -244,6 +245,7 @@ exports[`VerifyAddress - snapshot VerifyAddress initial (empty, no result) 1`] =
         </View>
       </View>
       <View
+        accessibilityRole="button"
         accessibilityState={
           {
             "busy": undefined,

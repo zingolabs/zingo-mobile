@@ -197,6 +197,18 @@ exports[`Component ShowUfvk - test ShowUfvk Backup - snapshot 1`] = `
       }
     >
       <View
+        onLayout={[Function]}
+        pointerEvents="none"
+        style={
+          {
+            "left": 0,
+            "position": "absolute",
+            "right": 0,
+            "top": 0,
+          }
+        }
+      />
+      <View
         style={
           {
             "alignItems": "center",
@@ -515,6 +527,18 @@ exports[`Component ShowUfvk - test ShowUfvk Change - snapshot 1`] = `
         }
       }
     >
+      <View
+        onLayout={[Function]}
+        pointerEvents="none"
+        style={
+          {
+            "left": 0,
+            "position": "absolute",
+            "right": 0,
+            "top": 0,
+          }
+        }
+      />
       <View
         style={
           {
@@ -835,6 +859,18 @@ exports[`Component ShowUfvk - test ShowUfvk Server - snapshot 1`] = `
       }
     >
       <View
+        onLayout={[Function]}
+        pointerEvents="none"
+        style={
+          {
+            "left": 0,
+            "position": "absolute",
+            "right": 0,
+            "top": 0,
+          }
+        }
+      />
+      <View
         style={
           {
             "alignItems": "center",
@@ -1153,6 +1189,18 @@ exports[`Component ShowUfvk - test ShowUfvk View - snapshot 1`] = `
         }
       }
     >
+      <View
+        onLayout={[Function]}
+        pointerEvents="none"
+        style={
+          {
+            "left": 0,
+            "position": "absolute",
+            "right": 0,
+            "top": 0,
+          }
+        }
+      />
       <View
         style={
           {
