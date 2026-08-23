@@ -30,14 +30,17 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
       <View>
         <View
           style={
-            {
-              "alignItems": "center",
-              "backgroundColor": "#011401",
-              "display": "flex",
-              "minHeight": 50,
-              "paddingBottom": 10,
-              "paddingTop": 0,
-            }
+            [
+              {},
+              {
+                "alignItems": "center",
+                "backgroundColor": "#011401",
+                "display": "flex",
+                "minHeight": 50,
+                "paddingBottom": 10,
+                "paddingTop": 0,
+              },
+            ]
           }
           testID="header"
         >

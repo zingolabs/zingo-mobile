@@ -1,0 +1,36 @@
+name: Kotlin UniFFI bindings
+description: >
+  Generates the wallet and Nym proxy shim Kotlin bindings into
+  android/app/build/generated/source/uniffi/<variant>/java with
+  scripts/generate_kotlin_bindings.mjs. Builds the shim for the host.
+
+inputs:
+  variants:
+    description: Comma-separated build types to generate for.
+    required: false
+    default: release
+
+runs:
+  using: composite
+  steps:
+    - name: Install protobuf-compiler
+      shell: bash
+      run: sudo apt-get update && sudo apt-get install -y protobuf-compiler
+
+    - name: Rust stable
+      shell: bash
+      run: rustup default stable
+
+    - name: Cache the bindgen and shim builds
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+          rust/target
+          rust/nym-proxy-ffi/target
+        key: kotlin-bindings-${{ runner.os }}-${{ hashFiles('rust/Cargo.lock', 'rust/nym-proxy-ffi/Cargo.lock') }}
+
+    - name: Generate Kotlin bindings
+      shell: bash
+      run: node scripts/generate_kotlin_bindings.mjs --variants "${{ inputs.variants }}"

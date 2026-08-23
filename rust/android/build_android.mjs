@@ -94,19 +94,21 @@ try {
   for (const { triple, jniDir } of ABIS) {
     run('docker', [
       'cp',
-      `${containerId}:/opt/zingo/rust/nym-host/target/${triple}/release/libzingo_nym_proxy_ffi.so`,
+      `${containerId}:/opt/zingo/rust/nym-proxy-ffi/target/${triple}/release/libzingo_nym_proxy_ffi.so`,
       join(JNI_PATH, jniDir, 'libzingo_nym_proxy_ffi.so'),
     ]);
   }
 
   console.log('\n=== Extracting Nym shim Kotlin bindings ===');
-  const shimKtDir = join(REPO_DIR, 'android', 'app', 'src', 'main', 'java', 'uniffi', 'zingo_nym_proxy_ffi');
-  mkdirSync(shimKtDir, { recursive: true });
-  run('docker', [
-    'cp',
-    `${containerId}:/opt/zingo/rust/nym-host/generated-kotlin/uniffi/zingo_nym_proxy_ffi/zingo_nym_proxy_ffi.kt`,
-    join(shimKtDir, 'zingo_nym_proxy_ffi.kt'),
-  ]);
+  for (const variant of ['debug', 'release']) {
+    const shimKtDir = join(UNIFFI_PATH, variant, 'java', 'uniffi', 'zingo_nym_proxy_ffi');
+    mkdirSync(shimKtDir, { recursive: true });
+    run('docker', [
+      'cp',
+      `${containerId}:/opt/zingo/rust/nym-proxy-ffi/generated-kotlin/uniffi/zingo_nym_proxy_ffi/zingo_nym_proxy_ffi.kt`,
+      join(shimKtDir, 'zingo_nym_proxy_ffi.kt'),
+    ]);
+  }
 } finally {
   console.log('\n=== Cleaning up container ===');
   spawnSync('docker', ['rm', '-v', containerId], { stdio: 'inherit' });

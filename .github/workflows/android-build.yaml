@@ -61,7 +61,7 @@ jobs:
         id: kotlin-check-build-cache
         uses: actions/cache/restore@v6
         with:
-          path: android/app/build/generated/source/uniffi/release/java/uniffi/zingo
+          path: android/app/build/generated/source/uniffi/release/java/uniffi
           key: kotlin-android-uniffi-${{ env.ARCH }}-${{ env.CACHE-KEY }}
           lookup-only: true
 
@@ -121,15 +121,17 @@ jobs:
 
           TOML="rust/Cargo.toml"
           REV="${GITHUB_SHA}"
+          PINS='^(zingolib|pepper-sync|zingolib_testutils|zingo-price)[[:space:]]*='
 
-          sed -i -E "/^zingolib[[:space:]]*=/ s/(rev[[:space:]]*=[[:space:]]*\")[^\"]*(\")/\1${REV}\2/" "$TOML"
+          sed -i -E "/${PINS}/ s/(rev[[:space:]]*=[[:space:]]*\")[^\"]*(\")/\1${REV}\2/" "$TOML"
 
-          sed -i -E "/^zingolib[[:space:]]*=/ s/(branch|tag)[[:space:]]*=[[:space:]]*\"[^\"]*\"/rev = \"${REV}\"/" "$TOML"
+          sed -i -E "/${PINS}/ s/(branch|tag)[[:space:]]*=[[:space:]]*\"[^\"]*\"/rev = \"${REV}\"/" "$TOML"
 
-          first_line="$(grep -E '^zingolib[[:space:]]*=' "$TOML")"
-          echo "zingolib first line => $first_line"
-          echo "$first_line" | grep -q "rev = \"${REV}\""
-          echo "$first_line" | grep -vqE '\b(branch|tag)[[:space:]]*='
+          pinned="$(grep -E "$PINS" "$TOML")"
+          echo "zingolib pins =>"
+          echo "$pinned"
+          test "$(echo "$pinned" | wc -l)" -eq "$(echo "$pinned" | grep -c "rev = \"${REV}\"")"
+          ! echo "$pinned" | grep -qE '\b(branch|tag)[[:space:]]*='
 
           cd rust
           rustup default stable
@@ -151,13 +153,6 @@ jobs:
           cargo run --release --features=uniffi/cli --bin uniffi-bindgen \
           generate ./src/zingo.udl --language kotlin \
           --out-dir ../../android/app/build/generated/source/uniffi/release/java
-
-      - name: Upload kotlin uniffi
-        uses: actions/upload-artifact@v7
-        with:
-          name: kotlin-android-uniffi-${{ env.ARCH }}-${{ env.CACHE-KEY }}
-          path: android/app/build/generated/source/uniffi/release/java/uniffi/zingo/zingo.kt
-          retention-days: 3
 
       - name: Set envs for x86_64
         if: ${{ env.ARCH == 'x86_64' }}
@@ -222,11 +217,57 @@ jobs:
         working-directory: ./rust/target/${{ env.TARGET }}/release
         run: mv ./libzingo.so ./libuniffi_zingo.so
 
+      - name: Cargo build nym proxy shim
+        working-directory: ./rust/nym-proxy-ffi
+        run: |
+          cargo ndk \
+          --target ${{ env.TARGET }} build \
+          --release
+        env:
+          AR: llvm-ar
+          LD: ld
+          RANLIB: llvm-ranlib
+          CC: ${{ env.CC }}26-clang
+          CARGO_FEATURE_STD: ${{ env.CARGO_FEATURE_STD }}
+          LIBCLANG_PATH: /usr/lib/llvm-18/lib
+          CARGO_NDK_PLATFORM: 26
+          CARGO_NDK_ANDROID_PLATFORM: 26
+
+      # Library mode reads the UniFFI metadata from the symbol table, so this
+      # runs before the strip.
+      - name: Kotlin bindings for nym proxy shim
+        working-directory: ./rust/nym-proxy-ffi
+        run: |
+          cargo run --release --locked --manifest-path ../Cargo.toml \
+            --package zingo-uniffi-bindgen --bin zingo-uniffi-bindgen -- \
+            generate --library target/${{ env.TARGET }}/release/libzingo_nym_proxy_ffi.so \
+            --language kotlin --no-format --metadata-no-deps \
+            --out-dir ../../android/app/build/generated/source/uniffi/release/java
+
+      - name: Upload kotlin uniffi
+        uses: actions/upload-artifact@v7
+        with:
+          name: kotlin-android-uniffi-${{ env.ARCH }}-${{ env.CACHE-KEY }}
+          path: android/app/build/generated/source/uniffi/release/java/uniffi
+          retention-days: 3
+
+      - name: LLVM Strip nym proxy shim
+        working-directory: ./rust/nym-proxy-ffi/target
+        run: |
+          llvm-strip --strip-all ./${{ env.TARGET }}/release/libzingo_nym_proxy_ffi.so
+          llvm-objcopy --remove-section .comment ./${{ env.TARGET }}/release/libzingo_nym_proxy_ffi.so
+
+      - name: Stage native libraries
+        run: |
+          mkdir -p rust/native-out
+          cp rust/target/${{ env.TARGET }}/release/libuniffi_zingo.so rust/native-out/
+          cp rust/nym-proxy-ffi/target/${{ env.TARGET }}/release/libzingo_nym_proxy_ffi.so rust/native-out/
+
       - name: Upload native rust
         uses: actions/upload-artifact@v7
         with:
           name: native-android-uniffi-${{ env.ARCH }}-${{ env.CACHE-KEY }}
-          path: rust/target/${{ env.TARGET }}/release/libuniffi_zingo.so
+          path: rust/native-out/
           retention-days: 3
 
       - name: Cancel the run on failure (fail-all)
@@ -270,12 +311,12 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: kotlin-android-uniffi-${{ env.ARCH }}-${{ env.CACHE-KEY }}
-          path: android/app/build/generated/source/uniffi/release/java/uniffi/zingo
+          path: android/app/build/generated/source/uniffi/release/java/uniffi
 
       - name: Cache kotlin uniffi
         uses: actions/cache/save@v6
         with:
-          path: android/app/build/generated/source/uniffi/release/java/uniffi/zingo
+          path: android/app/build/generated/source/uniffi/release/java/uniffi
           key: kotlin-android-uniffi-${{ env.ARCH }}-${{ env.CACHE-KEY }}
 
       - name: Cancel the run on failure (fail-all)

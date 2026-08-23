@@ -88,6 +88,7 @@ RCT_EXTERN_METHOD(setBroadcastCandidates:
                   reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(attachMixnet:
     (NSString)socks5Addr
+                  exitNode:(NSString)exitNode
                   resolve:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(enableMixnet:
@@ -97,13 +98,10 @@ RCT_EXTERN_METHOD(enableMixnet:
 RCT_EXTERN_METHOD(disableMixnet:
     (RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(mixnetModeInfo:
+RCT_EXTERN_METHOD(mixnetIndicatorInfo:
     (RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(mixnetBootstrapDetailInfo:
-    (RCTPromiseResolveBlock)resolve
-                  reject:(RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(mixnetIpCorrelationDisclaimerInfo:
     (RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(pollSyncInfo:

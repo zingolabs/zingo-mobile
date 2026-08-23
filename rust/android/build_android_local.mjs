@@ -21,15 +21,6 @@ const REPO_DIR = resolve(RUST_DIR, '..');
 const LIB_DIR = join(RUST_DIR, 'lib');
 const TARGET_DIR = join(RUST_DIR, 'target');
 const JNI_PATH = join(REPO_DIR, 'android', 'app', 'src', 'main', 'jniLibs');
-const UNIFFI_PATH = join(
-  REPO_DIR,
-  'android',
-  'app',
-  'build',
-  'generated',
-  'source',
-  'uniffi',
-);
 const NDK_VERSION = '28.2.13676358';
 const CARGO_NDK_VERSION = '4.0.1';
 
@@ -149,7 +140,7 @@ if (!capture('bindgen', ['--version'])) {
   missing.push('bindgen-cli: cargo install --force --locked bindgen-cli');
 }
 // lightwallet-protocol's `rebuild-proto` feature (enabled by both zingolib and
-// nym-host) runs tonic-prost-build, which shells out to protoc from PATH.
+// nym-proxy-ffi) runs tonic-prost-build, which shells out to protoc from PATH.
 if (!capture('protoc', ['--version'])) {
   missing.push(
     'protoc: apt install protobuf-compiler (Linux), brew install protobuf (macOS), winget install Google.Protobuf (Windows)',
@@ -190,33 +181,7 @@ const env = {
   CXXFLAGS_aarch64_linux_android: '-mno-outline-atomics',
 };
 
-// --- Output dirs ---
-for (const variant of ['debug', 'release']) {
-  mkdirSync(join(UNIFFI_PATH, variant, 'java', 'uniffi', 'zingo'), {
-    recursive: true,
-  });
-}
-
-// --- Generate Kotlin bindings ---
-console.log('=== Generating Kotlin bindings ===');
 process.chdir(LIB_DIR);
-run(
-  'cargo',
-  [
-    'run',
-    '--release',
-    '--features=uniffi/cli',
-    '--bin',
-    'uniffi-bindgen',
-    'generate',
-    './src/zingo.udl',
-    '--language',
-    'kotlin',
-    '--out-dir',
-    './src',
-  ],
-  { env },
-);
 
 // --- Build per ABI ---
 const exe = process.platform === 'win32' ? '.exe' : '';
@@ -247,17 +212,8 @@ for (const abi of abis) {
   copyFileSync(soPath, join(dstDir, 'libuniffi_zingo.so'));
 }
 
-// --- Export Kotlin bindings ---
-const kotlinSrc = join(LIB_DIR, 'src', 'uniffi', 'zingo', 'zingo.kt');
-for (const variant of ['debug', 'release']) {
-  copyFileSync(
-    kotlinSrc,
-    join(UNIFFI_PATH, variant, 'java', 'uniffi', 'zingo', 'zingo.kt'),
-  );
-}
-
-console.log('\n=== Building Nym proxy shim (nym-host) ===');
-const NYM_BUNDLE = join(RUST_DIR, 'nym-host', 'target', 'android-shim');
+console.log('\n=== Building Nym proxy shim (nym-proxy-ffi) ===');
+const NYM_BUNDLE = join(RUST_DIR, 'nym-proxy-ffi', 'target', 'android-shim');
 const SHIM_SO = 'libzingo_nym_proxy_ffi.so';
 const shimAbiFlags = abis.flatMap(abi => ['--abi', ABI_TABLE[abi].jniDir]);
 
@@ -289,6 +245,20 @@ run(
   { env, cwd: RUST_DIR },
 );
 
+// --- Kotlin bindings: the wallet from the UDL, the shim from the unstripped
+// bundle library ---
+run(
+  process.execPath,
+  [
+    join(REPO_DIR, 'scripts', 'generate_kotlin_bindings.mjs'),
+    '--variants',
+    'debug,release',
+    '--shim-library',
+    join(NYM_BUNDLE, 'jniLibs', ABI_TABLE[abis[0]].jniDir, SHIM_SO),
+  ],
+  { env, cwd: REPO_DIR },
+);
+
 // Strip the staged shim .so, matching the wallet .so treatment above.
 for (const abi of abis) {
   const staged = join(JNI_PATH, ABI_TABLE[abi].jniDir, SHIM_SO);
@@ -303,4 +273,4 @@ for (const abi of abis) {
   console.log(`sha256  ${sha256File(staged)}  ${staged}`);
 }
 
-console.log(`\nDone. ABIs built: ${abis.join(', ')} (wallet + nym-host)`);
+console.log(`\nDone. ABIs built: ${abis.join(', ')} (wallet + nym-proxy-ffi)`);

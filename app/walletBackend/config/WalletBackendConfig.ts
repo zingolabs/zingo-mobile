@@ -8,7 +8,10 @@ import {
 } from '../../AppState';
 import { RPCSyncStatusType } from '../types/RPCSyncStatusType';
 import { RPCPerformanceLevelEnum } from '../enums/RPCPerformanceLevelEnum';
-import { StartMixnetTransport } from '../modules/MixnetCoordinator';
+import {
+  StartMixnetTransport,
+  StopMixnetTransport,
+} from '../modules/MixnetCoordinator';
 import { MixnetView } from '../transforms/mixnetPresenter';
 
 /**
@@ -52,6 +55,11 @@ export type WalletBackendConfig = {
    * platform owns the transport; tests supply a stub.
    */
   startMixnetTransport: StartMixnetTransport;
+  /**
+   * Tears down the platform-hosted mixnet transport on the user's clearnet
+   * consent. Injected for the same reason as the start seam.
+   */
+  stopMixnetTransport: StopMixnetTransport;
   /**
    * Whether this platform runs the Mixnet Mode policy. Android and iOS both
    * host the native transport, so it is on for each; tests inject false to

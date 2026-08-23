@@ -189,14 +189,17 @@ const Header: React.FunctionComponent<HeaderProps> = ({
       <View>
         <Animated.View
           testID="header"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            backgroundColor: colors.bgCanvas,
-            paddingTop: 0,
-            paddingBottom: 10,
-            minHeight: 50,
-          }}
+          style={[
+            headerAnimatedStyle,
+            {
+              display: 'flex',
+              alignItems: 'center',
+              backgroundColor: colors.bgCanvas,
+              paddingTop: 0,
+              paddingBottom: 10,
+              minHeight: 50,
+            },
+          ]}
         >
           <SyncStatusBar
             noSyncingStatus={noSyncingStatus}

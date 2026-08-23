@@ -107,12 +107,12 @@ const PresetCard: React.FunctionComponent<PresetCardProps> = ({
         marginBottom: 8,
       }}
     >
-      <Text style={{ color: colors.fgDefault, fontSize: 17, fontWeight: '700' }}>
+      <Text
+        style={{ color: colors.fgDefault, fontSize: 17, fontWeight: '700' }}
+      >
         {title}
       </Text>
-      <Text
-        style={{ color: colors.fgMuted, fontSize: 16, fontWeight: '600' }}
-      >
+      <Text style={{ color: colors.fgMuted, fontSize: 16, fontWeight: '600' }}>
         ~{batches}
       </Text>
     </View>
@@ -374,7 +374,10 @@ const MigrationCadence: React.FunctionComponent<MigrationCadenceProps> = ({
         >
           {intro.split('**').map((part: string, i: number) =>
             i % 2 === 1 ? (
-              <Text key={i} style={{ color: colors.fgDefault, fontWeight: '700' }}>
+              <Text
+                key={i}
+                style={{ color: colors.fgDefault, fontWeight: '700' }}
+              >
                 {part}
               </Text>
             ) : (

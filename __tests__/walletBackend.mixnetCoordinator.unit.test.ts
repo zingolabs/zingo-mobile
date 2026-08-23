@@ -1,4 +1,4 @@
-import { RPCMixnetModeEnum } from '../app/walletBackend/enums/RPCMixnetModeEnum';
+import { RPCMixnetIndicatorEnum } from '../app/walletBackend/enums/RPCMixnetIndicatorEnum';
 import {
   MixnetCoordinator,
   RECONNECT_BASE_MILLIS,
@@ -15,11 +15,11 @@ import RPCModule from '../app/RPCModule';
 
 const mockedBridge = RPCModule as unknown as Record<string, jest.Mock>;
 
-function statusPayload(mode: string, socks5Addr?: string): string {
+function statusPayload(indicator: string, socks5Addr?: string): string {
   return JSON.stringify(
     socks5Addr === undefined
-      ? { mixnet_mode: mode }
-      : { mixnet_mode: mode, socks5_addr: socks5Addr },
+      ? { mixnet_indicator: indicator }
+      : { mixnet_indicator: indicator, socks5_addr: socks5Addr },
   );
 }
 
@@ -27,6 +27,13 @@ async function flushPromises(): Promise<void> {
   await Promise.resolve();
   await Promise.resolve();
 }
+
+const noopStop = () => Promise.resolve();
+
+const transportBinding = {
+  socks5Addr: '127.0.0.1:1080',
+  exitNode: 'test-exit',
+};
 
 describe('deriveMixnetView', () => {
   const noDetail = null;
@@ -36,7 +43,11 @@ describe('deriveMixnetView', () => {
     expect(
       blocked(
         deriveMixnetView(
-          { kind: 'status', mode: RPCMixnetModeEnum.off, socks5Addr: null },
+          {
+            kind: 'status',
+            indicator: RPCMixnetIndicatorEnum.off,
+            socks5Addr: null,
+          },
           noDetail,
         ),
       ),
@@ -46,7 +57,7 @@ describe('deriveMixnetView', () => {
         deriveMixnetView(
           {
             kind: 'status',
-            mode: RPCMixnetModeEnum.ready,
+            indicator: RPCMixnetIndicatorEnum.ready,
             socks5Addr: '127.0.0.1:1080',
           },
           noDetail,
@@ -58,7 +69,7 @@ describe('deriveMixnetView', () => {
         deriveMixnetView(
           {
             kind: 'status',
-            mode: RPCMixnetModeEnum.bootstrapping,
+            indicator: RPCMixnetIndicatorEnum.bootstrapping,
             socks5Addr: null,
           },
           noDetail,
@@ -68,7 +79,11 @@ describe('deriveMixnetView', () => {
     expect(
       blocked(
         deriveMixnetView(
-          { kind: 'status', mode: RPCMixnetModeEnum.died, socks5Addr: null },
+          {
+            kind: 'status',
+            indicator: RPCMixnetIndicatorEnum.died,
+            socks5Addr: null,
+          },
           noDetail,
         ),
       ),
@@ -89,7 +104,11 @@ describe('deriveMixnetView', () => {
   it('offers the right recovery per state', () => {
     expect(
       deriveMixnetView(
-        { kind: 'status', mode: RPCMixnetModeEnum.died, socks5Addr: null },
+        {
+          kind: 'status',
+          indicator: RPCMixnetIndicatorEnum.died,
+          socks5Addr: null,
+        },
         noDetail,
       ).recovery,
     ).toBe('reenable');
@@ -97,7 +116,7 @@ describe('deriveMixnetView', () => {
       deriveMixnetView(
         {
           kind: 'status',
-          mode: RPCMixnetModeEnum.bootstrapping,
+          indicator: RPCMixnetIndicatorEnum.bootstrapping,
           socks5Addr: null,
         },
         noDetail,
@@ -107,7 +126,7 @@ describe('deriveMixnetView', () => {
       deriveMixnetView(
         {
           kind: 'status',
-          mode: RPCMixnetModeEnum.ready,
+          indicator: RPCMixnetIndicatorEnum.ready,
           socks5Addr: '127.0.0.1:1',
         },
         noDetail,
@@ -121,7 +140,7 @@ describe('deriveMixnetView', () => {
       deriveMixnetView(
         {
           kind: 'status',
-          mode: RPCMixnetModeEnum.bootstrapping,
+          indicator: RPCMixnetIndicatorEnum.bootstrapping,
           socks5Addr: null,
         },
         narration,
@@ -131,7 +150,7 @@ describe('deriveMixnetView', () => {
       deriveMixnetView(
         {
           kind: 'status',
-          mode: RPCMixnetModeEnum.ready,
+          indicator: RPCMixnetIndicatorEnum.ready,
           socks5Addr: '127.0.0.1:1',
         },
         narration,
@@ -155,9 +174,9 @@ describe('MixnetCoordinator', () => {
     mockedBridge.mixnetBootstrapDetailInfo.mockResolvedValue(
       JSON.stringify({ detail: 'attempt 1/10' }),
     );
-    const startTransport = jest.fn().mockResolvedValue('127.0.0.1:1080');
+    const startTransport = jest.fn().mockResolvedValue(transportBinding);
     const published: MixnetView[] = [];
-    const coordinator = new MixnetCoordinator(startTransport, view =>
+    const coordinator = new MixnetCoordinator(startTransport, noopStop, view =>
       published.push(view),
     );
 
@@ -165,11 +184,38 @@ describe('MixnetCoordinator', () => {
     await flushPromises();
 
     expect(startTransport).toHaveBeenCalledTimes(1);
-    expect(mockedBridge.attachMixnet).toHaveBeenCalledWith('127.0.0.1:1080');
+    expect(mockedBridge.attachMixnet).toHaveBeenCalledWith(
+      '127.0.0.1:1080',
+      'test-exit',
+    );
+    // The first view is the start. The second view comes from the wallet
+    // and has the detail line.
+    expect(published).toHaveLength(2);
+    expect(published[0].statusKey).toBe('mixnet.status.bootstrapping');
+    expect(published[0].narration).toBeNull();
+    expect(published[1].statusKey).toBe('mixnet.status.bootstrapping');
+    expect(published[1].narration).toBe('attempt 1/10');
+    expect(published[1].sendBlocked).toBe(true);
+    coordinator.stop();
+  });
+
+  it('publishes the bootstrapping view immediately, before the transport answers', () => {
+    const startTransport = jest.fn().mockReturnValue(new Promise(() => {}));
+    const published: MixnetView[] = [];
+    const coordinator = new MixnetCoordinator(startTransport, noopStop, view =>
+      published.push(view),
+    );
+
+    coordinator.ensureForConnectedSession();
+
     expect(published).toHaveLength(1);
     expect(published[0].statusKey).toBe('mixnet.status.bootstrapping');
-    expect(published[0].narration).toBe('attempt 1/10');
     expect(published[0].sendBlocked).toBe(true);
+    expect(published[0].recovery).toBe('wait');
+    expect(published[0].reconnecting).toBe(false);
+    // The wallet is not attached yet. The coordinator does not ask it for
+    // a detail line.
+    expect(mockedBridge.mixnetBootstrapDetailInfo).not.toHaveBeenCalled();
     coordinator.stop();
   });
 
@@ -178,18 +224,46 @@ describe('MixnetCoordinator', () => {
       .fn()
       .mockRejectedValue(new Error('shim missing'));
     const published: MixnetView[] = [];
-    const coordinator = new MixnetCoordinator(startTransport, view =>
+    const coordinator = new MixnetCoordinator(startTransport, noopStop, view =>
       published.push(view),
     );
 
     await coordinator.ensureForConnectedSession();
     await flushPromises();
 
-    expect(published).toHaveLength(1);
-    expect(published[0].statusKey).toBe('mixnet.status.unknown');
-    expect(published[0].sendBlocked).toBe(true);
-    expect(published[0].recovery).toBe('reenable');
+    expect(published).toHaveLength(2);
+    expect(published[0].statusKey).toBe('mixnet.status.bootstrapping');
+    expect(published[1].statusKey).toBe('mixnet.status.unknown');
+    expect(published[1].sendBlocked).toBe(true);
+    expect(published[1].recovery).toBe('reenable');
     expect(mockedBridge.attachMixnet).not.toHaveBeenCalled();
+    coordinator.stop();
+  });
+
+  it('does not poll while a re-enable is in progress', async () => {
+    mockedBridge.attachMixnet.mockResolvedValue(statusPayload('died'));
+    const startTransport = jest
+      .fn()
+      .mockResolvedValueOnce(transportBinding)
+      .mockReturnValue(new Promise(() => {}));
+    const published: MixnetView[] = [];
+    const coordinator = new MixnetCoordinator(startTransport, noopStop, view =>
+      published.push(view),
+    );
+
+    await coordinator.ensureForConnectedSession();
+    await flushPromises();
+    expect(published[published.length - 1].statusKey).toBe(
+      'mixnet.status.died',
+    );
+
+    coordinator.reenable();
+    await jest.advanceTimersByTimeAsync(STEADY_POLL_MILLIS * 3);
+
+    expect(mockedBridge.mixnetIndicatorInfo).not.toHaveBeenCalled();
+    const latest = published[published.length - 1];
+    expect(latest.statusKey).toBe('mixnet.status.bootstrapping');
+    expect(latest.reconnecting).toBe(true);
     coordinator.stop();
   });
 
@@ -198,7 +272,7 @@ describe('MixnetCoordinator', () => {
       .fn()
       .mockRejectedValue(new Error('shim missing'));
     const published: MixnetView[] = [];
-    const coordinator = new MixnetCoordinator(startTransport, view =>
+    const coordinator = new MixnetCoordinator(startTransport, noopStop, view =>
       published.push(view),
     );
     await coordinator.ensureForConnectedSession();
@@ -207,7 +281,7 @@ describe('MixnetCoordinator', () => {
     // The wallet was never attached, so its default mode is `off` — the
     // same string a deliberate disable produces. The poll must not read
     // it as consent.
-    mockedBridge.mixnetModeInfo.mockResolvedValue(statusPayload('off'));
+    mockedBridge.mixnetIndicatorInfo.mockResolvedValue(statusPayload('off'));
     jest.advanceTimersByTime(STEADY_POLL_MILLIS);
     await flushPromises();
 
@@ -228,9 +302,9 @@ describe('MixnetCoordinator', () => {
       }),
     );
     mockedBridge.disableMixnet.mockResolvedValue(statusPayload('off'));
-    const startTransport = jest.fn().mockResolvedValue('127.0.0.1:1080');
+    const startTransport = jest.fn().mockResolvedValue(transportBinding);
     const published: MixnetView[] = [];
-    const coordinator = new MixnetCoordinator(startTransport, view =>
+    const coordinator = new MixnetCoordinator(startTransport, noopStop, view =>
       published.push(view),
     );
 
@@ -251,16 +325,16 @@ describe('MixnetCoordinator', () => {
       statusPayload('ready', '127.0.0.1:1080'),
     );
     mockedBridge.disableMixnet.mockResolvedValue(statusPayload('off'));
-    const startTransport = jest.fn().mockResolvedValue('127.0.0.1:1080');
+    const startTransport = jest.fn().mockResolvedValue(transportBinding);
     const published: MixnetView[] = [];
-    const coordinator = new MixnetCoordinator(startTransport, view =>
+    const coordinator = new MixnetCoordinator(startTransport, noopStop, view =>
       published.push(view),
     );
     await coordinator.ensureForConnectedSession();
     await coordinator.disable();
     await flushPromises();
 
-    mockedBridge.mixnetModeInfo.mockResolvedValue(statusPayload('off'));
+    mockedBridge.mixnetIndicatorInfo.mockResolvedValue(statusPayload('off'));
     jest.advanceTimersByTime(STEADY_POLL_MILLIS);
     await flushPromises();
 
@@ -274,16 +348,52 @@ describe('MixnetCoordinator', () => {
     mockedBridge.disableMixnet.mockResolvedValue(statusPayload('off'));
     const published: MixnetView[] = [];
     const coordinator = new MixnetCoordinator(
-      jest.fn().mockResolvedValue('127.0.0.1:1080'),
+      jest.fn().mockResolvedValue(transportBinding),
+      noopStop,
       view => published.push(view),
     );
 
     await coordinator.disable();
     await flushPromises();
 
+    // The first view is the off view. The second view is the wallet's confirmation.
+    expect(published).toHaveLength(2);
+    expect(published[0].statusKey).toBe('mixnet.status.off');
+    expect(published[0].sendBlocked).toBe(false);
+    expect(published[1]).toEqual(published[0]);
+    coordinator.stop();
+  });
+
+  it('disable publishes the off view immediately, before the wallet answers', () => {
+    mockedBridge.disableMixnet.mockReturnValue(new Promise(() => {}));
+    const published: MixnetView[] = [];
+    const coordinator = new MixnetCoordinator(
+      jest.fn().mockResolvedValue(transportBinding),
+      noopStop,
+      view => published.push(view),
+    );
+
+    coordinator.disable();
+
     expect(published).toHaveLength(1);
     expect(published[0].statusKey).toBe('mixnet.status.off');
     expect(published[0].sendBlocked).toBe(false);
+    coordinator.stop();
+  });
+
+  it('disable tears down the platform transport', async () => {
+    mockedBridge.disableMixnet.mockResolvedValue(statusPayload('off'));
+    const stopTransport = jest.fn().mockResolvedValue(undefined);
+    const coordinator = new MixnetCoordinator(
+      jest.fn().mockResolvedValue(transportBinding),
+      stopTransport,
+      () => {},
+    );
+
+    await coordinator.disable();
+    await flushPromises();
+
+    expect(stopTransport).toHaveBeenCalledTimes(1);
     coordinator.stop();
   });
 
@@ -292,9 +402,10 @@ describe('MixnetCoordinator', () => {
       statusPayload('ready', '127.0.0.1:1080'),
     );
     // A status poll that never settles: the lock must swallow later ticks.
-    mockedBridge.mixnetModeInfo.mockReturnValue(new Promise(() => {}));
+    mockedBridge.mixnetIndicatorInfo.mockReturnValue(new Promise(() => {}));
     const coordinator = new MixnetCoordinator(
-      jest.fn().mockResolvedValue('127.0.0.1:1080'),
+      jest.fn().mockResolvedValue(transportBinding),
+      noopStop,
       () => {},
     );
 
@@ -304,7 +415,7 @@ describe('MixnetCoordinator', () => {
     await jest.advanceTimersByTimeAsync(30_000);
     await jest.advanceTimersByTimeAsync(30_000);
     await jest.advanceTimersByTimeAsync(30_000);
-    expect(mockedBridge.mixnetModeInfo).toHaveBeenCalledTimes(1);
+    expect(mockedBridge.mixnetIndicatorInfo).toHaveBeenCalledTimes(1);
     coordinator.stop();
   });
 
@@ -312,11 +423,12 @@ describe('MixnetCoordinator', () => {
     mockedBridge.attachMixnet.mockResolvedValue(
       statusPayload('ready', '127.0.0.1:1080'),
     );
-    mockedBridge.mixnetModeInfo.mockResolvedValue(
+    mockedBridge.mixnetIndicatorInfo.mockResolvedValue(
       statusPayload('ready', '127.0.0.1:1080'),
     );
     const coordinator = new MixnetCoordinator(
-      jest.fn().mockResolvedValue('127.0.0.1:1080'),
+      jest.fn().mockResolvedValue(transportBinding),
+      noopStop,
       () => {},
     );
 
@@ -325,16 +437,16 @@ describe('MixnetCoordinator', () => {
     coordinator.stop();
 
     await jest.advanceTimersByTimeAsync(120_000);
-    expect(mockedBridge.mixnetModeInfo).not.toHaveBeenCalled();
+    expect(mockedBridge.mixnetIndicatorInfo).not.toHaveBeenCalled();
   });
 
   it('auto-reconnects after the transport dies, with no user action', async () => {
     mockedBridge.attachMixnet
       .mockResolvedValueOnce(statusPayload('died'))
       .mockResolvedValueOnce(statusPayload('ready', '127.0.0.1:1080'));
-    const startTransport = jest.fn().mockResolvedValue('127.0.0.1:1080');
+    const startTransport = jest.fn().mockResolvedValue(transportBinding);
     const published: MixnetView[] = [];
-    const coordinator = new MixnetCoordinator(startTransport, view =>
+    const coordinator = new MixnetCoordinator(startTransport, noopStop, view =>
       published.push(view),
     );
 
@@ -359,9 +471,9 @@ describe('MixnetCoordinator', () => {
     mockedBridge.attachMixnet
       .mockResolvedValueOnce(statusPayload('died'))
       .mockResolvedValueOnce(statusPayload('ready', '127.0.0.1:1080'));
-    const startTransport = jest.fn().mockResolvedValue('127.0.0.1:1080');
+    const startTransport = jest.fn().mockResolvedValue(transportBinding);
     const published: MixnetView[] = [];
-    const coordinator = new MixnetCoordinator(startTransport, view =>
+    const coordinator = new MixnetCoordinator(startTransport, noopStop, view =>
       published.push(view),
     );
 
@@ -382,9 +494,9 @@ describe('MixnetCoordinator', () => {
   it('a deliberate disable stops the auto-reconnect loop', async () => {
     mockedBridge.attachMixnet.mockResolvedValue(statusPayload('died'));
     mockedBridge.disableMixnet.mockResolvedValue(statusPayload('off'));
-    const startTransport = jest.fn().mockResolvedValue('127.0.0.1:1080');
+    const startTransport = jest.fn().mockResolvedValue(transportBinding);
     const published: MixnetView[] = [];
-    const coordinator = new MixnetCoordinator(startTransport, view =>
+    const coordinator = new MixnetCoordinator(startTransport, noopStop, view =>
       published.push(view),
     );
 
@@ -406,8 +518,12 @@ describe('MixnetCoordinator', () => {
 
   it('backs off exponentially while the transport stays down', async () => {
     mockedBridge.attachMixnet.mockResolvedValue(statusPayload('died'));
-    const startTransport = jest.fn().mockResolvedValue('127.0.0.1:1080');
-    const coordinator = new MixnetCoordinator(startTransport, () => {});
+    const startTransport = jest.fn().mockResolvedValue(transportBinding);
+    const coordinator = new MixnetCoordinator(
+      startTransport,
+      noopStop,
+      () => {},
+    );
 
     await coordinator.ensureForConnectedSession();
     await flushPromises();

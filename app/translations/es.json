@@ -458,7 +458,6 @@
       "died": "Conexión mixnet perdida",
       "unknown": "Mixnet no disponible"
     },
-    "send-blocked": "El envío está pausado hasta que la mixnet esté lista",
     "reenable": "Reactivar mixnet"
   },
   "mixnetdoctor": {

@@ -61,6 +61,11 @@ jobs:
     with:
       fail-all: true
 
+  nym-proxy-ffi-check:
+    uses: ./.github/workflows/nym-proxy-ffi-check.yaml
+    with:
+      fail-all: true
+
   js-depcheck:
     uses: ./.github/workflows/js-depcheck.yaml
     with:

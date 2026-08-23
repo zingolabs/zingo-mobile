@@ -84,20 +84,20 @@ run('lipo', [
   '-output', SIM_FAT_LIB,
 ]);
 
-// 4. Build the Nym proxy shim (nym-host) libraries + Swift bindings. The shim
-//    links nym-sdk, which resolves only in rust/nym-host's own lock, so it
+// 4. Build the Nym proxy shim (nym-proxy-ffi) libraries + Swift bindings. The shim
+//    links nym-sdk, which resolves only in rust/nym-proxy-ffi's own lock, so it
 //    builds apart from the wallet library above. Both static libraries link
 //    into the same app and share ONE module map (step 5), so there is never a
 //    second include/module.modulemap to collide with the wallet's.
-console.log('\n=== Building Nym proxy shim (nym-host) ===');
-const NYM_DIR = join(RUST_DIR, 'nym-host');
+console.log('\n=== Building Nym proxy shim (nym-proxy-ffi) ===');
+const NYM_DIR = join(RUST_DIR, 'nym-proxy-ffi');
 const NYM_TARGET_DIR = join(NYM_DIR, 'target');
 const NYM_GENERATED = join(NYM_DIR, 'Generated');
 const SHIM_LIB = 'libzingo_nym_proxy_ffi.a';
 const NYM_DEVICE_LIB = join(NYM_TARGET_DIR, DEVICE_TARGET, 'release', SHIM_LIB);
 const NYM_SIM_FAT_DIR = join(NYM_TARGET_DIR, 'universal-sim', 'release');
 const NYM_SIM_FAT_LIB = join(NYM_SIM_FAT_DIR, SHIM_LIB);
-const NYM_XCFRAMEWORK_OUT = join(REPO_IOS_DIR, 'NymHost.xcframework');
+const NYM_XCFRAMEWORK_OUT = join(REPO_IOS_DIR, 'ZingoNymProxyFFI.xcframework');
 
 for (const target of [DEVICE_TARGET, ...SIM_TARGETS]) {
   run('cargo', ['build', '--release', '--target', target, '-p', 'zingo-nym-proxy-ffi'], { env, cwd: NYM_DIR });
@@ -106,7 +106,7 @@ for (const target of [DEVICE_TARGET, ...SIM_TARGETS]) {
 rmSync(NYM_GENERATED, { recursive: true, force: true });
 mkdirSync(NYM_GENERATED, { recursive: true });
 run('cargo', [
-  'run', '--release', '-p', 'zingo-uniffi-bindgen', '--',
+  'run', '--release', '-p', 'zingo-uniffi-bindgen', '--bin', 'zingo-uniffi-bindgen', '--',
   'generate', '--library', NYM_DEVICE_LIB, '--language', 'swift', '--out-dir', NYM_GENERATED,
 ], { env, cwd: RUST_DIR });
 

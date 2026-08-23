@@ -415,6 +415,7 @@ exports[`Filters - snapshots Filters with active sent filter and memos 1`] = `
       }
     >
       <View
+        accessibilityRole="button"
         accessibilityState={
           {
             "busy": undefined,
@@ -491,6 +492,7 @@ exports[`Filters - snapshots Filters with active sent filter and memos 1`] = `
         </View>
       </View>
       <View
+        accessibilityRole="button"
         accessibilityState={
           {
             "busy": undefined,
@@ -987,6 +989,7 @@ exports[`Filters - snapshots Filters with no active filters 1`] = `
       }
     >
       <View
+        accessibilityRole="button"
         accessibilityState={
           {
             "busy": undefined,
@@ -1063,6 +1066,7 @@ exports[`Filters - snapshots Filters with no active filters 1`] = `
         </View>
       </View>
       <View
+        accessibilityRole="button"
         accessibilityState={
           {
             "busy": undefined,

@@ -139,19 +139,11 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
       ? route.params.sendPageState
       : ({} as SendPageStateClass),
   );
-  // NYM feature hidden for now — will be enabled in the future. Force the
-  // local flag to false so any residual `nym: true` carried in route params
-  // by a device that had NYM enabled in an earlier app version does not
-  // surface NYM-themed UI on this screen (green outline, "Processing via
-  // NYM" title, "Privacy Level NYM Enhanced" tag, NYM warning banner).
-  // Mirrors the same pattern used to hide the Send-screen toggle at
-  // components/Send/Send.tsx L2052-2083 (`{false && (...)}`).
-  // Read the route param so the value is still wired into the type system
-  // (so when NYM is re-enabled this single line is the only change needed
-  // here), but discard it.
-  const _routeNym: boolean =
+  // True when the send routes over the mixnet, so the confirm screen shows
+  // the NYM styling (green outline, processing title, enhanced-privacy tag,
+  // warning banner).
+  const nym: boolean =
     !!route.params && route.params.nym !== undefined ? route.params.nym : false;
-  const nym: boolean = false && _routeNym;
 
   const [containerH, setContainerH] = useState<number>(0);
   const [headerH, setHeaderH] = useState<number>(0);

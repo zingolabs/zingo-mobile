@@ -29,8 +29,12 @@ struct SyncStatus: Decodable {
     let total_sapling_outputs_scanned: Int64?
     let session_orchard_outputs_scanned: Int64?
     let total_orchard_outputs_scanned: Int64?
+    let session_ironwood_outputs_scanned: Int64?
+    let total_ironwood_outputs_scanned: Int64?
     let percentage_session_outputs_scanned: Double?
     let percentage_total_outputs_scanned: Double?
+    let total_outputs_scanned: Int64?
+    let total_outputs: Int64?
 }
 
 private struct BackgroundTaskResult: Encodable {

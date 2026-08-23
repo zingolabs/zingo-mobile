@@ -51,7 +51,7 @@ import NymOff from '../../assets/img/nym-off.svg';
 import NymSwitchOn from '../../assets/img/nym-switch-on.svg';
 import SwitchOff from '../../assets/img/switch-off.svg';
 import { showConfirm } from '../../app/showConfirm';
-import MixnetIcon, { mixnetPhase } from '../Header/components/MixnetIcon';
+import { mixnetPhase } from '../Header/components/MixnetIcon';
 import ErrorText from '../Components/ErrorText';
 import RegText from '../Components/RegText';
 import ZecAmount from '../Components/ZecAmount';
@@ -177,6 +177,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     mixnetView,
     nym,
     setNymOption,
+    reenableMixnet,
   } = context;
   const { colors } = useTheme();
 
@@ -186,7 +187,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       ? mixnetPhase(mixnetView.statusKey, mixnetView.reconnecting)
       : null;
   const nymLoading = enabling || nymPhase === 'connecting';
-  const nymOn = nym && !nymLoading;
+  const nymOn = nym;
 
   useEffect(() => {
     if (enabling && nymPhase !== null) {
@@ -1167,7 +1168,7 @@ const Send: React.FunctionComponent<SendProps> = ({
           Utils.parseStringLocaleToNumberFloat(maxAmount.toFixed(8)),
       calculateFeeWithPropose: calculateFeeWithPropose,
       sendPageState: buildSendState(),
-      nym: false,
+      nym,
     });
   };
 
@@ -2113,9 +2114,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                       opacity: nymLoading ? 0.4 : 1,
                     }}
                   >
-                    {nymLoading ? (
-                      <MixnetIcon phase="connecting" />
-                    ) : nymOn ? (
+                    {nymOn ? (
                       <NymOn width={22} height={22} />
                     ) : (
                       <NymOff width={22} height={22} />
@@ -2137,6 +2136,23 @@ const Send: React.FunctionComponent<SendProps> = ({
                     )}
                   </TouchableOpacity>
                 )}
+                {mixnetView !== null &&
+                  mixnetView.sendBlocked &&
+                  mixnetView.recovery === 'reenable' && (
+                    <View
+                      style={{
+                        alignItems: 'center',
+                        marginBottom: 10,
+                      }}
+                      testID="send.mixnet-reenable"
+                    >
+                      <TouchableOpacity onPress={() => reenableMixnet()}>
+                        <RegText color={colors.fgAccent}>
+                          {translate('mixnet.reenable') as string}
+                        </RegText>
+                      </TouchableOpacity>
+                    </View>
+                  )}
                 <View
                   style={{
                     flexGrow: 1,

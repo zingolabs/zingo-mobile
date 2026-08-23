@@ -36,7 +36,9 @@ const Button: React.FunctionComponent<ButtonProps> = ({
     type === ButtonTypeEnum.Primary
       ? {
           backgroundColor: disabled ? colors.bgAccentDisabled : colors.bgAccent,
-          borderColor: disabled ? colors.borderAccentDisabled : colors.borderAccent,
+          borderColor: disabled
+            ? colors.borderAccentDisabled
+            : colors.borderAccent,
           borderWidth: 2,
           width: twoButtons ? '40%' : '80%',
         }
@@ -45,7 +47,9 @@ const Button: React.FunctionComponent<ButtonProps> = ({
             backgroundColor: disabled
               ? colors.bgSecondaryDisabled
               : colors.bgSurface,
-            borderColor: disabled ? colors.borderAccentDisabled : colors.borderAccent,
+            borderColor: disabled
+              ? colors.borderAccentDisabled
+              : colors.borderAccent,
             borderWidth: 2,
             width: twoButtons ? '40%' : '80%',
           }

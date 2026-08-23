@@ -11,7 +11,11 @@ import { showConfirm } from '../../../app/showConfirm';
 
 import Clipboard from '@react-native-clipboard/clipboard';
 
-import { NavigationProp, ParamListBase, useNavigation } from '@react-navigation/native';
+import {
+  NavigationProp,
+  ParamListBase,
+  useNavigation,
+} from '@react-navigation/native';
 import { useTheme } from '../../../app/theme';
 
 import {

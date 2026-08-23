@@ -2,6 +2,7 @@
 
 exports[`Component Button - test Button Primary - snapshot 1`] = `
 <View
+  accessibilityRole="button"
   accessibilityState={
     {
       "busy": undefined,
@@ -81,6 +82,7 @@ exports[`Component Button - test Button Primary - snapshot 1`] = `
 
 exports[`Component Button - test Button Secondary - snapshot 1`] = `
 <View
+  accessibilityRole="button"
   accessibilityState={
     {
       "busy": undefined,

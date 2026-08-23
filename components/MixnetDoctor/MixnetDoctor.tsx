@@ -13,7 +13,6 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-import { useTheme } from '../../app/theme';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
@@ -22,6 +21,7 @@ import RegText from '../Components/RegText';
 import Button from '../Components/Button';
 import Header from '../Header';
 import { AppDrawerParamList } from '../../app/types';
+import { useTheme } from '../../app/theme';
 import { ContextAppLoaded } from '../../app/context';
 import { ButtonTypeEnum, RouteEnum, ScreenEnum } from '../../app/AppState';
 import {
@@ -78,8 +78,10 @@ const DoctorRow = ({
 // the box and its skeleton/report swap fade in place while the box and the
 // buttons below it morph to the new layout in sync, so nothing snaps ahead of
 // the frame. Fades survive reduced motion; the layout shift does not.
-const contentEnter = () => FadeIn.duration(200).reduceMotion(ReduceMotion.Never);
-const contentExit = () => FadeOut.duration(140).reduceMotion(ReduceMotion.Never);
+const contentEnter = () =>
+  FadeIn.duration(200).reduceMotion(ReduceMotion.Never);
+const contentExit = () =>
+  FadeOut.duration(140).reduceMotion(ReduceMotion.Never);
 const boxMorph = () =>
   LinearTransition.duration(260).reduceMotion(ReduceMotion.System);
 

@@ -26,11 +26,11 @@
 		1FA935B32BE457B100117DF5 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1F7D321C2B71D44800D2879C /* SystemConfiguration.framework */; };
 		1FC1E2172BE443270064963B /* ZingoTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FC1E2162BE443270064963B /* ZingoTest.swift */; };
 		1FE8E9AC296B85FC004A256B /* BackgroundTasks.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1FE8E9AB296B85FC004A256B /* BackgroundTasks.framework */; };
-		37F88F63B5EAB542D9638B06 /* NymHost.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = F1925119FD8B24B809B9A31C /* NymHost.xcframework */; };
+		37F88F63B5EAB542D9638B06 /* ZingoNymProxyFFI.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = F1925119FD8B24B809B9A31C /* ZingoNymProxyFFI.xcframework */; };
 		39916E0E0696D2BA46897D37 /* NymTransportModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0A6912D48B65F0E8D6E7619 /* NymTransportModule.swift */; };
 		406B854C612CDFA4B10C5B0A /* NymTransportModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0A6912D48B65F0E8D6E7619 /* NymTransportModule.swift */; };
 		5E39D39B9B57469EEF50715D /* zingo_nym_proxy_ffi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8866047183EF780F88A845B6 /* zingo_nym_proxy_ffi.swift */; };
-		72F4BE964DE9305F904FFD47 /* NymHost.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = F1925119FD8B24B809B9A31C /* NymHost.xcframework */; };
+		72F4BE964DE9305F904FFD47 /* ZingoNymProxyFFI.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = F1925119FD8B24B809B9A31C /* ZingoNymProxyFFI.xcframework */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		C15AEBBCEC942FCAC1519FEA /* libPods-Zingo-ZingoTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96E8D7BC5D3F3F73EA296DFA /* libPods-Zingo-ZingoTests.a */; };
 		E3B3E80957D603CCE394CAF9 /* NymTransportModuleBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = DD87BEDB3F10BB201D3845B8 /* NymTransportModuleBridge.m */; };
@@ -82,7 +82,7 @@
 		DD87BEDB3F10BB201D3845B8 /* NymTransportModuleBridge.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = NymTransportModuleBridge.m; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		F0A6912D48B65F0E8D6E7619 /* NymTransportModule.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NymTransportModule.swift; sourceTree = "<group>"; };
-		F1925119FD8B24B809B9A31C /* NymHost.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; path = NymHost.xcframework; sourceTree = "<group>"; };
+		F1925119FD8B24B809B9A31C /* ZingoNymProxyFFI.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; path = ZingoNymProxyFFI.xcframework; sourceTree = "<group>"; };
 		F2A2758701DF7B0BD33CA9F0 /* Pods-Zingo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Zingo.debug.xcconfig"; path = "Target Support Files/Pods-Zingo/Pods-Zingo.debug.xcconfig"; sourceTree = "<group>"; };
 		FB533652A711DBB0ED4E4306 /* Pods-Zingo.release-beta.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Zingo.release-beta.xcconfig"; path = "Target Support Files/Pods-Zingo/Pods-Zingo.release-beta.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -95,7 +95,7 @@
 				1FA935B32BE457B100117DF5 /* SystemConfiguration.framework in Frameworks */,
 				1F9FDA9C2FBD5CEC000C5248 /* Zingolib.xcframework in Frameworks */,
 				C15AEBBCEC942FCAC1519FEA /* libPods-Zingo-ZingoTests.a in Frameworks */,
-				72F4BE964DE9305F904FFD47 /* NymHost.xcframework in Frameworks */,
+				72F4BE964DE9305F904FFD47 /* ZingoNymProxyFFI.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -107,7 +107,7 @@
 				1F9FDA9B2FBD5CEC000C5248 /* Zingolib.xcframework in Frameworks */,
 				1F7D321D2B71D44800D2879C /* SystemConfiguration.framework in Frameworks */,
 				12BF9D27B26430347C700A81 /* libPods-Zingo.a in Frameworks */,
-				37F88F63B5EAB542D9638B06 /* NymHost.xcframework in Frameworks */,
+				37F88F63B5EAB542D9638B06 /* ZingoNymProxyFFI.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -160,7 +160,7 @@
 				1F9FDA9A2FBD5CEC000C5248 /* Zingolib.xcframework */,
 				293E2F479737E71EC621F947 /* libPods-Zingo.a */,
 				96E8D7BC5D3F3F73EA296DFA /* libPods-Zingo-ZingoTests.a */,
-				F1925119FD8B24B809B9A31C /* NymHost.xcframework */,
+				F1925119FD8B24B809B9A31C /* ZingoNymProxyFFI.xcframework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";

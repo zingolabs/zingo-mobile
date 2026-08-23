@@ -149,7 +149,7 @@ const ConfirmBottomSheet: React.FC = () => {
       <BottomSheetView
         style={{
           backgroundColor: colors.bgSurface,
-          paddingHorizontal: 6,
+          paddingHorizontal: 20,
           paddingTop: 18,
           paddingBottom: 24,
         }}

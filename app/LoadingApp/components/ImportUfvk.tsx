@@ -8,7 +8,11 @@ import React, {
 } from 'react';
 import { View, TouchableOpacity, TextInput, Keyboard } from 'react-native';
 
-import { NavigationProp, ParamListBase, useNavigation } from '@react-navigation/native';
+import {
+  NavigationProp,
+  ParamListBase,
+  useNavigation,
+} from '@react-navigation/native';
 import { useTheme } from '../../theme';
 import {
   faChevronLeft,

@@ -493,7 +493,11 @@ const IronwoodMigrationBanner: React.FunctionComponent<
                 }}
               />
               <Text
-                style={{ color: colors.fgDefault, fontSize: 15, fontWeight: '700' }}
+                style={{
+                  color: colors.fgDefault,
+                  fontSize: 15,
+                  fontWeight: '700',
+                }}
               >
                 {translate('ironwoodbanner.pool') as string}
               </Text>

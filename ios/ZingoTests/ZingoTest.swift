@@ -86,8 +86,12 @@ struct SyncStatus: Codable {
     let total_sapling_outputs_scanned: UInt64?
     let session_orchard_outputs_scanned: UInt64?
     let total_orchard_outputs_scanned: UInt64?
+    let session_ironwood_outputs_scanned: UInt64?
+    let total_ironwood_outputs_scanned: UInt64?
     let percentage_session_outputs_scanned: Double?
     let percentage_total_outputs_scanned: Double?
+    let total_outputs_scanned: UInt64?
+    let total_outputs: UInt64?
 }
 
 struct Balance: Codable {
@@ -552,12 +556,16 @@ final class UpdateCurrentPriceAndValueTransfersFromSeed: XCTestCase {
           return
         }
 
+        // Price rides the mixnet or does not happen (ADR 0011). This wallet
+        // never attached one, so the fetch must refuse. A price here would
+        // mean the wallet reached an oracle over clearnet, which is the
+        // leak the mixnet-only rule exists to prevent.
         do {
           let price = try zecPrice()
-          print("\nPrice:\n\(price)")
-        } catch {
-          XCTFail("\nInit from seed error:\n\(error.localizedDescription)")
+          XCTFail("\nThe price fetch answered without a mixnet:\n\(price)")
           return
+        } catch {
+          print("\nPrice refused without a mixnet:\n\(error.localizedDescription)")
         }
         
         do {
@@ -580,7 +588,7 @@ final class UpdateCurrentPriceAndValueTransfersFromSeed: XCTestCase {
             // Orden y valores como en Kotlin
             XCTAssertEqual(vts.value_transfers[0].kind, "memo-to-self")
             XCTAssertEqual(vts.value_transfers[0].status, "confirmed")
-            XCTAssertEqual(vts.value_transfers[0].value, 0)
+            XCTAssertEqual(vts.value_transfers[0].value, 870_000)
             XCTAssertEqual(vts.value_transfers[0].transaction_fee, 20_000)
 
             XCTAssertEqual(vts.value_transfers[1].kind, "sent")

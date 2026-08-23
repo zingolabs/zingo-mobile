@@ -6,13 +6,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import {
-  Image,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { useTheme } from '../../app/theme';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -216,13 +210,19 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
     );
   }, [navigation, selected]);
 
-  // Once the transport the user just enabled reaches ready, close the gate and
-  // advance to the chosen migration path.
+  // Ends the enable wait once the transport settles.
   useEffect(() => {
-    if (enabling && nymPhase === 'ready') {
+    if (!enabling) {
+      return;
+    }
+    if (nymPhase === 'ready') {
       setEnabling(false);
       nymSheetRef.current?.dismiss();
       startMigration();
+      return;
+    }
+    if (nymPhase === 'lost' || nymPhase === 'reconnecting') {
+      setEnabling(false);
     }
   }, [enabling, nymPhase, startMigration]);
 
@@ -347,8 +347,11 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
                 return;
               }
               if (nym) {
-                startMigration();
-                return;
+                if (nymPhase === 'ready') {
+                  startMigration();
+                  return;
+                }
+                setEnabling(true);
               }
               nymSheetRef.current?.present();
             }}
@@ -421,11 +424,23 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
           >
             {translate('migrationstrategy.nym-gate-body') as string}
           </Text>
-          {nymLoading && (
+          {nymLoading ? (
             <View style={{ marginBottom: 20 }}>
               <MixnetIcon phase="connecting" />
             </View>
-          )}
+          ) : (nymPhase === 'lost' || nymPhase === 'reconnecting') &&
+            mixnetView !== null ? (
+            <Text
+              style={{
+                fontSize: 15,
+                textAlign: 'center',
+                color: colors.fgDanger,
+                marginBottom: 20,
+              }}
+            >
+              {translate(mixnetView.statusKey) as string}
+            </Text>
+          ) : null}
           <Button
             testID="migrationstrategy.nym-continue"
             type={ButtonTypeEnum.Ghost}
