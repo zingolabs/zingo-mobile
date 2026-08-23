@@ -672,10 +672,10 @@ class RPCModule: NSObject {
   // The app-supplied migration broadcast candidate pool (its indexer
   // registry); zingolib embeds no default set.
   @objc(setBroadcastCandidates:resolve:reject:)
-  func setBroadcastCandidates(_ candidatesJson: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+  func setBroadcastCandidatesBridge(_ candidatesJson: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
       DispatchQueue.global(qos: .userInitiated).async {
         FfiOutcome.of {
-          try Zingo.setBroadcastCandidates(candidatesJson: candidatesJson)
+          try setBroadcastCandidates(candidatesJson: candidatesJson)
         }.settle(resolve: resolve, reject: reject)
       }
   }
@@ -683,28 +683,28 @@ class RPCModule: NSObject {
   // Mixnet Mode (send-over-nym). The wallet-side FFI seam, bridged on both
   // platforms; the local proxy is hosted separately by NymTransportModule.
   @objc(attachMixnet:exitNode:resolve:reject:)
-  func attachMixnet(_ socks5Addr: String, exitNode: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+  func attachMixnetBridge(_ socks5Addr: String, exitNode: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
       DispatchQueue.global(qos: .userInitiated).async {
         FfiOutcome.of {
-          try Zingo.attachMixnet(socks5Addr: socks5Addr, exitNode: exitNode)
+          try attachMixnet(socks5Addr: socks5Addr, exitNode: exitNode)
         }.settle(resolve: resolve, reject: reject)
       }
   }
 
   @objc(enableMixnet:resolve:reject:)
-  func enableMixnet(_ proxyPath: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+  func enableMixnetBridge(_ proxyPath: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
       DispatchQueue.global(qos: .userInitiated).async {
         FfiOutcome.of {
-          try Zingo.enableMixnet(proxyPath: proxyPath)
+          try enableMixnet(proxyPath: proxyPath)
         }.settle(resolve: resolve, reject: reject)
       }
   }
 
   @objc(disableMixnet:reject:)
-  func disableMixnet(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+  func disableMixnetBridge(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
       DispatchQueue.global(qos: .userInitiated).async {
         FfiOutcome.of {
-          try Zingo.disableMixnet()
+          try disableMixnet()
         }.settle(resolve: resolve, reject: reject)
       }
   }
