@@ -11,7 +11,11 @@ import { showConfirm } from '../../../app/showConfirm';
 
 import Clipboard from '@react-native-clipboard/clipboard';
 
-import { NavigationProp, ParamListBase, useNavigation } from '@react-navigation/native';
+import {
+  NavigationProp,
+  ParamListBase,
+  useNavigation,
+} from '@react-navigation/native';
 import { useTheme } from '../../../app/theme';
 
 import {
@@ -38,6 +42,7 @@ import { AppDrawerParamList } from '../../../app/types';
 import { ContextAppLoaded } from '../../../app/context';
 import Header from '../../Header';
 import BoldText from '../../Components/BoldText';
+import SheetRim from '../../Components/SheetRim';
 import CurrencyAmount from '../../Components/CurrencyAmount';
 import AddressItem from '../../Components/AddressItem';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -138,14 +143,9 @@ const ValueTransferDetail: React.FunctionComponent<
           backgroundColor: colors.bgSurface,
           borderTopLeftRadius: 40,
           borderTopRightRadius: 40,
-          borderTopWidth: 1,
-          borderLeftWidth: 0.5,
-          borderRightWidth: 0.5,
-          borderTopColor: colors.bottomSheetBorder,
-          borderLeftColor: colors.bottomSheetBorder,
-          borderRightColor: colors.bottomSheetBorder,
         }}
       >
+        <SheetRim />
         <View
           style={{
             flexDirection: 'row',
@@ -521,7 +521,9 @@ const ValueTransferDetail: React.FunctionComponent<
                             : valueTransfer.kind ===
                                   ValueTransferKindEnum.MemoToSelf &&
                                 valueTransfer.confirmations === 0
-                              ? (translate('history.sendingtoself') as string)
+                              ? (translate(
+                                  'history.sendingmemotoself',
+                                ) as string)
                               : valueTransfer.kind ===
                                     ValueTransferKindEnum.MemoToSelf &&
                                   valueTransfer.confirmations !== 0

@@ -15,7 +15,11 @@ import Animated, {
   withSequence,
   withTiming,
 } from 'react-native-reanimated';
-import { NavigationProp, ParamListBase, useNavigation } from '@react-navigation/native';
+import {
+  NavigationProp,
+  ParamListBase,
+  useNavigation,
+} from '@react-navigation/native';
 import { useTheme } from '../../theme';
 import BottomSheet, {
   BottomSheetFooter,
@@ -33,6 +37,7 @@ const RING_RED = '#822929';
 import RegText from '../../../components/Components/RegText';
 import BoldText from '../../../components/Components/BoldText';
 import Button from '../../../components/Components/Button';
+import SheetRim from '../../../components/Components/SheetRim';
 import { AppDrawerParamList } from '../../types';
 import { ContextAppLoaded } from '../../context';
 import Header from '../../../components/Header';
@@ -159,14 +164,10 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
           backgroundColor: colors.bgSurface,
           borderTopLeftRadius: 40,
           borderTopRightRadius: 40,
-          borderTopWidth: 1,
-          borderLeftWidth: 0.5,
-          borderRightWidth: 0.5,
-          borderTopColor: colors.bottomSheetBorder,
-          borderLeftColor: colors.bottomSheetBorder,
-          borderRightColor: colors.bottomSheetBorder,
         }}
-      />
+      >
+        <SheetRim />
+      </View>
     ),
     [colors],
   );

@@ -22,10 +22,6 @@ import mockSendPageState from '../__mocks__/dataMocks/mockSendPageState';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AppDrawerParamList } from '../app/types';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
-import { RPCParseAddressStatusEnum } from '../app/walletBackend/enums/RPCParseAddressStatusEnum';
-import { RPCAddressKindEnum } from '../app/walletBackend/enums/RPCAddressKindEnum';
-import { RPCReceiversEnum } from '../app/walletBackend/enums/RPCReceiversEnum';
-import { ChainNameEnum } from '../app/AppState';
 
 function makeProps(): NativeStackScreenProps<
   AppDrawerParamList,
@@ -38,15 +34,7 @@ function makeProps(): NativeStackScreenProps<
       name: RouteEnum.Confirm,
       params: {
         calculatedFee: 0.00001,
-        parseAddressInfoJSON: {
-          status: RPCParseAddressStatusEnum.successAddressParse,
-          chain_name: ChainNameEnum.mainChainName,
-          address_kind: RPCAddressKindEnum.unifiedAddressKind,
-          receivers_available: [
-            RPCReceiversEnum.orchardRPCReceiver,
-            RPCReceiversEnum.saplingRPCReceiver,
-          ],
-        },
+        proposalPools: { source: ['ironwood'], destination: ['ironwood'] },
         donationAmount: 0,
         confirmSend: jest.fn(async () => {}),
         sendAllAmount: false,

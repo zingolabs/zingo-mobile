@@ -23,6 +23,7 @@ import BottomSheet, { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 
 import RegText from '../Components/RegText';
 import BoldText from '../Components/BoldText';
+import SheetRim from '../Components/SheetRim';
 import ZecAmount from '../Components/ZecAmount';
 import { AppDrawerParamList } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
@@ -105,14 +106,9 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
           backgroundColor: colors.bgSurface,
           borderTopLeftRadius: 40,
           borderTopRightRadius: 40,
-          borderTopWidth: 1,
-          borderLeftWidth: 0.5,
-          borderRightWidth: 0.5,
-          borderTopColor: colors.bottomSheetBorder,
-          borderLeftColor: colors.bottomSheetBorder,
-          borderRightColor: colors.bottomSheetBorder,
         }}
       >
+        <SheetRim />
         <View
           style={{
             flexDirection: 'row',
@@ -204,9 +200,11 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
             address: item.address,
             tag: item.tag,
             svg: {
-              fill: item.address === 'fee' ? colors.bgMuted : randomColors[index],
+              fill:
+                item.address === 'fee' ? colors.bgMuted : randomColors[index],
             },
-            color: item.address === 'fee' ? colors.fgMuted : randomColors[index],
+            color:
+              item.address === 'fee' ? colors.fgMuted : randomColors[index],
             labelLineConfig: {
               color:
                 item.address === 'fee' ? colors.fgMuted : randomColors[index],
@@ -487,7 +485,8 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
                 <RegText
                   style={{
                     fontSize: 11,
-                    color: tab === 'memobytes' ? colors.fgAccent : colors.fgDefault,
+                    color:
+                      tab === 'memobytes' ? colors.fgAccent : colors.fgDefault,
                   }}
                 >
                   ({translate('insight.memobytes-text') as string})

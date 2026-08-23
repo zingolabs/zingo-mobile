@@ -13,6 +13,7 @@ import {
 
 import { ChainNameEnum, TranslateType } from '../../AppState';
 import BoldText from '../../../components/Components/BoldText';
+import SheetRim from '../../../components/Components/SheetRim';
 import CustomServer from './CustomServer';
 import { useKeyboardHeight } from '../../hooks/useKeyboardHeight';
 
@@ -81,14 +82,9 @@ const CustomServerModalHost = forwardRef<
             backgroundColor: colors.bgSurface,
             borderTopLeftRadius: 40,
             borderTopRightRadius: 40,
-            borderTopWidth: 1,
-            borderLeftWidth: 0.5,
-            borderRightWidth: 0.5,
-            borderTopColor: colors.bottomSheetBorder,
-            borderLeftColor: colors.bottomSheetBorder,
-            borderRightColor: colors.bottomSheetBorder,
           }}
         >
+          <SheetRim />
           <View
             style={{
               flexDirection: 'row',
@@ -118,7 +114,11 @@ const CustomServerModalHost = forwardRef<
               hitSlop={8}
               style={{ paddingHorizontal: 14, paddingVertical: 4 }}
             >
-              <FontAwesomeIcon icon={faXmark} size={20} color={colors.fgMuted} />
+              <FontAwesomeIcon
+                icon={faXmark}
+                size={20}
+                color={colors.fgMuted}
+              />
             </Pressable>
           </View>
         </View>

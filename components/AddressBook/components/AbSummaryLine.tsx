@@ -2,7 +2,11 @@
 import React, { useContext } from 'react';
 import { View, TouchableOpacity } from 'react-native';
 import { showConfirm } from '../../../app/showConfirm';
-import { NavigationProp, ParamListBase, useNavigation } from '@react-navigation/native';
+import {
+  NavigationProp,
+  ParamListBase,
+  useNavigation,
+} from '@react-navigation/native';
 import { useTheme } from '../../../app/theme';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {

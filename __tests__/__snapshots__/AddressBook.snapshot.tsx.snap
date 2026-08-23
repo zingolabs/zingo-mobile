@@ -13,19 +13,20 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
   <View
     onLayout={[Function]}
   >
-    <View
-      style={{}}
-    >
+    <View>
       <View
         style={
-          {
-            "alignItems": "center",
-            "backgroundColor": "#011401",
-            "display": "flex",
-            "minHeight": 50,
-            "paddingBottom": 10,
-            "paddingTop": 0,
-          }
+          [
+            {},
+            {
+              "alignItems": "center",
+              "backgroundColor": "#011401",
+              "display": "flex",
+              "minHeight": 50,
+              "paddingBottom": 10,
+              "paddingTop": 0,
+            },
+          ]
         }
         testID="header"
       >
@@ -69,12 +70,15 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
       </View>
       <View
         style={
-          {
-            "padding": 13,
-            "position": "absolute",
-            "right": 0,
-            "top": 0,
-          }
+          [
+            {},
+            {
+              "padding": 13,
+              "position": "absolute",
+              "right": 0,
+              "top": 0,
+            },
+          ]
         }
       >
         <Image
@@ -717,14 +721,8 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
             style={
               {
                 "backgroundColor": "#031124",
-                "borderLeftColor": "#05234C",
-                "borderLeftWidth": 0.5,
-                "borderRightColor": "#05234C",
-                "borderRightWidth": 0.5,
-                "borderTopColor": "#05234C",
                 "borderTopLeftRadius": 40,
                 "borderTopRightRadius": 40,
-                "borderTopWidth": 1,
                 "paddingHorizontal": 16,
                 "paddingTop": 8,
               }

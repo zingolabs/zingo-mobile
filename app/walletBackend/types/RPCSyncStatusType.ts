@@ -11,6 +11,10 @@ export type RPCSyncStatusType = {
   total_sapling_outputs_scanned?: number;
   session_orchard_outputs_scanned?: number;
   total_orchard_outputs_scanned?: number;
+  session_ironwood_outputs_scanned?: number;
+  total_ironwood_outputs_scanned?: number;
   percentage_session_outputs_scanned?: number;
   percentage_total_outputs_scanned?: number;
+  total_outputs_scanned?: number;
+  total_outputs?: number;
 };

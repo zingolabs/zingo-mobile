@@ -1,8 +1,11 @@
 /* eslint-disable react-native/no-inline-styles */
 import { faChevronLeft, faSnowflake } from '@fortawesome/free-solid-svg-icons';
-import BurgerIcon from '../../assets/img/options/burger.svg';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { NavigationProp, ParamListBase, useNavigation } from '@react-navigation/native';
+import {
+  NavigationProp,
+  ParamListBase,
+  useNavigation,
+} from '@react-navigation/native';
 import { useTheme } from '../../app/theme';
 import React, { useContext, useEffect } from 'react';
 import { Image, TouchableOpacity, View } from 'react-native';
@@ -36,6 +39,7 @@ import BalanceRow from './components/BalanceRow';
 import PriceRow from './components/PriceRow';
 import { MessagesIcon } from '../Components/Icons/MessagesIcon';
 import { MessagesIcon as BoltIcon } from '../Components/Icons/BoltIcon';
+import { MenuMorphIcon } from '../Components/Icons/MenuMorphIcon';
 
 type HeaderProps = {
   // general
@@ -131,8 +135,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
 
   const { colors } = useTheme();
 
-  // Fade the entire screen header out when the Options panel is open so
-  // its content doesn't shine through the (fading-in) panel overlay.
   const { isOpen: optionsPanelOpen } = useOptionsPanel();
   const headerOpacity = useSharedValue(1);
   useEffect(() => {
@@ -184,17 +186,20 @@ const Header: React.FunctionComponent<HeaderProps> = ({
 
   return (
     <>
-      <Animated.View style={headerAnimatedStyle}>
-        <View
+      <View>
+        <Animated.View
           testID="header"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            backgroundColor: colors.bgCanvas,
-            paddingTop: 0,
-            paddingBottom: 10,
-            minHeight: 50,
-          }}
+          style={[
+            headerAnimatedStyle,
+            {
+              display: 'flex',
+              alignItems: 'center',
+              backgroundColor: colors.bgCanvas,
+              paddingTop: 0,
+              paddingBottom: 10,
+              minHeight: 50,
+            },
+          ]}
         >
           <SyncStatusBar
             noSyncingStatus={noSyncingStatus}
@@ -251,7 +256,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               onLayout={onPriceRowLayout}
             />
           )}
-        </View>
+        </Animated.View>
 
         <View
           style={{
@@ -272,11 +277,11 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                 accessibilityLabel={translate('menudrawer-acc') as string}
                 onPress={toggleMenuDrawer}
               >
-                <BurgerIcon width={25} height={25} />
+                <MenuMorphIcon />
               </TouchableOpacity>
             )}
             {readOnly && !noUfvkIcon && (
-              <>
+              <Animated.View style={headerAnimatedStyle}>
                 {!(
                   mode === ModeEnum.basic &&
                   valueTransfersTotal !== null &&
@@ -304,18 +309,21 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                     color={colors.fgMuted}
                   />
                 )}
-              </>
+              </Animated.View>
             )}
           </View>
         </View>
 
-        <View
-          style={{
-            padding: 13,
-            position: 'absolute',
-            right: 0,
-            top: 0,
-          }}
+        <Animated.View
+          style={[
+            headerAnimatedStyle,
+            {
+              padding: 13,
+              position: 'absolute',
+              right: 0,
+              top: 0,
+            },
+          ]}
         >
           {!noDrawMenu && screenName !== ScreenEnum.Settings ? (
             <View
@@ -352,8 +360,8 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               }}
             />
           )}
-        </View>
-      </Animated.View>
+        </Animated.View>
+      </View>
 
       {!!title && (
         <View

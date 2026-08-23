@@ -21,8 +21,7 @@ const StepCircle: React.FunctionComponent<StepCircleProps> = ({
   active,
   colors,
 }) => {
-  const borderColor =
-    done || active ? colors.borderAccent : colors.borderMuted;
+  const borderColor = done || active ? colors.borderAccent : colors.borderMuted;
   const fgColor = done || active ? colors.fgAccent : colors.fgMuted;
   return (
     <View
@@ -39,7 +38,9 @@ const StepCircle: React.FunctionComponent<StepCircleProps> = ({
       {done ? (
         <FontAwesomeIcon icon={faCheck} size={14} color={fgColor} />
       ) : (
-        <Text style={{ color: fgColor, fontSize: 14, fontWeight: '700' }}>{label}</Text>
+        <Text style={{ color: fgColor, fontSize: 14, fontWeight: '700' }}>
+          {label}
+        </Text>
       )}
     </View>
   );

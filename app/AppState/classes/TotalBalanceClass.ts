@@ -38,3 +38,30 @@ export default class TotalBalanceClass {
     this.totalSpendableBalance = 0;
   }
 }
+
+const poolPairs = (
+  balance: TotalBalanceClass,
+): { total: number; confirmed: number }[] => [
+  {
+    total: balance.totalIronwoodBalance,
+    confirmed: balance.confirmedIronwoodBalance,
+  },
+  {
+    total: balance.totalOrchardBalance,
+    confirmed: balance.confirmedOrchardBalance,
+  },
+  {
+    total: balance.totalSaplingBalance,
+    confirmed: balance.confirmedSaplingBalance,
+  },
+  {
+    total: balance.totalTransparentBalance,
+    confirmed: balance.confirmedTransparentBalance,
+  },
+];
+
+export const hasUnconfirmedFunds = (balance: TotalBalanceClass): boolean =>
+  poolPairs(balance).some(pool => pool.total !== pool.confirmed);
+
+export const hasFullyUnconfirmedPool = (balance: TotalBalanceClass): boolean =>
+  poolPairs(balance).some(pool => pool.total > 0 && pool.confirmed === 0);

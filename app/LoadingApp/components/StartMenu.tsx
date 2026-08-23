@@ -25,6 +25,7 @@ import ActionMenuBottomSheet, {
 
 import { ButtonTypeEnum, ModeEnum, SelectServerEnum } from '../../AppState';
 import Button from '../../../components/Components/Button';
+import SheetRim from '../../../components/Components/SheetRim';
 import { ContextAppLoading } from '../../context';
 import {
   getZingoLogo,
@@ -142,14 +143,9 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
           backgroundColor: colors.bgSurface,
           borderTopLeftRadius: 40,
           borderTopRightRadius: 40,
-          borderTopWidth: 1,
-          borderLeftWidth: 0.5,
-          borderRightWidth: 0.5,
-          borderTopColor: colors.bottomSheetBorder,
-          borderLeftColor: colors.bottomSheetBorder,
-          borderRightColor: colors.bottomSheetBorder,
         }}
       >
+        <SheetRim />
         {/* StartMenu-only quirk: the parent header section has no opaque
             background (unlike the standard <Header/> used elsewhere), and
             on Android the straight middle of the top border between the

@@ -1125,8 +1125,8 @@ export class LoadingAppClass extends Component<
 
   // Android classifies the wallet files natively (2.0.21 double-wrap
   // incident). A repairable file gets a Repair button; every other failure
-  // keeps the usual server-aware handling, with the per-file states appended
-  // so a support report says what is on disk.
+  // gets a plain alert with the per-file states appended so a support
+  // report says what is on disk.
   walletLoadFailed = async (errorText: string) => {
     const title = this.state.translate(
       'loadingapp.readingwallet-label',
@@ -1134,12 +1134,27 @@ export class LoadingAppClass extends Component<
     const diagnosis = await walletFileDiagnosis();
     const diagnosisLines = this.walletFileDiagnosisLines(diagnosis);
     if (!hasRepairableWalletFile(diagnosis)) {
-      await this.walletErrorHandle(
-        diagnosisLines ? `${errorText}\n\n${diagnosisLines}` : errorText,
+      // Wallet-open failures are local and deterministic (undecodable
+      // file, chain mismatch, bad settings): the native layer opens
+      // Indexerless when only the server dial fails, so no open failure
+      // is server-caused. walletErrorHandle would diagnose this local
+      // error by probing the server, racing against its current state,
+      // and pick the alert text from whatever it happens to answer.
+      createAlert(
+        this.setBackgroundError,
+        this.addLastSnackbar,
         title,
-        RouteEnum.StartMenu,
-        true,
+        diagnosisLines ? `${errorText}\n\n${diagnosisLines}` : errorText,
+        false,
+        this.state.translate,
+        sendEmail,
+        this.state.zingolibVersion,
       );
+      this.setState({
+        actionButtonsDisabled: false,
+        serverErrorTries: 0,
+        screen: RouteEnum.StartMenu,
+      });
       return;
     }
     const body = `${this.state.translate(
