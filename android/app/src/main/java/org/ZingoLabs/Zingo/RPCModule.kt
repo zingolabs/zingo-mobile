@@ -35,6 +35,13 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         ).build()
     }
 
+    // The migration's trial decrypt ("is this file already encrypted?").
+    // Injectable so a test can replay a transient Keystore failure
+    // (DoubleWrapReproTest).
+    internal var migrationTrialDecrypt: (String) -> Unit = { fileName ->
+        buildEncryptedFile(fileName).openFileInput().use { it.readBytes() }
+    }
+
     // Migrates a wallet file from the old format (raw binary) to the new format
     // (encrypted Base64 text). Safe to call even if the file does not exist or
     // is already in the new format.
@@ -61,7 +68,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
         // Check if already encrypted — try reading it as EncryptedFile.
         val alreadyEncrypted = try {
-            buildEncryptedFile(fileName).openFileInput().use { it.readBytes() }
+            migrationTrialDecrypt(fileName)
             true
         } catch (_: Exception) {
             false
