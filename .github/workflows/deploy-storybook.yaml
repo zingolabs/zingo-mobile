@@ -1,0 +1,49 @@
+name: Deploy Storybook
+
+# On every push to dev, publishes the interactive web Storybook to the
+# Cloudflare Pages production URL — a stable link for browsing the current
+# components. Per-PR reports are preview deploys of the same project.
+
+on:
+  push:
+    branches: [dev]
+    paths:
+      - 'components/**'
+      - 'app/theme/**'
+      - 'app/AppState/**'
+      - '.storybook-web/**'
+      - 'assets/**'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-storybook
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Deploy Storybook
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.18.0
+          cache: yarn
+
+      - run: yarn
+
+      - run: yarn build-storybook
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: >-
+            pages deploy storybook-static
+            --project-name=zingo-visual
+            --branch=production

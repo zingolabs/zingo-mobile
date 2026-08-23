@@ -226,6 +226,18 @@ exports[`NewAddressTag - snapshot NewAddressTag renders correctly 1`] = `
             }
           >
             <View
+              onLayout={[Function]}
+              pointerEvents="none"
+              style={
+                {
+                  "left": 0,
+                  "position": "absolute",
+                  "right": 0,
+                  "top": 0,
+                }
+              }
+            />
+            <View
               style={
                 {
                   "alignItems": "center",
@@ -521,6 +533,7 @@ exports[`NewAddressTag - snapshot NewAddressTag renders correctly 1`] = `
       }
     >
       <View
+        accessibilityRole="button"
         accessibilityState={
           {
             "busy": undefined,
@@ -597,6 +610,7 @@ exports[`NewAddressTag - snapshot NewAddressTag renders correctly 1`] = `
         </View>
       </View>
       <View
+        accessibilityRole="button"
         accessibilityState={
           {
             "busy": undefined,

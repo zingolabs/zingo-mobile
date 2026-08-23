@@ -325,6 +325,18 @@ exports[`Component Address Book Details - test Address Book Datails - Add - snap
           }
         >
           <View
+            onLayout={[Function]}
+            pointerEvents="none"
+            style={
+              {
+                "left": 0,
+                "position": "absolute",
+                "right": 0,
+                "top": 0,
+              }
+            }
+          />
+          <View
             style={
               {
                 "alignItems": "center",
@@ -3410,6 +3422,7 @@ exports[`Component Address Book Details - test Address Book Datails - Add - snap
     }
   >
     <View
+      accessibilityRole="button"
       accessibilityState={
         {
           "busy": undefined,
@@ -3486,6 +3499,7 @@ exports[`Component Address Book Details - test Address Book Datails - Add - snap
       </View>
     </View>
     <View
+      accessibilityRole="button"
       accessibilityState={
         {
           "busy": undefined,
@@ -3791,6 +3805,18 @@ exports[`Component Address Book Details - test Address Book Datails - Delete - s
           }
         >
           <View
+            onLayout={[Function]}
+            pointerEvents="none"
+            style={
+              {
+                "left": 0,
+                "position": "absolute",
+                "right": 0,
+                "top": 0,
+              }
+            }
+          />
+          <View
             style={
               {
                 "alignItems": "center",
@@ -4086,6 +4112,7 @@ exports[`Component Address Book Details - test Address Book Datails - Delete - s
     }
   >
     <View
+      accessibilityRole="button"
       accessibilityState={
         {
           "busy": undefined,
@@ -4162,6 +4189,7 @@ exports[`Component Address Book Details - test Address Book Datails - Delete - s
       </View>
     </View>
     <View
+      accessibilityRole="button"
       accessibilityState={
         {
           "busy": undefined,
@@ -4534,6 +4562,18 @@ exports[`Component Address Book Details - test Address Book Datails - Modify - s
           }
         >
           <View
+            onLayout={[Function]}
+            pointerEvents="none"
+            style={
+              {
+                "left": 0,
+                "position": "absolute",
+                "right": 0,
+                "top": 0,
+              }
+            }
+          />
+          <View
             style={
               {
                 "alignItems": "center",
@@ -4829,6 +4869,7 @@ exports[`Component Address Book Details - test Address Book Datails - Modify - s
     }
   >
     <View
+      accessibilityRole="button"
       accessibilityState={
         {
           "busy": undefined,
@@ -4905,6 +4946,7 @@ exports[`Component Address Book Details - test Address Book Datails - Modify - s
       </View>
     </View>
     <View
+      accessibilityRole="button"
       accessibilityState={
         {
           "busy": undefined,

@@ -2,6 +2,11 @@
 #
 .DS_Store
 
+# Secrets
+.env
+.env.*
+!.env.example
+
 # Xcode
 #
 build/
@@ -39,6 +44,7 @@ ios/zingo.swift
 ios/zingo_nym_proxy_ffi.swift
 rust/lib/Generated/zingo.swift
 rust/lib/Generated/zingoFFI.h
+rust/nym-host/Generated/
 rust/nym-proxy-ffi/Generated/
 rust/lib/Generated/zingoFFI.modulemap
 
@@ -115,6 +121,22 @@ buck-out/
 
 # Jest coverage output
 coverage/
+
+# Storybook web static build
+storybook-static/
+
+# Visual regression (review artifacts. baselines are committed)
+visual/__current__/
+visual/__baseline__/
+visual/__diff__/
+visual/__video__/
+visual/report.html
+visual/report.json
+visual/index.html
+visual/styled.html
+visual/ci/
+test-results/
+playwright-report/
 
 # Local env
 .env
