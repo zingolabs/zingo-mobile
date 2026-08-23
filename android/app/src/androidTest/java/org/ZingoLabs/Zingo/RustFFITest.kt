@@ -113,8 +113,12 @@ data class SyncStatus (
     var total_sapling_outputs_scanned : Long = 0L,
     var session_orchard_outputs_scanned : Long = 0L,
     var total_orchard_outputs_scanned : Long = 0L,
+    var session_ironwood_outputs_scanned : Long = 0L,
+    var total_ironwood_outputs_scanned : Long = 0L,
     var percentage_session_outputs_scanned : Double = 0.0,
-    var percentage_total_outputs_scanned : Double = 0.0
+    var percentage_total_outputs_scanned : Double = 0.0,
+    var total_outputs_scanned : Long = 0L,
+    var total_outputs : Long = 0L
 )
 
 data class Balance (
