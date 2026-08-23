@@ -69,7 +69,7 @@ const Card: React.FunctionComponent<{
   <View
     style={{
       borderWidth: 1,
-      borderColor: colors.borderMuted,
+      borderColor: colors.bottomSheetBorder,
       backgroundColor: colors.bgSurface,
       borderRadius: 12,
       paddingHorizontal: 16,

@@ -13,6 +13,7 @@ import {
 
 import BoldText from './BoldText';
 import RegText from './RegText';
+import SheetRim from './SheetRim';
 
 export type ActionMenuBottomSheetAction = {
   label: string;
@@ -58,14 +59,9 @@ const ActionMenuBottomSheet = forwardRef<
           backgroundColor: colors.bgSurface,
           borderTopLeftRadius: 40,
           borderTopRightRadius: 40,
-          borderTopWidth: 1,
-          borderLeftWidth: 0.5,
-          borderRightWidth: 0.5,
-          borderTopColor: colors.bottomSheetBorder,
-          borderLeftColor: colors.bottomSheetBorder,
-          borderRightColor: colors.bottomSheetBorder,
         }}
       >
+        <SheetRim />
         <View
           style={{
             flexDirection: 'row',
