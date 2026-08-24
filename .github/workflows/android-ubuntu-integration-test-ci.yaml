@@ -312,7 +312,8 @@ jobs:
               url="$(echo "$line" | grep -oE 'git[[:space:]]*=[[:space:]]*"[^"]+"' | sed -E 's/.*"([^"]+)".*/\1/')"
               ref="$(echo "$line" | grep -oE '(branch|tag)[[:space:]]*=[[:space:]]*"[^"]+"' | sed -E 's/.*"([^"]+)".*/\1/')"
               echo "Resolving zingolib ${ref} from ${url} via git ls-remote"
-              REV="$(git ls-remote "$url" "$ref" | awk 'NR==1{print $1}')"
+              # For an annotated tag the peeled "$ref^{}" line lists last.
+              REV="$(git ls-remote "$url" "$ref" "${ref}^{}" | awk 'END{print $1}')"
             fi
           fi
           test -n "$REV"
