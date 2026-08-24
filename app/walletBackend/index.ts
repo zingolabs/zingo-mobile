@@ -71,4 +71,15 @@ export {
   walletExists,
   windowTimeline,
 } from './utils/walletUtils';
+export {
+  hasRepairableWalletFile,
+  repairDoubleWrappedWallet,
+  repairSucceeded,
+  walletFileDiagnosis,
+} from './utils/walletFileRepair';
+export type {
+  WalletFileDiagnosis,
+  WalletFileRepairOutcome,
+  WalletFileState,
+} from './utils/walletFileRepair';
 export default WalletBackend;
