@@ -1,9 +1,10 @@
 name: Visual review
 
-# Builds this PR and its base branch on the same runner, captures both with
-# the web Storybook harness, and diffs head vs base — no committed baseline.
-# The report (visual/ci) is uploaded as an artifact and the result posted to
-# the PR. The check fails when a component or animation changed.
+# Builds the PR head, captures it with the web Storybook harness, and diffs
+# it against the committed baseline (visual/__baseline__). The check fails
+# when a story changed, appeared, or disappeared without a baseline update.
+# Accepting is a commit: `yarn visual:accept` pulls this run's capture into
+# the baseline, so the accepted pixels are the runner's own.
 
 on:
   pull_request:
@@ -32,8 +33,6 @@ jobs:
     steps:
       - name: Checkout PR head
         uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -55,36 +54,24 @@ jobs:
       - name: Capture PR head
         run: VISUAL_OUT=visual/ci/head yarn visual:snapshot
 
-      # Base uses its own checked-out harness (works once this lands on the
-      # base branch). Until then — or on any base hiccup — this is a clean
-      # no-op and the diff below treats every story as new.
-      - name: Capture base (${{ github.base_ref }})
-        continue-on-error: true
-        run: |
-          git fetch origin "$BASE" --depth=1
-          git worktree add "$RUNNER_TEMP/base" "origin/$BASE"
-          ln -s "$GITHUB_WORKSPACE/node_modules" "$RUNNER_TEMP/base/node_modules"
-          if grep -q '"visual:snapshot"' "$RUNNER_TEMP/base/package.json"; then
-            ( cd "$RUNNER_TEMP/base" \
-              && VISUAL_OUT="$GITHUB_WORKSPACE/visual/ci/base" yarn visual:snapshot ) \
-              || echo "::warning::base capture failed — every story reads as new"
-          else
-            echo "::notice::base branch has no visual harness yet — every story reads as new"
-          fi
-        env:
-          BASE: ${{ github.base_ref }}
+      # The bundle `yarn visual:accept` downloads to become the baseline.
+      - name: Upload capture
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-head
+          path: visual/ci/head
 
-      # The head build is still in storybook-static (base built in its own
-      # worktree). Ship it alongside the report so the Current tab embeds it.
+      # Ship the head build alongside the report so the Current tab embeds it.
       - name: Assemble Current view
         run: cp -r storybook-static visual/ci/storybook
 
-      - name: Diff head vs base
+      - name: Diff head vs baseline
         id: diff
         continue-on-error: true
         run: >-
           VISUAL_CURRENT=visual/ci/head
-          VISUAL_BASELINE=visual/ci/base
+          VISUAL_BASELINE=visual/__baseline__
           VISUAL_REPORT=visual/ci/index.html
           VISUAL_STORYBOOK=storybook/index.html
           yarn tsx visual/diff.mts
@@ -122,15 +109,28 @@ jobs:
             const deployed = '${{ steps.deploy.outcome }}' === 'success';
             // Stable per-PR alias; always points at this PR's latest deploy.
             const url = `https://pr-${context.issue.number}.zingo-visual.pages.dev`;
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
             const link = deployed
               ? `**[Open the review page](${url})** — Current, Animations, and Image diffs tabs.`
-              : `Download the **visual-review** artifact from [this run](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}) and open \`index.html\`.`;
+              : `Download the **visual-review** artifact from [this run](${runUrl}) and open \`index.html\`.`;
+            const accept = changed
+              ? [
+                  '',
+                  'If the change is intended, accept it into the baseline from this branch:',
+                  '',
+                  '```',
+                  'yarn visual:accept   # pulls this run\'s capture into visual/__baseline__',
+                  'git add visual/__baseline__ && git commit -m "test(visual): accept <what changed>"',
+                  '```',
+                ]
+              : [];
             const marker = '<!-- visual-review -->';
             const body = [
               marker,
-              `### Visual review — ${changed ? '⚠️ changes detected' : '✅ no changes'}`,
+              `### Visual review — ${changed ? '⚠️ changes detected' : '✅ matches baseline'}`,
               '',
-              `Head vs \`${context.payload.pull_request.base.ref}\`. ${link}`,
+              `Head vs \`visual/__baseline__\`. ${link}`,
+              ...accept,
             ].join('\n');
             const { data: comments } = await github.rest.issues.listComments({
               owner: context.repo.owner, repo: context.repo.repo,
@@ -152,5 +152,5 @@ jobs:
       - name: Gate
         if: steps.diff.outcome != 'success'
         run: |
-          echo "Visual changes detected — open the visual-review artifact."
+          echo "Visual changes detected — review the report, then 'yarn visual:accept' and commit visual/__baseline__."
           exit 1

@@ -24,12 +24,17 @@ const animated = [
   { story: 'header-mixneticon--reconnecting', name: 'reconnecting' },
 ];
 
+// The clock is paused from before the page loads, so the animation's t=0 is
+// the first runFor, not whenever the runner finished loading the page.
 async function openStory(page: Page, story: string) {
   await page.clock.install({ time: 0 });
+  await page.clock.pauseAt(0);
   await page.goto(`/iframe.html?id=${story}&viewMode=story`);
   await page.locator('#storybook-root').waitFor({ state: 'visible' });
   const rect = page.locator('#storybook-root rect[stroke-dashoffset]').first();
   await rect.waitFor({ state: 'attached' });
+  await page.evaluate('document.fonts.ready');
+  await page.waitForTimeout(250);
   return rect;
 }
 
