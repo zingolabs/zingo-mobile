@@ -89,15 +89,21 @@ if (local) {
   const run = runArg === undefined ? latestRun() : undefined;
   const runId = runArg ?? String(run!.databaseId);
   if (run) {
-    if (run.status !== 'completed') {
-      fail(`run ${runId} is ${run.status}: wait for it to finish.`);
-    }
     const head = git('rev-parse HEAD');
     if (run.headSha !== head) {
       fail(
         `run ${runId} captured ${run.headSha.slice(0, 9)}, HEAD is ${head.slice(0, 9)}: ` +
           'push and wait for its run, or name one with --run <id>.',
       );
+    }
+    if (run.status !== 'completed') {
+      console.log(`run ${runId} is ${run.status}: watching it.`);
+      const watch = spawnSync('gh', ['run', 'watch', runId], {
+        stdio: 'inherit',
+      });
+      if (watch.status !== 0) {
+        fail(`watching run ${runId} failed.`);
+      }
     }
   }
   const tmp = mkdtempSync(join(tmpdir(), 'visual-head-'));
