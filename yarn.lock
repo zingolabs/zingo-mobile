@@ -2094,12 +2094,12 @@
     invariant "^2.2.4"
     nullthrows "^1.1.1"
 
-"@react-navigation/bottom-tabs@^7.18.7":
-  version "7.18.7"
-  resolved "https://registry.yarnpkg.com/@react-navigation/bottom-tabs/-/bottom-tabs-7.18.7.tgz#fae8398aae17896952ec8082be85a9f938764645"
-  integrity sha512-c3E15wXMyAjuLmDrafKUAfXQFS5M0QMpWbRqlGTw62iSyjrwZxVEGyJ0dD0xlckAJSRUYl2Di68QKWi61aePMg==
+"@react-navigation/bottom-tabs@^7.18.16":
+  version "7.18.16"
+  resolved "https://registry.yarnpkg.com/@react-navigation/bottom-tabs/-/bottom-tabs-7.18.16.tgz#59040cd7e4e47bedfe88082597581cd571824b74"
+  integrity sha512-5tBFuxvsCQBvYauDZK6u/uPdD86i/caWgBzABlZfTh8W2J7YZSHjT9SWOsquSMmR6dpcNj6idMd4utCNzuOnZg==
   dependencies:
-    "@react-navigation/elements" "^2.9.29"
+    "@react-navigation/elements" "^2.9.38"
     color "^4.2.3"
     sf-symbols-typescript "^2.1.0"
 
@@ -2117,10 +2117,10 @@
     use-latest-callback "^0.2.4"
     use-sync-external-store "^1.5.0"
 
-"@react-navigation/elements@^2.9.29":
-  version "2.9.30"
-  resolved "https://registry.yarnpkg.com/@react-navigation/elements/-/elements-2.9.30.tgz#60702877319f06c20b15e3f98446dcc994c67cff"
-  integrity sha512-2isleieiRMmP4WNMV2Q1u3qP1M47ZqsJ2hJ/Og11FeKXK8YmUTHya7PW7ecsgAh2CXKTxAcbfJDFTSvq2D++Tw==
+"@react-navigation/elements@^2.9.29", "@react-navigation/elements@^2.9.38":
+  version "2.9.39"
+  resolved "https://registry.yarnpkg.com/@react-navigation/elements/-/elements-2.9.39.tgz#4bbbf44d5d05708e1dcbb0ebeee3fcbe5cd9ebcb"
+  integrity sha512-XWgWIyMDZ0yjTP0aLbi2y+VID/3giOLEqtdpMfNTOQf8F5rdM49PWgUBZSlZ4b5VWL/eTIo5VNOsRon26OEiFA==
   dependencies:
     color "^4.2.3"
     use-latest-callback "^0.2.4"
