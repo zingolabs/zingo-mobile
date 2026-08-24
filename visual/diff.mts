@@ -75,6 +75,12 @@ const RADIUS = 6;
 const PERIMETER = 4 * (SIDE - 2 * RADIUS) + 2 * Math.PI * RADIUS;
 const LIT_ARC = PERIMETER * 0.32;
 
+// Pixels a pair may differ by and still pass. A long linear animation (the
+// 8s quote ring) lands a frame apart between two runs of the same machine,
+// about 40 anti-aliased pixels on a 1.5M-pixel capture. A real change to
+// even a small icon is hundreds. The budget sits between.
+const JITTER_PIXELS = 100;
+
 // --- image gate: reg-cli exits nonzero when a pair differs. A story with
 // no baseline, or a baseline with no story, fails too: the committed
 // baseline must cover exactly the stories that exist.
@@ -90,6 +96,8 @@ const reg = spawnSync(
     regReport,
     '-J',
     regJson,
+    '-S',
+    String(JITTER_PIXELS),
   ],
   { stdio: 'inherit' },
 );

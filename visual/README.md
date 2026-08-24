@@ -95,9 +95,19 @@ find a change quickly.
 ## Determinism
 
 A fake clock makes the animated frames stable. `capture.spec.ts` and the
-timeline spec pause the clock and step it. Because of this, a loop stops at the
-same tick every run. The `globalSetup` step clears the output bundle before
-each run. Therefore a renamed story or a retagged story leaves no old artifact.
+timeline spec pause the clock before the page loads and step it. Because of
+this, a loop stops at the same tick every run, on any machine speed. Fonts and
+layout observers run on real time, outside the fake clock, so the specs let
+them land before the first step. That is why CI runs one worker: parallel
+browsers on a two-core runner starve those callbacks and a sheet captures
+mid-present. CSS animations and the text caret run on real time too, so the
+screenshot freezes them.
+
+What remains is a frame of jitter on a long linear animation, a few dozen
+anti-aliased pixels. The image gate allows `JITTER_PIXELS` per pair (100),
+far below any real change. The `globalSetup` step clears the output bundle
+before each run. Therefore a renamed story or a retagged story leaves no old
+artifact.
 
 ## Capture bundles
 

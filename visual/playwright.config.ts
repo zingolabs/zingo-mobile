@@ -10,6 +10,10 @@ export default defineConfig({
   outputDir: './__video__',
   globalSetup: './global-setup.ts',
   fullyParallel: true,
+  // Layout observers and fonts run on real time, outside the fake clock.
+  // Parallel browsers on a two-core runner starve them past the settle
+  // window and the sheet stories capture mid-present. One worker there.
+  workers: process.env.CI ? 1 : undefined,
   reporter: [['list']],
   use: {
     baseURL: `http://localhost:${port}`,
