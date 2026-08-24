@@ -7,7 +7,12 @@ import {
   withBottomSheet,
   withNavigation,
 } from '../storyDecorators';
-import { mockInfo, mockTotalBalance } from '../storyMocks';
+import {
+  mixnetConnecting,
+  mixnetLost,
+  mockInfo,
+  mockTotalBalance,
+} from '../storyMocks';
 
 const meta: Meta<typeof MigrationStrategy> = {
   title: 'Migration/Strategy',
@@ -17,10 +22,37 @@ const meta: Meta<typeof MigrationStrategy> = {
     withNavigation,
     withBottomSheet,
   ],
-  args: screenProps(RouteEnum.MigrationStrategy),
+  args: { ...screenProps(RouteEnum.MigrationStrategy), nymSheetOpen: false },
+  argTypes: { nymSheetOpen: { control: 'boolean' } },
 };
 
 export default meta;
 type Story = StoryObj<typeof MigrationStrategy>;
 
 export const Default: Story = {};
+
+export const NymSheetOpen: Story = { args: { nymSheetOpen: true } };
+
+export const NymSheetConnecting: Story = {
+  args: { nymSheetOpen: true },
+  decorators: [
+    withAppContext({
+      info: mockInfo,
+      totalBalance: mockTotalBalance,
+      nym: true,
+      mixnetView: mixnetConnecting,
+    }),
+  ],
+};
+
+export const NymSheetLost: Story = {
+  args: { nymSheetOpen: true },
+  decorators: [
+    withAppContext({
+      info: mockInfo,
+      totalBalance: mockTotalBalance,
+      nym: true,
+      mixnetView: mixnetLost,
+    }),
+  ],
+};
