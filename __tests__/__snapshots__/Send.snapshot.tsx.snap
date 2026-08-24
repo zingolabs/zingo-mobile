@@ -1496,6 +1496,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
             >
               <View
                 accessibilityLabel="title text translated"
+                accessibilityRole="button"
                 accessibilityState={
                   {
                     "busy": undefined,
@@ -1768,6 +1769,7 @@ memo10"
         }
       >
         <View
+          accessibilityRole="button"
           accessibilityState={
             {
               "busy": undefined,
@@ -1857,19 +1859,25 @@ memo10"
       style={
         {
           "backgroundColor": "#031124",
-          "borderLeftColor": "#05234C",
-          "borderLeftWidth": 0.5,
-          "borderRightColor": "#05234C",
-          "borderRightWidth": 0.5,
-          "borderTopColor": "#05234C",
           "borderTopLeftRadius": 40,
           "borderTopRightRadius": 40,
-          "borderTopWidth": 1,
           "paddingHorizontal": 16,
           "paddingTop": 8,
         }
       }
     >
+      <View
+        onLayout={[Function]}
+        pointerEvents="none"
+        style={
+          {
+            "left": 0,
+            "position": "absolute",
+            "right": 0,
+            "top": 0,
+          }
+        }
+      />
       <View
         style={
           {
@@ -2048,6 +2056,7 @@ memo10"
     }
   >
     <View
+      accessibilityRole="button"
       accessibilityState={
         {
           "busy": undefined,
@@ -3172,6 +3181,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
             >
               <View
                 accessibilityLabel="title text translated"
+                accessibilityRole="button"
                 accessibilityState={
                   {
                     "busy": undefined,
@@ -3444,6 +3454,7 @@ memo10"
         }
       >
         <View
+          accessibilityRole="button"
           accessibilityState={
             {
               "busy": undefined,
@@ -3533,19 +3544,25 @@ memo10"
       style={
         {
           "backgroundColor": "#031124",
-          "borderLeftColor": "#05234C",
-          "borderLeftWidth": 0.5,
-          "borderRightColor": "#05234C",
-          "borderRightWidth": 0.5,
-          "borderTopColor": "#05234C",
           "borderTopLeftRadius": 40,
           "borderTopRightRadius": 40,
-          "borderTopWidth": 1,
           "paddingHorizontal": 16,
           "paddingTop": 8,
         }
       }
     >
+      <View
+        onLayout={[Function]}
+        pointerEvents="none"
+        style={
+          {
+            "left": 0,
+            "position": "absolute",
+            "right": 0,
+            "top": 0,
+          }
+        }
+      />
       <View
         style={
           {
@@ -3724,6 +3741,7 @@ memo10"
     }
   >
     <View
+      accessibilityRole="button"
       accessibilityState={
         {
           "busy": undefined,

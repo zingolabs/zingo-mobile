@@ -6,6 +6,7 @@ import { useTheme } from '../../app/theme';
 
 import ZecAmount from '../Components/ZecAmount';
 import BoldText from '../Components/BoldText';
+import SheetRim from '../Components/SheetRim';
 import DetailLine from '../Components/DetailLine';
 import { AppDrawerParamList } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
@@ -61,14 +62,9 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
           backgroundColor: colors.bgSurface,
           borderTopLeftRadius: 40,
           borderTopRightRadius: 40,
-          borderTopWidth: 1,
-          borderLeftWidth: 0.5,
-          borderRightWidth: 0.5,
-          borderTopColor: colors.bottomSheetBorder,
-          borderLeftColor: colors.bottomSheetBorder,
-          borderRightColor: colors.bottomSheetBorder,
         }}
       >
+        <SheetRim />
         <View
           style={{
             flexDirection: 'row',

@@ -317,19 +317,25 @@ exports[`Component Address Book Details - test Address Book Datails - Add - snap
           style={
             {
               "backgroundColor": "#031124",
-              "borderLeftColor": "#05234C",
-              "borderLeftWidth": 0.5,
-              "borderRightColor": "#05234C",
-              "borderRightWidth": 0.5,
-              "borderTopColor": "#05234C",
               "borderTopLeftRadius": 40,
               "borderTopRightRadius": 40,
-              "borderTopWidth": 1,
               "paddingHorizontal": 16,
               "paddingTop": 8,
             }
           }
         >
+          <View
+            onLayout={[Function]}
+            pointerEvents="none"
+            style={
+              {
+                "left": 0,
+                "position": "absolute",
+                "right": 0,
+                "top": 0,
+              }
+            }
+          />
           <View
             style={
               {
@@ -3416,6 +3422,7 @@ exports[`Component Address Book Details - test Address Book Datails - Add - snap
     }
   >
     <View
+      accessibilityRole="button"
       accessibilityState={
         {
           "busy": undefined,
@@ -3492,6 +3499,7 @@ exports[`Component Address Book Details - test Address Book Datails - Add - snap
       </View>
     </View>
     <View
+      accessibilityRole="button"
       accessibilityState={
         {
           "busy": undefined,
@@ -3789,19 +3797,25 @@ exports[`Component Address Book Details - test Address Book Datails - Delete - s
           style={
             {
               "backgroundColor": "#031124",
-              "borderLeftColor": "#05234C",
-              "borderLeftWidth": 0.5,
-              "borderRightColor": "#05234C",
-              "borderRightWidth": 0.5,
-              "borderTopColor": "#05234C",
               "borderTopLeftRadius": 40,
               "borderTopRightRadius": 40,
-              "borderTopWidth": 1,
               "paddingHorizontal": 16,
               "paddingTop": 8,
             }
           }
         >
+          <View
+            onLayout={[Function]}
+            pointerEvents="none"
+            style={
+              {
+                "left": 0,
+                "position": "absolute",
+                "right": 0,
+                "top": 0,
+              }
+            }
+          />
           <View
             style={
               {
@@ -4098,6 +4112,7 @@ exports[`Component Address Book Details - test Address Book Datails - Delete - s
     }
   >
     <View
+      accessibilityRole="button"
       accessibilityState={
         {
           "busy": undefined,
@@ -4174,6 +4189,7 @@ exports[`Component Address Book Details - test Address Book Datails - Delete - s
       </View>
     </View>
     <View
+      accessibilityRole="button"
       accessibilityState={
         {
           "busy": undefined,
@@ -4538,19 +4554,25 @@ exports[`Component Address Book Details - test Address Book Datails - Modify - s
           style={
             {
               "backgroundColor": "#031124",
-              "borderLeftColor": "#05234C",
-              "borderLeftWidth": 0.5,
-              "borderRightColor": "#05234C",
-              "borderRightWidth": 0.5,
-              "borderTopColor": "#05234C",
               "borderTopLeftRadius": 40,
               "borderTopRightRadius": 40,
-              "borderTopWidth": 1,
               "paddingHorizontal": 16,
               "paddingTop": 8,
             }
           }
         >
+          <View
+            onLayout={[Function]}
+            pointerEvents="none"
+            style={
+              {
+                "left": 0,
+                "position": "absolute",
+                "right": 0,
+                "top": 0,
+              }
+            }
+          />
           <View
             style={
               {
@@ -4847,6 +4869,7 @@ exports[`Component Address Book Details - test Address Book Datails - Modify - s
     }
   >
     <View
+      accessibilityRole="button"
       accessibilityState={
         {
           "busy": undefined,
@@ -4923,6 +4946,7 @@ exports[`Component Address Book Details - test Address Book Datails - Modify - s
       </View>
     </View>
     <View
+      accessibilityRole="button"
       accessibilityState={
         {
           "busy": undefined,

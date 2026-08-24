@@ -91,6 +91,7 @@ exports[`NewAddress - snapshots NewAddress transparent kind 1`] = `
       }
     >
       <View
+        accessibilityRole="button"
         accessibilityState={
           {
             "busy": undefined,
@@ -167,6 +168,7 @@ exports[`NewAddress - snapshots NewAddress transparent kind 1`] = `
         </View>
       </View>
       <View
+        accessibilityRole="button"
         accessibilityState={
           {
             "busy": undefined,
@@ -639,6 +641,7 @@ exports[`NewAddress - snapshots NewAddress unified kind 1`] = `
       }
     >
       <View
+        accessibilityRole="button"
         accessibilityState={
           {
             "busy": undefined,
@@ -715,6 +718,7 @@ exports[`NewAddress - snapshots NewAddress unified kind 1`] = `
         </View>
       </View>
       <View
+        accessibilityRole="button"
         accessibilityState={
           {
             "busy": undefined,

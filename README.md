@@ -145,5 +145,15 @@ The legacy Detox suite under `e2e/*.test.js` is no longer wired to CI or
 to any `yarn` script. It is being phased out in favour of Maestro and
 should not be relied on; new e2e coverage should land as Maestro flows.
 
+# Storybook & visual review
+Browse components in isolation with Storybook (on-device via
+`yarn storybook:ios`/`storybook:android`, web via `yarn storybook:web`).
+
+The web build powers per-PR visual regression: `yarn visual` captures and
+diffs components and animations against a baseline. See
+[visual/README.md](./visual/README.md) for the harness, and
+[.github/CLOUDFLARE.md](./.github/CLOUDFLARE.md) for the Cloudflare Pages deploy
+that publishes the review site.
+
 # Troubleshooting
 For notes on known issues and problems, see the [trouble-shooting notes](./TROUBLESHOOTING.md).

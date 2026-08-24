@@ -7,23 +7,24 @@ import ToAddrClass from './classes/ToAddrClass';
 import TotalBalanceClass from './classes/TotalBalanceClass';
 import AddressBookFileClassObsolete from './classes/AddressBookFileClassObsolete';
 
-import InfoType from './types/InfoType';
-import SendJsonToTypeType from './types/SendJsonToTypeType';
-import WalletType from './types/WalletType';
-import { TranslateType } from './types/TranslateType';
-import NetInfoType from './types/NetInfoType';
-import BackgroundType from './types/BackgroundType';
-import BackgroundErrorType from './types/BackgroundErrorType';
-import ServerType from './types/ServerType';
-import ZecPriceType from './types/ZecPriceType';
-import SecurityType from './types/SecurityType';
-import ServerUrisType from './types/ServerUrisType';
-import { SetServerResult } from './types/SetServerResult';
-import { ErrorKeyed, Done, DONE } from './types/Result';
-import ValueTransferType from './types/ValueTransferType';
-import ProposalPoolsType from './types/ProposalPoolsType';
-import TransactionType from './types/TransactionType';
-import TxDetailType from './types/TxDetailType';
+import type InfoType from './types/InfoType';
+import type SendJsonToTypeType from './types/SendJsonToTypeType';
+import type WalletType from './types/WalletType';
+import type { TranslateType } from './types/TranslateType';
+import type NetInfoType from './types/NetInfoType';
+import type BackgroundType from './types/BackgroundType';
+import type BackgroundErrorType from './types/BackgroundErrorType';
+import type ServerType from './types/ServerType';
+import type ZecPriceType from './types/ZecPriceType';
+import type SecurityType from './types/SecurityType';
+import type ServerUrisType from './types/ServerUrisType';
+import type { SetServerResult } from './types/SetServerResult';
+import type { ErrorKeyed, Done } from './types/Result';
+import { DONE } from './types/Result';
+import type ValueTransferType from './types/ValueTransferType';
+import type ProposalPoolsType from './types/ProposalPoolsType';
+import type TransactionType from './types/TransactionType';
+import type TxDetailType from './types/TxDetailType';
 
 import { AddressBookActionEnum } from './enums/AddressBookActionEnum';
 import { MenuItemEnum } from './enums/MenuItemEnum';
@@ -66,16 +67,12 @@ import {
   estimatedTimestampMs,
 } from './const/BlockTime';
 
-import AppStateLoaded from './AppStateLoaded';
-import AppStateLoading from './AppStateLoading';
-import AppContextLoading from './AppContextLoading';
-import AppContextLoaded from './AppContextLoaded';
+import type AppStateLoaded from './AppStateLoaded';
+import type AppStateLoading from './AppStateLoading';
+import type AppContextLoading from './AppContextLoading';
+import type AppContextLoaded from './AppContextLoaded';
 
 export {
-  AppStateLoaded,
-  AppStateLoading,
-  AppContextLoading,
-  AppContextLoaded,
   UnifiedAddressClass,
   TransparentAddressClass,
   AddressBookFileClass,
@@ -84,25 +81,7 @@ export {
   ToAddrClass,
   TotalBalanceClass,
   AddressBookFileClassObsolete,
-  WalletType,
-  SendJsonToTypeType,
-  InfoType,
-  ZecPriceType,
-  BackgroundType,
-  BackgroundErrorType,
-  TranslateType,
-  NetInfoType,
-  ServerType,
-  SecurityType,
-  ServerUrisType,
-  SetServerResult,
-  ErrorKeyed,
-  Done,
   DONE,
-  ValueTransferType,
-  ProposalPoolsType,
-  TransactionType,
-  TxDetailType,
   AddressBookActionEnum,
   MenuItemEnum,
   LanguageEnum,
@@ -140,4 +119,29 @@ export {
   foldBlockSpacing,
   windowTargetHeight,
   estimatedTimestampMs,
+};
+
+export type {
+  AppStateLoaded,
+  AppStateLoading,
+  AppContextLoading,
+  AppContextLoaded,
+  WalletType,
+  SendJsonToTypeType,
+  InfoType,
+  ZecPriceType,
+  BackgroundType,
+  BackgroundErrorType,
+  TranslateType,
+  NetInfoType,
+  ServerType,
+  SecurityType,
+  ServerUrisType,
+  SetServerResult,
+  ErrorKeyed,
+  Done,
+  ValueTransferType,
+  ProposalPoolsType,
+  TransactionType,
+  TxDetailType,
 };

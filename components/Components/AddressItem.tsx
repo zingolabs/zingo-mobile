@@ -119,7 +119,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
               marginRight: onlyContact ? 0 : 10,
             }}
           >
-            {contact && (
+            {!!contact && (
               <TouchableOpacity
                 onPress={() => {
                   setExpandContact(true);
@@ -236,7 +236,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
           )}
           {withSendIcon &&
             !addressProtected &&
-            contact &&
+            !!contact &&
             !readOnly &&
             selectServer !== SelectServerEnum.offline &&
             !(

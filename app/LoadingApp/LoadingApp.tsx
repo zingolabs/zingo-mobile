@@ -1,5 +1,6 @@
 import React, { Component, useState, useMemo, useEffect } from 'react';
 import {
+  Alert,
   I18nManager,
   EmitterSubscription,
   AppState,
@@ -31,7 +32,10 @@ import {
   createNewWallet,
   getVersionInfo,
   getWalletKind,
+  hasRepairableWalletFile,
   loadExistingWallet,
+  repairDoubleWrappedWallet,
+  repairSucceeded,
   resolvedTrue,
   restoreExistingWalletBackup,
   restoreWalletFromSeed,
@@ -39,6 +43,9 @@ import {
   setCryptoDefaultProvider,
   walletBackupExists,
   walletExists as rpcWalletExists,
+  walletFileDiagnosis,
+  WalletFileDiagnosis,
+  WalletFileRepairOutcome,
 } from '../walletBackend';
 import {
   AppStateLoading,
@@ -641,136 +648,7 @@ export class LoadingAppClass extends Component<
 
     if (exists) {
       this.setState({ walletExists: true });
-      const result = await loadExistingWallet(
-        this.state.server.uri,
-        this.state.server.chainName,
-        this.state.performanceLevel,
-        GlobalConst.minConfirmations.toString(),
-      );
-
-      let error = false;
-      let errorText = '';
-      if (result.ok && result.value) {
-        try {
-          // here result can have an `error` field for watch-only which is actually OK.
-          const resultJson: RPCSeedType & RPCUfvkType = await JSON.parse(
-            result.value,
-          );
-          if (!resultJson.error) {
-            // Load the wallet and navigate to the vts screen
-            let readOnly: boolean = false;
-            let orchardPool: boolean = false;
-            let saplingPool: boolean = false;
-            let transparentPool: boolean = false;
-            const walletKindResult = await getWalletKind();
-            const walletKindStr: string = walletKindResult.ok
-              ? walletKindResult.value
-              : walletKindResult.error.message;
-            try {
-              const walletKindJSON: RPCWalletKindType =
-                await JSON.parse(walletKindStr);
-              console.log('KIND... JSON', walletKindJSON);
-              // there are 4 kinds:
-              // 1. seed
-              // 2. USK
-              // 3. UFVK - watch-only wallet
-              // 4. No keys - watch-only wallet (possibly an error)
-
-              if (
-                walletKindJSON.kind ===
-                  RPCWalletKindEnum.LoadedFromUnifiedFullViewingKey ||
-                walletKindJSON.kind === RPCWalletKindEnum.NoKeysFound
-              ) {
-                readOnly = true;
-              } else {
-                readOnly = false;
-              }
-              orchardPool = walletKindJSON.orchard;
-              saplingPool = walletKindJSON.sapling;
-              transparentPool = walletKindJSON.transparent;
-              // if the seed & birthday are not stored in Keychain/Keystore, do it now.
-              if (this.state.recoveryWalletInfoOnDevice) {
-                const wallet = await fetchWallet(readOnly);
-                if (wallet) {
-                  await createUpdateRecoveryWalletInfo(wallet);
-                }
-              } else {
-                // needs to delete the seed from the Keychain/Keystore, do it now.
-                if (this.state.hasRecoveryWalletInfoSaved) {
-                  await removeRecoveryWalletInfo();
-                }
-              }
-              this.setState({
-                readOnly,
-                orchardPool,
-                saplingPool,
-                transparentPool,
-                actionButtonsDisabled: false,
-              });
-            } catch (e) {
-              this.setState({
-                readOnly,
-                orchardPool,
-                saplingPool,
-                transparentPool,
-                actionButtonsDisabled: false,
-              });
-              this.addLastSnackbar(walletKindStr);
-            }
-            // if the App is restoring another wallet backup...
-            // needs to recalculate the Address Book.
-            const newWallet =
-              !!this.props.route.params &&
-              this.props.route.params.newWallet !== undefined
-                ? this.props.route.params.newWallet
-                : false;
-            this.navigateToLoadedApp(
-              readOnly,
-              orchardPool,
-              saplingPool,
-              transparentPool,
-              newWallet,
-              this.state.firstLaunchingMessage,
-              // The wallet's own chain, surfaced by the native result (reliable
-              // even Offline). The server's chain is only a pre-rebuild fallback.
-              (resultJson.chain_name as ChainNameEnum) ||
-                this.state.server.chainName,
-            );
-          } else {
-            error = true;
-            errorText = resultJson.error;
-          }
-        } catch (e: unknown) {
-          error = true;
-          errorText = e instanceof Error ? e.message : String(e);
-        }
-      } else {
-        error = true;
-        errorText = result.ok ? result.value : result.error.message;
-      }
-      if (error) {
-        // Wallet-open failures are local and deterministic (undecodable
-        // file, chain mismatch, bad settings): the native layer opens
-        // Indexerless when only the server dial fails, so no open failure
-        // is server-caused. walletErrorHandle would diagnose this local
-        // error by probing the server, racing against its current state,
-        // and pick the alert text from whatever it happens to answer.
-        createAlert(
-          this.setBackgroundError,
-          this.addLastSnackbar,
-          this.state.translate('loadingapp.readingwallet-label') as string,
-          Utils.humanizeChainTokens(errorText, this.state.translate),
-          false,
-          this.state.translate,
-          sendEmail,
-          this.state.zingolibVersion,
-        );
-        this.setState({
-          actionButtonsDisabled: false,
-          serverErrorTries: 0,
-          screen: RouteEnum.StartMenu,
-        });
-      }
+      await this.loadExistingWalletOnBoot();
     } else {
       if (this.state.mode === ModeEnum.basic) {
         // setting the prop basicFirstViewSeed to false.
@@ -1127,6 +1005,242 @@ export class LoadingAppClass extends Component<
     } else {
       return false;
     }
+  };
+
+  // Loads the wallet file found on disk. Also the retry after a file repair.
+  loadExistingWalletOnBoot = async () => {
+    const result = await loadExistingWallet(
+      this.state.server.uri,
+      this.state.server.chainName,
+      this.state.performanceLevel,
+      GlobalConst.minConfirmations.toString(),
+    );
+
+    let error = false;
+    let errorText = '';
+    if (result.ok && result.value) {
+      try {
+        // here result can have an `error` field for watch-only which is actually OK.
+        const resultJson: RPCSeedType & RPCUfvkType = await JSON.parse(
+          result.value,
+        );
+        if (!resultJson.error) {
+          // Load the wallet and navigate to the vts screen
+          let readOnly: boolean = false;
+          let orchardPool: boolean = false;
+          let saplingPool: boolean = false;
+          let transparentPool: boolean = false;
+          const walletKindResult = await getWalletKind();
+          const walletKindStr: string = walletKindResult.ok
+            ? walletKindResult.value
+            : walletKindResult.error.message;
+          try {
+            const walletKindJSON: RPCWalletKindType =
+              await JSON.parse(walletKindStr);
+            console.log('KIND... JSON', walletKindJSON);
+            // there are 4 kinds:
+            // 1. seed
+            // 2. USK
+            // 3. UFVK - watch-only wallet
+            // 4. No keys - watch-only wallet (possibly an error)
+
+            if (
+              walletKindJSON.kind ===
+                RPCWalletKindEnum.LoadedFromUnifiedFullViewingKey ||
+              walletKindJSON.kind === RPCWalletKindEnum.NoKeysFound
+            ) {
+              readOnly = true;
+            } else {
+              readOnly = false;
+            }
+            orchardPool = walletKindJSON.orchard;
+            saplingPool = walletKindJSON.sapling;
+            transparentPool = walletKindJSON.transparent;
+            // if the seed & birthday are not stored in Keychain/Keystore, do it now.
+            if (this.state.recoveryWalletInfoOnDevice) {
+              const wallet = await fetchWallet(readOnly);
+              if (wallet) {
+                await createUpdateRecoveryWalletInfo(wallet);
+              }
+            } else {
+              // needs to delete the seed from the Keychain/Keystore, do it now.
+              if (this.state.hasRecoveryWalletInfoSaved) {
+                await removeRecoveryWalletInfo();
+              }
+            }
+            this.setState({
+              readOnly,
+              orchardPool,
+              saplingPool,
+              transparentPool,
+              actionButtonsDisabled: false,
+            });
+          } catch (e) {
+            this.setState({
+              readOnly,
+              orchardPool,
+              saplingPool,
+              transparentPool,
+              actionButtonsDisabled: false,
+            });
+            this.addLastSnackbar(walletKindStr);
+          }
+          // if the App is restoring another wallet backup...
+          // needs to recalculate the Address Book.
+          const newWallet =
+            !!this.props.route.params &&
+            this.props.route.params.newWallet !== undefined
+              ? this.props.route.params.newWallet
+              : false;
+          this.navigateToLoadedApp(
+            readOnly,
+            orchardPool,
+            saplingPool,
+            transparentPool,
+            newWallet,
+            this.state.firstLaunchingMessage,
+            // The wallet's own chain, surfaced by the native result (reliable
+            // even Offline). The server's chain is only a pre-rebuild fallback.
+            (resultJson.chain_name as ChainNameEnum) ||
+              this.state.server.chainName,
+          );
+        } else {
+          error = true;
+          errorText = resultJson.error;
+        }
+      } catch (e: unknown) {
+        error = true;
+        errorText = e instanceof Error ? e.message : String(e);
+      }
+    } else {
+      error = true;
+      errorText = result.ok ? result.value : result.error.message;
+    }
+    if (error) {
+      await this.walletLoadFailed(
+        Utils.humanizeChainTokens(errorText, this.state.translate),
+      );
+    }
+  };
+
+  // Android classifies the wallet files natively (2.0.21 double-wrap
+  // incident). A repairable file gets a Repair button; every other failure
+  // gets a plain alert with the per-file states appended so a support
+  // report says what is on disk.
+  walletLoadFailed = async (errorText: string) => {
+    const title = this.state.translate(
+      'loadingapp.readingwallet-label',
+    ) as string;
+    const diagnosis = await walletFileDiagnosis();
+    const diagnosisLines = this.walletFileDiagnosisLines(diagnosis);
+    if (!hasRepairableWalletFile(diagnosis)) {
+      // Wallet-open failures are local and deterministic (undecodable
+      // file, chain mismatch, bad settings): the native layer opens
+      // Indexerless when only the server dial fails, so no open failure
+      // is server-caused. walletErrorHandle would diagnose this local
+      // error by probing the server, racing against its current state,
+      // and pick the alert text from whatever it happens to answer.
+      createAlert(
+        this.setBackgroundError,
+        this.addLastSnackbar,
+        title,
+        diagnosisLines ? `${errorText}\n\n${diagnosisLines}` : errorText,
+        false,
+        this.state.translate,
+        sendEmail,
+        this.state.zingolibVersion,
+      );
+      this.setState({
+        actionButtonsDisabled: false,
+        serverErrorTries: 0,
+        screen: RouteEnum.StartMenu,
+      });
+      return;
+    }
+    const body = `${this.state.translate(
+      'loadingapp.walletrepair-body',
+    )}\n\n${diagnosisLines}`;
+    this.setState({
+      actionButtonsDisabled: false,
+      serverErrorTries: 0,
+      screen: RouteEnum.StartMenu,
+    });
+    Alert.alert(
+      title,
+      body,
+      [
+        {
+          text: this.state.translate(
+            'loadingapp.walletrepair-button',
+          ) as string,
+          onPress: () => this.repairWalletFiles(title),
+        },
+        {
+          text: this.state.translate('support') as string,
+          onPress: () =>
+            sendEmail(
+              this.state.translate,
+              this.state.zingolibVersion,
+              title,
+              `${errorText}\n\n${body}`,
+            ),
+        },
+        { text: this.state.translate('cancel') as string, style: 'cancel' },
+      ],
+      { cancelable: false },
+    );
+  };
+
+  walletFileDiagnosisLines = (diagnosis: WalletFileDiagnosis[]): string =>
+    diagnosis
+      .map(
+        d =>
+          `${d.name}: ${this.state.translate(
+            `loadingapp.walletfile-state-${d.state}`,
+          )}`,
+      )
+      .join('\n');
+
+  repairWalletFiles = async (title: string) => {
+    this.setState({ actionButtonsDisabled: true });
+    const outcomes = await repairDoubleWrappedWallet();
+    if (repairSucceeded(outcomes)) {
+      this.addLastSnackbar(
+        this.state.translate('loadingapp.walletrepair-success') as string,
+      );
+      await this.loadExistingWalletOnBoot();
+      return;
+    }
+    const outcomeLines = Object.entries(outcomes)
+      .map(
+        ([name, outcome]: [string, WalletFileRepairOutcome]) =>
+          `${name}: ${this.state.translate(
+            `loadingapp.walletrepair-outcome-${outcome}`,
+          )}`,
+      )
+      .join('\n');
+    const body = `${this.state.translate(
+      'loadingapp.walletrepair-failed',
+    )}\n\n${outcomeLines}`;
+    this.setState({ actionButtonsDisabled: false });
+    Alert.alert(
+      title,
+      body,
+      [
+        {
+          text: this.state.translate('support') as string,
+          onPress: () =>
+            sendEmail(
+              this.state.translate,
+              this.state.zingolibVersion,
+              title,
+              body,
+            ),
+        },
+        { text: this.state.translate('cancel') as string, style: 'cancel' },
+      ],
+      { cancelable: false },
+    );
   };
 
   walletErrorHandle = async (

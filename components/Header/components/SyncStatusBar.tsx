@@ -359,6 +359,12 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
               flexDirection: 'row',
               alignItems: 'center',
               justifyContent: 'center',
+              margin: 0,
+              marginHorizontal: 2.5,
+              paddingHorizontal: 5,
+              paddingVertical: 1,
+              minWidth: 25,
+              minHeight: 25,
             }}
           >
             <MixnetIcon phase={phase} />
