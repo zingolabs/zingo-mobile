@@ -2117,21 +2117,21 @@
     use-latest-callback "^0.2.4"
     use-sync-external-store "^1.5.0"
 
-"@react-navigation/elements@^2.9.29":
-  version "2.9.30"
-  resolved "https://registry.yarnpkg.com/@react-navigation/elements/-/elements-2.9.30.tgz#60702877319f06c20b15e3f98446dcc994c67cff"
-  integrity sha512-2isleieiRMmP4WNMV2Q1u3qP1M47ZqsJ2hJ/Og11FeKXK8YmUTHya7PW7ecsgAh2CXKTxAcbfJDFTSvq2D++Tw==
+"@react-navigation/elements@^2.9.29", "@react-navigation/elements@^2.9.38":
+  version "2.9.39"
+  resolved "https://registry.yarnpkg.com/@react-navigation/elements/-/elements-2.9.39.tgz#4bbbf44d5d05708e1dcbb0ebeee3fcbe5cd9ebcb"
+  integrity sha512-XWgWIyMDZ0yjTP0aLbi2y+VID/3giOLEqtdpMfNTOQf8F5rdM49PWgUBZSlZ4b5VWL/eTIo5VNOsRon26OEiFA==
   dependencies:
     color "^4.2.3"
     use-latest-callback "^0.2.4"
     use-sync-external-store "^1.5.0"
 
-"@react-navigation/native-stack@^7.17.9":
-  version "7.17.9"
-  resolved "https://registry.yarnpkg.com/@react-navigation/native-stack/-/native-stack-7.17.9.tgz#659c3ba0c6ef4fb5f8e19e42f3ac4e58c63d15c2"
-  integrity sha512-gXNSBxNjg9zpgOPgptwp5zM6LLorwXn2V8T4NuLZLjYe5DDovC+gtu6NhDXazwctiTWdff+BRwWbWK7zXvSvnw==
+"@react-navigation/native-stack@^7.18.8":
+  version "7.18.8"
+  resolved "https://registry.yarnpkg.com/@react-navigation/native-stack/-/native-stack-7.18.8.tgz#4048f4cc7165997d4b5135186d2e788400b4da52"
+  integrity sha512-Abcdt2ndmbeNSzJCXggxduK7X9yvMIajPNPdHgxsAZaA+16aIhb7TXZ2kRXprStZX5TRg8x+8G07Ne3kFwIQDg==
   dependencies:
-    "@react-navigation/elements" "^2.9.29"
+    "@react-navigation/elements" "^2.9.38"
     color "^4.2.3"
     sf-symbols-typescript "^2.1.0"
     warn-once "^0.1.1"
