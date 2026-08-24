@@ -7,6 +7,7 @@ import {
   NavigationProp,
   ParamListBase,
 } from '@react-navigation/native';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import {
   BottomSheetModal,
@@ -19,8 +20,10 @@ import {
   defaultAppContextLoaded,
 } from '../app/context/contextAppLoaded';
 import { AppContextLoaded } from '../app/AppState';
+import { AppDrawerParamList } from '../app/types';
 import { substituteZingoName } from '../app/utils/ZingoAppData';
 import en from '../app/translations/en.json';
+import { RpcFixture, setRpcFixtures } from './storyRpc';
 
 // Resolve the real English catalog so stories read like the app, not raw keys.
 const i18n = new I18n({ en });
@@ -32,23 +35,24 @@ export const mockTranslate = ((key: string) =>
 // Wrap a story in a loaded-app context, with overrides for the fields a component reads.
 export const withAppContext =
   (overrides: Partial<AppContextLoaded> = {}): Decorator =>
-  Story =>
-    (
-      <ContextAppLoadedProvider
-        value={{
-          ...defaultAppContextLoaded,
-          translate: mockTranslate,
-          ...overrides,
-        }}
-      >
-        <Story />
-      </ContextAppLoadedProvider>
-    );
+  Story => (
+    <ContextAppLoadedProvider
+      value={{
+        ...defaultAppContextLoaded,
+        translate: mockTranslate,
+        ...overrides,
+      }}
+    >
+      <Story />
+    </ContextAppLoadedProvider>
+  );
 
 // A navigate and goBack sink so useNavigation() resolves off-navigator.
 const mockNavigation = {
   navigate: () => {},
   goBack: () => {},
+  reset: () => {},
+  replace: () => {},
   dispatch: () => {},
   setOptions: () => {},
   addListener: () => () => {},
@@ -62,6 +66,32 @@ export const withNavigation: Decorator = Story => (
     <Story />
   </NavigationContext.Provider>
 );
+
+// The navigation and route props a stack screen receives, for stories of
+// whole screens. The sink above stands in for the navigator.
+export const screenProps = <R extends keyof AppDrawerParamList>(
+  name: R,
+  params?: AppDrawerParamList[R],
+): NativeStackScreenProps<AppDrawerParamList, R> => ({
+  navigation: mockNavigation as unknown as NativeStackScreenProps<
+    AppDrawerParamList,
+    R
+  >['navigation'],
+  route: {
+    key: `${name}-story`,
+    name,
+    params,
+  } as unknown as NativeStackScreenProps<AppDrawerParamList, R>['route'],
+});
+
+// Registers the bridge answers a screen's backend calls will get on web.
+// Set during render so the screen's mount effects already see them.
+export const withRpc =
+  (fixtures: Record<string, RpcFixture>): Decorator =>
+  Story => {
+    React.useState(() => setRpcFixtures(fixtures));
+    return <Story />;
+  };
 
 // Presents a forwardRef BottomSheetModal on mount so the sheet is the story.
 export const SheetHost: React.FunctionComponent<{
