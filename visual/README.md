@@ -1,20 +1,34 @@
 # Visual review (web)
 
 This tool finds visual changes in the web Storybook build. It compares each
-component against a baseline. The `yarn visual` command fails if an image or an
-animation timeline is different from the baseline.
+story against the committed baseline in `visual/__baseline__`. The check fails
+if an image or an animation timeline is different from the baseline, if a
+story has no baseline, or if a baseline has no story.
 
-In CI, the tool compares the branch against the base branch. It does not use a
-stored baseline. On your computer, the tool compares against the `__baseline__`
-folder, or against a reference with `visual:compare`.
+A visual change ships with its baseline update in the same PR. The reviewer
+sees the new pixels in the PR diff, next to the code that caused them.
 
 ## Flow
 
 ```
-yarn visual          # build storybook-static, capture, diff — fails on any change
+yarn visual          # build storybook-static, capture, diff against the baseline
 yarn visual:report   # open both reports: reg-cli (images) + motion (animations)
-yarn visual:accept   # promote current → baseline after reviewing a real change
+yarn visual:accept   # promote the CI capture of this branch → baseline, then commit
 ```
+
+The accept step reads the CI run, not your machine. Pixels differ between
+machines (font hinting, anti-aliasing), and CI is the renderer that gates, so
+the baseline holds what the CI runner drew. The PR flow is:
+
+1. Push. The `Visual review` check fails and links the report.
+2. Review the report. If the change is intended, run `yarn visual:accept` on
+   the branch. It downloads that run's `visual-head` artifact into
+   `visual/__baseline__` (needs the `gh` CLI, logged in).
+3. Commit `visual/__baseline__` and push. The check passes.
+
+`yarn visual:accept --run <id>` names a run. `yarn visual:accept --local`
+promotes your own `visual/__current__` instead; use it to try the harness, and
+expect CI to flag drift against it.
 
 The individual steps are:
 
@@ -96,10 +110,8 @@ A capture writes one self-contained bundle to `VISUAL_OUT` (default
 report to `VISUAL_REPORT` (default `index.html`). When you set these
 environment variables, CI can point the head and the base at different bundles.
 
-The tool ignores all files in `visual/` in git, except the harness. The
-harness is the specs, the config, the `*.mts` files, and this file. The tool
-does not commit the baselines. Seed a local baseline with `visual:accept`. Or
-compare against a branch with `visual:compare`.
+Git ignores the capture outputs in `visual/`. It tracks the harness (the
+specs, the config, the `*.mts` files, this file) and `__baseline__`.
 
 ## Compare against any ref, locally
 
@@ -109,26 +121,22 @@ yarn visual:compare <ref>     # e.g. origin/dev, a tag, a commit sha
 
 This command captures the working tree. It builds and captures `<ref>` on a
 temporary worktree, which shares `node_modules`. It diffs the two captures. It
-writes the report to `visual/ci/index.html`. This is the same mechanism as CI,
-but with the base that you choose.
+writes the report to `visual/ci/index.html`. Both sides render on your machine,
+so this is the drift-free way to see what your change did before CI runs.
 
 The reference must contain this harness. If you compare against an older commit
 that has no harness, every story reads as new.
 
-## CI (per-PR, vs base branch)
+## CI (per-PR, vs the committed baseline)
 
 The `.github/workflows/visual-review.yaml` workflow builds and captures the PR
-head and its base branch. It uses the same runner for both, so the pixel
-rendering is identical and there is no cross-machine drift. Then it diffs them,
-uploads `visual/ci` as an artifact, and adds the result as a comment on the
-PR.
+head, then diffs it against `visual/__baseline__` at the PR head. It uploads
+two artifacts: `visual-head`, the raw capture that `yarn visual:accept`
+promotes, and `visual-review`, the report. It adds the result as a comment on
+the PR, with the accept command when something changed.
 
-The workflow uses the base branch, not the committed `__baseline__`. Therefore
-baseline drift cannot change a PR result. If the base branch has no harness yet
-(the PR that adds it), every story reads as new, and the check stays green.
-
-The local `__baseline__` folder is a convenience for `yarn visual`. You can
-delete it and use only CI, if you do not want to keep baseline images in git.
+The runner image is the renderer of record. When GitHub updates it and the
+fonts shift, every story changes at once. Accept that in one PR of its own.
 
 ## Native
 

@@ -75,8 +75,11 @@ const RADIUS = 6;
 const PERIMETER = 4 * (SIDE - 2 * RADIUS) + 2 * Math.PI * RADIUS;
 const LIT_ARC = PERIMETER * 0.32;
 
-// --- image gate: reg-cli exits nonzero when anything differs ---
+// --- image gate: reg-cli exits nonzero when a pair differs. A story with
+// no baseline, or a baseline with no story, fails too: the committed
+// baseline must cover exactly the stories that exist.
 const regBin = join(dir, '..', 'node_modules', '.bin', 'reg-cli');
+const regJson = join(reportDir, 'report.json'); // reg-cli's json, out of the repo root
 const reg = spawnSync(
   regBin,
   [
@@ -86,11 +89,18 @@ const reg = spawnSync(
     '-R',
     regReport,
     '-J',
-    join(reportDir, 'report.json'), // keep reg-cli's json out of the repo root
+    regJson,
   ],
   { stdio: 'inherit' },
 );
-const imagesChanged = reg.status !== 0;
+const regResult = JSON.parse(readFileSync(regJson, 'utf8')) as {
+  newItems: string[];
+  deletedItems: string[];
+};
+const imagesChanged =
+  reg.status !== 0 ||
+  regResult.newItems.length > 0 ||
+  regResult.deletedItems.length > 0;
 
 // --- timeline gate ---
 const readSamples = (path: string): Timeline =>
@@ -121,7 +131,15 @@ const timelines: Entry[] = timelineFiles.map(file => {
   return { file, story: cur.story, verdict, maxDev, at, cur, base };
 });
 
-const timelineChanged = timelines.some(t => t.verdict === 'changed');
+// A baseline timeline whose story no longer captures is stale.
+const baseTimelines = join(baselineDir, 'timelines');
+const staleTimelines = existsSync(baseTimelines)
+  ? readdirSync(baseTimelines).filter(
+      f => f.endsWith('.timeline.json') && !timelineFiles.includes(f),
+    )
+  : [];
+const timelineChanged =
+  timelines.some(t => t.verdict !== 'pass') || staleTimelines.length > 0;
 
 // --- unified report (optional Current tab + animation + image tabs) ---
 writeFileSync(
@@ -137,6 +155,9 @@ for (const t of timelines) {
     `timeline: ${t.story} — ${tag}` +
       (t.verdict === 'changed' ? `, max Δ ${t.maxDev.toFixed(2)}px @ ${t.at}ms` : ''),
   );
+}
+for (const f of staleTimelines) {
+  console.log(`timeline: ${f} — DELETED (baseline has no matching story)`);
 }
 console.log(`report: ${indexPage}`);
 console.log(
