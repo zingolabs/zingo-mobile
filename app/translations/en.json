@@ -848,8 +848,7 @@
     "option2-label": "Send-All Migrate",
     "option2-body": "A quick internal transaction that moves everything to Ironwood at once. Your amounts are revealed.",
     "option3-label": "Split & Migrate",
-    "option3-soon": "Coming soon with IP obfuscation",
-    "option3-body": "Splits your balance into standardized notes, then sends them in timed batches for stronger privacy.",
+    "option3-body": "Splits your balance into standardized notes, then sends them in timed batches for stronger on-chain privacy.",
     "back": "Back",
     "next": "Next",
     "close": "Close"
