@@ -20,7 +20,7 @@
     "visual:report": "open visual/index.html",
     "visual:styled": "yarn build-storybook && yarn visual:capture && VISUAL_STYLE=tokens VISUAL_STORYBOOK=../storybook-static/index.html VISUAL_REPORT=visual/styled.html tsx visual/diff.mts; VISUAL_ROOT=../ VISUAL_PORT=6008 VISUAL_OPEN=http://localhost:6008/visual/styled.html tsx visual/serve.mts",
     "visual:compare": "tsx visual/compare-ref.mts",
-    "visual:accept": "rm -rf visual/__baseline__ && cp -r visual/__current__ visual/__baseline__",
+    "visual:accept": "tsx visual/accept.mts",
     "test": "jest --verbose",
     "typecheck": "tsc --noEmit",
     "lint": "eslint . --fix",

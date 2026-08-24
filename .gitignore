@@ -125,9 +125,8 @@ coverage/
 # Storybook web static build
 storybook-static/
 
-# Visual regression (review artifacts. baselines are committed)
+# Visual regression (review artifacts. visual/__baseline__ is committed)
 visual/__current__/
-visual/__baseline__/
 visual/__diff__/
 visual/__video__/
 visual/report.html
