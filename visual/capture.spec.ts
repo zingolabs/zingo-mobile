@@ -28,9 +28,12 @@ const shot = (id: string, state: string) => join(imagesDir, `${id}__${state}.png
 
 for (const entry of entries) {
   test(`${entry.title} — ${entry.name}`, async ({ page }) => {
-    // Fake clock so any RN Animated loop lands on a fixed frame — animated
-    // stories screenshot deterministically instead of catching a random tick.
+    // Fake clock, paused from before the page loads, so any RN Animated loop
+    // lands on a fixed frame — animated stories screenshot deterministically
+    // instead of catching a random tick. Pausing first also keeps a slow
+    // runner's load time from running the clock past the frame.
     await page.clock.install({ time: 0 });
+    await page.clock.pauseAt(0);
     await page.goto(`/iframe.html?id=${entry.id}&viewMode=story`);
     const root = page.locator('#storybook-root');
     await root.waitFor({ state: 'visible' });
@@ -38,7 +41,7 @@ for (const entry of entries) {
     // filmstrip); nothing here to pixel-diff for them.
     if (entry.tags?.includes('animated')) return;
 
-    await page.clock.pauseAt(600); // fixed frame for any incidental motion
+    await page.clock.runFor(600); // fixed frame for any incidental motion
     await page.waitForTimeout(250); // real settle for fonts/svg paint
     await page.screenshot({ path: shot(entry.id, 'default') });
 
