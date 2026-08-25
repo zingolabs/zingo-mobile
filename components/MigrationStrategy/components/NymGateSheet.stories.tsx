@@ -19,6 +19,7 @@ const PresentedSheet = (
 
 const meta: Meta<typeof PresentedSheet> = {
   title: 'Migration/Nym gate sheet',
+  tags: ['static'],
   component: PresentedSheet,
   decorators: [withAppContext(), withBottomSheet],
   args: {

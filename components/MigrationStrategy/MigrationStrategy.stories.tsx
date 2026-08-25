@@ -31,9 +31,13 @@ type Story = StoryObj<typeof MigrationStrategy>;
 
 export const Default: Story = {};
 
-export const NymSheetOpen: Story = { args: { nymSheetOpen: true } };
+export const NymSheetOpen: Story = {
+  tags: ['static'],
+  args: { nymSheetOpen: true },
+};
 
 export const NymSheetConnecting: Story = {
+  tags: ['static'],
   args: { nymSheetOpen: true },
   decorators: [
     withAppContext({
@@ -46,6 +50,7 @@ export const NymSheetConnecting: Story = {
 };
 
 export const NymSheetLost: Story = {
+  tags: ['static'],
   args: { nymSheetOpen: true },
   decorators: [
     withAppContext({
