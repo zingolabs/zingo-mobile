@@ -43,10 +43,14 @@ bootstrap race typed.
 A `tracing` layer inside `zingo-nym-proxy-ffi` matches events from two
 target prefixes: `nym_socks5_client_core`, where the exit's
 `ConnectionError` reason surfaces, and `nym_gateway_client`, where
-websocket send and stream failures surface. Captured events reach the
-host through one streaming `MixnetDiagnosticsObserver` callback
-interface registered at start. The existing `ProxyDeathObserver` keeps
-its at-most-once production contract unchanged.
+websocket send and stream failures surface. Captured events and the
+bootstrap narrative queue inside the crate, capped and drop-oldest,
+and the host polls one `drain_diagnostics` export that surrenders the
+queue in order with the count of any events lost to overflow. The host
+implements no callback, so no host code runs on the mixnet client's
+threads and no new trait object crosses the FFI. The existing
+`ProxyDeathObserver` keeps its at-most-once production contract
+unchanged.
 
 The probe has two arms. `probe_sentinel(deadline_millis)` opens one
 tunnel through the running proxy and performs the Sentinel round trip
@@ -125,6 +129,13 @@ as an unexplained stall exactly as it did through
 **A destination probe that sends an application request.** Rejected.
 It puts protocol knowledge in the crate or pushes it across the FFI,
 and the handshake alone already proves the three legs and the chain.
+
+**A streaming callback interface for the diagnostics events.**
+Rejected after a first implementation. UniFFI hands the crate a boxed
+trait object for every callback interface, host code runs on whatever
+thread fires the event, and the only consumer is a debug screen that
+polls its platform bridge anyway. The drain keeps every type static
+and deletes the forwarder thread the callback needed.
 
 **Read gateway state from a nym-sdk API.** Impossible today. The
 research found no connection state, no `is_connected`, and no event
