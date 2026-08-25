@@ -94,7 +94,7 @@ import { RPCSeedType } from '../walletBackend/types/RPCSeedType';
 import { Launching } from '../LoadingApp';
 import { AddressBook } from '../../components/AddressBook';
 import { AddressBookFileImpl } from '../../components/AddressBook';
-import simpleBiometrics from '../simpleBiometrics';
+import simpleBiometrics, { GateVerdict } from '../simpleBiometrics';
 import ShowAddressAlertAsync from '../../components/Send/components/ShowAddressAlertAsync';
 import {
   createUpdateRecoveryWalletInfo,
@@ -989,17 +989,13 @@ export class LoadedAppClass extends Component<
           this.setState(state => ({
             foregroundEpoch: state.foregroundEpoch + 1,
           }));
-          // (PIN or TouchID or FaceID)
-          const resultBio = this.state.security.foregroundApp
+          // (PIN or TouchID or FaceID). Only a decline locks; an
+          // 'unavailable' gate passes because it guards nothing and
+          // blocking locks the user out of the wallet.
+          const foregroundGate: GateVerdict = this.state.security.foregroundApp
             ? await simpleBiometrics({ translate: this.state.translate })
-            : true;
-          // resultBio:
-          // - true      -> authenticated (biometric, or device passcode via allowDeviceCredentials)
-          // - false     -> user cancelled or failed the prompt
-          // - undefined -> the gate cannot run here (no auth method, or a keychain
-          //                entry the OS refuses to serve); allow, since it guards
-          //                nothing and blocking locks the user out of the wallet
-          if (resultBio === false) {
+            : { kind: 'authenticated' };
+          if (foregroundGate.kind === 'declined') {
             this.navigateToLoadingApp({
               startingApp: true,
               biometricsFailed: true,

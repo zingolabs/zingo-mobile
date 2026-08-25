@@ -49,14 +49,16 @@ export const useBiometricGate = ({
     }
     let cancelled = false;
     (async () => {
-      const r = await simpleBiometrics({ translate });
+      const verdict = await simpleBiometrics({ translate });
       if (cancelled) {
         return;
       }
-      if (r === false) {
+      if (verdict.kind === 'declined') {
         addLastSnackbar(translate('biometrics-error') as string);
         onCancel();
       } else {
+        // 'unavailable' passes: the gate guards nothing, and blocking here
+        // would lock the user out of their own wallet.
         setAuthPassed(true);
       }
     })();
@@ -80,14 +82,16 @@ export const useBiometricGate = ({
     setAuthPassed(false);
     let cancelled = false;
     (async () => {
-      const r = await simpleBiometrics({ translate });
+      const verdict = await simpleBiometrics({ translate });
       if (cancelled) {
         return;
       }
-      if (r === false) {
+      if (verdict.kind === 'declined') {
         addLastSnackbar(translate('biometrics-error') as string);
         onCancel();
       } else {
+        // 'unavailable' passes: the gate guards nothing, and blocking here
+        // would lock the user out of their own wallet.
         setAuthPassed(true);
       }
     })();
