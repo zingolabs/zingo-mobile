@@ -92,6 +92,7 @@ import Launching from './components/Launching';
 import simpleBiometrics, {
   GateVerdict,
   getLastGateFailure,
+  releaseBlanking,
 } from '../simpleBiometrics';
 import selectingServer from '../selectingServer';
 import { isEqual } from 'lodash';
@@ -597,10 +598,16 @@ export class LoadingAppClass extends Component<
         // blocking locks the user out of the wallet.
         this.setState({ biometricsFailed: false });
         const startGate: GateVerdict = this.state.security.startApp
-          ? await simpleBiometrics({ translate: this.state.translate })
+          ? await simpleBiometrics({
+              translate: this.state.translate,
+              purpose: 'appEntry',
+            })
           : { kind: 'authenticated' };
         if (startGate.kind === 'declined') {
           this.setState({ biometricsFailed: true });
+          // The locked screen is on; nothing sensitive sits behind the
+          // blanking overlay, so drop it rather than bury the retry.
+          releaseBlanking();
           return;
         } else {
           this.setState({ biometricsFailed: false });
@@ -608,6 +615,7 @@ export class LoadingAppClass extends Component<
       } else {
         // if there is a biometric Fail, likely from the foreground check
         // keep the App in the first screen because the user needs to try again.
+        releaseBlanking();
         return;
       }
     }

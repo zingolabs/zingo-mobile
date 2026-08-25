@@ -94,8 +94,12 @@ const ANDROID_DECLINED: readonly number[] = [
   13, // ERROR_NEGATIVE_BUTTON
 ];
 
+/** Which authorization point a gate run answers for. */
+export type GatePurpose = 'appEntry' | 'screenEntry';
+
 type simpleBiometricsProps = {
   translate: (key: string) => TranslateType;
+  purpose: GatePurpose;
 };
 
 // Emitted with a boolean payload (true=show, false=hide) so a root-level
@@ -411,16 +415,26 @@ const attemptGate = async (
 // partial-screen prompt. A stranded call may still have that prompt on
 // screen when the verdict comes back, so the overlay stays up until every
 // strand settles.
+/** Drops the Android blanking overlay now, for a caller whose decline landed on a surface with nothing sensitive behind it. */
+export const releaseBlanking = (): void => {
+  DeviceEventEmitter.emit(BIOMETRIC_BLANKING_EVENT, false);
+};
+
 const hideBlankingWhenClear = (): void => {
   if (strandedCalls.length === 0) {
     DeviceEventEmitter.emit(BIOMETRIC_BLANKING_EVENT, false);
     return;
   }
-  // Bounded by the stall guard: a strand that never settles must not bury
-  // the locked screen under the overlay, and after the verdict navigates
-  // away nothing sensitive is behind it.
-  stallGuard(Promise.all(strandedCalls).then(swallow), false).finally(() =>
-    DeviceEventEmitter.emit(BIOMETRIC_BLANKING_EVENT, false),
+  // A stranded prompt may still be on screen over wallet content (a
+  // screen-gate decline lands back on a content screen), so the overlay
+  // holds for the policy window — past it the prompt is treated as absent,
+  // the same assumption the stall verdict made. A caller on a lock surface
+  // drops it sooner via releaseBlanking.
+  const capped = new Promise<undefined>(resolve =>
+    setTimeout(() => resolve(undefined), interactiveStallPolicy().windowMs),
+  );
+  Promise.race([Promise.all(strandedCalls).then(swallow), capped]).finally(
+    () => DeviceEventEmitter.emit(BIOMETRIC_BLANKING_EVENT, false),
   );
 };
 
@@ -463,10 +477,18 @@ const runGate = async (props: simpleBiometricsProps): Promise<GateVerdict> => {
     if (!has) {
       // Nothing reads v1 from here on. The delete needs no prompt, and
       // deleting an absent entry resolves, so it runs without a lookup.
-      await stallGuard(
+      const clearedV1 = await stallGuard(
         Keychain.resetGenericPassword({ service: SENTINEL_SERVICE_V1 }),
         false,
       );
+      if (clearedV1 === STALLED) {
+        // A wedge starting here settles now, like every sibling guard,
+        // instead of riding into the interactive attempt and its window.
+        return recordVerdict({
+          kind: 'unavailable',
+          failure: 'keychain stalled clearing the v1 sentinel',
+        });
+      }
     }
 
     // The effectful driver of the pure `advance` table. It terminates in at
@@ -528,7 +550,11 @@ const runGate = async (props: simpleBiometricsProps): Promise<GateVerdict> => {
 // stall window before running.
 type GateLifecycle =
   | { stage: 'idle' }
-  | { stage: 'running'; verdictOut: Promise<GateVerdict> }
+  | {
+      stage: 'running';
+      purpose: GatePurpose;
+      verdictOut: Promise<GateVerdict>;
+    }
   | { stage: 'strandedCall'; settled: Promise<undefined> };
 
 let lifecycle: GateLifecycle = { stage: 'idle' };
@@ -554,7 +580,7 @@ const settleLifecycle = (): void => {
 
 const startRun = (props: simpleBiometricsProps): Promise<GateVerdict> => {
   const verdictOut = runGate(props).finally(settleLifecycle);
-  lifecycle = { stage: 'running', verdictOut };
+  lifecycle = { stage: 'running', purpose: props.purpose, verdictOut };
   return verdictOut;
 };
 
@@ -566,18 +592,32 @@ const simpleBiometrics = (
   props: simpleBiometricsProps,
 ): Promise<GateVerdict> => {
   switch (lifecycle.stage) {
-    case 'running':
-      return lifecycle.verdictOut;
+    case 'running': {
+      const running = lifecycle;
+      if (running.purpose === props.purpose) {
+        return running.verdictOut;
+      }
+      // A pass authenticates the person for any purpose; a decline answers
+      // only the purpose the user was actually shown. A cross-purpose
+      // caller therefore adopts everything but a decline, and on one runs
+      // its own gate once the shared run has settled.
+      return running.verdictOut.then(verdict =>
+        verdict.kind === 'declined' ? simpleBiometrics(props) : verdict,
+      );
+    }
     case 'strandedCall': {
-      const verdictOut = stallGuard(lifecycle.settled, true).then(strand => {
+      const stranded = lifecycle;
+      // The wait exists only to keep a fresh prompt from colliding with
+      // the stranded call, and the probe window decides that; the guard is
+      // non-interactive so the strand is not re-entered into strandedCalls.
+      const verdictOut = stallGuard(stranded.settled, false).then(strand => {
         if (strand === STALLED) {
-          // The strand outlived another full window; stallGuard re-entered
-          // it into strandedCalls, and the verdict follows the platform's
-          // stall policy rather than risking a stacked prompt.
           const stall = interactiveStall(
             'a keychain call from an earlier gate is still pending',
           );
-          settleLifecycle();
+          // The same stranded object, so its settlement still returns the
+          // lifecycle to idle.
+          lifecycle = stranded;
           return recordVerdict({
             kind: stall.settleAs,
             failure: stall.failure,
@@ -585,7 +625,7 @@ const simpleBiometrics = (
         }
         return runGate(props).finally(settleLifecycle);
       });
-      lifecycle = { stage: 'running', verdictOut };
+      lifecycle = { stage: 'running', purpose: props.purpose, verdictOut };
       return verdictOut;
     }
     case 'idle':

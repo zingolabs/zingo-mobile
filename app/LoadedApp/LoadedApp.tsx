@@ -993,7 +993,10 @@ export class LoadedAppClass extends Component<
           // 'unavailable' gate passes because it guards nothing and
           // blocking locks the user out of the wallet.
           const foregroundGate: GateVerdict = this.state.security.foregroundApp
-            ? await simpleBiometrics({ translate: this.state.translate })
+            ? await simpleBiometrics({
+                translate: this.state.translate,
+                purpose: 'appEntry',
+              })
             : { kind: 'authenticated' };
           if (foregroundGate.kind === 'declined') {
             this.navigateToLoadingApp({
