@@ -22,3 +22,5 @@ export const getGenericPassword = jest.fn();
 export const resetGenericPassword = jest.fn();
 export const getSupportedBiometryType = jest.fn();
 export const hasGenericPassword = jest.fn();
+export const canImplyAuthentication = jest.fn();
+export const isPasscodeAuthAvailable = jest.fn();
