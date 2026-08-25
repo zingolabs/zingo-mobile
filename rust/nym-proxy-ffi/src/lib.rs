@@ -313,6 +313,15 @@ impl MixnetProxyHandle {
     pub fn start(
         observer: Option<Box<dyn ProxyDeathObserver>>,
     ) -> Result<std::sync::Arc<Self>, ProxyFfiError> {
+        #[cfg(feature = "diagnostics")]
+        {
+            #[cfg(not(target_os = "android"))]
+            diagnostics::install_capture();
+            Self::start_with(observer, |event| {
+                diagnostics::publish(diagnostics::bootstrap_event(event))
+            })
+        }
+        #[cfg(not(feature = "diagnostics"))]
         Self::start_with(observer, |_| {})
     }
 
