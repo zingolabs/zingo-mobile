@@ -1,6 +1,5 @@
 import React, { Component, useState, useMemo, useEffect } from 'react';
 import {
-  Alert,
   I18nManager,
   EmitterSubscription,
   AppState,
@@ -26,7 +25,9 @@ import {
 import CustomServerModalHost from './components/CustomServerModalHost';
 import { BottomSheetBackHandler } from '../hooks/useBottomSheetBackHandler';
 import ConfirmBottomSheet from '../../components/Components/ConfirmBottomSheet';
+import WalletRecoveryHost from '../../components/WalletRecovery/WalletRecoveryHost';
 import { showConfirm } from '../showConfirm';
+import { showWalletRecovery } from '../showWalletRecovery';
 
 import {
   createNewWallet,
@@ -45,7 +46,10 @@ import {
   walletExists as rpcWalletExists,
   walletFileDiagnosis,
   WalletFileDiagnosis,
+  WalletFileDiagnosisReport,
   WalletFileRepairOutcome,
+  WALLET_FILE_NAME,
+  WALLET_BACKUP_FILE_NAME,
 } from '../walletBackend';
 import {
   AppStateLoading,
@@ -1124,75 +1128,57 @@ export class LoadingAppClass extends Component<
   };
 
   // Android classifies the wallet files natively (2.0.21 double-wrap
-  // incident). A repairable file gets a Repair button; every other failure
-  // gets a plain alert with the per-file states appended so a support
-  // report says what is on disk.
+  // incident). Any repairable file is repaired without asking (the repair
+  // keeps a .prerepair copy, so nothing is destroyed), then the wallet
+  // reloads. A broken main file that no repair fixes gets the recovery
+  // alert with a shareable report and, when the backup is intact, a
+  // one-tap restore.
   walletLoadFailed = async (errorText: string) => {
     const title = this.state.translate(
       'loadingapp.readingwallet-label',
     ) as string;
-    const diagnosis = await walletFileDiagnosis();
-    const diagnosisLines = this.walletFileDiagnosisLines(diagnosis);
-    if (!hasRepairableWalletFile(diagnosis)) {
-      // Wallet-open failures are local and deterministic (undecodable
-      // file, chain mismatch, bad settings): the native layer opens
-      // Indexerless when only the server dial fails, so no open failure
-      // is server-caused. walletErrorHandle would diagnose this local
-      // error by probing the server, racing against its current state,
-      // and pick the alert text from whatever it happens to answer.
-      createAlert(
-        this.setBackgroundError,
-        this.addLastSnackbar,
-        title,
-        diagnosisLines ? `${errorText}\n\n${diagnosisLines}` : errorText,
-        false,
-        this.state.translate,
-        sendEmail,
-        this.state.zingolibVersion,
-      );
-      this.setState({
-        actionButtonsDisabled: false,
-        serverErrorTries: 0,
-        screen: RouteEnum.StartMenu,
-      });
-      return;
-    }
-    const body = `${this.state.translate(
-      'loadingapp.walletrepair-body',
-    )}\n\n${diagnosisLines}`;
+    const report = await walletFileDiagnosis();
     this.setState({
       actionButtonsDisabled: false,
       serverErrorTries: 0,
       screen: RouteEnum.StartMenu,
     });
-    Alert.alert(
+    if (hasRepairableWalletFile(report.files)) {
+      this.addLastSnackbar(
+        this.state.translate('loadingapp.walletrepair-running') as string,
+      );
+      await this.repairWalletFiles(title, errorText);
+      return;
+    }
+    const main = report.files.find(f => f.name === WALLET_FILE_NAME);
+    const mainBroken =
+      !!main && main.state !== 'plainWallet' && main.state !== 'missing';
+    if (mainBroken) {
+      this.walletRecoveryAlert(title, errorText, report);
+      return;
+    }
+    // Wallet-open failures are local and deterministic (undecodable
+    // file, chain mismatch, bad settings): the native layer opens
+    // Indexerless when only the server dial fails, so no open failure
+    // is server-caused. walletErrorHandle would diagnose this local
+    // error by probing the server, racing against its current state,
+    // and pick the alert text from whatever it happens to answer.
+    const diagnosisLines = this.walletFileDiagnosisLines(report.files);
+    createAlert(
+      this.setBackgroundError,
+      this.addLastSnackbar,
       title,
-      body,
-      [
-        {
-          text: this.state.translate(
-            'loadingapp.walletrepair-button',
-          ) as string,
-          onPress: () => this.repairWalletFiles(title),
-        },
-        {
-          text: this.state.translate('support') as string,
-          onPress: () =>
-            sendEmail(
-              this.state.translate,
-              this.state.zingolibVersion,
-              title,
-              `${errorText}\n\n${body}`,
-            ),
-        },
-        { text: this.state.translate('cancel') as string, style: 'cancel' },
-      ],
-      { cancelable: false },
+      diagnosisLines ? `${errorText}\n\n${diagnosisLines}` : errorText,
+      false,
+      this.state.translate,
+      sendEmail,
+      this.state.zingolibVersion,
     );
   };
 
   walletFileDiagnosisLines = (diagnosis: WalletFileDiagnosis[]): string =>
     diagnosis
+      .filter(d => d.state !== 'missing')
       .map(
         d =>
           `${d.name}: ${this.state.translate(
@@ -1201,7 +1187,103 @@ export class LoadingAppClass extends Component<
       )
       .join('\n');
 
-  repairWalletFiles = async (title: string) => {
+  // Support-facing, deliberately untranslated: one run must carry the whole
+  // evidence, because a tester round-trip costs weeks.
+  walletRecoveryReportText = (
+    errorText: string,
+    report: WalletFileDiagnosisReport,
+    outcomes?: Record<string, WalletFileRepairOutcome>,
+  ): string => {
+    const lines = [
+      `zingolib: ${this.state.zingolibVersion}`,
+      `platform: ${Platform.OS}`,
+      `error: ${errorText}`,
+    ];
+    if (report.keysetPresent !== undefined) {
+      lines.push(`keysetPresent: ${report.keysetPresent}`);
+    }
+    for (const f of report.files) {
+      const mtime = f.mtime > 0 ? new Date(f.mtime).toISOString() : 'n/a';
+      lines.push(
+        `${f.name}: state=${f.state} size=${f.size} mtime=${mtime} ` +
+          `depth=${f.depth} repairable=${f.repairable}` +
+          (f.head ? ` head=${f.head}` : ''),
+      );
+      if (f.readError) {
+        lines.push(`  readError: ${f.readError}`);
+      }
+      for (const unwrapError of f.unwrapErrors) {
+        lines.push(`  unwrap: ${unwrapError}`);
+      }
+    }
+    if (outcomes) {
+      for (const [name, outcome] of Object.entries(outcomes)) {
+        lines.push(`repair ${name}: ${outcome}`);
+      }
+    }
+    return lines.join('\n');
+  };
+
+  walletRecoveryAlert = (
+    title: string,
+    errorText: string,
+    report: WalletFileDiagnosisReport,
+    outcomes?: Record<string, WalletFileRepairOutcome>,
+  ) => {
+    const reportText = this.walletRecoveryReportText(
+      errorText,
+      report,
+      outcomes,
+    );
+    const backup = report.files.find(f => f.name === WALLET_BACKUP_FILE_NAME);
+    const backupRestorable = !!backup && backup.state === 'plainWallet';
+    const message = this.state.translate(
+      outcomes
+        ? 'loadingapp.walletrepair-failed'
+        : 'loadingapp.walletrecovery-body',
+    ) as string;
+    showWalletRecovery({
+      title,
+      message,
+      diagnosisLines: this.walletFileDiagnosisLines(report.files),
+      translate: this.state.translate,
+      onCopy: () => {
+        Clipboard.setString(reportText);
+        this.addLastSnackbar(this.state.translate('txtcopied') as string);
+      },
+      onRestoreBackup: backupRestorable
+        ? () => this.confirmRestoreBackupFromRecovery()
+        : undefined,
+      onSupport: () =>
+        sendEmail(
+          this.state.translate,
+          this.state.zingolibVersion,
+          title,
+          reportText,
+        ),
+      onCancel: () => {},
+    });
+  };
+
+  confirmRestoreBackupFromRecovery = () => {
+    showConfirm({
+      title: this.state.translate('loadedapp.restorebackupwallet') as string,
+      message: `${this.state.translate(
+        'loadedapp.alert-restorebackupwallet-body',
+      )}\n\n${
+        this.state.translate('loadingapp.walletrecovery-verifyseed') as string
+      }`,
+      buttons: [
+        {
+          text: this.state.translate('confirm') as string,
+          onPress: () => this.restoreLastBackup(),
+        },
+        { text: this.state.translate('cancel') as string, style: 'cancel' },
+      ],
+    });
+  };
+
+  repairWalletFiles = async (title: string, errorText: string) => {
     this.setState({ actionButtonsDisabled: true });
     const outcomes = await repairDoubleWrappedWallet();
     if (repairSucceeded(outcomes)) {
@@ -1211,36 +1293,11 @@ export class LoadingAppClass extends Component<
       await this.loadExistingWalletOnBoot();
       return;
     }
-    const outcomeLines = Object.entries(outcomes)
-      .map(
-        ([name, outcome]: [string, WalletFileRepairOutcome]) =>
-          `${name}: ${this.state.translate(
-            `loadingapp.walletrepair-outcome-${outcome}`,
-          )}`,
-      )
-      .join('\n');
-    const body = `${this.state.translate(
-      'loadingapp.walletrepair-failed',
-    )}\n\n${outcomeLines}`;
+    // Re-diagnose so the report carries the per-depth unwrap errors of the
+    // attempt that just failed.
+    const report = await walletFileDiagnosis();
     this.setState({ actionButtonsDisabled: false });
-    Alert.alert(
-      title,
-      body,
-      [
-        {
-          text: this.state.translate('support') as string,
-          onPress: () =>
-            sendEmail(
-              this.state.translate,
-              this.state.zingolibVersion,
-              title,
-              body,
-            ),
-        },
-        { text: this.state.translate('cancel') as string, style: 'cancel' },
-      ],
-      { cancelable: false },
-    );
+    this.walletRecoveryAlert(title, errorText, report, outcomes);
   };
 
   walletErrorHandle = async (
@@ -2159,6 +2216,7 @@ export class LoadingAppClass extends Component<
             <BottomSheetModalProvider>
               <BottomSheetBackHandler />
               <ConfirmBottomSheet />
+              <WalletRecoveryHost />
               {screen === RouteEnum.Launching && (
                 <Launching
                   translate={translate}
