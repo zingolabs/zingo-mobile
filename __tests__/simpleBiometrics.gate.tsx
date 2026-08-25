@@ -494,6 +494,143 @@ test('a wedge starting at the v1 cleanup settles unavailable in the probe window
   expect(verdict).toMatchObject({ kind: 'unavailable' });
 });
 
+test('an android lockout declines instead of opening the gate', async () => {
+  // Five failed faces must not classify as brokenEntry: a rebuild there
+  // would turn the lockout into 'unavailable' and open the wallet.
+  rn.Platform.OS = 'android';
+  kc.getSupportedBiometryType.mockResolvedValue('Fingerprint');
+  kc.hasGenericPassword.mockResolvedValue(true);
+  kc.getGenericPassword.mockRejectedValue(
+    Object.assign(new Error('code: 7, msg: Too many attempts'), {
+      code: 'E_CRYPTO_FAILED',
+    }),
+  );
+
+  await expect(
+    simpleBiometrics({ translate, purpose: 'appEntry' }),
+  ).resolves.toMatchObject({ kind: 'declined' });
+  expect(kc.setGenericPassword).not.toHaveBeenCalled();
+});
+
+test('a permanent android lockout declines too', async () => {
+  rn.Platform.OS = 'android';
+  kc.getSupportedBiometryType.mockResolvedValue('Fingerprint');
+  kc.hasGenericPassword.mockResolvedValue(true);
+  kc.getGenericPassword.mockRejectedValue(
+    Object.assign(new Error('code: 9, msg: Too many attempts. Locked.'), {
+      code: 'E_CRYPTO_FAILED',
+    }),
+  );
+
+  await expect(
+    simpleBiometrics({ translate, purpose: 'appEntry' }),
+  ).resolves.toMatchObject({ kind: 'declined' });
+  expect(kc.setGenericPassword).not.toHaveBeenCalled();
+});
+
+test('a missing sentinel read rebuilds and then authenticates', async () => {
+  kc.hasGenericPassword.mockResolvedValue(true);
+  kc.getGenericPassword
+    .mockResolvedValueOnce(false) // found no entry: no prompt was satisfied
+    .mockResolvedValueOnce({ password: '1' });
+
+  await expect(
+    simpleBiometrics({ translate, purpose: 'appEntry' }),
+  ).resolves.toMatchObject({ kind: 'authenticated' });
+  expect(kc.setGenericPassword).toHaveBeenCalledTimes(1);
+  expect(kc.resetGenericPassword).toHaveBeenCalledTimes(1);
+});
+
+test('a stalled sentinel write locks by the android policy', async () => {
+  jest.useFakeTimers();
+  rn.Platform.OS = 'android';
+  kc.getSupportedBiometryType.mockResolvedValue('Fingerprint');
+  kc.hasGenericPassword.mockResolvedValue(false);
+  kc.setGenericPassword.mockReturnValue(new Promise(() => {}));
+
+  let verdict: GateVerdict | undefined;
+  simpleBiometrics({ translate, purpose: 'appEntry' }).then(v => {
+    verdict = v;
+  });
+  await jest.advanceTimersByTimeAsync(60 * 1000);
+  expect(verdict).toMatchObject({ kind: 'declined' });
+  expect(getLastGateFailure()).toMatch(/stalled writing/);
+  expect(kc.getGenericPassword).not.toHaveBeenCalled();
+});
+
+test('a stalled rebuild clear settles unavailable in the probe window', async () => {
+  jest.useFakeTimers();
+  kc.hasGenericPassword.mockResolvedValue(true);
+  kc.getGenericPassword.mockRejectedValue(osError('-25308'));
+  kc.resetGenericPassword.mockReturnValue(new Promise(() => {}));
+
+  let verdict: GateVerdict | undefined;
+  simpleBiometrics({ translate, purpose: 'appEntry' }).then(v => {
+    verdict = v;
+  });
+  await jest.advanceTimersByTimeAsync(10 * 1000);
+  expect(verdict).toMatchObject({ kind: 'unavailable' });
+  expect(getLastGateFailure()).toMatch(/stalled clearing/);
+  expect(kc.setGenericPassword).not.toHaveBeenCalled();
+});
+
+test('an unexpected probe rejection is unavailable, nobody was asked', async () => {
+  kc.hasGenericPassword.mockRejectedValue(osError('-34018'));
+
+  await expect(
+    simpleBiometrics({ translate, purpose: 'appEntry' }),
+  ).resolves.toMatchObject({ kind: 'unavailable' });
+  expect(kc.getGenericPassword).not.toHaveBeenCalled();
+});
+
+test('an ios retry during a stranded call proceeds by the ios policy', async () => {
+  jest.useFakeTimers();
+  kc.hasGenericPassword.mockResolvedValue(true);
+  kc.getGenericPassword.mockReturnValue(new Promise(() => {}));
+
+  let first: GateVerdict | undefined;
+  simpleBiometrics({ translate, purpose: 'appEntry' }).then(v => {
+    first = v;
+  });
+  await jest.advanceTimersByTimeAsync(11 * 1000); // window plus veto grace
+  expect(first).toMatchObject({ kind: 'unavailable' });
+
+  let second: GateVerdict | undefined;
+  simpleBiometrics({ translate, purpose: 'appEntry' }).then(v => {
+    second = v;
+  });
+  await jest.advanceTimersByTimeAsync(10 * 1000); // probe window, no grace
+  expect(second).toMatchObject({ kind: 'unavailable' });
+  expect(kc.getGenericPassword).toHaveBeenCalledTimes(1);
+});
+
+test('the foreground-flag restore completes before the verdict', async () => {
+  const storage = (
+    require('@react-native-async-storage/async-storage') as {
+      default: Record<string, jest.Mock>;
+    }
+  ).default;
+  let restore: () => void = () => {};
+  storage.setItem.mockReturnValue(
+    new Promise<void>(resolve => {
+      restore = () => resolve();
+    }),
+  );
+  kc.hasGenericPassword.mockResolvedValue(true);
+  kc.getGenericPassword.mockResolvedValue({ password: '1' });
+
+  let verdict: GateVerdict | undefined;
+  simpleBiometrics({ translate, purpose: 'appEntry' }).then(v => {
+    verdict = v;
+  });
+  await new Promise(resolve => setTimeout(resolve, 0));
+  await new Promise(resolve => setTimeout(resolve, 0));
+  expect(verdict).toBeUndefined(); // the epilogue holds the verdict
+  restore();
+  await new Promise(resolve => setTimeout(resolve, 0));
+  expect(verdict).toMatchObject({ kind: 'authenticated' });
+});
+
 test('a retry during a stranded call answers within the probe window', async () => {
   jest.useFakeTimers();
   rn.Platform.OS = 'android';
