@@ -38,13 +38,22 @@ const SENTINEL_SERVICE_V1 = 'zingo-biometric-sentinel';
 //
 // `stalled` is the fourth way an attempt can end: the native call never came
 // back at all. It must not trigger the rebuild — see NATIVE_STALL_MS below.
+// What a stall settles as differs by platform, and the outcome carries that
+// answer in `settleAs` — see interactiveStall for the policy.
+
+/** The stalled attempt outcome, carrying the platform's settlement policy. */
+export type StalledOutcome = {
+  kind: 'stalled';
+  settleAs: 'declined' | 'unavailable';
+  failure: string;
+};
 
 /** Every way one keychain attempt against the sentinel can end. */
 export type AttemptOutcome =
   | { kind: 'authenticated' }
   | { kind: 'declined'; failure: string }
   | { kind: 'brokenEntry'; failure: string }
-  | { kind: 'stalled'; failure: string };
+  | StalledOutcome;
 
 // `unavailable` is the gate refusing to run, not the user refusing to
 // authenticate: no device security, a wedged native queue, or a platform
@@ -99,52 +108,104 @@ export const BIOMETRIC_BLANKING_EVENT = 'biometric-blanking';
 // up — so one call that never settles silently swallows every call queued
 // behind it. The awaits below would stay pending forever and the locked
 // screen's only action would do literally nothing, with no error to report.
-// A guarded call reports a stall instead, and a stall is a gate we cannot run
-// (-> `undefined` -> the caller proceeds), never a lockout.
+// A guarded call reports a stall instead; what a stall settles as is
+// per-platform — see interactiveStall.
 const NATIVE_STALL_MS = 10 * 1000;
+
+// Android cannot veto a fire the way iOS can (the BiometricPrompt sheet need
+// not take the activity out of 'active'), so its interactive window is wide
+// enough that a person still deciding at the prompt almost never outlasts it.
+const ANDROID_PROMPT_STALL_MS = 60 * 1000;
 
 const STALLED = Symbol('keychain-stalled');
 
-/**
- * Resolves to STALLED when `op` has not settled within NATIVE_STALL_MS.
- *
- * `interactive` marks the calls the OS may park on a human. On iOS the system
- * auth UI takes the app out of `active`, and that edge stands the watchdog
- * down: from there the call is waiting on the user and gets all the time the
- * user needs. Calls that never show UI (the capability probes, has, reset)
- * pass `false` — for them any stall is a wedged queue, full stop.
- *
- * Android keeps its BiometricPrompt inside the resumed activity, so there is
- * no active-state edge separating "waiting on the user" from "wedged", and
- * the iOS serial-queue stall mode has no counterpart there (the module
- * answers off an executor and BiometricPrompt always delivers a callback).
- * Interactive Android calls are therefore left unguarded rather than risk a
- * watchdog that fires while the user is looking at the prompt.
- */
+const swallow = () => undefined;
+
+// Native calls that lost their stall race but are still pending inside the
+// native module — their eventual prompt and result belong to nobody. The
+// gate lifecycle below waits on them so a retry never stacks a second
+// prompt on top of one, and the Android blanking overlay stays up until
+// they settle.
+let strandedCalls: Array<Promise<undefined>> = [];
+
+// The countdown for an interactive call runs only while the app is observed
+// 'active'. Leaving 'active' pauses it and returning re-arms it in full, so
+// time the OS parks on a human never counts toward a stall, and a queue
+// that is still wedged when the app comes back is caught by the fresh
+// window. On iOS a fire is vetoed while the current state is 'inactive' or
+// 'background' — the two states that prove a live auth sheet or a
+// backgrounded app — so a live prompt can never be declared a stall there.
+// An 'unknown' seed proves nothing (RN can seed it at launch and never
+// replay the missed transition), so it does not veto: parking a wedged call
+// on it would leave the gate pending forever. Android keeps its
+// BiometricPrompt inside the resumed activity, so no veto is possible and a
+// fire is answered by policy instead (see interactiveStall). Calls that
+// never show UI (the capability probes, has, reset) pass `false`: for them
+// any stall is a wedged queue, full stop.
+
+/** Resolves to STALLED when `op` outlives the platform's stall window. */
 const stallGuard = <T>(
   op: Promise<T>,
   interactive: boolean,
 ): Promise<T | typeof STALLED> => {
-  if (interactive && Platform.OS !== 'ios') {
-    return op;
-  }
   let disarm = () => {};
   const watchdog = new Promise<typeof STALLED>(resolve => {
-    const timer = setTimeout(() => resolve(STALLED), NATIVE_STALL_MS);
+    const stallWindowMs =
+      interactive && Platform.OS === 'android'
+        ? ANDROID_PROMPT_STALL_MS
+        : NATIVE_STALL_MS;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const pause = () => {
+      clearTimeout(timer);
+      timer = undefined;
+    };
+    const arm = () => {
+      timer = setTimeout(() => {
+        if (
+          interactive &&
+          Platform.OS === 'ios' &&
+          (AppState.currentState === 'inactive' ||
+            AppState.currentState === 'background')
+        ) {
+          // The change event that would have paused the countdown can lose
+          // the race against the timer; the veto reads the state that event
+          // was carrying, and the handler below re-arms on the way back.
+          pause();
+          return;
+        }
+        if (interactive) {
+          strandedCalls.push(op.then(swallow, swallow));
+        }
+        resolve(STALLED);
+      }, stallWindowMs);
+    };
     const subscription = interactive
       ? AppState.addEventListener('change', next => {
-          if (next !== 'active') {
-            clearTimeout(timer);
+          pause();
+          if (next === 'active') {
+            arm();
           }
         })
       : undefined;
+    arm();
     disarm = () => {
-      clearTimeout(timer);
+      pause();
       subscription?.remove();
     };
   });
   return Promise.race([op, watchdog]).finally(() => disarm());
 };
+
+// On iOS a fire proves the prompt is not on screen (a live prompt keeps the
+// app out of 'active' and vetoes it), so the gate cannot run and the caller
+// proceeds. On Android a fire cannot prove that, and proceeding would open
+// the wallet to whoever waits out the prompt, so it settles as declined: the
+// locked screen returns with a retry that issues a fresh prompt.
+const interactiveStall = (failure: string): StalledOutcome => ({
+  kind: 'stalled',
+  settleAs: Platform.OS === 'ios' ? 'unavailable' : 'declined',
+  failure,
+});
 
 const buildAuthPrompt = (
   translate: (key: string) => TranslateType,
@@ -191,9 +252,7 @@ const classifyFailure = (e: unknown): AttemptOutcome => {
 // open the gate.
 type SettledPhase = { phase: 'settled'; verdict: GateVerdict };
 type GatePhase =
-  | { phase: 'trustedEntry' }
-  | { phase: 'freshEntry' }
-  | SettledPhase;
+  { phase: 'trustedEntry' } | { phase: 'freshEntry' } | SettledPhase;
 
 const settled = (verdict: GateVerdict): SettledPhase => ({
   phase: 'settled',
@@ -213,9 +272,9 @@ const advance = (state: GatePhase, outcome: AttemptOutcome): GatePhase => {
     case 'declined':
       return settled({ kind: 'declined', failure: outcome.failure });
     case 'stalled':
-      // A wedged queue, never a lockout: retrying would just spend another
-      // NATIVE_STALL_MS in front of a dead screen.
-      return settled({ kind: 'unavailable', failure: outcome.failure });
+      // Never a rebuild: retrying would just spend another stall window in
+      // front of a dead screen. The verdict is the platform's answer.
+      return settled({ kind: outcome.settleAs, failure: outcome.failure });
     case 'brokenEntry':
       return state.phase === 'trustedEntry'
         ? { phase: 'freshEntry' }
@@ -259,7 +318,7 @@ const attemptGate = async (
         true,
       );
       if (written === STALLED) {
-        return { kind: 'stalled', failure: 'keychain stalled writing the sentinel' };
+        return interactiveStall('keychain stalled writing the sentinel');
       }
     }
     const cred = await stallGuard(
@@ -273,7 +332,7 @@ const attemptGate = async (
       true,
     );
     if (cred === STALLED) {
-      return { kind: 'stalled', failure: 'keychain stalled reading the sentinel' };
+      return interactiveStall('keychain stalled reading the sentinel');
     }
     if (cred) {
       return { kind: 'authenticated' };
@@ -286,13 +345,21 @@ const attemptGate = async (
   }
 };
 
-/**
- * Triggers an OS biometric / device-credential prompt and answers with a
- * GateVerdict.
- */
-const simpleBiometrics = async (
-  props: simpleBiometricsProps,
-): Promise<GateVerdict> => {
+// Audit Issue C: the overlay hides wallet content behind Android's
+// partial-screen prompt. A stranded call may still have that prompt on
+// screen when the verdict comes back, so the overlay stays up until every
+// strand settles.
+const hideBlankingWhenClear = (): void => {
+  if (strandedCalls.length === 0) {
+    DeviceEventEmitter.emit(BIOMETRIC_BLANKING_EVENT, false);
+    return;
+  }
+  Promise.all(strandedCalls).then(() =>
+    DeviceEventEmitter.emit(BIOMETRIC_BLANKING_EVENT, false),
+  );
+};
+
+const runGate = async (props: simpleBiometricsProps): Promise<GateVerdict> => {
   // Pre-flight: if the device cannot authenticate at all (no biometry, no
   // passcode), short-circuit so the caller can decide whether to allow the
   // operation rather than blocking on an impossible prompt. `lastFailure`
@@ -370,11 +437,85 @@ const simpleBiometrics = async (
     return recordVerdict({ kind: 'unavailable', failure: describeFailure(e) });
   } finally {
     if (Platform.OS === 'android') {
-      DeviceEventEmitter.emit(BIOMETRIC_BLANKING_EVENT, false);
+      hideBlankingWhenClear();
     }
     // iOS treats the auth prompt as the app going to background;
     // restore the foreground flag so background-state handling doesn't trip.
     await AsyncStorage.setItem(GlobalConst.background, GlobalConst.no);
+  }
+};
+
+// The gate's process-wide lifecycle. `running` shares the run in flight so
+// concurrent callers never stack prompts. `strandedCall` is the state a
+// bare Promise-or-undefined cache cannot represent: the verdict is out but
+// a native call is still pending, and a fresh run started against it
+// collides (Android answers the collision with ERROR_CANCELED, re-locking
+// every retry). A caller arriving then waits for the strand under the
+// stall window before running.
+type GateLifecycle =
+  | { stage: 'idle' }
+  | { stage: 'running'; verdictOut: Promise<GateVerdict> }
+  | { stage: 'strandedCall'; settled: Promise<undefined> };
+
+let lifecycle: GateLifecycle = { stage: 'idle' };
+
+const settleLifecycle = (): void => {
+  if (strandedCalls.length === 0) {
+    lifecycle = { stage: 'idle' };
+    return;
+  }
+  const strandSettled = Promise.all(strandedCalls).then(swallow);
+  strandedCalls = [];
+  const stranded: GateLifecycle = {
+    stage: 'strandedCall',
+    settled: strandSettled,
+  };
+  lifecycle = stranded;
+  strandSettled.then(() => {
+    if (lifecycle === stranded) {
+      lifecycle = { stage: 'idle' };
+    }
+  });
+};
+
+const startRun = (props: simpleBiometricsProps): Promise<GateVerdict> => {
+  const verdictOut = runGate(props).finally(settleLifecycle);
+  lifecycle = { stage: 'running', verdictOut };
+  return verdictOut;
+};
+
+/**
+ * Triggers an OS biometric / device-credential prompt and answers with a
+ * GateVerdict.
+ */
+const simpleBiometrics = (
+  props: simpleBiometricsProps,
+): Promise<GateVerdict> => {
+  switch (lifecycle.stage) {
+    case 'running':
+      return lifecycle.verdictOut;
+    case 'strandedCall': {
+      const verdictOut = stallGuard(lifecycle.settled, true).then(strand => {
+        if (strand === STALLED) {
+          // The strand outlived another full window; stallGuard re-entered
+          // it into strandedCalls, and the verdict follows the platform's
+          // stall policy rather than risking a stacked prompt.
+          const stall = interactiveStall(
+            'a keychain call from an earlier gate is still pending',
+          );
+          settleLifecycle();
+          return recordVerdict({
+            kind: stall.settleAs,
+            failure: stall.failure,
+          });
+        }
+        return runGate(props).finally(settleLifecycle);
+      });
+      lifecycle = { stage: 'running', verdictOut };
+      return verdictOut;
+    }
+    case 'idle':
+      return startRun(props);
   }
 };
 
@@ -389,8 +530,8 @@ const simpleBiometrics = async (
  *
  * These probes are the first keychain calls of the flow, which makes them the
  * ones that queue behind a wedged predecessor. A stall reads as "no device
- * security", and that is what sends simpleBiometrics down its `undefined`
- * path instead of leaving the caller waiting forever.
+ * security", and that is what settles the gate as `unavailable` instead of
+ * leaving the caller waiting forever.
  */
 export const hasDeviceSecurity = async (): Promise<boolean> => {
   try {
