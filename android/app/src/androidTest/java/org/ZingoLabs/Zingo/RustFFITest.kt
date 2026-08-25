@@ -436,17 +436,42 @@ class ExecuteSendFromOrchard {
 
         val send = taddresses[0].encoded_address?.let { Send(it, 100000, null) }
 
-        // A send rides the mixnet or does not happen (ADR 0011). This wallet
-        // never attached one, so the send must refuse. A transaction here
-        // would mean the wallet reached the network over clearnet, which is
-        // the leak the mixnet-only rule exists to prevent.
-        val refusal: String? = refusedWithoutMixnet("send") {
-            val proposeJson: String = uniffi.zingo.send(mapper.writeValueAsString(listOf(send)))
-            val confirmJson: String = uniffi.zingo.confirm()
-            "propose=$proposeJson confirm=$confirmJson"
+        val proposeJson: String = uniffi.zingo.send(mapper.writeValueAsString(listOf(send)))
+        println("\nPropose:")
+        println(proposeJson)
+
+        // The transmission rides the mixnet or does not happen (ADR 0011).
+        // This wallet never attached one, so the confirm must refuse. A txid
+        // here would mean the transaction reached an indexer over clearnet,
+        // which is the leak the mixnet-only rule exists to prevent.
+        val refusal: String? = try {
+            val txid = uniffi.zingo.confirm()
+            throw AssertionError("the transmission answered without a mixnet: $txid")
+        } catch (e: uniffi.zingo.ZingolibException.Mixnet) {
+            e.message
         }
-        println("\nSend refused without a mixnet:")
+        println("\nTransmission refused without a mixnet:")
         println(refusal)
+        // The refusal names the unattached state, because waiting out a
+        // bootstrap and restarting a dead proxy are different remedies.
+        assertThat(refusal).contains("the Nym mixnet is not enabled")
+
+        // The refusal consumed the stored proposal. A confirm takes the
+        // proposal before it attempts the transmission, so a refusal discards
+        // it exactly as any other failure does. A retry therefore reports no
+        // stored proposal rather than repeating the refusal, and an app that
+        // wants the send after the user enables Mixnet Mode must propose it
+        // again. A repeated Mixnet refusal here would mean the proposal
+        // survived, and a txid would mean the retry transmitted one that the
+        // first call had already taken.
+        val retry: String? = try {
+            val txid = uniffi.zingo.confirm()
+            throw AssertionError("a consumed proposal confirmed on retry: $txid")
+        } catch (e: uniffi.zingo.ZingolibException.Send) {
+            e.message
+        }
+        println("\nRetry after the refusal:")
+        println(retry)
 
         // A second launch while the first sync still runs is idempotent:
         // the bridge answers with status on the data channel ("Sync task
@@ -479,13 +504,14 @@ class ExecuteSendFromOrchard {
         }
 
         balanceJson = uniffi.zingo.getBalance()
-        println("\nBalance after the refused send:")
+        println("\nBalance post-refusal:")
         println(balanceJson)
-        val balanceAfterRefusal: Balance = mapper.readValue(balanceJson)
-        // A refused send leaves no trace: no fee taken, no pending output.
-        assertThat(balanceAfterRefusal.confirmed_orchard_balance).isEqualTo(1000000)
-        assertThat(balanceAfterRefusal.confirmed_transparent_balance).isEqualTo(0)
-        assertThat(balanceAfterRefusal.unconfirmed_transparent_balance).isEqualTo(0)
+        val balancePostRefusal: Balance = mapper.readValue(balanceJson)
+        // Nothing reached the chain, so the transparent recipient holds no
+        // confirmed funds. The unconfirmed side is deliberately unasserted:
+        // the proposal is still Calculated, and a Calculated transaction
+        // counts as pending whether or not it was ever transmitted.
+        assertThat(balancePostRefusal.confirmed_transparent_balance).isEqualTo(0)
     }
 }
 
