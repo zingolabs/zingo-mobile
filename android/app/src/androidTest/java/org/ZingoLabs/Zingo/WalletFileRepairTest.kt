@@ -77,6 +77,28 @@ class WalletFileRepairTest {
     }
 
     @Test
+    fun diagnosisCarriesTheSupportReportFields() {
+        val healthy = rpcModule.diagnoseWalletFile(fileName)
+        assertThat(healthy.getLong("mtime")).isGreaterThan(0L)
+        assertThat(healthy.getString("head")).isNotEmpty()
+
+        wrapAgain()
+        val doubleWrapped = rpcModule.diagnoseWalletFile(fileName)
+        assertThat(doubleWrapped.getJSONArray("unwrapErrors").length()).isEqualTo(0)
+
+        val garbageName = "$fileName.garbagediag"
+        try {
+            val garbage = ByteArray(64) { i -> if (i == 0) 0x28 else (i * 13).toByte() }
+            File(context.filesDir, garbageName).writeBytes(garbage)
+            val undecryptable = rpcModule.diagnoseWalletFile(garbageName)
+            assertThat(undecryptable.getString("state")).isEqualTo("undecryptable")
+            assertThat(undecryptable.getString("readError")).isNotEmpty()
+        } finally {
+            File(context.filesDir, garbageName).delete()
+        }
+    }
+
+    @Test
     fun repairSkipsAHealthyWallet() {
         assertThat(rpcModule.repairDoubleWrappedFile(fileName)).isEqualTo("skipped")
         assertThat(rpcModule.decryptedPayload(fileName)).isEqualTo(plainWallet)

@@ -76,9 +76,12 @@ export {
   repairDoubleWrappedWallet,
   repairSucceeded,
   walletFileDiagnosis,
+  WALLET_FILE_NAME,
+  WALLET_BACKUP_FILE_NAME,
 } from './utils/walletFileRepair';
 export type {
   WalletFileDiagnosis,
+  WalletFileDiagnosisReport,
   WalletFileRepairOutcome,
   WalletFileState,
 } from './utils/walletFileRepair';
