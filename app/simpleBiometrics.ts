@@ -117,6 +117,12 @@ const NATIVE_STALL_MS = 10 * 1000;
 // enough that a person still deciding at the prompt almost never outlasts it.
 const ANDROID_PROMPT_STALL_MS = 60 * 1000;
 
+// AppState.currentState mutates only when the change event reaches the JS
+// thread, so a resign-active event behind a just-appeared auth sheet can
+// still be in flight when the window closes and the veto would read a stale
+// 'active'. An iOS interactive fire waits this long for it to land first.
+const IOS_VETO_GRACE_MS = 1000;
+
 const STALLED = Symbol('keychain-stalled');
 
 const swallow = () => undefined;
@@ -159,24 +165,34 @@ const stallGuard = <T>(
       clearTimeout(timer);
       timer = undefined;
     };
+    const fire = () => {
+      if (
+        interactive &&
+        Platform.OS === 'ios' &&
+        (AppState.currentState === 'inactive' ||
+          AppState.currentState === 'background')
+      ) {
+        // The change event that would have paused the countdown can lose
+        // the race against the timer; the veto reads the state that event
+        // was carrying, and the handler below re-arms on the way back.
+        pause();
+        return;
+      }
+      if (interactive) {
+        strandedCalls.push(op.then(swallow, swallow));
+      }
+      resolve(STALLED);
+    };
     const arm = () => {
       timer = setTimeout(() => {
-        if (
-          interactive &&
-          Platform.OS === 'ios' &&
-          (AppState.currentState === 'inactive' ||
-            AppState.currentState === 'background')
-        ) {
-          // The change event that would have paused the countdown can lose
-          // the race against the timer; the veto reads the state that event
-          // was carrying, and the handler below re-arms on the way back.
-          pause();
+        if (interactive && Platform.OS === 'ios') {
+          // Give an in-flight resign-active event the grace to land before
+          // the veto reads the state; the change handler clears this timer
+          // like any other.
+          timer = setTimeout(fire, IOS_VETO_GRACE_MS);
           return;
         }
-        if (interactive) {
-          strandedCalls.push(op.then(swallow, swallow));
-        }
-        resolve(STALLED);
+        fire();
       }, stallWindowMs);
     };
     const subscription = interactive
@@ -371,7 +387,12 @@ const runGate = async (props: simpleBiometricsProps): Promise<GateVerdict> => {
   if (Platform.OS === 'android') {
     DeviceEventEmitter.emit(BIOMETRIC_BLANKING_EVENT, true);
     // Yield one frame so the overlay paints before the system prompt opens.
-    await new Promise<void>(resolve => requestAnimationFrame(() => resolve()));
+    // A backgrounded launch delivers no frames, so the wait is guarded: the
+    // prompt then opens without the paint rather than parking the gate.
+    await stallGuard(
+      new Promise<void>(resolve => requestAnimationFrame(() => resolve())),
+      false,
+    );
   }
 
   try {
@@ -439,9 +460,13 @@ const runGate = async (props: simpleBiometricsProps): Promise<GateVerdict> => {
     if (Platform.OS === 'android') {
       hideBlankingWhenClear();
     }
-    // iOS treats the auth prompt as the app going to background;
-    // restore the foreground flag so background-state handling doesn't trip.
-    await AsyncStorage.setItem(GlobalConst.background, GlobalConst.no);
+    // iOS treats the auth prompt as the app going to background; restore the
+    // foreground flag so background-state handling doesn't trip. Guarded: a
+    // wedged storage write must not park the verdict every caller shares.
+    await stallGuard(
+      AsyncStorage.setItem(GlobalConst.background, GlobalConst.no),
+      false,
+    );
   }
 };
 
