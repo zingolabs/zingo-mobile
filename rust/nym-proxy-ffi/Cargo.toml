@@ -12,7 +12,9 @@ crate-type = ["lib", "cdylib", "staticlib"]
 
 [dependencies]
 # NymProxy lives here, behind the nym feature; this shim always needs it.
-zingo-netutils = { git = "https://github.com/zingolabs/zingolib", tag = "zingolib_nym_rc0", features = [
+# Pinned to the nym_bootstrap_events head (PR 2742) for BootstrapEvent;
+# retarget to the next zingolib tag once that PR merges.
+zingo-netutils = { git = "https://github.com/zingolabs/zingolib", rev = "8fc056a945e24fa5d36d274aed5d1cf5b725fafa", features = [
     "nym",
 ] }
 # Proc-macro scaffolding (setup_scaffolding! + #[uniffi::export]); no build.rs
@@ -23,15 +25,37 @@ uniffi = "0.28"
 tokio = { version = "1", features = ["io-util", "net", "rt-multi-thread", "time"] }
 thiserror = "2"
 tracing = "0.1.44"
+# The diagnostics surface (ADR 0007): SOCKS5 tunnelling for the probes, TLS
+# for the destination arm (verifying against the patched Mozilla-bundle
+# verifier, ADR 0006), and the tracing capture layer.
+tokio-socks = { version = "0.5", optional = true }
+tokio-rustls = { version = "0.26", optional = true, default-features = false, features = [
+    "ring",
+] }
+rustls-platform-verifier = { version = "0.7", optional = true }
+tracing-subscriber = { version = "0.3.23", optional = true, default-features = false, features = [
+    "registry",
+    "std",
+] }
 
 [features]
 # Builds tests/live_mixnet.rs, which reaches the real Nym network.
 live-mixnet = []
+# The three-leg observation surface (ADR 0007): the tracing capture layer,
+# the Sentinel and destination probes, and the observed bootstrap. Only
+# debug wallet builds enable it; release binaries never carry it.
+diagnostics = [
+    "dep:rustls-platform-verifier",
+    "dep:tokio-rustls",
+    "dep:tokio-socks",
+    "dep:tracing-subscriber",
+    "zingo-netutils/socks5-transmit",
+]
 
 [dev-dependencies]
 tokio = { version = "1", features = ["macros", "rt-multi-thread", "sync"] }
 # The tests read their temporal parameters from `time::test`.
-zingo-netutils = { git = "https://github.com/zingolabs/zingolib", tag = "zingolib_nym_rc0", features = [
+zingo-netutils = { git = "https://github.com/zingolabs/zingolib", rev = "8fc056a945e24fa5d36d274aed5d1cf5b725fafa", features = [
     "testutils",
 ] }
 

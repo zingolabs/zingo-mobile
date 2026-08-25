@@ -9105,12 +9105,12 @@ dependencies = [
 [[package]]
 name = "zingo-net-diag"
 version = "0.1.0"
-source = "git+https://github.com/zingolabs/zingolib?tag=zingolib_nym_rc0#f65251c5648ebdb96f00d3f2a9de92b11e139abb"
+source = "git+https://github.com/zingolabs/zingolib?rev=8fc056a945e24fa5d36d274aed5d1cf5b725fafa#8fc056a945e24fa5d36d274aed5d1cf5b725fafa"
 
 [[package]]
 name = "zingo-netutils"
 version = "5.0.1"
-source = "git+https://github.com/zingolabs/zingolib?tag=zingolib_nym_rc0#f65251c5648ebdb96f00d3f2a9de92b11e139abb"
+source = "git+https://github.com/zingolabs/zingolib?rev=8fc056a945e24fa5d36d274aed5d1cf5b725fafa#8fc056a945e24fa5d36d274aed5d1cf5b725fafa"
 dependencies = [
  "http 1.5.0",
  "hyper-util",
@@ -9136,8 +9136,11 @@ version = "0.1.0"
 dependencies = [
  "android_logger",
  "log",
+ "rustls-platform-verifier",
  "thiserror 2.0.20",
  "tokio",
+ "tokio-rustls 0.26.4",
+ "tokio-socks",
  "tracing",
  "tracing-subscriber",
  "uniffi",
