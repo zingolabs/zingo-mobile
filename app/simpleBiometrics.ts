@@ -120,8 +120,34 @@ const ANDROID_PROMPT_STALL_MS = 60 * 1000;
 // AppState.currentState mutates only when the change event reaches the JS
 // thread, so a resign-active event behind a just-appeared auth sheet can
 // still be in flight when the window closes and the veto would read a stale
-// 'active'. An iOS interactive fire waits this long for it to land first.
-const IOS_VETO_GRACE_MS = 1000;
+// 'active'. A veto-capable fire waits this long for it to land first.
+const VETO_GRACE_MS = 1000;
+
+// The interactive stall policy's three axes move together, so one record
+// answers all of them: how long the window runs, whether a fire can be
+// vetoed off a live prompt, and what a stall settles as. A platform that
+// can veto (iOS, where a live auth sheet provably leaves 'active') affords
+// the short window and the fail-open verdict. One that cannot pairs the
+// wide window with the fail-closed verdict, and every platform other than
+// iOS takes that pairing: without a proven veto signal it is the safe one.
+type InteractiveStallPolicy = {
+  windowMs: number;
+  vetoOffActive: boolean;
+  settleAs: 'declined' | 'unavailable';
+};
+
+const interactiveStallPolicy = (): InteractiveStallPolicy =>
+  Platform.OS === 'ios'
+    ? {
+        windowMs: NATIVE_STALL_MS,
+        vetoOffActive: true,
+        settleAs: 'unavailable',
+      }
+    : {
+        windowMs: ANDROID_PROMPT_STALL_MS,
+        vetoOffActive: false,
+        settleAs: 'declined',
+      };
 
 const STALLED = Symbol('keychain-stalled');
 
@@ -138,16 +164,14 @@ let strandedCalls: Array<Promise<undefined>> = [];
 // 'active'. Leaving 'active' pauses it and returning re-arms it in full, so
 // time the OS parks on a human never counts toward a stall, and a queue
 // that is still wedged when the app comes back is caught by the fresh
-// window. On iOS a fire is vetoed while the current state is 'inactive' or
-// 'background' — the two states that prove a live auth sheet or a
-// backgrounded app — so a live prompt can never be declared a stall there.
-// An 'unknown' seed proves nothing (RN can seed it at launch and never
-// replay the missed transition), so it does not veto: parking a wedged call
-// on it would leave the gate pending forever. Android keeps its
-// BiometricPrompt inside the resumed activity, so no veto is possible and a
-// fire is answered by policy instead (see interactiveStall). Calls that
-// never show UI (the capability probes, has, reset) pass `false`: for them
-// any stall is a wedged queue, full stop.
+// window. Where the policy record allows a veto, a fire is vetoed while the
+// current state is 'inactive' or 'background' — the two states that prove a
+// live auth sheet or a backgrounded app — so a live prompt can never be
+// declared a stall. An 'unknown' seed proves nothing (RN can seed it at
+// launch and never replay the missed transition), so it does not veto:
+// parking a wedged call on it would leave the gate pending forever. Calls
+// that never show UI (the capability probes, has, reset) pass `false`: for
+// them any stall is a wedged queue, full stop.
 
 /** Resolves to STALLED when `op` outlives the platform's stall window. */
 const stallGuard = <T>(
@@ -156,10 +180,8 @@ const stallGuard = <T>(
 ): Promise<T | typeof STALLED> => {
   let disarm = () => {};
   const watchdog = new Promise<typeof STALLED>(resolve => {
-    const stallWindowMs =
-      interactive && Platform.OS === 'android'
-        ? ANDROID_PROMPT_STALL_MS
-        : NATIVE_STALL_MS;
+    const policy = interactiveStallPolicy();
+    const stallWindowMs = interactive ? policy.windowMs : NATIVE_STALL_MS;
     let timer: ReturnType<typeof setTimeout> | undefined;
     const pause = () => {
       clearTimeout(timer);
@@ -168,7 +190,7 @@ const stallGuard = <T>(
     const fire = () => {
       if (
         interactive &&
-        Platform.OS === 'ios' &&
+        policy.vetoOffActive &&
         (AppState.currentState === 'inactive' ||
           AppState.currentState === 'background')
       ) {
@@ -185,11 +207,11 @@ const stallGuard = <T>(
     };
     const arm = () => {
       timer = setTimeout(() => {
-        if (interactive && Platform.OS === 'ios') {
+        if (interactive && policy.vetoOffActive) {
           // Give an in-flight resign-active event the grace to land before
           // the veto reads the state; the change handler clears this timer
           // like any other.
-          timer = setTimeout(fire, IOS_VETO_GRACE_MS);
+          timer = setTimeout(fire, VETO_GRACE_MS);
           return;
         }
         fire();
@@ -212,14 +234,12 @@ const stallGuard = <T>(
   return Promise.race([op, watchdog]).finally(() => disarm());
 };
 
-// On iOS a fire proves the prompt is not on screen (a live prompt keeps the
-// app out of 'active' and vetoes it), so the gate cannot run and the caller
-// proceeds. On Android a fire cannot prove that, and proceeding would open
-// the wallet to whoever waits out the prompt, so it settles as declined: the
-// locked screen returns with a retry that issues a fresh prompt.
+// A stall settles by the policy record: fail-open where the veto proved the
+// prompt was off screen, fail-closed (a locked screen with a live retry)
+// where nothing could prove it.
 const interactiveStall = (failure: string): StalledOutcome => ({
   kind: 'stalled',
-  settleAs: Platform.OS === 'ios' ? 'unavailable' : 'declined',
+  settleAs: interactiveStallPolicy().settleAs,
   failure,
 });
 
