@@ -2159,6 +2159,8 @@ export class LoadingAppClass extends Component<
       blockExplorer: this.state.blockExplorer,
     };
 
+    const gateFailure = getLastGateFailure();
+
     return (
       <>
         <ContextAppLoadingProvider value={context}>
@@ -2171,7 +2173,13 @@ export class LoadingAppClass extends Component<
                   translate={translate}
                   firstLaunchingMessage={firstLaunchingMessage}
                   biometricsFailed={biometricsFailed}
-                  message={biometricsFailed ? getLastGateFailure() : undefined}
+                  message={
+                    biometricsFailed && gateFailure
+                      ? `${translate(gateFailure.errorKey) as string} ${
+                          gateFailure.detail
+                        }`.trim()
+                      : undefined
+                  }
                   tryAgain={() => {
                     this.setState({ biometricsFailed: false }, () =>
                       this.componentDidMount(),

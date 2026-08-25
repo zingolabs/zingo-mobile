@@ -13,7 +13,10 @@ jest.mock('react-native', () => {
   };
   return {
     __esModule: true,
-    Platform: { OS: 'ios', select: (o: any) => o.ios },
+    Platform: {
+      OS: 'ios',
+      select: (spec: Record<string, unknown>) => spec.ios,
+    },
     AppState: {
       get currentState() {
         return appState.currentState;
@@ -133,7 +136,9 @@ test('a wedged native queue is unavailable instead of hanging', async () => {
   await jest.advanceTimersByTimeAsync(10 * 1000);
 
   await expect(gate).resolves.toMatchObject({ kind: 'unavailable' });
-  expect(getLastGateFailure()).toMatch(/stalled/);
+  expect(getLastGateFailure()).toMatchObject({
+    errorKey: 'biometrics-failure-stalled',
+  });
 });
 
 test('a wedged capability probe is unavailable too', async () => {
@@ -280,7 +285,9 @@ test('an android interactive stall locks with a retriable decline', async () => 
   expect(verdict).toBeUndefined(); // the iOS window must not govern Android
   await jest.advanceTimersByTimeAsync(50 * 1000);
   expect(verdict).toMatchObject({ kind: 'declined' });
-  expect(getLastGateFailure()).toMatch(/stalled/);
+  expect(getLastGateFailure()).toMatchObject({
+    errorKey: 'biometrics-failure-stalled',
+  });
 });
 
 test('concurrent callers share one gate run', async () => {
@@ -554,7 +561,10 @@ test('a stalled sentinel write locks by the android policy', async () => {
   });
   await jest.advanceTimersByTimeAsync(60 * 1000);
   expect(verdict).toMatchObject({ kind: 'declined' });
-  expect(getLastGateFailure()).toMatch(/stalled writing/);
+  expect(getLastGateFailure()).toMatchObject({
+    errorKey: 'biometrics-failure-stalled',
+    detail: 'setGenericPassword',
+  });
   expect(kc.getGenericPassword).not.toHaveBeenCalled();
 });
 
@@ -570,7 +580,10 @@ test('a stalled rebuild clear settles unavailable in the probe window', async ()
   });
   await jest.advanceTimersByTimeAsync(10 * 1000);
   expect(verdict).toMatchObject({ kind: 'unavailable' });
-  expect(getLastGateFailure()).toMatch(/stalled clearing/);
+  expect(getLastGateFailure()).toMatchObject({
+    errorKey: 'biometrics-failure-stalled',
+    detail: 'resetGenericPassword',
+  });
   expect(kc.setGenericPassword).not.toHaveBeenCalled();
 });
 
@@ -694,11 +707,13 @@ test('a preflight refusal reports its own reason, not a previous decline', async
 
   kc.canImplyAuthentication.mockResolvedValue(false); // passcode removed
   const verdict = await simpleBiometrics({ translate, purpose: 'appEntry' });
-  expect(verdict).toMatchObject({ kind: 'unavailable' });
-  if (verdict.kind === 'unavailable') {
-    expect(verdict.failure).not.toMatch(/-128/);
-  }
-  expect(getLastGateFailure()).not.toMatch(/-128/);
+  expect(verdict).toMatchObject({
+    kind: 'unavailable',
+    failure: { errorKey: 'biometrics-failure-nosecurity' },
+  });
+  expect(getLastGateFailure()).toMatchObject({
+    errorKey: 'biometrics-failure-nosecurity',
+  });
 });
 
 test('a decline is shared with a concurrent caller without a second prompt', async () => {
