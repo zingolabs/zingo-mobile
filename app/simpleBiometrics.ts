@@ -48,11 +48,14 @@ export type StalledOutcome = {
   failure: string;
 };
 
+/** Whether a broken entry followed a human failing the prompt or the platform declining to serve it. */
+export type BrokenEntryCause = 'authFailed' | 'notServed';
+
 /** Every way one keychain attempt against the sentinel can end. */
 export type AttemptOutcome =
   | { kind: 'authenticated' }
   | { kind: 'declined'; failure: string }
-  | { kind: 'brokenEntry'; failure: string }
+  | { kind: 'brokenEntry'; cause: BrokenEntryCause; failure: string }
   | StalledOutcome;
 
 // `unavailable` is the gate refusing to run, not the user refusing to
@@ -267,16 +270,27 @@ const describeFailure = (e: unknown): string => {
   return code ? `${code} ${failureMessage(e)}` : failureMessage(e);
 };
 
+// errSecAuthFailed is the one broken-entry code that follows a human
+// actually failing the prompt (Android's equivalent, lockout, is already a
+// decline); every other code reaches brokenEntry without anyone being asked.
+const IOS_AUTH_FAILED = '-25293';
+
 const classifyFailure = (e: unknown): AttemptOutcome => {
+  const failure = describeFailure(e);
   const declined =
     Platform.OS === 'ios'
       ? IOS_DECLINED.includes(failureCode(e))
       : ANDROID_DECLINED.includes(
           Number(/code:\s*(-?\d+)/.exec(failureMessage(e))?.[1]),
         );
-  return declined
-    ? { kind: 'declined', failure: describeFailure(e) }
-    : { kind: 'brokenEntry', failure: describeFailure(e) };
+  if (declined) {
+    return { kind: 'declined', failure };
+  }
+  const cause: BrokenEntryCause =
+    Platform.OS === 'ios' && failureCode(e) === IOS_AUTH_FAILED
+      ? 'authFailed'
+      : 'notServed';
+  return { kind: 'brokenEntry', cause, failure };
 };
 
 // The rebuild decision needs one bit the outcome alone cannot carry: whether
@@ -296,12 +310,13 @@ const settled = (verdict: GateVerdict): SettledPhase => ({
 });
 
 // Pure and total: every (phase, outcome) pair maps to exactly one next
-// phase, and the annotated return type makes the compiler hold the table
-// exhaustive.
-const advance = (state: GatePhase, outcome: AttemptOutcome): GatePhase => {
-  if (state.phase === 'settled') {
-    return state;
-  }
+// phase, and the annotated types make the compiler hold the table
+// exhaustive — the driver's loop condition proves the settled phase never
+// reaches this function.
+const advance = (
+  state: Exclude<GatePhase, SettledPhase>,
+  outcome: AttemptOutcome,
+): GatePhase => {
   switch (outcome.kind) {
     case 'authenticated':
       return settled({ kind: 'authenticated' });
@@ -312,9 +327,16 @@ const advance = (state: GatePhase, outcome: AttemptOutcome): GatePhase => {
       // front of a dead screen. The verdict is the platform's answer.
       return settled({ kind: outcome.settleAs, failure: outcome.failure });
     case 'brokenEntry':
-      return state.phase === 'trustedEntry'
-        ? { phase: 'freshEntry' }
-        : settled({ kind: 'declined', failure: outcome.failure });
+      if (state.phase === 'trustedEntry') {
+        return { phase: 'freshEntry' };
+      }
+      // Against an entry written seconds ago, only a failure the user was
+      // actually asked about is a decline; an entry the platform would not
+      // serve is a gate that cannot run, and locking on it would re-open
+      // the issue #1266 trap.
+      return outcome.cause === 'authFailed'
+        ? settled({ kind: 'declined', failure: outcome.failure })
+        : settled({ kind: 'unavailable', failure: outcome.failure });
   }
 };
 
@@ -375,7 +397,11 @@ const attemptGate = async (
     }
     // A resolved `false` means the entry was not found. No prompt can have
     // been satisfied against an entry that is not there.
-    return { kind: 'brokenEntry', failure: 'sentinel entry missing' };
+    return {
+      kind: 'brokenEntry',
+      cause: 'notServed',
+      failure: 'sentinel entry missing',
+    };
   } catch (e) {
     return classifyFailure(e);
   }
@@ -390,7 +416,10 @@ const hideBlankingWhenClear = (): void => {
     DeviceEventEmitter.emit(BIOMETRIC_BLANKING_EVENT, false);
     return;
   }
-  Promise.all(strandedCalls).then(() =>
+  // Bounded by the stall guard: a strand that never settles must not bury
+  // the locked screen under the overlay, and after the verdict navigates
+  // away nothing sensitive is behind it.
+  stallGuard(Promise.all(strandedCalls).then(swallow), false).finally(() =>
     DeviceEventEmitter.emit(BIOMETRIC_BLANKING_EVENT, false),
   );
 };
@@ -398,10 +427,10 @@ const hideBlankingWhenClear = (): void => {
 const runGate = async (props: simpleBiometricsProps): Promise<GateVerdict> => {
   // Pre-flight: if the device cannot authenticate at all (no biometry, no
   // passcode), short-circuit so the caller can decide whether to allow the
-  // operation rather than blocking on an impossible prompt. `lastFailure`
-  // still holds whatever a stalled probe recorded, so pass it through.
-  if (!(await hasDeviceSecurity())) {
-    return { kind: 'unavailable', failure: lastFailure };
+  // operation rather than blocking on an impossible prompt.
+  const security = await probeDeviceSecurity();
+  if (!security.secure) {
+    return recordVerdict({ kind: 'unavailable', failure: security.failure });
   }
 
   if (Platform.OS === 'android') {
@@ -564,53 +593,64 @@ const simpleBiometrics = (
   }
 };
 
-/**
- * True when the device can authenticate the user via biometry or device
- * credential. Used by Settings to enable/disable the per-screen bio toggles.
- * Replaces the react-native-biometrics isSensorAvailable() check.
- *
- * canImplyAuthentication() is iOS-only in react-native-keychain and always
- * returns false on Android. So we compose the Android answer ourselves from
- * the biometry-type query plus the device passcode probe.
- *
- * These probes are the first keychain calls of the flow, which makes them the
- * ones that queue behind a wedged predecessor. A stall reads as "no device
- * security", and that is what settles the gate as `unavailable` instead of
- * leaving the caller waiting forever.
- */
-export const hasDeviceSecurity = async (): Promise<boolean> => {
+type DeviceSecurityProbe =
+  | { secure: true }
+  | { secure: false; failure: string };
+
+const insecure = (failure: string): DeviceSecurityProbe => ({
+  secure: false,
+  failure,
+});
+
+// canImplyAuthentication() is iOS-only in react-native-keychain and always
+// returns false on Android, so the Android answer is composed from the
+// biometry-type query plus the device passcode probe. These probes are the
+// first keychain calls of the flow, which makes them the ones that queue
+// behind a wedged predecessor; each refusal carries its own reason, so the
+// pre-flight verdict never inherits a stale one.
+
+/** Answers whether the device can authenticate its user, with the reason when it cannot. */
+const probeDeviceSecurity = async (): Promise<DeviceSecurityProbe> => {
   try {
     if (Platform.OS === 'ios') {
       const can = await stallGuard(Keychain.canImplyAuthentication(), false);
       if (can === STALLED) {
-        lastFailure = 'keychain stalled probing device security';
-        return false;
+        return insecure('keychain stalled probing device security');
       }
-      return can;
+      return can
+        ? { secure: true }
+        : insecure('no device authentication is enrolled');
     }
     const biometry = await stallGuard(
       Keychain.getSupportedBiometryType(),
       false,
     );
     if (biometry === STALLED) {
-      lastFailure = 'keychain stalled probing biometry type';
-      return false;
+      return insecure('keychain stalled probing biometry type');
     }
     if (biometry !== null) {
-      return true;
+      return { secure: true };
     }
     const passcode = await stallGuard(
       Keychain.isPasscodeAuthAvailable(),
       false,
     );
     if (passcode === STALLED) {
-      lastFailure = 'keychain stalled probing passcode availability';
-      return false;
+      return insecure('keychain stalled probing passcode availability');
     }
-    return passcode;
-  } catch {
-    return false;
+    return passcode
+      ? { secure: true }
+      : insecure('no device authentication is enrolled');
+  } catch (e) {
+    return insecure(describeFailure(e));
   }
 };
+
+// Settings uses the boolean wrapper to enable the per-screen bio toggles;
+// it replaces the react-native-biometrics isSensorAvailable() check.
+
+/** True when the device can authenticate the user via biometry or device credential. */
+export const hasDeviceSecurity = async (): Promise<boolean> =>
+  (await probeDeviceSecurity()).secure;
 
 export default simpleBiometrics;

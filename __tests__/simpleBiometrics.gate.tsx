@@ -33,6 +33,7 @@ jest.mock('react-native', () => {
 });
 
 import type { GateVerdict } from '../app/simpleBiometrics';
+import type { TranslateType } from '../app/AppState';
 
 type GateModule = typeof import('../app/simpleBiometrics');
 type RnMock = {
@@ -50,7 +51,7 @@ let blankingEvent: GateModule['BIOMETRIC_BLANKING_EVENT'];
 let kc: Record<string, jest.Mock>;
 let rn: RnMock;
 
-const translate = ((k: string) => k) as never;
+const translate = (k: string): TranslateType => k;
 const osError = (code: string) => Object.assign(new Error('boom'), { code });
 
 const setAppState = (next: string) => {
@@ -395,6 +396,74 @@ test('an authentication that outlasts the window locks, then recovers on the nex
   await jest.advanceTimersByTimeAsync(100); // one frame, no second window
   expect(second).toMatchObject({ kind: 'authenticated' });
   expect(kc.getGenericPassword).toHaveBeenCalledTimes(2);
+});
+
+test('a never-settling strand drops the blanking overlay after a bounded wait', async () => {
+  jest.useFakeTimers();
+  rn.Platform.OS = 'android';
+  kc.getSupportedBiometryType.mockResolvedValue('Fingerprint');
+  kc.hasGenericPassword.mockResolvedValue(true);
+  kc.getGenericPassword.mockReturnValue(new Promise(() => {}));
+
+  let verdict: GateVerdict | undefined;
+  simpleBiometrics({ translate }).then(v => {
+    verdict = v;
+  });
+  await jest.advanceTimersByTimeAsync(60 * 1000);
+  expect(verdict).toMatchObject({ kind: 'declined' });
+  expect(rn.DeviceEventEmitter.emit).not.toHaveBeenCalledWith(
+    blankingEvent,
+    false,
+  );
+  // The locked screen must not stay buried under the overlay forever when
+  // the strand never settles; after the decline nothing sensitive is
+  // behind it.
+  await jest.advanceTimersByTimeAsync(10 * 1000);
+  expect(rn.DeviceEventEmitter.emit).toHaveBeenCalledWith(blankingEvent, false);
+});
+
+test('a fresh sentinel the platform will not serve fails open, not locked', async () => {
+  // errSecInteractionNotAllowed: the OS refused to run the prompt at all,
+  // so nobody failed an authentication and locking would re-open the
+  // issue #1266 trap for the platform-error class.
+  kc.hasGenericPassword.mockResolvedValue(true);
+  kc.getGenericPassword.mockRejectedValue(osError('-25308'));
+
+  await expect(simpleBiometrics({ translate })).resolves.toMatchObject({
+    kind: 'unavailable',
+  });
+  expect(kc.setGenericPassword).toHaveBeenCalledTimes(1); // one rebuild try
+});
+
+test('an android hardware error on a fresh sentinel fails open, not locked', async () => {
+  rn.Platform.OS = 'android';
+  kc.getSupportedBiometryType.mockResolvedValue('Fingerprint');
+  kc.hasGenericPassword.mockResolvedValue(true);
+  kc.getGenericPassword.mockRejectedValue(
+    Object.assign(new Error('code: 1, msg: Hardware unavailable'), {
+      code: 'E_CRYPTO_FAILED',
+    }),
+  );
+
+  await expect(simpleBiometrics({ translate })).resolves.toMatchObject({
+    kind: 'unavailable',
+  });
+});
+
+test('a preflight refusal reports its own reason, not a previous decline', async () => {
+  kc.hasGenericPassword.mockResolvedValue(true);
+  kc.getGenericPassword.mockRejectedValue(osError('-128'));
+  await expect(simpleBiometrics({ translate })).resolves.toMatchObject({
+    kind: 'declined',
+  });
+
+  kc.canImplyAuthentication.mockResolvedValue(false); // passcode removed
+  const verdict = await simpleBiometrics({ translate });
+  expect(verdict).toMatchObject({ kind: 'unavailable' });
+  if (verdict.kind === 'unavailable') {
+    expect(verdict.failure).not.toMatch(/-128/);
+  }
+  expect(getLastGateFailure()).not.toMatch(/-128/);
 });
 
 test('a decline is shared with a concurrent caller without a second prompt', async () => {
