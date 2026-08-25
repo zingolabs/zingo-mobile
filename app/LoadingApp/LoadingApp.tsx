@@ -89,7 +89,10 @@ import Toast from 'react-native-toast-message';
 import { toastConfig } from '../toastConfig';
 import { RPCSeedType } from '../walletBackend/types/RPCSeedType';
 import Launching from './components/Launching';
-import simpleBiometrics, { getLastGateFailure } from '../simpleBiometrics';
+import simpleBiometrics, {
+  GateVerdict,
+  getLastGateFailure,
+} from '../simpleBiometrics';
 import selectingServer from '../selectingServer';
 import { isEqual } from 'lodash';
 import {
@@ -589,18 +592,14 @@ export class LoadingAppClass extends Component<
     // the user have to pass the security of the device
     if (this.state.startingApp) {
       if (!this.state.biometricsFailed) {
-        // (PIN or TouchID or FaceID)
+        // (PIN or TouchID or FaceID). Only a decline locks; an
+        // 'unavailable' gate passes because it guards nothing and
+        // blocking locks the user out of the wallet.
         this.setState({ biometricsFailed: false });
-        const resultBio = this.state.security.startApp
+        const startGate: GateVerdict = this.state.security.startApp
           ? await simpleBiometrics({ translate: this.state.translate })
-          : true;
-        // resultBio:
-        // - true      -> authenticated (biometric, or device passcode via allowDeviceCredentials)
-        // - false     -> user cancelled or failed the prompt
-        // - undefined -> the gate cannot run here (no auth method, or a keychain
-        //                entry the OS refuses to serve); allow, since it guards
-        //                nothing and blocking locks the user out of the wallet
-        if (resultBio === false) {
+          : { kind: 'authenticated' };
+        if (startGate.kind === 'declined') {
           this.setState({ biometricsFailed: true });
           return;
         } else {
