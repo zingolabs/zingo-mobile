@@ -241,17 +241,18 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
 
   // Audit Issue D — single source of truth for security.settingsScreen.
   // The requirement follows the live context except while this screen's
-  // own save rewrites it. The sync runs in an effect, so the thaw is a
-  // rendered state change at a deterministic moment, never a stale ref.
+  // own save rewrites it. The freeze is keyed on state, so the thaw is a
+  // rendered change at a deterministic moment, and the value derives
+  // during render with no lag commit.
   const [savingSettings, setSavingSettings] = useState<boolean>(false);
   const liveNeedsAuth = !!securityContext.settingsScreen;
-  const [gateRequirement, setGateRequirement] =
-    useState<boolean>(liveNeedsAuth);
-  useEffect(() => {
-    if (!savingSettings) {
-      setGateRequirement(liveNeedsAuth);
-    }
-  }, [savingSettings, liveNeedsAuth]);
+  const frozenNeedsAuthRef = useRef<boolean>(liveNeedsAuth);
+  if (!savingSettings) {
+    frozenNeedsAuthRef.current = liveNeedsAuth;
+  }
+  const gateRequirement = savingSettings
+    ? frozenNeedsAuthRef.current
+    : liveNeedsAuth;
   const screenGate = useBiometricGate({
     needsAuth: gateRequirement,
     translate,
@@ -425,6 +426,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     (async () => {
       const probe = await probeDeviceSecurity();
       if (cancelled) {
+        // The answer was discarded; the next settle probes again.
+        probedRef.current = false;
         return;
       }
       if (
@@ -432,6 +435,9 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         probe.failure.errorKey !== 'biometrics-failure-stalled'
       ) {
         setDeviceSecurity(probe);
+      } else {
+        // A stall answered nothing; the next settle probes again.
+        probedRef.current = false;
       }
     })();
     return () => {

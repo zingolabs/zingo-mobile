@@ -21,6 +21,7 @@
   "biometrics-failure-declined": "The authentication was cancelled or failed.",
   "biometrics-failure-notserved": "The device refused the security check.",
   "biometrics-failure-nosecurity": "No screen lock or biometry is enrolled on this device.",
+  "biometrics-failure-away": "The security check could not finish while the app was in the background.",
   "close": "Close",
   "cancel": "Cancel",
   "clear": "Clear",

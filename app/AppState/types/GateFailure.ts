@@ -10,7 +10,8 @@ export type GateFailureKey =
   | 'biometrics-failure-stalled'
   | 'biometrics-failure-declined'
   | 'biometrics-failure-notserved'
-  | 'biometrics-failure-nosecurity';
+  | 'biometrics-failure-nosecurity'
+  | 'biometrics-failure-away';
 
 /** A gate failure in the repo-canonical ErrorKeyed shape. */
 export type GateFailure = ErrorKeyed<GateFailureKey>;

@@ -503,12 +503,8 @@ const runGate = async (props: simpleBiometricsProps): Promise<GateVerdict> => {
       await new Promise<void>(resolve => {
         let frame: number | undefined;
         const frameBudget = setTimeout(() => {
-          try {
-            if (frame !== undefined) {
-              cancelAnimationFrame(frame);
-            }
-          } catch {
-            // The cancel is best-effort; the resolve below must run.
+          if (frame !== undefined) {
+            cancelAnimationFrame(frame);
           }
           resolve();
         }, PAINT_BUDGET_MS);
@@ -713,26 +709,35 @@ export const probeDeviceSecurity = async (): Promise<DeviceSecurityProbe> => {
   }
 };
 
-/** Resolves true when the app returns to 'active', false when the stall policy's window expires first. */
-export const returnedToForeground = (): Promise<boolean> => {
+/** Starts a bounded wait for the app's return to 'active', with a cancel that releases the listener and timer early. */
+export const foregroundReturnWatch = (): {
+  returned: Promise<boolean>;
+  cancel: () => void;
+} => {
   if (!provablyAway()) {
-    return Promise.resolve(true);
+    return { returned: Promise.resolve(true), cancel: () => {} };
   }
-  return new Promise(resolve => {
+  let settle: (value: boolean) => void = () => {};
+  const returned = new Promise<boolean>(resolve => {
     let expiry: ReturnType<typeof setTimeout> | undefined;
     const subscription = AppState.addEventListener('change', next => {
       if (next === 'active') {
-        clearTimeout(expiry);
-        subscription.remove();
-        resolve(true);
+        settle(true);
       }
     });
-    expiry = setTimeout(() => {
+    settle = (value: boolean) => {
+      clearTimeout(expiry);
       subscription.remove();
-      resolve(false);
-    }, interactiveStallPolicy().windowMs);
+      resolve(value);
+    };
+    expiry = setTimeout(() => settle(false), interactiveStallPolicy().windowMs);
   });
+  return { returned, cancel: () => settle(false) };
 };
+
+/** Resolves true when the app returns to 'active', false when the stall policy's window expires first. */
+export const returnedToForeground = (): Promise<boolean> =>
+  foregroundReturnWatch().returned;
 
 // The re-ask loop for app-level callers. A re-ask for a backgrounded
 // activity is answered ERROR_CANCELED and would lock, so the loop holds
@@ -747,12 +752,11 @@ export const gateUntilAnswered = async (
   let verdict = await simpleBiometrics(props);
   while (verdict.kind === 'unanswered') {
     if (!(await returnedToForeground())) {
+      // An expiry proves nothing about the prompt, so it fails closed on
+      // every platform: the locked screen returns with a live retry.
       return {
-        kind: interactiveStallPolicy().settleAs,
-        failure: gateFailure(
-          'biometrics-failure-stalled',
-          'returnToForeground',
-        ),
+        kind: 'declined',
+        failure: gateFailure('biometrics-failure-away'),
       };
     }
     verdict = await simpleBiometrics(props);

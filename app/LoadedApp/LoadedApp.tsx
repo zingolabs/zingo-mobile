@@ -989,17 +989,24 @@ export class LoadedAppClass extends Component<
           this.setState(state => ({
             foregroundEpoch: state.foregroundEpoch + 1,
           }));
-          // A parked earlier pass resumes with this same event and acts
-          // once; a second concurrent actor would double-run the restore
-          // work or the navigation reset.
+          // One actor at a time: a parked earlier pass resumes with this
+          // same event, and a genuine second entry that lands while a
+          // pass is mid-flight runs once more after it, never
+          // concurrently and never dropped.
           if (this.foregroundGateBusy) {
+            this.foregroundGateQueued = true;
             return;
           }
           this.foregroundGateBusy = true;
           try {
             await this.runForegroundGate();
+            while (this.foregroundGateQueued) {
+              this.foregroundGateQueued = false;
+              await this.runForegroundGate();
+            }
           } finally {
             this.foregroundGateBusy = false;
+            this.foregroundGateQueued = false;
           }
         } else if (
           priorAppState === AppStateStatusEnum.active &&
@@ -1100,6 +1107,8 @@ export class LoadedAppClass extends Component<
   };
 
   foregroundGateBusy = false;
+
+  foregroundGateQueued = false;
 
   // (PIN or TouchID or FaceID). Only a decline locks; an 'unavailable'
   // gate passes because it guards nothing and blocking locks the user out

@@ -2,10 +2,14 @@ import { useEffect, useRef, useState } from 'react';
 
 import simpleBiometrics, {
   AnsweredVerdict,
-  returnedToForeground,
+  foregroundReturnWatch,
 } from '../simpleBiometrics';
 import { SnackbarDurationEnum, TranslateType } from '../AppState';
 import Utils from '../utils';
+
+// The window a shared decline's teardown gets to cancel this run before a
+// fresh prompt may rise from it.
+const TEARDOWN_GRACE_MS = 1000;
 
 type UseBiometricGateArgs = {
   needsAuth: boolean;
@@ -33,10 +37,11 @@ export type ScreenGateState =
  *   - On a stalled fail-open: passes, and tells the user the check did not
  *     respond.
  *   - On `unanswered` (a shared appEntry run declined, locking the app):
- *     waits out the bounded return-to-foreground hold, then re-asks only
- *     if this screen still exists, so no prompt is ever raised on behalf
- *     of a component being torn down. The type enforces the no-action
- *     rule: only an AnsweredVerdict reaches the acting code.
+ *     waits out the return-to-foreground hold plus a teardown grace, then
+ *     re-asks only if this screen still exists and only while the app is
+ *     in the foreground, so no prompt is ever raised on behalf of a dead
+ *     component or a backgrounded activity. The type enforces the
+ *     no-action rule: only an AnsweredVerdict reaches the acting code.
  *   - On background → active (foregroundEpoch bumps): re-fires the gate
  *     only when `foregroundAppEnabled` is false. LoadedApp's own
  *     foreground gate already covers the enabled case.
@@ -91,17 +96,29 @@ export const useBiometricGate = ({
   // verdict and never re-asks for one.
   const runScreenGate = () => {
     let cancelled = false;
+    let cancelWatch: (() => void) | undefined;
     (async () => {
       let verdict = await simpleBiometrics({
         translate,
         purpose: 'screenEntry',
       });
       // 'unanswered' means an appEntry decline is locking the app, which
-      // usually tears this screen down; the bounded wait gives that
-      // teardown time to cancel this run. Where no teardown comes, the
-      // re-ask restores the screen's own gate instead of parking it.
+      // usually tears this screen down. The hold plus the grace give that
+      // teardown time to cancel this run; a hold that expires with the
+      // app still away waits again, because a backgrounded activity
+      // answers a prompt ERROR_CANCELED and must never be re-asked.
       while (verdict.kind === 'unanswered' && !cancelled) {
-        await returnedToForeground();
+        const watch = foregroundReturnWatch();
+        cancelWatch = watch.cancel;
+        const returned = await watch.returned;
+        cancelWatch = undefined;
+        if (cancelled) {
+          return;
+        }
+        if (!returned) {
+          continue;
+        }
+        await new Promise(resolve => setTimeout(resolve, TEARDOWN_GRACE_MS));
         if (cancelled) {
           return;
         }
@@ -117,6 +134,7 @@ export const useBiometricGate = ({
     })();
     return () => {
       cancelled = true;
+      cancelWatch?.();
     };
   };
 

@@ -21,6 +21,7 @@
   "biometrics-failure-declined": "La autenticación fue cancelada o falló.",
   "biometrics-failure-notserved": "El dispositivo rechazó la comprobación de seguridad.",
   "biometrics-failure-nosecurity": "Este dispositivo no tiene bloqueo de pantalla ni biometría configurados.",
+  "biometrics-failure-away": "La comprobación de seguridad no pudo terminar mientras la aplicación estaba en segundo plano.",
   "close": "Cerrar",
   "cancel": "Cancelar",
   "clear": "Limpiar",

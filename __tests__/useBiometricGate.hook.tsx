@@ -6,7 +6,10 @@
 jest.mock('../app/simpleBiometrics', () => ({
   __esModule: true,
   default: jest.fn(),
-  returnedToForeground: jest.fn(() => Promise.resolve(true)),
+  foregroundReturnWatch: jest.fn(() => ({
+    returned: Promise.resolve(true),
+    cancel: jest.fn(),
+  })),
 }));
 
 import { renderHook, waitFor } from '@testing-library/react-native';
@@ -97,7 +100,10 @@ test('a parked screen gate re-asks after the bounded wait', async () => {
     initialProps: gateArgs(),
   });
 
-  await waitFor(() => expect(gate).toHaveBeenCalledTimes(2));
+  // The re-ask sits behind the teardown grace, so the wait outlasts it.
+  await waitFor(() => expect(gate).toHaveBeenCalledTimes(2), {
+    timeout: 3000,
+  });
   await waitFor(() => expect(result.current).toMatchObject({ kind: 'passed' }));
 });
 
@@ -117,6 +123,46 @@ test('an ordinary cancel shows only the standard sentence', async () => {
 
   await waitFor(() => expect(props.onCancel).toHaveBeenCalled());
   expect(props.addLastSnackbar).toHaveBeenCalledWith('biometrics-error');
+});
+
+test('a torn-down screen cancels inside the teardown grace', async () => {
+  // The shared decline's teardown lands within the grace; a re-ask from a
+  // dead screen would raise a stray prompt over the locked screen.
+  gate
+    .mockResolvedValueOnce({ kind: 'unanswered' })
+    .mockResolvedValue({ kind: 'authenticated' });
+  const { unmount } = renderHook((p: GateProps) => useBiometricGate(p), {
+    initialProps: gateArgs(),
+  });
+  await waitFor(() => expect(gate).toHaveBeenCalledTimes(1));
+
+  unmount(); // the teardown arrives inside the grace window
+  await new Promise(resolve => setTimeout(resolve, 1200));
+  expect(gate).toHaveBeenCalledTimes(1);
+});
+
+test('the hook never re-asks while the app stays away', async () => {
+  const foreground = jest.requireMock('../app/simpleBiometrics')
+    .foregroundReturnWatch as jest.Mock;
+  foreground
+    .mockReturnValueOnce({
+      returned: Promise.resolve(false),
+      cancel: jest.fn(),
+    })
+    .mockReturnValue({ returned: new Promise(() => {}), cancel: jest.fn() });
+  gate
+    .mockResolvedValueOnce({ kind: 'unanswered' })
+    .mockResolvedValue({ kind: 'authenticated' });
+  const { result } = renderHook((p: GateProps) => useBiometricGate(p), {
+    initialProps: gateArgs(),
+  });
+
+  await waitFor(() => expect(gate).toHaveBeenCalledTimes(1));
+  await new Promise(resolve => setTimeout(resolve, 50));
+  // An expired hold with the app still away must wait again, never ask a
+  // backgrounded activity whose answer is ERROR_CANCELED.
+  expect(gate).toHaveBeenCalledTimes(1);
+  expect(result.current).toMatchObject({ kind: 'checking' });
 });
 
 test('an unmounted screen never re-asks on an unanswered verdict', async () => {

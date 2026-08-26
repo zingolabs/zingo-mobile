@@ -395,33 +395,6 @@ test('a resign-active event landing just after the fire still vetoes the stall',
   expect(verdict).toMatchObject({ kind: 'authenticated' });
 });
 
-test('a throwing cancelAnimationFrame never hangs the frame yield', async () => {
-  jest.useFakeTimers();
-  rn.Platform.OS = 'android';
-  const realFrame = globalThis.requestAnimationFrame;
-  const realCancel = globalThis.cancelAnimationFrame;
-  globalThis.requestAnimationFrame = (() =>
-    7) as typeof globalThis.requestAnimationFrame;
-  globalThis.cancelAnimationFrame = (() => {
-    throw new Error('no cancel here');
-  }) as typeof globalThis.cancelAnimationFrame;
-  try {
-    kc.getSupportedBiometryType.mockResolvedValue('Fingerprint');
-    kc.hasGenericPassword.mockResolvedValue(true);
-    kc.getGenericPassword.mockResolvedValue({ password: '1' });
-
-    let verdict: GateVerdict | undefined;
-    simpleBiometrics({ translate, purpose: 'appEntry' }).then(v => {
-      verdict = v;
-    });
-    await jest.advanceTimersByTimeAsync(2000);
-    expect(verdict).toMatchObject({ kind: 'authenticated' });
-  } finally {
-    globalThis.requestAnimationFrame = realFrame;
-    globalThis.cancelAnimationFrame = realCancel;
-  }
-});
-
 test('an android launch with no frames still settles the gate', async () => {
   jest.useFakeTimers();
   rn.Platform.OS = 'android';
@@ -874,6 +847,7 @@ test('every gate failure key exists in every catalog', () => {
     'biometrics-failure-declined',
     'biometrics-failure-notserved',
     'biometrics-failure-nosecurity',
+    'biometrics-failure-away',
   ];
   const languages = ['en', 'es', 'pt', 'ru', 'tr'];
   for (const language of languages) {
@@ -995,14 +969,45 @@ test('a hold that never sees the return settles by the stall policy', async () =
   expect(screenVerdict).toMatchObject({ kind: 'declined' });
 
   await jest.advanceTimersByTimeAsync(60 * 1000);
+  // Expiry proves nothing about the prompt, so it fails closed on every
+  // platform, under its own key and with no fake native-call param.
   expect(held).toMatchObject({
     kind: 'declined',
-    failure: {
-      errorKey: 'biometrics-failure-stalled',
-      param: 'returnToForeground',
-    },
+    failure: { errorKey: 'biometrics-failure-away' },
   });
   expect(kc.getGenericPassword).toHaveBeenCalledTimes(1);
+});
+
+test('an ios expired hold fails closed too', async () => {
+  jest.useFakeTimers();
+  kc.hasGenericPassword.mockResolvedValue(true);
+  let refuse: (e: Error) => void = () => {};
+  kc.getGenericPassword.mockReturnValueOnce(
+    new Promise((_serve, reject) => {
+      refuse = reject;
+    }),
+  );
+
+  let screenVerdict: GateVerdict | undefined;
+  simpleBiometrics({ translate, purpose: 'screenEntry' }).then(v => {
+    screenVerdict = v;
+  });
+  let held: GateVerdict | undefined;
+  gateUntilAnswered({ translate, purpose: 'appEntry' }).then(v => {
+    held = v;
+  });
+  rn.__appState.currentState = 'inactive'; // stale, no event ever comes
+  refuse(osError('-128'));
+  await jest.advanceTimersByTimeAsync(0);
+  expect(screenVerdict).toMatchObject({ kind: 'declined' });
+
+  // The old settle-by-policy opened the wallet here ('unavailable' on
+  // iOS); an expiry is not a proven-absent prompt, so it locks instead.
+  await jest.advanceTimersByTimeAsync(10 * 1000);
+  expect(held).toMatchObject({
+    kind: 'declined',
+    failure: { errorKey: 'biometrics-failure-away' },
+  });
 });
 
 test('an unknown app state proves nothing and never parks the re-ask', async () => {

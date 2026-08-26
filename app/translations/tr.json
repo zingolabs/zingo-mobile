@@ -21,6 +21,7 @@
   "biometrics-failure-declined": "Kimlik doğrulama iptal edildi veya başarısız oldu.",
   "biometrics-failure-notserved": "Cihaz güvenlik denetimini reddetti.",
   "biometrics-failure-nosecurity": "Bu cihazda ekran kilidi veya biyometri tanımlı değil.",
+  "biometrics-failure-away": "Uygulama arka plandayken güvenlik denetimi tamamlanamadı.",
   "close": "Kapat",
   "cancel": "İptal et",
   "clear": "Temizle",

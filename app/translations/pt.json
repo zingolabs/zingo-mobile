@@ -21,6 +21,7 @@
   "biometrics-failure-declined": "A autenticação foi cancelada ou falhou.",
   "biometrics-failure-notserved": "O dispositivo recusou a verificação de segurança.",
   "biometrics-failure-nosecurity": "Este dispositivo não tem bloqueio de tela nem biometria configurados.",
+  "biometrics-failure-away": "A verificação de segurança não pôde terminar enquanto o aplicativo estava em segundo plano.",
   "close": "Fechar",
   "cancel": "Cancelar",
   "clear": "Limpar",
