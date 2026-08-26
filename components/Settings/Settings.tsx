@@ -240,18 +240,20 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const screenName = ScreenEnum.Settings;
 
   // Audit Issue D — single source of truth for security.settingsScreen.
-  // The requirement is live (a toggle flip re-gates, and the
-  // background-return re-gate keeps working) except while this screen's
-  // own save rewrites the security context: re-gating the screen that is
-  // saving blanked the form under an unrequested prompt.
-  const savingSettingsRef = useRef<boolean>(false);
+  // The requirement follows the live context except while this screen's
+  // own save rewrites it. The sync runs in an effect, so the thaw is a
+  // rendered state change at a deterministic moment, never a stale ref.
+  const [savingSettings, setSavingSettings] = useState<boolean>(false);
   const liveNeedsAuth = !!securityContext.settingsScreen;
-  const gateRequirementRef = useRef<boolean>(liveNeedsAuth);
-  if (!savingSettingsRef.current) {
-    gateRequirementRef.current = liveNeedsAuth;
-  }
+  const [gateRequirement, setGateRequirement] =
+    useState<boolean>(liveNeedsAuth);
+  useEffect(() => {
+    if (!savingSettings) {
+      setGateRequirement(liveNeedsAuth);
+    }
+  }, [savingSettings, liveNeedsAuth]);
   const screenGate = useBiometricGate({
-    needsAuth: gateRequirementRef.current,
+    needsAuth: gateRequirement,
     translate,
     addLastSnackbar,
     onCancel: () => navigation.goBack(),
@@ -349,7 +351,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const [showDeveloperOptions, setShowDeveloperOptions] =
     useState<boolean>(false);
   const [openInfoSection, setOpenInfoSection] = useState<string | null>(null);
-  // Seeded optimistically; the union names the probe's answer instead of
+  // Seeded optimistically. The union names the probe's answer instead of
   // collapsing it to a bit at this edge.
   const [deviceSecurity, setDeviceSecurity] = useState<DeviceSecurityProbe>({
     kind: 'secured',
@@ -409,16 +411,22 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
 
   const settingsSnapPoints = useFullSheetSnapPoints(containerH, headerH);
 
+  const probedRef = useRef<boolean>(false);
   useEffect(() => {
-    // Probe only once the gate has settled: the probe queues behind this
-    // screen's own gate prompt on the serialized keychain queue, and a
-    // stalled probe answers nothing, so keep the current answer rather
-    // than claiming no device lock is enrolled.
-    if (!authPassed) {
+    // Probe once, after the gate first settles: the probe queues behind
+    // this screen's own gate prompt on the serialized keychain queue, a
+    // stalled probe answers nothing, and the enrolled-lock answer cannot
+    // change while the user stays in this app.
+    if (!authPassed || probedRef.current) {
       return;
     }
+    probedRef.current = true;
+    let cancelled = false;
     (async () => {
       const probe = await probeDeviceSecurity();
+      if (cancelled) {
+        return;
+      }
       if (
         probe.kind === 'secured' ||
         probe.failure.errorKey !== 'biometrics-failure-stalled'
@@ -426,6 +434,9 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         setDeviceSecurity(probe);
       }
     })();
+    return () => {
+      cancelled = true;
+    };
   }, [authPassed]);
 
   useEffect(() => {
@@ -1095,11 +1106,11 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     }
   };
   const saveSettings = async () => {
-    savingSettingsRef.current = true;
+    setSavingSettings(true);
     try {
       await doSaveSettings();
     } finally {
-      savingSettingsRef.current = false;
+      setSavingSettings(false);
     }
   };
   saveSettingsRef.current = saveSettings;

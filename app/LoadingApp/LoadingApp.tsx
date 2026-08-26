@@ -92,7 +92,7 @@ import Toast from 'react-native-toast-message';
 import { toastConfig } from '../toastConfig';
 import { RPCSeedType } from '../walletBackend/types/RPCSeedType';
 import Launching from './components/Launching';
-import { gateUntilAnswered, GateVerdict } from '../simpleBiometrics';
+import { AnsweredVerdict, gateUntilAnswered } from '../simpleBiometrics';
 import selectingServer from '../selectingServer';
 import { isEqual } from 'lodash';
 import {
@@ -593,16 +593,15 @@ export class LoadingAppClass extends Component<
       // (PIN or TouchID or FaceID). Only a decline locks; an
       // 'unavailable' gate passes because it guards nothing and
       // blocking locks the user out of the wallet.
-      const startGate = this.state.security.startApp
+      const startGate: AnsweredVerdict = this.state.security.startApp
         ? await gateUntilAnswered({
             translate: this.state.translate,
             purpose: 'appEntry',
           })
-        : ({ kind: 'authenticated' } satisfies GateVerdict);
+        : { kind: 'authenticated' };
       if (startGate.kind === 'declined') {
-        this.setState({
-          biometricGate: { kind: 'declined', failure: startGate.failure },
-        });
+        // The narrowed verdict is the gate outcome, whole.
+        this.setState({ biometricGate: startGate });
         return;
       }
     }
@@ -705,6 +704,11 @@ export class LoadingAppClass extends Component<
       }
     }
 
+    if (this.unmounted) {
+      // The boot chain outlived this instance; attaching listeners here
+      // would subscribe a dead component forever.
+      return;
+    }
     // Re-entry via the locked screen's tryAgain must not stack another
     // subscription pair on the one this mount already holds.
     this.detachListeners();
@@ -806,7 +810,10 @@ export class LoadingAppClass extends Component<
     this.unsubscribeNetInfo = undefined;
   };
 
+  unmounted = false;
+
   componentWillUnmount = () => {
+    this.unmounted = true;
     this.detachListeners();
   };
 

@@ -94,7 +94,7 @@ import { RPCSeedType } from '../walletBackend/types/RPCSeedType';
 import { Launching } from '../LoadingApp';
 import { AddressBook } from '../../components/AddressBook';
 import { AddressBookFileImpl } from '../../components/AddressBook';
-import { gateUntilAnswered, GateVerdict } from '../simpleBiometrics';
+import { AnsweredVerdict, gateUntilAnswered } from '../simpleBiometrics';
 import ShowAddressAlertAsync from '../../components/Send/components/ShowAddressAlertAsync';
 import {
   createUpdateRecoveryWalletInfo,
@@ -989,46 +989,17 @@ export class LoadedAppClass extends Component<
           this.setState(state => ({
             foregroundEpoch: state.foregroundEpoch + 1,
           }));
-          // (PIN or TouchID or FaceID). Only a decline locks; an
-          // 'unavailable' gate passes because it guards nothing and
-          // blocking locks the user out of the wallet.
-          const foregroundGate = this.state.security.foregroundApp
-            ? await gateUntilAnswered({
-                translate: this.state.translate,
-                purpose: 'appEntry',
-              })
-            : ({ kind: 'authenticated' } satisfies GateVerdict);
-          if (foregroundGate.kind === 'declined') {
-            // The gate outcome travels with the navigation whole, so the
-            // locked screen never reads mutable module state.
-            this.navigateToLoadingApp({
-              startingApp: true,
-              biometricGate: {
-                kind: 'declined',
-                failure: foregroundGate.failure,
-              },
-            });
-          } else {
-            // reading background task info
-            await this.fetchBackgroundSyncInfo();
-            // setting value for background task Android
-            await AsyncStorage.setItem(GlobalConst.background, GlobalConst.no);
-            // needs this because when the App go from back to fore
-            // it have to re-launch all the tasks.
-            await this.rpc.clearTimers();
-            await this.rpc.configure();
-            if (
-              this.state.backgroundError &&
-              (this.state.backgroundError.title ||
-                this.state.backgroundError.error)
-            ) {
-              showConfirm({
-                title: this.state.backgroundError.title,
-                message: this.state.backgroundError.error,
-                buttons: [{ text: this.state.translate('close') as string }],
-              });
-              this.setBackgroundError('', '');
-            }
+          // A parked earlier pass resumes with this same event and acts
+          // once; a second concurrent actor would double-run the restore
+          // work or the navigation reset.
+          if (this.foregroundGateBusy) {
+            return;
+          }
+          this.foregroundGateBusy = true;
+          try {
+            await this.runForegroundGate();
+          } finally {
+            this.foregroundGateBusy = false;
           }
         } else if (
           priorAppState === AppStateStatusEnum.active &&
@@ -1125,6 +1096,48 @@ export class LoadedAppClass extends Component<
   componentDidUpdate = (prevProps: LoadedAppClassProps) => {
     if (prevProps.translate !== this.props.translate) {
       this.setState({ translate: this.props.translate });
+    }
+  };
+
+  foregroundGateBusy = false;
+
+  // (PIN or TouchID or FaceID). Only a decline locks; an 'unavailable'
+  // gate passes because it guards nothing and blocking locks the user out
+  // of the wallet.
+  runForegroundGate = async () => {
+    const foregroundGate: AnsweredVerdict = this.state.security.foregroundApp
+      ? await gateUntilAnswered({
+          translate: this.state.translate,
+          purpose: 'appEntry',
+        })
+      : { kind: 'authenticated' };
+    if (foregroundGate.kind === 'declined') {
+      // The narrowed verdict is the gate outcome, whole; the locked
+      // screen never reads mutable module state.
+      this.navigateToLoadingApp({
+        startingApp: true,
+        biometricGate: foregroundGate,
+      });
+      return;
+    }
+    // reading background task info
+    await this.fetchBackgroundSyncInfo();
+    // setting value for background task Android
+    await AsyncStorage.setItem(GlobalConst.background, GlobalConst.no);
+    // needs this because when the App go from back to fore
+    // it have to re-launch all the tasks.
+    await this.rpc.clearTimers();
+    await this.rpc.configure();
+    if (
+      this.state.backgroundError &&
+      (this.state.backgroundError.title || this.state.backgroundError.error)
+    ) {
+      showConfirm({
+        title: this.state.backgroundError.title,
+        message: this.state.backgroundError.error,
+        buttons: [{ text: this.state.translate('close') as string }],
+      });
+      this.setBackgroundError('', '');
     }
   };
 
