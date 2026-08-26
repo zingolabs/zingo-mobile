@@ -1,5 +1,6 @@
 import {
   AddressKindEnum,
+  BiometricGateOutcome,
   ChainNameEnum,
   LaunchingModeEnum,
   RouteEnum,
@@ -34,7 +35,10 @@ export type AppStackParamList = {
 export type LoadingAppNavigationState = {
   screen?: RouteEnum;
   startingApp?: boolean;
-  biometricsFailed?: boolean;
+  // The gate outcome rides with the navigation whole, so a declined gate
+  // always carries its failure and the locked screen renders the reason it
+  // was locked for.
+  biometricGate?: BiometricGateOutcome;
   newWallet?: boolean;
 };
 /**

@@ -1,7 +1,6 @@
 import React, { Component, useState, useMemo, useEffect } from 'react';
 import {
   I18nManager,
-  EmitterSubscription,
   AppState,
   NativeEventSubscription,
   Platform,
@@ -93,7 +92,7 @@ import Toast from 'react-native-toast-message';
 import { toastConfig } from '../toastConfig';
 import { RPCSeedType } from '../walletBackend/types/RPCSeedType';
 import Launching from './components/Launching';
-import simpleBiometrics, { getLastGateFailure } from '../simpleBiometrics';
+import { AnsweredVerdict, gateUntilAnswered } from '../simpleBiometrics';
 import selectingServer from '../selectingServer';
 import { isEqual } from 'lodash';
 import {
@@ -432,7 +431,7 @@ export default function LoadingApp(props: LoadingAppProps) {
       <Launching
         translate={translate}
         firstLaunchingMessage={LaunchingModeEnum.opening}
-        biometricsFailed={false}
+        biometricGate={{ kind: 'passed' }}
       />
     );
   } else {
@@ -496,9 +495,8 @@ export class LoadingAppClass extends Component<
   LoadingAppClassProps,
   LoadingAppClassState
 > {
-  dim: EmitterSubscription;
-  appstate: NativeEventSubscription;
-  unsubscribeNetInfo: NetInfoSubscription;
+  appstate?: NativeEventSubscription;
+  unsubscribeNetInfo?: NetInfoSubscription;
   clipboardTimer: ReturnType<typeof setTimeout> | null = null;
   customServerModalRef: React.RefObject<React.ComponentRef<
     typeof BottomSheetModal
@@ -554,11 +552,9 @@ export class LoadingAppClass extends Component<
       customServerOffline: false,
       customServerAuto: false,
       customServerCustom: false,
-      biometricsFailed:
-        !!props.route.params &&
-        props.route.params.biometricsFailed !== undefined
-          ? props.route.params.biometricsFailed
-          : false,
+      // The gate outcome arrives with the navigation whole (see
+      // LoadingAppNavigationState), never from module state.
+      biometricGate: props.route.params?.biometricGate ?? { kind: 'passed' },
       startingApp:
         !!props.route.params && props.route.params.startingApp !== undefined
           ? props.route.params.startingApp
@@ -569,9 +565,6 @@ export class LoadingAppClass extends Component<
       hasRecoveryWalletInfoSaved: false,
     };
 
-    this.dim = {} as EmitterSubscription;
-    this.appstate = {} as NativeEventSubscription;
-    this.unsubscribeNetInfo = {} as NetInfoSubscription;
     this.customServerModalRef = React.createRef();
   }
 
@@ -592,27 +585,23 @@ export class LoadingAppClass extends Component<
     // to start the App the first time in this session
     // the user have to pass the security of the device
     if (this.state.startingApp) {
-      if (!this.state.biometricsFailed) {
-        // (PIN or TouchID or FaceID)
-        this.setState({ biometricsFailed: false });
-        const resultBio = this.state.security.startApp
-          ? await simpleBiometrics({ translate: this.state.translate })
-          : true;
-        // resultBio:
-        // - true      -> authenticated (biometric, or device passcode via allowDeviceCredentials)
-        // - false     -> user cancelled or failed the prompt
-        // - undefined -> the gate cannot run here (no auth method, or a keychain
-        //                entry the OS refuses to serve); allow, since it guards
-        //                nothing and blocking locks the user out of the wallet
-        if (resultBio === false) {
-          this.setState({ biometricsFailed: true });
-          return;
-        } else {
-          this.setState({ biometricsFailed: false });
-        }
-      } else {
-        // if there is a biometric Fail, likely from the foreground check
-        // keep the App in the first screen because the user needs to try again.
+      if (this.state.biometricGate.kind === 'declined') {
+        // A biometric fail, likely from the foreground check: keep the App
+        // on the first screen so the user can try again.
+        return;
+      }
+      // (PIN or TouchID or FaceID). Only a decline locks; an
+      // 'unavailable' gate passes because it guards nothing and
+      // blocking locks the user out of the wallet.
+      const startGate: AnsweredVerdict = this.state.security.startApp
+        ? await gateUntilAnswered({
+            translate: this.state.translate,
+            purpose: 'appEntry',
+          })
+        : { kind: 'authenticated' };
+      if (startGate.kind === 'declined') {
+        // The narrowed verdict is the gate outcome, whole.
+        this.setState({ biometricGate: startGate });
         return;
       }
     }
@@ -715,6 +704,14 @@ export class LoadingAppClass extends Component<
       }
     }
 
+    if (this.unmounted) {
+      // The boot chain outlived this instance; attaching listeners here
+      // would subscribe a dead component forever.
+      return;
+    }
+    // Re-entry via the locked screen's tryAgain must not stack another
+    // subscription pair on the one this mount already holds.
+    this.detachListeners();
     this.appstate = AppState.addEventListener(
       EventListenerEnum.change,
       async nextAppState => {
@@ -806,14 +803,18 @@ export class LoadingAppClass extends Component<
     // an empty screen. The modal opens on demand from the gear button.
   };
 
+  detachListeners = () => {
+    this.appstate?.remove();
+    this.appstate = undefined;
+    this.unsubscribeNetInfo?.();
+    this.unsubscribeNetInfo = undefined;
+  };
+
+  unmounted = false;
+
   componentWillUnmount = () => {
-    this.dim && typeof this.dim.remove === 'function' && this.dim.remove();
-    this.appstate &&
-      typeof this.appstate.remove === 'function' &&
-      this.appstate.remove();
-    this.unsubscribeNetInfo &&
-      typeof this.unsubscribeNetInfo === 'function' &&
-      this.unsubscribeNetInfo();
+    this.unmounted = true;
+    this.detachListeners();
   };
 
   // Default server for a chain = the `default` entry for that chain in the
@@ -2164,7 +2165,7 @@ export class LoadingAppClass extends Component<
       customServerOffline,
       customServerAuto,
       firstLaunchingMessage,
-      biometricsFailed,
+      biometricGate,
       translate,
       hasRecoveryWalletInfoSaved,
       readOnly,
@@ -2217,10 +2218,9 @@ export class LoadingAppClass extends Component<
                 <Launching
                   translate={translate}
                   firstLaunchingMessage={firstLaunchingMessage}
-                  biometricsFailed={biometricsFailed}
-                  message={biometricsFailed ? getLastGateFailure() : undefined}
+                  biometricGate={biometricGate}
                   tryAgain={() => {
-                    this.setState({ biometricsFailed: false }, () =>
+                    this.setState({ biometricGate: { kind: 'passed' } }, () =>
                       this.componentDidMount(),
                     );
                   }}

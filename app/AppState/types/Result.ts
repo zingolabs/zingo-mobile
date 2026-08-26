@@ -14,3 +14,9 @@ export type ErrorKeyed<K extends string> = {
 
 export type Done = { kind: 'done' };
 export const DONE: Done = { kind: 'done' };
+
+/** Builds an ErrorKeyed failure, the one constructor for the shape. */
+export const errorKeyed = <K extends string>(
+  errorKey: K,
+  param?: string,
+): ErrorKeyed<K> => ({ kind: 'error', errorKey, param });
