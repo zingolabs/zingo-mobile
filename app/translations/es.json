@@ -852,7 +852,7 @@
     "option2-label": "Migrar todo de una vez",
     "option2-body": "Una transacción interna rápida que mueve todo a Ironwood de una vez. Tus montos quedan expuestos.",
     "option3-label": "Dividir y migrar",
-    "option3-body": "Divide tu saldo en notas estandarizadas y las envía en lotes programados para mayor privacidad.",
+    "option3-body": "Divide tu saldo en notas estandarizadas y las envía en lotes programados para mayor privacidad en la cadena.",
     "back": "Atrás",
     "next": "Siguiente",
     "close": "Cerrar"
