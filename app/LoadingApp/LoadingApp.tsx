@@ -1150,9 +1150,17 @@ export class LoadingAppClass extends Component<
       await this.repairWalletFiles(title, errorText);
       return;
     }
+    // plainLegacy opens through readFileAsB64's legacy fallback, so it is not
+    // broken; only undecryptable/doubleWrapped/unknown are. Treating a legacy
+    // wallet as broken would offer the destructive Restore Backup for an
+    // unrelated load failure.
     const main = report.files.find(f => f.name === WALLET_FILE_NAME);
-    const mainBroken =
-      !!main && main.state !== 'plainWallet' && main.state !== 'missing';
+    const openableStates: ReadonlySet<WalletFileDiagnosis['state']> = new Set([
+      'plainWallet',
+      'plainLegacy',
+      'missing',
+    ]);
+    const mainBroken = !!main && !openableStates.has(main.state);
     if (mainBroken) {
       this.walletRecoveryAlert(title, errorText, report);
       return;
@@ -1199,9 +1207,6 @@ export class LoadingAppClass extends Component<
       `platform: ${Platform.OS}`,
       `error: ${errorText}`,
     ];
-    if (report.keysetPresent !== undefined) {
-      lines.push(`keysetPresent: ${report.keysetPresent}`);
-    }
     for (const f of report.files) {
       const mtime = f.mtime > 0 ? new Date(f.mtime).toISOString() : 'n/a';
       lines.push(

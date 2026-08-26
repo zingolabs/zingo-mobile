@@ -30,6 +30,9 @@ type WalletRecoveryModalProps = {
   onRestoreBackup?: () => void;
   onSupport: () => void;
   onCancel: () => void;
+  // Fires on any dismissal, including the Android back button; the host
+  // clears its state here so the sheet can be shown again later.
+  onDismiss?: () => void;
 };
 
 const VERTICAL_LIFT = Math.round(Dimensions.get('window').height * 0.22);
@@ -47,6 +50,7 @@ const WalletRecoveryModal: React.FunctionComponent<
   onRestoreBackup,
   onSupport,
   onCancel,
+  onDismiss,
 }) => {
   const { colors } = useTheme();
   const ref = useRef<BottomSheetModal>(null);
@@ -59,8 +63,8 @@ const WalletRecoveryModal: React.FunctionComponent<
     }
   }, [visible]);
 
-  // No swipe, no backdrop tap: the sheet closes only through a button, so
-  // dismissal never races the action callbacks.
+  // No swipe or backdrop tap; a button or the Android back button closes it.
+  // onDismiss lets the host reset its state on the back-button path too.
   const renderBackdrop = useCallback(
     (props: BottomSheetBackdropProps) => (
       <BottomSheetBackdrop
@@ -115,6 +119,7 @@ const WalletRecoveryModal: React.FunctionComponent<
       }}
       backgroundStyle={{ backgroundColor: colors.bgSurface, borderRadius: 20 }}
       backdropComponent={renderBackdrop}
+      onDismiss={onDismiss}
     >
       <BottomSheetView
         style={{
