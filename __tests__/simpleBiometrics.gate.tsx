@@ -49,7 +49,7 @@ type RnMock = {
 };
 
 let simpleBiometrics: GateModule['default'];
-let getLastGateFailure: GateModule['getLastGateFailure'];
+let gateUntilAnswered: GateModule['gateUntilAnswered'];
 let probeDeviceSecurity: GateModule['probeDeviceSecurity'];
 let blankingEvent: GateModule['BIOMETRIC_BLANKING_EVENT'];
 let kc: Record<string, jest.Mock>;
@@ -71,7 +71,7 @@ beforeEach(() => {
   kc = require('react-native-keychain');
   const gate: GateModule = require('../app/simpleBiometrics');
   simpleBiometrics = gate.default;
-  getLastGateFailure = gate.getLastGateFailure;
+  gateUntilAnswered = gate.gateUntilAnswered;
   probeDeviceSecurity = gate.probeDeviceSecurity;
   blankingEvent = gate.BIOMETRIC_BLANKING_EVENT;
   kc.canImplyAuthentication.mockResolvedValue(true);
@@ -143,9 +143,9 @@ test('a wedged native queue is unavailable instead of hanging', async () => {
   await Promise.resolve();
   await jest.advanceTimersByTimeAsync(10 * 1000);
 
-  await expect(gate).resolves.toMatchObject({ kind: 'unavailable' });
-  expect(getLastGateFailure()).toMatchObject({
-    errorKey: 'biometrics-failure-stalled',
+  await expect(gate).resolves.toMatchObject({
+    kind: 'unavailable',
+    failure: { errorKey: 'biometrics-failure-stalled' },
   });
 });
 
@@ -350,9 +350,9 @@ test('an android interactive stall locks with a retriable decline', async () => 
   await jest.advanceTimersByTimeAsync(10 * 1000);
   expect(verdict).toBeUndefined(); // the iOS window must not govern Android
   await jest.advanceTimersByTimeAsync(50 * 1000);
-  expect(verdict).toMatchObject({ kind: 'declined' });
-  expect(getLastGateFailure()).toMatchObject({
-    errorKey: 'biometrics-failure-stalled',
+  expect(verdict).toMatchObject({
+    kind: 'declined',
+    failure: { errorKey: 'biometrics-failure-stalled' },
   });
 });
 
@@ -571,9 +571,9 @@ test('a wedge starting at the v1 cleanup settles unavailable in the probe window
   // The wedge is caught at the non-interactive cleanup, not ridden into the
   // interactive attempt and its 60 s window.
   await jest.advanceTimersByTimeAsync(10 * 1000);
-  expect(verdict).toMatchObject({ kind: 'unavailable' });
-  expect(getLastGateFailure()).toMatchObject({
-    param: 'resetGenericPassword:v1',
+  expect(verdict).toMatchObject({
+    kind: 'unavailable',
+    failure: { param: 'resetGenericPassword:v1' },
   });
 });
 
@@ -636,11 +636,13 @@ test('a stalled sentinel write locks by the android policy', async () => {
     verdict = v;
   });
   await jest.advanceTimersByTimeAsync(60 * 1000);
-  expect(verdict).toMatchObject({ kind: 'declined' });
-  expect(getLastGateFailure()).toMatchObject({
-    kind: 'error',
-    errorKey: 'biometrics-failure-stalled',
-    param: 'setGenericPassword',
+  expect(verdict).toMatchObject({
+    kind: 'declined',
+    failure: {
+      kind: 'error',
+      errorKey: 'biometrics-failure-stalled',
+      param: 'setGenericPassword',
+    },
   });
   expect(kc.getGenericPassword).not.toHaveBeenCalled();
 });
@@ -659,10 +661,12 @@ test('a stalled rebuild clear settles unavailable in the probe window', async ()
   expect(verdict).toMatchObject({ kind: 'unavailable' });
   // The rebuild clear and the v1 migration clear are different defects;
   // their stall diagnostics must stay distinguishable.
-  expect(getLastGateFailure()).toMatchObject({
-    kind: 'error',
-    errorKey: 'biometrics-failure-stalled',
-    param: 'resetGenericPassword:rebuild',
+  expect(verdict).toMatchObject({
+    failure: {
+      kind: 'error',
+      errorKey: 'biometrics-failure-stalled',
+      param: 'resetGenericPassword:rebuild',
+    },
   });
   expect(kc.setGenericPassword).not.toHaveBeenCalled();
 });
@@ -791,10 +795,6 @@ test('a preflight refusal reports its own reason, not a previous decline', async
     kind: 'unavailable',
     failure: { kind: 'error', errorKey: 'biometrics-failure-nosecurity' },
   });
-  expect(getLastGateFailure()).toMatchObject({
-    kind: 'error',
-    errorKey: 'biometrics-failure-nosecurity',
-  });
 });
 
 test('a throwing frame yield neither denies the gate nor pins the overlay', async () => {
@@ -862,6 +862,50 @@ test('every gate failure key exists in every catalog', () => {
       });
     }
   }
+});
+
+test('gateUntilAnswered re-asks only while the caller still wants it', async () => {
+  kc.hasGenericPassword.mockResolvedValue(true);
+  let refuse: (e: Error) => void = () => {};
+  kc.getGenericPassword
+    .mockReturnValueOnce(
+      new Promise((_serve, reject) => {
+        refuse = reject;
+      }),
+    )
+    .mockResolvedValue({ password: '1' });
+
+  const screenGate = simpleBiometrics({ translate, purpose: 'screenEntry' });
+  const appGate = gateUntilAnswered(
+    { translate, purpose: 'appEntry' },
+    () => true,
+  );
+  refuse(osError('-128'));
+  await expect(screenGate).resolves.toMatchObject({ kind: 'declined' });
+  await expect(appGate).resolves.toMatchObject({ kind: 'authenticated' });
+  expect(kc.getGenericPassword).toHaveBeenCalledTimes(2);
+});
+
+test('gateUntilAnswered stops when the caller no longer wants it', async () => {
+  // A backgrounded activity must not receive the re-ask: Android answers
+  // its prompt ERROR_CANCELED, which classifies as a decline and locks.
+  kc.hasGenericPassword.mockResolvedValue(true);
+  let refuse: (e: Error) => void = () => {};
+  kc.getGenericPassword.mockReturnValueOnce(
+    new Promise((_serve, reject) => {
+      refuse = reject;
+    }),
+  );
+
+  const screenGate = simpleBiometrics({ translate, purpose: 'screenEntry' });
+  const appGate = gateUntilAnswered(
+    { translate, purpose: 'appEntry' },
+    () => false,
+  );
+  refuse(osError('-128'));
+  await expect(screenGate).resolves.toMatchObject({ kind: 'declined' });
+  await expect(appGate).resolves.toMatchObject({ kind: 'unanswered' });
+  expect(kc.getGenericPassword).toHaveBeenCalledTimes(1);
 });
 
 test('a decline is shared with a concurrent caller without a second prompt', async () => {

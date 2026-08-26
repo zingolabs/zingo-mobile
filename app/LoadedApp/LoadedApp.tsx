@@ -94,7 +94,7 @@ import { RPCSeedType } from '../walletBackend/types/RPCSeedType';
 import { Launching } from '../LoadingApp';
 import { AddressBook } from '../../components/AddressBook';
 import { AddressBookFileImpl } from '../../components/AddressBook';
-import simpleBiometrics, { GateVerdict } from '../simpleBiometrics';
+import { gateUntilAnswered, GateVerdict } from '../simpleBiometrics';
 import ShowAddressAlertAsync from '../../components/Send/components/ShowAddressAlertAsync';
 import {
   createUpdateRecoveryWalletInfo,
@@ -992,29 +992,26 @@ export class LoadedAppClass extends Component<
           // (PIN or TouchID or FaceID). Only a decline locks; an
           // 'unavailable' gate passes because it guards nothing and
           // blocking locks the user out of the wallet.
-          let foregroundGate: GateVerdict = this.state.security.foregroundApp
-            ? await simpleBiometrics({
-                translate: this.state.translate,
-                purpose: 'appEntry',
-              })
+          const foregroundGate: GateVerdict = this.state.security.foregroundApp
+            ? await gateUntilAnswered(
+                { translate: this.state.translate, purpose: 'appEntry' },
+                // A re-ask for a backgrounded activity is answered
+                // ERROR_CANCELED and would lock; the next foreground pass
+                // re-runs this handler in full.
+                () => AppState.currentState === AppStateStatusEnum.active,
+              )
             : { kind: 'authenticated' };
-          while (foregroundGate.kind === 'unanswered') {
-            // A shared run's decline answered a screen gate, not app
-            // entry; this caller is alive, so it asks for its own verdict.
-            foregroundGate = await simpleBiometrics({
-              translate: this.state.translate,
-              purpose: 'appEntry',
-            });
-          }
           if (foregroundGate.kind === 'declined') {
-            // The failure travels with the navigation, so the locked
-            // screen never reads the mutable module global.
+            // The gate outcome travels with the navigation whole, so the
+            // locked screen never reads mutable module state.
             this.navigateToLoadingApp({
               startingApp: true,
-              biometricsFailed: true,
-              gateFailure: foregroundGate.failure,
+              biometricGate: {
+                kind: 'declined',
+                failure: foregroundGate.failure,
+              },
             });
-          } else {
+          } else if (foregroundGate.kind !== 'unanswered') {
             // reading background task info
             await this.fetchBackgroundSyncInfo();
             // setting value for background task Android

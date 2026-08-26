@@ -69,6 +69,7 @@ import {
 
 import type AppStateLoaded from './AppStateLoaded';
 import type AppStateLoading from './AppStateLoading';
+import type { BiometricGateOutcome } from './AppStateLoading';
 import type AppContextLoading from './AppContextLoading';
 import type AppContextLoaded from './AppContextLoaded';
 
@@ -125,6 +126,7 @@ export {
 export type {
   AppStateLoaded,
   AppStateLoading,
+  BiometricGateOutcome,
   AppContextLoading,
   AppContextLoaded,
   WalletType,

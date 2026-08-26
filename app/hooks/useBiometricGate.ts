@@ -25,9 +25,9 @@ type UseBiometricGateArgs = {
  *     `navigation.goBack()`).
  *   - On a stalled fail-open: passes, and tells the user the check did not
  *     respond.
- *   - On `unanswered` (a shared run's decline answered another purpose):
- *     re-asks, but only while this screen is still mounted, so no prompt
- *     is ever raised on behalf of a dead component.
+ *   - On `unanswered` (a shared appEntry run declined, locking the app):
+ *     stays gated and never re-asks, so no prompt is ever raised on
+ *     behalf of a component being torn down.
  *   - On background → active (foregroundEpoch bumps): re-fires the gate
  *     only when `foregroundAppEnabled` is false. LoadedApp's own
  *     foreground gate already covers the enabled case.
@@ -52,22 +52,29 @@ export const useBiometricGate = ({
   const runScreenGate = () => {
     let cancelled = false;
     (async () => {
-      let verdict = await simpleBiometrics({
+      const verdict = await simpleBiometrics({
         translate,
         purpose: 'screenEntry',
       });
-      while (verdict.kind === 'unanswered' && !cancelled) {
-        verdict = await simpleBiometrics({ translate, purpose: 'screenEntry' });
-      }
+      // 'unanswered' means an appEntry run declined while this screen
+      // shared it, and an appEntry decline locks the whole app: this
+      // screen is being torn down, so it stays gated and never re-asks (a
+      // re-ask raced the teardown into a stray prompt over the locked
+      // screen).
       if (cancelled || verdict.kind === 'unanswered') {
         return;
       }
       if (verdict.kind === 'declined') {
+        // The raw diagnostic is bug-report data. Only the stalled key
+        // earns a place in user copy, because there the sentence is the
+        // sole trace the wedged-queue class leaves.
         addLastSnackbar(
-          `${translate('biometrics-error') as string} ${Utils.renderErrorKeyed(
-            verdict.failure,
-            translate,
-          )}`,
+          verdict.failure.errorKey === 'biometrics-failure-stalled'
+            ? `${translate('biometrics-error') as string} ${Utils.renderErrorKeyed(
+                verdict.failure,
+                translate,
+              )}`
+            : (translate('biometrics-error') as string),
         );
         onCancel();
         return;

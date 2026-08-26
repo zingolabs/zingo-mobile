@@ -3,11 +3,11 @@ import { AppStateStatus } from 'react-native';
 import { LaunchingModeEnum } from './enums/LaunchingModeEnum';
 import { RouteEnum } from './enums/RouteEnum';
 import WalletType from './types/WalletType';
-import { ErrorKeyed } from './types/Result';
+import { GateFailure } from './types/GateFailure';
 
 /** The launch gate's outcome, carried whole so the locked screen renders the reason it was locked for. */
 export type BiometricGateOutcome =
-  { kind: 'passed' } | { kind: 'declined'; failure?: ErrorKeyed<string> };
+  { kind: 'passed' } | { kind: 'declined'; failure: GateFailure };
 
 export default interface AppStateLoading {
   wallet: WalletType;

@@ -4,7 +4,8 @@ import * as Keychain from 'react-native-keychain';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { GlobalConst, TranslateType } from './AppState';
-import { ErrorKeyed, errorKeyed } from './AppState/types/Result';
+import { errorKeyed } from './AppState/types/Result';
+import { GateFailure, GateFailureKey } from './AppState/types/GateFailure';
 import {
   buildBaseOptions,
   buildGetOptions,
@@ -42,22 +43,9 @@ const SENTINEL_SERVICE_V1 = 'zingo-biometric-sentinel';
 // What a stall settles as differs by platform, and the outcome carries that
 // answer in `settleAs`, per interactiveStall.
 
-/** The translation-catalog keys a gate failure can carry. */
-export type GateFailureKey =
-  | 'biometrics-failure-stalled'
-  | 'biometrics-failure-declined'
-  | 'biometrics-failure-notserved'
-  | 'biometrics-failure-nosecurity';
-
-// The error channel carries a catalog key, never prose. `param` is the
-// untranslated platform diagnostic (an OSStatus, a prompt code, the machine
-// token of the native call that stalled) so a bug report still names the
-// mechanism. The shape is the repo-wide ErrorKeyed convention, so the
-// display edge is Utils.renderErrorKeyed rather than a hand-rolled
-// template.
-
-/** A gate failure in the repo-canonical ErrorKeyed shape. */
-export type GateFailure = ErrorKeyed<GateFailureKey>;
+// The failure shape lives beside ErrorKeyed in AppState/types, so state
+// and navigation types can carry it without importing this module.
+export type { GateFailure, GateFailureKey };
 
 const gateFailure = (errorKey: GateFailureKey, param?: string): GateFailure =>
   errorKeyed(errorKey, param);
@@ -157,9 +145,11 @@ const ANDROID_PROMPT_STALL_MS = 60 * 1000;
 // 'active'. A veto-capable fire waits this long for it to land first.
 const VETO_GRACE_MS = 1000;
 
-// One frame at 60Hz is ~17ms. The budget covers a slow first frame without
-// ever holding the gate for a stall window.
-const PAINT_BUDGET_MS = 100;
+// A real frame normally lands in one tick, so the budget costs nothing on
+// a healthy launch. The overlay is a separate Android window whose first
+// draw can lag a busy cold start, so the budget is generous without ever
+// holding the gate for a stall window.
+const PAINT_BUDGET_MS = 1000;
 
 // The interactive stall policy's three axes move together, so one record
 // answers all of them: how long the window runs, whether a fire can be
@@ -188,8 +178,6 @@ const interactiveStallPolicy = (): InteractiveStallPolicy =>
       };
 
 const STALLED = Symbol('keychain-stalled');
-
-const swallow = () => undefined;
 
 // The countdown for an interactive call runs only while the app is observed
 // 'active'. Leaving 'active' pauses it and returning re-arms it in full, so
@@ -231,10 +219,6 @@ const stallGuard = <T>(
         pause();
         return;
       }
-      // The losing arm keeps running. It holds a handler from here on, so
-      // a late rejection (the OS answering a stranded call ERROR_CANCELED)
-      // never surfaces as an unhandled rejection.
-      op.then(swallow, swallow);
       resolve(STALLED);
     };
     const arm = () => {
@@ -433,19 +417,6 @@ const advance = (
   }
 };
 
-let lastFailure: GateFailure | undefined;
-
-/** The failure behind the most recent refused gate, absent when the last attempt went through. */
-export const getLastGateFailure = (): GateFailure | undefined => lastFailure;
-
-const recordVerdict = (verdict: GateVerdict): GateVerdict => {
-  lastFailure =
-    verdict.kind === 'declined' || verdict.kind === 'unavailable'
-      ? verdict.failure
-      : undefined;
-  return verdict;
-};
-
 const attemptGate = async (
   translate: (key: string) => TranslateType,
   create: boolean,
@@ -516,7 +487,7 @@ const runGate = async (props: simpleBiometricsProps): Promise<GateVerdict> => {
       security.failure.errorKey === 'biometrics-failure-stalled'
         ? interactiveStallPolicy().settleAs
         : 'unavailable';
-    return recordVerdict({ kind, failure: security.failure });
+    return { kind, failure: security.failure };
   }
 
   try {
@@ -528,9 +499,15 @@ const runGate = async (props: simpleBiometricsProps): Promise<GateVerdict> => {
       // opens. The paint is cosmetic, so the wait is bounded by a frame
       // budget and a frameless or throwing yield never denies the gate.
       await new Promise<void>(resolve => {
-        const frameBudget = setTimeout(resolve, PAINT_BUDGET_MS);
+        let frame: number | undefined;
+        const frameBudget = setTimeout(() => {
+          if (frame !== undefined) {
+            cancelAnimationFrame(frame);
+          }
+          resolve();
+        }, PAINT_BUDGET_MS);
         try {
-          requestAnimationFrame(() => {
+          frame = requestAnimationFrame(() => {
             clearTimeout(frameBudget);
             resolve();
           });
@@ -549,7 +526,7 @@ const runGate = async (props: simpleBiometricsProps): Promise<GateVerdict> => {
       }),
     );
     if (has.kind === 'stalled') {
-      return recordVerdict({ kind: 'unavailable', failure: has.failure });
+      return { kind: 'unavailable', failure: has.failure };
     }
     if (!has.value) {
       // Nothing reads v1 from here on. The delete needs no prompt, and
@@ -560,10 +537,10 @@ const runGate = async (props: simpleBiometricsProps): Promise<GateVerdict> => {
       if (clearedV1.kind === 'stalled') {
         // A wedge starting here settles now, like every sibling guard,
         // instead of riding into the interactive attempt and its window.
-        return recordVerdict({
+        return {
           kind: 'unavailable',
           failure: clearedV1.failure,
-        });
+        };
       }
     }
 
@@ -584,10 +561,10 @@ const runGate = async (props: simpleBiometricsProps): Promise<GateVerdict> => {
           ),
         );
         if (cleared.kind === 'stalled') {
-          return recordVerdict({
+          return {
             kind: 'unavailable',
             failure: cleared.failure,
-          });
+          };
         }
       }
       state = advance(
@@ -596,15 +573,15 @@ const runGate = async (props: simpleBiometricsProps): Promise<GateVerdict> => {
       );
       clearBeforeAttempt = state.phase === 'freshEntry';
     }
-    return recordVerdict(state.verdict);
+    return state.verdict;
   } catch (e) {
     // The probes, the resets, and the frame yield reject on an unexpected
     // platform status. The user was never asked, so this is a gate we cannot
     // run rather than an authentication anybody failed.
-    return recordVerdict({
+    return {
       kind: 'unavailable',
       failure: gateFailure('biometrics-failure-notserved', describeFailure(e)),
-    });
+    };
   } finally {
     if (Platform.OS === 'android') {
       // Dropped at the verdict, accepting the bounded exposure behind a
@@ -728,6 +705,22 @@ export const probeDeviceSecurity = async (): Promise<DeviceSecurityProbe> => {
       gateFailure('biometrics-failure-notserved', describeFailure(e)),
     );
   }
+};
+
+// The re-ask loop for app-level callers, with the liveness check the loop
+// cannot infer: a re-ask for a backgrounded activity is answered
+// ERROR_CANCELED, which classifies as a decline and locks.
+
+/** Runs the gate, re-asking on `unanswered` while `stillWanted` holds. */
+export const gateUntilAnswered = async (
+  props: simpleBiometricsProps,
+  stillWanted: () => boolean,
+): Promise<GateVerdict> => {
+  let verdict = await simpleBiometrics(props);
+  while (verdict.kind === 'unanswered' && stillWanted()) {
+    verdict = await simpleBiometrics(props);
+  }
+  return verdict;
 };
 
 export default simpleBiometrics;

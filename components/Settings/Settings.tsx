@@ -237,8 +237,14 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const screenName = ScreenEnum.Settings;
 
   // Audit Issue D — single source of truth for security.settingsScreen.
+  // Authorized at entry: the settingsScreen toggle this screen itself
+  // saves must not re-gate the visit mid-save, so the requirement is a
+  // mount-time snapshot rather than a live context read.
+  const [settingsNeedsAuth] = useState<boolean>(
+    !!securityContext.settingsScreen,
+  );
   const authPassed = useBiometricGate({
-    needsAuth: !!securityContext.settingsScreen,
+    needsAuth: settingsNeedsAuth,
     translate,
     addLastSnackbar,
     onCancel: () => navigation.goBack(),
@@ -392,6 +398,13 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const settingsSnapPoints = useFullSheetSnapPoints(containerH, headerH);
 
   useEffect(() => {
+    // Probe only once the gate has settled: the probe queues behind this
+    // screen's own gate prompt on the serialized keychain queue, and a
+    // stalled probe answers nothing, so keep the current answer rather
+    // than claiming no device lock is enrolled.
+    if (!authPassed) {
+      return;
+    }
     (async () => {
       const probe = await probeDeviceSecurity();
       if (probe.secure) {
@@ -399,11 +412,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       } else if (probe.failure.errorKey !== 'biometrics-failure-stalled') {
         setDeviceHasSecurity(false);
       }
-      // A stalled probe answers nothing (the keychain queue was busy,
-      // often behind this screen's own gate prompt); keep the last known
-      // answer rather than claiming no device lock is enrolled.
     })();
-  }, []);
+  }, [authPassed]);
 
   useEffect(() => {
     (async () => {
