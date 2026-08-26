@@ -441,10 +441,10 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     // encrypted file after a transient Keystore failure, and zingolib then
     // reported "Failed to read wallet version <huge number>".
 
-    // Names that decrypt under their own name; raw copies like .prerepair are excluded.
+    // Includes each .migrating twin, a plain copy that flags an interrupted migration, but not the encrypted .prerepair/.broken copies that would only read as undecryptable.
     private fun walletFileNames(): List<String> =
         listOf(WalletFileName.value, WalletBackupFileName.value).flatMap {
-            listOf(it, "$it.write.tmp")
+            listOf(it, "$it.write.tmp", "$it.migrating")
         } + WalletTempSwapFileName.value
 
     // The outer layer stored the base64 text of an inner envelope. The inner
