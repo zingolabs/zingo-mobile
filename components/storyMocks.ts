@@ -1,4 +1,5 @@
-// Shared fixtures for stories whose props are wallet-domain objects.
+// Shared fixtures for stories and tests whose props are wallet-domain
+// objects.
 import {
   ChainNameEnum,
   CurrencyNameEnum,
