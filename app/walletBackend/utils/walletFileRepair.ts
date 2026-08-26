@@ -31,10 +31,8 @@ export type WalletFileDiagnosis = {
   unwrapErrors: string[];
 };
 
-// keysetPresent is undefined on iOS and when the bridge call fails.
 export type WalletFileDiagnosisReport = {
   files: WalletFileDiagnosis[];
-  keysetPresent?: boolean;
 };
 
 export type WalletFileRepairOutcome = 'repaired' | 'skipped' | 'failed';
@@ -97,20 +95,29 @@ export async function walletFileDiagnosis(): Promise<WalletFileDiagnosisReport> 
           .map(toDiagnosis)
           .filter((d): d is WalletFileDiagnosis => !!d)
       : [];
-    const report: WalletFileDiagnosisReport = { files };
-    if (typeof entry.keysetPresent === 'boolean') {
-      report.keysetPresent = entry.keysetPresent;
-    }
-    return report;
+    return { files };
   } catch {
     return { files: [] };
   }
 }
 
+// Only the two files the native repair actually rewrites. A repairable twin
+// (a .write.tmp or the swap temp) must not trigger auto-repair, or the repair
+// no-ops on the real files and the load-fail/reload cycle never terminates.
+const REPAIR_TARGET_NAMES: ReadonlySet<string> = new Set([
+  WALLET_FILE_NAME,
+  WALLET_BACKUP_FILE_NAME,
+]);
+
 export function hasRepairableWalletFile(
   diagnosis: WalletFileDiagnosis[],
 ): boolean {
-  return diagnosis.some(d => d.state === 'doubleWrapped' && d.repairable);
+  return diagnosis.some(
+    d =>
+      REPAIR_TARGET_NAMES.has(d.name) &&
+      d.state === 'doubleWrapped' &&
+      d.repairable,
+  );
 }
 
 // Outcome per file name; an empty record means the bridge call failed.

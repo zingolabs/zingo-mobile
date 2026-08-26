@@ -441,10 +441,13 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     // encrypted file after a transient Keystore failure, and zingolib then
     // reported "Failed to read wallet version <huge number>".
 
+    // Only names that decrypt under their own name (the file name is the AAD).
+    // `.prerepair`/`.migrating`/`.broken` are raw copies decryptable only under
+    // the original name, so diagnosing them would always read as undecryptable.
     private fun walletFileNames(): List<String> =
         listOf(WalletFileName.value, WalletBackupFileName.value).flatMap {
-            listOf(it, "$it.write.tmp", "$it.prerepair", "$it.migrating")
-        }
+            listOf(it, "$it.write.tmp")
+        } + WalletTempSwapFileName.value
 
     // The outer layer stored the base64 text of an inner envelope. The inner
     // envelope goes under the same file name in a scratch dir, because the
@@ -477,16 +480,21 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                     errors?.add("depth $depth: payload is neither a wallet nor a Tink envelope")
                     return null
                 }
-                WalletFileEnvelope.PayloadKind.TINK_ENVELOPE -> bytes = try {
-                    unwrapEnvelope(fileName, bytes)
-                } catch (e: Exception) {
-                    Log.w("MAIN", "[$fileName] unwrap at depth $depth failed: $e")
-                    errors?.add("depth $depth: $e")
-                    return null
+                WalletFileEnvelope.PayloadKind.TINK_ENVELOPE -> {
+                    if (depth == WalletFileEnvelope.MAX_UNWRAP_DEPTH) {
+                        errors?.add("still an envelope after ${WalletFileEnvelope.MAX_UNWRAP_DEPTH} layers")
+                        return null
+                    }
+                    bytes = try {
+                        unwrapEnvelope(fileName, bytes)
+                    } catch (e: Exception) {
+                        Log.w("MAIN", "[$fileName] unwrap at depth $depth failed: $e")
+                        errors?.add("depth $depth: $e")
+                        return null
+                    }
                 }
             }
         }
-        errors?.add("still an envelope after ${WalletFileEnvelope.MAX_UNWRAP_DEPTH} layers")
         return null
     }
 
@@ -499,16 +507,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             val n = input.read(head)
             (0 until maxOf(n, 0)).joinToString("") { "%02x".format(head[it]) }
         }
-
-    // Whether the Jetpack Security keyset that decrypts every wallet file is
-    // still present, which a device-key loss or app-data restore would remove.
-    private fun encryptedFileKeysetPresent(): Boolean =
-        applicationContext
-            .getSharedPreferences(
-                "__androidx_security_crypto_encrypted_file_pref__",
-                Context.MODE_PRIVATE,
-            )
-            .contains("__androidx_security_crypto_encrypted_file_keyset__")
 
     // state: missing | plainLegacy | undecryptable | plainWallet | doubleWrapped | unknown
     internal fun diagnoseWalletFile(fileName: String): JSONObject {
@@ -558,10 +556,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                     }
                 )
             }
-            JSONObject()
-                .put("files", files)
-                .put("keysetPresent", encryptedFileKeysetPresent())
-                .toString()
+            JSONObject().put("files", files).toString()
         }
     }
 
@@ -698,7 +693,21 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 // before starting a new swap — deleting the temp blindly
                 // would destroy the only copy of that crash's original main.
                 completePendingSwap()
-                val wallet = readFileAsB64(WalletFileName.value)
+                val wallet = try {
+                    readFileAsB64(WalletFileName.value)
+                } catch (e: Exception) {
+                    // An undecryptable main is the case Restore Backup exists
+                    // for. It cannot be re-encoded into the backup slot, so
+                    // preserve its raw bytes aside (still the double-wrap repair
+                    // source) and restore the backup as the sole good copy in
+                    // both slots, as in the no-main branch.
+                    Log.w("MAIN", "[Native] backup restore: main unreadable, preserving raw and restoring backup: $e")
+                    File(applicationContext.filesDir, WalletFileName.value)
+                        .copyTo(File(applicationContext.filesDir, "${WalletFileName.value}.broken"), overwrite = true)
+                    writeEncryptedFile(WalletFileName.value, backup)
+                    promise.resolve(true)
+                    return
+                }
                 writeEncryptedFile(WalletTempSwapFileName.value, wallet)   // (1) temp = original main
                 writeEncryptedFile(WalletFileName.value, backup)            // (2) main = backup
                 writeEncryptedFile(WalletBackupFileName.value, wallet)      // (3) backup = original main
