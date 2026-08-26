@@ -14,6 +14,7 @@ import { cpSync, existsSync, mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { RunJob, captureVerdict } from './captureVerdict';
 
 const dir = dirname(fileURLToPath(import.meta.url));
 const baseline = join(dir, '__baseline__');
@@ -105,6 +106,17 @@ if (local) {
         fail(`watching run ${runId} failed.`);
       }
     }
+  }
+  // `gh run watch` exits 0 whatever the run concluded, and the run itself
+  // concludes failure on the normal accept path (the Gate step trips on any
+  // diff), so the capture step's own conclusion is the only trustworthy
+  // signal that the bundle is whole.
+  const { jobs } = JSON.parse(gh(['run', 'view', runId, '--json', 'jobs'])) as {
+    jobs: RunJob[];
+  };
+  const verdict = captureVerdict(jobs);
+  if (verdict.kind === 'notCaptured') {
+    fail(`run ${runId}: ${verdict.reason}`);
   }
   const tmp = mkdtempSync(join(tmpdir(), 'visual-head-'));
   gh(['run', 'download', runId, '-n', 'visual-head', '-D', tmp]);

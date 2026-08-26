@@ -1,46 +1,48 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react-native';
-import { BottomSheetModal } from '@gorhom/bottom-sheet';
 
 import NymGateSheet from './NymGateSheet';
-import { withAppContext, withBottomSheet } from '../../storyDecorators';
+import {
+  SheetHost,
+  withAppContext,
+  withBottomSheet,
+} from '../../storyDecorators';
 
 const noop = () => {};
 
-const PresentedSheet = (
-  props: Omit<React.ComponentProps<typeof NymGateSheet>, 'ref'>,
-) => {
-  const ref = useRef<BottomSheetModal>(null);
-  useEffect(() => {
-    ref.current?.present();
-  }, []);
-  return <NymGateSheet ref={ref} {...props} />;
-};
-
-const meta: Meta<typeof PresentedSheet> = {
+const meta: Meta<typeof NymGateSheet> = {
   title: 'Migration/Nym gate sheet',
   tags: ['static'],
-  component: PresentedSheet,
+  component: NymGateSheet,
   decorators: [withAppContext(), withBottomSheet],
+  render: args => (
+    <SheetHost>{ref => <NymGateSheet ref={ref} {...args} />}</SheetHost>
+  ),
   args: {
-    loading: false,
-    failureKey: undefined,
+    gate: { kind: 'idle' },
     onDismiss: noop,
     onContinue: noop,
     onEnable: noop,
   },
   argTypes: {
-    loading: { control: 'boolean' },
-    failureKey: {
+    gate: {
       control: 'select',
-      options: [undefined, 'mixnet.status.died', 'mixnet.status.bootstrapping'],
+      options: ['idle', 'connecting', 'died', 'unknown'],
+      mapping: {
+        idle: { kind: 'idle' },
+        connecting: { kind: 'connecting' },
+        died: { kind: 'failed', failureKey: 'mixnet.status.died' },
+        unknown: { kind: 'failed', failureKey: 'mixnet.status.unknown' },
+      },
     },
   },
 };
 
 export default meta;
-type Story = StoryObj<typeof PresentedSheet>;
+type Story = StoryObj<typeof NymGateSheet>;
 
 export const Idle: Story = {};
-export const Connecting: Story = { args: { loading: true } };
-export const Lost: Story = { args: { failureKey: 'mixnet.status.died' } };
+export const Connecting: Story = { args: { gate: { kind: 'connecting' } } };
+export const Lost: Story = {
+  args: { gate: { kind: 'failed', failureKey: 'mixnet.status.died' } },
+};

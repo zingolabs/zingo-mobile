@@ -14,14 +14,13 @@ import MixnetIcon from '../../Header/components/MixnetIcon';
 import { ContextAppLoaded } from '../../../app/context';
 import { ButtonTypeEnum } from '../../../app/AppState';
 import { useTheme } from '../../../app/theme';
+import { NymGateState } from './nymGateState';
 
 const NYM_GREEN = '#07FF94';
 
 type NymGateSheetProps = {
-  // The transport is being brought up: the Enable button waits.
-  loading: boolean;
-  // The status key to show when the transport is lost or reconnecting.
-  failureKey?: string;
+  // The one gate state to present: connecting waits, failed shows its key.
+  gate: NymGateState;
   onDismiss: () => void;
   onContinue: () => void;
   onEnable: () => void;
@@ -30,7 +29,7 @@ type NymGateSheetProps = {
 // The Mixnet Mode gate before a migration starts: enable the transport, or
 // continue without it.
 const NymGateSheet = forwardRef<BottomSheetModal, NymGateSheetProps>(
-  ({ loading, failureKey, onDismiss, onContinue, onEnable }, ref) => {
+  ({ gate, onDismiss, onContinue, onEnable }, ref) => {
     const { translate } = useContext(ContextAppLoaded);
     const { colors } = useTheme();
 
@@ -110,11 +109,11 @@ const NymGateSheet = forwardRef<BottomSheetModal, NymGateSheetProps>(
           >
             {translate('migrationstrategy.nym-gate-body') as string}
           </Text>
-          {loading ? (
+          {gate.kind === 'connecting' ? (
             <View style={{ marginBottom: 20 }}>
               <MixnetIcon phase="connecting" />
             </View>
-          ) : failureKey !== undefined ? (
+          ) : gate.kind === 'failed' ? (
             <Text
               style={{
                 fontSize: 15,
@@ -123,7 +122,7 @@ const NymGateSheet = forwardRef<BottomSheetModal, NymGateSheetProps>(
                 marginBottom: 20,
               }}
             >
-              {translate(failureKey) as string}
+              {translate(gate.failureKey) as string}
             </Text>
           ) : null}
           <Button
@@ -137,11 +136,11 @@ const NymGateSheet = forwardRef<BottomSheetModal, NymGateSheetProps>(
             testID="migrationstrategy.nym-enable"
             type={ButtonTypeEnum.Primary}
             title={
-              loading
+              gate.kind === 'connecting'
                 ? (translate('migrationstrategy.nym-gate-connecting') as string)
                 : (translate('migrationstrategy.nym-gate-enable') as string)
             }
-            disabled={loading}
+            disabled={gate.kind === 'connecting'}
             onPress={onEnable}
             style={{ width: '100%' }}
           />
