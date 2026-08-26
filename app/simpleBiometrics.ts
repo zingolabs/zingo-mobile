@@ -506,7 +506,17 @@ const runGate = async (props: simpleBiometricsProps): Promise<GateVerdict> => {
   // operation rather than blocking on an impossible prompt.
   const security = await probeDeviceSecurity();
   if (!security.secure) {
-    return recordVerdict({ kind: 'unavailable', failure: security.failure });
+    // A stalled probe proves nothing about a live prompt, so it settles by
+    // the platform's stall policy like every other stall. A retry's probe
+    // queues behind the very call that stalled its parent, and answering
+    // it 'unavailable' would open on Android the lock the parent held.
+    // Only a genuine no-security answer fails open, because no lock could
+    // ever open it.
+    const kind =
+      security.failure.errorKey === 'biometrics-failure-stalled'
+        ? interactiveStallPolicy().settleAs
+        : 'unavailable';
+    return recordVerdict({ kind, failure: security.failure });
   }
 
   try {

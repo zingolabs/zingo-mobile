@@ -149,6 +149,36 @@ test('a wedged native queue is unavailable instead of hanging', async () => {
   });
 });
 
+test('a stalled pre-flight settles by the platform policy, not fail-open', async () => {
+  jest.useFakeTimers();
+  rn.Platform.OS = 'android';
+  kc.getSupportedBiometryType
+    .mockResolvedValueOnce('Fingerprint')
+    .mockReturnValue(new Promise(() => {}));
+  kc.hasGenericPassword.mockResolvedValue(true);
+  kc.getGenericPassword.mockReturnValue(new Promise(() => {}));
+
+  let first: GateVerdict | undefined;
+  simpleBiometrics({ translate, purpose: 'appEntry' }).then(v => {
+    first = v;
+  });
+  await jest.advanceTimersByTimeAsync(60 * 1000);
+  expect(first).toMatchObject({ kind: 'declined' });
+
+  // Try Again: the probe queues behind the wedged call and stalls. Nothing
+  // proves the prompt is off screen, so Android locks again instead of
+  // opening the wallet to whoever waits out the retry.
+  let second: GateVerdict | undefined;
+  simpleBiometrics({ translate, purpose: 'appEntry' }).then(v => {
+    second = v;
+  });
+  await jest.advanceTimersByTimeAsync(10 * 1000);
+  expect(second).toMatchObject({
+    kind: 'declined',
+    failure: { errorKey: 'biometrics-failure-stalled' },
+  });
+});
+
 test('a wedged capability probe is unavailable too', async () => {
   jest.useFakeTimers();
   kc.canImplyAuthentication.mockReturnValue(new Promise(() => {}));
