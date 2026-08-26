@@ -558,6 +558,13 @@ export class LoadingAppClass extends Component<
         props.route.params.biometricsFailed !== undefined
           ? props.route.params.biometricsFailed
           : false,
+      // One-time snapshot for the arrived-already-declined path (the
+      // foreground gate navigated here); the startGate path snapshots its
+      // own verdict's failure below.
+      gateFailure:
+        !!props.route.params && props.route.params.biometricsFailed
+          ? getLastGateFailure()
+          : undefined,
       startingApp:
         !!props.route.params && props.route.params.startingApp !== undefined
           ? props.route.params.startingApp
@@ -603,7 +610,10 @@ export class LoadingAppClass extends Component<
             })
           : { kind: 'authenticated' };
         if (startGate.kind === 'declined') {
-          this.setState({ biometricsFailed: true });
+          this.setState({
+            biometricsFailed: true,
+            gateFailure: startGate.failure,
+          });
           return;
         } else {
           this.setState({ biometricsFailed: false });
@@ -2154,7 +2164,7 @@ export class LoadingAppClass extends Component<
       blockExplorer: this.state.blockExplorer,
     };
 
-    const gateFailure = getLastGateFailure();
+    const { gateFailure } = this.state;
 
     return (
       <>
@@ -2170,9 +2180,7 @@ export class LoadingAppClass extends Component<
                   biometricsFailed={biometricsFailed}
                   message={
                     biometricsFailed && gateFailure
-                      ? `${translate(gateFailure.errorKey) as string} ${
-                          gateFailure.detail
-                        }`.trim()
+                      ? Utils.renderErrorKeyed(gateFailure, translate)
                       : undefined
                   }
                   tryAgain={() => {

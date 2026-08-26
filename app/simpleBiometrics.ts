@@ -4,6 +4,7 @@ import * as Keychain from 'react-native-keychain';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { GlobalConst, TranslateType } from './AppState';
+import { ErrorKeyed } from './AppState/types/Result';
 import {
   buildBaseOptions,
   buildGetOptions,
@@ -48,15 +49,20 @@ export type GateFailureKey =
   | 'biometrics-failure-notserved'
   | 'biometrics-failure-nosecurity';
 
-// The error channel carries a catalog key, never prose; `detail` is the
-// untranslated platform diagnostic (an OSStatus, a prompt code, the native
-// call that stalled) so a bug report still names the mechanism.
+// The error channel carries a catalog key, never prose; `param` is the
+// untranslated platform diagnostic (an OSStatus, a prompt code, the machine
+// token of the native call that stalled) so a bug report still names the
+// mechanism. The shape is the repo-wide ErrorKeyed convention, so the
+// display edge is Utils.renderErrorKeyed rather than a hand-rolled
+// template.
 
-/** A gate failure: the key the display edge translates plus the untranslated platform detail. */
-export type GateFailure = {
-  errorKey: GateFailureKey;
-  detail: string;
-};
+/** A gate failure in the repo-canonical ErrorKeyed shape. */
+export type GateFailure = ErrorKeyed<GateFailureKey>;
+
+const gateFailure = (
+  errorKey: GateFailureKey,
+  param?: string,
+): GateFailure => ({ kind: 'error', errorKey, param });
 
 /** The stalled attempt outcome, carrying the platform's settlement policy. */
 export type StalledOutcome = {
@@ -262,29 +268,45 @@ type GuardedOp =
   | 'getSupportedBiometryType'
   | 'isPasscodeAuthAvailable'
   | 'hasGenericPassword'
-  | 'resetGenericPassword'
+  | 'resetGenericPassword:v1'
+  | 'resetGenericPassword:rebuild'
   | 'setGenericPassword'
   | 'getGenericPassword'
   | 'requestAnimationFrame'
   | 'AsyncStorage.setItem';
 
 type Guarded<T> =
-  | { kind: 'settled'; value: T }
-  | { kind: 'stalled'; failure: GateFailure };
+  { kind: 'settled'; value: T } | { kind: 'stalled'; failure: GateFailure };
+
+// Interactivity is a property of the op, not of the call site: the record
+// removes the degree of freedom that would let a new site hand an
+// interactive read the probe window (declaring a live prompt a stall) or
+// park a wedged probe for the prompt window.
+const OP_INTERACTIVITY: Record<GuardedOp, boolean> = {
+  canImplyAuthentication: false,
+  getSupportedBiometryType: false,
+  isPasscodeAuthAvailable: false,
+  hasGenericPassword: false,
+  'resetGenericPassword:v1': false,
+  'resetGenericPassword:rebuild': false,
+  setGenericPassword: true,
+  getGenericPassword: true,
+  requestAnimationFrame: false,
+  'AsyncStorage.setItem': false,
+};
 
 // The one place a native call meets the stall guard: the op name doubles as
 // the stall diagnostic, so a new call site can neither silently regain the
 // unbounded hang nor invent failure prose.
 const guarded = async <T>(
   op: GuardedOp,
-  interactive: boolean,
   call: () => Promise<T>,
 ): Promise<Guarded<T>> => {
-  const raced = await stallGuard(call(), interactive);
+  const raced = await stallGuard(call(), OP_INTERACTIVITY[op]);
   return raced === STALLED
     ? {
         kind: 'stalled',
-        failure: { errorKey: 'biometrics-failure-stalled', detail: op },
+        failure: gateFailure('biometrics-failure-stalled', op),
       }
     : { kind: 'settled', value: raced };
 };
@@ -329,7 +351,7 @@ const classifyFailure = (e: unknown): AttemptOutcome => {
   if (declined) {
     return {
       kind: 'declined',
-      failure: { errorKey: 'biometrics-failure-declined', detail },
+      failure: gateFailure('biometrics-failure-declined', detail),
     };
   }
   const cause: BrokenEntryCause =
@@ -339,13 +361,12 @@ const classifyFailure = (e: unknown): AttemptOutcome => {
   return {
     kind: 'brokenEntry',
     cause,
-    failure: {
-      errorKey:
-        cause === 'authFailed'
-          ? 'biometrics-failure-declined'
-          : 'biometrics-failure-notserved',
+    failure: gateFailure(
+      cause === 'authFailed'
+        ? 'biometrics-failure-declined'
+        : 'biometrics-failure-notserved',
       detail,
-    },
+    ),
   };
 };
 
@@ -415,7 +436,7 @@ const attemptGate = async (
       // On Android the AES_GCM key is user-auth required so the set itself
       // drives the BiometricPrompt; on iOS the set is silent and the prompt
       // comes from the read below.
-      const written = await guarded('setGenericPassword', true, () =>
+      const written = await guarded('setGenericPassword', () =>
         Keychain.setGenericPassword(
           SENTINEL_USERNAME,
           SENTINEL_VALUE,
@@ -430,7 +451,7 @@ const attemptGate = async (
         return interactiveStall(written.failure);
       }
     }
-    const cred = await guarded('getGenericPassword', true, () =>
+    const cred = await guarded('getGenericPassword', () =>
       Keychain.getGenericPassword(
         buildGetOptions(
           SENTINEL_SERVICE,
@@ -450,10 +471,10 @@ const attemptGate = async (
     return {
       kind: 'brokenEntry',
       cause: 'notServed',
-      failure: {
-        errorKey: 'biometrics-failure-notserved',
-        detail: 'getGenericPassword: no entry',
-      },
+      failure: gateFailure(
+        'biometrics-failure-notserved',
+        'getGenericPassword:empty',
+      ),
     };
   } catch (e) {
     return classifyFailure(e);
@@ -469,23 +490,25 @@ const runGate = async (props: simpleBiometricsProps): Promise<GateVerdict> => {
     return recordVerdict({ kind: 'unavailable', failure: security.failure });
   }
 
-  if (Platform.OS === 'android') {
-    DeviceEventEmitter.emit(BIOMETRIC_BLANKING_EVENT, true);
-    // Yield one frame so the overlay paints before the system prompt opens.
-    // A backgrounded launch delivers no frames, so the wait is guarded: the
-    // prompt then opens without the paint rather than parking the gate.
-    await guarded(
-      'requestAnimationFrame',
-      false,
-      () => new Promise<void>(resolve => requestAnimationFrame(() => resolve())),
-    );
-  }
-
   try {
+    if (Platform.OS === 'android') {
+      // Raised inside the try so the finally can always lower it: a
+      // rejection anywhere past this line still drops the overlay.
+      DeviceEventEmitter.emit(BIOMETRIC_BLANKING_EVENT, true);
+      // Yield one frame so the overlay paints before the system prompt
+      // opens. A backgrounded launch delivers no frames, so the wait is
+      // guarded: the prompt then opens without the paint rather than
+      // parking the gate.
+      await guarded(
+        'requestAnimationFrame',
+        () =>
+          new Promise<void>(resolve => requestAnimationFrame(() => resolve())),
+      );
+    }
     // hasGenericPassword answers "an entry exists", never "an entry works".
     // The iOS bridge resolves it to true on errSecInteractionNotAllowed, so
     // use it to decide whether a create is worth paying for, not as proof.
-    const has = await guarded('hasGenericPassword', false, () =>
+    const has = await guarded('hasGenericPassword', () =>
       Keychain.hasGenericPassword({
         service: SENTINEL_SERVICE,
       }),
@@ -496,7 +519,7 @@ const runGate = async (props: simpleBiometricsProps): Promise<GateVerdict> => {
     if (!has.value) {
       // Nothing reads v1 from here on. The delete needs no prompt, and
       // deleting an absent entry resolves, so it runs without a lookup.
-      const clearedV1 = await guarded('resetGenericPassword', false, () =>
+      const clearedV1 = await guarded('resetGenericPassword:v1', () =>
         Keychain.resetGenericPassword({ service: SENTINEL_SERVICE_V1 }),
       );
       if (clearedV1.kind === 'stalled') {
@@ -520,7 +543,7 @@ const runGate = async (props: simpleBiometricsProps): Promise<GateVerdict> => {
     let clearBeforeAttempt = false;
     while (state.phase !== 'settled') {
       if (clearBeforeAttempt) {
-        const cleared = await guarded('resetGenericPassword', false, () =>
+        const cleared = await guarded('resetGenericPassword:rebuild', () =>
           Keychain.resetGenericPassword(
             buildBaseOptions(SENTINEL_SERVICE, 'INTERACTIVE_AUTH'),
           ),
@@ -540,30 +563,33 @@ const runGate = async (props: simpleBiometricsProps): Promise<GateVerdict> => {
     }
     return recordVerdict(state.verdict);
   } catch (e) {
-    // hasGenericPassword and resetGenericPassword reject on an unexpected
+    // The probes, the resets, and the frame yield reject on an unexpected
     // platform status. The user was never asked, so this is a gate we cannot
     // run rather than an authentication anybody failed.
     return recordVerdict({
       kind: 'unavailable',
-      failure: {
-        errorKey: 'biometrics-failure-notserved',
-        detail: describeFailure(e),
-      },
+      failure: gateFailure('biometrics-failure-notserved', describeFailure(e)),
     });
   } finally {
     if (Platform.OS === 'android') {
       // Dropped at the verdict even though a call from this run may still
       // hold its prompt on screen: the bounded exposure behind that prompt
-      // costs less than burying a screen under a black, dead overlay while
-      // a never-settling call pends (Audit Issue C accepted the trade).
+      // costs less than the capped but minute-long black overlay the
+      // deferred hide put over every screen while a call pended (Audit
+      // Issue C accepted the trade).
       DeviceEventEmitter.emit(BIOMETRIC_BLANKING_EVENT, false);
     }
     // iOS treats the auth prompt as the app going to background; restore the
-    // foreground flag so background-state handling doesn't trip. Guarded: a
-    // wedged storage write must not park the verdict every caller shares.
-    await guarded('AsyncStorage.setItem', false, () =>
-      AsyncStorage.setItem(GlobalConst.background, GlobalConst.no),
-    );
+    // foreground flag so background-state handling doesn't trip. Guarded and
+    // swallowed: neither a wedged nor a failing store write may replace the
+    // verdict every caller shares.
+    try {
+      await guarded('AsyncStorage.setItem', () =>
+        AsyncStorage.setItem(GlobalConst.background, GlobalConst.no),
+      );
+    } catch {
+      // The verdict outranks the flag restore.
+    }
   }
 };
 
@@ -572,9 +598,10 @@ const runGate = async (props: simpleBiometricsProps): Promise<GateVerdict> => {
 // to `idle`: a retry starts a fresh run with a fresh prompt, even while a
 // call from an earlier run is still pending inside the native module. The
 // collision can answer the fresh prompt ERROR_CANCELED, one bounded and
-// retriable decline; blocking the retry instead proved worse, because a
-// call that never settles turned Try Again into a permanent lock — the
-// issue #1266 trap this module exists to keep unreachable.
+// retriable decline. Blocking the retry proved worse: it answered Try
+// Again by policy after the probe window without ever prompting, so while
+// a call never settled (a lost Android callback) no retry could succeed —
+// the issue #1266 trap this module exists to keep unreachable.
 type GateLifecycle =
   | { stage: 'idle' }
   | {
@@ -620,18 +647,16 @@ const simpleBiometrics = (
 };
 
 type DeviceSecurityProbe =
-  | { secure: true }
-  | { secure: false; failure: GateFailure };
+  { secure: true } | { secure: false; failure: GateFailure };
 
 const insecure = (failure: GateFailure): DeviceSecurityProbe => ({
   secure: false,
   failure,
 });
 
-const NO_DEVICE_SECURITY: GateFailure = {
-  errorKey: 'biometrics-failure-nosecurity',
-  detail: '',
-};
+const NO_DEVICE_SECURITY: GateFailure = gateFailure(
+  'biometrics-failure-nosecurity',
+);
 
 // canImplyAuthentication() is iOS-only in react-native-keychain and always
 // returns false on Android, so the Android answer is composed from the
@@ -644,7 +669,7 @@ const NO_DEVICE_SECURITY: GateFailure = {
 const probeDeviceSecurity = async (): Promise<DeviceSecurityProbe> => {
   try {
     if (Platform.OS === 'ios') {
-      const can = await guarded('canImplyAuthentication', false, () =>
+      const can = await guarded('canImplyAuthentication', () =>
         Keychain.canImplyAuthentication(),
       );
       if (can.kind === 'stalled') {
@@ -652,7 +677,7 @@ const probeDeviceSecurity = async (): Promise<DeviceSecurityProbe> => {
       }
       return can.value ? { secure: true } : insecure(NO_DEVICE_SECURITY);
     }
-    const biometry = await guarded('getSupportedBiometryType', false, () =>
+    const biometry = await guarded('getSupportedBiometryType', () =>
       Keychain.getSupportedBiometryType(),
     );
     if (biometry.kind === 'stalled') {
@@ -661,7 +686,7 @@ const probeDeviceSecurity = async (): Promise<DeviceSecurityProbe> => {
     if (biometry.value !== null) {
       return { secure: true };
     }
-    const passcode = await guarded('isPasscodeAuthAvailable', false, () =>
+    const passcode = await guarded('isPasscodeAuthAvailable', () =>
       Keychain.isPasscodeAuthAvailable(),
     );
     if (passcode.kind === 'stalled') {
@@ -669,10 +694,9 @@ const probeDeviceSecurity = async (): Promise<DeviceSecurityProbe> => {
     }
     return passcode.value ? { secure: true } : insecure(NO_DEVICE_SECURITY);
   } catch (e) {
-    return insecure({
-      errorKey: 'biometrics-failure-notserved',
-      detail: describeFailure(e),
-    });
+    return insecure(
+      gateFailure('biometrics-failure-notserved', describeFailure(e)),
+    );
   }
 };
 
