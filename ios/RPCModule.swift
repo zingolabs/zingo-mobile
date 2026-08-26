@@ -581,6 +581,31 @@ class RPCModule: NSObject {
     }
   }
 
+  // Salvages seed and birthday from the closed wallet file and keeps the
+  // damaged file aside as ".broken". The file stores base64 text and
+  // truncation can cut it mid-quantum, so the decode drops the
+  // unfinishable tail characters before handing bytes to the salvage
+  // reader.
+  @objc(walletFileRecoveryInfo:reject:)
+  func walletFileRecoveryInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+    DispatchQueue.global(qos: .userInitiated).async {
+      FfiOutcome.of {
+        let text = try self.readWalletUtf8String()
+        let trimmed = String(text.prefix(text.count - text.count % 4))
+        guard let walletBytes = Data(base64Encoded: trimmed) else {
+          throw ZingolibError.Read(message: "the wallet file text does not decode as base64")
+        }
+        let salvaged = try readWalletRecoveryInfo(walletBytes: walletBytes)
+        let fm = FileManager.default
+        let mainPath = try self.getFileName(Constants.WalletFileName.rawValue)
+        let brokenPath = "\(mainPath).broken"
+        try? fm.removeItem(atPath: brokenPath)
+        try? fm.copyItem(atPath: mainPath, toPath: brokenPath)
+        return salvaged
+      }.settle(resolve: resolve, reject: reject)
+    }
+  }
+
   // The save internals throw on failure, so success is the only value the
   // data channel carries ("true", kept for the JS seam's shape matrix);
   // failure rejects with the thrown error — never as prose or a sentinel

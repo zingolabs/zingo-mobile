@@ -447,6 +447,23 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         }
     }
 
+    // Salvages seed and birthday from the raw bytes of the closed wallet
+    // file and keeps the damaged bytes at "$fileName.broken".
+    internal fun walletFileRecoveryInfoNative(): String {
+        val file = File(applicationContext.filesDir, WalletFileName.value)
+        val salvaged = uniffi.zingo.readWalletRecoveryInfo(file.readBytes())
+        file.copyTo(File(applicationContext.filesDir, "${WalletFileName.value}.broken"), overwrite = true)
+        return salvaged
+    }
+
+    @ReactMethod
+    fun walletFileRecoveryInfo(promise: Promise) {
+        FfiOutcome.settling(promise, "read_wallet_recovery_info") {
+            uniffi.zingo.initLogging()
+            walletFileRecoveryInfoNative()
+        }
+    }
+
     @ReactMethod
     fun repairDoubleWrappedWalletProcess(promise: Promise) {
         FfiOutcome.settling(promise, "repair_double_wrapped_wallet") {
