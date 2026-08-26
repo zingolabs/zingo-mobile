@@ -43,10 +43,6 @@ const SENTINEL_SERVICE_V1 = 'zingo-biometric-sentinel';
 // What a stall settles as differs by platform, and the outcome carries that
 // answer in `settleAs`, per interactiveStall.
 
-// The failure shape lives beside ErrorKeyed in AppState/types, so state
-// and navigation types can carry it without importing this module.
-export type { GateFailure, GateFailureKey };
-
 const gateFailure = (errorKey: GateFailureKey, param?: string): GateFailure =>
   errorKeyed(errorKey, param);
 
@@ -707,17 +703,39 @@ export const probeDeviceSecurity = async (): Promise<DeviceSecurityProbe> => {
   }
 };
 
-// The re-ask loop for app-level callers, with the liveness check the loop
-// cannot infer: a re-ask for a backgrounded activity is answered
-// ERROR_CANCELED, which classifies as a decline and locks.
+// The re-ask loop for app-level callers. A re-ask for a backgrounded
+// activity is answered ERROR_CANCELED, which classifies as a decline and
+// locks, so the loop holds while the app is provably away and asks again
+// the moment it returns. An 'inactive' read right after the shared sheet
+// closes is stale, and the pending active event releases the hold moments
+// later; an 'unknown' seed proves nothing and never parks the loop. A
+// concurrent run started by the caller's own re-entry shares, so the hold
+// can never stack prompts.
 
-/** Runs the gate, re-asking on `unanswered` while `stillWanted` holds. */
+const untilProvablyActive = (): Promise<void> => {
+  if (
+    AppState.currentState !== 'inactive' &&
+    AppState.currentState !== 'background'
+  ) {
+    return Promise.resolve();
+  }
+  return new Promise(resolve => {
+    const subscription = AppState.addEventListener('change', next => {
+      if (next === 'active') {
+        subscription.remove();
+        resolve();
+      }
+    });
+  });
+};
+
+/** Runs the gate for an app-level caller, re-asking on `unanswered` once the app is back in the foreground. */
 export const gateUntilAnswered = async (
   props: simpleBiometricsProps,
-  stillWanted: () => boolean,
-): Promise<GateVerdict> => {
+): Promise<Exclude<GateVerdict, { kind: 'unanswered' }>> => {
   let verdict = await simpleBiometrics(props);
-  while (verdict.kind === 'unanswered' && stillWanted()) {
+  while (verdict.kind === 'unanswered') {
+    await untilProvablyActive();
     verdict = await simpleBiometrics(props);
   }
   return verdict;

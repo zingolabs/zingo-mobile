@@ -20,6 +20,7 @@ import type SecurityType from './types/SecurityType';
 import type ServerUrisType from './types/ServerUrisType';
 import type { SetServerResult } from './types/SetServerResult';
 import type { ErrorKeyed, Done } from './types/Result';
+import type { GateFailure, GateFailureKey } from './types/GateFailure';
 import { DONE, errorKeyed } from './types/Result';
 import type ValueTransferType from './types/ValueTransferType';
 import type ProposalPoolsType from './types/ProposalPoolsType';
@@ -143,6 +144,8 @@ export type {
   SetServerResult,
   ErrorKeyed,
   Done,
+  GateFailure,
+  GateFailureKey,
   ValueTransferType,
   ProposalPoolsType,
   TransactionType,

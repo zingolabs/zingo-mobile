@@ -864,7 +864,7 @@ test('every gate failure key exists in every catalog', () => {
   }
 });
 
-test('gateUntilAnswered re-asks only while the caller still wants it', async () => {
+test('gateUntilAnswered re-asks a live app at once', async () => {
   kc.hasGenericPassword.mockResolvedValue(true);
   let refuse: (e: Error) => void = () => {};
   kc.getGenericPassword
@@ -876,36 +876,82 @@ test('gateUntilAnswered re-asks only while the caller still wants it', async () 
     .mockResolvedValue({ password: '1' });
 
   const screenGate = simpleBiometrics({ translate, purpose: 'screenEntry' });
-  const appGate = gateUntilAnswered(
-    { translate, purpose: 'appEntry' },
-    () => true,
-  );
+  const appGate = gateUntilAnswered({ translate, purpose: 'appEntry' });
   refuse(osError('-128'));
   await expect(screenGate).resolves.toMatchObject({ kind: 'declined' });
   await expect(appGate).resolves.toMatchObject({ kind: 'authenticated' });
   expect(kc.getGenericPassword).toHaveBeenCalledTimes(2);
 });
 
-test('gateUntilAnswered stops when the caller no longer wants it', async () => {
-  // A backgrounded activity must not receive the re-ask: Android answers
-  // its prompt ERROR_CANCELED, which classifies as a decline and locks.
+test('gateUntilAnswered holds a backgrounded app and re-asks on return', async () => {
+  // A backgrounded activity must not receive the re-ask (Android answers
+  // its prompt ERROR_CANCELED, which classifies as a decline and locks);
+  // the return to 'active' is the moment to ask again.
   kc.hasGenericPassword.mockResolvedValue(true);
   let refuse: (e: Error) => void = () => {};
-  kc.getGenericPassword.mockReturnValueOnce(
-    new Promise((_serve, reject) => {
-      refuse = reject;
-    }),
-  );
+  kc.getGenericPassword
+    .mockReturnValueOnce(
+      new Promise((_serve, reject) => {
+        refuse = reject;
+      }),
+    )
+    .mockResolvedValue({ password: '1' });
 
   const screenGate = simpleBiometrics({ translate, purpose: 'screenEntry' });
-  const appGate = gateUntilAnswered(
-    { translate, purpose: 'appEntry' },
-    () => false,
-  );
+  const appGate = gateUntilAnswered({ translate, purpose: 'appEntry' });
+  setAppState('background');
   refuse(osError('-128'));
   await expect(screenGate).resolves.toMatchObject({ kind: 'declined' });
-  await expect(appGate).resolves.toMatchObject({ kind: 'unanswered' });
-  expect(kc.getGenericPassword).toHaveBeenCalledTimes(1);
+  await new Promise(resolve => setTimeout(resolve, 0));
+  expect(kc.getGenericPassword).toHaveBeenCalledTimes(1); // held, not asked
+
+  setAppState('active');
+  await expect(appGate).resolves.toMatchObject({ kind: 'authenticated' });
+  expect(kc.getGenericPassword).toHaveBeenCalledTimes(2);
+});
+
+test('a stale inactive read does not refuse a live re-ask', async () => {
+  // Right after the shared sheet closes, currentState still reads the
+  // 'inactive' the sheet caused; the return-to-active event lands moments
+  // later and must release the re-ask instead of stranding the caller.
+  kc.hasGenericPassword.mockResolvedValue(true);
+  let refuse: (e: Error) => void = () => {};
+  kc.getGenericPassword
+    .mockReturnValueOnce(
+      new Promise((_serve, reject) => {
+        refuse = reject;
+      }),
+    )
+    .mockResolvedValue({ password: '1' });
+
+  const screenGate = simpleBiometrics({ translate, purpose: 'screenEntry' });
+  const appGate = gateUntilAnswered({ translate, purpose: 'appEntry' });
+  rn.__appState.currentState = 'inactive'; // the sheet's stale residue
+  refuse(osError('-128'));
+  await expect(screenGate).resolves.toMatchObject({ kind: 'declined' });
+  setAppState('active'); // the in-flight event lands
+  await expect(appGate).resolves.toMatchObject({ kind: 'authenticated' });
+  expect(kc.getGenericPassword).toHaveBeenCalledTimes(2);
+});
+
+test('an unknown app state proves nothing and never parks the re-ask', async () => {
+  kc.hasGenericPassword.mockResolvedValue(true);
+  let refuse: (e: Error) => void = () => {};
+  kc.getGenericPassword
+    .mockReturnValueOnce(
+      new Promise((_serve, reject) => {
+        refuse = reject;
+      }),
+    )
+    .mockResolvedValue({ password: '1' });
+
+  const screenGate = simpleBiometrics({ translate, purpose: 'screenEntry' });
+  const appGate = gateUntilAnswered({ translate, purpose: 'appEntry' });
+  rn.__appState.currentState = 'unknown';
+  refuse(osError('-128'));
+  await expect(screenGate).resolves.toMatchObject({ kind: 'declined' });
+  await expect(appGate).resolves.toMatchObject({ kind: 'authenticated' });
+  expect(kc.getGenericPassword).toHaveBeenCalledTimes(2);
 });
 
 test('a decline is shared with a concurrent caller without a second prompt', async () => {

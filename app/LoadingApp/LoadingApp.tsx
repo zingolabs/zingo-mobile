@@ -495,8 +495,8 @@ export class LoadingAppClass extends Component<
   LoadingAppClassProps,
   LoadingAppClassState
 > {
-  appstate: NativeEventSubscription;
-  unsubscribeNetInfo: NetInfoSubscription;
+  appstate?: NativeEventSubscription;
+  unsubscribeNetInfo?: NetInfoSubscription;
   clipboardTimer: ReturnType<typeof setTimeout> | null = null;
   customServerModalRef: React.RefObject<React.ComponentRef<
     typeof BottomSheetModal
@@ -565,8 +565,6 @@ export class LoadingAppClass extends Component<
       hasRecoveryWalletInfoSaved: false,
     };
 
-    this.appstate = {} as NativeEventSubscription;
-    this.unsubscribeNetInfo = {} as NetInfoSubscription;
     this.customServerModalRef = React.createRef();
   }
 
@@ -595,21 +593,16 @@ export class LoadingAppClass extends Component<
       // (PIN or TouchID or FaceID). Only a decline locks; an
       // 'unavailable' gate passes because it guards nothing and
       // blocking locks the user out of the wallet.
-      const startGate: GateVerdict = this.state.security.startApp
-        ? await gateUntilAnswered(
-            { translate: this.state.translate, purpose: 'appEntry' },
-            () => AppState.currentState === AppStateStatusEnum.active,
-          )
-        : { kind: 'authenticated' };
+      const startGate = this.state.security.startApp
+        ? await gateUntilAnswered({
+            translate: this.state.translate,
+            purpose: 'appEntry',
+          })
+        : ({ kind: 'authenticated' } satisfies GateVerdict);
       if (startGate.kind === 'declined') {
         this.setState({
           biometricGate: { kind: 'declined', failure: startGate.failure },
         });
-        return;
-      }
-      if (startGate.kind === 'unanswered') {
-        // The app left 'active' mid-gate; the retry entry points re-run
-        // this method in full.
         return;
       }
     }
@@ -807,12 +800,10 @@ export class LoadingAppClass extends Component<
   };
 
   detachListeners = () => {
-    if (typeof this.appstate.remove === 'function') {
-      this.appstate.remove();
-    }
-    if (typeof this.unsubscribeNetInfo === 'function') {
-      this.unsubscribeNetInfo();
-    }
+    this.appstate?.remove();
+    this.appstate = undefined;
+    this.unsubscribeNetInfo?.();
+    this.unsubscribeNetInfo = undefined;
   };
 
   componentWillUnmount = () => {
@@ -2222,8 +2213,11 @@ export class LoadingAppClass extends Component<
                   firstLaunchingMessage={firstLaunchingMessage}
                   biometricsFailed={biometricGate.kind === 'declined'}
                   message={
-                    biometricGate.kind === 'declined' && biometricGate.failure
-                      ? Utils.renderErrorKeyed(biometricGate.failure, translate)
+                    biometricGate.kind === 'declined'
+                      ? Utils.renderGateFailure(
+                          biometricGate.failure,
+                          translate,
+                        )
                       : undefined
                   }
                   tryAgain={() => {

@@ -992,15 +992,12 @@ export class LoadedAppClass extends Component<
           // (PIN or TouchID or FaceID). Only a decline locks; an
           // 'unavailable' gate passes because it guards nothing and
           // blocking locks the user out of the wallet.
-          const foregroundGate: GateVerdict = this.state.security.foregroundApp
-            ? await gateUntilAnswered(
-                { translate: this.state.translate, purpose: 'appEntry' },
-                // A re-ask for a backgrounded activity is answered
-                // ERROR_CANCELED and would lock; the next foreground pass
-                // re-runs this handler in full.
-                () => AppState.currentState === AppStateStatusEnum.active,
-              )
-            : { kind: 'authenticated' };
+          const foregroundGate = this.state.security.foregroundApp
+            ? await gateUntilAnswered({
+                translate: this.state.translate,
+                purpose: 'appEntry',
+              })
+            : ({ kind: 'authenticated' } satisfies GateVerdict);
           if (foregroundGate.kind === 'declined') {
             // The gate outcome travels with the navigation whole, so the
             // locked screen never reads mutable module state.
@@ -1011,7 +1008,7 @@ export class LoadedAppClass extends Component<
                 failure: foregroundGate.failure,
               },
             });
-          } else if (foregroundGate.kind !== 'unanswered') {
+          } else {
             // reading background task info
             await this.fetchBackgroundSyncInfo();
             // setting value for background task Android

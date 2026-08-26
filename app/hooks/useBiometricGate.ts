@@ -20,8 +20,8 @@ type UseBiometricGateArgs = {
  * Behaviour:
  *   - When `needsAuth` holds (at mount, or when a settings toggle flips it
  *     on while the screen stays mounted): triggers simpleBiometrics.
- *   - On decline: reports what the platform said (the rendered failure,
- *     appended to the standard sentence) and calls `onCancel` (typically
+ *   - On decline: shows the standard sentence, appending the rendered
+ *     failure only for the stalled key, and calls `onCancel` (typically
  *     `navigation.goBack()`).
  *   - On a stalled fail-open: passes, and tells the user the check did not
  *     respond.
@@ -70,7 +70,7 @@ export const useBiometricGate = ({
         // sole trace the wedged-queue class leaves.
         addLastSnackbar(
           verdict.failure.errorKey === 'biometrics-failure-stalled'
-            ? `${translate('biometrics-error') as string} ${Utils.renderErrorKeyed(
+            ? `${translate('biometrics-error') as string} ${Utils.renderGateFailure(
                 verdict.failure,
                 translate,
               )}`
@@ -85,7 +85,7 @@ export const useBiometricGate = ({
       ) {
         // Passing is the fail-open policy for a gate that could not run,
         // and the user should hear that the check did not respond.
-        addLastSnackbar(Utils.renderErrorKeyed(verdict.failure, translate));
+        addLastSnackbar(Utils.renderGateFailure(verdict.failure, translate));
       }
       setAuthPassed(true);
     })();

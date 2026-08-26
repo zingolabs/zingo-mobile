@@ -237,14 +237,18 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const screenName = ScreenEnum.Settings;
 
   // Audit Issue D — single source of truth for security.settingsScreen.
-  // Authorized at entry: the settingsScreen toggle this screen itself
-  // saves must not re-gate the visit mid-save, so the requirement is a
-  // mount-time snapshot rather than a live context read.
-  const [settingsNeedsAuth] = useState<boolean>(
-    !!securityContext.settingsScreen,
-  );
+  // The requirement is live (a toggle flip re-gates, and the
+  // background-return re-gate keeps working) except while this screen's
+  // own save rewrites the security context: re-gating the screen that is
+  // saving blanked the form under an unrequested prompt.
+  const savingSettingsRef = useRef<boolean>(false);
+  const liveNeedsAuth = !!securityContext.settingsScreen;
+  const gateRequirementRef = useRef<boolean>(liveNeedsAuth);
+  if (!savingSettingsRef.current) {
+    gateRequirementRef.current = liveNeedsAuth;
+  }
   const authPassed = useBiometricGate({
-    needsAuth: settingsNeedsAuth,
+    needsAuth: gateRequirementRef.current,
     translate,
     addLastSnackbar,
     onCancel: () => navigation.goBack(),
@@ -753,7 +757,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   // the footer's onPress always invoke the current closure.
   const saveSettingsRef = useRef<() => Promise<void>>(async () => {});
 
-  const saveSettings = async () => {
+  const doSaveSettings = async () => {
     // ───────────────────────────────────────────────────────────────
     // Phase 1: Resolve the target server URI/chain from the picker mode
     // and validate up-front (no I/O yet — purely synchronous guards).
@@ -1079,6 +1083,14 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       navigation.goBack();
     } else {
       navigation.navigate(RouteEnum.HomeStack);
+    }
+  };
+  const saveSettings = async () => {
+    savingSettingsRef.current = true;
+    try {
+      await doSaveSettings();
+    } finally {
+      savingSettingsRef.current = false;
     }
   };
   saveSettingsRef.current = saveSettings;
