@@ -293,6 +293,14 @@ jobs:
         working-directory: android
         run: ./gradlew ${{ steps.channel.outputs.gradle_task }} -PsplitApk=true -PincludeUniversalApk=true
 
+      # R8 runs on release builds only, and every test lane builds debug, so a
+      # missing -keep rule reaches users unchallenged: it happened to
+      # uniffi.zingo_nym_proxy_ffi, which shipped stripped and left Mixnet Mode
+      # dead in the published betas. The generated bindings are the contract;
+      # this fails the release before the APKs are collected and published.
+      - name: Verify R8 kept the uniffi bindings
+        run: bash ./scripts/verify_uniffi_kept_by_r8.sh android/app/build/outputs/apk/${{ steps.channel.outputs.flavor }}/release/*.apk
+
       - name: Collect APKs
         run: |
           set -eu
