@@ -345,28 +345,6 @@ const OptionTitle: React.FunctionComponent<{ children: string }> = ({
   children,
 }) => <BoldText style={{ fontSize: 17, marginBottom: 8 }}>{children}</BoldText>;
 
-// The "coming soon" pill next to an option that isn't shippable yet.
-const SoonTag: React.FunctionComponent<{ children: string }> = ({
-  children,
-}) => (
-  <Text
-    style={{
-      color: IRONWOOD_ACCENT,
-      fontSize: 12,
-      fontWeight: '600',
-      borderWidth: 1,
-      borderColor: IRONWOOD_BORDER,
-      backgroundColor: IRONWOOD_BG,
-      borderRadius: 6,
-      paddingHorizontal: 8,
-      paddingVertical: 2,
-      marginBottom: 8,
-    }}
-  >
-    {children}
-  </Text>
-);
-
 type MeetIronwoodProps = NativeStackScreenProps<
   AppDrawerParamList,
   RouteEnum.MeetIronwood
@@ -617,30 +595,18 @@ const MeetIronwood: React.FunctionComponent<MeetIronwoodProps> = ({
         }}
       />
 
-      {/* Option 3 — split & migrate, not shippable yet, so the whole block is
-          dimmed to read as inactive. */}
-      <View style={{ opacity: 0.5 }}>
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            flexWrap: 'wrap',
-            gap: 10,
-          }}
-        >
-          <OptionTitle>
-            {translate('meetironwood.option3-label') as string}
-          </OptionTitle>
-          <SoonTag>{translate('meetironwood.option3-soon') as string}</SoonTag>
-        </View>
-        <BodyText
-          dimColor={colors.fgMuted}
-          boldColor={colors.fgDefault}
-          marginBottom={0}
-        >
-          {translate('meetironwood.option3-body') as string}
-        </BodyText>
-      </View>
+      {/* Option 3 — split & migrate: the balance splits into standardized
+          notes that later cross in timed batches. */}
+      <OptionTitle>
+        {translate('meetironwood.option3-label') as string}
+      </OptionTitle>
+      <BodyText
+        dimColor={colors.fgMuted}
+        boldColor={colors.fgDefault}
+        marginBottom={0}
+      >
+        {translate('meetironwood.option3-body') as string}
+      </BodyText>
     </View>,
   ];
 

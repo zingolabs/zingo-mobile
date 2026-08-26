@@ -74,7 +74,10 @@ import { getLatestBlockServerInfo } from '../../app/walletBackend';
 import { isEqual } from 'lodash';
 import ChainTypeToggle from '../Components/ChainTypeToggle';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
-import { hasDeviceSecurity } from '../../app/simpleBiometrics';
+import {
+  DeviceSecurityProbe,
+  probeDeviceSecurity,
+} from '../../app/simpleBiometrics';
 import { useBiometricGate } from '../../app/hooks/useBiometricGate';
 import SelectBottomSheet from '../Components/SelectBottomSheet';
 import BottomSheet, {
@@ -237,14 +240,27 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const screenName = ScreenEnum.Settings;
 
   // Audit Issue D — single source of truth for security.settingsScreen.
-  const authPassed = useBiometricGate({
-    needsAuth: !!securityContext.settingsScreen,
+  // The requirement follows the live context except while this screen's
+  // own save rewrites it. The sync runs in an effect, so the thaw is a
+  // rendered state change at a deterministic moment, never a stale ref.
+  const [savingSettings, setSavingSettings] = useState<boolean>(false);
+  const liveNeedsAuth = !!securityContext.settingsScreen;
+  const [gateRequirement, setGateRequirement] =
+    useState<boolean>(liveNeedsAuth);
+  useEffect(() => {
+    if (!savingSettings) {
+      setGateRequirement(liveNeedsAuth);
+    }
+  }, [savingSettings, liveNeedsAuth]);
+  const screenGate = useBiometricGate({
+    needsAuth: gateRequirement,
     translate,
     addLastSnackbar,
     onCancel: () => navigation.goBack(),
     foregroundAppEnabled: !!securityContext.foregroundApp,
     foregroundEpoch,
   });
+  const authPassed = screenGate.kind === 'passed';
 
   const [autoServerUri, setAutoServerUri] = useState<string>('');
   const [autoServerChainName, setAutoServerChainName] = useState<string>('');
@@ -335,7 +351,11 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const [showDeveloperOptions, setShowDeveloperOptions] =
     useState<boolean>(false);
   const [openInfoSection, setOpenInfoSection] = useState<string | null>(null);
-  const [deviceHasSecurity, setDeviceHasSecurity] = useState<boolean>(true);
+  // Seeded optimistically. The union names the probe's answer instead of
+  // collapsing it to a bit at this edge.
+  const [deviceSecurity, setDeviceSecurity] = useState<DeviceSecurityProbe>({
+    kind: 'secured',
+  });
 
   // Bottom-sheet measurements — Settings has no balance area, so the sheet
   // uses a single snap at the maximum height (just below the screen Header).
@@ -391,11 +411,33 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
 
   const settingsSnapPoints = useFullSheetSnapPoints(containerH, headerH);
 
+  const probedRef = useRef<boolean>(false);
   useEffect(() => {
+    // Probe once, after the gate first settles: the probe queues behind
+    // this screen's own gate prompt on the serialized keychain queue, a
+    // stalled probe answers nothing, and the enrolled-lock answer cannot
+    // change while the user stays in this app.
+    if (!authPassed || probedRef.current) {
+      return;
+    }
+    probedRef.current = true;
+    let cancelled = false;
     (async () => {
-      setDeviceHasSecurity(await hasDeviceSecurity());
+      const probe = await probeDeviceSecurity();
+      if (cancelled) {
+        return;
+      }
+      if (
+        probe.kind === 'secured' ||
+        probe.failure.errorKey !== 'biometrics-failure-stalled'
+      ) {
+        setDeviceSecurity(probe);
+      }
     })();
-  }, []);
+    return () => {
+      cancelled = true;
+    };
+  }, [authPassed]);
 
   useEffect(() => {
     (async () => {
@@ -735,7 +777,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   // the footer's onPress always invoke the current closure.
   const saveSettingsRef = useRef<() => Promise<void>>(async () => {});
 
-  const saveSettings = async () => {
+  const doSaveSettings = async () => {
     // ───────────────────────────────────────────────────────────────
     // Phase 1: Resolve the target server URI/chain from the picker mode
     // and validate up-front (no I/O yet — purely synchronous guards).
@@ -1061,6 +1103,14 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       navigation.goBack();
     } else {
       navigation.navigate(RouteEnum.HomeStack);
+    }
+  };
+  const saveSettings = async () => {
+    setSavingSettings(true);
+    try {
+      await doSaveSettings();
+    } finally {
+      setSavingSettings(false);
     }
   };
   saveSettingsRef.current = saveSettings;
@@ -1935,7 +1985,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                       </View>
                     </TouchableOpacity>
                   </View>
-                  {!deviceHasSecurity && (
+                  {deviceSecurity.kind === 'insecure' && (
                     <FadeText style={{ marginTop: 6 }}>
                       {
                         translate(
