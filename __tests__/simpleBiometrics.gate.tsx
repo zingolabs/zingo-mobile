@@ -512,7 +512,7 @@ test('a stalled security probe reports stalled, not no-security', async () => {
   // Settings must be able to tell "the probe did not answer" from "no
   // device lock is enrolled" instead of disabling the toggles on a stall.
   await expect(probe).resolves.toMatchObject({
-    secure: false,
+    kind: 'insecure',
     failure: { errorKey: 'biometrics-failure-stalled' },
   });
 });

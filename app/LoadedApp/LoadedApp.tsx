@@ -652,7 +652,7 @@ export default function LoadedApp(props: LoadedAppProps) {
       <Launching
         translate={translate}
         firstLaunchingMessage={LaunchingModeEnum.opening}
-        biometricsFailed={false}
+        biometricGate={{ kind: 'passed' }}
       />
     );
   } else {

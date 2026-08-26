@@ -103,7 +103,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
   // brief window after auth where the Confirm button can be pressed
   // without re-authenticating. Native stack remounts the screen on each
   // navigation, so leaving and coming back forces a fresh prompt.
-  const authPassed = useBiometricGate({
+  const screenGate = useBiometricGate({
     needsAuth: !!security?.sendConfirm,
     translate,
     addLastSnackbar,
@@ -111,6 +111,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     foregroundAppEnabled: !!security?.foregroundApp,
     foregroundEpoch,
   });
+  const authPassed = screenGate.kind === 'passed';
 
   const [sendingTotal, setSendingTotal] = useState<number>(0);
 
