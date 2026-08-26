@@ -81,8 +81,9 @@ host and port, and no wallet configuration.
 For the client-to-gateway leg, `zingo-netutils` gains a public
 `BootstrapEvent` enum with five lifecycle variants: `DiscoveryStarted`,
 `DiscoveryFinished` with the candidate count, `PullLaunched` and
-`PullFailed` with the Exit Node address (the failure stays prose, as it
-already is inside `RaceEvent`), and `Connected` with the winner. The
+`PullFailed` with the Exit Node address (carrying the pull's whole
+typed `NetOpFailure`, ruled over prose so a diagnostics surface renders
+structure instead of parsing it), and `Connected` with the winner. The
 driver resolves arm indices to Exit Node addresses. The planner's
 hedging mechanics stay private. Every race reports, the first
 bootstrap and each reconnect alike, so the screen never goes blind at
