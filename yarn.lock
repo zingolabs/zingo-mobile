@@ -2103,10 +2103,10 @@
     color "^4.2.3"
     sf-symbols-typescript "^2.1.0"
 
-"@react-navigation/core@^7.21.12":
-  version "7.21.12"
-  resolved "https://registry.yarnpkg.com/@react-navigation/core/-/core-7.21.12.tgz#79ad9aa6bd07951eb0ad467a5d90166ce0da9e93"
-  integrity sha512-FopGMGy5df+IMqUYg9w7ygwK0oP4RaQbMnpb7VFP30+vZdd8MqsAGc+bZZwdiVSnzK9hzhgJtZV9XF0ZFlUYOQ==
+"@react-navigation/core@^7.21.13":
+  version "7.21.13"
+  resolved "https://registry.yarnpkg.com/@react-navigation/core/-/core-7.21.13.tgz#30948e4f3ba00a8bf9e9f10ec6dee972d42530f8"
+  integrity sha512-d1syMXra7RlJjGsjsIxEA14F6U+awFtQJeOfDc+V7x3y1mPqYQVTYnqnt3PR+fBBouUKaKsgKZsSR3MP5919Xg==
   dependencies:
     "@react-navigation/routers" "^7.6.4"
     escape-string-regexp "^4.0.0"
@@ -2136,12 +2136,12 @@
     sf-symbols-typescript "^2.1.0"
     warn-once "^0.1.1"
 
-"@react-navigation/native@^7.3.16":
-  version "7.3.16"
-  resolved "https://registry.yarnpkg.com/@react-navigation/native/-/native-7.3.16.tgz#0afb1dc595bf68ff53308fd7d65837b4423afab1"
-  integrity sha512-Wy/6mai2HpA5AEVFk7JFfvv4RUArwuN2UenP/fc3NK7kOyfSlNu1tmb/3JDPpMzPIRbF1MPB8PKAHjVB29qNEQ==
+"@react-navigation/native@^7.3.17":
+  version "7.3.17"
+  resolved "https://registry.yarnpkg.com/@react-navigation/native/-/native-7.3.17.tgz#cd5a002ecbdc215521351f2e6b0c96b3b6d5a0a1"
+  integrity sha512-DQVraYcaWIiYrmqsmOunPSGQjjjxfKD6quZ+P4ycujW870CFCAdRQ9cmgE+v8O0YjuOUCnIDoOrqK53rl5zDDw==
   dependencies:
-    "@react-navigation/core" "^7.21.12"
+    "@react-navigation/core" "^7.21.13"
     escape-string-regexp "^4.0.0"
     fast-deep-equal "^3.1.3"
     nanoid "^3.3.11"
@@ -7640,12 +7640,7 @@ nan@^2.14.0:
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.27.0.tgz#804e389f4c0e39b729a17eca85c80ebc4355c4c4"
   integrity sha512-hC+0LidcL3XE4rp1C4H54KujgXKzbfyTngZTwBByQxsOxCEKZT0MPQ4hOKUH2jU1OYstqdDH4onyHPDzcV0XdQ==
 
-nanoid@^3.3.1, nanoid@^3.3.11:
-  version "3.3.12"
-  resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-3.3.12.tgz#ab3d912e217a6d0a514f00a72a16543a28982c05"
-  integrity sha512-ZB9RH/39qpq5Vu6Y+NmUaFhQR6pp+M2Xt76XBnEwDaGcVAqhlvxrl3B2bKS5D3NH3QR76v3aSrKaF/Kiy7lEtQ==
-
-nanoid@^3.3.17:
+nanoid@^3.3.1, nanoid@^3.3.11, nanoid@^3.3.17:
   version "3.3.18"
   resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-3.3.18.tgz#f66a2de1199ffde0fcf21c8a5f13106b1c081913"
   integrity sha512-DTg4MJbGMWkfi6VZFdNt2/caMbQy4Ou+Op/hJQvGEWcnVfoA1QA+xzRKAzw9jD6+GVOOeYr/mIcuDSdug6F6+w==
