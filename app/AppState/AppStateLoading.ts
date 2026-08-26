@@ -3,6 +3,7 @@ import { AppStateStatus } from 'react-native';
 import { LaunchingModeEnum } from './enums/LaunchingModeEnum';
 import { RouteEnum } from './enums/RouteEnum';
 import WalletType from './types/WalletType';
+import type { GateFailure } from '../simpleBiometrics';
 
 export default interface AppStateLoading {
   wallet: WalletType;
@@ -18,6 +19,9 @@ export default interface AppStateLoading {
   customServerAuto: boolean;
   customServerCustom: boolean;
   biometricsFailed: boolean;
+  // Snapshotted at decline time so the locked screen's message cannot be
+  // rewritten or wiped by a later gate run mutating the module global.
+  gateFailure?: GateFailure;
   startingApp: boolean;
   serverErrorTries: number;
   donationAlert: boolean;
