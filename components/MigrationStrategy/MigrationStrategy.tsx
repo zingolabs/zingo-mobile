@@ -14,8 +14,8 @@ import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import BoldText from '../Components/BoldText';
 import Button from '../Components/Button';
-import { mixnetPhase } from '../Header/components/MixnetIcon';
 import NymGateSheet from './components/NymGateSheet';
+import { deriveNymGateState } from './components/nymGateState';
 import { AppDrawerParamList } from '../../app/types';
 import { AppTheme } from '../../app/theme';
 import { ContextAppLoaded } from '../../app/context';
@@ -33,7 +33,7 @@ type MigrationStrategyProps = NativeStackScreenProps<
 
 // Migration choices: opt out entirely ('none', the default), the immediate
 // drain ('now'), or the private two-phase path ('private': split notes, then
-// send batches inside scheduled windows — not shippable yet).
+// send batches inside scheduled windows).
 type StrategyOption = 'none' | 'now' | 'private';
 
 // Renders a translated string, bolding `**…**` spans in `highlight` and
@@ -197,11 +197,7 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
   // Held from the Enable tap until the transport is ready, mirroring the send
   // toggle: the button reads disabled-and-connecting until then.
   const [enabling, setEnabling] = useState<boolean>(false);
-  const nymPhase =
-    mixnetView !== null
-      ? mixnetPhase(mixnetView.statusKey, mixnetView.reconnecting)
-      : null;
-  const nymLoading = enabling || nymPhase === 'connecting';
+  const nymGate = deriveNymGateState(enabling, mixnetView);
 
   // Leaving the migration flow returns to Home. Reset (not goBack) so the
   // one-way onboarding/migration stack isn't left underneath to return to.
@@ -218,21 +214,23 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
     );
   }, [navigation, selected]);
 
-  // Ends the enable wait once the transport settles.
+  // Ends the enable wait once the transport settles: ready continues the
+  // migration, a lost transport releases the button. A reconnecting
+  // bootstrap is neither, so the wait holds through the blip.
   useEffect(() => {
     if (!enabling) {
       return;
     }
-    if (nymPhase === 'ready') {
+    if (nymGate.kind === 'ready') {
       setEnabling(false);
       nymSheetRef.current?.dismiss();
       startMigration();
       return;
     }
-    if (nymPhase === 'lost' || nymPhase === 'reconnecting') {
+    if (nymGate.kind === 'failed') {
       setEnabling(false);
     }
-  }, [enabling, nymPhase, startMigration]);
+  }, [enabling, nymGate.kind, startMigration]);
 
   // Orchard balance shown so the user sees what would cross the pool boundary
   // (and become publicly visible) on the immediate path.
@@ -344,7 +342,7 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
                 return;
               }
               if (nym) {
-                if (nymPhase === 'ready') {
+                if (nymGate.kind === 'ready') {
                   startMigration();
                   return;
                 }
@@ -359,13 +357,7 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
 
       <NymGateSheet
         ref={nymSheetRef}
-        loading={nymLoading}
-        failureKey={
-          (nymPhase === 'lost' || nymPhase === 'reconnecting') &&
-          mixnetView !== null
-            ? mixnetView.statusKey
-            : undefined
-        }
+        gate={nymGate}
         onDismiss={() => setEnabling(false)}
         onContinue={() => {
           setEnabling(false);
