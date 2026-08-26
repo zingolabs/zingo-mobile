@@ -50,7 +50,6 @@ type RnMock = {
 
 let simpleBiometrics: GateModule['default'];
 let getLastGateFailure: GateModule['getLastGateFailure'];
-let releaseBlanking: GateModule['releaseBlanking'];
 let blankingEvent: GateModule['BIOMETRIC_BLANKING_EVENT'];
 let kc: Record<string, jest.Mock>;
 let rn: RnMock;
@@ -72,7 +71,6 @@ beforeEach(() => {
   const gate: GateModule = require('../app/simpleBiometrics');
   simpleBiometrics = gate.default;
   getLastGateFailure = gate.getLastGateFailure;
-  releaseBlanking = gate.releaseBlanking;
   blankingEvent = gate.BIOMETRIC_BLANKING_EVENT;
   kc.canImplyAuthentication.mockResolvedValue(true);
   kc.resetGenericPassword.mockResolvedValue(true);
@@ -214,7 +212,7 @@ test('a wedged call under an unknown app state still settles', async () => {
   expect(verdict).toMatchObject({ kind: 'unavailable' });
 });
 
-test('a retry while a stranded call pends does not stack a second prompt', async () => {
+test('a retry after a stalled gate starts a fresh run immediately', async () => {
   jest.useFakeTimers();
   rn.Platform.OS = 'android';
   kc.getSupportedBiometryType.mockResolvedValue('Fingerprint');
@@ -228,29 +226,21 @@ test('a retry while a stranded call pends does not stack a second prompt', async
   await jest.advanceTimersByTimeAsync(60 * 1000);
   expect(first).toMatchObject({ kind: 'declined' });
 
-  // Try Again: the stranded read is still pending inside the native module,
-  // and a fresh prompt stacked on it is answered with ERROR_CANCELED, so no
-  // new keychain call may go out until the strand settles.
-  let second: GateVerdict | undefined;
-  simpleBiometrics({ translate, purpose: 'appEntry' }).then(v => {
-    second = v;
-  });
-  await jest.advanceTimersByTimeAsync(60 * 1000);
-  expect(second).toMatchObject({ kind: 'declined' });
-  expect(kc.getGenericPassword).toHaveBeenCalledTimes(1);
+  // Try Again issues a fresh prompt at once, even though the first read is
+  // still pending in the native module. The collision can answer the fresh
+  // prompt ERROR_CANCELED, one bounded and retriable decline; holding the
+  // retry back instead made a never-settling call a permanent lock.
+  simpleBiometrics({ translate, purpose: 'appEntry' });
+  await jest.advanceTimersByTimeAsync(1000);
+  expect(kc.getGenericPassword).toHaveBeenCalledTimes(2);
 });
 
-test('an android stall keeps the blanking overlay up until the stranded call settles', async () => {
+test('the blanking overlay drops at the verdict, prompt or no prompt', async () => {
   jest.useFakeTimers();
   rn.Platform.OS = 'android';
   kc.getSupportedBiometryType.mockResolvedValue('Fingerprint');
   kc.hasGenericPassword.mockResolvedValue(true);
-  let servePrompt: (cred: { password: string }) => void = () => {};
-  kc.getGenericPassword.mockReturnValue(
-    new Promise(resolve => {
-      servePrompt = resolve;
-    }),
-  );
+  kc.getGenericPassword.mockReturnValue(new Promise(() => {}));
 
   let verdict: GateVerdict | undefined;
   simpleBiometrics({ translate, purpose: 'appEntry' }).then(v => {
@@ -258,15 +248,9 @@ test('an android stall keeps the blanking overlay up until the stranded call set
   });
   await jest.advanceTimersByTimeAsync(60 * 1000);
   expect(verdict).toMatchObject({ kind: 'declined' });
-  // The prompt may still be on screen; dropping the overlay here exposes
-  // wallet content behind it (Audit Issue C).
-  expect(rn.DeviceEventEmitter.emit).not.toHaveBeenCalledWith(
-    blankingEvent,
-    false,
-  );
-
-  servePrompt({ password: '1' });
-  await jest.advanceTimersByTimeAsync(0);
+  // The stranded prompt may still be on screen; dropping anyway trades a
+  // bounded exposure behind it for never burying a screen under a black,
+  // dead overlay.
   expect(rn.DeviceEventEmitter.emit).toHaveBeenCalledWith(blankingEvent, false);
 });
 
@@ -407,60 +391,6 @@ test('an authentication that outlasts the window locks, then recovers on the nex
   expect(kc.getGenericPassword).toHaveBeenCalledTimes(2);
 });
 
-test('a never-settling strand drops the blanking overlay after a bounded wait', async () => {
-  jest.useFakeTimers();
-  rn.Platform.OS = 'android';
-  kc.getSupportedBiometryType.mockResolvedValue('Fingerprint');
-  kc.hasGenericPassword.mockResolvedValue(true);
-  kc.getGenericPassword.mockReturnValue(new Promise(() => {}));
-
-  let verdict: GateVerdict | undefined;
-  simpleBiometrics({ translate, purpose: 'appEntry' }).then(v => {
-    verdict = v;
-  });
-  await jest.advanceTimersByTimeAsync(60 * 1000);
-  expect(verdict).toMatchObject({ kind: 'declined' });
-  expect(rn.DeviceEventEmitter.emit).not.toHaveBeenCalledWith(
-    blankingEvent,
-    false,
-  );
-  // A screen-gate decline lands back on wallet content with the stranded
-  // prompt possibly still live, so the overlay holds for the full policy
-  // window rather than the probe window.
-  await jest.advanceTimersByTimeAsync(10 * 1000);
-  expect(rn.DeviceEventEmitter.emit).not.toHaveBeenCalledWith(
-    blankingEvent,
-    false,
-  );
-  // Past the policy window the strand's prompt is treated as absent, the
-  // same assumption the stall verdict already made.
-  await jest.advanceTimersByTimeAsync(50 * 1000);
-  expect(rn.DeviceEventEmitter.emit).toHaveBeenCalledWith(blankingEvent, false);
-});
-
-test('releaseBlanking drops the overlay for a caller on a lock surface', async () => {
-  jest.useFakeTimers();
-  rn.Platform.OS = 'android';
-  kc.getSupportedBiometryType.mockResolvedValue('Fingerprint');
-  kc.hasGenericPassword.mockResolvedValue(true);
-  kc.getGenericPassword.mockReturnValue(new Promise(() => {}));
-
-  let verdict: GateVerdict | undefined;
-  simpleBiometrics({ translate, purpose: 'appEntry' }).then(v => {
-    verdict = v;
-  });
-  await jest.advanceTimersByTimeAsync(60 * 1000);
-  expect(verdict).toMatchObject({ kind: 'declined' });
-  expect(rn.DeviceEventEmitter.emit).not.toHaveBeenCalledWith(
-    blankingEvent,
-    false,
-  );
-  // The app-level callers navigate to a lock surface on decline; nothing
-  // sensitive sits behind the overlay there, so they drop it explicitly.
-  releaseBlanking();
-  expect(rn.DeviceEventEmitter.emit).toHaveBeenCalledWith(blankingEvent, false);
-});
-
 test('a cancelled screen prompt does not relock the app gate', async () => {
   kc.hasGenericPassword.mockResolvedValue(true);
   let refuse: (e: Error) => void = () => {};
@@ -596,7 +526,7 @@ test('an unexpected probe rejection is unavailable, nobody was asked', async () 
   expect(kc.getGenericPassword).not.toHaveBeenCalled();
 });
 
-test('an ios retry during a stranded call proceeds by the ios policy', async () => {
+test('an ios retry after a stalled gate also runs fresh', async () => {
   jest.useFakeTimers();
   kc.hasGenericPassword.mockResolvedValue(true);
   kc.getGenericPassword.mockReturnValue(new Promise(() => {}));
@@ -608,13 +538,9 @@ test('an ios retry during a stranded call proceeds by the ios policy', async () 
   await jest.advanceTimersByTimeAsync(11 * 1000); // window plus veto grace
   expect(first).toMatchObject({ kind: 'unavailable' });
 
-  let second: GateVerdict | undefined;
-  simpleBiometrics({ translate, purpose: 'appEntry' }).then(v => {
-    second = v;
-  });
-  await jest.advanceTimersByTimeAsync(10 * 1000); // probe window, no grace
-  expect(second).toMatchObject({ kind: 'unavailable' });
-  expect(kc.getGenericPassword).toHaveBeenCalledTimes(1);
+  simpleBiometrics({ translate, purpose: 'appEntry' });
+  await jest.advanceTimersByTimeAsync(1000);
+  expect(kc.getGenericPassword).toHaveBeenCalledTimes(2);
 });
 
 test('the foreground-flag restore completes before the verdict', async () => {
@@ -644,31 +570,6 @@ test('the foreground-flag restore completes before the verdict', async () => {
   expect(verdict).toMatchObject({ kind: 'authenticated' });
 });
 
-test('a retry during a stranded call answers within the probe window', async () => {
-  jest.useFakeTimers();
-  rn.Platform.OS = 'android';
-  kc.getSupportedBiometryType.mockResolvedValue('Fingerprint');
-  kc.hasGenericPassword.mockResolvedValue(true);
-  kc.getGenericPassword.mockReturnValue(new Promise(() => {}));
-
-  let first: GateVerdict | undefined;
-  simpleBiometrics({ translate, purpose: 'appEntry' }).then(v => {
-    first = v;
-  });
-  await jest.advanceTimersByTimeAsync(60 * 1000);
-  expect(first).toMatchObject({ kind: 'declined' });
-
-  // A human tapped Unlock; holding the tap for another silent minute is a
-  // dead screen. The wait exists only to avoid a prompt collision, and ten
-  // seconds decides that.
-  let second: GateVerdict | undefined;
-  simpleBiometrics({ translate, purpose: 'appEntry' }).then(v => {
-    second = v;
-  });
-  await jest.advanceTimersByTimeAsync(10 * 1000);
-  expect(second).toMatchObject({ kind: 'declined' });
-  expect(kc.getGenericPassword).toHaveBeenCalledTimes(1);
-});
 
 test('a fresh sentinel the platform will not serve fails open, not locked', async () => {
   // errSecInteractionNotAllowed: the OS refused to run the prompt at all,

@@ -175,15 +175,6 @@ const interactiveStallPolicy = (): InteractiveStallPolicy =>
 
 const STALLED = Symbol('keychain-stalled');
 
-const swallow = () => undefined;
-
-// Native calls that lost their stall race but are still pending inside the
-// native module — their eventual prompt and result belong to nobody. The
-// gate lifecycle below waits on them so a retry never stacks a second
-// prompt on top of one, and the Android blanking overlay stays up until
-// they settle.
-let strandedCalls: Array<Promise<undefined>> = [];
-
 // The countdown for an interactive call runs only while the app is observed
 // 'active'. Leaving 'active' pauses it and returning re-arms it in full, so
 // time the OS parks on a human never counts toward a stall, and a queue
@@ -223,9 +214,6 @@ const stallGuard = <T>(
         // was carrying, and the handler below re-arms on the way back.
         pause();
         return;
-      }
-      if (interactive) {
-        strandedCalls.push(op.then(swallow, swallow));
       }
       resolve(STALLED);
     };
@@ -278,8 +266,7 @@ type GuardedOp =
   | 'setGenericPassword'
   | 'getGenericPassword'
   | 'requestAnimationFrame'
-  | 'AsyncStorage.setItem'
-  | 'strandedCall';
+  | 'AsyncStorage.setItem';
 
 type Guarded<T> =
   | { kind: 'settled'; value: T }
@@ -473,33 +460,6 @@ const attemptGate = async (
   }
 };
 
-// Audit Issue C: the overlay hides wallet content behind Android's
-// partial-screen prompt. A stranded call may still have that prompt on
-// screen when the verdict comes back, so the overlay stays up until every
-// strand settles.
-/** Drops the Android blanking overlay now, for a caller whose decline landed on a surface with nothing sensitive behind it. */
-export const releaseBlanking = (): void => {
-  DeviceEventEmitter.emit(BIOMETRIC_BLANKING_EVENT, false);
-};
-
-const hideBlankingWhenClear = (): void => {
-  if (strandedCalls.length === 0) {
-    DeviceEventEmitter.emit(BIOMETRIC_BLANKING_EVENT, false);
-    return;
-  }
-  // A stranded prompt may still be on screen over wallet content (a
-  // screen-gate decline lands back on a content screen), so the overlay
-  // holds for the policy window — past it the prompt is treated as absent,
-  // the same assumption the stall verdict made. A caller on a lock surface
-  // drops it sooner via releaseBlanking.
-  const capped = new Promise<undefined>(resolve =>
-    setTimeout(() => resolve(undefined), interactiveStallPolicy().windowMs),
-  );
-  Promise.race([Promise.all(strandedCalls).then(swallow), capped]).finally(
-    () => DeviceEventEmitter.emit(BIOMETRIC_BLANKING_EVENT, false),
-  );
-};
-
 const runGate = async (props: simpleBiometricsProps): Promise<GateVerdict> => {
   // Pre-flight: if the device cannot authenticate at all (no biometry, no
   // passcode), short-circuit so the caller can decide whether to allow the
@@ -592,7 +552,11 @@ const runGate = async (props: simpleBiometricsProps): Promise<GateVerdict> => {
     });
   } finally {
     if (Platform.OS === 'android') {
-      hideBlankingWhenClear();
+      // Dropped at the verdict even though a call from this run may still
+      // hold its prompt on screen: the bounded exposure behind that prompt
+      // costs less than burying a screen under a black, dead overlay while
+      // a never-settling call pends (Audit Issue C accepted the trade).
+      DeviceEventEmitter.emit(BIOMETRIC_BLANKING_EVENT, false);
     }
     // iOS treats the auth prompt as the app going to background; restore the
     // foreground flag so background-state handling doesn't trip. Guarded: a
@@ -604,44 +568,27 @@ const runGate = async (props: simpleBiometricsProps): Promise<GateVerdict> => {
 };
 
 // The gate's process-wide lifecycle. `running` shares the run in flight so
-// concurrent callers never stack prompts. `strandedCall` is the state a
-// bare Promise-or-undefined cache cannot represent: the verdict is out but
-// a native call is still pending, and a fresh run started against it
-// collides (Android answers the collision with ERROR_CANCELED, re-locking
-// every retry). A caller arriving then waits for the strand under the
-// stall window before running.
+// concurrent callers never stack prompts. A settled verdict always returns
+// to `idle`: a retry starts a fresh run with a fresh prompt, even while a
+// call from an earlier run is still pending inside the native module. The
+// collision can answer the fresh prompt ERROR_CANCELED, one bounded and
+// retriable decline; blocking the retry instead proved worse, because a
+// call that never settles turned Try Again into a permanent lock — the
+// issue #1266 trap this module exists to keep unreachable.
 type GateLifecycle =
   | { stage: 'idle' }
   | {
       stage: 'running';
       purpose: GatePurpose;
       verdictOut: Promise<GateVerdict>;
-    }
-  | { stage: 'strandedCall'; settled: Promise<undefined> };
+    };
 
 let lifecycle: GateLifecycle = { stage: 'idle' };
 
-const settleLifecycle = (): void => {
-  if (strandedCalls.length === 0) {
-    lifecycle = { stage: 'idle' };
-    return;
-  }
-  const strandSettled = Promise.all(strandedCalls).then(swallow);
-  strandedCalls = [];
-  const stranded: GateLifecycle = {
-    stage: 'strandedCall',
-    settled: strandSettled,
-  };
-  lifecycle = stranded;
-  strandSettled.then(() => {
-    if (lifecycle === stranded) {
-      lifecycle = { stage: 'idle' };
-    }
-  });
-};
-
 const startRun = (props: simpleBiometricsProps): Promise<GateVerdict> => {
-  const verdictOut = runGate(props).finally(settleLifecycle);
+  const verdictOut = runGate(props).finally(() => {
+    lifecycle = { stage: 'idle' };
+  });
   lifecycle = { stage: 'running', purpose: props.purpose, verdictOut };
   return verdictOut;
 };
@@ -666,31 +613,6 @@ const simpleBiometrics = (
       return running.verdictOut.then(verdict =>
         verdict.kind === 'declined' ? simpleBiometrics(props) : verdict,
       );
-    }
-    case 'strandedCall': {
-      const stranded = lifecycle;
-      // The wait exists only to keep a fresh prompt from colliding with
-      // the stranded call, and the probe window decides that; the guard is
-      // non-interactive so the strand is not re-entered into strandedCalls.
-      const verdictOut = guarded(
-        'strandedCall',
-        false,
-        () => stranded.settled,
-      ).then(strand => {
-        if (strand.kind === 'stalled') {
-          const stall = interactiveStall(strand.failure);
-          // The same stranded object, so its settlement still returns the
-          // lifecycle to idle.
-          lifecycle = stranded;
-          return recordVerdict({
-            kind: stall.settleAs,
-            failure: stall.failure,
-          });
-        }
-        return runGate(props).finally(settleLifecycle);
-      });
-      lifecycle = { stage: 'running', purpose: props.purpose, verdictOut };
-      return verdictOut;
     }
     case 'idle':
       return startRun(props);
