@@ -23,15 +23,13 @@ type WalletRecoveryModalProps = {
   // One line per wallet file, e.g. "wallet.dat: encrypted twice".
   diagnosisLines: string;
   translate: (key: string) => TranslateType;
-  // Copy is the primary path and does not close the sheet, so the person
-  // can copy and then still restore or read on.
+  // The primary action; it does not close the sheet.
   onCopy: () => void;
   // Absent hides the button (no intact backup to restore).
   onRestoreBackup?: () => void;
   onSupport: () => void;
   onCancel: () => void;
-  // Fires on any dismissal, including the Android back button; the host
-  // clears its state here so the sheet can be shown again later.
+  // Fires on any dismissal, including the Android back button.
   onDismiss?: () => void;
 };
 
@@ -64,7 +62,6 @@ const WalletRecoveryModal: React.FunctionComponent<
   }, [visible]);
 
   // No swipe or backdrop tap; a button or the Android back button closes it.
-  // onDismiss lets the host reset its state on the back-button path too.
   const renderBackdrop = useCallback(
     (props: BottomSheetBackdropProps) => (
       <BottomSheetBackdrop

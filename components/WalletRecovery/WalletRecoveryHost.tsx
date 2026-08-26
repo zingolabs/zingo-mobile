@@ -35,8 +35,7 @@ const WalletRecoveryHost: React.FunctionComponent = () => {
       }
       onSupport={() => options && close(options.onSupport)}
       onCancel={() => options && close(options.onCancel)}
-      // Clear state on any dismissal, including the Android back button, so
-      // the sheet is not wedged open (visible stays true) for the session.
+      // Clear state on any dismissal, including the Android back button.
       onDismiss={() => setOptions(null)}
     />
   );

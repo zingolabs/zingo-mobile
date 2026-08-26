@@ -1127,12 +1127,7 @@ export class LoadingAppClass extends Component<
     }
   };
 
-  // Android classifies the wallet files natively (2.0.21 double-wrap
-  // incident). Any repairable file is repaired without asking (the repair
-  // keeps a .prerepair copy, so nothing is destroyed), then the wallet
-  // reloads. A broken main file that no repair fixes gets the recovery
-  // alert with a shareable report and, when the backup is intact, a
-  // one-tap restore.
+  // A repairable file is repaired and reloaded, and a broken main that no repair fixes opens the recovery dialog.
   walletLoadFailed = async (errorText: string) => {
     const title = this.state.translate(
       'loadingapp.readingwallet-label',
@@ -1150,10 +1145,7 @@ export class LoadingAppClass extends Component<
       await this.repairWalletFiles(title, errorText);
       return;
     }
-    // plainLegacy opens through readFileAsB64's legacy fallback, so it is not
-    // broken; only undecryptable/doubleWrapped/unknown are. Treating a legacy
-    // wallet as broken would offer the destructive Restore Backup for an
-    // unrelated load failure.
+    // plainLegacy opens through the legacy fallback, so only undecryptable, doubleWrapped, and unknown count as broken.
     const main = report.files.find(f => f.name === WALLET_FILE_NAME);
     const openableStates: ReadonlySet<WalletFileDiagnosis['state']> = new Set([
       'plainWallet',
@@ -1195,8 +1187,7 @@ export class LoadingAppClass extends Component<
       )
       .join('\n');
 
-  // Support-facing, deliberately untranslated: one run must carry the whole
-  // evidence, because a tester round-trip costs weeks.
+  // Builds the untranslated support report copied and emailed from the dialog.
   walletRecoveryReportText = (
     errorText: string,
     report: WalletFileDiagnosisReport,

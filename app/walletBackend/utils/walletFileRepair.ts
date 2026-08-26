@@ -101,9 +101,7 @@ export async function walletFileDiagnosis(): Promise<WalletFileDiagnosisReport> 
   }
 }
 
-// Only the two files the native repair actually rewrites. A repairable twin
-// (a .write.tmp or the swap temp) must not trigger auto-repair, or the repair
-// no-ops on the real files and the load-fail/reload cycle never terminates.
+// The two files the native repair rewrites; a repairable twin must not trigger auto-repair.
 const REPAIR_TARGET_NAMES: ReadonlySet<string> = new Set([
   WALLET_FILE_NAME,
   WALLET_BACKUP_FILE_NAME,

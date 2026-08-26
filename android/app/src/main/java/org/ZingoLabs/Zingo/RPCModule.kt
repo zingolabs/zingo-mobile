@@ -441,9 +441,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     // encrypted file after a transient Keystore failure, and zingolib then
     // reported "Failed to read wallet version <huge number>".
 
-    // Only names that decrypt under their own name (the file name is the AAD).
-    // `.prerepair`/`.migrating`/`.broken` are raw copies decryptable only under
-    // the original name, so diagnosing them would always read as undecryptable.
+    // Names that decrypt under their own name; raw copies like .prerepair are excluded.
     private fun walletFileNames(): List<String> =
         listOf(WalletFileName.value, WalletBackupFileName.value).flatMap {
             listOf(it, "$it.write.tmp")
@@ -696,11 +694,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 val wallet = try {
                     readFileAsB64(WalletFileName.value)
                 } catch (e: Exception) {
-                    // An undecryptable main is the case Restore Backup exists
-                    // for. It cannot be re-encoded into the backup slot, so
-                    // preserve its raw bytes aside (still the double-wrap repair
-                    // source) and restore the backup as the sole good copy in
-                    // both slots, as in the no-main branch.
+                    // Keep the unreadable main's raw bytes aside and restore the backup into both slots.
                     Log.w("MAIN", "[Native] backup restore: main unreadable, preserving raw and restoring backup: $e")
                     File(applicationContext.filesDir, WalletFileName.value)
                         .copyTo(File(applicationContext.filesDir, "${WalletFileName.value}.broken"), overwrite = true)
