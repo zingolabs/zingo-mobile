@@ -1,13 +1,24 @@
 # Disable obfuscation — keep class names readable for crash reports
 -dontobfuscate
 
-# UniFFI-generated Kotlin bindings (uniffi.zingo package).
+# UniFFI-generated Kotlin bindings (every uniffi.* package).
 # These are loaded reflectively by JNA from the Rust side at runtime;
 # R8 cannot see the usage statically.
--keep class uniffi.zingo.** { *; }
--keepclassmembers class uniffi.zingo.** { *; }
+#
+# Deliberately the whole `uniffi.**` tree rather than one rule per crate.
+# The earlier `uniffi.zingo.**` covered that package and its subpackages
+# only, leaving the sibling `uniffi.zingo_nym_proxy_ffi` unprotected: R8
+# stripped 55 of its 112 classes from the release APK, RustBuffer.ByReference
+# and UniffiRustCallStatus.ByValue among them. Every call into the shim then
+# died with a NoClassDefFoundError, which guardingLinkage reported as "the
+# nym proxy shim is unavailable" — so Mixnet Mode was dead on every CI build
+# while every local debug build (no R8) worked. A per-crate rule would have
+# to be remembered for each new UniFFI crate; this one cannot be forgotten.
+-keep class uniffi.** { *; }
+-keepclassmembers class uniffi.** { *; }
 
-# JNA — used by UniFFI to call into libuniffi_zingo.so
+# JNA — used by UniFFI to call into libuniffi_zingo.so and
+# libzingo_nym_proxy_ffi.so
 -keep class com.sun.jna.** { *; }
 -keepclassmembers class com.sun.jna.** { *; }
 -keep class * implements com.sun.jna.Library { *; }
