@@ -1,4 +1,5 @@
-// Shared fixtures for stories whose props are wallet-domain objects.
+// Shared fixtures for stories and tests whose props are wallet-domain
+// objects.
 import {
   ChainNameEnum,
   CurrencyNameEnum,
@@ -11,6 +12,8 @@ import UnifiedAddressClass from '../app/AppState/classes/UnifiedAddressClass';
 import TransparentAddressClass from '../app/AppState/classes/TransparentAddressClass';
 import AddressBookFileClass from '../app/AppState/classes/AddressBookFileClass';
 import { RPCAddressScopeEnum } from '../app/walletBackend/enums/RPCAddressScopeEnum';
+import { RPCMixnetIndicatorEnum } from '../app/walletBackend/enums/RPCMixnetIndicatorEnum';
+import { deriveMixnetView } from '../app/walletBackend/transforms/mixnetPresenter';
 
 export const mockZecPrice: ZecPriceType = {
   zecPrice: 33.75,
@@ -61,4 +64,29 @@ export const sampleContact = new AddressBookFileClass(
   false,
   ChainNameEnum.mainChainName,
   'ZEC',
+);
+
+const mixnetStatus = (
+  indicator: RPCMixnetIndicatorEnum,
+  reconnecting = false,
+) =>
+  deriveMixnetView(
+    {
+      kind: 'status',
+      indicator,
+      socks5Addr:
+        indicator === RPCMixnetIndicatorEnum.ready ? '127.0.0.1:1080' : null,
+    },
+    null,
+    reconnecting,
+  );
+
+export const mixnetConnecting = mixnetStatus(
+  RPCMixnetIndicatorEnum.bootstrapping,
+);
+export const mixnetReady = mixnetStatus(RPCMixnetIndicatorEnum.ready);
+export const mixnetLost = mixnetStatus(RPCMixnetIndicatorEnum.died, true);
+export const mixnetReconnecting = mixnetStatus(
+  RPCMixnetIndicatorEnum.bootstrapping,
+  true,
 );
