@@ -239,3 +239,31 @@ The network path a mixnet-only surface resolves to, either the Standing
 Client's tunnel or clearnet. zingolib derives it from the indicator, and the
 app never sees it. A price fetch that resolves to clearnet is refused, never
 sent.
+
+## Wallet storage
+
+Vocabulary for wallet files at rest. The full state inventory lives in
+`docs/agents/wallet-file-states.md`; the security stance is ADR 0007.
+
+**Wallet file**:
+The raw `wallet.save()` bytes at rest, byte-identical to a desktop
+zingolib wallet file. base64 is a bridge encoding, never a storage
+format (iOS keeps base64 text on disk until Step 2 of the storage
+rework).
+_Avoid_: encrypted file (no app layer since ADR 0007)
+
+**Open / closed**:
+A wallet is open while the zingolib lightclient holds it in memory, and
+closed when it exists only as its wallet file. Saving writes the open
+wallet back to its file; it does not close it.
+
+**Retained wallet** (`wallet.backup.dat`):
+The previously active wallet file, kept aside when the user switches
+wallets and restorable from the start menu.
+_Avoid_: backup (collides with device backups, which wallet files are
+excluded from)
+
+**Device backup**:
+The OS backup mechanism (Google backup, iCloud). Wallet files are
+always excluded from it; a wallet restored from a stale device backup
+is an incident, not a feature.

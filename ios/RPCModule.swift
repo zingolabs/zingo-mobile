@@ -166,20 +166,13 @@ class RPCModule: NSObject {
     return try String(contentsOfFile: getFileName(fileName), encoding: .utf8)
   }
 
-  // Audit Issue N — wallet files at rest. We write with the `complete`
-  // file-protection class and exclude the file from iCloud / device
-  // backups. The per-file encryption key is derived from the user's
-  // passcode and held in the Secure Enclave (the same hardware that
-  // backs Keychain Services), so the file is unreadable while the
-  // device is locked and cannot be lifted from a backup. This is the
-  // iOS counterpart to Android's Jetpack Security `EncryptedFile`
-  // envelope used in `RPCModule.kt`: different mechanism, equivalent
-  // guarantee. The audit's recommendation ("encrypted with a key
-  // stored in the device's keychain") is satisfied because the Secure
-  // Enclave IS keychain-tier custody.
-  //
-  // `saveBackgroundFile` deliberately does NOT route through this
-  // helper — see its own comment for the BGAppRefreshTask rationale.
+  // Wallet files rest under OS protection alone: hardware encryption at
+  // rest (class C, key available after the first post-boot unlock, so
+  // background sync can save while the screen is locked), the app
+  // sandbox, and backup exclusion. Class `complete` locked the file
+  // seconds after screen lock and broke background saves. Backup
+  // exclusion is the guard against restoring a stale wallet over a
+  // newer one and must never regress.
   func writeFile(_ fileName: String, fileBase64EncodedString: String) throws {
     let filePath = try getFileName(fileName)
     try fileBase64EncodedString.write(toFile: filePath, atomically: true, encoding: .utf8)
@@ -188,7 +181,7 @@ class RPCModule: NSObject {
     resourceValues.isExcludedFromBackup = true
     try? fileURL.setResourceValues(resourceValues)
     try? FileManager.default.setAttributes(
-      [.protectionKey: FileProtectionType.complete],
+      [.protectionKey: FileProtectionType.completeUntilFirstUserAuthentication],
       ofItemAtPath: filePath
     )
   }
@@ -283,14 +276,11 @@ class RPCModule: NSObject {
   }
 
   // The background sync state is written from BGAppRefreshTask paths in
-  // AppDelegate while the device may be locked. The wallet `writeFile`
-  // helper sets `FileProtectionType.complete`, which would make the
-  // file inaccessible in that locked state and break background sync.
-  // So this path stays at the iOS default protection class
-  // (`completeUntilFirstUserAuthentication` since iOS 7): still
-  // encrypted at rest, key available after the first post-boot unlock,
-  // accessible to background tasks afterwards. The sync metadata
-  // stored here is not wallet-recovery material.
+  // AppDelegate while the device may be locked. It stays at the iOS
+  // default protection class (`completeUntilFirstUserAuthentication`
+  // since iOS 7) and outside the wallet `writeFile` helper because the
+  // sync metadata stored here is not wallet-recovery material and needs
+  // no backup exclusion.
   func saveBackgroundFile(_ jsonString: String) throws {
     do {
       // the content of this JSON can be represented safely in utf8.
