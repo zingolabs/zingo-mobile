@@ -12,11 +12,29 @@ pub(crate) fn init() {
                 .with_max_level(log::LevelFilter::Debug)
                 .with_tag("MixnetProxy"),
         );
-        let _ = fmt()
-            .with_ansi(false)
-            .with_max_level(tracing::Level::DEBUG)
-            .with_writer(Logcat)
-            .try_init();
+        #[cfg(feature = "diagnostics")]
+        {
+            use tracing_subscriber::Layer as _;
+            use tracing_subscriber::layer::SubscriberExt as _;
+            use tracing_subscriber::util::SubscriberInitExt as _;
+            let _ = tracing_subscriber::registry()
+                .with(
+                    fmt::layer()
+                        .with_ansi(false)
+                        .with_writer(Logcat)
+                        .with_filter(tracing_subscriber::filter::LevelFilter::DEBUG),
+                )
+                .with(crate::diagnostics::CaptureLayer)
+                .try_init();
+        }
+        #[cfg(not(feature = "diagnostics"))]
+        {
+            let _ = fmt()
+                .with_ansi(false)
+                .with_max_level(tracing::Level::DEBUG)
+                .with_writer(Logcat)
+                .try_init();
+        }
     });
 }
 

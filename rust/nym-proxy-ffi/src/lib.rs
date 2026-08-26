@@ -21,11 +21,14 @@
 use std::{net::SocketAddr, sync::Mutex, time::Duration};
 
 use tokio::runtime::Runtime;
-use zingo_netutils::NymProxy;
 use zingo_netutils::time::{LISTENER_MONITOR_INTERVAL, LOOPBACK_DIAL_BOUND};
+use zingo_netutils::{BootstrapEvent, NymProxy};
 
 #[cfg(target_os = "android")]
 mod debug_log;
+
+#[cfg(feature = "diagnostics")]
+mod diagnostics;
 
 /// Consecutive check failures required before the proxy is declared dead.
 const LISTENER_MONITOR_STRIKES: u32 = 2;
@@ -258,15 +261,12 @@ fn endpoint_from_listener_addr(addr: SocketAddr) -> Socks5Endpoint {
     }
 }
 
-#[uniffi::export]
 impl MixnetProxyHandle {
-    /// Bring up a mixnet proxy and return, once its SOCKS5 listener is up, a
-    /// handle whose [`Self::socks5_endpoint`] the app hands to the wallet's
-    /// `attach_mixnet`, with a listener monitor that reports through
-    /// `observer`, at most once, if the proxy is lost.
-    #[uniffi::constructor]
-    pub fn start(
+    /// One start seam shared by the plain and the observed constructors, so
+    /// the two cannot drift.
+    fn start_with(
         observer: Option<Box<dyn ProxyDeathObserver>>,
+        on_bootstrap: impl FnMut(BootstrapEvent),
     ) -> Result<std::sync::Arc<Self>, ProxyFfiError> {
         #[cfg(target_os = "android")]
         debug_log::init();
@@ -277,7 +277,7 @@ impl MixnetProxyHandle {
                 reason: e.to_string(),
             })?;
         let proxy = runtime
-            .block_on(NymProxy::start())
+            .block_on(NymProxy::start_observed(on_bootstrap))
             .inspect_err(|e| tracing::error!(error = %e, "mixnet proxy start failed"))
             .map_err(|e| ProxyFfiError::Connect {
                 reason: e.to_string(),
@@ -300,6 +300,29 @@ impl MixnetProxyHandle {
             endpoint,
             monitor,
         }))
+    }
+}
+
+#[uniffi::export]
+impl MixnetProxyHandle {
+    /// Bring up a mixnet proxy and return, once its SOCKS5 listener is up, a
+    /// handle whose [`Self::socks5_endpoint`] the app hands to the wallet's
+    /// `attach_mixnet`, with a listener monitor that reports through
+    /// `observer`, at most once, if the proxy is lost.
+    #[uniffi::constructor]
+    pub fn start(
+        observer: Option<Box<dyn ProxyDeathObserver>>,
+    ) -> Result<std::sync::Arc<Self>, ProxyFfiError> {
+        #[cfg(feature = "diagnostics")]
+        {
+            #[cfg(not(target_os = "android"))]
+            diagnostics::install_capture();
+            Self::start_with(observer, |event| {
+                diagnostics::publish(diagnostics::bootstrap_event(event))
+            })
+        }
+        #[cfg(not(feature = "diagnostics"))]
+        Self::start_with(observer, |_| {})
     }
 
     /// The local SOCKS5 endpoint the app hands to `attach_mixnet`.

@@ -239,3 +239,41 @@ The network path a mixnet-only surface resolves to, either the Standing
 Client's tunnel or clearnet. zingolib derives it from the indicator, and the
 app never sees it. A price fetch that resolves to clearnet is refused, never
 sent.
+
+**Leg**:
+One of the three links a mixnet send crosses: the client's websocket to its
+entry gateway (leg one), the sphinx path from that gateway to the Exit Node
+(leg two), and the Exit Node's TCP connection to the destination (leg
+three). The local SOCKS5 listener is leg zero.
+
+**Exit Node**:
+Our name for the node whose network requester opens leg three. Nym's
+literature calls it an exit gateway, and its embedded service a network
+requester (historically, a service provider).
+
+**Destination**:
+The clearnet host a mixnet send is addressed to, reached only by the Exit
+Node on leg three.
+_Avoid_: correspondent (the term this one renames), recipient (the payment
+addressee inside a transaction, never a network peer)
+
+**Sentinel**:
+The fixed public resolver (`1.1.1.1:53`) that exit evidence is gathered
+against, per zingolib ADR 0044: one DNS round trip through the tunnel,
+where any reply proves the Exit Node carries traffic. Not a destination,
+never eligible for a verdict.
+
+**Capture**:
+The debug-only tracing layer in the proxy FFI that matches nym's own log
+events to observe legs one and two, streamed to the host as diagnostics.
+
+**Probe**:
+The debug-only FFI surface that gathers evidence through the running
+proxy on a caller-supplied deadline: the Sentinel arm (one Sentinel round
+trip) and the destination arm (one TLS handshake against a caller-supplied
+destination, then hang up).
+
+**Verdict**:
+What one probe arm classified its attempt into, combining the round trip's
+outcome with the events captured in its window; silence that no capture
+explains is reported as indeterminate, never dressed as a diagnosis.
