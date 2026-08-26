@@ -5,22 +5,28 @@ import { Text, View, ActivityIndicator } from 'react-native';
 import { useTheme } from '../../theme';
 
 import {
+  BiometricGateOutcome,
   ButtonTypeEnum,
   LaunchingModeEnum,
   TranslateType,
 } from '../../AppState';
 import Button from '../../../components/Components/Button';
 import { getZingoName, getZingoVersion } from '../../utils/ZingoAppData';
+import Utils from '../../utils';
 
 type LaunchingProps = {
   translate: (key: string) => TranslateType;
   firstLaunchingMessage: LaunchingModeEnum;
-  biometricsFailed: boolean;
+  biometricGate: BiometricGateOutcome;
   tryAgain?: () => void;
-  message?: string;
 };
 
 const Launching: React.FunctionComponent<LaunchingProps> = props => {
+  const biometricsFailed = props.biometricGate.kind === 'declined';
+  const message =
+    props.biometricGate.kind === 'declined'
+      ? Utils.renderGateFailure(props.biometricGate.failure, props.translate)
+      : undefined;
   const { colors } = useTheme();
 
   return (
@@ -72,7 +78,7 @@ const Launching: React.FunctionComponent<LaunchingProps> = props => {
             padding: 10,
           }}
         >
-          {!!props.message && (
+          {!!message && (
             <Text
               style={{
                 color: colors.fgAccentDisabled,
@@ -81,10 +87,10 @@ const Launching: React.FunctionComponent<LaunchingProps> = props => {
               }}
               selectable
             >
-              {props.message}
+              {message}
             </Text>
           )}
-          {props.biometricsFailed ? (
+          {biometricsFailed ? (
             <>
               <Text
                 style={{
@@ -150,7 +156,7 @@ const Launching: React.FunctionComponent<LaunchingProps> = props => {
                       LaunchingModeEnum.updating ||
                       props.firstLaunchingMessage ===
                         LaunchingModeEnum.installing) &&
-                    !props.biometricsFailed
+                    !biometricsFailed
                       ? 1
                       : 0,
                   textAlign: 'center',
@@ -176,7 +182,7 @@ const Launching: React.FunctionComponent<LaunchingProps> = props => {
                       LaunchingModeEnum.updating ||
                       props.firstLaunchingMessage ===
                         LaunchingModeEnum.installing) &&
-                    !props.biometricsFailed
+                    !biometricsFailed
                       ? 1
                       : 0,
                   textAlign: 'center',
@@ -203,7 +209,7 @@ const Launching: React.FunctionComponent<LaunchingProps> = props => {
                       LaunchingModeEnum.updating ||
                       props.firstLaunchingMessage ===
                         LaunchingModeEnum.installing) &&
-                    !props.biometricsFailed
+                    !biometricsFailed
                       ? 1
                       : 0,
                   textAlign: 'center',

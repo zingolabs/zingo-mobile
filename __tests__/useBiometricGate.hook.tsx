@@ -51,6 +51,24 @@ test('a decline surfaces the failure, not only the generic sentence', async () =
   );
 });
 
+test('a decline is a named refused state, not a bare false', async () => {
+  gate.mockResolvedValue({
+    kind: 'declined',
+    failure: {
+      kind: 'error',
+      errorKey: 'biometrics-failure-declined',
+      param: '-128 boom',
+    },
+  });
+  const props = gateArgs();
+  const { result } = renderHook((p: GateProps) => useBiometricGate(p), {
+    initialProps: props,
+  });
+
+  await waitFor(() => expect(props.onCancel).toHaveBeenCalled());
+  expect(result.current).toMatchObject({ kind: 'refused' });
+});
+
 test('flipping needsAuth on re-gates a mounted screen', async () => {
   gate.mockResolvedValue({ kind: 'authenticated' });
   const { result, rerender } = renderHook(
@@ -59,24 +77,50 @@ test('flipping needsAuth on re-gates a mounted screen', async () => {
       initialProps: gateArgs({ needsAuth: false }),
     },
   );
-  expect(result.current).toBe(true);
+  expect(result.current).toMatchObject({ kind: 'passed' });
   expect(gate).not.toHaveBeenCalled();
 
   rerender(gateArgs({ needsAuth: true }));
   await waitFor(() => expect(gate).toHaveBeenCalledTimes(1));
-  await waitFor(() => expect(result.current).toBe(true));
+  await waitFor(() => expect(result.current).toMatchObject({ kind: 'passed' }));
 });
 
-test('an unanswered shared verdict re-asks while the screen lives', async () => {
+test('an unanswered shared verdict leaves the screen gated, no re-ask', async () => {
+  // 'unanswered' means an appEntry run declined while this screen shared
+  // it, and an appEntry decline locks the whole app: the screen is being
+  // torn down, and a re-ask from here raced that teardown into a stray
+  // prompt over the locked screen.
   gate
     .mockResolvedValueOnce({ kind: 'unanswered' })
     .mockResolvedValue({ kind: 'authenticated' });
+  const props = gateArgs();
   const { result } = renderHook((p: GateProps) => useBiometricGate(p), {
-    initialProps: gateArgs(),
+    initialProps: props,
   });
 
-  await waitFor(() => expect(result.current).toBe(true));
-  expect(gate).toHaveBeenCalledTimes(2);
+  await waitFor(() => expect(gate).toHaveBeenCalledTimes(1));
+  await new Promise(resolve => setTimeout(resolve, 0));
+  expect(gate).toHaveBeenCalledTimes(1);
+  expect(result.current).toMatchObject({ kind: 'checking' });
+  expect(props.onCancel).not.toHaveBeenCalled();
+});
+
+test('an ordinary cancel shows only the standard sentence', async () => {
+  // The raw platform diagnostic is bug-report data; the common Cancel path
+  // must not paste it into user copy.
+  gate.mockResolvedValue({
+    kind: 'declined',
+    failure: {
+      kind: 'error',
+      errorKey: 'biometrics-failure-declined',
+      param: 'E_CRYPTO_FAILED code: 13, msg: Cancel button pressed',
+    },
+  });
+  const props = gateArgs();
+  renderHook((p: GateProps) => useBiometricGate(p), { initialProps: props });
+
+  await waitFor(() => expect(props.onCancel).toHaveBeenCalled());
+  expect(props.addLastSnackbar).toHaveBeenCalledWith('biometrics-error');
 });
 
 test('an unmounted screen never re-asks on an unanswered verdict', async () => {
@@ -111,7 +155,7 @@ test('a stalled fail-open tells the user the check did not respond', async () =>
     initialProps: props,
   });
 
-  await waitFor(() => expect(result.current).toBe(true));
+  await waitFor(() => expect(result.current).toMatchObject({ kind: 'passed' }));
   expect(props.addLastSnackbar).toHaveBeenCalledWith(
     expect.stringContaining('biometrics-failure-stalled'),
   );

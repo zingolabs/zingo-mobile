@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
-import simpleBiometrics from '../simpleBiometrics';
+import simpleBiometrics, { AnsweredVerdict } from '../simpleBiometrics';
 import { SnackbarDurationEnum, TranslateType } from '../AppState';
 import Utils from '../utils';
 
@@ -13,6 +13,10 @@ type UseBiometricGateArgs = {
   foregroundEpoch: number;
 };
 
+/** The screen gate's named states, so callers never read a bare boolean. */
+export type ScreenGateState =
+  { kind: 'checking' } | { kind: 'passed' } | { kind: 'refused' };
+
 /**
  * Audit Issue D — single source of truth for the screen-level biometric
  * gate used by Seed, ShowUfvk, Settings, Rescan and Confirm.
@@ -20,20 +24,21 @@ type UseBiometricGateArgs = {
  * Behaviour:
  *   - When `needsAuth` holds (at mount, or when a settings toggle flips it
  *     on while the screen stays mounted): triggers simpleBiometrics.
- *   - On decline: reports what the platform said (the rendered failure,
- *     appended to the standard sentence) and calls `onCancel` (typically
+ *   - On decline: shows the standard sentence, appending the rendered
+ *     failure only for the stalled key, and calls `onCancel` (typically
  *     `navigation.goBack()`).
  *   - On a stalled fail-open: passes, and tells the user the check did not
  *     respond.
- *   - On `unanswered` (a shared run's decline answered another purpose):
- *     re-asks, but only while this screen is still mounted, so no prompt
- *     is ever raised on behalf of a dead component.
+ *   - On `unanswered` (a shared appEntry run declined, locking the app):
+ *     stays in `checking` and never re-asks, so no prompt is ever raised
+ *     on behalf of a component being torn down. The type enforces the
+ *     no-action rule: only an AnsweredVerdict reaches the acting code.
  *   - On background → active (foregroundEpoch bumps): re-fires the gate
  *     only when `foregroundAppEnabled` is false. LoadedApp's own
  *     foreground gate already covers the enabled case.
  *
- * Returns the boolean `authPassed`. Callers render a placeholder until
- * it flips to true so sensitive content is never visible while a prompt
+ * Returns a ScreenGateState. Callers render a placeholder until it
+ * reaches `passed`, so sensitive content is never visible while a prompt
  * is in flight.
  */
 export const useBiometricGate = ({
@@ -43,8 +48,39 @@ export const useBiometricGate = ({
   onCancel,
   foregroundAppEnabled,
   foregroundEpoch,
-}: UseBiometricGateArgs): boolean => {
-  const [authPassed, setAuthPassed] = useState<boolean>(!needsAuth);
+}: UseBiometricGateArgs): ScreenGateState => {
+  const [screenGate, setScreenGate] = useState<ScreenGateState>(
+    needsAuth ? { kind: 'checking' } : { kind: 'passed' },
+  );
+
+  // Only an answered verdict may act; `unanswered` cannot reach this code.
+  const enactScreenVerdict = (verdict: AnsweredVerdict) => {
+    if (verdict.kind === 'declined') {
+      setScreenGate({ kind: 'refused' });
+      // The raw diagnostic is bug-report data. Only the stalled key earns
+      // a place in user copy, because there the sentence is the sole
+      // trace the wedged-queue class leaves.
+      addLastSnackbar(
+        verdict.failure.errorKey === 'biometrics-failure-stalled'
+          ? `${translate('biometrics-error') as string} ${Utils.renderGateFailure(
+              verdict.failure,
+              translate,
+            )}`
+          : (translate('biometrics-error') as string),
+      );
+      onCancel();
+      return;
+    }
+    if (
+      verdict.kind === 'unavailable' &&
+      verdict.failure.errorKey === 'biometrics-failure-stalled'
+    ) {
+      // Passing is the fail-open policy for a gate that could not run,
+      // and the user should hear that the check did not respond.
+      addLastSnackbar(Utils.renderGateFailure(verdict.failure, translate));
+    }
+    setScreenGate({ kind: 'passed' });
+  };
 
   // The one gate body both effects run: returns the effect cleanup that
   // cancels it, so an unmounted or re-gated screen never acts on a stale
@@ -52,35 +88,18 @@ export const useBiometricGate = ({
   const runScreenGate = () => {
     let cancelled = false;
     (async () => {
-      let verdict = await simpleBiometrics({
+      const verdict = await simpleBiometrics({
         translate,
         purpose: 'screenEntry',
       });
-      while (verdict.kind === 'unanswered' && !cancelled) {
-        verdict = await simpleBiometrics({ translate, purpose: 'screenEntry' });
-      }
+      // 'unanswered' means an appEntry run declined while this screen
+      // shared it, and an appEntry decline locks the whole app: this
+      // screen is being torn down, so it stays in `checking` and never
+      // re-asks.
       if (cancelled || verdict.kind === 'unanswered') {
         return;
       }
-      if (verdict.kind === 'declined') {
-        addLastSnackbar(
-          `${translate('biometrics-error') as string} ${Utils.renderErrorKeyed(
-            verdict.failure,
-            translate,
-          )}`,
-        );
-        onCancel();
-        return;
-      }
-      if (
-        verdict.kind === 'unavailable' &&
-        verdict.failure.errorKey === 'biometrics-failure-stalled'
-      ) {
-        // Passing is the fail-open policy for a gate that could not run,
-        // and the user should hear that the check did not respond.
-        addLastSnackbar(Utils.renderErrorKeyed(verdict.failure, translate));
-      }
-      setAuthPassed(true);
+      enactScreenVerdict(verdict);
     })();
     return () => {
       cancelled = true;
@@ -92,10 +111,10 @@ export const useBiometricGate = ({
   // screen stays mounted; both paths re-gate here.
   useEffect(() => {
     if (!needsAuth) {
-      setAuthPassed(true);
+      setScreenGate({ kind: 'passed' });
       return;
     }
-    setAuthPassed(false);
+    setScreenGate({ kind: 'checking' });
     return runScreenGate();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [needsAuth]);
@@ -111,10 +130,10 @@ export const useBiometricGate = ({
     if (!needsAuth || foregroundAppEnabled) {
       return;
     }
-    setAuthPassed(false);
+    setScreenGate({ kind: 'checking' });
     return runScreenGate();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [foregroundEpoch]);
 
-  return authPassed;
+  return screenGate;
 };

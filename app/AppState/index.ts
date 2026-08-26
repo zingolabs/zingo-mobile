@@ -20,6 +20,7 @@ import type SecurityType from './types/SecurityType';
 import type ServerUrisType from './types/ServerUrisType';
 import type { SetServerResult } from './types/SetServerResult';
 import type { ErrorKeyed, Done } from './types/Result';
+import type { GateFailure, GateFailureKey } from './types/GateFailure';
 import { DONE, errorKeyed } from './types/Result';
 import type ValueTransferType from './types/ValueTransferType';
 import type ProposalPoolsType from './types/ProposalPoolsType';
@@ -69,6 +70,7 @@ import {
 
 import type AppStateLoaded from './AppStateLoaded';
 import type AppStateLoading from './AppStateLoading';
+import type { BiometricGateOutcome } from './AppStateLoading';
 import type AppContextLoading from './AppContextLoading';
 import type AppContextLoaded from './AppContextLoaded';
 
@@ -125,6 +127,7 @@ export {
 export type {
   AppStateLoaded,
   AppStateLoading,
+  BiometricGateOutcome,
   AppContextLoading,
   AppContextLoaded,
   WalletType,
@@ -141,6 +144,8 @@ export type {
   SetServerResult,
   ErrorKeyed,
   Done,
+  GateFailure,
+  GateFailureKey,
   ValueTransferType,
   ProposalPoolsType,
   TransactionType,

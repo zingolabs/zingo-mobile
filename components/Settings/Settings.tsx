@@ -74,7 +74,10 @@ import { getLatestBlockServerInfo } from '../../app/walletBackend';
 import { isEqual } from 'lodash';
 import ChainTypeToggle from '../Components/ChainTypeToggle';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
-import { probeDeviceSecurity } from '../../app/simpleBiometrics';
+import {
+  DeviceSecurityProbe,
+  probeDeviceSecurity,
+} from '../../app/simpleBiometrics';
 import { useBiometricGate } from '../../app/hooks/useBiometricGate';
 import SelectBottomSheet from '../Components/SelectBottomSheet';
 import BottomSheet, {
@@ -237,14 +240,25 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const screenName = ScreenEnum.Settings;
 
   // Audit Issue D — single source of truth for security.settingsScreen.
-  const authPassed = useBiometricGate({
-    needsAuth: !!securityContext.settingsScreen,
+  // The requirement is live (a toggle flip re-gates, and the
+  // background-return re-gate keeps working) except while this screen's
+  // own save rewrites the security context: re-gating the screen that is
+  // saving blanked the form under an unrequested prompt.
+  const savingSettingsRef = useRef<boolean>(false);
+  const liveNeedsAuth = !!securityContext.settingsScreen;
+  const gateRequirementRef = useRef<boolean>(liveNeedsAuth);
+  if (!savingSettingsRef.current) {
+    gateRequirementRef.current = liveNeedsAuth;
+  }
+  const screenGate = useBiometricGate({
+    needsAuth: gateRequirementRef.current,
     translate,
     addLastSnackbar,
     onCancel: () => navigation.goBack(),
     foregroundAppEnabled: !!securityContext.foregroundApp,
     foregroundEpoch,
   });
+  const authPassed = screenGate.kind === 'passed';
 
   const [autoServerUri, setAutoServerUri] = useState<string>('');
   const [autoServerChainName, setAutoServerChainName] = useState<string>('');
@@ -335,7 +349,11 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const [showDeveloperOptions, setShowDeveloperOptions] =
     useState<boolean>(false);
   const [openInfoSection, setOpenInfoSection] = useState<string | null>(null);
-  const [deviceHasSecurity, setDeviceHasSecurity] = useState<boolean>(true);
+  // Seeded optimistically; the union names the probe's answer instead of
+  // collapsing it to a bit at this edge.
+  const [deviceSecurity, setDeviceSecurity] = useState<DeviceSecurityProbe>({
+    kind: 'secured',
+  });
 
   // Bottom-sheet measurements — Settings has no balance area, so the sheet
   // uses a single snap at the maximum height (just below the screen Header).
@@ -392,18 +410,23 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const settingsSnapPoints = useFullSheetSnapPoints(containerH, headerH);
 
   useEffect(() => {
+    // Probe only once the gate has settled: the probe queues behind this
+    // screen's own gate prompt on the serialized keychain queue, and a
+    // stalled probe answers nothing, so keep the current answer rather
+    // than claiming no device lock is enrolled.
+    if (!authPassed) {
+      return;
+    }
     (async () => {
       const probe = await probeDeviceSecurity();
-      if (probe.secure) {
-        setDeviceHasSecurity(true);
-      } else if (probe.failure.errorKey !== 'biometrics-failure-stalled') {
-        setDeviceHasSecurity(false);
+      if (
+        probe.kind === 'secured' ||
+        probe.failure.errorKey !== 'biometrics-failure-stalled'
+      ) {
+        setDeviceSecurity(probe);
       }
-      // A stalled probe answers nothing (the keychain queue was busy,
-      // often behind this screen's own gate prompt); keep the last known
-      // answer rather than claiming no device lock is enrolled.
     })();
-  }, []);
+  }, [authPassed]);
 
   useEffect(() => {
     (async () => {
@@ -743,7 +766,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   // the footer's onPress always invoke the current closure.
   const saveSettingsRef = useRef<() => Promise<void>>(async () => {});
 
-  const saveSettings = async () => {
+  const doSaveSettings = async () => {
     // ───────────────────────────────────────────────────────────────
     // Phase 1: Resolve the target server URI/chain from the picker mode
     // and validate up-front (no I/O yet — purely synchronous guards).
@@ -1069,6 +1092,14 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       navigation.goBack();
     } else {
       navigation.navigate(RouteEnum.HomeStack);
+    }
+  };
+  const saveSettings = async () => {
+    savingSettingsRef.current = true;
+    try {
+      await doSaveSettings();
+    } finally {
+      savingSettingsRef.current = false;
     }
   };
   saveSettingsRef.current = saveSettings;
@@ -1943,7 +1974,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                       </View>
                     </TouchableOpacity>
                   </View>
-                  {!deviceHasSecurity && (
+                  {deviceSecurity.kind === 'insecure' && (
                     <FadeText style={{ marginTop: 6 }}>
                       {
                         translate(
