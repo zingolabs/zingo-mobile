@@ -74,7 +74,7 @@ import { getLatestBlockServerInfo } from '../../app/walletBackend';
 import { isEqual } from 'lodash';
 import ChainTypeToggle from '../Components/ChainTypeToggle';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
-import { hasDeviceSecurity } from '../../app/simpleBiometrics';
+import { probeDeviceSecurity } from '../../app/simpleBiometrics';
 import { useBiometricGate } from '../../app/hooks/useBiometricGate';
 import SelectBottomSheet from '../Components/SelectBottomSheet';
 import BottomSheet, {
@@ -393,7 +393,15 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
 
   useEffect(() => {
     (async () => {
-      setDeviceHasSecurity(await hasDeviceSecurity());
+      const probe = await probeDeviceSecurity();
+      if (probe.secure) {
+        setDeviceHasSecurity(true);
+      } else if (probe.failure.errorKey !== 'biometrics-failure-stalled') {
+        setDeviceHasSecurity(false);
+      }
+      // A stalled probe answers nothing (the keychain queue was busy,
+      // often behind this screen's own gate prompt); keep the last known
+      // answer rather than claiming no device lock is enrolled.
     })();
   }, []);
 

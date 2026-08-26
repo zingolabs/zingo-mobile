@@ -1,6 +1,7 @@
 import {
   AddressKindEnum,
   ChainNameEnum,
+  ErrorKeyed,
   LaunchingModeEnum,
   RouteEnum,
   SeedActionEnum,
@@ -35,6 +36,9 @@ export type LoadingAppNavigationState = {
   screen?: RouteEnum;
   startingApp?: boolean;
   biometricsFailed?: boolean;
+  // The decline's failure rides with the navigation, so the locked screen
+  // renders the reason it was locked for instead of reading module state.
+  gateFailure?: ErrorKeyed<string>;
   newWallet?: boolean;
 };
 /**

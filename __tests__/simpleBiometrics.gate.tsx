@@ -50,6 +50,7 @@ type RnMock = {
 
 let simpleBiometrics: GateModule['default'];
 let getLastGateFailure: GateModule['getLastGateFailure'];
+let probeDeviceSecurity: GateModule['probeDeviceSecurity'];
 let blankingEvent: GateModule['BIOMETRIC_BLANKING_EVENT'];
 let kc: Record<string, jest.Mock>;
 let rn: RnMock;
@@ -71,6 +72,7 @@ beforeEach(() => {
   const gate: GateModule = require('../app/simpleBiometrics');
   simpleBiometrics = gate.default;
   getLastGateFailure = gate.getLastGateFailure;
+  probeDeviceSecurity = gate.probeDeviceSecurity;
   blankingEvent = gate.BIOMETRIC_BLANKING_EVENT;
   kc.canImplyAuthentication.mockResolvedValue(true);
   kc.resetGenericPassword.mockResolvedValue(true);
@@ -144,6 +146,36 @@ test('a wedged native queue is unavailable instead of hanging', async () => {
   await expect(gate).resolves.toMatchObject({ kind: 'unavailable' });
   expect(getLastGateFailure()).toMatchObject({
     errorKey: 'biometrics-failure-stalled',
+  });
+});
+
+test('a stalled pre-flight settles by the platform policy, not fail-open', async () => {
+  jest.useFakeTimers();
+  rn.Platform.OS = 'android';
+  kc.getSupportedBiometryType
+    .mockResolvedValueOnce('Fingerprint')
+    .mockReturnValue(new Promise(() => {}));
+  kc.hasGenericPassword.mockResolvedValue(true);
+  kc.getGenericPassword.mockReturnValue(new Promise(() => {}));
+
+  let first: GateVerdict | undefined;
+  simpleBiometrics({ translate, purpose: 'appEntry' }).then(v => {
+    first = v;
+  });
+  await jest.advanceTimersByTimeAsync(60 * 1000);
+  expect(first).toMatchObject({ kind: 'declined' });
+
+  // Try Again: the probe queues behind the wedged call and stalls. Nothing
+  // proves the prompt is off screen, so Android locks again instead of
+  // opening the wallet to whoever waits out the retry.
+  let second: GateVerdict | undefined;
+  simpleBiometrics({ translate, purpose: 'appEntry' }).then(v => {
+    second = v;
+  });
+  await jest.advanceTimersByTimeAsync(10 * 1000);
+  expect(second).toMatchObject({
+    kind: 'declined',
+    failure: { errorKey: 'biometrics-failure-stalled' },
   });
 });
 
@@ -378,8 +410,9 @@ test('an android launch with no frames still settles the gate', async () => {
     simpleBiometrics({ translate, purpose: 'appEntry' }).then(v => {
       verdict = v;
     });
-    await jest.advanceTimersByTimeAsync(10 * 1000);
-    await jest.advanceTimersByTimeAsync(0);
+    // The paint is cosmetic: a frameless launch costs one frame budget,
+    // never the native stall window.
+    await jest.advanceTimersByTimeAsync(1000);
     expect(verdict).toMatchObject({ kind: 'authenticated' });
   } finally {
     globalThis.requestAnimationFrame = realFrame;
@@ -456,10 +489,70 @@ test('a cancelled screen prompt does not relock the app gate', async () => {
   const appGate = simpleBiometrics({ translate, purpose: 'appEntry' });
   refuse(osError('-128')); // the user cancels, meaning 'leave this screen'
   await expect(screenGate).resolves.toMatchObject({ kind: 'declined' });
-  // The decline answers only the purpose the user was shown; the app gate
-  // runs its own prompt instead of relocking the wallet on it.
-  await expect(appGate).resolves.toMatchObject({ kind: 'authenticated' });
+  // The decline answers only the purpose the user was shown. The module no
+  // longer re-runs on behalf of the parked caller (that raised prompts for
+  // components that may no longer exist); it answers 'unanswered' and the
+  // caller decides.
+  await expect(appGate).resolves.toMatchObject({ kind: 'unanswered' });
+  expect(kc.getGenericPassword).toHaveBeenCalledTimes(1);
+  // A live caller re-asks and gets its own prompt.
+  await expect(
+    simpleBiometrics({ translate, purpose: 'appEntry' }),
+  ).resolves.toMatchObject({ kind: 'authenticated' });
   expect(kc.getGenericPassword).toHaveBeenCalledTimes(2);
+});
+
+test('a stalled security probe reports stalled, not no-security', async () => {
+  jest.useFakeTimers();
+  kc.canImplyAuthentication.mockReturnValue(new Promise(() => {}));
+
+  const probe = probeDeviceSecurity();
+  await Promise.resolve();
+  await jest.advanceTimersByTimeAsync(10 * 1000);
+  // Settings must be able to tell "the probe did not answer" from "no
+  // device lock is enrolled" instead of disabling the toggles on a stall.
+  await expect(probe).resolves.toMatchObject({
+    secure: false,
+    failure: { errorKey: 'biometrics-failure-stalled' },
+  });
+});
+
+test('a late rejection of a stalled call stays swallowed', async () => {
+  jest.useFakeTimers();
+  rn.Platform.OS = 'android';
+  kc.getSupportedBiometryType.mockResolvedValue('Fingerprint');
+  kc.hasGenericPassword.mockResolvedValue(true);
+  let refuseLate: (e: Error) => void = () => {};
+  kc.getGenericPassword
+    .mockReturnValueOnce(
+      new Promise((_serve, reject) => {
+        refuseLate = reject;
+      }),
+    )
+    .mockResolvedValue({ password: '1' });
+
+  let first: GateVerdict | undefined;
+  simpleBiometrics({ translate, purpose: 'appEntry' }).then(v => {
+    first = v;
+  });
+  await jest.advanceTimersByTimeAsync(60 * 1000);
+  expect(first).toMatchObject({ kind: 'declined' });
+
+  // The OS answers the stranded call after the verdict is out; the losing
+  // arm must hold a handler so this never surfaces as an unhandled
+  // rejection, and the next gate is undisturbed.
+  refuseLate(
+    Object.assign(new Error('code: 5, msg: Canceled'), {
+      code: 'E_CRYPTO_FAILED',
+    }),
+  );
+  await jest.advanceTimersByTimeAsync(1000);
+  let second: GateVerdict | undefined;
+  simpleBiometrics({ translate, purpose: 'appEntry' }).then(v => {
+    second = v;
+  });
+  await jest.advanceTimersByTimeAsync(1000);
+  expect(second).toMatchObject({ kind: 'authenticated' });
 });
 
 test('a wedge starting at the v1 cleanup settles unavailable in the probe window', async () => {
@@ -647,6 +740,25 @@ test('a fresh sentinel the platform will not serve fails open, not locked', asyn
   expect(kc.setGenericPassword).toHaveBeenCalledTimes(1); // one rebuild try
 });
 
+test('an android error outside E_CRYPTO_FAILED never reads as a decline', async () => {
+  // The prompt-code scrape must stay anchored to E_CRYPTO_FAILED: a
+  // keystore error whose text happens to contain 'code: 5' is a platform
+  // failure nobody was asked about, not a user decline.
+  rn.Platform.OS = 'android';
+  kc.getSupportedBiometryType.mockResolvedValue('Fingerprint');
+  kc.hasGenericPassword.mockResolvedValue(true);
+  kc.getGenericPassword.mockRejectedValue(
+    Object.assign(new Error('keystore init failed with code: 5 inside'), {
+      code: 'E_KEYSTORE',
+    }),
+  );
+
+  await expect(
+    simpleBiometrics({ translate, purpose: 'appEntry' }),
+  ).resolves.toMatchObject({ kind: 'unavailable' });
+  expect(kc.setGenericPassword).toHaveBeenCalledTimes(1); // one rebuild try
+});
+
 test('an android hardware error on a fresh sentinel fails open, not locked', async () => {
   rn.Platform.OS = 'android';
   kc.getSupportedBiometryType.mockResolvedValue('Fingerprint');
@@ -685,10 +797,9 @@ test('a preflight refusal reports its own reason, not a previous decline', async
   });
 });
 
-test('a failure before the attempt still settles and drops the overlay', async () => {
-  // The overlay must be raised inside the try whose finally lowers it: a
-  // rejection between the raise and the try would otherwise leave an
-  // unclearable black Modal with no external hatch.
+test('a throwing frame yield neither denies the gate nor pins the overlay', async () => {
+  // The paint yield is best-effort: a JS context without frames proceeds
+  // to the prompt, and the finally still drops the overlay.
   jest.useFakeTimers();
   rn.Platform.OS = 'android';
   const realFrame = globalThis.requestAnimationFrame;
@@ -705,7 +816,7 @@ test('a failure before the attempt still settles and drops the overlay', async (
       verdict = v;
     });
     await jest.advanceTimersByTimeAsync(1000);
-    expect(verdict).toMatchObject({ kind: 'unavailable' });
+    expect(verdict).toMatchObject({ kind: 'authenticated' });
     expect(rn.DeviceEventEmitter.emit).toHaveBeenCalledWith(
       blankingEvent,
       false,

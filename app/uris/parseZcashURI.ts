@@ -4,6 +4,7 @@ import ZcashURITargetClass from './classes/ZcashURITargetClass';
 import {
   ServerType,
   ErrorKeyed,
+  errorKeyed,
   GlobalConst,
   ZcashUriFieldEnum,
 } from '../AppState';
@@ -32,7 +33,7 @@ export type ParseZcashUriResult =
 const err = (
   errorKey: ZcashUriErrorKey,
   param?: string,
-): ErrorKeyed<ZcashUriErrorKey> => ({ kind: 'error', errorKey, param });
+): ErrorKeyed<ZcashUriErrorKey> => errorKeyed(errorKey, param);
 
 const parseZcashURI = async (
   uri: string,
