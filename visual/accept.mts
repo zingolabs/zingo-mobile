@@ -14,6 +14,7 @@ import { cpSync, existsSync, mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { RunJob, captureVerdict } from './captureVerdict';
 
 const dir = dirname(fileURLToPath(import.meta.url));
 const baseline = join(dir, '__baseline__');
@@ -89,9 +90,6 @@ if (local) {
   const run = runArg === undefined ? latestRun() : undefined;
   const runId = runArg ?? String(run!.databaseId);
   if (run) {
-    if (run.status !== 'completed') {
-      fail(`run ${runId} is ${run.status}: wait for it to finish.`);
-    }
     const head = git('rev-parse HEAD');
     if (run.headSha !== head) {
       fail(
@@ -99,6 +97,26 @@ if (local) {
           'push and wait for its run, or name one with --run <id>.',
       );
     }
+    if (run.status !== 'completed') {
+      console.log(`run ${runId} is ${run.status}: watching it.`);
+      const watch = spawnSync('gh', ['run', 'watch', runId], {
+        stdio: 'inherit',
+      });
+      if (watch.status !== 0) {
+        fail(`watching run ${runId} failed.`);
+      }
+    }
+  }
+  // `gh run watch` exits 0 whatever the run concluded, and the run itself
+  // concludes failure on the normal accept path (the Gate step trips on any
+  // diff), so the capture step's own conclusion is the only trustworthy
+  // signal that the bundle is whole.
+  const { jobs } = JSON.parse(gh(['run', 'view', runId, '--json', 'jobs'])) as {
+    jobs: RunJob[];
+  };
+  const verdict = captureVerdict(jobs);
+  if (verdict.kind === 'notCaptured') {
+    fail(`run ${runId}: ${verdict.reason}`);
   }
   const tmp = mkdtempSync(join(tmpdir(), 'visual-head-'));
   gh(['run', 'download', runId, '-n', 'visual-head', '-D', tmp]);

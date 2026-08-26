@@ -441,10 +441,11 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     // encrypted file after a transient Keystore failure, and zingolib then
     // reported "Failed to read wallet version <huge number>".
 
+    // Includes each .migrating twin, a plain copy that flags an interrupted migration, but not the encrypted .prerepair/.broken copies that would only read as undecryptable.
     private fun walletFileNames(): List<String> =
         listOf(WalletFileName.value, WalletBackupFileName.value).flatMap {
-            listOf(it, "$it.write.tmp")
-        }
+            listOf(it, "$it.write.tmp", "$it.migrating")
+        } + WalletTempSwapFileName.value
 
     // The outer layer stored the base64 text of an inner envelope. The inner
     // envelope goes under the same file name in a scratch dir, because the
@@ -464,17 +465,31 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     // Peels nested envelopes until a plain wallet appears, at most
     // MAX_UNWRAP_DEPTH layers. Returns the plain bytes and the layers removed.
-    private fun unwrapToPlainWallet(fileName: String, payload: ByteArray): Pair<ByteArray, Int>? {
+    private fun unwrapToPlainWallet(
+        fileName: String,
+        payload: ByteArray,
+        errors: MutableList<String>? = null,
+    ): Pair<ByteArray, Int>? {
         var bytes = payload
         for (depth in 0..WalletFileEnvelope.MAX_UNWRAP_DEPTH) {
             when (WalletFileEnvelope.classify(bytes)) {
                 WalletFileEnvelope.PayloadKind.PLAIN_WALLET -> return Pair(bytes, depth)
-                WalletFileEnvelope.PayloadKind.UNKNOWN -> return null
-                WalletFileEnvelope.PayloadKind.TINK_ENVELOPE -> bytes = try {
-                    unwrapEnvelope(fileName, bytes)
-                } catch (e: Exception) {
-                    Log.w("MAIN", "[$fileName] unwrap at depth $depth failed: $e")
+                WalletFileEnvelope.PayloadKind.UNKNOWN -> {
+                    errors?.add("depth $depth: payload is neither a wallet nor a Tink envelope")
                     return null
+                }
+                WalletFileEnvelope.PayloadKind.TINK_ENVELOPE -> {
+                    if (depth == WalletFileEnvelope.MAX_UNWRAP_DEPTH) {
+                        errors?.add("still an envelope after ${WalletFileEnvelope.MAX_UNWRAP_DEPTH} layers")
+                        return null
+                    }
+                    bytes = try {
+                        unwrapEnvelope(fileName, bytes)
+                    } catch (e: Exception) {
+                        Log.w("MAIN", "[$fileName] unwrap at depth $depth failed: $e")
+                        errors?.add("depth $depth: $e")
+                        return null
+                    }
                 }
             }
         }
@@ -484,19 +499,29 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     internal fun decryptedPayload(fileName: String): ByteArray =
         Base64.decode(readEncryptedFile(fileName), Base64.NO_WRAP)
 
+    private fun fileHeadHex(file: File): String =
+        file.inputStream().use { input ->
+            val head = ByteArray(16)
+            val n = input.read(head)
+            (0 until maxOf(n, 0)).joinToString("") { "%02x".format(head[it]) }
+        }
+
     // state: missing | plainLegacy | undecryptable | plainWallet | doubleWrapped | unknown
     internal fun diagnoseWalletFile(fileName: String): JSONObject {
         val file = File(applicationContext.filesDir, fileName)
         val report = JSONObject()
             .put("name", fileName)
             .put("size", if (file.exists()) file.length() else 0)
+            .put("mtime", if (file.exists()) file.lastModified() else 0)
             .put("depth", 0)
             .put("repairable", false)
         if (!file.exists()) return report.put("state", "missing")
+        report.put("head", fileHeadHex(file))
         val payload = try {
             decryptedPayload(fileName)
         } catch (e: Exception) {
             Log.w("MAIN", "[$fileName] diagnosis: encrypted read failed: $e")
+            report.put("readError", e.toString())
             val raw = file.readBytes()
             return report.put("state", if (looksLikeLegacyPlainWallet(raw)) "plainLegacy" else "undecryptable")
         }
@@ -504,10 +529,12 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             WalletFileEnvelope.PayloadKind.PLAIN_WALLET -> report.put("state", "plainWallet")
             WalletFileEnvelope.PayloadKind.UNKNOWN -> report.put("state", "unknown")
             WalletFileEnvelope.PayloadKind.TINK_ENVELOPE -> {
-                val unwrapped = unwrapToPlainWallet(fileName, payload)
+                val unwrapErrors = mutableListOf<String>()
+                val unwrapped = unwrapToPlainWallet(fileName, payload, unwrapErrors)
                 report.put("state", "doubleWrapped")
                     .put("repairable", unwrapped != null)
                     .put("depth", unwrapped?.second ?: 0)
+                    .put("unwrapErrors", JSONArray(unwrapErrors))
             }
         }
     }
@@ -664,7 +691,17 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 // before starting a new swap — deleting the temp blindly
                 // would destroy the only copy of that crash's original main.
                 completePendingSwap()
-                val wallet = readFileAsB64(WalletFileName.value)
+                val wallet = try {
+                    readFileAsB64(WalletFileName.value)
+                } catch (e: Exception) {
+                    // Keep the unreadable main's raw bytes aside and restore the backup into both slots.
+                    Log.w("MAIN", "[Native] backup restore: main unreadable, preserving raw and restoring backup: $e")
+                    File(applicationContext.filesDir, WalletFileName.value)
+                        .copyTo(File(applicationContext.filesDir, "${WalletFileName.value}.broken"), overwrite = true)
+                    writeEncryptedFile(WalletFileName.value, backup)
+                    promise.resolve(true)
+                    return
+                }
                 writeEncryptedFile(WalletTempSwapFileName.value, wallet)   // (1) temp = original main
                 writeEncryptedFile(WalletFileName.value, backup)            // (2) main = backup
                 writeEncryptedFile(WalletBackupFileName.value, wallet)      // (3) backup = original main
