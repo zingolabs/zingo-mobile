@@ -1145,11 +1145,11 @@ export class LoadingAppClass extends Component<
       await this.repairWalletFiles(title, errorText);
       return;
     }
-    // plainLegacy opens through the legacy fallback, so only undecryptable, doubleWrapped, and unknown count as broken.
+    // encryptedLegacy opens through the load path's legacy recovery, so only undecryptable, doubleWrapped, and unknown count as broken.
     const main = report.files.find(f => f.name === WALLET_FILE_NAME);
     const openableStates: ReadonlySet<WalletFileDiagnosis['state']> = new Set([
       'plainWallet',
-      'plainLegacy',
+      'encryptedLegacy',
       'missing',
     ]);
     const mainBroken = !!main && !openableStates.has(main.state);
@@ -1232,7 +1232,9 @@ export class LoadingAppClass extends Component<
       outcomes,
     );
     const backup = report.files.find(f => f.name === WALLET_BACKUP_FILE_NAME);
-    const backupRestorable = !!backup && backup.state === 'plainWallet';
+    const backupRestorable =
+      !!backup &&
+      (backup.state === 'plainWallet' || backup.state === 'encryptedLegacy');
     const message = this.state.translate(
       outcomes
         ? 'loadingapp.walletrepair-failed'

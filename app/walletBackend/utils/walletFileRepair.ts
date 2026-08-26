@@ -13,9 +13,9 @@ export const WALLET_BACKUP_FILE_NAME = 'wallet.backup.dat';
 
 export type WalletFileState =
   | 'missing'
-  | 'plainLegacy'
-  | 'undecryptable'
   | 'plainWallet'
+  | 'encryptedLegacy'
+  | 'undecryptable'
   | 'doubleWrapped'
   | 'unknown';
 
@@ -39,9 +39,9 @@ export type WalletFileRepairOutcome = 'repaired' | 'skipped' | 'failed';
 
 const WALLET_FILE_STATES: ReadonlySet<string> = new Set([
   'missing',
-  'plainLegacy',
-  'undecryptable',
   'plainWallet',
+  'encryptedLegacy',
+  'undecryptable',
   'doubleWrapped',
   'unknown',
 ]);

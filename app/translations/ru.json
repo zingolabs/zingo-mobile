@@ -136,7 +136,7 @@
     "walletrepair-outcome-skipped": "исправление не требуется",
     "walletrepair-outcome-failed": "исправить не удалось",
     "walletfile-state-missing": "отсутствует",
-    "walletfile-state-plainLegacy": "еще не зашифрован",
+    "walletfile-state-encryptedLegacy": "зашифрован (старый формат)",
     "walletfile-state-undecryptable": "не расшифровывается (ключ устройства потерян)",
     "walletfile-state-plainWallet": "в порядке",
     "walletfile-state-doubleWrapped": "зашифрован дважды",

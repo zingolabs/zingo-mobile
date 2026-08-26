@@ -136,7 +136,7 @@
     "walletrepair-outcome-skipped": "no repair needed",
     "walletrepair-outcome-failed": "repair failed",
     "walletfile-state-missing": "missing",
-    "walletfile-state-plainLegacy": "not yet encrypted",
+    "walletfile-state-encryptedLegacy": "encrypted (old format)",
     "walletfile-state-undecryptable": "cannot be decrypted (device key lost)",
     "walletfile-state-plainWallet": "ok",
     "walletfile-state-doubleWrapped": "encrypted twice",

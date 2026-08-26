@@ -105,6 +105,38 @@ describe('walletFileDiagnosis', () => {
     });
   });
 
+  it('keeps encryptedLegacy and degrades the retired plainLegacy to unknown', async () => {
+    bridge.walletFileDiagnosisInfo.mockResolvedValueOnce(
+      JSON.stringify({
+        files: [
+          {
+            name: WALLET_FILE_NAME,
+            state: 'encryptedLegacy',
+            size: 42,
+            mtime: 0,
+            depth: 0,
+            repairable: false,
+          },
+          {
+            name: WALLET_BACKUP_FILE_NAME,
+            state: 'plainLegacy',
+            size: 42,
+            mtime: 0,
+            depth: 0,
+            repairable: false,
+          },
+        ],
+      }),
+    );
+
+    const report = await walletFileDiagnosis();
+
+    expect(report.files.map(f => f.state)).toEqual([
+      'encryptedLegacy',
+      'unknown',
+    ]);
+  });
+
   it('returns an empty file list when the bridge rejects', async () => {
     bridge.walletFileDiagnosisInfo.mockRejectedValueOnce(new Error('boom'));
     expect(await walletFileDiagnosis()).toEqual({ files: [] });
