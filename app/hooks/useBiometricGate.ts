@@ -49,7 +49,10 @@ export const useBiometricGate = ({
     }
     let cancelled = false;
     (async () => {
-      const verdict = await simpleBiometrics({ translate });
+      const verdict = await simpleBiometrics({
+        translate,
+        purpose: 'screenEntry',
+      });
       if (cancelled) {
         return;
       }
@@ -82,7 +85,10 @@ export const useBiometricGate = ({
     setAuthPassed(false);
     let cancelled = false;
     (async () => {
-      const verdict = await simpleBiometrics({ translate });
+      const verdict = await simpleBiometrics({
+        translate,
+        purpose: 'screenEntry',
+      });
       if (cancelled) {
         return;
       }

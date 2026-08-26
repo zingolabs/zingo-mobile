@@ -4,6 +4,7 @@ import * as Keychain from 'react-native-keychain';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { GlobalConst, TranslateType } from './AppState';
+import { ErrorKeyed } from './AppState/types/Result';
 import {
   buildBaseOptions,
   buildGetOptions,
@@ -41,18 +42,43 @@ const SENTINEL_SERVICE_V1 = 'zingo-biometric-sentinel';
 // What a stall settles as differs by platform, and the outcome carries that
 // answer in `settleAs` — see interactiveStall for the policy.
 
+/** The translation-catalog keys a gate failure can carry. */
+export type GateFailureKey =
+  | 'biometrics-failure-stalled'
+  | 'biometrics-failure-declined'
+  | 'biometrics-failure-notserved'
+  | 'biometrics-failure-nosecurity';
+
+// The error channel carries a catalog key, never prose; `param` is the
+// untranslated platform diagnostic (an OSStatus, a prompt code, the machine
+// token of the native call that stalled) so a bug report still names the
+// mechanism. The shape is the repo-wide ErrorKeyed convention, so the
+// display edge is Utils.renderErrorKeyed rather than a hand-rolled
+// template.
+
+/** A gate failure in the repo-canonical ErrorKeyed shape. */
+export type GateFailure = ErrorKeyed<GateFailureKey>;
+
+const gateFailure = (
+  errorKey: GateFailureKey,
+  param?: string,
+): GateFailure => ({ kind: 'error', errorKey, param });
+
 /** The stalled attempt outcome, carrying the platform's settlement policy. */
 export type StalledOutcome = {
   kind: 'stalled';
   settleAs: 'declined' | 'unavailable';
-  failure: string;
+  failure: GateFailure;
 };
+
+/** Whether a broken entry followed a human failing the prompt or the platform declining to serve it. */
+export type BrokenEntryCause = 'authFailed' | 'notServed';
 
 /** Every way one keychain attempt against the sentinel can end. */
 export type AttemptOutcome =
   | { kind: 'authenticated' }
-  | { kind: 'declined'; failure: string }
-  | { kind: 'brokenEntry'; failure: string }
+  | { kind: 'declined'; failure: GateFailure }
+  | { kind: 'brokenEntry'; cause: BrokenEntryCause; failure: GateFailure }
   | StalledOutcome;
 
 // `unavailable` is the gate refusing to run, not the user refusing to
@@ -63,8 +89,8 @@ export type AttemptOutcome =
 /** Every way the gate as a whole can answer. */
 export type GateVerdict =
   | { kind: 'authenticated' }
-  | { kind: 'declined'; failure: string }
-  | { kind: 'unavailable'; failure: string };
+  | { kind: 'declined'; failure: GateFailure }
+  | { kind: 'unavailable'; failure: GateFailure };
 
 // The iOS bridge rejects with the OSStatus as the error code.
 //
@@ -91,8 +117,12 @@ const ANDROID_DECLINED: readonly number[] = [
   13, // ERROR_NEGATIVE_BUTTON
 ];
 
+/** Which authorization point a gate run answers for. */
+export type GatePurpose = 'appEntry' | 'screenEntry';
+
 type simpleBiometricsProps = {
   translate: (key: string) => TranslateType;
+  purpose: GatePurpose;
 };
 
 // Emitted with a boolean payload (true=show, false=hide) so a root-level
@@ -117,31 +147,52 @@ const NATIVE_STALL_MS = 10 * 1000;
 // enough that a person still deciding at the prompt almost never outlasts it.
 const ANDROID_PROMPT_STALL_MS = 60 * 1000;
 
+// AppState.currentState mutates only when the change event reaches the JS
+// thread, so a resign-active event behind a just-appeared auth sheet can
+// still be in flight when the window closes and the veto would read a stale
+// 'active'. A veto-capable fire waits this long for it to land first.
+const VETO_GRACE_MS = 1000;
+
+// The interactive stall policy's three axes move together, so one record
+// answers all of them: how long the window runs, whether a fire can be
+// vetoed off a live prompt, and what a stall settles as. A platform that
+// can veto (iOS, where a live auth sheet provably leaves 'active') affords
+// the short window and the fail-open verdict. One that cannot pairs the
+// wide window with the fail-closed verdict, and every platform other than
+// iOS takes that pairing: without a proven veto signal it is the safe one.
+type InteractiveStallPolicy = {
+  windowMs: number;
+  vetoOffActive: boolean;
+  settleAs: 'declined' | 'unavailable';
+};
+
+const interactiveStallPolicy = (): InteractiveStallPolicy =>
+  Platform.OS === 'ios'
+    ? {
+        windowMs: NATIVE_STALL_MS,
+        vetoOffActive: true,
+        settleAs: 'unavailable',
+      }
+    : {
+        windowMs: ANDROID_PROMPT_STALL_MS,
+        vetoOffActive: false,
+        settleAs: 'declined',
+      };
+
 const STALLED = Symbol('keychain-stalled');
-
-const swallow = () => undefined;
-
-// Native calls that lost their stall race but are still pending inside the
-// native module — their eventual prompt and result belong to nobody. The
-// gate lifecycle below waits on them so a retry never stacks a second
-// prompt on top of one, and the Android blanking overlay stays up until
-// they settle.
-let strandedCalls: Array<Promise<undefined>> = [];
 
 // The countdown for an interactive call runs only while the app is observed
 // 'active'. Leaving 'active' pauses it and returning re-arms it in full, so
 // time the OS parks on a human never counts toward a stall, and a queue
 // that is still wedged when the app comes back is caught by the fresh
-// window. On iOS a fire is vetoed while the current state is 'inactive' or
-// 'background' — the two states that prove a live auth sheet or a
-// backgrounded app — so a live prompt can never be declared a stall there.
-// An 'unknown' seed proves nothing (RN can seed it at launch and never
-// replay the missed transition), so it does not veto: parking a wedged call
-// on it would leave the gate pending forever. Android keeps its
-// BiometricPrompt inside the resumed activity, so no veto is possible and a
-// fire is answered by policy instead (see interactiveStall). Calls that
-// never show UI (the capability probes, has, reset) pass `false`: for them
-// any stall is a wedged queue, full stop.
+// window. Where the policy record allows a veto, a fire is vetoed while the
+// current state is 'inactive' or 'background' — the two states that prove a
+// live auth sheet or a backgrounded app — so a live prompt can never be
+// declared a stall. An 'unknown' seed proves nothing (RN can seed it at
+// launch and never replay the missed transition), so it does not veto:
+// parking a wedged call on it would leave the gate pending forever. Calls
+// that never show UI (the capability probes, has, reset) pass `false`: for
+// them any stall is a wedged queue, full stop.
 
 /** Resolves to STALLED when `op` outlives the platform's stall window. */
 const stallGuard = <T>(
@@ -150,33 +201,38 @@ const stallGuard = <T>(
 ): Promise<T | typeof STALLED> => {
   let disarm = () => {};
   const watchdog = new Promise<typeof STALLED>(resolve => {
-    const stallWindowMs =
-      interactive && Platform.OS === 'android'
-        ? ANDROID_PROMPT_STALL_MS
-        : NATIVE_STALL_MS;
+    const policy = interactiveStallPolicy();
+    const stallWindowMs = interactive ? policy.windowMs : NATIVE_STALL_MS;
     let timer: ReturnType<typeof setTimeout> | undefined;
     const pause = () => {
       clearTimeout(timer);
       timer = undefined;
     };
+    const fire = () => {
+      if (
+        interactive &&
+        policy.vetoOffActive &&
+        (AppState.currentState === 'inactive' ||
+          AppState.currentState === 'background')
+      ) {
+        // The change event that would have paused the countdown can lose
+        // the race against the timer; the veto reads the state that event
+        // was carrying, and the handler below re-arms on the way back.
+        pause();
+        return;
+      }
+      resolve(STALLED);
+    };
     const arm = () => {
       timer = setTimeout(() => {
-        if (
-          interactive &&
-          Platform.OS === 'ios' &&
-          (AppState.currentState === 'inactive' ||
-            AppState.currentState === 'background')
-        ) {
-          // The change event that would have paused the countdown can lose
-          // the race against the timer; the veto reads the state that event
-          // was carrying, and the handler below re-arms on the way back.
-          pause();
+        if (interactive && policy.vetoOffActive) {
+          // Give an in-flight resign-active event the grace to land before
+          // the veto reads the state; the change handler clears this timer
+          // like any other.
+          timer = setTimeout(fire, VETO_GRACE_MS);
           return;
         }
-        if (interactive) {
-          strandedCalls.push(op.then(swallow, swallow));
-        }
-        resolve(STALLED);
+        fire();
       }, stallWindowMs);
     };
     const subscription = interactive
@@ -196,16 +252,64 @@ const stallGuard = <T>(
   return Promise.race([op, watchdog]).finally(() => disarm());
 };
 
-// On iOS a fire proves the prompt is not on screen (a live prompt keeps the
-// app out of 'active' and vetoes it), so the gate cannot run and the caller
-// proceeds. On Android a fire cannot prove that, and proceeding would open
-// the wallet to whoever waits out the prompt, so it settles as declined: the
-// locked screen returns with a retry that issues a fresh prompt.
-const interactiveStall = (failure: string): StalledOutcome => ({
+// A stall settles by the policy record: fail-open where the veto proved the
+// prompt was off screen, fail-closed (a locked screen with a live retry)
+// where nothing could prove it.
+const interactiveStall = (failure: GateFailure): StalledOutcome => ({
   kind: 'stalled',
-  settleAs: Platform.OS === 'ios' ? 'unavailable' : 'declined',
+  settleAs: interactiveStallPolicy().settleAs,
   failure,
 });
+
+// Every native call the gate guards, named so the stall diagnostic is a
+// machine token rather than prose.
+type GuardedOp =
+  | 'canImplyAuthentication'
+  | 'getSupportedBiometryType'
+  | 'isPasscodeAuthAvailable'
+  | 'hasGenericPassword'
+  | 'resetGenericPassword:v1'
+  | 'resetGenericPassword:rebuild'
+  | 'setGenericPassword'
+  | 'getGenericPassword'
+  | 'requestAnimationFrame'
+  | 'AsyncStorage.setItem';
+
+type Guarded<T> =
+  { kind: 'settled'; value: T } | { kind: 'stalled'; failure: GateFailure };
+
+// Interactivity is a property of the op, not of the call site: the record
+// removes the degree of freedom that would let a new site hand an
+// interactive read the probe window (declaring a live prompt a stall) or
+// park a wedged probe for the prompt window.
+const OP_INTERACTIVITY: Record<GuardedOp, boolean> = {
+  canImplyAuthentication: false,
+  getSupportedBiometryType: false,
+  isPasscodeAuthAvailable: false,
+  hasGenericPassword: false,
+  'resetGenericPassword:v1': false,
+  'resetGenericPassword:rebuild': false,
+  setGenericPassword: true,
+  getGenericPassword: true,
+  requestAnimationFrame: false,
+  'AsyncStorage.setItem': false,
+};
+
+// The one place a native call meets the stall guard: the op name doubles as
+// the stall diagnostic, so a new call site can neither silently regain the
+// unbounded hang nor invent failure prose.
+const guarded = async <T>(
+  op: GuardedOp,
+  call: () => Promise<T>,
+): Promise<Guarded<T>> => {
+  const raced = await stallGuard(call(), OP_INTERACTIVITY[op]);
+  return raced === STALLED
+    ? {
+        kind: 'stalled',
+        failure: gateFailure('biometrics-failure-stalled', op),
+      }
+    : { kind: 'settled', value: raced };
+};
 
 const buildAuthPrompt = (
   translate: (key: string) => TranslateType,
@@ -231,16 +335,39 @@ const describeFailure = (e: unknown): string => {
   return code ? `${code} ${failureMessage(e)}` : failureMessage(e);
 };
 
+// errSecAuthFailed is the one broken-entry code that follows a human
+// actually failing the prompt (Android's equivalent, lockout, is already a
+// decline); every other code reaches brokenEntry without anyone being asked.
+const IOS_AUTH_FAILED = '-25293';
+
 const classifyFailure = (e: unknown): AttemptOutcome => {
+  const detail = describeFailure(e);
   const declined =
     Platform.OS === 'ios'
       ? IOS_DECLINED.includes(failureCode(e))
       : ANDROID_DECLINED.includes(
           Number(/code:\s*(-?\d+)/.exec(failureMessage(e))?.[1]),
         );
-  return declined
-    ? { kind: 'declined', failure: describeFailure(e) }
-    : { kind: 'brokenEntry', failure: describeFailure(e) };
+  if (declined) {
+    return {
+      kind: 'declined',
+      failure: gateFailure('biometrics-failure-declined', detail),
+    };
+  }
+  const cause: BrokenEntryCause =
+    Platform.OS === 'ios' && failureCode(e) === IOS_AUTH_FAILED
+      ? 'authFailed'
+      : 'notServed';
+  return {
+    kind: 'brokenEntry',
+    cause,
+    failure: gateFailure(
+      cause === 'authFailed'
+        ? 'biometrics-failure-declined'
+        : 'biometrics-failure-notserved',
+      detail,
+    ),
+  };
 };
 
 // The rebuild decision needs one bit the outcome alone cannot carry: whether
@@ -260,12 +387,13 @@ const settled = (verdict: GateVerdict): SettledPhase => ({
 });
 
 // Pure and total: every (phase, outcome) pair maps to exactly one next
-// phase, and the annotated return type makes the compiler hold the table
-// exhaustive.
-const advance = (state: GatePhase, outcome: AttemptOutcome): GatePhase => {
-  if (state.phase === 'settled') {
-    return state;
-  }
+// phase, and the annotated types make the compiler hold the table
+// exhaustive — the driver's loop condition proves the settled phase never
+// reaches this function.
+const advance = (
+  state: Exclude<GatePhase, SettledPhase>,
+  outcome: AttemptOutcome,
+): GatePhase => {
   switch (outcome.kind) {
     case 'authenticated':
       return settled({ kind: 'authenticated' });
@@ -276,23 +404,26 @@ const advance = (state: GatePhase, outcome: AttemptOutcome): GatePhase => {
       // front of a dead screen. The verdict is the platform's answer.
       return settled({ kind: outcome.settleAs, failure: outcome.failure });
     case 'brokenEntry':
-      return state.phase === 'trustedEntry'
-        ? { phase: 'freshEntry' }
-        : settled({ kind: 'declined', failure: outcome.failure });
+      if (state.phase === 'trustedEntry') {
+        return { phase: 'freshEntry' };
+      }
+      // Against an entry written seconds ago, only a failure the user was
+      // actually asked about is a decline; an entry the platform would not
+      // serve is a gate that cannot run, and locking on it would re-open
+      // the issue #1266 trap.
+      return outcome.cause === 'authFailed'
+        ? settled({ kind: 'declined', failure: outcome.failure })
+        : settled({ kind: 'unavailable', failure: outcome.failure });
   }
 };
 
-let lastFailure = '';
+let lastFailure: GateFailure | undefined;
 
-/**
- * Platform error behind the most recent refused gate, empty when the last
- * attempt went through. The locked screen shows it so a bug report carries an
- * OSStatus instead of "it just bounces back".
- */
-export const getLastGateFailure = (): string => lastFailure;
+/** The failure behind the most recent refused gate, absent when the last attempt went through. */
+export const getLastGateFailure = (): GateFailure | undefined => lastFailure;
 
 const recordVerdict = (verdict: GateVerdict): GateVerdict => {
-  lastFailure = verdict.kind === 'authenticated' ? '' : verdict.failure;
+  lastFailure = verdict.kind === 'authenticated' ? undefined : verdict.failure;
   return verdict;
 };
 
@@ -305,7 +436,7 @@ const attemptGate = async (
       // On Android the AES_GCM key is user-auth required so the set itself
       // drives the BiometricPrompt; on iOS the set is silent and the prompt
       // comes from the read below.
-      const written = await stallGuard(
+      const written = await guarded('setGenericPassword', () =>
         Keychain.setGenericPassword(
           SENTINEL_USERNAME,
           SENTINEL_VALUE,
@@ -315,13 +446,12 @@ const attemptGate = async (
             buildAuthPrompt(translate),
           ),
         ),
-        true,
       );
-      if (written === STALLED) {
-        return interactiveStall('keychain stalled writing the sentinel');
+      if (written.kind === 'stalled') {
+        return interactiveStall(written.failure);
       }
     }
-    const cred = await stallGuard(
+    const cred = await guarded('getGenericPassword', () =>
       Keychain.getGenericPassword(
         buildGetOptions(
           SENTINEL_SERVICE,
@@ -329,80 +459,83 @@ const attemptGate = async (
           buildAuthPrompt(translate),
         ),
       ),
-      true,
     );
-    if (cred === STALLED) {
-      return interactiveStall('keychain stalled reading the sentinel');
+    if (cred.kind === 'stalled') {
+      return interactiveStall(cred.failure);
     }
-    if (cred) {
+    if (cred.value) {
       return { kind: 'authenticated' };
     }
     // A resolved `false` means the entry was not found. No prompt can have
     // been satisfied against an entry that is not there.
-    return { kind: 'brokenEntry', failure: 'sentinel entry missing' };
+    return {
+      kind: 'brokenEntry',
+      cause: 'notServed',
+      failure: gateFailure(
+        'biometrics-failure-notserved',
+        'getGenericPassword:empty',
+      ),
+    };
   } catch (e) {
     return classifyFailure(e);
   }
 };
 
-// Audit Issue C: the overlay hides wallet content behind Android's
-// partial-screen prompt. A stranded call may still have that prompt on
-// screen when the verdict comes back, so the overlay stays up until every
-// strand settles.
-const hideBlankingWhenClear = (): void => {
-  if (strandedCalls.length === 0) {
-    DeviceEventEmitter.emit(BIOMETRIC_BLANKING_EVENT, false);
-    return;
-  }
-  Promise.all(strandedCalls).then(() =>
-    DeviceEventEmitter.emit(BIOMETRIC_BLANKING_EVENT, false),
-  );
-};
-
 const runGate = async (props: simpleBiometricsProps): Promise<GateVerdict> => {
   // Pre-flight: if the device cannot authenticate at all (no biometry, no
   // passcode), short-circuit so the caller can decide whether to allow the
-  // operation rather than blocking on an impossible prompt. `lastFailure`
-  // still holds whatever a stalled probe recorded, so pass it through.
-  if (!(await hasDeviceSecurity())) {
-    return { kind: 'unavailable', failure: lastFailure };
-  }
-
-  if (Platform.OS === 'android') {
-    DeviceEventEmitter.emit(BIOMETRIC_BLANKING_EVENT, true);
-    // Yield one frame so the overlay paints before the system prompt opens.
-    await new Promise<void>(resolve => requestAnimationFrame(() => resolve()));
+  // operation rather than blocking on an impossible prompt.
+  const security = await probeDeviceSecurity();
+  if (!security.secure) {
+    return recordVerdict({ kind: 'unavailable', failure: security.failure });
   }
 
   try {
+    if (Platform.OS === 'android') {
+      // Raised inside the try so the finally can always lower it: a
+      // rejection anywhere past this line still drops the overlay.
+      DeviceEventEmitter.emit(BIOMETRIC_BLANKING_EVENT, true);
+      // Yield one frame so the overlay paints before the system prompt
+      // opens. A backgrounded launch delivers no frames, so the wait is
+      // guarded: the prompt then opens without the paint rather than
+      // parking the gate.
+      await guarded(
+        'requestAnimationFrame',
+        () =>
+          new Promise<void>(resolve => requestAnimationFrame(() => resolve())),
+      );
+    }
     // hasGenericPassword answers "an entry exists", never "an entry works".
     // The iOS bridge resolves it to true on errSecInteractionNotAllowed, so
     // use it to decide whether a create is worth paying for, not as proof.
-    const has = await stallGuard(
+    const has = await guarded('hasGenericPassword', () =>
       Keychain.hasGenericPassword({
         service: SENTINEL_SERVICE,
       }),
-      false,
     );
-    if (has === STALLED) {
-      return recordVerdict({
-        kind: 'unavailable',
-        failure: 'keychain stalled probing the sentinel',
-      });
+    if (has.kind === 'stalled') {
+      return recordVerdict({ kind: 'unavailable', failure: has.failure });
     }
-    if (!has) {
+    if (!has.value) {
       // Nothing reads v1 from here on. The delete needs no prompt, and
       // deleting an absent entry resolves, so it runs without a lookup.
-      await stallGuard(
+      const clearedV1 = await guarded('resetGenericPassword:v1', () =>
         Keychain.resetGenericPassword({ service: SENTINEL_SERVICE_V1 }),
-        false,
       );
+      if (clearedV1.kind === 'stalled') {
+        // A wedge starting here settles now, like every sibling guard,
+        // instead of riding into the interactive attempt and its window.
+        return recordVerdict({
+          kind: 'unavailable',
+          failure: clearedV1.failure,
+        });
+      }
     }
 
     // The effectful driver of the pure `advance` table. It terminates in at
     // most two attempts: `advance` never re-enters trustedEntry, and from
     // freshEntry every outcome settles.
-    let state: GatePhase = has
+    let state: GatePhase = has.value
       ? { phase: 'trustedEntry' }
       : { phase: 'freshEntry' };
     // A first-run create writes into an empty service; only the
@@ -410,16 +543,15 @@ const runGate = async (props: simpleBiometricsProps): Promise<GateVerdict> => {
     let clearBeforeAttempt = false;
     while (state.phase !== 'settled') {
       if (clearBeforeAttempt) {
-        const cleared = await stallGuard(
+        const cleared = await guarded('resetGenericPassword:rebuild', () =>
           Keychain.resetGenericPassword(
             buildBaseOptions(SENTINEL_SERVICE, 'INTERACTIVE_AUTH'),
           ),
-          false,
         );
-        if (cleared === STALLED) {
+        if (cleared.kind === 'stalled') {
           return recordVerdict({
             kind: 'unavailable',
-            failure: 'keychain stalled clearing the sentinel',
+            failure: cleared.failure,
           });
         }
       }
@@ -431,56 +563,60 @@ const runGate = async (props: simpleBiometricsProps): Promise<GateVerdict> => {
     }
     return recordVerdict(state.verdict);
   } catch (e) {
-    // hasGenericPassword and resetGenericPassword reject on an unexpected
+    // The probes, the resets, and the frame yield reject on an unexpected
     // platform status. The user was never asked, so this is a gate we cannot
     // run rather than an authentication anybody failed.
-    return recordVerdict({ kind: 'unavailable', failure: describeFailure(e) });
+    return recordVerdict({
+      kind: 'unavailable',
+      failure: gateFailure('biometrics-failure-notserved', describeFailure(e)),
+    });
   } finally {
     if (Platform.OS === 'android') {
-      hideBlankingWhenClear();
+      // Dropped at the verdict even though a call from this run may still
+      // hold its prompt on screen: the bounded exposure behind that prompt
+      // costs less than the capped but minute-long black overlay the
+      // deferred hide put over every screen while a call pended (Audit
+      // Issue C accepted the trade).
+      DeviceEventEmitter.emit(BIOMETRIC_BLANKING_EVENT, false);
     }
-    // iOS treats the auth prompt as the app going to background;
-    // restore the foreground flag so background-state handling doesn't trip.
-    await AsyncStorage.setItem(GlobalConst.background, GlobalConst.no);
+    // iOS treats the auth prompt as the app going to background; restore the
+    // foreground flag so background-state handling doesn't trip. Guarded and
+    // swallowed: neither a wedged nor a failing store write may replace the
+    // verdict every caller shares.
+    try {
+      await guarded('AsyncStorage.setItem', () =>
+        AsyncStorage.setItem(GlobalConst.background, GlobalConst.no),
+      );
+    } catch {
+      // The verdict outranks the flag restore.
+    }
   }
 };
 
 // The gate's process-wide lifecycle. `running` shares the run in flight so
-// concurrent callers never stack prompts. `strandedCall` is the state a
-// bare Promise-or-undefined cache cannot represent: the verdict is out but
-// a native call is still pending, and a fresh run started against it
-// collides (Android answers the collision with ERROR_CANCELED, re-locking
-// every retry). A caller arriving then waits for the strand under the
-// stall window before running.
+// concurrent callers never stack prompts. A settled verdict always returns
+// to `idle`: a retry starts a fresh run with a fresh prompt, even while a
+// call from an earlier run is still pending inside the native module. The
+// collision can answer the fresh prompt ERROR_CANCELED, one bounded and
+// retriable decline. Blocking the retry proved worse: it answered Try
+// Again by policy after the probe window without ever prompting, so while
+// a call never settled (a lost Android callback) no retry could succeed —
+// the issue #1266 trap this module exists to keep unreachable.
 type GateLifecycle =
   | { stage: 'idle' }
-  | { stage: 'running'; verdictOut: Promise<GateVerdict> }
-  | { stage: 'strandedCall'; settled: Promise<undefined> };
+  | {
+      stage: 'running';
+      purpose: GatePurpose;
+      verdictOut: Promise<GateVerdict>;
+    };
 
 let lifecycle: GateLifecycle = { stage: 'idle' };
 
-const settleLifecycle = (): void => {
-  if (strandedCalls.length === 0) {
-    lifecycle = { stage: 'idle' };
-    return;
-  }
-  const strandSettled = Promise.all(strandedCalls).then(swallow);
-  strandedCalls = [];
-  const stranded: GateLifecycle = {
-    stage: 'strandedCall',
-    settled: strandSettled,
-  };
-  lifecycle = stranded;
-  strandSettled.then(() => {
-    if (lifecycle === stranded) {
-      lifecycle = { stage: 'idle' };
-    }
-  });
-};
-
 const startRun = (props: simpleBiometricsProps): Promise<GateVerdict> => {
-  const verdictOut = runGate(props).finally(settleLifecycle);
-  lifecycle = { stage: 'running', verdictOut };
+  const verdictOut = runGate(props).finally(() => {
+    lifecycle = { stage: 'idle' };
+  });
+  lifecycle = { stage: 'running', purpose: props.purpose, verdictOut };
   return verdictOut;
 };
 
@@ -492,80 +628,83 @@ const simpleBiometrics = (
   props: simpleBiometricsProps,
 ): Promise<GateVerdict> => {
   switch (lifecycle.stage) {
-    case 'running':
-      return lifecycle.verdictOut;
-    case 'strandedCall': {
-      const verdictOut = stallGuard(lifecycle.settled, true).then(strand => {
-        if (strand === STALLED) {
-          // The strand outlived another full window; stallGuard re-entered
-          // it into strandedCalls, and the verdict follows the platform's
-          // stall policy rather than risking a stacked prompt.
-          const stall = interactiveStall(
-            'a keychain call from an earlier gate is still pending',
-          );
-          settleLifecycle();
-          return recordVerdict({
-            kind: stall.settleAs,
-            failure: stall.failure,
-          });
-        }
-        return runGate(props).finally(settleLifecycle);
-      });
-      lifecycle = { stage: 'running', verdictOut };
-      return verdictOut;
+    case 'running': {
+      const running = lifecycle;
+      if (running.purpose === props.purpose) {
+        return running.verdictOut;
+      }
+      // A pass authenticates the person for any purpose; a decline answers
+      // only the purpose the user was actually shown. A cross-purpose
+      // caller therefore adopts everything but a decline, and on one runs
+      // its own gate once the shared run has settled.
+      return running.verdictOut.then(verdict =>
+        verdict.kind === 'declined' ? simpleBiometrics(props) : verdict,
+      );
     }
     case 'idle':
       return startRun(props);
   }
 };
 
-/**
- * True when the device can authenticate the user via biometry or device
- * credential. Used by Settings to enable/disable the per-screen bio toggles.
- * Replaces the react-native-biometrics isSensorAvailable() check.
- *
- * canImplyAuthentication() is iOS-only in react-native-keychain and always
- * returns false on Android. So we compose the Android answer ourselves from
- * the biometry-type query plus the device passcode probe.
- *
- * These probes are the first keychain calls of the flow, which makes them the
- * ones that queue behind a wedged predecessor. A stall reads as "no device
- * security", and that is what settles the gate as `unavailable` instead of
- * leaving the caller waiting forever.
- */
-export const hasDeviceSecurity = async (): Promise<boolean> => {
+type DeviceSecurityProbe =
+  { secure: true } | { secure: false; failure: GateFailure };
+
+const insecure = (failure: GateFailure): DeviceSecurityProbe => ({
+  secure: false,
+  failure,
+});
+
+const NO_DEVICE_SECURITY: GateFailure = gateFailure(
+  'biometrics-failure-nosecurity',
+);
+
+// canImplyAuthentication() is iOS-only in react-native-keychain and always
+// returns false on Android, so the Android answer is composed from the
+// biometry-type query plus the device passcode probe. These probes are the
+// first keychain calls of the flow, which makes them the ones that queue
+// behind a wedged predecessor; each refusal carries its own reason, so the
+// pre-flight verdict never inherits a stale one.
+
+/** Answers whether the device can authenticate its user, with the reason when it cannot. */
+const probeDeviceSecurity = async (): Promise<DeviceSecurityProbe> => {
   try {
     if (Platform.OS === 'ios') {
-      const can = await stallGuard(Keychain.canImplyAuthentication(), false);
-      if (can === STALLED) {
-        lastFailure = 'keychain stalled probing device security';
-        return false;
+      const can = await guarded('canImplyAuthentication', () =>
+        Keychain.canImplyAuthentication(),
+      );
+      if (can.kind === 'stalled') {
+        return insecure(can.failure);
       }
-      return can;
+      return can.value ? { secure: true } : insecure(NO_DEVICE_SECURITY);
     }
-    const biometry = await stallGuard(
+    const biometry = await guarded('getSupportedBiometryType', () =>
       Keychain.getSupportedBiometryType(),
-      false,
     );
-    if (biometry === STALLED) {
-      lastFailure = 'keychain stalled probing biometry type';
-      return false;
+    if (biometry.kind === 'stalled') {
+      return insecure(biometry.failure);
     }
-    if (biometry !== null) {
-      return true;
+    if (biometry.value !== null) {
+      return { secure: true };
     }
-    const passcode = await stallGuard(
+    const passcode = await guarded('isPasscodeAuthAvailable', () =>
       Keychain.isPasscodeAuthAvailable(),
-      false,
     );
-    if (passcode === STALLED) {
-      lastFailure = 'keychain stalled probing passcode availability';
-      return false;
+    if (passcode.kind === 'stalled') {
+      return insecure(passcode.failure);
     }
-    return passcode;
-  } catch {
-    return false;
+    return passcode.value ? { secure: true } : insecure(NO_DEVICE_SECURITY);
+  } catch (e) {
+    return insecure(
+      gateFailure('biometrics-failure-notserved', describeFailure(e)),
+    );
   }
 };
+
+// Settings uses the boolean wrapper to enable the per-screen bio toggles;
+// it replaces the react-native-biometrics isSensorAvailable() check.
+
+/** True when the device can authenticate the user via biometry or device credential. */
+export const hasDeviceSecurity = async (): Promise<boolean> =>
+  (await probeDeviceSecurity()).secure;
 
 export default simpleBiometrics;

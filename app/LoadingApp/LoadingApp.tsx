@@ -558,6 +558,13 @@ export class LoadingAppClass extends Component<
         props.route.params.biometricsFailed !== undefined
           ? props.route.params.biometricsFailed
           : false,
+      // One-time snapshot for the arrived-already-declined path (the
+      // foreground gate navigated here); the startGate path snapshots its
+      // own verdict's failure below.
+      gateFailure:
+        !!props.route.params && props.route.params.biometricsFailed
+          ? getLastGateFailure()
+          : undefined,
       startingApp:
         !!props.route.params && props.route.params.startingApp !== undefined
           ? props.route.params.startingApp
@@ -597,10 +604,16 @@ export class LoadingAppClass extends Component<
         // blocking locks the user out of the wallet.
         this.setState({ biometricsFailed: false });
         const startGate: GateVerdict = this.state.security.startApp
-          ? await simpleBiometrics({ translate: this.state.translate })
+          ? await simpleBiometrics({
+              translate: this.state.translate,
+              purpose: 'appEntry',
+            })
           : { kind: 'authenticated' };
         if (startGate.kind === 'declined') {
-          this.setState({ biometricsFailed: true });
+          this.setState({
+            biometricsFailed: true,
+            gateFailure: startGate.failure,
+          });
           return;
         } else {
           this.setState({ biometricsFailed: false });
@@ -2151,6 +2164,8 @@ export class LoadingAppClass extends Component<
       blockExplorer: this.state.blockExplorer,
     };
 
+    const { gateFailure } = this.state;
+
     return (
       <>
         <ContextAppLoadingProvider value={context}>
@@ -2163,7 +2178,11 @@ export class LoadingAppClass extends Component<
                   translate={translate}
                   firstLaunchingMessage={firstLaunchingMessage}
                   biometricsFailed={biometricsFailed}
-                  message={biometricsFailed ? getLastGateFailure() : undefined}
+                  message={
+                    biometricsFailed && gateFailure
+                      ? Utils.renderErrorKeyed(gateFailure, translate)
+                      : undefined
+                  }
                   tryAgain={() => {
                     this.setState({ biometricsFailed: false }, () =>
                       this.componentDidMount(),
