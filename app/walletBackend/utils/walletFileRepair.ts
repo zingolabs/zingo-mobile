@@ -1,6 +1,7 @@
 import { Platform } from 'react-native';
 import RPCModule from '../../RPCModule';
 import { callFfi } from '../ffi';
+import { ErrorKeyed } from '../../AppState/types/Result';
 
 // Android-only support tooling for the 2.0.21 double-wrap incident: the
 // native migration re-encrypted an already encrypted wallet file, and
@@ -148,4 +149,41 @@ export function repairSucceeded(
 ): boolean {
   const values = Object.values(outcomes);
   return values.length > 0 && values.every(o => o !== 'failed');
+}
+
+export type WalletSeedSalvage =
+  | { kind: 'salvagedSeed'; seedPhrase: string; birthday: number }
+  | ErrorKeyed<'loadingapp.walletsalvage-failed'>;
+
+// Salvages seed and birthday from the stable prefix of a wallet file that
+// cannot open; the native side keeps the damaged bytes at `.broken`.
+export async function walletSeedSalvage(): Promise<WalletSeedSalvage> {
+  const failed: WalletSeedSalvage = {
+    kind: 'error',
+    errorKey: 'loadingapp.walletsalvage-failed',
+  };
+  const result = await callFfi(RPCModule.walletFileRecoveryInfo());
+  if (!result.ok) {
+    return failed;
+  }
+  try {
+    const parsed: unknown = JSON.parse(result.value);
+    if (typeof parsed !== 'object' || parsed === null) {
+      return failed;
+    }
+    const entry = parsed as Record<string, unknown>;
+    if (
+      typeof entry.seed_phrase !== 'string' ||
+      typeof entry.birthday !== 'number'
+    ) {
+      return failed;
+    }
+    return {
+      kind: 'salvagedSeed',
+      seedPhrase: entry.seed_phrase,
+      birthday: entry.birthday,
+    };
+  } catch {
+    return failed;
+  }
 }

@@ -18,6 +18,7 @@ import RPCModule from '../app/RPCModule';
 import {
   hasRepairableWalletFile,
   walletFileDiagnosis,
+  walletSeedSalvage,
   WalletFileDiagnosis,
   WalletFileState,
   WALLET_FILE_NAME,
@@ -140,5 +141,38 @@ describe('walletFileDiagnosis', () => {
   it('returns an empty file list when the bridge rejects', async () => {
     bridge.walletFileDiagnosisInfo.mockRejectedValueOnce(new Error('boom'));
     expect(await walletFileDiagnosis()).toEqual({ files: [] });
+  });
+});
+
+describe('walletSeedSalvage', () => {
+  it('salvages the seed phrase and birthday', async () => {
+    bridge.walletFileRecoveryInfo.mockResolvedValueOnce(
+      JSON.stringify({
+        seed_phrase: 'hospital museum valve',
+        birthday: 2000000,
+        no_of_accounts: 1,
+      }),
+    );
+    expect(await walletSeedSalvage()).toEqual({
+      kind: 'salvagedSeed',
+      seedPhrase: 'hospital museum valve',
+      birthday: 2000000,
+    });
+  });
+
+  it('fails typed when the bridge rejects', async () => {
+    bridge.walletFileRecoveryInfo.mockRejectedValueOnce(new Error('Read'));
+    expect(await walletSeedSalvage()).toEqual({
+      kind: 'error',
+      errorKey: 'loadingapp.walletsalvage-failed',
+    });
+  });
+
+  it('fails typed on a malformed payload', async () => {
+    bridge.walletFileRecoveryInfo.mockResolvedValueOnce('{"birthday":"x"}');
+    expect(await walletSeedSalvage()).toEqual({
+      kind: 'error',
+      errorKey: 'loadingapp.walletsalvage-failed',
+    });
   });
 });
