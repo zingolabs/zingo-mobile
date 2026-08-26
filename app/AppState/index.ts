@@ -20,7 +20,7 @@ import type SecurityType from './types/SecurityType';
 import type ServerUrisType from './types/ServerUrisType';
 import type { SetServerResult } from './types/SetServerResult';
 import type { ErrorKeyed, Done } from './types/Result';
-import { DONE } from './types/Result';
+import { DONE, errorKeyed } from './types/Result';
 import type ValueTransferType from './types/ValueTransferType';
 import type ProposalPoolsType from './types/ProposalPoolsType';
 import type TransactionType from './types/TransactionType';
@@ -82,6 +82,7 @@ export {
   TotalBalanceClass,
   AddressBookFileClassObsolete,
   DONE,
+  errorKeyed,
   AddressBookActionEnum,
   MenuItemEnum,
   LanguageEnum,

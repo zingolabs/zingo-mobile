@@ -89,10 +89,7 @@ import Toast from 'react-native-toast-message';
 import { toastConfig } from '../toastConfig';
 import { RPCSeedType } from '../walletBackend/types/RPCSeedType';
 import Launching from './components/Launching';
-import simpleBiometrics, {
-  GateVerdict,
-  getLastGateFailure,
-} from '../simpleBiometrics';
+import simpleBiometrics, { GateVerdict } from '../simpleBiometrics';
 import selectingServer from '../selectingServer';
 import { isEqual } from 'lodash';
 import {
@@ -553,18 +550,12 @@ export class LoadingAppClass extends Component<
       customServerOffline: false,
       customServerAuto: false,
       customServerCustom: false,
-      biometricsFailed:
-        !!props.route.params &&
-        props.route.params.biometricsFailed !== undefined
-          ? props.route.params.biometricsFailed
-          : false,
-      // One-time snapshot for the arrived-already-declined path (the
-      // foreground gate navigated here); the startGate path snapshots its
-      // own verdict's failure below.
-      gateFailure:
+      // A decline's failure arrives with the navigation (see
+      // LoadingAppNavigationState), never from module state.
+      biometricGate:
         !!props.route.params && props.route.params.biometricsFailed
-          ? getLastGateFailure()
-          : undefined,
+          ? { kind: 'declined', failure: props.route.params.gateFailure }
+          : { kind: 'passed' },
       startingApp:
         !!props.route.params && props.route.params.startingApp !== undefined
           ? props.route.params.startingApp
@@ -598,30 +589,35 @@ export class LoadingAppClass extends Component<
     // to start the App the first time in this session
     // the user have to pass the security of the device
     if (this.state.startingApp) {
-      if (!this.state.biometricsFailed) {
-        // (PIN or TouchID or FaceID). Only a decline locks; an
-        // 'unavailable' gate passes because it guards nothing and
-        // blocking locks the user out of the wallet.
-        this.setState({ biometricsFailed: false });
-        const startGate: GateVerdict = this.state.security.startApp
-          ? await simpleBiometrics({
-              translate: this.state.translate,
-              purpose: 'appEntry',
-            })
-          : { kind: 'authenticated' };
-        if (startGate.kind === 'declined') {
-          this.setState({
-            biometricsFailed: true,
-            gateFailure: startGate.failure,
-          });
-          return;
-        } else {
-          this.setState({ biometricsFailed: false });
-        }
-      } else {
-        // if there is a biometric Fail, likely from the foreground check
-        // keep the App in the first screen because the user needs to try again.
+      if (this.state.biometricGate.kind === 'declined') {
+        // A biometric fail, likely from the foreground check: keep the App
+        // on the first screen so the user can try again.
         return;
+      }
+      // (PIN or TouchID or FaceID). Only a decline locks; an
+      // 'unavailable' gate passes because it guards nothing and
+      // blocking locks the user out of the wallet.
+      let startGate: GateVerdict = this.state.security.startApp
+        ? await simpleBiometrics({
+            translate: this.state.translate,
+            purpose: 'appEntry',
+          })
+        : { kind: 'authenticated' };
+      while (startGate.kind === 'unanswered') {
+        // A shared run's decline answered a screen gate, not app entry;
+        // this caller is alive, so it asks for its own verdict.
+        startGate = await simpleBiometrics({
+          translate: this.state.translate,
+          purpose: 'appEntry',
+        });
+      }
+      if (startGate.kind === 'declined') {
+        this.setState({
+          biometricGate: { kind: 'declined', failure: startGate.failure },
+        });
+        return;
+      } else {
+        this.setState({ biometricGate: { kind: 'passed' } });
       }
     }
 
@@ -723,6 +719,11 @@ export class LoadingAppClass extends Component<
       }
     }
 
+    // Re-entry via the locked screen's tryAgain must not stack another
+    // subscription on the one this mount already holds.
+    if (typeof this.appstate.remove === 'function') {
+      this.appstate.remove();
+    }
     this.appstate = AppState.addEventListener(
       EventListenerEnum.change,
       async nextAppState => {
@@ -763,6 +764,9 @@ export class LoadingAppClass extends Component<
       },
     );
 
+    if (typeof this.unsubscribeNetInfo === 'function') {
+      this.unsubscribeNetInfo();
+    }
     this.unsubscribeNetInfo = NetInfo.addEventListener(
       (state: NetInfoState) => {
         const { screen } = this.state;
@@ -2123,7 +2127,7 @@ export class LoadingAppClass extends Component<
       customServerOffline,
       customServerAuto,
       firstLaunchingMessage,
-      biometricsFailed,
+      biometricGate,
       translate,
       hasRecoveryWalletInfoSaved,
       readOnly,
@@ -2164,8 +2168,6 @@ export class LoadingAppClass extends Component<
       blockExplorer: this.state.blockExplorer,
     };
 
-    const { gateFailure } = this.state;
-
     return (
       <>
         <ContextAppLoadingProvider value={context}>
@@ -2177,14 +2179,14 @@ export class LoadingAppClass extends Component<
                 <Launching
                   translate={translate}
                   firstLaunchingMessage={firstLaunchingMessage}
-                  biometricsFailed={biometricsFailed}
+                  biometricsFailed={biometricGate.kind === 'declined'}
                   message={
-                    biometricsFailed && gateFailure
-                      ? Utils.renderErrorKeyed(gateFailure, translate)
+                    biometricGate.kind === 'declined' && biometricGate.failure
+                      ? Utils.renderErrorKeyed(biometricGate.failure, translate)
                       : undefined
                   }
                   tryAgain={() => {
-                    this.setState({ biometricsFailed: false }, () =>
+                    this.setState({ biometricGate: { kind: 'passed' } }, () =>
                       this.componentDidMount(),
                     );
                   }}
