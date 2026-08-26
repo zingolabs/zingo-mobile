@@ -595,19 +595,18 @@ const MeetIronwood: React.FunctionComponent<MeetIronwoodProps> = ({
         }}
       />
 
-      {/* Option 3 — split & migrate. */}
-      <View>
-        <OptionTitle>
-          {translate('meetironwood.option3-label') as string}
-        </OptionTitle>
-        <BodyText
-          dimColor={colors.fgMuted}
-          boldColor={colors.fgDefault}
-          marginBottom={0}
-        >
-          {translate('meetironwood.option3-body') as string}
-        </BodyText>
-      </View>
+      {/* Option 3 — split & migrate: the balance splits into standardized
+          notes that later cross in timed batches. */}
+      <OptionTitle>
+        {translate('meetironwood.option3-label') as string}
+      </OptionTitle>
+      <BodyText
+        dimColor={colors.fgMuted}
+        boldColor={colors.fgDefault}
+        marginBottom={0}
+      >
+        {translate('meetironwood.option3-body') as string}
+      </BodyText>
     </View>,
   ];
 
