@@ -51,6 +51,24 @@ test('a decline surfaces the failure, not only the generic sentence', async () =
   );
 });
 
+test('a decline is a named refused state, not a bare false', async () => {
+  gate.mockResolvedValue({
+    kind: 'declined',
+    failure: {
+      kind: 'error',
+      errorKey: 'biometrics-failure-declined',
+      param: '-128 boom',
+    },
+  });
+  const props = gateArgs();
+  const { result } = renderHook((p: GateProps) => useBiometricGate(p), {
+    initialProps: props,
+  });
+
+  await waitFor(() => expect(props.onCancel).toHaveBeenCalled());
+  expect(result.current).toMatchObject({ kind: 'refused' });
+});
+
 test('flipping needsAuth on re-gates a mounted screen', async () => {
   gate.mockResolvedValue({ kind: 'authenticated' });
   const { result, rerender } = renderHook(
@@ -59,12 +77,12 @@ test('flipping needsAuth on re-gates a mounted screen', async () => {
       initialProps: gateArgs({ needsAuth: false }),
     },
   );
-  expect(result.current).toBe(true);
+  expect(result.current).toMatchObject({ kind: 'passed' });
   expect(gate).not.toHaveBeenCalled();
 
   rerender(gateArgs({ needsAuth: true }));
   await waitFor(() => expect(gate).toHaveBeenCalledTimes(1));
-  await waitFor(() => expect(result.current).toBe(true));
+  await waitFor(() => expect(result.current).toMatchObject({ kind: 'passed' }));
 });
 
 test('an unanswered shared verdict leaves the screen gated, no re-ask', async () => {
@@ -83,7 +101,7 @@ test('an unanswered shared verdict leaves the screen gated, no re-ask', async ()
   await waitFor(() => expect(gate).toHaveBeenCalledTimes(1));
   await new Promise(resolve => setTimeout(resolve, 0));
   expect(gate).toHaveBeenCalledTimes(1);
-  expect(result.current).toBe(false);
+  expect(result.current).toMatchObject({ kind: 'checking' });
   expect(props.onCancel).not.toHaveBeenCalled();
 });
 
@@ -137,7 +155,7 @@ test('a stalled fail-open tells the user the check did not respond', async () =>
     initialProps: props,
   });
 
-  await waitFor(() => expect(result.current).toBe(true));
+  await waitFor(() => expect(result.current).toMatchObject({ kind: 'passed' }));
   expect(props.addLastSnackbar).toHaveBeenCalledWith(
     expect.stringContaining('biometrics-failure-stalled'),
   );

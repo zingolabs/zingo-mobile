@@ -431,7 +431,7 @@ export default function LoadingApp(props: LoadingAppProps) {
       <Launching
         translate={translate}
         firstLaunchingMessage={LaunchingModeEnum.opening}
-        biometricsFailed={false}
+        biometricGate={{ kind: 'passed' }}
       />
     );
   } else {
@@ -2211,15 +2211,7 @@ export class LoadingAppClass extends Component<
                 <Launching
                   translate={translate}
                   firstLaunchingMessage={firstLaunchingMessage}
-                  biometricsFailed={biometricGate.kind === 'declined'}
-                  message={
-                    biometricGate.kind === 'declined'
-                      ? Utils.renderGateFailure(
-                          biometricGate.failure,
-                          translate,
-                        )
-                      : undefined
-                  }
+                  biometricGate={biometricGate}
                   tryAgain={() => {
                     this.setState({ biometricGate: { kind: 'passed' } }, () =>
                       this.componentDidMount(),

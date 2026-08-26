@@ -74,7 +74,10 @@ import { getLatestBlockServerInfo } from '../../app/walletBackend';
 import { isEqual } from 'lodash';
 import ChainTypeToggle from '../Components/ChainTypeToggle';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
-import { probeDeviceSecurity } from '../../app/simpleBiometrics';
+import {
+  DeviceSecurityProbe,
+  probeDeviceSecurity,
+} from '../../app/simpleBiometrics';
 import { useBiometricGate } from '../../app/hooks/useBiometricGate';
 import SelectBottomSheet from '../Components/SelectBottomSheet';
 import BottomSheet, {
@@ -247,7 +250,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   if (!savingSettingsRef.current) {
     gateRequirementRef.current = liveNeedsAuth;
   }
-  const authPassed = useBiometricGate({
+  const screenGate = useBiometricGate({
     needsAuth: gateRequirementRef.current,
     translate,
     addLastSnackbar,
@@ -255,6 +258,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     foregroundAppEnabled: !!securityContext.foregroundApp,
     foregroundEpoch,
   });
+  const authPassed = screenGate.kind === 'passed';
 
   const [autoServerUri, setAutoServerUri] = useState<string>('');
   const [autoServerChainName, setAutoServerChainName] = useState<string>('');
@@ -345,7 +349,11 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const [showDeveloperOptions, setShowDeveloperOptions] =
     useState<boolean>(false);
   const [openInfoSection, setOpenInfoSection] = useState<string | null>(null);
-  const [deviceHasSecurity, setDeviceHasSecurity] = useState<boolean>(true);
+  // Seeded optimistically; the union names the probe's answer instead of
+  // collapsing it to a bit at this edge.
+  const [deviceSecurity, setDeviceSecurity] = useState<DeviceSecurityProbe>({
+    kind: 'secured',
+  });
 
   // Bottom-sheet measurements — Settings has no balance area, so the sheet
   // uses a single snap at the maximum height (just below the screen Header).
@@ -411,10 +419,11 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     }
     (async () => {
       const probe = await probeDeviceSecurity();
-      if (probe.secure) {
-        setDeviceHasSecurity(true);
-      } else if (probe.failure.errorKey !== 'biometrics-failure-stalled') {
-        setDeviceHasSecurity(false);
+      if (
+        probe.kind === 'secured' ||
+        probe.failure.errorKey !== 'biometrics-failure-stalled'
+      ) {
+        setDeviceSecurity(probe);
       }
     })();
   }, [authPassed]);
@@ -1965,7 +1974,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                       </View>
                     </TouchableOpacity>
                   </View>
-                  {!deviceHasSecurity && (
+                  {deviceSecurity.kind === 'insecure' && (
                     <FadeText style={{ marginTop: 6 }}>
                       {
                         translate(

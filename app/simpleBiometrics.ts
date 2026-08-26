@@ -73,12 +73,17 @@ export type AttemptOutcome =
 // re-asks if it still exists. The module must not re-ask on its behalf,
 // because that raised prompts for components already unmounted.
 
-/** Every way the gate as a whole can answer. */
-export type GateVerdict =
+/** Every answer the gate gives a caller that must act on it. */
+export type AnsweredVerdict =
   | { kind: 'authenticated' }
   | { kind: 'declined'; failure: GateFailure }
-  | { kind: 'unavailable'; failure: GateFailure }
-  | { kind: 'unanswered' };
+  | { kind: 'unavailable'; failure: GateFailure };
+
+/** The non-answer: the shared run's decline addressed another purpose, and the holder must do nothing. */
+export type Unanswered = { kind: 'unanswered' };
+
+/** Every way the gate as a whole can answer. */
+export type GateVerdict = AnsweredVerdict | Unanswered;
 
 // The iOS bridge rejects with the OSStatus as the error code.
 //
@@ -472,7 +477,7 @@ const runGate = async (props: simpleBiometricsProps): Promise<GateVerdict> => {
   // passcode), short-circuit so the caller can decide whether to allow the
   // operation rather than blocking on an impossible prompt.
   const security = await probeDeviceSecurity();
-  if (!security.secure) {
+  if (security.kind === 'insecure') {
     // A stalled probe proves nothing about a live prompt, so it settles by
     // the platform's stall policy like every other stall. A retry's probe
     // queues behind the very call that stalled its parent, and answering
@@ -650,10 +655,10 @@ const simpleBiometrics = (
 
 /** The device-security probe's answer, carrying the reason when it cannot secure. */
 export type DeviceSecurityProbe =
-  { secure: true } | { secure: false; failure: GateFailure };
+  { kind: 'secured' } | { kind: 'insecure'; failure: GateFailure };
 
 const insecure = (failure: GateFailure): DeviceSecurityProbe => ({
-  secure: false,
+  kind: 'insecure',
   failure,
 });
 
@@ -678,7 +683,7 @@ export const probeDeviceSecurity = async (): Promise<DeviceSecurityProbe> => {
       if (can.kind === 'stalled') {
         return insecure(can.failure);
       }
-      return can.value ? { secure: true } : insecure(NO_DEVICE_SECURITY);
+      return can.value ? { kind: 'secured' } : insecure(NO_DEVICE_SECURITY);
     }
     const biometry = await guarded('getSupportedBiometryType', () =>
       Keychain.getSupportedBiometryType(),
@@ -687,7 +692,7 @@ export const probeDeviceSecurity = async (): Promise<DeviceSecurityProbe> => {
       return insecure(biometry.failure);
     }
     if (biometry.value !== null) {
-      return { secure: true };
+      return { kind: 'secured' };
     }
     const passcode = await guarded('isPasscodeAuthAvailable', () =>
       Keychain.isPasscodeAuthAvailable(),
@@ -695,7 +700,7 @@ export const probeDeviceSecurity = async (): Promise<DeviceSecurityProbe> => {
     if (passcode.kind === 'stalled') {
       return insecure(passcode.failure);
     }
-    return passcode.value ? { secure: true } : insecure(NO_DEVICE_SECURITY);
+    return passcode.value ? { kind: 'secured' } : insecure(NO_DEVICE_SECURITY);
   } catch (e) {
     return insecure(
       gateFailure('biometrics-failure-notserved', describeFailure(e)),
@@ -732,7 +737,7 @@ const untilProvablyActive = (): Promise<void> => {
 /** Runs the gate for an app-level caller, re-asking on `unanswered` once the app is back in the foreground. */
 export const gateUntilAnswered = async (
   props: simpleBiometricsProps,
-): Promise<Exclude<GateVerdict, { kind: 'unanswered' }>> => {
+): Promise<AnsweredVerdict> => {
   let verdict = await simpleBiometrics(props);
   while (verdict.kind === 'unanswered') {
     await untilProvablyActive();

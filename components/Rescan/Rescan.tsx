@@ -54,7 +54,7 @@ const Rescan: React.FunctionComponent<RescanProps> = ({
   const screenName = ScreenEnum.Rescan;
 
   // Audit Issue D — single source of truth for security.rescanScreen.
-  const authPassed = useBiometricGate({
+  const screenGate = useBiometricGate({
     needsAuth: !!security?.rescanScreen,
     translate,
     addLastSnackbar,
@@ -62,6 +62,7 @@ const Rescan: React.FunctionComponent<RescanProps> = ({
     foregroundAppEnabled: !!security?.foregroundApp,
     foregroundEpoch,
   });
+  const authPassed = screenGate.kind === 'passed';
 
   const [containerH, setContainerH] = useState<number>(0);
   const [headerH, setHeaderH] = useState<number>(0);
