@@ -395,6 +395,33 @@ test('a resign-active event landing just after the fire still vetoes the stall',
   expect(verdict).toMatchObject({ kind: 'authenticated' });
 });
 
+test('a throwing cancelAnimationFrame never hangs the frame yield', async () => {
+  jest.useFakeTimers();
+  rn.Platform.OS = 'android';
+  const realFrame = globalThis.requestAnimationFrame;
+  const realCancel = globalThis.cancelAnimationFrame;
+  globalThis.requestAnimationFrame = (() =>
+    7) as typeof globalThis.requestAnimationFrame;
+  globalThis.cancelAnimationFrame = (() => {
+    throw new Error('no cancel here');
+  }) as typeof globalThis.cancelAnimationFrame;
+  try {
+    kc.getSupportedBiometryType.mockResolvedValue('Fingerprint');
+    kc.hasGenericPassword.mockResolvedValue(true);
+    kc.getGenericPassword.mockResolvedValue({ password: '1' });
+
+    let verdict: GateVerdict | undefined;
+    simpleBiometrics({ translate, purpose: 'appEntry' }).then(v => {
+      verdict = v;
+    });
+    await jest.advanceTimersByTimeAsync(2000);
+    expect(verdict).toMatchObject({ kind: 'authenticated' });
+  } finally {
+    globalThis.requestAnimationFrame = realFrame;
+    globalThis.cancelAnimationFrame = realCancel;
+  }
+});
+
 test('an android launch with no frames still settles the gate', async () => {
   jest.useFakeTimers();
   rn.Platform.OS = 'android';
@@ -932,6 +959,50 @@ test('a stale inactive read does not refuse a live re-ask', async () => {
   setAppState('active'); // the in-flight event lands
   await expect(appGate).resolves.toMatchObject({ kind: 'authenticated' });
   expect(kc.getGenericPassword).toHaveBeenCalledTimes(2);
+});
+
+test('a hold that never sees the return settles by the stall policy', async () => {
+  // A stale away-read whose 'active' event was already delivered parks
+  // the hold; the policy window must settle it like every other stall,
+  // never wedge the gate for good.
+  jest.useFakeTimers();
+  rn.Platform.OS = 'android';
+  kc.getSupportedBiometryType.mockResolvedValue('Fingerprint');
+  kc.hasGenericPassword.mockResolvedValue(true);
+  let refuse: (e: Error) => void = () => {};
+  kc.getGenericPassword.mockReturnValueOnce(
+    new Promise((_serve, reject) => {
+      refuse = reject;
+    }),
+  );
+
+  let screenVerdict: GateVerdict | undefined;
+  simpleBiometrics({ translate, purpose: 'screenEntry' }).then(v => {
+    screenVerdict = v;
+  });
+  let held: GateVerdict | undefined;
+  gateUntilAnswered({ translate, purpose: 'appEntry' }).then(v => {
+    held = v;
+  });
+  rn.__appState.currentState = 'background'; // stale, no event ever comes
+  await jest.advanceTimersByTimeAsync(2000); // let the paint yield pass
+  refuse(
+    Object.assign(new Error('code: 10, msg: Canceled by user'), {
+      code: 'E_CRYPTO_FAILED',
+    }),
+  );
+  await jest.advanceTimersByTimeAsync(0);
+  expect(screenVerdict).toMatchObject({ kind: 'declined' });
+
+  await jest.advanceTimersByTimeAsync(60 * 1000);
+  expect(held).toMatchObject({
+    kind: 'declined',
+    failure: {
+      errorKey: 'biometrics-failure-stalled',
+      param: 'returnToForeground',
+    },
+  });
+  expect(kc.getGenericPassword).toHaveBeenCalledTimes(1);
 });
 
 test('an unknown app state proves nothing and never parks the re-ask', async () => {

@@ -178,6 +178,12 @@ const interactiveStallPolicy = (): InteractiveStallPolicy =>
         settleAs: 'declined',
       };
 
+// Only 'inactive' and 'background' prove absence. An 'unknown' seed
+// proves nothing and must never park a wait.
+const provablyAway = (): boolean =>
+  AppState.currentState === 'inactive' ||
+  AppState.currentState === 'background';
+
 const STALLED = Symbol('keychain-stalled');
 
 // The countdown for an interactive call runs only while the app is observed
@@ -208,12 +214,7 @@ const stallGuard = <T>(
       timer = undefined;
     };
     const fire = () => {
-      if (
-        interactive &&
-        policy.vetoOffActive &&
-        (AppState.currentState === 'inactive' ||
-          AppState.currentState === 'background')
-      ) {
+      if (interactive && policy.vetoOffActive && provablyAway()) {
         // The change event that would have paused the countdown can lose
         // the race against the timer. The veto reads the state that event
         // was carrying, and the handler below re-arms on the way back.
@@ -502,8 +503,12 @@ const runGate = async (props: simpleBiometricsProps): Promise<GateVerdict> => {
       await new Promise<void>(resolve => {
         let frame: number | undefined;
         const frameBudget = setTimeout(() => {
-          if (frame !== undefined) {
-            cancelAnimationFrame(frame);
+          try {
+            if (frame !== undefined) {
+              cancelAnimationFrame(frame);
+            }
+          } catch {
+            // The cancel is best-effort; the resolve below must run.
           }
           resolve();
         }, PAINT_BUDGET_MS);
@@ -708,31 +713,32 @@ export const probeDeviceSecurity = async (): Promise<DeviceSecurityProbe> => {
   }
 };
 
-// The re-ask loop for app-level callers. A re-ask for a backgrounded
-// activity is answered ERROR_CANCELED, which classifies as a decline and
-// locks, so the loop holds while the app is provably away and asks again
-// the moment it returns. An 'inactive' read right after the shared sheet
-// closes is stale, and the pending active event releases the hold moments
-// later; an 'unknown' seed proves nothing and never parks the loop. A
-// concurrent run started by the caller's own re-entry shares, so the hold
-// can never stack prompts.
-
-const untilProvablyActive = (): Promise<void> => {
-  if (
-    AppState.currentState !== 'inactive' &&
-    AppState.currentState !== 'background'
-  ) {
-    return Promise.resolve();
+/** Resolves true when the app returns to 'active', false when the stall policy's window expires first. */
+export const returnedToForeground = (): Promise<boolean> => {
+  if (!provablyAway()) {
+    return Promise.resolve(true);
   }
   return new Promise(resolve => {
+    let expiry: ReturnType<typeof setTimeout> | undefined;
     const subscription = AppState.addEventListener('change', next => {
       if (next === 'active') {
+        clearTimeout(expiry);
         subscription.remove();
-        resolve();
+        resolve(true);
       }
     });
+    expiry = setTimeout(() => {
+      subscription.remove();
+      resolve(false);
+    }, interactiveStallPolicy().windowMs);
   });
 };
+
+// The re-ask loop for app-level callers. A re-ask for a backgrounded
+// activity is answered ERROR_CANCELED and would lock, so the loop holds
+// while the app is provably away, re-asks the moment it returns, and on
+// an expired hold settles by the stall policy like every other bounded
+// wait in this module.
 
 /** Runs the gate for an app-level caller, re-asking on `unanswered` once the app is back in the foreground. */
 export const gateUntilAnswered = async (
@@ -740,7 +746,15 @@ export const gateUntilAnswered = async (
 ): Promise<AnsweredVerdict> => {
   let verdict = await simpleBiometrics(props);
   while (verdict.kind === 'unanswered') {
-    await untilProvablyActive();
+    if (!(await returnedToForeground())) {
+      return {
+        kind: interactiveStallPolicy().settleAs,
+        failure: gateFailure(
+          'biometrics-failure-stalled',
+          'returnToForeground',
+        ),
+      };
+    }
     verdict = await simpleBiometrics(props);
   }
   return verdict;

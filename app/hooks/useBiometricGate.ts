@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 
-import simpleBiometrics, { AnsweredVerdict } from '../simpleBiometrics';
+import simpleBiometrics, {
+  AnsweredVerdict,
+  returnedToForeground,
+} from '../simpleBiometrics';
 import { SnackbarDurationEnum, TranslateType } from '../AppState';
 import Utils from '../utils';
 
@@ -30,9 +33,10 @@ export type ScreenGateState =
  *   - On a stalled fail-open: passes, and tells the user the check did not
  *     respond.
  *   - On `unanswered` (a shared appEntry run declined, locking the app):
- *     stays in `checking` and never re-asks, so no prompt is ever raised
- *     on behalf of a component being torn down. The type enforces the
- *     no-action rule: only an AnsweredVerdict reaches the acting code.
+ *     waits out the bounded return-to-foreground hold, then re-asks only
+ *     if this screen still exists, so no prompt is ever raised on behalf
+ *     of a component being torn down. The type enforces the no-action
+ *     rule: only an AnsweredVerdict reaches the acting code.
  *   - On background → active (foregroundEpoch bumps): re-fires the gate
  *     only when `foregroundAppEnabled` is false. LoadedApp's own
  *     foreground gate already covers the enabled case.
@@ -88,14 +92,24 @@ export const useBiometricGate = ({
   const runScreenGate = () => {
     let cancelled = false;
     (async () => {
-      const verdict = await simpleBiometrics({
+      let verdict = await simpleBiometrics({
         translate,
         purpose: 'screenEntry',
       });
-      // 'unanswered' means an appEntry run declined while this screen
-      // shared it, and an appEntry decline locks the whole app: this
-      // screen is being torn down, so it stays in `checking` and never
-      // re-asks.
+      // 'unanswered' means an appEntry decline is locking the app, which
+      // usually tears this screen down; the bounded wait gives that
+      // teardown time to cancel this run. Where no teardown comes, the
+      // re-ask restores the screen's own gate instead of parking it.
+      while (verdict.kind === 'unanswered' && !cancelled) {
+        await returnedToForeground();
+        if (cancelled) {
+          return;
+        }
+        verdict = await simpleBiometrics({
+          translate,
+          purpose: 'screenEntry',
+        });
+      }
       if (cancelled || verdict.kind === 'unanswered') {
         return;
       }
