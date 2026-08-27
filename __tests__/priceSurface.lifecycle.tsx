@@ -22,7 +22,9 @@ jest.mock('../app/walletBackend', () => ({
 import 'react-native';
 import React from 'react';
 import { render, renderHook, waitFor } from '@testing-library/react-native';
-import PriceFetcher from '../components/Components/PriceFetcher';
+import PriceFetcher, {
+  PriceTrafficDriver,
+} from '../components/Components/PriceFetcher';
 import {
   priceFetcherStore,
   usePriceFetcherStore,
@@ -75,11 +77,19 @@ const makeCtx = (over?: Partial<Ctx>): Ctx => ({
   ...over,
 });
 
+// The production composition: the driver owns the lifecycle, the fetcher
+// only displays (pre-driver builds let the fetcher own both).
 const fetcherUi = (ctx: Ctx, setZecPrice: (p: number, d: number) => void) => (
-  <ContextAppLoadedProvider value={ctx}>
-    <PriceFetcher setZecPrice={setZecPrice} />
+  <ContextAppLoadedProvider value={{ ...ctx, setZecPrice }}>
+    {PriceTrafficDriver ? <PriceTrafficDriver /> : <></>}
+    <PriceFetcher />
   </ContextAppLoadedProvider>
 );
+
+const foregroundReturned = () => {
+
+  (priceFetcherStore as any).foregroundReturned?.();
+};
 
 // Emulates the deps a previous USD session left behind, so the entry-fetch
 // paths run in both the broken and the fixed store. The shape is a
@@ -120,6 +130,8 @@ const flush = () => new Promise(resolve => setTimeout(resolve, 0));
 
 beforeEach(() => {
   price.mockReset();
+
+  (priceFetcherStore as any).resetForTests?.();
 });
 
 afterEach(() => {
@@ -193,19 +205,21 @@ test('F4: a throwing fetch neither pins loading nor kills the timer', async () =
 });
 
 test('F5: a remounted surface with no price fetches instead of waiting a tick', async () => {
+  jest.useFakeTimers();
   price.mockResolvedValue({ price: 42, error: '' });
   const setZecPrice = jest.fn();
   seedDeps(setZecPrice);
 
   const view = render(fetcherUi(makeCtx(), setZecPrice));
-  await waitFor(() => expect(price).toHaveBeenCalledTimes(1));
+  await jest.advanceTimersByTimeAsync(0);
+  expect(price).toHaveBeenCalledTimes(1);
   view.unmount(); // wallet close: LoadedApp unmounts, zecPrice reseeds to 0
 
+  await jest.advanceTimersByTimeAsync(6_000); // a human-scale wallet switch
   seedDeps(setZecPrice);
   render(fetcherUi(makeCtx(), setZecPrice)); // reopen: no price in context
-  await waitFor(() => expect(price).toHaveBeenCalledTimes(2), {
-    timeout: 1500,
-  });
+  await jest.advanceTimersByTimeAsync(0);
+  expect(price).toHaveBeenCalledTimes(2);
 });
 
 test('F6: a background transition drops the follow-up even mid-flight', async () => {
@@ -283,17 +297,29 @@ test('F6: a real transport verdict disarms the follow-up', async () => {
   expect(price).toHaveBeenCalledTimes(2);
 });
 
-test('R1: a hung fetch releases the surface within the bound', async () => {
+test('R1: a hung fetch releases the surface and recovers once it settles', async () => {
   jest.useFakeTimers();
+  let settleLate: (v: { price: number; error: string }) => void = () => {};
   price
-    .mockImplementationOnce(() => new Promise(() => {})) // wedged native call
+    .mockImplementationOnce(
+      () =>
+        new Promise(resolve => {
+          settleLate = resolve; // the wedged native call
+        }),
+    )
     .mockResolvedValue({ price: 42, error: '' });
   const setZecPrice = jest.fn();
   seedDeps(setZecPrice);
 
   render(fetcherUi(makeCtx(), setZecPrice));
-  await jest.advanceTimersByTimeAsync(31_000); // past the fetch bound
+  // Both bounded attempts expire against the single wedged call; the
+  // surface must come out of `loading` instead of pinning forever.
+  await jest.advanceTimersByTimeAsync(61_000);
+  expect(priceFetcherStore.snapshot().loading).toBe(false);
 
+  settleLate({ price: -1, error: 'late' }); // the native side frees up
+  await jest.advanceTimersByTimeAsync(0);
+  await jest.advanceTimersByTimeAsync(60_000); // the next tick runs fresh
   expect(setZecPrice).toHaveBeenCalledWith(42, expect.any(Number));
 });
 
@@ -390,6 +416,7 @@ test('R6: a return landing inside a flight still produces the return fetch', asy
 
   fireAppState('background');
   fireAppState('active'); // the return lands while the flight is up
+  foregroundReturned();
   land({ price: -1, error: 'refused' });
   await flush();
   await flush();
@@ -432,8 +459,10 @@ test('R8: rapid app hops inside the cooldown do not multiply fetches', async () 
 
   fireAppState('background');
   fireAppState('active');
+  foregroundReturned();
   fireAppState('background');
   fireAppState('active');
+  foregroundReturned();
   await flush();
 
   expect(price).toHaveBeenCalledTimes(1);

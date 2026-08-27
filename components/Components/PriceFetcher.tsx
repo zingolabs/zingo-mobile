@@ -11,33 +11,17 @@ import {
   usePriceStale,
 } from './priceFetcherStore';
 
-// Display-only (ADR 0008): mounting this component is what starts and
-// keeps the shared store's fetch lifecycle; there is no tap.
-type PriceFetcherProps = {
-  setZecPrice: (p: number, d: number) => void;
-  textBefore?: string;
-  backgroundColor?: string;
-};
-
-const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
-  setZecPrice,
-  textBefore,
-  backgroundColor,
-}) => {
+/**
+ * Owns the price surface's traffic for the wallet session: LoadedApp
+ * mounts exactly one, so fetching follows the session and the Nym
+ * consent, never whichever currency the screens happen to display.
+ */
+export const PriceTrafficDriver: React.FunctionComponent = () => {
   const context = useContext(ContextAppLoaded);
-  const { translate, zecPrice, mixnetView, nym } = context;
-  const { colors } = useTheme();
-  const bg = backgroundColor ?? colors.bgCanvas;
+  const { zecPrice, mixnetView, nym, setZecPrice } = context;
 
-  // Shared state across every mounted PriceFetcher.
-  const { loading, cycle } = usePriceFetcherStore();
-  const stale = usePriceStale(zecPrice.date);
-
-  // Feed the shared store the latest context-bound callbacks and the live
-  // Indicator (identical across instances, so the last writer wins
-  // harmlessly). The statusKey write is also what fires an armed ready
-  // follow-up. Declared before the attach effect so the attach always
-  // finds its deps.
+  // Deps first, so the attach below always finds them. The statusKey
+  // write is also what fires an armed ready follow-up.
   useEffect(() => {
     priceFetcherStore.setDeps({
       setZecPrice,
@@ -49,8 +33,36 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
     });
   });
 
-  // The consent registration: a mounted fetcher is what lets fetches run.
   useEffect(() => priceFetcherStore.attach(), []);
+
+  return null;
+};
+
+// Display-only (ADR 0008): the ring reports the shared store's cadence
+// and the price's health; it starts nothing and offers no tap.
+type PriceFetcherProps = {
+  textBefore?: string;
+  backgroundColor?: string;
+};
+
+const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
+  textBefore,
+  backgroundColor,
+}) => {
+  const context = useContext(ContextAppLoaded);
+  const { translate, zecPrice, nym } = context;
+  const { colors } = useTheme();
+  const bg = backgroundColor ?? colors.bgCanvas;
+
+  // Shared state across every mounted PriceFetcher.
+  const { loading, cycle } = usePriceFetcherStore();
+  const stale = usePriceStale(zecPrice.date);
+
+  // Without the Nym consent no cadence exists, and a countdown that
+  // counts down to nothing would mislead: render nothing at all.
+  if (!nym) {
+    return null;
+  }
 
   const containerStyle: ViewStyle = {
     flexDirection: 'row',

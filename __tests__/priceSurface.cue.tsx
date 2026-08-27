@@ -16,12 +16,20 @@ jest.mock('../app/walletBackend', () => ({
 import 'react-native';
 import React from 'react';
 import { render, waitFor } from '@testing-library/react-native';
-import PriceFetcher from '../components/Components/PriceFetcher';
+import PriceFetcher, {
+  PriceTrafficDriver,
+} from '../components/Components/PriceFetcher';
 import QuoteRefreshRing from '../components/Components/QuoteRefreshRing';
+import { priceFetcherStore } from '../components/Components/priceFetcherStore';
 import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
 } from '../app/context';
+
+beforeEach(() => {
+   
+  (priceFetcherStore as any).resetForTests?.();
+});
 
 type Ctx = typeof defaultAppContextLoaded;
 const makeCtx = (over?: Partial<Ctx>): Ctx => ({
@@ -33,8 +41,9 @@ const makeCtx = (over?: Partial<Ctx>): Ctx => ({
 });
 
 const fetcherUi = (ctx: Ctx) => (
-  <ContextAppLoadedProvider value={ctx}>
-    <PriceFetcher setZecPrice={jest.fn()} />
+  <ContextAppLoadedProvider value={{ ...ctx, setZecPrice: jest.fn() }}>
+    {PriceTrafficDriver ? <PriceTrafficDriver /> : <></>}
+    <PriceFetcher />
   </ContextAppLoadedProvider>
 );
 
@@ -106,4 +115,11 @@ test('R5: a price that never arrived is announced as absent, not stale', async (
   await waitFor(() =>
     expect(view.getByLabelText('price-ring-none')).toBeTruthy(),
   );
+});
+
+test('N8: without the Nym consent no ring counts down to nothing', () => {
+  const view = render(fetcherUi(makeCtx({ nym: false })));
+  // A countdown beside a surface that will never fetch misleads; the
+  // unconsented state renders no ring at all.
+  expect(view.queryByTestId('pricefetcher.ring')).toBeNull();
 });

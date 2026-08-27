@@ -92,10 +92,6 @@ import { safeSnapToIndex } from '../../app/utils/safeSnapToIndex';
 import { AppDrawerParamList } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import PriceFetcher from '../Components/PriceFetcher';
-import {
-  usePriceFetcherStore,
-  usePriceStale,
-} from '../Components/priceFetcherStore';
 import Header from '../Header';
 import BottomSheet, {
   BottomSheetBackdrop,
@@ -171,7 +167,6 @@ const Send: React.FunctionComponent<SendProps> = ({
     defaultUnifiedAddress,
     shieldingAmount,
     selectServer,
-    setZecPrice,
     zenniesDonationAddress,
     //security,
     currency,
@@ -268,13 +263,6 @@ const Send: React.FunctionComponent<SendProps> = ({
   const addressBookSelectRef = useRef<BottomSheetModal>(null);
   const sendErrorSheetRef = useRef<BottomSheetModal>(null);
 
-  // Price-fetch state shared with the PriceFetcher ring; drives the CTA's
-  // transient "Refreshing price" label, but only while no price exists yet:
-  // unattended refreshes must never yank the send button mid-composition.
-  const { loading: priceLoading } = usePriceFetcherStore();
-  const firstPriceLoading = priceLoading && zecPrice.zecPrice <= 0;
-  // ADR 0008: a stale price dims wherever it converts an amount.
-  const priceStale = usePriceStale(zecPrice.date);
 
   // Fee (`sendPropose`) and/or spendable-balance RPC error → the CTA turns into
   // a tappable "calculation error" button that opens SendErrorSheet, which
@@ -1690,10 +1678,8 @@ const Send: React.FunctionComponent<SendProps> = ({
                                 marginTop: 0,
                                 marginBottom: 0,
                                 fontSize: 16,
-                                ...(priceStale
-                                  ? { color: colors.fgMuted }
-                                  : {}),
                               }}
+                              priceDate={zecPrice.date}
                               price={zecPrice.zecPrice}
                               amtZec={
                                 Utils.parseStringLocaleToNumberFloat(
@@ -1719,7 +1705,6 @@ const Send: React.FunctionComponent<SendProps> = ({
                           )}
                           <View style={{ marginLeft: inputZec ? 5 : 2 }}>
                             <PriceFetcher
-                              setZecPrice={setZecPrice}
                               backgroundColor={colors.bgSurface}
                             />
                           </View>
@@ -1779,10 +1764,8 @@ const Send: React.FunctionComponent<SendProps> = ({
                           />
                         ) : (
                           <CurrencyAmount
-                            style={{
-                              fontSize: 14,
-                              ...(priceStale ? { color: colors.fgMuted } : {}),
-                            }}
+                            style={{ fontSize: 14 }}
+                            priceDate={zecPrice.date}
                             price={zecPrice.zecPrice}
                             amtZec={maxAmount}
                             currency={currency}
@@ -2165,15 +2148,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                     marginBottom: 20,
                   }}
                 >
-                  {firstPriceLoading ? (
-                    <Button
-                      type={ButtonTypeEnum.Primary}
-                      disabled
-                      title={translate('send.refreshing-price') as string}
-                      onPress={() => {}}
-                      testID="send.refreshing-price"
-                    />
-                  ) : showCalcError ? (
+                  {showCalcError ? (
                     <Button
                       type={ButtonTypeEnum.Secondary}
                       title={`${translate('send.calc-error') as string} ⓘ`}

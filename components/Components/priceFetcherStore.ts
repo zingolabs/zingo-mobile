@@ -4,24 +4,28 @@ import { getZecPrice } from '../../app/walletBackend';
 import { MixnetStatusKey } from '../../app/walletBackend/transforms/mixnetPresenter';
 
 /**
- * Shared, singleton state for every <PriceFetcher/> on screen.
+ * Shared, singleton state for the price surface's fetch lifecycle.
  *
  * ADR 0008: the price surface has no manual fetch, and the Nym opt-in is
- * the single and only consent for price traffic. A mounted PriceFetcher
- * attaches here and carries the consent bit in its deps; observation
- * through usePriceFetcherStore carries no consent and never starts
- * traffic. The store owns the whole lifecycle:
- *   - ONE auto-refresh timer while at least one fetcher is attached and
- *     the app is in the foreground; a background transition pauses it.
- *     iOS 'inactive' (Control Center, the app's own Face ID sheet) is a
- *     non-event, matching LoadedApp's reading of the same signal.
- *   - A fetch on every background -> active return, and on attach when
- *     the context holds no fresh price.
- *   - The ready follow-up: a foreground-entry fetch refused while the
- *     mixnet Indicator is bootstrapping arms a one-shot fetch that fires
- *     when the Indicator turns ready. It is dropped on a background
- *     transition and on any transport state other than bootstrapping,
- *     and it survives an in-flight fetch instead of being consumed by it.
+ * the single and only consent for price traffic. The PriceTrafficDriver
+ * mounted by LoadedApp attaches here for the wallet session and carries
+ * the consent bit in its deps, so the displayed currency never decides
+ * what may be fetched; PriceFetcher and usePriceFetcherStore only
+ * observe. The store owns the whole lifecycle:
+ *   - ONE auto-refresh timer while the driver is attached, the app is in
+ *     the foreground, and the transport is not a refusing verdict ('off'
+ *     or 'died'); a background transition pauses it, and iOS 'inactive'
+ *     (Control Center, the app's own Face ID sheet) is a non-event.
+ *   - A fetch when LoadedApp's foreground gate opens after a real
+ *     background return (never on the raw AppState event, which can race
+ *     a locked, unauthenticated wallet), and on attach when the context
+ *     holds no fresh price. Entry fetches inside the cooldown of the
+ *     last start (attach) or last success (return) yield to the cadence.
+ *   - The ready follow-up: an unattended fetch refused during bootstrap
+ *     arms a one-shot fetch that fires when the Indicator turns ready.
+ *     It is dropped on a background transition and on a 'died' or 'off'
+ *     verdict, survives an in-flight fetch, and a transient 'unknown'
+ *     status poll never drops it.
  *   - No snackbars. A failure leaves the last price standing; the stale
  *     cue (see usePriceStale) is the only failure signal.
  */
@@ -32,9 +36,8 @@ export const PRICE_STALE_MS = 5 * 60_000;
 // The JS-side bound on one native price call: a wedged FFI promise must
 // never pin `loading` for the process lifetime.
 const PRICE_FETCH_TIMEOUT_MS = 30_000;
-// Rapid app hops must not multiply fetches: a return re-fetches only when
-// the last fetch started at least this long ago.
-const RETURN_FETCH_COOLDOWN_MS = 5_000;
+// Rapid remounts and app hops must not multiply fetches.
+const FETCH_BURST_COOLDOWN_MS = 5_000;
 
 type Deps = {
   setZecPrice: (price: number, date: number) => void;
@@ -61,9 +64,14 @@ let attachCount = 0;
 let appStateSub: NativeEventSubscription | null = null;
 let appAway = false;
 let lastFetchStartAt = 0;
+let lastSuccessAt = 0;
 // Bumped at every fetch completion, success or failure, so the ring can
 // restart its fill for the cycle that actually begins.
 let cycle = 0;
+// The single in-flight native call: a wedged one is raced against the
+// bound and reused by later attempts, never multiplied into a pile of
+// orphaned FFI calls each pinning a native thread.
+let nativeCall: Promise<{ price: number; error: string }> | null = null;
 const listeners = new Set<() => void>();
 
 function emit(): void {
@@ -77,12 +85,30 @@ function clearAuto(): void {
   }
 }
 
+// 'off' and 'died' are transport verdicts under which the wallet refuses
+// every price fetch by the route rule, so attempting is pure waste.
+function transportRefuses(): boolean {
+  return (
+    deps?.mixnetStatusKey === 'mixnet.status.off' ||
+    deps?.mixnetStatusKey === 'mixnet.status.died'
+  );
+}
+
 function scheduleAuto(): void {
   clearAuto();
-  if (attachCount === 0 || appAway) return;
+  if (attachCount === 0 || appAway || transportRefuses()) return;
   autoTimer = setTimeout(() => {
     doFetch('timer').catch(() => {});
   }, PRICE_AUTO_REFRESH_MS);
+}
+
+function startNativeCall(): Promise<{ price: number; error: string }> {
+  if (!nativeCall) {
+    nativeCall = getZecPrice().finally(() => {
+      nativeCall = null;
+    });
+  }
+  return nativeCall;
 }
 
 // One price attempt under the JS-side bound; a wedged native call reads
@@ -96,15 +122,26 @@ async function boundedPrice(): Promise<number> {
     );
   });
   try {
-    const { price } = await Promise.race([getZecPrice(), expiry]);
+    const { price } = await Promise.race([startNativeCall(), expiry]);
     return price;
   } finally {
     clearTimeout(bound);
   }
 }
 
+function consentHolds(): boolean {
+  return attachCount > 0 && !appAway && deps?.nymSelected === true;
+}
+
 async function doFetch(kind: FetchKind): Promise<void> {
-  if (loading || !deps || !deps.nymSelected || attachCount === 0 || appAway) {
+  if (
+    loading ||
+    !deps ||
+    !deps.nymSelected ||
+    attachCount === 0 ||
+    appAway ||
+    transportRefuses()
+  ) {
     return;
   }
   const d = deps;
@@ -119,32 +156,33 @@ async function doFetch(kind: FetchKind): Promise<void> {
     // first attempt
     // 0 initial · -1 Gemini/zingolib · -2 RPCModule · -3 bound · >0 real
     let price = await boundedPrice();
-    if (price <= 0 && attachCount > 0 && !appAway) {
+    if (price <= 0 && consentHolds()) {
       // The consent re-check: no second attempt for a surface every
-      // fetcher has left, or for a backgrounded app.
+      // fetcher has left, for a backgrounded app, or after the Nym
+      // opt-in was withdrawn mid-flight.
       price = await boundedPrice();
     }
 
     if (price > 0) {
-      if (attachCount > 0) {
+      if (consentHolds()) {
         followUpArmed = false;
         entryPending = false; // a fresh price satisfies a pending return
-        d.setZecPrice(price, Date.now());
+        lastSuccessAt = Date.now();
+        d.setZecPrice(price, lastSuccessAt);
       }
     } else if (
       kind !== 'readyFollowUp' &&
-      !appAway &&
-      attachCount > 0 &&
+      consentHolds() &&
       (launchStatusKey === 'mixnet.status.bootstrapping' ||
         deps?.mixnetStatusKey === 'mixnet.status.bootstrapping')
     ) {
       // Refused during bootstrap, judged by the launch status or the
       // live one: the ready follow-up recovers the price seconds after
-      // the transport comes up instead of a full tick later. The appAway
-      // re-check keeps a flight that outlived a background transition
-      // from re-arming what that transition dropped, and the follow-up
-      // itself never re-arms. Every other failure is silent; the last
-      // price stands and the stale cue carries the signal.
+      // the transport comes up instead of a full tick later. The
+      // consent re-check keeps a flight that outlived a background
+      // transition from re-arming what that transition dropped, and the
+      // follow-up itself never re-arms. Every other failure is silent;
+      // the last price stands and the stale cue carries the signal.
       followUpArmed = true;
     }
   } finally {
@@ -152,7 +190,7 @@ async function doFetch(kind: FetchKind): Promise<void> {
     cycle++;
     emit();
     scheduleAuto();
-    if (entryPending && attachCount > 0 && !appAway && deps) {
+    if (entryPending && consentHolds() && deps) {
       // The return that landed inside this flight gets its fetch.
       entryPending = false;
       doFetch('entry').catch(() => {});
@@ -171,10 +209,7 @@ function pump(): void {
   if (deps.mixnetStatusKey === 'mixnet.status.ready') {
     followUpArmed = false;
     doFetch('readyFollowUp').catch(() => {});
-  } else if (
-    deps.mixnetStatusKey === 'mixnet.status.died' ||
-    deps.mixnetStatusKey === 'mixnet.status.off'
-  ) {
+  } else if (transportRefuses()) {
     // A real transport verdict ends the bootstrap the arm belonged to.
     // 'unknown' is one failed status poll, not a verdict, and a
     // bootstrap's polls are flakiest exactly while the arm matters, so
@@ -184,10 +219,9 @@ function pump(): void {
 }
 
 // Fetch when the context holds no fresh price, otherwise start the
-// cadence: the seam attach, setDeps, and a quiet return all share. A
-// running timer or flight means the cadence already owns the surface, so
-// a refused fetch cannot echo into a refetch storm through the
-// re-renders its own emit causes.
+// cadence: the seam attach and setDeps share. A running timer or flight
+// means the cadence already owns the surface, and a start inside the
+// burst cooldown (a remount storm) yields to it too.
 function entryOrSchedule(): void {
   if (
     !deps ||
@@ -195,11 +229,14 @@ function entryOrSchedule(): void {
     attachCount === 0 ||
     appAway ||
     loading ||
-    autoTimer
+    autoTimer ||
+    transportRefuses()
   ) {
     return;
   }
-  if (Date.now() - deps.priceDate > PRICE_AUTO_REFRESH_MS) {
+  if (Date.now() - lastFetchStartAt < FETCH_BURST_COOLDOWN_MS) {
+    scheduleAuto();
+  } else if (Date.now() - deps.priceDate > PRICE_AUTO_REFRESH_MS) {
     doFetch('entry').catch(() => {});
   } else {
     scheduleAuto();
@@ -213,27 +250,12 @@ function onAppStateChange(next: string): void {
     entryPending = false;
     clearAuto();
   } else if (next === 'active') {
-    const returning = appAway;
+    // The return fetch waits for LoadedApp's foreground gate to open
+    // (foregroundReturned): a locked, unauthenticated wallet must not
+    // emit price traffic on the bare AppState event.
     appAway = false;
-    if (!returning) {
-      if (!autoTimer && !loading) {
-        scheduleAuto();
-      }
-      return;
-    }
-    // Every real return fetches (the grilled decision); 'inactive' round
-    // trips never set appAway, so they cannot reach this. A return
-    // landing inside a flight parks its fetch for the flight's landing,
-    // and hops inside the cooldown ride the price the last fetch just
-    // brought.
-    if (loading) {
-      entryPending = true;
-    } else if (Date.now() - lastFetchStartAt < RETURN_FETCH_COOLDOWN_MS) {
-      if (!autoTimer) {
-        scheduleAuto();
-      }
-    } else {
-      doFetch('entry').catch(() => {});
+    if (!autoTimer && !loading) {
+      scheduleAuto();
     }
   }
   // 'inactive' and 'unknown' prove nothing and change nothing.
@@ -253,7 +275,7 @@ export const priceFetcherStore = {
     pump();
     entryOrSchedule();
   },
-  /** Register a mounted price surface, the consent that lets fetches run, returning the detach cleanup. */
+  /** Register the wallet session's price surface, returning the detach cleanup. */
   attach(): () => void {
     attachCount++;
     if (attachCount === 1) {
@@ -273,8 +295,37 @@ export const priceFetcherStore = {
       }
     };
   },
+  /**
+   * The grilled every-real-return-fetches trigger, called by LoadedApp
+   * once its foreground gate has opened. A return inside a flight parks
+   * the fetch for the flight's landing, and a return within the burst
+   * cooldown of a SUCCESS rides the price that fetch just brought; a
+   * recent failure never excuses the return from fetching.
+   */
+  foregroundReturned(): void {
+    if (!deps || !deps.nymSelected || attachCount === 0 || appAway) return;
+    if (loading) {
+      entryPending = true;
+    } else if (Date.now() - lastSuccessAt < FETCH_BURST_COOLDOWN_MS) {
+      if (!autoTimer) {
+        scheduleAuto();
+      }
+    } else {
+      doFetch('entry').catch(() => {});
+    }
+  },
   snapshot(): { loading: boolean; cycle: number } {
     return { loading, cycle };
+  },
+  /** Test-only: forget the burst clocks, the arm state, and any wedged in-flight native call. */
+  resetForTests(): void {
+    lastFetchStartAt = 0;
+    lastSuccessAt = 0;
+    followUpArmed = false;
+    entryPending = false;
+    nativeCall = null;
+    loading = false;
+    clearAuto();
   },
   /** Observe store state; observation carries no consent and starts no traffic. */
   subscribe(listener: () => void): () => void {

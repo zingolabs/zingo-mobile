@@ -17,6 +17,7 @@ jest.mock('../components/Components/priceFetcherStore', () => ({
     attach: jest.fn(() => () => {}),
     subscribe: jest.fn(() => () => {}),
     snapshot: jest.fn(() => ({ loading: false, cycle: 0 })),
+    foregroundReturned: jest.fn(),
     fetch: jest.fn(),
   },
   usePriceFetcherStore: jest.fn(() => ({ loading: false, cycle: 0 })),
@@ -27,6 +28,7 @@ import 'react-native';
 import React from 'react';
 import { render } from '@testing-library/react-native';
 import Send from '../components/Send';
+import Confirm from '../components/Send/components/Confirm';
 import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
@@ -115,11 +117,17 @@ test('F7: an unattended refresh keeps the send CTA while a price is on screen', 
   ).toBeTruthy();
 });
 
-test('F7: the first fetch with no price still shows the refreshing state', () => {
+test('N1: price loading never takes the send CTA, price or no price', () => {
+  // Sending needs ZEC amounts, never the USD price; a bootstrapping
+  // mixnet must not block sends for the length of every fetch flight.
   storeHook.mockReturnValue({ loading: true, cycle: 0 });
   const view = render(sendUi({ zecPrice: 0, date: 0 }));
 
-  expect(view.getByTestId('send.refreshing-price')).toBeTruthy();
+  expect(view.queryByTestId('send.refreshing-price')).toBeNull();
+  expect(
+    view.queryByTestId('send.button') ??
+      view.queryByTestId('send.button-disabled'),
+  ).toBeTruthy();
 });
 
 test('F8: the in-form USD amounts dim when the price is stale', () => {
@@ -138,4 +146,50 @@ test('F8: the in-form USD amounts dim when the price is stale', () => {
     .filter((s: { fontSize?: number }) => s.fontSize === 16 || s.fontSize === 14);
   expect(formAmounts.length).toBeGreaterThan(0);
   formAmounts.forEach(s => expect(s.color).toBe('#888888'));
+});
+
+test('N7: the send-confirmation conversions dim on a stale price too', () => {
+  // The one screen where the figure drives a signing decision must not
+  // show a stale conversion at full strength.
+  staleHook.mockReturnValue(true);
+  const state = { ...defaultAppContextLoaded };
+  state.translate = mockTranslate;
+  state.info = mockInfo;
+  state.totalBalance = mockTotalBalance;
+  state.server = mockServer;
+  state.sendPageState = mockSendPageState;
+  state.currency = CurrencyEnum.USDCurrency;
+  state.mode = ModeEnum.advanced;
+  state.zecPrice = { zecPrice: 33.33, date: Date.now() - 40 * 60_000 };
+  state.security = { ...state.security, sendConfirm: false };
+  const confirmProps = {
+    navigation: mockNavigation,
+    route: {
+      key: 'Key-1',
+      name: RouteEnum.Confirm,
+      params: {
+        calculatedFee: 0.00001,
+        proposalPools: { source: ['ironwood'], destination: ['ironwood'] },
+        donationAmount: 0,
+        confirmSend: jest.fn(async () => {}),
+        sendAllAmount: false,
+        calculateFeeWithPropose: jest.fn(async () => {}),
+        sendPageState: mockSendPageState,
+        nym: true,
+      },
+    },
+     
+  } as any;
+  const view = render(
+    <ContextAppLoadedProvider value={state}>
+      <Confirm {...confirmProps} />
+    </ContextAppLoadedProvider>,
+  );
+
+  const { StyleSheet } = require('react-native');
+  const conversions = view
+    .getAllByText(/^\$ /)
+    .map(t => StyleSheet.flatten(t.props.style));
+  expect(conversions.length).toBeGreaterThan(0);
+  conversions.forEach(s => expect(s.color).toBe('#888888'));
 });

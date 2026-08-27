@@ -6,6 +6,7 @@ import { getNumberFormatSettings } from 'react-native-localize';
 
 import Utils from '../../app/utils';
 import { CurrencyEnum } from '../../app/AppState';
+import { usePriceStale } from './priceFetcherStore';
 
 type CurrencyAmountProps = {
   price?: number;
@@ -14,6 +15,9 @@ type CurrencyAmountProps = {
   currency: CurrencyEnum;
   privacy?: boolean;
   selectable?: boolean;
+  // The live price's date: a conversion older than the stale threshold
+  // dims (ADR 0008). Omit for historical conversions, which never dim.
+  priceDate?: number;
 };
 
 const CurrencyAmount: React.FunctionComponent<CurrencyAmountProps> = ({
@@ -23,11 +27,14 @@ const CurrencyAmount: React.FunctionComponent<CurrencyAmountProps> = ({
   currency,
   privacy,
   selectable,
+  priceDate,
 }) => {
   const [privacyHigh, setPrivacyHigh] = useState<boolean>(privacy || false);
   const [currencyString, setCurrencyString] = useState<string>('');
   const { colors } = useTheme();
   const { decimalSeparator } = getNumberFormatSettings();
+  const stale = usePriceStale(priceDate ?? 0);
+  const baseColor = stale ? colors.fgMuted : colors.fgDefault;
 
   useEffect(() => {
     setPrivacyHigh(privacy || false);
@@ -72,7 +79,7 @@ const CurrencyAmount: React.FunctionComponent<CurrencyAmountProps> = ({
             {privacyHigh ? (
               <Text
                 style={{
-                  color: colors.fgDefault,
+                  color: baseColor,
                   fontSize: 20,
                   fontWeight: '700',
                   ...style,
@@ -83,7 +90,7 @@ const CurrencyAmount: React.FunctionComponent<CurrencyAmountProps> = ({
             ) : (
               <Text
                 style={{
-                  color: colors.fgDefault,
+                  color: baseColor,
                   fontSize: 20,
                   fontWeight: '700',
                   ...style,

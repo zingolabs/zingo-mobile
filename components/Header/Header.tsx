@@ -120,7 +120,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     somePending,
     shieldingAmount,
     selectServer,
-    setZecPrice,
     nym,
     mixnetView,
   } = context;
@@ -229,7 +228,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             info={info}
             currency={currency}
             zecPrice={zecPrice}
-            setZecPrice={setZecPrice}
             selectServer={selectServer}
             showShieldButton={showShieldButton}
             shieldingFee={shieldingFee}
