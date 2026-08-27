@@ -1,8 +1,11 @@
 import { NativeModules } from 'react-native';
 
 // The native half of the privacy shutter (ADR 0007): one OS ceremony per
-// authenticate() call, resolved as a typed outcome. The promise always
-// resolves, so the gate controller needs no rejection path.
+// authenticate() call, resolved as a typed outcome. Both platforms
+// guarantee settlement, on the prompt's own terminal callback or on the
+// host activity's destruction, and classify leaving-the-app endings as
+// declined, so the gate controller needs no rejection path and no
+// watchdog.
 
 /** Every way one device-auth ceremony can end. */
 export type DeviceAuthOutcome = 'authenticated' | 'declined' | 'unavailable';
