@@ -41,7 +41,6 @@ exports[`Component PriceFetcher - test PriceFetcher - snapshot 1`] = `
           "alignItems": "center",
           "height": 22,
           "justifyContent": "center",
-          "opacity": 1,
           "width": 22,
         },
         undefined,

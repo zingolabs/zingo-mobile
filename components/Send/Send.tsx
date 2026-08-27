@@ -56,6 +56,7 @@ import ErrorText from '../Components/ErrorText';
 import RegText from '../Components/RegText';
 import ZecAmount from '../Components/ZecAmount';
 import CurrencyAmount from '../Components/CurrencyAmount';
+import { usePriceStale } from '../Components/priceFetcherStore';
 import Button from '../Components/Button';
 import SheetRim from '../Components/SheetRim';
 import {
@@ -178,6 +179,10 @@ const Send: React.FunctionComponent<SendProps> = ({
     reenableMixnet,
   } = context;
   const { colors } = useTheme();
+  // USD entry derives the ZEC actually sent from the price, so that
+  // figure carries the same stale/absent dim as the USD conversions.
+  const priceStale = usePriceStale(zecPrice.date);
+  const priceMuted = priceStale || !zecPrice.date;
 
   const [enabling, setEnabling] = useState<boolean>(false);
   const nymPhase =
@@ -1660,6 +1665,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                               !zecPrice.zecPrice || zecPrice.zecPrice <= 0
                             }
                             style={{ marginHorizontal: 8 }}
+                            testID="send.swap-entry"
                           >
                             <Swap
                               width={28}
@@ -1692,8 +1698,11 @@ const Send: React.FunctionComponent<SendProps> = ({
                             <ZecAmount
                               style={{ marginLeft: 0 }}
                               currencyName={info.currencyName}
-                              color={colors.fgDefault}
+                              color={
+                                priceMuted ? colors.fgMuted : colors.fgDefault
+                              }
                               size={16}
+                              testID="send.zec-derived"
                               amtZec={
                                 Utils.parseStringLocaleToNumberFloat(
                                   amountText,

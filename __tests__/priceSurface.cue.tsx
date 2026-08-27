@@ -15,6 +15,7 @@ jest.mock('../app/walletBackend', () => ({
 
 import 'react-native';
 import React from 'react';
+import { ReactTestRendererJSON } from 'react-test-renderer';
 import { render, waitFor } from '@testing-library/react-native';
 import PriceFetcher, {
   PriceTrafficDriver,
@@ -53,17 +54,19 @@ const fetcherUi = (ctx: Ctx) => (
   </ContextAppLoadedProvider>
 );
 
-type JsonNode = any;
+type JsonNode = ReactTestRendererJSON | ReactTestRendererJSON[] | string | null;
 const collect = (
   node: JsonNode,
-  hits: JsonNode[],
-  pick: (n: JsonNode) => boolean,
+  hits: ReactTestRendererJSON[],
+  pick: (n: ReactTestRendererJSON) => boolean,
 ) => {
-  if (!node || typeof node !== 'object') return;
+  if (!node || typeof node === 'string') return;
+  if (Array.isArray(node)) {
+    node.forEach(child => collect(child, hits, pick));
+    return;
+  }
   if (pick(node)) hits.push(node);
-  (node.children ?? []).forEach((child: JsonNode) =>
-    collect(child, hits, pick),
-  );
+  (node.children ?? []).forEach(child => collect(child, hits, pick));
 };
 
 test('F8: the stale arc keeps a color of its own, distinct from the track', () => {
@@ -82,7 +85,7 @@ test('F9: the display-only ring exposes no disabled tap stop', () => {
   });
   const view = render(fetcherUi(freshCtx));
 
-  const disabledStops: JsonNode[] = [];
+  const disabledStops: ReactTestRendererJSON[] = [];
   collect(
     view.toJSON(),
     disabledStops,

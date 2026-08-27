@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useEffect, useRef, useState } from 'react';
-import { Pressable, StyleProp, View, ViewStyle } from 'react-native';
+import { StyleProp, View, ViewStyle } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faRotateRight } from '@fortawesome/free-solid-svg-icons';
@@ -13,14 +13,10 @@ const RING_TICK_MS = 1_000;
 const RING_ARC_STEP = 1 / 64;
 
 /**
- * Manual re-quote control that doubles as an auto-refresh countdown: a refresh
- * glyph wrapped in a ring that fills clockwise from empty to full over
- * `durationMs` (the quote refresh cadence). The ring restarts whenever
- * `resetKey` changes — pass the live quote's `receivedAtMs` so a fresh quote
- * (auto OR manual) resets the fill.
- *
- * Tapping fires `onPress` (a manual re-quote). While `disabled` (a fetch in
- * flight or the post-tap cooldown) the whole control dims and ignores taps.
+ * Display-only countdown ring: a refresh glyph wrapped in a ring that
+ * fills clockwise to full over `durationMs` and restarts whenever
+ * `resetKey` changes. It offers no tap; ADR 0008 removed the manual
+ * fetch, so the ring only reports the cadence that is running.
  */
 type QuoteRefreshRingProps = {
   size: number;
@@ -36,9 +32,6 @@ type QuoteRefreshRingProps = {
   resetKey: number | string;
   /** Fill fraction a restart begins at, for a ring mounted mid-cycle. */
   startProgress?: number;
-  /** Omit for a display-only ring (no press affordance at all). */
-  onPress?: () => void;
-  disabled?: boolean;
   /** What a screen reader announces for this ring. */
   accessibilityLabel?: string;
   style?: StyleProp<ViewStyle>;
@@ -53,8 +46,6 @@ export default function QuoteRefreshRing({
   durationMs,
   resetKey,
   startProgress,
-  onPress,
-  disabled,
   accessibilityLabel,
   style,
   testID,
@@ -129,35 +120,18 @@ export default function QuoteRefreshRing({
     height: size,
     alignItems: 'center',
     justifyContent: 'center',
-    opacity: disabled ? 0.4 : 1,
   };
 
-  if (!onPress) {
-    // Display-only: no tap stop, no disabled state, just a labeled image.
-    return (
-      <View
-        accessible={!!accessibilityLabel}
-        accessibilityRole="image"
-        accessibilityLabel={accessibilityLabel}
-        testID={testID}
-        style={[frame, style]}
-      >
-        {face}
-      </View>
-    );
-  }
-
+  // Display-only: no tap stop, no disabled state, just a labeled image.
   return (
-    <Pressable
-      onPress={onPress}
-      disabled={disabled}
-      hitSlop={10}
-      accessibilityRole="button"
+    <View
+      accessible={!!accessibilityLabel}
+      accessibilityRole="image"
       accessibilityLabel={accessibilityLabel}
       testID={testID}
       style={[frame, style]}
     >
       {face}
-    </Pressable>
+    </View>
   );
 }

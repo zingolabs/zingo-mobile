@@ -9,6 +9,8 @@
  *     stale hook is mocked as a function of the priceDate it receives,
  *     so a Confirm or Send row that drops its priceDate wiring goes
  *     back to full strength and the test fails.
+ * H3 (round seven): the USD-entry derived ZEC amount, the figure that
+ *     decides what is sent, carries the same stale dim.
  */
 jest.mock('../components/Components/priceFetcherStore', () => ({
   __esModule: true,
@@ -21,7 +23,6 @@ jest.mock('../components/Components/priceFetcherStore', () => ({
     subscribe: jest.fn(() => () => {}),
     snapshot: jest.fn(() => ({
       loading: false,
-      cycle: 0,
       nextFetchAt: 0,
       nextFetchDelayMs: 0,
       surfaceActive: false,
@@ -31,7 +32,6 @@ jest.mock('../components/Components/priceFetcherStore', () => ({
   },
   usePriceFetcherStore: jest.fn(() => ({
     loading: false,
-    cycle: 0,
     nextFetchAt: 0,
     nextFetchDelayMs: 0,
     surfaceActive: false,
@@ -41,9 +41,10 @@ jest.mock('../components/Components/priceFetcherStore', () => ({
 
 import 'react-native';
 import React from 'react';
-import { render } from '@testing-library/react-native';
+import { fireEvent, render } from '@testing-library/react-native';
 import Send from '../components/Send';
 import Confirm from '../components/Send/components/Confirm';
+import ZecAmount from '../components/Components/ZecAmount';
 import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
@@ -116,7 +117,6 @@ const sendUi = (zecPrice: { zecPrice: number; date: number }) => {
 beforeEach(() => {
   storeHook.mockReturnValue({
     loading: false,
-    cycle: 0,
     nextFetchAt: 0,
     nextFetchDelayMs: 0,
     surfaceActive: false,
@@ -180,7 +180,7 @@ test('N7: the send-confirmation conversions dim on a stale price too', () => {
   state.mode = ModeEnum.advanced;
   state.zecPrice = { zecPrice: 33.33, date: Date.now() - 40 * 60_000 };
   state.security = { ...state.security, sendConfirm: false };
-  const confirmProps = {
+  const confirmProps: React.ComponentProps<typeof Confirm> = {
     navigation: mockNavigation,
     route: {
       key: 'Key-1',
@@ -196,7 +196,7 @@ test('N7: the send-confirmation conversions dim on a stale price too', () => {
         nym: true,
       },
     },
-  } as any;
+  };
   const view = render(
     <ContextAppLoadedProvider value={state}>
       <Confirm {...confirmProps} />
@@ -209,4 +209,19 @@ test('N7: the send-confirmation conversions dim on a stale price too', () => {
     .map(t => StyleSheet.flatten(t.props.style));
   expect(conversions.length).toBeGreaterThan(0);
   conversions.forEach(s => expect(s.color).toBe('#888888'));
+});
+
+test('H3: the USD-entry derived ZEC amount dims on a stale price', () => {
+  const view = render(
+    sendUi({ zecPrice: 33.33, date: Date.now() - 11 * 60_000 }),
+  );
+
+  // Swap the entry direction: the user types USD and the wallet derives
+  // the ZEC it will actually send from the stale price.
+  fireEvent.press(view.getByTestId('send.swap-entry'));
+  const derived = view
+    .UNSAFE_getAllByType(ZecAmount)
+    .find(z => z.props.testID === 'send.zec-derived');
+  expect(derived).toBeTruthy();
+  expect(derived?.props.color).toBe('#888888');
 });

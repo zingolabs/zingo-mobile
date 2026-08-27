@@ -20,6 +20,7 @@ jest.mock('../app/walletBackend', () => ({
 }));
 
 import 'react-native';
+import type { AppStateStatus } from 'react-native';
 import React from 'react';
 import { render, renderHook, waitFor } from '@testing-library/react-native';
 import PriceFetcher, {
@@ -100,31 +101,29 @@ const seedDeps = (setZecPrice: (p: number, d: number) => void) => {
   priceFetcherStore.setDeps({
     setZecPrice,
     mixnetStatusKey: 'mixnet.status.off',
-    priceDate: 0,
     nymSelected: true,
     marketAvailable: true,
   });
 };
 
-const appStateHandlers: Array<(next: string) => void> = [];
+const appStateHandlers: Array<(next: AppStateStatus) => void> = [];
 const removeSpies: jest.Mock[] = [];
 
 beforeAll(() => {
-  const { AppState } = require('react-native');
-  jest.spyOn(AppState, 'addEventListener').mockImplementation(((
-    event: string,
-    handler: (next: string) => void,
-  ) => {
-    if (event === 'change') {
-      appStateHandlers.push(handler);
-    }
-    const remove = jest.fn();
-    removeSpies.push(remove);
-    return { remove };
-  }) as any);
+  const RN: typeof import('react-native') = require('react-native');
+  jest
+    .spyOn(RN.AppState, 'addEventListener')
+    .mockImplementation((event, handler) => {
+      if (event === 'change') {
+        appStateHandlers.push(handler);
+      }
+      const remove = jest.fn();
+      removeSpies.push(remove);
+      return { remove };
+    });
 });
 
-const fireAppState = (next: string) => {
+const fireAppState = (next: AppStateStatus) => {
   [...appStateHandlers].forEach(h => h(next));
 };
 
@@ -381,7 +380,6 @@ test('R3: a timer refusal during bootstrap arms the follow-up too', async () => 
   priceFetcherStore.setDeps({
     setZecPrice,
     mixnetStatusKey: 'mixnet.status.bootstrapping',
-    priceDate: freshDate,
     nymSelected: true,
     marketAvailable: true,
   });

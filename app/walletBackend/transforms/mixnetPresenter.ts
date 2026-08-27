@@ -20,6 +20,26 @@ export const MIXNET_STATUS_KEYS: readonly MixnetStatusKey[] = [
   'mixnet.status.unknown',
 ];
 
+/** How the transport disposes a mixnet-only fetch: refuses it, might still be bootstrapping, or serves it. */
+export type MixnetTransportDisposition =
+  'refusing' | 'possibleBootstrap' | 'serving';
+
+/** Classifies a status key exhaustively, so a new indicator breaks this build instead of silently passing as servable. */
+export function transportDisposition(
+  key: MixnetStatusKey,
+): MixnetTransportDisposition {
+  switch (key) {
+    case 'mixnet.status.off':
+    case 'mixnet.status.died':
+      return 'refusing';
+    case 'mixnet.status.bootstrapping':
+    case 'mixnet.status.unknown':
+      return 'possibleBootstrap';
+    case 'mixnet.status.ready':
+      return 'serving';
+  }
+}
+
 /**
  * The screen-facing projection of the mixnet state. `statusKey` is a
  * translation key (`mixnet.status.*`), never display English; `narration`

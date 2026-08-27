@@ -22,6 +22,7 @@ jest.mock('../app/walletBackend', () => ({
 }));
 
 import 'react-native';
+import type { AppStateStatus } from 'react-native';
 import React from 'react';
 import { render, renderHook } from '@testing-library/react-native';
 import PriceFetcher, {
@@ -86,22 +87,21 @@ const surfaceUi = (ctx: Ctx, setZecPrice: (p: number, d: number) => void) => (
   </ContextAppLoadedProvider>
 );
 
-const appStateHandlers: Array<(next: string) => void> = [];
+const appStateHandlers: Array<(next: AppStateStatus) => void> = [];
 
 beforeAll(() => {
-  const { AppState } = require('react-native');
-  jest.spyOn(AppState, 'addEventListener').mockImplementation(((
-    event: string,
-    handler: (next: string) => void,
-  ) => {
-    if (event === 'change') {
-      appStateHandlers.push(handler);
-    }
-    return { remove: jest.fn() };
-  }) as any);
+  const RN: typeof import('react-native') = require('react-native');
+  jest
+    .spyOn(RN.AppState, 'addEventListener')
+    .mockImplementation((event, handler) => {
+      if (event === 'change') {
+        appStateHandlers.push(handler);
+      }
+      return { remove: jest.fn() };
+    });
 });
 
-const fireAppState = (next: string) => {
+const fireAppState = (next: AppStateStatus) => {
   [...appStateHandlers].forEach(h => h(next));
 };
 

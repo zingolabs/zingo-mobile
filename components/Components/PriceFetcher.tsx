@@ -19,26 +19,28 @@ import {
  */
 export const PriceTrafficDriver: React.FunctionComponent = () => {
   const context = useContext(ContextAppLoaded);
-  const { zecPrice, mixnetView, nym, setZecPrice, selectServer, info } =
-    context;
+  const { mixnetView, nym, setZecPrice, selectServer, info } = context;
 
-  // Deps first, so the attach below always finds them. The statusKey
-  // write is also what fires an armed ready follow-up.
+  const mixnetStatusKey = mixnetView
+    ? mixnetView.statusKey
+    : 'mixnet.status.unknown';
+  // Offline mode and non-mainnet chains have no usable ZEC/USD market,
+  // so they never justify traffic, consent or not.
+  const marketAvailable =
+    selectServer !== SelectServerEnum.offline &&
+    info.chainName === ChainNameEnum.mainChainName;
+
+  // Deps first, so the attach below always finds them; the dependency
+  // list keeps the store's fetch-decision path off the render loop. The
+  // statusKey write is also what fires an armed ready follow-up.
   useEffect(() => {
     priceFetcherStore.setDeps({
       setZecPrice,
-      priceDate: zecPrice.date,
-      mixnetStatusKey: mixnetView
-        ? mixnetView.statusKey
-        : 'mixnet.status.unknown',
+      mixnetStatusKey,
       nymSelected: nym,
-      // Offline mode and non-mainnet chains have no usable ZEC/USD
-      // market, so they never justify traffic, consent or not.
-      marketAvailable:
-        selectServer !== SelectServerEnum.offline &&
-        info.chainName === ChainNameEnum.mainChainName,
+      marketAvailable,
     });
-  });
+  }, [setZecPrice, mixnetStatusKey, nym, marketAvailable]);
 
   useEffect(() => priceFetcherStore.attach(), []);
 
@@ -109,10 +111,13 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
   const absent = !zecPrice.date;
   const muted = stale || absent;
   const cadenceMs = nextFetchDelayMs || PRICE_REFRESH_MIN_MS;
-  const elapsedFraction = Math.min(
-    Math.max(1 - (nextFetchAt - Date.now()) / cadenceMs, 0),
-    1,
-  );
+  // No armed deadline (an entry flight before its schedule) reads as a
+  // cycle just begun, never as one complete: a full ring is reserved
+  // for a deadline that has actually passed.
+  const elapsedFraction =
+    nextFetchAt > 0
+      ? Math.min(Math.max(1 - (nextFetchAt - Date.now()) / cadenceMs, 0), 1)
+      : 0;
   return (
     <View style={containerStyle}>
       {textBefore && (
