@@ -94,7 +94,7 @@ import { RPCSeedType } from '../walletBackend/types/RPCSeedType';
 import { Launching } from '../LoadingApp';
 import { AddressBook } from '../../components/AddressBook';
 import { AddressBookFileImpl } from '../../components/AddressBook';
-import { GateAnswer, askGate } from '../gateController';
+import { GateAnswer, askGate, enactGateAnswer } from '../gateController';
 import ShowAddressAlertAsync from '../../components/Send/components/ShowAddressAlertAsync';
 import {
   createUpdateRecoveryWalletInfo,
@@ -1108,19 +1108,22 @@ export class LoadedAppClass extends Component<
     const foregroundGate: GateAnswer = this.state.security.foregroundApp
       ? await askGate({ translate: this.state.translate })
       : { kind: 'passed' };
-    if (foregroundGate.kind === 'declined') {
-      // The narrowed answer is the gate outcome, whole; the locked
-      // screen never reads mutable module state.
-      this.navigateToLoadingApp({
-        startingApp: true,
-        biometricGate: foregroundGate,
-      });
+    const proceed = enactGateAnswer(
+      foregroundGate,
+      {
+        // The narrowed answer is the gate outcome, whole; the locked
+        // screen never reads mutable module state.
+        lock: declined =>
+          this.navigateToLoadingApp({
+            startingApp: true,
+            biometricGate: declined,
+          }),
+        notice: this.addLastSnackbar,
+      },
+      this.state.translate,
+    );
+    if (!proceed) {
       return;
-    }
-    if (foregroundGate.kind === 'failedOpen') {
-      this.addLastSnackbar(
-        Utils.renderGateFailure(foregroundGate.failure, this.state.translate),
-      );
     }
     // reading background task info
     await this.fetchBackgroundSyncInfo();

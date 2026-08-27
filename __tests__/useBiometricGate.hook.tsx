@@ -5,6 +5,7 @@
  */
 jest.mock('../app/gateController', () => ({
   __esModule: true,
+  ...jest.requireActual('../app/gateController'),
   askGate: jest.fn(),
 }));
 

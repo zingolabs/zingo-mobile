@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { askGate } from '../gateController';
+import { askGate, enactGateAnswer } from '../gateController';
 import { SnackbarDurationEnum, TranslateType } from '../AppState';
-import Utils from '../utils';
 
 type UseBiometricGateArgs = {
   needsAuth: boolean;
@@ -58,18 +57,23 @@ export const useBiometricGate = ({
       if (cancelled) {
         return;
       }
-      if (answer.kind === 'declined') {
-        setScreenGate({ kind: 'refused' });
-        addLastSnackbar(translate('biometrics-error') as string);
-        onCancel();
-        return;
+      const proceed = enactGateAnswer(
+        answer,
+        {
+          lock: () => {
+            setScreenGate({ kind: 'refused' });
+            // The raw platform diagnostic is bug-report data; the
+            // decline path must not paste it into user copy.
+            addLastSnackbar(translate('biometrics-error') as string);
+            onCancel();
+          },
+          notice: addLastSnackbar,
+        },
+        translate,
+      );
+      if (proceed) {
+        setScreenGate({ kind: 'passed' });
       }
-      if (answer.kind === 'failedOpen') {
-        // Passing is the fail-open policy for a gate that could not run,
-        // and the user should hear why.
-        addLastSnackbar(Utils.renderGateFailure(answer.failure, translate));
-      }
-      setScreenGate({ kind: 'passed' });
     })();
     return () => {
       cancelled = true;
