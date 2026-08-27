@@ -16,10 +16,10 @@ jest.mock('../components/Components/priceFetcherStore', () => ({
     setDeps: jest.fn(),
     attach: jest.fn(() => () => {}),
     subscribe: jest.fn(() => () => {}),
-    snapshot: jest.fn(() => ({ loading: false })),
+    snapshot: jest.fn(() => ({ loading: false, cycle: 0 })),
     fetch: jest.fn(),
   },
-  usePriceFetcherStore: jest.fn(() => ({ loading: false })),
+  usePriceFetcherStore: jest.fn(() => ({ loading: false, cycle: 0 })),
   usePriceStale: jest.fn(() => false),
 }));
 
@@ -97,7 +97,7 @@ const sendUi = (zecPrice: { zecPrice: number; date: number }) => {
 };
 
 beforeEach(() => {
-  storeHook.mockReturnValue({ loading: false });
+  storeHook.mockReturnValue({ loading: false, cycle: 0 });
   staleHook.mockReturnValue(false);
   // Send's mount effects call these; the shared RPCModule mock lacks them.
   const { NativeModules } = require('react-native');
@@ -105,7 +105,7 @@ beforeEach(() => {
 });
 
 test('F7: an unattended refresh keeps the send CTA while a price is on screen', () => {
-  storeHook.mockReturnValue({ loading: true });
+  storeHook.mockReturnValue({ loading: true, cycle: 0 });
   const view = render(sendUi({ zecPrice: 33.33, date: Date.now() }));
 
   expect(view.queryByTestId('send.refreshing-price')).toBeNull();
@@ -116,7 +116,7 @@ test('F7: an unattended refresh keeps the send CTA while a price is on screen', 
 });
 
 test('F7: the first fetch with no price still shows the refreshing state', () => {
-  storeHook.mockReturnValue({ loading: true });
+  storeHook.mockReturnValue({ loading: true, cycle: 0 });
   const view = render(sendUi({ zecPrice: 0, date: 0 }));
 
   expect(view.getByTestId('send.refreshing-price')).toBeTruthy();

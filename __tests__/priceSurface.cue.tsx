@@ -15,7 +15,7 @@ jest.mock('../app/walletBackend', () => ({
 
 import 'react-native';
 import React from 'react';
-import { render } from '@testing-library/react-native';
+import { render, waitFor } from '@testing-library/react-native';
 import PriceFetcher from '../components/Components/PriceFetcher';
 import QuoteRefreshRing from '../components/Components/QuoteRefreshRing';
 import {
@@ -84,4 +84,25 @@ test('F9: a current price reaches screen readers as a label too', () => {
   });
   const view = render(fetcherUi(freshCtx));
   expect(view.getByLabelText('price-ring-live')).toBeTruthy();
+});
+
+test('R4: the ring restarts on every refresh cycle, failed ones included', async () => {
+  jest.useFakeTimers();
+  const view = render(fetcherUi(makeCtx())); // every fetch here is refused
+  await jest.advanceTimersByTimeAsync(0);
+  const firstCycle = view.UNSAFE_getByType(QuoteRefreshRing).props.resetKey;
+
+  await jest.advanceTimersByTimeAsync(60_000); // a second refused cycle
+  const secondCycle = view.UNSAFE_getByType(QuoteRefreshRing).props.resetKey;
+
+  // A frozen full ring would misreport a failing refresh as complete.
+  expect(secondCycle).not.toBe(firstCycle);
+  jest.useRealTimers();
+});
+
+test('R5: a price that never arrived is announced as absent, not stale', async () => {
+  const view = render(fetcherUi(makeCtx())); // no price has ever existed
+  await waitFor(() =>
+    expect(view.getByLabelText('price-ring-none')).toBeTruthy(),
+  );
 });

@@ -14,6 +14,7 @@
   "biometricsfailed-body": "For security, the application is locked.",
   "biometricsfailed-footer": "Use the authentication method to unlock.",
   "biometricsfailed-button": "Unlock",
+  "price-ring-none": "No ZEC price yet",
   "price-ring-live": "The ZEC price is current",
   "price-ring-stale": "The ZEC price is stale",
   "biometrics-message": "Please authenticate",

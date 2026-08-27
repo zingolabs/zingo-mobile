@@ -55,6 +55,14 @@ const UNKNOWN_VIEW: MixnetView = {
   recovery: 'reenable',
   reconnecting: false,
 };
+const DIED_VIEW: MixnetView = {
+  statusKey: 'mixnet.status.died',
+  socks5Addr: null,
+  narration: null,
+  sendBlocked: true,
+  recovery: 'reenable',
+  reconnecting: false,
+};
 
 type Ctx = typeof defaultAppContextLoaded;
 const makeCtx = (over?: Partial<Ctx>): Ctx => ({
@@ -253,7 +261,7 @@ test('F6: a follow-up arriving mid-flight fires after the flight, not never', as
   expect(price.mock.calls.length).toBeGreaterThan(inFlight + 1);
 });
 
-test('F6: a non-bootstrap transport state disarms the follow-up', async () => {
+test('F6: a real transport verdict disarms the follow-up', async () => {
   price.mockResolvedValue({ price: -1, error: 'refused' });
   const setZecPrice = jest.fn();
   seedDeps(setZecPrice);
@@ -262,11 +270,184 @@ test('F6: a non-bootstrap transport state disarms the follow-up', async () => {
   const view = render(fetcherUi(ctx, setZecPrice));
   await waitFor(() => expect(price).toHaveBeenCalledTimes(2)); // entry, refused twice: arms
 
-  view.rerender(fetcherUi(makeCtx({ mixnetView: UNKNOWN_VIEW }), setZecPrice));
+  view.rerender(fetcherUi(makeCtx({ mixnetView: DIED_VIEW }), setZecPrice));
   await flush();
   view.rerender(fetcherUi(makeCtx({ mixnetView: READY_VIEW }), setZecPrice));
   await flush();
 
-  // The arm belonged to a transport story 'unknown' ended.
+  // The arm belonged to a transport 'died' ended for good.
   expect(price).toHaveBeenCalledTimes(2);
+});
+
+test('R1: a hung fetch releases the surface within the bound', async () => {
+  jest.useFakeTimers();
+  price
+    .mockImplementationOnce(() => new Promise(() => {})) // wedged native call
+    .mockResolvedValue({ price: 42, error: '' });
+  const setZecPrice = jest.fn();
+  seedDeps(setZecPrice);
+
+  render(fetcherUi(makeCtx(), setZecPrice));
+  await jest.advanceTimersByTimeAsync(31_000); // past the fetch bound
+
+  expect(setZecPrice).toHaveBeenCalledWith(42, expect.any(Number));
+});
+
+test('R3: a transport turning ready mid-flight still gets the follow-up', async () => {
+  let refuseFirst: (v: { price: number; error: string }) => void = () => {};
+  let refuseSecond: (v: { price: number; error: string }) => void = () => {};
+  price
+    .mockImplementationOnce(
+      () =>
+        new Promise(resolve => {
+          refuseFirst = resolve;
+        }),
+    )
+    .mockImplementationOnce(
+      () =>
+        new Promise(resolve => {
+          refuseSecond = resolve;
+        }),
+    )
+    .mockResolvedValue({ price: -1, error: 'refused' });
+  const setZecPrice = jest.fn();
+  seedDeps(setZecPrice);
+
+  const ctx = makeCtx({ mixnetView: INITIAL_MIXNET_VIEW }); // bootstrapping
+  const view = render(fetcherUi(ctx, setZecPrice));
+  await waitFor(() => expect(price).toHaveBeenCalledTimes(1));
+
+  // The Indicator turns ready while the entry flight is still up.
+  view.rerender(fetcherUi(makeCtx({ mixnetView: READY_VIEW }), setZecPrice));
+  refuseFirst({ price: -1, error: 'refused' });
+  await flush();
+  refuseSecond({ price: -1, error: 'refused' });
+  await flush();
+  await flush();
+
+  // The refusal happened during a bootstrap; ready is up: fetch now, not
+  // a full tick later.
+  expect(price.mock.calls.length).toBeGreaterThan(2);
+});
+
+test('R3: a timer refusal during bootstrap arms the follow-up too', async () => {
+  jest.useFakeTimers();
+  price.mockResolvedValue({ price: -1, error: 'refused' });
+  const setZecPrice = jest.fn();
+  const freshDate = Date.now();
+
+  (priceFetcherStore.setDeps as any)({
+    setZecPrice,
+    mixnetStatusKey: 'mixnet.status.bootstrapping',
+    priceDate: freshDate,
+  });
+
+  const ctx = makeCtx({
+    mixnetView: INITIAL_MIXNET_VIEW,
+    zecPrice: { zecPrice: 42, date: freshDate }, // fresh: no entry fetch
+  });
+  const view = render(fetcherUi(ctx, setZecPrice));
+  await jest.advanceTimersByTimeAsync(0);
+  expect(price).not.toHaveBeenCalled();
+
+  await jest.advanceTimersByTimeAsync(60_000); // the tick is refused
+  const afterTimer = price.mock.calls.length;
+  expect(afterTimer).toBeGreaterThan(0);
+
+  view.rerender(
+    fetcherUi(
+      makeCtx({
+        mixnetView: READY_VIEW,
+        zecPrice: { zecPrice: 42, date: freshDate },
+      }),
+      setZecPrice,
+    ),
+  );
+  await jest.advanceTimersByTimeAsync(0);
+
+  expect(price.mock.calls.length).toBeGreaterThan(afterTimer);
+});
+
+test('R6: a return landing inside a flight still produces the return fetch', async () => {
+  let land: (v: { price: number; error: string }) => void = () => {};
+  price
+    .mockImplementationOnce(
+      () =>
+        new Promise(resolve => {
+          land = resolve;
+        }),
+    )
+    .mockResolvedValue({ price: -1, error: 'refused' });
+  const setZecPrice = jest.fn();
+  seedDeps(setZecPrice);
+
+  render(fetcherUi(makeCtx(), setZecPrice));
+  await waitFor(() => expect(price).toHaveBeenCalledTimes(1));
+
+  fireAppState('background');
+  fireAppState('active'); // the return lands while the flight is up
+  land({ price: -1, error: 'refused' });
+  await flush();
+  await flush();
+
+  // The grilled invariant: every real return fetches.
+  expect(price.mock.calls.length).toBeGreaterThanOrEqual(3);
+});
+
+test('R7: withdrawing consent mid-flight stops the retry and the write', async () => {
+  let land: (v: { price: number; error: string }) => void = () => {};
+  price
+    .mockImplementationOnce(
+      () =>
+        new Promise(resolve => {
+          land = resolve;
+        }),
+    )
+    .mockResolvedValue({ price: 42, error: '' });
+  const setZecPrice = jest.fn();
+  seedDeps(setZecPrice);
+
+  const view = render(fetcherUi(makeCtx(), setZecPrice));
+  await waitFor(() => expect(price).toHaveBeenCalledTimes(1));
+
+  view.unmount(); // currency switched away: the consent is withdrawn
+  land({ price: 42, error: '' });
+  await flush();
+
+  expect(price).toHaveBeenCalledTimes(1); // no second attempt
+  expect(setZecPrice).not.toHaveBeenCalled(); // no write into a dead surface
+});
+
+test('R8: rapid app hops inside the cooldown do not multiply fetches', async () => {
+  price.mockResolvedValue({ price: 42, error: '' });
+  const setZecPrice = jest.fn();
+  seedDeps(setZecPrice);
+
+  render(fetcherUi(makeCtx(), setZecPrice));
+  await waitFor(() => expect(price).toHaveBeenCalledTimes(1)); // seconds-old price
+
+  fireAppState('background');
+  fireAppState('active');
+  fireAppState('background');
+  fireAppState('active');
+  await flush();
+
+  expect(price).toHaveBeenCalledTimes(1);
+});
+
+test('R9: a transient unknown poll does not drop the armed follow-up', async () => {
+  price.mockResolvedValue({ price: -1, error: 'refused' });
+  const setZecPrice = jest.fn();
+  seedDeps(setZecPrice);
+
+  const ctx = makeCtx({ mixnetView: INITIAL_MIXNET_VIEW }); // bootstrapping
+  const view = render(fetcherUi(ctx, setZecPrice));
+  await waitFor(() => expect(price).toHaveBeenCalledTimes(2)); // refused: arms
+
+  view.rerender(fetcherUi(makeCtx({ mixnetView: UNKNOWN_VIEW }), setZecPrice));
+  await flush(); // one failed status poll, not a transport verdict
+  view.rerender(fetcherUi(makeCtx({ mixnetView: READY_VIEW }), setZecPrice));
+  await flush();
+
+  expect(price.mock.calls.length).toBeGreaterThan(2); // the follow-up flew
 });

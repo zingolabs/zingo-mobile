@@ -8,17 +8,17 @@ import { MixnetDetailReport, MixnetStatusReport } from './mixnetTransform';
  */
 export type MixnetRecoveryAction = 'none' | 'wait' | 'reenable';
 
-/** The closed set of status translation keys a MixnetView can carry. */
-export const MIXNET_STATUS_KEYS = [
-  'mixnet.status.off',
-  'mixnet.status.unknown',
-  'mixnet.status.bootstrapping',
-  'mixnet.status.ready',
-  'mixnet.status.died',
-] as const;
+/** One member of the closed status-key set: an indicator the wallet reports, or this presenter's own `unknown` failure key. */
+export type MixnetStatusKey =
+  `mixnet.status.${`${RPCMixnetIndicatorEnum}` | 'unknown'}`;
 
-/** One member of the closed status-key set. */
-export type MixnetStatusKey = (typeof MIXNET_STATUS_KEYS)[number];
+/** The closed status-key set at runtime, derived from the same sources as the type. */
+export const MIXNET_STATUS_KEYS: readonly MixnetStatusKey[] = [
+  ...Object.values(RPCMixnetIndicatorEnum).map(
+    indicator => `mixnet.status.${indicator}` as MixnetStatusKey,
+  ),
+  'mixnet.status.unknown',
+];
 
 /**
  * The screen-facing projection of the mixnet state. `statusKey` is a

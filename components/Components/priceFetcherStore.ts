@@ -28,6 +28,12 @@ import { MixnetStatusKey } from '../../app/walletBackend/transforms/mixnetPresen
 export const PRICE_AUTO_REFRESH_MS = 60_000;
 // A price older than this wall-clock age is stale (CONTEXT.md: Stale price).
 export const PRICE_STALE_MS = 5 * 60_000;
+// The JS-side bound on one native price call: a wedged FFI promise must
+// never pin `loading` for the process lifetime.
+const PRICE_FETCH_TIMEOUT_MS = 30_000;
+// Rapid app hops must not multiply fetches: a return re-fetches only when
+// the last fetch started at least this long ago.
+const RETURN_FETCH_COOLDOWN_MS = 5_000;
 
 type Deps = {
   setZecPrice: (price: number, date: number) => void;
@@ -42,11 +48,18 @@ type FetchKind = 'entry' | 'timer' | 'readyFollowUp';
 
 let loading = false;
 let followUpArmed = false;
+// A return that landed while a fetch was in flight; honored when the
+// flight lands so a real return always produces its fetch.
+let entryPending = false;
 let deps: Deps | null = null;
 let autoTimer: ReturnType<typeof setTimeout> | null = null;
 let attachCount = 0;
 let appStateSub: NativeEventSubscription | null = null;
 let appAway = false;
+let lastFetchStartAt = 0;
+// Bumped at every fetch completion, success or failure, so the ring can
+// restart its fill for the cycle that actually begins.
+let cycle = 0;
 const listeners = new Set<() => void>();
 
 function emit(): void {
@@ -68,42 +81,76 @@ function scheduleAuto(): void {
   }, PRICE_AUTO_REFRESH_MS);
 }
 
+// One price attempt under the JS-side bound; a wedged native call reads
+// as a refused attempt instead of holding the surface forever.
+async function boundedPrice(): Promise<number> {
+  let bound: ReturnType<typeof setTimeout> | undefined;
+  const expiry = new Promise<{ price: number }>(resolve => {
+    bound = setTimeout(
+      () => resolve({ price: -3 }),
+      PRICE_FETCH_TIMEOUT_MS,
+    );
+  });
+  try {
+    const { price } = await Promise.race([getZecPrice(), expiry]);
+    return price;
+  } finally {
+    clearTimeout(bound);
+  }
+}
+
 async function doFetch(kind: FetchKind): Promise<void> {
   if (loading || !deps || attachCount === 0 || appAway) return;
   const d = deps;
+  // The status the flight launched under: a refusal belongs to this
+  // transport story even when the Indicator moves mid-flight.
+  const launchStatusKey = d.mixnetStatusKey;
 
   loading = true;
+  lastFetchStartAt = Date.now();
   emit();
   try {
-    let price: number;
     // first attempt
-    ({ price } = await getZecPrice());
-    // 0 initial · -1 Gemini/zingolib · -2 RPCModule · >0 real value
-    if (price <= 0) {
-      // second attempt
-      ({ price } = await getZecPrice());
+    // 0 initial · -1 Gemini/zingolib · -2 RPCModule · -3 bound · >0 real
+    let price = await boundedPrice();
+    if (price <= 0 && attachCount > 0 && !appAway) {
+      // The consent re-check: no second attempt for a surface every
+      // fetcher has left, or for a backgrounded app.
+      price = await boundedPrice();
     }
 
     if (price > 0) {
-      followUpArmed = false;
-      d.setZecPrice(price, Date.now());
+      if (attachCount > 0) {
+        followUpArmed = false;
+        entryPending = false; // a fresh price satisfies a pending return
+        d.setZecPrice(price, Date.now());
+      }
     } else if (
-      kind === 'entry' &&
+      kind !== 'readyFollowUp' &&
       !appAway &&
-      deps?.mixnetStatusKey === 'mixnet.status.bootstrapping'
+      attachCount > 0 &&
+      (launchStatusKey === 'mixnet.status.bootstrapping' ||
+        deps?.mixnetStatusKey === 'mixnet.status.bootstrapping')
     ) {
-      // Refused during bootstrap: the ready follow-up recovers the price
-      // seconds after the transport comes up instead of a full tick
-      // later. The appAway re-check keeps a flight that outlived a
-      // background transition from re-arming what that transition
-      // dropped. Every other failure is silent; the last price stands
-      // and the stale cue carries the signal.
+      // Refused during bootstrap, judged by the launch status or the
+      // live one: the ready follow-up recovers the price seconds after
+      // the transport comes up instead of a full tick later. The appAway
+      // re-check keeps a flight that outlived a background transition
+      // from re-arming what that transition dropped, and the follow-up
+      // itself never re-arms. Every other failure is silent; the last
+      // price stands and the stale cue carries the signal.
       followUpArmed = true;
     }
   } finally {
     loading = false;
+    cycle++;
     emit();
     scheduleAuto();
+    if (entryPending && attachCount > 0 && !appAway && deps) {
+      // The return that landed inside this flight gets its fetch.
+      entryPending = false;
+      doFetch('entry').catch(() => {});
+    }
     pump(); // a follow-up that turned ready mid-flight fires now
   }
 }
@@ -118,8 +165,14 @@ function pump(): void {
   if (deps.mixnetStatusKey === 'mixnet.status.ready') {
     followUpArmed = false;
     doFetch('readyFollowUp').catch(() => {});
-  } else if (deps.mixnetStatusKey !== 'mixnet.status.bootstrapping') {
-    // died, off, unknown: the arm belonged to a bootstrap that is over.
+  } else if (
+    deps.mixnetStatusKey === 'mixnet.status.died' ||
+    deps.mixnetStatusKey === 'mixnet.status.off'
+  ) {
+    // A real transport verdict ends the bootstrap the arm belonged to.
+    // 'unknown' is one failed status poll, not a verdict, and a
+    // bootstrap's polls are flakiest exactly while the arm matters, so
+    // both it and 'bootstrapping' keep the arm standing.
     followUpArmed = false;
   }
 }
@@ -142,16 +195,30 @@ function onAppStateChange(next: string): void {
   if (next === 'background') {
     appAway = true;
     followUpArmed = false;
+    entryPending = false;
     clearAuto();
   } else if (next === 'active') {
     const returning = appAway;
     appAway = false;
-    if (returning) {
-      // Every real return fetches (the grilled decision); 'inactive'
-      // round trips never set appAway, so they cannot reach this.
+    if (!returning) {
+      if (!autoTimer && !loading) {
+        scheduleAuto();
+      }
+      return;
+    }
+    // Every real return fetches (the grilled decision); 'inactive' round
+    // trips never set appAway, so they cannot reach this. A return
+    // landing inside a flight parks its fetch for the flight's landing,
+    // and hops inside the cooldown ride the price the last fetch just
+    // brought.
+    if (loading) {
+      entryPending = true;
+    } else if (Date.now() - lastFetchStartAt < RETURN_FETCH_COOLDOWN_MS) {
+      if (!autoTimer) {
+        scheduleAuto();
+      }
+    } else {
       doFetch('entry').catch(() => {});
-    } else if (!autoTimer && !loading) {
-      scheduleAuto();
     }
   }
   // 'inactive' and 'unknown' prove nothing and change nothing.
@@ -179,12 +246,13 @@ export const priceFetcherStore = {
         appStateSub?.remove();
         appStateSub = null;
         followUpArmed = false;
+        entryPending = false;
         deps = null;
       }
     };
   },
-  snapshot(): { loading: boolean } {
-    return { loading };
+  snapshot(): { loading: boolean; cycle: number } {
+    return { loading, cycle };
   },
   /** Observe store state; observation carries no consent and starts no traffic. */
   subscribe(listener: () => void): () => void {

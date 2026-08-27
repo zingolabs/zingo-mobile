@@ -12,14 +12,14 @@ import {
 } from '../app/walletBackend/transforms/mixnetPresenter';
 import { RPCMixnetIndicatorEnum } from '../app/walletBackend/enums/RPCMixnetIndicatorEnum';
 
-test('F10: the presenter exports the closed status-key set', () => {
-  expect(MIXNET_STATUS_KEYS).toEqual([
-    'mixnet.status.off',
+test('R10: the closed status-key set derives from the indicator enum', () => {
+  // No verbatim copy: the expectation is computed from the enum the wallet
+  // reports, plus the presenter's own failure key.
+  const derivedKeys = new Set([
+    ...Object.values(RPCMixnetIndicatorEnum).map(s => `mixnet.status.${s}`),
     'mixnet.status.unknown',
-    'mixnet.status.bootstrapping',
-    'mixnet.status.ready',
-    'mixnet.status.died',
   ]);
+  expect(new Set(MIXNET_STATUS_KEYS)).toEqual(derivedKeys);
 });
 
 test('F10: every derivable view stays inside the closed key set', () => {

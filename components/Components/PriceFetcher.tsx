@@ -30,7 +30,7 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
   const bg = backgroundColor ?? colors.bgCanvas;
 
   // Shared state across every mounted PriceFetcher.
-  const { loading } = usePriceFetcherStore();
+  const { loading, cycle } = usePriceFetcherStore();
   const stale = usePriceStale(zecPrice.date);
 
   // Feed the shared store the latest context-bound callbacks and the live
@@ -78,10 +78,13 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
     );
   }
 
-  // No price and nothing in flight, or a stale price: the ring mutes (to
-  // a value still distinct from the track) as the visual failure cue, and
-  // the label carries the same fact to screen readers.
-  const muted = stale || !zecPrice.date;
+  // A price that never arrived and a stale one share the muted look (a
+  // value still distinct from the track) but not the label: screen
+  // readers hear which of the two facts holds. The ring restarts on
+  // every completed fetch cycle, failed ones included, so a full ring
+  // always means a refresh really is due.
+  const absent = !zecPrice.date;
+  const muted = stale || absent;
   return (
     <View style={containerStyle}>
       {textBefore && (
@@ -95,9 +98,15 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
         }
         trackColor={'rgba(255,255,255,0.12)'}
         durationMs={PRICE_AUTO_REFRESH_MS}
-        resetKey={zecPrice.date}
+        resetKey={cycle}
         accessibilityLabel={
-          translate(muted ? 'price-ring-stale' : 'price-ring-live') as string
+          translate(
+            absent
+              ? 'price-ring-none'
+              : stale
+                ? 'price-ring-stale'
+                : 'price-ring-live',
+          ) as string
         }
         testID="pricefetcher.ring"
       />

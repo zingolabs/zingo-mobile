@@ -260,6 +260,7 @@ raises a snackbar.
 _Avoid_: manual fetch (removed; every fetch is app-initiated)
 
 **Ready follow-up**:
-The one-shot fetch armed when a return-to-active fetch is refused during
-bootstrap; it fires when the Indicator turns `ready` and is dropped on
-`died` or on the next background transition.
+The one-shot fetch armed when an unattended fetch is refused during
+bootstrap; it fires when the Indicator turns `ready` and is dropped on a
+`died` or `off` verdict or on the next background transition. A transient
+`unknown` is one failed status poll, not a verdict, and does not drop it.

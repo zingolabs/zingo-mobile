@@ -14,6 +14,7 @@
   "biometricsfailed-body": "Por questões de segurança, o aplicativo está bloqueado.",
   "biometricsfailed-footer": "Use o método de autenticação para desbloquear.",
   "biometricsfailed-button": "Desbloquear",
+  "price-ring-none": "Ainda não há preço de ZEC",
   "price-ring-live": "O preço de ZEC está atualizado",
   "price-ring-stale": "O preço de ZEC está desatualizado",
   "biometrics-message": "Por favor, autentique-se",

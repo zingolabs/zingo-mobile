@@ -14,6 +14,7 @@
   "biometricsfailed-body": "Güvenlik Nedeniyle, uygulama kilitlendi.",
   "biometricsfailed-footer": "Kilidi açmak için kimlik doğrulama yöntemini kullanın.",
   "biometricsfailed-button": "Kilidi aç",
+  "price-ring-none": "Henüz ZEC fiyatı yok",
   "price-ring-live": "ZEC fiyatı güncel",
   "price-ring-stale": "ZEC fiyatı güncel değil",
   "biometrics-message": "Lütfen kimliğinizi doğrulayın",
