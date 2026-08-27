@@ -254,10 +254,12 @@ clock. Staleness is a fact about the value's accuracy, not about fetch
 mechanics, and it is independent of transport.
 
 **Price consent**:
-Selecting USD as the display currency. It is the sole authority for price
-traffic: the surface fetches on no other gesture, and no fetch failure
-raises a snackbar.
-_Avoid_: manual fetch (removed; every fetch is app-initiated)
+Selecting Nym, the persisted Mixnet Mode opt-in. It is the single and
+only consent for price traffic: the surface fetches on no other
+authority, and no fetch failure raises a snackbar. The display currency
+chooses what to show, never what may be fetched.
+_Avoid_: manual fetch (removed; every fetch is app-initiated); USD
+selection as consent (the seeded default authorizes nothing)
 
 **Ready follow-up**:
 The one-shot fetch armed when an unattended fetch is refused during

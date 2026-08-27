@@ -25,7 +25,7 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
   backgroundColor,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, zecPrice, mixnetView } = context;
+  const { translate, zecPrice, mixnetView, nym } = context;
   const { colors } = useTheme();
   const bg = backgroundColor ?? colors.bgCanvas;
 
@@ -45,6 +45,7 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
       mixnetStatusKey: mixnetView
         ? mixnetView.statusKey
         : 'mixnet.status.unknown',
+      nymSelected: nym,
     });
   });
 

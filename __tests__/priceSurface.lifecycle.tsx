@@ -65,10 +65,13 @@ const DIED_VIEW: MixnetView = {
 };
 
 type Ctx = typeof defaultAppContextLoaded;
+// Every session here holds the Nym selection, the sole price-traffic
+// consent, unless a test overrides it away.
 const makeCtx = (over?: Partial<Ctx>): Ctx => ({
   ...defaultAppContextLoaded,
   translate: (k: string) => k,
   zecPrice: { zecPrice: 0, date: 0 },
+  nym: true,
   ...over,
 });
 
@@ -87,6 +90,7 @@ const seedDeps = (setZecPrice: (p: number, d: number) => void) => {
     setZecPrice,
     mixnetStatusKey: 'mixnet.status.off',
     priceDate: 0,
+    nymSelected: true,
   });
 };
 
@@ -433,6 +437,22 @@ test('R8: rapid app hops inside the cooldown do not multiply fetches', async () 
   await flush();
 
   expect(price).toHaveBeenCalledTimes(1);
+});
+
+test('R2: without the Nym selection no price traffic exists', async () => {
+  jest.useFakeTimers();
+  price.mockResolvedValue({ price: 42, error: '' });
+  const setZecPrice = jest.fn();
+  seedDeps(setZecPrice);
+
+  // USD may even be the seeded default; the currency authorizes nothing.
+  render(fetcherUi(makeCtx({ nym: false }), setZecPrice));
+  await jest.advanceTimersByTimeAsync(61_000);
+  fireAppState('background');
+  fireAppState('active');
+  await jest.advanceTimersByTimeAsync(61_000);
+
+  expect(price).not.toHaveBeenCalled();
 });
 
 test('R9: a transient unknown poll does not drop the armed follow-up', async () => {

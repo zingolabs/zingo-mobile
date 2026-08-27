@@ -6,8 +6,9 @@ import { MixnetStatusKey } from '../../app/walletBackend/transforms/mixnetPresen
 /**
  * Shared, singleton state for every <PriceFetcher/> on screen.
  *
- * ADR 0008: the price surface has no manual fetch. A mounted PriceFetcher
- * (the render sites gate on USD, the consent) attaches here; observation
+ * ADR 0008: the price surface has no manual fetch, and the Nym opt-in is
+ * the single and only consent for price traffic. A mounted PriceFetcher
+ * attaches here and carries the consent bit in its deps; observation
  * through usePriceFetcherStore carries no consent and never starts
  * traffic. The store owns the whole lifecycle:
  *   - ONE auto-refresh timer while at least one fetcher is attached and
@@ -41,6 +42,9 @@ type Deps = {
   mixnetStatusKey: MixnetStatusKey;
   // The date of the price the context currently holds.
   priceDate: number;
+  // The persisted Nym opt-in: the sole consent for price traffic. The
+  // display currency chooses what to show, never what may be fetched.
+  nymSelected: boolean;
 };
 
 // Only a foreground-entry refusal may arm the ready follow-up.
@@ -100,7 +104,9 @@ async function boundedPrice(): Promise<number> {
 }
 
 async function doFetch(kind: FetchKind): Promise<void> {
-  if (loading || !deps || attachCount === 0 || appAway) return;
+  if (loading || !deps || !deps.nymSelected || attachCount === 0 || appAway) {
+    return;
+  }
   const d = deps;
   // The status the flight launched under: a refusal belongs to this
   // transport story even when the Indicator moves mid-flight.
@@ -183,7 +189,16 @@ function pump(): void {
 // a refused fetch cannot echo into a refetch storm through the
 // re-renders its own emit causes.
 function entryOrSchedule(): void {
-  if (!deps || attachCount === 0 || appAway || loading || autoTimer) return;
+  if (
+    !deps ||
+    !deps.nymSelected ||
+    attachCount === 0 ||
+    appAway ||
+    loading ||
+    autoTimer
+  ) {
+    return;
+  }
   if (Date.now() - deps.priceDate > PRICE_AUTO_REFRESH_MS) {
     doFetch('entry').catch(() => {});
   } else {
@@ -228,6 +243,13 @@ export const priceFetcherStore = {
   /** Keep the latest context-bound callbacks (same across all instances). */
   setDeps(d: Deps): void {
     deps = d;
+    if (!d.nymSelected) {
+      // The consent was withdrawn (or never given): stop the cadence.
+      clearAuto();
+      followUpArmed = false;
+      entryPending = false;
+      return;
+    }
     pump();
     entryOrSchedule();
   },

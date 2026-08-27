@@ -28,6 +28,7 @@ const makeCtx = (over?: Partial<Ctx>): Ctx => ({
   ...defaultAppContextLoaded,
   translate: (k: string) => k,
   zecPrice: { zecPrice: 0, date: 0 },
+  nym: true,
   ...over,
 });
 
