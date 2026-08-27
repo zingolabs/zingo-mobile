@@ -2,6 +2,7 @@ import React, { useContext, useEffect } from 'react';
 import { View, ActivityIndicator, ViewStyle } from 'react-native';
 import { useTheme } from '../../app/theme';
 import { ContextAppLoaded } from '../../app/context';
+import { ChainNameEnum, SelectServerEnum } from '../../app/AppState';
 import RegText from './RegText';
 import QuoteRefreshRing from './QuoteRefreshRing';
 import {
@@ -18,7 +19,8 @@ import {
  */
 export const PriceTrafficDriver: React.FunctionComponent = () => {
   const context = useContext(ContextAppLoaded);
-  const { zecPrice, mixnetView, nym, setZecPrice } = context;
+  const { zecPrice, mixnetView, nym, setZecPrice, selectServer, info } =
+    context;
 
   // Deps first, so the attach below always finds them. The statusKey
   // write is also what fires an armed ready follow-up.
@@ -30,6 +32,11 @@ export const PriceTrafficDriver: React.FunctionComponent = () => {
         ? mixnetView.statusKey
         : 'mixnet.status.unknown',
       nymSelected: nym,
+      // Offline mode and non-mainnet chains have no usable ZEC/USD
+      // market, so they never justify traffic, consent or not.
+      marketAvailable:
+        selectServer !== SelectServerEnum.offline &&
+        info.chainName === ChainNameEnum.mainChainName,
     });
   });
 
@@ -50,7 +57,7 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
   backgroundColor,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, zecPrice, nym } = context;
+  const { translate, zecPrice, nym, mixnetView } = context;
   const { colors } = useTheme();
   const bg = backgroundColor ?? colors.bgCanvas;
 
@@ -58,9 +65,15 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
   const { loading, cycle } = usePriceFetcherStore();
   const stale = usePriceStale(zecPrice.date);
 
-  // Without the Nym consent no cadence exists, and a countdown that
-  // counts down to nothing would mislead: render nothing at all.
-  if (!nym) {
+  // Without the Nym consent no cadence exists, and under an 'off' or
+  // 'died' transport verdict the store pauses it; in both states a ring
+  // counting down to a refresh that cannot come would mislead, so
+  // render nothing at all.
+  const transportRefuses =
+    mixnetView !== null &&
+    (mixnetView.statusKey === 'mixnet.status.off' ||
+      mixnetView.statusKey === 'mixnet.status.died');
+  if (!nym || transportRefuses) {
     return null;
   }
 

@@ -34,7 +34,11 @@ const CurrencyAmount: React.FunctionComponent<CurrencyAmountProps> = ({
   const { colors } = useTheme();
   const { decimalSeparator } = getNumberFormatSettings();
   const stale = usePriceStale(priceDate ?? 0);
-  const baseColor = stale ? colors.fgMuted : colors.fgDefault;
+  // A live conversion whose price never arrived (priceDate 0) mutes like
+  // a stale one, matching the ring beside it; historical conversions
+  // omit priceDate and never dim.
+  const absent = priceDate === 0;
+  const baseColor = stale || absent ? colors.fgMuted : colors.fgDefault;
 
   useEffect(() => {
     setPrivacyHigh(privacy || false);

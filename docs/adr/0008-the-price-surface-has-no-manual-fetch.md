@@ -30,8 +30,10 @@ default case, since a fresh install carries USD without any choice.
 ## Consequences
 
 A user cannot force a refresh: a stale price waits for the next timer
-tick or the ready follow-up. Auto-refresh arms whenever a fetcher is
-mounted in the foreground with the Nym selection held. A wallet without
-that selection emits no price traffic at all: its USD rows render without
-a fetched value, and enabling Mixnet Mode is what turns the price
-surface on.
+tick or the ready follow-up. Auto-refresh arms whenever the wallet
+session holds the Nym selection in the foreground. A wallet without that
+selection emits no price traffic at all: its USD rows render without a
+fetched value, and enabling Mixnet Mode is what turns the price surface
+on. Consent alone is also not enough where no market exists: offline
+mode and non-mainnet chains never fetch, since no usable ZEC/USD price
+exists for them.

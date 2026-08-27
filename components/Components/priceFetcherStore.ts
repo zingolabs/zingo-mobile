@@ -38,6 +38,9 @@ export const PRICE_STALE_MS = 5 * 60_000;
 const PRICE_FETCH_TIMEOUT_MS = 30_000;
 // Rapid remounts and app hops must not multiply fetches.
 const FETCH_BURST_COOLDOWN_MS = 5_000;
+// A wedged native call is reused until this age, then retired so a fresh
+// request can run: bounded orphans, never a corpse cached forever.
+const NATIVE_CALL_TTL_MS = 5 * 60_000;
 
 type Deps = {
   setZecPrice: (price: number, date: number) => void;
@@ -48,6 +51,9 @@ type Deps = {
   // The persisted Nym opt-in: the sole consent for price traffic. The
   // display currency chooses what to show, never what may be fetched.
   nymSelected: boolean;
+  // Whether a market exists to ask: a live server selection on mainnet.
+  // Offline mode and other chains have no usable ZEC/USD price.
+  marketAvailable: boolean;
 };
 
 // Only a foreground-entry refusal may arm the ready follow-up.
@@ -65,6 +71,8 @@ let appStateSub: NativeEventSubscription | null = null;
 let appAway = false;
 let lastFetchStartAt = 0;
 let lastSuccessAt = 0;
+let lastReturnFetchAt = 0;
+let nativeCallStartedAt = 0;
 // Bumped at every fetch completion, success or failure, so the ring can
 // restart its fill for the cycle that actually begins.
 let cycle = 0;
@@ -94,19 +102,46 @@ function transportRefuses(): boolean {
   );
 }
 
+// The one gate every path consults: the consent, the market, an attached
+// session, the foreground, and a transport that could serve. Hand-copied
+// guard subsets drifted; this predicate is the single source.
+function surfaceMayFetch(): boolean {
+  return (
+    deps !== null &&
+    deps.nymSelected &&
+    deps.marketAvailable &&
+    attachCount > 0 &&
+    !appAway &&
+    !transportRefuses()
+  );
+}
+
 function scheduleAuto(): void {
   clearAuto();
-  if (attachCount === 0 || appAway || transportRefuses()) return;
+  if (!surfaceMayFetch()) return;
   autoTimer = setTimeout(() => {
+    // Null the handle first: a tick that fires into a state doFetch
+    // refuses must not leave a dead handle blocking every reschedule.
+    autoTimer = null;
     doFetch('timer').catch(() => {});
   }, PRICE_AUTO_REFRESH_MS);
 }
 
 function startNativeCall(): Promise<{ price: number; error: string }> {
+  if (nativeCall && Date.now() - nativeCallStartedAt > NATIVE_CALL_TTL_MS) {
+    // The cached call wedged past its TTL: retire the corpse so a fresh
+    // request can run instead of reattaching to it forever.
+    nativeCall = null;
+  }
   if (!nativeCall) {
-    nativeCall = getZecPrice().finally(() => {
-      nativeCall = null;
-    });
+    nativeCallStartedAt = Date.now();
+    const launched: Promise<{ price: number; error: string }> =
+      getZecPrice().finally(() => {
+        if (nativeCall === launched) {
+          nativeCall = null;
+        }
+      });
+    nativeCall = launched;
   }
   return nativeCall;
 }
@@ -129,19 +164,8 @@ async function boundedPrice(): Promise<number> {
   }
 }
 
-function consentHolds(): boolean {
-  return attachCount > 0 && !appAway && deps?.nymSelected === true;
-}
-
 async function doFetch(kind: FetchKind): Promise<void> {
-  if (
-    loading ||
-    !deps ||
-    !deps.nymSelected ||
-    attachCount === 0 ||
-    appAway ||
-    transportRefuses()
-  ) {
+  if (loading || !surfaceMayFetch() || !deps) {
     return;
   }
   const d = deps;
@@ -156,7 +180,7 @@ async function doFetch(kind: FetchKind): Promise<void> {
     // first attempt
     // 0 initial · -1 Gemini/zingolib · -2 RPCModule · -3 bound · >0 real
     let price = await boundedPrice();
-    if (price <= 0 && consentHolds()) {
+    if (price <= 0 && surfaceMayFetch()) {
       // The consent re-check: no second attempt for a surface every
       // fetcher has left, for a backgrounded app, or after the Nym
       // opt-in was withdrawn mid-flight.
@@ -164,7 +188,7 @@ async function doFetch(kind: FetchKind): Promise<void> {
     }
 
     if (price > 0) {
-      if (consentHolds()) {
+      if (surfaceMayFetch()) {
         followUpArmed = false;
         entryPending = false; // a fresh price satisfies a pending return
         lastSuccessAt = Date.now();
@@ -172,7 +196,7 @@ async function doFetch(kind: FetchKind): Promise<void> {
       }
     } else if (
       kind !== 'readyFollowUp' &&
-      consentHolds() &&
+      surfaceMayFetch() &&
       (launchStatusKey === 'mixnet.status.bootstrapping' ||
         deps?.mixnetStatusKey === 'mixnet.status.bootstrapping')
     ) {
@@ -190,7 +214,7 @@ async function doFetch(kind: FetchKind): Promise<void> {
     cycle++;
     emit();
     scheduleAuto();
-    if (entryPending && consentHolds() && deps) {
+    if (entryPending && surfaceMayFetch() && deps) {
       // The return that landed inside this flight gets its fetch.
       entryPending = false;
       doFetch('entry').catch(() => {});
@@ -250,13 +274,11 @@ function onAppStateChange(next: string): void {
     entryPending = false;
     clearAuto();
   } else if (next === 'active') {
-    // The return fetch waits for LoadedApp's foreground gate to open
-    // (foregroundReturned): a locked, unauthenticated wallet must not
-    // emit price traffic on the bare AppState event.
+    // The bare event only lifts the pause. Fetching AND the cadence wait
+    // for LoadedApp's foreground gate to open (foregroundReturned): a
+    // locked wallet must not emit price traffic, and an armed timer
+    // behind the gate would fire a tick at it sixty seconds later.
     appAway = false;
-    if (!autoTimer && !loading) {
-      scheduleAuto();
-    }
   }
   // 'inactive' and 'unknown' prove nothing and change nothing.
 }
@@ -298,19 +320,25 @@ export const priceFetcherStore = {
   /**
    * The grilled every-real-return-fetches trigger, called by LoadedApp
    * once its foreground gate has opened. A return inside a flight parks
-   * the fetch for the flight's landing, and a return within the burst
-   * cooldown of a SUCCESS rides the price that fetch just brought; a
-   * recent failure never excuses the return from fetching.
+   * the fetch for the flight's landing; a return within the burst
+   * cooldown of a SUCCESS rides the price that fetch just brought; and
+   * hops during a failure window are rate-bound by the last
+   * return-triggered fetch, so one recent failure never excuses a
+   * return while a storm of hops cannot multiply into one fetch each.
    */
   foregroundReturned(): void {
-    if (!deps || !deps.nymSelected || attachCount === 0 || appAway) return;
+    if (!surfaceMayFetch()) return;
     if (loading) {
       entryPending = true;
-    } else if (Date.now() - lastSuccessAt < FETCH_BURST_COOLDOWN_MS) {
+    } else if (
+      Date.now() - lastSuccessAt < FETCH_BURST_COOLDOWN_MS ||
+      Date.now() - lastReturnFetchAt < FETCH_BURST_COOLDOWN_MS
+    ) {
       if (!autoTimer) {
         scheduleAuto();
       }
     } else {
+      lastReturnFetchAt = Date.now();
       doFetch('entry').catch(() => {});
     }
   },
@@ -321,6 +349,8 @@ export const priceFetcherStore = {
   resetForTests(): void {
     lastFetchStartAt = 0;
     lastSuccessAt = 0;
+    lastReturnFetchAt = 0;
+    nativeCallStartedAt = 0;
     followUpArmed = false;
     entryPending = false;
     nativeCall = null;

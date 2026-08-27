@@ -148,6 +148,21 @@ test('F8: the in-form USD amounts dim when the price is stale', () => {
   formAmounts.forEach(s => expect(s.color).toBe('#888888'));
 });
 
+test('P8: an absent price dims the USD rows like the ring beside them', () => {
+  staleHook.mockReturnValue(false); // not stale: the price never existed
+  const view = render(sendUi({ zecPrice: 0, date: 0 }));
+
+  const { StyleSheet } = require('react-native');
+  const formAmounts = view
+    .getAllByText(/^\$ /)
+    .map(t => StyleSheet.flatten(t.props.style))
+    .filter(
+      (s: { fontSize?: number }) => s.fontSize === 16 || s.fontSize === 14,
+    );
+  expect(formAmounts.length).toBeGreaterThan(0);
+  formAmounts.forEach(s => expect(s.color).toBe('#888888'));
+});
+
 test('N7: the send-confirmation conversions dim on a stale price too', () => {
   // The one screen where the figure drives a signing decision must not
   // show a stale conversion at full strength.

@@ -30,6 +30,8 @@ import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
 } from '../app/context';
+import { SelectServerEnum } from '../app/AppState';
+import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { getZecPrice } from '../app/walletBackend';
 import {
   INITIAL_MIXNET_VIEW,
@@ -44,6 +46,8 @@ const makeCtx = (over?: Partial<Ctx>): Ctx => ({
   translate: (k: string) => k,
   zecPrice: { zecPrice: 0, date: 0 },
   nym: true,
+  info: mockInfo,
+  selectServer: SelectServerEnum.auto,
   ...over,
 });
 
@@ -68,18 +72,17 @@ const driverOnlyUi = (
 
 const seedDeps = (setZecPrice: (p: number, d: number) => void) => {
 
-  (priceFetcherStore.setDeps as any)({
+  priceFetcherStore.setDeps({
     setZecPrice,
     mixnetStatusKey: 'mixnet.status.unknown',
     priceDate: 0,
     nymSelected: true,
+    marketAvailable: true,
   });
 };
 
-const foregroundReturned = () => {
-
-  (priceFetcherStore as any).foregroundReturned?.();
-};
+const foregroundReturned = () =>
+  priceFetcherStore.foregroundReturned();
 
 const appStateHandlers: Array<(next: string) => void> = [];
 
@@ -105,7 +108,7 @@ const flush = () => new Promise(resolve => setTimeout(resolve, 0));
 beforeEach(() => {
   price.mockReset();
 
-  (priceFetcherStore as any).resetForTests?.();
+  priceFetcherStore.resetForTests();
 });
 
 afterEach(() => {

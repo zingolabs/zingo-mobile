@@ -33,6 +33,8 @@ import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
 } from '../app/context';
+import { SelectServerEnum } from '../app/AppState';
+import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { getZecPrice } from '../app/walletBackend';
 import {
   INITIAL_MIXNET_VIEW,
@@ -74,6 +76,8 @@ const makeCtx = (over?: Partial<Ctx>): Ctx => ({
   translate: (k: string) => k,
   zecPrice: { zecPrice: 0, date: 0 },
   nym: true,
+  info: mockInfo,
+  selectServer: SelectServerEnum.auto,
   ...over,
 });
 
@@ -86,21 +90,20 @@ const fetcherUi = (ctx: Ctx, setZecPrice: (p: number, d: number) => void) => (
   </ContextAppLoadedProvider>
 );
 
-const foregroundReturned = () => {
-
-  (priceFetcherStore as any).foregroundReturned?.();
-};
+const foregroundReturned = () =>
+  priceFetcherStore.foregroundReturned();
 
 // Emulates the deps a previous USD session left behind, so the entry-fetch
 // paths run in both the broken and the fixed store. The shape is a
 // superset of both eras' Deps.
 const seedDeps = (setZecPrice: (p: number, d: number) => void) => {
 
-  (priceFetcherStore.setDeps as any)({
+  priceFetcherStore.setDeps({
     setZecPrice,
     mixnetStatusKey: 'mixnet.status.off',
     priceDate: 0,
     nymSelected: true,
+    marketAvailable: true,
   });
 };
 
@@ -131,7 +134,7 @@ const flush = () => new Promise(resolve => setTimeout(resolve, 0));
 beforeEach(() => {
   price.mockReset();
 
-  (priceFetcherStore as any).resetForTests?.();
+  priceFetcherStore.resetForTests();
 });
 
 afterEach(() => {
@@ -366,10 +369,12 @@ test('R3: a timer refusal during bootstrap arms the follow-up too', async () => 
   const setZecPrice = jest.fn();
   const freshDate = Date.now();
 
-  (priceFetcherStore.setDeps as any)({
+  priceFetcherStore.setDeps({
     setZecPrice,
     mixnetStatusKey: 'mixnet.status.bootstrapping',
     priceDate: freshDate,
+    nymSelected: true,
+    marketAvailable: true,
   });
 
   const ctx = makeCtx({

@@ -25,10 +25,12 @@ import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
 } from '../app/context';
+import { SelectServerEnum } from '../app/AppState';
+import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 
 beforeEach(() => {
-   
-  (priceFetcherStore as any).resetForTests?.();
+
+  priceFetcherStore.resetForTests();
 });
 
 type Ctx = typeof defaultAppContextLoaded;
@@ -37,6 +39,8 @@ const makeCtx = (over?: Partial<Ctx>): Ctx => ({
   translate: (k: string) => k,
   zecPrice: { zecPrice: 0, date: 0 },
   nym: true,
+  info: mockInfo,
+  selectServer: SelectServerEnum.auto,
   ...over,
 });
 
@@ -121,5 +125,25 @@ test('N8: without the Nym consent no ring counts down to nothing', () => {
   const view = render(fetcherUi(makeCtx({ nym: false })));
   // A countdown beside a surface that will never fetch misleads; the
   // unconsented state renders no ring at all.
+  expect(view.queryByTestId('pricefetcher.ring')).toBeNull();
+});
+
+test('P4: a refusing transport hides the ring for the same reason', () => {
+  const view = render(
+    fetcherUi(
+      makeCtx({
+        mixnetView: {
+          statusKey: 'mixnet.status.died',
+          socks5Addr: null,
+          narration: null,
+          sendBlocked: true,
+          recovery: 'reenable',
+          reconnecting: false,
+        },
+      }),
+    ),
+  );
+  // The cadence is paused by the verdict; a ring filling toward a
+  // refresh that cannot come misleads exactly like the unconsented case.
   expect(view.queryByTestId('pricefetcher.ring')).toBeNull();
 });
