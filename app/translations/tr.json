@@ -17,7 +17,6 @@
   "biometrics-message": "Lütfen kimliğinizi doğrulayın",
   "biometrics-message-ios": "Lütfen parola ile kimliğinizi doğrulayın",
   "biometrics-error": "Güvenlik nedeniyle bu işlemi gerçekleştirmek için yeniden kimlik doğrulaması yapmanız gerekiyor. Bu ayarı dilediğiniz zaman Ayarlar bölümünden değiştirebilirsiniz",
-  "biometrics-failure-stalled": "Cihaz güvenlik denetimi yanıt vermedi.",
   "biometrics-failure-declined": "Kimlik doğrulama iptal edildi veya başarısız oldu.",
   "biometrics-failure-notserved": "Cihaz güvenlik denetimini reddetti.",
   "biometrics-failure-nosecurity": "Bu cihazda ekran kilidi veya biyometri tanımlı değil.",

@@ -136,38 +136,6 @@ test('concurrent triggers share one ceremony, a decline answering both', async (
   expect(native.authenticate).toHaveBeenCalledTimes(1);
 });
 
-test('a ceremony the OS never answers fails open at the stall window', async () => {
-  jest.useFakeTimers();
-  const { controller, native } = load();
-  secured(native);
-  native.authenticate.mockReturnValue(new Promise(() => {}));
-
-  const answer = controller.askGate({ translate });
-  await jest.advanceTimersByTimeAsync(controller.CEREMONY_STALL_MS);
-
-  await expect(answer).resolves.toMatchObject({
-    kind: 'failedOpen',
-    failure: { errorKey: 'biometrics-failure-stalled', param: 'authenticate' },
-  });
-});
-
-test('a wedged availability probe fails the gate open at its own window', async () => {
-  jest.useFakeTimers();
-  const { controller, native } = load();
-  native.canAuthenticate.mockReturnValue(new Promise(() => {}));
-
-  const answer = controller.askGate({ translate });
-  await jest.advanceTimersByTimeAsync(controller.PROBE_STALL_MS);
-
-  await expect(answer).resolves.toMatchObject({
-    kind: 'failedOpen',
-    failure: {
-      errorKey: 'biometrics-failure-stalled',
-      param: 'canAuthenticate',
-    },
-  });
-});
-
 test('the Android blanking overlay rises before the prompt and drops after', async () => {
   const { controller, native } = load();
   const rn = require('react-native');
@@ -223,23 +191,6 @@ test('the device-security probe names why a device cannot secure', async () => {
   });
 });
 
-test('a wedged device-security probe reports the stall, never security', async () => {
-  jest.useFakeTimers();
-  const { controller, native } = load();
-  native.canAuthenticate.mockReturnValue(new Promise(() => {}));
-
-  const probe = controller.probeDeviceSecurity();
-  await jest.advanceTimersByTimeAsync(controller.PROBE_STALL_MS);
-
-  await expect(probe).resolves.toMatchObject({
-    kind: 'insecure',
-    failure: {
-      errorKey: 'biometrics-failure-stalled',
-      param: 'canAuthenticate',
-    },
-  });
-});
-
 test('a throwing availability call fails the gate open, never rejecting', async () => {
   const { controller, native } = load();
   native.canAuthenticate.mockImplementation(() => {
@@ -281,86 +232,18 @@ test('a throwing device-security probe answers insecure, never rejecting', async
   });
 });
 
-test('a stall never fires over a provably-away app, and a late pass lands', async () => {
-  jest.useFakeTimers();
-  const { controller, native } = load();
-  const rn = require('react-native');
-  const priorState = rn.AppState.currentState;
-  rn.AppState.currentState = 'background';
-  try {
-    secured(native);
-    let settle: (r: { outcome: string; code: string }) => void = () => {};
-    native.authenticate.mockReturnValue(
-      new Promise(resolve => {
-        settle = resolve;
-      }),
-    );
-
-    const answer = controller.askGate({ translate });
-    await jest.advanceTimersByTimeAsync(controller.CEREMONY_STALL_MS * 3);
-    await expect(
-      Promise.race([answer, Promise.resolve('pending')]),
-    ).resolves.toBe('pending');
-
-    settle({ outcome: 'authenticated', code: '' });
-    await expect(answer).resolves.toEqual({ kind: 'passed' });
-  } finally {
-    rn.AppState.currentState = priorState;
-  }
-});
-
-test('a ceremony interrupted by leaving the app locks, on both platforms', async () => {
+test('every unavailable code fails open: interruption classification is native', async () => {
+  // The native modules classify leaving-the-app endings as declined
+  // before the outcome crosses the bridge, so the controller applies no
+  // second reading of its own to any unavailable code.
   const { controller, native } = load();
   secured(native);
-  // iOS reports the backgrounded sheet as LAError.systemCancel.
   native.authenticate.mockResolvedValue({ outcome: 'unavailable', code: '-4' });
+
   await expect(controller.askGate({ translate })).resolves.toMatchObject({
-    kind: 'declined',
-    failure: { errorKey: 'biometrics-failure-declined', param: '-4' },
+    kind: 'failedOpen',
+    failure: { errorKey: 'biometrics-failure-notserved', param: '-4' },
   });
-
-  // A cold Android start backgrounded before the prompt has no resumed
-  // activity to attach it to.
-  const second = load();
-  secured(second.native);
-  second.native.authenticate.mockResolvedValue({
-    outcome: 'unavailable',
-    code: 'no-resumed-activity',
-  });
-  await expect(second.controller.askGate({ translate })).resolves.toMatchObject(
-    {
-      kind: 'declined',
-      failure: {
-        errorKey: 'biometrics-failure-declined',
-        param: 'no-resumed-activity',
-      },
-    },
-  );
-});
-
-test('a trigger after a stalled ceremony adopts the pending prompt', async () => {
-  jest.useFakeTimers();
-  const { controller, native } = load();
-  secured(native);
-  let settle: (r: { outcome: string; code: string }) => void = () => {};
-  native.authenticate.mockReturnValue(
-    new Promise(resolve => {
-      settle = resolve;
-    }),
-  );
-
-  const first = controller.askGate({ translate });
-  await jest.advanceTimersByTimeAsync(controller.CEREMONY_STALL_MS);
-  await expect(first).resolves.toMatchObject({ kind: 'failedOpen' });
-
-  // The prompt may still be on screen; a fresh authenticate() would
-  // cancel one of the two and read as a decline nobody made.
-  const second = controller.askGate({ translate });
-  await jest.advanceTimersByTimeAsync(0);
-  expect(native.authenticate).toHaveBeenCalledTimes(1);
-
-  settle({ outcome: 'authenticated', code: '' });
-  await expect(second).resolves.toEqual({ kind: 'passed' });
 });
 
 test('the probe carries the platform code that refused to secure', async () => {
@@ -395,12 +278,14 @@ test('enactGateAnswer locks a decline, notices a fail-open, proceeds a pass', ()
     kind: 'failedOpen',
     failure: {
       kind: 'error',
-      errorKey: 'biometrics-failure-stalled',
-      param: 'authenticate',
+      errorKey: 'biometrics-failure-notserved',
+      param: '11',
     },
   } as const;
   expect(controller.enactGateAnswer(failedOpen, site, translate)).toBe(true);
-  expect(notice).toHaveBeenCalledWith(expect.stringContaining('authenticate'));
+  // The raw diagnostic is bug-report data; the notice carries only the
+  // translated catalog entry.
+  expect(notice).toHaveBeenCalledWith('biometrics-failure-notserved');
   expect(lock).toHaveBeenCalledTimes(1);
 
   expect(controller.enactGateAnswer({ kind: 'passed' }, site, translate)).toBe(
@@ -417,8 +302,8 @@ test('a carried answer is consumed as data, never re-asking the gate', async () 
     kind: 'failedOpen',
     failure: {
       kind: 'error',
-      errorKey: 'biometrics-failure-stalled',
-      param: 'authenticate',
+      errorKey: 'biometrics-failure-notserved',
+      param: '11',
     },
   } as const;
 
@@ -456,8 +341,7 @@ test('resetGateController clears the freshness memory', async () => {
   expect(native.authenticate).toHaveBeenCalledTimes(2);
 });
 
-test('a wedged storage write in the epilogue still settles the answer', async () => {
-  jest.useFakeTimers();
+test('the answer never waits on the epilogue storage write', async () => {
   const { controller, native } = load();
   const storage = (
     require('@react-native-async-storage/async-storage') as {
@@ -468,36 +352,11 @@ test('a wedged storage write in the epilogue still settles the answer', async ()
   secured(native);
   native.authenticate.mockResolvedValue({ outcome: 'authenticated', code: '' });
 
-  const answer = controller.askGate({ translate });
-  await jest.advanceTimersByTimeAsync(controller.PROBE_STALL_MS);
-
-  await expect(
-    Promise.race([answer, Promise.resolve('trapped')]),
-  ).resolves.toEqual({ kind: 'passed' });
-});
-
-test('a twice-stalled ceremony is declared dead and the next starts fresh', async () => {
-  jest.useFakeTimers();
-  const { controller, native } = load();
-  secured(native);
-  native.authenticate.mockReturnValue(new Promise(() => {}));
-
-  const first = controller.askGate({ translate });
-  await jest.advanceTimersByTimeAsync(controller.CEREMONY_STALL_MS);
-  await expect(first).resolves.toMatchObject({ kind: 'failedOpen' });
-
-  // The one adoption life: the prompt may still be on screen.
-  const second = controller.askGate({ translate });
-  await jest.advanceTimersByTimeAsync(controller.CEREMONY_STALL_MS);
-  await expect(second).resolves.toMatchObject({ kind: 'failedOpen' });
-  expect(native.authenticate).toHaveBeenCalledTimes(1);
-
-  // Two full windows of observed-active waiting prove the call dead; a
-  // gate wedged forever on one leaked promise would never prompt again.
-  const third = controller.askGate({ translate });
-  await jest.advanceTimersByTimeAsync(controller.CEREMONY_STALL_MS);
-  expect(native.authenticate).toHaveBeenCalledTimes(2);
-  await expect(third).resolves.toMatchObject({ kind: 'failedOpen' });
+  // The write floats: a wedged storage queue must not delay the answer
+  // by even one watchdog window.
+  await expect(controller.askGate({ translate })).resolves.toEqual({
+    kind: 'passed',
+  });
 });
 
 test('dropWhileInFlight runs one flight and drops re-entrant calls', async () => {
@@ -575,7 +434,6 @@ test('boot cleanup retires both shipped sentinel services', async () => {
 
 test('every gate failure key exists in every catalog', () => {
   const keys = [
-    'biometrics-failure-stalled',
     'biometrics-failure-declined',
     'biometrics-failure-notserved',
     'biometrics-failure-nosecurity',

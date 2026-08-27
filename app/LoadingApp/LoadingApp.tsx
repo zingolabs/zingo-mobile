@@ -591,7 +591,7 @@ export class LoadingAppClass extends Component<
 
     // Retire the keychain entries the replaced sentinel gate shipped:
     // nothing reads them, and an auth-gated key left under a known name
-    // invites stale-entry reuse. Fire-and-forget, bounded, idempotent.
+    // invites stale-entry reuse. Fire-and-forget, best-effort, idempotent.
     retireSentinelEntries();
 
     // to start the App the first time in this session

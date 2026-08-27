@@ -413,9 +413,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
 
   const probedRef = useRef<boolean>(false);
   useEffect(() => {
-    // Probe once, after the gate first settles: a stalled probe answers
-    // nothing, and the enrolled-lock answer cannot change while the user
-    // stays in this app.
+    // Probe once, after the gate first settles: the enrolled-lock answer
+    // cannot change while the user stays in this app.
     if (!authPassed || probedRef.current) {
       return;
     }
@@ -426,12 +425,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       if (cancelled) {
         return;
       }
-      if (
-        probe.kind === 'secured' ||
-        probe.failure.errorKey !== 'biometrics-failure-stalled'
-      ) {
-        setDeviceSecurity(probe);
-      }
+      setDeviceSecurity(probe);
     })();
     return () => {
       cancelled = true;

@@ -60,8 +60,8 @@ test('a fail-open passes the screen and says why the gate could not run', async 
     kind: 'failedOpen',
     failure: {
       kind: 'error',
-      errorKey: 'biometrics-failure-stalled',
-      param: 'authenticate',
+      errorKey: 'biometrics-failure-notserved',
+      param: '11',
     },
   });
   const props = gateArgs();
@@ -71,7 +71,7 @@ test('a fail-open passes the screen and says why the gate could not run', async 
 
   await waitFor(() => expect(result.current).toMatchObject({ kind: 'passed' }));
   expect(props.addLastSnackbar).toHaveBeenCalledWith(
-    expect.stringContaining('authenticate'),
+    'biometrics-failure-notserved',
   );
   expect(props.onCancel).not.toHaveBeenCalled();
 });
