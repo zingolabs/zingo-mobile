@@ -126,7 +126,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
     (initialAction === SeedActionEnum.backup &&
       (!!security?.seedUfvkScreen || !!security?.restoreWalletBackupScreen)) ||
     (initialAction === SeedActionEnum.server && !!security?.seedUfvkScreen);
-  const authPassed = useBiometricGate({
+  const screenGate = useBiometricGate({
     needsAuth,
     translate,
     addLastSnackbar,
@@ -134,6 +134,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
     foregroundAppEnabled: !!security?.foregroundApp,
     foregroundEpoch,
   });
+  const authPassed = screenGate.kind === 'passed';
 
   const [times, setTimes] = useState<number>(0);
   const [texts, setTexts] = useState<TextsType>({} as TextsType);
