@@ -263,7 +263,6 @@ const Send: React.FunctionComponent<SendProps> = ({
   const addressBookSelectRef = useRef<BottomSheetModal>(null);
   const sendErrorSheetRef = useRef<BottomSheetModal>(null);
 
-
   // Fee (`sendPropose`) and/or spendable-balance RPC error → the CTA turns into
   // a tappable "calculation error" button that opens SendErrorSheet, which
   // lists BOTH errors (they are often the same failure, shown under each label
@@ -1704,9 +1703,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                             />
                           )}
                           <View style={{ marginLeft: inputZec ? 5 : 2 }}>
-                            <PriceFetcher
-                              backgroundColor={colors.bgSurface}
-                            />
+                            <PriceFetcher backgroundColor={colors.bgSurface} />
                           </View>
                         </>
                       )}

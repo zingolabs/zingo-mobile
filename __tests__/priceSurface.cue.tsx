@@ -31,6 +31,18 @@ import {
 import { SelectServerEnum } from '../app/AppState';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 
+beforeAll(() => {
+  // The ring's JS-driven fill ticks every 16 ms of a fake-timer advance,
+  // and the cadence advances here span minutes; no test asserts on the
+  // animation, so a no-op keeps the advances cheap.
+  const { Animated } = require('react-native');
+  jest.spyOn(Animated, 'timing').mockReturnValue({
+    start: jest.fn(),
+    stop: jest.fn(),
+    reset: jest.fn(),
+  });
+});
+
 beforeEach(() => {
   priceFetcherStore.resetForTests();
 });
@@ -68,7 +80,7 @@ const collect = (
 
 test('F8: the stale arc keeps a color of its own, distinct from the track', () => {
   const staleCtx = makeCtx({
-    zecPrice: { zecPrice: 33.33, date: Date.now() - 6 * 60_000 },
+    zecPrice: { zecPrice: 33.33, date: Date.now() - 11 * 60_000 },
   });
   const view = render(fetcherUi(staleCtx));
 
@@ -93,7 +105,7 @@ test('F9: the display-only ring exposes no disabled tap stop', () => {
 
 test('F9: a stale price reaches screen readers as a label', () => {
   const staleCtx = makeCtx({
-    zecPrice: { zecPrice: 33.33, date: Date.now() - 6 * 60_000 },
+    zecPrice: { zecPrice: 33.33, date: Date.now() - 11 * 60_000 },
   });
   const view = render(fetcherUi(staleCtx));
   expect(view.getByLabelText('price-ring-stale')).toBeTruthy();

@@ -498,7 +498,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                             style={{ fontSize: 18 }}
                             amtZec={donationAmount}
                             price={zecPrice.zecPrice}
-                  priceDate={zecPrice.date}
+                            priceDate={zecPrice.date}
                             currency={currency}
                             privacy={privacy}
                           />
@@ -528,7 +528,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                         style={{ fontSize: 18 }}
                         amtZec={Utils.parseStringLocaleToNumberFloat(to.amount)}
                         price={zecPrice.zecPrice}
-                  priceDate={zecPrice.date}
+                        priceDate={zecPrice.date}
                         currency={currency}
                         privacy={privacy}
                       />

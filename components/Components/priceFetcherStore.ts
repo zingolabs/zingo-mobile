@@ -36,8 +36,9 @@ import { MixnetStatusKey } from '../../app/walletBackend/transforms/mixnetPresen
 // from this window.
 export const PRICE_REFRESH_MIN_MS = 5 * 60_000;
 export const PRICE_REFRESH_MAX_MS = 10 * 60_000;
-// A price older than this wall-clock age is stale (CONTEXT.md: Stale price).
-export const PRICE_STALE_MS = 5 * 60_000;
+// A price older than this wall-clock age is stale (CONTEXT.md: Stale
+// price): the cadence ceiling, so a healthy cadence never dims.
+export const PRICE_STALE_MS = PRICE_REFRESH_MAX_MS;
 // The JS-side bound on one native price call: a wedged FFI promise must
 // never pin `loading` for the process lifetime.
 const PRICE_FETCH_TIMEOUT_MS = 30_000;

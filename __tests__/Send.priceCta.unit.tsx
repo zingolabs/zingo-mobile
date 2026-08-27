@@ -12,7 +12,7 @@ jest.mock('../components/Components/priceFetcherStore', () => ({
   __esModule: true,
   PRICE_REFRESH_MIN_MS: 5 * 60_000,
   PRICE_REFRESH_MAX_MS: 10 * 60_000,
-  PRICE_STALE_MS: 5 * 60_000,
+  PRICE_STALE_MS: 10 * 60_000,
   priceFetcherStore: {
     setDeps: jest.fn(),
     attach: jest.fn(() => () => {}),
@@ -159,7 +159,7 @@ test('N1: price loading never takes the send CTA, price or no price', () => {
 test('F8: the in-form USD amounts dim when the price is stale', () => {
   staleHook.mockReturnValue(true);
   const view = render(
-    sendUi({ zecPrice: 33.33, date: Date.now() - 6 * 60_000 }),
+    sendUi({ zecPrice: 33.33, date: Date.now() - 11 * 60_000 }),
   );
 
   // The form rows render at 16 pt (amount) and 14 pt (spendable); the

@@ -86,7 +86,7 @@ const driverOnlyUi = (
 const appStateHandlers: Array<(next: string) => void> = [];
 
 beforeAll(() => {
-  const { AppState } = require('react-native');
+  const { AppState, Animated } = require('react-native');
   jest.spyOn(AppState, 'addEventListener').mockImplementation(((
     event: string,
     handler: (next: string) => void,
@@ -96,6 +96,14 @@ beforeAll(() => {
     }
     return { remove: jest.fn() };
   }) as any);
+  // The ring's JS-driven fill ticks every 16 ms of a fake-timer advance,
+  // and the cadence advances here span minutes; no test asserts on the
+  // animation, so a no-op keeps the advances cheap.
+  jest.spyOn(Animated, 'timing').mockReturnValue({
+    start: jest.fn(),
+    stop: jest.fn(),
+    reset: jest.fn(),
+  });
 });
 
 const fireAppState = (next: string) => {

@@ -250,8 +250,9 @@ The fetched ZEC/USD value the price surface displays.
 _Avoid_: quote (legacy name in the ring components)
 
 **Stale price**:
-A price whose last successful fetch is older than five minutes of wall
-clock. Staleness is a fact about the value's accuracy, not about fetch
+A price whose last successful fetch is older than ten minutes of wall
+clock, the cadence's longest draw, so a healthy cadence never dims.
+Staleness is a fact about the value's accuracy, not about fetch
 mechanics, and it is independent of transport.
 
 **Price consent**:
