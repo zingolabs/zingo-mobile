@@ -117,7 +117,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
     (initialAction === UfvkActionEnum.backup &&
       (!!security?.seedUfvkScreen || !!security?.restoreWalletBackupScreen)) ||
     (initialAction === UfvkActionEnum.server && !!security?.seedUfvkScreen);
-  const authPassed = useBiometricGate({
+  const screenGate = useBiometricGate({
     needsAuth,
     translate,
     addLastSnackbar,
@@ -125,6 +125,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
     foregroundAppEnabled: !!security?.foregroundApp,
     foregroundEpoch,
   });
+  const authPassed = screenGate.kind === 'passed';
 
   const [times, setTimes] = useState<number>(0);
   const [texts, setTexts] = useState<TextsType>({} as TextsType);

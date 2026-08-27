@@ -11,7 +11,7 @@ export const mockLoadingAppRoute: RouteProp<
   params: {
     screen: RouteEnum.Launching,
     startingApp: true,
-    biometricsFailed: false,
+    biometricGate: { kind: 'passed' as const },
     newWallet: false,
   },
 };

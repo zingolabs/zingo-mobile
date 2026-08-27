@@ -42,6 +42,18 @@ module.exports = [
     },
   },
   {
+    // The visual-diff report runs in a browser, not in React Native.
+    files: ['visual/report/**/*.js'],
+    languageOptions: {
+      globals: {
+        IntersectionObserver: 'readonly',
+        addEventListener: 'readonly',
+        location: 'readonly',
+        matchMedia: 'readonly',
+      },
+    },
+  },
+  {
     files: ['**/*.mjs'],
     languageOptions: {
       parser: require('espree'),
