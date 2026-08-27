@@ -14,6 +14,7 @@ import ZecPriceType from '../../../app/AppState/types/ZecPriceType';
 import BoldText from '../../Components/BoldText';
 import CurrencyAmount from '../../Components/CurrencyAmount';
 import FadeText from '../../Components/FadeText';
+import { usePriceStale } from '../../Components/priceFetcherStore';
 
 const zcashLogo = require('../../../assets/img/zcash-yellow.png');
 
@@ -46,6 +47,8 @@ const formatLastUpdate = (date: number): string => {
 const PriceRow: React.FC<PriceRowProps> = React.memo(
   ({ translate, currency, zecPrice, info, selectServer, onLayout }) => {
     const { colors } = useTheme();
+    // ADR 0008: a stale price dims; this row is the price display proper.
+    const priceStale = usePriceStale(zecPrice.date);
 
     const isUsd = currency === CurrencyEnum.USDCurrency;
     if (
@@ -91,7 +94,10 @@ const PriceRow: React.FC<PriceRowProps> = React.memo(
         </View>
         <View style={{ alignItems: 'flex-end' }}>
           <CurrencyAmount
-            style={{ fontSize: 14 }}
+            style={{
+              fontSize: 14,
+              ...(priceStale ? { color: colors.fgMuted } : {}),
+            }}
             price={zecPrice.zecPrice}
             amtZec={1}
             currency={currency}

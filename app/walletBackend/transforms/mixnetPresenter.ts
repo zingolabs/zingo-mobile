@@ -8,6 +8,18 @@ import { MixnetDetailReport, MixnetStatusReport } from './mixnetTransform';
  */
 export type MixnetRecoveryAction = 'none' | 'wait' | 'reenable';
 
+/** The closed set of status translation keys a MixnetView can carry. */
+export const MIXNET_STATUS_KEYS = [
+  'mixnet.status.off',
+  'mixnet.status.unknown',
+  'mixnet.status.bootstrapping',
+  'mixnet.status.ready',
+  'mixnet.status.died',
+] as const;
+
+/** One member of the closed status-key set. */
+export type MixnetStatusKey = (typeof MIXNET_STATUS_KEYS)[number];
+
 /**
  * The screen-facing projection of the mixnet state. `statusKey` is a
  * translation key (`mixnet.status.*`), never display English; `narration`
@@ -16,7 +28,7 @@ export type MixnetRecoveryAction = 'none' | 'wait' | 'reenable';
  * except an explicit `off` (deliberate clearnet consent) or `ready`.
  */
 export type MixnetView = {
-  readonly statusKey: string;
+  readonly statusKey: MixnetStatusKey;
   readonly socks5Addr: string | null;
   readonly narration: string | null;
   readonly sendBlocked: boolean;

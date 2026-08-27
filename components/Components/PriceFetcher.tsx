@@ -25,7 +25,7 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
   backgroundColor,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { zecPrice, mixnetView } = context;
+  const { translate, zecPrice, mixnetView } = context;
   const { colors } = useTheme();
   const bg = backgroundColor ?? colors.bgCanvas;
 
@@ -36,13 +36,20 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
   // Feed the shared store the latest context-bound callbacks and the live
   // Indicator (identical across instances, so the last writer wins
   // harmlessly). The statusKey write is also what fires an armed ready
-  // follow-up.
+  // follow-up. Declared before the attach effect so the attach always
+  // finds its deps.
   useEffect(() => {
     priceFetcherStore.setDeps({
       setZecPrice,
-      mixnetStatusKey: mixnetView ? mixnetView.statusKey : null,
+      priceDate: zecPrice.date,
+      mixnetStatusKey: mixnetView
+        ? mixnetView.statusKey
+        : 'mixnet.status.unknown',
     });
   });
+
+  // The consent registration: a mounted fetcher is what lets fetches run.
+  useEffect(() => priceFetcherStore.attach(), []);
 
   const containerStyle: ViewStyle = {
     flexDirection: 'row',
@@ -71,8 +78,9 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
     );
   }
 
-  // No price and nothing in flight, or a stale price: the ring drops to
-  // its track color, the only failure cue this surface shows.
+  // No price and nothing in flight, or a stale price: the ring mutes (to
+  // a value still distinct from the track) as the visual failure cue, and
+  // the label carries the same fact to screen readers.
   const muted = stale || !zecPrice.date;
   return (
     <View style={containerStyle}>
@@ -83,11 +91,14 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
         size={22}
         color={muted ? colors.fgMuted : colors.fgAccent}
         ringColor={
-          muted ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.55)'
+          muted ? 'rgba(255,255,255,0.30)' : 'rgba(255,255,255,0.55)'
         }
         trackColor={'rgba(255,255,255,0.12)'}
         durationMs={PRICE_AUTO_REFRESH_MS}
         resetKey={zecPrice.date}
+        accessibilityLabel={
+          translate(muted ? 'price-ring-stale' : 'price-ring-live') as string
+        }
         testID="pricefetcher.ring"
       />
     </View>

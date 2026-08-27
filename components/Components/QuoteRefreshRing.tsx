@@ -5,6 +5,7 @@ import {
   Easing,
   Pressable,
   StyleProp,
+  View,
   ViewStyle,
 } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
@@ -38,6 +39,8 @@ type QuoteRefreshRingProps = {
   /** Omit for a display-only ring (no press affordance at all). */
   onPress?: () => void;
   disabled?: boolean;
+  /** What a screen reader announces for this ring. */
+  accessibilityLabel?: string;
   style?: StyleProp<ViewStyle>;
   testID?: string;
 };
@@ -51,6 +54,7 @@ export default function QuoteRefreshRing({
   resetKey,
   onPress,
   disabled,
+  accessibilityLabel,
   style,
   testID,
 }: QuoteRefreshRingProps) {
@@ -83,24 +87,8 @@ export default function QuoteRefreshRing({
     [progress, circumference],
   );
 
-  return (
-    <Pressable
-      onPress={onPress}
-      disabled={disabled || !onPress}
-      hitSlop={10}
-      accessibilityRole={onPress ? 'button' : 'image'}
-      testID={testID}
-      style={[
-        {
-          width: size,
-          height: size,
-          alignItems: 'center',
-          justifyContent: 'center',
-          opacity: disabled ? 0.4 : 1,
-        },
-        style,
-      ]}
-    >
+  const face = (
+    <>
       <Svg width={size} height={size} style={{ position: 'absolute' }}>
         <Circle
           cx={center}
@@ -131,6 +119,43 @@ export default function QuoteRefreshRing({
         size={Math.round(size * 0.48)}
         color={color}
       />
+    </>
+  );
+
+  const frame: ViewStyle = {
+    width: size,
+    height: size,
+    alignItems: 'center',
+    justifyContent: 'center',
+    opacity: disabled ? 0.4 : 1,
+  };
+
+  if (!onPress) {
+    // Display-only: no tap stop, no disabled state, just a labeled image.
+    return (
+      <View
+        accessible={!!accessibilityLabel}
+        accessibilityRole="image"
+        accessibilityLabel={accessibilityLabel}
+        testID={testID}
+        style={[frame, style]}
+      >
+        {face}
+      </View>
+    );
+  }
+
+  return (
+    <Pressable
+      onPress={onPress}
+      disabled={disabled}
+      hitSlop={10}
+      accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel}
+      testID={testID}
+      style={[frame, style]}
+    >
+      {face}
     </Pressable>
   );
 }

@@ -1,22 +1,26 @@
 import { useEffect, useReducer } from 'react';
-import { AppState, AppStateStatus } from 'react-native';
+import { AppState, NativeEventSubscription } from 'react-native';
 import { getZecPrice } from '../../app/walletBackend';
+import { MixnetStatusKey } from '../../app/walletBackend/transforms/mixnetPresenter';
 
 /**
  * Shared, singleton state for every <PriceFetcher/> on screen.
  *
- * ADR 0008: the price surface has no manual fetch. Mounting a fetcher with
- * USD selected (the render sites gate on the currency) is the consent for
- * price traffic; every fetch is app-initiated and silent. The store owns
- * the whole lifecycle:
- *   - ONE auto-refresh timer while at least one fetcher is mounted and the
- *     app is in the foreground; backgrounding pauses it.
- *   - A fetch on every return to the foreground, and on the first mount
- *     when no fresh price exists.
+ * ADR 0008: the price surface has no manual fetch. A mounted PriceFetcher
+ * (the render sites gate on USD, the consent) attaches here; observation
+ * through usePriceFetcherStore carries no consent and never starts
+ * traffic. The store owns the whole lifecycle:
+ *   - ONE auto-refresh timer while at least one fetcher is attached and
+ *     the app is in the foreground; a background transition pauses it.
+ *     iOS 'inactive' (Control Center, the app's own Face ID sheet) is a
+ *     non-event, matching LoadedApp's reading of the same signal.
+ *   - A fetch on every background -> active return, and on attach when
+ *     the context holds no fresh price.
  *   - The ready follow-up: a foreground-entry fetch refused while the
  *     mixnet Indicator is bootstrapping arms a one-shot fetch that fires
- *     when the Indicator turns ready. It is dropped on `died` and on the
- *     next background transition.
+ *     when the Indicator turns ready. It is dropped on a background
+ *     transition and on any transport state other than bootstrapping,
+ *     and it survives an in-flight fetch instead of being consumed by it.
  *   - No snackbars. A failure leaves the last price standing; the stale
  *     cue (see usePriceStale) is the only failure signal.
  */
@@ -25,26 +29,24 @@ export const PRICE_AUTO_REFRESH_MS = 60_000;
 // A price older than this wall-clock age is stale (CONTEXT.md: Stale price).
 export const PRICE_STALE_MS = 5 * 60_000;
 
-const MIXNET_BOOTSTRAPPING = 'mixnet.status.bootstrapping';
-const MIXNET_READY = 'mixnet.status.ready';
-const MIXNET_DIED = 'mixnet.status.died';
-
 type Deps = {
   setZecPrice: (price: number, date: number) => void;
-  // The current MixnetView statusKey, null before the first publication.
-  mixnetStatusKey: string | null;
+  // The live Indicator key; 'mixnet.status.unknown' before a publication.
+  mixnetStatusKey: MixnetStatusKey;
+  // The date of the price the context currently holds.
+  priceDate: number;
 };
 
 // Only a foreground-entry refusal may arm the ready follow-up.
 type FetchKind = 'entry' | 'timer' | 'readyFollowUp';
 
 let loading = false;
-let lastSuccessAt = 0;
 let followUpArmed = false;
 let deps: Deps | null = null;
 let autoTimer: ReturnType<typeof setTimeout> | null = null;
-let appStateWired = false;
-let appActive = true;
+let attachCount = 0;
+let appStateSub: NativeEventSubscription | null = null;
+let appAway = false;
 const listeners = new Set<() => void>();
 
 function emit(): void {
@@ -60,101 +62,135 @@ function clearAuto(): void {
 
 function scheduleAuto(): void {
   clearAuto();
-  if (listeners.size === 0 || !appActive) return;
+  if (attachCount === 0 || appAway) return;
   autoTimer = setTimeout(() => {
     doFetch('timer').catch(() => {});
   }, PRICE_AUTO_REFRESH_MS);
 }
 
 async function doFetch(kind: FetchKind): Promise<void> {
-  if (loading || !deps) return;
+  if (loading || !deps || attachCount === 0 || appAway) return;
   const d = deps;
 
   loading = true;
   emit();
-
-  let price: number;
-  // first attempt
-  ({ price } = await getZecPrice());
-  // 0 initial · -1 Gemini/zingolib · -2 RPCModule · >0 real value
-  if (price <= 0) {
-    // second attempt
+  try {
+    let price: number;
+    // first attempt
     ({ price } = await getZecPrice());
-  }
+    // 0 initial · -1 Gemini/zingolib · -2 RPCModule · >0 real value
+    if (price <= 0) {
+      // second attempt
+      ({ price } = await getZecPrice());
+    }
 
-  if (price > 0) {
-    lastSuccessAt = Date.now();
-    followUpArmed = false;
-    d.setZecPrice(price, lastSuccessAt);
-  } else if (
-    kind === 'entry' &&
-    deps?.mixnetStatusKey === MIXNET_BOOTSTRAPPING
-  ) {
-    // Refused during bootstrap: the ready follow-up recovers the price
-    // seconds after the transport comes up instead of a full tick later.
-    followUpArmed = true;
+    if (price > 0) {
+      followUpArmed = false;
+      d.setZecPrice(price, Date.now());
+    } else if (
+      kind === 'entry' &&
+      !appAway &&
+      deps?.mixnetStatusKey === 'mixnet.status.bootstrapping'
+    ) {
+      // Refused during bootstrap: the ready follow-up recovers the price
+      // seconds after the transport comes up instead of a full tick
+      // later. The appAway re-check keeps a flight that outlived a
+      // background transition from re-arming what that transition
+      // dropped. Every other failure is silent; the last price stands
+      // and the stale cue carries the signal.
+      followUpArmed = true;
+    }
+  } finally {
+    loading = false;
+    emit();
+    scheduleAuto();
+    pump(); // a follow-up that turned ready mid-flight fires now
   }
-  // Every other failure is silent; the last price stands and the stale
-  // cue carries the signal.
-
-  loading = false;
-  emit();
-  scheduleAuto();
 }
 
-function onAppStateChange(next: AppStateStatus): void {
-  const wasActive = appActive;
-  // 'unknown' proves nothing and must neither pause nor fetch.
-  if (next === 'active') {
-    appActive = true;
-    if (!wasActive && listeners.size > 0) {
-      doFetch('entry').catch(() => {});
-    }
-  } else if (next === 'background' || next === 'inactive') {
-    appActive = false;
+// Fires the armed ready follow-up, consuming it exactly when its fetch
+// actually starts, and disarms it when the transport story it belonged
+// to has ended.
+function pump(): void {
+  if (!followUpArmed || loading || !deps || attachCount === 0 || appAway) {
+    return;
+  }
+  if (deps.mixnetStatusKey === 'mixnet.status.ready') {
+    followUpArmed = false;
+    doFetch('readyFollowUp').catch(() => {});
+  } else if (deps.mixnetStatusKey !== 'mixnet.status.bootstrapping') {
+    // died, off, unknown: the arm belonged to a bootstrap that is over.
+    followUpArmed = false;
+  }
+}
+
+// Fetch when the context holds no fresh price, otherwise start the
+// cadence: the seam attach, setDeps, and a quiet return all share. A
+// running timer or flight means the cadence already owns the surface, so
+// a refused fetch cannot echo into a refetch storm through the
+// re-renders its own emit causes.
+function entryOrSchedule(): void {
+  if (!deps || attachCount === 0 || appAway || loading || autoTimer) return;
+  if (Date.now() - deps.priceDate > PRICE_AUTO_REFRESH_MS) {
+    doFetch('entry').catch(() => {});
+  } else {
+    scheduleAuto();
+  }
+}
+
+function onAppStateChange(next: string): void {
+  if (next === 'background') {
+    appAway = true;
     followUpArmed = false;
     clearAuto();
+  } else if (next === 'active') {
+    const returning = appAway;
+    appAway = false;
+    if (returning) {
+      // Every real return fetches (the grilled decision); 'inactive'
+      // round trips never set appAway, so they cannot reach this.
+      doFetch('entry').catch(() => {});
+    } else if (!autoTimer && !loading) {
+      scheduleAuto();
+    }
   }
-}
-
-function wireAppState(): void {
-  if (appStateWired) return;
-  appStateWired = true;
-  appActive = AppState.currentState !== 'background' &&
-    AppState.currentState !== 'inactive';
-  AppState.addEventListener('change', onAppStateChange);
+  // 'inactive' and 'unknown' prove nothing and change nothing.
 }
 
 export const priceFetcherStore = {
   /** Keep the latest context-bound callbacks (same across all instances). */
   setDeps(d: Deps): void {
     deps = d;
-    if (followUpArmed) {
-      if (d.mixnetStatusKey === MIXNET_DIED) {
-        followUpArmed = false;
-      } else if (d.mixnetStatusKey === MIXNET_READY) {
-        followUpArmed = false;
-        doFetch('readyFollowUp').catch(() => {});
-      }
+    pump();
+    entryOrSchedule();
+  },
+  /** Register a mounted price surface, the consent that lets fetches run, returning the detach cleanup. */
+  attach(): () => void {
+    attachCount++;
+    if (attachCount === 1) {
+      appAway = AppState.currentState === 'background';
+      appStateSub = AppState.addEventListener('change', onAppStateChange);
+      entryOrSchedule();
     }
+    return () => {
+      attachCount--;
+      if (attachCount === 0) {
+        clearAuto();
+        appStateSub?.remove();
+        appStateSub = null;
+        followUpArmed = false;
+        deps = null;
+      }
+    };
   },
   snapshot(): { loading: boolean } {
     return { loading };
   },
+  /** Observe store state; observation carries no consent and starts no traffic. */
   subscribe(listener: () => void): () => void {
-    wireAppState();
-    const first = listeners.size === 0;
     listeners.add(listener);
-    if (first && appActive) {
-      if (Date.now() - lastSuccessAt > PRICE_AUTO_REFRESH_MS) {
-        doFetch('entry').catch(() => {});
-      } else {
-        scheduleAuto();
-      }
-    }
     return () => {
       listeners.delete(listener);
-      if (listeners.size === 0) clearAuto();
     };
   },
 };
