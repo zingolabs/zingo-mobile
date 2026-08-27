@@ -125,6 +125,35 @@ test('a foreground return re-gates only when the app-level gate is off', async (
   expect(gate).toHaveBeenCalledTimes(2);
 });
 
+test('an epoch re-fire supersedes the pending run, acting once on a shared decline', async () => {
+  let settle: (a: GateAnswer) => void = () => {};
+  gate.mockReturnValue(
+    new Promise(resolve => {
+      settle = resolve;
+    }),
+  );
+  const props = gateArgs({ foregroundAppEnabled: false });
+  const { rerender } = renderHook((p: GateProps) => useBiometricGate(p), {
+    initialProps: props,
+  });
+  await waitFor(() => expect(gate).toHaveBeenCalledTimes(1));
+
+  rerender({ ...props, foregroundEpoch: 1 });
+  await waitFor(() => expect(gate).toHaveBeenCalledTimes(2));
+
+  settle({
+    kind: 'declined',
+    failure: {
+      kind: 'error',
+      errorKey: 'biometrics-failure-declined',
+      param: '10',
+    },
+  });
+
+  await waitFor(() => expect(props.onCancel).toHaveBeenCalledTimes(1));
+  expect(props.addLastSnackbar).toHaveBeenCalledTimes(1);
+});
+
 test('an unmounted screen never acts on a late answer', async () => {
   let handAnswer: (a: GateAnswer) => void = () => {};
   gate.mockReturnValueOnce(

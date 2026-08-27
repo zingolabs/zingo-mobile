@@ -20,7 +20,7 @@ export type ScreenGateState =
  * Audit Issue D — single source of truth for the screen-level biometric
  * gate used by Seed, ShowUfvk, Settings, Rescan and Confirm.
  *
- * Behaviour (ADR 0007):
+ * Behaviour:
  *   - When `needsAuth` holds (at mount, or when a settings toggle flips it
  *     on while the screen stays mounted): asks the gate controller.
  *   - On decline: shows the standard sentence and calls `onCancel`
@@ -49,8 +49,12 @@ export const useBiometricGate = ({
 
   // The one gate body both effects run: returns the effect cleanup that
   // cancels it, so an unmounted or re-gated screen never acts on a stale
-  // answer.
+  // answer. One run lives at a time: starting a new one supersedes the
+  // pending one, so two effect invocations sharing one ceremony can
+  // never both act on its answer.
+  const supersededRef = useRef<() => void>(() => {});
   const runScreenGate = () => {
+    supersededRef.current();
     let cancelled = false;
     (async () => {
       const answer = await askGate({ translate });
@@ -75,9 +79,11 @@ export const useBiometricGate = ({
         setScreenGate({ kind: 'passed' });
       }
     })();
-    return () => {
+    const cancel = () => {
       cancelled = true;
     };
+    supersededRef.current = cancel;
+    return cancel;
   };
 
   // Reactive to needsAuth: the native stack remounts screens per

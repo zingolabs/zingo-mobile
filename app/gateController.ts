@@ -1,5 +1,6 @@
 import { AppState, DeviceEventEmitter, Platform } from 'react-native';
 
+import * as Keychain from 'react-native-keychain';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import DeviceAuth, { DeviceAuthResult } from './DeviceAuthModule';
@@ -42,8 +43,8 @@ export const BIOMETRIC_BLANKING_EVENT = 'biometric-blanking';
 // enough that the shutter still asks after any real absence.
 export const AUTH_FRESHNESS_MS = 15 * 1000;
 
-// The availability probe shows no UI, so any stall is a wedged native
-// module.
+// The availability probe and the epilogue's flag restore show no UI, so
+// any stall there is a wedged native module.
 export const PROBE_STALL_MS = 10 * 1000;
 
 // The ceremony is user-paced: a person deciding at the prompt keeps the
@@ -65,6 +66,15 @@ const PAINT_BUDGET_MS = 1000;
 // LAError.systemCancel, and a cold Android start backgrounded before the
 // prompt as the module's own no-resumed-activity token.
 const INTERRUPTED_CODES: readonly string[] = ['-4', 'no-resumed-activity'];
+
+// The keychain services the replaced sentinel gate shipped in the 2.0.23
+// betas. Nothing reads them any more, and an auth-gated key left under a
+// known name invites a future consumer to inherit a stale entry written
+// under a different access control, the issue-1266 class.
+const RETIRED_SENTINEL_SERVICES: readonly string[] = [
+  'zingo-biometric-sentinel',
+  'zingo-biometric-sentinel-v2',
+];
 
 const gateFailure = (errorKey: GateFailureKey, param?: string): GateFailure =>
   errorKeyed(errorKey, param);
@@ -141,38 +151,76 @@ const ceremonyStallBounded = <T>(
 };
 
 // Yield one frame so the overlay paints before the system prompt opens.
-// The paint is cosmetic: a missed frame resolves at the budget and never
-// denies the gate.
+// The paint is cosmetic: a missed or throwing frame resolves at once and
+// never denies the gate.
 const yieldOneFrame = (): Promise<void> =>
   new Promise(resolve => {
     const frameBudget = setTimeout(resolve, PAINT_BUDGET_MS);
-    requestAnimationFrame(() => {
+    try {
+      requestAnimationFrame(() => {
+        clearTimeout(frameBudget);
+        resolve();
+      });
+    } catch {
       clearTimeout(frameBudget);
       resolve();
-    });
+    }
   });
 
 // A pass is remembered so triggers landing inside the freshness window
 // share it silently, and a ceremony in flight is shared so concurrent
 // triggers never stack prompts. A shared decline answers every waiting
 // trigger: with one controller there is no other purpose it could have
-// been answering. A stalled ceremony's native call is kept, not abandoned:
-// its prompt may still be on screen, and a fresh authenticate() would
-// cancel one of the two and read as a decline nobody made, so the next
-// trigger adopts the pending call instead.
+// been answering. A stalled ceremony's native call is kept for one
+// adoption: its prompt may still be on screen, and a fresh authenticate()
+// would cancel one of the two and read as a decline nobody made. A call
+// that stalls a second adopted window is declared dead and dropped, so
+// one leaked promise can never wedge the gate for the rest of the
+// process.
 let lastPassedAt: number | undefined;
 let ceremonyInFlight: Promise<GateAnswer> | undefined;
 let pendingNativeCeremony: Promise<DeviceAuthResult> | undefined;
+let pendingCeremonyStalls = 0;
 
 /** Clears the controller's process-wide memory, for tests that share one module registry. */
 export const resetGateController = (): void => {
   lastPassedAt = undefined;
   ceremonyInFlight = undefined;
   pendingNativeCeremony = undefined;
+  pendingCeremonyStalls = 0;
 };
 
 const freshlyPassed = (): boolean =>
   lastPassedAt !== undefined && Date.now() - lastPassedAt <= AUTH_FRESHNESS_MS;
+
+const insecure = (failure: GateFailure): DeviceSecurityProbe => ({
+  kind: 'insecure',
+  failure,
+});
+
+/** Answers whether the device can authenticate its user, with the reason when it cannot. */
+export const probeDeviceSecurity = async (): Promise<DeviceSecurityProbe> => {
+  try {
+    const availability = await stallBounded(
+      DeviceAuth.canAuthenticate(),
+      PROBE_STALL_MS,
+    );
+    if (availability === STALLED) {
+      return insecure(
+        gateFailure('biometrics-failure-stalled', 'canAuthenticate'),
+      );
+    }
+    return availability.available
+      ? { kind: 'secured' }
+      : insecure(
+          gateFailure('biometrics-failure-nosecurity', availability.code),
+        );
+  } catch (e) {
+    return insecure(
+      gateFailure('biometrics-failure-notserved', describeFailure(e)),
+    );
+  }
+};
 
 const startNativeCeremony = (
   translate: GateControllerProps['translate'],
@@ -182,6 +230,7 @@ const startNativeCeremony = (
     translate('cancel') as string,
   );
   pendingNativeCeremony = native;
+  pendingCeremonyStalls = 0;
   // The one place a pass arms the freshness window, so an adopted or
   // late-settling ceremony arms it the same as a raced one.
   native.then(
@@ -205,15 +254,9 @@ const startNativeCeremony = (
 const ceremonyBody = async ({
   translate,
 }: GateControllerProps): Promise<GateAnswer> => {
-  const availability = await stallBounded(
-    DeviceAuth.canAuthenticate(),
-    PROBE_STALL_MS,
-  );
-  if (availability === STALLED) {
-    return failedOpen('biometrics-failure-stalled', 'canAuthenticate');
-  }
-  if (!availability.available) {
-    return failedOpen('biometrics-failure-nosecurity', availability.code);
+  const security = await probeDeviceSecurity();
+  if (security.kind === 'insecure') {
+    return { kind: 'failedOpen', failure: security.failure };
   }
   try {
     if (Platform.OS === 'android') {
@@ -224,6 +267,10 @@ const ceremonyBody = async ({
       pendingNativeCeremony ?? startNativeCeremony(translate),
     );
     if (ceremony === STALLED) {
+      pendingCeremonyStalls += 1;
+      if (pendingCeremonyStalls >= 2) {
+        pendingNativeCeremony = undefined;
+      }
       return failedOpen('biometrics-failure-stalled', 'authenticate');
     }
     switch (ceremony.outcome) {
@@ -244,16 +291,27 @@ const ceremonyBody = async ({
               ),
             }
           : failedOpen('biometrics-failure-notserved', ceremony.code);
+      default:
+        // A native binary newer or older than this bundle can answer
+        // outside the union; the controller still always answers.
+        return failedOpen(
+          'biometrics-failure-notserved',
+          String(ceremony.outcome),
+        );
     }
   } finally {
     if (Platform.OS === 'android') {
       DeviceEventEmitter.emit(BIOMETRIC_BLANKING_EVENT, false);
     }
     // iOS treats the auth prompt as the app going to background; restore
-    // the foreground flag so background-state handling doesn't trip. A
-    // failing write must not replace the answer every caller shares.
+    // the foreground flag so background-state handling doesn't trip. The
+    // write is bounded and its failure swallowed: neither a wedged nor a
+    // failing store may replace the answer every caller shares.
     try {
-      await AsyncStorage.setItem(GlobalConst.background, GlobalConst.no);
+      await stallBounded(
+        AsyncStorage.setItem(GlobalConst.background, GlobalConst.no),
+        PROBE_STALL_MS,
+      );
     } catch {
       // The answer outranks the flag restore.
     }
@@ -322,31 +380,34 @@ export const enactGateAnswer = (
   }
 };
 
-const insecure = (failure: GateFailure): DeviceSecurityProbe => ({
-  kind: 'insecure',
-  failure,
-});
-
-/** Answers whether the device can authenticate its user, with the reason when it cannot. */
-export const probeDeviceSecurity = async (): Promise<DeviceSecurityProbe> => {
-  try {
-    const availability = await stallBounded(
-      DeviceAuth.canAuthenticate(),
-      PROBE_STALL_MS,
-    );
-    if (availability === STALLED) {
-      return insecure(
-        gateFailure('biometrics-failure-stalled', 'canAuthenticate'),
-      );
+/** Wraps an async action so calls arriving during a flight are dropped. */
+export const dropWhileInFlight = (
+  action: () => Promise<void>,
+): (() => Promise<void>) => {
+  let inFlight = false;
+  return async () => {
+    if (inFlight) {
+      return;
     }
-    return availability.available
-      ? { kind: 'secured' }
-      : insecure(
-          gateFailure('biometrics-failure-nosecurity', availability.code),
-        );
-  } catch (e) {
-    return insecure(
-      gateFailure('biometrics-failure-notserved', describeFailure(e)),
-    );
+    inFlight = true;
+    try {
+      await action();
+    } finally {
+      inFlight = false;
+    }
+  };
+};
+
+/** Deletes the retired keychain-sentinel entries, best-effort and bounded. */
+export const retireSentinelEntries = async (): Promise<void> => {
+  for (const service of RETIRED_SENTINEL_SERVICES) {
+    try {
+      await stallBounded(
+        Keychain.resetGenericPassword({ service }),
+        PROBE_STALL_MS,
+      );
+    } catch {
+      // Best-effort: an entry that resists deletion guards nothing.
+    }
   }
 };

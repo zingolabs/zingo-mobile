@@ -94,7 +94,11 @@ import { RPCSeedType } from '../walletBackend/types/RPCSeedType';
 import { Launching } from '../LoadingApp';
 import { AddressBook } from '../../components/AddressBook';
 import { AddressBookFileImpl } from '../../components/AddressBook';
-import { GateAnswer, askGate, enactGateAnswer } from '../gateController';
+import {
+  GateAnswer,
+  enactGateAnswer,
+  resolveTriggerGate,
+} from '../gateController';
 import ShowAddressAlertAsync from '../../components/Send/components/ShowAddressAlertAsync';
 import {
   createUpdateRecoveryWalletInfo,
@@ -1105,9 +1109,11 @@ export class LoadedAppClass extends Component<
   // run fails open with a notice (ADR 0007), because blocking would trap
   // the user out of the wallet.
   runForegroundGate = async () => {
-    const foregroundGate: GateAnswer = this.state.security.foregroundApp
-      ? await askGate({ translate: this.state.translate })
-      : { kind: 'passed' };
+    const foregroundGate: GateAnswer = await resolveTriggerGate(
+      undefined,
+      this.state.security.foregroundApp,
+      { translate: this.state.translate },
+    );
     const proceed = enactGateAnswer(
       foregroundGate,
       {

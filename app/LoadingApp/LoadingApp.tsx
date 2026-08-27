@@ -95,8 +95,10 @@ import Launching from './components/Launching';
 import {
   GateAnswer,
   askGate,
+  dropWhileInFlight,
   enactGateAnswer,
   resolveTriggerGate,
+  retireSentinelEntries,
 } from '../gateController';
 import selectingServer from '../selectingServer';
 import { isEqual } from 'lodash';
@@ -586,6 +588,11 @@ export class LoadingAppClass extends Component<
     });
 
     this.fetchZingolibVersion();
+
+    // Retire the keychain entries the replaced sentinel gate shipped:
+    // nothing reads them, and an auth-gated key left under a known name
+    // invites stale-entry reuse. Fire-and-forget, bounded, idempotent.
+    retireSentinelEntries();
 
     // to start the App the first time in this session
     // the user have to pass the security of the device
@@ -2041,17 +2048,20 @@ export class LoadingAppClass extends Component<
   // (ADR 0007). The answer rides into the boot path as data, so the
   // startApp trigger consumes it instead of asking again and the
   // fail-open notice shows once, from the boot path's own handling.
-  retryGate = async () => {
+  // Re-entrant taps are dropped for the whole flight, ceremony and boot,
+  // so a double tap cannot run two concurrent boots against one wallet.
+  retryGate = dropWhileInFlight(async () => {
     const retry = await askGate({ translate: this.state.translate });
     if (retry.kind === 'declined') {
       this.setState({ biometricGate: retry });
       return;
     }
     this.retryAnswer = retry;
-    this.setState({ biometricGate: { kind: 'passed' } }, () =>
-      this.componentDidMount(),
-    );
-  };
+    await new Promise<void>(resolve => {
+      this.setState({ biometricGate: { kind: 'passed' } }, resolve);
+    });
+    await this.componentDidMount();
+  });
 
   addLastSnackbar = (message: string, duration?: SnackbarDurationEnum) => {
     Toast.show({

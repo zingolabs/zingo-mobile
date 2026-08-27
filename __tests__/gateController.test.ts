@@ -456,6 +456,123 @@ test('resetGateController clears the freshness memory', async () => {
   expect(native.authenticate).toHaveBeenCalledTimes(2);
 });
 
+test('a wedged storage write in the epilogue still settles the answer', async () => {
+  jest.useFakeTimers();
+  const { controller, native } = load();
+  const storage = (
+    require('@react-native-async-storage/async-storage') as {
+      default: { setItem: jest.Mock };
+    }
+  ).default;
+  storage.setItem.mockReturnValue(new Promise(() => {}));
+  secured(native);
+  native.authenticate.mockResolvedValue({ outcome: 'authenticated', code: '' });
+
+  const answer = controller.askGate({ translate });
+  await jest.advanceTimersByTimeAsync(controller.PROBE_STALL_MS);
+
+  await expect(
+    Promise.race([answer, Promise.resolve('trapped')]),
+  ).resolves.toEqual({ kind: 'passed' });
+});
+
+test('a twice-stalled ceremony is declared dead and the next starts fresh', async () => {
+  jest.useFakeTimers();
+  const { controller, native } = load();
+  secured(native);
+  native.authenticate.mockReturnValue(new Promise(() => {}));
+
+  const first = controller.askGate({ translate });
+  await jest.advanceTimersByTimeAsync(controller.CEREMONY_STALL_MS);
+  await expect(first).resolves.toMatchObject({ kind: 'failedOpen' });
+
+  // The one adoption life: the prompt may still be on screen.
+  const second = controller.askGate({ translate });
+  await jest.advanceTimersByTimeAsync(controller.CEREMONY_STALL_MS);
+  await expect(second).resolves.toMatchObject({ kind: 'failedOpen' });
+  expect(native.authenticate).toHaveBeenCalledTimes(1);
+
+  // Two full windows of observed-active waiting prove the call dead; a
+  // gate wedged forever on one leaked promise would never prompt again.
+  const third = controller.askGate({ translate });
+  await jest.advanceTimersByTimeAsync(controller.CEREMONY_STALL_MS);
+  expect(native.authenticate).toHaveBeenCalledTimes(2);
+  await expect(third).resolves.toMatchObject({ kind: 'failedOpen' });
+});
+
+test('dropWhileInFlight runs one flight and drops re-entrant calls', async () => {
+  const { controller } = load();
+  let settle: () => void = () => {};
+  const action = jest.fn(
+    () =>
+      new Promise<void>(resolve => {
+        settle = resolve;
+      }),
+  );
+  const guarded = controller.dropWhileInFlight(action);
+
+  const first = guarded();
+  const second = guarded();
+  expect(action).toHaveBeenCalledTimes(1);
+  settle();
+  await first;
+  await second;
+
+  action.mockResolvedValue(undefined);
+  await guarded();
+  expect(action).toHaveBeenCalledTimes(2);
+});
+
+test('a throwing frame yield never denies the gate', async () => {
+  const { controller, native } = load();
+  const rn = require('react-native');
+  const priorOS = rn.Platform.OS;
+  const priorRaf = global.requestAnimationFrame;
+  rn.Platform.OS = 'android';
+  global.requestAnimationFrame = (_cb: (time: number) => void): number => {
+    throw new Error('no raf');
+  };
+  try {
+    secured(native);
+    native.authenticate.mockResolvedValue({
+      outcome: 'authenticated',
+      code: '',
+    });
+    await expect(controller.askGate({ translate })).resolves.toEqual({
+      kind: 'passed',
+    });
+  } finally {
+    global.requestAnimationFrame = priorRaf;
+    rn.Platform.OS = priorOS;
+  }
+});
+
+test('an outcome outside the union still fails open, never undefined', async () => {
+  const { controller, native } = load();
+  secured(native);
+  native.authenticate.mockResolvedValue({ outcome: 'someday-new', code: '' });
+
+  await expect(controller.askGate({ translate })).resolves.toMatchObject({
+    kind: 'failedOpen',
+    failure: { errorKey: 'biometrics-failure-notserved' },
+  });
+});
+
+test('boot cleanup retires both shipped sentinel services', async () => {
+  const { controller } = load();
+  const kc = require('react-native-keychain');
+  kc.resetGenericPassword.mockClear();
+
+  await controller.retireSentinelEntries();
+
+  expect(kc.resetGenericPassword).toHaveBeenCalledWith({
+    service: 'zingo-biometric-sentinel',
+  });
+  expect(kc.resetGenericPassword).toHaveBeenCalledWith({
+    service: 'zingo-biometric-sentinel-v2',
+  });
+});
+
 test('every gate failure key exists in every catalog', () => {
   const keys = [
     'biometrics-failure-stalled',
