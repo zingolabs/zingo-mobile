@@ -1,82 +1,48 @@
 import React, { useContext, useEffect } from 'react';
-import {
-  TouchableOpacity,
-  View,
-  ActivityIndicator,
-  ViewStyle,
-} from 'react-native';
+import { View, ActivityIndicator, ViewStyle } from 'react-native';
 import { useTheme } from '../../app/theme';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faRotateRight } from '@fortawesome/free-solid-svg-icons';
 import { ContextAppLoaded } from '../../app/context';
 import RegText from './RegText';
-import { ModeEnum } from '../../app/AppState';
-import { showConfirm, ConfirmButton } from '../../app/showConfirm';
 import QuoteRefreshRing from './QuoteRefreshRing';
 import {
   PRICE_AUTO_REFRESH_MS,
   priceFetcherStore,
   usePriceFetcherStore,
+  usePriceStale,
 } from './priceFetcherStore';
 
+// Display-only (ADR 0008): mounting this component is what starts and
+// keeps the shared store's fetch lifecycle; there is no tap.
 type PriceFetcherProps = {
   setZecPrice: (p: number, d: number) => void;
   textBefore?: string;
   backgroundColor?: string;
-  // Fired on a manual (user) tap only — not on the 60 s auto-refresh. Lets the
-  // host screen reveal the header PriceRow (snap the bottom sheet down) so the
-  // freshly-fetched price is actually visible.
-  onManualFetch?: () => void;
 };
 
 const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
   setZecPrice,
   textBefore,
   backgroundColor,
-  onManualFetch,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, zecPrice, addLastSnackbar, mode } = context;
+  const { zecPrice, mixnetView } = context;
   const { colors } = useTheme();
   const bg = backgroundColor ?? colors.bgCanvas;
 
   // Shared state across every mounted PriceFetcher.
-  const { started, loading, coolingDown } = usePriceFetcherStore();
+  const { loading } = usePriceFetcherStore();
+  const stale = usePriceStale(zecPrice.date);
 
-  // Feed the shared store the latest context-bound callbacks (identical across
-  // instances, so the last writer wins harmlessly).
+  // Feed the shared store the latest context-bound callbacks and the live
+  // Indicator (identical across instances, so the last writer wins
+  // harmlessly). The statusKey write is also what fires an armed ready
+  // follow-up.
   useEffect(() => {
-    priceFetcherStore.setDeps({ setZecPrice, translate, addLastSnackbar });
-  });
-
-  const onPressFetchAlert = () => {
-    const buttons: ConfirmButton[] = [
-      {
-        text: translate('send.fetch-button') as string,
-        onPress: () => priceFetcherStore.fetch(),
-      },
-      { text: translate('cancel') as string, style: 'cancel' },
-    ];
-    showConfirm({
-      title: translate('send.fetchpricetitle') as string,
-      message: translate('send.fetchpricebody') as string,
-      buttons,
+    priceFetcherStore.setDeps({
+      setZecPrice,
+      mixnetStatusKey: mixnetView ? mixnetView.statusKey : null,
     });
-  };
-
-  const onManualPress = () => {
-    // Reveal the header PriceRow so the (soon-to-refresh) price is on screen.
-    // No-ops on screens that don't wire a reveal callback.
-    onManualFetch?.();
-    // Confirm only on the very first request in advanced mode; afterwards a tap
-    // fetches straight away. Basic mode never confirms. The store swallows the
-    // tap while loading / within the 5 s cooldown, so this can't be spammed.
-    if (!started && mode === ModeEnum.advanced) {
-      onPressFetchAlert();
-    } else {
-      priceFetcherStore.fetch();
-    }
-  };
+  });
 
   const containerStyle: ViewStyle = {
     flexDirection: 'row',
@@ -93,8 +59,8 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
     columnGap: 10,
   };
 
-  // First fetch in flight (no ring yet): show the spinner.
-  if (loading && !started) {
+  // First fetch in flight (no price yet): show the spinner.
+  if (loading && !zecPrice.date) {
     return (
       <View style={containerStyle}>
         {textBefore && (
@@ -105,36 +71,25 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
     );
   }
 
+  // No price and nothing in flight, or a stale price: the ring drops to
+  // its track color, the only failure cue this surface shows.
+  const muted = stale || !zecPrice.date;
   return (
     <View style={containerStyle}>
       {textBefore && (
         <RegText style={{ color: colors.fgDefault }}>{textBefore}</RegText>
       )}
-      {started ? (
-        <QuoteRefreshRing
-          size={22}
-          color={colors.fgAccent}
-          ringColor={'rgba(255,255,255,0.55)'}
-          trackColor={'rgba(255,255,255,0.12)'}
-          durationMs={PRICE_AUTO_REFRESH_MS}
-          resetKey={zecPrice.date}
-          onPress={onManualPress}
-          disabled={loading || coolingDown}
-          testID="pricefetcher.ring"
-        />
-      ) : (
-        <TouchableOpacity
-          disabled={loading}
-          onPress={onManualPress}
-          testID="pricefetcher.fetch"
-        >
-          <FontAwesomeIcon
-            icon={faRotateRight}
-            size={16}
-            color={colors.fgAccent}
-          />
-        </TouchableOpacity>
-      )}
+      <QuoteRefreshRing
+        size={22}
+        color={muted ? colors.fgMuted : colors.fgAccent}
+        ringColor={
+          muted ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.55)'
+        }
+        trackColor={'rgba(255,255,255,0.12)'}
+        durationMs={PRICE_AUTO_REFRESH_MS}
+        resetKey={zecPrice.date}
+        testID="pricefetcher.ring"
+      />
     </View>
   );
 };

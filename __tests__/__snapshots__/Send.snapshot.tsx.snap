@@ -464,11 +464,12 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                 }
               >
                 <View
+                  accessibilityRole="image"
                   accessibilityState={
                     {
                       "busy": undefined,
                       "checked": undefined,
-                      "disabled": false,
+                      "disabled": true,
                       "expanded": undefined,
                       "selected": undefined,
                     }
@@ -484,7 +485,10 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                   accessible={true}
                   collapsable={false}
                   focusable={true}
+                  hitSlop={10}
+                  onBlur={[Function]}
                   onClick={[Function]}
+                  onFocus={[Function]}
                   onResponderGrant={[Function]}
                   onResponderMove={[Function]}
                   onResponderRelease={[Function]}
@@ -492,14 +496,21 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                   onResponderTerminationRequest={[Function]}
                   onStartShouldSetResponder={[Function]}
                   style={
-                    {
-                      "opacity": 1,
-                    }
+                    [
+                      {
+                        "alignItems": "center",
+                        "height": 22,
+                        "justifyContent": "center",
+                        "opacity": 1,
+                        "width": 22,
+                      },
+                      undefined,
+                    ]
                   }
-                  testID="pricefetcher.fetch"
+                  testID="pricefetcher.ring"
                 >
                   <
-                    color="#18bd18"
+                    color="#888888"
                     icon={
                       {
                         "icon": [
@@ -516,7 +527,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                         "prefix": "fas",
                       }
                     }
-                    size={16}
+                    size={11}
                   />
                 </View>
               </View>

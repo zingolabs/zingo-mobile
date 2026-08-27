@@ -239,3 +239,27 @@ The network path a mixnet-only surface resolves to, either the Standing
 Client's tunnel or clearnet. zingolib derives it from the indicator, and the
 app never sees it. A price fetch that resolves to clearnet is refused, never
 sent.
+
+## Price surface
+
+Vocabulary for the ZEC/USD display and its fetch lifecycle.
+
+**Price**:
+The fetched ZEC/USD value the price surface displays.
+_Avoid_: quote (legacy name in the ring components)
+
+**Stale price**:
+A price whose last successful fetch is older than five minutes of wall
+clock. Staleness is a fact about the value's accuracy, not about fetch
+mechanics, and it is independent of transport.
+
+**Price consent**:
+Selecting USD as the display currency. It is the sole authority for price
+traffic: the surface fetches on no other gesture, and no fetch failure
+raises a snackbar.
+_Avoid_: manual fetch (removed; every fetch is app-initiated)
+
+**Ready follow-up**:
+The one-shot fetch armed when a return-to-active fetch is refused during
+bootstrap; it fires when the Indicator turns `ready` and is dropped on
+`died` or on the next background transition.

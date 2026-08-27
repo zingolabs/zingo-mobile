@@ -35,7 +35,8 @@ type QuoteRefreshRingProps = {
   durationMs: number;
   /** Change this to restart the fill from 0 (e.g. the quote's receivedAtMs). */
   resetKey: number | string;
-  onPress: () => void;
+  /** Omit for a display-only ring (no press affordance at all). */
+  onPress?: () => void;
   disabled?: boolean;
   style?: StyleProp<ViewStyle>;
   testID?: string;
@@ -85,9 +86,9 @@ export default function QuoteRefreshRing({
   return (
     <Pressable
       onPress={onPress}
-      disabled={disabled}
+      disabled={disabled || !onPress}
       hitSlop={10}
-      accessibilityRole="button"
+      accessibilityRole={onPress ? 'button' : 'image'}
       testID={testID}
       style={[
         {

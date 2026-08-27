@@ -498,8 +498,6 @@
     "zecprice": "Precio del ZEC",
     "unknown": "Desconocido",
     "title": "Información del Servidor",
-    "errorgemini": "Error extrayendo el precio de Internet.",
-    "errorrpcmodule": "Fallo interno al obtener el precio de Internet",
     "zingolib": "Versión de Zingolib"
   },
   "rescan": {
@@ -604,9 +602,6 @@
     "duplicate-nullifier-error": "Tus fondos están todavía confirmándose y probablemente sincronizándose. Puedes esperar hasta que tus fondos estén confirmados o puedes intentar enviar una cantidad más pequeña, ¡La creación de la Transacción ha fallado!",
     "dust-error": "La cantidad que estás intentando enviar a una dirección Transparente es realmente ínfima, ¡La creación de la Transacción ha fallado!",
     "needtoshield": "Hay fondos para blindar",
-    "fetchpricetitle": "Consultar Precio USD",
-    "fetchpricebody": "Por favor confirma que quieres recuperar/consultar el precio en USD de internet.",
-    "fetch-button": "Consultar",
     "refreshing-price": "Actualizando precio…",
     "calc-error": "Error de cálculo",
     "confirm-privacy-level": "Nivel de Privacidad",

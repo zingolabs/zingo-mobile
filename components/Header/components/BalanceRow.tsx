@@ -27,6 +27,7 @@ import Button from '../../Components/Button';
 import CurrencyAmount from '../../Components/CurrencyAmount';
 import FadeText from '../../Components/FadeText';
 import PriceFetcher from '../../Components/PriceFetcher';
+import { usePriceStale } from '../../Components/priceFetcherStore';
 import RegText from '../../Components/RegText';
 import ZecAmount from '../../Components/ZecAmount';
 import PrivacyToggle from './PrivacyToggle';
@@ -55,7 +56,6 @@ type BalanceRowProps = {
   onPressShieldFunds: () => void;
   receivedLegend: boolean | undefined;
   onUsdRowLayout?: (height: number) => void;
-  onManualFetchPrice?: () => void;
 };
 
 const BalanceRow: React.FC<BalanceRowProps> = React.memo(
@@ -82,10 +82,11 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
     onPressShieldFunds,
     receivedLegend,
     onUsdRowLayout,
-    onManualFetchPrice,
   }) => {
     const navigation = useNavigation<NavigationProp<ParamListBase>>();
     const { colors } = useTheme();
+    // ADR 0008: a stale price dims; there is no tap to refresh it.
+    const priceStale = usePriceStale(zecPrice.date);
 
     return (
       <>
@@ -203,7 +204,11 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
               style={{ flexDirection: 'row', alignItems: 'center' }}
             >
               <CurrencyAmount
-                style={{ marginTop: 0, marginBottom: 0 }}
+                style={{
+                  marginTop: 0,
+                  marginBottom: 0,
+                  ...(priceStale ? { color: colors.fgMuted } : {}),
+                }}
                 price={zecPrice.zecPrice}
                 amtZec={
                   totalBalance
@@ -217,10 +222,7 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
                 privacy={privacy}
               />
               <View style={{ marginLeft: 5 }}>
-                <PriceFetcher
-                  setZecPrice={setZecPrice}
-                  onManualFetch={onManualFetchPrice}
-                />
+                <PriceFetcher setZecPrice={setZecPrice} />
               </View>
             </View>
           )}

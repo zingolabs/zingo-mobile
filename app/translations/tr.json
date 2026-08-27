@@ -498,8 +498,6 @@
     "zecprice": "ZEC Fiyatı ",
     "unknown": "Bilinmeyen ",
     "title": "Sunucu Bilgisi",
-    "errorgemini": "Error İnternetten fiyat alınırken hata oluştu.",
-    "errorrpcmodule": "İnternetten fiyat alınırken iç hata oluştu ",
     "zingolib": "Zingolib Sürümü"
   },
   "rescan": {
@@ -604,9 +602,6 @@
     "duplicate-nullifier-error": "Fonlarınız hâlâ onaylanıyor ve muhtemelen senkronize ediliyor. Fonlar onaylanana kadar bekleyebilir veya daha düşük bir tutarla göndermeyi deneyebilirsiniz. İşlem oluşturulamadı!",
     "dust-error": "Göndermeye çalıştığınız tutar Şeffaf bir adrese göre çok küçük. İşlem oluşturulamadı!",
     "needtoshield": "Korumaya alınacak fonlarınız var",
-    "fetchpricetitle": "USD Fiyatını Getir",
-    "fetchpricebody": "Lütfen USD fiyatını internetten almak istediğinizi onaylayın.",
-    "fetch-button": "Getir",
     "refreshing-price": "Fiyat güncelleniyor…",
     "calc-error": "Hesaplama hatası",
     "confirm-privacy-level": "Gizlilik Seviyesi",

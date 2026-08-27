@@ -498,8 +498,6 @@
     "zecprice": "ZEC Price",
     "unknown": "Unknown",
     "title": "Server Info",
-    "errorgemini": "Error fetching the price from the Internet.",
-    "errorrpcmodule": "Internal Error fetching the price from the Internet",
     "zingolib": "Zingolib Version"
   },
   "rescan": {
@@ -604,9 +602,6 @@
     "duplicate-nullifier-error": "Your funds are still confirming and probably syncing. You can wait until the funds are confirmed or you can try to send now with a lower amount. The Transaction build failed!",
     "dust-error": "The amount that you are trying to send to a Transparent address is really tiny. The Transaction build failed!",
     "needtoshield": "You have funds to shield",
-    "fetchpricetitle": "Fetch USD Price",
-    "fetchpricebody": "Please confirm that you want to fetch the USD price from the Internet.",
-    "fetch-button": "Fetch",
     "refreshing-price": "Refreshing price…",
     "calc-error": "Calculation error",
     "confirm-privacy-level": "Privacy Level",

@@ -332,14 +332,6 @@ const Send: React.FunctionComponent<SendProps> = ({
     sendSnapPoints.length,
   );
 
-  // Tapping the price fetch button (header or the in-form amount row) reveals
-  // the header PriceRow (smallest snap). The auto-close timer armed by
-  // usePriceSnapAutoClose returns it afterwards.
-  const revealPrice = useCallback(() => {
-    if (priceSnapIndex === null) return;
-    safeSnapToIndex(sendSheetRef, priceSnapIndex, sendSnapPoints.length);
-  }, [priceSnapIndex, sendSnapPoints.length]);
-
   useEffect(() => {
     if (internalSnapIndexRef.current >= sendSnapPoints.length) {
       safeSnapToIndex(
@@ -1216,7 +1208,6 @@ const Send: React.FunctionComponent<SendProps> = ({
             showMessagesIcon={true}
             onUsdRowLayout={setUsdRowH}
             onPriceRowLayout={setPriceRowH}
-            onManualFetchPrice={revealPrice}
           />
         </View>
       </View>
@@ -1720,7 +1711,6 @@ const Send: React.FunctionComponent<SendProps> = ({
                             <PriceFetcher
                               setZecPrice={setZecPrice}
                               backgroundColor={colors.bgSurface}
-                              onManualFetch={revealPrice}
                             />
                           </View>
                         </>
