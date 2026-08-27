@@ -7,7 +7,7 @@ import {
   View,
 } from 'react-native';
 
-import { BIOMETRIC_BLANKING_EVENT } from './simpleBiometrics';
+import { BIOMETRIC_BLANKING_EVENT } from './gateController';
 
 const styles = StyleSheet.create({
   overlay: { flex: 1, backgroundColor: 'black' },

@@ -92,7 +92,7 @@ import Toast from 'react-native-toast-message';
 import { toastConfig } from '../toastConfig';
 import { RPCSeedType } from '../walletBackend/types/RPCSeedType';
 import Launching from './components/Launching';
-import { AnsweredVerdict, gateUntilAnswered } from '../simpleBiometrics';
+import { GateAnswer, askGate } from '../gateController';
 import selectingServer from '../selectingServer';
 import { isEqual } from 'lodash';
 import {
@@ -590,19 +590,21 @@ export class LoadingAppClass extends Component<
         // on the first screen so the user can try again.
         return;
       }
-      // (PIN or TouchID or FaceID). Only a decline locks; an
-      // 'unavailable' gate passes because it guards nothing and
-      // blocking locks the user out of the wallet.
-      const startGate: AnsweredVerdict = this.state.security.startApp
-        ? await gateUntilAnswered({
-            translate: this.state.translate,
-            purpose: 'appEntry',
-          })
-        : { kind: 'authenticated' };
+      // (PIN or TouchID or FaceID). Only a decline locks; a gate that
+      // cannot run fails open with a notice (ADR 0007), because blocking
+      // would trap the user out of the wallet.
+      const startGate: GateAnswer = this.state.security.startApp
+        ? await askGate({ translate: this.state.translate })
+        : { kind: 'passed' };
       if (startGate.kind === 'declined') {
-        // The narrowed verdict is the gate outcome, whole.
+        // The narrowed answer is the gate outcome, whole.
         this.setState({ biometricGate: startGate });
         return;
+      }
+      if (startGate.kind === 'failedOpen') {
+        this.addLastSnackbar(
+          Utils.renderGateFailure(startGate.failure, this.state.translate),
+        );
       }
     }
 
@@ -2014,6 +2016,27 @@ export class LoadingAppClass extends Component<
     });
   };
 
+  // The locked screen's retry runs its own ceremony unconditionally: the
+  // security toggles enable triggers, they never bypass a retry
+  // (ADR 0007). A pass re-enters the boot path inside the freshness
+  // window, so the startApp trigger there shares it without a second
+  // prompt.
+  retryGate = async () => {
+    const retry = await askGate({ translate: this.state.translate });
+    if (retry.kind === 'declined') {
+      this.setState({ biometricGate: retry });
+      return;
+    }
+    if (retry.kind === 'failedOpen') {
+      this.addLastSnackbar(
+        Utils.renderGateFailure(retry.failure, this.state.translate),
+      );
+    }
+    this.setState({ biometricGate: { kind: 'passed' } }, () =>
+      this.componentDidMount(),
+    );
+  };
+
   addLastSnackbar = (message: string, duration?: SnackbarDurationEnum) => {
     Toast.show({
       type: 'appInfo',
@@ -2219,11 +2242,7 @@ export class LoadingAppClass extends Component<
                   translate={translate}
                   firstLaunchingMessage={firstLaunchingMessage}
                   biometricGate={biometricGate}
-                  tryAgain={() => {
-                    this.setState({ biometricGate: { kind: 'passed' } }, () =>
-                      this.componentDidMount(),
-                    );
-                  }}
+                  tryAgain={this.retryGate}
                 />
               )}
               {screen === RouteEnum.StartMenu && (

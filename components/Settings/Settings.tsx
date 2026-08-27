@@ -77,7 +77,7 @@ import BouncyCheckbox from 'react-native-bouncy-checkbox';
 import {
   DeviceSecurityProbe,
   probeDeviceSecurity,
-} from '../../app/simpleBiometrics';
+} from '../../app/gateController';
 import { useBiometricGate } from '../../app/hooks/useBiometricGate';
 import SelectBottomSheet from '../Components/SelectBottomSheet';
 import BottomSheet, {
@@ -413,10 +413,9 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
 
   const probedRef = useRef<boolean>(false);
   useEffect(() => {
-    // Probe once, after the gate first settles: the probe queues behind
-    // this screen's own gate prompt on the serialized keychain queue, a
-    // stalled probe answers nothing, and the enrolled-lock answer cannot
-    // change while the user stays in this app.
+    // Probe once, after the gate first settles: a stalled probe answers
+    // nothing, and the enrolled-lock answer cannot change while the user
+    // stays in this app.
     if (!authPassed || probedRef.current) {
       return;
     }
