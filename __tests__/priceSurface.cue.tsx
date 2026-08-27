@@ -31,18 +31,6 @@ import {
 import { SelectServerEnum } from '../app/AppState';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 
-beforeAll(() => {
-  // The ring's JS-driven fill ticks every 16 ms of a fake-timer advance,
-  // and the cadence advances here span minutes; no test asserts on the
-  // animation, so a no-op keeps the advances cheap.
-  const { Animated } = require('react-native');
-  jest.spyOn(Animated, 'timing').mockReturnValue({
-    start: jest.fn(),
-    stop: jest.fn(),
-    reset: jest.fn(),
-  });
-});
-
 beforeEach(() => {
   priceFetcherStore.resetForTests();
 });

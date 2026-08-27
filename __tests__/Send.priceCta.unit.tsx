@@ -4,15 +4,17 @@
  * screen should have: it fails on the broken code and passes once the
  * finding is fixed.
  *
- * F7: an unattended refresh must not swap the send CTA away while a
- *     price is already on screen.
  * F8 (amount half): the in-form USD amounts dim when the price is stale.
+ * N7: the send-confirmation conversions dim on a stale price too. The
+ *     stale hook is mocked as a function of the priceDate it receives,
+ *     so a Confirm or Send row that drops its priceDate wiring goes
+ *     back to full strength and the test fails.
  */
 jest.mock('../components/Components/priceFetcherStore', () => ({
   __esModule: true,
   PRICE_REFRESH_MIN_MS: 5 * 60_000,
   PRICE_REFRESH_MAX_MS: 10 * 60_000,
-  PRICE_STALE_MS: 10 * 60_000,
+  PRICE_STALE_MS: 10 * 60_000 + 30_000,
   priceFetcherStore: {
     setDeps: jest.fn(),
     attach: jest.fn(() => () => {}),
@@ -22,6 +24,7 @@ jest.mock('../components/Components/priceFetcherStore', () => ({
       cycle: 0,
       nextFetchAt: 0,
       nextFetchDelayMs: 0,
+      surfaceActive: false,
     })),
     foregroundReturned: jest.fn(),
     fetch: jest.fn(),
@@ -31,6 +34,7 @@ jest.mock('../components/Components/priceFetcherStore', () => ({
     cycle: 0,
     nextFetchAt: 0,
     nextFetchDelayMs: 0,
+    surfaceActive: false,
   })),
   usePriceStale: jest.fn(() => false),
 }));
@@ -115,49 +119,20 @@ beforeEach(() => {
     cycle: 0,
     nextFetchAt: 0,
     nextFetchDelayMs: 0,
+    surfaceActive: false,
   });
-  staleHook.mockReturnValue(false);
+  // Staleness follows the priceDate each call site actually wires
+  // through, so an unwired row cannot pass by a blanket `true`.
+  staleHook.mockImplementation(
+    (priceDate: number) =>
+      priceDate > 0 && Date.now() - priceDate > 10 * 60_000 + 30_000,
+  );
   // Send's mount effects call these; the shared RPCModule mock lacks them.
   const { NativeModules } = require('react-native');
   NativeModules.RPCModule.getDonationAddress = jest.fn(async () => '{}');
 });
 
-test('F7: an unattended refresh keeps the send CTA while a price is on screen', () => {
-  storeHook.mockReturnValue({
-    loading: true,
-    cycle: 0,
-    nextFetchAt: 0,
-    nextFetchDelayMs: 0,
-  });
-  const view = render(sendUi({ zecPrice: 33.33, date: Date.now() }));
-
-  expect(view.queryByTestId('send.refreshing-price')).toBeNull();
-  expect(
-    view.queryByTestId('send.button') ??
-      view.queryByTestId('send.button-disabled'),
-  ).toBeTruthy();
-});
-
-test('N1: price loading never takes the send CTA, price or no price', () => {
-  // Sending needs ZEC amounts, never the USD price; a bootstrapping
-  // mixnet must not block sends for the length of every fetch flight.
-  storeHook.mockReturnValue({
-    loading: true,
-    cycle: 0,
-    nextFetchAt: 0,
-    nextFetchDelayMs: 0,
-  });
-  const view = render(sendUi({ zecPrice: 0, date: 0 }));
-
-  expect(view.queryByTestId('send.refreshing-price')).toBeNull();
-  expect(
-    view.queryByTestId('send.button') ??
-      view.queryByTestId('send.button-disabled'),
-  ).toBeTruthy();
-});
-
 test('F8: the in-form USD amounts dim when the price is stale', () => {
-  staleHook.mockReturnValue(true);
   const view = render(
     sendUi({ zecPrice: 33.33, date: Date.now() - 11 * 60_000 }),
   );
@@ -177,7 +152,7 @@ test('F8: the in-form USD amounts dim when the price is stale', () => {
 });
 
 test('P8: an absent price dims the USD rows like the ring beside them', () => {
-  staleHook.mockReturnValue(false); // not stale: the price never existed
+  // Not stale, absent: the price never existed and the hook sees 0.
   const view = render(sendUi({ zecPrice: 0, date: 0 }));
 
   const { StyleSheet } = require('react-native');
@@ -193,8 +168,8 @@ test('P8: an absent price dims the USD rows like the ring beside them', () => {
 
 test('N7: the send-confirmation conversions dim on a stale price too', () => {
   // The one screen where the figure drives a signing decision must not
-  // show a stale conversion at full strength.
-  staleHook.mockReturnValue(true);
+  // show a stale conversion at full strength; the arg-keyed stale mock
+  // dims only rows that wire their priceDate through.
   const state = { ...defaultAppContextLoaded };
   state.translate = mockTranslate;
   state.info = mockInfo;

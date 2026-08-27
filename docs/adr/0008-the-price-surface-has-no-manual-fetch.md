@@ -5,10 +5,10 @@ tap raised a confirm dialog, and that gesture was the consent for all
 later price traffic. We removed the tap entirely. Selecting Nym (the
 persisted Mixnet Mode opt-in) is now the single and only consent for
 price traffic, the surface is display-only, and no fetch failure raises a
-snackbar. Staleness is the only failure signal: a price older than ten
-minutes of wall clock, the cadence's longest draw, dims, and recovery
-arrives from the refresh timer or the ready follow-up, never from a
-gesture.
+snackbar. Staleness is the only failure signal: a price older than the
+cadence's longest draw plus one fetch bound (ten minutes and thirty
+seconds) dims, and recovery arrives from the refresh timer or the ready
+follow-up, never from a gesture.
 
 We chose this because the tap carried most of the surface's complexity
 (the confirm dialog, the cooldown and anti-spam gate, the idle and

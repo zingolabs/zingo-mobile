@@ -36,12 +36,13 @@ import { MixnetStatusKey } from '../../app/walletBackend/transforms/mixnetPresen
 // from this window.
 export const PRICE_REFRESH_MIN_MS = 5 * 60_000;
 export const PRICE_REFRESH_MAX_MS = 10 * 60_000;
-// A price older than this wall-clock age is stale (CONTEXT.md: Stale
-// price): the cadence ceiling, so a healthy cadence never dims.
-export const PRICE_STALE_MS = PRICE_REFRESH_MAX_MS;
 // The JS-side bound on one native price call: a wedged FFI promise must
 // never pin `loading` for the process lifetime.
 const PRICE_FETCH_TIMEOUT_MS = 30_000;
+// A price older than this wall-clock age is stale (CONTEXT.md: Stale
+// price): the cadence ceiling plus one fetch bound of headroom, so a
+// healthy cadence never dims, not even on a ceiling draw's latency.
+export const PRICE_STALE_MS = PRICE_REFRESH_MAX_MS + PRICE_FETCH_TIMEOUT_MS;
 // Rapid remounts and app hops must not multiply fetches.
 const FETCH_BURST_COOLDOWN_MS = 5_000;
 // A wedged native call is reused until this age, then retired so a fresh
@@ -73,6 +74,9 @@ let entryPending = false;
 let deps: Deps | null = null;
 let autoTimer: ReturnType<typeof setTimeout> | null = null;
 let attachCount = 0;
+// Bumped when a session detaches: a flight that outlived its session
+// must not write state or spawn work into the next one.
+let sessionEpoch = 0;
 let appStateSub: NativeEventSubscription | null = null;
 let appAway = false;
 let lastFetchStartAt = 0;
@@ -101,6 +105,10 @@ function clearAuto(): void {
     clearTimeout(autoTimer);
     autoTimer = null;
   }
+  // A dead deadline must not linger: the ring reads it, and a stale one
+  // renders as a full ring for a tick that will never come.
+  nextFetchAt = 0;
+  nextFetchDelayMs = 0;
 }
 
 // 'off' and 'died' are transport verdicts under which the wallet refuses
@@ -176,11 +184,21 @@ async function boundedPrice(): Promise<number> {
   }
 }
 
+// A status that could still be a bootstrap in progress: 'unknown' is
+// one failed status poll, not a verdict, on the arm path exactly as on
+// the drop path in pump().
+function statusCouldBeBootstrap(key: MixnetStatusKey): boolean {
+  return (
+    key === 'mixnet.status.bootstrapping' || key === 'mixnet.status.unknown'
+  );
+}
+
 async function doFetch(kind: FetchKind): Promise<void> {
   if (loading || !surfaceMayFetch() || !deps) {
     return;
   }
   const d = deps;
+  const epoch = sessionEpoch;
   // The status the flight launched under: a refusal belongs to this
   // transport story even when the Indicator moves mid-flight.
   const launchStatusKey = d.mixnetStatusKey;
@@ -192,48 +210,68 @@ async function doFetch(kind: FetchKind): Promise<void> {
     // first attempt
     // 0 initial · -1 Gemini/zingolib · -2 RPCModule · -3 bound · >0 real
     let price = await boundedPrice();
-    if (price <= 0 && surfaceMayFetch()) {
+    if (
+      price <= 0 &&
+      price !== -3 &&
+      epoch === sessionEpoch &&
+      surfaceMayFetch()
+    ) {
       // The consent re-check: no second attempt for a surface every
       // fetcher has left, for a backgrounded app, or after the Nym
-      // opt-in was withdrawn mid-flight.
+      // opt-in was withdrawn mid-flight. A -3 means the bound expired
+      // on a still-pending native call, and a retry would only reattach
+      // to that same wedged promise for another bound of nothing.
       price = await boundedPrice();
     }
 
+    if (epoch !== sessionEpoch) {
+      // The session this flight belonged to detached: its state is gone
+      // and nothing here may leak into the next one.
+      return;
+    }
     if (price > 0) {
-      if (surfaceMayFetch()) {
-        followUpArmed = false;
-        entryPending = false; // a fresh price satisfies a pending return
-        lastSuccessAt = Date.now();
-        d.setZecPrice(price, lastSuccessAt);
-      }
+      // The traffic was already spent under the launch's consent, so
+      // the value is recorded even where a new fetch would now be
+      // refused (a background hop, a moved verdict): discarding it
+      // would only buy a second identical fetch later.
+      followUpArmed = false;
+      entryPending = false; // a fresh price satisfies a pending return
+      lastSuccessAt = Date.now();
+      d.setZecPrice(price, lastSuccessAt);
     } else if (
       kind !== 'readyFollowUp' &&
       surfaceMayFetch() &&
-      (launchStatusKey === 'mixnet.status.bootstrapping' ||
-        deps?.mixnetStatusKey === 'mixnet.status.bootstrapping')
+      (statusCouldBeBootstrap(launchStatusKey) ||
+        (deps ? statusCouldBeBootstrap(deps.mixnetStatusKey) : false))
     ) {
-      // Refused during bootstrap, judged by the launch status or the
-      // live one: the ready follow-up recovers the price seconds after
-      // the transport comes up instead of a full tick later. The
-      // consent re-check keeps a flight that outlived a background
-      // transition from re-arming what that transition dropped, and the
-      // follow-up itself never re-arms. Every other failure is silent;
-      // the last price stands and the stale cue carries the signal.
+      // Refused during a possible bootstrap, judged by the launch
+      // status or the live one: the ready follow-up recovers the price
+      // seconds after the transport comes up instead of a full tick
+      // later. The consent re-check keeps a flight that outlived a
+      // background transition from re-arming what that transition
+      // dropped, and the follow-up itself never re-arms. Every other
+      // failure is silent; the last price stands and the stale cue
+      // carries the signal.
       followUpArmed = true;
     }
   } finally {
-    loading = false;
-    cycle++;
-    scheduleAuto();
-    emit();
-    if (entryPending && surfaceMayFetch() && deps) {
-      // The return that landed inside this flight gets its fetch and
-      // stamps the hop rate bound, exactly as an unparked return does.
-      entryPending = false;
-      lastReturnFetchAt = Date.now();
-      doFetch('entry').catch(() => {});
+    if (epoch === sessionEpoch) {
+      loading = false;
+      cycle++;
+      scheduleAuto();
+      emit();
+      if (entryPending) {
+        // The parked return is consumed here whether or not its fetch
+        // may fly: a return the landing declines must not survive to
+        // double some later entry past the burst cooldown.
+        entryPending = false;
+        if (surfaceMayFetch() && deps) {
+          lastReturnFetchAt = Date.now();
+          doFetch('entry').catch(() => {});
+        }
+      }
+      pump(); // a follow-up that turned ready mid-flight fires now
     }
-    pump(); // a follow-up that turned ready mid-flight fires now
   }
 }
 
@@ -309,11 +347,22 @@ export const priceFetcherStore = {
     return () => {
       attachCount--;
       if (attachCount === 0) {
+        // The session is over: sweep every clock and flag, or the next
+        // wallet inherits this one's burst cooldowns, its in-flight
+        // loading, and its wedged native call. The epoch bump makes an
+        // orphan flight's landing a no-op.
+        sessionEpoch++;
         clearAuto();
         appStateSub?.remove();
         appStateSub = null;
         followUpArmed = false;
         entryPending = false;
+        loading = false;
+        lastFetchStartAt = 0;
+        lastSuccessAt = 0;
+        lastReturnFetchAt = 0;
+        nativeCallStartedAt = 0;
+        nativeCall = null;
         deps = null;
       }
     };
@@ -350,8 +399,17 @@ export const priceFetcherStore = {
     cycle: number;
     nextFetchAt: number;
     nextFetchDelayMs: number;
+    // The store's own render verdict, so no view re-derives (and
+    // drifts from) surfaceMayFetch.
+    surfaceActive: boolean;
   } {
-    return { loading, cycle, nextFetchAt, nextFetchDelayMs };
+    return {
+      loading,
+      cycle,
+      nextFetchAt,
+      nextFetchDelayMs,
+      surfaceActive: surfaceMayFetch(),
+    };
   },
   /** Test-only: forget the burst clocks, the arm state, and any wedged in-flight native call. */
   resetForTests(): void {
@@ -381,7 +439,14 @@ export function usePriceFetcherStore(): ReturnType<
   typeof priceFetcherStore.snapshot
 > {
   const [, force] = useReducer((n: number) => n + 1, 0);
-  useEffect(() => priceFetcherStore.subscribe(force), []);
+  useEffect(() => {
+    const unsubscribe = priceFetcherStore.subscribe(force);
+    // An emit between this component's render and this effect (the
+    // driver's attach effect runs first and starts the boot fetch) is
+    // otherwise lost until the next one.
+    force();
+    return unsubscribe;
+  }, []);
   return priceFetcherStore.snapshot();
 }
 

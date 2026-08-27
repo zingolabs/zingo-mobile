@@ -57,23 +57,20 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
   backgroundColor,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, zecPrice, nym, mixnetView } = context;
+  const { translate, zecPrice } = context;
   const { colors } = useTheme();
   const bg = backgroundColor ?? colors.bgCanvas;
 
   // Shared state across every mounted PriceFetcher.
-  const { loading, nextFetchAt, nextFetchDelayMs } = usePriceFetcherStore();
+  const { loading, nextFetchAt, nextFetchDelayMs, surfaceActive } =
+    usePriceFetcherStore();
   const stale = usePriceStale(zecPrice.date);
 
-  // Without the Nym consent no cadence exists, and under an 'off' or
-  // 'died' transport verdict the store pauses it; in both states a ring
+  // The store's own verdict decides visibility: without the consent,
+  // the market, or a serving transport no cadence exists, and a ring
   // counting down to a refresh that cannot come would mislead, so
   // render nothing at all.
-  const transportRefuses =
-    mixnetView !== null &&
-    (mixnetView.statusKey === 'mixnet.status.off' ||
-      mixnetView.statusKey === 'mixnet.status.died');
-  if (!nym || transportRefuses) {
+  if (!surfaceActive) {
     return null;
   }
 

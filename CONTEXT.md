@@ -250,8 +250,9 @@ The fetched ZEC/USD value the price surface displays.
 _Avoid_: quote (legacy name in the ring components)
 
 **Stale price**:
-A price whose last successful fetch is older than ten minutes of wall
-clock, the cadence's longest draw, so a healthy cadence never dims.
+A price whose last successful fetch is older than the cadence's longest
+draw plus one fetch bound (ten minutes and thirty seconds of wall
+clock), so a healthy cadence never dims, ceiling draws included.
 Staleness is a fact about the value's accuracy, not about fetch
 mechanics, and it is independent of transport.
 

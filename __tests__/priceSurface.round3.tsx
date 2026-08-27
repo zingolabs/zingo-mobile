@@ -71,7 +71,6 @@ const driverOnlyUi = (
 );
 
 const seedDeps = (setZecPrice: (p: number, d: number) => void) => {
-
   priceFetcherStore.setDeps({
     setZecPrice,
     mixnetStatusKey: 'mixnet.status.unknown',
@@ -81,22 +80,21 @@ const seedDeps = (setZecPrice: (p: number, d: number) => void) => {
   });
 };
 
-const foregroundReturned = () =>
-  priceFetcherStore.foregroundReturned();
+const foregroundReturned = () => priceFetcherStore.foregroundReturned();
 
 const appStateHandlers: Array<(next: string) => void> = [];
 
 beforeAll(() => {
   const { AppState } = require('react-native');
-  jest
-    .spyOn(AppState, 'addEventListener')
-    .mockImplementation(((event: string, handler: (next: string) => void) => {
-      if (event === 'change') {
-        appStateHandlers.push(handler);
-      }
-      return { remove: jest.fn() };
-
-    }) as any);
+  jest.spyOn(AppState, 'addEventListener').mockImplementation(((
+    event: string,
+    handler: (next: string) => void,
+  ) => {
+    if (event === 'change') {
+      appStateHandlers.push(handler);
+    }
+    return { remove: jest.fn() };
+  }) as any);
 });
 
 const fireAppState = (next: string) => {
@@ -115,16 +113,20 @@ afterEach(() => {
   jest.useRealTimers();
 });
 
-test('N2: an immediate remount inside the cooldown starts no new fetch', async () => {
+test('N2: remounting display fetchers starts no new fetch', async () => {
+  // The driver owns the session; screens mount and unmount fetchers
+  // freely (a settings toggle, a navigation) and none of that is a
+  // boot. Only a driver detach ends the session, and the next attach
+  // fetches by the cadence spec.
   price.mockResolvedValue({ price: -1, error: 'refused' });
   const setZecPrice = jest.fn();
   seedDeps(setZecPrice);
 
   const view = render(surfaceUi(makeCtx(), setZecPrice));
   await waitFor(() => expect(price).toHaveBeenCalledTimes(2)); // entry refused
-  view.unmount();
 
-  render(surfaceUi(makeCtx(), setZecPrice)); // a settings toggle remount
+  view.rerender(driverOnlyUi(makeCtx(), setZecPrice)); // the screen closes
+  view.rerender(surfaceUi(makeCtx(), setZecPrice)); // and reopens
   await flush();
   await flush();
   expect(price).toHaveBeenCalledTimes(2);

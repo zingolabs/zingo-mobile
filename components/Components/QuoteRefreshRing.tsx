@@ -1,18 +1,16 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useEffect, useMemo, useRef } from 'react';
-import {
-  Animated,
-  Easing,
-  Pressable,
-  StyleProp,
-  View,
-  ViewStyle,
-} from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { Pressable, StyleProp, View, ViewStyle } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faRotateRight } from '@fortawesome/free-solid-svg-icons';
 
-const AnimatedCircle = Animated.createAnimatedComponent(Circle);
+// One coarse wall-clock tick per second, re-rendered only when the arc
+// would visibly move: a per-frame Animated.timing on the JS driver cost
+// a bridge write every 16 ms for minutes to move the arc by well under
+// a pixel.
+const RING_TICK_MS = 1_000;
+const RING_ARC_STEP = 1 / 64;
 
 /**
  * Manual re-quote control that doubles as an auto-refresh countdown: a refresh
@@ -61,11 +59,11 @@ export default function QuoteRefreshRing({
   style,
   testID,
 }: QuoteRefreshRingProps) {
-  const progress = useRef(new Animated.Value(0)).current;
-  // A ref, so a re-render's fresher phase never restarts the animation:
+  // A ref, so a re-render's fresher phase never restarts the fill:
   // only resetKey (and a changed duration) may.
   const startProgressRef = useRef(0);
   startProgressRef.current = Math.min(Math.max(startProgress ?? 0, 0), 1);
+  const [progress, setProgress] = useState(startProgressRef.current);
   const strokeWidth = 2;
   const center = size / 2;
   const radius = (size - strokeWidth) / 2;
@@ -73,27 +71,23 @@ export default function QuoteRefreshRing({
 
   useEffect(() => {
     const from = startProgressRef.current;
-    progress.setValue(from);
-    const anim = Animated.timing(progress, {
-      toValue: 1,
-      duration: durationMs * (1 - from),
-      easing: Easing.linear,
-      // strokeDashoffset is not supported by the native driver.
-      useNativeDriver: false,
-    });
-    anim.start();
-    return () => anim.stop();
-  }, [resetKey, durationMs, progress]);
+    const startedAt = Date.now();
+    setProgress(from);
+    if (from >= 1 || durationMs <= 0) return;
+    const tick = setInterval(() => {
+      const now = Math.min(from + (Date.now() - startedAt) / durationMs, 1);
+      // The functional update returns the previous value for sub-step
+      // movement, so React bails out of those re-renders.
+      setProgress(prev =>
+        now >= 1 || now - prev >= RING_ARC_STEP ? now : prev,
+      );
+      if (now >= 1) clearInterval(tick);
+    }, RING_TICK_MS);
+    return () => clearInterval(tick);
+  }, [resetKey, durationMs]);
 
-  // Full offset = empty ring; 0 = full ring. Stable across re-renders.
-  const strokeDashoffset = useMemo(
-    () =>
-      progress.interpolate({
-        inputRange: [0, 1],
-        outputRange: [circumference, 0],
-      }),
-    [progress, circumference],
-  );
+  // Full offset = empty ring; 0 = full ring.
+  const strokeDashoffset = circumference * (1 - progress);
 
   const face = (
     <>
@@ -106,7 +100,7 @@ export default function QuoteRefreshRing({
           strokeWidth={strokeWidth}
           fill="none"
         />
-        <AnimatedCircle
+        <Circle
           cx={center}
           cy={center}
           r={radius}
