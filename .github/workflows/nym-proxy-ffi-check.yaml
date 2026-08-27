@@ -98,6 +98,8 @@ jobs:
         with:
           tool: cargo-nextest@0.9.98
 
+      # The shim workspace sees no nextest.toml from the main one, so the
+      # serialization the live tests need is spelled out here.
       - name: Live mixnet start
         working-directory: ./rust/nym-proxy-ffi
-        run: cargo nextest run --locked --features live-mixnet --test live_mixnet
+        run: cargo nextest run --locked --features live-mixnet --test-threads 1 --test live_mixnet

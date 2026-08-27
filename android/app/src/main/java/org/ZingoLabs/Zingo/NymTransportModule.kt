@@ -90,7 +90,13 @@ class NymTransportModule internal constructor(reactContext: ReactApplicationCont
             android.util.Log.w("NymTransportModule", "mixnet proxy died: $reason")
             synchronized(handleLock) {
                 when (verdictOnDeath(handle, watched)) {
-                    HandleDeathVerdict.ClearStored -> handle = null
+                    HandleDeathVerdict.ClearStored -> {
+                        // destroy() frees the Rust handle, whose Drop begins
+                        // the off-thread teardown; without it the dead
+                        // proxy's runtime outlives the wrapper.
+                        handle?.destroy()
+                        handle = null
+                    }
                     HandleDeathVerdict.RetainStored -> Unit
                 }
             }
@@ -114,6 +120,7 @@ class NymTransportModule internal constructor(reactContext: ReactApplicationCont
             guardingLinkage {
                 synchronized(handleLock) {
                     handle?.stop()
+                    handle?.destroy()
                     val observer = HandleClearingObserver()
                     val started = MixnetProxyHandle.start(observer)
                     observer.watched = started
@@ -136,6 +143,7 @@ class NymTransportModule internal constructor(reactContext: ReactApplicationCont
             guardingLinkage {
                 synchronized(handleLock) {
                     handle?.stop()
+                    handle?.destroy()
                     handle = null
                 }
             }
