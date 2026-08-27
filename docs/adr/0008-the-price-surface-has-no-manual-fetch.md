@@ -37,3 +37,11 @@ fetched value, and enabling Mixnet Mode is what turns the price surface
 on. Consent alone is also not enough where no market exists: offline
 mode and non-mainnet chains never fetch, since no usable ZEC/USD price
 exists for them.
+
+The consented cadence is fixed: turning the Nym selection on fetches at
+once, and so do a boot and every return from the background whose
+foreground gate opens. Each further fetch follows the last at a uniform
+random delay of five to ten minutes. Traffic follows the consent, never
+the display: a wallet showing ZEC amounts fetches on the same cadence as
+one showing USD, so the price is warm whenever the display wants it and
+the traffic pattern reveals nothing about what the user looks at.

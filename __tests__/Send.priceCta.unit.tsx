@@ -10,17 +10,28 @@
  */
 jest.mock('../components/Components/priceFetcherStore', () => ({
   __esModule: true,
-  PRICE_AUTO_REFRESH_MS: 60_000,
+  PRICE_REFRESH_MIN_MS: 5 * 60_000,
+  PRICE_REFRESH_MAX_MS: 10 * 60_000,
   PRICE_STALE_MS: 5 * 60_000,
   priceFetcherStore: {
     setDeps: jest.fn(),
     attach: jest.fn(() => () => {}),
     subscribe: jest.fn(() => () => {}),
-    snapshot: jest.fn(() => ({ loading: false, cycle: 0 })),
+    snapshot: jest.fn(() => ({
+      loading: false,
+      cycle: 0,
+      nextFetchAt: 0,
+      nextFetchDelayMs: 0,
+    })),
     foregroundReturned: jest.fn(),
     fetch: jest.fn(),
   },
-  usePriceFetcherStore: jest.fn(() => ({ loading: false, cycle: 0 })),
+  usePriceFetcherStore: jest.fn(() => ({
+    loading: false,
+    cycle: 0,
+    nextFetchAt: 0,
+    nextFetchDelayMs: 0,
+  })),
   usePriceStale: jest.fn(() => false),
 }));
 
@@ -99,7 +110,12 @@ const sendUi = (zecPrice: { zecPrice: number; date: number }) => {
 };
 
 beforeEach(() => {
-  storeHook.mockReturnValue({ loading: false, cycle: 0 });
+  storeHook.mockReturnValue({
+    loading: false,
+    cycle: 0,
+    nextFetchAt: 0,
+    nextFetchDelayMs: 0,
+  });
   staleHook.mockReturnValue(false);
   // Send's mount effects call these; the shared RPCModule mock lacks them.
   const { NativeModules } = require('react-native');
@@ -107,7 +123,12 @@ beforeEach(() => {
 });
 
 test('F7: an unattended refresh keeps the send CTA while a price is on screen', () => {
-  storeHook.mockReturnValue({ loading: true, cycle: 0 });
+  storeHook.mockReturnValue({
+    loading: true,
+    cycle: 0,
+    nextFetchAt: 0,
+    nextFetchDelayMs: 0,
+  });
   const view = render(sendUi({ zecPrice: 33.33, date: Date.now() }));
 
   expect(view.queryByTestId('send.refreshing-price')).toBeNull();
@@ -120,7 +141,12 @@ test('F7: an unattended refresh keeps the send CTA while a price is on screen', 
 test('N1: price loading never takes the send CTA, price or no price', () => {
   // Sending needs ZEC amounts, never the USD price; a bootstrapping
   // mixnet must not block sends for the length of every fetch flight.
-  storeHook.mockReturnValue({ loading: true, cycle: 0 });
+  storeHook.mockReturnValue({
+    loading: true,
+    cycle: 0,
+    nextFetchAt: 0,
+    nextFetchDelayMs: 0,
+  });
   const view = render(sendUi({ zecPrice: 0, date: 0 }));
 
   expect(view.queryByTestId('send.refreshing-price')).toBeNull();
@@ -143,7 +169,9 @@ test('F8: the in-form USD amounts dim when the price is stale', () => {
   const formAmounts = view
     .getAllByText(/^\$ /)
     .map(t => StyleSheet.flatten(t.props.style))
-    .filter((s: { fontSize?: number }) => s.fontSize === 16 || s.fontSize === 14);
+    .filter(
+      (s: { fontSize?: number }) => s.fontSize === 16 || s.fontSize === 14,
+    );
   expect(formAmounts.length).toBeGreaterThan(0);
   formAmounts.forEach(s => expect(s.color).toBe('#888888'));
 });
@@ -193,7 +221,6 @@ test('N7: the send-confirmation conversions dim on a stale price too', () => {
         nym: true,
       },
     },
-     
   } as any;
   const view = render(
     <ContextAppLoadedProvider value={state}>

@@ -20,7 +20,10 @@ import PriceFetcher, {
   PriceTrafficDriver,
 } from '../components/Components/PriceFetcher';
 import QuoteRefreshRing from '../components/Components/QuoteRefreshRing';
-import { priceFetcherStore } from '../components/Components/priceFetcherStore';
+import {
+  PRICE_REFRESH_MAX_MS,
+  priceFetcherStore,
+} from '../components/Components/priceFetcherStore';
 import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
@@ -29,7 +32,6 @@ import { SelectServerEnum } from '../app/AppState';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 
 beforeEach(() => {
-
   priceFetcherStore.resetForTests();
 });
 
@@ -51,12 +53,17 @@ const fetcherUi = (ctx: Ctx) => (
   </ContextAppLoadedProvider>
 );
 
-
 type JsonNode = any;
-const collect = (node: JsonNode, hits: JsonNode[], pick: (n: JsonNode) => boolean) => {
+const collect = (
+  node: JsonNode,
+  hits: JsonNode[],
+  pick: (n: JsonNode) => boolean,
+) => {
   if (!node || typeof node !== 'object') return;
   if (pick(node)) hits.push(node);
-  (node.children ?? []).forEach((child: JsonNode) => collect(child, hits, pick));
+  (node.children ?? []).forEach((child: JsonNode) =>
+    collect(child, hits, pick),
+  );
 };
 
 test('F8: the stale arc keeps a color of its own, distinct from the track', () => {
@@ -106,7 +113,9 @@ test('R4: the ring restarts on every refresh cycle, failed ones included', async
   await jest.advanceTimersByTimeAsync(0);
   const firstCycle = view.UNSAFE_getByType(QuoteRefreshRing).props.resetKey;
 
-  await jest.advanceTimersByTimeAsync(60_000); // a second refused cycle
+  // Past the longest draw plus both bounded attempts: a second refused
+  // cycle has completed and redrawn.
+  await jest.advanceTimersByTimeAsync(PRICE_REFRESH_MAX_MS + 61_000);
   const secondCycle = view.UNSAFE_getByType(QuoteRefreshRing).props.resetKey;
 
   // A frozen full ring would misreport a failing refresh as complete.

@@ -34,8 +34,10 @@ type QuoteRefreshRingProps = {
   trackColor: string;
   /** Time for the ring to go empty → full (matches the refresh interval). */
   durationMs: number;
-  /** Change this to restart the fill from 0 (e.g. the quote's receivedAtMs). */
+  /** Change this to restart the fill (e.g. the quote's receivedAtMs). */
   resetKey: number | string;
+  /** Fill fraction a restart begins at, for a ring mounted mid-cycle. */
+  startProgress?: number;
   /** Omit for a display-only ring (no press affordance at all). */
   onPress?: () => void;
   disabled?: boolean;
@@ -52,6 +54,7 @@ export default function QuoteRefreshRing({
   trackColor,
   durationMs,
   resetKey,
+  startProgress,
   onPress,
   disabled,
   accessibilityLabel,
@@ -59,16 +62,21 @@ export default function QuoteRefreshRing({
   testID,
 }: QuoteRefreshRingProps) {
   const progress = useRef(new Animated.Value(0)).current;
+  // A ref, so a re-render's fresher phase never restarts the animation:
+  // only resetKey (and a changed duration) may.
+  const startProgressRef = useRef(0);
+  startProgressRef.current = Math.min(Math.max(startProgress ?? 0, 0), 1);
   const strokeWidth = 2;
   const center = size / 2;
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
 
   useEffect(() => {
-    progress.setValue(0);
+    const from = startProgressRef.current;
+    progress.setValue(from);
     const anim = Animated.timing(progress, {
       toValue: 1,
-      duration: durationMs,
+      duration: durationMs * (1 - from),
       easing: Easing.linear,
       // strokeDashoffset is not supported by the native driver.
       useNativeDriver: false,

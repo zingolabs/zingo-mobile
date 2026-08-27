@@ -12,15 +12,17 @@ import { MixnetStatusKey } from '../../app/walletBackend/transforms/mixnetPresen
  * the consent bit in its deps, so the displayed currency never decides
  * what may be fetched; PriceFetcher and usePriceFetcherStore only
  * observe. The store owns the whole lifecycle:
- *   - ONE auto-refresh timer while the driver is attached, the app is in
- *     the foreground, and the transport is not a refusing verdict ('off'
- *     or 'died'); a background transition pauses it, and iOS 'inactive'
- *     (Control Center, the app's own Face ID sheet) is a non-event.
- *   - A fetch when LoadedApp's foreground gate opens after a real
- *     background return (never on the raw AppState event, which can race
- *     a locked, unauthenticated wallet), and on attach when the context
- *     holds no fresh price. Entry fetches inside the cooldown of the
- *     last start (attach) or last success (return) yield to the cadence.
+ *   - ONE auto-refresh timer while the driver is attached, the gate-open
+ *     foreground holds, and the transport is not a refusing verdict
+ *     ('off' or 'died'): each fetch schedules the next at a uniform
+ *     random delay of five to ten minutes. A background transition
+ *     pauses the cadence, and iOS 'inactive' (Control Center, the app's
+ *     own Face ID sheet) is a non-event.
+ *   - A fetch at every entry: attach (boot), the Nym consent turning
+ *     on, and LoadedApp's foreground gate opening after a real
+ *     background return (never on the raw AppState event, which races a
+ *     locked, unauthenticated wallet). Entry fetches inside the burst
+ *     cooldown of the last start or last success yield to the cadence.
  *   - The ready follow-up: an unattended fetch refused during bootstrap
  *     arms a one-shot fetch that fires when the Indicator turns ready.
  *     It is dropped on a background transition and on a 'died' or 'off'
@@ -30,7 +32,10 @@ import { MixnetStatusKey } from '../../app/walletBackend/transforms/mixnetPresen
  *     cue (see usePriceStale) is the only failure signal.
  */
 
-export const PRICE_AUTO_REFRESH_MS = 60_000;
+// ADR 0008 cadence: each fetch schedules the next at a uniform draw
+// from this window.
+export const PRICE_REFRESH_MIN_MS = 5 * 60_000;
+export const PRICE_REFRESH_MAX_MS = 10 * 60_000;
 // A price older than this wall-clock age is stale (CONTEXT.md: Stale price).
 export const PRICE_STALE_MS = 5 * 60_000;
 // The JS-side bound on one native price call: a wedged FFI promise must
@@ -73,9 +78,13 @@ let lastFetchStartAt = 0;
 let lastSuccessAt = 0;
 let lastReturnFetchAt = 0;
 let nativeCallStartedAt = 0;
-// Bumped at every fetch completion, success or failure, so the ring can
-// restart its fill for the cycle that actually begins.
+// Bumped at every fetch completion, success or failure.
 let cycle = 0;
+// The armed tick's deadline and the delay it was drawn with, so the
+// ring can render the cadence that is actually running; 0 until the
+// first schedule.
+let nextFetchAt = 0;
+let nextFetchDelayMs = 0;
 // The single in-flight native call: a wedged one is raced against the
 // bound and reused by later attempts, never multiplied into a pile of
 // orphaned FFI calls each pinning a native thread.
@@ -119,12 +128,17 @@ function surfaceMayFetch(): boolean {
 function scheduleAuto(): void {
   clearAuto();
   if (!surfaceMayFetch()) return;
+  nextFetchDelayMs =
+    PRICE_REFRESH_MIN_MS +
+    Math.random() * (PRICE_REFRESH_MAX_MS - PRICE_REFRESH_MIN_MS);
+  nextFetchAt = Date.now() + nextFetchDelayMs;
   autoTimer = setTimeout(() => {
     // Null the handle first: a tick that fires into a state doFetch
     // refuses must not leave a dead handle blocking every reschedule.
     autoTimer = null;
     doFetch('timer').catch(() => {});
-  }, PRICE_AUTO_REFRESH_MS);
+  }, nextFetchDelayMs);
+  emit();
 }
 
 function startNativeCall(): Promise<{ price: number; error: string }> {
@@ -151,10 +165,7 @@ function startNativeCall(): Promise<{ price: number; error: string }> {
 async function boundedPrice(): Promise<number> {
   let bound: ReturnType<typeof setTimeout> | undefined;
   const expiry = new Promise<{ price: number }>(resolve => {
-    bound = setTimeout(
-      () => resolve({ price: -3 }),
-      PRICE_FETCH_TIMEOUT_MS,
-    );
+    bound = setTimeout(() => resolve({ price: -3 }), PRICE_FETCH_TIMEOUT_MS);
   });
   try {
     const { price } = await Promise.race([startNativeCall(), expiry]);
@@ -212,11 +223,13 @@ async function doFetch(kind: FetchKind): Promise<void> {
   } finally {
     loading = false;
     cycle++;
-    emit();
     scheduleAuto();
+    emit();
     if (entryPending && surfaceMayFetch() && deps) {
-      // The return that landed inside this flight gets its fetch.
+      // The return that landed inside this flight gets its fetch and
+      // stamps the hop rate bound, exactly as an unparked return does.
       entryPending = false;
+      lastReturnFetchAt = Date.now();
       doFetch('entry').catch(() => {});
     }
     pump(); // a follow-up that turned ready mid-flight fires now
@@ -242,28 +255,18 @@ function pump(): void {
   }
 }
 
-// Fetch when the context holds no fresh price, otherwise start the
-// cadence: the seam attach and setDeps share. A running timer or flight
-// means the cadence already owns the surface, and a start inside the
-// burst cooldown (a remount storm) yields to it too.
+// The seam attach and setDeps share: every entry (boot, the consent
+// turning on, a recovered surface) fetches at once. A running timer or
+// flight means the cadence already owns the surface, and a start inside
+// the burst cooldown (a remount storm) yields to it too.
 function entryOrSchedule(): void {
-  if (
-    !deps ||
-    !deps.nymSelected ||
-    attachCount === 0 ||
-    appAway ||
-    loading ||
-    autoTimer ||
-    transportRefuses()
-  ) {
+  if (!surfaceMayFetch() || loading || autoTimer) {
     return;
   }
   if (Date.now() - lastFetchStartAt < FETCH_BURST_COOLDOWN_MS) {
     scheduleAuto();
-  } else if (Date.now() - deps.priceDate > PRICE_AUTO_REFRESH_MS) {
-    doFetch('entry').catch(() => {});
   } else {
-    scheduleAuto();
+    doFetch('entry').catch(() => {});
   }
 }
 
@@ -273,14 +276,11 @@ function onAppStateChange(next: string): void {
     followUpArmed = false;
     entryPending = false;
     clearAuto();
-  } else if (next === 'active') {
-    // The bare event only lifts the pause. Fetching AND the cadence wait
-    // for LoadedApp's foreground gate to open (foregroundReturned): a
-    // locked wallet must not emit price traffic, and an armed timer
-    // behind the gate would fire a tick at it sixty seconds later.
-    appAway = false;
   }
-  // 'inactive' and 'unknown' prove nothing and change nothing.
+  // 'active' proves nothing about the wallet's lock state, so only the
+  // open foreground gate (foregroundReturned) ends the pause: a locked
+  // wallet's re-renders must find the surface still away. 'inactive'
+  // and 'unknown' prove nothing and change nothing.
 }
 
 export const priceFetcherStore = {
@@ -318,15 +318,17 @@ export const priceFetcherStore = {
     };
   },
   /**
-   * The grilled every-real-return-fetches trigger, called by LoadedApp
-   * once its foreground gate has opened. A return inside a flight parks
-   * the fetch for the flight's landing; a return within the burst
-   * cooldown of a SUCCESS rides the price that fetch just brought; and
-   * hops during a failure window are rate-bound by the last
-   * return-triggered fetch, so one recent failure never excuses a
-   * return while a storm of hops cannot multiply into one fetch each.
+   * The every-real-return-fetches trigger, called by LoadedApp once its
+   * foreground gate has opened, and the only place the background pause
+   * ends. A return inside a flight parks the fetch for the flight's
+   * landing; a return within the burst cooldown of a SUCCESS rides the
+   * price that fetch just brought; and hops during a failure window are
+   * rate-bound by the last return-triggered fetch, so one recent
+   * failure never excuses a return while a storm of hops cannot
+   * multiply into one fetch each.
    */
   foregroundReturned(): void {
+    appAway = false;
     if (!surfaceMayFetch()) return;
     if (loading) {
       entryPending = true;
@@ -342,8 +344,13 @@ export const priceFetcherStore = {
       doFetch('entry').catch(() => {});
     }
   },
-  snapshot(): { loading: boolean; cycle: number } {
-    return { loading, cycle };
+  snapshot(): {
+    loading: boolean;
+    cycle: number;
+    nextFetchAt: number;
+    nextFetchDelayMs: number;
+  } {
+    return { loading, cycle, nextFetchAt, nextFetchDelayMs };
   },
   /** Test-only: forget the burst clocks, the arm state, and any wedged in-flight native call. */
   resetForTests(): void {
@@ -351,6 +358,8 @@ export const priceFetcherStore = {
     lastSuccessAt = 0;
     lastReturnFetchAt = 0;
     nativeCallStartedAt = 0;
+    nextFetchAt = 0;
+    nextFetchDelayMs = 0;
     followUpArmed = false;
     entryPending = false;
     nativeCall = null;

@@ -115,7 +115,7 @@ and glyphs), `border` (strokes). Unqualified "surface" always means this
 axis; the raised-panel role is always written out as `bgSurface`.
 
 **Role**:
-The meaning half of a token name — what the color is *for* (Canvas, Muted,
+The meaning half of a token name — what the color is _for_ (Canvas, Muted,
 Accent, Danger), as opposed to which surface carries it.
 
 **Family**:
@@ -211,6 +211,7 @@ acceleration, which requires the guest to match the x86_64 host: x86_64
 and 32-bit x86 only. Calling one of these "primary" is wrong; an
 emulator ABI in a test lane reflects a hosting constraint, not which
 library matters most.
+
 ## Build identity
 
 **Build descriptor** — the string `get_version()` reports: a zingolib
@@ -260,6 +261,12 @@ authority, and no fetch failure raises a snackbar. The display currency
 chooses what to show, never what may be fetched.
 _Avoid_: manual fetch (removed; every fetch is app-initiated); USD
 selection as consent (the seeded default authorizes nothing)
+
+**Cadence**:
+The consented fetch rhythm: boot, the Nym selection turning on, and
+every gate-open return from the background fetch at once, and each
+further fetch follows the last at a uniform random delay of five to ten
+minutes.
 
 **Ready follow-up**:
 The one-shot fetch armed when an unattended fetch is refused during

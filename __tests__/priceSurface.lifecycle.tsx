@@ -26,6 +26,7 @@ import PriceFetcher, {
   PriceTrafficDriver,
 } from '../components/Components/PriceFetcher';
 import {
+  PRICE_REFRESH_MAX_MS,
   priceFetcherStore,
   usePriceFetcherStore,
 } from '../components/Components/priceFetcherStore';
@@ -90,14 +91,12 @@ const fetcherUi = (ctx: Ctx, setZecPrice: (p: number, d: number) => void) => (
   </ContextAppLoadedProvider>
 );
 
-const foregroundReturned = () =>
-  priceFetcherStore.foregroundReturned();
+const foregroundReturned = () => priceFetcherStore.foregroundReturned();
 
 // Emulates the deps a previous USD session left behind, so the entry-fetch
 // paths run in both the broken and the fixed store. The shape is a
 // superset of both eras' Deps.
 const seedDeps = (setZecPrice: (p: number, d: number) => void) => {
-
   priceFetcherStore.setDeps({
     setZecPrice,
     mixnetStatusKey: 'mixnet.status.off',
@@ -112,17 +111,17 @@ const removeSpies: jest.Mock[] = [];
 
 beforeAll(() => {
   const { AppState } = require('react-native');
-  jest
-    .spyOn(AppState, 'addEventListener')
-    .mockImplementation(((event: string, handler: (next: string) => void) => {
-      if (event === 'change') {
-        appStateHandlers.push(handler);
-      }
-      const remove = jest.fn();
-      removeSpies.push(remove);
-      return { remove };
-
-    }) as any);
+  jest.spyOn(AppState, 'addEventListener').mockImplementation(((
+    event: string,
+    handler: (next: string) => void,
+  ) => {
+    if (event === 'change') {
+      appStateHandlers.push(handler);
+    }
+    const remove = jest.fn();
+    removeSpies.push(remove);
+    return { remove };
+  }) as any);
 });
 
 const fireAppState = (next: string) => {
@@ -147,9 +146,12 @@ test('F1: a cold start with no price fetches once the surface mounts', async () 
 
   render(fetcherUi(makeCtx(), setZecPrice));
 
-  await waitFor(() => expect(setZecPrice).toHaveBeenCalledWith(42, expect.any(Number)), {
-    timeout: 1500,
-  });
+  await waitFor(
+    () => expect(setZecPrice).toHaveBeenCalledWith(42, expect.any(Number)),
+    {
+      timeout: 1500,
+    },
+  );
 });
 
 test('F2: observing the store snapshot never starts price traffic', async () => {
@@ -203,7 +205,8 @@ test('F4: a throwing fetch neither pins loading nor kills the timer', async () =
   render(fetcherUi(makeCtx(), setZecPrice));
   await jest.advanceTimersByTimeAsync(0); // the entry fetch throws
 
-  await jest.advanceTimersByTimeAsync(60_000); // the next tick must run
+  // Past the longest draw: the next tick must run.
+  await jest.advanceTimersByTimeAsync(PRICE_REFRESH_MAX_MS + 1_000);
   expect(setZecPrice).toHaveBeenCalledWith(42, expect.any(Number));
 });
 
@@ -270,7 +273,10 @@ test('F6: a follow-up arriving mid-flight fires after the flight, not never', as
         settleTick = resolve;
       }),
   );
-  await jest.advanceTimersByTimeAsync(60_000); // the timer flight takes off
+  // Advance exactly to the drawn deadline: the timer flight takes off
+  // and stays in flight (its 30 s bound has not yet expired).
+  const { nextFetchAt } = priceFetcherStore.snapshot();
+  await jest.advanceTimersByTimeAsync(nextFetchAt - Date.now() + 1);
   const inFlight = price.mock.calls.length;
 
   // The Indicator turns ready while the flight is up.
@@ -322,7 +328,8 @@ test('R1: a hung fetch releases the surface and recovers once it settles', async
 
   settleLate({ price: -1, error: 'late' }); // the native side frees up
   await jest.advanceTimersByTimeAsync(0);
-  await jest.advanceTimersByTimeAsync(60_000); // the next tick runs fresh
+  // Past the longest draw: the next tick runs fresh.
+  await jest.advanceTimersByTimeAsync(PRICE_REFRESH_MAX_MS + 1_000);
   expect(setZecPrice).toHaveBeenCalledWith(42, expect.any(Number));
 });
 
@@ -365,7 +372,9 @@ test('R3: a transport turning ready mid-flight still gets the follow-up', async 
 
 test('R3: a timer refusal during bootstrap arms the follow-up too', async () => {
   jest.useFakeTimers();
-  price.mockResolvedValue({ price: -1, error: 'refused' });
+  price
+    .mockResolvedValueOnce({ price: 42, error: '' }) // the boot fetch lands
+    .mockResolvedValue({ price: -1, error: 'refused' });
   const setZecPrice = jest.fn();
   const freshDate = Date.now();
 
@@ -379,15 +388,16 @@ test('R3: a timer refusal during bootstrap arms the follow-up too', async () => 
 
   const ctx = makeCtx({
     mixnetView: INITIAL_MIXNET_VIEW,
-    zecPrice: { zecPrice: 42, date: freshDate }, // fresh: no entry fetch
+    zecPrice: { zecPrice: 42, date: freshDate },
   });
   const view = render(fetcherUi(ctx, setZecPrice));
   await jest.advanceTimersByTimeAsync(0);
-  expect(price).not.toHaveBeenCalled();
+  expect(price).toHaveBeenCalledTimes(1); // the boot fetch, no arm
 
-  await jest.advanceTimersByTimeAsync(60_000); // the tick is refused
+  // Past the longest draw: the tick is refused during bootstrap.
+  await jest.advanceTimersByTimeAsync(PRICE_REFRESH_MAX_MS + 1_000);
   const afterTimer = price.mock.calls.length;
-  expect(afterTimer).toBeGreaterThan(0);
+  expect(afterTimer).toBeGreaterThan(1);
 
   view.rerender(
     fetcherUi(

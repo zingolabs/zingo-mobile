@@ -24,15 +24,15 @@ import { render, waitFor } from '@testing-library/react-native';
 import PriceFetcher, {
   PriceTrafficDriver,
 } from '../components/Components/PriceFetcher';
-import { priceFetcherStore } from '../components/Components/priceFetcherStore';
+import {
+  PRICE_REFRESH_MAX_MS,
+  priceFetcherStore,
+} from '../components/Components/priceFetcherStore';
 import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
 } from '../app/context';
-import {
-  ChainNameEnum,
-  SelectServerEnum,
-} from '../app/AppState';
+import { ChainNameEnum, SelectServerEnum } from '../app/AppState';
 import { getZecPrice } from '../app/walletBackend';
 import { MixnetView } from '../app/walletBackend/transforms/mixnetPresenter';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
@@ -87,15 +87,15 @@ const appStateHandlers: Array<(next: string) => void> = [];
 
 beforeAll(() => {
   const { AppState } = require('react-native');
-  jest
-    .spyOn(AppState, 'addEventListener')
-    .mockImplementation(((event: string, handler: (next: string) => void) => {
-      if (event === 'change') {
-        appStateHandlers.push(handler);
-      }
-      return { remove: jest.fn() };
-
-    }) as any);
+  jest.spyOn(AppState, 'addEventListener').mockImplementation(((
+    event: string,
+    handler: (next: string) => void,
+  ) => {
+    if (event === 'change') {
+      appStateHandlers.push(handler);
+    }
+    return { remove: jest.fn() };
+  }) as any);
 });
 
 const fireAppState = (next: string) => {
@@ -121,11 +121,11 @@ test('P1: a tick fired into a refusing window never wedges the cadence', async (
 
   const ctx = makeCtx({
     mixnetView: READY_VIEW,
-    zecPrice: { zecPrice: 42, date: freshDate }, // fresh: cadence only
+    zecPrice: { zecPrice: 42, date: freshDate },
   });
   const view = render(surfaceUi(ctx, setZecPrice));
   await jest.advanceTimersByTimeAsync(0);
-  expect(price).not.toHaveBeenCalled(); // armed, not fetching
+  expect(price).toHaveBeenCalledTimes(1); // the boot fetch, then the cadence
 
   // The transport dies; the pending tick fires into the refusing window.
   view.rerender(
@@ -137,8 +137,8 @@ test('P1: a tick fired into a refusing window never wedges the cadence', async (
       setZecPrice,
     ),
   );
-  await jest.advanceTimersByTimeAsync(60_000);
-  expect(price).not.toHaveBeenCalled(); // refused, correctly
+  await jest.advanceTimersByTimeAsync(PRICE_REFRESH_MAX_MS + 1_000);
+  expect(price).toHaveBeenCalledTimes(1); // refused, correctly
 
   // The transport recovers: the cadence must come back.
   view.rerender(
@@ -150,8 +150,8 @@ test('P1: a tick fired into a refusing window never wedges the cadence', async (
       setZecPrice,
     ),
   );
-  await jest.advanceTimersByTimeAsync(61_000);
-  expect(price).toHaveBeenCalled();
+  await jest.advanceTimersByTimeAsync(0);
+  expect(price.mock.calls.length).toBeGreaterThan(1);
 });
 
 test('P2: a wedged native call retires after its TTL and a fresh one runs', async () => {
@@ -162,9 +162,9 @@ test('P2: a wedged native call retires after its TTL and a fresh one runs', asyn
   const setZecPrice = jest.fn();
 
   render(surfaceUi(makeCtx(), setZecPrice));
-  // Entry: both bounded attempts ride the one wedged call. Ticks keep
-  // reattaching to the corpse until its TTL retires it.
-  await jest.advanceTimersByTimeAsync(6 * 60_000);
+  // Entry: both bounded attempts ride the one wedged call. The next tick
+  // lands after the corpse's TTL and retires it.
+  await jest.advanceTimersByTimeAsync(60_000 + PRICE_REFRESH_MAX_MS + 1_000);
 
   expect(price.mock.calls.length).toBeGreaterThan(1); // a fresh call ran
   expect(setZecPrice).toHaveBeenCalledWith(42, expect.any(Number));

@@ -6,7 +6,7 @@ import { ChainNameEnum, SelectServerEnum } from '../../app/AppState';
 import RegText from './RegText';
 import QuoteRefreshRing from './QuoteRefreshRing';
 import {
-  PRICE_AUTO_REFRESH_MS,
+  PRICE_REFRESH_MIN_MS,
   priceFetcherStore,
   usePriceFetcherStore,
   usePriceStale,
@@ -62,7 +62,7 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
   const bg = backgroundColor ?? colors.bgCanvas;
 
   // Shared state across every mounted PriceFetcher.
-  const { loading, cycle } = usePriceFetcherStore();
+  const { loading, nextFetchAt, nextFetchDelayMs } = usePriceFetcherStore();
   const stale = usePriceStale(zecPrice.date);
 
   // Without the Nym consent no cadence exists, and under an 'off' or
@@ -106,11 +106,16 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
 
   // A price that never arrived and a stale one share the muted look (a
   // value still distinct from the track) but not the label: screen
-  // readers hear which of the two facts holds. The ring restarts on
-  // every completed fetch cycle, failed ones included, so a full ring
-  // always means a refresh really is due.
+  // readers hear which of the two facts holds. The ring keys on the
+  // armed tick's deadline and starts at the cycle's true phase, so a
+  // full ring always means a refresh really is due, on any mount.
   const absent = !zecPrice.date;
   const muted = stale || absent;
+  const cadenceMs = nextFetchDelayMs || PRICE_REFRESH_MIN_MS;
+  const elapsedFraction = Math.min(
+    Math.max(1 - (nextFetchAt - Date.now()) / cadenceMs, 0),
+    1,
+  );
   return (
     <View style={containerStyle}>
       {textBefore && (
@@ -119,12 +124,11 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
       <QuoteRefreshRing
         size={22}
         color={muted ? colors.fgMuted : colors.fgAccent}
-        ringColor={
-          muted ? 'rgba(255,255,255,0.30)' : 'rgba(255,255,255,0.55)'
-        }
+        ringColor={muted ? 'rgba(255,255,255,0.30)' : 'rgba(255,255,255,0.55)'}
         trackColor={'rgba(255,255,255,0.12)'}
-        durationMs={PRICE_AUTO_REFRESH_MS}
-        resetKey={cycle}
+        durationMs={cadenceMs}
+        resetKey={nextFetchAt}
+        startProgress={elapsedFraction}
         accessibilityLabel={
           translate(
             absent
