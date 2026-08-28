@@ -1,5 +1,5 @@
 /**
- * Evidence tests for the seventh review round on PR 1343. Each test
+ * Evidence tests for the seventh review of PR 1343. Each test
  * encodes the behavior the finding says the surface should have: it
  * fails on the broken code and passes once the finding is fixed.
  *
@@ -215,12 +215,12 @@ test('H9: no any-casts in the price suites and no null in the store', () => {
     'priceSurface.cadence.tsx',
     'priceSurface.cue.tsx',
     'priceSurface.lifecycle.tsx',
-    'priceSurface.round3.tsx',
-    'priceSurface.round4.tsx',
-    'priceSurface.round5.tsx',
-    'priceSurface.round6.tsx',
-    'priceSurface.round7.tsx',
-    'priceSurface.round8.tsx',
+    'pr1343.review3.tsx',
+    'pr1343.review4.tsx',
+    'pr1343.review5.tsx',
+    'pr1343.review6.tsx',
+    'pr1343.review7.tsx',
+    'pr1343.review8.tsx',
     'Send.priceCta.unit.tsx',
     'PriceFetcher.snapshot.tsx',
   ];

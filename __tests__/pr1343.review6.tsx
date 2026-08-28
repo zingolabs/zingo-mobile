@@ -1,5 +1,5 @@
 /**
- * Evidence tests for the sixth review round on PR 1343. Each test
+ * Evidence tests for the sixth review of PR 1343. Each test
  * encodes the behavior the finding says the surface should have: it
  * fails on the broken code and passes once the finding is fixed.
  *
@@ -288,7 +288,7 @@ test('G10: the ring fills from coarse ticks, not a per-frame animation', async (
       durationMs={60_000}
       resetKey={1}
       accessibilityLabel="ring"
-      testID="round6.ring"
+      testID="review6.ring"
     />,
   );
   await jest.advanceTimersByTimeAsync(30_000);

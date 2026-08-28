@@ -9,7 +9,7 @@
  *     stale hook is mocked as a function of the priceDate it receives,
  *     so a Confirm or Send row that drops its priceDate wiring goes
  *     back to full strength and the test fails.
- * H3 (round seven): the USD-entry derived ZEC amount, the figure that
+ * H3 (PR 1343 review seven): the USD-entry derived ZEC amount, the figure that
  *     decides what is sent, carries the same stale dim.
  */
 jest.mock('../components/Components/priceFetcherStore', () => ({

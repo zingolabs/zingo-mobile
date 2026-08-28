@@ -1,5 +1,5 @@
 /**
- * Evidence tests for the eighth review round on PR 1343. Each test
+ * Evidence tests for the eighth review of PR 1343. Each test
  * encodes the behavior the finding says the surface should have: it
  * fails on the broken code and passes once the finding is fixed.
  *

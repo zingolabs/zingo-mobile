@@ -1,5 +1,5 @@
 /**
- * Evidence tests for the fifth review round on PR 1343: one verdict
+ * Evidence tests for the fifth review of PR 1343: one verdict
  * test per finding of Juanky's review, plus one the round surfaced.
  * Each test encodes the behavior the surface should have: it fails on
  * the broken code and passes once the finding is fixed.
