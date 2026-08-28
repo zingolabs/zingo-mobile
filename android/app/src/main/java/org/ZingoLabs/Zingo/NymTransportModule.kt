@@ -75,10 +75,11 @@ class NymTransportModule internal constructor(reactContext: ReactApplicationCont
          * can throw, so a failed restart never strands a destroyed wrapper.
          */
         private fun releaseHandle() {
-            // destroy() frees the Rust Arc, whose Drop is the whole ordered
-            // off-thread teardown; Swift mirrors this through ARC release.
-            handle?.destroy()
+            // destroy() frees the Rust Arc, whose Drop runs the ordered
+            // off-thread teardown.
+            val stored = handle
             handle = null
+            stored?.destroy()
         }
     }
 
