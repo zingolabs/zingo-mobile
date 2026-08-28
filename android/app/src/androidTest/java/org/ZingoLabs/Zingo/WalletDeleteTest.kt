@@ -61,11 +61,24 @@ class WalletDeleteTest {
             for (suffix in suffixes) file("$name$suffix").delete()
         }
         file(swapName).delete()
+        RPCModule.walletFileClosed = false
         uniffi.zingo.initLogging()
         uniffi.zingo.setCryptoDefaultProviderToRing()
         uniffi.zingo.initFromSeed(Seeds.HOSPITAL, 2000000u, "", "main", "Medium", 1u)
         plainWallet = uniffi.zingo.saveWalletBytes()!!
         file(mainName).writeBytes(plainWallet)
+    }
+
+    @Test
+    fun aSaveAfterDeleteIsRefusedUntilTheNextLoad() {
+        assertThat(deleteWallet()).isEqualTo(true)
+
+        assertThat(rpcModule.saveWalletFile()).isFalse()
+        assertThat(file(mainName).exists()).isFalse()
+
+        file(mainName).writeBytes(plainWallet)
+        rpcModule.loadExistingWalletNative("", "main", "Medium", "1")
+        assertThat(rpcModule.saveWalletFile()).isTrue()
     }
 
     @Test

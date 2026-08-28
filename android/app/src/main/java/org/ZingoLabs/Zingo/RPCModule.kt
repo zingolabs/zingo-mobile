@@ -46,6 +46,14 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     // can replay a transient Keystore failure (DoubleWrapReproTest).
     internal var legacyDecrypt: (String) -> String = { readEncryptedFile(it) }
 
+    companion object {
+        // Set by delete and restore, cleared by the next successful wallet
+        // init: a stray save of the in-memory wallet must not resurrect a
+        // file the user replaced.
+        @Volatile
+        internal var walletFileClosed = false
+    }
+
     fun fileExists(fileName: String): Boolean {
         // Check if a file already exists
         val file = File(applicationContext.filesDir, fileName)
@@ -280,11 +288,19 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             val walletBytes = uniffi.zingo.saveWalletBytes()
             if (walletBytes == null) {
                 Log.i("MAIN", "[Native] No need to save the wallet.")
+                true
             } else {
                 Log.i("MAIN", "[Native] file size: ${walletBytes.size} bytes")
-                PlainWalletFile.write(applicationContext.filesDir, WalletFileName.value, walletBytes)
+                PlainWalletFile.locked {
+                    if (walletFileClosed) {
+                        Log.w("MAIN", "[Native] wallet file closed, save refused")
+                        false
+                    } else {
+                        PlainWalletFile.write(applicationContext.filesDir, WalletFileName.value, walletBytes)
+                        true
+                    }
+                }
             }
-            true
         } catch (e: Exception) {
             Log.e("MAIN", "[Native] Unexpected error. Couldn't save the wallet. $e")
             false
@@ -293,6 +309,10 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     private fun saveWalletBackupFile(): Boolean {
         return try {
+            if (walletFileClosed) {
+                Log.w("MAIN", "[Native] wallet file closed, backup save refused")
+                return false
+            }
             val content = readFileAsB64(WalletFileName.value)
             writePlainFromB64(WalletBackupFileName.value, content)
             true
@@ -504,6 +524,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             // `birthday` in place of the chain tip; online it is ignored
             // (pass "0").
             val resp = uniffi.zingo.initNew(serveruri, birthday.toUInt(), chainhint, performancelevel, minconfirmations.toUInt())
+            walletFileClosed = false
             saveWalletFile()
             resp
         }
@@ -515,6 +536,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             uniffi.zingo.initLogging()
 
             val resp = uniffi.zingo.initFromSeed(seed, birthday.toUInt(), serveruri, chainhint, performancelevel, minconfirmations.toUInt())
+            walletFileClosed = false
             saveWalletFile()
             resp
         }
@@ -526,6 +548,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             uniffi.zingo.initLogging()
 
             val resp = uniffi.zingo.initFromUfvk(ufvk, birthday.toUInt(), serveruri, chainhint, performancelevel, minconfirmations.toUInt())
+            walletFileClosed = false
             saveWalletFile()
             resp
         }
@@ -547,6 +570,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         Log.i("MAIN", "file size: ${fileb64.length} chars (Base64)")
 
         val resp = uniffi.zingo.initFromB64(fileb64, serveruri, chainhint, performancelevel, minconfirmations.toUInt())
+        walletFileClosed = false
         migrateRetainedWallet()
         return resp
     }
@@ -573,6 +597,9 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 promise.resolve(false)
                 return
             }
+            // Closed across the swap; the reload after a successful restore
+            // clears it.
+            walletFileClosed = true
             if (fileExists(WalletFileName.value)) {
                 // Durable swap via temp file (audit Issue P (b)): the temp
                 // copy written at step (1) is what `completePendingSwap`
@@ -631,6 +658,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         val deleted = PlainWalletFile.locked {
             val gone = fileExists(WalletFileName.value) && deleteFile(WalletFileName.value)
             if (!fileExists(WalletFileName.value)) {
+                walletFileClosed = true
                 deleteWalletSidecars(WalletFileName.value)
                 File(applicationContext.filesDir, "${WalletTempSwapFileName.value}.plain.tmp").delete()
             }

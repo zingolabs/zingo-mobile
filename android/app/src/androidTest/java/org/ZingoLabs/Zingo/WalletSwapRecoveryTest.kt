@@ -55,6 +55,7 @@ class WalletSwapRecoveryTest {
             for (suffix in suffixes) file("$name$suffix").delete()
         }
         file(swapName).delete()
+        RPCModule.walletFileClosed = false
         uniffi.zingo.initLogging()
         uniffi.zingo.setCryptoDefaultProviderToRing()
         walletA = offlineWallet(2000000u)
