@@ -1,7 +1,8 @@
 /**
- * Evidence tests for the third review of PR 1343. Each test encodes
- * the behavior the finding says the surface should have: it fails on the
- * broken code and passes once the finding is fixed.
+ * What may start price traffic: the guards on entries, consent,
+ * transport, and the foreground gate, distilled from the reviews of
+ * PR 1343. Each test encodes the behavior a finding says the surface
+ * should have: it fails on the broken code and passes once fixed.
  *
  * N2: the attach/entry path is rate-limited against remount storms.
  * N3: a withdrawn Nym consent stops the mid-flight retry and the write.

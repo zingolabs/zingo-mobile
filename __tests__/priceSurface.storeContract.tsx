@@ -1,7 +1,9 @@
 /**
- * Evidence tests for the seventh review of PR 1343. Each test
- * encodes the behavior the finding says the surface should have: it
- * fails on the broken code and passes once the finding is fixed.
+ * The store's observable contract: snapshot shape and identity, deps
+ * writes, the disposition switch, and the display-only ring,
+ * distilled from the reviews of PR 1343. Each test encodes the
+ * behavior a finding says the surface should have: it fails on the
+ * broken code and passes once fixed.
  *
  * H1: withdrawing the consent takes the ring down with the cadence.
  * H2: an entry flight with no armed deadline never reads as full.
@@ -215,12 +217,12 @@ test('H9: no any-casts in the price suites and no null in the store', () => {
     'priceSurface.cadence.tsx',
     'priceSurface.cue.tsx',
     'priceSurface.lifecycle.tsx',
-    'pr1343.review3.tsx',
-    'pr1343.review4.tsx',
-    'pr1343.review5.tsx',
-    'pr1343.review6.tsx',
-    'pr1343.review7.tsx',
-    'pr1343.review8.tsx',
+    'priceSurface.trafficGuards.tsx',
+    'priceSurface.wedges.tsx',
+    'priceSurface.soleConsent.tsx',
+    'priceSurface.landings.tsx',
+    'priceSurface.storeContract.tsx',
+    'priceSurface.recovery.tsx',
     'Send.priceCta.unit.tsx',
     'PriceFetcher.snapshot.tsx',
   ];

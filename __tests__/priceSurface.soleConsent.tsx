@@ -1,8 +1,9 @@
 /**
- * Evidence tests for the fifth review of PR 1343: one verdict
- * test per finding of Juanky's review, plus one the round surfaced.
- * Each test encodes the behavior the surface should have: it fails on
- * the broken code and passes once the finding is fixed.
+ * The Nym selection as the single and only price-traffic consent
+ * (ADR 0008): one verdict test per finding of Juanky's review of
+ * PR 1343, plus one that review surfaced. Each test encodes the
+ * behavior the surface should have: it fails on the broken code and
+ * passes once the finding is fixed.
  *
  * J1: the Nym consent alone starts the cadence; the display currency
  *     never gates traffic. This pins the ratified ADR 0008 behavior

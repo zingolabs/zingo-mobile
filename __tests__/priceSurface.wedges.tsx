@@ -1,7 +1,9 @@
 /**
- * Evidence tests for the fourth review of PR 1343. Each test
- * encodes the behavior the finding says the surface should have: it
- * fails on the broken code and passes once the finding is fixed.
+ * Wedged timers and wedged native calls, and the gates and rate
+ * bounds that keep them from re-forming, distilled from the reviews
+ * of PR 1343. Each test encodes the behavior a finding says the
+ * surface should have: it fails on the broken code and passes once
+ * fixed.
  *
  * P1: a tick that fires into a refusing window must not wedge the timer.
  * P2: a wedged native call is retired after its TTL, so the store can

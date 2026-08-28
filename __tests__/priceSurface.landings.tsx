@@ -1,7 +1,9 @@
 /**
- * Evidence tests for the sixth review of PR 1343. Each test
- * encodes the behavior the finding says the surface should have: it
- * fails on the broken code and passes once the finding is fixed.
+ * Flight landings and the cues at their edges: how a fetch's landing
+ * treats detach, background, parked returns, and the ring beside it,
+ * distilled from the reviews of PR 1343. Each test encodes the
+ * behavior a finding says the surface should have: it fails on the
+ * broken code and passes once fixed.
  *
  * G1: a market-less surface (offline mode, non-mainnet chain) renders
  *     no ring at all, per the store's own verdict.
@@ -288,7 +290,7 @@ test('G10: the ring fills from coarse ticks, not a per-frame animation', async (
       durationMs={60_000}
       resetKey={1}
       accessibilityLabel="ring"
-      testID="review6.ring"
+      testID="landings.ring"
     />,
   );
   await jest.advanceTimersByTimeAsync(30_000);

@@ -1,7 +1,9 @@
 /**
- * Evidence tests for the eighth review of PR 1343. Each test
- * encodes the behavior the finding says the surface should have: it
- * fails on the broken code and passes once the finding is fixed.
+ * Outage recovery and staleness: a lost market, a flapping transport,
+ * a rejected native call, and the stale crossings and muting beside
+ * them, distilled from the reviews of PR 1343. Each test encodes the
+ * behavior a finding says the surface should have: it fails on the
+ * broken code and passes once fixed.
  *
  * R1: a lost market takes the cadence down now, and publishes it.
  * R2: a market outage wedges no past deadline, and its recovery past
