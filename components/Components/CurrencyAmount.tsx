@@ -6,7 +6,7 @@ import { getNumberFormatSettings } from 'react-native-localize';
 
 import Utils from '../../app/utils';
 import { CurrencyEnum } from '../../app/AppState';
-import { usePriceStale } from './priceFetcherStore';
+import { usePriceHealth } from './priceFetcherStore';
 
 type CurrencyAmountProps = {
   price?: number;
@@ -33,12 +33,11 @@ const CurrencyAmount: React.FunctionComponent<CurrencyAmountProps> = ({
   const [currencyString, setCurrencyString] = useState<string>('');
   const { colors } = useTheme();
   const { decimalSeparator } = getNumberFormatSettings();
-  const stale = usePriceStale(priceDate ?? 0);
   // A live conversion whose price never arrived (priceDate 0) mutes like
   // a stale one, matching the ring beside it; historical conversions
   // omit priceDate and never dim.
-  const absent = priceDate === 0;
-  const baseColor = stale || absent ? colors.fgMuted : colors.fgDefault;
+  const health = usePriceHealth(priceDate);
+  const baseColor = health === 'live' ? colors.fgDefault : colors.fgMuted;
 
   useEffect(() => {
     setPrivacyHigh(privacy || false);

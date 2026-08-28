@@ -56,7 +56,7 @@ import ErrorText from '../Components/ErrorText';
 import RegText from '../Components/RegText';
 import ZecAmount from '../Components/ZecAmount';
 import CurrencyAmount from '../Components/CurrencyAmount';
-import { usePriceStale } from '../Components/priceFetcherStore';
+import { usePriceHealth } from '../Components/priceFetcherStore';
 import Button from '../Components/Button';
 import SheetRim from '../Components/SheetRim';
 import {
@@ -181,8 +181,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   const { colors } = useTheme();
   // USD entry derives the ZEC actually sent from the price, so that
   // figure carries the same stale/absent dim as the USD conversions.
-  const priceStale = usePriceStale(zecPrice.date);
-  const priceMuted = priceStale || !zecPrice.date;
+  const priceMuted = usePriceHealth(zecPrice.date) !== 'live';
 
   const [enabling, setEnabling] = useState<boolean>(false);
   const nymPhase =

@@ -36,7 +36,7 @@ jest.mock('../components/Components/priceFetcherStore', () => ({
     nextFetchDelayMs: 0,
     surfaceActive: false,
   })),
-  usePriceStale: jest.fn(() => false),
+  usePriceHealth: jest.fn(() => 'live'),
 }));
 
 import 'react-native';
@@ -52,7 +52,7 @@ import {
 import { CurrencyEnum, ModeEnum, RouteEnum } from '../app/AppState';
 import {
   usePriceFetcherStore,
-  usePriceStale,
+  usePriceHealth,
 } from '../components/Components/priceFetcherStore';
 import { mockValueTransfers } from '../__mocks__/dataMocks/mockValueTransfers';
 import { mockAddresses } from '../__mocks__/dataMocks/mockAddresses';
@@ -68,7 +68,9 @@ import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 const storeHook = usePriceFetcherStore as jest.MockedFunction<
   typeof usePriceFetcherStore
 >;
-const staleHook = usePriceStale as jest.MockedFunction<typeof usePriceStale>;
+const healthHook = usePriceHealth as jest.MockedFunction<
+  typeof usePriceHealth
+>;
 
 function makeDrawerProps(): NativeStackScreenProps<
   AppDrawerParamList,
@@ -121,11 +123,15 @@ beforeEach(() => {
     nextFetchDelayMs: 0,
     surfaceActive: false,
   });
-  // Staleness follows the priceDate each call site actually wires
-  // through, so an unwired row cannot pass by a blanket `true`.
-  staleHook.mockImplementation(
-    (priceDate: number) =>
-      priceDate > 0 && Date.now() - priceDate > 10 * 60_000 + 30_000,
+  // The health follows the priceDate each call site actually wires
+  // through, so an unwired row cannot pass by a blanket verdict.
+  healthHook.mockImplementation(priceDate =>
+    priceDate === 0
+      ? 'absent'
+      : priceDate !== undefined &&
+          Date.now() - priceDate > 10 * 60_000 + 30_000
+        ? 'stale'
+        : 'live',
   );
   // Send's mount effects call these; the shared RPCModule mock lacks them.
   const { NativeModules } = require('react-native');

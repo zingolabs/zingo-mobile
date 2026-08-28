@@ -214,6 +214,11 @@ async function boundedPrice(): Promise<number> {
   try {
     const { price } = await Promise.race([startNativeCall(), expiry]);
     return price;
+  } catch {
+    // A rejection (a native member missing on one platform, a mock
+    // resolving nothing) reads as the RPCModule sentinel, so the retry
+    // and the follow-up arm run exactly as for a resolved refusal.
+    return -2;
   } finally {
     clearTimeout(bound);
   }
@@ -330,13 +335,19 @@ function pump(): void {
 
 // The seam attach and setDeps share: every entry (boot, the consent
 // turning on, a recovered surface) fetches at once. A running timer or
-// flight means the cadence already owns the surface, and a start inside
-// the burst cooldown (a remount storm) yields to it too.
+// flight means the cadence already owns the surface, a start inside
+// the burst cooldown (a remount storm) yields to it, and so does an
+// entry whose price is younger than the cadence floor: a flapping
+// transport or a market hop re-arms the timer instead of spending a
+// fetch per reconnect on a window the consent already covered.
 function entryOrSchedule(): void {
   if (!surfaceMayFetch() || loading || cadence.state === 'armed') {
     return;
   }
-  if (Date.now() - lastFetchStartAt < FETCH_BURST_COOLDOWN_MS) {
+  if (
+    Date.now() - lastFetchStartAt < FETCH_BURST_COOLDOWN_MS ||
+    Date.now() - lastSuccessAt < PRICE_REFRESH_MIN_MS
+  ) {
     scheduleAuto();
   } else {
     doFetch(true).catch(() => {});
@@ -368,9 +379,10 @@ export const priceFetcherStore = {
       return;
     }
     pump();
-    if (transportRefuses()) {
-      // A refusing verdict ends the cadence now, not at the next tick,
-      // and clearAuto's emit takes the ring down with it.
+    if (transportRefuses() || !d.marketAvailable) {
+      // A refusing verdict or a lost market ends the cadence now, not
+      // at the next tick, and clearAuto's emit takes the ring down
+      // with it.
       clearAuto();
       return;
     }
@@ -463,10 +475,6 @@ export const priceFetcherStore = {
     entryPending = false;
     nativeFlight = { state: 'none' };
     loading = false;
-    if (staleCrossing.state === 'armed') {
-      clearTimeout(staleCrossing.timer);
-    }
-    staleCrossing = { state: 'unarmed' };
     clearAuto();
   },
   /** Observe store state; observation carries no consent and starts no traffic. */
@@ -489,47 +497,34 @@ export function usePriceFetcherStore(): PriceSurfaceSnapshot {
   );
 }
 
-// ONE wall-clock crossing timer for however many components watch the
-// same price, instead of one duplicate setTimeout per mounted amount.
-type StaleCrossing =
-  | { state: 'unarmed' }
-  | {
-      state: 'armed';
-      timer: ReturnType<typeof setTimeout>;
-      priceDate: number;
-    };
-
-const staleListeners = new Set<() => void>();
-let staleCrossing: StaleCrossing = { state: 'unarmed' };
-
-function armStaleCrossing(priceDate: number): void {
-  if (priceDate <= 0) return;
-  if (staleCrossing.state === 'armed') {
-    if (staleCrossing.priceDate === priceDate) return;
-    clearTimeout(staleCrossing.timer);
-    staleCrossing = { state: 'unarmed' };
-  }
-  const untilStale = priceDate + PRICE_STALE_MS - Date.now();
-  if (untilStale <= 0) return;
-  staleCrossing = {
-    state: 'armed',
-    priceDate,
-    timer: setTimeout(() => {
-      staleCrossing = { state: 'unarmed' };
-      for (const l of staleListeners) l();
-    }, untilStale + 50),
-  };
-}
-
-/** Whether the price at `priceDate` is stale, re-rendering the caller at the shared wall-clock crossing. */
+/** Whether the price at `priceDate` is stale, re-rendering the caller at its own wall-clock crossing. */
 export function usePriceStale(priceDate: number): boolean {
   const [, force] = useReducer((n: number) => n + 1, 0);
   useEffect(() => {
-    staleListeners.add(force);
-    armStaleCrossing(priceDate);
-    return () => {
-      staleListeners.delete(force);
-    };
+    if (priceDate <= 0) {
+      return;
+    }
+    const untilStale = priceDate + PRICE_STALE_MS - Date.now();
+    if (untilStale <= 0) {
+      return;
+    }
+    // The crossing timer lives and dies with its consumer: no clock
+    // outlives an unmount, and no second price evicts another
+    // consumer's crossing.
+    const timer = setTimeout(force, untilStale + 50);
+    return () => clearTimeout(timer);
   }, [priceDate]);
   return priceDate > 0 && Date.now() - priceDate > PRICE_STALE_MS;
+}
+
+/** The price's health for display muting. */
+export type PriceHealth = 'live' | 'stale' | 'absent';
+
+/** The one spelling of the muting rule: absent before a first price, stale past the crossing, live otherwise (an omitted date is a historical conversion, always live). */
+export function usePriceHealth(priceDate: number | undefined): PriceHealth {
+  const stale = usePriceStale(priceDate ?? 0);
+  if (priceDate === 0) {
+    return 'absent';
+  }
+  return stale ? 'stale' : 'live';
 }

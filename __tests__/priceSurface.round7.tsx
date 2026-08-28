@@ -220,6 +220,7 @@ test('H9: no any-casts in the price suites and no null in the store', () => {
     'priceSurface.round5.tsx',
     'priceSurface.round6.tsx',
     'priceSurface.round7.tsx',
+    'priceSurface.round8.tsx',
     'Send.priceCta.unit.tsx',
     'PriceFetcher.snapshot.tsx',
   ];

@@ -9,7 +9,7 @@ import {
   PRICE_REFRESH_MIN_MS,
   priceFetcherStore,
   usePriceFetcherStore,
-  usePriceStale,
+  usePriceHealth,
 } from './priceFetcherStore';
 
 /**
@@ -66,7 +66,7 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
   // Shared state across every mounted PriceFetcher.
   const { loading, nextFetchAt, nextFetchDelayMs, surfaceActive } =
     usePriceFetcherStore();
-  const stale = usePriceStale(zecPrice.date);
+  const health = usePriceHealth(zecPrice.date);
 
   // The store's own verdict decides visibility: without the consent,
   // the market, or a serving transport no cadence exists, and a ring
@@ -108,8 +108,7 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
   // readers hear which of the two facts holds. The ring keys on the
   // armed tick's deadline and starts at the cycle's true phase, so a
   // full ring always means a refresh really is due, on any mount.
-  const absent = !zecPrice.date;
-  const muted = stale || absent;
+  const muted = health !== 'live';
   const cadenceMs = nextFetchDelayMs || PRICE_REFRESH_MIN_MS;
   // No armed deadline (an entry flight before its schedule) reads as a
   // cycle just begun, never as one complete: a full ring is reserved
@@ -133,9 +132,9 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
         startProgress={elapsedFraction}
         accessibilityLabel={
           translate(
-            absent
+            health === 'absent'
               ? 'price-ring-none'
-              : stale
+              : health === 'stale'
                 ? 'price-ring-stale'
                 : 'price-ring-live',
           ) as string
