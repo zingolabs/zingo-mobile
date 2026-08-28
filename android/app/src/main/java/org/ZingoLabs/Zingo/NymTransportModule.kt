@@ -69,13 +69,26 @@ class NymTransportModule internal constructor(reactContext: ReactApplicationCont
         // One proxy per app process, shared across React context reloads.
         private val handleLock = Any()
         private var handle: MixnetProxyHandle? = null
+
+        /**
+         * Frees the stored handle and clears the slot before anything that
+         * can throw, so a failed restart never strands a destroyed wrapper.
+         */
+        private fun releaseHandle() {
+            // destroy() frees the Rust Arc, whose Drop runs the ordered
+            // off-thread teardown.
+            val stored = handle
+            handle = null
+            stored?.destroy()
+        }
     }
 
     /**
-     * The proxy-owner-remediates contract: a death report only clears the
-     * stored handle (its endpoint is dead, so it must not be stopped or
-     * reused). Recovery stays with the user-driven re-enable; the wallet's
-     * own liveness probe lands the `died` mode the app is already polling.
+     * The proxy-owner-remediates contract: a death report clears the stored
+     * handle and destroys it, which runs the ordered teardown on a proxy
+     * whose dead endpoint the app layer never sees again. Recovery stays
+     * with the user-driven re-enable, and the wallet's own liveness probe
+     * lands the `died` mode the app is already polling.
      *
      * Identity-checked (#1227): the observer speaks only for the handle it
      * was started with, so a dying predecessor's late report cannot wipe a
@@ -90,7 +103,7 @@ class NymTransportModule internal constructor(reactContext: ReactApplicationCont
             android.util.Log.w("NymTransportModule", "mixnet proxy died: $reason")
             synchronized(handleLock) {
                 when (verdictOnDeath(handle, watched)) {
-                    HandleDeathVerdict.ClearStored -> handle = null
+                    HandleDeathVerdict.ClearStored -> releaseHandle()
                     HandleDeathVerdict.RetainStored -> Unit
                 }
             }
@@ -113,7 +126,7 @@ class NymTransportModule internal constructor(reactContext: ReactApplicationCont
         FfiOutcome.settling(promise, "start_mixnet_transport") {
             guardingLinkage {
                 synchronized(handleLock) {
-                    handle?.stop()
+                    releaseHandle()
                     val observer = HandleClearingObserver()
                     val started = MixnetProxyHandle.start(observer)
                     observer.watched = started
@@ -135,8 +148,7 @@ class NymTransportModule internal constructor(reactContext: ReactApplicationCont
         FfiOutcome.settling(promise, "stop_mixnet_transport") {
             guardingLinkage {
                 synchronized(handleLock) {
-                    handle?.stop()
-                    handle = null
+                    releaseHandle()
                 }
             }
             null
