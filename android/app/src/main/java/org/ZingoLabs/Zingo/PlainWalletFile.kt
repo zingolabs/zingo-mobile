@@ -52,6 +52,9 @@ object PlainWalletFile {
             }
         }
 
+    // Runs file work under the writer lock.
+    fun <T> locked(block: () -> T): T = synchronized(writeLock) { block() }
+
     // The bytes when the file exists and is a plain wallet.
     fun readIfPlain(dir: File, fileName: String): ByteArray? {
         val file = File(dir, fileName)

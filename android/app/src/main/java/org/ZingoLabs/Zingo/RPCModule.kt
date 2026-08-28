@@ -615,24 +615,41 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         }
     }
 
+    // Deletes every sidecar the recovery paths could rename or copy back
+    // onto the wallet path.
+    private fun deleteWalletSidecars(fileName: String) {
+        for (suffix in listOf(".migrating", ".write.tmp", ".plain.tmp", ".prerepair", ".broken")) {
+            File(applicationContext.filesDir, "$fileName$suffix").delete()
+        }
+    }
+
+    // A swap temp that `completePendingSwap` could not consume can hold
+    // the only copy of a wallet, and it survives both delete methods.
     @ReactMethod
     fun deleteExistingWallet(promise: Promise) {
-        // check first if the file exists
-        if (fileExists(WalletFileName.value)) {
-            promise.resolve(deleteFile(WalletFileName.value))
-        } else {
-            promise.resolve(false)
+        completePendingSwap()
+        val deleted = PlainWalletFile.locked {
+            val gone = fileExists(WalletFileName.value) && deleteFile(WalletFileName.value)
+            if (!fileExists(WalletFileName.value)) {
+                deleteWalletSidecars(WalletFileName.value)
+                File(applicationContext.filesDir, "${WalletTempSwapFileName.value}.plain.tmp").delete()
+            }
+            gone
         }
+        promise.resolve(deleted)
     }
 
     @ReactMethod
     fun deleteExistingWalletBackup(promise: Promise) {
-        // check first if the file exists
-        if (fileExists(WalletBackupFileName.value)) {
-            promise.resolve(deleteFile((WalletBackupFileName.value)))
-        } else {
-            promise.resolve(false)
+        completePendingSwap()
+        val deleted = PlainWalletFile.locked {
+            val gone = fileExists(WalletBackupFileName.value) && deleteFile(WalletBackupFileName.value)
+            if (!fileExists(WalletBackupFileName.value)) {
+                deleteWalletSidecars(WalletBackupFileName.value)
+            }
+            gone
         }
+        promise.resolve(deleted)
     }
 
     // saveWalletFile/saveWalletBackupFile still contain their own failures
