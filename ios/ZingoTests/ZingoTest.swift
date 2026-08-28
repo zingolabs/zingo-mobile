@@ -1089,7 +1089,32 @@ class WalletSwapRecoveryTests: XCTestCase {
                 try? fm.removeItem(atPath: path)
             }
         }
+        RPCModule.walletFileClosed = false
         super.tearDown()
+    }
+
+    func testAClosedWalletFileRefusesTheSave() throws {
+        let rpc = RPCModule()
+        let files = try paths(rpc)
+        clear(files)
+        try walletA.write(toFile: files.main, atomically: true, encoding: .utf8)
+
+        RPCModule.walletFileClosed = true
+        try rpc.saveWalletInternal()
+
+        XCTAssertEqual(try read(files.main), walletA)
+    }
+
+    func testDeleteClosesTheWalletFile() throws {
+        let rpc = RPCModule()
+        let files = try paths(rpc)
+        clear(files)
+        RPCModule.walletFileClosed = false
+        try walletA.write(toFile: files.main, atomically: true, encoding: .utf8)
+
+        try rpc.fnDeleteExistingWallet()
+
+        XCTAssertTrue(RPCModule.walletFileClosed)
     }
 
     private func paths(_ rpc: RPCModule) throws -> (main: String, backup: String, temp: String) {

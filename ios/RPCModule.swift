@@ -145,6 +145,18 @@ class RPCModule: NSObject {
     return pathsFirst
   }
   
+  // Set by delete and restore, cleared by the next successful wallet
+  // init: a stray save of the in-memory wallet must not resurrect a file
+  // the user replaced.
+  static var walletFileClosed = false
+  static let walletFileHold = NSLock()
+
+  func reopenWalletFile() {
+    RPCModule.walletFileHold.lock()
+    RPCModule.walletFileClosed = false
+    RPCModule.walletFileHold.unlock()
+  }
+
   func getFileName(_ file: String) throws -> String {
     let documentsDirectory = try getDocumentsDirectory()
     let fileName = "\(documentsDirectory)/\(file)"
@@ -352,6 +364,9 @@ class RPCModule: NSObject {
     } catch {
       throw FileError.deleteFileError("Error: [Native] deleting wallet error: \(error.localizedDescription)")
     }
+    RPCModule.walletFileHold.lock()
+    RPCModule.walletFileClosed = true
+    RPCModule.walletFileHold.unlock()
     if let broken = try? getFileName("\(Constants.WalletFileName.rawValue).broken") {
       try? FileManager.default.removeItem(atPath: broken)
     }
@@ -414,6 +429,12 @@ class RPCModule: NSObject {
   // unrepresentable, so no validator exists to disagree with the file
   // format, which stays base64 and is encoded only at this write site.
   func saveWalletInternal() throws {
+    RPCModule.walletFileHold.lock()
+    defer { RPCModule.walletFileHold.unlock() }
+    if RPCModule.walletFileClosed {
+      NSLog("[Native] wallet file closed, save refused")
+      return
+    }
     // Each failure is logged and wrapped exactly once. FileError does not
     // conform to LocalizedError, so re-catching our own throw would replace
     // the message with the generic localizedDescription.
@@ -463,6 +484,7 @@ class RPCModule: NSObject {
     // exists. Offline (empty serveruri) uses `birthday` in place of the
     // chain tip; online it is ignored (pass "0").
     let seed = try initNew(serveruri: serveruri, birthday: UInt32(birthday) ?? 0, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: UInt32(minconfirmations) ?? 0)
+    reopenWalletFile()
     let seedStr = String(seed)
     try self.saveWalletInternal()
     return seedStr
@@ -494,6 +516,7 @@ class RPCModule: NSObject {
     // initFromSeed throws on failure, so reaching the save implies the wallet exists.
     let seed = try initFromSeed(seed: restoreSeed, birthday: UInt32(birthday) ?? 0, serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: UInt32(minconfirmations) ?? 0)
     let seedStr = String(seed)
+    reopenWalletFile()
     try self.saveWalletInternal()
     return seedStr
   }
@@ -525,6 +548,7 @@ class RPCModule: NSObject {
     // initFromUfvk throws on failure, so reaching the save implies the wallet exists.
     let ufvk = try initFromUfvk(ufvk: restoreUfvk, birthday: UInt32(birthday) ?? 0, serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: UInt32(minconfirmations) ?? 0)
     let ufvkStr = String(ufvk)
+    reopenWalletFile()
     try self.saveWalletInternal()
     return ufvkStr
   }
@@ -552,6 +576,7 @@ class RPCModule: NSObject {
     minconfirmations: String
   ) throws -> String {
     let seed = try initFromB64(datab64: try self.readWalletUtf8String(), serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: UInt32(minconfirmations) ?? 0)
+    reopenWalletFile()
     let seedStr = String(seed)
     return seedStr
   }
@@ -576,6 +601,10 @@ class RPCModule: NSObject {
       let backupEncodedData = try self.readWalletBackup()
       // check if the content is correct. Stored Encoded.
       if WalletExport.isValidBase64(backupEncodedData) {
+        // Closed across the swap; the reload after the restore clears it.
+        RPCModule.walletFileHold.lock()
+        RPCModule.walletFileClosed = true
+        RPCModule.walletFileHold.unlock()
         if try fileExists(Constants.WalletFileName.rawValue) == "true" {
           // Audit Issue P (b) — atomic swap via three renames. APFS
           // rename is atomic AND preserves the file's protection class
