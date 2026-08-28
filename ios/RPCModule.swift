@@ -218,9 +218,12 @@ class RPCModule: NSObject {
   // Calling this helper at startup detects that and finishes the swap.
   //
   // Possible interrupted states (temp exists, by construction):
-  //   between (1)–(2): main does NOT exist, backup exists → complete (2) then (3)
-  //   between (2)–(3): main exists,         backup does NOT → complete (3)
-  // Both branches end at the intended final state. Idempotent — when no
+  //   between (1)–(2): main does NOT exist → complete (2) then (3)
+  //   between (2)–(3): main exists, backup does NOT → complete (3)
+  //   all three present: a save landed between the renames. The temp is
+  //   the pre-swap main, and content comparison picks the window, as on
+  //   Android.
+  // Every branch ends at the intended final state. Idempotent — when no
   // temp file is present this is a near-zero-cost no-op.
   func completePendingSwap() {
     let fm = FileManager.default
@@ -232,13 +235,29 @@ class RPCModule: NSObject {
       return
     }
     do {
-      if fm.fileExists(atPath: backupPath) {
-        // Crash between (1) and (2): backup still in original position.
-        try fm.moveItem(atPath: backupPath, toPath: mainPath)
+      if !fm.fileExists(atPath: mainPath) {
+        if fm.fileExists(atPath: backupPath) {
+          try fm.moveItem(atPath: backupPath, toPath: mainPath)
+        }
+        try fm.moveItem(atPath: tempPath, toPath: backupPath)
+      } else if !fm.fileExists(atPath: backupPath) {
+        try fm.moveItem(atPath: tempPath, toPath: backupPath)
+      } else {
+        let tempData = try Data(contentsOf: URL(fileURLWithPath: tempPath))
+        let mainData = try Data(contentsOf: URL(fileURLWithPath: mainPath))
+        if mainData == tempData {
+          try fm.removeItem(atPath: mainPath)
+          try fm.moveItem(atPath: backupPath, toPath: mainPath)
+          try fm.moveItem(atPath: tempPath, toPath: backupPath)
+        } else if try Data(contentsOf: URL(fileURLWithPath: backupPath)) == tempData {
+          try fm.removeItem(atPath: tempPath)
+        } else {
+          // Three distinct contents: no window matches, and any pick could
+          // destroy a wallet. Everything holds its place for diagnosis.
+          NSLog("[Native] completePendingSwap: three distinct wallet files, left untouched")
+          return
+        }
       }
-      // Crash between (2) and (3): main now holds the former backup;
-      // only (3) is left.
-      try fm.moveItem(atPath: tempPath, toPath: backupPath)
       NSLog("[Native] completePendingSwap: interrupted swap recovered")
     } catch {
       NSLog("Error: [Native] completePendingSwap failed: \(error.localizedDescription)")
@@ -327,10 +346,14 @@ class RPCModule: NSObject {
   }
 
   func fnDeleteExistingWallet() throws {
+    completePendingSwap()
     do {
       try deleteFile(Constants.WalletFileName.rawValue)
     } catch {
       throw FileError.deleteFileError("Error: [Native] deleting wallet error: \(error.localizedDescription)")
+    }
+    if let broken = try? getFileName("\(Constants.WalletFileName.rawValue).broken") {
+      try? FileManager.default.removeItem(atPath: broken)
     }
   }
 
@@ -356,6 +379,7 @@ class RPCModule: NSObject {
   }
   
   func fnDeleteExistingWalletBackup() throws {
+    completePendingSwap()
     do {
       try deleteFile(Constants.WalletBackupFileName.rawValue)
     } catch {
@@ -622,6 +646,69 @@ class RPCModule: NSObject {
         try? fm.removeItem(atPath: brokenPath)
         try? fm.copyItem(atPath: mainPath, toPath: brokenPath)
         return salvaged
+      }.settle(resolve: resolve, reject: reject)
+    }
+  }
+
+  // "plainWallet" when the base64 text decodes to bytes with a plausible
+  // zingolib version header, truncated files included.
+  func walletFileState(_ path: String) -> String {
+    guard let text = try? String(contentsOfFile: path, encoding: .utf8) else {
+      return "unknown"
+    }
+    let trimmed = String(text.prefix(text.count - text.count % 4))
+    guard let bytes = Data(base64Encoded: trimmed), bytes.count >= 8 else {
+      return "unknown"
+    }
+    var version: UInt64 = 0
+    for (offset, byte) in bytes.prefix(8).enumerated() {
+      version |= UInt64(byte) << (8 * UInt64(offset))
+    }
+    return version <= 1000 ? "plainWallet" : "unknown"
+  }
+
+  // The per-file diagnosis for the recovery dialog, in the Android report
+  // format.
+  func walletFileDiagnosis() -> [[String: Any]] {
+    let fm = FileManager.default
+    var files: [[String: Any]] = []
+    for name in [Constants.WalletFileName.rawValue,
+                 Constants.WalletBackupFileName.rawValue,
+                 Constants.WalletTempSwapFileName.rawValue] {
+      var entry: [String: Any] = [
+        "name": name,
+        "size": 0,
+        "mtime": 0,
+        "depth": 0,
+        "repairable": false,
+        "unwrapErrors": [String](),
+      ]
+      guard let path = try? getFileName(name), fm.fileExists(atPath: path) else {
+        entry["state"] = "missing"
+        files.append(entry)
+        continue
+      }
+      if let attrs = try? fm.attributesOfItem(atPath: path) {
+        entry["size"] = (attrs[.size] as? NSNumber)?.intValue ?? 0
+        if let modified = attrs[.modificationDate] as? Date {
+          entry["mtime"] = Int(modified.timeIntervalSince1970 * 1000)
+        }
+      }
+      entry["state"] = walletFileState(path)
+      files.append(entry)
+    }
+    return files
+  }
+
+  @objc(walletFileDiagnosisInfo:reject:)
+  func walletFileDiagnosisInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+    DispatchQueue.global(qos: .userInitiated).async {
+      FfiOutcome.of {
+        let json = try JSONSerialization.data(withJSONObject: ["files": self.walletFileDiagnosis()])
+        guard let text = String(data: json, encoding: .utf8) else {
+          throw ZingolibError.Read(message: "the wallet diagnosis does not encode as JSON text")
+        }
+        return text
       }.settle(resolve: resolve, reject: reject)
     }
   }
