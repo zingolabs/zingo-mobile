@@ -84,10 +84,11 @@ class NymTransportModule internal constructor(reactContext: ReactApplicationCont
     }
 
     /**
-     * The proxy-owner-remediates contract: a death report only clears the
-     * stored handle (its endpoint is dead, so it must not be stopped or
-     * reused). Recovery stays with the user-driven re-enable; the wallet's
-     * own liveness probe lands the `died` mode the app is already polling.
+     * The proxy-owner-remediates contract: a death report clears the stored
+     * handle and destroys it, which runs the ordered teardown on a proxy
+     * whose dead endpoint the app layer never sees again. Recovery stays
+     * with the user-driven re-enable, and the wallet's own liveness probe
+     * lands the `died` mode the app is already polling.
      *
      * Identity-checked (#1227): the observer speaks only for the handle it
      * was started with, so a dying predecessor's late report cannot wipe a

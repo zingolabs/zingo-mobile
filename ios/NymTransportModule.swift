@@ -63,9 +63,10 @@ class NymTransportModule: NSObject {
     stored?.stop()
   }
 
-  /// The proxy-owner-remediates contract: a death report only clears the
-  /// stored handle (its endpoint is dead, so it must not be stopped or
-  /// reused). Recovery stays with the user-driven re-enable.
+  /// The proxy-owner-remediates contract: a death report clears the stored
+  /// handle and stops it, which begins the ordered teardown on a proxy whose
+  /// dead endpoint the app layer never sees again. Recovery stays with the
+  /// user-driven re-enable.
   ///
   /// Identity-checked (#1227): the observer speaks only for the handle it was
   /// started with, so a dying predecessor's late report cannot wipe a fresh
