@@ -74,31 +74,14 @@ async function doFetch(): Promise<void> {
   if (cooldownTimer) clearTimeout(cooldownTimer);
   cooldownTimer = setTimeout(emit, COOLDOWN_MS);
 
-  let price: number;
-  let error: string;
-  // first attempt
-  ({ price, error } = await getZecPrice());
-  // 0 initial · -1 Gemini/zingolib · -2 RPCModule · >0 real value
-  if (price <= 0) {
-    // second attempt
-    ({ price, error } = await getZecPrice());
-  }
-
-  if (price === -1) {
-    d.addLastSnackbar(
-      `${d.translate('info.errorgemini') as string} - ${error}`,
-    );
-  } else if (price === -2) {
-    d.addLastSnackbar(
-      `${d.translate('info.errorrpcmodule') as string} - ${error}`,
-    );
-  } else if (price <= 0) {
-    d.addLastSnackbar(
-      `${d.translate('info.errorgemini') as string} - ${error}`,
-    );
-    d.setZecPrice(price, 0);
+  const outcome = await getZecPrice();
+  if (outcome.kind === 'error') {
+    // A failed refresh leaves the last good price on screen. Overwriting it
+    // would trade a stale number for no number at all.
+    const detail = outcome.param === undefined ? '' : ` - ${outcome.param}`;
+    d.addLastSnackbar(`${d.translate(outcome.errorKey) as string}${detail}`);
   } else {
-    d.setZecPrice(price, Date.now());
+    d.setZecPrice(outcome.usd, Date.now());
     started = true;
   }
 
