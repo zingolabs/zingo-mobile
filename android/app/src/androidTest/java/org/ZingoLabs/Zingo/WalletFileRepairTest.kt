@@ -41,8 +41,9 @@ class WalletFileRepairTest {
         override fun reject(message: String) {}
     }
 
-    // Version 42 LE followed by filler, enough to look like a plain wallet.
-    private val plainWallet = ByteArray(64) { i -> if (i == 0) 42 else if (i < 8) 0 else (i * 7).toByte() }
+    // A real offline zingolib wallet: the recovery writes run the full
+    // parse.
+    private lateinit var plainWallet: ByteArray
 
     // A Tink-looking header the keyset cannot open.
     private val undecryptableBytes = ByteArray(64) { i -> if (i == 0) 0x28 else (i * 13).toByte() }
@@ -54,7 +55,7 @@ class WalletFileRepairTest {
         return EncryptedFile.Builder(file, context, alias, EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB).build()
     }
 
-    // The 2.0.21 storage shape: base64 of the current bytes inside the
+    // The 2.0.21 storage format: base64 of the current bytes inside the
     // envelope. From plain bytes one call yields a legacy encrypted file,
     // a second call the double wrap.
     private fun wrapAgain(file: File = walletFile()) {
@@ -75,6 +76,10 @@ class WalletFileRepairTest {
         }
         File(context.filesDir, backupName).delete()
         File(context.filesDir, swapName).delete()
+        uniffi.zingo.initLogging()
+        uniffi.zingo.setCryptoDefaultProviderToRing()
+        uniffi.zingo.initFromSeed(Seeds.HOSPITAL, 2000000u, "", "main", "Medium", 1u)
+        plainWallet = uniffi.zingo.saveWalletBytes()!!
         walletFile().writeBytes(plainWallet)
         assertThat(state(fileName)).isEqualTo("plainWallet")
     }

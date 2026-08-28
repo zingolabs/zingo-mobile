@@ -190,6 +190,24 @@ class RPCModule: NSObject {
     try FileManager.default.removeItem(atPath: getFileName(fileName))
   }
 
+  // Moves existing wallet files to the resting protection this build
+  // writes: class C plus backup exclusion. Old builds wrote class A, and
+  // a synced wallet can open without a save.
+  func applyWalletFileProtection() {
+    let fm = FileManager.default
+    for name in [Constants.WalletFileName.rawValue, Constants.WalletBackupFileName.rawValue] {
+      guard let path = try? getFileName(name), fm.fileExists(atPath: path) else { continue }
+      var fileURL = URL(fileURLWithPath: path)
+      var resourceValues = URLResourceValues()
+      resourceValues.isExcludedFromBackup = true
+      try? fileURL.setResourceValues(resourceValues)
+      try? fm.setAttributes(
+        [.protectionKey: FileProtectionType.completeUntilFirstUserAuthentication],
+        ofItemAtPath: path
+      )
+    }
+  }
+
   // Audit Issue P (b) — wallet ↔ backup swap recovery.
   //
   // `restoreExistingWalletBackup` does its swap as three atomic renames:
@@ -230,6 +248,7 @@ class RPCModule: NSObject {
   @objc(walletExists:reject:)
   func walletExists(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     completePendingSwap()
+    applyWalletFileProtection()
     do {
       let result = try fileExists(Constants.WalletFileName.rawValue)
       DispatchQueue.main.async {
@@ -246,6 +265,7 @@ class RPCModule: NSObject {
   @objc(walletBackupExists:reject:)
   func walletBackupExists(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     completePendingSwap()
+    applyWalletFileProtection()
     do {
       let result = try fileExists(Constants.WalletBackupFileName.rawValue)
       DispatchQueue.main.async {

@@ -57,8 +57,10 @@ class WalletSeedSalvageTest {
 
     @Test
     fun anUnreadableFileFailsAndLeavesNoBrokenCopy() {
-        walletFile().writeBytes(ByteArray(64) { i -> if (i == 0) 0x28 else (i * 13).toByte() })
-        assertThrows(Exception::class.java) { rpcModule.walletFileRecoveryInfoNative() }
-        assertThat(brokenFile().exists()).isFalse()
+        for (garbage in listOf(ByteArray(47) { 0x20 }, ByteArray(64) { i -> if (i == 0) 0x28 else (i * 13).toByte() })) {
+            walletFile().writeBytes(garbage)
+            assertThrows(Exception::class.java) { rpcModule.walletFileRecoveryInfoNative() }
+            assertThat(brokenFile().exists()).isFalse()
+        }
     }
 }

@@ -972,3 +972,44 @@ class FfiArgsTests: XCTestCase {
             "a malformed numeric arg must reject under InvalidInput on both platforms")
     }
 }
+
+/// The startup attribute migration: wallet files an old build wrote under
+/// class A move to class C with backup exclusion, content untouched.
+class WalletFileProtectionTests: XCTestCase {
+    func testClassAFileMovesToClassCWithBackupExclusion() throws {
+        let rpc = RPCModule()
+        let fm = FileManager.default
+        try fm.createDirectory(
+            atPath: rpc.getDocumentsDirectory(),
+            withIntermediateDirectories: true
+        )
+        let path = try rpc.getFileName(Constants.WalletFileName.rawValue)
+        try "d2FsbGV0".write(toFile: path, atomically: true, encoding: .utf8)
+        defer { try? fm.removeItem(atPath: path) }
+        try fm.setAttributes([.protectionKey: FileProtectionType.complete], ofItemAtPath: path)
+        let stored = try fm.attributesOfItem(atPath: path)[.protectionKey] as? FileProtectionType
+
+        rpc.applyWalletFileProtection()
+
+        XCTAssertEqual(try String(contentsOfFile: path, encoding: .utf8), "d2FsbGV0")
+        let excluded = try URL(fileURLWithPath: path)
+            .resourceValues(forKeys: [.isExcludedFromBackupKey]).isExcludedFromBackup
+        XCTAssertEqual(excluded, true)
+        guard stored == .complete else {
+            throw XCTSkip("this simulator does not store file-protection attributes")
+        }
+        let after = try fm.attributesOfItem(atPath: path)[.protectionKey] as? FileProtectionType
+        XCTAssertEqual(after, .completeUntilFirstUserAuthentication)
+    }
+
+    func testMissingWalletFilesAreANoOp() throws {
+        let rpc = RPCModule()
+        let fm = FileManager.default
+        for name in [Constants.WalletFileName.rawValue, Constants.WalletBackupFileName.rawValue] {
+            if let path = try? rpc.getFileName(name) {
+                try? fm.removeItem(atPath: path)
+            }
+        }
+        rpc.applyWalletFileProtection()
+    }
+}

@@ -91,16 +91,16 @@ class PlainWalletFileTest {
     fun aMigratingCopyBecomesMainWhenMainIsMissing() {
         val bytes = plainWallet()
         File(dir, "$fileName.migrating").writeBytes(bytes)
-        PlainWalletFile.resolveInterruptedMigration(dir, fileName)
+        PlainWalletFile.resolveInterruptedMigration(dir, fileName) { true }
         assertArrayEquals(bytes, File(dir, fileName).readBytes())
         assertFalse(File(dir, "$fileName.migrating").exists())
     }
 
     @Test
-    fun aStaleMigratingCopyIsDroppedWhenMainIsPlain() {
+    fun aStaleMigratingCopyIsDroppedWhenMainIsIntact() {
         File(dir, fileName).writeBytes(plainWallet())
         File(dir, "$fileName.migrating").writeBytes(plainWallet(fill = 3))
-        PlainWalletFile.resolveInterruptedMigration(dir, fileName)
+        PlainWalletFile.resolveInterruptedMigration(dir, fileName) { true }
         assertFalse(File(dir, "$fileName.migrating").exists())
     }
 
@@ -109,14 +109,56 @@ class PlainWalletFileTest {
         // Main still encrypted: the sidecar may be the only plain copy.
         File(dir, fileName).writeBytes(envelopeLookalike)
         File(dir, "$fileName.migrating").writeBytes(plainWallet())
-        PlainWalletFile.resolveInterruptedMigration(dir, fileName)
+        PlainWalletFile.resolveInterruptedMigration(dir, fileName) { true }
         assertTrue(File(dir, "$fileName.migrating").exists())
         assertArrayEquals(envelopeLookalike, File(dir, fileName).readBytes())
     }
 
     @Test
+    fun theMigratingCopyStaysWhileMainFailsTheFullParse() {
+        val truncated = plainWallet().copyOf(20)
+        File(dir, fileName).writeBytes(truncated)
+        File(dir, "$fileName.migrating").writeBytes(plainWallet())
+        PlainWalletFile.resolveInterruptedMigration(dir, fileName) { false }
+        assertTrue(File(dir, "$fileName.migrating").exists())
+        assertArrayEquals(truncated, File(dir, fileName).readBytes())
+    }
+
+    @Test
     fun nothingHappensWithNoFilesAtAll() {
-        PlainWalletFile.resolveInterruptedMigration(dir, fileName)
+        PlainWalletFile.resolveInterruptedMigration(dir, fileName) { true }
         assertArrayEquals(arrayOf<String>(), dir.list())
+    }
+
+    @Test
+    fun aMigrationSkipsWhenTheFileTurnedPlainAlready() {
+        val fresh = plainWallet(fill = 11)
+        File(dir, fileName).writeBytes(fresh)
+        val migrated = PlainWalletFile.migrateIfStillLegacy(dir, fileName, plainWallet(fill = 3))
+        assertFalse(migrated)
+        assertArrayEquals(fresh, File(dir, fileName).readBytes())
+    }
+
+    @Test
+    fun aMigrationWritesWhenTheFileIsStillLegacy() {
+        File(dir, fileName).writeBytes(envelopeLookalike)
+        val bytes = plainWallet()
+        assertTrue(PlainWalletFile.migrateIfStillLegacy(dir, fileName, bytes))
+        assertArrayEquals(bytes, File(dir, fileName).readBytes())
+    }
+
+    @Test
+    fun concurrentWritersNeverLeaveAPartialFile() {
+        val a = plainWallet(fill = 3)
+        val b = plainWallet(fill = 11)
+        repeat(50) {
+            val threads = listOf(a, b).map { bytes ->
+                Thread { PlainWalletFile.write(dir, fileName, bytes) }
+            }
+            threads.forEach(Thread::start)
+            threads.forEach(Thread::join)
+            val survivor = File(dir, fileName).readBytes()
+            assertTrue(survivor.contentEquals(a) || survivor.contentEquals(b))
+        }
     }
 }

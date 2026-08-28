@@ -12,11 +12,8 @@ import java.io.File
 import java.io.IOException
 
 /**
- * The 2.0.21 incident class (#965) replayed against the Step 1 load path
- * with the real Keystore and a real zingolib wallet: a legacy encrypted
- * file migrates to raw plain bytes on first load, a transient Keystore
- * failure can only fail the load without touching the file, and once the
- * file is plain the Keystore is out of the loop entirely.
+ * The 2.0.21 double-wrap incident class replayed against the Step 1 load
+ * path with the real Keystore and a real zingolib wallet.
  *
  * Run: ./gradlew :app:connectedProdDebugAndroidTest \
  *   -Pandroid.testInstrumentationRunnerArguments.class=org.ZingoLabs.Zingo.DoubleWrapReproTest
@@ -106,7 +103,6 @@ class DoubleWrapReproTest {
         assertThat(loadError()).contains("seed")
         assertThat(walletFile().readBytes()).isEqualTo(fileBefore)
 
-        // The failure clears; the next load migrates and opens.
         rpcModule.legacyDecrypt = defaultLegacyDecrypt
         assertThat(loadError()).isNull()
         assertThat(walletFile().readBytes()).isEqualTo(plainWallet)
@@ -129,11 +125,61 @@ class DoubleWrapReproTest {
     }
 
     @Test
+    fun theLoadAlsoMigratesTheRetainedWallet() {
+        val backupFile = File(context.filesDir, Constants.WalletBackupFileName.value)
+        backupFile.delete()
+        encryptedFile(backupFile).openFileOutput().use {
+            it.write(Base64.encodeToString(plainWallet, Base64.NO_WRAP).toByteArray(Charsets.UTF_8))
+        }
+
+        assertThat(loadError()).isNull()
+
+        assertThat(walletFile().readBytes()).isEqualTo(plainWallet)
+        assertThat(backupFile.readBytes()).isEqualTo(plainWallet)
+        backupFile.delete()
+    }
+
+    @Test
     fun anInterruptedMigrationRestoresFromTheMigratingCopy() {
         walletFile().delete()
         File(context.filesDir, "$fileName.migrating").writeBytes(plainWallet)
         assertThat(loadError()).isNull()
         assertThat(walletFile().readBytes()).isEqualTo(plainWallet)
         assertThat(File(context.filesDir, "$fileName.migrating").exists()).isFalse()
+    }
+
+    @Test
+    fun aTruncatedMainRestoresFromTheWriteTemp() {
+        walletFile().delete()
+        walletFile().writeBytes(plainWallet.copyOf(plainWallet.size / 2))
+        File(context.filesDir, "$fileName.write.tmp").writeBytes(plainWallet)
+
+        rpcModule.completePendingWrite()
+
+        assertThat(walletFile().readBytes()).isEqualTo(plainWallet)
+        assertThat(File(context.filesDir, "$fileName.write.tmp").exists()).isFalse()
+    }
+
+    @Test
+    fun anIntactMainDropsTheWriteTempOrphan() {
+        walletFile().delete()
+        walletFile().writeBytes(plainWallet)
+        File(context.filesDir, "$fileName.write.tmp").writeBytes(plainWallet.copyOf(plainWallet.size / 2))
+
+        rpcModule.completePendingWrite()
+
+        assertThat(walletFile().readBytes()).isEqualTo(plainWallet)
+        assertThat(File(context.filesDir, "$fileName.write.tmp").exists()).isFalse()
+    }
+
+    @Test
+    fun aTruncatedMainKeepsTheMigratingCopy() {
+        walletFile().delete()
+        walletFile().writeBytes(plainWallet.copyOf(plainWallet.size / 2))
+        File(context.filesDir, "$fileName.migrating").writeBytes(plainWallet)
+
+        assertThat(loadError()).isNotNull()
+
+        assertThat(File(context.filesDir, "$fileName.migrating").readBytes()).isEqualTo(plainWallet)
     }
 }

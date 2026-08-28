@@ -39,8 +39,8 @@ Android states apply.
 
 | File | Format | Written by | Step 1 handling |
 |---|---|---|---|
-| `<name>.write.tmp` | encrypted | `writeEncryptedFileDurably`, stash of the previous content before its delete-then-write | `completePendingWrite` keeps working: restore when the main file is unreadable, else delete |
-| `<name>.migrating` | plain | the 2.0.21 migration, plain copy kept until the encrypted write verified | rename to main when main is missing, delete once main verifies plain, keep otherwise |
+| `<name>.write.tmp` | encrypted | `writeEncryptedFileDurably`, stash of the previous content before its delete-then-write | `completePendingWrite` keeps working: restore when the main file fails the full parse, delete only when it passes |
+| `<name>.migrating` | plain | the 2.0.21 migration, plain copy kept until the encrypted write verified | rename to main when main is missing, delete once main passes the full parse, keep otherwise |
 | `wallet.swap.tmp` | encrypted (legacy) or plain (Step 1) | backup restore swap, copy of the original main | `completePendingSwap` keeps working, reads either format |
 | `<name>.prerepair` | raw double-wrapped copy | double-wrap repair, and now the load path's unwrap | support evidence only, never auto-read |
 | `<name>.broken` | raw undecryptable copy | backup restore over an unreadable main | support evidence only, never auto-read |
@@ -51,6 +51,10 @@ Android states apply.
   replacement verifies. The temp write verifies its read-back bytes and
   the version header before the atomic rename, and the rename is the
   only operation that touches the legacy path.
+- The 8-byte header check (`WalletFileEnvelope`) only routes formats: it
+  survives truncation. Every decision to delete a sidecar, drop a temp,
+  or write over a wallet file runs the full zingolib parse
+  (`validateWalletBytes`) first.
 - A read failure never triggers a write. Classification uses the raw
   bytes (`WalletFileEnvelope`), never a trial decrypt, so a transient
   Keystore failure can only fail the load with a typed error. The next
