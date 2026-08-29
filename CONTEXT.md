@@ -115,7 +115,7 @@ and glyphs), `border` (strokes). Unqualified "surface" always means this
 axis; the raised-panel role is always written out as `bgSurface`.
 
 **Role**:
-The meaning half of a token name — what the color is *for* (Canvas, Muted,
+The meaning half of a token name — what the color is _for_ (Canvas, Muted,
 Accent, Danger), as opposed to which surface carries it.
 
 **Family**:
@@ -211,6 +211,7 @@ acceleration, which requires the guest to match the x86_64 host: x86_64
 and 32-bit x86 only. Calling one of these "primary" is wrong; an
 emulator ABI in a test lane reflects a hosting constraint, not which
 library matters most.
+
 ## Build identity
 
 **Build descriptor** — the string `get_version()` reports: a zingolib
@@ -239,6 +240,41 @@ The network path a mixnet-only surface resolves to, either the Standing
 Client's tunnel or clearnet. zingolib derives it from the indicator, and the
 app never sees it. A price fetch that resolves to clearnet is refused, never
 sent.
+
+## Price surface
+
+Vocabulary for the ZEC/USD display and its fetch lifecycle.
+
+**Price**:
+The fetched ZEC/USD value the price surface displays.
+_Avoid_: quote (legacy name in the ring components)
+
+**Stale price**:
+A price whose last successful fetch is older than the cadence's longest
+draw plus one fetch bound (ten minutes and thirty seconds of wall
+clock), so a healthy cadence never dims, ceiling draws included.
+Staleness is a fact about the value's accuracy, not about fetch
+mechanics, and it is independent of transport.
+
+**Price consent**:
+Selecting Nym, the persisted Mixnet Mode opt-in. It is the single and
+only consent for price traffic: the surface fetches on no other
+authority, and no fetch failure raises a snackbar. The display currency
+chooses what to show, never what may be fetched.
+_Avoid_: manual fetch (removed; every fetch is app-initiated); USD
+selection as consent (the seeded default authorizes nothing)
+
+**Cadence**:
+The consented fetch rhythm: boot, the Nym selection turning on, and
+every gate-open return from the background fetch at once, and each
+further fetch follows the last at a uniform random delay of five to ten
+minutes.
+
+**Ready follow-up**:
+The one-shot fetch armed when an unattended fetch is refused during
+bootstrap; it fires when the Indicator turns `ready` and is dropped on a
+`died` or `off` verdict or on the next background transition. A transient
+`unknown` is one failed status poll, not a verdict, and does not drop it.
 
 ## Biometric gate
 

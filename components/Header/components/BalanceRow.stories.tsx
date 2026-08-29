@@ -29,7 +29,6 @@ const meta: Meta<typeof BalanceRow> = {
     info: mockInfo,
     currency: CurrencyEnum.USDCurrency,
     zecPrice: mockZecPrice,
-    setZecPrice: () => {},
     selectServer: SelectServerEnum.auto,
     showShieldButton: false,
     shieldingFee: 0,

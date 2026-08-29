@@ -52,9 +52,21 @@ class NymTransportModule: NSObject {
   private static let handleLock = NSLock()
   private static var handle: MixnetProxyHandle?
 
-  /// The proxy-owner-remediates contract: a death report only clears the
-  /// stored handle (its endpoint is dead, so it must not be stopped or
-  /// reused). Recovery stays with the user-driven re-enable.
+  /// Frees the stored handle and clears the slot before anything that can
+  /// throw, so a failed restart never strands a stopped predecessor.
+  private static func releaseHandle() {
+    // stop() begins the ordered off-thread teardown at a known point, and
+    // the ARC release of the last reference reaches the same idempotent
+    // path through the Rust Drop.
+    let stored = handle
+    handle = nil
+    stored?.stop()
+  }
+
+  /// The proxy-owner-remediates contract: a death report clears the stored
+  /// handle and stops it, which begins the ordered teardown on a proxy whose
+  /// dead endpoint the app layer never sees again. Recovery stays with the
+  /// user-driven re-enable.
   ///
   /// Identity-checked (#1227): the observer speaks only for the handle it was
   /// started with, so a dying predecessor's late report cannot wipe a fresh
@@ -68,7 +80,7 @@ class NymTransportModule: NSObject {
       NymTransportModule.handleLock.lock()
       defer { NymTransportModule.handleLock.unlock() }
       switch verdictOnDeath(stored: NymTransportModule.handle, watched: watched) {
-      case .clearStored: NymTransportModule.handle = nil
+      case .clearStored: NymTransportModule.releaseHandle()
       case .retainStored: break
       }
     }
@@ -85,7 +97,7 @@ class NymTransportModule: NSObject {
       NymTransportModule.handleLock.lock()
       defer { NymTransportModule.handleLock.unlock() }
       do {
-        NymTransportModule.handle?.stop()
+        NymTransportModule.releaseHandle()
         let observer = HandleClearingObserver()
         let started = try MixnetProxyHandle.start(observer: observer)
         observer.watched = started
@@ -112,8 +124,7 @@ class NymTransportModule: NSObject {
                            reject: @escaping RCTPromiseRejectBlock) {
     DispatchQueue.global(qos: .userInitiated).async {
       NymTransportModule.handleLock.lock()
-      NymTransportModule.handle?.stop()
-      NymTransportModule.handle = nil
+      NymTransportModule.releaseHandle()
       NymTransportModule.handleLock.unlock()
       DispatchQueue.main.async { resolve(nil) }
     }
