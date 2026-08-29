@@ -15,7 +15,6 @@
   "biometricsfailed-footer": "Usa el método de autenticación para desbloquear.",
   "biometricsfailed-button": "Desbloquear",
   "biometrics-message": "Por favor autenticar",
-  "biometrics-message-ios": "Por favor autenticar con la clave",
   "biometrics-error": "Por seguridad necesitas autenticarte de nuevo para realizar esta acción. Siempre puedes cambiarlo en Parámetros",
   "biometrics-failure-declined": "La autenticación fue cancelada o falló.",
   "biometrics-failure-notserved": "El dispositivo rechazó la comprobación de seguridad.",

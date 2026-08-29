@@ -15,7 +15,6 @@
   "biometricsfailed-footer": "Use the authentication method to unlock.",
   "biometricsfailed-button": "Unlock",
   "biometrics-message": "Please authenticate",
-  "biometrics-message-ios": "Please authenticate with your passcode",
   "biometrics-error": "For security you need to authenticate again to perform this action. You Always can change this in Settings",
   "biometrics-failure-declined": "The authentication was cancelled or failed.",
   "biometrics-failure-notserved": "The device refused the security check.",

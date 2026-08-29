@@ -101,8 +101,18 @@ export const resetGateController = (): void => {
   ceremonyInFlight = undefined;
 };
 
-const freshlyPassed = (): boolean =>
-  lastPassedAt !== undefined && Date.now() - lastPassedAt <= AUTH_FRESHNESS_MS;
+// Freshness is elapsed time, and only forwards. A clock moved back — a
+// timezone or NTP correction, a manual change — makes the difference
+// negative, which reads as inside the window for as long as it takes the
+// clock to catch up, holding the shutter open across the gap. A pass from
+// the future is no pass at all.
+const freshlyPassed = (): boolean => {
+  if (lastPassedAt === undefined) {
+    return false;
+  }
+  const elapsed = Date.now() - lastPassedAt;
+  return elapsed >= 0 && elapsed <= AUTH_FRESHNESS_MS;
+};
 
 const insecure = (failure: GateFailure): DeviceSecurityProbe => ({
   kind: 'insecure',

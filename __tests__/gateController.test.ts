@@ -117,6 +117,23 @@ test('a trigger past the freshness window runs a new ceremony', async () => {
   expect(native.authenticate).toHaveBeenCalledTimes(2);
 });
 
+test('a clock moved backwards does not hold the shutter open', async () => {
+  const { controller, native } = load();
+  secured(native);
+  native.authenticate.mockResolvedValue({ outcome: 'authenticated', code: '' });
+  const now = jest.spyOn(Date, 'now');
+
+  now.mockReturnValue(1_000_000);
+  await controller.askGate({ translate });
+  // A correction lands the clock before the pass. Elapsed time goes
+  // negative, and a window measured as "less than fifteen seconds" would
+  // stay open for the whole gap.
+  now.mockReturnValue(1_000_000 - 60 * 60 * 1000);
+  await controller.askGate({ translate });
+
+  expect(native.authenticate).toHaveBeenCalledTimes(2);
+});
+
 test('concurrent triggers share one ceremony, a decline answering both', async () => {
   const { controller, native } = load();
   secured(native);
