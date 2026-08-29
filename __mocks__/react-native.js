@@ -54,6 +54,13 @@ jest.mock('react-native', () => {
     confirmProcess: jest.fn(() => '{}'),
     getZenniesDonationAddress: jest.fn(() => '{}'),
   };
+  RN.NativeModules.DeviceAuth = {
+    canAuthenticate: jest.fn(async () => ({ available: true, code: '' })),
+    authenticate: jest.fn(async () => ({
+      outcome: 'authenticated',
+      code: '',
+    })),
+  };
   RN.View = jest.fn();
   RN.RefreshControl = jest.fn(() => null);
 
