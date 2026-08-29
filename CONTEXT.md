@@ -242,8 +242,8 @@ sent.
 
 ## Biometric gate
 
-Vocabulary for the app's biometric lock surfaces (`app/simpleBiometrics.ts`
-and its callers).
+Vocabulary for the app's biometric lock surfaces (`app/gateController.ts`
+and its triggers), ratified by ADR 0007.
 
 **Privacy shutter**:
 What the biometric gate is: a deterrent against a casual person holding the
