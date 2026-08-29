@@ -533,13 +533,11 @@ export default class Utils {
     return failure.param ? `${text} "${failure.param}"` : text;
   }
 
-  /** Renders a gate failure for user copy, letting the diagnostic param through only for the stalled key. */
+  /** Renders a gate failure for user copy, translating its catalog key and keeping the raw diagnostic out. */
   static renderGateFailure(
     failure: GateFailure,
     translate: (key: string) => TranslateType,
   ): string {
-    return failure.errorKey === 'biometrics-failure-stalled'
-      ? Utils.renderErrorKeyed(failure, translate)
-      : (translate(failure.errorKey) as string);
+    return translate(failure.errorKey) as string;
   }
 }

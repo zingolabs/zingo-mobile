@@ -5,7 +5,7 @@ import type { TranslateType } from '../app/AppState';
 
 const translate = (k: string): TranslateType => k;
 
-test('renderGateFailure keeps raw diagnostics out of non-stalled copy', () => {
+test('renderGateFailure keeps raw diagnostics out of user copy', () => {
   expect(
     Utils.renderGateFailure(
       {
@@ -16,17 +16,10 @@ test('renderGateFailure keeps raw diagnostics out of non-stalled copy', () => {
       translate,
     ),
   ).toBe('biometrics-failure-declined');
-});
-
-test('renderGateFailure appends the diagnostic for the stalled key', () => {
   expect(
     Utils.renderGateFailure(
-      {
-        kind: 'error',
-        errorKey: 'biometrics-failure-stalled',
-        param: 'getGenericPassword',
-      },
+      { kind: 'error', errorKey: 'biometrics-failure-notserved', param: '11' },
       translate,
     ),
-  ).toBe('biometrics-failure-stalled "getGenericPassword"');
+  ).toBe('biometrics-failure-notserved');
 });
