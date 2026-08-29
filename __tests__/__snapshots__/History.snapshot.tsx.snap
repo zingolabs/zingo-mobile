@@ -1018,8 +1018,8 @@ exports[`Component History - test History currency USD, privacy high & mode adva
     style={
       [
         {
-          "borderTopLeftRadius": undefined,
-          "borderTopRightRadius": undefined,
+          "borderTopLeftRadius": 40,
+          "borderTopRightRadius": 40,
           "overflow": "hidden",
         },
         {
@@ -1913,8 +1913,8 @@ exports[`Component History - test History no currency, privacy normal & mode bas
     style={
       [
         {
-          "borderTopLeftRadius": undefined,
-          "borderTopRightRadius": undefined,
+          "borderTopLeftRadius": 40,
+          "borderTopRightRadius": 40,
           "overflow": "hidden",
         },
         {

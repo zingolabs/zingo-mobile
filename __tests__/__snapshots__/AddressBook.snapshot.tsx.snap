@@ -432,8 +432,8 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
     style={
       [
         {
-          "borderTopLeftRadius": undefined,
-          "borderTopRightRadius": undefined,
+          "borderTopLeftRadius": 40,
+          "borderTopRightRadius": 40,
           "overflow": "hidden",
         },
         {
@@ -861,8 +861,8 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
               style={
                 {
                   "backgroundColor": "#031124",
-                  "borderTopLeftRadius": undefined,
-                  "borderTopRightRadius": undefined,
+                  "borderTopLeftRadius": 40,
+                  "borderTopRightRadius": 40,
                   "paddingHorizontal": 16,
                   "paddingTop": 8,
                 }

@@ -218,8 +218,8 @@ exports[`NewAddressTag - snapshot NewAddressTag renders correctly 1`] = `
             style={
               {
                 "backgroundColor": "#031124",
-                "borderTopLeftRadius": undefined,
-                "borderTopRightRadius": undefined,
+                "borderTopLeftRadius": 40,
+                "borderTopRightRadius": 40,
                 "paddingHorizontal": 16,
                 "paddingTop": 8,
               }

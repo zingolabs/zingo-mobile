@@ -231,8 +231,8 @@ exports[`Component ShowUfvk - test ShowUfvk Backup - snapshot 1`] = `
     style={
       [
         {
-          "borderTopLeftRadius": undefined,
-          "borderTopRightRadius": undefined,
+          "borderTopLeftRadius": 40,
+          "borderTopRightRadius": 40,
           "overflow": "hidden",
         },
         {
@@ -490,8 +490,8 @@ exports[`Component ShowUfvk - test ShowUfvk Change - snapshot 1`] = `
     style={
       [
         {
-          "borderTopLeftRadius": undefined,
-          "borderTopRightRadius": undefined,
+          "borderTopLeftRadius": 40,
+          "borderTopRightRadius": 40,
           "overflow": "hidden",
         },
         {
@@ -749,8 +749,8 @@ exports[`Component ShowUfvk - test ShowUfvk Server - snapshot 1`] = `
     style={
       [
         {
-          "borderTopLeftRadius": undefined,
-          "borderTopRightRadius": undefined,
+          "borderTopLeftRadius": 40,
+          "borderTopRightRadius": 40,
           "overflow": "hidden",
         },
         {
@@ -1008,8 +1008,8 @@ exports[`Component ShowUfvk - test ShowUfvk View - snapshot 1`] = `
     style={
       [
         {
-          "borderTopLeftRadius": undefined,
-          "borderTopRightRadius": undefined,
+          "borderTopLeftRadius": 40,
+          "borderTopRightRadius": 40,
           "overflow": "hidden",
         },
         {

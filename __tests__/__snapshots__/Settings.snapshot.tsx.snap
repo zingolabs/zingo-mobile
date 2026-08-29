@@ -1669,8 +1669,8 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
     style={
       [
         {
-          "borderTopLeftRadius": undefined,
-          "borderTopRightRadius": undefined,
+          "borderTopLeftRadius": 40,
+          "borderTopRightRadius": 40,
           "overflow": "hidden",
         },
         {

@@ -1521,8 +1521,8 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
     style={
       [
         {
-          "borderTopLeftRadius": undefined,
-          "borderTopRightRadius": undefined,
+          "borderTopLeftRadius": 40,
+          "borderTopRightRadius": 40,
           "overflow": "hidden",
         },
         {
@@ -1931,8 +1931,8 @@ memo10"
       style={
         {
           "backgroundColor": "#031124",
-          "borderTopLeftRadius": undefined,
-          "borderTopRightRadius": undefined,
+          "borderTopLeftRadius": 40,
+          "borderTopRightRadius": 40,
           "paddingHorizontal": 16,
           "paddingTop": 8,
         }
@@ -3354,8 +3354,8 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
     style={
       [
         {
-          "borderTopLeftRadius": undefined,
-          "borderTopRightRadius": undefined,
+          "borderTopLeftRadius": 40,
+          "borderTopRightRadius": 40,
           "overflow": "hidden",
         },
         {
@@ -3764,8 +3764,8 @@ memo10"
       style={
         {
           "backgroundColor": "#031124",
-          "borderTopLeftRadius": undefined,
-          "borderTopRightRadius": undefined,
+          "borderTopLeftRadius": 40,
+          "borderTopRightRadius": 40,
           "paddingHorizontal": 16,
           "paddingTop": 8,
         }
