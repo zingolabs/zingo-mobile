@@ -92,6 +92,7 @@ const PriceRow: React.FC<PriceRowProps> = React.memo(
         <View style={{ alignItems: 'flex-end' }}>
           <CurrencyAmount
             style={{ fontSize: 14 }}
+            priceDate={zecPrice.date}
             price={zecPrice.zecPrice}
             amtZec={1}
             currency={currency}

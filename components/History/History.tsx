@@ -407,13 +407,6 @@ const History: React.FunctionComponent<HistoryProps> = ({
     historySnapPoints.length,
   );
 
-  // Tapping the price fetch button reveals the header PriceRow (smallest snap).
-  // The auto-close timer armed by usePriceSnapAutoClose returns it afterwards.
-  const revealPrice = useCallback(() => {
-    if (priceSnapIndex === null) return;
-    safeSnapToIndex(historySheetRef, priceSnapIndex, historySnapPoints.length);
-  }, [priceSnapIndex, historySnapPoints.length]);
-
   useEffect(() => {
     let target = historySnapIds.indexOf(currentSnapIdRef.current);
     if (target < 0) {
@@ -818,7 +811,6 @@ const History: React.FunctionComponent<HistoryProps> = ({
             showMessagesIcon={true}
             onUsdRowLayout={setUsdRowH}
             onPriceRowLayout={setPriceRowH}
-            onManualFetchPrice={revealPrice}
           />
         </View>
         {/* Measured so the history sheet's snap points sit just below it. An

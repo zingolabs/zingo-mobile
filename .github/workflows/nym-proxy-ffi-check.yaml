@@ -98,6 +98,8 @@ jobs:
         with:
           tool: cargo-nextest@0.9.98
 
+      # The shim workspace's own .config/nextest.toml serializes the live
+      # binary, here and for any local invocation alike.
       - name: Live mixnet start
         working-directory: ./rust/nym-proxy-ffi
         run: cargo nextest run --locked --features live-mixnet --test live_mixnet
