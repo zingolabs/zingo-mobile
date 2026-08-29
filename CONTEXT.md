@@ -275,3 +275,54 @@ The one-shot fetch armed when an unattended fetch is refused during
 bootstrap; it fires when the Indicator turns `ready` and is dropped on a
 `died` or `off` verdict or on the next background transition. A transient
 `unknown` is one failed status poll, not a verdict, and does not drop it.
+
+## Biometric gate
+
+Vocabulary for the app's biometric lock surfaces (`app/gateController.ts`
+and its triggers), ratified by ADR 0007.
+
+**Privacy shutter**:
+What the biometric gate is: a deterrent against a casual person holding the
+unlocked phone. Nothing cryptographic depends on the prompt, so a gate that
+cannot run may fail open with a visible notice; it must never trap the owner
+out of the wallet.
+_Avoid_: security boundary, authentication wall (both overclaim what the
+mechanism can enforce)
+
+**Gate controller**:
+The single authority that runs ceremonies. Every surface that wants the
+shutter closed asks it; nothing else may raise an authentication prompt.
+
+**Ceremony**:
+One OS authentication prompt, run by the gate controller. One ceremony
+answers every trigger waiting on it, including a cancel.
+
+**Trigger**:
+A surface that asks the gate controller (app foreground, screen entry, a
+security toggle flipping on). Each trigger owns its own decline
+consequence; none owns a prompt.
+
+**Freshness window**:
+The period after a successful ceremony during which any trigger passes
+without a new ceremony.
+
+**Stall**:
+A ceremony the platform never answers. After one window a stall opens the
+shutter with a visible notice, on every platform; it never locks.
+_Avoid_: timeout (names the mechanism, not the outcome)
+
+**Device-auth call**:
+The native authenticate call (LAContext on iOS, BiometricPrompt on
+Android) the gate controller uses to run a ceremony. It replaces the
+retired keychain-sentinel trick.
+_Avoid_: sentinel (the retired mechanism: an auth-gated keychain entry
+holding "1" whose read summoned the prompt)
+
+**Security toggle**:
+A per-surface setting that enables a trigger, and nothing else. No toggle
+selects a mechanism, a policy, or a retry path.
+
+**Lock**:
+The decline consequence of an app-level trigger: the locked launch screen,
+whose retry asks the gate controller unconditionally. A lock exists only
+while the app runs; a cold start begins unlocked unless a trigger asks.

@@ -16,8 +16,10 @@ import * as Keychain from 'react-native-keychain';
  * Profiles:
  *
  * - `INTERACTIVE_AUTH`: the read/write is gated by an OS auth prompt
- *   (biometric or device credential). Used by `simpleBiometrics` to gate
- *   app startup and foreground-resume. Critically, the Android prompt
+ *   (biometric or device credential). The retired keychain-sentinel gate
+ *   was its only consumer (ADR 0007 replaced it with the DeviceAuth
+ *   native module), so the profile is currently unused and awaits its own
+ *   removal. Critically, the Android prompt
  *   accepts EITHER biometric (BIOMETRIC_STRONG) OR the device passcode —
  *   without explicitly setting `accessControl` the lib defaults to a
  *   prompt that only accepts BIOMETRIC_STRONG, which fails on
