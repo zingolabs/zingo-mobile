@@ -81,6 +81,8 @@ import Utils from '../utils';
 import { getZingoVersion, substituteZingoName } from '../utils/ZingoAppData';
 import { AppTheme } from '../theme';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
+import { PriceTrafficDriver } from '../../components/Components/PriceFetcher';
+import { priceFetcherStore } from '../../components/Components/priceFetcherStore';
 import { ContextAppLoadedProvider } from '../context';
 import { parseZcashURI, serverUris, fetchServerList } from '../uris';
 import selectingServer from '../selectingServer';
@@ -1120,6 +1122,9 @@ export class LoadedAppClass extends Component<
       });
       return;
     }
+    // The gate is open: this, never the raw AppState event, is when a
+    // real return may emit price traffic.
+    priceFetcherStore.foregroundReturned();
     // reading background task info
     await this.fetchBackgroundSyncInfo();
     // setting value for background task Android
@@ -2356,6 +2361,7 @@ export class LoadedAppClass extends Component<
     return (
       <>
         <ContextAppLoadedProvider value={context}>
+          <PriceTrafficDriver />
           <GestureHandlerRootView>
             <BottomSheetModalProvider>
               <BottomSheetBackHandler />

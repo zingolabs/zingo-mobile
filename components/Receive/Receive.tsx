@@ -237,13 +237,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
     receiveSnapPoints.length,
   );
 
-  // Tapping the price fetch button reveals the header PriceRow (smallest snap).
-  // The auto-close timer armed by usePriceSnapAutoClose returns it afterwards.
-  const revealPrice = useCallback(() => {
-    if (priceSnapIndex === null) return;
-    safeSnapToIndex(receiveSheetRef, priceSnapIndex, receiveSnapPoints.length);
-  }, [priceSnapIndex, receiveSnapPoints.length]);
-
   const show = useCallback((_sheetType: 'NA' | 'VA' | 'NAT' | 'TW' | 'EA') => {
     setSheetType(_sheetType);
     bottomSheetRef.current?.present();
@@ -437,7 +430,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
           showMessagesIcon={true}
           onUsdRowLayout={setUsdRowH}
           onPriceRowLayout={setPriceRowH}
-          onManualFetchPrice={revealPrice}
         />
       </View>
       <Animated.View
