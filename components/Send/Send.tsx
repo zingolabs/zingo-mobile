@@ -56,6 +56,7 @@ import ErrorText from '../Components/ErrorText';
 import RegText from '../Components/RegText';
 import ZecAmount from '../Components/ZecAmount';
 import CurrencyAmount from '../Components/CurrencyAmount';
+import { usePriceHealth } from '../Components/priceFetcherStore';
 import Button from '../Components/Button';
 import AppSheet from '../Components/AppSheet';
 import AppSheetModal from '../Components/AppSheetModal';
@@ -93,7 +94,6 @@ import { safeSnapToIndex } from '../../app/utils/safeSnapToIndex';
 import { AppDrawerParamList } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import PriceFetcher from '../Components/PriceFetcher';
-import { usePriceFetcherStore } from '../Components/priceFetcherStore';
 import Header from '../Header';
 import BottomSheet, { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useKeyboardHeight } from '../../app/hooks/useKeyboardHeight';
@@ -164,7 +164,6 @@ const Send: React.FunctionComponent<SendProps> = ({
     defaultUnifiedAddress,
     shieldingAmount,
     selectServer,
-    setZecPrice,
     zenniesDonationAddress,
     //security,
     currency,
@@ -176,6 +175,9 @@ const Send: React.FunctionComponent<SendProps> = ({
     reenableMixnet,
   } = context;
   const { colors } = useTheme();
+  // USD entry derives the ZEC actually sent from the price, so that
+  // figure carries the same stale/absent dim as the USD conversions.
+  const priceMuted = usePriceHealth(zecPrice.date) !== 'live';
 
   const [enabling, setEnabling] = useState<boolean>(false);
   const nymPhase =
@@ -261,10 +263,6 @@ const Send: React.FunctionComponent<SendProps> = ({
   const addressBookSelectRef = useRef<BottomSheetModal>(null);
   const sendErrorSheetRef = useRef<BottomSheetModal>(null);
 
-  // Price-fetch state shared with the PriceFetcher ring; drives the CTA's
-  // transient "Refreshing price" label.
-  const { loading: priceLoading } = usePriceFetcherStore();
-
   // Fee (`sendPropose`) and/or spendable-balance RPC error → the CTA turns into
   // a tappable "calculation error" button that opens SendErrorSheet, which
   // lists BOTH errors (they are often the same failure, shown under each label
@@ -327,14 +325,6 @@ const Send: React.FunctionComponent<SendProps> = ({
     1,
     sendSnapPoints.length,
   );
-
-  // Tapping the price fetch button (header or the in-form amount row) reveals
-  // the header PriceRow (smallest snap). The auto-close timer armed by
-  // usePriceSnapAutoClose returns it afterwards.
-  const revealPrice = useCallback(() => {
-    if (priceSnapIndex === null) return;
-    safeSnapToIndex(sendSheetRef, priceSnapIndex, sendSnapPoints.length);
-  }, [priceSnapIndex, sendSnapPoints.length]);
 
   useEffect(() => {
     if (internalSnapIndexRef.current >= sendSnapPoints.length) {
@@ -1179,7 +1169,6 @@ const Send: React.FunctionComponent<SendProps> = ({
             showMessagesIcon={true}
             onUsdRowLayout={setUsdRowH}
             onPriceRowLayout={setPriceRowH}
-            onManualFetchPrice={revealPrice}
           />
         </View>
       </View>
@@ -1626,6 +1615,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                               !zecPrice.zecPrice || zecPrice.zecPrice <= 0
                             }
                             style={{ marginHorizontal: 8 }}
+                            testID="send.swap-entry"
                           >
                             <Swap
                               width={28}
@@ -1644,6 +1634,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                                 marginBottom: 0,
                                 fontSize: 16,
                               }}
+                              priceDate={zecPrice.date}
                               price={zecPrice.zecPrice}
                               amtZec={
                                 Utils.parseStringLocaleToNumberFloat(
@@ -1657,8 +1648,11 @@ const Send: React.FunctionComponent<SendProps> = ({
                             <ZecAmount
                               style={{ marginLeft: 0 }}
                               currencyName={info.currencyName}
-                              color={colors.fgDefault}
+                              color={
+                                priceMuted ? colors.fgMuted : colors.fgDefault
+                              }
                               size={16}
+                              testID="send.zec-derived"
                               amtZec={
                                 Utils.parseStringLocaleToNumberFloat(
                                   amountText,
@@ -1668,11 +1662,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                             />
                           )}
                           <View style={{ marginLeft: inputZec ? 5 : 2 }}>
-                            <PriceFetcher
-                              setZecPrice={setZecPrice}
-                              backgroundColor={colors.bgSurface}
-                              onManualFetch={revealPrice}
-                            />
+                            <PriceFetcher backgroundColor={colors.bgSurface} />
                           </View>
                         </>
                       )}
@@ -1731,6 +1721,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                         ) : (
                           <CurrencyAmount
                             style={{ fontSize: 14 }}
+                            priceDate={zecPrice.date}
                             price={zecPrice.zecPrice}
                             amtZec={maxAmount}
                             currency={currency}
@@ -2113,15 +2104,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                     marginBottom: 20,
                   }}
                 >
-                  {priceLoading ? (
-                    <Button
-                      type={ButtonTypeEnum.Primary}
-                      disabled
-                      title={translate('send.refreshing-price') as string}
-                      onPress={() => {}}
-                      testID="send.refreshing-price"
-                    />
-                  ) : showCalcError ? (
+                  {showCalcError ? (
                     <Button
                       type={ButtonTypeEnum.Secondary}
                       title={`${translate('send.calc-error') as string} ⓘ`}

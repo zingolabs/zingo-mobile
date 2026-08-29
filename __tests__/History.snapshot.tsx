@@ -48,6 +48,8 @@ describe('Component History - test', () => {
     latestBlock: mockInfo.ironwoodActivationHeight as number,
   };
   state.totalBalance = mockTotalBalance;
+  // The price ring renders only for a Nym-consenting session.
+  state.nym = true;
   const onFunction = jest.fn();
 
   test('History no currency, privacy normal & mode basic - snapshot', () => {

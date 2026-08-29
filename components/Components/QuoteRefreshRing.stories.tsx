@@ -29,8 +29,6 @@ const meta: Meta<typeof QuoteRefreshRing> = {
     trackColor: '#333333',
     durationMs: 8000,
     resetKey: 'story',
-    onPress: () => {},
-    disabled: false,
   },
 };
 
@@ -38,4 +36,4 @@ export default meta;
 type Story = StoryObj<typeof QuoteRefreshRing>;
 
 export const Default: Story = {};
-export const Disabled: Story = { args: { disabled: true } };
+export const MidCycle: Story = { args: { startProgress: 0.5 } };

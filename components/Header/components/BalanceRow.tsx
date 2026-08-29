@@ -44,7 +44,6 @@ type BalanceRowProps = {
   info: InfoType;
   currency: CurrencyEnum;
   zecPrice: ZecPriceType;
-  setZecPrice: (p: number, d: number) => void;
   selectServer: SelectServerEnum;
   showShieldButton: boolean;
   shieldingFee: number;
@@ -55,7 +54,6 @@ type BalanceRowProps = {
   onPressShieldFunds: () => void;
   receivedLegend: boolean | undefined;
   onUsdRowLayout?: (height: number) => void;
-  onManualFetchPrice?: () => void;
 };
 
 const BalanceRow: React.FC<BalanceRowProps> = React.memo(
@@ -71,7 +69,6 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
     info,
     currency,
     zecPrice,
-    setZecPrice,
     selectServer,
     showShieldButton,
     shieldingFee,
@@ -82,7 +79,6 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
     onPressShieldFunds,
     receivedLegend,
     onUsdRowLayout,
-    onManualFetchPrice,
   }) => {
     const navigation = useNavigation<NavigationProp<ParamListBase>>();
     const { colors } = useTheme();
@@ -204,6 +200,7 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
             >
               <CurrencyAmount
                 style={{ marginTop: 0, marginBottom: 0 }}
+                priceDate={zecPrice.date}
                 price={zecPrice.zecPrice}
                 amtZec={
                   totalBalance
@@ -217,10 +214,7 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
                 privacy={privacy}
               />
               <View style={{ marginLeft: 5 }}>
-                <PriceFetcher
-                  setZecPrice={setZecPrice}
-                  onManualFetch={onManualFetchPrice}
-                />
+                <PriceFetcher />
               </View>
             </View>
           )}

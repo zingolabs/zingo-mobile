@@ -382,6 +382,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                 <CurrencyAmount
                   amtZec={sendingTotal}
                   price={zecPrice.zecPrice}
+                  priceDate={zecPrice.date}
                   currency={currency}
                   privacy={false}
                 />
@@ -437,6 +438,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                   style={{ fontSize: 18 }}
                   amtZec={calculatedFee}
                   price={zecPrice.zecPrice}
+                  priceDate={zecPrice.date}
                   currency={currency}
                   privacy={privacy}
                 />
@@ -476,6 +478,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                             style={{ fontSize: 18 }}
                             amtZec={donationAmount}
                             price={zecPrice.zecPrice}
+                            priceDate={zecPrice.date}
                             currency={currency}
                             privacy={privacy}
                           />
@@ -505,6 +508,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                         style={{ fontSize: 18 }}
                         amtZec={Utils.parseStringLocaleToNumberFloat(to.amount)}
                         price={zecPrice.zecPrice}
+                        priceDate={zecPrice.date}
                         currency={currency}
                         privacy={privacy}
                       />
