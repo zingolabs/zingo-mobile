@@ -13,7 +13,7 @@ import SheetRim from '../../Components/SheetRim';
 import MixnetIcon from '../../Header/components/MixnetIcon';
 import { ContextAppLoaded } from '../../../app/context';
 import { ButtonTypeEnum } from '../../../app/AppState';
-import { useTheme } from '../../../app/theme';
+import { radiusSheet, useTheme } from '../../../app/theme';
 import { NymGateState } from './nymGateState';
 
 const NYM_GREEN = '#07FF94';
@@ -53,8 +53,8 @@ const NymGateSheet = forwardRef<BottomSheetModal, NymGateSheetProps>(
         stackBehavior="push"
         backgroundStyle={{
           backgroundColor: colors.bgSurface,
-          borderTopLeftRadius: 40,
-          borderTopRightRadius: 40,
+          borderTopLeftRadius: radiusSheet,
+          borderTopRightRadius: radiusSheet,
         }}
         backdropComponent={renderBackdrop}
         onDismiss={onDismiss}
@@ -62,8 +62,8 @@ const NymGateSheet = forwardRef<BottomSheetModal, NymGateSheetProps>(
         <BottomSheetView
           style={{
             backgroundColor: colors.bgSurface,
-            borderTopLeftRadius: 40,
-            borderTopRightRadius: 40,
+            borderTopLeftRadius: radiusSheet,
+            borderTopRightRadius: radiusSheet,
             paddingHorizontal: 28,
             paddingTop: 28,
             paddingBottom: 40,

@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { forwardRef, useCallback } from 'react';
 import { Keyboard, Pressable, StyleSheet, View } from 'react-native';
-import { useTheme } from '../../../app/theme';
+import { radiusSheet, useTheme } from '../../../app/theme';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCircleInfo, faXmark } from '@fortawesome/free-solid-svg-icons';
 import {
@@ -92,8 +92,8 @@ const SendErrorSheet = forwardRef<BottomSheetModal, SendErrorSheetProps>(
             paddingBottom: 6,
             paddingHorizontal: 16,
             backgroundColor: colors.bgSurface,
-            borderTopLeftRadius: 40,
-            borderTopRightRadius: 40,
+            borderTopLeftRadius: radiusSheet,
+            borderTopRightRadius: radiusSheet,
           }}
         >
           <SheetRim />
@@ -182,8 +182,8 @@ const SendErrorSheet = forwardRef<BottomSheetModal, SendErrorSheetProps>(
         handleComponent={renderHandle}
         backgroundStyle={{
           backgroundColor: colors.bgSurface,
-          borderTopLeftRadius: 40,
-          borderTopRightRadius: 40,
+          borderTopLeftRadius: radiusSheet,
+          borderTopRightRadius: radiusSheet,
         }}
         backdropComponent={renderBackdrop}
       >

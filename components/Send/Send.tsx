@@ -57,7 +57,8 @@ import RegText from '../Components/RegText';
 import ZecAmount from '../Components/ZecAmount';
 import CurrencyAmount from '../Components/CurrencyAmount';
 import Button from '../Components/Button';
-import SheetRim from '../Components/SheetRim';
+import AppSheet from '../Components/AppSheet';
+import AppSheetModal from '../Components/AppSheetModal';
 import {
   AddressBookFileClass,
   SendPageStateClass,
@@ -94,12 +95,7 @@ import { ContextAppLoaded } from '../../app/context';
 import PriceFetcher from '../Components/PriceFetcher';
 import { usePriceFetcherStore } from '../Components/priceFetcherStore';
 import Header from '../Header';
-import BottomSheet, {
-  BottomSheetBackdrop,
-  BottomSheetBackdropProps,
-  BottomSheetModal,
-  BottomSheetView,
-} from '@gorhom/bottom-sheet';
+import BottomSheet, { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useKeyboardHeight } from '../../app/hooks/useKeyboardHeight';
 import { useDismissSheetsOnBlur } from '../../app/hooks/useDismissSheetsOnBlur';
 import { useOptionsPanelSheetSlide } from '../../app/hooks/useOptionsPanelSheetSlide';
@@ -370,43 +366,36 @@ const Send: React.FunctionComponent<SendProps> = ({
     );
   }, [priceRowH, sendSnapPoints]);
 
-  const renderSendHandle = useCallback(
-    () => (
+  const sendHeader = (
+    <View
+      style={{
+        paddingTop: 8,
+        paddingBottom: 6,
+        paddingHorizontal: 16,
+      }}
+    >
       <View
         style={{
-          paddingTop: 8,
-          paddingBottom: 6,
-          paddingHorizontal: 16,
-          backgroundColor: colors.bgSurface,
-          borderTopLeftRadius: 40,
-          borderTopRightRadius: 40,
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
         }}
       >
-        <SheetRim />
-        <View
+        <View style={{ width: 28 }} />
+        <BoldText
+          numberOfLines={1}
           style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
+            flex: 1,
+            fontSize: 16,
+            lineHeight: 28,
+            textAlign: 'center',
           }}
         >
-          <View style={{ width: 28 }} />
-          <BoldText
-            numberOfLines={1}
-            style={{
-              flex: 1,
-              fontSize: 16,
-              lineHeight: 28,
-              textAlign: 'center',
-            }}
-          >
-            {translate('send.title') as string}
-          </BoldText>
-          <View style={{ width: 28 }} />
-        </View>
+          {translate('send.title') as string}
+        </BoldText>
+        <View style={{ width: 28 }} />
       </View>
-    ),
-    [colors, translate],
+    </View>
   );
 
   const defaultValueFee = (): void => {
@@ -1089,63 +1078,37 @@ const Send: React.FunctionComponent<SendProps> = ({
     memoBottomSheetRef.current?.present();
   };
 
-  const renderMemoBackdrop = useCallback(
-    (props: BottomSheetBackdropProps) => (
-      <BottomSheetBackdrop
-        {...props}
-        disappearsOnIndex={-1}
-        appearsOnIndex={0}
-        pressBehavior="close"
-      />
-    ),
-    [],
-  );
-
-  const renderMemoHandle = useCallback(
-    () => (
-      <View
+  const memoHeader = (
+    <View
+      style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingTop: 8,
+        paddingBottom: 6,
+        paddingHorizontal: 16,
+      }}
+    >
+      <View style={{ width: 48 }} />
+      <BoldText
+        numberOfLines={1}
         style={{
-          paddingTop: 8,
-          paddingBottom: 6,
-          paddingHorizontal: 16,
-          backgroundColor: colors.bgSurface,
-          borderTopLeftRadius: 40,
-          borderTopRightRadius: 40,
+          flex: 1,
+          fontSize: 16,
+          lineHeight: 28,
+          textAlign: 'center',
         }}
       >
-        <SheetRim />
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}
-        >
-          {/* Left spacer matches the X Pressable width (14×2 + 20 = 48)
-              so the title is geometrically centered in the row. */}
-          <View style={{ width: 48 }} />
-          <BoldText
-            numberOfLines={1}
-            style={{
-              flex: 1,
-              fontSize: 16,
-              lineHeight: 28,
-              textAlign: 'center',
-            }}
-          >
-            {translate('send.memo') as string}
-          </BoldText>
-          <Pressable
-            onPress={() => memoBottomSheetRef.current?.dismiss()}
-            hitSlop={8}
-            style={{ paddingHorizontal: 14, paddingVertical: 4 }}
-          >
-            <FontAwesomeIcon icon={faXmark} size={20} color={colors.fgMuted} />
-          </Pressable>
-        </View>
-      </View>
-    ),
-    [colors, translate],
+        {translate('send.memo') as string}
+      </BoldText>
+      <Pressable
+        onPress={() => memoBottomSheetRef.current?.dismiss()}
+        hitSlop={8}
+        style={{ paddingHorizontal: 14, paddingVertical: 4 }}
+      >
+        <FontAwesomeIcon icon={faXmark} size={20} color={colors.fgMuted} />
+      </Pressable>
+    </View>
   );
 
   const setConfirmModalShow = async () => {
@@ -1224,26 +1187,14 @@ const Send: React.FunctionComponent<SendProps> = ({
         pointerEvents="box-none"
         style={[StyleSheet.absoluteFill, sheetSlideStyle]}
       >
-        <BottomSheet
+        <AppSheet
           ref={sendSheetRef}
           snapPoints={sendSnapPoints}
-          index={0}
           onChange={i => {
             internalSnapIndexRef.current = i;
             onPriceSnapChange(i);
           }}
-          enableDynamicSizing={false}
-          enablePanDownToClose={false}
-          enableContentPanningGesture={false}
-          keyboardBehavior={'interactive'}
-          keyboardBlurBehavior={'restore'}
-          android_keyboardInputMode={'adjustResize'}
-          backgroundStyle={{
-            backgroundColor: colors.bgSurface,
-            borderTopLeftRadius: 40,
-            borderTopRightRadius: 40,
-          }}
-          handleComponent={renderSendHandle}
+          header={sendHeader}
         >
           <ScrollView
             ref={scrollViewRef}
@@ -2344,43 +2295,27 @@ const Send: React.FunctionComponent<SendProps> = ({
               </View>
             </View>
           </ScrollView>
-        </BottomSheet>
+        </AppSheet>
       </Animated.View>
-      <BottomSheetModal
+      <AppSheetModal
         ref={memoBottomSheetRef}
-        enableDynamicSizing={true}
-        enablePanDownToClose
-        stackBehavior="push"
-        keyboardBehavior={'interactive'}
-        keyboardBlurBehavior={'restore'}
-        android_keyboardInputMode={'adjustResize'}
-        handleComponent={renderMemoHandle}
-        backgroundStyle={{
-          backgroundColor: colors.bgSurface,
-          borderTopLeftRadius: 40,
-          borderTopRightRadius: 40,
+        header={memoHeader}
+        contentStyle={{
+          paddingHorizontal: 20,
+          paddingTop: 12,
+          paddingBottom: keyboardHeight > 0 ? keyboardHeight + 20 : 30,
         }}
-        backdropComponent={renderMemoBackdrop}
       >
-        <BottomSheetView
-          style={{
-            backgroundColor: colors.bgSurface,
-            paddingHorizontal: 20,
-            paddingTop: 12,
-            paddingBottom: keyboardHeight > 0 ? keyboardHeight + 20 : 30,
-          }}
-        >
-          <Memo
-            key={memoSheetKey}
-            closeSheet={() => memoBottomSheetRef.current?.dismiss()}
-            initialMemo={memoText}
-            includeUAMemoBoolean={includeUAMemoBoolean}
-            defaultUnifiedAddress={defaultUnifiedAddress}
-            setMemoText={setMemoText}
-            translate={translate}
-          />
-        </BottomSheetView>
-      </BottomSheetModal>
+        <Memo
+          key={memoSheetKey}
+          closeSheet={() => memoBottomSheetRef.current?.dismiss()}
+          initialMemo={memoText}
+          includeUAMemoBoolean={includeUAMemoBoolean}
+          defaultUnifiedAddress={defaultUnifiedAddress}
+          setMemoText={setMemoText}
+          translate={translate}
+        />
+      </AppSheetModal>
       <SelectBottomSheet
         ref={addressBookSelectRef}
         title={translate('addressbook.select-placeholder') as string}

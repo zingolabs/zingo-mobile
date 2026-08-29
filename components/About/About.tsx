@@ -9,7 +9,7 @@ import BottomSheet, { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 
 import FadeText from '../Components/FadeText';
 import BoldText from '../Components/BoldText';
-import SheetRim from '../Components/SheetRim';
+import AppSheet from '../Components/AppSheet';
 import { AppDrawerParamList } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
@@ -45,53 +45,32 @@ const About: React.FunctionComponent<AboutProps> = ({ navigation }) => {
 
   const aboutSnapPoints = useFullSheetSnapPoints(containerH, headerH);
 
-  const renderAboutHandle = useCallback(
-    () => (
-      <View
-        style={{
-          paddingTop: 12,
-          paddingBottom: 8,
-          paddingHorizontal: 16,
-          backgroundColor: colors.bgSurface,
-          borderTopLeftRadius: 40,
-          borderTopRightRadius: 40,
-        }}
+  const aboutHeader = (
+    <View
+      style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingTop: 12,
+        paddingBottom: 8,
+        paddingHorizontal: 16,
+      }}
+    >
+      <TouchableOpacity
+        onPress={closeScreen}
+        hitSlop={8}
+        style={{ paddingHorizontal: 4, paddingVertical: 4 }}
       >
-        <SheetRim />
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}
-        >
-          <TouchableOpacity
-            onPress={closeScreen}
-            hitSlop={8}
-            style={{ paddingHorizontal: 4, paddingVertical: 4 }}
-          >
-            <FontAwesomeIcon
-              icon={faChevronLeft}
-              size={20}
-              color={colors.fgAccent}
-            />
-          </TouchableOpacity>
-          <BoldText
-            numberOfLines={1}
-            style={{
-              flex: 1,
-              fontSize: 16,
-              lineHeight: 28,
-              textAlign: 'center',
-            }}
-          >
-            {getZingoName() + ' ' + getZingoVersion()}
-          </BoldText>
-          <View style={{ width: 28 }} />
-        </View>
-      </View>
-    ),
-    [colors, closeScreen],
+        <FontAwesomeIcon icon={faChevronLeft} size={20} color={colors.fgAccent} />
+      </TouchableOpacity>
+      <BoldText
+        numberOfLines={1}
+        style={{ flex: 1, fontSize: 16, lineHeight: 28, textAlign: 'center' }}
+      >
+        {getZingoName() + ' ' + getZingoVersion()}
+      </BoldText>
+      <View style={{ width: 28 }} />
+    </View>
   );
 
   return (
@@ -113,31 +92,16 @@ const About: React.FunctionComponent<AboutProps> = ({ navigation }) => {
           noUfvkIcon={true}
         />
       </View>
-      <BottomSheet
+      <AppSheet
         ref={aboutSheetRef}
         snapPoints={aboutSnapPoints}
-        index={0}
-        enableDynamicSizing={false}
-        enablePanDownToClose={false}
-        enableContentPanningGesture={false}
-        keyboardBehavior={'interactive'}
-        keyboardBlurBehavior={'restore'}
-        android_keyboardInputMode={'adjustResize'}
-        backgroundStyle={{
-          backgroundColor: colors.bgSurface,
-          borderTopLeftRadius: 40,
-          borderTopRightRadius: 40,
-        }}
-        handleComponent={renderAboutHandle}
+        header={aboutHeader}
       >
         <BottomSheetScrollView
           testID="about.scroll-view"
           bounces={false}
           alwaysBounceVertical={false}
-          style={{
-            flex: 1,
-            backgroundColor: colors.bgSurface,
-          }}
+          style={{ flex: 1 }}
           contentContainerStyle={{
             flexDirection: 'column',
             alignItems: 'stretch',
@@ -160,7 +124,7 @@ const About: React.FunctionComponent<AboutProps> = ({ navigation }) => {
             ))}
           </View>
         </BottomSheetScrollView>
-      </BottomSheet>
+      </AppSheet>
     </View>
   );
 };

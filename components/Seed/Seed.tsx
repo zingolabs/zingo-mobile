@@ -35,7 +35,7 @@ import RegText from '../Components/RegText';
 import FadeText from '../Components/FadeText';
 import BoldText from '../Components/BoldText';
 import Button from '../Components/Button';
-import SheetRim from '../Components/SheetRim';
+import AppSheet from '../Components/AppSheet';
 import { useFullSheetSnapPoints } from '../../app/hooks/useFullSheetSnapPoints';
 import { AppDrawerParamList } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
@@ -428,54 +428,46 @@ const Seed: React.FunctionComponent<SeedProps> = ({
     [action, translate],
   );
 
-  const renderSeedHandle = useCallback(
-    () => (
+  const seedHeader = (
+    <View
+      style={{
+        paddingTop: 12,
+        paddingBottom: 8,
+        paddingHorizontal: 16,
+      }}
+    >
       <View
         style={{
-          paddingTop: 12,
-          paddingBottom: 8,
-          paddingHorizontal: 16,
-          backgroundColor: colors.bgSurface,
-          borderTopLeftRadius: 40,
-          borderTopRightRadius: 40,
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
         }}
       >
-        <SheetRim />
-        <View
+        <TouchableOpacity
+          onPress={onClickCancelHide}
+          hitSlop={8}
+          style={{ paddingHorizontal: 4, paddingVertical: 4 }}
+        >
+          <FontAwesomeIcon
+            icon={faChevronLeft}
+            size={20}
+            color={colors.fgAccent}
+          />
+        </TouchableOpacity>
+        <BoldText
+          numberOfLines={1}
           style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
+            flex: 1,
+            fontSize: 16,
+            lineHeight: 28,
+            textAlign: 'center',
           }}
         >
-          <TouchableOpacity
-            onPress={onClickCancelHide}
-            hitSlop={8}
-            style={{ paddingHorizontal: 4, paddingVertical: 4 }}
-          >
-            <FontAwesomeIcon
-              icon={faChevronLeft}
-              size={20}
-              color={colors.fgAccent}
-            />
-          </TouchableOpacity>
-          <BoldText
-            numberOfLines={1}
-            style={{
-              flex: 1,
-              fontSize: 16,
-              lineHeight: 28,
-              textAlign: 'center',
-            }}
-          >
-            {seedTitle}
-          </BoldText>
-          <View style={{ width: 28 }} />
-        </View>
+          {seedTitle}
+        </BoldText>
+        <View style={{ width: 28 }} />
       </View>
-    ),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [colors, seedTitle],
+    </View>
   );
 
   const renderSeedFooter = useCallback(
@@ -571,23 +563,11 @@ const Seed: React.FunctionComponent<SeedProps> = ({
           }
         />
       </View>
-      <BottomSheet
+      <AppSheet
         ref={seedSheetRef}
         snapPoints={seedSnapPoints}
-        index={0}
-        enableDynamicSizing={false}
-        enablePanDownToClose={false}
-        enableContentPanningGesture={false}
-        keyboardBehavior={'interactive'}
-        keyboardBlurBehavior={'restore'}
-        android_keyboardInputMode={'adjustResize'}
-        backgroundStyle={{
-          backgroundColor: colors.bgSurface,
-          borderTopLeftRadius: 40,
-          borderTopRightRadius: 40,
-        }}
-        handleComponent={renderSeedHandle}
-        footerComponent={loadingSeed ? undefined : renderSeedFooter}
+        header={seedHeader}
+        renderFooter={loadingSeed ? undefined : renderSeedFooter}
       >
         {loadingSeed ? (
           <View
@@ -616,10 +596,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
               keyboardShouldPersistTaps="handled"
               bounces={false}
               alwaysBounceVertical={false}
-              style={{
-                flex: 1,
-                backgroundColor: colors.bgSurface,
-              }}
+              style={{ flex: 1 }}
               contentContainerStyle={{
                 flexDirection: 'column',
                 alignItems: 'stretch',
@@ -791,7 +768,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
             </BottomSheetScrollView>
           </>
         )}
-      </BottomSheet>
+      </AppSheet>
     </View>
   );
 };

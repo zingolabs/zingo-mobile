@@ -1,25 +1,29 @@
 import React, { useState } from 'react';
 import { LayoutChangeEvent, StyleSheet, View } from 'react-native';
 import Svg, { Defs, LinearGradient, Path, Stop } from 'react-native-svg';
-import { useTheme } from '../../app/theme';
+import { radiusSheet, useTheme } from '../../app/theme';
 
-const SHEET_RADIUS = 40;
 const RIM_STROKE = 1.5;
 const RIM_INSET = RIM_STROKE / 2;
 
+type SheetRimProps = {
+  radius?: number;
+};
+
 // Measure the sheet width with onLayout so the rim stays aligned when the sheet is narrower than the window.
-const SheetRim: React.FunctionComponent = () => {
+const SheetRim: React.FunctionComponent<SheetRimProps> = ({ radius = radiusSheet }) => {
   const { colors } = useTheme();
   const [width, setWidth] = useState(0);
   const onLayout = (e: LayoutChangeEvent) => setWidth(e.nativeEvent.layout.width);
 
-  const corner = SHEET_RADIUS / width;
-  const path = `M 0 ${SHEET_RADIUS + RIM_INSET} A ${SHEET_RADIUS} ${SHEET_RADIUS} 0 0 1 ${SHEET_RADIUS} ${RIM_INSET} L ${width - SHEET_RADIUS} ${RIM_INSET} A ${SHEET_RADIUS} ${SHEET_RADIUS} 0 0 1 ${width} ${SHEET_RADIUS + RIM_INSET}`;
+  const inner = radius - RIM_INSET;
+  const corner = radius / width;
+  const path = `M ${RIM_INSET} ${radius} A ${inner} ${inner} 0 0 1 ${radius} ${RIM_INSET} L ${width - radius} ${RIM_INSET} A ${inner} ${inner} 0 0 1 ${width - RIM_INSET} ${radius}`;
 
   return (
     <View style={styles.rim} onLayout={onLayout} pointerEvents="none">
-      {width > 2 * SHEET_RADIUS && (
-        <Svg width={width} height={SHEET_RADIUS + RIM_STROKE}>
+      {width > 2 * radius && (
+        <Svg width={width} height={radius + RIM_STROKE}>
           <Defs>
             <LinearGradient id="sheetRim" x1="0" y1="0" x2="1" y2="0">
               <Stop

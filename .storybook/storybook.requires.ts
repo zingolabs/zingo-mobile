@@ -17,6 +17,18 @@ const normalizedStories = [
       true,
       /^\.(?:(?:^|\/|(?:(?:(?!(?:^|\/)\.).)*?)\/)(?!\.)(?=.)[^/]*?\.stories\.(?:ts|tsx)?)$/
     ),
+  },
+  {
+    titlePrefix: "",
+    directory: "./app",
+    files: "**/*.stories.?(ts|tsx)",
+    importPathMatcher: /^\.(?:(?:^|\/|(?:(?:(?!(?:^|\/)\.).)*?)\/)(?!\.)(?=.)[^/]*?\.stories\.(?:ts|tsx)?)$/,
+    // @ts-ignore
+    req: require.context(
+      '../app',
+      true,
+      /^\.(?:(?:^|\/|(?:(?:(?!(?:^|\/)\.).)*?)\/)(?!\.)(?=.)[^/]*?\.stories\.(?:ts|tsx)?)$/
+    ),
   }
 ];
 

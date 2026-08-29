@@ -45,7 +45,10 @@ export default props => React.createElement(SvgXml, Object.assign({ xml }, props
 });
 
 const main: StorybookConfig = {
-  stories: ['../components/**/*.stories.?(ts|tsx)'],
+  stories: [
+    '../components/**/*.stories.?(ts|tsx)',
+    '../app/**/*.stories.?(ts|tsx)',
+  ],
   addons: [],
   framework: {
     name: '@storybook/react-native-web-vite',

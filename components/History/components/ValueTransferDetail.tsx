@@ -42,7 +42,7 @@ import { AppDrawerParamList } from '../../../app/types';
 import { ContextAppLoaded } from '../../../app/context';
 import Header from '../../Header';
 import BoldText from '../../Components/BoldText';
-import SheetRim from '../../Components/SheetRim';
+import AppSheet from '../../Components/AppSheet';
 import CurrencyAmount from '../../Components/CurrencyAmount';
 import AddressItem from '../../Components/AddressItem';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -133,53 +133,46 @@ const ValueTransferDetail: React.FunctionComponent<
 
   const vtdSnapPoints = useFullSheetSnapPoints(containerH, headerH);
 
-  const renderVtdHandle = useCallback(
-    () => (
+  const vtdHeader = (
+    <View
+      style={{
+        paddingTop: 12,
+        paddingBottom: 8,
+        paddingHorizontal: 16,
+      }}
+    >
       <View
         style={{
-          paddingTop: 12,
-          paddingBottom: 8,
-          paddingHorizontal: 16,
-          backgroundColor: colors.bgSurface,
-          borderTopLeftRadius: 40,
-          borderTopRightRadius: 40,
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
         }}
       >
-        <SheetRim />
-        <View
+        <TouchableOpacity
+          onPress={closeScreen}
+          hitSlop={8}
+          style={{ paddingHorizontal: 4, paddingVertical: 4 }}
+        >
+          <FontAwesomeIcon
+            icon={faChevronLeft}
+            size={20}
+            color={colors.fgAccent}
+          />
+        </TouchableOpacity>
+        <BoldText
+          numberOfLines={1}
           style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
+            flex: 1,
+            fontSize: 16,
+            lineHeight: 28,
+            textAlign: 'center',
           }}
         >
-          <TouchableOpacity
-            onPress={closeScreen}
-            hitSlop={8}
-            style={{ paddingHorizontal: 4, paddingVertical: 4 }}
-          >
-            <FontAwesomeIcon
-              icon={faChevronLeft}
-              size={20}
-              color={colors.fgAccent}
-            />
-          </TouchableOpacity>
-          <BoldText
-            numberOfLines={1}
-            style={{
-              flex: 1,
-              fontSize: 16,
-              lineHeight: 28,
-              textAlign: 'center',
-            }}
-          >
-            {translate('history.details') as string}
-          </BoldText>
-          <View style={{ width: 28 }} />
-        </View>
+          {translate('history.details') as string}
+        </BoldText>
+        <View style={{ width: 28 }} />
       </View>
-    ),
-    [colors, closeScreen, translate],
+    </View>
   );
 
   const { memo, memoUA } = Utils.splitMemo(valueTransfer.memos);
@@ -395,22 +388,10 @@ const ValueTransferDetail: React.FunctionComponent<
           addLastSnackbar={addLastSnackbar}
         />
       </View>
-      <BottomSheet
+      <AppSheet
         ref={vtdSheetRef}
         snapPoints={vtdSnapPoints}
-        index={0}
-        enableDynamicSizing={false}
-        enablePanDownToClose={false}
-        enableContentPanningGesture={false}
-        keyboardBehavior={'interactive'}
-        keyboardBlurBehavior={'restore'}
-        android_keyboardInputMode={'adjustResize'}
-        backgroundStyle={{
-          backgroundColor: colors.bgSurface,
-          borderTopLeftRadius: 40,
-          borderTopRightRadius: 40,
-        }}
-        handleComponent={renderVtdHandle}
+        header={vtdHeader}
       >
         {showNavigator && (
           <View
@@ -464,7 +445,6 @@ const ValueTransferDetail: React.FunctionComponent<
           alwaysBounceVertical={false}
           style={{
             flex: 1,
-            backgroundColor: colors.bgSurface,
           }}
           contentContainerStyle={{
             flexDirection: 'column',
@@ -1033,7 +1013,7 @@ const ValueTransferDetail: React.FunctionComponent<
             )}
           </View>
         </BottomSheetScrollView>
-      </BottomSheet>
+      </AppSheet>
     </View>
   );
 };
