@@ -99,40 +99,53 @@ exports[`Component Unified Address List - test Address Transparent List - snapsh
       </View>
     </View>
   </View>
-  <RCTScrollView
-    alwaysBounceVertical={false}
-    bounces={false}
-    contentContainerStyle={
-      {
-        "alignItems": "stretch",
-        "flexDirection": "column",
-        "justifyContent": "flex-start",
-      }
-    }
-    keyboardShouldPersistTaps="handled"
-    onScroll={[Function]}
-    scrollEventThrottle={100}
+  <View
     style={
-      {
-        "backgroundColor": "#031124",
-        "flex": 1,
-      }
+      [
+        {
+          "flex": 1,
+        },
+        {
+          "backgroundColor": "#031124",
+        },
+        undefined,
+      ]
     }
-    testID="addressbook.scroll-view"
   >
-    <View>
-      <ActivityIndicator
-        color="#5a8c5a"
-        size={20}
-        style={
-          {
-            "marginRight": 7,
-            "marginTop": 7,
-          }
+    <RCTScrollView
+      alwaysBounceVertical={false}
+      bounces={false}
+      contentContainerStyle={
+        {
+          "alignItems": "stretch",
+          "flexDirection": "column",
+          "justifyContent": "flex-start",
         }
-      />
-    </View>
-  </RCTScrollView>
+      }
+      keyboardShouldPersistTaps="handled"
+      onScroll={[Function]}
+      scrollEventThrottle={100}
+      style={
+        {
+          "flex": 1,
+        }
+      }
+      testID="addressbook.scroll-view"
+    >
+      <View>
+        <ActivityIndicator
+          color="#5a8c5a"
+          size={20}
+          style={
+            {
+              "marginRight": 7,
+              "marginTop": 7,
+            }
+          }
+        />
+      </View>
+    </RCTScrollView>
+  </View>
 </View>
 `;
 
@@ -235,39 +248,52 @@ exports[`Component Unified Address List - test Address Unified List - snapshot 1
       </View>
     </View>
   </View>
-  <RCTScrollView
-    alwaysBounceVertical={false}
-    bounces={false}
-    contentContainerStyle={
-      {
-        "alignItems": "stretch",
-        "flexDirection": "column",
-        "justifyContent": "flex-start",
-      }
-    }
-    keyboardShouldPersistTaps="handled"
-    onScroll={[Function]}
-    scrollEventThrottle={100}
+  <View
     style={
-      {
-        "backgroundColor": "#031124",
-        "flex": 1,
-      }
+      [
+        {
+          "flex": 1,
+        },
+        {
+          "backgroundColor": "#031124",
+        },
+        undefined,
+      ]
     }
-    testID="addressbook.scroll-view"
   >
-    <View>
-      <ActivityIndicator
-        color="#5a8c5a"
-        size={20}
-        style={
-          {
-            "marginRight": 7,
-            "marginTop": 7,
-          }
+    <RCTScrollView
+      alwaysBounceVertical={false}
+      bounces={false}
+      contentContainerStyle={
+        {
+          "alignItems": "stretch",
+          "flexDirection": "column",
+          "justifyContent": "flex-start",
         }
-      />
-    </View>
-  </RCTScrollView>
+      }
+      keyboardShouldPersistTaps="handled"
+      onScroll={[Function]}
+      scrollEventThrottle={100}
+      style={
+        {
+          "flex": 1,
+        }
+      }
+      testID="addressbook.scroll-view"
+    >
+      <View>
+        <ActivityIndicator
+          color="#5a8c5a"
+          size={20}
+          style={
+            {
+              "marginRight": 7,
+              "marginTop": 7,
+            }
+          }
+        />
+      </View>
+    </RCTScrollView>
+  </View>
 </View>
 `;

@@ -66,12 +66,15 @@ jobs:
       - name: Assemble Current view
         run: cp -r storybook-static visual/ci/storybook
 
+      - name: Stage baseline into the report
+        run: cp -r visual/__baseline__ visual/ci/baseline
+
       - name: Diff head vs baseline
         id: diff
         continue-on-error: true
         run: >-
           VISUAL_CURRENT=visual/ci/head
-          VISUAL_BASELINE=visual/__baseline__
+          VISUAL_BASELINE=visual/ci/baseline
           VISUAL_REPORT=visual/ci/index.html
           VISUAL_STORYBOOK=storybook/index.html
           yarn tsx visual/diff.mts

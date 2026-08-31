@@ -27,7 +27,7 @@ import BoldText from '../../Components/BoldText';
 import ZecAmount from '../../Components/ZecAmount';
 import CurrencyAmount from '../../Components/CurrencyAmount';
 import Button from '../../Components/Button';
-import SheetRim from '../../Components/SheetRim';
+import AppSheet from '../../Components/AppSheet';
 import { useTheme } from '../../../app/theme';
 import { ContextAppLoaded } from '../../../app/context';
 import Header from '../../Header';
@@ -158,53 +158,46 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
 
   const confirmSnapPoints = useFullSheetSnapPoints(containerH, headerH);
 
-  const renderConfirmHandle = useCallback(
-    () => (
+  const confirmHeader = (
+    <View
+      style={{
+        paddingTop: 12,
+        paddingBottom: 8,
+        paddingHorizontal: 16,
+      }}
+    >
       <View
         style={{
-          paddingTop: 12,
-          paddingBottom: 8,
-          paddingHorizontal: 16,
-          backgroundColor: colors.bgSurface,
-          borderTopLeftRadius: 40,
-          borderTopRightRadius: 40,
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
         }}
       >
-        <SheetRim />
-        <View
+        <TouchableOpacity
+          onPress={closeScreen}
+          hitSlop={8}
+          style={{ paddingHorizontal: 4, paddingVertical: 4 }}
+        >
+          <FontAwesomeIcon
+            icon={faChevronLeft}
+            size={20}
+            color={colors.fgAccent}
+          />
+        </TouchableOpacity>
+        <BoldText
+          numberOfLines={1}
           style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
+            flex: 1,
+            fontSize: 16,
+            lineHeight: 28,
+            textAlign: 'center',
           }}
         >
-          <TouchableOpacity
-            onPress={closeScreen}
-            hitSlop={8}
-            style={{ paddingHorizontal: 4, paddingVertical: 4 }}
-          >
-            <FontAwesomeIcon
-              icon={faChevronLeft}
-              size={20}
-              color={colors.fgAccent}
-            />
-          </TouchableOpacity>
-          <BoldText
-            numberOfLines={1}
-            style={{
-              flex: 1,
-              fontSize: 16,
-              lineHeight: 28,
-              textAlign: 'center',
-            }}
-          >
-            {translate('send.confirm-title') as string}
-          </BoldText>
-          <View style={{ width: 28 }} />
-        </View>
+          {translate('send.confirm-title') as string}
+        </BoldText>
+        <View style={{ width: 28 }} />
       </View>
-    ),
-    [colors, closeScreen, translate],
+    </View>
   );
 
   const [memoTotal, setMemoTotal] = useState<string>(
@@ -336,23 +329,11 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
             noUfvkIcon={true}
           />
         </View>
-        <BottomSheet
+        <AppSheet
           ref={confirmSheetRef}
           snapPoints={confirmSnapPoints}
-          index={0}
-          enableDynamicSizing={false}
-          enablePanDownToClose={false}
-          enableContentPanningGesture={false}
-          keyboardBehavior={'interactive'}
-          keyboardBlurBehavior={'restore'}
-          android_keyboardInputMode={'adjustResize'}
-          backgroundStyle={{
-            backgroundColor: colors.bgSurface,
-            borderTopLeftRadius: 40,
-            borderTopRightRadius: 40,
-          }}
-          handleComponent={renderConfirmHandle}
-          footerComponent={renderConfirmFooter}
+          header={confirmHeader}
+          renderFooter={renderConfirmFooter}
         >
           <BottomSheetScrollView
             showsVerticalScrollIndicator={true}
@@ -363,7 +344,6 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
             alwaysBounceVertical={false}
             style={{
               flex: 1,
-              backgroundColor: colors.bgSurface,
             }}
             contentContainerStyle={{
               flexDirection: 'column',
@@ -572,7 +552,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
             )}
             <View style={{ marginBottom: 30 }} />
           </BottomSheetScrollView>
-        </BottomSheet>
+        </AppSheet>
       </View>
     </View>
   );
