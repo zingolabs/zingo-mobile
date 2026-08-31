@@ -1,5 +1,5 @@
-import { test } from '@playwright/test';
-import { readFileSync, mkdirSync } from 'node:fs';
+import { test, type Page } from '@playwright/test';
+import { readFileSync, mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 type Entry = {
@@ -31,12 +31,22 @@ const shot = (id: string, state: string) => join(imagesDir, `${id}__${state}.png
 const FRAME = 1200;
 // Fake-clock milliseconds for hover/press feedback to settle.
 const FEEDBACK = 200;
-const SETTLE_STEP = 200;
-const SETTLE_TRIES = 15;
+const STATIC_SETTLES = [400, 1500, 3500, 6000];
 // CSS animations and transitions run on real time, not the fake clock, so
 // the screenshot freezes them (finite ones jump to their end state) and
 // hides the text caret, whose blink is real time too.
 const still = { animations: 'disabled', caret: 'hide' } as const;
+
+async function shootStatic(
+  p: Page,
+  settle: number,
+): Promise<Buffer | undefined> {
+  const blank = await p.screenshot(still);
+  await p.waitForTimeout(settle);
+  await p.clock.runFor(FRAME);
+  const frame = await p.screenshot(still);
+  return frame.equals(blank) ? undefined : frame;
+}
 
 for (const entry of entries) {
   test(`${entry.title} — ${entry.name}`, async ({ page }) => {
@@ -60,19 +70,21 @@ for (const entry of entries) {
     await page.evaluate('document.fonts.ready');
 
     if (entry.tags?.includes('static')) {
-      let last = -1;
-      for (let i = 0; i < SETTLE_TRIES; i += 1) {
-        await page.waitForTimeout(SETTLE_STEP);
-        const count = await page.evaluate(
-          () =>
-            document.getElementById('storybook-root')?.getElementsByTagName('*')
-              .length ?? 0,
-        );
-        if (count > 0 && count === last) break;
-        last = count;
+      let frame = await shootStatic(page, STATIC_SETTLES[0]);
+      for (let i = 1; i < STATIC_SETTLES.length && !frame; i += 1) {
+        const fresh = await page.context().newPage();
+        await fresh.clock.install({ time: 0 });
+        await fresh.clock.pauseAt(0);
+        await fresh.goto(`/iframe.html?id=${entry.id}&viewMode=story`);
+        await fresh.locator('#storybook-root').waitFor({ state: 'visible' });
+        await fresh.evaluate('document.fonts.ready');
+        frame = await shootStatic(fresh, STATIC_SETTLES[i]);
+        await fresh.close();
       }
-      await page.clock.runFor(FRAME);
-      await page.screenshot({ path: shot(entry.id, 'default'), ...still });
+      if (!frame) {
+        throw new Error(`static story never presented: ${entry.id}`);
+      }
+      writeFileSync(shot(entry.id, 'default'), frame);
       return;
     }
 
