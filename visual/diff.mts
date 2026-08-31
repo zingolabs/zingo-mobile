@@ -173,7 +173,12 @@ console.log(
     timelineChanged ? 'CHANGED' : 'pass'
   }`,
 );
-process.exit(imagesChanged || timelineChanged ? 1 : 0);
+const changed = imagesChanged || timelineChanged;
+writeFileSync(
+  join(reportDir, 'status.json'),
+  JSON.stringify({ status: changed ? 'changed' : 'matches' }),
+);
+process.exit(changed ? 1 : 0);
 
 // ---------------------------------------------------------------------------
 
