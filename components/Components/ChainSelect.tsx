@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { useTheme } from '../../app/theme';
+import { radiusSheet, useTheme } from '../../app/theme';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
   faCheck,
@@ -223,8 +223,8 @@ const ChainSelect: React.FunctionComponent<ChainSelectProps> = ({
         handleComponent={null}
         backgroundStyle={{
           backgroundColor: colors.bgSurface,
-          borderTopLeftRadius: 40,
-          borderTopRightRadius: 40,
+          borderTopLeftRadius: radiusSheet,
+          borderTopRightRadius: radiusSheet,
         }}
         backdropComponent={renderBackdrop}
       >
@@ -236,8 +236,8 @@ const ChainSelect: React.FunctionComponent<ChainSelectProps> = ({
               paddingTop: 8,
               paddingHorizontal: 16,
               backgroundColor: colors.bgSurface,
-              borderTopLeftRadius: 40,
-              borderTopRightRadius: 40,
+              borderTopLeftRadius: radiusSheet,
+              borderTopRightRadius: radiusSheet,
             }}
           >
             <SheetRim />

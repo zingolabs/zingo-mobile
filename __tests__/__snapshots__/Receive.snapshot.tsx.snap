@@ -632,6 +632,136 @@ exports[`Component Receive - test Receive - snapshot 1`] = `
     }
   />
   <View
+    style={
+      [
+        {
+          "borderTopLeftRadius": 40,
+          "borderTopRightRadius": 40,
+          "overflow": "hidden",
+        },
+        {
+          "backgroundColor": "#031124",
+        },
+        {
+          "paddingBottom": 30,
+        },
+      ]
+    }
+  >
+    <View
+      style={
+        {
+          "alignItems": "center",
+          "flexDirection": "row",
+          "justifyContent": "space-between",
+          "paddingBottom": 6,
+          "paddingHorizontal": 16,
+          "paddingTop": 8,
+        }
+      }
+    >
+      <View
+        style={
+          {
+            "width": 48,
+          }
+        }
+      />
+      <Text
+        numberOfLines={1}
+        style={
+          {
+            "color": "#c3c3c3",
+            "flex": 1,
+            "fontSize": 16,
+            "fontWeight": "bold",
+            "lineHeight": 28,
+            "opacity": 0.87,
+            "textAlign": "center",
+          }
+        }
+      />
+      <View
+        accessibilityState={
+          {
+            "busy": undefined,
+            "checked": undefined,
+            "disabled": undefined,
+            "expanded": undefined,
+            "selected": undefined,
+          }
+        }
+        accessibilityValue={
+          {
+            "max": undefined,
+            "min": undefined,
+            "now": undefined,
+            "text": undefined,
+          }
+        }
+        accessible={true}
+        collapsable={false}
+        focusable={true}
+        hitSlop={8}
+        onBlur={[Function]}
+        onClick={[Function]}
+        onFocus={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          {
+            "paddingHorizontal": 14,
+            "paddingVertical": 4,
+          }
+        }
+      >
+        <
+          color="#888888"
+          icon={
+            {
+              "icon": [
+                384,
+                512,
+                [
+                  128473,
+                  10005,
+                  10006,
+                  10060,
+                  215,
+                  "close",
+                  "multiply",
+                  "remove",
+                  "times",
+                ],
+                "f00d",
+                "M55.1 73.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L147.2 256 9.9 393.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192.5 301.3 329.9 438.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.8 256 375.1 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192.5 210.7 55.1 73.4z",
+              ],
+              "iconName": "xmark",
+              "prefix": "fas",
+            }
+          }
+          size={20}
+        />
+      </View>
+    </View>
+  </View>
+  <View
+    onLayout={[Function]}
+    pointerEvents="none"
+    style={
+      {
+        "left": 0,
+        "position": "absolute",
+        "right": 0,
+        "top": 0,
+      }
+    }
+  />
+  <View
     accessibilityState={
       {
         "busy": undefined,

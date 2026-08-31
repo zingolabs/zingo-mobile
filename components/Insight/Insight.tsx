@@ -23,7 +23,7 @@ import BottomSheet, { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 
 import RegText from '../Components/RegText';
 import BoldText from '../Components/BoldText';
-import SheetRim from '../Components/SheetRim';
+import AppSheet from '../Components/AppSheet';
 import ZecAmount from '../Components/ZecAmount';
 import { AppDrawerParamList } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
@@ -96,53 +96,46 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
 
   const insightSnapPoints = useFullSheetSnapPoints(containerH, headerH);
 
-  const renderInsightHandle = useCallback(
-    () => (
+  const insightHeader = (
+    <View
+      style={{
+        paddingTop: 12,
+        paddingBottom: 8,
+        paddingHorizontal: 16,
+      }}
+    >
       <View
         style={{
-          paddingTop: 12,
-          paddingBottom: 8,
-          paddingHorizontal: 16,
-          backgroundColor: colors.bgSurface,
-          borderTopLeftRadius: 40,
-          borderTopRightRadius: 40,
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
         }}
       >
-        <SheetRim />
-        <View
+        <TouchableOpacity
+          onPress={closeScreen}
+          hitSlop={8}
+          style={{ paddingHorizontal: 4, paddingVertical: 4 }}
+        >
+          <FontAwesomeIcon
+            icon={faChevronLeft}
+            size={20}
+            color={colors.fgAccent}
+          />
+        </TouchableOpacity>
+        <BoldText
+          numberOfLines={1}
           style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
+            flex: 1,
+            fontSize: 16,
+            lineHeight: 28,
+            textAlign: 'center',
           }}
         >
-          <TouchableOpacity
-            onPress={closeScreen}
-            hitSlop={8}
-            style={{ paddingHorizontal: 4, paddingVertical: 4 }}
-          >
-            <FontAwesomeIcon
-              icon={faChevronLeft}
-              size={20}
-              color={colors.fgAccent}
-            />
-          </TouchableOpacity>
-          <BoldText
-            numberOfLines={1}
-            style={{
-              flex: 1,
-              fontSize: 16,
-              lineHeight: 28,
-              textAlign: 'center',
-            }}
-          >
-            {translate('insight.title') as string}
-          </BoldText>
-          <View style={{ width: 28 }} />
-        </View>
+          {translate('insight.title') as string}
+        </BoldText>
+        <View style={{ width: 28 }} />
       </View>
-    ),
-    [colors, closeScreen, translate],
+    </View>
   );
 
   useEffect(() => {
@@ -381,27 +374,14 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
           addLastSnackbar={addLastSnackbar}
         />
       </View>
-      <BottomSheet
+      <AppSheet
         ref={insightSheetRef}
         snapPoints={insightSnapPoints}
-        index={0}
-        enableDynamicSizing={false}
-        enablePanDownToClose={false}
-        enableContentPanningGesture={false}
-        keyboardBehavior={'interactive'}
-        keyboardBlurBehavior={'restore'}
-        android_keyboardInputMode={'adjustResize'}
-        backgroundStyle={{
-          backgroundColor: colors.bgSurface,
-          borderTopLeftRadius: 40,
-          borderTopRightRadius: 40,
-        }}
-        handleComponent={renderInsightHandle}
+        header={insightHeader}
       >
         <View
           style={{
             flex: 1,
-            backgroundColor: colors.bgSurface,
           }}
         >
           <View style={{ width: '100%', flexDirection: 'row', marginTop: 10 }}>
@@ -583,7 +563,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
             </View>
           </BottomSheetScrollView>
         </View>
-      </BottomSheet>
+      </AppSheet>
     </View>
   );
 };

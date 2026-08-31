@@ -24,7 +24,8 @@ import { AppDrawerParamList } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
 import BoldText from '../Components/BoldText';
-import SheetRim from '../Components/SheetRim';
+import AppSheet from '../Components/AppSheet';
+import AppSheetModal from '../Components/AppSheetModal';
 
 import {
   AddressKindEnum,
@@ -40,12 +41,7 @@ import {
   RouteEnum,
 } from '../../app/AppState';
 import { RPCAddressScopeEnum } from '../../app/walletBackend/enums/RPCAddressScopeEnum';
-import BottomSheet, {
-  BottomSheetBackdrop,
-  BottomSheetBackdropProps,
-  BottomSheetModal,
-  BottomSheetView,
-} from '@gorhom/bottom-sheet';
+import BottomSheet, { BottomSheetModal } from '@gorhom/bottom-sheet';
 import NewAddress from './components/NewAddress';
 import VerifyAddress from './components/VerifyAddress';
 import NewAddressTag from './components/NewAddressTag';
@@ -305,60 +301,37 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
     }
   }, [sheetType, index, translate]);
 
-  const renderModalHandle = useCallback(
-    () => (
-      <View
+  const xHeader = (
+    <View
+      style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingTop: 8,
+        paddingBottom: 6,
+        paddingHorizontal: 16,
+      }}
+    >
+      <View style={{ width: 48 }} />
+      <BoldText
+        numberOfLines={1}
         style={{
-          paddingTop: 8,
-          paddingBottom: 6,
-          paddingHorizontal: 16,
-          backgroundColor: colors.bgSurface,
-          borderTopLeftRadius: 40,
-          borderTopRightRadius: 40,
+          flex: 1,
+          fontSize: 16,
+          lineHeight: 28,
+          textAlign: 'center',
         }}
       >
-        <SheetRim />
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}
-        >
-          {/* Left spacer matches the X Pressable width (14×2 + 20 = 48)
-              so the title is geometrically centered in the row. */}
-          <View style={{ width: 48 }} />
-          <BoldText
-            numberOfLines={1}
-            style={{
-              flex: 1,
-              fontSize: 16,
-              lineHeight: 28,
-              textAlign: 'center',
-            }}
-          >
-            {modalTitle}
-          </BoldText>
-          <Pressable
-            onPress={hide}
-            hitSlop={8}
-            style={{ paddingHorizontal: 14, paddingVertical: 4 }}
-          >
-            <FontAwesomeIcon icon={faXmark} size={20} color={colors.fgMuted} />
-          </Pressable>
-        </View>
-      </View>
-    ),
-    [colors, modalTitle, hide],
-  );
-
-  const renderBackdrop = (props: BottomSheetBackdropProps) => (
-    <BottomSheetBackdrop
-      {...props}
-      disappearsOnIndex={-1}
-      appearsOnIndex={0}
-      pressBehavior="close"
-    />
+        {modalTitle}
+      </BoldText>
+      <Pressable
+        onPress={hide}
+        hitSlop={8}
+        style={{ paddingHorizontal: 14, paddingVertical: 4 }}
+      >
+        <FontAwesomeIcon icon={faXmark} size={20} color={colors.fgMuted} />
+      </Pressable>
+    </View>
   );
 
   const doCopy = () => {
@@ -405,6 +378,80 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   const currentTotal = index === 0 ? uAddr.length : tAddr.length;
   const currentAddrIndex = index === 0 ? (uAddrIndex ?? 0) : (tAddrIndex ?? 0);
 
+  const receiveHeader = (
+    <View
+      style={{
+        paddingTop: 8,
+        paddingBottom: 6,
+        paddingHorizontal: 16,
+      }}
+    >
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+        }}
+      >
+        <View style={{ width: 46 }} />
+        <View
+          style={{
+            flex: 1,
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          {canPickScope ? (
+            <Pressable
+              onPress={() => scopeSelectRef.current?.present()}
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                paddingHorizontal: 2,
+                paddingVertical: 4,
+              }}
+            >
+              <FontAwesomeIcon
+                icon={faChevronDown}
+                size={14}
+                color={colors.fgMuted}
+                style={{ marginRight: 8 }}
+              />
+              <BoldText style={{ fontSize: 16, lineHeight: 28 }}>
+                {
+                  (index === 0
+                    ? translate('receive.scope-shielded')
+                    : translate('receive.scope-transparent')) as string
+                }
+              </BoldText>
+            </Pressable>
+          ) : (
+            <BoldText style={{ fontSize: 16, lineHeight: 28 }}>
+              {
+                (index === 0
+                  ? translate('receive.scope-shielded')
+                  : translate('receive.scope-transparent')) as string
+              }
+            </BoldText>
+          )}
+        </View>
+        {isAdvanced ? (
+          <Pressable
+            onPress={() => show('NA')}
+            hitSlop={8}
+            style={{
+              paddingHorizontal: 14,
+              paddingVertical: 4,
+            }}
+          >
+            <FontAwesomeIcon icon={faPlus} size={18} color={colors.fgMuted} />
+          </Pressable>
+        ) : (
+          <View style={{ width: 46 }} />
+        )}
+      </View>
+    </View>
+  );
+
   const returnPage = (
     <View
       style={{ flex: 1 }}
@@ -437,112 +484,17 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
         style={[StyleSheet.absoluteFill, sheetSlideStyle]}
       >
         {sheetMeasured && (
-          <BottomSheet
+          <AppSheet
             ref={receiveSheetRef}
-            accessible={false}
             snapPoints={receiveSnapPoints}
-            index={0}
             onChange={i => {
               internalSnapIndexRef.current = i;
               onPriceSnapChange(i);
             }}
-            enableDynamicSizing={false}
-            enablePanDownToClose={false}
-            enableContentPanningGesture={true}
-            keyboardBehavior={'interactive'}
-            keyboardBlurBehavior={'restore'}
-            android_keyboardInputMode={'adjustResize'}
-            backgroundStyle={{
-              backgroundColor: colors.bgSurface,
-              borderTopLeftRadius: 40,
-              borderTopRightRadius: 40,
-            }}
-            handleComponent={null}
+            enableContentPanningGesture
+            header={receiveHeader}
           >
-            <View style={{ flex: 1 }}>
-              {/* Sheet header rendered as content (not via handleComponent) so
-              index-change re-renders don't remount the inner select trigger. */}
-              <View
-                style={{
-                  paddingTop: 8,
-                  paddingBottom: 6,
-                  paddingHorizontal: 16,
-                  backgroundColor: colors.bgSurface,
-                  borderTopLeftRadius: 40,
-                  borderTopRightRadius: 40,
-                }}
-              >
-                <SheetRim />
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                  }}
-                >
-                  <View style={{ width: 46 }} />
-                  <View
-                    style={{
-                      flex: 1,
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
-                  >
-                    {canPickScope ? (
-                      <Pressable
-                        onPress={() => scopeSelectRef.current?.present()}
-                        style={{
-                          flexDirection: 'row',
-                          alignItems: 'center',
-                          paddingHorizontal: 2,
-                          paddingVertical: 4,
-                        }}
-                      >
-                        <FontAwesomeIcon
-                          icon={faChevronDown}
-                          size={14}
-                          color={colors.fgMuted}
-                          style={{ marginRight: 8 }}
-                        />
-                        <BoldText style={{ fontSize: 16, lineHeight: 28 }}>
-                          {
-                            (index === 0
-                              ? translate('receive.scope-shielded')
-                              : translate(
-                                  'receive.scope-transparent',
-                                )) as string
-                          }
-                        </BoldText>
-                      </Pressable>
-                    ) : (
-                      <BoldText style={{ fontSize: 16, lineHeight: 28 }}>
-                        {
-                          (index === 0
-                            ? translate('receive.scope-shielded')
-                            : translate('receive.scope-transparent')) as string
-                        }
-                      </BoldText>
-                    )}
-                  </View>
-                  {isAdvanced ? (
-                    <Pressable
-                      onPress={() => show('NA')}
-                      hitSlop={8}
-                      style={{
-                        paddingHorizontal: 14,
-                        paddingVertical: 4,
-                      }}
-                    >
-                      <FontAwesomeIcon
-                        icon={faPlus}
-                        size={18}
-                        color={colors.fgMuted}
-                      />
-                    </Pressable>
-                  ) : (
-                    <View style={{ width: 46 }} />
-                  )}
-                </View>
-              </View>
+            <View accessible={false} style={{ flex: 1 }}>
               {!!addresses && !!defaultUnifiedAddress && (
                 <SingleAddress
                   address={currentAddress}
@@ -554,40 +506,17 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                 />
               )}
             </View>
-          </BottomSheet>
+          </AppSheet>
         )}
       </Animated.View>
-      <BottomSheetModal
+      <AppSheetModal
         ref={bottomSheetRef}
-        enableDynamicSizing={true}
-        enablePanDownToClose
-        stackBehavior="push"
-        keyboardBehavior={'interactive'}
-        keyboardBlurBehavior={'restore'}
-        android_keyboardInputMode={'adjustResize'}
-        onAnimate={(from, to) => {
-          // Opening (from === -1) dismisses a keyboard left open by the
-          // underlying screen so the sheet never renders behind it. Guard
-          // avoids fighting a keyboard the sheet itself focuses later.
-          if (from === -1 && to >= 0) {
-            Keyboard.dismiss();
-          }
+        header={xHeader}
+        contentStyle={{
+          paddingBottom: keyboardHeight > 0 ? keyboardHeight + 20 : 30,
         }}
-        handleComponent={renderModalHandle}
-        backgroundStyle={{
-          backgroundColor: colors.bgSurface,
-          borderTopLeftRadius: 40,
-          borderTopRightRadius: 40,
-        }}
-        backdropComponent={renderBackdrop}
       >
-        <BottomSheetView
-          style={{
-            backgroundColor: colors.bgSurface,
-            paddingBottom: keyboardHeight > 0 ? keyboardHeight + 20 : 30,
-          }}
-        >
-          {sheetType === 'NA' && (
+        {sheetType === 'NA' && (
             <NewAddress
               addressKind={index === 0 ? AddressKindEnum.u : AddressKindEnum.t}
               closeSheet={hide}
@@ -639,8 +568,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
               }
             />
           )}
-        </BottomSheetView>
-      </BottomSheetModal>
+      </AppSheetModal>
       <SelectBottomSheet
         ref={scopeSelectRef}
         title={translate('receive.select-scope-placeholder') as string}

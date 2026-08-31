@@ -101,25 +101,39 @@ exports[`Component Rescan - test Rescan - snapshot 1`] = `
   </View>
   <View
     style={
-      {
-        "display": "flex",
-        "margin": 20,
-        "marginBottom": 30,
-      }
+      [
+        {
+          "flex": 1,
+        },
+        {
+          "backgroundColor": "#031124",
+        },
+        undefined,
+      ]
     }
   >
-    <Text
+    <View
       style={
         {
-          "color": "#c3c3c3",
-          "fontSize": 15,
-          "fontWeight": "400",
-          "opacity": 1,
+          "display": "flex",
+          "margin": 20,
+          "marginBottom": 30,
         }
       }
     >
-      text translated1900100text translated
-    </Text>
+      <Text
+        style={
+          {
+            "color": "#c3c3c3",
+            "fontSize": 15,
+            "fontWeight": "400",
+            "opacity": 1,
+          }
+        }
+      >
+        text translated1900100text translated
+      </Text>
+    </View>
   </View>
 </View>
 `;
