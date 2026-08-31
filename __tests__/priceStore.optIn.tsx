@@ -1,21 +1,5 @@
 /**
- * The Nym selection as the single and only price-traffic consent
- * (ADR 0008): one verdict test per finding of Juanky's review of
- * PR 1343, plus one that review surfaced. Each test encodes the
- * behavior the surface should have: it fails on the broken code and
- * passes once the finding is fixed.
- *
- * J1: the Nym consent alone starts the cadence; the display currency
- *     never gates traffic. This pins the ratified ADR 0008 behavior
- *     Juanky asks about: a ZEC-display wallet with the consent fetches
- *     a price nothing renders. The test passes today; if the answer to
- *     "intended?" is no, this is the test to invert.
- * J2: when the ring's cycle-keyed fill completes, a refresh really is
- *     due: no path re-arms a full timer without restarting the ring.
- * J3: a return parked on an in-flight fetch still counts as the last
- *     return-triggered fetch, so the next hop is rate-bound.
- * R1: a re-render behind the closed foreground gate emits no traffic;
- *     only foregroundReturned may, as the store's own comment states.
+ * The Nym opt-in that starts price traffic.
  */
 jest.mock('../app/walletBackend', () => ({
   __esModule: true,
@@ -97,7 +81,7 @@ afterEach(() => {
   jest.useRealTimers();
 });
 
-test('J1: with the consent a ZEC-display wallet still fetches every tick', async () => {
+test('with the opt-in a ZEC-display wallet still fetches every tick', async () => {
   jest.useFakeTimers();
   price.mockResolvedValue({ price: 42, error: '' });
   const setZecPrice = jest.fn();
@@ -112,7 +96,7 @@ test('J1: with the consent a ZEC-display wallet still fetches every tick', async
   expect(price.mock.calls.length).toBeGreaterThanOrEqual(2); // the cadence, display or not
 });
 
-test('J2: a full ring always means a refresh really is due', async () => {
+test('a full ring always means a refresh really is due', async () => {
   jest.useFakeTimers();
   price.mockResolvedValue({ price: 42, error: '' });
   const setZecPrice = jest.fn();
@@ -138,7 +122,7 @@ test('J2: a full ring always means a refresh really is due', async () => {
   expect(rearmed.nextFetchAt).toBe(Date.now() + rearmed.nextFetchDelayMs);
 });
 
-test('J3: a return parked on a flight still arms the hop rate bound', async () => {
+test('a return parked on a flight still arms the hop rate bound', async () => {
   jest.useFakeTimers();
   let land: (v: { price: number; error: string }) => void = () => {};
   price
@@ -174,7 +158,7 @@ test('J3: a return parked on a flight still arms the hop rate bound', async () =
   expect(price).toHaveBeenCalledTimes(4); // rate-bound, no fifth call
 });
 
-test('R1: a re-render behind the closed gate emits no traffic', async () => {
+test('a re-render behind the closed gate emits no traffic', async () => {
   jest.useFakeTimers();
   price.mockResolvedValue({ price: 42, error: '' });
   const setZecPrice = jest.fn();

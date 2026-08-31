@@ -20,21 +20,21 @@ export const MIXNET_STATUS_KEYS: readonly MixnetStatusKey[] = [
   'mixnet.status.unknown',
 ];
 
-/** How the transport disposes a mixnet-only fetch: refuses it, might still be bootstrapping, or serves it. */
+/** How the transport disposes a price fetch. */
 export type MixnetTransportDisposition =
   'refusing' | 'possibleBootstrap' | 'serving';
 
-/** Classifies a status key exhaustively, so a new indicator breaks this build instead of silently passing as servable. */
+/** Classifies a status key exhaustively. */
 export function transportDisposition(
   key: MixnetStatusKey,
 ): MixnetTransportDisposition {
   switch (key) {
-    case 'mixnet.status.off':
     case 'mixnet.status.died':
       return 'refusing';
     case 'mixnet.status.bootstrapping':
     case 'mixnet.status.unknown':
       return 'possibleBootstrap';
+    case 'mixnet.status.off':
     case 'mixnet.status.ready':
       return 'serving';
   }
@@ -88,11 +88,10 @@ export const OFF_MIXNET_VIEW: MixnetView = {
 /**
  * Derives the screen-facing view from the typed reports.
  *
- * Pure function — no side effects. The fail-closed invariant lives here in
+ * Pure function. The fail-closed invariant lives here in
  * app form: a failure report blocks sending exactly as `bootstrapping` and
  * `died` do, because an unknowable transport must never be treated as
- * consented clearnet (ADR 0011; the wallet core enforces the same rule —
- * this projection only keeps the UI honest about it).
+ * consented clearnet.
  */
 export function deriveMixnetView(
   status: MixnetStatusReport,

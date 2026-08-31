@@ -1,19 +1,6 @@
 /**
- * Wedged timers and wedged native calls, and the gates and rate
- * bounds that keep them from re-forming, distilled from the reviews
- * of PR 1343. Each test encodes the behavior a finding says the
- * surface should have: it fails on the broken code and passes once
- * fixed.
- *
- * P1: a tick that fires into a refusing window must not wedge the timer.
- * P2: a wedged native call is retired after its TTL, so the store can
- *     issue a fresh request again.
- * P3: the bare 'active' event arms no cadence; the opened gate does.
- * P6: no market, no traffic: offline mode and non-mainnet chains fetch
- *     nothing, consent or not.
- * P7: repeated returns during a failure window are rate-bound.
- * P9: a mid-flight consent withdrawal leaves no dangling timer, and a
- *     re-grant restarts the cadence.
+ * Wedged timers and wedged native calls, and the gates and rate bounds
+ * that keep them from re-forming.
  */
 jest.mock('../app/walletBackend', () => ({
   __esModule: true,
@@ -115,7 +102,7 @@ afterEach(() => {
   jest.useRealTimers();
 });
 
-test('P1: a tick fired into a refusing window never wedges the cadence', async () => {
+test('a tick fired into a refusing window never wedges the cadence', async () => {
   jest.useFakeTimers();
   price.mockResolvedValue({ price: 42, error: '' });
   const setZecPrice = jest.fn();
@@ -156,7 +143,7 @@ test('P1: a tick fired into a refusing window never wedges the cadence', async (
   expect(price.mock.calls.length).toBeGreaterThan(1);
 });
 
-test('P2: a wedged native call retires after its TTL and a fresh one runs', async () => {
+test('a wedged native call retires after its TTL and a fresh one runs', async () => {
   jest.useFakeTimers();
   price
     .mockImplementationOnce(() => new Promise(() => {})) // wedged forever
@@ -172,7 +159,7 @@ test('P2: a wedged native call retires after its TTL and a fresh one runs', asyn
   expect(setZecPrice).toHaveBeenCalledWith(42, expect.any(Number));
 });
 
-test('P3: the bare active event arms no cadence behind the gate', async () => {
+test('the bare active event arms no cadence behind the gate', async () => {
   jest.useFakeTimers();
   price.mockResolvedValue({ price: 42, error: '' });
   const setZecPrice = jest.fn();
@@ -191,7 +178,7 @@ test('P3: the bare active event arms no cadence behind the gate', async () => {
   expect(price).toHaveBeenCalledTimes(2);
 });
 
-test('P6: no market, no traffic: offline and non-mainnet fetch nothing', async () => {
+test('no market, no traffic: offline and non-mainnet fetch nothing', async () => {
   jest.useFakeTimers();
   price.mockResolvedValue({ price: 42, error: '' });
   const setZecPrice = jest.fn();
@@ -218,7 +205,7 @@ test('P6: no market, no traffic: offline and non-mainnet fetch nothing', async (
   expect(price).not.toHaveBeenCalled();
 });
 
-test('P7: repeated returns during a failure window are rate-bound', async () => {
+test('repeated returns during a failure window are rate-bound', async () => {
   price.mockResolvedValue({ price: -1, error: 'refused' });
   const setZecPrice = jest.fn();
 
@@ -238,7 +225,7 @@ test('P7: repeated returns during a failure window are rate-bound', async () => 
   expect(price).toHaveBeenCalledTimes(4);
 });
 
-test('P9: a mid-flight consent withdrawal leaves no wedge for a re-grant', async () => {
+test('a mid-flight opt-in withdrawal leaves no wedge for a re-grant', async () => {
   jest.useFakeTimers();
   let land: (v: { price: number; error: string }) => void = () => {};
   price

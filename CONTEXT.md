@@ -238,8 +238,7 @@ _Avoid_: mode (names the feature, not the state it reports)
 **Route**:
 The network path a mixnet-only surface resolves to, either the Standing
 Client's tunnel or clearnet. zingolib derives it from the indicator, and the
-app never sees it. A price fetch that resolves to clearnet is refused, never
-sent.
+app never sees it.
 
 ## Price surface
 
@@ -256,25 +255,11 @@ clock), so a healthy cadence never dims, ceiling draws included.
 Staleness is a fact about the value's accuracy, not about fetch
 mechanics, and it is independent of transport.
 
-**Price consent**:
-Selecting Nym, the persisted Mixnet Mode opt-in. It is the single and
-only consent for price traffic: the surface fetches on no other
-authority, and no fetch failure raises a snackbar. The display currency
-chooses what to show, never what may be fetched.
-_Avoid_: manual fetch (removed; every fetch is app-initiated); USD
-selection as consent (the seeded default authorizes nothing)
-
-**Cadence**:
-The consented fetch rhythm: boot, the Nym selection turning on, and
-every gate-open return from the background fetch at once, and each
-further fetch follows the last at a uniform random delay of five to ten
-minutes.
-
 **Ready follow-up**:
 The one-shot fetch armed when an unattended fetch is refused during
 bootstrap; it fires when the Indicator turns `ready` and is dropped on a
-`died` or `off` verdict or on the next background transition. A transient
-`unknown` is one failed status poll, not a verdict, and does not drop it.
+`died` status or on the next background transition. A transient `unknown`
+is one failed status poll, not a settled status, and does not drop it.
 
 ## Biometric gate
 

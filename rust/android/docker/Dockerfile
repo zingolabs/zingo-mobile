@@ -109,7 +109,7 @@ ENV CC=aarch64-linux-android26-clang
 RUN cargo ndk --target aarch64-linux-android build --release --package zingo-nym-proxy-ffi
 
 RUN cargo run --release --manifest-path /opt/zingo/rust/Cargo.toml \
-    --package zingo-uniffi-bindgen -- generate \
+    --package zingo-uniffi-bindgen --bin zingo-uniffi-bindgen -- generate \
     --library target/aarch64-linux-android/release/$SHIM \
     --language kotlin --out-dir generated-kotlin
 RUN llvm-strip --strip-all target/aarch64-linux-android/release/$SHIM
