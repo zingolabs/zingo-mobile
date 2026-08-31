@@ -1,19 +1,5 @@
 /**
- * What may start price traffic: the guards on entries, consent,
- * transport, and the foreground gate, distilled from the reviews of
- * PR 1343. Each test encodes the behavior a finding says the surface
- * should have: it fails on the broken code and passes once fixed.
- *
- * N2: the attach/entry path is rate-limited against remount storms.
- * N3: a withdrawn Nym consent stops the mid-flight retry and the write.
- * N4: a return shortly after a FAILED fetch still fetches.
- * N5: an 'off' or 'died' transport pauses the cadence instead of feeding
- *     it refusals forever, and a recovering status resumes it.
- * N6: price traffic belongs to the wallet session (the driver), not to
- *     whichever currency the screens happen to display.
- * N9: a wedged native call is never multiplied: one orphan, reused.
- * N10: the raw AppState 'active' event fetches nothing; the foreground
- *      gate's opening is what triggers the return fetch.
+ * What may start price traffic.
  */
 jest.mock('../app/walletBackend', () => ({
   __esModule: true,
@@ -38,7 +24,17 @@ import { getZecPrice } from '../app/walletBackend';
 import {
   INITIAL_MIXNET_VIEW,
   OFF_MIXNET_VIEW,
+  MixnetView,
 } from '../app/walletBackend/transforms/mixnetPresenter';
+
+const DIED_VIEW: MixnetView = {
+  statusKey: 'mixnet.status.died',
+  socks5Addr: null,
+  narration: null,
+  sendBlocked: true,
+  recovery: 'reenable',
+  reconnecting: false,
+};
 
 const price = getZecPrice as jest.MockedFunction<typeof getZecPrice>;
 
@@ -77,7 +73,7 @@ const seedDeps = (setZecPrice: (p: number, d: number) => void) => {
     setZecPrice,
     mixnetStatusKey: 'mixnet.status.unknown',
     nymSelected: true,
-    marketAvailable: true,
+    priceFetchable: true,
   });
 };
 
@@ -113,7 +109,7 @@ afterEach(() => {
   jest.useRealTimers();
 });
 
-test('N2: remounting display fetchers starts no new fetch', async () => {
+test('remounting display fetchers starts no new fetch', async () => {
   // The driver owns the session; screens mount and unmount fetchers
   // freely (a settings toggle, a navigation) and none of that is a
   // boot. Only a driver detach ends the session, and the next attach
@@ -132,7 +128,7 @@ test('N2: remounting display fetchers starts no new fetch', async () => {
   expect(price).toHaveBeenCalledTimes(2);
 });
 
-test('N3: a withdrawn consent stops the mid-flight retry', async () => {
+test('a withdrawn opt-in stops the mid-flight retry', async () => {
   let land: (v: { price: number; error: string }) => void = () => {};
   price
     .mockImplementationOnce(
@@ -155,7 +151,7 @@ test('N3: a withdrawn consent stops the mid-flight retry', async () => {
   expect(price).toHaveBeenCalledTimes(1); // no retry after the withdrawal
 });
 
-test('N4: a return shortly after a failed fetch still fetches', async () => {
+test('a return shortly after a failed fetch still fetches', async () => {
   price.mockResolvedValue({ price: -1, error: 'refused' });
   const setZecPrice = jest.fn();
   seedDeps(setZecPrice);
@@ -172,16 +168,16 @@ test('N4: a return shortly after a failed fetch still fetches', async () => {
   expect(price.mock.calls.length).toBeGreaterThan(2);
 });
 
-test('N5: an off transport pauses the cadence until the status recovers', async () => {
+test('a died transport pauses the cadence until the status recovers', async () => {
   jest.useFakeTimers();
   price.mockResolvedValue({ price: -1, error: 'refused' });
   const setZecPrice = jest.fn();
   seedDeps(setZecPrice);
 
-  // Nym consent held, mixnet session-disabled: the backend refuses every
-  // price fetch by the route rule, so attempts are pure waste.
+  // Nym consent held, mixnet died: the backend refuses every price fetch
+  // by the route rule, so attempts are pure waste.
   const view = render(
-    surfaceUi(makeCtx({ mixnetView: OFF_MIXNET_VIEW }), setZecPrice),
+    surfaceUi(makeCtx({ mixnetView: DIED_VIEW }), setZecPrice),
   );
   await jest.advanceTimersByTimeAsync(61_000);
   expect(price).not.toHaveBeenCalled();
@@ -193,7 +189,22 @@ test('N5: an off transport pauses the cadence until the status recovers', async 
   expect(price).toHaveBeenCalled();
 });
 
-test('N6: a consented wallet fetches regardless of the displayed currency', async () => {
+test('a switch-off fetches the price over clearnet', async () => {
+  price.mockResolvedValue({ price: 42, error: '' });
+  const setZecPrice = jest.fn();
+
+  render(
+    surfaceUi(
+      makeCtx({ nym: false, mixnetView: OFF_MIXNET_VIEW }),
+      setZecPrice,
+    ),
+  );
+  await waitFor(() =>
+    expect(setZecPrice).toHaveBeenCalledWith(42, expect.any(Number)),
+  );
+});
+
+test('an opted-in wallet fetches regardless of the displayed currency', async () => {
   price.mockResolvedValue({ price: 42, error: '' });
   const setZecPrice = jest.fn();
   seedDeps(setZecPrice);
@@ -207,7 +218,7 @@ test('N6: a consented wallet fetches regardless of the displayed currency', asyn
   );
 });
 
-test('N9: a wedged native call is reused, never multiplied', async () => {
+test('a wedged native call is reused, never multiplied', async () => {
   jest.useFakeTimers();
   price.mockImplementation(() => new Promise(() => {})); // wedged forever
   const setZecPrice = jest.fn();
@@ -220,7 +231,7 @@ test('N9: a wedged native call is reused, never multiplied', async () => {
   expect(price).toHaveBeenCalledTimes(1);
 });
 
-test('N10: the raw active event fetches nothing; the opened gate does', async () => {
+test('the raw active event fetches nothing; the opened gate does', async () => {
   jest.useFakeTimers();
   price.mockResolvedValue({ price: 42, error: '' });
   const setZecPrice = jest.fn();

@@ -15,7 +15,7 @@ const RING_ARC_STEP = 1 / 64;
 /**
  * Display-only countdown ring: a refresh glyph wrapped in a ring that
  * fills clockwise to full over `durationMs` and restarts whenever
- * `resetKey` changes. It offers no tap; ADR 0008 removed the manual
+ * `resetKey` changes. It offers no tap: the surface has no manual
  * fetch, so the ring only reports the cadence that is running.
  */
 type QuoteRefreshRingProps = {

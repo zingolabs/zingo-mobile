@@ -14,8 +14,8 @@ import {
 
 /**
  * Owns the price surface's traffic for the wallet session: LoadedApp
- * mounts exactly one, so fetching follows the session and the Nym
- * consent, never whichever currency the screens happen to display.
+ * mounts exactly one, so fetching follows the session and its consent,
+ * never whichever currency the screens happen to display.
  */
 export const PriceTrafficDriver: React.FunctionComponent = () => {
   const context = useContext(ContextAppLoaded);
@@ -24,13 +24,12 @@ export const PriceTrafficDriver: React.FunctionComponent = () => {
   const mixnetStatusKey = mixnetView
     ? mixnetView.statusKey
     : 'mixnet.status.unknown';
-  // Offline mode and non-mainnet chains have no usable ZEC/USD market,
-  // so they never justify traffic, consent or not.
-  const marketAvailable =
+  // The price source is fetchable only on mainnet with a live server.
+  const priceFetchable =
     selectServer !== SelectServerEnum.offline &&
     info.chainName === ChainNameEnum.mainChainName;
 
-  // Deps first, so the attach below always finds them; the dependency
+  // PriceInputs first, so the attach below always finds them; the dependency
   // list keeps the store's fetch-decision path off the render loop. The
   // statusKey write is also what fires an armed ready follow-up.
   useEffect(() => {
@@ -38,17 +37,17 @@ export const PriceTrafficDriver: React.FunctionComponent = () => {
       setZecPrice,
       mixnetStatusKey,
       nymSelected: nym,
-      marketAvailable,
+      priceFetchable,
     });
-  }, [setZecPrice, mixnetStatusKey, nym, marketAvailable]);
+  }, [setZecPrice, mixnetStatusKey, nym, priceFetchable]);
 
   useEffect(() => priceFetcherStore.attach(), []);
 
   return null;
 };
 
-// Display-only (ADR 0008): the ring reports the shared store's cadence
-// and the price's health; it starts nothing and offers no tap.
+// Display-only: the ring reports the shared store's cadence and the
+// price's health; it starts nothing and offers no tap.
 type PriceFetcherProps = {
   textBefore?: string;
   backgroundColor?: string;

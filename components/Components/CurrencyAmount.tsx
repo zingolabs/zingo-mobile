@@ -16,7 +16,7 @@ type CurrencyAmountProps = {
   privacy?: boolean;
   selectable?: boolean;
   // The live price's date: a conversion older than the stale threshold
-  // dims (ADR 0008). Omit for historical conversions, which never dim.
+  // dims. Omit for historical conversions, which never dim.
   priceDate?: number;
 };
 

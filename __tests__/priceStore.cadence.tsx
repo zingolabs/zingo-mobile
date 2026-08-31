@@ -1,8 +1,5 @@
 /**
- * Spec tests for the ratified price cadence (ADR 0008, Consequences):
- * turning Nym on, a boot, and every gate-open return from the
- * background fetch at once, and each further fetch follows the last at
- * a uniform random delay of five to ten minutes.
+ * The ratified price cadence.
  */
 jest.mock('../app/walletBackend', () => ({
   __esModule: true,
