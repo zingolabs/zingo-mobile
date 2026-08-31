@@ -3,8 +3,9 @@ name: Visual review
 # Builds the PR head, captures it with the web Storybook harness, and diffs
 # it against the committed baseline (visual/__baseline__). The check fails
 # when a story changed, appeared, or disappeared without a baseline update.
-# Accepting is a commit: `yarn visual:accept` pulls this run's capture into
-# the baseline, so the accepted pixels are the runner's own.
+# Accepting is a commit: comment `/visual-accept` on the PR (or run
+# `yarn visual:accept`) to pull this run's capture into the baseline, so the
+# accepted pixels are the runner's own.
 
 on:
   pull_request:
@@ -123,7 +124,9 @@ jobs:
             const accept = changed
               ? [
                   '',
-                  'If the change is intended, accept it into the baseline from this branch:',
+                  'If the change is intended, comment `/visual-accept` on this PR. It pulls this run\'s capture into the baseline, commits, and pushes. Needs write access and a finished run for the current commit.',
+                  '',
+                  'Or accept from a terminal on this branch:',
                   '',
                   '```',
                   'yarn visual:accept   # pulls this run\'s capture into visual/__baseline__',
@@ -159,5 +162,5 @@ jobs:
       - name: Gate
         if: steps.diff.outcome != 'success'
         run: |
-          echo "Visual changes detected — review the report, then 'yarn visual:accept' and commit visual/__baseline__."
+          echo "Visual changes detected — review the report, then comment '/visual-accept' on the PR (or run 'yarn visual:accept' and commit visual/__baseline__)."
           exit 1

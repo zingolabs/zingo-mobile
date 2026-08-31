@@ -30,6 +30,11 @@ the baseline holds what the CI runner drew. The PR flow is:
    then commit `visual/__baseline__` and push. It downloads the run's
    `visual-head` artifact (needs the `gh` CLI, logged in).
 
+The `/visual-accept` bot commits with `GITHUB_TOKEN` by default, which does not
+retrigger the required checks on the accept commit, so the PR needs a manual
+nudge to become mergeable. Set the `VISUAL_ACCEPT_TOKEN` secret to a GitHub App
+installation token to retrigger CI and green the checks in one step.
+
 `yarn visual:accept --run <id>` names a run. `yarn visual:accept --local`
 promotes your own `visual/__current__` instead; use it to try the harness, and
 expect CI to flag drift against it.

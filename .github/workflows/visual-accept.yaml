@@ -46,8 +46,13 @@ jobs:
                 issue_number: context.issue.number,
                 body,
               });
-            const assoc = context.payload.comment.author_association;
-            if (!['OWNER', 'MEMBER', 'COLLABORATOR'].includes(assoc)) {
+            const { data: perm } =
+              await github.rest.repos.getCollaboratorPermissionLevel({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                username: context.payload.comment.user.login,
+              });
+            if (!['admin', 'write'].includes(perm.permission)) {
               await reply('`/visual-accept` needs write access to this repository.');
               return core.setFailed('unauthorized');
             }
@@ -67,6 +72,7 @@ jobs:
         uses: actions/checkout@v7
         with:
           ref: ${{ steps.gate.outputs.head_ref }}
+          token: ${{ secrets.VISUAL_ACCEPT_TOKEN || secrets.GITHUB_TOKEN }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -78,7 +84,7 @@ jobs:
 
       - name: Accept the baseline
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.VISUAL_ACCEPT_TOKEN || secrets.GITHUB_TOKEN }}
           HEAD_SHA: ${{ steps.gate.outputs.head_sha }}
           HEAD_REF: ${{ steps.gate.outputs.head_ref }}
           PR_NUMBER: ${{ github.event.issue.number }}
