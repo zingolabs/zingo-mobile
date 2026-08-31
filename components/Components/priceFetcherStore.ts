@@ -164,7 +164,9 @@ function surfaceMayFetch(): boolean {
 function priceTrafficConsented(): boolean {
   return (
     deps !== undefined &&
-    (deps.nymSelected || deps.mixnetStatusKey === 'mixnet.status.off')
+    (deps.nymSelected
+      ? deps.mixnetStatusKey !== 'mixnet.status.off'
+      : deps.mixnetStatusKey === 'mixnet.status.off')
   );
 }
 

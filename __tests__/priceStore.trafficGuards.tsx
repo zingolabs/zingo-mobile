@@ -204,6 +204,18 @@ test('a switch-off fetches the price over clearnet', async () => {
   );
 });
 
+test('opting in with the transport still off emits no clearnet fetch', async () => {
+  price.mockResolvedValue({ price: 42, error: '' });
+  const setZecPrice = jest.fn();
+
+  render(
+    surfaceUi(makeCtx({ nym: true, mixnetView: OFF_MIXNET_VIEW }), setZecPrice),
+  );
+  await flush();
+  await flush();
+  expect(price).not.toHaveBeenCalled();
+});
+
 test('an opted-in wallet fetches regardless of the displayed currency', async () => {
   price.mockResolvedValue({ price: 42, error: '' });
   const setZecPrice = jest.fn();
