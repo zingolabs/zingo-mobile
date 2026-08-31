@@ -48,6 +48,15 @@ const refuse = (message: string): never => {
   process.exit(1);
 };
 
+const tip = execFileSync('git', ['rev-parse', 'HEAD'], {
+  encoding: 'utf8',
+}).trim();
+if (tip !== headSha) {
+  refuse(
+    `The reviewed commit ${headSha.slice(0, 9)} is no longer the branch tip. Wait for its visual review, then run the command again.`,
+  );
+}
+
 type Runs = { workflow_runs: { id: number; head_sha: string; status: string }[] };
 const runs = ghJson<Runs>(
   `repos/${repo}/actions/workflows/visual-review.yaml/runs?head_sha=${headSha}&per_page=20`,
