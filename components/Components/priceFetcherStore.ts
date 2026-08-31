@@ -3,48 +3,47 @@ import { AppState, NativeEventSubscription } from 'react-native';
 import { getZecPrice } from '../../app/walletBackend';
 import {
   MixnetStatusKey,
-  transportDisposition,
-} from '../../app/walletBackend/transforms/mixnetPresenter';
+  fetchPolicy,
+} from '../../app/walletBackend/transforms/mixnetView';
 
 /**
  * Shared, singleton state for the price surface's fetch lifecycle.
  *
- * ADR 0008: the price surface has no manual fetch, and the Nym opt-in is
- * the single and only consent for price traffic. The PriceTrafficDriver
- * mounted by LoadedApp attaches here for the wallet session and carries
- * the consent bit in its deps, so the displayed currency never decides
- * what may be fetched; PriceFetcher and usePriceFetcherStore only
- * observe. The store owns the whole lifecycle:
+ * The price surface has no manual fetch. Consent is the Nym opt-in or an
+ * explicit switch-off, which serves the fetch over clearnet. The
+ * PriceTrafficDriver mounted by LoadedApp attaches here for the wallet
+ * session and carries the consent bit in its deps, so the displayed
+ * currency never decides what may be fetched; PriceFetcher and
+ * usePriceFetcherStore only observe. The store owns the whole lifecycle:
  *   - ONE auto-refresh timer while the driver is attached, the gate-open
- *     foreground holds, and the transport is not a refusing verdict
- *     ('off' or 'died'): each fetch schedules the next at a uniform
- *     random delay of five to ten minutes. A background transition
- *     pauses the cadence, and iOS 'inactive' (Control Center, the app's
- *     own Face ID sheet) is a non-event.
- *   - A fetch at every entry: attach (boot), the Nym consent turning
- *     on, and LoadedApp's foreground gate opening after a real
- *     background return (never on the raw AppState event, which races a
- *     locked, unauthenticated wallet). Entry fetches inside the burst
- *     cooldown of the last start or last success yield to the cadence.
+ *     foreground holds, and the transport is not a refusing policy
+ *     ('died'): each fetch schedules the next at a uniform random delay
+ *     of five to ten minutes. A background transition pauses the
+ *     cadence, and iOS 'inactive' (Control Center, the app's own Face ID
+ *     sheet) is a non-event.
+ *   - A fetch at every entry: attach (boot), the consent turning on, and
+ *     LoadedApp's foreground gate opening after a real background return
+ *     (never on the raw AppState event, which races a locked,
+ *     unauthenticated wallet). Entry fetches inside the burst cooldown of
+ *     the last start or last success yield to the cadence.
  *   - The ready follow-up: an unattended fetch refused during bootstrap
  *     arms a one-shot fetch that fires when the Indicator turns ready.
- *     It is dropped on a background transition and on a 'died' or 'off'
- *     verdict, survives an in-flight fetch, and a transient 'unknown'
- *     status poll never drops it.
+ *     It is dropped on a background transition and on a 'died' policy,
+ *     survives an in-flight fetch, and a transient 'unknown' status poll
+ *     never drops it.
  *   - No snackbars. A failure leaves the last price standing; the stale
- *     cue (see usePriceStale) is the only failure signal.
+ *     cue is the only failure signal.
  */
 
-// ADR 0008 cadence: each fetch schedules the next at a uniform draw
-// from this window.
+// Each fetch schedules the next at a uniform draw from this window.
 export const PRICE_REFRESH_MIN_MS = 5 * 60_000;
 export const PRICE_REFRESH_MAX_MS = 10 * 60_000;
 // The JS-side bound on one native price call: a wedged FFI promise must
 // never pin `loading` for the process lifetime.
 const PRICE_FETCH_TIMEOUT_MS = 30_000;
-// A price older than this wall-clock age is stale (CONTEXT.md: Stale
-// price): the cadence ceiling plus one fetch bound of headroom, so a
-// healthy cadence never dims, not even on a ceiling draw's latency.
+// A price older than this wall-clock age is stale: the cadence ceiling
+// plus one fetch bound of headroom, so a healthy cadence never dims,
+// not even on a ceiling draw's latency.
 export const PRICE_STALE_MS = PRICE_REFRESH_MAX_MS + PRICE_FETCH_TIMEOUT_MS;
 // Rapid remounts and app hops must not multiply fetches.
 const FETCH_BURST_COOLDOWN_MS = 5_000;
@@ -52,16 +51,14 @@ const FETCH_BURST_COOLDOWN_MS = 5_000;
 // request can run: bounded orphans, never a corpse cached forever.
 const NATIVE_CALL_TTL_MS = 5 * 60_000;
 
-type Deps = {
+type PriceInputs = {
   setZecPrice: (price: number, date: number) => void;
   // The live Indicator key; 'mixnet.status.unknown' before a publication.
   mixnetStatusKey: MixnetStatusKey;
-  // The persisted Nym opt-in: the sole consent for price traffic. The
-  // display currency chooses what to show, never what may be fetched.
+  // The persisted Nym opt-in.
   nymSelected: boolean;
-  // Whether a market exists to ask: a live server selection on mainnet.
-  // Offline mode and other chains have no usable ZEC/USD price.
-  marketAvailable: boolean;
+  // Whether the price source is fetchable for the current Zcash network.
+  priceFetchable: boolean;
 };
 
 // What every observer reads: identity-stable between real changes, as
@@ -70,7 +67,7 @@ type PriceSurfaceSnapshot = {
   loading: boolean;
   nextFetchAt: number;
   nextFetchDelayMs: number;
-  // The store's own render verdict, so no view re-derives (and drifts
+  // The store's own render decision, so no view re-derives (and drifts
   // from) surfaceMayFetch.
   surfaceActive: boolean;
 };
@@ -104,7 +101,7 @@ let followUpArmed = false;
 // A return that landed while a fetch was in flight; honored when the
 // flight lands so a real return always produces its fetch.
 let entryPending = false;
-let deps: Deps | undefined;
+let deps: PriceInputs | undefined;
 let cadence: Cadence = { state: 'idle' };
 let attachCount = 0;
 // Bumped when a session detaches: a flight that outlived its session
@@ -140,13 +137,13 @@ function clearAuto(): void {
   emit();
 }
 
-// A transport verdict under which the wallet refuses every price fetch
+// A transport policy under which the wallet refuses every price fetch
 // by the route rule, so attempting is pure waste; the classification is
-// the presenter's exhaustive switch, which a new indicator breaks.
+// fetchPolicy's exhaustive switch, which a new indicator breaks.
 function transportRefuses(): boolean {
   return (
     deps !== undefined &&
-    transportDisposition(deps.mixnetStatusKey) === 'refusing'
+    fetchPolicy(deps.mixnetStatusKey) === 'refusing'
   );
 }
 
@@ -156,11 +153,20 @@ function transportRefuses(): boolean {
 function surfaceMayFetch(): boolean {
   return (
     deps !== undefined &&
-    deps.nymSelected &&
-    deps.marketAvailable &&
+    priceTrafficConsented() &&
+    deps.priceFetchable &&
     attachCount > 0 &&
     !appAway &&
     !transportRefuses()
+  );
+}
+
+function priceTrafficConsented(): boolean {
+  return (
+    deps !== undefined &&
+    (deps.nymSelected
+      ? deps.mixnetStatusKey !== 'mixnet.status.off'
+      : deps.mixnetStatusKey === 'mixnet.status.off')
   );
 }
 
@@ -225,10 +231,10 @@ async function boundedPrice(): Promise<number> {
 }
 
 // A status that could still be a bootstrap in progress: 'unknown' is
-// one failed status poll, not a verdict, on the arm path exactly as on
+// one failed status poll, not a policy, on the arm path exactly as on
 // the drop path in pump().
 function statusCouldBeBootstrap(key: MixnetStatusKey): boolean {
-  return transportDisposition(key) === 'possibleBootstrap';
+  return fetchPolicy(key) === 'possibleBootstrap';
 }
 
 // A refusal may arm the ready follow-up from every launch path except
@@ -272,7 +278,7 @@ async function doFetch(mayArmFollowUp: boolean): Promise<void> {
     if (price > 0) {
       // The traffic was already spent under the launch's consent, so
       // the value is recorded even where a new fetch would now be
-      // refused (a background hop, a moved verdict): discarding it
+      // refused (a background hop, a moved policy): discarding it
       // would only buy a second identical fetch later.
       followUpArmed = false;
       entryPending = false; // a fresh price satisfies a pending return
@@ -325,8 +331,8 @@ function pump(): void {
     followUpArmed = false;
     doFetch(false).catch(() => {});
   } else if (transportRefuses()) {
-    // A real transport verdict ends the bootstrap the arm belonged to.
-    // 'unknown' is one failed status poll, not a verdict, and a
+    // A real transport policy ends the bootstrap the arm belonged to.
+    // 'unknown' is one failed status poll, not a policy, and a
     // bootstrap's polls are flakiest exactly while the arm matters, so
     // both it and 'bootstrapping' keep the arm standing.
     followUpArmed = false;
@@ -369,21 +375,13 @@ function onAppStateChange(next: string): void {
 
 export const priceFetcherStore = {
   /** Keep the latest context-bound callbacks (same across all instances). */
-  setDeps(d: Deps): void {
+  setDeps(d: PriceInputs): void {
     deps = d;
-    if (!d.nymSelected) {
-      // The consent was withdrawn (or never given): stop the cadence.
+    pump();
+    if (!surfaceMayFetch()) {
       clearAuto();
       followUpArmed = false;
       entryPending = false;
-      return;
-    }
-    pump();
-    if (transportRefuses() || !d.marketAvailable) {
-      // A refusing verdict or a lost market ends the cadence now, not
-      // at the next tick, and clearAuto's emit takes the ring down
-      // with it.
-      clearAuto();
       return;
     }
     entryOrSchedule();

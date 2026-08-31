@@ -9,53 +9,23 @@
 
 ## The mobile backend and the UI are separate concerns
 
-The mobile backend is the Rust under `rust/` and the native interfaces to it:
-the UniFFI components, the Kotlin and Swift modules that bind them, and the
-build systems that produce them. The UI is everything above that boundary: the
-React Native screens and components, the theme, the styles, the colours, and
-the user-facing copy.
-
-Keep work on one out of the other. A change to the mobile backend carries no
-colour, spacing, typography, or component-styling edit. A UI change carries no
-edit to the Rust or its bindings. Where a task genuinely needs both, make them
-separate commits and say which is which, so a reviewer can read one without the
-other.
-
-Before you finish backend work, read your own diff and split out anything that
-is UI. A styling edit that rides along in a backend diff wastes a reviewer's
-attention and gets reverted rather than reviewed. This has already cost the
-project once: a batch of colour changes was undone inside a mixnet pull request
-because it travelled with unrelated backend work.
-
-While you are in either half, watch for places where the boundary is muddy. A
-component that reaches into the wallet backend, a backend module that formats
-prose meant for a person, a native module that decides what a screen shows:
-each is worth naming. Propose the separation as its own change rather than
-fixing it inline, and say what it would cost.
+The mobile backend (Rust under `rust/`, its UniFFI/Kotlin/Swift bindings, and their build systems) and the UI (React Native screens, theme, styles, colours, copy) are separate concerns: keep each change to one side, and where a task needs both, split them into commits labelled backend or UI so a reviewer can read one without the other. Before finishing, scan your own diff for stray edits from the other half, and when the boundary is muddy (a component reaching into the wallet backend, a backend module formatting human prose), name it and propose the separation as its own change rather than fixing it inline.
 
 ## Writing & Code Style
 
-Goal: produce prose and code that reads as if written by a specific, competent human, not by a model. The point is naturalness and fit, not looking exhaustive or safe. When in doubt, commit to a choice and keep it short.
+Goal: produce prose and code that reads as if written by a specific, competent human, not by a model. The point is naturalness and accuracy, not looking exhaustive or safe. When in doubt, commit to a choice and keep it short.
 
 ### Prose
 
 #### Economy and precision (adapted from Strunk's Elements of Style)
 
-- Omit needless words. Every word must earn its place. Cut filler phrases entirely:
-  - "the fact that"            → delete or restructure
-  - "in order to"              → "to"
-  - "due to the fact that"     → "because"
-  - "at this point in time"    → "now"
-  - "has the ability to"       → "can"
-  - "there is X that does Y"   → "X does Y"
-  - "essentially" / "basically" / "fundamentally" → almost always delete
 - Use the active voice. Prefer "the parser rejects malformed input" over "malformed input is rejected by the parser". Passive voice only when the actor is unknown or irrelevant.
 - Put statements in positive form. Say what something is, not what it isn't. "The cache is stale" beats "the cache is not up to date". No "not un-" constructions.
 - Use definite, specific, concrete language. "Sync stalls after 40k blocks" beats "performance degrades under certain conditions". If you have a number, a name, or a mechanism, state it.
-- One paragraph, one topic. Don't braid two ideas together and rely on connectors to hold them.
 - Place emphatic words at the end of the sentence. Don't bury the key claim mid-sentence and trail off with qualifiers.
 - Don't overstate. Cut intensifiers ("very", "extremely", "incredibly"). When uncertainty is real, hedge precisely ("untested on mainnet"), not vaguely ("may or may not work").
-- Do not explain too much. State the point once. If a sentence adds no new information, delete it.
+- Don't be verbose: if you need ":" to explain something, shorten it instead.
+- Do not explain too much. State the point once.
 - Revise by deletion. When tightening prose, the default operation is removal, not substitution. A shorter draft that says the same thing is strictly better.
 
 #### Punctuation
@@ -117,6 +87,7 @@ without losing meaning, the "so" was decorative. Delete it.
 
 ### Code (all languages)
 
+- Never add inline comments.
 - Comment why, not what. No line-by-line narration of obvious operations.
 - No tutorial narration ("Now we...", "Step 1:", "First, let's...") and no banner comments (`// ===== HELPERS =====`).
 - No docstrings that just restate the signature.

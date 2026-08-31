@@ -25,7 +25,7 @@ import TransparentAddressClass from './classes/TransparentAddressClass';
 import { ScreenEnum } from './enums/ScreenEnum';
 import { RPCPerformanceLevelEnum } from '../walletBackend/enums/RPCPerformanceLevelEnum';
 import { BlockExplorerEnum } from './enums/BlockExplorerEnum';
-import { MixnetView } from '../walletBackend/transforms/mixnetPresenter';
+import { MixnetView } from '../walletBackend/transforms/mixnetView';
 
 export default interface AppContextLoaded {
   netInfo: NetInfoType;

@@ -1,21 +1,5 @@
 /**
- * The store's observable contract: snapshot shape and identity, deps
- * writes, the disposition switch, and the display-only ring,
- * distilled from the reviews of PR 1343. Each test encodes the
- * behavior a finding says the surface should have: it fails on the
- * broken code and passes once fixed.
- *
- * H1: withdrawing the consent takes the ring down with the cadence.
- * H2: an entry flight with no armed deadline never reads as full.
- * H3: (in Send.priceCta.unit) the USD-entry derived ZEC dims when the
- *     price is stale.
- * H4: the ready follow-up never re-arms itself.
- * H5: every status key classifies under the exhaustive disposition.
- * H6: the driver writes deps when an input moves, not per render.
- * H7: the snapshot carries exactly its four read fields.
- * H8: the snapshot keeps its identity between emits.
- * H9: no any-casts in the price suites and no null in the store.
- * H10: the ring is display-only.
+ * The store's observable contract.
  */
 jest.mock('../app/walletBackend', () => ({
   __esModule: true,
@@ -44,8 +28,8 @@ import {
   INITIAL_MIXNET_VIEW,
   MIXNET_STATUS_KEYS,
   MixnetView,
-  transportDisposition,
-} from '../app/walletBackend/transforms/mixnetPresenter';
+  fetchPolicy,
+} from '../app/walletBackend/transforms/mixnetView';
 
 const price = getZecPrice as jest.MockedFunction<typeof getZecPrice>;
 
@@ -108,7 +92,7 @@ afterEach(() => {
   jest.useRealTimers();
 });
 
-test('H1: withdrawing the consent takes the ring down', async () => {
+test('withdrawing the opt-in takes the ring down', async () => {
   jest.useFakeTimers();
   price.mockResolvedValue({ price: 42, error: '' });
   const setZecPrice = jest.fn();
@@ -128,7 +112,7 @@ test('H1: withdrawing the consent takes the ring down', async () => {
   expect(view.queryByTestId('pricefetcher.ring')).toBeNull();
 });
 
-test('H2: an entry flight with no armed deadline never reads full', async () => {
+test('an entry flight with no armed deadline never reads full', async () => {
   jest.useFakeTimers();
   price.mockImplementation(() => new Promise(() => {})); // in flight
   const setZecPrice = jest.fn();
@@ -147,7 +131,7 @@ test('H2: an entry flight with no armed deadline never reads full', async () => 
   expect(ring.props.startProgress).toBeLessThan(1);
 });
 
-test('H4: the ready follow-up never re-arms itself', async () => {
+test('the ready follow-up never re-arms itself', async () => {
   jest.useFakeTimers();
   price.mockResolvedValue({ price: -1, error: 'refused' });
   const setZecPrice = jest.fn();
@@ -168,17 +152,17 @@ test('H4: the ready follow-up never re-arms itself', async () => {
   expect(price).toHaveBeenCalledTimes(4);
 });
 
-test('H5: every status key classifies under the disposition switch', () => {
-  const dispositions = MIXNET_STATUS_KEYS.map(key => transportDisposition(key));
-  dispositions.forEach(d =>
-    expect(['refusing', 'possibleBootstrap', 'serving']).toContain(d),
+test('every status key classifies under the fetch-policy switch', () => {
+  const policies = MIXNET_STATUS_KEYS.map(key => fetchPolicy(key));
+  policies.forEach(p =>
+    expect(['refusing', 'possibleBootstrap', 'serving']).toContain(p),
   );
-  expect(dispositions).toContain('refusing');
-  expect(dispositions).toContain('possibleBootstrap');
-  expect(dispositions).toContain('serving');
+  expect(policies).toContain('refusing');
+  expect(policies).toContain('possibleBootstrap');
+  expect(policies).toContain('serving');
 });
 
-test('H6: the driver writes deps when an input moves, not per render', async () => {
+test('the driver writes deps when an input moves, not per render', async () => {
   jest.useFakeTimers();
   price.mockResolvedValue({ price: 42, error: '' });
   const setDepsSpy = jest.spyOn(priceFetcherStore, 'setDeps');
@@ -198,7 +182,7 @@ test('H6: the driver writes deps when an input moves, not per render', async () 
   setDepsSpy.mockRestore();
 });
 
-test('H7: the snapshot carries exactly its four read fields', () => {
+test('the snapshot carries exactly its four read fields', () => {
   expect(Object.keys(priceFetcherStore.snapshot()).sort()).toEqual([
     'loading',
     'nextFetchAt',
@@ -207,22 +191,22 @@ test('H7: the snapshot carries exactly its four read fields', () => {
   ]);
 });
 
-test('H8: the snapshot keeps its identity between emits', () => {
+test('the snapshot keeps its identity between emits', () => {
   const first = priceFetcherStore.snapshot();
   expect(priceFetcherStore.snapshot()).toBe(first);
 });
 
-test('H9: no any-casts in the price suites and no null in the store', () => {
+test('no any-casts in the price suites and no null in the store', () => {
   const suites = [
-    'priceSurface.cadence.tsx',
-    'priceSurface.cue.tsx',
-    'priceSurface.lifecycle.tsx',
-    'priceSurface.trafficGuards.tsx',
-    'priceSurface.wedges.tsx',
-    'priceSurface.soleConsent.tsx',
-    'priceSurface.landings.tsx',
-    'priceSurface.storeContract.tsx',
-    'priceSurface.recovery.tsx',
+    'priceStore.cadence.tsx',
+    'priceDisplay.ring.tsx',
+    'priceStore.lifecycle.tsx',
+    'priceStore.trafficGuards.tsx',
+    'priceStore.wedgeGuards.tsx',
+    'priceStore.optIn.tsx',
+    'priceStore.nativeCall.tsx',
+    'priceStore.contract.tsx',
+    'priceStore.recovery.tsx',
     'Send.priceCta.unit.tsx',
     'PriceFetcher.snapshot.tsx',
   ];
@@ -240,7 +224,7 @@ test('H9: no any-casts in the price suites and no null in the store', () => {
   expect(new RegExp('\\bnul' + 'l\\b').test(store)).toBe(false);
 });
 
-test('H10: the ring is display-only', () => {
+test('the ring is display-only', () => {
   const ringSource = fs.readFileSync(
     path.join(__dirname, '../components/Components/QuoteRefreshRing.tsx'),
     'utf8',

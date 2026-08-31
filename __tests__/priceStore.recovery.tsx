@@ -1,20 +1,5 @@
 /**
- * Outage recovery and staleness: a lost market, a flapping transport,
- * a rejected native call, and the stale crossings and muting beside
- * them, distilled from the reviews of PR 1343. Each test encodes the
- * behavior a finding says the surface should have: it fails on the
- * broken code and passes once fixed.
- *
- * R1: a lost market takes the cadence down now, and publishes it.
- * R2: a market outage wedges no past deadline, and its recovery past
- *     the cadence floor fetches its entry at once.
- * R3: a flapping transport rides the cadence instead of fetching a
- *     pair per reconnect.
- * R4: a rejected native price call reads as a refusal (retry and
- *     follow-up arm included), never as a silent vanish.
- * R5: no stale crossing outlives its consumers.
- * R6: two prices each keep their own stale crossing.
- * R7: the stale-or-absent muting rule has one spelling, usePriceHealth.
+ * Outage recovery and staleness.
  */
 jest.mock('../app/walletBackend', () => ({
   __esModule: true,
@@ -43,7 +28,7 @@ import {
 import { SelectServerEnum } from '../app/AppState';
 import { getZecPrice } from '../app/walletBackend';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
-import { MixnetView } from '../app/walletBackend/transforms/mixnetPresenter';
+import { MixnetView } from '../app/walletBackend/transforms/mixnetView';
 
 const price = getZecPrice as jest.MockedFunction<typeof getZecPrice>;
 
@@ -106,7 +91,7 @@ afterEach(() => {
   jest.useRealTimers();
 });
 
-test('R1: a lost market takes the cadence down now, and publishes it', async () => {
+test('a lost market takes the cadence down now, and publishes it', async () => {
   jest.useFakeTimers();
   price.mockResolvedValue({ price: 42, error: '' });
   const setZecPrice = jest.fn();
@@ -137,7 +122,7 @@ test('R1: a lost market takes the cadence down now, and publishes it', async () 
   unsubscribe();
 });
 
-test('R2: no wedged deadline across an outage, and the recovery entry fires', async () => {
+test('no wedged deadline across an outage, and the recovery entry fires', async () => {
   jest.useFakeTimers();
   price.mockResolvedValue({ price: 42, error: '' });
   const setZecPrice = jest.fn();
@@ -171,7 +156,7 @@ test('R2: no wedged deadline across an outage, and the recovery entry fires', as
   expect(priceFetcherStore.snapshot().nextFetchAt).toBeGreaterThan(Date.now());
 });
 
-test('R3: a flapping transport rides the cadence, one fetch per window', async () => {
+test('a flapping transport rides the cadence, one fetch per window', async () => {
   jest.useFakeTimers();
   price.mockResolvedValue({ price: 42, error: '' });
   const setZecPrice = jest.fn();
@@ -198,7 +183,7 @@ test('R3: a flapping transport rides the cadence, one fetch per window', async (
   expect(price.mock.calls.length).toBeGreaterThan(1);
 });
 
-test('R4: a rejected native call reads as a refusal, not a vanish', async () => {
+test('a rejected native call reads as a refusal, not a vanish', async () => {
   jest.useFakeTimers();
   // A missing native member rejects instead of resolving a sentinel.
   price.mockRejectedValue(new Error('zecPriceInfo is not a function'));
@@ -217,7 +202,7 @@ test('R4: a rejected native call reads as a refusal, not a vanish', async () => 
   expect(price).toHaveBeenCalledTimes(4);
 });
 
-test('R5: no stale crossing outlives its consumers', () => {
+test('no stale crossing outlives its consumers', () => {
   jest.useFakeTimers();
   const timersBefore = jest.getTimerCount();
   const fresh = renderHook(() => usePriceStale(Date.now() - 1_000));
@@ -227,7 +212,7 @@ test('R5: no stale crossing outlives its consumers', () => {
   expect(jest.getTimerCount()).toBe(timersBefore);
 });
 
-test('R6: two prices each keep their own stale crossing', () => {
+test('two prices each keep their own stale crossing', () => {
   jest.useFakeTimers();
   const older = Date.now() - PRICE_STALE_MS + 5_000; // crosses in five seconds
   const newer = Date.now() - 1_000;
@@ -243,7 +228,7 @@ test('R6: two prices each keep their own stale crossing', () => {
   expect(first.result.current).toBe(true);
 });
 
-test('R7: the muting rule has one spelling, usePriceHealth', () => {
+test('the muting rule has one spelling, usePriceHealth', () => {
   const sites = [
     '../components/Components/PriceFetcher.tsx',
     '../components/Components/CurrencyAmount.tsx',

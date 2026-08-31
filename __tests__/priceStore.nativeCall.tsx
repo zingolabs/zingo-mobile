@@ -1,22 +1,6 @@
 /**
- * Flight landings and the cues at their edges: how a fetch's landing
- * treats detach, background, parked returns, and the ring beside it,
- * distilled from the reviews of PR 1343. Each test encodes the
- * behavior a finding says the surface should have: it fails on the
- * broken code and passes once fixed.
- *
- * G1: a market-less surface (offline mode, non-mainnet chain) renders
- *     no ring at all, per the store's own verdict.
- * G2: a bound expiry never retries against the same wedged native call.
- * G3: a session detached mid-flight leaves no loading for the next one.
- * G4: a price landing while the app is away is recorded, not re-bought.
- * G5: a refusal under a transient 'unknown' status arms the follow-up.
- * G6: a parked return the landing declines is consumed, never doubled.
- * G7: the boot fetch's loading reaches a fetcher subscribed after it.
- * G9: a ceiling draw's fetch latency does not dim a healthy cadence.
- * G10: the ring fills from coarse wall-clock ticks, not a per-frame
- *      animation.
- * (G8, the Send/Confirm pinning repair, lives in Send.priceCta.unit.)
+ * The native price call in flight, on timeout, on detach, and on
+ * resolve or reject.
  */
 jest.mock('../app/walletBackend', () => ({
   __esModule: true,
@@ -42,7 +26,7 @@ import {
 import { SelectServerEnum } from '../app/AppState';
 import { getZecPrice } from '../app/walletBackend';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
-import { MixnetView } from '../app/walletBackend/transforms/mixnetPresenter';
+import { MixnetView } from '../app/walletBackend/transforms/mixnetView';
 
 const price = getZecPrice as jest.MockedFunction<typeof getZecPrice>;
 
@@ -116,7 +100,7 @@ afterEach(() => {
   jest.useRealTimers();
 });
 
-test('G1: a market-less surface renders no ring at all', async () => {
+test('a market-less surface renders no ring at all', async () => {
   jest.useFakeTimers();
   price.mockResolvedValue({ price: 42, error: '' });
   const setZecPrice = jest.fn();
@@ -138,7 +122,7 @@ test('G1: a market-less surface renders no ring at all', async () => {
   expect(view.queryByTestId('pricefetcher.ring')).toBeNull();
 });
 
-test('G2: a bound expiry never retries against the same wedged call', async () => {
+test('a bound expiry never retries against the same wedged call', async () => {
   jest.useFakeTimers();
   price.mockImplementation(() => new Promise(() => {})); // wedged forever
   const setZecPrice = jest.fn();
@@ -154,7 +138,7 @@ test('G2: a bound expiry never retries against the same wedged call', async () =
   expect(price).toHaveBeenCalledTimes(1);
 });
 
-test('G3: a session detached mid-flight leaves no loading behind', async () => {
+test('a session detached mid-flight leaves no loading behind', async () => {
   jest.useFakeTimers();
   price
     .mockImplementationOnce(() => new Promise(() => {})) // wedged flight
@@ -175,7 +159,7 @@ test('G3: a session detached mid-flight leaves no loading behind', async () => {
   expect(setZecPrice).toHaveBeenCalledWith(42, expect.any(Number));
 });
 
-test('G4: a price landing while the app is away is recorded', async () => {
+test('a price landing while the app is away is recorded', async () => {
   jest.useFakeTimers();
   let land: (v: { price: number; error: string }) => void = () => {};
   price.mockImplementationOnce(
@@ -199,7 +183,7 @@ test('G4: a price landing while the app is away is recorded', async () => {
   expect(setZecPrice).toHaveBeenCalledWith(42, expect.any(Number));
 });
 
-test("G5: a refusal under a transient 'unknown' arms the follow-up", async () => {
+test("a refusal under a transient 'unknown' arms the follow-up", async () => {
   jest.useFakeTimers();
   price.mockResolvedValue({ price: -1, error: 'refused' });
   const setZecPrice = jest.fn();
@@ -211,7 +195,7 @@ test("G5: a refusal under a transient 'unknown' arms the follow-up", async () =>
   const refusedUnderUnknown = price.mock.calls.length;
   expect(refusedUnderUnknown).toBeGreaterThan(0);
 
-  // 'unknown' is one failed status poll, not a verdict, on the arm path
+  // 'unknown' is one failed status poll, not a policy, on the arm path
   // exactly as on the drop path: ready must fire the follow-up now, not
   // a full tick later.
   view.rerender(surfaceUi(makeCtx({ mixnetView: READY_VIEW }), setZecPrice));
@@ -219,7 +203,7 @@ test("G5: a refusal under a transient 'unknown' arms the follow-up", async () =>
   expect(price.mock.calls.length).toBeGreaterThan(refusedUnderUnknown);
 });
 
-test('G6: a parked return the landing declines is consumed, not doubled', async () => {
+test('a parked return the landing declines is consumed, not doubled', async () => {
   jest.useFakeTimers();
   let land: (v: { price: number; error: string }) => void = () => {};
   price
@@ -252,7 +236,7 @@ test('G6: a parked return the landing declines is consumed, not doubled', async 
   expect(price).toHaveBeenCalledTimes(3);
 });
 
-test('G7: the boot fetch shows the first-fetch spinner', async () => {
+test('the boot fetch shows the first-fetch spinner', async () => {
   jest.useFakeTimers();
   price.mockImplementation(() => new Promise(() => {})); // in flight
   const setZecPrice = jest.fn();
@@ -267,7 +251,7 @@ test('G7: the boot fetch shows the first-fetch spinner', async () => {
   expect(view.UNSAFE_queryByType(ActivityIndicator)).toBeTruthy();
 });
 
-test('G9: a ceiling draw plus fetch latency does not dim', () => {
+test('a ceiling draw plus fetch latency does not dim', () => {
   const withinHeadroom = Date.now() - (10 * 60_000 + 10_000);
   const { result: healthy } = renderHook(() => usePriceStale(withinHeadroom));
   expect(healthy.current).toBe(false);
@@ -277,7 +261,7 @@ test('G9: a ceiling draw plus fetch latency does not dim', () => {
   expect(slipped.current).toBe(true);
 });
 
-test('G10: the ring fills from coarse ticks, not a per-frame animation', async () => {
+test('the ring fills from coarse ticks, not a per-frame animation', async () => {
   jest.useFakeTimers();
   const { Animated } = require('react-native');
   const timingSpy = jest.spyOn(Animated, 'timing');
@@ -290,7 +274,7 @@ test('G10: the ring fills from coarse ticks, not a per-frame animation', async (
       durationMs={60_000}
       resetKey={1}
       accessibilityLabel="ring"
-      testID="landings.ring"
+      testID="ring"
     />,
   );
   await jest.advanceTimersByTimeAsync(30_000);

@@ -1,18 +1,5 @@
 /**
- * Evidence tests for the PR 1343 review findings in the price-surface
- * store lifecycle. Each test encodes the behavior the finding says the
- * surface should have: it fails on the broken code and passes once the
- * finding is fixed.
- *
- * F1: the cold-start entry fetch must not race the deps write.
- * F2: observing the store must never count as price-traffic consent.
- * F3: an iOS interruption (inactive) is a non-event, and the AppState
- *     subscription dies with the last mounted fetcher.
- * F4: a throwing fetch must not pin `loading` and kill the timer.
- * F5: a remounted surface with no price must fetch, not trust a module
- *     clock that outlived the wallet.
- * F6: the ready follow-up never re-arms after a background transition,
- *     survives an in-flight fetch, and disarms on a non-bootstrap state.
+ * The price-surface store lifecycle.
  */
 jest.mock('../app/walletBackend', () => ({
   __esModule: true,
@@ -41,7 +28,7 @@ import { getZecPrice } from '../app/walletBackend';
 import {
   INITIAL_MIXNET_VIEW,
   MixnetView,
-} from '../app/walletBackend/transforms/mixnetPresenter';
+} from '../app/walletBackend/transforms/mixnetView';
 
 const price = getZecPrice as jest.MockedFunction<typeof getZecPrice>;
 
@@ -83,8 +70,8 @@ const makeCtx = (over?: Partial<Ctx>): Ctx => ({
   ...over,
 });
 
-// The production composition: the driver owns the lifecycle, the fetcher
-// only displays (pre-driver builds let the fetcher own both).
+// The production composition: the driver owns the lifecycle, the
+// fetcher only displays.
 const fetcherUi = (ctx: Ctx, setZecPrice: (p: number, d: number) => void) => (
   <ContextAppLoadedProvider value={{ ...ctx, setZecPrice }}>
     {PriceTrafficDriver ? <PriceTrafficDriver /> : <></>}
@@ -94,15 +81,14 @@ const fetcherUi = (ctx: Ctx, setZecPrice: (p: number, d: number) => void) => (
 
 const foregroundReturned = () => priceFetcherStore.foregroundReturned();
 
-// Emulates the deps a previous USD session left behind, so the entry-fetch
-// paths run in both the broken and the fixed store. The shape is a
-// superset of both eras' Deps.
+// Seeds the inputs a previous session left behind, so the entry-fetch
+// paths run.
 const seedDeps = (setZecPrice: (p: number, d: number) => void) => {
   priceFetcherStore.setDeps({
     setZecPrice,
     mixnetStatusKey: 'mixnet.status.off',
     nymSelected: true,
-    marketAvailable: true,
+    priceFetchable: true,
   });
 };
 
@@ -139,7 +125,7 @@ afterEach(() => {
   jest.useRealTimers();
 });
 
-test('F1: a cold start with no price fetches once the surface mounts', async () => {
+test('a cold start with no price fetches once the surface mounts', async () => {
   price.mockResolvedValue({ price: 42, error: '' });
   const setZecPrice = jest.fn();
 
@@ -153,7 +139,7 @@ test('F1: a cold start with no price fetches once the surface mounts', async () 
   );
 });
 
-test('F2: observing the store snapshot never starts price traffic', async () => {
+test('observing the store snapshot never starts price traffic', async () => {
   jest.useFakeTimers();
   price.mockResolvedValue({ price: 42, error: '' });
   seedDeps(jest.fn());
@@ -165,7 +151,7 @@ test('F2: observing the store snapshot never starts price traffic', async () => 
   expect(price).not.toHaveBeenCalled();
 });
 
-test('F3: an ios interruption neither refetches nor disturbs the surface', async () => {
+test('an ios interruption neither refetches nor disturbs the surface', async () => {
   price.mockResolvedValue({ price: 42, error: '' });
   const setZecPrice = jest.fn();
   seedDeps(setZecPrice);
@@ -181,7 +167,7 @@ test('F3: an ios interruption neither refetches nor disturbs the surface', async
   expect(price).toHaveBeenCalledTimes(1);
 });
 
-test('F3: the AppState subscription dies with the last mounted fetcher', async () => {
+test('the AppState subscription dies with the last mounted fetcher', async () => {
   price.mockResolvedValue({ price: 42, error: '' });
   const setZecPrice = jest.fn();
   seedDeps(setZecPrice);
@@ -193,7 +179,7 @@ test('F3: the AppState subscription dies with the last mounted fetcher', async (
   expect(removeSpies[removeSpies.length - 1]).toHaveBeenCalled();
 });
 
-test('F4: a throwing fetch neither pins loading nor kills the timer', async () => {
+test('a throwing fetch neither pins loading nor kills the timer', async () => {
   jest.useFakeTimers();
   price
     .mockRejectedValueOnce(new Error('ffi never settled'))
@@ -209,7 +195,7 @@ test('F4: a throwing fetch neither pins loading nor kills the timer', async () =
   expect(setZecPrice).toHaveBeenCalledWith(42, expect.any(Number));
 });
 
-test('F5: a remounted surface with no price fetches instead of waiting a tick', async () => {
+test('a remounted surface with no price fetches instead of waiting a tick', async () => {
   jest.useFakeTimers();
   price.mockResolvedValue({ price: 42, error: '' });
   const setZecPrice = jest.fn();
@@ -227,7 +213,7 @@ test('F5: a remounted surface with no price fetches instead of waiting a tick', 
   expect(price).toHaveBeenCalledTimes(2);
 });
 
-test('F6: a background transition drops the follow-up even mid-flight', async () => {
+test('a background transition drops the follow-up even mid-flight', async () => {
   let refuseEntry: (v: { price: number; error: string }) => void = () => {};
   price
     .mockImplementationOnce(
@@ -244,7 +230,7 @@ test('F6: a background transition drops the follow-up even mid-flight', async ()
   const view = render(fetcherUi(ctx, setZecPrice));
   await waitFor(() => expect(price).toHaveBeenCalledTimes(1));
 
-  fireAppState('background'); // documented: drops the armed follow-up
+  fireAppState('background'); // background drops the armed follow-up
   refuseEntry({ price: -1, error: 'refused' }); // the flight lands refused
   await flush();
   const afterFlight = price.mock.calls.length; // both attempts of the entry
@@ -255,7 +241,7 @@ test('F6: a background transition drops the follow-up even mid-flight', async ()
   expect(price).toHaveBeenCalledTimes(afterFlight);
 });
 
-test('F6: a follow-up arriving mid-flight fires after the flight, not never', async () => {
+test('a follow-up arriving mid-flight fires after the flight, not never', async () => {
   jest.useFakeTimers();
   price.mockResolvedValue({ price: -1, error: 'refused' });
   const setZecPrice = jest.fn();
@@ -287,7 +273,7 @@ test('F6: a follow-up arriving mid-flight fires after the flight, not never', as
   expect(price.mock.calls.length).toBeGreaterThan(inFlight + 1);
 });
 
-test('F6: a real transport verdict disarms the follow-up', async () => {
+test('a real transport policy disarms the follow-up', async () => {
   price.mockResolvedValue({ price: -1, error: 'refused' });
   const setZecPrice = jest.fn();
   seedDeps(setZecPrice);
@@ -305,7 +291,7 @@ test('F6: a real transport verdict disarms the follow-up', async () => {
   expect(price).toHaveBeenCalledTimes(2);
 });
 
-test('R1: a hung fetch releases the surface and recovers once it settles', async () => {
+test('a hung fetch releases the surface and recovers once it settles', async () => {
   jest.useFakeTimers();
   let settleLate: (v: { price: number; error: string }) => void = () => {};
   price
@@ -332,7 +318,7 @@ test('R1: a hung fetch releases the surface and recovers once it settles', async
   expect(setZecPrice).toHaveBeenCalledWith(42, expect.any(Number));
 });
 
-test('R3: a transport turning ready mid-flight still gets the follow-up', async () => {
+test('a transport turning ready mid-flight still gets the follow-up', async () => {
   let refuseFirst: (v: { price: number; error: string }) => void = () => {};
   let refuseSecond: (v: { price: number; error: string }) => void = () => {};
   price
@@ -369,7 +355,7 @@ test('R3: a transport turning ready mid-flight still gets the follow-up', async 
   expect(price.mock.calls.length).toBeGreaterThan(2);
 });
 
-test('R3: a timer refusal during bootstrap arms the follow-up too', async () => {
+test('a timer refusal during bootstrap arms the follow-up too', async () => {
   jest.useFakeTimers();
   price
     .mockResolvedValueOnce({ price: 42, error: '' }) // the boot fetch lands
@@ -381,7 +367,7 @@ test('R3: a timer refusal during bootstrap arms the follow-up too', async () => 
     setZecPrice,
     mixnetStatusKey: 'mixnet.status.bootstrapping',
     nymSelected: true,
-    marketAvailable: true,
+    priceFetchable: true,
   });
 
   const ctx = makeCtx({
@@ -411,7 +397,7 @@ test('R3: a timer refusal during bootstrap arms the follow-up too', async () => 
   expect(price.mock.calls.length).toBeGreaterThan(afterTimer);
 });
 
-test('R6: a return landing inside a flight still produces the return fetch', async () => {
+test('a return landing inside a flight still produces the return fetch', async () => {
   let land: (v: { price: number; error: string }) => void = () => {};
   price
     .mockImplementationOnce(
@@ -438,7 +424,7 @@ test('R6: a return landing inside a flight still produces the return fetch', asy
   expect(price.mock.calls.length).toBeGreaterThanOrEqual(3);
 });
 
-test('R7: withdrawing consent mid-flight stops the retry and the write', async () => {
+test('withdrawing the opt-in mid-flight stops the retry and the write', async () => {
   let land: (v: { price: number; error: string }) => void = () => {};
   price
     .mockImplementationOnce(
@@ -462,7 +448,7 @@ test('R7: withdrawing consent mid-flight stops the retry and the write', async (
   expect(setZecPrice).not.toHaveBeenCalled(); // no write into a dead surface
 });
 
-test('R8: rapid app hops inside the cooldown do not multiply fetches', async () => {
+test('rapid app hops inside the cooldown do not multiply fetches', async () => {
   price.mockResolvedValue({ price: 42, error: '' });
   const setZecPrice = jest.fn();
   seedDeps(setZecPrice);
@@ -481,7 +467,7 @@ test('R8: rapid app hops inside the cooldown do not multiply fetches', async () 
   expect(price).toHaveBeenCalledTimes(1);
 });
 
-test('R2: without the Nym selection no price traffic exists', async () => {
+test('without the Nym selection no price traffic exists', async () => {
   jest.useFakeTimers();
   price.mockResolvedValue({ price: 42, error: '' });
   const setZecPrice = jest.fn();
@@ -497,7 +483,7 @@ test('R2: without the Nym selection no price traffic exists', async () => {
   expect(price).not.toHaveBeenCalled();
 });
 
-test('R9: a transient unknown poll does not drop the armed follow-up', async () => {
+test('a transient unknown poll does not drop the armed follow-up', async () => {
   price.mockResolvedValue({ price: -1, error: 'refused' });
   const setZecPrice = jest.fn();
   seedDeps(setZecPrice);
@@ -507,7 +493,7 @@ test('R9: a transient unknown poll does not drop the armed follow-up', async () 
   await waitFor(() => expect(price).toHaveBeenCalledTimes(2)); // refused: arms
 
   view.rerender(fetcherUi(makeCtx({ mixnetView: UNKNOWN_VIEW }), setZecPrice));
-  await flush(); // one failed status poll, not a transport verdict
+  await flush(); // one failed status poll, not a transport policy
   view.rerender(fetcherUi(makeCtx({ mixnetView: READY_VIEW }), setZecPrice));
   await flush();
 

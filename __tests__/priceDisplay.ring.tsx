@@ -1,12 +1,5 @@
 /**
- * Evidence tests for the PR 1343 review findings in the staleness cue and
- * the display-only ring's accessibility. Each test encodes the behavior
- * the finding says the surface should have: it fails on the broken code
- * and passes once the finding is fixed.
- *
- * F8 (ring half): the muted arc must stay distinguishable from the track.
- * F9: the display-only ring is not an unnamed disabled tap stop, and the
- *     staleness cue reaches screen readers as a label.
+ * The staleness cue and the display-only ring's accessibility.
  */
 jest.mock('../app/walletBackend', () => ({
   __esModule: true,
@@ -69,7 +62,7 @@ const collect = (
   (node.children ?? []).forEach(child => collect(child, hits, pick));
 };
 
-test('F8: the stale arc keeps a color of its own, distinct from the track', () => {
+test('the stale arc keeps a color of its own, distinct from the track', () => {
   const staleCtx = makeCtx({
     zecPrice: { zecPrice: 33.33, date: Date.now() - 11 * 60_000 },
   });
@@ -79,7 +72,7 @@ test('F8: the stale arc keeps a color of its own, distinct from the track', () =
   expect(ring.props.ringColor).not.toBe(ring.props.trackColor);
 });
 
-test('F9: the display-only ring exposes no disabled tap stop', () => {
+test('the display-only ring exposes no disabled tap stop', () => {
   const freshCtx = makeCtx({
     zecPrice: { zecPrice: 33.33, date: Date.now() },
   });
@@ -94,7 +87,7 @@ test('F9: the display-only ring exposes no disabled tap stop', () => {
   expect(disabledStops).toEqual([]);
 });
 
-test('F9: a stale price reaches screen readers as a label', () => {
+test('a stale price reaches screen readers as a label', () => {
   const staleCtx = makeCtx({
     zecPrice: { zecPrice: 33.33, date: Date.now() - 11 * 60_000 },
   });
@@ -102,7 +95,7 @@ test('F9: a stale price reaches screen readers as a label', () => {
   expect(view.getByLabelText('price-ring-stale')).toBeTruthy();
 });
 
-test('F9: a current price reaches screen readers as a label too', () => {
+test('a current price reaches screen readers as a label too', () => {
   const freshCtx = makeCtx({
     zecPrice: { zecPrice: 33.33, date: Date.now() },
   });
@@ -110,7 +103,7 @@ test('F9: a current price reaches screen readers as a label too', () => {
   expect(view.getByLabelText('price-ring-live')).toBeTruthy();
 });
 
-test('R4: the ring restarts on every refresh cycle, failed ones included', async () => {
+test('the ring restarts on every refresh cycle, failed ones included', async () => {
   jest.useFakeTimers();
   const view = render(fetcherUi(makeCtx())); // every fetch here is refused
   await jest.advanceTimersByTimeAsync(0);
@@ -126,21 +119,21 @@ test('R4: the ring restarts on every refresh cycle, failed ones included', async
   jest.useRealTimers();
 });
 
-test('R5: a price that never arrived is announced as absent, not stale', async () => {
+test('a price that never arrived is announced as absent, not stale', async () => {
   const view = render(fetcherUi(makeCtx())); // no price has ever existed
   await waitFor(() =>
     expect(view.getByLabelText('price-ring-none')).toBeTruthy(),
   );
 });
 
-test('N8: without the Nym consent no ring counts down to nothing', () => {
+test('without the Nym opt-in no ring counts down to nothing', () => {
   const view = render(fetcherUi(makeCtx({ nym: false })));
   // A countdown beside a surface that will never fetch misleads; the
   // unconsented state renders no ring at all.
   expect(view.queryByTestId('pricefetcher.ring')).toBeNull();
 });
 
-test('P4: a refusing transport hides the ring for the same reason', () => {
+test('a refusing transport hides the ring for the same reason', () => {
   const view = render(
     fetcherUi(
       makeCtx({
@@ -155,7 +148,7 @@ test('P4: a refusing transport hides the ring for the same reason', () => {
       }),
     ),
   );
-  // The cadence is paused by the verdict; a ring filling toward a
+  // The cadence is paused by the policy; a ring filling toward a
   // refresh that cannot come misleads exactly like the unconsented case.
   expect(view.queryByTestId('pricefetcher.ring')).toBeNull();
 });

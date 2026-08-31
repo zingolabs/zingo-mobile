@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "android:prod": "react-native run-android --mode prodDebug",
-    "android:beta": "react-native run-android --mode betaDebug",
+    "android:beta": "react-native run-android --mode betaDebug --appId org.ZingoLabs.Zingo.Beta --main-activity org.ZingoLabs.Zingo.MainActivity",
     "ios": "react-native run-ios",
     "start": "react-native start",
     "storybook:generate": "tsx .storybook/generate.mts",
