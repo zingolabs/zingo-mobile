@@ -103,7 +103,7 @@
     "@react-native-community/slider": "^5.2.0",
     "@react-native/babel-preset": "0.81.6",
     "@react-native/eslint-config": "^0.81.6",
-    "@react-native/metro-config": "0.81.6",
+    "@react-native/metro-config": "0.87.1",
     "@react-native/typescript-config": "0.81.6",
     "@storybook/addon-ondevice-actions": "^9.1.4",
     "@storybook/addon-ondevice-backgrounds": "^9.1.4",
