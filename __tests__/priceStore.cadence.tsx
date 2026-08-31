@@ -23,6 +23,7 @@ import {
 import { SelectServerEnum } from '../app/AppState';
 import { getZecPrice } from '../app/walletBackend';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
+import { INITIAL_MIXNET_VIEW } from '../app/walletBackend/transforms/mixnetView';
 
 const price = getZecPrice as jest.MockedFunction<typeof getZecPrice>;
 
@@ -92,11 +93,21 @@ test('turning Nym on mid-session fetches at once', async () => {
   price.mockResolvedValue({ price: 42, error: '' });
   const setZecPrice = jest.fn();
 
-  const view = render(driverUi(makeCtx({ nym: false }), setZecPrice));
+  const view = render(
+    driverUi(
+      makeCtx({ nym: false, mixnetView: INITIAL_MIXNET_VIEW }),
+      setZecPrice,
+    ),
+  );
   await jest.advanceTimersByTimeAsync(10_000);
   expect(price).not.toHaveBeenCalled();
 
-  view.rerender(driverUi(makeCtx({ nym: true }), setZecPrice));
+  view.rerender(
+    driverUi(
+      makeCtx({ nym: true, mixnetView: INITIAL_MIXNET_VIEW }),
+      setZecPrice,
+    ),
+  );
   await jest.advanceTimersByTimeAsync(0);
   expect(price).toHaveBeenCalledTimes(1);
 });

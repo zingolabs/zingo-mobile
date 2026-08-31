@@ -162,11 +162,13 @@ function surfaceMayFetch(): boolean {
 }
 
 function priceTrafficConsented(): boolean {
+  if (deps === undefined) return false;
+  if (deps.nymSelected) {
+    return deps.mixnetStatusKey !== 'mixnet.status.off';
+  }
   return (
-    deps !== undefined &&
-    (deps.nymSelected
-      ? deps.mixnetStatusKey !== 'mixnet.status.off'
-      : deps.mixnetStatusKey === 'mixnet.status.off')
+    deps.mixnetStatusKey !== 'mixnet.status.ready' &&
+    deps.mixnetStatusKey !== 'mixnet.status.bootstrapping'
   );
 }
 

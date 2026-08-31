@@ -36,6 +36,15 @@ const DIED_VIEW: MixnetView = {
   reconnecting: false,
 };
 
+const UNKNOWN_VIEW: MixnetView = {
+  statusKey: 'mixnet.status.unknown',
+  socks5Addr: null,
+  narration: null,
+  sendBlocked: true,
+  recovery: 'reenable',
+  reconnecting: false,
+};
+
 const price = getZecPrice as jest.MockedFunction<typeof getZecPrice>;
 
 type Ctx = typeof defaultAppContextLoaded;
@@ -144,7 +153,12 @@ test('a withdrawn opt-in stops the mid-flight retry', async () => {
   const view = render(surfaceUi(makeCtx(), setZecPrice));
   await waitFor(() => expect(price).toHaveBeenCalledTimes(1));
 
-  view.rerender(surfaceUi(makeCtx({ nym: false }), setZecPrice)); // Nym off
+  view.rerender(
+    surfaceUi(
+      makeCtx({ nym: false, mixnetView: INITIAL_MIXNET_VIEW }),
+      setZecPrice,
+    ),
+  );
   land({ price: -1, error: 'refused' });
   await flush();
 
@@ -196,6 +210,21 @@ test('a switch-off fetches the price over clearnet', async () => {
   render(
     surfaceUi(
       makeCtx({ nym: false, mixnetView: OFF_MIXNET_VIEW }),
+      setZecPrice,
+    ),
+  );
+  await waitFor(() =>
+    expect(setZecPrice).toHaveBeenCalledWith(42, expect.any(Number)),
+  );
+});
+
+test('a switch-off whose disable rejected still fetches over clearnet', async () => {
+  price.mockResolvedValue({ price: 42, error: '' });
+  const setZecPrice = jest.fn();
+
+  render(
+    surfaceUi(
+      makeCtx({ nym: false, mixnetView: UNKNOWN_VIEW }),
       setZecPrice,
     ),
   );
