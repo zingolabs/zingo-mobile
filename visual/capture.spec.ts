@@ -31,6 +31,8 @@ const shot = (id: string, state: string) => join(imagesDir, `${id}__${state}.png
 const FRAME = 1200;
 // Fake-clock milliseconds for hover/press feedback to settle.
 const FEEDBACK = 200;
+const SETTLE_STEP = 200;
+const SETTLE_TRIES = 15;
 // CSS animations and transitions run on real time, not the fake clock, so
 // the screenshot freezes them (finite ones jump to their end state) and
 // hides the text caret, whose blink is real time too.
@@ -56,12 +58,27 @@ for (const entry of entries) {
     // presenting after its measurement) plays inside the stepped window
     // below instead of racing the screenshot.
     await page.evaluate('document.fonts.ready');
+
+    if (entry.tags?.includes('static')) {
+      let last = -1;
+      for (let i = 0; i < SETTLE_TRIES; i += 1) {
+        await page.waitForTimeout(SETTLE_STEP);
+        const count = await page.evaluate(
+          () =>
+            document.getElementById('storybook-root')?.getElementsByTagName('*')
+              .length ?? 0,
+        );
+        if (count > 0 && count === last) break;
+        last = count;
+      }
+      await page.clock.runFor(FRAME);
+      await page.screenshot({ path: shot(entry.id, 'default'), ...still });
+      return;
+    }
+
     await page.waitForTimeout(250);
     await page.clock.runFor(FRAME); // one fixed frame for any incidental motion
     await page.screenshot({ path: shot(entry.id, 'default'), ...still });
-
-    // The `static` tag skips the interaction pass for modal-sheet stories, whose backdrop swallows pointer events.
-    if (entry.tags?.includes('static')) return;
 
     // Interaction states, only where the story renders something pressable.
     // The clock stays paused, so the feedback (RN Animated opacity) is

@@ -1,9 +1,3 @@
-// Accepts the visual baseline for a PR from a `/visual-accept` comment: it
-// resolves the PR's finished Visual review run, promotes that run's capture to
-// visual/__baseline__, commits and pushes it, then publishes a passing Visual
-// review check on the new commit. The workflow gates authorization, the PR
-// fetch, and the cross-repo refusal before this runs; here the branch is
-// already checked out and same-repo.
 import { execFileSync, spawnSync } from 'node:child_process';
 import { cpSync, existsSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
