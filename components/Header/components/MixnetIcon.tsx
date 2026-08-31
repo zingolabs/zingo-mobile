@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { Animated, Easing, StyleSheet, View } from 'react-native';
 import Svg, { Rect } from 'react-native-svg';
 import NymOn from '../../../assets/img/nym-on.svg';
-import { MixnetStatusKey } from '../../../app/walletBackend/transforms/mixnetPresenter';
+import { MixnetStatusKey } from '../../../app/walletBackend/transforms/mixnetView';
 
 const HALO_GREEN = '#07FF94';
 const HALO_CORAL = '#FF6F61';

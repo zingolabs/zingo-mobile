@@ -1,7 +1,7 @@
 /**
  * Evidence test for the PR 1343 review finding F10: the mixnet status
  * keys were hand-copied as bare string literals in three modules with no
- * shared, compiler-checked source. The presenter must export the closed
+ * shared, compiler-checked source. The transform must export the closed
  * key set, and every view it derives must stay inside it.
  */
 import {
@@ -9,12 +9,12 @@ import {
   INITIAL_MIXNET_VIEW,
   OFF_MIXNET_VIEW,
   deriveMixnetView,
-} from '../app/walletBackend/transforms/mixnetPresenter';
+} from '../app/walletBackend/transforms/mixnetView';
 import { RPCMixnetIndicatorEnum } from '../app/walletBackend/enums/RPCMixnetIndicatorEnum';
 
 test('R10: the closed status-key set derives from the indicator enum', () => {
   // No verbatim copy: the expectation is computed from the enum the wallet
-  // reports, plus the presenter's own failure key.
+  // reports, plus the transform's own failure key.
   const derivedKeys = new Set([
     ...Object.values(RPCMixnetIndicatorEnum).map(s => `mixnet.status.${s}`),
     'mixnet.status.unknown',

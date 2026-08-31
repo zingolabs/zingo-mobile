@@ -22,7 +22,7 @@ import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 // test suite
 describe('Component PriceFetcher - test', () => {
-  // The ring renders only while the store's surface verdict holds, so
+  // The ring renders only while the store's surface decision holds, so
   // the driver mounts beside the fetcher exactly as LoadedApp does; the
   // snapshot pins that consented state, not the empty render.
   const state = { ...defaultAppContextLoaded };

@@ -13,7 +13,7 @@
  * the platform owns it: on Android the UniFFI proxy shim (step 3 of the
  * critical path) supplies it; tests supply a stub. This coordinator owns
  * cadence and policy only — every payload decision lives in the pure
- * transforms, and every screen projection in the pure presenter.
+ * transforms, and every screen projection in the pure transform.
  *
  * Cadence follows the SyncCoordinator idiom: one interval, a lock flag so
  * a slow poll is never enqueued twice, and an onChange callback that
@@ -28,7 +28,7 @@ import {
   describeRejection,
   vetPolledStatus,
 } from '../transforms/mixnetTransform';
-import { MixnetView, deriveMixnetView } from '../transforms/mixnetPresenter';
+import { MixnetView, deriveMixnetView } from '../transforms/mixnetView';
 import {
   attachMixnet,
   disableMixnet,

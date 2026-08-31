@@ -148,7 +148,7 @@ test('a refusing transport hides the ring for the same reason', () => {
       }),
     ),
   );
-  // The cadence is paused by the verdict; a ring filling toward a
+  // The cadence is paused by the policy; a ring filling toward a
   // refresh that cannot come misleads exactly like the unconsented case.
   expect(view.queryByTestId('pricefetcher.ring')).toBeNull();
 });

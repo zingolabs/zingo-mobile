@@ -4,8 +4,8 @@ import {
   RECONNECT_BASE_MILLIS,
   STEADY_POLL_MILLIS,
 } from '../app/walletBackend/modules/MixnetCoordinator';
-import { deriveMixnetView } from '../app/walletBackend/transforms/mixnetPresenter';
-import { MixnetView } from '../app/walletBackend/transforms/mixnetPresenter';
+import { deriveMixnetView } from '../app/walletBackend/transforms/mixnetView';
+import { MixnetView } from '../app/walletBackend/transforms/mixnetView';
 
 jest.mock('../app/RPCModule', () =>
   require('../__mocks__/rpcModuleProxy').rpcModuleProxyMock(),

@@ -28,7 +28,7 @@ import { getZecPrice } from '../app/walletBackend';
 import {
   INITIAL_MIXNET_VIEW,
   MixnetView,
-} from '../app/walletBackend/transforms/mixnetPresenter';
+} from '../app/walletBackend/transforms/mixnetView';
 
 const price = getZecPrice as jest.MockedFunction<typeof getZecPrice>;
 
@@ -273,7 +273,7 @@ test('a follow-up arriving mid-flight fires after the flight, not never', async 
   expect(price.mock.calls.length).toBeGreaterThan(inFlight + 1);
 });
 
-test('a real transport verdict disarms the follow-up', async () => {
+test('a real transport policy disarms the follow-up', async () => {
   price.mockResolvedValue({ price: -1, error: 'refused' });
   const setZecPrice = jest.fn();
   seedDeps(setZecPrice);
@@ -493,7 +493,7 @@ test('a transient unknown poll does not drop the armed follow-up', async () => {
   await waitFor(() => expect(price).toHaveBeenCalledTimes(2)); // refused: arms
 
   view.rerender(fetcherUi(makeCtx({ mixnetView: UNKNOWN_VIEW }), setZecPrice));
-  await flush(); // one failed status poll, not a transport verdict
+  await flush(); // one failed status poll, not a transport policy
   view.rerender(fetcherUi(makeCtx({ mixnetView: READY_VIEW }), setZecPrice));
   await flush();
 

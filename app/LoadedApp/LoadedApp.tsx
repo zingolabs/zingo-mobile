@@ -134,7 +134,7 @@ import {
   INITIAL_MIXNET_VIEW,
   OFF_MIXNET_VIEW,
   MixnetView,
-} from '../walletBackend/transforms/mixnetPresenter';
+} from '../walletBackend/transforms/mixnetView';
 import {
   startMixnetTransport,
   stopMixnetTransport,
