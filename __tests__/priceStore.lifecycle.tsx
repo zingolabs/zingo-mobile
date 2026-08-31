@@ -467,7 +467,7 @@ test('rapid app hops inside the cooldown do not multiply fetches', async () => {
   expect(price).toHaveBeenCalledTimes(1);
 });
 
-test('Nym off while the route still serves stays off clearnet', async () => {
+test('Nym off holds off clearnet while the route still serves', async () => {
   jest.useFakeTimers();
   price.mockResolvedValue({ price: 42, error: '' });
   const setZecPrice = jest.fn();

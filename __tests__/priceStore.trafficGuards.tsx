@@ -218,7 +218,7 @@ test('a switch-off fetches the price over clearnet', async () => {
   );
 });
 
-test('a switch-off whose disable rejected still fetches over clearnet', async () => {
+test('a failed disable still fetches the price over clearnet', async () => {
   price.mockResolvedValue({ price: 42, error: '' });
   const setZecPrice = jest.fn();
 
@@ -231,6 +231,23 @@ test('a switch-off whose disable rejected still fetches over clearnet', async ()
   await waitFor(() =>
     expect(setZecPrice).toHaveBeenCalledWith(42, expect.any(Number)),
   );
+});
+
+test('a disabled route that still refuses keeps retrying, not dying', async () => {
+  jest.useFakeTimers();
+  price.mockResolvedValue({ price: -1, error: 'refused' });
+  const setZecPrice = jest.fn();
+
+  render(
+    surfaceUi(makeCtx({ nym: false, mixnetView: UNKNOWN_VIEW }), setZecPrice),
+  );
+  await jest.advanceTimersByTimeAsync(0);
+  const entryCalls = price.mock.calls.length;
+  expect(entryCalls).toBeGreaterThan(0);
+
+  await jest.advanceTimersByTimeAsync(21 * 60_000);
+  expect(price.mock.calls.length).toBeGreaterThan(entryCalls);
+  expect(setZecPrice).not.toHaveBeenCalled();
 });
 
 test('opting in with the transport still off emits no clearnet fetch', async () => {

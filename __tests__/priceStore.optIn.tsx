@@ -24,8 +24,22 @@ import {
 import { CurrencyEnum, SelectServerEnum } from '../app/AppState';
 import { getZecPrice } from '../app/walletBackend';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
+import {
+  MIXNET_STATUS_KEYS,
+  MixnetStatusKey,
+  MixnetView,
+} from '../app/walletBackend/transforms/mixnetView';
 
 const price = getZecPrice as jest.MockedFunction<typeof getZecPrice>;
+
+const viewFor = (statusKey: MixnetStatusKey): MixnetView => ({
+  statusKey,
+  socks5Addr: null,
+  narration: null,
+  sendBlocked: true,
+  recovery: 'none',
+  reconnecting: false,
+});
 
 type Ctx = typeof defaultAppContextLoaded;
 const makeCtx = (over?: Partial<Ctx>): Ctx => ({
@@ -156,6 +170,40 @@ test('a return parked on a flight still arms the hop rate bound', async () => {
   priceFetcherStore.foregroundReturned();
   await jest.advanceTimersByTimeAsync(0);
   expect(price).toHaveBeenCalledTimes(4); // rate-bound, no fifth call
+});
+
+const FETCH_EXPECTED: Record<string, boolean> = {
+  'true|mixnet.status.off': false,
+  'true|mixnet.status.bootstrapping': true,
+  'true|mixnet.status.ready': true,
+  'true|mixnet.status.died': false,
+  'true|mixnet.status.unknown': true,
+  'false|mixnet.status.off': true,
+  'false|mixnet.status.bootstrapping': false,
+  'false|mixnet.status.ready': false,
+  'false|mixnet.status.died': false,
+  'false|mixnet.status.unknown': true,
+};
+
+test('the opt-in resolves a fetch for every mixnet status', async () => {
+  for (const nym of [true, false]) {
+    for (const statusKey of MIXNET_STATUS_KEYS) {
+      jest.useFakeTimers();
+      price.mockReset();
+      price.mockResolvedValue({ price: 42, error: '' });
+      priceFetcherStore.resetForTests();
+      const setZecPrice = jest.fn();
+
+      const view = render(
+        surfaceUi(makeCtx({ nym, mixnetView: viewFor(statusKey) }), setZecPrice),
+      );
+      await jest.advanceTimersByTimeAsync(0);
+
+      expect(price.mock.calls.length > 0).toBe(FETCH_EXPECTED[`${nym}|${statusKey}`]);
+      view.unmount();
+      jest.useRealTimers();
+    }
+  }
 });
 
 test('a re-render behind the closed gate emits no traffic', async () => {

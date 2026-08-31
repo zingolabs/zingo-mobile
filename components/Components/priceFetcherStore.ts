@@ -153,7 +153,7 @@ function transportRefuses(): boolean {
 function surfaceMayFetch(): boolean {
   return (
     deps !== undefined &&
-    priceTrafficConsented() &&
+    priceTrafficAllowed() &&
     deps.priceFetchable &&
     attachCount > 0 &&
     !appAway &&
@@ -161,15 +161,23 @@ function surfaceMayFetch(): boolean {
   );
 }
 
-function priceTrafficConsented(): boolean {
-  if (deps === undefined) return false;
-  if (deps.nymSelected) {
-    return deps.mixnetStatusKey !== 'mixnet.status.off';
+function clearnetFetchable(key: MixnetStatusKey): boolean {
+  switch (key) {
+    case 'mixnet.status.off':
+    case 'mixnet.status.died':
+    case 'mixnet.status.unknown':
+      return true;
+    case 'mixnet.status.ready':
+    case 'mixnet.status.bootstrapping':
+      return false;
   }
-  return (
-    deps.mixnetStatusKey !== 'mixnet.status.ready' &&
-    deps.mixnetStatusKey !== 'mixnet.status.bootstrapping'
-  );
+}
+
+function priceTrafficAllowed(): boolean {
+  if (deps === undefined) return false;
+  return deps.nymSelected
+    ? deps.mixnetStatusKey !== 'mixnet.status.off'
+    : clearnetFetchable(deps.mixnetStatusKey);
 }
 
 function scheduleAuto(): void {
