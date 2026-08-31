@@ -1,0 +1,155 @@
+name: Visual accept
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: write
+  pull-requests: write
+  checks: write
+  actions: read
+
+concurrency:
+  group: visual-accept-${{ github.event.issue.number }}
+  cancel-in-progress: false
+
+jobs:
+  accept:
+    name: Visual accept
+    if: >-
+      github.event.issue.pull_request &&
+      startsWith(github.event.comment.body, '/visual-accept')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Acknowledge the command
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.reactions.createForIssueComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: context.payload.comment.id,
+              content: '+1',
+            });
+
+      - name: Authorize and resolve the run
+        id: resolve
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const reply = body =>
+              github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body,
+              });
+            const assoc = context.payload.comment.author_association;
+            if (!['OWNER', 'MEMBER', 'COLLABORATOR'].includes(assoc)) {
+              await reply('`/visual-accept` needs write access to this repository.');
+              return core.setFailed('unauthorized');
+            }
+            const { data: pr } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+            });
+            if (pr.head.repo.full_name !== pr.base.repo.full_name) {
+              await reply('Review locally and push if changes are okay.');
+              return core.setFailed('cross-repo branch');
+            }
+            const { data: runs } = await github.rest.actions.listWorkflowRuns({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'visual-review.yaml',
+              head_sha: pr.head.sha,
+              per_page: 1,
+            });
+            const run = runs.workflow_runs.find(r => r.status === 'completed');
+            if (!run) {
+              await reply('No finished visual review yet. Wait for the check, then run the command again.');
+              return core.setFailed('no completed run for head');
+            }
+            const { data: jobs } = await github.rest.actions.listJobsForWorkflowRun({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: run.id,
+            });
+            const capture = jobs.jobs
+              .flatMap(job => job.steps)
+              .find(step => step.name === 'Capture PR head');
+            if (!capture || capture.conclusion !== 'success') {
+              await reply('The visual capture did not complete on this commit. Wait for a green capture, then run the command again.');
+              return core.setFailed('capture incomplete');
+            }
+            core.setOutput('run_id', String(run.id));
+            core.setOutput('head_ref', pr.head.ref);
+
+      - name: Checkout PR head
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ steps.resolve.outputs.head_ref }}
+
+      - name: Download the accepted capture
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          rm -rf visual/__baseline__
+          gh run download ${{ steps.resolve.outputs.run_id }} -n visual-head -D visual/__baseline__
+
+      - name: Commit the baseline
+        id: commit
+        env:
+          AUTHOR_LOGIN: ${{ github.event.comment.user.login }}
+          AUTHOR_ID: ${{ github.event.comment.user.id }}
+          PR_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          git config user.name 'visual-review-bot'
+          git config user.email 'visual-review-bot@users.noreply.github.com'
+          git add visual/__baseline__
+          if git diff --cached --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git commit \
+            -m "test(visual): accept baseline (PR #${PR_NUMBER})" \
+            -m "Co-authored-by: ${AUTHOR_LOGIN} <${AUTHOR_ID}+${AUTHOR_LOGIN}@users.noreply.github.com>"
+          git push origin "HEAD:${{ steps.resolve.outputs.head_ref }}"
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Publish a passing Visual review check
+        if: steps.commit.outputs.changed == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.checks.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              name: 'Visual review',
+              head_sha: '${{ steps.commit.outputs.sha }}',
+              status: 'completed',
+              conclusion: 'success',
+              output: {
+                title: 'Baseline accepted',
+                summary: `Baseline accepted via \`/visual-accept\` by @${context.payload.comment.user.login}.`,
+              },
+            });
+
+      - name: Report the outcome
+        if: steps.resolve.outcome == 'success'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const changed = '${{ steps.commit.outputs.changed }}' === 'true';
+            const body = changed
+              ? `Baseline accepted from run \`${{ steps.resolve.outputs.run_id }}\` and pushed. The Visual review check is green.`
+              : 'The baseline already matches this run. Nothing to accept.';
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body,
+            });

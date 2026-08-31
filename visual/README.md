@@ -21,10 +21,14 @@ machines (font hinting, anti-aliasing), and CI is the renderer that gates, so
 the baseline holds what the CI runner drew. The PR flow is:
 
 1. Push. The `Visual review` check fails and links the report.
-2. Review the report. If the change is intended, run `yarn visual:accept` on
-   the branch. It downloads that run's `visual-head` artifact into
-   `visual/__baseline__` (needs the `gh` CLI, logged in).
-3. Commit `visual/__baseline__` and push. The check passes.
+2. Review the report. If the change is intended, comment `/visual-accept` on
+   the PR. A bot downloads that run's `visual-head` artifact into
+   `visual/__baseline__`, commits it to the branch, and turns the check green.
+   The command needs write access to the repository and a finished run for the
+   current commit.
+3. For a same result from a terminal, run `yarn visual:accept` on the branch,
+   then commit `visual/__baseline__` and push. It downloads the run's
+   `visual-head` artifact (needs the `gh` CLI, logged in).
 
 `yarn visual:accept --run <id>` names a run. `yarn visual:accept --local`
 promotes your own `visual/__current__` instead; use it to try the harness, and
