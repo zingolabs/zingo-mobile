@@ -24,7 +24,7 @@ import {
 } from '../app/context';
 import { ChainNameEnum, SelectServerEnum } from '../app/AppState';
 import { getZecPrice } from '../app/walletBackend';
-import { MixnetView } from '../app/walletBackend/transforms/mixnetPresenter';
+import { MixnetView } from '../app/walletBackend/transforms/mixnetView';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 
 const price = getZecPrice as jest.MockedFunction<typeof getZecPrice>;

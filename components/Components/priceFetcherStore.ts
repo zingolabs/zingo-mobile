@@ -3,8 +3,8 @@ import { AppState, NativeEventSubscription } from 'react-native';
 import { getZecPrice } from '../../app/walletBackend';
 import {
   MixnetStatusKey,
-  transportDisposition,
-} from '../../app/walletBackend/transforms/mixnetPresenter';
+  fetchPolicy,
+} from '../../app/walletBackend/transforms/mixnetView';
 
 /**
  * Shared, singleton state for the price surface's fetch lifecycle.
@@ -16,7 +16,7 @@ import {
  * currency never decides what may be fetched; PriceFetcher and
  * usePriceFetcherStore only observe. The store owns the whole lifecycle:
  *   - ONE auto-refresh timer while the driver is attached, the gate-open
- *     foreground holds, and the transport is not a refusing verdict
+ *     foreground holds, and the transport is not a refusing policy
  *     ('died'): each fetch schedules the next at a uniform random delay
  *     of five to ten minutes. A background transition pauses the
  *     cadence, and iOS 'inactive' (Control Center, the app's own Face ID
@@ -28,7 +28,7 @@ import {
  *     the last start or last success yield to the cadence.
  *   - The ready follow-up: an unattended fetch refused during bootstrap
  *     arms a one-shot fetch that fires when the Indicator turns ready.
- *     It is dropped on a background transition and on a 'died' verdict,
+ *     It is dropped on a background transition and on a 'died' policy,
  *     survives an in-flight fetch, and a transient 'unknown' status poll
  *     never drops it.
  *   - No snackbars. A failure leaves the last price standing; the stale
@@ -67,7 +67,7 @@ type PriceSurfaceSnapshot = {
   loading: boolean;
   nextFetchAt: number;
   nextFetchDelayMs: number;
-  // The store's own render verdict, so no view re-derives (and drifts
+  // The store's own render decision, so no view re-derives (and drifts
   // from) surfaceMayFetch.
   surfaceActive: boolean;
 };
@@ -137,13 +137,13 @@ function clearAuto(): void {
   emit();
 }
 
-// A transport verdict under which the wallet refuses every price fetch
+// A transport policy under which the wallet refuses every price fetch
 // by the route rule, so attempting is pure waste; the classification is
-// the presenter's exhaustive switch, which a new indicator breaks.
+// fetchPolicy's exhaustive switch, which a new indicator breaks.
 function transportRefuses(): boolean {
   return (
     deps !== undefined &&
-    transportDisposition(deps.mixnetStatusKey) === 'refusing'
+    fetchPolicy(deps.mixnetStatusKey) === 'refusing'
   );
 }
 
@@ -231,10 +231,10 @@ async function boundedPrice(): Promise<number> {
 }
 
 // A status that could still be a bootstrap in progress: 'unknown' is
-// one failed status poll, not a verdict, on the arm path exactly as on
+// one failed status poll, not a policy, on the arm path exactly as on
 // the drop path in pump().
 function statusCouldBeBootstrap(key: MixnetStatusKey): boolean {
-  return transportDisposition(key) === 'possibleBootstrap';
+  return fetchPolicy(key) === 'possibleBootstrap';
 }
 
 // A refusal may arm the ready follow-up from every launch path except
@@ -278,7 +278,7 @@ async function doFetch(mayArmFollowUp: boolean): Promise<void> {
     if (price > 0) {
       // The traffic was already spent under the launch's consent, so
       // the value is recorded even where a new fetch would now be
-      // refused (a background hop, a moved verdict): discarding it
+      // refused (a background hop, a moved policy): discarding it
       // would only buy a second identical fetch later.
       followUpArmed = false;
       entryPending = false; // a fresh price satisfies a pending return
@@ -331,8 +331,8 @@ function pump(): void {
     followUpArmed = false;
     doFetch(false).catch(() => {});
   } else if (transportRefuses()) {
-    // A real transport verdict ends the bootstrap the arm belonged to.
-    // 'unknown' is one failed status poll, not a verdict, and a
+    // A real transport policy ends the bootstrap the arm belonged to.
+    // 'unknown' is one failed status poll, not a policy, and a
     // bootstrap's polls are flakiest exactly while the arm matters, so
     // both it and 'bootstrapping' keep the arm standing.
     followUpArmed = false;

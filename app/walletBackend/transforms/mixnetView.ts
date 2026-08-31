@@ -3,12 +3,11 @@ import { MixnetDetailReport, MixnetStatusReport } from './mixnetTransform';
 
 /**
  * What the user may do about the current mixnet state: nothing, wait for
- * the bootstrap, or re-enable a lost transport. A closed union so screens
- * must render every case the policy can produce.
+ * the bootstrap, or re-enable a transport.
  */
 export type MixnetRecoveryAction = 'none' | 'wait' | 'reenable';
 
-/** One member of the closed status-key set: an indicator the wallet reports, or this presenter's own `unknown` failure key. */
+/** One member of the closed status-key set: an indicator the wallet reports, or this transform's own `unknown` failure key. */
 export type MixnetStatusKey =
   `mixnet.status.${`${RPCMixnetIndicatorEnum}` | 'unknown'}`;
 
@@ -20,14 +19,14 @@ export const MIXNET_STATUS_KEYS: readonly MixnetStatusKey[] = [
   'mixnet.status.unknown',
 ];
 
-/** How the transport disposes a price fetch. */
-export type MixnetTransportDisposition =
+/** What the transport will do with a price fetch. */
+export type FetchPolicy =
   'refusing' | 'possibleBootstrap' | 'serving';
 
 /** Classifies a status key exhaustively. */
-export function transportDisposition(
+export function fetchPolicy(
   key: MixnetStatusKey,
-): MixnetTransportDisposition {
+): FetchPolicy {
   switch (key) {
     case 'mixnet.status.died':
       return 'refusing';
@@ -44,7 +43,7 @@ export function transportDisposition(
  * The screen-facing projection of the mixnet state. `statusKey` is a
  * translation key (`mixnet.status.*`), never display English; `narration`
  * is the live bootstrap line when one exists; `sendBlocked` is the
- * fail-closed verdict a send screen must respect — `true` in every state
+ * fail-closed status a send screen must respect — `true` in every state
  * except an explicit `off` (deliberate clearnet consent) or `ready`.
  */
 export type MixnetView = {

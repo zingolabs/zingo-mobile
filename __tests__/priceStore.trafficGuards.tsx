@@ -25,7 +25,7 @@ import {
   INITIAL_MIXNET_VIEW,
   OFF_MIXNET_VIEW,
   MixnetView,
-} from '../app/walletBackend/transforms/mixnetPresenter';
+} from '../app/walletBackend/transforms/mixnetView';
 
 const DIED_VIEW: MixnetView = {
   statusKey: 'mixnet.status.died',

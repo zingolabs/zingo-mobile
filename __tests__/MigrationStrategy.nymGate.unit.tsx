@@ -17,7 +17,7 @@ import { RPCMixnetIndicatorEnum } from '../app/walletBackend/enums/RPCMixnetIndi
 import {
   MixnetView,
   deriveMixnetView,
-} from '../app/walletBackend/transforms/mixnetPresenter';
+} from '../app/walletBackend/transforms/mixnetView';
 import {
   mixnetConnecting,
   mixnetLost,
@@ -80,7 +80,7 @@ describe('deriveNymGateState', () => {
   });
 
   test('fails only on the died and unknown keys, across every view', () => {
-    // Every view the presenter can emit: the four indicators and the failure
+    // Every view the transform can emit: the four indicators and the failure
     // report, with and without the reconnect flag, with and without a held
     // Enable tap.
     const indicators = [

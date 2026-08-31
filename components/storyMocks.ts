@@ -13,7 +13,7 @@ import TransparentAddressClass from '../app/AppState/classes/TransparentAddressC
 import AddressBookFileClass from '../app/AppState/classes/AddressBookFileClass';
 import { RPCAddressScopeEnum } from '../app/walletBackend/enums/RPCAddressScopeEnum';
 import { RPCMixnetIndicatorEnum } from '../app/walletBackend/enums/RPCMixnetIndicatorEnum';
-import { deriveMixnetView } from '../app/walletBackend/transforms/mixnetPresenter';
+import { deriveMixnetView } from '../app/walletBackend/transforms/mixnetView';
 
 export const mockZecPrice: ZecPriceType = {
   zecPrice: 33.75,

@@ -67,7 +67,7 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
     usePriceFetcherStore();
   const health = usePriceHealth(zecPrice.date);
 
-  // The store's own verdict decides visibility: without the consent,
+  // The store's own decision governs visibility: without the consent,
   // the market, or a serving transport no cadence exists, and a ring
   // counting down to a refresh that cannot come would mislead, so
   // render nothing at all.

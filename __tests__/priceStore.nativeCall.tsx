@@ -26,7 +26,7 @@ import {
 import { SelectServerEnum } from '../app/AppState';
 import { getZecPrice } from '../app/walletBackend';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
-import { MixnetView } from '../app/walletBackend/transforms/mixnetPresenter';
+import { MixnetView } from '../app/walletBackend/transforms/mixnetView';
 
 const price = getZecPrice as jest.MockedFunction<typeof getZecPrice>;
 
@@ -195,7 +195,7 @@ test("a refusal under a transient 'unknown' arms the follow-up", async () => {
   const refusedUnderUnknown = price.mock.calls.length;
   expect(refusedUnderUnknown).toBeGreaterThan(0);
 
-  // 'unknown' is one failed status poll, not a verdict, on the arm path
+  // 'unknown' is one failed status poll, not a policy, on the arm path
   // exactly as on the drop path: ready must fire the follow-up now, not
   // a full tick later.
   view.rerender(surfaceUi(makeCtx({ mixnetView: READY_VIEW }), setZecPrice));

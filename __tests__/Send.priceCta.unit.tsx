@@ -124,7 +124,7 @@ beforeEach(() => {
     surfaceActive: false,
   });
   // The health follows the priceDate each call site actually wires
-  // through, so an unwired row cannot pass by a blanket verdict.
+  // through, so an unwired row cannot pass by a blanket decision.
   healthHook.mockImplementation(priceDate =>
     priceDate === 0
       ? 'absent'

@@ -12,7 +12,7 @@ import {
   StartMixnetTransport,
   StopMixnetTransport,
 } from '../modules/MixnetCoordinator';
-import { MixnetView } from '../transforms/mixnetPresenter';
+import { MixnetView } from '../transforms/mixnetView';
 
 /**
  * All callbacks and settings required by WalletBackend and its sub-services.

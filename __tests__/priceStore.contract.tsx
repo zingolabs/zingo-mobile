@@ -28,8 +28,8 @@ import {
   INITIAL_MIXNET_VIEW,
   MIXNET_STATUS_KEYS,
   MixnetView,
-  transportDisposition,
-} from '../app/walletBackend/transforms/mixnetPresenter';
+  fetchPolicy,
+} from '../app/walletBackend/transforms/mixnetView';
 
 const price = getZecPrice as jest.MockedFunction<typeof getZecPrice>;
 
@@ -152,14 +152,14 @@ test('the ready follow-up never re-arms itself', async () => {
   expect(price).toHaveBeenCalledTimes(4);
 });
 
-test('every status key classifies under the disposition switch', () => {
-  const dispositions = MIXNET_STATUS_KEYS.map(key => transportDisposition(key));
-  dispositions.forEach(d =>
-    expect(['refusing', 'possibleBootstrap', 'serving']).toContain(d),
+test('every status key classifies under the fetch-policy switch', () => {
+  const policies = MIXNET_STATUS_KEYS.map(key => fetchPolicy(key));
+  policies.forEach(p =>
+    expect(['refusing', 'possibleBootstrap', 'serving']).toContain(p),
   );
-  expect(dispositions).toContain('refusing');
-  expect(dispositions).toContain('possibleBootstrap');
-  expect(dispositions).toContain('serving');
+  expect(policies).toContain('refusing');
+  expect(policies).toContain('possibleBootstrap');
+  expect(policies).toContain('serving');
 });
 
 test('the driver writes deps when an input moves, not per render', async () => {
