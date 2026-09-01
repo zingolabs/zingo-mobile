@@ -31,7 +31,7 @@ const gh = (ghArgs: string[]): string => {
   return out.stdout;
 };
 
-const ghJson = <T>(path: string): T => JSON.parse(gh(['api', path])) as T;
+const ghJson = <T,>(path: string): T => JSON.parse(gh(['api', path])) as T;
 
 const ghPost = (path: string, body: unknown) => {
   const tmp = join(mkdtempSync(join(tmpdir(), 'gh-body-')), 'body.json');
@@ -105,17 +105,23 @@ git(['commit', '-m', `test(visual): accept baseline (PR #${prNumber})`, '-m', co
 git(['push', 'origin', `HEAD:${headRef}`]);
 const newSha = git(['rev-parse', 'HEAD']);
 
-ghPost(`repos/${repo}/check-runs`, {
-  name: 'Visual review',
-  head_sha: newSha,
-  status: 'completed',
-  conclusion: 'success',
-  output: {
-    title: 'Baseline accepted',
-    summary: `Baseline accepted via \`/visual-accept\` by @${authorLogin}.`,
-  },
-});
-
-comment(
-  `Baseline accepted from run \`${run!.id}\` and pushed. The Visual review check is green.`,
-);
+const retriggers = process.env.RETRIGGERS === 'true';
+if (retriggers) {
+  comment(
+    `Baseline accepted from run \`${run!.id}\` and pushed. Visual review is re-running on the new commit.`,
+  );
+} else {
+  ghPost(`repos/${repo}/check-runs`, {
+    name: 'Visual review',
+    head_sha: newSha,
+    status: 'completed',
+    conclusion: 'success',
+    output: {
+      title: 'Baseline accepted',
+      summary: `Baseline accepted via \`/visual-accept\` by @${authorLogin}.`,
+    },
+  });
+  comment(
+    `Baseline accepted from run \`${run!.id}\` and pushed. The Visual review check is green.`,
+  );
+}
