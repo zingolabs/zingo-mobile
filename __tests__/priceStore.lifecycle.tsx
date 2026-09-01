@@ -467,14 +467,15 @@ test('rapid app hops inside the cooldown do not multiply fetches', async () => {
   expect(price).toHaveBeenCalledTimes(1);
 });
 
-test('without the Nym selection no price traffic exists', async () => {
+test('Nym off holds off clearnet while the route still serves', async () => {
   jest.useFakeTimers();
   price.mockResolvedValue({ price: 42, error: '' });
   const setZecPrice = jest.fn();
   seedDeps(setZecPrice);
 
-  // USD may even be the seeded default; the currency authorizes nothing.
-  render(fetcherUi(makeCtx({ nym: false }), setZecPrice));
+  render(
+    fetcherUi(makeCtx({ nym: false, mixnetView: READY_VIEW }), setZecPrice),
+  );
   await jest.advanceTimersByTimeAsync(61_000);
   fireAppState('background');
   fireAppState('active');
