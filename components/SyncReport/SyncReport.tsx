@@ -19,7 +19,7 @@ import Header from '../Header';
 import { NetInfoStateType } from '@react-native-community/netinfo/src/index';
 import RegText from '../Components/RegText';
 import BoldText from '../Components/BoldText';
-import SheetRim from '../Components/SheetRim';
+import AppSheet from '../Components/AppSheet';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
   faChevronLeft,
@@ -83,53 +83,46 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
 
   const syncReportSnapPoints = useFullSheetSnapPoints(containerH, headerH);
 
-  const renderSyncReportHandle = useCallback(
-    () => (
+  const syncReportHeader = (
+    <View
+      style={{
+        paddingTop: 12,
+        paddingBottom: 8,
+        paddingHorizontal: 16,
+      }}
+    >
       <View
         style={{
-          paddingTop: 12,
-          paddingBottom: 8,
-          paddingHorizontal: 16,
-          backgroundColor: colors.bgSurface,
-          borderTopLeftRadius: 40,
-          borderTopRightRadius: 40,
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
         }}
       >
-        <SheetRim />
-        <View
+        <TouchableOpacity
+          onPress={closeScreen}
+          hitSlop={8}
+          style={{ paddingHorizontal: 4, paddingVertical: 4 }}
+        >
+          <FontAwesomeIcon
+            icon={faChevronLeft}
+            size={20}
+            color={colors.fgAccent}
+          />
+        </TouchableOpacity>
+        <BoldText
+          numberOfLines={1}
           style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
+            flex: 1,
+            fontSize: 16,
+            lineHeight: 28,
+            textAlign: 'center',
           }}
         >
-          <TouchableOpacity
-            onPress={closeScreen}
-            hitSlop={8}
-            style={{ paddingHorizontal: 4, paddingVertical: 4 }}
-          >
-            <FontAwesomeIcon
-              icon={faChevronLeft}
-              size={20}
-              color={colors.fgAccent}
-            />
-          </TouchableOpacity>
-          <BoldText
-            numberOfLines={1}
-            style={{
-              flex: 1,
-              fontSize: 16,
-              lineHeight: 28,
-              textAlign: 'center',
-            }}
-          >
-            {translate('report.title') as string}
-          </BoldText>
-          <View style={{ width: 28 }} />
-        </View>
+          {translate('report.title') as string}
+        </BoldText>
+        <View style={{ width: 28 }} />
       </View>
-    ),
-    [colors, closeScreen, translate],
+    </View>
   );
 
   useEffect(() => {
@@ -266,22 +259,10 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
           noUfvkIcon={true}
         />
       </View>
-      <BottomSheet
+      <AppSheet
         ref={syncReportSheetRef}
         snapPoints={syncReportSnapPoints}
-        index={0}
-        enableDynamicSizing={false}
-        enablePanDownToClose={false}
-        enableContentPanningGesture={false}
-        keyboardBehavior={'interactive'}
-        keyboardBlurBehavior={'restore'}
-        android_keyboardInputMode={'adjustResize'}
-        backgroundStyle={{
-          backgroundColor: colors.bgSurface,
-          borderTopLeftRadius: 40,
-          borderTopRightRadius: 40,
-        }}
-        handleComponent={renderSyncReportHandle}
+        header={syncReportHeader}
       >
         <BottomSheetScrollView
           testID="syncreport.scroll-view"
@@ -289,7 +270,6 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
           alwaysBounceVertical={false}
           style={{
             flex: 1,
-            backgroundColor: colors.bgSurface,
           }}
           contentContainerStyle={{
             flexDirection: 'column',
@@ -905,7 +885,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
             </View>
           )}
         </BottomSheetScrollView>
-      </BottomSheet>
+      </AppSheet>
     </View>
   );
 };

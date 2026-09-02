@@ -93,7 +93,14 @@ import Toast from 'react-native-toast-message';
 import { toastConfig } from '../toastConfig';
 import { RPCSeedType } from '../walletBackend/types/RPCSeedType';
 import Launching from './components/Launching';
-import { AnsweredVerdict, gateUntilAnswered } from '../simpleBiometrics';
+import {
+  GateAnswer,
+  askGate,
+  dropWhileInFlight,
+  enactGateAnswer,
+  resolveTriggerGate,
+  retireSentinelEntries,
+} from '../gateController';
 import selectingServer from '../selectingServer';
 import { isEqual } from 'lodash';
 import {
@@ -583,6 +590,11 @@ export class LoadingAppClass extends Component<
 
     this.fetchZingolibVersion();
 
+    // Retire the keychain entries the replaced sentinel gate shipped:
+    // nothing reads them, and an auth-gated key left under a known name
+    // invites stale-entry reuse. Fire-and-forget, best-effort, idempotent.
+    retireSentinelEntries();
+
     // to start the App the first time in this session
     // the user have to pass the security of the device
     if (this.state.startingApp) {
@@ -591,18 +603,25 @@ export class LoadingAppClass extends Component<
         // on the first screen so the user can try again.
         return;
       }
-      // (PIN or TouchID or FaceID). Only a decline locks; an
-      // 'unavailable' gate passes because it guards nothing and
-      // blocking locks the user out of the wallet.
-      const startGate: AnsweredVerdict = this.state.security.startApp
-        ? await gateUntilAnswered({
-            translate: this.state.translate,
-            purpose: 'appEntry',
-          })
-        : { kind: 'authenticated' };
-      if (startGate.kind === 'declined') {
-        // The narrowed verdict is the gate outcome, whole.
-        this.setState({ biometricGate: startGate });
+      // (PIN or TouchID or FaceID). Only a decline locks; a gate that
+      // cannot run fails open with a notice (ADR 0007), because blocking
+      // would trap the user out of the wallet. A retry's answer rides in
+      // as data, so this trigger never runs a second ceremony behind it.
+      const startGate: GateAnswer = await resolveTriggerGate(
+        this.consumeRetryAnswer(),
+        this.state.security.startApp,
+        { translate: this.state.translate },
+      );
+      const proceed = enactGateAnswer(
+        startGate,
+        {
+          // The narrowed answer is the gate outcome, whole.
+          lock: declined => this.setState({ biometricGate: declined }),
+          notice: this.addLastSnackbar,
+        },
+        this.state.translate,
+      );
+      if (!proceed) {
         return;
       }
     }
@@ -2056,6 +2075,36 @@ export class LoadingAppClass extends Component<
     });
   };
 
+  // The retry's non-declined answer, parked for the boot path to consume
+  // as data instead of running a second ceremony.
+  retryAnswer: GateAnswer | undefined;
+
+  consumeRetryAnswer = (): GateAnswer | undefined => {
+    const carried = this.retryAnswer;
+    this.retryAnswer = undefined;
+    return carried;
+  };
+
+  // The locked screen's retry runs its own ceremony unconditionally: the
+  // security toggles enable triggers, they never bypass a retry
+  // (ADR 0007). The answer rides into the boot path as data, so the
+  // startApp trigger consumes it instead of asking again and the
+  // fail-open notice shows once, from the boot path's own handling.
+  // Re-entrant taps are dropped for the whole flight, ceremony and boot,
+  // so a double tap cannot run two concurrent boots against one wallet.
+  retryGate = dropWhileInFlight(async () => {
+    const retry = await askGate({ translate: this.state.translate });
+    if (retry.kind === 'declined') {
+      this.setState({ biometricGate: retry });
+      return;
+    }
+    this.retryAnswer = retry;
+    await new Promise<void>(resolve => {
+      this.setState({ biometricGate: { kind: 'passed' } }, resolve);
+    });
+    await this.componentDidMount();
+  });
+
   addLastSnackbar = (message: string, duration?: SnackbarDurationEnum) => {
     Toast.show({
       type: 'appInfo',
@@ -2261,11 +2310,7 @@ export class LoadingAppClass extends Component<
                   translate={translate}
                   firstLaunchingMessage={firstLaunchingMessage}
                   biometricGate={biometricGate}
-                  tryAgain={() => {
-                    this.setState({ biometricGate: { kind: 'passed' } }, () =>
-                      this.componentDidMount(),
-                    );
-                  }}
+                  tryAgain={this.retryGate}
                 />
               )}
               {screen === RouteEnum.StartMenu && (

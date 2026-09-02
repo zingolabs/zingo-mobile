@@ -81,6 +81,8 @@ import Utils from '../utils';
 import { getZingoVersion, substituteZingoName } from '../utils/ZingoAppData';
 import { AppTheme } from '../theme';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
+import { PriceTrafficDriver } from '../../components/Components/PriceFetcher';
+import { priceFetcherStore } from '../../components/Components/priceFetcherStore';
 import { ContextAppLoadedProvider } from '../context';
 import { parseZcashURI, serverUris, fetchServerList } from '../uris';
 import selectingServer from '../selectingServer';
@@ -94,7 +96,11 @@ import { RPCSeedType } from '../walletBackend/types/RPCSeedType';
 import { Launching } from '../LoadingApp';
 import { AddressBook } from '../../components/AddressBook';
 import { AddressBookFileImpl } from '../../components/AddressBook';
-import { AnsweredVerdict, gateUntilAnswered } from '../simpleBiometrics';
+import {
+  GateAnswer,
+  enactGateAnswer,
+  resolveTriggerGate,
+} from '../gateController';
 import ShowAddressAlertAsync from '../../components/Send/components/ShowAddressAlertAsync';
 import {
   createUpdateRecoveryWalletInfo,
@@ -128,7 +134,7 @@ import {
   INITIAL_MIXNET_VIEW,
   OFF_MIXNET_VIEW,
   MixnetView,
-} from '../walletBackend/transforms/mixnetPresenter';
+} from '../walletBackend/transforms/mixnetView';
 import {
   startMixnetTransport,
   stopMixnetTransport,
@@ -984,7 +990,7 @@ export class LoadedAppClass extends Component<
           // Bump the foreground epoch so any currently-mounted
           // protected screen (Seed/Ufvk/Settings/Rescan/Confirm) can
           // re-fire its biometric gate when security.foregroundApp is
-          // OFF. Done before the foregroundApp simpleBiometrics so the
+          // OFF. Done before the foregroundApp askGate so the
           // screen-level effects don't race against the app-level one.
           this.setState(state => ({
             foregroundEpoch: state.foregroundEpoch + 1,
@@ -1101,25 +1107,35 @@ export class LoadedAppClass extends Component<
 
   foregroundGateBusy = false;
 
-  // (PIN or TouchID or FaceID). Only a decline locks; an 'unavailable'
-  // gate passes because it guards nothing and blocking locks the user out
-  // of the wallet.
+  // (PIN or TouchID or FaceID). Only a decline locks; a gate that cannot
+  // run fails open with a notice (ADR 0007), because blocking would trap
+  // the user out of the wallet.
   runForegroundGate = async () => {
-    const foregroundGate: AnsweredVerdict = this.state.security.foregroundApp
-      ? await gateUntilAnswered({
-          translate: this.state.translate,
-          purpose: 'appEntry',
-        })
-      : { kind: 'authenticated' };
-    if (foregroundGate.kind === 'declined') {
-      // The narrowed verdict is the gate outcome, whole; the locked
-      // screen never reads mutable module state.
-      this.navigateToLoadingApp({
-        startingApp: true,
-        biometricGate: foregroundGate,
-      });
+    const foregroundGate: GateAnswer = await resolveTriggerGate(
+      undefined,
+      this.state.security.foregroundApp,
+      { translate: this.state.translate },
+    );
+    const proceed = enactGateAnswer(
+      foregroundGate,
+      {
+        // The narrowed answer is the gate outcome, whole; the locked
+        // screen never reads mutable module state.
+        lock: declined =>
+          this.navigateToLoadingApp({
+            startingApp: true,
+            biometricGate: declined,
+          }),
+        notice: this.addLastSnackbar,
+      },
+      this.state.translate,
+    );
+    if (!proceed) {
       return;
     }
+    // The gate is open: this, never the raw AppState event, is when a
+    // real return may emit price traffic.
+    priceFetcherStore.foregroundReturned();
     // reading background task info
     await this.fetchBackgroundSyncInfo();
     // setting value for background task Android
@@ -2356,6 +2372,7 @@ export class LoadedAppClass extends Component<
     return (
       <>
         <ContextAppLoadedProvider value={context}>
+          <PriceTrafficDriver />
           <GestureHandlerRootView>
             <BottomSheetModalProvider>
               <BottomSheetBackHandler />

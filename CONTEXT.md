@@ -115,7 +115,7 @@ and glyphs), `border` (strokes). Unqualified "surface" always means this
 axis; the raised-panel role is always written out as `bgSurface`.
 
 **Role**:
-The meaning half of a token name — what the color is *for* (Canvas, Muted,
+The meaning half of a token name — what the color is _for_ (Canvas, Muted,
 Accent, Danger), as opposed to which surface carries it.
 
 **Family**:
@@ -211,6 +211,7 @@ acceleration, which requires the guest to match the x86_64 host: x86_64
 and 32-bit x86 only. Calling one of these "primary" is wrong; an
 emulator ABI in a test lane reflects a hosting constraint, not which
 library matters most.
+
 ## Build identity
 
 **Build descriptor** — the string `get_version()` reports: a zingolib
@@ -237,33 +238,76 @@ _Avoid_: mode (names the feature, not the state it reports)
 **Route**:
 The network path a mixnet-only surface resolves to, either the Standing
 Client's tunnel or clearnet. zingolib derives it from the indicator, and the
-app never sees it. A price fetch that resolves to clearnet is refused, never
-sent.
+app never sees it.
 
-## Wallet storage
+## Price surface
 
-Vocabulary for wallet files at rest. The full state inventory lives in
-`docs/agents/wallet-file-states.md`; the security stance is ADR 0007.
+Vocabulary for the ZEC/USD display and its fetch lifecycle.
 
-**Wallet file**:
-The raw `wallet.save()` bytes at rest, byte-identical to a desktop
-zingolib wallet file. base64 is a bridge encoding, never a storage
-format (iOS keeps base64 text on disk until Step 2 of the storage
-rework).
-_Avoid_: encrypted file (no app layer since ADR 0007)
+**Price**:
+The fetched ZEC/USD value the price surface displays.
+_Avoid_: quote (legacy name in the ring components)
 
-**Open / closed**:
-A wallet is open while the zingolib lightclient holds it in memory, and
-closed when it exists only as its wallet file. Saving writes the open
-wallet back to its file; it does not close it.
+**Stale price**:
+A price whose last successful fetch is older than the cadence's longest
+draw plus one fetch bound (ten minutes and thirty seconds of wall
+clock), so a healthy cadence never dims, ceiling draws included.
+Staleness is a fact about the value's accuracy, not about fetch
+mechanics, and it is independent of transport.
 
-**Retained wallet** (`wallet.backup.dat`):
-The previously active wallet file, kept aside when the user switches
-wallets and restorable from the start menu.
-_Avoid_: backup (collides with device backups, which wallet files are
-excluded from)
+**Ready follow-up**:
+The one-shot fetch armed when an unattended fetch is refused during
+bootstrap; it fires when the Indicator turns `ready` and is dropped on a
+`died` status or on the next background transition. A transient `unknown`
+is one failed status poll, not a settled status, and does not drop it.
 
-**Device backup**:
-The OS backup mechanism (Google backup, iCloud). Wallet files are
-always excluded from it; a wallet restored from a stale device backup
-is an incident, not a feature.
+## Biometric gate
+
+Vocabulary for the app's biometric lock surfaces (`app/gateController.ts`
+and its triggers), ratified by ADR 0007.
+
+**Privacy shutter**:
+What the biometric gate is: a deterrent against a casual person holding the
+unlocked phone. Nothing cryptographic depends on the prompt, so a gate that
+cannot run may fail open with a visible notice; it must never trap the owner
+out of the wallet.
+_Avoid_: security boundary, authentication wall (both overclaim what the
+mechanism can enforce)
+
+**Gate controller**:
+The single authority that runs ceremonies. Every surface that wants the
+shutter closed asks it; nothing else may raise an authentication prompt.
+
+**Ceremony**:
+One OS authentication prompt, run by the gate controller. One ceremony
+answers every trigger waiting on it, including a cancel.
+
+**Trigger**:
+A surface that asks the gate controller (app foreground, screen entry, a
+security toggle flipping on). Each trigger owns its own decline
+consequence; none owns a prompt.
+
+**Freshness window**:
+The period after a successful ceremony during which any trigger passes
+without a new ceremony.
+
+**Stall**:
+A ceremony the platform never answers. After one window a stall opens the
+shutter with a visible notice, on every platform; it never locks.
+_Avoid_: timeout (names the mechanism, not the outcome)
+
+**Device-auth call**:
+The native authenticate call (LAContext on iOS, BiometricPrompt on
+Android) the gate controller uses to run a ceremony. It replaces the
+retired keychain-sentinel trick.
+_Avoid_: sentinel (the retired mechanism: an auth-gated keychain entry
+holding "1" whose read summoned the prompt)
+
+**Security toggle**:
+A per-surface setting that enables a trigger, and nothing else. No toggle
+selects a mechanism, a policy, or a retry path.
+
+**Lock**:
+The decline consequence of an app-level trigger: the locked launch screen,
+whose retry asks the gate controller unconditionally. A lock exists only
+while the app runs; a cold start begins unlocked unless a trigger asks.

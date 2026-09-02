@@ -56,8 +56,10 @@ import ErrorText from '../Components/ErrorText';
 import RegText from '../Components/RegText';
 import ZecAmount from '../Components/ZecAmount';
 import CurrencyAmount from '../Components/CurrencyAmount';
+import { usePriceHealth } from '../Components/priceFetcherStore';
 import Button from '../Components/Button';
-import SheetRim from '../Components/SheetRim';
+import AppSheet from '../Components/AppSheet';
+import AppSheetModal from '../Components/AppSheetModal';
 import {
   AddressBookFileClass,
   SendPageStateClass,
@@ -92,14 +94,8 @@ import { safeSnapToIndex } from '../../app/utils/safeSnapToIndex';
 import { AppDrawerParamList } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import PriceFetcher from '../Components/PriceFetcher';
-import { usePriceFetcherStore } from '../Components/priceFetcherStore';
 import Header from '../Header';
-import BottomSheet, {
-  BottomSheetBackdrop,
-  BottomSheetBackdropProps,
-  BottomSheetModal,
-  BottomSheetView,
-} from '@gorhom/bottom-sheet';
+import BottomSheet, { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useKeyboardHeight } from '../../app/hooks/useKeyboardHeight';
 import { useDismissSheetsOnBlur } from '../../app/hooks/useDismissSheetsOnBlur';
 import { useOptionsPanelSheetSlide } from '../../app/hooks/useOptionsPanelSheetSlide';
@@ -168,7 +164,6 @@ const Send: React.FunctionComponent<SendProps> = ({
     defaultUnifiedAddress,
     shieldingAmount,
     selectServer,
-    setZecPrice,
     zenniesDonationAddress,
     //security,
     currency,
@@ -180,6 +175,9 @@ const Send: React.FunctionComponent<SendProps> = ({
     reenableMixnet,
   } = context;
   const { colors } = useTheme();
+  // USD entry derives the ZEC actually sent from the price, so that
+  // figure carries the same stale/absent dim as the USD conversions.
+  const priceMuted = usePriceHealth(zecPrice.date) !== 'live';
 
   const [enabling, setEnabling] = useState<boolean>(false);
   const nymPhase =
@@ -265,10 +263,6 @@ const Send: React.FunctionComponent<SendProps> = ({
   const addressBookSelectRef = useRef<BottomSheetModal>(null);
   const sendErrorSheetRef = useRef<BottomSheetModal>(null);
 
-  // Price-fetch state shared with the PriceFetcher ring; drives the CTA's
-  // transient "Refreshing price" label.
-  const { loading: priceLoading } = usePriceFetcherStore();
-
   // Fee (`sendPropose`) and/or spendable-balance RPC error → the CTA turns into
   // a tappable "calculation error" button that opens SendErrorSheet, which
   // lists BOTH errors (they are often the same failure, shown under each label
@@ -332,14 +326,6 @@ const Send: React.FunctionComponent<SendProps> = ({
     sendSnapPoints.length,
   );
 
-  // Tapping the price fetch button (header or the in-form amount row) reveals
-  // the header PriceRow (smallest snap). The auto-close timer armed by
-  // usePriceSnapAutoClose returns it afterwards.
-  const revealPrice = useCallback(() => {
-    if (priceSnapIndex === null) return;
-    safeSnapToIndex(sendSheetRef, priceSnapIndex, sendSnapPoints.length);
-  }, [priceSnapIndex, sendSnapPoints.length]);
-
   useEffect(() => {
     if (internalSnapIndexRef.current >= sendSnapPoints.length) {
       safeSnapToIndex(
@@ -370,43 +356,36 @@ const Send: React.FunctionComponent<SendProps> = ({
     );
   }, [priceRowH, sendSnapPoints]);
 
-  const renderSendHandle = useCallback(
-    () => (
+  const sendHeader = (
+    <View
+      style={{
+        paddingTop: 8,
+        paddingBottom: 6,
+        paddingHorizontal: 16,
+      }}
+    >
       <View
         style={{
-          paddingTop: 8,
-          paddingBottom: 6,
-          paddingHorizontal: 16,
-          backgroundColor: colors.bgSurface,
-          borderTopLeftRadius: 40,
-          borderTopRightRadius: 40,
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
         }}
       >
-        <SheetRim />
-        <View
+        <View style={{ width: 28 }} />
+        <BoldText
+          numberOfLines={1}
           style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
+            flex: 1,
+            fontSize: 16,
+            lineHeight: 28,
+            textAlign: 'center',
           }}
         >
-          <View style={{ width: 28 }} />
-          <BoldText
-            numberOfLines={1}
-            style={{
-              flex: 1,
-              fontSize: 16,
-              lineHeight: 28,
-              textAlign: 'center',
-            }}
-          >
-            {translate('send.title') as string}
-          </BoldText>
-          <View style={{ width: 28 }} />
-        </View>
+          {translate('send.title') as string}
+        </BoldText>
+        <View style={{ width: 28 }} />
       </View>
-    ),
-    [colors, translate],
+    </View>
   );
 
   const defaultValueFee = (): void => {
@@ -1089,63 +1068,37 @@ const Send: React.FunctionComponent<SendProps> = ({
     memoBottomSheetRef.current?.present();
   };
 
-  const renderMemoBackdrop = useCallback(
-    (props: BottomSheetBackdropProps) => (
-      <BottomSheetBackdrop
-        {...props}
-        disappearsOnIndex={-1}
-        appearsOnIndex={0}
-        pressBehavior="close"
-      />
-    ),
-    [],
-  );
-
-  const renderMemoHandle = useCallback(
-    () => (
-      <View
+  const memoHeader = (
+    <View
+      style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingTop: 8,
+        paddingBottom: 6,
+        paddingHorizontal: 16,
+      }}
+    >
+      <View style={{ width: 48 }} />
+      <BoldText
+        numberOfLines={1}
         style={{
-          paddingTop: 8,
-          paddingBottom: 6,
-          paddingHorizontal: 16,
-          backgroundColor: colors.bgSurface,
-          borderTopLeftRadius: 40,
-          borderTopRightRadius: 40,
+          flex: 1,
+          fontSize: 16,
+          lineHeight: 28,
+          textAlign: 'center',
         }}
       >
-        <SheetRim />
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}
-        >
-          {/* Left spacer matches the X Pressable width (14×2 + 20 = 48)
-              so the title is geometrically centered in the row. */}
-          <View style={{ width: 48 }} />
-          <BoldText
-            numberOfLines={1}
-            style={{
-              flex: 1,
-              fontSize: 16,
-              lineHeight: 28,
-              textAlign: 'center',
-            }}
-          >
-            {translate('send.memo') as string}
-          </BoldText>
-          <Pressable
-            onPress={() => memoBottomSheetRef.current?.dismiss()}
-            hitSlop={8}
-            style={{ paddingHorizontal: 14, paddingVertical: 4 }}
-          >
-            <FontAwesomeIcon icon={faXmark} size={20} color={colors.fgMuted} />
-          </Pressable>
-        </View>
-      </View>
-    ),
-    [colors, translate],
+        {translate('send.memo') as string}
+      </BoldText>
+      <Pressable
+        onPress={() => memoBottomSheetRef.current?.dismiss()}
+        hitSlop={8}
+        style={{ paddingHorizontal: 14, paddingVertical: 4 }}
+      >
+        <FontAwesomeIcon icon={faXmark} size={20} color={colors.fgMuted} />
+      </Pressable>
+    </View>
   );
 
   const setConfirmModalShow = async () => {
@@ -1216,7 +1169,6 @@ const Send: React.FunctionComponent<SendProps> = ({
             showMessagesIcon={true}
             onUsdRowLayout={setUsdRowH}
             onPriceRowLayout={setPriceRowH}
-            onManualFetchPrice={revealPrice}
           />
         </View>
       </View>
@@ -1224,26 +1176,14 @@ const Send: React.FunctionComponent<SendProps> = ({
         pointerEvents="box-none"
         style={[StyleSheet.absoluteFill, sheetSlideStyle]}
       >
-        <BottomSheet
+        <AppSheet
           ref={sendSheetRef}
           snapPoints={sendSnapPoints}
-          index={0}
           onChange={i => {
             internalSnapIndexRef.current = i;
             onPriceSnapChange(i);
           }}
-          enableDynamicSizing={false}
-          enablePanDownToClose={false}
-          enableContentPanningGesture={false}
-          keyboardBehavior={'interactive'}
-          keyboardBlurBehavior={'restore'}
-          android_keyboardInputMode={'adjustResize'}
-          backgroundStyle={{
-            backgroundColor: colors.bgSurface,
-            borderTopLeftRadius: 40,
-            borderTopRightRadius: 40,
-          }}
-          handleComponent={renderSendHandle}
+          header={sendHeader}
         >
           <ScrollView
             ref={scrollViewRef}
@@ -1675,6 +1615,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                               !zecPrice.zecPrice || zecPrice.zecPrice <= 0
                             }
                             style={{ marginHorizontal: 8 }}
+                            testID="send.swap-entry"
                           >
                             <Swap
                               width={28}
@@ -1693,6 +1634,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                                 marginBottom: 0,
                                 fontSize: 16,
                               }}
+                              priceDate={zecPrice.date}
                               price={zecPrice.zecPrice}
                               amtZec={
                                 Utils.parseStringLocaleToNumberFloat(
@@ -1706,8 +1648,11 @@ const Send: React.FunctionComponent<SendProps> = ({
                             <ZecAmount
                               style={{ marginLeft: 0 }}
                               currencyName={info.currencyName}
-                              color={colors.fgDefault}
+                              color={
+                                priceMuted ? colors.fgMuted : colors.fgDefault
+                              }
                               size={16}
+                              testID="send.zec-derived"
                               amtZec={
                                 Utils.parseStringLocaleToNumberFloat(
                                   amountText,
@@ -1717,11 +1662,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                             />
                           )}
                           <View style={{ marginLeft: inputZec ? 5 : 2 }}>
-                            <PriceFetcher
-                              setZecPrice={setZecPrice}
-                              backgroundColor={colors.bgSurface}
-                              onManualFetch={revealPrice}
-                            />
+                            <PriceFetcher backgroundColor={colors.bgSurface} />
                           </View>
                         </>
                       )}
@@ -1780,6 +1721,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                         ) : (
                           <CurrencyAmount
                             style={{ fontSize: 14 }}
+                            priceDate={zecPrice.date}
                             price={zecPrice.zecPrice}
                             amtZec={maxAmount}
                             currency={currency}
@@ -2162,15 +2104,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                     marginBottom: 20,
                   }}
                 >
-                  {priceLoading ? (
-                    <Button
-                      type={ButtonTypeEnum.Primary}
-                      disabled
-                      title={translate('send.refreshing-price') as string}
-                      onPress={() => {}}
-                      testID="send.refreshing-price"
-                    />
-                  ) : showCalcError ? (
+                  {showCalcError ? (
                     <Button
                       type={ButtonTypeEnum.Secondary}
                       title={`${translate('send.calc-error') as string} ⓘ`}
@@ -2344,43 +2278,27 @@ const Send: React.FunctionComponent<SendProps> = ({
               </View>
             </View>
           </ScrollView>
-        </BottomSheet>
+        </AppSheet>
       </Animated.View>
-      <BottomSheetModal
+      <AppSheetModal
         ref={memoBottomSheetRef}
-        enableDynamicSizing={true}
-        enablePanDownToClose
-        stackBehavior="push"
-        keyboardBehavior={'interactive'}
-        keyboardBlurBehavior={'restore'}
-        android_keyboardInputMode={'adjustResize'}
-        handleComponent={renderMemoHandle}
-        backgroundStyle={{
-          backgroundColor: colors.bgSurface,
-          borderTopLeftRadius: 40,
-          borderTopRightRadius: 40,
+        header={memoHeader}
+        contentStyle={{
+          paddingHorizontal: 20,
+          paddingTop: 12,
+          paddingBottom: keyboardHeight > 0 ? keyboardHeight + 20 : 30,
         }}
-        backdropComponent={renderMemoBackdrop}
       >
-        <BottomSheetView
-          style={{
-            backgroundColor: colors.bgSurface,
-            paddingHorizontal: 20,
-            paddingTop: 12,
-            paddingBottom: keyboardHeight > 0 ? keyboardHeight + 20 : 30,
-          }}
-        >
-          <Memo
-            key={memoSheetKey}
-            closeSheet={() => memoBottomSheetRef.current?.dismiss()}
-            initialMemo={memoText}
-            includeUAMemoBoolean={includeUAMemoBoolean}
-            defaultUnifiedAddress={defaultUnifiedAddress}
-            setMemoText={setMemoText}
-            translate={translate}
-          />
-        </BottomSheetView>
-      </BottomSheetModal>
+        <Memo
+          key={memoSheetKey}
+          closeSheet={() => memoBottomSheetRef.current?.dismiss()}
+          initialMemo={memoText}
+          includeUAMemoBoolean={includeUAMemoBoolean}
+          defaultUnifiedAddress={defaultUnifiedAddress}
+          setMemoText={setMemoText}
+          translate={translate}
+        />
+      </AppSheetModal>
       <SelectBottomSheet
         ref={addressBookSelectRef}
         title={translate('addressbook.select-placeholder') as string}

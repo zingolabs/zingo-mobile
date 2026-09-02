@@ -1,10 +1,16 @@
 // Derives the Nym gate sheet's presentation from the mixnet view and the
-// held Enable tap. Pure and total: every `mixnet.status.*` key the presenter
+// held Enable tap. Pure and total: every `mixnet.status.*` key the transform
 // emits maps to exactly one state, and a reconnecting bootstrap reads as
 // connecting, never as a failure.
-import { MixnetView } from '../../../app/walletBackend/transforms/mixnetPresenter';
+import {
+  MixnetStatusKey,
+  MixnetView,
+} from '../../../app/walletBackend/transforms/mixnetView';
 
-export type NymGateFailureKey = 'mixnet.status.died' | 'mixnet.status.unknown';
+export type NymGateFailureKey = Extract<
+  MixnetStatusKey,
+  'mixnet.status.died' | 'mixnet.status.unknown'
+>;
 
 export type NymGateState =
   | { kind: 'ready' }
@@ -31,7 +37,7 @@ export function deriveNymGateState(
       return { kind: 'failed', failureKey: view.statusKey };
     case 'mixnet.status.bootstrapping':
       return { kind: 'connecting' };
-    default:
+    case 'mixnet.status.off':
       return enabling ? { kind: 'connecting' } : { kind: 'idle' };
   }
 }

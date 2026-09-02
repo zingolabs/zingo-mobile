@@ -30,7 +30,7 @@ import FadeText from '../../../components/Components/FadeText';
 import RegText from '../../../components/Components/RegText';
 import BoldText from '../../../components/Components/BoldText';
 import Button from '../../../components/Components/Button';
-import SheetRim from '../../../components/Components/SheetRim';
+import AppSheet from '../../../components/Components/AppSheet';
 import { ContextAppLoading } from '../../context';
 import Header from '../../../components/Header';
 import { getLatestBlockServerInfo } from '../../walletBackend';
@@ -157,53 +157,46 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
 
   const importUfvkSnapPoints = useFullSheetSnapPoints(containerH, headerH);
 
-  const renderImportUfvkHandle = useCallback(
-    () => (
+  const importUfvkHeader = (
+    <View
+      style={{
+        paddingTop: 12,
+        paddingBottom: 8,
+        paddingHorizontal: 16,
+      }}
+    >
       <View
         style={{
-          paddingTop: 12,
-          paddingBottom: 8,
-          paddingHorizontal: 16,
-          backgroundColor: colors.bgSurface,
-          borderTopLeftRadius: 40,
-          borderTopRightRadius: 40,
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
         }}
       >
-        <SheetRim />
-        <View
+        <TouchableOpacity
+          onPress={onClickCancel}
+          hitSlop={8}
+          style={{ paddingHorizontal: 4, paddingVertical: 4 }}
+        >
+          <FontAwesomeIcon
+            icon={faChevronLeft}
+            size={20}
+            color={colors.fgAccent}
+          />
+        </TouchableOpacity>
+        <BoldText
+          numberOfLines={1}
           style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
+            flex: 1,
+            fontSize: 16,
+            lineHeight: 28,
+            textAlign: 'center',
           }}
         >
-          <TouchableOpacity
-            onPress={onClickCancel}
-            hitSlop={8}
-            style={{ paddingHorizontal: 4, paddingVertical: 4 }}
-          >
-            <FontAwesomeIcon
-              icon={faChevronLeft}
-              size={20}
-              color={colors.fgAccent}
-            />
-          </TouchableOpacity>
-          <BoldText
-            numberOfLines={1}
-            style={{
-              flex: 1,
-              fontSize: 16,
-              lineHeight: 28,
-              textAlign: 'center',
-            }}
-          >
-            {translate('import.title') as string}
-          </BoldText>
-          <View style={{ width: 28 }} />
-        </View>
+          {translate('import.title') as string}
+        </BoldText>
+        <View style={{ width: 28 }} />
       </View>
-    ),
-    [colors, onClickCancel, translate],
+    </View>
   );
 
   const renderImportUfvkFooter = useCallback(
@@ -256,23 +249,11 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
           mode={mode}
         />
       </View>
-      <BottomSheet
+      <AppSheet
         ref={importUfvkSheetRef}
         snapPoints={importUfvkSnapPoints}
-        index={0}
-        enableDynamicSizing={false}
-        enablePanDownToClose={false}
-        enableContentPanningGesture={false}
-        keyboardBehavior={'interactive'}
-        keyboardBlurBehavior={'restore'}
-        android_keyboardInputMode={'adjustResize'}
-        backgroundStyle={{
-          backgroundColor: colors.bgSurface,
-          borderTopLeftRadius: 40,
-          borderTopRightRadius: 40,
-        }}
-        handleComponent={renderImportUfvkHandle}
-        footerComponent={renderImportUfvkFooter}
+        header={importUfvkHeader}
+        renderFooter={renderImportUfvkFooter}
       >
         <BottomSheetScrollView
           keyboardShouldPersistTaps="handled"
@@ -280,7 +261,6 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
           alwaysBounceVertical={false}
           style={{
             flex: 1,
-            backgroundColor: colors.bgSurface,
           }}
           contentContainerStyle={{
             flexDirection: 'column',
@@ -445,7 +425,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
             </RegText>
           </View>
         </BottomSheetScrollView>
-      </BottomSheet>
+      </AppSheet>
     </View>
   );
 };

@@ -3,8 +3,9 @@ name: Visual review
 # Builds the PR head, captures it with the web Storybook harness, and diffs
 # it against the committed baseline (visual/__baseline__). The check fails
 # when a story changed, appeared, or disappeared without a baseline update.
-# Accepting is a commit: `yarn visual:accept` pulls this run's capture into
-# the baseline, so the accepted pixels are the runner's own.
+# Accepting is a commit: comment `/visual-accept` on the PR (or run
+# `yarn visual:accept`) to pull this run's capture into the baseline, so the
+# accepted pixels are the runner's own.
 
 on:
   pull_request:
@@ -66,12 +67,15 @@ jobs:
       - name: Assemble Current view
         run: cp -r storybook-static visual/ci/storybook
 
+      - name: Stage baseline into the report
+        run: cp -r visual/__baseline__ visual/ci/baseline
+
       - name: Diff head vs baseline
         id: diff
         continue-on-error: true
         run: >-
           VISUAL_CURRENT=visual/ci/head
-          VISUAL_BASELINE=visual/__baseline__
+          VISUAL_BASELINE=visual/ci/baseline
           VISUAL_REPORT=visual/ci/index.html
           VISUAL_STORYBOOK=storybook/index.html
           yarn tsx visual/diff.mts
@@ -105,7 +109,11 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const changed = '${{ steps.diff.outcome }}' !== 'success';
+            const fs = require('fs');
+            const statusPath = 'visual/ci/status.json';
+            if (!fs.existsSync(statusPath)) return;
+            const { status } = JSON.parse(fs.readFileSync(statusPath, 'utf8'));
+            const changed = status === 'changed';
             const deployed = '${{ steps.deploy.outcome }}' === 'success';
             // Stable per-PR alias; always points at this PR's latest deploy.
             const url = `https://pr-${context.issue.number}.zingo-visual.pages.dev`;
@@ -116,7 +124,9 @@ jobs:
             const accept = changed
               ? [
                   '',
-                  'If the change is intended, accept it into the baseline from this branch:',
+                  'If the change is intended, comment `/visual-accept` on this PR. It pulls this run\'s capture into the baseline, commits, and pushes. Needs write access and a finished run for the current commit.',
+                  '',
+                  'Or accept from a terminal on this branch:',
                   '',
                   '```',
                   'yarn visual:accept   # pulls this run\'s capture into visual/__baseline__',
@@ -152,5 +162,5 @@ jobs:
       - name: Gate
         if: steps.diff.outcome != 'success'
         run: |
-          echo "Visual changes detected — review the report, then 'yarn visual:accept' and commit visual/__baseline__."
+          echo "Visual changes detected — review the report, then comment '/visual-accept' on the PR (or run 'yarn visual:accept' and commit visual/__baseline__)."
           exit 1

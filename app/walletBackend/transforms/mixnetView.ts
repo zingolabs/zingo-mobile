@@ -3,20 +3,51 @@ import { MixnetDetailReport, MixnetStatusReport } from './mixnetTransform';
 
 /**
  * What the user may do about the current mixnet state: nothing, wait for
- * the bootstrap, or re-enable a lost transport. A closed union so screens
- * must render every case the policy can produce.
+ * the bootstrap, or re-enable a transport.
  */
 export type MixnetRecoveryAction = 'none' | 'wait' | 'reenable';
+
+/** One member of the closed status-key set: an indicator the wallet reports, or this transform's own `unknown` failure key. */
+export type MixnetStatusKey =
+  `mixnet.status.${`${RPCMixnetIndicatorEnum}` | 'unknown'}`;
+
+/** The closed status-key set at runtime, derived from the same sources as the type. */
+export const MIXNET_STATUS_KEYS: readonly MixnetStatusKey[] = [
+  ...Object.values(RPCMixnetIndicatorEnum).map(
+    indicator => `mixnet.status.${indicator}` as MixnetStatusKey,
+  ),
+  'mixnet.status.unknown',
+];
+
+/** What the transport will do with a price fetch. */
+export type FetchPolicy =
+  'refusing' | 'possibleBootstrap' | 'serving';
+
+/** Classifies a status key exhaustively. */
+export function fetchPolicy(
+  key: MixnetStatusKey,
+): FetchPolicy {
+  switch (key) {
+    case 'mixnet.status.died':
+      return 'refusing';
+    case 'mixnet.status.bootstrapping':
+    case 'mixnet.status.unknown':
+      return 'possibleBootstrap';
+    case 'mixnet.status.off':
+    case 'mixnet.status.ready':
+      return 'serving';
+  }
+}
 
 /**
  * The screen-facing projection of the mixnet state. `statusKey` is a
  * translation key (`mixnet.status.*`), never display English; `narration`
  * is the live bootstrap line when one exists; `sendBlocked` is the
- * fail-closed verdict a send screen must respect — `true` in every state
+ * fail-closed status a send screen must respect — `true` in every state
  * except an explicit `off` (deliberate clearnet consent) or `ready`.
  */
 export type MixnetView = {
-  readonly statusKey: string;
+  readonly statusKey: MixnetStatusKey;
   readonly socks5Addr: string | null;
   readonly narration: string | null;
   readonly sendBlocked: boolean;
@@ -56,11 +87,10 @@ export const OFF_MIXNET_VIEW: MixnetView = {
 /**
  * Derives the screen-facing view from the typed reports.
  *
- * Pure function — no side effects. The fail-closed invariant lives here in
+ * Pure function. The fail-closed invariant lives here in
  * app form: a failure report blocks sending exactly as `bootstrapping` and
  * `died` do, because an unknowable transport must never be treated as
- * consented clearnet (ADR 0011; the wallet core enforces the same rule —
- * this projection only keeps the UI honest about it).
+ * consented clearnet.
  */
 export function deriveMixnetView(
   status: MixnetStatusReport,

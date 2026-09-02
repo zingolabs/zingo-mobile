@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "android:prod": "react-native run-android --mode prodDebug",
-    "android:beta": "react-native run-android --mode betaDebug",
+    "android:beta": "react-native run-android --mode betaDebug --appId org.ZingoLabs.Zingo.Beta --main-activity org.ZingoLabs.Zingo.MainActivity",
     "ios": "react-native run-ios",
     "start": "react-native start",
     "storybook:generate": "tsx .storybook/generate.mts",
@@ -100,7 +100,7 @@
     "@react-native-community/cli-platform-android": "20.2.0",
     "@react-native-community/cli-platform-ios": "20.2.0",
     "@react-native-community/datetimepicker": "^9.1.0",
-    "@react-native-community/slider": "^5.2.0",
+    "@react-native-community/slider": "^5.2.1",
     "@react-native/babel-preset": "0.81.6",
     "@react-native/eslint-config": "^0.81.6",
     "@react-native/metro-config": "0.81.6",
@@ -113,12 +113,12 @@
     "@testing-library/react-native": "^13.2.0",
     "@types/jest": "^30.0.0",
     "@types/lodash": "^4.17.25",
-    "@types/node": "^26.2.0",
+    "@types/node": "^26.4.0",
     "@types/randomcolor": "^0.5.9",
     "@types/react": "^19.1.0",
     "@types/react-test-renderer": "^19.1.0",
     "@types/url-parse": "^1.4.11",
-    "babel-jest": "^30.1.2",
+    "babel-jest": "^30.5.0",
     "babel-plugin-dynamic-import-node": "^2.3.3",
     "babel-plugin-transform-inline-environment-variables": "^0.4.4",
     "depcheck": "^1.4.7",
@@ -126,7 +126,7 @@
     "eslint": "^9.17.0",
     "eslint-plugin-ft-flow": "^3.0.11",
     "eslint-plugin-react-native": "^5.0.0",
-    "jest": "^30.3.0",
+    "jest": "^30.5.0",
     "prettier": "^3.9.5",
     "react-dom": "19.1.4",
     "react-native-web": "^0.21.2",
@@ -145,11 +145,11 @@
   ],
   "resolutions": {
     "fast-xml-parser": ">=4.5.4",
-    "jest": "30.4.1",
-    "jest-circus": "30.4.1",
-    "jest-runtime": "30.4.1",
-    "jest-jasmine2": "30.4.1",
-    "jest-mock": "30.4.1"
+    "jest": "30.5.0",
+    "jest-circus": "30.5.0",
+    "jest-runtime": "30.5.0",
+    "jest-jasmine2": "30.5.0",
+    "jest-mock": "30.5.0"
   },
   "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }

@@ -1,11 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {
-  useCallback,
-  useContext,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import React, { useContext, useMemo, useRef, useState } from 'react';
 import { Text, View, ActivityIndicator, Image, Pressable } from 'react-native';
 import { showConfirm } from '../../showConfirm';
 import { useTheme } from '../../theme';
@@ -25,7 +19,7 @@ import ActionMenuBottomSheet, {
 
 import { ButtonTypeEnum, ModeEnum, SelectServerEnum } from '../../AppState';
 import Button from '../../../components/Components/Button';
-import SheetRim from '../../../components/Components/SheetRim';
+import AppSheet from '../../../components/Components/AppSheet';
 import { ContextAppLoading } from '../../context';
 import {
   getZingoLogo,
@@ -133,56 +127,34 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
     restoreLastBackup,
   ]);
 
-  const renderStartMenuHandle = useCallback(
-    () => (
+  const startMenuHeader = (
+    <View
+      style={{
+        paddingTop: 12,
+        paddingBottom: 8,
+        paddingHorizontal: 16,
+      }}
+    >
       <View
         style={{
-          paddingTop: 12,
-          paddingBottom: 8,
-          paddingHorizontal: 16,
-          backgroundColor: colors.bgSurface,
-          borderTopLeftRadius: 40,
-          borderTopRightRadius: 40,
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'center',
         }}
       >
-        <SheetRim />
-        {/* StartMenu-only quirk: the parent header section has no opaque
-            background (unlike the standard <Header/> used elsewhere), and
-            on Android the straight middle of the top border between the
-            two corner arcs is dropped. Paint it explicitly between the
-            corner radii. */}
-        <View
+        <BoldText
+          numberOfLines={1}
           style={{
-            position: 'absolute',
-            top: 0,
-            left: 40,
-            right: 40,
-            height: 1,
-            backgroundColor: colors.bottomSheetBorder,
-          }}
-        />
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'center',
+            flex: 1,
+            fontSize: 16,
+            lineHeight: 28,
+            textAlign: 'center',
           }}
         >
-          <BoldText
-            numberOfLines={1}
-            style={{
-              flex: 1,
-              fontSize: 16,
-              lineHeight: 28,
-              textAlign: 'center',
-            }}
-          >
-            {translate('loadingapp.welcome') as string}
-          </BoldText>
-        </View>
+          {translate('loadingapp.welcome') as string}
+        </BoldText>
       </View>
-    ),
-    [colors, translate],
+    </View>
   );
 
   return (
@@ -240,22 +212,10 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
           />
         </View>
       </View>
-      <BottomSheet
+      <AppSheet
         ref={startMenuSheetRef}
         snapPoints={startMenuSnapPoints}
-        index={0}
-        enableDynamicSizing={false}
-        enablePanDownToClose={false}
-        enableContentPanningGesture={false}
-        keyboardBehavior={'interactive'}
-        keyboardBlurBehavior={'restore'}
-        android_keyboardInputMode={'adjustResize'}
-        backgroundStyle={{
-          backgroundColor: colors.bgSurface,
-          borderTopLeftRadius: 40,
-          borderTopRightRadius: 40,
-        }}
-        handleComponent={renderStartMenuHandle}
+        header={startMenuHeader}
       >
         <BottomSheetScrollView
           keyboardShouldPersistTaps={'handled'}
@@ -263,7 +223,6 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
           alwaysBounceVertical={false}
           style={{
             flex: 1,
-            backgroundColor: colors.bgSurface,
           }}
           contentContainerStyle={{
             flexDirection: 'column',
@@ -525,7 +484,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
             />
           )}
         </BottomSheetScrollView>
-      </BottomSheet>
+      </AppSheet>
       <ActionMenuBottomSheet
         ref={optionsMenuRef}
         title={translate('loadedapp.options') as string}

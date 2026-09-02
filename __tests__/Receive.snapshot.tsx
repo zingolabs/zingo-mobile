@@ -42,6 +42,8 @@ describe('Component Receive - test', () => {
     state.translate = mockTranslate;
     state.info = mockInfo;
     state.totalBalance = mockTotalBalance;
+    // The price ring renders only for a Nym-consenting session.
+    state.nym = true;
     const onFunction = jest.fn();
     const props = makeDrawerProps();
     const receive = render(
