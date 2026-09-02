@@ -30,6 +30,19 @@ const TAB_V_PADDING = 10;
 // StyleSheet below
 const PILL_BG = advancedTokens.bgChrome;
 const PILL_BORDER = '#071A35';
+const PILL_HEIGHT = ICON_SIZE + 2 * TAB_V_PADDING + 2 * BUBBLE_V_MARGIN + 2;
+const WRAPPER_PADDING_BOTTOM = 25;
+const FADE_COLORS = ['transparent', 'rgba(0,0,0,0.3)'];
+
+/** Bottom scrim with the tab bar's footprint. */
+export const FadeOnlyTabBar = (): React.ReactElement => (
+  <View
+    style={[styles.wrapper, { height: PILL_HEIGHT + WRAPPER_PADDING_BOTTOM }]}
+    pointerEvents="none"
+  >
+    <LinearGradient colors={FADE_COLORS} style={StyleSheet.absoluteFill} />
+  </View>
+);
 
 function renderNavIcon(
   routeName: string,
@@ -174,7 +187,7 @@ const CustomTabBar = ({
   return (
     <View style={styles.wrapper} pointerEvents="box-none">
       <LinearGradient
-        colors={['transparent', 'rgba(0,0,0,0.3)']}
+        colors={FADE_COLORS}
         style={StyleSheet.absoluteFill}
         pointerEvents="none"
       />
@@ -229,7 +242,7 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     alignItems: 'center',
-    paddingBottom: 25,
+    paddingBottom: WRAPPER_PADDING_BOTTOM,
   },
   pill: {
     flexDirection: 'row',

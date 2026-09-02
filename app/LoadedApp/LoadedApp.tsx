@@ -111,7 +111,9 @@ import History from '../../components/History';
 import Send from '../../components/Send';
 import Receive from '../../components/Receive';
 import Settings from '../../components/Settings';
-import CustomTabBar from '../../components/TabBar/CustomTabBar';
+import CustomTabBar, {
+  FadeOnlyTabBar,
+} from '../../components/TabBar/CustomTabBar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import {
   BottomSheetModal,
@@ -769,6 +771,8 @@ type LoadedAppClassState = AppStateLoaded & AppContextLoaded;
 const renderTabBar = (
   props: import('@react-navigation/bottom-tabs').BottomTabBarProps,
 ) => <CustomTabBar {...props} />;
+
+const renderFadeOnlyTabBar = () => <FadeOnlyTabBar />;
 
 export class LoadedAppClass extends Component<
   LoadedAppClassProps,
@@ -2508,10 +2512,8 @@ export class LoadedAppClass extends Component<
                                 ) : (
                                   <Tab.Navigator
                                     initialRouteName={RouteEnum.Receive}
+                                    tabBar={renderFadeOnlyTabBar}
                                     screenOptions={{
-                                      tabBarStyle: {
-                                        display: 'none',
-                                      },
                                       headerShown: false,
                                     }}
                                   >
