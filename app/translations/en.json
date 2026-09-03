@@ -220,6 +220,7 @@
   "rpc": {
     "walletnotfound-error": "Error: Couldn't find any wallet.",
     "backupnotfound-error": "Error: Couldn't find any backup of any wallet.",
+    "restorebackup-error": "Error: The wallet backup could not be restored. The backup file failed to open as a wallet.",
     "deletewallet-error": "Error: Couldn't delete the current wallet.",
     "backupwallet-error": "Error: Couldn't save the wallet backup."
   },

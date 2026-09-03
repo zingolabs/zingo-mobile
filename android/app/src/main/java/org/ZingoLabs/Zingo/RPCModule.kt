@@ -3,6 +3,7 @@ package org.ZingoLabs.Zingo
 import android.content.Context
 import android.util.Log
 import android.util.Base64
+import android.util.Base64InputStream
 import androidx.security.crypto.EncryptedFile
 import androidx.security.crypto.MasterKeys
 import com.facebook.react.bridge.ReactApplicationContext
@@ -11,7 +12,11 @@ import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.bridge.Promise
 import java.io.File
 import java.io.FileNotFoundException
+import java.io.FileOutputStream
+import java.io.FilterOutputStream
+import java.io.OutputStream
 import java.io.IOException
+import java.security.MessageDigest
 import org.json.JSONArray
 import org.json.JSONObject
 import org.ZingoLabs.Zingo.Constants.*
@@ -42,9 +47,30 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         ).build()
     }
 
-    // The legacy decrypt used only as load recovery. Injectable so a test
-    // can replay a transient Keystore failure (DoubleWrapReproTest).
-    internal var legacyDecrypt: (String) -> String = { readEncryptedFile(it) }
+    // The legacy decrypt used only as load recovery: streams the AEAD
+    // payload of `envelope`, base64 text by the 2.0.21 format, into `sink`
+    // as raw bytes. Injectable so a test can replay a transient Keystore
+    // failure (DoubleWrapReproTest).
+    internal var legacyDecrypt: (File, OutputStream) -> Unit = { envelope, sink -> decryptLegacyInto(envelope, sink) }
+
+    // Records the first failure of the wrapped stream, which tells a
+    // decrypt failure apart from a sink that cannot take the bytes.
+    private class SinkStream(out: OutputStream) : FilterOutputStream(out) {
+        var failure: IOException? = null
+
+        override fun write(b: Int) = guarded { out.write(b) }
+        override fun write(b: ByteArray, off: Int, len: Int) = guarded { out.write(b, off, len) }
+        override fun flush() = guarded { out.flush() }
+
+        private inline fun guarded(op: () -> Unit) {
+            try {
+                op()
+            } catch (e: IOException) {
+                failure = failure ?: e
+                throw e
+            }
+        }
+    }
 
     companion object {
         // Set by delete and restore, cleared by the next successful wallet
@@ -82,97 +108,235 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         return file!!.delete()
     }
 
-    private fun readEncryptedFile(fileName: String): String {
-        return buildEncryptedFile(fileName).openFileInput().use { input ->
-            input.bufferedReader(Charsets.UTF_8).readText()
+    private fun decryptLegacyInto(envelope: File, sink: OutputStream) {
+        buildEncryptedFile(envelope).openFileInput().use { input ->
+            Base64InputStream(input, Base64.NO_WRAP).use { decoded ->
+                decoded.copyTo(sink)
+                sink.flush()
+            }
         }
     }
 
     // The full zingolib parse behind every destructive file decision.
-    private fun isIntactWallet(bytes: ByteArray): Boolean = try {
-        uniffi.zingo.validateWalletBytes(bytes)
+    private fun isIntactWallet(file: File): Boolean = try {
+        uniffi.zingo.validateWalletFile(file.path)
         true
     } catch (e: Exception) {
-        Log.w("MAIN", "[Native] wallet bytes failed validation: $e")
+        Log.w("MAIN", "[Native] ${file.name} failed validation: $e")
         false
     }
 
-    // Writes validated plain wallet bytes from their Base64 form.
-    private fun writePlainFromB64(fileName: String, contentB64: String) {
-        val bytes = Base64.decode(contentB64, Base64.NO_WRAP)
-        uniffi.zingo.validateWalletBytes(bytes)
-        PlainWalletFile.write(applicationContext.filesDir, fileName, bytes)
+    // Streams `source` into `sink` and syncs it.
+    private fun copyInto(source: File, sink: File) {
+        source.inputStream().use { input ->
+            FileOutputStream(sink).use { out ->
+                input.copyTo(out)
+                out.fd.sync()
+            }
+        }
     }
 
-    // Reads a wallet file as a Base64 string: raw plain bytes first (the
-    // format every save writes since the encryption removal, and the
-    // legacy plain format of Zingo ≤ 2.0.20), then the legacy encrypted
-    // formats as recovery only. A successful legacy read migrates the file
-    // to plain in the same call; the legacy bytes stay at their path until
-    // the verified temp copy renames over them, and a double wrap
-    // additionally keeps its original at "$fileName.prerepair".
+    // Installs a validated plain copy of `source` under `fileName`. The
+    // copy is compared with its source by digest before the rename, all
+    // under the writer lock so no install replaces the source meanwhile.
+    private fun writePlainCopy(fileName: String, source: File) {
+        PlainWalletFile.locked {
+            uniffi.zingo.validateWalletFile(source.path)
+            PlainWalletFile.write(applicationContext.filesDir, fileName) { temp ->
+                copyInto(source, temp)
+                if (!sameContent(source, temp)) {
+                    throw IOException("Error: the copy of ${source.name} for $fileName differs from its source")
+                }
+                true
+            }
+        }
+    }
+
+    private fun fileDigest(file: File): ByteArray {
+        val digest = MessageDigest.getInstance("SHA-256")
+        file.inputStream().use { input ->
+            val buffer = ByteArray(64 * 1024)
+            while (true) {
+                val read = input.read(buffer)
+                if (read < 0) break
+                digest.update(buffer, 0, read)
+            }
+        }
+        return digest.digest()
+    }
+
+    private fun sameContent(a: File, b: File): Boolean =
+        a.length() == b.length() && fileDigest(a).contentEquals(fileDigest(b))
+
+    private val recoveryAdvice =
+        "Please restore the wallet from your seed phrase or from your Viewing Key (UFVK)."
+
+    // The outcome of streaming a legacy file's envelopes into a sink.
+    private class Peel(
+        // The kind of payload under the outer envelope, absent when the
+        // outer envelope did not decrypt.
+        val outerPayload: WalletFileEnvelope.PayloadKind?,
+        val readError: Exception?,
+        // The failure of the sink itself, when the bytes could not land.
+        val writeError: IOException?,
+        // Extra layers removed before the sink held plain bytes, absent
+        // when no plain wallet appeared.
+        val plainDepth: Int?,
+        val unwrapErrors: List<String>,
+    )
+
+    // Streams one envelope into `sink`, telling a sink failure apart from
+    // a decrypt failure.
+    private fun decryptLayer(source: File, sink: File): IOException? {
+        val file = try {
+            FileOutputStream(sink)
+        } catch (e: IOException) {
+            return e
+        }
+        val out = SinkStream(file)
+        try {
+            legacyDecrypt(source, out)
+        } catch (e: Exception) {
+            try {
+                out.close()
+            } catch (_: IOException) {
+            }
+            if (out.failure != null) return out.failure
+            throw e
+        }
+        return try {
+            out.flush()
+            file.fd.sync()
+            null
+        } catch (e: IOException) {
+            e
+        } finally {
+            try {
+                out.close()
+            } catch (_: IOException) {
+            }
+        }
+    }
+
+    // Test seam: runs before each numbered step of the restore swap.
+    internal var restoreStepHook: (Int) -> Unit = {}
+
+    // Streams the envelopes of `fileName` into `sink` one layer at a time,
+    // at most MAX_UNWRAP_DEPTH extra layers. The outer layer stored the
+    // base64 text of an inner envelope, which goes under the same file name
+    // in a scratch dir, because the name is the AAD.
+    private fun peelLegacy(fileName: String, sink: File): Peel {
+        val scratchDir = File(applicationContext.cacheDir, "wallet-unwrap").apply { mkdirs() }
+        val scratch = File(scratchDir, fileName)
+        val errors = mutableListOf<String>()
+        var source = File(applicationContext.filesDir, fileName)
+        var outerPayload: WalletFileEnvelope.PayloadKind? = null
+        try {
+            for (depth in 0..WalletFileEnvelope.MAX_UNWRAP_DEPTH) {
+                val sinkFailure = try {
+                    decryptLayer(source, sink)
+                } catch (e: Exception) {
+                    if (depth == 0) return Peel(null, e, null, null, errors)
+                    Log.w("MAIN", "[$fileName] unwrap at depth $depth failed: $e")
+                    errors.add("depth $depth: $e")
+                    return Peel(outerPayload, null, null, null, errors)
+                }
+                if (sinkFailure != null) return Peel(outerPayload, null, sinkFailure, null, errors)
+                val kind = WalletFileEnvelope.classify(PlainWalletFile.header(sink))
+                if (depth == 0) outerPayload = kind
+                when (kind) {
+                    WalletFileEnvelope.PayloadKind.PLAIN_WALLET -> return Peel(outerPayload, null, null, depth, errors)
+                    WalletFileEnvelope.PayloadKind.UNKNOWN -> {
+                        errors.add("depth $depth: payload is neither a wallet nor a Tink envelope")
+                        return Peel(outerPayload, null, null, null, errors)
+                    }
+                    WalletFileEnvelope.PayloadKind.TINK_ENVELOPE -> {
+                        if (depth == WalletFileEnvelope.MAX_UNWRAP_DEPTH) {
+                            errors.add("still an envelope after ${WalletFileEnvelope.MAX_UNWRAP_DEPTH} layers")
+                            return Peel(outerPayload, null, null, null, errors)
+                        }
+                        sink.copyTo(scratch, overwrite = true)
+                        source = scratch
+                    }
+                }
+            }
+            return Peel(outerPayload, null, null, null, errors)
+        } finally {
+            scratch.delete()
+        }
+    }
+
+    // The user-actionable diagnosis of a legacy file that yields no plain
+    // wallet.
+    private fun legacyFailure(fileName: String, peel: Peel): IOException = when {
+        peel.writeError != null -> {
+            Log.e("MAIN", "[$fileName] the plain copy could not be written: ${peel.writeError}")
+            IOException(
+                "Error: the plain copy of $fileName could not be written (${peel.writeError.message}). " +
+                "Free some storage space and open the app again. The wallet file is unchanged.",
+                peel.writeError
+            )
+        }
+        peel.readError != null -> {
+            Log.e(
+                "MAIN",
+                "[$fileName] not a plain wallet and decryption failed, Keystore key likely lost: ${peel.readError}"
+            )
+            IOException(
+                "Error: wallet decryption failed and the file is not a plain wallet. " +
+                "This usually means the device Keystore was reset, a backup of an old " +
+                "wallet was restored, or the OEM Keystore lost its keys. $recoveryAdvice",
+                peel.readError
+            )
+        }
+        peel.outerPayload == WalletFileEnvelope.PayloadKind.TINK_ENVELOPE ->
+            IOException(
+                "Error: $fileName is wrapped in envelopes that could not be " +
+                "removed (${peel.unwrapErrors}). $recoveryAdvice"
+            )
+        else -> IOException("Error: the decrypted content of $fileName is not a wallet. $recoveryAdvice")
+    }
+
+    // Resolves a wallet file to its plain-format path: raw plain bytes
+    // first (the format every save writes since the encryption removal,
+    // and the legacy plain format of Zingo ≤ 2.0.20), then the legacy
+    // encrypted formats as recovery only. A legacy file migrates to plain
+    // in the same call: its envelopes stream layer by layer into the plain
+    // temp, the temp runs the full parse, and the rename is the only step
+    // that touches the legacy path. A double wrap additionally keeps its
+    // original at "$fileName.prerepair".
     //
-    // Classification uses the raw bytes, never a trial decrypt (#965), so
+    // Classification uses the raw header, never a trial decrypt (#965), so
     // a transient Keystore failure can only fail this read and the next
     // launch retries from unchanged bytes.
     //
     // A thrown IOException here is outside the FFI's typed family, so a
     // bridge caller rejects it under the "Unknown" code; the message text
     // is the user-actionable diagnosis.
-    private fun readFileAsB64(fileName: String): String {
+    private fun resolveWalletFile(fileName: String): File {
         val filesDir = applicationContext.filesDir
         PlainWalletFile.resolveInterruptedMigration(filesDir, fileName, ::isIntactWallet)
-        PlainWalletFile.readIfPlain(filesDir, fileName)?.let {
-            return Base64.encodeToString(it, Base64.NO_WRAP)
-        }
         val file = File(filesDir, fileName)
+        if (PlainWalletFile.isPlain(file)) return file
         if (!file.exists()) {
             throw FileNotFoundException("Error: $fileName does not exist")
         }
-        val payload = try {
-            Base64.decode(legacyDecrypt(fileName), Base64.NO_WRAP)
-        } catch (decryptError: Exception) {
-            Log.e(
-                "MAIN",
-                "[$fileName] not a plain wallet and decryption failed, Keystore key likely lost: $decryptError"
-            )
-            throw IOException(
-                "Error: wallet decryption failed and the file is not a plain wallet. " +
-                "This usually means the device Keystore was reset, a backup of an old " +
-                "wallet was restored, or the OEM Keystore lost its keys. Please restore " +
-                "the wallet from your seed phrase or from your Viewing Key (UFVK).",
-                decryptError
-            )
-        }
-        val plain = when (WalletFileEnvelope.classify(payload)) {
-            WalletFileEnvelope.PayloadKind.PLAIN_WALLET -> payload
-            WalletFileEnvelope.PayloadKind.TINK_ENVELOPE -> {
-                val unwrapErrors = mutableListOf<String>()
-                val unwrapped = unwrapToPlainWallet(fileName, payload, unwrapErrors)
-                    ?: throw IOException(
-                        "Error: $fileName is wrapped in envelopes that could not be " +
-                        "removed ($unwrapErrors). Please restore the wallet from your " +
-                        "seed phrase or from your Viewing Key (UFVK)."
-                    )
+        val migrated = PlainWalletFile.migrateIfStillLegacy(filesDir, fileName) { temp ->
+            val peel = peelLegacy(fileName, temp)
+            val layers = peel.plainDepth ?: throw legacyFailure(fileName, peel)
+            try {
+                uniffi.zingo.validateWalletFile(temp.path)
+            } catch (e: Exception) {
+                throw IOException("Error: the decrypted content of $fileName fails to parse as a wallet. $recoveryAdvice", e)
+            }
+            if (layers > 0) {
                 file.copyTo(File(filesDir, "$fileName.prerepair"), overwrite = true)
-                Log.i("MAIN", "[$fileName] removed ${unwrapped.second} extra envelope layer(s)")
-                unwrapped.first
+                Log.i("MAIN", "[$fileName] removed $layers extra envelope layer(s)")
             }
-            WalletFileEnvelope.PayloadKind.UNKNOWN ->
-                throw IOException(
-                    "Error: the decrypted content of $fileName is not a wallet. Please " +
-                    "restore the wallet from your seed phrase or from your Viewing Key (UFVK)."
-                )
+            true
         }
-        try {
-            uniffi.zingo.validateWalletBytes(plain)
-            if (PlainWalletFile.migrateIfStillLegacy(filesDir, fileName, plain)) {
-                Log.i("MAIN", "[$fileName] migrated to plain wallet bytes")
-            }
-        } catch (writeError: Exception) {
-            Log.e("MAIN", "[$fileName] migration to plain skipped: $writeError")
-        }
-        return Base64.encodeToString(plain, Base64.NO_WRAP)
+        if (migrated) Log.i("MAIN", "[$fileName] migrated to plain wallet bytes")
+        return file
     }
 
     // Restores a wallet file from its legacy "$fileName.write.tmp" stash
@@ -184,13 +348,12 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             if (!fileExists(tempName)) continue
             try {
                 val targetIntact = fileExists(fileName) && try {
-                    isIntactWallet(Base64.decode(readFileAsB64(fileName), Base64.NO_WRAP))
+                    isIntactWallet(resolveWalletFile(fileName))
                 } catch (_: Exception) {
                     false
                 }
                 if (!targetIntact) {
-                    val tempContent = readFileAsB64(tempName)
-                    writePlainFromB64(fileName, tempContent)
+                    writePlainCopy(fileName, resolveWalletFile(tempName))
                     Log.i("MAIN", "[Native] completePendingWrite: restored $fileName from $tempName")
                 }
                 deleteFile(tempName)
@@ -207,9 +370,9 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     //   (2) write main(originalBackup)
     //   (3) write backup(originalMain)
     //   (4) delete temp
-    // Recovery goes by content comparison, and `readFileAsB64` levels the
-    // formats: the temp may be a legacy encrypted file from an old release
-    // or plain bytes from the current one.
+    // Recovery goes by streamed content comparison, and `resolveWalletFile`
+    // levels the formats: the temp may be a legacy encrypted file from an
+    // old release or plain bytes from the current one.
     //
     // Possible interrupted states (temp exists with originalMain):
     //   between (1)–(2): main == temp  → write main(backup), write backup(temp)
@@ -219,30 +382,43 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun completePendingSwap() {
         val tempFile = File(applicationContext.filesDir, WalletTempSwapFileName.value)
         if (!tempFile.exists()) return
+        PlainWalletFile.locked { completePendingSwapLocked(tempFile) }
+    }
+
+    private fun completePendingSwapLocked(tempFile: File) {
         try {
-            val tempContent = readFileAsB64(WalletTempSwapFileName.value)
+            val temp = resolveWalletFile(WalletTempSwapFileName.value)
             if (fileExists(WalletFileName.value)) {
-                val mainContent = readFileAsB64(WalletFileName.value)
-                if (mainContent == tempContent) {
+                val main = resolveWalletFile(WalletFileName.value)
+                if (sameContent(main, temp)) {
                     // (1)–(2) window: main not yet overwritten.
                     if (fileExists(WalletBackupFileName.value)) {
-                        val backupContent = readFileAsB64(WalletBackupFileName.value)
-                        writePlainFromB64(WalletFileName.value, backupContent)
+                        writePlainCopy(WalletFileName.value, resolveWalletFile(WalletBackupFileName.value))
                     }
-                    writePlainFromB64(WalletBackupFileName.value, tempContent)
+                    writePlainCopy(WalletBackupFileName.value, temp)
                 } else {
                     // (2)–(3) or post-(3) window: main already holds the new content.
-                    val backupExists = fileExists(WalletBackupFileName.value)
-                    val backupContent = if (backupExists) readFileAsB64(WalletBackupFileName.value) else null
-                    if (backupContent != tempContent) {
-                        // (2)–(3) window or backup missing: write the lost content.
-                        writePlainFromB64(WalletBackupFileName.value, tempContent)
+                    val backup = if (fileExists(WalletBackupFileName.value)) resolveWalletFile(WalletBackupFileName.value) else null
+                    if (backup == null || sameContent(main, backup)) {
+                        // (2)–(3) window: main still equals the backup it came from, write the lost content.
+                        writePlainCopy(WalletBackupFileName.value, temp)
+                    } else if (!sameContent(backup, temp)) {
+                        // Three distinct wallets: no window matches, and any pick
+                        // could destroy a wallet. The temp becomes an orphan
+                        // evidence copy that no path installs, and both slots
+                        // hold their place.
+                        val orphan = File(applicationContext.filesDir, "${WalletTempSwapFileName.value}.orphan.${System.currentTimeMillis()}")
+                        if (!temp.renameTo(orphan)) {
+                            throw IOException("Error: could not set the swap temp aside as ${orphan.name}")
+                        }
+                        Log.w("MAIN", "[Native] completePendingSwap: three distinct wallet files, swap temp kept as ${orphan.name}")
+                        return
                     }
                     // else: post-(3), backup already correct.
                 }
             } else {
                 // Main missing: restore from temp.
-                writePlainFromB64(WalletFileName.value, tempContent)
+                writePlainCopy(WalletFileName.value, temp)
             }
             deleteFile(WalletTempSwapFileName.value)
             Log.i("MAIN", "[Native] completePendingSwap: interrupted swap recovered")
@@ -278,31 +454,52 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     // The FFI contract is structural (zingo-mobile#1151; audit Issue Q):
-    // null means no save was needed, bytes are the wallet export, and
-    // failure throws. The export lands on disk verbatim, so the file is
-    // byte-identical to a desktop zingolib wallet.
+    // Rust streams the wallet into the temp path it is handed, verifies the
+    // file by digest, and answers whether a save was needed; failure
+    // throws. The fill runs outside the writer lock, so a slow save never
+    // stalls the other file paths, and the rename under the lock re-checks
+    // that the wallet file is still open. The rename is the only step that
+    // touches the final path, so the file is byte-identical to a desktop
+    // zingolib wallet.
     fun saveWalletFile(): Boolean {
         return try {
             uniffi.zingo.initLogging()
-
-            val walletBytes = uniffi.zingo.saveWalletBytes()
-            if (walletBytes == null) {
-                Log.i("MAIN", "[Native] No need to save the wallet.")
-                true
-            } else {
-                Log.i("MAIN", "[Native] file size: ${walletBytes.size} bytes")
-                PlainWalletFile.locked {
-                    if (walletFileClosed) {
-                        Log.w("MAIN", "[Native] wallet file closed, save refused")
-                        false
-                    } else {
-                        PlainWalletFile.write(applicationContext.filesDir, WalletFileName.value, walletBytes)
-                        true
-                    }
+            if (walletFileClosed) {
+                Log.w("MAIN", "[Native] wallet file closed, save refused")
+                return false
+            }
+            val filesDir = applicationContext.filesDir
+            var refused = false
+            val written = PlainWalletFile.write(
+                filesDir,
+                WalletFileName.value,
+                commit = {
+                    refused = walletFileClosed
+                    !refused
+                },
+            ) { temp ->
+                uniffi.zingo.saveWalletFile(temp.path)
+            }
+            when {
+                refused -> {
+                    Log.w("MAIN", "[Native] wallet file closed during the save, install refused")
+                    false
+                }
+                written -> {
+                    Log.i("MAIN", "[Native] file size: ${File(filesDir, WalletFileName.value).length()} bytes")
+                    true
+                }
+                else -> {
+                    Log.i("MAIN", "[Native] No need to save the wallet.")
+                    true
                 }
             }
         } catch (e: Exception) {
-            Log.e("MAIN", "[Native] Unexpected error. Couldn't save the wallet. $e")
+            if (walletFileClosed) {
+                Log.w("MAIN", "[Native] wallet file closed during the save, save abandoned: $e")
+            } else {
+                Log.e("MAIN", "[Native] Unexpected error. Couldn't save the wallet. $e")
+            }
             false
         }
     }
@@ -313,8 +510,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 Log.w("MAIN", "[Native] wallet file closed, backup save refused")
                 return false
             }
-            val content = readFileAsB64(WalletFileName.value)
-            writePlainFromB64(WalletBackupFileName.value, content)
+            writePlainCopy(WalletBackupFileName.value, resolveWalletFile(WalletFileName.value))
             true
         } catch (e: Exception) {
             Log.e("MAIN", "[Native] Couldn't save the wallet backup: $e")
@@ -333,65 +529,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             listOf(it, "$it.write.tmp", "$it.migrating")
         } + WalletTempSwapFileName.value
 
-    // The outer layer stored the base64 text of an inner envelope. The inner
-    // envelope goes under the same file name in a scratch dir, because the
-    // name is the AAD.
-    private fun unwrapEnvelope(fileName: String, envelope: ByteArray): ByteArray {
-        val scratchDir = File(applicationContext.cacheDir, "wallet-unwrap").apply { mkdirs() }
-        val scratch = File(scratchDir, fileName)
-        try {
-            scratch.delete()
-            scratch.writeBytes(envelope)
-            val text = buildEncryptedFile(scratch).openFileInput().use { it.readBytes() }
-            return Base64.decode(text, Base64.NO_WRAP)
-        } finally {
-            scratch.delete()
-        }
-    }
-
-    // Peels nested envelopes until a plain wallet appears, at most
-    // MAX_UNWRAP_DEPTH layers. Returns the plain bytes and the layers removed.
-    private fun unwrapToPlainWallet(
-        fileName: String,
-        payload: ByteArray,
-        errors: MutableList<String>? = null,
-    ): Pair<ByteArray, Int>? {
-        var bytes = payload
-        for (depth in 0..WalletFileEnvelope.MAX_UNWRAP_DEPTH) {
-            when (WalletFileEnvelope.classify(bytes)) {
-                WalletFileEnvelope.PayloadKind.PLAIN_WALLET -> return Pair(bytes, depth)
-                WalletFileEnvelope.PayloadKind.UNKNOWN -> {
-                    errors?.add("depth $depth: payload is neither a wallet nor a Tink envelope")
-                    return null
-                }
-                WalletFileEnvelope.PayloadKind.TINK_ENVELOPE -> {
-                    if (depth == WalletFileEnvelope.MAX_UNWRAP_DEPTH) {
-                        errors?.add("still an envelope after ${WalletFileEnvelope.MAX_UNWRAP_DEPTH} layers")
-                        return null
-                    }
-                    bytes = try {
-                        unwrapEnvelope(fileName, bytes)
-                    } catch (e: Exception) {
-                        Log.w("MAIN", "[$fileName] unwrap at depth $depth failed: $e")
-                        errors?.add("depth $depth: $e")
-                        return null
-                    }
-                }
-            }
-        }
-        return null
-    }
-
-    internal fun decryptedPayload(fileName: String): ByteArray =
-        Base64.decode(legacyDecrypt(fileName), Base64.NO_WRAP)
-
-    private fun fileHeadHex(file: File): String =
-        file.inputStream().use { input ->
-            val head = ByteArray(16)
-            val n = input.read(head)
-            (0 until maxOf(n, 0)).joinToString("") { "%02x".format(head[it]) }
-        }
-
     // state: missing | plainWallet | encryptedLegacy | doubleWrapped | undecryptable | unknown
     internal fun diagnoseWalletFile(fileName: String): JSONObject {
         val file = File(applicationContext.filesDir, fileName)
@@ -402,27 +539,29 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             .put("depth", 0)
             .put("repairable", false)
         if (!file.exists()) return report.put("state", "missing")
-        report.put("head", fileHeadHex(file))
-        if (PlainWalletFile.readIfPlain(applicationContext.filesDir, fileName) != null) {
+        report.put("head", PlainWalletFile.header(file).joinToString("") { "%02x".format(it) })
+        if (PlainWalletFile.isPlain(file)) {
             return report.put("state", "plainWallet")
         }
-        val payload = try {
-            decryptedPayload(fileName)
-        } catch (e: Exception) {
-            Log.w("MAIN", "[$fileName] diagnosis: encrypted read failed: $e")
-            return report.put("readError", e.toString()).put("state", "undecryptable")
+        val scratchDir = File(applicationContext.cacheDir, "wallet-unwrap").apply { mkdirs() }
+        val sink = File(scratchDir, "$fileName.peeled")
+        val peel = try {
+            peelLegacy(fileName, sink)
+        } finally {
+            sink.delete()
         }
-        return when (WalletFileEnvelope.classify(payload)) {
+        peel.readError?.let {
+            Log.w("MAIN", "[$fileName] diagnosis: encrypted read failed: $it")
+            return report.put("readError", it.toString()).put("state", "undecryptable")
+        }
+        return when (peel.outerPayload) {
             WalletFileEnvelope.PayloadKind.PLAIN_WALLET -> report.put("state", "encryptedLegacy")
-            WalletFileEnvelope.PayloadKind.UNKNOWN -> report.put("state", "unknown")
-            WalletFileEnvelope.PayloadKind.TINK_ENVELOPE -> {
-                val unwrapErrors = mutableListOf<String>()
-                val unwrapped = unwrapToPlainWallet(fileName, payload, unwrapErrors)
+            WalletFileEnvelope.PayloadKind.UNKNOWN, null -> report.put("state", "unknown")
+            WalletFileEnvelope.PayloadKind.TINK_ENVELOPE ->
                 report.put("state", "doubleWrapped")
-                    .put("repairable", unwrapped != null)
-                    .put("depth", unwrapped?.second ?: 0)
-                    .put("unwrapErrors", JSONArray(unwrapErrors))
-            }
+                    .put("repairable", peel.plainDepth != null)
+                    .put("depth", peel.plainDepth ?: 0)
+                    .put("unwrapErrors", JSONArray(peel.unwrapErrors))
         }
     }
 
@@ -451,34 +590,39 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     internal fun repairDoubleWrappedFile(fileName: String): String {
         val filesDir = applicationContext.filesDir
         val file = File(filesDir, fileName)
-        if (!file.exists()) return "skipped"
-        if (PlainWalletFile.readIfPlain(filesDir, fileName) != null) return "skipped"
-        val payload = try {
-            decryptedPayload(fileName)
-        } catch (e: Exception) {
-            Log.w("MAIN", "[$fileName] repair: encrypted read failed, nothing to unwrap: $e")
-            return "skipped"
-        }
-        if (WalletFileEnvelope.classify(payload) != WalletFileEnvelope.PayloadKind.TINK_ENVELOPE) return "skipped"
-        val unwrapped = unwrapToPlainWallet(fileName, payload) ?: return "failed"
-        return try {
-            uniffi.zingo.validateWalletBytes(unwrapped.first)
-            file.copyTo(File(filesDir, "$fileName.prerepair"), overwrite = true)
-            PlainWalletFile.write(filesDir, fileName, unwrapped.first)
-            val verified = PlainWalletFile.readIfPlain(filesDir, fileName) != null
-            Log.i("MAIN", "[$fileName] repair: removed ${unwrapped.second} layer(s), verified=$verified")
-            if (verified) "repaired" else "failed"
+        if (!file.exists() || PlainWalletFile.isPlain(file)) return "skipped"
+        var outcome = "failed"
+        try {
+            PlainWalletFile.write(filesDir, fileName) { temp ->
+                val peel = peelLegacy(fileName, temp)
+                if (peel.readError != null) {
+                    Log.w("MAIN", "[$fileName] repair: encrypted read failed, nothing to unwrap: ${peel.readError}")
+                    outcome = "skipped"
+                    return@write false
+                }
+                if (peel.outerPayload != WalletFileEnvelope.PayloadKind.TINK_ENVELOPE) {
+                    outcome = "skipped"
+                    return@write false
+                }
+                val layers = peel.plainDepth ?: return@write false
+                uniffi.zingo.validateWalletFile(temp.path)
+                file.copyTo(File(filesDir, "$fileName.prerepair"), overwrite = true)
+                Log.i("MAIN", "[$fileName] repair: removed $layers layer(s)")
+                outcome = "repaired"
+                true
+            }
         } catch (e: Exception) {
             Log.e("MAIN", "[$fileName] repair: rewrite failed: $e")
-            "failed"
+            outcome = "failed"
         }
+        return outcome
     }
 
-    // Salvages seed and birthday from the raw bytes of the closed wallet
-    // file and keeps the damaged bytes at "$fileName.broken".
+    // Salvages seed and birthday from the stable prefix of the closed
+    // wallet file and keeps the damaged bytes at "$fileName.broken".
     internal fun walletFileRecoveryInfoNative(): String {
         val file = File(applicationContext.filesDir, WalletFileName.value)
-        val salvaged = uniffi.zingo.readWalletRecoveryInfo(file.readBytes())
+        val salvaged = uniffi.zingo.readWalletRecoveryInfoFile(file.path)
         file.copyTo(File(applicationContext.filesDir, "${WalletFileName.value}.broken"), overwrite = true)
         return salvaged
     }
@@ -556,7 +700,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     @ReactMethod
     fun loadExistingWallet(serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String, promise: Promise) {
-        FfiOutcome.settling(promise, "init_from_b64") {
+        FfiOutcome.settling(promise, "load_wallet_file") {
             loadExistingWalletNative(serveruri, chainhint, performancelevel, minconfirmations)
         }
     }
@@ -566,21 +710,21 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun loadExistingWalletNative(serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String): String {
         uniffi.zingo.initLogging()
 
-        val fileb64 = readFileAsB64(WalletFileName.value)
-        Log.i("MAIN", "file size: ${fileb64.length} chars (Base64)")
+        val wallet = resolveWalletFile(WalletFileName.value)
+        Log.i("MAIN", "file size: ${wallet.length()} bytes")
 
-        val resp = uniffi.zingo.initFromB64(fileb64, serveruri, chainhint, performancelevel, minconfirmations.toUInt())
+        val resp = uniffi.zingo.loadWalletFile(wallet.path, serveruri, chainhint, performancelevel, minconfirmations.toUInt())
         walletFileClosed = false
         migrateRetainedWallet()
         return resp
     }
 
-    // Best-effort after a successful load: reading the retained wallet
+    // Best-effort after a successful load: resolving the retained wallet
     // migrates a legacy encrypted file to plain.
     private fun migrateRetainedWallet() {
         if (!fileExists(WalletBackupFileName.value)) return
         try {
-            readFileAsB64(WalletBackupFileName.value)
+            resolveWalletFile(WalletBackupFileName.value)
         } catch (e: Exception) {
             Log.w("MAIN", "[Native] retained wallet migration failed: $e")
         }
@@ -589,48 +733,77 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     @ReactMethod
     fun restoreExistingWalletBackup(promise: Promise) {
         try {
-            val backup = readFileAsB64(WalletBackupFileName.value)
-            // Check the content is correct before swapping it into place.
-            // Stored encoded, so the guard is structural (zingo-mobile#1151).
-            if (!WalletBackup.isRestorable(backup)) {
-                Log.e("MAIN", "[Native] backup restore: content failed validation")
+            // Recover any orphan temp from a prior crash before reading the
+            // slots: it can rewrite either of them, and the wallet this
+            // restore validates must be the one it installs.
+            completePendingSwap()
+            val backup = resolveWalletFile(WalletBackupFileName.value)
+            // The full parse guards the swap: only a wallet zingolib opens
+            // is restorable.
+            try {
+                uniffi.zingo.validateWalletFile(backup.path)
+            } catch (e: Exception) {
+                Log.e("MAIN", "[Native] backup restore: content failed validation: $e")
                 promise.resolve(false)
                 return
             }
             // Closed across the swap; the reload after a successful restore
-            // clears it.
+            // clears it. A failure before the main slot changed reopens it.
+            val wasClosed = walletFileClosed
             walletFileClosed = true
-            if (fileExists(WalletFileName.value)) {
-                // Durable swap via temp file (audit Issue P (b)): the temp
-                // copy written at step (1) is what `completePendingSwap`
-                // restores after a crash before step (3).
-                //
-                // Recover any orphan temp from a prior crash before starting
-                // a new swap: it can hold the only copy of that crash's
-                // original main.
-                completePendingSwap()
-                val wallet = try {
-                    readFileAsB64(WalletFileName.value)
-                } catch (e: Exception) {
-                    // Keep the unreadable main's raw bytes aside and restore the backup into both slots.
-                    Log.w("MAIN", "[Native] backup restore: main unreadable, preserving raw and restoring backup: $e")
-                    File(applicationContext.filesDir, WalletFileName.value)
-                        .copyTo(File(applicationContext.filesDir, "${WalletFileName.value}.broken"), overwrite = true)
-                    writePlainFromB64(WalletFileName.value, backup)
-                    promise.resolve(true)
-                    return
+            var mainChanged = false
+            try {
+                PlainWalletFile.locked {
+                if (fileExists(WalletFileName.value)) {
+                    // Durable swap via temp file (audit Issue P (b)): the temp
+                    // copy written at step (1) is what `completePendingSwap`
+                    // restores after a crash before step (3).
+                    val wallet = try {
+                        resolveWalletFile(WalletFileName.value)
+                    } catch (e: Exception) {
+                        // Keep the unreadable main's raw bytes aside and restore the backup into both slots.
+                        Log.w("MAIN", "[Native] backup restore: main unreadable, preserving raw and restoring backup: $e")
+                        File(applicationContext.filesDir, WalletFileName.value)
+                            .copyTo(File(applicationContext.filesDir, "${WalletFileName.value}.broken"), overwrite = true)
+                        writePlainCopy(WalletFileName.value, backup)
+                        mainChanged = true
+                        promise.resolve(true)
+                        return
+                    }
+                    val swap = File(applicationContext.filesDir, WalletTempSwapFileName.value)
+                    try {
+                        restoreStepHook(1)
+                        writePlainCopy(WalletTempSwapFileName.value, wallet)   // (1) temp = original main
+                        restoreStepHook(2)
+                        writePlainCopy(WalletFileName.value, backup)           // (2) main = backup
+                    } catch (e: Exception) {
+                        // Main is untouched before (2) lands, so the temp must not
+                        // let the startup recovery finish a swap that never began.
+                        swap.delete()
+                        throw e
+                    }
+                    mainChanged = true
+                    try {
+                        restoreStepHook(3)
+                        writePlainCopy(WalletBackupFileName.value, swap)       // (3) backup = original main
+                        deleteFile(WalletTempSwapFileName.value)               // (4) cleanup
+                    } catch (e: Exception) {
+                        // Main already holds the backup: the restore happened.
+                        // The temp lets the startup recovery finish (3).
+                        Log.w("MAIN", "[Native] backup restore: retained copy pending, the startup recovery completes it: $e")
+                    }
+                } else {
+                    // No wallet exists: restore backup as wallet, but KEEP the
+                    // backup file. Deleting it here left the user with no backup
+                    // right after a restore, so if they then created/restored a
+                    // different wallet the just-restored one was gone. Keeping a
+                    // duplicate copy as backup is far safer than none.
+                    writePlainCopy(WalletFileName.value, backup)
+                    mainChanged = true
                 }
-                writePlainFromB64(WalletTempSwapFileName.value, wallet)   // (1) temp = original main
-                writePlainFromB64(WalletFileName.value, backup)           // (2) main = backup
-                writePlainFromB64(WalletBackupFileName.value, wallet)     // (3) backup = original main
-                deleteFile(WalletTempSwapFileName.value)                  // (4) cleanup
-            } else {
-                // No wallet exists: restore backup as wallet, but KEEP the
-                // backup file. Deleting it here left the user with no backup
-                // right after a restore, so if they then created/restored a
-                // different wallet the just-restored one was gone. Keeping a
-                // duplicate copy as backup is far safer than none.
-                writePlainFromB64(WalletFileName.value, backup)
+                }
+            } finally {
+                if (!mainChanged) walletFileClosed = wasClosed
             }
             promise.resolve(true)
         } catch (e: FileNotFoundException) {
@@ -645,22 +818,38 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     // Deletes every sidecar the recovery paths could rename or copy back
     // onto the wallet path.
     private fun deleteWalletSidecars(fileName: String) {
-        for (suffix in listOf(".migrating", ".write.tmp", ".plain.tmp", ".prerepair", ".broken")) {
+        for (suffix in listOf(".migrating", ".write.tmp", ".prerepair", ".broken")) {
             File(applicationContext.filesDir, "$fileName$suffix").delete()
+        }
+        PlainWalletFile.deleteTemps(applicationContext.filesDir, fileName)
+    }
+
+    // Whether the swap temp, resolved to its plain format, holds a copy of
+    // `slot`. A temp that cannot be read answers false.
+    private fun swapHoldsCopyOf(slot: File): Boolean {
+        val swap = File(applicationContext.filesDir, WalletTempSwapFileName.value)
+        if (!swap.isFile || !slot.isFile) return false
+        return try {
+            sameContent(resolveWalletFile(WalletTempSwapFileName.value), slot)
+        } catch (e: Exception) {
+            false
         }
     }
 
-    // A swap temp that `completePendingSwap` could not consume can hold
-    // the only copy of a wallet, and it survives both delete methods.
+    // A swap temp that is a copy of the deleted wallet goes with it, one
+    // the swap recovery cannot place becomes an orphan evidence copy, and
+    // one that cannot be read stays as evidence.
     @ReactMethod
     fun deleteExistingWallet(promise: Promise) {
-        completePendingSwap()
+        val filesDir = applicationContext.filesDir
         val deleted = PlainWalletFile.locked {
+            val main = File(filesDir, WalletFileName.value)
+            if (swapHoldsCopyOf(main)) deleteFile(WalletTempSwapFileName.value) else completePendingSwap()
             val gone = fileExists(WalletFileName.value) && deleteFile(WalletFileName.value)
             if (!fileExists(WalletFileName.value)) {
                 walletFileClosed = true
                 deleteWalletSidecars(WalletFileName.value)
-                File(applicationContext.filesDir, "${WalletTempSwapFileName.value}.plain.tmp").delete()
+                PlainWalletFile.deleteTemps(filesDir, WalletTempSwapFileName.value)
             }
             gone
         }
@@ -669,8 +858,10 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     @ReactMethod
     fun deleteExistingWalletBackup(promise: Promise) {
-        completePendingSwap()
+        val filesDir = applicationContext.filesDir
         val deleted = PlainWalletFile.locked {
+            val backup = File(filesDir, WalletBackupFileName.value)
+            if (swapHoldsCopyOf(backup)) deleteFile(WalletTempSwapFileName.value) else completePendingSwap()
             val gone = fileExists(WalletBackupFileName.value) && deleteFile(WalletBackupFileName.value)
             if (!fileExists(WalletBackupFileName.value)) {
                 deleteWalletSidecars(WalletBackupFileName.value)
@@ -687,7 +878,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     // re-encoded as prose in the success channel (zingo-mobile#1151).
     @ReactMethod
     fun doSave(promise: Promise) {
-        FfiOutcome.settling(promise, "save_wallet_bytes") {
+        FfiOutcome.settling(promise, "save_wallet_file") {
             uniffi.zingo.initLogging()
             saveWalletFile()
         }

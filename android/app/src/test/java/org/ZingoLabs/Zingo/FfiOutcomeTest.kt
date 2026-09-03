@@ -20,7 +20,7 @@ class FfiOutcomeTest {
         "init_new" to (ZingolibException.Init("boom") to "Init"),
         "init_from_seed" to (ZingolibException.Init("boom") to "Init"),
         "init_from_ufvk" to (ZingolibException.Init("boom") to "Init"),
-        "init_from_b64" to (ZingolibException.Init("boom") to "Init"),
+        "load_wallet_file" to (ZingolibException.Init("boom") to "Init"),
         "run_sync" to (ZingolibException.Sync("boom") to "Sync"),
         "pause_sync" to (ZingolibException.Sync("boom") to "Sync"),
         "status_sync" to (ZingolibException.Sync("boom") to "Sync"),
@@ -40,7 +40,7 @@ class FfiOutcomeTest {
         // The save shells resolve their helpers' contained boolean; what
         // rejects is an escaping exception, FFI-typed or platform I/O —
         // the latter is outside the typed family, hence "Unknown".
-        "save_wallet_bytes" to (ZingolibException.Save("boom") to "Save"),
+        "save_wallet_file" to (ZingolibException.Save("boom") to "Save"),
         "save_wallet_backup" to (java.io.IOException("boom") to "Unknown"),
         // The wallet-read getters whose domain failures are the typed
         // Read variant.

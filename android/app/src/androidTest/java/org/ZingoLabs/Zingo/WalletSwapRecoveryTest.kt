@@ -45,7 +45,7 @@ class WalletSwapRecoveryTest {
 
     private fun offlineWallet(birthday: UInt): ByteArray {
         uniffi.zingo.initFromSeed(Seeds.HOSPITAL, birthday, "", "main", "Medium", 1u)
-        return uniffi.zingo.saveWalletBytes()!!
+        return WalletFixtures.savedWalletBytes(context)
     }
 
     @Before

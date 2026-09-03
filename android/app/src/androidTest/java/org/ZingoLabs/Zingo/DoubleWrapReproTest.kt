@@ -50,7 +50,7 @@ class DoubleWrapReproTest {
     }
 
     // Tink 1.5.0 wording for the transient path the reported devices hit.
-    private val transientKeystoreFailure: (String) -> String = {
+    private val transientKeystoreFailure: (File, java.io.OutputStream) -> Unit = { _, _ ->
         throw IOException("Keystore temporarily unavailable")
     }
 
@@ -69,7 +69,7 @@ class DoubleWrapReproTest {
         uniffi.zingo.initLogging()
         uniffi.zingo.setCryptoDefaultProviderToRing()
         uniffi.zingo.initFromSeed(Seeds.HOSPITAL, 2000000u, "", chainHint, "Medium", 1u)
-        plainWallet = uniffi.zingo.saveWalletBytes()!!
+        plainWallet = WalletFixtures.savedWalletBytes(context)
         assertThat(WalletFileEnvelope.looksLikePlainWallet(plainWallet)).isTrue()
 
         // A 2.0.21+ device: the wallet rests inside the Tink envelope.

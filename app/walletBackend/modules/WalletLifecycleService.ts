@@ -21,7 +21,8 @@ export type WalletLifecycleErrorKey =
   | 'rpc.backupwallet-error'
   | 'rpc.deletewallet-error'
   | 'rpc.walletnotfound-error'
-  | 'rpc.backupnotfound-error';
+  | 'rpc.backupnotfound-error'
+  | 'rpc.restorebackup-error';
 
 export type WalletLifecycleResult = Done | ErrorKeyed<WalletLifecycleErrorKey>;
 
@@ -85,7 +86,11 @@ export class WalletLifecycleService {
       return err('rpc.walletnotfound-error');
     }
     await this.syncCoordinator.pauseSyncProcess();
-    await RPCModule.restoreExistingWalletBackup();
+    const restored = await RPCModule.restoreExistingWalletBackup();
+
+    if (!(restored && restored !== GlobalConst.false)) {
+      return err('rpc.restorebackup-error');
+    }
     return DONE;
   }
 }

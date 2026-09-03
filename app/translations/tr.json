@@ -220,6 +220,7 @@
   "rpc": {
     "walletnotfound-error": "Error: Herhangi bir cüzdan bulunamadı.",
     "backupnotfound-error": "Error: Herhangi bir cüzdan yedeği bulunamadı.",
+    "restorebackup-error": "Error: Cüzdan yedeği geri yüklenemedi. Yedek dosyası cüzdan olarak açılamadı.",
     "deletewallet-error": "Error: Mevcut cüzdan silinemedi.",
     "backupwallet-error": "Error: Cüzdan yedeği kaydedilemedi."
   },

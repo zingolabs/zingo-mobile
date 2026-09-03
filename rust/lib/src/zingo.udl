@@ -62,8 +62,8 @@ namespace zingo {
   );
 
   [Throws=ZingolibError]
-  string init_from_b64(
-      string datab64,
+  string load_wallet_file(
+      string path,
       string serveruri,
       string chainhint,
       string performancelevel,
@@ -71,13 +71,19 @@ namespace zingo {
   );
 
   [Throws=ZingolibError]
-  bytes? save_wallet_bytes();
+  boolean save_wallet_file(string temp_path);
 
   [Throws=ZingolibError]
   string read_wallet_recovery_info(bytes wallet_bytes);
 
   [Throws=ZingolibError]
+  string read_wallet_recovery_info_file(string path);
+
+  [Throws=ZingolibError]
   void validate_wallet_bytes(bytes wallet_bytes);
+
+  [Throws=ZingolibError]
+  void validate_wallet_file(string path);
 
   [Throws=ZingolibError]
   string get_latest_block_server(

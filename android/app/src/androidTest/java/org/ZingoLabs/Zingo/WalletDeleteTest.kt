@@ -65,7 +65,7 @@ class WalletDeleteTest {
         uniffi.zingo.initLogging()
         uniffi.zingo.setCryptoDefaultProviderToRing()
         uniffi.zingo.initFromSeed(Seeds.HOSPITAL, 2000000u, "", "main", "Medium", 1u)
-        plainWallet = uniffi.zingo.saveWalletBytes()!!
+        plainWallet = WalletFixtures.savedWalletBytes(context)
         file(mainName).writeBytes(plainWallet)
     }
 

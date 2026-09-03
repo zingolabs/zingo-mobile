@@ -220,6 +220,7 @@
   "rpc": {
     "walletnotfound-error": "Error: Не удалось найти кошелёк.",
     "backupnotfound-error": "Error: Резервная копия кошелька не найдена.",
+    "restorebackup-error": "Error: Не удалось восстановить резервную копию. Файл не открывается как кошелёк.",
     "deletewallet-error": "Error: Не удалось удалить текущий кошелёк.",
     "backupwallet-error": "Error: Не удалось сохранить резервную копию кошелька."
   },

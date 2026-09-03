@@ -14,12 +14,12 @@ exclude = ["nym-proxy-ffi"]
 resolver = "2"
 
 [workspace.dependencies]
-zingolib = { git = "https://github.com/zingolabs/zingolib", branch = "bb/add-wallet-file-validation-thr_dfg7v7d7jv", features = [
+zingolib = { git = "https://github.com/zingolabs/zingolib", branch = "feat/lightclient-from-reader", features = [
     "nym",
     "perspective",
 ] }
-pepper-sync = { git = "https://github.com/zingolabs/zingolib", branch = "bb/add-wallet-file-validation-thr_dfg7v7d7jv" }
-zingolib_testutils = { git = "https://github.com/zingolabs/zingolib", branch = "bb/add-wallet-file-validation-thr_dfg7v7d7jv" }
+pepper-sync = { git = "https://github.com/zingolabs/zingolib", branch = "feat/lightclient-from-reader" }
+zingolib_testutils = { git = "https://github.com/zingolabs/zingolib", branch = "feat/lightclient-from-reader" }
 regchest_utils = { git = "https://github.com/zingolabs/zingo-regchest", branch = "dev" }
 zingomobile_utils = { path = "zingomobile_utils" }
 
@@ -43,9 +43,10 @@ tokio = { version = "1", features = ["rt-multi-thread", "time"] }
 rustls = { version = "0.23.37", features = ["ring"] }
 serde_json = "1"
 android_logger = "0.11"
-base64 = "0.22"
+sha2 = "0.10"
 http = "1"
 hex = "0.4"
+libc = "0.2"
 json = "0.12"
 lazy_static = "1.4.0"
 log = "0.4"
