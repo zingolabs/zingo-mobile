@@ -98,8 +98,6 @@ rmSync(tmp, { recursive: true, force: true });
 const git = (args: string[]) =>
   execFileSync('git', args, { encoding: 'utf8' }).trim();
 
-git(['config', 'user.name', 'visual-review-bot']);
-git(['config', 'user.email', 'visual-review-bot@users.noreply.github.com']);
 git(['add', 'visual/__baseline__']);
 
 const staged = spawnSync('git', ['diff', '--cached', '--quiet']).status;
@@ -110,6 +108,10 @@ if (staged === 0) {
 
 const coauthor = `Co-authored-by: ${authorLogin} <${authorId}+${authorLogin}@users.noreply.github.com>`;
 git([
+  '-c',
+  'user.name=visual-review-bot',
+  '-c',
+  'user.email=visual-review-bot@users.noreply.github.com',
   'commit',
   '-m',
   `test(visual): accept baseline (PR #${prNumber})`,
