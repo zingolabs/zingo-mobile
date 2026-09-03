@@ -67,3 +67,7 @@
 
 # kotlinx.datetime references kotlinx.serialization internally
 -dontwarn kotlinx.serialization.**
+
+# kotlin.io file helpers: the release test APK takes its stdlib from the app APK,
+# and the app no longer reads whole files itself, so the tests need these kept.
+-keep class kotlin.io.FilesKt** { *; }
