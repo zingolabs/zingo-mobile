@@ -2310,7 +2310,7 @@ dependencies = [
 [[package]]
 name = "pepper-sync"
 version = "0.5.0"
-source = "git+https://github.com/zingolabs/zingolib?branch=feat%2Flightclient-from-reader#d14c33cc6b0be5ea2ef30ee259d6a29db251efd3"
+source = "git+https://github.com/zingolabs/zingolib?branch=dev#3a0f5a7e5cf917389d184ff4c9d76d906b31dd2e"
 dependencies = [
  "bip32",
  "byteorder",
@@ -5030,7 +5030,7 @@ source = "git+https://github.com/zingolabs/infrastructure.git?rev=89cf104a241614
 [[package]]
 name = "zingo-memo"
 version = "0.1.1"
-source = "git+https://github.com/zingolabs/zingolib?branch=feat%2Flightclient-from-reader#d14c33cc6b0be5ea2ef30ee259d6a29db251efd3"
+source = "git+https://github.com/zingolabs/zingolib?branch=dev#3a0f5a7e5cf917389d184ff4c9d76d906b31dd2e"
 dependencies = [
  "zcash_address",
  "zcash_encoding",
@@ -5041,7 +5041,7 @@ dependencies = [
 [[package]]
 name = "zingo-net-diag"
 version = "0.1.0"
-source = "git+https://github.com/zingolabs/zingolib?branch=feat%2Flightclient-from-reader#d14c33cc6b0be5ea2ef30ee259d6a29db251efd3"
+source = "git+https://github.com/zingolabs/zingolib?branch=dev#3a0f5a7e5cf917389d184ff4c9d76d906b31dd2e"
 dependencies = [
  "serde",
 ]
@@ -5049,7 +5049,7 @@ dependencies = [
 [[package]]
 name = "zingo-netutils"
 version = "5.0.1"
-source = "git+https://github.com/zingolabs/zingolib?branch=feat%2Flightclient-from-reader#d14c33cc6b0be5ea2ef30ee259d6a29db251efd3"
+source = "git+https://github.com/zingolabs/zingolib?branch=dev#3a0f5a7e5cf917389d184ff4c9d76d906b31dd2e"
 dependencies = [
  "http",
  "hyper-util",
@@ -5071,7 +5071,7 @@ dependencies = [
 [[package]]
 name = "zingo-price"
 version = "0.1.0"
-source = "git+https://github.com/zingolabs/zingolib?branch=feat%2Flightclient-from-reader#d14c33cc6b0be5ea2ef30ee259d6a29db251efd3"
+source = "git+https://github.com/zingolabs/zingolib?branch=dev#3a0f5a7e5cf917389d184ff4c9d76d906b31dd2e"
 dependencies = [
  "byteorder",
  "serde",
@@ -5085,7 +5085,7 @@ dependencies = [
 [[package]]
 name = "zingo-status"
 version = "0.2.1"
-source = "git+https://github.com/zingolabs/zingolib?branch=feat%2Flightclient-from-reader#d14c33cc6b0be5ea2ef30ee259d6a29db251efd3"
+source = "git+https://github.com/zingolabs/zingolib?branch=dev#3a0f5a7e5cf917389d184ff4c9d76d906b31dd2e"
 dependencies = [
  "byteorder",
  "zcash_protocol",
@@ -5116,7 +5116,7 @@ source = "git+https://github.com/zingolabs/infrastructure.git?rev=89cf104a241614
 [[package]]
 name = "zingolib"
 version = "5.0.0"
-source = "git+https://github.com/zingolabs/zingolib?branch=feat%2Flightclient-from-reader#d14c33cc6b0be5ea2ef30ee259d6a29db251efd3"
+source = "git+https://github.com/zingolabs/zingolib?branch=dev#3a0f5a7e5cf917389d184ff4c9d76d906b31dd2e"
 dependencies = [
  "append-only-vec",
  "bech32",
@@ -5176,7 +5176,7 @@ dependencies = [
 [[package]]
 name = "zingolib_testutils"
 version = "0.1.0"
-source = "git+https://github.com/zingolabs/zingolib?branch=feat%2Flightclient-from-reader#d14c33cc6b0be5ea2ef30ee259d6a29db251efd3"
+source = "git+https://github.com/zingolabs/zingolib?branch=dev#3a0f5a7e5cf917389d184ff4c9d76d906b31dd2e"
 dependencies = [
  "http",
  "nonempty",
