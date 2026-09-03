@@ -1,5 +1,5 @@
-import { ChainNameEnum, CurrencyNameEnum, InfoType } from '../../app/AppState';
-import { serverUris } from '../../app/uris';
+import { ChainNameEnum, CurrencyNameEnum, InfoType } from '@app/AppState';
+import { serverUris } from '@app/uris';
 
 export const mockInfo: InfoType = {
   chainName: ChainNameEnum.mainChainName,

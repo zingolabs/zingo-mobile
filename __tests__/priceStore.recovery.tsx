@@ -1,7 +1,7 @@
 /**
  * Outage recovery and staleness.
  */
-jest.mock('../app/walletBackend', () => ({
+jest.mock('@app/walletBackend', () => ({
   __esModule: true,
   getZecPrice: jest.fn(),
 }));
@@ -11,24 +11,22 @@ import * as path from 'path';
 import 'react-native';
 import React from 'react';
 import { act, render, renderHook } from '@testing-library/react-native';
-import PriceFetcher, {
-  PriceTrafficDriver,
-} from '../components/Components/PriceFetcher';
+import PriceFetcher, { PriceTrafficDriver } from '@ui/widgets/PriceFetcher';
 import {
   PRICE_REFRESH_MAX_MS,
   PRICE_STALE_MS,
   priceFetcherStore,
   usePriceHealth,
   usePriceStale,
-} from '../components/Components/priceFetcherStore';
+} from '@ui/widgets/priceFetcherStore';
 import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
-} from '../app/context';
-import { SelectServerEnum } from '../app/AppState';
-import { getZecPrice } from '../app/walletBackend';
+} from '@app/context';
+import { SelectServerEnum } from '@app/AppState';
+import { getZecPrice } from '@app/walletBackend';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
-import { MixnetView } from '../app/walletBackend/transforms/mixnetView';
+import { MixnetView } from '@app/walletBackend/transforms/mixnetView';
 
 const price = getZecPrice as jest.MockedFunction<typeof getZecPrice>;
 
@@ -230,9 +228,9 @@ test('two prices each keep their own stale crossing', () => {
 
 test('the muting rule has one spelling, usePriceHealth', () => {
   const sites = [
-    '../components/Components/PriceFetcher.tsx',
-    '../components/Components/CurrencyAmount.tsx',
-    '../components/Send/Send.tsx',
+    '../ui/widgets/PriceFetcher.tsx',
+    '../ui/widgets/CurrencyAmount.tsx',
+    '../screens/Send/Send.tsx',
   ];
   sites.forEach(site => {
     const source = fs.readFileSync(path.join(__dirname, site), 'utf8');

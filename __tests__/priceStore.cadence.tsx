@@ -1,7 +1,7 @@
 /**
  * The ratified price cadence.
  */
-jest.mock('../app/walletBackend', () => ({
+jest.mock('@app/walletBackend', () => ({
   __esModule: true,
   getZecPrice: jest.fn(),
 }));
@@ -10,20 +10,20 @@ import 'react-native';
 import type { AppStateStatus } from 'react-native';
 import React from 'react';
 import { render } from '@testing-library/react-native';
-import { PriceTrafficDriver } from '../components/Components/PriceFetcher';
+import { PriceTrafficDriver } from '@ui/widgets/PriceFetcher';
 import {
   PRICE_REFRESH_MAX_MS,
   PRICE_REFRESH_MIN_MS,
   priceFetcherStore,
-} from '../components/Components/priceFetcherStore';
+} from '@ui/widgets/priceFetcherStore';
 import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
-} from '../app/context';
-import { SelectServerEnum } from '../app/AppState';
-import { getZecPrice } from '../app/walletBackend';
+} from '@app/context';
+import { SelectServerEnum } from '@app/AppState';
+import { getZecPrice } from '@app/walletBackend';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
-import { INITIAL_MIXNET_VIEW } from '../app/walletBackend/transforms/mixnetView';
+import { INITIAL_MIXNET_VIEW } from '@app/walletBackend/transforms/mixnetView';
 
 const price = getZecPrice as jest.MockedFunction<typeof getZecPrice>;
 

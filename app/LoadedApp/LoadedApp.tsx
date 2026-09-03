@@ -11,12 +11,12 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { useTheme } from '../theme';
+import { useTheme } from '@app/theme';
 import { I18n } from 'i18n-js';
 import * as RNLocalize from 'react-native-localize';
 import { isEqual } from 'lodash';
 import { StackScreenProps } from '@react-navigation/stack';
-import { LoadingAppNavigationState, AppDrawerParamList } from '../types';
+import { LoadingAppNavigationState, AppDrawerParamList } from '@app/types';
 import NetInfo, {
   NetInfoSubscription,
   NetInfoState,
@@ -26,7 +26,7 @@ import {
   deactivateKeepAwake,
 } from '@sayem314/react-native-keep-awake';
 
-import WalletBackend, { fetchWallet } from '../walletBackend';
+import WalletBackend, { fetchWallet } from '@app/walletBackend';
 import {
   changeServer,
   doSave,
@@ -35,7 +35,7 @@ import {
   parseAddress,
   reconcileMigration,
   setConfigWalletToProd,
-} from '../walletBackend';
+} from '@app/walletBackend';
 import {
   AppStateLoaded,
   TotalBalanceClass,
@@ -76,124 +76,114 @@ import {
   LaunchingModeEnum,
   BlockExplorerEnum,
   SnackbarDurationEnum,
-} from '../AppState';
-import Utils from '../utils';
-import { getZingoVersion, substituteZingoName } from '../utils/ZingoAppData';
-import { AppTheme } from '../theme';
-import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
-import { PriceTrafficDriver } from '../../components/Components/PriceFetcher';
-import { priceFetcherStore } from '../../components/Components/priceFetcherStore';
-import { ContextAppLoadedProvider } from '../context';
-import { parseZcashURI, serverUris, fetchServerList } from '../uris';
-import selectingServer from '../selectingServer';
-import BackgroundFileImpl from '../../components/Background';
+} from '@app/AppState';
+import Utils from '@app/utils';
+import { getZingoVersion, substituteZingoName } from '@app/utils/ZingoAppData';
+import { AppTheme } from '@app/theme';
+import SettingsFileImpl from '@app/services/SettingsFileImpl';
+import { PriceTrafficDriver } from '@ui/widgets/PriceFetcher';
+import { priceFetcherStore } from '@ui/widgets/priceFetcherStore';
+import { ContextAppLoadedProvider } from '@app/context';
+import { parseZcashURI, serverUris, fetchServerList } from '@app/uris';
+import selectingServer from '@app/services/selectingServer';
+import BackgroundFileImpl from '@app/services/BackgroundFileImpl';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { createAlert } from '../createAlert';
-import { sendEmail } from '../sendEmail';
+import { createAlert } from '@app/services/createAlert';
+import { sendEmail } from '@app/services/sendEmail';
 import Toast from 'react-native-toast-message';
-import { toastConfig } from '../toastConfig';
-import { RPCSeedType } from '../walletBackend/types/RPCSeedType';
-import { Launching } from '../LoadingApp';
-import { AddressBook } from '../../components/AddressBook';
-import { AddressBookFileImpl } from '../../components/AddressBook';
+import { toastConfig } from '@ui/widgets/toastConfig';
+import { RPCSeedType } from '@app/walletBackend/types/RPCSeedType';
+import Launching from '@screens/Launching';
+import { AddressBook } from '@screens/AddressBook';
+import AddressBookFileImpl from '@app/services/AddressBookFileImpl';
 import {
   GateAnswer,
   enactGateAnswer,
   resolveTriggerGate,
-} from '../gateController';
-import ShowAddressAlertAsync from '../../components/Send/components/ShowAddressAlertAsync';
+} from '@app/services/gateController';
+import ShowAddressAlertAsync from '@app/services/showAddressAlertAsync';
 import {
   createUpdateRecoveryWalletInfo,
   removeRecoveryWalletInfo,
-} from '../recoveryWalletInfo';
+} from '@app/services/recoveryWalletInfo';
 
-import History from '../../components/History';
-import Send from '../../components/Send';
-import Receive from '../../components/Receive';
-import Settings from '../../components/Settings';
-import CustomTabBar, {
-  FadeOnlyTabBar,
-} from '../../components/TabBar/CustomTabBar';
+import History from '@screens/History';
+import Send from '@screens/Send';
+import Receive from '@screens/Receive';
+import Settings from '@screens/Settings';
+import CustomTabBar, { FadeOnlyTabBar } from '@app/navigation/CustomTabBar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import {
   BottomSheetModal,
   BottomSheetModalProvider,
 } from '@gorhom/bottom-sheet';
-import AddTagModalHost from '../../components/AddressBook/components/AddTagModalHost';
-import { BottomSheetBackHandler } from '../hooks/useBottomSheetBackHandler';
-import ConfirmBottomSheet from '../../components/Components/ConfirmBottomSheet';
-import { showConfirm } from '../showConfirm';
-import RootNavigator from '../../components/RootNavigator';
+import AddTagModalHost from './components/AddTagModalHost';
+import { BottomSheetBackHandler } from '@app/hooks/useBottomSheetBackHandler';
+import ConfirmBottomSheet from '@ui/widgets/ConfirmBottomSheet';
+import { showConfirm } from '@app/services/showConfirm';
+import RootNavigator from '@app/navigation/RootNavigator';
 import {
   OptionsPanelProvider,
   toggleOptionsPanel,
-} from '../context/optionsPanel';
+} from '@app/context/optionsPanel';
 import LoadedAppOptionsPanelHost from './LoadedAppOptionsPanelHost';
-import { MessageList } from '../../components/Messages';
-import { RPCSyncStatusType } from '../walletBackend/types/RPCSyncStatusType';
-import { RPCUfvkType } from '../walletBackend/types/RPCUfvkType';
+import { MessageList } from '@screens/Messages';
+import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
+import { RPCUfvkType } from '@app/walletBackend/types/RPCUfvkType';
 import {
   INITIAL_MIXNET_VIEW,
   OFF_MIXNET_VIEW,
   MixnetView,
-} from '../walletBackend/transforms/mixnetView';
+} from '@app/walletBackend/transforms/mixnetView';
 import {
   startMixnetTransport,
   stopMixnetTransport,
-} from '../walletBackend/utils/nymTransport';
-import { RPCPerformanceLevelEnum } from '../walletBackend/enums/RPCPerformanceLevelEnum';
-import { AddressList } from '../../components/AddressList';
-import ValueTransferDetail from '../../components/History/components/ValueTransferDetail';
-import Confirm from '../../components/Send/components/Confirm';
-import { AppStackParamList } from '../types';
+} from '@app/walletBackend/utils/nymTransport';
+import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
+import { AddressList } from '@screens/AddressList';
+import ValueTransferDetail from '@screens/ValueTransferDetail';
+import Confirm from '@screens/Confirm';
+import { AppStackParamList } from '@app/types';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RPCValueTransfersStatusEnum } from '../walletBackend/enums/RPCValueTransfersStatusEnum';
+import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
 
-const About = React.lazy(() => import('../../components/About'));
-const MixnetDoctor = React.lazy(() => import('../../components/MixnetDoctor'));
-const Seed = React.lazy(() => import('../../components/Seed'));
-const SyncReport = React.lazy(() => import('../../components/SyncReport'));
-const Rescan = React.lazy(() => import('../../components/Rescan'));
-const Pools = React.lazy(() => import('../../components/Pools'));
-const MeetIronwood = React.lazy(() => import('../../components/MeetIronwood'));
+const About = React.lazy(() => import('@screens/About'));
+const MixnetDoctor = React.lazy(() => import('@screens/MixnetDoctor'));
+const Seed = React.lazy(() => import('@screens/Seed'));
+const SyncReport = React.lazy(() => import('@screens/SyncReport'));
+const Rescan = React.lazy(() => import('@screens/Rescan'));
+const Pools = React.lazy(() => import('@screens/Pools'));
+const MeetIronwood = React.lazy(() => import('@screens/MeetIronwood'));
 const MigrationStrategy = React.lazy(
-  () => import('../../components/MigrationStrategy'),
+  () => import('@screens/MigrationStrategy'),
 );
 const MigrationTransactions = React.lazy(
-  () => import('../../components/MigrationTransactions'),
+  () => import('@screens/MigrationTransactions'),
 );
-const MigrationSending = React.lazy(
-  () => import('../../components/MigrationSending'),
-);
+const MigrationSending = React.lazy(() => import('@screens/MigrationSending'));
 const MigrationSplitPlan = React.lazy(
-  () => import('../../components/MigrationSplitPlan'),
+  () => import('@screens/MigrationSplitPlan'),
 );
 const MigrationSplitting = React.lazy(
-  () => import('../../components/MigrationSplitting'),
+  () => import('@screens/MigrationSplitting'),
 );
-const MigrationCadence = React.lazy(
-  () => import('../../components/MigrationCadence'),
-);
+const MigrationCadence = React.lazy(() => import('@screens/MigrationCadence'));
 const MigrationSchedule = React.lazy(
-  () => import('../../components/MigrationSchedule'),
+  () => import('@screens/MigrationSchedule'),
 );
-const MigrationStatus = React.lazy(
-  () => import('../../components/MigrationStatus'),
-);
+const MigrationStatus = React.lazy(() => import('@screens/MigrationStatus'));
 const MigrationBatchSending = React.lazy(
-  () => import('../../components/MigrationBatchSending'),
+  () => import('@screens/MigrationBatchSending'),
 );
-const Insight = React.lazy(() => import('../../components/Insight'));
-const ShowUfvk = React.lazy(() => import('../../components/Ufvk/ShowUfvk'));
-const ComputingTxContent = React.lazy(
-  () => import('./components/ComputingTxContent'),
-);
+const Insight = React.lazy(() => import('@screens/Insight'));
+const ShowUfvk = React.lazy(() => import('@screens/Ufvk/ShowUfvk'));
+const ComputingTxContent = React.lazy(() => import('@screens/Computing'));
 
-const en = require('../translations/en.json');
-const es = require('../translations/es.json');
-const pt = require('../translations/pt.json');
-const ru = require('../translations/ru.json');
-const tr = require('../translations/tr.json');
+const en = require('@app/translations/en.json');
+const es = require('@app/translations/es.json');
+const pt = require('@app/translations/pt.json');
+const ru = require('@app/translations/ru.json');
+const tr = require('@app/translations/tr.json');
 
 const Tab = createBottomTabNavigator<AppDrawerParamList>();
 

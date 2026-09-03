@@ -1,7 +1,7 @@
-jest.mock('../app/RPCModule', () => ({ __esModule: true, default: {} }));
+jest.mock('@app/RPCModule', () => ({ __esModule: true, default: {} }));
 
-import Utils from '../app/utils';
-import type { TranslateType } from '../app/AppState';
+import Utils from '@app/utils';
+import type { TranslateType } from '@app/AppState';
 
 const translate = (k: string): TranslateType => k;
 

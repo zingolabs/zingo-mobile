@@ -1,4 +1,4 @@
-import { RPCSyncStatusType } from '../types/RPCSyncStatusType';
+import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
 
 // True while a scan is running and short of the chain tip. A note only becomes spendable once the scan
 // reaches the tip, so spend-dependent work gates on this. An absent or empty

@@ -3,17 +3,17 @@
  * effects, asking the single gate controller of ADR 0007 and acting on
  * its three-way answer.
  */
-jest.mock('../app/gateController', () => ({
+jest.mock('@app/services/gateController', () => ({
   __esModule: true,
-  ...jest.requireActual('../app/gateController'),
+  ...jest.requireActual('@app/services/gateController'),
   askGate: jest.fn(),
 }));
 
 import { renderHook, waitFor } from '@testing-library/react-native';
-import { askGate } from '../app/gateController';
-import type { GateAnswer } from '../app/gateController';
-import { useBiometricGate } from '../app/hooks/useBiometricGate';
-import type { TranslateType } from '../app/AppState';
+import { askGate } from '@app/services/gateController';
+import type { GateAnswer } from '@app/services/gateController';
+import { useBiometricGate } from '@app/hooks/useBiometricGate';
+import type { TranslateType } from '@app/AppState';
 
 const gate = askGate as jest.MockedFunction<typeof askGate>;
 const translate = (k: string): TranslateType => k;

@@ -12,7 +12,7 @@ Zingo ships as two parallel apps from this single repo:
 | **Production** | `org.ZingoLabs.Zingo` | `org.ZingoLabs.Zingo` | "Zingo" | App Store / Play Production |
 | **Beta** | `org.ZingoLabs.Zingo.Beta` | `org.ZingoLabs.Zingo.Beta` | "Zingo Beta" | TestFlight External / Play Open Testing |
 
-Both apps share the same JS bundle (`app/`, `components/`, `app/translations/`),
+Both apps share the same JS bundle (`app/`, `screens/`, `ui/`),
 the same Rust libs (`libuniffi_zingo.so`, `Zingolib.xcframework`), the same
 keystores and certificates. They differ only in bundle ID, display name, and
 app icon (Beta has a red `BETA` band). The channel is detected at runtime from

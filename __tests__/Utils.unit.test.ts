@@ -2,7 +2,7 @@
  * @format
  */
 
-jest.mock('../app/RPCModule', () => ({
+jest.mock('@app/RPCModule', () => ({
   default: {
     parseAddressInfo: jest.fn(),
     getDonationAddress: jest.fn(),
@@ -10,13 +10,13 @@ jest.mock('../app/RPCModule', () => ({
   },
 }));
 
-import Utils from '../app/utils/Utils';
+import Utils from '@app/utils/Utils';
 import {
   BlockExplorerEnum,
   ChainNameEnum,
   GlobalConst,
   LanguageEnum,
-} from '../app/AppState';
+} from '@app/AppState';
 
 // react-native-localize mock returns decimalSeparator: '.'
 

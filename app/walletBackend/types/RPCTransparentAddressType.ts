@@ -1,4 +1,4 @@
-import { RPCAddressScopeEnum } from '../enums/RPCAddressScopeEnum';
+import { RPCAddressScopeEnum } from '@app/walletBackend/enums/RPCAddressScopeEnum';
 
 export type RPCTransparentAddressType = {
   account: number;

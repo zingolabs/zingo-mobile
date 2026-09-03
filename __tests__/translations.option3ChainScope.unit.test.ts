@@ -1,8 +1,8 @@
-import en from '../app/translations/en.json';
-import es from '../app/translations/es.json';
-import pt from '../app/translations/pt.json';
-import ru from '../app/translations/ru.json';
-import tr from '../app/translations/tr.json';
+import en from '@app/translations/en.json';
+import es from '@app/translations/es.json';
+import pt from '@app/translations/pt.json';
+import ru from '@app/translations/ru.json';
+import tr from '@app/translations/tr.json';
 
 // The split-and-migrate teaser promises privacy. ZIP-318 batching hides
 // on-chain linkage, not the sender's network address, so every catalog must

@@ -8,9 +8,9 @@ import { render } from '@testing-library/react-native';
 import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
-} from '../app/context';
+} from '@app/context';
 
-import NewAddressTag from '../components/Receive/components/NewAddressTag';
+import NewAddressTag from '@ui/widgets/NewAddressTag';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 
 describe('NewAddressTag - snapshot', () => {

@@ -1,7 +1,7 @@
 /**
  * The staleness cue and the display-only ring's accessibility.
  */
-jest.mock('../app/walletBackend', () => ({
+jest.mock('@app/walletBackend', () => ({
   __esModule: true,
   getZecPrice: jest.fn().mockResolvedValue({ price: -1, error: 'refused' }),
 }));
@@ -10,19 +10,17 @@ import 'react-native';
 import React from 'react';
 import { ReactTestRendererJSON } from 'react-test-renderer';
 import { render, waitFor } from '@testing-library/react-native';
-import PriceFetcher, {
-  PriceTrafficDriver,
-} from '../components/Components/PriceFetcher';
-import QuoteRefreshRing from '../components/Components/QuoteRefreshRing';
+import PriceFetcher, { PriceTrafficDriver } from '@ui/widgets/PriceFetcher';
+import QuoteRefreshRing from '@ui/primitives/QuoteRefreshRing';
 import {
   PRICE_REFRESH_MAX_MS,
   priceFetcherStore,
-} from '../components/Components/priceFetcherStore';
+} from '@ui/widgets/priceFetcherStore';
 import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
-} from '../app/context';
-import { SelectServerEnum } from '../app/AppState';
+} from '@app/context';
+import { SelectServerEnum } from '@app/AppState';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 
 beforeEach(() => {

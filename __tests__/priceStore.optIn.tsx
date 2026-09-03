@@ -1,7 +1,7 @@
 /**
  * The Nym opt-in that starts price traffic.
  */
-jest.mock('../app/walletBackend', () => ({
+jest.mock('@app/walletBackend', () => ({
   __esModule: true,
   getZecPrice: jest.fn(),
 }));
@@ -10,25 +10,23 @@ import 'react-native';
 import type { AppStateStatus } from 'react-native';
 import React from 'react';
 import { render } from '@testing-library/react-native';
-import PriceFetcher, {
-  PriceTrafficDriver,
-} from '../components/Components/PriceFetcher';
+import PriceFetcher, { PriceTrafficDriver } from '@ui/widgets/PriceFetcher';
 import {
   PRICE_REFRESH_MAX_MS,
   priceFetcherStore,
-} from '../components/Components/priceFetcherStore';
+} from '@ui/widgets/priceFetcherStore';
 import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
-} from '../app/context';
-import { CurrencyEnum, SelectServerEnum } from '../app/AppState';
-import { getZecPrice } from '../app/walletBackend';
+} from '@app/context';
+import { CurrencyEnum, SelectServerEnum } from '@app/AppState';
+import { getZecPrice } from '@app/walletBackend';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import {
   MIXNET_STATUS_KEYS,
   MixnetStatusKey,
   MixnetView,
-} from '../app/walletBackend/transforms/mixnetView';
+} from '@app/walletBackend/transforms/mixnetView';
 
 const price = getZecPrice as jest.MockedFunction<typeof getZecPrice>;
 
@@ -195,11 +193,16 @@ test('the opt-in resolves a fetch for every mixnet status', async () => {
       const setZecPrice = jest.fn();
 
       const view = render(
-        surfaceUi(makeCtx({ nym, mixnetView: viewFor(statusKey) }), setZecPrice),
+        surfaceUi(
+          makeCtx({ nym, mixnetView: viewFor(statusKey) }),
+          setZecPrice,
+        ),
       );
       await jest.advanceTimersByTimeAsync(0);
 
-      expect(price.mock.calls.length > 0).toBe(FETCH_EXPECTED[`${nym}|${statusKey}`]);
+      expect(price.mock.calls.length > 0).toBe(
+        FETCH_EXPECTED[`${nym}|${statusKey}`],
+      );
       view.unmount();
       jest.useRealTimers();
     }

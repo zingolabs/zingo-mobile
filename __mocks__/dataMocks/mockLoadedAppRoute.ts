@@ -1,10 +1,6 @@
 import { RouteProp } from '@react-navigation/native';
-import { AppStackParamList } from '../../app/types';
-import {
-  ChainNameEnum,
-  LaunchingModeEnum,
-  RouteEnum,
-} from '../../app/AppState';
+import { AppStackParamList } from '@app/types';
+import { ChainNameEnum, LaunchingModeEnum, RouteEnum } from '@app/AppState';
 
 export const mockLoadedAppRoute: RouteProp<
   AppStackParamList,

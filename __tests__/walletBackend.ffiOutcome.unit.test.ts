@@ -10,7 +10,7 @@
  */
 // Every member of the mocked bridge is a lazily created jest.fn, so a future
 // import-time touch of some other RPCModule member cannot break this suite.
-jest.mock('../app/RPCModule', () => {
+jest.mock('@app/RPCModule', () => {
   const members: Record<PropertyKey, jest.Mock> = {};
   return {
     __esModule: true,
@@ -20,16 +20,16 @@ jest.mock('../app/RPCModule', () => {
   };
 });
 
-import RPCModule from '../app/RPCModule';
-import { FfiResult } from '../app/walletBackend/ffi';
+import RPCModule from '@app/RPCModule';
+import { FfiResult } from '@app/walletBackend/ffi';
 import {
   createNewWallet,
   loadExistingWallet,
   restoreWalletFromSeed,
   restoreWalletFromUfvk,
-} from '../app/walletBackend/utils/walletUtils';
-import { SyncCoordinator } from '../app/walletBackend/modules/SyncCoordinator';
-import { DataService } from '../app/walletBackend/modules/DataService';
+} from '@app/walletBackend/utils/walletUtils';
+import { SyncCoordinator } from '@app/walletBackend/modules/SyncCoordinator';
+import { DataService } from '@app/walletBackend/modules/DataService';
 
 const bridge = RPCModule as unknown as Record<string, jest.Mock>;
 

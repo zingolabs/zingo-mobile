@@ -24,8 +24,11 @@ const refBundle = join(ci, 'ref');
 const worktree = join(ci, 'worktree');
 const report = join(ci, 'index.html');
 
-const run = (cmd: string, args: string[], opts: Parameters<typeof spawnSync>[2] = {}) =>
-  spawnSync(cmd, args, { stdio: 'inherit', cwd: repo, ...opts });
+const run = (
+  cmd: string,
+  args: string[],
+  opts: Parameters<typeof spawnSync>[2] = {},
+) => spawnSync(cmd, args, { stdio: 'inherit', cwd: repo, ...opts });
 
 const tolerant = (cmd: string): void => {
   try {
@@ -36,7 +39,10 @@ const tolerant = (cmd: string): void => {
 };
 
 const snapshot = (out: string, cwd: string) =>
-  run('yarn', ['visual:snapshot'], { cwd, env: { ...process.env, VISUAL_OUT: out } });
+  run('yarn', ['visual:snapshot'], {
+    cwd,
+    env: { ...process.env, VISUAL_OUT: out },
+  });
 
 console.log('› capturing working tree');
 rmSync(headBundle, { recursive: true, force: true });
@@ -49,7 +55,10 @@ console.log(`› capturing ${ref}`);
 rmSync(refBundle, { recursive: true, force: true });
 tolerant(`git worktree remove --force ${worktree}`);
 try {
-  execSync(`git worktree add --detach --force ${worktree} ${ref}`, { cwd: repo, stdio: 'inherit' });
+  execSync(`git worktree add --detach --force ${worktree} ${ref}`, {
+    cwd: repo,
+    stdio: 'inherit',
+  });
   if (!existsSync(join(worktree, 'node_modules'))) {
     symlinkSync(join(repo, 'node_modules'), join(worktree, 'node_modules'));
   }
@@ -69,5 +78,7 @@ const diff = run('tsx', ['visual/diff.mts'], {
     VISUAL_REPORT: report,
   },
 });
-console.log(`\nreport: ${report}  (open ${join('visual', '.ci', 'index.html')})`);
+console.log(
+  `\nreport: ${report}  (open ${join('visual', '.ci', 'index.html')})`,
+);
 process.exit(diff.status ?? 0);

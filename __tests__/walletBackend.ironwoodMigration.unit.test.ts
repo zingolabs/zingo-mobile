@@ -11,12 +11,12 @@
  */
 // Every member of the mocked bridge is a lazily created jest.fn, so a future
 // import-time touch of some other RPCModule member cannot break this suite.
-jest.mock('../app/RPCModule', () =>
+jest.mock('@app/RPCModule', () =>
   require('../__mocks__/rpcModuleProxy').rpcModuleProxyMock(),
 );
 
-import RPCModule from '../app/RPCModule';
-import { FfiResult } from '../app/walletBackend/ffi';
+import RPCModule from '@app/RPCModule';
+import { FfiResult } from '@app/walletBackend/ffi';
 import {
   cancelIronwoodMigration,
   continueNoteSplitting,
@@ -29,7 +29,7 @@ import {
   rescheduleParts,
   splitStatus,
   startIronwoodMigration,
-} from '../app/walletBackend/utils/walletUtils';
+} from '@app/walletBackend/utils/walletUtils';
 
 const bridge = RPCModule as unknown as Record<string, jest.Mock>;
 
