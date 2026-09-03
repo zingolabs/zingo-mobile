@@ -12,7 +12,10 @@ const meta: Meta<typeof ZecAmount> = {
     privacy: false,
   },
   argTypes: {
-    currencyName: { control: 'select', options: Object.values(CurrencyNameEnum) },
+    currencyName: {
+      control: 'select',
+      options: Object.values(CurrencyNameEnum),
+    },
   },
 };
 

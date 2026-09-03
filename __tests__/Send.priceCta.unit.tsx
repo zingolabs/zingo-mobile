@@ -68,9 +68,7 @@ import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 const storeHook = usePriceFetcherStore as jest.MockedFunction<
   typeof usePriceFetcherStore
 >;
-const healthHook = usePriceHealth as jest.MockedFunction<
-  typeof usePriceHealth
->;
+const healthHook = usePriceHealth as jest.MockedFunction<typeof usePriceHealth>;
 
 function makeDrawerProps(): NativeStackScreenProps<
   AppDrawerParamList,
@@ -128,8 +126,7 @@ beforeEach(() => {
   healthHook.mockImplementation(priceDate =>
     priceDate === 0
       ? 'absent'
-      : priceDate !== undefined &&
-          Date.now() - priceDate > 10 * 60_000 + 30_000
+      : priceDate !== undefined && Date.now() - priceDate > 10 * 60_000 + 30_000
         ? 'stale'
         : 'live',
   );

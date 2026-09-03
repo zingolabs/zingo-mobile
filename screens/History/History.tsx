@@ -654,48 +654,45 @@ const History: React.FunctionComponent<HistoryProps> = ({
           justifyContent: 'space-between',
         }}
       >
-          <View style={{ width: 48 }} />
-          <BoldText
-            numberOfLines={1}
-            style={{
-              flex: 1,
-              fontSize: 16,
-              lineHeight: 28,
-              textAlign: 'center',
-            }}
-          >
-            {translate('history.title') as string}
-          </BoldText>
-          <Pressable
-            onPress={() => {
-              setShowFilters(true);
-              bottomSheetRef.current?.present();
-            }}
-            hitSlop={8}
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              paddingHorizontal: 14,
-              paddingVertical: 4,
-            }}
-          >
-            <FiltersIcon color={colors.fgMuted} size={20} />
-            {(!!filterKind ||
-              filterFailed ||
-              filterMemos ||
-              filterWithFunds) && (
-              <View
-                style={{
-                  backgroundColor: colors.fgDefault,
-                  width: 7,
-                  height: 7,
-                  borderRadius: 7,
-                  marginLeft: -3,
-                  marginTop: -8,
-                }}
-              />
-            )}
-          </Pressable>
+        <View style={{ width: 48 }} />
+        <BoldText
+          numberOfLines={1}
+          style={{
+            flex: 1,
+            fontSize: 16,
+            lineHeight: 28,
+            textAlign: 'center',
+          }}
+        >
+          {translate('history.title') as string}
+        </BoldText>
+        <Pressable
+          onPress={() => {
+            setShowFilters(true);
+            bottomSheetRef.current?.present();
+          }}
+          hitSlop={8}
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            paddingHorizontal: 14,
+            paddingVertical: 4,
+          }}
+        >
+          <FiltersIcon color={colors.fgMuted} size={20} />
+          {(!!filterKind || filterFailed || filterMemos || filterWithFunds) && (
+            <View
+              style={{
+                backgroundColor: colors.fgDefault,
+                width: 7,
+                height: 7,
+                borderRadius: 7,
+                marginLeft: -3,
+                marginTop: -8,
+              }}
+            />
+          )}
+        </Pressable>
       </View>
     </View>
   );

@@ -31,10 +31,38 @@ test('F10: every derivable view stays inside the closed key set', () => {
       { kind: 'failure', failure: { reason: 'unconsentedOff' } },
       null,
     ),
-    deriveMixnetView({ kind: 'status', indicator: RPCMixnetIndicatorEnum.off, socks5Addr: null }, null),
-    deriveMixnetView({ kind: 'status', indicator: RPCMixnetIndicatorEnum.bootstrapping, socks5Addr: null }, null),
-    deriveMixnetView({ kind: 'status', indicator: RPCMixnetIndicatorEnum.ready, socks5Addr: '127.0.0.1:1' }, null),
-    deriveMixnetView({ kind: 'status', indicator: RPCMixnetIndicatorEnum.died, socks5Addr: null }, null),
+    deriveMixnetView(
+      {
+        kind: 'status',
+        indicator: RPCMixnetIndicatorEnum.off,
+        socks5Addr: null,
+      },
+      null,
+    ),
+    deriveMixnetView(
+      {
+        kind: 'status',
+        indicator: RPCMixnetIndicatorEnum.bootstrapping,
+        socks5Addr: null,
+      },
+      null,
+    ),
+    deriveMixnetView(
+      {
+        kind: 'status',
+        indicator: RPCMixnetIndicatorEnum.ready,
+        socks5Addr: '127.0.0.1:1',
+      },
+      null,
+    ),
+    deriveMixnetView(
+      {
+        kind: 'status',
+        indicator: RPCMixnetIndicatorEnum.died,
+        socks5Addr: null,
+      },
+      null,
+    ),
   ];
   derived.forEach(view => expect(keys.has(view.statusKey)).toBe(true));
 });

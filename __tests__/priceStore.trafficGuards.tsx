@@ -10,9 +10,7 @@ import 'react-native';
 import type { AppStateStatus } from 'react-native';
 import React from 'react';
 import { render, waitFor } from '@testing-library/react-native';
-import PriceFetcher, {
-  PriceTrafficDriver,
-} from '@ui/widgets/PriceFetcher';
+import PriceFetcher, { PriceTrafficDriver } from '@ui/widgets/PriceFetcher';
 import { priceFetcherStore } from '@ui/widgets/priceFetcherStore';
 import {
   ContextAppLoadedProvider,
@@ -223,10 +221,7 @@ test('a failed disable still fetches the price over clearnet', async () => {
   const setZecPrice = jest.fn();
 
   render(
-    surfaceUi(
-      makeCtx({ nym: false, mixnetView: UNKNOWN_VIEW }),
-      setZecPrice,
-    ),
+    surfaceUi(makeCtx({ nym: false, mixnetView: UNKNOWN_VIEW }), setZecPrice),
   );
   await waitFor(() =>
     expect(setZecPrice).toHaveBeenCalledWith(42, expect.any(Number)),

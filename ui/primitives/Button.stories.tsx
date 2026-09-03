@@ -24,6 +24,10 @@ type Story = StoryObj<typeof Button>;
 
 export const Primary: Story = {};
 export const Secondary: Story = { args: { type: ButtonTypeEnum.Secondary } };
-export const Ghost: Story = { args: { type: ButtonTypeEnum.Ghost, title: 'Cancel' } };
-export const Nym: Story = { args: { type: ButtonTypeEnum.Nym, title: 'Send via Nym' } };
+export const Ghost: Story = {
+  args: { type: ButtonTypeEnum.Ghost, title: 'Cancel' },
+};
+export const Nym: Story = {
+  args: { type: ButtonTypeEnum.Nym, title: 'Send via Nym' },
+};
 export const Disabled: Story = { args: { disabled: true } };

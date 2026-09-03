@@ -20,13 +20,10 @@ export const MIXNET_STATUS_KEYS: readonly MixnetStatusKey[] = [
 ];
 
 /** What the transport will do with a price fetch. */
-export type FetchPolicy =
-  'refusing' | 'possibleBootstrap' | 'serving';
+export type FetchPolicy = 'refusing' | 'possibleBootstrap' | 'serving';
 
 /** Classifies a status key exhaustively. */
-export function fetchPolicy(
-  key: MixnetStatusKey,
-): FetchPolicy {
+export function fetchPolicy(key: MixnetStatusKey): FetchPolicy {
   switch (key) {
     case 'mixnet.status.died':
       return 'refusing';

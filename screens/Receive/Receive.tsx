@@ -517,57 +517,57 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
         }}
       >
         {sheetType === 'NA' && (
-            <NewAddress
-              addressKind={index === 0 ? AddressKindEnum.u : AddressKindEnum.t}
-              closeSheet={hide}
-              setAddressBook={setAddressBook}
-              screenName={screenName}
-            />
-          )}
-          {sheetType === 'NAT' && (
-            <NewAddressTag
-              address={
-                index === 0 && uAddrIndex !== null
-                  ? uAddr[uAddrIndex].address
-                  : index === 1 && tAddrIndex !== null
-                    ? tAddr[tAddrIndex].address
-                    : ''
-              }
-              own={true}
-              closeSheet={hide}
-              setAddressBook={setAddressBook}
-            />
-          )}
-          {sheetType === 'VA' && (
-            <VerifyAddress
-              closeSheet={hide}
-              screenName={screenName}
-              navigation={navigation}
-            />
-          )}
-          {sheetType === 'TW' && (
-            <TransparentWarning
-              closeSheet={hide}
-              onSuccess={() => {
-                setIndex(1);
-              }}
-            />
-          )}
-          {sheetType === 'EA' && (
-            <ExpandedAddress
-              onCopy={doCopy}
-              closeSheet={hide}
-              title={translate('receive.title-address') as string}
-              button={translate('receive.copy-address-button') as string}
-              address={
-                index === 0 && uAddrIndex !== null
-                  ? uAddr[uAddrIndex].address
-                  : index === 1 && tAddrIndex !== null
-                    ? tAddr[tAddrIndex].address
-                    : ''
-              }
-            />
-          )}
+          <NewAddress
+            addressKind={index === 0 ? AddressKindEnum.u : AddressKindEnum.t}
+            closeSheet={hide}
+            setAddressBook={setAddressBook}
+            screenName={screenName}
+          />
+        )}
+        {sheetType === 'NAT' && (
+          <NewAddressTag
+            address={
+              index === 0 && uAddrIndex !== null
+                ? uAddr[uAddrIndex].address
+                : index === 1 && tAddrIndex !== null
+                  ? tAddr[tAddrIndex].address
+                  : ''
+            }
+            own={true}
+            closeSheet={hide}
+            setAddressBook={setAddressBook}
+          />
+        )}
+        {sheetType === 'VA' && (
+          <VerifyAddress
+            closeSheet={hide}
+            screenName={screenName}
+            navigation={navigation}
+          />
+        )}
+        {sheetType === 'TW' && (
+          <TransparentWarning
+            closeSheet={hide}
+            onSuccess={() => {
+              setIndex(1);
+            }}
+          />
+        )}
+        {sheetType === 'EA' && (
+          <ExpandedAddress
+            onCopy={doCopy}
+            closeSheet={hide}
+            title={translate('receive.title-address') as string}
+            button={translate('receive.copy-address-button') as string}
+            address={
+              index === 0 && uAddrIndex !== null
+                ? uAddr[uAddrIndex].address
+                : index === 1 && tAddrIndex !== null
+                  ? tAddr[tAddrIndex].address
+                  : ''
+            }
+          />
+        )}
       </AppSheetModal>
       <SelectBottomSheet
         ref={scopeSelectRef}

@@ -11,10 +11,13 @@ type SheetRimProps = {
 };
 
 // Measure the sheet width with onLayout so the rim stays aligned when the sheet is narrower than the window.
-const SheetRim: React.FunctionComponent<SheetRimProps> = ({ radius = radiusSheet }) => {
+const SheetRim: React.FunctionComponent<SheetRimProps> = ({
+  radius = radiusSheet,
+}) => {
   const { colors } = useTheme();
   const [width, setWidth] = useState(0);
-  const onLayout = (e: LayoutChangeEvent) => setWidth(e.nativeEvent.layout.width);
+  const onLayout = (e: LayoutChangeEvent) =>
+    setWidth(e.nativeEvent.layout.width);
 
   const inner = radius - RIM_INSET;
   const corner = radius / width;

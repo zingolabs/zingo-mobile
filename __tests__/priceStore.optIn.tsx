@@ -10,9 +10,7 @@ import 'react-native';
 import type { AppStateStatus } from 'react-native';
 import React from 'react';
 import { render } from '@testing-library/react-native';
-import PriceFetcher, {
-  PriceTrafficDriver,
-} from '@ui/widgets/PriceFetcher';
+import PriceFetcher, { PriceTrafficDriver } from '@ui/widgets/PriceFetcher';
 import {
   PRICE_REFRESH_MAX_MS,
   priceFetcherStore,
@@ -195,11 +193,16 @@ test('the opt-in resolves a fetch for every mixnet status', async () => {
       const setZecPrice = jest.fn();
 
       const view = render(
-        surfaceUi(makeCtx({ nym, mixnetView: viewFor(statusKey) }), setZecPrice),
+        surfaceUi(
+          makeCtx({ nym, mixnetView: viewFor(statusKey) }),
+          setZecPrice,
+        ),
       );
       await jest.advanceTimersByTimeAsync(0);
 
-      expect(price.mock.calls.length > 0).toBe(FETCH_EXPECTED[`${nym}|${statusKey}`]);
+      expect(price.mock.calls.length > 0).toBe(
+        FETCH_EXPECTED[`${nym}|${statusKey}`],
+      );
       view.unmount();
       jest.useRealTimers();
     }

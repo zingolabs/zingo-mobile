@@ -1,5 +1,11 @@
 import { execFileSync, spawnSync } from 'node:child_process';
-import { cpSync, existsSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import {
+  cpSync,
+  existsSync,
+  mkdtempSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -57,7 +63,9 @@ if (tip !== headSha) {
   );
 }
 
-type Runs = { workflow_runs: { id: number; head_sha: string; status: string }[] };
+type Runs = {
+  workflow_runs: { id: number; head_sha: string; status: string }[];
+};
 const runs = ghJson<Runs>(
   `repos/${repo}/actions/workflows/visual-review.yaml/runs?head_sha=${headSha}&per_page=20`,
 );
@@ -101,7 +109,13 @@ if (staged === 0) {
 }
 
 const coauthor = `Co-authored-by: ${authorLogin} <${authorId}+${authorLogin}@users.noreply.github.com>`;
-git(['commit', '-m', `test(visual): accept baseline (PR #${prNumber})`, '-m', coauthor]);
+git([
+  'commit',
+  '-m',
+  `test(visual): accept baseline (PR #${prNumber})`,
+  '-m',
+  coauthor,
+]);
 git(['push', 'origin', `HEAD:${headRef}`]);
 const newSha = git(['rev-parse', 'HEAD']);
 

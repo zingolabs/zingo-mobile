@@ -1,11 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
 import WalletRecoveryModal from './WalletRecoveryModal';
-import { mockTranslate, withBottomSheet } from '../../../.storybook/storyDecorators';
+import {
+  mockTranslate,
+  withBottomSheet,
+} from '../../../.storybook/storyDecorators';
 
-const DIAGNOSIS = [
-  'wallet.dat: encrypted twice',
-  'wallet.backup.dat: ok',
-].join('\n');
+const DIAGNOSIS = ['wallet.dat: encrypted twice', 'wallet.backup.dat: ok'].join(
+  '\n',
+);
 
 const shared = {
   title: mockTranslate('loadingapp.readingwallet-label') as string,

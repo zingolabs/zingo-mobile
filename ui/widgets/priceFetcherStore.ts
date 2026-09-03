@@ -141,10 +141,7 @@ function clearAuto(): void {
 // by the route rule, so attempting is pure waste; the classification is
 // fetchPolicy's exhaustive switch, which a new indicator breaks.
 function transportRefuses(): boolean {
-  return (
-    deps !== undefined &&
-    fetchPolicy(deps.mixnetStatusKey) === 'refusing'
-  );
+  return deps !== undefined && fetchPolicy(deps.mixnetStatusKey) === 'refusing';
 }
 
 // The one gate every path consults: the consent, the market, an attached

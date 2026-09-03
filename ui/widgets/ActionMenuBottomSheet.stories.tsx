@@ -8,7 +8,9 @@ const meta: Meta<typeof ActionMenuBottomSheet> = {
   tags: ['static'],
   decorators: [withBottomSheet],
   render: args => (
-    <SheetHost>{ref => <ActionMenuBottomSheet ref={ref} {...args} />}</SheetHost>
+    <SheetHost>
+      {ref => <ActionMenuBottomSheet ref={ref} {...args} />}
+    </SheetHost>
   ),
   args: {
     title: 'Address actions',

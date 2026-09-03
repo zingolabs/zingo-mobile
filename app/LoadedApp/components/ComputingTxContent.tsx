@@ -215,116 +215,116 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
           justifyContent: 'center',
         }}
       >
-          {/* Both terminal states render the icon inside a colored ring;
+        {/* Both terminal states render the icon inside a colored ring;
               the computing state uses the same 120x120 bounding box so
               `justifyContent: 'center'` lands every variant at the same Y. */}
+        <View
+          style={{
+            width: 100,
+            height: 100,
+            borderRadius: 50,
+            borderWidth: isTerminal ? 3 : 0,
+            borderColor: isCreated
+              ? RING_GREEN
+              : isFailed
+                ? RING_RED
+                : 'transparent',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          {isCreated ? (
+            <TransactionCreatedIcon width={30} height={30} />
+          ) : isFailed ? (
+            <TransactionFailedIcon width={30} height={30} />
+          ) : (
+            // size="large" renders at ~36px; scale ≈ 2.8 brings the
+            // visible footprint up to ~100px to match the terminal ring.
+            <ActivityIndicator
+              size="large"
+              color={colors.fgAccent}
+              style={{ transform: [{ scale: 2.8 }] }}
+            />
+          )}
+        </View>
+        <BoldText
+          style={{
+            fontSize: 20,
+            marginTop: 48,
+            textAlign: 'center',
+          }}
+        >
+          {
+            translate(
+              isCreated
+                ? 'loadedapp.transactioncreated-title'
+                : isFailed
+                  ? 'loadedapp.transactionfailed-title'
+                  : 'send.sending-title',
+            ) as string
+          }
+        </BoldText>
+        <RegText
+          style={{
+            marginTop: 12,
+            textAlign: 'center',
+            color: colors.fgMuted,
+          }}
+        >
+          {
+            translate(
+              isCreated
+                ? 'loadedapp.transactioncreated-body'
+                : isFailed
+                  ? 'loadedapp.transactionfailed-body'
+                  : timerPhase === 0
+                    ? 'loadedapp.computingtx'
+                    : 'loadedapp.computingtx-hangon',
+            ) as string
+          }
+        </RegText>
+        {!isTerminal && (
           <View
             style={{
-              width: 100,
-              height: 100,
-              borderRadius: 50,
-              borderWidth: isTerminal ? 3 : 0,
-              borderColor: isCreated
-                ? RING_GREEN
-                : isFailed
-                  ? RING_RED
-                  : 'transparent',
-              alignItems: 'center',
-              justifyContent: 'center',
+              flexDirection: 'row',
+              marginTop: 24,
+              gap: 12,
             }}
           >
-            {isCreated ? (
-              <TransactionCreatedIcon width={30} height={30} />
-            ) : isFailed ? (
-              <TransactionFailedIcon width={30} height={30} />
-            ) : (
-              // size="large" renders at ~36px; scale ≈ 2.8 brings the
-              // visible footprint up to ~100px to match the terminal ring.
-              <ActivityIndicator
-                size="large"
-                color={colors.fgAccent}
-                style={{ transform: [{ scale: 2.8 }] }}
-              />
+            <TypingDot delay={0} color={colors.bgMuted} />
+            <TypingDot delay={DOT_OFFSET_MS} color={colors.bgMuted} />
+            <TypingDot delay={DOT_OFFSET_MS * 2} color={colors.bgMuted} />
+          </View>
+        )}
+        {isFailed && !!errorMessage && (
+          <View style={{ marginTop: 16, alignItems: 'center' }}>
+            <TouchableOpacity
+              onPress={() => setShowErrorDetails(v => !v)}
+              hitSlop={8}
+            >
+              <RegText
+                style={{
+                  color: RING_RED,
+                  textDecorationLine: 'underline',
+                }}
+              >
+                {translate('loadedapp.transactionfailed-details') as string}
+              </RegText>
+            </TouchableOpacity>
+            {showErrorDetails && (
+              <RegText
+                style={{
+                  marginTop: 10,
+                  textAlign: 'center',
+                  color: colors.fgMuted,
+                  fontSize: 12,
+                }}
+              >
+                {errorMessage}
+              </RegText>
             )}
           </View>
-          <BoldText
-            style={{
-              fontSize: 20,
-              marginTop: 48,
-              textAlign: 'center',
-            }}
-          >
-            {
-              translate(
-                isCreated
-                  ? 'loadedapp.transactioncreated-title'
-                  : isFailed
-                    ? 'loadedapp.transactionfailed-title'
-                    : 'send.sending-title',
-              ) as string
-            }
-          </BoldText>
-          <RegText
-            style={{
-              marginTop: 12,
-              textAlign: 'center',
-              color: colors.fgMuted,
-            }}
-          >
-            {
-              translate(
-                isCreated
-                  ? 'loadedapp.transactioncreated-body'
-                  : isFailed
-                    ? 'loadedapp.transactionfailed-body'
-                    : timerPhase === 0
-                      ? 'loadedapp.computingtx'
-                      : 'loadedapp.computingtx-hangon',
-              ) as string
-            }
-          </RegText>
-          {!isTerminal && (
-            <View
-              style={{
-                flexDirection: 'row',
-                marginTop: 24,
-                gap: 12,
-              }}
-            >
-              <TypingDot delay={0} color={colors.bgMuted} />
-              <TypingDot delay={DOT_OFFSET_MS} color={colors.bgMuted} />
-              <TypingDot delay={DOT_OFFSET_MS * 2} color={colors.bgMuted} />
-            </View>
-          )}
-          {isFailed && !!errorMessage && (
-            <View style={{ marginTop: 16, alignItems: 'center' }}>
-              <TouchableOpacity
-                onPress={() => setShowErrorDetails(v => !v)}
-                hitSlop={8}
-              >
-                <RegText
-                  style={{
-                    color: RING_RED,
-                    textDecorationLine: 'underline',
-                  }}
-                >
-                  {translate('loadedapp.transactionfailed-details') as string}
-                </RegText>
-              </TouchableOpacity>
-              {showErrorDetails && (
-                <RegText
-                  style={{
-                    marginTop: 10,
-                    textAlign: 'center',
-                    color: colors.fgMuted,
-                    fontSize: 12,
-                  }}
-                >
-                  {errorMessage}
-                </RegText>
-              )}
-            </View>
-          )}
+        )}
       </AppSheet>
     </View>
   );

@@ -388,11 +388,7 @@ const ValueTransferDetail: React.FunctionComponent<
           addLastSnackbar={addLastSnackbar}
         />
       </View>
-      <AppSheet
-        ref={vtdSheetRef}
-        snapPoints={vtdSnapPoints}
-        header={vtdHeader}
-      >
+      <AppSheet ref={vtdSheetRef} snapPoints={vtdSnapPoints} header={vtdHeader}>
         {showNavigator && (
           <View
             style={{

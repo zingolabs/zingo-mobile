@@ -61,7 +61,11 @@ const About: React.FunctionComponent<AboutProps> = ({ navigation }) => {
         hitSlop={8}
         style={{ paddingHorizontal: 4, paddingVertical: 4 }}
       >
-        <FontAwesomeIcon icon={faChevronLeft} size={20} color={colors.fgAccent} />
+        <FontAwesomeIcon
+          icon={faChevronLeft}
+          size={20}
+          color={colors.fgAccent}
+        />
       </TouchableOpacity>
       <BoldText
         numberOfLines={1}
