@@ -45,6 +45,7 @@ interface RPCModuleAPI {
   // the wallet files, and the unwrap repair. Absent on iOS.
   walletFileDiagnosisInfo(): Promise<string>;
   repairDoubleWrappedWalletProcess(): Promise<string>;
+  walletFileRecoveryInfo(): Promise<string>;
   deleteExistingWallet(): Promise<string>;
   deleteExistingWalletBackup(): Promise<string>;
   // The save results are trimodal across the bridges: Android resolves a

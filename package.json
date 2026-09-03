@@ -8,6 +8,7 @@
     "ios": "react-native run-ios",
     "start": "react-native start",
     "storybook:generate": "tsx .storybook/generate.mts",
+    "bench:wallet-memory": "tsx scripts/bench_wallet_memory.mts",
     "storybook:web": "storybook dev -p 6006 -c .storybook-web",
     "build-storybook": "storybook build -c .storybook-web",
     "storybook:start": "STORYBOOK_ENABLED=true react-native start",

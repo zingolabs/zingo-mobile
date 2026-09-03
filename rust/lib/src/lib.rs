@@ -13,19 +13,20 @@ use log::Level;
 
 use std::any::Any;
 use std::backtrace::Backtrace;
+use std::fs::File;
+use std::io::{self, BufReader, BufWriter, Read, Write};
 use std::num::NonZeroU32;
 use std::panic::{self, PanicHookInfo, UnwindSafe};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::sync::Mutex;
 use std::sync::Once;
 use std::sync::RwLock;
 use std::time::Duration;
 
-use base64::Engine;
-use base64::engine::general_purpose::STANDARD;
 use json::object;
 use once_cell::sync::Lazy;
 use rustls::crypto::{CryptoProvider, ring::default_provider};
+use sha2::{Digest, Sha256};
 
 use zcash_address::unified::{Container, Encoding, Ufvk};
 use zcash_keys::address::Address;
@@ -55,6 +56,7 @@ use zingolib::lightclient::error::{LightClientError, SendError};
 use zingolib::lightclient::migrate::SplitStep;
 use zingolib::netutils::{GrpcIndexer, Indexer};
 use zingolib::utils::{conversion::address_from_str, conversion::txid_from_hex_encoded_str};
+use zingolib::wallet::LightWallet;
 use zingolib::wallet::WalletSettings;
 use zingolib::wallet::keys::{
     WalletAddressRef,
@@ -165,7 +167,7 @@ fn ffi_error(e: LightClientError) -> ZingolibError {
         LightClientError::MixnetNotReady(_) | LightClientError::ProbeRequiresMixnet => {
             ZingolibError::Mixnet(text)
         }
-        // A deliberate verdict (#1229): exhausting the eligible Destinations
+        // A deliberate choice (#1229): exhausting the eligible Destinations
         // is a server-topology problem, not a mixnet refusal — switching the
         // synchronization endpoint changes eligibility, so the app's
         // switch-and-retry routing can genuinely help. Mapping it to Mixnet
@@ -787,8 +789,17 @@ pub fn init_from_ufvk(
     )
 }
 
-pub fn init_from_b64(
-    base64_data: String,
+/// Opens the wallet file at `path` for a streaming read, with no path in the error.
+fn open_wallet_file(path: &Path) -> Result<BufReader<File>, ZingolibError> {
+    File::open(path)
+        .map(BufReader::new)
+        .map_err(|e| ZingolibError::Init(format!("opening the wallet file: {e}")))
+}
+
+/// Builds the global lightclient from the wallet file at `path`, streaming it
+/// through `LightClient::from_reader` once per chain attempt.
+pub fn load_wallet_file(
+    path: String,
     server_uri: String,
     chain_hint: String,
     performance_level: String,
@@ -796,19 +807,7 @@ pub fn init_from_b64(
 ) -> Result<String, ZingolibError> {
     with_panic_guard(|| {
         reset_lightclient();
-
-        let decoded_bytes = match STANDARD.decode(&base64_data) {
-            Ok(b) => b,
-            Err(e) => {
-                // The undecodable payload is wallet material; describe it by
-                // size only, never by content (audit Issues A and K).
-                return Err(ZingolibError::Init(format!(
-                    "Decoding Base64: {}, Size: {}",
-                    e,
-                    base64_data.len()
-                )));
-            }
-        };
+        let path = PathBuf::from(path);
 
         // Offline (empty server uri) has no server, so the caller-supplied
         // `chain_hint` is meaningless — and the wallet already stores its own
@@ -827,17 +826,6 @@ pub fn init_from_b64(
             vec![chain_hint]
         };
 
-        // `LightClient::from_bytes` deserializes the wallet straight from memory.
-        // The native layer (Kotlin/Swift) owns all wallet persistence and ships
-        // the bytes across the FFI; nothing here touches the filesystem. It reads
-        // (and chain-validates) the wallet BEFORE building the indexer, so a chain
-        // mismatch fails fast and cheaply — no network is ever dialed, which is
-        // what makes trying several chains offline essentially free.
-        //
-        // (This whole path replaced the previous staging-to-`std::env::temp_dir()`
-        // workaround that satisfied v5's `WalletConfig::Read` variant, which failed
-        // with `Permission denied (os error 13)` on Android where `TMPDIR` is unset
-        // and the app UID cannot write to `/tmp`.)
         let mut built: Option<(LightClient, ConnectionParams)> = None;
         let mut last_error = ZingolibError::init("could not read the wallet with any chain");
         for hint in chain_hints {
@@ -860,7 +848,14 @@ pub fn init_from_b64(
                     continue;
                 }
             };
-            match RT.block_on(LightClient::from_bytes(decoded_bytes.clone(), config)) {
+            let reader = match open_wallet_file(&path) {
+                Ok(r) => r,
+                Err(e) => {
+                    last_error = e;
+                    continue;
+                }
+            };
+            match RT.block_on(LightClient::from_reader(reader, config)) {
                 Ok(l) => {
                     built = Some((l, params));
                     break;
@@ -876,7 +871,14 @@ pub fn init_from_b64(
                             continue;
                         }
                     };
-                    match RT.block_on(LightClient::from_bytes(decoded_bytes.clone(), config)) {
+                    let reader = match open_wallet_file(&path) {
+                        Ok(r) => r,
+                        Err(e) => {
+                            last_error = e;
+                            continue;
+                        }
+                    };
+                    match RT.block_on(LightClient::from_reader(reader, config)) {
                         Ok(l) => {
                             if let Ok(mut pending) = PENDING_INDEXER_URI.write() {
                                 *pending = pending_uri;
@@ -916,25 +918,92 @@ pub fn init_from_b64(
     })
 }
 
-/// Maps a wallet-save result onto the FFI channels structurally: bytes are
-/// the wallet export, an absent buffer means no save was needed and crosses
-/// as null, and failure travels on the error channel. No shape of success
-/// can resemble failure, so no boundary ever classifies content
-/// (zingolabs/zingo-mobile#1151; audit Issue Q).
-fn map_wallet_save(
-    save_result: std::io::Result<Option<Vec<u8>>>,
-) -> Result<Option<Vec<u8>>, ZingolibError> {
-    save_result.map_err(|e| ZingolibError::Save(e.to_string()))
+/// Feeds every byte written through the inner writer into a SHA-256 digest.
+struct Digesting<W> {
+    inner: W,
+    hasher: Sha256,
 }
 
-pub fn save_wallet_bytes() -> Result<Option<Vec<u8>>, ZingolibError> {
-    // Return the wallet as raw bytes; the platforms own the file format and
-    // encode base64 at their write sites.
-    with_initialized_lightclient(|lightclient| {
+impl<W: Write> Write for Digesting<W> {
+    fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
+        let written = self.inner.write(buf)?;
+        self.hasher.update(&buf[..written]);
+        Ok(written)
+    }
+
+    fn flush(&mut self) -> io::Result<()> {
+        self.inner.flush()
+    }
+}
+
+/// Opens the temp file for a save and refuses a symlink at the final path component.
+fn create_wallet_temp(path: &Path) -> io::Result<File> {
+    let mut options = std::fs::OpenOptions::new();
+    options.write(true).create(true).truncate(true);
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::OpenOptionsExt;
+        options.custom_flags(libc::O_NOFOLLOW);
+    }
+    options.open(path)
+}
+
+/// Serializes the wallet into the file at `path`, syncs it and its directory, and returns the digest of the bytes written.
+fn write_wallet_file(
+    wallet: &mut LightWallet,
+    path: &Path,
+    chain_type: &ChainType,
+) -> io::Result<[u8; 32]> {
+    let mut writer = Digesting {
+        inner: BufWriter::new(create_wallet_temp(path)?),
+        hasher: Sha256::new(),
+    };
+    wallet.write(&mut writer, chain_type)?;
+    writer.flush()?;
+    let Digesting { inner, hasher } = writer;
+    inner.into_inner().map_err(|e| e.into_error())?.sync_all()?;
+    if let Some(parent) = path.parent().filter(|p| !p.as_os_str().is_empty()) {
+        File::open(parent)?.sync_all()?;
+    }
+    Ok(hasher.finalize().into())
+}
+
+/// Streams the file at `path` back and compares its digest with `expected`.
+fn verify_wallet_file(path: &Path, expected: &[u8; 32]) -> io::Result<()> {
+    let mut hasher = Sha256::new();
+    io::copy(&mut BufReader::new(File::open(path)?), &mut hasher)?;
+    if hasher.finalize().as_slice() == expected {
+        Ok(())
+    } else {
+        Err(io::Error::other(
+            "the read-back of the wallet temp differs from the bytes written",
+        ))
+    }
+}
+
+/// Writes the wallet to `temp_path` when a save is required, verifies the file by digest with no lock held, and returns whether a save was needed.
+pub fn save_wallet_file(temp_path: String) -> Result<bool, ZingolibError> {
+    let temp_path = PathBuf::from(temp_path);
+    let written = with_initialized_lightclient(|lightclient| {
+        let temp_path = &temp_path;
         RT.block_on(async move {
+            if !lightclient.is_save_required().await {
+                return Ok(None);
+            }
             let mut wallet = lightclient.wallet().write().await;
-            map_wallet_save(wallet.save())
+            let chain_type = wallet.chain_type();
+            write_wallet_file(&mut wallet, temp_path, &chain_type)
+                .map(Some)
+                .map_err(|e| ZingolibError::Save(e.to_string()))
         })
+    })?;
+    with_panic_guard(|| match written {
+        None => Ok(false),
+        Some(digest) => {
+            verify_wallet_file(&temp_path, &digest)
+                .map_err(|e| ZingolibError::Save(e.to_string()))?;
+            Ok(true)
+        }
     })
 }
 
@@ -973,19 +1042,26 @@ mod ffi_error_routing_tests {
     }
 }
 
-/// The save-path contract (zingolabs/zingo-mobile#1151; audit Issue Q), now
-/// structural at the boundary: bytes are the export, null means no save was
-/// needed, and failure is typed. The historical attack string — a base64
-/// wallet export beginning with "error" — is no longer representable,
-/// because no string crosses this boundary at all.
+/// The save path at the file boundary: the wallet streams into the file the native layer named, the file is verified by digest, `true` means a file was written, and failure is typed.
 #[cfg(test)]
-mod wallet_export_tests {
+mod wallet_save_file_tests {
     use super::*;
 
     #[test]
-    fn save_failure_travels_on_the_error_channel() {
-        let error = map_wallet_save(Err(std::io::Error::other("disk full")))
-            .expect_err("a failed save must be typed, not prose in the data channel");
+    fn a_save_without_a_client_fails_typed() {
+        let _serial = lock_discipline_tests::serialized();
+        reset_lightclient();
+        let error = save_wallet_file(scratch_path("no-client").display().to_string())
+            .expect_err("an uninitialized client must fail typed");
+        assert!(matches!(error, ZingolibError::LightclientNotInitialized));
+    }
+
+    #[test]
+    fn a_save_into_a_missing_directory_travels_on_the_error_channel() {
+        let _serial = lock_discipline_tests::serialized();
+        lock_discipline_tests::init_offline_wallet();
+        let error = save_wallet_file("/nonexistent-zingo-dir/wallet.dat".to_string())
+            .expect_err("an unwritable path must be typed, not prose in the data channel");
         assert!(
             matches!(error, ZingolibError::Save(_)),
             "the failure must be the typed Save variant: {error}"
@@ -993,18 +1069,108 @@ mod wallet_export_tests {
     }
 
     #[test]
-    fn wallet_bytes_cross_the_data_channel_verbatim() {
-        let wallet_bytes = vec![0xde, 0xad, 0xbe, 0xef];
-        let crossed = map_wallet_save(Ok(Some(wallet_bytes.clone())))
-            .expect("wallet bytes travel on the data channel");
-        assert_eq!(crossed, Some(wallet_bytes));
+    fn a_failed_open_keeps_the_wallet_path_out_of_the_error() {
+        let _serial = lock_discipline_tests::serialized();
+        let error = load_wallet_file(
+            "/nonexistent-zingo-dir/wallet.dat".to_string(),
+            String::new(),
+            "main".to_string(),
+            "Medium".to_string(),
+            1,
+        )
+        .expect_err("a missing wallet file must fail typed");
+        assert!(
+            !error.to_string().contains("nonexistent-zingo-dir"),
+            "the failure must not embed the path it could not open: {error}"
+        );
     }
 
     #[test]
-    fn no_save_needed_crosses_as_null() {
-        let crossed = map_wallet_save(Ok(None)).expect("no-save is not a failure");
-        assert_eq!(crossed, None);
+    fn a_save_into_a_bare_file_name_skips_the_parent_sync() {
+        let _serial = lock_discipline_tests::serialized();
+        lock_discipline_tests::init_offline_wallet();
+        let bare = format!("zingo-bare-{}.dat", std::process::id());
+        assert!(
+            save_wallet_file(bare.clone())
+                .expect("a bare path has the working directory as parent")
+        );
+        std::fs::remove_file(&bare).unwrap();
     }
+
+    #[cfg(unix)]
+    #[test]
+    fn a_save_refuses_a_symlinked_temp_path() {
+        let _serial = lock_discipline_tests::serialized();
+        lock_discipline_tests::init_offline_wallet();
+        let target = scratch_path("symlink-target");
+        let link = scratch_path("symlink");
+        let _ = std::fs::remove_file(&target);
+        let _ = std::fs::remove_file(&link);
+        std::os::unix::fs::symlink(&target, &link).unwrap();
+        let error = save_wallet_file(link.display().to_string())
+            .expect_err("a save must not follow a symlink out of the path it was handed");
+        assert!(matches!(error, ZingolibError::Save(_)), "{error}");
+        assert!(
+            !target.exists(),
+            "the wallet must not land on the symlink target"
+        );
+        std::fs::remove_file(&link).unwrap();
+    }
+
+    #[test]
+    fn a_read_back_that_differs_from_the_bytes_written_is_a_save_failure() {
+        let path = scratch_path("mismatch");
+        std::fs::write(&path, b"not what was written").unwrap();
+        let wrong_digest = [0u8; 32];
+        let error = verify_wallet_file(&path, &wrong_digest)
+            .expect_err("a digest mismatch must fail the save");
+        assert!(error.to_string().contains("differs"));
+        std::fs::remove_file(&path).unwrap();
+    }
+
+    #[test]
+    fn the_saved_file_streams_back_through_every_path_entry_point() {
+        let _serial = lock_discipline_tests::serialized();
+        let _ = set_crypto_default_provider_to_ring();
+        let seed = "hospital museum valve antique skate museum \
+             unfold vocal weird milk scale social vessel identify \
+             crowd hospital control album rib bulb path oven civil tank";
+        init_from_seed(
+            seed.to_string(),
+            2_000_000,
+            String::new(),
+            "main".to_string(),
+            "Medium".to_string(),
+            1,
+        )
+        .expect("offline init from seed");
+        let path = scratch_path("roundtrip");
+
+        assert!(save_wallet_file(path.display().to_string()).expect("the save must write"));
+        validate_wallet_file(path.display().to_string()).expect("the saved file must validate");
+
+        let salvaged = read_wallet_recovery_info_file(path.display().to_string()).unwrap();
+        let val: serde_json::Value = serde_json::from_str(&salvaged).unwrap();
+        assert_eq!(val["seed_phrase"], seed);
+        assert_eq!(val["birthday"], 2_000_000);
+
+        let loaded = load_wallet_file(
+            path.display().to_string(),
+            String::new(),
+            "test".to_string(),
+            "Medium".to_string(),
+            1,
+        )
+        .expect("the saved file must load offline under any chain hint");
+        assert!(loaded.contains(seed));
+        std::fs::remove_file(&path).unwrap();
+    }
+}
+
+/// A unique path under the host temp dir for one test's wallet file.
+#[cfg(test)]
+fn scratch_path(tag: &str) -> PathBuf {
+    std::env::temp_dir().join(format!("zingo-{tag}-{}.dat", std::process::id()))
 }
 
 /// The regtest schedule handoff: a `regtest:<schedule>` hint must carry
@@ -1084,6 +1250,7 @@ mod init_error_channel_tests {
 
     #[test]
     fn invalid_server_uri_travels_on_the_error_channel() {
+        let _serial = lock_discipline_tests::serialized();
         let error = init_new(
             "http://an invalid uri with spaces".to_string(),
             0,
@@ -1146,23 +1313,44 @@ mod init_error_channel_tests {
     }
 
     #[test]
-    fn undecodable_wallet_base64_travels_on_the_error_channel() {
-        let error = init_from_b64(
-            "!!!not-base64!!!".to_string(),
+    fn a_missing_wallet_file_travels_on_the_error_channel() {
+        let _serial = lock_discipline_tests::serialized();
+        let error = load_wallet_file(
+            "/nonexistent-zingo-dir/wallet.dat".to_string(),
             String::new(),
             "main".to_string(),
             "Medium".to_string(),
             1,
         )
-        .expect_err("undecodable wallet bytes must be typed, not prose in the data channel");
+        .expect_err("a missing wallet file must be typed, not prose in the data channel");
+        assert!(
+            matches!(error, ZingolibError::Init(_)),
+            "the failure must be the typed Init variant: {error}"
+        );
+    }
+
+    #[test]
+    fn a_wallet_file_that_is_not_a_wallet_travels_on_the_error_channel() {
+        let _serial = lock_discipline_tests::serialized();
+        let path = scratch_path("garbage");
+        std::fs::write(&path, b"!!!not-a-wallet!!!").unwrap();
+        let error = load_wallet_file(
+            path.display().to_string(),
+            String::new(),
+            "main".to_string(),
+            "Medium".to_string(),
+            1,
+        )
+        .expect_err("unreadable wallet bytes must be typed, not prose in the data channel");
         assert!(
             matches!(error, ZingolibError::Init(_)),
             "the failure must be the typed Init variant: {error}"
         );
         assert!(
-            !error.to_string().contains("!!!not-base64!!!"),
-            "the failure must not embed the payload it could not decode: {error}"
+            !error.to_string().contains("!!!not-a-wallet!!!"),
+            "the failure must not embed the content it could not read: {error}"
         );
+        std::fs::remove_file(&path).unwrap();
     }
 }
 
@@ -1868,6 +2056,213 @@ pub fn get_ufvk() -> Result<String, ZingolibError> {
             .pretty(2))
         })
     })
+}
+
+/// Salvages seed phrase, birthday, and account count from the stable prefix
+/// of a wallet that cannot open.
+fn salvage_recovery_info<R: Read>(reader: R) -> Result<String, ZingolibError> {
+    let salvaged =
+        LightWallet::read_recovery_info(reader).map_err(|e| ZingolibError::Read(e.to_string()))?;
+    serde_json::to_string(&salvaged).map_err(|e| ZingolibError::Read(e.to_string()))
+}
+
+pub fn read_wallet_recovery_info(wallet_bytes: Vec<u8>) -> Result<String, ZingolibError> {
+    salvage_recovery_info(wallet_bytes.as_slice())
+}
+
+/// Reads only the stable prefix of the wallet file at `path`.
+pub fn read_wallet_recovery_info_file(path: String) -> Result<String, ZingolibError> {
+    let file = File::open(&path).map_err(|e| ZingolibError::Read(e.to_string()))?;
+    salvage_recovery_info(BufReader::new(file))
+}
+
+/// Counts the bytes a parser pulls from the wrapped reader.
+struct Counting<R> {
+    inner: R,
+    consumed: usize,
+}
+
+impl<R: Read> Read for Counting<R> {
+    fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
+        let pulled = self.inner.read(buf)?;
+        self.consumed += pulled;
+        Ok(pulled)
+    }
+}
+
+/// Confirms the wallet `open` yields parses completely under one of the
+/// supported chains, reporting the failure whose parse reached the deepest
+/// byte.
+fn validate_wallet<R: Read>(mut open: impl FnMut() -> io::Result<R>) -> Result<(), ZingolibError> {
+    let chains = [
+        ChainType::Mainnet,
+        ChainType::Testnet,
+        ChainType::Regtest(ActivationHeights::default()),
+    ];
+    let mut deepest = (0usize, String::from("empty wallet bytes"));
+    for chain in chains {
+        let mut reader = Counting {
+            inner: open().map_err(|e| ZingolibError::Read(e.to_string()))?,
+            consumed: 0,
+        };
+        match LightWallet::validate(&mut reader, chain) {
+            Ok(()) => return Ok(()),
+            Err(e) => {
+                if reader.consumed >= deepest.0 {
+                    deepest = (reader.consumed, e.to_string());
+                }
+            }
+        }
+    }
+    Err(ZingolibError::Read(deepest.1))
+}
+
+pub fn validate_wallet_bytes(wallet_bytes: Vec<u8>) -> Result<(), ZingolibError> {
+    validate_wallet(|| Ok(wallet_bytes.as_slice()))
+}
+
+/// Streams the wallet file at `path` through the full parse, once per chain.
+pub fn validate_wallet_file(path: String) -> Result<(), ZingolibError> {
+    validate_wallet(|| File::open(&path).map(BufReader::new))
+}
+
+/// The salvage contract: a wallet file cut anywhere past its stable prefix
+/// still yields the seed and birthday, and unreadable bytes fail on the
+/// typed Read channel.
+#[cfg(test)]
+mod wallet_salvage_tests {
+    use super::*;
+
+    fn stable_prefix() -> Vec<u8> {
+        let mut bytes = 42u64.to_le_bytes().to_vec();
+        bytes.push(0);
+        bytes.push(32);
+        bytes.extend([7u8; 32]);
+        bytes.extend(2_000_000u32.to_le_bytes());
+        bytes.push(1);
+        bytes
+    }
+
+    #[test]
+    fn a_truncated_wallet_salvages_seed_and_birthday() {
+        let salvaged = read_wallet_recovery_info(stable_prefix()).unwrap();
+        let val: serde_json::Value = serde_json::from_str(&salvaged).unwrap();
+        assert_eq!(val["birthday"], 2_000_000);
+        assert_eq!(val["no_of_accounts"], 1);
+        assert_eq!(val["seed_phrase"].as_str().unwrap().split(' ').count(), 24);
+    }
+
+    #[test]
+    fn the_cut_point_past_the_prefix_does_not_matter() {
+        let mut bytes = stable_prefix();
+        bytes.extend([0xAB; 100]);
+        let with_tail = read_wallet_recovery_info(bytes).unwrap();
+        assert_eq!(
+            with_tail,
+            read_wallet_recovery_info(stable_prefix()).unwrap()
+        );
+    }
+
+    #[test]
+    fn garbage_fails_on_the_read_channel() {
+        for garbage in [vec![0x20; 47], vec![0x28; 40]] {
+            assert!(matches!(
+                read_wallet_recovery_info(garbage),
+                Err(ZingolibError::Read(_))
+            ));
+        }
+    }
+
+    #[test]
+    fn a_cut_inside_the_prefix_fails_on_the_read_channel() {
+        let mut bytes = stable_prefix();
+        bytes.truncate(20);
+        assert!(matches!(
+            read_wallet_recovery_info(bytes),
+            Err(ZingolibError::Read(_))
+        ));
+    }
+}
+
+/// The validation contract: only bytes the full deserializer opens count as
+/// an intact wallet, regardless of which chain wrote them.
+#[cfg(test)]
+mod wallet_validation_tests {
+    use super::*;
+
+    fn saved_wallet(chain_hint: &str) -> Vec<u8> {
+        let _ = set_crypto_default_provider_to_ring();
+        init_from_seed(
+            "hospital museum valve antique skate museum \
+             unfold vocal weird milk scale social vessel identify \
+             crowd hospital control album rib bulb path oven civil tank"
+                .to_string(),
+            2_000_000,
+            String::new(),
+            chain_hint.to_string(),
+            "Medium".to_string(),
+            1,
+        )
+        .expect("offline init from seed");
+        let path = scratch_path(chain_hint);
+        assert!(save_wallet_file(path.display().to_string()).expect("save after init"));
+        let bytes = std::fs::read(&path).expect("the saved file exists");
+        std::fs::remove_file(&path).unwrap();
+        bytes
+    }
+
+    #[test]
+    fn a_saved_wallet_validates_and_every_truncation_fails() {
+        let _serial = lock_discipline_tests::serialized();
+        let bytes = saved_wallet("main");
+        validate_wallet_bytes(bytes.clone()).expect("the saved wallet must validate");
+
+        let path = scratch_path("truncation");
+        for cut in [0, 8, bytes.len() / 2, bytes.len() - 1] {
+            assert!(
+                matches!(
+                    validate_wallet_bytes(bytes[..cut].to_vec()),
+                    Err(ZingolibError::Read(_))
+                ),
+                "the wallet cut to {cut} of {} bytes must fail validation",
+                bytes.len()
+            );
+            std::fs::write(&path, &bytes[..cut]).unwrap();
+            assert!(
+                matches!(
+                    validate_wallet_file(path.display().to_string()),
+                    Err(ZingolibError::Read(_))
+                ),
+                "the wallet file cut to {cut} of {} bytes must fail validation",
+                bytes.len()
+            );
+        }
+        std::fs::remove_file(&path).unwrap();
+
+        validate_wallet_bytes(saved_wallet("test")).expect("the testnet wallet must validate");
+    }
+
+    #[test]
+    fn a_missing_wallet_file_fails_on_the_read_channel() {
+        assert!(matches!(
+            validate_wallet_file("/nonexistent-zingo-dir/wallet.dat".to_string()),
+            Err(ZingolibError::Read(_))
+        ));
+        assert!(matches!(
+            read_wallet_recovery_info_file("/nonexistent-zingo-dir/wallet.dat".to_string()),
+            Err(ZingolibError::Read(_))
+        ));
+    }
+
+    #[test]
+    fn bytes_that_pass_the_header_heuristic_still_fail_validation() {
+        let mut bytes = 42u64.to_le_bytes().to_vec();
+        bytes.extend([0x07; 400]);
+        assert!(matches!(
+            validate_wallet_bytes(bytes),
+            Err(ZingolibError::Read(_))
+        ));
+    }
 }
 
 pub fn change_server(server_uri: String) -> Result<String, ZingolibError> {

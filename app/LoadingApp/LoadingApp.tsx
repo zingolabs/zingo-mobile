@@ -44,6 +44,7 @@ import {
   walletBackupExists,
   walletExists as rpcWalletExists,
   walletFileDiagnosis,
+  walletSeedSalvage,
   WalletFileDiagnosis,
   WalletFileDiagnosisReport,
   WalletFileRepairOutcome,
@@ -1165,16 +1166,25 @@ export class LoadingAppClass extends Component<
       await this.repairWalletFiles(title, errorText);
       return;
     }
-    // plainLegacy opens through the legacy fallback, so only undecryptable, doubleWrapped, and unknown count as broken.
+    // encryptedLegacy opens through the load path's legacy recovery, so only undecryptable, doubleWrapped, and unknown count as broken.
     const main = report.files.find(f => f.name === WALLET_FILE_NAME);
     const openableStates: ReadonlySet<WalletFileDiagnosis['state']> = new Set([
       'plainWallet',
-      'plainLegacy',
+      'encryptedLegacy',
       'missing',
     ]);
     const mainBroken = !!main && !openableStates.has(main.state);
-    if (mainBroken) {
-      this.walletRecoveryAlert(title, errorText, report);
+    // A load failure with a plain-looking main means the file is damaged
+    // past its stable prefix (truncated), so the dialog offers seed salvage.
+    const mainSalvageable = !!main && main.state === 'plainWallet';
+    if (mainBroken || mainSalvageable) {
+      this.walletRecoveryAlert(
+        title,
+        errorText,
+        report,
+        undefined,
+        mainSalvageable,
+      );
       return;
     }
     // Wallet-open failures are local and deterministic (undecodable
@@ -1245,6 +1255,7 @@ export class LoadingAppClass extends Component<
     errorText: string,
     report: WalletFileDiagnosisReport,
     outcomes?: Record<string, WalletFileRepairOutcome>,
+    salvage?: boolean,
   ) => {
     const reportText = this.walletRecoveryReportText(
       errorText,
@@ -1252,7 +1263,9 @@ export class LoadingAppClass extends Component<
       outcomes,
     );
     const backup = report.files.find(f => f.name === WALLET_BACKUP_FILE_NAME);
-    const backupRestorable = !!backup && backup.state === 'plainWallet';
+    const backupRestorable =
+      !!backup &&
+      (backup.state === 'plainWallet' || backup.state === 'encryptedLegacy');
     const message = this.state.translate(
       outcomes
         ? 'loadingapp.walletrepair-failed'
@@ -1269,6 +1282,9 @@ export class LoadingAppClass extends Component<
       },
       onRestoreBackup: backupRestorable
         ? () => this.confirmRestoreBackupFromRecovery()
+        : undefined,
+      onSalvageSeed: salvage
+        ? () => this.salvageSeedFromWalletFile()
         : undefined,
       onSupport: () =>
         sendEmail(
@@ -1293,6 +1309,32 @@ export class LoadingAppClass extends Component<
         {
           text: this.state.translate('confirm') as string,
           onPress: () => this.restoreLastBackup(),
+        },
+        { text: this.state.translate('cancel') as string, style: 'cancel' },
+      ],
+    });
+  };
+
+  // Salvages the seed from the damaged wallet file and, on the user's
+  // confirmation, restores the wallet from it (rescan included).
+  salvageSeedFromWalletFile = async () => {
+    const salvage = await walletSeedSalvage();
+    if (salvage.kind === 'error') {
+      this.addLastSnackbar(this.state.translate(salvage.errorKey) as string);
+      return;
+    }
+    showConfirm({
+      title: this.state.translate('loadingapp.walletsalvage-title') as string,
+      message:
+        `${this.state.translate('loadingapp.walletsalvage-body')}\n\n` +
+        `${salvage.seedPhrase}\n\n` +
+        `${this.state.translate('loadingapp.walletsalvage-birthday')}: ${
+          salvage.birthday
+        }`,
+      buttons: [
+        {
+          text: this.state.translate('confirm') as string,
+          onPress: () => this.doRestore(salvage.seedPhrase, salvage.birthday),
         },
         { text: this.state.translate('cancel') as string, style: 'cancel' },
       ],
@@ -2174,7 +2216,7 @@ export class LoadingAppClass extends Component<
     const result = await restoreExistingWalletBackup();
     if (!resolvedTrue(result)) {
       this.addLastSnackbar(
-        this.state.translate('rpc.backupnotfound-error') as string,
+        this.state.translate('rpc.restorebackup-error') as string,
       );
       this.setState({
         screen: RouteEnum.StartMenu,

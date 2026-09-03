@@ -67,3 +67,16 @@
 
 # kotlinx.datetime references kotlinx.serialization internally
 -dontwarn kotlinx.serialization.**
+
+# kotlin.io file helpers: the release test APK takes its stdlib from the app APK,
+# and the app no longer reads whole files itself, so the tests need these kept.
+-keep class kotlin.io.FilesKt** { *; }
+
+# androidx.security.crypto: the app only reads legacy encrypted files now, the
+# release test APK still writes them as fixtures.
+-keep class androidx.security.crypto.** { *; }
+
+# The release test APK calls into the app classes by name, including Kotlin
+# internal accessors, so the app package keeps every member, as the test rules do.
+-keep class org.ZingoLabs.Zingo.** { *; }
+-keepclassmembers class org.ZingoLabs.Zingo.** { *; }

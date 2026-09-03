@@ -141,7 +141,12 @@
     "walletrepair-outcome-skipped": "no necesita reparación",
     "walletrepair-outcome-failed": "reparación fallida",
     "walletfile-state-missing": "no existe",
-    "walletfile-state-plainLegacy": "todavía sin cifrar",
+    "walletrecovery-salvageseed": "Recuperar semilla",
+    "walletsalvage-title": "Semilla recuperada",
+    "walletsalvage-body": "El archivo de billetera dañado todavía contiene esta semilla y su cumpleaños. Anote la semilla y guárdela en un lugar seguro. Confirme para restaurar la billetera con ella. La restauración vuelve a escanear la cadena y puede tardar.",
+    "walletsalvage-birthday": "Cumpleaños",
+    "walletsalvage-failed": "La semilla no se puede recuperar del archivo de billetera.",
+    "walletfile-state-encryptedLegacy": "cifrado (formato antiguo)",
     "walletfile-state-undecryptable": "no se puede descifrar (clave del dispositivo perdida)",
     "walletfile-state-plainWallet": "correcto",
     "walletfile-state-doubleWrapped": "cifrado dos veces",
@@ -215,6 +220,7 @@
   "rpc": {
     "walletnotfound-error": "Error: No se encuentra ningún monedero.",
     "backupnotfound-error": "Error: No se encuentra ninguna copia de seguridad de ningún monedero.",
+    "restorebackup-error": "Error: No se pudo restaurar la copia de seguridad. El archivo no se abre como un monedero.",
     "deletewallet-error": "Error: No se pudo borrar el monedero actual.",
     "backupwallet-error": "Error: No se pudo guardar la copia de seguridad del monedero."
   },

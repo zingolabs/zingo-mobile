@@ -141,7 +141,12 @@
     "walletrepair-outcome-skipped": "onarım gerekmiyor",
     "walletrepair-outcome-failed": "onarım başarısız",
     "walletfile-state-missing": "yok",
-    "walletfile-state-plainLegacy": "henüz şifrelenmemiş",
+    "walletrecovery-salvageseed": "Tohum ifadesini kurtar",
+    "walletsalvage-title": "Kurtarılan tohum ifadesi",
+    "walletsalvage-body": "Hasarlı cüzdan dosyası bu tohum ifadesini ve doğum gününü hala içeriyor. Tohum ifadesini yazın ve güvenli bir yerde saklayın. Cüzdanı bu ifadeyle geri yüklemek için onaylayın. Geri yükleme zinciri yeniden tarar ve zaman alabilir.",
+    "walletsalvage-birthday": "Doğum günü",
+    "walletsalvage-failed": "Tohum ifadesi cüzdan dosyasından kurtarılamıyor.",
+    "walletfile-state-encryptedLegacy": "şifreli (eski biçim)",
     "walletfile-state-undecryptable": "çözülemiyor (cihaz anahtarı kayıp)",
     "walletfile-state-plainWallet": "tamam",
     "walletfile-state-doubleWrapped": "iki kez şifrelenmiş",
@@ -215,6 +220,7 @@
   "rpc": {
     "walletnotfound-error": "Error: Herhangi bir cüzdan bulunamadı.",
     "backupnotfound-error": "Error: Herhangi bir cüzdan yedeği bulunamadı.",
+    "restorebackup-error": "Error: Cüzdan yedeği geri yüklenemedi. Yedek dosyası cüzdan olarak açılamadı.",
     "deletewallet-error": "Error: Mevcut cüzdan silinemedi.",
     "backupwallet-error": "Error: Cüzdan yedeği kaydedilemedi."
   },

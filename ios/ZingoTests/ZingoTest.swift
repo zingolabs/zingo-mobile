@@ -793,50 +793,571 @@ final class ExecuteParseAddressInvalid: XCTestCase {
     }
 }
 
-/// The wallet-file base64 guard (zingo-mobile#1151; audit Issue Q). The FFI
-/// save path now crosses as bytes, so the historical attack string — a valid
-/// base64 export beginning with "error" — is unrepresentable there; this
-/// validator's one remaining consumer is restoreExistingWalletBackup, which
-/// checks file content read back from disk. Its acceptance rules are pinned
-/// here: base64 is recognized by structure alone, never by sentinel.
-class WalletFileBase64Tests: XCTestCase {
-    func testContentResemblingAnErrorSentinelIsValid() {
-        // Every case variant of the historical sentinel is well-formed
-        // base64 and must validate.
-        XCTAssertTrue(WalletExport.isValidBase64("errorAAA"))
-        XCTAssertTrue(WalletExport.isValidBase64("ERRORAAA"))
+/// The legacy text format on iOS: every build before the raw-bytes format
+/// stored the wallet as base64 text. A file is classified by its first
+/// bytes alone, the text decodes in aligned chunks with an unfinishable
+/// tail dropped, and the migration to raw bytes leaves the text file as it
+/// was unless its plain replacement passes the full parse.
+class WalletFileTextMigrationTests: XCTestCase {
+    private let rpc = RPCModule()
+
+    private func documents() throws -> String {
+        let dir = try rpc.getDocumentsDirectory()
+        try FileManager.default.createDirectory(atPath: dir, withIntermediateDirectories: true)
+        return dir
     }
 
-    func testFailureProseNeverValidates() {
-        // Prose always contains ':' and ' ', both outside the base64
-        // alphabet.
-        XCTAssertFalse(WalletExport.isValidBase64("Error: disk full"))
+    private func scratch(_ name: String) throws -> String {
+        let path = "\(try documents())/\(name)"
+        try? FileManager.default.removeItem(atPath: path)
+        return path
     }
 
-    func testEmptyContentNeverValidates() {
-        XCTAssertFalse(WalletExport.isValidBase64(""))
+    override func tearDown() {
+        let fm = FileManager.default
+        if let dir = try? rpc.getDocumentsDirectory(),
+           let names = try? fm.contentsOfDirectory(atPath: dir) {
+            for name in names where name.hasPrefix("wallet") || name.hasPrefix("text-") {
+                try? fm.removeItem(atPath: "\(dir)/\(name)")
+            }
+        }
+        RPCModule.walletFileClosed = false
+        super.tearDown()
     }
 
-    func testMalformedContentNeverValidates() {
-        XCTAssertFalse(WalletExport.isValidBase64("not base64 at all"))
+    // A real offline wallet's raw bytes, streamed through the save entry
+    // point into a scratch file.
+    private func savedWalletBytes() throws -> Data {
+        setCryptoProvider()
+        _ = try initFromSeed(seed: Seeds.HOSPITAL, birthday: 2_000_000, serveruri: "", chainhint: "main", performancelevel: "Medium", minconfirmations: 1)
+        let path = try scratch("text-fixture.dat")
+        XCTAssertTrue(try saveWalletFile(tempPath: path))
+        defer { try? FileManager.default.removeItem(atPath: path) }
+        return try Data(contentsOf: URL(fileURLWithPath: path))
     }
 
-    func testPaddingMayOnlyTrail() {
-        XCTAssertFalse(WalletExport.isValidBase64("AB=A"))
-        XCTAssertTrue(WalletExport.isValidBase64("ABCD"))
+    func testTheFormatIsToldApartByTheFirstBytes() throws {
+        let raw = try scratch("text-raw.dat")
+        var wallet = Data([42, 0, 0, 0, 0, 0, 0, 0])
+        wallet.append(Data(repeating: 7, count: 64))
+        try wallet.write(to: URL(fileURLWithPath: raw))
+        XCTAssertEqual(PlainWalletFile.format(raw), .plainWallet)
+
+        let text = try scratch("text-b64.dat")
+        try wallet.base64EncodedString().write(toFile: text, atomically: true, encoding: .utf8)
+        XCTAssertEqual(PlainWalletFile.format(text), .base64Text)
+
+        let garbage = try scratch("text-garbage.dat")
+        try "!!!not-base64!!!".write(toFile: garbage, atomically: true, encoding: .utf8)
+        XCTAssertEqual(PlainWalletFile.format(garbage), .unknown)
+
+        let empty = try scratch("text-empty.dat")
+        FileManager.default.createFile(atPath: empty, contents: nil)
+        XCTAssertEqual(PlainWalletFile.format(empty), .unknown)
+        XCTAssertEqual(PlainWalletFile.format(try scratch("text-missing.dat")), .unknown)
     }
 
-    func testPaddingIsAtMostTwoCharacters() {
-        XCTAssertFalse(WalletExport.isValidBase64("A==="))
+    func testTheChunkedDecodeMatchesFoundationAcrossChunkBoundaries() throws {
+        // 64 KiB of text decodes to 48 KiB, so these sizes straddle the
+        // chunk edge and end on every padding length.
+        for size in [1, 2, 3, 49_151, 49_152, 49_153, 150_001] {
+            var bytes = Data(count: size)
+            for i in 0..<size { bytes[i] = UInt8((i * 31 + 7) & 0xff) }
+            let text = try scratch("text-in.dat")
+            let raw = try scratch("text-out.dat")
+            try bytes.base64EncodedString().write(toFile: text, atomically: true, encoding: .utf8)
+
+            try PlainWalletFile.decodeBase64Text(from: text, to: raw)
+
+            XCTAssertEqual(try Data(contentsOf: URL(fileURLWithPath: raw)), bytes, "size \(size)")
+        }
     }
 
-    func testTrailingBitsMustBeZero() {
-        // Non-canonical padding decodes downstream-dependently: the Rust
-        // STANDARD engine rejects it, so the guard must too.
-        XCTAssertFalse(WalletExport.isValidBase64("AB=="))
-        XCTAssertFalse(WalletExport.isValidBase64("AAB="))
-        XCTAssertTrue(WalletExport.isValidBase64("AA=="))
-        XCTAssertTrue(WalletExport.isValidBase64("AAA="))
+    func testAnUnfinishableTailIsDropped() throws {
+        let text = try scratch("text-cut.dat")
+        let raw = try scratch("text-cut-out.dat")
+        // 12 characters encode 9 bytes; cutting to 11 leaves 8 usable.
+        try "KgAAAAAAAAA".write(toFile: text, atomically: true, encoding: .utf8)
+
+        try PlainWalletFile.decodeBase64Text(from: text, to: raw)
+
+        XCTAssertEqual(try Data(contentsOf: URL(fileURLWithPath: raw)), Data([42, 0, 0, 0, 0, 0]))
+    }
+
+    func testTextThatIsNotBase64FailsTheDecode() throws {
+        let text = try scratch("text-bad.dat")
+        let raw = try scratch("text-bad-out.dat")
+        try "KgAA!!!!".write(toFile: text, atomically: true, encoding: .utf8)
+        XCTAssertThrowsError(try PlainWalletFile.decodeBase64Text(from: text, to: raw))
+    }
+
+    func testALegacyTextWalletMigratesToRawBytesOnResolve() throws {
+        let wallet = try savedWalletBytes()
+        let main = try rpc.getFileName(Constants.WalletFileName.rawValue)
+        try wallet.base64EncodedString().write(toFile: main, atomically: true, encoding: .utf8)
+
+        XCTAssertEqual(try rpc.resolveWalletFile(Constants.WalletFileName.rawValue), main)
+
+        XCTAssertEqual(try Data(contentsOf: URL(fileURLWithPath: main)), wallet)
+        XCTAssertFalse(FileManager.default.fileExists(atPath: PlainWalletFile.tempPath(main)))
+        let excluded = try URL(fileURLWithPath: main)
+            .resourceValues(forKeys: [.isExcludedFromBackupKey]).isExcludedFromBackup
+        XCTAssertEqual(excluded, true)
+        let seed = try rpc.fnLoadExistingWallet(serveruri: "", chainhint: "main", performancelevel: "Medium", minconfirmations: "1")
+        XCTAssertTrue(seed.contains(Seeds.HOSPITAL))
+    }
+
+    func testARawWalletResolvesWithoutARewrite() throws {
+        let wallet = try savedWalletBytes()
+        let main = try rpc.getFileName(Constants.WalletFileName.rawValue)
+        try wallet.write(to: URL(fileURLWithPath: main))
+        let before = try FileManager.default.attributesOfItem(atPath: main)[.modificationDate] as? Date
+
+        XCTAssertEqual(try rpc.resolveWalletFile(Constants.WalletFileName.rawValue), main)
+
+        let after = try FileManager.default.attributesOfItem(atPath: main)[.modificationDate] as? Date
+        XCTAssertEqual(before, after)
+        XCTAssertEqual(try Data(contentsOf: URL(fileURLWithPath: main)), wallet)
+    }
+
+    func testATextWalletThatFailsTheParseStaysUntouched() throws {
+        let wallet = try savedWalletBytes()
+        let main = try rpc.getFileName(Constants.WalletFileName.rawValue)
+        let truncated = wallet.prefix(wallet.count / 2).base64EncodedString()
+        try truncated.write(toFile: main, atomically: true, encoding: .utf8)
+
+        XCTAssertThrowsError(try rpc.resolveWalletFile(Constants.WalletFileName.rawValue))
+
+        XCTAssertEqual(try String(contentsOfFile: main, encoding: .utf8), truncated)
+        XCTAssertFalse(FileManager.default.fileExists(atPath: PlainWalletFile.tempPath(main)))
+        XCTAssertEqual(rpc.walletFileState(main), "plainWallet")
+    }
+
+    func testAStaleTempFromAnInterruptedMigrationIsReplaced() throws {
+        let wallet = try savedWalletBytes()
+        let main = try rpc.getFileName(Constants.WalletFileName.rawValue)
+        try wallet.base64EncodedString().write(toFile: main, atomically: true, encoding: .utf8)
+        try wallet.prefix(20).write(to: URL(fileURLWithPath: PlainWalletFile.tempPath(main)))
+
+        _ = try rpc.resolveWalletFile(Constants.WalletFileName.rawValue)
+
+        XCTAssertEqual(try Data(contentsOf: URL(fileURLWithPath: main)), wallet)
+        XCTAssertFalse(FileManager.default.fileExists(atPath: PlainWalletFile.tempPath(main)))
+    }
+
+    func testTheStreamingSaveWritesRawBytesTheFullParseAccepts() throws {
+        setCryptoProvider()
+        _ = try initFromSeed(seed: Seeds.HOSPITAL, birthday: 2_000_000, serveruri: "", chainhint: "main", performancelevel: "Medium", minconfirmations: 1)
+        let main = try rpc.getFileName(Constants.WalletFileName.rawValue)
+        try? FileManager.default.removeItem(atPath: main)
+        rpc.reopenWalletFile()
+
+        try rpc.saveWalletInternal()
+
+        XCTAssertEqual(PlainWalletFile.format(main), .plainWallet)
+        XCTAssertNoThrow(try validateWalletFile(path: main))
+        XCTAssertFalse(FileManager.default.fileExists(atPath: PlainWalletFile.tempPath(main)))
+        let excluded = try URL(fileURLWithPath: main)
+            .resourceValues(forKeys: [.isExcludedFromBackupKey]).isExcludedFromBackup
+        XCTAssertEqual(excluded, true)
+    }
+
+    func testTheSalvageReadsALegacyTextFileCutMidQuantum() throws {
+        let wallet = try savedWalletBytes()
+        let main = try rpc.getFileName(Constants.WalletFileName.rawValue)
+        let text = wallet.base64EncodedString()
+        try String(text.prefix(text.count / 2 + 1)).write(toFile: main, atomically: true, encoding: .utf8)
+
+        let expectation = self.expectation(description: "salvage")
+        var salvaged: String?
+        rpc.walletFileRecoveryInfo({ value in
+            salvaged = value as? String
+            expectation.fulfill()
+        }, reject: { _, message, _ in
+            XCTFail("salvage rejected: \(message ?? "")")
+            expectation.fulfill()
+        })
+        wait(for: [expectation], timeout: 30)
+
+        XCTAssertTrue(salvaged?.contains(Seeds.HOSPITAL) ?? false)
+        XCTAssertTrue(FileManager.default.fileExists(atPath: "\(main).broken"))
+        XCTAssertFalse(FileManager.default.fileExists(atPath: "\(main).salvage.tmp"))
+    }
+}
+
+/// Peak memory of a load and a save against a synced wallet file named by
+/// the `ZINGO_BENCH_WALLET` environment variable, written as one JSON
+/// object to the path in `ZINGO_BENCH_OUT`: the file size and, for each
+/// operation, the peak growth over the level at entry of the malloc heap
+/// in use and the physical footprint. The benchmark skips when either
+/// variable is absent. `scripts/bench_wallet_memory.mts` drives it.
+class WalletMemoryBenchmark: XCTestCase {
+    private struct Peak {
+        let malloc: UInt64
+        let footprint: UInt64
+    }
+
+    private static func mallocInUse() -> UInt64 {
+        var stats = malloc_statistics_t()
+        malloc_zone_statistics(nil, &stats)
+        return UInt64(stats.size_in_use)
+    }
+
+    private static func physFootprint() -> UInt64 {
+        var info = task_vm_info_data_t()
+        var count = mach_msg_type_number_t(MemoryLayout<task_vm_info_data_t>.size / MemoryLayout<natural_t>.size)
+        let result = withUnsafeMutablePointer(to: &info) {
+            $0.withMemoryRebound(to: integer_t.self, capacity: Int(count)) {
+                task_info(mach_task_self_, task_flavor_t(TASK_VM_INFO), $0, &count)
+            }
+        }
+        return result == KERN_SUCCESS ? info.phys_footprint : 0
+    }
+
+    // Samples both measures every millisecond while `operation` runs and
+    // reports their peak growth over the level at entry.
+    private func peakDuring(_ operation: () throws -> Void) rethrows -> Peak {
+        let mallocBase = Self.mallocInUse()
+        let footprintBase = Self.physFootprint()
+        var mallocPeak = mallocBase
+        var footprintPeak = footprintBase
+        let running = NSLock()
+        var stop = false
+        let sampler = Thread {
+            while true {
+                running.lock()
+                let done = stop
+                running.unlock()
+                if done { break }
+                mallocPeak = max(mallocPeak, Self.mallocInUse())
+                footprintPeak = max(footprintPeak, Self.physFootprint())
+                Thread.sleep(forTimeInterval: 0.001)
+            }
+        }
+        sampler.start()
+        defer {
+            running.lock()
+            stop = true
+            running.unlock()
+            while !sampler.isFinished { Thread.sleep(forTimeInterval: 0.001) }
+        }
+        try operation()
+        return Peak(malloc: mallocPeak - mallocBase, footprint: footprintPeak - footprintBase)
+    }
+
+    func testPeakMemoryOfLoadAndSaveOnASyncedWallet() throws {
+        let env = ProcessInfo.processInfo.environment
+        guard let fixture = env["ZINGO_BENCH_WALLET"], let out = env["ZINGO_BENCH_OUT"] else {
+            throw XCTSkip("ZINGO_BENCH_WALLET and ZINGO_BENCH_OUT are not set")
+        }
+        let rpc = RPCModule()
+        let fm = FileManager.default
+        try fm.createDirectory(atPath: rpc.getDocumentsDirectory(), withIntermediateDirectories: true)
+        let main = try rpc.getFileName(Constants.WalletFileName.rawValue)
+        try? fm.removeItem(atPath: main)
+        try fm.copyItem(atPath: fixture, toPath: main)
+        defer { try? fm.removeItem(atPath: main) }
+        let size = try XCTUnwrap(fm.attributesOfItem(atPath: main)[.size] as? UInt64)
+        rpc.reopenWalletFile()
+        setCryptoProvider()
+
+        let load = try peakDuring {
+            _ = try rpc.fnLoadExistingWallet(serveruri: "", chainhint: "main", performancelevel: "Medium", minconfirmations: "1")
+        }
+        _ = try createNewUnifiedAddress(receivers: "o")
+        let before = try fm.attributesOfItem(atPath: main)[.modificationDate] as? Date
+        Thread.sleep(forTimeInterval: 0.05)
+        let save = try peakDuring { try rpc.saveWalletInternal() }
+        XCTAssertNotEqual(try fm.attributesOfItem(atPath: main)[.modificationDate] as? Date, before)
+        try validateWalletFile(path: main)
+
+        let report: [String: Any] = [
+            "platform": "ios",
+            "fileBytes": size,
+            "load": ["malloc": load.malloc, "footprint": load.footprint],
+            "save": ["malloc": save.malloc, "footprint": save.footprint],
+        ]
+        try JSONSerialization.data(withJSONObject: report).write(to: URL(fileURLWithPath: out))
+    }
+}
+
+/// Adversarial scenarios against the path-based wallet persistence. Each
+/// test states a rule the load, save, restore, delete, or salvage path
+/// must keep and fails when the code breaks it.
+class WalletAdversarialTests: XCTestCase {
+    private let rpc = RPCModule()
+
+    private func paths() throws -> (main: String, backup: String, temp: String) {
+        try FileManager.default.createDirectory(atPath: rpc.getDocumentsDirectory(), withIntermediateDirectories: true)
+        return (
+            try rpc.getFileName(Constants.WalletFileName.rawValue),
+            try rpc.getFileName(Constants.WalletBackupFileName.rawValue),
+            try rpc.getFileName(Constants.WalletTempSwapFileName.rawValue)
+        )
+    }
+
+    private func clearAll() throws {
+        let files = try paths()
+        let fm = FileManager.default
+        for path in [files.main, files.backup, files.temp] {
+            for suffix in ["", ".plain.tmp", ".salvage.tmp", ".broken"] {
+                try? fm.removeItem(atPath: path + suffix)
+            }
+        }
+        RPCModule.walletFileClosed = false
+    }
+
+    override func setUp() {
+        super.setUp()
+        try? clearAll()
+        setCryptoProvider()
+    }
+
+    override func tearDown() {
+        try? clearAll()
+        super.tearDown()
+    }
+
+    private func savedWallet(birthday: UInt32) throws -> Data {
+        _ = try initFromSeed(seed: Seeds.HOSPITAL, birthday: birthday, serveruri: "", chainhint: "main", performancelevel: "Medium", minconfirmations: 1)
+        let path = try rpc.getFileName("adversarial-fixture.dat")
+        try? FileManager.default.removeItem(atPath: path)
+        XCTAssertTrue(try saveWalletFile(tempPath: path))
+        defer { try? FileManager.default.removeItem(atPath: path) }
+        return try Data(contentsOf: URL(fileURLWithPath: path))
+    }
+
+    private func restore() -> String? {
+        let done = expectation(description: "restore")
+        var outcome: String?
+        rpc.restoreExistingWalletBackup({ value in
+            outcome = value as? String
+            done.fulfill()
+        }, reject: { _, _, _ in done.fulfill() })
+        wait(for: [done], timeout: 60)
+        return outcome
+    }
+
+    // Rule: a restore installs the wallet it validated. An orphan swap temp
+    // from an earlier crash must not be swapped in instead.
+    func testTheRestoreInstallsTheFileItValidated() throws {
+        let files = try paths()
+        defer {
+            let dir = (files.temp as NSString).deletingLastPathComponent
+            let prefix = (files.temp as NSString).lastPathComponent + ".orphan."
+            for name in (try? FileManager.default.contentsOfDirectory(atPath: dir)) ?? [] where name.hasPrefix(prefix) {
+                try? FileManager.default.removeItem(atPath: "\(dir)/\(name)")
+            }
+        }
+        let good = try savedWallet(birthday: 2_000_000)
+        try good.write(to: URL(fileURLWithPath: files.backup))
+        var junk = Data([42, 0, 0, 0, 0, 0, 0, 0])
+        junk.append(Data(repeating: 9, count: 64))
+        try junk.write(to: URL(fileURLWithPath: files.main))
+        try junk.write(to: URL(fileURLWithPath: files.temp))
+
+        _ = restore()
+
+        XCTAssertEqual(try Data(contentsOf: URL(fileURLWithPath: files.main)), good)
+        XCTAssertNoThrow(try validateWalletFile(path: files.main))
+    }
+
+    // Rule: a restore that reports failure reopens the wallet file for the
+    // saves that follow, and keeps the orphan it could not place.
+    func testAFailedRestoreReopensTheWalletFileAndKeepsTheOrphan() throws {
+        let files = try paths()
+        let good = try savedWallet(birthday: 2_000_000)
+        let other = try savedWallet(birthday: 2_100_000)
+        var junk = Data([42, 0, 0, 0, 0, 0, 0, 0])
+        junk.append(Data(repeating: 9, count: 64))
+        try good.write(to: URL(fileURLWithPath: files.main))
+        try junk.write(to: URL(fileURLWithPath: files.backup))
+        try other.write(to: URL(fileURLWithPath: files.temp))
+
+        XCTAssertEqual(restore(), "false")
+
+        XCTAssertFalse(RPCModule.walletFileClosed)
+        XCTAssertEqual(try Data(contentsOf: URL(fileURLWithPath: files.main)), good)
+        let dir = (files.temp as NSString).deletingLastPathComponent
+        let orphans = try FileManager.default.contentsOfDirectory(atPath: dir)
+            .filter { $0.hasPrefix((files.temp as NSString).lastPathComponent + ".orphan.") }
+        XCTAssertEqual(orphans.count, 1)
+        for name in orphans { try? FileManager.default.removeItem(atPath: "\(dir)/\(name)") }
+    }
+
+    // Rule: an install never sweeps a temp another writer of this process
+    // is still filling.
+    func testAnInstallKeepsATempAnotherWriterIsStillFilling() throws {
+        let files = try paths()
+        var wallet = Data([42, 0, 0, 0, 0, 0, 0, 0])
+        wallet.append(Data(repeating: 7, count: 64))
+        let filled = DispatchSemaphore(value: 0)
+        let released = DispatchSemaphore(value: 0)
+        var slowError: Error?
+        let slow = expectation(description: "slow writer")
+        DispatchQueue.global().async {
+            do {
+                _ = try PlainWalletFile.write(files.main) { temp in
+                    try wallet.write(to: URL(fileURLWithPath: temp))
+                    filled.signal()
+                    released.wait()
+                    return true
+                }
+            } catch {
+                slowError = error
+            }
+            slow.fulfill()
+        }
+        filled.wait()
+        _ = try PlainWalletFile.write(files.main) { temp in
+            try wallet.write(to: URL(fileURLWithPath: temp))
+            return true
+        }
+        released.signal()
+        wait(for: [slow], timeout: 10)
+
+        XCTAssertNil(slowError)
+        XCTAssertEqual(PlainWalletFile.staleTemps(files.main), [])
+    }
+
+    // Rule: the salvage scratch copy is excluded from backup while it exists.
+    func testTheSalvageScratchIsExcludedFromBackup() throws {
+        let files = try paths()
+        var wallet = Data([42, 0, 0, 0, 0, 0, 0, 0])
+        wallet.append(Data(repeating: 7, count: 64))
+        let text = "\(files.main).text-fixture"
+        let raw = "\(files.main).raw-fixture"
+        defer {
+            try? FileManager.default.removeItem(atPath: text)
+            try? FileManager.default.removeItem(atPath: raw)
+        }
+        try wallet.base64EncodedString().write(toFile: text, atomically: true, encoding: .utf8)
+
+        try PlainWalletFile.decodeBase64Text(from: text, to: raw)
+
+        let excluded = try URL(fileURLWithPath: raw)
+            .resourceValues(forKeys: [.isExcludedFromBackupKey]).isExcludedFromBackup
+        XCTAssertEqual(excluded, true)
+    }
+
+    // Rule: a failed salvage decode leaves no plaintext scratch copy.
+    func testAFailedSalvageDecodeLeavesNoScratchCopy() throws {
+        let files = try paths()
+        let text = Data(repeating: 0, count: 90_000).base64EncodedString() + "!!!!"
+        try text.write(toFile: files.main, atomically: true, encoding: .utf8)
+
+        let done = expectation(description: "salvage")
+        rpc.walletFileRecoveryInfo({ _ in done.fulfill() }, reject: { _, _, _ in done.fulfill() })
+        wait(for: [done], timeout: 30)
+
+        XCTAssertFalse(FileManager.default.fileExists(atPath: "\(files.main).salvage.tmp"))
+    }
+
+    // Rule: deleting the wallet removes every plain copy beside it.
+    func testDeleteRemovesThePlainAndSalvageTemps() throws {
+        let files = try paths()
+        let wallet = Data([42, 0, 0, 0, 0, 0, 0, 0])
+        try wallet.write(to: URL(fileURLWithPath: files.main))
+        try wallet.write(to: URL(fileURLWithPath: PlainWalletFile.tempPath(files.main)))
+        try wallet.write(to: URL(fileURLWithPath: "\(files.main).salvage.tmp"))
+
+        try rpc.fnDeleteExistingWallet()
+
+        let fm = FileManager.default
+        XCTAssertFalse(fm.fileExists(atPath: PlainWalletFile.tempPath(files.main)))
+        XCTAssertFalse(fm.fileExists(atPath: "\(files.main).salvage.tmp"))
+    }
+
+    // Rule: a wallet file the load cannot read rejects under a typed code.
+    func testAnUnreadableWalletFileRejectsTyped() throws {
+        let files = try paths()
+        try "!!!not-base64!!!".write(toFile: files.main, atomically: true, encoding: .utf8)
+
+        let outcome = FfiOutcome.of {
+            try self.rpc.fnLoadExistingWallet(serveruri: "", chainhint: "main", performancelevel: "Medium", minconfirmations: "1")
+        }
+
+        guard case .rejected(let code, _, _) = outcome else {
+            return XCTFail("an unreadable wallet file must reject")
+        }
+        XCTAssertNotEqual(code, "Unknown")
+    }
+
+    // Rule: the temp is excluded from backup before the rename publishes it.
+    func testTheRenamePublishesAnAlreadyExcludedFile() throws {
+        let files = try paths()
+        var temp = ""
+        func excluded(_ path: String) throws -> Bool? {
+            try URL(fileURLWithPath: path).resourceValues(forKeys: [.isExcludedFromBackupKey]).isExcludedFromBackup
+        }
+        _ = try PlainWalletFile.write(
+            files.main,
+            commit: {
+                XCTAssertEqual(try? excluded(temp), true)
+                return true
+            }
+        ) { path in
+            temp = path
+            try Data([42, 0, 0, 0, 0, 0, 0, 0]).write(to: URL(fileURLWithPath: path))
+            return true
+        }
+        XCTAssertEqual(try excluded(files.main), true)
+    }
+
+    // Rule: a save in flight when the user deletes the wallet must not
+    // recreate the file.
+    func testASaveInFlightDoesNotUndoADelete() throws {
+        let files = try paths()
+        let wallet = try savedWallet(birthday: 2_000_000)
+        try wallet.write(to: URL(fileURLWithPath: files.main))
+        _ = try createNewUnifiedAddress(receivers: "o")
+
+        let inFill = DispatchSemaphore(value: 0)
+        let release = DispatchSemaphore(value: 0)
+        let saved = expectation(description: "save")
+        rpc.beforeSaveFill = {
+            inFill.signal()
+            release.wait()
+        }
+        defer { rpc.beforeSaveFill = {} }
+        DispatchQueue.global().async {
+            try? self.rpc.saveWalletInternal()
+            saved.fulfill()
+        }
+        inFill.wait()
+
+        let deleted = expectation(description: "delete")
+        DispatchQueue.global().async {
+            try? self.rpc.fnDeleteExistingWallet()
+            deleted.fulfill()
+        }
+        Thread.sleep(forTimeInterval: 0.3)
+        release.signal()
+        wait(for: [saved, deleted], timeout: 10)
+
+        XCTAssertFalse(FileManager.default.fileExists(atPath: files.main))
+    }
+
+    // Rule: zingolib clears the save flag on every read, so a save right
+    // after a load is a no-op until the wallet changes. A benchmark or a
+    // test that loads then saves must dirty the wallet first.
+    func testASaveRightAfterALoadIsANoOpUntilTheWalletChanges() throws {
+        let files = try paths()
+        let wallet = try savedWallet(birthday: 2_000_000)
+        try wallet.write(to: URL(fileURLWithPath: files.main))
+        _ = try rpc.fnLoadExistingWallet(serveruri: "", chainhint: "main", performancelevel: "Medium", minconfirmations: "1")
+        func modified() throws -> Date? {
+            try FileManager.default.attributesOfItem(atPath: files.main)[.modificationDate] as? Date
+        }
+        let before = try modified()
+        Thread.sleep(forTimeInterval: 0.05)
+
+        try rpc.saveWalletInternal()
+        XCTAssertEqual(try modified(), before)
+
+        _ = try createNewUnifiedAddress(receivers: "o")
+        try rpc.saveWalletInternal()
+        XCTAssertNotEqual(try modified(), before)
     }
 }
 
@@ -970,5 +1491,369 @@ class FfiArgsTests: XCTestCase {
         XCTAssertEqual(
             code, "InvalidInput",
             "a malformed numeric arg must reject under InvalidInput on both platforms")
+    }
+}
+
+/// The startup attribute migration: wallet files an old build wrote under
+/// class A move to class C with backup exclusion, content untouched.
+class WalletFileProtectionTests: XCTestCase {
+    func testClassAFileMovesToClassCWithBackupExclusion() throws {
+        let rpc = RPCModule()
+        let fm = FileManager.default
+        try fm.createDirectory(
+            atPath: rpc.getDocumentsDirectory(),
+            withIntermediateDirectories: true
+        )
+        let path = try rpc.getFileName(Constants.WalletFileName.rawValue)
+        try "d2FsbGV0".write(toFile: path, atomically: true, encoding: .utf8)
+        defer { try? fm.removeItem(atPath: path) }
+        try fm.setAttributes([.protectionKey: FileProtectionType.complete], ofItemAtPath: path)
+        let stored = try fm.attributesOfItem(atPath: path)[.protectionKey] as? FileProtectionType
+
+        rpc.applyWalletFileProtection()
+
+        XCTAssertEqual(try String(contentsOfFile: path, encoding: .utf8), "d2FsbGV0")
+        let excluded = try URL(fileURLWithPath: path)
+            .resourceValues(forKeys: [.isExcludedFromBackupKey]).isExcludedFromBackup
+        XCTAssertEqual(excluded, true)
+        guard stored == .complete else {
+            throw XCTSkip("this simulator does not store file-protection attributes")
+        }
+        let after = try fm.attributesOfItem(atPath: path)[.protectionKey] as? FileProtectionType
+        XCTAssertEqual(after, .completeUntilFirstUserAuthentication)
+    }
+
+    func testMissingWalletFilesAreANoOp() throws {
+        let rpc = RPCModule()
+        let fm = FileManager.default
+        for name in [Constants.WalletFileName.rawValue, Constants.WalletBackupFileName.rawValue] {
+            if let path = try? rpc.getFileName(name) {
+                try? fm.removeItem(atPath: path)
+            }
+        }
+        rpc.applyWalletFileProtection()
+    }
+}
+
+/// The per-file diagnosis behind the recovery dialog: base64 text that
+/// decodes to a plausible wallet header reads `plainWallet`, truncation
+/// included.
+class WalletFileDiagnosisTests: XCTestCase {
+    private func mainEntry(_ rpc: RPCModule) -> [String: Any]? {
+        rpc.walletFileDiagnosis().first { $0["name"] as? String == Constants.WalletFileName.rawValue }
+    }
+
+    private func mainPath(_ rpc: RPCModule) throws -> String {
+        try FileManager.default.createDirectory(
+            atPath: rpc.getDocumentsDirectory(),
+            withIntermediateDirectories: true
+        )
+        return try rpc.getFileName(Constants.WalletFileName.rawValue)
+    }
+
+    override func tearDown() {
+        let rpc = RPCModule()
+        if let path = try? rpc.getFileName(Constants.WalletFileName.rawValue) {
+            try? FileManager.default.removeItem(atPath: path)
+        }
+        super.tearDown()
+    }
+
+    func testATruncatedWalletFileDiagnosesPlainWallet() throws {
+        let rpc = RPCModule()
+        let path = try mainPath(rpc)
+        var wallet = Data([42, 0, 0, 0, 0, 0, 0, 0])
+        wallet.append(Data(repeating: 7, count: 64))
+        let text = wallet.base64EncodedString()
+        let truncated = String(text.prefix(text.count / 2 + 1))
+        try truncated.write(toFile: path, atomically: true, encoding: .utf8)
+
+        let entry = try XCTUnwrap(mainEntry(rpc))
+        XCTAssertEqual(entry["state"] as? String, "plainWallet")
+        XCTAssertGreaterThan(entry["size"] as? Int ?? 0, 0)
+    }
+
+    func testGarbageTextDiagnosesUnknown() throws {
+        let rpc = RPCModule()
+        let path = try mainPath(rpc)
+        try "!!!not-base64!!!".write(toFile: path, atomically: true, encoding: .utf8)
+
+        let entry = try XCTUnwrap(mainEntry(rpc))
+        XCTAssertEqual(entry["state"] as? String, "unknown")
+    }
+
+    func testAMissingFileDiagnosesMissing() throws {
+        let rpc = RPCModule()
+        let path = try mainPath(rpc)
+        try? FileManager.default.removeItem(atPath: path)
+
+        let entry = try XCTUnwrap(mainEntry(rpc))
+        XCTAssertEqual(entry["state"] as? String, "missing")
+    }
+}
+
+/// The wallet and backup swap recovered from every interruption window,
+/// and the delete purge of sidecar copies. The fixtures are real offline
+/// wallets, since every move into a slot runs the full parse first.
+class WalletSwapRecoveryTests: XCTestCase {
+    private var walletA = Data()
+    private var walletB = Data()
+    private var walletC = Data()
+    private var junk = Data()
+
+    override func setUp() {
+        super.setUp()
+        setCryptoProvider()
+        let rpc = RPCModule()
+        walletA = (try? Self.savedWallet(rpc, birthday: 2_000_000)) ?? Data()
+        walletB = (try? Self.savedWallet(rpc, birthday: 2_100_000)) ?? Data()
+        walletC = (try? Self.savedWallet(rpc, birthday: 2_200_000)) ?? Data()
+        junk = Data([42, 0, 0, 0, 0, 0, 0, 0]) + Data(repeating: 9, count: 64)
+        RPCModule.walletFileClosed = false
+    }
+
+    override func tearDown() {
+        let rpc = RPCModule()
+        let fm = FileManager.default
+        for name in [Constants.WalletFileName.rawValue,
+                     Constants.WalletBackupFileName.rawValue,
+                     Constants.WalletTempSwapFileName.rawValue,
+                     "\(Constants.WalletFileName.rawValue).broken"] {
+            if let path = try? rpc.getFileName(name) {
+                try? fm.removeItem(atPath: path)
+            }
+        }
+        if let files = try? paths(rpc) { clearOrphans(files) }
+        RPCModule.walletFileClosed = false
+        super.tearDown()
+    }
+
+    private static func savedWallet(_ rpc: RPCModule, birthday: UInt32) throws -> Data {
+        _ = try initFromSeed(seed: Seeds.HOSPITAL, birthday: birthday, serveruri: "", chainhint: "main", performancelevel: "Medium", minconfirmations: 1)
+        try FileManager.default.createDirectory(atPath: rpc.getDocumentsDirectory(), withIntermediateDirectories: true)
+        let path = try rpc.getFileName("swap-fixture.dat")
+        try? FileManager.default.removeItem(atPath: path)
+        XCTAssertTrue(try saveWalletFile(tempPath: path))
+        defer { try? FileManager.default.removeItem(atPath: path) }
+        return try Data(contentsOf: URL(fileURLWithPath: path))
+    }
+
+    private func paths(_ rpc: RPCModule) throws -> (main: String, backup: String, temp: String) {
+        try FileManager.default.createDirectory(
+            atPath: rpc.getDocumentsDirectory(),
+            withIntermediateDirectories: true
+        )
+        return (
+            try rpc.getFileName(Constants.WalletFileName.rawValue),
+            try rpc.getFileName(Constants.WalletBackupFileName.rawValue),
+            try rpc.getFileName(Constants.WalletTempSwapFileName.rawValue)
+        )
+    }
+
+    private func clear(_ files: (main: String, backup: String, temp: String)) {
+        let fm = FileManager.default
+        for path in [files.main, files.backup, files.temp] {
+            try? fm.removeItem(atPath: path)
+        }
+    }
+
+    private func write(_ bytes: Data, to path: String) throws {
+        try bytes.write(to: URL(fileURLWithPath: path))
+    }
+
+    private func read(_ path: String) throws -> Data {
+        try Data(contentsOf: URL(fileURLWithPath: path))
+    }
+
+    private func orphans(_ files: (main: String, backup: String, temp: String)) throws -> [Data] {
+        let dir = (files.temp as NSString).deletingLastPathComponent
+        let prefix = (files.temp as NSString).lastPathComponent + ".orphan."
+        return try FileManager.default.contentsOfDirectory(atPath: dir)
+            .filter { $0.hasPrefix(prefix) }
+            .map { try Data(contentsOf: URL(fileURLWithPath: "\(dir)/\($0)")) }
+    }
+
+    private func clearOrphans(_ files: (main: String, backup: String, temp: String)) {
+        let dir = (files.temp as NSString).deletingLastPathComponent
+        let prefix = (files.temp as NSString).lastPathComponent + ".orphan."
+        for name in (try? FileManager.default.contentsOfDirectory(atPath: dir)) ?? [] where name.hasPrefix(prefix) {
+            try? FileManager.default.removeItem(atPath: "\(dir)/\(name)")
+        }
+    }
+
+    func testAClosedWalletFileRefusesTheSave() throws {
+        let rpc = RPCModule()
+        let files = try paths(rpc)
+        clear(files)
+        try write(walletA, to: files.main)
+
+        RPCModule.walletFileClosed = true
+        try rpc.saveWalletInternal()
+
+        XCTAssertEqual(try read(files.main), walletA)
+    }
+
+    func testDeleteClosesTheWalletFile() throws {
+        let rpc = RPCModule()
+        let files = try paths(rpc)
+        clear(files)
+        try write(walletA, to: files.main)
+
+        try rpc.fnDeleteExistingWallet()
+
+        XCTAssertTrue(RPCModule.walletFileClosed)
+    }
+
+    func testInterruptedBeforeMainRenameFinishesTheSwap() throws {
+        let rpc = RPCModule()
+        let files = try paths(rpc)
+        clear(files)
+        try write(walletA, to: files.temp)
+        try write(walletB, to: files.backup)
+
+        rpc.completePendingSwap()
+
+        XCTAssertEqual(try read(files.main), walletB)
+        XCTAssertEqual(try read(files.backup), walletA)
+        XCTAssertFalse(FileManager.default.fileExists(atPath: files.temp))
+    }
+
+    func testInterruptedBeforeBackupRenameFinishesTheSwap() throws {
+        let rpc = RPCModule()
+        let files = try paths(rpc)
+        clear(files)
+        try write(walletA, to: files.temp)
+        try write(walletB, to: files.main)
+
+        rpc.completePendingSwap()
+
+        XCTAssertEqual(try read(files.main), walletB)
+        XCTAssertEqual(try read(files.backup), walletA)
+        XCTAssertFalse(FileManager.default.fileExists(atPath: files.temp))
+    }
+
+    func testASaveRecreatingMainFinishesTheSwap() throws {
+        let rpc = RPCModule()
+        let files = try paths(rpc)
+        clear(files)
+        try write(walletA, to: files.temp)
+        try write(walletA, to: files.main)
+        try write(walletB, to: files.backup)
+
+        rpc.completePendingSwap()
+
+        XCTAssertEqual(try read(files.main), walletB)
+        XCTAssertEqual(try read(files.backup), walletA)
+        XCTAssertFalse(FileManager.default.fileExists(atPath: files.temp))
+    }
+
+    func testAnInterruptionBeforeBackupIsRewrittenCompletesTheSwap() throws {
+        let rpc = RPCModule()
+        let files = try paths(rpc)
+        clear(files)
+        try write(walletA, to: files.temp)
+        try write(walletB, to: files.main)
+        try write(walletB, to: files.backup)
+
+        rpc.completePendingSwap()
+
+        XCTAssertEqual(try read(files.main), walletB)
+        XCTAssertEqual(try read(files.backup), walletA)
+        XCTAssertFalse(FileManager.default.fileExists(atPath: files.temp))
+    }
+
+    func testACompletedSwapDropsTheTemp() throws {
+        let rpc = RPCModule()
+        let files = try paths(rpc)
+        clear(files)
+        try write(walletA, to: files.temp)
+        try write(walletB, to: files.main)
+        try write(walletA, to: files.backup)
+
+        rpc.completePendingSwap()
+
+        XCTAssertEqual(try read(files.main), walletB)
+        XCTAssertEqual(try read(files.backup), walletA)
+        XCTAssertFalse(FileManager.default.fileExists(atPath: files.temp))
+    }
+
+    func testThreeDistinctWalletFilesBecomeAnOrphanAndTwoUntouchedSlots() throws {
+        let rpc = RPCModule()
+        let files = try paths(rpc)
+        clear(files)
+        clearOrphans(files)
+        try write(walletA, to: files.temp)
+        try write(walletC, to: files.main)
+        try write(walletB, to: files.backup)
+
+        rpc.completePendingSwap()
+
+        XCTAssertEqual(try read(files.main), walletC)
+        XCTAssertEqual(try read(files.backup), walletB)
+        XCTAssertFalse(FileManager.default.fileExists(atPath: files.temp))
+        XCTAssertEqual(try orphans(files), [walletA])
+    }
+
+    func testAnUnreadableSwapTempIsNeverInstalledAndStaysAsEvidence() throws {
+        let rpc = RPCModule()
+        let files = try paths(rpc)
+        clear(files)
+        try write(junk, to: files.temp)
+        try write(walletB, to: files.main)
+
+        rpc.completePendingSwap()
+
+        XCTAssertEqual(try read(files.main), walletB)
+        XCTAssertFalse(FileManager.default.fileExists(atPath: files.backup))
+        XCTAssertEqual(try read(files.temp), junk)
+    }
+
+    func testDeleteKeepsAnUnresolvedSwapTempAsAnOrphan() throws {
+        let rpc = RPCModule()
+        let files = try paths(rpc)
+        clear(files)
+        clearOrphans(files)
+        try write(walletA, to: files.temp)
+        try write(walletC, to: files.main)
+        try write(walletB, to: files.backup)
+
+        try rpc.fnDeleteExistingWallet()
+
+        XCTAssertFalse(FileManager.default.fileExists(atPath: files.main))
+        XCTAssertEqual(try orphans(files), [walletA])
+        XCTAssertEqual(try read(files.backup), walletB)
+    }
+
+    func testDeleteDoesNotInstallAnUnreadableSwapTempAsTheBackup() throws {
+        let rpc = RPCModule()
+        let files = try paths(rpc)
+        clear(files)
+        try write(walletA, to: files.main)
+        try write(junk, to: files.temp)
+
+        try rpc.fnDeleteExistingWallet()
+
+        XCTAssertFalse(FileManager.default.fileExists(atPath: files.main))
+        XCTAssertFalse(FileManager.default.fileExists(atPath: files.backup))
+        XCTAssertEqual(try read(files.temp), junk)
+    }
+
+    func testDeleteRemovesTheBrokenCopyAndTheSwapTemp() throws {
+        let rpc = RPCModule()
+        let files = try paths(rpc)
+        clear(files)
+        let brokenPath = try rpc.getFileName("\(Constants.WalletFileName.rawValue).broken")
+        try? FileManager.default.removeItem(atPath: brokenPath)
+        try write(walletA, to: files.main)
+        try write(walletA, to: brokenPath)
+        try write(walletA, to: files.temp)
+
+        try rpc.fnDeleteExistingWallet()
+
+        let fm = FileManager.default
+        XCTAssertFalse(fm.fileExists(atPath: files.main))
+        XCTAssertFalse(fm.fileExists(atPath: brokenPath))
+        XCTAssertFalse(fm.fileExists(atPath: files.temp))
+        XCTAssertFalse(fm.fileExists(atPath: files.backup))
     }
 }

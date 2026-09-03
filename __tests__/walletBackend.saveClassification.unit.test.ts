@@ -4,10 +4,9 @@
  * knowable from the shape of its result, never from sniffing its content —
  * and error prose must never be mistaken for success.
  *
- * These tests are the TS twins of the Rust wallet_export_tests. (Kotlin
- * has no export classifier to twin: exports cross the Android bridge as
- * bytes. Its one base64 classifier, WalletBackup.isRestorable, guards
- * the restore read-back and has its own JVM suite.)
+ * These tests are the TS twins of the Rust wallet_save_file_tests. (Kotlin
+ * and Swift have no classifier to twin: the wallet never crosses either
+ * bridge, Rust streams it to the path the native layer names.)
  */
 jest.mock('@app/RPCModule', () =>
   require('../__mocks__/rpcModuleProxy').rpcModuleProxyMock(),

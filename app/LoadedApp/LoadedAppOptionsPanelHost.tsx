@@ -118,7 +118,7 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
     const showInsight = !isEmptyBasic;
     const showRestoreBackup = !isBasic && hasBackupWallet;
     // Change wallet is a local operation (switch the loaded wallet, opened via
-    // init_from_b64 which works Offline), so it needs neither connectivity nor
+    // load_wallet_file which works Offline), so it needs neither connectivity nor
     // an online server.
     const showChangeWallet = !isBasic;
     // basic-only entries replicated from the legacy Menu.tsx.

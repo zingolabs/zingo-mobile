@@ -1,23 +1,31 @@
 # Instructions for Agents
 
-## MUST DO ALWAYS
+## Highest Priority
 
-- When reporting information to me, be extremely concise and use ASD-STE100 for the sake of concision.
-- If you need a paragraph-long comment to justify why a workaround is OK, the code is wrong: Fix the code!
-- Call the user "friend", in a similar fashion to Mr Robot.
-- When in doubt, use context7 to check for accurate documentation.
+- Refer to the user as the host's username.
+- Be terse. Be precise. Use common technical language. And use ASD-STE100 when speaking.
+- Never ever explain something by stating what it is not.
+- Never ever explain a behavior by stating what it does not do.
+- Don't add contrast where it doesn't help. Contrast only when the users asks you to do so.
 
-## The mobile backend and the UI are separate concerns
+## The codebase is old. Do not copy it.
 
 The mobile backend (Rust under `rust/`, its UniFFI/Kotlin/Swift bindings, and their build systems) and the UI (React Native screens, theme, styles, colours, copy) are separate concerns: keep each change to one side, and where a task needs both, split them into commits labelled backend or UI so a reviewer can read one without the other. Before finishing, scan your own diff for stray edits from the other half, and when the boundary is muddy (a component reaching into the wallet backend, a backend module formatting human prose), name it and propose the separation as its own change rather than fixing it inline.
 
-## Writing & Code Style
+## Architecture
 
 Goal: produce prose and code that reads as if written by a specific, competent human, not by a model. The point is naturalness and accuracy, not looking exhaustive or safe. When in doubt, commit to a choice and keep it short.
 
-### Prose
+The mobile backend is the Rust under `rust/` and its native interfaces: the
+UniFFI components, the Kotlin and Swift modules that bind them, and the build
+systems that produce them.
 
-#### Economy and precision (adapted from Strunk's Elements of Style)
+The UI is everything above that boundary: the React Native screens and
+components, the theme, the styles, and the user-facing copy. Core UI modules
+(`app/uris/`, `app/walletBackend/`) hold logic and know nothing about display.
+Shared outcome types (`ErrorKeyed<K>`, `Done`) live in
+`app/AppState/types/Result.ts`. Translation happens only at the display edge.
+ESLint enforces the zone.
 
 - Use the active voice. Prefer "the parser rejects malformed input" over "malformed input is rejected by the parser". Passive voice only when the actor is unknown or irrelevant.
 - Put statements in positive form. Say what something is, not what it isn't. "The cache is stale" beats "the cache is not up to date". No "not un-" constructions.
@@ -28,18 +36,28 @@ Goal: produce prose and code that reads as if written by a specific, competent h
 - Do not explain too much. State the point once.
 - Revise by deletion. When tightening prose, the default operation is removal, not substitution. A shorter draft that says the same thing is strictly better.
 
-#### Punctuation
-- No em dashes. Use commas, parentheses, or separate sentences.
-- No semicolons. Split into two sentences.
-- Don't over-clarify with parentheticals. Cut the aside or fold it into the sentence.
+## Code
 
-#### Constructions to avoid
-- The antithesis flip: "not X, but Y", "isn't just X, it's Y", "not only X but also Y". State the claim directly.
-- Defaulting to groups of three (adjectives, clauses, list items). Vary the count.
-- "From X to Y" fake-comprehensive sweeps.
-- "Whether you're X or Y" catch-all wrap-ups.
-- Forced analogies ("think of it like a...").
+### All languages
 
+- In comments, never narrate.
+- In comments, never include justifications or logical connectors.
+- In functions, explain what the function does in one sentence, if possible.
+- No tutorial narration ("Now we...", "Step 1:") and no banner comments
+  (`// ===== HELPERS =====`).
+- If a workaround needs a paragraph of justification, the code is wrong. Fix
+  the code.
+- Names are short and domain-specific. No `data`, `result`, `output`, `item`,
+  `value`, `temp`, `handleData`, or a helper named `helper`. No over-long
+  descriptive names where a short one is idiomatic.
+- No completeness theater: no unrequested demo or usage blocks, no logs
+  narrating execution, no emoji in output, no unprompted complexity analysis.
+- No guards for conditions that cannot occur. No try/catch around code that
+  does not throw. Do not swallow-and-log errors. Let them propagate.
+- Never leave an error unhandled.
+- When writing tests, don't ever enumerate facts, or make a list of things something does. Use the following form:
+  "Tests that <behavior> happens when <condition>. <Clarifications>".
+  
 #### Avoid manufactured logical connectors generally
 
 Don't use "so," "which means," "therefore," or "as a result" unless the
@@ -98,50 +116,95 @@ without losing meaning, the "so" was decorative. Delete it.
 
 ### Documentation in code
 
-The one-sentence documentation rule, ratified 2026-08-10: every item
-doc-comment — Rust `///`, and the KDoc or doc-comment on a Kotlin or Swift
-item — is exactly one sentence. That sentence must not reference ADRs,
-issues, or any other document. Module headers (Rust `//!`, a file- or
-class-level header block) are exempt, and test doc-comments that follow a
-ratified convention (for example HYPOTHESIS falsifiers) keep that
-convention's shape. Apply the rule to every unmerged doc-comment before
-merge.
+Every item doc-comment (Rust `///`, KDoc, Swift doc-comment) is one sentence
+and references no ADR, issue, or other document. Module headers (Rust `//!`,
+file- or class-level blocks) are NOT exempt.
 
 ### Rust
 
-- Don't reach for `.clone()` to satisfy the borrow checker. Borrow or restructure first.
-- Use `?` for propagation. Avoid `.unwrap()`/`.expect()` outside tests and throwaway code.
-- Use tail expressions. No explicit `return` on the final line.
-- Don't annotate types the compiler infers (`let x: i32 = 5;`).
-- Prefer `if let` and combinators (`map`, `and_then`, `ok_or`, `unwrap_or_else`) over verbose `match` when clearer.
-- Prefer iterator chains over manual `for` + `push` where idiomatic.
-- Use `&str` where a borrow suffices instead of `String`.
+- Borrow or restructure before reaching for `.clone()`.
+- Use `?` for propagation. No `.unwrap()` or `.expect()` outside tests.
+- Tail expressions. No explicit `return` on the final line.
+- Do not annotate types the compiler infers.
+- Prefer `if let` and combinators (`map`, `and_then`, `ok_or`,
+  `unwrap_or_else`) over verbose `match` when clearer.
+- Prefer iterator chains over manual `for` + `push`.
+- Take `&str` where a borrow suffices.
 
 ### TypeScript / React
 
-- No `any`. Type precisely. Don't annotate what TS already infers. Don't use `as` to silence the checker.
-- Prefer union/literal types over enums where idiomatic. Prefer named exports.
-- Don't use `React.FC`. Type props directly.
-- Don't wrap everything in `useMemo`/`useCallback`. Use them only for a real identity or perf need.
-- Don't reach for `useEffect` to compute derived state. Derive it during render.
-- No `console.log` narrating execution.
-- Don't over-componentize trivial markup, and don't prop-drill where composition or context fits.
-- No `null` in new or touched code. We aim to eliminate `null` from this codebase in favor of the strictest named types available: model absence and outcomes as discriminated unions that say what the value is. Shrink the null count with every touch, never grow it.
-- Never signal errors in-band through string content: no sentinel prefixes, no empty-string-means-success, no error prose returned where data is expected. An error channel carries an `ErrorKey` (a string-literal union of translation-catalog keys), never translated prose.
-- Call `translate()` only at the display edge, in the component about to render the text. Core modules (`app/uris/`, `app/walletBackend/`) neither accept nor call `translate`. ESLint enforces the zone.
-- Model operation outcomes as discriminated unions with domain-named success tags and a shared `'error'` failure tag (`{ kind: 'canonicalUri'; uri } | ErrorKeyed<'uris.baduri'>`). The shared pieces (`ErrorKeyed<K>`, `Done`) live in `app/AppState/types/Result.ts`.
+- No `any`. Do not annotate what TS infers. No `as` to silence the checker.
+- Union and literal types over enums. Named exports.
+- No `React.FC`. Type props directly.
+- `useMemo` and `useCallback` only for a real identity or performance need.
+- Derive state during render. No `useEffect` to compute it.
+- No `console.log`.
+- Do not over-componentize trivial markup. Do not prop-drill where
+  composition or context fits.
+- No `null` in new or touched code. Model absence and outcomes as
+  discriminated unions with domain-named success tags and a shared `'error'`
+  tag: `{ kind: 'canonicalUri'; uri } | ErrorKeyed<'uris.baduri'>`.
+- Never signal errors in-band through string content. An error channel
+  carries an `ErrorKey` (a string-literal union of catalog keys), never
+  translated prose.
+- Call `translate()` only in the component about to render the text.
 
 ### HTML / CSS
 
-- Use semantic elements. Avoid div soup.
-- Keep class lists purposeful and legible. Don't pad with utilities that don't do anything.
+- Semantic elements. No div soup.
+- Class lists stay purposeful. No utilities that do nothing.
 
-### For agents
+### Shell
 
-- Before finishing a task, scan what you wrote against this file. Focus on the high-signal tells, not a full re-audit: antithesis flips and narrating comments in prose, `.clone()`/`.unwrap()` spam and explicit trailing `return` in Rust, `useEffect` for derived state and `any` in TS.
-- Verify your *new* output fits these rules and the surrounding code's style. The question is "does what I added fit", not "does this whole file now obey CLAUDE.md".
-- Don't reformat, re-comment, or otherwise "correct" existing code you were only asked to touch lightly. Match what's there. Keep diffs scoped to the task.
+- No heredocs. Use a real file or `printf` with explicit lines.
 
-### Tooling
+## Prose
 
-- No heredocs (<< EOF, << 'EOF') in bash or other shell scripts. They're hard to read, break on escaping, and bury content that should be its own file. Use a real file, a templating step, or printf with explicit lines instead.
+Applies to comments, commit messages, pull request descriptions, and reports.
+Write as a specific, competent human. Commit to a choice and keep it short.
+Commits should avoid descriptions. They should follow conventional commits terminology.
+
+### Economy
+
+- Omit needless words. "in order to" → "to", "due to the fact that" →
+  "because", "has the ability to" → "can". Delete "essentially",
+  "basically", "fundamentally".
+- Active voice. Positive form. Specific, concrete language: "sync stalls after
+  40k blocks", not "performance degrades under certain conditions".
+- One paragraph, one topic. Emphatic words at the end of the sentence.
+- No intensifiers. Hedge precisely ("untested on mainnet") or not at all.
+- State the point once. Revise by deletion.
+
+### Punctuation and constructions
+
+- No em dashes. No semicolons. Split the sentence.
+- No antithesis flips: "not X, but Y", "isn't just X, it's Y", "not only X
+  but also Y".
+- No default groups of three. No "from X to Y" sweeps. No "whether you're X
+  or Y" wrap-ups. No forced analogies.
+- No decorative connectors. "So", "therefore", "which means" only when the
+  second clause is a real, non-obvious consequence of the first.
+- No throat-clearing ("it's worth noting"), no grandiose closers ("in
+  conclusion", "at the end of the day"), no chained connectives ("moreover",
+  "furthermore", "that said").
+- No sycophancy. No false balance.
+- Keep articles and past tense. "The spec was written", not "spec is
+  written". Telegraphic prose reads machine-generated.
+- Describe, don't sell. No hype (powerful, effortless, blazing-fast,
+  supercharge, transform, simply, just), no benefit pitches, no stacked
+  fragments for impact, no "let's dive in".
+
+### Banned vocabulary
+
+so, delve, tapestry, realm, landscape, navigate, navigating, leverage, robust,
+seamless, crucial, vital, pivotal, testament, boasts, nestled, foster,
+harness, unlock, elevate, embark, showcase, underscore, spearhead, treasure
+trove, game-changer, cheap, liveness, gap, shape, correctness, alive, honest,
+simple, probe, contact, stay, stranger, ratified, verdict, witness, claim, assert, ride.
+
+### Formatting
+
+- Do not bold the lead phrase of every bullet.
+- Do not bullet what should be prose.
+- No headers on two-sentence sections. No emoji as section markers.
+- Vary sentence length.

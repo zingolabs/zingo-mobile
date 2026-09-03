@@ -1,21 +1,25 @@
 import { Platform } from 'react-native';
 import RPCModule from '@app/RPCModule';
 import { callFfi } from '@app/walletBackend/ffi';
+import { ErrorKeyed } from '@app/AppState/types/Result';
 
-// Android-only support tooling for the 2.0.21 double-wrap incident: the
-// native migration re-encrypted an already encrypted wallet file, and
-// zingolib then failed to read it. The bridge classifies each wallet file
-// and can peel the extra envelope layers off.
+// Support tooling for damaged wallet files: both platforms classify their
+// wallet files for the recovery dialog, and Android additionally repairs
+// the 2.0.21 double-wrap incident by peeling the extra envelope layers.
 
-// Mirror of Constants.kt WalletFileName / WalletBackupFileName.
-export const WALLET_FILE_NAME = 'wallet.dat';
-export const WALLET_BACKUP_FILE_NAME = 'wallet.backup.dat';
+// Mirror of Constants.kt and Constants.swift wallet file names. The
+// optional chain tolerates partial react-native test mocks at module
+// load.
+export const WALLET_FILE_NAME =
+  Platform?.OS === 'ios' ? 'wallet.dat.txt' : 'wallet.dat';
+export const WALLET_BACKUP_FILE_NAME =
+  Platform?.OS === 'ios' ? 'wallet.backup.dat.txt' : 'wallet.backup.dat';
 
 export type WalletFileState =
   | 'missing'
-  | 'plainLegacy'
-  | 'undecryptable'
   | 'plainWallet'
+  | 'encryptedLegacy'
+  | 'undecryptable'
   | 'doubleWrapped'
   | 'unknown';
 
@@ -39,9 +43,9 @@ export type WalletFileRepairOutcome = 'repaired' | 'skipped' | 'failed';
 
 const WALLET_FILE_STATES: ReadonlySet<string> = new Set([
   'missing',
-  'plainLegacy',
-  'undecryptable',
   'plainWallet',
+  'encryptedLegacy',
+  'undecryptable',
   'doubleWrapped',
   'unknown',
 ]);
@@ -74,12 +78,9 @@ function toDiagnosis(raw: unknown): WalletFileDiagnosis | undefined {
   return diagnosis;
 }
 
-// Empty on iOS and when the bridge call fails: the caller then falls back
-// to the plain error dialog.
+// Empty when the bridge call fails: the caller then falls back to the
+// plain error dialog.
 export async function walletFileDiagnosis(): Promise<WalletFileDiagnosisReport> {
-  if (Platform.OS !== 'android') {
-    return { files: [] };
-  }
   const result = await callFfi(RPCModule.walletFileDiagnosisInfo());
   if (!result.ok) {
     return { files: [] };
@@ -148,4 +149,41 @@ export function repairSucceeded(
 ): boolean {
   const values = Object.values(outcomes);
   return values.length > 0 && values.every(o => o !== 'failed');
+}
+
+export type WalletSeedSalvage =
+  | { kind: 'salvagedSeed'; seedPhrase: string; birthday: number }
+  | ErrorKeyed<'loadingapp.walletsalvage-failed'>;
+
+// Salvages seed and birthday from the stable prefix of a wallet file that
+// cannot open; the native side keeps the damaged bytes at `.broken`.
+export async function walletSeedSalvage(): Promise<WalletSeedSalvage> {
+  const failed: WalletSeedSalvage = {
+    kind: 'error',
+    errorKey: 'loadingapp.walletsalvage-failed',
+  };
+  const result = await callFfi(RPCModule.walletFileRecoveryInfo());
+  if (!result.ok) {
+    return failed;
+  }
+  try {
+    const parsed: unknown = JSON.parse(result.value);
+    if (typeof parsed !== 'object' || parsed === null) {
+      return failed;
+    }
+    const entry = parsed as Record<string, unknown>;
+    if (
+      typeof entry.seed_phrase !== 'string' ||
+      typeof entry.birthday !== 'number'
+    ) {
+      return failed;
+    }
+    return {
+      kind: 'salvagedSeed',
+      seedPhrase: entry.seed_phrase,
+      birthday: entry.birthday,
+    };
+  } catch {
+    return failed;
+  }
 }

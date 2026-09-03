@@ -141,7 +141,12 @@
     "walletrepair-outcome-skipped": "não precisa de reparo",
     "walletrepair-outcome-failed": "reparo falhou",
     "walletfile-state-missing": "inexistente",
-    "walletfile-state-plainLegacy": "ainda não criptografado",
+    "walletrecovery-salvageseed": "Recuperar frases de recuperação",
+    "walletsalvage-title": "Frases de recuperação recuperadas",
+    "walletsalvage-body": "O arquivo de carteira danificado ainda contém estas frases de recuperação e a data de nascimento. Anote as frases e guarde-as em local seguro. Confirme para restaurar a carteira com elas. A restauração examina a cadeia novamente e pode demorar.",
+    "walletsalvage-birthday": "Data de nascimento",
+    "walletsalvage-failed": "As frases de recuperação não podem ser recuperadas do arquivo de carteira.",
+    "walletfile-state-encryptedLegacy": "criptografado (formato antigo)",
     "walletfile-state-undecryptable": "não pode ser descriptografado (chave do dispositivo perdida)",
     "walletfile-state-plainWallet": "ok",
     "walletfile-state-doubleWrapped": "criptografado duas vezes",
@@ -215,6 +220,7 @@
   "rpc": {
     "walletnotfound-error": "Error: não foi possível encontrar nenhuma carteira.",
     "backupnotfound-error": "Error: não foi possível encontrar nenhum backup de nenhuma carteira.",
+    "restorebackup-error": "Error: não foi possível restaurar o backup. O arquivo não abre como uma carteira.",
     "deletewallet-error": "Error: não foi possível excluir a carteira atual.",
     "backupwallet-error": "Error: não foi possível salvar o backup da carteira."
   },

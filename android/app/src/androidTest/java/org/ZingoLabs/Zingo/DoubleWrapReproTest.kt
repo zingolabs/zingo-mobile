@@ -12,13 +12,8 @@ import java.io.File
 import java.io.IOException
 
 /**
- * The 2.0.21 double-wrap (#965) replayed against the real Keystore, the real
- * EncryptedFile and a real zingolib wallet: migrated once with a working
- * Keystore, then launches whose trial decrypt fails transiently. On the
- * unguarded migration each such launch wraps the envelope again and zingolib
- * then reads the inner Tink header as the wallet version, so these tests FAIL
- * while the #965 bug is present and pass once the plain-wallet guard (#1301)
- * lands.
+ * The 2.0.21 double-wrap incident class replayed against the Step 1 load
+ * path with the real Keystore and a real zingolib wallet.
  *
  * Run: ./gradlew :app:connectedProdDebugAndroidTest \
  *   -Pandroid.testInstrumentationRunnerArguments.class=org.ZingoLabs.Zingo.DoubleWrapReproTest
@@ -27,35 +22,35 @@ class DoubleWrapReproTest {
     private val fileName = Constants.WalletFileName.value
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
     private val rpcModule = RPCModule(MainApplication.getAppReactContext())
-    private val defaultTrialDecrypt = rpcModule.migrationTrialDecrypt
+    private val defaultLegacyDecrypt = rpcModule.legacyDecrypt
 
     // Offline wallet: empty server uri, a post-Sapling birthday. No network needed.
     private val chainHint = "main"
     private lateinit var plainWallet: ByteArray
 
     private fun walletFile() = File(context.filesDir, fileName)
-    private fun migratingFile() = File(context.filesDir, "$fileName.migrating")
 
-    private fun encryptedFile(): EncryptedFile {
+    private fun encryptedFile(file: File = walletFile()): EncryptedFile {
         val alias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
-        return EncryptedFile.Builder(walletFile(), context, alias, EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB).build()
+        return EncryptedFile.Builder(file, context, alias, EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB).build()
     }
 
-    // What the app stores: base64 text inside the envelope. Decoded here.
-    private fun storedPayload(): ByteArray {
-        val text = encryptedFile().openFileInput().use { it.readBytes() }
-        return Base64.decode(text, Base64.NO_WRAP)
+    // What the 2.0.21 save path stored: base64 text inside the envelope.
+    private fun writeEncryptedLegacyFile(payload: ByteArray) {
+        walletFile().delete()
+        encryptedFile().openFileOutput().use {
+            it.write(Base64.encodeToString(payload, Base64.NO_WRAP).toByteArray(Charsets.UTF_8))
+        }
     }
 
-    // What zingolib does first with the bytes it receives: read a u64-LE version.
-    private fun versionAsZingolibReadsIt(bytes: ByteArray): ULong {
-        var v = 0UL
-        for (i in 7 downTo 0) v = (v shl 8) or (bytes[i].toULong() and 0xFFUL)
-        return v
+    // What the buggy migration did: wrap the envelope bytes a second time.
+    private fun wrapAgain() {
+        val envelope = walletFile().readBytes()
+        writeEncryptedLegacyFile(envelope)
     }
 
     // Tink 1.5.0 wording for the transient path the reported devices hit.
-    private val transientKeystoreFailure: (String) -> Unit = {
+    private val transientKeystoreFailure: (File, java.io.OutputStream) -> Unit = { _, _ ->
         throw IOException("Keystore temporarily unavailable")
     }
 
@@ -67,60 +62,124 @@ class DoubleWrapReproTest {
     }
 
     @Before
-    fun plainWalletMigratedOnceWithAWorkingKeystore() {
-        for (suffix in listOf("", ".write.tmp", ".migrating")) {
+    fun aLegacyEncryptedWalletOnDisk() {
+        for (suffix in listOf("", ".write.tmp", ".migrating", ".prerepair", ".broken")) {
             File(context.filesDir, "$fileName$suffix").delete()
         }
         uniffi.zingo.initLogging()
         uniffi.zingo.setCryptoDefaultProviderToRing()
         uniffi.zingo.initFromSeed(Seeds.HOSPITAL, 2000000u, "", chainHint, "Medium", 1u)
-        plainWallet = uniffi.zingo.saveWalletBytes()!!
-        assertThat(versionAsZingolibReadsIt(plainWallet)).isAtMost(1000UL)
+        plainWallet = WalletFixtures.savedWalletBytes(context)
+        assertThat(WalletFileEnvelope.looksLikePlainWallet(plainWallet)).isTrue()
 
-        // A ≤2.0.20 plain wallet on disk, then the 2.0.21 migration.
-        walletFile().writeBytes(plainWallet)
-        rpcModule.migrateFileIfNeeded(fileName)
-        assertThat(storedPayload()).isEqualTo(plainWallet)
-        assertThat(loadError()).isNull()
+        // A 2.0.21+ device: the wallet rests inside the Tink envelope.
+        writeEncryptedLegacyFile(plainWallet)
     }
 
     @After
-    fun restoreTrialDecrypt() {
-        rpcModule.migrationTrialDecrypt = defaultTrialDecrypt
+    fun restoreLegacyDecrypt() {
+        rpcModule.legacyDecrypt = defaultLegacyDecrypt
     }
 
     @Test
-    fun oneTransientTrialDecryptFailureLeavesTheWalletSingleWrapped() {
-        val fileBefore = walletFile().readBytes()
-        rpcModule.migrationTrialDecrypt = transientKeystoreFailure
-        rpcModule.migrateFileIfNeeded(fileName)
-        rpcModule.migrationTrialDecrypt = defaultTrialDecrypt
-
-        // The guard reads the raw file, sees a Tink envelope rather than a
-        // plain wallet, and refuses to migrate: bytes on disk are unchanged.
-        assertThat(walletFile().readBytes()).isEqualTo(fileBefore)
-        assertThat(migratingFile().exists()).isFalse()
-        val payload = storedPayload()
-        assertThat(payload).isEqualTo(plainWallet)
-        assertThat(versionAsZingolibReadsIt(payload)).isAtMost(1000UL)
+    fun theFirstLoadMigratesTheEncryptedFileToPlainBytes() {
         assertThat(loadError()).isNull()
+        assertThat(walletFile().readBytes()).isEqualTo(plainWallet)
     }
 
     @Test
-    fun repeatedFailingLaunchesLeaveTheWalletAlone() {
-        val fileBefore = walletFile().readBytes()
-        rpcModule.migrationTrialDecrypt = transientKeystoreFailure
-        rpcModule.migrateFileIfNeeded(fileName)
-        rpcModule.migrateFileIfNeeded(fileName)
-        rpcModule.migrateFileIfNeeded(fileName)
-        assertThat(walletFile().readBytes()).isEqualTo(fileBefore)
-        assertThat(storedPayload()).isEqualTo(plainWallet)
-    }
-
-    @Test
-    fun aWorkingTrialDecryptLeavesTheWalletAlone() {
-        rpcModule.migrateFileIfNeeded(fileName)
-        assertThat(storedPayload()).isEqualTo(plainWallet)
+    fun aPlainWalletLoadsWithADeadKeystore() {
+        walletFile().delete()
+        walletFile().writeBytes(plainWallet)
+        rpcModule.legacyDecrypt = transientKeystoreFailure
         assertThat(loadError()).isNull()
+        assertThat(walletFile().readBytes()).isEqualTo(plainWallet)
+    }
+
+    @Test
+    fun aTransientKeystoreFailureFailsTheLoadAndTouchesNothing() {
+        val fileBefore = walletFile().readBytes()
+        rpcModule.legacyDecrypt = transientKeystoreFailure
+        assertThat(loadError()).contains("seed")
+        assertThat(walletFile().readBytes()).isEqualTo(fileBefore)
+
+        rpcModule.legacyDecrypt = defaultLegacyDecrypt
+        assertThat(loadError()).isNull()
+        assertThat(walletFile().readBytes()).isEqualTo(plainWallet)
+    }
+
+    @Test
+    fun repeatedFailingLoadsNeverGrowTheFile() {
+        val fileBefore = walletFile().readBytes()
+        rpcModule.legacyDecrypt = transientKeystoreFailure
+        repeat(3) { assertThat(loadError()).isNotNull() }
+        assertThat(walletFile().readBytes()).isEqualTo(fileBefore)
+    }
+
+    @Test
+    fun aDoubleWrappedFileIsUnwrappedAndMigratedOnLoad() {
+        wrapAgain()
+        assertThat(loadError()).isNull()
+        assertThat(walletFile().readBytes()).isEqualTo(plainWallet)
+        assertThat(File(context.filesDir, "$fileName.prerepair").exists()).isTrue()
+    }
+
+    @Test
+    fun theLoadAlsoMigratesTheRetainedWallet() {
+        val backupFile = File(context.filesDir, Constants.WalletBackupFileName.value)
+        backupFile.delete()
+        encryptedFile(backupFile).openFileOutput().use {
+            it.write(Base64.encodeToString(plainWallet, Base64.NO_WRAP).toByteArray(Charsets.UTF_8))
+        }
+
+        assertThat(loadError()).isNull()
+
+        assertThat(walletFile().readBytes()).isEqualTo(plainWallet)
+        assertThat(backupFile.readBytes()).isEqualTo(plainWallet)
+        backupFile.delete()
+    }
+
+    @Test
+    fun anInterruptedMigrationRestoresFromTheMigratingCopy() {
+        walletFile().delete()
+        File(context.filesDir, "$fileName.migrating").writeBytes(plainWallet)
+        assertThat(loadError()).isNull()
+        assertThat(walletFile().readBytes()).isEqualTo(plainWallet)
+        assertThat(File(context.filesDir, "$fileName.migrating").exists()).isFalse()
+    }
+
+    @Test
+    fun aTruncatedMainRestoresFromTheWriteTemp() {
+        walletFile().delete()
+        walletFile().writeBytes(plainWallet.copyOf(plainWallet.size / 2))
+        File(context.filesDir, "$fileName.write.tmp").writeBytes(plainWallet)
+
+        rpcModule.completePendingWrite()
+
+        assertThat(walletFile().readBytes()).isEqualTo(plainWallet)
+        assertThat(File(context.filesDir, "$fileName.write.tmp").exists()).isFalse()
+    }
+
+    @Test
+    fun anIntactMainDropsTheWriteTempOrphan() {
+        walletFile().delete()
+        walletFile().writeBytes(plainWallet)
+        File(context.filesDir, "$fileName.write.tmp").writeBytes(plainWallet.copyOf(plainWallet.size / 2))
+
+        rpcModule.completePendingWrite()
+
+        assertThat(walletFile().readBytes()).isEqualTo(plainWallet)
+        assertThat(File(context.filesDir, "$fileName.write.tmp").exists()).isFalse()
+    }
+
+    @Test
+    fun aTruncatedMainKeepsTheMigratingCopy() {
+        walletFile().delete()
+        walletFile().writeBytes(plainWallet.copyOf(plainWallet.size / 2))
+        File(context.filesDir, "$fileName.migrating").writeBytes(plainWallet)
+
+        assertThat(loadError()).isNotNull()
+
+        assertThat(File(context.filesDir, "$fileName.migrating").readBytes()).isEqualTo(plainWallet)
     }
 }

@@ -141,7 +141,12 @@
     "walletrepair-outcome-skipped": "исправление не требуется",
     "walletrepair-outcome-failed": "исправить не удалось",
     "walletfile-state-missing": "отсутствует",
-    "walletfile-state-plainLegacy": "еще не зашифрован",
+    "walletrecovery-salvageseed": "Восстановить начальную фразу",
+    "walletsalvage-title": "Восстановленная начальная фраза",
+    "walletsalvage-body": "Поврежденный файл кошелька все еще содержит эту начальную фразу и дату рождения. Запишите начальную фразу и храните ее в надежном месте. Подтвердите, чтобы восстановить кошелек с ее помощью. Восстановление заново сканирует цепочку и может занять время.",
+    "walletsalvage-birthday": "Дата рождения",
+    "walletsalvage-failed": "Начальную фразу не удается восстановить из файла кошелька.",
+    "walletfile-state-encryptedLegacy": "зашифрован (старый формат)",
     "walletfile-state-undecryptable": "не расшифровывается (ключ устройства потерян)",
     "walletfile-state-plainWallet": "в порядке",
     "walletfile-state-doubleWrapped": "зашифрован дважды",
@@ -215,6 +220,7 @@
   "rpc": {
     "walletnotfound-error": "Error: Не удалось найти кошелёк.",
     "backupnotfound-error": "Error: Резервная копия кошелька не найдена.",
+    "restorebackup-error": "Error: Не удалось восстановить резервную копию. Файл не открывается как кошелёк.",
     "deletewallet-error": "Error: Не удалось удалить текущий кошелёк.",
     "backupwallet-error": "Error: Не удалось сохранить резервную копию кошелька."
   },
