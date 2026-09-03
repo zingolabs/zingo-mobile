@@ -7,27 +7,22 @@ import java.nio.file.StandardOpenOption
 import java.util.concurrent.atomic.AtomicLong
 
 /**
- * Owns the plain wallet-file path discipline: a temp that is filled
- * outside the writer lock and installed under it by an atomic rename, the
- * header routing, and the `.migrating` sidecar resolution, in pure
- * java.io for plain JVM unit tests. The bytes never pass through here:
- * whatever fills the temp file streams them, Rust for a save and a
- * stream copy for a migration.
+ * Owns the wallet file path rules: a temp file filled outside the writer
+ * lock and renamed into place under it, the header check, and the
+ * `.migrating` sidecar. Pure java.io, so plain JVM tests cover it. The
+ * wallet bytes stream through whatever fills the temp, never through here.
  */
 object PlainWalletFile {
-    // One installer at a time: the JS bridge, BackgroundSyncWorker, and
-    // the load-path migration share the process and the final names.
+    // One install at a time across the bridge, the sync worker, and the load-path migration.
     private val writeLock = Any()
     private val tempSerial = AtomicLong()
 
-    // The temps a writer of this process is filling right now, kept out
-    // of every sweep.
+    // Temps that a writer of this process is still filling.
     private val liveTemps = mutableSetOf<File>()
 
     const val TEMP_SUFFIX: String = ".plain.tmp"
 
-    // A temp beside the final path, unique per write so two fills never
-    // share a file, and registered as live until its writer is done.
+    // A new temp beside the final file, unique per write and live until its writer is done.
     fun newTemp(dir: File, fileName: String): File {
         val temp = File(dir, "$fileName$TEMP_SUFFIX.${System.nanoTime()}.${tempSerial.incrementAndGet()}")
         synchronized(writeLock) { liveTemps.add(temp) }
@@ -42,8 +37,7 @@ object PlainWalletFile {
     fun isTempOf(fileName: String, candidate: File): Boolean =
         candidate.name.startsWith("$fileName$TEMP_SUFFIX")
 
-    // Every temp of `fileName` beside it that no live writer of this
-    // process owns: the leftovers of a killed process.
+    // Temps of `fileName` that no live writer of this process owns.
     fun staleTemps(dir: File, fileName: String): List<File> = synchronized(writeLock) {
         dir.listFiles()?.filter { isTempOf(fileName, it) && it !in liveTemps } ?: emptyList()
     }
@@ -52,11 +46,9 @@ object PlainWalletFile {
         for (temp in staleTemps(dir, fileName)) temp.deleteRecursively()
     }
 
-    // Fills a fresh temp through `fill` outside the lock, then under the
-    // lock asks `commit`, confirms the header, and renames the temp onto
-    // the final path, which keeps its old content until then. `fill` or
-    // `commit` answering false abandons the write. Returns whether the
-    // final path changed.
+    // Fills a new temp outside the lock, then under the lock asks `commit`,
+    // checks the header, and renames the temp onto the final file. Returns
+    // whether the final file changed.
     fun write(dir: File, fileName: String, commit: () -> Boolean = { true }, fill: (File) -> Boolean): Boolean {
         val temp = newTemp(dir, fileName)
         try {
@@ -69,9 +61,6 @@ object PlainWalletFile {
                 if (!temp.renameTo(File(dir, fileName))) {
                     throw IOException("Error: could not rename ${temp.name} onto $fileName")
                 }
-                // The file is installed from here on: a sync or sweep failure
-                // is logged by the caller's platform, never reported as a
-                // failed install.
                 try {
                     syncDirectory(dir)
                     deleteTemps(dir, fileName)
@@ -84,8 +73,7 @@ object PlainWalletFile {
         }
     }
 
-    // The migration's write: under the lock, a file that already reads
-    // plain is left untouched.
+    // The migration's write, under the lock, skipped when the file already reads plain.
     fun migrateIfStillLegacy(dir: File, fileName: String, fill: (File) -> Boolean): Boolean =
         synchronized(writeLock) {
             if (isPlain(dir, fileName)) false else write(dir, fileName, fill = fill)

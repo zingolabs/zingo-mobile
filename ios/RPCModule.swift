@@ -9,9 +9,7 @@ import CryptoKit
 import Foundation
 import React
 
-/// The formats a wallet file on disk can hold, told apart by its first
-/// bytes: raw zingolib bytes start with a small u64 LE version, the legacy
-/// text format is base64 of those bytes and starts with ASCII.
+/// The formats a wallet file on disk can hold, told apart by its first bytes.
 enum WalletFileFormat {
   case plainWallet
   case base64Text
@@ -19,27 +17,23 @@ enum WalletFileFormat {
   case unreadable
 }
 
-/// Owns the plain wallet-file path discipline: the temp-then-rename write
-/// under one writer lock, the header routing, the resting protection
-/// attributes, and the one-time decode of the legacy text format. The
-/// wallet bytes never pass through here as a whole: whatever fills the
-/// temp file streams them, Rust for a save and a chunked decode or a file
-/// copy for a migration.
+/// Owns the wallet file path rules: the temp-then-rename write under one
+/// writer lock, the header check, the protection attributes, and the one-time
+/// decode of the legacy text format. The wallet bytes stream through whatever
+/// fills the temp, never through here.
 enum PlainWalletFile {
   private static let writeLock = NSRecursiveLock()
   private static let decodeChunk = 64 * 1024
   private static var tempSerial: UInt64 = 0
 
-  /// The temps a writer of this process is filling right now, kept out of
-  /// every sweep.
+  /// Temps that a writer of this process is still filling.
   private static var liveTemps = Set<String>()
 
   static let tempSuffix = ".plain.tmp"
 
   static func tempPath(_ path: String) -> String { path + tempSuffix }
 
-  /// A temp beside the final path, unique per write so two fills never
-  /// share a file, and registered as live until its writer is done.
+  /// A new temp beside the final file, unique per write and live until its writer is done.
   static func newTemp(_ path: String) -> String {
     writeLock.lock()
     defer { writeLock.unlock() }
@@ -56,8 +50,7 @@ enum PlainWalletFile {
     try? FileManager.default.removeItem(atPath: temp)
   }
 
-  /// Every temp of `path` beside it that no live writer of this process
-  /// owns: the leftovers of a killed process.
+  /// Temps of `path` that no live writer of this process owns.
   static func staleTemps(_ path: String) -> [String] {
     let dir = (path as NSString).deletingLastPathComponent
     let prefix = ((path as NSString).lastPathComponent) + tempSuffix
@@ -78,13 +71,10 @@ enum PlainWalletFile {
     return try block()
   }
 
-  /// Fills a fresh temp through `fill` outside the lock, then under the
-  /// lock asks `commit`, confirms the header, and renames the temp onto
-  /// `path`, which keeps its old content until then. The temp exists with
-  /// the resting protection before `fill` writes a byte: a truncating open
-  /// keeps that inode, and a fill that replaces the file reapplies it.
-  /// `fill` or `commit` answering false abandons the write. Returns
-  /// whether `path` changed.
+  /// Fills a new temp outside the lock, then under the lock asks `commit`,
+  /// checks the header, and renames the temp onto `path`. The temp carries
+  /// the protection attributes before `fill` runs. Returns whether `path`
+  /// changed.
   static func write(_ path: String, commit: () -> Bool = { true }, fill: (String) throws -> Bool) throws -> Bool {
     let fm = FileManager.default
     let temp = newTemp(path)
@@ -108,8 +98,7 @@ enum PlainWalletFile {
     return true
   }
 
-  /// The migration's write: under the lock, a file that already reads
-  /// plain is left untouched.
+  /// The migration's write, under the lock, skipped when the file already reads plain.
   static func migrateIfStillLegacy(_ path: String, fill: (String) throws -> Bool) throws -> Bool {
     try locked {
       if format(path) == .plainWallet { return false }
@@ -127,13 +116,9 @@ enum PlainWalletFile {
     }
   }
 
-  /// Wallet files rest under OS protection alone: hardware encryption at
-  /// rest (class C, key available after the first post-boot unlock, so
-  /// background sync can save while the screen is locked), the app
-  /// sandbox, and backup exclusion. Class `complete` locked the file
-  /// seconds after screen lock and broke background saves. Backup
-  /// exclusion is the guard against restoring a stale wallet over a
-  /// newer one and must never regress.
+  /// Applies the resting protection, class C plus backup exclusion. Class C
+  /// keeps background saves working after the first unlock, and backup
+  /// exclusion keeps a stale wallet out of a device restore.
   static func applyProtection(_ path: String) throws {
     var fileURL = URL(fileURLWithPath: path)
     var resourceValues = URLResourceValues()
@@ -189,10 +174,9 @@ enum PlainWalletFile {
     }
   }
 
-  /// Decodes the base64 text at `textPath` into `rawPath` in aligned
-  /// chunks, so the buffer stays at the chunk size whatever the wallet
-  /// size. A tail shorter than one quantum cannot finish and is dropped,
-  /// which lets a truncated text file still yield its stable prefix.
+  /// Decodes the base64 text at `textPath` into `rawPath` in aligned chunks.
+  /// A tail shorter than one quantum is dropped, so a truncated text file
+  /// still yields its prefix.
   static func decodeBase64Text(from textPath: String, to rawPath: String) throws {
     let fm = FileManager.default
     guard let input = FileHandle(forReadingAtPath: textPath) else {
@@ -368,8 +352,7 @@ class RPCModule: NSObject {
   static var walletFileClosed = false
   static let walletFileHold = NSLock()
 
-  // The flag is written under the writer lock, which orders it with every
-  // save's commit, and under its own hold for the readers that take none.
+  // Writes the flag under the writer lock and its own hold.
   static func setWalletFileClosed(_ closed: Bool) {
     PlainWalletFile.locked {
       walletFileHold.lock()
@@ -414,12 +397,9 @@ class RPCModule: NSObject {
     }
   }
 
-  // The plain-format path of a wallet file. Raw zingolib bytes answer
-  // directly. The legacy base64 text format every build before this one
-  // wrote migrates in the same call: the text decodes in chunks into the
-  // plain temp, the temp runs the full parse, and the rename is the only
-  // step that touches the text path, so a failure anywhere leaves the
-  // text file as it was for the next launch.
+  // The plain-format path of a wallet file. A legacy text file migrates in
+  // the same call: it decodes into the plain temp, the temp runs the full
+  // parse, and the rename is the only step that touches the text file.
   func resolveWalletFile(_ name: String) throws -> String {
     let path = try getFileName(name)
     switch PlainWalletFile.format(path) {
@@ -445,9 +425,8 @@ class RPCModule: NSObject {
     }
   }
 
-  // Installs a validated plain copy of `source` under `name`. The copy is
-  // compared with its source by digest before the rename, all under the
-  // writer lock so no install replaces the source meanwhile.
+  // Installs a validated copy of `source` under `name`, compared by
+  // digest, under the writer lock.
   func writePlainCopy(of source: String, to name: String) throws {
     let path = try getFileName(name)
     try PlainWalletFile.locked {
@@ -498,10 +477,7 @@ class RPCModule: NSObject {
     }
   }
 
-  // Every move into a wallet slot runs the full parse on its source first,
-  // so a truncated or foreign temp never becomes a wallet file. The temp
-  // and the slots resolve their format on the way, which migrates a
-  // legacy text file in place.
+  // Every move into a wallet slot runs the full parse on its source first.
   private func completePendingSwapLocked(mainPath: String, backupPath: String, tempPath: String) {
     let fm = FileManager.default
     do {
@@ -527,14 +503,9 @@ class RPCModule: NSObject {
         } else if try PlainWalletFile.sameContent(backup, temp) {
           try fm.removeItem(atPath: temp)
         } else if try PlainWalletFile.sameContent(main, backup) {
-          // (2)–(3) window: main already holds the backup, the retained
-          // slot still waits for the original main.
           try fm.removeItem(atPath: backup)
           try fm.moveItem(atPath: temp, toPath: backupPath)
         } else {
-          // Three distinct contents: no window matches, and any pick could
-          // destroy a wallet. The temp becomes an orphan evidence copy that
-          // no path installs, and both slots hold their place.
           let orphan = "\(tempPath).orphan.\(Int(Date().timeIntervalSince1970 * 1000))"
           try fm.moveItem(atPath: temp, toPath: orphan)
           NSLog("[Native] completePendingSwap: three distinct wallet files, swap temp kept as an orphan")
@@ -596,19 +567,24 @@ class RPCModule: NSObject {
     }
   }
 
-  // Whether the swap temp, resolved to its plain format, holds a copy of
-  // `slot`. A temp that cannot be read answers false.
+  // Sets a swap temp the recovery could not place aside as an orphan.
+  func orphanLeftoverSwapTemp() throws {
+    let temp = try getFileName(Constants.WalletTempSwapFileName.rawValue)
+    guard FileManager.default.fileExists(atPath: temp) else { return }
+    let orphan = "\(temp).orphan.\(Int(Date().timeIntervalSince1970 * 1000))"
+    try FileManager.default.moveItem(atPath: temp, toPath: orphan)
+    NSLog("[Native] backup restore: leftover swap temp kept as an orphan")
+  }
+
+  // Whether the swap temp holds a copy of `slot`, false when it cannot be read.
   func swapHoldsCopy(of slot: String) -> Bool {
     guard let swap = try? resolveWalletFile(Constants.WalletTempSwapFileName.rawValue),
           FileManager.default.fileExists(atPath: slot) else { return false }
     return (try? PlainWalletFile.sameContent(swap, slot)) ?? false
   }
 
-  // Under the writer lock, so a save in flight cannot install its temp
-  // after the unlink: its commit sees the closed flag. Every plain copy
-  // beside the wallet goes with it. A swap temp that is a copy of the
-  // deleted wallet goes with it, one the swap recovery cannot place
-  // becomes an orphan evidence copy, and one that cannot be read stays.
+  // Deletes the wallet, its sidecars, and a swap temp that is a copy of it,
+  // under the writer lock so a save in flight cannot install its temp.
   func fnDeleteExistingWallet() throws {
     let main = try getFileName(Constants.WalletFileName.rawValue)
     let swap = try getFileName(Constants.WalletTempSwapFileName.rawValue)
@@ -692,11 +668,9 @@ class RPCModule: NSObject {
     }
   }
 
-  // The FFI contract is structural (zingo-mobile#1151; audit Issue Q):
-  // Rust streams the wallet into the temp path it is handed, verifies the
-  // file by digest, and answers whether a save was needed; failure
-  // throws. The rename is the only step that touches the final path, so
-  // the file is byte-identical to a desktop zingolib wallet.
+  // Rust streams the wallet into the temp it is handed, verifies it by
+  // digest, and answers whether a save was needed. The rename under the
+  // lock re-checks that the wallet file is still open.
   func saveWalletInternal() throws {
     if RPCModule.walletFileClosed {
       NSLog("[Native] wallet file closed, save refused")
@@ -721,9 +695,6 @@ class RPCModule: NSObject {
         NSLog("[Native] wallet file closed during the save, save abandoned: \(String(describing: error))")
         return
       }
-      // Logged here, rethrown unwrapped: the FFI's typed error must reach
-      // the bridge intact so it rejects under its own variant name, not
-      // wrapped into a FileError that would reject as "Unknown".
       NSLog("Error: [Native] Couldn't save the wallet. \(String(describing: error))")
       throw error
     }
@@ -874,13 +845,9 @@ class RPCModule: NSObject {
   @objc(restoreExistingWalletBackup:reject:)
   func restoreExistingWalletBackup(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     do {
-      // Recover any orphan temp from a prior crash before reading the
-      // slots: it can move either of them, and the wallet this restore
-      // validates must be the one it installs.
       self.completePendingSwap()
+      try self.orphanLeftoverSwapTemp()
       let backupPath = try self.resolveWalletFile(Constants.WalletBackupFileName.rawValue)
-      // The full parse guards the swap: only a wallet zingolib opens is
-      // restorable.
       do {
         try validateWalletFile(path: backupPath)
       } catch {
@@ -890,8 +857,6 @@ class RPCModule: NSObject {
         }
         return
       }
-      // Closed across the swap; the reload after the restore clears it. A
-      // failure before the main slot changed reopens it.
       let wasClosed = RPCModule.walletFileClosed
       RPCModule.setWalletFileClosed(true)
       var mainChanged = false
@@ -899,42 +864,25 @@ class RPCModule: NSObject {
         if !mainChanged { RPCModule.setWalletFileClosed(wasClosed) }
       }
       if try fileExists(Constants.WalletFileName.rawValue) == "true" {
-        // Audit Issue P (b) — atomic swap via three renames. APFS
-        // rename is atomic AND preserves the file's protection class
-        // and isExcludedFromBackup attribute, so this is strictly
-        // safer than the previous read-into-memory + two writes
-        // pattern, which lost the original main wallet on a crash
-        // between writes. `completePendingSwap` (called early on
-        // walletExists/walletBackupExists) finishes the swap if a
-        // crash interrupts these three steps.
         let fm = FileManager.default
         let mainPath = try getFileName(Constants.WalletFileName.rawValue)
         let tempPath = try getFileName(Constants.WalletTempSwapFileName.rawValue)
         try PlainWalletFile.locked {
-          try fm.moveItem(atPath: mainPath, toPath: tempPath)   // (1) main → temp
+          try fm.moveItem(atPath: mainPath, toPath: tempPath)
           do {
-            try fm.moveItem(atPath: backupPath, toPath: mainPath)   // (2) backup → main
+            try fm.moveItem(atPath: backupPath, toPath: mainPath)
           } catch {
-            // Main is back where it was, so the startup recovery has no
-            // swap to finish for a restore that never began.
             try? fm.moveItem(atPath: tempPath, toPath: mainPath)
             throw error
           }
           mainChanged = true
           do {
-            try fm.moveItem(atPath: tempPath, toPath: backupPath) // (3) temp → backup
+            try fm.moveItem(atPath: tempPath, toPath: backupPath)
           } catch {
-            // Main already holds the backup: the restore happened. The
-            // temp lets the startup recovery finish (3).
             NSLog("[Native] backup restore: retained copy pending, the startup recovery completes it: \(error.localizedDescription)")
           }
         }
       } else {
-        // No wallet exists: restore backup as wallet, but KEEP the backup
-        // file. Deleting it here left the user with no backup right after a
-        // restore, so if they then created/restored a different wallet the
-        // just-restored one was gone. Keeping a duplicate copy as backup is
-        // far safer than none.
         try self.writePlainCopy(of: backupPath, to: Constants.WalletFileName.rawValue)
         mainChanged = true
       }
@@ -949,10 +897,9 @@ class RPCModule: NSObject {
     }
   }
 
-  // Salvages seed and birthday from the stable prefix of the closed wallet
-  // file and keeps the damaged file aside as ".broken". A legacy text
-  // file decodes into a scratch copy first, its unfinishable tail
-  // dropped, so a text file cut mid-quantum still yields its prefix.
+  // Salvages the seed and birthday from the stable prefix of the wallet
+  // file and keeps the damaged file aside as ".broken". A legacy text file
+  // decodes into a scratch copy first.
   @objc(walletFileRecoveryInfo:reject:)
   func walletFileRecoveryInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     DispatchQueue.global(qos: .userInitiated).async {
@@ -982,9 +929,8 @@ class RPCModule: NSObject {
     }
   }
 
-  // "plainWallet" when the file's first bytes, decoded first for the
-  // legacy text format, carry a plausible zingolib version header,
-  // truncated files included.
+  // "plainWallet" when the first bytes, decoded first for legacy text,
+  // carry a plausible zingolib version header.
   func walletFileState(_ path: String) -> String {
     switch PlainWalletFile.format(path) {
     case .plainWallet:

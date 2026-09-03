@@ -2216,7 +2216,7 @@ export class LoadingAppClass extends Component<
     const result = await restoreExistingWalletBackup();
     if (!resolvedTrue(result)) {
       this.addLastSnackbar(
-        this.state.translate('rpc.backupnotfound-error') as string,
+        this.state.translate('rpc.restorebackup-error') as string,
       );
       this.setState({
         screen: RouteEnum.StartMenu,

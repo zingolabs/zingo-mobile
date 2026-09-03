@@ -190,7 +190,6 @@ class PlainWalletFileTest {
 
     @Test
     fun theMigratingCopyStaysWhileMainIsNotYetPlain() {
-        // Main still encrypted: the sidecar may be the only plain copy.
         File(dir, fileName).writeBytes(envelopeLookalike)
         File(dir, "$fileName.migrating").writeBytes(plainWallet())
         PlainWalletFile.resolveInterruptedMigration(dir, fileName) { true }

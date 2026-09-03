@@ -789,8 +789,7 @@ pub fn init_from_ufvk(
     )
 }
 
-/// Opens the wallet file at `path` for a streaming read. The path is the
-/// caller's and never travels back in the error.
+/// Opens the wallet file at `path` for a streaming read, with no path in the error.
 fn open_wallet_file(path: &Path) -> Result<BufReader<File>, ZingolibError> {
     File::open(path)
         .map(BufReader::new)
@@ -827,11 +826,6 @@ pub fn load_wallet_file(
             vec![chain_hint]
         };
 
-        // The native layer resolves the path (sidecars, legacy formats, the
-        // write lock) and Rust streams the bytes: the file is reopened per
-        // attempt, so no attempt holds the whole wallet in memory. The read
-        // chain-validates the wallet BEFORE building the indexer, so a chain
-        // mismatch fails fast and cheaply — no network is ever dialed.
         let mut built: Option<(LightClient, ConnectionParams)> = None;
         let mut last_error = ZingolibError::init("could not read the wallet with any chain");
         for hint in chain_hints {
@@ -942,8 +936,7 @@ impl<W: Write> Write for Digesting<W> {
     }
 }
 
-/// Opens the temp file for a save, creating or truncating it, and refuses a
-/// symlink at the final path component.
+/// Opens the temp file for a save and refuses a symlink at the final path component.
 fn create_wallet_temp(path: &Path) -> io::Result<File> {
     let mut options = std::fs::OpenOptions::new();
     options.write(true).create(true).truncate(true);
@@ -955,9 +948,7 @@ fn create_wallet_temp(path: &Path) -> io::Result<File> {
     options.open(path)
 }
 
-/// Serializes the wallet into the file at `path`, syncs the file and, when
-/// the path names one, its directory, and returns the digest of the bytes
-/// written.
+/// Serializes the wallet into the file at `path`, syncs it and its directory, and returns the digest of the bytes written.
 fn write_wallet_file(
     wallet: &mut LightWallet,
     path: &Path,
@@ -990,12 +981,7 @@ fn verify_wallet_file(path: &Path, expected: &[u8; 32]) -> io::Result<()> {
     }
 }
 
-/// Writes the wallet to `temp_path` when a save is required and verifies the
-/// file by digest, returning whether a save was needed. The wallet lock is
-/// held only while the bytes are serialized and synced, the read-back runs
-/// with no lock held. The wallet flag stays set: zingolib clears it only
-/// from its own save task, so the shim saves on every request, as it always
-/// has.
+/// Writes the wallet to `temp_path` when a save is required, verifies the file by digest with no lock held, and returns whether a save was needed.
 pub fn save_wallet_file(temp_path: String) -> Result<bool, ZingolibError> {
     let temp_path = PathBuf::from(temp_path);
     let written = with_initialized_lightclient(|lightclient| {
@@ -1056,10 +1042,7 @@ mod ffi_error_routing_tests {
     }
 }
 
-/// The save-path contract (zingolabs/zingo-mobile#1151; audit Issue Q) at the
-/// path boundary: the wallet streams into the file the native layer named,
-/// the file is verified by digest before the call returns, `true` means a
-/// file was written, and failure is typed. No wallet bytes cross the FFI.
+/// The save path at the file boundary: the wallet streams into the file the native layer named, the file is verified by digest, `true` means a file was written, and failure is typed.
 #[cfg(test)]
 mod wallet_save_file_tests {
     use super::*;

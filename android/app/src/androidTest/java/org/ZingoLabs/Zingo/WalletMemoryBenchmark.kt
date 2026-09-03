@@ -90,8 +90,6 @@ class WalletMemoryBenchmark {
         val fileBytes = walletFile.length()
 
         val load = peakDuring { rpcModule.loadExistingWalletNative("", "main", "Medium", "1") }
-        // A load clears zingolib's save flag, so the wallet is dirtied
-        // first or the save would measure an early return.
         uniffi.zingo.createNewUnifiedAddress("o")
         val before = walletFile.lastModified()
         Thread.sleep(20)

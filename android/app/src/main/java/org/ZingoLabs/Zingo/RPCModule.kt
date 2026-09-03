@@ -47,14 +47,11 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         ).build()
     }
 
-    // The legacy decrypt used only as load recovery: streams the AEAD
-    // payload of `envelope`, base64 text by the 2.0.21 format, into `sink`
-    // as raw bytes. Injectable so a test can replay a transient Keystore
-    // failure (DoubleWrapReproTest).
+    // The legacy decrypt, used only to recover a 2.0.21 file: streams the
+    // envelope's base64 payload into `sink` as raw bytes. A test can replace it.
     internal var legacyDecrypt: (File, OutputStream) -> Unit = { envelope, sink -> decryptLegacyInto(envelope, sink) }
 
-    // Records the first failure of the wrapped stream, which tells a
-    // decrypt failure apart from a sink that cannot take the bytes.
+    // Records the first failure of the wrapped stream.
     private class SinkStream(out: OutputStream) : FilterOutputStream(out) {
         var failure: IOException? = null
 
@@ -136,9 +133,8 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         }
     }
 
-    // Installs a validated plain copy of `source` under `fileName`. The
-    // copy is compared with its source by digest before the rename, all
-    // under the writer lock so no install replaces the source meanwhile.
+    // Installs a validated copy of `source` under `fileName`, compared by
+    // digest, under the writer lock.
     private fun writePlainCopy(fileName: String, source: File) {
         PlainWalletFile.locked {
             uniffi.zingo.validateWalletFile(source.path)
@@ -173,20 +169,17 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     // The outcome of streaming a legacy file's envelopes into a sink.
     private class Peel(
-        // The kind of payload under the outer envelope, absent when the
-        // outer envelope did not decrypt.
+        // The payload kind under the outer envelope, absent when it did not decrypt.
         val outerPayload: WalletFileEnvelope.PayloadKind?,
         val readError: Exception?,
-        // The failure of the sink itself, when the bytes could not land.
+        // The sink's own failure, when the bytes could not land.
         val writeError: IOException?,
-        // Extra layers removed before the sink held plain bytes, absent
-        // when no plain wallet appeared.
+        // Extra layers removed before the sink held plain bytes, absent when none did.
         val plainDepth: Int?,
         val unwrapErrors: List<String>,
     )
 
-    // Streams one envelope into `sink`, telling a sink failure apart from
-    // a decrypt failure.
+    // Streams one envelope into `sink` and returns the sink's failure, if any.
     private fun decryptLayer(source: File, sink: File): IOException? {
         val file = try {
             FileOutputStream(sink)
@@ -221,10 +214,9 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     // Test seam: runs before each numbered step of the restore swap.
     internal var restoreStepHook: (Int) -> Unit = {}
 
-    // Streams the envelopes of `fileName` into `sink` one layer at a time,
-    // at most MAX_UNWRAP_DEPTH extra layers. The outer layer stored the
-    // base64 text of an inner envelope, which goes under the same file name
-    // in a scratch dir, because the name is the AAD.
+    // Streams the envelopes of `fileName` into `sink` one layer at a time, at
+    // most MAX_UNWRAP_DEPTH extra layers. An inner envelope goes under the
+    // same file name in a scratch dir, since the name is the AAD.
     private fun peelLegacy(fileName: String, sink: File): Peel {
         val scratchDir = File(applicationContext.cacheDir, "wallet-unwrap").apply { mkdirs() }
         val scratch = File(scratchDir, fileName)
@@ -297,22 +289,12 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         else -> IOException("Error: the decrypted content of $fileName is not a wallet. $recoveryAdvice")
     }
 
-    // Resolves a wallet file to its plain-format path: raw plain bytes
-    // first (the format every save writes since the encryption removal,
-    // and the legacy plain format of Zingo ≤ 2.0.20), then the legacy
-    // encrypted formats as recovery only. A legacy file migrates to plain
-    // in the same call: its envelopes stream layer by layer into the plain
-    // temp, the temp runs the full parse, and the rename is the only step
-    // that touches the legacy path. A double wrap additionally keeps its
-    // original at "$fileName.prerepair".
-    //
-    // Classification uses the raw header, never a trial decrypt (#965), so
-    // a transient Keystore failure can only fail this read and the next
-    // launch retries from unchanged bytes.
-    //
-    // A thrown IOException here is outside the FFI's typed family, so a
-    // bridge caller rejects it under the "Unknown" code; the message text
-    // is the user-actionable diagnosis.
+    // Resolves a wallet file to its plain-format path. Plain bytes answer
+    // directly. A legacy encrypted file migrates in the same call: its
+    // envelopes stream into the plain temp, the temp runs the full parse,
+    // and the rename is the only step that touches the legacy path. A
+    // double wrap keeps its original at "$fileName.prerepair". The header
+    // decides the format, never a trial decrypt (#965).
     private fun resolveWalletFile(fileName: String): File {
         val filesDir = applicationContext.filesDir
         PlainWalletFile.resolveInterruptedMigration(filesDir, fileName, ::isIntactWallet)
@@ -370,9 +352,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     //   (2) write main(originalBackup)
     //   (3) write backup(originalMain)
     //   (4) delete temp
-    // Recovery goes by streamed content comparison, and `resolveWalletFile`
-    // levels the formats: the temp may be a legacy encrypted file from an
-    // old release or plain bytes from the current one.
+    // Recovery compares content by digest after `resolveWalletFile` levels the formats.
     //
     // Possible interrupted states (temp exists with originalMain):
     //   between (1)–(2): main == temp  → write main(backup), write backup(temp)
@@ -391,22 +371,15 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             if (fileExists(WalletFileName.value)) {
                 val main = resolveWalletFile(WalletFileName.value)
                 if (sameContent(main, temp)) {
-                    // (1)–(2) window: main not yet overwritten.
                     if (fileExists(WalletBackupFileName.value)) {
                         writePlainCopy(WalletFileName.value, resolveWalletFile(WalletBackupFileName.value))
                     }
                     writePlainCopy(WalletBackupFileName.value, temp)
                 } else {
-                    // (2)–(3) or post-(3) window: main already holds the new content.
                     val backup = if (fileExists(WalletBackupFileName.value)) resolveWalletFile(WalletBackupFileName.value) else null
                     if (backup == null || sameContent(main, backup)) {
-                        // (2)–(3) window: main still equals the backup it came from, write the lost content.
                         writePlainCopy(WalletBackupFileName.value, temp)
                     } else if (!sameContent(backup, temp)) {
-                        // Three distinct wallets: no window matches, and any pick
-                        // could destroy a wallet. The temp becomes an orphan
-                        // evidence copy that no path installs, and both slots
-                        // hold their place.
                         val orphan = File(applicationContext.filesDir, "${WalletTempSwapFileName.value}.orphan.${System.currentTimeMillis()}")
                         if (!temp.renameTo(orphan)) {
                             throw IOException("Error: could not set the swap temp aside as ${orphan.name}")
@@ -414,17 +387,13 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                         Log.w("MAIN", "[Native] completePendingSwap: three distinct wallet files, swap temp kept as ${orphan.name}")
                         return
                     }
-                    // else: post-(3), backup already correct.
                 }
             } else {
-                // Main missing: restore from temp.
                 writePlainCopy(WalletFileName.value, temp)
             }
             deleteFile(WalletTempSwapFileName.value)
             Log.i("MAIN", "[Native] completePendingSwap: interrupted swap recovered")
         } catch (e: Exception) {
-            // The temp can hold the only copy of the original main wallet,
-            // so it stays in place for diagnosis and the next attempt.
             Log.e("MAIN", "[Native] completePendingSwap failed: $e", e)
         }
     }
@@ -453,14 +422,10 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         promise.resolve(fileExists(WalletBackupFileName.value))
     }
 
-    // The FFI contract is structural (zingo-mobile#1151; audit Issue Q):
-    // Rust streams the wallet into the temp path it is handed, verifies the
-    // file by digest, and answers whether a save was needed; failure
-    // throws. The fill runs outside the writer lock, so a slow save never
-    // stalls the other file paths, and the rename under the lock re-checks
-    // that the wallet file is still open. The rename is the only step that
-    // touches the final path, so the file is byte-identical to a desktop
-    // zingolib wallet.
+    // Rust streams the wallet into the temp it is handed, verifies it by
+    // digest, and answers whether a save was needed. The fill runs outside
+    // the writer lock, and the rename under it re-checks that the wallet
+    // file is still open.
     fun saveWalletFile(): Boolean {
         return try {
             uniffi.zingo.initLogging()
@@ -733,13 +698,9 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     @ReactMethod
     fun restoreExistingWalletBackup(promise: Promise) {
         try {
-            // Recover any orphan temp from a prior crash before reading the
-            // slots: it can rewrite either of them, and the wallet this
-            // restore validates must be the one it installs.
             completePendingSwap()
+            orphanLeftoverSwapTemp()
             val backup = resolveWalletFile(WalletBackupFileName.value)
-            // The full parse guards the swap: only a wallet zingolib opens
-            // is restorable.
             try {
                 uniffi.zingo.validateWalletFile(backup.path)
             } catch (e: Exception) {
@@ -747,57 +708,41 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 promise.resolve(false)
                 return
             }
-            // Closed across the swap; the reload after a successful restore
-            // clears it. A failure before the main slot changed reopens it.
             val wasClosed = walletFileClosed
             walletFileClosed = true
             var mainChanged = false
             try {
                 PlainWalletFile.locked {
                 if (fileExists(WalletFileName.value)) {
-                    // Durable swap via temp file (audit Issue P (b)): the temp
-                    // copy written at step (1) is what `completePendingSwap`
-                    // restores after a crash before step (3).
                     val wallet = try {
                         resolveWalletFile(WalletFileName.value)
                     } catch (e: Exception) {
-                        // Keep the unreadable main's raw bytes aside and restore the backup into both slots.
                         Log.w("MAIN", "[Native] backup restore: main unreadable, preserving raw and restoring backup: $e")
                         File(applicationContext.filesDir, WalletFileName.value)
                             .copyTo(File(applicationContext.filesDir, "${WalletFileName.value}.broken"), overwrite = true)
                         writePlainCopy(WalletFileName.value, backup)
                         mainChanged = true
-                        promise.resolve(true)
-                        return
+                        return@locked
                     }
                     val swap = File(applicationContext.filesDir, WalletTempSwapFileName.value)
                     try {
                         restoreStepHook(1)
-                        writePlainCopy(WalletTempSwapFileName.value, wallet)   // (1) temp = original main
+                        writePlainCopy(WalletTempSwapFileName.value, wallet)
                         restoreStepHook(2)
-                        writePlainCopy(WalletFileName.value, backup)           // (2) main = backup
+                        writePlainCopy(WalletFileName.value, backup)
                     } catch (e: Exception) {
-                        // Main is untouched before (2) lands, so the temp must not
-                        // let the startup recovery finish a swap that never began.
                         swap.delete()
                         throw e
                     }
                     mainChanged = true
                     try {
                         restoreStepHook(3)
-                        writePlainCopy(WalletBackupFileName.value, swap)       // (3) backup = original main
-                        deleteFile(WalletTempSwapFileName.value)               // (4) cleanup
+                        writePlainCopy(WalletBackupFileName.value, swap)
+                        deleteFile(WalletTempSwapFileName.value)
                     } catch (e: Exception) {
-                        // Main already holds the backup: the restore happened.
-                        // The temp lets the startup recovery finish (3).
                         Log.w("MAIN", "[Native] backup restore: retained copy pending, the startup recovery completes it: $e")
                     }
                 } else {
-                    // No wallet exists: restore backup as wallet, but KEEP the
-                    // backup file. Deleting it here left the user with no backup
-                    // right after a restore, so if they then created/restored a
-                    // different wallet the just-restored one was gone. Keeping a
-                    // duplicate copy as backup is far safer than none.
                     writePlainCopy(WalletFileName.value, backup)
                     mainChanged = true
                 }
@@ -824,8 +769,18 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         PlainWalletFile.deleteTemps(applicationContext.filesDir, fileName)
     }
 
-    // Whether the swap temp, resolved to its plain format, holds a copy of
-    // `slot`. A temp that cannot be read answers false.
+    // Sets a swap temp the recovery could not place aside as an orphan.
+    private fun orphanLeftoverSwapTemp() {
+        val temp = File(applicationContext.filesDir, WalletTempSwapFileName.value)
+        if (!temp.isFile) return
+        val orphan = File(applicationContext.filesDir, "${WalletTempSwapFileName.value}.orphan.${System.currentTimeMillis()}")
+        if (!temp.renameTo(orphan)) {
+            throw IOException("Error: could not set the swap temp aside as ${orphan.name}")
+        }
+        Log.w("MAIN", "[Native] backup restore: leftover swap temp kept as ${orphan.name}")
+    }
+
+    // Whether the swap temp holds a copy of `slot`, false when it cannot be read.
     private fun swapHoldsCopyOf(slot: File): Boolean {
         val swap = File(applicationContext.filesDir, WalletTempSwapFileName.value)
         if (!swap.isFile || !slot.isFile) return false
@@ -836,9 +791,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         }
     }
 
-    // A swap temp that is a copy of the deleted wallet goes with it, one
-    // the swap recovery cannot place becomes an orphan evidence copy, and
-    // one that cannot be read stays as evidence.
+    // Deletes the wallet, its sidecars, and a swap temp that is a copy of it.
     @ReactMethod
     fun deleteExistingWallet(promise: Promise) {
         val filesDir = applicationContext.filesDir

@@ -72,8 +72,6 @@ class WalletStreamingSaveTest {
         assertThat(load()).contains(Seeds.HOSPITAL)
         assertThat(walletFile().readBytes()).isEqualTo(saved)
 
-        // A load clears zingolib's save flag, so the next save only writes
-        // once the wallet changed again.
         uniffi.zingo.createNewUnifiedAddress("o")
         val before = walletFile().lastModified()
         Thread.sleep(20)
@@ -122,7 +120,6 @@ class WalletStreamingSaveTest {
         val saved = walletFile().readBytes()
         uniffi.zingo.createNewUnifiedAddress("o")
 
-        // A directory at the temp's own name makes Rust's create fail.
         val failure = try {
             PlainWalletFile.write(context.filesDir, fileName) { temp ->
                 temp.mkdir()

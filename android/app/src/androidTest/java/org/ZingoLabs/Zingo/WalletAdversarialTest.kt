@@ -155,8 +155,6 @@ class WalletAdversarialTest {
             rpcModule.legacyDecrypt = defaultDecrypt
         }
 
-        // The bytes landed and the decrypt itself reported the failure, so
-        // the diagnosis names neither storage nor the Keystore as certain.
         assertThat(message).isNotEmpty()
         assertThat(file(mainName).readBytes()).isNotEqualTo(walletA)
     }
