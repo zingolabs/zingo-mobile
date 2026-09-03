@@ -16,7 +16,7 @@ import BoldText from '@ui/primitives/BoldText';
 import FadeText from '@ui/primitives/FadeText';
 import RegText from '@ui/primitives/RegText';
 
-import { MenuMorphIcon } from '@ui/primitives/Icons/MenuMorphIcon';
+import { MenuMorphIcon } from '@ui/widgets/MenuMorphIcon';
 import XSocial from '../../assets/img/options/x.svg';
 import Github from '../../assets/img/options/github.svg';
 import Mail from '../../assets/img/options/mail.svg';

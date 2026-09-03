@@ -173,8 +173,8 @@ when reading history.
 Vocabulary of the shared component tree in `ui/`.
 
 **Primitive**:
-A shared component that is domain-free and leaf-level: it composes no other
-shared UI module and would ship unchanged in any React Native app. Home:
+A shared component that is domain-free and leaf-level: it composes nothing
+outside `ui/primitives` and would ship unchanged in any React Native app. Home:
 `ui/primitives`.
 _Avoid_: atom
 

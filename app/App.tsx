@@ -9,8 +9,8 @@ import { createStackNavigator } from '@react-navigation/stack';
 
 import { LoadedApp } from './LoadedApp';
 import { LoadingApp } from './LoadingApp';
-import ScannerAddress from '@screens/Send/components/ScannerAddress';
-import ScannerUfvk from './LoadingApp/components/ScannerUfvk';
+import ScannerAddress from '@screens/ScannerAddress';
+import ScannerUfvk from '@screens/ScannerUfvk';
 import { AppStackParamList } from './types';
 import { RouteEnum } from './AppState';
 import { ThemeProvider, useTheme, navigationTheme } from './theme';
@@ -18,7 +18,7 @@ import { ThemeProvider, useTheme, navigationTheme } from './theme';
 import { BackHandler, LogBox, StatusBar } from 'react-native';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import AppErrorBoundary from './AppErrorBoundary';
-import BiometricBlankingOverlay from './BiometricBlankingOverlay';
+import BiometricBlankingOverlay from '@ui/widgets/BiometricBlankingOverlay';
 
 LogBox.ignoreLogs([
   '[Reanimated] Reduced motion setting is enabled on this device.',

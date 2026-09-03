@@ -9,7 +9,6 @@ import { faCheck, faQrcode, faXmark } from '@fortawesome/free-solid-svg-icons';
 import {
   AddressBookActionEnum,
   AddressBookFileClass,
-  ButtonTypeEnum,
   ChainNameEnum,
   GlobalConst,
   RouteEnum,
@@ -30,7 +29,7 @@ import {
   extractPlainAddress,
   SWAP_ADDRESS_CHAINS,
 } from '@app/swap';
-import Button from '@ui/primitives/Button';
+import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
 import FadeText from '@ui/primitives/FadeText';
 
 type AbDetailProps = {

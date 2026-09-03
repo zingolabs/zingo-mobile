@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import { Animated, Easing, StyleSheet, View } from 'react-native';
 import Svg, { Rect } from 'react-native-svg';
 import NymOn from '../../../assets/img/nym-on.svg';
-import { MixnetStatusKey } from '@app/walletBackend/transforms/mixnetView';
 
 const HALO_GREEN = '#07FF94';
 const HALO_CORAL = '#FF6F61';
@@ -53,34 +52,7 @@ const dashOffset = travel.interpolate({
   outputRange: [0, -PERIMETER],
 });
 
-export type MixnetPhase = 'connecting' | 'ready' | 'lost' | 'reconnecting';
-
-/**
- * Maps a status key and the recovery flag to the icon phase. `off`
- * (deliberate clearnet) has no icon, so the caller renders nothing on null.
- * An active reconnect wins over the underlying status so the whole
- * loss-recovery cycle reads as one animated state.
- */
-export function mixnetPhase(
-  statusKey: MixnetStatusKey,
-  reconnecting: boolean,
-): MixnetPhase | null {
-  if (statusKey === 'mixnet.status.ready') {
-    return 'ready';
-  }
-  if (reconnecting) {
-    return 'reconnecting';
-  }
-  switch (statusKey) {
-    case 'mixnet.status.bootstrapping':
-      return 'connecting';
-    case 'mixnet.status.died':
-    case 'mixnet.status.unknown':
-      return 'lost';
-    case 'mixnet.status.off':
-      return null;
-  }
-}
+export type MixnetIconPhase = 'connecting' | 'ready' | 'lost' | 'reconnecting';
 
 const styles = StyleSheet.create({
   container: {
@@ -112,7 +84,7 @@ const HaloRect = ({ color }: { color: string }) => (
   </Svg>
 );
 
-const MixnetIcon = ({ phase }: { phase: MixnetPhase }) => {
+const MixnetIcon = ({ phase }: { phase: MixnetIconPhase }) => {
   const animating = phase === 'connecting' || phase === 'reconnecting';
 
   useEffect(() => {

@@ -6,7 +6,7 @@
 import React from 'react';
 import { render, act } from '@testing-library/react-native';
 import { DeviceEventEmitter, Modal, Platform } from 'react-native';
-import BiometricBlankingOverlay from '@app/BiometricBlankingOverlay';
+import BiometricBlankingOverlay from '@ui/widgets/BiometricBlankingOverlay';
 import { BIOMETRIC_BLANKING_EVENT } from '@app/services/gateController';
 
 test('hardware back dismisses a stranded blanking overlay', () => {

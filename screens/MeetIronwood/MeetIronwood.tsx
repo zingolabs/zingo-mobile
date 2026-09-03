@@ -34,11 +34,11 @@ import { faArrowRightLong } from '@fortawesome/free-solid-svg-icons';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import BoldText from '@ui/primitives/BoldText';
-import Button from '@ui/primitives/Button';
+import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
 import SettingsFileImpl from '@app/services/SettingsFileImpl';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
-import { ButtonTypeEnum, RouteEnum, SettingsNameEnum } from '@app/AppState';
+import { RouteEnum, SettingsNameEnum } from '@app/AppState';
 
 // Pool artwork palette — Orchard teal and Ironwood gold are one-off brand
 // accents for this onboarding, not part of the app theme.

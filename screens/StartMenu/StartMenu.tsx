@@ -1,8 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useMemo, useRef, useState } from 'react';
 import { Text, View, ActivityIndicator, Image, Pressable } from 'react-native';
-import { showConfirm } from '../../services/showConfirm';
-import { useTheme } from '../../theme';
+import { showConfirm } from '@app/services/showConfirm';
+import { useTheme } from '@app/theme';
 
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faEllipsisV } from '@fortawesome/free-solid-svg-icons';
@@ -17,17 +17,17 @@ import ActionMenuBottomSheet, {
   ActionMenuBottomSheetAction,
 } from '@ui/widgets/ActionMenuBottomSheet';
 
-import { ButtonTypeEnum, ModeEnum, SelectServerEnum } from '../../AppState';
-import Button from '@ui/primitives/Button';
+import { ModeEnum, SelectServerEnum } from '@app/AppState';
+import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
 import AppSheet from '@ui/primitives/AppSheet';
-import { ContextAppLoading } from '../../context';
+import { ContextAppLoading } from '@app/context';
 import {
   getZingoLogo,
   getZingoName,
   getZingoVersion,
-} from '../../utils/ZingoAppData';
+} from '@app/utils/ZingoAppData';
 import BoldText from '@ui/primitives/BoldText';
-import { useFullSheetSnapPoints } from '../../hooks/useFullSheetSnapPoints';
+import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
 
 type StartMenuProps = {
   actionButtonsDisabled: boolean;

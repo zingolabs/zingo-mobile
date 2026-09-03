@@ -3,7 +3,13 @@ import React from 'react';
 import { TouchableOpacity, Text, View, TextStyle } from 'react-native';
 import { useTheme } from '@app/theme';
 
-import { ButtonTypeEnum } from '@app/AppState';
+export enum ButtonTypeEnum {
+  Primary = 'Primary',
+  Secondary = 'Secondary',
+  Ghost = 'Ghost',
+  Warning = 'Warning',
+  Nym = 'Nym',
+}
 
 type ButtonProps = {
   type: ButtonTypeEnum;

@@ -4,10 +4,10 @@ import * as Keychain from 'react-native-keychain';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import DeviceAuth from './DeviceAuthModule';
-import { GlobalConst, TranslateType } from '../AppState';
-import { errorKeyed } from '../AppState/types/Result';
-import { GateFailure, GateFailureKey } from '../AppState/types/GateFailure';
-import Utils from '../utils';
+import { GlobalConst, TranslateType } from '@app/AppState';
+import { errorKeyed } from '@app/AppState/types/Result';
+import { GateFailure, GateFailureKey } from '@app/AppState/types/GateFailure';
+import Utils from '@app/utils';
 
 // The single gate controller of ADR 0007. The gate is a privacy shutter,
 // not a security boundary: every trigger asks this controller, the

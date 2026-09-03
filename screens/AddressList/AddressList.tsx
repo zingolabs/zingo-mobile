@@ -21,7 +21,6 @@ import { useScrollToTop } from '@react-navigation/native';
 import { useTheme } from '@app/theme';
 import {
   AddressKindEnum,
-  ButtonTypeEnum,
   RouteEnum,
   ScreenEnum,
   TransparentAddressClass,
@@ -30,7 +29,7 @@ import {
 import { AppDrawerParamList } from '@app/types';
 import FadeText from '@ui/primitives/FadeText';
 import BoldText from '@ui/primitives/BoldText';
-import Button from '@ui/primitives/Button';
+import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
 import AppSheet from '@ui/primitives/AppSheet';
 import AlSummaryLine from './components/AlSummaryLine';
 import { ContextAppLoaded } from '@app/context';

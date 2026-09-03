@@ -1,4 +1,4 @@
-import { ServerUrisType, TranslateType, ChainNameEnum } from '../AppState';
+import { ServerUrisType, TranslateType, ChainNameEnum } from '@app/AppState';
 
 const serverUris = (
   translate: (key: string) => TranslateType | void,

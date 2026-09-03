@@ -25,19 +25,19 @@ import {
   ServerType,
   TranslateType,
   BlockExplorerEnum,
-} from '../AppState';
+} from '@app/AppState';
 
 import randomColor from 'randomcolor';
 import {
   getDonationAddress,
   getZenniesDonationAddress,
   parseAddress,
-} from '../walletBackend';
+} from '@app/walletBackend';
 import { Buffer } from 'buffer';
-import { RPCParseAddressType } from '../walletBackend/types/RPCParseAddressType';
-import { RPCParseAddressStatusEnum } from '../walletBackend/enums/RPCParseAddressStatusEnum';
-import { RPCAddressKindEnum } from '../walletBackend/enums/RPCAddressKindEnum';
-import { RPCReceiversEnum } from '../walletBackend/enums/RPCReceiversEnum';
+import { RPCParseAddressType } from '@app/walletBackend/types/RPCParseAddressType';
+import { RPCParseAddressStatusEnum } from '@app/walletBackend/enums/RPCParseAddressStatusEnum';
+import { RPCAddressKindEnum } from '@app/walletBackend/enums/RPCAddressKindEnum';
+import { RPCReceiversEnum } from '@app/walletBackend/enums/RPCReceiversEnum';
 
 export default class Utils {
   static trimToSmall(addr?: string, numChars?: number): string {

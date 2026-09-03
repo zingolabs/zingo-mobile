@@ -1,12 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
-import { RouteEnum } from '../../AppState';
+import { RouteEnum } from '@app/AppState';
 import ComputingTxContent from './ComputingTxContent';
 import {
   screenProps,
   withAppContext,
   withBottomSheet,
   withNavigation,
-} from '../../../.storybook/storyDecorators';
+} from '../../.storybook/storyDecorators';
 
 const meta: Meta<typeof ComputingTxContent> = {
   title: 'LoadedApp/ComputingTx',

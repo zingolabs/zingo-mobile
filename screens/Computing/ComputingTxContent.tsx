@@ -20,13 +20,13 @@ import {
   ParamListBase,
   useNavigation,
 } from '@react-navigation/native';
-import { useTheme } from '../../theme';
+import { useTheme } from '@app/theme';
 import BottomSheet, {
   BottomSheetFooter,
   BottomSheetFooterProps,
 } from '@gorhom/bottom-sheet';
-import TransactionCreatedIcon from '../../../assets/img/transaction-created.svg';
-import TransactionFailedIcon from '../../../assets/img/transaction-failed.svg';
+import TransactionCreatedIcon from '../../assets/img/transaction-created.svg';
+import TransactionFailedIcon from '../../assets/img/transaction-failed.svg';
 
 // Ring colors come from the SVG stroke palette so the outer border
 // matches the icon inside.
@@ -35,14 +35,14 @@ const RING_RED = '#822929';
 
 import RegText from '@ui/primitives/RegText';
 import BoldText from '@ui/primitives/BoldText';
-import Button from '@ui/primitives/Button';
+import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
 import AppSheet from '@ui/primitives/AppSheet';
-import { AppDrawerParamList } from '../../types';
-import { ContextAppLoaded } from '../../context';
+import { AppDrawerParamList } from '@app/types';
+import { ContextAppLoaded } from '@app/context';
 import Header from '@ui/widgets/Header';
-import { ButtonTypeEnum, RouteEnum, ScreenEnum } from '../../AppState';
+import { RouteEnum, ScreenEnum } from '@app/AppState';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { useFullSheetSnapPoints } from '../../hooks/useFullSheetSnapPoints';
+import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
 
 // Time spent on phase 1 ("Computing Transaction...") before swapping the
 // copy to phase 2 ("Hang on tight..."). The actual `sendTransaction` runs

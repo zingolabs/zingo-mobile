@@ -1,5 +1,5 @@
-import { ServerUrisType } from '../AppState';
-import { getLatestBlockServerInfo } from '../walletBackend';
+import { ServerUrisType } from '@app/AppState';
+import { getLatestBlockServerInfo } from '@app/walletBackend';
 
 const calculateLatency = async (server: ServerUrisType, _index: number) => {
   const start: number = Date.now();

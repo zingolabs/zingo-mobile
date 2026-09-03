@@ -1,10 +1,10 @@
 import * as Keychain from 'react-native-keychain';
-import { GlobalConst, WalletType } from '../AppState';
+import { GlobalConst, WalletType } from '@app/AppState';
 import {
   buildBaseOptions,
   buildGetOptions,
   buildSetOptions,
-} from '../utils/keychainOptions';
+} from '@app/utils/keychainOptions';
 
 const service = GlobalConst.serviceKeyChain;
 

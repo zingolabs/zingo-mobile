@@ -13,13 +13,13 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import BoldText from '@ui/primitives/BoldText';
-import Button from '@ui/primitives/Button';
+import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
 import NymGateSheet from './components/NymGateSheet';
 import { deriveNymGateState } from './components/nymGateState';
 import { AppDrawerParamList } from '@app/types';
 import { AppTheme } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
-import { ButtonTypeEnum, RouteEnum } from '@app/AppState';
+import { RouteEnum } from '@app/AppState';
 import Utils from '@app/utils';
 
 type MigrationStrategyProps = NativeStackScreenProps<

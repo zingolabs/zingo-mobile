@@ -10,7 +10,7 @@ import {
   defaultAppContextLoaded,
 } from '@app/context';
 
-import NewAddressTag from '@screens/Receive/components/NewAddressTag';
+import NewAddressTag from '@ui/widgets/NewAddressTag';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 
 describe('NewAddressTag - snapshot', () => {

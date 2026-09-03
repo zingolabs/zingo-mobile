@@ -11,11 +11,11 @@ import {
   BottomSheetScrollView,
 } from '@gorhom/bottom-sheet';
 
-import { ButtonTypeEnum, TranslateType } from '@app/AppState';
+import { TranslateType } from '@app/AppState';
 import BoldText from '@ui/primitives/BoldText';
 import FadeText from '@ui/primitives/FadeText';
 import RegText from '@ui/primitives/RegText';
-import Button from '@ui/primitives/Button';
+import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
 import SheetRim from '@ui/primitives/SheetRim';
 
 /**

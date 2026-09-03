@@ -21,7 +21,7 @@ import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AppDrawerParamList } from '@app/types';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
-import NewSeed from '@app/LoadingApp/components/NewSeed';
+import NewSeed from '@screens/NewSeed';
 
 function makeDrawerProps(
   a: SeedActionEnum,

@@ -1,4 +1,4 @@
-import { RPCMixnetIndicatorEnum } from '../enums/RPCMixnetIndicatorEnum';
+import { RPCMixnetIndicatorEnum } from '@app/walletBackend/enums/RPCMixnetIndicatorEnum';
 import {
   MixnetDetailReport,
   MixnetFailure,

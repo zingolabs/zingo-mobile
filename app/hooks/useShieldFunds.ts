@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { showConfirm } from '../services/showConfirm';
+import { showConfirm } from '@app/services/showConfirm';
 import {
   NavigationProp,
   ParamListBase,
@@ -11,14 +11,14 @@ import {
   SelectServerEnum,
   SnackbarDurationEnum,
   TranslateType,
-} from '../AppState';
-import TotalBalanceClass from '../AppState/classes/TotalBalanceClass';
-import NetInfoType from '../AppState/types/NetInfoType';
-import { shieldConfirm, shieldPropose } from '../walletBackend';
-import type { FfiResult } from '../walletBackend';
-import { RPCShieldProposeType } from '../walletBackend/types/RPCShieldProposeType';
-import { RPCShieldType } from '../walletBackend/types/RPCShieldType';
-import Utils from '../utils';
+} from '@app/AppState';
+import TotalBalanceClass from '@app/AppState/classes/TotalBalanceClass';
+import NetInfoType from '@app/AppState/types/NetInfoType';
+import { shieldConfirm, shieldPropose } from '@app/walletBackend';
+import type { FfiResult } from '@app/walletBackend';
+import { RPCShieldProposeType } from '@app/walletBackend/types/RPCShieldProposeType';
+import { RPCShieldType } from '@app/walletBackend/types/RPCShieldType';
+import Utils from '@app/utils';
 
 type UseShieldFundsInput = {
   readOnly: boolean;

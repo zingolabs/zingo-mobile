@@ -27,10 +27,10 @@ import {
 import { TranslateType } from '@app/AppState';
 import Utils from '@app/utils';
 import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
-import BoldText from '../primitives/BoldText';
-import FadeText from '../primitives/FadeText';
-import RegText from '../primitives/RegText';
-import SheetRim from '../primitives/SheetRim';
+import BoldText from '@ui/primitives/BoldText';
+import FadeText from '@ui/primitives/FadeText';
+import RegText from '@ui/primitives/RegText';
+import SheetRim from '@ui/primitives/SheetRim';
 import { chainDisplayName } from './chainDisplayName';
 import { getChainIcon } from './chainIcons';
 

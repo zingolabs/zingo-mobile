@@ -6,11 +6,11 @@
  * when done. The inSend flag is exposed so the UI can gate actions that must
  * not run during a send.
  */
-import { SendJsonToTypeType } from '../../AppState';
-import RPCModule from '../../RPCModule';
-import { RPCSendProposeType } from '../types/RPCSendProposeType';
-import { RPCSendType } from '../types/RPCSendType';
-import { WalletBackendConfig } from '../config/WalletBackendConfig';
+import { SendJsonToTypeType } from '@app/AppState';
+import RPCModule from '@app/RPCModule';
+import { RPCSendProposeType } from '@app/walletBackend/types/RPCSendProposeType';
+import { RPCSendType } from '@app/walletBackend/types/RPCSendType';
+import { WalletBackendConfig } from '@app/walletBackend/config/WalletBackendConfig';
 import { SyncCoordinator } from './SyncCoordinator';
 
 export class TransactionService {

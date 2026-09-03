@@ -1,6 +1,6 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { AppDrawerParamList } from '../types';
+import { AppDrawerParamList } from '@app/types';
 
 const Stack = createNativeStackNavigator<AppDrawerParamList>();
 

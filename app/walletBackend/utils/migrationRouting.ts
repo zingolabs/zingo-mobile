@@ -1,5 +1,5 @@
-import { FfiResult } from '../ffi';
-import { RPCMigrationPlanType } from '../types/RPCMigrationPlanType';
+import { FfiResult } from '@app/walletBackend/ffi';
+import { RPCMigrationPlanType } from '@app/walletBackend/types/RPCMigrationPlanType';
 
 /**
  * Pure routing of the migration consent screens' FFI outcomes

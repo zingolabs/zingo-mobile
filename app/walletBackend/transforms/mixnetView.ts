@@ -1,4 +1,4 @@
-import { RPCMixnetIndicatorEnum } from '../enums/RPCMixnetIndicatorEnum';
+import { RPCMixnetIndicatorEnum } from '@app/walletBackend/enums/RPCMixnetIndicatorEnum';
 import { MixnetDetailReport, MixnetStatusReport } from './mixnetTransform';
 
 /**
@@ -147,5 +147,35 @@ export function deriveMixnetView(
         recovery: 'reenable',
         reconnecting,
       };
+  }
+}
+
+/** The transport phase a status indicator renders. `off` has no phase. */
+export type MixnetPhase = 'connecting' | 'ready' | 'lost' | 'reconnecting';
+
+/**
+ * Maps a status key and the recovery flag to a phase. `off` (deliberate
+ * clearnet) has none, so the caller renders nothing on null. An active
+ * reconnect wins over the underlying status so the whole loss-recovery
+ * cycle reads as one animated state.
+ */
+export function mixnetPhase(
+  statusKey: MixnetStatusKey,
+  reconnecting: boolean,
+): MixnetPhase | null {
+  if (statusKey === 'mixnet.status.ready') {
+    return 'ready';
+  }
+  if (reconnecting) {
+    return 'reconnecting';
+  }
+  switch (statusKey) {
+    case 'mixnet.status.bootstrapping':
+      return 'connecting';
+    case 'mixnet.status.died':
+    case 'mixnet.status.unknown':
+      return 'lost';
+    case 'mixnet.status.off':
+      return null;
   }
 }

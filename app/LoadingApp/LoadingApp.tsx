@@ -7,7 +7,7 @@ import {
 } from 'react-native';
 
 import Clipboard from '@react-native-clipboard/clipboard';
-import { useTheme } from '../theme';
+import { useTheme } from '@app/theme';
 import { I18n } from 'i18n-js';
 import * as RNLocalize from 'react-native-localize';
 import { StackScreenProps } from '@react-navigation/stack';
@@ -22,11 +22,11 @@ import {
   BottomSheetModalProvider,
 } from '@gorhom/bottom-sheet';
 import CustomServerModalHost from './components/CustomServerModalHost';
-import { BottomSheetBackHandler } from '../hooks/useBottomSheetBackHandler';
+import { BottomSheetBackHandler } from '@app/hooks/useBottomSheetBackHandler';
 import ConfirmBottomSheet from '@ui/widgets/ConfirmBottomSheet';
 import WalletRecoveryHost from './components/WalletRecoveryHost';
-import { showConfirm } from '../services/showConfirm';
-import { showWalletRecovery } from '../services/showWalletRecovery';
+import { showConfirm } from '@app/services/showConfirm';
+import { showWalletRecovery } from '@app/services/showWalletRecovery';
 
 import {
   createNewWallet,
@@ -49,7 +49,7 @@ import {
   WalletFileRepairOutcome,
   WALLET_FILE_NAME,
   WALLET_BACKUP_FILE_NAME,
-} from '../walletBackend';
+} from '@app/walletBackend';
 import {
   AppStateLoading,
   BackgroundType,
@@ -76,22 +76,22 @@ import {
   ScreenEnum,
   LaunchingModeEnum,
   BlockExplorerEnum,
-} from '../AppState';
-import { parseServerURI, serverUris, fetchServerList } from '../uris';
-import SettingsFileImpl from '../services/SettingsFileImpl';
-import { fetchWallet } from '../walletBackend';
-import { AppTheme } from '../theme';
-import { ContextAppLoadingProvider } from '../context';
-import BackgroundFileImpl from '../services/BackgroundFileImpl';
+} from '@app/AppState';
+import { parseServerURI, serverUris, fetchServerList } from '@app/uris';
+import SettingsFileImpl from '@app/services/SettingsFileImpl';
+import { fetchWallet } from '@app/walletBackend';
+import { AppTheme } from '@app/theme';
+import { ContextAppLoadingProvider } from '@app/context';
+import BackgroundFileImpl from '@app/services/BackgroundFileImpl';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { createAlert } from '../services/createAlert';
-import { getZingoVersion, substituteZingoName } from '../utils/ZingoAppData';
-import Utils from '../utils';
-import { RPCWalletKindType } from '../walletBackend/types/RPCWalletKindType';
+import { createAlert } from '@app/services/createAlert';
+import { getZingoVersion, substituteZingoName } from '@app/utils/ZingoAppData';
+import Utils from '@app/utils';
+import { RPCWalletKindType } from '@app/walletBackend/types/RPCWalletKindType';
 import Toast from 'react-native-toast-message';
-import { toastConfig } from '../toastConfig';
-import { RPCSeedType } from '../walletBackend/types/RPCSeedType';
-import Launching from './components/Launching';
+import { toastConfig } from '@ui/widgets/toastConfig';
+import { RPCSeedType } from '@app/walletBackend/types/RPCSeedType';
+import Launching from '@screens/Launching';
 import {
   GateAnswer,
   askGate,
@@ -99,31 +99,31 @@ import {
   enactGateAnswer,
   resolveTriggerGate,
   retireSentinelEntries,
-} from '../services/gateController';
-import selectingServer from '../services/selectingServer';
+} from '@app/services/gateController';
+import selectingServer from '@app/services/selectingServer';
 import { isEqual } from 'lodash';
 import {
   createUpdateRecoveryWalletInfo,
   getRecoveryWalletInfo,
   hasRecoveryWalletInfo,
   removeRecoveryWalletInfo,
-} from '../services/recoveryWalletInfo';
+} from '@app/services/recoveryWalletInfo';
 
 // no lazy load because slowing down screens.
-import ImportUfvk from './components/ImportUfvk';
-import { sendEmail } from '../services/sendEmail';
-import { RPCWalletKindEnum } from '../walletBackend/enums/RPCWalletKindEnum';
-import StartMenu from './components/StartMenu';
-import { RPCUfvkType } from '../walletBackend/types/RPCUfvkType';
-import { RPCPerformanceLevelEnum } from '../walletBackend/enums/RPCPerformanceLevelEnum';
-import NewSeed from './components/NewSeed';
-import { AppStackParamList } from '../types';
+import ImportUfvk from '@screens/ImportUfvk';
+import { sendEmail } from '@app/services/sendEmail';
+import { RPCWalletKindEnum } from '@app/walletBackend/enums/RPCWalletKindEnum';
+import StartMenu from '@screens/StartMenu';
+import { RPCUfvkType } from '@app/walletBackend/types/RPCUfvkType';
+import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
+import NewSeed from '@screens/NewSeed';
+import { AppStackParamList } from '@app/types';
 
-const en = require('../translations/en.json');
-const es = require('../translations/es.json');
-const pt = require('../translations/pt.json');
-const ru = require('../translations/ru.json');
-const tr = require('../translations/tr.json');
+const en = require('@app/translations/en.json');
+const es = require('@app/translations/es.json');
+const pt = require('@app/translations/pt.json');
+const ru = require('@app/translations/ru.json');
+const tr = require('@app/translations/tr.json');
 
 type LoadingAppProps = {
   navigation: StackScreenProps<

@@ -9,10 +9,9 @@ import {
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
 
-import BoldText from '../primitives/BoldText';
-import RegText from '../primitives/RegText';
-import Button from '../primitives/Button';
-import { ButtonTypeEnum } from '@app/AppState';
+import BoldText from '@ui/primitives/BoldText';
+import RegText from '@ui/primitives/RegText';
+import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
 import {
   ConfirmOptions,
   registerConfirmListener,

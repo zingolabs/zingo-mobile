@@ -7,14 +7,13 @@ import { faXmark } from '@fortawesome/free-solid-svg-icons';
 
 import {
   AddressBookFileClass,
-  ButtonTypeEnum,
   ChainNameEnum,
   GlobalConst,
 } from '@app/AppState';
 import RegText from '@ui/primitives/RegText';
 import { ContextAppLoaded } from '@app/context';
 import { showConfirm } from '@app/services/showConfirm';
-import Button from '@ui/primitives/Button';
+import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
 import ChainSelect from '@ui/widgets/ChainSelect';
 import { chainDisplayName } from '@ui/widgets/chainDisplayName';
 import Utils from '@app/utils';

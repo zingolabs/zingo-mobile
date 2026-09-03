@@ -13,7 +13,7 @@ import {
   ParamListBase,
   useNavigation,
 } from '@react-navigation/native';
-import { useTheme } from '../../theme';
+import { useTheme } from '@app/theme';
 import {
   faChevronLeft,
   faQrcode,
@@ -29,20 +29,19 @@ import BottomSheet, {
 import FadeText from '@ui/primitives/FadeText';
 import RegText from '@ui/primitives/RegText';
 import BoldText from '@ui/primitives/BoldText';
-import Button from '@ui/primitives/Button';
+import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
 import AppSheet from '@ui/primitives/AppSheet';
-import { ContextAppLoading } from '../../context';
+import { ContextAppLoading } from '@app/context';
 import Header from '@ui/widgets/Header';
-import { getLatestBlockServerInfo } from '../../walletBackend';
+import { getLatestBlockServerInfo } from '@app/walletBackend';
 import {
-  ButtonTypeEnum,
   GlobalConst,
   RouteEnum,
   ScreenEnum,
   SelectServerEnum,
-} from '../../AppState';
-import { useFullSheetSnapPoints } from '../../hooks/useFullSheetSnapPoints';
-import { useKeyboardHeight } from '../../hooks/useKeyboardHeight';
+} from '@app/AppState';
+import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
+import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
 
 const activationHeight = {
   main: 419200,

@@ -8,7 +8,7 @@ import React, {
 } from 'react';
 import { View, TouchableOpacity, Text, Platform } from 'react-native';
 
-import { useTheme } from '../../theme';
+import { useTheme } from '@app/theme';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
@@ -21,20 +21,15 @@ import BottomSheet, {
 import RegText from '@ui/primitives/RegText';
 import FadeText from '@ui/primitives/FadeText';
 import BoldText from '@ui/primitives/BoldText';
-import Button from '@ui/primitives/Button';
+import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
 import AppSheet from '@ui/primitives/AppSheet';
-import { ContextAppLoading } from '../../context';
-import WalletType from '../../AppState/types/WalletType';
-import {
-  ModeEnum,
-  SnackbarDurationEnum,
-  ButtonTypeEnum,
-  ScreenEnum,
-} from '../../AppState';
+import { ContextAppLoading } from '@app/context';
+import WalletType from '@app/AppState/types/WalletType';
+import { ModeEnum, SnackbarDurationEnum, ScreenEnum } from '@app/AppState';
 import Header from '@ui/widgets/Header';
-import Utils from '../../utils';
-import { useFullSheetSnapPoints } from '../../hooks/useFullSheetSnapPoints';
-import { showConfirm } from '../../services/showConfirm';
+import Utils from '@app/utils';
+import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
+import { showConfirm } from '@app/services/showConfirm';
 
 type TextsType = {
   new: string[];

@@ -31,16 +31,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faChevronLeft, faAngleDown } from '@fortawesome/free-solid-svg-icons';
 import BottomSheet from '@gorhom/bottom-sheet';
 
-import {
-  ButtonTypeEnum,
-  RouteEnum,
-  ScreenEnum,
-  ValueTransferType,
-} from '@app/AppState';
+import { RouteEnum, ScreenEnum, ValueTransferType } from '@app/AppState';
 import { AppDrawerParamList } from '@app/types';
 import FadeText from '@ui/primitives/FadeText';
 import BoldText from '@ui/primitives/BoldText';
-import Button from '@ui/primitives/Button';
+import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
 import AppSheet from '@ui/primitives/AppSheet';
 import MessageLine from './components/MessageLine';
 import { ContextAppLoaded } from '@app/context';

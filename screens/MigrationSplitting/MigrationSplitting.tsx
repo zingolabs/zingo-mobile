@@ -21,12 +21,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
 
 import BoldText from '@ui/primitives/BoldText';
-import Button from '@ui/primitives/Button';
+import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
 import ProgressBar from '@ui/primitives/ProgressBar';
 import StepperHeader from '@ui/widgets/StepperHeader';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
-import { ButtonTypeEnum, RouteEnum } from '@app/AppState';
+import { RouteEnum } from '@app/AppState';
 import useTrickleProgress from '@app/hooks/useTrickleProgress';
 import { planIronwoodMigration, quickSplit } from '@app/walletBackend';
 import { RPCSplitOutcomeType } from '@app/walletBackend/types/RPCSplitOutcomeType';

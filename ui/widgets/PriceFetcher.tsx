@@ -3,8 +3,8 @@ import { View, ActivityIndicator, ViewStyle } from 'react-native';
 import { useTheme } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
 import { ChainNameEnum, SelectServerEnum } from '@app/AppState';
-import RegText from '../primitives/RegText';
-import QuoteRefreshRing from '../primitives/QuoteRefreshRing';
+import RegText from '@ui/primitives/RegText';
+import QuoteRefreshRing from '@ui/primitives/QuoteRefreshRing';
 import {
   PRICE_REFRESH_MIN_MS,
   priceFetcherStore,

@@ -11,12 +11,12 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { useTheme } from '../theme';
+import { useTheme } from '@app/theme';
 import { I18n } from 'i18n-js';
 import * as RNLocalize from 'react-native-localize';
 import { isEqual } from 'lodash';
 import { StackScreenProps } from '@react-navigation/stack';
-import { LoadingAppNavigationState, AppDrawerParamList } from '../types';
+import { LoadingAppNavigationState, AppDrawerParamList } from '@app/types';
 import NetInfo, {
   NetInfoSubscription,
   NetInfoState,
@@ -26,7 +26,7 @@ import {
   deactivateKeepAwake,
 } from '@sayem314/react-native-keep-awake';
 
-import WalletBackend, { fetchWallet } from '../walletBackend';
+import WalletBackend, { fetchWallet } from '@app/walletBackend';
 import {
   changeServer,
   doSave,
@@ -35,7 +35,7 @@ import {
   parseAddress,
   reconcileMigration,
   setConfigWalletToProd,
-} from '../walletBackend';
+} from '@app/walletBackend';
 import {
   AppStateLoaded,
   TotalBalanceClass,
@@ -76,76 +76,76 @@ import {
   LaunchingModeEnum,
   BlockExplorerEnum,
   SnackbarDurationEnum,
-} from '../AppState';
-import Utils from '../utils';
-import { getZingoVersion, substituteZingoName } from '../utils/ZingoAppData';
-import { AppTheme } from '../theme';
-import SettingsFileImpl from '../services/SettingsFileImpl';
+} from '@app/AppState';
+import Utils from '@app/utils';
+import { getZingoVersion, substituteZingoName } from '@app/utils/ZingoAppData';
+import { AppTheme } from '@app/theme';
+import SettingsFileImpl from '@app/services/SettingsFileImpl';
 import { PriceTrafficDriver } from '@ui/widgets/PriceFetcher';
 import { priceFetcherStore } from '@ui/widgets/priceFetcherStore';
-import { ContextAppLoadedProvider } from '../context';
-import { parseZcashURI, serverUris, fetchServerList } from '../uris';
-import selectingServer from '../services/selectingServer';
-import BackgroundFileImpl from '../services/BackgroundFileImpl';
+import { ContextAppLoadedProvider } from '@app/context';
+import { parseZcashURI, serverUris, fetchServerList } from '@app/uris';
+import selectingServer from '@app/services/selectingServer';
+import BackgroundFileImpl from '@app/services/BackgroundFileImpl';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { createAlert } from '../services/createAlert';
-import { sendEmail } from '../services/sendEmail';
+import { createAlert } from '@app/services/createAlert';
+import { sendEmail } from '@app/services/sendEmail';
 import Toast from 'react-native-toast-message';
-import { toastConfig } from '../toastConfig';
-import { RPCSeedType } from '../walletBackend/types/RPCSeedType';
-import { Launching } from '../LoadingApp';
+import { toastConfig } from '@ui/widgets/toastConfig';
+import { RPCSeedType } from '@app/walletBackend/types/RPCSeedType';
+import Launching from '@screens/Launching';
 import { AddressBook } from '@screens/AddressBook';
-import AddressBookFileImpl from '../services/AddressBookFileImpl';
+import AddressBookFileImpl from '@app/services/AddressBookFileImpl';
 import {
   GateAnswer,
   enactGateAnswer,
   resolveTriggerGate,
-} from '../services/gateController';
-import ShowAddressAlertAsync from '@screens/Send/components/ShowAddressAlertAsync';
+} from '@app/services/gateController';
+import ShowAddressAlertAsync from '@app/services/showAddressAlertAsync';
 import {
   createUpdateRecoveryWalletInfo,
   removeRecoveryWalletInfo,
-} from '../services/recoveryWalletInfo';
+} from '@app/services/recoveryWalletInfo';
 
 import History from '@screens/History';
 import Send from '@screens/Send';
 import Receive from '@screens/Receive';
 import Settings from '@screens/Settings';
-import CustomTabBar from '../navigation/CustomTabBar';
+import CustomTabBar from '@app/navigation/CustomTabBar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import {
   BottomSheetModal,
   BottomSheetModalProvider,
 } from '@gorhom/bottom-sheet';
 import AddTagModalHost from './components/AddTagModalHost';
-import { BottomSheetBackHandler } from '../hooks/useBottomSheetBackHandler';
+import { BottomSheetBackHandler } from '@app/hooks/useBottomSheetBackHandler';
 import ConfirmBottomSheet from '@ui/widgets/ConfirmBottomSheet';
-import { showConfirm } from '../services/showConfirm';
-import RootNavigator from '../navigation/RootNavigator';
+import { showConfirm } from '@app/services/showConfirm';
+import RootNavigator from '@app/navigation/RootNavigator';
 import {
   OptionsPanelProvider,
   toggleOptionsPanel,
-} from '../context/optionsPanel';
+} from '@app/context/optionsPanel';
 import LoadedAppOptionsPanelHost from './LoadedAppOptionsPanelHost';
 import { MessageList } from '@screens/Messages';
-import { RPCSyncStatusType } from '../walletBackend/types/RPCSyncStatusType';
-import { RPCUfvkType } from '../walletBackend/types/RPCUfvkType';
+import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
+import { RPCUfvkType } from '@app/walletBackend/types/RPCUfvkType';
 import {
   INITIAL_MIXNET_VIEW,
   OFF_MIXNET_VIEW,
   MixnetView,
-} from '../walletBackend/transforms/mixnetView';
+} from '@app/walletBackend/transforms/mixnetView';
 import {
   startMixnetTransport,
   stopMixnetTransport,
-} from '../walletBackend/utils/nymTransport';
-import { RPCPerformanceLevelEnum } from '../walletBackend/enums/RPCPerformanceLevelEnum';
+} from '@app/walletBackend/utils/nymTransport';
+import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
 import { AddressList } from '@screens/AddressList';
-import ValueTransferDetail from '@screens/History/components/ValueTransferDetail';
-import Confirm from '@screens/Send/components/Confirm';
-import { AppStackParamList } from '../types';
+import ValueTransferDetail from '@screens/ValueTransferDetail';
+import Confirm from '@screens/Confirm';
+import { AppStackParamList } from '@app/types';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RPCValueTransfersStatusEnum } from '../walletBackend/enums/RPCValueTransfersStatusEnum';
+import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
 
 const About = React.lazy(() => import('@screens/About'));
 const MixnetDoctor = React.lazy(() => import('@screens/MixnetDoctor'));
@@ -177,15 +177,13 @@ const MigrationBatchSending = React.lazy(
 );
 const Insight = React.lazy(() => import('@screens/Insight'));
 const ShowUfvk = React.lazy(() => import('@screens/Ufvk/ShowUfvk'));
-const ComputingTxContent = React.lazy(
-  () => import('./components/ComputingTxContent'),
-);
+const ComputingTxContent = React.lazy(() => import('@screens/Computing'));
 
-const en = require('../translations/en.json');
-const es = require('../translations/es.json');
-const pt = require('../translations/pt.json');
-const ru = require('../translations/ru.json');
-const tr = require('../translations/tr.json');
+const en = require('@app/translations/en.json');
+const es = require('@app/translations/es.json');
+const pt = require('@app/translations/pt.json');
+const ru = require('@app/translations/ru.json');
+const tr = require('@app/translations/tr.json');
 
 const Tab = createBottomTabNavigator<AppDrawerParamList>();
 

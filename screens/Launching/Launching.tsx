@@ -2,17 +2,16 @@
 import React from 'react';
 import { Text, View, ActivityIndicator } from 'react-native';
 
-import { useTheme } from '../../theme';
+import { useTheme } from '@app/theme';
 
 import {
   BiometricGateOutcome,
-  ButtonTypeEnum,
   LaunchingModeEnum,
   TranslateType,
-} from '../../AppState';
-import Button from '@ui/primitives/Button';
-import { getZingoName, getZingoVersion } from '../../utils/ZingoAppData';
-import Utils from '../../utils';
+} from '@app/AppState';
+import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
+import { getZingoName, getZingoVersion } from '@app/utils/ZingoAppData';
+import Utils from '@app/utils';
 
 type LaunchingProps = {
   translate: (key: string) => TranslateType;

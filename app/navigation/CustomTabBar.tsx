@@ -6,14 +6,14 @@ import {
   BottomTabBarProps,
 } from '@react-navigation/bottom-tabs';
 import { TabActions } from '@react-navigation/native';
-import { useTheme, advancedTokens } from '../theme';
+import { useTheme, advancedTokens } from '@app/theme';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faRefresh } from '@fortawesome/free-solid-svg-icons';
-import { ModeEnum, RouteEnum } from '../AppState';
-import { ContextAppLoaded } from '../context';
+import { ModeEnum, RouteEnum } from '@app/AppState';
+import { ContextAppLoaded } from '@app/context';
 import TotalBalanceClass, {
   hasFullyUnconfirmedPool,
-} from '../AppState/classes/TotalBalanceClass';
+} from '@app/AppState/classes/TotalBalanceClass';
 import { HouseFilledIcon } from '@ui/primitives/Icons/HouseFilledIcon';
 import { HouseOutlineIcon } from '@ui/primitives/Icons/HouseOutlineIcon';
 import { SendFilledIcon } from '@ui/primitives/Icons/SendFilledIcon';

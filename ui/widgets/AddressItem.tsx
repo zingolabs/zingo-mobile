@@ -3,7 +3,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { ActivityIndicator, TouchableOpacity, View } from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { ContextAppLoaded } from '@app/context';
-import RegText from '../primitives/RegText';
+import RegText from '@ui/primitives/RegText';
 import Utils from '@app/utils';
 import {
   AddressBookFileClass,

@@ -34,7 +34,7 @@ import BottomSheet, {
 import RegText from '@ui/primitives/RegText';
 import FadeText from '@ui/primitives/FadeText';
 import BoldText from '@ui/primitives/BoldText';
-import Button from '@ui/primitives/Button';
+import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
 import AppSheet from '@ui/primitives/AppSheet';
 import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
 import { AppDrawerParamList } from '@app/types';
@@ -46,7 +46,6 @@ import {
   SnackbarDurationEnum,
   SeedActionEnum,
   SettingsNameEnum,
-  ButtonTypeEnum,
   ScreenEnum,
   RouteEnum,
 } from '@app/AppState';

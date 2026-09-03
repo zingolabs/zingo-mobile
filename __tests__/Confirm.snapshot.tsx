@@ -10,7 +10,7 @@ import {
   defaultAppContextLoaded,
 } from '@app/context';
 
-import Confirm from '@screens/Send/components/Confirm';
+import Confirm from '@screens/Confirm';
 import { CurrencyEnum, ModeEnum, RouteEnum } from '@app/AppState';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';

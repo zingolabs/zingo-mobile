@@ -15,9 +15,9 @@ import {
   BottomSheetScrollView,
 } from '@gorhom/bottom-sheet';
 
-import BoldText from '../primitives/BoldText';
-import RegText from '../primitives/RegText';
-import SheetRim from '../primitives/SheetRim';
+import BoldText from '@ui/primitives/BoldText';
+import RegText from '@ui/primitives/RegText';
+import SheetRim from '@ui/primitives/SheetRim';
 import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
 
 export type SelectBottomSheetItem = {

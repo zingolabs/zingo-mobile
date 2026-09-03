@@ -1,16 +1,16 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { forwardRef, useCallback } from 'react';
 import { Pressable, View } from 'react-native';
-import { useTheme } from '../../theme';
+import { useTheme } from '@app/theme';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 
-import { AddressBookFileClass, TranslateType } from '../../AppState';
+import { AddressBookFileClass, TranslateType } from '@app/AppState';
 import BoldText from '@ui/primitives/BoldText';
 import AppSheetModal from '@ui/primitives/AppSheetModal';
-import NewAddressTag from '@screens/Receive/components/NewAddressTag';
-import { useKeyboardHeight } from '../../hooks/useKeyboardHeight';
+import NewAddressTag from '@ui/widgets/NewAddressTag';
+import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
 
 type AddTagModalHostProps = {
   // Latest target the host should render. Pass `null` while the modal is

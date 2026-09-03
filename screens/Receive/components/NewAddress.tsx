@@ -12,14 +12,13 @@ import { useTheme } from '@app/theme';
 import {
   AddressBookFileClass,
   AddressKindEnum,
-  ButtonTypeEnum,
   ReceiverEnum,
   ScreenEnum,
   SnackbarDurationEnum,
 } from '@app/AppState';
 import RegText from '@ui/primitives/RegText';
 import { ContextAppLoaded } from '@app/context';
-import Button from '@ui/primitives/Button';
+import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
 import { AddressUnifiedTypeEnum } from '@app/AppState';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faChevronDown, faXmark } from '@fortawesome/free-solid-svg-icons';

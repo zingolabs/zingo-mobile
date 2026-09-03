@@ -4,7 +4,7 @@ import { TouchableOpacity, View } from 'react-native';
 import { useTheme } from '@app/theme';
 
 import { ChainNameEnum, TranslateType } from '@app/AppState';
-import RegText from '../primitives/RegText';
+import RegText from '@ui/primitives/RegText';
 
 type ChainTypeToggleProps = {
   customServerChainName: string;

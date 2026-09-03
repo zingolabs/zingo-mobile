@@ -11,9 +11,9 @@ import {
 } from '@app/AppState';
 import InfoType from '@app/AppState/types/InfoType';
 import ZecPriceType from '@app/AppState/types/ZecPriceType';
-import BoldText from '../../../primitives/BoldText';
-import CurrencyAmount from '../../CurrencyAmount';
-import FadeText from '../../../primitives/FadeText';
+import BoldText from '@ui/primitives/BoldText';
+import CurrencyAmount from '@ui/widgets/CurrencyAmount';
+import FadeText from '@ui/primitives/FadeText';
 
 const zcashLogo = require('../../../../assets/img/zcash-yellow.png');
 

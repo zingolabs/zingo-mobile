@@ -43,7 +43,7 @@ import 'react-native';
 import React from 'react';
 import { fireEvent, render } from '@testing-library/react-native';
 import Send from '@screens/Send';
-import Confirm from '@screens/Send/components/Confirm';
+import Confirm from '@screens/Confirm';
 import ZecAmount from '@ui/widgets/ZecAmount';
 import {
   ContextAppLoadedProvider,

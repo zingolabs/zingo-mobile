@@ -8,12 +8,11 @@ import {
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
 
-import { useTheme } from '../../theme';
-import { ButtonTypeEnum } from '../../AppState';
-import { TranslateType } from '../../AppState/types/TranslateType';
+import { useTheme } from '@app/theme';
+import { TranslateType } from '@app/AppState/types/TranslateType';
 import BoldText from '@ui/primitives/BoldText';
 import RegText from '@ui/primitives/RegText';
-import Button from '@ui/primitives/Button';
+import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
 
 type WalletRecoveryModalProps = {
   visible: boolean;

@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import { View, Text } from 'react-native';
-import { useTheme } from './theme';
+import { useTheme } from '@app/theme';
 import { ToastConfigParams } from 'react-native-toast-message';
 
 const AppInfoToast: React.FC<ToastConfigParams<undefined>> = ({ text1 }) => {

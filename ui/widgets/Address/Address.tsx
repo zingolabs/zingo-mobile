@@ -1,8 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import { TextStyle } from 'react-native';
-import Button from '../../primitives/Button';
-import { ButtonTypeEnum } from '@app/AppState';
+import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
 
 type AddressProps = {
   address: string;

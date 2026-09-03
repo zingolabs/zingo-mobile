@@ -5,13 +5,13 @@ import type {
   OptionsPanelAction,
   OptionsPanelSocial,
 } from '@screens/OptionsPanel';
-import { closeOptionsPanel, useOptionsPanel } from '../context/optionsPanel';
-import { ContextAppLoaded } from '../context';
-import { MenuItemEnum, ModeEnum, SelectServerEnum } from '../AppState';
-import { sendEmail } from '../services/sendEmail';
-import { walletBackupExists } from '../walletBackend';
-import { getZingoLogo, getZingoName } from '../utils/ZingoAppData';
-import { advancedTokens, basicTokens } from '../theme';
+import { closeOptionsPanel, useOptionsPanel } from '@app/context/optionsPanel';
+import { ContextAppLoaded } from '@app/context';
+import { MenuItemEnum, ModeEnum, SelectServerEnum } from '@app/AppState';
+import { sendEmail } from '@app/services/sendEmail';
+import { walletBackupExists } from '@app/walletBackend';
+import { getZingoLogo, getZingoName } from '@app/utils/ZingoAppData';
+import { advancedTokens, basicTokens } from '@app/theme';
 
 import AddressBookIcon from '../../assets/img/options/address-book.svg';
 import AddressBookBasicIcon from '../../assets/img/options/address-book-basic.svg';

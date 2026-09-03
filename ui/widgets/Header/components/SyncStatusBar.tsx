@@ -23,10 +23,13 @@ import {
   TranslateType,
 } from '@app/AppState';
 import NetInfoType from '@app/AppState/types/NetInfoType';
-import { MixnetView } from '@app/walletBackend/transforms/mixnetView';
-import FadeText from '../../../primitives/FadeText';
+import {
+  MixnetView,
+  mixnetPhase,
+} from '@app/walletBackend/transforms/mixnetView';
+import FadeText from '@ui/primitives/FadeText';
 import NymOn from '../../../../assets/img/nym-on.svg';
-import MixnetIcon, { mixnetPhase } from '../../../primitives/Icons/MixnetIcon';
+import MixnetIcon from '@ui/primitives/Icons/MixnetIcon';
 import PrivacyToggle from './PrivacyToggle';
 
 type SyncStatusBarProps = {

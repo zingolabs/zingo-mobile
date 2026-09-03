@@ -26,7 +26,7 @@ import RegText from '@ui/primitives/RegText';
 import BoldText from '@ui/primitives/BoldText';
 import ZecAmount from '@ui/widgets/ZecAmount';
 import CurrencyAmount from '@ui/widgets/CurrencyAmount';
-import Button from '@ui/primitives/Button';
+import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
 import AppSheet from '@ui/primitives/AppSheet';
 import { useTheme } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
@@ -38,7 +38,6 @@ import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
 import { AppDrawerParamList } from '@app/types';
 import Utils from '@app/utils';
 import {
-  ButtonTypeEnum,
   ChainNameEnum,
   GlobalConst,
   ScreenEnum,

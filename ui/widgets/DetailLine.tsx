@@ -4,8 +4,8 @@ import { TouchableOpacity, View } from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { useTheme } from '@app/theme';
 
-import FadeText from '../primitives/FadeText';
-import RegText from '../primitives/RegText';
+import FadeText from '@ui/primitives/FadeText';
+import RegText from '@ui/primitives/RegText';
 import { ContextAppLoaded } from '@app/context';
 import { SnackbarDurationEnum } from '@app/AppState';
 

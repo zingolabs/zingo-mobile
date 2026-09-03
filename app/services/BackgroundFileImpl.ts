@@ -1,6 +1,6 @@
 import * as RNFS from 'react-native-fs';
 
-import { BackgroundType, GlobalConst } from '../AppState';
+import { BackgroundType, GlobalConst } from '@app/AppState';
 
 export default class BackgroundFileImpl {
   static async getFileName() {

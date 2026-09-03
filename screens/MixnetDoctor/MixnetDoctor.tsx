@@ -18,12 +18,12 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import FadeText from '@ui/primitives/FadeText';
 import RegText from '@ui/primitives/RegText';
-import Button from '@ui/primitives/Button';
+import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
 import Header from '@ui/widgets/Header';
 import { AppDrawerParamList } from '@app/types';
 import { useTheme } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
-import { ButtonTypeEnum, RouteEnum, ScreenEnum } from '@app/AppState';
+import { RouteEnum, ScreenEnum } from '@app/AppState';
 import {
   getMixnetBootstrapDetail,
   getMixnetStatus,

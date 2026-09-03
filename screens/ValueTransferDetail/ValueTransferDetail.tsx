@@ -26,7 +26,6 @@ import {
   ValueTransferType,
   ValueTransferKindEnum,
   GlobalConst,
-  ButtonTypeEnum,
   SelectServerEnum,
   RouteEnum,
   TransactionActionEnum,
@@ -56,7 +55,7 @@ import {
 import BottomSheet, { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
 import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
-import Button from '@ui/primitives/Button';
+import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
 import { removeTransaction } from '@app/walletBackend';
 import { createAlert } from '@app/services/createAlert';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';

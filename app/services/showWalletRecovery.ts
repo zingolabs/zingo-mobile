@@ -4,7 +4,7 @@
  * BottomSheetModalProvider. Registered once per provider; a call before
  * mount no-ops (warns in dev).
  */
-import { TranslateType } from '../AppState/types/TranslateType';
+import { TranslateType } from '@app/AppState/types/TranslateType';
 
 export type WalletRecoveryOptions = {
   title: string;

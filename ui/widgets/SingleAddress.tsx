@@ -18,14 +18,14 @@ import {
   TransparentAddressClass,
   UnifiedAddressClass,
 } from '@app/AppState';
-import RegText from '../primitives/RegText';
-import FadeText from '../primitives/FadeText';
+import RegText from '@ui/primitives/RegText';
+import FadeText from '@ui/primitives/FadeText';
 import Clipboard from '@react-native-clipboard/clipboard';
-import { CopyIcon } from '../primitives/Icons/CopyIcon';
-import { EyeIcon } from '../primitives/Icons/EyeIcon';
-import { TriangleAlert } from '../primitives/Icons/TriangleAlert';
-import { ShieldIcon } from '../primitives/Icons/ShieldIcon';
-import { ListIcon } from '../primitives/Icons/ListIcon';
+import { CopyIcon } from '@ui/primitives/Icons/CopyIcon';
+import { EyeIcon } from '@ui/primitives/Icons/EyeIcon';
+import { TriangleAlert } from '@ui/primitives/Icons/TriangleAlert';
+import { ShieldIcon } from '@ui/primitives/Icons/ShieldIcon';
+import { ListIcon } from '@ui/primitives/Icons/ListIcon';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCircleCheck } from '@fortawesome/free-regular-svg-icons';
 import Address from './Address/Address';

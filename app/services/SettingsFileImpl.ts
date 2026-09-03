@@ -12,10 +12,10 @@ import {
   SettingsFileClass,
   SettingsNameEnum,
   BlockExplorerEnum,
-} from '../AppState';
-import { serverUris } from '../uris';
+} from '@app/AppState';
+import { serverUris } from '@app/uris';
 import { isEqual } from 'lodash';
-import { RPCPerformanceLevelEnum } from '../walletBackend/enums/RPCPerformanceLevelEnum';
+import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
 
 export default class SettingsFileImpl {
   static async getFileName() {

@@ -3,7 +3,7 @@ import WalletRecoveryModal from './WalletRecoveryModal';
 import {
   registerWalletRecoveryListener,
   WalletRecoveryOptions,
-} from '../../services/showWalletRecovery';
+} from '@app/services/showWalletRecovery';
 
 // Bridges the imperative showWalletRecovery trigger to the controlled
 // modal: an action closes the sheet, Copy leaves it open.

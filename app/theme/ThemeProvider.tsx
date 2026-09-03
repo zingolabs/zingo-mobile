@@ -9,7 +9,7 @@ import React, {
   useState,
 } from 'react';
 
-import { ModeEnum } from '../AppState';
+import { ModeEnum } from '@app/AppState';
 import { advancedTokens, basicTokens, ThemeColors } from './tokens';
 
 export type AppTheme = {

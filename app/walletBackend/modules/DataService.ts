@@ -21,23 +21,23 @@ import {
   UnifiedAddressClass,
   TransparentAddressClass,
   foldBlockSpacing,
-} from '../../AppState';
-import RPCModule from '../../RPCModule';
-import { RPCUnifiedAddressType } from '../types/RPCUnifiedAddressType';
-import { RPCBalancesType } from '../types/RPCBalancesType';
-import { RPCInfoType } from '../types/RPCInfoType';
-import { RPCWalletHeight } from '../types/RPCWalletHeightType';
-import { RPCValueTransfersType } from '../types/RPCValueTransfersType';
-import { RPCValueTransferType } from '../types/RPCValueTransferType';
-import { RPCTransparentAddressType } from '../types/RPCTransparentAddressType';
-import { RPCSpendablebalanceType } from '../types/RPCSpendablebalanceType';
-import { RPCWalletSaveRequiredType } from '../types/RPCWalletSaveRequiredType';
-import { RPCConfigWalletPerformanceType } from '../types/RPCConfigWalletPerformanceType';
-import { RPCPerformanceLevelEnum } from '../enums/RPCPerformanceLevelEnum';
-import { RPCWalletVersionType } from '../types/RPCWalletVersionType';
-import { WalletBackendConfig } from '../config/WalletBackendConfig';
-import { transformValueTransfer } from '../transforms/valueTransferTransform';
-import { fetchWallet } from '../utils/walletUtils';
+} from '@app/AppState';
+import RPCModule from '@app/RPCModule';
+import { RPCUnifiedAddressType } from '@app/walletBackend/types/RPCUnifiedAddressType';
+import { RPCBalancesType } from '@app/walletBackend/types/RPCBalancesType';
+import { RPCInfoType } from '@app/walletBackend/types/RPCInfoType';
+import { RPCWalletHeight } from '@app/walletBackend/types/RPCWalletHeightType';
+import { RPCValueTransfersType } from '@app/walletBackend/types/RPCValueTransfersType';
+import { RPCValueTransferType } from '@app/walletBackend/types/RPCValueTransferType';
+import { RPCTransparentAddressType } from '@app/walletBackend/types/RPCTransparentAddressType';
+import { RPCSpendablebalanceType } from '@app/walletBackend/types/RPCSpendablebalanceType';
+import { RPCWalletSaveRequiredType } from '@app/walletBackend/types/RPCWalletSaveRequiredType';
+import { RPCConfigWalletPerformanceType } from '@app/walletBackend/types/RPCConfigWalletPerformanceType';
+import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
+import { RPCWalletVersionType } from '@app/walletBackend/types/RPCWalletVersionType';
+import { WalletBackendConfig } from '@app/walletBackend/config/WalletBackendConfig';
+import { transformValueTransfer } from '@app/walletBackend/transforms/valueTransferTransform';
+import { fetchWallet } from '@app/walletBackend/utils/walletUtils';
 
 export class DataService {
   config: WalletBackendConfig;

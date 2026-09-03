@@ -3,9 +3,9 @@ import React, { useContext, useState } from 'react';
 import { View, TouchableOpacity, ScrollView } from 'react-native';
 import { useTheme } from '@app/theme';
 
-import { ButtonTypeEnum, FilterEnum } from '@app/AppState';
+import { FilterEnum } from '@app/AppState';
 import { ContextAppLoaded } from '@app/context';
-import Button from '@ui/primitives/Button';
+import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
 import FadeText from '@ui/primitives/FadeText';
 
 type FiltersProps = {

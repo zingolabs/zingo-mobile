@@ -1,4 +1,4 @@
-import { RPCWalletKindEnum } from '../enums/RPCWalletKindEnum';
+import { RPCWalletKindEnum } from '@app/walletBackend/enums/RPCWalletKindEnum';
 
 export type RPCWalletKindType = {
   kind: RPCWalletKindEnum;

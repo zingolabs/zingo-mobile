@@ -13,14 +13,13 @@ import BottomSheet, {
 
 import RegText from '@ui/primitives/RegText';
 import BoldText from '@ui/primitives/BoldText';
-import Button from '@ui/primitives/Button';
+import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
 import AppSheet from '@ui/primitives/AppSheet';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
 import { useBiometricGate } from '@app/hooks/useBiometricGate';
 import Header from '@ui/widgets/Header';
 import {
-  ButtonTypeEnum,
   RouteEnum,
   ScreenEnum,
   SelectServerEnum,

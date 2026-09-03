@@ -1,8 +1,8 @@
 import { Linking } from 'react-native';
 import DeviceInfo from 'react-native-device-info';
-import { GlobalConst, TranslateType } from '../AppState';
-import { sanitizePaths } from '../utils/sanitizePaths';
-import { getZingoName, getZingoVersion } from '../utils/ZingoAppData';
+import { GlobalConst, TranslateType } from '@app/AppState';
+import { sanitizePaths } from '@app/utils/sanitizePaths';
+import { getZingoName, getZingoVersion } from '@app/utils/ZingoAppData';
 import { showConfirm } from './showConfirm';
 
 export const sendEmail = async (

@@ -10,7 +10,6 @@ import { useTheme } from '@app/theme';
 import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
-  ButtonTypeEnum,
   ChainNameEnum,
   CurrencyEnum,
   ModeEnum,
@@ -23,12 +22,12 @@ import TotalBalanceClass from '@app/AppState/classes/TotalBalanceClass';
 import InfoType from '@app/AppState/types/InfoType';
 import ZecPriceType from '@app/AppState/types/ZecPriceType';
 import Utils from '@app/utils';
-import Button from '../../../primitives/Button';
-import CurrencyAmount from '../../CurrencyAmount';
-import FadeText from '../../../primitives/FadeText';
-import PriceFetcher from '../../PriceFetcher';
-import RegText from '../../../primitives/RegText';
-import ZecAmount from '../../ZecAmount';
+import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
+import CurrencyAmount from '@ui/widgets/CurrencyAmount';
+import FadeText from '@ui/primitives/FadeText';
+import PriceFetcher from '@ui/widgets/PriceFetcher';
+import RegText from '@ui/primitives/RegText';
+import ZecAmount from '@ui/widgets/ZecAmount';
 import PrivacyToggle from './PrivacyToggle';
 
 type BalanceRowProps = {

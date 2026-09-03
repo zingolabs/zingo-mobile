@@ -8,11 +8,10 @@ import {
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
 
-import Button from '@ui/primitives/Button';
+import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
 import SheetRim from '@ui/primitives/SheetRim';
 import MixnetIcon from '@ui/primitives/Icons/MixnetIcon';
 import { ContextAppLoaded } from '@app/context';
-import { ButtonTypeEnum } from '@app/AppState';
 import { radiusSheet, useTheme } from '@app/theme';
 import { NymGateState } from './nymGateState';
 

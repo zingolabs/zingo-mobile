@@ -11,8 +11,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCheck, faQrcode, faXmark } from '@fortawesome/free-solid-svg-icons';
 
 import { ContextAppLoaded } from '@app/context';
-import ErrorText from '../primitives/ErrorText';
-import RegText from '../primitives/RegText';
+import ErrorText from '@ui/primitives/ErrorText';
+import RegText from '@ui/primitives/RegText';
 import { validateAddressForChain } from '@app/swap';
 import { GlobalConst, RouteEnum, ScreenEnum } from '@app/AppState';
 

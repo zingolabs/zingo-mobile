@@ -51,13 +51,13 @@ import NymOff from '../../assets/img/nym-off.svg';
 import NymSwitchOn from '../../assets/img/nym-switch-on.svg';
 import SwitchOff from '../../assets/img/switch-off.svg';
 import { showConfirm } from '@app/services/showConfirm';
-import { mixnetPhase } from '@ui/primitives/Icons/MixnetIcon';
+import { mixnetPhase } from '@app/walletBackend/transforms/mixnetView';
 import ErrorText from '@ui/primitives/ErrorText';
 import RegText from '@ui/primitives/RegText';
 import ZecAmount from '@ui/widgets/ZecAmount';
 import CurrencyAmount from '@ui/widgets/CurrencyAmount';
 import { usePriceHealth } from '@ui/widgets/priceFetcherStore';
-import Button from '@ui/primitives/Button';
+import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
 import AppSheet from '@ui/primitives/AppSheet';
 import AppSheetModal from '@ui/primitives/AppSheetModal';
 import {
@@ -67,7 +67,6 @@ import {
   ModeEnum,
   CurrencyEnum,
   ChainNameEnum,
-  ButtonTypeEnum,
   GlobalConst,
   ServerUrisType,
   ServerType,
@@ -102,7 +101,7 @@ import { useOptionsPanelSheetSlide } from '@app/hooks/useOptionsPanelSheetSlide'
 import { usePriceSnapAutoClose } from '@app/hooks/usePriceSnapAutoClose';
 import AddressItem from '@ui/widgets/AddressItem';
 import { RPCSendProposeType } from '@app/walletBackend/types/RPCSendProposeType';
-import ShowAddressAlertAsync from './components/ShowAddressAlertAsync';
+import ShowAddressAlertAsync from '@app/services/showAddressAlertAsync';
 import Memo from './components/Memo';
 import SendErrorSheet from './components/SendErrorSheet';
 import { sendEmail } from '@app/services/sendEmail';

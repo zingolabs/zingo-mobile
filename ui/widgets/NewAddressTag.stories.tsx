@@ -3,8 +3,8 @@ import NewAddressTag from './NewAddressTag';
 import {
   withAppContext,
   withBottomSheet,
-} from '../../../.storybook/storyDecorators';
-import { uAddress } from '../../../.storybook/storyMocks';
+} from '../../.storybook/storyDecorators';
+import { uAddress } from '../../.storybook/storyMocks';
 
 // Nests ChainSelect, which mounts a BottomSheetModal. It needs the sheet provider
 const meta: Meta<typeof NewAddressTag> = {

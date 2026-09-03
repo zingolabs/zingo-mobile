@@ -44,7 +44,7 @@ import { RPCAddressScopeEnum } from '@app/walletBackend/enums/RPCAddressScopeEnu
 import BottomSheet, { BottomSheetModal } from '@gorhom/bottom-sheet';
 import NewAddress from './components/NewAddress';
 import VerifyAddress from './components/VerifyAddress';
-import NewAddressTag from './components/NewAddressTag';
+import NewAddressTag from '@ui/widgets/NewAddressTag';
 import TransparentWarning from './components/TransparentWarning';
 import ExpandedAddress from '@ui/widgets/ExpandedAddress';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';

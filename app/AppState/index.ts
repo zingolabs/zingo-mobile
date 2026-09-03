@@ -45,7 +45,6 @@ import { SettingsNameEnum } from './enums/SettingsNameEnum';
 import { RouteEnum } from './enums/RouteEnum';
 import { AppStateStatusEnum } from './enums/AppStateStatusEnum';
 import { CurrencyNameEnum } from './enums/CurrencyNameEnum';
-import { ButtonTypeEnum } from './enums/ButtonTypeEnum';
 import { AddressKindEnum } from './enums/AddressKindEnum';
 import { ReceiverEnum } from './enums/ReceiverEnum';
 import { SecurityTypeEnum } from './enums/SecurityTypeEnum';
@@ -103,7 +102,6 @@ export {
   RouteEnum,
   AppStateStatusEnum,
   CurrencyNameEnum,
-  ButtonTypeEnum,
   AddressKindEnum,
   ReceiverEnum,
   SecurityTypeEnum,

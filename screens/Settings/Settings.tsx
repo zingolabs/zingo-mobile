@@ -47,7 +47,7 @@ import {
   parseServerURI,
   serverUris,
 } from '@app/uris';
-import Button from '@ui/primitives/Button';
+import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
 
@@ -66,7 +66,6 @@ import {
   ChainNameEnum,
   CurrencyNameEnum,
   InfoType,
-  ButtonTypeEnum,
   GlobalConst,
   RouteEnum,
   ScreenEnum,

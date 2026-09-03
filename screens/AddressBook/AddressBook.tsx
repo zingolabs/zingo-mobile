@@ -23,7 +23,6 @@ import { useTheme } from '@app/theme';
 import {
   AddressBookActionEnum,
   AddressBookFileClass,
-  ButtonTypeEnum,
   ChainNameEnum,
   FilterEnum,
   RouteEnum,
@@ -32,7 +31,7 @@ import {
 import { AppDrawerParamList } from '@app/types';
 import FadeText from '@ui/primitives/FadeText';
 import BoldText from '@ui/primitives/BoldText';
-import Button from '@ui/primitives/Button';
+import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
 import AppSheet from '@ui/primitives/AppSheet';
 import AppSheetModal from '@ui/primitives/AppSheetModal';
 import AbDetail from './components/AbDetail';
