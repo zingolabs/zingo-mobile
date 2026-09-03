@@ -17,11 +17,11 @@
 // and the binding below reads that registry at module scope.
 import 'react-native';
 
-import DeviceAuth from '../app/DeviceAuthModule';
+import DeviceAuth from '@app/services/DeviceAuthModule';
 import type {
   DeviceAuthAvailability,
   DeviceAuthResult,
-} from '../app/DeviceAuthModule';
+} from '@app/services/DeviceAuthModule';
 
 test('the binding resolves the natively registered DeviceAuth module', () => {
   // A top-level `import { NativeModules } from 'react-native'` here lands

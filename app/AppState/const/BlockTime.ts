@@ -1,4 +1,4 @@
-import { RPCBroadcastWindowType } from '../../walletBackend/types/RPCMigrationStatusType';
+import { RPCBroadcastWindowType } from '@app/walletBackend/types/RPCMigrationStatusType';
 
 /**
  * Mainnet's target block spacing, which is also what zingolib assumes when it

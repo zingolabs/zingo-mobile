@@ -3,7 +3,7 @@ import {
   classifySendFailure,
   retryOnAnotherServer,
   sendFailureText,
-} from '../app/walletBackend/transforms/sendFailureTransform';
+} from '@app/walletBackend/transforms/sendFailureTransform';
 
 /**
  * Realistic failure strings, one per real family the send path produces.

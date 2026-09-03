@@ -1,5 +1,5 @@
 import Url from 'url-parse';
-import { ErrorKeyed, GlobalConst } from '../AppState';
+import { ErrorKeyed, GlobalConst } from '@app/AppState';
 
 // Audit Issue G — plaintext http:// is only acceptable when the user is
 // pointing at a server running on the same device (local development,

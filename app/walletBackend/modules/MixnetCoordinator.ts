@@ -21,20 +21,23 @@
  * publishes its view immediately, before the transport or the wallet
  * answers.
  */
-import { RPCMixnetIndicatorEnum } from '../enums/RPCMixnetIndicatorEnum';
+import { RPCMixnetIndicatorEnum } from '@app/walletBackend/enums/RPCMixnetIndicatorEnum';
 import {
   ClearnetConsent,
   MixnetStatusReport,
   describeRejection,
   vetPolledStatus,
-} from '../transforms/mixnetTransform';
-import { MixnetView, deriveMixnetView } from '../transforms/mixnetView';
+} from '@app/walletBackend/transforms/mixnetTransform';
+import {
+  MixnetView,
+  deriveMixnetView,
+} from '@app/walletBackend/transforms/mixnetView';
 import {
   attachMixnet,
   disableMixnet,
   getMixnetBootstrapDetail,
   getMixnetStatus,
-} from '../utils/mixnetUtils';
+} from '@app/walletBackend/utils/mixnetUtils';
 
 /**
  * What a started platform transport reports back: its local SOCKS5 address

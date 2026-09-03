@@ -24,7 +24,8 @@ const entries = Object.values(
 const out = process.env.VISUAL_OUT ?? join(__dirname, '__current__');
 const imagesDir = join(out, 'images');
 mkdirSync(imagesDir, { recursive: true });
-const shot = (id: string, state: string) => join(imagesDir, `${id}__${state}.png`);
+const shot = (id: string, state: string) =>
+  join(imagesDir, `${id}__${state}.png`);
 
 // Fake-clock milliseconds stepped before a screenshot: long enough for a
 // sheet to finish presenting, and the fixed tick every loop is caught on.

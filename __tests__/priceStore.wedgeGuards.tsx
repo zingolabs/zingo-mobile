@@ -2,7 +2,7 @@
  * Wedged timers and wedged native calls, and the gates and rate bounds
  * that keep them from re-forming.
  */
-jest.mock('../app/walletBackend', () => ({
+jest.mock('@app/walletBackend', () => ({
   __esModule: true,
   getZecPrice: jest.fn(),
 }));
@@ -11,20 +11,18 @@ import 'react-native';
 import type { AppStateStatus } from 'react-native';
 import React from 'react';
 import { render, waitFor } from '@testing-library/react-native';
-import PriceFetcher, {
-  PriceTrafficDriver,
-} from '../components/Components/PriceFetcher';
+import PriceFetcher, { PriceTrafficDriver } from '@ui/widgets/PriceFetcher';
 import {
   PRICE_REFRESH_MAX_MS,
   priceFetcherStore,
-} from '../components/Components/priceFetcherStore';
+} from '@ui/widgets/priceFetcherStore';
 import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
-} from '../app/context';
-import { ChainNameEnum, SelectServerEnum } from '../app/AppState';
-import { getZecPrice } from '../app/walletBackend';
-import { MixnetView } from '../app/walletBackend/transforms/mixnetView';
+} from '@app/context';
+import { ChainNameEnum, SelectServerEnum } from '@app/AppState';
+import { getZecPrice } from '@app/walletBackend';
+import { MixnetView } from '@app/walletBackend/transforms/mixnetView';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 
 const price = getZecPrice as jest.MockedFunction<typeof getZecPrice>;

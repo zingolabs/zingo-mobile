@@ -13,4 +13,4 @@ export const basicTokens = mockTheme.colors;
 // Not themed, so re-export the real token instead of a stand-in: the mock
 // shadows the whole `app/theme` barrel, and a missing export here would
 // silently render every sheet radius as `undefined`.
-export { radiusSheet } from '../app/theme/radii';
+export { radiusSheet } from '@app/theme/radii';

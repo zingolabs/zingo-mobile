@@ -1,5 +1,5 @@
 import { DefaultTheme } from '@react-navigation/native';
-import type { ThemeColors } from '../../app/theme';
+import type { ThemeColors } from '@app/theme';
 
 // The drifted values (`#18bd18` for the accent, `#c3c3c3` for text) predate the
 // token layer and stay wrong on purpose: the 43 snapshot suites are baselined

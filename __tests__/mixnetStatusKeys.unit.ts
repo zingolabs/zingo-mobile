@@ -9,8 +9,8 @@ import {
   INITIAL_MIXNET_VIEW,
   OFF_MIXNET_VIEW,
   deriveMixnetView,
-} from '../app/walletBackend/transforms/mixnetView';
-import { RPCMixnetIndicatorEnum } from '../app/walletBackend/enums/RPCMixnetIndicatorEnum';
+} from '@app/walletBackend/transforms/mixnetView';
+import { RPCMixnetIndicatorEnum } from '@app/walletBackend/enums/RPCMixnetIndicatorEnum';
 
 test('R10: the closed status-key set derives from the indicator enum', () => {
   // No verbatim copy: the expectation is computed from the enum the wallet
@@ -31,10 +31,38 @@ test('F10: every derivable view stays inside the closed key set', () => {
       { kind: 'failure', failure: { reason: 'unconsentedOff' } },
       null,
     ),
-    deriveMixnetView({ kind: 'status', indicator: RPCMixnetIndicatorEnum.off, socks5Addr: null }, null),
-    deriveMixnetView({ kind: 'status', indicator: RPCMixnetIndicatorEnum.bootstrapping, socks5Addr: null }, null),
-    deriveMixnetView({ kind: 'status', indicator: RPCMixnetIndicatorEnum.ready, socks5Addr: '127.0.0.1:1' }, null),
-    deriveMixnetView({ kind: 'status', indicator: RPCMixnetIndicatorEnum.died, socks5Addr: null }, null),
+    deriveMixnetView(
+      {
+        kind: 'status',
+        indicator: RPCMixnetIndicatorEnum.off,
+        socks5Addr: null,
+      },
+      null,
+    ),
+    deriveMixnetView(
+      {
+        kind: 'status',
+        indicator: RPCMixnetIndicatorEnum.bootstrapping,
+        socks5Addr: null,
+      },
+      null,
+    ),
+    deriveMixnetView(
+      {
+        kind: 'status',
+        indicator: RPCMixnetIndicatorEnum.ready,
+        socks5Addr: '127.0.0.1:1',
+      },
+      null,
+    ),
+    deriveMixnetView(
+      {
+        kind: 'status',
+        indicator: RPCMixnetIndicatorEnum.died,
+        socks5Addr: null,
+      },
+      null,
+    ),
   ];
   derived.forEach(view => expect(keys.has(view.statusKey)).toBe(true));
 });

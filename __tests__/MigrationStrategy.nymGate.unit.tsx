@@ -6,18 +6,18 @@ import 'react-native';
 import React from 'react';
 
 import { fireEvent, render } from '@testing-library/react-native';
-import MigrationStrategy from '../components/MigrationStrategy';
-import { deriveNymGateState } from '../components/MigrationStrategy/components/nymGateState';
+import MigrationStrategy from '@screens/MigrationStrategy';
+import { deriveNymGateState } from '@screens/MigrationStrategy/components/nymGateState';
 import {
   defaultAppContextLoaded,
   ContextAppLoadedProvider,
-} from '../app/context';
-import { RouteEnum } from '../app/AppState';
-import { RPCMixnetIndicatorEnum } from '../app/walletBackend/enums/RPCMixnetIndicatorEnum';
+} from '@app/context';
+import { RouteEnum } from '@app/AppState';
+import { RPCMixnetIndicatorEnum } from '@app/walletBackend/enums/RPCMixnetIndicatorEnum';
 import {
   MixnetView,
   deriveMixnetView,
-} from '../app/walletBackend/transforms/mixnetView';
+} from '@app/walletBackend/transforms/mixnetView';
 import {
   mixnetConnecting,
   mixnetLost,
@@ -25,7 +25,7 @@ import {
   mixnetReconnecting,
   mockInfo,
   mockTotalBalance,
-} from '../components/storyMocks';
+} from '../.storybook/storyMocks';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
 // Rendering the raw key keeps the assertions on which translation the sheet

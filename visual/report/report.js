@@ -5,10 +5,13 @@ const show = name => {
   for (const b of document.querySelectorAll('.tab'))
     b.classList.toggle('current', b.dataset.tab === name);
 };
-for (const b of document.querySelectorAll('.tab')) b.onclick = () => show(b.dataset.tab);
+for (const b of document.querySelectorAll('.tab'))
+  b.onclick = () => show(b.dataset.tab);
 show(tabs.dataset.first);
 
-const hashRow = location.hash ? document.getElementById(location.hash.slice(1)) : null;
+const hashRow = location.hash
+  ? document.getElementById(location.hash.slice(1))
+  : null;
 if (hashRow && hashRow.classList.contains('imgrow')) {
   show('images');
   requestAnimationFrame(() => hashRow.scrollIntoView());
@@ -17,7 +20,8 @@ if (hashRow && hashRow.classList.contains('imgrow')) {
 const viewer = document.querySelector('.imgviewer');
 if (viewer) {
   const nav = new Map();
-  for (const a of document.querySelectorAll('.navitem')) nav.set(a.getAttribute('href').slice(1), a);
+  for (const a of document.querySelectorAll('.navitem'))
+    nav.set(a.getAttribute('href').slice(1), a);
   const io = new IntersectionObserver(
     es => {
       for (const e of es)
@@ -64,7 +68,11 @@ if (lb) {
     const fx = clamp((e.clientX - fit.left) / fit.width, 0, 1);
     const fy = clamp((e.clientY - fit.top) / fit.height, 0, 1);
     li.style.transformOrigin = '0 0';
-    li.style.transform = tf(-fx * fit.width * (z - 1), -fy * fit.height * (z - 1), z);
+    li.style.transform = tf(
+      -fx * fit.width * (z - 1),
+      -fy * fit.height * (z - 1),
+      z,
+    );
     zoom = z;
     li.classList.toggle('zoomed', z > 1);
   };
@@ -84,12 +92,18 @@ if (lb) {
       fill: 'both',
     });
     if (reduce) {
-      li.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 120, fill: 'both' });
+      li.animate([{ opacity: 0 }, { opacity: 1 }], {
+        duration: 120,
+        fill: 'both',
+      });
       return;
     }
     anim = li.animate(
       [
-        { transformOrigin: 'top left', transform: tf(r.left - t.left, r.top - t.top, s) },
+        {
+          transformOrigin: 'top left',
+          transform: tf(r.left - t.left, r.top - t.top, s),
+        },
         { transformOrigin: 'top left', transform: 'none' },
       ],
       { duration: 260, easing: EASE, fill: 'both' },
@@ -129,14 +143,18 @@ if (lb) {
     anim = li.animate(
       [
         { transformOrigin: 'top left', transform: 'none' },
-        { transformOrigin: 'top left', transform: tf(r.left - t.left, r.top - t.top, s) },
+        {
+          transformOrigin: 'top left',
+          transform: tf(r.left - t.left, r.top - t.top, s),
+        },
       ],
       { duration: 190, easing: EASE, fill: 'both' },
     );
     anim.onfinish = done;
   };
 
-  for (const im of document.querySelectorAll('img.zoom')) im.onclick = () => open(im);
+  for (const im of document.querySelectorAll('img.zoom'))
+    im.onclick = () => open(im);
   li.onclick = e => {
     e.stopPropagation();
     zoom > 1 ? resetZoom() : zoomTo(e, 2.5);

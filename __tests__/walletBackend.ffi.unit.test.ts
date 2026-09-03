@@ -5,7 +5,7 @@
  * the funnel's edge branches directly — the wrapper suites exercise it
  * only through Error-shaped rejections carrying known codes.
  */
-import { callFfi, toFfiError } from '../app/walletBackend/ffi';
+import { callFfi, toFfiError } from '@app/walletBackend/ffi';
 
 describe('toFfiError maps every rejection shape to a typed FfiError', () => {
   it('keeps a known code and the Error message verbatim', () => {

@@ -1,5 +1,5 @@
-import { RPCAddressScopeEnum } from '../enums/RPCAddressScopeEnum';
-import { RPCCheckAddressTypeEnum } from '../enums/RPCCheckAddressTypeEnum';
+import { RPCAddressScopeEnum } from '@app/walletBackend/enums/RPCAddressScopeEnum';
+import { RPCCheckAddressTypeEnum } from '@app/walletBackend/enums/RPCCheckAddressTypeEnum';
 
 export type RPCCheckAddressType = {
   is_wallet_address: boolean;

@@ -1,4 +1,4 @@
-import { AddressBookFileClass, ChainNameEnum } from '../../app/AppState';
+import { AddressBookFileClass, ChainNameEnum } from '@app/AppState';
 
 export const mockAddressBook: AddressBookFileClass[] = [
   {

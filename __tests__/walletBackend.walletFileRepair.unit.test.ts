@@ -4,7 +4,7 @@ jest.mock('react-native', () => ({
   Platform: { OS: 'android' },
 }));
 
-jest.mock('../app/RPCModule', () => {
+jest.mock('@app/RPCModule', () => {
   const members: Record<PropertyKey, jest.Mock> = {};
   return {
     __esModule: true,
@@ -14,7 +14,7 @@ jest.mock('../app/RPCModule', () => {
   };
 });
 
-import RPCModule from '../app/RPCModule';
+import RPCModule from '@app/RPCModule';
 import {
   hasRepairableWalletFile,
   walletFileDiagnosis,
@@ -23,7 +23,7 @@ import {
   WalletFileState,
   WALLET_FILE_NAME,
   WALLET_BACKUP_FILE_NAME,
-} from '../app/walletBackend/utils/walletFileRepair';
+} from '@app/walletBackend/utils/walletFileRepair';
 
 const bridge = RPCModule as unknown as Record<string, jest.Mock>;
 
