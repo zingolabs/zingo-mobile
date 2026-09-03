@@ -1,6 +1,6 @@
 import { Platform } from 'react-native';
-import RPCModule from '../../RPCModule';
-import { callFfi } from '../ffi';
+import RPCModule from '@app/RPCModule';
+import { callFfi } from '@app/walletBackend/ffi';
 
 // Android-only support tooling for the 2.0.21 double-wrap incident: the
 // native migration re-encrypted an already encrypted wallet file, and

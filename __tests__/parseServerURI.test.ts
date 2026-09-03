@@ -1,4 +1,4 @@
-import parseServerURI from '../app/uris/parseServerURI';
+import parseServerURI from '@app/uris/parseServerURI';
 
 // Audit Issue G — parseServerURI must reject plaintext http:// for any
 // non-local host and accept it only when the user is pointing at a

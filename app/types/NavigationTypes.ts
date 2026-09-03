@@ -9,9 +9,9 @@ import {
   UfvkActionEnum,
   ValueTransferType,
   ProposalPoolsType,
-} from '../AppState';
-import { RPCDrainTxType } from '../walletBackend/types/RPCDrainPlanType';
-import { RPCMigrationPlanType } from '../walletBackend/types/RPCMigrationPlanType';
+} from '@app/AppState';
+import { RPCDrainTxType } from '@app/walletBackend/types/RPCDrainPlanType';
+import { RPCMigrationPlanType } from '@app/walletBackend/types/RPCMigrationPlanType';
 
 /**
  * Root navigation parameter list for the main stack navigator

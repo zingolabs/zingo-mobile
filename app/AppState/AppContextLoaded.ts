@@ -18,14 +18,14 @@ import { ModeEnum } from './enums/ModeEnum';
 import { SelectServerEnum } from './enums/SelectServerEnum';
 import { ChainNameEnum } from './enums/ChainNameEnum';
 import { SnackbarDurationEnum } from './enums/SnackbarDurationEnum';
-import { LoadedAppNavigationState } from '../types';
+import { LoadedAppNavigationState } from '@app/types';
 import ValueTransferType from './types/ValueTransferType';
-import { RPCSyncStatusType } from '../walletBackend/types/RPCSyncStatusType';
+import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
 import TransparentAddressClass from './classes/TransparentAddressClass';
 import { ScreenEnum } from './enums/ScreenEnum';
-import { RPCPerformanceLevelEnum } from '../walletBackend/enums/RPCPerformanceLevelEnum';
+import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
 import { BlockExplorerEnum } from './enums/BlockExplorerEnum';
-import { MixnetView } from '../walletBackend/transforms/mixnetView';
+import { MixnetView } from '@app/walletBackend/transforms/mixnetView';
 
 export default interface AppContextLoaded {
   netInfo: NetInfoType;

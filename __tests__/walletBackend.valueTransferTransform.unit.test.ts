@@ -2,11 +2,11 @@
  * @format
  */
 
-import { PoolEnum, ValueTransferKindEnum } from '../app/AppState';
-import { RPCValueTransfersKindEnum } from '../app/walletBackend/enums/RPCValueTransfersKindEnum';
-import { RPCValueTransfersStatusEnum } from '../app/walletBackend/enums/RPCValueTransfersStatusEnum';
-import { transformValueTransfer } from '../app/walletBackend/transforms/valueTransferTransform';
-import { RPCValueTransferType } from '../app/walletBackend/types/RPCValueTransferType';
+import { PoolEnum, ValueTransferKindEnum } from '@app/AppState';
+import { RPCValueTransfersKindEnum } from '@app/walletBackend/enums/RPCValueTransfersKindEnum';
+import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
+import { transformValueTransfer } from '@app/walletBackend/transforms/valueTransferTransform';
+import { RPCValueTransferType } from '@app/walletBackend/types/RPCValueTransferType';
 
 function makeVt(
   overrides: Partial<RPCValueTransferType> = {},

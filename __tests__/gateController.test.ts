@@ -3,7 +3,7 @@
  * freshness window instead of purposes and holds, and a uniform fail-open
  * answer for every way the gate cannot run.
  */
-jest.mock('../app/DeviceAuthModule', () => ({
+jest.mock('@app/services/DeviceAuthModule', () => ({
   __esModule: true,
   default: {
     canAuthenticate: jest.fn(),
@@ -19,7 +19,7 @@ jest.mock('@react-native-async-storage/async-storage', () => ({
   },
 }));
 
-import type { TranslateType } from '../app/AppState';
+import type { TranslateType } from '@app/AppState';
 
 const translate = (k: string): TranslateType => k;
 
@@ -30,9 +30,10 @@ type NativeMock = { canAuthenticate: jest.Mock; authenticate: jest.Mock };
 const load = () => {
   jest.resetModules();
   const controller =
-    require('../app/gateController') as typeof import('../app/gateController');
-  const native = (require('../app/DeviceAuthModule') as { default: NativeMock })
-    .default;
+    require('@app/services/gateController') as typeof import('@app/services/gateController');
+  const native = (
+    require('@app/services/DeviceAuthModule') as { default: NativeMock }
+  ).default;
   return { controller, native };
 };
 

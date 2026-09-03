@@ -1,5 +1,11 @@
 import { execFileSync, spawnSync } from 'node:child_process';
-import { cpSync, existsSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import {
+  cpSync,
+  existsSync,
+  mkdtempSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -57,7 +63,9 @@ if (tip !== headSha) {
   );
 }
 
-type Runs = { workflow_runs: { id: number; head_sha: string; status: string }[] };
+type Runs = {
+  workflow_runs: { id: number; head_sha: string; status: string }[];
+};
 const runs = ghJson<Runs>(
   `repos/${repo}/actions/workflows/visual-review.yaml/runs?head_sha=${headSha}&per_page=20`,
 );

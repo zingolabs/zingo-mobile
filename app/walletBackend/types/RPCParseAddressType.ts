@@ -1,7 +1,7 @@
-import { ChainNameEnum } from '../../AppState';
-import { RPCAddressKindEnum } from '../enums/RPCAddressKindEnum';
-import { RPCParseAddressStatusEnum } from '../enums/RPCParseAddressStatusEnum';
-import { RPCReceiversEnum } from '../enums/RPCReceiversEnum';
+import { ChainNameEnum } from '@app/AppState';
+import { RPCAddressKindEnum } from '@app/walletBackend/enums/RPCAddressKindEnum';
+import { RPCParseAddressStatusEnum } from '@app/walletBackend/enums/RPCParseAddressStatusEnum';
+import { RPCReceiversEnum } from '@app/walletBackend/enums/RPCReceiversEnum';
 
 export type RPCParseAddressType = {
   status: RPCParseAddressStatusEnum;

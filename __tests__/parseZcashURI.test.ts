@@ -1,17 +1,17 @@
 import { Base64 } from 'js-base64';
-import { ChainNameEnum, ServerType } from '../app/AppState';
+import { ChainNameEnum, ServerType } from '@app/AppState';
 
 // Mock Utils so the parser's `Utils.isValidAddress` call resolves to a
 // controllable result without dragging the native RPC bridge into Jest.
-jest.mock('../app/utils', () => ({
+jest.mock('@app/utils', () => ({
   __esModule: true,
   default: {
     isValidAddress: jest.fn(),
   },
 }));
 
-import parseZcashURI from '../app/uris/parseZcashURI';
-import Utils from '../app/utils';
+import parseZcashURI from '@app/uris/parseZcashURI';
+import Utils from '@app/utils';
 
 const mockIsValidAddress = Utils.isValidAddress as jest.Mock;
 

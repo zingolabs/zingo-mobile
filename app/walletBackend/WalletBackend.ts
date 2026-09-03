@@ -14,7 +14,7 @@
  * RPCModule is the React Native native module that bridges to zingolib (Rust).
  * This class never calls RPCModule directly.
  */
-import { SendJsonToTypeType, ServerType } from '../AppState';
+import { SendJsonToTypeType, ServerType } from '@app/AppState';
 import { WalletBackendConfig } from './config/WalletBackendConfig';
 import { RPCPerformanceLevelEnum } from './enums/RPCPerformanceLevelEnum';
 import { DataService } from './modules/DataService';

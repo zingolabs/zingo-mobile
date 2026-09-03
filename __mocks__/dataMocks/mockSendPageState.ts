@@ -1,4 +1,4 @@
-import { SendPageStateClass, ToAddrClass } from '../../app/AppState';
+import { SendPageStateClass, ToAddrClass } from '@app/AppState';
 
 const mockSendPageState: SendPageStateClass = new SendPageStateClass(
   new ToAddrClass(0),

@@ -8,10 +8,10 @@ import { render } from '@testing-library/react-native';
 import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
-} from '../app/context';
+} from '@app/context';
 
-import NewAddress from '../components/Receive/components/NewAddress';
-import { AddressKindEnum, ScreenEnum } from '../app/AppState';
+import NewAddress from '@screens/Receive/components/NewAddress';
+import { AddressKindEnum, ScreenEnum } from '@app/AppState';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockAddressBook } from '../__mocks__/dataMocks/mockAddressBook';
 

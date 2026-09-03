@@ -1,8 +1,8 @@
-import { RPCMixnetIndicatorEnum } from '../enums/RPCMixnetIndicatorEnum';
+import { RPCMixnetIndicatorEnum } from '@app/walletBackend/enums/RPCMixnetIndicatorEnum';
 import {
   RPCMixnetDetailType,
   RPCMixnetStatusType,
-} from '../types/RPCMixnetType';
+} from '@app/walletBackend/types/RPCMixnetType';
 
 /**
  * Why a mixnet call failed, as a compile-time-enforced type

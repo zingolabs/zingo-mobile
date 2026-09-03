@@ -1,4 +1,4 @@
-import { PoolNameType } from '../../AppState/types/ProposalPoolsType';
+import { PoolNameType } from '@app/AppState/types/ProposalPoolsType';
 
 export type RPCSendProposeType = {
   fee?: number;

@@ -5,7 +5,7 @@ import type { Preview } from '@storybook/react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-import { ThemeProvider, useTheme } from '../app/theme';
+import { ThemeProvider, useTheme } from '@app/theme';
 
 const Canvas: React.FunctionComponent<{ children: React.ReactNode }> = ({
   children,

@@ -2,7 +2,7 @@
  * The native price call in flight, on timeout, on detach, and on
  * resolve or reject.
  */
-jest.mock('../app/walletBackend', () => ({
+jest.mock('@app/walletBackend', () => ({
   __esModule: true,
   getZecPrice: jest.fn(),
 }));
@@ -11,22 +11,20 @@ import 'react-native';
 import type { AppStateStatus } from 'react-native';
 import React from 'react';
 import { render, renderHook } from '@testing-library/react-native';
-import PriceFetcher, {
-  PriceTrafficDriver,
-} from '../components/Components/PriceFetcher';
-import QuoteRefreshRing from '../components/Components/QuoteRefreshRing';
+import PriceFetcher, { PriceTrafficDriver } from '@ui/widgets/PriceFetcher';
+import QuoteRefreshRing from '@ui/primitives/QuoteRefreshRing';
 import {
   priceFetcherStore,
   usePriceStale,
-} from '../components/Components/priceFetcherStore';
+} from '@ui/widgets/priceFetcherStore';
 import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
-} from '../app/context';
-import { SelectServerEnum } from '../app/AppState';
-import { getZecPrice } from '../app/walletBackend';
+} from '@app/context';
+import { SelectServerEnum } from '@app/AppState';
+import { getZecPrice } from '@app/walletBackend';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
-import { MixnetView } from '../app/walletBackend/transforms/mixnetView';
+import { MixnetView } from '@app/walletBackend/transforms/mixnetView';
 
 const price = getZecPrice as jest.MockedFunction<typeof getZecPrice>;
 

@@ -12,7 +12,7 @@ import {
 } from 'node:fs';
 import { join, dirname, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { advancedTokens } from '../app/theme/tokens';
+import { advancedTokens } from '@app/theme/tokens';
 
 type Sample = { t: number; offset: number };
 type Timeline = { story: string; step: number; samples: Sample[] };
@@ -49,18 +49,34 @@ const styled = process.env.VISUAL_STYLE === 'tokens';
 const T = advancedTokens;
 const palette = styled
   ? {
-      bg: T.bgCanvas, surface: T.bgSurface, border: T.bottomSheetBorder,
-      fg: T.fgDefault, muted: T.fgMuted, figcap: T.fgMuted, accent: T.fgAccent,
-      passBg: T.bgSecondaryDisabled, passFg: T.fgAccent,
-      newBg: T.bottomSheetBorder, newFg: T.fgDefault,
-      dangerBg: T.bgWarning, dangerFg: T.fgDanger,
+      bg: T.bgCanvas,
+      surface: T.bgSurface,
+      border: T.bottomSheetBorder,
+      fg: T.fgDefault,
+      muted: T.fgMuted,
+      figcap: T.fgMuted,
+      accent: T.fgAccent,
+      passBg: T.bgSecondaryDisabled,
+      passFg: T.fgAccent,
+      newBg: T.bottomSheetBorder,
+      newFg: T.fgDefault,
+      dangerBg: T.bgWarning,
+      dangerFg: T.fgDanger,
     }
   : {
-      bg: '#060b12', surface: '#0d1520', border: '#1c2634',
-      fg: '#e6edf3', muted: '#8b98a5', figcap: '#6b7684', accent: '#07ff94',
-      passBg: '#123524', passFg: '#3fb950',
-      newBg: '#1c2a3a', newFg: '#58a6ff',
-      dangerBg: '#3d1d1d', dangerFg: '#ff7b72',
+      bg: '#060b12',
+      surface: '#0d1520',
+      border: '#1c2634',
+      fg: '#e6edf3',
+      muted: '#8b98a5',
+      figcap: '#6b7684',
+      accent: '#07ff94',
+      passBg: '#123524',
+      passFg: '#3fb950',
+      newBg: '#1c2a3a',
+      newFg: '#58a6ff',
+      dangerBg: '#3d1d1d',
+      dangerFg: '#ff7b72',
     };
 const ACCENT = palette.accent;
 const MUTED = styled ? T.fgMuted : '#5b6b7f';
@@ -161,7 +177,9 @@ for (const t of timelines) {
     t.verdict === 'changed' ? 'CHANGED' : t.verdict === 'new' ? 'new' : 'pass';
   console.log(
     `timeline: ${t.story} — ${tag}` +
-      (t.verdict === 'changed' ? `, max Δ ${t.maxDev.toFixed(2)}px @ ${t.at}ms` : ''),
+      (t.verdict === 'changed'
+        ? `, max Δ ${t.maxDev.toFixed(2)}px @ ${t.at}ms`
+        : ''),
   );
 }
 for (const f of staleTimelines) {
@@ -193,8 +211,10 @@ function curveSvg(base: Timeline | undefined, cur: Timeline): string {
   const tMax = Math.max(...ts);
   const oMin = Math.min(...os);
   const oMax = Math.max(...os);
-  const x = (t: number) => pad + ((t - tMin) / (tMax - tMin || 1)) * (W - 2 * pad);
-  const y = (o: number) => pad + ((o - oMax) / (oMin - oMax || 1)) * (H - 2 * pad);
+  const x = (t: number) =>
+    pad + ((t - tMin) / (tMax - tMin || 1)) * (W - 2 * pad);
+  const y = (o: number) =>
+    pad + ((o - oMax) / (oMin - oMax || 1)) * (H - 2 * pad);
   const line = (s: Timeline, color: string, dash: boolean) =>
     `<polyline fill="none" stroke="${color}" stroke-width="2"${
       dash ? ` stroke-dasharray="4 3"` : ''
@@ -206,8 +226,16 @@ function curveSvg(base: Timeline | undefined, cur: Timeline): string {
   </svg>`;
 }
 
-function filmstripRow(label: string, story: string, kind: 'current' | 'baseline'): string {
-  const frameDir = join(kind === 'current' ? currentDir : baselineDir, 'filmstrip', story);
+function filmstripRow(
+  label: string,
+  story: string,
+  kind: 'current' | 'baseline',
+): string {
+  const frameDir = join(
+    kind === 'current' ? currentDir : baselineDir,
+    'filmstrip',
+    story,
+  );
   if (!existsSync(frameDir)) {
     return `<div class="row"><span class="lbl">${label}</span><em>—</em></div>`;
   }
@@ -421,18 +449,24 @@ function imagePanel(): string {
     `<div class="imgrow" id="${slug(f)}"><div class="imghd"><a class="anchor" href="#${slug(f)}" title="link">#</a><span class="name" title="${f}">${f}</span><span class="badge ${cls}">${badge}</span></div><div class="tiles">${tiles}</div></div>`;
   const groups = [
     {
-      items: rj.failedItems, badge: 'CHANGED', cls: 'changed',
+      items: rj.failedItems,
+      badge: 'CHANGED',
+      cls: 'changed',
       tiles: (f: string) =>
         tile('baseline', rj.expectedDir, f) +
         tile('current', rj.actualDir, f) +
         tile('diff', rj.diffDir, f),
     },
     {
-      items: rj.deletedItems, badge: 'DELETED', cls: 'changed',
+      items: rj.deletedItems,
+      badge: 'DELETED',
+      cls: 'changed',
       tiles: (f: string) => tile('baseline', rj.expectedDir, f),
     },
     {
-      items: rj.newItems, badge: 'NEW', cls: 'new',
+      items: rj.newItems,
+      badge: 'NEW',
+      cls: 'new',
       tiles: (f: string) => tile('current', rj.actualDir, f),
     },
   ];
@@ -444,7 +478,9 @@ function imagePanel(): string {
   const entries = groups.flatMap(g =>
     g.items.map(f => ({ f, cls: g.cls, rank: g.cls === 'new' ? 2 : 0 })),
   );
-  const nav = entries.length ? tree(entries) : '<p class="navempty">no diffs</p>';
+  const nav = entries.length
+    ? tree(entries)
+    : '<p class="navempty">no diffs</p>';
   const passed = rj.passedItems.length
     ? `<div class="imgbar"><span class="passline">${rj.passedItems.length} unchanged</span></div>`
     : '';

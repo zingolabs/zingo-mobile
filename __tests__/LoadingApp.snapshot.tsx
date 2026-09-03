@@ -6,10 +6,10 @@ import 'react-native';
 import React from 'react';
 
 import { render } from '@testing-library/react-native';
-import { LoadingApp } from '../app/LoadingApp';
+import { LoadingApp } from '@app/LoadingApp';
 import { StackScreenProps } from '@react-navigation/stack';
-import { AppStackParamList } from '../app/types';
-import { RouteEnum } from '../app/AppState';
+import { AppStackParamList } from '@app/types';
+import { RouteEnum } from '@app/AppState';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
 jest.mock('react-native-localize', () => ({

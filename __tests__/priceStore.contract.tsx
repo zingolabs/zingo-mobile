@@ -1,7 +1,7 @@
 /**
  * The store's observable contract.
  */
-jest.mock('../app/walletBackend', () => ({
+jest.mock('@app/walletBackend', () => ({
   __esModule: true,
   getZecPrice: jest.fn(),
 }));
@@ -12,24 +12,22 @@ import 'react-native';
 import type { AppStateStatus } from 'react-native';
 import React from 'react';
 import { render } from '@testing-library/react-native';
-import PriceFetcher, {
-  PriceTrafficDriver,
-} from '../components/Components/PriceFetcher';
-import QuoteRefreshRing from '../components/Components/QuoteRefreshRing';
-import { priceFetcherStore } from '../components/Components/priceFetcherStore';
+import PriceFetcher, { PriceTrafficDriver } from '@ui/widgets/PriceFetcher';
+import QuoteRefreshRing from '@ui/primitives/QuoteRefreshRing';
+import { priceFetcherStore } from '@ui/widgets/priceFetcherStore';
 import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
-} from '../app/context';
-import { SelectServerEnum } from '../app/AppState';
-import { getZecPrice } from '../app/walletBackend';
+} from '@app/context';
+import { SelectServerEnum } from '@app/AppState';
+import { getZecPrice } from '@app/walletBackend';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import {
   INITIAL_MIXNET_VIEW,
   MIXNET_STATUS_KEYS,
   MixnetView,
   fetchPolicy,
-} from '../app/walletBackend/transforms/mixnetView';
+} from '@app/walletBackend/transforms/mixnetView';
 
 const price = getZecPrice as jest.MockedFunction<typeof getZecPrice>;
 
@@ -218,7 +216,7 @@ test('no any-casts in the price suites and no null in the store', () => {
     expect(anyCast.test(source)).toBe(false);
   });
   const store = fs.readFileSync(
-    path.join(__dirname, '../components/Components/priceFetcherStore.ts'),
+    path.join(__dirname, '../ui/widgets/priceFetcherStore.ts'),
     'utf8',
   );
   expect(new RegExp('\\bnul' + 'l\\b').test(store)).toBe(false);
@@ -226,7 +224,7 @@ test('no any-casts in the price suites and no null in the store', () => {
 
 test('the ring is display-only', () => {
   const ringSource = fs.readFileSync(
-    path.join(__dirname, '../components/Components/QuoteRefreshRing.tsx'),
+    path.join(__dirname, '../ui/primitives/QuoteRefreshRing.tsx'),
     'utf8',
   );
   expect(new RegExp('Pres' + 'sable').test(ringSource)).toBe(false);

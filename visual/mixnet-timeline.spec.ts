@@ -45,7 +45,10 @@ for (const { story, name } of animated) {
 
     const samples: { t: number; offset: number }[] = [];
     for (let t = START; t <= END; t += STEP) {
-      samples.push({ t, offset: Number(await rect.getAttribute('stroke-dashoffset')) });
+      samples.push({
+        t,
+        offset: Number(await rect.getAttribute('stroke-dashoffset')),
+      });
       await page.clock.runFor(STEP);
     }
 
@@ -65,7 +68,10 @@ for (const { story, name } of animated) {
     for (const tick of FRAME_TICKS) {
       await page.clock.runFor(tick - clock);
       clock = tick;
-      await page.screenshot({ path: join(frames, `${tick}.png`), clip: FRAME_CLIP });
+      await page.screenshot({
+        path: join(frames, `${tick}.png`),
+        clip: FRAME_CLIP,
+      });
     }
   });
 }

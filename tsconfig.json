@@ -5,6 +5,12 @@
   "compilerOptions": {
     "types": [
       "node", "jest"
-    ]
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "@app/*": ["app/*"],
+      "@screens/*": ["screens/*"],
+      "@ui/*": ["ui/*"]
+    }
   },
 }

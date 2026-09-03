@@ -12,7 +12,7 @@
  * H3: the USD-entry derived ZEC amount, the figure that
  *     decides what is sent, carries the same stale dim.
  */
-jest.mock('../components/Components/priceFetcherStore', () => ({
+jest.mock('@ui/widgets/priceFetcherStore', () => ({
   __esModule: true,
   PRICE_REFRESH_MIN_MS: 5 * 60_000,
   PRICE_REFRESH_MAX_MS: 10 * 60_000,
@@ -42,18 +42,18 @@ jest.mock('../components/Components/priceFetcherStore', () => ({
 import 'react-native';
 import React from 'react';
 import { fireEvent, render } from '@testing-library/react-native';
-import Send from '../components/Send';
-import Confirm from '../components/Send/components/Confirm';
-import ZecAmount from '../components/Components/ZecAmount';
+import Send from '@screens/Send';
+import Confirm from '@screens/Confirm';
+import ZecAmount from '@ui/widgets/ZecAmount';
 import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
-} from '../app/context';
-import { CurrencyEnum, ModeEnum, RouteEnum } from '../app/AppState';
+} from '@app/context';
+import { CurrencyEnum, ModeEnum, RouteEnum } from '@app/AppState';
 import {
   usePriceFetcherStore,
   usePriceHealth,
-} from '../components/Components/priceFetcherStore';
+} from '@ui/widgets/priceFetcherStore';
 import { mockValueTransfers } from '../__mocks__/dataMocks/mockValueTransfers';
 import { mockAddresses } from '../__mocks__/dataMocks/mockAddresses';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
@@ -62,15 +62,13 @@ import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import { mockServer } from '../__mocks__/dataMocks/mockServer';
 import mockSendPageState from '../__mocks__/dataMocks/mockSendPageState';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { AppDrawerParamList } from '../app/types';
+import { AppDrawerParamList } from '@app/types';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
 const storeHook = usePriceFetcherStore as jest.MockedFunction<
   typeof usePriceFetcherStore
 >;
-const healthHook = usePriceHealth as jest.MockedFunction<
-  typeof usePriceHealth
->;
+const healthHook = usePriceHealth as jest.MockedFunction<typeof usePriceHealth>;
 
 function makeDrawerProps(): NativeStackScreenProps<
   AppDrawerParamList,
@@ -128,8 +126,7 @@ beforeEach(() => {
   healthHook.mockImplementation(priceDate =>
     priceDate === 0
       ? 'absent'
-      : priceDate !== undefined &&
-          Date.now() - priceDate > 10 * 60_000 + 30_000
+      : priceDate !== undefined && Date.now() - priceDate > 10 * 60_000 + 30_000
         ? 'stale'
         : 'live',
   );

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { askGate, enactGateAnswer } from '../gateController';
-import { SnackbarDurationEnum, TranslateType } from '../AppState';
+import { askGate, enactGateAnswer } from '@app/services/gateController';
+import { SnackbarDurationEnum, TranslateType } from '@app/AppState';
 
 type UseBiometricGateArgs = {
   needsAuth: boolean;
