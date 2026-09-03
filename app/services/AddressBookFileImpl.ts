@@ -1,10 +1,6 @@
 import * as RNFS from 'react-native-fs';
 
-import {
-  AddressBookFileClass,
-  ChainNameEnum,
-  GlobalConst,
-} from '../AppState';
+import { AddressBookFileClass, ChainNameEnum, GlobalConst } from '../AppState';
 
 export default class AddressBookFileImpl {
   static async getFileName() {

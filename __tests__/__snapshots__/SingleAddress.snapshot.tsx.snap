@@ -300,6 +300,7 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
           />
         </View>
         <View
+          accessibilityRole="button"
           accessibilityState={
             {
               "busy": undefined,
@@ -522,6 +523,7 @@ exports[`Component SingleAddress UFVK - test SingleAddress UFVK - snapshot 1`] =
         </View>
       </View>
       <View
+        accessibilityRole="button"
         accessibilityState={
           {
             "busy": undefined,

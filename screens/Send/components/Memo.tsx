@@ -13,11 +13,7 @@ import { useTheme } from '@app/theme';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
 
-import {
-  ButtonTypeEnum,
-  GlobalConst,
-  TranslateType,
-} from '@app/AppState';
+import { ButtonTypeEnum, GlobalConst, TranslateType } from '@app/AppState';
 import Utils from '@app/utils';
 import FadeText from '@ui/primitives/FadeText';
 import Button from '@ui/primitives/Button';

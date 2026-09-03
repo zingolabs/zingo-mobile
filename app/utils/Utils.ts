@@ -17,6 +17,7 @@ import { ZecAmountSplitType } from './types/ZecAmountSplitType';
 import {
   ChainNameEnum,
   ErrorKeyed,
+  GateFailure,
   GlobalConst,
   LanguageEnum,
   SendJsonToTypeType,
@@ -530,5 +531,13 @@ export default class Utils {
   ): string {
     const text = translate(failure.errorKey) as string;
     return failure.param ? `${text} "${failure.param}"` : text;
+  }
+
+  /** Renders a gate failure for user copy, translating its catalog key and keeping the raw diagnostic out. */
+  static renderGateFailure(
+    failure: GateFailure,
+    translate: (key: string) => TranslateType,
+  ): string {
+    return translate(failure.errorKey) as string;
   }
 }

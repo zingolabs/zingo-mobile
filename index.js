@@ -8,7 +8,7 @@ import { name as appName } from './app.json';
 
 // STORYBOOK_ENABLED is inlined by Metro (withStorybook) at bundle time.
 const Root = process.env.STORYBOOK_ENABLED === 'true'
-  ? require('./.storybook').default
+  ? require('.storybook/index.tsx').default
   : App;
 
 // Audit Issue K — single-point logging facade. Release builds silence

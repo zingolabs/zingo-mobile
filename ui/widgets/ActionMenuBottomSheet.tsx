@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { forwardRef, useCallback } from 'react';
 import { Keyboard, Pressable, View } from 'react-native';
-import { useTheme } from '@app/theme';
+import { radiusSheet, useTheme } from '@app/theme';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import {
@@ -57,8 +57,8 @@ const ActionMenuBottomSheet = forwardRef<
           paddingBottom: 6,
           paddingHorizontal: 16,
           backgroundColor: colors.bgSurface,
-          borderTopLeftRadius: 40,
-          borderTopRightRadius: 40,
+          borderTopLeftRadius: radiusSheet,
+          borderTopRightRadius: radiusSheet,
         }}
       >
         <SheetRim />
@@ -115,8 +115,8 @@ const ActionMenuBottomSheet = forwardRef<
       handleComponent={renderHandle}
       backgroundStyle={{
         backgroundColor: colors.bgSurface,
-        borderTopLeftRadius: 40,
-        borderTopRightRadius: 40,
+        borderTopLeftRadius: radiusSheet,
+        borderTopRightRadius: radiusSheet,
       }}
       backdropComponent={renderBackdrop}
     >
@@ -143,7 +143,9 @@ const ActionMenuBottomSheet = forwardRef<
             <RegText
               style={{
                 fontSize: 16,
-                color: action.destructive ? colors.fgDangerEmphasis : colors.fgDefault,
+                color: action.destructive
+                  ? colors.fgDangerEmphasis
+                  : colors.fgDefault,
                 fontWeight: '400',
               }}
             >

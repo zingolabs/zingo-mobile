@@ -122,7 +122,9 @@ const CustomServer: React.FunctionComponent<CustomServerProps> = ({
                 alignItems: 'center',
                 paddingHorizontal: 10,
                 paddingVertical: 5,
-                borderColor: m.selected ? colors.borderAccent : colors.borderMuted,
+                borderColor: m.selected
+                  ? colors.borderAccent
+                  : colors.borderMuted,
                 borderWidth: m.selected ? 2 : 1,
                 borderRadius: 10,
                 opacity: m.disabled ? 0.4 : 1,

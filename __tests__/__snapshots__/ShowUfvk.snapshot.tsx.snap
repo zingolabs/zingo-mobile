@@ -20,19 +20,20 @@ exports[`Component ShowUfvk - test ShowUfvk Backup - snapshot 1`] = `
     <View
       onLayout={[Function]}
     >
-      <View
-        style={{}}
-      >
+      <View>
         <View
           style={
-            {
-              "alignItems": "center",
-              "backgroundColor": "#011401",
-              "display": "flex",
-              "minHeight": 50,
-              "paddingBottom": 10,
-              "paddingTop": 0,
-            }
+            [
+              {},
+              {
+                "alignItems": "center",
+                "backgroundColor": "#011401",
+                "display": "flex",
+                "minHeight": 50,
+                "paddingBottom": 10,
+                "paddingTop": 0,
+              },
+            ]
           }
           testID="header"
         >
@@ -154,12 +155,15 @@ exports[`Component ShowUfvk - test ShowUfvk Backup - snapshot 1`] = `
         </View>
         <View
           style={
-            {
-              "padding": 13,
-              "position": "absolute",
-              "right": 0,
-              "top": 0,
-            }
+            [
+              {},
+              {
+                "padding": 13,
+                "position": "absolute",
+                "right": 0,
+                "top": 0,
+              },
+            ]
           }
         >
           <Image
@@ -182,142 +186,76 @@ exports[`Component ShowUfvk - test ShowUfvk Backup - snapshot 1`] = `
     </View>
     <View
       style={
-        {
-          "backgroundColor": "#031124",
-          "borderLeftColor": "#05234C",
-          "borderLeftWidth": 0.5,
-          "borderRightColor": "#05234C",
-          "borderRightWidth": 0.5,
-          "borderTopColor": "#05234C",
-          "borderTopLeftRadius": 40,
-          "borderTopRightRadius": 40,
-          "borderTopWidth": 1,
-          "paddingBottom": 8,
-          "paddingHorizontal": 16,
-          "paddingTop": 12,
-        }
+        [
+          {
+            "flex": 1,
+          },
+          {
+            "backgroundColor": "#031124",
+          },
+          undefined,
+        ]
       }
     >
       <View
         style={
           {
             "alignItems": "center",
-            "flexDirection": "row",
-            "justifyContent": "space-between",
+            "justifyContent": "center",
+            "marginVertical": 20,
           }
         }
       >
-        <View
-          accessibilityState={
-            {
-              "busy": undefined,
-              "checked": undefined,
-              "disabled": undefined,
-              "expanded": undefined,
-              "selected": undefined,
-            }
-          }
-          accessibilityValue={
-            {
-              "max": undefined,
-              "min": undefined,
-              "now": undefined,
-              "text": undefined,
-            }
-          }
-          accessible={true}
-          collapsable={false}
-          focusable={true}
-          hitSlop={8}
-          onClick={[Function]}
-          onResponderGrant={[Function]}
-          onResponderMove={[Function]}
-          onResponderRelease={[Function]}
-          onResponderTerminate={[Function]}
-          onResponderTerminationRequest={[Function]}
-          onStartShouldSetResponder={[Function]}
-          style={
-            {
-              "opacity": 1,
-              "paddingHorizontal": 4,
-              "paddingVertical": 4,
-            }
-          }
-        >
-          <
-            color="#18bd18"
-            icon={
-              {
-                "icon": [
-                  320,
-                  512,
-                  [
-                    9001,
-                  ],
-                  "f053",
-                  "M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l192 192c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256 246.6 86.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-192 192z",
-                ],
-                "iconName": "chevron-left",
-                "prefix": "fas",
-              }
-            }
-            size={20}
-          />
-        </View>
+        <ActivityIndicator
+          color="#18bd18"
+          size="large"
+        />
         <Text
-          numberOfLines={1}
           style={
             {
               "color": "#c3c3c3",
-              "flex": 1,
-              "fontSize": 16,
-              "fontWeight": "bold",
-              "lineHeight": 28,
-              "opacity": 0.87,
+              "fontSize": 15,
+              "fontWeight": "400",
+              "marginTop": 12,
+              "opacity": 1,
               "textAlign": "center",
             }
           }
         >
-          text translated (text translated)
+          text translated
         </Text>
-        <View
-          style={
-            {
-              "width": 28,
-            }
-          }
-        />
       </View>
     </View>
-    <View
-      style={
-        {
-          "alignItems": "center",
-          "justifyContent": "center",
-          "marginVertical": 20,
-        }
-      }
-    >
-      <ActivityIndicator
-        color="#18bd18"
-        size="large"
-      />
-      <Text
-        style={
-          {
-            "color": "#c3c3c3",
-            "fontSize": 15,
-            "fontWeight": "400",
-            "marginTop": 12,
-            "opacity": 1,
-            "textAlign": "center",
-          }
-        }
-      >
-        text translated
-      </Text>
-    </View>
   </View>
+  <View
+    style={
+      [
+        {
+          "borderTopLeftRadius": 40,
+          "borderTopRightRadius": 40,
+          "overflow": "hidden",
+        },
+        {
+          "backgroundColor": "#031124",
+        },
+        {
+          "paddingBottom": 30,
+        },
+      ]
+    }
+  />
+  <View
+    onLayout={[Function]}
+    pointerEvents="none"
+    style={
+      {
+        "left": 0,
+        "position": "absolute",
+        "right": 0,
+        "top": 0,
+      }
+    }
+  />
 </View>
 `;
 
@@ -341,19 +279,20 @@ exports[`Component ShowUfvk - test ShowUfvk Change - snapshot 1`] = `
     <View
       onLayout={[Function]}
     >
-      <View
-        style={{}}
-      >
+      <View>
         <View
           style={
-            {
-              "alignItems": "center",
-              "backgroundColor": "#011401",
-              "display": "flex",
-              "minHeight": 50,
-              "paddingBottom": 10,
-              "paddingTop": 0,
-            }
+            [
+              {},
+              {
+                "alignItems": "center",
+                "backgroundColor": "#011401",
+                "display": "flex",
+                "minHeight": 50,
+                "paddingBottom": 10,
+                "paddingTop": 0,
+              },
+            ]
           }
           testID="header"
         >
@@ -475,12 +414,15 @@ exports[`Component ShowUfvk - test ShowUfvk Change - snapshot 1`] = `
         </View>
         <View
           style={
-            {
-              "padding": 13,
-              "position": "absolute",
-              "right": 0,
-              "top": 0,
-            }
+            [
+              {},
+              {
+                "padding": 13,
+                "position": "absolute",
+                "right": 0,
+                "top": 0,
+              },
+            ]
           }
         >
           <Image
@@ -503,142 +445,76 @@ exports[`Component ShowUfvk - test ShowUfvk Change - snapshot 1`] = `
     </View>
     <View
       style={
-        {
-          "backgroundColor": "#031124",
-          "borderLeftColor": "#05234C",
-          "borderLeftWidth": 0.5,
-          "borderRightColor": "#05234C",
-          "borderRightWidth": 0.5,
-          "borderTopColor": "#05234C",
-          "borderTopLeftRadius": 40,
-          "borderTopRightRadius": 40,
-          "borderTopWidth": 1,
-          "paddingBottom": 8,
-          "paddingHorizontal": 16,
-          "paddingTop": 12,
-        }
+        [
+          {
+            "flex": 1,
+          },
+          {
+            "backgroundColor": "#031124",
+          },
+          undefined,
+        ]
       }
     >
       <View
         style={
           {
             "alignItems": "center",
-            "flexDirection": "row",
-            "justifyContent": "space-between",
+            "justifyContent": "center",
+            "marginVertical": 20,
           }
         }
       >
-        <View
-          accessibilityState={
-            {
-              "busy": undefined,
-              "checked": undefined,
-              "disabled": undefined,
-              "expanded": undefined,
-              "selected": undefined,
-            }
-          }
-          accessibilityValue={
-            {
-              "max": undefined,
-              "min": undefined,
-              "now": undefined,
-              "text": undefined,
-            }
-          }
-          accessible={true}
-          collapsable={false}
-          focusable={true}
-          hitSlop={8}
-          onClick={[Function]}
-          onResponderGrant={[Function]}
-          onResponderMove={[Function]}
-          onResponderRelease={[Function]}
-          onResponderTerminate={[Function]}
-          onResponderTerminationRequest={[Function]}
-          onStartShouldSetResponder={[Function]}
-          style={
-            {
-              "opacity": 1,
-              "paddingHorizontal": 4,
-              "paddingVertical": 4,
-            }
-          }
-        >
-          <
-            color="#18bd18"
-            icon={
-              {
-                "icon": [
-                  320,
-                  512,
-                  [
-                    9001,
-                  ],
-                  "f053",
-                  "M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l192 192c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256 246.6 86.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-192 192z",
-                ],
-                "iconName": "chevron-left",
-                "prefix": "fas",
-              }
-            }
-            size={20}
-          />
-        </View>
+        <ActivityIndicator
+          color="#18bd18"
+          size="large"
+        />
         <Text
-          numberOfLines={1}
           style={
             {
               "color": "#c3c3c3",
-              "flex": 1,
-              "fontSize": 16,
-              "fontWeight": "bold",
-              "lineHeight": 28,
-              "opacity": 0.87,
+              "fontSize": 15,
+              "fontWeight": "400",
+              "marginTop": 12,
+              "opacity": 1,
               "textAlign": "center",
             }
           }
         >
-          text translated (text translated)
+          text translated
         </Text>
-        <View
-          style={
-            {
-              "width": 28,
-            }
-          }
-        />
       </View>
     </View>
-    <View
-      style={
-        {
-          "alignItems": "center",
-          "justifyContent": "center",
-          "marginVertical": 20,
-        }
-      }
-    >
-      <ActivityIndicator
-        color="#18bd18"
-        size="large"
-      />
-      <Text
-        style={
-          {
-            "color": "#c3c3c3",
-            "fontSize": 15,
-            "fontWeight": "400",
-            "marginTop": 12,
-            "opacity": 1,
-            "textAlign": "center",
-          }
-        }
-      >
-        text translated
-      </Text>
-    </View>
   </View>
+  <View
+    style={
+      [
+        {
+          "borderTopLeftRadius": 40,
+          "borderTopRightRadius": 40,
+          "overflow": "hidden",
+        },
+        {
+          "backgroundColor": "#031124",
+        },
+        {
+          "paddingBottom": 30,
+        },
+      ]
+    }
+  />
+  <View
+    onLayout={[Function]}
+    pointerEvents="none"
+    style={
+      {
+        "left": 0,
+        "position": "absolute",
+        "right": 0,
+        "top": 0,
+      }
+    }
+  />
 </View>
 `;
 
@@ -662,19 +538,20 @@ exports[`Component ShowUfvk - test ShowUfvk Server - snapshot 1`] = `
     <View
       onLayout={[Function]}
     >
-      <View
-        style={{}}
-      >
+      <View>
         <View
           style={
-            {
-              "alignItems": "center",
-              "backgroundColor": "#011401",
-              "display": "flex",
-              "minHeight": 50,
-              "paddingBottom": 10,
-              "paddingTop": 0,
-            }
+            [
+              {},
+              {
+                "alignItems": "center",
+                "backgroundColor": "#011401",
+                "display": "flex",
+                "minHeight": 50,
+                "paddingBottom": 10,
+                "paddingTop": 0,
+              },
+            ]
           }
           testID="header"
         >
@@ -796,12 +673,15 @@ exports[`Component ShowUfvk - test ShowUfvk Server - snapshot 1`] = `
         </View>
         <View
           style={
-            {
-              "padding": 13,
-              "position": "absolute",
-              "right": 0,
-              "top": 0,
-            }
+            [
+              {},
+              {
+                "padding": 13,
+                "position": "absolute",
+                "right": 0,
+                "top": 0,
+              },
+            ]
           }
         >
           <Image
@@ -824,142 +704,76 @@ exports[`Component ShowUfvk - test ShowUfvk Server - snapshot 1`] = `
     </View>
     <View
       style={
-        {
-          "backgroundColor": "#031124",
-          "borderLeftColor": "#05234C",
-          "borderLeftWidth": 0.5,
-          "borderRightColor": "#05234C",
-          "borderRightWidth": 0.5,
-          "borderTopColor": "#05234C",
-          "borderTopLeftRadius": 40,
-          "borderTopRightRadius": 40,
-          "borderTopWidth": 1,
-          "paddingBottom": 8,
-          "paddingHorizontal": 16,
-          "paddingTop": 12,
-        }
+        [
+          {
+            "flex": 1,
+          },
+          {
+            "backgroundColor": "#031124",
+          },
+          undefined,
+        ]
       }
     >
       <View
         style={
           {
             "alignItems": "center",
-            "flexDirection": "row",
-            "justifyContent": "space-between",
+            "justifyContent": "center",
+            "marginVertical": 20,
           }
         }
       >
-        <View
-          accessibilityState={
-            {
-              "busy": undefined,
-              "checked": undefined,
-              "disabled": undefined,
-              "expanded": undefined,
-              "selected": undefined,
-            }
-          }
-          accessibilityValue={
-            {
-              "max": undefined,
-              "min": undefined,
-              "now": undefined,
-              "text": undefined,
-            }
-          }
-          accessible={true}
-          collapsable={false}
-          focusable={true}
-          hitSlop={8}
-          onClick={[Function]}
-          onResponderGrant={[Function]}
-          onResponderMove={[Function]}
-          onResponderRelease={[Function]}
-          onResponderTerminate={[Function]}
-          onResponderTerminationRequest={[Function]}
-          onStartShouldSetResponder={[Function]}
-          style={
-            {
-              "opacity": 1,
-              "paddingHorizontal": 4,
-              "paddingVertical": 4,
-            }
-          }
-        >
-          <
-            color="#18bd18"
-            icon={
-              {
-                "icon": [
-                  320,
-                  512,
-                  [
-                    9001,
-                  ],
-                  "f053",
-                  "M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l192 192c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256 246.6 86.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-192 192z",
-                ],
-                "iconName": "chevron-left",
-                "prefix": "fas",
-              }
-            }
-            size={20}
-          />
-        </View>
+        <ActivityIndicator
+          color="#18bd18"
+          size="large"
+        />
         <Text
-          numberOfLines={1}
           style={
             {
               "color": "#c3c3c3",
-              "flex": 1,
-              "fontSize": 16,
-              "fontWeight": "bold",
-              "lineHeight": 28,
-              "opacity": 0.87,
+              "fontSize": 15,
+              "fontWeight": "400",
+              "marginTop": 12,
+              "opacity": 1,
               "textAlign": "center",
             }
           }
         >
-          text translated (text translated)
+          text translated
         </Text>
-        <View
-          style={
-            {
-              "width": 28,
-            }
-          }
-        />
       </View>
     </View>
-    <View
-      style={
-        {
-          "alignItems": "center",
-          "justifyContent": "center",
-          "marginVertical": 20,
-        }
-      }
-    >
-      <ActivityIndicator
-        color="#18bd18"
-        size="large"
-      />
-      <Text
-        style={
-          {
-            "color": "#c3c3c3",
-            "fontSize": 15,
-            "fontWeight": "400",
-            "marginTop": 12,
-            "opacity": 1,
-            "textAlign": "center",
-          }
-        }
-      >
-        text translated
-      </Text>
-    </View>
   </View>
+  <View
+    style={
+      [
+        {
+          "borderTopLeftRadius": 40,
+          "borderTopRightRadius": 40,
+          "overflow": "hidden",
+        },
+        {
+          "backgroundColor": "#031124",
+        },
+        {
+          "paddingBottom": 30,
+        },
+      ]
+    }
+  />
+  <View
+    onLayout={[Function]}
+    pointerEvents="none"
+    style={
+      {
+        "left": 0,
+        "position": "absolute",
+        "right": 0,
+        "top": 0,
+      }
+    }
+  />
 </View>
 `;
 
@@ -983,19 +797,20 @@ exports[`Component ShowUfvk - test ShowUfvk View - snapshot 1`] = `
     <View
       onLayout={[Function]}
     >
-      <View
-        style={{}}
-      >
+      <View>
         <View
           style={
-            {
-              "alignItems": "center",
-              "backgroundColor": "#011401",
-              "display": "flex",
-              "minHeight": 50,
-              "paddingBottom": 10,
-              "paddingTop": 0,
-            }
+            [
+              {},
+              {
+                "alignItems": "center",
+                "backgroundColor": "#011401",
+                "display": "flex",
+                "minHeight": 50,
+                "paddingBottom": 10,
+                "paddingTop": 0,
+              },
+            ]
           }
           testID="header"
         >
@@ -1117,12 +932,15 @@ exports[`Component ShowUfvk - test ShowUfvk View - snapshot 1`] = `
         </View>
         <View
           style={
-            {
-              "padding": 13,
-              "position": "absolute",
-              "right": 0,
-              "top": 0,
-            }
+            [
+              {},
+              {
+                "padding": 13,
+                "position": "absolute",
+                "right": 0,
+                "top": 0,
+              },
+            ]
           }
         >
           <Image
@@ -1145,141 +963,75 @@ exports[`Component ShowUfvk - test ShowUfvk View - snapshot 1`] = `
     </View>
     <View
       style={
-        {
-          "backgroundColor": "#031124",
-          "borderLeftColor": "#05234C",
-          "borderLeftWidth": 0.5,
-          "borderRightColor": "#05234C",
-          "borderRightWidth": 0.5,
-          "borderTopColor": "#05234C",
-          "borderTopLeftRadius": 40,
-          "borderTopRightRadius": 40,
-          "borderTopWidth": 1,
-          "paddingBottom": 8,
-          "paddingHorizontal": 16,
-          "paddingTop": 12,
-        }
+        [
+          {
+            "flex": 1,
+          },
+          {
+            "backgroundColor": "#031124",
+          },
+          undefined,
+        ]
       }
     >
       <View
         style={
           {
             "alignItems": "center",
-            "flexDirection": "row",
-            "justifyContent": "space-between",
+            "justifyContent": "center",
+            "marginVertical": 20,
           }
         }
       >
-        <View
-          accessibilityState={
-            {
-              "busy": undefined,
-              "checked": undefined,
-              "disabled": undefined,
-              "expanded": undefined,
-              "selected": undefined,
-            }
-          }
-          accessibilityValue={
-            {
-              "max": undefined,
-              "min": undefined,
-              "now": undefined,
-              "text": undefined,
-            }
-          }
-          accessible={true}
-          collapsable={false}
-          focusable={true}
-          hitSlop={8}
-          onClick={[Function]}
-          onResponderGrant={[Function]}
-          onResponderMove={[Function]}
-          onResponderRelease={[Function]}
-          onResponderTerminate={[Function]}
-          onResponderTerminationRequest={[Function]}
-          onStartShouldSetResponder={[Function]}
-          style={
-            {
-              "opacity": 1,
-              "paddingHorizontal": 4,
-              "paddingVertical": 4,
-            }
-          }
-        >
-          <
-            color="#18bd18"
-            icon={
-              {
-                "icon": [
-                  320,
-                  512,
-                  [
-                    9001,
-                  ],
-                  "f053",
-                  "M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l192 192c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256 246.6 86.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-192 192z",
-                ],
-                "iconName": "chevron-left",
-                "prefix": "fas",
-              }
-            }
-            size={20}
-          />
-        </View>
+        <ActivityIndicator
+          color="#18bd18"
+          size="large"
+        />
         <Text
-          numberOfLines={1}
           style={
             {
               "color": "#c3c3c3",
-              "flex": 1,
-              "fontSize": 16,
-              "fontWeight": "bold",
-              "lineHeight": 28,
-              "opacity": 0.87,
+              "fontSize": 15,
+              "fontWeight": "400",
+              "marginTop": 12,
+              "opacity": 1,
               "textAlign": "center",
             }
           }
         >
-          text translated (text translated)
+          text translated
         </Text>
-        <View
-          style={
-            {
-              "width": 28,
-            }
-          }
-        />
       </View>
     </View>
-    <View
-      style={
-        {
-          "alignItems": "center",
-          "justifyContent": "center",
-          "marginVertical": 20,
-        }
-      }
-    >
-      <ActivityIndicator
-        color="#18bd18"
-        size="large"
-      />
-      <Text
-        style={
-          {
-            "color": "#c3c3c3",
-            "fontSize": 15,
-            "fontWeight": "400",
-            "marginTop": 12,
-            "opacity": 1,
-            "textAlign": "center",
-          }
-        }
-      >
-        text translated
-      </Text>
-    </View>
   </View>
+  <View
+    style={
+      [
+        {
+          "borderTopLeftRadius": 40,
+          "borderTopRightRadius": 40,
+          "overflow": "hidden",
+        },
+        {
+          "backgroundColor": "#031124",
+        },
+        {
+          "paddingBottom": 30,
+        },
+      ]
+    }
+  />
+  <View
+    onLayout={[Function]}
+    pointerEvents="none"
+    style={
+      {
+        "left": 0,
+        "position": "absolute",
+        "right": 0,
+        "top": 0,
+      }
+    }
+  />
 </View>
 `;

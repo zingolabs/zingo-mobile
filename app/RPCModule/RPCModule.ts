@@ -41,6 +41,10 @@ interface RPCModuleAPI {
     minConfirmations: string,
   ): Promise<string>;
   restoreExistingWalletBackup(): Promise<string>;
+  // Android only (2.0.21 double-wrap incident): per-file classification of
+  // the wallet files, and the unwrap repair. Absent on iOS.
+  walletFileDiagnosisInfo(): Promise<string>;
+  repairDoubleWrappedWalletProcess(): Promise<string>;
   deleteExistingWallet(): Promise<string>;
   deleteExistingWalletBackup(): Promise<string>;
   // The save results are trimodal across the bridges: Android resolves a
@@ -156,12 +160,11 @@ interface RPCModuleAPI {
 
   // Mixnet Mode (send-over-nym). Implemented by the native RPCModule on both
   // Android and iOS.
-  attachMixnet(socks5Addr: string): Promise<string>;
+  attachMixnet(socks5Addr: string, exitNode: string): Promise<string>;
   enableMixnet(proxyPath: string): Promise<string>;
   disableMixnet(): Promise<string>;
-  mixnetModeInfo(): Promise<string>;
+  mixnetIndicatorInfo(): Promise<string>;
   mixnetBootstrapDetailInfo(): Promise<string>;
-  mixnetIpCorrelationDisclaimerInfo(): Promise<string>;
 }
 
 export default NativeModules.RPCModule as RPCModuleAPI;

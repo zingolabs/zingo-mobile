@@ -15,17 +15,9 @@
 //! - Each ABI's `.so` is copied into `android/app/src/main/jniLibs/<abi>/`,
 //!   which is gitignored — the shared libraries are build products, exactly
 //!   like the wallet's `libuniffi_zingo.so`.
-//! - The Kotlin bindings are then regenerated locally by this repo's
-//!   `zingo-uniffi-bindgen` (pinned to the shim's uniffi version) from a
-//!   staged `.so` — library mode reads the UniFFI metadata statically, so a
-//!   cross-compiled Android library works on the host. They land over the
-//!   *committed* copy under `android/app/src/main/java/`, following the
-//!   committed-`zingo.kt` precedent, so the app compiles without a local
-//!   zingolib checkout. Because bindings and libraries always come from the
-//!   same bundle, the `.kt` can never drift from the `.so` set; drift against
-//!   a stale committed binding is still caught at runtime by UniFFI's
-//!   scaffolding checksum check, and the wire format itself is pinned by the
-//!   golden contract test in the app's unit suite.
+//! - The Kotlin bindings are not staged here. `scripts/generate_kotlin_bindings.mjs`
+//!   generates them into `android/app/build/generated/source/uniffi/` from an
+//!   unstripped shim library; pass the bundle's `.so` with `--shim-library`.
 //!
 //! A `kotlin/` tree in the bundle (produced by older zingolib versions that
 //! generated bindings on their side) is ignored.
@@ -38,14 +30,14 @@
 use std::path::{Path, PathBuf};
 
 /// The ABIs zingo-mobile ships (`reactNativeArchitectures` in
-/// `android/gradle.properties`); must stay in step with zingolib's
-/// `bundle-android-shim` SHIPPED_ABIS.
+/// `android/gradle.properties`), which must stay in step with
+/// `bundle-android-shim`'s `SHIPPED_ABIS`.
 const SHIPPED_ABIS: [&str; 4] = ["arm64-v8a", "armeabi-v7a", "x86", "x86_64"];
 
 const SHIM_SO: &str = "libzingo_nym_proxy_ffi.so";
 
-/// Which shipped ABIs a bundle tree carries and which it lacks. Pure, so the
-/// partition is unit-testable without a real bundle on disk.
+/// Which shipped ABIs a bundle tree carries and which it lacks, computed
+/// purely so the partition is unit-testable without a real bundle on disk.
 fn partition_abis(has_so: impl Fn(&str) -> bool) -> (Vec<&'static str>, Vec<&'static str>) {
     SHIPPED_ABIS.iter().partition(|abi| has_so(abi))
 }
@@ -80,26 +72,6 @@ fn parse_bundle_arg() -> Result<PathBuf, String> {
     Ok(bundle)
 }
 
-/// Regenerate the Kotlin bindings from a staged shim library via the
-/// project-local `zingo-uniffi-bindgen`, writing them over the committed copy
-/// under `android/app/src/main/java/`.
-fn generate_kotlin(root: &Path, library: &Path) -> Result<(), String> {
-    let status = std::process::Command::new("cargo")
-        .current_dir(root.join("rust"))
-        .args(["run", "--package", "zingo-uniffi-bindgen", "--", "generate"])
-        .arg("--library")
-        .arg(library)
-        .args(["--language", "kotlin"])
-        .arg("--out-dir")
-        .arg(root.join("android/app/src/main/java"))
-        .status()
-        .map_err(|e| format!("failed to run zingo-uniffi-bindgen: {e}"))?;
-    if !status.success() {
-        return Err(format!("kotlin bindings generation failed ({status})"));
-    }
-    Ok(())
-}
-
 fn stage(bundle: &Path) -> Result<(), String> {
     let root = repo_root();
 
@@ -124,15 +96,6 @@ fn stage(bundle: &Path) -> Result<(), String> {
     for abi in &missing {
         println!("note: bundle carries no {abi} shim; that ABI will not embed it");
     }
-
-    // Any staged ABI's library carries the same UniFFI metadata; generate
-    // from the first one present.
-    let library = root
-        .join("android/app/src/main/jniLibs")
-        .join(present[0])
-        .join(SHIM_SO);
-    generate_kotlin(&root, &library)?;
-    println!("regenerated Kotlin bindings under android/app/src/main/java");
     Ok(())
 }
 

@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { Animated, Easing, StyleSheet, View } from 'react-native';
 import Svg, { Rect } from 'react-native-svg';
 import NymOn from '../../../assets/img/nym-on.svg';
+import { MixnetStatusKey } from '@app/walletBackend/transforms/mixnetView';
 
 const HALO_GREEN = '#07FF94';
 const HALO_CORAL = '#FF6F61';
@@ -61,7 +62,7 @@ export type MixnetPhase = 'connecting' | 'ready' | 'lost' | 'reconnecting';
  * loss-recovery cycle reads as one animated state.
  */
 export function mixnetPhase(
-  statusKey: string,
+  statusKey: MixnetStatusKey,
   reconnecting: boolean,
 ): MixnetPhase | null {
   if (statusKey === 'mixnet.status.ready') {
@@ -76,7 +77,7 @@ export function mixnetPhase(
     case 'mixnet.status.died':
     case 'mixnet.status.unknown':
       return 'lost';
-    default:
+    case 'mixnet.status.off':
       return null;
   }
 }

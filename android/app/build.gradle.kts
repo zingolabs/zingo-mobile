@@ -121,8 +121,8 @@ android {
         applicationId = "org.ZingoLabs.Zingo" // Real
         minSdk = rootProject.extra["minSdkVersion"] as Int
         targetSdk = rootProject.extra["targetSdkVersion"] as Int
-        versionCode = 313 // Real (prod baseline; beta flavor overrides below)
-        versionName = "2.0.22" // Real
+        versionCode = 315 // Real (prod baseline; beta flavor overrides below)
+        versionName = "2.0.23" // Real
         testBuildType = System.getProperty("testBuildType", "debug")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
@@ -162,8 +162,8 @@ android {
         create("beta") {
             dimension = "channel"
             applicationIdSuffix = ".Beta"
-            versionCode = 322 // beta override
-            versionName = "2.0.22" // beta override
+            versionCode = 327 // beta override
+            versionName = "2.0.23" // beta override
             resValue("string", "app_name", "Zingo Beta")
             resValue("bool", "enforce_privacy_controls", "false")
         }
@@ -244,14 +244,23 @@ android {
         fatal += "NewApi"
     }
 
+    sourceSets {
+        getByName("test") {
+            // The nym proxy shim's Kotlin wire-contract test, read from the
+            // crate itself. No copy lives under src/test.
+            java.srcDir("../../rust/nym-proxy-ffi/contract-tests/kotlin")
+        }
+    }
+
     testOptions {
         unitTests.all {
-            // The golden wire-contract pins for the nym proxy shim
-            // (GoldenWireContractTest); the canonical copies live in
-            // zingolib's zingo-netutils/nym-proxy-ffi/test-data/golden.
+            // The golden wire-contract pins for GoldenWireContractTest, read
+            // from the crate itself.
             it.systemProperty(
                 "zingo.golden.dir",
-                layout.projectDirectory.dir("src/test/golden").asFile.absolutePath
+                layout.projectDirectory
+                    .dir("../../rust/nym-proxy-ffi/test-data/golden")
+                    .asFile.absolutePath
             )
         }
         managedDevices {
@@ -344,6 +353,9 @@ dependencies {
 
     androidTestImplementation("com.wix:detox:20.51.4")
     implementation("androidx.appcompat:appcompat:1.7.0")
+    // DeviceAuthModule's BiometricPrompt (react-native-keychain only pulls
+    // this transitively; direct use declares it).
+    implementation("androidx.biometric:biometric:1.1.0")
 
     implementation(project(":react-native-device-info")) {
         exclude(group = "com.google.firebase")
@@ -351,6 +363,7 @@ dependencies {
         exclude(group = "com.android.installreferrer")
     }
     implementation("com.facebook.soloader:soloader:0.10.5")
+
 
     // Detox tests getAttributes() reaches this by reflection at runtime, so
     // it is runtime-only: no source references exist for compile analysis.

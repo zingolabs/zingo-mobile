@@ -46,6 +46,8 @@ describe('Component Send - test', () => {
   state.info = mockInfo;
   state.zecPrice = mockZecPrice;
   state.totalBalance = mockTotalBalance;
+  // The price ring renders only for a Nym-consenting session.
+  state.nym = true;
   state.sendPageState = mockSendPageState;
   const onFunction = jest.fn();
 

@@ -1,6 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
 import ChainSelect from './ChainSelect';
-import { mockTranslate, withBottomSheet } from '../../.storybook/storyDecorators';
+import {
+  mockTranslate,
+  withBottomSheet,
+} from '../../.storybook/storyDecorators';
 
 // Mounts a BottomSheetModal for the picker. It needs the sheet provider.
 const meta: Meta<typeof ChainSelect> = {

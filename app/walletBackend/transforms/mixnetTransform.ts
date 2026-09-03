@@ -1,4 +1,4 @@
-import { RPCMixnetModeEnum } from '../enums/RPCMixnetModeEnum';
+import { RPCMixnetIndicatorEnum } from '../enums/RPCMixnetIndicatorEnum';
 import {
   RPCMixnetDetailType,
   RPCMixnetStatusType,
@@ -14,18 +14,18 @@ import {
 export type MixnetFailure =
   | { readonly reason: 'nativeRejection'; readonly message: string }
   | { readonly reason: 'malformedPayload'; readonly payload: string }
-  | { readonly reason: 'unrecognizedMode'; readonly claimed: string }
+  | { readonly reason: 'unrecognizedIndicator'; readonly claimed: string }
   | { readonly reason: 'unconsentedOff' };
 
 /**
  * The validated outcome of a mixnet status call. A discriminated union so
- * callers must handle both arms; `socks5Addr` is `null` in every mode but
+ * callers must handle both arms; `socks5Addr` is `null` in every indicator but
  * `ready`.
  */
 export type MixnetStatusReport =
   | {
       readonly kind: 'status';
-      readonly mode: RPCMixnetModeEnum;
+      readonly indicator: RPCMixnetIndicatorEnum;
       readonly socks5Addr: string | null;
     }
   | { readonly kind: 'failure'; readonly failure: MixnetFailure };
@@ -62,7 +62,7 @@ export function vetPolledStatus(
 ): MixnetStatusReport {
   if (
     status.kind === 'status' &&
-    status.mode === RPCMixnetModeEnum.off &&
+    status.indicator === RPCMixnetIndicatorEnum.off &&
     consent === 'none'
   ) {
     return { kind: 'failure', failure: { reason: 'unconsentedOff' } };
@@ -83,22 +83,24 @@ export function describeRejection(thrown: unknown): MixnetFailure {
 }
 
 /**
- * Validates an untrusted value as a Mixnet Mode.
+ * Validates an untrusted value as a Mixnet Mode indicator.
  *
  * Pure function — no side effects. Returns `null` for anything that is not
- * exactly one of the four mode strings, so an unknown future mode degrades
+ * exactly one of the four indicator strings, so an unknown future one degrades
  * to an explicit failure instead of a misread state.
  */
-export function parseMixnetMode(candidate: unknown): RPCMixnetModeEnum | null {
+export function parseMixnetIndicator(
+  candidate: unknown,
+): RPCMixnetIndicatorEnum | null {
   switch (candidate) {
-    case RPCMixnetModeEnum.off:
-      return RPCMixnetModeEnum.off;
-    case RPCMixnetModeEnum.bootstrapping:
-      return RPCMixnetModeEnum.bootstrapping;
-    case RPCMixnetModeEnum.ready:
-      return RPCMixnetModeEnum.ready;
-    case RPCMixnetModeEnum.died:
-      return RPCMixnetModeEnum.died;
+    case RPCMixnetIndicatorEnum.off:
+      return RPCMixnetIndicatorEnum.off;
+    case RPCMixnetIndicatorEnum.bootstrapping:
+      return RPCMixnetIndicatorEnum.bootstrapping;
+    case RPCMixnetIndicatorEnum.ready:
+      return RPCMixnetIndicatorEnum.ready;
+    case RPCMixnetIndicatorEnum.died:
+      return RPCMixnetIndicatorEnum.died;
     default:
       return null;
   }
@@ -137,22 +139,24 @@ export function transformMixnetStatus(dataReply: string): MixnetStatusReport {
     };
   }
   const statusPayload = parsedReply as RPCMixnetStatusType;
-  const validatedMode = parseMixnetMode(statusPayload.mixnet_mode);
-  if (validatedMode === null) {
+  const validatedIndicator = parseMixnetIndicator(
+    statusPayload.mixnet_indicator,
+  );
+  if (validatedIndicator === null) {
     return {
       kind: 'failure',
       failure: {
-        reason: 'unrecognizedMode',
-        claimed: String(statusPayload.mixnet_mode),
+        reason: 'unrecognizedIndicator',
+        claimed: String(statusPayload.mixnet_indicator),
       },
     };
   }
   const socks5Addr =
-    validatedMode === RPCMixnetModeEnum.ready &&
+    validatedIndicator === RPCMixnetIndicatorEnum.ready &&
     typeof statusPayload.socks5_addr === 'string'
       ? statusPayload.socks5_addr
       : null;
-  return { kind: 'status', mode: validatedMode, socks5Addr };
+  return { kind: 'status', indicator: validatedIndicator, socks5Addr };
 }
 
 /**

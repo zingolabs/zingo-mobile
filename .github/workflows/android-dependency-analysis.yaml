@@ -27,7 +27,7 @@ jobs:
       - run: yarn
 
       - name: Setup Java
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@v6
         with:
           distribution: 'temurin'
           java-version: '17'
@@ -36,15 +36,11 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       # The analysis compiles every variant's Kotlin, which needs the
-      # generated uniffi bindings on the source path. The generated file is
-      # checked in, so staging it beats running the full Rust NDK build.
-      - name: Stage uniffi bindings
-        run: |
-          for build_type in debug debugOptimized release; do
-            bindings_dir="android/app/build/generated/source/uniffi/${build_type}/java/uniffi/zingo"
-            mkdir -p "${bindings_dir}"
-            cp rust/lib/src/uniffi/zingo/zingo.kt "${bindings_dir}/zingo.kt"
-          done
+      # generated uniffi bindings on the source path.
+      - name: Generate UniFFI bindings
+        uses: ./.github/actions/kotlin-bindings
+        with:
+          variants: debug,debugOptimized,release
 
       # Fails on dependencies nothing compiles against (the Kotlin analog
       # of the rust-shear job); scope and transitive advice is warn-only.

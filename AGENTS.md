@@ -7,29 +7,25 @@
 - Call the user "friend", in a similar fashion to Mr Robot.
 - When in doubt, use context7 to check for accurate documentation.
 
+## The mobile backend and the UI are separate concerns
+
+The mobile backend (Rust under `rust/`, its UniFFI/Kotlin/Swift bindings, and their build systems) and the UI (React Native screens, theme, styles, colours, copy) are separate concerns: keep each change to one side, and where a task needs both, split them into commits labelled backend or UI so a reviewer can read one without the other. Before finishing, scan your own diff for stray edits from the other half, and when the boundary is muddy (a component reaching into the wallet backend, a backend module formatting human prose), name it and propose the separation as its own change rather than fixing it inline.
+
 ## Writing & Code Style
 
-Goal: produce prose and code that reads as if written by a specific, competent human, not by a model. The point is naturalness and fit, not looking exhaustive or safe. When in doubt, commit to a choice and keep it short.
+Goal: produce prose and code that reads as if written by a specific, competent human, not by a model. The point is naturalness and accuracy, not looking exhaustive or safe. When in doubt, commit to a choice and keep it short.
 
 ### Prose
 
 #### Economy and precision (adapted from Strunk's Elements of Style)
 
-- Omit needless words. Every word must earn its place. Cut filler phrases entirely:
-  - "the fact that"            → delete or restructure
-  - "in order to"              → "to"
-  - "due to the fact that"     → "because"
-  - "at this point in time"    → "now"
-  - "has the ability to"       → "can"
-  - "there is X that does Y"   → "X does Y"
-  - "essentially" / "basically" / "fundamentally" → almost always delete
 - Use the active voice. Prefer "the parser rejects malformed input" over "malformed input is rejected by the parser". Passive voice only when the actor is unknown or irrelevant.
 - Put statements in positive form. Say what something is, not what it isn't. "The cache is stale" beats "the cache is not up to date". No "not un-" constructions.
 - Use definite, specific, concrete language. "Sync stalls after 40k blocks" beats "performance degrades under certain conditions". If you have a number, a name, or a mechanism, state it.
-- One paragraph, one topic. Don't braid two ideas together and rely on connectors to hold them.
 - Place emphatic words at the end of the sentence. Don't bury the key claim mid-sentence and trail off with qualifiers.
 - Don't overstate. Cut intensifiers ("very", "extremely", "incredibly"). When uncertainty is real, hedge precisely ("untested on mainnet"), not vaguely ("may or may not work").
-- Do not explain too much. State the point once. If a sentence adds no new information, delete it.
+- Don't be verbose: if you need ":" to explain something, shorten it instead.
+- Do not explain too much. State the point once.
 - Revise by deletion. When tightening prose, the default operation is removal, not substitution. A shorter draft that says the same thing is strictly better.
 
 #### Punctuation
@@ -91,6 +87,7 @@ without losing meaning, the "so" was decorative. Delete it.
 
 ### Code (all languages)
 
+- Never add inline comments.
 - Comment why, not what. No line-by-line narration of obvious operations.
 - No tutorial narration ("Now we...", "Step 1:", "First, let's...") and no banner comments (`// ===== HELPERS =====`).
 - No docstrings that just restate the signature.
@@ -98,6 +95,17 @@ without losing meaning, the "so" was decorative. Delete it.
 - No completeness theater: no unrequested demo/usage blocks, no logs narrating execution ("Starting...", "Done!"), no emoji in output, no unprompted complexity analysis in comments.
 - Don't add guards for conditions that can't occur. Don't wrap non-throwing code in try/catch. Don't swallow-and-log errors; let them propagate.
 - Match the surrounding codebase's idioms and conventions over textbook-uniform formatting.
+
+### Documentation in code
+
+The one-sentence documentation rule, ratified 2026-08-10: every item
+doc-comment — Rust `///`, and the KDoc or doc-comment on a Kotlin or Swift
+item — is exactly one sentence. That sentence must not reference ADRs,
+issues, or any other document. Module headers (Rust `//!`, a file- or
+class-level header block) are exempt, and test doc-comments that follow a
+ratified convention (for example HYPOTHESIS falsifiers) keep that
+convention's shape. Apply the rule to every unmerged doc-comment before
+merge.
 
 ### Rust
 

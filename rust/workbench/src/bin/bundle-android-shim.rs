@@ -1,7 +1,7 @@
 //! Cross-compile the mixnet proxy shim for Android and lay out its package.
 //!
-//! The shim (`zingo-nym-proxy-ffi`, ADR 0011 mobile amendment) lives in the
-//! vendored `rust/nym-host` workspace with its own lockfile, so ordinary wallet
+//! The shim (`zingo-nym-proxy-ffi`, ADR 0011 mobile amendment) lives at
+//! `rust/nym-proxy-ffi`, excluded from the workspace with its own lockfile, so ordinary wallet
 //! builds never produce it (nym-sdk's `crypto-common` cannot share the wallet
 //! lock). This tool release-builds it with cargo-ndk for every Android ABI
 //! zingo-mobile ships (`reactNativeArchitectures` in `android/gradle.properties`)
@@ -15,7 +15,7 @@
 //! Kotlin bindings (library mode against a staged `.so`), so this tool never
 //! needs a host cdylib. Usage: `bundle-android-shim [--abi <name>]… [--dest
 //! <dir>]`. Without `--abi` every shipped ABI is built; without `--dest` the
-//! tree lands in `rust/nym-host/target/android-shim`. Requires cargo-ndk, an
+//! tree lands in `rust/nym-proxy-ffi/target/android-shim`. Requires cargo-ndk, an
 //! NDK, and the matching `rustup target`s.
 
 #![forbid(unsafe_code)]
@@ -49,7 +49,7 @@ fn main() {
 fn bundle(args: &[String]) -> Result<PathBuf, Vec<String>> {
     let abis = requested_abis(args)?;
     let root = repo_root()?;
-    let shim_workspace = root.join("rust/nym-host");
+    let shim_workspace = root.join("rust/nym-proxy-ffi");
     let dest = parse_dest(args)?.unwrap_or_else(|| shim_workspace.join("target/android-shim"));
 
     for (abi, triple) in &abis {
@@ -68,7 +68,10 @@ fn bundle(args: &[String]) -> Result<PathBuf, Vec<String>> {
             .join("release")
             .join(SHIM_SO);
         if !source.is_file() {
-            return Err(vec![format!("built {abi} shim missing at {}", source.display())]);
+            return Err(vec![format!(
+                "built {abi} shim missing at {}",
+                source.display()
+            )]);
         }
         let abi_dir = dest.join("jniLibs").join(abi);
         std::fs::create_dir_all(&abi_dir)
@@ -126,7 +129,11 @@ mod tests {
 
     #[test]
     fn abi_args_select_and_order() {
-        let args = vec!["--abi".to_string(), "x86_64".to_string(), "--abi=arm64-v8a".to_string()];
+        let args = vec![
+            "--abi".to_string(),
+            "x86_64".to_string(),
+            "--abi=arm64-v8a".to_string(),
+        ];
         let abis = requested_abis(&args).unwrap();
         assert_eq!(
             abis.iter().map(|(abi, _)| *abi).collect::<Vec<_>>(),

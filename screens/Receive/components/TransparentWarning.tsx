@@ -34,10 +34,14 @@ const TransparentWarning = ({
         }}
       >
         <View>
-          <Text style={{ color: colors.fgDefault, fontSize: 16, marginBottom: 12 }}>
+          <Text
+            style={{ color: colors.fgDefault, fontSize: 16, marginBottom: 12 }}
+          >
             {translate('receive.modal-transparent.message') as string}
           </Text>
-          <Text style={{ color: colors.fgMuted, fontSize: 16, marginBottom: 16 }}>
+          <Text
+            style={{ color: colors.fgMuted, fontSize: 16, marginBottom: 16 }}
+          >
             {translate('receive.modal-transparent.recommendation') as string}
           </Text>
           <TouchableOpacity

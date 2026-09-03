@@ -1,6 +1,6 @@
 import { LogBox } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { view } from './storybook.requires';
+import { view } from './storybook.requires.ts';
 
 // storybook/test wraps `screen` in a warn-on-access Proxy; Fast Refresh
 // enumerating that module's exports trips it at registration. No story

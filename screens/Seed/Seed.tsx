@@ -16,7 +16,11 @@ import {
 } from 'react-native';
 import { showConfirm } from '@app/services/showConfirm';
 
-import { NavigationProp, ParamListBase, useNavigation } from '@react-navigation/native';
+import {
+  NavigationProp,
+  ParamListBase,
+  useNavigation,
+} from '@react-navigation/native';
 import { useTheme } from '@app/theme';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -31,7 +35,7 @@ import RegText from '@ui/primitives/RegText';
 import FadeText from '@ui/primitives/FadeText';
 import BoldText from '@ui/primitives/BoldText';
 import Button from '@ui/primitives/Button';
-import SheetRim from '@ui/primitives/SheetRim';
+import AppSheet from '@ui/primitives/AppSheet';
 import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
@@ -122,7 +126,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
     (initialAction === SeedActionEnum.backup &&
       (!!security?.seedUfvkScreen || !!security?.restoreWalletBackupScreen)) ||
     (initialAction === SeedActionEnum.server && !!security?.seedUfvkScreen);
-  const authPassed = useBiometricGate({
+  const screenGate = useBiometricGate({
     needsAuth,
     translate,
     addLastSnackbar,
@@ -130,6 +134,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
     foregroundAppEnabled: !!security?.foregroundApp,
     foregroundEpoch,
   });
+  const authPassed = screenGate.kind === 'passed';
 
   const [times, setTimes] = useState<number>(0);
   const [texts, setTexts] = useState<TextsType>({} as TextsType);
@@ -423,54 +428,46 @@ const Seed: React.FunctionComponent<SeedProps> = ({
     [action, translate],
   );
 
-  const renderSeedHandle = useCallback(
-    () => (
+  const seedHeader = (
+    <View
+      style={{
+        paddingTop: 12,
+        paddingBottom: 8,
+        paddingHorizontal: 16,
+      }}
+    >
       <View
         style={{
-          paddingTop: 12,
-          paddingBottom: 8,
-          paddingHorizontal: 16,
-          backgroundColor: colors.bgSurface,
-          borderTopLeftRadius: 40,
-          borderTopRightRadius: 40,
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
         }}
       >
-        <SheetRim />
-        <View
+        <TouchableOpacity
+          onPress={onClickCancelHide}
+          hitSlop={8}
+          style={{ paddingHorizontal: 4, paddingVertical: 4 }}
+        >
+          <FontAwesomeIcon
+            icon={faChevronLeft}
+            size={20}
+            color={colors.fgAccent}
+          />
+        </TouchableOpacity>
+        <BoldText
+          numberOfLines={1}
           style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
+            flex: 1,
+            fontSize: 16,
+            lineHeight: 28,
+            textAlign: 'center',
           }}
         >
-          <TouchableOpacity
-            onPress={onClickCancelHide}
-            hitSlop={8}
-            style={{ paddingHorizontal: 4, paddingVertical: 4 }}
-          >
-            <FontAwesomeIcon
-              icon={faChevronLeft}
-              size={20}
-              color={colors.fgAccent}
-            />
-          </TouchableOpacity>
-          <BoldText
-            numberOfLines={1}
-            style={{
-              flex: 1,
-              fontSize: 16,
-              lineHeight: 28,
-              textAlign: 'center',
-            }}
-          >
-            {seedTitle}
-          </BoldText>
-          <View style={{ width: 28 }} />
-        </View>
+          {seedTitle}
+        </BoldText>
+        <View style={{ width: 28 }} />
       </View>
-    ),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [colors, seedTitle],
+    </View>
   );
 
   const renderSeedFooter = useCallback(
@@ -566,23 +563,11 @@ const Seed: React.FunctionComponent<SeedProps> = ({
           }
         />
       </View>
-      <BottomSheet
+      <AppSheet
         ref={seedSheetRef}
         snapPoints={seedSnapPoints}
-        index={0}
-        enableDynamicSizing={false}
-        enablePanDownToClose={false}
-        enableContentPanningGesture={false}
-        keyboardBehavior={'interactive'}
-        keyboardBlurBehavior={'restore'}
-        android_keyboardInputMode={'adjustResize'}
-        backgroundStyle={{
-          backgroundColor: colors.bgSurface,
-          borderTopLeftRadius: 40,
-          borderTopRightRadius: 40,
-        }}
-        handleComponent={renderSeedHandle}
-        footerComponent={loadingSeed ? undefined : renderSeedFooter}
+        header={seedHeader}
+        renderFooter={loadingSeed ? undefined : renderSeedFooter}
       >
         {loadingSeed ? (
           <View
@@ -611,10 +596,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
               keyboardShouldPersistTaps="handled"
               bounces={false}
               alwaysBounceVertical={false}
-              style={{
-                flex: 1,
-                backgroundColor: colors.bgSurface,
-              }}
+              style={{ flex: 1 }}
               contentContainerStyle={{
                 flexDirection: 'column',
                 alignItems: 'stretch',
@@ -724,7 +706,10 @@ const Seed: React.FunctionComponent<SeedProps> = ({
                     }
                   }}
                 >
-                  <RegText color={colors.fgDefault} style={{ textAlign: 'center' }}>
+                  <RegText
+                    color={colors.fgDefault}
+                    style={{ textAlign: 'center' }}
+                  >
                     {!expandBirthday
                       ? Utils.trimToSmall(birthdayNumber, 1)
                       : birthdayNumber}
@@ -783,7 +768,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
             </BottomSheetScrollView>
           </>
         )}
-      </BottomSheet>
+      </AppSheet>
     </View>
   );
 };

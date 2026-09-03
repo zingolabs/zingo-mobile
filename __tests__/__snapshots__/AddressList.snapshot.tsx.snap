@@ -13,19 +13,20 @@ exports[`Component Unified Address List - test Address Transparent List - snapsh
   <View
     onLayout={[Function]}
   >
-    <View
-      style={{}}
-    >
+    <View>
       <View
         style={
-          {
-            "alignItems": "center",
-            "backgroundColor": "#011401",
-            "display": "flex",
-            "minHeight": 50,
-            "paddingBottom": 10,
-            "paddingTop": 0,
-          }
+          [
+            {},
+            {
+              "alignItems": "center",
+              "backgroundColor": "#011401",
+              "display": "flex",
+              "minHeight": 50,
+              "paddingBottom": 10,
+              "paddingTop": 0,
+            },
+          ]
         }
         testID="header"
       >
@@ -69,12 +70,15 @@ exports[`Component Unified Address List - test Address Transparent List - snapsh
       </View>
       <View
         style={
-          {
-            "padding": 13,
-            "position": "absolute",
-            "right": 0,
-            "top": 0,
-          }
+          [
+            {},
+            {
+              "padding": 13,
+              "position": "absolute",
+              "right": 0,
+              "top": 0,
+            },
+          ]
         }
       >
         <Image
@@ -95,40 +99,53 @@ exports[`Component Unified Address List - test Address Transparent List - snapsh
       </View>
     </View>
   </View>
-  <RCTScrollView
-    alwaysBounceVertical={false}
-    bounces={false}
-    contentContainerStyle={
-      {
-        "alignItems": "stretch",
-        "flexDirection": "column",
-        "justifyContent": "flex-start",
-      }
-    }
-    keyboardShouldPersistTaps="handled"
-    onScroll={[Function]}
-    scrollEventThrottle={100}
+  <View
     style={
-      {
-        "backgroundColor": "#031124",
-        "flex": 1,
-      }
+      [
+        {
+          "flex": 1,
+        },
+        {
+          "backgroundColor": "#031124",
+        },
+        undefined,
+      ]
     }
-    testID="addressbook.scroll-view"
   >
-    <View>
-      <ActivityIndicator
-        color="#5a8c5a"
-        size={20}
-        style={
-          {
-            "marginRight": 7,
-            "marginTop": 7,
-          }
+    <RCTScrollView
+      alwaysBounceVertical={false}
+      bounces={false}
+      contentContainerStyle={
+        {
+          "alignItems": "stretch",
+          "flexDirection": "column",
+          "justifyContent": "flex-start",
         }
-      />
-    </View>
-  </RCTScrollView>
+      }
+      keyboardShouldPersistTaps="handled"
+      onScroll={[Function]}
+      scrollEventThrottle={100}
+      style={
+        {
+          "flex": 1,
+        }
+      }
+      testID="addressbook.scroll-view"
+    >
+      <View>
+        <ActivityIndicator
+          color="#5a8c5a"
+          size={20}
+          style={
+            {
+              "marginRight": 7,
+              "marginTop": 7,
+            }
+          }
+        />
+      </View>
+    </RCTScrollView>
+  </View>
 </View>
 `;
 
@@ -145,19 +162,20 @@ exports[`Component Unified Address List - test Address Unified List - snapshot 1
   <View
     onLayout={[Function]}
   >
-    <View
-      style={{}}
-    >
+    <View>
       <View
         style={
-          {
-            "alignItems": "center",
-            "backgroundColor": "#011401",
-            "display": "flex",
-            "minHeight": 50,
-            "paddingBottom": 10,
-            "paddingTop": 0,
-          }
+          [
+            {},
+            {
+              "alignItems": "center",
+              "backgroundColor": "#011401",
+              "display": "flex",
+              "minHeight": 50,
+              "paddingBottom": 10,
+              "paddingTop": 0,
+            },
+          ]
         }
         testID="header"
       >
@@ -201,12 +219,15 @@ exports[`Component Unified Address List - test Address Unified List - snapshot 1
       </View>
       <View
         style={
-          {
-            "padding": 13,
-            "position": "absolute",
-            "right": 0,
-            "top": 0,
-          }
+          [
+            {},
+            {
+              "padding": 13,
+              "position": "absolute",
+              "right": 0,
+              "top": 0,
+            },
+          ]
         }
       >
         <Image
@@ -227,39 +248,52 @@ exports[`Component Unified Address List - test Address Unified List - snapshot 1
       </View>
     </View>
   </View>
-  <RCTScrollView
-    alwaysBounceVertical={false}
-    bounces={false}
-    contentContainerStyle={
-      {
-        "alignItems": "stretch",
-        "flexDirection": "column",
-        "justifyContent": "flex-start",
-      }
-    }
-    keyboardShouldPersistTaps="handled"
-    onScroll={[Function]}
-    scrollEventThrottle={100}
+  <View
     style={
-      {
-        "backgroundColor": "#031124",
-        "flex": 1,
-      }
+      [
+        {
+          "flex": 1,
+        },
+        {
+          "backgroundColor": "#031124",
+        },
+        undefined,
+      ]
     }
-    testID="addressbook.scroll-view"
   >
-    <View>
-      <ActivityIndicator
-        color="#5a8c5a"
-        size={20}
-        style={
-          {
-            "marginRight": 7,
-            "marginTop": 7,
-          }
+    <RCTScrollView
+      alwaysBounceVertical={false}
+      bounces={false}
+      contentContainerStyle={
+        {
+          "alignItems": "stretch",
+          "flexDirection": "column",
+          "justifyContent": "flex-start",
         }
-      />
-    </View>
-  </RCTScrollView>
+      }
+      keyboardShouldPersistTaps="handled"
+      onScroll={[Function]}
+      scrollEventThrottle={100}
+      style={
+        {
+          "flex": 1,
+        }
+      }
+      testID="addressbook.scroll-view"
+    >
+      <View>
+        <ActivityIndicator
+          color="#5a8c5a"
+          size={20}
+          style={
+            {
+              "marginRight": 7,
+              "marginTop": 7,
+            }
+          }
+        />
+      </View>
+    </RCTScrollView>
+  </View>
 </View>
 `;

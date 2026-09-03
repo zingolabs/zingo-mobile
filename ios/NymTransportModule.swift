@@ -8,8 +8,10 @@
 //  it to the wallet's `attach_mixnet` seam. The loopback socket, not a shared
 //  compile unit, is the boundary between the two lockfile-incompatible stacks.
 //
-//  Lifecycle: `startMixnetTransport` (re)starts the proxy and resolves the
-//  endpoint as `host:port`; `stopMixnetTransport` is the deliberate teardown.
+//  Lifecycle: `startMixnetTransport` (re)starts the proxy and resolves its
+//  binding — the `host:port` endpoint and the Exit Node it bound, both of
+//  which the wallet's attach seam requires; `stopMixnetTransport` is the
+//  deliberate teardown.
 //  A proxy that dies on its own is caught by the shim's liveness monitor; the
 //  observer clears the stored handle so a later re-enable starts afresh, while
 //  the wallet's own probe surfaces the `died` mode the app polls.
@@ -50,9 +52,21 @@ class NymTransportModule: NSObject {
   private static let handleLock = NSLock()
   private static var handle: MixnetProxyHandle?
 
-  /// The proxy-owner-remediates contract: a death report only clears the
-  /// stored handle (its endpoint is dead, so it must not be stopped or
-  /// reused). Recovery stays with the user-driven re-enable.
+  /// Frees the stored handle and clears the slot before anything that can
+  /// throw, so a failed restart never strands a stopped predecessor.
+  private static func releaseHandle() {
+    // stop() begins the ordered off-thread teardown at a known point, and
+    // the ARC release of the last reference reaches the same idempotent
+    // path through the Rust Drop.
+    let stored = handle
+    handle = nil
+    stored?.stop()
+  }
+
+  /// The proxy-owner-remediates contract: a death report clears the stored
+  /// handle and stops it, which begins the ordered teardown on a proxy whose
+  /// dead endpoint the app layer never sees again. Recovery stays with the
+  /// user-driven re-enable.
   ///
   /// Identity-checked (#1227): the observer speaks only for the handle it was
   /// started with, so a dying predecessor's late report cannot wipe a fresh
@@ -62,10 +76,11 @@ class NymTransportModule: NSObject {
     weak var watched: MixnetProxyHandle?
 
     func onDeath(reason: ProxyDeathReason) {
+      NSLog("[Native] mixnet proxy died: \(reason)")
       NymTransportModule.handleLock.lock()
       defer { NymTransportModule.handleLock.unlock() }
       switch verdictOnDeath(stored: NymTransportModule.handle, watched: watched) {
-      case .clearStored: NymTransportModule.handle = nil
+      case .clearStored: NymTransportModule.releaseHandle()
       case .retainStored: break
       }
     }
@@ -82,14 +97,21 @@ class NymTransportModule: NSObject {
       NymTransportModule.handleLock.lock()
       defer { NymTransportModule.handleLock.unlock() }
       do {
-        NymTransportModule.handle?.stop()
+        NymTransportModule.releaseHandle()
         let observer = HandleClearingObserver()
         let started = try MixnetProxyHandle.start(observer: observer)
         observer.watched = started
         NymTransportModule.handle = started
         let endpoint = started.socks5Endpoint()
         let address = "\(endpoint.host):\(endpoint.port)"
-        DispatchQueue.main.async { resolve(address) }
+        guard let exitNode = started.exitNode() else {
+          throw NSError(domain: "start_mixnet_transport", code: 1, userInfo: [
+            NSLocalizedDescriptionKey: "the started proxy reported no exit node",
+          ])
+        }
+        DispatchQueue.main.async {
+          resolve(["socks5Addr": address, "exitNode": exitNode])
+        }
       } catch {
         NSLog("[Native] nym start_mixnet_transport rejected. \(error)")
         DispatchQueue.main.async { reject("start_mixnet_transport", "\(error)", error) }
@@ -102,8 +124,7 @@ class NymTransportModule: NSObject {
                            reject: @escaping RCTPromiseRejectBlock) {
     DispatchQueue.global(qos: .userInitiated).async {
       NymTransportModule.handleLock.lock()
-      NymTransportModule.handle?.stop()
-      NymTransportModule.handle = nil
+      NymTransportModule.releaseHandle()
       NymTransportModule.handleLock.unlock()
       DispatchQueue.main.async { resolve(nil) }
     }

@@ -20,8 +20,7 @@ export type ServerUriErrorKey = 'uris.baduri' | 'uris.error-http-not-allowed';
 // Audit Issue R — the error travels as an ErrorKey the display edge
 // translates, never as prose, so no locale can break the discrimination.
 export type ParseServerUriResult =
-  | { kind: 'canonicalUri'; uri: string }
-  | ErrorKeyed<ServerUriErrorKey>;
+  { kind: 'canonicalUri'; uri: string } | ErrorKeyed<ServerUriErrorKey>;
 
 const parseServerURI = (uri: string): ParseServerUriResult => {
   if (!uri) {

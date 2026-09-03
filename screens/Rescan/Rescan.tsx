@@ -14,7 +14,7 @@ import BottomSheet, {
 import RegText from '@ui/primitives/RegText';
 import BoldText from '@ui/primitives/BoldText';
 import Button from '@ui/primitives/Button';
-import SheetRim from '@ui/primitives/SheetRim';
+import AppSheet from '@ui/primitives/AppSheet';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
 import { useBiometricGate } from '@app/hooks/useBiometricGate';
@@ -54,7 +54,7 @@ const Rescan: React.FunctionComponent<RescanProps> = ({
   const screenName = ScreenEnum.Rescan;
 
   // Audit Issue D — single source of truth for security.rescanScreen.
-  const authPassed = useBiometricGate({
+  const screenGate = useBiometricGate({
     needsAuth: !!security?.rescanScreen,
     translate,
     addLastSnackbar,
@@ -62,6 +62,7 @@ const Rescan: React.FunctionComponent<RescanProps> = ({
     foregroundAppEnabled: !!security?.foregroundApp,
     foregroundEpoch,
   });
+  const authPassed = screenGate.kind === 'passed';
 
   const [containerH, setContainerH] = useState<number>(0);
   const [headerH, setHeaderH] = useState<number>(0);
@@ -92,53 +93,46 @@ const Rescan: React.FunctionComponent<RescanProps> = ({
 
   const rescanSnapPoints = useFullSheetSnapPoints(containerH, headerH);
 
-  const renderRescanHandle = useCallback(
-    () => (
+  const rescanHeader = (
+    <View
+      style={{
+        paddingTop: 12,
+        paddingBottom: 8,
+        paddingHorizontal: 16,
+      }}
+    >
       <View
         style={{
-          paddingTop: 12,
-          paddingBottom: 8,
-          paddingHorizontal: 16,
-          backgroundColor: colors.bgSurface,
-          borderTopLeftRadius: 40,
-          borderTopRightRadius: 40,
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
         }}
       >
-        <SheetRim />
-        <View
+        <TouchableOpacity
+          onPress={closeScreen}
+          hitSlop={8}
+          style={{ paddingHorizontal: 4, paddingVertical: 4 }}
+        >
+          <FontAwesomeIcon
+            icon={faChevronLeft}
+            size={20}
+            color={colors.fgAccent}
+          />
+        </TouchableOpacity>
+        <BoldText
+          numberOfLines={1}
           style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
+            flex: 1,
+            fontSize: 16,
+            lineHeight: 28,
+            textAlign: 'center',
           }}
         >
-          <TouchableOpacity
-            onPress={closeScreen}
-            hitSlop={8}
-            style={{ paddingHorizontal: 4, paddingVertical: 4 }}
-          >
-            <FontAwesomeIcon
-              icon={faChevronLeft}
-              size={20}
-              color={colors.fgAccent}
-            />
-          </TouchableOpacity>
-          <BoldText
-            numberOfLines={1}
-            style={{
-              flex: 1,
-              fontSize: 16,
-              lineHeight: 28,
-              textAlign: 'center',
-            }}
-          >
-            {translate('rescan.title') as string}
-          </BoldText>
-          <View style={{ width: 28 }} />
-        </View>
+          {translate('rescan.title') as string}
+        </BoldText>
+        <View style={{ width: 28 }} />
       </View>
-    ),
-    [colors, closeScreen, translate],
+    </View>
   );
 
   const renderRescanFooter = useCallback(
@@ -188,31 +182,16 @@ const Rescan: React.FunctionComponent<RescanProps> = ({
           noUfvkIcon={true}
         />
       </View>
-      <BottomSheet
+      <AppSheet
         ref={rescanSheetRef}
         snapPoints={rescanSnapPoints}
-        index={0}
-        enableDynamicSizing={false}
-        enablePanDownToClose={false}
-        enableContentPanningGesture={false}
-        keyboardBehavior={'interactive'}
-        keyboardBlurBehavior={'restore'}
-        android_keyboardInputMode={'adjustResize'}
-        backgroundStyle={{
-          backgroundColor: colors.bgSurface,
-          borderTopLeftRadius: 40,
-          borderTopRightRadius: 40,
-        }}
-        handleComponent={renderRescanHandle}
-        footerComponent={renderRescanFooter}
+        header={rescanHeader}
+        renderFooter={renderRescanFooter}
       >
         <BottomSheetScrollView
           bounces={false}
           alwaysBounceVertical={false}
-          style={{
-            flex: 1,
-            backgroundColor: colors.bgSurface,
-          }}
+          style={{ flex: 1 }}
           contentContainerStyle={{
             flexDirection: 'column',
             alignItems: 'stretch',
@@ -228,7 +207,7 @@ const Rescan: React.FunctionComponent<RescanProps> = ({
             </RegText>
           </View>
         </BottomSheetScrollView>
-      </BottomSheet>
+      </AppSheet>
     </View>
   );
 };

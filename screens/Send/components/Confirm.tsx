@@ -27,7 +27,7 @@ import BoldText from '@ui/primitives/BoldText';
 import ZecAmount from '@ui/widgets/ZecAmount';
 import CurrencyAmount from '@ui/widgets/CurrencyAmount';
 import Button from '@ui/primitives/Button';
-import SheetRim from '@ui/primitives/SheetRim';
+import AppSheet from '@ui/primitives/AppSheet';
 import { useTheme } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
 import Header from '@ui/widgets/Header';
@@ -103,7 +103,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
   // brief window after auth where the Confirm button can be pressed
   // without re-authenticating. Native stack remounts the screen on each
   // navigation, so leaving and coming back forces a fresh prompt.
-  const authPassed = useBiometricGate({
+  const screenGate = useBiometricGate({
     needsAuth: !!security?.sendConfirm,
     translate,
     addLastSnackbar,
@@ -111,6 +111,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     foregroundAppEnabled: !!security?.foregroundApp,
     foregroundEpoch,
   });
+  const authPassed = screenGate.kind === 'passed';
 
   const [sendingTotal, setSendingTotal] = useState<number>(0);
 
@@ -139,19 +140,11 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
       ? route.params.sendPageState
       : ({} as SendPageStateClass),
   );
-  // NYM feature hidden for now — will be enabled in the future. Force the
-  // local flag to false so any residual `nym: true` carried in route params
-  // by a device that had NYM enabled in an earlier app version does not
-  // surface NYM-themed UI on this screen (green outline, "Processing via
-  // NYM" title, "Privacy Level NYM Enhanced" tag, NYM warning banner).
-  // Mirrors the same pattern used to hide the Send-screen toggle at
-  // components/Send/Send.tsx L2052-2083 (`{false && (...)}`).
-  // Read the route param so the value is still wired into the type system
-  // (so when NYM is re-enabled this single line is the only change needed
-  // here), but discard it.
-  const _routeNym: boolean =
+  // True when the send routes over the mixnet, so the confirm screen shows
+  // the NYM styling (green outline, processing title, enhanced-privacy tag,
+  // warning banner).
+  const nym: boolean =
     !!route.params && route.params.nym !== undefined ? route.params.nym : false;
-  const nym: boolean = false && _routeNym;
 
   const [containerH, setContainerH] = useState<number>(0);
   const [headerH, setHeaderH] = useState<number>(0);
@@ -165,53 +158,46 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
 
   const confirmSnapPoints = useFullSheetSnapPoints(containerH, headerH);
 
-  const renderConfirmHandle = useCallback(
-    () => (
+  const confirmHeader = (
+    <View
+      style={{
+        paddingTop: 12,
+        paddingBottom: 8,
+        paddingHorizontal: 16,
+      }}
+    >
       <View
         style={{
-          paddingTop: 12,
-          paddingBottom: 8,
-          paddingHorizontal: 16,
-          backgroundColor: colors.bgSurface,
-          borderTopLeftRadius: 40,
-          borderTopRightRadius: 40,
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
         }}
       >
-        <SheetRim />
-        <View
+        <TouchableOpacity
+          onPress={closeScreen}
+          hitSlop={8}
+          style={{ paddingHorizontal: 4, paddingVertical: 4 }}
+        >
+          <FontAwesomeIcon
+            icon={faChevronLeft}
+            size={20}
+            color={colors.fgAccent}
+          />
+        </TouchableOpacity>
+        <BoldText
+          numberOfLines={1}
           style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
+            flex: 1,
+            fontSize: 16,
+            lineHeight: 28,
+            textAlign: 'center',
           }}
         >
-          <TouchableOpacity
-            onPress={closeScreen}
-            hitSlop={8}
-            style={{ paddingHorizontal: 4, paddingVertical: 4 }}
-          >
-            <FontAwesomeIcon
-              icon={faChevronLeft}
-              size={20}
-              color={colors.fgAccent}
-            />
-          </TouchableOpacity>
-          <BoldText
-            numberOfLines={1}
-            style={{
-              flex: 1,
-              fontSize: 16,
-              lineHeight: 28,
-              textAlign: 'center',
-            }}
-          >
-            {translate('send.confirm-title') as string}
-          </BoldText>
-          <View style={{ width: 28 }} />
-        </View>
+          {translate('send.confirm-title') as string}
+        </BoldText>
+        <View style={{ width: 28 }} />
       </View>
-    ),
-    [colors, closeScreen, translate],
+    </View>
   );
 
   const [memoTotal, setMemoTotal] = useState<string>(
@@ -343,23 +329,11 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
             noUfvkIcon={true}
           />
         </View>
-        <BottomSheet
+        <AppSheet
           ref={confirmSheetRef}
           snapPoints={confirmSnapPoints}
-          index={0}
-          enableDynamicSizing={false}
-          enablePanDownToClose={false}
-          enableContentPanningGesture={false}
-          keyboardBehavior={'interactive'}
-          keyboardBlurBehavior={'restore'}
-          android_keyboardInputMode={'adjustResize'}
-          backgroundStyle={{
-            backgroundColor: colors.bgSurface,
-            borderTopLeftRadius: 40,
-            borderTopRightRadius: 40,
-          }}
-          handleComponent={renderConfirmHandle}
-          footerComponent={renderConfirmFooter}
+          header={confirmHeader}
+          renderFooter={renderConfirmFooter}
         >
           <BottomSheetScrollView
             showsVerticalScrollIndicator={true}
@@ -370,7 +344,6 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
             alwaysBounceVertical={false}
             style={{
               flex: 1,
-              backgroundColor: colors.bgSurface,
             }}
             contentContainerStyle={{
               flexDirection: 'column',
@@ -409,6 +382,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                 <CurrencyAmount
                   amtZec={sendingTotal}
                   price={zecPrice.zecPrice}
+                  priceDate={zecPrice.date}
                   currency={currency}
                   privacy={false}
                 />
@@ -464,6 +438,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                   style={{ fontSize: 18 }}
                   amtZec={calculatedFee}
                   price={zecPrice.zecPrice}
+                  priceDate={zecPrice.date}
                   currency={currency}
                   privacy={privacy}
                 />
@@ -503,6 +478,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                             style={{ fontSize: 18 }}
                             amtZec={donationAmount}
                             price={zecPrice.zecPrice}
+                            priceDate={zecPrice.date}
                             currency={currency}
                             privacy={privacy}
                           />
@@ -532,6 +508,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                         style={{ fontSize: 18 }}
                         amtZec={Utils.parseStringLocaleToNumberFloat(to.amount)}
                         price={zecPrice.zecPrice}
+                        priceDate={zecPrice.date}
                         currency={currency}
                         privacy={privacy}
                       />
@@ -575,7 +552,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
             )}
             <View style={{ marginBottom: 30 }} />
           </BottomSheetScrollView>
-        </BottomSheet>
+        </AppSheet>
       </View>
     </View>
   );

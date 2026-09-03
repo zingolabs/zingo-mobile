@@ -1,7 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
 import AlSummaryLine from './AlSummaryLine';
 import { withAppContext } from '../../../.storybook/storyDecorators';
-import { sampleTransparent, sampleUnified } from '../../../.storybook/storyMocks';
+import {
+  sampleTransparent,
+  sampleUnified,
+} from '../../../.storybook/storyMocks';
 
 const meta: Meta<typeof AlSummaryLine> = {
   title: 'AddressList/AlSummaryLine',

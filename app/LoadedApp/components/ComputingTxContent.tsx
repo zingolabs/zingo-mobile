@@ -15,12 +15,15 @@ import Animated, {
   withSequence,
   withTiming,
 } from 'react-native-reanimated';
-import { NavigationProp, ParamListBase, useNavigation } from '@react-navigation/native';
+import {
+  NavigationProp,
+  ParamListBase,
+  useNavigation,
+} from '@react-navigation/native';
 import { useTheme } from '../../theme';
 import BottomSheet, {
   BottomSheetFooter,
   BottomSheetFooterProps,
-  BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import TransactionCreatedIcon from '../../../assets/img/transaction-created.svg';
 import TransactionFailedIcon from '../../../assets/img/transaction-failed.svg';
@@ -33,7 +36,7 @@ const RING_RED = '#822929';
 import RegText from '@ui/primitives/RegText';
 import BoldText from '@ui/primitives/BoldText';
 import Button from '@ui/primitives/Button';
-import SheetRim from '@ui/primitives/SheetRim';
+import AppSheet from '@ui/primitives/AppSheet';
 import { AppDrawerParamList } from '../../types';
 import { ContextAppLoaded } from '../../context';
 import Header from '@ui/widgets/Header';
@@ -150,24 +153,6 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
     });
   }, [navigation]);
 
-  const renderComputingHandle = useCallback(
-    () => (
-      <View
-        style={{
-          paddingTop: 12,
-          paddingBottom: 8,
-          paddingHorizontal: 16,
-          backgroundColor: colors.bgSurface,
-          borderTopLeftRadius: 40,
-          borderTopRightRadius: 40,
-        }}
-      >
-        <SheetRim />
-      </View>
-    ),
-    [colors],
-  );
-
   // Footer is rendered in every phase (with the same reserved height) so
   // the BottomSheetView above always shrinks by the same amount, keeping
   // the centered content at the exact same vertical position regardless
@@ -218,39 +203,18 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
           noUfvkIcon={true}
         />
       </View>
-      <BottomSheet
+      <AppSheet
         ref={computingSheetRef}
         snapPoints={computingSnapPoints}
-        index={0}
-        enableDynamicSizing={false}
-        enablePanDownToClose={false}
-        enableContentPanningGesture={false}
-        keyboardBehavior={'interactive'}
-        keyboardBlurBehavior={'restore'}
-        android_keyboardInputMode={'adjustResize'}
-        backgroundStyle={{
-          backgroundColor: colors.bgSurface,
-          borderTopLeftRadius: 40,
-          borderTopRightRadius: 40,
+        renderFooter={renderComputingFooter}
+        contentStyle={{
+          paddingHorizontal: 24,
+          paddingTop: 106,
+          paddingBottom: 106,
+          alignItems: 'center',
+          justifyContent: 'center',
         }}
-        handleComponent={renderComputingHandle}
-        footerComponent={renderComputingFooter}
       >
-        <BottomSheetView
-          style={{
-            flex: 1,
-            backgroundColor: colors.bgSurface,
-            paddingHorizontal: 24,
-            // Footer floats absolutely on top of the sheet (it doesn't
-            // shrink the BottomSheetView), so we mirror its height on top
-            // too — keeping the centered content in the true visual middle
-            // of the area between handle and footer.
-            paddingTop: 106,
-            paddingBottom: 106,
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
           {/* Both terminal states render the icon inside a colored ring;
               the computing state uses the same 120x120 bounding box so
               `justifyContent: 'center'` lands every variant at the same Y. */}
@@ -361,8 +325,7 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
               )}
             </View>
           )}
-        </BottomSheetView>
-      </BottomSheet>
+      </AppSheet>
     </View>
   );
 };

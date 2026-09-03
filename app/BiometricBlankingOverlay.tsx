@@ -7,7 +7,7 @@ import {
   View,
 } from 'react-native';
 
-import { BIOMETRIC_BLANKING_EVENT } from './services/simpleBiometrics';
+import { BIOMETRIC_BLANKING_EVENT } from './services/gateController';
 
 const styles = StyleSheet.create({
   overlay: { flex: 1, backgroundColor: 'black' },
@@ -37,7 +37,10 @@ const BiometricBlankingOverlay: React.FunctionComponent = () => {
       animationType="none"
       statusBarTranslucent
       hardwareAccelerated
-      onRequestClose={() => {}}
+      // The person's escape hatch: a ceremony wedged with no prompt on
+      // screen must not strand an unclosable black screen behind a dead
+      // back button.
+      onRequestClose={() => setVisible(false)}
     >
       <View style={styles.overlay} />
     </Modal>

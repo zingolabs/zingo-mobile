@@ -1,7 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
 import { ScreenEnum } from '@app/AppState';
 import AddressItem from './AddressItem';
-import { withAppContext, withNavigation } from '../../.storybook/storyDecorators';
+import {
+  withAppContext,
+  withNavigation,
+} from '../../.storybook/storyDecorators';
 import { uAddress } from '../../.storybook/storyMocks';
 
 const meta: Meta<typeof AddressItem> = {

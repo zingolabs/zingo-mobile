@@ -81,6 +81,8 @@ import Utils from '../utils';
 import { getZingoVersion, substituteZingoName } from '../utils/ZingoAppData';
 import { AppTheme } from '../theme';
 import SettingsFileImpl from '../services/SettingsFileImpl';
+import { PriceTrafficDriver } from '@ui/widgets/PriceFetcher';
+import { priceFetcherStore } from '@ui/widgets/priceFetcherStore';
 import { ContextAppLoadedProvider } from '../context';
 import { parseZcashURI, serverUris, fetchServerList } from '../uris';
 import selectingServer from '../services/selectingServer';
@@ -94,7 +96,11 @@ import { RPCSeedType } from '../walletBackend/types/RPCSeedType';
 import { Launching } from '../LoadingApp';
 import { AddressBook } from '@screens/AddressBook';
 import AddressBookFileImpl from '../services/AddressBookFileImpl';
-import simpleBiometrics from '../services/simpleBiometrics';
+import {
+  GateAnswer,
+  enactGateAnswer,
+  resolveTriggerGate,
+} from '../services/gateController';
 import ShowAddressAlertAsync from '@screens/Send/components/ShowAddressAlertAsync';
 import {
   createUpdateRecoveryWalletInfo,
@@ -128,8 +134,11 @@ import {
   INITIAL_MIXNET_VIEW,
   OFF_MIXNET_VIEW,
   MixnetView,
-} from '../walletBackend/transforms/mixnetPresenter';
-import { startMixnetTransport } from '../walletBackend/utils/nymTransport';
+} from '../walletBackend/transforms/mixnetView';
+import {
+  startMixnetTransport,
+  stopMixnetTransport,
+} from '../walletBackend/utils/nymTransport';
 import { RPCPerformanceLevelEnum } from '../walletBackend/enums/RPCPerformanceLevelEnum';
 import { AddressList } from '@screens/AddressList';
 import ValueTransferDetail from '@screens/History/components/ValueTransferDetail';
@@ -151,24 +160,18 @@ const MigrationStrategy = React.lazy(
 const MigrationTransactions = React.lazy(
   () => import('@screens/MigrationTransactions'),
 );
-const MigrationSending = React.lazy(
-  () => import('@screens/MigrationSending'),
-);
+const MigrationSending = React.lazy(() => import('@screens/MigrationSending'));
 const MigrationSplitPlan = React.lazy(
   () => import('@screens/MigrationSplitPlan'),
 );
 const MigrationSplitting = React.lazy(
   () => import('@screens/MigrationSplitting'),
 );
-const MigrationCadence = React.lazy(
-  () => import('@screens/MigrationCadence'),
-);
+const MigrationCadence = React.lazy(() => import('@screens/MigrationCadence'));
 const MigrationSchedule = React.lazy(
   () => import('@screens/MigrationSchedule'),
 );
-const MigrationStatus = React.lazy(
-  () => import('@screens/MigrationStatus'),
-);
+const MigrationStatus = React.lazy(() => import('@screens/MigrationStatus'));
 const MigrationBatchSending = React.lazy(
   () => import('@screens/MigrationBatchSending'),
 );
@@ -649,7 +652,7 @@ export default function LoadedApp(props: LoadedAppProps) {
       <Launching
         translate={translate}
         firstLaunchingMessage={LaunchingModeEnum.opening}
-        biometricsFailed={false}
+        biometricGate={{ kind: 'passed' }}
       />
     );
   } else {
@@ -881,6 +884,7 @@ export class LoadedAppClass extends Component<
       onPersistentSyncFailure: this.recoverServer,
       onMixnetViewChanged: this.setMixnetView,
       startMixnetTransport: startMixnetTransport,
+      stopMixnetTransport: stopMixnetTransport,
       mixnetSupported: true,
       nymEnabled: props.nym,
       readOnly: props.readOnly,
@@ -980,47 +984,22 @@ export class LoadedAppClass extends Component<
           // Bump the foreground epoch so any currently-mounted
           // protected screen (Seed/Ufvk/Settings/Rescan/Confirm) can
           // re-fire its biometric gate when security.foregroundApp is
-          // OFF. Done before the foregroundApp simpleBiometrics so the
+          // OFF. Done before the foregroundApp askGate so the
           // screen-level effects don't race against the app-level one.
           this.setState(state => ({
             foregroundEpoch: state.foregroundEpoch + 1,
           }));
-          // (PIN or TouchID or FaceID)
-          const resultBio = this.state.security.foregroundApp
-            ? await simpleBiometrics({ translate: this.state.translate })
-            : true;
-          // resultBio:
-          // - true      -> authenticated (biometric, or device passcode via allowDeviceCredentials)
-          // - false     -> user cancelled or failed the prompt
-          // - undefined -> the gate cannot run here (no auth method, or a keychain
-          //                entry the OS refuses to serve); allow, since it guards
-          //                nothing and blocking locks the user out of the wallet
-          if (resultBio === false) {
-            this.navigateToLoadingApp({
-              startingApp: true,
-              biometricsFailed: true,
-            });
-          } else {
-            // reading background task info
-            await this.fetchBackgroundSyncInfo();
-            // setting value for background task Android
-            await AsyncStorage.setItem(GlobalConst.background, GlobalConst.no);
-            // needs this because when the App go from back to fore
-            // it have to re-launch all the tasks.
-            await this.rpc.clearTimers();
-            await this.rpc.configure();
-            if (
-              this.state.backgroundError &&
-              (this.state.backgroundError.title ||
-                this.state.backgroundError.error)
-            ) {
-              showConfirm({
-                title: this.state.backgroundError.title,
-                message: this.state.backgroundError.error,
-                buttons: [{ text: this.state.translate('close') as string }],
-              });
-              this.setBackgroundError('', '');
-            }
+          // A parked earlier pass resumes with this same event and acts
+          // once; a second concurrent actor would double-run the restore
+          // work or the navigation reset.
+          if (this.foregroundGateBusy) {
+            return;
+          }
+          this.foregroundGateBusy = true;
+          try {
+            await this.runForegroundGate();
+          } finally {
+            this.foregroundGateBusy = false;
           }
         } else if (
           priorAppState === AppStateStatusEnum.active &&
@@ -1117,6 +1096,58 @@ export class LoadedAppClass extends Component<
   componentDidUpdate = (prevProps: LoadedAppClassProps) => {
     if (prevProps.translate !== this.props.translate) {
       this.setState({ translate: this.props.translate });
+    }
+  };
+
+  foregroundGateBusy = false;
+
+  // (PIN or TouchID or FaceID). Only a decline locks; a gate that cannot
+  // run fails open with a notice (ADR 0007), because blocking would trap
+  // the user out of the wallet.
+  runForegroundGate = async () => {
+    const foregroundGate: GateAnswer = await resolveTriggerGate(
+      undefined,
+      this.state.security.foregroundApp,
+      { translate: this.state.translate },
+    );
+    const proceed = enactGateAnswer(
+      foregroundGate,
+      {
+        // The narrowed answer is the gate outcome, whole; the locked
+        // screen never reads mutable module state.
+        lock: declined =>
+          this.navigateToLoadingApp({
+            startingApp: true,
+            biometricGate: declined,
+          }),
+        notice: this.addLastSnackbar,
+      },
+      this.state.translate,
+    );
+    if (!proceed) {
+      return;
+    }
+    // The gate is open: this, never the raw AppState event, is when a
+    // real return may emit price traffic.
+    priceFetcherStore.foregroundReturned();
+    // reading background task info
+    await this.fetchBackgroundSyncInfo();
+    // setting value for background task Android
+    await AsyncStorage.setItem(GlobalConst.background, GlobalConst.no);
+    // needs this because when the App go from back to fore
+    // it have to re-launch all the tasks.
+    await this.rpc.clearTimers();
+    await this.rpc.configure();
+    if (
+      this.state.backgroundError &&
+      (this.state.backgroundError.title || this.state.backgroundError.error)
+    ) {
+      showConfirm({
+        title: this.state.backgroundError.title,
+        message: this.state.backgroundError.error,
+        buttons: [{ text: this.state.translate('close') as string }],
+      });
+      this.setBackgroundError('', '');
     }
   };
 
@@ -1816,6 +1847,43 @@ export class LoadedAppClass extends Component<
     };
   };
 
+  // Dials each candidate in order and activates the first that connects.
+  activateReachableServer = async (
+    candidates: ServerUrisType[],
+  ): Promise<boolean> => {
+    for (const candidate of candidates) {
+      if (!candidate.uri) {
+        continue;
+      }
+      const next: ServerType = {
+        uri: candidate.uri,
+        chainName: candidate.chainName,
+      };
+      // Cap each dial: a dead candidate's changeServer can otherwise block for
+      // minutes (see checkServerURI), stalling the whole rotation.
+      const changed = await Promise.race([
+        changeServer(next.uri).then(result => result.ok),
+        new Promise<boolean>(resolve =>
+          setTimeout(() => resolve(false), 15_000),
+        ),
+      ]);
+      if (!changed) {
+        continue;
+      }
+      await SettingsFileImpl.writeSettings(SettingsNameEnum.server, next);
+      this.setState({ server: next });
+      this.rpc.setServer(next);
+      if (this.state.mode === ModeEnum.advanced) {
+        this.addLastSnackbar(
+          `${this.state.translate('loadedapp.selectingserverbest') as string} ${next.uri}`,
+          SnackbarDurationEnum.long,
+        );
+      }
+      return true;
+    }
+    return false;
+  };
+
   // The runtime half of the old boot-time server rescue: after repeated
   // sync-launch failures, silently activate a working server (live registry
   // first, then the static list by latency) and reattach the client to it.
@@ -1836,38 +1904,19 @@ export class LoadedAppClass extends Component<
       const live = (await fetchServerList(current.chainName)).filter(
         (s: ServerUrisType) => s.uri !== current.uri,
       );
-      let picked: ServerUrisType | null = live.length > 0 ? live[0] : null;
-      if (!picked) {
-        picked = await selectingServer(
-          serverUris(this.state.translate).filter(
-            (s: ServerUrisType) =>
-              !s.obsolete &&
-              s.chainName === current.chainName &&
-              s.uri !== current.uri,
-          ),
-        );
-      }
-      if (!picked || !picked.uri) {
+      if (await this.activateReachableServer(live)) {
         return;
       }
-      const next: ServerType = {
-        uri: picked.uri,
-        chainName: picked.chainName,
-      };
-      const changed = await changeServer(next.uri);
-      if (!changed.ok) {
-        // The pick is dead too. Keep the current server; the failure streak
-        // rebuilds and this retries with the next candidate.
-        return;
-      }
-      await SettingsFileImpl.writeSettings(SettingsNameEnum.server, next);
-      this.setState({ server: next });
-      this.rpc.setServer(next);
-      if (this.state.mode === ModeEnum.advanced) {
-        this.addLastSnackbar(
-          `${this.state.translate('loadedapp.selectingserverbest') as string} ${next.uri}`,
-          SnackbarDurationEnum.long,
-        );
+      const fallback = await selectingServer(
+        serverUris(this.state.translate).filter(
+          (s: ServerUrisType) =>
+            !s.obsolete &&
+            s.chainName === current.chainName &&
+            s.uri !== current.uri,
+        ),
+      );
+      if (fallback) {
+        await this.activateReachableServer([fallback]);
       }
     } finally {
       this.recoveringServer = false;
@@ -2006,17 +2055,16 @@ export class LoadedAppClass extends Component<
   };
 
   setNymOption = async (value: boolean): Promise<void> => {
-    await SettingsFileImpl.writeSettings(SettingsNameEnum.nym, value);
     this.setState({
       nym: value,
     });
     // The merged switch: enabling arms Mixnet Mode (start transport + attach),
-    // disabling drops to clearnet. The coordinator publishes the resulting view.
-    if (value) {
-      await this.rpc.reenableMixnet();
-    } else {
-      await this.rpc.disableMixnet();
-    }
+    // disabling drops to clearnet. The coordinator publishes its first view
+    // immediately. The disk write runs in parallel.
+    await Promise.all([
+      SettingsFileImpl.writeSettings(SettingsNameEnum.nym, value),
+      value ? this.rpc.reenableMixnet() : this.rpc.disableMixnet(),
+    ]);
   };
 
   navigateToLoadingApp = async (state: LoadingAppNavigationState) => {
@@ -2318,6 +2366,7 @@ export class LoadedAppClass extends Component<
     return (
       <>
         <ContextAppLoadedProvider value={context}>
+          <PriceTrafficDriver />
           <GestureHandlerRootView>
             <BottomSheetModalProvider>
               <BottomSheetBackHandler />

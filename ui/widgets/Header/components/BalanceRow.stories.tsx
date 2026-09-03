@@ -1,16 +1,16 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
-import {
-  CurrencyEnum,
-  ModeEnum,
-  SelectServerEnum,
-} from '@app/AppState';
+import { CurrencyEnum, ModeEnum, SelectServerEnum } from '@app/AppState';
 import BalanceRow from './BalanceRow';
 import {
   mockTranslate,
   withAppContext,
   withNavigation,
 } from '../../../../.storybook/storyDecorators';
-import { mockInfo, mockTotalBalance, mockZecPrice } from '../../../../.storybook/storyMocks';
+import {
+  mockInfo,
+  mockTotalBalance,
+  mockZecPrice,
+} from '../../../../.storybook/storyMocks';
 
 // BalanceRow nests PriceFetcher (context) and navigates on tap (navigation). It needs both decorators
 const meta: Meta<typeof BalanceRow> = {
@@ -29,7 +29,6 @@ const meta: Meta<typeof BalanceRow> = {
     info: mockInfo,
     currency: CurrencyEnum.USDCurrency,
     zecPrice: mockZecPrice,
-    setZecPrice: () => {},
     selectServer: SelectServerEnum.auto,
     showShieldButton: false,
     shieldingFee: 0,

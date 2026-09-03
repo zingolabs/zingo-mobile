@@ -1,7 +1,6 @@
 import React, { Component, useState, useMemo, useEffect } from 'react';
 import {
   I18nManager,
-  EmitterSubscription,
   AppState,
   NativeEventSubscription,
   Platform,
@@ -25,13 +24,18 @@ import {
 import CustomServerModalHost from './components/CustomServerModalHost';
 import { BottomSheetBackHandler } from '../hooks/useBottomSheetBackHandler';
 import ConfirmBottomSheet from '@ui/widgets/ConfirmBottomSheet';
+import WalletRecoveryHost from './components/WalletRecoveryHost';
 import { showConfirm } from '../services/showConfirm';
+import { showWalletRecovery } from '../services/showWalletRecovery';
 
 import {
   createNewWallet,
   getVersionInfo,
   getWalletKind,
+  hasRepairableWalletFile,
   loadExistingWallet,
+  repairDoubleWrappedWallet,
+  repairSucceeded,
   resolvedTrue,
   restoreExistingWalletBackup,
   restoreWalletFromSeed,
@@ -39,6 +43,12 @@ import {
   setCryptoDefaultProvider,
   walletBackupExists,
   walletExists as rpcWalletExists,
+  walletFileDiagnosis,
+  WalletFileDiagnosis,
+  WalletFileDiagnosisReport,
+  WalletFileRepairOutcome,
+  WALLET_FILE_NAME,
+  WALLET_BACKUP_FILE_NAME,
 } from '../walletBackend';
 import {
   AppStateLoading,
@@ -82,7 +92,14 @@ import Toast from 'react-native-toast-message';
 import { toastConfig } from '../toastConfig';
 import { RPCSeedType } from '../walletBackend/types/RPCSeedType';
 import Launching from './components/Launching';
-import simpleBiometrics, { getLastGateFailure } from '../services/simpleBiometrics';
+import {
+  GateAnswer,
+  askGate,
+  dropWhileInFlight,
+  enactGateAnswer,
+  resolveTriggerGate,
+  retireSentinelEntries,
+} from '../services/gateController';
 import selectingServer from '../services/selectingServer';
 import { isEqual } from 'lodash';
 import {
@@ -421,7 +438,7 @@ export default function LoadingApp(props: LoadingAppProps) {
       <Launching
         translate={translate}
         firstLaunchingMessage={LaunchingModeEnum.opening}
-        biometricsFailed={false}
+        biometricGate={{ kind: 'passed' }}
       />
     );
   } else {
@@ -485,9 +502,8 @@ export class LoadingAppClass extends Component<
   LoadingAppClassProps,
   LoadingAppClassState
 > {
-  dim: EmitterSubscription;
-  appstate: NativeEventSubscription;
-  unsubscribeNetInfo: NetInfoSubscription;
+  appstate?: NativeEventSubscription;
+  unsubscribeNetInfo?: NetInfoSubscription;
   clipboardTimer: ReturnType<typeof setTimeout> | null = null;
   customServerModalRef: React.RefObject<React.ComponentRef<
     typeof BottomSheetModal
@@ -543,11 +559,9 @@ export class LoadingAppClass extends Component<
       customServerOffline: false,
       customServerAuto: false,
       customServerCustom: false,
-      biometricsFailed:
-        !!props.route.params &&
-        props.route.params.biometricsFailed !== undefined
-          ? props.route.params.biometricsFailed
-          : false,
+      // The gate outcome arrives with the navigation whole (see
+      // LoadingAppNavigationState), never from module state.
+      biometricGate: props.route.params?.biometricGate ?? { kind: 'passed' },
       startingApp:
         !!props.route.params && props.route.params.startingApp !== undefined
           ? props.route.params.startingApp
@@ -558,9 +572,6 @@ export class LoadingAppClass extends Component<
       hasRecoveryWalletInfoSaved: false,
     };
 
-    this.dim = {} as EmitterSubscription;
-    this.appstate = {} as NativeEventSubscription;
-    this.unsubscribeNetInfo = {} as NetInfoSubscription;
     this.customServerModalRef = React.createRef();
   }
 
@@ -578,30 +589,38 @@ export class LoadingAppClass extends Component<
 
     this.fetchZingolibVersion();
 
+    // Retire the keychain entries the replaced sentinel gate shipped:
+    // nothing reads them, and an auth-gated key left under a known name
+    // invites stale-entry reuse. Fire-and-forget, best-effort, idempotent.
+    retireSentinelEntries();
+
     // to start the App the first time in this session
     // the user have to pass the security of the device
     if (this.state.startingApp) {
-      if (!this.state.biometricsFailed) {
-        // (PIN or TouchID or FaceID)
-        this.setState({ biometricsFailed: false });
-        const resultBio = this.state.security.startApp
-          ? await simpleBiometrics({ translate: this.state.translate })
-          : true;
-        // resultBio:
-        // - true      -> authenticated (biometric, or device passcode via allowDeviceCredentials)
-        // - false     -> user cancelled or failed the prompt
-        // - undefined -> the gate cannot run here (no auth method, or a keychain
-        //                entry the OS refuses to serve); allow, since it guards
-        //                nothing and blocking locks the user out of the wallet
-        if (resultBio === false) {
-          this.setState({ biometricsFailed: true });
-          return;
-        } else {
-          this.setState({ biometricsFailed: false });
-        }
-      } else {
-        // if there is a biometric Fail, likely from the foreground check
-        // keep the App in the first screen because the user needs to try again.
+      if (this.state.biometricGate.kind === 'declined') {
+        // A biometric fail, likely from the foreground check: keep the App
+        // on the first screen so the user can try again.
+        return;
+      }
+      // (PIN or TouchID or FaceID). Only a decline locks; a gate that
+      // cannot run fails open with a notice (ADR 0007), because blocking
+      // would trap the user out of the wallet. A retry's answer rides in
+      // as data, so this trigger never runs a second ceremony behind it.
+      const startGate: GateAnswer = await resolveTriggerGate(
+        this.consumeRetryAnswer(),
+        this.state.security.startApp,
+        { translate: this.state.translate },
+      );
+      const proceed = enactGateAnswer(
+        startGate,
+        {
+          // The narrowed answer is the gate outcome, whole.
+          lock: declined => this.setState({ biometricGate: declined }),
+          notice: this.addLastSnackbar,
+        },
+        this.state.translate,
+      );
+      if (!proceed) {
         return;
       }
     }
@@ -641,136 +660,7 @@ export class LoadingAppClass extends Component<
 
     if (exists) {
       this.setState({ walletExists: true });
-      const result = await loadExistingWallet(
-        this.state.server.uri,
-        this.state.server.chainName,
-        this.state.performanceLevel,
-        GlobalConst.minConfirmations.toString(),
-      );
-
-      let error = false;
-      let errorText = '';
-      if (result.ok && result.value) {
-        try {
-          // here result can have an `error` field for watch-only which is actually OK.
-          const resultJson: RPCSeedType & RPCUfvkType = await JSON.parse(
-            result.value,
-          );
-          if (!resultJson.error) {
-            // Load the wallet and navigate to the vts screen
-            let readOnly: boolean = false;
-            let orchardPool: boolean = false;
-            let saplingPool: boolean = false;
-            let transparentPool: boolean = false;
-            const walletKindResult = await getWalletKind();
-            const walletKindStr: string = walletKindResult.ok
-              ? walletKindResult.value
-              : walletKindResult.error.message;
-            try {
-              const walletKindJSON: RPCWalletKindType =
-                await JSON.parse(walletKindStr);
-              console.log('KIND... JSON', walletKindJSON);
-              // there are 4 kinds:
-              // 1. seed
-              // 2. USK
-              // 3. UFVK - watch-only wallet
-              // 4. No keys - watch-only wallet (possibly an error)
-
-              if (
-                walletKindJSON.kind ===
-                  RPCWalletKindEnum.LoadedFromUnifiedFullViewingKey ||
-                walletKindJSON.kind === RPCWalletKindEnum.NoKeysFound
-              ) {
-                readOnly = true;
-              } else {
-                readOnly = false;
-              }
-              orchardPool = walletKindJSON.orchard;
-              saplingPool = walletKindJSON.sapling;
-              transparentPool = walletKindJSON.transparent;
-              // if the seed & birthday are not stored in Keychain/Keystore, do it now.
-              if (this.state.recoveryWalletInfoOnDevice) {
-                const wallet = await fetchWallet(readOnly);
-                if (wallet) {
-                  await createUpdateRecoveryWalletInfo(wallet);
-                }
-              } else {
-                // needs to delete the seed from the Keychain/Keystore, do it now.
-                if (this.state.hasRecoveryWalletInfoSaved) {
-                  await removeRecoveryWalletInfo();
-                }
-              }
-              this.setState({
-                readOnly,
-                orchardPool,
-                saplingPool,
-                transparentPool,
-                actionButtonsDisabled: false,
-              });
-            } catch (e) {
-              this.setState({
-                readOnly,
-                orchardPool,
-                saplingPool,
-                transparentPool,
-                actionButtonsDisabled: false,
-              });
-              this.addLastSnackbar(walletKindStr);
-            }
-            // if the App is restoring another wallet backup...
-            // needs to recalculate the Address Book.
-            const newWallet =
-              !!this.props.route.params &&
-              this.props.route.params.newWallet !== undefined
-                ? this.props.route.params.newWallet
-                : false;
-            this.navigateToLoadedApp(
-              readOnly,
-              orchardPool,
-              saplingPool,
-              transparentPool,
-              newWallet,
-              this.state.firstLaunchingMessage,
-              // The wallet's own chain, surfaced by the native result (reliable
-              // even Offline). The server's chain is only a pre-rebuild fallback.
-              (resultJson.chain_name as ChainNameEnum) ||
-                this.state.server.chainName,
-            );
-          } else {
-            error = true;
-            errorText = resultJson.error;
-          }
-        } catch (e: unknown) {
-          error = true;
-          errorText = e instanceof Error ? e.message : String(e);
-        }
-      } else {
-        error = true;
-        errorText = result.ok ? result.value : result.error.message;
-      }
-      if (error) {
-        // Wallet-open failures are local and deterministic (undecodable
-        // file, chain mismatch, bad settings): the native layer opens
-        // Indexerless when only the server dial fails, so no open failure
-        // is server-caused. walletErrorHandle would diagnose this local
-        // error by probing the server, racing against its current state,
-        // and pick the alert text from whatever it happens to answer.
-        createAlert(
-          this.setBackgroundError,
-          this.addLastSnackbar,
-          this.state.translate('loadingapp.readingwallet-label') as string,
-          Utils.humanizeChainTokens(errorText, this.state.translate),
-          false,
-          this.state.translate,
-          sendEmail,
-          this.state.zingolibVersion,
-        );
-        this.setState({
-          actionButtonsDisabled: false,
-          serverErrorTries: 0,
-          screen: RouteEnum.StartMenu,
-        });
-      }
+      await this.loadExistingWalletOnBoot();
     } else {
       if (this.state.mode === ModeEnum.basic) {
         // setting the prop basicFirstViewSeed to false.
@@ -833,6 +723,14 @@ export class LoadingAppClass extends Component<
       }
     }
 
+    if (this.unmounted) {
+      // The boot chain outlived this instance; attaching listeners here
+      // would subscribe a dead component forever.
+      return;
+    }
+    // Re-entry via the locked screen's tryAgain must not stack another
+    // subscription pair on the one this mount already holds.
+    this.detachListeners();
     this.appstate = AppState.addEventListener(
       EventListenerEnum.change,
       async nextAppState => {
@@ -924,14 +822,18 @@ export class LoadingAppClass extends Component<
     // an empty screen. The modal opens on demand from the gear button.
   };
 
+  detachListeners = () => {
+    this.appstate?.remove();
+    this.appstate = undefined;
+    this.unsubscribeNetInfo?.();
+    this.unsubscribeNetInfo = undefined;
+  };
+
+  unmounted = false;
+
   componentWillUnmount = () => {
-    this.dim && typeof this.dim.remove === 'function' && this.dim.remove();
-    this.appstate &&
-      typeof this.appstate.remove === 'function' &&
-      this.appstate.remove();
-    this.unsubscribeNetInfo &&
-      typeof this.unsubscribeNetInfo === 'function' &&
-      this.unsubscribeNetInfo();
+    this.unmounted = true;
+    this.detachListeners();
   };
 
   // Default server for a chain = the `default` entry for that chain in the
@@ -1127,6 +1029,291 @@ export class LoadingAppClass extends Component<
     } else {
       return false;
     }
+  };
+
+  // Loads the wallet file found on disk. Also the retry after a file repair.
+  loadExistingWalletOnBoot = async () => {
+    const result = await loadExistingWallet(
+      this.state.server.uri,
+      this.state.server.chainName,
+      this.state.performanceLevel,
+      GlobalConst.minConfirmations.toString(),
+    );
+
+    let error = false;
+    let errorText = '';
+    if (result.ok && result.value) {
+      try {
+        // here result can have an `error` field for watch-only which is actually OK.
+        const resultJson: RPCSeedType & RPCUfvkType = await JSON.parse(
+          result.value,
+        );
+        if (!resultJson.error) {
+          // Load the wallet and navigate to the vts screen
+          let readOnly: boolean = false;
+          let orchardPool: boolean = false;
+          let saplingPool: boolean = false;
+          let transparentPool: boolean = false;
+          const walletKindResult = await getWalletKind();
+          const walletKindStr: string = walletKindResult.ok
+            ? walletKindResult.value
+            : walletKindResult.error.message;
+          try {
+            const walletKindJSON: RPCWalletKindType =
+              await JSON.parse(walletKindStr);
+            console.log('KIND... JSON', walletKindJSON);
+            // there are 4 kinds:
+            // 1. seed
+            // 2. USK
+            // 3. UFVK - watch-only wallet
+            // 4. No keys - watch-only wallet (possibly an error)
+
+            if (
+              walletKindJSON.kind ===
+                RPCWalletKindEnum.LoadedFromUnifiedFullViewingKey ||
+              walletKindJSON.kind === RPCWalletKindEnum.NoKeysFound
+            ) {
+              readOnly = true;
+            } else {
+              readOnly = false;
+            }
+            orchardPool = walletKindJSON.orchard;
+            saplingPool = walletKindJSON.sapling;
+            transparentPool = walletKindJSON.transparent;
+            // if the seed & birthday are not stored in Keychain/Keystore, do it now.
+            if (this.state.recoveryWalletInfoOnDevice) {
+              const wallet = await fetchWallet(readOnly);
+              if (wallet) {
+                await createUpdateRecoveryWalletInfo(wallet);
+              }
+            } else {
+              // needs to delete the seed from the Keychain/Keystore, do it now.
+              if (this.state.hasRecoveryWalletInfoSaved) {
+                await removeRecoveryWalletInfo();
+              }
+            }
+            this.setState({
+              readOnly,
+              orchardPool,
+              saplingPool,
+              transparentPool,
+              actionButtonsDisabled: false,
+            });
+          } catch (e) {
+            this.setState({
+              readOnly,
+              orchardPool,
+              saplingPool,
+              transparentPool,
+              actionButtonsDisabled: false,
+            });
+            this.addLastSnackbar(walletKindStr);
+          }
+          // if the App is restoring another wallet backup...
+          // needs to recalculate the Address Book.
+          const newWallet =
+            !!this.props.route.params &&
+            this.props.route.params.newWallet !== undefined
+              ? this.props.route.params.newWallet
+              : false;
+          this.navigateToLoadedApp(
+            readOnly,
+            orchardPool,
+            saplingPool,
+            transparentPool,
+            newWallet,
+            this.state.firstLaunchingMessage,
+            // The wallet's own chain, surfaced by the native result (reliable
+            // even Offline). The server's chain is only a pre-rebuild fallback.
+            (resultJson.chain_name as ChainNameEnum) ||
+              this.state.server.chainName,
+          );
+        } else {
+          error = true;
+          errorText = resultJson.error;
+        }
+      } catch (e: unknown) {
+        error = true;
+        errorText = e instanceof Error ? e.message : String(e);
+      }
+    } else {
+      error = true;
+      errorText = result.ok ? result.value : result.error.message;
+    }
+    if (error) {
+      await this.walletLoadFailed(
+        Utils.humanizeChainTokens(errorText, this.state.translate),
+      );
+    }
+  };
+
+  // A repairable file is repaired and reloaded, and a broken main that no repair fixes opens the recovery dialog.
+  walletLoadFailed = async (errorText: string) => {
+    const title = this.state.translate(
+      'loadingapp.readingwallet-label',
+    ) as string;
+    const report = await walletFileDiagnosis();
+    this.setState({
+      actionButtonsDisabled: false,
+      serverErrorTries: 0,
+      screen: RouteEnum.StartMenu,
+    });
+    if (hasRepairableWalletFile(report.files)) {
+      this.addLastSnackbar(
+        this.state.translate('loadingapp.walletrepair-running') as string,
+      );
+      await this.repairWalletFiles(title, errorText);
+      return;
+    }
+    // plainLegacy opens through the legacy fallback, so only undecryptable, doubleWrapped, and unknown count as broken.
+    const main = report.files.find(f => f.name === WALLET_FILE_NAME);
+    const openableStates: ReadonlySet<WalletFileDiagnosis['state']> = new Set([
+      'plainWallet',
+      'plainLegacy',
+      'missing',
+    ]);
+    const mainBroken = !!main && !openableStates.has(main.state);
+    if (mainBroken) {
+      this.walletRecoveryAlert(title, errorText, report);
+      return;
+    }
+    // Wallet-open failures are local and deterministic (undecodable
+    // file, chain mismatch, bad settings): the native layer opens
+    // Indexerless when only the server dial fails, so no open failure
+    // is server-caused. walletErrorHandle would diagnose this local
+    // error by probing the server, racing against its current state,
+    // and pick the alert text from whatever it happens to answer.
+    const diagnosisLines = this.walletFileDiagnosisLines(report.files);
+    createAlert(
+      this.setBackgroundError,
+      this.addLastSnackbar,
+      title,
+      diagnosisLines ? `${errorText}\n\n${diagnosisLines}` : errorText,
+      false,
+      this.state.translate,
+      sendEmail,
+      this.state.zingolibVersion,
+    );
+  };
+
+  walletFileDiagnosisLines = (diagnosis: WalletFileDiagnosis[]): string =>
+    diagnosis
+      .filter(d => d.state !== 'missing')
+      .map(
+        d =>
+          `${d.name}: ${this.state.translate(
+            `loadingapp.walletfile-state-${d.state}`,
+          )}`,
+      )
+      .join('\n');
+
+  // Builds the untranslated support report copied and emailed from the dialog.
+  walletRecoveryReportText = (
+    errorText: string,
+    report: WalletFileDiagnosisReport,
+    outcomes?: Record<string, WalletFileRepairOutcome>,
+  ): string => {
+    const lines = [
+      `zingolib: ${this.state.zingolibVersion}`,
+      `platform: ${Platform.OS}`,
+      `error: ${errorText}`,
+    ];
+    for (const f of report.files) {
+      const mtime = f.mtime > 0 ? new Date(f.mtime).toISOString() : 'n/a';
+      lines.push(
+        `${f.name}: state=${f.state} size=${f.size} mtime=${mtime} ` +
+          `depth=${f.depth} repairable=${f.repairable}` +
+          (f.head ? ` head=${f.head}` : ''),
+      );
+      if (f.readError) {
+        lines.push(`  readError: ${f.readError}`);
+      }
+      for (const unwrapError of f.unwrapErrors) {
+        lines.push(`  unwrap: ${unwrapError}`);
+      }
+    }
+    if (outcomes) {
+      for (const [name, outcome] of Object.entries(outcomes)) {
+        lines.push(`repair ${name}: ${outcome}`);
+      }
+    }
+    return lines.join('\n');
+  };
+
+  walletRecoveryAlert = (
+    title: string,
+    errorText: string,
+    report: WalletFileDiagnosisReport,
+    outcomes?: Record<string, WalletFileRepairOutcome>,
+  ) => {
+    const reportText = this.walletRecoveryReportText(
+      errorText,
+      report,
+      outcomes,
+    );
+    const backup = report.files.find(f => f.name === WALLET_BACKUP_FILE_NAME);
+    const backupRestorable = !!backup && backup.state === 'plainWallet';
+    const message = this.state.translate(
+      outcomes
+        ? 'loadingapp.walletrepair-failed'
+        : 'loadingapp.walletrecovery-body',
+    ) as string;
+    showWalletRecovery({
+      title,
+      message,
+      diagnosisLines: this.walletFileDiagnosisLines(report.files),
+      translate: this.state.translate,
+      onCopy: () => {
+        Clipboard.setString(reportText);
+        this.addLastSnackbar(this.state.translate('txtcopied') as string);
+      },
+      onRestoreBackup: backupRestorable
+        ? () => this.confirmRestoreBackupFromRecovery()
+        : undefined,
+      onSupport: () =>
+        sendEmail(
+          this.state.translate,
+          this.state.zingolibVersion,
+          title,
+          reportText,
+        ),
+      onCancel: () => {},
+    });
+  };
+
+  confirmRestoreBackupFromRecovery = () => {
+    showConfirm({
+      title: this.state.translate('loadedapp.restorebackupwallet') as string,
+      message: `${this.state.translate(
+        'loadedapp.alert-restorebackupwallet-body',
+      )}\n\n${
+        this.state.translate('loadingapp.walletrecovery-verifyseed') as string
+      }`,
+      buttons: [
+        {
+          text: this.state.translate('confirm') as string,
+          onPress: () => this.restoreLastBackup(),
+        },
+        { text: this.state.translate('cancel') as string, style: 'cancel' },
+      ],
+    });
+  };
+
+  repairWalletFiles = async (title: string, errorText: string) => {
+    this.setState({ actionButtonsDisabled: true });
+    const outcomes = await repairDoubleWrappedWallet();
+    if (repairSucceeded(outcomes)) {
+      this.addLastSnackbar(
+        this.state.translate('loadingapp.walletrepair-success') as string,
+      );
+      await this.loadExistingWalletOnBoot();
+      return;
+    }
+    // Re-diagnose so the report carries the per-depth unwrap errors of the
+    // attempt that just failed.
+    const report = await walletFileDiagnosis();
+    this.setState({ actionButtonsDisabled: false });
+    this.walletRecoveryAlert(title, errorText, report, outcomes);
   };
 
   walletErrorHandle = async (
@@ -1846,6 +2033,36 @@ export class LoadingAppClass extends Component<
     });
   };
 
+  // The retry's non-declined answer, parked for the boot path to consume
+  // as data instead of running a second ceremony.
+  retryAnswer: GateAnswer | undefined;
+
+  consumeRetryAnswer = (): GateAnswer | undefined => {
+    const carried = this.retryAnswer;
+    this.retryAnswer = undefined;
+    return carried;
+  };
+
+  // The locked screen's retry runs its own ceremony unconditionally: the
+  // security toggles enable triggers, they never bypass a retry
+  // (ADR 0007). The answer rides into the boot path as data, so the
+  // startApp trigger consumes it instead of asking again and the
+  // fail-open notice shows once, from the boot path's own handling.
+  // Re-entrant taps are dropped for the whole flight, ceremony and boot,
+  // so a double tap cannot run two concurrent boots against one wallet.
+  retryGate = dropWhileInFlight(async () => {
+    const retry = await askGate({ translate: this.state.translate });
+    if (retry.kind === 'declined') {
+      this.setState({ biometricGate: retry });
+      return;
+    }
+    this.retryAnswer = retry;
+    await new Promise<void>(resolve => {
+      this.setState({ biometricGate: { kind: 'passed' } }, resolve);
+    });
+    await this.componentDidMount();
+  });
+
   addLastSnackbar = (message: string, duration?: SnackbarDurationEnum) => {
     Toast.show({
       type: 'appInfo',
@@ -1997,7 +2214,7 @@ export class LoadingAppClass extends Component<
       customServerOffline,
       customServerAuto,
       firstLaunchingMessage,
-      biometricsFailed,
+      biometricGate,
       translate,
       hasRecoveryWalletInfoSaved,
       readOnly,
@@ -2045,17 +2262,13 @@ export class LoadingAppClass extends Component<
             <BottomSheetModalProvider>
               <BottomSheetBackHandler />
               <ConfirmBottomSheet />
+              <WalletRecoveryHost />
               {screen === RouteEnum.Launching && (
                 <Launching
                   translate={translate}
                   firstLaunchingMessage={firstLaunchingMessage}
-                  biometricsFailed={biometricsFailed}
-                  message={biometricsFailed ? getLastGateFailure() : undefined}
-                  tryAgain={() => {
-                    this.setState({ biometricsFailed: false }, () =>
-                      this.componentDidMount(),
-                    );
-                  }}
+                  biometricGate={biometricGate}
+                  tryAgain={this.retryGate}
                 />
               )}
               {screen === RouteEnum.StartMenu && (

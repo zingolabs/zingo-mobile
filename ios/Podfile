@@ -43,6 +43,20 @@ target 'Zingo' do
       end
     end
 
+    # fmt 11 turns on consteval for clang >= 14, but Xcode 26's clang rejects
+    # its format-string checks as non-constant expressions. The macro block is
+    # unconditional, so a -D define cannot override it; patch the header to
+    # take fmt's own broken-compiler path. Idempotent, re-applied each install.
+    fmt_base = File.join(__dir__, 'Pods', 'fmt', 'include', 'fmt', 'base.h')
+    if File.exist?(fmt_base)
+      src = File.read(fmt_base)
+      patched = src.gsub('define FMT_USE_CONSTEVAL 1', 'define FMT_USE_CONSTEVAL 0')
+      if patched != src
+        File.chmod(0644, fmt_base)
+        File.write(fmt_base, patched)
+      end
+    end
+
     # https://github.com/facebook/react-native/blob/main/packages/react-native/scripts/react_native_pods.rb#L197-L202
     react_native_post_install(
       installer,

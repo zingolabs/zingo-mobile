@@ -274,9 +274,7 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
     return {
       walletName: getZingoName(),
       targetModeLabel: translate(`settings.value-mode-${target}`) as string,
-      targetModeColor: isBasic
-        ? advancedTokens.fgAccent
-        : basicTokens.fgAccent,
+      targetModeColor: isBasic ? advancedTokens.fgAccent : basicTokens.fgAccent,
       logoSource: getZingoLogo(),
       // Intentionally NOT closing the panel — staying open lets the user
       // see the action grid change as it re-filters by the new mode.

@@ -22,7 +22,7 @@ import RegText from '@ui/primitives/RegText';
 import FadeText from '@ui/primitives/FadeText';
 import BoldText from '@ui/primitives/BoldText';
 import Button from '@ui/primitives/Button';
-import SheetRim from '@ui/primitives/SheetRim';
+import AppSheet from '@ui/primitives/AppSheet';
 import { ContextAppLoading } from '../../context';
 import WalletType from '../../AppState/types/WalletType';
 import {
@@ -184,54 +184,46 @@ const NewSeed: React.FunctionComponent<NewSeedProps> = ({
   const seedTitle =
     translate('seed.title') + ' (' + translate('seed.new') + ')';
 
-  const renderNewSeedHandle = useCallback(
-    () => (
+  const newSeedHeader = (
+    <View
+      style={{
+        paddingTop: 12,
+        paddingBottom: 8,
+        paddingHorizontal: 16,
+      }}
+    >
       <View
         style={{
-          paddingTop: 12,
-          paddingBottom: 8,
-          paddingHorizontal: 16,
-          backgroundColor: colors.bgSurface,
-          borderTopLeftRadius: 40,
-          borderTopRightRadius: 40,
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
         }}
       >
-        <SheetRim />
-        <View
+        <TouchableOpacity
+          onPress={onClickOKHide}
+          hitSlop={8}
+          style={{ paddingHorizontal: 4, paddingVertical: 4 }}
+        >
+          <FontAwesomeIcon
+            icon={faChevronLeft}
+            size={20}
+            color={colors.fgAccent}
+          />
+        </TouchableOpacity>
+        <BoldText
+          numberOfLines={1}
           style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
+            flex: 1,
+            fontSize: 16,
+            lineHeight: 28,
+            textAlign: 'center',
           }}
         >
-          <TouchableOpacity
-            onPress={onClickOKHide}
-            hitSlop={8}
-            style={{ paddingHorizontal: 4, paddingVertical: 4 }}
-          >
-            <FontAwesomeIcon
-              icon={faChevronLeft}
-              size={20}
-              color={colors.fgAccent}
-            />
-          </TouchableOpacity>
-          <BoldText
-            numberOfLines={1}
-            style={{
-              flex: 1,
-              fontSize: 16,
-              lineHeight: 28,
-              textAlign: 'center',
-            }}
-          >
-            {seedTitle}
-          </BoldText>
-          <View style={{ width: 28 }} />
-        </View>
+          {seedTitle}
+        </BoldText>
+        <View style={{ width: 28 }} />
       </View>
-    ),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [colors, seedTitle],
+    </View>
   );
 
   const renderNewSeedFooter = useCallback(
@@ -293,23 +285,11 @@ const NewSeed: React.FunctionComponent<NewSeedProps> = ({
           privacy={privacy}
         />
       </View>
-      <BottomSheet
+      <AppSheet
         ref={newSeedSheetRef}
         snapPoints={newSeedSnapPoints}
-        index={0}
-        enableDynamicSizing={false}
-        enablePanDownToClose={false}
-        enableContentPanningGesture={false}
-        keyboardBehavior={'interactive'}
-        keyboardBlurBehavior={'restore'}
-        android_keyboardInputMode={'adjustResize'}
-        backgroundStyle={{
-          backgroundColor: colors.bgSurface,
-          borderTopLeftRadius: 40,
-          borderTopRightRadius: 40,
-        }}
-        handleComponent={renderNewSeedHandle}
-        footerComponent={renderNewSeedFooter}
+        header={newSeedHeader}
+        renderFooter={renderNewSeedFooter}
       >
         <BottomSheetScrollView
           keyboardShouldPersistTaps="handled"
@@ -317,7 +297,6 @@ const NewSeed: React.FunctionComponent<NewSeedProps> = ({
           alwaysBounceVertical={false}
           style={{
             flex: 1,
-            backgroundColor: colors.bgSurface,
           }}
           contentContainerStyle={{
             flexDirection: 'column',
@@ -408,7 +387,7 @@ const NewSeed: React.FunctionComponent<NewSeedProps> = ({
             </TouchableOpacity>
           </View>
         </BottomSheetScrollView>
-      </BottomSheet>
+      </AppSheet>
     </View>
   );
 };

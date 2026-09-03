@@ -29,6 +29,15 @@ fun regtestChainHint(): String {
 inline fun <reified T> ObjectMapper.readValue(src: String): T =
     readValue(src, object : TypeReference<T>() {})
 
+/** Returns the mixnet refusal [attempt] raises, and fails the test if it answers instead. */
+fun <T> refusedWithoutMixnet(what: String, attempt: () -> T): String? =
+    try {
+        val answered = attempt()
+        throw AssertionError("the $what answered without a mixnet: $answered")
+    } catch (e: uniffi.zingo.ZingolibException.Mixnet) {
+        e.message
+    }
+
 object Seeds {
     const val HOSPITAL = "hospital museum valve antique skate museum unfold vocal weird milk scale social vessel identify crowd hospital control album rib bulb path oven civil tank"
 }
@@ -104,8 +113,12 @@ data class SyncStatus (
     var total_sapling_outputs_scanned : Long = 0L,
     var session_orchard_outputs_scanned : Long = 0L,
     var total_orchard_outputs_scanned : Long = 0L,
+    var session_ironwood_outputs_scanned : Long = 0L,
+    var total_ironwood_outputs_scanned : Long = 0L,
     var percentage_session_outputs_scanned : Double = 0.0,
-    var percentage_total_outputs_scanned : Double = 0.0
+    var percentage_total_outputs_scanned : Double = 0.0,
+    var total_outputs_scanned : Long = 0L,
+    var total_outputs : Long = 0L
 )
 
 data class Balance (
@@ -427,9 +440,38 @@ class ExecuteSendFromOrchard {
         println("\nPropose:")
         println(proposeJson)
 
-        val confirmJson: String = uniffi.zingo.confirm()
-        println("\nConfirm Txid:")
-        println(confirmJson)
+        // The transmission rides the mixnet or does not happen (ADR 0011).
+        // This wallet never attached one, so the confirm must refuse. A txid
+        // here would mean the transaction reached an indexer over clearnet,
+        // which is the leak the mixnet-only rule exists to prevent.
+        val refusal: String? = try {
+            val txid = uniffi.zingo.confirm()
+            throw AssertionError("the transmission answered without a mixnet: $txid")
+        } catch (e: uniffi.zingo.ZingolibException.Mixnet) {
+            e.message
+        }
+        println("\nTransmission refused without a mixnet:")
+        println(refusal)
+        // The refusal names the unattached state, because waiting out a
+        // bootstrap and restarting a dead proxy are different remedies.
+        assertThat(refusal).contains("the Nym mixnet is not enabled")
+
+        // The refusal consumed the stored proposal. A confirm takes the
+        // proposal before it attempts the transmission, so a refusal discards
+        // it exactly as any other failure does. A retry therefore reports no
+        // stored proposal rather than repeating the refusal, and an app that
+        // wants the send after the user enables Mixnet Mode must propose it
+        // again. A repeated Mixnet refusal here would mean the proposal
+        // survived, and a txid would mean the retry transmitted one that the
+        // first call had already taken.
+        val retry: String? = try {
+            val txid = uniffi.zingo.confirm()
+            throw AssertionError("a consumed proposal confirmed on retry: $txid")
+        } catch (e: uniffi.zingo.ZingolibException.Send) {
+            e.message
+        }
+        println("\nRetry after the refusal:")
+        println(retry)
 
         // A second launch while the first sync still runs is idempotent:
         // the bridge answers with status on the data channel ("Sync task
@@ -462,13 +504,14 @@ class ExecuteSendFromOrchard {
         }
 
         balanceJson = uniffi.zingo.getBalance()
-        println("\nBalance post-send:")
+        println("\nBalance post-refusal:")
         println(balanceJson)
-        val balancePostSend: Balance = mapper.readValue(balanceJson)
-        assertThat(balancePostSend.total_orchard_balance).isEqualTo(885000)
-        // the transparent funds are unconfirmed...
-        assertThat(balancePostSend.confirmed_transparent_balance).isEqualTo(0)
-        assertThat(balancePostSend.unconfirmed_transparent_balance).isEqualTo(100000)
+        val balancePostRefusal: Balance = mapper.readValue(balanceJson)
+        // Nothing reached the chain, so the transparent recipient holds no
+        // confirmed funds. The unconfirmed side is deliberately unasserted:
+        // the proposal is still Calculated, and a Calculated transaction
+        // counts as pending whether or not it was ever transmitted.
+        assertThat(balancePostRefusal.confirmed_transparent_balance).isEqualTo(0)
     }
 }
 
@@ -498,16 +541,13 @@ class UpdateCurrentPriceAndValueTransfersFromSeed {
         val info: Info = mapper.readValue(infoJson)
         assertThat(info.latest_block_height).isGreaterThan(0)
 
-        // The price fetch dials api.gemini.com, which the CI emulator
-        // cannot reach, so the typed Read failure is as valid an outcome
-        // here as a price. Any other exception type still fails the test.
-        val price: String = try {
-            uniffi.zingo.zecPrice()
-        } catch (e: uniffi.zingo.ZingolibException.Read) {
-            "price unavailable: ${e.message}"
-        }
-        println("\nPrice:")
-        println(price)
+        // Price rides the mixnet or does not happen (ADR 0011). This wallet
+        // never attached one, so the fetch must refuse. A price here would
+        // mean the wallet reached an oracle over clearnet, which is the
+        // leak the mixnet-only rule exists to prevent.
+        val refusal: String? = refusedWithoutMixnet("price fetch") { uniffi.zingo.zecPrice() }
+        println("\nPrice refused without a mixnet:")
+        println(refusal)
 
         val syncJson: String = uniffi.zingo.runSync()
         println("\nSync:")
@@ -544,12 +584,12 @@ class UpdateCurrentPriceAndValueTransfersFromSeed {
         // the value transfers have 3 items for 3 different txs
         // 1. Received - 1_000_000 - orchard (1 item)
         // 2. Sent - 110_000 - uregtest1az7w9w3t... (1 item)
-        // 3. memoToSelf - 10_000 (1 item)
+        // 3. memoToSelf - 870_000 (1 item)
         assertThat(valueTranfers.value_transfers.size).isEqualTo(3)
         // third item have to be a `fee` from the last `Sent` with the same txid
         assertThat(valueTranfers.value_transfers[0].kind).isEqualTo("memo-to-self")
         assertThat(valueTranfers.value_transfers[0].status).isEqualTo("confirmed")
-        assertThat(valueTranfers.value_transfers[0].value).isEqualTo(0)
+        assertThat(valueTranfers.value_transfers[0].value).isEqualTo(870000)
         assertThat(valueTranfers.value_transfers[0].transaction_fee).isEqualTo(20000)
         // second item have to be a `Sent`
         assertThat(valueTranfers.value_transfers[1].kind).isEqualTo("sent")

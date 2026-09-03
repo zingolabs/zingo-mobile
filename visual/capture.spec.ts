@@ -1,5 +1,5 @@
-import { test } from '@playwright/test';
-import { readFileSync, mkdirSync } from 'node:fs';
+import { test, type Page } from '@playwright/test';
+import { readFileSync, mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 type Entry = {
@@ -26,11 +26,36 @@ const imagesDir = join(out, 'images');
 mkdirSync(imagesDir, { recursive: true });
 const shot = (id: string, state: string) => join(imagesDir, `${id}__${state}.png`);
 
+// Fake-clock milliseconds stepped before a screenshot: long enough for a
+// sheet to finish presenting, and the fixed tick every loop is caught on.
+const FRAME = 1200;
+// Fake-clock milliseconds for hover/press feedback to settle.
+const FEEDBACK = 200;
+const STATIC_SETTLES = [400, 1500, 3500, 6000];
+// CSS animations and transitions run on real time, not the fake clock, so
+// the screenshot freezes them (finite ones jump to their end state) and
+// hides the text caret, whose blink is real time too.
+const still = { animations: 'disabled', caret: 'hide' } as const;
+
+async function shootStatic(
+  p: Page,
+  settle: number,
+): Promise<Buffer | undefined> {
+  const blank = await p.screenshot(still);
+  await p.waitForTimeout(settle);
+  await p.clock.runFor(FRAME);
+  const frame = await p.screenshot(still);
+  return frame.equals(blank) ? undefined : frame;
+}
+
 for (const entry of entries) {
   test(`${entry.title} — ${entry.name}`, async ({ page }) => {
-    // Fake clock so any RN Animated loop lands on a fixed frame — animated
-    // stories screenshot deterministically instead of catching a random tick.
+    // Fake clock, paused from before the page loads, so any RN Animated loop
+    // lands on a fixed frame — animated stories screenshot deterministically
+    // instead of catching a random tick. Pausing first also keeps a slow
+    // runner's load time from running the clock past the frame.
     await page.clock.install({ time: 0 });
+    await page.clock.pauseAt(0);
     await page.goto(`/iframe.html?id=${entry.id}&viewMode=story`);
     const root = page.locator('#storybook-root');
     await root.waitFor({ state: 'visible' });
@@ -38,27 +63,51 @@ for (const entry of entries) {
     // filmstrip); nothing here to pixel-diff for them.
     if (entry.tags?.includes('animated')) return;
 
-    await page.clock.pauseAt(600); // fixed frame for any incidental motion
-    await page.waitForTimeout(250); // real settle for fonts/svg paint
-    await page.screenshot({ path: shot(entry.id, 'default') });
+    // Fonts and layout observers run on real time, outside the fake clock.
+    // Let them land first, so every animation they trigger (a sheet
+    // presenting after its measurement) plays inside the stepped window
+    // below instead of racing the screenshot.
+    await page.evaluate('document.fonts.ready');
 
-    // The `static` tag skips the interaction pass for modal-sheet stories, whose backdrop swallows pointer events.
-    if (entry.tags?.includes('static')) return;
+    if (entry.tags?.includes('static')) {
+      let frame = await shootStatic(page, STATIC_SETTLES[0]);
+      for (let i = 1; i < STATIC_SETTLES.length && !frame; i += 1) {
+        const fresh = await page.context().newPage();
+        await fresh.clock.install({ time: 0 });
+        await fresh.clock.pauseAt(0);
+        await fresh.goto(`/iframe.html?id=${entry.id}&viewMode=story`);
+        await fresh.locator('#storybook-root').waitFor({ state: 'visible' });
+        await fresh.evaluate('document.fonts.ready');
+        frame = await shootStatic(fresh, STATIC_SETTLES[i]);
+        await fresh.close();
+      }
+      if (!frame) {
+        throw new Error(`static story never presented: ${entry.id}`);
+      }
+      writeFileSync(shot(entry.id, 'default'), frame);
+      return;
+    }
+
+    await page.waitForTimeout(250);
+    await page.clock.runFor(FRAME); // one fixed frame for any incidental motion
+    await page.screenshot({ path: shot(entry.id, 'default'), ...still });
 
     // Interaction states, only where the story renders something pressable.
+    // The clock stays paused, so the feedback (RN Animated opacity) is
+    // stepped the same way, not waited for on real time.
     const pressable = root.getByRole('button').first();
     if ((await pressable.count()) === 0) return;
 
     await pressable.hover();
-    await page.waitForTimeout(120);
-    await page.screenshot({ path: shot(entry.id, 'hover') });
+    await page.clock.runFor(FEEDBACK);
+    await page.screenshot({ path: shot(entry.id, 'hover'), ...still });
 
     const box = await pressable.boundingBox();
     if (!box) return;
     await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
     await page.mouse.down();
-    await page.waitForTimeout(120); // active opacity settles
-    await page.screenshot({ path: shot(entry.id, 'press') });
+    await page.clock.runFor(FEEDBACK); // active opacity settles
+    await page.screenshot({ path: shot(entry.id, 'press'), ...still });
     await page.mouse.up();
   });
 }

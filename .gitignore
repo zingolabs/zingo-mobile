@@ -30,16 +30,22 @@ ios/vendor/
 
 # Exclude compiled libs
 android/app/src/main/jniLibs
+# Generated UniFFI Kotlin bindings (scripts/generate_kotlin_bindings.mjs)
+android/app/src/main/java/uniffi/
+rust/lib/src/uniffi/
 android/app/release/
 android/app/beta/release/
 *.aab
 *.apk
 ios/Zingolib.xcframework/
+ios/ZingoNymProxyFFI.xcframework/
 ios/NymHost.xcframework/
 ios/zingo.swift
+ios/zingo_nym_proxy_ffi.swift
 rust/lib/Generated/zingo.swift
 rust/lib/Generated/zingoFFI.h
 rust/nym-host/Generated/
+rust/nym-proxy-ffi/Generated/
 rust/lib/Generated/zingoFFI.modulemap
 
 # Android/IntelliJ
@@ -107,6 +113,9 @@ buck-out/
 # Claude Code
 .claude/
 
+# Per-agent instruction scratch; the tracked instructions live in AGENTS.md
+.agents/
+
 # Wayfinder Agent Skill
 .wayfinder
 
@@ -116,9 +125,8 @@ coverage/
 # Storybook web static build
 storybook-static/
 
-# Visual regression (review artifacts. baselines are committed)
+# Visual regression (review artifacts. visual/__baseline__ is committed)
 visual/__current__/
-visual/__baseline__/
 visual/__diff__/
 visual/__video__/
 visual/report.html
@@ -128,3 +136,6 @@ visual/styled.html
 visual/ci/
 test-results/
 playwright-report/
+
+# Local env
+.env

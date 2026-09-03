@@ -8,7 +8,6 @@ import React, {
   useState,
 } from 'react';
 import {
-  Keyboard,
   View,
   ActivityIndicator,
   Text,
@@ -31,7 +30,7 @@ import SingleAddress from '@ui/widgets/SingleAddress';
 import RegText from '@ui/primitives/RegText';
 import FadeText from '@ui/primitives/FadeText';
 import BoldText from '@ui/primitives/BoldText';
-import SheetRim from '@ui/primitives/SheetRim';
+import AppSheet from '@ui/primitives/AppSheet';
 import {
   ButtonTypeEnum,
   ChainNameEnum,
@@ -42,14 +41,12 @@ import {
   UfvkActionEnum,
 } from '@app/AppState';
 import BottomSheet, {
-  BottomSheetBackdrop,
-  BottomSheetBackdropProps,
   BottomSheetFooter,
   BottomSheetFooterProps,
   BottomSheetModal,
   BottomSheetScrollView,
-  BottomSheetView,
 } from '@gorhom/bottom-sheet';
+import AppSheetModal from '@ui/primitives/AppSheetModal';
 import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
 import { useDismissSheetsOnBlur } from '@app/hooks/useDismissSheetsOnBlur';
 import ExpandedAddress from '@ui/widgets/ExpandedAddress';
@@ -117,7 +114,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
     (initialAction === UfvkActionEnum.backup &&
       (!!security?.seedUfvkScreen || !!security?.restoreWalletBackupScreen)) ||
     (initialAction === UfvkActionEnum.server && !!security?.seedUfvkScreen);
-  const authPassed = useBiometricGate({
+  const screenGate = useBiometricGate({
     needsAuth,
     translate,
     addLastSnackbar,
@@ -125,6 +122,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
     foregroundAppEnabled: !!security?.foregroundApp,
     foregroundEpoch,
   });
+  const authPassed = screenGate.kind === 'passed';
 
   const [times, setTimes] = useState<number>(0);
   const [texts, setTexts] = useState<TextsType>({} as TextsType);
@@ -283,15 +281,6 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
     }
   };
 
-  const renderBackdrop = (props: BottomSheetBackdropProps) => (
-    <BottomSheetBackdrop
-      {...props}
-      disappearsOnIndex={-1}
-      appearsOnIndex={0}
-      pressBehavior="close"
-    />
-  );
-
   const doCopy = () => {
     // Capture into a local so the `string | undefined` narrowing from the
     // guard below survives into the showConfirm callback closure.
@@ -346,54 +335,46 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
     [action, translate],
   );
 
-  const renderUfvkHandle = useCallback(
-    () => (
+  const ufvkHeader = (
+    <View
+      style={{
+        paddingTop: 12,
+        paddingBottom: 8,
+        paddingHorizontal: 16,
+      }}
+    >
       <View
         style={{
-          paddingTop: 12,
-          paddingBottom: 8,
-          paddingHorizontal: 16,
-          backgroundColor: colors.bgSurface,
-          borderTopLeftRadius: 40,
-          borderTopRightRadius: 40,
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
         }}
       >
-        <SheetRim />
-        <View
+        <TouchableOpacity
+          onPress={onClickCancelHide}
+          hitSlop={8}
+          style={{ paddingHorizontal: 4, paddingVertical: 4 }}
+        >
+          <FontAwesomeIcon
+            icon={faChevronLeft}
+            size={20}
+            color={colors.fgAccent}
+          />
+        </TouchableOpacity>
+        <BoldText
+          numberOfLines={1}
           style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
+            flex: 1,
+            fontSize: 16,
+            lineHeight: 28,
+            textAlign: 'center',
           }}
         >
-          <TouchableOpacity
-            onPress={onClickCancelHide}
-            hitSlop={8}
-            style={{ paddingHorizontal: 4, paddingVertical: 4 }}
-          >
-            <FontAwesomeIcon
-              icon={faChevronLeft}
-              size={20}
-              color={colors.fgAccent}
-            />
-          </TouchableOpacity>
-          <BoldText
-            numberOfLines={1}
-            style={{
-              flex: 1,
-              fontSize: 16,
-              lineHeight: 28,
-              textAlign: 'center',
-            }}
-          >
-            {ufvkTitle}
-          </BoldText>
-          <View style={{ width: 28 }} />
-        </View>
+          {ufvkTitle}
+        </BoldText>
+        <View style={{ width: 28 }} />
       </View>
-    ),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [colors, ufvkTitle],
+    </View>
   );
 
   const renderUfvkFooter = useCallback(
@@ -470,32 +451,12 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
             addLastSnackbar={addLastSnackbar}
           />
         </View>
-        <BottomSheet
+        <AppSheet
           ref={ufvkSheetRef}
           snapPoints={ufvkSnapPoints}
-          index={0}
-          enableDynamicSizing={false}
-          enablePanDownToClose={false}
-          enableContentPanningGesture={false}
-          keyboardBehavior={'interactive'}
-          keyboardBlurBehavior={'restore'}
-          android_keyboardInputMode={'adjustResize'}
-          backgroundStyle={{
-            backgroundColor: colors.bgSurface,
-            borderTopLeftRadius: 40,
-            borderTopRightRadius: 40,
-          }}
-          // Rendering the handle as sheet CONTENT (via `handleComponent={null}`
-          // plus an inline call to `renderUfvkHandle` below) is what lets its
-          // `borderTopRadius: 40` actually clip against the sheet's
-          // `backgroundStyle`. When passed via `handleComponent`, gorhom wraps
-          // the handle in an internal container that does not honour the
-          // inner View's border-radius, so the corners render square. Same
-          // pattern as `components/Receive/Receive.tsx`.
-          handleComponent={null}
-          footerComponent={loadingUfvk ? undefined : renderUfvkFooter}
+          header={ufvkHeader}
+          renderFooter={loadingUfvk ? undefined : renderUfvkFooter}
         >
-          {renderUfvkHandle()}
           {loadingUfvk ? (
             <View
               style={{
@@ -609,49 +570,19 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
               </BottomSheetScrollView>
             </>
           )}
-        </BottomSheet>
+        </AppSheet>
       </View>
-      <BottomSheetModal
-        ref={bottomSheetRef}
-        enableDynamicSizing={true}
-        enablePanDownToClose
-        stackBehavior="push"
-        keyboardBehavior={'interactive'}
-        keyboardBlurBehavior={'restore'}
-        android_keyboardInputMode={'adjustResize'}
-        onAnimate={(from, to) => {
-          // Opening (from === -1) dismisses a keyboard left open by the
-          // underlying screen so the sheet never renders behind it. Guard
-          // avoids fighting a keyboard the sheet itself focuses later.
-          if (from === -1 && to >= 0) {
-            Keyboard.dismiss();
-          }
-        }}
-        handleStyle={{ display: 'none' }}
-        backgroundStyle={{
-          backgroundColor: colors.bgSurface,
-          borderTopLeftRadius: 40,
-          borderTopRightRadius: 40,
-        }}
-        backdropComponent={renderBackdrop}
-      >
-        <BottomSheetView
-          style={{
-            backgroundColor: colors.bgSurface,
-            paddingBottom: 30,
-          }}
-        >
-          {sheetType === 'EA' && (
-            <ExpandedAddress
-              onCopy={doCopy}
-              closeSheet={hide}
-              title={translate('receive.title-address') as string}
-              button={translate('receive.copy-address-button') as string}
-              address={fetchedWallet.ufvk ? fetchedWallet.ufvk : ''}
-            />
-          )}
-        </BottomSheetView>
-      </BottomSheetModal>
+      <AppSheetModal ref={bottomSheetRef} contentStyle={{ paddingBottom: 30 }}>
+        {sheetType === 'EA' && (
+          <ExpandedAddress
+            onCopy={doCopy}
+            closeSheet={hide}
+            title={translate('receive.title-address') as string}
+            button={translate('receive.copy-address-button') as string}
+            address={fetchedWallet.ufvk ? fetchedWallet.ufvk : ''}
+          />
+        )}
+      </AppSheetModal>
     </View>
   );
 };

@@ -86,8 +86,12 @@ struct SyncStatus: Codable {
     let total_sapling_outputs_scanned: UInt64?
     let session_orchard_outputs_scanned: UInt64?
     let total_orchard_outputs_scanned: UInt64?
+    let session_ironwood_outputs_scanned: UInt64?
+    let total_ironwood_outputs_scanned: UInt64?
     let percentage_session_outputs_scanned: Double?
     let percentage_total_outputs_scanned: Double?
+    let total_outputs_scanned: UInt64?
+    let total_outputs: UInt64?
 }
 
 struct Balance: Codable {
@@ -490,11 +494,24 @@ final class ExecuteSendFromOrchard: XCTestCase {
           return
         }
         
+        // The transmission rides the mixnet or does not happen (ADR 0011).
+        // This wallet never attached one, so the confirm must refuse. A txid
+        // here would mean the transaction reached an indexer over clearnet,
+        // which is the leak the mixnet-only rule exists to prevent.
         do {
           let confirmJson = try confirm()
-          print("\nConfirm Txid:\n\(confirmJson)")
+          XCTFail("\nThe transmission answered without a mixnet:\n\(confirmJson)")
+          return
+        } catch ZingolibError.Mixnet(let message) {
+          print("\nTransmission refused without a mixnet:\n\(message)")
+          // The refusal names the unattached state, because waiting out a
+          // bootstrap and restarting a dead proxy are different remedies.
+          XCTAssertTrue(
+            message.contains("the Nym mixnet is not enabled"),
+            "The refusal must name the unattached state:\n\(message)"
+          )
         } catch {
-          XCTFail("\nConfirm error:\n\(error.localizedDescription)")
+          XCTFail("\nThe transmission failed without refusing:\n\(error.localizedDescription)")
           return
         }
         
@@ -509,13 +526,16 @@ final class ExecuteSendFromOrchard: XCTestCase {
 
         do {
             let balJson = try getBalance()
-            print("\nBalance post-send:\n\(balJson)")
+            print("\nBalance post-refusal:\n\(balJson)")
             let bal: Balance = try decodeJSON(balJson)
-            XCTAssertEqual(bal.total_orchard_balance, 885_000)
+            // Nothing reached the chain, so the transparent recipient holds
+            // no confirmed funds. The unconfirmed side is deliberately
+            // unasserted: the proposal is still Calculated, and a Calculated
+            // transaction counts as pending whether or not it was ever
+            // transmitted.
             XCTAssertEqual(bal.confirmed_transparent_balance, 0)
-            XCTAssertEqual(bal.unconfirmed_transparent_balance, 100_000)
         } catch {
-          XCTFail("\nBalance post-send error:\n\(error.localizedDescription)")
+          XCTFail("\nBalance post-refusal error:\n\(error.localizedDescription)")
           return
         }
     }
@@ -552,12 +572,16 @@ final class UpdateCurrentPriceAndValueTransfersFromSeed: XCTestCase {
           return
         }
 
+        // Price rides the mixnet or does not happen (ADR 0011). This wallet
+        // never attached one, so the fetch must refuse. A price here would
+        // mean the wallet reached an oracle over clearnet, which is the
+        // leak the mixnet-only rule exists to prevent.
         do {
           let price = try zecPrice()
-          print("\nPrice:\n\(price)")
-        } catch {
-          XCTFail("\nInit from seed error:\n\(error.localizedDescription)")
+          XCTFail("\nThe price fetch answered without a mixnet:\n\(price)")
           return
+        } catch {
+          print("\nPrice refused without a mixnet:\n\(error.localizedDescription)")
         }
         
         do {
@@ -580,7 +604,7 @@ final class UpdateCurrentPriceAndValueTransfersFromSeed: XCTestCase {
             // Orden y valores como en Kotlin
             XCTAssertEqual(vts.value_transfers[0].kind, "memo-to-self")
             XCTAssertEqual(vts.value_transfers[0].status, "confirmed")
-            XCTAssertEqual(vts.value_transfers[0].value, 0)
+            XCTAssertEqual(vts.value_transfers[0].value, 870_000)
             XCTAssertEqual(vts.value_transfers[0].transaction_fee, 20_000)
 
             XCTAssertEqual(vts.value_transfers[1].kind, "sent")

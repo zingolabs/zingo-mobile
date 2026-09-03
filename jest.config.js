@@ -5,6 +5,8 @@ module.exports = {
   testEnvironment: '<rootDir>/jest-environment-react-native.js',
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   modulePathIgnorePatterns: ['e2e'],
+  // visual/ holds Playwright specs, run by `yarn visual:capture`.
+  testPathIgnorePatterns: ['/node_modules/', '<rootDir>/visual/'],
   transform: {
     '\\.[jt]sx?$': 'babel-jest',
     '^.+\\.(bmp|gif|jpg|jpeg|mp4|png|psd|webp)$':

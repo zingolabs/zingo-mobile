@@ -31,7 +31,7 @@ import { AppDrawerParamList } from '@app/types';
 import FadeText from '@ui/primitives/FadeText';
 import BoldText from '@ui/primitives/BoldText';
 import Button from '@ui/primitives/Button';
-import SheetRim from '@ui/primitives/SheetRim';
+import AppSheet from '@ui/primitives/AppSheet';
 import AlSummaryLine from './components/AlSummaryLine';
 import { ContextAppLoaded } from '@app/context';
 import Header from '@ui/widgets/Header';
@@ -102,53 +102,46 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
     [addressKind, translate],
   );
 
-  const renderAddressListHandle = useCallback(
-    () => (
+  const addressListHeader = (
+    <View
+      style={{
+        paddingTop: 12,
+        paddingBottom: 8,
+        paddingHorizontal: 16,
+      }}
+    >
       <View
         style={{
-          paddingTop: 12,
-          paddingBottom: 8,
-          paddingHorizontal: 16,
-          backgroundColor: colors.bgSurface,
-          borderTopLeftRadius: 40,
-          borderTopRightRadius: 40,
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
         }}
       >
-        <SheetRim />
-        <View
+        <TouchableOpacity
+          onPress={closeScreen}
+          hitSlop={8}
+          style={{ paddingHorizontal: 4, paddingVertical: 4 }}
+        >
+          <FontAwesomeIcon
+            icon={faChevronLeft}
+            size={20}
+            color={colors.fgAccent}
+          />
+        </TouchableOpacity>
+        <BoldText
+          numberOfLines={1}
           style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
+            flex: 1,
+            fontSize: 16,
+            lineHeight: 28,
+            textAlign: 'center',
           }}
         >
-          <TouchableOpacity
-            onPress={closeScreen}
-            hitSlop={8}
-            style={{ paddingHorizontal: 4, paddingVertical: 4 }}
-          >
-            <FontAwesomeIcon
-              icon={faChevronLeft}
-              size={20}
-              color={colors.fgAccent}
-            />
-          </TouchableOpacity>
-          <BoldText
-            numberOfLines={1}
-            style={{
-              flex: 1,
-              fontSize: 16,
-              lineHeight: 28,
-              textAlign: 'center',
-            }}
-          >
-            {handleTitle}
-          </BoldText>
-          <View style={{ width: 28 }} />
-        </View>
+          {handleTitle}
+        </BoldText>
+        <View style={{ width: 28 }} />
       </View>
-    ),
-    [colors, closeScreen, handleTitle],
+    </View>
   );
 
   useEffect(() => {
@@ -257,22 +250,10 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
           noUfvkIcon={true}
         />
       </View>
-      <BottomSheet
+      <AppSheet
         ref={addressListSheetRef}
         snapPoints={addressListSnapPoints}
-        index={0}
-        enableDynamicSizing={false}
-        enablePanDownToClose={false}
-        enableContentPanningGesture={false}
-        keyboardBehavior={'interactive'}
-        keyboardBlurBehavior={'restore'}
-        android_keyboardInputMode={'adjustResize'}
-        backgroundStyle={{
-          backgroundColor: colors.bgSurface,
-          borderTopLeftRadius: 40,
-          borderTopRightRadius: 40,
-        }}
-        handleComponent={renderAddressListHandle}
+        header={addressListHeader}
       >
         <ScrollView
           ref={scrollViewRef}
@@ -284,7 +265,6 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
           alwaysBounceVertical={false}
           style={{
             flex: 1,
-            backgroundColor: colors.bgSurface,
           }}
           contentContainerStyle={{
             flexDirection: 'column',
@@ -372,7 +352,7 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
             </>
           )}
         </ScrollView>
-      </BottomSheet>
+      </AppSheet>
       {!isAtTop && (
         <Pressable
           onPress={handleScrollToTop}

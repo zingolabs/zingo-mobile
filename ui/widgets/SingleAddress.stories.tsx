@@ -1,6 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
 import SingleAddress from './SingleAddress';
-import { withAppContext, withNavigation } from '../../.storybook/storyDecorators';
+import {
+  withAppContext,
+  withNavigation,
+} from '../../.storybook/storyDecorators';
 import { sampleTransparent, sampleUnified } from '../../.storybook/storyMocks';
 
 const meta: Meta<typeof SingleAddress> = {

@@ -1,7 +1,7 @@
-import { RPCMixnetModeEnum } from '@app/walletBackend/enums/RPCMixnetModeEnum';
+import { RPCMixnetIndicatorEnum } from '@app/walletBackend/enums/RPCMixnetIndicatorEnum';
 import {
   describeRejection,
-  parseMixnetMode,
+  parseMixnetIndicator,
   transformMixnetDetail,
   transformMixnetStatus,
 } from '@app/walletBackend/transforms/mixnetTransform';
@@ -28,61 +28,61 @@ describe('describeRejection', () => {
   });
 });
 
-describe('parseMixnetMode', () => {
+describe('parseMixnetIndicator', () => {
   it('accepts each of the four modes exactly', () => {
-    expect(parseMixnetMode('off')).toBe(RPCMixnetModeEnum.off);
-    expect(parseMixnetMode('bootstrapping')).toBe(
-      RPCMixnetModeEnum.bootstrapping,
+    expect(parseMixnetIndicator('off')).toBe(RPCMixnetIndicatorEnum.off);
+    expect(parseMixnetIndicator('bootstrapping')).toBe(
+      RPCMixnetIndicatorEnum.bootstrapping,
     );
-    expect(parseMixnetMode('ready')).toBe(RPCMixnetModeEnum.ready);
-    expect(parseMixnetMode('died')).toBe(RPCMixnetModeEnum.died);
+    expect(parseMixnetIndicator('ready')).toBe(RPCMixnetIndicatorEnum.ready);
+    expect(parseMixnetIndicator('died')).toBe(RPCMixnetIndicatorEnum.died);
   });
 
-  it('rejects anything that is not exactly a mode string', () => {
-    expect(parseMixnetMode('READY')).toBeNull();
-    expect(parseMixnetMode('offline')).toBeNull();
-    expect(parseMixnetMode('')).toBeNull();
-    expect(parseMixnetMode(undefined)).toBeNull();
-    expect(parseMixnetMode(3)).toBeNull();
-    expect(parseMixnetMode({ mode: 'ready' })).toBeNull();
+  it('rejects anything that is not exactly an indicator string', () => {
+    expect(parseMixnetIndicator('READY')).toBeNull();
+    expect(parseMixnetIndicator('offline')).toBeNull();
+    expect(parseMixnetIndicator('')).toBeNull();
+    expect(parseMixnetIndicator(undefined)).toBeNull();
+    expect(parseMixnetIndicator(3)).toBeNull();
+    expect(parseMixnetIndicator({ mode: 'ready' })).toBeNull();
   });
 });
 
 describe('transformMixnetStatus', () => {
   it('reports ready with the SOCKS5 address', () => {
     const dataReply = JSON.stringify({
-      mixnet_mode: 'ready',
+      mixnet_indicator: 'ready',
       socks5_addr: '127.0.0.1:43210',
     });
     expect(transformMixnetStatus(dataReply)).toEqual({
       kind: 'status',
-      mode: RPCMixnetModeEnum.ready,
+      indicator: RPCMixnetIndicatorEnum.ready,
       socks5Addr: '127.0.0.1:43210',
     });
   });
 
-  it('reports every non-ready mode with a null address', () => {
-    const nonReadyModes: readonly RPCMixnetModeEnum[] = [
-      RPCMixnetModeEnum.off,
-      RPCMixnetModeEnum.bootstrapping,
-      RPCMixnetModeEnum.died,
+  it('reports every non-ready indicator with a null address', () => {
+    const nonReadyIndicators: readonly RPCMixnetIndicatorEnum[] = [
+      RPCMixnetIndicatorEnum.off,
+      RPCMixnetIndicatorEnum.bootstrapping,
+      RPCMixnetIndicatorEnum.died,
     ];
-    for (const mode of nonReadyModes) {
+    for (const indicator of nonReadyIndicators) {
       expect(
-        transformMixnetStatus(JSON.stringify({ mixnet_mode: mode })),
-      ).toEqual({ kind: 'status', mode, socks5Addr: null });
+        transformMixnetStatus(JSON.stringify({ mixnet_indicator: indicator })),
+      ).toEqual({ kind: 'status', indicator, socks5Addr: null });
     }
   });
 
   it('never surfaces a stale address outside of ready', () => {
     // A died payload must not carry a dialable address even if one leaks in.
     const dataReply = JSON.stringify({
-      mixnet_mode: 'died',
+      mixnet_indicator: 'died',
       socks5_addr: '127.0.0.1:1',
     });
     expect(transformMixnetStatus(dataReply)).toEqual({
       kind: 'status',
-      mode: RPCMixnetModeEnum.died,
+      indicator: RPCMixnetIndicatorEnum.died,
       socks5Addr: null,
     });
   });
@@ -103,11 +103,11 @@ describe('transformMixnetStatus', () => {
     expect(transformMixnetStatus('').kind).toBe('failure');
   });
 
-  it('lands an unrecognized mode in the failure arm', () => {
-    const dataReply = JSON.stringify({ mixnet_mode: 'hibernating' });
+  it('lands an unrecognized indicator in the failure arm', () => {
+    const dataReply = JSON.stringify({ mixnet_indicator: 'hibernating' });
     expect(transformMixnetStatus(dataReply)).toEqual({
       kind: 'failure',
-      failure: { reason: 'unrecognizedMode', claimed: 'hibernating' },
+      failure: { reason: 'unrecognizedIndicator', claimed: 'hibernating' },
     });
   });
 });

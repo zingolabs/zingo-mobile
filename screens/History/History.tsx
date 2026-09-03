@@ -8,7 +8,6 @@ import React, {
   useRef,
 } from 'react';
 import {
-  Keyboard,
   View,
   RefreshControl,
   ActivityIndicator,
@@ -44,7 +43,8 @@ import {
 import { AppDrawerParamList } from '@app/types';
 import FadeText from '@ui/primitives/FadeText';
 import BoldText from '@ui/primitives/BoldText';
-import SheetRim from '@ui/primitives/SheetRim';
+import AppSheet from '@ui/primitives/AppSheet';
+import AppSheetModal from '@ui/primitives/AppSheetModal';
 import RingBorder from '@ui/primitives/RingBorder';
 import ValueTransferLine from './components/ValueTransferLine';
 import IronwoodMigrationBanner from './components/IronwoodMigrationBanner';
@@ -66,12 +66,7 @@ import { RecyclerListViewState } from 'recyclerlistview/dist/reactnative/core/Re
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Swipeable } from 'react-native-gesture-handler';
 import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
-import BottomSheet, {
-  BottomSheetBackdrop,
-  BottomSheetBackdropProps,
-  BottomSheetModal,
-  BottomSheetView,
-} from '@gorhom/bottom-sheet';
+import BottomSheet, { BottomSheetModal } from '@gorhom/bottom-sheet';
 import Filters from './components/Filters';
 import { FiltersIcon } from '@ui/primitives/Icons/FiltersIcon';
 
@@ -407,13 +402,6 @@ const History: React.FunctionComponent<HistoryProps> = ({
     historySnapPoints.length,
   );
 
-  // Tapping the price fetch button reveals the header PriceRow (smallest snap).
-  // The auto-close timer armed by usePriceSnapAutoClose returns it afterwards.
-  const revealPrice = useCallback(() => {
-    if (priceSnapIndex === null) return;
-    safeSnapToIndex(historySheetRef, priceSnapIndex, historySnapPoints.length);
-  }, [priceSnapIndex, historySnapPoints.length]);
-
   useEffect(() => {
     let target = historySnapIds.indexOf(currentSnapIdRef.current);
     if (target < 0) {
@@ -650,40 +638,22 @@ const History: React.FunctionComponent<HistoryProps> = ({
     );
   };
 
-  const renderBackdrop = (props: BottomSheetBackdropProps) => (
-    <BottomSheetBackdrop
-      {...props}
-      disappearsOnIndex={-1}
-      appearsOnIndex={0}
-      pressBehavior="close"
-    />
-  );
-
-  const renderHistoryHandle = useCallback(
-    () => (
+  const historyHeader = (
+    <View
+      onLayout={e => setHandleH(e.nativeEvent.layout.height)}
+      style={{
+        paddingTop: 8,
+        paddingBottom: 6,
+        paddingHorizontal: 16,
+      }}
+    >
       <View
-        onLayout={e => setHandleH(e.nativeEvent.layout.height)}
         style={{
-          paddingTop: 8,
-          paddingBottom: 6,
-          paddingHorizontal: 16,
-          backgroundColor: colors.bgSurface,
-          borderTopLeftRadius: 40,
-          borderTopRightRadius: 40,
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
         }}
       >
-        <SheetRim />
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}
-        >
-          {/* Left spacer matches the filter Pressable width
-              (paddingHorizontal: 14 × 2 + icon 20 = 48) so the title
-              stays perfectly centered. flex/textAlign/numberOfLines on
-              the BoldText keep a long translation from being clipped. */}
           <View style={{ width: 48 }} />
           <BoldText
             numberOfLines={1}
@@ -726,61 +696,44 @@ const History: React.FunctionComponent<HistoryProps> = ({
               />
             )}
           </Pressable>
-        </View>
       </View>
-    ),
-    [colors, translate, filterKind, filterFailed, filterMemos, filterWithFunds],
+    </View>
   );
 
-  const renderFiltersHandle = useCallback(
-    () => (
-      <View
+  const filtersXHeader = (
+    <View
+      style={{
+        paddingTop: 8,
+        paddingBottom: 6,
+        paddingHorizontal: 16,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+      }}
+    >
+      <View style={{ width: 48 }} />
+      <BoldText
+        numberOfLines={1}
         style={{
-          paddingTop: 8,
-          paddingBottom: 6,
-          paddingHorizontal: 16,
-          backgroundColor: colors.bgSurface,
-          borderTopLeftRadius: 40,
-          borderTopRightRadius: 40,
+          flex: 1,
+          fontSize: 16,
+          lineHeight: 28,
+          textAlign: 'center',
         }}
       >
-        <SheetRim />
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}
-        >
-          {/* Left spacer matches the X Pressable width
-              (paddingHorizontal: 14 × 2 + icon 20 = 48) so the title
-              stays perfectly centered. */}
-          <View style={{ width: 48 }} />
-          <BoldText
-            numberOfLines={1}
-            style={{
-              flex: 1,
-              fontSize: 16,
-              lineHeight: 28,
-              textAlign: 'center',
-            }}
-          >
-            {translate('history.filters') as string}
-          </BoldText>
-          <Pressable
-            onPress={() => bottomSheetRef.current?.dismiss()}
-            hitSlop={8}
-            style={{
-              paddingHorizontal: 14,
-              paddingVertical: 4,
-            }}
-          >
-            <FontAwesomeIcon icon={faXmark} size={20} color={colors.fgMuted} />
-          </Pressable>
-        </View>
-      </View>
-    ),
-    [colors, translate],
+        {translate('history.filters') as string}
+      </BoldText>
+      <Pressable
+        onPress={() => bottomSheetRef.current?.dismiss()}
+        hitSlop={8}
+        style={{
+          paddingHorizontal: 14,
+          paddingVertical: 4,
+        }}
+      >
+        <FontAwesomeIcon icon={faXmark} size={20} color={colors.fgMuted} />
+      </Pressable>
+    </View>
   );
 
   const hide = useCallback(() => {
@@ -818,7 +771,6 @@ const History: React.FunctionComponent<HistoryProps> = ({
             showMessagesIcon={true}
             onUsdRowLayout={setUsdRowH}
             onPriceRowLayout={setPriceRowH}
-            onManualFetchPrice={revealPrice}
           />
         </View>
         {/* Measured so the history sheet's snap points sit just below it. An
@@ -841,10 +793,10 @@ const History: React.FunctionComponent<HistoryProps> = ({
         pointerEvents="box-none"
         style={[StyleSheet.absoluteFill, sheetSlideStyle]}
       >
-        <BottomSheet
+        <AppSheet
           ref={historySheetRef}
           snapPoints={historySnapPoints}
-          index={0}
+          header={historyHeader}
           onChange={i => {
             internalSnapIndexRef.current = i;
             setSnapIndex(i);
@@ -853,18 +805,6 @@ const History: React.FunctionComponent<HistoryProps> = ({
             }
             onPriceSnapChange(i);
           }}
-          enableDynamicSizing={false}
-          enablePanDownToClose={false}
-          enableContentPanningGesture={false}
-          keyboardBehavior={'interactive'}
-          keyboardBlurBehavior={'restore'}
-          android_keyboardInputMode={'adjustResize'}
-          backgroundStyle={{
-            backgroundColor: colors.bgSurface,
-            borderTopLeftRadius: 40,
-            borderTopRightRadius: 40,
-          }}
-          handleComponent={renderHistoryHandle}
         >
           <View
             style={
@@ -968,7 +908,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
               </View>
             )}
           </View>
-        </BottomSheet>
+        </AppSheet>
         {/* Floating "back to top" anchored to the Animated.View (full
             screen) instead of the BottomSheet content. On Android, the
             inner container ends above the system nav bar; anchoring there
@@ -1010,52 +950,26 @@ const History: React.FunctionComponent<HistoryProps> = ({
           </Pressable>
         )}
       </Animated.View>
-      <BottomSheetModal
+      <AppSheetModal
         ref={bottomSheetRef}
-        enableDynamicSizing={true}
-        enablePanDownToClose
-        stackBehavior="push"
-        keyboardBehavior={'interactive'}
-        keyboardBlurBehavior={'restore'}
-        android_keyboardInputMode={'adjustResize'}
-        onAnimate={(from, to) => {
-          // Opening (from === -1) dismisses a keyboard left open by the
-          // underlying screen so the sheet never renders behind it. Guard
-          // avoids fighting a keyboard the sheet itself focuses later.
-          if (from === -1 && to >= 0) {
-            Keyboard.dismiss();
-          }
-        }}
-        handleComponent={renderFiltersHandle}
-        backgroundStyle={{
-          backgroundColor: colors.bgSurface,
-          borderTopLeftRadius: 40,
-          borderTopRightRadius: 40,
-        }}
+        header={filtersXHeader}
+        contentStyle={{ paddingBottom: 30 }}
         onDismiss={() => setShowFilters(false)}
-        backdropComponent={renderBackdrop}
       >
-        <BottomSheetView
-          style={{
-            backgroundColor: colors.bgSurface,
-            paddingBottom: 30,
-          }}
-        >
-          {showFilters && (
-            <Filters
-              closeSheet={hide}
-              filterKind={filterKind}
-              setFilterKind={setFilterKind}
-              filterFailed={filterFailed}
-              setFilterFailed={setFilterFailed}
-              filterMemos={filterMemos}
-              setFilterMemos={setFilterMemos}
-              filterWithFunds={filterWithFunds}
-              setFilterWithFunds={setFilterWithFunds}
-            />
-          )}
-        </BottomSheetView>
-      </BottomSheetModal>
+        {showFilters && (
+          <Filters
+            closeSheet={hide}
+            filterKind={filterKind}
+            setFilterKind={setFilterKind}
+            filterFailed={filterFailed}
+            setFilterFailed={setFilterFailed}
+            filterMemos={filterMemos}
+            setFilterMemos={setFilterMemos}
+            filterWithFunds={filterWithFunds}
+            setFilterWithFunds={setFilterWithFunds}
+          />
+        )}
+      </AppSheetModal>
     </View>
   );
 };

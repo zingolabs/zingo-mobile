@@ -18,10 +18,7 @@ import SegmentedBar from '@ui/primitives/SegmentedBar';
 import { ContextAppLoaded } from '@app/context';
 import Utils from '@app/utils';
 import { RouteEnum } from '@app/AppState';
-import {
-  migrationStatus,
-  reconcileMigration,
-} from '@app/walletBackend';
+import { migrationStatus, reconcileMigration } from '@app/walletBackend';
 import {
   RPCMigrationStatusType,
   RPCBroadcastWindowType,
@@ -493,7 +490,11 @@ const IronwoodMigrationBanner: React.FunctionComponent<
                 }}
               />
               <Text
-                style={{ color: colors.fgDefault, fontSize: 15, fontWeight: '700' }}
+                style={{
+                  color: colors.fgDefault,
+                  fontSize: 15,
+                  fontWeight: '700',
+                }}
               >
                 {translate('ironwoodbanner.pool') as string}
               </Text>

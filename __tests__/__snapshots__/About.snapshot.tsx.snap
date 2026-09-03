@@ -13,19 +13,20 @@ exports[`Component About - test About - snapshot 1`] = `
   <View
     onLayout={[Function]}
   >
-    <View
-      style={{}}
-    >
+    <View>
       <View
         style={
-          {
-            "alignItems": "center",
-            "backgroundColor": "#011401",
-            "display": "flex",
-            "minHeight": 50,
-            "paddingBottom": 10,
-            "paddingTop": 0,
-          }
+          [
+            {},
+            {
+              "alignItems": "center",
+              "backgroundColor": "#011401",
+              "display": "flex",
+              "minHeight": 50,
+              "paddingBottom": 10,
+              "paddingTop": 0,
+            },
+          ]
         }
         testID="header"
       >
@@ -69,12 +70,15 @@ exports[`Component About - test About - snapshot 1`] = `
       </View>
       <View
         style={
-          {
-            "padding": 13,
-            "position": "absolute",
-            "right": 0,
-            "top": 0,
-          }
+          [
+            {},
+            {
+              "padding": 13,
+              "position": "absolute",
+              "right": 0,
+              "top": 0,
+            },
+          ]
         }
       >
         <Image
@@ -95,20 +99,17 @@ exports[`Component About - test About - snapshot 1`] = `
       </View>
     </View>
   </View>
-  <Text
-    style={
-      {
-        "color": "#c3c3c3",
-        "opacity": 0.65,
-      }
-    }
-  />
   <View
     style={
-      {
-        "display": "flex",
-        "marginTop": 20,
-      }
+      [
+        {
+          "flex": 1,
+        },
+        {
+          "backgroundColor": "#031124",
+        },
+        undefined,
+      ]
     }
   >
     <Text
@@ -118,16 +119,33 @@ exports[`Component About - test About - snapshot 1`] = `
           "opacity": 0.65,
         }
       }
-    >
-      text translated
-    </Text>
-  </View>
-  <View
-    style={
-      {
-        "marginTop": 20,
+    />
+    <View
+      style={
+        {
+          "display": "flex",
+          "marginTop": 20,
+        }
       }
-    }
-  />
+    >
+      <Text
+        style={
+          {
+            "color": "#c3c3c3",
+            "opacity": 0.65,
+          }
+        }
+      >
+        text translated
+      </Text>
+    </View>
+    <View
+      style={
+        {
+          "marginTop": 20,
+        }
+      }
+    />
+  </View>
 </View>
 `;

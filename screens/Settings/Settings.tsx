@@ -21,7 +21,7 @@ import {
 import Animated from 'react-native-reanimated';
 import { useOptionsPanelSheetSlide } from '@app/hooks/useOptionsPanelSheetSlide';
 
-import { useTheme } from '@app/theme';
+import { radiusSheet, useTheme } from '@app/theme';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
   IconDefinition,
@@ -39,6 +39,8 @@ import RegText from '@ui/primitives/RegText';
 import FadeText from '@ui/primitives/FadeText';
 import BoldText from '@ui/primitives/BoldText';
 import SheetRim from '@ui/primitives/SheetRim';
+import AppSheet from '@ui/primitives/AppSheet';
+import AppSheetModal from '@ui/primitives/AppSheetModal';
 import {
   checkServerURI,
   fetchServerList,
@@ -74,7 +76,10 @@ import { getLatestBlockServerInfo } from '@app/walletBackend';
 import { isEqual } from 'lodash';
 import ChainTypeToggle from '@ui/widgets/ChainTypeToggle';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
-import { hasDeviceSecurity } from '@app/services/simpleBiometrics';
+import {
+  DeviceSecurityProbe,
+  probeDeviceSecurity,
+} from '@app/services/gateController';
 import { useBiometricGate } from '@app/hooks/useBiometricGate';
 import SelectBottomSheet from '@ui/widgets/SelectBottomSheet';
 import BottomSheet, {
@@ -84,7 +89,6 @@ import BottomSheet, {
   BottomSheetFooterProps,
   BottomSheetModal,
   BottomSheetScrollView,
-  BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import { hasRecoveryWalletInfo } from '@app/services/recoveryWalletInfo';
 import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
@@ -237,14 +241,27 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const screenName = ScreenEnum.Settings;
 
   // Audit Issue D — single source of truth for security.settingsScreen.
-  const authPassed = useBiometricGate({
-    needsAuth: !!securityContext.settingsScreen,
+  // The requirement follows the live context except while this screen's
+  // own save rewrites it. The sync runs in an effect, so the thaw is a
+  // rendered state change at a deterministic moment, never a stale ref.
+  const [savingSettings, setSavingSettings] = useState<boolean>(false);
+  const liveNeedsAuth = !!securityContext.settingsScreen;
+  const [gateRequirement, setGateRequirement] =
+    useState<boolean>(liveNeedsAuth);
+  useEffect(() => {
+    if (!savingSettings) {
+      setGateRequirement(liveNeedsAuth);
+    }
+  }, [savingSettings, liveNeedsAuth]);
+  const screenGate = useBiometricGate({
+    needsAuth: gateRequirement,
     translate,
     addLastSnackbar,
     onCancel: () => navigation.goBack(),
     foregroundAppEnabled: !!securityContext.foregroundApp,
     foregroundEpoch,
   });
+  const authPassed = screenGate.kind === 'passed';
 
   const [autoServerUri, setAutoServerUri] = useState<string>('');
   const [autoServerChainName, setAutoServerChainName] = useState<string>('');
@@ -335,7 +352,11 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const [showDeveloperOptions, setShowDeveloperOptions] =
     useState<boolean>(false);
   const [openInfoSection, setOpenInfoSection] = useState<string | null>(null);
-  const [deviceHasSecurity, setDeviceHasSecurity] = useState<boolean>(true);
+  // Seeded optimistically. The union names the probe's answer instead of
+  // collapsing it to a bit at this edge.
+  const [deviceSecurity, setDeviceSecurity] = useState<DeviceSecurityProbe>({
+    kind: 'secured',
+  });
 
   // Bottom-sheet measurements — Settings has no balance area, so the sheet
   // uses a single snap at the maximum height (just below the screen Header).
@@ -391,11 +412,26 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
 
   const settingsSnapPoints = useFullSheetSnapPoints(containerH, headerH);
 
+  const probedRef = useRef<boolean>(false);
   useEffect(() => {
+    // Probe once, after the gate first settles: the enrolled-lock answer
+    // cannot change while the user stays in this app.
+    if (!authPassed || probedRef.current) {
+      return;
+    }
+    probedRef.current = true;
+    let cancelled = false;
     (async () => {
-      setDeviceHasSecurity(await hasDeviceSecurity());
+      const probe = await probeDeviceSecurity();
+      if (cancelled) {
+        return;
+      }
+      setDeviceSecurity(probe);
     })();
-  }, []);
+    return () => {
+      cancelled = true;
+    };
+  }, [authPassed]);
 
   useEffect(() => {
     (async () => {
@@ -735,7 +771,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   // the footer's onPress always invoke the current closure.
   const saveSettingsRef = useRef<() => Promise<void>>(async () => {});
 
-  const saveSettings = async () => {
+  const doSaveSettings = async () => {
     // ───────────────────────────────────────────────────────────────
     // Phase 1: Resolve the target server URI/chain from the picker mode
     // and validate up-front (no I/O yet — purely synchronous guards).
@@ -1063,6 +1099,14 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       navigation.navigate(RouteEnum.HomeStack);
     }
   };
+  const saveSettings = async () => {
+    setSavingSettings(true);
+    try {
+      await doSaveSettings();
+    } finally {
+      setSavingSettings(false);
+    }
+  };
   saveSettingsRef.current = saveSettings;
 
   const navigateToHome = useCallback((reset: boolean) => {
@@ -1258,57 +1302,50 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const keyboardHeight = useKeyboardHeight();
   useDismissSheetsOnBlur();
 
-  const renderSettingsHandle = useCallback(
-    () => (
+  const settingsHeader = (
+    <View
+      style={{
+        paddingTop: 12,
+        paddingBottom: 8,
+        paddingHorizontal: 16,
+      }}
+    >
       <View
         style={{
-          paddingTop: 12,
-          paddingBottom: 8,
-          paddingHorizontal: 16,
-          backgroundColor: colors.bgSurface,
-          borderTopLeftRadius: 40,
-          borderTopRightRadius: 40,
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
         }}
       >
-        <SheetRim />
-        <View
+        <TouchableOpacity
+          onPress={() => {
+            if (!disabled) {
+              navigateToHome(true);
+            }
+          }}
+          hitSlop={8}
+          style={{ paddingHorizontal: 4, paddingVertical: 4 }}
+        >
+          <FontAwesomeIcon
+            icon={faChevronLeft}
+            size={20}
+            color={colors.fgAccent}
+          />
+        </TouchableOpacity>
+        <BoldText
+          numberOfLines={1}
           style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
+            flex: 1,
+            fontSize: 16,
+            lineHeight: 28,
+            textAlign: 'center',
           }}
         >
-          <TouchableOpacity
-            onPress={() => {
-              if (!disabled) {
-                navigateToHome(true);
-              }
-            }}
-            hitSlop={8}
-            style={{ paddingHorizontal: 4, paddingVertical: 4 }}
-          >
-            <FontAwesomeIcon
-              icon={faChevronLeft}
-              size={20}
-              color={colors.fgAccent}
-            />
-          </TouchableOpacity>
-          <BoldText
-            numberOfLines={1}
-            style={{
-              flex: 1,
-              fontSize: 16,
-              lineHeight: 28,
-              textAlign: 'center',
-            }}
-          >
-            {translate('settings.title') as string}
-          </BoldText>
-          <View style={{ width: 28 }} />
-        </View>
+          {translate('settings.title') as string}
+        </BoldText>
+        <View style={{ width: 28 }} />
       </View>
-    ),
-    [colors, disabled, navigateToHome, translate],
+    </View>
   );
 
   const renderSettingsFooter = useCallback(
@@ -1343,53 +1380,42 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     [colors, disabled, disabledButton, translate],
   );
 
-  const renderSecurityHandle = useCallback(
-    () => (
+  const securityHeader = (
+    <View
+      style={{
+        paddingTop: 8,
+        paddingBottom: 6,
+        paddingHorizontal: 16,
+      }}
+    >
       <View
         style={{
-          paddingTop: 8,
-          paddingBottom: 6,
-          paddingHorizontal: 16,
-          backgroundColor: colors.bgSurface,
-          borderTopLeftRadius: 40,
-          borderTopRightRadius: 40,
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
         }}
       >
-        <SheetRim />
-        <View
+        <View style={{ width: 48 }} />
+        <BoldText
+          numberOfLines={1}
           style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
+            flex: 1,
+            fontSize: 16,
+            lineHeight: 28,
+            textAlign: 'center',
           }}
         >
-          {/* Left spacer matches the X Pressable's width (14×2 + 20 = 48)
-              so the title stays perfectly centered. The BoldText
-              flex-fills the middle space so a long localized title can
-              still ellipsize cleanly instead of being clipped. */}
-          <View style={{ width: 48 }} />
-          <BoldText
-            numberOfLines={1}
-            style={{
-              flex: 1,
-              fontSize: 16,
-              lineHeight: 28,
-              textAlign: 'center',
-            }}
-          >
-            {translate('settings.security-title') as string}
-          </BoldText>
-          <Pressable
-            onPress={() => securityBottomSheetRef.current?.close()}
-            hitSlop={8}
-            style={{ paddingHorizontal: 14, paddingVertical: 4 }}
-          >
-            <FontAwesomeIcon icon={faXmark} size={20} color={colors.fgMuted} />
-          </Pressable>
-        </View>
+          {translate('settings.security-title') as string}
+        </BoldText>
+        <Pressable
+          onPress={() => securityBottomSheetRef.current?.close()}
+          hitSlop={8}
+          style={{ paddingHorizontal: 14, paddingVertical: 4 }}
+        >
+          <FontAwesomeIcon icon={faXmark} size={20} color={colors.fgMuted} />
+        </Pressable>
       </View>
-    ),
-    [colors, translate],
+    </View>
   );
 
   const renderServerHandle = useCallback(
@@ -1400,8 +1426,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
           paddingBottom: 6,
           paddingHorizontal: 16,
           backgroundColor: colors.bgSurface,
-          borderTopLeftRadius: 40,
-          borderTopRightRadius: 40,
+          borderTopLeftRadius: radiusSheet,
+          borderTopRightRadius: radiusSheet,
         }}
       >
         <SheetRim />
@@ -1412,10 +1438,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
             justifyContent: 'space-between',
           }}
         >
-          {/* Left spacer matches the X Pressable's width (14×2 + 20 = 48)
-              so the title stays perfectly centered. The BoldText
-              flex-fills the middle space so a long localized title can
-              still ellipsize cleanly instead of being clipped. */}
           <View style={{ width: 48 }} />
           <BoldText
             numberOfLines={1}
@@ -1587,24 +1609,11 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
           pointerEvents="box-none"
           style={[StyleSheet.absoluteFill, sheetSlideStyle]}
         >
-          <BottomSheet
+          <AppSheet
             ref={settingsSheetRef}
-            accessible={false}
             snapPoints={settingsSnapPoints}
-            index={0}
-            enableDynamicSizing={false}
-            enablePanDownToClose={false}
-            enableContentPanningGesture={false}
-            keyboardBehavior={'interactive'}
-            keyboardBlurBehavior={'restore'}
-            android_keyboardInputMode={'adjustResize'}
-            backgroundStyle={{
-              backgroundColor: colors.bgSurface,
-              borderTopLeftRadius: 40,
-              borderTopRightRadius: 40,
-            }}
-            handleComponent={renderSettingsHandle}
-            footerComponent={renderSettingsFooter}
+            header={settingsHeader}
+            renderFooter={renderSettingsFooter}
           >
             <BottomSheetScrollView
               keyboardShouldPersistTaps="handled"
@@ -1613,7 +1622,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
               alwaysBounceVertical={false}
               style={{
                 flex: 1,
-                backgroundColor: colors.bgSurface,
               }}
               contentContainerStyle={{
                 flexDirection: 'column',
@@ -1935,7 +1943,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                       </View>
                     </TouchableOpacity>
                   </View>
-                  {!deviceHasSecurity && (
+                  {deviceSecurity.kind === 'insecure' && (
                     <FadeText style={{ marginTop: 6 }}>
                       {
                         translate(
@@ -2385,99 +2393,71 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                 </>
               )}
             </BottomSheetScrollView>
-          </BottomSheet>
+          </AppSheet>
         </Animated.View>
       </View>
-      <BottomSheetModal
+      <AppSheetModal
         ref={securityBottomSheetRef}
-        enableDynamicSizing={true}
-        enablePanDownToClose
-        stackBehavior="push"
-        keyboardBehavior={'interactive'}
-        keyboardBlurBehavior={'restore'}
-        android_keyboardInputMode={'adjustResize'}
-        onAnimate={(from, to) => {
-          // Opening (from === -1) dismisses a keyboard left open by the
-          // underlying screen so the sheet never renders behind it. Guard
-          // avoids fighting a keyboard the sheet itself focuses later.
-          if (from === -1 && to >= 0) {
-            Keyboard.dismiss();
-          }
-        }}
-        handleComponent={renderSecurityHandle}
-        backgroundStyle={{
-          backgroundColor: colors.bgSurface,
-          borderTopLeftRadius: 40,
-          borderTopRightRadius: 40,
-        }}
-        backdropComponent={renderBackdropSecurity}
+        header={securityHeader}
+        contentStyle={{ paddingBottom: 30 }}
       >
-        <BottomSheetView
-          style={{
-            backgroundColor: colors.bgSurface,
-            paddingBottom: 30,
-          }}
-        >
-          {securityCheckBox(
-            startApp,
-            setStartApp as React.Dispatch<
-              React.SetStateAction<string | boolean>
-            >,
-            translate('settings.security-startapp') as string,
-          )}
-          {securityCheckBox(
-            foregroundApp,
-            setForegroundApp as React.Dispatch<
-              React.SetStateAction<string | boolean>
-            >,
-            translate('settings.security-foregroundapp') as string,
-          )}
-          {securityCheckBox(
-            sendConfirm,
-            setSendConfirm as React.Dispatch<
-              React.SetStateAction<string | boolean>
-            >,
-            translate('settings.security-sendconfirm') as string,
-          )}
-          {securityCheckBox(
-            seedUfvkScreen,
-            setSeedUfvkScreen as React.Dispatch<
-              React.SetStateAction<string | boolean>
-            >,
-            readOnly
-              ? (translate('settings.security-ufvkscreen') as string)
-              : (translate('settings.security-seedscreen') as string),
-          )}
-          {securityCheckBox(
-            rescanScreen,
-            setRescanScreen as React.Dispatch<
-              React.SetStateAction<string | boolean>
-            >,
-            translate('settings.security-rescanscreen') as string,
-          )}
-          {securityCheckBox(
-            settingsScreen,
-            setSettingsScreen as React.Dispatch<
-              React.SetStateAction<string | boolean>
-            >,
-            translate('settings.security-settingsscreen') as string,
-          )}
-          {securityCheckBox(
-            changeWalletScreen,
-            setChangeWalletScreen as React.Dispatch<
-              React.SetStateAction<string | boolean>
-            >,
-            translate('settings.security-changewalletscreen') as string,
-          )}
-          {securityCheckBox(
-            restoreWalletBackupScreen,
-            setRestoreWalletBackupScreen as React.Dispatch<
-              React.SetStateAction<string | boolean>
-            >,
-            translate('settings.security-restorewalletbackupscreen') as string,
-          )}
-        </BottomSheetView>
-      </BottomSheetModal>
+        {securityCheckBox(
+          startApp,
+          setStartApp as React.Dispatch<React.SetStateAction<string | boolean>>,
+          translate('settings.security-startapp') as string,
+        )}
+        {securityCheckBox(
+          foregroundApp,
+          setForegroundApp as React.Dispatch<
+            React.SetStateAction<string | boolean>
+          >,
+          translate('settings.security-foregroundapp') as string,
+        )}
+        {securityCheckBox(
+          sendConfirm,
+          setSendConfirm as React.Dispatch<
+            React.SetStateAction<string | boolean>
+          >,
+          translate('settings.security-sendconfirm') as string,
+        )}
+        {securityCheckBox(
+          seedUfvkScreen,
+          setSeedUfvkScreen as React.Dispatch<
+            React.SetStateAction<string | boolean>
+          >,
+          readOnly
+            ? (translate('settings.security-ufvkscreen') as string)
+            : (translate('settings.security-seedscreen') as string),
+        )}
+        {securityCheckBox(
+          rescanScreen,
+          setRescanScreen as React.Dispatch<
+            React.SetStateAction<string | boolean>
+          >,
+          translate('settings.security-rescanscreen') as string,
+        )}
+        {securityCheckBox(
+          settingsScreen,
+          setSettingsScreen as React.Dispatch<
+            React.SetStateAction<string | boolean>
+          >,
+          translate('settings.security-settingsscreen') as string,
+        )}
+        {securityCheckBox(
+          changeWalletScreen,
+          setChangeWalletScreen as React.Dispatch<
+            React.SetStateAction<string | boolean>
+          >,
+          translate('settings.security-changewalletscreen') as string,
+        )}
+        {securityCheckBox(
+          restoreWalletBackupScreen,
+          setRestoreWalletBackupScreen as React.Dispatch<
+            React.SetStateAction<string | boolean>
+          >,
+          translate('settings.security-restorewalletbackupscreen') as string,
+        )}
+      </AppSheetModal>
       <BottomSheetModal
         ref={serverBottomSheetRef}
         enableDynamicSizing={true}
@@ -2497,8 +2477,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         handleComponent={renderServerHandle}
         backgroundStyle={{
           backgroundColor: colors.bgSurface,
-          borderTopLeftRadius: 40,
-          borderTopRightRadius: 40,
+          borderTopLeftRadius: radiusSheet,
+          borderTopRightRadius: radiusSheet,
         }}
         backdropComponent={renderBackdropSecurity}
       >

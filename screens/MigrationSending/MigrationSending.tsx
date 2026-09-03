@@ -318,7 +318,9 @@ const MigrationSending: React.FunctionComponent<MigrationSendingProps> = ({
           <Text style={{ color: colors.fgMuted, fontSize: 14 }}>
             {translate('migrationsending.total') as string}
           </Text>
-          <Text style={{ color: colors.fgDefault, fontSize: 16, fontWeight: '700' }}>
+          <Text
+            style={{ color: colors.fgDefault, fontSize: 16, fontWeight: '700' }}
+          >
             {totalTransferredStr}
           </Text>
         </View>

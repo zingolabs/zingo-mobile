@@ -6,43 +6,34 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import {
-  Image,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { useTheme } from '@app/theme';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
-import {
-  BottomSheetBackdrop,
-  BottomSheetBackdropProps,
-  BottomSheetModal,
-  BottomSheetView,
-} from '@gorhom/bottom-sheet';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import BoldText from '@ui/primitives/BoldText';
-import SheetRim from '@ui/primitives/SheetRim';
 import Button from '@ui/primitives/Button';
-import MixnetIcon, { mixnetPhase } from '@ui/primitives/Icons/MixnetIcon';
+import NymGateSheet from './components/NymGateSheet';
+import { deriveNymGateState } from './components/nymGateState';
 import { AppDrawerParamList } from '@app/types';
 import { AppTheme } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
 import { ButtonTypeEnum, RouteEnum } from '@app/AppState';
 import Utils from '@app/utils';
 
-const NYM_GREEN = '#07FF94';
-
 type MigrationStrategyProps = NativeStackScreenProps<
   AppDrawerParamList,
   RouteEnum.MigrationStrategy
->;
+> & {
+  // Opens or closes the nym gate sheet from outside. Storybook sets it; the
+  // app leaves it unset and the Start button drives the sheet.
+  nymSheetOpen?: boolean;
+};
 
 // Migration choices: opt out entirely ('none', the default), the immediate
 // drain ('now'), or the private two-phase path ('private': split notes, then
-// send batches inside scheduled windows — not shippable yet).
+// send batches inside scheduled windows).
 type StrategyOption = 'none' | 'now' | 'private';
 
 // Renders a translated string, bolding `**…**` spans in `highlight` and
@@ -184,6 +175,7 @@ const OptionCard: React.FunctionComponent<OptionCardProps> = ({
 
 const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
   navigation,
+  nymSheetOpen,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, totalBalance, info, nym, setNymOption, mixnetView } =
@@ -192,14 +184,20 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
   const [selected, setSelected] = useState<StrategyOption>('none');
 
   const nymSheetRef = useRef<BottomSheetModal>(null);
+  useEffect(() => {
+    if (nymSheetOpen === undefined) {
+      return;
+    }
+    if (nymSheetOpen) {
+      nymSheetRef.current?.present();
+    } else {
+      nymSheetRef.current?.dismiss();
+    }
+  }, [nymSheetOpen]);
   // Held from the Enable tap until the transport is ready, mirroring the send
   // toggle: the button reads disabled-and-connecting until then.
   const [enabling, setEnabling] = useState<boolean>(false);
-  const nymPhase =
-    mixnetView !== null
-      ? mixnetPhase(mixnetView.statusKey, mixnetView.reconnecting)
-      : null;
-  const nymLoading = enabling || nymPhase === 'connecting';
+  const nymGate = deriveNymGateState(enabling, mixnetView);
 
   // Leaving the migration flow returns to Home. Reset (not goBack) so the
   // one-way onboarding/migration stack isn't left underneath to return to.
@@ -216,26 +214,23 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
     );
   }, [navigation, selected]);
 
-  // Once the transport the user just enabled reaches ready, close the gate and
-  // advance to the chosen migration path.
+  // Ends the enable wait once the transport settles: ready continues the
+  // migration, a lost transport releases the button. A reconnecting
+  // bootstrap is neither, so the wait holds through the blip.
   useEffect(() => {
-    if (enabling && nymPhase === 'ready') {
+    if (!enabling) {
+      return;
+    }
+    if (nymGate.kind === 'ready') {
       setEnabling(false);
       nymSheetRef.current?.dismiss();
       startMigration();
+      return;
     }
-  }, [enabling, nymPhase, startMigration]);
-
-  const renderNymBackdrop = useCallback(
-    (props: BottomSheetBackdropProps) => (
-      <BottomSheetBackdrop
-        {...props}
-        disappearsOnIndex={-1}
-        appearsOnIndex={0}
-      />
-    ),
-    [],
-  );
+    if (nymGate.kind === 'failed') {
+      setEnabling(false);
+    }
+  }, [enabling, nymGate.kind, startMigration]);
 
   // Orchard balance shown so the user sees what would cross the pool boundary
   // (and become publicly visible) on the immediate path.
@@ -347,8 +342,11 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
                 return;
               }
               if (nym) {
-                startMigration();
-                return;
+                if (nymGate.kind === 'ready') {
+                  startMigration();
+                  return;
+                }
+                setEnabling(true);
               }
               nymSheetRef.current?.present();
             }}
@@ -357,103 +355,20 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
         </View>
       </View>
 
-      <BottomSheetModal
+      <NymGateSheet
         ref={nymSheetRef}
-        enableDynamicSizing={true}
-        enablePanDownToClose
-        handleComponent={null}
-        stackBehavior="push"
-        backgroundStyle={{
-          backgroundColor: colors.bgSurface,
-          borderTopLeftRadius: 40,
-          borderTopRightRadius: 40,
-        }}
-        backdropComponent={renderNymBackdrop}
+        gate={nymGate}
         onDismiss={() => setEnabling(false)}
-      >
-        <BottomSheetView
-          style={{
-            backgroundColor: colors.bgSurface,
-            borderTopLeftRadius: 40,
-            borderTopRightRadius: 40,
-            paddingHorizontal: 28,
-            paddingTop: 28,
-            paddingBottom: 40,
-            alignItems: 'center',
-          }}
-        >
-          <SheetRim />
-          <Image
-            source={require('../../assets/img/nym-mixnet.png')}
-            style={{ width: 95, height: 95, marginBottom: 24 }}
-            resizeMode="contain"
-          />
-          <Text
-            style={{
-              fontSize: 24,
-              fontWeight: '700',
-              textAlign: 'center',
-              color: colors.fgDefault,
-              marginBottom: 18,
-            }}
-          >
-            {(translate('migrationstrategy.nym-gate-title') as string)
-              .split(/(NYM)/g)
-              .map((part, i) =>
-                part === 'NYM' ? (
-                  <Text key={i} style={{ color: NYM_GREEN }}>
-                    {part}
-                  </Text>
-                ) : (
-                  part
-                ),
-              )}
-          </Text>
-          <Text
-            style={{
-              fontSize: 16,
-              lineHeight: 24,
-              textAlign: 'left',
-              alignSelf: 'stretch',
-              color: colors.fgMuted,
-              marginBottom: 28,
-            }}
-          >
-            {translate('migrationstrategy.nym-gate-body') as string}
-          </Text>
-          {nymLoading && (
-            <View style={{ marginBottom: 20 }}>
-              <MixnetIcon phase="connecting" />
-            </View>
-          )}
-          <Button
-            testID="migrationstrategy.nym-continue"
-            type={ButtonTypeEnum.Ghost}
-            title={translate('migrationstrategy.nym-gate-continue') as string}
-            onPress={() => {
-              setEnabling(false);
-              nymSheetRef.current?.dismiss();
-              startMigration();
-            }}
-            style={{ marginBottom: 10 }}
-          />
-          <Button
-            testID="migrationstrategy.nym-enable"
-            type={ButtonTypeEnum.Primary}
-            title={
-              nymLoading
-                ? (translate('migrationstrategy.nym-gate-connecting') as string)
-                : (translate('migrationstrategy.nym-gate-enable') as string)
-            }
-            disabled={nymLoading}
-            onPress={() => {
-              setEnabling(true);
-              setNymOption(true);
-            }}
-            style={{ width: '100%' }}
-          />
-        </BottomSheetView>
-      </BottomSheetModal>
+        onContinue={() => {
+          setEnabling(false);
+          nymSheetRef.current?.dismiss();
+          startMigration();
+        }}
+        onEnable={() => {
+          setEnabling(true);
+          setNymOption(true);
+        }}
+      />
     </>
   );
 };

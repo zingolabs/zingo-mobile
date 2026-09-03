@@ -1,6 +1,6 @@
 import { RouteProp } from '@react-navigation/native';
-import { AppStackParamList } from '../../app/types';
-import { RouteEnum } from '../../app/AppState';
+import { AppStackParamList } from '@app/types';
+import { RouteEnum } from '@app/AppState';
 
 export const mockLoadingAppRoute: RouteProp<
   AppStackParamList,
@@ -11,7 +11,7 @@ export const mockLoadingAppRoute: RouteProp<
   params: {
     screen: RouteEnum.Launching,
     startingApp: true,
-    biometricsFailed: false,
+    biometricGate: { kind: 'passed' as const },
     newWallet: false,
   },
 };

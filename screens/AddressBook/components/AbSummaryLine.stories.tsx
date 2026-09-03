@@ -1,6 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
 import AbSummaryLine from './AbSummaryLine';
-import { withAppContext, withNavigation } from '../../../.storybook/storyDecorators';
+import {
+  withAppContext,
+  withNavigation,
+} from '../../../.storybook/storyDecorators';
 import { sampleContact } from '../../../.storybook/storyMocks';
 
 const meta: Meta<typeof AbSummaryLine> = {

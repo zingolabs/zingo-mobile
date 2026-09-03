@@ -12,6 +12,8 @@ import com.facebook.react.bridge.Promise
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
+import org.json.JSONArray
+import org.json.JSONObject
 import org.ZingoLabs.Zingo.Constants.*
 
 class RPCModule internal constructor(private val reactContext: ReactApplicationContext?) : ReactContextBaseJavaModule(reactContext) {
@@ -25,14 +27,26 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         return applicationContext.filesDir.absolutePath
     }
 
-    private fun buildEncryptedFile(fileName: String): EncryptedFile {
+    private fun buildEncryptedFile(fileName: String): EncryptedFile =
+        buildEncryptedFile(File(applicationContext.filesDir, fileName))
+
+    // The keyset is one per app; the file *name* is the AAD, so a file with
+    // the same name in another directory decrypts with the same keyset.
+    private fun buildEncryptedFile(file: File): EncryptedFile {
         val masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
         return EncryptedFile.Builder(
-            File(applicationContext.filesDir, fileName),
+            file,
             applicationContext,
             masterKeyAlias,
             EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB,
         ).build()
+    }
+
+    // The migration's trial decrypt ("is this file already encrypted?").
+    // Injectable so a test can replay a transient Keystore failure
+    // (DoubleWrapReproTest).
+    internal var migrationTrialDecrypt: (String) -> Unit = { fileName ->
+        buildEncryptedFile(fileName).openFileInput().use { it.readBytes() }
     }
 
     // Migrates a wallet file from the old format (raw binary) to the new format
@@ -61,9 +75,10 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
         // Check if already encrypted — try reading it as EncryptedFile.
         val alreadyEncrypted = try {
-            buildEncryptedFile(fileName).openFileInput().use { it.readBytes() }
+            migrationTrialDecrypt(fileName)
             true
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            Log.w("MAIN", "[$fileName] migration: trial decrypt failed: $e")
             false
         }
 
@@ -80,6 +95,14 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             applicationContext.openFileInput(fileName).use { it.readBytes() }
         } catch (e: Exception) {
             Log.e("MAIN", "[$fileName] migration: could not read old file, aborting: $e")
+            return
+        }
+
+        // A trial decrypt can fail transiently (Keystore unavailable) on a file
+        // that is already encrypted. Wrapping that envelope again would bury
+        // the wallet under two layers, so only a plain wallet migrates.
+        if (!WalletFileEnvelope.looksLikePlainWallet(oldBytes)) {
+            Log.e("MAIN", "[$fileName] migration: file is not a plain wallet, refusing to migrate")
             return
         }
 
@@ -157,22 +180,8 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         }
     }
 
-    // A legitimate plain-binary wallet (pre-encryption format) starts with a
-    // u64-LE serialization version. zingolib currently writes 41; we accept
-    // up to 1_000 to leave generous headroom for future formats without
-    // risking misdetection of an encrypted envelope's header bytes as a
-    // version number. The actual encrypted envelope header (Tink) is
-    // essentially random from this check's perspective and reliably falls
-    // outside the range — observed in the wild as e.g. 11506714174589491496
-    // (0x9FA09A1F94EA5E68) on a Tecno AC8 after Keystore key loss.
-    private fun looksLikeLegacyPlainWallet(bytes: ByteArray): Boolean {
-        if (bytes.size < 8) return false
-        var version = 0L
-        for (i in 7 downTo 0) {
-            version = (version shl 8) or (bytes[i].toLong() and 0xFFL)
-        }
-        return version in 0..1000
-    }
+    private fun looksLikeLegacyPlainWallet(bytes: ByteArray): Boolean =
+        WalletFileEnvelope.looksLikePlainWallet(bytes)
 
     // Reads a wallet file as a Base64 string.
     //
@@ -427,6 +436,166 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         }
     }
 
+    // Wallet-file diagnosis and the double-wrap repair. Support tooling for
+    // the 2.0.21 incident: `migrateFileIfNeeded` re-wrapped an already
+    // encrypted file after a transient Keystore failure, and zingolib then
+    // reported "Failed to read wallet version <huge number>".
+
+    // Includes each .migrating twin, a plain copy that flags an interrupted migration, but not the encrypted .prerepair/.broken copies that would only read as undecryptable.
+    private fun walletFileNames(): List<String> =
+        listOf(WalletFileName.value, WalletBackupFileName.value).flatMap {
+            listOf(it, "$it.write.tmp", "$it.migrating")
+        } + WalletTempSwapFileName.value
+
+    // The outer layer stored the base64 text of an inner envelope. The inner
+    // envelope goes under the same file name in a scratch dir, because the
+    // name is the AAD.
+    private fun unwrapEnvelope(fileName: String, envelope: ByteArray): ByteArray {
+        val scratchDir = File(applicationContext.cacheDir, "wallet-unwrap").apply { mkdirs() }
+        val scratch = File(scratchDir, fileName)
+        try {
+            scratch.delete()
+            scratch.writeBytes(envelope)
+            val text = buildEncryptedFile(scratch).openFileInput().use { it.readBytes() }
+            return Base64.decode(text, Base64.NO_WRAP)
+        } finally {
+            scratch.delete()
+        }
+    }
+
+    // Peels nested envelopes until a plain wallet appears, at most
+    // MAX_UNWRAP_DEPTH layers. Returns the plain bytes and the layers removed.
+    private fun unwrapToPlainWallet(
+        fileName: String,
+        payload: ByteArray,
+        errors: MutableList<String>? = null,
+    ): Pair<ByteArray, Int>? {
+        var bytes = payload
+        for (depth in 0..WalletFileEnvelope.MAX_UNWRAP_DEPTH) {
+            when (WalletFileEnvelope.classify(bytes)) {
+                WalletFileEnvelope.PayloadKind.PLAIN_WALLET -> return Pair(bytes, depth)
+                WalletFileEnvelope.PayloadKind.UNKNOWN -> {
+                    errors?.add("depth $depth: payload is neither a wallet nor a Tink envelope")
+                    return null
+                }
+                WalletFileEnvelope.PayloadKind.TINK_ENVELOPE -> {
+                    if (depth == WalletFileEnvelope.MAX_UNWRAP_DEPTH) {
+                        errors?.add("still an envelope after ${WalletFileEnvelope.MAX_UNWRAP_DEPTH} layers")
+                        return null
+                    }
+                    bytes = try {
+                        unwrapEnvelope(fileName, bytes)
+                    } catch (e: Exception) {
+                        Log.w("MAIN", "[$fileName] unwrap at depth $depth failed: $e")
+                        errors?.add("depth $depth: $e")
+                        return null
+                    }
+                }
+            }
+        }
+        return null
+    }
+
+    internal fun decryptedPayload(fileName: String): ByteArray =
+        Base64.decode(readEncryptedFile(fileName), Base64.NO_WRAP)
+
+    private fun fileHeadHex(file: File): String =
+        file.inputStream().use { input ->
+            val head = ByteArray(16)
+            val n = input.read(head)
+            (0 until maxOf(n, 0)).joinToString("") { "%02x".format(head[it]) }
+        }
+
+    // state: missing | plainLegacy | undecryptable | plainWallet | doubleWrapped | unknown
+    internal fun diagnoseWalletFile(fileName: String): JSONObject {
+        val file = File(applicationContext.filesDir, fileName)
+        val report = JSONObject()
+            .put("name", fileName)
+            .put("size", if (file.exists()) file.length() else 0)
+            .put("mtime", if (file.exists()) file.lastModified() else 0)
+            .put("depth", 0)
+            .put("repairable", false)
+        if (!file.exists()) return report.put("state", "missing")
+        report.put("head", fileHeadHex(file))
+        val payload = try {
+            decryptedPayload(fileName)
+        } catch (e: Exception) {
+            Log.w("MAIN", "[$fileName] diagnosis: encrypted read failed: $e")
+            report.put("readError", e.toString())
+            val raw = file.readBytes()
+            return report.put("state", if (looksLikeLegacyPlainWallet(raw)) "plainLegacy" else "undecryptable")
+        }
+        return when (WalletFileEnvelope.classify(payload)) {
+            WalletFileEnvelope.PayloadKind.PLAIN_WALLET -> report.put("state", "plainWallet")
+            WalletFileEnvelope.PayloadKind.UNKNOWN -> report.put("state", "unknown")
+            WalletFileEnvelope.PayloadKind.TINK_ENVELOPE -> {
+                val unwrapErrors = mutableListOf<String>()
+                val unwrapped = unwrapToPlainWallet(fileName, payload, unwrapErrors)
+                report.put("state", "doubleWrapped")
+                    .put("repairable", unwrapped != null)
+                    .put("depth", unwrapped?.second ?: 0)
+                    .put("unwrapErrors", JSONArray(unwrapErrors))
+            }
+        }
+    }
+
+    @ReactMethod
+    fun walletFileDiagnosisInfo(promise: Promise) {
+        FfiOutcome.settling(promise, "wallet_file_diagnosis") {
+            val files = JSONArray()
+            for (name in walletFileNames()) {
+                files.put(
+                    try {
+                        diagnoseWalletFile(name)
+                    } catch (e: Exception) {
+                        Log.e("MAIN", "[$name] diagnosis failed: $e")
+                        JSONObject().put("name", name).put("state", "unknown")
+                            .put("size", 0).put("depth", 0).put("repairable", false)
+                    }
+                )
+            }
+            JSONObject().put("files", files).toString()
+        }
+    }
+
+    // Outcome per file: repaired | skipped | failed. The untouched original
+    // stays at "$fileName.prerepair" (raw copy, decryptable only under the
+    // original name).
+    internal fun repairDoubleWrappedFile(fileName: String): String {
+        val file = File(applicationContext.filesDir, fileName)
+        if (!file.exists()) return "skipped"
+        val payload = try {
+            decryptedPayload(fileName)
+        } catch (e: Exception) {
+            Log.w("MAIN", "[$fileName] repair: encrypted read failed, nothing to unwrap: $e")
+            return "skipped"
+        }
+        if (WalletFileEnvelope.classify(payload) != WalletFileEnvelope.PayloadKind.TINK_ENVELOPE) return "skipped"
+        val unwrapped = unwrapToPlainWallet(fileName, payload) ?: return "failed"
+        return try {
+            file.copyTo(File(applicationContext.filesDir, "$fileName.prerepair"), overwrite = true)
+            writeEncryptedFileDurably(fileName, Base64.encodeToString(unwrapped.first, Base64.NO_WRAP))
+            val verified = WalletFileEnvelope.classify(decryptedPayload(fileName)) ==
+                WalletFileEnvelope.PayloadKind.PLAIN_WALLET
+            Log.i("MAIN", "[$fileName] repair: removed ${unwrapped.second} layer(s), verified=$verified")
+            if (verified) "repaired" else "failed"
+        } catch (e: Exception) {
+            Log.e("MAIN", "[$fileName] repair: rewrite failed: $e")
+            "failed"
+        }
+    }
+
+    @ReactMethod
+    fun repairDoubleWrappedWalletProcess(promise: Promise) {
+        FfiOutcome.settling(promise, "repair_double_wrapped_wallet") {
+            val outcome = JSONObject()
+            for (name in listOf(WalletFileName.value, WalletBackupFileName.value)) {
+                outcome.put(name, repairDoubleWrappedFile(name))
+            }
+            outcome.toString()
+        }
+    }
+
     fun saveBackgroundFile(json: String) {
         try {
             val fileBytes = json.toByteArray()
@@ -522,7 +691,17 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 // before starting a new swap — deleting the temp blindly
                 // would destroy the only copy of that crash's original main.
                 completePendingSwap()
-                val wallet = readFileAsB64(WalletFileName.value)
+                val wallet = try {
+                    readFileAsB64(WalletFileName.value)
+                } catch (e: Exception) {
+                    // Keep the unreadable main's raw bytes aside and restore the backup into both slots.
+                    Log.w("MAIN", "[Native] backup restore: main unreadable, preserving raw and restoring backup: $e")
+                    File(applicationContext.filesDir, WalletFileName.value)
+                        .copyTo(File(applicationContext.filesDir, "${WalletFileName.value}.broken"), overwrite = true)
+                    writeEncryptedFile(WalletFileName.value, backup)
+                    promise.resolve(true)
+                    return
+                }
                 writeEncryptedFile(WalletTempSwapFileName.value, wallet)   // (1) temp = original main
                 writeEncryptedFile(WalletFileName.value, backup)            // (2) main = backup
                 writeEncryptedFile(WalletBackupFileName.value, wallet)      // (3) backup = original main
@@ -814,10 +993,10 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
-    fun attachMixnet(socks5Addr: String, promise: Promise) {
+    fun attachMixnet(socks5Addr: String, exitNode: String, promise: Promise) {
         FfiOutcome.settling(promise, "attach_mixnet") {
             uniffi.zingo.initLogging()
-            uniffi.zingo.attachMixnet(socks5Addr)
+            uniffi.zingo.attachMixnet(socks5Addr, exitNode)
         }
     }
 
@@ -838,10 +1017,10 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
-    fun mixnetModeInfo(promise: Promise) {
-        FfiOutcome.settling(promise, "mixnet_mode") {
+    fun mixnetIndicatorInfo(promise: Promise) {
+        FfiOutcome.settling(promise, "mixnet_indicator") {
             uniffi.zingo.initLogging()
-            uniffi.zingo.mixnetMode()
+            uniffi.zingo.mixnetIndicator()
         }
     }
 
@@ -850,14 +1029,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         FfiOutcome.settling(promise, "mixnet_bootstrap_detail") {
             uniffi.zingo.initLogging()
             uniffi.zingo.mixnetBootstrapDetail()
-        }
-    }
-
-    @ReactMethod
-    fun mixnetIpCorrelationDisclaimerInfo(promise: Promise) {
-        FfiOutcome.settling(promise, "mixnet_ip_correlation_disclaimer") {
-            uniffi.zingo.initLogging()
-            uniffi.zingo.mixnetIpCorrelationDisclaimer()
         }
     }
 

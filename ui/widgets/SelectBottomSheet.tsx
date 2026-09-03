@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { forwardRef, useCallback, useMemo, useState } from 'react';
 import { Keyboard, Pressable, StyleSheet, TextInput, View } from 'react-native';
-import { useTheme } from '@app/theme';
+import { radiusSheet, useTheme } from '@app/theme';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
   faCheck,
@@ -101,8 +101,8 @@ const SelectBottomSheet = forwardRef<BottomSheetModal, SelectBottomSheetProps>(
             paddingBottom: 6,
             paddingHorizontal: 16,
             backgroundColor: colors.bgSurface,
-            borderTopLeftRadius: 40,
-            borderTopRightRadius: 40,
+            borderTopLeftRadius: radiusSheet,
+            borderTopRightRadius: radiusSheet,
           }}
         >
           <SheetRim />
@@ -131,7 +131,11 @@ const SelectBottomSheet = forwardRef<BottomSheetModal, SelectBottomSheetProps>(
               hitSlop={8}
               style={{ paddingHorizontal: 14, paddingVertical: 4 }}
             >
-              <FontAwesomeIcon icon={faXmark} size={20} color={colors.fgMuted} />
+              <FontAwesomeIcon
+                icon={faXmark}
+                size={20}
+                color={colors.fgMuted}
+              />
             </Pressable>
           </View>
         </View>
@@ -214,8 +218,8 @@ const SelectBottomSheet = forwardRef<BottomSheetModal, SelectBottomSheetProps>(
         handleComponent={searchable ? null : renderHandle}
         backgroundStyle={{
           backgroundColor: colors.bgSurface,
-          borderTopLeftRadius: 40,
-          borderTopRightRadius: 40,
+          borderTopLeftRadius: radiusSheet,
+          borderTopRightRadius: radiusSheet,
         }}
         backdropComponent={renderBackdrop}
       >
@@ -226,8 +230,8 @@ const SelectBottomSheet = forwardRef<BottomSheetModal, SelectBottomSheetProps>(
                 paddingTop: 8,
                 paddingHorizontal: 16,
                 backgroundColor: colors.bgSurface,
-                borderTopLeftRadius: 40,
-                borderTopRightRadius: 40,
+                borderTopLeftRadius: radiusSheet,
+                borderTopRightRadius: radiusSheet,
               }}
             >
               <SheetRim />
@@ -242,7 +246,11 @@ const SelectBottomSheet = forwardRef<BottomSheetModal, SelectBottomSheetProps>(
                 <View style={{ width: 48 }} />
                 <BoldText
                   numberOfLines={1}
-                  style={{ flex: 1, textAlign: 'center', color: colors.fgDefault }}
+                  style={{
+                    flex: 1,
+                    textAlign: 'center',
+                    color: colors.fgDefault,
+                  }}
                 >
                   {title}
                 </BoldText>

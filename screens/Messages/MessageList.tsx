@@ -21,7 +21,11 @@ import {
 import Animated from 'react-native-reanimated';
 import { useOptionsPanelSheetSlide } from '@app/hooks/useOptionsPanelSheetSlide';
 
-import { NavigationProp, ParamListBase, useNavigation } from '@react-navigation/native';
+import {
+  NavigationProp,
+  ParamListBase,
+  useNavigation,
+} from '@react-navigation/native';
 import { useTheme } from '@app/theme';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faChevronLeft, faAngleDown } from '@fortawesome/free-solid-svg-icons';
@@ -37,7 +41,7 @@ import { AppDrawerParamList } from '@app/types';
 import FadeText from '@ui/primitives/FadeText';
 import BoldText from '@ui/primitives/BoldText';
 import Button from '@ui/primitives/Button';
-import SheetRim from '@ui/primitives/SheetRim';
+import AppSheet from '@ui/primitives/AppSheet';
 import MessageLine from './components/MessageLine';
 import { ContextAppLoaded } from '@app/context';
 import Header from '@ui/widgets/Header';
@@ -91,57 +95,50 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
 
   const messagesSnapPoints = useFullSheetSnapPoints(containerH, headerH);
 
-  const renderMessagesHandle = useCallback(
-    () => (
+  const messagesHeader = (
+    <View
+      style={{
+        paddingTop: 12,
+        paddingBottom: 8,
+        paddingHorizontal: 16,
+      }}
+    >
       <View
         style={{
-          paddingTop: 12,
-          paddingBottom: 8,
-          paddingHorizontal: 16,
-          backgroundColor: colors.bgSurface,
-          borderTopLeftRadius: 40,
-          borderTopRightRadius: 40,
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
         }}
       >
-        <SheetRim />
-        <View
+        {closeScreen ? (
+          <TouchableOpacity
+            onPress={closeScreen}
+            hitSlop={8}
+            style={{ paddingHorizontal: 4, paddingVertical: 4 }}
+          >
+            <FontAwesomeIcon
+              icon={faChevronLeft}
+              size={20}
+              color={colors.fgAccent}
+            />
+          </TouchableOpacity>
+        ) : (
+          <View style={{ width: 28 }} />
+        )}
+        <BoldText
+          numberOfLines={1}
           style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
+            flex: 1,
+            fontSize: 16,
+            lineHeight: 28,
+            textAlign: 'center',
           }}
         >
-          {closeScreen ? (
-            <TouchableOpacity
-              onPress={closeScreen}
-              hitSlop={8}
-              style={{ paddingHorizontal: 4, paddingVertical: 4 }}
-            >
-              <FontAwesomeIcon
-                icon={faChevronLeft}
-                size={20}
-                color={colors.fgAccent}
-              />
-            </TouchableOpacity>
-          ) : (
-            <View style={{ width: 28 }} />
-          )}
-          <BoldText
-            numberOfLines={1}
-            style={{
-              flex: 1,
-              fontSize: 16,
-              lineHeight: 28,
-              textAlign: 'center',
-            }}
-          >
-            {translate('messages.title') as string}
-          </BoldText>
-          <View style={{ width: 28 }} />
-        </View>
+          {translate('messages.title') as string}
+        </BoldText>
+        <View style={{ width: 28 }} />
       </View>
-    ),
-    [closeScreen, colors, translate],
+    </View>
   );
 
   useEffect(() => {
@@ -276,22 +273,10 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
         pointerEvents="box-none"
         style={[StyleSheet.absoluteFill, sheetSlideStyle]}
       >
-        <BottomSheet
+        <AppSheet
           ref={messagesSheetRef}
           snapPoints={messagesSnapPoints}
-          index={0}
-          enableDynamicSizing={false}
-          enablePanDownToClose={false}
-          enableContentPanningGesture={false}
-          keyboardBehavior={'interactive'}
-          keyboardBlurBehavior={'restore'}
-          android_keyboardInputMode={'adjustResize'}
-          backgroundStyle={{
-            backgroundColor: colors.bgSurface,
-            borderTopLeftRadius: 40,
-            borderTopRightRadius: 40,
-          }}
-          handleComponent={renderMessagesHandle}
+          header={messagesHeader}
         >
           <ScrollView
             ref={scrollViewRef}
@@ -302,7 +287,6 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
             alwaysBounceVertical={false}
             style={{
               flex: 1,
-              backgroundColor: colors.bgSurface,
             }}
             contentContainerStyle={{
               flexDirection: 'column',
@@ -389,7 +373,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
               </>
             )}
           </ScrollView>
-        </BottomSheet>
+        </AppSheet>
         {!isAtBottom && !loading && (
           <Pressable
             onPress={handleScrollToBottom}
