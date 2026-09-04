@@ -560,7 +560,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     @ReactMethod
     fun loadExistingWallet(serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String, promise: Promise) {
-        FfiOutcome.settling(promise, "init_from_b64") {
+        FfiOutcome.settling(promise, "init_from_bytes") {
             loadExistingWalletNative(serveruri, chainhint, performancelevel, minconfirmations)
         }
     }

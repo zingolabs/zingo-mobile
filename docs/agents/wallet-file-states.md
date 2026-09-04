@@ -32,8 +32,14 @@ bridge (`WalletFileState` in `walletFileRepair.ts`).
 
 The plain state and the Step 1 write format are the same bytes a desktop
 zingolib wallet file holds. zingolib's parser is the only judge of
-content. On iOS the file is base64 text until Step 2 and none of the
-Android states apply.
+content.
+
+iOS holds the same plain state and one legacy state of its own,
+`base64Text`, the format every release before this one wrote. A read
+classifies by the same 8-byte header, decodes the text when the header
+does not match, validates the result, and writes the raw bytes back
+through an atomic replace. The text stays until the validated raw copy
+lands. The Android encrypted states never occur there.
 
 ## Sidecars
 

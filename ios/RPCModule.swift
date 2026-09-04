@@ -103,6 +103,27 @@ enum FfiArgs {
   }
 }
 
+/// The plain wallet format on disk: raw zingolib bytes whose first field
+/// is a little-endian u64 version.
+enum WalletFileFormat {
+  static func looksLikePlainWallet(_ bytes: Data) -> Bool {
+    guard bytes.count >= 8 else { return false }
+    var version: UInt64 = 0
+    for (offset, byte) in bytes.prefix(8).enumerated() {
+      version |= UInt64(byte) << (8 * UInt64(offset))
+    }
+    return version <= 1000
+  }
+
+  /// The bytes of a legacy base64 text file, trimmed to the last whole
+  /// quantum so a truncated file still decodes.
+  static func decodeLegacyText(_ bytes: Data) -> Data? {
+    guard let text = String(data: bytes, encoding: .utf8) else { return nil }
+    let trimmed = String(text.prefix(text.count - text.count % 4))
+    return Data(base64Encoded: trimmed)
+  }
+}
+
 @objc(RPCModule)
 class RPCModule: NSObject {
   
@@ -167,9 +188,9 @@ class RPCModule: NSObject {
   // seconds after screen lock and broke background saves. Backup
   // exclusion is the guard against restoring a stale wallet over a
   // newer one and must never regress.
-  func writeFile(_ fileName: String, fileBase64EncodedString: String) throws {
+  func writeFile(_ fileName: String, walletBytes: Data) throws {
     let filePath = try getFileName(fileName)
-    try fileBase64EncodedString.write(toFile: filePath, atomically: true, encoding: .utf8)
+    try walletBytes.write(to: URL(fileURLWithPath: filePath), options: .atomic)
     var fileURL = URL(fileURLWithPath: filePath)
     var resourceValues = URLResourceValues()
     resourceValues.isExcludedFromBackup = true
@@ -292,17 +313,17 @@ class RPCModule: NSObject {
     }
   }
 
-  func saveWalletFile(_ base64EncodedString: String) throws {
+  func saveWalletFile(_ walletBytes: Data) throws {
     do {
-      try writeFile(Constants.WalletFileName.rawValue, fileBase64EncodedString: base64EncodedString)
+      try writeFile(Constants.WalletFileName.rawValue, walletBytes: walletBytes)
     } catch {
       throw FileError.writeFileError("Error: [Native] writting wallet file error: \(error.localizedDescription)")
     }
   }
   
-  func saveWalletBackupFile(_ base64EncodedString: String) throws {
+  func saveWalletBackupFile(_ walletBytes: Data) throws {
     do {
-      try writeFile(Constants.WalletBackupFileName.rawValue, fileBase64EncodedString: base64EncodedString)
+      try writeFile(Constants.WalletBackupFileName.rawValue, walletBytes: walletBytes)
     } catch {
       throw FileError.writeFileError("Error: [Native] writting wallet backup file error: \(error.localizedDescription)")
     }
@@ -323,29 +344,38 @@ class RPCModule: NSObject {
     }
   }
 
-  // The wallet file's base64 text decoded to raw bytes.
-  func readWalletFileBytes() throws -> Data {
-    let text = try readWalletUtf8String()
-    guard let bytes = Data(base64Encoded: text) else {
-      throw FileError.readWalletError("Error: [Native] the wallet file text does not decode as base64")
+  // Raw wallet bytes, migrating a legacy base64 text file in place. The
+  // text stays until the validated raw copy replaces it.
+  func readWalletFileBytes(_ fileName: String) throws -> Data {
+    let path = try getFileName(fileName)
+    let stored: Data
+    do {
+      stored = try Data(contentsOf: URL(fileURLWithPath: path))
+    } catch {
+      throw FileError.readWalletError("Error: [Native] reading \(fileName) error: \(error.localizedDescription)")
     }
-    return bytes
+    if WalletFileFormat.looksLikePlainWallet(stored) {
+      return stored
+    }
+    guard let decoded = WalletFileFormat.decodeLegacyText(stored),
+          (try? validateWalletBytes(walletBytes: decoded)) != nil else {
+      throw FileError.readWalletError("Error: [Native] \(fileName) is not a wallet this build can read")
+    }
+    do {
+      try writeFile(fileName, walletBytes: decoded)
+      NSLog("[Native] \(fileName) migrated to raw wallet bytes")
+    } catch {
+      NSLog("Error: [Native] \(fileName) migration to raw bytes skipped: \(error.localizedDescription)")
+    }
+    return decoded
   }
 
-  func readWalletUtf8String() throws -> String {
-    do {
-      return try readFile(Constants.WalletFileName.rawValue)
-    } catch {
-      throw FileError.readWalletError("Error: [Native] reading wallet format error: \(error.localizedDescription)")
-    }
+  func readWalletBytes() throws -> Data {
+    try readWalletFileBytes(Constants.WalletFileName.rawValue)
   }
 
-  func readWalletBackup() throws -> String {
-    do {
-      return try readFile(Constants.WalletBackupFileName.rawValue)
-    } catch {
-      throw FileError.readWalletError("Error: [Native] reading wallet backup format error: \(error.localizedDescription)")
-    }
+  func readWalletBackupBytes() throws -> Data {
+    try readWalletFileBytes(Constants.WalletBackupFileName.rawValue)
   }
 
   func fnDeleteExistingWallet() throws {
@@ -453,15 +483,14 @@ class RPCModule: NSObject {
 
     NSLog("[Native] file size: \(walletBytes.count) bytes")
     do {
-      try self.saveWalletFile(walletBytes.base64EncodedString())
+      try self.saveWalletFile(walletBytes)
     } catch {
       throw saveFailure(error.localizedDescription)
     }
   }
 
   func saveWalletBackupInternal() throws {
-    let walletString = try readWalletUtf8String()
-    try self.saveWalletBackupFile(walletString)
+    try self.saveWalletBackupFile(try readWalletBytes())
   }
 
   func fnCreateNewWallet(
@@ -566,7 +595,7 @@ class RPCModule: NSObject {
     performancelevel: String, 
     minconfirmations: String
   ) throws -> String {
-    let seed = try initFromBytes(walletBytes: try self.readWalletFileBytes(), serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: UInt32(minconfirmations) ?? 0)
+    let seed = try initFromBytes(walletBytes: try self.readWalletBytes(), serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: UInt32(minconfirmations) ?? 0)
     reopenWalletFile()
     let seedStr = String(seed)
     return seedStr
@@ -589,9 +618,8 @@ class RPCModule: NSObject {
   @objc(restoreExistingWalletBackup:reject:)
   func restoreExistingWalletBackup(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     do {
-      let backupEncodedData = try self.readWalletBackup()
-      if let backupBytes = Data(base64Encoded: backupEncodedData),
-         (try? validateWalletBytes(walletBytes: backupBytes)) != nil {
+      let backupBytes = try self.readWalletBackupBytes()
+      if (try? validateWalletBytes(walletBytes: backupBytes)) != nil {
         // Closed across the swap; the reload after the restore clears it.
         RPCModule.walletFileHold.lock()
         RPCModule.walletFileClosed = true
@@ -624,7 +652,7 @@ class RPCModule: NSObject {
           // restore, so if they then created/restored a different wallet the
           // just-restored one was gone. Keeping a duplicate copy as backup is
           // far safer than none.
-          try self.saveWalletFile(backupEncodedData)
+          try self.saveWalletFile(backupBytes)
         }
         DispatchQueue.main.async {
           resolve("true")
@@ -632,7 +660,7 @@ class RPCModule: NSObject {
       } else {
         // Audit Issue A — redact the payload. Mirrors the saveExistingWallet
         // path at L240: log only the size, never the encoded wallet bytes.
-        NSLog("Error: [Native] Couldn't save the wallet backup. The Encoded content is incorrect. Size: \(backupEncodedData.count)")
+        NSLog("Error: [Native] Couldn't save the wallet backup. The content is not a wallet. Size: \(backupBytes.count)")
         DispatchQueue.main.async {
           resolve("false")
         }
@@ -646,22 +674,21 @@ class RPCModule: NSObject {
   }
 
   // Salvages seed and birthday from the closed wallet file and keeps the
-  // damaged file aside as ".broken". The file stores base64 text and
-  // truncation can cut it mid-quantum, so the decode drops the
-  // unfinishable tail characters before handing bytes to the salvage
-  // reader.
+  // damaged file aside as ".broken".
   @objc(walletFileRecoveryInfo:reject:)
   func walletFileRecoveryInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     DispatchQueue.global(qos: .userInitiated).async {
       FfiOutcome.of {
-        let text = try self.readWalletUtf8String()
-        let trimmed = String(text.prefix(text.count - text.count % 4))
-        guard let walletBytes = Data(base64Encoded: trimmed) else {
-          throw ZingolibError.Read(message: "the wallet file text does not decode as base64")
+        let mainPath = try self.getFileName(Constants.WalletFileName.rawValue)
+        let stored = try Data(contentsOf: URL(fileURLWithPath: mainPath))
+        let walletBytes = WalletFileFormat.looksLikePlainWallet(stored)
+          ? stored
+          : WalletFileFormat.decodeLegacyText(stored)
+        guard let walletBytes else {
+          throw ZingolibError.Read(message: "the wallet file is not a wallet this build can read")
         }
         let salvaged = try readWalletRecoveryInfo(walletBytes: walletBytes)
         let fm = FileManager.default
-        let mainPath = try self.getFileName(Constants.WalletFileName.rawValue)
         let brokenPath = "\(mainPath).broken"
         try? fm.removeItem(atPath: brokenPath)
         try? fm.copyItem(atPath: mainPath, toPath: brokenPath)
@@ -670,21 +697,19 @@ class RPCModule: NSObject {
     }
   }
 
-  // "plainWallet" when the base64 text decodes to bytes with a plausible
-  // zingolib version header, truncated files included.
+  // "plainWallet" when the file carries a plausible zingolib version
+  // header, raw or as legacy base64 text, truncated files included.
   func walletFileState(_ path: String) -> String {
-    guard let text = try? String(contentsOfFile: path, encoding: .utf8) else {
+    guard let stored = try? Data(contentsOf: URL(fileURLWithPath: path)) else {
       return "unknown"
     }
-    let trimmed = String(text.prefix(text.count - text.count % 4))
-    guard let bytes = Data(base64Encoded: trimmed), bytes.count >= 8 else {
+    if WalletFileFormat.looksLikePlainWallet(stored) {
+      return "plainWallet"
+    }
+    guard let decoded = WalletFileFormat.decodeLegacyText(stored) else {
       return "unknown"
     }
-    var version: UInt64 = 0
-    for (offset, byte) in bytes.prefix(8).enumerated() {
-      version |= UInt64(byte) << (8 * UInt64(offset))
-    }
-    return version <= 1000 ? "plainWallet" : "unknown"
+    return WalletFileFormat.looksLikePlainWallet(decoded) ? "plainWallet" : "unknown"
   }
 
   // The per-file diagnosis for the recovery dialog, in the Android report

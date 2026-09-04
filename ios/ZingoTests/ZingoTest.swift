@@ -967,9 +967,8 @@ class WalletFileProtectionTests: XCTestCase {
     }
 }
 
-/// The per-file diagnosis behind the recovery dialog: base64 text that
-/// decodes to a plausible wallet header reads `plainWallet`, truncation
-/// included.
+/// The per-file diagnosis behind the recovery dialog, and the migration
+/// from the legacy base64 text format to raw wallet bytes.
 class WalletFileDiagnosisTests: XCTestCase {
     private func mainEntry(_ rpc: RPCModule) -> [String: Any]? {
         rpc.walletFileDiagnosis().first { $0["name"] as? String == Constants.WalletFileName.rawValue }
@@ -991,18 +990,40 @@ class WalletFileDiagnosisTests: XCTestCase {
         super.tearDown()
     }
 
-    func testATruncatedWalletFileDiagnosesPlainWallet() throws {
-        let rpc = RPCModule()
-        let path = try mainPath(rpc)
+    private func walletBytes() -> Data {
         var wallet = Data([42, 0, 0, 0, 0, 0, 0, 0])
         wallet.append(Data(repeating: 7, count: 64))
-        let text = wallet.base64EncodedString()
-        let truncated = String(text.prefix(text.count / 2 + 1))
-        try truncated.write(toFile: path, atomically: true, encoding: .utf8)
+        return wallet
+    }
+
+    func testARawWalletFileDiagnosesPlainWallet() throws {
+        let rpc = RPCModule()
+        let path = try mainPath(rpc)
+        try walletBytes().write(to: URL(fileURLWithPath: path))
 
         let entry = try XCTUnwrap(mainEntry(rpc))
         XCTAssertEqual(entry["state"] as? String, "plainWallet")
         XCTAssertGreaterThan(entry["size"] as? Int ?? 0, 0)
+    }
+
+    func testATruncatedRawWalletFileDiagnosesPlainWallet() throws {
+        let rpc = RPCModule()
+        let path = try mainPath(rpc)
+        try walletBytes().prefix(20).write(to: URL(fileURLWithPath: path))
+
+        let entry = try XCTUnwrap(mainEntry(rpc))
+        XCTAssertEqual(entry["state"] as? String, "plainWallet")
+    }
+
+    func testALegacyBase64TextFileDiagnosesPlainWallet() throws {
+        let rpc = RPCModule()
+        let path = try mainPath(rpc)
+        let text = walletBytes().base64EncodedString()
+        try String(text.prefix(text.count / 2 + 1)).write(
+            toFile: path, atomically: true, encoding: .utf8)
+
+        let entry = try XCTUnwrap(mainEntry(rpc))
+        XCTAssertEqual(entry["state"] as? String, "plainWallet")
     }
 
     func testGarbageTextDiagnosesUnknown() throws {
@@ -1012,6 +1033,34 @@ class WalletFileDiagnosisTests: XCTestCase {
 
         let entry = try XCTUnwrap(mainEntry(rpc))
         XCTAssertEqual(entry["state"] as? String, "unknown")
+    }
+
+    func testALegacyTextFileMigratesToRawBytesOnRead() throws {
+        setCryptoProvider()
+        _ = try initFromSeed(
+            seed: Seeds.HOSPITAL, birthday: UInt32(2_000_000), serveruri: "",
+            chainhint: "main", performancelevel: "Medium", minconfirmations: UInt32(1))
+        let wallet = try XCTUnwrap(try saveWalletBytes())
+
+        let rpc = RPCModule()
+        let path = try mainPath(rpc)
+        try wallet.base64EncodedString().write(
+            toFile: path, atomically: true, encoding: .utf8)
+
+        XCTAssertEqual(try rpc.readWalletBytes(), wallet)
+        XCTAssertEqual(try Data(contentsOf: URL(fileURLWithPath: path)), wallet)
+    }
+
+    func testAnInvalidLegacyTextFileFailsAndLeavesTheFileUntouched() throws {
+        let rpc = RPCModule()
+        let path = try mainPath(rpc)
+        let text = walletBytes().base64EncodedString()
+        try text.write(toFile: path, atomically: true, encoding: .utf8)
+
+        XCTAssertThrowsError(try rpc.readWalletBytes())
+        XCTAssertEqual(
+            try Data(contentsOf: URL(fileURLWithPath: path)),
+            text.data(using: .utf8))
     }
 
     func testAMissingFileDiagnosesMissing() throws {
