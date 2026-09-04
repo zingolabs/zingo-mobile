@@ -81,7 +81,7 @@ export async function walletExists(): Promise<boolean> {
 
 // Runs before every wallet init. A custom (off-registry) server pins migration
 // transmission to itself, since no registry pool applies. A registry server
-// leaves it unset so the library's curated Correspondent pool, which excludes
+// leaves it unset so the library's curated Destination pool, which excludes
 // the sync operator, routes instead.
 async function applyBroadcastCandidates(
   serverUri: string,
