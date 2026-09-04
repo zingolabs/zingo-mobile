@@ -57,6 +57,13 @@ network in a docker container. Before running tests, pull the latest Regchest im
 1. From the root directory, run: <br />
    `yarn test`
 
+### Memory Benchmark
+Peak heap per wallet-file path, on a connected Android device or emulator.
+
+- `yarn bench:memory`: measure and compare against `scripts/wallet_memory_baseline.json`, non-zero exit on a regression
+- `yarn bench:memory --report`: measure only
+- `yarn bench:memory:accept`: record a new baseline
+
 ### Integration Tests
 These exercise the Rust ↔ Kotlin/Swift FFI boundary against a regtest network.
 

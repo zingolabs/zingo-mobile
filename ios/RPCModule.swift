@@ -8,24 +8,6 @@
 import Foundation
 import React
 
-/// A pure canonical-base64 check — no I/O, no logging, no platform
-/// dependencies — so it runs under plain XCTest unit tests.
-///
-/// The FFI no longer returns base64 (the save path crosses as bytes, so a
-/// malformed export is unrepresentable). This guard's one remaining role is
-/// validating wallet-file content read back from disk before
-/// `restoreExistingWalletBackup` swaps it into place.
-enum WalletExport {
-  // Canonical: exactly the strings the encoder emits and the Rust
-  // STANDARD engine accepts, checked by decode/re-encode round-trip.
-  // (Foundation's decoder alone tolerates non-zero trailing padding
-  // bits, which Rust rejects at init_from_b64.)
-  static func isValidBase64(_ s: String) -> Bool {
-    guard !s.isEmpty, let decoded = Data(base64Encoded: s) else { return false }
-    return decoded.base64EncodedString() == s
-  }
-}
-
 /// The outcome of an FFI call, classified by channel alone
 /// (zingo-mobile#1151): the value a call returns is resolved verbatim —
 /// never inspected for an error sentinel — and a thrown ZingolibError is
@@ -341,6 +323,15 @@ class RPCModule: NSObject {
     }
   }
 
+  // The wallet file's base64 text decoded to raw bytes.
+  func readWalletFileBytes() throws -> Data {
+    let text = try readWalletUtf8String()
+    guard let bytes = Data(base64Encoded: text) else {
+      throw FileError.readWalletError("Error: [Native] the wallet file text does not decode as base64")
+    }
+    return bytes
+  }
+
   func readWalletUtf8String() throws -> String {
     do {
       return try readFile(Constants.WalletFileName.rawValue)
@@ -575,7 +566,7 @@ class RPCModule: NSObject {
     performancelevel: String, 
     minconfirmations: String
   ) throws -> String {
-    let seed = try initFromB64(datab64: try self.readWalletUtf8String(), serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: UInt32(minconfirmations) ?? 0)
+    let seed = try initFromBytes(walletBytes: try self.readWalletFileBytes(), serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: UInt32(minconfirmations) ?? 0)
     reopenWalletFile()
     let seedStr = String(seed)
     return seedStr
@@ -599,8 +590,8 @@ class RPCModule: NSObject {
   func restoreExistingWalletBackup(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     do {
       let backupEncodedData = try self.readWalletBackup()
-      // check if the content is correct. Stored Encoded.
-      if WalletExport.isValidBase64(backupEncodedData) {
+      if let backupBytes = Data(base64Encoded: backupEncodedData),
+         (try? validateWalletBytes(walletBytes: backupBytes)) != nil {
         // Closed across the swap; the reload after the restore clears it.
         RPCModule.walletFileHold.lock()
         RPCModule.walletFileClosed = true

@@ -97,14 +97,13 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         false
     }
 
-    // Writes validated plain wallet bytes from their Base64 form.
-    private fun writePlainFromB64(fileName: String, contentB64: String) {
-        val bytes = Base64.decode(contentB64, Base64.NO_WRAP)
+    // Writes validated plain wallet bytes.
+    private fun writeWalletBytes(fileName: String, bytes: ByteArray) {
         uniffi.zingo.validateWalletBytes(bytes)
         PlainWalletFile.write(applicationContext.filesDir, fileName, bytes)
     }
 
-    // Reads a wallet file as a Base64 string: raw plain bytes first (the
+    // Reads a wallet file as raw bytes: the plain format first (the
     // format every save writes since the encryption removal, and the
     // legacy plain format of Zingo ≤ 2.0.20), then the legacy encrypted
     // formats as recovery only. A successful legacy read migrates the file
@@ -119,11 +118,11 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     // A thrown IOException here is outside the FFI's typed family, so a
     // bridge caller rejects it under the "Unknown" code; the message text
     // is the user-actionable diagnosis.
-    private fun readFileAsB64(fileName: String): String {
+    private fun readWalletBytes(fileName: String): ByteArray {
         val filesDir = applicationContext.filesDir
         PlainWalletFile.resolveInterruptedMigration(filesDir, fileName, ::isIntactWallet)
         PlainWalletFile.readIfPlain(filesDir, fileName)?.let {
-            return Base64.encodeToString(it, Base64.NO_WRAP)
+            return it
         }
         val file = File(filesDir, fileName)
         if (!file.exists()) {
@@ -172,8 +171,17 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         } catch (writeError: Exception) {
             Log.e("MAIN", "[$fileName] migration to plain skipped: $writeError")
         }
-        return Base64.encodeToString(plain, Base64.NO_WRAP)
+        return plain
     }
+
+    // The content digest of a wallet file, streamed when the file is
+    // plain and decrypted when it is legacy.
+    private fun walletDigest(fileName: String): ByteArray =
+        if (PlainWalletFile.readsPlain(applicationContext.filesDir, fileName)) {
+            PlainWalletFile.digest(applicationContext.filesDir, fileName)
+        } else {
+            PlainWalletFile.digest(readWalletBytes(fileName))
+        }
 
     // Restores a wallet file from its legacy "$fileName.write.tmp" stash
     // when the file fails the full parse, and drops the orphan once the
@@ -184,13 +192,12 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             if (!fileExists(tempName)) continue
             try {
                 val targetIntact = fileExists(fileName) && try {
-                    isIntactWallet(Base64.decode(readFileAsB64(fileName), Base64.NO_WRAP))
+                    isIntactWallet(readWalletBytes(fileName))
                 } catch (_: Exception) {
                     false
                 }
                 if (!targetIntact) {
-                    val tempContent = readFileAsB64(tempName)
-                    writePlainFromB64(fileName, tempContent)
+                    writeWalletBytes(fileName, readWalletBytes(tempName))
                     Log.i("MAIN", "[Native] completePendingWrite: restored $fileName from $tempName")
                 }
                 deleteFile(tempName)
@@ -207,7 +214,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     //   (2) write main(originalBackup)
     //   (3) write backup(originalMain)
     //   (4) delete temp
-    // Recovery goes by content comparison, and `readFileAsB64` levels the
+    // Recovery goes by content digest, and `walletDigest` levels the
     // formats: the temp may be a legacy encrypted file from an old release
     // or plain bytes from the current one.
     //
@@ -220,29 +227,27 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         val tempFile = File(applicationContext.filesDir, WalletTempSwapFileName.value)
         if (!tempFile.exists()) return
         try {
-            val tempContent = readFileAsB64(WalletTempSwapFileName.value)
+            val tempDigest = walletDigest(WalletTempSwapFileName.value)
             if (fileExists(WalletFileName.value)) {
-                val mainContent = readFileAsB64(WalletFileName.value)
-                if (mainContent == tempContent) {
+                if (walletDigest(WalletFileName.value).contentEquals(tempDigest)) {
                     // (1)–(2) window: main not yet overwritten.
                     if (fileExists(WalletBackupFileName.value)) {
-                        val backupContent = readFileAsB64(WalletBackupFileName.value)
-                        writePlainFromB64(WalletFileName.value, backupContent)
+                        writeWalletBytes(WalletFileName.value, readWalletBytes(WalletBackupFileName.value))
                     }
-                    writePlainFromB64(WalletBackupFileName.value, tempContent)
+                    writeWalletBytes(WalletBackupFileName.value, readWalletBytes(WalletTempSwapFileName.value))
                 } else {
                     // (2)–(3) or post-(3) window: main already holds the new content.
-                    val backupExists = fileExists(WalletBackupFileName.value)
-                    val backupContent = if (backupExists) readFileAsB64(WalletBackupFileName.value) else null
-                    if (backupContent != tempContent) {
+                    val backupMatches = fileExists(WalletBackupFileName.value) &&
+                        walletDigest(WalletBackupFileName.value).contentEquals(tempDigest)
+                    if (!backupMatches) {
                         // (2)–(3) window or backup missing: write the lost content.
-                        writePlainFromB64(WalletBackupFileName.value, tempContent)
+                        writeWalletBytes(WalletBackupFileName.value, readWalletBytes(WalletTempSwapFileName.value))
                     }
                     // else: post-(3), backup already correct.
                 }
             } else {
                 // Main missing: restore from temp.
-                writePlainFromB64(WalletFileName.value, tempContent)
+                writeWalletBytes(WalletFileName.value, readWalletBytes(WalletTempSwapFileName.value))
             }
             deleteFile(WalletTempSwapFileName.value)
             Log.i("MAIN", "[Native] completePendingSwap: interrupted swap recovered")
@@ -313,8 +318,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 Log.w("MAIN", "[Native] wallet file closed, backup save refused")
                 return false
             }
-            val content = readFileAsB64(WalletFileName.value)
-            writePlainFromB64(WalletBackupFileName.value, content)
+            writeWalletBytes(WalletBackupFileName.value, readWalletBytes(WalletFileName.value))
             true
         } catch (e: Exception) {
             Log.e("MAIN", "[Native] Couldn't save the wallet backup: $e")
@@ -566,10 +570,10 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun loadExistingWalletNative(serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String): String {
         uniffi.zingo.initLogging()
 
-        val fileb64 = readFileAsB64(WalletFileName.value)
-        Log.i("MAIN", "file size: ${fileb64.length} chars (Base64)")
+        val walletBytes = readWalletBytes(WalletFileName.value)
+        Log.i("MAIN", "file size: ${walletBytes.size} bytes")
 
-        val resp = uniffi.zingo.initFromB64(fileb64, serveruri, chainhint, performancelevel, minconfirmations.toUInt())
+        val resp = uniffi.zingo.initFromBytes(walletBytes, serveruri, chainhint, performancelevel, minconfirmations.toUInt())
         walletFileClosed = false
         migrateRetainedWallet()
         return resp
@@ -579,8 +583,9 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     // migrates a legacy encrypted file to plain.
     private fun migrateRetainedWallet() {
         if (!fileExists(WalletBackupFileName.value)) return
+        if (PlainWalletFile.readsPlain(applicationContext.filesDir, WalletBackupFileName.value)) return
         try {
-            readFileAsB64(WalletBackupFileName.value)
+            readWalletBytes(WalletBackupFileName.value)
         } catch (e: Exception) {
             Log.w("MAIN", "[Native] retained wallet migration failed: $e")
         }
@@ -589,10 +594,8 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     @ReactMethod
     fun restoreExistingWalletBackup(promise: Promise) {
         try {
-            val backup = readFileAsB64(WalletBackupFileName.value)
-            // Check the content is correct before swapping it into place.
-            // Stored encoded, so the guard is structural (zingo-mobile#1151).
-            if (!WalletBackup.isRestorable(backup)) {
+            val backup = readWalletBytes(WalletBackupFileName.value)
+            if (!isIntactWallet(backup)) {
                 Log.e("MAIN", "[Native] backup restore: content failed validation")
                 promise.resolve(false)
                 return
@@ -610,27 +613,27 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 // original main.
                 completePendingSwap()
                 val wallet = try {
-                    readFileAsB64(WalletFileName.value)
+                    readWalletBytes(WalletFileName.value)
                 } catch (e: Exception) {
                     // Keep the unreadable main's raw bytes aside and restore the backup into both slots.
                     Log.w("MAIN", "[Native] backup restore: main unreadable, preserving raw and restoring backup: $e")
                     File(applicationContext.filesDir, WalletFileName.value)
                         .copyTo(File(applicationContext.filesDir, "${WalletFileName.value}.broken"), overwrite = true)
-                    writePlainFromB64(WalletFileName.value, backup)
+                    writeWalletBytes(WalletFileName.value, backup)
                     promise.resolve(true)
                     return
                 }
-                writePlainFromB64(WalletTempSwapFileName.value, wallet)   // (1) temp = original main
-                writePlainFromB64(WalletFileName.value, backup)           // (2) main = backup
-                writePlainFromB64(WalletBackupFileName.value, wallet)     // (3) backup = original main
-                deleteFile(WalletTempSwapFileName.value)                  // (4) cleanup
+                writeWalletBytes(WalletTempSwapFileName.value, wallet)
+                writeWalletBytes(WalletFileName.value, backup)
+                writeWalletBytes(WalletBackupFileName.value, wallet)
+                deleteFile(WalletTempSwapFileName.value)
             } else {
                 // No wallet exists: restore backup as wallet, but KEEP the
                 // backup file. Deleting it here left the user with no backup
                 // right after a restore, so if they then created/restored a
                 // different wallet the just-restored one was gone. Keeping a
                 // duplicate copy as backup is far safer than none.
-                writePlainFromB64(WalletFileName.value, backup)
+                writeWalletBytes(WalletFileName.value, backup)
             }
             promise.resolve(true)
         } catch (e: FileNotFoundException) {

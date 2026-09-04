@@ -26,6 +26,8 @@
     "lint": "eslint . --fix",
     "lint:check": "eslint .",
     "lint:android": "node scripts/android_lint.mjs",
+    "bench:memory": "tsx scripts/wallet_memory_bench.mts",
+    "bench:memory:accept": "tsx scripts/wallet_memory_bench.mts --accept",
     "depcheck": "depcheck",
     "prettier": "prettier './**/*.{js,jsx,ts,tsx}' -w",
     "prettier:check": "prettier --check './**/*.{js,jsx,ts,tsx}'",

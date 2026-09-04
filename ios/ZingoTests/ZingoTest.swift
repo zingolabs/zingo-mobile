@@ -793,53 +793,6 @@ final class ExecuteParseAddressInvalid: XCTestCase {
     }
 }
 
-/// The wallet-file base64 guard (zingo-mobile#1151; audit Issue Q). The FFI
-/// save path now crosses as bytes, so the historical attack string — a valid
-/// base64 export beginning with "error" — is unrepresentable there; this
-/// validator's one remaining consumer is restoreExistingWalletBackup, which
-/// checks file content read back from disk. Its acceptance rules are pinned
-/// here: base64 is recognized by structure alone, never by sentinel.
-class WalletFileBase64Tests: XCTestCase {
-    func testContentResemblingAnErrorSentinelIsValid() {
-        // Every case variant of the historical sentinel is well-formed
-        // base64 and must validate.
-        XCTAssertTrue(WalletExport.isValidBase64("errorAAA"))
-        XCTAssertTrue(WalletExport.isValidBase64("ERRORAAA"))
-    }
-
-    func testFailureProseNeverValidates() {
-        // Prose always contains ':' and ' ', both outside the base64
-        // alphabet.
-        XCTAssertFalse(WalletExport.isValidBase64("Error: disk full"))
-    }
-
-    func testEmptyContentNeverValidates() {
-        XCTAssertFalse(WalletExport.isValidBase64(""))
-    }
-
-    func testMalformedContentNeverValidates() {
-        XCTAssertFalse(WalletExport.isValidBase64("not base64 at all"))
-    }
-
-    func testPaddingMayOnlyTrail() {
-        XCTAssertFalse(WalletExport.isValidBase64("AB=A"))
-        XCTAssertTrue(WalletExport.isValidBase64("ABCD"))
-    }
-
-    func testPaddingIsAtMostTwoCharacters() {
-        XCTAssertFalse(WalletExport.isValidBase64("A==="))
-    }
-
-    func testTrailingBitsMustBeZero() {
-        // Non-canonical padding decodes downstream-dependently: the Rust
-        // STANDARD engine rejects it, so the guard must too.
-        XCTAssertFalse(WalletExport.isValidBase64("AB=="))
-        XCTAssertFalse(WalletExport.isValidBase64("AAB="))
-        XCTAssertTrue(WalletExport.isValidBase64("AA=="))
-        XCTAssertTrue(WalletExport.isValidBase64("AAA="))
-    }
-}
-
 /// The bridge-outcome contract for every migrated FFI (zingo-mobile#1151):
 /// whether a call succeeded is knowable from the channel of its result —
 /// resolved versus rejected — never from its content, and a rejection's

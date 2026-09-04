@@ -1,8 +1,10 @@
 package org.ZingoLabs.Zingo
 
 import java.io.File
+import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
+import java.security.MessageDigest
 
 /**
  * Owns the plain wallet-file format (raw zingolib bytes under OS
@@ -14,6 +16,9 @@ object PlainWalletFile {
     // One writer at a time: the JS bridge, BackgroundSyncWorker, and the
     // load-path migration share the process and the temp file name.
     private val writeLock = Any()
+
+    private const val BUFFER_SIZE = 8 * 1024
+    private const val HEADER_SIZE = 8
 
     // Writes to "$fileName.plain.tmp", verifies the synced read-back, then
     // renames onto the final path, which keeps its old content until then.
@@ -28,7 +33,7 @@ object PlainWalletFile {
                     out.write(bytes)
                     out.fd.sync()
                 }
-                if (!temp.readBytes().contentEquals(bytes)) {
+                if (!matchesFile(temp, bytes)) {
                     throw IOException("Error: read-back of ${temp.name} does not match the wallet bytes")
                 }
                 if (!temp.renameTo(File(dir, fileName))) {
@@ -51,6 +56,54 @@ object PlainWalletFile {
                 true
             }
         }
+
+    // Compares a file against bytes one buffer at a time, so verifying a
+    // write never holds a second copy of the wallet.
+    private fun matchesFile(file: File, bytes: ByteArray): Boolean {
+        if (file.length() != bytes.size.toLong()) return false
+        val buffer = ByteArray(BUFFER_SIZE)
+        FileInputStream(file).use { input ->
+            var offset = 0
+            while (offset < bytes.size) {
+                val read = input.read(buffer)
+                if (read <= 0) return false
+                for (i in 0 until read) {
+                    if (buffer[i] != bytes[offset + i]) return false
+                }
+                offset += read
+            }
+            return input.read() == -1
+        }
+    }
+
+    // Whether the file starts with a plain wallet header. Reads 8 bytes,
+    // never the whole file.
+    fun readsPlain(dir: File, fileName: String): Boolean {
+        val file = File(dir, fileName)
+        if (!file.exists()) return false
+        val header = ByteArray(HEADER_SIZE)
+        val read = FileInputStream(file).use { it.read(header) }
+        return read == HEADER_SIZE && WalletFileEnvelope.looksLikePlainWallet(header)
+    }
+
+    // A content digest of a plain wallet file, streamed.
+    fun digest(dir: File, fileName: String): ByteArray {
+        val md = MessageDigest.getInstance("SHA-256")
+        val buffer = ByteArray(BUFFER_SIZE)
+        FileInputStream(File(dir, fileName)).use { input ->
+            while (true) {
+                val read = input.read(buffer)
+                if (read <= 0) break
+                md.update(buffer, 0, read)
+            }
+        }
+        return md.digest()
+    }
+
+    // The digest of bytes already in memory, for the legacy files that
+    // only exist as decrypted bytes.
+    fun digest(bytes: ByteArray): ByteArray =
+        MessageDigest.getInstance("SHA-256").digest(bytes)
 
     // Runs file work under the writer lock.
     fun <T> locked(block: () -> T): T = synchronized(writeLock) { block() }
