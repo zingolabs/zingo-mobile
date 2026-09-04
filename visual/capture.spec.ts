@@ -1,5 +1,5 @@
-import { test } from '@playwright/test';
-import { readFileSync, mkdirSync } from 'node:fs';
+import { test, type Page } from '@playwright/test';
+import { readFileSync, mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 type Entry = {
@@ -24,17 +24,30 @@ const entries = Object.values(
 const out = process.env.VISUAL_OUT ?? join(__dirname, '__current__');
 const imagesDir = join(out, 'images');
 mkdirSync(imagesDir, { recursive: true });
-const shot = (id: string, state: string) => join(imagesDir, `${id}__${state}.png`);
+const shot = (id: string, state: string) =>
+  join(imagesDir, `${id}__${state}.png`);
 
 // Fake-clock milliseconds stepped before a screenshot: long enough for a
 // sheet to finish presenting, and the fixed tick every loop is caught on.
 const FRAME = 1200;
 // Fake-clock milliseconds for hover/press feedback to settle.
 const FEEDBACK = 200;
+const STATIC_SETTLES = [400, 1500, 3500, 6000];
 // CSS animations and transitions run on real time, not the fake clock, so
 // the screenshot freezes them (finite ones jump to their end state) and
 // hides the text caret, whose blink is real time too.
 const still = { animations: 'disabled', caret: 'hide' } as const;
+
+async function shootStatic(
+  p: Page,
+  settle: number,
+): Promise<Buffer | undefined> {
+  const blank = await p.screenshot(still);
+  await p.waitForTimeout(settle);
+  await p.clock.runFor(FRAME);
+  const frame = await p.screenshot(still);
+  return frame.equals(blank) ? undefined : frame;
+}
 
 for (const entry of entries) {
   test(`${entry.title} — ${entry.name}`, async ({ page }) => {
@@ -56,12 +69,29 @@ for (const entry of entries) {
     // presenting after its measurement) plays inside the stepped window
     // below instead of racing the screenshot.
     await page.evaluate('document.fonts.ready');
+
+    if (entry.tags?.includes('static')) {
+      let frame = await shootStatic(page, STATIC_SETTLES[0]);
+      for (let i = 1; i < STATIC_SETTLES.length && !frame; i += 1) {
+        const fresh = await page.context().newPage();
+        await fresh.clock.install({ time: 0 });
+        await fresh.clock.pauseAt(0);
+        await fresh.goto(`/iframe.html?id=${entry.id}&viewMode=story`);
+        await fresh.locator('#storybook-root').waitFor({ state: 'visible' });
+        await fresh.evaluate('document.fonts.ready');
+        frame = await shootStatic(fresh, STATIC_SETTLES[i]);
+        await fresh.close();
+      }
+      if (!frame) {
+        throw new Error(`static story never presented: ${entry.id}`);
+      }
+      writeFileSync(shot(entry.id, 'default'), frame);
+      return;
+    }
+
     await page.waitForTimeout(250);
     await page.clock.runFor(FRAME); // one fixed frame for any incidental motion
     await page.screenshot({ path: shot(entry.id, 'default'), ...still });
-
-    // The `static` tag skips the interaction pass for modal-sheet stories, whose backdrop swallows pointer events.
-    if (entry.tags?.includes('static')) return;
 
     // Interaction states, only where the story renders something pressable.
     // The clock stays paused, so the feedback (RN Animated opacity) is

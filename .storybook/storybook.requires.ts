@@ -8,12 +8,36 @@ import "@storybook/addon-ondevice-backgrounds/register";
 const normalizedStories = [
   {
     titlePrefix: "",
-    directory: "./components",
+    directory: "./screens",
     files: "**/*.stories.?(ts|tsx)",
     importPathMatcher: /^\.(?:(?:^|\/|(?:(?:(?!(?:^|\/)\.).)*?)\/)(?!\.)(?=.)[^/]*?\.stories\.(?:ts|tsx)?)$/,
     // @ts-ignore
     req: require.context(
-      '../components',
+      '../screens',
+      true,
+      /^\.(?:(?:^|\/|(?:(?:(?!(?:^|\/)\.).)*?)\/)(?!\.)(?=.)[^/]*?\.stories\.(?:ts|tsx)?)$/
+    ),
+  },
+  {
+    titlePrefix: "",
+    directory: "./ui",
+    files: "**/*.stories.?(ts|tsx)",
+    importPathMatcher: /^\.(?:(?:^|\/|(?:(?:(?!(?:^|\/)\.).)*?)\/)(?!\.)(?=.)[^/]*?\.stories\.(?:ts|tsx)?)$/,
+    // @ts-ignore
+    req: require.context(
+      '../ui',
+      true,
+      /^\.(?:(?:^|\/|(?:(?:(?!(?:^|\/)\.).)*?)\/)(?!\.)(?=.)[^/]*?\.stories\.(?:ts|tsx)?)$/
+    ),
+  },
+  {
+    titlePrefix: "",
+    directory: "./app",
+    files: "**/*.stories.?(ts|tsx)",
+    importPathMatcher: /^\.(?:(?:^|\/|(?:(?:(?!(?:^|\/)\.).)*?)\/)(?!\.)(?=.)[^/]*?\.stories\.(?:ts|tsx)?)$/,
+    // @ts-ignore
+    req: require.context(
+      '../app',
       true,
       /^\.(?:(?:^|\/|(?:(?:(?!(?:^|\/)\.).)*?)\/)(?!\.)(?=.)[^/]*?\.stories\.(?:ts|tsx)?)$/
     ),

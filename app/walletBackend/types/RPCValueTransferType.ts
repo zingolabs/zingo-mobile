@@ -1,6 +1,6 @@
-import { PoolEnum } from '../../AppState';
-import { RPCValueTransfersStatusEnum } from '../enums/RPCValueTransfersStatusEnum';
-import { RPCValueTransfersKindEnum } from '../enums/RPCValueTransfersKindEnum';
+import { PoolEnum } from '@app/AppState';
+import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
+import { RPCValueTransfersKindEnum } from '@app/walletBackend/enums/RPCValueTransfersKindEnum';
 
 export type RPCValueTransferType = {
   txid: string;

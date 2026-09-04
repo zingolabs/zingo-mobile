@@ -45,7 +45,11 @@ export default props => React.createElement(SvgXml, Object.assign({ xml }, props
 });
 
 const main: StorybookConfig = {
-  stories: ['../components/**/*.stories.?(ts|tsx)'],
+  stories: [
+    '../screens/**/*.stories.?(ts|tsx)',
+    '../ui/**/*.stories.?(ts|tsx)',
+    '../app/**/*.stories.?(ts|tsx)',
+  ],
   addons: [],
   framework: {
     name: '@storybook/react-native-web-vite',
@@ -98,10 +102,11 @@ const main: StorybookConfig = {
         find: '@notifee/react-native',
         replacement: path.resolve(__dirname, './shims/notifee.ts'),
       },
-      // The native bridge: walletBackend reaches it as '../../RPCModule'.
-      // Screens then run their real wrappers against story fixtures.
+      // The native bridge: walletBackend reaches it as '@app/RPCModule',
+      // AppErrorBoundary as './RPCModule'. Screens then run their real
+      // wrappers against story fixtures.
       {
-        find: /^(?:\.\.\/)+RPCModule$/,
+        find: /^(?:(?:\.{1,2}\/)+|@app\/)RPCModule$/,
         replacement: path.resolve(__dirname, './shims/rpcModule.ts'),
       },
     ];

@@ -6,18 +6,18 @@ import 'react-native';
 import React from 'react';
 
 import { render } from '@testing-library/react-native';
-import Receive from '../components/Receive';
+import Receive from '@screens/Receive';
 import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
-} from '../app/context';
+} from '@app/context';
 import { mockAddresses } from '../__mocks__/dataMocks/mockAddresses';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { AppDrawerParamList } from '../app/types';
-import { RouteEnum } from '../app/AppState';
+import { AppDrawerParamList } from '@app/types';
+import { RouteEnum } from '@app/AppState';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
 function makeDrawerProps(): NativeStackScreenProps<
@@ -42,6 +42,8 @@ describe('Component Receive - test', () => {
     state.translate = mockTranslate;
     state.info = mockInfo;
     state.totalBalance = mockTotalBalance;
+    // The price ring renders only for a Nym-consenting session.
+    state.nym = true;
     const onFunction = jest.fn();
     const props = makeDrawerProps();
     const receive = render(

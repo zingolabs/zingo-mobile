@@ -7,7 +7,7 @@ import {
   withSequence,
   withTiming,
 } from 'react-native-reanimated';
-import { useOptionsPanel } from '../context/optionsPanel';
+import { useOptionsPanel } from '@app/context/optionsPanel';
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 // Same feel both ways: start fast, decelerate into the resting position.

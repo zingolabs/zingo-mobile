@@ -1,11 +1,11 @@
-import RPCModule from '../../RPCModule';
+import RPCModule from '@app/RPCModule';
 import {
   MixnetDetailReport,
   MixnetStatusReport,
   describeRejection,
   transformMixnetDetail,
   transformMixnetStatus,
-} from '../transforms/mixnetTransform';
+} from '@app/walletBackend/transforms/mixnetTransform';
 
 // The effectful edge of the Mixnet Mode surface. Each function makes one
 // native call; the two channels are settled separately and typed

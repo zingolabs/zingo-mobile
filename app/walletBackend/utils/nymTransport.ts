@@ -3,7 +3,7 @@ import { NativeModules } from 'react-native';
 import {
   MixnetTransportBinding,
   StartMixnetTransport,
-} from '../modules/MixnetCoordinator';
+} from '@app/walletBackend/modules/MixnetCoordinator';
 
 // One-to-one mirror of the native NymTransportModule, exposed on both
 // platforms (Android: org.ZingoLabs.Zingo.NymTransportModule; iOS:

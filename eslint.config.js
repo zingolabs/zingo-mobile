@@ -17,6 +17,26 @@ module.exports = [
   },
   ...compat.extends('@react-native'),
   {
+    // Imports that leave the current folder go through the @app, @screens
+    // and @ui aliases. assets/ and .storybook/ have no alias and stay
+    // relative.
+    files: ['app/**', 'screens/**', 'ui/**'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              regex: '^(\\.\\./)+(?!\\.\\./|assets/|\\.storybook/)',
+              message:
+                'Import through @app/, @screens/ or @ui/ instead of a parent-relative path.',
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
     // TODO: Undo once this string-based approach gets removed
     files: ['app/uris/**', 'app/walletBackend/**'],
     ignores: ['app/uris/serverUris.ts'],
@@ -39,6 +59,18 @@ module.exports = [
             'Core modules take no translate callback. Return an ErrorKey and let the display edge translate it (docs/adr/0002-error-keys-not-prose.md).',
         },
       ],
+    },
+  },
+  {
+    // The visual-diff report runs in a browser, not in React Native.
+    files: ['visual/report/**/*.js'],
+    languageOptions: {
+      globals: {
+        IntersectionObserver: 'readonly',
+        addEventListener: 'readonly',
+        location: 'readonly',
+        matchMedia: 'readonly',
+      },
     },
   },
   {

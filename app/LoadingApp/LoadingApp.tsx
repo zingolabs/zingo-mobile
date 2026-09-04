@@ -1,14 +1,13 @@
 import React, { Component, useState, useMemo, useEffect } from 'react';
 import {
   I18nManager,
-  EmitterSubscription,
   AppState,
   NativeEventSubscription,
   Platform,
 } from 'react-native';
 
 import Clipboard from '@react-native-clipboard/clipboard';
-import { useTheme } from '../theme';
+import { useTheme } from '@app/theme';
 import { I18n } from 'i18n-js';
 import * as RNLocalize from 'react-native-localize';
 import { StackScreenProps } from '@react-navigation/stack';
@@ -23,11 +22,11 @@ import {
   BottomSheetModalProvider,
 } from '@gorhom/bottom-sheet';
 import CustomServerModalHost from './components/CustomServerModalHost';
-import { BottomSheetBackHandler } from '../hooks/useBottomSheetBackHandler';
-import ConfirmBottomSheet from '../../components/Components/ConfirmBottomSheet';
-import WalletRecoveryHost from '../../components/WalletRecovery/WalletRecoveryHost';
-import { showConfirm } from '../showConfirm';
-import { showWalletRecovery } from '../showWalletRecovery';
+import { BottomSheetBackHandler } from '@app/hooks/useBottomSheetBackHandler';
+import ConfirmBottomSheet from '@ui/widgets/ConfirmBottomSheet';
+import WalletRecoveryHost from './components/WalletRecoveryHost';
+import { showConfirm } from '@app/services/showConfirm';
+import { showWalletRecovery } from '@app/services/showWalletRecovery';
 
 import {
   createNewWallet,
@@ -50,7 +49,7 @@ import {
   WalletFileRepairOutcome,
   WALLET_FILE_NAME,
   WALLET_BACKUP_FILE_NAME,
-} from '../walletBackend';
+} from '@app/walletBackend';
 import {
   AppStateLoading,
   BackgroundType,
@@ -77,47 +76,54 @@ import {
   ScreenEnum,
   LaunchingModeEnum,
   BlockExplorerEnum,
-} from '../AppState';
-import { parseServerURI, serverUris, fetchServerList } from '../uris';
-import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
-import { fetchWallet } from '../walletBackend';
-import { AppTheme } from '../theme';
-import { ContextAppLoadingProvider } from '../context';
-import BackgroundFileImpl from '../../components/Background';
+} from '@app/AppState';
+import { parseServerURI, serverUris, fetchServerList } from '@app/uris';
+import SettingsFileImpl from '@app/services/SettingsFileImpl';
+import { fetchWallet } from '@app/walletBackend';
+import { AppTheme } from '@app/theme';
+import { ContextAppLoadingProvider } from '@app/context';
+import BackgroundFileImpl from '@app/services/BackgroundFileImpl';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { createAlert } from '../createAlert';
-import { getZingoVersion, substituteZingoName } from '../utils/ZingoAppData';
-import Utils from '../utils';
-import { RPCWalletKindType } from '../walletBackend/types/RPCWalletKindType';
+import { createAlert } from '@app/services/createAlert';
+import { getZingoVersion, substituteZingoName } from '@app/utils/ZingoAppData';
+import Utils from '@app/utils';
+import { RPCWalletKindType } from '@app/walletBackend/types/RPCWalletKindType';
 import Toast from 'react-native-toast-message';
-import { toastConfig } from '../toastConfig';
-import { RPCSeedType } from '../walletBackend/types/RPCSeedType';
-import Launching from './components/Launching';
-import simpleBiometrics, { getLastGateFailure } from '../simpleBiometrics';
-import selectingServer from '../selectingServer';
+import { toastConfig } from '@ui/widgets/toastConfig';
+import { RPCSeedType } from '@app/walletBackend/types/RPCSeedType';
+import Launching from '@screens/Launching';
+import {
+  GateAnswer,
+  askGate,
+  dropWhileInFlight,
+  enactGateAnswer,
+  resolveTriggerGate,
+  retireSentinelEntries,
+} from '@app/services/gateController';
+import selectingServer from '@app/services/selectingServer';
 import { isEqual } from 'lodash';
 import {
   createUpdateRecoveryWalletInfo,
   getRecoveryWalletInfo,
   hasRecoveryWalletInfo,
   removeRecoveryWalletInfo,
-} from '../recoveryWalletInfo';
+} from '@app/services/recoveryWalletInfo';
 
 // no lazy load because slowing down screens.
-import ImportUfvk from './components/ImportUfvk';
-import { sendEmail } from '../sendEmail';
-import { RPCWalletKindEnum } from '../walletBackend/enums/RPCWalletKindEnum';
-import StartMenu from './components/StartMenu';
-import { RPCUfvkType } from '../walletBackend/types/RPCUfvkType';
-import { RPCPerformanceLevelEnum } from '../walletBackend/enums/RPCPerformanceLevelEnum';
-import NewSeed from './components/NewSeed';
-import { AppStackParamList } from '../types';
+import ImportUfvk from '@screens/ImportUfvk';
+import { sendEmail } from '@app/services/sendEmail';
+import { RPCWalletKindEnum } from '@app/walletBackend/enums/RPCWalletKindEnum';
+import StartMenu from '@screens/StartMenu';
+import { RPCUfvkType } from '@app/walletBackend/types/RPCUfvkType';
+import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
+import NewSeed from '@screens/NewSeed';
+import { AppStackParamList } from '@app/types';
 
-const en = require('../translations/en.json');
-const es = require('../translations/es.json');
-const pt = require('../translations/pt.json');
-const ru = require('../translations/ru.json');
-const tr = require('../translations/tr.json');
+const en = require('@app/translations/en.json');
+const es = require('@app/translations/es.json');
+const pt = require('@app/translations/pt.json');
+const ru = require('@app/translations/ru.json');
+const tr = require('@app/translations/tr.json');
 
 type LoadingAppProps = {
   navigation: StackScreenProps<
@@ -432,7 +438,7 @@ export default function LoadingApp(props: LoadingAppProps) {
       <Launching
         translate={translate}
         firstLaunchingMessage={LaunchingModeEnum.opening}
-        biometricsFailed={false}
+        biometricGate={{ kind: 'passed' }}
       />
     );
   } else {
@@ -496,9 +502,8 @@ export class LoadingAppClass extends Component<
   LoadingAppClassProps,
   LoadingAppClassState
 > {
-  dim: EmitterSubscription;
-  appstate: NativeEventSubscription;
-  unsubscribeNetInfo: NetInfoSubscription;
+  appstate?: NativeEventSubscription;
+  unsubscribeNetInfo?: NetInfoSubscription;
   clipboardTimer: ReturnType<typeof setTimeout> | null = null;
   customServerModalRef: React.RefObject<React.ComponentRef<
     typeof BottomSheetModal
@@ -554,11 +559,9 @@ export class LoadingAppClass extends Component<
       customServerOffline: false,
       customServerAuto: false,
       customServerCustom: false,
-      biometricsFailed:
-        !!props.route.params &&
-        props.route.params.biometricsFailed !== undefined
-          ? props.route.params.biometricsFailed
-          : false,
+      // The gate outcome arrives with the navigation whole (see
+      // LoadingAppNavigationState), never from module state.
+      biometricGate: props.route.params?.biometricGate ?? { kind: 'passed' },
       startingApp:
         !!props.route.params && props.route.params.startingApp !== undefined
           ? props.route.params.startingApp
@@ -569,9 +572,6 @@ export class LoadingAppClass extends Component<
       hasRecoveryWalletInfoSaved: false,
     };
 
-    this.dim = {} as EmitterSubscription;
-    this.appstate = {} as NativeEventSubscription;
-    this.unsubscribeNetInfo = {} as NetInfoSubscription;
     this.customServerModalRef = React.createRef();
   }
 
@@ -589,30 +589,38 @@ export class LoadingAppClass extends Component<
 
     this.fetchZingolibVersion();
 
+    // Retire the keychain entries the replaced sentinel gate shipped:
+    // nothing reads them, and an auth-gated key left under a known name
+    // invites stale-entry reuse. Fire-and-forget, best-effort, idempotent.
+    retireSentinelEntries();
+
     // to start the App the first time in this session
     // the user have to pass the security of the device
     if (this.state.startingApp) {
-      if (!this.state.biometricsFailed) {
-        // (PIN or TouchID or FaceID)
-        this.setState({ biometricsFailed: false });
-        const resultBio = this.state.security.startApp
-          ? await simpleBiometrics({ translate: this.state.translate })
-          : true;
-        // resultBio:
-        // - true      -> authenticated (biometric, or device passcode via allowDeviceCredentials)
-        // - false     -> user cancelled or failed the prompt
-        // - undefined -> the gate cannot run here (no auth method, or a keychain
-        //                entry the OS refuses to serve); allow, since it guards
-        //                nothing and blocking locks the user out of the wallet
-        if (resultBio === false) {
-          this.setState({ biometricsFailed: true });
-          return;
-        } else {
-          this.setState({ biometricsFailed: false });
-        }
-      } else {
-        // if there is a biometric Fail, likely from the foreground check
-        // keep the App in the first screen because the user needs to try again.
+      if (this.state.biometricGate.kind === 'declined') {
+        // A biometric fail, likely from the foreground check: keep the App
+        // on the first screen so the user can try again.
+        return;
+      }
+      // (PIN or TouchID or FaceID). Only a decline locks; a gate that
+      // cannot run fails open with a notice (ADR 0007), because blocking
+      // would trap the user out of the wallet. A retry's answer rides in
+      // as data, so this trigger never runs a second ceremony behind it.
+      const startGate: GateAnswer = await resolveTriggerGate(
+        this.consumeRetryAnswer(),
+        this.state.security.startApp,
+        { translate: this.state.translate },
+      );
+      const proceed = enactGateAnswer(
+        startGate,
+        {
+          // The narrowed answer is the gate outcome, whole.
+          lock: declined => this.setState({ biometricGate: declined }),
+          notice: this.addLastSnackbar,
+        },
+        this.state.translate,
+      );
+      if (!proceed) {
         return;
       }
     }
@@ -715,6 +723,14 @@ export class LoadingAppClass extends Component<
       }
     }
 
+    if (this.unmounted) {
+      // The boot chain outlived this instance; attaching listeners here
+      // would subscribe a dead component forever.
+      return;
+    }
+    // Re-entry via the locked screen's tryAgain must not stack another
+    // subscription pair on the one this mount already holds.
+    this.detachListeners();
     this.appstate = AppState.addEventListener(
       EventListenerEnum.change,
       async nextAppState => {
@@ -806,14 +822,18 @@ export class LoadingAppClass extends Component<
     // an empty screen. The modal opens on demand from the gear button.
   };
 
+  detachListeners = () => {
+    this.appstate?.remove();
+    this.appstate = undefined;
+    this.unsubscribeNetInfo?.();
+    this.unsubscribeNetInfo = undefined;
+  };
+
+  unmounted = false;
+
   componentWillUnmount = () => {
-    this.dim && typeof this.dim.remove === 'function' && this.dim.remove();
-    this.appstate &&
-      typeof this.appstate.remove === 'function' &&
-      this.appstate.remove();
-    this.unsubscribeNetInfo &&
-      typeof this.unsubscribeNetInfo === 'function' &&
-      this.unsubscribeNetInfo();
+    this.unmounted = true;
+    this.detachListeners();
   };
 
   // Default server for a chain = the `default` entry for that chain in the
@@ -2013,6 +2033,36 @@ export class LoadingAppClass extends Component<
     });
   };
 
+  // The retry's non-declined answer, parked for the boot path to consume
+  // as data instead of running a second ceremony.
+  retryAnswer: GateAnswer | undefined;
+
+  consumeRetryAnswer = (): GateAnswer | undefined => {
+    const carried = this.retryAnswer;
+    this.retryAnswer = undefined;
+    return carried;
+  };
+
+  // The locked screen's retry runs its own ceremony unconditionally: the
+  // security toggles enable triggers, they never bypass a retry
+  // (ADR 0007). The answer rides into the boot path as data, so the
+  // startApp trigger consumes it instead of asking again and the
+  // fail-open notice shows once, from the boot path's own handling.
+  // Re-entrant taps are dropped for the whole flight, ceremony and boot,
+  // so a double tap cannot run two concurrent boots against one wallet.
+  retryGate = dropWhileInFlight(async () => {
+    const retry = await askGate({ translate: this.state.translate });
+    if (retry.kind === 'declined') {
+      this.setState({ biometricGate: retry });
+      return;
+    }
+    this.retryAnswer = retry;
+    await new Promise<void>(resolve => {
+      this.setState({ biometricGate: { kind: 'passed' } }, resolve);
+    });
+    await this.componentDidMount();
+  });
+
   addLastSnackbar = (message: string, duration?: SnackbarDurationEnum) => {
     Toast.show({
       type: 'appInfo',
@@ -2164,7 +2214,7 @@ export class LoadingAppClass extends Component<
       customServerOffline,
       customServerAuto,
       firstLaunchingMessage,
-      biometricsFailed,
+      biometricGate,
       translate,
       hasRecoveryWalletInfoSaved,
       readOnly,
@@ -2217,13 +2267,8 @@ export class LoadingAppClass extends Component<
                 <Launching
                   translate={translate}
                   firstLaunchingMessage={firstLaunchingMessage}
-                  biometricsFailed={biometricsFailed}
-                  message={biometricsFailed ? getLastGateFailure() : undefined}
-                  tryAgain={() => {
-                    this.setState({ biometricsFailed: false }, () =>
-                      this.componentDidMount(),
-                    );
-                  }}
+                  biometricGate={biometricGate}
+                  tryAgain={this.retryGate}
                 />
               )}
               {screen === RouteEnum.StartMenu && (

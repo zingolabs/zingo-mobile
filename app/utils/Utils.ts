@@ -17,6 +17,7 @@ import { ZecAmountSplitType } from './types/ZecAmountSplitType';
 import {
   ChainNameEnum,
   ErrorKeyed,
+  GateFailure,
   GlobalConst,
   LanguageEnum,
   SendJsonToTypeType,
@@ -24,19 +25,19 @@ import {
   ServerType,
   TranslateType,
   BlockExplorerEnum,
-} from '../AppState';
+} from '@app/AppState';
 
 import randomColor from 'randomcolor';
 import {
   getDonationAddress,
   getZenniesDonationAddress,
   parseAddress,
-} from '../walletBackend';
+} from '@app/walletBackend';
 import { Buffer } from 'buffer';
-import { RPCParseAddressType } from '../walletBackend/types/RPCParseAddressType';
-import { RPCParseAddressStatusEnum } from '../walletBackend/enums/RPCParseAddressStatusEnum';
-import { RPCAddressKindEnum } from '../walletBackend/enums/RPCAddressKindEnum';
-import { RPCReceiversEnum } from '../walletBackend/enums/RPCReceiversEnum';
+import { RPCParseAddressType } from '@app/walletBackend/types/RPCParseAddressType';
+import { RPCParseAddressStatusEnum } from '@app/walletBackend/enums/RPCParseAddressStatusEnum';
+import { RPCAddressKindEnum } from '@app/walletBackend/enums/RPCAddressKindEnum';
+import { RPCReceiversEnum } from '@app/walletBackend/enums/RPCReceiversEnum';
 
 export default class Utils {
   static trimToSmall(addr?: string, numChars?: number): string {
@@ -530,5 +531,13 @@ export default class Utils {
   ): string {
     const text = translate(failure.errorKey) as string;
     return failure.param ? `${text} "${failure.param}"` : text;
+  }
+
+  /** Renders a gate failure for user copy, translating its catalog key and keeping the raw diagnostic out. */
+  static renderGateFailure(
+    failure: GateFailure,
+    translate: (key: string) => TranslateType,
+  ): string {
+    return translate(failure.errorKey) as string;
   }
 }

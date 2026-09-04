@@ -1,0 +1,102 @@
+name: Visual accept
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: write
+  pull-requests: write
+  checks: write
+  actions: read
+
+concurrency:
+  group: visual-accept-${{ github.event.issue.number }}
+  cancel-in-progress: false
+
+jobs:
+  accept:
+    name: Visual accept
+    if: >-
+      github.event.issue.pull_request &&
+      startsWith(github.event.comment.body, '/visual-accept')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Acknowledge the command
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.reactions.createForIssueComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: context.payload.comment.id,
+              content: '+1',
+            });
+
+      - name: Authorize and resolve the PR
+        id: gate
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const reply = body =>
+              github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body,
+              });
+            const { data: perm } =
+              await github.rest.repos.getCollaboratorPermissionLevel({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                username: context.payload.comment.user.login,
+              });
+            if (!['admin', 'write'].includes(perm.permission)) {
+              await reply('`/visual-accept` needs write access to this repository.');
+              return core.setFailed('unauthorized');
+            }
+            const { data: pr } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+            });
+            if (pr.head.repo.full_name !== pr.base.repo.full_name) {
+              await reply('Review locally and push if changes are okay.');
+              return core.setFailed('cross-repo branch');
+            }
+            core.setOutput('head_sha', pr.head.sha);
+            core.setOutput('head_ref', pr.head.ref);
+
+      - name: Mint app token
+        id: app-token
+        if: vars.VISUAL_ACCEPT_APP_ID != ''
+        uses: actions/create-github-app-token@v3
+        with:
+          app-id: ${{ vars.VISUAL_ACCEPT_APP_ID }}
+          private-key: ${{ secrets.VISUAL_ACCEPT_APP_PRIVATE_KEY }}
+
+      - name: Checkout PR head
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ steps.gate.outputs.head_ref }}
+          token: ${{ steps.app-token.outputs.token || secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.18.0
+          cache: yarn
+
+      - run: yarn
+
+      - name: Accept the baseline
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token || secrets.GITHUB_TOKEN }}
+          RETRIGGERS: ${{ steps.app-token.outputs.token != '' }}
+          HEAD_SHA: ${{ steps.gate.outputs.head_sha }}
+          HEAD_REF: ${{ steps.gate.outputs.head_ref }}
+          PR_NUMBER: ${{ github.event.issue.number }}
+          AUTHOR_LOGIN: ${{ github.event.comment.user.login }}
+          AUTHOR_ID: ${{ github.event.comment.user.id }}
+        run: yarn tsx visual/acceptComment.mts

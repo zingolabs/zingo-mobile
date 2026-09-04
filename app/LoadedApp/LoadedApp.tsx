@@ -11,12 +11,12 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { useTheme } from '../theme';
+import { useTheme } from '@app/theme';
 import { I18n } from 'i18n-js';
 import * as RNLocalize from 'react-native-localize';
 import { isEqual } from 'lodash';
 import { StackScreenProps } from '@react-navigation/stack';
-import { LoadingAppNavigationState, AppDrawerParamList } from '../types';
+import { LoadingAppNavigationState, AppDrawerParamList } from '@app/types';
 import NetInfo, {
   NetInfoSubscription,
   NetInfoState,
@@ -26,7 +26,7 @@ import {
   deactivateKeepAwake,
 } from '@sayem314/react-native-keep-awake';
 
-import WalletBackend, { fetchWallet } from '../walletBackend';
+import WalletBackend, { fetchWallet } from '@app/walletBackend';
 import {
   changeServer,
   doSave,
@@ -35,7 +35,7 @@ import {
   parseAddress,
   reconcileMigration,
   setConfigWalletToProd,
-} from '../walletBackend';
+} from '@app/walletBackend';
 import {
   AppStateLoaded,
   TotalBalanceClass,
@@ -76,116 +76,114 @@ import {
   LaunchingModeEnum,
   BlockExplorerEnum,
   SnackbarDurationEnum,
-} from '../AppState';
-import Utils from '../utils';
-import { getZingoVersion, substituteZingoName } from '../utils/ZingoAppData';
-import { AppTheme } from '../theme';
-import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
-import { ContextAppLoadedProvider } from '../context';
-import { parseZcashURI, serverUris, fetchServerList } from '../uris';
-import selectingServer from '../selectingServer';
-import BackgroundFileImpl from '../../components/Background';
+} from '@app/AppState';
+import Utils from '@app/utils';
+import { getZingoVersion, substituteZingoName } from '@app/utils/ZingoAppData';
+import { AppTheme } from '@app/theme';
+import SettingsFileImpl from '@app/services/SettingsFileImpl';
+import { PriceTrafficDriver } from '@ui/widgets/PriceFetcher';
+import { priceFetcherStore } from '@ui/widgets/priceFetcherStore';
+import { ContextAppLoadedProvider } from '@app/context';
+import { parseZcashURI, serverUris, fetchServerList } from '@app/uris';
+import selectingServer from '@app/services/selectingServer';
+import BackgroundFileImpl from '@app/services/BackgroundFileImpl';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { createAlert } from '../createAlert';
-import { sendEmail } from '../sendEmail';
+import { createAlert } from '@app/services/createAlert';
+import { sendEmail } from '@app/services/sendEmail';
 import Toast from 'react-native-toast-message';
-import { toastConfig } from '../toastConfig';
-import { RPCSeedType } from '../walletBackend/types/RPCSeedType';
-import { Launching } from '../LoadingApp';
-import { AddressBook } from '../../components/AddressBook';
-import { AddressBookFileImpl } from '../../components/AddressBook';
-import simpleBiometrics from '../simpleBiometrics';
-import ShowAddressAlertAsync from '../../components/Send/components/ShowAddressAlertAsync';
+import { toastConfig } from '@ui/widgets/toastConfig';
+import { RPCSeedType } from '@app/walletBackend/types/RPCSeedType';
+import Launching from '@screens/Launching';
+import { AddressBook } from '@screens/AddressBook';
+import AddressBookFileImpl from '@app/services/AddressBookFileImpl';
+import {
+  GateAnswer,
+  enactGateAnswer,
+  resolveTriggerGate,
+} from '@app/services/gateController';
+import ShowAddressAlertAsync from '@app/services/showAddressAlertAsync';
 import {
   createUpdateRecoveryWalletInfo,
   removeRecoveryWalletInfo,
-} from '../recoveryWalletInfo';
+} from '@app/services/recoveryWalletInfo';
 
-import History from '../../components/History';
-import Send from '../../components/Send';
-import Receive from '../../components/Receive';
-import Settings from '../../components/Settings';
-import CustomTabBar from '../../components/TabBar/CustomTabBar';
+import History from '@screens/History';
+import Send from '@screens/Send';
+import Receive from '@screens/Receive';
+import Settings from '@screens/Settings';
+import CustomTabBar from '@app/navigation/CustomTabBar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import {
   BottomSheetModal,
   BottomSheetModalProvider,
 } from '@gorhom/bottom-sheet';
-import AddTagModalHost from '../../components/AddressBook/components/AddTagModalHost';
-import { BottomSheetBackHandler } from '../hooks/useBottomSheetBackHandler';
-import ConfirmBottomSheet from '../../components/Components/ConfirmBottomSheet';
-import { showConfirm } from '../showConfirm';
-import RootNavigator from '../../components/RootNavigator';
+import AddTagModalHost from './components/AddTagModalHost';
+import { BottomSheetBackHandler } from '@app/hooks/useBottomSheetBackHandler';
+import ConfirmBottomSheet from '@ui/widgets/ConfirmBottomSheet';
+import { showConfirm } from '@app/services/showConfirm';
+import RootNavigator from '@app/navigation/RootNavigator';
 import {
   OptionsPanelProvider,
   toggleOptionsPanel,
-} from '../context/optionsPanel';
+} from '@app/context/optionsPanel';
 import LoadedAppOptionsPanelHost from './LoadedAppOptionsPanelHost';
-import { MessageList } from '../../components/Messages';
-import { RPCSyncStatusType } from '../walletBackend/types/RPCSyncStatusType';
-import { RPCUfvkType } from '../walletBackend/types/RPCUfvkType';
+import { MessageList } from '@screens/Messages';
+import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
+import { RPCUfvkType } from '@app/walletBackend/types/RPCUfvkType';
 import {
   INITIAL_MIXNET_VIEW,
   OFF_MIXNET_VIEW,
   MixnetView,
-} from '../walletBackend/transforms/mixnetPresenter';
+} from '@app/walletBackend/transforms/mixnetView';
 import {
   startMixnetTransport,
   stopMixnetTransport,
-} from '../walletBackend/utils/nymTransport';
-import { RPCPerformanceLevelEnum } from '../walletBackend/enums/RPCPerformanceLevelEnum';
-import { AddressList } from '../../components/AddressList';
-import ValueTransferDetail from '../../components/History/components/ValueTransferDetail';
-import Confirm from '../../components/Send/components/Confirm';
-import { AppStackParamList } from '../types';
+} from '@app/walletBackend/utils/nymTransport';
+import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
+import { AddressList } from '@screens/AddressList';
+import ValueTransferDetail from '@screens/ValueTransferDetail';
+import Confirm from '@screens/Confirm';
+import { AppStackParamList } from '@app/types';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RPCValueTransfersStatusEnum } from '../walletBackend/enums/RPCValueTransfersStatusEnum';
+import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
 
-const About = React.lazy(() => import('../../components/About'));
-const MixnetDoctor = React.lazy(() => import('../../components/MixnetDoctor'));
-const Seed = React.lazy(() => import('../../components/Seed'));
-const SyncReport = React.lazy(() => import('../../components/SyncReport'));
-const Rescan = React.lazy(() => import('../../components/Rescan'));
-const Pools = React.lazy(() => import('../../components/Pools'));
-const MeetIronwood = React.lazy(() => import('../../components/MeetIronwood'));
+const About = React.lazy(() => import('@screens/About'));
+const MixnetDoctor = React.lazy(() => import('@screens/MixnetDoctor'));
+const Seed = React.lazy(() => import('@screens/Seed'));
+const SyncReport = React.lazy(() => import('@screens/SyncReport'));
+const Rescan = React.lazy(() => import('@screens/Rescan'));
+const Pools = React.lazy(() => import('@screens/Pools'));
+const MeetIronwood = React.lazy(() => import('@screens/MeetIronwood'));
 const MigrationStrategy = React.lazy(
-  () => import('../../components/MigrationStrategy'),
+  () => import('@screens/MigrationStrategy'),
 );
 const MigrationTransactions = React.lazy(
-  () => import('../../components/MigrationTransactions'),
+  () => import('@screens/MigrationTransactions'),
 );
-const MigrationSending = React.lazy(
-  () => import('../../components/MigrationSending'),
-);
+const MigrationSending = React.lazy(() => import('@screens/MigrationSending'));
 const MigrationSplitPlan = React.lazy(
-  () => import('../../components/MigrationSplitPlan'),
+  () => import('@screens/MigrationSplitPlan'),
 );
 const MigrationSplitting = React.lazy(
-  () => import('../../components/MigrationSplitting'),
+  () => import('@screens/MigrationSplitting'),
 );
-const MigrationCadence = React.lazy(
-  () => import('../../components/MigrationCadence'),
-);
+const MigrationCadence = React.lazy(() => import('@screens/MigrationCadence'));
 const MigrationSchedule = React.lazy(
-  () => import('../../components/MigrationSchedule'),
+  () => import('@screens/MigrationSchedule'),
 );
-const MigrationStatus = React.lazy(
-  () => import('../../components/MigrationStatus'),
-);
+const MigrationStatus = React.lazy(() => import('@screens/MigrationStatus'));
 const MigrationBatchSending = React.lazy(
-  () => import('../../components/MigrationBatchSending'),
+  () => import('@screens/MigrationBatchSending'),
 );
-const Insight = React.lazy(() => import('../../components/Insight'));
-const ShowUfvk = React.lazy(() => import('../../components/Ufvk/ShowUfvk'));
-const ComputingTxContent = React.lazy(
-  () => import('./components/ComputingTxContent'),
-);
+const Insight = React.lazy(() => import('@screens/Insight'));
+const ShowUfvk = React.lazy(() => import('@screens/Ufvk/ShowUfvk'));
+const ComputingTxContent = React.lazy(() => import('@screens/Computing'));
 
-const en = require('../translations/en.json');
-const es = require('../translations/es.json');
-const pt = require('../translations/pt.json');
-const ru = require('../translations/ru.json');
-const tr = require('../translations/tr.json');
+const en = require('@app/translations/en.json');
+const es = require('@app/translations/es.json');
+const pt = require('@app/translations/pt.json');
+const ru = require('@app/translations/ru.json');
+const tr = require('@app/translations/tr.json');
 
 const Tab = createBottomTabNavigator<AppDrawerParamList>();
 
@@ -652,7 +650,7 @@ export default function LoadedApp(props: LoadedAppProps) {
       <Launching
         translate={translate}
         firstLaunchingMessage={LaunchingModeEnum.opening}
-        biometricsFailed={false}
+        biometricGate={{ kind: 'passed' }}
       />
     );
   } else {
@@ -984,47 +982,22 @@ export class LoadedAppClass extends Component<
           // Bump the foreground epoch so any currently-mounted
           // protected screen (Seed/Ufvk/Settings/Rescan/Confirm) can
           // re-fire its biometric gate when security.foregroundApp is
-          // OFF. Done before the foregroundApp simpleBiometrics so the
+          // OFF. Done before the foregroundApp askGate so the
           // screen-level effects don't race against the app-level one.
           this.setState(state => ({
             foregroundEpoch: state.foregroundEpoch + 1,
           }));
-          // (PIN or TouchID or FaceID)
-          const resultBio = this.state.security.foregroundApp
-            ? await simpleBiometrics({ translate: this.state.translate })
-            : true;
-          // resultBio:
-          // - true      -> authenticated (biometric, or device passcode via allowDeviceCredentials)
-          // - false     -> user cancelled or failed the prompt
-          // - undefined -> the gate cannot run here (no auth method, or a keychain
-          //                entry the OS refuses to serve); allow, since it guards
-          //                nothing and blocking locks the user out of the wallet
-          if (resultBio === false) {
-            this.navigateToLoadingApp({
-              startingApp: true,
-              biometricsFailed: true,
-            });
-          } else {
-            // reading background task info
-            await this.fetchBackgroundSyncInfo();
-            // setting value for background task Android
-            await AsyncStorage.setItem(GlobalConst.background, GlobalConst.no);
-            // needs this because when the App go from back to fore
-            // it have to re-launch all the tasks.
-            await this.rpc.clearTimers();
-            await this.rpc.configure();
-            if (
-              this.state.backgroundError &&
-              (this.state.backgroundError.title ||
-                this.state.backgroundError.error)
-            ) {
-              showConfirm({
-                title: this.state.backgroundError.title,
-                message: this.state.backgroundError.error,
-                buttons: [{ text: this.state.translate('close') as string }],
-              });
-              this.setBackgroundError('', '');
-            }
+          // A parked earlier pass resumes with this same event and acts
+          // once; a second concurrent actor would double-run the restore
+          // work or the navigation reset.
+          if (this.foregroundGateBusy) {
+            return;
+          }
+          this.foregroundGateBusy = true;
+          try {
+            await this.runForegroundGate();
+          } finally {
+            this.foregroundGateBusy = false;
           }
         } else if (
           priorAppState === AppStateStatusEnum.active &&
@@ -1121,6 +1094,58 @@ export class LoadedAppClass extends Component<
   componentDidUpdate = (prevProps: LoadedAppClassProps) => {
     if (prevProps.translate !== this.props.translate) {
       this.setState({ translate: this.props.translate });
+    }
+  };
+
+  foregroundGateBusy = false;
+
+  // (PIN or TouchID or FaceID). Only a decline locks; a gate that cannot
+  // run fails open with a notice (ADR 0007), because blocking would trap
+  // the user out of the wallet.
+  runForegroundGate = async () => {
+    const foregroundGate: GateAnswer = await resolveTriggerGate(
+      undefined,
+      this.state.security.foregroundApp,
+      { translate: this.state.translate },
+    );
+    const proceed = enactGateAnswer(
+      foregroundGate,
+      {
+        // The narrowed answer is the gate outcome, whole; the locked
+        // screen never reads mutable module state.
+        lock: declined =>
+          this.navigateToLoadingApp({
+            startingApp: true,
+            biometricGate: declined,
+          }),
+        notice: this.addLastSnackbar,
+      },
+      this.state.translate,
+    );
+    if (!proceed) {
+      return;
+    }
+    // The gate is open: this, never the raw AppState event, is when a
+    // real return may emit price traffic.
+    priceFetcherStore.foregroundReturned();
+    // reading background task info
+    await this.fetchBackgroundSyncInfo();
+    // setting value for background task Android
+    await AsyncStorage.setItem(GlobalConst.background, GlobalConst.no);
+    // needs this because when the App go from back to fore
+    // it have to re-launch all the tasks.
+    await this.rpc.clearTimers();
+    await this.rpc.configure();
+    if (
+      this.state.backgroundError &&
+      (this.state.backgroundError.title || this.state.backgroundError.error)
+    ) {
+      showConfirm({
+        title: this.state.backgroundError.title,
+        message: this.state.backgroundError.error,
+        buttons: [{ text: this.state.translate('close') as string }],
+      });
+      this.setBackgroundError('', '');
     }
   };
 
@@ -2339,6 +2364,7 @@ export class LoadedAppClass extends Component<
     return (
       <>
         <ContextAppLoadedProvider value={context}>
+          <PriceTrafficDriver />
           <GestureHandlerRootView>
             <BottomSheetModalProvider>
               <BottomSheetBackHandler />

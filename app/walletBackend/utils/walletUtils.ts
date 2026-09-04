@@ -10,12 +10,12 @@
  * rejection channel (typed FFI errors); resolved values are data, never
  * inspected for an error sentinel.
  */
-import { WalletType, GlobalConst } from '../../AppState';
-import RPCModule from '../../RPCModule';
-import { callFfi, FfiResult } from '../ffi';
-import { serverUris } from '../../uris';
-import { RPCZecPriceType } from '../types/RPCZecPriceType';
-import { RPCSeedType } from '../types/RPCSeedType';
+import { WalletType, GlobalConst } from '@app/AppState';
+import RPCModule from '@app/RPCModule';
+import { callFfi, FfiResult } from '@app/walletBackend/ffi';
+import { serverUris } from '@app/uris';
+import { RPCZecPriceType } from '@app/walletBackend/types/RPCZecPriceType';
+import { RPCSeedType } from '@app/walletBackend/types/RPCSeedType';
 
 /**
  * Fetches the current ZEC/USD price from the zingolib price oracle.

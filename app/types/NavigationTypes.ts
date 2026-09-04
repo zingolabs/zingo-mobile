@@ -1,5 +1,6 @@
 import {
   AddressKindEnum,
+  BiometricGateOutcome,
   ChainNameEnum,
   LaunchingModeEnum,
   RouteEnum,
@@ -8,9 +9,9 @@ import {
   UfvkActionEnum,
   ValueTransferType,
   ProposalPoolsType,
-} from '../AppState';
-import { RPCDrainTxType } from '../walletBackend/types/RPCDrainPlanType';
-import { RPCMigrationPlanType } from '../walletBackend/types/RPCMigrationPlanType';
+} from '@app/AppState';
+import { RPCDrainTxType } from '@app/walletBackend/types/RPCDrainPlanType';
+import { RPCMigrationPlanType } from '@app/walletBackend/types/RPCMigrationPlanType';
 
 /**
  * Root navigation parameter list for the main stack navigator
@@ -34,7 +35,10 @@ export type AppStackParamList = {
 export type LoadingAppNavigationState = {
   screen?: RouteEnum;
   startingApp?: boolean;
-  biometricsFailed?: boolean;
+  // The gate outcome rides with the navigation whole, so a declined gate
+  // always carries its failure and the locked screen renders the reason it
+  // was locked for.
+  biometricGate?: BiometricGateOutcome;
   newWallet?: boolean;
 };
 /**

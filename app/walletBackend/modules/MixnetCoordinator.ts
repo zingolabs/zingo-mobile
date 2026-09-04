@@ -13,7 +13,7 @@
  * the platform owns it: on Android the UniFFI proxy shim (step 3 of the
  * critical path) supplies it; tests supply a stub. This coordinator owns
  * cadence and policy only — every payload decision lives in the pure
- * transforms, and every screen projection in the pure presenter.
+ * transforms, and every screen projection in the pure transform.
  *
  * Cadence follows the SyncCoordinator idiom: one interval, a lock flag so
  * a slow poll is never enqueued twice, and an onChange callback that
@@ -21,20 +21,23 @@
  * publishes its view immediately, before the transport or the wallet
  * answers.
  */
-import { RPCMixnetIndicatorEnum } from '../enums/RPCMixnetIndicatorEnum';
+import { RPCMixnetIndicatorEnum } from '@app/walletBackend/enums/RPCMixnetIndicatorEnum';
 import {
   ClearnetConsent,
   MixnetStatusReport,
   describeRejection,
   vetPolledStatus,
-} from '../transforms/mixnetTransform';
-import { MixnetView, deriveMixnetView } from '../transforms/mixnetPresenter';
+} from '@app/walletBackend/transforms/mixnetTransform';
+import {
+  MixnetView,
+  deriveMixnetView,
+} from '@app/walletBackend/transforms/mixnetView';
 import {
   attachMixnet,
   disableMixnet,
   getMixnetBootstrapDetail,
   getMixnetStatus,
-} from '../utils/mixnetUtils';
+} from '@app/walletBackend/utils/mixnetUtils';
 
 /**
  * What a started platform transport reports back: its local SOCKS5 address

@@ -115,7 +115,7 @@ and glyphs), `border` (strokes). Unqualified "surface" always means this
 axis; the raised-panel role is always written out as `bgSurface`.
 
 **Role**:
-The meaning half of a token name — what the color is *for* (Canvas, Muted,
+The meaning half of a token name — what the color is _for_ (Canvas, Muted,
 Accent, Danger), as opposed to which surface carries it.
 
 **Family**:
@@ -168,6 +168,41 @@ The pre-migration vocabulary: `primary`, `secondary`, `text`, `money`,
 `zingo`, `placeholder`, `border`, `card`, and friends. Dead — use only
 when reading history.
 
+## UI tiers
+
+Vocabulary of the shared component tree in `ui/`.
+
+**Primitive**:
+A shared component that is domain-free and leaf-level: it composes nothing
+outside `ui/primitives` and would ship unchanged in any React Native app. Home:
+`ui/primitives`.
+_Avoid_: atom
+
+**Widget**:
+Any other shared component — it knows a wallet concept or composes shared
+modules. Home: `ui/widgets`. A widget may keep private parts in its own
+`components/` subfolder, the same convention screens use.
+_Avoid_: molecule, organism, composed component
+
+**Screen**:
+A routed top-level UI surface, one per navigation destination. Home:
+`screens/`. A screen keeps private parts in its own `components/` subfolder.
+_Avoid_: view
+
+## App boundary
+
+**Runtime**:
+Domain, services, and the wiring that mounts screens (`App.tsx`, navigation,
+the error boundary). Home: `app/`. The runtime may import screens, since it
+mounts them. Screens never import the runtime's wiring. They reach it via
+navigation and context. Where a component is mounted does not decide where
+its file lives. The repo root holds only `index.js` and config.
+_Avoid_: shell
+
+**Service**:
+A module that renders nothing and is called by the runtime or screens: file
+IO, alerts, email, biometrics. Home: `app/services`.
+
 ## CI
 
 **Blocking check** — a PR CI job whose failure fails the pull request.
@@ -211,6 +246,7 @@ acceleration, which requires the guest to match the x86_64 host: x86_64
 and 32-bit x86 only. Calling one of these "primary" is wrong; an
 emulator ABI in a test lane reflects a hosting constraint, not which
 library matters most.
+
 ## Build identity
 
 **Build descriptor** — the string `get_version()` reports: a zingolib
@@ -237,5 +273,76 @@ _Avoid_: mode (names the feature, not the state it reports)
 **Route**:
 The network path a mixnet-only surface resolves to, either the Standing
 Client's tunnel or clearnet. zingolib derives it from the indicator, and the
-app never sees it. A price fetch that resolves to clearnet is refused, never
-sent.
+app never sees it.
+
+## Price surface
+
+Vocabulary for the ZEC/USD display and its fetch lifecycle.
+
+**Price**:
+The fetched ZEC/USD value the price surface displays.
+_Avoid_: quote (legacy name in the ring components)
+
+**Stale price**:
+A price whose last successful fetch is older than the cadence's longest
+draw plus one fetch bound (ten minutes and thirty seconds of wall
+clock), so a healthy cadence never dims, ceiling draws included.
+Staleness is a fact about the value's accuracy, not about fetch
+mechanics, and it is independent of transport.
+
+**Ready follow-up**:
+The one-shot fetch armed when an unattended fetch is refused during
+bootstrap; it fires when the Indicator turns `ready` and is dropped on a
+`died` status or on the next background transition. A transient `unknown`
+is one failed status poll, not a settled status, and does not drop it.
+
+## Biometric gate
+
+Vocabulary for the app's biometric lock surfaces (`app/gateController.ts`
+and its triggers), ratified by ADR 0007.
+
+**Privacy shutter**:
+What the biometric gate is: a deterrent against a casual person holding the
+unlocked phone. Nothing cryptographic depends on the prompt, so a gate that
+cannot run may fail open with a visible notice; it must never trap the owner
+out of the wallet.
+_Avoid_: security boundary, authentication wall (both overclaim what the
+mechanism can enforce)
+
+**Gate controller**:
+The single authority that runs ceremonies. Every surface that wants the
+shutter closed asks it; nothing else may raise an authentication prompt.
+
+**Ceremony**:
+One OS authentication prompt, run by the gate controller. One ceremony
+answers every trigger waiting on it, including a cancel.
+
+**Trigger**:
+A surface that asks the gate controller (app foreground, screen entry, a
+security toggle flipping on). Each trigger owns its own decline
+consequence; none owns a prompt.
+
+**Freshness window**:
+The period after a successful ceremony during which any trigger passes
+without a new ceremony.
+
+**Stall**:
+A ceremony the platform never answers. After one window a stall opens the
+shutter with a visible notice, on every platform; it never locks.
+_Avoid_: timeout (names the mechanism, not the outcome)
+
+**Device-auth call**:
+The native authenticate call (LAContext on iOS, BiometricPrompt on
+Android) the gate controller uses to run a ceremony. It replaces the
+retired keychain-sentinel trick.
+_Avoid_: sentinel (the retired mechanism: an auth-gated keychain entry
+holding "1" whose read summoned the prompt)
+
+**Security toggle**:
+A per-surface setting that enables a trigger, and nothing else. No toggle
+selects a mechanism, a policy, or a retry path.
+
+**Lock**:
+The decline consequence of an app-level trigger: the locked launch screen,
+whose retry asks the gate controller unconditionally. A lock exists only
+while the app runs; a cold start begins unlocked unless a trigger asks.

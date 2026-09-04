@@ -121,7 +121,7 @@ android {
         applicationId = "org.ZingoLabs.Zingo" // Real
         minSdk = rootProject.extra["minSdkVersion"] as Int
         targetSdk = rootProject.extra["targetSdkVersion"] as Int
-        versionCode = 314 // Real (prod baseline; beta flavor overrides below)
+        versionCode = 315 // Real (prod baseline; beta flavor overrides below)
         versionName = "2.0.23" // Real
         testBuildType = System.getProperty("testBuildType", "debug")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -162,7 +162,7 @@ android {
         create("beta") {
             dimension = "channel"
             applicationIdSuffix = ".Beta"
-            versionCode = 326 // beta override
+            versionCode = 327 // beta override
             versionName = "2.0.23" // beta override
             resValue("string", "app_name", "Zingo Beta")
             resValue("bool", "enforce_privacy_controls", "false")
@@ -353,6 +353,9 @@ dependencies {
 
     androidTestImplementation("com.wix:detox:20.51.4")
     implementation("androidx.appcompat:appcompat:1.7.0")
+    // DeviceAuthModule's BiometricPrompt (react-native-keychain only pulls
+    // this transitively; direct use declares it).
+    implementation("androidx.biometric:biometric:1.1.0")
 
     implementation(project(":react-native-device-info")) {
         exclude(group = "com.google.firebase")

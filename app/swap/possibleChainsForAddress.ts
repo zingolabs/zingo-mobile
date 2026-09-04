@@ -1,4 +1,4 @@
-import { ChainNameEnum } from '../AppState';
+import { ChainNameEnum } from '@app/AppState';
 import { SWAP_ADDRESS_CHAINS } from './addressValidators';
 import { validateAddressForChain } from './validateAddressForChain';
 

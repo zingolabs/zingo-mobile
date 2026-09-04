@@ -6,10 +6,10 @@
  * return DONE on success or an ErrorKeyed failure the display edge
  * translates (docs/adr/0002-error-keys-not-prose.md).
  */
-import { GlobalConst, Done, DONE, ErrorKeyed } from '../../AppState';
-import RPCModule from '../../RPCModule';
+import { GlobalConst, Done, DONE, ErrorKeyed, errorKeyed } from '@app/AppState';
+import RPCModule from '@app/RPCModule';
 import { SyncCoordinator } from './SyncCoordinator';
-import { doSaveBackup } from '../utils/walletUtils';
+import { doSaveBackup } from '@app/walletBackend/utils/walletUtils';
 
 export type WalletLifecycleErrorKey =
   | 'rpc.backupwallet-error'
@@ -21,7 +21,7 @@ export type WalletLifecycleResult = Done | ErrorKeyed<WalletLifecycleErrorKey>;
 
 const err = (
   errorKey: WalletLifecycleErrorKey,
-): ErrorKeyed<WalletLifecycleErrorKey> => ({ kind: 'error', errorKey });
+): ErrorKeyed<WalletLifecycleErrorKey> => errorKeyed(errorKey);
 
 export class WalletLifecycleService {
   syncCoordinator: SyncCoordinator;

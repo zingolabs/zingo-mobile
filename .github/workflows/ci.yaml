@@ -71,6 +71,14 @@ jobs:
     with:
       fail-all: true
 
+  # tsc, eslint and prettier --check. A rename-heavy PR is what this gate
+  # catches: a stale import path or an unformatted file that jest never
+  # loads.
+  js-static-checks:
+    uses: ./.github/workflows/js-static-checks.yaml
+    with:
+      fail-all: true
+
   andr-dependency-analysis:
     uses: ./.github/workflows/android-dependency-analysis.yaml
     secrets: inherit
@@ -158,6 +166,7 @@ jobs:
       - jest-test
       - rust-shear
       - js-depcheck
+      - js-static-checks
       - andr-dependency-analysis
       - create-cache-key
       - andr-ubu-integra-test-ci

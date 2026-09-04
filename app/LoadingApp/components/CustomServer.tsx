@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import { Keyboard, TextInput, TouchableOpacity, View } from 'react-native';
-import { useTheme } from '../../theme';
+import { useTheme } from '@app/theme';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
   faBolt,
@@ -10,15 +10,10 @@ import {
   faXmark,
 } from '@fortawesome/free-solid-svg-icons';
 
-import {
-  ButtonTypeEnum,
-  ChainNameEnum,
-  GlobalConst,
-  TranslateType,
-} from '../../AppState';
-import Button from '../../../components/Components/Button';
-import FadeText from '../../../components/Components/FadeText';
-import ChainTypeToggle from '../../../components/Components/ChainTypeToggle';
+import { ChainNameEnum, GlobalConst, TranslateType } from '@app/AppState';
+import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
+import FadeText from '@ui/primitives/FadeText';
+import ChainTypeToggle from '@ui/widgets/ChainTypeToggle';
 
 type CustomServerProps = {
   actionButtonsDisabled: boolean;

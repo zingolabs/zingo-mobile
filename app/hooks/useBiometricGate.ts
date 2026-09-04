@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 
-import simpleBiometrics from '../simpleBiometrics';
-import { SnackbarDurationEnum, TranslateType } from '../AppState';
+import { askGate, enactGateAnswer } from '@app/services/gateController';
+import { SnackbarDurationEnum, TranslateType } from '@app/AppState';
 
 type UseBiometricGateArgs = {
   needsAuth: boolean;
@@ -12,22 +12,27 @@ type UseBiometricGateArgs = {
   foregroundEpoch: number;
 };
 
+/** The screen gate's named states, so callers never read a bare boolean. */
+export type ScreenGateState =
+  { kind: 'checking' } | { kind: 'passed' } | { kind: 'refused' };
+
 /**
  * Audit Issue D — single source of truth for the screen-level biometric
  * gate used by Seed, ShowUfvk, Settings, Rescan and Confirm.
  *
  * Behaviour:
- *   - On mount: triggers simpleBiometrics when `needsAuth` is true.
- *   - On user cancel / fail: emits the standard snackbar via the
- *     supplied `addLastSnackbar` and calls `onCancel` (typically
- *     `navigation.goBack()`).
+ *   - When `needsAuth` holds (at mount, or when a settings toggle flips it
+ *     on while the screen stays mounted): asks the gate controller.
+ *   - On decline: shows the standard sentence and calls `onCancel`
+ *     (typically `navigation.goBack()`).
+ *   - On a fail-open: passes, and tells the user why the gate could not
+ *     run.
  *   - On background → active (foregroundEpoch bumps): re-fires the gate
  *     only when `foregroundAppEnabled` is false. LoadedApp's own
- *     foreground gate already covers the enabled case, so re-firing
- *     here would just stack a second prompt on top of it.
+ *     foreground gate already covers the enabled case.
  *
- * Returns the boolean `authPassed`. Callers render a placeholder until
- * it flips to true so sensitive content is never visible while a prompt
+ * Returns a ScreenGateState. Callers render a placeholder until it
+ * reaches `passed`, so sensitive content is never visible while a prompt
  * is in flight.
  */
 export const useBiometricGate = ({
@@ -37,37 +42,65 @@ export const useBiometricGate = ({
   onCancel,
   foregroundAppEnabled,
   foregroundEpoch,
-}: UseBiometricGateArgs): boolean => {
-  const [authPassed, setAuthPassed] = useState<boolean>(!needsAuth);
+}: UseBiometricGateArgs): ScreenGateState => {
+  const [screenGate, setScreenGate] = useState<ScreenGateState>(
+    needsAuth ? { kind: 'checking' } : { kind: 'passed' },
+  );
 
-  // Mount-only initial prompt. Native stack remounts the screen on
-  // every navigation, so a single check at mount enforces the gate on
-  // each visit.
-  useEffect(() => {
-    if (!needsAuth) {
-      return;
-    }
+  // The one gate body both effects run: returns the effect cleanup that
+  // cancels it, so an unmounted or re-gated screen never acts on a stale
+  // answer. One run lives at a time: starting a new one supersedes the
+  // pending one, so two effect invocations sharing one ceremony can
+  // never both act on its answer.
+  const supersededRef = useRef<() => void>(() => {});
+  const runScreenGate = () => {
+    supersededRef.current();
     let cancelled = false;
     (async () => {
-      const r = await simpleBiometrics({ translate });
+      const answer = await askGate({ translate });
       if (cancelled) {
         return;
       }
-      if (r === false) {
-        addLastSnackbar(translate('biometrics-error') as string);
-        onCancel();
-      } else {
-        setAuthPassed(true);
+      const proceed = enactGateAnswer(
+        answer,
+        {
+          lock: () => {
+            setScreenGate({ kind: 'refused' });
+            // The raw platform diagnostic is bug-report data; the
+            // decline path must not paste it into user copy.
+            addLastSnackbar(translate('biometrics-error') as string);
+            onCancel();
+          },
+          notice: addLastSnackbar,
+        },
+        translate,
+      );
+      if (proceed) {
+        setScreenGate({ kind: 'passed' });
       }
     })();
-    return () => {
+    const cancel = () => {
       cancelled = true;
     };
+    supersededRef.current = cancel;
+    return cancel;
+  };
+
+  // Reactive to needsAuth: the native stack remounts screens per
+  // navigation, and a settings toggle can flip the requirement while the
+  // screen stays mounted; both paths re-gate here.
+  useEffect(() => {
+    if (!needsAuth) {
+      setScreenGate({ kind: 'passed' });
+      return;
+    }
+    setScreenGate({ kind: 'checking' });
+    return runScreenGate();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [needsAuth]);
 
   // Re-fire on background → active. Skips the initial render so the
-  // mount effect above isn't duplicated.
+  // effect above isn't duplicated.
   const isFirstEpochRef = useRef(true);
   useEffect(() => {
     if (isFirstEpochRef.current) {
@@ -77,25 +110,10 @@ export const useBiometricGate = ({
     if (!needsAuth || foregroundAppEnabled) {
       return;
     }
-    setAuthPassed(false);
-    let cancelled = false;
-    (async () => {
-      const r = await simpleBiometrics({ translate });
-      if (cancelled) {
-        return;
-      }
-      if (r === false) {
-        addLastSnackbar(translate('biometrics-error') as string);
-        onCancel();
-      } else {
-        setAuthPassed(true);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
+    setScreenGate({ kind: 'checking' });
+    return runScreenGate();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [foregroundEpoch]);
 
-  return authPassed;
+  return screenGate;
 };

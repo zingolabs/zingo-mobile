@@ -1,7 +1,7 @@
 // Web stand-in for the native RPCModule bridge: every method resolves from
-// the story's registered fixtures (components/storyRpc.ts). Vite aliases the
+// the story's registered fixtures (.storybook/storyRpc.ts). Vite aliases the
 // real module to this file for the web Storybook build.
-import { callRpcFixture } from '../../components/storyRpc';
+import { callRpcFixture } from '../../.storybook/storyRpc';
 
 export default new Proxy(
   {},

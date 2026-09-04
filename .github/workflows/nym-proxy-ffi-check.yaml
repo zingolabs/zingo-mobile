@@ -28,7 +28,7 @@ jobs:
       # rust/Cargo.toml), so workspace-wide jobs never touch it. This job
       # is its only host-side verdict.
       - name: Cache the shim build
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             ~/.cargo/registry
@@ -85,7 +85,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y protobuf-compiler
 
       - name: Cache the shim build
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             ~/.cargo/registry
@@ -98,6 +98,8 @@ jobs:
         with:
           tool: cargo-nextest@0.9.98
 
+      # The shim workspace's own .config/nextest.toml serializes the live
+      # binary, here and for any local invocation alike.
       - name: Live mixnet start
         working-directory: ./rust/nym-proxy-ffi
         run: cargo nextest run --locked --features live-mixnet --test live_mixnet

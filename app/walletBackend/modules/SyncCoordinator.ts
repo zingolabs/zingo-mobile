@@ -12,15 +12,15 @@
  *
  * To add a new periodic task, push it into taskPromises inside runTaskPromises.
  */
-import { TotalBalanceClass, GlobalConst } from '../../AppState';
-import RPCModule from '../../RPCModule';
-import { RPCSyncStatusType } from '../types/RPCSyncStatusType';
-import { RPCSyncPollType } from '../types/RPCSyncPollType';
-import { scanInProgress } from '../utils/syncProgress';
-import { RPCPerformanceLevelEnum } from '../enums/RPCPerformanceLevelEnum';
-import { WalletBackendConfig } from '../config/WalletBackendConfig';
+import { TotalBalanceClass, GlobalConst } from '@app/AppState';
+import RPCModule from '@app/RPCModule';
+import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
+import { RPCSyncPollType } from '@app/walletBackend/types/RPCSyncPollType';
+import { scanInProgress } from '@app/walletBackend/utils/syncProgress';
+import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
+import { WalletBackendConfig } from '@app/walletBackend/config/WalletBackendConfig';
 import { DataService } from './DataService';
-import { doSave } from '../utils/walletUtils';
+import { doSave } from '@app/walletBackend/utils/walletUtils';
 
 // Consecutive failed sync launches before onPersistentSyncFailure fires.
 // Three failures span ~15 s of the 5 s tick: long enough to ride out a

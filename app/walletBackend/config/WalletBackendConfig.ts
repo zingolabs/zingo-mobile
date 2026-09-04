@@ -5,14 +5,14 @@ import {
   UnifiedAddressClass,
   TransparentAddressClass,
   ServerType,
-} from '../../AppState';
-import { RPCSyncStatusType } from '../types/RPCSyncStatusType';
-import { RPCPerformanceLevelEnum } from '../enums/RPCPerformanceLevelEnum';
+} from '@app/AppState';
+import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
+import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
 import {
   StartMixnetTransport,
   StopMixnetTransport,
-} from '../modules/MixnetCoordinator';
-import { MixnetView } from '../transforms/mixnetPresenter';
+} from '@app/walletBackend/modules/MixnetCoordinator';
+import { MixnetView } from '@app/walletBackend/transforms/mixnetView';
 
 /**
  * All callbacks and settings required by WalletBackend and its sub-services.

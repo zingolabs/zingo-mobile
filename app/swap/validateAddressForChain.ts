@@ -1,5 +1,5 @@
-import { ChainNameEnum, GlobalConst } from '../AppState';
-import Utils from '../utils';
+import { ChainNameEnum, GlobalConst } from '@app/AppState';
+import Utils from '@app/utils';
 import { isValidChainAddress } from './addressValidators';
 
 /**
