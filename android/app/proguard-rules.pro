@@ -67,3 +67,9 @@
 
 # kotlinx.datetime references kotlinx.serialization internally
 -dontwarn kotlinx.serialization.**
+
+# The instrumented tests forge 2.0.21 files through the legacy encrypted
+# writer, which the app itself no longer calls.
+-keepclassmembers class androidx.security.crypto.EncryptedFile {
+    public java.io.FileOutputStream openFileOutput();
+}

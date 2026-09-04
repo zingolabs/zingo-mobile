@@ -57,8 +57,14 @@ RCT_EXTERN_METHOD(loadExistingWallet:
 RCT_EXTERN_METHOD(restoreExistingWalletBackup:
     (RCTPromiseResolveBlock)resolve 
                   reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(walletFileRecoveryInfo:
+    (RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(walletFileDiagnosisInfo:
+    (RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(doSave:
-    (RCTPromiseResolveBlock)resolve 
+    (RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(doSaveBackup:
     (RCTPromiseResolveBlock)resolve 

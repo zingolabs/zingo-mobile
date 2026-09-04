@@ -55,7 +55,7 @@ describe('init family wrappers pass resolutions through and type rejections', ()
       () => restoreWalletFromUfvk('ufvk', '1', 'uri', 'main', 'Medium', '1'),
     ],
     [
-      'init_from_b64',
+      'init_from_bytes',
       'loadExistingWallet',
       () => loadExistingWallet('uri', 'main', 'Medium', '1'),
     ],
