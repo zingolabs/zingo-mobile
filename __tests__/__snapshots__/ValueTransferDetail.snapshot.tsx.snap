@@ -181,7 +181,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
     style={
       [
         {
-          "flex": 1,
+          "height": "100%",
         },
         {
           "backgroundColor": "#031124",
@@ -978,7 +978,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
     style={
       [
         {
-          "flex": 1,
+          "height": "100%",
         },
         {
           "backgroundColor": "#031124",

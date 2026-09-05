@@ -110,7 +110,7 @@ exports[`Confirm - snapshots Confirm USD currency, privacy on 1`] = `
       style={
         [
           {
-            "flex": 1,
+            "height": "100%",
           },
           {
             "backgroundColor": "#031124",
@@ -959,7 +959,7 @@ exports[`Confirm - snapshots Confirm no currency, privacy off 1`] = `
       style={
         [
           {
-            "flex": 1,
+            "height": "100%",
           },
           {
             "backgroundColor": "#031124",
