@@ -15,8 +15,6 @@
 		1F0894002BA4C4380089FD88 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 1F0893FE2BA4C4380089FD88 /* PrivacyInfo.xcprivacy */; };
 		1F5569272BBCB4D900F2CD6C /* RPCModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F5569262BBCB4D900F2CD6C /* RPCModule.swift */; };
 		1F5569292BBCB98100F2CD6C /* RPCModuleBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = 1F5569282BBCB98100F2CD6C /* RPCModuleBridge.m */; };
-		D07A0007DA1CE0DE00000003 /* DeviceAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = D07A0007DA1CE0DE00000001 /* DeviceAuth.swift */; };
-		D07A0007DA1CE0DE00000004 /* DeviceAuthBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = D07A0007DA1CE0DE00000002 /* DeviceAuthBridge.m */; };
 		1F5CEBBB2BBF025700E2551A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F5CEBBA2BBF025700E2551A /* AppDelegate.swift */; };
 		1F5E677B2BD30D0A007B17AA /* zingo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F5E677A2BD30D0A007B17AA /* zingo.swift */; };
 		1F5E677C2BD30D0A007B17AA /* zingo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F5E677A2BD30D0A007B17AA /* zingo.swift */; };
@@ -25,8 +23,6 @@
 		1F9FDA9C2FBD5CEC000C5248 /* Zingolib.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1F9FDA9A2FBD5CEC000C5248 /* Zingolib.xcframework */; };
 		1FA935B02BE4506300117DF5 /* RPCModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F5569262BBCB4D900F2CD6C /* RPCModule.swift */; };
 		1FA935B12BE454FA00117DF5 /* RPCModuleBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = 1F5569282BBCB98100F2CD6C /* RPCModuleBridge.m */; };
-		D07A0007DA1CE0DE00000005 /* DeviceAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = D07A0007DA1CE0DE00000001 /* DeviceAuth.swift */; };
-		D07A0007DA1CE0DE00000006 /* DeviceAuthBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = D07A0007DA1CE0DE00000002 /* DeviceAuthBridge.m */; };
 		1FA935B32BE457B100117DF5 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1F7D321C2B71D44800D2879C /* SystemConfiguration.framework */; };
 		1FC1E2172BE443270064963B /* ZingoTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FC1E2162BE443270064963B /* ZingoTest.swift */; };
 		1FE8E9AC296B85FC004A256B /* BackgroundTasks.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1FE8E9AB296B85FC004A256B /* BackgroundTasks.framework */; };
@@ -37,6 +33,10 @@
 		72F4BE964DE9305F904FFD47 /* ZingoNymProxyFFI.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = F1925119FD8B24B809B9A31C /* ZingoNymProxyFFI.xcframework */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		C15AEBBCEC942FCAC1519FEA /* libPods-Zingo-ZingoTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96E8D7BC5D3F3F73EA296DFA /* libPods-Zingo-ZingoTests.a */; };
+		D07A0007DA1CE0DE00000003 /* DeviceAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = D07A0007DA1CE0DE00000001 /* DeviceAuth.swift */; };
+		D07A0007DA1CE0DE00000004 /* DeviceAuthBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = D07A0007DA1CE0DE00000002 /* DeviceAuthBridge.m */; };
+		D07A0007DA1CE0DE00000005 /* DeviceAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = D07A0007DA1CE0DE00000001 /* DeviceAuth.swift */; };
+		D07A0007DA1CE0DE00000006 /* DeviceAuthBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = D07A0007DA1CE0DE00000002 /* DeviceAuthBridge.m */; };
 		E3B3E80957D603CCE394CAF9 /* NymTransportModuleBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = DD87BEDB3F10BB201D3845B8 /* NymTransportModuleBridge.m */; };
 		EEE4199FE8378DA314A03A16 /* zingo_nym_proxy_ffi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8866047183EF780F88A845B6 /* zingo_nym_proxy_ffi.swift */; };
 		F2BBD0386AE916EE94551101 /* NymTransportModuleBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = DD87BEDB3F10BB201D3845B8 /* NymTransportModuleBridge.m */; };
@@ -65,8 +65,6 @@
 		1F5569252BBCB4D900F2CD6C /* RPCModule-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RPCModule-Bridging-Header.h"; sourceTree = "<group>"; };
 		1F5569262BBCB4D900F2CD6C /* RPCModule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RPCModule.swift; sourceTree = "<group>"; };
 		1F5569282BBCB98100F2CD6C /* RPCModuleBridge.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RPCModuleBridge.m; sourceTree = "<group>"; };
-		D07A0007DA1CE0DE00000001 /* DeviceAuth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceAuth.swift; sourceTree = "<group>"; };
-		D07A0007DA1CE0DE00000002 /* DeviceAuthBridge.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DeviceAuthBridge.m; sourceTree = "<group>"; };
 		1F5CEBBA2BBF025700E2551A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		1F5E677A2BD30D0A007B17AA /* zingo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = zingo.swift; sourceTree = "<group>"; };
 		1F70326429905E6A001D70A2 /* Zingo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = Zingo.entitlements; path = Zingo/Zingo.entitlements; sourceTree = "<group>"; };
@@ -85,6 +83,8 @@
 		8E84DCC50BD0296D0F292579 /* Pods-Zingo-ZingoTests.debug-beta.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Zingo-ZingoTests.debug-beta.xcconfig"; path = "Target Support Files/Pods-Zingo-ZingoTests/Pods-Zingo-ZingoTests.debug-beta.xcconfig"; sourceTree = "<group>"; };
 		96E8D7BC5D3F3F73EA296DFA /* libPods-Zingo-ZingoTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Zingo-ZingoTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		9A651BC798997B244C79A0F6 /* Pods-Zingo-ZingoTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Zingo-ZingoTests.release.xcconfig"; path = "Target Support Files/Pods-Zingo-ZingoTests/Pods-Zingo-ZingoTests.release.xcconfig"; sourceTree = "<group>"; };
+		D07A0007DA1CE0DE00000001 /* DeviceAuth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceAuth.swift; sourceTree = "<group>"; };
+		D07A0007DA1CE0DE00000002 /* DeviceAuthBridge.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DeviceAuthBridge.m; sourceTree = "<group>"; };
 		DD87BEDB3F10BB201D3845B8 /* NymTransportModuleBridge.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = NymTransportModuleBridge.m; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		F0A6912D48B65F0E8D6E7619 /* NymTransportModule.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NymTransportModule.swift; sourceTree = "<group>"; };
