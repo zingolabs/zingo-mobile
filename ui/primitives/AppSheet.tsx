@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: radiusSheet,
     borderTopRightRadius: radiusSheet,
   },
-  content: { flex: 1 },
+  content: { height: '100%' },
 });
 
 export default AppSheet;
