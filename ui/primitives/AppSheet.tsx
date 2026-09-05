@@ -1,9 +1,6 @@
 import React, { useCallback } from 'react';
 import { StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
-import BottomSheet, {
-  BottomSheetFooterProps,
-  BottomSheetView,
-} from '@gorhom/bottom-sheet';
+import BottomSheet, { BottomSheetFooterProps } from '@gorhom/bottom-sheet';
 import { radiusSheet, useTheme } from '@app/theme';
 import SheetRim from './SheetRim';
 
@@ -64,17 +61,15 @@ const AppSheet = React.forwardRef<BottomSheet, AppSheetProps>(
         handleComponent={renderHandle}
         footerComponent={renderFooter}
       >
-        <BottomSheetView style={styles.fill}>
-          <View
-            style={[
-              styles.content,
-              { backgroundColor: colors.bgSurface },
-              contentStyle,
-            ]}
-          >
-            {children}
-          </View>
-        </BottomSheetView>
+        <View
+          style={[
+            styles.content,
+            { backgroundColor: colors.bgSurface },
+            contentStyle,
+          ]}
+        >
+          {children}
+        </View>
       </BottomSheet>
     );
   },
@@ -83,7 +78,6 @@ const AppSheet = React.forwardRef<BottomSheet, AppSheetProps>(
 AppSheet.displayName = 'AppSheet';
 
 const styles = StyleSheet.create({
-  fill: { flex: 1 },
   handle: {
     minHeight: radiusSheet,
     borderTopLeftRadius: radiusSheet,
