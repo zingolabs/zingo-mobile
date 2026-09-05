@@ -181,7 +181,7 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
     style={
       [
         {
-          "flex": 1,
+          "height": "100%",
         },
         {
           "backgroundColor": "#031124",
@@ -403,7 +403,7 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
     style={
       [
         {
-          "flex": 1,
+          "height": "100%",
         },
         {
           "backgroundColor": "#031124",
@@ -625,7 +625,7 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
     style={
       [
         {
-          "flex": 1,
+          "height": "100%",
         },
         {
           "backgroundColor": "#031124",
@@ -1022,7 +1022,7 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
     style={
       [
         {
-          "flex": 1,
+          "height": "100%",
         },
         {
           "backgroundColor": "#031124",
@@ -1244,7 +1244,7 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
     style={
       [
         {
-          "flex": 1,
+          "height": "100%",
         },
         {
           "backgroundColor": "#031124",

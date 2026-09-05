@@ -181,7 +181,7 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
     style={
       [
         {
-          "flex": 1,
+          "height": "100%",
         },
         {
           "backgroundColor": "#031124",

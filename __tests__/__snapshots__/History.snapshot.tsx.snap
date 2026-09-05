@@ -784,7 +784,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
       style={
         [
           {
-            "flex": 1,
+            "height": "100%",
           },
           {
             "backgroundColor": "#031124",
@@ -1679,7 +1679,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
       style={
         [
           {
-            "flex": 1,
+            "height": "100%",
           },
           {
             "backgroundColor": "#031124",

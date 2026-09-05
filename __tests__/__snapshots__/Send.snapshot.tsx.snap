@@ -761,7 +761,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
       style={
         [
           {
-            "flex": 1,
+            "height": "100%",
           },
           {
             "backgroundColor": "#031124",
@@ -2579,7 +2579,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
       style={
         [
           {
-            "flex": 1,
+            "height": "100%",
           },
           {
             "backgroundColor": "#031124",

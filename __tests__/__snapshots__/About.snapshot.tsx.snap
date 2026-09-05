@@ -103,7 +103,7 @@ exports[`Component About - test About - snapshot 1`] = `
     style={
       [
         {
-          "flex": 1,
+          "height": "100%",
         },
         {
           "backgroundColor": "#031124",
