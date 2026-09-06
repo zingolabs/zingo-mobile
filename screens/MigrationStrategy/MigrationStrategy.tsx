@@ -31,8 +31,8 @@ type MigrationStrategyProps = NativeStackScreenProps<
   nymSheetOpen?: boolean;
 };
 
-// Migration choices: opt out entirely ('none', the default), the immediate
-// drain ('now'), or the private two-phase path ('private': split notes, then
+// Migration choices: opt out entirely ('none'), the immediate
+// drain ('now'), or the private two-phase path ('private', the default: split notes, then
 // send batches inside scheduled windows).
 type StrategyOption = 'none' | 'now' | 'private';
 
@@ -181,7 +181,7 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
   const { translate, totalBalance, info, nym, setNymOption, mixnetView } =
     context;
   const { colors } = useTheme();
-  const [selected, setSelected] = useState<StrategyOption>('none');
+  const [selected, setSelected] = useState<StrategyOption>('private');
 
   const nymSheetRef = useRef<BottomSheetModal>(null);
   useEffect(() => {
