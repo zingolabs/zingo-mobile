@@ -3547,7 +3547,7 @@ available-typed-arrays@^1.0.7:
   dependencies:
     possible-typed-array-names "^1.0.0"
 
-babel-jest@30.5.1:
+babel-jest@30.5.1, babel-jest@^30.5.1:
   version "30.5.1"
   resolved "https://registry.yarnpkg.com/babel-jest/-/babel-jest-30.5.1.tgz#b20da241e3d525e17a1cda61eadbc2e13230baeb"
   integrity sha512-ge1xUVZS91ml09YRMgRGgeKJ4YJpcOiuwteAxFBYLugQyp7cRw+hHej6Ho0vPjvLrjq60bb7JPHH9LAMA1/krA==
@@ -3571,19 +3571,6 @@ babel-jest@^29.7.0:
     babel-preset-jest "^29.6.3"
     chalk "^4.0.0"
     graceful-fs "^4.2.9"
-    slash "^3.0.0"
-
-babel-jest@^30.5.0:
-  version "30.5.0"
-  resolved "https://registry.yarnpkg.com/babel-jest/-/babel-jest-30.5.0.tgz#0110679d8442ab57ec1b7d1f9fd2dd80f3b8845b"
-  integrity sha512-PrhPHlKC+MsLnuNzgIH/y1dkz1f6cSfKWaQeaG8WxLMuG44dYWQ8E9uRrsBbAGCU/3+BEFYPN4d6G3Zc5Y+waA==
-  dependencies:
-    "@jest/transform" "30.5.0"
-    "@types/babel__core" "^7.20.5"
-    babel-plugin-istanbul "^8.0.0"
-    babel-preset-jest "30.5.0"
-    chalk "^4.1.2"
-    graceful-fs "^4.2.11"
     slash "^3.0.0"
 
 babel-plugin-dynamic-import-node@^2.3.3:
