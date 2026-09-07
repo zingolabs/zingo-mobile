@@ -2314,7 +2314,8 @@ pub fn remove_transaction(txid: String) -> Result<String, ZingolibError> {
     })
 }
 
-// we don't use this anymore...
+// The Send screen calls this on every address change, to size the amount field
+// against the address the user is typing.
 pub fn get_spendable_balance_with_address(
     address: String,
     zennies: String,
@@ -2326,6 +2327,27 @@ pub fn get_spendable_balance_with_address(
             ZingolibError::InvalidInput("failed to parse zennies setting".to_string())
         })?;
         RT.block_on(async move {
+            // `max_send_value` prices a trial payment of the whole shielded
+            // spendable balance to `address`. With nothing shielded to spend, that
+            // trial payment is zero-valued, and zip321 refuses a zero-valued output
+            // to a transparent recipient ("disallowed by consensus") -- so merely
+            // typing a transparent address on a wallet whose funds are all
+            // transparent, or still syncing, raised a consensus error out of what is
+            // only a balance query. Nothing to spend means a max of zero; answer
+            // that directly. Scoped so the read guard is released before
+            // `max_send_value` takes the wallet's write lock.
+            let spendable_balance = {
+                let wallet = lightclient.wallet().read().await;
+                wallet
+                    .shielded_spendable_balance(AccountId::ZERO, false)
+                    .map_err(ZingolibError::read)?
+            };
+            if spendable_balance == Zatoshis::ZERO {
+                return Ok(
+                    object! { "spendable_balance" => spendable_balance.into_u64() }.pretty(2),
+                );
+            }
+
             let bal = lightclient
                 .max_send_value(address, zennies, AccountId::ZERO)
                 .await
