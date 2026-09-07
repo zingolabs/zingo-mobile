@@ -579,7 +579,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         try {
           const runSpendableBalanceJson: RPCSpendablebalanceType =
             await JSON.parse(runSpendableBalance.value);
-          if (runSpendableBalanceJson.spendable_balance) {
+          if (runSpendableBalanceJson.spendable_balance !== undefined) {
             // Audit Issue K — do not log the spendable balance value.
             spendableBalance =
               runSpendableBalanceJson.spendable_balance / 10 ** 8;
