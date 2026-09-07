@@ -73,3 +73,6 @@
 -keepclassmembers class androidx.security.crypto.EncryptedFile {
     public java.io.FileOutputStream openFileOutput();
 }
+
+-keep class org.ZingoLabs.Zingo.SyncStatus { *; }
+-keep class org.ZingoLabs.Zingo.ScanRanges { *; }
