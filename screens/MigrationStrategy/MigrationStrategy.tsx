@@ -31,9 +31,10 @@ type MigrationStrategyProps = NativeStackScreenProps<
   nymSheetOpen?: boolean;
 };
 
-// Migration choices: opt out entirely ('none'), the immediate
-// drain ('now'), or the private two-phase path ('private', the default: split notes, then
-// send batches inside scheduled windows).
+// Migration choices: opt out entirely ('none', the default), the immediate
+// drain ('now'), or the private two-phase path ('private': split notes, then
+// send batches inside scheduled windows). The private path ships later and
+// its card is disabled.
 type StrategyOption = 'none' | 'now' | 'private';
 
 // Renders a translated string, bolding `**…**` spans in `highlight` and
@@ -117,6 +118,8 @@ type OptionCardProps = {
   selected: boolean;
   onPress: () => void;
   colors: AppTheme['colors'];
+  disabled?: boolean;
+  badge?: string;
   accent?: string;
 };
 
@@ -126,10 +129,13 @@ const OptionCard: React.FunctionComponent<OptionCardProps> = ({
   selected,
   onPress,
   colors,
+  disabled = false,
+  badge,
   accent,
 }) => (
   <TouchableOpacity
-    activeOpacity={0.8}
+    activeOpacity={disabled ? 1 : 0.8}
+    disabled={disabled}
     onPress={onPress}
     style={{
       borderWidth: 1.5,
@@ -137,6 +143,7 @@ const OptionCard: React.FunctionComponent<OptionCardProps> = ({
       backgroundColor: colors.bgSurface,
       borderRadius: 14,
       padding: 18,
+      opacity: disabled ? 0.5 : 1,
     }}
   >
     <View
@@ -155,6 +162,21 @@ const OptionCard: React.FunctionComponent<OptionCardProps> = ({
         >
           {title}
         </Text>
+        {badge ? (
+          <View
+            style={{
+              marginLeft: 8,
+              paddingHorizontal: 8,
+              paddingVertical: 2,
+              borderRadius: 6,
+              backgroundColor: colors.bgSecondaryDisabled,
+            }}
+          >
+            <Text style={{ color: colors.fgMuted, fontSize: 12 }}>
+              {badge}
+            </Text>
+          </View>
+        ) : null}
       </View>
       <RadioDot
         selected={selected}
@@ -181,7 +203,7 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
   const { translate, totalBalance, info, nym, setNymOption, mixnetView } =
     context;
   const { colors } = useTheme();
-  const [selected, setSelected] = useState<StrategyOption>('private');
+  const [selected, setSelected] = useState<StrategyOption>('none');
 
   const nymSheetRef = useRef<BottomSheetModal>(null);
   useEffect(() => {
@@ -311,8 +333,10 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
             title={translate('migrationstrategy.private-label') as string}
             body={translate('migrationstrategy.private-body') as string}
             selected={selected === 'private'}
-            onPress={() => setSelected('private')}
+            onPress={() => {}}
             colors={colors}
+            disabled={true}
+            badge={translate('migrationstrategy.coming-soon') as string}
           />
         </ScrollView>
 
