@@ -169,10 +169,10 @@ const OptionCard: React.FunctionComponent<OptionCardProps> = ({
               paddingHorizontal: 8,
               paddingVertical: 2,
               borderRadius: 6,
-              backgroundColor: colors.bgSecondaryDisabled,
+              backgroundColor: colors.bgMuted,
             }}
           >
-            <Text style={{ color: colors.fgMuted, fontSize: 12 }}>
+            <Text style={{ color: colors.bgSurface, fontSize: 12 }}>
               {badge}
             </Text>
           </View>
