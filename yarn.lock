@@ -1759,6 +1759,11 @@
   dependencies:
     eslint-scope "5.1.1"
 
+"@noble/ed25519@^2.0.0":
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/@noble/ed25519/-/ed25519-2.3.0.tgz#df0dbe424cfd7da4968b956b819c15db5fbe7f21"
+  integrity sha512-M7dvXL2B92/M7dw9+gzuydL8qn/jiqNHaoR3Q+cb1q1GHV7uwE17WCyFMG+Y+TZb5izcaXk5TdJRrDUxHXL78A==
+
 "@nodable/entities@^2.2.0":
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/@nodable/entities/-/entities-2.2.0.tgz#a1d45a992b022591b1c2b03a77935c939375b642"
@@ -3734,6 +3739,11 @@ baseline-browser-mapping@^2.10.12:
   version "2.10.37"
   resolved "https://registry.yarnpkg.com/baseline-browser-mapping/-/baseline-browser-mapping-2.10.37.tgz#3e636475b6b293244e2b23e2c71a2ab9d9e6ba7d"
   integrity sha512-girxaJ7WZssDOFhzCGZTDKoTa1gk6A1TbflaYTpykLJ4UU9Fz9kx1aREM8JCuoVHbL8X8T/mJg7w2oYSq72Oig==
+
+bech32@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/bech32/-/bech32-2.0.0.tgz#078d3686535075c8c79709f054b1b226a133b355"
+  integrity sha512-LcknSilhIGatDAsY1ak2I8VtGaHNhgMSYVxFrGLXv+xLHytaKZKcaUJJUE7qmBr7h33o5YQwP55pMI0xmkpJwg==
 
 better-opn@^3.0.2:
   version "3.0.2"
@@ -10987,3 +10997,11 @@ yocto-queue@^1.0.0:
   version "1.2.2"
   resolved "https://registry.yarnpkg.com/yocto-queue/-/yocto-queue-1.2.2.tgz#3e09c95d3f1aa89a58c114c99223edf639152c00"
   integrity sha512-4LCcse/U2MHZ63HAJVE+v71o7yOdIe4cZ70Wpf8D/IyjDKYQLV5GD46B+hSTjJsvV5PztjvHoU580EftxjDZFQ==
+
+zcashname-sdk@^0.8.7:
+  version "0.8.7"
+  resolved "https://registry.yarnpkg.com/zcashname-sdk/-/zcashname-sdk-0.8.7.tgz#5a300b94ab80d6729eafa51da144e2bfaea16d81"
+  integrity sha512-pcF9llTkYn1nG343V0ryqZKypA/fwRmmd9qeMbkNsCs3BnnibZjjt4TnxS4c6mrZrhl/5q1d6jqtMa6Mr2XdNQ==
+  dependencies:
+    "@noble/ed25519" "^2.0.0"
+    bech32 "^2.0.0"

@@ -79,6 +79,10 @@ import {
 } from '@app/AppState';
 import { hasUnconfirmedFunds } from '@app/AppState/classes/TotalBalanceClass';
 import { parseZcashURI, serverUris, fetchServerList } from '@app/uris';
+// Imported straight from the module rather than through the `uris` barrel, so
+// the ZNS SDK stays out of the module graph of everything else that barrel
+// serves (the wallet backend among them).
+import { isZnsAlias, resolveZnsName } from '@app/uris/resolveZnsName';
 import {
   getSpendableBalanceWithAddress,
   sendPropose,
@@ -199,6 +203,10 @@ const Send: React.FunctionComponent<SendProps> = ({
 
   const [memoEnabled, setMemoEnabled] = useState<boolean>(false);
   const [validAddress, setValidAddress] = useState<number>(0); // 1 - OK, 0 - Empty, -1 - KO
+  // A `name.zcash` the indexer does not know. Reported in place of the
+  // invalid-address text, which would be wrong: the address is not malformed,
+  // the name simply is not registered.
+  const [znsNotFound, setZnsNotFound] = useState<boolean>(false);
   const [validAmount, setValidAmount] = useState<number>(0); // 1 - OK, 0 - Empty, -1 - Invalid number, -2 - Invalid Amount
   const [validMemo, setValidMemo] = useState<number>(0); // 1 - OK, 0 - Empty, -1 - KO
   const [sendButtonEnabled, setSendButtonEnabled] = useState<boolean>(false);
@@ -746,6 +754,43 @@ const Send: React.FunctionComponent<SendProps> = ({
     }
   }, [calculateSpendableBalance, addressText]);
 
+  // Zcash Name Service: a `name.zcash` in the recipient field is looked up and
+  // swapped for the unified address it points at, so everything downstream
+  // (the fee proposal, the spendable balance, the address book, the confirm
+  // screen) keeps receiving a real address. Debounced, because this fires on
+  // every keystroke and each run is a network round trip.
+  useEffect(() => {
+    if (!isZnsAlias(addressText)) {
+      setZnsNotFound(false);
+      return;
+    }
+    // Neither valid nor invalid until the indexer answers.
+    setValidAddress(0);
+    setZnsNotFound(false);
+    let cancelled = false;
+    const timerId = setTimeout(async () => {
+      const resolution = await resolveZnsName(addressText, server.chainName);
+      if (cancelled) {
+        return;
+      }
+      if (resolution.ok) {
+        // Re-runs this effect with the address in hand, which then takes the
+        // ordinary validation path and lights the check.
+        updateToField(resolution.address, null, null, null, null);
+      } else {
+        setZnsNotFound(true);
+        setValidAddress(-1);
+      }
+    }, 500);
+    return () => {
+      cancelled = true;
+      clearTimeout(timerId);
+    };
+    // updateToField is redefined on every render; depending on it would restart
+    // the debounce continuously.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [addressText, server.chainName]);
+
   useEffect(() => {
     const getMemoEnabled = async (
       address: string,
@@ -772,12 +817,17 @@ const Send: React.FunctionComponent<SendProps> = ({
 
   useEffect(() => {
     if (addressText) {
-      Utils.isValidAddress(addressText, server.chainName).then(r => {
-        setValidAddress(r.isValid ? 1 : -1);
-        if (!r.isValid) {
-          setSpendableBalanceLastError('');
-        }
-      });
+      // A ZNS alias is not an address yet, so the address parser would call it
+      // invalid while the lookup is still in flight. The resolver effect above
+      // owns the verdict for those.
+      if (!isZnsAlias(addressText)) {
+        Utils.isValidAddress(addressText, server.chainName).then(r => {
+          setValidAddress(r.isValid ? 1 : -1);
+          if (!r.isValid) {
+            setSpendableBalanceLastError('');
+          }
+        });
+      }
     } else {
       setValidAddress(0);
     }
@@ -1243,7 +1293,13 @@ const Send: React.FunctionComponent<SendProps> = ({
                       testID="send.address.error"
                       style={{ color: colors.fgDanger }}
                     >
-                      {translate('send.invalidaddress') as string}
+                      {
+                        translate(
+                          znsNotFound
+                            ? 'send.znsnamenotfound'
+                            : 'send.invalidaddress',
+                        ) as string
+                      }
                     </ErrorText>
                   )}
                 </View>

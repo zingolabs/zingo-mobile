@@ -94,7 +94,8 @@
     "react-native-vision-camera": "^4.7.2",
     "react-native-worklets": "^0.5.1",
     "recyclerlistview": "^4.2.3",
-    "url-parse": "^1.5.10"
+    "url-parse": "^1.5.10",
+    "zcashname-sdk": "^0.8.7"
   },
   "devDependencies": {
     "@babel/core": "^7.29.7",
