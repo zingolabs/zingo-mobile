@@ -402,11 +402,10 @@ dependencies {
     // google truth testing framework
     androidTestImplementation("com.google.truth:truth:1.1.3")
 
-    // JSON parsing: the Kotlin module plus the core/databind classes the
-    // sources use directly (ObjectMapper, JsonNode, and friends).
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.18.3")
-    implementation("com.fasterxml.jackson.core:jackson-core:2.18.3")
-    implementation("com.fasterxml.jackson.core:jackson-databind:2.18.3")
+    // JSON decoding in the instrumented tests.
+    androidTestImplementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.18.3")
+    androidTestImplementation("com.fasterxml.jackson.core:jackson-core:2.18.3")
+    androidTestImplementation("com.fasterxml.jackson.core:jackson-databind:2.18.3")
 
     // JVM unit tests for pure logic (no device or emulator)
     testImplementation("junit:junit:4.13.2")
