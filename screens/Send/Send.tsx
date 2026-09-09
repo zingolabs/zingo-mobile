@@ -1410,7 +1410,18 @@ const Send: React.FunctionComponent<SendProps> = ({
                             <TouchableOpacity
                               testID="send.add-address"
                               disabled={updatingToField}
-                              onPress={() => launchAddTagModal(addressText)}
+                              onPress={() =>
+                                launchAddTagModal(
+                                  addressText,
+                                  undefined,
+                                  // The name the user actually typed is a
+                                  // better first guess at the contact's label
+                                  // than an empty field.
+                                  zns?.address === addressText
+                                    ? zns.alias
+                                    : undefined,
+                                )
+                              }
                             >
                               <FontAwesomeIcon
                                 style={{ marginRight: 5 }}

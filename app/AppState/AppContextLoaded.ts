@@ -100,7 +100,11 @@ export default interface AppContextLoaded {
   // Opens the shared "Add Tag / Add Contact" BottomSheet modal in-place,
   // pre-filled with the given address. Used from any screen that displays an
   // address (AddressItem's + icon).
-  launchAddTagModal: (address: string, swapChain?: string) => void;
+  launchAddTagModal: (
+    address: string,
+    swapChain?: string,
+    initialLabel?: string,
+  ) => void;
 
   // is calculated in the header & needed in the send screen
   shieldingAmount: number;

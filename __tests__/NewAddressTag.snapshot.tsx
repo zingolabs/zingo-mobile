@@ -4,7 +4,7 @@
 
 import 'react-native';
 import React from 'react';
-import { render } from '@testing-library/react-native';
+import { render, screen } from '@testing-library/react-native';
 import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
@@ -31,5 +31,27 @@ describe('NewAddressTag - snapshot', () => {
         </ContextAppLoadedProvider>,
       ).toJSON(),
     ).toMatchSnapshot();
+  });
+
+  // A contact saved from a resolved "pepe.zcash" starts with that name in the
+  // label field, so the user confirms rather than retypes it.
+  test('the label field starts from initialLabel', () => {
+    const state = { ...defaultAppContextLoaded };
+    state.translate = mockTranslate;
+    const onFn = jest.fn();
+
+    render(
+      <ContextAppLoadedProvider value={state}>
+        <NewAddressTag
+          address="u1abc123def456abc123def456abc123def456abc123"
+          own={false}
+          initialLabel="pepe.zcash"
+          closeSheet={onFn}
+          setAddressBook={onFn}
+        />
+      </ContextAppLoadedProvider>,
+    );
+
+    expect(screen.getByDisplayValue('pepe.zcash')).toBeTruthy();
   });
 });
