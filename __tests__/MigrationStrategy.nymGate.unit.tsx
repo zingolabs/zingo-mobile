@@ -149,7 +149,7 @@ describe('MigrationStrategy nym gate sheet', () => {
     const { getByText, getByTestId, navigate, rerenderWith } =
       renderScreen(mixnetConnecting);
 
-    fireEvent.press(getByText('migrationstrategy.private-label'));
+    fireEvent.press(getByText('migrationstrategy.now-label'));
     fireEvent.press(getByTestId('migrationstrategy.start'));
     expect(navigate).not.toHaveBeenCalled();
 
@@ -157,6 +157,6 @@ describe('MigrationStrategy nym gate sheet', () => {
     expect(navigate).not.toHaveBeenCalled();
 
     rerenderWith(mixnetReady);
-    expect(navigate).toHaveBeenCalledWith(RouteEnum.MigrationSplitPlan);
+    expect(navigate).toHaveBeenCalledWith(RouteEnum.MigrationTransactions);
   });
 });
