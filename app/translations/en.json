@@ -584,7 +584,7 @@
     "toaddress": "To Address",
     "invalidaddress": "Invalid Address!",
     "znsnamenotfound": "That .zcash name does not exist!",
-    "addressplaceholder": "Unified, Z-Sapling, Transparent or name.zcash",
+    "addressplaceholder": "Address or name.zcash",
     "invalidamount": "Invalid Amount!",
     "invalidnumber": "Invalid Number!",
     "spendable": "Spendable: ",

@@ -584,7 +584,7 @@
     "toaddress": "На адрес",
     "invalidaddress": "Некорректный адрес!",
     "znsnamenotfound": "Такого имени .zcash не существует!",
-    "addressplaceholder": "Унифицированный, Z-адрес в пуле Sapling, прозрачный или имя.zcash",
+    "addressplaceholder": "Адрес или имя.zcash",
     "invalidamount": "Недопустимая сумма!",
     "invalidnumber": "Некорректное значение!",
     "spendable": "Доступно: ",

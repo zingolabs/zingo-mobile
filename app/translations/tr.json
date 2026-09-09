@@ -584,7 +584,7 @@
     "toaddress": "Adrese",
     "invalidaddress": "Geçersiz adres!",
     "znsnamenotfound": "Bu .zcash adı mevcut değil!",
-    "addressplaceholder": "Birleşik, Z-Sapling, Şeffaf veya isim.zcash",
+    "addressplaceholder": "Adres veya isim.zcash",
     "invalidamount": "Geçersiz tutar!",
     "invalidnumber": "Geçersiz sayı!",
     "spendable": "Harcanabilir:",
