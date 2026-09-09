@@ -1605,6 +1605,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
                 "opacity": 1,
               }
             }
+            testID="addressitem.add-contact"
           >
             <
               color="#18bd18"

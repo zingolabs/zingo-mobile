@@ -624,6 +624,7 @@ exports[`Confirm - snapshots Confirm USD currency, privacy on 1`] = `
                 "opacity": 1,
               }
             }
+            testID="addressitem.add-contact"
           >
             <
               color="#18bd18"
@@ -1360,6 +1361,7 @@ exports[`Confirm - snapshots Confirm no currency, privacy off 1`] = `
                 "opacity": 1,
               }
             }
+            testID="addressitem.add-contact"
           >
             <
               color="#18bd18"
