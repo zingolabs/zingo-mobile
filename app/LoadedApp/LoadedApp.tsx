@@ -2250,6 +2250,7 @@ export class LoadedAppClass extends Component<
   launchAddTagModal = (
     address: string,
     swapChain: string = GlobalConst.zecSwapChain,
+    initialLabel?: string,
   ) => {
     // Every launcher (Send, address rows) saves a recipient/destination,
     // i.e. a contact — never a label for one of the wallet's own addresses.
@@ -2257,7 +2258,7 @@ export class LoadedAppClass extends Component<
     // with own={true} directly. So this modal is always a contact (own=false),
     // "Add contact", not "Add tag".
     this.setState(
-      { addTagModalTarget: { address, own: false, swapChain } },
+      { addTagModalTarget: { address, own: false, swapChain, initialLabel } },
       () => {
         this.addTagModalRef.current?.present();
       },

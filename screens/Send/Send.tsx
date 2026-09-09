@@ -79,6 +79,10 @@ import {
 } from '@app/AppState';
 import { hasUnconfirmedFunds } from '@app/AppState/classes/TotalBalanceClass';
 import { parseZcashURI, serverUris, fetchServerList } from '@app/uris';
+// Imported straight from the module rather than through the `uris` barrel, so
+// the ZNS SDK stays out of the module graph of everything else that barrel
+// serves (the wallet backend among them).
+import { isZnsAlias, resolveZnsName } from '@app/uris/resolveZnsName';
 import {
   getSpendableBalanceWithAddress,
   sendPropose,
@@ -199,6 +203,17 @@ const Send: React.FunctionComponent<SendProps> = ({
 
   const [memoEnabled, setMemoEnabled] = useState<boolean>(false);
   const [validAddress, setValidAddress] = useState<number>(0); // 1 - OK, 0 - Empty, -1 - KO
+  // A `name.zcash` the indexer does not know. Reported in place of the
+  // invalid-address text, which would be wrong: the address is not malformed,
+  // the name simply is not registered.
+  const [znsNotFound, setZnsNotFound] = useState<boolean>(false);
+  // The alias a resolution came from, kept beside the address it produced.
+  // Resolving replaces the alias in the field with a unified address, and
+  // without this the origin of that address would be lost — the user typed
+  // "pepe.zcash" and would be looking at a string of base32.
+  const [zns, setZns] = useState<{ alias: string; address: string } | null>(
+    null,
+  );
   const [validAmount, setValidAmount] = useState<number>(0); // 1 - OK, 0 - Empty, -1 - Invalid number, -2 - Invalid Amount
   const [validMemo, setValidMemo] = useState<number>(0); // 1 - OK, 0 - Empty, -1 - KO
   const [sendButtonEnabled, setSendButtonEnabled] = useState<boolean>(false);
@@ -746,6 +761,52 @@ const Send: React.FunctionComponent<SendProps> = ({
     }
   }, [calculateSpendableBalance, addressText]);
 
+  // Zcash Name Service: a `name.zcash` in the recipient field is looked up and
+  // swapped for the unified address it points at, so everything downstream
+  // (the fee proposal, the spendable balance, the address book, the confirm
+  // screen) keeps receiving a real address. Debounced, because this fires on
+  // every keystroke and each run is a network round trip.
+  useEffect(() => {
+    if (!isZnsAlias(addressText)) {
+      setZnsNotFound(false);
+      // The badge belongs to the address the alias resolved to. Anything else
+      // in the field — a pasted address, an edit — is no longer that name.
+      setZns(previous =>
+        previous && previous.address !== addressText ? null : previous,
+      );
+      return;
+    }
+    // Neither valid nor invalid until the indexer answers.
+    setValidAddress(0);
+    setZnsNotFound(false);
+    let cancelled = false;
+    const timerId = setTimeout(async () => {
+      const resolution = await resolveZnsName(addressText, server.chainName);
+      if (cancelled) {
+        return;
+      }
+      if (resolution.ok) {
+        setZns({
+          alias: addressText.trim().toLowerCase(),
+          address: resolution.address,
+        });
+        // Re-runs this effect with the address in hand, which then takes the
+        // ordinary validation path and lights the check.
+        updateToField(resolution.address, null, null, null, null);
+      } else {
+        setZnsNotFound(true);
+        setValidAddress(-1);
+      }
+    }, 500);
+    return () => {
+      cancelled = true;
+      clearTimeout(timerId);
+    };
+    // updateToField is redefined on every render; depending on it would restart
+    // the debounce continuously.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [addressText, server.chainName]);
+
   useEffect(() => {
     const getMemoEnabled = async (
       address: string,
@@ -772,12 +833,17 @@ const Send: React.FunctionComponent<SendProps> = ({
 
   useEffect(() => {
     if (addressText) {
-      Utils.isValidAddress(addressText, server.chainName).then(r => {
-        setValidAddress(r.isValid ? 1 : -1);
-        if (!r.isValid) {
-          setSpendableBalanceLastError('');
-        }
-      });
+      // A ZNS alias is not an address yet, so the address parser would call it
+      // invalid while the lookup is still in flight. The resolver effect above
+      // owns the verdict for those.
+      if (!isZnsAlias(addressText)) {
+        Utils.isValidAddress(addressText, server.chainName).then(r => {
+          setValidAddress(r.isValid ? 1 : -1);
+          if (!r.isValid) {
+            setSpendableBalanceLastError('');
+          }
+        });
+      }
     } else {
       setValidAddress(0);
     }
@@ -1134,6 +1200,12 @@ const Send: React.FunctionComponent<SendProps> = ({
   //  contentHeight,
   //);
 
+  // The recipient is already a contact. Saving one is also what retires the
+  // ZNS badge: once the address has a name of the user's own, that name is the
+  // one that means something, and two labels on one address just read as noise.
+  const addressIsSaved =
+    !!addressText && addressBook.some(ab => ab.address === addressText);
+
   const returnPage = (
     <View
       style={{ flex: 1 }}
@@ -1232,6 +1304,14 @@ const Send: React.FunctionComponent<SendProps> = ({
                         withIcon={false}
                       />
                     )}
+                    {zns?.address === addressText && !addressIsSaved && (
+                      <RegText
+                        testID="send.address.zns"
+                        style={{ color: colors.fgAccent, fontWeight: '600' }}
+                      >
+                        {`ZNS: ${zns.alias}`}
+                      </RegText>
+                    )}
                   </View>
                   {validAddress === 1 && (
                     <View testID="send.address.check">
@@ -1243,7 +1323,13 @@ const Send: React.FunctionComponent<SendProps> = ({
                       testID="send.address.error"
                       style={{ color: colors.fgDanger }}
                     >
-                      {translate('send.invalidaddress') as string}
+                      {
+                        translate(
+                          znsNotFound
+                            ? 'send.znsnamenotfound'
+                            : 'send.invalidaddress',
+                        ) as string
+                      }
                     </ErrorText>
                   )}
                 </View>
@@ -1319,15 +1405,23 @@ const Send: React.FunctionComponent<SendProps> = ({
                         // button for an "add to address book" one. It reverts
                         // automatically after saving: `addressBook` updates and
                         // this recomputes `addressIsSaved`.
-                        const addressIsSaved =
-                          !!addressText &&
-                          addressBook.some(ab => ab.address === addressText);
                         if (validAddress === 1 && !addressIsSaved) {
                           return (
                             <TouchableOpacity
                               testID="send.add-address"
                               disabled={updatingToField}
-                              onPress={() => launchAddTagModal(addressText)}
+                              onPress={() =>
+                                launchAddTagModal(
+                                  addressText,
+                                  undefined,
+                                  // The name the user actually typed is a
+                                  // better first guess at the contact's label
+                                  // than an empty field.
+                                  zns?.address === addressText
+                                    ? zns.alias
+                                    : undefined,
+                                )
+                              }
                             >
                               <FontAwesomeIcon
                                 style={{ marginRight: 5 }}

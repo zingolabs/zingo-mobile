@@ -25,6 +25,9 @@ type NewAddressTagProps = {
   // SwapKit chain code of the address ('ZEC' by default). Non-ZEC contacts are
   // saved with chain = mainnet (swaps live in mainnet context).
   swapChain?: string;
+  // Suggested label, when whoever opened the form already knows a name for the
+  // address. Editable like any other: it is a starting point, not a value.
+  initialLabel?: string;
   closeSheet: () => void;
   setAddressBook: (ab: AddressBookFileClass[]) => void;
 };
@@ -32,6 +35,7 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
   address,
   own,
   swapChain,
+  initialLabel,
   closeSheet,
   setAddressBook,
 }) => {
@@ -39,7 +43,7 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
   const { translate, server } = context;
   const { colors } = useTheme();
 
-  const [label, setLabel] = useState<string>('');
+  const [label, setLabel] = useState<string>(initialLabel ?? '');
   // The chain is fixed to whatever triggered the save (Send → ZEC; Swap → the
   // selected token's chain), so the selector shows a single, non-editable
   // option — same value used to persist the contact.

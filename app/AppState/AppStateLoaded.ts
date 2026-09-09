@@ -25,5 +25,9 @@ export default interface AppStateLoaded {
     address: string;
     own: boolean;
     swapChain: string;
+    // What to put in the label field before the user types, when the launcher
+    // knows a name for the address (a ZNS alias, say). The user is free to
+    // replace it.
+    initialLabel?: string;
   } | null;
 }
