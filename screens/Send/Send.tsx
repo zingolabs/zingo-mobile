@@ -207,6 +207,13 @@ const Send: React.FunctionComponent<SendProps> = ({
   // invalid-address text, which would be wrong: the address is not malformed,
   // the name simply is not registered.
   const [znsNotFound, setZnsNotFound] = useState<boolean>(false);
+  // The alias a resolution came from, kept beside the address it produced.
+  // Resolving replaces the alias in the field with a unified address, and
+  // without this the origin of that address would be lost — the user typed
+  // "pepe.zcash" and would be looking at a string of base32.
+  const [zns, setZns] = useState<{ alias: string; address: string } | null>(
+    null,
+  );
   const [validAmount, setValidAmount] = useState<number>(0); // 1 - OK, 0 - Empty, -1 - Invalid number, -2 - Invalid Amount
   const [validMemo, setValidMemo] = useState<number>(0); // 1 - OK, 0 - Empty, -1 - KO
   const [sendButtonEnabled, setSendButtonEnabled] = useState<boolean>(false);
@@ -762,6 +769,11 @@ const Send: React.FunctionComponent<SendProps> = ({
   useEffect(() => {
     if (!isZnsAlias(addressText)) {
       setZnsNotFound(false);
+      // The badge belongs to the address the alias resolved to. Anything else
+      // in the field — a pasted address, an edit — is no longer that name.
+      setZns(previous =>
+        previous && previous.address !== addressText ? null : previous,
+      );
       return;
     }
     // Neither valid nor invalid until the indexer answers.
@@ -774,6 +786,10 @@ const Send: React.FunctionComponent<SendProps> = ({
         return;
       }
       if (resolution.ok) {
+        setZns({
+          alias: addressText.trim().toLowerCase(),
+          address: resolution.address,
+        });
         // Re-runs this effect with the address in hand, which then takes the
         // ordinary validation path and lights the check.
         updateToField(resolution.address, null, null, null, null);
@@ -1281,6 +1297,14 @@ const Send: React.FunctionComponent<SendProps> = ({
                         // already saved; nothing renders when it isn't.
                         withIcon={false}
                       />
+                    )}
+                    {zns?.address === addressText && (
+                      <RegText
+                        testID="send.address.zns"
+                        style={{ color: colors.fgAccent, fontWeight: '600' }}
+                      >
+                        {`ZNS: ${zns.alias}`}
+                      </RegText>
                     )}
                   </View>
                   {validAddress === 1 && (
