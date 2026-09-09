@@ -4,5 +4,4 @@ export default interface NetInfoType {
   isConnected: boolean | null;
   type: NetInfoStateType;
   isConnectionExpensive: boolean | null;
-   
 }

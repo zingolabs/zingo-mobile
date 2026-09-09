@@ -5,9 +5,16 @@ jest.mock('react-native', () => {
     getLatestBlockServerInfo: jest.fn(() => '{}'),
     getLatestBlockWalletInfo: jest.fn(() => '{}'),
     walletExists: jest.fn(() => 'false'),
-    getValueTransfersList: jest.fn(() => '{ "value_transfers": [], "total": 0 }'),
+    walletBackupExists: jest.fn(() => 'false'),
+    doSaveBackup: jest.fn(() => 'true'),
+    restoreExistingWalletBackup: jest.fn(() => '{}'),
+    getValueTransfersList: jest.fn(
+      () => '{ "value_transfers": [], "total": 0 }',
+    ),
     setCryptoDefaultProvider: jest.fn(() => 'true'),
-    createNewWallet: jest.fn(() => '{ "seed": "seed phrase test", "birthday": 0 }'),
+    createNewWallet: jest.fn(
+      () => '{ "seed": "seed phrase test", "birthday": 0 }',
+    ),
     doSave: jest.fn(),
     pollSyncInfo: jest.fn(() => '{}'),
     runSyncProcess: jest.fn(() => '{}'),
@@ -33,7 +40,6 @@ jest.mock('react-native', () => {
     getSpendableBalanceTotalInfo: jest.fn(() => '{}'),
     getOptionWalletInfo: jest.fn(() => '{}'),
     setOptionWalletProcess: jest.fn(() => '{}'),
-    createTorClientProcess: jest.fn(() => '{}'),
     getUnifiedAddressesInfo: jest.fn(() => '{}'),
     getTransparentAddressesInfo: jest.fn(() => '{}'),
     createNewUnifiedAddressProcess: jest.fn(() => '{}'),
@@ -48,7 +54,15 @@ jest.mock('react-native', () => {
     confirmProcess: jest.fn(() => '{}'),
     getZenniesDonationAddress: jest.fn(() => '{}'),
   };
+  RN.NativeModules.DeviceAuth = {
+    canAuthenticate: jest.fn(async () => ({ available: true, code: '' })),
+    authenticate: jest.fn(async () => ({
+      outcome: 'authenticated',
+      code: '',
+    })),
+  };
   RN.View = jest.fn();
+  RN.RefreshControl = jest.fn(() => null);
 
   return RN;
 });

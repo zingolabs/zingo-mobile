@@ -1,0 +1,60 @@
+name: Android dependency analysis
+
+on:
+  workflow_call:
+    inputs:
+      # Fail-all (see CONTEXT.md): when true, a failure here cancels the
+      # whole run. PR CI opts in; ci-nightly does not.
+      fail-all:
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  android-dependency-analysis:
+    name: Andr dependency analysis
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.18.0
+          cache: yarn
+
+      - run: yarn
+
+      - name: Setup Java
+        uses: actions/setup-java@v6
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      # The analysis compiles every variant's Kotlin, which needs the
+      # generated uniffi bindings on the source path.
+      - name: Generate UniFFI bindings
+        uses: ./.github/actions/kotlin-bindings
+        with:
+          variants: debug,debugOptimized,release
+
+      # Fails on dependencies nothing compiles against (the Kotlin analog
+      # of the rust-shear job); scope and transitive advice is warn-only.
+      - name: Dependency analysis
+        working-directory: ./android
+        run: ./gradlew buildHealth
+
+      - name: Cancel the run on failure (fail-all)
+        if: ${{ failure() && inputs.fail-all }}
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.actions.cancelWorkflowRun({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.runId,
+            });

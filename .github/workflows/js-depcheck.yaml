@@ -1,0 +1,43 @@
+name: JS unused dependencies
+
+on:
+  workflow_call:
+    inputs:
+      # Fail-all (see CONTEXT.md): when true, a failure here cancels the
+      # whole run. PR CI opts in; ci-nightly does not.
+      fail-all:
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  js-depcheck:
+    name: depcheck
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.18.0
+          cache: yarn
+
+      - run: yarn
+
+      # Fails on any dependency or devDependency that nothing uses.
+      # Known false positives are recorded, with reasons, in .depcheckrc.yml.
+      - name: Check for unused dependencies
+        run: yarn depcheck
+
+      - name: Cancel the run on failure (fail-all)
+        if: ${{ failure() && inputs.fail-all }}
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.actions.cancelWorkflowRun({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.runId,
+            });

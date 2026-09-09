@@ -1,0 +1,191 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`ScannerAddress - snapshots ScannerAddress active 1`] = `
+<View
+  style={
+    {
+      "backgroundColor": "#011401",
+      "flex": 1,
+    }
+  }
+>
+  <View
+    style={
+      {
+        "backgroundColor": "#011401",
+        "flex": 1,
+      }
+    }
+  />
+  <View
+    accessibilityLabel="Close scanner"
+    accessibilityRole="button"
+    accessibilityState={
+      {
+        "busy": undefined,
+        "checked": undefined,
+        "disabled": undefined,
+        "expanded": undefined,
+        "selected": undefined,
+      }
+    }
+    accessibilityValue={
+      {
+        "max": undefined,
+        "min": undefined,
+        "now": undefined,
+        "text": undefined,
+      }
+    }
+    accessible={true}
+    collapsable={false}
+    focusable={true}
+    hitSlop={12}
+    onBlur={[Function]}
+    onClick={[Function]}
+    onFocus={[Function]}
+    onResponderGrant={[Function]}
+    onResponderMove={[Function]}
+    onResponderRelease={[Function]}
+    onResponderTerminate={[Function]}
+    onResponderTerminationRequest={[Function]}
+    onStartShouldSetResponder={[Function]}
+    style={
+      {
+        "alignItems": "center",
+        "backgroundColor": "rgba(0,0,0,0.55)",
+        "borderRadius": 22,
+        "height": 44,
+        "justifyContent": "center",
+        "position": "absolute",
+        "right": 32,
+        "top": 32,
+        "width": 44,
+      }
+    }
+  >
+    <
+      color="#FFFFFF"
+      icon={
+        {
+          "icon": [
+            384,
+            512,
+            [
+              128473,
+              10005,
+              10006,
+              10060,
+              215,
+              "close",
+              "multiply",
+              "remove",
+              "times",
+            ],
+            "f00d",
+            "M55.1 73.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L147.2 256 9.9 393.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192.5 301.3 329.9 438.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.8 256 375.1 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192.5 210.7 55.1 73.4z",
+          ],
+          "iconName": "xmark",
+          "prefix": "fas",
+        }
+      }
+      size={22}
+    />
+  </View>
+</View>
+`;
+
+exports[`ScannerAddress - snapshots ScannerAddress inactive 1`] = `
+<View
+  style={
+    {
+      "backgroundColor": "#011401",
+      "flex": 1,
+    }
+  }
+>
+  <View
+    style={
+      {
+        "backgroundColor": "#011401",
+        "flex": 1,
+      }
+    }
+  />
+  <View
+    accessibilityLabel="Close scanner"
+    accessibilityRole="button"
+    accessibilityState={
+      {
+        "busy": undefined,
+        "checked": undefined,
+        "disabled": undefined,
+        "expanded": undefined,
+        "selected": undefined,
+      }
+    }
+    accessibilityValue={
+      {
+        "max": undefined,
+        "min": undefined,
+        "now": undefined,
+        "text": undefined,
+      }
+    }
+    accessible={true}
+    collapsable={false}
+    focusable={true}
+    hitSlop={12}
+    onBlur={[Function]}
+    onClick={[Function]}
+    onFocus={[Function]}
+    onResponderGrant={[Function]}
+    onResponderMove={[Function]}
+    onResponderRelease={[Function]}
+    onResponderTerminate={[Function]}
+    onResponderTerminationRequest={[Function]}
+    onStartShouldSetResponder={[Function]}
+    style={
+      {
+        "alignItems": "center",
+        "backgroundColor": "rgba(0,0,0,0.55)",
+        "borderRadius": 22,
+        "height": 44,
+        "justifyContent": "center",
+        "position": "absolute",
+        "right": 32,
+        "top": 32,
+        "width": 44,
+      }
+    }
+  >
+    <
+      color="#FFFFFF"
+      icon={
+        {
+          "icon": [
+            384,
+            512,
+            [
+              128473,
+              10005,
+              10006,
+              10060,
+              215,
+              "close",
+              "multiply",
+              "remove",
+              "times",
+            ],
+            "f00d",
+            "M55.1 73.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L147.2 256 9.9 393.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192.5 301.3 329.9 438.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.8 256 375.1 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192.5 210.7 55.1 73.4z",
+          ],
+          "iconName": "xmark",
+          "prefix": "fas",
+        }
+      }
+      size={22}
+    />
+  </View>
+</View>
+`;

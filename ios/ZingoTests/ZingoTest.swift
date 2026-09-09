@@ -86,8 +86,12 @@ struct SyncStatus: Codable {
     let total_sapling_outputs_scanned: UInt64?
     let session_orchard_outputs_scanned: UInt64?
     let total_orchard_outputs_scanned: UInt64?
+    let session_ironwood_outputs_scanned: UInt64?
+    let total_ironwood_outputs_scanned: UInt64?
     let percentage_session_outputs_scanned: Double?
     let percentage_total_outputs_scanned: Double?
+    let total_outputs_scanned: UInt64?
+    let total_outputs: UInt64?
 }
 
 struct Balance: Codable {
@@ -118,7 +122,8 @@ struct ValueTransfer: Codable, Equatable {
     let kind: String
     let value: Int64
     let recipient_address: String?
-    let pool_received: String?
+    let pools_sent_from: [String]?
+    let pools_received: [String]?
     let memos: [String]?
 }
 
@@ -489,11 +494,24 @@ final class ExecuteSendFromOrchard: XCTestCase {
           return
         }
         
+        // The transmission rides the mixnet or does not happen (ADR 0011).
+        // This wallet never attached one, so the confirm must refuse. A txid
+        // here would mean the transaction reached an indexer over clearnet,
+        // which is the leak the mixnet-only rule exists to prevent.
         do {
           let confirmJson = try confirm()
-          print("\nConfirm Txid:\n\(confirmJson)")
+          XCTFail("\nThe transmission answered without a mixnet:\n\(confirmJson)")
+          return
+        } catch ZingolibError.Mixnet(let message) {
+          print("\nTransmission refused without a mixnet:\n\(message)")
+          // The refusal names the unattached state, because waiting out a
+          // bootstrap and restarting a dead proxy are different remedies.
+          XCTAssertTrue(
+            message.contains("the Nym mixnet is not enabled"),
+            "The refusal must name the unattached state:\n\(message)"
+          )
         } catch {
-          XCTFail("\nConfirm error:\n\(error.localizedDescription)")
+          XCTFail("\nThe transmission failed without refusing:\n\(error.localizedDescription)")
           return
         }
         
@@ -508,13 +526,16 @@ final class ExecuteSendFromOrchard: XCTestCase {
 
         do {
             let balJson = try getBalance()
-            print("\nBalance post-send:\n\(balJson)")
+            print("\nBalance post-refusal:\n\(balJson)")
             let bal: Balance = try decodeJSON(balJson)
-            XCTAssertEqual(bal.total_orchard_balance, 885_000)
+            // Nothing reached the chain, so the transparent recipient holds
+            // no confirmed funds. The unconfirmed side is deliberately
+            // unasserted: the proposal is still Calculated, and a Calculated
+            // transaction counts as pending whether or not it was ever
+            // transmitted.
             XCTAssertEqual(bal.confirmed_transparent_balance, 0)
-            XCTAssertEqual(bal.unconfirmed_transparent_balance, 100_000)
         } catch {
-          XCTFail("\nBalance post-send error:\n\(error.localizedDescription)")
+          XCTFail("\nBalance post-refusal error:\n\(error.localizedDescription)")
           return
         }
     }
@@ -527,7 +548,6 @@ final class UpdateCurrentPriceAndValueTransfersFromSeed: XCTestCase {
         let serveruri = "http://10.0.2.2:20000"
         let chainhint = "regtest"
         let seed = Seeds.HOSPITAL
-        let tor = "false"
 
         do {
           let initJson = try initFromSeed(seed: seed, birthday: UInt32(1), serveruri: serveruri, chainhint: chainhint, performancelevel: "Medium", minconfirmations: UInt32(1))
@@ -552,12 +572,16 @@ final class UpdateCurrentPriceAndValueTransfersFromSeed: XCTestCase {
           return
         }
 
+        // Price rides the mixnet or does not happen (ADR 0011). This wallet
+        // never attached one, so the fetch must refuse. A price here would
+        // mean the wallet reached an oracle over clearnet, which is the
+        // leak the mixnet-only rule exists to prevent.
         do {
-          let price = try zecPrice(tor: tor)
-          print("\nPrice:\n\(price)")
-        } catch {
-          XCTFail("\nInit from seed error:\n\(error.localizedDescription)")
+          let price = try zecPrice()
+          XCTFail("\nThe price fetch answered without a mixnet:\n\(price)")
           return
+        } catch {
+          print("\nPrice refused without a mixnet:\n\(error.localizedDescription)")
         }
         
         do {
@@ -580,7 +604,7 @@ final class UpdateCurrentPriceAndValueTransfersFromSeed: XCTestCase {
             // Orden y valores como en Kotlin
             XCTAssertEqual(vts.value_transfers[0].kind, "memo-to-self")
             XCTAssertEqual(vts.value_transfers[0].status, "confirmed")
-            XCTAssertEqual(vts.value_transfers[0].value, 0)
+            XCTAssertEqual(vts.value_transfers[0].value, 870_000)
             XCTAssertEqual(vts.value_transfers[0].transaction_fee, 20_000)
 
             XCTAssertEqual(vts.value_transfers[1].kind, "sent")
@@ -590,7 +614,7 @@ final class UpdateCurrentPriceAndValueTransfersFromSeed: XCTestCase {
             XCTAssertEqual(vts.value_transfers[1].transaction_fee, 10_000)
 
             XCTAssertEqual(vts.value_transfers[2].kind, "received")
-            XCTAssertEqual(vts.value_transfers[2].pool_received, "Orchard")
+            XCTAssertEqual(vts.value_transfers[2].pools_received, ["Orchard"])
             XCTAssertEqual(vts.value_transfers[2].status, "confirmed")
             XCTAssertEqual(vts.value_transfers[2].value, 1_000_000)
         } catch {
@@ -766,5 +790,466 @@ final class ExecuteParseAddressInvalid: XCTestCase {
           XCTFail("\nWrong address error:\n\(error.localizedDescription)")
           return
         }
+    }
+}
+
+/// The bridge-outcome contract for every migrated FFI (zingo-mobile#1151):
+/// whether a call succeeded is knowable from the channel of its result —
+/// resolved versus rejected — never from its content, and a rejection's
+/// code is exactly the thrown ZingolibError variant's name, the stable
+/// code shared by every bridge. One case per contract variant. These are
+/// the Swift twins of the Rust init_error_channel_tests, the Kotlin
+/// FfiOutcomeTest, and the TypeScript ffiOutcome tests.
+class FfiOutcomeTests: XCTestCase {
+    // Every contract variant, paired with its stable rejection code.
+    private let contractVariants: [(error: ZingolibError, code: String)] = [
+        (ZingolibError.LightclientNotInitialized(message: "boom"), "LightclientNotInitialized"),
+        (ZingolibError.LightclientLockPoisoned(message: "boom"), "LightclientLockPoisoned"),
+        (ZingolibError.Panic(message: "boom"), "Panic"),
+        (ZingolibError.Save(message: "boom"), "Save"),
+        (ZingolibError.Init(message: "boom"), "Init"),
+        (ZingolibError.Sync(message: "boom"), "Sync"),
+        (ZingolibError.Rescan(message: "boom"), "Rescan"),
+        (ZingolibError.Read(message: "boom"), "Read"),
+        (ZingolibError.Send(message: "boom"), "Send"),
+        (ZingolibError.Shield(message: "boom"), "Shield"),
+        (ZingolibError.InvalidInput(message: "boom"), "InvalidInput"),
+        (ZingolibError.Wallet(message: "boom"), "Wallet"),
+        (ZingolibError.Indexer(message: "boom"), "Indexer"),
+        (ZingolibError.Offline(message: "boom"), "Offline"),
+        (ZingolibError.SideChannelPoisoned(message: "boom"), "SideChannelPoisoned"),
+        (ZingolibError.MigrationNotInProgress(message: "boom"), "MigrationNotInProgress"),
+        (ZingolibError.MigrationAlreadyInProgress(message: "boom"), "MigrationAlreadyInProgress"),
+        (ZingolibError.MigrationConsentStale(message: "boom"), "MigrationConsentStale"),
+        (ZingolibError.MigrationCadenceFixed(message: "boom"), "MigrationCadenceFixed"),
+        (ZingolibError.MigrationSplit(message: "boom"), "MigrationSplit"),
+        (ZingolibError.Migration(message: "boom"), "Migration"),
+        (ZingolibError.Mixnet(message: "boom"), "Mixnet"),
+    ]
+
+    func testResolvedValuesPassThroughUnclassified() {
+        // The value deliberately wears the historical error sentinel:
+        // classification must be by channel, never by content.
+        let proseLikeData = "Error: looks like prose but is legitimate data"
+
+        guard case .resolved(let value) = FfiOutcome.of({ proseLikeData }) else {
+            return XCTFail("A returning call must resolve")
+        }
+        XCTAssertEqual(value, proseLikeData, "A returning call must resolve its value verbatim")
+    }
+
+    func testThrownFfiErrorsRejectUnderTheVariantName() {
+        for (failure, expectedCode) in contractVariants {
+            guard case .rejected(let code, let message, let error) = FfiOutcome.of({ throw failure }) else {
+                return XCTFail("Variant \(expectedCode) must reject on a thrown error")
+            }
+            XCTAssertEqual(code, expectedCode, "The rejection code is exactly the variant's name")
+            XCTAssertEqual(message, "boom", "The rejection message is the error's message, verbatim")
+            XCTAssertTrue(error is ZingolibError, "Variant \(expectedCode) must reject with its typed error")
+        }
+    }
+
+    func testNonFfiErrorsRejectAsUnknown() {
+        struct Boom: Error {}
+        guard case .rejected(let code, let message, let error) = FfiOutcome.of({ throw Boom() }) else {
+            return XCTFail("A non-FFI error must still reject")
+        }
+        XCTAssertEqual(code, "Unknown", "Errors outside the contract reject under the catch-all code")
+        XCTAssertFalse(message.isEmpty, "Even a catch-all rejection carries a diagnostic message")
+        XCTAssertTrue(error is Boom, "The original error object crosses the bridge")
+    }
+}
+
+/// The numeric-arg contract of the bridge (zingo-mobile#1151): a malformed
+/// or overflowing string throws the typed InvalidInput with the same
+/// message shape the Android bridge rejects with — never a silent default
+/// (the old per_bucket bug) and never an unsettled promise (the old
+/// reschedule/execute bug). The Swift twin of the Kotlin FfiArgsTest.
+class FfiArgsTests: XCTestCase {
+    func testValidNumbersParse() throws {
+        XCTAssertEqual(try FfiArgs.requiredU32("7", name: "per_bucket"), 7)
+        XCTAssertEqual(try FfiArgs.requiredU32("4294967295", name: "per_bucket"), UInt32.max)
+        XCTAssertEqual(try FfiArgs.requiredU64("250", name: "spacing_ms"), 250)
+        XCTAssertEqual(
+            try FfiArgs.requiredU64("18446744073709551615", name: "spacing_ms"), UInt64.max)
+        XCTAssertEqual(try FfiArgs.optionalU32("7", name: "per_bucket"), 7)
+    }
+
+    func testEmptyOptionalMeansAbsentNeverZero() throws {
+        XCTAssertNil(try FfiArgs.optionalU32("", name: "per_bucket"))
+    }
+
+    func testMalformedAndOverflowingValuesRejectAsInvalidInput() {
+        let rejected: [(raw: String, parse: () throws -> Any)] = [
+            ("not-a-number", { try FfiArgs.requiredU32("not-a-number", name: "per_bucket") }),
+            ("-1", { try FfiArgs.requiredU32("-1", name: "per_bucket") }),
+            ("4294967296", { try FfiArgs.requiredU32("4294967296", name: "per_bucket") }),
+            ("1.5", { try FfiArgs.optionalU32("1.5", name: "per_bucket") as Any }),
+            ("18446744073709551616",
+             { try FfiArgs.requiredU64("18446744073709551616", name: "spacing_ms") }),
+        ]
+        for (raw, parse) in rejected {
+            XCTAssertThrowsError(try parse(), "\"\(raw)\" must reject, never default") { error in
+                guard case ZingolibError.InvalidInput = error else {
+                    return XCTFail("\"\(raw)\" must throw the typed InvalidInput, got \(error)")
+                }
+            }
+        }
+    }
+
+    func testTheRejectionMessageMatchesTheAndroidBridgeShape() {
+        XCTAssertThrowsError(try FfiArgs.requiredU32("nope", name: "per_bucket")) { error in
+            guard case ZingolibError.InvalidInput(let message) = error else {
+                return XCTFail("expected the typed InvalidInput, got \(error)")
+            }
+            XCTAssertEqual(message, "per_bucket must be a u32: \"nope\"")
+        }
+        XCTAssertThrowsError(try FfiArgs.requiredU64("nope", name: "spacing_ms")) { error in
+            guard case ZingolibError.InvalidInput(let message) = error else {
+                return XCTFail("expected the typed InvalidInput, got \(error)")
+            }
+            XCTAssertEqual(message, "spacing_ms must be a u64: \"nope\"")
+        }
+    }
+
+    func testTheRejectionCrossesTheBridgeAsInvalidInputNeverUnknown() {
+        let outcome = FfiOutcome.of {
+            _ = try FfiArgs.requiredU32("not-a-number", name: "per_bucket")
+            return ""
+        }
+        guard case .rejected(let code, _, _) = outcome else {
+            return XCTFail("a malformed numeric arg must reject")
+        }
+        XCTAssertEqual(
+            code, "InvalidInput",
+            "a malformed numeric arg must reject under InvalidInput on both platforms")
+    }
+}
+
+/// The startup attribute migration: wallet files an old build wrote under
+/// class A move to class C with backup exclusion, content untouched.
+class WalletFileProtectionTests: XCTestCase {
+    func testClassAFileMovesToClassCWithBackupExclusion() throws {
+        let rpc = RPCModule()
+        let fm = FileManager.default
+        try fm.createDirectory(
+            atPath: rpc.getDocumentsDirectory(),
+            withIntermediateDirectories: true
+        )
+        let path = try rpc.getFileName(Constants.WalletFileName.rawValue)
+        try "d2FsbGV0".write(toFile: path, atomically: true, encoding: .utf8)
+        defer { try? fm.removeItem(atPath: path) }
+        try fm.setAttributes([.protectionKey: FileProtectionType.complete], ofItemAtPath: path)
+        let stored = try fm.attributesOfItem(atPath: path)[.protectionKey] as? FileProtectionType
+
+        rpc.applyWalletFileProtection()
+
+        XCTAssertEqual(try String(contentsOfFile: path, encoding: .utf8), "d2FsbGV0")
+        let excluded = try URL(fileURLWithPath: path)
+            .resourceValues(forKeys: [.isExcludedFromBackupKey]).isExcludedFromBackup
+        XCTAssertEqual(excluded, true)
+        guard stored == .complete else {
+            throw XCTSkip("this simulator does not store file-protection attributes")
+        }
+        let after = try fm.attributesOfItem(atPath: path)[.protectionKey] as? FileProtectionType
+        XCTAssertEqual(after, .completeUntilFirstUserAuthentication)
+    }
+
+    func testMissingWalletFilesAreANoOp() throws {
+        let rpc = RPCModule()
+        let fm = FileManager.default
+        for name in [Constants.WalletFileName.rawValue, Constants.WalletBackupFileName.rawValue] {
+            if let path = try? rpc.getFileName(name) {
+                try? fm.removeItem(atPath: path)
+            }
+        }
+        rpc.applyWalletFileProtection()
+    }
+}
+
+/// The per-file diagnosis behind the recovery dialog, and the migration
+/// from the legacy base64 text format to raw wallet bytes.
+class WalletFileDiagnosisTests: XCTestCase {
+    private func mainEntry(_ rpc: RPCModule) -> [String: Any]? {
+        rpc.walletFileDiagnosis().first { $0["name"] as? String == Constants.WalletFileName.rawValue }
+    }
+
+    private func mainPath(_ rpc: RPCModule) throws -> String {
+        try FileManager.default.createDirectory(
+            atPath: rpc.getDocumentsDirectory(),
+            withIntermediateDirectories: true
+        )
+        return try rpc.getFileName(Constants.WalletFileName.rawValue)
+    }
+
+    override func tearDown() {
+        let rpc = RPCModule()
+        if let path = try? rpc.getFileName(Constants.WalletFileName.rawValue) {
+            try? FileManager.default.removeItem(atPath: path)
+        }
+        super.tearDown()
+    }
+
+    private func walletBytes() -> Data {
+        var wallet = Data([42, 0, 0, 0, 0, 0, 0, 0])
+        wallet.append(Data(repeating: 7, count: 64))
+        return wallet
+    }
+
+    func testARawWalletFileDiagnosesPlainWallet() throws {
+        let rpc = RPCModule()
+        let path = try mainPath(rpc)
+        try walletBytes().write(to: URL(fileURLWithPath: path))
+
+        let entry = try XCTUnwrap(mainEntry(rpc))
+        XCTAssertEqual(entry["state"] as? String, "plainWallet")
+        XCTAssertGreaterThan(entry["size"] as? Int ?? 0, 0)
+    }
+
+    func testATruncatedRawWalletFileDiagnosesPlainWallet() throws {
+        let rpc = RPCModule()
+        let path = try mainPath(rpc)
+        try walletBytes().prefix(20).write(to: URL(fileURLWithPath: path))
+
+        let entry = try XCTUnwrap(mainEntry(rpc))
+        XCTAssertEqual(entry["state"] as? String, "plainWallet")
+    }
+
+    func testALegacyBase64TextFileDiagnosesPlainWallet() throws {
+        let rpc = RPCModule()
+        let path = try mainPath(rpc)
+        let text = walletBytes().base64EncodedString()
+        try String(text.prefix(text.count / 2 + 1)).write(
+            toFile: path, atomically: true, encoding: .utf8)
+
+        let entry = try XCTUnwrap(mainEntry(rpc))
+        XCTAssertEqual(entry["state"] as? String, "plainWallet")
+    }
+
+    func testGarbageTextDiagnosesUnknown() throws {
+        let rpc = RPCModule()
+        let path = try mainPath(rpc)
+        try "!!!not-base64!!!".write(toFile: path, atomically: true, encoding: .utf8)
+
+        let entry = try XCTUnwrap(mainEntry(rpc))
+        XCTAssertEqual(entry["state"] as? String, "unknown")
+    }
+
+    func testALegacyTextFileMigratesToRawBytesOnRead() throws {
+        setCryptoProvider()
+        _ = try initFromSeed(
+            seed: Seeds.HOSPITAL, birthday: UInt32(2_000_000), serveruri: "",
+            chainhint: "main", performancelevel: "Medium", minconfirmations: UInt32(1))
+        let wallet = try XCTUnwrap(try saveWalletBytes())
+
+        let rpc = RPCModule()
+        let path = try mainPath(rpc)
+        try wallet.base64EncodedString().write(
+            toFile: path, atomically: true, encoding: .utf8)
+
+        XCTAssertEqual(try rpc.readWalletBytes(), wallet)
+        XCTAssertEqual(try Data(contentsOf: URL(fileURLWithPath: path)), wallet)
+    }
+
+    func testAnInvalidLegacyTextFileFailsAndLeavesTheFileUntouched() throws {
+        let rpc = RPCModule()
+        let path = try mainPath(rpc)
+        let text = walletBytes().base64EncodedString()
+        try text.write(toFile: path, atomically: true, encoding: .utf8)
+
+        XCTAssertThrowsError(try rpc.readWalletBytes())
+        XCTAssertEqual(
+            try Data(contentsOf: URL(fileURLWithPath: path)),
+            text.data(using: .utf8))
+    }
+
+    func testAMissingFileDiagnosesMissing() throws {
+        let rpc = RPCModule()
+        let path = try mainPath(rpc)
+        try? FileManager.default.removeItem(atPath: path)
+
+        let entry = try XCTUnwrap(mainEntry(rpc))
+        XCTAssertEqual(entry["state"] as? String, "missing")
+    }
+}
+
+/// The wallet and backup swap recovered from every interruption window,
+/// and the delete purge of sidecar copies.
+class WalletSwapRecoveryTests: XCTestCase {
+    let walletA = "walletA"
+    let walletB = "walletB"
+    let walletC = "walletC"
+
+    override func tearDown() {
+        let rpc = RPCModule()
+        let fm = FileManager.default
+        for name in [Constants.WalletFileName.rawValue,
+                     Constants.WalletBackupFileName.rawValue,
+                     Constants.WalletTempSwapFileName.rawValue,
+                     "\(Constants.WalletFileName.rawValue).broken"] {
+            if let path = try? rpc.getFileName(name) {
+                try? fm.removeItem(atPath: path)
+            }
+        }
+        RPCModule.walletFileClosed = false
+        super.tearDown()
+    }
+
+    func testAClosedWalletFileRefusesTheSave() throws {
+        let rpc = RPCModule()
+        let files = try paths(rpc)
+        clear(files)
+        try walletA.write(toFile: files.main, atomically: true, encoding: .utf8)
+
+        RPCModule.walletFileClosed = true
+        try rpc.saveWalletInternal()
+
+        XCTAssertEqual(try read(files.main), walletA)
+    }
+
+    func testDeleteClosesTheWalletFile() throws {
+        let rpc = RPCModule()
+        let files = try paths(rpc)
+        clear(files)
+        RPCModule.walletFileClosed = false
+        try walletA.write(toFile: files.main, atomically: true, encoding: .utf8)
+
+        try rpc.fnDeleteExistingWallet()
+
+        XCTAssertTrue(RPCModule.walletFileClosed)
+    }
+
+    private func paths(_ rpc: RPCModule) throws -> (main: String, backup: String, temp: String) {
+        try FileManager.default.createDirectory(
+            atPath: rpc.getDocumentsDirectory(),
+            withIntermediateDirectories: true
+        )
+        return (
+            try rpc.getFileName(Constants.WalletFileName.rawValue),
+            try rpc.getFileName(Constants.WalletBackupFileName.rawValue),
+            try rpc.getFileName(Constants.WalletTempSwapFileName.rawValue)
+        )
+    }
+
+    private func clear(_ files: (main: String, backup: String, temp: String)) {
+        let fm = FileManager.default
+        for path in [files.main, files.backup, files.temp] {
+            try? fm.removeItem(atPath: path)
+        }
+    }
+
+    private func read(_ path: String) throws -> String {
+        try String(contentsOfFile: path, encoding: .utf8)
+    }
+
+    func testInterruptedBeforeMainRenameFinishesTheSwap() throws {
+        let rpc = RPCModule()
+        let files = try paths(rpc)
+        clear(files)
+        try walletA.write(toFile: files.temp, atomically: true, encoding: .utf8)
+        try walletB.write(toFile: files.backup, atomically: true, encoding: .utf8)
+
+        rpc.completePendingSwap()
+
+        XCTAssertEqual(try read(files.main), walletB)
+        XCTAssertEqual(try read(files.backup), walletA)
+        XCTAssertFalse(FileManager.default.fileExists(atPath: files.temp))
+        clear(files)
+    }
+
+    func testInterruptedBeforeBackupRenameFinishesTheSwap() throws {
+        let rpc = RPCModule()
+        let files = try paths(rpc)
+        clear(files)
+        try walletA.write(toFile: files.temp, atomically: true, encoding: .utf8)
+        try walletB.write(toFile: files.main, atomically: true, encoding: .utf8)
+
+        rpc.completePendingSwap()
+
+        XCTAssertEqual(try read(files.main), walletB)
+        XCTAssertEqual(try read(files.backup), walletA)
+        XCTAssertFalse(FileManager.default.fileExists(atPath: files.temp))
+        clear(files)
+    }
+
+    func testASaveRecreatingMainFinishesTheSwap() throws {
+        let rpc = RPCModule()
+        let files = try paths(rpc)
+        clear(files)
+        try walletA.write(toFile: files.temp, atomically: true, encoding: .utf8)
+        try walletA.write(toFile: files.main, atomically: true, encoding: .utf8)
+        try walletB.write(toFile: files.backup, atomically: true, encoding: .utf8)
+
+        rpc.completePendingSwap()
+
+        XCTAssertEqual(try read(files.main), walletB)
+        XCTAssertEqual(try read(files.backup), walletA)
+        XCTAssertFalse(FileManager.default.fileExists(atPath: files.temp))
+        clear(files)
+    }
+
+    func testACompletedSwapDropsTheTemp() throws {
+        let rpc = RPCModule()
+        let files = try paths(rpc)
+        clear(files)
+        try walletA.write(toFile: files.temp, atomically: true, encoding: .utf8)
+        try walletB.write(toFile: files.main, atomically: true, encoding: .utf8)
+        try walletA.write(toFile: files.backup, atomically: true, encoding: .utf8)
+
+        rpc.completePendingSwap()
+
+        XCTAssertEqual(try read(files.main), walletB)
+        XCTAssertEqual(try read(files.backup), walletA)
+        XCTAssertFalse(FileManager.default.fileExists(atPath: files.temp))
+        clear(files)
+    }
+
+    func testThreeDistinctWalletFilesAreLeftUntouched() throws {
+        let rpc = RPCModule()
+        let files = try paths(rpc)
+        clear(files)
+        try walletA.write(toFile: files.temp, atomically: true, encoding: .utf8)
+        try walletC.write(toFile: files.main, atomically: true, encoding: .utf8)
+        try walletB.write(toFile: files.backup, atomically: true, encoding: .utf8)
+
+        rpc.completePendingSwap()
+
+        XCTAssertEqual(try read(files.main), walletC)
+        XCTAssertEqual(try read(files.backup), walletB)
+        XCTAssertEqual(try read(files.temp), walletA)
+    }
+
+    func testDeleteKeepsAnUnresolvedSwapTemp() throws {
+        let rpc = RPCModule()
+        let files = try paths(rpc)
+        clear(files)
+        try walletA.write(toFile: files.temp, atomically: true, encoding: .utf8)
+        try walletC.write(toFile: files.main, atomically: true, encoding: .utf8)
+        try walletB.write(toFile: files.backup, atomically: true, encoding: .utf8)
+
+        try rpc.fnDeleteExistingWallet()
+
+        XCTAssertFalse(FileManager.default.fileExists(atPath: files.main))
+        XCTAssertEqual(try read(files.temp), walletA)
+        XCTAssertEqual(try read(files.backup), walletB)
+    }
+
+    func testDeleteRemovesTheBrokenCopyAndTheSwapTemp() throws {
+        let rpc = RPCModule()
+        let files = try paths(rpc)
+        clear(files)
+        let brokenPath = try rpc.getFileName("\(Constants.WalletFileName.rawValue).broken")
+        try? FileManager.default.removeItem(atPath: brokenPath)
+        try walletA.write(toFile: files.main, atomically: true, encoding: .utf8)
+        try walletA.write(toFile: brokenPath, atomically: true, encoding: .utf8)
+        try walletA.write(toFile: files.temp, atomically: true, encoding: .utf8)
+
+        try rpc.fnDeleteExistingWallet()
+
+        let fm = FileManager.default
+        XCTAssertFalse(fm.fileExists(atPath: files.main))
+        XCTAssertFalse(fm.fileExists(atPath: brokenPath))
+        XCTAssertFalse(fm.fileExists(atPath: files.temp))
+        clear(files)
     }
 }

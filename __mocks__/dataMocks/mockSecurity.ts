@@ -1,4 +1,4 @@
-import { SecurityType } from '../../app/AppState';
+import { SecurityType } from '@app/AppState';
 
 export const mockSecurity: SecurityType = {
   startApp: true,

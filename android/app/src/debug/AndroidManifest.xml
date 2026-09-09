@@ -5,10 +5,11 @@
     <uses-permission android:name="android.permission.CAMERA"
         tools:ignore="PermissionImpliesUnsupportedChromeOsHardware" />
 
-    <application 
-        android:usesCleartextTraffic="${usesCleartextTraffic}"
-        tools:targetApi="33" 
-        tools:ignore="GoogleAppIndexingWarning" 
+    <application
+        android:usesCleartextTraffic="false"
+        tools:replace="android:usesCleartextTraffic"
+        tools:targetApi="33"
+        tools:ignore="GoogleAppIndexingWarning"
         android:networkSecurityConfig="@xml/network_security_config">
     </application>
 </manifest>

@@ -6,19 +6,25 @@ import 'react-native';
 import React from 'react';
 
 import { render } from '@testing-library/react-native';
-import History from '../components/History';
-import { defaultAppContextLoaded, ContextAppLoadedProvider } from '../app/context';
-import { CurrencyEnum, ModeEnum, RouteEnum } from '../app/AppState';
+import History from '@screens/History';
+import {
+  defaultAppContextLoaded,
+  ContextAppLoadedProvider,
+} from '@app/context';
+import { CurrencyEnum, ModeEnum, RouteEnum } from '@app/AppState';
 import { mockValueTransfers } from '../__mocks__/dataMocks/mockValueTransfers';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockAddresses } from '../__mocks__/dataMocks/mockAddresses';
-import { DrawerScreenProps } from '@react-navigation/drawer';
-import { AppDrawerParamList } from '../app/types';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { AppDrawerParamList } from '@app/types';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
-function makeDrawerProps(): DrawerScreenProps<AppDrawerParamList, RouteEnum.History> {
+function makeDrawerProps(): NativeStackScreenProps<
+  AppDrawerParamList,
+  RouteEnum.History
+> {
   return {
     navigation: mockNavigation,
     route: {
@@ -31,12 +37,19 @@ function makeDrawerProps(): DrawerScreenProps<AppDrawerParamList, RouteEnum.Hist
 // test suite
 describe('Component History - test', () => {
   //snapshot test
-  const state = defaultAppContextLoaded;
+  const state = { ...defaultAppContextLoaded };
   state.valueTransfers = mockValueTransfers;
   state.addresses = mockAddresses;
   state.translate = mockTranslate;
-  state.info = mockInfo;
+  // `mockInfo`'s tip predates NU6.3, which would hide the Ironwood migration
+  // banner; put the chain past activation so these snapshots keep covering it.
+  state.info = {
+    ...mockInfo,
+    latestBlock: mockInfo.ironwoodActivationHeight as number,
+  };
   state.totalBalance = mockTotalBalance;
+  // The price ring renders only for a Nym-consenting session.
+  state.nym = true;
   const onFunction = jest.fn();
 
   test('History no currency, privacy normal & mode basic - snapshot', () => {
@@ -49,7 +62,8 @@ describe('Component History - test', () => {
     const props = makeDrawerProps();
     const history = render(
       <ContextAppLoadedProvider value={state}>
-        <History {...props}
+        <History
+          {...props}
           toggleMenuDrawer={onFunction}
           setShieldingAmount={onFunction}
           setScrollToTop={onFunction}
@@ -71,7 +85,8 @@ describe('Component History - test', () => {
     const props = makeDrawerProps();
     const history = render(
       <ContextAppLoadedProvider value={state}>
-        <History {...props}
+        <History
+          {...props}
           toggleMenuDrawer={onFunction}
           setShieldingAmount={onFunction}
           setScrollToTop={onFunction}

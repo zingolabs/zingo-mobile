@@ -6,6 +6,13 @@ on:
       cache-key:
         required: true
         type: string
+      advisory:
+        # Advisory mode: job failures are recorded but do not fail the
+        # caller, for runs where iOS is informational (per-PR CI) rather
+        # than a gate (nightly).
+        required: false
+        default: false
+        type: boolean
 
 env:
   CACHE-KEY: ${{ inputs.cache-key }}
@@ -14,6 +21,7 @@ env:
 jobs:
   ios-check-build-cache:
     name: Check build cache
+    continue-on-error: ${{ inputs.advisory }}
     runs-on: macos-15
     outputs:
       ios-cache-found: ${{ steps.ios-set-cache-found.outputs.ios-cache-found }}
@@ -23,16 +31,20 @@ jobs:
         run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
 
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: ${{ env.REPO-OWNER }}/zingo-mobile
 
-      - name: Check if native rust cache exists
+      - name: Check if iOS xcframework cache exists
         id: ios-check-build-cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v6
         with:
-          path: rust/lib/Generated
-          key: native-ios-uniffi-universal-${{ env.CACHE-KEY }}
+          path: |
+            ios/Zingolib.xcframework
+            ios/zingo.swift
+            ios/ZingoNymProxyFFI.xcframework
+            ios/zingo_nym_proxy_ffi.swift
+          key: native-ios-xcframework-${{ env.CACHE-KEY }}
           lookup-only: true
 
       - name: Set cache-found
@@ -40,10 +52,11 @@ jobs:
         run: echo "ios-cache-found=${{ steps.ios-check-build-cache.outputs.cache-hit }}" >> $GITHUB_OUTPUT
 
   ios-build:
-    name: Build native rust & swift uniffi
+    name: Build iOS Rust xcframework
     needs: ios-check-build-cache
     if: ${{ needs.ios-check-build-cache.outputs.ios-cache-found != 'true' }}
-    runs-on: macos-15
+    continue-on-error: ${{ inputs.advisory }}
+    runs-on: zingo-ios-build-12
     env:
       RUSTUP_HOME: ${{ github.workspace }}/.rustup
       CARGO_HOME:  ${{ github.workspace }}/.cargo
@@ -53,7 +66,7 @@ jobs:
         run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
 
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: ${{ env.REPO-OWNER }}/zingo-mobile
 
@@ -64,48 +77,68 @@ jobs:
 
           TOML="rust/Cargo.toml"
           REV="${GITHUB_SHA}"
+          PINS='^(zingolib|pepper-sync|zingolib_testutils|zingo-price)[[:space:]]*='
 
           sed -i '' -E \
-            "/^zingolib[[:space:]]*=/ s/rev[[:space:]]*=[[:space:]]*\"[^\"]*\"/rev = \"${REV}\"/" \
+            "/${PINS}/ s/rev[[:space:]]*=[[:space:]]*\"[^\"]*\"/rev = \"${REV}\"/" \
             "$TOML"
 
           sed -i '' -E \
-            "/^zingolib[[:space:]]*=/ s/(branch|tag)[[:space:]]*=[[:space:]]*\"[^\"]*\"/rev = \"${REV}\"/" \
+            "/${PINS}/ s/(branch|tag)[[:space:]]*=[[:space:]]*\"[^\"]*\"/rev = \"${REV}\"/" \
             "$TOML"
 
-          first_line="$(grep -E '^zingolib[[:space:]]*=' "$TOML")"
-          echo "zingolib first line => $first_line"
-          echo "$first_line" | grep -q "rev = \"${REV}\""
-          echo "$first_line" | grep -vqE '\b(branch|tag)[[:space:]]*='
+          pinned="$(grep -E "$PINS" "$TOML")"
+          echo "zingolib pins =>"
+          echo "$pinned"
+          test "$(echo "$pinned" | wc -l)" -eq "$(echo "$pinned" | grep -c "rev = \"${REV}\"")"
+          ! echo "$pinned" | grep -qE '\b(branch|tag)[[:space:]]*='
 
           cd rust
-          sudo rustup default stable
-          sudo cargo update -p zingolib -p regchest_utils --aggressive
+          rustup default stable
+          cargo update -p zingolib -p regchest_utils --aggressive
 
       - name: Cargo default stable
         run: |
-          sudo rustup update
-          sudo rustup upgrade
-          sudo rustup default stable
+          rustup update
+          rustup upgrade
+          rustup default stable
 
-      - name: AWS libcrypto rust building
-        run: sudo cargo install --force --locked bindgen-cli
+      # Placed after the toolchain steps on purpose: rust-cache reads
+      # `rustc -vV` into its key, and RUSTUP_HOME here is a workspace-relative
+      # dir that has no default toolchain until the step above installs one.
+      #
+      # Two workspaces: the shim is excluded from the main one (own lockfile,
+      # see rust/Cargo.toml), so its target dir needs listing separately. It
+      # was missing from the cache this replaces, which is why the 24 minutes
+      # of nym-sdk were never cacheable at all.
+      #
+      # What it replaces: a plain actions/cache over .cargo + rust/target that
+      # never once hit. It stored 4.6 GB unpruned, the repo's cache store
+      # evicted it before the next iOS build needed it, and every run logged
+      # "Cache not found for input keys: ios-cargo-..." and then spent 8m30
+      # re-uploading it. rust-cache prunes to dependency artifacts only, which
+      # is all this job needs: zingolib and nym-sdk are git/registry deps, not
+      # workspace members, and compiling them is nearly the whole 45 minutes.
+      #
+      # Saved from dev only. A cache written on refs/pull/N/merge is invisible
+      # to every other PR, so per-PR saves buy nothing and only add eviction
+      # pressure; the dev copy is readable by all of them.
+      - name: Cargo cache (registry, git, iOS targets)
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: |
+            rust
+            rust/nym-proxy-ffi
+          save-if: ${{ github.ref == 'refs/heads/dev' }}
+
+      - name: Install bindgen-cli (needed by aws-lc-sys, ring etc.)
+        run: cargo install --force --locked bindgen-cli
 
       - name: Install protoc
         run: brew install protobuf
 
-      - name: Cargo uniffi swift
-        working-directory: rust/lib
-        run: |
-          sudo cargo run --release --bin uniffi-bindgen \
-          generate ./src/zingo.udl --language swift \
-          --out-dir ./Generated
-
-      - name: Install Cargo Lipo
-        run: sudo cargo install cargo-lipo
-
-      - name: Install rust Target
-        run: sudo rustup target add aarch64-apple-ios-sim x86_64-apple-ios
+      - name: Install iOS Rust targets (device + simulator)
+        run: rustup target add aarch64-apple-ios aarch64-apple-ios-sim x86_64-apple-ios
 
       # this issue is solved in bindgen 0.70
       # But we have a dependency that are using a incompatible version 0.69.
@@ -121,25 +154,29 @@ jobs:
           CXXFLAGS_aarch64_apple_ios_sim = "--target=arm64-apple-ios-simulator -isysroot $SDKROOT"
           EOF
 
-      - name: Cargo lipo universal library
-        working-directory: rust/lib
-        run: |
-          sudo cargo lipo --release --targets aarch64-apple-ios-sim x86_64-apple-ios
-
-      - name: Copy libraries to ios folder
-        working-directory: rust/lib
-        run: |
-          sudo cp ../target/universal/release/libzingo.a ./Generated/libuniffi_zingo.a
-
-      - name: Upload native rust
-        uses: actions/upload-artifact@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          name: native-ios-uniffi-universal-${{ env.CACHE-KEY }}
-          path: rust/lib/Generated
+          node-version: 22.18.0
+
+      - name: Build iOS Rust xcframework
+        run: node rust/ios/build_ios.mjs
+
+      - name: Upload xcframework artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: native-ios-xcframework-${{ env.CACHE-KEY }}
+          path: |
+            ios/Zingolib.xcframework
+            ios/zingo.swift
+            ios/ZingoNymProxyFFI.xcframework
+            ios/zingo_nym_proxy_ffi.swift
+          retention-days: 3
 
   cache-native-ios-uniffi:
-    name: Cache native rust
+    name: Cache iOS xcframework
     needs: ios-build
+    continue-on-error: ${{ inputs.advisory }}
     runs-on: macos-15
     steps:
       - name: Set envs for zingolib CI
@@ -147,19 +184,22 @@ jobs:
         run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
 
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: ${{ env.REPO-OWNER }}/zingo-mobile
 
-      - name: Download native rust
+      - name: Download xcframework artifact
         uses: actions/download-artifact@v4
         with:
-          name: native-ios-uniffi-universal-${{ env.CACHE-KEY }}
-          path: rust/lib/Generated
+          name: native-ios-xcframework-${{ env.CACHE-KEY }}
+          path: ios
 
-      - name: Cache native rust
-        uses: actions/cache/save@v4
+      - name: Cache xcframework
+        uses: actions/cache/save@v6
         with:
-          path: rust/lib/Generated
-          key: native-ios-uniffi-universal-${{ env.CACHE-KEY }}
-
+          path: |
+            ios/Zingolib.xcframework
+            ios/zingo.swift
+            ios/ZingoNymProxyFFI.xcframework
+            ios/zingo_nym_proxy_ffi.swift
+          key: native-ios-xcframework-${{ env.CACHE-KEY }}

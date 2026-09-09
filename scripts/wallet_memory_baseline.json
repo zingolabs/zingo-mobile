@@ -1,0 +1,25 @@
+{
+  "walletSize": 8388608,
+  "measurements": {
+    "swap.decision": {
+      "kind": "guarded",
+      "bytes": 132272
+    },
+    "swap.decision.base64": {
+      "kind": "reference",
+      "bytes": 117526528
+    },
+    "write.verify": {
+      "kind": "guarded",
+      "bytes": 65584
+    },
+    "write.verify.wholeFile": {
+      "kind": "reference",
+      "bytes": 8425520
+    },
+    "retained.check": {
+      "kind": "guarded",
+      "bytes": 65584
+    }
+  }
+}

@@ -6,13 +6,13 @@ import 'react-native';
 import React from 'react';
 
 import { render } from '@testing-library/react-native';
-import CurrencyAmount from '../components/Components/CurrencyAmount';
-import ZecAmount from '../components/Components/ZecAmount';
-import BoldText from '../components/Components/BoldText';
-import FadeText from '../components/Components/FadeText';
-import ErrorText from '../components/Components/ErrorText';
-import RegText from '../components/Components/RegText';
-import { CurrencyEnum, CurrencyNameEnum } from '../app/AppState';
+import CurrencyAmount from '@ui/widgets/CurrencyAmount';
+import ZecAmount from '@ui/widgets/ZecAmount';
+import BoldText from '@ui/primitives/BoldText';
+import FadeText from '@ui/primitives/FadeText';
+import ErrorText from '@ui/primitives/ErrorText';
+import RegText from '@ui/primitives/RegText';
+import { CurrencyEnum, CurrencyNameEnum } from '@app/AppState';
 
 // test suite
 describe('Component Components - test', () => {
@@ -25,18 +25,6 @@ describe('Component Components - test', () => {
         style={{ backgroundColor: 'red' }}
         currency={CurrencyEnum.USDCurrency}
         privacy={true}
-      />,
-    );
-    expect(currencyAmount).toMatchSnapshot();
-  });
-
-  test('CurrencyAmount Normal Privacy with TOR - snapshot', () => {
-    const currencyAmount = render(
-      <CurrencyAmount
-        price={1.12345678}
-        amtZec={39.99}
-        style={{ backgroundColor: 'red' }}
-        currency={CurrencyEnum.USDTORCurrency}
       />,
     );
     expect(currencyAmount).toMatchSnapshot();
@@ -70,24 +58,38 @@ describe('Component Components - test', () => {
   });
 
   test('BoldText - snapshot', () => {
-    const boldText = render(<BoldText style={{ backgroundColor: 'red' }} children={'bold text'} />);
+    const boldText = render(
+      <BoldText style={{ backgroundColor: 'red' }} children={'bold text'} />,
+    );
     expect(boldText).toMatchSnapshot();
   });
 
   test('FadeText - snapshot', () => {
-    const fadeText = render(<FadeText style={{ backgroundColor: 'red' }} children={'fade text'} />);
+    const fadeText = render(
+      <FadeText style={{ backgroundColor: 'red' }} children={'fade text'} />,
+    );
     expect(fadeText).toMatchSnapshot();
   });
 
   test('ErrorText - snapshot', () => {
-    const errorText = render(<ErrorText style={{ backgroundColor: 'white' }} children={'error text'} />);
+    const errorText = render(
+      <ErrorText
+        style={{ backgroundColor: 'white' }}
+        children={'error text'}
+      />,
+    );
     expect(errorText).toMatchSnapshot();
   });
 
   test('RegText - snapshot', () => {
     const onPress = jest.fn();
     const regText = render(
-      <RegText style={{ backgroundColor: 'white' }} color={'red'} onPress={onPress} children={'reg text'} />,
+      <RegText
+        style={{ backgroundColor: 'white' }}
+        color={'red'}
+        onPress={onPress}
+        children={'reg text'}
+      />,
     );
     expect(regText).toMatchSnapshot();
   });

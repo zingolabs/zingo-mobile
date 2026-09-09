@@ -6,6 +6,13 @@ on:
       cache-key:
         required: true
         type: string
+      advisory:
+        # Advisory mode: job failures are recorded but do not fail the
+        # caller, for runs where iOS is informational (per-PR CI) rather
+        # than a gate (nightly).
+        required: false
+        default: false
+        type: boolean
 
 env:
   CACHE-KEY: ${{ inputs.cache-key }}
@@ -13,6 +20,11 @@ env:
 
 jobs:
   build-for-testing:
+    continue-on-error: ${{ inputs.advisory }}
+    # Stock runners, deliberately: the huge macos-15 fleet queues in seconds,
+    # while the max-4 zingo-ios-build-12 pool is left to the xcframework
+    # build alone. The xcodebuild destination pins no arch (see the
+    # build-for-testing step), so Apple-silicon stock runners are fine.
     runs-on: macos-15
     steps:
       - name: Xcode 16.4
@@ -29,36 +41,37 @@ jobs:
         run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
 
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: ${{ env.REPO-OWNER }}/zingo-mobile
 
-      - name: Native rust cache
-        uses: actions/cache/restore@v4
+      - name: Restore iOS xcframework cache
+        uses: actions/cache/restore@v6
         with:
-          path: rust/lib/Generated
-          key: native-ios-uniffi-universal-${{ env.CACHE-KEY }}
+          path: |
+            ios/Zingolib.xcframework
+            ios/zingo.swift
+            ios/ZingoNymProxyFFI.xcframework
+            ios/zingo_nym_proxy_ffi.swift
+          key: native-ios-xcframework-${{ env.CACHE-KEY }}
           fail-on-cache-miss: true
 
-      - name: Copy libs to ios folder
-        working-directory: rust/lib/Generated
-        run: cp ./*.* ../../../ios
-
-      - name: Install nvm with node 22.18.0
-        run: |
-          curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
-          export NVM_DIR="$HOME/.nvm"
-            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-            [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-          nvm install 22.18.0
-          nvm use 22.18.0
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.18.0
+          cache: yarn
 
       - name: Yarn
         run: yarn
 
       - name: Pod Install
-        working-directory: ios
-        run: pod install
+        uses: nick-fields/retry@v4
+        with:
+          timeout_minutes: 10
+          max_attempts: 3
+          retry_wait_seconds: 15
+          command: cd ios && pod install
 
       - name: Info
         run: |
@@ -70,32 +83,37 @@ jobs:
         run: |
           set -euxo pipefail
           mkdir -p build/reports build/DerivedData
+          # The destination pins no arch: it resolves arm64 on Apple-silicon
+          # runners and x86_64 on the Intel larger-runner pool; the
+          # xcframework's simulator slice is a fat arm64+x86_64 binary
+          # either way.
           xcodebuild build-for-testing \
             -workspace Zingo.xcworkspace \
             -scheme Zingo \
             -sdk iphonesimulator \
             -configuration Debug \
-            -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.5,arch=arm64' \
+            -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.5' \
             -derivedDataPath "build/DerivedData" \
             -resultBundlePath "build/reports/Zingo-BuildForTesting.xcresult" \
             -quiet
 
       - name: Upload Build Result
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: xctestrun-and-products
           path: ios/build/DerivedData/Build/Products
+          retention-days: 3
 
       - name: Upload IOS build reports (.xcresult)
         if: ${{ always() && !cancelled() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: test-ios-integration-build-reports.xcresult
           path: ios/build/reports/Zingo-BuildForTesting.xcresult
 
       - name: Upload IOS build DerivedData logs (optional)
         if: ${{ always() && !cancelled() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: test-ios-integration-build-derived-logs
           path: |
@@ -147,7 +165,7 @@ jobs:
   #       run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
 
   #     - name: Checkout repository
-  #       uses: actions/checkout@v5
+  #       uses: actions/checkout@v7
   #       with:
   #         repository: ${{ env.REPO-OWNER }}/zingo-mobile
 
@@ -232,14 +250,14 @@ jobs:
 
   #     - name: Upload IOS test reports (.xcresult)
   #       if: ${{ always() && !cancelled() }}
-  #       uses: actions/upload-artifact@v4
+  #       uses: actions/upload-artifact@v7
   #       with:
   #         name: test-ios-integration-test-reports-${{ matrix.test }}.xcresult
   #         path: ios/build/reports/Zingo-Test.xcresult
 
   #     - name: Upload IOS DerivedData logs (optional)
   #       if: ${{ always() && !cancelled() }}
-  #       uses: actions/upload-artifact@v4
+  #       uses: actions/upload-artifact@v7
   #       with:
   #         name: test-ios-integration-test-derived-logs-${{ matrix.test }}
   #         path: |

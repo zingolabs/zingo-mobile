@@ -1,6 +1,6 @@
 export const getNumberFormatSettings = () => {
-    return {
-      decimalSeparator: '.', // us
-      groupingSeparator: ',', // us
-    };
+  return {
+    decimalSeparator: '.', // us
+    groupingSeparator: ',', // us
   };
+};

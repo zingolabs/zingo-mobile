@@ -15,6 +15,8 @@ class RPCPackage : ReactPackage {
             reactContext: ReactApplicationContext): List<NativeModule> {
         val modules: MutableList<NativeModule> = ArrayList()
         modules.add(RPCModule(reactContext))
+        modules.add(NymTransportModule(reactContext))
+        modules.add(DeviceAuthModule(reactContext))
         return modules
     }
 }

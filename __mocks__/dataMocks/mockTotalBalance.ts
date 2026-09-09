@@ -1,4 +1,4 @@
-import { TotalBalanceClass } from '../../app/AppState';
+import { TotalBalanceClass } from '@app/AppState';
 
 export const mockTotalBalance: TotalBalanceClass = {
   totalTransparentBalance: 0.12345678,
@@ -7,5 +7,7 @@ export const mockTotalBalance: TotalBalanceClass = {
   confirmedSaplingBalance: 0.2,
   totalOrchardBalance: 0.6,
   confirmedOrchardBalance: 0.3,
+  totalIronwoodBalance: 0.5,
+  confirmedIronwoodBalance: 0.5,
   totalSpendableBalance: 1.12345678,
 };

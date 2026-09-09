@@ -44,17 +44,17 @@ RUN rustup target add \
     x86_64-linux-android
 RUN    echo "[target.armv7-linux-androideabi]" >> $CARGO_HOME/config.toml \
     && echo "ar = \"llvm-ar\"" >> $CARGO_HOME/config.toml \
-    && echo "linker = \"armv7a-linux-androideabi24-clang\"" >> $CARGO_HOME/config.toml \
+    && echo "linker = \"armv7a-linux-androideabi26-clang\"" >> $CARGO_HOME/config.toml \
     && echo "" >> $CARGO_HOME/config.toml
 RUN    echo "[target.i686-linux-android]" >> $CARGO_HOME/config.toml \
     && echo "ar = \"llvm-ar\"" >> $CARGO_HOME/config.toml \
-    && echo "linker = \"i686-linux-android24-clang\"" >> $CARGO_HOME/config.toml \
+    && echo "linker = \"i686-linux-android26-clang\"" >> $CARGO_HOME/config.toml \
     && echo "" >> $CARGO_HOME/config.toml
 RUN    echo "[target.aarch64-linux-android]" >> $CARGO_HOME/config.toml \
     && echo "ar = \"llvm-ar\"" >> $CARGO_HOME/config.toml \
-    && echo "linker = \"aarch64-linux-android24-clang\"" >> $CARGO_HOME/config.toml \
+    && echo "linker = \"aarch64-linux-android26-clang\"" >> $CARGO_HOME/config.toml \
     && echo "" >> $CARGO_HOME/config.toml
 RUN    echo "[target.x86_64-linux-android]" >> $CARGO_HOME/config.toml \
     && echo "ar = \"llvm-ar\"" >> $CARGO_HOME/config.toml \
-    && echo "linker = \"x86_64-linux-android24-clang\"" >> $CARGO_HOME/config.toml \
+    && echo "linker = \"x86_64-linux-android26-clang\"" >> $CARGO_HOME/config.toml \
     && echo "" >> $CARGO_HOME/config.toml

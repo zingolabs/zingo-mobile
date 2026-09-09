@@ -4,6 +4,10 @@
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="android:textColor">#000000</item>
+        <!-- Dark window background so edge-to-edge (forced by
+             react-native-keyboard-controller) doesn't show white in the
+             status-bar / navigation-bar safe-area regions. -->
+        <item name="android:windowBackground">@color/window_background</item>
     </style>
 
 </resources>

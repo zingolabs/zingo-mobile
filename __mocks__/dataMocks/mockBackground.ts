@@ -1,4 +1,4 @@
-import { BackgroundType } from '../../app/AppState';
+import { BackgroundType } from '@app/AppState';
 
 export const mockBackground: BackgroundType = {
   batches: 0,

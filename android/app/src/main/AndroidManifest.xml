@@ -7,7 +7,25 @@
     <uses-permission android:name="android.permission.VIBRATE"/>
     <uses-permission android:name="android.permission.USE_BIOMETRIC" />
     <uses-permission android:name="android.permission.USE_FINGERPRINT" />
+    <!-- Android 13+: batch reminders for the private Ironwood migration. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!--
+      notifee's core AAR auto-merges SCHEDULE_EXACT_ALARM for its optional
+      exact-alarm (AlarmManager) path. Our reminders use notifee's DEFAULT
+      WorkManager path (see app/notifications/reminders.ts) — no exact alarms —
+      so strip the unused permission to avoid Google Play's exact-alarm policy
+      declaration. RECEIVE_BOOT_COMPLETED + notifee's RebootBroadcastReceiver
+      (also from the AAR) still reschedule reminders after reboot.
+      If a trigger ever opts into alarmManager: SET_EXACT_AND_ALLOW_WHILE_IDLE,
+      remove this line and add the runtime openAlarmPermissionSettings() gate.
+    -->
+    <uses-permission
+        android:name="android.permission.SCHEDULE_EXACT_ALARM"
+        tools:node="remove" />
 
+    <!-- allowBackup="false": wallet files rest as plain zingolib bytes, and
+         backup exclusion is their only guard against a stale device backup
+         restoring an old wallet over a newer one. It must never flip to true. -->
     <application
       android:name=".MainApplication"
       android:label="@string/app_name"
@@ -27,7 +45,8 @@
         android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize|uiMode"
         android:launchMode="singleTask"
         android:windowSoftInputMode="adjustResize"
-        android:exported="true">
+        android:exported="true"
+        android:screenOrientation="portrait">
         <intent-filter>
             <action android:name="android.intent.action.MAIN" />
             <category android:name="android.intent.category.LAUNCHER" />

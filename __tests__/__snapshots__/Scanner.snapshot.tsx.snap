@@ -5,6 +5,7 @@ exports[`Component Scanner - test Scanner - snapshot 1`] = `
   style={
     {
       "backgroundColor": "#011401",
+      "flex": 1,
     }
   }
 />

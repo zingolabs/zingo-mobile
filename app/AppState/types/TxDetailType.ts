@@ -1,5 +1,5 @@
-import { PoolEnum } from '../enums/PoolEnum';
-import { TransactionTypeEnum } from '../enums/TransactionTypeEnum';
+import { PoolEnum } from '@app/AppState/enums/PoolEnum';
+import { TransactionTypeEnum } from '@app/AppState/enums/TransactionTypeEnum';
 
 export default interface TxDetailType {
   // those field excepcionally can be different between
@@ -14,5 +14,4 @@ export default interface TxDetailType {
   amount: number;
   memos?: string[];
   poolType?: PoolEnum;
-   
 }

@@ -1,5 +1,5 @@
-import { ChainNameEnum, CurrencyNameEnum, InfoType } from '../../app/AppState';
-import { serverUris } from '../../app/uris';
+import { ChainNameEnum, CurrencyNameEnum, InfoType } from '@app/AppState';
+import { serverUris } from '@app/uris';
 
 export const mockInfo: InfoType = {
   chainName: ChainNameEnum.mainChainName,
@@ -7,4 +7,5 @@ export const mockInfo: InfoType = {
   latestBlock: 2000000,
   version: 'server_version',
   currencyName: CurrencyNameEnum.ZEC,
+  ironwoodActivationHeight: 3428143,
 };

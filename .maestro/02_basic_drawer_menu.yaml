@@ -1,0 +1,39 @@
+appId: org.ZingoLabs.Zingo
+---
+- launchApp
+
+- extendedWaitUntil:
+    visible:
+      id: "receive.title"
+    timeout: 120000
+
+# Open options panel and verify basic-mode items are present
+- tapOn:
+    id: "header.drawmenu"
+- assertVisible:
+    id: "menu.addressbook"
+- assertVisible:
+    id: "menu.loadwalletfromseed"
+- back
+
+# Server info now lives inline inside Settings (see settings.*-server rows);
+# About remains as its own navigation row.
+- tapOn:
+    id: "header.settings"
+- extendedWaitUntil:
+    visible:
+      id: "settings.scroll-view"
+    timeout: 10000
+- assertVisible:
+    id: "settings.about"
+
+# Navigate to About and verify it loads
+- tapOn:
+    id: "settings.about"
+- extendedWaitUntil:
+    visible:
+      id: "about.scroll-view"
+    timeout: 10000
+
+- back
+- back

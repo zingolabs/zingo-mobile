@@ -1,0 +1,187 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`ExpandedAddress - snapshots ExpandedAddress with title and button 1`] = `
+<View
+  style={
+    {
+      "backgroundColor": "#031124",
+    }
+  }
+>
+  <View
+    style={
+      {
+        "alignSelf": "center",
+        "backgroundColor": "#031124",
+        "borderRadius": 8,
+        "padding": 16,
+        "width": "90%",
+      }
+    }
+  >
+    <View
+      style={
+        {
+          "alignItems": "flex-start",
+        }
+      }
+    >
+      <Text
+        style={
+          {
+            "color": "#cbd5e1",
+            "fontSize": 16,
+            "marginBottom": 20,
+          }
+        }
+      >
+        u1abc123def456abc123def456abc123def456abc123
+      </Text>
+      <View
+        accessibilityState={
+          {
+            "busy": undefined,
+            "checked": undefined,
+            "disabled": undefined,
+            "expanded": undefined,
+            "selected": undefined,
+          }
+        }
+        accessibilityValue={
+          {
+            "max": undefined,
+            "min": undefined,
+            "now": undefined,
+            "text": undefined,
+          }
+        }
+        accessible={true}
+        collapsable={false}
+        focusable={true}
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          {
+            "alignSelf": "center",
+            "backgroundColor": "#2A394D",
+            "borderColor": "#3B4B5F",
+            "borderRadius": 5,
+            "borderWidth": 1,
+            "opacity": 1,
+            "paddingHorizontal": 8,
+            "paddingVertical": 4,
+          }
+        }
+      >
+        <Text
+          style={
+            {
+              "color": "#ccc",
+              "fontSize": 16,
+            }
+          }
+        >
+          Copy
+        </Text>
+      </View>
+    </View>
+  </View>
+</View>
+`;
+
+exports[`ExpandedAddress - snapshots ExpandedAddress without optional props 1`] = `
+<View
+  style={
+    {
+      "backgroundColor": "#031124",
+    }
+  }
+>
+  <View
+    style={
+      {
+        "alignSelf": "center",
+        "backgroundColor": "#031124",
+        "borderRadius": 8,
+        "padding": 16,
+        "width": "90%",
+      }
+    }
+  >
+    <View
+      style={
+        {
+          "alignItems": "flex-start",
+        }
+      }
+    >
+      <Text
+        style={
+          {
+            "color": "#cbd5e1",
+            "fontSize": 16,
+            "marginBottom": 20,
+          }
+        }
+      >
+        u1abc123def456abc123def456abc123def456abc123
+      </Text>
+      <View
+        accessibilityState={
+          {
+            "busy": undefined,
+            "checked": undefined,
+            "disabled": undefined,
+            "expanded": undefined,
+            "selected": undefined,
+          }
+        }
+        accessibilityValue={
+          {
+            "max": undefined,
+            "min": undefined,
+            "now": undefined,
+            "text": undefined,
+          }
+        }
+        accessible={true}
+        collapsable={false}
+        focusable={true}
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          {
+            "alignSelf": "center",
+            "backgroundColor": "#2A394D",
+            "borderColor": "#3B4B5F",
+            "borderRadius": 5,
+            "borderWidth": 1,
+            "opacity": 1,
+            "paddingHorizontal": 8,
+            "paddingVertical": 4,
+          }
+        }
+      >
+        <Text
+          style={
+            {
+              "color": "#ccc",
+              "fontSize": 16,
+            }
+          }
+        />
+      </View>
+    </View>
+  </View>
+</View>
+`;

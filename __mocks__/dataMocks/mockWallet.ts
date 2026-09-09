@@ -1,4 +1,4 @@
-import { WalletType } from '../../app/AppState';
+import { WalletType } from '@app/AppState';
 
 export const mockWallet: WalletType = {
   seed: 'pepe lolo titi',

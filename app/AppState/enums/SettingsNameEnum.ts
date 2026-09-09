@@ -13,10 +13,12 @@ export enum SettingsNameEnum {
   recoveryWalletInfoOnDevice = 'recoveryWalletInfoOnDevice',
   performanceLevel = 'performanceLevel',
   blockExplorer = 'blockExplorer',
+  nym = 'nym',
 
   // internal management
   firstInstall = 'firstInstall',
   basicFirstViewSeed = 'basicFirstViewSeed',
   version = 'version',
   firstUpdateWithDonation = 'firstUpdateWithDonation',
+  ironwoodOnboardSeen = 'ironwoodOnboardSeen',
 }

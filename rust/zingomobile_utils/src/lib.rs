@@ -1,6 +1,18 @@
 use std::process::Command;
 
-pub fn android_integration_test(abi: &str, test_name: &str) -> (i32, String, String) {
+/// Runs one on-device instrumented test class.
+///
+/// `activation_heights` is the launched regtest chain's schedule in the
+/// harness's `key=height` spec form; `None` when the chain provisioner
+/// cannot report one (regchest). The script forwards it to the device as
+/// an instrumentation argument, from which the Kotlin side builds the
+/// wallet's `regtest:<schedule>` chain hint — so the wallet's schedule is
+/// derived from the chain that was actually launched, never assumed.
+pub fn android_integration_test(
+    abi: &str,
+    test_name: &str,
+    activation_heights: Option<&str>,
+) -> (i32, String, String) {
     let command: String;
     let arg: String;
     #[cfg(unix)]
@@ -15,9 +27,14 @@ pub fn android_integration_test(abi: &str, test_name: &str) -> (i32, String, Str
         arg = "/C".to_string();
     }
 
+    let mut process = Command::new(command);
+    process.arg(arg);
+    if let Some(heights) = activation_heights {
+        process.env("ACTIVATION_HEIGHTS", heights);
+    }
+
     #[cfg(not(any(target_arch = "arm", target_arch = "aarch64")))]
-    let output = Command::new(command)
-        .arg(arg)
+    let output = process
         .arg(format!(
             r#"
             cd $(git rev-parse --show-toplevel)
@@ -28,8 +45,7 @@ pub fn android_integration_test(abi: &str, test_name: &str) -> (i32, String, Str
         .expect("Failed to execute command");
 
     #[cfg(any(target_arch = "arm", target_arch = "aarch64"))]
-    let output = Command::new(command)
-        .arg(arg)
+    let output = process
         .arg(format!(
             r#"
             cd $(git rev-parse --show-toplevel)
@@ -47,7 +63,13 @@ pub fn android_integration_test(abi: &str, test_name: &str) -> (i32, String, Str
     (exit_code, stdout, stderr)
 }
 
-pub fn android_integration_test_ci(abi: &str, test_name: &str) -> (i32, String, String) {
+/// CI variant of [`android_integration_test`]; same activation-heights
+/// contract.
+pub fn android_integration_test_ci(
+    abi: &str,
+    test_name: &str,
+    activation_heights: Option<&str>,
+) -> (i32, String, String) {
     let command: String;
     let arg: String;
     #[cfg(unix)]
@@ -62,8 +84,13 @@ pub fn android_integration_test_ci(abi: &str, test_name: &str) -> (i32, String, 
         arg = "/C".to_string();
     }
 
-    let output = Command::new(command)
-        .arg(arg)
+    let mut process = Command::new(command);
+    process.arg(arg);
+    if let Some(heights) = activation_heights {
+        process.env("ACTIVATION_HEIGHTS", heights);
+    }
+
+    let output = process
         .arg(format!(
             r#"
             cd $(git rev-parse --show-toplevel)

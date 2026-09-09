@@ -23,8 +23,8 @@ exports[`Component DetailLine - test DetailLine children - snapshot 1`] = `
     style={
       {
         "color": "#c3c3c3",
-        "fontSize": 18,
-        "fontWeight": "600",
+        "fontSize": 15,
+        "fontWeight": "400",
         "opacity": 1,
       }
     }
@@ -91,8 +91,8 @@ exports[`Component DetailLine - test DetailLine value - snapshot 1`] = `
       style={
         {
           "color": "#c3c3c3",
-          "fontSize": 18,
-          "fontWeight": "600",
+          "fontSize": 15,
+          "fontWeight": "400",
           "opacity": 1,
         }
       }
