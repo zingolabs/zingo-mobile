@@ -1013,6 +1013,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         amountCurrency: amountCurrencyText,
         memo: memoText,
         includeUAMemo: includeUAMemoBoolean,
+        znsAlias: zns?.address === addressText ? zns.alias : '',
       },
     } as SendPageStateClass;
   };

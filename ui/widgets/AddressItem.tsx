@@ -30,6 +30,10 @@ type AddressItemProps = {
   oneLine?: boolean;
   onlyContact?: boolean;
   withIcon?: boolean;
+  // The `name.zcash` the address was resolved from, when the caller knows it.
+  // Shown in place of a contact name — a contact of the user's own always wins
+  // — and offered as the label when saving this address to the book.
+  znsAlias?: string;
   withSendIcon?: boolean;
   addressProtected?: boolean;
   ufvk?: boolean;
@@ -43,6 +47,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
   oneLine,
   onlyContact,
   withIcon,
+  znsAlias,
   withSendIcon,
   addressProtected,
   ufvk,
@@ -153,6 +158,11 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
                 </View>
               </TouchableOpacity>
             )}
+            {!contact && !!znsAlias && (
+              <RegText style={{ color: colors.fgAccent, fontWeight: '600' }}>
+                {`ZNS: ${znsAlias}`}
+              </RegText>
+            )}
             {(!oneLine || (oneLine && !contact)) && !onlyContact && (
               <TouchableOpacity
                 onPress={() => {
@@ -205,7 +215,10 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
             )}
           </View>
           {withIcon && !contact && oneLine && (
-            <TouchableOpacity onPress={() => launchAddTagModal(address)}>
+            <TouchableOpacity
+              testID="addressitem.add-contact"
+              onPress={() => launchAddTagModal(address, undefined, znsAlias)}
+            >
               <View
                 style={{
                   flexDirection: 'row',
@@ -225,7 +238,10 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
             </TouchableOpacity>
           )}
           {withIcon && !contact && !oneLine && (
-            <TouchableOpacity onPress={() => launchAddTagModal(address)}>
+            <TouchableOpacity
+              testID="addressitem.add-contact"
+              onPress={() => launchAddTagModal(address, undefined, znsAlias)}
+            >
               <FontAwesomeIcon
                 style={{ marginTop: 3 }}
                 size={24}
