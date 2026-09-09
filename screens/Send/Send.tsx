@@ -1200,6 +1200,12 @@ const Send: React.FunctionComponent<SendProps> = ({
   //  contentHeight,
   //);
 
+  // The recipient is already a contact. Saving one is also what retires the
+  // ZNS badge: once the address has a name of the user's own, that name is the
+  // one that means something, and two labels on one address just read as noise.
+  const addressIsSaved =
+    !!addressText && addressBook.some(ab => ab.address === addressText);
+
   const returnPage = (
     <View
       style={{ flex: 1 }}
@@ -1298,7 +1304,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                         withIcon={false}
                       />
                     )}
-                    {zns?.address === addressText && (
+                    {zns?.address === addressText && !addressIsSaved && (
                       <RegText
                         testID="send.address.zns"
                         style={{ color: colors.fgAccent, fontWeight: '600' }}
@@ -1399,9 +1405,6 @@ const Send: React.FunctionComponent<SendProps> = ({
                         // button for an "add to address book" one. It reverts
                         // automatically after saving: `addressBook` updates and
                         // this recomputes `addressIsSaved`.
-                        const addressIsSaved =
-                          !!addressText &&
-                          addressBook.some(ab => ab.address === addressText);
                         if (validAddress === 1 && !addressIsSaved) {
                           return (
                             <TouchableOpacity
