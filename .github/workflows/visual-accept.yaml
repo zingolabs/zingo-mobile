@@ -22,6 +22,8 @@ jobs:
       startsWith(github.event.comment.body, '/visual-accept')
     runs-on: ubuntu-24.04
     timeout-minutes: 15
+    env:
+      VISUAL_ACCEPT_APP_ID: ${{ secrets.VISUAL_ACCEPT_APP_ID }}
     steps:
       - name: Acknowledge the command
         uses: actions/github-script@v7
@@ -70,10 +72,10 @@ jobs:
 
       - name: Mint app token
         id: app-token
-        if: vars.VISUAL_ACCEPT_APP_ID != ''
+        if: env.VISUAL_ACCEPT_APP_ID != ''
         uses: actions/create-github-app-token@v3
         with:
-          app-id: ${{ vars.VISUAL_ACCEPT_APP_ID }}
+          app-id: ${{ env.VISUAL_ACCEPT_APP_ID }}
           private-key: ${{ secrets.VISUAL_ACCEPT_APP_PRIVATE_KEY }}
 
       - name: Checkout PR head
@@ -94,6 +96,7 @@ jobs:
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token || secrets.GITHUB_TOKEN }}
           RETRIGGERS: ${{ steps.app-token.outputs.token != '' }}
+          BOT_LOGIN: ${{ steps.app-token.outputs.app-slug && format('{0}[bot]', steps.app-token.outputs.app-slug) || 'github-actions[bot]' }}
           HEAD_SHA: ${{ steps.gate.outputs.head_sha }}
           HEAD_REF: ${{ steps.gate.outputs.head_ref }}
           PR_NUMBER: ${{ github.event.issue.number }}
