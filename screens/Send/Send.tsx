@@ -203,7 +203,7 @@ const Send: React.FunctionComponent<SendProps> = ({
 
   const [memoEnabled, setMemoEnabled] = useState<boolean>(false);
   const [validAddress, setValidAddress] = useState<number>(0); // 1 - OK, 0 - Empty, -1 - KO
-  // A `name.zcash` the indexer does not know. Reported in place of the
+  // A ZNS alias the indexer does not know. Reported in place of the
   // invalid-address text, which would be wrong: the address is not malformed,
   // the name simply is not registered.
   const [znsNotFound, setZnsNotFound] = useState<boolean>(false);
@@ -761,7 +761,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     }
   }, [calculateSpendableBalance, addressText]);
 
-  // Zcash Name Service: a `name.zcash` in the recipient field is looked up and
+  // Zcash Name Service: a ZNS alias in the recipient field is looked up and
   // swapped for the unified address it points at, so everything downstream
   // (the fee proposal, the spendable balance, the address book, the confirm
   // screen) keeps receiving a real address. Debounced, because this fires on
