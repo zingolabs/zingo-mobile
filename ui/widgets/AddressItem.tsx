@@ -30,7 +30,7 @@ type AddressItemProps = {
   oneLine?: boolean;
   onlyContact?: boolean;
   withIcon?: boolean;
-  // The `name.zcash` the address was resolved from, when the caller knows it.
+  // The ZNS alias the address was resolved from, when the caller knows it.
   // Shown in place of a contact name — a contact of the user's own always wins
   // — and offered as the label when saving this address to the book.
   znsAlias?: string;

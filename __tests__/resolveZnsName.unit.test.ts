@@ -12,21 +12,33 @@ import { isZnsAlias, resolveZnsName } from '@app/uris/resolveZnsName';
 const UA = 'u1abcdefghijklmnopqrstuvwxyz0123456789';
 
 describe('isZnsAlias', () => {
-  it.each(['alice.zcash', 'ALICE.ZCASH', '  bob123.zcash  ', 'a.zcash'])(
-    'accepts %s',
-    text => {
-      expect(isZnsAlias(text)).toBe(true);
-    },
-  );
+  it.each([
+    'alice.zcash',
+    'ALICE.ZCASH',
+    '  bob123.zcash  ',
+    'a.zcash',
+    // Edge hands out names in this form, against the same registry: the
+    // indexer is asked for the bare name either way.
+    'alice.zec',
+    'ALICE.ZEC',
+    '  bob123.zec  ',
+  ])('accepts %s', text => {
+    expect(isZnsAlias(text)).toBe(true);
+  });
 
   it.each([
     ['a bare name', 'alice'],
-    ['another suffix', 'alice.zec'],
     ['a unified address', UA],
     ['an empty name', '.zcash'],
+    ['an empty name under the other suffix', '.zec'],
     ['a name with symbols', 'al_ice.zcash'],
     ['a name over 62 characters', `${'a'.repeat(63)}.zcash`],
     ['nothing', ''],
+    // The list of suffixes is closed on purpose: one nobody issues is a
+    // mistyped address, and resolving it would hand back someone else's.
+    ['a suffix nobody issues', 'alice.zzzzzzzzzzz'],
+    ['a domain', 'alice.com'],
+    ['both suffixes at once', 'alice.zcash.zec'],
   ])('rejects %s', (_label, text) => {
     expect(isZnsAlias(text)).toBe(false);
   });
@@ -53,6 +65,17 @@ describe('resolveZnsName', () => {
       .mockResolvedValue({ address: UA } as never);
 
     await resolveZnsName('  ALICE.zcash ', ChainNameEnum.mainChainName);
+
+    expect(resolveName).toHaveBeenCalledWith('alice');
+  });
+
+  // The suffix never reaches the indexer, so both forms are one lookup.
+  it('asks for the same name whichever suffix was written', async () => {
+    const resolveName = jest
+      .spyOn(ZNS.prototype, 'resolveName')
+      .mockResolvedValue({ address: UA } as never);
+
+    await resolveZnsName('  ALICE.zec ', ChainNameEnum.mainChainName);
 
     expect(resolveName).toHaveBeenCalledWith('alice');
   });

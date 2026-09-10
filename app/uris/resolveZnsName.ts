@@ -15,7 +15,6 @@ import { ChainNameEnum } from '@app/AppState';
 // details somebody else's to maintain.
 
 const RESOLVE_TIMEOUT_MS = 5000;
-const ZNS_SUFFIX = '.zcash';
 
 export type ZnsResolution =
   | { ok: true; address: string }
@@ -45,22 +44,33 @@ const clientFor = (chainName: ChainNameEnum): ZNS | null => {
   return client;
 };
 
-// The protocol's own name rule. The SDK ships an `isValidName` but does not
-// export it, so this is the one piece of ZNS knowledge kept here; zingo-pc
-// carries the same expression.
-const ZNS_NAME = /^[a-z0-9]{1,62}$/;
+// The protocol's own name rule, wrapped in the suffix this app puts around
+// it. The SDK ships an `isValidName` but does not export it, so this is the
+// one piece of ZNS knowledge kept here; zingo-pc carries the same expression.
+//
+// The suffix is ours, not the protocol's: a registration is the bare name and
+// the rules forbid a dot inside it, so the indexer never sees ".zcash" or
+// ".zec" and cannot tell them apart.
+//
+// Which is why this list stays closed rather than becoming "anything after a
+// dot". Accepting any suffix would turn a fumbled address, a domain or half
+// an email into a silent lookup of whoever owns its first label, and hand
+// back a real address to send funds to. These two earn their place by being
+// in circulation — .zcash from zcashnames itself, .zec from Edge, which hands
+// out names in that form — and nothing else is.
+const ZNS_ALIAS = /^([a-z0-9]{1,62})\.(?:zcash|zec)$/;
 
-/** True when `text` reads as a ZNS alias, e.g. "alice.zcash". */
-export const isZnsAlias = (text: string): boolean => {
-  const trimmed = text.trim().toLowerCase();
-  return (
-    trimmed.endsWith(ZNS_SUFFIX) &&
-    ZNS_NAME.test(trimmed.slice(0, -ZNS_SUFFIX.length))
-  );
+/** The registered name inside an alias, or null when `text` is not one. */
+const znsName = (text: string): string | null => {
+  const match = text.trim().toLowerCase().match(ZNS_ALIAS);
+  return match ? match[1] : null;
 };
 
+/** True when `text` reads as a ZNS alias, e.g. "alice.zcash" or "alice.zec". */
+export const isZnsAlias = (text: string): boolean => znsName(text) !== null;
+
 /**
- * Resolve "alice.zcash" to the unified address it points at.
+ * Resolve "alice.zcash" (or "alice.zec") to the unified address it points at.
  *
  * Never throws. An unreachable indexer, a malformed answer or the 5s deadline
  * all come back as `network`. The SDK's fetch takes no abort signal, so the
@@ -72,15 +82,14 @@ export const resolveZnsName = async (
 ): Promise<ZnsResolution> => {
   // A name the protocol would refuse cannot be registered, so it resolves to
   // nothing rather than being worth a round trip.
-  if (!isZnsAlias(alias)) {
+  const name = znsName(alias);
+  if (name === null) {
     return { ok: false, reason: 'not-found' };
   }
   const client = clientFor(chainName);
   if (!client) {
     return { ok: false, reason: 'unsupported-chain' };
   }
-
-  const name = alias.trim().toLowerCase().slice(0, -ZNS_SUFFIX.length);
   let timer: ReturnType<typeof setTimeout> | undefined;
   try {
     const registration = await Promise.race([
