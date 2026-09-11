@@ -33,12 +33,13 @@ the baseline holds what the CI runner drew. The PR flow is:
 The `/visual-accept` bot commits with `GITHUB_TOKEN` by default, which does not
 retrigger the required checks on the accept commit, so the PR needs a manual
 nudge to become mergeable. To retrigger CI and green the checks in one step,
-set the `VISUAL_ACCEPT_APP_ID` repository variable and the
-`VISUAL_ACCEPT_APP_PRIVATE_KEY` secret to a GitHub App the workflow mints an
-installation token from. Install that App on this repository only, with
-`contents: write` and `checks: write`: the accept job runs `yarn` and
-`visual/acceptComment.mts` from the PR branch with its token in the
-environment.
+set the `VISUAL_ACCEPT_APP_ID` and `VISUAL_ACCEPT_APP_PRIVATE_KEY` secrets to
+a GitHub App the workflow mints an installation token from. Install that App
+on this repository only, with `contents: write` and `checks: write`: the
+accept job runs `yarn` and `visual/acceptComment.mts` from the PR branch with
+its token in the environment. The bot commits as the App's own `[bot]` user,
+so the push counts as a collaborator's and the new runs start without the
+"Approve and run" step.
 
 `yarn visual:accept --run <id>` names a run. `yarn visual:accept --local`
 promotes your own `visual/__current__` instead; use it to try the harness, and
