@@ -77,6 +77,7 @@ const useDerivedValue = jest.fn(fn => ({ value: fn() }));
 const useAnimatedGestureHandler = jest.fn(() => ({}));
 const useAnimatedReaction = jest.fn();
 const useAnimatedRef = jest.fn(() => ({ current: null }));
+const useReducedMotion = jest.fn(() => false);
 const withTiming = jest.fn(v => v);
 const withSpring = jest.fn(v => v);
 const withDelay = jest.fn((_, v) => v);
@@ -119,6 +120,7 @@ export {
   useAnimatedRef,
   useAnimatedStyle,
   useDerivedValue,
+  useReducedMotion,
   useSharedValue,
   withDelay,
   withRepeat,
