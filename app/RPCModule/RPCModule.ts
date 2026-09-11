@@ -159,11 +159,8 @@ interface RPCModuleAPI {
 
   setBroadcastCandidates(candidatesJson: string): Promise<string>;
 
-  // Mixnet Mode (send-over-nym). Implemented by the native RPCModule on both
-  // Android and iOS.
   attachMixnet(socks5Addr: string, exitNode: string): Promise<string>;
   enableMixnet(proxyPath: string): Promise<string>;
-  disableMixnet(): Promise<string>;
   mixnetIndicatorInfo(): Promise<string>;
   mixnetBootstrapDetailInfo(): Promise<string>;
 }

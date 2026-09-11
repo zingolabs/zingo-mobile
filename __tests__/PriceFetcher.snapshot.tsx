@@ -18,23 +18,20 @@ import {
 import { SelectServerEnum } from '@app/AppState';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
-// test suite
+
 describe('Component PriceFetcher - test', () => {
-  // The ring renders only while the store's surface decision holds, so
-  // the driver mounts beside the fetcher exactly as LoadedApp does; the
-  // snapshot pins that consented state, not the empty render.
   const state = { ...defaultAppContextLoaded };
   state.translate = mockTranslate;
   state.nym = true;
   state.info = mockInfo;
   state.selectServer = SelectServerEnum.auto;
   state.zecPrice = { zecPrice: 33.33, date: 1 };
-  //snapshot test
+
   test('PriceFetcher - snapshot', () => {
     const price = render(
       <ContextAppLoadedProvider value={state}>
         <PriceTrafficDriver />
-        <PriceFetcher textBefore="text before" />
+        <PriceFetcher />
       </ContextAppLoadedProvider>,
     );
     expect(price.toJSON()).toMatchSnapshot();

@@ -12,8 +12,5 @@
 RCT_EXTERN_METHOD(startMixnetTransport:
     (RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(stopMixnetTransport:
-    (RCTPromiseResolveBlock)resolve
-                  reject:(RCTPromiseRejectBlock)reject)
 
 @end

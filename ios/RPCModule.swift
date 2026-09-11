@@ -867,15 +867,6 @@ class RPCModule: NSObject {
       }
   }
 
-  @objc(disableMixnet:reject:)
-  func disableMixnetProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      DispatchQueue.global(qos: .userInitiated).async {
-        FfiOutcome.of {
-          try disableMixnet()
-        }.settle(resolve: resolve, reject: reject)
-      }
-  }
-
   @objc(mixnetIndicatorInfo:reject:)
   func mixnetIndicatorInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
       DispatchQueue.global(qos: .userInitiated).async {

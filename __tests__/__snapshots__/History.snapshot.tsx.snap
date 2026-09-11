@@ -140,6 +140,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                 "alignItems": "center",
                 "flexDirection": "row",
                 "justifyContent": "center",
+                "marginBottom": 20,
                 "marginTop": 10,
               }
             }
@@ -363,89 +364,6 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                 />
               </View>
             </View>
-          </View>
-          <View
-            onLayout={[Function]}
-            style={
-              {
-                "alignItems": "center",
-                "flexDirection": "row",
-              }
-            }
-          >
-            <View
-              style={
-                {
-                  "alignItems": "baseline",
-                  "flexDirection": "row",
-                }
-              }
-            >
-              <View
-                accessibilityState={
-                  {
-                    "busy": undefined,
-                    "checked": undefined,
-                    "disabled": false,
-                    "expanded": undefined,
-                    "selected": undefined,
-                  }
-                }
-                accessibilityValue={
-                  {
-                    "max": undefined,
-                    "min": undefined,
-                    "now": undefined,
-                    "text": undefined,
-                  }
-                }
-                accessible={true}
-                collapsable={false}
-                focusable={true}
-                onClick={[Function]}
-                onResponderGrant={[Function]}
-                onResponderMove={[Function]}
-                onResponderRelease={[Function]}
-                onResponderTerminate={[Function]}
-                onResponderTerminationRequest={[Function]}
-                onStartShouldSetResponder={[Function]}
-                style={
-                  {
-                    "opacity": 1,
-                  }
-                }
-              >
-                <View
-                  style={
-                    {
-                      "alignItems": "baseline",
-                      "flexDirection": "row",
-                    }
-                  }
-                >
-                  <Text
-                    style={
-                      {
-                        "color": "#888888",
-                        "fontSize": 20,
-                        "fontWeight": "700",
-                        "marginBottom": 0,
-                        "marginTop": 0,
-                      }
-                    }
-                  >
-                    $ -.--
-                  </Text>
-                </View>
-              </View>
-            </View>
-            <View
-              style={
-                {
-                  "marginLeft": 5,
-                }
-              }
-            />
           </View>
         </View>
         <View
@@ -1254,6 +1172,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                 "alignItems": "center",
                 "flexDirection": "row",
                 "justifyContent": "center",
+                "marginBottom": 20,
                 "marginTop": 10,
               }
             }

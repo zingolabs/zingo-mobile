@@ -1,6 +1,3 @@
-/**
- * The Nym opt-in that starts price traffic.
- */
 jest.mock('@app/walletBackend', () => ({
   __esModule: true,
   getZecPrice: jest.fn(),
@@ -12,7 +9,7 @@ import React from 'react';
 import { render } from '@testing-library/react-native';
 import PriceFetcher, { PriceTrafficDriver } from '@ui/widgets/PriceFetcher';
 import {
-  PRICE_REFRESH_MAX_MS,
+  PRICE_REFRESH_MS,
   priceFetcherStore,
 } from '@ui/widgets/priceFetcherStore';
 import {
@@ -47,6 +44,7 @@ const makeCtx = (over?: Partial<Ctx>): Ctx => ({
   nym: true,
   info: mockInfo,
   selectServer: SelectServerEnum.auto,
+  mixnetView: viewFor('mixnet.status.ready'),
   ...over,
 });
 
@@ -93,7 +91,7 @@ afterEach(() => {
   jest.useRealTimers();
 });
 
-test('with the opt-in a ZEC-display wallet still fetches every tick', async () => {
+test('a ZEC-display wallet still fetches every tick', async () => {
   jest.useFakeTimers();
   price.mockResolvedValue({ price: 42, error: '' });
   const setZecPrice = jest.fn();
@@ -102,10 +100,10 @@ test('with the opt-in a ZEC-display wallet still fetches every tick', async () =
     driverOnlyUi(makeCtx({ currency: CurrencyEnum.noCurrency }), setZecPrice),
   );
   await jest.advanceTimersByTimeAsync(0);
-  expect(price).toHaveBeenCalledTimes(1); // the mount entry
+  expect(price).toHaveBeenCalledTimes(1);
 
-  await jest.advanceTimersByTimeAsync(PRICE_REFRESH_MAX_MS + 1_000);
-  expect(price.mock.calls.length).toBeGreaterThanOrEqual(2); // the cadence, display or not
+  await jest.advanceTimersByTimeAsync(PRICE_REFRESH_MS + 1_000);
+  expect(price.mock.calls.length).toBeGreaterThanOrEqual(2);
 });
 
 test('a full ring always means a refresh really is due', async () => {
@@ -115,14 +113,10 @@ test('a full ring always means a refresh really is due', async () => {
 
   render(surfaceUi(makeCtx(), setZecPrice));
   await jest.advanceTimersByTimeAsync(0);
-  expect(price).toHaveBeenCalledTimes(1); // entry success: the ring keys here
+  expect(price).toHaveBeenCalledTimes(1);
   const keyAtSuccess = priceFetcherStore.snapshot().nextFetchAt;
-  expect(keyAtSuccess).toBeGreaterThan(0); // the cadence armed and keyed
+  expect(keyAtSuccess).toBeGreaterThan(0);
 
-  // A hop inside the success cooldown lands on the re-arm branch of
-  // foregroundReturned: a fresh full timer starts, and the ring's
-  // deadline key MUST move with it, or the ring reads full while the
-  // re-armed timer still runs.
   await jest.advanceTimersByTimeAsync(2_000);
   fireAppState('background');
   fireAppState('active');
@@ -130,7 +124,6 @@ test('a full ring always means a refresh really is due', async () => {
   priceFetcherStore.foregroundReturned();
   const rearmed = priceFetcherStore.snapshot();
   expect(rearmed.nextFetchAt).not.toBe(keyAtSuccess);
-  // The rekeyed ring fills toward the tick that will actually fire.
   expect(rearmed.nextFetchAt).toBe(Date.now() + rearmed.nextFetchDelayMs);
 });
 
@@ -149,41 +142,32 @@ test('a return parked on a flight still arms the hop rate bound', async () => {
 
   render(surfaceUi(makeCtx(), setZecPrice));
   await jest.advanceTimersByTimeAsync(0);
-  expect(price).toHaveBeenCalledTimes(1); // entry in flight
+  expect(price).toHaveBeenCalledTimes(1);
 
-  // A real return lands inside the flight: it parks.
   fireAppState('background');
   fireAppState('active');
   priceFetcherStore.foregroundReturned();
 
-  // The flight fails; the parked return fires its fetch (also failing).
   land({ price: -1, error: 'refused' });
   await jest.advanceTimersByTimeAsync(0);
-  expect(price).toHaveBeenCalledTimes(4); // flight retry + parked pair
+  expect(price).toHaveBeenCalledTimes(4);
 
-  // An immediate second hop during the failure window must be bounded
-  // by the parked return-fetch, as the foregroundReturned doc promises.
   fireAppState('background');
   fireAppState('active');
   priceFetcherStore.foregroundReturned();
   await jest.advanceTimersByTimeAsync(0);
-  expect(price).toHaveBeenCalledTimes(4); // rate-bound, no fifth call
+  expect(price).toHaveBeenCalledTimes(4);
 });
 
-const FETCH_EXPECTED: Record<string, boolean> = {
-  'true|mixnet.status.off': false,
-  'true|mixnet.status.bootstrapping': true,
-  'true|mixnet.status.ready': true,
-  'true|mixnet.status.died': false,
-  'true|mixnet.status.unknown': true,
-  'false|mixnet.status.off': true,
-  'false|mixnet.status.bootstrapping': false,
-  'false|mixnet.status.ready': false,
-  'false|mixnet.status.died': false,
-  'false|mixnet.status.unknown': true,
+const FETCH_EXPECTED: Record<MixnetStatusKey, boolean> = {
+  'mixnet.status.off': false,
+  'mixnet.status.bootstrapping': false,
+  'mixnet.status.ready': true,
+  'mixnet.status.died': false,
+  'mixnet.status.unknown': false,
 };
 
-test('the opt-in resolves a fetch for every mixnet status', async () => {
+test('the transport status alone resolves a fetch, the Nym toggle notwithstanding', async () => {
   for (const nym of [true, false]) {
     for (const statusKey of MIXNET_STATUS_KEYS) {
       jest.useFakeTimers();
@@ -200,9 +184,7 @@ test('the opt-in resolves a fetch for every mixnet status', async () => {
       );
       await jest.advanceTimersByTimeAsync(0);
 
-      expect(price.mock.calls.length > 0).toBe(
-        FETCH_EXPECTED[`${nym}|${statusKey}`],
-      );
+      expect(price.mock.calls.length > 0).toBe(FETCH_EXPECTED[statusKey]);
       view.unmount();
       jest.useRealTimers();
     }
@@ -216,15 +198,14 @@ test('a re-render behind the closed gate emits no traffic', async () => {
 
   const view = render(surfaceUi(makeCtx(), setZecPrice));
   await jest.advanceTimersByTimeAsync(0);
-  expect(price).toHaveBeenCalledTimes(1); // the mount entry
+  expect(price).toHaveBeenCalledTimes(1);
   const priceDate = Date.now();
 
   await jest.advanceTimersByTimeAsync(2_000);
   fireAppState('background');
-  await jest.advanceTimersByTimeAsync(120_000); // the price goes old away
-  fireAppState('active'); // the user sits on the biometric prompt
+  await jest.advanceTimersByTimeAsync(120_000);
+  fireAppState('active');
 
-  // Any context change re-renders the driver while the gate is closed.
   view.rerender(
     surfaceUi(
       makeCtx({ zecPrice: { zecPrice: 42, date: priceDate } }),
@@ -232,9 +213,9 @@ test('a re-render behind the closed gate emits no traffic', async () => {
     ),
   );
   await jest.advanceTimersByTimeAsync(0);
-  expect(price).toHaveBeenCalledTimes(1); // nothing behind the gate
+  expect(price).toHaveBeenCalledTimes(1);
 
-  priceFetcherStore.foregroundReturned(); // the gate opened
+  priceFetcherStore.foregroundReturned();
   await jest.advanceTimersByTimeAsync(0);
   expect(price).toHaveBeenCalledTimes(2);
 });

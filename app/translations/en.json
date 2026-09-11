@@ -14,7 +14,6 @@
   "biometricsfailed-body": "For security, the application is locked.",
   "biometricsfailed-footer": "Use the authentication method to unlock.",
   "biometricsfailed-button": "Unlock",
-  "price-ring-none": "No ZEC price yet",
   "price-ring-live": "The ZEC price is current",
   "price-ring-stale": "The ZEC price is stale",
   "biometrics-message": "Please authenticate",
@@ -472,7 +471,7 @@
     "walletkeyssaved": "The last Wallet Recovery Info stored safely in the device.",
     "walletkeyswarning": "This is an experimental feature, that depends on the security of unaudited code to store your seed-phrase. Please do not use it with seeds that control significant funds!",
     "value-language-tr": "Turkish",
-    "nym-disable-warning": "Turning off Mixnet Mode routes your transactions and price lookups over the clearnet and links your activity to your IP address.",
+    "nym-disable-warning": "Turning off Mixnet Mode routes your transactions over the clearnet and links your activity to your IP address.",
     "nym-network": "NYM Mixnet",
     "nym-enhanced-privacy": "Enhanced Privacy",
     "nym-diagnostics": "Run mixnet diagnostics"

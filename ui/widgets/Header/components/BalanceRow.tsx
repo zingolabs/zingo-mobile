@@ -1,6 +1,13 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import { TouchableOpacity, View } from 'react-native';
+import Animated, {
+  Easing,
+  EntryExitAnimationFunction,
+  FadeIn,
+  useReducedMotion,
+  withTiming,
+} from 'react-native-reanimated';
 import {
   NavigationProp,
   ParamListBase,
@@ -29,6 +36,23 @@ import PriceFetcher from '@ui/widgets/PriceFetcher';
 import RegText from '@ui/primitives/RegText';
 import ZecAmount from '@ui/widgets/ZecAmount';
 import PrivacyToggle from './PrivacyToggle';
+
+const BALANCE_BOTTOM_GAP = 20;
+const REVEAL_MS = 220;
+const REVEAL_EASE = Easing.bezier(0.23, 1, 0.32, 1);
+
+// The fiat row settles into place from a slightly smaller, transparent copy.
+const materialize: EntryExitAnimationFunction = () => {
+  'worklet';
+  const timing = { duration: REVEAL_MS, easing: REVEAL_EASE };
+  return {
+    initialValues: { opacity: 0, transform: [{ scale: 0.94 }] },
+    animations: {
+      opacity: withTiming(1, timing),
+      transform: [{ scale: withTiming(1, timing) }],
+    },
+  };
+};
 
 type BalanceRowProps = {
   noBalance: boolean | undefined;
@@ -81,6 +105,13 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
   }) => {
     const navigation = useNavigation<NavigationProp<ParamListBase>>();
     const { colors } = useTheme();
+    const reducedMotion = useReducedMotion();
+    const showFiat =
+      currency === CurrencyEnum.USDCurrency &&
+      !noBalance &&
+      selectServer !== SelectServerEnum.offline &&
+      info.chainName === ChainNameEnum.mainChainName &&
+      zecPrice.date > 0;
 
     return (
       <>
@@ -91,6 +122,8 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
               alignItems: 'center',
               justifyContent: 'center',
               marginTop: 10,
+              // Without the fiat row the balance keeps the same air below as above.
+              marginBottom: showFiat ? 0 : BALANCE_BOTTOM_GAP,
             }}
           >
             {mode !== ModeEnum.basic &&
@@ -189,34 +222,32 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
             </View>
           )}
 
-        {currency === CurrencyEnum.USDCurrency &&
-          !noBalance &&
-          selectServer !== SelectServerEnum.offline &&
-          info.chainName === ChainNameEnum.mainChainName && (
-            <View
-              onLayout={e => onUsdRowLayout?.(e.nativeEvent.layout.height)}
-              style={{ flexDirection: 'row', alignItems: 'center' }}
-            >
-              <CurrencyAmount
-                style={{ marginTop: 0, marginBottom: 0 }}
-                priceDate={zecPrice.date}
-                price={zecPrice.zecPrice}
-                amtZec={
-                  totalBalance
-                    ? totalBalance.totalIronwoodBalance +
-                      totalBalance.totalOrchardBalance +
-                      totalBalance.totalSaplingBalance +
-                      totalBalance.totalTransparentBalance
-                    : 0
-                }
-                currency={currency}
-                privacy={privacy}
-              />
-              <View style={{ marginLeft: 5 }}>
-                <PriceFetcher />
-              </View>
+        {showFiat && (
+          <Animated.View
+            entering={reducedMotion ? FadeIn.duration(REVEAL_MS) : materialize}
+            onLayout={e => onUsdRowLayout?.(e.nativeEvent.layout.height)}
+            style={{ flexDirection: 'row', alignItems: 'center' }}
+          >
+            <CurrencyAmount
+              style={{ marginTop: 0, marginBottom: 0 }}
+              priceDate={zecPrice.date}
+              price={zecPrice.zecPrice}
+              amtZec={
+                totalBalance
+                  ? totalBalance.totalIronwoodBalance +
+                    totalBalance.totalOrchardBalance +
+                    totalBalance.totalSaplingBalance +
+                    totalBalance.totalTransparentBalance
+                  : 0
+              }
+              currency={currency}
+              privacy={privacy}
+            />
+            <View style={{ marginLeft: 5 }}>
+              <PriceFetcher />
             </View>
-          )}
+          </Animated.View>
+        )}
 
         {showShieldButton &&
           !noBalance &&

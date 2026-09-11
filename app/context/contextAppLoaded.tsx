@@ -86,7 +86,6 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   nym: false,
   setNymOption: async () => {},
   mixnetView: null,
-  disableMixnet: async () => {},
   reenableMixnet: async () => {},
   setModeOption: async () => {},
   setCurrencyOption: async () => {},
