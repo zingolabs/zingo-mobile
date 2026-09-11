@@ -61,7 +61,6 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
     justifyContent: 'center',
     backgroundColor: bg,
     margin: 0,
-    marginTop: 10,
     padding: 5,
     minWidth: 40,
     minHeight: 40,

@@ -8,7 +8,6 @@ exports[`Component PriceFetcher - test PriceFetcher - snapshot 1`] = `
       "backgroundColor": "#011401",
       "justifyContent": "center",
       "margin": 0,
-      "marginTop": 10,
       "minHeight": 40,
       "minWidth": 40,
       "padding": 5,
