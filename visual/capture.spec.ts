@@ -32,21 +32,24 @@ const shot = (id: string, state: string) =>
 const FRAME = 1200;
 // Fake-clock milliseconds for hover/press feedback to settle.
 const FEEDBACK = 200;
-const STATIC_SETTLES = [400, 1500, 3500, 6000];
+// Fake-clock milliseconds per display frame.
+const TICK = 16;
 // CSS animations and transitions run on real time, not the fake clock, so
 // the screenshot freezes them (finite ones jump to their end state) and
 // hides the text caret, whose blink is real time too.
 const still = { animations: 'disabled', caret: 'hide' } as const;
+// Resolves on the next real rendering step, which also delivers RN-web's
+// pending onLayout (a ResizeObserver) entries.
+const RENDERED =
+  'new Promise(r => { const o = new ResizeObserver(() => { o.disconnect(); r(); }); o.observe(document.documentElement); })';
 
-async function shootStatic(
-  p: Page,
-  settle: number,
-): Promise<Buffer | undefined> {
-  const blank = await p.screenshot(still);
-  await p.waitForTimeout(settle);
-  await p.clock.runFor(FRAME);
-  const frame = await p.screenshot(still);
-  return frame.equals(blank) ? undefined : frame;
+// Steps the fake clock one frame at a time with a real rendering step between
+// frames, so a sheet measured after it mounts still presents inside `ms`.
+async function play(p: Page, ms: number) {
+  for (let t = 0; t < ms; t += TICK) {
+    await p.clock.runFor(TICK);
+    await p.evaluate(RENDERED);
+  }
 }
 
 for (const entry of entries) {
@@ -64,25 +67,16 @@ for (const entry of entries) {
     // filmstrip); nothing here to pixel-diff for them.
     if (entry.tags?.includes('animated')) return;
 
-    // Fonts and layout observers run on real time, outside the fake clock.
-    // Let them land first, so every animation they trigger (a sheet
-    // presenting after its measurement) plays inside the stepped window
-    // below instead of racing the screenshot.
+    // Fonts load on real time, outside the fake clock.
     await page.evaluate('document.fonts.ready');
 
+    // A sheet mounts on the first fake frame and measures on a real
+    // rendering step after it, so its present needs both clocks interleaved.
     if (entry.tags?.includes('static')) {
-      let frame = await shootStatic(page, STATIC_SETTLES[0]);
-      for (let i = 1; i < STATIC_SETTLES.length && !frame; i += 1) {
-        const fresh = await page.context().newPage();
-        await fresh.clock.install({ time: 0 });
-        await fresh.clock.pauseAt(0);
-        await fresh.goto(`/iframe.html?id=${entry.id}&viewMode=story`);
-        await fresh.locator('#storybook-root').waitFor({ state: 'visible' });
-        await fresh.evaluate('document.fonts.ready');
-        frame = await shootStatic(fresh, STATIC_SETTLES[i]);
-        await fresh.close();
-      }
-      if (!frame) {
+      const blank = await page.screenshot(still);
+      await play(page, FRAME);
+      const frame = await page.screenshot(still);
+      if (frame.equals(blank)) {
         throw new Error(`static story never presented: ${entry.id}`);
       }
       writeFileSync(shot(entry.id, 'default'), frame);
