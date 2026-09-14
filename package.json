@@ -141,7 +141,7 @@
     "storybook": "^9.1.4",
     "tsx": "^4.23.13",
     "typescript": "5.5.4",
-    "vite": "^8.2.2"
+    "vite": "^8.3.0"
   },
   "engines": {
     "node": ">=20"
