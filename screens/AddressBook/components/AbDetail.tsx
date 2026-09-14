@@ -23,6 +23,9 @@ import ChainSelect from '@ui/widgets/ChainSelect';
 import { chainDisplayName } from '@ui/widgets/chainDisplayName';
 import Utils from '@app/utils';
 import { parseZcashURI } from '@app/uris';
+// Straight from the module rather than the `uris` barrel, as Send does, so the
+// ZNS SDK stays out of that barrel's module graph.
+import { isZnsAlias, resolveZnsName } from '@app/uris/resolveZnsName';
 import {
   possibleChainsForAddress,
   validateAddressForChain,
@@ -73,6 +76,14 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
   const [errorAddress, setErrorAddress] = useState<string>('');
   // 1 - OK, 0 - Empty, -1 - KO (mirrors the standalone TextInputAddress).
   const [validAddress, setValidAddress] = useState<number>(0);
+  // A ZNS alias the indexer does not know: reported instead of the
+  // invalid-address text, since the name is not malformed, just unregistered.
+  const [znsNotFound, setZnsNotFound] = useState<boolean>(false);
+  // The alias a resolution came from, kept beside the address it produced so
+  // the field — now a unified address — can still show which name it was.
+  const [zns, setZns] = useState<{ alias: string; address: string } | null>(
+    null,
+  );
   // Chain code of the contact ('ZEC' by default; 'BTC'/'ETH'/... when
   // the multi-chain UI is active). Editable only when adding.
   const [swapChain, setSwapChain] = useState<string>(
@@ -85,9 +96,11 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
   const [possibleChains, setPossibleChains] = useState<string[]>([
     ...SWAP_ADDRESS_CHAINS,
   ]);
-  // The chain picker is only editable while adding a new contact; otherwise
-  // the chain is fixed.
-  const showSwapChain = action === AddressBookActionEnum.Add;
+  // TEMPORARY: swaps are out of the app for now, so the chain is locked to
+  // Zcash. Restore `action === AddressBookActionEnum.Add` when swaps return.
+  const showSwapChain = false;
+  // Whether the field holds a ZNS name rather than an address.
+  const addressIsZns = !!address && isZnsAlias(address);
 
   useEffect(() => {
     if (currentAddress) {
@@ -150,6 +163,12 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
     if (!showSwapChain) {
       return;
     }
+    // A ZNS name only ever resolves to a Zcash address.
+    if (addressIsZns) {
+      setPossibleChains([GlobalConst.zecSwapChain]);
+      setSwapChain(GlobalConst.zecSwapChain);
+      return;
+    }
     let cancelled = false;
     const timer = setTimeout(async () => {
       const chains = await possibleChainsForAddress(address, server.chainName);
@@ -209,11 +228,51 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
     }
   };
 
+  // Zcash Name Service, as in Send: a ZNS alias in the address field is looked
+  // up and swapped for the unified address it points at, so the contact is
+  // saved with a real address. The alias is offered as the label when the
+  // user has not written one. Debounced: each run is a network round trip.
+  useEffect(() => {
+    if (!addressIsZns) {
+      setZnsNotFound(false);
+      setZns(previous =>
+        previous && previous.address !== address ? null : previous,
+      );
+      return;
+    }
+    setZnsNotFound(false);
+    let cancelled = false;
+    const timer = setTimeout(async () => {
+      const resolution = await resolveZnsName(address, server.chainName);
+      if (cancelled) {
+        return;
+      }
+      if (resolution.ok) {
+        const alias = address.trim().toLowerCase();
+        setZns({ alias, address: resolution.address });
+        setLabel(previous => (previous?.trim() ? previous : alias));
+        setAddress(resolution.address);
+      } else {
+        setZnsNotFound(true);
+      }
+    }, 500);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [address, addressIsZns, server.chainName]);
+
   // Validate the address for the selected chain (async — the ZEC check hits the
   // native RPC), mirroring the standalone TextInputAddress.
   useEffect(() => {
     let cancelled = false;
-    if (address) {
+    if (addressIsZns) {
+      // Not an address yet: the resolver effect above owns the verdict.
+      setValidAddress(znsNotFound ? -1 : 0);
+      setErrorAddress(
+        znsNotFound ? (translate('send.znsnamenotfound') as string) : '',
+      );
+    } else if (address) {
       validateAddressForChain(swapChain, address, server.chainName).then(
         valid => {
           if (!cancelled) {
@@ -231,7 +290,14 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
     return () => {
       cancelled = true;
     };
-  }, [address, swapChain, server.chainName, translate]);
+  }, [
+    address,
+    addressIsZns,
+    swapChain,
+    server.chainName,
+    translate,
+    znsNotFound,
+  ]);
 
   // Same navigation the working Send / Swap / ImportUfvk scanners use: go to the
   // ScannerAddress screen and let its callback write the value straight back
@@ -280,7 +346,13 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
             )}
             {validAddress === -1 && (
               <ErrorText>
-                {translate('send.invalidaddress') as string}
+                {
+                  translate(
+                    znsNotFound
+                      ? 'send.znsnamenotfound'
+                      : 'send.invalidaddress',
+                  ) as string
+                }
               </ErrorText>
             )}
           </View>
@@ -296,9 +368,7 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
           >
             <TextInput
               testID="addressbook.address-field"
-              placeholder={
-                translate('addressbook.address-placeholder') as string
-              }
+              placeholder={translate('send.addressplaceholder') as string}
               placeholderTextColor={colors.fgMuted}
               style={{
                 flex: 1,
@@ -336,6 +406,18 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
               />
             </TouchableOpacity>
           </View>
+          {!!zns && zns.address === address && (
+            <RegText
+              testID="addressbook.address.zns"
+              style={{
+                color: colors.fgAccent,
+                fontWeight: '600',
+                marginTop: 5,
+              }}
+            >
+              {`ZNS: ${zns.alias}`}
+            </RegText>
+          )}
         </View>
       ) : (
         // Modify / Delete: address is read-only — same UX as NewAddressTag.
@@ -521,7 +603,9 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
                   errorAddress ||
                   !label ||
                   (label && !label.trim()) ||
-                  !address
+                  !address ||
+                  // An alias still waiting on (or refused by) the indexer.
+                  addressIsZns
                 ? true
                 : false
           }
