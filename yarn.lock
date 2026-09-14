@@ -1764,6 +1764,11 @@
   resolved "https://registry.yarnpkg.com/@noble/ed25519/-/ed25519-2.3.0.tgz#df0dbe424cfd7da4968b956b819c15db5fbe7f21"
   integrity sha512-M7dvXL2B92/M7dw9+gzuydL8qn/jiqNHaoR3Q+cb1q1GHV7uwE17WCyFMG+Y+TZb5izcaXk5TdJRrDUxHXL78A==
 
+"@noble/hashes@^2.2.0":
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/@noble/hashes/-/hashes-2.4.0.tgz#e6a3e98edbed3c8659b28bb8f9b18ca02ec8ea4b"
+  integrity sha512-X5XaVWZIBCT7HHZGm5I7ZQXDwLG+bGXuSrMQAW+7Zvl87h1kmc1ZB1VSRJcpUfoUrGQp4Fkoxm5kZ+Ms+aW+eA==
+
 "@nodable/entities@^2.2.0":
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/@nodable/entities/-/entities-2.2.0.tgz#a1d45a992b022591b1c2b03a77935c939375b642"
@@ -10991,10 +10996,11 @@ yocto-queue@^1.0.0:
   resolved "https://registry.yarnpkg.com/yocto-queue/-/yocto-queue-1.2.2.tgz#3e09c95d3f1aa89a58c114c99223edf639152c00"
   integrity sha512-4LCcse/U2MHZ63HAJVE+v71o7yOdIe4cZ70Wpf8D/IyjDKYQLV5GD46B+hSTjJsvV5PztjvHoU580EftxjDZFQ==
 
-zcashname-sdk@^0.8.7:
-  version "0.8.7"
-  resolved "https://registry.yarnpkg.com/zcashname-sdk/-/zcashname-sdk-0.8.7.tgz#5a300b94ab80d6729eafa51da144e2bfaea16d81"
-  integrity sha512-pcF9llTkYn1nG343V0ryqZKypA/fwRmmd9qeMbkNsCs3BnnibZjjt4TnxS4c6mrZrhl/5q1d6jqtMa6Mr2XdNQ==
+zcashname-sdk@^0.12.0:
+  version "0.12.0"
+  resolved "https://registry.yarnpkg.com/zcashname-sdk/-/zcashname-sdk-0.12.0.tgz#e6023c9bc297d9cf5eeaeb576758c30a9c7df408"
+  integrity sha512-KW1NrurpSX9ezOWL8MFlb7JrzyiyodbD3M9X/O5ExD6BBMZJqciBlyRGhZHyl6OSuMSdXFJTX/3RYdChosgccw==
   dependencies:
     "@noble/ed25519" "^2.0.0"
+    "@noble/hashes" "^2.2.0"
     bech32 "^2.0.0"
