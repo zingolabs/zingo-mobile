@@ -1,7 +1,3 @@
-/**
- * Wedged timers and wedged native calls, and the gates and rate bounds
- * that keep them from re-forming.
- */
 jest.mock('@app/walletBackend', () => ({
   __esModule: true,
   getZecPrice: jest.fn(),
@@ -13,7 +9,7 @@ import React from 'react';
 import { render, waitFor } from '@testing-library/react-native';
 import PriceFetcher, { PriceTrafficDriver } from '@ui/widgets/PriceFetcher';
 import {
-  PRICE_REFRESH_MAX_MS,
+  PRICE_REFRESH_MS,
   priceFetcherStore,
 } from '@ui/widgets/priceFetcherStore';
 import {
@@ -52,6 +48,7 @@ const makeCtx = (over?: Partial<Ctx>): Ctx => ({
   nym: true,
   info: mockInfo,
   selectServer: SelectServerEnum.auto,
+  mixnetView: READY_VIEW,
   ...over,
 });
 
@@ -112,9 +109,8 @@ test('a tick fired into a refusing window never wedges the cadence', async () =>
   });
   const view = render(surfaceUi(ctx, setZecPrice));
   await jest.advanceTimersByTimeAsync(0);
-  expect(price).toHaveBeenCalledTimes(1); // the boot fetch, then the cadence
+  expect(price).toHaveBeenCalledTimes(1);
 
-  // The transport dies; the pending tick fires into the refusing window.
   view.rerender(
     surfaceUi(
       makeCtx({
@@ -124,10 +120,9 @@ test('a tick fired into a refusing window never wedges the cadence', async () =>
       setZecPrice,
     ),
   );
-  await jest.advanceTimersByTimeAsync(PRICE_REFRESH_MAX_MS + 1_000);
-  expect(price).toHaveBeenCalledTimes(1); // refused, correctly
+  await jest.advanceTimersByTimeAsync(PRICE_REFRESH_MS + 1_000);
+  expect(price).toHaveBeenCalledTimes(1);
 
-  // The transport recovers: the cadence must come back.
   view.rerender(
     surfaceUi(
       makeCtx({
@@ -144,16 +139,14 @@ test('a tick fired into a refusing window never wedges the cadence', async () =>
 test('a wedged native call retires after its TTL and a fresh one runs', async () => {
   jest.useFakeTimers();
   price
-    .mockImplementationOnce(() => new Promise(() => {})) // wedged forever
+    .mockImplementationOnce(() => new Promise(() => {}))
     .mockResolvedValue({ price: 42, error: '' });
   const setZecPrice = jest.fn();
 
   render(surfaceUi(makeCtx(), setZecPrice));
-  // Entry: both bounded attempts ride the one wedged call. The next tick
-  // lands after the corpse's TTL and retires it.
-  await jest.advanceTimersByTimeAsync(60_000 + PRICE_REFRESH_MAX_MS + 1_000);
+  await jest.advanceTimersByTimeAsync(6 * 60_000 + 1_000);
 
-  expect(price.mock.calls.length).toBeGreaterThan(1); // a fresh call ran
+  expect(price.mock.calls.length).toBeGreaterThan(1);
   expect(setZecPrice).toHaveBeenCalledWith(42, expect.any(Number));
 });
 
@@ -164,14 +157,14 @@ test('the bare active event arms no cadence behind the gate', async () => {
 
   render(surfaceUi(makeCtx(), setZecPrice));
   await jest.advanceTimersByTimeAsync(0);
-  expect(price).toHaveBeenCalledTimes(1); // the mount entry
+  expect(price).toHaveBeenCalledTimes(1);
 
   fireAppState('background');
-  fireAppState('active'); // the user may still sit on the biometric prompt
+  fireAppState('active');
   await jest.advanceTimersByTimeAsync(61_000);
-  expect(price).toHaveBeenCalledTimes(1); // no tick behind the gate
+  expect(price).toHaveBeenCalledTimes(1);
 
-  priceFetcherStore.foregroundReturned(); // the gate opened
+  priceFetcherStore.foregroundReturned();
   await jest.advanceTimersByTimeAsync(0);
   expect(price).toHaveBeenCalledTimes(2);
 });
@@ -208,22 +201,22 @@ test('repeated returns during a failure window are rate-bound', async () => {
   const setZecPrice = jest.fn();
 
   render(surfaceUi(makeCtx(), setZecPrice));
-  await waitFor(() => expect(price).toHaveBeenCalledTimes(2)); // failed entry
+  await waitFor(() => expect(price).toHaveBeenCalledTimes(2));
 
   fireAppState('background');
   fireAppState('active');
-  priceFetcherStore.foregroundReturned(); // the first return fetches
+  priceFetcherStore.foregroundReturned();
   await waitFor(() => expect(price).toHaveBeenCalledTimes(4));
 
   fireAppState('background');
   fireAppState('active');
-  priceFetcherStore.foregroundReturned(); // an immediate hop: bounded
+  priceFetcherStore.foregroundReturned();
   await flush();
   await flush();
   expect(price).toHaveBeenCalledTimes(4);
 });
 
-test('a mid-flight opt-in withdrawal leaves no wedge for a re-grant', async () => {
+test('a mid-flight transport loss leaves no wedge for the recovery', async () => {
   jest.useFakeTimers();
   let land: (v: { price: number; error: string }) => void = () => {};
   price
@@ -238,13 +231,13 @@ test('a mid-flight opt-in withdrawal leaves no wedge for a re-grant', async () =
 
   const view = render(surfaceUi(makeCtx(), setZecPrice));
   await jest.advanceTimersByTimeAsync(0);
-  expect(price).toHaveBeenCalledTimes(1); // entry in flight
+  expect(price).toHaveBeenCalledTimes(1);
 
-  view.rerender(surfaceUi(makeCtx({ nym: false }), setZecPrice)); // Nym off
+  view.rerender(surfaceUi(makeCtx({ mixnetView: DIED_VIEW }), setZecPrice));
   land({ price: -1, error: 'refused' });
-  await jest.advanceTimersByTimeAsync(60_000); // any dangling tick fires
+  await jest.advanceTimersByTimeAsync(60_000);
 
-  view.rerender(surfaceUi(makeCtx(), setZecPrice)); // Nym back on
+  view.rerender(surfaceUi(makeCtx({ mixnetView: READY_VIEW }), setZecPrice));
   await jest.advanceTimersByTimeAsync(61_000);
   expect(setZecPrice).toHaveBeenCalledWith(42, expect.any(Number));
 });

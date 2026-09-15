@@ -14,7 +14,6 @@
   "biometricsfailed-body": "Güvenlik Nedeniyle, uygulama kilitlendi.",
   "biometricsfailed-footer": "Kilidi açmak için kimlik doğrulama yöntemini kullanın.",
   "biometricsfailed-button": "Kilidi aç",
-  "price-ring-none": "Henüz ZEC fiyatı yok",
   "price-ring-live": "ZEC fiyatı güncel",
   "price-ring-stale": "ZEC fiyatı güncel değil",
   "biometrics-message": "Lütfen kimliğinizi doğrulayın",
@@ -472,7 +471,7 @@
     "walletkeyssaved": "Son Cüzdan Kurtarma Bilgisi cihazda güvenli bir şekilde saklandı.",
     "walletkeyswarning": "Bu, kurtarma ifadesi'inizi saklamak için denetlenmemiş kodun güvenliğine bağlı olan deneysel bir özelliktir. Lütfen önemli miktarda fon içeren seed'lerle kullanmayın!",
     "value-language-tr": "Türkçe",
-    "nym-disable-warning": "Mixnet Modunu kapatmak işlemlerinizi ve fiyat sorgularınızı açık ağ üzerinden yönlendirir ve etkinliğinizi IP adresinizle ilişkilendirir.",
+    "nym-disable-warning": "Mixnet Modunu kapatmak işlemlerinizi açık ağ üzerinden yönlendirir ve etkinliğinizi IP adresinizle ilişkilendirir.",
     "nym-network": "NYM Mixnet",
     "nym-enhanced-privacy": "Gelişmiş Gizlilik",
     "nym-diagnostics": "Mixnet tanılamasını çalıştır"

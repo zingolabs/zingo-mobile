@@ -1,22 +1,7 @@
-/**
- * Evidence tests for the PR 1343 review findings on the Send screen's
- * price surface. Each test encodes the behavior the finding says the
- * screen should have: it fails on the broken code and passes once the
- * finding is fixed.
- *
- * F8 (amount half): the in-form USD amounts dim when the price is stale.
- * N7: the send-confirmation conversions dim on a stale price too. The
- *     stale hook is mocked as a function of the priceDate it receives,
- *     so a Confirm or Send row that drops its priceDate wiring goes
- *     back to full strength and the test fails.
- * H3: the USD-entry derived ZEC amount, the figure that
- *     decides what is sent, carries the same stale dim.
- */
 jest.mock('@ui/widgets/priceFetcherStore', () => ({
   __esModule: true,
-  PRICE_REFRESH_MIN_MS: 5 * 60_000,
-  PRICE_REFRESH_MAX_MS: 10 * 60_000,
-  PRICE_STALE_MS: 10 * 60_000 + 30_000,
+  PRICE_REFRESH_MS: 60_000,
+  PRICE_STALE_MS: 60_000 + 30_000,
   priceFetcherStore: {
     setDeps: jest.fn(),
     attach: jest.fn(() => () => {}),
@@ -121,8 +106,6 @@ beforeEach(() => {
     nextFetchDelayMs: 0,
     surfaceActive: false,
   });
-  // The health follows the priceDate each call site actually wires
-  // through, so an unwired row cannot pass by a blanket decision.
   healthHook.mockImplementation(priceDate =>
     priceDate === 0
       ? 'absent'
@@ -130,7 +113,6 @@ beforeEach(() => {
         ? 'stale'
         : 'live',
   );
-  // Send's mount effects call these; the shared RPCModule mock lacks them.
   const { NativeModules } = require('react-native');
   NativeModules.RPCModule.getDonationAddress = jest.fn(async () => '{}');
 });
@@ -140,9 +122,6 @@ test('F8: the in-form USD amounts dim when the price is stale', () => {
     sendUi({ zecPrice: 33.33, date: Date.now() - 11 * 60_000 }),
   );
 
-  // The form rows render at 16 pt (amount) and 14 pt (spendable); the
-  // header BalanceRow dims already and must not satisfy this test, and
-  // the bare "$" input glyph (no trailing space) is not an amount.
   const { StyleSheet } = require('react-native');
   const formAmounts = view
     .getAllByText(/^\$ /)
@@ -154,25 +133,21 @@ test('F8: the in-form USD amounts dim when the price is stale', () => {
   formAmounts.forEach(s => expect(s.color).toBe('#888888'));
 });
 
-test('P8: an absent price dims the USD rows like the ring beside them', () => {
-  // Not stale, absent: the price never existed and the hook sees 0.
+test('P8: an absent price hides the in-form USD amounts and the ring', () => {
   const view = render(sendUi({ zecPrice: 0, date: 0 }));
 
   const { StyleSheet } = require('react-native');
   const formAmounts = view
-    .getAllByText(/^\$ /)
+    .queryAllByText(/^\$ /)
     .map(t => StyleSheet.flatten(t.props.style))
     .filter(
       (s: { fontSize?: number }) => s.fontSize === 16 || s.fontSize === 14,
     );
-  expect(formAmounts.length).toBeGreaterThan(0);
-  formAmounts.forEach(s => expect(s.color).toBe('#888888'));
+  expect(formAmounts).toHaveLength(0);
+  expect(view.queryByTestId('pricefetcher.ring')).toBeNull();
 });
 
 test('N7: the send-confirmation conversions dim on a stale price too', () => {
-  // The one screen where the figure drives a signing decision must not
-  // show a stale conversion at full strength; the arg-keyed stale mock
-  // dims only rows that wire their priceDate through.
   const state = { ...defaultAppContextLoaded };
   state.translate = mockTranslate;
   state.info = mockInfo;
@@ -219,8 +194,6 @@ test('H3: the USD-entry derived ZEC amount dims on a stale price', () => {
     sendUi({ zecPrice: 33.33, date: Date.now() - 11 * 60_000 }),
   );
 
-  // Swap the entry direction: the user types USD and the wallet derives
-  // the ZEC it will actually send from the stale price.
   fireEvent.press(view.getByTestId('send.swap-entry'));
   const derived = view
     .UNSAFE_getAllByType(ZecAmount)

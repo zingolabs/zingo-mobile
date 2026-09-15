@@ -1,6 +1,3 @@
-/**
- * The staleness cue and the display-only ring's accessibility.
- */
 jest.mock('@app/walletBackend', () => ({
   __esModule: true,
   getZecPrice: jest.fn().mockResolvedValue({ price: -1, error: 'refused' }),
@@ -13,7 +10,7 @@ import { render, waitFor } from '@testing-library/react-native';
 import PriceFetcher, { PriceTrafficDriver } from '@ui/widgets/PriceFetcher';
 import QuoteRefreshRing from '@ui/primitives/QuoteRefreshRing';
 import {
-  PRICE_REFRESH_MAX_MS,
+  PRICE_REFRESH_MS,
   priceFetcherStore,
 } from '@ui/widgets/priceFetcherStore';
 import {
@@ -22,10 +19,20 @@ import {
 } from '@app/context';
 import { SelectServerEnum } from '@app/AppState';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
+import { MixnetView } from '@app/walletBackend/transforms/mixnetView';
 
 beforeEach(() => {
   priceFetcherStore.resetForTests();
 });
+
+const READY_VIEW: MixnetView = {
+  statusKey: 'mixnet.status.ready',
+  socks5Addr: '127.0.0.1:1080',
+  narration: null,
+  sendBlocked: false,
+  recovery: 'none',
+  reconnecting: false,
+};
 
 type Ctx = typeof defaultAppContextLoaded;
 const makeCtx = (over?: Partial<Ctx>): Ctx => ({
@@ -35,6 +42,7 @@ const makeCtx = (over?: Partial<Ctx>): Ctx => ({
   nym: true,
   info: mockInfo,
   selectServer: SelectServerEnum.auto,
+  mixnetView: READY_VIEW,
   ...over,
 });
 
@@ -103,31 +111,41 @@ test('a current price reaches screen readers as a label too', () => {
 
 test('the ring restarts on every refresh cycle, failed ones included', async () => {
   jest.useFakeTimers();
-  const view = render(fetcherUi(makeCtx())); // every fetch here is refused
+  const view = render(
+    fetcherUi(makeCtx({ zecPrice: { zecPrice: 33.33, date: Date.now() } })),
+  );
   await jest.advanceTimersByTimeAsync(0);
   const firstCycle = view.UNSAFE_getByType(QuoteRefreshRing).props.resetKey;
 
-  // Past the longest draw plus both bounded attempts: a second refused
-  // cycle has completed and redrawn.
-  await jest.advanceTimersByTimeAsync(PRICE_REFRESH_MAX_MS + 61_000);
+  await jest.advanceTimersByTimeAsync(PRICE_REFRESH_MS + 61_000);
   const secondCycle = view.UNSAFE_getByType(QuoteRefreshRing).props.resetKey;
 
-  // A frozen full ring would misreport a failing refresh as complete.
   expect(secondCycle).not.toBe(firstCycle);
   jest.useRealTimers();
 });
 
-test('a price that never arrived is announced as absent, not stale', async () => {
-  const view = render(fetcherUi(makeCtx())); // no price has ever existed
+test('a price that never arrived renders no ring', async () => {
+  const view = render(fetcherUi(makeCtx()));
   await waitFor(() =>
-    expect(view.getByLabelText('price-ring-none')).toBeTruthy(),
+    expect(view.queryByTestId('pricefetcher.ring')).toBeNull(),
   );
 });
 
-test('without the Nym opt-in no ring counts down to nothing', () => {
-  const view = render(fetcherUi(makeCtx({ nym: false })));
-  // A countdown beside a surface that will never fetch misleads; the
-  // unconsented state renders no ring at all.
+test('a switched-off transport shows no ring', () => {
+  const view = render(
+    fetcherUi(
+      makeCtx({
+        mixnetView: {
+          statusKey: 'mixnet.status.off',
+          socks5Addr: null,
+          narration: null,
+          sendBlocked: false,
+          recovery: 'reenable',
+          reconnecting: false,
+        },
+      }),
+    ),
+  );
   expect(view.queryByTestId('pricefetcher.ring')).toBeNull();
 });
 
@@ -146,7 +164,5 @@ test('a refusing transport hides the ring for the same reason', () => {
       }),
     ),
   );
-  // The cadence is paused by the policy; a ring filling toward a
-  // refresh that cannot come misleads exactly like the unconsented case.
   expect(view.queryByTestId('pricefetcher.ring')).toBeNull();
 });

@@ -1722,22 +1722,24 @@ const Send: React.FunctionComponent<SendProps> = ({
                             />
                           </TouchableOpacity>
                           {inputZec ? (
-                            <CurrencyAmount
-                              style={{
-                                marginTop: 0,
-                                marginBottom: 0,
-                                fontSize: 16,
-                              }}
-                              priceDate={zecPrice.date}
-                              price={zecPrice.zecPrice}
-                              amtZec={
-                                Utils.parseStringLocaleToNumberFloat(
-                                  amountText,
-                                ) || 0
-                              }
-                              currency={currency}
-                              privacy={privacy}
-                            />
+                            zecPrice.date > 0 && (
+                              <CurrencyAmount
+                                style={{
+                                  marginTop: 0,
+                                  marginBottom: 0,
+                                  fontSize: 16,
+                                }}
+                                priceDate={zecPrice.date}
+                                price={zecPrice.zecPrice}
+                                amtZec={
+                                  Utils.parseStringLocaleToNumberFloat(
+                                    amountText,
+                                  ) || 0
+                                }
+                                currency={currency}
+                                privacy={privacy}
+                              />
+                            )
                           ) : (
                             <ZecAmount
                               style={{ marginLeft: 0 }}
@@ -1755,9 +1757,13 @@ const Send: React.FunctionComponent<SendProps> = ({
                               privacy={privacy}
                             />
                           )}
-                          <View style={{ marginLeft: inputZec ? 5 : 2 }}>
-                            <PriceFetcher backgroundColor={colors.bgSurface} />
-                          </View>
+                          {zecPrice.date > 0 && (
+                            <View style={{ marginLeft: inputZec ? 5 : 2 }}>
+                              <PriceFetcher
+                                backgroundColor={colors.bgSurface}
+                              />
+                            </View>
+                          )}
                         </>
                       )}
                   </View>

@@ -1,7 +1,3 @@
-/**
- * The native price call in flight, on timeout, on detach, and on
- * resolve or reject.
- */
 jest.mock('@app/walletBackend', () => ({
   __esModule: true,
   getZecPrice: jest.fn(),
@@ -14,6 +10,7 @@ import { render, renderHook } from '@testing-library/react-native';
 import PriceFetcher, { PriceTrafficDriver } from '@ui/widgets/PriceFetcher';
 import QuoteRefreshRing from '@ui/primitives/QuoteRefreshRing';
 import {
+  PRICE_REFRESH_MS,
   priceFetcherStore,
   usePriceStale,
 } from '@ui/widgets/priceFetcherStore';
@@ -36,14 +33,6 @@ const READY_VIEW: MixnetView = {
   recovery: 'none',
   reconnecting: false,
 };
-const UNKNOWN_VIEW: MixnetView = {
-  statusKey: 'mixnet.status.unknown',
-  socks5Addr: null,
-  narration: null,
-  sendBlocked: true,
-  recovery: 'reenable',
-  reconnecting: false,
-};
 const DIED_VIEW: MixnetView = {
   statusKey: 'mixnet.status.died',
   socks5Addr: null,
@@ -61,6 +50,7 @@ const makeCtx = (over?: Partial<Ctx>): Ctx => ({
   nym: true,
   info: mockInfo,
   selectServer: SelectServerEnum.auto,
+  mixnetView: READY_VIEW,
   ...over,
 });
 
@@ -114,23 +104,19 @@ test('a market-less surface renders no ring at all', async () => {
   );
   await jest.advanceTimersByTimeAsync(1_000);
 
-  // No market means no cadence: a full frozen ring here would promise a
-  // refresh that cannot come.
   expect(price).not.toHaveBeenCalled();
   expect(view.queryByTestId('pricefetcher.ring')).toBeNull();
 });
 
 test('a bound expiry never retries against the same wedged call', async () => {
   jest.useFakeTimers();
-  price.mockImplementation(() => new Promise(() => {})); // wedged forever
+  price.mockImplementation(() => new Promise(() => {}));
   const setZecPrice = jest.fn();
 
   render(surfaceUi(makeCtx(), setZecPrice));
   await jest.advanceTimersByTimeAsync(0);
-  expect(price).toHaveBeenCalledTimes(1); // the boot fetch, wedged
+  expect(price).toHaveBeenCalledTimes(1);
 
-  // One bound later the flight is over: no second 30 s spent awaiting
-  // the identical dead promise.
   await jest.advanceTimersByTimeAsync(31_000);
   expect(priceFetcherStore.snapshot().loading).toBe(false);
   expect(price).toHaveBeenCalledTimes(1);
@@ -139,20 +125,18 @@ test('a bound expiry never retries against the same wedged call', async () => {
 test('a session detached mid-flight leaves no loading behind', async () => {
   jest.useFakeTimers();
   price
-    .mockImplementationOnce(() => new Promise(() => {})) // wedged flight
+    .mockImplementationOnce(() => new Promise(() => {}))
     .mockResolvedValue({ price: 42, error: '' });
   const setZecPrice = jest.fn();
 
   const view = render(surfaceUi(makeCtx(), setZecPrice));
   await jest.advanceTimersByTimeAsync(0);
-  expect(price).toHaveBeenCalledTimes(1); // the boot fetch, in flight
+  expect(price).toHaveBeenCalledTimes(1);
 
-  view.unmount(); // wallet closed mid-flight
+  view.unmount();
 
-  render(surfaceUi(makeCtx(), setZecPrice)); // the next wallet session
+  render(surfaceUi(makeCtx(), setZecPrice));
   await jest.advanceTimersByTimeAsync(0);
-  // The new session's guaranteed boot fetch, not a 5-10 minute wait
-  // behind the dead session's loading flag.
   expect(price).toHaveBeenCalledTimes(2);
   expect(setZecPrice).toHaveBeenCalledWith(42, expect.any(Number));
 });
@@ -170,35 +154,13 @@ test('a price landing while the app is away is recorded', async () => {
 
   render(surfaceUi(makeCtx(), setZecPrice));
   await jest.advanceTimersByTimeAsync(0);
-  expect(price).toHaveBeenCalledTimes(1); // the boot fetch, in flight
+  expect(price).toHaveBeenCalledTimes(1);
 
-  fireAppState('background'); // a two-second hop away
+  fireAppState('background');
   land({ price: 42, error: '' });
   await jest.advanceTimersByTimeAsync(0);
 
-  // The traffic was already spent; discarding the value would only buy
-  // a second identical fetch after the gate opens.
   expect(setZecPrice).toHaveBeenCalledWith(42, expect.any(Number));
-});
-
-test("a refusal under a transient 'unknown' arms the follow-up", async () => {
-  jest.useFakeTimers();
-  price.mockResolvedValue({ price: -1, error: 'refused' });
-  const setZecPrice = jest.fn();
-
-  const view = render(
-    surfaceUi(makeCtx({ mixnetView: UNKNOWN_VIEW }), setZecPrice),
-  );
-  await jest.advanceTimersByTimeAsync(0);
-  const refusedUnderUnknown = price.mock.calls.length;
-  expect(refusedUnderUnknown).toBeGreaterThan(0);
-
-  // 'unknown' is one failed status poll, not a policy, on the arm path
-  // exactly as on the drop path: ready must fire the follow-up now, not
-  // a full tick later.
-  view.rerender(surfaceUi(makeCtx({ mixnetView: READY_VIEW }), setZecPrice));
-  await jest.advanceTimersByTimeAsync(0);
-  expect(price.mock.calls.length).toBeGreaterThan(refusedUnderUnknown);
 });
 
 test('a parked return the landing declines is consumed, not doubled', async () => {
@@ -218,43 +180,38 @@ test('a parked return the landing declines is consumed, not doubled', async () =
     surfaceUi(makeCtx({ mixnetView: READY_VIEW }), setZecPrice),
   );
   await jest.advanceTimersByTimeAsync(0);
-  expect(price).toHaveBeenCalledTimes(1); // the boot fetch, in flight
+  expect(price).toHaveBeenCalledTimes(1);
 
-  priceFetcherStore.foregroundReturned(); // a return parks on the flight
+  priceFetcherStore.foregroundReturned();
   view.rerender(surfaceUi(makeCtx({ mixnetView: DIED_VIEW }), setZecPrice));
   land({ price: -1, error: 'refused' });
-  await jest.advanceTimersByTimeAsync(0); // the landing declines the park
+  await jest.advanceTimersByTimeAsync(0);
 
-  await jest.advanceTimersByTimeAsync(6_000); // past the burst cooldown
+  await jest.advanceTimersByTimeAsync(6_000);
   view.rerender(surfaceUi(makeCtx({ mixnetView: READY_VIEW }), setZecPrice));
   await jest.advanceTimersByTimeAsync(0);
 
-  // The recovery entry (a refused pair) and nothing more: the ancient
-  // park must not ride its finally into a cooldown-free double.
   expect(price).toHaveBeenCalledTimes(3);
 });
 
-test('the boot fetch shows the first-fetch spinner', async () => {
+test('the boot fetch renders nothing before the first price', async () => {
   jest.useFakeTimers();
-  price.mockImplementation(() => new Promise(() => {})); // in flight
+  price.mockImplementation(() => new Promise(() => {}));
   const setZecPrice = jest.fn();
 
   const view = render(surfaceUi(makeCtx(), setZecPrice));
   await jest.advanceTimersByTimeAsync(0);
 
-  // The driver's attach effect starts the fetch before this fetcher's
-  // subscribe effect runs; the missed emit must be re-read, or the one
-  // path the spinner exists for never shows it.
-  const { ActivityIndicator } = require('react-native');
-  expect(view.UNSAFE_queryByType(ActivityIndicator)).toBeTruthy();
+  expect(price).toHaveBeenCalledTimes(1);
+  expect(view.queryByTestId('pricefetcher.ring')).toBeNull();
 });
 
-test('a ceiling draw plus fetch latency does not dim', () => {
-  const withinHeadroom = Date.now() - (10 * 60_000 + 10_000);
+test('the cadence plus fetch latency does not dim', () => {
+  const withinHeadroom = Date.now() - (PRICE_REFRESH_MS + 10_000);
   const { result: healthy } = renderHook(() => usePriceStale(withinHeadroom));
   expect(healthy.current).toBe(false);
 
-  const pastHeadroom = Date.now() - (10 * 60_000 + 31_000);
+  const pastHeadroom = Date.now() - (PRICE_REFRESH_MS + 31_000);
   const { result: slipped } = renderHook(() => usePriceStale(pastHeadroom));
   expect(slipped.current).toBe(true);
 });
@@ -277,14 +234,10 @@ test('the ring fills from coarse ticks, not a per-frame animation', async () => 
   );
   await jest.advanceTimersByTimeAsync(30_000);
 
-  // Mid-fill: the coarse tick interval pends, and no Animated frame
-  // pipeline was ever started.
   expect(timingSpy).not.toHaveBeenCalled();
   const midFill = jest.getTimerCount();
   expect(midFill).toBeGreaterThan(0);
 
-  // Past the full duration the fill is complete and the interval has
-  // cleared itself instead of ticking forever.
   await jest.advanceTimersByTimeAsync(31_000);
   expect(timingSpy).not.toHaveBeenCalled();
   expect(jest.getTimerCount()).toBeLessThan(midFill);

@@ -1,29 +1,5 @@
-/**
- * Drives the Mixnet Mode lifecycle for the app (send-over-nym step 5).
- *
- * Policy: Mixnet Mode is a persisted user opt-in, default off and sticky.
- * When enabled, `ensureForConnectedSession` starts the platform transport
- * through the injected seam and attaches the wallet to its address. Turning
- * it off is a deliberate per-session consent (`disable`). A died or failed
- * transport auto-recovers on an exponential backoff and never drops to
- * clearnet on its own. `reenable` is the manual trigger for that recovery,
- * and only a deliberate disable stops the reconnect loop.
- *
- * The transport start is an injected seam (`StartMixnetTransport`) because
- * the platform owns it: on Android the UniFFI proxy shim (step 3 of the
- * critical path) supplies it; tests supply a stub. This coordinator owns
- * cadence and policy only — every payload decision lives in the pure
- * transforms, and every screen projection in the pure transform.
- *
- * Cadence follows the SyncCoordinator idiom: one interval, a lock flag so
- * a slow poll is never enqueued twice, and an onChange callback that
- * publishes the latest view to the context layer. A start or a disable
- * publishes its view immediately, before the transport or the wallet
- * answers.
- */
 import { RPCMixnetIndicatorEnum } from '@app/walletBackend/enums/RPCMixnetIndicatorEnum';
 import {
-  ClearnetConsent,
   MixnetStatusReport,
   describeRejection,
   vetPolledStatus,
@@ -34,68 +10,38 @@ import {
 } from '@app/walletBackend/transforms/mixnetView';
 import {
   attachMixnet,
-  disableMixnet,
   getMixnetBootstrapDetail,
   getMixnetStatus,
 } from '@app/walletBackend/utils/mixnetUtils';
 
-/**
- * What a started platform transport reports back: its local SOCKS5 address
- * and the Exit Node the proxy bound, both of which the wallet's attach seam
- * requires.
- */
 export type MixnetTransportBinding = {
   socks5Addr: string;
   exitNode: string;
 };
 
-/**
- * Starts the platform-hosted mixnet transport and yields its binding.
- * Rejections propagate to the caller.
- */
 export type StartMixnetTransport = () => Promise<MixnetTransportBinding>;
 
-/** Tears down the platform-hosted mixnet transport. */
-export type StopMixnetTransport = () => Promise<void>;
-
-/**
- * Whether a publication is still the latest one issued. Pure. A
- * publication that awaited a native narration fetch may resolve after a
- * newer immediate one; only the latest may reach the screen (#1228).
- */
 export function isCurrentPublication(seq: number, latest: number): boolean {
   return seq === latest;
 }
 
-/** The report published immediately when a start begins. */
 const STARTING_REPORT: MixnetStatusReport = {
   kind: 'status',
   indicator: RPCMixnetIndicatorEnum.bootstrapping,
   socks5Addr: null,
 };
 
-/** The report published immediately when the user disables Mixnet Mode. */
-const OFF_REPORT: MixnetStatusReport = {
-  kind: 'status',
-  indicator: RPCMixnetIndicatorEnum.off,
-  socks5Addr: null,
-};
-
-/** How often the coordinator polls while the transport is bootstrapping. */
 export const BOOTSTRAP_POLL_MILLIS = 2_000;
 
-/** How often the coordinator polls outside of bootstrapping. */
 export const STEADY_POLL_MILLIS = 30_000;
 
-/** Delay before the first auto-reconnect attempt after the transport is lost. */
 export const RECONNECT_BASE_MILLIS = 3_000;
 
-/** Ceiling for the exponential auto-reconnect backoff. */
 export const RECONNECT_MAX_MILLIS = 60_000;
 
+// Arms the mixnet transport at wallet load, polls its status, and auto-recovers a lost transport.
 export class MixnetCoordinator {
   private readonly startTransport: StartMixnetTransport;
-  private readonly stopTransport: StopMixnetTransport;
   private readonly onChange: (view: MixnetView) => void;
 
   private pollTimerID?: ReturnType<typeof setInterval>;
@@ -105,36 +51,20 @@ export class MixnetCoordinator {
   private reconnectDelayMillis: number = RECONNECT_BASE_MILLIS;
   private reconnecting: boolean = false;
   private reconnectActive: boolean = false;
-  // The consent bit belongs to the coordinator, not the wallet: the wallet
-  // reports `off` both for a deliberate disable and for a never-attached
-  // session, and only the former is consent (#1226).
-  private consent: ClearnetConsent = 'none';
-  /** Marks the active enable attempt. */
   private enableEpoch: number = 0;
-  /** Set by `stop`; suppresses any later publish or poll. */
   private stopped: boolean = false;
 
   constructor(
     startTransport: StartMixnetTransport,
-    stopTransport: StopMixnetTransport,
     onChange: (view: MixnetView) => void,
   ) {
     this.startTransport = startTransport;
-    this.stopTransport = stopTransport;
     this.onChange = onChange;
   }
 
-  /**
-   * Enable Mixnet Mode for the session: start the platform transport,
-   * attach the wallet to its address, and begin polling. A failure at
-   * either stage is published as the typed failure view. The session
-   * proceeds, sends stay blocked, and the user is offered re-enable,
-   * never a silent fall-through to clearnet.
-   */
+  // Starts the transport, attaches the wallet, and polls; a failure publishes the typed failure view.
   async ensureForConnectedSession(): Promise<void> {
     const epoch = ++this.enableEpoch;
-    this.consent = 'none';
-    // No poll and no reconnect runs while this start is in progress.
     this.clearPolling();
     this.clearReconnectTimer();
     this.publishStarting();
@@ -157,26 +87,10 @@ export class MixnetCoordinator {
     this.schedulePolling();
   }
 
-  /** The user's deliberate per-session consent to clearnet. */
-  async disable(): Promise<void> {
-    this.enableEpoch += 1;
-    this.consent = 'disabledThisSession';
-    this.reconnectActive = false;
-    this.clearReconnect();
-    this.clearPolling();
-    this.publish(OFF_REPORT);
-    this.publish(await disableMixnet());
-    // Best-effort proxy teardown: consent is already recorded and the off view
-    // published, so a stop failure must not surface as a disable error.
-    await this.stopTransport().catch(() => undefined);
-  }
-
-  /** Recover a died or failed transport by starting it afresh. */
   async reenable(): Promise<void> {
     await this.ensureForConnectedSession();
   }
 
-  /** Stops polling and reconnecting; the coordinator publishes nothing further. */
   stop(): void {
     this.stopped = true;
     this.enableEpoch += 1;
@@ -191,13 +105,7 @@ export class MixnetCoordinator {
     }
   }
 
-  // A transport is lost when it died or became unknowable while the user has
-  // not deliberately dropped to clearnet. Lost transports are auto-recovered;
-  // a consented `off` is not.
   private isLost(status: MixnetStatusReport): boolean {
-    if (this.consent === 'disabledThisSession') {
-      return false;
-    }
     return (
       status.kind === 'failure' ||
       status.indicator === RPCMixnetIndicatorEnum.died
@@ -231,9 +139,6 @@ export class MixnetCoordinator {
   }
 
   private async attemptReconnect(): Promise<void> {
-    if (this.consent === 'disabledThisSession') {
-      return;
-    }
     this.reconnecting = true;
     try {
       await this.ensureForConnectedSession();
@@ -262,7 +167,7 @@ export class MixnetCoordinator {
     this.pollLock = true;
     const epoch = this.enableEpoch;
     try {
-      const status = vetPolledStatus(await getMixnetStatus(), this.consent);
+      const status = vetPolledStatus(await getMixnetStatus());
       if (this.enableEpoch === epoch && !this.stopped) {
         this.publish(status);
       }
@@ -299,14 +204,9 @@ export class MixnetCoordinator {
       return;
     }
     const wasBootstrapping = this.isBootstrapping();
-    // Maintain the sticky recovery flag before publishing, so the view carries
-    // it. A settled state (ready, or a consented off) ends the cycle; a lost
-    // status starts one; bootstrapping leaves it as-is so a reconnect attempt
-    // stays flagged as it comes back up.
     const settled =
       status.kind === 'status' &&
-      (status.indicator === RPCMixnetIndicatorEnum.ready ||
-        status.indicator === RPCMixnetIndicatorEnum.off);
+      status.indicator === RPCMixnetIndicatorEnum.ready;
     if (settled) {
       this.reconnectActive = false;
       this.resetReconnectBackoff();
@@ -329,7 +229,6 @@ export class MixnetCoordinator {
     }
   }
 
-  // This view does not ask the wallet for a detail line.
   private publishStarting(): void {
     if (this.stopped) {
       return;
@@ -341,6 +240,7 @@ export class MixnetCoordinator {
     );
   }
 
+  // A publication superseded during the narration await never reaches the screen.
   private async publishView(
     status: MixnetStatusReport,
     seq: number,
@@ -348,9 +248,6 @@ export class MixnetCoordinator {
     const narration = this.isBootstrapping()
       ? await getMixnetBootstrapDetail()
       : null;
-    // The narration await opened a gap; a newer publication may have
-    // superseded this one meanwhile, and stale state must not reach the
-    // screen (#1228).
     if (!isCurrentPublication(seq, this.publishSeq)) {
       return;
     }

@@ -146,16 +146,12 @@ export default interface AppContextLoaded {
   recoveryWalletInfoOnDevice: boolean;
   performanceLevel: RPCPerformanceLevelEnum;
   blockExplorer: BlockExplorerEnum;
+  // The persisted send-route preference; the transport runs either way.
   nym: boolean;
   setNymOption: (value: boolean) => Promise<void>;
 
-  // Mixnet Mode (send-over-nym step 5). The screen-facing projection of the
-  // per-session policy, or null where the policy is not run (tests inject
-  // mixnetSupported false) — screens render nothing and the send gate stays
-  // open when null. Disable is the deliberate per-session clearnet consent;
-  // re-enable recovers a died or failed transport.
+  // Null where the mixnet policy does not run.
   mixnetView: MixnetView | null;
-  disableMixnet: () => Promise<void>;
   reenableMixnet: () => Promise<void>;
   setModeOption: (value: string) => Promise<void>;
   setCurrencyOption: (value: CurrencyEnum) => Promise<void>;

@@ -1,6 +1,3 @@
-/**
- * The store's observable contract.
- */
 jest.mock('@app/walletBackend', () => ({
   __esModule: true,
   getZecPrice: jest.fn(),
@@ -22,12 +19,7 @@ import {
 import { SelectServerEnum } from '@app/AppState';
 import { getZecPrice } from '@app/walletBackend';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
-import {
-  INITIAL_MIXNET_VIEW,
-  MIXNET_STATUS_KEYS,
-  MixnetView,
-  fetchPolicy,
-} from '@app/walletBackend/transforms/mixnetView';
+import { MixnetView } from '@app/walletBackend/transforms/mixnetView';
 
 const price = getZecPrice as jest.MockedFunction<typeof getZecPrice>;
 
@@ -48,6 +40,7 @@ const makeCtx = (over?: Partial<Ctx>): Ctx => ({
   nym: true,
   info: mockInfo,
   selectServer: SelectServerEnum.auto,
+  mixnetView: READY_VIEW,
   ...over,
 });
 
@@ -90,33 +83,52 @@ afterEach(() => {
   jest.useRealTimers();
 });
 
-test('withdrawing the opt-in takes the ring down', async () => {
+test('a switched-off transport mutes the ring and stops its fill', async () => {
   jest.useFakeTimers();
   price.mockResolvedValue({ price: 42, error: '' });
   const setZecPrice = jest.fn();
+  const priceDate = Date.now();
 
   const view = render(
-    surfaceUi(makeCtx({ mixnetView: READY_VIEW }), setZecPrice),
+    surfaceUi(
+      makeCtx({
+        mixnetView: READY_VIEW,
+        zecPrice: { zecPrice: 42, date: priceDate },
+      }),
+      setZecPrice,
+    ),
   );
   await jest.advanceTimersByTimeAsync(0);
-  expect(view.queryByTestId('pricefetcher.ring')).toBeTruthy();
+  const live = view.UNSAFE_getByType(QuoteRefreshRing).props;
+  expect(live.durationMs).toBe(60_000);
 
-  // Settings turns Nym off: the driver's next deps write must emit, or
-  // an idle wallet keeps a ring filling toward a refusal forever.
   view.rerender(
-    surfaceUi(makeCtx({ mixnetView: READY_VIEW, nym: false }), setZecPrice),
+    surfaceUi(
+      makeCtx({
+        mixnetView: {
+          statusKey: 'mixnet.status.off',
+          socks5Addr: null,
+          narration: null,
+          sendBlocked: false,
+          recovery: 'reenable',
+          reconnecting: false,
+        },
+        zecPrice: { zecPrice: 42, date: priceDate },
+      }),
+      setZecPrice,
+    ),
   );
   await jest.advanceTimersByTimeAsync(0);
-  expect(view.queryByTestId('pricefetcher.ring')).toBeNull();
+  const off = view.UNSAFE_getByType(QuoteRefreshRing).props;
+  expect(off.durationMs).toBe(0);
+  expect(off.color).not.toBe(live.color);
 });
 
 test('an entry flight with no armed deadline never reads full', async () => {
   jest.useFakeTimers();
-  price.mockImplementation(() => new Promise(() => {})); // in flight
+  price.mockImplementation(() => new Promise(() => {}));
   const setZecPrice = jest.fn();
 
-  // A prior price exists, so the ring (not the spinner) renders during
-  // the boot flight, before any deadline is drawn.
   const view = render(
     surfaceUi(
       makeCtx({ zecPrice: { zecPrice: 42, date: Date.now() - 60_000 } }),
@@ -127,37 +139,6 @@ test('an entry flight with no armed deadline never reads full', async () => {
 
   const ring = view.UNSAFE_getByType(QuoteRefreshRing);
   expect(ring.props.startProgress).toBeLessThan(1);
-});
-
-test('the ready follow-up never re-arms itself', async () => {
-  jest.useFakeTimers();
-  price.mockResolvedValue({ price: -1, error: 'refused' });
-  const setZecPrice = jest.fn();
-
-  const view = render(
-    surfaceUi(makeCtx({ mixnetView: INITIAL_MIXNET_VIEW }), setZecPrice),
-  );
-  await jest.advanceTimersByTimeAsync(0);
-  expect(price).toHaveBeenCalledTimes(2); // the boot pair, refused: arms
-
-  view.rerender(surfaceUi(makeCtx({ mixnetView: READY_VIEW }), setZecPrice));
-  await jest.advanceTimersByTimeAsync(0);
-  expect(price).toHaveBeenCalledTimes(4); // the follow-up pair, refused
-
-  // The follow-up's own refusal must not have re-armed: nothing more
-  // fires until the cadence tick, minutes away.
-  await jest.advanceTimersByTimeAsync(10_000);
-  expect(price).toHaveBeenCalledTimes(4);
-});
-
-test('every status key classifies under the fetch-policy switch', () => {
-  const policies = MIXNET_STATUS_KEYS.map(key => fetchPolicy(key));
-  policies.forEach(p =>
-    expect(['refusing', 'possibleBootstrap', 'serving']).toContain(p),
-  );
-  expect(policies).toContain('refusing');
-  expect(policies).toContain('possibleBootstrap');
-  expect(policies).toContain('serving');
 });
 
 test('the driver writes deps when an input moves, not per render', async () => {
@@ -172,8 +153,6 @@ test('the driver writes deps when an input moves, not per render', async () => {
   const writes = setDepsSpy.mock.calls.length;
   expect(writes).toBeGreaterThan(0);
 
-  // An unrelated context change re-renders the driver with the same
-  // five inputs: no new deps write may follow.
   view.rerender(driverOnlyUi({ ...ctx }, setZecPrice));
   await jest.advanceTimersByTimeAsync(0);
   expect(setDepsSpy.mock.calls.length).toBe(writes);
@@ -208,8 +187,6 @@ test('no any-casts in the price suites and no null in the store', () => {
     'Send.priceCta.unit.tsx',
     'PriceFetcher.snapshot.tsx',
   ];
-  // Built by concatenation, so this file's own source stays clean of
-  // the pattern it hunts.
   const anyCast = new RegExp('as' + ' any');
   suites.forEach(suite => {
     const source = fs.readFileSync(path.join(__dirname, suite), 'utf8');
