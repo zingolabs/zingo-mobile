@@ -4,7 +4,8 @@
  * WorkManager, which Doze/App Standby defer for hours and OEM task killers
  * wipe, so reminders never show. An exact type is just as bad: the manifest
  * strips SCHEDULE_EXACT_ALARM, and without it notifee silently skips
- * scheduling exact alarms.
+ * scheduling exact alarms. And the alarm firing is not enough: without a
+ * resolvable small icon Android rejects the notification it posts.
  */
 // The real enums come from notifee's pure types module (no native code), so
 // the assertions hold against notifee's actual values rather than a copy.
@@ -45,7 +46,7 @@ describe('armBatchReminders trigger', () => {
     jest.clearAllMocks();
   });
 
-  test('every future reminder uses AlarmManager SET_AND_ALLOW_WHILE_IDLE', async () => {
+  test('every future reminder uses AlarmManager SET_AND_ALLOW_WHILE_IDLE and a shipped small icon', async () => {
     const now = Date.now();
     await armBatchReminders([
       { id: '1', timestampMs: now + 60 * 60 * 1000, title: 't1', body: 'b' },
@@ -58,12 +59,31 @@ describe('armBatchReminders trigger', () => {
     ]);
 
     expect(createTrigger).toHaveBeenCalledTimes(2);
-    for (const [, trigger] of createTrigger.mock.calls) {
+    for (const [notification, trigger] of createTrigger.mock.calls) {
+      // notifee's default 'ic_launcher' does not exist in this app, and
+      // Android drops a notification without a valid small icon.
+      expect(notification.android.smallIcon).toBe('zingo_foreground');
       expect(trigger.type).toBe(TriggerType.TIMESTAMP);
       expect(trigger.alarmManager).toEqual({
         type: AlarmType.SET_AND_ALLOW_WHILE_IDLE,
       });
       expect(EXACT_TYPES).not.toContain(trigger.alarmManager.type);
+    }
+  });
+
+  // The small icon is looked up by name at display time, so deleting the
+  // resource only fails on device, silently. Pin it to the main source set,
+  // which every flavor inherits.
+  test('the small icon resource exists in every density', () => {
+    const fs = jest.requireActual('fs');
+    const path = jest.requireActual('path');
+    const res = path.join(__dirname, '../android/app/src/main/res');
+    for (const density of ['mdpi', 'hdpi', 'xhdpi', 'xxhdpi', 'xxxhdpi']) {
+      expect(
+        fs.existsSync(
+          path.join(res, `mipmap-${density}`, 'zingo_foreground.png'),
+        ),
+      ).toBe(true);
     }
   });
 });
