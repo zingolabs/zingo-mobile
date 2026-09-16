@@ -159,4 +159,12 @@ describe('MigrationStrategy nym gate sheet', () => {
     rerenderWith(mixnetReady);
     expect(navigate).toHaveBeenCalledWith(RouteEnum.MigrationTransactions);
   });
+
+  test('the private path is selectable and continues to the split plan', () => {
+    const { getByText, getByTestId, navigate } = renderScreen(mixnetReady);
+
+    fireEvent.press(getByText('migrationstrategy.private-label'));
+    fireEvent.press(getByTestId('migrationstrategy.start'));
+    expect(navigate).toHaveBeenCalledWith(RouteEnum.MigrationSplitPlan);
+  });
 });

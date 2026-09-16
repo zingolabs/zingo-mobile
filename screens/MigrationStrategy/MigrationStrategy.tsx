@@ -33,8 +33,7 @@ type MigrationStrategyProps = NativeStackScreenProps<
 
 // Migration choices: opt out entirely ('none', the default), the immediate
 // drain ('now'), or the private two-phase path ('private': split notes, then
-// send batches inside scheduled windows). The private path ships later and
-// its card is disabled.
+// send batches inside scheduled windows).
 type StrategyOption = 'none' | 'now' | 'private';
 
 // Renders a translated string, bolding `**…**` spans in `highlight` and
@@ -333,10 +332,8 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
             title={translate('migrationstrategy.private-label') as string}
             body={translate('migrationstrategy.private-body') as string}
             selected={selected === 'private'}
-            onPress={() => {}}
+            onPress={() => setSelected('private')}
             colors={colors}
-            disabled={true}
-            badge={translate('migrationstrategy.coming-soon') as string}
           />
         </ScrollView>
 
