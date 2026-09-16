@@ -65,6 +65,7 @@ import {
   foldBlockSpacing,
   windowTargetHeight,
   estimatedTimestampMs,
+  awaitingWalletTip,
 } from './const/BlockTime';
 
 import type AppStateLoaded from './AppStateLoaded';
@@ -120,6 +121,7 @@ export {
   foldBlockSpacing,
   windowTargetHeight,
   estimatedTimestampMs,
+  awaitingWalletTip,
 };
 
 export type {

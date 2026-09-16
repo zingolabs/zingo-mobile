@@ -18,7 +18,7 @@ import { useTheme } from '@app/theme';
 import SegmentedBar from '@ui/primitives/SegmentedBar';
 import { ContextAppLoaded } from '@app/context';
 import Utils from '@app/utils';
-import { RouteEnum } from '@app/AppState';
+import { RouteEnum, awaitingWalletTip } from '@app/AppState';
 import { migrationStatus, reconcileMigration } from '@app/walletBackend';
 import {
   RPCMigrationStatusType,
@@ -161,7 +161,7 @@ const IronwoodMigrationBanner: React.FunctionComponent<
   IronwoodMigrationBannerProps
 > = ({ amount, currencyName, onStart, onResume }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, info, privacy } = context;
+  const { translate, info, privacy, syncingStatus } = context;
   const { colors } = useTheme();
   const { decimalSeparator } = getNumberFormatSettings();
   const masked = `-${decimalSeparator}----`;
@@ -175,6 +175,20 @@ const IronwoodMigrationBanner: React.FunctionComponent<
   // chain tip is what catches it: focus alone left the countdown at zero and
   // the pill on Pending until the user navigated away and back.
   const height = info?.latestBlock ?? 0;
+
+  // The server tip can reach the next boundary before the wallet's sync does,
+  // and until then the backend reports the window as still ahead. A new block
+  // is then no help (the next one is minutes away), so while that gap lasts
+  // the sync's own progress drives the re-read too. Outside the gap it stays
+  // 0 and never re-triggers.
+  const awaitingSync = awaitingWalletTip(
+    migration?.upcoming_windows?.[0]?.boundary,
+    height,
+    migration?.due_now != null,
+  );
+  const syncTick = awaitingSync
+    ? (syncingStatus?.total_blocks_scanned ?? 0)
+    : 0;
 
   // Re-check on focus and on every new block: the phase advances while the
   // user is elsewhere in the flow, and this banner is what routes them back
@@ -213,10 +227,11 @@ const IronwoodMigrationBanner: React.FunctionComponent<
       return () => {
         cancelled = true;
       };
-      // `height` is a trigger, not a value the body reads: a new block is the
-      // only thing that can open a window while this screen stays mounted.
+      // `height` and `syncTick` are triggers, not values the body reads: a new
+      // block opens a window, and the wallet's sync catching up to it is what
+      // lets the backend report it.
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [height]),
+    }, [height, syncTick]),
   );
 
   const phaseKind = migration?.phase?.kind;
@@ -311,9 +326,16 @@ const IronwoodMigrationBanner: React.FunctionComponent<
             )
           : !nextWake
             ? (translate('ironwoodbanner.next-all-sent') as string)
-            : (translate('ironwoodbanner.next-in-blocks') as string)
-                .replace('{n}', String(batchesConfirmed + 1))
-                .replace('{blocks}', String(blocksUntil));
+            : awaitingSync
+              ? // Not "in ~0 blocks": the window is open on-chain, the wallet
+                // just hasn't synced to it yet.
+                (translate('ironwoodbanner.next-syncing') as string).replace(
+                  '{n}',
+                  String(batchesConfirmed + 1),
+                )
+              : (translate('ironwoodbanner.next-in-blocks') as string)
+                  .replace('{n}', String(batchesConfirmed + 1))
+                  .replace('{blocks}', String(blocksUntil));
     const nextActionActive = !splitting && (ready || !nextWake);
     const nextActionColor = confirming
       ? colors.fgSyncing

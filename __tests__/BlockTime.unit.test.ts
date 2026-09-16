@@ -4,6 +4,7 @@
 
 import {
   TARGET_BLOCK_SPACING_SECONDS,
+  awaitingWalletTip,
   estimatedTimestampMs,
   foldBlockSpacing,
   windowTargetHeight,
@@ -80,5 +81,25 @@ describe('estimatedTimestampMs', () => {
 
   test('past heights estimate as now', () => {
     expect(estimatedTimestampMs(900, 1_000, 10, NOW)).toBe(NOW);
+  });
+});
+
+describe('awaitingWalletTip', () => {
+  test('server tip at or past the boundary with nothing due is awaiting sync', () => {
+    expect(awaitingWalletTip(1_000, 1_000, false)).toBe(true);
+    expect(awaitingWalletTip(1_000, 1_003, false)).toBe(true);
+  });
+
+  test('a batch already due is not awaiting sync', () => {
+    expect(awaitingWalletTip(1_000, 1_000, true)).toBe(false);
+  });
+
+  test('before the boundary the countdown still stands', () => {
+    expect(awaitingWalletTip(1_000, 999, false)).toBe(false);
+  });
+
+  test('no upcoming window or no server tip yet is not awaiting sync', () => {
+    expect(awaitingWalletTip(undefined, 1_000, false)).toBe(false);
+    expect(awaitingWalletTip(1_000, 0, false)).toBe(false);
   });
 });

@@ -12,7 +12,11 @@ import StepperHeader from '@ui/widgets/StepperHeader';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
 import Utils from '@app/utils/Utils';
-import { RouteEnum, TARGET_BLOCK_SPACING_SECONDS } from '@app/AppState';
+import {
+  RouteEnum,
+  TARGET_BLOCK_SPACING_SECONDS,
+  awaitingWalletTip,
+} from '@app/AppState';
 import {
   cancelIronwoodMigration,
   migrationStatus,
@@ -41,7 +45,7 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
   navigation,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, info, language } = context;
+  const { translate, info, language, syncingStatus } = context;
   const { colors } = useTheme();
 
   const [status, setStatus] = useState<RPCMigrationStatusType | null>(null);
@@ -55,6 +59,19 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
   // Batch button on screen. Reading only on focus left the user watching a
   // screen whose window had already opened, so the tip drives the refresh.
   const height = info?.latestBlock ?? 0;
+
+  // The server tip can reach the next boundary before the wallet's sync does,
+  // and until then the backend reports the window as still ahead. While that
+  // gap lasts the sync's own progress drives the re-read too; outside it this
+  // stays 0 and never re-triggers.
+  const awaitingSync = awaitingWalletTip(
+    status?.upcoming_windows?.[0]?.boundary,
+    height,
+    status?.due_now != null,
+  );
+  const syncTick = awaitingSync
+    ? (syncingStatus?.total_blocks_scanned ?? 0)
+    : 0;
 
   // Re-read on focus and on every new block: the phase advances while the user
   // watches (parts confirm, windows open), so a status screen must reflect the
@@ -102,10 +119,11 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
       return () => {
         cancelled = true;
       };
-      // `height` is a trigger, not a value the body reads: a new block is the
-      // only thing that can open a window while this screen stays mounted.
+      // `height` and `syncTick` are triggers, not values the body reads: a new
+      // block opens a window, and the wallet's sync catching up to it is what
+      // lets the backend report it.
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [height]),
+    }, [height, syncTick]),
   );
 
   const goHome = useCallback(() => {
@@ -292,24 +310,28 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
           '{n}',
           String(batchesConfirmed + 1),
         )
-      : nextWake
-        ? (translate('migrationstatus.next-opens') as string)
-            .replace(
-              '{blocks}',
-              String(Math.max(0, nextWake.boundary - height)),
-            )
-            .replace(
-              '{time}',
-              // The block count is exact; the wall-clock it covers is the
-              // estimate, at the observed spacing when one has converged.
-              Utils.formatDurationMs(
-                Math.max(0, nextWake.boundary - height) *
-                  (info?.secondsPerBlock ?? TARGET_BLOCK_SPACING_SECONDS) *
-                  1000,
-                language,
-              ),
-            )
-        : (translate('migrationstatus.all-sent') as string);
+      : nextWake && awaitingSync
+        ? // Not "opens in 0 blocks": the window is open on-chain, the wallet
+          // just hasn't synced to it yet.
+          (translate('migrationstatus.next-syncing') as string)
+        : nextWake
+          ? (translate('migrationstatus.next-opens') as string)
+              .replace(
+                '{blocks}',
+                String(Math.max(0, nextWake.boundary - height)),
+              )
+              .replace(
+                '{time}',
+                // The block count is exact; the wall-clock it covers is the
+                // estimate, at the observed spacing when one has converged.
+                Utils.formatDurationMs(
+                  Math.max(0, nextWake.boundary - height) *
+                    (info?.secondsPerBlock ?? TARGET_BLOCK_SPACING_SECONDS) *
+                    1000,
+                  language,
+                ),
+              )
+          : (translate('migrationstatus.all-sent') as string);
   const remindersLine =
     wakes.length === 1
       ? (translate('migrationstatus.reminders-one') as string)

@@ -51,6 +51,25 @@ export const windowTargetHeight = (wake: RPCBroadcastWindowType): number =>
   );
 
 /**
+ * Whether the server tip has reached the next window's boundary while the
+ * backend still reports no batch due. The countdown measures from the server
+ * tip (`info.latestBlock`), but zingolib decides `due_now` and
+ * `upcoming_windows` from the wallet's own last known chain height, which
+ * trails the server until sync picks the new block up. In that gap the
+ * countdown reads zero blocks with nothing to send, so callers show "syncing"
+ * instead and re-read as the sync advances.
+ */
+export const awaitingWalletTip = (
+  nextBoundary: number | undefined,
+  serverHeight: number,
+  batchDue: boolean,
+): boolean =>
+  !batchDue &&
+  nextBoundary !== undefined &&
+  serverHeight > 0 &&
+  nextBoundary <= serverHeight;
+
+/**
  * When `targetHeight` is expected to be mined, in ms since epoch, extrapolated
  * from the chain tip at the observed spacing. Past heights estimate as now,
  * mirroring zingolib's `estimated_unix_at`.
