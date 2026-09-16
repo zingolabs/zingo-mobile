@@ -26,6 +26,7 @@ import {
   RPCMigrationStatusType,
   RPCBroadcastWindowType,
 } from '@app/walletBackend/types/RPCMigrationStatusType';
+import { useRearmBatchReminders } from '@app/hooks/useRearmBatchReminders';
 
 type MigrationStatusProps = NativeStackScreenProps<
   AppDrawerParamList,
@@ -125,6 +126,10 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [height, syncTick]),
   );
+
+  // Sending a batch returns here, and a sent batch renumbers the rest: keep
+  // the reminders in step (see useRearmBatchReminders).
+  useRearmBatchReminders(status);
 
   const goHome = useCallback(() => {
     navigation.reset({ index: 0, routes: [{ name: RouteEnum.HomeStack }] });

@@ -17,8 +17,8 @@ const REMINDER_PREFIX = 'ironwood-batch-';
 export type BatchReminder = {
   // Stable per-window id (the bucket index), so re-arming replaces cleanly.
   id: string;
-  // When to fire, in ms since epoch: the window's advisory target, estimated
-  // from its block distance at the observed spacing.
+  // When to fire, in ms since epoch: the window's advisory target kept inside
+  // the window (see reminderTimestampMs).
   timestampMs: number;
   title: string;
   body: string;
@@ -26,6 +26,13 @@ export type BatchReminder = {
 
 export async function requestReminderPermission(): Promise<boolean> {
   const settings = await notifee.requestPermission();
+  return settings.authorizationStatus >= AuthorizationStatus.AUTHORIZED;
+}
+
+// Reads the permission without prompting, for re-arming in the background of
+// a screen: only the schedule confirmation may put up the system dialog.
+export async function reminderPermissionGranted(): Promise<boolean> {
+  const settings = await notifee.getNotificationSettings();
   return settings.authorizationStatus >= AuthorizationStatus.AUTHORIZED;
 }
 

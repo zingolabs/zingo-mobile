@@ -26,6 +26,7 @@ import {
   armBatchReminders,
   requestReminderPermission,
 } from '@app/notifications/reminders';
+import { buildBatchReminders } from '@app/notifications/batchReminders';
 
 type MigrationScheduleProps = NativeStackScreenProps<
   AppDrawerParamList,
@@ -174,15 +175,27 @@ const MigrationSchedule: React.FunctionComponent<MigrationScheduleProps> = ({
     setConfirming(true);
     const granted = await requestReminderPermission();
     if (granted) {
+      // The same builder the re-arm hook uses, so the reminders armed here
+      // match what later screens keep in step.
       await armBatchReminders(
-        wakes.map((wake: RPCBroadcastWindowType, i: number) => ({
-          id: String(wake.bucket_index),
-          timestampMs: wakeTargetMs(wake),
-          title: (
-            translate('migrationschedule.reminder-title') as string
-          ).replace('{n}', String(nextWakeBase + i)),
-          body: translate('migrationschedule.reminder-body') as string,
-        })),
+        status
+          ? buildBatchReminders(
+              status,
+              {
+                latestBlock: info?.latestBlock,
+                secondsPerBlock: info?.secondsPerBlock,
+                mainnet: info?.chainName === ChainNameEnum.mainChainName,
+              },
+              {
+                title: (n: number) =>
+                  (
+                    translate('migrationschedule.reminder-title') as string
+                  ).replace('{n}', String(n)),
+                body: translate('migrationschedule.reminder-body') as string,
+              },
+              Date.now(),
+            )
+          : [],
       );
       addLastSnackbar(translate('migrationschedule.armed') as string);
     } else {
@@ -210,9 +223,8 @@ const MigrationSchedule: React.FunctionComponent<MigrationScheduleProps> = ({
     }
   }, [
     confirming,
-    wakes,
-    wakeTargetMs,
-    nextWakeBase,
+    status,
+    info,
     dueNow,
     navigation,
     translate,

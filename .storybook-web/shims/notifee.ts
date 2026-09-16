@@ -15,6 +15,9 @@ const notifee = {
   requestPermission: async () => ({
     authorizationStatus: AuthorizationStatus.DENIED,
   }),
+  getNotificationSettings: async () => ({
+    authorizationStatus: AuthorizationStatus.DENIED,
+  }),
   createChannel: async () => 'storybook',
   createTriggerNotification: async () => 'storybook',
   getTriggerNotificationIds: async (): Promise<string[]> => [],

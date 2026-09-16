@@ -20,6 +20,7 @@ import { ContextAppLoaded } from '@app/context';
 import Utils from '@app/utils';
 import { RouteEnum, awaitingWalletTip } from '@app/AppState';
 import { migrationStatus, reconcileMigration } from '@app/walletBackend';
+import { useRearmBatchReminders } from '@app/hooks/useRearmBatchReminders';
 import {
   RPCMigrationStatusType,
   RPCBroadcastWindowType,
@@ -233,6 +234,10 @@ const IronwoodMigrationBanner: React.FunctionComponent<
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [height, syncTick]),
   );
+
+  // Every app open lands here, so this is what keeps the batch reminders in
+  // step with a schedule that moved since they were armed.
+  useRearmBatchReminders(migration);
 
   const phaseKind = migration?.phase?.kind;
   const inFlight =
