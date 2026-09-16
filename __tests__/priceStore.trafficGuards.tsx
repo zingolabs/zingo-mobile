@@ -8,7 +8,10 @@ import type { AppStateStatus } from 'react-native';
 import React from 'react';
 import { render, waitFor } from '@testing-library/react-native';
 import PriceFetcher, { PriceTrafficDriver } from '@ui/widgets/PriceFetcher';
-import { priceFetcherStore } from '@ui/widgets/priceFetcherStore';
+import {
+  PRICE_REFRESH_MAX_MS,
+  priceFetcherStore,
+} from '@ui/widgets/priceFetcherStore';
 import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
@@ -254,7 +257,7 @@ test('a wedged native call is reused, never multiplied', async () => {
   seedDeps(setZecPrice);
 
   render(surfaceUi(makeCtx(), setZecPrice));
-  await jest.advanceTimersByTimeAsync(30_000 + 30_000 + 60_000 + 30_000);
+  await jest.advanceTimersByTimeAsync(2 * PRICE_REFRESH_MAX_MS - 1_000);
 
   expect(price).toHaveBeenCalledTimes(1);
 });

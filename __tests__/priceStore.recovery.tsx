@@ -10,7 +10,7 @@ import React from 'react';
 import { act, render, renderHook } from '@testing-library/react-native';
 import PriceFetcher, { PriceTrafficDriver } from '@ui/widgets/PriceFetcher';
 import {
-  PRICE_REFRESH_MS,
+  PRICE_REFRESH_MAX_MS,
   PRICE_STALE_MS,
   priceFetcherStore,
   usePriceHealth,
@@ -127,7 +127,7 @@ test('no wedged deadline across an outage, and the recovery entry fires', async 
       setZecPrice,
     ),
   );
-  await jest.advanceTimersByTimeAsync(PRICE_REFRESH_MS + 60_000);
+  await jest.advanceTimersByTimeAsync(PRICE_REFRESH_MAX_MS + 60_000);
   expect(price).toHaveBeenCalledTimes(1);
   expect(priceFetcherStore.snapshot().nextFetchAt).toBe(0);
 
@@ -156,7 +156,7 @@ test('a flapping transport rides the cadence, one fetch per window', async () =>
   }
   expect(price).toHaveBeenCalledTimes(1);
 
-  await jest.advanceTimersByTimeAsync(PRICE_REFRESH_MS);
+  await jest.advanceTimersByTimeAsync(PRICE_REFRESH_MAX_MS);
   expect(price.mock.calls.length).toBeGreaterThan(1);
 });
 
@@ -169,7 +169,7 @@ test('a rejected native call reads as a refusal, not a vanish', async () => {
   await jest.advanceTimersByTimeAsync(0);
   expect(price).toHaveBeenCalledTimes(2);
 
-  await jest.advanceTimersByTimeAsync(PRICE_REFRESH_MS + 1_000);
+  await jest.advanceTimersByTimeAsync(PRICE_REFRESH_MAX_MS + 1_000);
   expect(price).toHaveBeenCalledTimes(4);
 });
 

@@ -9,7 +9,8 @@ import React from 'react';
 import { render } from '@testing-library/react-native';
 import { PriceTrafficDriver } from '@ui/widgets/PriceFetcher';
 import {
-  PRICE_REFRESH_MS,
+  PRICE_REFRESH_MAX_MS,
+  PRICE_REFRESH_MIN_MS,
   priceFetcherStore,
 } from '@ui/widgets/priceFetcherStore';
 import {
@@ -135,7 +136,7 @@ test('every gate-open return from the background fetches', async () => {
   expect(price).toHaveBeenCalledTimes(2);
 });
 
-test('the next fetch follows the last one minute later', async () => {
+test('the next fetch follows the last inside the jitter window', async () => {
   jest.useFakeTimers();
   price.mockResolvedValue({ price: 42, error: '' });
   const setZecPrice = jest.fn();
@@ -144,14 +145,16 @@ test('the next fetch follows the last one minute later', async () => {
   await jest.advanceTimersByTimeAsync(0);
   expect(price).toHaveBeenCalledTimes(1);
 
-  await jest.advanceTimersByTimeAsync(PRICE_REFRESH_MS - 1_000);
+  await jest.advanceTimersByTimeAsync(PRICE_REFRESH_MIN_MS - 1_000);
   expect(price).toHaveBeenCalledTimes(1);
 
-  await jest.advanceTimersByTimeAsync(2_000);
+  await jest.advanceTimersByTimeAsync(
+    PRICE_REFRESH_MAX_MS - PRICE_REFRESH_MIN_MS + 2_000,
+  );
   expect(price).toHaveBeenCalledTimes(2);
 });
 
-test('every tick fires one minute after the last', async () => {
+test('every tick draws its own delay from the jitter window', async () => {
   jest.useFakeTimers();
   price.mockResolvedValue({ price: 42, error: '' });
   const setZecPrice = jest.fn();
@@ -160,7 +163,8 @@ test('every tick fires one minute after the last', async () => {
   for (let tick = 0; tick < 5; tick++) {
     await jest.advanceTimersByTimeAsync(0);
     const { nextFetchAt, nextFetchDelayMs } = priceFetcherStore.snapshot();
-    expect(nextFetchDelayMs).toBe(PRICE_REFRESH_MS);
+    expect(nextFetchDelayMs).toBeGreaterThanOrEqual(PRICE_REFRESH_MIN_MS);
+    expect(nextFetchDelayMs).toBeLessThanOrEqual(PRICE_REFRESH_MAX_MS);
     const before = price.mock.calls.length;
     await jest.advanceTimersByTimeAsync(nextFetchAt - Date.now() - 1_000);
     expect(price.mock.calls.length).toBe(before);

@@ -917,11 +917,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         !(
           !memoEnabled && Utils.parseStringLocaleToNumberFloat(amountText) === 0
         ) &&
-        // Mixnet Mode fail-closed verdict: while the transport is
-        // bootstrapping, died, or unknowable, sending stays blocked; only
-        // `ready` or the user's explicit clearnet consent (`off`) opens it.
-        // Null means no mixnet policy runs (mixnetSupported injected false).
-        (mixnetView === null || !mixnetView.sendBlocked),
+        (mixnetView === null || !nym || !mixnetView.sendBlocked),
     );
   }, [
     memoEnabled,
@@ -932,6 +928,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     fee,
     maxAmount,
     mixnetView,
+    nym,
   ]);
 
   useEffect(() => {

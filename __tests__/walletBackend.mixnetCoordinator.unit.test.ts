@@ -422,4 +422,58 @@ describe('MixnetCoordinator', () => {
     expect(startTransport).toHaveBeenCalledTimes(3);
     coordinator.stop();
   });
+
+  it('restates the clearnet policy after an attach lands, since the attach consents to the mixnet', async () => {
+    mockedBridge.attachMixnet.mockResolvedValue(
+      statusPayload('ready', '127.0.0.1:1080'),
+    );
+    mockedBridge.setTransmitPolicy.mockResolvedValue('{}');
+    const startTransport = jest.fn().mockResolvedValue(transportBinding);
+    const coordinator = new MixnetCoordinator(
+      startTransport,
+      () => {},
+      'clearnet',
+    );
+
+    await coordinator.ensureForConnectedSession();
+    await flushPromises();
+
+    expect(mockedBridge.setTransmitPolicy).toHaveBeenCalledWith('clearnet');
+    expect(mockedBridge.attachMixnet.mock.invocationCallOrder[0]).toBeLessThan(
+      mockedBridge.setTransmitPolicy.mock.invocationCallOrder[0],
+    );
+    coordinator.stop();
+  });
+
+  it('leaves the policy alone after an attach when the session sends over the mixnet', async () => {
+    mockedBridge.attachMixnet.mockResolvedValue(
+      statusPayload('ready', '127.0.0.1:1080'),
+    );
+    const startTransport = jest.fn().mockResolvedValue(transportBinding);
+    const coordinator = new MixnetCoordinator(startTransport, () => {});
+
+    await coordinator.ensureForConnectedSession();
+    await flushPromises();
+
+    expect(mockedBridge.setTransmitPolicy).not.toHaveBeenCalled();
+    coordinator.stop();
+  });
+
+  it('a policy change reaches the backend at once and survives the next reattach', async () => {
+    mockedBridge.attachMixnet.mockResolvedValue(
+      statusPayload('ready', '127.0.0.1:1080'),
+    );
+    mockedBridge.setTransmitPolicy.mockResolvedValue('{}');
+    const startTransport = jest.fn().mockResolvedValue(transportBinding);
+    const coordinator = new MixnetCoordinator(startTransport, () => {});
+
+    await coordinator.setTransmitPolicy('clearnet');
+    expect(mockedBridge.setTransmitPolicy).toHaveBeenCalledTimes(1);
+
+    await coordinator.reenable();
+    await flushPromises();
+    expect(mockedBridge.setTransmitPolicy).toHaveBeenCalledTimes(2);
+    expect(mockedBridge.setTransmitPolicy).toHaveBeenLastCalledWith('clearnet');
+    coordinator.stop();
+  });
 });

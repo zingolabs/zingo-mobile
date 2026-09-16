@@ -163,6 +163,7 @@ interface RPCModuleAPI {
   enableMixnet(proxyPath: string): Promise<string>;
   mixnetIndicatorInfo(): Promise<string>;
   mixnetBootstrapDetailInfo(): Promise<string>;
+  setTransmitPolicy(policy: string): Promise<string>;
 }
 
 export default NativeModules.RPCModule as RPCModuleAPI;

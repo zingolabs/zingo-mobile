@@ -3,6 +3,7 @@ import { WalletBackendConfig } from './config/WalletBackendConfig';
 import { RPCPerformanceLevelEnum } from './enums/RPCPerformanceLevelEnum';
 import { DataService } from './modules/DataService';
 import { MixnetCoordinator } from './modules/MixnetCoordinator';
+import { TransmitPolicy } from './utils/mixnetUtils';
 import { SyncCoordinator } from './modules/SyncCoordinator';
 import { TransactionService } from './modules/TransactionService';
 import { WalletLifecycleService } from './modules/WalletLifecycleService';
@@ -24,6 +25,7 @@ export default class WalletBackend {
     this.mixnetCoordinator = new MixnetCoordinator(
       config.startMixnetTransport,
       config.onMixnetViewChanged,
+      config.transmitPolicy,
     );
     this.dataService.onSyncError = async () => {
       await this.syncCoordinator.clearTimers();
@@ -70,6 +72,9 @@ export default class WalletBackend {
 
   async reenableMixnet() {
     return this.mixnetCoordinator.reenable();
+  }
+  async setTransmitPolicy(policy: TransmitPolicy) {
+    return this.mixnetCoordinator.setTransmitPolicy(policy);
   }
   stopMixnetPolling() {
     this.mixnetCoordinator.stop();

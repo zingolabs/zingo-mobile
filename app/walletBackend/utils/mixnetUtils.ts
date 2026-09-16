@@ -35,6 +35,12 @@ export async function getMixnetStatus(): Promise<MixnetStatusReport> {
   return statusCall(() => RPCModule.mixnetIndicatorInfo());
 }
 
+export type TransmitPolicy = 'mixnet' | 'clearnet';
+
+export async function setTransmitPolicy(policy: TransmitPolicy): Promise<void> {
+  await RPCModule.setTransmitPolicy(policy);
+}
+
 export async function getMixnetBootstrapDetail(): Promise<MixnetDetailReport> {
   try {
     return transformMixnetDetail(await RPCModule.mixnetBootstrapDetailInfo());

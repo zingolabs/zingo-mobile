@@ -875,6 +875,7 @@ export class LoadedAppClass extends Component<
       onPersistentSyncFailure: this.recoverServer,
       onMixnetViewChanged: this.setMixnetView,
       startMixnetTransport: startMixnetTransport,
+      transmitPolicy: props.nym ? 'mixnet' : 'clearnet',
       mixnetSupported: true,
       readOnly: props.readOnly,
       server: props.server,
@@ -2038,6 +2039,12 @@ export class LoadedAppClass extends Component<
   };
 
   setNymOption = async (value: boolean): Promise<void> => {
+    try {
+      await this.rpc.setTransmitPolicy(value ? 'mixnet' : 'clearnet');
+    } catch (error) {
+      this.setLastError(`Transmit policy: ${error}`);
+      return;
+    }
     this.setState({
       nym: value,
     });

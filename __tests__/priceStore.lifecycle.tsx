@@ -9,7 +9,7 @@ import React from 'react';
 import { render, renderHook, waitFor } from '@testing-library/react-native';
 import PriceFetcher, { PriceTrafficDriver } from '@ui/widgets/PriceFetcher';
 import {
-  PRICE_REFRESH_MS,
+  PRICE_REFRESH_MAX_MS,
   priceFetcherStore,
   usePriceFetcherStore,
 } from '@ui/widgets/priceFetcherStore';
@@ -156,7 +156,7 @@ test('a throwing fetch neither pins loading nor kills the timer', async () => {
   render(fetcherUi(makeCtx(), setZecPrice));
   await jest.advanceTimersByTimeAsync(0);
 
-  await jest.advanceTimersByTimeAsync(PRICE_REFRESH_MS + 1_000);
+  await jest.advanceTimersByTimeAsync(PRICE_REFRESH_MAX_MS + 1_000);
   expect(setZecPrice).toHaveBeenCalledWith(42, expect.any(Number));
 });
 
@@ -198,7 +198,7 @@ test('a hung fetch releases the surface and recovers once it settles', async () 
 
   settleLate({ price: -1, error: 'late' });
   await jest.advanceTimersByTimeAsync(0);
-  await jest.advanceTimersByTimeAsync(PRICE_REFRESH_MS + 1_000);
+  await jest.advanceTimersByTimeAsync(PRICE_REFRESH_MAX_MS + 1_000);
   expect(setZecPrice).toHaveBeenCalledWith(42, expect.any(Number));
 });
 

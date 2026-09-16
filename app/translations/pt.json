@@ -16,6 +16,7 @@
   "biometricsfailed-button": "Desbloquear",
   "price-ring-live": "O preço de ZEC está atualizado",
   "price-ring-stale": "O preço de ZEC está desatualizado",
+  "price-ring-paused": "Atualização do preço em pausa",
   "biometrics-message": "Por favor, autentique-se",
   "biometrics-error": "Para sua segurança, você precisa autenticar essa ação novamente para executá-la. Você pode alterar isso em Configurações sempre que desejar.",
   "biometrics-failure-declined": "A autenticação foi cancelada ou falhou.",

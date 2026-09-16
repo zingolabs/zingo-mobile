@@ -9,6 +9,7 @@ import {
 import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
 import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
 import { StartMixnetTransport } from '@app/walletBackend/modules/MixnetCoordinator';
+import { TransmitPolicy } from '@app/walletBackend/utils/mixnetUtils';
 import { MixnetView } from '@app/walletBackend/transforms/mixnetView';
 
 // Every sub-service shares one reference to this config.
@@ -28,6 +29,7 @@ export type WalletBackendConfig = {
   onPersistentSyncFailure?: () => void;
   onMixnetViewChanged: (view: MixnetView) => void;
   startMixnetTransport: StartMixnetTransport;
+  transmitPolicy: TransmitPolicy;
   // Tests inject false to keep the coordinator unstarted.
   mixnetSupported: boolean;
   keepAwake: (keep: boolean) => void;

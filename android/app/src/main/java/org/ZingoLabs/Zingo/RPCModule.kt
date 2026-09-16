@@ -964,6 +964,14 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
+    fun setTransmitPolicy(policy: String, promise: Promise) {
+        FfiOutcome.settling(promise, "set_transmit_policy") {
+            uniffi.zingo.initLogging()
+            uniffi.zingo.setTransmitPolicy(policy)
+        }
+    }
+
+    @ReactMethod
     fun getSpendableBalanceWithAddressInfo(address: String, zennies: String, promise: Promise) {
         FfiOutcome.settling(promise, "get_spendable_balance_with_address") {
             uniffi.zingo.initLogging()

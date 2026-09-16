@@ -5,7 +5,7 @@ import { ContextAppLoaded } from '@app/context';
 import { ChainNameEnum, SelectServerEnum } from '@app/AppState';
 import QuoteRefreshRing from '@ui/primitives/QuoteRefreshRing';
 import {
-  PRICE_REFRESH_MS,
+  PRICE_REFRESH_MAX_MS,
   priceFetcherStore,
   usePriceFetcherStore,
   usePriceHealth,
@@ -68,7 +68,7 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
 
   // A ring with no running cadence stays static and muted.
   const muted = health !== 'live' || !surfaceActive;
-  const cadenceMs = nextFetchDelayMs || PRICE_REFRESH_MS;
+  const cadenceMs = nextFetchDelayMs || PRICE_REFRESH_MAX_MS;
   const elapsedFraction =
     nextFetchAt > 0
       ? Math.min(Math.max(1 - (nextFetchAt - Date.now()) / cadenceMs, 0), 1)
@@ -85,7 +85,11 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
         startProgress={elapsedFraction}
         accessibilityLabel={
           translate(
-            health === 'stale' ? 'price-ring-stale' : 'price-ring-live',
+            health === 'stale'
+              ? 'price-ring-stale'
+              : surfaceActive
+                ? 'price-ring-live'
+                : 'price-ring-paused',
           ) as string
         }
         testID="pricefetcher.ring"

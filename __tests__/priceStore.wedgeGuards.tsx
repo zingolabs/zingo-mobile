@@ -9,7 +9,7 @@ import React from 'react';
 import { render, waitFor } from '@testing-library/react-native';
 import PriceFetcher, { PriceTrafficDriver } from '@ui/widgets/PriceFetcher';
 import {
-  PRICE_REFRESH_MS,
+  PRICE_REFRESH_MAX_MS,
   priceFetcherStore,
 } from '@ui/widgets/priceFetcherStore';
 import {
@@ -120,7 +120,7 @@ test('a tick fired into a refusing window never wedges the cadence', async () =>
       setZecPrice,
     ),
   );
-  await jest.advanceTimersByTimeAsync(PRICE_REFRESH_MS + 1_000);
+  await jest.advanceTimersByTimeAsync(PRICE_REFRESH_MAX_MS + 1_000);
   expect(price).toHaveBeenCalledTimes(1);
 
   view.rerender(
@@ -144,7 +144,7 @@ test('a wedged native call retires after its TTL and a fresh one runs', async ()
   const setZecPrice = jest.fn();
 
   render(surfaceUi(makeCtx(), setZecPrice));
-  await jest.advanceTimersByTimeAsync(6 * 60_000 + 1_000);
+  await jest.advanceTimersByTimeAsync(4 * (30_000 + PRICE_REFRESH_MAX_MS));
 
   expect(price.mock.calls.length).toBeGreaterThan(1);
   expect(setZecPrice).toHaveBeenCalledWith(42, expect.any(Number));

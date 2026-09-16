@@ -1,7 +1,7 @@
 jest.mock('@ui/widgets/priceFetcherStore', () => ({
   __esModule: true,
-  PRICE_REFRESH_MS: 60_000,
-  PRICE_STALE_MS: 60_000 + 30_000,
+  PRICE_REFRESH_MAX_MS: 75_000,
+  PRICE_STALE_MS: 75_000 + 30_000,
   priceFetcherStore: {
     setDeps: jest.fn(),
     attach: jest.fn(() => () => {}),

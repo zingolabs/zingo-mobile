@@ -3,13 +3,12 @@ import { AppState, NativeEventSubscription } from 'react-native';
 import { getZecPrice } from '@app/walletBackend';
 import { MixnetStatusKey } from '@app/walletBackend/transforms/mixnetView';
 
-// Singleton lifecycle of the price surface: it fetches through the ready mixnet only, once a minute.
-
-export const PRICE_REFRESH_MS = 60_000;
+export const PRICE_REFRESH_MIN_MS = 45_000;
+export const PRICE_REFRESH_MAX_MS = 75_000;
 const PRICE_FETCH_TIMEOUT_MS = 30_000;
-export const PRICE_STALE_MS = PRICE_REFRESH_MS + PRICE_FETCH_TIMEOUT_MS;
+export const PRICE_STALE_MS = PRICE_REFRESH_MAX_MS + PRICE_FETCH_TIMEOUT_MS;
 const FETCH_BURST_COOLDOWN_MS = 5_000;
-const NATIVE_CALL_TTL_MS = 5 * 60_000;
+const NATIVE_CALL_TTL_MS = 2 * PRICE_REFRESH_MAX_MS;
 
 type PriceInputs = {
   setZecPrice: (price: number, date: number) => void;
@@ -88,7 +87,10 @@ function surfaceMayFetch(): boolean {
 function scheduleAuto(): void {
   clearAuto();
   if (!surfaceMayFetch()) return;
-  const delayMs = PRICE_REFRESH_MS;
+  const delayMs = Math.round(
+    PRICE_REFRESH_MIN_MS +
+      Math.random() * (PRICE_REFRESH_MAX_MS - PRICE_REFRESH_MIN_MS),
+  );
   const deadline = Date.now() + delayMs;
   cadence = {
     state: 'armed',
@@ -187,7 +189,7 @@ function entryOrSchedule(): void {
   }
   if (
     Date.now() - lastFetchStartAt < FETCH_BURST_COOLDOWN_MS ||
-    Date.now() - lastSuccessAt < PRICE_REFRESH_MS
+    Date.now() - lastSuccessAt < PRICE_REFRESH_MIN_MS
   ) {
     scheduleAuto();
   } else {

@@ -10,7 +10,7 @@ import { render, waitFor } from '@testing-library/react-native';
 import PriceFetcher, { PriceTrafficDriver } from '@ui/widgets/PriceFetcher';
 import QuoteRefreshRing from '@ui/primitives/QuoteRefreshRing';
 import {
-  PRICE_REFRESH_MS,
+  PRICE_REFRESH_MAX_MS,
   priceFetcherStore,
 } from '@ui/widgets/priceFetcherStore';
 import {
@@ -109,6 +109,15 @@ test('a current price reaches screen readers as a label too', () => {
   expect(view.getByLabelText('price-ring-live')).toBeTruthy();
 });
 
+test('a paused surface reaches screen readers as paused, not current', () => {
+  const pausedCtx = makeCtx({
+    zecPrice: { zecPrice: 33.33, date: Date.now() },
+    mixnetView: { ...READY_VIEW, statusKey: 'mixnet.status.died' },
+  });
+  const view = render(fetcherUi(pausedCtx));
+  expect(view.getByLabelText('price-ring-paused')).toBeTruthy();
+});
+
 test('the ring restarts on every refresh cycle, failed ones included', async () => {
   jest.useFakeTimers();
   const view = render(
@@ -117,7 +126,7 @@ test('the ring restarts on every refresh cycle, failed ones included', async () 
   await jest.advanceTimersByTimeAsync(0);
   const firstCycle = view.UNSAFE_getByType(QuoteRefreshRing).props.resetKey;
 
-  await jest.advanceTimersByTimeAsync(PRICE_REFRESH_MS + 61_000);
+  await jest.advanceTimersByTimeAsync(PRICE_REFRESH_MAX_MS + 61_000);
   const secondCycle = view.UNSAFE_getByType(QuoteRefreshRing).props.resetKey;
 
   expect(secondCycle).not.toBe(firstCycle);

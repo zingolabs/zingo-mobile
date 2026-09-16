@@ -9,7 +9,7 @@ import React from 'react';
 import { render } from '@testing-library/react-native';
 import PriceFetcher, { PriceTrafficDriver } from '@ui/widgets/PriceFetcher';
 import {
-  PRICE_REFRESH_MS,
+  PRICE_REFRESH_MAX_MS,
   priceFetcherStore,
 } from '@ui/widgets/priceFetcherStore';
 import {
@@ -102,7 +102,7 @@ test('a ZEC-display wallet still fetches every tick', async () => {
   await jest.advanceTimersByTimeAsync(0);
   expect(price).toHaveBeenCalledTimes(1);
 
-  await jest.advanceTimersByTimeAsync(PRICE_REFRESH_MS + 1_000);
+  await jest.advanceTimersByTimeAsync(PRICE_REFRESH_MAX_MS + 1_000);
   expect(price.mock.calls.length).toBeGreaterThanOrEqual(2);
 });
 

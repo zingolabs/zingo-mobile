@@ -10,7 +10,7 @@ import { render, renderHook } from '@testing-library/react-native';
 import PriceFetcher, { PriceTrafficDriver } from '@ui/widgets/PriceFetcher';
 import QuoteRefreshRing from '@ui/primitives/QuoteRefreshRing';
 import {
-  PRICE_REFRESH_MS,
+  PRICE_REFRESH_MAX_MS,
   priceFetcherStore,
   usePriceStale,
 } from '@ui/widgets/priceFetcherStore';
@@ -207,11 +207,11 @@ test('the boot fetch renders nothing before the first price', async () => {
 });
 
 test('the cadence plus fetch latency does not dim', () => {
-  const withinHeadroom = Date.now() - (PRICE_REFRESH_MS + 10_000);
+  const withinHeadroom = Date.now() - (PRICE_REFRESH_MAX_MS + 10_000);
   const { result: healthy } = renderHook(() => usePriceStale(withinHeadroom));
   expect(healthy.current).toBe(false);
 
-  const pastHeadroom = Date.now() - (PRICE_REFRESH_MS + 31_000);
+  const pastHeadroom = Date.now() - (PRICE_REFRESH_MAX_MS + 31_000);
   const { result: slipped } = renderHook(() => usePriceStale(pastHeadroom));
   expect(slipped.current).toBe(true);
 });

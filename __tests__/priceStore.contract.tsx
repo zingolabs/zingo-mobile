@@ -11,7 +11,11 @@ import React from 'react';
 import { render } from '@testing-library/react-native';
 import PriceFetcher, { PriceTrafficDriver } from '@ui/widgets/PriceFetcher';
 import QuoteRefreshRing from '@ui/primitives/QuoteRefreshRing';
-import { priceFetcherStore } from '@ui/widgets/priceFetcherStore';
+import {
+  PRICE_REFRESH_MAX_MS,
+  PRICE_REFRESH_MIN_MS,
+  priceFetcherStore,
+} from '@ui/widgets/priceFetcherStore';
 import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
@@ -100,7 +104,8 @@ test('a switched-off transport mutes the ring and stops its fill', async () => {
   );
   await jest.advanceTimersByTimeAsync(0);
   const live = view.UNSAFE_getByType(QuoteRefreshRing).props;
-  expect(live.durationMs).toBe(60_000);
+  expect(live.durationMs).toBeGreaterThanOrEqual(PRICE_REFRESH_MIN_MS);
+  expect(live.durationMs).toBeLessThanOrEqual(PRICE_REFRESH_MAX_MS);
 
   view.rerender(
     surfaceUi(
