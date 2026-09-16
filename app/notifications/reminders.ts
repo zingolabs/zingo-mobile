@@ -1,4 +1,5 @@
 import notifee, {
+  AlarmType,
   AndroidImportance,
   AuthorizationStatus,
   TimestampTrigger,
@@ -50,9 +51,15 @@ export async function armBatchReminders(
     if (reminder.timestampMs <= now + 5000) {
       continue;
     }
+    // Android: AlarmManager, not notifee's default WorkManager path, which
+    // Doze/App Standby defer for hours and OEM task killers wipe outright.
+    // SET_AND_ALLOW_WHILE_IDLE is inexact (fires in Doze within minutes) and
+    // needs no SCHEDULE_EXACT_ALARM. Never an exact type here: without that
+    // permission notifee silently drops the trigger. Ignored on iOS.
     const trigger: TimestampTrigger = {
       type: TriggerType.TIMESTAMP,
       timestamp: reminder.timestampMs,
+      alarmManager: { type: AlarmType.SET_AND_ALLOW_WHILE_IDLE },
     };
     await notifee.createTriggerNotification(
       {

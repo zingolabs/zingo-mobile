@@ -3,11 +3,12 @@
 export const AndroidImportance = { HIGH: 4 } as const;
 export const AuthorizationStatus = { DENIED: 0, AUTHORIZED: 1 } as const;
 export const TriggerType = { TIMESTAMP: 0 } as const;
+export const AlarmType = { SET_AND_ALLOW_WHILE_IDLE: 1 } as const;
 
 export type TimestampTrigger = {
   type: number;
   timestamp: number;
-  alarmManager?: boolean | { allowWhileIdle?: boolean };
+  alarmManager?: boolean | { allowWhileIdle?: boolean; type?: number };
 };
 
 const notifee = {
