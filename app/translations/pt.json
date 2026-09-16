@@ -1052,6 +1052,7 @@
     "slid-title": "O lote ainda não pode ser enviado",
     "slid-body": "Nenhuma parte deste lote pôde ser construída agora, normalmente porque a sincronização ainda não alcançou a altura da âncora do lote. Nada foi enviado. As partes deslizaram para uma próxima janela e o plano segue intacto. Deixe a carteira terminar de sincronizar e tente novamente.",
     "error-title": "Não foi possível enviar o lote",
+    "unsent": "{unsent} de {total} partes não chegaram à rede. Elas podem já aparecer como pendentes no seu histórico, mas não foram enviadas. Continuam previstas para esta janela, então nada se perde: volte e envie o lote novamente.",
     "back": "Voltar ao status"
   },
   "migrationtransactions": {

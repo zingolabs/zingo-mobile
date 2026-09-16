@@ -18,9 +18,15 @@ import SegmentedBar from '@ui/primitives/SegmentedBar';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
 import { RouteEnum } from '@app/AppState';
-import { executeDueParts, executeDuePartsStatus } from '@app/walletBackend';
+import {
+  executeDueParts,
+  executeDuePartsStatus,
+  migrationStatus,
+} from '@app/walletBackend';
 import { RPCBatchReportType } from '@app/walletBackend/types/RPCBatchReportType';
 import { RPCBatchStatusType } from '@app/walletBackend/types/RPCBatchStatusType';
+import { RPCMigrationStatusType } from '@app/walletBackend/types/RPCMigrationStatusType';
+import { deriveBatchVerdict } from './batchVerdict';
 
 type MigrationBatchSendingProps = NativeStackScreenProps<
   AppDrawerParamList,
@@ -128,31 +134,70 @@ const MigrationBatchSending: React.FunctionComponent<
       if (cancelled) {
         return;
       }
-      // A halted batch stopped on a submission error partway; surface it so the
-      // user can retry (the retry folds the un-sent parts back in).
-      if (failure || report?.halted) {
-        setErrorMsg(failure ?? report?.halted ?? '');
-        return;
-      }
+      // A part that did not come back `sent` may never have reached the
+      // network (a failed submission reports as `slid`), so ask which of them
+      // are still due. Skipped on a clean batch; a failed read leaves the
+      // verdict to the report alone.
+      let dueNowPartIds: number[] | null = null;
       const outcomes = report?.outcomes ?? [];
-      const sent = outcomes.filter(o => o.result.kind === 'sent').length;
-      if (outcomes.length === 0) {
-        // Reached with nothing actually due (the window has not opened yet, or
-        // every part already confirmed or slid to a later window); the monitor
-        // will show why.
-        addLastSnackbar(translate('migrationbatchsending.nothing') as string);
-      } else if (sent === 0) {
-        // The batch was due but no part could be built (typically the sync is
-        // short of the anchor). Bouncing straight back reads as a silent
-        // failure, so hold here and say what happened.
-        setNotSendable(true);
-        return;
-      } else {
-        addLastSnackbar(
-          (translate('migrationbatchsending.success') as string)
-            .replace('{sent}', String(sent))
-            .replace('{total}', String(outcomes.length)),
-        );
+      if (
+        !failure &&
+        !report?.halted &&
+        outcomes.some(o => o.result.kind !== 'sent')
+      ) {
+        try {
+          const statusResult = await migrationStatus();
+          if (statusResult.ok) {
+            const parsed = JSON.parse(
+              statusResult.value,
+            ) as RPCMigrationStatusType;
+            if (!parsed.error) {
+              dueNowPartIds = parsed.due_now?.part_ids ?? [];
+            }
+          }
+        } catch {
+          // Unreadable status: fall back to the report alone.
+        }
+        if (cancelled) {
+          return;
+        }
+      }
+      const verdict = deriveBatchVerdict(failure, report, dueNowPartIds);
+      switch (verdict.kind) {
+        case 'failed':
+          // A halted batch stopped on a submission error partway; surface it so
+          // the user can retry (the retry folds the un-sent parts back in).
+          setErrorMsg(verdict.message);
+          return;
+        case 'unsent':
+          // Still due in this window, so a retry from the monitor sends them.
+          // They may already show in History as pending; say so, or the user
+          // reads the batch as sent.
+          setErrorMsg(
+            (translate('migrationbatchsending.unsent') as string)
+              .replace('{unsent}', String(verdict.unsent))
+              .replace('{total}', String(verdict.total)),
+          );
+          return;
+        case 'nothing':
+          // Reached with nothing actually due (the window has not opened yet,
+          // or every part already confirmed or slid to a later window); the
+          // monitor will show why.
+          addLastSnackbar(translate('migrationbatchsending.nothing') as string);
+          break;
+        case 'not-sendable':
+          // The batch was due but no part could be built and none is still due
+          // (slid to a coming window). Bouncing straight back reads as a silent
+          // failure, so hold here and say what happened.
+          setNotSendable(true);
+          return;
+        case 'sent':
+          addLastSnackbar(
+            (translate('migrationbatchsending.success') as string)
+              .replace('{sent}', String(verdict.sent))
+              .replace('{total}', String(verdict.total)),
+          );
+          break;
       }
       goStatus();
     })();

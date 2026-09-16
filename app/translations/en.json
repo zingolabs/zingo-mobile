@@ -1052,6 +1052,7 @@
     "slid-title": "Batch not sendable yet",
     "slid-body": "None of this batch's parts could be built right now, usually because syncing hasn't reached the batch's anchor height. Nothing was sent. The parts slid to a coming window and the schedule stays intact. Let the wallet finish syncing and try again.",
     "error-title": "Couldn't send the batch",
+    "unsent": "{unsent} of {total} parts didn't reach the network. They may already show as pending in your history, but they weren't sent. They're still due in this window, so nothing is lost: go back and send the batch again.",
     "back": "Back to status"
   },
   "migrationtransactions": {

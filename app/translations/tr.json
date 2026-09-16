@@ -1052,6 +1052,7 @@
     "slid-title": "Grup henüz gönderilemiyor",
     "slid-body": "Bu grubun hiçbir parçası şu anda oluşturulamadı; bu genellikle eşitlemenin grubun çapa yüksekliğine henüz ulaşmadığı anlamına gelir. Hiçbir şey gönderilmedi. Parçalar sonraki bir pencereye kaydı ve plan bozulmadı. Cüzdanın eşitlemeyi bitirmesini bekleyip yeniden deneyin.",
     "error-title": "Grup gönderilemedi",
+    "unsent": "{total} parçadan {unsent} tanesi ağa ulaşmadı. Geçmişinizde beklemede olarak görünebilirler, ancak gönderilmediler. Hâlâ bu pencerede gönderilmeleri gerekiyor, bu yüzden hiçbir şey kaybolmadı: geri dönüp grubu yeniden gönderin.",
     "back": "Duruma dön"
   },
   "migrationtransactions": {

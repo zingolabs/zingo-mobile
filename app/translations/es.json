@@ -1052,6 +1052,7 @@
     "slid-title": "El lote aún no se puede enviar",
     "slid-body": "Ninguna parte de este lote se pudo construir ahora, normalmente porque la sincronización todavía no llegó a la altura del ancla del lote. No se envió nada. Las partes pasaron a una ventana próxima y el plan sigue intacto. Deja que la billetera termine de sincronizar y vuelve a intentarlo.",
     "error-title": "No se pudo enviar el lote",
+    "unsent": "{unsent} de {total} partes no llegaron a la red. Puede que ya aparezcan como pendientes en tu historial, pero no se enviaron. Siguen tocando en esta ventana, así que no se pierde nada: vuelve y envía el lote otra vez.",
     "back": "Volver al estado"
   },
   "migrationtransactions": {
