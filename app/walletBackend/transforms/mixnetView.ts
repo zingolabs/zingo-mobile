@@ -94,6 +94,16 @@ export function deriveMixnetView(
   }
 }
 
+// With Nym off a send waits only for an attach in flight, which holds the mixnet policy.
+export function sendGateOpen(nym: boolean, view: MixnetView | null): boolean {
+  if (view === null) {
+    return true;
+  }
+  return nym
+    ? !view.sendBlocked
+    : view.statusKey !== 'mixnet.status.bootstrapping';
+}
+
 export type MixnetPhase = 'connecting' | 'ready' | 'lost' | 'reconnecting';
 
 // `off` has no phase and an active reconnect wins over the underlying status.

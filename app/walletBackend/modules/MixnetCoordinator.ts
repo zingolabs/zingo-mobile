@@ -72,6 +72,13 @@ export class MixnetCoordinator {
     await setTransmitPolicy(policy);
   }
 
+  // Every attach is the library's mixnet consent act, so clearnet is restated around it.
+  private async restateClearnet(): Promise<void> {
+    if (this.transmitPolicy === 'clearnet') {
+      await setTransmitPolicy('clearnet');
+    }
+  }
+
   // Starts the transport, attaches the wallet, and polls; a failure publishes the typed failure view.
   async ensureForConnectedSession(): Promise<void> {
     const epoch = ++this.enableEpoch;
@@ -79,6 +86,7 @@ export class MixnetCoordinator {
     this.clearReconnectTimer();
     this.publishStarting();
     try {
+      await this.restateClearnet();
       const { socks5Addr, exitNode } = await this.startTransport();
       if (this.enableEpoch !== epoch) {
         return;
@@ -87,9 +95,7 @@ export class MixnetCoordinator {
       if (this.enableEpoch !== epoch) {
         return;
       }
-      if (this.transmitPolicy === 'clearnet') {
-        await setTransmitPolicy('clearnet');
-      }
+      await this.restateClearnet();
       this.publish(status);
     } catch (thrown: unknown) {
       if (this.enableEpoch !== epoch) {

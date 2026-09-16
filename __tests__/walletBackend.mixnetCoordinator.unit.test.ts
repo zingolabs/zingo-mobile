@@ -5,7 +5,10 @@ import {
   RECONNECT_BASE_MILLIS,
   STEADY_POLL_MILLIS,
 } from '@app/walletBackend/modules/MixnetCoordinator';
-import { deriveMixnetView } from '@app/walletBackend/transforms/mixnetView';
+import {
+  deriveMixnetView,
+  sendGateOpen,
+} from '@app/walletBackend/transforms/mixnetView';
 import { MixnetView } from '@app/walletBackend/transforms/mixnetView';
 
 jest.mock('@app/RPCModule', () =>
@@ -155,6 +158,44 @@ describe('deriveMixnetView', () => {
         narration,
       ).narration,
     ).toBeNull();
+  });
+});
+
+describe('sendGateOpen', () => {
+  const view = (statusKey: MixnetView['statusKey'], sendBlocked: boolean) =>
+    ({
+      ...deriveMixnetView(
+        {
+          kind: 'status',
+          indicator: RPCMixnetIndicatorEnum.ready,
+          socks5Addr: '127.0.0.1:1080',
+        },
+        null,
+      ),
+      statusKey,
+      sendBlocked,
+    }) as MixnetView;
+
+  it('opens with Nym off in every state except an attach in flight', () => {
+    expect(sendGateOpen(false, view('mixnet.status.bootstrapping', true))).toBe(
+      false,
+    );
+    expect(sendGateOpen(false, view('mixnet.status.died', true))).toBe(true);
+    expect(sendGateOpen(false, view('mixnet.status.unknown', true))).toBe(true);
+    expect(sendGateOpen(false, view('mixnet.status.ready', false))).toBe(true);
+  });
+
+  it('follows the fail-closed verdict with Nym on', () => {
+    expect(sendGateOpen(true, view('mixnet.status.died', true))).toBe(false);
+    expect(sendGateOpen(true, view('mixnet.status.bootstrapping', true))).toBe(
+      false,
+    );
+    expect(sendGateOpen(true, view('mixnet.status.ready', false))).toBe(true);
+  });
+
+  it('opens where no mixnet policy runs', () => {
+    expect(sendGateOpen(false, null)).toBe(true);
+    expect(sendGateOpen(true, null)).toBe(true);
   });
 });
 
@@ -423,7 +464,7 @@ describe('MixnetCoordinator', () => {
     coordinator.stop();
   });
 
-  it('restates the clearnet policy after an attach lands, since the attach consents to the mixnet', async () => {
+  it('restates the clearnet policy before and after an attach, since the attach consents to the mixnet', async () => {
     mockedBridge.attachMixnet.mockResolvedValue(
       statusPayload('ready', '127.0.0.1:1080'),
     );
@@ -438,14 +479,36 @@ describe('MixnetCoordinator', () => {
     await coordinator.ensureForConnectedSession();
     await flushPromises();
 
+    expect(mockedBridge.setTransmitPolicy).toHaveBeenCalledTimes(2);
     expect(mockedBridge.setTransmitPolicy).toHaveBeenCalledWith('clearnet');
-    expect(mockedBridge.attachMixnet.mock.invocationCallOrder[0]).toBeLessThan(
-      mockedBridge.setTransmitPolicy.mock.invocationCallOrder[0],
-    );
+    const attachAt = mockedBridge.attachMixnet.mock.invocationCallOrder[0];
+    const [before, after] =
+      mockedBridge.setTransmitPolicy.mock.invocationCallOrder;
+    expect(before).toBeLessThan(attachAt);
+    expect(after).toBeGreaterThan(attachAt);
     coordinator.stop();
   });
 
-  it('leaves the policy alone after an attach when the session sends over the mixnet', async () => {
+  it('a failed attach still had clearnet applied before it, so the library restores clearnet', async () => {
+    mockedBridge.attachMixnet.mockResolvedValue(statusPayload('died'));
+    mockedBridge.setTransmitPolicy.mockResolvedValue('{}');
+    const startTransport = jest.fn().mockResolvedValue(transportBinding);
+    const coordinator = new MixnetCoordinator(
+      startTransport,
+      () => {},
+      'clearnet',
+    );
+
+    await coordinator.ensureForConnectedSession();
+    await flushPromises();
+
+    expect(
+      mockedBridge.setTransmitPolicy.mock.invocationCallOrder[0],
+    ).toBeLessThan(mockedBridge.attachMixnet.mock.invocationCallOrder[0]);
+    coordinator.stop();
+  });
+
+  it('leaves the policy alone around an attach when the session sends over the mixnet', async () => {
     mockedBridge.attachMixnet.mockResolvedValue(
       statusPayload('ready', '127.0.0.1:1080'),
     );
@@ -472,7 +535,7 @@ describe('MixnetCoordinator', () => {
 
     await coordinator.reenable();
     await flushPromises();
-    expect(mockedBridge.setTransmitPolicy).toHaveBeenCalledTimes(2);
+    expect(mockedBridge.setTransmitPolicy).toHaveBeenCalledTimes(3);
     expect(mockedBridge.setTransmitPolicy).toHaveBeenLastCalledWith('clearnet');
     coordinator.stop();
   });

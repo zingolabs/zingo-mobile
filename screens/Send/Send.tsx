@@ -51,7 +51,10 @@ import NymOff from '../../assets/img/nym-off.svg';
 import NymSwitchOn from '../../assets/img/nym-switch-on.svg';
 import SwitchOff from '../../assets/img/switch-off.svg';
 import { showConfirm } from '@app/services/showConfirm';
-import { mixnetPhase } from '@app/walletBackend/transforms/mixnetView';
+import {
+  mixnetPhase,
+  sendGateOpen,
+} from '@app/walletBackend/transforms/mixnetView';
 import ErrorText from '@ui/primitives/ErrorText';
 import RegText from '@ui/primitives/RegText';
 import ZecAmount from '@ui/widgets/ZecAmount';
@@ -917,7 +920,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         !(
           !memoEnabled && Utils.parseStringLocaleToNumberFloat(amountText) === 0
         ) &&
-        (mixnetView === null || !nym || !mixnetView.sendBlocked),
+        sendGateOpen(nym, mixnetView),
     );
   }, [
     memoEnabled,
