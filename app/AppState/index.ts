@@ -66,6 +66,7 @@ import {
   windowTargetHeight,
   estimatedTimestampMs,
   awaitingWalletTip,
+  reminderTimestampMs,
 } from './const/BlockTime';
 
 import type AppStateLoaded from './AppStateLoaded';
@@ -122,6 +123,7 @@ export {
   windowTargetHeight,
   estimatedTimestampMs,
   awaitingWalletTip,
+  reminderTimestampMs,
 };
 
 export type {

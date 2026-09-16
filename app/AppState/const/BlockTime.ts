@@ -81,3 +81,63 @@ export const estimatedTimestampMs = (
   nowMs: number,
 ): number =>
   nowMs + Math.max(0, targetHeight - currentHeight) * secondsPerBlock * 1000;
+
+// A reminder never fires in the window's first blocks, so the wallet has
+// synced to the boundary and "Send" is on screen when the user opens the app.
+export const REMINDER_START_MARGIN_BLOCKS = 2;
+// Nor in its last ~30 minutes, so there is time to send (and retry) before the
+// window closes and its batch slides.
+export const REMINDER_END_MARGIN_BLOCKS = 24;
+
+/**
+ * The height a window's reminder fires at: its advisory target, kept inside
+ * the window. zingolib draws each part's target as the boundary plus an
+ * exponential delay capped far beyond the window (576 blocks against a
+ * 144-block window) and the window's target is the latest of its parts', so
+ * unclamped it often lands after the window has closed, when its batch can no
+ * longer be sent. Targets already inside the margins are left untouched.
+ */
+export const reminderHeight = (
+  wake: RPCBroadcastWindowType,
+  bucketModulus: number,
+): number => {
+  const earliest = wake.boundary + REMINDER_START_MARGIN_BLOCKS;
+  const latest = Math.max(
+    earliest,
+    wake.boundary + bucketModulus - REMINDER_END_MARGIN_BLOCKS,
+  );
+  return Math.min(Math.max(windowTargetHeight(wake), earliest), latest);
+};
+
+/**
+ * When a window's reminder fires, in ms since epoch. On mainnet the block
+ * distance is scaled by the protocol's target spacing: the observed spacing is
+ * an average over a handful of recent blocks, noisy enough (tens of seconds
+ * either way) to fire hours early or late across hundreds of blocks, while the
+ * chain holds the target on average. Test chains, which may tick much faster,
+ * keep the observed spacing. Without a chain tip the payload's own estimate
+ * (target spacing from the window's opening) is used.
+ */
+export const reminderTimestampMs = (
+  wake: RPCBroadcastWindowType,
+  bucketModulus: number,
+  chain: {
+    latestBlock?: number;
+    secondsPerBlock?: number;
+    mainnet: boolean;
+  },
+  nowMs: number,
+): number => {
+  const height = reminderHeight(wake, bucketModulus);
+  if (!chain.latestBlock) {
+    return (
+      (wake.window_opens_unix_time +
+        (height - wake.boundary) * TARGET_BLOCK_SPACING_SECONDS) *
+      1000
+    );
+  }
+  const spacing = chain.mainnet
+    ? TARGET_BLOCK_SPACING_SECONDS
+    : (chain.secondsPerBlock ?? TARGET_BLOCK_SPACING_SECONDS);
+  return estimatedTimestampMs(height, chain.latestBlock, spacing, nowMs);
+};

@@ -15,12 +15,7 @@ import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
 import StepperHeader from '@ui/widgets/StepperHeader';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
-import {
-  RouteEnum,
-  TARGET_BLOCK_SPACING_SECONDS,
-  estimatedTimestampMs,
-  windowTargetHeight,
-} from '@app/AppState';
+import { ChainNameEnum, RouteEnum, reminderTimestampMs } from '@app/AppState';
 import Utils from '@app/utils';
 import { migrationStatus } from '@app/walletBackend';
 import {
@@ -39,6 +34,9 @@ type MigrationScheduleProps = NativeStackScreenProps<
 
 const ZATS_PER_ZEC = 10 ** 8;
 
+// ZIP 318's window length, for the moment before the status read lands.
+const DEFAULT_BUCKET_MODULUS = 144;
+
 const fmt = (zats: number): string =>
   `${parseFloat((zats / ZATS_PER_ZEC).toFixed(4))}`;
 
@@ -55,28 +53,29 @@ const MigrationSchedule: React.FunctionComponent<MigrationScheduleProps> = ({
   const { translate, language, addLastSnackbar, info } = context;
   const { colors } = useTheme();
 
-  // The payload's unix estimates assume mainnet spacing; re-derive each
-  // target's wall-clock moment from its block distance and the spacing the
-  // wallet actually observes, so the times hold on faster chains too. Without
-  // a chain tip there is no distance to scale, so the payload's own estimate
-  // stands.
-  const wakeTargetMs = useCallback(
-    (wake: RPCBroadcastWindowType): number =>
-      info?.latestBlock
-        ? estimatedTimestampMs(
-            windowTargetHeight(wake),
-            info.latestBlock,
-            info.secondsPerBlock ?? TARGET_BLOCK_SPACING_SECONDS,
-            Date.now(),
-          )
-        : wake.latest_target_unix_time * 1000,
-    [info],
-  );
-
   const [status, setStatus] = useState<RPCMigrationStatusType | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [confirming, setConfirming] = useState<boolean>(false);
+
+  // When each window's reminder fires: its advisory target kept inside the
+  // window, timed by block distance from the chain tip (see
+  // reminderTimestampMs). The schedule card shows the same moment the
+  // reminder is armed at.
+  const wakeTargetMs = useCallback(
+    (wake: RPCBroadcastWindowType): number =>
+      reminderTimestampMs(
+        wake,
+        status?.bucket_modulus ?? DEFAULT_BUCKET_MODULUS,
+        {
+          latestBlock: info?.latestBlock,
+          secondsPerBlock: info?.secondsPerBlock,
+          mainnet: info?.chainName === ChainNameEnum.mainChainName,
+        },
+        Date.now(),
+      ),
+    [info, status],
+  );
 
   // The cadence chooser just called start_ironwood_migration, which bound the
   // parts and scheduled them — so this fetch, after it, is the schedule's truth.
