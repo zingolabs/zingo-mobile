@@ -6,8 +6,7 @@ type ScreenSecurityAPI = {
 };
 
 const ScreenSecurity = NativeModules.ScreenSecurity as
-  | ScreenSecurityAPI
-  | undefined;
+  ScreenSecurityAPI | undefined;
 
 const supported = Platform.OS === 'android' && !!ScreenSecurity;
 
