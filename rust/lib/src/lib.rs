@@ -151,7 +151,11 @@ fn ffi_error(e: LightClientError) -> ZingolibError {
             | SendError::CalculateSendError(_)
             | SendError::RetargetError(_)
             | SendError::NoStoredProposal
-            | SendError::TransmissionError(_) => ZingolibError::Send(text),
+            | SendError::TransmissionError(_)
+            | SendError::OpReturn(_)
+            | SendError::OpReturnNotCalculable
+            | SendError::OpReturnSourceAddressStale
+            | SendError::OpReturnAfterDeshield { .. } => ZingolibError::Send(text),
         },
         LightClientError::ClientError(_) | LightClientError::IndexerError(_) => {
             ZingolibError::Indexer(text)
@@ -160,9 +164,7 @@ fn ffi_error(e: LightClientError) -> ZingolibError {
         LightClientError::WalletError(_) => ZingolibError::Wallet(text),
         LightClientError::Offline => ZingolibError::Offline,
         LightClientError::PriceError(_) => ZingolibError::Read(text),
-        LightClientError::MixnetNotReady(_) | LightClientError::ProbeRequiresMixnet => {
-            ZingolibError::Mixnet(text)
-        }
+        LightClientError::MixnetNotReady(_) => ZingolibError::Mixnet(text),
         // A deliberate choice (#1229): exhausting the eligible Destinations
         // is a server-topology problem, not a mixnet refusal — switching the
         // synchronization endpoint changes eligibility, so the app's
@@ -948,7 +950,9 @@ mod ffi_error_routing_tests {
     #[test]
     fn excluded_indexer_exhaustion_is_an_indexer_failure_not_a_refusal() {
         let mapped = ffi_error(LightClientError::NoEligibleDestination(
-            zingolib::destination::NoEligibleDestinations::EmptyPool,
+            zingolib::destination::servers::NoEligibleDestinations::Empty(
+                zingolib::destination::servers::Transport::Mixnet,
+            ),
         ));
         assert!(
             matches!(&mapped, ZingolibError::Indexer(_)),
@@ -3584,7 +3588,8 @@ pub fn enable_mixnet(proxy_path: String) -> Result<String, ZingolibError> {
 }
 
 /// Disable Mixnet Mode: the user's deliberate per-session consent to
-/// clearnet for the send and price surfaces.
+/// clearnet for sends and migration parts. The price fetch stays mixnet-only
+/// and refuses while the mixnet is off.
 pub fn disable_mixnet() -> Result<String, ZingolibError> {
     with_panic_guard(|| {
         let mut guard = LIGHTCLIENT
@@ -3593,6 +3598,12 @@ pub fn disable_mixnet() -> Result<String, ZingolibError> {
         if let Some(lightclient) = &mut *guard {
             Ok(RT.block_on(async move {
                 lightclient.disable_mixnet().await;
+                // Switching the transport off no longer routes sends over
+                // clearnet by itself: the transmit policy does, and every
+                // session starts under Mixnet. Without this, turning Mixnet
+                // Mode off would make every send refuse. Enabling or attaching
+                // the mixnet sets the policy back to Mixnet.
+                lightclient.set_transmit_policy(zingolib::mixnet::TransmitPolicy::Clearnet);
                 object! { "mixnet_indicator" => "off" }.pretty(2)
             }))
         } else {
