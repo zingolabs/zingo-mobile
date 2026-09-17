@@ -51,7 +51,10 @@ import NymOff from '../../assets/img/nym-off.svg';
 import NymSwitchOn from '../../assets/img/nym-switch-on.svg';
 import SwitchOff from '../../assets/img/switch-off.svg';
 import { showConfirm } from '@app/services/showConfirm';
-import { mixnetPhase } from '@app/walletBackend/transforms/mixnetView';
+import {
+  mixnetPhase,
+  sendGateOpen,
+} from '@app/walletBackend/transforms/mixnetView';
 import ErrorText from '@ui/primitives/ErrorText';
 import RegText from '@ui/primitives/RegText';
 import ZecAmount from '@ui/widgets/ZecAmount';
@@ -917,11 +920,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         !(
           !memoEnabled && Utils.parseStringLocaleToNumberFloat(amountText) === 0
         ) &&
-        // Mixnet Mode fail-closed verdict: while the transport is
-        // bootstrapping, died, or unknowable, sending stays blocked; only
-        // `ready` or the user's explicit clearnet consent (`off`) opens it.
-        // Null means no mixnet policy runs (mixnetSupported injected false).
-        (mixnetView === null || !mixnetView.sendBlocked),
+        sendGateOpen(nym, mixnetView),
     );
   }, [
     memoEnabled,
@@ -932,6 +931,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     fee,
     maxAmount,
     mixnetView,
+    nym,
   ]);
 
   useEffect(() => {
@@ -1722,22 +1722,24 @@ const Send: React.FunctionComponent<SendProps> = ({
                             />
                           </TouchableOpacity>
                           {inputZec ? (
-                            <CurrencyAmount
-                              style={{
-                                marginTop: 0,
-                                marginBottom: 0,
-                                fontSize: 16,
-                              }}
-                              priceDate={zecPrice.date}
-                              price={zecPrice.zecPrice}
-                              amtZec={
-                                Utils.parseStringLocaleToNumberFloat(
-                                  amountText,
-                                ) || 0
-                              }
-                              currency={currency}
-                              privacy={privacy}
-                            />
+                            zecPrice.date > 0 && (
+                              <CurrencyAmount
+                                style={{
+                                  marginTop: 0,
+                                  marginBottom: 0,
+                                  fontSize: 16,
+                                }}
+                                priceDate={zecPrice.date}
+                                price={zecPrice.zecPrice}
+                                amtZec={
+                                  Utils.parseStringLocaleToNumberFloat(
+                                    amountText,
+                                  ) || 0
+                                }
+                                currency={currency}
+                                privacy={privacy}
+                              />
+                            )
                           ) : (
                             <ZecAmount
                               style={{ marginLeft: 0 }}
@@ -1755,9 +1757,13 @@ const Send: React.FunctionComponent<SendProps> = ({
                               privacy={privacy}
                             />
                           )}
-                          <View style={{ marginLeft: inputZec ? 5 : 2 }}>
-                            <PriceFetcher backgroundColor={colors.bgSurface} />
-                          </View>
+                          {zecPrice.date > 0 && (
+                            <View style={{ marginLeft: inputZec ? 5 : 2 }}>
+                              <PriceFetcher
+                                backgroundColor={colors.bgSurface}
+                              />
+                            </View>
+                          )}
                         </>
                       )}
                   </View>

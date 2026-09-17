@@ -132,6 +132,7 @@ visual/__video__/
 visual/report.html
 visual/report.json
 visual/index.html
+visual/status.json
 visual/styled.html
 visual/ci/
 test-results/
