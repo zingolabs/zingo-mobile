@@ -354,8 +354,14 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
             on platforms whose transport has not landed) and never in the `off`
             state (deliberate clearnet: phase is null). A pulsing green halo
             means connecting, a bare icon means ready, a coral halo means lost,
-            a traveling yellow arc means reconnecting. */}
-        {mixnetView !== null && phase !== null && (
+            a traveling yellow arc means reconnecting.
+
+            Shown only while the user's transmit policy is the mixnet. The
+            transport now starts in every session because the price fetch is
+            mixnet-only, so without this the icon sat there connecting with
+            Mixnet Mode switched off, which reads as the wallet ignoring the
+            setting. What it reports is where a send travels. */}
+        {nym && mixnetView !== null && phase !== null && (
           <View
             testID="header.mixnet-status"
             style={{
