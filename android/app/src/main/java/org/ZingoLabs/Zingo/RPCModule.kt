@@ -948,14 +948,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
-    fun disableMixnet(promise: Promise) {
-        FfiOutcome.settling(promise, "disable_mixnet") {
-            uniffi.zingo.initLogging()
-            uniffi.zingo.disableMixnet()
-        }
-    }
-
-    @ReactMethod
     fun mixnetIndicatorInfo(promise: Promise) {
         FfiOutcome.settling(promise, "mixnet_indicator") {
             uniffi.zingo.initLogging()
@@ -968,6 +960,14 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         FfiOutcome.settling(promise, "mixnet_bootstrap_detail") {
             uniffi.zingo.initLogging()
             uniffi.zingo.mixnetBootstrapDetail()
+        }
+    }
+
+    @ReactMethod
+    fun setTransmitPolicy(policy: String, promise: Promise) {
+        FfiOutcome.settling(promise, "set_transmit_policy") {
+            uniffi.zingo.initLogging()
+            uniffi.zingo.setTransmitPolicy(policy)
         }
     }
 
