@@ -5,8 +5,9 @@
  * that slid or was rebuilt into another window kept its stale reminder. The
  * builder is shared by the confirmation and the re-arm hook; the hook re-arms
  * when the upcoming windows or their numbering change, clears the reminders
- * when none are left, and never prompts for permission. A permission granted
- * later (back from the system settings) arms what a denial could not.
+ * when none are left, and asks for notification permission when there are
+ * reminders to arm without it. A permission granted later (back from the
+ * system settings) arms what a denial could not.
  */
 
 import 'react-native';
@@ -24,6 +25,7 @@ import {
   armBatchReminders,
   cancelBatchReminders,
   reminderPermissionGranted,
+  requestReminderPermission,
 } from '@app/notifications/reminders';
 import {
   defaultAppContextLoaded,
@@ -40,11 +42,13 @@ jest.mock('@app/notifications/reminders', () => ({
   armBatchReminders: jest.fn(async () => {}),
   cancelBatchReminders: jest.fn(async () => {}),
   reminderPermissionGranted: jest.fn(async () => true),
+  requestReminderPermission: jest.fn(async () => false),
 }));
 
 const armMock = armBatchReminders as jest.Mock;
 const cancelMock = cancelBatchReminders as jest.Mock;
 const permissionMock = reminderPermissionGranted as jest.Mock;
+const requestMock = requestReminderPermission as jest.Mock;
 
 const window = (bucket: number): RPCBroadcastWindowType => ({
   bucket_index: bucket,
@@ -135,6 +139,7 @@ describe('useRearmBatchReminders', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     permissionMock.mockResolvedValue(true);
+    requestMock.mockResolvedValue(false);
   });
 
   test('arms from the first status, and not again while nothing moved', async () => {
@@ -167,11 +172,37 @@ describe('useRearmBatchReminders', () => {
     expect(armMock).not.toHaveBeenCalled();
   });
 
-  test('without permission nothing is armed', async () => {
+  test('missing permission is asked for, and a refusal arms nothing', async () => {
     permissionMock.mockResolvedValue(false);
     render(probe(status()));
-    await waitFor(() => expect(permissionMock).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(requestMock).toHaveBeenCalledTimes(1));
     expect(armMock).not.toHaveBeenCalled();
+  });
+
+  test('granting the prompt arms the reminders at once', async () => {
+    permissionMock.mockResolvedValue(false);
+    requestMock.mockResolvedValue(true);
+    render(probe(status()));
+    await waitFor(() => expect(armMock).toHaveBeenCalledTimes(1));
+    expect(requestMock).toHaveBeenCalledTimes(1);
+  });
+
+  test('it asks once per schedule, not on every re-read', async () => {
+    permissionMock.mockResolvedValue(false);
+    const { rerender } = render(probe(status()));
+    await waitFor(() => expect(requestMock).toHaveBeenCalledTimes(1));
+
+    rerender(probe(status({ orchard_confirmed_spendable: 5 })));
+    rerender(probe(status({ parts_confirmed: 4 })));
+    await new Promise(resolve => setTimeout(resolve, 0));
+    expect(requestMock).toHaveBeenCalledTimes(1);
+  });
+
+  test('with nothing to arm it does not ask', async () => {
+    permissionMock.mockResolvedValue(false);
+    render(probe(status({ upcoming_windows: [] })));
+    await waitFor(() => expect(cancelMock).toHaveBeenCalled());
+    expect(requestMock).not.toHaveBeenCalled();
   });
 
   test('a permission granted later, back in the app, arms the reminders', async () => {

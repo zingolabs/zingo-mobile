@@ -9,6 +9,7 @@ import {
 import {
   armBatchReminders,
   cancelBatchReminders,
+  requestReminderPermission,
 } from '@app/notifications/reminders';
 import { RPCMigrationStatusType } from '@app/walletBackend/types/RPCMigrationStatusType';
 import { useReminderPermission } from './useReminderPermission';
@@ -22,9 +23,17 @@ import { useReminderPermission } from './useReminderPermission';
  * Re-arms whenever the upcoming windows (or their numbering) change, starting
  * with the first status a screen reads, and when notification permission is
  * granted later from the system settings. With no upcoming windows left (no
- * migration, still splitting, or all sent) it clears the reminders. Never
- * prompts for permission: without it, nothing is armed. `status` null (not
- * read yet, or the read failed) leaves the reminders alone.
+ * migration, still splitting, or all sent) it clears the reminders. `status`
+ * null (not read yet, or the read failed) leaves the reminders alone.
+ *
+ * When there are reminders to arm and permission is missing, it asks for it:
+ * the schedule confirmation is otherwise the only place that ever prompts, so
+ * a migration confirmed in an older build (or a denial back then) left the
+ * user with no reminders and nowhere in the app to grant them. It asks once
+ * per schedule per mount — so once more each time the app is opened, which is
+ * the insistence a wallet that would rather remind you needs, without turning
+ * a refusal into a loop. Android stops showing the dialog after two denials
+ * and answers no on its own.
  *
  * Returns the permission as read (`null` until known), so a screen can say
  * whether reminders will actually arrive.
@@ -34,15 +43,19 @@ export function useRearmBatchReminders(
 ): boolean | null {
   const context = useContext(ContextAppLoaded);
   const { translate, info } = context;
-  const permitted = useReminderPermission();
+  const { permitted, refresh } = useReminderPermission();
   const signature = status ? batchRemindersSignature(status) : null;
   // A permission change counts as a change: a grant arms what a denial could
   // not.
   const key = signature === null ? null : `${signature}#${permitted}`;
   const handledKey = useRef<string | null>(null);
+  const promptedSignature = useRef<string | null>(null);
 
   useEffect(() => {
-    if (!status || key === null || key === handledKey.current) {
+    if (!status || key === null || signature === null) {
+      return;
+    }
+    if (key === handledKey.current) {
       return;
     }
     handledKey.current = key;
@@ -52,8 +65,21 @@ export function useRearmBatchReminders(
           await cancelBatchReminders();
           return;
         }
-        if (permitted !== true) {
+        if (permitted === null) {
+          // Not known yet; the read lands in a moment and re-runs this.
+          handledKey.current = null;
           return;
+        }
+        if (!permitted) {
+          if (promptedSignature.current === signature) {
+            return;
+          }
+          promptedSignature.current = signature;
+          const granted = await requestReminderPermission();
+          refresh();
+          if (!granted) {
+            return;
+          }
         }
         await armBatchReminders(
           buildBatchReminders(
