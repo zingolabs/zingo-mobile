@@ -26,6 +26,8 @@ type WalletRecoveryModalProps = {
   onCopy: () => void;
   // Absent hides the button (no intact backup to restore).
   onRestoreBackup?: () => void;
+  // Absent hides the button (the damaged file holds no salvageable seed).
+  onSalvageSeed?: () => void;
   onSupport: () => void;
   onCancel: () => void;
   // Fires on any dismissal, including the Android back button.
@@ -45,6 +47,7 @@ const WalletRecoveryModal: React.FunctionComponent<
   translate,
   onCopy,
   onRestoreBackup,
+  onSalvageSeed,
   onSupport,
   onCancel,
   onDismiss,
@@ -149,6 +152,15 @@ const WalletRecoveryModal: React.FunctionComponent<
             title={translate('copy') as string}
             onPress={onCopy}
           />
+          {onSalvageSeed && (
+            <Button
+              type={ButtonTypeEnum.Secondary}
+              title={
+                translate('loadingapp.walletrecovery-salvageseed') as string
+              }
+              onPress={onSalvageSeed}
+            />
+          )}
           <View
             style={{
               flexDirection: 'row',

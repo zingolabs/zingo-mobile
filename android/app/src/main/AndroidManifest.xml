@@ -23,6 +23,9 @@
         android:name="android.permission.SCHEDULE_EXACT_ALARM"
         tools:node="remove" />
 
+    <!-- allowBackup="false": wallet files rest as plain zingolib bytes, and
+         backup exclusion is their only guard against a stale device backup
+         restoring an old wallet over a newer one. It must never flip to true. -->
     <application
       android:name=".MainApplication"
       android:label="@string/app_name"

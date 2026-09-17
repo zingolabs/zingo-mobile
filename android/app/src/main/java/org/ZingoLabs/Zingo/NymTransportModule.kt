@@ -20,8 +20,7 @@ import uniffi.zingo_nym_proxy_ffi.ProxyDeathReason
  *
  * Lifecycle: `startMixnetTransport` (re)starts the proxy and resolves its
  * binding — the `host:port` endpoint and the Exit Node it bound, both of
- * which the wallet's attach seam requires; `stopMixnetTransport` is the
- * deliberate teardown.
+ * which the wallet's attach seam requires.
  * A proxy that dies on its own is observed by the shim's liveness monitor;
  * the observer clears the stored handle so a later re-enable starts afresh,
  * while the wallet's own probe surfaces the `died` mode the app polls.
@@ -32,7 +31,7 @@ import uniffi.zingo_nym_proxy_ffi.ProxyDeathReason
  * exceptions at this boundary because a build whose APK carries no shim
  * library must degrade fail-closed — an `UnsatisfiedLinkError` becomes a
  * rejected start, sends stay blocked, and the app survives to offer
- * re-enable or the clearnet consent path.
+ * re-enable.
  */
 /**
  * The identity decision for a proxy death report (zingo-mobile#1227): a
@@ -140,18 +139,6 @@ class NymTransportModule internal constructor(reactContext: ReactApplicationCont
                     }
                 }
             }
-        }
-    }
-
-    @ReactMethod
-    fun stopMixnetTransport(promise: Promise) {
-        FfiOutcome.settling(promise, "stop_mixnet_transport") {
-            guardingLinkage {
-                synchronized(handleLock) {
-                    releaseHandle()
-                }
-            }
-            null
         }
     }
 }

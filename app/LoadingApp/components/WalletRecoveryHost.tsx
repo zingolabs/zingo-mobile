@@ -33,6 +33,11 @@ const WalletRecoveryHost: React.FunctionComponent = () => {
           ? () => close(options.onRestoreBackup as () => void)
           : undefined
       }
+      onSalvageSeed={
+        options?.onSalvageSeed
+          ? () => close(options.onSalvageSeed as () => void)
+          : undefined
+      }
       onSupport={() => options && close(options.onSupport)}
       onCancel={() => options && close(options.onCancel)}
       // Clear state on any dismissal, including the Android back button.

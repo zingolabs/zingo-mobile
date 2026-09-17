@@ -10,8 +10,7 @@
 //
 //  Lifecycle: `startMixnetTransport` (re)starts the proxy and resolves its
 //  binding — the `host:port` endpoint and the Exit Node it bound, both of
-//  which the wallet's attach seam requires; `stopMixnetTransport` is the
-//  deliberate teardown.
+//  which the wallet's attach seam requires.
 //  A proxy that dies on its own is caught by the shim's liveness monitor; the
 //  observer clears the stored handle so a later re-enable starts afresh, while
 //  the wallet's own probe surfaces the `died` mode the app polls.
@@ -116,17 +115,6 @@ class NymTransportModule: NSObject {
         NSLog("[Native] nym start_mixnet_transport rejected. \(error)")
         DispatchQueue.main.async { reject("start_mixnet_transport", "\(error)", error) }
       }
-    }
-  }
-
-  @objc(stopMixnetTransport:reject:)
-  func stopMixnetTransport(_ resolve: @escaping RCTPromiseResolveBlock,
-                           reject: @escaping RCTPromiseRejectBlock) {
-    DispatchQueue.global(qos: .userInitiated).async {
-      NymTransportModule.handleLock.lock()
-      NymTransportModule.releaseHandle()
-      NymTransportModule.handleLock.unlock()
-      DispatchQueue.main.async { resolve(nil) }
     }
   }
 }

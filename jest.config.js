@@ -4,7 +4,7 @@ module.exports = {
   preset: 'react-native',
   testEnvironment: '<rootDir>/jest-environment-react-native.js',
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
-  modulePathIgnorePatterns: ['e2e'],
+  modulePathIgnorePatterns: ['e2e', '<rootDir>/.claude/'],
   // visual/ holds Playwright specs, run by `yarn visual:capture`.
   testPathIgnorePatterns: ['/node_modules/', '<rootDir>/visual/'],
   transform: {

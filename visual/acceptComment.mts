@@ -28,6 +28,7 @@ const headRef = need('HEAD_REF');
 const prNumber = need('PR_NUMBER');
 const authorLogin = need('AUTHOR_LOGIN');
 const authorId = need('AUTHOR_ID');
+const botLogin = need('BOT_LOGIN');
 
 const gh = (ghArgs: string[]): string => {
   const out = spawnSync('gh', ghArgs, { encoding: 'utf8' });
@@ -107,11 +108,12 @@ if (staged === 0) {
 }
 
 const coauthor = `Co-authored-by: ${authorLogin} <${authorId}+${authorLogin}@users.noreply.github.com>`;
+const { id: botId } = ghJson<{ id: number }>(`users/${botLogin}`);
 git([
   '-c',
-  'user.name=visual-review-bot',
+  `user.name=${botLogin}`,
   '-c',
-  'user.email=visual-review-bot@users.noreply.github.com',
+  `user.email=${botId}+${botLogin}@users.noreply.github.com`,
   'commit',
   '-m',
   `test(visual): accept baseline (PR #${prNumber})`,

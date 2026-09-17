@@ -1,6 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useContext, useState } from 'react';
 import { Pressable, Text, View, ViewStyle } from 'react-native';
+import { getNumberFormatSettings } from 'react-native-localize';
 import Animated, {
   Easing,
   FadeIn,
@@ -160,8 +161,10 @@ const IronwoodMigrationBanner: React.FunctionComponent<
   IronwoodMigrationBannerProps
 > = ({ amount, currencyName, onStart, onResume }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, info } = context;
+  const { translate, info, privacy } = context;
   const { colors } = useTheme();
+  const { decimalSeparator } = getNumberFormatSettings();
+  const masked = `-${decimalSeparator}----`;
 
   const [migration, setMigration] = useState<RPCMigrationStatusType | null>(
     null,
@@ -246,10 +249,12 @@ const IronwoodMigrationBanner: React.FunctionComponent<
     const perBucket = scheduled ? Math.max(1, migration.per_bucket ?? 1) : 1;
     const batchesConfirmed = Math.floor(migration.parts_confirmed / perBucket);
 
-    const orchardLeftStr = `${Utils.parseNumberFloatToStringLocale(
-      migration.orchard_confirmed_spendable / ZATS_PER_ZEC,
-      4,
-    )} ${currencyName}`;
+    const orchardLeftStr = privacy
+      ? `${masked} ${currencyName}`
+      : `${Utils.parseNumberFloatToStringLocale(
+          migration.orchard_confirmed_spendable / ZATS_PER_ZEC,
+          4,
+        )} ${currencyName}`;
 
     // A batch is ready to send exactly when the backend reports a due batch:
     // the window the chain is currently inside, which upcoming_windows cannot
@@ -502,7 +507,9 @@ const IronwoodMigrationBanner: React.FunctionComponent<
             <Text style={{ color: colors.fgMuted, fontSize: 13 }}>
               {translate('ironwoodbanner.balance') as string}{' '}
               <Text style={{ color: colors.fgDefault, fontWeight: '700' }}>
-                {Utils.parseNumberFloatToStringLocale(amount, 4)}
+                {privacy
+                  ? masked
+                  : Utils.parseNumberFloatToStringLocale(amount, 4)}
               </Text>{' '}
               {currencyName}
             </Text>

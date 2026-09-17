@@ -5,7 +5,7 @@ package org.ZingoLabs.Zingo
  * wallet starts with a small u64-LE serialization version, a Jetpack
  * `EncryptedFile` (Tink AES-GCM-HKDF streaming, RAW prefix) starts with its
  * header length byte, 0x28. A file whose decrypted payload is itself a Tink
- * envelope was wrapped twice by `migrateFileIfNeeded` after a transient
+ * envelope was wrapped twice by the 2.0.21 migration after a transient
  * Keystore failure made a valid encrypted file look unencrypted. Pure, so
  * it runs under plain JVM unit tests.
  */

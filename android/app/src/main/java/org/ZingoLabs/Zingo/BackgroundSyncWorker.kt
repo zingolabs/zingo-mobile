@@ -32,34 +32,6 @@ import kotlin.time.toDuration
 import kotlin.time.toJavaDuration
 import org.ZingoLabs.Zingo.Constants.*
 import java.io.FileInputStream
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
-
-data class ScanRanges (
-    val priority : String = "",
-    val start_block : String = "",
-    val end_block : String = ""
-)
-
-data class SyncStatus (
-    val scan_ranges : List<ScanRanges> = emptyList(),
-    val sync_start_height : Long = 0L,
-    val session_blocks_scanned : Long = 0L,
-    val total_blocks_scanned : Long = 0L,
-    val percentage_session_blocks_scanned : Double = 0.0,
-    val percentage_total_blocks_scanned : Double = 0.0,
-    val session_sapling_outputs_scanned : Long = 0L,
-    val total_sapling_outputs_scanned : Long = 0L,
-    val session_orchard_outputs_scanned : Long = 0L,
-    val total_orchard_outputs_scanned : Long = 0L,
-    val session_ironwood_outputs_scanned : Long = 0L,
-    val total_ironwood_outputs_scanned : Long = 0L,
-    val percentage_session_outputs_scanned : Double = 0.0,
-    val percentage_total_outputs_scanned : Double = 0.0,
-    val total_outputs_scanned : Long = 0L,
-    val total_outputs : Long = 0L
-)
 
 class BackgroundSyncWorker(private val context: Context, workerParams: WorkerParameters) : Worker(context, workerParams) {
     private val rpcModule = RPCModule(MainApplication.getAppReactContext())
@@ -83,11 +55,6 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
     override fun doWork(): Result {
 
         Log.i("SCHEDULED_TASK_RUN", "Task running")
-
-        // zingolib adds sync-status fields as new pools land; an unknown field
-        // is not a reason to fail the background sync.
-        val mapper = jacksonObjectMapper()
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 
         // save the background JSON file
         val timeStampStart = Date().time / 1000
@@ -188,7 +155,6 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
             val startTime = System.currentTimeMillis()
             val maxDurationMillis = 60 * 60 * 1000
 
-            var syncStatus: SyncStatus
             while (true) {
                 val elapsed = System.currentTimeMillis() - startTime
                 if (elapsed > maxDurationMillis) {
@@ -222,10 +188,9 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
                 }
 
                 try {
-                    syncStatus = mapper.readValue(syncStatusJson)
-
-                    val percent = syncStatus.percentage_total_outputs_scanned
-                       ?: syncStatus.percentage_total_blocks_scanned
+                    val status = JSONObject(syncStatusJson)
+                    val percent = status.optDouble("percentage_total_outputs_scanned").takeUnless { it.isNaN() }
+                        ?: status.getDouble("percentage_total_blocks_scanned")
 
                     if (percent >= 100.0) {
                         Log.i("SCHEDULED_TASK_RUN", "sync COMPLETED %: $percent")
@@ -234,7 +199,7 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
                         Log.i("SCHEDULED_TASK_RUN", "sync STATUS %: $percent")
                     }
                 } catch (e: Exception) {
-                    Log.e("SCHEDULED_TASK_RUN", "sync STATUS - parsing ERROR ${e.localizedMessage}")
+                    Log.e("SCHEDULED_TASK_RUN", "sync STATUS - parsing ERROR $e")
                     // save the background JSON file
                     val timeStampError = Date().time / 1000
                     val timeStampStrError = timeStampError.toString()
@@ -243,7 +208,7 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
                         put("message", "Status sync parsing process KO.")
                         put("date", "$timeStampStrStart")
                         put("dateEnd", "$timeStampStrError")
-                        put("error", "Status sync parsing process KO. ${e.localizedMessage}")
+                        put("error", "Status sync parsing process KO. $e")
                     }
                     val jsonBackgroundError = payload.toString()
                     rpcModule.saveBackgroundFile(jsonBackgroundError)

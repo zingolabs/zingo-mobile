@@ -51,7 +51,10 @@ import NymOff from '../../assets/img/nym-off.svg';
 import NymSwitchOn from '../../assets/img/nym-switch-on.svg';
 import SwitchOff from '../../assets/img/switch-off.svg';
 import { showConfirm } from '@app/services/showConfirm';
-import { mixnetPhase } from '@app/walletBackend/transforms/mixnetView';
+import {
+  mixnetPhase,
+  sendGateOpen,
+} from '@app/walletBackend/transforms/mixnetView';
 import ErrorText from '@ui/primitives/ErrorText';
 import RegText from '@ui/primitives/RegText';
 import ZecAmount from '@ui/widgets/ZecAmount';
@@ -79,6 +82,10 @@ import {
 } from '@app/AppState';
 import { hasUnconfirmedFunds } from '@app/AppState/classes/TotalBalanceClass';
 import { parseZcashURI, serverUris, fetchServerList } from '@app/uris';
+// Imported straight from the module rather than through the `uris` barrel, so
+// the ZNS SDK stays out of the module graph of everything else that barrel
+// serves (the wallet backend among them).
+import { isZnsAlias, resolveZnsName } from '@app/uris/resolveZnsName';
 import {
   getSpendableBalanceWithAddress,
   sendPropose,
@@ -199,6 +206,17 @@ const Send: React.FunctionComponent<SendProps> = ({
 
   const [memoEnabled, setMemoEnabled] = useState<boolean>(false);
   const [validAddress, setValidAddress] = useState<number>(0); // 1 - OK, 0 - Empty, -1 - KO
+  // A ZNS alias the indexer does not know. Reported in place of the
+  // invalid-address text, which would be wrong: the address is not malformed,
+  // the name simply is not registered.
+  const [znsNotFound, setZnsNotFound] = useState<boolean>(false);
+  // The alias a resolution came from, kept beside the address it produced.
+  // Resolving replaces the alias in the field with a unified address, and
+  // without this the origin of that address would be lost — the user typed
+  // "pepe.zcash" and would be looking at a string of base32.
+  const [zns, setZns] = useState<{ alias: string; address: string } | null>(
+    null,
+  );
   const [validAmount, setValidAmount] = useState<number>(0); // 1 - OK, 0 - Empty, -1 - Invalid number, -2 - Invalid Amount
   const [validMemo, setValidMemo] = useState<number>(0); // 1 - OK, 0 - Empty, -1 - KO
   const [sendButtonEnabled, setSendButtonEnabled] = useState<boolean>(false);
@@ -579,7 +597,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         try {
           const runSpendableBalanceJson: RPCSpendablebalanceType =
             await JSON.parse(runSpendableBalance.value);
-          if (runSpendableBalanceJson.spendable_balance) {
+          if (runSpendableBalanceJson.spendable_balance !== undefined) {
             // Audit Issue K — do not log the spendable balance value.
             spendableBalance =
               runSpendableBalanceJson.spendable_balance / 10 ** 8;
@@ -746,6 +764,52 @@ const Send: React.FunctionComponent<SendProps> = ({
     }
   }, [calculateSpendableBalance, addressText]);
 
+  // Zcash Name Service: a ZNS alias in the recipient field is looked up and
+  // swapped for the unified address it points at, so everything downstream
+  // (the fee proposal, the spendable balance, the address book, the confirm
+  // screen) keeps receiving a real address. Debounced, because this fires on
+  // every keystroke and each run is a network round trip.
+  useEffect(() => {
+    if (!isZnsAlias(addressText)) {
+      setZnsNotFound(false);
+      // The badge belongs to the address the alias resolved to. Anything else
+      // in the field — a pasted address, an edit — is no longer that name.
+      setZns(previous =>
+        previous && previous.address !== addressText ? null : previous,
+      );
+      return;
+    }
+    // Neither valid nor invalid until the indexer answers.
+    setValidAddress(0);
+    setZnsNotFound(false);
+    let cancelled = false;
+    const timerId = setTimeout(async () => {
+      const resolution = await resolveZnsName(addressText, server.chainName);
+      if (cancelled) {
+        return;
+      }
+      if (resolution.ok) {
+        setZns({
+          alias: addressText.trim().toLowerCase(),
+          address: resolution.address,
+        });
+        // Re-runs this effect with the address in hand, which then takes the
+        // ordinary validation path and lights the check.
+        updateToField(resolution.address, null, null, null, null);
+      } else {
+        setZnsNotFound(true);
+        setValidAddress(-1);
+      }
+    }, 500);
+    return () => {
+      cancelled = true;
+      clearTimeout(timerId);
+    };
+    // updateToField is redefined on every render; depending on it would restart
+    // the debounce continuously.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [addressText, server.chainName]);
+
   useEffect(() => {
     const getMemoEnabled = async (
       address: string,
@@ -772,12 +836,17 @@ const Send: React.FunctionComponent<SendProps> = ({
 
   useEffect(() => {
     if (addressText) {
-      Utils.isValidAddress(addressText, server.chainName).then(r => {
-        setValidAddress(r.isValid ? 1 : -1);
-        if (!r.isValid) {
-          setSpendableBalanceLastError('');
-        }
-      });
+      // A ZNS alias is not an address yet, so the address parser would call it
+      // invalid while the lookup is still in flight. The resolver effect above
+      // owns the verdict for those.
+      if (!isZnsAlias(addressText)) {
+        Utils.isValidAddress(addressText, server.chainName).then(r => {
+          setValidAddress(r.isValid ? 1 : -1);
+          if (!r.isValid) {
+            setSpendableBalanceLastError('');
+          }
+        });
+      }
     } else {
       setValidAddress(0);
     }
@@ -851,11 +920,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         !(
           !memoEnabled && Utils.parseStringLocaleToNumberFloat(amountText) === 0
         ) &&
-        // Mixnet Mode fail-closed verdict: while the transport is
-        // bootstrapping, died, or unknowable, sending stays blocked; only
-        // `ready` or the user's explicit clearnet consent (`off`) opens it.
-        // Null means no mixnet policy runs (mixnetSupported injected false).
-        (mixnetView === null || !mixnetView.sendBlocked),
+        sendGateOpen(nym, mixnetView),
     );
   }, [
     memoEnabled,
@@ -866,6 +931,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     fee,
     maxAmount,
     mixnetView,
+    nym,
   ]);
 
   useEffect(() => {
@@ -947,6 +1013,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         amountCurrency: amountCurrencyText,
         memo: memoText,
         includeUAMemo: includeUAMemoBoolean,
+        znsAlias: zns?.address === addressText ? zns.alias : '',
       },
     } as SendPageStateClass;
   };
@@ -1134,6 +1201,12 @@ const Send: React.FunctionComponent<SendProps> = ({
   //  contentHeight,
   //);
 
+  // The recipient is already a contact. Saving one is also what retires the
+  // ZNS badge: once the address has a name of the user's own, that name is the
+  // one that means something, and two labels on one address just read as noise.
+  const addressIsSaved =
+    !!addressText && addressBook.some(ab => ab.address === addressText);
+
   const returnPage = (
     <View
       style={{ flex: 1 }}
@@ -1232,6 +1305,14 @@ const Send: React.FunctionComponent<SendProps> = ({
                         withIcon={false}
                       />
                     )}
+                    {zns?.address === addressText && !addressIsSaved && (
+                      <RegText
+                        testID="send.address.zns"
+                        style={{ color: colors.fgAccent, fontWeight: '600' }}
+                      >
+                        {`ZNS: ${zns.alias}`}
+                      </RegText>
+                    )}
                   </View>
                   {validAddress === 1 && (
                     <View testID="send.address.check">
@@ -1243,7 +1324,13 @@ const Send: React.FunctionComponent<SendProps> = ({
                       testID="send.address.error"
                       style={{ color: colors.fgDanger }}
                     >
-                      {translate('send.invalidaddress') as string}
+                      {
+                        translate(
+                          znsNotFound
+                            ? 'send.znsnamenotfound'
+                            : 'send.invalidaddress',
+                        ) as string
+                      }
                     </ErrorText>
                   )}
                 </View>
@@ -1319,15 +1406,23 @@ const Send: React.FunctionComponent<SendProps> = ({
                         // button for an "add to address book" one. It reverts
                         // automatically after saving: `addressBook` updates and
                         // this recomputes `addressIsSaved`.
-                        const addressIsSaved =
-                          !!addressText &&
-                          addressBook.some(ab => ab.address === addressText);
                         if (validAddress === 1 && !addressIsSaved) {
                           return (
                             <TouchableOpacity
                               testID="send.add-address"
                               disabled={updatingToField}
-                              onPress={() => launchAddTagModal(addressText)}
+                              onPress={() =>
+                                launchAddTagModal(
+                                  addressText,
+                                  undefined,
+                                  // The name the user actually typed is a
+                                  // better first guess at the contact's label
+                                  // than an empty field.
+                                  zns?.address === addressText
+                                    ? zns.alias
+                                    : undefined,
+                                )
+                              }
                             >
                               <FontAwesomeIcon
                                 style={{ marginRight: 5 }}
@@ -1627,22 +1722,24 @@ const Send: React.FunctionComponent<SendProps> = ({
                             />
                           </TouchableOpacity>
                           {inputZec ? (
-                            <CurrencyAmount
-                              style={{
-                                marginTop: 0,
-                                marginBottom: 0,
-                                fontSize: 16,
-                              }}
-                              priceDate={zecPrice.date}
-                              price={zecPrice.zecPrice}
-                              amtZec={
-                                Utils.parseStringLocaleToNumberFloat(
-                                  amountText,
-                                ) || 0
-                              }
-                              currency={currency}
-                              privacy={privacy}
-                            />
+                            zecPrice.date > 0 && (
+                              <CurrencyAmount
+                                style={{
+                                  marginTop: 0,
+                                  marginBottom: 0,
+                                  fontSize: 16,
+                                }}
+                                priceDate={zecPrice.date}
+                                price={zecPrice.zecPrice}
+                                amtZec={
+                                  Utils.parseStringLocaleToNumberFloat(
+                                    amountText,
+                                  ) || 0
+                                }
+                                currency={currency}
+                                privacy={privacy}
+                              />
+                            )
                           ) : (
                             <ZecAmount
                               style={{ marginLeft: 0 }}
@@ -1660,9 +1757,13 @@ const Send: React.FunctionComponent<SendProps> = ({
                               privacy={privacy}
                             />
                           )}
-                          <View style={{ marginLeft: inputZec ? 5 : 2 }}>
-                            <PriceFetcher backgroundColor={colors.bgSurface} />
-                          </View>
+                          {zecPrice.date > 0 && (
+                            <View style={{ marginLeft: inputZec ? 5 : 2 }}>
+                              <PriceFetcher
+                                backgroundColor={colors.bgSurface}
+                              />
+                            </View>
+                          )}
                         </>
                       )}
                   </View>

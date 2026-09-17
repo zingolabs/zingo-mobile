@@ -46,6 +46,45 @@ After the bump, `release-prep` prints the suggested commit / push / tag
 commands to copy-paste. Pushing the tag triggers the Android Release CI
 workflow described below.
 
+## Release order: tag first, then rebuild the Rust libs
+
+Gradle never invokes cargo, and Xcode never invokes cargo. The native libs
+(`android/app/src/main/jniLibs/<abi>/libuniffi_zingo.so`, `ios/Zingolib.xcframework`)
+are produced by the separate `yarn rust:android` / `yarn rust:ios` steps, and
+the AAB / archive just packages whatever is already sitting there.
+
+That ordering is visible to users. `rust/lib/build.rs` runs
+`git describe --long --match=zingo-*` **at cargo build time** and bakes the
+result into the binary; `get_version()` returns
+`<zingolib descriptor>-zm_<tag>[_<commits-since-tag>_<hash5>][_dirty]`, which is
+the string on the **zingolib** line of the About screen. So it describes the
+commit the `.so` was compiled at — not the app around it. (The version in the
+About header, and what the stores show, is unrelated: it comes from
+`versionName`/`versionCode` at runtime via `app/utils/ZingoAppData.ts`.)
+
+Build the Rust libs before creating the tag and the About screen advertises the
+*previous* tag plus a commit count — e.g. build 327 shipped showing
+`zm_beta-2.0.23-326_83_5ea12`, because the `.so` was compiled 83 commits past
+tag `zingo-beta-2.0.23-326`, one commit short of the commit tagged `-327`.
+
+Correct order for any store build:
+
+1. `yarn release:<channel>:prep <ver> <build>`
+2. `git commit` the bump
+3. `git tag ...` — the tag must exist locally before step 4; push it whenever
+4. `yarn rust:android` / `yarn rust:ios` — recompiles the native libs sitting
+   exactly on the tag, so the descriptor collapses to a clean `zm_<tag>`
+5. Build the AAB (Android Studio / gradle) or Archive in Xcode
+
+Anything other than a bare `zm_<tag>` on the About screen means the shipped
+native lib does not correspond to the tag: a `_<count>_<hash>` suffix means it
+was built that many commits before (or after) the tag, and `_dirty` means it was
+built from an uncommitted working tree.
+
+This only affects the manual store builds. The tag-triggered APKs below are
+built by CI from source on the tagged commit, so their descriptor is always
+clean.
+
 ## Tag-triggered Android APKs
 
 Pushing a release tag publishes a set of Android APKs as a GitHub Release.
@@ -81,27 +120,32 @@ These APKs are signed with `debug.keystore`.
 
 ### iOS
 
-1. `yarn release:prod:prep <ver> <build>` and commit the diff.
-2. Open `ios/Zingo.xcworkspace` in Xcode.
-3. Select scheme **Zingo**, destination **Any iOS Device (arm64)**.
-4. **Product → Archive**.
-5. In the Organizer that opens: **Distribute App → App Store Connect → Upload**.
+1. `yarn release:prod:prep <ver> <build>`, commit the diff, and create the tag.
+2. `yarn rust:ios` — rebuild the xcframework on the tag (see
+   [Release order](#release-order-tag-first-then-rebuild-the-rust-libs)).
+3. Open `ios/Zingo.xcworkspace` in Xcode.
+4. Select scheme **Zingo**, destination **Any iOS Device (arm64)**.
+5. **Product → Archive**.
+6. In the Organizer that opens: **Distribute App → App Store Connect → Upload**.
    Signing is Automatic — your account needs to be a member of the team that
    owns the App Store Connect record.
-6. Wait ~10-20 min for "build processed" email from Apple.
-7. App Store Connect → app "Zingo" → fill **What's New** for the version and
+7. Wait ~10-20 min for "build processed" email from Apple.
+8. App Store Connect → app "Zingo" → fill **What's New** for the version and
    submit for App Store Review.
 
 ### Android
 
 1. `yarn release:prod:prep <ver> <build>` (use the same numbers as the matching
-   iOS bump for consistency, even though they're independent under the hood).
-2. Android Studio → **Build → Generate Signed App Bundle / APK** → AAB.
-3. Point the wizard at the release keystore and enter its passwords (see
+   iOS bump for consistency, even though they're independent under the hood),
+   commit, and create the tag.
+2. `yarn rust:android` — rebuild the `.so`s on the tag (see
+   [Release order](#release-order-tag-first-then-rebuild-the-rust-libs)).
+3. Android Studio → **Build → Generate Signed App Bundle / APK** → AAB.
+4. Point the wizard at the release keystore and enter its passwords (see
    *First-time dev setup* below for where they live).
-4. Build variant: **prodRelease**.
-5. Output AAB lands under `android/app/prod/release/`.
-6. Play Console → app "Zingo" → **Production** → Create new release → upload
+5. Build variant: **prodRelease**.
+6. Output AAB lands under `android/app/prod/release/`.
+7. Play Console → app "Zingo" → **Production** → Create new release → upload
    AAB → fill release notes → Review release → Roll out.
 
 CLI equivalents (without local signing config in place, gradle falls back to
@@ -117,10 +161,12 @@ cd android && ./gradlew bundleProdRelease   # AAB
 
 ### iOS (TestFlight External + public link)
 
-1. `yarn release:beta:prep <ver> <build>` and commit.
-2. Xcode scheme **Zingo Beta** → **Product → Archive** → **Distribute App →
+1. `yarn release:beta:prep <ver> <build>`, commit, and create the tag.
+2. `yarn rust:ios` — rebuild the xcframework on the tag (see
+   [Release order](#release-order-tag-first-then-rebuild-the-rust-libs)).
+3. Xcode scheme **Zingo Beta** → **Product → Archive** → **Distribute App →
    App Store Connect → Upload**.
-3. After "build processed", in App Store Connect → app "Zingo Beta" →
+4. After "build processed", in App Store Connect → app "Zingo Beta" →
    **TestFlight**:
    - Click the new build → **Manage** → mark **Missing Compliance** (encryption
      declaration carries over from `Info.plist`, just acknowledge it once per build).
@@ -128,22 +174,24 @@ cd android && ./gradlew bundleProdRelease   # AAB
      uploaded build.
    - Fill **Beta App Review** info (description, what to test, "No login
      required" notes) → **Submit for Review**.
-4. Apple's review of the **first build of each major version** takes 24-48h.
+5. Apple's review of the **first build of each major version** takes 24-48h.
    Subsequent builds of the same major usually auto-approve.
-5. After approval, toggle on the **Public Link** in the External group settings.
+6. After approval, toggle on the **Public Link** in the External group settings.
    The URL is `testflight.apple.com/join/XXXXXXXX` — share with testers.
 
 ### Android (Play Open Testing + public link)
 
-1. `yarn release:beta:prep <ver> <build>` and commit.
-2. Android Studio → **Build → Generate Signed App Bundle / APK** → AAB →
+1. `yarn release:beta:prep <ver> <build>`, commit, and create the tag.
+2. `yarn rust:android` — rebuild the `.so`s on the tag (see
+   [Release order](#release-order-tag-first-then-rebuild-the-rust-libs)).
+3. Android Studio → **Build → Generate Signed App Bundle / APK** → AAB →
    variant **betaRelease**.
-3. AAB at `android/app/beta/release/app-beta-release.aab`.
-4. Play Console → app "Zingo Beta" → **Testing → Open testing → Create new
+4. AAB at `android/app/beta/release/app-beta-release.aab`.
+5. Play Console → app "Zingo Beta" → **Testing → Open testing → Create new
    release** → upload AAB.
-5. Fill **Release notes** (EN at minimum) → **Save → Review release → Roll
+6. Fill **Release notes** (EN at minimum) → **Save → Review release → Roll
    out**.
-6. First release of an Open testing track needs Google's content review
+7. First release of an Open testing track needs Google's content review
    (typically 1-3 days). After approval, share the **opt-in URL** from the
    Open testing → **Testers** tab.
 
@@ -187,10 +235,14 @@ each variant.
 - Hardcoded `app_name` removed from `strings.xml` — provided per-flavor via `resValue`.
 
 ### Runtime version
-`app/utils/zingoVersion.ts` derives the displayed version from
+`app/utils/ZingoAppData.ts` derives the displayed version from
 `react-native-device-info` at runtime. The displayed string is always
 consistent with the binary the user installed, regardless of which channel
 the shared JS bundle was prepped against.
+
+The **zingolib** line on the About screen is a different thing entirely: it is
+the source descriptor compiled into the native lib, see
+[Release order](#release-order-tag-first-then-rebuild-the-rust-libs).
 
 ### Known caveats
 - **Bundle ID case sensitivity**: both iOS and Android use `.Beta` (capital B). The `applicationIdSuffix` in `build.gradle.kts` is intentionally capital to match what's registered in App Store Connect and Play Console.

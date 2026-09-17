@@ -452,6 +452,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                     address={to.to}
                     screenName={screenName}
                     withIcon={true}
+                    znsAlias={to.znsAlias}
                   />
 
                   {donationAmount > 0 && (

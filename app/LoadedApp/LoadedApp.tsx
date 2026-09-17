@@ -111,7 +111,7 @@ import History from '@screens/History';
 import Send from '@screens/Send';
 import Receive from '@screens/Receive';
 import Settings from '@screens/Settings';
-import CustomTabBar from '@app/navigation/CustomTabBar';
+import CustomTabBar, { FadeOnlyTabBar } from '@app/navigation/CustomTabBar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import {
   BottomSheetModal,
@@ -132,13 +132,9 @@ import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
 import { RPCUfvkType } from '@app/walletBackend/types/RPCUfvkType';
 import {
   INITIAL_MIXNET_VIEW,
-  OFF_MIXNET_VIEW,
   MixnetView,
 } from '@app/walletBackend/transforms/mixnetView';
-import {
-  startMixnetTransport,
-  stopMixnetTransport,
-} from '@app/walletBackend/utils/nymTransport';
+import { startMixnetTransport } from '@app/walletBackend/utils/nymTransport';
 import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
 import { AddressList } from '@screens/AddressList';
 import ValueTransferDetail from '@screens/ValueTransferDetail';
@@ -762,6 +758,8 @@ const renderTabBar = (
   props: import('@react-navigation/bottom-tabs').BottomTabBarProps,
 ) => <CustomTabBar {...props} />;
 
+const renderFadeOnlyTabBar = () => <FadeOnlyTabBar />;
+
 export class LoadedAppClass extends Component<
   LoadedAppClassProps,
   LoadedAppClassState
@@ -843,12 +841,7 @@ export class LoadedAppClass extends Component<
       blockExplorer: props.blockExplorer,
       nym: props.nym,
 
-      // Mixnet Mode initial view from the persisted setting: enabled starts
-      // fail-closed (bootstrapping) so the send gate is shut until the
-      // transport attaches; disabled starts off (clearnet, ungated). The
-      // coordinator republishes on any change.
-      mixnetView: props.nym ? INITIAL_MIXNET_VIEW : OFF_MIXNET_VIEW,
-      disableMixnet: this.disableMixnet,
+      mixnetView: INITIAL_MIXNET_VIEW,
       reenableMixnet: this.reenableMixnet,
 
       // state
@@ -882,9 +875,8 @@ export class LoadedAppClass extends Component<
       onPersistentSyncFailure: this.recoverServer,
       onMixnetViewChanged: this.setMixnetView,
       startMixnetTransport: startMixnetTransport,
-      stopMixnetTransport: stopMixnetTransport,
+      transmitPolicy: props.nym ? 'mixnet' : 'clearnet',
       mixnetSupported: true,
-      nymEnabled: props.nym,
       readOnly: props.readOnly,
       server: props.server,
       performanceLevel: props.performanceLevel,
@@ -1293,12 +1285,6 @@ export class LoadedAppClass extends Component<
     }
   };
 
-  // The user's deliberate per-session consent to clearnet.
-  disableMixnet = async (): Promise<void> => {
-    await this.rpc.disableMixnet();
-  };
-
-  // Recover a died or failed mixnet transport by starting it afresh.
   reenableMixnet = async (): Promise<void> => {
     await this.rpc.reenableMixnet();
   };
@@ -2053,16 +2039,16 @@ export class LoadedAppClass extends Component<
   };
 
   setNymOption = async (value: boolean): Promise<void> => {
+    try {
+      await this.rpc.setTransmitPolicy(value ? 'mixnet' : 'clearnet');
+    } catch (error) {
+      this.setLastError(`Transmit policy: ${error}`);
+      return;
+    }
     this.setState({
       nym: value,
     });
-    // The merged switch: enabling arms Mixnet Mode (start transport + attach),
-    // disabling drops to clearnet. The coordinator publishes its first view
-    // immediately. The disk write runs in parallel.
-    await Promise.all([
-      SettingsFileImpl.writeSettings(SettingsNameEnum.nym, value),
-      value ? this.rpc.reenableMixnet() : this.rpc.disableMixnet(),
-    ]);
+    await SettingsFileImpl.writeSettings(SettingsNameEnum.nym, value);
   };
 
   navigateToLoadingApp = async (state: LoadingAppNavigationState) => {
@@ -2248,6 +2234,7 @@ export class LoadedAppClass extends Component<
   launchAddTagModal = (
     address: string,
     swapChain: string = GlobalConst.zecSwapChain,
+    initialLabel?: string,
   ) => {
     // Every launcher (Send, address rows) saves a recipient/destination,
     // i.e. a contact — never a label for one of the wallet's own addresses.
@@ -2255,7 +2242,7 @@ export class LoadedAppClass extends Component<
     // with own={true} directly. So this modal is always a contact (own=false),
     // "Add contact", not "Add tag".
     this.setState(
-      { addTagModalTarget: { address, own: false, swapChain } },
+      { addTagModalTarget: { address, own: false, swapChain, initialLabel } },
       () => {
         this.addTagModalRef.current?.present();
       },
@@ -2356,7 +2343,6 @@ export class LoadedAppClass extends Component<
       blockExplorer: this.state.blockExplorer,
       nym: this.state.nym,
       mixnetView: this.state.mixnetView,
-      disableMixnet: this.disableMixnet,
       reenableMixnet: this.reenableMixnet,
       foregroundEpoch: this.state.foregroundEpoch,
     };
@@ -2500,10 +2486,8 @@ export class LoadedAppClass extends Component<
                                 ) : (
                                   <Tab.Navigator
                                     initialRouteName={RouteEnum.Receive}
+                                    tabBar={renderFadeOnlyTabBar}
                                     screenOptions={{
-                                      tabBarStyle: {
-                                        display: 'none',
-                                      },
                                       headerShown: false,
                                     }}
                                   >

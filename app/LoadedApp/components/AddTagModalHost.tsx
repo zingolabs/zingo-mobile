@@ -16,7 +16,12 @@ type AddTagModalHostProps = {
   // Latest target the host should render. Pass `null` while the modal is
   // hidden. Bump `key` (via the address/own pair) to force-remount the inner
   // form so its local state resets between presentations.
-  target: { address: string; own: boolean; swapChain: string } | null;
+  target: {
+    address: string;
+    own: boolean;
+    swapChain: string;
+    initialLabel?: string;
+  } | null;
   setAddressBook: (ab: AddressBookFileClass[]) => void;
   translate: (key: string) => TranslateType;
 };
@@ -76,10 +81,11 @@ const AddTagModalHost = forwardRef<
     >
       {target && (
         <NewAddressTag
-          key={`${target.address}-${target.own}`}
+          key={`${target.address}-${target.own}-${target.initialLabel ?? ''}`}
           address={target.address}
           own={target.own}
           swapChain={target.swapChain}
+          initialLabel={target.initialLabel}
           closeSheet={dismiss}
           setAddressBook={setAddressBook}
         />

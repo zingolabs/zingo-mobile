@@ -32,6 +32,11 @@ yarn release:prod:prep <version> <build>
 yarn release:beta:prep <version> <build>
 ```
 
+Create the tag **before** rebuilding the Rust libs: the About screen shows a
+`git describe` descriptor baked into the native lib at cargo build time, so a
+`.so`/xcframework compiled before the tag ships advertising the previous one.
+See [Release order](./docs/release_quickstart.md#release-order-tag-first-then-rebuild-the-rust-libs).
+
 Pushing a `zingo-<version>-<build>` or `zingo-beta-<version>-<build>` tag
 triggers a CI workflow that builds the 4 ABI APKs + a universal APK from
 source on the tagged commit and publishes them to a fresh GitHub Release.
@@ -56,6 +61,13 @@ network in a docker container. Before running tests, pull the latest Regchest im
 ### Yarn Tests
 1. From the root directory, run: <br />
    `yarn test`
+
+### Memory Benchmark
+Peak heap per wallet-file path, on a connected Android device or emulator.
+
+- `yarn bench:memory`: measure and compare against `scripts/wallet_memory_baseline.json`, non-zero exit on a regression
+- `yarn bench:memory --report`: measure only
+- `yarn bench:memory:accept`: record a new baseline
 
 ### Integration Tests
 These exercise the Rust ↔ Kotlin/Swift FFI boundary against a regtest network.

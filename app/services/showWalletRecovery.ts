@@ -13,6 +13,8 @@ export type WalletRecoveryOptions = {
   translate: (key: string) => TranslateType;
   onCopy: () => void;
   onRestoreBackup?: () => void;
+  // Absent hides the button (the damaged file holds no salvageable seed).
+  onSalvageSeed?: () => void;
   onSupport: () => void;
   onCancel: () => void;
 };

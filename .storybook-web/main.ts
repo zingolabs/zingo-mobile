@@ -102,6 +102,10 @@ const main: StorybookConfig = {
         find: '@notifee/react-native',
         replacement: path.resolve(__dirname, './shims/notifee.ts'),
       },
+      {
+        find: 'react-native-linear-gradient',
+        replacement: path.resolve(__dirname, './shims/linearGradient.tsx'),
+      },
       // The native bridge: walletBackend reaches it as '@app/RPCModule',
       // AppErrorBoundary as './RPCModule'. Screens then run their real
       // wrappers against story fixtures.
