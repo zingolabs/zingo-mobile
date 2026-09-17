@@ -35,11 +35,7 @@ export const MIXNET_DOCTOR_HEADLINE = 'zingo mixnet doctor report';
 export function failureCause(failure: MixnetFailure): string {
   switch (failure.reason) {
     case 'nativeRejection':
-      return `native rejection: ${failure.message}`;
-    case 'malformedPayload':
-      return `malformed payload: ${failure.payload}`;
-    case 'unrecognizedIndicator':
-      return `unrecognized indicator: ${failure.claimed}`;
+      return `native rejection: ${failure.error.tag}: ${failure.error.detail}`;
     case 'unconsentedOff':
       return 'reported off without this session consent';
   }
@@ -51,7 +47,7 @@ function statusLine(status: MixnetStatusReport, millis: number): string {
   }
   const addr =
     status.indicator === RPCMixnetIndicatorEnum.ready &&
-    status.socks5Addr !== null
+    status.socks5Addr !== undefined
       ? `, socks5 ${status.socks5Addr}`
       : '';
   return `- status probe: ok in ${millis} ms — indicator ${status.indicator}${addr}`;
@@ -94,7 +90,7 @@ function statusRows(
   ];
   if (
     status.indicator === RPCMixnetIndicatorEnum.ready &&
-    status.socks5Addr !== null
+    status.socks5Addr !== undefined
   ) {
     rows.push({ label: 'Socks5', value: status.socks5Addr });
   }

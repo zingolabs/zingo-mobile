@@ -1,13 +1,14 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
+import { ZingoError } from 'zingo-ffi';
 import { RouteEnum } from '@app/AppState';
 import MigrationCadence from './MigrationCadence';
 import {
   screenProps,
   withAppContext,
   withNavigation,
-  withRpc,
+  withWallet,
 } from '../../.storybook/storyDecorators';
-import { json, pending, rejection } from '../../.storybook/storyRpc';
+import { answer, pending, rejection } from '../../.storybook/storyRpc';
 import {
   dustPlan,
   idleStatus,
@@ -27,43 +28,40 @@ type Story = StoryObj<typeof MigrationCadence>;
 
 export const Choose: Story = {
   decorators: [
-    withRpc({
-      migrationStatusProcess: json(idleStatus),
-      planIronwoodMigrationProcess: json(readyPlan),
+    withWallet({
+      migrationStatus: answer(idleStatus),
+      planMigration: answer(readyPlan),
     }),
   ],
 };
 // Every note sits below the sweep floor: nothing to schedule.
 export const Dust: Story = {
   decorators: [
-    withRpc({
-      migrationStatusProcess: json(idleStatus),
-      planIronwoodMigrationProcess: json(dustPlan),
+    withWallet({
+      migrationStatus: answer(idleStatus),
+      planMigration: answer(dustPlan),
     }),
   ],
 };
 // The split outputs are mined but not yet spendable at the anchor.
 export const Unconfirmed: Story = {
   decorators: [
-    withRpc({
-      migrationStatusProcess: json(idleStatus),
-      planIronwoodMigrationProcess: json(unconfirmedPlan),
+    withWallet({
+      migrationStatus: answer(idleStatus),
+      planMigration: answer(unconfirmedPlan),
     }),
   ],
 };
 export const Loading: Story = {
   decorators: [
-    withRpc({
-      migrationStatusProcess: pending,
-      planIronwoodMigrationProcess: pending,
-    }),
+    withWallet({ migrationStatus: pending, planMigration: pending }),
   ],
 };
 export const Error: Story = {
   decorators: [
-    withRpc({
-      migrationStatusProcess: rejection('wallet is offline', 'Offline'),
-      planIronwoodMigrationProcess: json(readyPlan),
+    withWallet({
+      migrationStatus: rejection(new ZingoError.Offline()),
+      planMigration: answer(readyPlan),
     }),
   ],
 };

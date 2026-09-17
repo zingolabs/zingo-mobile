@@ -15,9 +15,7 @@ import {
 import TotalBalanceClass from '@app/AppState/classes/TotalBalanceClass';
 import NetInfoType from '@app/AppState/types/NetInfoType';
 import { shieldConfirm, shieldPropose } from '@app/walletBackend';
-import type { FfiResult } from '@app/walletBackend';
-import { RPCShieldProposeType } from '@app/walletBackend/types/RPCShieldProposeType';
-import { RPCShieldType } from '@app/walletBackend/types/RPCShieldType';
+import type { FfiResult, ShieldProposalType } from '@app/walletBackend';
 import Utils from '@app/utils';
 
 type UseShieldFundsInput = {
@@ -79,14 +77,13 @@ export function useShieldFunds({
   const shieldProposeLockRef = useRef<boolean>(false);
 
   useEffect(() => {
-    const runShieldPropose = async (): Promise<FfiResult<string>> => {
+    const runShieldPropose = async (): Promise<
+      FfiResult<ShieldProposalType>
+    > => {
       if (shieldProposeLockRef.current) {
         return {
           ok: false,
-          error: {
-            code: 'Unknown',
-            message: 'shield propose already running...',
-          },
+          error: { tag: 'Unknown', detail: 'shield propose already running' },
         };
       }
       shieldProposeLockRef.current = true;
@@ -102,32 +99,12 @@ export function useShieldFunds({
       (somePending ? 0 : (totalBalance?.confirmedTransparentBalance ?? 0)) > 0
     ) {
       (async () => {
-        let proposeFee = 0;
-        let proposeAmount = 0;
         const runPropose = await runShieldPropose();
-        if (!runPropose.ok) {
-          console.log('Error shield proposing', runPropose.error.message);
-        } else {
-          try {
-            const runProposeJson: RPCShieldProposeType = JSON.parse(
-              runPropose.value,
-            );
-            if (runProposeJson.error) {
-              console.log('Error shield proposing', runProposeJson.error);
-            } else {
-              if (runProposeJson.fee) {
-                proposeFee = runProposeJson.fee / 10 ** 8;
-              }
-              if (runProposeJson.value_to_shield) {
-                proposeAmount = runProposeJson.value_to_shield / 10 ** 8;
-              }
-            }
-          } catch (e) {
-            console.log('Error shield proposing', e);
-          }
-        }
-        setShieldingFee(proposeFee);
-        setShieldingAmount(proposeAmount);
+        const proposal = runPropose.ok
+          ? runPropose.value
+          : { fee: 0, valueToShield: 0 };
+        setShieldingFee(proposal.fee / 10 ** 8);
+        setShieldingAmount(proposal.valueToShield / 10 ** 8);
       })();
     } else {
       setShieldingFee(0);
@@ -163,32 +140,13 @@ export function useShieldFunds({
     await shieldPropose();
     const shield = await shieldConfirm();
 
-    let success = false;
-    let errorMessage: string | undefined;
-    if (!shield.ok) {
-      errorMessage = shield.error.message;
-    } else {
-      try {
-        const shieldJSON: RPCShieldType = JSON.parse(shield.value);
-        if (shieldJSON.error) {
-          errorMessage = shieldJSON.error;
-        } else if (shieldJSON.txids) {
-          success = true;
-        }
-      } catch (e) {
-        // An unparseable SUCCESS payload is most likely a quirky success
-        // shape — treat it as success and let the user land on the
-        // "created" confirmation.
-        success = true;
-      }
-    }
     setScrollToTop?.(true);
     setScrollToBottom?.(true);
     setShieldingFee(0);
     setShieldingAmount?.(0);
     navigation.navigate(RouteEnum.Computing, {
-      phase: success ? 'created' : 'failed',
-      errorMessage: success ? undefined : errorMessage,
+      phase: shield.ok ? 'created' : 'failed',
+      errorMessage: shield.ok ? undefined : shield.error.detail,
     });
   }, [
     setBackgroundError,

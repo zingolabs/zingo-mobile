@@ -1,128 +1,92 @@
 /**
- * The consent screens' routing contract (zingo-mobile#1151): the special
- * routes — resume an existing migration, replan on stale consent, review
- * the standing schedule on a fixed cadence — are reachable only from
- * typed rejection codes, never from error prose. A resolved payload
- * carrying the legacy { error } JSON shape is a generic failure.
+ * The consent screens' routing: the special routes (resume, replan, the
+ * standing schedule) are reachable only from the rejection tags.
  */
+import { ZingoError_Tags } from 'zingo-ffi';
 import { FfiResult } from '@app/walletBackend/ffi';
 import {
   routeCadencePlan,
   routeRescheduleParts,
   routeStartMigration,
 } from '@app/walletBackend/utils/migrationRouting';
+import { MigrationPlanType } from '@app/walletBackend/types/MigrationTypes';
 
-const rejected = (code: string, message = 'boom'): FfiResult<string> => ({
+const rejected = (tag: ZingoError_Tags, detail = 'boom'): FfiResult<void> => ({
   ok: false,
-  error: { code: code as never, message },
+  error: { tag, detail },
+});
+
+const started: FfiResult<void> = { ok: true, value: undefined };
+
+const plan = (parts: number[], residual: number): MigrationPlanType => ({
+  splitRounds: [],
+  parts,
+  splitFee: 0,
+  partsFee: 0,
+  residual,
+  planHash: 'ab12',
 });
 
 describe('routeStartMigration', () => {
-  it('proceeds on a clean start', () => {
-    expect(routeStartMigration({ ok: true, value: '{}' })).toEqual({
-      kind: 'proceed',
-    });
+  test('Tests that the route proceeds when the start resolves', () => {
+    expect(routeStartMigration(started)).toEqual({ kind: 'proceed' });
   });
 
-  it('resumes when a migration already exists', () => {
-    expect(routeStartMigration(rejected('MigrationAlreadyInProgress'))).toEqual(
-      { kind: 'resume' },
-    );
+  test('Tests that the route resumes when a migration already exists', () => {
+    expect(
+      routeStartMigration(rejected(ZingoError_Tags.MigrationAlreadyInProgress)),
+    ).toEqual({ kind: 'resume' });
   });
 
-  it('replans on stale consent', () => {
-    expect(routeStartMigration(rejected('MigrationConsentStale'))).toEqual({
-      kind: 'replan',
-    });
+  test('Tests that the route replans when the consent is stale', () => {
+    expect(
+      routeStartMigration(rejected(ZingoError_Tags.MigrationConsentStale)),
+    ).toEqual({ kind: 'replan' });
   });
 
-  it('surfaces any other rejection as an error with its message', () => {
-    expect(routeStartMigration(rejected('InvalidInput', 'bad hash'))).toEqual({
-      kind: 'error',
-      message: 'bad hash',
-    });
-    expect(routeStartMigration(rejected('Unknown'))).toEqual({
-      kind: 'error',
-      message: 'boom',
-    });
-  });
-
-  it('treats a resolved legacy { error } body as a generic failure', () => {
-    // The typed routes belong to the rejection channel alone: prose in
-    // the data channel must never trigger resume or replan.
-    const legacy: FfiResult<string> = {
-      ok: true,
-      value: '{"error":"a migration is already in progress"}',
-    };
-    expect(routeStartMigration(legacy)).toEqual({
-      kind: 'error',
-      message: 'a migration is already in progress',
-    });
-  });
-
-  it('treats an unparseable resolved body as a generic failure', () => {
-    const route = routeStartMigration({ ok: true, value: 'not json' });
-    expect(route.kind).toBe('error');
+  test('Tests that any other rejection routes to an error with its detail when the start fails', () => {
+    expect(
+      routeStartMigration(rejected(ZingoError_Tags.InvalidInput, 'bad hash')),
+    ).toEqual({ kind: 'error', detail: 'bad hash' });
   });
 });
 
 describe('routeRescheduleParts', () => {
-  it('proceeds on a clean reschedule', () => {
-    expect(routeRescheduleParts({ ok: true, value: '{}' })).toEqual({
-      kind: 'proceed',
-    });
+  test('Tests that the route proceeds when the reschedule resolves', () => {
+    expect(routeRescheduleParts(started)).toEqual({ kind: 'proceed' });
   });
 
-  it('lets the standing schedule stand on a fixed cadence', () => {
-    expect(routeRescheduleParts(rejected('MigrationCadenceFixed'))).toEqual({
-      kind: 'schedule-stands',
-    });
-  });
-
-  it('surfaces any other rejection as an error with its message', () => {
+  test('Tests that the standing schedule stands when the cadence is fixed', () => {
     expect(
-      routeRescheduleParts(rejected('MigrationNotInProgress', 'none')),
-    ).toEqual({ kind: 'error', message: 'none' });
+      routeRescheduleParts(rejected(ZingoError_Tags.MigrationCadenceFixed)),
+    ).toEqual({ kind: 'schedule-stands' });
   });
 
-  it('never routes on prose: a resolved body naming the cadence error is a generic failure', () => {
-    const legacy: FfiResult<string> = {
-      ok: true,
-      value: '{"error":"cadence is fixed"}',
-    };
-    expect(routeRescheduleParts(legacy)).toEqual({
-      kind: 'error',
-      message: 'cadence is fixed',
-    });
+  test('Tests that any other rejection routes to an error with its detail when the reschedule fails', () => {
+    expect(
+      routeRescheduleParts(
+        rejected(ZingoError_Tags.MigrationNotInProgress, 'none'),
+      ),
+    ).toEqual({ kind: 'error', detail: 'none' });
   });
 });
 
 describe('routeCadencePlan', () => {
-  it('offers the choice when the plan carries notes', () => {
-    expect(routeCadencePlan({ parts: [100, 100, 50], residual: 7 })).toEqual({
+  test('Tests that the choice is offered when the plan carries notes', () => {
+    expect(routeCadencePlan(plan([100, 100, 50], 7))).toEqual({
       kind: 'choose',
       parts: 3,
     });
   });
 
-  it('reports dust when nothing but residual is left', () => {
-    expect(routeCadencePlan({ parts: [], residual: 4200 })).toEqual({
+  test('Tests that dust is reported when only a residual is left', () => {
+    expect(routeCadencePlan(plan([], 4200))).toEqual({
       kind: 'dust',
       residual: 4200,
     });
   });
 
-  // The planner saw no notes at all, which after a split means its outputs
-  // are mined but not yet spendable at the anchor.
-  it('reports unconfirmed when the plan is empty of everything', () => {
-    expect(
-      routeCadencePlan({ split_rounds: [], parts: [], residual: 0 }),
-    ).toEqual({ kind: 'unconfirmed' });
-  });
-
-  it('treats absent fields as an empty plan', () => {
-    expect(routeCadencePlan({ plan_hash: 'ab12' })).toEqual({
-      kind: 'unconfirmed',
-    });
+  test('Tests that unconfirmed is reported when the plan is empty of everything', () => {
+    expect(routeCadencePlan(plan([], 0))).toEqual({ kind: 'unconfirmed' });
   });
 });

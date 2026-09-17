@@ -130,9 +130,6 @@ beforeEach(() => {
         ? 'stale'
         : 'live',
   );
-  // Send's mount effects call these; the shared RPCModule mock lacks them.
-  const { NativeModules } = require('react-native');
-  NativeModules.RPCModule.getDonationAddress = jest.fn(async () => '{}');
 });
 
 test('F8: the in-form USD amounts dim when the price is stale', () => {

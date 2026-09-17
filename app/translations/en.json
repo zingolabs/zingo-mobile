@@ -110,6 +110,22 @@
     "sends-unit": " sends.",
     "memobytes-unit": " chars."
   },
+  "ffi": {
+    "invalidmnemonic": "The seed phrase is not valid. Check every word and the word count.",
+    "viewingkeymalformed": "The viewing key is not valid.",
+    "viewingkeynetworkmismatch": "The viewing key belongs to a different network.",
+    "birthdaybelowactivation": "The birthday {birthday} is below the Sapling activation height {activation}.",
+    "mnemonicnotfound": "The wallet holds no seed phrase.",
+    "walletunreadable": "This version cannot read the wallet file.",
+    "indexerunreachable": "The server cannot be reached.",
+    "indexerrequestfailed": "The server did not answer the request.",
+    "offline": "The wallet is offline.",
+    "insufficientfunds": "Insufficient funds.",
+    "syncrequired": "Finish syncing first.",
+    "panic": "The wallet engine crashed. Restart the app.",
+    "poisoned": "The wallet engine is in a broken state. Restart the app.",
+    "busy": "The wallet is busy with {detail}. Wait for it to finish."
+  },
   "loadingapp": {
     "welcome": "Welcome",
     "actualserver": "Actual server:",

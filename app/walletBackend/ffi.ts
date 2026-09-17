@@ -1,74 +1,88 @@
 /**
- * The typed FFI error contract at the TS boundary (ADRs 0001/0002): every
- * native method resolves only success payloads, and every failure is a
- * rejected promise whose `.code` is a ZingolibError variant name. callFfi is
- * the one place a native promise becomes a discriminated FfiResult; wrappers
- * stay pure — one native call, one mapped return, no side effects.
+ * The one seam between the typed bindings and the app: a rejection becomes
+ * an FfiError keyed by its variant tag, and a promise becomes a
+ * discriminated FfiResult.
  */
+import {
+  JobKind,
+  LoadError,
+  LoadError_Tags,
+  ZingoError,
+  ZingoError_Tags,
+} from 'zingo-ffi';
 
-// The stable rejection codes: exactly the ZingolibError variant names the
-// native bridges emit. Anything unrecognized maps to 'Unknown'.
-const FFI_ERROR_CODES = [
-  'LightclientNotInitialized',
-  'LightclientLockPoisoned',
-  'Panic',
-  'Save',
-  'Init',
-  'Sync',
-  'Rescan',
-  'Read',
-  'Send',
-  'Shield',
-  'InvalidInput',
-  'Wallet',
-  'Indexer',
-  'Offline',
-  'SideChannelPoisoned',
-  'MigrationNotInProgress',
-  'MigrationAlreadyInProgress',
-  'MigrationConsentStale',
-  'MigrationCadenceFixed',
-  'MigrationSplit',
-  'Migration',
-  'Mixnet',
-] as const;
-
-export type FfiErrorCode = (typeof FFI_ERROR_CODES)[number] | 'Unknown';
+export type FfiTag = ZingoError_Tags | LoadError_Tags | 'Host' | 'Unknown';
 
 export type FfiError = {
-  code: FfiErrorCode;
-  message: string;
+  tag: FfiTag;
+  detail: string;
+  error?: ZingoError | LoadError;
 };
 
 export type FfiResult<T> =
-  { ok: true; value: T } | { ok: false; error: FfiError };
+  | { ok: true; value: T }
+  | { ok: false; error: FfiError };
 
-const KNOWN_CODES: ReadonlySet<string> = new Set(FFI_ERROR_CODES);
+const HOST_TAGS: ReadonlySet<string> = new Set([
+  ...Object.values(LoadError_Tags),
+  'Host',
+]);
 
-// Maps a native rejection to a typed FfiError: the bridge's `.code` when it
-// is a known variant name, 'Unknown' otherwise.
-export function toFfiError(rejection: unknown): FfiError {
-  const code =
-    typeof rejection === 'object' && rejection !== null && 'code' in rejection
-      ? String((rejection as { code: unknown }).code)
-      : undefined;
-  return {
-    code:
-      code !== undefined && KNOWN_CODES.has(code)
-        ? (code as FfiErrorCode)
-        : 'Unknown',
-    message: rejection instanceof Error ? rejection.message : String(rejection),
-  };
+function detailOf(error: ZingoError | LoadError): string {
+  if (ZingoError.instanceOf(error) && error.tag === ZingoError_Tags.Busy) {
+    return JobKind[error.inner.running];
+  }
+  if ('inner' in error && 'detail' in error.inner) {
+    return error.inner.detail;
+  }
+  return error.message;
 }
 
-// The one funnel from the promise channel to the discriminated union:
-// resolution → ok, rejection → typed error.
-export async function callFfi(
-  call: Promise<string>,
-): Promise<FfiResult<string>> {
+function codeOf(rejection: unknown): string | undefined {
+  if (typeof rejection !== 'object' || rejection === null) {
+    return undefined;
+  }
+  const code = (rejection as { code?: unknown }).code;
+  return typeof code === 'string' ? code : undefined;
+}
+
+export function toFfiError(rejection: unknown): FfiError {
+  if (
+    typeof rejection === 'object' &&
+    rejection !== null &&
+    (ZingoError.instanceOf(rejection) || LoadError.instanceOf(rejection))
+  ) {
+    return { tag: rejection.tag, detail: detailOf(rejection), error: rejection };
+  }
+  const detail =
+    rejection instanceof Error ? rejection.message : String(rejection);
+  const code = codeOf(rejection);
+  if (code !== undefined && HOST_TAGS.has(code)) {
+    return { tag: code as LoadError_Tags | 'Host', detail };
+  }
+  return { tag: 'Unknown', detail };
+}
+
+export function ffiFailure<T>(tag: FfiTag, detail: string): FfiResult<T> {
+  return { ok: false, error: { tag, detail } };
+}
+
+export async function callFfi<T>(call: Promise<T>): Promise<FfiResult<T>> {
   try {
     return { ok: true, value: await call };
   } catch (rejection) {
     return { ok: false, error: toFfiError(rejection) };
   }
 }
+
+export function callFfiSync<T>(call: () => T): FfiResult<T> {
+  try {
+    return { ok: true, value: call() };
+  } catch (rejection) {
+    return { ok: false, error: toFfiError(rejection) };
+  }
+}
+
+/** Zatoshi amounts cross the seam as bigint and stay under 2^53 in the app. */
+export const zats = (amount: bigint | undefined): number =>
+  amount === undefined ? 0 : Number(amount);

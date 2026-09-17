@@ -24,9 +24,9 @@ import {
 import Utils from '@app/utils';
 import { migrationStatus } from '@app/walletBackend';
 import {
-  RPCMigrationStatusType,
-  RPCBroadcastWindowType,
-} from '@app/walletBackend/types/RPCMigrationStatusType';
+  MigrationStatusType,
+  BroadcastWindowType,
+} from '@app/walletBackend/types/MigrationTypes';
 import {
   armBatchReminders,
   requestReminderPermission,
@@ -61,7 +61,7 @@ const MigrationSchedule: React.FunctionComponent<MigrationScheduleProps> = ({
   // a chain tip there is no distance to scale, so the payload's own estimate
   // stands.
   const wakeTargetMs = useCallback(
-    (wake: RPCBroadcastWindowType): number =>
+    (wake: BroadcastWindowType): number =>
       info?.latestBlock
         ? estimatedTimestampMs(
             windowTargetHeight(wake),
@@ -69,11 +69,11 @@ const MigrationSchedule: React.FunctionComponent<MigrationScheduleProps> = ({
             info.secondsPerBlock ?? TARGET_BLOCK_SPACING_SECONDS,
             Date.now(),
           )
-        : wake.latest_target_unix_time * 1000,
+        : wake.latestTargetUnixTime * 1000,
     [info],
   );
 
-  const [status, setStatus] = useState<RPCMigrationStatusType | null>(null);
+  const [status, setStatus] = useState<MigrationStatusType | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [confirming, setConfirming] = useState<boolean>(false);
@@ -88,20 +88,11 @@ const MigrationSchedule: React.FunctionComponent<MigrationScheduleProps> = ({
         return;
       }
       if (!statusResult.ok) {
-        setErrorMsg(statusResult.error.message);
+        setErrorMsg(statusResult.error.detail);
         setLoading(false);
         return;
       }
-      try {
-        const parsed = JSON.parse(statusResult.value) as RPCMigrationStatusType;
-        if (parsed.error) {
-          setErrorMsg(parsed.error);
-        } else {
-          setStatus(parsed);
-        }
-      } catch (e) {
-        setErrorMsg(`${e}`);
-      }
+      setStatus(statusResult.value);
       setLoading(false);
     })();
     return () => {
@@ -119,22 +110,22 @@ const MigrationSchedule: React.FunctionComponent<MigrationScheduleProps> = ({
     });
   }, [navigation]);
 
-  const wakes = useMemo(() => status?.upcoming_windows ?? [], [status]);
+  const wakes = useMemo(() => status?.upcomingWindows ?? [], [status]);
 
   // upcoming_windows carries only future windows. The first batch opens in the
   // current bucket, so it rides in due_now (immediately sendable) and never
   // appears here — number the coming windows past it, exactly as the status
   // screen does, or the first future window would mislabel as "Batch 1".
-  const perBucket = Math.max(1, status?.per_bucket ?? 1);
+  const perBucket = Math.max(1, status?.perBucket ?? 1);
   const batchesTotal = Math.max(
     1,
-    Math.ceil((status?.parts_total ?? 0) / perBucket),
+    Math.ceil((status?.partsTotal ?? 0) / perBucket),
   );
   const batchesConfirmed = Math.min(
     batchesTotal,
-    Math.floor((status?.parts_confirmed ?? 0) / perBucket),
+    Math.floor((status?.partsConfirmed ?? 0) / perBucket),
   );
-  const dueNow = status?.due_now ?? null;
+  const dueNow = status?.dueNow ?? null;
   const nextWakeBase = batchesConfirmed + (dueNow ? 2 : 1);
 
   // Consent covers every batch, including the one that leaves the moment the
@@ -154,8 +145,8 @@ const MigrationSchedule: React.FunctionComponent<MigrationScheduleProps> = ({
           },
         ]
       : []),
-    ...wakes.map((wake: RPCBroadcastWindowType, i: number) => ({
-      key: `w${wake.bucket_index}`,
+    ...wakes.map((wake: BroadcastWindowType, i: number) => ({
+      key: `w${wake.bucketIndex}`,
       n: nextWakeBase + i,
       denominations: wake.denominations,
       when: (translate('migrationschedule.due') as string).replace(
@@ -164,7 +155,7 @@ const MigrationSchedule: React.FunctionComponent<MigrationScheduleProps> = ({
       ),
       tech: (translate('migrationschedule.tech-line') as string)
         .replace('{anchor}', String(wake.boundary))
-        .replace('{window}', String(wake.bucket_index)),
+        .replace('{window}', String(wake.bucketIndex)),
     })),
   ];
 
@@ -176,8 +167,8 @@ const MigrationSchedule: React.FunctionComponent<MigrationScheduleProps> = ({
     const granted = await requestReminderPermission();
     if (granted) {
       await armBatchReminders(
-        wakes.map((wake: RPCBroadcastWindowType, i: number) => ({
-          id: String(wake.bucket_index),
+        wakes.map((wake: BroadcastWindowType, i: number) => ({
+          id: String(wake.bucketIndex),
           timestampMs: wakeTargetMs(wake),
           title: (
             translate('migrationschedule.reminder-title') as string

@@ -1,13 +1,16 @@
 /**
- * Public API for the wallet backend layer.
- *
- * Import WalletBackend (default) to drive the wallet from a component.
- * Import the named utility functions for one-off operations that don't need
- * a running WalletBackend instance (price fetching, shielding, seed display).
+ * Public API for the wallet backend layer: WalletBackend (default) drives
+ * the wallet from a component, and the named exports serve one-off calls
+ * that need no running instance.
  */
 import WalletBackend from './WalletBackend';
 
-export type { FfiError, FfiErrorCode, FfiResult } from './ffi';
+export type { FfiError, FfiResult, FfiTag } from './ffi';
+export { toFfiError } from './ffi';
+export type { WalletHandle } from './wallet';
+export { openWallet } from './wallet';
+export { subscribeWalletEvents } from './events';
+export type { WalletEventListener } from './events';
 export type {
   CadencePlanRoute,
   ReschedulePartsRoute,
@@ -18,11 +21,38 @@ export {
   routeRescheduleParts,
   routeStartMigration,
 } from './utils/migrationRouting';
-export { scanInProgress } from './utils/syncProgress';
+export {
+  IDLE_SYNC_STATUS,
+  hasSyncStatus,
+  scanInProgress,
+} from './utils/syncProgress';
+export {
+  ffiErrorText,
+  fillParams,
+} from './transforms/ffiErrorTransform';
+export type { FfiErrorKey, FfiErrorText } from './transforms/ffiErrorTransform';
+export type {
+  BroadcastWindowType,
+  DrainPlanType,
+  DrainTransactionType,
+  DueBatchType,
+  MigrationPhaseType,
+  MigrationPlanType,
+  MigrationStatusType,
+  SplitTransactionType,
+  WindowReportType,
+} from './types/MigrationTypes';
+export type {
+  DrainReportType,
+  SendProposalType,
+  ShieldProposalType,
+  WalletProfile,
+} from './utils/walletUtils';
 export {
   cancelIronwoodMigration,
   changeServer,
   checkMyAddress,
+  confirmSend,
   continueNoteSplitting,
   createNewTransparentAddress,
   createNewUnifiedAddress,
@@ -30,9 +60,7 @@ export {
   doSave,
   doSaveBackup,
   drainOrchard,
-  drainStatus,
   executeDueParts,
-  executeDuePartsStatus,
   fetchWallet,
   getBalanceInfo,
   getDonationAddress,
@@ -43,9 +71,9 @@ export {
   getTotalSpendsToAddress,
   getTotalValueToAddress,
   getVersionInfo,
-  getWalletKind,
   getZecPrice,
   getZenniesDonationAddress,
+  installCryptoProvider,
   isWalletAddress,
   loadExistingWallet,
   migrationStatus,
@@ -56,19 +84,17 @@ export {
   reconcileMigration,
   removeTransaction,
   rescheduleParts,
-  resolvedTrue,
   restoreExistingWalletBackup,
   restoreWalletFromSeed,
   restoreWalletFromUfvk,
   sendPropose,
-  setConfigWalletToProd,
-  setCryptoDefaultProvider,
+  setWalletSettings,
   shieldConfirm,
   shieldPropose,
-  splitStatus,
   startIronwoodMigration,
   walletBackupExists,
   walletExists,
+  walletProfile,
   windowTimeline,
 } from './utils/walletUtils';
 export {

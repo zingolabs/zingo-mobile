@@ -34,8 +34,11 @@ import {
   loadExistingWallet,
   parseAddress,
   reconcileMigration,
-  setConfigWalletToProd,
+  setWalletSettings,
 } from '@app/walletBackend';
+import type { FfiResult } from '@app/walletBackend';
+import { ParsedAddress_Tags } from 'zingo-ffi';
+import { chainName as chainNameOfChain } from '@app/walletBackend/transforms/enumTransform';
 import {
   AppStateLoaded,
   TotalBalanceClass,
@@ -92,7 +95,6 @@ import { createAlert } from '@app/services/createAlert';
 import { sendEmail } from '@app/services/sendEmail';
 import Toast from 'react-native-toast-message';
 import { toastConfig } from '@ui/widgets/toastConfig';
-import { RPCSeedType } from '@app/walletBackend/types/RPCSeedType';
 import Launching from '@screens/Launching';
 import { AddressBook } from '@screens/AddressBook';
 import AddressBookFileImpl from '@app/services/AddressBookFileImpl';
@@ -128,8 +130,8 @@ import {
 } from '@app/context/optionsPanel';
 import LoadedAppOptionsPanelHost from './LoadedAppOptionsPanelHost';
 import { MessageList } from '@screens/Messages';
-import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
-import { RPCUfvkType } from '@app/walletBackend/types/RPCUfvkType';
+import { SyncStatus } from 'zingo-ffi';
+import { IDLE_SYNC_STATUS } from '@app/walletBackend/utils/syncProgress';
 import {
   INITIAL_MIXNET_VIEW,
   OFF_MIXNET_VIEW,
@@ -604,18 +606,12 @@ export default function LoadedApp(props: LoadedAppProps) {
             migrated.push(a as AddressBookFileClass);
             continue;
           }
-          let chain: ChainNameEnum = ChainNameEnum.mainChainName;
-          try {
-            const parseResult = await parseAddress(a.address);
-            if (parseResult.ok) {
-              const parsed = JSON.parse(parseResult.value);
-              if (parsed && parsed.chain_name) {
-                chain = parsed.chain_name as ChainNameEnum;
-              }
-            }
-          } catch {
-            // unparseable address → keep the mainnet default
-          }
+          const parseResult = parseAddress(a.address);
+          const chain =
+            parseResult.ok &&
+            parseResult.value.tag !== ParsedAddress_Tags.Invalid
+              ? chainNameOfChain(parseResult.value.inner.chain)
+              : ChainNameEnum.mainChainName;
           migrated.push({
             ...(a as AddressBookFileClass),
             swapChain: GlobalConst.zecSwapChain,
@@ -794,7 +790,7 @@ export class LoadedAppClass extends Component<
       sendPageState: new SendPageStateClass(new ToAddrClass(0)),
       setSendPageState: this.setSendPageState,
       info: {} as InfoType,
-      syncingStatus: {} as RPCSyncStatusType,
+      syncingStatus: IDLE_SYNC_STATUS,
       birthday: 0,
       defaultUnifiedAddress: '',
       zecPrice: {
@@ -961,7 +957,7 @@ export class LoadedAppClass extends Component<
             // setting value for background task Android
             await AsyncStorage.setItem(GlobalConst.background, GlobalConst.yes);
             await this.rpc.clearTimers();
-            this.setSyncingStatus({} as RPCSyncStatusType);
+            this.setSyncingStatus(IDLE_SYNC_STATUS);
             // We need to save the wallet file here because
             // sometimes the App can lose the last synced chunk
             await doSave();
@@ -1010,7 +1006,7 @@ export class LoadedAppClass extends Component<
           // setting value for background task Android
           await AsyncStorage.setItem(GlobalConst.background, GlobalConst.yes);
           await this.rpc.clearTimers();
-          this.setSyncingStatus({} as RPCSyncStatusType);
+          this.setSyncingStatus(IDLE_SYNC_STATUS);
           // We need to save the wallet file here because
           // sometimes the App can lose the last synced chunk
           await doSave();
@@ -1274,7 +1270,7 @@ export class LoadedAppClass extends Component<
     }
   };
 
-  setSyncingStatus = (syncingStatus: RPCSyncStatusType) => {
+  setSyncingStatus = (syncingStatus: SyncStatus) => {
     // here is a good place to fetch the background task info
     this.fetchBackgroundSyncInfo();
     if (!isEqual(this.state.syncingStatus, syncingStatus)) {
@@ -1620,23 +1616,15 @@ export class LoadedAppClass extends Component<
 
   sendTransaction = async (
     sendPageState: SendPageStateClass,
-  ): Promise<String> => {
-    try {
-      // Construct a sendJson from the sendPage state
-      const { server, donation, defaultUnifiedAddress } = this.state;
-      const sendJson = await Utils.getSendManyJSON(
-        sendPageState,
-        defaultUnifiedAddress,
-        server,
-        donation,
-      );
-      //const start = Date.now();
-      const txid = await this.rpc.sendTransaction(sendJson);
-
-      return txid;
-    } catch (err) {
-      throw err;
-    }
+  ): Promise<FfiResult<string[]>> => {
+    const { server, donation, defaultUnifiedAddress } = this.state;
+    const sendJson = await Utils.getSendManyJSON(
+      sendPageState,
+      defaultUnifiedAddress,
+      server,
+      donation,
+    );
+    return this.rpc.sendTransaction(sendJson);
   };
 
   doRefresh = (screen: ScreenEnum) => {
@@ -1749,7 +1737,7 @@ export class LoadedAppClass extends Component<
     // The server is changing — stop the ongoing sync tasks before touching
     // anything else.
     await this.rpc.clearTimers();
-    this.setSyncingStatus({} as RPCSyncStatusType);
+    this.setSyncingStatus(IDLE_SYNC_STATUS);
     this.keepAwake(false);
 
     // Caller pre-detected a chain change (`sameServerChainName === false`).
@@ -1780,28 +1768,10 @@ export class LoadedAppClass extends Component<
       value.uri,
       value.chainName,
       this.state.performanceLevel,
-      GlobalConst.minConfirmations.toString(),
+      GlobalConst.minConfirmations,
     );
 
-    let openError: string | null = null;
-    if (!result.ok) {
-      openError = result.error.message;
-    } else if (!result.value) {
-      openError = 'loadExistingWallet returned empty';
-    } else {
-      try {
-        // `resultJson` may carry an `error` field for watch-only wallets,
-        // which is actually fine — we treat it as success.
-        const resultJson: RPCSeedType & RPCUfvkType = JSON.parse(result.value);
-        if (resultJson.error) {
-          openError = String(resultJson.error);
-        }
-      } catch (e) {
-        openError = (e as Error).message ?? 'JSON parse error';
-      }
-    }
-
-    if (openError === null) {
+    if (result.ok) {
       // Success path.
       if (toast && selectServer !== SelectServerEnum.offline) {
         this.addLastSnackbar(
@@ -1843,7 +1813,10 @@ export class LoadedAppClass extends Component<
     }
     return {
       kind: 'error',
-      message: Utils.humanizeChainTokens(openError, this.state.translate),
+      message: Utils.humanizeChainTokens(
+        result.error.detail,
+        this.state.translate,
+      ),
     };
   };
 
@@ -2034,15 +2007,13 @@ export class LoadedAppClass extends Component<
     // change it in zingolib as well. Use `value` directly — `setState`
     // above is async, so `this.state.performanceLevel` here is still the
     // OLD value at this point in the same event handler.
-    const setConfigWallet = await setConfigWalletToProd(
+    const setConfigWallet = await setWalletSettings(
       value,
-      GlobalConst.minConfirmations.toString(),
+      GlobalConst.minConfirmations,
     );
-    // Audit Issue K — do not log the setConfigWallet response; on actual
-    // failure it is propagated via setLastError below.
     if (!setConfigWallet.ok) {
       this.setLastError(
-        `Set performance level error: ${setConfigWallet.error.message}`,
+        `Set performance level error: ${setConfigWallet.error.detail}`,
       );
     }
   };
@@ -2151,7 +2122,7 @@ export class LoadedAppClass extends Component<
 
       if (!resultServer.ok) {
         this.addLastSnackbar(
-          `${this.state.translate('loadedapp.changeservernew-error')} ${resultServer.error.message}`,
+          `${this.state.translate('loadedapp.changeservernew-error')} ${resultServer.error.detail}`,
         );
         return;
       }

@@ -21,9 +21,9 @@ import Utils from '@app/utils';
 import { RouteEnum } from '@app/AppState';
 import { migrationStatus, reconcileMigration } from '@app/walletBackend';
 import {
-  RPCMigrationStatusType,
-  RPCBroadcastWindowType,
-} from '@app/walletBackend/types/RPCMigrationStatusType';
+  MigrationStatusType,
+  BroadcastWindowType,
+} from '@app/walletBackend/types/MigrationTypes';
 
 const ZATS_PER_ZEC = 10 ** 8;
 
@@ -166,7 +166,7 @@ const IronwoodMigrationBanner: React.FunctionComponent<
   const { decimalSeparator } = getNumberFormatSettings();
   const masked = `-${decimalSeparator}----`;
 
-  const [migration, setMigration] = useState<RPCMigrationStatusType | null>(
+  const [migration, setMigration] = useState<MigrationStatusType | null>(
     null,
   );
 
@@ -199,16 +199,7 @@ const IronwoodMigrationBanner: React.FunctionComponent<
         if (!statusResult.ok) {
           return;
         }
-        try {
-          const parsed = JSON.parse(
-            statusResult.value,
-          ) as RPCMigrationStatusType;
-          if (!parsed.error) {
-            setMigration(parsed);
-          }
-        } catch {
-          // Transient; keep whatever variant we last rendered.
-        }
+        setMigration(statusResult.value);
       })();
       return () => {
         cancelled = true;
@@ -222,13 +213,13 @@ const IronwoodMigrationBanner: React.FunctionComponent<
   const phaseKind = migration?.phase?.kind;
   const inFlight =
     phaseKind === 'planned' ||
-    phaseKind === 'note_splitting' ||
-    phaseKind === 'parts_scheduled';
+    phaseKind === 'noteSplitting' ||
+    phaseKind === 'partsScheduled';
 
   // ----- In-flight variant -----
   if (inFlight && migration) {
-    const splitting = phaseKind === 'note_splitting';
-    const scheduled = phaseKind === 'parts_scheduled';
+    const splitting = phaseKind === 'noteSplitting';
+    const scheduled = phaseKind === 'partsScheduled';
     const resumeRoute = scheduled
       ? RouteEnum.MigrationStatus
       : RouteEnum.MigrationSplitting;
@@ -239,20 +230,20 @@ const IronwoodMigrationBanner: React.FunctionComponent<
     // carries zingolib's provisional k_max of 8 rather than anything the user
     // picked. parts_total is projected from the plan through Phase 1 and is the
     // bound count afterwards, so the segments hold their meaning throughout.
-    const notesTotal = Math.max(1, migration.parts_total);
-    const notesConfirmed = Math.min(notesTotal, migration.parts_confirmed);
+    const notesTotal = Math.max(1, migration.partsTotal);
+    const notesConfirmed = Math.min(notesTotal, migration.partsConfirmed);
     const pct = Math.round((notesConfirmed / notesTotal) * 100);
 
     // Batch numbering for the next-action line only. A batch counts as
     // confirmed once all its notes do (floor division), as on the status
     // screen, so "Batch 3" means the same in both places.
-    const perBucket = scheduled ? Math.max(1, migration.per_bucket ?? 1) : 1;
-    const batchesConfirmed = Math.floor(migration.parts_confirmed / perBucket);
+    const perBucket = scheduled ? Math.max(1, migration.perBucket ?? 1) : 1;
+    const batchesConfirmed = Math.floor(migration.partsConfirmed / perBucket);
 
     const orchardLeftStr = privacy
       ? `${masked} ${currencyName}`
       : `${Utils.parseNumberFloatToStringLocale(
-          migration.orchard_confirmed_spendable / ZATS_PER_ZEC,
+          migration.orchardConfirmedSpendable / ZATS_PER_ZEC,
           4,
         )} ${currencyName}`;
 
@@ -260,20 +251,20 @@ const IronwoodMigrationBanner: React.FunctionComponent<
     // the window the chain is currently inside, which upcoming_windows cannot
     // carry. upcoming_windows stays the source for the "waiting N blocks"
     // countdown to the next scheduled window.
-    const wakes: RPCBroadcastWindowType[] = migration.upcoming_windows ?? [];
+    const wakes: BroadcastWindowType[] = migration.upcomingWindows ?? [];
     const nextWake = wakes[0];
     const blocksUntil = nextWake ? Math.max(0, nextWake.boundary - height) : 0;
-    const ready = migration.due_now != null;
+    const ready = migration.dueNow !== undefined;
     // A batch broadcast but not yet mined: sent, confirming on-chain. Its window
     // is gone from both due_now and upcoming_windows, so without this signal it would
     // read as the next batch still pending.
-    const confirming = !splitting && !ready && migration.parts_broadcast > 0;
+    const confirming = !splitting && !ready && migration.partsBroadcast > 0;
     // The bar's broadcast run outlives `confirming`: a new window can open
     // while the batch still mines, which flips the pill to Ready but changes
     // nothing about the parts in flight. Keyed to parts_broadcast alone, the
     // run stays lit until those parts confirm, and the confirm flash lands on
     // lit segments instead of blanks.
-    const broadcasting = migration.parts_broadcast > 0;
+    const broadcasting = migration.partsBroadcast > 0;
 
     // Status pill (dot + word): Splitting while notes split, Ready when a batch
     // can be sent now, Confirming while a sent batch mines, Pending while the
@@ -386,7 +377,7 @@ const IronwoodMigrationBanner: React.FunctionComponent<
                   segments={notesTotal}
                   progress={notesConfirmed / notesTotal}
                   active={broadcasting ? notesConfirmed : undefined}
-                  activeSpan={migration.parts_broadcast}
+                  activeSpan={migration.partsBroadcast}
                   activeColor={colors.fgSyncing}
                   height={8}
                 />

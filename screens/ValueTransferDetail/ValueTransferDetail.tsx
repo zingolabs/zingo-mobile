@@ -333,16 +333,16 @@ const ValueTransferDetail: React.FunctionComponent<
         setBackgroundError,
         addLastSnackbar,
         translate(`history.${action}-title`) as string,
-        `${translate(`history.${action}-error`)} ${actionResult.error.message}`,
+        `${translate(`history.${action}-error`)} ${actionResult.error.detail}`,
         false,
         translate,
       );
-    } else if (actionResult.value) {
+    } else {
       createAlert(
         setBackgroundError,
         addLastSnackbar,
         translate(`history.${action}-title`) as string,
-        `${translate(`history.${action}-message`)} ${actionResult.value}`,
+        translate(`history.${action}-message`) as string,
         true,
         translate,
       );

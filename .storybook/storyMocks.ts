@@ -75,7 +75,10 @@ const mixnetStatus = (
       kind: 'status',
       indicator,
       socks5Addr:
-        indicator === RPCMixnetIndicatorEnum.ready ? '127.0.0.1:1080' : null,
+        indicator === RPCMixnetIndicatorEnum.ready
+          ? '127.0.0.1:1080'
+          : undefined,
+      bootstrapDetail: '',
     },
     null,
     reconnecting,

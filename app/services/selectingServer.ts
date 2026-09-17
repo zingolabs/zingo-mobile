@@ -7,7 +7,7 @@ const calculateLatency = async (server: ServerUrisType, _index: number) => {
 
   const end: number = Date.now();
   let latency = null;
-  if (resp.ok && resp.value) {
+  if (resp.ok) {
     latency = end - start;
   }
 

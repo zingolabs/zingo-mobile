@@ -12,7 +12,6 @@ import { useTheme } from '@app/theme';
 import {
   AddressBookFileClass,
   AddressKindEnum,
-  ReceiverEnum,
   ScreenEnum,
   SnackbarDurationEnum,
 } from '@app/AppState';
@@ -28,8 +27,6 @@ import {
   createNewTransparentAddress,
   createNewUnifiedAddress,
 } from '@app/walletBackend';
-import { RPCUnifiedAddressType } from '@app/walletBackend/types/RPCUnifiedAddressType';
-import { RPCTransparentAddressType } from '@app/walletBackend/types/RPCTransparentAddressType';
 import Utils from '@app/utils';
 import AddressBookFileImpl from '@app/services/AddressBookFileImpl';
 
@@ -73,20 +70,13 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
   );
 
   const createAddress = async () => {
-    const receivers: string =
-      addressKind === AddressKindEnum.u &&
-      type === AddressUnifiedTypeEnum.orchard
-        ? ReceiverEnum.o
-        : addressKind === AddressKindEnum.u &&
-            type === AddressUnifiedTypeEnum.sapling
-          ? ReceiverEnum.z
-          : addressKind === AddressKindEnum.u &&
-              type === AddressUnifiedTypeEnum.orchardAndSapling
-            ? ReceiverEnum.o + ReceiverEnum.z
-            : '';
+    const unified = addressKind === AddressKindEnum.u;
     try {
-      const newAddressResult = receivers
-        ? await createNewUnifiedAddress(receivers)
+      const newAddressResult = unified
+        ? await createNewUnifiedAddress({
+            orchard: type !== AddressUnifiedTypeEnum.sapling,
+            sapling: type !== AddressUnifiedTypeEnum.orchard,
+          })
         : await createNewTransparentAddress();
 
       if (!newAddressResult.ok) {
@@ -95,18 +85,7 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
           SnackbarDurationEnum.short,
         );
       } else if (label) {
-        let newAddress: string;
-        if (receivers) {
-          const newUnifiedAddressJSON: RPCUnifiedAddressType = await JSON.parse(
-            newAddressResult.value,
-          );
-          newAddress = newUnifiedAddressJSON.encoded_address;
-        } else {
-          const newTransparentAddressJSON: RPCTransparentAddressType =
-            await JSON.parse(newAddressResult.value);
-          newAddress = newTransparentAddressJSON.encoded_address;
-        }
-        //console.log(label, newAddress);
+        const newAddress = newAddressResult.value.encodedAddress;
         const randomColors = Utils.generateColorList(1);
         const ab = await AddressBookFileImpl.writeAddressBookItem(
           label,

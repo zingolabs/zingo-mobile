@@ -4,7 +4,7 @@ import {
   getBalanceInfo,
   getServerInfo,
 } from '@app/walletBackend';
-import { RPCInfoType } from '@app/walletBackend/types/RPCInfoType';
+import { chainNameOf } from '@app/walletBackend/transforms/enumTransform';
 
 type checkServerURIReturn = {
   result: boolean;
@@ -50,7 +50,7 @@ const checkServerURI = async (
         result: false,
         timeout: false,
         newChainName,
-        errorDetail: `changeServer: ${resultServer.error.message}`,
+        errorDetail: `changeServer: ${resultServer.error.detail}`,
       };
     } else {
       // the server is changed
@@ -74,26 +74,10 @@ const checkServerURI = async (
             result: false,
             timeout: false,
             newChainName,
-            errorDetail: `infoServerInfo: ${info.error.message}`,
+            errorDetail: `serverInfo: ${info.error.detail}`,
           };
-        } else {
-          try {
-            const infoJSON: RPCInfoType = await JSON.parse(info.value);
-            newChainName = infoJSON.chain_name;
-          } catch (e) {
-            // I have to restore the old server again.
-            await changeServer(oldUri);
-            // error, no timeout
-            return {
-              result: false,
-              timeout: false,
-              newChainName,
-              errorDetail: `infoServerInfo parse: ${
-                e instanceof Error ? e.message : String(e)
-              } | raw: ${info.value}`,
-            };
-          }
         }
+        newChainName = chainNameOf(info.value.chainName);
       } else {
         // the new server is empty -> means Offline mode.
         // No `await` here so Promise.race can enforce the 15s cap.
@@ -117,7 +101,7 @@ const checkServerURI = async (
             result: false,
             timeout: false,
             newChainName,
-            errorDetail: `getBalanceInfo: ${balance.error.message}`,
+            errorDetail: `getBalanceInfo: ${balance.error.detail}`,
           };
         } else {
           newChainName = undefined;

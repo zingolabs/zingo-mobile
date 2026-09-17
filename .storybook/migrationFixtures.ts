@@ -1,14 +1,21 @@
-// Backend payloads for the migration screen stories. Values in zatoshis,
-// mirroring what zingolib returns through the bridge.
-import { RPCMigrationPlanType } from '@app/walletBackend/types/RPCMigrationPlanType';
-import { RPCMigrationStatusType } from '@app/walletBackend/types/RPCMigrationStatusType';
-import { RPCDrainPlanType } from '@app/walletBackend/types/RPCDrainPlanType';
-import { RPCDrainStatusType } from '@app/walletBackend/types/RPCDrainStatusType';
-import { RPCBatchStatusType } from '@app/walletBackend/types/RPCBatchStatusType';
-import { RPCBatchReportType } from '@app/walletBackend/types/RPCBatchReportType';
+// Wallet answers for the migration screen stories, in the generated shapes
+// the wallet handle yields (zatoshi amounts as bigint).
+import {
+  BatchPhase,
+  BatchReport,
+  BatchStatus,
+  BuildPhase,
+  DrainPlan,
+  DrainStatus,
+  MigrationPhase,
+  MigrationPlan,
+  MigrationStatus,
+  PartResult,
+} from 'zingo-ffi';
 
-const ZEC = 100_000_000;
-const PART = 49_990_000;
+const ZEC = 100_000_000n;
+const PART = 49_990_000n;
+const zec = (amount: number): bigint => BigInt(Math.round(amount * 1e8));
 
 export const planHash = 'ab'.repeat(32);
 
@@ -19,174 +26,193 @@ export const txids = [
 ];
 
 // Two splitting rounds resize a 2.5 ZEC note into five parts.
-export const splitPlan: RPCMigrationPlanType = {
-  split_rounds: [
-    [{ inputs: [2.5 * ZEC], outputs: [ZEC, ZEC, PART], fee: 10_000 }],
-    [
-      { inputs: [ZEC], outputs: [PART, PART], fee: 20_000 },
-      { inputs: [ZEC], outputs: [PART, PART], fee: 20_000 },
-    ],
+export const splitPlan: MigrationPlan = {
+  splitRounds: [
+    {
+      transactions: [
+        { inputs: [zec(2.5)], outputs: [ZEC, ZEC, PART], fee: 10_000n },
+      ],
+    },
+    {
+      transactions: [
+        { inputs: [ZEC], outputs: [PART, PART], fee: 20_000n },
+        { inputs: [ZEC], outputs: [PART, PART], fee: 20_000n },
+      ],
+    },
   ],
   parts: [PART, PART, PART, PART, PART],
-  split_fee: 50_000,
-  parts_fee: 50_000,
-  residual: 12_345,
-  plan_hash: planHash,
+  splitFee: 50_000n,
+  partsFee: 50_000n,
+  residual: 12_345n,
+  planHash,
 };
 
 // Notes already part-sized: no splitting rounds, straight to the cadence.
-export const readyPlan: RPCMigrationPlanType = {
+export const readyPlan: MigrationPlan = {
   ...splitPlan,
-  split_rounds: [],
-  split_fee: 0,
+  splitRounds: [],
+  splitFee: 0n,
 };
 
-export const dustPlan: RPCMigrationPlanType = {
-  split_rounds: [],
+export const dustPlan: MigrationPlan = {
+  splitRounds: [],
   parts: [],
-  split_fee: 0,
-  parts_fee: 0,
-  residual: 4_000,
-  plan_hash: planHash,
+  splitFee: 0n,
+  partsFee: 0n,
+  residual: 4_000n,
+  planHash,
 };
 
-export const unconfirmedPlan: RPCMigrationPlanType = {
+export const unconfirmedPlan: MigrationPlan = {
   ...dustPlan,
-  residual: 0,
+  residual: 0n,
 };
 
-export const drainPlan: RPCDrainPlanType = {
+export const drainPlan: DrainPlan = {
   transactions: [
-    { inputs: [1.2 * ZEC, 0.3 * ZEC], output: 1.5 * ZEC - 10_000, fee: 10_000 },
-    { inputs: [0.75 * ZEC], output: 0.75 * ZEC - 10_000, fee: 10_000 },
+    {
+      inputs: [zec(1.2), zec(0.3)],
+      output: zec(1.5) - 10_000n,
+      fee: 10_000n,
+    },
+    { inputs: [zec(0.75)], output: zec(0.75) - 10_000n, fee: 10_000n },
   ],
-  migrated: 2.25 * ZEC - 20_000,
-  fee: 20_000,
-  residual: 5_000,
+  migrated: zec(2.25) - 20_000n,
+  fee: 20_000n,
+  residual: 5_000n,
 };
 
-export const emptyDrainPlan: RPCDrainPlanType = {
+export const emptyDrainPlan: DrainPlan = {
   transactions: [],
-  migrated: 0,
-  fee: 0,
-  residual: 3_000,
+  migrated: 0n,
+  fee: 0n,
+  residual: 3_000n,
 };
 
-export const pendingDrainPlan: RPCDrainPlanType = {
+export const pendingDrainPlan: DrainPlan = {
   ...emptyDrainPlan,
-  residual: 0,
+  residual: 0n,
 };
 
-export const drainBuilding: RPCDrainStatusType = {
+export const drainBuilding: DrainStatus = {
   total: 2,
   built: 1,
   sent: 0,
-  phase: 'building',
+  phase: BuildPhase.Building,
 };
 
 const windowAt = (bucket: number, boundary: number, parts: number[]) => ({
-  bucket_index: bucket,
+  bucketIndex: BigInt(bucket),
   boundary,
-  part_ids: parts,
+  partIds: parts,
   denominations: parts.map(() => PART),
-  window_opens_unix_time: 1_700_000_000 + (bucket - 17_362) * 10_800,
-  latest_target_unix_time: 1_700_003_600 + (bucket - 17_362) * 10_800,
+  windowOpensUnixTime: BigInt(1_700_000_000 + (bucket - 17_362) * 10_800),
+  latestTargetUnixTime: BigInt(1_700_003_600 + (bucket - 17_362) * 10_800),
 });
 
 // Nothing planned yet: what the cadence chooser reads before consent.
-export const idleStatus: RPCMigrationStatusType = {
-  orchard_confirmed_spendable: 2.5 * ZEC,
-  phase: null,
-  parts_total: 0,
-  parts_confirmed: 0,
-  parts_broadcast: 0,
-  value_total: 0,
-  value_migrated: 0,
-  per_bucket: null,
-  bucket_modulus: 144,
-  upcoming_windows: [],
-  due_now: null,
+export const idleStatus: MigrationStatus = {
+  orchardConfirmedSpendable: zec(2.5),
+  phase: undefined,
+  partsTotal: 0,
+  partsConfirmed: 0,
+  partsBroadcast: 0,
+  valueTotal: 0n,
+  valueMigrated: 0n,
+  perBucket: undefined,
+  bucketModulus: 144,
+  upcomingWindows: [],
+  dueNow: undefined,
 };
 
 // Two of five parts confirmed, the rest scheduled across coming windows.
-export const scheduledStatus: RPCMigrationStatusType = {
-  orchard_confirmed_spendable: 1.5 * ZEC,
-  phase: { kind: 'parts_scheduled' },
-  parts_total: 5,
-  parts_confirmed: 2,
-  parts_broadcast: 0,
-  value_total: 5 * PART,
-  value_migrated: 2 * PART,
-  per_bucket: 2,
-  bucket_modulus: 144,
-  upcoming_windows: [
+export const scheduledStatus: MigrationStatus = {
+  orchardConfirmedSpendable: zec(1.5),
+  phase: new MigrationPhase.PartsScheduled(),
+  partsTotal: 5,
+  partsConfirmed: 2,
+  partsBroadcast: 0,
+  valueTotal: 5n * PART,
+  valueMigrated: 2n * PART,
+  perBucket: 2,
+  bucketModulus: 144,
+  upcomingWindows: [
     windowAt(17_362, 2_500_128, [2, 3]),
     windowAt(17_363, 2_500_272, [4]),
   ],
-  due_now: null,
+  dueNow: undefined,
 };
 
 // The chain is inside a window: a batch is sendable now.
-export const dueNowStatus: RPCMigrationStatusType = {
+export const dueNowStatus: MigrationStatus = {
   ...scheduledStatus,
-  upcoming_windows: [windowAt(17_363, 2_500_272, [4])],
-  due_now: {
+  upcomingWindows: [windowAt(17_363, 2_500_272, [4])],
+  dueNow: {
     boundary: 2_499_984,
-    part_ids: [2, 3],
+    partIds: [2, 3],
     denominations: [PART, PART],
   },
 };
 
+/** The due batch's denominations as the route param the screen renders. */
+export const dueNowDenominations = [Number(PART), Number(PART)];
+
 // A batch broadcast and still mining.
-export const confirmingStatus: RPCMigrationStatusType = {
+export const confirmingStatus: MigrationStatus = {
   ...dueNowStatus,
-  parts_broadcast: 2,
-  due_now: null,
+  partsBroadcast: 2,
+  dueNow: undefined,
 };
 
-export const completeStatus: RPCMigrationStatusType = {
+export const completeStatus: MigrationStatus = {
   ...scheduledStatus,
-  orchard_confirmed_spendable: 12_345,
-  phase: { kind: 'complete', residual: 12_345 },
-  parts_confirmed: 5,
-  value_migrated: 5 * PART,
-  upcoming_windows: [],
+  orchardConfirmedSpendable: 12_345n,
+  phase: new MigrationPhase.Complete({ residual: 12_345n }),
+  partsConfirmed: 5,
+  valueMigrated: 5n * PART,
+  upcomingWindows: [],
 };
 
 // Scheduled with nothing bound: the only exit is to start over.
-export const stalledStatus: RPCMigrationStatusType = {
+export const stalledStatus: MigrationStatus = {
   ...idleStatus,
-  phase: { kind: 'parts_scheduled' },
-  per_bucket: 2,
+  phase: new MigrationPhase.PartsScheduled(),
+  perBucket: 2,
 };
 
-export const batchSpacing: RPCBatchStatusType = {
+export const batchSpacing: BatchStatus = {
   total: 2,
   resolved: 1,
   sent: 1,
-  phase: 'spacing',
+  phase: BatchPhase.Spacing,
 };
 
 // Every part skipped: nothing broadcast, nothing lost.
-export const skippedBatch: RPCBatchReportType = {
+export const skippedBatch: BatchReport = {
   outcomes: [
-    { part: 2, denomination: PART, result: { kind: 'slid' } },
+    { part: 2, denomination: PART, result: new PartResult.Slid() },
     {
       part: 3,
       denomination: PART,
-      result: { kind: 'not_due', window_opens_unix_time: 1_700_000_000 },
+      result: new PartResult.NotDue({ windowOpensUnixTime: 1_700_000_000n }),
     },
   ],
-  halted: null,
+  halted: undefined,
 };
 
-export const haltedBatch: RPCBatchReportType = {
+export const haltedBatch: BatchReport = {
   outcomes: [
-    { part: 2, denomination: PART, result: { kind: 'sent', txid: txids[0] } },
+    {
+      part: 2,
+      denomination: PART,
+      result: new PartResult.Sent({ txid: txids[0] }),
+    },
     {
       part: 3,
       denomination: PART,
-      result: { kind: 'failed', error: 'broadcast refused: mempool full' },
+      result: new PartResult.Failed({
+        error: 'broadcast refused: mempool full',
+      }),
     },
   ],
   halted: 'broadcast refused: mempool full',

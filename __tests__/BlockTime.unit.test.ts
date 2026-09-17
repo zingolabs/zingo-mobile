@@ -8,7 +8,7 @@ import {
   foldBlockSpacing,
   windowTargetHeight,
 } from '@app/AppState';
-import { RPCBroadcastWindowType } from '@app/walletBackend/types/RPCMigrationStatusType';
+import { BroadcastWindowType } from '@app/walletBackend/types/MigrationTypes';
 
 describe('foldBlockSpacing', () => {
   test('first accepted sample becomes the estimate', () => {
@@ -45,13 +45,13 @@ describe('windowTargetHeight', () => {
     boundary: number,
     opensUnix: number,
     targetUnix: number,
-  ): RPCBroadcastWindowType => ({
-    bucket_index: Math.floor(boundary / 144),
+  ): BroadcastWindowType => ({
+    bucketIndex: Math.floor(boundary / 144),
     boundary,
-    part_ids: [],
+    partIds: [],
     denominations: [],
-    window_opens_unix_time: opensUnix,
-    latest_target_unix_time: targetUnix,
+    windowOpensUnixTime: opensUnix,
+    latestTargetUnixTime: targetUnix,
   });
 
   test('recovers the target offset the payload encoded at mainnet spacing', () => {

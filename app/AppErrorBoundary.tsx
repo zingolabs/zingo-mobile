@@ -2,7 +2,7 @@ import React, { Component, ErrorInfo } from 'react';
 import { View, Text, Pressable, ScrollView, StyleSheet } from 'react-native';
 import RNRestart from 'react-native-restart';
 
-import RPCModule from './RPCModule';
+import { getVersionInfo } from './walletBackend';
 import { advancedTokens } from './theme';
 import { sendEmail } from './services/sendEmail';
 import { TranslateType } from './AppState';
@@ -44,20 +44,7 @@ class AppErrorBoundary extends Component<React.PropsWithChildren, State> {
 
   componentDidCatch(error: Error, info: ErrorInfo) {
     console.error('AppErrorBoundary caught:', error, info.componentStack);
-    // Best-effort fetch of the rust layer version so the report carries the
-    // same identity info Settings would. Bounded by a 2s timeout because the
-    // native bridge could be in a degraded state after a crash; on failure
-    // the report still goes out, just without the zingolib line.
-    Promise.race<string>([
-      RPCModule.getVersionInfo(),
-      new Promise<string>((_, reject) =>
-        setTimeout(() => reject(new Error('timeout')), 2000),
-      ),
-    ])
-      .then(v => this.setState({ zingolibVersion: v }))
-      .catch(() => {
-        /* leave zingolibVersion empty */
-      });
+    this.setState({ zingolibVersion: getVersionInfo() });
   }
 
   // Body for the support email. sendEmail prepends device/app/zingolib info

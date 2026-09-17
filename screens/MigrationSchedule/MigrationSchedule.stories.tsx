@@ -1,14 +1,15 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
+import { ZingoError } from 'zingo-ffi';
 import { RouteEnum } from '@app/AppState';
 import MigrationSchedule from './MigrationSchedule';
 import {
   screenProps,
   withAppContext,
   withNavigation,
-  withRpc,
+  withWallet,
 } from '../../.storybook/storyDecorators';
 import { mockInfo } from '../../.storybook/storyMocks';
-import { json, pending, rejection } from '../../.storybook/storyRpc';
+import { answer, pending, rejection } from '../../.storybook/storyRpc';
 import {
   dueNowStatus,
   scheduledStatus,
@@ -26,21 +27,18 @@ type Story = StoryObj<typeof MigrationSchedule>;
 
 // The first batch leaves on confirm; the rest wait for their windows.
 export const FirstBatchDue: Story = {
-  decorators: [withRpc({ migrationStatusProcess: json(dueNowStatus) })],
+  decorators: [withWallet({ migrationStatus: answer(dueNowStatus) })],
 };
 export const AllUpcoming: Story = {
-  decorators: [withRpc({ migrationStatusProcess: json(scheduledStatus) })],
+  decorators: [withWallet({ migrationStatus: answer(scheduledStatus) })],
 };
 export const Loading: Story = {
-  decorators: [withRpc({ migrationStatusProcess: pending })],
+  decorators: [withWallet({ migrationStatus: pending })],
 };
 export const Error: Story = {
   decorators: [
-    withRpc({
-      migrationStatusProcess: rejection(
-        'no migration in progress',
-        'MigrationNotInProgress',
-      ),
+    withWallet({
+      migrationStatus: rejection(new ZingoError.MigrationNotInProgress()),
     }),
   ],
 };

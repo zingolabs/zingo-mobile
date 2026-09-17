@@ -14,9 +14,8 @@ import { ContextAppLoaded } from '@app/context';
 import { RouteEnum } from '@app/AppState';
 import Utils from '@app/utils';
 import useTrickleProgress from '@app/hooks/useTrickleProgress';
-import { drainOrchard, drainStatus } from '@app/walletBackend';
-import { RPCDrainType } from '@app/walletBackend/types/RPCDrainType';
-import { RPCDrainStatusType } from '@app/walletBackend/types/RPCDrainStatusType';
+import { BuildPhase, DrainStatus, WalletEvent_Tags } from 'zingo-ffi';
+import { drainOrchard, subscribeWalletEvents } from '@app/walletBackend';
 
 type MigrationSendingProps = NativeStackScreenProps<
   AppDrawerParamList,
@@ -42,12 +41,12 @@ type TxStatus = 'queued' | 'calculating' | 'calculated' | 'sending' | 'sent';
 
 const deriveStatus = (
   index: number,
-  progress: RPCDrainStatusType | null,
+  progress: DrainStatus | undefined,
 ): TxStatus => {
   if (!progress) {
     return 'queued';
   }
-  if (progress.phase === 'building') {
+  if (progress.phase === BuildPhase.Building) {
     if (index < progress.built) {
       return 'calculated';
     }
@@ -90,7 +89,7 @@ const MigrationSending: React.FunctionComponent<MigrationSendingProps> = ({
     4,
   )} ${info.currencyName}`;
 
-  const [progress, setProgress] = useState<RPCDrainStatusType | null>(null);
+  const [progress, setProgress] = useState<DrainStatus | undefined>(undefined);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const goHome = useCallback(() => {
@@ -111,67 +110,37 @@ const MigrationSending: React.FunctionComponent<MigrationSendingProps> = ({
   const trickle = useTrickleProgress();
   const { setCeiling, stop, finish } = trickle;
 
-  // Run the drain once, polling the native side channel for progress while the
-  // single long drain call is in flight. Both run concurrently on separate
-  // native queues; drainStatus reads a side channel, not the lightclient lock
-  // the drain holds, so the poll stays live throughout.
+  // Run the drain once, following its DrainProgress events while the single
+  // long drain call is in flight.
   useEffect(() => {
     let cancelled = false;
-    let polling = false;
-    const poll = setInterval(async () => {
-      if (polling) {
-        return;
+    const unsubscribe = subscribeWalletEvents(event => {
+      if (event.tag === WalletEvent_Tags.DrainProgress && !cancelled) {
+        setProgress(event.inner.status);
       }
-      polling = true;
-      try {
-        const status = await drainStatus();
-        if (status.ok) {
-          const parsed = JSON.parse(status.value) as RPCDrainStatusType | null;
-          if (parsed && !cancelled) {
-            setProgress(parsed);
-          }
-        }
-      } catch {
-        // Transient read/parse between ticks; the next tick recovers.
-      } finally {
-        polling = false;
-      }
-    }, 300);
+    });
 
     (async () => {
-      let failure: string | null = null;
-      try {
-        const drain = await drainOrchard();
-        if (!drain.ok) {
-          failure = drain.error.message;
-        } else {
-          const parsed: RPCDrainType = JSON.parse(drain.value);
-          if (parsed.error) {
-            failure = parsed.error;
-          }
-        }
-      } catch (e) {
-        failure = `${e}`;
-      }
-      clearInterval(poll);
+      const drain = await drainOrchard();
+      unsubscribe();
       if (cancelled) {
         return;
       }
-      if (failure) {
+      if (!drain.ok) {
         // Stop the trickle; the drain is no longer progressing.
         stop();
-        setErrorMsg(failure);
+        setErrorMsg(drain.error.detail);
         return;
       }
       // Mark every transaction sent, then glide the bar to 100% and navigate.
-      // (The transmit phase is near-instant next to proving, so the poll
-      // rarely observes it — this is what makes the bar reliably finish full
+      // (The transmit phase is near-instant next to proving, so its events
+      // rarely land — this is what makes the bar reliably finish full
       // instead of stalling where building left it.)
       setProgress({
         total: txCount,
         built: txCount,
         sent: txCount,
-        phase: 'transmitting',
+        phase: BuildPhase.Transmitting,
       });
       addLastSnackbar(translate('migrationsending.success') as string);
       finish(goHome);
@@ -179,7 +148,7 @@ const MigrationSending: React.FunctionComponent<MigrationSendingProps> = ({
 
     return () => {
       cancelled = true;
-      clearInterval(poll);
+      unsubscribe();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -200,7 +169,7 @@ const MigrationSending: React.FunctionComponent<MigrationSendingProps> = ({
       (BUILD_WEIGHT * progress.built + (1 - BUILD_WEIGHT) * progress.sent) /
       total;
     const step =
-      (progress.phase === 'transmitting' ? 1 - BUILD_WEIGHT : BUILD_WEIGHT) /
+      (progress.phase === BuildPhase.Transmitting ? 1 - BUILD_WEIGHT : BUILD_WEIGHT) /
       total;
     setCeiling(real + step);
   }, [progress, txCount, setCeiling]);

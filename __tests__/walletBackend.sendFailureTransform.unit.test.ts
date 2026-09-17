@@ -1,3 +1,5 @@
+import { ZingoError, ZingoError_Tags } from 'zingo-ffi';
+import { FfiError, toFfiError } from '@app/walletBackend/ffi';
 import {
   SendFailureClass,
   classifySendFailure,
@@ -5,177 +7,139 @@ import {
   sendFailureText,
 } from '@app/walletBackend/transforms/sendFailureTransform';
 
-/**
- * Realistic failure strings, one per real family the send path produces.
- * The refusal and internal texts are verbatim from their producers
- * (zingolib's MixnetNotReady displays; TransactionService's fabricated
- * no-payload errors).
- */
-const BOOTSTRAPPING_REFUSAL =
-  'Error: send the Nym mixnet is bootstrapping; this operation requires it to be ready';
-const DIED_REFUSAL =
-  'Error: send the Nym mixnet proxy died; this operation refuses rather than fall back to clearnet — run `nym on` to restart the proxy';
-const INTERNAL_PROPOSE = 'Error: Internal RPC Error: propose';
-const INTERNAL_CONFIRM = 'Error: Internal RPC Error: confirm';
-const CONNECTION_REFUSED = 'Error: connection refused';
+const failure = (detail: string): FfiError => ({ tag: 'Unknown', detail });
 
-describe('classifySendFailure covers each real error family', () => {
-  it.each([
+describe('classifySendFailure', () => {
+  test('Tests that an InsufficientFunds rejection carries its amounts when the wallet lacks funds', () => {
+    const rejection = toFfiError(
+      new ZingoError.InsufficientFunds({
+        available: 5_000n,
+        required: 12_000n,
+        detail: 'need 12000, have 5000',
+      }),
+    );
+    expect(classifySendFailure(rejection)).toMatchObject({
+      kind: 'insufficientFunds',
+      available: 5_000,
+      required: 12_000,
+    });
+  });
+
+  test.each([
+    new ZingoError.MixnetUnattached({ detail: 'no proxy' }),
+    new ZingoError.MixnetBootstrapping({ detail: 'wait' }),
+    new ZingoError.MixnetDied({ detail: 'proxy died' }),
+    new ZingoError.MixnetSwitchedOff({ detail: 'off' }),
+    new ZingoError.MixnetEnableFailed({ detail: 'spawn failed' }),
+  ])(
+    'Tests that a mixnet rejection classifies as a refusal when the tag is %s',
+    error => {
+      expect(classifySendFailure(toFfiError(error)).kind).toBe(
+        'mixnetRefusal',
+      );
+    },
+  );
+
+  test('Tests that the destination and offline tags classify by tag before any text', () => {
+    expect(
+      classifySendFailure(
+        toFfiError(
+          new ZingoError.DestinationIneligible({ detail: '64: dust' }),
+        ),
+      ).kind,
+    ).toBe('destinationIneligible');
+    expect(classifySendFailure(toFfiError(new ZingoError.Offline())).kind).toBe(
+      'offline',
+    );
+  });
+
+  test('Tests that an unreachable indexer classifies as a server suspect when the tag says so', () => {
+    expect(
+      classifySendFailure(
+        toFfiError(new ZingoError.IndexerUnreachable({ detail: 'dial' })),
+      ).kind,
+    ).toBe('serverSuspect');
+  });
+
+  test.each([
     '18: bad-txns-sapling-duplicate-nullifier',
     '18: bad-txns-sprout-duplicate-nullifier',
     '18: bad-txns-orchard-duplicate-nullifier',
-  ])('classifies %s as duplicateNullifier', marker => {
-    expect(classifySendFailure(`Error: send ${marker}`).kind).toBe(
-      'duplicateNullifier',
-    );
+  ])(
+    'Tests that the node reject %s classifies as a duplicate nullifier when it appears in the detail',
+    marker => {
+      expect(classifySendFailure(failure(`send ${marker}`)).kind).toBe(
+        'duplicateNullifier',
+      );
+    },
+  );
+
+  test('Tests that the dust reject classifies as dust when it appears in the detail', () => {
+    expect(classifySendFailure(failure('send 64: dust')).kind).toBe('dust');
   });
 
-  it('classifies the dust reject as dust', () => {
-    expect(classifySendFailure('Error: send 64: dust').kind).toBe('dust');
-  });
-
-  it('classifies both fail-closed refusal texts as mixnetRefusal', () => {
-    expect(classifySendFailure(BOOTSTRAPPING_REFUSAL).kind).toBe(
-      'mixnetRefusal',
+  test('Tests that an unrecognized failure is presumed a server suspect', () => {
+    expect(classifySendFailure(failure('connection refused')).kind).toBe(
+      'serverSuspect',
     );
-    expect(classifySendFailure(DIED_REFUSAL).kind).toBe('mixnetRefusal');
-  });
-
-  it('classifies both fabricated no-payload errors as internalRpcFailure', () => {
-    expect(classifySendFailure(INTERNAL_PROPOSE).kind).toBe(
-      'internalRpcFailure',
-    );
-    expect(classifySendFailure(INTERNAL_CONFIRM).kind).toBe(
-      'internalRpcFailure',
-    );
-  });
-
-  it('presumes an unrecognized error is a serverSuspect', () => {
-    expect(classifySendFailure(CONNECTION_REFUSED).kind).toBe('serverSuspect');
   });
 });
 
-/**
- * Regression: the legacy classifier (`interceptCustomError`) returned
- * `string | undefined`, and `undefined` collapsed the states below into one
- * "presume server, switch and retry" bucket. Each test names one collapsed
- * state and asserts the pair the enumeration now guarantees for it — the
- * distinct kind and the explicit retry routing. Every test here FAILS
- * against the legacy semantics (where each state was `undefined`:
- * indistinguishable, and unconditionally retry-eligible) and PASSES against
- * the enumeration.
- */
-describe('regression: states the legacy undefined collapsed', () => {
-  it('a bootstrapping refusal was undefined (kindless, retried); now mixnetRefusal, never retried', () => {
-    const failure = classifySendFailure(BOOTSTRAPPING_REFUSAL);
-    expect(failure.kind).toBe('mixnetRefusal');
-    expect(retryOnAnotherServer(failure)).toBe(false);
-  });
-
-  it('a died refusal was undefined (kindless, retried); now mixnetRefusal, never retried', () => {
-    const failure = classifySendFailure(DIED_REFUSAL);
-    expect(failure.kind).toBe('mixnetRefusal');
-    expect(retryOnAnotherServer(failure)).toBe(false);
-  });
-
-  it('an internal propose failure was undefined (kindless); now its own kind, historical routing kept', () => {
-    const failure = classifySendFailure(INTERNAL_PROPOSE);
-    expect(failure.kind).toBe('internalRpcFailure');
-    // Routing deliberately preserved from the legacy bucket; the point of
-    // the arm is that the state is now visible and separately revisable.
-    expect(retryOnAnotherServer(failure)).toBe(true);
-  });
-
-  it('an internal confirm failure was undefined (kindless); now its own kind, historical routing kept', () => {
-    const failure = classifySendFailure(INTERNAL_CONFIRM);
-    expect(failure.kind).toBe('internalRpcFailure');
-    expect(retryOnAnotherServer(failure)).toBe(true);
-  });
-
-  it('a genuine server fault keeps the historical presumption and its retry', () => {
-    const failure = classifySendFailure(CONNECTION_REFUSED);
-    expect(failure.kind).toBe('serverSuspect');
-    expect(retryOnAnotherServer(failure)).toBe(true);
-  });
-
-  it('the collapsed states are now pairwise distinct', () => {
-    const kinds = new Set(
-      [BOOTSTRAPPING_REFUSAL, INTERNAL_PROPOSE, CONNECTION_REFUSED].map(
-        error => classifySendFailure(error).kind,
-      ),
-    );
-    expect(kinds.size).toBe(3);
-  });
-});
-
-describe('retryOnAnotherServer is exhaustive over the enumeration', () => {
+describe('retryOnAnotherServer', () => {
   const arm = (kind: SendFailureClass['kind']): SendFailureClass =>
-    ({ kind, error: 'x' }) as SendFailureClass;
+    ({ kind, error: failure('x') }) as SendFailureClass;
 
-  it.each([
+  test.each([
     ['serverSuspect', true],
-    ['internalRpcFailure', true],
+    ['insufficientFunds', false],
+    ['mixnetRefusal', false],
+    ['destinationIneligible', false],
+    ['offline', false],
     ['duplicateNullifier', false],
     ['dust', false],
-    ['mixnetRefusal', false],
-  ] as const)('%s -> %s', (kind, eligible) => {
-    expect(retryOnAnotherServer(arm(kind))).toBe(eligible);
-  });
+  ] as const)(
+    'Tests that a %s failure retries on another server only when a switch can help',
+    (kind, eligible) => {
+      expect(retryOnAnotherServer(arm(kind))).toBe(eligible);
+    },
+  );
 });
 
 describe('sendFailureText', () => {
-  it('carries a catalog key for the wallet verdicts', () => {
-    expect(sendFailureText(classifySendFailure('64: dust'))).toEqual({
+  test('Tests that the wallet verdicts carry catalog keys when classified', () => {
+    expect(sendFailureText(classifySendFailure(failure('64: dust')))).toEqual({
       kind: 'key',
       errorKey: 'send.dust-error',
     });
     expect(
       sendFailureText(
-        classifySendFailure('18: bad-txns-orchard-duplicate-nullifier'),
+        classifySendFailure(
+          toFfiError(
+            new ZingoError.InsufficientFunds({
+              available: 1n,
+              required: 2n,
+              detail: '',
+            }),
+          ),
+        ),
       ),
-    ).toEqual({ kind: 'key', errorKey: 'send.duplicate-nullifier-error' });
+    ).toEqual({ kind: 'key', errorKey: 'ffi.insufficientfunds' });
+    expect(
+      sendFailureText(classifySendFailure(toFfiError(new ZingoError.Offline()))),
+    ).toEqual({ kind: 'key', errorKey: 'ffi.offline' });
   });
 
-  it('carries a mixnet refusal verbatim, untranslated', () => {
-    expect(sendFailureText(classifySendFailure(DIED_REFUSAL))).toEqual({
+  test('Tests that a refusal and a server fault carry the detail verbatim when no key applies', () => {
+    const refusal = toFfiError(
+      new ZingoError.MixnetDied({ detail: 'the proxy died' }),
+    );
+    expect(sendFailureText(classifySendFailure(refusal))).toEqual({
       kind: 'verbatim',
-      text: DIED_REFUSAL,
+      text: 'the proxy died',
     });
-  });
-
-  it('carries internal and server-suspect errors verbatim', () => {
-    expect(sendFailureText(classifySendFailure(INTERNAL_CONFIRM))).toEqual({
-      kind: 'verbatim',
-      text: INTERNAL_CONFIRM,
-    });
-    expect(sendFailureText(classifySendFailure(CONNECTION_REFUSED))).toEqual({
-      kind: 'verbatim',
-      text: CONNECTION_REFUSED,
-    });
-  });
-});
-
-/**
- * The classification seam is mobile-owned (#1229): our own
- * `ZingolibError::Mixnet` display prefix marks a mixnet refusal, so a
- * zingolib rewording of the refusal prose cannot silently revert refusals
- * to the switch-server-and-retry dance. The zingolib phrase stays as a
- * secondary marker for texts wrapped under other variants by old builds.
- */
-describe('the mobile-owned refusal marker (#1229)', () => {
-  it('classifies our own mixnet prefix as a refusal, whatever zingolib says inside', () => {
-    const reworded =
-      'Error: mixnet: the tunnel is not ready to carry this operation';
-    const failure = classifySendFailure(reworded);
-    expect(failure.kind).toBe('mixnetRefusal');
-    expect(retryOnAnotherServer(failure)).toBe(false);
-  });
-
-  it('the excluded-indexer exhaustion is a deliberate serverSuspect: switching servers changes eligibility', () => {
-    const exhaustion =
-      "Error: indexer: no eligible Broadcast Indexer remains after excluding the synchronization endpoint's host";
-    const failure = classifySendFailure(exhaustion);
-    expect(failure.kind).toBe('serverSuspect');
-    expect(retryOnAnotherServer(failure)).toBe(true);
+    expect(
+      sendFailureText(classifySendFailure(failure('connection refused'))),
+    ).toEqual({ kind: 'verbatim', text: 'connection refused' });
+    expect(refusal.tag).toBe(ZingoError_Tags.MixnetDied);
   });
 });

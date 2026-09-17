@@ -1,29 +1,28 @@
-import { RPCSyncScanRangePriorityStatusEnum } from '@app/walletBackend/enums/RPCSyncScanRangePriorityStatusEnum';
-import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
+import { ScanPriority, SyncStatus } from 'zingo-ffi';
 
-export const mockSyncingStatus: RPCSyncStatusType = {} as RPCSyncStatusType;
-
-mockSyncingStatus.scan_ranges = [
-  {
-    priority: RPCSyncScanRangePriorityStatusEnum.Scanned,
-    start_block: 2000000,
-    end_block: 2500000,
-  },
-];
-mockSyncingStatus.sync_start_height = 2000000;
-mockSyncingStatus.session_blocks_scanned = 0;
-mockSyncingStatus.total_blocks_scanned = 0;
-mockSyncingStatus.percentage_session_blocks_scanned = 0;
-mockSyncingStatus.percentage_total_blocks_scanned = 100;
-mockSyncingStatus.session_sapling_outputs_scanned = 0;
-mockSyncingStatus.total_sapling_outputs_scanned = 0;
-mockSyncingStatus.session_orchard_outputs_scanned = 0;
-mockSyncingStatus.total_orchard_outputs_scanned = 0;
-mockSyncingStatus.session_ironwood_outputs_scanned = 0;
-mockSyncingStatus.total_ironwood_outputs_scanned = 0;
-mockSyncingStatus.percentage_session_outputs_scanned = 0;
-mockSyncingStatus.percentage_total_outputs_scanned = 100;
-mockSyncingStatus.total_outputs_scanned = 0;
-mockSyncingStatus.total_outputs = 0;
+export const mockSyncingStatus: SyncStatus = {
+  scanRanges: [
+    {
+      priority: ScanPriority.Scanned,
+      startBlock: 2000000,
+      endBlock: 2500000,
+    },
+  ],
+  syncStartHeight: 2000000,
+  sessionBlocksScanned: 0,
+  totalBlocksScanned: 0,
+  percentageSessionBlocksScanned: 0,
+  percentageTotalBlocksScanned: 100,
+  sessionSaplingOutputsScanned: 0,
+  totalSaplingOutputsScanned: 0,
+  sessionOrchardOutputsScanned: 0,
+  totalOrchardOutputsScanned: 0,
+  sessionIronwoodOutputsScanned: 0,
+  totalIronwoodOutputsScanned: 0,
+  percentageSessionOutputsScanned: 0,
+  percentageTotalOutputsScanned: 100,
+  totalOutputsScanned: 0n,
+  totalOutputs: 0n,
+};
 
 export default mockSyncingStatus;

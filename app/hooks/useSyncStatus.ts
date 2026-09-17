@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { Animated } from 'react-native';
-import { isEqual } from 'lodash';
-import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
-import { scanInProgress } from '@app/walletBackend/utils/syncProgress';
+import { SyncStatus } from 'zingo-ffi';
+import {
+  hasSyncStatus,
+  scanInProgress,
+} from '@app/walletBackend/utils/syncProgress';
 
 /**
  * Derives display-ready sync state from the raw RPC sync status.
@@ -14,7 +16,7 @@ import { scanInProgress } from '@app/walletBackend/utils/syncProgress';
  */
 
 type UseSyncStatusInput = {
-  syncingStatus: RPCSyncStatusType;
+  syncingStatus: SyncStatus;
   noSyncingStatus: boolean | undefined;
 };
 
@@ -38,27 +40,16 @@ export function useSyncStatus({
 
   useEffect(() => {
     if (
-      !syncingStatus ||
-      isEqual(syncingStatus, {} as RPCSyncStatusType) ||
-      (!!syncingStatus.scan_ranges && syncingStatus.scan_ranges.length === 0) ||
-      syncingStatus.percentage_total_outputs_scanned === 0
+      !hasSyncStatus(syncingStatus) ||
+      syncingStatus.percentageTotalOutputsScanned === 0
     ) {
       setPercentageOutputsScanned(0);
       setSyncInProgress(true);
     } else {
-      setPercentageOutputsScanned(
-        syncingStatus.percentage_total_outputs_scanned ??
-          syncingStatus.percentage_total_blocks_scanned ??
-          0,
-      );
+      setPercentageOutputsScanned(syncingStatus.percentageTotalOutputsScanned);
       setSyncInProgress(scanInProgress(syncingStatus));
     }
-  }, [
-    syncingStatus,
-    syncingStatus.percentage_total_outputs_scanned,
-    syncingStatus.percentage_total_blocks_scanned,
-    syncingStatus.scan_ranges,
-  ]);
+  }, [syncingStatus]);
 
   useEffect(() => {
     let timeoutId: ReturnType<typeof setTimeout> | undefined;

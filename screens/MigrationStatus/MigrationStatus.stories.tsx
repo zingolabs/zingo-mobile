@@ -1,14 +1,15 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
+import { ZingoError } from 'zingo-ffi';
 import { RouteEnum } from '@app/AppState';
 import MigrationStatus from './MigrationStatus';
 import {
   screenProps,
   withAppContext,
   withNavigation,
-  withRpc,
+  withWallet,
 } from '../../.storybook/storyDecorators';
 import { mockInfo } from '../../.storybook/storyMocks';
-import { json, pending, rejection } from '../../.storybook/storyRpc';
+import { answer, pending, rejection } from '../../.storybook/storyRpc';
 import {
   completeStatus,
   confirmingStatus,
@@ -17,7 +18,7 @@ import {
   stalledStatus,
 } from '../../.storybook/migrationFixtures';
 
-const reconciled = json({ reconciled: true });
+const reconciled = answer([]);
 
 const meta: Meta<typeof MigrationStatus> = {
   title: 'Migration/Status',
@@ -31,59 +32,56 @@ type Story = StoryObj<typeof MigrationStatus>;
 
 export const Scheduled: Story = {
   decorators: [
-    withRpc({
-      reconcileMigrationProcess: reconciled,
-      migrationStatusProcess: json(scheduledStatus),
+    withWallet({
+      reconcileMigration: reconciled,
+      migrationStatus: answer(scheduledStatus),
     }),
   ],
 };
 // The chain is inside a window: the Send Batch action shows.
 export const BatchDue: Story = {
   decorators: [
-    withRpc({
-      reconcileMigrationProcess: reconciled,
-      migrationStatusProcess: json(dueNowStatus),
+    withWallet({
+      reconcileMigration: reconciled,
+      migrationStatus: answer(dueNowStatus),
     }),
   ],
 };
 export const Confirming: Story = {
   decorators: [
-    withRpc({
-      reconcileMigrationProcess: reconciled,
-      migrationStatusProcess: json(confirmingStatus),
+    withWallet({
+      reconcileMigration: reconciled,
+      migrationStatus: answer(confirmingStatus),
     }),
   ],
 };
 export const Complete: Story = {
   decorators: [
-    withRpc({
-      reconcileMigrationProcess: reconciled,
-      migrationStatusProcess: json(completeStatus),
+    withWallet({
+      reconcileMigration: reconciled,
+      migrationStatus: answer(completeStatus),
     }),
   ],
 };
 // Scheduled with no parts bound: the only exit is to start over.
 export const Stalled: Story = {
   decorators: [
-    withRpc({
-      reconcileMigrationProcess: reconciled,
-      migrationStatusProcess: json(stalledStatus),
+    withWallet({
+      reconcileMigration: reconciled,
+      migrationStatus: answer(stalledStatus),
     }),
   ],
 };
 export const Loading: Story = {
   decorators: [
-    withRpc({
-      reconcileMigrationProcess: reconciled,
-      migrationStatusProcess: pending,
-    }),
+    withWallet({ reconcileMigration: reconciled, migrationStatus: pending }),
   ],
 };
 export const Error: Story = {
   decorators: [
-    withRpc({
-      reconcileMigrationProcess: reconciled,
-      migrationStatusProcess: rejection('wallet is offline', 'Offline'),
+    withWallet({
+      reconcileMigration: reconciled,
+      migrationStatus: rejection(new ZingoError.Offline()),
     }),
   ],
 };

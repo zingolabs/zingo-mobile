@@ -1,20 +1,24 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
+import { SplitOutcome, ZingoError } from 'zingo-ffi';
 import { RouteEnum } from '@app/AppState';
+import { transformMigrationPlan } from '@app/walletBackend/transforms/migrationTransform';
 import MigrationSplitting from './MigrationSplitting';
 import {
   screenProps,
   withAppContext,
   withNavigation,
-  withRpc,
+  withWallet,
 } from '../../.storybook/storyDecorators';
-import { json, pending, rejection } from '../../.storybook/storyRpc';
+import { answer, pending, rejection } from '../../.storybook/storyRpc';
 import { splitPlan, txids } from '../../.storybook/migrationFixtures';
 
 const meta: Meta<typeof MigrationSplitting> = {
   title: 'Migration/Splitting',
   component: MigrationSplitting,
   decorators: [withAppContext(), withNavigation],
-  args: screenProps(RouteEnum.MigrationSplitting, { plan: splitPlan }),
+  args: screenProps(RouteEnum.MigrationSplitting, {
+    plan: transformMigrationPlan(splitPlan),
+  }),
 };
 
 export default meta;
@@ -23,26 +27,27 @@ type Story = StoryObj<typeof MigrationSplitting>;
 // The first round broadcast, then the loop waits on its confirmation.
 export const Awaiting: Story = {
   decorators: [
-    withRpc({
-      quickSplitProcess: call =>
+    withWallet({
+      splitRound: (call: number) =>
         call === 0
-          ? json({ outcome: 'round', txids: [txids[0]] })
-          : json({ outcome: 'awaiting_confirmation' }),
+          ? new SplitOutcome.Round({ txids: [txids[0]] })
+          : new SplitOutcome.AwaitingConfirmation(),
     }),
   ],
 };
 export const Proving: Story = {
-  decorators: [withRpc({ quickSplitProcess: pending })],
+  decorators: [withWallet({ splitRound: pending })],
 };
 export const Complete: Story = {
-  decorators: [withRpc({ quickSplitProcess: json({ outcome: 'complete' }) })],
+  decorators: [withWallet({ splitRound: answer(new SplitOutcome.Complete()) })],
 };
 export const Error: Story = {
   decorators: [
-    withRpc({
-      quickSplitProcess: rejection(
-        'not enough confirmed notes to split',
-        'MigrationSplit',
+    withWallet({
+      splitRound: rejection(
+        new ZingoError.MigrationSplitFailed({
+          detail: 'not enough confirmed notes to split',
+        }),
       ),
     }),
   ],

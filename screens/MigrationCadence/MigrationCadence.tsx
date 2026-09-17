@@ -24,8 +24,10 @@ import {
   routeStartMigration,
   startIronwoodMigration,
 } from '@app/walletBackend';
-import { RPCMigrationStatusType } from '@app/walletBackend/types/RPCMigrationStatusType';
-import { RPCMigrationPlanType } from '@app/walletBackend/types/RPCMigrationPlanType';
+import {
+  MigrationPlanType,
+  MigrationStatusType,
+} from '@app/walletBackend/types/MigrationTypes';
 
 type MigrationCadenceProps = NativeStackScreenProps<
   AppDrawerParamList,
@@ -147,8 +149,8 @@ const MigrationCadence: React.FunctionComponent<MigrationCadenceProps> = ({
   const { translate, addLastSnackbar } = context;
   const { colors } = useTheme();
 
-  const [status, setStatus] = useState<RPCMigrationStatusType | null>(null);
-  const [plan, setPlan] = useState<RPCMigrationPlanType | null>(null);
+  const [status, setStatus] = useState<MigrationStatusType | null>(null);
+  const [plan, setPlan] = useState<MigrationPlanType | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [selected, setSelected] = useState<CadenceChoice>('fewer');
@@ -162,31 +164,17 @@ const MigrationCadence: React.FunctionComponent<MigrationCadenceProps> = ({
       planIronwoodMigration(),
     ]);
     if (!statusResult.ok) {
-      setErrorMsg(statusResult.error.message);
+      setErrorMsg(statusResult.error.detail);
       setLoading(false);
       return;
     }
     if (!planResult.ok) {
-      setErrorMsg(planResult.error.message);
+      setErrorMsg(planResult.error.detail);
       setLoading(false);
       return;
     }
-    try {
-      const parsedStatus = JSON.parse(
-        statusResult.value,
-      ) as RPCMigrationStatusType;
-      const parsedPlan = JSON.parse(planResult.value) as RPCMigrationPlanType;
-      if (parsedStatus.error) {
-        setErrorMsg(parsedStatus.error);
-      } else if (parsedPlan.error) {
-        setErrorMsg(parsedPlan.error);
-      } else {
-        setStatus(parsedStatus);
-        setPlan(parsedPlan);
-      }
-    } catch (e) {
-      setErrorMsg(`${e}`);
-    }
+    setStatus(statusResult.value);
+    setPlan(planResult.value);
     setLoading(false);
   }, []);
 
@@ -196,10 +184,10 @@ const MigrationCadence: React.FunctionComponent<MigrationCadenceProps> = ({
 
   const planRoute = plan ? routeCadencePlan(plan) : null;
   const parts = planRoute?.kind === 'choose' ? planRoute.parts : 0;
-  const bucketModulus = status?.bucket_modulus ?? 144;
+  const bucketModulus = status?.bucketModulus ?? 144;
   // The "fewer" preset IS zingolib's default cadence, so we never invent a
   // second opinion about a privacy parameter; "more" is maximum dispersion.
-  const fewerPerBucket = status?.per_bucket ?? DEFAULT_PER_BUCKET;
+  const fewerPerBucket = status?.perBucket ?? DEFAULT_PER_BUCKET;
   const fewerBatches = Math.max(
     1,
     Math.ceil(parts / Math.max(1, fewerPerBucket)),
@@ -212,12 +200,12 @@ const MigrationCadence: React.FunctionComponent<MigrationCadenceProps> = ({
   // now-split notes and schedules them under the chosen cadence. Its consent
   // hash is the plan we just read (post-split), not the pre-split one.
   const onReview = useCallback(async () => {
-    if (submitting || !plan?.plan_hash) {
+    if (submitting || !plan?.planHash) {
       return;
     }
     const perBucket = selected === 'fewer' ? fewerPerBucket : 1;
     setSubmitting(true);
-    const start = await startIronwoodMigration(plan.plan_hash, perBucket);
+    const start = await startIronwoodMigration(plan.planHash, perBucket);
     setSubmitting(false);
     const route = routeStartMigration(start);
     switch (route.kind) {
@@ -236,7 +224,7 @@ const MigrationCadence: React.FunctionComponent<MigrationCadenceProps> = ({
         load();
         return;
       case 'error':
-        addLastSnackbar(route.message);
+        addLastSnackbar(route.detail);
     }
   }, [
     submitting,

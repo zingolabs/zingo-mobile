@@ -19,9 +19,9 @@ import {
   reconcileMigration,
 } from '@app/walletBackend';
 import {
-  RPCMigrationStatusType,
-  RPCBroadcastWindowType,
-} from '@app/walletBackend/types/RPCMigrationStatusType';
+  MigrationStatusType,
+  BroadcastWindowType,
+} from '@app/walletBackend/types/MigrationTypes';
 
 type MigrationStatusProps = NativeStackScreenProps<
   AppDrawerParamList,
@@ -44,7 +44,7 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
   const { translate, info, language } = context;
   const { colors } = useTheme();
 
-  const [status, setStatus] = useState<RPCMigrationStatusType | null>(null);
+  const [status, setStatus] = useState<MigrationStatusType | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [clearing, setClearing] = useState<boolean>(false);
@@ -79,24 +79,13 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
           return;
         }
         if (!statusResult.ok) {
-          fail(statusResult.error.message);
+          fail(statusResult.error.detail);
           setLoading(false);
           return;
         }
-        try {
-          const parsed = JSON.parse(
-            statusResult.value,
-          ) as RPCMigrationStatusType;
-          if (parsed.error) {
-            fail(parsed.error);
-          } else {
-            rendered.current = true;
-            setStatus(parsed);
-            setErrorMsg(null);
-          }
-        } catch (e) {
-          fail(`${e}`);
-        }
+        rendered.current = true;
+        setStatus(statusResult.value);
+        setErrorMsg(null);
         setLoading(false);
       })();
       return () => {
@@ -121,7 +110,7 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
     if (cancelled.ok) {
       goHome();
     } else {
-      setErrorMsg(cancelled.error.message);
+      setErrorMsg(cancelled.error.detail);
     }
   }, [goHome]);
 
@@ -154,13 +143,13 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
     );
   }
 
-  const wakes: RPCBroadcastWindowType[] = status?.upcoming_windows ?? [];
+  const wakes: BroadcastWindowType[] = status?.upcomingWindows ?? [];
   // per_bucket is parts-per-window; a batch counts as confirmed once all of its
   // parts confirm (floor division), so partial windows don't over-report.
-  const perBucket = Math.max(1, status?.per_bucket ?? 1);
-  const partsTotal = status?.parts_total ?? 0;
-  const partsConfirmed = status?.parts_confirmed ?? 0;
-  const bucketModulus = status?.bucket_modulus ?? 144;
+  const perBucket = Math.max(1, status?.perBucket ?? 1);
+  const partsTotal = status?.partsTotal ?? 0;
+  const partsConfirmed = status?.partsConfirmed ?? 0;
+  const bucketModulus = status?.bucketModulus ?? 144;
 
   const batchesTotal = Math.max(1, Math.ceil(partsTotal / perBucket));
   const batchesConfirmed = Math.min(
@@ -177,7 +166,7 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
 
   // A scheduled migration that bound no parts has nothing to send and no way
   // to gain any: every entry point refuses while it exists. Offer the one exit.
-  if (status?.phase?.kind === 'parts_scheduled' && partsTotal === 0) {
+  if (status?.phase?.kind === 'partsScheduled' && partsTotal === 0) {
     return (
       <View style={{ flex: 1, backgroundColor: colors.bgCanvas }}>
         <StepperHeader splitDone={true} sendActive={true} />
@@ -239,14 +228,14 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
   // reported by the backend. upcoming_windows lists only future windows and cannot
   // carry this one, so the Send action reads it from here. Null means a tap
   // would broadcast nothing, so the action stays hidden.
-  const dueNow = status?.due_now ?? null;
-  const confirming = !dueNow && (status?.parts_broadcast ?? 0) > 0;
+  const dueNow = status?.dueNow ?? null;
+  const confirming = !dueNow && (status?.partsBroadcast ?? 0) > 0;
   // The bar's broadcast run outlives `confirming`: a new window can open while
   // the batch still mines, which surfaces the dueNow card but changes nothing
   // about the parts in flight. Keyed to parts_broadcast alone, the run stays
   // lit until those parts confirm, and the confirm flash lands on lit segments
   // instead of blanks.
-  const broadcasting = (status?.parts_broadcast ?? 0) > 0;
+  const broadcasting = (status?.partsBroadcast ?? 0) > 0;
 
   // One card per visible batch: the open one (dueNow) first, then the upcoming
   // scheduled windows. Batch numbers continue from the confirmed count so
@@ -265,7 +254,7 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
         ]
       : []),
     ...wakes.map((wake, i) => ({
-      key: `w${wake.bucket_index}`,
+      key: `w${wake.bucketIndex}`,
       n: nextWakeBase + i,
       denominations: wake.denominations,
       anchor: wake.boundary,
@@ -338,7 +327,7 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
             segments={notesTotal}
             progress={notesConfirmed / notesTotal}
             active={broadcasting ? notesConfirmed : undefined}
-            activeSpan={status?.parts_broadcast ?? 0}
+            activeSpan={status?.partsBroadcast ?? 0}
             activeColor={colors.fgSyncing}
           />
         </View>

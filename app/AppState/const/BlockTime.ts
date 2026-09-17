@@ -1,8 +1,8 @@
-import { RPCBroadcastWindowType } from '@app/walletBackend/types/RPCMigrationStatusType';
+import { BroadcastWindowType } from '@app/walletBackend/types/MigrationTypes';
 
 /**
  * Mainnet's target block spacing, which is also what zingolib assumes when it
- * extrapolates `window_opens_unix_time` and `latest_target_unix_time`. On a
+ * extrapolates `windowOpensUnixTime` and `latestTargetUnixTime`. On a
  * test rig ticking faster than mainnet those extrapolations read many times
  * too long, so the app re-derives wall-clock estimates from block distances
  * (which are exact) and the spacing it actually observes.
@@ -43,10 +43,10 @@ export const foldBlockSpacing = (
  * extrapolation, so their gap divided by that spacing recovers the target's
  * offset from the boundary exactly.
  */
-export const windowTargetHeight = (wake: RPCBroadcastWindowType): number =>
+export const windowTargetHeight = (wake: BroadcastWindowType): number =>
   wake.boundary +
   Math.round(
-    (wake.latest_target_unix_time - wake.window_opens_unix_time) /
+    (wake.latestTargetUnixTime - wake.windowOpensUnixTime) /
       TARGET_BLOCK_SPACING_SECONDS,
   );
 

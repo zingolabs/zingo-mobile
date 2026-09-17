@@ -1,86 +1,47 @@
-import { ValueTransferType, ValueTransferKindEnum } from '@app/AppState';
-import { RPCValueTransferType } from '@app/walletBackend/types/RPCValueTransferType';
-import { RPCValueTransfersKindEnum } from '@app/walletBackend/enums/RPCValueTransfersKindEnum';
+import { ValueTransfer } from 'zingo-ffi';
+import { ValueTransferType } from '@app/AppState';
+import { zats } from '@app/walletBackend/ffi';
 import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
+import {
+  poolName,
+  transferKind,
+  transferStatus,
+} from '@app/walletBackend/transforms/enumTransform';
+
+const ZATS_PER_ZEC = 10 ** 8;
 
 /**
- * Maps a raw zingolib value transfer to the app's ValueTransferType.
- *
- * Pure function — no side effects, safe to call in `.map()`.
- *
- * Confirmation count is derived from block heights: server height is preferred
- * when it is ahead of the wallet height (mid-sync), otherwise wallet height is
- * used. Unconfirmed/mempool/failed transfers always get confirmations = 0.
- * Amounts and fees are converted from zats (integer) to ZEC (÷ 10^8).
+ * Maps a wallet value transfer to the app's ValueTransferType, counting
+ * confirmations from whichever of the server and wallet heights is ahead.
  */
 export function transformValueTransfer(
-  vt: RPCValueTransferType,
+  vt: ValueTransfer,
   lastServerBlockHeight: number,
   lastWalletBlockHeight: number,
 ): ValueTransferType {
-  const result: ValueTransferType = {} as ValueTransferType;
-
-  result.txid = vt.txid;
-  result.time = vt.datetime;
-  result.kind =
-    vt.kind === RPCValueTransfersKindEnum.migration
-      ? ValueTransferKindEnum.Migration
-      : vt.kind === RPCValueTransfersKindEnum.memoToSelf
-        ? ValueTransferKindEnum.MemoToSelf
-        : vt.kind === RPCValueTransfersKindEnum.sendToSelf
-          ? ValueTransferKindEnum.SendToSelf
-          : vt.kind === RPCValueTransfersKindEnum.received
-            ? ValueTransferKindEnum.Received
-            : vt.kind === RPCValueTransfersKindEnum.sent
-              ? ValueTransferKindEnum.Sent
-              : vt.kind === RPCValueTransfersKindEnum.shield
-                ? ValueTransferKindEnum.Shield
-                : vt.kind === RPCValueTransfersKindEnum.rejection
-                  ? ValueTransferKindEnum.Rejection
-                  : vt.kind;
-  result.fee = (!vt.transaction_fee ? 0 : vt.transaction_fee) / 10 ** 8;
-  result.zecPrice = !vt.zec_price ? 0 : vt.zec_price;
-
-  if (
-    vt.status === RPCValueTransfersStatusEnum.calculated ||
-    vt.status === RPCValueTransfersStatusEnum.transmitted ||
-    vt.status === RPCValueTransfersStatusEnum.mempool ||
-    vt.status === RPCValueTransfersStatusEnum.failed
-  ) {
-    result.confirmations = 0;
-  } else if (vt.status === RPCValueTransfersStatusEnum.confirmed) {
-    result.confirmations =
-      lastServerBlockHeight && lastServerBlockHeight >= lastWalletBlockHeight
-        ? lastServerBlockHeight - vt.blockheight + 1
-        : lastWalletBlockHeight - vt.blockheight + 1;
-  } else {
-    // impossible case... I guess.
-    result.confirmations = 0;
-  }
-
-  result.blockheight = vt.blockheight;
-  result.status = vt.status;
-
-  if (vt.status === RPCValueTransfersStatusEnum.failed) {
-    console.log('[RPC] failed value transfer (raw):', vt);
-  }
-  result.address = !vt.recipient_address ? undefined : vt.recipient_address;
-  result.amount = (!vt.value ? 0 : vt.value) / 10 ** 8;
-  result.memos =
-    !vt.memos || vt.memos.length === 0 || !vt.memos.join('')
-      ? undefined
-      : vt.memos;
-  // `pools_received` is in protocol order (transparent, sapling, orchard,
-  // ironwood); a transfer can span pools, and the app displays one, so
-  // surface the newest pool present.
-  result.poolType =
-    !vt.pools_received || vt.pools_received.length === 0
-      ? undefined
-      : vt.pools_received[vt.pools_received.length - 1];
-
-  if (result.status === RPCValueTransfersStatusEnum.failed) {
-    console.log('[RPC] failed value transfer (transformed):', result);
-  }
-
-  return result;
+  const status = transferStatus(vt.status);
+  const tip =
+    lastServerBlockHeight && lastServerBlockHeight >= lastWalletBlockHeight
+      ? lastServerBlockHeight
+      : lastWalletBlockHeight;
+  const confirmations =
+    status === RPCValueTransfersStatusEnum.confirmed
+      ? tip - vt.blockheight + 1
+      : 0;
+  const memos = vt.memos.join('') ? vt.memos : undefined;
+  const newestPool = vt.poolsReceived[vt.poolsReceived.length - 1];
+  return {
+    txid: vt.txid,
+    time: vt.datetime,
+    kind: transferKind(vt.kind),
+    fee: zats(vt.transactionFee) / ZATS_PER_ZEC,
+    zecPrice: vt.zecPrice ?? 0,
+    confirmations,
+    blockheight: vt.blockheight,
+    status,
+    address: vt.recipientAddress,
+    amount: zats(vt.value) / ZATS_PER_ZEC,
+    memos,
+    poolType: newestPool === undefined ? undefined : poolName(newestPool),
+  };
 }

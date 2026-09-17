@@ -12,7 +12,6 @@ import { parseZcashURI } from '@app/uris';
 import Utils from '@app/utils';
 import TextInputAddress from '@ui/widgets/TextInputAddress';
 import FadeText from '@ui/primitives/FadeText';
-import { RPCCheckAddressType } from '@app/walletBackend/types/RPCCheckAddressType';
 import { VerifyCheckIcon } from '@ui/primitives/Icons/VerifyCheckIcon';
 import { VerifyXIcon } from '@ui/primitives/Icons/VerifyXIcon';
 
@@ -41,15 +40,12 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
       const verifyAddressResult = await checkMyAddress(address);
       if (!verifyAddressResult.ok) {
         addLastSnackbar(
-          verifyAddressResult.error.message,
+          verifyAddressResult.error.detail,
           SnackbarDurationEnum.short,
         );
-        setErrorAddress(verifyAddressResult.error.message);
+        setErrorAddress(verifyAddressResult.error.detail);
       } else {
-        const verifyAddressJSON: RPCCheckAddressType = await JSON.parse(
-          verifyAddressResult.value,
-        );
-        setVerifyOK(verifyAddressJSON.is_wallet_address);
+        setVerifyOK(verifyAddressResult.value !== undefined);
       }
     } catch (error) {
       console.log(`Critical Error new address ${error}`);

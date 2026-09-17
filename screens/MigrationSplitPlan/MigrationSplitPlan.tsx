@@ -14,9 +14,9 @@ import { RouteEnum } from '@app/AppState';
 import Utils from '@app/utils';
 import { planIronwoodMigration } from '@app/walletBackend';
 import {
-  RPCMigrationPlanType,
-  RPCSplitTxType,
-} from '@app/walletBackend/types/RPCMigrationPlanType';
+  MigrationPlanType,
+  SplitTransactionType,
+} from '@app/walletBackend/types/MigrationTypes';
 
 type MigrationSplitPlanProps = NativeStackScreenProps<
   AppDrawerParamList,
@@ -94,7 +94,7 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
   const { translate, info, totalBalance } = context;
   const { colors } = useTheme();
 
-  const [plan, setPlan] = useState<RPCMigrationPlanType | null>(null);
+  const [plan, setPlan] = useState<MigrationPlanType | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -119,20 +119,11 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
     setErrorMsg(null);
     const planResult = await planIronwoodMigration();
     if (!planResult.ok) {
-      setErrorMsg(planResult.error.message);
+      setErrorMsg(planResult.error.detail);
       setLoading(false);
       return;
     }
-    try {
-      const parsed: RPCMigrationPlanType = JSON.parse(planResult.value);
-      if (parsed.error) {
-        setErrorMsg(parsed.error);
-      } else {
-        setPlan(parsed);
-      }
-    } catch (e) {
-      setErrorMsg(`${e}`);
-    }
+    setPlan(planResult.value);
     setLoading(false);
   }, []);
 
@@ -149,7 +140,7 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
     if (!plan) {
       return;
     }
-    const hasSplits = (plan.split_rounds?.length ?? 0) > 0;
+    const hasSplits = (plan.splitRounds?.length ?? 0) > 0;
     if (!hasSplits && (plan.parts?.length ?? 0) > 0) {
       navigation.navigate(RouteEnum.MigrationCadence);
       return;
@@ -157,7 +148,7 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
     navigation.navigate(RouteEnum.MigrationSplitting, { plan });
   }, [plan, navigation]);
 
-  const splitRounds = plan?.split_rounds ?? [];
+  const splitRounds = plan?.splitRounds ?? [];
   const roundCount = splitRounds.length;
   const txCount = splitRounds.reduce((sum, round) => sum + round.length, 0);
   const noteCount = plan?.parts?.length ?? 0;
@@ -368,7 +359,7 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
 
   // ----- Notes already part-ready: no splitting, straight to Phase 2 -----
   if (noSplitNeeded) {
-    const partsFee = plan?.parts_fee ?? 0;
+    const partsFee = plan?.partsFee ?? 0;
     const stranded = plan?.residual ?? 0;
     const readyWord = translate(
       noteCount === 1
@@ -479,7 +470,7 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
   ) as string;
   const feeSuffix = translate('migrationsplitplan.fee-suffix') as string;
   const totalSummary = `${noteCount} ${noteWord} · ${txCount} ${txWord} · ${zec(
-    plan?.split_fee ?? 0,
+    plan?.splitFee ?? 0,
   )} ${feeSuffix}`;
   const confirmInValue =
     roundCount <= 1
@@ -542,7 +533,7 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
           </Text>
         ) : null}
 
-        {splitRounds.map((round: RPCSplitTxType[], r: number) => (
+        {splitRounds.map((round: SplitTransactionType[], r: number) => (
           <View key={r}>
             {roundCount > 1 ? (
               <Text
@@ -559,7 +550,7 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
                   .replace('{r}', String(roundCount))}
               </Text>
             ) : null}
-            {round.map((tx: RPCSplitTxType, i: number) => {
+            {round.map((tx: SplitTransactionType, i: number) => {
               txNumber += 1;
               return (
                 <Card key={i} colors={colors}>
@@ -611,7 +602,7 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
           />
           <Row
             label={translate('migrationsplitplan.sending-fee') as string}
-            value={zec(plan?.parts_fee ?? 0)}
+            value={zec(plan?.partsFee ?? 0)}
             colors={colors}
           />
           {(plan?.residual ?? 0) > 0 ? (

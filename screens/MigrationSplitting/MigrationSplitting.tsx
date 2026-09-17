@@ -29,8 +29,7 @@ import { ContextAppLoaded } from '@app/context';
 import { RouteEnum } from '@app/AppState';
 import useTrickleProgress from '@app/hooks/useTrickleProgress';
 import { planIronwoodMigration, quickSplit } from '@app/walletBackend';
-import { RPCSplitOutcomeType } from '@app/walletBackend/types/RPCSplitOutcomeType';
-import { RPCMigrationPlanType } from '@app/walletBackend/types/RPCMigrationPlanType';
+import { SplitOutcome_Tags } from 'zingo-ffi';
 
 type MigrationSplittingProps = NativeStackScreenProps<
   AppDrawerParamList,
@@ -92,13 +91,13 @@ const MigrationSplitting: React.FunctionComponent<MigrationSplittingProps> = ({
   const { colors } = useTheme();
 
   const plan = route.params?.plan;
-  const roundCount = plan?.split_rounds?.length ?? 0;
+  const roundCount = plan?.splitRounds?.length ?? 0;
 
   const [rows, setRows] = useState<RowData[]>(() => {
-    if (!plan?.split_rounds) {
+    if (!plan?.splitRounds) {
       return [];
     }
-    return plan.split_rounds.flatMap((round, r) =>
+    return plan.splitRounds.flatMap((round, r) =>
       round.map(tx => ({
         round: r,
         label: outputsLabel(tx.outputs),
@@ -203,31 +202,14 @@ const MigrationSplitting: React.FunctionComponent<MigrationSplittingProps> = ({
       if (cancelled) {
         return;
       }
-      let failure: string | null = null;
-      let parsed: RPCSplitOutcomeType | null = null;
       if (!result.ok) {
-        failure = result.error.message;
-      } else {
-        try {
-          parsed = JSON.parse(result.value) as RPCSplitOutcomeType;
-          if (parsed.error) {
-            failure = parsed.error;
-          }
-        } catch (e) {
-          failure = `${e}`;
-        }
-      }
-      if (failure) {
         // A transmit failure leaves every unsent note spendable; the retry
         // button re-enters the same loop, which re-plans the remainder.
-        setErrorMsg(failure);
+        setErrorMsg(result.error.detail);
         return;
       }
-      if (!parsed || !parsed.outcome) {
-        setErrorMsg('Error: malformed splitting outcome');
-        return;
-      }
-      if (parsed.outcome === 'complete') {
+      const outcome = result.value;
+      if (outcome.tag === SplitOutcome_Tags.Complete) {
         setRows(prev =>
           prev.map(row => ({ ...row, status: 'confirmed' as TxStatus })),
         );
@@ -235,14 +217,14 @@ const MigrationSplitting: React.FunctionComponent<MigrationSplittingProps> = ({
         finish();
         return;
       }
-      if (parsed.outcome === 'round') {
+      if (outcome.tag === SplitOutcome_Tags.Round) {
         const round = roundRef.current;
-        applyBroadcast(round, parsed.txids ?? []);
+        applyBroadcast(round, outcome.inner.txids);
         roundRef.current = round + 1;
         setStep({
           kind: 'awaiting',
           round,
-          pending: (parsed.txids ?? []).length,
+          pending: outcome.inner.txids.length,
         });
         schedule(drive, POLL_MS);
         return;
@@ -272,29 +254,22 @@ const MigrationSplitting: React.FunctionComponent<MigrationSplittingProps> = ({
           return;
         }
         if (planResult.ok) {
-          try {
-            const parsed = JSON.parse(planResult.value) as RPCMigrationPlanType;
-            if (!parsed.error && parsed.split_rounds) {
-              if (parsed.split_rounds.length === 0) {
-                setRows([]);
-                setStep({ kind: 'complete' });
-                finish();
-                return;
-              }
-              setRows(
-                parsed.split_rounds.flatMap((round, r) =>
-                  round.map(tx => ({
-                    round: r,
-                    label: outputsLabel(tx.outputs),
-                    txid: null,
-                    status: 'queued' as TxStatus,
-                  })),
-                ),
-              );
-            }
-          } catch {
-            // Fall through to the driver, which re-plans regardless.
+          if (planResult.value.splitRounds.length === 0) {
+            setRows([]);
+            setStep({ kind: 'complete' });
+            finish();
+            return;
           }
+          setRows(
+            planResult.value.splitRounds.flatMap((round, r) =>
+              round.map(tx => ({
+                round: r,
+                label: outputsLabel(tx.outputs),
+                txid: null,
+                status: 'queued' as TxStatus,
+              })),
+            ),
+          );
         }
       }
       drive();

@@ -137,36 +137,16 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
   useEffect(() => {
     (async () => {
       setLoading(true);
-      let resultStr: string = '';
-      switch (tab) {
-        case 'sent': {
-          const result = await getTotalValueToAddress();
-          resultStr = result.ok ? result.value : '';
-          break;
-        }
-        case 'sends': {
-          const result = await getTotalSpendsToAddress();
-          resultStr = result.ok ? result.value : '';
-          break;
-        }
-        case 'memobytes': {
-          const result = await getTotalMemobytesToAddress();
-          resultStr = result.ok ? result.value : '';
-          break;
-        }
-        default:
-          break;
-      }
-      let resultJSON: Record<string, unknown>;
-      try {
-        resultJSON = await JSON.parse(resultStr);
-      } catch (e) {
-        resultJSON = {};
-      }
+      const totals =
+        tab === 'sent'
+          ? await getTotalValueToAddress()
+          : tab === 'sends'
+            ? await getTotalSpendsToAddress()
+            : await getTotalMemobytesToAddress();
       let amounts: { value: number; address: string; tag: string }[] = [];
       const resultJSONEntries: [string, number][] = Object.entries(
-        resultJSON,
-      ) as [string, number][];
+        totals.ok ? totals.value : {},
+      );
       resultJSONEntries &&
         resultJSONEntries.forEach(([key, value]) => {
           if (!(tab !== 'sent' && key === 'fee')) {

@@ -34,10 +34,8 @@ import {
   parseAddress,
 } from '@app/walletBackend';
 import { Buffer } from 'buffer';
-import { RPCParseAddressType } from '@app/walletBackend/types/RPCParseAddressType';
-import { RPCParseAddressStatusEnum } from '@app/walletBackend/enums/RPCParseAddressStatusEnum';
-import { RPCAddressKindEnum } from '@app/walletBackend/enums/RPCAddressKindEnum';
-import { RPCReceiversEnum } from '@app/walletBackend/enums/RPCReceiversEnum';
+import { ParsedAddress_Tags, Pool } from 'zingo-ffi';
+import { chainName as chainNameOfChain } from '@app/walletBackend/transforms/enumTransform';
 
 export default class Utils {
   static trimToSmall(addr?: string, numChars?: number): string {
@@ -124,8 +122,7 @@ export default class Utils {
   static async getDonationAddress(chainName: ChainNameEnum): Promise<string> {
     // donations only for mainnet.
     if (chainName === ChainNameEnum.mainChainName) {
-      // UA -> we need a fresh one.
-      const ua = await getDonationAddress();
+      const ua = getDonationAddress();
       return ua.ok ? ua.value : '';
     }
     return '';
@@ -147,8 +144,7 @@ export default class Utils {
   ): Promise<string> {
     // donations only for mainnet.
     if (chainName === ChainNameEnum.mainChainName) {
-      // UA -> we need a fresh one.
-      const ua = await getZenniesDonationAddress();
+      const ua = getZenniesDonationAddress();
       return ua.ok ? ua.value : '';
     }
     return '';
@@ -368,68 +364,42 @@ export default class Utils {
     address: string,
     serverChainName: string,
   ): Promise<{ isValid: boolean; shieldedOnlyUA: string }> {
-    const result = await parseAddress(address);
-    let isValid: boolean = false;
-    let isFullUA: boolean = false;
-    let shieldedOnlyUA: string = '';
-
-    if (!result.ok || !result.value) {
-      return { isValid, shieldedOnlyUA };
+    const result = parseAddress(address);
+    if (
+      !result.ok ||
+      result.value.tag === ParsedAddress_Tags.Invalid ||
+      chainNameOfChain(result.value.inner.chain) !== serverChainName
+    ) {
+      return { isValid: false, shieldedOnlyUA: '' };
     }
-    let resultJSON = {} as RPCParseAddressType;
-    try {
-      resultJSON = await JSON.parse(result.value);
-    } catch (e) {
-      return { isValid, shieldedOnlyUA };
-    }
-
-    isValid =
-      resultJSON.status === RPCParseAddressStatusEnum.successAddressParse &&
-      resultJSON.chain_name === serverChainName;
-    if (isValid) {
-      isFullUA =
-        resultJSON.address_kind === RPCAddressKindEnum.unifiedAddressKind &&
-        !!resultJSON.receivers_available &&
-        resultJSON.receivers_available.includes(
-          RPCReceiversEnum.orchardRPCReceiver,
-        ) &&
-        resultJSON.receivers_available.includes(
-          RPCReceiversEnum.saplingRPCReceiver,
-        ) &&
-        resultJSON.receivers_available.includes(
-          RPCReceiversEnum.transparentRPCReceiver,
-        );
-      if (isFullUA) {
-        // the only use case for this is: if the UA is full (3 receivers)
-        shieldedOnlyUA = resultJSON.shielded_only_ua
-          ? resultJSON.shielded_only_ua
-          : '';
-      }
-    }
-
-    return { isValid, shieldedOnlyUA };
+    const parsed = result.value;
+    const isFullUA =
+      parsed.tag === ParsedAddress_Tags.Unified &&
+      [Pool.Orchard, Pool.Sapling, Pool.Transparent].every(pool =>
+        parsed.inner.receivers.includes(pool),
+      );
+    return {
+      isValid: true,
+      shieldedOnlyUA:
+        isFullUA && parsed.tag === ParsedAddress_Tags.Unified
+          ? (parsed.inner.shieldedOnly ?? '')
+          : '',
+    };
   }
 
   static async isValidOrchardOrSaplingAddress(
     address: string,
     serverChainName: string,
   ): Promise<boolean> {
-    const result = await parseAddress(address);
-    if (!result.ok || !result.value) {
+    const result = parseAddress(address);
+    if (!result.ok || result.value.tag === ParsedAddress_Tags.Invalid) {
       return false;
     }
-    let resultJSON = {} as RPCParseAddressType;
-    try {
-      resultJSON = await JSON.parse(result.value);
-    } catch (e) {
-      return false;
-    }
-
+    const parsed = result.value;
     return (
-      resultJSON.status === RPCParseAddressStatusEnum.successAddressParse &&
-      resultJSON.address_kind !== RPCAddressKindEnum.transparentAddressKind &&
-      resultJSON.address_kind !== RPCAddressKindEnum.texAddressKind &&
-      resultJSON.chain_name === serverChainName
+      parsed.tag !== ParsedAddress_Tags.Transparent &&
+      parsed.tag !== ParsedAddress_Tags.Tex &&
+      chainNameOfChain(parsed.inner.chain) === serverChainName
     );
   }
 

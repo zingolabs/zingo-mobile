@@ -20,12 +20,12 @@ import {
   BlockExplorerEnum,
 } from '@app/AppState';
 
-import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
+import { IDLE_SYNC_STATUS } from '@app/walletBackend/utils/syncProgress';
 import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
 
 export const defaultAppContextLoaded: AppContextLoaded = {
   netInfo: {} as NetInfoType,
-  syncingStatus: {} as RPCSyncStatusType,
+  syncingStatus: IDLE_SYNC_STATUS,
   totalBalance: null,
   addresses: null,
   valueTransfers: null,

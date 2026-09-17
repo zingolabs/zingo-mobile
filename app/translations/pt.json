@@ -110,6 +110,22 @@
     "sends-unit": " envios.",
     "memobytes-unit": " chars."
   },
+  "ffi": {
+    "invalidmnemonic": "A frase semente não é válida. Verifique cada palavra e o número de palavras.",
+    "viewingkeymalformed": "A chave de visualização não é válida.",
+    "viewingkeynetworkmismatch": "A chave de visualização pertence a outra rede.",
+    "birthdaybelowactivation": "O aniversário {birthday} está abaixo da altura de ativação do Sapling {activation}.",
+    "mnemonicnotfound": "A carteira não tem frase semente.",
+    "walletunreadable": "Esta versão não consegue ler o arquivo da carteira.",
+    "indexerunreachable": "Não foi possível conectar ao servidor.",
+    "indexerrequestfailed": "O servidor não respondeu ao pedido.",
+    "offline": "A carteira está offline.",
+    "insufficientfunds": "Fundos insuficientes.",
+    "syncrequired": "Conclua a sincronização primeiro.",
+    "panic": "O motor da carteira falhou. Reinicie o app.",
+    "poisoned": "O motor da carteira ficou em um estado quebrado. Reinicie o app.",
+    "busy": "A carteira está ocupada com {detail}. Aguarde até terminar."
+  },
   "loadingapp": {
     "welcome": "Bem-vindo",
     "actualserver": "Servidor atual:",

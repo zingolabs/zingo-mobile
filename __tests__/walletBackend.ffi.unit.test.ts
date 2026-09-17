@@ -1,77 +1,101 @@
-/**
- * The funnel itself (app/walletBackend/ffi.ts): toFfiError is the one
- * place a native rejection becomes a typed FfiError, and callFfi is the
- * one place a native promise becomes a discriminated FfiResult. These pin
- * the funnel's edge branches directly — the wrapper suites exercise it
- * only through Error-shaped rejections carrying known codes.
- */
-import { callFfi, toFfiError } from '@app/walletBackend/ffi';
+import { JobKind, LoadError, ZingoError, ZingoError_Tags } from 'zingo-ffi';
+import { callFfi, callFfiSync, toFfiError } from '@app/walletBackend/ffi';
 
-describe('toFfiError maps every rejection shape to a typed FfiError', () => {
-  it('keeps a known code and the Error message verbatim', () => {
-    const rejection = Object.assign(new Error('plan hash moved'), {
-      code: 'MigrationConsentStale',
+describe('toFfiError', () => {
+  test('Tests that a ZingoError keeps its tag and detail when it carries a detail field', () => {
+    const rejection = new ZingoError.MigrationConsentStale({
+      detail: 'plan hash moved',
     });
     expect(toFfiError(rejection)).toEqual({
-      code: 'MigrationConsentStale',
-      message: 'plan hash moved',
+      tag: ZingoError_Tags.MigrationConsentStale,
+      detail: 'plan hash moved',
+      error: rejection,
     });
   });
 
-  it('maps an unrecognized code to Unknown without losing the message', () => {
-    const rejection = Object.assign(new Error('boom'), { code: 'Bogus' });
-    expect(toFfiError(rejection)).toEqual({ code: 'Unknown', message: 'boom' });
+  test('Tests that a Busy rejection names the running job when it carries no detail', () => {
+    const rejection = new ZingoError.Busy({ running: JobKind.Drain });
+    expect(toFfiError(rejection)).toMatchObject({
+      tag: ZingoError_Tags.Busy,
+      detail: 'Drain',
+    });
   });
 
-  it('maps an Error without a code to Unknown', () => {
+  test('Tests that a variant without fields yields its variant text when no detail exists', () => {
+    expect(toFfiError(new ZingoError.Closed())).toMatchObject({
+      tag: ZingoError_Tags.Closed,
+      detail: 'ZingoError.Closed',
+    });
+  });
+
+  test('Tests that a LoadError keeps its tag when the file module throws one', () => {
+    const rejection = new LoadError.Unreadable({ detail: 'bad magic' });
+    expect(toFfiError(rejection)).toEqual({
+      tag: 'Unreadable',
+      detail: 'bad magic',
+      error: rejection,
+    });
+  });
+
+  test('Tests that a native rejection maps to its tag when its code is a LoadError tag or Host', () => {
+    expect(
+      toFfiError(Object.assign(new Error('disk full'), { code: 'Save' })),
+    ).toEqual({ tag: 'Save', detail: 'disk full' });
+    expect(
+      toFfiError(Object.assign(new Error('shim missing'), { code: 'Host' })),
+    ).toEqual({ tag: 'Host', detail: 'shim missing' });
+  });
+
+  test('Tests that an unrecognized rejection maps to Unknown when it carries no known code', () => {
+    expect(
+      toFfiError(Object.assign(new Error('boom'), { code: 'Bogus' })),
+    ).toEqual({ tag: 'Unknown', detail: 'boom' });
     expect(toFfiError(new Error('boom'))).toEqual({
-      code: 'Unknown',
-      message: 'boom',
+      tag: 'Unknown',
+      detail: 'boom',
     });
-  });
-
-  it('maps a thrown string to Unknown carrying the string', () => {
-    expect(toFfiError('boom')).toEqual({ code: 'Unknown', message: 'boom' });
-  });
-
-  it('maps null and undefined rejections to Unknown', () => {
-    expect(toFfiError(null)).toEqual({ code: 'Unknown', message: 'null' });
+    expect(toFfiError('boom')).toEqual({ tag: 'Unknown', detail: 'boom' });
     expect(toFfiError(undefined)).toEqual({
-      code: 'Unknown',
-      message: 'undefined',
+      tag: 'Unknown',
+      detail: 'undefined',
     });
   });
 
-  it('maps a non-string code value to Unknown', () => {
-    const rejection = Object.assign(new Error('boom'), { code: 42 });
-    expect(toFfiError(rejection)).toEqual({ code: 'Unknown', message: 'boom' });
-  });
-
-  it('never invents a code from message prose', () => {
-    // The anti-in-band tripwire: prose that names a variant must not be
-    // promoted into that variant's code — codes come from `.code` alone.
-    const rejection = new Error('Error: MigrationConsentStale: plan moved');
-    expect(toFfiError(rejection).code).toBe('Unknown');
+  test('Tests that prose naming a variant stays Unknown when the rejection carries no tag', () => {
+    const rejection = new Error('ZingoError.MigrationConsentStale: plan moved');
+    expect(toFfiError(rejection).tag).toBe('Unknown');
   });
 });
 
-describe('callFfi funnels the promise channel into the union', () => {
-  it('resolutions cross as ok, even when they wear error prose', () => {
-    // Classification is by channel, never by content.
-    const proseLikeData = 'Error: looks like prose but is legitimate data';
-    return expect(callFfi(Promise.resolve(proseLikeData))).resolves.toEqual({
+describe('callFfi', () => {
+  test('Tests that a resolution crosses as ok when the promise resolves', async () => {
+    await expect(callFfi(Promise.resolve(42))).resolves.toEqual({
       ok: true,
-      value: proseLikeData,
+      value: 42,
     });
   });
 
-  it('rejections cross as typed errors, never as resolved prose', () => {
-    const rejection = Object.assign(new Error('no migration'), {
-      code: 'MigrationNotInProgress',
-    });
-    return expect(callFfi(Promise.reject(rejection))).resolves.toEqual({
+  test('Tests that a rejection crosses as a typed error when the promise rejects', async () => {
+    const rejection = new ZingoError.MigrationNotInProgress();
+    await expect(callFfi(Promise.reject(rejection))).resolves.toEqual({
       ok: false,
-      error: { code: 'MigrationNotInProgress', message: 'no migration' },
+      error: {
+        tag: ZingoError_Tags.MigrationNotInProgress,
+        detail: 'ZingoError.MigrationNotInProgress',
+        error: rejection,
+      },
     });
+  });
+
+  test('Tests that a synchronous throw crosses as a typed error when the call throws', () => {
+    expect(
+      callFfiSync(() => {
+        throw new ZingoError.InvalidInput({ detail: 'not an address' });
+      }),
+    ).toMatchObject({
+      ok: false,
+      error: { tag: ZingoError_Tags.InvalidInput, detail: 'not an address' },
+    });
+    expect(callFfiSync(() => 'v')).toEqual({ ok: true, value: 'v' });
   });
 });

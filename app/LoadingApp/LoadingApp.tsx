@@ -30,21 +30,23 @@ import { showWalletRecovery } from '@app/services/showWalletRecovery';
 
 import {
   createNewWallet,
+  ffiErrorText,
+  fillParams,
   getVersionInfo,
-  getWalletKind,
   hasRepairableWalletFile,
+  installCryptoProvider,
   loadExistingWallet,
   repairDoubleWrappedWallet,
   repairSucceeded,
-  resolvedTrue,
   restoreExistingWalletBackup,
   restoreWalletFromSeed,
   restoreWalletFromUfvk,
-  setCryptoDefaultProvider,
   walletBackupExists,
   walletExists as rpcWalletExists,
   walletFileDiagnosis,
+  walletProfile,
   walletSeedSalvage,
+  FfiError,
   WalletFileDiagnosis,
   WalletFileDiagnosisReport,
   WalletFileRepairOutcome,
@@ -88,10 +90,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createAlert } from '@app/services/createAlert';
 import { getZingoVersion, substituteZingoName } from '@app/utils/ZingoAppData';
 import Utils from '@app/utils';
-import { RPCWalletKindType } from '@app/walletBackend/types/RPCWalletKindType';
 import Toast from 'react-native-toast-message';
 import { toastConfig } from '@ui/widgets/toastConfig';
-import { RPCSeedType } from '@app/walletBackend/types/RPCSeedType';
 import Launching from '@screens/Launching';
 import {
   GateAnswer,
@@ -113,9 +113,7 @@ import {
 // no lazy load because slowing down screens.
 import ImportUfvk from '@screens/ImportUfvk';
 import { sendEmail } from '@app/services/sendEmail';
-import { RPCWalletKindEnum } from '@app/walletBackend/enums/RPCWalletKindEnum';
 import StartMenu from '@screens/StartMenu';
-import { RPCUfvkType } from '@app/walletBackend/types/RPCUfvkType';
 import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
 import NewSeed from '@screens/NewSeed';
 import { AppStackParamList } from '@app/types';
@@ -630,7 +628,7 @@ export class LoadingAppClass extends Component<
 
     // The App needs to set the crypto Provider by default to ring
     // before anything...
-    const r = await setCryptoDefaultProvider();
+    const r = installCryptoProvider();
     console.log('crypto provider result', r);
 
     // has the device the Wallet Keys stored?
@@ -1038,114 +1036,72 @@ export class LoadingAppClass extends Component<
       this.state.server.uri,
       this.state.server.chainName,
       this.state.performanceLevel,
-      GlobalConst.minConfirmations.toString(),
+      GlobalConst.minConfirmations,
     );
+    if (!result.ok) {
+      await this.walletLoadFailed(this.ffiErrorMessage(result.error));
+      return;
+    }
+    // if the App is restoring another wallet backup...
+    // needs to recalculate the Address Book.
+    const newWallet =
+      !!this.props.route.params &&
+      this.props.route.params.newWallet !== undefined
+        ? this.props.route.params.newWallet
+        : false;
+    await this.enterLoadedWallet(newWallet);
+  };
 
-    let error = false;
-    let errorText = '';
-    if (result.ok && result.value) {
-      try {
-        // here result can have an `error` field for watch-only which is actually OK.
-        const resultJson: RPCSeedType & RPCUfvkType = await JSON.parse(
-          result.value,
-        );
-        if (!resultJson.error) {
-          // Load the wallet and navigate to the vts screen
-          let readOnly: boolean = false;
-          let orchardPool: boolean = false;
-          let saplingPool: boolean = false;
-          let transparentPool: boolean = false;
-          const walletKindResult = await getWalletKind();
-          const walletKindStr: string = walletKindResult.ok
-            ? walletKindResult.value
-            : walletKindResult.error.message;
-          try {
-            const walletKindJSON: RPCWalletKindType =
-              await JSON.parse(walletKindStr);
-            console.log('KIND... JSON', walletKindJSON);
-            // there are 4 kinds:
-            // 1. seed
-            // 2. USK
-            // 3. UFVK - watch-only wallet
-            // 4. No keys - watch-only wallet (possibly an error)
+  // The catalog sentence for a keyed tag, the detail otherwise.
+  ffiErrorMessage = (error: FfiError): string => {
+    const text = ffiErrorText(error);
+    return text === undefined
+      ? Utils.humanizeChainTokens(error.detail, this.state.translate)
+      : fillParams(this.state.translate(text.errorKey) as string, text.params);
+  };
 
-            if (
-              walletKindJSON.kind ===
-                RPCWalletKindEnum.LoadedFromUnifiedFullViewingKey ||
-              walletKindJSON.kind === RPCWalletKindEnum.NoKeysFound
-            ) {
-              readOnly = true;
-            } else {
-              readOnly = false;
-            }
-            orchardPool = walletKindJSON.orchard;
-            saplingPool = walletKindJSON.sapling;
-            transparentPool = walletKindJSON.transparent;
-            // if the seed & birthday are not stored in Keychain/Keystore, do it now.
-            if (this.state.recoveryWalletInfoOnDevice) {
-              const wallet = await fetchWallet(readOnly);
-              if (wallet) {
-                await createUpdateRecoveryWalletInfo(wallet);
-              }
-            } else {
-              // needs to delete the seed from the Keychain/Keystore, do it now.
-              if (this.state.hasRecoveryWalletInfoSaved) {
-                await removeRecoveryWalletInfo();
-              }
-            }
-            this.setState({
-              readOnly,
-              orchardPool,
-              saplingPool,
-              transparentPool,
-              actionButtonsDisabled: false,
-            });
-          } catch (e) {
-            this.setState({
-              readOnly,
-              orchardPool,
-              saplingPool,
-              transparentPool,
-              actionButtonsDisabled: false,
-            });
-            this.addLastSnackbar(walletKindStr);
-          }
-          // if the App is restoring another wallet backup...
-          // needs to recalculate the Address Book.
-          const newWallet =
-            !!this.props.route.params &&
-            this.props.route.params.newWallet !== undefined
-              ? this.props.route.params.newWallet
-              : false;
-          this.navigateToLoadedApp(
-            readOnly,
-            orchardPool,
-            saplingPool,
-            transparentPool,
-            newWallet,
-            this.state.firstLaunchingMessage,
-            // The wallet's own chain, surfaced by the native result (reliable
-            // even Offline). The server's chain is only a pre-rebuild fallback.
-            (resultJson.chain_name as ChainNameEnum) ||
-              this.state.server.chainName,
-          );
-        } else {
-          error = true;
-          errorText = resultJson.error;
-        }
-      } catch (e: unknown) {
-        error = true;
-        errorText = e instanceof Error ? e.message : String(e);
+  // Reads the open wallet's profile, syncs the on-device recovery info and
+  // navigates to the loaded app.
+  enterLoadedWallet = async (newWallet: boolean) => {
+    const profile = await walletProfile();
+    if (!profile.ok) {
+      this.addLastSnackbar(profile.error.detail);
+    }
+    const { readOnly, orchardPool, saplingPool, transparentPool, chainName } =
+      profile.ok
+        ? profile.value
+        : {
+            readOnly: false,
+            orchardPool: false,
+            saplingPool: false,
+            transparentPool: false,
+            chainName: this.state.server.chainName,
+          };
+    // if the seed & birthday are not stored in Keychain/Keystore, do it now.
+    if (this.state.recoveryWalletInfoOnDevice) {
+      const wallet = await fetchWallet(readOnly);
+      if (wallet) {
+        await createUpdateRecoveryWalletInfo(wallet);
       }
-    } else {
-      error = true;
-      errorText = result.ok ? result.value : result.error.message;
+    } else if (this.state.hasRecoveryWalletInfoSaved) {
+      await removeRecoveryWalletInfo();
     }
-    if (error) {
-      await this.walletLoadFailed(
-        Utils.humanizeChainTokens(errorText, this.state.translate),
-      );
-    }
+    this.setState({
+      readOnly,
+      orchardPool,
+      saplingPool,
+      transparentPool,
+      actionButtonsDisabled: false,
+    });
+    this.navigateToLoadedApp(
+      readOnly,
+      orchardPool,
+      saplingPool,
+      transparentPool,
+      newWallet,
+      this.state.firstLaunchingMessage,
+      chainName,
+    );
   };
 
   // A repairable file is repaired and reloaded, and a broken main that no repair fixes opens the recovery dialog.
@@ -1358,172 +1314,22 @@ export class LoadingAppClass extends Component<
     this.walletRecoveryAlert(title, errorText, report, outcomes);
   };
 
-  walletErrorHandle = async (
-    result: string,
-    title: string,
-    screen: RouteEnum,
-    start: boolean,
-  ) => {
-    // first check the actual server
-    // if the server is not working properly sometimes can take more than one minute to fail.
-    if (
-      start &&
-      this.state.netInfo.isConnected &&
-      this.state.selectServer !== SelectServerEnum.offline
-    ) {
-      this.addLastSnackbar(
-        this.state.translate('restarting') as string,
-        SnackbarDurationEnum.long,
-      );
-    }
-    // if no internet connection -> show the error.
-    // if Offline mode -> show the error.
-    if (
-      !this.state.netInfo.isConnected ||
-      this.state.selectServer === SelectServerEnum.offline
-    ) {
-      createAlert(
-        this.setBackgroundError,
-        this.addLastSnackbar,
-        title,
-        result,
-        false,
-        this.state.translate,
-        sendEmail,
-        this.state.zingolibVersion,
-      );
-      this.setState({
-        actionButtonsDisabled: false,
-        serverErrorTries: 0,
-        screen,
-      });
-    } else {
-      const workingServer = await this.checkServer(this.state.server);
-      if (workingServer) {
-        // the server is working -> this error is something not related with the server availability
-        createAlert(
-          this.setBackgroundError,
-          this.addLastSnackbar,
-          title,
-          result,
-          false,
-          this.state.translate,
-          sendEmail,
-          this.state.zingolibVersion,
-        );
-        this.setState({
-          actionButtonsDisabled: false,
-          serverErrorTries: 0,
-          screen,
-        });
-      } else {
-        // Audit Issue S — custom server users opted out of automatic
-        // server selection (almost always for privacy / self-hosting).
-        // The checkServer probe above is a 15-second latency check, not
-        // a causal diagnosis: even if it returns false, the original
-        // wallet error may or may not be server-related. Silently
-        // swapping the user's custom URI for a default would leak
-        // metadata to that default server. Surface the situation and
-        // let the user decide from Settings.
-        if (this.state.selectServer === SelectServerEnum.custom) {
-          createAlert(
-            this.setBackgroundError,
-            this.addLastSnackbar,
-            title,
-            this.state.translate(
-              'loadingapp.customserver-unreachable',
-            ) as string,
-            false,
-            this.state.translate,
-            sendEmail,
-            this.state.zingolibVersion,
-          );
-          this.setState({
-            actionButtonsDisabled: false,
-            serverErrorTries: 0,
-            screen,
-          });
-          return;
-        }
-
-        // let's change to another server
-        if (this.state.serverErrorTries === 0) {
-          // first try
-          this.setState({ screen, actionButtonsDisabled: true });
-          this.addLastSnackbar(
-            this.state.translate('loadingapp.serverfirsttry') as string,
-            SnackbarDurationEnum.longer,
-          );
-          // a different server (live registry first, then static by latency).
-          const someServerIsWorking = await this.selectRecoveryServer();
-          if (someServerIsWorking) {
-            if (start) {
-              this.setState(
-                { startingApp: false, serverErrorTries: 1, screen },
-                () => {
-                  this.componentDidMount();
-                },
-              );
-            } else {
-              createAlert(
-                this.setBackgroundError,
-                this.addLastSnackbar,
-                title,
-                result,
-                false,
-                this.state.translate,
-                sendEmail,
-                this.state.zingolibVersion,
-              );
-              this.setState({
-                actionButtonsDisabled: false,
-                serverErrorTries: 0,
-                screen,
-              });
-            }
-          } else {
-            createAlert(
-              this.setBackgroundError,
-              this.addLastSnackbar,
-              title,
-              this.state.translate('loadingapp.noservers') as string,
-              false,
-              this.state.translate,
-              sendEmail,
-              this.state.zingolibVersion,
-            );
-            this.setState({
-              actionButtonsDisabled: false,
-              serverErrorTries: 0,
-              screen,
-            });
-          }
-        } else {
-          // second try
-          this.addLastSnackbar(
-            this.state.translate('loadingapp.serversecondtry') as string,
-            SnackbarDurationEnum.longer,
-          );
-          setTimeout(() => {
-            createAlert(
-              this.setBackgroundError,
-              this.addLastSnackbar,
-              title,
-              result,
-              false,
-              this.state.translate,
-              sendEmail,
-              this.state.zingolibVersion,
-            );
-            this.setState({
-              actionButtonsDisabled: false,
-              serverErrorTries: 0,
-              screen,
-            });
-          }, 1 * 1000);
-        }
-      }
-    }
+  walletErrorHandle = (error: FfiError, title: string, screen: RouteEnum) => {
+    createAlert(
+      this.setBackgroundError,
+      this.addLastSnackbar,
+      title,
+      this.ffiErrorMessage(error),
+      false,
+      this.state.translate,
+      sendEmail,
+      this.state.zingolibVersion,
+    );
+    this.setState({
+      actionButtonsDisabled: false,
+      serverErrorTries: 0,
+      screen,
+    });
   };
 
   fetchBackgroundSyncInfo = async () => {
@@ -1713,74 +1519,38 @@ export class LoadingAppClass extends Component<
     // instead of scanning the whole chain from Sapling activation (zingolib
     // ADR 0007). A non-zero value here would act as an explicit override.
     const serverUri = offline ? '' : this.state.server.uri;
-    const birthday = '0';
-    const seed = await createNewWallet(
+    const opened = await createNewWallet(
       serverUri,
-      birthday,
+      0,
       this.state.server.chainName,
       this.state.performanceLevel,
-      GlobalConst.minConfirmations.toString(),
+      GlobalConst.minConfirmations,
     );
-
-    if (seed.ok && seed.value) {
-      let seedJSON = {} as RPCSeedType;
-      try {
-        seedJSON = await JSON.parse(seed.value);
-        if (seedJSON.error) {
-          this.setState({ actionButtonsDisabled: false });
-          createAlert(
-            this.setBackgroundError,
-            this.addLastSnackbar,
-            this.state.translate('loadingapp.creatingwallet-label') as string,
-            seedJSON.error,
-            false,
-            this.state.translate,
-            sendEmail,
-            this.state.zingolibVersion,
-          );
-          return;
-        }
-      } catch (e: unknown) {
-        this.setState({ actionButtonsDisabled: false });
-        createAlert(
-          this.setBackgroundError,
-          this.addLastSnackbar,
-          this.state.translate('loadingapp.creatingwallet-label') as string,
-          e instanceof Error ? e.message : String(e),
-          false,
-          this.state.translate,
-          sendEmail,
-          this.state.zingolibVersion,
-        );
-        return;
-      }
-      const wallet: WalletType = {
-        seed: seedJSON.seed_phrase || '',
-        birthday: seedJSON.birthday || 0,
-      };
-      // storing the seed & birthday in KeyChain/KeyStore
-      if (this.state.recoveryWalletInfoOnDevice) {
-        await createUpdateRecoveryWalletInfo(wallet);
-      } else {
-        if (this.state.hasRecoveryWalletInfoSaved) {
-          await removeRecoveryWalletInfo();
-        }
-      }
-      // basic mode -> same screen.
-      this.setState(state => ({
-        wallet,
-        screen: goSeedScreen ? RouteEnum.NewSeed : state.screen,
-        actionButtonsDisabled: false,
-        walletExists: true,
-      }));
-    } else {
+    if (!opened.ok) {
       this.walletErrorHandle(
-        seed.ok ? seed.value : seed.error.message,
+        opened.error,
         this.state.translate('loadingapp.creatingwallet-label') as string,
         RouteEnum.StartMenu,
-        false,
       );
+      return;
     }
+    const wallet: WalletType = (await fetchWallet(false)) ?? {
+      seed: '',
+      birthday: 0,
+    };
+    // storing the seed & birthday in KeyChain/KeyStore
+    if (this.state.recoveryWalletInfoOnDevice) {
+      await createUpdateRecoveryWalletInfo(wallet);
+    } else if (this.state.hasRecoveryWalletInfoSaved) {
+      await removeRecoveryWalletInfo();
+    }
+    // basic mode -> same screen.
+    this.setState(state => ({
+      wallet,
+      screen: goSeedScreen ? RouteEnum.NewSeed : state.screen,
+      actionButtonsDisabled: false,
+      walletExists: true,
+    }));
   };
 
   getwalletToRestore = async () => {
@@ -1874,131 +1644,39 @@ export class LoadingAppClass extends Component<
       type = RestoreFromTypeEnum.ufvkRestoreFrom;
     }
 
-    let result: Awaited<ReturnType<typeof restoreWalletFromSeed>>;
-    if (type === RestoreFromTypeEnum.seedRestoreFrom) {
-      result = await restoreWalletFromSeed(
-        seedUfvk.toLowerCase(),
-        walletBirthday || '0',
-        this.state.server.uri,
-        this.state.server.chainName,
-        this.state.performanceLevel,
-        GlobalConst.minConfirmations.toString(),
-      );
-    } else {
-      result = await restoreWalletFromUfvk(
-        seedUfvk.toLowerCase(),
-        walletBirthday || '0',
-        this.state.server.uri,
-        this.state.server.chainName,
-        this.state.performanceLevel,
-        GlobalConst.minConfirmations.toString(),
-      );
-    }
-
-    let error = false;
-    let errorText = '';
-    if (result.ok && result.value) {
-      try {
-        // here result can have an `error` field for watch-only which is actually OK.
-        const resultJson: RPCSeedType & RPCUfvkType = await JSON.parse(
-          result.value,
-        );
-        if (!resultJson.error) {
-          // when restore a wallet never the user needs that the seed screen shows up with the first funds received.
-          await SettingsFileImpl.writeSettings(
-            SettingsNameEnum.basicFirstViewSeed,
-            true,
-          );
-          // Load the wallet and navigate to the vts screen
-          let readOnly: boolean = false;
-          let orchardPool: boolean = false;
-          let saplingPool: boolean = false;
-          let transparentPool: boolean = false;
-          const walletKindResult = await getWalletKind();
-          const walletKindStr: string = walletKindResult.ok
-            ? walletKindResult.value
-            : walletKindResult.error.message;
-          console.log('KIND...', walletKindStr);
-          try {
-            const walletKindJSON: RPCWalletKindType =
-              await JSON.parse(walletKindStr);
-            // there are 4 kinds:
-            // 1. seed
-            // 2. USK
-            // 3. UFVK - watch-only wallet
-            // 4. No keys - watch-only wallet (possibly an error)
-
-            if (
-              walletKindJSON.kind ===
-                RPCWalletKindEnum.LoadedFromUnifiedFullViewingKey ||
-              walletKindJSON.kind === RPCWalletKindEnum.NoKeysFound
-            ) {
-              readOnly = true;
-            } else {
-              readOnly = false;
-            }
-            orchardPool = walletKindJSON.orchard;
-            saplingPool = walletKindJSON.sapling;
-            transparentPool = walletKindJSON.transparent;
-            // if the seed & birthday are not stored in Keychain/Keystore, do it now.
-            if (this.state.recoveryWalletInfoOnDevice) {
-              const wallet = await fetchWallet(readOnly);
-              if (wallet) {
-                await createUpdateRecoveryWalletInfo(wallet);
-              }
-            } else {
-              // needs to delete the seed from the Keychain/Keystore, do it now.
-              if (this.state.hasRecoveryWalletInfoSaved) {
-                await removeRecoveryWalletInfo();
-              }
-            }
-            this.setState({
-              readOnly,
-              orchardPool,
-              saplingPool,
-              transparentPool,
-              actionButtonsDisabled: false,
-            });
-          } catch (e) {
-            this.setState({
-              readOnly,
-              orchardPool,
-              saplingPool,
-              transparentPool,
-              actionButtonsDisabled: false,
-            });
-            this.addLastSnackbar(walletKindStr);
-          }
-          this.navigateToLoadedApp(
-            readOnly,
-            orchardPool,
-            saplingPool,
-            transparentPool,
-            true,
-            this.state.firstLaunchingMessage,
-            // restore requires a live server → its chain is the wallet's chain.
+    const birthdayHeight = Number(walletBirthday) || 0;
+    const result =
+      type === RestoreFromTypeEnum.seedRestoreFrom
+        ? await restoreWalletFromSeed(
+            seedUfvk.toLowerCase(),
+            birthdayHeight,
+            this.state.server.uri,
             this.state.server.chainName,
+            this.state.performanceLevel,
+            GlobalConst.minConfirmations,
+          )
+        : await restoreWalletFromUfvk(
+            seedUfvk.toLowerCase(),
+            birthdayHeight,
+            this.state.server.uri,
+            this.state.server.chainName,
+            this.state.performanceLevel,
+            GlobalConst.minConfirmations,
           );
-        } else {
-          error = true;
-          errorText = resultJson.error;
-        }
-      } catch (e: unknown) {
-        error = true;
-        errorText = e instanceof Error ? e.message : String(e);
-      }
-    } else {
-      error = true;
-      errorText = result.ok ? result.value : result.error.message;
-    }
-    if (error) {
+    if (!result.ok) {
       this.walletErrorHandle(
-        errorText,
+        result.error,
         this.state.translate('loadingapp.readingwallet-label') as string,
         RouteEnum.ImportUfvk,
-        false,
       );
+      return;
     }
+    // when restore a wallet never the user needs that the seed screen shows up with the first funds received.
+    await SettingsFileImpl.writeSettings(
+      SettingsNameEnum.basicFirstViewSeed,
+      true,
+    );
+    await this.enterLoadedWallet(true);
   };
 
   setPrivacyOption = async (value: boolean): Promise<void> => {
@@ -2214,7 +1892,7 @@ export class LoadingAppClass extends Component<
   restoreLastBackup = async () => {
     this.setState({ screen: RouteEnum.Launching, actionButtonsDisabled: true });
     const result = await restoreExistingWalletBackup();
-    if (!resolvedTrue(result)) {
+    if (!result.ok) {
       this.addLastSnackbar(
         this.state.translate('rpc.backupnotfound-error') as string,
       );
@@ -2228,20 +1906,7 @@ export class LoadingAppClass extends Component<
   };
 
   async fetchZingolibVersion(): Promise<void> {
-    const zingolibResult = await getVersionInfo();
-    let zingolibStr: string;
-    if (!zingolibResult.ok) {
-      // The version display still needs a value when the FFI rejects.
-      zingolibStr = GlobalConst.zingolibError;
-    } else if (!zingolibResult.value) {
-      zingolibStr = GlobalConst.zingolibNone;
-    } else {
-      zingolibStr = zingolibResult.value;
-    }
-
-    this.setState({
-      zingolibVersion: zingolibStr,
-    });
+    this.setState({ zingolibVersion: getVersionInfo() });
   }
 
   render() {

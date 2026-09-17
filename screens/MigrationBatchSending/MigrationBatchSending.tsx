@@ -18,9 +18,8 @@ import SegmentedBar from '@ui/primitives/SegmentedBar';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
 import { RouteEnum } from '@app/AppState';
-import { executeDueParts, executeDuePartsStatus } from '@app/walletBackend';
-import { RPCBatchReportType } from '@app/walletBackend/types/RPCBatchReportType';
-import { RPCBatchStatusType } from '@app/walletBackend/types/RPCBatchStatusType';
+import { BatchStatus, PartResult_Tags, WalletEvent_Tags } from 'zingo-ffi';
+import { executeDueParts, subscribeWalletEvents } from '@app/walletBackend';
 
 type MigrationBatchSendingProps = NativeStackScreenProps<
   AppDrawerParamList,
@@ -56,7 +55,7 @@ const MigrationBatchSending: React.FunctionComponent<
 
   const denominations = route.params?.denominations ?? [];
 
-  const [progress, setProgress] = useState<RPCBatchStatusType | null>(null);
+  const [progress, setProgress] = useState<BatchStatus | undefined>(undefined);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   // Every part skipped without sending (slid or not due): nothing broadcast,
   // nothing lost. Distinct from the error state because nothing failed.
@@ -79,63 +78,37 @@ const MigrationBatchSending: React.FunctionComponent<
     }, []),
   );
 
-  // Run the batch once, polling the native side channel for progress while the
-  // single long execute call is in flight. Both run concurrently on separate
-  // native queues; executeDuePartsStatus reads a side channel, not the
-  // lightclient lock the batch holds, so the poll stays live throughout.
+  // Run the batch once, following its BatchProgress events while the single
+  // long execute call is in flight.
   useEffect(() => {
     let cancelled = false;
-    let polling = false;
-    const poll = setInterval(async () => {
-      if (polling) {
-        return;
+    const unsubscribe = subscribeWalletEvents(event => {
+      if (event.tag === WalletEvent_Tags.BatchProgress && !cancelled) {
+        setProgress(event.inner.status);
       }
-      polling = true;
-      try {
-        const status = await executeDuePartsStatus();
-        if (status.ok) {
-          const parsed = JSON.parse(status.value) as RPCBatchStatusType | null;
-          if (parsed && !cancelled) {
-            setProgress(parsed);
-          }
-        }
-      } catch {
-        // Transient read/parse between ticks; the next tick recovers.
-      } finally {
-        polling = false;
-      }
-    }, 400);
+    });
 
     (async () => {
-      let failure: string | null = null;
-      let report: RPCBatchReportType | null = null;
-      try {
-        const reportResult = await executeDueParts(BATCH_SEND_SPACING_MS);
-        if (!reportResult.ok) {
-          failure = reportResult.error.message;
-        } else {
-          const parsed = JSON.parse(reportResult.value) as RPCBatchReportType;
-          if (parsed.error) {
-            failure = parsed.error;
-          } else {
-            report = parsed;
-          }
-        }
-      } catch (e) {
-        failure = `${e}`;
-      }
-      clearInterval(poll);
+      const reportResult = await executeDueParts(BATCH_SEND_SPACING_MS);
+      unsubscribe();
       if (cancelled) {
         return;
       }
-      // A halted batch stopped on a submission error partway; surface it so the
-      // user can retry (the retry folds the un-sent parts back in).
-      if (failure || report?.halted) {
-        setErrorMsg(failure ?? report?.halted ?? '');
+      if (!reportResult.ok) {
+        setErrorMsg(reportResult.error.detail);
         return;
       }
-      const outcomes = report?.outcomes ?? [];
-      const sent = outcomes.filter(o => o.result.kind === 'sent').length;
+      const report = reportResult.value;
+      // A halted batch stopped on a submission error partway; surface it so the
+      // user can retry (the retry folds the un-sent parts back in).
+      if (report.halted !== undefined) {
+        setErrorMsg(report.halted);
+        return;
+      }
+      const outcomes = report.outcomes;
+      const sent = outcomes.filter(
+        o => o.result.tag === PartResult_Tags.Sent,
+      ).length;
       if (outcomes.length === 0) {
         // Reached with nothing actually due (the window has not opened yet, or
         // every part already confirmed or slid to a later window); the monitor
@@ -159,7 +132,7 @@ const MigrationBatchSending: React.FunctionComponent<
 
     return () => {
       cancelled = true;
-      clearInterval(poll);
+      unsubscribe();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

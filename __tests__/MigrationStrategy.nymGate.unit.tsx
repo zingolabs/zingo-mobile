@@ -98,7 +98,8 @@ describe('deriveNymGateState', () => {
             socks5Addr:
               indicator === RPCMixnetIndicatorEnum.ready
                 ? '127.0.0.1:1080'
-                : null,
+                : undefined,
+            bootstrapDetail: '',
           },
           null,
           reconnecting,

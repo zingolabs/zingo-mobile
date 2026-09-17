@@ -1,20 +1,11 @@
 /**
- * Thin coordinator for all wallet operations.
- *
- * WalletBackend owns no business logic itself — it wires the four sub-services
- * together and exposes a stable public API to LoadedApp. To add a new feature,
- * create or extend the relevant sub-service and add a delegation method here.
- *
- * Sub-service overview:
- *  - DataService       — fetches wallet state from the native layer (RPCModule)
- *  - SyncCoordinator   — drives the 5 s polling loop and sync/rescan lifecycle
- *  - TransactionService — propose → confirm send flow
- *  - WalletLifecycleService — wallet create/delete/restore operations
- *
- * RPCModule is the React Native native module that bridges to zingolib (Rust).
- * This class never calls RPCModule directly.
+ * Thin coordinator for all wallet operations: it wires the sub-services
+ * together (DataService reads wallet state, SyncCoordinator drives sync from
+ * the event stream, TransactionService sends, WalletLifecycleService swaps
+ * wallet files) and exposes a stable API to LoadedApp.
  */
 import { SendJsonToTypeType, ServerType } from '@app/AppState';
+import { FfiResult } from './ffi';
 import { WalletBackendConfig } from './config/WalletBackendConfig';
 import { RPCPerformanceLevelEnum } from './enums/RPCPerformanceLevelEnum';
 import { DataService } from './modules/DataService';
@@ -94,7 +85,9 @@ export default class WalletBackend {
   }
 
   // Transactions
-  async sendTransaction(sendJson: Array<SendJsonToTypeType>): Promise<string> {
+  async sendTransaction(
+    sendJson: Array<SendJsonToTypeType>,
+  ): Promise<FfiResult<string[]>> {
     return this.transactionService.sendTransaction(sendJson);
   }
 

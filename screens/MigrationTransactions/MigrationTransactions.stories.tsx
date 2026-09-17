@@ -1,14 +1,15 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
+import { ZingoError } from 'zingo-ffi';
 import { RouteEnum } from '@app/AppState';
 import MigrationTransactions from './MigrationTransactions';
 import {
   screenProps,
   withAppContext,
   withNavigation,
-  withRpc,
+  withWallet,
 } from '../../.storybook/storyDecorators';
 import { mockInfo, mockTotalBalance } from '../../.storybook/storyMocks';
-import { json, pending, rejection } from '../../.storybook/storyRpc';
+import { answer, pending, rejection } from '../../.storybook/storyRpc';
 import {
   drainPlan,
   emptyDrainPlan,
@@ -29,22 +30,18 @@ export default meta;
 type Story = StoryObj<typeof MigrationTransactions>;
 
 export const Plan: Story = {
-  decorators: [withRpc({ planOrchardDrainProcess: json(drainPlan) })],
+  decorators: [withWallet({ planDrain: answer(drainPlan) })],
 };
 export const Loading: Story = {
-  decorators: [withRpc({ planOrchardDrainProcess: pending })],
+  decorators: [withWallet({ planDrain: pending })],
 };
 // Nothing to build yet while Orchard still holds funds: notes are confirming.
 export const Pending: Story = {
-  decorators: [withRpc({ planOrchardDrainProcess: json(pendingDrainPlan) })],
+  decorators: [withWallet({ planDrain: answer(pendingDrainPlan) })],
 };
 export const Empty: Story = {
-  decorators: [withRpc({ planOrchardDrainProcess: json(emptyDrainPlan) })],
+  decorators: [withWallet({ planDrain: answer(emptyDrainPlan) })],
 };
 export const Error: Story = {
-  decorators: [
-    withRpc({
-      planOrchardDrainProcess: rejection('wallet is offline', 'Offline'),
-    }),
-  ],
+  decorators: [withWallet({ planDrain: rejection(new ZingoError.Offline()) })],
 };

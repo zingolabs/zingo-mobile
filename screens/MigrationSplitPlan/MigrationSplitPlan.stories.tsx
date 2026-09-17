@@ -1,14 +1,15 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
+import { ZingoError } from 'zingo-ffi';
 import { RouteEnum } from '@app/AppState';
 import MigrationSplitPlan from './MigrationSplitPlan';
 import {
   screenProps,
   withAppContext,
   withNavigation,
-  withRpc,
+  withWallet,
 } from '../../.storybook/storyDecorators';
 import { mockInfo, mockTotalBalance } from '../../.storybook/storyMocks';
-import { json, pending, rejection } from '../../.storybook/storyRpc';
+import { answer, pending, rejection } from '../../.storybook/storyRpc';
 import {
   dustPlan,
   readyPlan,
@@ -29,22 +30,20 @@ export default meta;
 type Story = StoryObj<typeof MigrationSplitPlan>;
 
 export const Plan: Story = {
-  decorators: [withRpc({ planIronwoodMigrationProcess: json(splitPlan) })],
+  decorators: [withWallet({ planMigration: answer(splitPlan) })],
 };
 // Notes already part-sized: no splitting rounds to run.
 export const AlreadySplit: Story = {
-  decorators: [withRpc({ planIronwoodMigrationProcess: json(readyPlan) })],
+  decorators: [withWallet({ planMigration: answer(readyPlan) })],
 };
 export const Loading: Story = {
-  decorators: [withRpc({ planIronwoodMigrationProcess: pending })],
+  decorators: [withWallet({ planMigration: pending })],
 };
 export const Empty: Story = {
-  decorators: [withRpc({ planIronwoodMigrationProcess: json(dustPlan) })],
+  decorators: [withWallet({ planMigration: answer(dustPlan) })],
 };
 export const Error: Story = {
   decorators: [
-    withRpc({
-      planIronwoodMigrationProcess: rejection('wallet is offline', 'Offline'),
-    }),
+    withWallet({ planMigration: rejection(new ZingoError.Offline()) }),
   ],
 };

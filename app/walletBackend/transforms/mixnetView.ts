@@ -132,7 +132,7 @@ export function deriveMixnetView(
     case RPCMixnetIndicatorEnum.ready:
       return {
         statusKey: 'mixnet.status.ready',
-        socks5Addr: status.socks5Addr,
+        socks5Addr: status.socks5Addr ?? null,
         narration: null,
         sendBlocked: false,
         recovery: 'none',

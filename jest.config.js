@@ -7,6 +7,10 @@ module.exports = {
   modulePathIgnorePatterns: ['e2e', '<rootDir>/.claude/'],
   // visual/ holds Playwright specs, run by `yarn visual:capture`.
   testPathIgnorePatterns: ['/node_modules/', '<rootDir>/visual/'],
+  // The generated bindings import the bindgen's TypeScript runtime as source.
+  transformIgnorePatterns: [
+    'node_modules/(?!((jest-)?react-native|@react-native(-community)?|uniffi-bindgen-react-native)/)',
+  ],
   transform: {
     '\\.[jt]sx?$': 'babel-jest',
     '^.+\\.(bmp|gif|jpg|jpeg|mp4|png|psd|webp)$':
@@ -17,6 +21,7 @@ module.exports = {
     // See __mocks__/appTheme.ts
     '^(\\.{1,2}/)+(app/)?theme$': '<rootDir>/__mocks__/appTheme.ts',
     '^@app/theme$': '<rootDir>/__mocks__/appTheme.ts',
+    '^zingo-ffi$': '<rootDir>/__mocks__/zingoFfi.ts',
     '^@app/(.*)$': '<rootDir>/app/$1',
     '^@screens/(.*)$': '<rootDir>/screens/$1',
     '^@ui/(.*)$': '<rootDir>/ui/$1',

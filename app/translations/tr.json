@@ -110,6 +110,22 @@
     "sends-unit": " gönderme işlemleri.",
     "memobytes-unit": " karakterler."
   },
+  "ffi": {
+    "invalidmnemonic": "Tohum ifadesi geçerli değil. Her kelimeyi ve kelime sayısını kontrol edin.",
+    "viewingkeymalformed": "Görüntüleme anahtarı geçerli değil.",
+    "viewingkeynetworkmismatch": "Görüntüleme anahtarı başka bir ağa ait.",
+    "birthdaybelowactivation": "Doğum günü {birthday}, Sapling etkinleştirme yüksekliği {activation} altında.",
+    "mnemonicnotfound": "Cüzdanda tohum ifadesi yok.",
+    "walletunreadable": "Bu sürüm cüzdan dosyasını okuyamıyor.",
+    "indexerunreachable": "Sunucuya ulaşılamıyor.",
+    "indexerrequestfailed": "Sunucu isteğe yanıt vermedi.",
+    "offline": "Cüzdan çevrimdışı.",
+    "insufficientfunds": "Yetersiz bakiye.",
+    "syncrequired": "Önce eşitlemeyi tamamlayın.",
+    "panic": "Cüzdan motoru çöktü. Uygulamayı yeniden başlatın.",
+    "poisoned": "Cüzdan motoru bozuk durumda. Uygulamayı yeniden başlatın.",
+    "busy": "Cüzdan {detail} ile meşgul. Bitmesini bekleyin."
+  },
   "loadingapp": {
     "welcome": "Hoş geldiniz",
     "actualserver": "Mevcut sunucu:",

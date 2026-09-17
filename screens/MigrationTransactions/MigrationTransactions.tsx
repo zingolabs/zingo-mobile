@@ -12,7 +12,7 @@ import { ContextAppLoaded } from '@app/context';
 import { RouteEnum } from '@app/AppState';
 import Utils from '@app/utils';
 import { planOrchardDrain } from '@app/walletBackend';
-import { RPCDrainPlanType } from '@app/walletBackend/types/RPCDrainPlanType';
+import { DrainPlanType } from '@app/walletBackend/types/MigrationTypes';
 
 type MigrationTransactionsProps = NativeStackScreenProps<
   AppDrawerParamList,
@@ -97,7 +97,7 @@ const MigrationTransactions: React.FunctionComponent<
   const { translate, info, totalBalance } = context;
   const { colors } = useTheme();
 
-  const [plan, setPlan] = useState<RPCDrainPlanType | null>(null);
+  const [plan, setPlan] = useState<DrainPlanType | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -120,20 +120,11 @@ const MigrationTransactions: React.FunctionComponent<
     setErrorMsg(null);
     const planResult = await planOrchardDrain();
     if (!planResult.ok) {
-      setErrorMsg(planResult.error.message);
+      setErrorMsg(planResult.error.detail);
       setLoading(false);
       return;
     }
-    try {
-      const parsed: RPCDrainPlanType = JSON.parse(planResult.value);
-      if (parsed.error) {
-        setErrorMsg(parsed.error);
-      } else {
-        setPlan(parsed);
-      }
-    } catch (e) {
-      setErrorMsg(`${e}`);
-    }
+    setPlan(planResult.value);
     setLoading(false);
   }, []);
 

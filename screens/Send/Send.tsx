@@ -87,6 +87,7 @@ import {
   getSpendableBalanceWithAddress,
   sendPropose,
 } from '@app/walletBackend';
+import type { FfiResult } from '@app/walletBackend';
 import {
   classifySendFailure,
   retryOnAnotherServer,
@@ -104,13 +105,11 @@ import { useDismissSheetsOnBlur } from '@app/hooks/useDismissSheetsOnBlur';
 import { useOptionsPanelSheetSlide } from '@app/hooks/useOptionsPanelSheetSlide';
 import { usePriceSnapAutoClose } from '@app/hooks/usePriceSnapAutoClose';
 import AddressItem from '@ui/widgets/AddressItem';
-import { RPCSendProposeType } from '@app/walletBackend/types/RPCSendProposeType';
 import ShowAddressAlertAsync from '@app/services/showAddressAlertAsync';
 import Memo from './components/Memo';
 import SendErrorSheet from './components/SendErrorSheet';
 import { sendEmail } from '@app/services/sendEmail';
 import selectingServer from '@app/services/selectingServer';
-import { RPCSpendablebalanceType } from '@app/walletBackend/types/RPCSpendablebalanceType';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 type SendProps = NativeStackScreenProps<AppDrawerParamList, RouteEnum.Send> & {
@@ -122,7 +121,7 @@ type SendProps = NativeStackScreenProps<AppDrawerParamList, RouteEnum.Send> & {
   setScrollToTop: (value: boolean) => void;
   setScrollToBottom: (value: boolean) => void;
   // for send
-  sendTransaction: (s: SendPageStateClass) => Promise<String>;
+  sendTransaction: (s: SendPageStateClass) => Promise<FfiResult<string[]>>;
   setServerOption: (
     value: ServerType,
     selectServer: SelectServerEnum,
@@ -485,7 +484,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       // fee
       let proposeFee = 0;
       let proposePools: ProposalPoolsType = { source: [], destination: [] };
-      const runPropose = await sendPropose(JSON.stringify(sendJson));
+      const runPropose = await sendPropose(sendJson);
 
       // discard result if a newer calculation (or a clear) has superseded this one
       if (feeCalculationGenRef.current !== generation) {
@@ -494,48 +493,14 @@ const Send: React.FunctionComponent<SendProps> = ({
 
       if (!runPropose.ok) {
         // snack with error
-        setProposeSendLastError(runPropose.error.message);
+        setProposeSendLastError(runPropose.error.detail);
       } else {
-        try {
-          let runProposeJson: RPCSendProposeType;
-          runProposeJson = await JSON.parse(runPropose.value);
-          if (runProposeJson.error) {
-            // snack with error — the error message already reaches the UI via
-            // setProposeSendLastError; do not mirror to console (Audit Issue K).
-            setProposeSendLastError(runProposeJson.error);
-          } else {
-            if (runProposeJson.fee !== undefined) {
-              proposeFee = runProposeJson.fee / 10 ** 8;
-              setProposeSendLastError('');
-            }
-            proposePools = {
-              source: runProposeJson.source_pools ?? [],
-              destination: runProposeJson.destination_pools ?? [],
-            };
-            if (runProposeJson.amount !== undefined) {
-              const newAmount =
-                runProposeJson.amount / 10 ** 8 -
-                (donation &&
-                server.chainName === ChainNameEnum.mainChainName &&
-                !donationAddress
-                  ? Utils.parseStringLocaleToNumberFloat(
-                      Utils.getZenniesDonationAmount(),
-                    )
-                  : 0);
-              updateToField(
-                null,
-                Utils.parseNumberFloatToStringLocale(newAmount, 8),
-                null,
-                null,
-                null,
-              );
-              setProposeSendLastError('');
-            }
-          }
-        } catch (e) {
-          // snack with error
-          setProposeSendLastError(runPropose.value);
-        }
+        proposeFee = runPropose.value.fee / 10 ** 8;
+        proposePools = {
+          source: runPropose.value.sourcePools,
+          destination: runPropose.value.destinationPools,
+        };
+        setProposeSendLastError('');
       }
       setFee(proposeFee);
       setProposalPools(proposePools);
@@ -579,7 +544,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       const start = Date.now();
       const runSpendableBalance = await getSpendableBalanceWithAddress(
         addressPar,
-        zenniesForZingo ? 'true' : 'false',
+        zenniesForZingo,
       );
       if (Date.now() - start > 4000) {
         console.log(
@@ -589,25 +554,10 @@ const Send: React.FunctionComponent<SendProps> = ({
       }
       if (!runSpendableBalance.ok) {
         // snack with error
-        setSpendableBalanceLastError(runSpendableBalance.error.message);
+        setSpendableBalanceLastError(runSpendableBalance.error.detail);
       } else {
-        try {
-          const runSpendableBalanceJson: RPCSpendablebalanceType =
-            await JSON.parse(runSpendableBalance.value);
-          if (runSpendableBalanceJson.spendable_balance !== undefined) {
-            // Audit Issue K — do not log the spendable balance value.
-            spendableBalance =
-              runSpendableBalanceJson.spendable_balance / 10 ** 8;
-            setSpendableBalanceLastError('');
-          }
-        } catch (e) {
-          // snack with error
-          setSpendableBalanceLastError(
-            runSpendableBalance.value +
-              ' ' +
-              (e instanceof Error ? e.message : String(e)),
-          );
-        }
+        spendableBalance = runSpendableBalance.value / 10 ** 8;
+        setSpendableBalanceLastError('');
       }
 
       setSpendable(spendableBalance);
@@ -1026,9 +976,8 @@ const Send: React.FunctionComponent<SendProps> = ({
 
     navigation.navigate(RouteEnum.Computing);
 
-    try {
-      await sendTransaction(sendPageStatePar);
-
+    const sent = await sendTransaction(sendPageStatePar);
+    if (sent.ok) {
       // Clear the fields
       clearState();
 
@@ -1039,80 +988,77 @@ const Send: React.FunctionComponent<SendProps> = ({
       // the app send successfully on the first attemp.
       navigation.navigate(RouteEnum.Computing, { phase: 'created' });
       return;
-    } catch (err1) {
-      let failure = classifySendFailure(err1 as string);
+    }
+    let failure = classifySendFailure(sent.error);
 
-      // The transform decides which families a server switch can plausibly
-      // help; the wallet's own verdicts (dust, duplicate nullifier, a
-      // fail-closed mixnet refusal) are excluded there. If the user selected
-      // a `custom` server, we cannot change it regardless.
-      if (
-        retryOnAnotherServer(failure) &&
-        selectServer !== SelectServerEnum.custom
-      ) {
-        // Pick a working server, same pattern as boot/recovery: the live
-        // registry first (best, excluding the failed server, no probe), then
-        // the static list ranked by latency (also excluding the failed one).
-        let fasterServer: ServerType = {} as ServerType;
-        const live = await fetchServerList(server.chainName);
-        const liveCandidates = live.filter(
-          (s: ServerUrisType) => s.uri !== server.uri,
+    // The transform decides which families a server switch can plausibly
+    // help; the wallet's own verdicts (dust, duplicate nullifier, a
+    // fail-closed mixnet refusal) are excluded there. If the user selected
+    // a `custom` server, we cannot change it regardless.
+    if (
+      retryOnAnotherServer(failure) &&
+      selectServer !== SelectServerEnum.custom
+    ) {
+      // Pick a working server, same pattern as boot/recovery: the live
+      // registry first (best, excluding the failed server, no probe), then
+      // the static list ranked by latency (also excluding the failed one).
+      let fasterServer: ServerType = {} as ServerType;
+      const live = await fetchServerList(server.chainName);
+      const liveCandidates = live.filter(
+        (s: ServerUrisType) => s.uri !== server.uri,
+      );
+      if (liveCandidates.length > 0) {
+        fasterServer = {
+          uri: liveCandidates[0].uri,
+          chainName: liveCandidates[0].chainName,
+        };
+      } else {
+        const serverChecked = await selectingServer(
+          serverUris(translate).filter(
+            (s: ServerUrisType) =>
+              !s.obsolete &&
+              s.chainName === server.chainName &&
+              s.uri !== server.uri,
+          ),
         );
-        if (liveCandidates.length > 0) {
+        if (serverChecked && serverChecked.latency) {
           fasterServer = {
-            uri: liveCandidates[0].uri,
-            chainName: liveCandidates[0].chainName,
+            uri: serverChecked.uri,
+            chainName: serverChecked.chainName,
           };
         } else {
-          const serverChecked = await selectingServer(
-            serverUris(translate).filter(
-              (s: ServerUrisType) =>
-                !s.obsolete &&
-                s.chainName === server.chainName &&
-                s.uri !== server.uri,
-            ),
-          );
-          if (serverChecked && serverChecked.latency) {
-            fasterServer = {
-              uri: serverChecked.uri,
-              chainName: serverChecked.chainName,
-            };
-          } else {
-            fasterServer = server;
-            // likely a connection problem — all servers unreachable / timeout.
-          }
-        }
-        if (fasterServer.uri !== server.uri) {
-          await setServerOption(fasterServer, selectServer, false, true);
-        }
-
-        try {
-          await sendTransaction(sendPageStatePar);
-
-          // Clear the fields
-          clearState();
-
-          // scroll to top in history, just in case.
-          setScrollToTop(true);
-          setScrollToBottom(true);
-
-          // the app send successfully on the second attemp.
-          navigation.navigate(RouteEnum.Computing, { phase: 'created' });
-          return;
-        } catch (err2) {
-          failure = classifySendFailure(err2 as string);
+          fasterServer = server;
+          // likely a connection problem — all servers unreachable / timeout.
         }
       }
+      if (fasterServer.uri !== server.uri) {
+        await setServerOption(fasterServer, selectServer, false, true);
+      }
 
-      const failureText = sendFailureText(failure);
-      navigation.navigate(RouteEnum.Computing, {
-        phase: 'failed',
-        errorMessage:
-          failureText.kind === 'key'
-            ? (translate(failureText.errorKey) as string)
-            : failureText.text,
-      });
+      const resent = await sendTransaction(sendPageStatePar);
+      if (resent.ok) {
+        // Clear the fields
+        clearState();
+
+        // scroll to top in history, just in case.
+        setScrollToTop(true);
+        setScrollToBottom(true);
+
+        // the app send successfully on the second attemp.
+        navigation.navigate(RouteEnum.Computing, { phase: 'created' });
+        return;
+      }
+      failure = classifySendFailure(resent.error);
     }
+
+    const failureText = sendFailureText(failure);
+    navigation.navigate(RouteEnum.Computing, {
+      phase: 'failed',
+      errorMessage:
+        failureText.kind === 'key'
+          ? (translate(failureText.errorKey) as string)
+          : failureText.text,
+    });
   };
 
   const scrollToEnd = () => {

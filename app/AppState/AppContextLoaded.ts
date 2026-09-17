@@ -20,7 +20,7 @@ import { ChainNameEnum } from './enums/ChainNameEnum';
 import { SnackbarDurationEnum } from './enums/SnackbarDurationEnum';
 import { LoadedAppNavigationState } from '@app/types';
 import ValueTransferType from './types/ValueTransferType';
-import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
+import { SyncStatus } from 'zingo-ffi';
 import TransparentAddressClass from './classes/TransparentAddressClass';
 import { ScreenEnum } from './enums/ScreenEnum';
 import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
@@ -52,7 +52,7 @@ export default interface AppContextLoaded {
   info: InfoType;
 
   // syncing Info about the status of the process
-  syncingStatus: RPCSyncStatusType;
+  syncingStatus: SyncStatus;
 
   // wallet birthday block height
   birthday: number;

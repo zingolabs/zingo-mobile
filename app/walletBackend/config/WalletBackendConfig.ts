@@ -6,7 +6,7 @@ import {
   TransparentAddressClass,
   ServerType,
 } from '@app/AppState';
-import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
+import { SyncStatus } from 'zingo-ffi';
 import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
 import {
   StartMixnetTransport,
@@ -34,8 +34,8 @@ export type WalletBackendConfig = {
   ) => void;
   /** Called with server/chain info including latest block height. */
   onInfoChanged: (info: InfoType) => void;
-  /** Called every poll cycle with current sync progress. */
-  onSyncStatusChanged: (status: RPCSyncStatusType) => void;
+  /** Called on every SyncProgress event with the clamped status. */
+  onSyncStatusChanged: (status: SyncStatus) => void;
   onZingolibVersionChanged: (version: string) => void;
   /** Called with the wallet birthday block height after each fetch. */
   onBirthdayChanged: (birthday: number) => void;

@@ -24,10 +24,8 @@ import { AppDrawerParamList } from '@app/types';
 import { useTheme } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
 import { RouteEnum, ScreenEnum } from '@app/AppState';
-import {
-  getMixnetBootstrapDetail,
-  getMixnetStatus,
-} from '@app/walletBackend/utils/mixnetUtils';
+import { getMixnetStatus } from '@app/walletBackend/utils/mixnetUtils';
+import { mixnetDetail } from '@app/walletBackend/transforms/mixnetTransform';
 import {
   MixnetDoctorRow,
   MixnetDoctorRun,
@@ -141,16 +139,13 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
     const statusStart = Date.now();
     const status = await getMixnetStatus();
     const statusMillis = Date.now() - statusStart;
-    const detailStart = Date.now();
-    const detail = await getMixnetBootstrapDetail();
-    const detailMillis = Date.now() - detailStart;
     setRun({
       serverUri: server.uri,
       chainName: server.chainName,
       status,
       statusMillis,
-      detail,
-      detailMillis,
+      detail: mixnetDetail(status),
+      detailMillis: statusMillis,
     });
     setRunning(false);
   }, [server.chainName, server.uri]);

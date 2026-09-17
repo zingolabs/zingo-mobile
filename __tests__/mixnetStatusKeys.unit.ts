@@ -35,7 +35,8 @@ test('F10: every derivable view stays inside the closed key set', () => {
       {
         kind: 'status',
         indicator: RPCMixnetIndicatorEnum.off,
-        socks5Addr: null,
+        socks5Addr: undefined,
+        bootstrapDetail: '',
       },
       null,
     ),
@@ -43,7 +44,8 @@ test('F10: every derivable view stays inside the closed key set', () => {
       {
         kind: 'status',
         indicator: RPCMixnetIndicatorEnum.bootstrapping,
-        socks5Addr: null,
+        socks5Addr: undefined,
+        bootstrapDetail: '',
       },
       null,
     ),
@@ -52,6 +54,7 @@ test('F10: every derivable view stays inside the closed key set', () => {
         kind: 'status',
         indicator: RPCMixnetIndicatorEnum.ready,
         socks5Addr: '127.0.0.1:1',
+        bootstrapDetail: '',
       },
       null,
     ),
@@ -59,7 +62,8 @@ test('F10: every derivable view stays inside the closed key set', () => {
       {
         kind: 'status',
         indicator: RPCMixnetIndicatorEnum.died,
-        socks5Addr: null,
+        socks5Addr: undefined,
+        bootstrapDetail: '',
       },
       null,
     ),

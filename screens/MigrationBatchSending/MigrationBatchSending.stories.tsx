@@ -5,12 +5,11 @@ import {
   screenProps,
   withAppContext,
   withNavigation,
-  withRpc,
+  withWallet,
 } from '../../.storybook/storyDecorators';
-import { json, pending } from '../../.storybook/storyRpc';
+import { answer, pending } from '../../.storybook/storyRpc';
 import {
-  batchSpacing,
-  dueNowStatus,
+  dueNowDenominations,
   haltedBatch,
   skippedBatch,
 } from '../../.storybook/migrationFixtures';
@@ -20,37 +19,22 @@ const meta: Meta<typeof MigrationBatchSending> = {
   component: MigrationBatchSending,
   decorators: [withAppContext(), withNavigation],
   args: screenProps(RouteEnum.MigrationBatchSending, {
-    denominations: dueNowStatus.due_now?.denominations,
+    denominations: dueNowDenominations,
   }),
 };
 
 export default meta;
 type Story = StoryObj<typeof MigrationBatchSending>;
 
-// The batch call stays in flight while the status poll reports progress.
+// The batch call stays in flight; progress arrives through BatchProgress events.
 export const Sending: Story = {
-  decorators: [
-    withRpc({
-      executeDuePartsProcess: pending,
-      executeDuePartsStatusProcess: json(batchSpacing),
-    }),
-  ],
+  decorators: [withWallet({ executeDueParts: pending })],
 };
 // Every part slid or was not yet due: nothing broadcast, nothing lost.
 export const NotSendable: Story = {
-  decorators: [
-    withRpc({
-      executeDuePartsProcess: json(skippedBatch),
-      executeDuePartsStatusProcess: 'null',
-    }),
-  ],
+  decorators: [withWallet({ executeDueParts: answer(skippedBatch) })],
 };
 // A submission failed partway; the un-sent parts remain due.
 export const Halted: Story = {
-  decorators: [
-    withRpc({
-      executeDuePartsProcess: json(haltedBatch),
-      executeDuePartsStatusProcess: 'null',
-    }),
-  ],
+  decorators: [withWallet({ executeDueParts: answer(haltedBatch) })],
 };

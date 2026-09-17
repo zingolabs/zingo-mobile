@@ -1,43 +1,45 @@
 /**
- * Fetches all wallet state from RPCModule and pushes updates via config callbacks.
- *
- * Each public method is guarded by a boolean lock (e.g. fetchTotalBalanceLock)
- * so that concurrent calls from the SyncCoordinator timer loop are safely
- * dropped rather than queued. SyncCoordinator reads these lock flags to decide
- * whether to skip a polling cycle entirely.
- *
- * onSyncError is intentionally a no-op at construction time. WalletBackend
- * overwrites it after SyncCoordinator is created to break the circular
- * dependency: DataService → SyncCoordinator → DataService.
+ * Reads wallet state through the typed handle and publishes it through the
+ * config callbacks. Each fetch holds a lock so overlapping refreshes drop
+ * instead of queueing; `onSyncError` is wired by WalletBackend once the
+ * SyncCoordinator exists.
  */
+import { ZingoError_Tags } from 'zingo-ffi';
 import {
-  TotalBalanceClass,
   InfoType,
   ChainNameEnum,
   CurrencyNameEnum,
   AddressKindEnum,
-  GlobalConst,
-  ValueTransferType,
   UnifiedAddressClass,
   TransparentAddressClass,
   foldBlockSpacing,
 } from '@app/AppState';
-import RPCModule from '@app/RPCModule';
-import { RPCUnifiedAddressType } from '@app/walletBackend/types/RPCUnifiedAddressType';
-import { RPCBalancesType } from '@app/walletBackend/types/RPCBalancesType';
-import { RPCInfoType } from '@app/walletBackend/types/RPCInfoType';
-import { RPCWalletHeight } from '@app/walletBackend/types/RPCWalletHeightType';
-import { RPCValueTransfersType } from '@app/walletBackend/types/RPCValueTransfersType';
-import { RPCValueTransferType } from '@app/walletBackend/types/RPCValueTransferType';
-import { RPCTransparentAddressType } from '@app/walletBackend/types/RPCTransparentAddressType';
-import { RPCSpendablebalanceType } from '@app/walletBackend/types/RPCSpendablebalanceType';
-import { RPCWalletSaveRequiredType } from '@app/walletBackend/types/RPCWalletSaveRequiredType';
-import { RPCConfigWalletPerformanceType } from '@app/walletBackend/types/RPCConfigWalletPerformanceType';
+import { FfiError, zats } from '@app/walletBackend/ffi';
+import { callWallet } from '@app/walletBackend/wallet';
 import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
-import { RPCWalletVersionType } from '@app/walletBackend/types/RPCWalletVersionType';
 import { WalletBackendConfig } from '@app/walletBackend/config/WalletBackendConfig';
+import {
+  addressScope,
+  chainNameOf,
+  performanceLevelName,
+} from '@app/walletBackend/transforms/enumTransform';
 import { transformValueTransfer } from '@app/walletBackend/transforms/valueTransferTransform';
-import { fetchWallet } from '@app/walletBackend/utils/walletUtils';
+import {
+  fetchWallet,
+  getLatestBlockServerInfo,
+  getVersionInfo,
+} from '@app/walletBackend/utils/walletUtils';
+
+const ZATS_PER_ZEC = 10 ** 8;
+
+const NO_INFO: InfoType = {
+  chainName: ChainNameEnum.noneChainName,
+  latestBlock: 0,
+  serverUri: '',
+  version: '',
+  currencyName: CurrencyNameEnum.ZEC,
+  ironwoodActivationHeight: null,
+};
 
 export class DataService {
   config: WalletBackendConfig;
@@ -46,12 +48,9 @@ export class DataService {
   lastServerBlockHeight: number = 0;
   walletBirthday: number = 0;
 
-  // Block-spacing observation: the last (height, wall-clock) pair a server
-  // reading moved from, and the EMA the samples fold into. Null until two
-  // readings at different heights land.
   blockTimeBaseHeight: number = 0;
   blockTimeBaseMs: number = 0;
-  secondsPerBlock: number | null = null;
+  secondsPerBlock: number | undefined;
 
   fetchWalletHeightLock: boolean = false;
   fetchWalletBirthdaySeedUfvkLock: boolean = false;
@@ -63,152 +62,108 @@ export class DataService {
   fetchZingolibVersionLock: boolean = false;
   getWalletSaveRequiredLock: boolean = false;
 
-  // Set by WalletBackend after SyncCoordinator is created, to restart sync on critical errors.
   onSyncError: () => Promise<void> = async () => {};
 
   constructor(config: WalletBackendConfig) {
     this.config = config;
   }
 
-  async fetchTotalBalance() {
+  busy(): boolean {
+    return (
+      this.getWalletSaveRequiredLock ||
+      this.fetchWalletHeightLock ||
+      this.fetchWalletBirthdaySeedUfvkLock ||
+      this.fetchInfoAndServerHeightLock ||
+      this.fetchAddressesLock ||
+      this.fetchTotalBalanceLock ||
+      this.fetchTandZandOValueTransfersLock ||
+      this.fetchTandZandOMessagesLock ||
+      this.fetchZingolibVersionLock
+    );
+  }
+
+  private async fail(scope: string, error: FfiError): Promise<void> {
+    this.config.onError(`Error ${scope}: ${error.tag}: ${error.detail}`);
+    await this.onSyncError();
+  }
+
+  async fetchTotalBalance(): Promise<void> {
     if (this.fetchTotalBalanceLock) {
       return;
     }
     this.fetchTotalBalanceLock = true;
     try {
-      const start = Date.now();
-      const spendableStr: string =
-        await RPCModule.getSpendableBalanceTotalInfo();
-      if (Date.now() - start > 4000) {
-        console.log(
-          '=========================================== > spendable balance - ',
-          Date.now() - start,
-        );
-      }
-      let spendableJSON: RPCSpendablebalanceType =
-        {} as RPCSpendablebalanceType;
-      if (spendableStr) {
-        spendableJSON = await JSON.parse(spendableStr);
-      } else {
-        console.log('Internal Error spendable balance');
-      }
-
-      const start2 = Date.now();
-      const balanceStr: string = await RPCModule.getBalanceInfo();
-      if (Date.now() - start2 > 4000) {
-        console.log(
-          '=========================================== > balance - ',
-          Date.now() - start2,
-        );
-      }
-      if (!balanceStr) {
-        console.log('Internal Error balance');
+      const spendable = await callWallet(wallet => wallet.spendableBalance());
+      if (!spendable.ok) {
+        await this.fail('balance', spendable.error);
         return;
       }
-      const balanceJSON: RPCBalancesType = await JSON.parse(balanceStr);
-
-      const balance: TotalBalanceClass = {
-        totalOrchardBalance: (balanceJSON.total_orchard_balance || 0) / 10 ** 8,
-        totalIronwoodBalance:
-          (balanceJSON.total_ironwood_balance || 0) / 10 ** 8,
-        totalSaplingBalance: (balanceJSON.total_sapling_balance || 0) / 10 ** 8,
+      const balance = await callWallet(wallet => wallet.balance());
+      if (!balance.ok) {
+        await this.fail('balance', balance.error);
+        return;
+      }
+      const b = balance.value;
+      this.config.onBalanceChanged({
+        totalOrchardBalance: zats(b.totalOrchardBalance) / ZATS_PER_ZEC,
+        totalIronwoodBalance: zats(b.totalIronwoodBalance) / ZATS_PER_ZEC,
+        totalSaplingBalance: zats(b.totalSaplingBalance) / ZATS_PER_ZEC,
         totalTransparentBalance:
-          (balanceJSON.total_transparent_balance || 0) / 10 ** 8,
-        confirmedOrchardBalance:
-          (balanceJSON.confirmed_orchard_balance || 0) / 10 ** 8,
+          zats(b.totalTransparentBalance) / ZATS_PER_ZEC,
+        confirmedOrchardBalance: zats(b.confirmedOrchardBalance) / ZATS_PER_ZEC,
         confirmedIronwoodBalance:
-          (balanceJSON.confirmed_ironwood_balance || 0) / 10 ** 8,
-        confirmedSaplingBalance:
-          (balanceJSON.confirmed_sapling_balance || 0) / 10 ** 8,
+          zats(b.confirmedIronwoodBalance) / ZATS_PER_ZEC,
+        confirmedSaplingBalance: zats(b.confirmedSaplingBalance) / ZATS_PER_ZEC,
         confirmedTransparentBalance:
-          (balanceJSON.confirmed_transparent_balance || 0) / 10 ** 8,
-        totalSpendableBalance: (spendableJSON.spendable_balance || 0) / 10 ** 8,
-      };
-      this.config.onBalanceChanged(balance);
-    } catch (error) {
-      console.log(`Critical Error balances ${error}`);
-      this.config.onError(`Error balance: ${error}`);
-      await this.onSyncError();
+          zats(b.confirmedTransparentBalance) / ZATS_PER_ZEC,
+        totalSpendableBalance: zats(spendable.value) / ZATS_PER_ZEC,
+      });
     } finally {
       this.fetchTotalBalanceLock = false;
     }
   }
 
-  async fetchAddresses() {
+  async fetchAddresses(): Promise<void> {
     if (this.fetchAddressesLock) {
       return;
     }
     this.fetchAddressesLock = true;
     try {
-      const start = Date.now();
-      const unifiedAddressesStr: string =
-        await RPCModule.getUnifiedAddressesInfo();
-      if (Date.now() - start > 4000) {
-        console.log(
-          '=========================================== > addresses unified - ',
-          Date.now() - start,
-        );
-      }
-      // The routed getters reject on failure, so error handling lives in
-      // the owning catch; a resolved value is data, never inspected for
-      // an error sentinel (zingo-mobile#1151).
-      if (!unifiedAddressesStr) {
-        console.log('Internal Error addresses');
+      const unified = await callWallet(wallet => wallet.unifiedAddresses());
+      if (!unified.ok) {
+        await this.fail('addresses', unified.error);
         return;
       }
-      const unifiedAddressesJSON: RPCUnifiedAddressType[] =
-        (await JSON.parse(unifiedAddressesStr)) || [];
-
-      const start2 = Date.now();
-      const transparentAddressStr: string =
-        await RPCModule.getTransparentAddressesInfo();
-      if (Date.now() - start2 > 4000) {
-        console.log(
-          '=========================================== > addresses transparent - ',
-          Date.now() - start2,
-        );
-      }
-      if (!transparentAddressStr) {
-        console.log('Internal Error addresses');
+      const transparent = await callWallet(wallet =>
+        wallet.transparentAddresses(),
+      );
+      if (!transparent.ok) {
+        await this.fail('addresses', transparent.error);
         return;
       }
-      const transparentAddressesJSON: RPCTransparentAddressType[] =
-        (await JSON.parse(transparentAddressStr)) || [];
-
-      const allAddresses: (UnifiedAddressClass | TransparentAddressClass)[] =
-        [];
-
-      unifiedAddressesJSON &&
-        unifiedAddressesJSON.forEach((u: RPCUnifiedAddressType) => {
-          allAddresses.push(
+      const addresses: (UnifiedAddressClass | TransparentAddressClass)[] = [
+        ...unified.value.map(
+          u =>
             new UnifiedAddressClass(
-              u.address_index,
-              u.encoded_address,
+              u.addressIndex,
+              u.encodedAddress,
               AddressKindEnum.u,
-              u.has_orchard,
-              u.has_sapling,
-              u.has_transparent,
+              u.hasOrchard,
+              u.hasSapling,
+              u.hasTransparent,
             ),
-          );
-        });
-
-      transparentAddressesJSON &&
-        transparentAddressesJSON.forEach((u: RPCTransparentAddressType) => {
-          allAddresses.push(
+        ),
+        ...transparent.value.map(
+          t =>
             new TransparentAddressClass(
-              u.address_index,
-              u.encoded_address,
+              t.addressIndex,
+              t.encodedAddress,
               AddressKindEnum.t,
-              u.scope,
+              addressScope(t.scope),
             ),
-          );
-        });
-
-      this.config.onAddressesChanged(allAddresses);
-    } catch (error) {
-      console.log(`Critical Error addresses ${error}`);
-      this.config.onError(`Error addresses: ${error}`);
-      await this.onSyncError();
+        ),
+      ];
+      this.config.onAddressesChanged(addresses);
     } finally {
       this.fetchAddressesLock = false;
     }
@@ -220,24 +175,12 @@ export class DataService {
     }
     this.fetchWalletHeightLock = true;
     try {
-      const start = Date.now();
-      const heightStr: string = await RPCModule.getLatestBlockWalletInfo();
-      if (Date.now() - start > 4000) {
-        console.log(
-          '=========================================== > wallet height - ',
-          Date.now() - start,
-        );
-      }
-      if (!heightStr) {
-        console.log('Internal Error wallet height');
+      const height = await callWallet(wallet => wallet.latestBlockWallet());
+      if (!height.ok) {
+        await this.fail('wallet height', height.error);
         return;
       }
-      const heightJSON: RPCWalletHeight = await JSON.parse(heightStr);
-      this.lastWalletBlockHeight = heightJSON.height;
-    } catch (error) {
-      console.log(`Critical Error wallet height ${error}`);
-      this.config.onError(`Error wallet height: ${error}`);
-      await this.onSyncError();
+      this.lastWalletBlockHeight = height.value;
     } finally {
       this.fetchWalletHeightLock = false;
     }
@@ -249,73 +192,43 @@ export class DataService {
     }
     this.fetchInfoAndServerHeightLock = true;
     try {
-      let infoError: boolean = false;
-      const start = Date.now();
-      const infoStr: string = await RPCModule.infoServerInfo();
-      if (Date.now() - start > 4000) {
-        console.log(
-          '=========================================== > info - ',
-          Date.now() - start,
-        );
-      }
-      // infoServerInfo rejects on failure (typed FFI errors); the catch owns
-      // the error path, so a resolved value is data. Only an empty resolution
-      // — a programming error — is classified here.
-      if (!infoStr) {
-        console.log('Internal Error info & server block height');
-        infoError = true;
-      }
-
-      if (infoError) {
-        this.config.onInfoChanged({
-          latestBlock: 0,
-          serverUri: '',
-          version: '',
-        } as InfoType);
+      const info = await callWallet(wallet => wallet.serverInfo());
+      if (!info.ok) {
+        this.config.onInfoChanged(NO_INFO);
         this.lastServerBlockHeight = 0;
+        if (info.error.tag !== ZingoError_Tags.Offline) {
+          await this.fail('info', info.error);
+        }
         return;
       }
-
-      const infoJSON: RPCInfoType = await JSON.parse(infoStr);
-
-      const info: InfoType = {
-        chainName: infoJSON.chain_name,
-        latestBlock: infoJSON.latest_block_height,
-        serverUri: infoJSON.server_uri || '',
-        version: `${infoJSON.vendor}/${infoJSON.git_commit ? infoJSON.git_commit.substring(0, 6) : ''}/${
-          infoJSON.version
-        }`,
+      const s = info.value;
+      const latestBlock = zats(s.latestBlockHeight);
+      const chainName =
+        chainNameOf(s.chainName) ?? ChainNameEnum.noneChainName;
+      const published: InfoType = {
+        chainName,
+        latestBlock,
+        serverUri: s.serverUri,
+        version: `${s.vendor}/${s.gitCommit.substring(0, 6)}/${s.version}`,
         currencyName:
-          infoJSON.chain_name === ChainNameEnum.mainChainName
+          chainName === ChainNameEnum.mainChainName
             ? CurrencyNameEnum.ZEC
             : CurrencyNameEnum.TAZ,
-        // `?? null` collapses both "no activation scheduled" (null) and "older
-        // native lib that doesn't report it" (undefined) into the same
-        // not-yet-active answer.
-        ironwoodActivationHeight: infoJSON.ironwood_activation_height ?? null,
+        ironwoodActivationHeight: s.ironwoodActivationHeight ?? null,
       };
-
-      this.observeBlockSpacing(info.latestBlock, Date.now());
-      if (this.secondsPerBlock !== null) {
-        info.secondsPerBlock = this.secondsPerBlock;
+      this.observeBlockSpacing(latestBlock, Date.now());
+      if (this.secondsPerBlock !== undefined) {
+        published.secondsPerBlock = this.secondsPerBlock;
       }
-
-      this.config.onInfoChanged(info);
-      this.lastServerBlockHeight = info.latestBlock;
-    } catch (error) {
-      console.log(`Critical Error info & server block height ${error}`);
-      this.config.onError(`Error info: ${error}`);
-      await this.onSyncError();
+      this.config.onInfoChanged(published);
+      this.lastServerBlockHeight = latestBlock;
     } finally {
       this.fetchInfoAndServerHeightLock = false;
     }
   }
 
   // One sample per height change: the wall-clock gap since the last reading
-  // that moved, divided by how many blocks it moved. A rewound tip (server
-  // restart) just re-bases; foldBlockSpacing rejects artifact samples (staged
-  // jumps, paused miners) but the base advances regardless, so one artifact
-  // never pollutes the next sample.
+  // that moved, divided by how many blocks it moved. A rewound tip re-bases.
   private observeBlockSpacing(height: number, nowMs: number): void {
     if (height <= 0) {
       return;
@@ -334,7 +247,8 @@ export class DataService {
       (height - this.blockTimeBaseHeight);
     this.blockTimeBaseHeight = height;
     this.blockTimeBaseMs = nowMs;
-    this.secondsPerBlock = foldBlockSpacing(this.secondsPerBlock, sample);
+    this.secondsPerBlock =
+      foldBlockSpacing(this.secondsPerBlock ?? null, sample) ?? undefined;
   }
 
   async fetchZingolibVersion(): Promise<void> {
@@ -343,25 +257,7 @@ export class DataService {
     }
     this.fetchZingolibVersionLock = true;
     try {
-      const start = Date.now();
-      let zingolibStr: string = await RPCModule.getVersionInfo();
-      if (Date.now() - start > 4000) {
-        console.log(
-          '=========================================== > zingolib version - ',
-          Date.now() - start,
-        );
-      }
-      if (!zingolibStr) {
-        console.log('Internal Error zingolib version');
-        zingolibStr = GlobalConst.zingolibNone;
-      }
-
-      this.config.onZingolibVersionChanged(zingolibStr);
-    } catch (error) {
-      console.log(`Critical Error zingolib version ${error}`);
-      this.config.onError(`Error zingolib version: ${error}`);
-      // The version display still needs a value when the FFI rejects.
-      this.config.onZingolibVersionChanged(GlobalConst.zingolibError);
+      this.config.onZingolibVersionChanged(getVersionInfo());
     } finally {
       this.fetchZingolibVersionLock = false;
     }
@@ -374,124 +270,64 @@ export class DataService {
     this.fetchWalletBirthdaySeedUfvkLock = true;
     try {
       const wallet = await fetchWallet(this.config.readOnly);
-
       if (wallet) {
         this.walletBirthday = wallet.birthday;
-        this.config.onBirthdayChanged(wallet.birthday || 0);
+        this.config.onBirthdayChanged(wallet.birthday);
       }
-    } catch (error) {
-      console.log(`Critical Error wallet birthday ${error}`);
-      this.config.onError(`Error wallet birthday: ${error}`);
-      await this.onSyncError();
     } finally {
       this.fetchWalletBirthdaySeedUfvkLock = false;
     }
   }
 
-  async fetchTandZandOValueTransfers() {
+  async fetchTandZandOValueTransfers(): Promise<void> {
     if (this.fetchTandZandOValueTransfersLock) {
       return;
     }
     this.fetchTandZandOValueTransfersLock = true;
     try {
-      const start = Date.now();
-      const heightStr: string = await RPCModule.getLatestBlockServerInfo(
-        this.config.server.uri,
-      );
-      if (Date.now() - start > 4000) {
-        console.log(
-          '=========================================== > server height - ',
-          Date.now() - start,
-        );
+      if (this.config.server.uri) {
+        const height = await getLatestBlockServerInfo(this.config.server.uri);
+        if (height.ok) {
+          this.lastServerBlockHeight = height.value;
+        }
       }
-      if (heightStr) {
-        this.lastServerBlockHeight = Number(heightStr);
-      } else {
-        console.log('Internal Error server height');
-      }
-
-      const start2 = Date.now();
-      const valueTransfersStr: string = await RPCModule.getValueTransfersList();
-      if (Date.now() - start2 > 4000) {
-        console.log(
-          '=========================================== > value transfers - ',
-          Date.now() - start2,
-        );
-      }
-      if (!valueTransfersStr) {
-        console.log('Internal Error value transfers');
+      const transfers = await callWallet(wallet => wallet.valueTransfers());
+      if (!transfers.ok) {
+        await this.fail('value transfers', transfers.error);
         return;
       }
-      const valueTransfersJSON: RPCValueTransfersType =
-        await JSON.parse(valueTransfersStr);
-
-      const vtList: ValueTransferType[] =
-        valueTransfersJSON?.value_transfers?.map((vt: RPCValueTransferType) => {
-          const result = transformValueTransfer(
-            vt,
-            this.lastServerBlockHeight,
-            this.lastWalletBlockHeight,
-          );
-          if (vt.txid.startsWith('xxxxxxxxx')) {
-            console.log('server', this.lastServerBlockHeight);
-            console.log('wallet', this.lastWalletBlockHeight);
-            console.log('valuetransfer zingolib: ', vt);
-            console.log('valuetransfer zingo', result);
-            console.log('--------------------------------------------------');
-          }
-          return result;
-        }) ?? [];
-
-      this.config.onValueTransfersChanged(vtList, vtList.length);
-    } catch (error) {
-      console.log(`Critical Error value transfers ${error}`);
-      this.config.onError(`Error value transfers: ${error}`);
-      await this.onSyncError();
+      const list = transfers.value.map(vt =>
+        transformValueTransfer(
+          vt,
+          this.lastServerBlockHeight,
+          this.lastWalletBlockHeight,
+        ),
+      );
+      this.config.onValueTransfersChanged(list, list.length);
     } finally {
       this.fetchTandZandOValueTransfersLock = false;
     }
   }
 
-  async fetchTandZandOMessages() {
+  async fetchTandZandOMessages(): Promise<void> {
     if (this.fetchTandZandOMessagesLock) {
       return;
     }
     this.fetchTandZandOMessagesLock = true;
     try {
-      const start = Date.now();
-      const messagesStr: string = await RPCModule.getMessagesInfo('');
-      if (Date.now() - start > 4000) {
-        console.log(
-          '=========================================== > messages - ',
-          Date.now() - start,
-        );
-      }
-      if (!messagesStr) {
-        console.log('Internal Error value transfers messages');
+      const messages = await callWallet(wallet => wallet.messages(''));
+      if (!messages.ok) {
+        await this.fail('messages', messages.error);
         return;
       }
-      const messagesJSON: RPCValueTransfersType = await JSON.parse(messagesStr);
-
-      const mList: ValueTransferType[] =
-        messagesJSON?.value_transfers?.map((m: RPCValueTransferType) => {
-          const result = transformValueTransfer(
-            m,
-            this.lastServerBlockHeight,
-            this.lastWalletBlockHeight,
-          );
-          if (m.txid.startsWith('xxxxxxxxx')) {
-            console.log('valuetransfer messages zingolib: ', m);
-            console.log('valuetransfer messages zingo', result);
-            console.log('--------------------------------------------------');
-          }
-          return result;
-        }) ?? [];
-
-      this.config.onMessagesChanged(mList, mList.length);
-    } catch (error) {
-      console.log(`Critical Error value transfers messages ${error}`);
-      this.config.onError(`Error value transfers messages: ${error}`);
-      await this.onSyncError();
+      const list = messages.value.map(m =>
+        transformValueTransfer(
+          m,
+          this.lastServerBlockHeight,
+          this.lastWalletBlockHeight,
+        ),
+      );
+      this.config.onMessagesChanged(list, list.length);
     } finally {
       this.fetchTandZandOMessagesLock = false;
     }
@@ -503,27 +339,14 @@ export class DataService {
     }
     this.getWalletSaveRequiredLock = true;
     try {
-      const start = Date.now();
-      const walletSaveRequiredStr: string =
-        await RPCModule.getWalletSaveRequiredInfo();
-      if (Date.now() - start > 4000) {
-        console.log(
-          '=========================================== > wallet save required - ',
-          Date.now() - start,
+      const required = await callWallet(wallet => wallet.isSaveRequired());
+      if (!required.ok) {
+        this.config.onError(
+          `Error wallet save required: ${required.error.detail}`,
         );
-      }
-      if (!walletSaveRequiredStr) {
-        console.log('Internal Error wallet save required');
         return false;
       }
-      const walletSaveRequiredJSON: RPCWalletSaveRequiredType =
-        await JSON.parse(walletSaveRequiredStr);
-
-      return walletSaveRequiredJSON.save_required;
-    } catch (error) {
-      console.log(`Critical Error wallet save required ${error}`);
-      this.config.onError(`Error wallet save required: ${error}`);
-      return false;
+      return required.value;
     } finally {
       this.getWalletSaveRequiredLock = false;
     }
@@ -532,53 +355,22 @@ export class DataService {
   async getConfigWalletPerformance(): Promise<
     RPCPerformanceLevelEnum | undefined
   > {
-    try {
-      const start = Date.now();
-      const configWalletPerformanceStr: string =
-        await RPCModule.getConfigWalletPerformanceInfo();
-      if (Date.now() - start > 4000) {
-        console.log(
-          '=========================================== > wallet config performance - ',
-          Date.now() - start,
-        );
-      }
-      if (!configWalletPerformanceStr) {
-        console.log('Internal Error wallet config performance');
-        return;
-      }
-      const configWalletPerformanceJSON: RPCConfigWalletPerformanceType =
-        await JSON.parse(configWalletPerformanceStr);
-
-      return configWalletPerformanceJSON.performance_level;
-    } catch (error) {
-      console.log(`Critical Error wallet config performance ${error}`);
-      this.config.onError(`Error wallet config performance: ${error}`);
-      return;
+    const settings = await callWallet(wallet => wallet.settings());
+    if (!settings.ok) {
+      this.config.onError(
+        `Error wallet config performance: ${settings.error.detail}`,
+      );
+      return undefined;
     }
+    return performanceLevelName(settings.value.performance);
   }
 
   async getWalletVersion(): Promise<number | undefined> {
-    try {
-      const start = Date.now();
-      const walletVersionStr: string = await RPCModule.getWalletVersionInfo();
-      if (Date.now() - start > 4000) {
-        console.log(
-          '=========================================== > wallet version - ',
-          Date.now() - start,
-        );
-      }
-      if (!walletVersionStr) {
-        console.log('Internal Error wallet version');
-        return;
-      }
-      const walletVersionJSON: RPCWalletVersionType =
-        await JSON.parse(walletVersionStr);
-
-      return walletVersionJSON.read_version;
-    } catch (error) {
-      console.log(`Critical Error wallet version ${error}`);
-      this.config.onError(`Error wallet version: ${error}`);
-      return;
+    const walletVersion = await callWallet(wallet => wallet.walletVersion());
+    if (!walletVersion.ok) {
+      this.config.onError(`Error wallet version: ${walletVersion.error.detail}`);
+      return undefined;
     }
+    return zats(walletVersion.value.read);
   }
 }

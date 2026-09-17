@@ -10,8 +10,10 @@ import {
   ValueTransferType,
   ProposalPoolsType,
 } from '@app/AppState';
-import { RPCDrainTxType } from '@app/walletBackend/types/RPCDrainPlanType';
-import { RPCMigrationPlanType } from '@app/walletBackend/types/RPCMigrationPlanType';
+import {
+  DrainTransactionType,
+  MigrationPlanType,
+} from '@app/walletBackend/types/MigrationTypes';
 
 /**
  * Root navigation parameter list for the main stack navigator
@@ -82,12 +84,12 @@ export type AppDrawerParamList = {
   [RouteEnum.MigrationTransactions]: undefined;
   // The immediate drain broadcasts here; `transactions` is the previewed plan,
   // so the list matches what the user accepted while the drain re-plans/sends.
-  [RouteEnum.MigrationSending]: { transactions: RPCDrainTxType[] };
+  [RouteEnum.MigrationSending]: { transactions: DrainTransactionType[] };
   [RouteEnum.MigrationSplitPlan]: undefined;
   // The splitting loop runs here; `plan` is the consented preview so the
   // transaction rows match what the user accepted. Absent on banner-rescue
   // re-entry, where the screen renders coarsely from migrationStatus.
-  [RouteEnum.MigrationSplitting]: { plan?: RPCMigrationPlanType } | undefined;
+  [RouteEnum.MigrationSplitting]: { plan?: MigrationPlanType } | undefined;
   [RouteEnum.MigrationCadence]: undefined;
   // The cadence the user picked, so Back from the review screen can restore
   // the selection.

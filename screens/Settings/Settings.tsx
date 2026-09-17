@@ -581,18 +581,17 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
             () =>
               resolve({
                 ok: false,
-                error: { code: 'Unknown', message: 'timeout' },
+                error: { tag: 'Unknown', detail: 'timeout' },
               }),
             15 * 1000,
           ),
       ),
     ]);
-    const heightStr = height.ok ? height.value : '';
-    const working = /^\d+$/.test(heightStr);
+    const working = height.ok;
     setCheckingServer(false);
     setSelectedServerActive(working);
     setSelectedInfo(
-      buildSelectedInfo(uri, working ? Number(heightStr) : 0, chainName),
+      buildSelectedInfo(uri, height.ok ? height.value : 0, chainName),
     );
   };
 
@@ -906,13 +905,13 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                 () =>
                   resolve({
                     ok: false,
-                    error: { code: 'Unknown', message: 'timeout' },
+                    error: { tag: 'Unknown', detail: 'timeout' },
                   }),
                 15 * 1000,
               ),
           ),
         ]);
-        if (!height.ok || !/^\d+$/.test(height.value)) {
+        if (!height.ok) {
           addLastSnackbar(
             translate('loadedapp.tryingnewserver-error') as string,
           );

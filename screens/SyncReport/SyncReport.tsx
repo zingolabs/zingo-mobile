@@ -25,11 +25,12 @@ import {
   faChevronLeft,
   faCloudDownload,
 } from '@fortawesome/free-solid-svg-icons';
-import { isEqual } from 'lodash';
 import BottomSheet, { BottomSheetScrollView } from '@gorhom/bottom-sheet';
-import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
-import { RPCSyncScanRangeStatusType } from '@app/walletBackend/types/RPCSyncScanRangeStatusType';
-import { RPCSyncScanRangePriorityStatusEnum } from '@app/walletBackend/enums/RPCSyncScanRangePriorityStatusEnum';
+import { ScanPriority, ScanRange } from 'zingo-ffi';
+import {
+  hasSyncStatus,
+  scanInProgress,
+} from '@app/walletBackend/utils/syncProgress';
 import { RouteEnum, ScreenEnum } from '@app/AppState';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
@@ -137,34 +138,17 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
 
   useEffect(() => {
     if (
-      !syncingStatus ||
-      isEqual(syncingStatus, {} as RPCSyncStatusType) ||
-      (!!syncingStatus.scan_ranges && syncingStatus.scan_ranges.length === 0) ||
-      syncingStatus.percentage_total_outputs_scanned === 0
+      !hasSyncStatus(syncingStatus) ||
+      syncingStatus.percentageTotalOutputsScanned === 0
     ) {
       // if the App is waiting for the first fetching, let's put 0.
       setPercentageOutputsScanned(0);
       setSyncInProgress(true);
     } else {
-      setPercentageOutputsScanned(
-        syncingStatus.percentage_total_outputs_scanned ??
-          syncingStatus.percentage_total_blocks_scanned ??
-          0,
-      );
-      setSyncInProgress(
-        !!syncingStatus.scan_ranges &&
-          syncingStatus.scan_ranges.length > 0 &&
-          (syncingStatus.percentage_total_outputs_scanned ??
-            syncingStatus.percentage_total_blocks_scanned ??
-            0) < 100,
-      );
+      setPercentageOutputsScanned(syncingStatus.percentageTotalOutputsScanned);
+      setSyncInProgress(scanInProgress(syncingStatus));
     }
-  }, [
-    syncingStatus,
-    syncingStatus.percentage_total_outputs_scanned,
-    syncingStatus.percentage_total_blocks_scanned,
-    syncingStatus.scan_ranges,
-  ]);
+  }, [syncingStatus]);
 
   useEffect(() => {
     // Totals shown as plain text under the chart ("X blocks"). The
@@ -611,45 +595,45 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                           marginBottom: 0,
                         }}
                       >
-                        {!!syncingStatus.scan_ranges &&
-                          syncingStatus.scan_ranges.map(
-                            (range: RPCSyncScanRangeStatusType) => {
+                        {hasSyncStatus(syncingStatus) &&
+                          syncingStatus.scanRanges.map(
+                            (range: ScanRange) => {
                               const percent: number =
-                                ((range.end_block - range.start_block) * 100) /
+                                ((range.endBlock - range.startBlock) * 100) /
                                 (info.latestBlock - birthday);
                               return (
                                 <View
-                                  key={`${range.start_block.toString() + '-' + range.end_block.toString()}`}
+                                  key={`${range.startBlock.toString() + '-' + range.endBlock.toString()}`}
                                   style={{
                                     height: 15,
                                     width: `${percent}%`,
                                     backgroundColor:
                                       range.priority ===
-                                      RPCSyncScanRangePriorityStatusEnum.Scanning
+                                      ScanPriority.Scanning
                                         ? 'orange' /* Scanning */
                                         : range.priority ===
-                                            RPCSyncScanRangePriorityStatusEnum.Scanned
+                                            ScanPriority.Scanned
                                           ? 'green' /* Scanned  */
                                           : range.priority ===
-                                              RPCSyncScanRangePriorityStatusEnum.ScannedWithoutMapping
+                                              ScanPriority.ScannedWithoutMapping
                                             ? 'green' /* Scanned  */
                                             : range.priority ===
-                                                RPCSyncScanRangePriorityStatusEnum.Historic
+                                                ScanPriority.Historic
                                               ? 'gray' /* Low priority */
                                               : range.priority ===
-                                                  RPCSyncScanRangePriorityStatusEnum.OpenAdjacent
+                                                  ScanPriority.OpenAdjacent
                                                 ? 'blue' /* High priority */
                                                 : range.priority ===
-                                                    RPCSyncScanRangePriorityStatusEnum.FoundNote
+                                                    ScanPriority.FoundNote
                                                   ? 'blue' /* High priority */
                                                   : range.priority ===
-                                                      RPCSyncScanRangePriorityStatusEnum.ChainTip
+                                                      ScanPriority.ChainTip
                                                     ? 'blue' /* High priority */
                                                     : range.priority ===
-                                                        RPCSyncScanRangePriorityStatusEnum.Verify
+                                                        ScanPriority.Verify
                                                       ? 'blue' /* High priority */
                                                       : range.priority ===
-                                                          RPCSyncScanRangePriorityStatusEnum.RefetchingNullifiers
+                                                          ScanPriority.RefetchingNullifiers
                                                         ? 'darkorange' /* Refetching spends */
                                                         : 'red' /* error somehow */,
                                   }}

@@ -23,7 +23,7 @@ import { AppContextLoaded } from '@app/AppState';
 import { AppDrawerParamList } from '@app/types';
 import { substituteZingoName } from '@app/utils/ZingoAppData';
 import en from '@app/translations/en.json';
-import { RpcFixture, setRpcFixtures } from './storyRpc';
+import { WalletFixture, setWalletFixtures } from './storyRpc';
 
 // Resolve the real English catalog so stories read like the app, not raw keys.
 const i18n = new I18n({ en });
@@ -84,12 +84,12 @@ export const screenProps = <R extends keyof AppDrawerParamList>(
   } as unknown as NativeStackScreenProps<AppDrawerParamList, R>['route'],
 });
 
-// Registers the bridge answers a screen's backend calls will get on web.
+// Registers the wallet answers a screen's backend calls will get on web.
 // Set during render so the screen's mount effects already see them.
-export const withRpc =
-  (fixtures: Record<string, RpcFixture>): Decorator =>
+export const withWallet =
+  (fixtures: Record<string, WalletFixture>): Decorator =>
   Story => {
-    React.useState(() => setRpcFixtures(fixtures));
+    React.useState(() => setWalletFixtures(fixtures));
     return <Story />;
   };
 

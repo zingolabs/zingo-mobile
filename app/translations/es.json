@@ -110,6 +110,22 @@
     "sends-unit": " env.",
     "memobytes-unit": " car."
   },
+  "ffi": {
+    "invalidmnemonic": "La frase semilla no es válida. Revisa cada palabra y el número de palabras.",
+    "viewingkeymalformed": "La clave de visualización no es válida.",
+    "viewingkeynetworkmismatch": "La clave de visualización pertenece a otra red.",
+    "birthdaybelowactivation": "El cumpleaños {birthday} está por debajo de la altura de activación de Sapling {activation}.",
+    "mnemonicnotfound": "La billetera no tiene frase semilla.",
+    "walletunreadable": "Esta versión no puede leer el archivo de la billetera.",
+    "indexerunreachable": "No se puede conectar con el servidor.",
+    "indexerrequestfailed": "El servidor no respondió a la solicitud.",
+    "offline": "La billetera está sin conexión.",
+    "insufficientfunds": "Fondos insuficientes.",
+    "syncrequired": "Termina la sincronización primero.",
+    "panic": "El motor de la billetera falló. Reinicia la app.",
+    "poisoned": "El motor de la billetera quedó en un estado roto. Reinicia la app.",
+    "busy": "La billetera está ocupada con {detail}. Espera a que termine."
+  },
   "loadingapp": {
     "welcome": "Bienvenido",
     "actualserver": "Servidor Activo:",

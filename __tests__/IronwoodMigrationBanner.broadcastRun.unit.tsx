@@ -16,7 +16,7 @@ import { InfoType } from '@app/AppState';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { migrationStatus, reconcileMigration } from '@app/walletBackend';
-import { RPCMigrationStatusType } from '@app/walletBackend/types/RPCMigrationStatusType';
+import { MigrationStatusType } from '@app/walletBackend/types/MigrationTypes';
 
 jest.mock('@app/walletBackend', () => ({
   migrationStatus: jest.fn(),
@@ -36,37 +36,37 @@ jest.mock('@react-navigation/native', () => ({
 const migrationStatusMock = migrationStatus as jest.Mock;
 const reconcileMock = reconcileMigration as jest.Mock;
 
-const baseStatus: RPCMigrationStatusType = {
-  orchard_confirmed_spendable: 40000000,
-  phase: { kind: 'parts_scheduled' },
-  parts_total: 12,
-  parts_confirmed: 4,
-  parts_broadcast: 0,
-  value_total: 120000000,
-  value_migrated: 40000000,
-  per_bucket: 4,
-  bucket_modulus: 144,
-  upcoming_windows: [],
-  due_now: null,
+const baseStatus: MigrationStatusType = {
+  orchardConfirmedSpendable: 40000000,
+  phase: { kind: 'partsScheduled' },
+  partsTotal: 12,
+  partsConfirmed: 4,
+  partsBroadcast: 0,
+  valueTotal: 120000000,
+  valueMigrated: 40000000,
+  perBucket: 4,
+  bucketModulus: 144,
+  upcomingWindows: [],
+  dueNow: undefined,
 };
 
 // Batch of 4 broadcast and mining while the next window is already open: the
-// backend reports due_now alongside parts_broadcast > 0.
-const overlapStatus: RPCMigrationStatusType = {
+// backend reports due_now alongside partsBroadcast > 0.
+const overlapStatus: MigrationStatusType = {
   ...baseStatus,
-  parts_broadcast: 4,
-  due_now: {
+  partsBroadcast: 4,
+  dueNow: {
     boundary: 3428608,
-    part_ids: [9, 10, 11, 12],
+    partIds: [9, 10, 11, 12],
     denominations: [10000000, 10000000, 10000000, 10000000],
   },
 };
 
 // The batch mined: broadcast run cleared into the confirmed figures.
-const confirmedStatus: RPCMigrationStatusType = {
+const confirmedStatus: MigrationStatusType = {
   ...baseStatus,
-  parts_confirmed: 8,
-  value_migrated: 80000000,
+  partsConfirmed: 8,
+  valueMigrated: 80000000,
 };
 
 function renderBanner(latestBlock: number) {
@@ -90,14 +90,11 @@ function renderBanner(latestBlock: number) {
 
 describe('Ironwood banner broadcast run', () => {
   beforeEach(() => {
-    reconcileMock.mockResolvedValue({ ok: true, value: '{}' });
+    reconcileMock.mockResolvedValue({ ok: true, value: [] });
   });
 
   test('run stays lit while a new window opens over a mining batch', async () => {
-    migrationStatusMock.mockResolvedValue({
-      ok: true,
-      value: JSON.stringify(overlapStatus),
-    });
+    migrationStatusMock.mockResolvedValue({ ok: true, value: overlapStatus });
     const { UNSAFE_getByType } = renderBanner(3428600);
     await waitFor(() => {
       expect(UNSAFE_getByType(SegmentedBar).props.active).toBe(4);
@@ -106,10 +103,7 @@ describe('Ironwood banner broadcast run', () => {
   });
 
   test('a new block clears the run into confirmed segments in place', async () => {
-    migrationStatusMock.mockResolvedValue({
-      ok: true,
-      value: JSON.stringify(overlapStatus),
-    });
+    migrationStatusMock.mockResolvedValue({ ok: true, value: overlapStatus });
     const { UNSAFE_getByType, rerender } = renderBanner(3428600);
     await waitFor(() => {
       expect(UNSAFE_getByType(SegmentedBar).props.active).toBe(4);
@@ -117,7 +111,7 @@ describe('Ironwood banner broadcast run', () => {
 
     migrationStatusMock.mockResolvedValue({
       ok: true,
-      value: JSON.stringify(confirmedStatus),
+      value: confirmedStatus,
     });
     rerender(
       <ContextAppLoadedProvider
