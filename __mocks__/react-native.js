@@ -57,6 +57,13 @@ jest.mock('react-native', () => {
   RN.NativeModules.ScreenSecurity = {
     setSecure: jest.fn(() => Promise.resolve(true)),
   };
+  RN.NativeModules.DeviceAuth = {
+    canAuthenticate: jest.fn(async () => ({ available: true, code: '' })),
+    authenticate: jest.fn(async () => ({
+      outcome: 'authenticated',
+      code: '',
+    })),
+  };
   RN.View = jest.fn();
   RN.RefreshControl = jest.fn(() => null);
 

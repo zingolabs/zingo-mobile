@@ -2,7 +2,7 @@
  * @format
  */
 
-import { InfoType, isIronwoodActive } from '../app/AppState';
+import { InfoType, isIronwoodActive } from '@app/AppState';
 
 // Stands in for whatever zingolib reports for the connected chain; the value
 // itself is never asserted on, only how the tip compares to it.

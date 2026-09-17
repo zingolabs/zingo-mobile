@@ -16,6 +16,8 @@ import {
 import { ZecAmountSplitType } from './types/ZecAmountSplitType';
 import {
   ChainNameEnum,
+  ErrorKeyed,
+  GateFailure,
   GlobalConst,
   LanguageEnum,
   SendJsonToTypeType,
@@ -23,19 +25,19 @@ import {
   ServerType,
   TranslateType,
   BlockExplorerEnum,
-} from '../AppState';
+} from '@app/AppState';
 
 import randomColor from 'randomcolor';
 import {
   getDonationAddress,
   getZenniesDonationAddress,
   parseAddress,
-} from '../walletBackend';
+} from '@app/walletBackend';
 import { Buffer } from 'buffer';
-import { RPCParseAddressType } from '../walletBackend/types/RPCParseAddressType';
-import { RPCParseAddressStatusEnum } from '../walletBackend/enums/RPCParseAddressStatusEnum';
-import { RPCAddressKindEnum } from '../walletBackend/enums/RPCAddressKindEnum';
-import { RPCReceiversEnum } from '../walletBackend/enums/RPCReceiversEnum';
+import { RPCParseAddressType } from '@app/walletBackend/types/RPCParseAddressType';
+import { RPCParseAddressStatusEnum } from '@app/walletBackend/enums/RPCParseAddressStatusEnum';
+import { RPCAddressKindEnum } from '@app/walletBackend/enums/RPCAddressKindEnum';
+import { RPCReceiversEnum } from '@app/walletBackend/enums/RPCReceiversEnum';
 
 export default class Utils {
   static trimToSmall(addr?: string, numChars?: number): string {
@@ -365,20 +367,20 @@ export default class Utils {
   static async isValidAddress(
     address: string,
     serverChainName: string,
-  ): Promise<{ isValid: boolean; onlyOrchardUA: string }> {
+  ): Promise<{ isValid: boolean; shieldedOnlyUA: string }> {
     const result = await parseAddress(address);
     let isValid: boolean = false;
     let isFullUA: boolean = false;
-    let onlyOrchardUA: string = '';
+    let shieldedOnlyUA: string = '';
 
     if (!result.ok || !result.value) {
-      return { isValid, onlyOrchardUA };
+      return { isValid, shieldedOnlyUA };
     }
     let resultJSON = {} as RPCParseAddressType;
     try {
       resultJSON = await JSON.parse(result.value);
     } catch (e) {
-      return { isValid, onlyOrchardUA };
+      return { isValid, shieldedOnlyUA };
     }
 
     isValid =
@@ -399,13 +401,13 @@ export default class Utils {
         );
       if (isFullUA) {
         // the only use case for this is: if the UA is full (3 receivers)
-        onlyOrchardUA = resultJSON.only_orchard_ua
-          ? resultJSON.only_orchard_ua
+        shieldedOnlyUA = resultJSON.shielded_only_ua
+          ? resultJSON.shielded_only_ua
           : '';
       }
     }
 
-    return { isValid, onlyOrchardUA };
+    return { isValid, shieldedOnlyUA };
   }
 
   static async isValidOrchardOrSaplingAddress(
@@ -515,5 +517,27 @@ export default class Utils {
       /\b(main|test|regtest)\b/g,
       token => translate(`settings.value-chainname-${token}`) as string,
     );
+  }
+
+  /**
+   * Renders an ErrorKeyed failure for display: the translated catalog
+   * entry, followed by the offending fragment when the error carries one.
+   * This is the display-edge counterpart of the ErrorKey convention
+   * (docs/adr/0002-error-keys-not-prose.md).
+   */
+  static renderErrorKeyed(
+    failure: ErrorKeyed<string>,
+    translate: (key: string) => TranslateType,
+  ): string {
+    const text = translate(failure.errorKey) as string;
+    return failure.param ? `${text} "${failure.param}"` : text;
+  }
+
+  /** Renders a gate failure for user copy, translating its catalog key and keeping the raw diagnostic out. */
+  static renderGateFailure(
+    failure: GateFailure,
+    translate: (key: string) => TranslateType,
+  ): string {
+    return translate(failure.errorKey) as string;
   }
 }

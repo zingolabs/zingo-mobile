@@ -5,12 +5,12 @@
  * typed rejection codes, never from error prose. A resolved payload
  * carrying the legacy { error } JSON shape is a generic failure.
  */
-import { FfiResult } from '../app/walletBackend/ffi';
+import { FfiResult } from '@app/walletBackend/ffi';
 import {
   routeCadencePlan,
   routeRescheduleParts,
   routeStartMigration,
-} from '../app/walletBackend/utils/migrationRouting';
+} from '@app/walletBackend/utils/migrationRouting';
 
 const rejected = (code: string, message = 'boom'): FfiResult<string> => ({
   ok: false,

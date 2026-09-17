@@ -1,4 +1,4 @@
-import InfoType from '../types/InfoType';
+import InfoType from '@app/AppState/types/InfoType';
 
 /**
  * True once the connected chain's tip has passed Ironwood (NU6.3) activation.

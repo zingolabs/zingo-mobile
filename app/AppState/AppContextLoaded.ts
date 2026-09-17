@@ -18,13 +18,14 @@ import { ModeEnum } from './enums/ModeEnum';
 import { SelectServerEnum } from './enums/SelectServerEnum';
 import { ChainNameEnum } from './enums/ChainNameEnum';
 import { SnackbarDurationEnum } from './enums/SnackbarDurationEnum';
-import { LoadedAppNavigationState } from '../types';
+import { LoadedAppNavigationState } from '@app/types';
 import ValueTransferType from './types/ValueTransferType';
-import { RPCSyncStatusType } from '../walletBackend/types/RPCSyncStatusType';
+import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
 import TransparentAddressClass from './classes/TransparentAddressClass';
 import { ScreenEnum } from './enums/ScreenEnum';
-import { RPCPerformanceLevelEnum } from '../walletBackend/enums/RPCPerformanceLevelEnum';
+import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
 import { BlockExplorerEnum } from './enums/BlockExplorerEnum';
+import { MixnetView } from '@app/walletBackend/transforms/mixnetView';
 
 export default interface AppContextLoaded {
   netInfo: NetInfoType;
@@ -99,7 +100,11 @@ export default interface AppContextLoaded {
   // Opens the shared "Add Tag / Add Contact" BottomSheet modal in-place,
   // pre-filled with the given address. Used from any screen that displays an
   // address (AddressItem's + icon).
-  launchAddTagModal: (address: string, swapChain?: string) => void;
+  launchAddTagModal: (
+    address: string,
+    swapChain?: string,
+    initialLabel?: string,
+  ) => void;
 
   // is calculated in the header & needed in the send screen
   shieldingAmount: number;
@@ -141,8 +146,13 @@ export default interface AppContextLoaded {
   recoveryWalletInfoOnDevice: boolean;
   performanceLevel: RPCPerformanceLevelEnum;
   blockExplorer: BlockExplorerEnum;
+  // The persisted send-route preference; the transport runs either way.
   nym: boolean;
   setNymOption: (value: boolean) => Promise<void>;
+
+  // Null where the mixnet policy does not run.
+  mixnetView: MixnetView | null;
+  reenableMixnet: () => Promise<void>;
   setModeOption: (value: string) => Promise<void>;
   setCurrencyOption: (value: CurrencyEnum) => Promise<void>;
 

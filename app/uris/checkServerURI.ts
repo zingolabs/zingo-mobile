@@ -1,6 +1,10 @@
-import { ChainNameEnum } from '../AppState';
-import { changeServer, getBalanceInfo, getServerInfo } from '../walletBackend';
-import { RPCInfoType } from '../walletBackend/types/RPCInfoType';
+import { ChainNameEnum } from '@app/AppState';
+import {
+  changeServer,
+  getBalanceInfo,
+  getServerInfo,
+} from '@app/walletBackend';
+import { RPCInfoType } from '@app/walletBackend/types/RPCInfoType';
 
 type checkServerURIReturn = {
   result: boolean;

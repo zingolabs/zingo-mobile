@@ -1,5 +1,6 @@
 import {
   AddressKindEnum,
+  BiometricGateOutcome,
   ChainNameEnum,
   LaunchingModeEnum,
   RouteEnum,
@@ -7,10 +8,10 @@ import {
   SendPageStateClass,
   UfvkActionEnum,
   ValueTransferType,
-} from '../AppState';
-import { RPCParseAddressType } from '../walletBackend/types/RPCParseAddressType';
-import { RPCDrainTxType } from '../walletBackend/types/RPCDrainPlanType';
-import { RPCMigrationPlanType } from '../walletBackend/types/RPCMigrationPlanType';
+  ProposalPoolsType,
+} from '@app/AppState';
+import { RPCDrainTxType } from '@app/walletBackend/types/RPCDrainPlanType';
+import { RPCMigrationPlanType } from '@app/walletBackend/types/RPCMigrationPlanType';
 
 /**
  * Root navigation parameter list for the main stack navigator
@@ -34,7 +35,10 @@ export type AppStackParamList = {
 export type LoadingAppNavigationState = {
   screen?: RouteEnum;
   startingApp?: boolean;
-  biometricsFailed?: boolean;
+  // The gate outcome rides with the navigation whole, so a declined gate
+  // always carries its failure and the locked screen renders the reason it
+  // was locked for.
+  biometricGate?: BiometricGateOutcome;
   newWallet?: boolean;
 };
 /**
@@ -66,6 +70,7 @@ export type AppDrawerParamList = {
   [RouteEnum.Messages]: undefined;
   [RouteEnum.Settings]: undefined;
   [RouteEnum.About]: undefined;
+  [RouteEnum.MixnetDoctor]: undefined;
   [RouteEnum.Rescan]: undefined;
   [RouteEnum.Insight]: undefined;
   [RouteEnum.Computing]:
@@ -140,7 +145,7 @@ export type ValueTransferDetailNavigationState = {
 
 export type ConfirmNavigationState = {
   calculatedFee: number;
-  parseAddressInfoJSON: RPCParseAddressType;
+  proposalPools: ProposalPoolsType;
   donationAmount: number;
   confirmSend: (s: SendPageStateClass) => Promise<void>;
   sendAllAmount: boolean;

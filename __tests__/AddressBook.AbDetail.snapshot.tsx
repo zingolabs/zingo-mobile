@@ -9,14 +9,14 @@ import { render, RenderResult } from '@testing-library/react-native';
 import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
-} from '../app/context';
-import AbDetail from '../components/AddressBook/components/AbDetail';
+} from '@app/context';
+import AbDetail from '@screens/AddressBook/components/AbDetail';
 import {
   AddressBookActionEnum,
   AddressBookFileClass,
   RouteEnum,
   ScreenEnum,
-} from '../app/AppState';
+} from '@app/AppState';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockAddressBook } from '../__mocks__/dataMocks/mockAddressBook';
 

@@ -1,6 +1,6 @@
 import { StackNavigationProp } from '@react-navigation/stack';
-import { AppStackParamList } from '../../app/types';
-import { RouteEnum } from '../../app/AppState';
+import { AppStackParamList } from '@app/types';
+import { RouteEnum } from '@app/AppState';
 
 export const mockLoadedAppNavigation: StackNavigationProp<
   AppStackParamList,

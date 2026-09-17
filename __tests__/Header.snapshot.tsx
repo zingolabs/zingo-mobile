@@ -6,15 +6,15 @@ import 'react-native';
 import React from 'react';
 
 import { render } from '@testing-library/react-native';
-import Header from '../components/Header';
+import Header from '@ui/widgets/Header';
 import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
-} from '../app/context';
+} from '@app/context';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
-import { ScreenEnum } from '../app/AppState';
+import { ScreenEnum } from '@app/AppState';
 
 // test suite
 describe('Component Header - test', () => {
@@ -44,6 +44,8 @@ describe('Component Header - test', () => {
     state.translate = mockTranslate;
     state.info = mockInfo;
     state.totalBalance = mockTotalBalance;
+    // The price ring renders only for a Nym-consenting session.
+    state.nym = true;
     const onFunction = jest.fn();
     const header = render(
       <ContextAppLoadedProvider value={state}>

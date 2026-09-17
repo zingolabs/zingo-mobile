@@ -215,7 +215,7 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
               }
             >
               <
-                color="#ffffff"
+                color="#c3c3c3"
                 icon={
                   {
                     "icon": [
@@ -300,6 +300,7 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
           />
         </View>
         <View
+          accessibilityRole="button"
           accessibilityState={
             {
               "busy": undefined,
@@ -332,7 +333,7 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
               "alignItems": "center",
               "backgroundColor": "transparent",
               "borderRadius": 24,
-              "color": "#ffffff",
+              "color": "#c3c3c3",
               "justifyContent": "center",
               "maxWidth": "90%",
               "minHeight": 48,
@@ -362,7 +363,7 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
             <Text
               style={
                 {
-                  "color": "#ffffff",
+                  "color": "#c3c3c3",
                   "fontFamily": "monospace",
                   "fontSize": 16,
                   "fontWeight": "600",
@@ -522,6 +523,7 @@ exports[`Component SingleAddress UFVK - test SingleAddress UFVK - snapshot 1`] =
         </View>
       </View>
       <View
+        accessibilityRole="button"
         accessibilityState={
           {
             "busy": undefined,
@@ -554,7 +556,7 @@ exports[`Component SingleAddress UFVK - test SingleAddress UFVK - snapshot 1`] =
             "alignItems": "center",
             "backgroundColor": "transparent",
             "borderRadius": 24,
-            "color": "#ffffff",
+            "color": "#c3c3c3",
             "justifyContent": "center",
             "maxWidth": "90%",
             "minHeight": 48,
@@ -583,7 +585,7 @@ exports[`Component SingleAddress UFVK - test SingleAddress UFVK - snapshot 1`] =
           <Text
             style={
               {
-                "color": "#ffffff",
+                "color": "#c3c3c3",
                 "fontFamily": "monospace",
                 "fontSize": 16,
                 "fontWeight": "600",

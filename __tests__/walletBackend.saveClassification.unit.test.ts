@@ -9,16 +9,16 @@
  * bytes. Its one base64 classifier, WalletBackup.isRestorable, guards
  * the restore read-back and has its own JVM suite.)
  */
-jest.mock('../app/RPCModule', () =>
+jest.mock('@app/RPCModule', () =>
   require('../__mocks__/rpcModuleProxy').rpcModuleProxyMock(),
 );
 
-import RPCModule from '../app/RPCModule';
+import RPCModule from '@app/RPCModule';
 import {
   doSave,
   doSaveBackup,
   nativeSaveSucceeded,
-} from '../app/walletBackend/utils/walletUtils';
+} from '@app/walletBackend/utils/walletUtils';
 
 const mockedDoSave = RPCModule.doSave as jest.Mock;
 const mockedDoSaveBackup = RPCModule.doSaveBackup as jest.Mock;

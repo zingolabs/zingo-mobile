@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Window background — matches `advancePalette[0]` in App.tsx so the
-         Android activity background blends with the dark theme when
-         react-native-keyboard-controller enables edge-to-edge mode and
-         the activity is drawn behind the system bars. -->
-    <color name="window_background">#010A17</color>
+    <!-- Window background. Matches `bgCanvas` in app/theme/tokens.ts so the
+         activity blends with the theme where it is drawn behind the system
+         bars in edge-to-edge mode. -->
+    <color name="window_background">#060B12</color>
 </resources>

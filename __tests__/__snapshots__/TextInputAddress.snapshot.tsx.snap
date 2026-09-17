@@ -21,7 +21,7 @@ exports[`TextInputAddress - snapshots TextInputAddress disabled without label 1`
     <View
       style={
         {
-          "borderColor": "#ffffff",
+          "borderColor": "#888888",
           "borderRadius": 12,
           "borderWidth": 1,
           "marginTop": 5,
@@ -111,7 +111,7 @@ exports[`TextInputAddress - snapshots TextInputAddress disabled without label 1`
             testID="send.scan-button"
           >
             <
-              color="#ffffff"
+              color="#888888"
               icon={
                 {
                   "icon": [
@@ -183,7 +183,7 @@ exports[`TextInputAddress - snapshots TextInputAddress empty, enabled, with labe
     <View
       style={
         {
-          "borderColor": "#ffffff",
+          "borderColor": "#888888",
           "borderRadius": 12,
           "borderWidth": 1,
           "marginTop": 5,
@@ -273,7 +273,7 @@ exports[`TextInputAddress - snapshots TextInputAddress empty, enabled, with labe
             testID="send.scan-button"
           >
             <
-              color="#ffffff"
+              color="#888888"
               icon={
                 {
                   "icon": [

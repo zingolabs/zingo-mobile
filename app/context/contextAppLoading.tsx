@@ -13,8 +13,8 @@ import {
   CurrencyEnum,
   SelectServerEnum,
   BlockExplorerEnum,
-} from '../AppState';
-import { RPCPerformanceLevelEnum } from '../walletBackend/enums/RPCPerformanceLevelEnum';
+} from '@app/AppState';
+import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
 
 export const defaultAppContextLoading: AppContextLoading = {
   netInfo: {} as NetInfoType,

@@ -16,13 +16,16 @@ import * as Keychain from 'react-native-keychain';
  * Profiles:
  *
  * - `INTERACTIVE_AUTH`: the read/write is gated by an OS auth prompt
- *   (biometric or device credential). Used by `simpleBiometrics` to gate
- *   app startup and foreground-resume. Critically, the Android prompt
+ *   (biometric or device credential). The retired keychain-sentinel gate
+ *   was its only consumer (ADR 0007 replaced it with the DeviceAuth
+ *   native module), so the profile is currently unused and awaits its own
+ *   removal. Critically, the Android prompt
  *   accepts EITHER biometric (BIOMETRIC_STRONG) OR the device passcode —
  *   without explicitly setting `accessControl` the lib defaults to a
  *   prompt that only accepts BIOMETRIC_STRONG, which fails on
  *   passcode-only devices (e.g. Galaxy Tab A8) with
- *   `BIOMETRIC_ERROR_HW_UNAVAILABLE` (code 12).
+ *   `BIOMETRIC_ERROR_HW_UNAVAILABLE` (code 12). Both platforms now use the
+ *   `BIOMETRY_ANY_OR_DEVICE_PASSCODE` shape for the same reason.
  *
  * - `SILENT_SECURE`: no prompt. The data is encrypted at rest in the
  *   hardware-backed Keystore/Keychain but readable any time the device is
@@ -64,12 +67,25 @@ export function buildSetOptions(
   }
 
   // INTERACTIVE_AUTH
+  // iOS: `BIOMETRY_ANY_OR_DEVICE_PASSCODE` maps to
+  // `kSecAccessControlTouchIDAny|Or|DevicePasscode`, which Apple defines as
+  // `kSecAccessControlUserPresence`. The `CurrentSet` variant this used to
+  // carry snapshots the biometric enrolment into the entry, so it breaks two
+  // ways: re-enrolling Face ID invalidates the entry, and on a device with no
+  // enrolment at all there is nothing to snapshot, so `SecItemAdd` rejects
+  // before any prompt appears. The entry holds the string "1", so that
+  // strictness buys nothing, and it cost a user their wallet (issue #1266).
+  //
+  // Do not "simplify" this to `USER_PRESENCE` even though iOS treats the two
+  // as equal. `KeychainModule.kt` excludes that constant from both
+  // `getUsePasscode` and `getUseBiometry`, which drops Android back to a
+  // biometric-only prompt and reopens the passcode-only failure below.
   const iosPart =
     Platform.OS === 'ios'
       ? {
           accessible: Keychain.ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
           accessControl:
-            Keychain.ACCESS_CONTROL.BIOMETRY_CURRENT_SET_OR_DEVICE_PASSCODE,
+            Keychain.ACCESS_CONTROL.BIOMETRY_ANY_OR_DEVICE_PASSCODE,
         }
       : {};
   // Android: `storage: AES_GCM` makes the underlying KeyStore key auth-

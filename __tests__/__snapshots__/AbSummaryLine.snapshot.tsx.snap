@@ -208,7 +208,7 @@ exports[`AbSummaryLine - snapshots AbSummaryLine normal contact 1`] = `
         }
       >
         <
-          color="#ffffff"
+          color="#c3c3c3"
           icon={
             {
               "icon": [
@@ -347,7 +347,7 @@ exports[`AbSummaryLine - snapshots AbSummaryLine normal contact 1`] = `
         }
       >
         <
-          color="#ffffff"
+          color="#c3c3c3"
           icon={
             {
               "icon": [
@@ -755,7 +755,7 @@ exports[`AbSummaryLine - snapshots AbSummaryLine readOnly mode 1`] = `
         }
       >
         <
-          color="#ffffff"
+          color="#c3c3c3"
           icon={
             {
               "icon": [
@@ -828,7 +828,7 @@ exports[`AbSummaryLine - snapshots AbSummaryLine readOnly mode 1`] = `
         }
       >
         <
-          color="#ffffff"
+          color="#c3c3c3"
           icon={
             {
               "icon": [

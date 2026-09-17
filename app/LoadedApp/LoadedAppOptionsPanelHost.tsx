@@ -1,17 +1,17 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 
-import { OptionsPanelHost } from '../../components/OptionsPanel';
+import { OptionsPanelHost } from '@screens/OptionsPanel';
 import type {
   OptionsPanelAction,
   OptionsPanelSocial,
-} from '../../components/OptionsPanel';
-import { closeOptionsPanel, useOptionsPanel } from '../context/optionsPanel';
-import { ContextAppLoaded } from '../context';
-import { MenuItemEnum, ModeEnum, SelectServerEnum } from '../AppState';
-import { sendEmail } from '../sendEmail';
-import { walletBackupExists } from '../walletBackend';
-import { getZingoLogo, getZingoName } from '../utils/ZingoAppData';
-import { advancedTheme, basicTheme } from '../../App';
+} from '@screens/OptionsPanel';
+import { closeOptionsPanel, useOptionsPanel } from '@app/context/optionsPanel';
+import { ContextAppLoaded } from '@app/context';
+import { MenuItemEnum, ModeEnum, SelectServerEnum } from '@app/AppState';
+import { sendEmail } from '@app/services/sendEmail';
+import { walletBackupExists } from '@app/walletBackend';
+import { getZingoLogo, getZingoName } from '@app/utils/ZingoAppData';
+import { advancedTokens, basicTokens } from '@app/theme';
 
 import AddressBookIcon from '../../assets/img/options/address-book.svg';
 import AddressBookBasicIcon from '../../assets/img/options/address-book-basic.svg';
@@ -274,9 +274,7 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
     return {
       walletName: getZingoName(),
       targetModeLabel: translate(`settings.value-mode-${target}`) as string,
-      targetModeColor: isBasic
-        ? advancedTheme.colors.primary
-        : basicTheme.colors.primary,
+      targetModeColor: isBasic ? advancedTokens.fgAccent : basicTokens.fgAccent,
       logoSource: getZingoLogo(),
       // Intentionally NOT closing the panel — staying open lets the user
       // see the action grid change as it re-filters by the new mode.

@@ -20,7 +20,7 @@ class FfiOutcomeTest {
         "init_new" to (ZingolibException.Init("boom") to "Init"),
         "init_from_seed" to (ZingolibException.Init("boom") to "Init"),
         "init_from_ufvk" to (ZingolibException.Init("boom") to "Init"),
-        "init_from_b64" to (ZingolibException.Init("boom") to "Init"),
+        "init_from_bytes" to (ZingolibException.Init("boom") to "Init"),
         "run_sync" to (ZingolibException.Sync("boom") to "Sync"),
         "pause_sync" to (ZingolibException.Sync("boom") to "Sync"),
         "status_sync" to (ZingolibException.Sync("boom") to "Sync"),

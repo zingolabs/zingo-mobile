@@ -410,9 +410,29 @@ async fn execute_parse_address_invalid(abi: &str) {
     assert_eq!(exit_code, 0);
 }
 
+async fn double_wrap_repro(abi: &str) {
+    #[cfg(not(feature = "ci"))]
+    let (exit_code, output, error) =
+        zingomobile_utils::android_integration_test(abi, "DoubleWrapReproTest", None);
+    #[cfg(feature = "ci")]
+    let (exit_code, output, error) =
+        zingomobile_utils::android_integration_test_ci(abi, "DoubleWrapReproTest", None);
+
+    println!("Exit Code: {}", exit_code);
+    println!("Output: {}", output);
+    println!("Error: {}", error);
+
+    assert_eq!(exit_code, 0);
+}
+
 mod android_integration {
     mod x86_32 {
         const ABI: &str = "x86";
+
+        #[tokio::test]
+        async fn double_wrap_repro() {
+            crate::double_wrap_repro(ABI).await;
+        }
 
         #[tokio::test]
         async fn execute_version_from_seed() {
@@ -464,6 +484,11 @@ mod android_integration {
         const ABI: &str = "x86_64";
 
         #[tokio::test]
+        async fn double_wrap_repro() {
+            crate::double_wrap_repro(ABI).await;
+        }
+
+        #[tokio::test]
         async fn execute_version_from_seed() {
             crate::execute_version_from_seed(ABI).await;
         }
@@ -513,6 +538,11 @@ mod android_integration {
         const ABI: &str = "armeabi-v7a";
 
         #[tokio::test]
+        async fn double_wrap_repro() {
+            crate::double_wrap_repro(ABI).await;
+        }
+
+        #[tokio::test]
         async fn execute_version_from_seed() {
             crate::execute_version_from_seed(ABI).await;
         }
@@ -560,6 +590,11 @@ mod android_integration {
 
     mod arm64 {
         const ABI: &str = "arm64-v8a";
+
+        #[tokio::test]
+        async fn double_wrap_repro() {
+            crate::double_wrap_repro(ABI).await;
+        }
 
         #[tokio::test]
         async fn execute_version_from_seed() {

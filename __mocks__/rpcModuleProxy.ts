@@ -4,8 +4,8 @@
  * RPCModule member cannot break a suite that uses it. Shared by every
  * walletBackend unit suite that mocks the bridge:
  *
- *   jest.mock('../app/RPCModule', () =>
- *     require('../__mocks__/rpcModuleProxy').rpcModuleProxyMock(),
+ *   jest.mock('@app/RPCModule', () =>
+ *     require('./rpcModuleProxy').rpcModuleProxyMock(),
  *   );
  */
 export function rpcModuleProxyMock() {

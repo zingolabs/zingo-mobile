@@ -11,12 +11,12 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { useTheme } from '@react-navigation/native';
+import { useTheme } from '@app/theme';
 import { I18n } from 'i18n-js';
 import * as RNLocalize from 'react-native-localize';
 import { isEqual } from 'lodash';
 import { StackScreenProps } from '@react-navigation/stack';
-import { LoadingAppNavigationState, AppDrawerParamList } from '../types';
+import { LoadingAppNavigationState, AppDrawerParamList } from '@app/types';
 import NetInfo, {
   NetInfoSubscription,
   NetInfoState,
@@ -26,7 +26,7 @@ import {
   deactivateKeepAwake,
 } from '@sayem314/react-native-keep-awake';
 
-import WalletBackend, { fetchWallet } from '../walletBackend';
+import WalletBackend, { fetchWallet } from '@app/walletBackend';
 import {
   changeServer,
   doSave,
@@ -35,7 +35,7 @@ import {
   parseAddress,
   reconcileMigration,
   setConfigWalletToProd,
-} from '../walletBackend';
+} from '@app/walletBackend';
 import {
   AppStateLoaded,
   TotalBalanceClass,
@@ -46,6 +46,7 @@ import {
   BackgroundType,
   TranslateType,
   ServerType,
+  ServerUrisType,
   SetServerResult,
   AddressBookFileClass,
   SecurityType,
@@ -75,105 +76,110 @@ import {
   LaunchingModeEnum,
   BlockExplorerEnum,
   SnackbarDurationEnum,
-} from '../AppState';
-import Utils from '../utils';
-import { getZingoVersion, substituteZingoName } from '../utils/ZingoAppData';
-import { ThemeType } from '../types';
-import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
-import { ContextAppLoadedProvider } from '../context';
-import { parseZcashURI, serverUris } from '../uris';
-import BackgroundFileImpl from '../../components/Background';
+} from '@app/AppState';
+import Utils from '@app/utils';
+import { getZingoVersion, substituteZingoName } from '@app/utils/ZingoAppData';
+import { AppTheme } from '@app/theme';
+import SettingsFileImpl from '@app/services/SettingsFileImpl';
+import { PriceTrafficDriver } from '@ui/widgets/PriceFetcher';
+import { priceFetcherStore } from '@ui/widgets/priceFetcherStore';
+import { ContextAppLoadedProvider } from '@app/context';
+import { parseZcashURI, serverUris, fetchServerList } from '@app/uris';
+import selectingServer from '@app/services/selectingServer';
+import BackgroundFileImpl from '@app/services/BackgroundFileImpl';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { createAlert } from '../createAlert';
-import { sendEmail } from '../sendEmail';
+import { createAlert } from '@app/services/createAlert';
+import { sendEmail } from '@app/services/sendEmail';
 import Toast from 'react-native-toast-message';
-import { toastConfig } from '../toastConfig';
-import { RPCSeedType } from '../walletBackend/types/RPCSeedType';
-import { Launching } from '../LoadingApp';
-import { AddressBook } from '../../components/AddressBook';
-import { AddressBookFileImpl } from '../../components/AddressBook';
-import simpleBiometrics from '../simpleBiometrics';
-import ShowAddressAlertAsync from '../../components/Send/components/ShowAddressAlertAsync';
+import { toastConfig } from '@ui/widgets/toastConfig';
+import { RPCSeedType } from '@app/walletBackend/types/RPCSeedType';
+import Launching from '@screens/Launching';
+import { AddressBook } from '@screens/AddressBook';
+import AddressBookFileImpl from '@app/services/AddressBookFileImpl';
+import {
+  GateAnswer,
+  enactGateAnswer,
+  resolveTriggerGate,
+} from '@app/services/gateController';
+import ShowAddressAlertAsync from '@app/services/showAddressAlertAsync';
 import {
   createUpdateRecoveryWalletInfo,
   removeRecoveryWalletInfo,
-} from '../recoveryWalletInfo';
+} from '@app/services/recoveryWalletInfo';
 
-import History from '../../components/History';
-import Send from '../../components/Send';
-import Receive from '../../components/Receive';
-import Settings from '../../components/Settings';
-import CustomTabBar from '../../components/TabBar/CustomTabBar';
+import History from '@screens/History';
+import Send from '@screens/Send';
+import Receive from '@screens/Receive';
+import Settings from '@screens/Settings';
+import CustomTabBar, { FadeOnlyTabBar } from '@app/navigation/CustomTabBar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import {
   BottomSheetModal,
   BottomSheetModalProvider,
 } from '@gorhom/bottom-sheet';
-import AddTagModalHost from '../../components/AddressBook/components/AddTagModalHost';
-import { BottomSheetBackHandler } from '../hooks/useBottomSheetBackHandler';
-import ConfirmBottomSheet from '../../components/Components/ConfirmBottomSheet';
-import { showConfirm } from '../showConfirm';
-import RootNavigator from '../../components/RootNavigator';
+import AddTagModalHost from './components/AddTagModalHost';
+import { BottomSheetBackHandler } from '@app/hooks/useBottomSheetBackHandler';
+import ConfirmBottomSheet from '@ui/widgets/ConfirmBottomSheet';
+import { showConfirm } from '@app/services/showConfirm';
+import RootNavigator from '@app/navigation/RootNavigator';
 import {
   OptionsPanelProvider,
   toggleOptionsPanel,
-} from '../context/optionsPanel';
+} from '@app/context/optionsPanel';
 import LoadedAppOptionsPanelHost from './LoadedAppOptionsPanelHost';
-import { MessageList } from '../../components/Messages';
-import { RPCSyncStatusType } from '../walletBackend/types/RPCSyncStatusType';
-import { RPCUfvkType } from '../walletBackend/types/RPCUfvkType';
-import { RPCPerformanceLevelEnum } from '../walletBackend/enums/RPCPerformanceLevelEnum';
-import { AddressList } from '../../components/AddressList';
-import ValueTransferDetail from '../../components/History/components/ValueTransferDetail';
-import Confirm from '../../components/Send/components/Confirm';
-import { AppStackParamList } from '../types';
+import { MessageList } from '@screens/Messages';
+import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
+import { RPCUfvkType } from '@app/walletBackend/types/RPCUfvkType';
+import {
+  INITIAL_MIXNET_VIEW,
+  MixnetView,
+} from '@app/walletBackend/transforms/mixnetView';
+import { startMixnetTransport } from '@app/walletBackend/utils/nymTransport';
+import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
+import { AddressList } from '@screens/AddressList';
+import ValueTransferDetail from '@screens/ValueTransferDetail';
+import Confirm from '@screens/Confirm';
+import { AppStackParamList } from '@app/types';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RPCValueTransfersStatusEnum } from '../walletBackend/enums/RPCValueTransfersStatusEnum';
+import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
 
-const About = React.lazy(() => import('../../components/About'));
-const Seed = React.lazy(() => import('../../components/Seed'));
-const SyncReport = React.lazy(() => import('../../components/SyncReport'));
-const Rescan = React.lazy(() => import('../../components/Rescan'));
-const Pools = React.lazy(() => import('../../components/Pools'));
-const MeetIronwood = React.lazy(() => import('../../components/MeetIronwood'));
+const About = React.lazy(() => import('@screens/About'));
+const MixnetDoctor = React.lazy(() => import('@screens/MixnetDoctor'));
+const Seed = React.lazy(() => import('@screens/Seed'));
+const SyncReport = React.lazy(() => import('@screens/SyncReport'));
+const Rescan = React.lazy(() => import('@screens/Rescan'));
+const Pools = React.lazy(() => import('@screens/Pools'));
+const MeetIronwood = React.lazy(() => import('@screens/MeetIronwood'));
 const MigrationStrategy = React.lazy(
-  () => import('../../components/MigrationStrategy'),
+  () => import('@screens/MigrationStrategy'),
 );
 const MigrationTransactions = React.lazy(
-  () => import('../../components/MigrationTransactions'),
+  () => import('@screens/MigrationTransactions'),
 );
-const MigrationSending = React.lazy(
-  () => import('../../components/MigrationSending'),
-);
+const MigrationSending = React.lazy(() => import('@screens/MigrationSending'));
 const MigrationSplitPlan = React.lazy(
-  () => import('../../components/MigrationSplitPlan'),
+  () => import('@screens/MigrationSplitPlan'),
 );
 const MigrationSplitting = React.lazy(
-  () => import('../../components/MigrationSplitting'),
+  () => import('@screens/MigrationSplitting'),
 );
-const MigrationCadence = React.lazy(
-  () => import('../../components/MigrationCadence'),
-);
+const MigrationCadence = React.lazy(() => import('@screens/MigrationCadence'));
 const MigrationSchedule = React.lazy(
-  () => import('../../components/MigrationSchedule'),
+  () => import('@screens/MigrationSchedule'),
 );
-const MigrationStatus = React.lazy(
-  () => import('../../components/MigrationStatus'),
-);
+const MigrationStatus = React.lazy(() => import('@screens/MigrationStatus'));
 const MigrationBatchSending = React.lazy(
-  () => import('../../components/MigrationBatchSending'),
+  () => import('@screens/MigrationBatchSending'),
 );
-const Insight = React.lazy(() => import('../../components/Insight'));
-const ShowUfvk = React.lazy(() => import('../../components/Ufvk/ShowUfvk'));
-const ComputingTxContent = React.lazy(
-  () => import('./components/ComputingTxContent'),
-);
+const Insight = React.lazy(() => import('@screens/Insight'));
+const ShowUfvk = React.lazy(() => import('@screens/Ufvk/ShowUfvk'));
+const ComputingTxContent = React.lazy(() => import('@screens/Computing'));
 
-const en = require('../translations/en.json');
-const es = require('../translations/es.json');
-const pt = require('../translations/pt.json');
-const ru = require('../translations/ru.json');
-const tr = require('../translations/tr.json');
+const en = require('@app/translations/en.json');
+const es = require('@app/translations/es.json');
+const pt = require('@app/translations/pt.json');
+const ru = require('@app/translations/ru.json');
+const tr = require('@app/translations/tr.json');
 
 const Tab = createBottomTabNavigator<AppDrawerParamList>();
 
@@ -195,7 +201,7 @@ const SERVER_DEFAULT_0: ServerType = {
 } as ServerType;
 
 export default function LoadedApp(props: LoadedAppProps) {
-  const theme = useTheme() as ThemeType;
+  const theme = useTheme();
   const [language, setLanguage] = useState<LanguageEnum>(LanguageEnum.en);
   const [currency, setCurrency] = useState<CurrencyEnum>(
     CurrencyEnum.USDCurrency,
@@ -640,7 +646,7 @@ export default function LoadedApp(props: LoadedAppProps) {
       <Launching
         translate={translate}
         firstLaunchingMessage={LaunchingModeEnum.opening}
-        biometricsFailed={false}
+        biometricGate={{ kind: 'passed' }}
       />
     );
   } else {
@@ -720,7 +726,7 @@ type LoadedAppClassProps = {
   // still take effect immediately for snackbars and any RPC error text
   // produced after the change.
   setI18nLocale: (locale: string) => void;
-  theme: ThemeType;
+  theme: AppTheme;
   language: LanguageEnum;
   currency: CurrencyEnum;
   server: ServerType;
@@ -752,11 +758,14 @@ const renderTabBar = (
   props: import('@react-navigation/bottom-tabs').BottomTabBarProps,
 ) => <CustomTabBar {...props} />;
 
+const renderFadeOnlyTabBar = () => <FadeOnlyTabBar />;
+
 export class LoadedAppClass extends Component<
   LoadedAppClassProps,
   LoadedAppClassState
 > {
   rpc: WalletBackend;
+  recoveringServer: boolean = false;
   appstate: NativeEventSubscription;
   linking: EmitterSubscription;
   unsubscribeNetInfo: NetInfoSubscription;
@@ -832,6 +841,9 @@ export class LoadedAppClass extends Component<
       blockExplorer: props.blockExplorer,
       nym: props.nym,
 
+      mixnetView: INITIAL_MIXNET_VIEW,
+      reenableMixnet: this.reenableMixnet,
+
       // state
       appStateStatus:
         Platform.OS === GlobalConst.platformOSios
@@ -856,11 +868,15 @@ export class LoadedAppClass extends Component<
       onAddressesChanged: this.setAllAddresses,
       onInfoChanged: this.setInfo,
       onSyncStatusChanged: this.setSyncingStatus,
-      translate: props.translate,
       keepAwake: this.keepAwake,
       onZingolibVersionChanged: this.setZingolibVersion,
       onBirthdayChanged: this.setBirthday,
       onError: this.setLastError,
+      onPersistentSyncFailure: this.recoverServer,
+      onMixnetViewChanged: this.setMixnetView,
+      startMixnetTransport: startMixnetTransport,
+      transmitPolicy: props.nym ? 'mixnet' : 'clearnet',
+      mixnetSupported: true,
       readOnly: props.readOnly,
       server: props.server,
       performanceLevel: props.performanceLevel,
@@ -958,45 +974,22 @@ export class LoadedAppClass extends Component<
           // Bump the foreground epoch so any currently-mounted
           // protected screen (Seed/Ufvk/Settings/Rescan/Confirm) can
           // re-fire its biometric gate when security.foregroundApp is
-          // OFF. Done before the foregroundApp simpleBiometrics so the
+          // OFF. Done before the foregroundApp askGate so the
           // screen-level effects don't race against the app-level one.
           this.setState(state => ({
             foregroundEpoch: state.foregroundEpoch + 1,
           }));
-          // (PIN or TouchID or FaceID)
-          const resultBio = this.state.security.foregroundApp
-            ? await simpleBiometrics({ translate: this.state.translate })
-            : true;
-          // resultBio:
-          // - true      -> authenticated (biometric, or device passcode via allowDeviceCredentials)
-          // - false     -> user cancelled or failed the prompt
-          // - undefined -> device has no auth method at all; allow (cannot lock the user out)
-          if (resultBio === false) {
-            this.navigateToLoadingApp({
-              startingApp: true,
-              biometricsFailed: true,
-            });
-          } else {
-            // reading background task info
-            await this.fetchBackgroundSyncInfo();
-            // setting value for background task Android
-            await AsyncStorage.setItem(GlobalConst.background, GlobalConst.no);
-            // needs this because when the App go from back to fore
-            // it have to re-launch all the tasks.
-            await this.rpc.clearTimers();
-            await this.rpc.configure();
-            if (
-              this.state.backgroundError &&
-              (this.state.backgroundError.title ||
-                this.state.backgroundError.error)
-            ) {
-              showConfirm({
-                title: this.state.backgroundError.title,
-                message: this.state.backgroundError.error,
-                buttons: [{ text: this.state.translate('close') as string }],
-              });
-              this.setBackgroundError('', '');
-            }
+          // A parked earlier pass resumes with this same event and acts
+          // once; a second concurrent actor would double-run the restore
+          // work or the navigation reset.
+          if (this.foregroundGateBusy) {
+            return;
+          }
+          this.foregroundGateBusy = true;
+          try {
+            await this.runForegroundGate();
+          } finally {
+            this.foregroundGateBusy = false;
           }
         } else if (
           priorAppState === AppStateStatusEnum.active &&
@@ -1085,22 +1078,72 @@ export class LoadedAppClass extends Component<
 
   // Sync the externally-rebuilt `translate` (the outer functional
   // LoadedApp rebuilds its memoized translate on every language change)
-  // into both `state.translate` and the WalletBackend config. Without this,
-  // memoized children whose useMemo / React.memo deps include `translate`
-  // (notably the OptionsPanel grid built in LoadedAppOptionsPanelHost) keep
-  // the identity-stable closure captured at mount and render in the old
-  // language. WalletBackend sub-services (WalletLifecycleService etc.)
-  // would likewise keep returning localized error strings in the language
-  // the user had at app mount.
+  // into `state.translate`. Without this, memoized children whose
+  // useMemo / React.memo deps include `translate` (notably the
+  // OptionsPanel grid built in LoadedAppOptionsPanelHost) keep the
+  // identity-stable closure captured at mount and render in the old
+  // language.
   componentDidUpdate = (prevProps: LoadedAppClassProps) => {
     if (prevProps.translate !== this.props.translate) {
       this.setState({ translate: this.props.translate });
-      this.rpc.setTranslate(this.props.translate);
+    }
+  };
+
+  foregroundGateBusy = false;
+
+  // (PIN or TouchID or FaceID). Only a decline locks; a gate that cannot
+  // run fails open with a notice (ADR 0007), because blocking would trap
+  // the user out of the wallet.
+  runForegroundGate = async () => {
+    const foregroundGate: GateAnswer = await resolveTriggerGate(
+      undefined,
+      this.state.security.foregroundApp,
+      { translate: this.state.translate },
+    );
+    const proceed = enactGateAnswer(
+      foregroundGate,
+      {
+        // The narrowed answer is the gate outcome, whole; the locked
+        // screen never reads mutable module state.
+        lock: declined =>
+          this.navigateToLoadingApp({
+            startingApp: true,
+            biometricGate: declined,
+          }),
+        notice: this.addLastSnackbar,
+      },
+      this.state.translate,
+    );
+    if (!proceed) {
+      return;
+    }
+    // The gate is open: this, never the raw AppState event, is when a
+    // real return may emit price traffic.
+    priceFetcherStore.foregroundReturned();
+    // reading background task info
+    await this.fetchBackgroundSyncInfo();
+    // setting value for background task Android
+    await AsyncStorage.setItem(GlobalConst.background, GlobalConst.no);
+    // needs this because when the App go from back to fore
+    // it have to re-launch all the tasks.
+    await this.rpc.clearTimers();
+    await this.rpc.configure();
+    if (
+      this.state.backgroundError &&
+      (this.state.backgroundError.title || this.state.backgroundError.error)
+    ) {
+      showConfirm({
+        title: this.state.backgroundError.title,
+        message: this.state.backgroundError.error,
+        buttons: [{ text: this.state.translate('close') as string }],
+      });
+      this.setBackgroundError('', '');
     }
   };
 
   componentWillUnmount = async () => {
     await this.rpc.clearTimers();
+    this.rpc.stopMixnetPolling();
     const safeRemove = (listener: unknown, name: string) => {
       try {
         if (
@@ -1132,21 +1175,19 @@ export class LoadedAppClass extends Component<
     // Attempt to parse as URI if it starts with zcash
     // only if it is a spendable wallet
     if (url && url.startsWith(GlobalConst.zcash) && !this.state.readOnly) {
-      const { error, target } = await parseZcashURI(
-        url,
-        this.state.translate,
-        this.state.server,
-      );
+      const parsed = await parseZcashURI(url, this.state.server);
 
       // Audit Issue H — surface the parser error and abort before any
-      // Send-state mutation. parseZcashURI now returns an empty target
-      // when error is non-empty, but the explicit guard keeps intent
-      // obvious here and protects against future contract changes.
-      if (error) {
-        this.addLastSnackbar(error);
+      // Send-state mutation. A failure result carries no target, so a
+      // malformed URI cannot reach the state updates below.
+      if (parsed.kind === 'error') {
+        this.addLastSnackbar(
+          Utils.renderErrorKeyed(parsed, this.state.translate),
+        );
         return;
       }
 
+      const target = parsed.target;
       if (target) {
         let update = false;
         if (
@@ -1189,10 +1230,6 @@ export class LoadedAppClass extends Component<
 
           this.setSendPageState(newSendPageState);
         }
-      }
-      if (error) {
-        // Show the error message as a toast
-        this.addLastSnackbar(error);
       }
     }
   };
@@ -1240,6 +1277,16 @@ export class LoadedAppClass extends Component<
     this.setState({
       isSeedViewModalOpen: value,
     });
+  };
+
+  setMixnetView = (mixnetView: MixnetView) => {
+    if (!isEqual(this.state.mixnetView, mixnetView)) {
+      this.setState({ mixnetView });
+    }
+  };
+
+  reenableMixnet = async (): Promise<void> => {
+    await this.rpc.reenableMixnet();
   };
 
   setValueTransfersList = async (
@@ -1784,6 +1831,82 @@ export class LoadedAppClass extends Component<
     };
   };
 
+  // Dials each candidate in order and activates the first that connects.
+  activateReachableServer = async (
+    candidates: ServerUrisType[],
+  ): Promise<boolean> => {
+    for (const candidate of candidates) {
+      if (!candidate.uri) {
+        continue;
+      }
+      const next: ServerType = {
+        uri: candidate.uri,
+        chainName: candidate.chainName,
+      };
+      // Cap each dial: a dead candidate's changeServer can otherwise block for
+      // minutes (see checkServerURI), stalling the whole rotation.
+      const changed = await Promise.race([
+        changeServer(next.uri).then(result => result.ok),
+        new Promise<boolean>(resolve =>
+          setTimeout(() => resolve(false), 15_000),
+        ),
+      ]);
+      if (!changed) {
+        continue;
+      }
+      await SettingsFileImpl.writeSettings(SettingsNameEnum.server, next);
+      this.setState({ server: next });
+      this.rpc.setServer(next);
+      if (this.state.mode === ModeEnum.advanced) {
+        this.addLastSnackbar(
+          `${this.state.translate('loadedapp.selectingserverbest') as string} ${next.uri}`,
+          SnackbarDurationEnum.long,
+        );
+      }
+      return true;
+    }
+    return false;
+  };
+
+  // The runtime half of the old boot-time server rescue: after repeated
+  // sync-launch failures, silently activate a working server (live registry
+  // first, then the static list by latency) and reattach the client to it.
+  // Custom and offline modes are exempt: custom users opted out of automatic
+  // selection (Audit Issue S) and offline has no server at all.
+  recoverServer = async (): Promise<void> => {
+    if (
+      this.recoveringServer ||
+      !this.state.netInfo.isConnected ||
+      (this.state.selectServer !== SelectServerEnum.auto &&
+        this.state.selectServer !== SelectServerEnum.list)
+    ) {
+      return;
+    }
+    this.recoveringServer = true;
+    try {
+      const current = this.state.server;
+      const live = (await fetchServerList(current.chainName)).filter(
+        (s: ServerUrisType) => s.uri !== current.uri,
+      );
+      if (await this.activateReachableServer(live)) {
+        return;
+      }
+      const fallback = await selectingServer(
+        serverUris(this.state.translate).filter(
+          (s: ServerUrisType) =>
+            !s.obsolete &&
+            s.chainName === current.chainName &&
+            s.uri !== current.uri,
+        ),
+      );
+      if (fallback) {
+        await this.activateReachableServer([fallback]);
+      }
+    } finally {
+      this.recoveringServer = false;
+    }
+  };
+
   setCurrencyOption = async (value: CurrencyEnum): Promise<void> => {
     await SettingsFileImpl.writeSettings(SettingsNameEnum.currency, value);
     this.setState({
@@ -1916,10 +2039,16 @@ export class LoadedAppClass extends Component<
   };
 
   setNymOption = async (value: boolean): Promise<void> => {
-    await SettingsFileImpl.writeSettings(SettingsNameEnum.nym, value);
+    try {
+      await this.rpc.setTransmitPolicy(value ? 'mixnet' : 'clearnet');
+    } catch (error) {
+      this.setLastError(`Transmit policy: ${error}`);
+      return;
+    }
     this.setState({
       nym: value,
     });
+    await SettingsFileImpl.writeSettings(SettingsNameEnum.nym, value);
   };
 
   navigateToLoadingApp = async (state: LoadingAppNavigationState) => {
@@ -1943,21 +2072,17 @@ export class LoadedAppClass extends Component<
     // WALLET's own chain (walletChainName), not the server's — Offline has no
     // server chain, yet a mainnet wallet must still be backed up when it is
     // left. Testnet/regtest are never backed up.
-    let resultStr = '';
-    if (this.state.walletChainName === ChainNameEnum.mainChainName) {
-      // backup
-      resultStr = (await this.rpc.changeWallet()) as string;
-    } else {
-      // no backup
-      resultStr = (await this.rpc.changeWalletNoBackup()) as string;
-    }
+    const changed =
+      this.state.walletChainName === ChainNameEnum.mainChainName
+        ? await this.rpc.changeWallet() // backup
+        : await this.rpc.changeWalletNoBackup(); // no backup
 
-    if (resultStr) {
+    if (changed.kind === 'error') {
       createAlert(
         this.setBackgroundError,
         this.addLastSnackbar,
         this.state.translate('loadedapp.changingwallet-label') as string,
-        resultStr,
+        this.state.translate(changed.errorKey) as string,
         false,
         this.state.translate,
         sendEmail,
@@ -1971,14 +2096,14 @@ export class LoadedAppClass extends Component<
   };
 
   onClickOKRestoreBackup = async () => {
-    const resultStr = (await this.rpc.restoreBackup()) as string;
+    const restored = await this.rpc.restoreBackup();
 
-    if (resultStr) {
+    if (restored.kind === 'error') {
       createAlert(
         this.setBackgroundError,
         this.addLastSnackbar,
         this.state.translate('loadedapp.restoringwallet-label') as string,
-        resultStr,
+        this.state.translate(restored.errorKey) as string,
         false,
         this.state.translate,
         sendEmail,
@@ -2035,26 +2160,20 @@ export class LoadedAppClass extends Component<
 
       await this.rpc.fetchInfoAndServerHeight();
 
-      let resultStr2 = '';
       // Back up any MAINNET wallet being abandoned — keyed on the WALLET's own
       // chain (walletChainName), not the server's, so a mainnet wallet left
       // while Offline still gets backed up. Testnet/regtest are not backed up.
-      if (this.state.walletChainName === ChainNameEnum.mainChainName) {
-        // backup
-        resultStr2 = (await this.rpc.changeWallet()) as string;
-      } else {
-        // no backup
-        resultStr2 = (await this.rpc.changeWalletNoBackup()) as string;
-      }
+      const changed =
+        this.state.walletChainName === ChainNameEnum.mainChainName
+          ? await this.rpc.changeWallet() // backup
+          : await this.rpc.changeWalletNoBackup(); // no backup
 
-      // changeWallet/changeWalletNoBackup return '' on success or a
-      // translated error string — non-empty means failure, no sniffing.
-      if (resultStr2) {
+      if (changed.kind === 'error') {
         createAlert(
           this.setBackgroundError,
           this.addLastSnackbar,
           this.state.translate('loadedapp.changingwallet-label') as string,
-          resultStr2,
+          this.state.translate(changed.errorKey) as string,
           false,
           this.state.translate,
           sendEmail,
@@ -2115,6 +2234,7 @@ export class LoadedAppClass extends Component<
   launchAddTagModal = (
     address: string,
     swapChain: string = GlobalConst.zecSwapChain,
+    initialLabel?: string,
   ) => {
     // Every launcher (Send, address rows) saves a recipient/destination,
     // i.e. a contact — never a label for one of the wallet's own addresses.
@@ -2122,7 +2242,7 @@ export class LoadedAppClass extends Component<
     // with own={true} directly. So this modal is always a contact (own=false),
     // "Add contact", not "Add tag".
     this.setState(
-      { addTagModalTarget: { address, own: false, swapChain } },
+      { addTagModalTarget: { address, own: false, swapChain, initialLabel } },
       () => {
         this.addTagModalRef.current?.present();
       },
@@ -2222,12 +2342,15 @@ export class LoadedAppClass extends Component<
       performanceLevel: this.state.performanceLevel,
       blockExplorer: this.state.blockExplorer,
       nym: this.state.nym,
+      mixnetView: this.state.mixnetView,
+      reenableMixnet: this.reenableMixnet,
       foregroundEpoch: this.state.foregroundEpoch,
     };
 
     return (
       <>
         <ContextAppLoadedProvider value={context}>
+          <PriceTrafficDriver />
           <GestureHandlerRootView>
             <BottomSheetModalProvider>
               <BottomSheetBackHandler />
@@ -2357,16 +2480,14 @@ export class LoadedAppClass extends Component<
                               <>
                                 {addresses === null ? (
                                   <Loading
-                                    backgroundColor={colors.background}
-                                    spinColor={colors.primary}
+                                    backgroundColor={colors.bgCanvas}
+                                    spinColor={colors.fgAccent}
                                   />
                                 ) : (
                                   <Tab.Navigator
                                     initialRouteName={RouteEnum.Receive}
+                                    tabBar={renderFadeOnlyTabBar}
                                     screenOptions={{
-                                      tabBarStyle: {
-                                        display: 'none',
-                                      },
                                       headerShown: false,
                                     }}
                                   >
@@ -2423,6 +2544,10 @@ export class LoadedAppClass extends Component<
                     <RootNavigator.Screen
                       name={RouteEnum.About}
                       component={About}
+                    />
+                    <RootNavigator.Screen
+                      name={RouteEnum.MixnetDoctor}
+                      component={MixnetDoctor}
                     />
                     <RootNavigator.Screen name={RouteEnum.Rescan}>
                       {props => <Rescan {...props} doRescan={this.doRescan} />}

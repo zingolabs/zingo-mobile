@@ -8,10 +8,10 @@ import { render } from '@testing-library/react-native';
 import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
-} from '../app/context';
+} from '@app/context';
 
-import ValueTransferDetail from '../components/History/components/ValueTransferDetail';
-import { CurrencyEnum, ModeEnum, RouteEnum } from '../app/AppState';
+import ValueTransferDetail from '@screens/ValueTransferDetail';
+import { CurrencyEnum, ModeEnum, RouteEnum } from '@app/AppState';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockValueTransfers } from '../__mocks__/dataMocks/mockValueTransfers';
@@ -22,7 +22,7 @@ import { mockZecPrice } from '../__mocks__/dataMocks/mockZecPrice';
 import { mockServer } from '../__mocks__/dataMocks/mockServer';
 import { mockNetInfo } from '../__mocks__/dataMocks/mockNetInfo';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { AppDrawerParamList } from '../app/types';
+import { AppDrawerParamList } from '@app/types';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
 // Fixed timestamps so the snapshot doesn't change between runs

@@ -2,8 +2,8 @@ import {
   PoolEnum,
   ValueTransferType,
   ValueTransferKindEnum,
-} from '../../app/AppState';
-import { RPCValueTransfersStatusEnum } from '../../app/walletBackend/enums/RPCValueTransfersStatusEnum';
+} from '@app/AppState';
+import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
 
 // Fixed instant rather than Date.now(): these rows reach the History snapshot
 // verbatim, and a wall-clock reading makes it fail on the next run. The

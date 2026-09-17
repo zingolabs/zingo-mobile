@@ -1,4 +1,4 @@
-import { ChainNameEnum } from '../../AppState';
+import { ChainNameEnum } from '@app/AppState';
 
 export type RPCInfoType = {
   version: string;

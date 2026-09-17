@@ -2,8 +2,8 @@ import {
   UnifiedAddressClass,
   AddressKindEnum,
   TransparentAddressClass,
-} from '../../app/AppState';
-import { RPCAddressScopeEnum } from '../../app/walletBackend/enums/RPCAddressScopeEnum';
+} from '@app/AppState';
+import { RPCAddressScopeEnum } from '@app/walletBackend/enums/RPCAddressScopeEnum';
 
 export const mockAddresses: (UnifiedAddressClass | TransparentAddressClass)[] =
   [

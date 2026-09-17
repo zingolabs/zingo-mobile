@@ -7,4 +7,9 @@ const { TestEnvironment: NodeEnv } = require('jest-environment-node');
 
 module.exports = class ReactNativeEnv extends NodeEnv {
   customExportConditions = ['require', 'react-native'];
+
+  async setup() {
+    await super.setup();
+    this.global.dispatchEvent = () => true;
+  }
 };

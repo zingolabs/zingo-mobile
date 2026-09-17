@@ -1,7 +1,7 @@
 import BottomSheet from '@gorhom/bottom-sheet';
 import { useCallback, useEffect, useRef } from 'react';
 
-import { safeSnapToIndex } from '../utils/safeSnapToIndex';
+import { safeSnapToIndex } from '@app/utils/safeSnapToIndex';
 
 const PRICE_SNAP_TIMEOUT_MS = 30 * 1000;
 

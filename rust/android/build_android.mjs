@@ -43,8 +43,19 @@ if (!capture('docker', ['--version'])) {
 
 process.chdir(RUST_DIR);
 
+// The docker build context is rust/ and has no .git, so describe here.
+const gitDescribe =
+  capture('git', ['-C', REPO_DIR, 'describe', '--dirty', '--always', '--long', '--match', 'zingo-*']) ?? '';
+
 console.log('=== Building Docker image ===');
-run('docker', ['build', '--target', 'build_android', '--tag', IMAGE_TAG, '.', '-f', 'android/docker/Dockerfile']);
+run('docker', [
+  'build',
+  '--target', 'build_android',
+  '--build-arg', `ZINGO_MOBILE_GIT_DESCRIBE=${gitDescribe}`,
+  '--tag', IMAGE_TAG,
+  '.',
+  '-f', 'android/docker/Dockerfile',
+]);
 
 console.log('\n=== Creating temporary container ===');
 const containerId = capture('docker', ['create', IMAGE_TAG]);
@@ -76,6 +87,26 @@ try {
       'cp',
       `${containerId}:/opt/zingo/rust/lib/src/uniffi/zingo/zingo.kt`,
       join(UNIFFI_PATH, variant, 'java', 'uniffi', 'zingo', 'zingo.kt'),
+    ]);
+  }
+
+  console.log('\n=== Extracting Nym shim .so artifacts ===');
+  for (const { triple, jniDir } of ABIS) {
+    run('docker', [
+      'cp',
+      `${containerId}:/opt/zingo/rust/nym-proxy-ffi/target/${triple}/release/libzingo_nym_proxy_ffi.so`,
+      join(JNI_PATH, jniDir, 'libzingo_nym_proxy_ffi.so'),
+    ]);
+  }
+
+  console.log('\n=== Extracting Nym shim Kotlin bindings ===');
+  for (const variant of ['debug', 'release']) {
+    const shimKtDir = join(UNIFFI_PATH, variant, 'java', 'uniffi', 'zingo_nym_proxy_ffi');
+    mkdirSync(shimKtDir, { recursive: true });
+    run('docker', [
+      'cp',
+      `${containerId}:/opt/zingo/rust/nym-proxy-ffi/generated-kotlin/uniffi/zingo_nym_proxy_ffi/zingo_nym_proxy_ffi.kt`,
+      join(shimKtDir, 'zingo_nym_proxy_ffi.kt'),
     ]);
   }
 } finally {
