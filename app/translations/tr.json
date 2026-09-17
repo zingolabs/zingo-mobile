@@ -1032,6 +1032,7 @@
     "all-sent": "Tüm gruplar gönderildi. Son onaylar bekleniyor.",
     "reminders": "Size hatırlatmak için {n} bildirim göndereceğiz.",
     "reminders-one": "Size hatırlatmak için bir bildirim göndereceğiz.",
+    "reminders-off": "Bildirimler kapalı, bu yüzden hatırlatma gelmeyecek. Telefon ayarlarından açın ya da bir grup hazır olduğunda ana ekrandaki bildirim kartından geri dönün.",
     "batch": "Grup {n}",
     "scheduled": "Planlandı",
     "open": "Açık",

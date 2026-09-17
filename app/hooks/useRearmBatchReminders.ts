@@ -9,9 +9,9 @@ import {
 import {
   armBatchReminders,
   cancelBatchReminders,
-  reminderPermissionGranted,
 } from '@app/notifications/reminders';
 import { RPCMigrationStatusType } from '@app/walletBackend/types/RPCMigrationStatusType';
+import { useReminderPermission } from './useReminderPermission';
 
 /**
  * Keeps the batch reminders in step with the schedule. They used to be armed
@@ -20,29 +20,39 @@ import { RPCMigrationStatusType } from '@app/walletBackend/types/RPCMigrationSta
  * windows past the 32-window horizon never got one.
  *
  * Re-arms whenever the upcoming windows (or their numbering) change, starting
- * with the first status a screen reads. With no upcoming windows left (no
+ * with the first status a screen reads, and when notification permission is
+ * granted later from the system settings. With no upcoming windows left (no
  * migration, still splitting, or all sent) it clears the reminders. Never
  * prompts for permission: without it, nothing is armed. `status` null (not
  * read yet, or the read failed) leaves the reminders alone.
+ *
+ * Returns the permission as read (`null` until known), so a screen can say
+ * whether reminders will actually arrive.
  */
-export function useRearmBatchReminders(status: RPCMigrationStatusType | null) {
+export function useRearmBatchReminders(
+  status: RPCMigrationStatusType | null,
+): boolean | null {
   const context = useContext(ContextAppLoaded);
   const { translate, info } = context;
+  const permitted = useReminderPermission();
   const signature = status ? batchRemindersSignature(status) : null;
-  const armedSignature = useRef<string | null>(null);
+  // A permission change counts as a change: a grant arms what a denial could
+  // not.
+  const key = signature === null ? null : `${signature}#${permitted}`;
+  const handledKey = useRef<string | null>(null);
 
   useEffect(() => {
-    if (!status || signature === null || signature === armedSignature.current) {
+    if (!status || key === null || key === handledKey.current) {
       return;
     }
-    armedSignature.current = signature;
+    handledKey.current = key;
     (async () => {
       try {
         if ((status.upcoming_windows ?? []).length === 0) {
           await cancelBatchReminders();
           return;
         }
-        if (!(await reminderPermissionGranted())) {
+        if (permitted !== true) {
           return;
         }
         await armBatchReminders(
@@ -65,11 +75,14 @@ export function useRearmBatchReminders(status: RPCMigrationStatusType | null) {
         );
       } catch {
         // Try again on the next change rather than never.
-        armedSignature.current = null;
+        handledKey.current = null;
       }
     })();
-    // Keyed to the signature: info and translate only shape the text and the
-    // estimate, and a new block alone must not re-arm every reminder.
+    // Keyed to the signature and the permission: info and translate only
+    // shape the text and the estimate, and a new block alone must not re-arm
+    // every reminder.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [signature]);
+  }, [key]);
+
+  return permitted;
 }

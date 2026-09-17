@@ -1032,6 +1032,7 @@
     "all-sent": "All batches sent. Waiting for the final confirmations.",
     "reminders": "We'll send you {n} notifications to remind you.",
     "reminders-one": "We'll send you a notification to remind you.",
+    "reminders-off": "Notifications are off, so no reminders will arrive. Turn them on in your phone settings, or come back from the home screen banner when a batch is ready.",
     "batch": "Batch {n}",
     "scheduled": "Scheduled",
     "open": "Open",

@@ -129,7 +129,7 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
 
   // Sending a batch returns here, and a sent batch renumbers the rest: keep
   // the reminders in step (see useRearmBatchReminders).
-  useRearmBatchReminders(status);
+  const remindersPermitted = useRearmBatchReminders(status);
 
   const goHome = useCallback(() => {
     navigation.reset({ index: 0, routes: [{ name: RouteEnum.HomeStack }] });
@@ -337,13 +337,20 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
                 ),
               )
           : (translate('migrationstatus.all-sent') as string);
+  // Only promise reminders that can arrive. Without notification permission
+  // none is armed, so say so and point back to the banner; until the
+  // permission is known, say nothing.
   const remindersLine =
-    wakes.length === 1
-      ? (translate('migrationstatus.reminders-one') as string)
-      : (translate('migrationstatus.reminders') as string).replace(
-          '{n}',
-          String(wakes.length),
-        );
+    remindersPermitted === null
+      ? null
+      : !remindersPermitted
+        ? (translate('migrationstatus.reminders-off') as string)
+        : wakes.length === 1
+          ? (translate('migrationstatus.reminders-one') as string)
+          : (translate('migrationstatus.reminders') as string).replace(
+              '{n}',
+              String(wakes.length),
+            );
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.bgCanvas }}>
@@ -405,7 +412,7 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
               ),
             )}
           </Text>
-          {wakes.length > 0 && (
+          {wakes.length > 0 && remindersLine !== null && (
             <Text
               style={{
                 color: colors.fgMuted,

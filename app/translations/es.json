@@ -1032,6 +1032,7 @@
     "all-sent": "Todos los lotes enviados. Esperando las confirmaciones finales.",
     "reminders": "Te enviaremos {n} notificaciones para recordártelo.",
     "reminders-one": "Te enviaremos una notificación para recordártelo.",
+    "reminders-off": "Las notificaciones están desactivadas, así que no llegarán recordatorios. Actívalas en los ajustes del teléfono o vuelve desde el aviso de la pantalla de inicio cuando un lote esté listo.",
     "batch": "Lote {n}",
     "scheduled": "Programado",
     "open": "Abierto",

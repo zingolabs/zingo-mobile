@@ -5,11 +5,13 @@
  * that slid or was rebuilt into another window kept its stale reminder. The
  * builder is shared by the confirmation and the re-arm hook; the hook re-arms
  * when the upcoming windows or their numbering change, clears the reminders
- * when none are left, and never prompts for permission.
+ * when none are left, and never prompts for permission. A permission granted
+ * later (back from the system settings) arms what a denial could not.
  */
 
 import 'react-native';
 import React from 'react';
+import type { AppStateStatus } from 'react-native';
 import { render, waitFor } from '@testing-library/react-native';
 
 import {
@@ -161,7 +163,7 @@ describe('useRearmBatchReminders', () => {
 
   test('clears the reminders when no window is left', async () => {
     render(probe(status({ upcoming_windows: [] })));
-    await waitFor(() => expect(cancelMock).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(cancelMock).toHaveBeenCalled());
     expect(armMock).not.toHaveBeenCalled();
   });
 
@@ -172,11 +174,34 @@ describe('useRearmBatchReminders', () => {
     expect(armMock).not.toHaveBeenCalled();
   });
 
+  test('a permission granted later, back in the app, arms the reminders', async () => {
+    let onChange: ((state: AppStateStatus) => void) | undefined;
+    // The ES import of AppState is undefined under the preset; the required
+    // module is what the hook subscribes through.
+    const RN: typeof import('react-native') = require('react-native');
+    const spy = jest
+      .spyOn(RN.AppState, 'addEventListener')
+      .mockImplementation((_type, handler) => {
+        onChange = handler as (state: AppStateStatus) => void;
+        return { remove: jest.fn() } as ReturnType<
+          typeof RN.AppState.addEventListener
+        >;
+      });
+    permissionMock.mockResolvedValue(false);
+    render(probe(status()));
+    await waitFor(() => expect(permissionMock).toHaveBeenCalledTimes(1));
+    expect(armMock).not.toHaveBeenCalled();
+
+    permissionMock.mockResolvedValue(true);
+    onChange?.('active');
+    await waitFor(() => expect(armMock).toHaveBeenCalledTimes(1));
+    spy.mockRestore();
+  });
+
   test('an unread status leaves the reminders alone', async () => {
     render(probe(null));
     await new Promise(resolve => setTimeout(resolve, 0));
     expect(armMock).not.toHaveBeenCalled();
     expect(cancelMock).not.toHaveBeenCalled();
-    expect(permissionMock).not.toHaveBeenCalled();
   });
 });
