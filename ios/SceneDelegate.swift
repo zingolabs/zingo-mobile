@@ -30,13 +30,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     // iOS captures the app-switcher snapshot between willResignActive and
     // didEnterBackground, so the overlay has to be installed here.
     //
-    // Gated off in Zingo Beta (ZINGO_BETA compile flag, set in Debug-Beta /
-    // Release-Beta configurations) so testers can record video and the
-    // app-switcher snapshot reflects real UI state. Prod always enforces it.
+    // Applied to every configuration, beta included: beta has to behave
+    // exactly like the build that ships, or beta testing proves nothing
+    // about prod.
     func sceneWillResignActive(_ scene: UIScene) {
-        #if !ZINGO_BETA
         showPrivacyOverlay(on: scene)
-        #endif
     }
 
     func sceneDidBecomeActive(_ scene: UIScene) {

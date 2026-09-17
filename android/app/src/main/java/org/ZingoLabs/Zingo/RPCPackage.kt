@@ -17,6 +17,7 @@ class RPCPackage : ReactPackage {
         modules.add(RPCModule(reactContext))
         modules.add(NymTransportModule(reactContext))
         modules.add(DeviceAuthModule(reactContext))
+        modules.add(ScreenSecurityModule(reactContext))
         return modules
     }
 }
