@@ -20,9 +20,11 @@ jest.mock('@app/RPCModule', () => {
 
 import RPCModule from '@app/RPCModule';
 import {
+  createNewWallet,
   fetchWallet,
   getZecPrice,
   isWalletAddress,
+  loadExistingWallet,
   resolvedTrue,
   restoreExistingWalletBackup,
   walletBackupExists,
@@ -157,5 +159,40 @@ describe('fetchWallet returns null on any failure', () => {
   ])('%s yields null, never prose', async (_case, native) => {
     bridge.getSeedInfo.mockReturnValueOnce(native);
     await expect(fetchWallet(false)).resolves.toBeNull();
+  });
+});
+
+/**
+ * Migration parts never go to the sync server (zingolib ADR 0022). A custom
+ * server used to be pinned as the migration transmission target, which is the
+ * wallet's own sync endpoint, so every batch failed with "the migration
+ * transmission target '<host>' is the synchronization endpoint". Wallet init
+ * now always clears the target and lets the library route.
+ */
+describe('wallet init clears the migration transmission target', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    bridge.setBroadcastCandidates.mockResolvedValue('{}');
+    bridge.loadExistingWallet.mockResolvedValue('{}');
+    bridge.createNewWallet.mockResolvedValue('{}');
+  });
+
+  it.each([
+    ['a custom server', 'https://lwd.example.xyz:9067'],
+    ['a registry server', 'https://zec.rocks:443'],
+  ])('sends no target for %s', async (_case, uri) => {
+    await loadExistingWallet(uri, 'main', 'high', '1');
+    expect(bridge.setBroadcastCandidates).toHaveBeenCalledWith('{}');
+  });
+
+  it('clears it before a new wallet too', async () => {
+    await createNewWallet(
+      'https://lwd.example.xyz:9067',
+      '0',
+      'main',
+      'high',
+      '1',
+    );
+    expect(bridge.setBroadcastCandidates).toHaveBeenCalledWith('{}');
   });
 });
