@@ -17,7 +17,7 @@
 -keep class uniffi.** { *; }
 -keepclassmembers class uniffi.** { *; }
 
-# JNA — used by UniFFI to call into libuniffi_zingo.so and
+# JNA — used by UniFFI to call into libzingo.so and
 # libzingo_nym_proxy_ffi.so
 -keep class com.sun.jna.** { *; }
 -keepclassmembers class com.sun.jna.** { *; }

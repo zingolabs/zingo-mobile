@@ -1,0 +1,45 @@
+{
+  "name": "zingo-ffi",
+  "version": "0.0.0",
+  "private": true,
+  "description": "The wallet backend's UniFFI surface, bound to React Native by uniffi-bindgen-react-native.",
+  "license": "MIT",
+  "author": "Zingo Labs",
+  "homepage": "https://github.com/zingolabs/zingo-mobile",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zingolabs/zingo-mobile.git"
+  },
+  "main": "src/index.tsx",
+  "source": "src/index.tsx",
+  "react-native": "src/index.tsx",
+  "files": [
+    "src",
+    "cpp",
+    "android",
+    "ios",
+    "build",
+    "*.podspec",
+    "ubrn.config.yaml"
+  ],
+  "scripts": {
+    "ubrn:generate": "(cd ../../rust/lib && ubrn generate jsi bindings --library --ts-dir ../../packages/zingo-ffi/src/generated --cpp-dir ../../packages/zingo-ffi/cpp/generated ../target/release/libzingo.dylib) && ubrn generate jsi turbo-module --config ubrn.config.yaml zingo && prettier --write src",
+    "ubrn:ios": "ubrn build ios --config ubrn.config.yaml --release --no-xcodebuild",
+    "ubrn:android": "ubrn build android --config ubrn.config.yaml --release"
+  },
+  "dependencies": {
+    "uniffi-bindgen-react-native": "0.29.3-1"
+  },
+  "peerDependencies": {
+    "react": "*",
+    "react-native": "*"
+  },
+  "codegenConfig": {
+    "name": "NativeZingoFfi",
+    "type": "modules",
+    "jsSrcsDir": "src",
+    "android": {
+      "javaPackageName": "org.ZingoLabs.ZingoFfi"
+    }
+  }
+}

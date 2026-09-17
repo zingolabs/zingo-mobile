@@ -10,7 +10,7 @@
 // Cross-platform: Linux, macOS, Windows.
 
 import { spawnSync } from 'node:child_process';
-import { existsSync, mkdirSync, copyFileSync, readFileSync } from 'node:fs';
+import { existsSync, mkdirSync, copyFileSync, readFileSync, rmSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -21,6 +21,8 @@ const REPO_DIR = resolve(RUST_DIR, '..');
 const LIB_DIR = join(RUST_DIR, 'lib');
 const TARGET_DIR = join(RUST_DIR, 'target');
 const JNI_PATH = join(REPO_DIR, 'android', 'app', 'src', 'main', 'jniLibs');
+const FFI_PACKAGE_DIR = join(REPO_DIR, 'packages', 'zingo-ffi');
+const FFI_JNI_PATH = join(FFI_PACKAGE_DIR, 'android', 'src', 'main', 'jniLibs');
 const NDK_VERSION = '28.2.13676358';
 const CARGO_NDK_VERSION = '4.0.1';
 
@@ -207,9 +209,10 @@ for (const abi of abis) {
 
   console.log(`sha256  ${sha256File(soPath)}  ${soPath}`);
 
-  const dstDir = join(JNI_PATH, jniDir);
+  rmSync(join(JNI_PATH, jniDir, 'libuniffi_zingo.so'), { force: true });
+  const dstDir = join(FFI_JNI_PATH, jniDir);
   mkdirSync(dstDir, { recursive: true });
-  copyFileSync(soPath, join(dstDir, 'libuniffi_zingo.so'));
+  copyFileSync(soPath, join(dstDir, 'libzingo.so'));
 }
 
 console.log('\n=== Building Nym proxy shim (nym-proxy-ffi) ===');
@@ -274,3 +277,6 @@ for (const abi of abis) {
 }
 
 console.log(`\nDone. ABIs built: ${abis.join(', ')} (wallet + nym-proxy-ffi)`);
+
+console.log('\n=== JSI bindings and turbo-module glue ===');
+run('yarn', ['--cwd', FFI_PACKAGE_DIR, 'ubrn:generate'], { env, cwd: REPO_DIR });

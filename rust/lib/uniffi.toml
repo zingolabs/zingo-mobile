@@ -1,0 +1,6 @@
+[bindings.kotlin]
+package_name = "uniffi.zingo"
+cdylib_name = "zingo"
+
+[bindings.swift]
+cdylib_name = "zingo"

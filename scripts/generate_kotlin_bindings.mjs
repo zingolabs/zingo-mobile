@@ -4,10 +4,9 @@
 // android/app/build/generated/source/uniffi/<variant>/java, the source dir
 // the app module compiles. Neither binding is checked in.
 //
-// The wallet binding comes from the UDL and needs no wallet build. The shim
-// binding comes from library mode, which reads the UniFFI metadata from an
-// unstripped shim library: pass one with --shim-library, or this script
-// builds the shim for the host.
+// Both bindings come from library mode, which reads the UniFFI metadata from
+// an unstripped library. The wallet library is built for the host here. The
+// shim library is passed with --shim-library, or built for the host here.
 //
 // Usage: node scripts/generate_kotlin_bindings.mjs
 //          [--variants release|debug,release,...]  (default: release)
@@ -22,7 +21,7 @@ const SCRIPTS_DIR = dirname(fileURLToPath(import.meta.url));
 const REPO_DIR = resolve(SCRIPTS_DIR, '..');
 const RUST_DIR = join(REPO_DIR, 'rust');
 const SHIM_DIR = join(RUST_DIR, 'nym-proxy-ffi');
-const UDL = join(RUST_DIR, 'lib', 'src', 'zingo.udl');
+const WALLET_CONFIG = join(RUST_DIR, 'lib', 'uniffi.toml');
 const OUT_ROOT = join(REPO_DIR, 'android', 'app', 'build', 'generated', 'source', 'uniffi');
 
 const exe = process.platform === 'win32' ? '.exe' : '';
@@ -58,6 +57,16 @@ function run(cmd, args, cwd) {
   }
 }
 
+function hostLibrary(dir, stem, profile) {
+  const name =
+    process.platform === 'win32'
+      ? `${stem}.dll`
+      : process.platform === 'darwin'
+        ? `lib${stem}.dylib`
+        : `lib${stem}.so`;
+  return join(dir, 'target', profile, name);
+}
+
 function hostShimLibrary() {
   const name =
     process.platform === 'win32'
@@ -68,10 +77,15 @@ function hostShimLibrary() {
   return join(SHIM_DIR, 'target', 'debug', name);
 }
 
+const WALLET_LIB = hostLibrary(RUST_DIR, 'zingo', 'release');
+
 const { variants, shimLibrary } = parseArgs(process.argv.slice(2));
 
 console.log('=== Building the bindgen binaries ===');
 run('cargo', ['build', '--release', '--locked', '--package', 'zingo-uniffi-bindgen'], RUST_DIR);
+
+console.log('=== Building the wallet library for the host ===');
+run('cargo', ['build', '--release', '--locked', '--package', 'zingo'], RUST_DIR);
 
 let shimLib = shimLibrary;
 if (shimLib === undefined) {
@@ -90,7 +104,19 @@ for (const variant of variants) {
   console.log(`=== Kotlin bindings (${variant}) ===`);
   run(
     WALLET_BINDGEN,
-    ['generate', UDL, '--language', 'kotlin', '--no-format', '--out-dir', outDir],
+    [
+      'generate',
+      '--library',
+      WALLET_LIB,
+      '--language',
+      'kotlin',
+      '--config',
+      WALLET_CONFIG,
+      '--no-format',
+      '--metadata-no-deps',
+      '--out-dir',
+      outDir,
+    ],
     RUST_DIR,
   );
   // Library mode resolves the crate through `cargo metadata` in the shim's

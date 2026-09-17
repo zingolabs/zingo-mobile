@@ -133,10 +133,6 @@ jobs:
         working-directory: ./rust/target
         run: llvm-objcopy --remove-section .comment ./${{ env.TARGET }}/release/libzingo.so
 
-      - name: Rename the rust lib for uniffi compatibility
-        working-directory: ./rust/target/${{ env.TARGET }}/release
-        run: mv ./libzingo.so ./libuniffi_zingo.so
-
       - name: Cargo build nym proxy shim
         working-directory: ./rust/nym-proxy-ffi
         run: |
@@ -162,7 +158,7 @@ jobs:
       - name: Stage native libraries
         run: |
           mkdir -p rust/native-out
-          cp rust/target/${{ env.TARGET }}/release/libuniffi_zingo.so rust/native-out/
+          cp rust/target/${{ env.TARGET }}/release/libzingo.so rust/native-out/
           cp rust/nym-proxy-ffi/target/${{ env.TARGET }}/release/libzingo_nym_proxy_ffi.so rust/native-out/
 
       - name: Upload native rust
@@ -264,6 +260,15 @@ jobs:
           name: native-rust-armeabi-v7a
           path: android/app/src/main/jniLibs/armeabi-v7a
 
+      # The wallet library ships in the autolinked FFI package; the shim stays in the app.
+      - name: Place the wallet libraries in the FFI package
+        run: |
+          set -eu
+          for abi in armeabi-v7a arm64-v8a x86 x86_64; do
+            mkdir -p "packages/zingo-ffi/android/src/main/jniLibs/${abi}"
+            mv "android/app/src/main/jniLibs/${abi}/libzingo.so" "packages/zingo-ffi/android/src/main/jniLibs/${abi}/libzingo.so"
+          done
+
       - name: Download kotlin uniffi
         uses: actions/download-artifact@v4
         with:
@@ -274,7 +279,7 @@ jobs:
         run: |
           set -eu
           for abi in armeabi-v7a arm64-v8a x86 x86_64; do
-            test -f "android/app/src/main/jniLibs/${abi}/libuniffi_zingo.so"
+            test -f "packages/zingo-ffi/android/src/main/jniLibs/${abi}/libzingo.so"
             test -f "android/app/src/main/jniLibs/${abi}/libzingo_nym_proxy_ffi.so"
           done
           test -f "android/app/build/generated/source/uniffi/release/java/uniffi/zingo/zingo.kt"

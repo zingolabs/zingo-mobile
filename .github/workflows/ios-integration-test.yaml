@@ -49,8 +49,8 @@ jobs:
         uses: actions/cache/restore@v6
         with:
           path: |
-            ios/Zingolib.xcframework
-            ios/zingo.swift
+            packages/zingo-ffi/build/ZingoFfi.xcframework
+            packages/zingo-ffi/ios/swift
             ios/ZingoNymProxyFFI.xcframework
             ios/zingo_nym_proxy_ffi.swift
           key: native-ios-xcframework-${{ env.CACHE-KEY }}

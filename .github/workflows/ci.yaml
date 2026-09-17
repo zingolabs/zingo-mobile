@@ -79,6 +79,9 @@ jobs:
     with:
       fail-all: true
 
+  ffi-bindings-check:
+    uses: ./.github/workflows/ffi-bindings-check.yaml
+
   andr-dependency-analysis:
     uses: ./.github/workflows/android-dependency-analysis.yaml
     secrets: inherit

@@ -14,6 +14,9 @@ import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.defaults.DefaultReactHost.getDefaultReactHost
 import com.facebook.react.defaults.DefaultReactNativeHost
 import java.lang.ref.WeakReference
+import uniffi.zingo.LogLevel
+import uniffi.zingo.initLogging
+import uniffi.zingo.installCryptoProvider
 
 class MainApplication : Application(), ReactApplication {
 
@@ -38,6 +41,8 @@ class MainApplication : Application(), ReactApplication {
     override fun onCreate() {
         super.onCreate()
         context = WeakReference(applicationContext)
+        initLogging(LogLevel.INFO)
+        installCryptoProvider()
         loadReactNative(this)
     }
 
@@ -56,7 +61,7 @@ class MainApplication : Application(), ReactApplication {
         }
 
         init {
-            System.loadLibrary("uniffi_zingo")
+            System.loadLibrary("zingo")
         }
     }
 }

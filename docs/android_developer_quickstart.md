@@ -63,6 +63,18 @@ For faster iteration during development you can also build natively on the host
 - `yarn rust:android-local` _(all 4 ABIs)_
 - `yarn rust:android-local arm64` _(only arm64-v8a)_
 
+Both commands place the wallet library in
+`packages/zingo-ffi/android/src/main/jniLibs/<abi>/libzingo.so`, where the
+`zingo-ffi` module links it, and the Kotlin bindings in
+`android/app/build/generated/source/uniffi`. They end by generating the JSI
+bindings the app calls from TypeScript into `packages/zingo-ffi/src/generated`.
+
+Every binding comes from library mode against a built wallet library, never
+from a UDL. After a change to `rust/lib`, run `yarn ffi:generate` to refresh
+the Kotlin, Swift, TypeScript, and C++ bindings from one host build. The
+TypeScript and C++ bindings are committed, and CI fails when they are stale
+(`yarn ffi:check`).
+
 Native mode requires these extras on the host (NDK is already listed above):
 - `cargo install --version 4.0.1 cargo-ndk`
 - `cargo install --force --locked bindgen-cli`

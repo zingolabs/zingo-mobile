@@ -2,7 +2,7 @@ name: Kotlin UniFFI bindings
 description: >
   Generates the wallet and Nym proxy shim Kotlin bindings into
   android/app/build/generated/source/uniffi/<variant>/java with
-  scripts/generate_kotlin_bindings.mjs. Builds the shim for the host.
+  scripts/generate_kotlin_bindings.mjs. Builds the wallet and the shim for the host.
 
 inputs:
   variants:

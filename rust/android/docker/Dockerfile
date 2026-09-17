@@ -34,10 +34,6 @@ RUN rustup default stable
 
 RUN cargo install --force --locked bindgen-cli
 
-RUN cargo run --release --features=uniffi/cli --bin uniffi-bindgen \
-    generate ./src/zingo.udl --language kotlin \ 
-    --out-dir ./src
-
 RUN cargo install --version 4.0.1 cargo-ndk
 
 ENV LIBCLANG_PATH=/usr/lib/llvm-18/lib
@@ -56,6 +52,10 @@ ENV CC=aarch64-linux-android26-clang
 ENV CFLAGS_aarch64_linux_android="-mno-outline-atomics"
 ENV CXXFLAGS_aarch64_linux_android="-mno-outline-atomics"
 RUN cargo ndk --target aarch64-linux-android build --release
+# The Kotlin bindings come from library mode against the unstripped .so.
+RUN cargo run --release --features=uniffi/cli --bin uniffi-bindgen -- \
+    generate --library ../target/aarch64-linux-android/release/libzingo.so \
+    --language kotlin --config ./uniffi.toml --out-dir ./src
 RUN llvm-strip --strip-all ../target/aarch64-linux-android/release/libzingo.so
 RUN llvm-objcopy \
     --remove-section .comment \

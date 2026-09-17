@@ -2,6 +2,9 @@
   "name": "zingo-mobile",
   "version": "2.0.23",
   "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
     "android:prod": "react-native run-android --mode prodDebug",
     "android:beta": "react-native run-android --mode betaDebug --appId org.ZingoLabs.Zingo.Beta --main-activity org.ZingoLabs.Zingo.MainActivity",
@@ -44,6 +47,8 @@
     "cargo:update": "cd rust && cargo update -p zingolib -p regchest_utils --aggressive && cd ..",
     "cargo:clean": "cd rust && cargo clean && cd ..",
     "cargo:check": "cd rust && cargo check && cd ..",
+    "ffi:generate": "node scripts/generate_bindings.mjs",
+    "ffi:check": "node scripts/generate_bindings.mjs --check",
     "rust:android": "node rust/android/build_android.mjs",
     "rust:android-local": "node rust/android/build_android_local.mjs",
     "rust:ios": "node rust/ios/build_ios.mjs",
@@ -52,6 +57,8 @@
     "pods": "cd ios && pod install && cd .."
   },
   "dependencies": {
+    "uniffi-bindgen-react-native": "0.29.3-1",
+    "zingo-ffi": "0.0.0",
     "@fortawesome/fontawesome-svg-core": "^7.3.0",
     "@fortawesome/free-regular-svg-icons": "^7.3.0",
     "@fortawesome/free-solid-svg-icons": "^7.3.0",

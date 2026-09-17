@@ -1,9 +1,8 @@
 package org.ZingoLabs.Zingo
 
 import androidx.test.platform.app.InstrumentationRegistry
-import com.facebook.react.bridge.Promise
-import com.facebook.react.bridge.WritableMap
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
 import java.io.File
@@ -25,28 +24,9 @@ class WalletSwapRecoveryTest {
     private lateinit var walletA: ByteArray
     private lateinit var walletB: ByteArray
 
-    private class CapturingPromise : Promise {
-        val resolved = mutableListOf<Any?>()
-        override fun resolve(value: Any?) { resolved.add(value) }
-        override fun reject(code: String, message: String?) {}
-        override fun reject(code: String, throwable: Throwable?) {}
-        override fun reject(code: String, message: String?, throwable: Throwable?) {}
-        override fun reject(throwable: Throwable) {}
-        override fun reject(throwable: Throwable, userInfo: WritableMap) {}
-        override fun reject(code: String, userInfo: WritableMap) {}
-        override fun reject(code: String, throwable: Throwable?, userInfo: WritableMap) {}
-        override fun reject(code: String, message: String?, userInfo: WritableMap) {}
-        override fun reject(code: String?, message: String?, throwable: Throwable?, userInfo: WritableMap?) {}
-        @Deprecated("Deprecated in the React Native Promise interface")
-        override fun reject(message: String) {}
-    }
-
     private fun file(name: String) = File(context.filesDir, name)
 
-    private fun offlineWallet(birthday: UInt): ByteArray {
-        uniffi.zingo.initFromSeed(Seeds.HOSPITAL, birthday, "", "main", "Medium", 1u)
-        return uniffi.zingo.saveWalletBytes()!!
-    }
+    private fun offlineWallet(birthday: UInt): ByteArray = runBlocking { offlineWalletBytes(birthday) }
 
     @Before
     fun twoDistinctWallets() {
@@ -56,8 +36,6 @@ class WalletSwapRecoveryTest {
         }
         file(swapName).delete()
         RPCModule.walletFileClosed = false
-        uniffi.zingo.initLogging()
-        uniffi.zingo.setCryptoDefaultProviderToRing()
         walletA = offlineWallet(2000000u)
         walletB = offlineWallet(2100000u)
         assertThat(walletA).isNotEqualTo(walletB)
@@ -119,10 +97,11 @@ class WalletSwapRecoveryTest {
         file(mainName).writeBytes(walletA)
         file(backupName).writeBytes(walletB)
 
-        val promise = CapturingPromise()
+        val promise = SettledPromise()
         rpcModule.restoreExistingWalletBackup(promise)
 
-        assertThat(promise.resolved).containsExactly(true)
+        assertThat(promise.await().rejections).isEmpty()
+        assertThat(promise.resolved).hasSize(1)
         assertThat(file(mainName).readBytes()).isEqualTo(walletB)
         assertThat(file(backupName).readBytes()).isEqualTo(walletA)
         assertThat(file(swapName).exists()).isFalse()

@@ -1,9 +1,8 @@
 package org.ZingoLabs.Zingo
 
 import androidx.test.platform.app.InstrumentationRegistry
-import com.facebook.react.bridge.Promise
-import com.facebook.react.bridge.WritableMap
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
 import java.io.File
@@ -24,34 +23,18 @@ class WalletDeleteTest {
 
     private lateinit var plainWallet: ByteArray
 
-    private class CapturingPromise : Promise {
-        val resolved = mutableListOf<Any?>()
-        override fun resolve(value: Any?) { resolved.add(value) }
-        override fun reject(code: String, message: String?) {}
-        override fun reject(code: String, throwable: Throwable?) {}
-        override fun reject(code: String, message: String?, throwable: Throwable?) {}
-        override fun reject(throwable: Throwable) {}
-        override fun reject(throwable: Throwable, userInfo: WritableMap) {}
-        override fun reject(code: String, userInfo: WritableMap) {}
-        override fun reject(code: String, throwable: Throwable?, userInfo: WritableMap) {}
-        override fun reject(code: String, message: String?, userInfo: WritableMap) {}
-        override fun reject(code: String?, message: String?, throwable: Throwable?, userInfo: WritableMap?) {}
-        @Deprecated("Deprecated in the React Native Promise interface")
-        override fun reject(message: String) {}
-    }
-
     private fun file(name: String) = File(context.filesDir, name)
 
     private fun deleteWallet(): Any? {
-        val promise = CapturingPromise()
+        val promise = SettledPromise()
         rpcModule.deleteExistingWallet(promise)
-        return promise.resolved.single()
+        return promise.await().resolved.single()
     }
 
     private fun walletExists(): Any? {
-        val promise = CapturingPromise()
+        val promise = SettledPromise()
         rpcModule.walletExists(promise)
-        return promise.resolved.single()
+        return promise.await().resolved.single()
     }
 
     @Before
@@ -62,10 +45,7 @@ class WalletDeleteTest {
         }
         file(swapName).delete()
         RPCModule.walletFileClosed = false
-        uniffi.zingo.initLogging()
-        uniffi.zingo.setCryptoDefaultProviderToRing()
-        uniffi.zingo.initFromSeed(Seeds.HOSPITAL, 2000000u, "", "main", "Medium", 1u)
-        plainWallet = uniffi.zingo.saveWalletBytes()!!
+        plainWallet = runBlocking { offlineWalletBytes() }
         file(mainName).writeBytes(plainWallet)
     }
 
@@ -73,12 +53,12 @@ class WalletDeleteTest {
     fun aSaveAfterDeleteIsRefusedUntilTheNextLoad() {
         assertThat(deleteWallet()).isEqualTo(true)
 
-        assertThat(rpcModule.saveWalletFile()).isFalse()
+        assertThat(runBlocking { rpcModule.saveWalletFile() }).isFalse()
         assertThat(file(mainName).exists()).isFalse()
 
         file(mainName).writeBytes(plainWallet)
-        rpcModule.loadExistingWalletNative("", "main", "Medium", "1")
-        assertThat(rpcModule.saveWalletFile()).isTrue()
+        runBlocking { rpcModule.openWalletFile(offlineConnection()) }
+        assertThat(runBlocking { rpcModule.saveWalletFile() }).isTrue()
     }
 
     @Test
@@ -107,13 +87,13 @@ class WalletDeleteTest {
         file(backupName).writeBytes(plainWallet)
         file(swapName).writeBytes(plainWallet)
 
-        val promise = CapturingPromise()
+        val promise = SettledPromise()
         rpcModule.deleteExistingWalletBackup(promise)
-        assertThat(promise.resolved).containsExactly(true)
+        assertThat(promise.await().resolved).containsExactly(true)
 
-        val exists = CapturingPromise()
+        val exists = SettledPromise()
         rpcModule.walletBackupExists(exists)
-        assertThat(exists.resolved).containsExactly(false)
+        assertThat(exists.await().resolved).containsExactly(false)
         assertThat(file(swapName).exists()).isFalse()
     }
 

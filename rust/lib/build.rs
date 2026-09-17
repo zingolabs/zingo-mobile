@@ -5,11 +5,9 @@ use std::path::{Path, PathBuf};
 use std::{env, fs::File, process::Command};
 
 // Emitting any directive disables cargo's whole-package fallback, so the
-// watch set must cover the uniffi scaffolding inputs (src/) as well as
-// the git state behind the zm descriptor.
+// watch set must cover the git state behind the zm descriptor.
 fn register_rerun_watches() {
     println!("cargo:rerun-if-changed=build.rs");
-    println!("cargo:rerun-if-changed=src");
     println!("cargo:rerun-if-env-changed=ZINGO_MOBILE_GIT_DESCRIBE");
     if let Some(git_dir) = git_path_query("--git-dir") {
         println!("cargo:rerun-if-changed={}", git_dir.join("HEAD").display());
@@ -105,10 +103,7 @@ fn zm_description() {
     let mut f = File::create(dest_path).unwrap();
     writeln!(
         f,
-        "/// The zingo-mobile part of the build descriptor:\n\
-        /// `zm_<tag#>[_<numcommit>_<hash5>][_dirty]`, where the bracketed\n\
-        /// fields are elided when the build sits exactly on its\n\
-        /// `zingo-<tag#>` release tag\n\
+        "/// The zingo-mobile part of the build descriptor.\n\
         pub fn zm_description() -> &'static str {{\"{description}\"}}"
     )
     .unwrap();
@@ -116,6 +111,5 @@ fn zm_description() {
 
 fn main() {
     register_rerun_watches();
-    uniffi_build::generate_scaffolding("src/zingo.udl").expect("A valid UDL file");
     zm_description();
 }

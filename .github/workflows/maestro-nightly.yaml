@@ -57,6 +57,13 @@ jobs:
           key: native-android-uniffi-${{ env.ABI }}-${{ env.CACHE-KEY }}
           fail-on-cache-miss: true
 
+      # The wallet library ships in the autolinked FFI package; the shim stays in the app.
+      - name: Place the wallet library in the FFI package
+        run: |
+          set -eu
+          mkdir -p "packages/zingo-ffi/android/src/main/jniLibs/${{ env.ABI }}"
+          mv "android/app/src/main/jniLibs/${{ env.ABI }}/libzingo.so" "packages/zingo-ffi/android/src/main/jniLibs/${{ env.ABI }}/libzingo.so"
+
       - name: Kotlin uniffi cache
         uses: actions/cache/restore@v6
         with:
@@ -149,8 +156,8 @@ jobs:
         uses: actions/cache/restore@v6
         with:
           path: |
-            ios/Zingolib.xcframework
-            ios/zingo.swift
+            packages/zingo-ffi/build/ZingoFfi.xcframework
+            packages/zingo-ffi/ios/swift
             ios/ZingoNymProxyFFI.xcframework
             ios/zingo_nym_proxy_ffi.swift
           key: native-ios-xcframework-${{ env.CACHE-KEY }}

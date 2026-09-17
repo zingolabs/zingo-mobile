@@ -7,6 +7,8 @@ import org.junit.Assert.assertThrows
 import org.junit.Before
 import org.junit.Test
 import java.io.File
+import kotlinx.coroutines.runBlocking
+import uniffi.zingo.LoadException
 
 /**
  * Seed salvage against a real zingolib wallet: a wallet file cut anywhere
@@ -29,10 +31,7 @@ class WalletSeedSalvageTest {
     fun aRealOfflineWallet() {
         walletFile().delete()
         brokenFile().delete()
-        uniffi.zingo.initLogging()
-        uniffi.zingo.setCryptoDefaultProviderToRing()
-        uniffi.zingo.initFromSeed(Seeds.HOSPITAL, 2000000u, "", "main", "Medium", 1u)
-        plainWallet = uniffi.zingo.saveWalletBytes()!!
+        plainWallet = runBlocking { offlineWalletBytes() }
     }
 
     @Test
@@ -59,7 +58,7 @@ class WalletSeedSalvageTest {
     fun anUnreadableFileFailsAndLeavesNoBrokenCopy() {
         for (garbage in listOf(ByteArray(47) { 0x20 }, ByteArray(64) { i -> if (i == 0) 0x28 else (i * 13).toByte() })) {
             walletFile().writeBytes(garbage)
-            assertThrows(Exception::class.java) { rpcModule.walletFileRecoveryInfoNative() }
+            assertThrows(LoadException::class.java) { rpcModule.walletFileRecoveryInfoNative() }
             assertThat(brokenFile().exists()).isFalse()
         }
     }

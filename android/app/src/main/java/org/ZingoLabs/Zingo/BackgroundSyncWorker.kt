@@ -1,27 +1,18 @@
 package org.ZingoLabs.Zingo
 
-import android.content.Context
 import android.app.ActivityManager
+import android.content.Context
 import android.os.Build
-import androidx.work.Worker
-import androidx.work.WorkerParameters
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.work.Constraints
+import androidx.work.CoroutineWorker
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
-import java.util.*
-import org.json.JSONObject
-import kotlinx.datetime.Clock
-import kotlinx.datetime.DateTimeUnit
-import kotlinx.datetime.Instant
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.atTime
-import kotlinx.datetime.toInstant
-import kotlinx.datetime.toLocalDateTime
-import kotlinx.datetime.until
+import androidx.work.WorkerParameters
+import java.util.Date
 import kotlin.random.Random
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
@@ -30,254 +21,145 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 import kotlin.time.toJavaDuration
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
+import kotlinx.datetime.Clock
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atTime
+import kotlinx.datetime.toInstant
+import kotlinx.datetime.toLocalDateTime
+import kotlinx.datetime.until
 import org.ZingoLabs.Zingo.Constants.*
-import java.io.FileInputStream
+import org.json.JSONObject
+import uniffi.zingo.EventStream
+import uniffi.zingo.Wallet
+import uniffi.zingo.WalletEvent
+import uniffi.zingo.currentWallet
 
-class BackgroundSyncWorker(private val context: Context, workerParams: WorkerParameters) : Worker(context, workerParams) {
+private const val TAG = "SCHEDULED_TASK_RUN"
+private val SYNC_TIMEOUT = 1.hours
+
+class BackgroundSyncWorker(private val context: Context, workerParams: WorkerParameters) : CoroutineWorker(context, workerParams) {
     private val rpcModule = RPCModule(MainApplication.getAppReactContext())
+    private val startedAt = unixSeconds()
 
-    fun isAppInForeground(context: Context): Boolean {
+    private fun unixSeconds(): String = (Date().time / 1000).toString()
+
+    private fun isAppInForeground(): Boolean {
         val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
         val appProcesses = activityManager.runningAppProcesses ?: return false
-
-        val packageName = context.packageName
-        for (appProcess in appProcesses) {
-            if (appProcess.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND &&
-                appProcess.processName == packageName
-            ) {
-                return true
-            }
+        return appProcesses.any {
+            it.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND &&
+                it.processName == context.packageName
         }
-        return false
+    }
+
+    /** Writes the background report JS reads on the next launch. */
+    private fun report(message: String, dateEnd: String = unixSeconds(), error: String? = null) {
+        val payload = JSONObject()
+            .put("batches", "0")
+            .put("message", message)
+            .put("date", startedAt)
+            .put("dateEnd", dateEnd)
+        error?.let { payload.put("error", it) }
+        rpcModule.saveBackgroundFile(payload.toString())
+        Log.i(TAG, "background json file SAVED $payload")
+    }
+
+    private fun serverSettings(): Pair<String, String> {
+        val settings = context.openFileInput("settings.json").use {
+            JSONObject(it.readBytes().toString(Charsets.UTF_8))
+        }
+        val server = settings.getJSONObject("server")
+        return server.getString("uri") to server.getString("chainName")
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    override fun doWork(): Result {
+    override suspend fun doWork(): Result {
+        Log.i(TAG, "Task running")
+        report("Starting OK.", dateEnd = "0")
 
-        Log.i("SCHEDULED_TASK_RUN", "Task running")
+        if (isAppInForeground()) {
+            Log.i(TAG, "App in Foreground, cancel background task")
+            report("App in Foreground, Background task KO.")
+            return Result.failure()
+        }
 
-        // save the background JSON file
-        val timeStampStart = Date().time / 1000
-        val timeStampStrStart = timeStampStart.toString()
-        val jsonBackgroundStart = "{\"batches\": \"0\", \"message\": \"Starting OK.\", \"date\": \"$timeStampStrStart\", \"dateEnd\": \"0\"}"
-        rpcModule.saveBackgroundFile(jsonBackgroundStart)
-        Log.i("SCHEDULED_TASK_RUN", "background json file SAVED $jsonBackgroundStart")
-
-        if (isAppInForeground(context)) {
-            Log.i("SCHEDULED_TASK_RUN", "App in Foreground, cancel background task")
-            // save the background JSON file
-            val timeStampError = Date().time / 1000
-            val timeStampStrError = timeStampError.toString()
-            val payload = JSONObject().apply {
-                put("batches", "0")
-                put("message", "App in Foreground, Background task KO.")
-                put("date", "$timeStampStrStart")
-                put("dateEnd", "$timeStampStrError")
-            }
-            val jsonBackgroundError = payload.toString()
-            rpcModule.saveBackgroundFile(jsonBackgroundError)
-            Log.i("SCHEDULED_TASK_RUN", "background json file SAVED $jsonBackgroundError")
+        if (!rpcModule.fileExists(WalletFileName.value)) {
+            Log.i(TAG, "No exists wallet file END")
+            report("No active wallet KO.")
             return Result.failure()
         }
 
         try {
-            // if the App is close, it need this at first step.
-            val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
-            Log.i("SCHEDULED_TASK_RUN", "crypto provider default: $setCrytoProvider")
-        } catch (t: Throwable) {
-            Log.i("SCHEDULED_TASK_RUN", "crypto provider default error: $t")
-            // save the background JSON file
-            val timeStampError = Date().time / 1000
-            val timeStampStrError = timeStampError.toString()
-            val msg = (t.message ?: "Error: Unknown")
-            val payload = JSONObject().apply {
-                put("batches", "0")
-                put("message", "Crypto Provider Default KO.")
-                put("date", "$timeStampStrStart")
-                put("dateEnd", "$timeStampStrError")
-                put("error", "Crypto Provider Default KO. $msg")
+            val (serverUri, chainName) = serverSettings()
+            if (serverUri.isEmpty()) {
+                Log.i(TAG, "Offline mode detected (empty serveruri) - skipping wallet load")
+                report("Sync skipped - Offline mode.")
+                return Result.success()
             }
-            val jsonBackgroundError = payload.toString()
-            rpcModule.saveBackgroundFile(jsonBackgroundError)
-            Log.i("SCHEDULED_TASK_RUN", "background json file SAVED $jsonBackgroundError")
-            return Result.failure()
-        }
-
-        // checking if the wallet file exists
-        val exists: Boolean = rpcModule.fileExists(WalletFileName.value)
-
-        if (exists) {
-            try {
-                uniffi.zingo.initLogging()
-                // load the wallet file
-                val shouldSync = loadWalletFile()
-
-                if (!shouldSync) {
-                    Log.i("SCHEDULED_TASK_RUN", "Offline mode, sync skipped")
-                    val timeStampOffline = Date().time / 1000
-                    val timeStampStrOffline = timeStampOffline.toString()
-                    val payload = JSONObject().apply {
-                        put("batches", "0")
-                        put("message", "Sync skipped - Offline mode.")
-                        put("date", "$timeStampStrStart")
-                        put("dateEnd", "$timeStampStrOffline")
-                    }
-                    val jsonBackgroundOffline = payload.toString()
-                    rpcModule.saveBackgroundFile(jsonBackgroundOffline)
-                    Log.i("SCHEDULED_TASK_RUN", "background json file SAVED $jsonBackgroundOffline")
-                    return Result.success()
-                }
-
-                // runSync throws on failure (typed FFI errors); the catch
-                // below owns the error path, so the launch message is never
-                // inspected for an error sentinel.
-                val syncing = uniffi.zingo.runSync()
-                Log.i("SCHEDULED_TASK_RUN", "sync LAUNCH: $syncing")
-            } catch (t: Throwable) {
-                Log.i("SCHEDULED_TASK_RUN", "Run Sync unknown error: $t")
-                // save the background JSON file
-                val timeStampError = Date().time / 1000
-                val timeStampStrError = timeStampError.toString()
-                val msg = (t.message ?: "Error: Unknown")
-                val payload = JSONObject().apply {
-                    put("batches", "0")
-                    put("message", "Run sync process KO.")
-                    put("date", "$timeStampStrStart")
-                    put("dateEnd", "$timeStampStrError")
-                    put("error", "Run sync process KO. $msg")
-                }
-                val jsonBackgroundError = payload.toString()
-                rpcModule.saveBackgroundFile(jsonBackgroundError)
-                Log.i("SCHEDULED_TASK_RUN", "background json file SAVED $jsonBackgroundError")
+            Log.i(TAG, "Opening the wallet file - No App active - serveruri: $serverUri chain: $chainName")
+            val wallet = currentWallet()
+                ?: rpcModule.openWalletFile(walletConnection(serverUri, chainName, "Medium", 3u))
+            val end = syncUntilDone(wallet)
+            if (end is WalletEvent.SyncFailed) {
+                Log.i(TAG, "sync FAILED: ${end.error}")
+                report("Run sync process KO.", error = "Run sync process KO. ${end.error.message}")
                 return Result.failure()
             }
-
-            val startTime = System.currentTimeMillis()
-            val maxDurationMillis = 60 * 60 * 1000
-
-            while (true) {
-                val elapsed = System.currentTimeMillis() - startTime
-                if (elapsed > maxDurationMillis) {
-                    Log.w("SCHEDULED_TASK_RUN", "sync TIMEOUT after 1 hour")
-                    break
-                }
-
-                var syncStatusJson: String = ""
-                try {
-                    // statusSync throws on failure (typed FFI errors); the
-                    // catch below owns the error path, so the status JSON is
-                    // never inspected for an error sentinel.
-                    syncStatusJson = uniffi.zingo.statusSync()
-                } catch (t: Throwable) {
-                    Log.i("SCHEDULED_TASK_RUN", "Sync STATUS unknown error: $t")
-                    // save the background JSON file
-                    val timeStampError = Date().time / 1000
-                    val timeStampStrError = timeStampError.toString()
-                    val msg = (t.message ?: "Error: Unknown")
-                    val payload = JSONObject().apply {
-                        put("batches", "0")
-                        put("message", "Status sync process KO.")
-                        put("date", "$timeStampStrStart")
-                        put("dateEnd", "$timeStampStrError")
-                        put("error", "Status sync process KO. $msg")
-                    }
-                    val jsonBackgroundError = payload.toString()
-                    rpcModule.saveBackgroundFile(jsonBackgroundError)
-                    Log.i("SCHEDULED_TASK_RUN", "background json file SAVED $jsonBackgroundError")
-                    return Result.failure()
-                }
-
-                try {
-                    val status = JSONObject(syncStatusJson)
-                    val percent = status.optDouble("percentage_total_outputs_scanned").takeUnless { it.isNaN() }
-                        ?: status.getDouble("percentage_total_blocks_scanned")
-
-                    if (percent >= 100.0) {
-                        Log.i("SCHEDULED_TASK_RUN", "sync COMPLETED %: $percent")
-                        break
-                    } else {
-                        Log.i("SCHEDULED_TASK_RUN", "sync STATUS %: $percent")
-                    }
-                } catch (e: Exception) {
-                    Log.e("SCHEDULED_TASK_RUN", "sync STATUS - parsing ERROR $e")
-                    // save the background JSON file
-                    val timeStampError = Date().time / 1000
-                    val timeStampStrError = timeStampError.toString()
-                    val payload = JSONObject().apply {
-                        put("batches", "0")
-                        put("message", "Status sync parsing process KO.")
-                        put("date", "$timeStampStrStart")
-                        put("dateEnd", "$timeStampStrError")
-                        put("error", "Status sync parsing process KO. $e")
-                    }
-                    val jsonBackgroundError = payload.toString()
-                    rpcModule.saveBackgroundFile(jsonBackgroundError)
-                    Log.i("SCHEDULED_TASK_RUN", "background json file SAVED $jsonBackgroundError")
-                    return Result.failure()
-                }
-
-                Thread.sleep(5000)
-            }
-
-        } else {
-            Log.i("SCHEDULED_TASK_RUN", "No exists wallet file END")
-            // save the background JSON file
-            val timeStampError = Date().time / 1000
-            val timeStampStrError = timeStampError.toString()
-            val jsonBackgroundError = "{\"batches\": \"0\", \"message\": \"No active wallet KO.\", \"date\": \"$timeStampStrStart\", \"dateEnd\": \"$timeStampStrError\"}"
-            rpcModule.saveBackgroundFile(jsonBackgroundError)
-            Log.i("SCHEDULED_TASK_RUN", "background json file SAVED $jsonBackgroundError")
+            rpcModule.saveWalletFile()
+            Log.i(TAG, "wallet file SAVED")
+        } catch (stop: CancellationException) {
+            throw stop
+        } catch (t: Throwable) {
+            Log.i(TAG, "Run Sync unknown error: $t")
+            report("Run sync process KO.", error = "Run sync process KO. ${t.message ?: "Error: Unknown"}")
             return Result.failure()
         }
 
-        // save the wallet file with the new data from the sync process
-        rpcModule.saveWalletFile()
-        Log.i("SCHEDULED_TASK_RUN", "wallet file SAVED")
-
-        // save the background JSON file
-        val timeStampEnd = Date().time / 1000
-        val timeStampStrEnd = timeStampEnd.toString()
-        val jsonBackgroundEnd = "{\"batches\": \"0\", \"message\": \"Finished OK.\", \"date\": \"$timeStampStrStart\", \"dateEnd\": \"$timeStampStrEnd\"}"
-        rpcModule.saveBackgroundFile(jsonBackgroundEnd)
-        Log.i("SCHEDULED_TASK_RUN", "background json file SAVED $jsonBackgroundEnd")
-
+        report("Finished OK.")
         return Result.success()
     }
 
-    /**
-     * Reads settings.json and loads the wallet file when a server URI is
-     * configured. Returns `true` to signal the caller may proceed with sync, or
-     * `false` only when the user is explicitly in offline mode (empty server
-     * URI) and sync must be skipped. On any other unexpected condition the
-     * function returns `true` so the downstream sync path surfaces its own
-     * error rather than masquerading as offline mode.
-     */
-    private fun loadWalletFile(): Boolean {
-        var shouldSync = true
-        context.openFileInput("settings.json")?.use { file: FileInputStream ->
-            val settingsBytes = file.readBytes()
-            file.close()
-            val settingsString = settingsBytes.toString(Charsets.UTF_8)
-            val jsonObject = JSONObject(settingsString)
-            val serveruri = jsonObject.getJSONObject("server").getString("uri")
-            val chainhint = jsonObject.getJSONObject("server").getString("chainName")
-            if (serveruri.isEmpty()) {
-                Log.i(
-                    "SCHEDULED_TASK_RUN",
-                    "Offline mode detected (empty serveruri) - skipping wallet load"
-                )
-                shouldSync = false
-                return@use
+    /** Starts a sync and reads its events until it completes, fails, or ends early on the timeout or the worker's stop, which pause it. */
+    private suspend fun syncUntilDone(wallet: Wallet): WalletEvent? {
+        val events = wallet.events()
+        try {
+            wallet.startSync()
+            val end = withTimeoutOrNull(SYNC_TIMEOUT) { awaitSyncEnd(events) }
+            if (end == null) {
+                Log.w(TAG, "sync TIMEOUT after 1 hour")
+                wallet.pauseSync()
             }
-            Log.i(
-                "SCHEDULED_TASK_RUN",
-                "Opening the wallet file - No App active - serveruri: $serveruri chain: $chainhint"
-            )
-            rpcModule.loadExistingWalletNative(serveruri, chainhint, "Medium", "3")
+            return end
+        } catch (stop: CancellationException) {
+            withContext(NonCancellable) { wallet.pauseSync() }
+            throw stop
+        } finally {
+            events.cancel()
         }
-        return shouldSync
     }
 
+    private suspend fun awaitSyncEnd(events: EventStream): WalletEvent? {
+        while (true) {
+            val event = events.next()
+            when (event) {
+                null -> return null
+                is WalletEvent.SyncComplete -> {
+                    Log.i(TAG, "sync COMPLETED %: ${event.result.percentageTotalOutputsScanned}")
+                    return event
+                }
+                is WalletEvent.SyncFailed -> return event
+                is WalletEvent.SyncProgress ->
+                    Log.i(TAG, "sync STATUS %: ${event.status.percentageTotalOutputsScanned}")
+                else -> Unit
+            }
+        }
+    }
 }
 
 class BSCompanion {

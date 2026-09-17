@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 // Build all 4 Android ABIs in a Docker container (reproducible).
-// Output: <repo>/android/app/src/main/jniLibs/<abi>/libuniffi_zingo.so + Kotlin bindings.
+// Output: <repo>/packages/zingo-ffi/android/src/main/jniLibs/<abi>/libzingo.so, the
+// Kotlin bindings, and the shim's .so + bindings in the app.
 // Cross-platform: Linux, macOS, Windows (requires Docker Desktop running).
 
 import { spawnSync } from 'node:child_process';
-import { mkdirSync } from 'node:fs';
+import { mkdirSync, rmSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -13,6 +14,8 @@ const RUST_DIR = resolve(ANDROID_DIR, '..');
 const REPO_DIR = resolve(RUST_DIR, '..');
 const IMAGE_TAG = 'localhost/devlocal/build_android';
 const JNI_PATH = join(REPO_DIR, 'android', 'app', 'src', 'main', 'jniLibs');
+const FFI_PACKAGE_DIR = join(REPO_DIR, 'packages', 'zingo-ffi');
+const FFI_JNI_PATH = join(FFI_PACKAGE_DIR, 'android', 'src', 'main', 'jniLibs');
 const UNIFFI_PATH = join(REPO_DIR, 'android', 'app', 'build', 'generated', 'source', 'uniffi');
 
 const ABIS = [
@@ -67,6 +70,8 @@ if (!containerId) {
 try {
   for (const { jniDir } of ABIS) {
     mkdirSync(join(JNI_PATH, jniDir), { recursive: true });
+    mkdirSync(join(FFI_JNI_PATH, jniDir), { recursive: true });
+    rmSync(join(JNI_PATH, jniDir, 'libuniffi_zingo.so'), { force: true });
   }
   for (const variant of ['debug', 'release']) {
     mkdirSync(join(UNIFFI_PATH, variant, 'java', 'uniffi', 'zingo'), { recursive: true });
@@ -77,7 +82,7 @@ try {
     run('docker', [
       'cp',
       `${containerId}:/opt/zingo/rust/target/${triple}/release/libzingo.so`,
-      join(JNI_PATH, jniDir, 'libuniffi_zingo.so'),
+      join(FFI_JNI_PATH, jniDir, 'libzingo.so'),
     ]);
   }
 
@@ -113,5 +118,8 @@ try {
   console.log('\n=== Cleaning up container ===');
   spawnSync('docker', ['rm', '-v', containerId], { stdio: 'inherit' });
 }
+
+console.log('\n=== JSI bindings and turbo-module glue ===');
+run('yarn', ['--cwd', FFI_PACKAGE_DIR, 'ubrn:generate']);
 
 console.log('\nDone. 4 ABIs built and exported.');

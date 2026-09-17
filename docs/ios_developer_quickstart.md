@@ -10,10 +10,18 @@
 5. CocoaPods (`sudo gem install cocoapods`)
 
 ## Building
-A single command produces `ios/Zingolib.xcframework`, a bundle that contains both
-the device slice (arm64) and the simulator slice (arm64 + x86_64). Xcode picks
-the right slice automatically based on the build destination — there is no
-separate "device build" vs "simulator build".
+A single command produces `packages/zingo-ffi/build/ZingoFfi.xcframework`, the
+framework the `ZingoFfi` pod vendors, with the device slice (arm64) and the
+simulator slice (arm64 + x86_64). Xcode picks the right slice automatically
+based on the build destination. The same command writes the Swift bindings into
+`packages/zingo-ffi/ios/swift` and the JSI bindings the app calls from
+TypeScript into `packages/zingo-ffi/src/generated`.
+
+Every binding comes from library mode against a host build of the wallet
+library. After a change to `rust/lib`, `yarn ffi:generate` refreshes the
+Kotlin, Swift, TypeScript, and C++ bindings without the device builds. The
+TypeScript and C++ bindings are committed, and CI fails when they are stale
+(`yarn ffi:check`).
 
 1. Clone the repository.
 2. Go to the cloned repo `cd zingo-mobile`.

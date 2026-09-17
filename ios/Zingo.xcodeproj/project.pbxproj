@@ -16,11 +16,7 @@
 		1F5569272BBCB4D900F2CD6C /* RPCModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F5569262BBCB4D900F2CD6C /* RPCModule.swift */; };
 		1F5569292BBCB98100F2CD6C /* RPCModuleBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = 1F5569282BBCB98100F2CD6C /* RPCModuleBridge.m */; };
 		1F5CEBBB2BBF025700E2551A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F5CEBBA2BBF025700E2551A /* AppDelegate.swift */; };
-		1F5E677B2BD30D0A007B17AA /* zingo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F5E677A2BD30D0A007B17AA /* zingo.swift */; };
-		1F5E677C2BD30D0A007B17AA /* zingo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F5E677A2BD30D0A007B17AA /* zingo.swift */; };
 		1F7D321D2B71D44800D2879C /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1F7D321C2B71D44800D2879C /* SystemConfiguration.framework */; };
-		1F9FDA9B2FBD5CEC000C5248 /* Zingolib.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1F9FDA9A2FBD5CEC000C5248 /* Zingolib.xcframework */; };
-		1F9FDA9C2FBD5CEC000C5248 /* Zingolib.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1F9FDA9A2FBD5CEC000C5248 /* Zingolib.xcframework */; };
 		1FA935B02BE4506300117DF5 /* RPCModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F5569262BBCB4D900F2CD6C /* RPCModule.swift */; };
 		1FA935B12BE454FA00117DF5 /* RPCModuleBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = 1F5569282BBCB98100F2CD6C /* RPCModuleBridge.m */; };
 		1FA935B32BE457B100117DF5 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1F7D321C2B71D44800D2879C /* SystemConfiguration.framework */; };
@@ -66,10 +62,8 @@
 		1F5569262BBCB4D900F2CD6C /* RPCModule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RPCModule.swift; sourceTree = "<group>"; };
 		1F5569282BBCB98100F2CD6C /* RPCModuleBridge.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RPCModuleBridge.m; sourceTree = "<group>"; };
 		1F5CEBBA2BBF025700E2551A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		1F5E677A2BD30D0A007B17AA /* zingo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = zingo.swift; sourceTree = "<group>"; };
 		1F70326429905E6A001D70A2 /* Zingo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = Zingo.entitlements; path = Zingo/Zingo.entitlements; sourceTree = "<group>"; };
 		1F7D321C2B71D44800D2879C /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
-		1F9FDA9A2FBD5CEC000C5248 /* Zingolib.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = Zingolib.xcframework; sourceTree = "<group>"; };
 		1FA935B62BE474CD00117DF5 /* ZingoTest-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ZingoTest-Bridging-Header.h"; sourceTree = "<group>"; };
 		1FC1E2162BE443270064963B /* ZingoTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZingoTest.swift; sourceTree = "<group>"; };
 		1FE8E9AB296B85FC004A256B /* BackgroundTasks.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = BackgroundTasks.framework; path = System/Library/Frameworks/BackgroundTasks.framework; sourceTree = SDKROOT; };
@@ -99,7 +93,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				1FA935B32BE457B100117DF5 /* SystemConfiguration.framework in Frameworks */,
-				1F9FDA9C2FBD5CEC000C5248 /* Zingolib.xcframework in Frameworks */,
 				C15AEBBCEC942FCAC1519FEA /* libPods-Zingo-ZingoTests.a in Frameworks */,
 				72F4BE964DE9305F904FFD47 /* ZingoNymProxyFFI.xcframework in Frameworks */,
 			);
@@ -110,7 +103,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				1FE8E9AC296B85FC004A256B /* BackgroundTasks.framework in Frameworks */,
-				1F9FDA9B2FBD5CEC000C5248 /* Zingolib.xcframework in Frameworks */,
 				1F7D321D2B71D44800D2879C /* SystemConfiguration.framework in Frameworks */,
 				12BF9D27B26430347C700A81 /* libPods-Zingo.a in Frameworks */,
 				37F88F63B5EAB542D9638B06 /* ZingoNymProxyFFI.xcframework in Frameworks */,
@@ -165,7 +157,6 @@
 				1F7D321C2B71D44800D2879C /* SystemConfiguration.framework */,
 				1FE8E9AB296B85FC004A256B /* BackgroundTasks.framework */,
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				1F9FDA9A2FBD5CEC000C5248 /* Zingolib.xcframework */,
 				293E2F479737E71EC621F947 /* libPods-Zingo.a */,
 				96E8D7BC5D3F3F73EA296DFA /* libPods-Zingo-ZingoTests.a */,
 				F1925119FD8B24B809B9A31C /* ZingoNymProxyFFI.xcframework */,
@@ -183,7 +174,6 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
-				1F5E677A2BD30D0A007B17AA /* zingo.swift */,
 				1F0893FE2BA4C4380089FD88 /* PrivacyInfo.xcprivacy */,
 				13B07FAE1A68108700A75B9A /* Zingo */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
@@ -501,7 +491,6 @@
 				1FA935B12BE454FA00117DF5 /* RPCModuleBridge.m in Sources */,
 				D07A0007DA1CE0DE00000005 /* DeviceAuth.swift in Sources */,
 				D07A0007DA1CE0DE00000006 /* DeviceAuthBridge.m in Sources */,
-				1F5E677C2BD30D0A007B17AA /* zingo.swift in Sources */,
 				1FA935B02BE4506300117DF5 /* RPCModule.swift in Sources */,
 				1FC1E2172BE443270064963B /* ZingoTest.swift in Sources */,
 				5E39D39B9B57469EEF50715D /* zingo_nym_proxy_ffi.swift in Sources */,
@@ -517,7 +506,6 @@
 				1F0338192C48782D00A3FC49 /* Constants.swift in Sources */,
 				1F5CEBBB2BBF025700E2551A /* AppDelegate.swift in Sources */,
 				FBBD6650421A473A90DAF827 /* SceneDelegate.swift in Sources */,
-				1F5E677B2BD30D0A007B17AA /* zingo.swift in Sources */,
 				1F5569272BBCB4D900F2CD6C /* RPCModule.swift in Sources */,
 				1F5569292BBCB98100F2CD6C /* RPCModuleBridge.m in Sources */,
 				D07A0007DA1CE0DE00000003 /* DeviceAuth.swift in Sources */,

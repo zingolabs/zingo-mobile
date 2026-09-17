@@ -1,0 +1,23 @@
+rust:
+  directory: ../../rust
+  manifestPath: lib/Cargo.toml
+bindings:
+  cpp: cpp/generated
+  ts: src/generated
+  uniffiToml: ../../rust/lib/uniffi.toml
+android:
+  directory: android
+  targets:
+    - arm64-v8a
+    - armeabi-v7a
+  apiLevel: 26
+  useSharedLibrary: true
+ios:
+  directory: ios
+  targets:
+    - aarch64-apple-ios
+    - aarch64-apple-ios-sim
+    - x86_64-apple-ios
+  frameworkName: build/ZingoFfi
+noOverwrite:
+  - "*.podspec"

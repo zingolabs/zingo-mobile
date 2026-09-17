@@ -10,6 +10,7 @@ import org.junit.Before
 import org.junit.Test
 import java.io.File
 import java.io.IOException
+import kotlinx.coroutines.runBlocking
 
 /**
  * The 2.0.21 double-wrap incident class replayed against the Step 1 load
@@ -25,7 +26,6 @@ class DoubleWrapReproTest {
     private val defaultLegacyDecrypt = rpcModule.legacyDecrypt
 
     // Offline wallet: empty server uri, a post-Sapling birthday. No network needed.
-    private val chainHint = "main"
     private lateinit var plainWallet: ByteArray
 
     private fun walletFile() = File(context.filesDir, fileName)
@@ -55,7 +55,7 @@ class DoubleWrapReproTest {
     }
 
     private fun loadError(): String? = try {
-        rpcModule.loadExistingWalletNative("", chainHint, "Medium", "1")
+        runBlocking { rpcModule.openWalletFile(offlineConnection()) }
         null
     } catch (e: Exception) {
         e.message ?: e.toString()
@@ -66,10 +66,7 @@ class DoubleWrapReproTest {
         for (suffix in listOf("", ".write.tmp", ".migrating", ".prerepair", ".broken")) {
             File(context.filesDir, "$fileName$suffix").delete()
         }
-        uniffi.zingo.initLogging()
-        uniffi.zingo.setCryptoDefaultProviderToRing()
-        uniffi.zingo.initFromSeed(Seeds.HOSPITAL, 2000000u, "", chainHint, "Medium", 1u)
-        plainWallet = uniffi.zingo.saveWalletBytes()!!
+        plainWallet = runBlocking { offlineWalletBytes() }
         assertThat(WalletFileEnvelope.looksLikePlainWallet(plainWallet)).isTrue()
 
         // A 2.0.21+ device: the wallet rests inside the Tink envelope.

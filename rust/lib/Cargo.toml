@@ -15,21 +15,17 @@ zcash_client_backend = { workspace = true }
 zingo_common_components = { workspace = true }
 
 http = { workspace = true }
-json = { workspace = true }
-lazy_static = { workspace = true }
 hex = { workspace = true }
-android_logger = { workspace = true }
-log = { workspace = true }
-uniffi = { workspace = true, features = ["cli"] }
-tokio = { workspace = true }
+log = { workspace = true, features = ["kv"] }
+uniffi = { workspace = true, features = ["cli", "tokio"] }
+tokio = { workspace = true, features = ["sync", "macros"] }
 rustls = { workspace = true }
-serde_json = { workspace = true }
 zip32 = { workspace = true }
 thiserror = { workspace = true }
 once_cell = { workspace = true }
 
-[build-dependencies]
-uniffi_build = { workspace = true, features = ["builtin-bindgen"] }
+[target.'cfg(target_os = "android")'.dependencies]
+android_logger = { workspace = true }
 
 [lib]
 crate-type = ["cdylib", "staticlib"]

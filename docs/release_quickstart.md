@@ -13,7 +13,7 @@ Zingo ships as two parallel apps from this single repo:
 | **Beta** | `org.ZingoLabs.Zingo.Beta` | `org.ZingoLabs.Zingo.Beta` | "Zingo Beta" | TestFlight External / Play Open Testing |
 
 Both apps share the same JS bundle (`app/`, `screens/`, `ui/`),
-the same Rust libs (`libuniffi_zingo.so`, `Zingolib.xcframework`), the same
+the same Rust libs (`libzingo.so`, `ZingoFfi.xcframework`), the same
 keystores and certificates. They differ only in bundle ID, display name, and
 app icon (Beta has a red `BETA` band). The channel is detected at runtime from
 the native binary — there is no JS-side toggle.
@@ -49,7 +49,8 @@ workflow described below.
 ## Release order: tag first, then rebuild the Rust libs
 
 Gradle never invokes cargo, and Xcode never invokes cargo. The native libs
-(`android/app/src/main/jniLibs/<abi>/libuniffi_zingo.so`, `ios/Zingolib.xcframework`)
+(`packages/zingo-ffi/android/src/main/jniLibs/<abi>/libzingo.so`,
+`packages/zingo-ffi/build/ZingoFfi.xcframework`)
 are produced by the separate `yarn rust:android` / `yarn rust:ios` steps, and
 the AAB / archive just packages whatever is already sitting there.
 

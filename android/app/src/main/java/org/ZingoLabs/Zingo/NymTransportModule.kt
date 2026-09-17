@@ -112,8 +112,8 @@ class NymTransportModule internal constructor(reactContext: ReactApplicationCont
 
     /**
      * Runs `call`, converting JVM `Error`s (a missing or mismatched shim
-     * library) into exceptions so [FfiOutcome] settles them as rejections
-     * instead of the process dying.
+     * library) into exceptions so [settling] rejects them instead of the
+     * process dying.
      */
     private fun <T> guardingLinkage(call: () -> T): T = try {
         call()
@@ -123,7 +123,7 @@ class NymTransportModule internal constructor(reactContext: ReactApplicationCont
 
     @ReactMethod
     fun startMixnetTransport(promise: Promise) {
-        FfiOutcome.settling(promise, "start_mixnet_transport") {
+        settling(promise) {
             guardingLinkage {
                 synchronized(handleLock) {
                     releaseHandle()
@@ -145,13 +145,12 @@ class NymTransportModule internal constructor(reactContext: ReactApplicationCont
 
     @ReactMethod
     fun stopMixnetTransport(promise: Promise) {
-        FfiOutcome.settling(promise, "stop_mixnet_transport") {
+        settling(promise) {
             guardingLinkage {
                 synchronized(handleLock) {
                     releaseHandle()
                 }
             }
-            null
         }
     }
 }

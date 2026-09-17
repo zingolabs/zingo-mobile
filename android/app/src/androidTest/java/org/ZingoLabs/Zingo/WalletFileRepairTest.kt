@@ -4,9 +4,8 @@ import android.util.Base64
 import androidx.security.crypto.EncryptedFile
 import androidx.security.crypto.MasterKeys
 import androidx.test.platform.app.InstrumentationRegistry
-import com.facebook.react.bridge.Promise
-import com.facebook.react.bridge.WritableMap
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
 import java.io.File
@@ -23,23 +22,6 @@ class WalletFileRepairTest {
     private val swapName = Constants.WalletTempSwapFileName.value
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
     private val rpcModule = RPCModule(MainApplication.getAppReactContext())
-
-    // Captures the single resolve the restore path settles with.
-    private class CapturingPromise : Promise {
-        val resolved = mutableListOf<Any?>()
-        override fun resolve(value: Any?) { resolved.add(value) }
-        override fun reject(code: String, message: String?) {}
-        override fun reject(code: String, throwable: Throwable?) {}
-        override fun reject(code: String, message: String?, throwable: Throwable?) {}
-        override fun reject(throwable: Throwable) {}
-        override fun reject(throwable: Throwable, userInfo: WritableMap) {}
-        override fun reject(code: String, userInfo: WritableMap) {}
-        override fun reject(code: String, throwable: Throwable?, userInfo: WritableMap) {}
-        override fun reject(code: String, message: String?, userInfo: WritableMap) {}
-        override fun reject(code: String?, message: String?, throwable: Throwable?, userInfo: WritableMap?) {}
-        @Deprecated("Deprecated in the React Native Promise interface")
-        override fun reject(message: String) {}
-    }
 
     // A real offline zingolib wallet: the recovery writes run the full
     // parse.
@@ -76,10 +58,7 @@ class WalletFileRepairTest {
         }
         File(context.filesDir, backupName).delete()
         File(context.filesDir, swapName).delete()
-        uniffi.zingo.initLogging()
-        uniffi.zingo.setCryptoDefaultProviderToRing()
-        uniffi.zingo.initFromSeed(Seeds.HOSPITAL, 2000000u, "", "main", "Medium", 1u)
-        plainWallet = uniffi.zingo.saveWalletBytes()!!
+        plainWallet = runBlocking { offlineWalletBytes() }
         walletFile().writeBytes(plainWallet)
         assertThat(state(fileName)).isEqualTo("plainWallet")
     }
@@ -135,10 +114,11 @@ class WalletFileRepairTest {
         walletFile().delete()
         walletFile().writeBytes(undecryptableBytes)
 
-        val promise = CapturingPromise()
+        val promise = SettledPromise()
         rpcModule.restoreExistingWalletBackup(promise)
 
-        assertThat(promise.resolved).containsExactly(true)
+        assertThat(promise.await().rejections).isEmpty()
+        assertThat(promise.resolved).hasSize(1)
         assertThat(walletFile().readBytes()).isEqualTo(plainWallet)
         assertThat(File(context.filesDir, "$fileName.broken").exists()).isTrue()
     }

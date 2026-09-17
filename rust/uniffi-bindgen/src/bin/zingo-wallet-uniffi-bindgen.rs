@@ -2,11 +2,12 @@
 
 //! Project-local `uniffi-bindgen` for the wallet library, pinned to the
 //! workspace `uniffi` version `zingo` (rust/lib) compiles against. Run it
-//! against the UDL. It does not compile the wallet:
+//! in library mode against an unstripped wallet library:
 //!
 //! ```text
 //! cargo run --package zingo-uniffi-bindgen --bin zingo-wallet-uniffi-bindgen -- \
-//!     generate rust/lib/src/zingo.udl --language kotlin --out-dir <out>
+//!     generate --library rust/target/release/libzingo.dylib --language kotlin \
+//!     --config rust/lib/uniffi.toml --out-dir <out>
 //! ```
 //!
 //! `scripts/generate_kotlin_bindings.mjs` drives it.
