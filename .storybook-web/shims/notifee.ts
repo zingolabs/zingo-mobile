@@ -3,21 +3,29 @@
 export const AndroidImportance = { HIGH: 4 } as const;
 export const AuthorizationStatus = { DENIED: 0, AUTHORIZED: 1 } as const;
 export const TriggerType = { TIMESTAMP: 0 } as const;
+export const AlarmType = { SET_AND_ALLOW_WHILE_IDLE: 1 } as const;
 
 export type TimestampTrigger = {
   type: number;
   timestamp: number;
-  alarmManager?: boolean | { allowWhileIdle?: boolean };
+  alarmManager?: boolean | { allowWhileIdle?: boolean; type?: number };
 };
 
 const notifee = {
   requestPermission: async () => ({
     authorizationStatus: AuthorizationStatus.DENIED,
   }),
+  getNotificationSettings: async () => ({
+    authorizationStatus: AuthorizationStatus.DENIED,
+  }),
   createChannel: async () => 'storybook',
   createTriggerNotification: async () => 'storybook',
   getTriggerNotificationIds: async (): Promise<string[]> => [],
   cancelTriggerNotifications: async () => {},
+  isBatteryOptimizationEnabled: async () => false,
+  getPowerManagerInfo: async () => ({ activity: null as string | null }),
+  openBatteryOptimizationSettings: async () => {},
+  openPowerManagerSettings: async () => {},
 };
 
 export default notifee;

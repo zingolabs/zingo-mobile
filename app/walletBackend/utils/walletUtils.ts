@@ -13,7 +13,6 @@
 import { WalletType, GlobalConst } from '@app/AppState';
 import RPCModule from '@app/RPCModule';
 import { callFfi, FfiResult } from '@app/walletBackend/ffi';
-import { serverUris } from '@app/uris';
 import { RPCZecPriceType } from '@app/walletBackend/types/RPCZecPriceType';
 import { RPCSeedType } from '@app/walletBackend/types/RPCSeedType';
 
@@ -79,27 +78,24 @@ export async function walletExists(): Promise<boolean> {
   return resolvedTrue(await callFfi(RPCModule.walletExists()));
 }
 
-// Runs before every wallet init. A custom (off-registry) server pins migration
-// transmission to itself, since no registry pool applies. A registry server
-// leaves it unset so the library's curated Destination pool, which excludes
-// the sync operator, routes instead.
-async function applyBroadcastCandidates(
-  serverUri: string,
-  chainHint: string,
-): Promise<void> {
-  const chain = chainHint.split(':')[0];
-  const registry = serverUris(() => '')
-    .filter(s => (s.chainName as string) === chain && !s.obsolete)
-    .map(s => s.uri);
-  const strip = (uri: string) => uri.replace(/\/+$/, '');
-  const isCustom =
-    serverUri !== '' && !registry.some(uri => strip(uri) === strip(serverUri));
-  const payload = isCustom ? { transmissionUri: serverUri } : {};
+// Runs before every wallet init, clearing any dedicated migration-transmission
+// endpoint so the library routes: the Destination Rotation over the mixnet, the
+// configured indexer over clearnet.
+//
+// A custom (off-registry) server used to be pinned as that endpoint, on the
+// idea that no registry pool applies to it. But a custom server is the
+// wallet's own sync endpoint, and migration parts never go to the sync server
+// (zingolib ADR 0022), so every batch failed with "the migration transmission
+// target '<host>' is the synchronization endpoint". The library's per-chain
+// registry is what routes them, whichever server the wallet syncs with.
+//
+// The target is process-global in the Rust layer, so this also clears one left
+// by an earlier wallet in the same session.
+async function clearMigrationTransmissionTarget(): Promise<void> {
   try {
-    await RPCModule.setBroadcastCandidates(JSON.stringify(payload));
+    await RPCModule.setBroadcastCandidates('{}');
   } catch {
-    // Best-effort pre-init: migration-over-mixnet refuses explicitly if unset,
-    // so a failure here must not block wallet creation.
+    // Best-effort pre-init: a failure here must not block wallet creation.
   }
 }
 
@@ -115,7 +111,7 @@ export async function createNewWallet(
   performanceLevel: string,
   minConfirmations: string,
 ): Promise<FfiResult<string>> {
-  await applyBroadcastCandidates(serverUri, chainHint);
+  await clearMigrationTransmissionTarget();
   return callFfi(
     RPCModule.createNewWallet(
       serverUri,
@@ -136,7 +132,7 @@ export async function restoreWalletFromSeed(
   performanceLevel: string,
   minConfirmations: string,
 ): Promise<FfiResult<string>> {
-  await applyBroadcastCandidates(serverUri, chainHint);
+  await clearMigrationTransmissionTarget();
   return callFfi(
     RPCModule.restoreWalletFromSeed(
       seed,
@@ -158,7 +154,7 @@ export async function restoreWalletFromUfvk(
   performanceLevel: string,
   minConfirmations: string,
 ): Promise<FfiResult<string>> {
-  await applyBroadcastCandidates(serverUri, chainHint);
+  await clearMigrationTransmissionTarget();
   return callFfi(
     RPCModule.restoreWalletFromUfvk(
       ufvk,
@@ -178,7 +174,7 @@ export async function loadExistingWallet(
   performanceLevel: string,
   minConfirmations: string,
 ): Promise<FfiResult<string>> {
-  await applyBroadcastCandidates(serverUri, chainHint);
+  await clearMigrationTransmissionTarget();
   return callFfi(
     RPCModule.loadExistingWallet(
       serverUri,

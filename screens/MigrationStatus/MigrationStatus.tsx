@@ -12,7 +12,11 @@ import StepperHeader from '@ui/widgets/StepperHeader';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
 import Utils from '@app/utils/Utils';
-import { RouteEnum, TARGET_BLOCK_SPACING_SECONDS } from '@app/AppState';
+import {
+  RouteEnum,
+  TARGET_BLOCK_SPACING_SECONDS,
+  awaitingWalletTip,
+} from '@app/AppState';
 import {
   cancelIronwoodMigration,
   migrationStatus,
@@ -22,6 +26,12 @@ import {
   RPCMigrationStatusType,
   RPCBroadcastWindowType,
 } from '@app/walletBackend/types/RPCMigrationStatusType';
+import { useRearmBatchReminders } from '@app/hooks/useRearmBatchReminders';
+import { useBatteryRestriction } from '@app/hooks/useBatteryRestriction';
+import {
+  openBatterySettings,
+  openMakerPowerSettings,
+} from '@app/notifications/reminders';
 
 type MigrationStatusProps = NativeStackScreenProps<
   AppDrawerParamList,
@@ -41,7 +51,7 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
   navigation,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, info, language } = context;
+  const { translate, info, language, syncingStatus } = context;
   const { colors } = useTheme();
 
   const [status, setStatus] = useState<RPCMigrationStatusType | null>(null);
@@ -55,6 +65,19 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
   // Batch button on screen. Reading only on focus left the user watching a
   // screen whose window had already opened, so the tip drives the refresh.
   const height = info?.latestBlock ?? 0;
+
+  // The server tip can reach the next boundary before the wallet's sync does,
+  // and until then the backend reports the window as still ahead. While that
+  // gap lasts the sync's own progress drives the re-read too; outside it this
+  // stays 0 and never re-triggers.
+  const awaitingSync = awaitingWalletTip(
+    status?.upcoming_windows?.[0]?.boundary,
+    height,
+    status?.due_now != null,
+  );
+  const syncTick = awaitingSync
+    ? (syncingStatus?.total_blocks_scanned ?? 0)
+    : 0;
 
   // Re-read on focus and on every new block: the phase advances while the user
   // watches (parts confirm, windows open), so a status screen must reflect the
@@ -102,11 +125,18 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
       return () => {
         cancelled = true;
       };
-      // `height` is a trigger, not a value the body reads: a new block is the
-      // only thing that can open a window while this screen stays mounted.
+      // `height` and `syncTick` are triggers, not values the body reads: a new
+      // block opens a window, and the wallet's sync catching up to it is what
+      // lets the backend report it.
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [height]),
+    }, [height, syncTick]),
   );
+
+  // Sending a batch returns here, and a sent batch renumbers the rest: keep
+  // the reminders in step (see useRearmBatchReminders).
+  const remindersPermitted = useRearmBatchReminders(status);
+  const { restricted: batteryRestricted, makerSettings: makerPowerSettings } =
+    useBatteryRestriction();
 
   const goHome = useCallback(() => {
     navigation.reset({ index: 0, routes: [{ name: RouteEnum.HomeStack }] });
@@ -292,31 +322,42 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
           '{n}',
           String(batchesConfirmed + 1),
         )
-      : nextWake
-        ? (translate('migrationstatus.next-opens') as string)
-            .replace(
-              '{blocks}',
-              String(Math.max(0, nextWake.boundary - height)),
-            )
-            .replace(
-              '{time}',
-              // The block count is exact; the wall-clock it covers is the
-              // estimate, at the observed spacing when one has converged.
-              Utils.formatDurationMs(
-                Math.max(0, nextWake.boundary - height) *
-                  (info?.secondsPerBlock ?? TARGET_BLOCK_SPACING_SECONDS) *
-                  1000,
-                language,
-              ),
-            )
-        : (translate('migrationstatus.all-sent') as string);
+      : nextWake && awaitingSync
+        ? // Not "opens in 0 blocks": the window is open on-chain, the wallet
+          // just hasn't synced to it yet.
+          (translate('migrationstatus.next-syncing') as string)
+        : nextWake
+          ? (translate('migrationstatus.next-opens') as string)
+              .replace(
+                '{blocks}',
+                String(Math.max(0, nextWake.boundary - height)),
+              )
+              .replace(
+                '{time}',
+                // The block count is exact; the wall-clock it covers is the
+                // estimate, at the observed spacing when one has converged.
+                Utils.formatDurationMs(
+                  Math.max(0, nextWake.boundary - height) *
+                    (info?.secondsPerBlock ?? TARGET_BLOCK_SPACING_SECONDS) *
+                    1000,
+                  language,
+                ),
+              )
+          : (translate('migrationstatus.all-sent') as string);
+  // Only promise reminders that can arrive. Without notification permission
+  // none is armed, so say so and point back to the banner; until the
+  // permission is known, say nothing.
   const remindersLine =
-    wakes.length === 1
-      ? (translate('migrationstatus.reminders-one') as string)
-      : (translate('migrationstatus.reminders') as string).replace(
-          '{n}',
-          String(wakes.length),
-        );
+    remindersPermitted === null
+      ? null
+      : !remindersPermitted
+        ? (translate('migrationstatus.reminders-off') as string)
+        : wakes.length === 1
+          ? (translate('migrationstatus.reminders-one') as string)
+          : (translate('migrationstatus.reminders') as string).replace(
+              '{n}',
+              String(wakes.length),
+            );
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.bgCanvas }}>
@@ -378,7 +419,7 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
               ),
             )}
           </Text>
-          {wakes.length > 0 && (
+          {wakes.length > 0 && remindersLine !== null && (
             <Text
               style={{
                 color: colors.fgMuted,
@@ -389,6 +430,56 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
               {remindersLine}
             </Text>
           )}
+          {/* Reminders armed on a phone that force stops the app on battery
+              grounds are wiped before they fire. Only then say so, with the
+              way out. */}
+          {wakes.length > 0 &&
+            remindersPermitted === true &&
+            batteryRestricted === true && (
+              <View style={{ marginTop: 10 }}>
+                <Text
+                  style={{
+                    color: colors.fgWarning,
+                    fontSize: 14,
+                    lineHeight: 21,
+                  }}
+                >
+                  {translate('migrationstatus.battery-restricted') as string}
+                </Text>
+                <Text
+                  testID="migrationstatus.battery-settings"
+                  onPress={() => {
+                    openBatterySettings().catch(() => {});
+                  }}
+                  style={{
+                    color: colors.fgAccent,
+                    fontSize: 14,
+                    lineHeight: 21,
+                    marginTop: 6,
+                    textDecorationLine: 'underline',
+                  }}
+                >
+                  {translate('migrationstatus.battery-open') as string}
+                </Text>
+                {makerPowerSettings && (
+                  <Text
+                    testID="migrationstatus.maker-power-settings"
+                    onPress={() => {
+                      openMakerPowerSettings().catch(() => {});
+                    }}
+                    style={{
+                      color: colors.fgAccent,
+                      fontSize: 14,
+                      lineHeight: 21,
+                      marginTop: 6,
+                      textDecorationLine: 'underline',
+                    }}
+                  >
+                    {translate('migrationstatus.battery-maker') as string}
+                  </Text>
+                )}
+              </View>
+            )}
         </View>
 
         {/* One card per batch: the open one (dueNow) first, then upcoming. */}
