@@ -9,7 +9,7 @@
 
 import 'react-native';
 import React from 'react';
-import { render, waitFor } from '@testing-library/react-native';
+import { fireEvent, render, waitFor } from '@testing-library/react-native';
 
 import MigrationStatus from '@screens/MigrationStatus';
 import {
@@ -20,7 +20,13 @@ import { InfoType, RouteEnum } from '@app/AppState';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 import { migrationStatus, reconcileMigration } from '@app/walletBackend';
-import { reminderPermissionGranted } from '@app/notifications/reminders';
+import {
+  batteryRestricted,
+  hasMakerPowerSettings,
+  openBatterySettings,
+  openMakerPowerSettings,
+  reminderPermissionGranted,
+} from '@app/notifications/reminders';
 import { RPCMigrationStatusType } from '@app/walletBackend/types/RPCMigrationStatusType';
 
 jest.mock('@app/walletBackend', () => ({
@@ -33,6 +39,11 @@ jest.mock('@app/notifications/reminders', () => ({
   armBatchReminders: jest.fn(async () => {}),
   cancelBatchReminders: jest.fn(async () => {}),
   reminderPermissionGranted: jest.fn(),
+  requestReminderPermission: jest.fn(async () => false),
+  batteryRestricted: jest.fn(async () => false),
+  hasMakerPowerSettings: jest.fn(async () => false),
+  openBatterySettings: jest.fn(async () => {}),
+  openMakerPowerSettings: jest.fn(async () => {}),
 }));
 
 // The global mock stubs useFocusEffect to a no-op; the screen's read lives
@@ -47,6 +58,10 @@ jest.mock('@react-navigation/native', () => ({
 const migrationStatusMock = migrationStatus as jest.Mock;
 const reconcileMock = reconcileMigration as jest.Mock;
 const permissionMock = reminderPermissionGranted as jest.Mock;
+const restrictedMock = batteryRestricted as jest.Mock;
+const makerMock = hasMakerPowerSettings as jest.Mock;
+const openBatteryMock = openBatterySettings as jest.Mock;
+const openMakerMock = openMakerPowerSettings as jest.Mock;
 
 const window = (bucket: number) => ({
   bucket_index: bucket,
@@ -119,5 +134,39 @@ describe('MigrationStatus reminders line', () => {
       expect(getByText('migrationstatus.reminders')).toBeTruthy();
     });
     expect(queryByText('migrationstatus.reminders-off')).toBeNull();
+  });
+
+  test('a battery-restricted phone gets the warning and the way out', async () => {
+    permissionMock.mockResolvedValue(true);
+    restrictedMock.mockResolvedValue(true);
+    makerMock.mockResolvedValue(true);
+    const { getByText, getByTestId } = renderScreen();
+    await waitFor(() => {
+      expect(getByText('migrationstatus.battery-restricted')).toBeTruthy();
+    });
+    fireEvent.press(getByTestId('migrationstatus.battery-settings'));
+    expect(openBatteryMock).toHaveBeenCalledTimes(1);
+    fireEvent.press(getByTestId('migrationstatus.maker-power-settings'));
+    expect(openMakerMock).toHaveBeenCalledTimes(1);
+  });
+
+  test('an exempted phone shows no battery warning', async () => {
+    permissionMock.mockResolvedValue(true);
+    restrictedMock.mockResolvedValue(false);
+    const { getByText, queryByText } = renderScreen();
+    await waitFor(() => {
+      expect(getByText('migrationstatus.reminders')).toBeTruthy();
+    });
+    expect(queryByText('migrationstatus.battery-restricted')).toBeNull();
+  });
+
+  test('without notification permission the battery warning waits', async () => {
+    permissionMock.mockResolvedValue(false);
+    restrictedMock.mockResolvedValue(true);
+    const { getByText, queryByText } = renderScreen();
+    await waitFor(() => {
+      expect(getByText('migrationstatus.reminders-off')).toBeTruthy();
+    });
+    expect(queryByText('migrationstatus.battery-restricted')).toBeNull();
   });
 });

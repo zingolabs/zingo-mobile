@@ -22,6 +22,10 @@ const notifee = {
   createTriggerNotification: async () => 'storybook',
   getTriggerNotificationIds: async (): Promise<string[]> => [],
   cancelTriggerNotifications: async () => {},
+  isBatteryOptimizationEnabled: async () => false,
+  getPowerManagerInfo: async () => ({ activity: null as string | null }),
+  openBatteryOptimizationSettings: async () => {},
+  openPowerManagerSettings: async () => {},
 };
 
 export default notifee;

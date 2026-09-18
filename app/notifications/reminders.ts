@@ -5,6 +5,7 @@ import notifee, {
   TimestampTrigger,
   TriggerType,
 } from '@notifee/react-native';
+import { Platform } from 'react-native';
 
 const CHANNEL_ID = 'ironwood-migration';
 const REMINDER_PREFIX = 'ironwood-batch-';
@@ -29,11 +30,40 @@ export async function requestReminderPermission(): Promise<boolean> {
   return settings.authorizationStatus >= AuthorizationStatus.AUTHORIZED;
 }
 
-// Reads the permission without prompting, for re-arming in the background of
-// a screen: only the schedule confirmation may put up the system dialog.
+// Reads the permission without prompting.
 export async function reminderPermissionGranted(): Promise<boolean> {
   const settings = await notifee.getNotificationSettings();
   return settings.authorizationStatus >= AuthorizationStatus.AUTHORIZED;
+}
+
+// Android only: whether the system optimizes the app's battery. Aggressive
+// OEM power managers (Tecno/Infinix HiOS, Xiaomi, Oppo, Huawei…) then force
+// stop the app, and a force stop wipes its scheduled alarms, so reminders
+// never fire. A beta tester's Tecno Phantom X got none until the app was
+// exempted. iOS has nothing to exempt.
+export async function batteryRestricted(): Promise<boolean> {
+  if (Platform.OS !== 'android') {
+    return false;
+  }
+  return notifee.isBatteryOptimizationEnabled();
+}
+
+// Android only: whether the maker ships its own power-manager screen (autostart,
+// background activity) beyond the system battery optimization list.
+export async function hasMakerPowerSettings(): Promise<boolean> {
+  if (Platform.OS !== 'android') {
+    return false;
+  }
+  const info = await notifee.getPowerManagerInfo();
+  return !!info.activity;
+}
+
+export async function openBatterySettings(): Promise<void> {
+  await notifee.openBatteryOptimizationSettings();
+}
+
+export async function openMakerPowerSettings(): Promise<void> {
+  await notifee.openPowerManagerSettings();
 }
 
 // Replaces the whole reminder set. Always cancel-then-arm: after any

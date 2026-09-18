@@ -27,6 +27,11 @@ import {
   RPCBroadcastWindowType,
 } from '@app/walletBackend/types/RPCMigrationStatusType';
 import { useRearmBatchReminders } from '@app/hooks/useRearmBatchReminders';
+import { useBatteryRestriction } from '@app/hooks/useBatteryRestriction';
+import {
+  openBatterySettings,
+  openMakerPowerSettings,
+} from '@app/notifications/reminders';
 
 type MigrationStatusProps = NativeStackScreenProps<
   AppDrawerParamList,
@@ -130,6 +135,8 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
   // Sending a batch returns here, and a sent batch renumbers the rest: keep
   // the reminders in step (see useRearmBatchReminders).
   const remindersPermitted = useRearmBatchReminders(status);
+  const { restricted: batteryRestricted, makerSettings: makerPowerSettings } =
+    useBatteryRestriction();
 
   const goHome = useCallback(() => {
     navigation.reset({ index: 0, routes: [{ name: RouteEnum.HomeStack }] });
@@ -423,6 +430,56 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
               {remindersLine}
             </Text>
           )}
+          {/* Reminders armed on a phone that force stops the app on battery
+              grounds are wiped before they fire. Only then say so, with the
+              way out. */}
+          {wakes.length > 0 &&
+            remindersPermitted === true &&
+            batteryRestricted === true && (
+              <View style={{ marginTop: 10 }}>
+                <Text
+                  style={{
+                    color: colors.fgWarning,
+                    fontSize: 14,
+                    lineHeight: 21,
+                  }}
+                >
+                  {translate('migrationstatus.battery-restricted') as string}
+                </Text>
+                <Text
+                  testID="migrationstatus.battery-settings"
+                  onPress={() => {
+                    openBatterySettings().catch(() => {});
+                  }}
+                  style={{
+                    color: colors.fgAccent,
+                    fontSize: 14,
+                    lineHeight: 21,
+                    marginTop: 6,
+                    textDecorationLine: 'underline',
+                  }}
+                >
+                  {translate('migrationstatus.battery-open') as string}
+                </Text>
+                {makerPowerSettings && (
+                  <Text
+                    testID="migrationstatus.maker-power-settings"
+                    onPress={() => {
+                      openMakerPowerSettings().catch(() => {});
+                    }}
+                    style={{
+                      color: colors.fgAccent,
+                      fontSize: 14,
+                      lineHeight: 21,
+                      marginTop: 6,
+                      textDecorationLine: 'underline',
+                    }}
+                  >
+                    {translate('migrationstatus.battery-maker') as string}
+                  </Text>
+                )}
+              </View>
+            )}
         </View>
 
         {/* One card per batch: the open one (dueNow) first, then upcoming. */}

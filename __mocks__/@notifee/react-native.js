@@ -16,6 +16,12 @@ const notifee = {
   createTriggerNotification: jest.fn(async () => 'mock-id'),
   getTriggerNotificationIds: jest.fn(async () => []),
   cancelTriggerNotifications: jest.fn(async () => {}),
+  // Unrestricted by default, so no battery warning renders unless a suite
+  // overrides it.
+  isBatteryOptimizationEnabled: jest.fn(async () => false),
+  getPowerManagerInfo: jest.fn(async () => ({ activity: null })),
+  openBatteryOptimizationSettings: jest.fn(async () => {}),
+  openPowerManagerSettings: jest.fn(async () => {}),
 };
 
 module.exports = {
