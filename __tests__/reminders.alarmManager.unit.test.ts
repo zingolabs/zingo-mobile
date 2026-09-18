@@ -61,8 +61,9 @@ describe('armBatchReminders trigger', () => {
     expect(createTrigger).toHaveBeenCalledTimes(2);
     for (const [notification, trigger] of createTrigger.mock.calls) {
       // notifee's default 'ic_launcher' does not exist in this app, and
-      // Android drops a notification without a valid small icon.
-      expect(notification.android.smallIcon).toBe('zingo_foreground');
+      // Android drops a notification without a valid small icon. The status
+      // bar draws it from its alpha, so it is a monochrome asset of its own.
+      expect(notification.android.smallIcon).toBe('ic_notification');
       expect(trigger.type).toBe(TriggerType.TIMESTAMP);
       expect(trigger.alarmManager).toEqual({
         type: AlarmType.SET_AND_ALLOW_WHILE_IDLE,
@@ -81,7 +82,7 @@ describe('armBatchReminders trigger', () => {
     for (const density of ['mdpi', 'hdpi', 'xhdpi', 'xxhdpi', 'xxxhdpi']) {
       expect(
         fs.existsSync(
-          path.join(res, `mipmap-${density}`, 'zingo_foreground.png'),
+          path.join(res, `drawable-${density}`, 'ic_notification.png'),
         ),
       ).toBe(true);
     }

@@ -76,11 +76,15 @@ export async function armBatchReminders(
         android: {
           channelId,
           // notifee defaults to 'ic_launcher', which this app does not ship
-          // (its launcher icon is the adaptive @mipmap/zingo). Without a
-          // resolvable small icon Android rejects the notification and the
-          // fired alarm shows nothing. Must name a PNG present in every
-          // flavor, not the adaptive-icon XML.
-          smallIcon: 'zingo_foreground',
+          // (its launcher icon is the adaptive @mipmap/zingo), and Android
+          // rejects a notification whose small icon does not resolve — the
+          // alarm then fires and shows nothing.
+          //
+          // A dedicated monochrome asset, not the launcher foreground: the
+          // status bar draws this icon from its alpha alone, so the opaque
+          // circle of @mipmap/zingo_foreground came out as a white blob, and
+          // its adaptive-icon safe-zone padding left the mark tiny.
+          smallIcon: 'ic_notification',
           pressAction: { id: 'default' },
         },
       },
