@@ -83,7 +83,7 @@
     "react-native-keyboard-controller": "^1.22.5",
     "react-native-keychain": "^10.0.0",
     "react-native-linear-gradient": "^2.8.3",
-    "react-native-localize": "^3.5.2",
+    "react-native-localize": "^3.7.2",
     "react-native-qrcode-svg": "^6.3.24",
     "react-native-reanimated": "4.1.7",
     "react-native-restart": "^0.0.28",
