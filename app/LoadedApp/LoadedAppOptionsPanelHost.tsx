@@ -288,6 +288,7 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
       onLinkCopied={() => addLastSnackbar(translate('linkcopied') as string)}
       mode={modePill}
       onClose={closeOptionsPanel}
+      onSettings={() => dispatch(MenuItemEnum.Settings)}
     >
       {children}
     </OptionsPanelHost>

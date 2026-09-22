@@ -38,7 +38,6 @@ import SyncStatusBar from './components/SyncStatusBar';
 import BalanceRow from './components/BalanceRow';
 import PriceRow from './components/PriceRow';
 import { MessagesIcon } from '@ui/primitives/Icons/MessagesIcon';
-import { MessagesIcon as BoltIcon } from '@ui/primitives/Icons/BoltIcon';
 import { MenuMorphIcon } from '@ui/widgets/MenuMorphIcon';
 
 type HeaderProps = {
@@ -316,28 +315,22 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             },
           ]}
         >
-          {!noDrawMenu && screenName !== ScreenEnum.Settings ? (
+          {/* Settings used to sit here too; it now lives in the Options
+              panel's header, its single door. With only messages left,
+              the corner falls back to the logo when there is nothing to
+              show. */}
+          {!noDrawMenu &&
+          screenName !== ScreenEnum.Settings &&
+          showMessagesIcon ? (
             <View
               style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}
             >
-              {showMessagesIcon && (
-                <TouchableOpacity
-                  testID="header.messages"
-                  onPress={() => navigation.navigate(RouteEnum.Messages)}
-                >
-                  <MessagesIcon size={24} color="#B1BBC5" />
-                </TouchableOpacity>
-              )}
               <TouchableOpacity
                 style={{ marginRight: 5 }}
-                testID="header.settings"
-                onPress={() => {
-                  // Bio gate for settingsScreen lives at the Settings
-                  // screen entry (components/Settings/Settings.tsx).
-                  navigation.navigate(RouteEnum.Settings);
-                }}
+                testID="header.messages"
+                onPress={() => navigation.navigate(RouteEnum.Messages)}
               >
-                <BoltIcon size={25} color="#B1BBC5" />
+                <MessagesIcon size={24} color="#B1BBC5" />
               </TouchableOpacity>
             </View>
           ) : (

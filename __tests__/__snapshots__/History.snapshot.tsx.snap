@@ -478,46 +478,11 @@ exports[`Component History - test History privacy high & mode advanced - snapsho
               onStartShouldSetResponder={[Function]}
               style={
                 {
-                  "opacity": 1,
-                }
-              }
-              testID="header.messages"
-            />
-            <View
-              accessibilityState={
-                {
-                  "busy": undefined,
-                  "checked": undefined,
-                  "disabled": undefined,
-                  "expanded": undefined,
-                  "selected": undefined,
-                }
-              }
-              accessibilityValue={
-                {
-                  "max": undefined,
-                  "min": undefined,
-                  "now": undefined,
-                  "text": undefined,
-                }
-              }
-              accessible={true}
-              collapsable={false}
-              focusable={true}
-              onClick={[Function]}
-              onResponderGrant={[Function]}
-              onResponderMove={[Function]}
-              onResponderRelease={[Function]}
-              onResponderTerminate={[Function]}
-              onResponderTerminationRequest={[Function]}
-              onStartShouldSetResponder={[Function]}
-              style={
-                {
                   "marginRight": 5,
                   "opacity": 1,
                 }
               }
-              testID="header.settings"
+              testID="header.messages"
             />
           </View>
         </View>
@@ -1374,46 +1339,11 @@ exports[`Component History - test History privacy normal & mode basic - snapshot
               onStartShouldSetResponder={[Function]}
               style={
                 {
-                  "opacity": 1,
-                }
-              }
-              testID="header.messages"
-            />
-            <View
-              accessibilityState={
-                {
-                  "busy": undefined,
-                  "checked": undefined,
-                  "disabled": undefined,
-                  "expanded": undefined,
-                  "selected": undefined,
-                }
-              }
-              accessibilityValue={
-                {
-                  "max": undefined,
-                  "min": undefined,
-                  "now": undefined,
-                  "text": undefined,
-                }
-              }
-              accessible={true}
-              collapsable={false}
-              focusable={true}
-              onClick={[Function]}
-              onResponderGrant={[Function]}
-              onResponderMove={[Function]}
-              onResponderRelease={[Function]}
-              onResponderTerminate={[Function]}
-              onResponderTerminationRequest={[Function]}
-              onStartShouldSetResponder={[Function]}
-              style={
-                {
                   "marginRight": 5,
                   "opacity": 1,
                 }
               }
-              testID="header.settings"
+              testID="header.messages"
             />
           </View>
         </View>

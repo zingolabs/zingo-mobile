@@ -1660,6 +1660,11 @@ export class LoadedAppClass extends Component<
           { text: translate('cancel') as string, style: 'cancel' },
         ],
       });
+    } else if (item === MenuItemEnum.Settings) {
+      // Bio gate for settingsScreen lives at the Settings screen entry
+      // (screens/Settings/Settings.tsx).
+      this.drawerNav?.navigate(RouteEnum.Settings);
+      return;
     } else if (item === MenuItemEnum.AddressBook) {
       this.drawerNav?.navigate(RouteEnum.AddressBook);
       return;
