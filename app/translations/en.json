@@ -271,16 +271,6 @@
         "text": "All the information will be in Turkish."
       }
     ],
-    "sendalls": [
-      {
-        "value": true,
-        "text": "Enable the 'MAX' button to fill the amount with your entire wallet balance."
-      },
-      {
-        "value": false,
-        "text": "Disable the sending all button because could be a risk to have it."
-      }
-    ],
     "privacys": [
       {
         "value": true,
@@ -299,16 +289,6 @@
       {
         "value": "advanced",
         "text": "Advanced Mode, for the advanced user."
-      }
-    ],
-    "rescanmenus": [
-      {
-        "value": true,
-        "text": "Enable/Show the menu option to rescan the wallet."
-      },
-      {
-        "value": false,
-        "text": "Disable/Hide the menu option to rescan the wallet."
       }
     ],
     "recoverywalletinfoondevices": [
@@ -386,10 +366,8 @@
     "currency-title": "Currency Price",
     "language-title": "Language",
     "islanguage": "You need to choose a language to save.",
-    "sendall-title": "Enable sending all funds",
     "privacy-title": "High Privacy",
     "mode-title": "Switch between Basic or Advanced Mode",
-    "rescanmenu-title": "Show Rescan Button",
     "recoverywalletinfoondevice-title": "Store Wallet Recovery Info",
     "performancelevel-title": "Zingolib Performance Level",
     "blockexplorer-title": "Block Explorer",
@@ -398,8 +376,6 @@
     "value-language-en": "English",
     "value-language-es": "Spanish",
     "value-language-pt": "Portuguese",
-    "value-sendall-true": "Enable",
-    "value-sendall-false": "Disable",
     "value-privacy-true": "High",
     "value-privacy-false": "Normal",
     "privacy": "Priv: ",
@@ -412,8 +388,6 @@
     "value-chainname-none": "None",
     "server-chain-title": "Network",
     "select-chain-placeholder": "Select a Network...",
-    "value-rescanmenu-true": "Enable",
-    "value-rescanmenu-false": "Disable",
     "value-recoverywalletinfoondevice-true": "Enable",
     "value-recoverywalletinfoondevice-false": "Disable",
     "value-performancelevel-Maximum": "Maximum",

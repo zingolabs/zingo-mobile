@@ -271,16 +271,6 @@
         "text": "Todas as informações estarão em Turco."
       }
     ],
-    "sendalls": [
-      {
-        "value": true,
-        "text": "Habilita o botão 'MÁX' para preencher o valor com todo o saldo da carteira."
-      },
-      {
-        "value": false,
-        "text": "Desative o botão de ENVIAR TUDO, pode ser um risco tê-lo ativado."
-      }
-    ],
     "privacys": [
       {
         "value": true,
@@ -299,16 +289,6 @@
       {
         "value": "advanced",
         "text": "Modo Avançado, para usuários mais avançados."
-      }
-    ],
-    "rescanmenus": [
-      {
-        "value": true,
-        "text": "Ativar/Mostrar a opção de menu para reescanear a carteira."
-      },
-      {
-        "value": false,
-        "text": "Desativar/ocultar a opção de menu para reescanear a carteira."
       }
     ],
     "recoverywalletinfoondevices": [
@@ -386,10 +366,8 @@
     "currency-title": "Preço da Moeda",
     "language-title": "Linguagem",
     "islanguage": "Você precisa escolher um idioma para salvar.",
-    "sendall-title": "Ativar o envio de todos os fundos",
     "privacy-title": "High Privacy",
     "mode-title": "Alterar entre o modo Básico ou Avançado",
-    "rescanmenu-title": "Mostrar o botão de reescaneamento",
     "recoverywalletinfoondevice-title": "Armazene informações de recuperação da carteira",
     "performancelevel-title": "Zingolib Performance Level",
     "blockexplorer-title": "Block Explorer",
@@ -398,8 +376,6 @@
     "value-language-en": "Inglês",
     "value-language-es": "Espanhol",
     "value-language-pt": "Português",
-    "value-sendall-true": "Habilitar",
-    "value-sendall-false": "Desabilitar",
     "value-privacy-true": "Alto",
     "value-privacy-false": "Média",
     "privacy": "Priv: ",
@@ -412,8 +388,6 @@
     "value-chainname-none": "Nenhuma",
     "server-chain-title": "Rede",
     "select-chain-placeholder": "Selecione uma Rede...",
-    "value-rescanmenu-true": "Habilitar",
-    "value-rescanmenu-false": "Desabilitar",
     "value-recoverywalletinfoondevice-true": "Habilitar",
     "value-recoverywalletinfoondevice-false": "Desabilitar",
     "value-performancelevel-Maximum": "Maximum",

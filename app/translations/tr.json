@@ -271,16 +271,6 @@
         "text": "Tüm bilgiler Türkçe olacak."
       }
     ],
-    "sendalls": [
-      {
-        "value": true,
-        "text": "Tutar alanını tüm cüzdan bakiyenizle doldurmak için 'MAKS' düğmesini etkinleştirin."
-      },
-      {
-        "value": false,
-        "text": "Tümünü gönder butonunu devre dışı bırak, çünkü bu özelliğe sahip olmak risk oluşturabilir."
-      }
-    ],
     "privacys": [
       {
         "value": true,
@@ -299,16 +289,6 @@
       {
         "value": "advanced",
         "text": "Gelişmiş Mod: Gelişmiş kullanıcılar için."
-      }
-    ],
-    "rescanmenus": [
-      {
-        "value": true,
-        "text": "Cüzdanı yeniden tarama seçeneğini menüde etkinleştir/göster."
-      },
-      {
-        "value": false,
-        "text": "Cüzdanı yeniden tarama seçeneğini menüden devre dışı bırak/gizle."
       }
     ],
     "recoverywalletinfoondevices": [
@@ -386,10 +366,8 @@
     "currency-title": "Döviz Fiyatı",
     "language-title": "Dil",
     "islanguage": "Kaydetmek için bir dil seçmeniz gerekiyor.",
-    "sendall-title": "Tüm fonları göndermeyi etkinleştir",
     "privacy-title": "High Privacy",
     "mode-title": "Temel ve Gelişmiş Mod arasında geçiş yapın.",
-    "rescanmenu-title": "Yeniden Tarama Butonunu Göster",
     "recoverywalletinfoondevice-title": "Cüzdan Kurtarma Bilgilerini Kaydet",
     "performancelevel-title": "Zingolib Performance Level",
     "blockexplorer-title": "Block Explorer",
@@ -398,8 +376,6 @@
     "value-language-en": "İngilizce",
     "value-language-es": "İspanyolca",
     "value-language-pt": "Portekizce",
-    "value-sendall-true": "Etkin",
-    "value-sendall-false": "Etkin değil",
     "value-privacy-true": "Yüksek",
     "value-privacy-false": "Normal ",
     "privacy": "Özel:",
@@ -412,8 +388,6 @@
     "value-chainname-none": "Yok",
     "server-chain-title": "Ağ",
     "select-chain-placeholder": "Bir Ağ Seçin...",
-    "value-rescanmenu-true": "Etkin",
-    "value-rescanmenu-false": "Etkin değil",
     "value-recoverywalletinfoondevice-true": "Etkin",
     "value-recoverywalletinfoondevice-false": "Etkin değil",
     "value-performancelevel-Maximum": "Maximum",

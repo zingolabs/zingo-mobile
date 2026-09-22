@@ -128,7 +128,6 @@ export default interface AppContextLoaded {
   server: ServerType;
   currency: CurrencyEnum;
   language: LanguageEnum;
-  sendAll: boolean;
   privacy: boolean;
   mode: ModeEnum;
   security: SecurityType;
@@ -138,7 +137,6 @@ export default interface AppContextLoaded {
   // wallet / unknown. Used to decide, on a server change, whether to open the
   // wallet directly or launch a chain switch.
   walletChainName: ChainNameEnum;
-  rescanMenu: boolean;
   recoveryWalletInfoOnDevice: boolean;
   performanceLevel: RPCPerformanceLevelEnum;
   blockExplorer: BlockExplorerEnum;

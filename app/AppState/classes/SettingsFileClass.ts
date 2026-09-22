@@ -11,7 +11,6 @@ export default class SettingsFileClass {
   server: ServerType;
   currency: CurrencyEnum;
   language: LanguageEnum;
-  sendAll: boolean;
   privacy: boolean;
   mode: ModeEnum;
   firstInstall: boolean;
@@ -23,7 +22,6 @@ export default class SettingsFileClass {
   // - string: means it have a normal value
   security: SecurityType;
   selectServer: SelectServerEnum;
-  rescanMenu: boolean;
   recoveryWalletInfoOnDevice: boolean;
   performanceLevel: RPCPerformanceLevelEnum;
   blockExplorer: BlockExplorerEnum;
@@ -34,7 +32,6 @@ export default class SettingsFileClass {
     server: ServerType,
     currency: CurrencyEnum,
     language: LanguageEnum,
-    sendAll: boolean,
     privacy: boolean,
     mode: ModeEnum,
     firstInstall: boolean,
@@ -42,7 +39,6 @@ export default class SettingsFileClass {
     version: string,
     security: SecurityType,
     selectServer: SelectServerEnum,
-    rescanMenu: boolean,
     recoveryWalletInfoOnDevice: boolean,
     performanceLevel: RPCPerformanceLevelEnum,
     blockExplorer: BlockExplorerEnum,
@@ -52,7 +48,6 @@ export default class SettingsFileClass {
     this.server = server;
     this.currency = currency;
     this.language = language;
-    this.sendAll = sendAll;
     this.privacy = privacy;
     this.mode = mode;
     this.firstInstall = firstInstall;
@@ -60,7 +55,6 @@ export default class SettingsFileClass {
     this.version = version;
     this.security = security;
     this.selectServer = selectServer;
-    this.rescanMenu = rescanMenu;
     this.recoveryWalletInfoOnDevice = recoveryWalletInfoOnDevice;
     this.performanceLevel = performanceLevel;
     this.blockExplorer = blockExplorer;

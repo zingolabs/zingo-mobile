@@ -154,7 +154,6 @@ export default function LoadingApp(props: LoadingAppProps) {
     CurrencyEnum.USDCurrency,
   ); // by default USD
   const [server, setServer] = useState<ServerType>(SERVER_DEFAULT_0);
-  const [sendAll, setSendAll] = useState<boolean>(false);
   const [privacy, setPrivacy] = useState<boolean>(false);
   const [mode, setMode] = useState<ModeEnum.basic | ModeEnum.advanced>(
     ModeEnum.advanced,
@@ -181,7 +180,6 @@ export default function LoadingApp(props: LoadingAppProps) {
   const [selectServer, setSelectServer] = useState<SelectServerEnum>(
     SelectServerEnum.auto,
   );
-  const [rescanMenu, setRescanMenu] = useState<boolean>(false);
   const [recoveryWalletInfoOnDevice, setRecoveryWalletInfoOnDevice] =
     useState<boolean>(false);
   const [performanceLevel, setPerformanceLevel] =
@@ -319,11 +317,6 @@ export default function LoadingApp(props: LoadingAppProps) {
       } else {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.server, server);
       }
-      if (settings.sendAll === true || settings.sendAll === false) {
-        setSendAll(settings.sendAll);
-      } else {
-        await SettingsFileImpl.writeSettings(SettingsNameEnum.sendAll, sendAll);
-      }
       if (settings.privacy === true || settings.privacy === false) {
         setPrivacy(settings.privacy);
       } else {
@@ -348,14 +341,6 @@ export default function LoadingApp(props: LoadingAppProps) {
         await SettingsFileImpl.writeSettings(
           SettingsNameEnum.selectServer,
           selectServer,
-        );
-      }
-      if (settings.rescanMenu === true || settings.rescanMenu === false) {
-        setRescanMenu(settings.rescanMenu);
-      } else {
-        await SettingsFileImpl.writeSettings(
-          SettingsNameEnum.rescanMenu,
-          rescanMenu,
         );
       }
       if (
@@ -437,14 +422,12 @@ export default function LoadingApp(props: LoadingAppProps) {
         language={language}
         currency={currency}
         server={server}
-        sendAll={sendAll}
         privacy={privacy}
         mode={mode}
         backgroundSyncInfo={backgroundSyncInfo}
         firstLaunchingMessage={firstLaunchingMessage}
         security={security}
         selectServer={selectServer}
-        rescanMenu={rescanMenu}
         recoveryWalletInfoOnDevice={recoveryWalletInfoOnDevice}
         performanceLevel={performanceLevel}
         blockExplorer={blockExplorer}
@@ -465,14 +448,12 @@ type LoadingAppClassProps = {
   language: LanguageEnum;
   currency: CurrencyEnum;
   server: ServerType;
-  sendAll: boolean;
   privacy: boolean;
   mode: ModeEnum;
   backgroundSyncInfo: BackgroundType;
   firstLaunchingMessage: LaunchingModeEnum;
   security: SecurityType;
   selectServer: SelectServerEnum;
-  rescanMenu: boolean;
   recoveryWalletInfoOnDevice: boolean;
   performanceLevel: RPCPerformanceLevelEnum;
   blockExplorer: BlockExplorerEnum;
@@ -516,12 +497,10 @@ export class LoadingAppClass extends Component<
       server: props.server,
       currency: props.currency,
       language: props.language,
-      sendAll: props.sendAll,
       privacy: props.privacy,
       mode: props.mode,
       security: props.security,
       selectServer: props.selectServer,
-      rescanMenu: props.rescanMenu,
       recoveryWalletInfoOnDevice: props.recoveryWalletInfoOnDevice,
       performanceLevel: props.performanceLevel,
       blockExplorer: props.blockExplorer,
@@ -2264,12 +2243,10 @@ export class LoadingAppClass extends Component<
       server: this.state.server,
       currency: this.state.currency,
       language: this.state.language,
-      sendAll: this.state.sendAll,
       privacy: this.state.privacy,
       mode: this.state.mode,
       security: this.state.security,
       selectServer: this.state.selectServer,
-      rescanMenu: this.state.rescanMenu,
       recoveryWalletInfoOnDevice: this.state.recoveryWalletInfoOnDevice,
       performanceLevel: this.state.performanceLevel,
       blockExplorer: this.state.blockExplorer,

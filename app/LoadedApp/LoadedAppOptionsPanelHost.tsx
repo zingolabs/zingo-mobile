@@ -75,7 +75,6 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
     selectServer,
     netInfo,
     valueTransfersTotal,
-    rescanMenu,
   } = context;
   const { isOpen } = useOptionsPanel();
 
@@ -112,7 +111,7 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
 
     const showSeedUfvk = !isEmptyBasic;
     // Legacy Menu.tsx parity: advanced + online + context-flag.
-    const showRescan = !isBasic && !isOffline && rescanMenu;
+    const showRescan = !isBasic && !isOffline;
     const showSyncReport = !isBasic && !isOffline;
     const showFundPools = !isBasic;
     const showInsight = !isEmptyBasic;
@@ -250,7 +249,6 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
     netInfo.isConnected,
     valueTransfersTotal,
     hasBackupWallet,
-    rescanMenu,
   ]);
 
   const socials = useMemo<OptionsPanelSocial[]>(

@@ -1101,6 +1101,65 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                         }
                       />
                     </View>
+                    <View
+                      accessibilityState={
+                        {
+                          "busy": undefined,
+                          "checked": undefined,
+                          "disabled": undefined,
+                          "expanded": undefined,
+                          "selected": undefined,
+                        }
+                      }
+                      accessibilityValue={
+                        {
+                          "max": undefined,
+                          "min": undefined,
+                          "now": undefined,
+                          "text": undefined,
+                        }
+                      }
+                      accessible={true}
+                      collapsable={false}
+                      focusable={true}
+                      onClick={[Function]}
+                      onResponderGrant={[Function]}
+                      onResponderMove={[Function]}
+                      onResponderRelease={[Function]}
+                      onResponderTerminate={[Function]}
+                      onResponderTerminationRequest={[Function]}
+                      onStartShouldSetResponder={[Function]}
+                      style={
+                        {
+                          "alignItems": "center",
+                          "justifyContent": "center",
+                          "opacity": 1,
+                          "paddingLeft": 0,
+                          "paddingRight": 8,
+                        }
+                      }
+                      testID="send.max"
+                    >
+                      <Text
+                        style={
+                          {
+                            "color": "#18bd18",
+                            "fontSize": 20,
+                            "fontWeight": "bold",
+                            "letterSpacing": -1.5,
+                            "lineHeight": 20,
+                            "opacity": 0.87,
+                            "transform": [
+                              {
+                                "scaleX": 0.8,
+                              },
+                            ],
+                          }
+                        }
+                      >
+                        text translated
+                      </Text>
+                    </View>
                   </View>
                 </View>
                 <View

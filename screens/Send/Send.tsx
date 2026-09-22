@@ -156,7 +156,6 @@ const Send: React.FunctionComponent<SendProps> = ({
     totalBalance,
     sendPageState,
     zecPrice,
-    sendAll,
     netInfo,
     privacy,
     server,
@@ -235,7 +234,6 @@ const Send: React.FunctionComponent<SendProps> = ({
   const [updatingToField, setUpdatingToField] = useState<boolean>(false);
   const [negativeMaxAmount, setNegativeMaxAmount] = useState<boolean>(false);
   const [inputZec, setInputZec] = useState<boolean>(true);
-  //const [sendAllClick, setSendAllClick] = useState<boolean>(false);
   const [proposeSendLastError, setProposeSendLastError] = useState<string>('');
   const [spendableBalanceLastError, setSpendableBalanceLastError] =
     useState<string>('');
@@ -1623,7 +1621,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           />
                         </TouchableOpacity>
                       ) : null}
-                      {sendAll && mode !== ModeEnum.basic && (
+                      {mode !== ModeEnum.basic && (
                         <TouchableOpacity
                           testID="send.max"
                           onPress={() => {

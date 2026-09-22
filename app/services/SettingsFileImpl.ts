@@ -193,11 +193,15 @@ export default class SettingsFileImpl {
           settings.selectServer = SelectServerEnum.auto;
         }
       }
-      // Donations are gone from the App, so the flags of the old tip feature
-      // are dropped from the file the first time an older settings.json loads.
+      // Settings the App no longer asks about are dropped from the file the
+      // first time an older settings.json loads: the donation flags of the
+      // old tip feature, and the two switches that used to hide the MAX
+      // button and the Rescan menu entry, both of which are always there now.
       const obsolete = settings as unknown as Record<string, unknown>;
       delete obsolete.donation;
       delete obsolete.firstUpdateWithDonation;
+      delete obsolete.sendAll;
+      delete obsolete.rescanMenu;
       // old security options that have to be removed and to add the new one.
       if (settings.hasOwnProperty(SettingsNameEnum.security)) {
         const sec: SecurityType = settings.security;

@@ -53,28 +53,6 @@ export const mockTranslate = (p: string) => {
         text: 'text tr',
       },
     ];
-  } else if (p === 'settings.sendalls') {
-    return [
-      {
-        value: true,
-        text: 'text true',
-      },
-      {
-        value: false,
-        text: 'text false',
-      },
-    ];
-  } else if (p === 'settings.rescanmenus') {
-    return [
-      {
-        value: true,
-        text: 'text true',
-      },
-      {
-        value: false,
-        text: 'text false',
-      },
-    ];
   } else if (p === 'settings.recoverywalletinfoondevices') {
     return [
       {

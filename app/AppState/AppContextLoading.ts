@@ -34,12 +34,10 @@ export default interface AppContextLoading {
   server: ServerType;
   currency: CurrencyEnum;
   language: LanguageEnum;
-  sendAll: boolean;
   privacy: boolean;
   mode: ModeEnum;
   security: SecurityType;
   selectServer: SelectServerEnum;
-  rescanMenu: boolean;
   recoveryWalletInfoOnDevice: boolean;
   performanceLevel: RPCPerformanceLevelEnum;
   blockExplorer: BlockExplorerEnum;

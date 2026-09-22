@@ -116,10 +116,8 @@ type SettingsProps = NativeStackScreenProps<
   ) => Promise<SetServerResult>;
   setCurrencyOption: (value: CurrencyEnum) => Promise<void>;
   setLanguageOption: (value: LanguageEnum) => Promise<void>;
-  setSendAllOption: (value: boolean) => Promise<void>;
   setSecurityOption: (value: SecurityType) => Promise<void>;
   setSelectServerOption: (value: string) => Promise<void>;
-  setRescanMenuOption: (value: boolean) => Promise<void>;
   setRecoveryWalletInfoOnDeviceOption: (value: boolean) => Promise<void>;
   setPerformanceLevelOption: (value: RPCPerformanceLevelEnum) => Promise<void>;
   setBlockExplorerOption: (value: BlockExplorerEnum) => Promise<void>;
@@ -137,10 +135,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   setServerOption,
   setCurrencyOption,
   setLanguageOption,
-  setSendAllOption,
   setSecurityOption,
   setSelectServerOption,
-  setRescanMenuOption,
   setRecoveryWalletInfoOnDeviceOption,
   setPerformanceLevelOption,
   setBlockExplorerOption,
@@ -154,7 +150,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     server: serverContext,
     currency: currencyContext,
     language: languageContext,
-    sendAll: sendAllContext,
     privacy: privacyContext,
     mode,
     netInfo,
@@ -162,7 +157,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     security: securityContext,
     selectServer: selectServerContext,
     walletChainName,
-    rescanMenu: rescanMenuContext,
     recoveryWalletInfoOnDevice: recoveryWalletInfoOnDeviceContext,
     performanceLevel: performanceLevelContext,
     blockExplorer: blockExplorerContext,
@@ -189,22 +183,10 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     LANGUAGES = languagesArray as Options[];
   }
 
-  const sendAllsArray = translate('settings.sendalls');
-  let SENDALLS: Options[] = [];
-  if (typeof sendAllsArray === 'object') {
-    SENDALLS = sendAllsArray as Options[];
-  }
-
   const privacysArray = translate('settings.privacys');
   let PRIVACYS: Options[] = [];
   if (typeof privacysArray === 'object') {
     PRIVACYS = privacysArray as Options[];
-  }
-
-  const rescanMenusArray = translate('settings.rescanmenus');
-  let RESCANMENU: Options[] = [];
-  if (typeof rescanMenusArray === 'object') {
-    RESCANMENU = rescanMenusArray as Options[];
   }
 
   const recoveryWalletInfoOnDevicesArray = translate(
@@ -293,7 +275,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   );
   const [currency, setCurrency] = useState<CurrencyEnum>(currencyContext);
   const [language, setLanguage] = useState<LanguageEnum>(languageContext);
-  const [sendAll, setSendAll] = useState<boolean>(sendAllContext);
   const [privacy, setPrivacy] = useState<boolean>(privacyContext);
   // security checks box.
   const [startApp, setStartApp] = useState<boolean>(securityContext.startApp);
@@ -319,7 +300,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     useState<boolean>(securityContext.restoreWalletBackupScreen);
   const [selectServer, setSelectServer] =
     useState<SelectServerEnum>(selectServerContext);
-  const [rescanMenu, setRescanMenu] = useState<boolean>(rescanMenuContext);
   const [recoveryWalletInfoOnDevice, setRecoveryWalletInfoOnDevice] =
     useState<boolean>(recoveryWalletInfoOnDeviceContext);
   const [performanceLevel, setPerformanceLevel] =
@@ -701,11 +681,9 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       serverContext.chainName === chainNameParsed &&
       currencyContext === currency &&
       languageContext === language &&
-      sendAllContext === sendAll &&
       privacyContext === privacy &&
       isEqual(securityContext, securityObject()) &&
       selectServerContext === selectServer &&
-      rescanMenuContext === rescanMenu &&
       recoveryWalletInfoOnDeviceContext === recoveryWalletInfoOnDevice &&
       performanceLevelContext === performanceLevel &&
       blockExplorerContext === blockExplorer &&
@@ -730,8 +708,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     privacyContext,
     recoveryWalletInfoOnDevice,
     recoveryWalletInfoOnDeviceContext,
-    rescanMenu,
-    rescanMenuContext,
     performanceLevel,
     performanceLevelContext,
     blockExplorer,
@@ -741,8 +717,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     securityContext,
     selectServer,
     selectServerContext,
-    sendAll,
-    sendAllContext,
     serverContext.chainName,
     serverContext.uri,
     securityObject,
@@ -785,11 +759,9 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       serverContext.chainName === chainNameParsed &&
       currencyContext === currency &&
       languageContext === language &&
-      sendAllContext === sendAll &&
       privacyContext === privacy &&
       isEqual(securityContext, securityObject()) &&
       selectServerContext === selectServer &&
-      rescanMenuContext === rescanMenu &&
       recoveryWalletInfoOnDeviceContext === recoveryWalletInfoOnDevice &&
       performanceLevelContext === performanceLevel &&
       blockExplorerContext === blockExplorer &&
@@ -969,17 +941,11 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       if (currencyContext !== currency) {
         await setCurrencyOption(currency);
       }
-      if (sendAllContext !== sendAll) {
-        await setSendAllOption(sendAll);
-      }
       if (privacyContext !== privacy) {
         await setPrivacyOption(privacy);
       }
       if (!isEqual(securityContext, securityObject())) {
         await setSecurityOption(securityObject());
-      }
-      if (rescanMenuContext !== rescanMenu) {
-        await setRescanMenuOption(rescanMenu);
       }
       if (recoveryWalletInfoOnDeviceContext !== recoveryWalletInfoOnDevice) {
         await setRecoveryWalletInfoOnDeviceOption(recoveryWalletInfoOnDevice);
@@ -1097,8 +1063,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       setCurrency(currencyContext);
       setLanguage(languageContext);
       setPrivacy(privacyContext);
-      setSendAll(sendAllContext);
-      setRescanMenu(rescanMenuContext);
       setSelectServer(selectServerContext);
       setServer();
       setStartApp(securityContext.startApp);
@@ -2140,116 +2104,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                       />
                     </View>
                   </TouchableOpacity>
-                </View>
-              )}
-
-              {mode !== ModeEnum.basic && !readOnly && (
-                <View style={{ marginHorizontal: 25, marginVertical: 15 }}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        flex: 1,
-                      }}
-                    >
-                      <BoldText>
-                        {translate('settings.sendall-title') as string}
-                      </BoldText>
-                      <TouchableOpacity
-                        onPress={() =>
-                          setOpenInfoSection(
-                            openInfoSection === 'sendall' ? null : 'sendall',
-                          )
-                        }
-                        style={{ marginLeft: 6 }}
-                      >
-                        <FontAwesomeIcon
-                          icon={faInfoCircle}
-                          size={14}
-                          color={colors.fgDefault}
-                        />
-                      </TouchableOpacity>
-                    </View>
-                    <TouchableOpacity onPress={() => setSendAll(!sendAll)}>
-                      {sendAll ? (
-                        <SettingSwitchOn width={40} height={19} />
-                      ) : (
-                        <SwitchOff width={40} height={19} />
-                      )}
-                    </TouchableOpacity>
-                  </View>
-                  {openInfoSection === 'sendall' && (
-                    <View
-                      style={{
-                        backgroundColor: '#040E1D',
-                        borderRadius: 8,
-                        padding: 10,
-                        marginTop: 8,
-                      }}
-                    >
-                      <FadeText style={{ textAlign: 'center' }}>
-                        {SENDALLS.find(d => String(d.value) === 'true')?.text ??
-                          ''}
-                      </FadeText>
-                    </View>
-                  )}
-                </View>
-              )}
-
-              {mode !== ModeEnum.basic && (
-                <View style={{ marginHorizontal: 25, marginVertical: 15 }}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        flex: 1,
-                      }}
-                    >
-                      <BoldText>
-                        {translate('settings.rescanmenu-title') as string}
-                      </BoldText>
-                      <TouchableOpacity
-                        onPress={() =>
-                          setOpenInfoSection(
-                            openInfoSection === 'rescan' ? null : 'rescan',
-                          )
-                        }
-                        style={{ marginLeft: 6 }}
-                      >
-                        <FontAwesomeIcon
-                          icon={faInfoCircle}
-                          size={14}
-                          color={colors.fgDefault}
-                        />
-                      </TouchableOpacity>
-                    </View>
-                    <TouchableOpacity
-                      onPress={() => setRescanMenu(!rescanMenu)}
-                    >
-                      {rescanMenu ? (
-                        <SettingSwitchOn width={40} height={19} />
-                      ) : (
-                        <SwitchOff width={40} height={19} />
-                      )}
-                    </TouchableOpacity>
-                  </View>
-                  {openInfoSection === 'rescan' && (
-                    <View
-                      style={{
-                        backgroundColor: '#040E1D',
-                        borderRadius: 8,
-                        padding: 10,
-                        marginTop: 8,
-                      }}
-                    >
-                      <FadeText style={{ textAlign: 'center' }}>
-                        {RESCANMENU.find(d => String(d.value) === 'true')
-                          ?.text ?? ''}
-                      </FadeText>
-                    </View>
-                  )}
                 </View>
               )}
 

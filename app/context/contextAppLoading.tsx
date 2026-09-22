@@ -25,7 +25,6 @@ export const defaultAppContextLoading: AppContextLoading = {
     zecPrice: 0,
     date: 0,
   } as ZecPriceType,
-  sendAll: false,
   backgroundSyncInfo: {
     batches: 0,
     message: '',
@@ -44,7 +43,6 @@ export const defaultAppContextLoading: AppContextLoading = {
   addLastSnackbar: () => {},
   security: {} as SecurityType,
   selectServer: SelectServerEnum.auto,
-  rescanMenu: false,
   recoveryWalletInfoOnDevice: false,
   zingolibVersion: '',
   performanceLevel: RPCPerformanceLevelEnum.Medium,
