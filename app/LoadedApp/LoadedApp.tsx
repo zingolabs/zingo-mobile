@@ -53,7 +53,6 @@ import {
   MenuItemEnum,
   LanguageEnum,
   ModeEnum,
-  CurrencyEnum,
   SelectServerEnum,
   ChainNameEnum,
   SeedActionEnum,
@@ -217,9 +216,6 @@ const SERVER_DEFAULT_0: ServerType = {
 export default function LoadedApp(props: LoadedAppProps) {
   const theme = useTheme();
   const [language, setLanguage] = useState<LanguageEnum>(LanguageEnum.en);
-  const [currency, setCurrency] = useState<CurrencyEnum>(
-    CurrencyEnum.USDCurrency,
-  );
   const [server, setServer] = useState<ServerType>(SERVER_DEFAULT_0);
   const [privacy, setPrivacy] = useState<boolean>(false);
   const [mode, setMode] = useState<ModeEnum>(ModeEnum.advanced); // by default advanced
@@ -363,17 +359,6 @@ export default function LoadedApp(props: LoadedAppProps) {
         setLanguage(lang);
         i18n.locale = lang;
         await SettingsFileImpl.writeSettings(SettingsNameEnum.language, lang);
-      }
-      if (
-        settings.currency === CurrencyEnum.noCurrency ||
-        settings.currency === CurrencyEnum.USDCurrency
-      ) {
-        setCurrency(settings.currency);
-      } else {
-        await SettingsFileImpl.writeSettings(
-          SettingsNameEnum.currency,
-          currency,
-        );
       }
       if (settings.server) {
         // Offline (empty uri) has no chain. Normalize any residual chainName to
@@ -643,7 +628,6 @@ export default function LoadedApp(props: LoadedAppProps) {
           setLanguage(locale as LanguageEnum);
         }}
         language={language}
-        currency={currency}
         server={server}
         privacy={privacy}
         mode={mode}
@@ -702,7 +686,6 @@ type LoadedAppClassProps = {
   setI18nLocale: (locale: string) => void;
   theme: AppTheme;
   language: LanguageEnum;
-  currency: CurrencyEnum;
   server: ServerType;
   privacy: boolean;
   mode: ModeEnum;
@@ -791,11 +774,9 @@ export class LoadedAppClass extends Component<
       setPrivacyOption: this.setPrivacyOption,
       setNymOption: this.setNymOption,
       setModeOption: this.setModeOption,
-      setCurrencyOption: this.setCurrencyOption,
 
       // context settings
       server: props.server,
-      currency: props.currency,
       language: props.language,
       privacy: props.privacy,
       mode: props.mode,
@@ -1872,13 +1853,6 @@ export class LoadedAppClass extends Component<
     }
   };
 
-  setCurrencyOption = async (value: CurrencyEnum): Promise<void> => {
-    await SettingsFileImpl.writeSettings(SettingsNameEnum.currency, value);
-    this.setState({
-      currency: value as CurrencyEnum,
-    });
-  };
-
   setLanguageOption = async (value: string): Promise<void> => {
     await SettingsFileImpl.writeSettings(SettingsNameEnum.language, value);
     this.setState({
@@ -2267,11 +2241,9 @@ export class LoadedAppClass extends Component<
       setPrivacyOption: this.setPrivacyOption,
       setNymOption: this.setNymOption,
       setModeOption: this.setModeOption,
-      setCurrencyOption: this.setCurrencyOption,
 
       // context settings
       server: this.state.server,
-      currency: this.state.currency,
       language: this.state.language,
       privacy: this.state.privacy,
       mode: this.state.mode,
@@ -2460,7 +2432,6 @@ export class LoadedAppClass extends Component<
                         <Settings
                           {...props}
                           setServerOption={this.setServerOption}
-                          setCurrencyOption={this.setCurrencyOption}
                           setLanguageOption={this.setLanguageOption}
                           setSecurityOption={this.setSecurityOption}
                           setSelectServerOption={this.setSelectServerOption}

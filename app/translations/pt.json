@@ -239,16 +239,6 @@
         "text": "Baixe todos os MEMOS na blockchain. O servidor não coletará quais os IDs de transação pertencem a você. Isso consome MUITA largura de banda."
       }
     ],
-    "currencies": [
-      {
-        "value": "",
-        "text": "Não é possível buscar nenhum preço para outras moedas, apenas ZEC."
-      },
-      {
-        "value": "USD",
-        "text": "Você pode obter o preço em USD na internet."
-      }
-    ],
     "languages": [
       {
         "value": "en",
@@ -363,7 +353,6 @@
     "value-memo-none": "nenhum",
     "value-memo-wallet": "carteira",
     "value-memo-all": "todos",
-    "currency-title": "Preço da Moeda",
     "language-title": "Linguagem",
     "islanguage": "Você precisa escolher um idioma para salvar.",
     "privacy-title": "High Privacy",
@@ -371,8 +360,6 @@
     "recoverywalletinfoondevice-title": "Armazene informações de recuperação da carteira",
     "performancelevel-title": "Zingolib Performance Level",
     "blockexplorer-title": "Block Explorer",
-    "value-currency-": "Sem Saldo",
-    "value-currency-USD": "US Dólares",
     "value-language-en": "Inglês",
     "value-language-es": "Espanhol",
     "value-language-pt": "Português",

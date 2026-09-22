@@ -66,7 +66,6 @@ import {
   SendPageStateClass,
   ToAddrClass,
   ModeEnum,
-  CurrencyEnum,
   ChainNameEnum,
   GlobalConst,
   ServerUrisType,
@@ -170,7 +169,6 @@ const Send: React.FunctionComponent<SendProps> = ({
     shieldingAmount,
     selectServer,
     //security,
-    currency,
     zingolibVersion,
     setPrivacyOption,
     mixnetView,
@@ -305,17 +303,15 @@ const Send: React.FunctionComponent<SendProps> = ({
 
   useEffect(() => {
     const isMainChain = server.chainName === ChainNameEnum.mainChainName;
-    const withUsd = isMainChain && currency === CurrencyEnum.USDCurrency;
-    if (!withUsd) {
+    if (!isMainChain) {
       setUsdRowH(0);
     }
-  }, [currency, server.chainName]);
+  }, [server.chainName]);
 
   const sendSnapPoints = useMemo(() => {
     const isMainChain = server.chainName === ChainNameEnum.mainChainName;
-    const withUsd = isMainChain && currency === CurrencyEnum.USDCurrency;
     if (containerH <= 0 || headerH <= 0) {
-      return withUsd ? ['85%', '89%', '93%'] : ['89%', '93%'];
+      return isMainChain ? ['85%', '89%', '93%'] : ['89%', '93%'];
     }
     const snapBase = containerH - headerH - SNAP_GAP;
     const snapPrice = Math.max(snapBase + BALANCE_SNAP_BUMP, 100);
@@ -330,12 +326,12 @@ const Send: React.FunctionComponent<SendProps> = ({
       points.push(snapPrice);
     }
     points.push(snapLow);
-    if (withUsd && usdRowH > 0) {
+    if (isMainChain && usdRowH > 0) {
       points.push(snapMid);
     }
     points.push(snapMax);
     return points;
-  }, [currency, server.chainName, containerH, headerH, usdRowH, priceRowH]);
+  }, [server.chainName, containerH, headerH, usdRowH, priceRowH]);
 
   const priceSnapIndex = priceRowH > 0 ? 0 : null;
   const onPriceSnapChange = usePriceSnapAutoClose(
@@ -495,7 +491,11 @@ const Send: React.FunctionComponent<SendProps> = ({
         ? await sendAllPropose(
             addressPar,
             memoEnabled
-              ? Utils.buildMemo(memoPar, includeUAMemoPar, defaultUnifiedAddress)
+              ? Utils.buildMemo(
+                  memoPar,
+                  includeUAMemoPar,
+                  defaultUnifiedAddress,
+                )
               : '',
           )
         : await sendPropose(JSON.stringify(sendJson));
@@ -1659,76 +1659,57 @@ const Send: React.FunctionComponent<SendProps> = ({
                         </TouchableOpacity>
                       )}
                     </View>
-                    {currency === CurrencyEnum.USDCurrency &&
-                      server.chainName === ChainNameEnum.mainChainName && (
-                        <>
-                          <TouchableOpacity
-                            onPress={() => {
-                              if (
-                                inputZec &&
-                                !amountCurrencyText &&
-                                amountText &&
-                                zecPrice.zecPrice > 0
-                              ) {
-                                const zecVal =
-                                  Utils.parseStringLocaleToNumberFloat(
-                                    amountText,
-                                  );
-                                if (!isNaN(zecVal)) {
-                                  setAmountCurrencyText(
-                                    Utils.parseNumberFloatToStringLocale(
-                                      zecVal * zecPrice.zecPrice,
-                                      2,
-                                    ),
-                                  );
-                                }
+                    {server.chainName === ChainNameEnum.mainChainName && (
+                      <>
+                        <TouchableOpacity
+                          onPress={() => {
+                            if (
+                              inputZec &&
+                              !amountCurrencyText &&
+                              amountText &&
+                              zecPrice.zecPrice > 0
+                            ) {
+                              const zecVal =
+                                Utils.parseStringLocaleToNumberFloat(
+                                  amountText,
+                                );
+                              if (!isNaN(zecVal)) {
+                                setAmountCurrencyText(
+                                  Utils.parseNumberFloatToStringLocale(
+                                    zecVal * zecPrice.zecPrice,
+                                    2,
+                                  ),
+                                );
                               }
-                              setInputZec(!inputZec);
-                            }}
-                            disabled={
-                              !zecPrice.zecPrice || zecPrice.zecPrice <= 0
                             }
-                            style={{ marginHorizontal: 8 }}
-                            testID="send.swap-entry"
-                          >
-                            <Swap
-                              width={28}
-                              height={28}
-                              color={
-                                !zecPrice.zecPrice || zecPrice.zecPrice <= 0
-                                  ? colors.fgAccentDisabled
-                                  : colors.fgAccent
-                              }
-                            />
-                          </TouchableOpacity>
-                          {inputZec ? (
-                            zecPrice.date > 0 && (
-                              <CurrencyAmount
-                                style={{
-                                  marginTop: 0,
-                                  marginBottom: 0,
-                                  fontSize: 16,
-                                }}
-                                priceDate={zecPrice.date}
-                                price={zecPrice.zecPrice}
-                                amtZec={
-                                  Utils.parseStringLocaleToNumberFloat(
-                                    amountText,
-                                  ) || 0
-                                }
-                                currency={currency}
-                                privacy={privacy}
-                              />
-                            )
-                          ) : (
-                            <ZecAmount
-                              style={{ marginLeft: 0 }}
-                              currencyName={info.currencyName}
-                              color={
-                                priceMuted ? colors.fgMuted : colors.fgDefault
-                              }
-                              size={16}
-                              testID="send.zec-derived"
+                            setInputZec(!inputZec);
+                          }}
+                          disabled={
+                            !zecPrice.zecPrice || zecPrice.zecPrice <= 0
+                          }
+                          style={{ marginHorizontal: 8 }}
+                          testID="send.swap-entry"
+                        >
+                          <Swap
+                            width={28}
+                            height={28}
+                            color={
+                              !zecPrice.zecPrice || zecPrice.zecPrice <= 0
+                                ? colors.fgAccentDisabled
+                                : colors.fgAccent
+                            }
+                          />
+                        </TouchableOpacity>
+                        {inputZec ? (
+                          zecPrice.date > 0 && (
+                            <CurrencyAmount
+                              style={{
+                                marginTop: 0,
+                                marginBottom: 0,
+                                fontSize: 16,
+                              }}
+                              priceDate={zecPrice.date}
+                              price={zecPrice.zecPrice}
                               amtZec={
                                 Utils.parseStringLocaleToNumberFloat(
                                   amountText,
@@ -1736,16 +1717,31 @@ const Send: React.FunctionComponent<SendProps> = ({
                               }
                               privacy={privacy}
                             />
-                          )}
-                          {zecPrice.date > 0 && (
-                            <View style={{ marginLeft: inputZec ? 5 : 2 }}>
-                              <PriceFetcher
-                                backgroundColor={colors.bgSurface}
-                              />
-                            </View>
-                          )}
-                        </>
-                      )}
+                          )
+                        ) : (
+                          <ZecAmount
+                            style={{ marginLeft: 0 }}
+                            currencyName={info.currencyName}
+                            color={
+                              priceMuted ? colors.fgMuted : colors.fgDefault
+                            }
+                            size={16}
+                            testID="send.zec-derived"
+                            amtZec={
+                              Utils.parseStringLocaleToNumberFloat(
+                                amountText,
+                              ) || 0
+                            }
+                            privacy={privacy}
+                          />
+                        )}
+                        {zecPrice.date > 0 && (
+                          <View style={{ marginLeft: inputZec ? 5 : 2 }}>
+                            <PriceFetcher backgroundColor={colors.bgSurface} />
+                          </View>
+                        )}
+                      </>
+                    )}
                   </View>
 
                   <View style={{ display: 'flex', flexDirection: 'column' }}>
@@ -1804,7 +1800,6 @@ const Send: React.FunctionComponent<SendProps> = ({
                             priceDate={zecPrice.date}
                             price={zecPrice.zecPrice}
                             amtZec={maxAmount}
-                            currency={currency}
                             privacy={privacy}
                           />
                         )}

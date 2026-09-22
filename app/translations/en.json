@@ -239,16 +239,6 @@
         "text": "Download all memos in the blockchain. Server will not learn what TxIDs belong to you. This consumes A LOT of bandwidth."
       }
     ],
-    "currencies": [
-      {
-        "value": "",
-        "text": "No fetching any price for any currency, only ZEC."
-      },
-      {
-        "value": "USD",
-        "text": "You can fetch the price for US Dollars from internet."
-      }
-    ],
     "languages": [
       {
         "value": "en",
@@ -363,7 +353,6 @@
     "value-memo-none": "none",
     "value-memo-wallet": "wallet",
     "value-memo-all": "all",
-    "currency-title": "Currency Price",
     "language-title": "Language",
     "islanguage": "You need to choose a language to save.",
     "privacy-title": "High Privacy",
@@ -371,8 +360,6 @@
     "recoverywalletinfoondevice-title": "Store Wallet Recovery Info",
     "performancelevel-title": "Zingolib Performance Level",
     "blockexplorer-title": "Block Explorer",
-    "value-currency-": "No currency",
-    "value-currency-USD": "US Dollar",
     "value-language-en": "English",
     "value-language-es": "Spanish",
     "value-language-pt": "Portuguese",

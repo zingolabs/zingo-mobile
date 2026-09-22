@@ -1,6 +1,5 @@
 import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
 import { BlockExplorerEnum } from '@app/AppState/enums/BlockExplorerEnum';
-import { CurrencyEnum } from '@app/AppState/enums/CurrencyEnum';
 import { LanguageEnum } from '@app/AppState/enums/LanguageEnum';
 import { ModeEnum } from '@app/AppState/enums/ModeEnum';
 import { SelectServerEnum } from '@app/AppState/enums/SelectServerEnum';
@@ -9,7 +8,6 @@ import ServerType from '@app/AppState/types/ServerType';
 
 export default class SettingsFileClass {
   server: ServerType;
-  currency: CurrencyEnum;
   language: LanguageEnum;
   privacy: boolean;
   mode: ModeEnum;
@@ -30,7 +28,6 @@ export default class SettingsFileClass {
 
   constructor(
     server: ServerType,
-    currency: CurrencyEnum,
     language: LanguageEnum,
     privacy: boolean,
     mode: ModeEnum,
@@ -46,7 +43,6 @@ export default class SettingsFileClass {
     ironwoodOnboardSeen: boolean,
   ) {
     this.server = server;
-    this.currency = currency;
     this.language = language;
     this.privacy = privacy;
     this.mode = mode;

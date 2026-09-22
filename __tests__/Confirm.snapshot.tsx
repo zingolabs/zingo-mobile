@@ -11,7 +11,7 @@ import {
 } from '@app/context';
 
 import Confirm from '@screens/Confirm';
-import { CurrencyEnum, ModeEnum, RouteEnum } from '@app/AppState';
+import { ModeEnum, RouteEnum } from '@app/AppState';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
@@ -56,13 +56,11 @@ describe('Confirm - snapshots', () => {
   // stays inactive and the snapshot captures the actual Confirm UI rather
   // than the auth placeholder.
   state.security = { ...mockSecurity, sendConfirm: false };
-  state.currency = CurrencyEnum.noCurrency;
   state.mode = ModeEnum.advanced;
   state.defaultUnifiedAddress = 'u1abc123def456abc123def456abc123def456abc123';
 
-  test('Confirm no currency, privacy off', () => {
+  test('Confirm privacy off', () => {
     state.privacy = false;
-    state.currency = CurrencyEnum.noCurrency;
     expect(
       render(
         <ContextAppLoadedProvider value={state}>
@@ -72,9 +70,8 @@ describe('Confirm - snapshots', () => {
     ).toMatchSnapshot();
   });
 
-  test('Confirm USD currency, privacy on', () => {
+  test('Confirm privacy on', () => {
     state.privacy = true;
-    state.currency = CurrencyEnum.USDCurrency;
     expect(
       render(
         <ContextAppLoadedProvider value={state}>

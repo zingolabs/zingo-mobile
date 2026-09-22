@@ -16,7 +16,7 @@ import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
 } from '@app/context';
-import { CurrencyEnum, SelectServerEnum } from '@app/AppState';
+import { SelectServerEnum } from '@app/AppState';
 import { getZecPrice } from '@app/walletBackend';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import {
@@ -97,7 +97,7 @@ test('a ZEC-display wallet still fetches every tick', async () => {
   const setZecPrice = jest.fn();
 
   render(
-    driverOnlyUi(makeCtx({ currency: CurrencyEnum.noCurrency }), setZecPrice),
+    driverOnlyUi(makeCtx({}), setZecPrice),
   );
   await jest.advanceTimersByTimeAsync(0);
   expect(price).toHaveBeenCalledTimes(1);

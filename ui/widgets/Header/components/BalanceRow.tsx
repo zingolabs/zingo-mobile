@@ -18,7 +18,6 @@ import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
   ChainNameEnum,
-  CurrencyEnum,
   ModeEnum,
   RouteEnum,
   SelectServerEnum,
@@ -65,7 +64,6 @@ type BalanceRowProps = {
   translate: (key: string) => TranslateType;
   totalBalance: TotalBalanceClass | null;
   info: InfoType;
-  currency: CurrencyEnum;
   zecPrice: ZecPriceType;
   selectServer: SelectServerEnum;
   showShieldButton: boolean;
@@ -90,7 +88,6 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
     translate,
     totalBalance,
     info,
-    currency,
     zecPrice,
     selectServer,
     showShieldButton,
@@ -107,7 +104,6 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
     const { colors } = useTheme();
     const reducedMotion = useReducedMotion();
     const showFiat =
-      currency === CurrencyEnum.USDCurrency &&
       !noBalance &&
       selectServer !== SelectServerEnum.offline &&
       info.chainName === ChainNameEnum.mainChainName &&
@@ -240,7 +236,6 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
                     totalBalance.totalTransparentBalance
                   : 0
               }
-              currency={currency}
               privacy={privacy}
             />
             <View style={{ marginLeft: 5 }}>

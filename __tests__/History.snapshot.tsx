@@ -11,7 +11,7 @@ import {
   defaultAppContextLoaded,
   ContextAppLoadedProvider,
 } from '@app/context';
-import { CurrencyEnum, ModeEnum, RouteEnum } from '@app/AppState';
+import { ModeEnum, RouteEnum } from '@app/AppState';
 import { mockValueTransfers } from '../__mocks__/dataMocks/mockValueTransfers';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
@@ -52,9 +52,7 @@ describe('Component History - test', () => {
   state.nym = true;
   const onFunction = jest.fn();
 
-  test('History no currency, privacy normal & mode basic - snapshot', () => {
-    // no currency
-    state.currency = CurrencyEnum.noCurrency;
+  test('History privacy normal & mode basic - snapshot', () => {
     // privacy normal
     state.privacy = false;
     // mode basic
@@ -75,9 +73,7 @@ describe('Component History - test', () => {
     expect(history.toJSON()).toMatchSnapshot();
   });
 
-  test('History currency USD, privacy high & mode advanced - snapshot', () => {
-    // no currency
-    state.currency = CurrencyEnum.USDCurrency;
+  test('History privacy high & mode advanced - snapshot', () => {
     // privacy normal
     state.privacy = true;
     // mode basic

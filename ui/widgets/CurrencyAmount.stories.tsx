@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
-import { CurrencyEnum } from '@app/AppState';
 import CurrencyAmount from './CurrencyAmount';
 
 const meta: Meta<typeof CurrencyAmount> = {
@@ -8,11 +7,9 @@ const meta: Meta<typeof CurrencyAmount> = {
   args: {
     price: 33.75,
     amtZec: 1.2345,
-    currency: CurrencyEnum.USDCurrency,
     privacy: false,
   },
   argTypes: {
-    currency: { control: 'select', options: Object.values(CurrencyEnum) },
   },
 };
 

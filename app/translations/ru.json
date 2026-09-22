@@ -239,16 +239,6 @@
         "text": "Скачивать все заметки из блокчейна. Сервер не узнает принадлежащие вам TxID, но это потребует больше времени и пропускной способности."
       }
     ],
-    "currencies": [
-      {
-        "value": "",
-        "text": "Не показывать сумму в фиатных валютах, только ZEC."
-      },
-      {
-        "value": "USD",
-        "text": "Цену в долларах США можно узнать из интернета."
-      }
-    ],
     "languages": [
       {
         "value": "en",
@@ -363,7 +353,6 @@
     "value-memo-none": "отсутствует",
     "value-memo-wallet": "кошелек",
     "value-memo-all": "все",
-    "currency-title": "Цена Валюты",
     "language-title": "Язык",
     "islanguage": "Выберите язык для приложения.",
     "privacy-title": "High Privacy",
@@ -371,8 +360,6 @@
     "recoverywalletinfoondevice-title": "Сохраните данные для восстановления кошелька",
     "performancelevel-title": "Zingolib Performance Level",
     "blockexplorer-title": "Block Explorer",
-    "value-currency-": "Без указания валюты",
-    "value-currency-USD": "Доллар США",
     "value-language-en": "Английский",
     "value-language-es": "Испанский",
     "value-language-pt": "Португальский",

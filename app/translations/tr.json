@@ -239,16 +239,6 @@
         "text": "Blokzincirdeki tüm notları (memo) indir. Bu durumda sunucu, hangi işlem kimliklerinin (TxID) sana ait olduğunu öğrenemez. Ancak bu işlem ÇOK FAZLA bant genişliği tüketir."
       }
     ],
-    "currencies": [
-      {
-        "value": "",
-        "text": "Sadece ZEC fiyatı alınsın, diğer para birimleri için fiyat sorgulanmasın."
-      },
-      {
-        "value": "USD",
-        "text": "Dolar fiyat bilgisi internet üzerinden alınabilir."
-      }
-    ],
     "languages": [
       {
         "value": "en",
@@ -363,7 +353,6 @@
     "value-memo-none": "Hiçbiri",
     "value-memo-wallet": "cüzdan",
     "value-memo-all": "hepsi ",
-    "currency-title": "Döviz Fiyatı",
     "language-title": "Dil",
     "islanguage": "Kaydetmek için bir dil seçmeniz gerekiyor.",
     "privacy-title": "High Privacy",
@@ -371,8 +360,6 @@
     "recoverywalletinfoondevice-title": "Cüzdan Kurtarma Bilgilerini Kaydet",
     "performancelevel-title": "Zingolib Performance Level",
     "blockexplorer-title": "Block Explorer",
-    "value-currency-": "Para birimi yok",
-    "value-currency-USD": "Amerikan doları",
     "value-language-en": "İngilizce",
     "value-language-es": "İspanyolca",
     "value-language-pt": "Portekizce",

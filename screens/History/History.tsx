@@ -28,7 +28,6 @@ import { faAngleUp, faXmark } from '@fortawesome/free-solid-svg-icons';
 
 import {
   ChainNameEnum,
-  CurrencyEnum,
   FilterEnum,
   GlobalConst,
   isIronwoodActive,
@@ -122,7 +121,6 @@ const History: React.FunctionComponent<HistoryProps> = ({
     server,
     doRefresh,
     setPrivacyOption,
-    currency,
     totalBalance,
     readOnly,
     info,
@@ -315,19 +313,17 @@ const History: React.FunctionComponent<HistoryProps> = ({
 
   useEffect(() => {
     const isMainChain = server.chainName === ChainNameEnum.mainChainName;
-    const withUsd = isMainChain && currency === CurrencyEnum.USDCurrency;
-    if (!withUsd) {
+    if (!isMainChain) {
       setUsdRowH(0);
     }
-  }, [currency, server.chainName]);
+  }, [server.chainName]);
 
   const snapEntries = useMemo<{ id: SnapId; value: number | string }[]>(() => {
     const isMainChain = server.chainName === ChainNameEnum.mainChainName;
-    const withUsd = isMainChain && currency === CurrencyEnum.USDCurrency;
     // Until the layout reports the actual container + header heights, fall
     // back to percentages.
     if (containerH <= 0 || headerH <= 0) {
-      return withUsd
+      return isMainChain
         ? [
             { id: 'balance', value: '85%' },
             { id: 'usd', value: '89%' },
@@ -367,20 +363,12 @@ const History: React.FunctionComponent<HistoryProps> = ({
       entries.push({ id: 'price', value: snapPrice });
     }
     entries.push({ id: 'balance', value: snapLow });
-    if (withUsd && usdRowH > 0) {
+    if (isMainChain && usdRowH > 0) {
       entries.push({ id: 'usd', value: snapMid });
     }
     entries.push({ id: 'max', value: snapMax });
     return entries;
-  }, [
-    currency,
-    server.chainName,
-    containerH,
-    headerH,
-    usdRowH,
-    priceRowH,
-    bannerH,
-  ]);
+  }, [server.chainName, containerH, headerH, usdRowH, priceRowH, bannerH]);
 
   const historySnapPoints = useMemo(
     () => snapEntries.map(e => e.value),

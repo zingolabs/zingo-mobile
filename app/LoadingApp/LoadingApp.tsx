@@ -61,7 +61,6 @@ import {
   SecurityType,
   ServerUrisType,
   LanguageEnum,
-  CurrencyEnum,
   ModeEnum,
   SelectServerEnum,
   ChainNameEnum,
@@ -150,9 +149,6 @@ const activationHeight = {
 export default function LoadingApp(props: LoadingAppProps) {
   const theme = useTheme();
   const [language, setLanguage] = useState<LanguageEnum>(LanguageEnum.en);
-  const [currency, setCurrency] = useState<CurrencyEnum>(
-    CurrencyEnum.USDCurrency,
-  ); // by default USD
   const [server, setServer] = useState<ServerType>(SERVER_DEFAULT_0);
   const [privacy, setPrivacy] = useState<boolean>(false);
   const [mode, setMode] = useState<ModeEnum.basic | ModeEnum.advanced>(
@@ -228,14 +224,6 @@ export default function LoadingApp(props: LoadingAppProps) {
       ) {
         // this is an update
         setFirstLaunchingMessage(LaunchingModeEnum.updating);
-        // The App needs to set the currency opt-in to USD by default
-        // only if the currency have `none`
-        if (settings.currency === CurrencyEnum.noCurrency) {
-          await SettingsFileImpl.writeSettings(
-            SettingsNameEnum.currency,
-            CurrencyEnum.USDCurrency,
-          );
-        }
       }
 
       // first I need to know if this launch is a fresh install...
@@ -283,17 +271,6 @@ export default function LoadingApp(props: LoadingAppProps) {
         setLanguage(lang);
         i18n.locale = lang;
         await SettingsFileImpl.writeSettings(SettingsNameEnum.language, lang);
-      }
-      if (
-        settings.currency === CurrencyEnum.noCurrency ||
-        settings.currency === CurrencyEnum.USDCurrency
-      ) {
-        setCurrency(settings.currency);
-      } else {
-        await SettingsFileImpl.writeSettings(
-          SettingsNameEnum.currency,
-          currency,
-        );
       }
       if (settings.server) {
         // Offline (empty uri) still carries the user's chosen chain: create and
@@ -420,7 +397,6 @@ export default function LoadingApp(props: LoadingAppProps) {
         theme={theme}
         translate={translate}
         language={language}
-        currency={currency}
         server={server}
         privacy={privacy}
         mode={mode}
@@ -446,7 +422,6 @@ type LoadingAppClassProps = {
   translate: (key: string) => TranslateType;
   theme: AppTheme;
   language: LanguageEnum;
-  currency: CurrencyEnum;
   server: ServerType;
   privacy: boolean;
   mode: ModeEnum;
@@ -495,7 +470,6 @@ export class LoadingAppClass extends Component<
 
       // context settings
       server: props.server,
-      currency: props.currency,
       language: props.language,
       privacy: props.privacy,
       mode: props.mode,
@@ -2241,7 +2215,6 @@ export class LoadingAppClass extends Component<
 
       // settings
       server: this.state.server,
-      currency: this.state.currency,
       language: this.state.language,
       privacy: this.state.privacy,
       mode: this.state.mode,

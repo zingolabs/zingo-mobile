@@ -113,7 +113,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     totalBalance,
     info,
     syncingStatus,
-    currency,
     zecPrice,
     readOnly,
     valueTransfersTotal,
@@ -226,7 +225,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             translate={translate}
             totalBalance={totalBalance}
             info={info}
-            currency={currency}
             zecPrice={zecPrice}
             selectServer={selectServer}
             showShieldButton={showShieldButton}
@@ -243,7 +241,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
           {!noBalance && (
             <PriceRow
               translate={translate}
-              currency={currency}
               zecPrice={zecPrice}
               info={info}
               selectServer={selectServer}

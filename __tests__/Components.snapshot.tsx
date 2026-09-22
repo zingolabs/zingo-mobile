@@ -12,7 +12,7 @@ import BoldText from '@ui/primitives/BoldText';
 import FadeText from '@ui/primitives/FadeText';
 import ErrorText from '@ui/primitives/ErrorText';
 import RegText from '@ui/primitives/RegText';
-import { CurrencyEnum, CurrencyNameEnum } from '@app/AppState';
+import { CurrencyNameEnum } from '@app/AppState';
 
 // test suite
 describe('Component Components - test', () => {
@@ -23,7 +23,6 @@ describe('Component Components - test', () => {
         price={1.12345678}
         amtZec={39.99}
         style={{ backgroundColor: 'red' }}
-        currency={CurrencyEnum.USDCurrency}
         privacy={true}
       />,
     );

@@ -79,7 +79,6 @@ const ValueTransferDetail: React.FunctionComponent<
     privacy,
     addLastSnackbar,
     server,
-    currency,
     addressBook,
     addresses,
     setBackgroundError,
@@ -553,7 +552,6 @@ const ValueTransferDetail: React.FunctionComponent<
                 <CurrencyAmount
                   price={valueTransfer.zecPrice}
                   amtZec={valueTransfer.amount}
-                  currency={currency}
                   privacy={privacy}
                 />
               )}
@@ -909,7 +907,6 @@ const ValueTransferDetail: React.FunctionComponent<
                     <CurrencyAmount
                       price={valueTransfer.zecPrice}
                       amtZec={valueTransfer.amount}
-                      currency={currency}
                       privacy={privacy}
                     />
                   )}

@@ -11,7 +11,7 @@ import {
   defaultAppContextLoaded,
   ContextAppLoadedProvider,
 } from '@app/context';
-import { ModeEnum, CurrencyEnum, RouteEnum } from '@app/AppState';
+import { ModeEnum, RouteEnum } from '@app/AppState';
 import { mockValueTransfers } from '../__mocks__/dataMocks/mockValueTransfers';
 import { mockAddresses } from '../__mocks__/dataMocks/mockAddresses';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
@@ -51,9 +51,7 @@ describe('Component Send - test', () => {
   state.sendPageState = mockSendPageState;
   const onFunction = jest.fn();
 
-  test('Send no currency, privacy normal & mode basic - snapshot', () => {
-    // no currency
-    state.currency = CurrencyEnum.noCurrency;
+  test('Send privacy normal & mode basic - snapshot', () => {
     // privacy normal
     state.privacy = false;
     // mode basic
@@ -77,9 +75,7 @@ describe('Component Send - test', () => {
     expect(send.toJSON()).toMatchSnapshot();
   });
 
-  test('Send currency USD, privacy high & mode advanced - snapshot', () => {
-    // no currency
-    state.currency = CurrencyEnum.USDCurrency;
+  test('Send privacy high & mode advanced - snapshot', () => {
     // privacy normal
     state.privacy = true;
     // mode basic

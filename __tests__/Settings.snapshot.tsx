@@ -13,7 +13,6 @@ import {
 } from '@app/context';
 import {
   LanguageEnum,
-  CurrencyEnum,
   RouteEnum,
   BlockExplorerEnum,
 } from '@app/AppState';
@@ -46,7 +45,6 @@ describe('Component Settings - test', () => {
   state.info = mockInfo;
   state.totalBalance = mockTotalBalance;
   state.server = mockServer;
-  state.currency = CurrencyEnum.USDCurrency;
   state.language = LanguageEnum.en;
   state.blockExplorer = BlockExplorerEnum.Zcashexplorer;
   state.recoveryWalletInfoOnDevice = true;
@@ -59,7 +57,6 @@ describe('Component Settings - test', () => {
         <Settings
           {...props}
           setServerOption={onSetOption}
-          setCurrencyOption={onSetOption}
           setLanguageOption={onSetOption}
           setSecurityOption={onSetOption}
           setSelectServerOption={onSetOption}

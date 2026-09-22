@@ -431,6 +431,70 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
           </View>
         </View>
       </View>
+      <View
+        style={
+          {
+            "alignItems": "baseline",
+            "flexDirection": "row",
+          }
+        }
+      >
+        <View
+          accessibilityState={
+            {
+              "busy": undefined,
+              "checked": undefined,
+              "disabled": true,
+              "expanded": undefined,
+              "selected": undefined,
+            }
+          }
+          accessibilityValue={
+            {
+              "max": undefined,
+              "min": undefined,
+              "now": undefined,
+              "text": undefined,
+            }
+          }
+          accessible={true}
+          collapsable={false}
+          focusable={false}
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          style={
+            {
+              "opacity": 1,
+            }
+          }
+        >
+          <View
+            style={
+              {
+                "alignItems": "baseline",
+                "flexDirection": "row",
+              }
+            }
+          >
+            <Text
+              style={
+                {
+                  "color": "#c3c3c3",
+                  "fontSize": 20,
+                  "fontWeight": "700",
+                }
+              }
+            >
+              $ 51.76
+            </Text>
+          </View>
+        </View>
+      </View>
     </View>
     <View
       style={
@@ -718,6 +782,70 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
                   testID="undefined.small-part"
                 >
                   4321
+                </Text>
+              </View>
+            </View>
+          </View>
+          <View
+            style={
+              {
+                "alignItems": "baseline",
+                "flexDirection": "row",
+              }
+            }
+          >
+            <View
+              accessibilityState={
+                {
+                  "busy": undefined,
+                  "checked": undefined,
+                  "disabled": true,
+                  "expanded": undefined,
+                  "selected": undefined,
+                }
+              }
+              accessibilityValue={
+                {
+                  "max": undefined,
+                  "min": undefined,
+                  "now": undefined,
+                  "text": undefined,
+                }
+              }
+              accessible={true}
+              collapsable={false}
+              focusable={false}
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                {
+                  "opacity": 1,
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "alignItems": "baseline",
+                    "flexDirection": "row",
+                  }
+                }
+              >
+                <Text
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 20,
+                      "fontWeight": "700",
+                    }
+                  }
+                >
+                  $ 51.76
                 </Text>
               </View>
             </View>
@@ -1224,6 +1352,70 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
               testID="undefined.small-part"
             >
               5678
+            </Text>
+          </View>
+        </View>
+      </View>
+      <View
+        style={
+          {
+            "alignItems": "baseline",
+            "flexDirection": "row",
+          }
+        }
+      >
+        <View
+          accessibilityState={
+            {
+              "busy": undefined,
+              "checked": undefined,
+              "disabled": true,
+              "expanded": undefined,
+              "selected": undefined,
+            }
+          }
+          accessibilityValue={
+            {
+              "max": undefined,
+              "min": undefined,
+              "now": undefined,
+              "text": undefined,
+            }
+          }
+          accessible={true}
+          collapsable={false}
+          focusable={false}
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          style={
+            {
+              "opacity": 1,
+            }
+          }
+        >
+          <View
+            style={
+              {
+                "alignItems": "baseline",
+                "flexDirection": "row",
+              }
+            }
+          >
+            <Text
+              style={
+                {
+                  "color": "#c3c3c3",
+                  "fontSize": 20,
+                  "fontWeight": "700",
+                }
+              }
+            >
+              $ 4.11
             </Text>
           </View>
         </View>
@@ -1738,6 +1930,70 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
                   testID="undefined.small-part"
                 >
                   5678
+                </Text>
+              </View>
+            </View>
+          </View>
+          <View
+            style={
+              {
+                "alignItems": "baseline",
+                "flexDirection": "row",
+              }
+            }
+          >
+            <View
+              accessibilityState={
+                {
+                  "busy": undefined,
+                  "checked": undefined,
+                  "disabled": true,
+                  "expanded": undefined,
+                  "selected": undefined,
+                }
+              }
+              accessibilityValue={
+                {
+                  "max": undefined,
+                  "min": undefined,
+                  "now": undefined,
+                  "text": undefined,
+                }
+              }
+              accessible={true}
+              collapsable={false}
+              focusable={false}
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                {
+                  "opacity": 1,
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "alignItems": "baseline",
+                    "flexDirection": "row",
+                  }
+                }
+              >
+                <Text
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 20,
+                      "fontWeight": "700",
+                    }
+                  }
+                >
+                  $ 4.11
                 </Text>
               </View>
             </View>

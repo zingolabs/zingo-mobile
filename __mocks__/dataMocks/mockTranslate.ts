@@ -1,4 +1,4 @@
-import { CurrencyEnum, LanguageEnum, BlockExplorerEnum } from '@app/AppState';
+import { LanguageEnum, BlockExplorerEnum } from '@app/AppState';
 import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
 
 export const mockTranslate = (p: string) => {
@@ -19,17 +19,6 @@ export const mockTranslate = (p: string) => {
         "restore": ["restore"],
         "backup": ["backup"]
       }`;
-  } else if (p === 'settings.currencies') {
-    return [
-      {
-        value: '',
-        text: 'text no currency',
-      },
-      {
-        value: CurrencyEnum.USDCurrency,
-        text: 'text USD',
-      },
-    ];
   } else if (p === 'settings.languages') {
     return [
       {

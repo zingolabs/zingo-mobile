@@ -12,7 +12,7 @@ import BoldText from '@ui/primitives/BoldText';
 import FadeText from '@ui/primitives/FadeText';
 import ErrorText from '@ui/primitives/ErrorText';
 import RegText from '@ui/primitives/RegText';
-import { CurrencyEnum, CurrencyNameEnum } from '@app/AppState';
+import { CurrencyNameEnum } from '@app/AppState';
 
 // test suite
 describe('Component Components - test', () => {
@@ -23,7 +23,6 @@ describe('Component Components - test', () => {
         price={2.9826}
         amtZec={1.00098}
         style={{}}
-        currency={CurrencyEnum.USDCurrency}
         privacy={true}
       />,
     );
@@ -35,7 +34,6 @@ describe('Component Components - test', () => {
       <CurrencyAmount
         amtZec={1}
         style={{}}
-        currency={CurrencyEnum.USDCurrency}
       />,
     );
     expect(screen.getByText('$ -.--')).toBeTruthy();
@@ -47,7 +45,6 @@ describe('Component Components - test', () => {
         price={0}
         amtZec={1}
         style={{}}
-        currency={CurrencyEnum.USDCurrency}
       />,
     );
     expect(screen.getByText('$ -.--')).toBeTruthy();
@@ -58,7 +55,6 @@ describe('Component Components - test', () => {
       <CurrencyAmount
         price={1}
         style={{}}
-        currency={CurrencyEnum.USDCurrency}
       />,
     );
     expect(screen.getByText('$ -.--')).toBeTruthy();
@@ -70,7 +66,6 @@ describe('Component Components - test', () => {
         price={0.001}
         amtZec={1}
         style={{}}
-        currency={CurrencyEnum.USDCurrency}
       />,
     );
     expect(screen.getByText('$ < 0.01')).toBeTruthy();
@@ -82,7 +77,6 @@ describe('Component Components - test', () => {
         price={2.9826}
         amtZec={1.00098}
         style={{}}
-        currency={CurrencyEnum.USDCurrency}
       />,
     );
     expect(screen.getByText('$ 2.99')).toBeTruthy();

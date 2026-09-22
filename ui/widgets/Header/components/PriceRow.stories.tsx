@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
-import { CurrencyEnum, SelectServerEnum } from '@app/AppState';
+import { SelectServerEnum } from '@app/AppState';
 import PriceRow from './PriceRow';
 import { mockInfo, mockZecPrice } from '../../../../.storybook/storyMocks';
 import { mockTranslate } from '../../../../.storybook/storyDecorators';
@@ -9,7 +9,6 @@ const meta: Meta<typeof PriceRow> = {
   component: PriceRow,
   args: {
     translate: mockTranslate,
-    currency: CurrencyEnum.USDCurrency,
     zecPrice: mockZecPrice,
     info: mockInfo,
     selectServer: SelectServerEnum.auto,

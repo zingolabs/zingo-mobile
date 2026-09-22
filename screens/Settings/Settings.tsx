@@ -61,7 +61,6 @@ import {
   SetServerResult,
   UfvkActionEnum,
   ModeEnum,
-  CurrencyEnum,
   SelectServerEnum,
   ChainNameEnum,
   CurrencyNameEnum,
@@ -114,7 +113,6 @@ type SettingsProps = NativeStackScreenProps<
     toast: boolean,
     sameServerChainName: boolean,
   ) => Promise<SetServerResult>;
-  setCurrencyOption: (value: CurrencyEnum) => Promise<void>;
   setLanguageOption: (value: LanguageEnum) => Promise<void>;
   setSecurityOption: (value: SecurityType) => Promise<void>;
   setSelectServerOption: (value: string) => Promise<void>;
@@ -133,7 +131,6 @@ type Options = {
 const Settings: React.FunctionComponent<SettingsProps> = ({
   navigation,
   setServerOption,
-  setCurrencyOption,
   setLanguageOption,
   setSecurityOption,
   setSelectServerOption,
@@ -148,7 +145,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     translate,
     info,
     server: serverContext,
-    currency: currencyContext,
     language: languageContext,
     privacy: privacyContext,
     mode,
@@ -170,12 +166,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     lastError,
     setLastError,
   } = context;
-
-  const currenciesArray = translate('settings.currencies');
-  let CURRENCIES: Options[] = [];
-  if (typeof currenciesArray === 'object') {
-    CURRENCIES = currenciesArray as Options[];
-  }
 
   const languagesArray = translate('settings.languages');
   let LANGUAGES: Options[] = [];
@@ -273,7 +263,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
           : [],
     [serverChain, mainServerList, testServerList],
   );
-  const [currency, setCurrency] = useState<CurrencyEnum>(currencyContext);
   const [language, setLanguage] = useState<LanguageEnum>(languageContext);
   const [privacy, setPrivacy] = useState<boolean>(privacyContext);
   // security checks box.
@@ -679,7 +668,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     if (
       serverContext.uri === serverUriParsed &&
       serverContext.chainName === chainNameParsed &&
-      currencyContext === currency &&
       languageContext === language &&
       privacyContext === privacy &&
       isEqual(securityContext, securityObject()) &&
@@ -696,8 +684,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   }, [
     autoServerChainName,
     autoServerUri,
-    currency,
-    currencyContext,
     customServerChainName,
     customServerUri,
     language,
@@ -757,7 +743,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     if (
       serverContext.uri === serverUriParsed &&
       serverContext.chainName === chainNameParsed &&
-      currencyContext === currency &&
       languageContext === language &&
       privacyContext === privacy &&
       isEqual(securityContext, securityObject()) &&
@@ -938,9 +923,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     // setter doesn't silently drop the rest.
     // ───────────────────────────────────────────────────────────────
     try {
-      if (currencyContext !== currency) {
-        await setCurrencyOption(currency);
-      }
       if (privacyContext !== privacy) {
         await setPrivacyOption(privacy);
       }
@@ -1060,7 +1042,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const navigateToHome = useCallback((reset: boolean) => {
     if (reset) {
       // reset all settings - no save changes
-      setCurrency(currencyContext);
       setLanguage(languageContext);
       setPrivacy(privacyContext);
       setSelectServer(selectServerContext);
@@ -1615,95 +1596,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                     />
                   </View>
                 </TouchableOpacity>
-              </View>
-
-              <View style={{ marginHorizontal: 25, marginVertical: 15 }}>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    marginBottom: 16,
-                  }}
-                >
-                  <BoldText>
-                    {translate('settings.currency-title') as string}
-                  </BoldText>
-                  <TouchableOpacity
-                    onPress={() =>
-                      setOpenInfoSection(
-                        openInfoSection === 'currency' ? null : 'currency',
-                      )
-                    }
-                    style={{ marginLeft: 6 }}
-                  >
-                    <FontAwesomeIcon
-                      icon={faInfoCircle}
-                      size={14}
-                      color={colors.fgDefault}
-                    />
-                  </TouchableOpacity>
-                </View>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    borderWidth: 1,
-                    borderColor: colors.borderAccent,
-                    borderRadius: 8,
-                  }}
-                >
-                  {CURRENCIES.map(c => {
-                    const selected = String(currency) === String(c.value);
-                    return (
-                      <TouchableOpacity
-                        key={String(c.value)}
-                        onPress={() =>
-                          setCurrency(c.value as unknown as CurrencyEnum)
-                        }
-                        style={{
-                          flex: 1,
-                          paddingVertical: 8,
-                          alignItems: 'center',
-                          backgroundColor: selected
-                            ? colors.bgAccent
-                            : 'transparent',
-                          borderRadius: 8,
-                          borderWidth: selected ? 1 : 0,
-                          borderColor: colors.borderAccent,
-                        }}
-                      >
-                        <RegText
-                          style={{
-                            color: selected ? colors.bgCanvas : colors.fgAccent,
-                            fontSize: 12,
-                          }}
-                        >
-                          {
-                            translate(
-                              `settings.value-currency-${c.value}`,
-                            ) as string
-                          }
-                        </RegText>
-                      </TouchableOpacity>
-                    );
-                  })}
-                </View>
-                {openInfoSection === 'currency' && (
-                  <View
-                    style={{
-                      backgroundColor: '#040E1D',
-                      borderRadius: 8,
-                      padding: 10,
-                      marginTop: 8,
-                    }}
-                  >
-                    <FadeText style={{ textAlign: 'center' }}>
-                      {CURRENCIES.find(
-                        d => String(d.value) === CurrencyEnum.USDCurrency,
-                      )?.text ?? ''}
-                    </FadeText>
-                  </View>
-                )}
               </View>
 
               {/* SECTION: Privacy & Security */}

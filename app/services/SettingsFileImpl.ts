@@ -2,7 +2,6 @@ import * as RNFS from 'react-native-fs';
 
 import {
   ChainNameEnum,
-  CurrencyEnum,
   GlobalConst,
   SecurityType,
   SecurityTypeEnum,
@@ -195,13 +194,15 @@ export default class SettingsFileImpl {
       }
       // Settings the App no longer asks about are dropped from the file the
       // first time an older settings.json loads: the donation flags of the
-      // old tip feature, and the two switches that used to hide the MAX
-      // button and the Rescan menu entry, both of which are always there now.
+      // old tip feature, the two switches that used to hide the MAX button
+      // and the Rescan menu entry, both always there now, and the currency
+      // choice, now always USD.
       const obsolete = settings as unknown as Record<string, unknown>;
       delete obsolete.donation;
       delete obsolete.firstUpdateWithDonation;
       delete obsolete.sendAll;
       delete obsolete.rescanMenu;
+      delete obsolete.currency;
       // old security options that have to be removed and to add the new one.
       if (settings.hasOwnProperty(SettingsNameEnum.security)) {
         const sec: SecurityType = settings.security;
@@ -249,11 +250,6 @@ export default class SettingsFileImpl {
         // the wallet hasn't shown the "Meet Ironwood" onboarding yet; it
         // launches once, the first time spendable Orchard funds are detected.
         settings.ironwoodOnboardSeen = false;
-      }
-      // Silent migration: legacy "USDTOR" currency is dropped in favor of "USD".
-      // Tor support has been removed; users on an older settings.json get rewritten transparently.
-      if ((settings.currency as string) === 'USDTOR') {
-        settings.currency = CurrencyEnum.USDCurrency;
       }
       return settings;
     } catch (err) {

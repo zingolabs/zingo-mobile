@@ -13,7 +13,6 @@ import {
   SecurityType,
   LanguageEnum,
   ModeEnum,
-  CurrencyEnum,
   SelectServerEnum,
   ChainNameEnum,
   AppContextLoaded,
@@ -38,7 +37,6 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   birthday: 0,
   defaultUnifiedAddress: '',
   server: {} as ServerType,
-  currency: CurrencyEnum.USDCurrency,
   language: LanguageEnum.en,
   zecPrice: {
     zecPrice: 0,
@@ -84,7 +82,6 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   mixnetView: null,
   reenableMixnet: async () => {},
   setModeOption: async () => {},
-  setCurrencyOption: async () => {},
   foregroundEpoch: 0,
 };
 

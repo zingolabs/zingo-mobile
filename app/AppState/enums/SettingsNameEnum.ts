@@ -1,7 +1,6 @@
 export enum SettingsNameEnum {
   // screen
   server = 'server',
-  currency = 'currency',
   language = 'language',
   privacy = 'privacy',
   mode = 'mode',

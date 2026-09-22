@@ -13,7 +13,6 @@ import ServerType from './types/ServerType';
 import SecurityType from './types/SecurityType';
 
 import { LanguageEnum } from './enums/LanguageEnum';
-import { CurrencyEnum } from './enums/CurrencyEnum';
 import { ModeEnum } from './enums/ModeEnum';
 import { SelectServerEnum } from './enums/SelectServerEnum';
 import { ChainNameEnum } from './enums/ChainNameEnum';
@@ -126,7 +125,6 @@ export default interface AppContextLoaded {
 
   // settings
   server: ServerType;
-  currency: CurrencyEnum;
   language: LanguageEnum;
   privacy: boolean;
   mode: ModeEnum;
@@ -148,7 +146,6 @@ export default interface AppContextLoaded {
   mixnetView: MixnetView | null;
   reenableMixnet: () => Promise<void>;
   setModeOption: (value: string) => Promise<void>;
-  setCurrencyOption: (value: CurrencyEnum) => Promise<void>;
 
   // Monotonically increasing counter incremented every time the app
   // returns from background/inactive to active. Protected screens

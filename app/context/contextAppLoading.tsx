@@ -10,7 +10,6 @@ import {
   SecurityType,
   LanguageEnum,
   ModeEnum,
-  CurrencyEnum,
   SelectServerEnum,
   BlockExplorerEnum,
 } from '@app/AppState';
@@ -19,7 +18,6 @@ import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformance
 export const defaultAppContextLoading: AppContextLoading = {
   netInfo: {} as NetInfoType,
   server: {} as ServerType,
-  currency: CurrencyEnum.USDCurrency,
   language: LanguageEnum.en,
   zecPrice: {
     zecPrice: 0,

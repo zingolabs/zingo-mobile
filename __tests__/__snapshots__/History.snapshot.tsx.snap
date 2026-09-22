@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
-exports[`Component History - test History currency USD, privacy high & mode advanced - snapshot 1`] = `
+exports[`Component History - test History privacy high & mode advanced - snapshot 1`] = `
 <View
   onLayout={[Function]}
   style={
@@ -1067,7 +1067,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
 </View>
 `;
 
-exports[`Component History - test History no currency, privacy normal & mode basic - snapshot 1`] = `
+exports[`Component History - test History privacy normal & mode basic - snapshot 1`] = `
 <View
   onLayout={[Function]}
   style={

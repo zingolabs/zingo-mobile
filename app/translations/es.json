@@ -239,16 +239,6 @@
         "text": "Se descargan absolutamente todos los Memos. El Servidor no aprenderá qué transacciones te pertenecen. Esta opción consume GRAN cantidad de ancho de banda."
       }
     ],
-    "currencies": [
-      {
-        "value": "",
-        "text": "No se consulta ningún precio de ninguna moneda, solo ZEC."
-      },
-      {
-        "value": "USD",
-        "text": "Puedes consultar el precio para US Dólares de internet."
-      }
-    ],
     "languages": [
       {
         "value": "en",
@@ -363,7 +353,6 @@
     "value-memo-none": "Ninguno",
     "value-memo-wallet": "Monedero",
     "value-memo-all": "Todos",
-    "currency-title": "Precio de la Moneda",
     "language-title": "Idioma",
     "islanguage": "Necesitas escoger un Idioma para poder guardar.",
     "privacy-title": "High Privacy",
@@ -371,8 +360,6 @@
     "recoverywalletinfoondevice-title": "Almacenar la información de recuperación del monedero",
     "performancelevel-title": "Zingolib Performance Level",
     "blockexplorer-title": "Block Explorer",
-    "value-currency-": "Sin moneda",
-    "value-currency-USD": "US Dólares",
     "value-language-en": "Inglés",
     "value-language-es": "Español",
     "value-language-pt": "Portugués",

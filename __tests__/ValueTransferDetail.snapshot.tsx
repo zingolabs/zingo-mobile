@@ -11,7 +11,7 @@ import {
 } from '@app/context';
 
 import ValueTransferDetail from '@screens/ValueTransferDetail';
-import { CurrencyEnum, ModeEnum, RouteEnum } from '@app/AppState';
+import { ModeEnum, RouteEnum } from '@app/AppState';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockValueTransfers } from '../__mocks__/dataMocks/mockValueTransfers';
@@ -62,7 +62,6 @@ describe('ValueTransferDetail - snapshots', () => {
   state.server = mockServer;
   state.netInfo = mockNetInfo;
   state.mode = ModeEnum.advanced;
-  state.currency = CurrencyEnum.noCurrency;
 
   test('ValueTransferDetail sent transaction', () => {
     expect(
