@@ -44,6 +44,10 @@ type MessageLineProps = {
   messageAddress?: string;
   screenName: ScreenEnum;
 };
+// Amounts under this are not worth a line of their own — the message is the
+// point, not the dust attached to it.
+const MIN_AMOUNT_SHOWN = 0.01;
+
 const MessageLine: React.FunctionComponent<MessageLineProps> = ({
   index,
   vt,
@@ -258,10 +262,7 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
                 {translate(`history.${vt.status}`) as string}
               </FadeText>
             )}
-            {vt.amount >=
-              Utils.parseStringLocaleToNumberFloat(
-                Utils.getZenniesDonationAmount(),
-              ) && (
+            {vt.amount >= MIN_AMOUNT_SHOWN && (
               <ZecAmount
                 style={{
                   paddingRight: 5,

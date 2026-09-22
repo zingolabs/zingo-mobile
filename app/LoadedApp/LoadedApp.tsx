@@ -208,7 +208,6 @@ export default function LoadedApp(props: LoadedAppProps) {
   );
   const [server, setServer] = useState<ServerType>(SERVER_DEFAULT_0);
   const [sendAll, setSendAll] = useState<boolean>(false);
-  const [donation, setDonation] = useState<boolean>(false);
   const [privacy, setPrivacy] = useState<boolean>(false);
   const [mode, setMode] = useState<ModeEnum>(ModeEnum.advanced); // by default advanced
   const [backgroundSyncInfo, setBackgroundSyncInfo] = useState<BackgroundType>({
@@ -241,8 +240,6 @@ export default function LoadedApp(props: LoadedAppProps) {
     BlockExplorerEnum.Zcashexplorer,
   );
   const [nym, setNym] = useState<boolean>(false);
-  const [zenniesDonationAddress, setZenniesDonationAddress] =
-    useState<string>('');
   const file = useMemo(
     () => ({
       en: en,
@@ -315,13 +312,9 @@ export default function LoadedApp(props: LoadedAppProps) {
       I18nManager.forceRTL(isRTL);
 
       // If the App is mounting this component,
-      // I know I have to reset the firstInstall & firstUpdateWithDonation prop in settings.
+      // I know I have to reset the firstInstall prop in settings.
       await SettingsFileImpl.writeSettings(
         SettingsNameEnum.firstInstall,
-        false,
-      );
-      await SettingsFileImpl.writeSettings(
-        SettingsNameEnum.firstUpdateWithDonation,
         false,
       );
 
@@ -395,14 +388,6 @@ export default function LoadedApp(props: LoadedAppProps) {
         setSendAll(settings.sendAll);
       } else {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.sendAll, sendAll);
-      }
-      if (settings.donation === true || settings.donation === false) {
-        setDonation(settings.donation);
-      } else {
-        await SettingsFileImpl.writeSettings(
-          SettingsNameEnum.donation,
-          donation,
-        );
       }
       if (settings.privacy === true || settings.privacy === false) {
         setPrivacy(settings.privacy);
@@ -496,24 +481,19 @@ export default function LoadedApp(props: LoadedAppProps) {
       setBackgroundSyncInfo(backgroundSyncInfoJson);
 
       let sort: boolean = false;
-      const zenniesAddress = await Utils.getZenniesDonationAddress(
-        server.chainName,
-      );
-      setZenniesDonationAddress(zenniesAddress);
-
-      // adding `Zenny Tips` address always.
       let ab = await AddressBookFileImpl.readAddressBook();
-      if (
-        ab.filter((a: AddressBookFileClass) => a.address === zenniesAddress)
-          .length === 0
-      ) {
-        ab = await AddressBookFileImpl.writeAddressBookItem(
-          translate('zenny-tips-ab') as string,
-          zenniesAddress,
-          '',
-          false,
+
+      // older versions added the `Zenny Tips` contact to every address book.
+      // Donations are gone, so it is removed wherever it is still stored.
+      const zennyTips: AddressBookFileClass[] = ab.filter(
+        (a: AddressBookFileClass) =>
+          a.address === GlobalConst.obsoleteZenniesDonationAddress,
+      );
+      for (const a of zennyTips) {
+        ab = await AddressBookFileImpl.removeAddressBookItem(
+          a.label,
+          a.address,
         );
-        sort = true;
       }
 
       // now make no sense to have two UA's in the same contact
@@ -568,8 +548,7 @@ export default function LoadedApp(props: LoadedAppProps) {
       // in the Address Book belong to this new/restored wallet.
       if (newWallet) {
         toUpdate = ab.filter((a: AddressBookFileClass) => !!a.address);
-        // always have one -> Zennies.
-        if (toUpdate.length > 1) {
+        if (toUpdate.length > 0) {
           for (let i = 0; i < toUpdate.length; i++) {
             const a = toUpdate[i];
             // verify this address as own or not
@@ -668,7 +647,6 @@ export default function LoadedApp(props: LoadedAppProps) {
         currency={currency}
         server={server}
         sendAll={sendAll}
-        donation={donation}
         privacy={privacy}
         mode={mode}
         backgroundSyncInfo={backgroundSyncInfo}
@@ -682,7 +660,6 @@ export default function LoadedApp(props: LoadedAppProps) {
         walletChainName={walletChainName}
         rescanMenu={rescanMenu}
         recoveryWalletInfoOnDevice={recoveryWalletInfoOnDevice}
-        zenniesDonationAddress={zenniesDonationAddress}
         firstLaunchingMessage={firstLaunchingMessage}
         performanceLevel={performanceLevel}
         blockExplorer={blockExplorer}
@@ -731,7 +708,6 @@ type LoadedAppClassProps = {
   currency: CurrencyEnum;
   server: ServerType;
   sendAll: boolean;
-  donation: boolean;
   privacy: boolean;
   mode: ModeEnum;
   backgroundSyncInfo: BackgroundType;
@@ -745,7 +721,6 @@ type LoadedAppClassProps = {
   walletChainName: ChainNameEnum;
   rescanMenu: boolean;
   recoveryWalletInfoOnDevice: boolean;
-  zenniesDonationAddress: string;
   firstLaunchingMessage: LaunchingModeEnum;
   performanceLevel: RPCPerformanceLevelEnum;
   blockExplorer: BlockExplorerEnum;
@@ -817,7 +792,6 @@ export class LoadedAppClass extends Component<
       showSwipeableIcons: true,
       doRefresh: this.doRefresh,
       setZecPrice: this.setZecPrice,
-      zenniesDonationAddress: props.zenniesDonationAddress,
       zingolibVersion: '',
       setPrivacyOption: this.setPrivacyOption,
       setNymOption: this.setNymOption,
@@ -829,7 +803,6 @@ export class LoadedAppClass extends Component<
       currency: props.currency,
       language: props.language,
       sendAll: props.sendAll,
-      donation: props.donation,
       privacy: props.privacy,
       mode: props.mode,
       security: props.security,
@@ -1197,7 +1170,7 @@ export class LoadedAppClass extends Component<
         ) {
           await ShowAddressAlertAsync(this.state.translate)
             .then(async () => {
-              // fill the fields in the screen with the donation data
+              // fill the fields in the screen with the target data
               update = true;
             })
             .catch((e: unknown) => {
@@ -1207,7 +1180,7 @@ export class LoadedAppClass extends Component<
               }
             });
         } else if (target.address) {
-          // fill the fields in the screen with the donation data
+          // fill the fields in the screen with the target data
           update = true;
         }
         if (update) {
@@ -1607,12 +1580,10 @@ export class LoadedAppClass extends Component<
   ): Promise<String> => {
     try {
       // Construct a sendJson from the sendPage state
-      const { server, donation, defaultUnifiedAddress } = this.state;
+      const { defaultUnifiedAddress } = this.state;
       const sendJson = await Utils.getSendManyJSON(
         sendPageState,
         defaultUnifiedAddress,
-        server,
-        donation,
       );
       //const start = Date.now();
       const txid = await this.rpc.sendTransaction(sendJson);
@@ -1931,13 +1902,6 @@ export class LoadedAppClass extends Component<
     await SettingsFileImpl.writeSettings(SettingsNameEnum.sendAll, value);
     this.setState({
       sendAll: value as boolean,
-    });
-  };
-
-  setDonationOption = async (value: boolean): Promise<void> => {
-    await SettingsFileImpl.writeSettings(SettingsNameEnum.donation, value);
-    this.setState({
-      donation: value as boolean,
     });
   };
 
@@ -2319,7 +2283,6 @@ export class LoadedAppClass extends Component<
       showSwipeableIcons: this.state.showSwipeableIcons,
       doRefresh: this.state.doRefresh,
       setZecPrice: this.state.setZecPrice,
-      zenniesDonationAddress: this.state.zenniesDonationAddress,
       zingolibVersion: this.state.zingolibVersion,
       setPrivacyOption: this.setPrivacyOption,
       setNymOption: this.setNymOption,
@@ -2331,7 +2294,6 @@ export class LoadedAppClass extends Component<
       currency: this.state.currency,
       language: this.state.language,
       sendAll: this.state.sendAll,
-      donation: this.state.donation,
       privacy: this.state.privacy,
       mode: this.state.mode,
       security: this.state.security,
@@ -2523,7 +2485,6 @@ export class LoadedAppClass extends Component<
                           setCurrencyOption={this.setCurrencyOption}
                           setLanguageOption={this.setLanguageOption}
                           setSendAllOption={this.setSendAllOption}
-                          setDonationOption={this.setDonationOption}
                           setSecurityOption={this.setSecurityOption}
                           setSelectServerOption={this.setSelectServerOption}
                           setRescanMenuOption={this.setRescanMenuOption}

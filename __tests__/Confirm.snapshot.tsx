@@ -35,7 +35,6 @@ function makeProps(): NativeStackScreenProps<
       params: {
         calculatedFee: 0.00001,
         proposalPools: { source: ['ironwood'], destination: ['ironwood'] },
-        donationAmount: 0,
         confirmSend: jest.fn(async () => {}),
         sendAllAmount: false,
         calculateFeeWithPropose: jest.fn(async () => {}),

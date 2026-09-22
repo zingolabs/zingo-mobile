@@ -64,17 +64,6 @@ export const mockTranslate = (p: string) => {
         text: 'text false',
       },
     ];
-  } else if (p === 'settings.donations') {
-    return [
-      {
-        value: true,
-        text: 'text true',
-      },
-      {
-        value: false,
-        text: 'text false',
-      },
-    ];
   } else if (p === 'settings.rescanmenus') {
     return [
       {

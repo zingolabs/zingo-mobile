@@ -124,11 +124,6 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
       ? route.params.proposalPools
       : { source: [], destination: [] },
   );
-  const [donationAmount, setDonationAmount] = useState<number>(
-    !!route.params && route.params.donationAmount !== undefined
-      ? route.params.donationAmount
-      : 0,
-  );
   const [sendAllAmount, setSendAllAmount] = useState<boolean>(
     !!route.params && route.params.sendAllAmount !== undefined
       ? route.params.sendAllAmount
@@ -216,10 +211,6 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
       !!route.params && route.params.proposalPools !== undefined
         ? route.params.proposalPools
         : { source: [], destination: [] };
-    const _donationAmount =
-      !!route.params && route.params.donationAmount !== undefined
-        ? route.params.donationAmount
-        : 0;
     const _sendAllAmount =
       !!route.params && route.params.sendAllAmount !== undefined
         ? route.params.sendAllAmount
@@ -235,7 +226,6 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     );
     setCalculatedFee(_calculatedFee);
     setProposalPools(_proposalPools);
-    setDonationAmount(_donationAmount);
     setSendAllAmount(_sendAllAmount);
     setSendPageState(_sendPageState);
     setMemoTotal(_memoTotal);
@@ -244,7 +234,6 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     route.params,
     route.params?.calculatedFee,
     route.params?.proposalPools,
-    route.params?.donationAmount,
     route.params?.sendAllAmount,
     sendPageState,
     sendPageState.toaddr.memo,
@@ -260,10 +249,9 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
   useEffect(() => {
     const sendingTot =
       Utils.parseStringLocaleToNumberFloat(sendPageState.toaddr.amount) +
-      calculatedFee +
-      donationAmount;
+      calculatedFee;
     setSendingTotal(sendingTot);
-  }, [calculatedFee, donationAmount, sendPageState.toaddr.amount]);
+  }, [calculatedFee, sendPageState.toaddr.amount]);
 
   useEffect(() => {
     calculateFeeWithPropose(
@@ -454,38 +442,6 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                     withIcon={true}
                     znsAlias={to.znsAlias}
                   />
-
-                  {donationAmount > 0 && (
-                    <>
-                      <FadeText style={{ marginTop: 10 }}>
-                        {translate('send.confirm-donation') as string}
-                      </FadeText>
-                      <View
-                        style={{
-                          display: 'flex',
-                          flexDirection: 'row',
-                          justifyContent: 'space-between',
-                        }}
-                      >
-                        <ZecAmount
-                          currencyName={info.currencyName}
-                          size={14}
-                          amtZec={donationAmount}
-                          privacy={privacy}
-                        />
-                        {isMainChain && (
-                          <CurrencyAmount
-                            style={{ fontSize: 18 }}
-                            amtZec={donationAmount}
-                            price={zecPrice.zecPrice}
-                            priceDate={zecPrice.date}
-                            currency={currency}
-                            privacy={privacy}
-                          />
-                        )}
-                      </View>
-                    </>
-                  )}
 
                   <FadeText style={{ marginTop: 10 }}>
                     {translate('send.confirm-amount') as string}

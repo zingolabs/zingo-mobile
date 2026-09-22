@@ -32,8 +32,6 @@
   "support": "Send Email",
   "view-error": "View/Report Error",
   "menudrawer-acc": "Open Menu Drawer",
-  "donation": "Donation to Zingo!\nThanks for supporting ZingoLabs!",
-  "zenny-tips-ab": "Zenny Tips",
   "restarting": "Error connecting to the Server, the App will restart in a few seconds.",
   "change-privacy": "New privacy policy: ",
   "email": "support@zingolabs.org",
@@ -155,8 +153,6 @@
     "alert-newwallet-body": "Can you confirm that you really want to create a new wallet and lose access to the current wallet.",
     "serverfirsttry": "An error occurred while trying to connect to the above server, currently checking the servers on the list.",
     "serversecondtry": "It doesn't seem to be a problem with the server. Someting else is happening.",
-    "alert-donation-title": "TIP ZINGOLABS",
-    "alert-donation-body": "Do you want to help ZingoLabs make Zcash more useful? Opt in to tip one Zenny (0.01 ZEC) to ZingoLabs with each transaction! If so, press confirm, otherwise press Cancel.",
     "recoverkeys": "Recover last Keys used",
     "recoverkeysinstall": "Recovered the last Keys used in this device:",
     "customserver-unreachable": "Your custom server didn't respond and the wallet returned an error. Open Settings to choose a different one or retry later.",
@@ -285,16 +281,6 @@
         "text": "Disable the sending all button because could be a risk to have it."
       }
     ],
-    "donations": [
-      {
-        "value": true,
-        "text": "Tip ZingoLabs a Zenny (0.01 ZEC) in every transaction."
-      },
-      {
-        "value": false,
-        "text": "Don't pay to incentivize a more secure system."
-      }
-    ],
     "privacys": [
       {
         "value": true,
@@ -401,7 +387,6 @@
     "language-title": "Language",
     "islanguage": "You need to choose a language to save.",
     "sendall-title": "Enable sending all funds",
-    "donation-title": "Tip ZingoLabs",
     "privacy-title": "High Privacy",
     "mode-title": "Switch between Basic or Advanced Mode",
     "rescanmenu-title": "Show Rescan Button",
@@ -415,8 +400,6 @@
     "value-language-pt": "Portuguese",
     "value-sendall-true": "Enable",
     "value-sendall-false": "Disable",
-    "value-donation-true": "Yes",
-    "value-donation-false": "No",
     "value-privacy-true": "High",
     "value-privacy-false": "Normal",
     "privacy": "Priv: ",
@@ -620,8 +603,6 @@
     "deshielded": "Deshielded",
     "lose-address-title": "SELECT A NEW ADDRESS",
     "lose-address-alert": "You already have a valid address in the address field. Do you want to replace it?",
-    "confirm-donation": "Donation",
-    "donation-minimum-message": "The minimum amount for donations is a Zenny (0.01 ZEC), Try again and Thanks.",
     "nym-processing-title": "Processing via NYM",
     "nym-enhanced": "NYM Enhanced",
     "nym-warning": "This transaction will be routed through the NYM mixnet for enhanced privacy. This may take slightly longer than standard transactions."
@@ -1096,7 +1077,5 @@
     "oneentry": "URI Should have at least 1 entry",
     "memo-too-long": "Memo too long in parameter",
     "error-http-not-allowed": "Error: Plain HTTP is only allowed for localhost. Use HTTPS for remote servers."
-  },
-  "donation-button": "Donate To ZingoLabs ",
-  "donation-legend": "You are donating to ZingoLabs activately, Thanks"
+  }
 }

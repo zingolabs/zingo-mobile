@@ -32,8 +32,6 @@
   "support": "Enviar E-mail",
   "view-error": "Ver/Relatar Erro",
   "menudrawer-acc": "Abrir Menu Lateral",
-  "donation": "Doação para o Zingo!\nObrigado por apoiar o ZingoLabs!",
-  "zenny-tips-ab": "Zenny Gorjetas",
   "restarting": "Error ao conectar ao servidor, o aplicativo será reiniciado em alguns segundos.",
   "change-privacy": "Nova política de privacidade: ",
   "email": "support@zingolabs.org",
@@ -155,8 +153,6 @@
     "alert-newwallet-body": "Você pode confirmar que deseja realmente criar uma nova carteira e perder o acesso à carteira atual.",
     "serverfirsttry": "Ocorreu um erro ao tentar conectar-se ao servidor acima, atualmente verificando os servidores na lista.",
     "serversecondtry": "Não parece haver nenhum problema com o servidor. Algo mais está acontecendo.",
-    "alert-donation-title": "APOIAR A ZINGOLABS",
-    "alert-donation-body": "Você quer ajudar o ZingoLabs a tornar o Zcash mais útil? Opte por dar uma gorjeta de um Zenny (0.01 ZEC) para ZingoLabs em cada transação! Se sim, pressione confirmar, caso contrário, pressione Cancelar.",
     "recoverkeys": "Recuperar a última Clave de Recuperação usada",
     "recoverkeysinstall": "Recuperou a última Clave de Recuperação usada neste dispositivo:",
     "customserver-unreachable": "Seu servidor personalizado não respondeu e a carteira retornou um erro. Abra Ajustes para escolher outro ou tente novamente mais tarde.",
@@ -285,16 +281,6 @@
         "text": "Desative o botão de ENVIAR TUDO, pode ser um risco tê-lo ativado."
       }
     ],
-    "donations": [
-      {
-        "value": true,
-        "text": "Dê gorjeta ao ZingoLabs a Zenny (0.01 ZEC) em cada transação."
-      },
-      {
-        "value": false,
-        "text": "Não pague para incentivar um sistema mais seguro."
-      }
-    ],
     "privacys": [
       {
         "value": true,
@@ -401,7 +387,6 @@
     "language-title": "Linguagem",
     "islanguage": "Você precisa escolher um idioma para salvar.",
     "sendall-title": "Ativar o envio de todos os fundos",
-    "donation-title": "Dica ZingoLabs",
     "privacy-title": "High Privacy",
     "mode-title": "Alterar entre o modo Básico ou Avançado",
     "rescanmenu-title": "Mostrar o botão de reescaneamento",
@@ -415,8 +400,6 @@
     "value-language-pt": "Português",
     "value-sendall-true": "Habilitar",
     "value-sendall-false": "Desabilitar",
-    "value-donation-true": "Sim",
-    "value-donation-false": "Não",
     "value-privacy-true": "Alto",
     "value-privacy-false": "Média",
     "privacy": "Priv: ",
@@ -620,8 +603,6 @@
     "deshielded": "Desblindada",
     "lose-address-title": "SELECIONE UM NOVO ENDEREÇO",
     "lose-address-alert": "Você já possui um endereço válido no campo de endereço. Deseja substituí-lo?",
-    "confirm-donation": "Doação",
-    "donation-minimum-message": "O valor mínimo para doações é um Zenny (0,01 ZEC), tente novamente e obrigado.",
     "nym-processing-title": "Processando via NYM",
     "nym-enhanced": "NYM Aprimorado",
     "nym-warning": "Esta transação será roteada através do mixnet NYM para maior privacidade. Pode levar um pouco mais de tempo do que as transações padrão."
@@ -1096,7 +1077,5 @@
     "oneentry": "RI deve ter pelo menos 1 entrada",
     "memo-too-long": "Memo muito longo no parâmetro",
     "error-http-not-allowed": "Error: HTTP em texto plano só é permitido para localhost. Use HTTPS para servidores remotos."
-  },
-  "donation-button": "Doar para ZingoLabs ",
-  "donation-legend": "Você está doando para ZingoLabs ativamente, Obrigado"
+  }
 }

@@ -146,7 +146,6 @@ export type ValueTransferDetailNavigationState = {
 export type ConfirmNavigationState = {
   calculatedFee: number;
   proposalPools: ProposalPoolsType;
-  donationAmount: number;
   confirmSend: (s: SendPageStateClass) => Promise<void>;
   sendAllAmount: boolean;
   calculateFeeWithPropose: (

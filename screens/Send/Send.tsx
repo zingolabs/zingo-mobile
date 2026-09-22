@@ -14,7 +14,6 @@ import {
   TextInput,
   TouchableOpacity,
   Platform,
-  Text,
   Pressable,
   StyleSheet,
   NativeSyntheticEvent,
@@ -29,7 +28,6 @@ import {
   faAddressCard,
   faUserPlus,
   faMagnifyingGlassPlus,
-  faMoneyCheckDollar,
   faXmark,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -165,12 +163,9 @@ const Send: React.FunctionComponent<SendProps> = ({
     somePending,
     addressBook,
     launchAddTagModal,
-    donation,
-    addresses,
     defaultUnifiedAddress,
     shieldingAmount,
     selectServer,
-    zenniesDonationAddress,
     //security,
     currency,
     zingolibVersion,
@@ -234,7 +229,6 @@ const Send: React.FunctionComponent<SendProps> = ({
   const [stillConfirming, setStillConfirming] = useState<boolean>(false);
   const [showShieldInfo, setShowShieldInfo] = useState<boolean>(false);
   const [updatingToField, setUpdatingToField] = useState<boolean>(false);
-  const [donationAddress, setDonationAddress] = useState<boolean>(false);
   const [negativeMaxAmount, setNegativeMaxAmount] = useState<boolean>(false);
   const [inputZec, setInputZec] = useState<boolean>(true);
   //const [sendAllClick, setSendAllClick] = useState<boolean>(false);
@@ -413,13 +407,7 @@ const Send: React.FunctionComponent<SendProps> = ({
 
   const defaultValuesSpendableMaxAmount = useCallback((): void => {
     setSpendable(totalBalance ? totalBalance.totalSpendableBalance : 0);
-    const max =
-      (totalBalance ? totalBalance.totalSpendableBalance : 0) -
-      (donation &&
-      server.chainName === ChainNameEnum.mainChainName &&
-      !donationAddress
-        ? Utils.parseStringLocaleToNumberFloat(Utils.getZenniesDonationAmount())
-        : 0);
+    const max = totalBalance ? totalBalance.totalSpendableBalance : 0;
     if (max > 0) {
       // if max have to be more than 0, then the user can send a memo with amount 0 & some fee.
       setMaxAmount(max);
@@ -431,13 +419,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     }
     setSpendableBalanceLastError('');
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    donation,
-    donationAddress,
-    server.chainName,
-    totalBalance,
-    totalBalance?.totalSpendableBalance,
-  ]);
+  }, [totalBalance, totalBalance?.totalSpendableBalance]);
 
   const calculateFeeWithPropose = useCallback(
     async (
@@ -482,8 +464,6 @@ const Send: React.FunctionComponent<SendProps> = ({
       sendJson = await Utils.getSendManyJSON(
         sendPageStateCalculateFee,
         defaultUnifiedAddress,
-        server,
-        donation,
       );
       // fee
       let proposeFee = 0;
@@ -516,15 +496,7 @@ const Send: React.FunctionComponent<SendProps> = ({
               destination: runProposeJson.destination_pools ?? [],
             };
             if (runProposeJson.amount !== undefined) {
-              const newAmount =
-                runProposeJson.amount / 10 ** 8 -
-                (donation &&
-                server.chainName === ChainNameEnum.mainChainName &&
-                !donationAddress
-                  ? Utils.parseStringLocaleToNumberFloat(
-                      Utils.getZenniesDonationAmount(),
-                    )
-                  : 0);
+              const newAmount = runProposeJson.amount / 10 ** 8;
               updateToField(
                 null,
                 Utils.parseNumberFloatToStringLocale(newAmount, 8),
@@ -545,13 +517,11 @@ const Send: React.FunctionComponent<SendProps> = ({
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [
-      donation,
       server,
       defaultUnifiedAddress,
       validAddress,
       validAmount,
       validMemo,
-      donationAddress,
       /* added */ spendable,
       maxAmount,
       somePending,
@@ -578,12 +548,9 @@ const Send: React.FunctionComponent<SendProps> = ({
       let spendableBalance = totalBalance
         ? totalBalance.totalSpendableBalance
         : 0;
-      let zenniesForZingo = donationAddress ? false : donation;
       const start = Date.now();
-      const runSpendableBalance = await getSpendableBalanceWithAddress(
-        addressPar,
-        zenniesForZingo ? 'true' : 'false',
-      );
+      const runSpendableBalance =
+        await getSpendableBalanceWithAddress(addressPar);
       if (Date.now() - start > 4000) {
         console.log(
           '=========================================== > spendable balance with address - ',
@@ -615,7 +582,6 @@ const Send: React.FunctionComponent<SendProps> = ({
 
       setSpendable(spendableBalance);
       // max amount
-      // don't need to substract the donation here.
       const max = spendableBalance;
       if (max > 0) {
         // if max have to be more than 0, then the user can send a memo with amount 0 & some fee.
@@ -630,8 +596,6 @@ const Send: React.FunctionComponent<SendProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       defaultValuesSpendableMaxAmount,
-      donation,
-      donationAddress,
       totalBalance,
       totalBalance?.totalSpendableBalance,
       validAddress,
@@ -893,8 +857,6 @@ const Send: React.FunctionComponent<SendProps> = ({
       }
     }
   }, [
-    donation,
-    donationAddress,
     decimalSeparator,
     server.chainName,
     addressText,
@@ -942,7 +904,6 @@ const Send: React.FunctionComponent<SendProps> = ({
     const items = addressBook
       .filter(
         (item: AddressBookFileClass) =>
-          item.address !== zenniesDonationAddress &&
           item.swapChain === GlobalConst.zecSwapChain &&
           item.chain === walletChain,
       )
@@ -951,20 +912,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         value: item.address,
       }));
     setItemsPicker(items);
-  }, [addressBook, zenniesDonationAddress, walletChainName, server.chainName]);
-
-  useEffect(() => {
-    if (addressText) {
-      (async () => {
-        const donationA =
-          addressText === (await Utils.getDonationAddress(server.chainName)) ||
-          addressText === zenniesDonationAddress;
-        setDonationAddress(donationA);
-      })();
-    } else {
-      setDonationAddress(false);
-    }
-  }, [addresses, addressText, server.chainName, zenniesDonationAddress]);
+  }, [addressBook, walletChainName, server.chainName]);
 
   useEffect(() => {
     setAddressText(sendPageState.toaddr.to);
@@ -1171,14 +1119,6 @@ const Send: React.FunctionComponent<SendProps> = ({
     navigation.navigate(RouteEnum.Confirm, {
       calculatedFee: fee,
       proposalPools: proposalPools,
-      donationAmount:
-        donation &&
-        server.chainName === ChainNameEnum.mainChainName &&
-        !donationAddress
-          ? Utils.parseStringLocaleToNumberFloat(
-              Utils.getZenniesDonationAmount(),
-            )
-          : 0,
       confirmSend: confirmSend,
       sendAllAmount:
         mode !== ModeEnum.basic &&
@@ -1830,36 +1770,6 @@ const Send: React.FunctionComponent<SendProps> = ({
                         )}
                       </View>
                     </TouchableOpacity>
-                    {donation &&
-                      server.chainName === ChainNameEnum.mainChainName &&
-                      !donationAddress && (
-                        <View
-                          style={{
-                            display: 'flex',
-                            flexDirection: 'row',
-                            marginTop: 0,
-                            backgroundColor: colors.bgSurface,
-                            padding: 5,
-                            borderRadius: 10,
-                            alignSelf: 'flex-start',
-                          }}
-                        >
-                          <FontAwesomeIcon
-                            icon={faInfoCircle}
-                            size={16}
-                            color={colors.fgAccent}
-                            style={{ marginRight: 5 }}
-                          />
-                          <FadeText>{'( '}</FadeText>
-                          <FadeText>
-                            {(translate('send.confirm-donation') as string) +
-                              ': ' +
-                              Utils.getZenniesDonationAmount() +
-                              ' '}
-                          </FadeText>
-                          <FadeText>{')'}</FadeText>
-                        </View>
-                      )}
                     {stillConfirming && (
                       <TouchableOpacity
                         style={{ alignSelf: 'flex-start' }}
@@ -2238,27 +2148,6 @@ const Send: React.FunctionComponent<SendProps> = ({
                       onPress={async () => {
                         setSendButtonEnabled(false);
                         updateToField(null, null, null, memoText, null);
-                        // donation - a Zenny is the minimum
-                        if (
-                          server.chainName === ChainNameEnum.mainChainName &&
-                          donationAddress &&
-                          Utils.parseStringLocaleToNumberFloat(amountText) <
-                            Utils.parseStringLocaleToNumberFloat(
-                              Utils.getZenniesDonationAmount(),
-                            )
-                        ) {
-                          addLastSnackbar(
-                            `${translate('send.donation-minimum-message') as string}`,
-                          );
-                          updateToField(
-                            null,
-                            Utils.getZenniesDonationAmount(),
-                            null,
-                            null,
-                            false,
-                          );
-                          return;
-                        }
                         if (
                           !netInfo.isConnected ||
                           selectServer === SelectServerEnum.offline
@@ -2293,88 +2182,6 @@ const Send: React.FunctionComponent<SendProps> = ({
                     />
                   )}
                 </View>
-                {server.chainName === ChainNameEnum.mainChainName &&
-                  Platform.OS === GlobalConst.platformOSandroid && (
-                    <>
-                      {donation ? (
-                        <View
-                          style={{
-                            flexDirection: 'row',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            paddingHorizontal: 4,
-                            paddingBottom: 2,
-                            borderWidth: 1,
-                            borderColor: colors.borderAccent,
-                            borderRadius: 5,
-                          }}
-                        >
-                          <Text style={{ fontSize: 13, color: colors.fgMuted }}>
-                            {translate('donation-legend') as string}
-                          </Text>
-                        </View>
-                      ) : (
-                        <TouchableOpacity
-                          onPress={async () => {
-                            let update = false;
-                            if (
-                              addressText &&
-                              addressText !==
-                                (await Utils.getDonationAddress(
-                                  server.chainName,
-                                ))
-                            ) {
-                              await ShowAddressAlertAsync(translate)
-                                .then(async () => {
-                                  // fill the fields in the screen with the donation data
-                                  update = true;
-                                })
-                                .catch(() => {}); // user cancelled the alert — expected
-                            } else {
-                              // fill the fields in the screen with the donation data
-                              update = true;
-                            }
-                            if (update) {
-                              updateToField(
-                                await Utils.getDonationAddress(
-                                  server.chainName,
-                                ),
-                                Utils.getDonationAmount(),
-                                null,
-                                Utils.getDonationMemo(translate),
-                                true,
-                              );
-                            }
-                          }}
-                        >
-                          <View
-                            style={{
-                              flexDirection: 'row',
-                              justifyContent: 'center',
-                              alignItems: 'center',
-                              paddingHorizontal: 4,
-                              paddingBottom: 2,
-                              borderWidth: 1,
-                              borderColor: colors.borderAccent,
-                              borderRadius: 5,
-                            }}
-                          >
-                            <Text
-                              style={{ fontSize: 13, color: colors.fgMuted }}
-                            >
-                              {translate('donation-button') as string}
-                            </Text>
-                            <FontAwesomeIcon
-                              style={{ marginTop: 3 }}
-                              size={16}
-                              icon={faMoneyCheckDollar}
-                              color={colors.fgAccent}
-                            />
-                          </View>
-                        </TouchableOpacity>
-                      )}
-                    </>
-                  )}
               </View>
             </View>
           </ScrollView>

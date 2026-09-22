@@ -35,7 +35,6 @@ export default interface AppContextLoading {
   currency: CurrencyEnum;
   language: LanguageEnum;
   sendAll: boolean;
-  donation: boolean;
   privacy: boolean;
   mode: ModeEnum;
   security: SecurityType;

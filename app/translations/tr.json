@@ -32,8 +32,6 @@
   "support": "Email gönder",
   "view-error": "Hatayı Görüntüle/Bildir",
   "menudrawer-acc": "Menü çekmecesini aç",
-  "donation": "Zingo'ya Bağış!\nZingoLabs'i desteklediğiniz için teşekkürler!",
-  "zenny-tips-ab": "Zenny Tavsiyeleri",
   "restarting": "Error Sunucuya bağlanırken hata oluştu, uygulama birkaç saniye içinde yeniden başlayacak.",
   "change-privacy": "Yeni gizlilik politikası ",
   "email": "support@zingolabs.org",
@@ -155,8 +153,6 @@
     "alert-newwallet-body": "Yeni bir cüzdan oluşturmak istediğinizi ve mevcut cüzdana erişimi kaybetmeyi gerçekten onaylıyor musunuz.",
     "serverfirsttry": "Yukarıdaki sunucuya bağlanmaya çalışılırken bir hata oluştu, şu anda listedeki sunucular kontrol ediliyor.",
     "serversecondtry": "Sorun sunucudan kaynaklanıyor gibi görünmüyor. Başka bir şey oluyor.",
-    "alert-donation-title": "ZINGOLABS İPUCU",
-    "alert-donation-body": "ZingoLabs’in Zcash’i daha faydalı hale getirmesine yardımcı olmak ister misiniz? Her işlemde ZingoLabs’e bir Zenny (0.01 ZEC) bağışlamak için katılın! Katılmak istiyorsanız Onayla’ya, istemiyorsanız İptal’e basın.",
     "recoverkeys": "Son anahtarları geri yükle",
     "recoverkeysinstall": "Bu cihazda kullanılan son anahtarlar kurtarıldı:",
     "customserver-unreachable": "Özel sunucunuz yanıt vermedi ve cüzdan bir hata döndürdü. Farklı bir sunucu seçmek için Ayarları açın veya daha sonra tekrar deneyin.",
@@ -285,16 +281,6 @@
         "text": "Tümünü gönder butonunu devre dışı bırak, çünkü bu özelliğe sahip olmak risk oluşturabilir."
       }
     ],
-    "donations": [
-      {
-        "value": true,
-        "text": "Her işlemle birlikte ZingoLabs’e bir Zenny (0.01 ZEC) katkı sağla."
-      },
-      {
-        "value": false,
-        "text": "Daha güvenli bir sistemi teşvik etmek için ödeme yapmayın."
-      }
-    ],
     "privacys": [
       {
         "value": true,
@@ -401,7 +387,6 @@
     "language-title": "Dil",
     "islanguage": "Kaydetmek için bir dil seçmeniz gerekiyor.",
     "sendall-title": "Tüm fonları göndermeyi etkinleştir",
-    "donation-title": "ZingoLabs’a katkıda bulun",
     "privacy-title": "High Privacy",
     "mode-title": "Temel ve Gelişmiş Mod arasında geçiş yapın.",
     "rescanmenu-title": "Yeniden Tarama Butonunu Göster",
@@ -415,8 +400,6 @@
     "value-language-pt": "Portekizce",
     "value-sendall-true": "Etkin",
     "value-sendall-false": "Etkin değil",
-    "value-donation-true": "Evet",
-    "value-donation-false": "Hayır",
     "value-privacy-true": "Yüksek",
     "value-privacy-false": "Normal ",
     "privacy": "Özel:",
@@ -620,8 +603,6 @@
     "deshielded": "Korumasız",
     "lose-address-title": "YENİ BİR ADRES SEÇ",
     "lose-address-alert": "Adres alanında zaten geçerli bir adresiniz var. Onu değiştirmek istiyor musunuz?",
-    "confirm-donation": "Bağış",
-    "donation-minimum-message": "Bağışlar için minimum tutar bir Zenny'dir (0.01 ZEC). Lütfen tekrar deneyin ve teşekkürler.",
     "nym-processing-title": "NYM üzerinden işleniyor",
     "nym-enhanced": "NYM Gelişmiş",
     "nym-warning": "Bu işlem, gelişmiş gizlilik için NYM mixnet'i üzerinden yönlendirilecektir. Standart işlemlerden biraz daha uzun sürebilir."
@@ -1096,7 +1077,5 @@
     "oneentry": "URI en az 1 girişe sahip olmalıdır",
     "memo-too-long": "Parametrede memo çok uzun",
     "error-http-not-allowed": "Error: Düz HTTP yalnızca localhost için izin verilir. Uzak sunucular için HTTPS kullanın."
-  },
-  "donation-button": "ZingoLabs’a Bağış Yap",
-  "donation-legend": "ZingoLabs'a aktif olarak bağış yapıyorsunuz, Teşekkürler"
+  }
 }

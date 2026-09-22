@@ -29,7 +29,6 @@ import {
   drainOrchard,
   drainStatus,
   getBalanceInfo,
-  getDonationAddress,
   getLatestBlockServerInfo,
   getServerInfo,
   getSpendableBalanceWithAddress,
@@ -38,7 +37,6 @@ import {
   getTotalValueToAddress,
   getVersionInfo,
   getWalletKind,
-  getZenniesDonationAddress,
   parseAddress,
   planOrchardDrain,
   removeTransaction,
@@ -72,12 +70,6 @@ const wrappers: Array<[string, string, () => Promise<FfiResult<string>>]> = [
   ['getBalanceInfo', 'getBalanceInfo', () => getBalanceInfo()],
   ['getVersionInfo', 'getVersionInfo', () => getVersionInfo()],
   ['walletKindInfo', 'getWalletKind', () => getWalletKind()],
-  ['getDonationAddress', 'getDonationAddress', () => getDonationAddress()],
-  [
-    'getZenniesDonationAddress',
-    'getZenniesDonationAddress',
-    () => getZenniesDonationAddress(),
-  ],
   ['sendProcess', 'sendPropose', () => sendPropose('{}')],
   ['planOrchardDrainProcess', 'planOrchardDrain', () => planOrchardDrain()],
   ['drainOrchardProcess', 'drainOrchard', () => drainOrchard()],
@@ -85,7 +77,7 @@ const wrappers: Array<[string, string, () => Promise<FfiResult<string>>]> = [
   [
     'getSpendableBalanceWithAddressInfo',
     'getSpendableBalanceWithAddress',
-    () => getSpendableBalanceWithAddress('u1...', 'false'),
+    () => getSpendableBalanceWithAddress('u1...'),
   ],
   ['parseAddressInfo', 'parseAddress', () => parseAddress('u1...')],
   [

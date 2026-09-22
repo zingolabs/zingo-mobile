@@ -155,7 +155,6 @@ export default function LoadingApp(props: LoadingAppProps) {
   ); // by default USD
   const [server, setServer] = useState<ServerType>(SERVER_DEFAULT_0);
   const [sendAll, setSendAll] = useState<boolean>(false);
-  const [donation, setDonation] = useState<boolean>(false);
   const [privacy, setPrivacy] = useState<boolean>(false);
   const [mode, setMode] = useState<ModeEnum.basic | ModeEnum.advanced>(
     ModeEnum.advanced,
@@ -182,7 +181,6 @@ export default function LoadingApp(props: LoadingAppProps) {
   const [selectServer, setSelectServer] = useState<SelectServerEnum>(
     SelectServerEnum.auto,
   );
-  const [donationAlert, setDonationAlert] = useState<boolean>(false);
   const [rescanMenu, setRescanMenu] = useState<boolean>(false);
   const [recoveryWalletInfoOnDevice, setRecoveryWalletInfoOnDevice] =
     useState<boolean>(false);
@@ -240,11 +238,6 @@ export default function LoadingApp(props: LoadingAppProps) {
             CurrencyEnum.USDCurrency,
           );
         }
-      }
-
-      // new donation feature.
-      if (settings.firstInstall || settings.firstUpdateWithDonation) {
-        setDonationAlert(true);
       }
 
       // first I need to know if this launch is a fresh install...
@@ -330,14 +323,6 @@ export default function LoadingApp(props: LoadingAppProps) {
         setSendAll(settings.sendAll);
       } else {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.sendAll, sendAll);
-      }
-      if (settings.donation === true || settings.donation === false) {
-        setDonation(settings.donation);
-      } else {
-        await SettingsFileImpl.writeSettings(
-          SettingsNameEnum.donation,
-          donation,
-        );
       }
       if (settings.privacy === true || settings.privacy === false) {
         setPrivacy(settings.privacy);
@@ -453,14 +438,12 @@ export default function LoadingApp(props: LoadingAppProps) {
         currency={currency}
         server={server}
         sendAll={sendAll}
-        donation={donation}
         privacy={privacy}
         mode={mode}
         backgroundSyncInfo={backgroundSyncInfo}
         firstLaunchingMessage={firstLaunchingMessage}
         security={security}
         selectServer={selectServer}
-        donationAlert={donationAlert}
         rescanMenu={rescanMenu}
         recoveryWalletInfoOnDevice={recoveryWalletInfoOnDevice}
         performanceLevel={performanceLevel}
@@ -483,14 +466,12 @@ type LoadingAppClassProps = {
   currency: CurrencyEnum;
   server: ServerType;
   sendAll: boolean;
-  donation: boolean;
   privacy: boolean;
   mode: ModeEnum;
   backgroundSyncInfo: BackgroundType;
   firstLaunchingMessage: LaunchingModeEnum;
   security: SecurityType;
   selectServer: SelectServerEnum;
-  donationAlert: boolean;
   rescanMenu: boolean;
   recoveryWalletInfoOnDevice: boolean;
   performanceLevel: RPCPerformanceLevelEnum;
@@ -536,7 +517,6 @@ export class LoadingAppClass extends Component<
       currency: props.currency,
       language: props.language,
       sendAll: props.sendAll,
-      donation: props.donation,
       privacy: props.privacy,
       mode: props.mode,
       security: props.security,
@@ -568,7 +548,6 @@ export class LoadingAppClass extends Component<
           ? props.route.params.startingApp
           : true,
       serverErrorTries: 0,
-      donationAlert: props.donationAlert,
       firstLaunchingMessage: props.firstLaunchingMessage,
       hasRecoveryWalletInfoSaved: false,
     };
@@ -2286,7 +2265,6 @@ export class LoadingAppClass extends Component<
       currency: this.state.currency,
       language: this.state.language,
       sendAll: this.state.sendAll,
-      donation: this.state.donation,
       privacy: this.state.privacy,
       mode: this.state.mode,
       security: this.state.security,

@@ -22,17 +22,12 @@ import {
   LanguageEnum,
   SendJsonToTypeType,
   SendPageStateClass,
-  ServerType,
   TranslateType,
   BlockExplorerEnum,
 } from '@app/AppState';
 
 import randomColor from 'randomcolor';
-import {
-  getDonationAddress,
-  getZenniesDonationAddress,
-  parseAddress,
-} from '@app/walletBackend';
+import { parseAddress } from '@app/walletBackend';
 import { Buffer } from 'buffer';
 import { RPCParseAddressType } from '@app/walletBackend/types/RPCParseAddressType';
 import { RPCParseAddressStatusEnum } from '@app/walletBackend/enums/RPCParseAddressStatusEnum';
@@ -118,46 +113,6 @@ export default class Utils {
     chunks.push(s.slice((numChunks - 1) * chunkSize));
 
     return chunks;
-  }
-
-  // DONATION TO ZINGOLABS
-  static async getDonationAddress(chainName: ChainNameEnum): Promise<string> {
-    // donations only for mainnet.
-    if (chainName === ChainNameEnum.mainChainName) {
-      // UA -> we need a fresh one.
-      const ua = await getDonationAddress();
-      return ua.ok ? ua.value : '';
-    }
-    return '';
-  }
-
-  static getDonationAmount(): string {
-    const { decimalSeparator } = getNumberFormatSettings();
-
-    return '0' + decimalSeparator + '01';
-  }
-
-  static getDonationMemo(translate: (key: string) => TranslateType): string {
-    return translate('donation') as string;
-  }
-
-  // ZENNIES FOR ZINGO
-  static async getZenniesDonationAddress(
-    chainName: ChainNameEnum,
-  ): Promise<string> {
-    // donations only for mainnet.
-    if (chainName === ChainNameEnum.mainChainName) {
-      // UA -> we need a fresh one.
-      const ua = await getZenniesDonationAddress();
-      return ua.ok ? ua.value : '';
-    }
-    return '';
-  }
-
-  static getZenniesDonationAmount(): string {
-    const { decimalSeparator } = getNumberFormatSettings();
-
-    return '0' + decimalSeparator + '01';
   }
 
   // NYM
@@ -292,13 +247,8 @@ export default class Utils {
   static async getSendManyJSON(
     sendPageState: SendPageStateClass,
     uAddress: string,
-    server: ServerType,
-    donation: boolean,
   ): Promise<SendJsonToTypeType[]> {
     const to = sendPageState.toaddr;
-    const donationAddress: boolean =
-      to.to === (await Utils.getDonationAddress(server.chainName)) ||
-      to.to === (await Utils.getZenniesDonationAddress(server.chainName));
 
     const memo = Utils.buildMemo(to.memo, to.includeUAMemo, uAddress);
     const amount = parseInt(
@@ -336,32 +286,7 @@ export default class Utils {
       }
     }
 
-    const donationTransaction: SendJsonToTypeType[] = [];
-
-    // we need to exclude 2 use cases:
-    // 2. send to one of our donation UA's
-    // (make no sense to do a double donation)
-    if (
-      donation &&
-      server.chainName === ChainNameEnum.mainChainName &&
-      !donationAddress
-    ) {
-      donationTransaction.push({
-        address: await Utils.getZenniesDonationAddress(server.chainName),
-        amount: parseInt(
-          (
-            Utils.parseStringLocaleToNumberFloat(
-              Utils.getZenniesDonationAmount(),
-            ) *
-            10 ** 8
-          ).toFixed(0),
-          10,
-        ),
-        memo: '', // zancas decision to not leak info with no reason.
-      });
-    }
-
-    return [...jsonFlat, ...donationTransaction];
+    return jsonFlat;
   }
 
   static async isValidAddress(

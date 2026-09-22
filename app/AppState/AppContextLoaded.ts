@@ -118,9 +118,6 @@ export default interface AppContextLoaded {
   // fetch the ZEC price in USD
   setZecPrice: (p: number, d: number) => void;
 
-  // donation address
-  zenniesDonationAddress: string;
-
   // zingolib Version
   zingolibVersion: string;
 
@@ -132,7 +129,6 @@ export default interface AppContextLoaded {
   currency: CurrencyEnum;
   language: LanguageEnum;
   sendAll: boolean;
-  donation: boolean;
   privacy: boolean;
   mode: ModeEnum;
   security: SecurityType;

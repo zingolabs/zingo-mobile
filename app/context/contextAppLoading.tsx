@@ -26,7 +26,6 @@ export const defaultAppContextLoading: AppContextLoading = {
     date: 0,
   } as ZecPriceType,
   sendAll: false,
-  donation: false,
   backgroundSyncInfo: {
     batches: 0,
     message: '',

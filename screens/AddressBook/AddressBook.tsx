@@ -70,13 +70,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
   setAddressBook,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const {
-    translate,
-    addressBook,
-    zenniesDonationAddress,
-    walletChainName,
-    server,
-  } = context;
+  const { translate, addressBook, walletChainName, server } = context;
   const { colors } = useTheme();
   const screenName = ScreenEnum.AddressBook;
   // The wallet's own Zcash network (reliable even offline); the chain subfilter
@@ -87,9 +81,6 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
   const [loadMoreButton, setLoadMoreButton] = useState<boolean>(false);
   //const [addressBookFiltered, setAddressBookFiltered] = useState<AddressBookFileClass[]>([]);
   const [addressBookSliced, setAddressBookSliced] = useState<
-    AddressBookFileClass[]
-  >([]);
-  const [addressBookProtected, setAddressBookProtected] = useState<
     AddressBookFileClass[]
   >([]);
 
@@ -127,13 +118,12 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
 
   useScrollToTop(scrollViewRef as unknown as React.RefObject<ScrollView>);
 
-  // Zcash networks that actually have a contact (protected/internal entries
-  // aside), in a stable order. When there is only one, the chain subfilter row
-  // is hidden — there is nothing to choose.
+  // Zcash networks that actually have a contact, in a stable order. When there
+  // is only one, the chain subfilter row is hidden — there is nothing to choose.
   const availableChains = useMemo(() => {
     const present = new Set<ChainNameEnum>();
     addressBook.forEach((ab: AddressBookFileClass) => {
-      if (ab.address !== zenniesDonationAddress && ab.chain) {
+      if (ab.chain) {
         present.add(ab.chain);
       }
     });
@@ -142,7 +132,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
       ChainNameEnum.testChainName,
       ChainNameEnum.regtestChainName,
     ].filter(c => present.has(c));
-  }, [addressBook, zenniesDonationAddress]);
+  }, [addressBook]);
   const showNetworkRow = availableChains.length > 1;
   const networkLabel = (c: ChainNameEnum): string => {
     switch (c) {
@@ -179,31 +169,15 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
       q.length === 0 ||
       ab.label.toLowerCase().includes(q) ||
       ab.address.toLowerCase().includes(q);
-    // excluding this address from the list; the chain subfilter (when visible)
-    // narrows to the selected network on top of the type filter, and the search
-    // matches label + address.
+    // the chain subfilter (when visible) narrows to the selected network on
+    // top of the type filter, and the search matches label + address.
     return addressBook.filter(
       (ab: AddressBookFileClass) =>
-        ab.address !== zenniesDonationAddress &&
         (!showNetworkRow || ab.chain === effectiveNetwork) &&
         filterApply(ab) &&
         searchApply(ab),
     );
-  }, [
-    addressBook,
-    filter,
-    zenniesDonationAddress,
-    showNetworkRow,
-    effectiveNetwork,
-    search,
-  ]);
-
-  const fetchAddressBookProtected = useMemo(async () => {
-    // only protected address to use internally ZingoLabs.
-    return addressBook.filter(
-      (ab: AddressBookFileClass) => ab.address === zenniesDonationAddress,
-    );
-  }, [addressBook, zenniesDonationAddress]);
+  }, [addressBook, filter, showNetworkRow, effectiveNetwork, search]);
 
   useEffect(() => {
     const _currentAddress =
@@ -221,11 +195,9 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
   useEffect(() => {
     (async () => {
       const abf = await fetchAddressBookFiltered;
-      const abp = await fetchAddressBookProtected;
       //setAddressBookFiltered(abf);
       setLoadMoreButton(numAb < abf.length);
       setAddressBookSliced(abf.slice(0, numAb));
-      setAddressBookProtected(abp);
       // find the current address
       if (currentAddress) {
         const index: number = abf.findIndex(
@@ -240,13 +212,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
       }
       setLoading(false);
     })();
-  }, [
-    currentAddress,
-    fetchAddressBookProtected,
-    fetchAddressBookFiltered,
-    numAb,
-    addressBook,
-  ]);
+  }, [currentAddress, fetchAddressBookFiltered, numAb, addressBook]);
 
   const loadMoreClicked = useCallback(() => {
     setNumAb(numAb + 50);
@@ -812,22 +778,6 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
                       />
                     </View>
                   ))}
-                {!currentAddress &&
-                  addressBookProtected.map((aBItem, index) => {
-                    return (
-                      <View key={`container-${index}-${aBItem.label}`}>
-                        <AbSummaryLine
-                          index={index}
-                          key={`line-${index}-${aBItem.label}`}
-                          item={aBItem}
-                          openAbDetail={openAbDetail}
-                          handleScrollToTop={handleScrollToTop}
-                          doAction={doAction}
-                          addressProtected={true}
-                        />
-                      </View>
-                    );
-                  })}
               </>
             )}
             {loadMoreButton && !currentAddress ? (

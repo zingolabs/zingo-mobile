@@ -113,8 +113,6 @@ beforeEach(() => {
         ? 'stale'
         : 'live',
   );
-  const { NativeModules } = require('react-native');
-  NativeModules.RPCModule.getDonationAddress = jest.fn(async () => '{}');
 });
 
 test('F8: the in-form USD amounts dim when the price is stale', () => {
@@ -166,7 +164,6 @@ test('N7: the send-confirmation conversions dim on a stale price too', () => {
       params: {
         calculatedFee: 0.00001,
         proposalPools: { source: ['ironwood'], destination: ['ironwood'] },
-        donationAmount: 0,
         confirmSend: jest.fn(async () => {}),
         sendAllAmount: false,
         calculateFeeWithPropose: jest.fn(async () => {}),

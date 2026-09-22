@@ -193,10 +193,11 @@ export default class SettingsFileImpl {
           settings.selectServer = SelectServerEnum.auto;
         }
       }
-      if (!settings.hasOwnProperty(SettingsNameEnum.donation)) {
-        // this means the App shows up an Alert asking about the tip/donation new feature.
-        settings.firstUpdateWithDonation = true;
-      }
+      // Donations are gone from the App, so the flags of the old tip feature
+      // are dropped from the file the first time an older settings.json loads.
+      const obsolete = settings as unknown as Record<string, unknown>;
+      delete obsolete.donation;
+      delete obsolete.firstUpdateWithDonation;
       // old security options that have to be removed and to add the new one.
       if (settings.hasOwnProperty(SettingsNameEnum.security)) {
         const sec: SecurityType = settings.security;

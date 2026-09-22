@@ -121,7 +121,6 @@ const History: React.FunctionComponent<HistoryProps> = ({
     addLastSnackbar,
     server,
     doRefresh,
-    zenniesDonationAddress,
     setPrivacyOption,
     currency,
     totalBalance,
@@ -629,7 +628,6 @@ const History: React.FunctionComponent<HistoryProps> = ({
             ? false
             : valueTransfersSliced[index + 1].txid === data.txid
         }
-        addressProtected={data.address === zenniesDonationAddress}
         screenName={screenName}
         registerSwipeable={registerSwipeable(index)}
         closeAllSwipeables={() => closeAllSwipeables()}

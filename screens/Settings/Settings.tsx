@@ -117,7 +117,6 @@ type SettingsProps = NativeStackScreenProps<
   setCurrencyOption: (value: CurrencyEnum) => Promise<void>;
   setLanguageOption: (value: LanguageEnum) => Promise<void>;
   setSendAllOption: (value: boolean) => Promise<void>;
-  setDonationOption: (value: boolean) => Promise<void>;
   setSecurityOption: (value: SecurityType) => Promise<void>;
   setSelectServerOption: (value: string) => Promise<void>;
   setRescanMenuOption: (value: boolean) => Promise<void>;
@@ -139,7 +138,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   setCurrencyOption,
   setLanguageOption,
   setSendAllOption,
-  setDonationOption,
   setSecurityOption,
   setSelectServerOption,
   setRescanMenuOption,
@@ -157,7 +155,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     currency: currencyContext,
     language: languageContext,
     sendAll: sendAllContext,
-    donation: donationContext,
     privacy: privacyContext,
     mode,
     netInfo,
@@ -190,12 +187,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   let LANGUAGES: Options[] = [];
   if (typeof languagesArray === 'object') {
     LANGUAGES = languagesArray as Options[];
-  }
-
-  const donationsArray = translate('settings.donations');
-  let DONATIONS: Options[] = [];
-  if (typeof donationsArray === 'object') {
-    DONATIONS = donationsArray as Options[];
   }
 
   const sendAllsArray = translate('settings.sendalls');
@@ -303,7 +294,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const [currency, setCurrency] = useState<CurrencyEnum>(currencyContext);
   const [language, setLanguage] = useState<LanguageEnum>(languageContext);
   const [sendAll, setSendAll] = useState<boolean>(sendAllContext);
-  const [donation, setDonation] = useState<boolean>(donationContext);
   const [privacy, setPrivacy] = useState<boolean>(privacyContext);
   // security checks box.
   const [startApp, setStartApp] = useState<boolean>(securityContext.startApp);
@@ -712,7 +702,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       currencyContext === currency &&
       languageContext === language &&
       sendAllContext === sendAll &&
-      donationContext === donation &&
       privacyContext === privacy &&
       isEqual(securityContext, securityObject()) &&
       selectServerContext === selectServer &&
@@ -733,8 +722,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     currencyContext,
     customServerChainName,
     customServerUri,
-    donation,
-    donationContext,
     language,
     languageContext,
     listServerChainName,
@@ -799,7 +786,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       currencyContext === currency &&
       languageContext === language &&
       sendAllContext === sendAll &&
-      donationContext === donation &&
       privacyContext === privacy &&
       isEqual(securityContext, securityObject()) &&
       selectServerContext === selectServer &&
@@ -986,9 +972,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       if (sendAllContext !== sendAll) {
         await setSendAllOption(sendAll);
       }
-      if (donationContext !== donation) {
-        await setDonationOption(donation);
-      }
       if (privacyContext !== privacy) {
         await setPrivacyOption(privacy);
       }
@@ -1113,7 +1096,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       // reset all settings - no save changes
       setCurrency(currencyContext);
       setLanguage(languageContext);
-      setDonation(donationContext);
       setPrivacy(privacyContext);
       setSendAll(sendAllContext);
       setRescanMenu(rescanMenuContext);
@@ -2273,60 +2255,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
 
               {/* SECTION: Other */}
               {sectionHeader('settings.section-other')}
-
-              {!readOnly && (
-                <View style={{ marginHorizontal: 25, marginVertical: 15 }}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        flex: 1,
-                      }}
-                    >
-                      <BoldText>
-                        {translate('settings.donation-title') as string}
-                      </BoldText>
-                      <TouchableOpacity
-                        onPress={() =>
-                          setOpenInfoSection(
-                            openInfoSection === 'donation' ? null : 'donation',
-                          )
-                        }
-                        style={{ marginLeft: 6 }}
-                      >
-                        <FontAwesomeIcon
-                          icon={faInfoCircle}
-                          size={14}
-                          color={colors.fgDefault}
-                        />
-                      </TouchableOpacity>
-                    </View>
-                    <TouchableOpacity onPress={() => setDonation(!donation)}>
-                      {donation ? (
-                        <SettingSwitchOn width={40} height={19} />
-                      ) : (
-                        <SwitchOff width={40} height={19} />
-                      )}
-                    </TouchableOpacity>
-                  </View>
-                  {openInfoSection === 'donation' && (
-                    <View
-                      style={{
-                        backgroundColor: '#040E1D',
-                        borderRadius: 8,
-                        padding: 10,
-                        marginTop: 8,
-                      }}
-                    >
-                      <FadeText style={{ textAlign: 'center' }}>
-                        {DONATIONS.find(d => String(d.value) === 'true')
-                          ?.text ?? ''}
-                      </FadeText>
-                    </View>
-                  )}
-                </View>
-              )}
 
               <TouchableOpacity
                 testID="settings.about"
