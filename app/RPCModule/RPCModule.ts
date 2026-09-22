@@ -89,10 +89,7 @@ interface RPCModuleAPI {
 
   // Balances
   getBalanceInfo(): Promise<string>;
-  getSpendableBalanceWithAddressInfo(
-    address: string,
-    zennies: string,
-  ): Promise<string>;
+  getSpendableBalanceWithAddressInfo(address: string): Promise<string>;
   getSpendableBalanceTotalInfo(): Promise<string>;
   getTotalValueToAddressInfo(): Promise<string>;
   getTotalMemobytesToAddressInfo(): Promise<string>;
@@ -106,6 +103,7 @@ interface RPCModuleAPI {
 
   // Send / shield / confirm
   sendProcess(sendJson: string): Promise<string>;
+  sendAllProcess(address: string, memo: string): Promise<string>;
   shieldProcess(): Promise<string>;
   confirmProcess(): Promise<string>;
 

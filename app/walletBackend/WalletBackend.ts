@@ -66,8 +66,11 @@ export default class WalletBackend {
     return this.dataService.fetchTandZandOMessages();
   }
 
-  async sendTransaction(sendJson: Array<SendJsonToTypeType>): Promise<string> {
-    return this.transactionService.sendTransaction(sendJson);
+  async sendTransaction(
+    sendJson: Array<SendJsonToTypeType>,
+    sendAll: boolean = false,
+  ): Promise<string> {
+    return this.transactionService.sendTransaction(sendJson, sendAll);
   }
 
   async reenableMixnet() {

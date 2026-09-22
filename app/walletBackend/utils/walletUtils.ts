@@ -301,6 +301,19 @@ export async function sendPropose(
   return callFfi(RPCModule.sendProcess(proposeJson));
 }
 
+// The propose phase of a MAX send, mirroring the native `sendAllProcess`. The
+// amount `getSpendableBalanceWithAddress` reports is sized by zingolib's
+// send-max proposal, which an ordinary `sendPropose` request can be refused
+// for, so the whole balance travels this way instead. The success value is raw
+// JSON (parseable as RPCSendProposeType) and carries `amount`: what the
+// recipient really receives, for the caller to show. `memo` is '' when none.
+export async function sendAllPropose(
+  address: string,
+  memo: string,
+): Promise<FfiResult<string>> {
+  return callFfi(RPCModule.sendAllProcess(address, memo));
+}
+
 // Plans the immediate Orchard -> Ironwood drain without broadcasting. Mirrors
 // the native `planOrchardDrainProcess` (propose/preview phase). The success
 // value is raw JSON (parseable as RPCDrainPlanType).
@@ -456,9 +469,7 @@ export async function cancelIronwoodMigration(): Promise<FfiResult<string>> {
 export async function getSpendableBalanceWithAddress(
   address: string,
 ): Promise<FfiResult<string>> {
-  return callFfi(
-    RPCModule.getSpendableBalanceWithAddressInfo(address, 'false'),
-  );
+  return callFfi(RPCModule.getSpendableBalanceWithAddressInfo(address));
 }
 
 // Validates and classifies a Zcash address. The success value is raw JSON

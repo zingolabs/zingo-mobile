@@ -58,6 +58,7 @@ export {
   restoreExistingWalletBackup,
   restoreWalletFromSeed,
   restoreWalletFromUfvk,
+  sendAllPropose,
   sendPropose,
   setConfigWalletToProd,
   setCryptoDefaultProvider,

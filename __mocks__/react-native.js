@@ -50,6 +50,7 @@ jest.mock('react-native', () => {
     getConfigWalletPerformanceInfo: jest.fn(() => '{}'),
     getWalletVersionInfo: jest.fn(() => '{}'),
     sendProcess: jest.fn(() => '{}'),
+    sendAllProcess: jest.fn(() => '{}'),
     shieldProcess: jest.fn(() => '{}'),
     confirmProcess: jest.fn(() => '{}'),
   };

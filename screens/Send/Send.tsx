@@ -86,6 +86,7 @@ import { parseZcashURI, serverUris, fetchServerList } from '@app/uris';
 import { isZnsAlias, resolveZnsName } from '@app/uris/resolveZnsName';
 import {
   getSpendableBalanceWithAddress,
+  sendAllPropose,
   sendPropose,
 } from '@app/walletBackend';
 import {
@@ -123,7 +124,10 @@ type SendProps = NativeStackScreenProps<AppDrawerParamList, RouteEnum.Send> & {
   setScrollToTop: (value: boolean) => void;
   setScrollToBottom: (value: boolean) => void;
   // for send
-  sendTransaction: (s: SendPageStateClass) => Promise<String>;
+  sendTransaction: (
+    s: SendPageStateClass,
+    sendAll?: boolean,
+  ) => Promise<String>;
   setServerOption: (
     value: ServerType,
     selectServer: SelectServerEnum,
@@ -262,6 +266,12 @@ const Send: React.FunctionComponent<SendProps> = ({
   const [priceRowH, setPriceRowH] = useState<number>(0);
 
   const scrollViewRef = useRef<ScrollView>(null);
+  // The user asked for the whole balance: MAX sets it, typing in the amount
+  // field clears it. A send-all proposal can come back with less than the
+  // figure MAX offered — the change output the send path always writes costs
+  // one more ZIP 317 action — and it writes that corrected amount into the
+  // field, so the intent cannot be read back from the amount alone.
+  const sendAllRef = useRef<boolean>(false);
   const sendSheetRef = useRef<BottomSheet>(null);
   // Track internal snap index; when snapPoints shrinks (e.g., USD currency
   // disabled, 3 → 2 snaps), clamp the index in an effect so the sheet
@@ -421,6 +431,18 @@ const Send: React.FunctionComponent<SendProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [totalBalance, totalBalance?.totalSpendableBalance]);
 
+  // Whether this send empties the wallet: MAX was pressed, or the amount
+  // typed is the maximum itself. Both travel the send-all path, so the fee
+  // quoted and the transaction sent come from the same proposal.
+  const isSendAllAmount = useCallback(
+    (amountPar: string): boolean =>
+      sendAllRef.current ||
+      (maxAmount > 0 &&
+        Utils.parseStringLocaleToNumberFloat(amountPar) ===
+          Utils.parseStringLocaleToNumberFloat(maxAmount.toFixed(8))),
+    [maxAmount],
+  );
+
   const calculateFeeWithPropose = useCallback(
     async (
       amountPar: string,
@@ -468,7 +490,17 @@ const Send: React.FunctionComponent<SendProps> = ({
       // fee
       let proposeFee = 0;
       let proposePools: ProposalPoolsType = { source: [], destination: [] };
-      const runPropose = await sendPropose(JSON.stringify(sendJson));
+      // A MAX send is proposed as a send-all: the figure the spendable
+      // balance reports is sized by zingolib's send-max proposal, which an
+      // ordinary send request for the same amount can be refused for.
+      const runPropose = isSendAllAmount(amountPar)
+        ? await sendAllPropose(
+            addressPar,
+            memoEnabled
+              ? Utils.buildMemo(memoPar, includeUAMemoPar, defaultUnifiedAddress)
+              : '',
+          )
+        : await sendPropose(JSON.stringify(sendJson));
 
       // discard result if a newer calculation (or a clear) has superseded this one
       if (feeCalculationGenRef.current !== generation) {
@@ -522,6 +554,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       validAddress,
       validAmount,
       validMemo,
+      memoEnabled,
       /* added */ spendable,
       maxAmount,
       somePending,
@@ -943,6 +976,7 @@ const Send: React.FunctionComponent<SendProps> = ({
 
   const clearState = () => {
     feeCalculationGenRef.current += 1;
+    sendAllRef.current = false;
     setAddressText('');
     setAmountText('');
     setAmountCurrencyText('');
@@ -967,6 +1001,9 @@ const Send: React.FunctionComponent<SendProps> = ({
   };
 
   const confirmSend = async (sendPageStatePar: SendPageStateClass) => {
+    // The MAX send travels the send-all path all the way: quoted and sent by
+    // the same proposal, so the amount confirmed is the amount broadcast.
+    const sendAllSend = isSendAllAmount(sendPageStatePar.toaddr.amount);
     if (!netInfo.isConnected || selectServer === SelectServerEnum.offline) {
       addLastSnackbar(translate('loadedapp.connection-error') as string);
       return;
@@ -975,7 +1012,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     navigation.navigate(RouteEnum.Computing);
 
     try {
-      await sendTransaction(sendPageStatePar);
+      await sendTransaction(sendPageStatePar, sendAllSend);
 
       // Clear the fields
       clearState();
@@ -1035,7 +1072,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         }
 
         try {
-          await sendTransaction(sendPageStatePar);
+          await sendTransaction(sendPageStatePar, sendAllSend);
 
           // Clear the fields
           clearState();
@@ -1120,11 +1157,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       calculatedFee: fee,
       proposalPools: proposalPools,
       confirmSend: confirmSend,
-      sendAllAmount:
-        mode !== ModeEnum.basic &&
-        maxAmount > 0 &&
-        Utils.parseStringLocaleToNumberFloat(amountText) ===
-          Utils.parseStringLocaleToNumberFloat(maxAmount.toFixed(8)),
+      sendAllAmount: mode !== ModeEnum.basic && isSendAllAmount(amountText),
       calculateFeeWithPropose: calculateFeeWithPropose,
       sendPageState: buildSendState(),
       nym,
@@ -1523,15 +1556,17 @@ const Send: React.FunctionComponent<SendProps> = ({
                             backgroundColor: 'transparent',
                           }}
                           value={amountText}
-                          onChangeText={(text: string) =>
+                          onChangeText={(text: string) => {
+                            // typing an amount drops the MAX intent
+                            sendAllRef.current = false;
                             updateToField(
                               null,
                               text.substring(0, 20),
                               null,
                               null,
                               null,
-                            )
-                          }
+                            );
+                          }}
                           editable={true}
                           maxLength={20}
                         />
@@ -1553,26 +1588,32 @@ const Send: React.FunctionComponent<SendProps> = ({
                             backgroundColor: 'transparent',
                           }}
                           value={amountCurrencyText}
-                          onChangeText={(text: string) =>
+                          onChangeText={(text: string) => {
+                            // typing an amount drops the MAX intent
+                            sendAllRef.current = false;
                             updateToField(
                               null,
                               null,
                               text.substring(0, 15),
                               null,
                               null,
-                            )
-                          }
+                            );
+                          }}
                           editable={true}
                           maxLength={15}
                         />
                       )}
                       {(inputZec ? amountText : amountCurrencyText) ? (
                         <TouchableOpacity
-                          onPress={() =>
-                            inputZec
-                              ? updateToField(null, '', null, null, null)
-                              : updateToField(null, null, '', null, null)
-                          }
+                          onPress={() => {
+                            // clearing the amount drops the MAX intent
+                            sendAllRef.current = false;
+                            if (inputZec) {
+                              updateToField(null, '', null, null, null);
+                            } else {
+                              updateToField(null, null, '', null, null);
+                            }
+                          }}
                         >
                           <FontAwesomeIcon
                             style={{ marginRight: 5 }}
@@ -1590,6 +1631,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                               maxAmount,
                               8,
                             );
+                            sendAllRef.current = true;
                             updateToField(null, maxStr, null, null, null);
                             calculateFeeWithPropose(
                               maxStr,
@@ -2136,11 +2178,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                         validAmount === 1 &&
                         amountText &&
                         mode !== ModeEnum.basic &&
-                        maxAmount > 0 &&
-                        Utils.parseStringLocaleToNumberFloat(amountText) ===
-                          Utils.parseStringLocaleToNumberFloat(
-                            maxAmount.toFixed(8),
-                          )
+                        isSendAllAmount(amountText)
                           ? (translate('send.button-all') as string)
                           : (translate('send.button') as string)
                       }
@@ -2161,10 +2199,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           validAmount === 1 &&
                           amountText &&
                           mode !== ModeEnum.basic &&
-                          Utils.parseStringLocaleToNumberFloat(amountText) ===
-                            Utils.parseStringLocaleToNumberFloat(
-                              maxAmount.toFixed(8),
-                            )
+                          isSendAllAmount(amountText)
                         ) {
                           addLastSnackbar(
                             `${translate('send.sendall-message') as string}`,

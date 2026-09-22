@@ -1591,6 +1591,7 @@ export class LoadedAppClass extends Component<
 
   sendTransaction = async (
     sendPageState: SendPageStateClass,
+    sendAll: boolean = false,
   ): Promise<String> => {
     try {
       // Construct a sendJson from the sendPage state
@@ -1600,7 +1601,7 @@ export class LoadedAppClass extends Component<
         defaultUnifiedAddress,
       );
       //const start = Date.now();
-      const txid = await this.rpc.sendTransaction(sendJson);
+      const txid = await this.rpc.sendTransaction(sendJson, sendAll);
 
       return txid;
     } catch (err) {

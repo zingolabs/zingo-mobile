@@ -1079,11 +1079,11 @@ class RPCModule: NSObject {
       }
   }
 
-  @objc(getSpendableBalanceWithAddressInfo:zennies:resolve:reject:)
-  func getSpendableBalanceWithAddressInfo(_ address: String, zennies: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+  @objc(getSpendableBalanceWithAddressInfo:resolve:reject:)
+  func getSpendableBalanceWithAddressInfo(_ address: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
       DispatchQueue.global(qos: .userInitiated).async {
         FfiOutcome.of {
-          try getSpendableBalanceWithAddress(address: address, zennies: zennies)
+          try getSpendableBalanceWithAddress(address: address)
         }.settle(resolve: resolve, reject: reject)
       }
   }
@@ -1201,6 +1201,15 @@ class RPCModule: NSObject {
       DispatchQueue.global(qos: .userInitiated).async {
         FfiOutcome.of {
           try send(sendJson: send_json)
+        }.settle(resolve: resolve, reject: reject)
+      }
+  }
+
+  @objc(sendAllProcess:memo:resolve:reject:)
+  func sendAllProcess(_ address: String, memo: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      DispatchQueue.global(qos: .userInitiated).async {
+        FfiOutcome.of {
+          try sendAll(address: address, memo: memo)
         }.settle(resolve: resolve, reject: reject)
       }
   }
