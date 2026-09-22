@@ -183,6 +183,20 @@ const tr = require('@app/translations/tr.json');
 
 const Tab = createBottomTabNavigator<AppDrawerParamList>();
 
+// The `Zenny Tips` contact older versions wrote into every address book on
+// their own, in the five languages that could have created it, and the UA it
+// always pointed at. Donations are gone, so the contact is removed — matching
+// both the label and the address, to never delete a contact of the user's.
+const OBSOLETE_ZENNY_TIPS_LABELS: string[] = [
+  'Zenny Tips',
+  'Zenny Propinas',
+  'Zenny Gorjetas',
+  'Поддержать Zenny',
+  'Zenny Tavsiyeleri',
+];
+const OBSOLETE_ZENNY_TIPS_ADDRESS: string =
+  'u1p32nu0pgev5cr0u6t4ja9lcn29kaw37xch8nyglwvp7grl07f72c46hxvw0u3q58ks43ntg324fmulc2xqf4xl3pv42s232m25vaukp05s6av9z76s3evsstax4u6f5g7tql5yqwuks9t4ef6vdayfmrsymenqtshgxzj59hdydzygesqa7pdpw463hu7afqf4an29m69kfasdwr494';
+
 // for testing
 //const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -483,12 +497,11 @@ export default function LoadedApp(props: LoadedAppProps) {
       let sort: boolean = false;
       let ab = await AddressBookFileImpl.readAddressBook();
 
-      // older versions added the `Zenny Tips` contact to every address book,
-      // with a label the user could not edit. Donations are gone, so it is
-      // removed wherever it is still stored — every translation of that label
-      // carries the word `Zenny`.
+      // dropping the obsolete `Zenny Tips` contact wherever it is still stored.
       const zennyTips: AddressBookFileClass[] = ab.filter(
-        (a: AddressBookFileClass) => a.label.toLowerCase().includes('zenny'),
+        (a: AddressBookFileClass) =>
+          a.address === OBSOLETE_ZENNY_TIPS_ADDRESS &&
+          OBSOLETE_ZENNY_TIPS_LABELS.includes(a.label),
       );
       for (const a of zennyTips) {
         ab = await AddressBookFileImpl.removeAddressBookItem(
