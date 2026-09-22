@@ -118,7 +118,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     somePending,
     shieldingAmount,
     selectServer,
-    nym,
     mixnetView,
   } = context;
 
@@ -204,7 +203,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             syncInProgress={syncInProgress}
             viewSyncStatus={viewSyncStatus}
             opacityValue={opacityValue}
-            nym={nym}
             mixnetView={mixnetView}
             translate={translate}
             privacy={privacy}

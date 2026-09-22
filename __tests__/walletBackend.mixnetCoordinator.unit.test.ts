@@ -176,26 +176,14 @@ describe('sendGateOpen', () => {
       sendBlocked,
     }) as MixnetView;
 
-  it('opens with Nym off in every state except an attach in flight', () => {
-    expect(sendGateOpen(false, view('mixnet.status.bootstrapping', true))).toBe(
-      false,
-    );
-    expect(sendGateOpen(false, view('mixnet.status.died', true))).toBe(true);
-    expect(sendGateOpen(false, view('mixnet.status.unknown', true))).toBe(true);
-    expect(sendGateOpen(false, view('mixnet.status.ready', false))).toBe(true);
-  });
-
-  it('follows the fail-closed verdict with Nym on', () => {
-    expect(sendGateOpen(true, view('mixnet.status.died', true))).toBe(false);
-    expect(sendGateOpen(true, view('mixnet.status.bootstrapping', true))).toBe(
-      false,
-    );
-    expect(sendGateOpen(true, view('mixnet.status.ready', false))).toBe(true);
+  it('follows the fail-closed verdict: a send waits for a usable transport', () => {
+    expect(sendGateOpen(view('mixnet.status.died', true))).toBe(false);
+    expect(sendGateOpen(view('mixnet.status.bootstrapping', true))).toBe(false);
+    expect(sendGateOpen(view('mixnet.status.ready', false))).toBe(true);
   });
 
   it('opens where no mixnet policy runs', () => {
-    expect(sendGateOpen(false, null)).toBe(true);
-    expect(sendGateOpen(true, null)).toBe(true);
+    expect(sendGateOpen(null)).toBe(true);
   });
 });
 

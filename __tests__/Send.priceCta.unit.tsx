@@ -166,7 +166,6 @@ test('N7: the send-confirmation conversions dim on a stale price too', () => {
         sendAllAmount: false,
         calculateFeeWithPropose: jest.fn(async () => {}),
         sendPageState: mockSendPageState,
-        nym: true,
       },
     },
   };

@@ -136,8 +136,6 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
   // True when the send routes over the mixnet, so the confirm screen shows
   // the NYM styling (green outline, processing title, enhanced-privacy tag,
   // warning banner).
-  const nym: boolean =
-    !!route.params && route.params.nym !== undefined ? route.params.nym : false;
 
   const [containerH, setContainerH] = useState<number>(0);
   const [headerH, setHeaderH] = useState<number>(0);
@@ -276,7 +274,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
           }}
         >
           <Button
-            type={nym ? ButtonTypeEnum.Nym : ButtonTypeEnum.Primary}
+            type={ButtonTypeEnum.Nym}
             title={
               sendAllAmount
                 ? (translate('send.confirm-button-all') as string)
@@ -288,7 +286,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
       </BottomSheetFooter>
     ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [colors, nym, sendAllAmount, translate],
+    [colors, sendAllAmount, translate],
   );
 
   if (!authPassed) {
@@ -346,15 +344,13 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                 padding: 10,
                 borderWidth: 1,
                 borderRadius: 10,
-                borderColor: nym ? '#07FF94' : colors.borderMuted,
+                borderColor: '#07FF94',
               }}
             >
               <RegText
                 style={{ textAlign: 'center', textTransform: 'capitalize' }}
               >
-                {nym
-                  ? (translate('send.nym-processing-title') as string)
-                  : (translate('send.sending-title') as string)}
+                {translate('send.nym-processing-title') as string}
               </RegText>
 
               <ZecAmount
@@ -393,11 +389,9 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                   ) : (
                     <RegText>{privacyLevel}</RegText>
                   )}
-                  {nym && (
-                    <RegText style={{ color: '#07FF94' }}>
-                      {translate('send.nym-enhanced') as string}
-                    </RegText>
-                  )}
+                  <RegText style={{ color: '#07FF94' }}>
+                    {translate('send.nym-enhanced') as string}
+                  </RegText>
                 </View>
               </View>
             </View>
@@ -479,29 +473,27 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                 </View>
               );
             })}
-            {nym && (
-              <View
-                style={{
-                  margin: 10,
-                  padding: 10,
-                  borderWidth: 1,
-                  borderRadius: 10,
-                  borderColor: '#07FF94',
-                  backgroundColor: '#07252B',
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                }}
-              >
-                <TriangleAlert
-                  size={20}
-                  color={'#07FF94'}
-                  style={{ marginRight: 6 }}
-                />
-                <RegText style={{ flex: 1, fontSize: 13, color: '#87919B' }}>
-                  {translate('send.nym-warning') as string}
-                </RegText>
-              </View>
-            )}
+            <View
+              style={{
+                margin: 10,
+                padding: 10,
+                borderWidth: 1,
+                borderRadius: 10,
+                borderColor: '#07FF94',
+                backgroundColor: '#07252B',
+                flexDirection: 'row',
+                alignItems: 'center',
+              }}
+            >
+              <TriangleAlert
+                size={20}
+                color={'#07FF94'}
+                style={{ marginRight: 6 }}
+              />
+              <RegText style={{ flex: 1, fontSize: 13, color: '#87919B' }}>
+                {translate('send.nym-warning') as string}
+              </RegText>
+            </View>
             <View style={{ marginBottom: 30 }} />
           </BottomSheetScrollView>
         </AppSheet>

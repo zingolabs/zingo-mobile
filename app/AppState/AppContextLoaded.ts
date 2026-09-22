@@ -139,8 +139,6 @@ export default interface AppContextLoaded {
   performanceLevel: RPCPerformanceLevelEnum;
   blockExplorer: BlockExplorerEnum;
   // The persisted send-route preference; the transport runs either way.
-  nym: boolean;
-  setNymOption: (value: boolean) => Promise<void>;
 
   // Null where the mixnet policy does not run.
   mixnetView: MixnetView | null;

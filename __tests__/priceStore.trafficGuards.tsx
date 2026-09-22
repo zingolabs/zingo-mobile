@@ -64,7 +64,6 @@ const makeCtx = (over?: Partial<Ctx>): Ctx => ({
   ...defaultAppContextLoaded,
   translate: (k: string) => k,
   zecPrice: { zecPrice: 0, date: 0 },
-  nym: true,
   info: mockInfo,
   selectServer: SelectServerEnum.auto,
   mixnetView: READY_VIEW,
@@ -198,19 +197,17 @@ test('a died transport pauses the cadence until the status recovers', async () =
   expect(price).toHaveBeenCalled();
 });
 
-test('a switched-off transport starts no fetch, the Nym toggle notwithstanding', async () => {
+test('a switched-off transport starts no fetch', async () => {
   price.mockResolvedValue({ price: 42, error: '' });
   const setZecPrice = jest.fn();
 
-  for (const nym of [true, false]) {
-    const view = render(
-      surfaceUi(makeCtx({ nym, mixnetView: OFF_VIEW }), setZecPrice),
-    );
-    await flush();
-    await flush();
-    expect(price).not.toHaveBeenCalled();
-    view.unmount();
-  }
+  const view = render(
+    surfaceUi(makeCtx({ mixnetView: OFF_VIEW }), setZecPrice),
+  );
+  await flush();
+  await flush();
+  expect(price).not.toHaveBeenCalled();
+  view.unmount();
 });
 
 test('an unknowable transport starts no fetch', async () => {

@@ -77,8 +77,6 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   performanceLevel: RPCPerformanceLevelEnum.Medium,
   setPrivacyOption: async () => {},
   blockExplorer: BlockExplorerEnum.Zcashexplorer,
-  nym: false,
-  setNymOption: async () => {},
   mixnetView: null,
   reenableMixnet: async () => {},
   setModeOption: async () => {},

@@ -44,13 +44,7 @@ import { SvgXml } from 'react-native-svg';
 import FadeText from '@ui/primitives/FadeText';
 import BoldText from '@ui/primitives/BoldText';
 import Swap from '../../assets/img/swap.svg';
-import NymOn from '../../assets/img/nym-on.svg';
-import NymOff from '../../assets/img/nym-off.svg';
-import NymSwitchOn from '../../assets/img/nym-switch-on.svg';
-import SwitchOff from '../../assets/img/switch-off.svg';
-import { showConfirm } from '@app/services/showConfirm';
 import {
-  mixnetPhase,
   sendGateOpen,
 } from '@app/walletBackend/transforms/mixnetView';
 import ErrorText from '@ui/primitives/ErrorText';
@@ -172,8 +166,6 @@ const Send: React.FunctionComponent<SendProps> = ({
     zingolibVersion,
     setPrivacyOption,
     mixnetView,
-    nym,
-    setNymOption,
     reenableMixnet,
   } = context;
   const { colors } = useTheme();
@@ -181,19 +173,6 @@ const Send: React.FunctionComponent<SendProps> = ({
   // figure carries the same stale/absent dim as the USD conversions.
   const priceMuted = usePriceHealth(zecPrice.date) !== 'live';
 
-  const [enabling, setEnabling] = useState<boolean>(false);
-  const nymPhase =
-    mixnetView !== null
-      ? mixnetPhase(mixnetView.statusKey, mixnetView.reconnecting)
-      : null;
-  const nymLoading = enabling || nymPhase === 'connecting';
-  const nymOn = nym;
-
-  useEffect(() => {
-    if (enabling && nymPhase !== null) {
-      setEnabling(false);
-    }
-  }, [enabling, nymPhase]);
   const screenName = ScreenEnum.Send;
   const zecIconXml = `<?xml version="1.0" encoding="UTF-8"?>
   <svg viewBox="0 0 88.03 147.85">
@@ -913,7 +892,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         !(
           !memoEnabled && Utils.parseStringLocaleToNumberFloat(amountText) === 0
         ) &&
-        sendGateOpen(nym, mixnetView),
+        sendGateOpen(mixnetView),
     );
   }, [
     memoEnabled,
@@ -924,7 +903,6 @@ const Send: React.FunctionComponent<SendProps> = ({
     fee,
     maxAmount,
     mixnetView,
-    nym,
   ]);
 
   useEffect(() => {
@@ -1158,7 +1136,6 @@ const Send: React.FunctionComponent<SendProps> = ({
       sendAllAmount: mode !== ModeEnum.basic && isSendAllAmount(amountText),
       calculateFeeWithPropose: calculateFeeWithPropose,
       sendPageState: buildSendState(),
-      nym,
     });
   };
 
@@ -2063,66 +2040,6 @@ const Send: React.FunctionComponent<SendProps> = ({
                   marginVertical: 0,
                 }}
               >
-                {mixnetView !== null && (
-                  <TouchableOpacity
-                    testID="send.nym-toggle"
-                    disabled={nymLoading}
-                    onPress={() => {
-                      if (!nym) {
-                        setEnabling(true);
-                        setNymOption(true);
-                        return;
-                      }
-                      showConfirm({
-                        title: translate('settings.nym-network') as string,
-                        message: translate(
-                          'settings.nym-disable-warning',
-                        ) as string,
-                        messageAlign: 'left',
-                        buttons: [
-                          {
-                            text: translate('cancel') as string,
-                            style: 'cancel',
-                          },
-                          {
-                            text: translate('confirm') as string,
-                            onPress: () => setNymOption(false),
-                          },
-                        ],
-                      });
-                    }}
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      alignSelf: 'stretch',
-                      marginHorizontal: 25,
-                      marginTop: 16,
-                      marginBottom: 28,
-                      opacity: nymLoading ? 0.4 : 1,
-                    }}
-                  >
-                    {nymOn ? (
-                      <NymOn width={22} height={22} />
-                    ) : (
-                      <NymOff width={22} height={22} />
-                    )}
-                    <View style={{ flex: 1, marginLeft: 10 }}>
-                      <BoldText
-                        style={{ color: nymOn ? '#07FF94' : colors.fgDefault }}
-                      >
-                        {translate('settings.nym-network') as string}
-                      </BoldText>
-                      <FadeText>
-                        {translate('settings.nym-enhanced-privacy') as string}
-                      </FadeText>
-                    </View>
-                    {nymOn ? (
-                      <NymSwitchOn width={40} height={19} />
-                    ) : (
-                      <SwitchOff width={40} height={19} />
-                    )}
-                  </TouchableOpacity>
-                )}
                 {mixnetView !== null &&
                   mixnetView.sendBlocked &&
                   mixnetView.recovery === 'reenable' && (

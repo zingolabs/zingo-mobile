@@ -25,7 +25,6 @@ export default class WalletBackend {
     this.mixnetCoordinator = new MixnetCoordinator(
       config.startMixnetTransport,
       config.onMixnetViewChanged,
-      config.transmitPolicy,
     );
     this.dataService.onSyncError = async () => {
       await this.syncCoordinator.clearTimers();

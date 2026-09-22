@@ -416,9 +416,7 @@
     "walletkeyssaved": "As últimas informações de recuperação da carteira armazenadas com segurança no dispositivo.",
     "walletkeyswarning": "Este é um recurso experimental que depende da segurança de código não auditado para armazenar sua frase-semente. Por favor, não o use com sementes que controlam fundos significativos!",
     "value-language-tr": "Turco",
-    "nym-disable-warning": "Desativar o modo Mixnet envia suas transações pela rede aberta e vincula sua atividade ao seu endereço IP.",
     "nym-network": "NYM Mixnet",
-    "nym-enhanced-privacy": "Privacidade Aprimorada",
     "nym-diagnostics": "Executar diagnóstico do mixnet"
   },
   "mixnet": {

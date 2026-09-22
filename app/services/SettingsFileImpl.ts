@@ -195,14 +195,16 @@ export default class SettingsFileImpl {
       // Settings the App no longer asks about are dropped from the file the
       // first time an older settings.json loads: the donation flags of the
       // old tip feature, the two switches that used to hide the MAX button
-      // and the Rescan menu entry, both always there now, and the currency
-      // choice, now always USD.
+      // and the Rescan menu entry, both always there now, the currency
+      // choice, now always USD, and the Nym switch: every transmission
+      // travels the mixnet, so there is nothing left to choose.
       const obsolete = settings as unknown as Record<string, unknown>;
       delete obsolete.donation;
       delete obsolete.firstUpdateWithDonation;
       delete obsolete.sendAll;
       delete obsolete.rescanMenu;
       delete obsolete.currency;
+      delete obsolete.nym;
       // old security options that have to be removed and to add the new one.
       if (settings.hasOwnProperty(SettingsNameEnum.security)) {
         const sec: SecurityType = settings.security;
@@ -242,9 +244,6 @@ export default class SettingsFileImpl {
       if (!settings.hasOwnProperty(SettingsNameEnum.blockExplorer)) {
         // by default medium
         settings.blockExplorer = BlockExplorerEnum.Zcashexplorer;
-      }
-      if (!settings.hasOwnProperty(SettingsNameEnum.nym)) {
-        settings.nym = false;
       }
       if (!settings.hasOwnProperty(SettingsNameEnum.ironwoodOnboardSeen)) {
         // the wallet hasn't shown the "Meet Ironwood" onboarding yet; it

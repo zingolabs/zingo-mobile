@@ -94,14 +94,11 @@ export function deriveMixnetView(
   }
 }
 
-// With Nym off a send waits only for an attach in flight, which holds the mixnet policy.
-export function sendGateOpen(nym: boolean, view: MixnetView | null): boolean {
-  if (view === null) {
-    return true;
-  }
-  return nym
-    ? !view.sendBlocked
-    : view.statusKey !== 'mixnet.status.bootstrapping';
+// Every transmission travels the mixnet, so a send waits for a transport
+// that can carry it. A null view is a platform whose transport has not
+// landed: nothing to wait for there.
+export function sendGateOpen(view: MixnetView | null): boolean {
+  return view === null ? true : !view.sendBlocked;
 }
 
 export type MixnetPhase = 'connecting' | 'ready' | 'lost' | 'reconnecting';

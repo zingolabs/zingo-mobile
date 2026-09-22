@@ -247,7 +247,6 @@ export default function LoadedApp(props: LoadedAppProps) {
   const [blockExplorer, setBlockExplorer] = useState<BlockExplorerEnum>(
     BlockExplorerEnum.Zcashexplorer,
   );
-  const [nym, setNym] = useState<boolean>(false);
   const file = useMemo(
     () => ({
       en: en,
@@ -454,11 +453,6 @@ export default function LoadedApp(props: LoadedAppProps) {
           blockExplorer,
         );
       }
-      if (settings.nym === true || settings.nym === false) {
-        setNym(settings.nym);
-      } else {
-        await SettingsFileImpl.writeSettings(SettingsNameEnum.nym, false);
-      }
 
       // reading background task info
       const backgroundSyncInfoJson = await BackgroundFileImpl.readBackground();
@@ -644,7 +638,6 @@ export default function LoadedApp(props: LoadedAppProps) {
         firstLaunchingMessage={firstLaunchingMessage}
         performanceLevel={performanceLevel}
         blockExplorer={blockExplorer}
-        nym={nym}
       />
     );
   }
@@ -702,7 +695,6 @@ type LoadedAppClassProps = {
   firstLaunchingMessage: LaunchingModeEnum;
   performanceLevel: RPCPerformanceLevelEnum;
   blockExplorer: BlockExplorerEnum;
-  nym: boolean;
 };
 
 type LoadedAppClassState = AppStateLoaded & AppContextLoaded;
@@ -772,7 +764,6 @@ export class LoadedAppClass extends Component<
       setZecPrice: this.setZecPrice,
       zingolibVersion: '',
       setPrivacyOption: this.setPrivacyOption,
-      setNymOption: this.setNymOption,
       setModeOption: this.setModeOption,
 
       // context settings
@@ -786,7 +777,6 @@ export class LoadedAppClass extends Component<
       recoveryWalletInfoOnDevice: props.recoveryWalletInfoOnDevice,
       performanceLevel: props.performanceLevel,
       blockExplorer: props.blockExplorer,
-      nym: props.nym,
 
       mixnetView: INITIAL_MIXNET_VIEW,
       reenableMixnet: this.reenableMixnet,
@@ -822,7 +812,6 @@ export class LoadedAppClass extends Component<
       onPersistentSyncFailure: this.recoverServer,
       onMixnetViewChanged: this.setMixnetView,
       startMixnetTransport: startMixnetTransport,
-      transmitPolicy: props.nym ? 'mixnet' : 'clearnet',
       mixnetSupported: true,
       readOnly: props.readOnly,
       server: props.server,
@@ -1961,19 +1950,6 @@ export class LoadedAppClass extends Component<
     });
   };
 
-  setNymOption = async (value: boolean): Promise<void> => {
-    try {
-      await this.rpc.setTransmitPolicy(value ? 'mixnet' : 'clearnet');
-    } catch (error) {
-      this.setLastError(`Transmit policy: ${error}`);
-      return;
-    }
-    this.setState({
-      nym: value,
-    });
-    await SettingsFileImpl.writeSettings(SettingsNameEnum.nym, value);
-  };
-
   navigateToLoadingApp = async (state: LoadingAppNavigationState) => {
     await this.rpc.clearTimers();
     if (state.screen === RouteEnum.ImportUfvk) {
@@ -2244,7 +2220,6 @@ export class LoadedAppClass extends Component<
       setZecPrice: this.state.setZecPrice,
       zingolibVersion: this.state.zingolibVersion,
       setPrivacyOption: this.setPrivacyOption,
-      setNymOption: this.setNymOption,
       setModeOption: this.setModeOption,
 
       // context settings
@@ -2258,7 +2233,6 @@ export class LoadedAppClass extends Component<
       recoveryWalletInfoOnDevice: this.state.recoveryWalletInfoOnDevice,
       performanceLevel: this.state.performanceLevel,
       blockExplorer: this.state.blockExplorer,
-      nym: this.state.nym,
       mixnetView: this.state.mixnetView,
       reenableMixnet: this.reenableMixnet,
       foregroundEpoch: this.state.foregroundEpoch,
@@ -2447,7 +2421,6 @@ export class LoadedAppClass extends Component<
                             this.setPerformanceLevelOption
                           }
                           setBlockExplorerOption={this.setBlockExplorerOption}
-                          setNymOption={this.setNymOption}
                           toggleMenuDrawer={
                             () => toggleOptionsPanel() /* header */
                           }

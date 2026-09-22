@@ -23,7 +23,6 @@ export default class SettingsFileClass {
   recoveryWalletInfoOnDevice: boolean;
   performanceLevel: RPCPerformanceLevelEnum;
   blockExplorer: BlockExplorerEnum;
-  nym: boolean;
   ironwoodOnboardSeen: boolean;
 
   constructor(
@@ -39,7 +38,6 @@ export default class SettingsFileClass {
     recoveryWalletInfoOnDevice: boolean,
     performanceLevel: RPCPerformanceLevelEnum,
     blockExplorer: BlockExplorerEnum,
-    nym: boolean,
     ironwoodOnboardSeen: boolean,
   ) {
     this.server = server;
@@ -54,7 +52,6 @@ export default class SettingsFileClass {
     this.recoveryWalletInfoOnDevice = recoveryWalletInfoOnDevice;
     this.performanceLevel = performanceLevel;
     this.blockExplorer = blockExplorer;
-    this.nym = nym;
     this.ironwoodOnboardSeen = ironwoodOnboardSeen;
   }
 }

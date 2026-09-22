@@ -47,7 +47,6 @@ function renderScreen(mixnetView: MixnetView) {
     translate: keyTranslate,
     info: mockInfo,
     totalBalance: mockTotalBalance,
-    nym: true,
     mixnetView,
   };
   const utils = render(

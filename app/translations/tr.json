@@ -416,9 +416,7 @@
     "walletkeyssaved": "Son Cüzdan Kurtarma Bilgisi cihazda güvenli bir şekilde saklandı.",
     "walletkeyswarning": "Bu, kurtarma ifadesi'inizi saklamak için denetlenmemiş kodun güvenliğine bağlı olan deneysel bir özelliktir. Lütfen önemli miktarda fon içeren seed'lerle kullanmayın!",
     "value-language-tr": "Türkçe",
-    "nym-disable-warning": "Mixnet Modunu kapatmak işlemlerinizi açık ağ üzerinden yönlendirir ve etkinliğinizi IP adresinizle ilişkilendirir.",
     "nym-network": "NYM Mixnet",
-    "nym-enhanced-privacy": "Gelişmiş Gizlilik",
     "nym-diagnostics": "Mixnet tanılamasını çalıştır"
   },
   "mixnet": {

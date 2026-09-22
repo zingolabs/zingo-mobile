@@ -41,7 +41,6 @@ const makeCtx = (over?: Partial<Ctx>): Ctx => ({
   ...defaultAppContextLoaded,
   translate: (k: string) => k,
   zecPrice: { zecPrice: 0, date: 0 },
-  nym: true,
   info: mockInfo,
   selectServer: SelectServerEnum.auto,
   mixnetView: viewFor('mixnet.status.ready'),
@@ -96,9 +95,7 @@ test('a ZEC-display wallet still fetches every tick', async () => {
   price.mockResolvedValue({ price: 42, error: '' });
   const setZecPrice = jest.fn();
 
-  render(
-    driverOnlyUi(makeCtx({}), setZecPrice),
-  );
+  render(driverOnlyUi(makeCtx({}), setZecPrice));
   await jest.advanceTimersByTimeAsync(0);
   expect(price).toHaveBeenCalledTimes(1);
 
@@ -167,27 +164,22 @@ const FETCH_EXPECTED: Record<MixnetStatusKey, boolean> = {
   'mixnet.status.unknown': false,
 };
 
-test('the transport status alone resolves a fetch, the Nym toggle notwithstanding', async () => {
-  for (const nym of [true, false]) {
-    for (const statusKey of MIXNET_STATUS_KEYS) {
-      jest.useFakeTimers();
-      price.mockReset();
-      price.mockResolvedValue({ price: 42, error: '' });
-      priceFetcherStore.resetForTests();
-      const setZecPrice = jest.fn();
+test('the transport status alone resolves a fetch', async () => {
+  for (const statusKey of MIXNET_STATUS_KEYS) {
+    jest.useFakeTimers();
+    price.mockReset();
+    price.mockResolvedValue({ price: 42, error: '' });
+    priceFetcherStore.resetForTests();
+    const setZecPrice = jest.fn();
 
-      const view = render(
-        surfaceUi(
-          makeCtx({ nym, mixnetView: viewFor(statusKey) }),
-          setZecPrice,
-        ),
-      );
-      await jest.advanceTimersByTimeAsync(0);
+    const view = render(
+      surfaceUi(makeCtx({ mixnetView: viewFor(statusKey) }), setZecPrice),
+    );
+    await jest.advanceTimersByTimeAsync(0);
 
-      expect(price.mock.calls.length > 0).toBe(FETCH_EXPECTED[statusKey]);
-      view.unmount();
-      jest.useRealTimers();
-    }
+    expect(price.mock.calls.length > 0).toBe(FETCH_EXPECTED[statusKey]);
+    view.unmount();
+    jest.useRealTimers();
   }
 });
 

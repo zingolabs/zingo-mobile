@@ -39,7 +39,6 @@ function makeProps(): NativeStackScreenProps<
         sendAllAmount: false,
         calculateFeeWithPropose: jest.fn(async () => {}),
         sendPageState: mockSendPageState,
-        nym: false,
       },
     },
   };

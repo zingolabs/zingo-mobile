@@ -31,7 +31,6 @@ import {
   faInfoCircle,
   faXmark,
   faCheck,
-  faBug,
 } from '@fortawesome/free-solid-svg-icons';
 import { faCircle as farCircle } from '@fortawesome/free-regular-svg-icons';
 
@@ -95,11 +94,7 @@ import { useDismissSheetsOnBlur } from '@app/hooks/useDismissSheetsOnBlur';
 import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { createAlert } from '@app/services/createAlert';
-import { showConfirm } from '@app/services/showConfirm';
 import { sendEmail } from '@app/services/sendEmail';
-import NymOn from '../../assets/img/nym-on.svg';
-import NymOff from '../../assets/img/nym-off.svg';
-import NymSwitchOn from '../../assets/img/nym-switch-on.svg';
 import SwitchOff from '../../assets/img/switch-off.svg';
 import SettingSwitchOn from '../../assets/img/setting-switch-on.svg';
 
@@ -119,7 +114,6 @@ type SettingsProps = NativeStackScreenProps<
   setRecoveryWalletInfoOnDeviceOption: (value: boolean) => Promise<void>;
   setPerformanceLevelOption: (value: RPCPerformanceLevelEnum) => Promise<void>;
   setBlockExplorerOption: (value: BlockExplorerEnum) => Promise<void>;
-  setNymOption: (value: boolean) => Promise<void>;
   toggleMenuDrawer: () => void;
 };
 
@@ -137,7 +131,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   setRecoveryWalletInfoOnDeviceOption,
   setPerformanceLevelOption,
   setBlockExplorerOption,
-  setNymOption,
   toggleMenuDrawer,
 }) => {
   const context = useContext(ContextAppLoaded);
@@ -153,11 +146,10 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     security: securityContext,
     selectServer: selectServerContext,
     walletChainName,
+    mixnetView,
     recoveryWalletInfoOnDevice: recoveryWalletInfoOnDeviceContext,
     performanceLevel: performanceLevelContext,
     blockExplorer: blockExplorerContext,
-    nym: nymContext,
-    mixnetView,
     foregroundEpoch,
     readOnly,
     setPrivacyOption,
@@ -295,7 +287,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     useState<RPCPerformanceLevelEnum>(performanceLevelContext);
   const [blockExplorer, setBlockExplorer] =
     useState<BlockExplorerEnum>(blockExplorerContext);
-  const [nym, setNym] = useState<boolean>(nymContext);
 
   const [autoIcon, setAutoIcon] = useState<IconDefinition>(farCircle);
   const [listIcon, setListIcon] = useState<IconDefinition>(farCircle);
@@ -674,8 +665,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       selectServerContext === selectServer &&
       recoveryWalletInfoOnDeviceContext === recoveryWalletInfoOnDevice &&
       performanceLevelContext === performanceLevel &&
-      blockExplorerContext === blockExplorer &&
-      nymContext === nym
+      blockExplorerContext === blockExplorer
     ) {
       setDisabledButton(true);
     } else {
@@ -698,8 +688,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     performanceLevelContext,
     blockExplorer,
     blockExplorerContext,
-    nym,
-    nymContext,
     securityContext,
     selectServer,
     selectServerContext,
@@ -749,8 +737,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       selectServerContext === selectServer &&
       recoveryWalletInfoOnDeviceContext === recoveryWalletInfoOnDevice &&
       performanceLevelContext === performanceLevel &&
-      blockExplorerContext === blockExplorer &&
-      nymContext === nym
+      blockExplorerContext === blockExplorer
     ) {
       addLastSnackbar(translate('settings.nochanges') as string);
       return;
@@ -947,9 +934,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       if (blockExplorerContext !== blockExplorer) {
         await setBlockExplorerOption(blockExplorer);
       }
-      if (nymContext !== nym) {
-        await setNymOption(nym);
-      }
       // Language: applied in place. Belongs with the light settings now
       // that the i18n update propagates without an app reset. Apply it
       // before phase 5 so any snackbar that surfaces during the server
@@ -1057,7 +1041,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       setRecoveryWalletInfoOnDevice(recoveryWalletInfoOnDeviceContext);
       setPerformanceLevel(performanceLevelContext);
       setBlockExplorer(blockExplorerContext);
-      setNym(nymContext);
     }
     // `goBack()` pops Settings off the stack — using `navigate(HomeStack)`
     // would push HomeStack on top while leaving the already-authenticated
@@ -1796,90 +1779,31 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
               {mode !== ModeEnum.basic &&
                 sectionHeader('settings.section-networkadvanced')}
 
+              {/* Nym is no longer a choice: every transmission travels the
+                  mixnet. The row is left as the way into the diagnostics,
+                  and its green says the network is the one carrying the
+                  wallet's traffic. */}
               {mode !== ModeEnum.basic && mixnetView !== null && (
-                <View
-                  style={{ marginHorizontal: 25, marginTop: 15 }}
+                <TouchableOpacity
                   testID="settings.mixnet"
+                  onPress={() => navigation.navigate(RouteEnum.MixnetDoctor)}
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    marginHorizontal: 25,
+                    marginVertical: 15,
+                  }}
                 >
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                    }}
-                  >
-                    {nym ? (
-                      <NymOn width={22} height={22} />
-                    ) : (
-                      <NymOff width={22} height={22} />
-                    )}
-                    <View style={{ flex: 1, marginLeft: 10 }}>
-                      <View
-                        style={{
-                          flexDirection: 'row',
-                          alignItems: 'center',
-                          gap: 8,
-                        }}
-                      >
-                        <BoldText
-                          style={{ color: nym ? '#07FF94' : colors.fgDefault }}
-                        >
-                          {translate('settings.nym-network') as string}
-                        </BoldText>
-                        <TouchableOpacity
-                          testID="settings.mixnet-doctor"
-                          accessibilityLabel={
-                            translate('settings.nym-diagnostics') as string
-                          }
-                          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                          onPress={() =>
-                            navigation.navigate(RouteEnum.MixnetDoctor)
-                          }
-                        >
-                          <FontAwesomeIcon
-                            icon={faBug}
-                            color={colors.fgMuted}
-                            size={16}
-                          />
-                        </TouchableOpacity>
-                      </View>
-                      <FadeText>
-                        {translate('settings.nym-enhanced-privacy') as string}
-                      </FadeText>
-                    </View>
-                    <TouchableOpacity
-                      testID="settings.mixnet-toggle"
-                      onPress={() => {
-                        if (!nym) {
-                          setNym(true);
-                          return;
-                        }
-                        showConfirm({
-                          title: translate('settings.nym-network') as string,
-                          message: translate(
-                            'settings.nym-disable-warning',
-                          ) as string,
-                          messageAlign: 'left',
-                          buttons: [
-                            {
-                              text: translate('cancel') as string,
-                              style: 'cancel',
-                            },
-                            {
-                              text: translate('confirm') as string,
-                              onPress: () => setNym(false),
-                            },
-                          ],
-                        });
-                      }}
-                    >
-                      {nym ? (
-                        <NymSwitchOn width={40} height={19} />
-                      ) : (
-                        <SwitchOff width={40} height={19} />
-                      )}
-                    </TouchableOpacity>
-                  </View>
-                </View>
+                  <BoldText style={{ color: '#07FF94' }}>
+                    {translate('settings.nym-network') as string}
+                  </BoldText>
+                  <FontAwesomeIcon
+                    icon={faChevronRight}
+                    size={12}
+                    color={colors.fgMuted}
+                  />
+                </TouchableOpacity>
               )}
 
               {mode !== ModeEnum.basic && (
