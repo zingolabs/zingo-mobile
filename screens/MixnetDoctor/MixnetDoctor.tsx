@@ -44,6 +44,10 @@ type MixnetDoctorProps = NativeStackScreenProps<
 
 const SKELETON_WIDTHS = ['70%', '90%', '55%', '80%'] as const;
 const REPORT_MIN_HEIGHT = 120;
+// How often the report re-probes while the transport is still settling. Fast
+// enough that the bootstrap narration moves, slow enough that the two probes
+// never overlap.
+const LIVE_REFRESH_MS = 2000;
 
 // One iOS-style row: muted label on the left, value right-aligned.
 const DoctorRow = ({
@@ -163,33 +167,61 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
 
   // Both probes reach the mixnet surface from the real IP. Each is timed, so
   // the report carries a latency the user can compare across runs.
-  const runDoctor = useCallback(async () => {
-    setRunning(true);
-    setRun(null);
-    const statusStart = Date.now();
-    const status = await getMixnetStatus();
-    const statusMillis = Date.now() - statusStart;
-    const detailStart = Date.now();
-    const detail = await getMixnetBootstrapDetail();
-    const detailMillis = Date.now() - detailStart;
-    setRun({
-      serverUri: server.uri,
-      chainName: server.chainName,
-      status,
-      statusMillis,
-      detail,
-      detailMillis,
-    });
-    setRunning(false);
-  }, [server.chainName, server.uri]);
+  //
+  // A silent run replaces the report in place, without the skeleton: it is the
+  // screen following a transport that is still settling, not a run the user
+  // asked for.
+  const runDoctor = useCallback(
+    async (silent: boolean = false) => {
+      if (!silent) {
+        setRunning(true);
+        setRun(null);
+      }
+      const statusStart = Date.now();
+      const status = await getMixnetStatus();
+      const statusMillis = Date.now() - statusStart;
+      const detailStart = Date.now();
+      const detail = await getMixnetBootstrapDetail();
+      const detailMillis = Date.now() - detailStart;
+      setRun({
+        serverUri: server.uri,
+        chainName: server.chainName,
+        status,
+        statusMillis,
+        detail,
+        detailMillis,
+      });
+      setRunning(false);
+    },
+    [server.chainName, server.uri],
+  );
 
   // The screen is opened because something looks wrong, so it answers without
-  // being asked twice: the first run starts on entry, and the button below
-  // stays for the re-runs the user compares against it.
+  // being asked twice: the first run starts on entry.
   useEffect(() => {
     runDoctor();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // While the transport is still settling the report follows it, so a mixnet
+  // that comes up cannot leave a dead verdict on screen. Once it settles the
+  // polling stops and the last run stays put: from then on the values only
+  // change because the user ran the diagnostics again or restarted the
+  // transport.
+  useEffect(() => {
+    if (!attachInFlight) {
+      return;
+    }
+    const tick = setInterval(() => runDoctor(true), LIVE_REFRESH_MS);
+    return () => clearInterval(tick);
+  }, [attachInFlight, runDoctor]);
+
+  // The settling itself is worth a run: the moment the transport lands, or
+  // gives up, the report says so rather than showing the state before it.
+  useEffect(() => {
+    runDoctor(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase]);
 
   // Restart the transport and diagnose again, so the screen that reported the
   // trouble also shows whether the remedy worked.
@@ -285,20 +317,24 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
             </Animated.View>
           )}
 
-          <Animated.View layout={boxMorph()}>
-            <Button
-              testID="mixnetdoctor.run"
-              type={ButtonTypeEnum.Primary}
-              title={
-                running
-                  ? (translate('mixnetdoctor.running') as string)
-                  : (translate('mixnetdoctor.run') as string)
-              }
-              disabled={running}
-              style={{ alignSelf: 'center' }}
-              onPress={runDoctor}
-            />
-          </Animated.View>
+          {/* No run to ask for while the screen is already following the
+              transport; the button returns once the report is frozen. */}
+          {!attachInFlight && (
+            <Animated.View layout={boxMorph()}>
+              <Button
+                testID="mixnetdoctor.run"
+                type={ButtonTypeEnum.Primary}
+                title={
+                  running
+                    ? (translate('mixnetdoctor.running') as string)
+                    : (translate('mixnetdoctor.run') as string)
+                }
+                disabled={running}
+                style={{ alignSelf: 'center' }}
+                onPress={() => runDoctor()}
+              />
+            </Animated.View>
+          )}
 
           {!running && run !== null && runIsTerminal(run, attachInFlight) && (
             <Animated.View

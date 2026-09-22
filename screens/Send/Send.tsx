@@ -166,7 +166,6 @@ const Send: React.FunctionComponent<SendProps> = ({
     zingolibVersion,
     setPrivacyOption,
     mixnetView,
-    reenableMixnet,
   } = context;
   const { colors } = useTheme();
   // USD entry derives the ZEC actually sent from the price, so that
@@ -2067,23 +2066,6 @@ const Send: React.FunctionComponent<SendProps> = ({
                     </RegText>
                   </View>
                 )}
-                {mixnetView !== null &&
-                  mixnetView.sendBlocked &&
-                  mixnetView.recovery === 'reenable' && (
-                    <View
-                      style={{
-                        alignItems: 'center',
-                        marginBottom: 10,
-                      }}
-                      testID="send.mixnet-reenable"
-                    >
-                      <TouchableOpacity onPress={() => reenableMixnet()}>
-                        <RegText color={colors.fgAccent}>
-                          {translate('mixnet.reenable') as string}
-                        </RegText>
-                      </TouchableOpacity>
-                    </View>
-                  )}
                 <View
                   style={{
                     flexGrow: 1,
