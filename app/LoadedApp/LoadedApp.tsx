@@ -483,11 +483,12 @@ export default function LoadedApp(props: LoadedAppProps) {
       let sort: boolean = false;
       let ab = await AddressBookFileImpl.readAddressBook();
 
-      // older versions added the `Zenny Tips` contact to every address book.
-      // Donations are gone, so it is removed wherever it is still stored.
+      // older versions added the `Zenny Tips` contact to every address book,
+      // with a label the user could not edit. Donations are gone, so it is
+      // removed wherever it is still stored — every translation of that label
+      // carries the word `Zenny`.
       const zennyTips: AddressBookFileClass[] = ab.filter(
-        (a: AddressBookFileClass) =>
-          a.address === GlobalConst.obsoleteZenniesDonationAddress,
+        (a: AddressBookFileClass) => a.label.toLowerCase().includes('zenny'),
       );
       for (const a of zennyTips) {
         ab = await AddressBookFileImpl.removeAddressBookItem(
