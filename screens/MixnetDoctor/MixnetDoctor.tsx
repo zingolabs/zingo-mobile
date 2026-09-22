@@ -28,6 +28,7 @@ import {
   getMixnetBootstrapDetail,
   getMixnetStatus,
 } from '@app/walletBackend/utils/mixnetUtils';
+import { RPCMixnetIndicatorEnum } from '@app/walletBackend/enums/RPCMixnetIndicatorEnum';
 import {
   MixnetDoctorRow,
   MixnetDoctorRun,
@@ -116,11 +117,19 @@ const ReportSkeleton = ({ color }: { color: string }) => {
   );
 };
 
+// A run the user can act on: the transport is down for good, so restarting it
+// is the remedy rather than waiting. A bootstrap is not one of these — it
+// arrives on its own — and neither is a reachable mixnet.
+const runIsTerminal = (finished: MixnetDoctorRun): boolean =>
+  finished.status.kind === 'failure' ||
+  finished.status.indicator === RPCMixnetIndicatorEnum.died ||
+  finished.status.indicator === RPCMixnetIndicatorEnum.off;
+
 const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
   navigation,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, server, addLastSnackbar } = context;
+  const { translate, server, addLastSnackbar, reenableMixnet } = context;
   const { colors } = useTheme();
 
   const [run, setRun] = useState<MixnetDoctorRun | null>(null);
@@ -161,6 +170,15 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
     runDoctor();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Restart the transport and diagnose again, so the screen that reported the
+  // trouble also shows whether the remedy worked.
+  const restartMixnet = useCallback(async () => {
+    setRunning(true);
+    setRun(null);
+    await reenableMixnet();
+    await runDoctor();
+  }, [reenableMixnet, runDoctor]);
 
   const copyReport = useCallback(
     (finished: MixnetDoctorRun) => {
@@ -250,6 +268,22 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
               onPress={runDoctor}
             />
           </Animated.View>
+
+          {!running && run !== null && runIsTerminal(run) && (
+            <Animated.View
+              layout={boxMorph()}
+              entering={contentEnter()}
+              exiting={contentExit()}
+            >
+              <Button
+                testID="mixnetdoctor.reenable"
+                type={ButtonTypeEnum.Secondary}
+                title={translate('mixnet.reenable') as string}
+                style={{ alignSelf: 'center' }}
+                onPress={restartMixnet}
+              />
+            </Animated.View>
+          )}
 
           {!running && run !== null && (
             <Animated.View
