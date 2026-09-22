@@ -567,7 +567,7 @@
     "nym-processing-title": "NYM üzerinden işleniyor",
     "nym-enhanced": "NYM Gelişmiş",
     "nym-warning": "Bu işlem, gelişmiş gizlilik için NYM mixnet'i üzerinden yönlendirilecektir. Standart işlemlerden biraz daha uzun sürebilir.",
-    "nym-blocked": "Her gönderim NYM mixnet üzerinden gider, bu yüzden ağ hazır olana kadar bekler."
+    "nym-blocked": "Gönderimler NYM'den gider. Ağ bekleniyor."
   },
   "receive": {
     "u-title": "Korumalı",

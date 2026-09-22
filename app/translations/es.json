@@ -567,7 +567,7 @@
     "nym-processing-title": "Procesando vía NYM",
     "nym-enhanced": "NYM Mejorado",
     "nym-warning": "Esta transacción será enrutada a través del mixnet de NYM para mayor privacidad. Puede tardar un poco más que las transacciones estándar.",
-    "nym-blocked": "Todo envío viaja por el mixnet de NYM, así que espera a que la red esté lista."
+    "nym-blocked": "Los envíos van por NYM. Esperando la red."
   },
   "receive": {
     "u-title": "Blindadas",

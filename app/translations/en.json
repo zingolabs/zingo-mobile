@@ -567,7 +567,7 @@
     "nym-processing-title": "Processing via NYM",
     "nym-enhanced": "NYM Enhanced",
     "nym-warning": "This transaction will be routed through the NYM mixnet for enhanced privacy. This may take slightly longer than standard transactions.",
-    "nym-blocked": "Every send travels the NYM mixnet, so it waits until the network is ready."
+    "nym-blocked": "Sends travel the NYM mixnet. Waiting for it."
   },
   "receive": {
     "u-title": "Shielded",
