@@ -436,6 +436,7 @@
     "intro": "Tests whether the mixnet is reachable from your device using your real IP address.",
     "run": "Run diagnostics",
     "running": "Running…",
+    "attaching": "The app is still connecting to the mixnet. Until the transport attaches it reports as lost, so this run is not a verdict yet.",
     "copy-report": "Copy report",
     "report-copied": "Report copied to clipboard"
   },

@@ -436,6 +436,7 @@
     "intro": "Comprueba si el mixnet es accesible desde tu dispositivo usando tu dirección IP real.",
     "run": "Ejecutar diagnóstico",
     "running": "Ejecutando…",
+    "attaching": "La app todavía se está conectando a la mixnet. Hasta que el transporte se enganche se informa como perdido, así que esta pasada aún no es un veredicto.",
     "copy-report": "Copiar informe",
     "report-copied": "Informe copiado al portapapeles"
   },

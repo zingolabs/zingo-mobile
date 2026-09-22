@@ -29,6 +29,7 @@ import {
   getMixnetStatus,
 } from '@app/walletBackend/utils/mixnetUtils';
 import { RPCMixnetIndicatorEnum } from '@app/walletBackend/enums/RPCMixnetIndicatorEnum';
+import { mixnetPhase } from '@app/walletBackend/transforms/mixnetView';
 import {
   MixnetDoctorRow,
   MixnetDoctorRun,
@@ -120,17 +121,36 @@ const ReportSkeleton = ({ color }: { color: string }) => {
 // A run the user can act on: the transport is down for good, so restarting it
 // is the remedy rather than waiting. A bootstrap is not one of these — it
 // arrives on its own — and neither is a reachable mixnet.
-const runIsTerminal = (finished: MixnetDoctorRun): boolean =>
-  finished.status.kind === 'failure' ||
-  finished.status.indicator === RPCMixnetIndicatorEnum.died ||
-  finished.status.indicator === RPCMixnetIndicatorEnum.off;
+//
+// `attachInFlight` is what the probe alone cannot see. The library reports a
+// transport that has not attached yet as `died` (Unattached fails closed, so
+// the mixnet-only surfaces stay shut), which during a connect in progress is
+// a state the app is already leaving. Restarting it there would cancel the
+// attach and start the same wait again.
+const runIsTerminal = (
+  finished: MixnetDoctorRun,
+  attachInFlight: boolean,
+): boolean =>
+  !attachInFlight &&
+  (finished.status.kind === 'failure' ||
+    finished.status.indicator === RPCMixnetIndicatorEnum.died ||
+    finished.status.indicator === RPCMixnetIndicatorEnum.off);
 
 const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
   navigation,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, server, addLastSnackbar, reenableMixnet } = context;
+  const { translate, server, addLastSnackbar, reenableMixnet, mixnetView } =
+    context;
   const { colors } = useTheme();
+
+  // The coordinator's own view of the session, which the probes cannot see:
+  // it knows an attach is under way while the library still answers `died`.
+  const phase =
+    mixnetView !== null
+      ? mixnetPhase(mixnetView.statusKey, mixnetView.reconnecting)
+      : null;
+  const attachInFlight = phase === 'connecting' || phase === 'reconnecting';
 
   const [run, setRun] = useState<MixnetDoctorRun | null>(null);
   const [running, setRunning] = useState<boolean>(false);
@@ -254,6 +274,17 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
             </Animated.View>
           )}
 
+          {/* A connect in progress reads as lost in the report above, because
+              a transport that has not attached fails closed. Say so, rather
+              than leave the user with a verdict the app is already undoing. */}
+          {attachInFlight && !running && (
+            <Animated.View entering={contentEnter()} layout={boxMorph()}>
+              <FadeText style={{ textAlign: 'center' }}>
+                {translate('mixnetdoctor.attaching') as string}
+              </FadeText>
+            </Animated.View>
+          )}
+
           <Animated.View layout={boxMorph()}>
             <Button
               testID="mixnetdoctor.run"
@@ -269,7 +300,7 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
             />
           </Animated.View>
 
-          {!running && run !== null && runIsTerminal(run) && (
+          {!running && run !== null && runIsTerminal(run, attachInFlight) && (
             <Animated.View
               layout={boxMorph()}
               entering={contentEnter()}

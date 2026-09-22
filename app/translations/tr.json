@@ -436,6 +436,7 @@
     "intro": "Mixnet’in cihazınızdan erişilebilir olup olmadığını gerçek IP adresinizi kullanarak test eder.",
     "run": "Tanılamayı çalıştır",
     "running": "Çalışıyor…",
+    "attaching": "Uygulama hâlâ mixnet'e bağlanıyor. Taşıma bağlanana kadar kayıp olarak bildirilir, bu yüzden bu çalışma henüz bir hüküm değildir.",
     "copy-report": "Raporu kopyala",
     "report-copied": "Rapor panoya kopyalandı"
   },
