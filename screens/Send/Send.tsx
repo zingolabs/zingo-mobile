@@ -2040,6 +2040,33 @@ const Send: React.FunctionComponent<SendProps> = ({
                   marginVertical: 0,
                 }}
               >
+                {/* The send button goes grey while the mixnet cannot carry a
+                    transaction, and with no switch left to flip the user is
+                    owed the reason: why the wait exists, and what the
+                    transport is doing right now. */}
+                {mixnetView !== null && mixnetView.sendBlocked && (
+                  <View
+                    style={{
+                      alignItems: 'center',
+                      marginBottom: 10,
+                      marginHorizontal: 25,
+                    }}
+                    testID="send.mixnet-blocked"
+                  >
+                    <FadeText style={{ textAlign: 'center', fontSize: 12 }}>
+                      {translate('send.nym-blocked') as string}
+                    </FadeText>
+                    <RegText color={colors.fgDefault} style={{ fontSize: 13 }}>
+                      {
+                        translate(
+                          mixnetView.reconnecting
+                            ? 'mixnet.reconnecting'
+                            : mixnetView.statusKey,
+                        ) as string
+                      }
+                    </RegText>
+                  </View>
+                )}
                 {mixnetView !== null &&
                   mixnetView.sendBlocked &&
                   mixnetView.recovery === 'reenable' && (

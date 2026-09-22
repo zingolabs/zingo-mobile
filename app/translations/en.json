@@ -427,7 +427,8 @@
       "died": "Mixnet connection lost",
       "unknown": "Mixnet unavailable"
     },
-    "reenable": "Re-enable mixnet"
+    "reenable": "Re-enable mixnet",
+    "reconnecting": "Reconnecting to mixnet…"
   },
   "mixnetdoctor": {
     "title": "Mixnet Doctor",
@@ -564,7 +565,8 @@
     "lose-address-alert": "You already have a valid address in the address field. Do you want to replace it?",
     "nym-processing-title": "Processing via NYM",
     "nym-enhanced": "NYM Enhanced",
-    "nym-warning": "This transaction will be routed through the NYM mixnet for enhanced privacy. This may take slightly longer than standard transactions."
+    "nym-warning": "This transaction will be routed through the NYM mixnet for enhanced privacy. This may take slightly longer than standard transactions.",
+    "nym-blocked": "Every send travels the NYM mixnet, so it waits until the network is ready."
   },
   "receive": {
     "u-title": "Shielded",

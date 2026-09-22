@@ -132,9 +132,8 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
     }
   }, [navigation]);
 
-  // A user-invoked diagnostic: both probes reach the mixnet surface from the
-  // real IP, which is why nothing runs until the button is pressed. Each is
-  // timed so the report carries a latency the user can compare across runs.
+  // Both probes reach the mixnet surface from the real IP. Each is timed, so
+  // the report carries a latency the user can compare across runs.
   const runDoctor = useCallback(async () => {
     setRunning(true);
     setRun(null);
@@ -154,6 +153,14 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
     });
     setRunning(false);
   }, [server.chainName, server.uri]);
+
+  // The screen is opened because something looks wrong, so it answers without
+  // being asked twice: the first run starts on entry, and the button below
+  // stays for the re-runs the user compares against it.
+  useEffect(() => {
+    runDoctor();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const copyReport = useCallback(
     (finished: MixnetDoctorRun) => {

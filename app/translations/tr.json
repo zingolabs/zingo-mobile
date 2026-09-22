@@ -427,7 +427,8 @@
       "died": "Mixnet bağlantısı koptu",
       "unknown": "Mixnet kullanılamıyor"
     },
-    "reenable": "Mixnet'i yeniden etkinleştir"
+    "reenable": "Mixnet'i yeniden etkinleştir",
+    "reconnecting": "Mixnet'e yeniden bağlanılıyor…"
   },
   "mixnetdoctor": {
     "title": "Mixnet Doktoru",
@@ -564,7 +565,8 @@
     "lose-address-alert": "Adres alanında zaten geçerli bir adresiniz var. Onu değiştirmek istiyor musunuz?",
     "nym-processing-title": "NYM üzerinden işleniyor",
     "nym-enhanced": "NYM Gelişmiş",
-    "nym-warning": "Bu işlem, gelişmiş gizlilik için NYM mixnet'i üzerinden yönlendirilecektir. Standart işlemlerden biraz daha uzun sürebilir."
+    "nym-warning": "Bu işlem, gelişmiş gizlilik için NYM mixnet'i üzerinden yönlendirilecektir. Standart işlemlerden biraz daha uzun sürebilir.",
+    "nym-blocked": "Her gönderim NYM mixnet üzerinden gider, bu yüzden ağ hazır olana kadar bekler."
   },
   "receive": {
     "u-title": "Korumalı",

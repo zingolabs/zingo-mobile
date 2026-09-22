@@ -427,7 +427,8 @@
       "died": "Conexão mixnet perdida",
       "unknown": "Mixnet indisponível"
     },
-    "reenable": "Reativar mixnet"
+    "reenable": "Reativar mixnet",
+    "reconnecting": "Reconectando à mixnet…"
   },
   "mixnetdoctor": {
     "title": "Doutor do Mixnet",
@@ -564,7 +565,8 @@
     "lose-address-alert": "Você já possui um endereço válido no campo de endereço. Deseja substituí-lo?",
     "nym-processing-title": "Processando via NYM",
     "nym-enhanced": "NYM Aprimorado",
-    "nym-warning": "Esta transação será roteada através do mixnet NYM para maior privacidade. Pode levar um pouco mais de tempo do que as transações padrão."
+    "nym-warning": "Esta transação será roteada através do mixnet NYM para maior privacidade. Pode levar um pouco mais de tempo do que as transações padrão.",
+    "nym-blocked": "Todo envio viaja pelo mixnet NYM, portanto aguarda até a rede estar pronta."
   },
   "receive": {
     "u-title": "Blindadas",
