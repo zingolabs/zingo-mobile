@@ -104,10 +104,6 @@ RCT_EXTERN_METHOD(mixnetIndicatorInfo:
 RCT_EXTERN_METHOD(mixnetBootstrapDetailInfo:
     (RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(setTransmitPolicy:
-    (NSString)policy
-                  resolve:(RCTPromiseResolveBlock)resolve
-                  reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(pollSyncInfo:
     (RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
