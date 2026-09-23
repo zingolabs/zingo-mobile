@@ -990,11 +990,6 @@ export class LoadingAppClass extends Component<
             orchardPool = walletKindJSON.orchard;
             saplingPool = walletKindJSON.sapling;
             transparentPool = walletKindJSON.transparent;
-            // if the seed & birthday are not stored in Keychain/Keystore, do it now.
-            const walletToStore = await fetchWallet(readOnly);
-            if (walletToStore) {
-              await createUpdateRecoveryWalletInfo(walletToStore);
-            }
             this.setState({
               readOnly,
               orchardPool,
@@ -1011,6 +1006,18 @@ export class LoadingAppClass extends Component<
               actionButtonsDisabled: false,
             });
             this.addLastSnackbar(walletKindStr);
+          }
+          // Outside the wallet-kind parse on purpose: a wallet that opens
+          // without its seed/UFVK reaching the keychain breaks the invariant
+          // the whole recovery flow stands on, and a kind JSON the App could
+          // not parse is no reason to skip the write.
+          try {
+            const walletToStore = await fetchWallet(readOnly);
+            if (walletToStore) {
+              await createUpdateRecoveryWalletInfo(walletToStore);
+            }
+          } catch (storeError) {
+            console.log('Error storing the recovery wallet info', storeError);
           }
           // if the App is restoring another wallet backup...
           // needs to recalculate the Address Book.
@@ -1836,11 +1843,6 @@ export class LoadingAppClass extends Component<
             orchardPool = walletKindJSON.orchard;
             saplingPool = walletKindJSON.sapling;
             transparentPool = walletKindJSON.transparent;
-            // if the seed & birthday are not stored in Keychain/Keystore, do it now.
-            const walletToStore = await fetchWallet(readOnly);
-            if (walletToStore) {
-              await createUpdateRecoveryWalletInfo(walletToStore);
-            }
             this.setState({
               readOnly,
               orchardPool,
@@ -1857,6 +1859,18 @@ export class LoadingAppClass extends Component<
               actionButtonsDisabled: false,
             });
             this.addLastSnackbar(walletKindStr);
+          }
+          // Outside the wallet-kind parse on purpose: a wallet that opens
+          // without its seed/UFVK reaching the keychain breaks the invariant
+          // the whole recovery flow stands on, and a kind JSON the App could
+          // not parse is no reason to skip the write.
+          try {
+            const walletToStore = await fetchWallet(readOnly);
+            if (walletToStore) {
+              await createUpdateRecoveryWalletInfo(walletToStore);
+            }
+          } catch (storeError) {
+            console.log('Error storing the recovery wallet info', storeError);
           }
           this.navigateToLoadedApp(
             readOnly,

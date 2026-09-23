@@ -101,7 +101,6 @@ import {
   resolveTriggerGate,
 } from '@app/services/gateController';
 import ShowAddressAlertAsync from '@app/services/showAddressAlertAsync';
-import {} from '@app/services/recoveryWalletInfo';
 
 import History from '@screens/History';
 import Send from '@screens/Send';

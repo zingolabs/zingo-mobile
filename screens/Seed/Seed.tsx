@@ -196,9 +196,15 @@ const Seed: React.FunctionComponent<SeedProps> = ({
             // while the gate's recent bio auth window is still warm so
             // subsequent visits read from the keychain. Fire-and-forget so a
             // save failure doesn't block the render.
-            saveRecoveryWalletInfo(walletInfo).catch(e =>
-              console.log('Self-heal save failed', e),
-            );
+            //
+            // Only when the wallet actually handed us something: an empty
+            // answer here means the fetch failed, and saving it would drop
+            // the entry this wallet's UFVK may still be stored in.
+            if (walletInfo.seed || walletInfo.ufvk) {
+              saveRecoveryWalletInfo(walletInfo).catch(e =>
+                console.log('Self-heal save failed', e),
+              );
+            }
           }
         }
         const ufvkInfo = await fetchWallet(true);

@@ -169,9 +169,15 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
           // Self-heal: the keychain entry is missing although the App always
           // keeps one. Write it now while the gate's recent bio auth window is
           // still warm so subsequent visits hit the keychain. Fire-and-forget.
-          saveRecoveryWalletInfo(walletInfo).catch(e =>
-            console.log('Self-heal save failed', e),
-          );
+          //
+          // Only when the wallet actually handed us something: an empty answer
+          // here means the fetch failed, and saving it would drop the entry
+          // this wallet's seed may still be stored in.
+          if (walletInfo.seed || walletInfo.ufvk) {
+            saveRecoveryWalletInfo(walletInfo).catch(e =>
+              console.log('Self-heal save failed', e),
+            );
+          }
         }
       }
       setFetchedWallet(info);

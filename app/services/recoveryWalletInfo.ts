@@ -44,25 +44,50 @@ const getOptions: Keychain.GetOptions = buildGetOptions(
 
 // The recovery info is no longer optional, so a device that refuses to store
 // or return it is a failure the user has to be told about instead of a line in
-// the log. The last outcome is remembered here and Settings reads it through
-// `recoveryWalletInfoIsFailing`; any later success clears it.
-let lastOperationFailed: boolean = false;
+// the log. Settings reads the outcome through `recoveryWalletInfoIsFailing`.
+//
+// Saves and reads are remembered apart because they clear differently:
+//   - a failed save stays flagged until a later save succeeds. The device
+//     answering `hasGenericPassword` proves nothing about it, since the entry
+//     being reported may well be the one an older wallet left behind.
+//   - a failed read is cleared by the next keychain call that answers, so a
+//     transient error does not pin the warning until the App restarts.
+let lastSaveFailed: boolean = false;
+let lastReadFailed: boolean = false;
+
+// `setGenericPassword` reports a refusal by resolving falsy, it does not
+// always throw. Both are the same failure here, so the falsy result is turned
+// into the throw the caller's reset+retry is written around.
+const setOrThrow = async (
+  password: string,
+  options: Keychain.SetOptions | Keychain.BaseOptions,
+): Promise<void> => {
+  const stored = await Keychain.setGenericPassword(
+    GlobalConst.keyKeyChain,
+    password,
+    options as Keychain.SetOptions,
+  );
+  if (!stored) {
+    throw new Error('the device refused to store the recovery info');
+  }
+};
 
 export const saveRecoveryWalletInfo = async (
   keys: WalletType,
 ): Promise<void> => {
   if (!keys.seed && !keys.ufvk) {
-    console.log('no seed or ufvk to store');
+    // A wallet with no keys to store is not a no-op: whatever is in the
+    // keychain belongs to a previous wallet, and leaving it there makes the
+    // recovery screens show the old wallet's seed/UFVK next to the current
+    // wallet's data.
+    console.log('no seed or ufvk to store, dropping any previous entry');
+    await removeRecoveryWalletInfo();
     return;
   }
   const password = JSON.stringify(keys);
   try {
-    await Keychain.setGenericPassword(
-      GlobalConst.keyKeyChain,
-      password,
-      setOptions,
-    );
-    lastOperationFailed = false;
+    await setOrThrow(password, setOptions);
+    lastSaveFailed = false;
   } catch (error) {
     // An existing entry from a previous app version may use an
     // incompatible cipher (e.g. the old auth-required AES_GCM or RSA).
@@ -71,15 +96,11 @@ export const saveRecoveryWalletInfo = async (
     console.log('Error saving keys, resetting and retrying:', error);
     try {
       await Keychain.resetGenericPassword({ service });
-      await Keychain.setGenericPassword(
-        GlobalConst.keyKeyChain,
-        password,
-        baseOptions,
-      );
-      lastOperationFailed = false;
+      await setOrThrow(password, baseOptions);
+      lastSaveFailed = false;
     } catch (retryError) {
       console.log('Error saving keys after reset:', retryError);
-      lastOperationFailed = true;
+      lastSaveFailed = true;
     }
   }
 };
@@ -87,12 +108,13 @@ export const saveRecoveryWalletInfo = async (
 export const getRecoveryWalletInfo = async (): Promise<WalletType> => {
   try {
     const credentials = await Keychain.getGenericPassword(getOptions);
+    // The device answered, whatever it answered.
+    lastReadFailed = false;
     if (credentials) {
       if (
         credentials.username === GlobalConst.keyKeyChain &&
         credentials.service === service
       ) {
-        lastOperationFailed = false;
         return JSON.parse(credentials.password) as WalletType;
       } else {
         console.log('no match the key');
@@ -105,31 +127,30 @@ export const getRecoveryWalletInfo = async (): Promise<WalletType> => {
     // its own reset+retry for genuine cipher incompatibilities, and a
     // wipe-on-read makes the seed unrecoverable until the next save.
     console.log('Error getting recovery keys (entry left intact):', error);
-    lastOperationFailed = true;
+    lastReadFailed = true;
   }
   return {} as WalletType;
 };
 
 export const hasRecoveryWalletInfo = async (): Promise<boolean> => {
   try {
-    // A device that answers does not clear a failed save: the entry it is
-    // reporting may well be the one an older wallet left behind.
-    return await Keychain.hasGenericPassword(baseOptions);
+    const has = await Keychain.hasGenericPassword(baseOptions);
+    lastReadFailed = false;
+    return has;
   } catch (error) {
     console.log('Error asking the device for the recovery keys:', error);
-    lastOperationFailed = true;
+    lastReadFailed = true;
     return false;
   }
 };
 
 // Whether the device is currently failing to keep the recovery info: the last
-// call to the keychain errored, or the entry is missing although every wallet
-// the App opens, creates or restores writes it. Probing also refreshes the
-// answer, so the warning it feeds goes away on its own once the device
-// behaves again.
+// save errored, the last read errored, or the entry is missing although every
+// wallet the App opens, creates or restores writes it. Probing also refreshes
+// the read half, so a transient read error stops answering true on its own.
 export const recoveryWalletInfoIsFailing = async (): Promise<boolean> => {
   const stored = await hasRecoveryWalletInfo();
-  return lastOperationFailed || !stored;
+  return lastSaveFailed || lastReadFailed || !stored;
 };
 
 export const createUpdateRecoveryWalletInfo = async (
