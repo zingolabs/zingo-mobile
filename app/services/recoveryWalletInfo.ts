@@ -120,22 +120,40 @@ export const saveRecoveryWalletInfo = async (
   }
 };
 
-export const getRecoveryWalletInfo = async (): Promise<WalletType> => {
+// A read that also says whether the device answered. Callers deciding whether
+// a write may delete what is stored need the two apart: an empty answer is
+// evidence that there is nothing worth keeping, while no answer at all is no
+// evidence, and only the first one makes a reset safe.
+export const readRecoveryWalletInfo = async (): Promise<{
+  answered: boolean;
+  keys: WalletType;
+}> => {
+  const nothing = { answered: true, keys: {} as WalletType };
   try {
     const credentials = await Keychain.getGenericPassword(getOptions);
     // The device answered, whatever it answered.
     lastReadFailed = false;
-    if (credentials) {
-      if (
-        credentials.username === GlobalConst.keyKeyChain &&
-        credentials.service === service
-      ) {
-        return JSON.parse(credentials.password) as WalletType;
-      } else {
-        console.log('no match the key');
-      }
-    } else {
+    if (!credentials) {
       console.log('no recovery keys stored');
+      return nothing;
+    }
+    if (
+      credentials.username !== GlobalConst.keyKeyChain ||
+      credentials.service !== service
+    ) {
+      console.log('no match the key');
+      return nothing;
+    }
+    try {
+      return {
+        answered: true,
+        keys: JSON.parse(credentials.password) as WalletType,
+      };
+    } catch (parseError) {
+      // The device is fine, its payload is not: an entry nothing can read is
+      // an entry there is no reason to protect.
+      console.log('Stored recovery keys could not be parsed:', parseError);
+      return nothing;
     }
   } catch (error) {
     // Leave the entry intact on any error — saveRecoveryWalletInfo has
@@ -143,8 +161,12 @@ export const getRecoveryWalletInfo = async (): Promise<WalletType> => {
     // wipe-on-read makes the seed unrecoverable until the next save.
     console.log('Error getting recovery keys (entry left intact):', error);
     lastReadFailed = true;
+    return { answered: false, keys: {} as WalletType };
   }
-  return {} as WalletType;
+};
+
+export const getRecoveryWalletInfo = async (): Promise<WalletType> => {
+  return (await readRecoveryWalletInfo()).keys;
 };
 
 export const hasRecoveryWalletInfo = async (): Promise<boolean> => {
@@ -180,14 +202,26 @@ export const createUpdateRecoveryWalletInfo = async (
 };
 
 export const removeRecoveryWalletInfo = async (): Promise<void> => {
-  if (await hasRecoveryWalletInfo()) {
-    const removed = await Keychain.resetGenericPassword(baseOptions);
-    if (!removed) {
-      console.log('error removing keys');
-    } else {
-      console.log('keys removed');
-    }
-  } else {
+  if (!(await hasRecoveryWalletInfo())) {
     console.log('no keys to remove');
+    return;
+  }
+  // A removal that does not go through leaves another wallet's keys on the
+  // device, so it is retried once with the bare options, the same shape the
+  // save path resets with. It never throws at the caller: the next boot of
+  // this wallet asks for the removal again.
+  try {
+    if (await Keychain.resetGenericPassword(baseOptions)) {
+      console.log('keys removed');
+      return;
+    }
+    console.log('the device refused to remove the keys, retrying');
+    if (await Keychain.resetGenericPassword({ service })) {
+      console.log('keys removed on retry');
+      return;
+    }
+    console.log('error removing keys');
+  } catch (error) {
+    console.log('Error removing keys:', error);
   }
 };

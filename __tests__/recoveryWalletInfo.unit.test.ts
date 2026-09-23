@@ -158,3 +158,99 @@ describe('recoveryWalletInfo - the device is failing or it is not', () => {
     await expect(service.recoveryWalletInfoIsFailing()).resolves.toBe(true);
   });
 });
+
+describe('recoveryWalletInfo - reading, and what a silent device means', () => {
+  beforeEach(() => {
+    jest.resetModules();
+    jest.clearAllMocks();
+  });
+
+  const entry = (password: string) =>
+    ({
+      username: 'ZINGO_SEED_BIRTHDAY',
+      service: 'ZINGO',
+      password,
+      storage: 'AES_GCM_NO_AUTH',
+    }) as unknown as Awaited<ReturnType<typeof Keychain.getGenericPassword>>;
+
+  test('an entry the device hands over comes back parsed, and answered', async () => {
+    const { keychain, service } = load();
+    keychain.getGenericPassword.mockResolvedValue(
+      entry(JSON.stringify({ seed: 'twenty four words', birthday: 7 })),
+    );
+
+    await expect(service.readRecoveryWalletInfo()).resolves.toEqual({
+      answered: true,
+      keys: { seed: 'twenty four words', birthday: 7 },
+    });
+  });
+
+  test('an empty keychain is an answer: there is nothing worth keeping', async () => {
+    const { keychain, service } = load();
+    keychain.getGenericPassword.mockResolvedValue(false);
+
+    await expect(service.readRecoveryWalletInfo()).resolves.toEqual({
+      answered: true,
+      keys: {},
+    });
+  });
+
+  test('a payload nothing can parse is an answer too', async () => {
+    const { keychain, service } = load();
+    keychain.getGenericPassword.mockResolvedValue(entry('not json at all'));
+
+    await expect(service.readRecoveryWalletInfo()).resolves.toEqual({
+      answered: true,
+      keys: {},
+    });
+  });
+
+  test('a device that throws answers nothing, and the caller learns that', async () => {
+    const { keychain, service } = load();
+    keychain.getGenericPassword.mockRejectedValue(new Error('keystore busy'));
+
+    await expect(service.readRecoveryWalletInfo()).resolves.toEqual({
+      answered: false,
+      keys: {},
+    });
+    // and the next call that does answer forgives it: the read half of the
+    // warning is deliberately the forgiving one
+    keychain.hasGenericPassword.mockResolvedValue(true);
+    await expect(service.recoveryWalletInfoIsFailing()).resolves.toBe(false);
+  });
+});
+
+describe('recoveryWalletInfo - removing what belongs to another wallet', () => {
+  beforeEach(() => {
+    jest.resetModules();
+    jest.clearAllMocks();
+  });
+
+  test('a refused removal is retried once with the bare options', async () => {
+    const { keychain, service } = load();
+    keychain.hasGenericPassword.mockResolvedValue(true);
+    keychain.resetGenericPassword.mockResolvedValueOnce(false);
+    keychain.resetGenericPassword.mockResolvedValue(true);
+
+    await service.removeRecoveryWalletInfo();
+
+    expect(keychain.resetGenericPassword).toHaveBeenCalledTimes(2);
+  });
+
+  test('a device that throws on the removal does not throw at the caller', async () => {
+    const { keychain, service } = load();
+    keychain.hasGenericPassword.mockResolvedValue(true);
+    keychain.resetGenericPassword.mockRejectedValue(new Error('no reset'));
+
+    await expect(service.removeRecoveryWalletInfo()).resolves.toBeUndefined();
+  });
+
+  test('nothing stored, nothing to remove', async () => {
+    const { keychain, service } = load();
+    keychain.hasGenericPassword.mockResolvedValue(false);
+
+    await service.removeRecoveryWalletInfo();
+
+    expect(keychain.resetGenericPassword).not.toHaveBeenCalled();
+  });
+});

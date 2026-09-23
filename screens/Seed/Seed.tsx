@@ -56,6 +56,7 @@ import SettingsFileImpl from '@app/services/SettingsFileImpl';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import {
   getRecoveryWalletInfo,
+  readRecoveryWalletInfo,
   saveRecoveryWalletInfo,
 } from '@app/services/recoveryWalletInfo';
 import WalletType from '@app/AppState/types/WalletType';
@@ -189,18 +190,23 @@ const Seed: React.FunctionComponent<SeedProps> = ({
         setSeedSource('wallet');
         const walletInfo = await fetchWallet(false);
         if (walletInfo?.seed) {
-          // Refresh the entry with what the wallet just said. It costs one
-          // write on a screen the user rarely opens, and it leaves the device
-          // holding this wallet's seed even if every write before it failed.
-          // Fire-and-forget so a save failure doesn't block the render.
+          // Keep the device's copy in step with the wallet, but look before
+          // writing: most visits find an entry that already holds these very
+          // words, and then there is nothing to do. Writing is only worth its
+          // risk when what is stored is not this wallet's.
           //
-          // No reset on failure: this runs on every visit, and wiping the
-          // entry to retry would turn a transient refusal into the loss of a
-          // backup the App is not even replacing. The boot write is the one
-          // that may replace an entry it cannot overwrite.
-          saveRecoveryWalletInfo(walletInfo, { resetOnFailure: false }).catch(
-            e => console.log('Self-heal save failed', e),
-          );
+          // The reset before a retry is allowed only when the device answered
+          // the read: then whatever is in there is another wallet's, or
+          // something nothing can read, and replacing it loses nothing. When
+          // the device did not answer we know nothing about the entry, so it
+          // stands — a transient refusal must not cost a good backup.
+          // Fire-and-forget so a save failure doesn't block the render.
+          const stored = await readRecoveryWalletInfo();
+          if (stored.keys.seed !== walletInfo.seed) {
+            saveRecoveryWalletInfo(walletInfo, {
+              resetOnFailure: stored.answered,
+            }).catch(e => console.log('Self-heal save failed', e));
+          }
           // This wallet's UFVK belongs beside its own seed, and only there.
           // When the words come from the device's copy below, they may be the
           // ones saved for the wallet used before this one, and attaching the
