@@ -186,11 +186,9 @@ const Seed: React.FunctionComponent<SeedProps> = ({
         // a user-cancel of its own prompt): that is what the entry is for, and
         // the legend says where the words came from. seedSource is updated as
         // we go so the loading legend follows.
-        let seedInfo: WalletType = {} as WalletType;
         setSeedSource('wallet');
         const walletInfo = await fetchWallet(false);
         if (walletInfo?.seed) {
-          seedInfo = walletInfo;
           // Refresh the entry with what the wallet just said. It costs one
           // write on a screen the user rarely opens, and it leaves the device
           // holding this wallet's seed even if every write before it failed.
@@ -203,12 +201,18 @@ const Seed: React.FunctionComponent<SeedProps> = ({
           saveRecoveryWalletInfo(walletInfo, { resetOnFailure: false }).catch(
             e => console.log('Self-heal save failed', e),
           );
+          // This wallet's UFVK belongs beside its own seed, and only there.
+          // When the words come from the device's copy below, they may be the
+          // ones saved for the wallet used before this one, and attaching the
+          // current wallet's key to them would present two wallets as one.
+          const ufvkInfo = await fetchWallet(true);
+          setFetchedWallet({ ...walletInfo, ufvk: ufvkInfo?.ufvk });
         } else {
           setSeedSource('keychain');
-          seedInfo = await getRecoveryWalletInfo();
+          // Whatever the device saved, whole: its seed and the UFVK stored
+          // with it are the same wallet's.
+          setFetchedWallet(await getRecoveryWalletInfo());
         }
-        const ufvkInfo = await fetchWallet(true);
-        setFetchedWallet({ ...seedInfo, ufvk: ufvkInfo?.ufvk });
       } catch (e) {
         console.log('Error fetching wallet info for seed screen', e);
       } finally {
