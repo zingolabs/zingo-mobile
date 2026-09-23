@@ -6,7 +6,6 @@ export enum SettingsNameEnum {
   mode = 'mode',
   security = 'security',
   selectServer = 'selectServer',
-  recoveryWalletInfoOnDevice = 'recoveryWalletInfoOnDevice',
   performanceLevel = 'performanceLevel',
   blockExplorer = 'blockExplorer',
 

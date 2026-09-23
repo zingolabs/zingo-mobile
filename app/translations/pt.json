@@ -281,16 +281,6 @@
         "text": "Modo Avançado, para usuários mais avançados."
       }
     ],
-    "recoverywalletinfoondevices": [
-      {
-        "value": true,
-        "text": "Faça backup da carteira Seed Phrase no dispositivo."
-      },
-      {
-        "value": false,
-        "text": "Não salve nada relacionado à carteira no dispositivo."
-      }
-    ],
     "performancelevels": [
       {
         "value": "Maximum",
@@ -357,7 +347,6 @@
     "islanguage": "Você precisa escolher um idioma para salvar.",
     "privacy-title": "Ocultar valores sensíveis",
     "mode-title": "Alterar entre o modo Básico ou Avançado",
-    "recoverywalletinfoondevice-title": "Armazene informações de recuperação da carteira",
     "performancelevel-title": "Zingolib Performance Level",
     "blockexplorer-title": "Block Explorer",
     "value-language-en": "Inglês",
@@ -375,8 +364,6 @@
     "value-chainname-none": "Nenhuma",
     "server-chain-title": "Rede",
     "select-chain-placeholder": "Selecione uma Rede...",
-    "value-recoverywalletinfoondevice-true": "Habilitar",
-    "value-recoverywalletinfoondevice-false": "Desabilitar",
     "value-performancelevel-Maximum": "Maximum",
     "value-performancelevel-High": "High",
     "value-performancelevel-Medium": "Medium",
@@ -413,11 +400,10 @@
     "select-language-placeholder": "Selecione um Idioma...",
     "select-blockexplorer-placeholder": "Selecione um Block Explorer...",
     "value-language-ru": "Russo",
-    "walletkeyssaved": "As últimas informações de recuperação da carteira armazenadas com segurança no dispositivo.",
-    "walletkeyswarning": "Este é um recurso experimental que depende da segurança de código não auditado para armazenar sua frase-semente. Por favor, não o use com sementes que controlam fundos significativos!",
     "value-language-tr": "Turco",
     "nym-network": "NYM Mixnet",
-    "nym-diagnostics": "Executar diagnóstico do mixnet"
+    "nym-diagnostics": "Executar diagnóstico do mixnet",
+    "walletkeys-error": "O dispositivo não está guardando as informações de recuperação desta carteira. Abra a tela da seed e anote as palavras: são a única forma de voltar a entrar nesta carteira."
   },
   "mixnet": {
     "status": {

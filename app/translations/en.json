@@ -281,16 +281,6 @@
         "text": "Advanced Mode, for the advanced user."
       }
     ],
-    "recoverywalletinfoondevices": [
-      {
-        "value": true,
-        "text": "Backup wallet Seed Phrase to device."
-      },
-      {
-        "value": false,
-        "text": "Do not save anything related to the wallet on the device."
-      }
-    ],
     "performancelevels": [
       {
         "value": "Maximum",
@@ -357,7 +347,6 @@
     "islanguage": "You need to choose a language to save.",
     "privacy-title": "Hide Sensitive Values",
     "mode-title": "Switch between Basic or Advanced Mode",
-    "recoverywalletinfoondevice-title": "Store Wallet Recovery Info",
     "performancelevel-title": "Zingolib Performance Level",
     "blockexplorer-title": "Block Explorer",
     "value-language-en": "English",
@@ -375,8 +364,6 @@
     "value-chainname-none": "None",
     "server-chain-title": "Network",
     "select-chain-placeholder": "Select a Network...",
-    "value-recoverywalletinfoondevice-true": "Enable",
-    "value-recoverywalletinfoondevice-false": "Disable",
     "value-performancelevel-Maximum": "Maximum",
     "value-performancelevel-High": "High",
     "value-performancelevel-Medium": "Medium",
@@ -413,11 +400,10 @@
     "select-language-placeholder": "Select a Language...",
     "select-blockexplorer-placeholder": "Select a Block Explorer...",
     "value-language-ru": "Russian",
-    "walletkeyssaved": "The last Wallet Recovery Info stored safely in the device.",
-    "walletkeyswarning": "This is an experimental feature, that depends on the security of unaudited code to store your seed-phrase. Please do not use it with seeds that control significant funds!",
     "value-language-tr": "Turkish",
     "nym-network": "NYM Mixnet",
-    "nym-diagnostics": "Run mixnet diagnostics"
+    "nym-diagnostics": "Run mixnet diagnostics",
+    "walletkeys-error": "The device is not keeping this wallet's recovery info. Open the Seed screen and write the words down: they are the only way back into this wallet."
   },
   "mixnet": {
     "status": {

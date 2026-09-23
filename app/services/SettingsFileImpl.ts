@@ -197,7 +197,9 @@ export default class SettingsFileImpl {
       // old tip feature, the two switches that used to hide the MAX button
       // and the Rescan menu entry, both always there now, the currency
       // choice, now always USD, and the Nym switch: every transmission
-      // travels the mixnet, so there is nothing left to choose.
+      // travels the mixnet, so there is nothing left to choose, and the
+      // switch for keeping the wallet's recovery info on the device, now
+      // always kept.
       const obsolete = settings as unknown as Record<string, unknown>;
       delete obsolete.donation;
       delete obsolete.firstUpdateWithDonation;
@@ -205,6 +207,7 @@ export default class SettingsFileImpl {
       delete obsolete.rescanMenu;
       delete obsolete.currency;
       delete obsolete.nym;
+      delete obsolete.recoveryWalletInfoOnDevice;
       // old security options that have to be removed and to add the new one.
       if (settings.hasOwnProperty(SettingsNameEnum.security)) {
         const sec: SecurityType = settings.security;
@@ -230,12 +233,6 @@ export default class SettingsFileImpl {
           }
           settings.security = sec;
         }
-      }
-      if (
-        !settings.hasOwnProperty(SettingsNameEnum.recoveryWalletInfoOnDevice)
-      ) {
-        // doing backup of seed & birthday in the device -> false by default.
-        settings.recoveryWalletInfoOnDevice = false;
       }
       if (!settings.hasOwnProperty(SettingsNameEnum.performanceLevel)) {
         // by default medium

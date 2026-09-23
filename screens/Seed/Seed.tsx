@@ -94,7 +94,6 @@ const Seed: React.FunctionComponent<SeedProps> = ({
     mode,
     addLastSnackbar,
     setPrivacyOption,
-    recoveryWalletInfoOnDevice,
     security,
     foregroundEpoch,
   } = context;
@@ -185,26 +184,21 @@ const Seed: React.FunctionComponent<SeedProps> = ({
         // the loading legend reflects what's actually being read at
         // each moment (keychain → wallet on fallback).
         let seedInfo: WalletType = {} as WalletType;
-        if (recoveryWalletInfoOnDevice) {
-          setSeedSource('keychain');
-          seedInfo = await getRecoveryWalletInfo();
-        }
+        setSeedSource('keychain');
+        seedInfo = await getRecoveryWalletInfo();
         if (!seedInfo.seed) {
           setSeedSource('wallet');
           const walletInfo = await fetchWallet(false);
           if (walletInfo) {
             seedInfo = walletInfo;
-            // Self-heal: the user opted into the on-device cache but the
-            // keychain entry is missing (startup save likely failed or the
-            // toggle was flipped without auth). Write it now while the
-            // gate's recent bio auth window is still warm so subsequent
-            // visits read from the keychain. Fire-and-forget so a save
-            // failure doesn't block the render.
-            if (recoveryWalletInfoOnDevice) {
-              saveRecoveryWalletInfo(walletInfo).catch(e =>
-                console.log('Self-heal save failed', e),
-              );
-            }
+            // Self-heal: the keychain entry is missing although the App
+            // always keeps one (the startup save likely failed). Write it now
+            // while the gate's recent bio auth window is still warm so
+            // subsequent visits read from the keychain. Fire-and-forget so a
+            // save failure doesn't block the render.
+            saveRecoveryWalletInfo(walletInfo).catch(e =>
+              console.log('Self-heal save failed', e),
+            );
           }
         }
         const ufvkInfo = await fetchWallet(true);
@@ -215,7 +209,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
         setLoadingSeed(false);
       }
     })();
-  }, [recoveryWalletInfoOnDevice, authPassed]);
+  }, [authPassed]);
 
   const seedPhrase = fetchedWallet.seed || '';
   const ufvk = fetchedWallet.ufvk || '';

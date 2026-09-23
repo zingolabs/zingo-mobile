@@ -135,7 +135,6 @@ export default interface AppContextLoaded {
   // wallet / unknown. Used to decide, on a server change, whether to open the
   // wallet directly or launch a chain switch.
   walletChainName: ChainNameEnum;
-  recoveryWalletInfoOnDevice: boolean;
   performanceLevel: RPCPerformanceLevelEnum;
   blockExplorer: BlockExplorerEnum;
   // The persisted send-route preference; the transport runs either way.

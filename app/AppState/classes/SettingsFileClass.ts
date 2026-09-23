@@ -20,7 +20,6 @@ export default class SettingsFileClass {
   // - string: means it have a normal value
   security: SecurityType;
   selectServer: SelectServerEnum;
-  recoveryWalletInfoOnDevice: boolean;
   performanceLevel: RPCPerformanceLevelEnum;
   blockExplorer: BlockExplorerEnum;
   ironwoodOnboardSeen: boolean;
@@ -35,7 +34,6 @@ export default class SettingsFileClass {
     version: string,
     security: SecurityType,
     selectServer: SelectServerEnum,
-    recoveryWalletInfoOnDevice: boolean,
     performanceLevel: RPCPerformanceLevelEnum,
     blockExplorer: BlockExplorerEnum,
     ironwoodOnboardSeen: boolean,
@@ -49,7 +47,6 @@ export default class SettingsFileClass {
     this.version = version;
     this.security = security;
     this.selectServer = selectServer;
-    this.recoveryWalletInfoOnDevice = recoveryWalletInfoOnDevice;
     this.performanceLevel = performanceLevel;
     this.blockExplorer = blockExplorer;
     this.ironwoodOnboardSeen = ironwoodOnboardSeen;

@@ -87,7 +87,7 @@ import BottomSheet, {
   BottomSheetModal,
   BottomSheetScrollView,
 } from '@gorhom/bottom-sheet';
-import { hasRecoveryWalletInfo } from '@app/services/recoveryWalletInfo';
+import { recoveryWalletInfoIsFailing } from '@app/services/recoveryWalletInfo';
 import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
 import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
 import { useDismissSheetsOnBlur } from '@app/hooks/useDismissSheetsOnBlur';
@@ -111,7 +111,6 @@ type SettingsProps = NativeStackScreenProps<
   setLanguageOption: (value: LanguageEnum) => Promise<void>;
   setSecurityOption: (value: SecurityType) => Promise<void>;
   setSelectServerOption: (value: string) => Promise<void>;
-  setRecoveryWalletInfoOnDeviceOption: (value: boolean) => Promise<void>;
   setPerformanceLevelOption: (value: RPCPerformanceLevelEnum) => Promise<void>;
   setBlockExplorerOption: (value: BlockExplorerEnum) => Promise<void>;
   toggleMenuDrawer: () => void;
@@ -128,7 +127,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   setLanguageOption,
   setSecurityOption,
   setSelectServerOption,
-  setRecoveryWalletInfoOnDeviceOption,
   setPerformanceLevelOption,
   setBlockExplorerOption,
   toggleMenuDrawer,
@@ -147,7 +145,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     selectServer: selectServerContext,
     walletChainName,
     mixnetView,
-    recoveryWalletInfoOnDevice: recoveryWalletInfoOnDeviceContext,
     performanceLevel: performanceLevelContext,
     blockExplorer: blockExplorerContext,
     foregroundEpoch,
@@ -169,14 +166,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   let PRIVACYS: Options[] = [];
   if (typeof privacysArray === 'object') {
     PRIVACYS = privacysArray as Options[];
-  }
-
-  const recoveryWalletInfoOnDevicesArray = translate(
-    'settings.recoverywalletinfoondevices',
-  );
-  let RECOVERYWALLETINFOONDEVICE: Options[] = [];
-  if (typeof recoveryWalletInfoOnDevicesArray === 'object') {
-    RECOVERYWALLETINFOONDEVICE = recoveryWalletInfoOnDevicesArray as Options[];
   }
 
   const performanceLevelsArray = translate('settings.performancelevels');
@@ -281,8 +270,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     useState<boolean>(securityContext.restoreWalletBackupScreen);
   const [selectServer, setSelectServer] =
     useState<SelectServerEnum>(selectServerContext);
-  const [recoveryWalletInfoOnDevice, setRecoveryWalletInfoOnDevice] =
-    useState<boolean>(recoveryWalletInfoOnDeviceContext);
   const [performanceLevel, setPerformanceLevel] =
     useState<RPCPerformanceLevelEnum>(performanceLevelContext);
   const [blockExplorer, setBlockExplorer] =
@@ -294,10 +281,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const [offlineIcon, setOfflineIcon] = useState<IconDefinition>(farCircle);
   const [disabled, setDisabled] = useState<boolean>(false);
   const [disabledButton, setDisabledButton] = useState<boolean>(false);
-  const [hasRecoveryWalletInfoSaved, setHasRecoveryWalletInfoSaved] =
-    useState<boolean>(false);
-  const [storageRecoveryWalletInfo, setStorageRecoveryWalletInfo] =
-    useState<string>('');
   const [showDeveloperOptions, setShowDeveloperOptions] =
     useState<boolean>(false);
   const [openInfoSection, setOpenInfoSection] = useState<string | null>(null);
@@ -382,20 +365,27 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     };
   }, [authPassed]);
 
+  // The device is asked, every time the screen opens, whether it is still
+  // keeping the wallet's recovery info. The App always stores it and offers no
+  // switch to turn it off, so a no here is a real failure, and the user gets a
+  // warning at the end of the screen until the device answers yes again.
+  const [recoveryInfoFailing, setRecoveryInfoFailing] =
+    useState<boolean>(false);
   useEffect(() => {
+    if (!authPassed) {
+      return;
+    }
+    let cancelled = false;
     (async () => {
-      if (await hasRecoveryWalletInfo()) {
-        setHasRecoveryWalletInfoSaved(true);
-        setStorageRecoveryWalletInfo(
-          Platform.OS === GlobalConst.platformOSios
-            ? GlobalConst.keyChain
-            : GlobalConst.keyStore,
-        );
-      } else {
-        setHasRecoveryWalletInfoSaved(false);
+      const failing = await recoveryWalletInfoIsFailing();
+      if (!cancelled) {
+        setRecoveryInfoFailing(failing);
       }
     })();
-  }, [translate]);
+    return () => {
+      cancelled = true;
+    };
+  }, [authPassed]);
 
   // Default server to display for the "auto" option: the `default` entry for
   // the active chain (mainnet and testnet each have one), falling back to the
@@ -663,7 +653,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       privacyContext === privacy &&
       isEqual(securityContext, securityObject()) &&
       selectServerContext === selectServer &&
-      recoveryWalletInfoOnDeviceContext === recoveryWalletInfoOnDevice &&
       performanceLevelContext === performanceLevel &&
       blockExplorerContext === blockExplorer
     ) {
@@ -682,8 +671,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     listServerUri,
     privacy,
     privacyContext,
-    recoveryWalletInfoOnDevice,
-    recoveryWalletInfoOnDeviceContext,
     performanceLevel,
     performanceLevelContext,
     blockExplorer,
@@ -735,7 +722,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       privacyContext === privacy &&
       isEqual(securityContext, securityObject()) &&
       selectServerContext === selectServer &&
-      recoveryWalletInfoOnDeviceContext === recoveryWalletInfoOnDevice &&
       performanceLevelContext === performanceLevel &&
       blockExplorerContext === blockExplorer
     ) {
@@ -916,18 +902,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       if (!isEqual(securityContext, securityObject())) {
         await setSecurityOption(securityObject());
       }
-      if (recoveryWalletInfoOnDeviceContext !== recoveryWalletInfoOnDevice) {
-        await setRecoveryWalletInfoOnDeviceOption(recoveryWalletInfoOnDevice);
-        const saved = await hasRecoveryWalletInfo();
-        setHasRecoveryWalletInfoSaved(saved);
-        if (saved) {
-          setStorageRecoveryWalletInfo(
-            Platform.OS === GlobalConst.platformOSios
-              ? GlobalConst.keyChain
-              : GlobalConst.keyStore,
-          );
-        }
-      }
       if (performanceLevelContext !== performanceLevel) {
         await setPerformanceLevelOption(performanceLevel);
       }
@@ -1038,7 +1012,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       setSettingsScreen(securityContext.settingsScreen);
       setChangeWalletScreen(securityContext.changeWalletScreen);
       setRestoreWalletBackupScreen(securityContext.restoreWalletBackupScreen);
-      setRecoveryWalletInfoOnDevice(recoveryWalletInfoOnDeviceContext);
       setPerformanceLevel(performanceLevelContext);
       setBlockExplorer(blockExplorerContext);
     }
@@ -1465,20 +1438,29 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     setLastError('');
   };
 
-  const sectionHeader = (key: string) => (
-    <FadeText
-      style={{
-        marginLeft: 25,
-        marginRight: 25,
-        marginTop: 24,
-        marginBottom: 4,
-        fontSize: 12,
-        letterSpacing: 0.5,
-      }}
-    >
-      {(translate(key) as string).toUpperCase()}
-    </FadeText>
-  );
+  const sectionHeader = (key: string, onLongPress?: () => void) => {
+    const header = (
+      <FadeText
+        style={{
+          marginLeft: 25,
+          marginRight: 25,
+          marginTop: 24,
+          marginBottom: 4,
+          fontSize: 12,
+          letterSpacing: 0.5,
+        }}
+      >
+        {(translate(key) as string).toUpperCase()}
+      </FadeText>
+    );
+    // The developer section has no entry of its own: a long press on the last
+    // section's title is what reveals it.
+    return onLongPress ? (
+      <TouchableOpacity onLongPress={onLongPress}>{header}</TouchableOpacity>
+    ) : (
+      header
+    );
+  };
 
   if (!authPassed) {
     return <View style={{ flex: 1, backgroundColor: colors.bgCanvas }} />;
@@ -1634,97 +1616,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                         {PRIVACYS.find(d => String(d.value) === 'true')?.text ??
                           ''}
                       </FadeText>
-                    </View>
-                  )}
-                </View>
-              )}
-
-              {mode !== ModeEnum.basic && (
-                <View style={{ marginHorizontal: 25, marginVertical: 15 }}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        flex: 1,
-                      }}
-                    >
-                      {/* This title is the longest in the screen and wraps in
-                          several languages. Beside the text the icon would
-                          then sit at the far right, against the switch, so it
-                          rides inside the text instead and follows the last
-                          word wherever it lands. Tapping the title opens the
-                          note, which is what the icon announces. */}
-                      <TouchableOpacity
-                        style={{ flexShrink: 1 }}
-                        onPress={() =>
-                          setOpenInfoSection(
-                            openInfoSection === 'recovery' ? null : 'recovery',
-                          )
-                        }
-                        onLongPress={() => setShowDeveloperOptions(true)}
-                      >
-                        <BoldText>
-                          {
-                            translate(
-                              'settings.recoverywalletinfoondevice-title',
-                            ) as string
-                          }
-                          {'  '}
-                          {/* An inline icon sits on the baseline, so its box
-                              rides above the text's cap height. Two points
-                              down centre it on the words. */}
-                          <FontAwesomeIcon
-                            icon={faInfoCircle}
-                            size={14}
-                            color={colors.fgDefault}
-                            style={{ transform: [{ translateY: 2 }] }}
-                          />
-                        </BoldText>
-                      </TouchableOpacity>
-                    </View>
-                    <TouchableOpacity
-                      onPress={() =>
-                        setRecoveryWalletInfoOnDevice(
-                          !recoveryWalletInfoOnDevice,
-                        )
-                      }
-                    >
-                      {recoveryWalletInfoOnDevice ? (
-                        <SettingSwitchOn width={40} height={19} />
-                      ) : (
-                        <SwitchOff width={40} height={19} />
-                      )}
-                    </TouchableOpacity>
-                  </View>
-                  {openInfoSection === 'recovery' && (
-                    <View
-                      style={{
-                        backgroundColor: '#040E1D',
-                        borderRadius: 8,
-                        padding: 10,
-                        marginTop: 8,
-                      }}
-                    >
-                      <FadeText style={{ textAlign: 'center' }}>
-                        {RECOVERYWALLETINFOONDEVICE.find(
-                          d => String(d.value) === 'true',
-                        )?.text ?? ''}
-                      </FadeText>
-                      {hasRecoveryWalletInfoSaved && (
-                        <FadeText
-                          style={{
-                            color: colors.fgAccent,
-                            textAlign: 'center',
-                            marginTop: 6,
-                          }}
-                        >
-                          {(translate('settings.walletkeyssaved') as string) +
-                            (storageRecoveryWalletInfo
-                              ? ' [' + storageRecoveryWalletInfo + ']'
-                              : '')}
-                        </FadeText>
-                      )}
                     </View>
                   )}
                 </View>
@@ -1932,7 +1823,9 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
               )}
 
               {/* SECTION: Other */}
-              {sectionHeader('settings.section-other')}
+              {sectionHeader('settings.section-other', () =>
+                setShowDeveloperOptions(true),
+              )}
 
               <TouchableOpacity
                 testID="settings.about"
@@ -1996,6 +1889,26 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                     )}
                   </View>
                 </>
+              )}
+
+              {recoveryInfoFailing && (
+                <View
+                  style={{
+                    marginHorizontal: 25,
+                    marginTop: 24,
+                    marginBottom: 10,
+                    padding: 10,
+                    borderRadius: 8,
+                    borderWidth: 1,
+                    borderColor: colors.fgDanger,
+                  }}
+                >
+                  <FadeText
+                    style={{ color: colors.fgDanger, textAlign: 'center' }}
+                  >
+                    {translate('settings.walletkeys-error') as string}
+                  </FadeText>
+                </View>
               )}
             </BottomSheetScrollView>
           </AppSheet>

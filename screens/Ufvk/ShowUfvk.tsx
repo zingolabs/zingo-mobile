@@ -86,7 +86,6 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
     mode,
     addLastSnackbar,
     setPrivacyOption,
-    recoveryWalletInfoOnDevice,
     security,
     foregroundEpoch,
   } = context;
@@ -160,30 +159,25 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
       // ufvkSource is updated as we go so the loading legend reflects
       // what's actually being read at each moment.
       let info: WalletType = {} as WalletType;
-      if (recoveryWalletInfoOnDevice) {
-        setUfvkSource('keychain');
-        info = await getRecoveryWalletInfo();
-      }
+      setUfvkSource('keychain');
+      info = await getRecoveryWalletInfo();
       if (!info.ufvk) {
         setUfvkSource('wallet');
         const walletInfo = await fetchWallet(true);
         if (walletInfo) {
           info = walletInfo;
-          // Self-heal: user opted into the on-device cache but the
-          // keychain entry is missing. Write it now while the gate's
-          // recent bio auth window is still warm so subsequent visits
-          // hit the keychain. Fire-and-forget.
-          if (recoveryWalletInfoOnDevice) {
-            saveRecoveryWalletInfo(walletInfo).catch(e =>
-              console.log('Self-heal save failed', e),
-            );
-          }
+          // Self-heal: the keychain entry is missing although the App always
+          // keeps one. Write it now while the gate's recent bio auth window is
+          // still warm so subsequent visits hit the keychain. Fire-and-forget.
+          saveRecoveryWalletInfo(walletInfo).catch(e =>
+            console.log('Self-heal save failed', e),
+          );
         }
       }
       setFetchedWallet(info);
       setLoadingUfvk(false);
     })();
-  }, [recoveryWalletInfoOnDevice, authPassed]);
+  }, [authPassed]);
 
   const clipboardTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const bottomSheetRef = useRef<BottomSheetModal>(null);

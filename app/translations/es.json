@@ -281,16 +281,6 @@
         "text": "Modo Avanzado, para el usuario avanzado."
       }
     ],
-    "recoverywalletinfoondevices": [
-      {
-        "value": true,
-        "text": "Hacer copia de seguridad de la Frase Semilla del monedero en el dispositivo."
-      },
-      {
-        "value": false,
-        "text": "No guardar absolutamente nada en el dispositivo referente al monedero."
-      }
-    ],
     "performancelevels": [
       {
         "value": "Maximum",
@@ -357,7 +347,6 @@
     "islanguage": "Necesitas escoger un Idioma para poder guardar.",
     "privacy-title": "Ocultar valores sensibles",
     "mode-title": "Cambiar entre Modo Básico o Avanzado",
-    "recoverywalletinfoondevice-title": "Almacenar la información de recuperación del monedero",
     "performancelevel-title": "Zingolib Performance Level",
     "blockexplorer-title": "Block Explorer",
     "value-language-en": "Inglés",
@@ -375,8 +364,6 @@
     "value-chainname-none": "Ninguna",
     "server-chain-title": "Red",
     "select-chain-placeholder": "Selecciona una Red...",
-    "value-recoverywalletinfoondevice-true": "Activar",
-    "value-recoverywalletinfoondevice-false": "Desactivar",
     "value-performancelevel-Maximum": "Maximum",
     "value-performancelevel-High": "High",
     "value-performancelevel-Medium": "Medium",
@@ -413,11 +400,10 @@
     "select-language-placeholder": "Selecciona un Idioma...",
     "select-blockexplorer-placeholder": "Selecciona un Block Explorer...",
     "value-language-ru": "Ruso",
-    "walletkeyssaved": "La ultima información de recuperacion del Monedero almacenada de forma segura en el dispositivo.",
-    "walletkeyswarning": "Esta es una función experimental que depende de la seguridad de código no auditado para almacenar tu frase semilla. ¡Por favor, no la utilices con semillas que controlen fondos significativos!",
     "value-language-tr": "Turco",
     "nym-network": "NYM Mixnet",
-    "nym-diagnostics": "Ejecutar diagnóstico de mixnet"
+    "nym-diagnostics": "Ejecutar diagnóstico de mixnet",
+    "walletkeys-error": "El dispositivo no está guardando la información de recuperación de este monedero. Abre la pantalla de la semilla y apunta las palabras: son la única forma de volver a entrar en este monedero."
   },
   "mixnet": {
     "status": {

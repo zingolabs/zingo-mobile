@@ -42,17 +42,6 @@ export const mockTranslate = (p: string) => {
         text: 'text tr',
       },
     ];
-  } else if (p === 'settings.recoverywalletinfoondevices') {
-    return [
-      {
-        value: true,
-        text: 'text true',
-      },
-      {
-        value: false,
-        text: 'text false',
-      },
-    ];
   } else if (p === 'settings.performancelevels') {
     return [
       {
