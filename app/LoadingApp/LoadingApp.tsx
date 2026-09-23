@@ -103,6 +103,7 @@ import selectingServer from '@app/services/selectingServer';
 import { isEqual } from 'lodash';
 import {
   createUpdateRecoveryWalletInfo,
+  removeRecoveryWalletInfo,
   getRecoveryWalletInfo,
   hasRecoveryWalletInfo,
 } from '@app/services/recoveryWalletInfo';
@@ -961,6 +962,7 @@ export class LoadingAppClass extends Component<
         if (!resultJson.error) {
           // Load the wallet and navigate to the vts screen
           let readOnly: boolean = false;
+          let keyless: boolean = false;
           let orchardPool: boolean = false;
           let saplingPool: boolean = false;
           let transparentPool: boolean = false;
@@ -987,6 +989,7 @@ export class LoadingAppClass extends Component<
             } else {
               readOnly = false;
             }
+            keyless = walletKindJSON.kind === RPCWalletKindEnum.NoKeysFound;
             orchardPool = walletKindJSON.orchard;
             saplingPool = walletKindJSON.sapling;
             transparentPool = walletKindJSON.transparent;
@@ -1012,9 +1015,18 @@ export class LoadingAppClass extends Component<
           // the whole recovery flow stands on, and a kind JSON the App could
           // not parse is no reason to skip the write.
           try {
-            const walletToStore = await fetchWallet(readOnly);
-            if (walletToStore) {
-              await createUpdateRecoveryWalletInfo(walletToStore);
+            if (keyless) {
+              // A wallet with no keys has nothing to store, and whatever the
+              // keychain still holds belongs to the wallet used before it.
+              // Only the wallet's own kind may decide this: a fetch that comes
+              // back empty is an error, not an answer, and must never be a
+              // reason to drop a good entry.
+              await removeRecoveryWalletInfo();
+            } else {
+              const walletToStore = await fetchWallet(readOnly);
+              if (walletToStore) {
+                await createUpdateRecoveryWalletInfo(walletToStore);
+              }
             }
           } catch (storeError) {
             console.log('Error storing the recovery wallet info', storeError);
@@ -1814,6 +1826,7 @@ export class LoadingAppClass extends Component<
           );
           // Load the wallet and navigate to the vts screen
           let readOnly: boolean = false;
+          let keyless: boolean = false;
           let orchardPool: boolean = false;
           let saplingPool: boolean = false;
           let transparentPool: boolean = false;
@@ -1840,6 +1853,7 @@ export class LoadingAppClass extends Component<
             } else {
               readOnly = false;
             }
+            keyless = walletKindJSON.kind === RPCWalletKindEnum.NoKeysFound;
             orchardPool = walletKindJSON.orchard;
             saplingPool = walletKindJSON.sapling;
             transparentPool = walletKindJSON.transparent;
@@ -1865,9 +1879,18 @@ export class LoadingAppClass extends Component<
           // the whole recovery flow stands on, and a kind JSON the App could
           // not parse is no reason to skip the write.
           try {
-            const walletToStore = await fetchWallet(readOnly);
-            if (walletToStore) {
-              await createUpdateRecoveryWalletInfo(walletToStore);
+            if (keyless) {
+              // A wallet with no keys has nothing to store, and whatever the
+              // keychain still holds belongs to the wallet used before it.
+              // Only the wallet's own kind may decide this: a fetch that comes
+              // back empty is an error, not an answer, and must never be a
+              // reason to drop a good entry.
+              await removeRecoveryWalletInfo();
+            } else {
+              const walletToStore = await fetchWallet(readOnly);
+              if (walletToStore) {
+                await createUpdateRecoveryWalletInfo(walletToStore);
+              }
             }
           } catch (storeError) {
             console.log('Error storing the recovery wallet info', storeError);

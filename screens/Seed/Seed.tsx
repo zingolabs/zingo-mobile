@@ -174,38 +174,33 @@ const Seed: React.FunctionComponent<SeedProps> = ({
     (async () => {
       setLoadingSeed(true);
       try {
-        // Prefer the recovery-info keychain entry when the user enabled
-        // the on-device cache, but always fall back to fetching the seed
-        // directly from the wallet if the keychain returns empty — that
-        // happens on user-cancel of the keychain's own bio prompt as
-        // well as on genuine read errors. Leaving the field empty would
-        // surprise the user since they did not opt-in to the screen-
-        // level seedUfvkScreen gate. seedSource is updated as we go so
-        // the loading legend reflects what's actually being read at
-        // each moment (keychain → wallet on fallback).
+        // The wallet is asked first, and the keychain entry is only the
+        // fallback. The entry carries no idea of which wallet it belongs to,
+        // so when its write failed — the one case the Settings warning is
+        // about — it still holds the seed of the wallet used before this one.
+        // Showing those words here would hand the user a backup of somebody
+        // else's wallet, which is worse than showing none. The wallet always
+        // knows whose seed it is holding.
+        //
+        // The keychain still answers when the wallet does not (a read error,
+        // a user-cancel of its own prompt): that is what the entry is for, and
+        // the legend says where the words came from. seedSource is updated as
+        // we go so the loading legend follows.
         let seedInfo: WalletType = {} as WalletType;
-        setSeedSource('keychain');
-        seedInfo = await getRecoveryWalletInfo();
-        if (!seedInfo.seed) {
-          setSeedSource('wallet');
-          const walletInfo = await fetchWallet(false);
-          if (walletInfo) {
-            seedInfo = walletInfo;
-            // Self-heal: the keychain entry is missing although the App
-            // always keeps one (the startup save likely failed). Write it now
-            // while the gate's recent bio auth window is still warm so
-            // subsequent visits read from the keychain. Fire-and-forget so a
-            // save failure doesn't block the render.
-            //
-            // Only when the wallet actually handed us something: an empty
-            // answer here means the fetch failed, and saving it would drop
-            // the entry this wallet's UFVK may still be stored in.
-            if (walletInfo.seed || walletInfo.ufvk) {
-              saveRecoveryWalletInfo(walletInfo).catch(e =>
-                console.log('Self-heal save failed', e),
-              );
-            }
-          }
+        setSeedSource('wallet');
+        const walletInfo = await fetchWallet(false);
+        if (walletInfo?.seed) {
+          seedInfo = walletInfo;
+          // Refresh the entry with what the wallet just said. It costs one
+          // write on a screen the user rarely opens, and it leaves the device
+          // holding this wallet's seed even if every write before it failed.
+          // Fire-and-forget so a save failure doesn't block the render.
+          saveRecoveryWalletInfo(walletInfo).catch(e =>
+            console.log('Self-heal save failed', e),
+          );
+        } else {
+          setSeedSource('keychain');
+          seedInfo = await getRecoveryWalletInfo();
         }
         const ufvkInfo = await fetchWallet(true);
         setFetchedWallet({ ...seedInfo, ufvk: ufvkInfo?.ufvk });

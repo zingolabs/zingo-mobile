@@ -149,6 +149,9 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     blockExplorer: blockExplorerContext,
     foregroundEpoch,
     readOnly,
+    orchardPool,
+    saplingPool,
+    transparentPool,
     setPrivacyOption,
     setBackgroundError,
     zingolibVersion,
@@ -377,7 +380,11 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     }
     let cancelled = false;
     (async () => {
-      const failing = await recoveryWalletInfoIsFailing();
+      // A read-only wallet with no pool at all is the keyless kind: it has
+      // nothing of its own to store, so an empty keychain is not a failure.
+      const walletHasKeys =
+        !readOnly || orchardPool || saplingPool || transparentPool;
+      const failing = await recoveryWalletInfoIsFailing(walletHasKeys);
       if (!cancelled) {
         setRecoveryInfoFailing(failing);
       }
@@ -385,7 +392,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     return () => {
       cancelled = true;
     };
-  }, [authPassed]);
+  }, [authPassed, readOnly, orchardPool, saplingPool, transparentPool]);
 
   // Default server to display for the "auto" option: the `default` entry for
   // the active chain (mainnet and testnet each have one), falling back to the

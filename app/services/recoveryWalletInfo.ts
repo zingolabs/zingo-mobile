@@ -148,9 +148,14 @@ export const hasRecoveryWalletInfo = async (): Promise<boolean> => {
 // save errored, the last read errored, or the entry is missing although every
 // wallet the App opens, creates or restores writes it. Probing also refreshes
 // the read half, so a transient read error stops answering true on its own.
-export const recoveryWalletInfoIsFailing = async (): Promise<boolean> => {
+//
+// `expectStored` is false for a wallet with no keys of its own to store, the
+// one case where an empty keychain is the right answer instead of a failure.
+export const recoveryWalletInfoIsFailing = async (
+  expectStored: boolean = true,
+): Promise<boolean> => {
   const stored = await hasRecoveryWalletInfo();
-  return lastSaveFailed || lastReadFailed || !stored;
+  return lastSaveFailed || lastReadFailed || (expectStored && !stored);
 };
 
 export const createUpdateRecoveryWalletInfo = async (

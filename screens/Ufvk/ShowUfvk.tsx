@@ -152,33 +152,26 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
     }
     (async () => {
       setLoadingUfvk(true);
-      // Same logic as Seed.tsx: try the keychain first when the user
-      // enabled the on-device recovery cache, but fall back to fetching
-      // the UFVK directly from the wallet when the keychain returns
-      // empty (user-cancel of the keychain bio prompt or read error).
-      // ufvkSource is updated as we go so the loading legend reflects
-      // what's actually being read at each moment.
+      // Same order as Seed.tsx, and for the same reason: the wallet is the
+      // only source that knows whose UFVK it is holding. A keychain entry
+      // whose write failed still belongs to the wallet used before this one,
+      // and showing it here would present another wallet's key as this one's.
+      // The entry is the fallback, for when the wallet does not answer, and
+      // the legend says where the key came from.
       let info: WalletType = {} as WalletType;
-      setUfvkSource('keychain');
-      info = await getRecoveryWalletInfo();
-      if (!info.ufvk) {
-        setUfvkSource('wallet');
-        const walletInfo = await fetchWallet(true);
-        if (walletInfo) {
-          info = walletInfo;
-          // Self-heal: the keychain entry is missing although the App always
-          // keeps one. Write it now while the gate's recent bio auth window is
-          // still warm so subsequent visits hit the keychain. Fire-and-forget.
-          //
-          // Only when the wallet actually handed us something: an empty answer
-          // here means the fetch failed, and saving it would drop the entry
-          // this wallet's seed may still be stored in.
-          if (walletInfo.seed || walletInfo.ufvk) {
-            saveRecoveryWalletInfo(walletInfo).catch(e =>
-              console.log('Self-heal save failed', e),
-            );
-          }
-        }
+      setUfvkSource('wallet');
+      const walletInfo = await fetchWallet(true);
+      if (walletInfo?.ufvk) {
+        info = walletInfo;
+        // Refresh the entry with what the wallet just said, so the device
+        // holds this wallet's key even if every write before it failed.
+        // Fire-and-forget: a save failure must not block the render.
+        saveRecoveryWalletInfo(walletInfo).catch(e =>
+          console.log('Self-heal save failed', e),
+        );
+      } else {
+        setUfvkSource('keychain');
+        info = await getRecoveryWalletInfo();
       }
       setFetchedWallet(info);
       setLoadingUfvk(false);

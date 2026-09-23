@@ -110,6 +110,24 @@ describe('recoveryWalletInfo - the device is failing or it is not', () => {
     await expect(service.recoveryWalletInfoIsFailing()).resolves.toBe(true);
   });
 
+  test('a wallet with nothing to store is not failing on an empty keychain', async () => {
+    const { keychain, service } = load();
+    keychain.hasGenericPassword.mockResolvedValue(false);
+
+    await expect(service.recoveryWalletInfoIsFailing(false)).resolves.toBe(
+      false,
+    );
+  });
+
+  test('a wallet with nothing to store still reports a device that errors', async () => {
+    const { keychain, service } = load();
+    keychain.hasGenericPassword.mockRejectedValue(new Error('keystore gone'));
+
+    await expect(service.recoveryWalletInfoIsFailing(false)).resolves.toBe(
+      true,
+    );
+  });
+
   test('a wallet with no keys drops the entry the previous wallet left', async () => {
     const { keychain, service } = load();
     keychain.hasGenericPassword.mockResolvedValue(true);
