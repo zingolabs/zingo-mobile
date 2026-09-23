@@ -1671,10 +1671,14 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                             ) as string
                           }
                           {'  '}
+                          {/* An inline icon sits on the baseline, so its box
+                              rides above the text's cap height. Two points
+                              down centre it on the words. */}
                           <FontAwesomeIcon
                             icon={faInfoCircle}
                             size={14}
                             color={colors.fgDefault}
+                            style={{ transform: [{ translateY: 2 }] }}
                           />
                         </BoldText>
                       </TouchableOpacity>

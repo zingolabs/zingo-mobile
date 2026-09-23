@@ -534,6 +534,15 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
                       }
                     }
                     size={14}
+                    style={
+                      {
+                        "transform": [
+                          {
+                            "translateY": 2,
+                          },
+                        ],
+                      }
+                    }
                   />
                 </Text>
               </View>
