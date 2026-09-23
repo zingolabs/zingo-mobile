@@ -128,7 +128,7 @@ describe('recoveryWalletInfo - the device is failing or it is not', () => {
     );
   });
 
-  test('a wallet with no keys drops the entry the previous wallet left', async () => {
+  test('nothing to store leaves the entry alone: an empty fetch is an error, not an answer', async () => {
     const { keychain, service } = load();
     keychain.hasGenericPassword.mockResolvedValue(true);
     keychain.resetGenericPassword.mockResolvedValue(true);
@@ -136,6 +136,25 @@ describe('recoveryWalletInfo - the device is failing or it is not', () => {
     await service.saveRecoveryWalletInfo({ birthday: 0 });
 
     expect(keychain.setGenericPassword).not.toHaveBeenCalled();
-    expect(keychain.resetGenericPassword).toHaveBeenCalled();
+    // Dropping the entry is the wallet-kind branch's call, never this one:
+    // `fetchWallet` hands back an empty object on an RPC error too.
+    expect(keychain.resetGenericPassword).not.toHaveBeenCalled();
+  });
+
+  test('the screen refresh never wipes the entry to retry a refused write', async () => {
+    const { keychain, service } = load();
+    keychain.setGenericPassword.mockResolvedValue(false);
+    keychain.resetGenericPassword.mockResolvedValue(true);
+    keychain.hasGenericPassword.mockResolvedValue(true);
+
+    await service.saveRecoveryWalletInfo(
+      { seed: 'twenty four words', birthday: 1 },
+      { resetOnFailure: false },
+    );
+
+    expect(keychain.setGenericPassword).toHaveBeenCalledTimes(1);
+    expect(keychain.resetGenericPassword).not.toHaveBeenCalled();
+    // still remembered as a failure, the warning has to show up
+    await expect(service.recoveryWalletInfoIsFailing()).resolves.toBe(true);
   });
 });

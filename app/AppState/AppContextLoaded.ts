@@ -80,6 +80,10 @@ export default interface AppContextLoaded {
   // this wallet is watch-only (Readonly)
   readOnly: boolean;
 
+  // this wallet has no seed and no UFVK of its own (wallet-kind NoKeysFound),
+  // so it has nothing to keep in the recovery keychain
+  keyless: boolean;
+
   // pools available
   orchardPool: boolean;
   saplingPool: boolean;

@@ -72,16 +72,26 @@ const setOrThrow = async (
   }
 };
 
+type SaveOptions = {
+  // Whether a refused write may delete the entry before retrying. The boot
+  // paths want it: an entry an older app version left behind can carry a
+  // cipher this build cannot overwrite, and replacing it is the point. The
+  // Seed/ShowUfvk refresh does not: it runs on every visit, so a transient
+  // refusal there would destroy a good entry the App is not replacing.
+  resetOnFailure?: boolean;
+};
+
 export const saveRecoveryWalletInfo = async (
   keys: WalletType,
+  { resetOnFailure = true }: SaveOptions = {},
 ): Promise<void> => {
   if (!keys.seed && !keys.ufvk) {
-    // A wallet with no keys to store is not a no-op: whatever is in the
-    // keychain belongs to a previous wallet, and leaving it there makes the
-    // recovery screens show the old wallet's seed/UFVK next to the current
-    // wallet's data.
-    console.log('no seed or ufvk to store, dropping any previous entry');
-    await removeRecoveryWalletInfo();
+    // Nothing to store, and nothing to conclude from it. `fetchWallet` answers
+    // with an empty object when the RPC resolves with an error body, so a
+    // wallet with no keys and a wallet that failed to answer look the same
+    // here. Only the wallet-kind branch in LoadingApp tells them apart, and it
+    // drops the previous entry itself through `removeRecoveryWalletInfo`.
+    console.log('no seed or ufvk to store');
     return;
   }
   const password = JSON.stringify(keys);
@@ -89,6 +99,11 @@ export const saveRecoveryWalletInfo = async (
     await setOrThrow(password, setOptions);
     lastSaveFailed = false;
   } catch (error) {
+    if (!resetOnFailure) {
+      console.log('Error saving keys, entry left intact:', error);
+      lastSaveFailed = true;
+      return;
+    }
     // An existing entry from a previous app version may use an
     // incompatible cipher (e.g. the old auth-required AES_GCM or RSA).
     // Deleting never requires auth, so reset and retry with the

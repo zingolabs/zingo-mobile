@@ -195,8 +195,13 @@ const Seed: React.FunctionComponent<SeedProps> = ({
           // write on a screen the user rarely opens, and it leaves the device
           // holding this wallet's seed even if every write before it failed.
           // Fire-and-forget so a save failure doesn't block the render.
-          saveRecoveryWalletInfo(walletInfo).catch(e =>
-            console.log('Self-heal save failed', e),
+          //
+          // No reset on failure: this runs on every visit, and wiping the
+          // entry to retry would turn a transient refusal into the loss of a
+          // backup the App is not even replacing. The boot write is the one
+          // that may replace an entry it cannot overwrite.
+          saveRecoveryWalletInfo(walletInfo, { resetOnFailure: false }).catch(
+            e => console.log('Self-heal save failed', e),
           );
         } else {
           setSeedSource('keychain');

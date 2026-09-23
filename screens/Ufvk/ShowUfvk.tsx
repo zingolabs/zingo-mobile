@@ -166,7 +166,10 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
         // Refresh the entry with what the wallet just said, so the device
         // holds this wallet's key even if every write before it failed.
         // Fire-and-forget: a save failure must not block the render.
-        saveRecoveryWalletInfo(walletInfo).catch(e =>
+        //
+        // No reset on failure: same reason as Seed.tsx, this runs on every
+        // visit and must not destroy a good entry to retry a write.
+        saveRecoveryWalletInfo(walletInfo, { resetOnFailure: false }).catch(e =>
           console.log('Self-heal save failed', e),
         );
       } else {

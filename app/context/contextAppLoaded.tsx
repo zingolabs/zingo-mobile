@@ -56,6 +56,7 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   setBackgroundError: () => {},
   lastError: '',
   setLastError: () => {},
+  keyless: false,
   orchardPool: true,
   saplingPool: true,
   transparentPool: true,

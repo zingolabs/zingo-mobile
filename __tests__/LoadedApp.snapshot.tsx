@@ -31,6 +31,7 @@ function makeDrawerProps(): StackScreenProps<
       name: RouteEnum.LoadedApp,
       params: {
         readOnly: false,
+        keyless: false,
         orchardPool: true,
         saplingPool: true,
         transparentPool: true,

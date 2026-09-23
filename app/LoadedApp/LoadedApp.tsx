@@ -273,6 +273,10 @@ export default function LoadedApp(props: LoadedAppProps) {
     !!props.route.params && props.route.params.readOnly !== undefined
       ? props.route.params.readOnly
       : false;
+  const keyless =
+    !!props.route.params && props.route.params.keyless !== undefined
+      ? props.route.params.keyless
+      : false;
   const orchardPool =
     !!props.route.params && props.route.params.orchardPool !== undefined
       ? props.route.params.orchardPool
@@ -610,6 +614,7 @@ export default function LoadedApp(props: LoadedAppProps) {
         mode={mode}
         backgroundSyncInfo={backgroundSyncInfo}
         readOnly={readOnly}
+        keyless={keyless}
         orchardPool={orchardPool}
         saplingPool={saplingPool}
         transparentPool={transparentPool}
@@ -666,6 +671,7 @@ type LoadedAppClassProps = {
   mode: ModeEnum;
   backgroundSyncInfo: BackgroundType;
   readOnly: boolean;
+  keyless: boolean;
   orchardPool: boolean;
   saplingPool: boolean;
   transparentPool: boolean;
@@ -731,6 +737,7 @@ export class LoadedAppClass extends Component<
       setBackgroundError: this.setBackgroundError,
       lastError: '',
       setLastError: this.setLastError,
+      keyless: props.keyless,
       orchardPool: props.orchardPool,
       saplingPool: props.saplingPool,
       transparentPool: props.transparentPool,
@@ -2165,6 +2172,7 @@ export class LoadedAppClass extends Component<
       readOnly: this.state.readOnly,
       lastError: this.state.lastError,
       setLastError: this.state.setLastError,
+      keyless: this.state.keyless,
       orchardPool: this.state.orchardPool,
       saplingPool: this.state.saplingPool,
       transparentPool: this.state.transparentPool,

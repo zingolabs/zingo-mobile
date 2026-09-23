@@ -47,6 +47,9 @@ export type LoadingAppNavigationState = {
  */
 export type LoadedAppNavigationState = {
   readOnly: boolean;
+  // The wallet-kind is NoKeysFound: it has no seed and no UFVK of its own.
+  // Carried from the open, not inferred downstream from readOnly + pools.
+  keyless: boolean;
   orchardPool: boolean;
   saplingPool: boolean;
   transparentPool: boolean;

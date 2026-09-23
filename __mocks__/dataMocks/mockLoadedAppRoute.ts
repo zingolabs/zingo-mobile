@@ -10,6 +10,7 @@ export const mockLoadedAppRoute: RouteProp<
   name: RouteEnum.LoadedApp,
   params: {
     readOnly: false,
+    keyless: false,
     orchardPool: true,
     saplingPool: true,
     transparentPool: true,

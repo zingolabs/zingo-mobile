@@ -607,6 +607,8 @@ export class LoadingAppClass extends Component<
             this.setState({ actionButtonsDisabled: false });
             this.navigateToLoadedApp(
               false,
+              // a wallet the App just created always has a seed
+              false,
               true,
               true,
               true,
@@ -1024,8 +1026,16 @@ export class LoadingAppClass extends Component<
               await removeRecoveryWalletInfo();
             } else {
               const walletToStore = await fetchWallet(readOnly);
-              if (walletToStore) {
+              if (walletToStore && (walletToStore.seed || walletToStore.ufvk)) {
                 await createUpdateRecoveryWalletInfo(walletToStore);
+              } else {
+                // `fetchWallet` answers with an empty object when the RPC
+                // resolves with an error body, so nothing here means a failed
+                // fetch on a wallet that does have keys — the keyless case
+                // already took the branch above. Leave the entry alone.
+                console.log(
+                  'the wallet did not answer with its keys, nothing stored',
+                );
               }
             }
           } catch (storeError) {
@@ -1040,6 +1050,7 @@ export class LoadingAppClass extends Component<
               : false;
           this.navigateToLoadedApp(
             readOnly,
+            keyless,
             orchardPool,
             saplingPool,
             transparentPool,
@@ -1588,6 +1599,7 @@ export class LoadingAppClass extends Component<
 
   navigateToLoadedApp = (
     readOnly: boolean,
+    keyless: boolean,
     orchardPool: boolean,
     saplingPool: boolean,
     transparentPool: boolean,
@@ -1603,6 +1615,7 @@ export class LoadingAppClass extends Component<
           name: RouteEnum.LoadedApp,
           params: {
             readOnly,
+            keyless,
             orchardPool,
             saplingPool,
             transparentPool,
@@ -1888,8 +1901,16 @@ export class LoadingAppClass extends Component<
               await removeRecoveryWalletInfo();
             } else {
               const walletToStore = await fetchWallet(readOnly);
-              if (walletToStore) {
+              if (walletToStore && (walletToStore.seed || walletToStore.ufvk)) {
                 await createUpdateRecoveryWalletInfo(walletToStore);
+              } else {
+                // `fetchWallet` answers with an empty object when the RPC
+                // resolves with an error body, so nothing here means a failed
+                // fetch on a wallet that does have keys — the keyless case
+                // already took the branch above. Leave the entry alone.
+                console.log(
+                  'the wallet did not answer with its keys, nothing stored',
+                );
               }
             }
           } catch (storeError) {
@@ -1897,6 +1918,7 @@ export class LoadingAppClass extends Component<
           }
           this.navigateToLoadedApp(
             readOnly,
+            keyless,
             orchardPool,
             saplingPool,
             transparentPool,
@@ -2269,6 +2291,8 @@ export class LoadingAppClass extends Component<
                   onClickOK={() =>
                     this.navigateToLoadedApp(
                       readOnly,
+                      // a wallet the App just created always has a seed
+                      false,
                       orchardPool,
                       saplingPool,
                       transparentPool,
