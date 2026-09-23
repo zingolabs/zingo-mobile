@@ -9,11 +9,9 @@ import {
   deriveMixnetView,
 } from '@app/walletBackend/transforms/mixnetView';
 import {
-  TransmitPolicy,
   attachMixnet,
   getMixnetBootstrapDetail,
   getMixnetStatus,
-  setTransmitPolicy,
 } from '@app/walletBackend/utils/mixnetUtils';
 
 export type MixnetTransportBinding = {
@@ -55,28 +53,13 @@ export class MixnetCoordinator {
   private reconnectActive: boolean = false;
   private enableEpoch: number = 0;
   private stopped: boolean = false;
-  private transmitPolicy: TransmitPolicy;
 
   constructor(
     startTransport: StartMixnetTransport,
     onChange: (view: MixnetView) => void,
-    transmitPolicy: TransmitPolicy = 'mixnet',
   ) {
     this.startTransport = startTransport;
     this.onChange = onChange;
-    this.transmitPolicy = transmitPolicy;
-  }
-
-  async setTransmitPolicy(policy: TransmitPolicy): Promise<void> {
-    this.transmitPolicy = policy;
-    await setTransmitPolicy(policy);
-  }
-
-  // Every attach is the library's mixnet consent act, so clearnet is restated around it.
-  private async restateClearnet(): Promise<void> {
-    if (this.transmitPolicy === 'clearnet') {
-      await setTransmitPolicy('clearnet');
-    }
   }
 
   // Starts the transport, attaches the wallet, and polls; a failure publishes the typed failure view.
@@ -86,7 +69,6 @@ export class MixnetCoordinator {
     this.clearReconnectTimer();
     this.publishStarting();
     try {
-      await this.restateClearnet();
       const { socks5Addr, exitNode } = await this.startTransport();
       if (this.enableEpoch !== epoch) {
         return;
@@ -95,7 +77,6 @@ export class MixnetCoordinator {
       if (this.enableEpoch !== epoch) {
         return;
       }
-      await this.restateClearnet();
       this.publish(status);
     } catch (thrown: unknown) {
       if (this.enableEpoch !== epoch) {
