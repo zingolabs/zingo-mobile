@@ -479,6 +479,7 @@ exports[`Component History - test History privacy high & mode advanced - snapsho
               style={
                 {
                   "marginRight": 5,
+                  "marginTop": 4.5,
                   "opacity": 1,
                 }
               }
@@ -1340,6 +1341,7 @@ exports[`Component History - test History privacy normal & mode basic - snapshot
               style={
                 {
                   "marginRight": 5,
+                  "marginTop": 4.5,
                   "opacity": 1,
                 }
               }

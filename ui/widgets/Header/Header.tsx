@@ -323,8 +323,13 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             <View
               style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}
             >
+              {/* Level with the menu icon opposite: that one centres at 28.5
+                  from the top (16 of padding, half of its 25 box), this
+                  corner pads 13, so an 11 half-box lands at 24 without the
+                  4.5 below. The nudge rides on the icon alone, leaving the
+                  logo this corner falls back to where it already sat. */}
               <TouchableOpacity
-                style={{ marginRight: 5 }}
+                style={{ marginRight: 5, marginTop: 4.5 }}
                 testID="header.messages"
                 onPress={() => navigation.navigate(RouteEnum.Messages)}
               >

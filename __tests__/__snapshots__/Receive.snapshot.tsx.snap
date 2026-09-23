@@ -490,6 +490,7 @@ exports[`Component Receive - test Receive - snapshot 1`] = `
             style={
               {
                 "marginRight": 5,
+                "marginTop": 4.5,
                 "opacity": 1,
               }
             }
