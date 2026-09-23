@@ -18,14 +18,9 @@ test('F10: every derivable view stays inside the closed key set', () => {
   const derived = [
     INITIAL_MIXNET_VIEW,
     deriveMixnetView(
-      { kind: 'failure', failure: { reason: 'unconsentedOff' } },
-      null,
-    ),
-    deriveMixnetView(
       {
-        kind: 'status',
-        indicator: RPCMixnetIndicatorEnum.off,
-        socks5Addr: null,
+        kind: 'failure',
+        failure: { reason: 'unrecognizedIndicator', claimed: 'off' },
       },
       null,
     ),

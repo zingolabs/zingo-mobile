@@ -2,7 +2,6 @@ import { RPCMixnetIndicatorEnum } from '@app/walletBackend/enums/RPCMixnetIndica
 import {
   MixnetStatusReport,
   describeRejection,
-  vetPolledStatus,
 } from '@app/walletBackend/transforms/mixnetTransform';
 import {
   MixnetView,
@@ -167,7 +166,7 @@ export class MixnetCoordinator {
     this.pollLock = true;
     const epoch = this.enableEpoch;
     try {
-      const status = vetPolledStatus(await getMixnetStatus());
+      const status = await getMixnetStatus();
       if (this.enableEpoch === epoch && !this.stopped) {
         this.publish(status);
       }

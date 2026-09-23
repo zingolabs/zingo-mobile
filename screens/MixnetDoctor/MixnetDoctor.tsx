@@ -137,8 +137,7 @@ const runIsTerminal = (
 ): boolean =>
   !attachInFlight &&
   (finished.status.kind === 'failure' ||
-    finished.status.indicator === RPCMixnetIndicatorEnum.died ||
-    finished.status.indicator === RPCMixnetIndicatorEnum.off);
+    finished.status.indicator === RPCMixnetIndicatorEnum.died);
 
 const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
   navigation,

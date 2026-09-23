@@ -37,7 +37,5 @@ export function deriveNymGateState(
       return { kind: 'failed', failureKey: view.statusKey };
     case 'mixnet.status.bootstrapping':
       return { kind: 'connecting' };
-    case 'mixnet.status.off':
-      return enabling ? { kind: 'connecting' } : { kind: 'idle' };
   }
 }
