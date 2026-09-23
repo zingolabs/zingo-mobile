@@ -72,11 +72,7 @@ const wrappers: Array<[string, string, () => Promise<FfiResult<string>>]> = [
   ['getVersionInfo', 'getVersionInfo', () => getVersionInfo()],
   ['walletKindInfo', 'getWalletKind', () => getWalletKind()],
   ['sendProcess', 'sendPropose', () => sendPropose('{}')],
-  [
-    'sendAllProcess',
-    'sendAllPropose',
-    () => sendAllPropose('u1...', ''),
-  ],
+  ['sendAllProcess', 'sendAllPropose', () => sendAllPropose('u1...', '')],
   ['planOrchardDrainProcess', 'planOrchardDrain', () => planOrchardDrain()],
   ['drainOrchardProcess', 'drainOrchard', () => drainOrchard()],
   ['drainStatusProcess', 'drainStatus', () => drainStatus()],

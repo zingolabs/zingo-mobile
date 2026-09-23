@@ -200,8 +200,7 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
   nymSheetOpen,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, totalBalance, info, mixnetView, reenableMixnet } =
-    context;
+  const { translate, totalBalance, info, mixnetView, reenableMixnet } = context;
   const { colors } = useTheme();
   const [selected, setSelected] = useState<StrategyOption>('none');
 

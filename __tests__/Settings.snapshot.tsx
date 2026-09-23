@@ -11,11 +11,7 @@ import {
   defaultAppContextLoaded,
   ContextAppLoadedProvider,
 } from '@app/context';
-import {
-  LanguageEnum,
-  RouteEnum,
-  BlockExplorerEnum,
-} from '@app/AppState';
+import { LanguageEnum, RouteEnum, BlockExplorerEnum } from '@app/AppState';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';

@@ -3,11 +3,7 @@ import React from 'react';
 import { Image, View } from 'react-native';
 import { useTheme } from '@app/theme';
 
-import {
-  ChainNameEnum,
-  SelectServerEnum,
-  TranslateType,
-} from '@app/AppState';
+import { ChainNameEnum, SelectServerEnum, TranslateType } from '@app/AppState';
 import InfoType from '@app/AppState/types/InfoType';
 import ZecPriceType from '@app/AppState/types/ZecPriceType';
 import BoldText from '@ui/primitives/BoldText';

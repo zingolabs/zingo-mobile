@@ -9,8 +9,7 @@ const meta: Meta<typeof CurrencyAmount> = {
     amtZec: 1.2345,
     privacy: false,
   },
-  argTypes: {
-  },
+  argTypes: {},
 };
 
 export default meta;

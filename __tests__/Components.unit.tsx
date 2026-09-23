@@ -30,55 +30,27 @@ describe('Component Components - test', () => {
   });
 
   test('CurrencyAmount - price undefined should display placeholder', () => {
-    render(
-      <CurrencyAmount
-        amtZec={1}
-        style={{}}
-      />,
-    );
+    render(<CurrencyAmount amtZec={1} style={{}} />);
     expect(screen.getByText('$ -.--')).toBeTruthy();
   });
 
   test('CurrencyAmount - price 0 should display placeholder', () => {
-    render(
-      <CurrencyAmount
-        price={0}
-        amtZec={1}
-        style={{}}
-      />,
-    );
+    render(<CurrencyAmount price={0} amtZec={1} style={{}} />);
     expect(screen.getByText('$ -.--')).toBeTruthy();
   });
 
   test('CurrencyAmount - amtZec undefined should display placeholder', () => {
-    render(
-      <CurrencyAmount
-        price={1}
-        style={{}}
-      />,
-    );
+    render(<CurrencyAmount price={1} style={{}} />);
     expect(screen.getByText('$ -.--')).toBeTruthy();
   });
 
   test('CurrencyAmount - very small amount should display < 0.01', () => {
-    render(
-      <CurrencyAmount
-        price={0.001}
-        amtZec={1}
-        style={{}}
-      />,
-    );
+    render(<CurrencyAmount price={0.001} amtZec={1} style={{}} />);
     expect(screen.getByText('$ < 0.01')).toBeTruthy();
   });
 
   test('CurrencyAmount - valid amount should display calculated value', () => {
-    render(
-      <CurrencyAmount
-        price={2.9826}
-        amtZec={1.00098}
-        style={{}}
-      />,
-    );
+    render(<CurrencyAmount price={2.9826} amtZec={1.00098} style={{}} />);
     expect(screen.getByText('$ 2.99')).toBeTruthy();
   });
 
