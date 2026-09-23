@@ -17,6 +17,7 @@ import FadeText from '@ui/primitives/FadeText';
 import RegText from '@ui/primitives/RegText';
 
 import { MenuMorphIcon } from '@ui/widgets/MenuMorphIcon';
+import { MessagesIcon as BoltIcon } from '@ui/primitives/Icons/BoltIcon';
 import XSocial from '../../assets/img/options/x.svg';
 import Github from '../../assets/img/options/github.svg';
 import Mail from '../../assets/img/options/mail.svg';
@@ -70,6 +71,8 @@ export type OptionsPanelProps = {
   };
   /** Triggered by the triple-chevron close button at top-left. */
   onClose: () => void;
+  /** Settings button at top-right, the one way into the Settings screen. */
+  onSettings?: () => void;
 };
 
 /**
@@ -84,6 +87,7 @@ const OptionsPanel: React.FC<OptionsPanelProps> = ({
   onLinkCopied,
   mode,
   onClose,
+  onSettings,
 }) => {
   const { colors } = useTheme();
   // Caption under the social row — set when the user taps X / GitHub so
@@ -150,8 +154,19 @@ const OptionsPanel: React.FC<OptionsPanelProps> = ({
         >
           <BoldText style={{ fontSize: 18 }}>{title}</BoldText>
         </View>
-        {/* Spacer matches the chevron column width so the title centers. */}
-        <View style={{ width: 27 }} />
+        {/* The Settings door. Balances the chevron column, so the title
+            stays centred whether or not the button is there. */}
+        <View style={{ width: 27, alignItems: 'flex-end' }}>
+          {onSettings && (
+            <Pressable
+              testID="header.settings"
+              onPress={onSettings}
+              hitSlop={12}
+            >
+              <BoltIcon size={25} color="#B1BBC5" />
+            </Pressable>
+          )}
+        </View>
       </View>
 
       {/* Grid of actions — 4 columns */}

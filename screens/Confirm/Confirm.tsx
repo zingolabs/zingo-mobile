@@ -83,7 +83,6 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
   const {
     info,
     translate,
-    currency,
     zecPrice,
     defaultUnifiedAddress,
     privacy,
@@ -124,11 +123,6 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
       ? route.params.proposalPools
       : { source: [], destination: [] },
   );
-  const [donationAmount, setDonationAmount] = useState<number>(
-    !!route.params && route.params.donationAmount !== undefined
-      ? route.params.donationAmount
-      : 0,
-  );
   const [sendAllAmount, setSendAllAmount] = useState<boolean>(
     !!route.params && route.params.sendAllAmount !== undefined
       ? route.params.sendAllAmount
@@ -142,8 +136,6 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
   // True when the send routes over the mixnet, so the confirm screen shows
   // the NYM styling (green outline, processing title, enhanced-privacy tag,
   // warning banner).
-  const nym: boolean =
-    !!route.params && route.params.nym !== undefined ? route.params.nym : false;
 
   const [containerH, setContainerH] = useState<number>(0);
   const [headerH, setHeaderH] = useState<number>(0);
@@ -216,10 +208,6 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
       !!route.params && route.params.proposalPools !== undefined
         ? route.params.proposalPools
         : { source: [], destination: [] };
-    const _donationAmount =
-      !!route.params && route.params.donationAmount !== undefined
-        ? route.params.donationAmount
-        : 0;
     const _sendAllAmount =
       !!route.params && route.params.sendAllAmount !== undefined
         ? route.params.sendAllAmount
@@ -235,7 +223,6 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     );
     setCalculatedFee(_calculatedFee);
     setProposalPools(_proposalPools);
-    setDonationAmount(_donationAmount);
     setSendAllAmount(_sendAllAmount);
     setSendPageState(_sendPageState);
     setMemoTotal(_memoTotal);
@@ -244,7 +231,6 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     route.params,
     route.params?.calculatedFee,
     route.params?.proposalPools,
-    route.params?.donationAmount,
     route.params?.sendAllAmount,
     sendPageState,
     sendPageState.toaddr.memo,
@@ -260,10 +246,9 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
   useEffect(() => {
     const sendingTot =
       Utils.parseStringLocaleToNumberFloat(sendPageState.toaddr.amount) +
-      calculatedFee +
-      donationAmount;
+      calculatedFee;
     setSendingTotal(sendingTot);
-  }, [calculatedFee, donationAmount, sendPageState.toaddr.amount]);
+  }, [calculatedFee, sendPageState.toaddr.amount]);
 
   useEffect(() => {
     calculateFeeWithPropose(
@@ -289,7 +274,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
           }}
         >
           <Button
-            type={nym ? ButtonTypeEnum.Nym : ButtonTypeEnum.Primary}
+            type={ButtonTypeEnum.Nym}
             title={
               sendAllAmount
                 ? (translate('send.confirm-button-all') as string)
@@ -301,7 +286,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
       </BottomSheetFooter>
     ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [colors, nym, sendAllAmount, translate],
+    [colors, sendAllAmount, translate],
   );
 
   if (!authPassed) {
@@ -359,15 +344,13 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                 padding: 10,
                 borderWidth: 1,
                 borderRadius: 10,
-                borderColor: nym ? '#07FF94' : colors.borderMuted,
+                borderColor: '#07FF94',
               }}
             >
               <RegText
                 style={{ textAlign: 'center', textTransform: 'capitalize' }}
               >
-                {nym
-                  ? (translate('send.nym-processing-title') as string)
-                  : (translate('send.sending-title') as string)}
+                {translate('send.nym-processing-title') as string}
               </RegText>
 
               <ZecAmount
@@ -382,7 +365,6 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                   amtZec={sendingTotal}
                   price={zecPrice.zecPrice}
                   priceDate={zecPrice.date}
-                  currency={currency}
                   privacy={false}
                 />
               )}
@@ -407,11 +389,9 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                   ) : (
                     <RegText>{privacyLevel}</RegText>
                   )}
-                  {nym && (
-                    <RegText style={{ color: '#07FF94' }}>
-                      {translate('send.nym-enhanced') as string}
-                    </RegText>
-                  )}
+                  <RegText style={{ color: '#07FF94' }}>
+                    {translate('send.nym-enhanced') as string}
+                  </RegText>
                 </View>
               </View>
             </View>
@@ -438,7 +418,6 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                   amtZec={calculatedFee}
                   price={zecPrice.zecPrice}
                   priceDate={zecPrice.date}
-                  currency={currency}
                   privacy={privacy}
                 />
               )}
@@ -454,38 +433,6 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                     withIcon={true}
                     znsAlias={to.znsAlias}
                   />
-
-                  {donationAmount > 0 && (
-                    <>
-                      <FadeText style={{ marginTop: 10 }}>
-                        {translate('send.confirm-donation') as string}
-                      </FadeText>
-                      <View
-                        style={{
-                          display: 'flex',
-                          flexDirection: 'row',
-                          justifyContent: 'space-between',
-                        }}
-                      >
-                        <ZecAmount
-                          currencyName={info.currencyName}
-                          size={14}
-                          amtZec={donationAmount}
-                          privacy={privacy}
-                        />
-                        {isMainChain && (
-                          <CurrencyAmount
-                            style={{ fontSize: 18 }}
-                            amtZec={donationAmount}
-                            price={zecPrice.zecPrice}
-                            priceDate={zecPrice.date}
-                            currency={currency}
-                            privacy={privacy}
-                          />
-                        )}
-                      </View>
-                    </>
-                  )}
 
                   <FadeText style={{ marginTop: 10 }}>
                     {translate('send.confirm-amount') as string}
@@ -509,7 +456,6 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                         amtZec={Utils.parseStringLocaleToNumberFloat(to.amount)}
                         price={zecPrice.zecPrice}
                         priceDate={zecPrice.date}
-                        currency={currency}
                         privacy={privacy}
                       />
                     )}
@@ -527,29 +473,27 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                 </View>
               );
             })}
-            {nym && (
-              <View
-                style={{
-                  margin: 10,
-                  padding: 10,
-                  borderWidth: 1,
-                  borderRadius: 10,
-                  borderColor: '#07FF94',
-                  backgroundColor: '#07252B',
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                }}
-              >
-                <TriangleAlert
-                  size={20}
-                  color={'#07FF94'}
-                  style={{ marginRight: 6 }}
-                />
-                <RegText style={{ flex: 1, fontSize: 13, color: '#87919B' }}>
-                  {translate('send.nym-warning') as string}
-                </RegText>
-              </View>
-            )}
+            <View
+              style={{
+                margin: 10,
+                padding: 10,
+                borderWidth: 1,
+                borderRadius: 10,
+                borderColor: '#07FF94',
+                backgroundColor: '#07252B',
+                flexDirection: 'row',
+                alignItems: 'center',
+              }}
+            >
+              <TriangleAlert
+                size={20}
+                color={'#07FF94'}
+                style={{ marginRight: 6 }}
+              />
+              <RegText style={{ flex: 1, fontSize: 13, color: '#87919B' }}>
+                {translate('send.nym-warning') as string}
+              </RegText>
+            </View>
             <View style={{ marginBottom: 30 }} />
           </BottomSheetScrollView>
         </AppSheet>

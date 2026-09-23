@@ -27,7 +27,6 @@ export default interface AppStateLoading {
   biometricGate: BiometricGateOutcome;
   startingApp: boolean;
   serverErrorTries: number;
-  donationAlert: boolean;
   firstLaunchingMessage: LaunchingModeEnum;
   hasRecoveryWalletInfoSaved: boolean;
 }

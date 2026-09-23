@@ -32,8 +32,6 @@
   "support": "Send Email",
   "view-error": "View/Report Error",
   "menudrawer-acc": "Open Menu Drawer",
-  "donation": "Donation to Zingo!\nThanks for supporting ZingoLabs!",
-  "zenny-tips-ab": "Zenny Tips",
   "restarting": "Error connecting to the Server, the App will restart in a few seconds.",
   "change-privacy": "New privacy policy: ",
   "email": "support@zingolabs.org",
@@ -155,8 +153,6 @@
     "alert-newwallet-body": "Can you confirm that you really want to create a new wallet and lose access to the current wallet.",
     "serverfirsttry": "An error occurred while trying to connect to the above server, currently checking the servers on the list.",
     "serversecondtry": "It doesn't seem to be a problem with the server. Someting else is happening.",
-    "alert-donation-title": "TIP ZINGOLABS",
-    "alert-donation-body": "Do you want to help ZingoLabs make Zcash more useful? Opt in to tip one Zenny (0.01 ZEC) to ZingoLabs with each transaction! If so, press confirm, otherwise press Cancel.",
     "recoverkeys": "Recover last Keys used",
     "recoverkeysinstall": "Recovered the last Keys used in this device:",
     "customserver-unreachable": "Your custom server didn't respond and the wallet returned an error. Open Settings to choose a different one or retry later.",
@@ -243,16 +239,6 @@
         "text": "Download all memos in the blockchain. Server will not learn what TxIDs belong to you. This consumes A LOT of bandwidth."
       }
     ],
-    "currencies": [
-      {
-        "value": "",
-        "text": "No fetching any price for any currency, only ZEC."
-      },
-      {
-        "value": "USD",
-        "text": "You can fetch the price for US Dollars from internet."
-      }
-    ],
     "languages": [
       {
         "value": "en",
@@ -275,26 +261,6 @@
         "text": "All the information will be in Turkish."
       }
     ],
-    "sendalls": [
-      {
-        "value": true,
-        "text": "Enable the 'MAX' button to fill the amount with your entire wallet balance."
-      },
-      {
-        "value": false,
-        "text": "Disable the sending all button because could be a risk to have it."
-      }
-    ],
-    "donations": [
-      {
-        "value": true,
-        "text": "Tip ZingoLabs a Zenny (0.01 ZEC) in every transaction."
-      },
-      {
-        "value": false,
-        "text": "Don't pay to incentivize a more secure system."
-      }
-    ],
     "privacys": [
       {
         "value": true,
@@ -313,16 +279,6 @@
       {
         "value": "advanced",
         "text": "Advanced Mode, for the advanced user."
-      }
-    ],
-    "rescanmenus": [
-      {
-        "value": true,
-        "text": "Enable/Show the menu option to rescan the wallet."
-      },
-      {
-        "value": false,
-        "text": "Disable/Hide the menu option to rescan the wallet."
       }
     ],
     "recoverywalletinfoondevices": [
@@ -397,26 +353,16 @@
     "value-memo-none": "none",
     "value-memo-wallet": "wallet",
     "value-memo-all": "all",
-    "currency-title": "Currency Price",
     "language-title": "Language",
     "islanguage": "You need to choose a language to save.",
-    "sendall-title": "Enable sending all funds",
-    "donation-title": "Tip ZingoLabs",
-    "privacy-title": "High Privacy",
+    "privacy-title": "Hide Sensitive Values",
     "mode-title": "Switch between Basic or Advanced Mode",
-    "rescanmenu-title": "Show Rescan Button",
     "recoverywalletinfoondevice-title": "Store Wallet Recovery Info",
     "performancelevel-title": "Zingolib Performance Level",
     "blockexplorer-title": "Block Explorer",
-    "value-currency-": "No currency",
-    "value-currency-USD": "US Dollar",
     "value-language-en": "English",
     "value-language-es": "Spanish",
     "value-language-pt": "Portuguese",
-    "value-sendall-true": "Enable",
-    "value-sendall-false": "Disable",
-    "value-donation-true": "Yes",
-    "value-donation-false": "No",
     "value-privacy-true": "High",
     "value-privacy-false": "Normal",
     "privacy": "Priv: ",
@@ -429,8 +375,6 @@
     "value-chainname-none": "None",
     "server-chain-title": "Network",
     "select-chain-placeholder": "Select a Network...",
-    "value-rescanmenu-true": "Enable",
-    "value-rescanmenu-false": "Disable",
     "value-recoverywalletinfoondevice-true": "Enable",
     "value-recoverywalletinfoondevice-false": "Disable",
     "value-performancelevel-Maximum": "Maximum",
@@ -441,7 +385,7 @@
     "value-blockexplorer-Cipherscan": "Cipherscan",
     "value-blockexplorer-Zexplorer": "Zexplorer",
     "value-blockexplorer-None": "None",
-    "security-title": "Apply Device Security",
+    "security-title": "Biometric/PIN",
     "security-all": "All",
     "security-some": "Some",
     "security-none": "None",
@@ -472,9 +416,7 @@
     "walletkeyssaved": "The last Wallet Recovery Info stored safely in the device.",
     "walletkeyswarning": "This is an experimental feature, that depends on the security of unaudited code to store your seed-phrase. Please do not use it with seeds that control significant funds!",
     "value-language-tr": "Turkish",
-    "nym-disable-warning": "Turning off Mixnet Mode routes your transactions over the clearnet and links your activity to your IP address.",
     "nym-network": "NYM Mixnet",
-    "nym-enhanced-privacy": "Enhanced Privacy",
     "nym-diagnostics": "Run mixnet diagnostics"
   },
   "mixnet": {
@@ -485,7 +427,8 @@
       "died": "Mixnet connection lost",
       "unknown": "Mixnet unavailable"
     },
-    "reenable": "Re-enable mixnet"
+    "reenable": "Re-enable mixnet",
+    "reconnecting": "Reconnecting to mixnet…"
   },
   "mixnetdoctor": {
     "title": "Mixnet Doctor",
@@ -493,6 +436,7 @@
     "intro": "Tests whether the mixnet is reachable from your device using your real IP address.",
     "run": "Run diagnostics",
     "running": "Running…",
+    "attaching": "The app is still connecting to the mixnet. Until the transport attaches it reports as lost, so this run is not a verdict yet.",
     "copy-report": "Copy report",
     "report-copied": "Report copied to clipboard"
   },
@@ -620,11 +564,10 @@
     "deshielded": "Deshielded",
     "lose-address-title": "SELECT A NEW ADDRESS",
     "lose-address-alert": "You already have a valid address in the address field. Do you want to replace it?",
-    "confirm-donation": "Donation",
-    "donation-minimum-message": "The minimum amount for donations is a Zenny (0.01 ZEC), Try again and Thanks.",
     "nym-processing-title": "Processing via NYM",
     "nym-enhanced": "NYM Enhanced",
-    "nym-warning": "This transaction will be routed through the NYM mixnet for enhanced privacy. This may take slightly longer than standard transactions."
+    "nym-warning": "This transaction will be routed through the NYM mixnet for enhanced privacy. This may take slightly longer than standard transactions.",
+    "nym-blocked": "Sends travel the NYM mixnet. Waiting for it."
   },
   "receive": {
     "u-title": "Shielded",
@@ -1096,7 +1039,5 @@
     "oneentry": "URI Should have at least 1 entry",
     "memo-too-long": "Memo too long in parameter",
     "error-http-not-allowed": "Error: Plain HTTP is only allowed for localhost. Use HTTPS for remote servers."
-  },
-  "donation-button": "Donate To ZingoLabs ",
-  "donation-legend": "You are donating to ZingoLabs activately, Thanks"
+  }
 }

@@ -5,8 +5,6 @@
 jest.mock('@app/RPCModule', () => ({
   default: {
     parseAddressInfo: jest.fn(),
-    getDonationAddress: jest.fn(),
-    getZenniesDonationAddress: jest.fn(),
   },
 }));
 

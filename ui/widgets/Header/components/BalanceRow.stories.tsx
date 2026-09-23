@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
-import { CurrencyEnum, ModeEnum, SelectServerEnum } from '@app/AppState';
+import { ModeEnum, SelectServerEnum } from '@app/AppState';
 import BalanceRow from './BalanceRow';
 import {
   mockTranslate,
@@ -27,7 +27,6 @@ const meta: Meta<typeof BalanceRow> = {
     translate: mockTranslate,
     totalBalance: mockTotalBalance,
     info: mockInfo,
-    currency: CurrencyEnum.USDCurrency,
     zecPrice: mockZecPrice,
     selectServer: SelectServerEnum.auto,
     showShieldButton: false,

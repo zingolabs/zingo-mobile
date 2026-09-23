@@ -47,7 +47,6 @@ type AbSummaryLineProps = {
     chain: ChainNameEnum,
     swapChain: string,
   ) => void;
-  addressProtected?: boolean;
 };
 const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
   index,
@@ -55,7 +54,6 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
   openAbDetail,
   handleScrollToTop,
   doAction,
-  addressProtected,
 }) => {
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const context = useContext(ContextAppLoaded);
@@ -80,9 +78,8 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
 
   // Every contact carries a chain badge — the Zcash mark for external ZEC
   // contacts, the chain logo for non-ZEC ones. The wallet's own addresses
-  // (tags) and protected internal entries (e.g. the Zennies tip address) show
-  // the bare icon with nothing beside it.
-  const showChainBadge = !item.own && !addressProtected;
+  // (tags) show the bare icon with nothing beside it.
+  const showChainBadge = !item.own;
 
   const onPressDelete = () => {
     showConfirm({
@@ -132,10 +129,8 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
         >
           <TouchableOpacity
             onPress={() => {
-              if (!addressProtected) {
-                openAbDetail(index, AddressBookActionEnum.Modify);
-                handleScrollToTop();
-              }
+              openAbDetail(index, AddressBookActionEnum.Modify);
+              handleScrollToTop();
             }}
           >
             <View
@@ -158,7 +153,7 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
                   size={28}
                   icon={item.own ? faWallet : faAddressCard}
                   color={
-                    addressProtected || item.own
+                    item.own
                       ? colors.fgMuted
                       : item.color
                         ? item.color
@@ -192,7 +187,7 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
                 style={{
                   fontSize: 18,
                   marginHorizontal: 10,
-                  color: addressProtected ? colors.fgMuted : colors.fgAccent,
+                  color: colors.fgAccent,
                   opacity: 1,
                   fontWeight: 'bold',
                 }}
@@ -220,33 +215,30 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
             </View>
           </TouchableOpacity>
         </View>
-        {!addressProtected && (
-          <View
-            style={{
-              width: 50,
-              justifyContent: 'center',
-              alignItems: 'center',
+        <View
+          style={{
+            width: 50,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <TouchableOpacity
+            style={{ zIndex: 999, padding: 10 }}
+            onPress={() => {
+              openAbDetail(index, AddressBookActionEnum.Modify);
+              handleScrollToTop();
             }}
           >
-            <TouchableOpacity
-              style={{ zIndex: 999, padding: 10 }}
-              onPress={() => {
-                openAbDetail(index, AddressBookActionEnum.Modify);
-                handleScrollToTop();
-              }}
-            >
-              <FontAwesomeIcon
-                style={{ opacity: 0.8 }}
-                size={20}
-                icon={faPencil}
-                color={colors.fgDefault}
-              />
-            </TouchableOpacity>
-          </View>
-        )}
+            <FontAwesomeIcon
+              style={{ opacity: 0.8 }}
+              size={20}
+              icon={faPencil}
+              color={colors.fgDefault}
+            />
+          </TouchableOpacity>
+        </View>
         {!readOnly &&
           selectServer !== SelectServerEnum.offline &&
-          !addressProtected &&
           // The wallet can only send to Zcash addresses — hide the send action
           // for non-ZEC (swap) contacts.
           item.swapChain === GlobalConst.zecSwapChain &&
@@ -285,27 +277,25 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
               </TouchableOpacity>
             </View>
           )}
-        {!addressProtected && (
-          <View
-            style={{
-              width: 50,
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
+        <View
+          style={{
+            width: 50,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <TouchableOpacity
+            style={{ zIndex: 999, padding: 10 }}
+            onPress={() => onPressDelete()}
           >
-            <TouchableOpacity
-              style={{ zIndex: 999, padding: 10 }}
-              onPress={() => onPressDelete()}
-            >
-              <FontAwesomeIcon
-                style={{ opacity: 0.8 }}
-                size={20}
-                icon={faTrashCan}
-                color={colors.fgDefault}
-              />
-            </TouchableOpacity>
-          </View>
-        )}
+            <FontAwesomeIcon
+              style={{ opacity: 0.8 }}
+              size={20}
+              icon={faTrashCan}
+              color={colors.fgDefault}
+            />
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );

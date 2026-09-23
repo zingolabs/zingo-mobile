@@ -292,17 +292,6 @@ export async function getWalletKind(): Promise<FfiResult<string>> {
   return callFfi(RPCModule.walletKindInfo());
 }
 
-// Returns the ZingoLabs donation unified address (mainnet only — caller
-// must gate by chain). The bridge returns a freshly-generated UA every time.
-export async function getDonationAddress(): Promise<FfiResult<string>> {
-  return callFfi(RPCModule.getDonationAddress());
-}
-
-// Same as `getDonationAddress` but for the Zennies-for-Zingo wallet.
-export async function getZenniesDonationAddress(): Promise<FfiResult<string>> {
-  return callFfi(RPCModule.getZenniesDonationAddress());
-}
-
 // Pre-calculates the fee and validates a send without broadcasting. Mirrors
 // the native `sendProcess` (propose phase). `proposeJson` is a stringified
 // SendJson zingolib expects, with recipients/amounts/memos.
@@ -310,6 +299,19 @@ export async function sendPropose(
   proposeJson: string,
 ): Promise<FfiResult<string>> {
   return callFfi(RPCModule.sendProcess(proposeJson));
+}
+
+// The propose phase of a MAX send, mirroring the native `sendAllProcess`. The
+// amount `getSpendableBalanceWithAddress` reports is sized by zingolib's
+// send-max proposal, which an ordinary `sendPropose` request can be refused
+// for, so the whole balance travels this way instead. The success value is raw
+// JSON (parseable as RPCSendProposeType) and carries `amount`: what the
+// recipient really receives, for the caller to show. `memo` is '' when none.
+export async function sendAllPropose(
+  address: string,
+  memo: string,
+): Promise<FfiResult<string>> {
+  return callFfi(RPCModule.sendAllProcess(address, memo));
 }
 
 // Plans the immediate Orchard -> Ironwood drain without broadcasting. Mirrors
@@ -460,15 +462,14 @@ export async function cancelIronwoodMigration(): Promise<FfiResult<string>> {
 }
 
 // Returns the spendable balance that could be sent to `address` right now,
-// honoring privacy levels and donation flags. The success value is raw JSON
-// (parseable as RPCSpendablebalanceType).
+// honoring privacy levels. The success value is raw JSON (parseable as
+// RPCSpendablebalanceType). The bridge still takes the Zennies-for-Zingo flag
+// that zingolib has not dropped yet; the App no longer sends donations, so it
+// is always off.
 export async function getSpendableBalanceWithAddress(
   address: string,
-  zennies: string,
 ): Promise<FfiResult<string>> {
-  return callFfi(
-    RPCModule.getSpendableBalanceWithAddressInfo(address, zennies),
-  );
+  return callFfi(RPCModule.getSpendableBalanceWithAddressInfo(address));
 }
 
 // Validates and classifies a Zcash address. The success value is raw JSON

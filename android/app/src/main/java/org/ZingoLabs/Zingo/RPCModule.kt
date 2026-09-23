@@ -972,10 +972,10 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
-    fun getSpendableBalanceWithAddressInfo(address: String, zennies: String, promise: Promise) {
+    fun getSpendableBalanceWithAddressInfo(address: String, promise: Promise) {
         FfiOutcome.settling(promise, "get_spendable_balance_with_address") {
             uniffi.zingo.initLogging()
-            uniffi.zingo.getSpendableBalanceWithAddress(address, zennies)
+            uniffi.zingo.getSpendableBalanceWithAddress(address)
         }
     }
 
@@ -1080,6 +1080,14 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         FfiOutcome.settling(promise, "send") {
             uniffi.zingo.initLogging()
             uniffi.zingo.send(send_json)
+        }
+    }
+
+    @ReactMethod
+    fun sendAllProcess(address: String, memo: String, promise: Promise) {
+        FfiOutcome.settling(promise, "send_all") {
+            uniffi.zingo.initLogging()
+            uniffi.zingo.sendAll(address, memo)
         }
     }
 

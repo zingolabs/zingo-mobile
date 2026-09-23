@@ -38,7 +38,6 @@ const makeCtx = (over?: Partial<Ctx>): Ctx => ({
   ...defaultAppContextLoaded,
   translate: (k: string) => k,
   zecPrice: { zecPrice: 0, date: 0 },
-  nym: true,
   info: mockInfo,
   selectServer: SelectServerEnum.auto,
   mixnetView: READY_VIEW,
@@ -269,16 +268,4 @@ test('rapid app hops inside the cooldown do not multiply fetches', async () => {
   await flush();
 
   expect(price).toHaveBeenCalledTimes(1);
-});
-
-test('the Nym toggle off leaves the price surface on the ready mixnet', async () => {
-  jest.useFakeTimers();
-  price.mockResolvedValue({ price: 42, error: '' });
-  const setZecPrice = jest.fn();
-  seedDeps(setZecPrice);
-
-  render(fetcherUi(makeCtx({ nym: false }), setZecPrice));
-  await jest.advanceTimersByTimeAsync(0);
-
-  expect(setZecPrice).toHaveBeenCalledWith(42, expect.any(Number));
 });

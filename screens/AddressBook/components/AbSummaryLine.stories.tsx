@@ -16,7 +16,6 @@ const meta: Meta<typeof AbSummaryLine> = {
     openAbDetail: () => {},
     handleScrollToTop: () => {},
     doAction: () => {},
-    addressProtected: false,
   },
 };
 
@@ -24,4 +23,3 @@ export default meta;
 type Story = StoryObj<typeof AbSummaryLine>;
 
 export const Default: Story = {};
-export const Protected: Story = { args: { addressProtected: true } };

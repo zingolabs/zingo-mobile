@@ -43,7 +43,6 @@ export const NymSheetConnecting: Story = {
     withAppContext({
       info: mockInfo,
       totalBalance: mockTotalBalance,
-      nym: true,
       mixnetView: mixnetConnecting,
     }),
   ],
@@ -56,7 +55,6 @@ export const NymSheetLost: Story = {
     withAppContext({
       info: mockInfo,
       totalBalance: mockTotalBalance,
-      nym: true,
       mixnetView: mixnetLost,
     }),
   ],

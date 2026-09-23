@@ -31,7 +31,6 @@ import { AddressBookActionEnum } from './enums/AddressBookActionEnum';
 import { MenuItemEnum } from './enums/MenuItemEnum';
 import { LanguageEnum } from './enums/LanguageEnum';
 import { ModeEnum } from './enums/ModeEnum';
-import { CurrencyEnum } from './enums/CurrencyEnum';
 import { SelectServerEnum } from './enums/SelectServerEnum';
 import { ChainNameEnum } from './enums/ChainNameEnum';
 import { SnackbarDurationEnum } from './enums/SnackbarDurationEnum';
@@ -88,7 +87,6 @@ export {
   MenuItemEnum,
   LanguageEnum,
   ModeEnum,
-  CurrencyEnum,
   SelectServerEnum,
   ChainNameEnum,
   SnackbarDurationEnum,

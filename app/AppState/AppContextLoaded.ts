@@ -13,7 +13,6 @@ import ServerType from './types/ServerType';
 import SecurityType from './types/SecurityType';
 
 import { LanguageEnum } from './enums/LanguageEnum';
-import { CurrencyEnum } from './enums/CurrencyEnum';
 import { ModeEnum } from './enums/ModeEnum';
 import { SelectServerEnum } from './enums/SelectServerEnum';
 import { ChainNameEnum } from './enums/ChainNameEnum';
@@ -118,9 +117,6 @@ export default interface AppContextLoaded {
   // fetch the ZEC price in USD
   setZecPrice: (p: number, d: number) => void;
 
-  // donation address
-  zenniesDonationAddress: string;
-
   // zingolib Version
   zingolibVersion: string;
 
@@ -129,10 +125,7 @@ export default interface AppContextLoaded {
 
   // settings
   server: ServerType;
-  currency: CurrencyEnum;
   language: LanguageEnum;
-  sendAll: boolean;
-  donation: boolean;
   privacy: boolean;
   mode: ModeEnum;
   security: SecurityType;
@@ -142,19 +135,15 @@ export default interface AppContextLoaded {
   // wallet / unknown. Used to decide, on a server change, whether to open the
   // wallet directly or launch a chain switch.
   walletChainName: ChainNameEnum;
-  rescanMenu: boolean;
   recoveryWalletInfoOnDevice: boolean;
   performanceLevel: RPCPerformanceLevelEnum;
   blockExplorer: BlockExplorerEnum;
   // The persisted send-route preference; the transport runs either way.
-  nym: boolean;
-  setNymOption: (value: boolean) => Promise<void>;
 
   // Null where the mixnet policy does not run.
   mixnetView: MixnetView | null;
   reenableMixnet: () => Promise<void>;
   setModeOption: (value: string) => Promise<void>;
-  setCurrencyOption: (value: CurrencyEnum) => Promise<void>;
 
   // Monotonically increasing counter incremented every time the app
   // returns from background/inactive to active. Protected screens

@@ -31,7 +31,16 @@ export class TransactionService {
     return this.inSend;
   }
 
-  async sendTransaction(sendJson: Array<SendJsonToTypeType>): Promise<string> {
+  // `sendAll` routes the propose phase through the native `sendAllProcess`
+  // (zingolib's `propose_send_all`) instead of `sendProcess`. The amount the
+  // Send screen shows as the maximum is sized by a send-max proposal, and an
+  // ordinary send request for it can be refused by the input selector, so the
+  // whole balance only goes out this way. The confirm phase is the same for
+  // both: the proposal is already stored.
+  async sendTransaction(
+    sendJson: Array<SendJsonToTypeType>,
+    sendAll: boolean = false,
+  ): Promise<string> {
     const sendTxPromise = new Promise<string>(async (resolve, reject) => {
       await this.syncCoordinator.clearTimers();
       this.setInSend(true);
@@ -43,9 +52,12 @@ export class TransactionService {
         // sendProcess and confirmProcess reject on failure (typed FFI
         // errors); the catch owns that path. Only an empty resolution — a
         // programming error — is classified here.
-        const proposeStr: string = await RPCModule.sendProcess(
-          JSON.stringify(sendJson),
-        );
+        const proposeStr: string = sendAll
+          ? await RPCModule.sendAllProcess(
+              sendJson[0].address,
+              sendJson[0].memo ?? '',
+            )
+          : await RPCModule.sendProcess(JSON.stringify(sendJson));
         if (!proposeStr) {
           console.log('Internal Error propose');
           sendError = 'Error: Internal RPC Error: propose';

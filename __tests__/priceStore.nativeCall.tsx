@@ -47,7 +47,6 @@ const makeCtx = (over?: Partial<Ctx>): Ctx => ({
   ...defaultAppContextLoaded,
   translate: (k: string) => k,
   zecPrice: { zecPrice: 0, date: 0 },
-  nym: true,
   info: mockInfo,
   selectServer: SelectServerEnum.auto,
   mixnetView: READY_VIEW,

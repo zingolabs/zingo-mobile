@@ -79,10 +79,8 @@ const ValueTransferDetail: React.FunctionComponent<
     privacy,
     addLastSnackbar,
     server,
-    currency,
     addressBook,
     addresses,
-    zenniesDonationAddress,
     setBackgroundError,
     netInfo,
     selectServer,
@@ -115,7 +113,6 @@ const ValueTransferDetail: React.FunctionComponent<
   const [spendColor, setSpendColor] = useState<string>(colors.fgAccentDisabled);
   const [expandTxid, setExpandTxid] = useState<boolean>(false);
   const [showNavigator, setShowNavigator] = useState<boolean>(true);
-  const [addressProtected, setAddressProtected] = useState<boolean>(true);
   const [containerH, setContainerH] = useState<number>(0);
   const [headerH, setHeaderH] = useState<number>(0);
   const isTheFirstMount = useRef(true);
@@ -228,17 +225,6 @@ const ValueTransferDetail: React.FunctionComponent<
     valueTransfer.status,
   ]);
 
-  useEffect(() => {
-    (async () => {
-      setAddressProtected(
-        await isAddressProtected(
-          valueTransfer.address ? valueTransfer.address : '',
-        ),
-      );
-    })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [valueTransfer.address]);
-
   const handleTxIDClick = async (txid?: string) => {
     if (!txid) {
       return;
@@ -291,12 +277,6 @@ const ValueTransferDetail: React.FunctionComponent<
         )
       : [];
     return address.length >= 1;
-  };
-
-  const isAddressProtected: (add: string) => Promise<boolean> = async (
-    add: string,
-  ) => {
-    return zenniesDonationAddress === add;
   };
 
   const moveValueTransferDetail = (indexParm: number, typeParm: number) => {
@@ -572,7 +552,6 @@ const ValueTransferDetail: React.FunctionComponent<
                 <CurrencyAmount
                   price={valueTransfer.zecPrice}
                   amtZec={valueTransfer.amount}
-                  currency={currency}
                   privacy={privacy}
                 />
               )}
@@ -872,7 +851,6 @@ const ValueTransferDetail: React.FunctionComponent<
                   screenName={screenName}
                   withIcon={true}
                   withSendIcon={true}
-                  addressProtected={addressProtected}
                 />
               </View>
             )}
@@ -929,7 +907,6 @@ const ValueTransferDetail: React.FunctionComponent<
                     <CurrencyAmount
                       price={valueTransfer.zecPrice}
                       amtZec={valueTransfer.amount}
-                      currency={currency}
                       privacy={privacy}
                     />
                   )}

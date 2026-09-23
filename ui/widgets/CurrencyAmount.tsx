@@ -5,14 +5,12 @@ import { useTheme } from '@app/theme';
 import { getNumberFormatSettings } from 'react-native-localize';
 
 import Utils from '@app/utils';
-import { CurrencyEnum } from '@app/AppState';
 import { usePriceHealth } from './priceFetcherStore';
 
 type CurrencyAmountProps = {
   price?: number;
   amtZec?: number;
   style?: TextStyle;
-  currency: CurrencyEnum;
   privacy?: boolean;
   selectable?: boolean;
   // The live price's date: a conversion older than the stale threshold
@@ -24,7 +22,6 @@ const CurrencyAmount: React.FunctionComponent<CurrencyAmountProps> = ({
   price,
   style,
   amtZec,
-  currency,
   privacy,
   selectable,
   priceDate,
@@ -74,42 +71,38 @@ const CurrencyAmount: React.FunctionComponent<CurrencyAmountProps> = ({
     setTimeout(() => setPrivacyHigh(true), 5 * 1000);
   };
 
-  if (currency === CurrencyEnum.USDCurrency) {
-    return (
-      <View style={{ flexDirection: 'row', alignItems: 'baseline' }}>
-        <TouchableOpacity disabled={!privacyHigh} onPress={onPress}>
-          <View style={{ flexDirection: 'row', alignItems: 'baseline' }}>
-            {privacyHigh ? (
-              <Text
-                style={{
-                  color: baseColor,
-                  fontSize: 20,
-                  fontWeight: '700',
-                  ...style,
-                }}
-              >
-                {'$ -' + decimalSeparator + '--'}
-              </Text>
-            ) : (
-              <Text
-                style={{
-                  color: baseColor,
-                  fontSize: 20,
-                  fontWeight: '700',
-                  ...style,
-                }}
-                selectable={selectable}
-              >
-                {'$ ' + currencyString}
-              </Text>
-            )}
-          </View>
-        </TouchableOpacity>
-      </View>
-    );
-  } else {
-    return null;
-  }
+  return (
+    <View style={{ flexDirection: 'row', alignItems: 'baseline' }}>
+      <TouchableOpacity disabled={!privacyHigh} onPress={onPress}>
+        <View style={{ flexDirection: 'row', alignItems: 'baseline' }}>
+          {privacyHigh ? (
+            <Text
+              style={{
+                color: baseColor,
+                fontSize: 20,
+                fontWeight: '700',
+                ...style,
+              }}
+            >
+              {'$ -' + decimalSeparator + '--'}
+            </Text>
+          ) : (
+            <Text
+              style={{
+                color: baseColor,
+                fontSize: 20,
+                fontWeight: '700',
+                ...style,
+              }}
+              selectable={selectable}
+            >
+              {'$ ' + currencyString}
+            </Text>
+          )}
+        </View>
+      </TouchableOpacity>
+    </View>
+  );
 };
 
 export default CurrencyAmount;

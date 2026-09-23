@@ -200,8 +200,7 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
   nymSheetOpen,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, totalBalance, info, nym, setNymOption, mixnetView } =
-    context;
+  const { translate, totalBalance, info, mixnetView, reenableMixnet } = context;
   const { colors } = useTheme();
   const [selected, setSelected] = useState<StrategyOption>('none');
 
@@ -365,13 +364,11 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
                 closeMigration();
                 return;
               }
-              if (nym) {
-                if (nymGate.kind === 'ready') {
-                  startMigration();
-                  return;
-                }
-                setEnabling(true);
+              if (nymGate.kind === 'ready') {
+                startMigration();
+                return;
               }
+              setEnabling(true);
               nymSheetRef.current?.present();
             }}
             twoButtons={true}
@@ -388,9 +385,11 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
           nymSheetRef.current?.dismiss();
           startMigration();
         }}
+        // The transport is always meant to be up, so the gate's action is
+        // to restart a dead one rather than to opt in.
         onEnable={() => {
           setEnabling(true);
-          setNymOption(true);
+          reenableMixnet();
         }}
       />
     </>

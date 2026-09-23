@@ -6,7 +6,6 @@ import BackgroundErrorType from './types/BackgroundErrorType';
 import ServerType from './types/ServerType';
 import SecurityType from './types/SecurityType';
 
-import { CurrencyEnum } from './enums/CurrencyEnum';
 import { LanguageEnum } from './enums/LanguageEnum';
 import { ModeEnum } from './enums/ModeEnum';
 import { SelectServerEnum } from './enums/SelectServerEnum';
@@ -32,15 +31,11 @@ export default interface AppContextLoading {
 
   // context settings
   server: ServerType;
-  currency: CurrencyEnum;
   language: LanguageEnum;
-  sendAll: boolean;
-  donation: boolean;
   privacy: boolean;
   mode: ModeEnum;
   security: SecurityType;
   selectServer: SelectServerEnum;
-  rescanMenu: boolean;
   recoveryWalletInfoOnDevice: boolean;
   performanceLevel: RPCPerformanceLevelEnum;
   blockExplorer: BlockExplorerEnum;

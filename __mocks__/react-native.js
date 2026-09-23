@@ -50,9 +50,9 @@ jest.mock('react-native', () => {
     getConfigWalletPerformanceInfo: jest.fn(() => '{}'),
     getWalletVersionInfo: jest.fn(() => '{}'),
     sendProcess: jest.fn(() => '{}'),
+    sendAllProcess: jest.fn(() => '{}'),
     shieldProcess: jest.fn(() => '{}'),
     confirmProcess: jest.fn(() => '{}'),
-    getZenniesDonationAddress: jest.fn(() => '{}'),
   };
   RN.NativeModules.ScreenSecurity = {
     setSecure: jest.fn(() => Promise.resolve(true)),

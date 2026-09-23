@@ -3,12 +3,7 @@ import React from 'react';
 import { Image, View } from 'react-native';
 import { useTheme } from '@app/theme';
 
-import {
-  ChainNameEnum,
-  CurrencyEnum,
-  SelectServerEnum,
-  TranslateType,
-} from '@app/AppState';
+import { ChainNameEnum, SelectServerEnum, TranslateType } from '@app/AppState';
 import InfoType from '@app/AppState/types/InfoType';
 import ZecPriceType from '@app/AppState/types/ZecPriceType';
 import BoldText from '@ui/primitives/BoldText';
@@ -19,7 +14,6 @@ const zcashLogo = require('../../../../assets/img/zcash-yellow.png');
 
 type PriceRowProps = {
   translate: (key: string) => TranslateType;
-  currency: CurrencyEnum;
   zecPrice: ZecPriceType;
   info: InfoType;
   selectServer: SelectServerEnum;
@@ -44,12 +38,10 @@ const formatLastUpdate = (date: number): string => {
 };
 
 const PriceRow: React.FC<PriceRowProps> = React.memo(
-  ({ translate, currency, zecPrice, info, selectServer, onLayout }) => {
+  ({ translate, zecPrice, info, selectServer, onLayout }) => {
     const { colors } = useTheme();
 
-    const isUsd = currency === CurrencyEnum.USDCurrency;
     if (
-      !isUsd ||
       zecPrice.zecPrice <= 0 ||
       selectServer === SelectServerEnum.offline ||
       info.chainName !== ChainNameEnum.mainChainName
@@ -95,7 +87,6 @@ const PriceRow: React.FC<PriceRowProps> = React.memo(
             priceDate={zecPrice.date}
             price={zecPrice.zecPrice}
             amtZec={1}
-            currency={currency}
             privacy={false}
           />
           {!!lastUpdate && (

@@ -17,7 +17,10 @@ appId: org.ZingoLabs.Zingo
 - back
 
 # Server info now lives inline inside Settings (see settings.*-server rows);
-# About remains as its own navigation row.
+# About remains as its own navigation row. Settings now opens from the
+# Options panel, so the panel closed by the `back` above is reopened.
+- tapOn:
+    id: "header.drawmenu"
 - tapOn:
     id: "header.settings"
 - extendedWaitUntil:

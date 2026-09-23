@@ -11,12 +11,7 @@ import {
   defaultAppContextLoaded,
   ContextAppLoadedProvider,
 } from '@app/context';
-import {
-  LanguageEnum,
-  CurrencyEnum,
-  RouteEnum,
-  BlockExplorerEnum,
-} from '@app/AppState';
+import { LanguageEnum, RouteEnum, BlockExplorerEnum } from '@app/AppState';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
@@ -46,13 +41,9 @@ describe('Component Settings - test', () => {
   state.info = mockInfo;
   state.totalBalance = mockTotalBalance;
   state.server = mockServer;
-  state.currency = CurrencyEnum.USDCurrency;
   state.language = LanguageEnum.en;
-  state.sendAll = false;
   state.blockExplorer = BlockExplorerEnum.Zcashexplorer;
-  state.rescanMenu = false;
   state.recoveryWalletInfoOnDevice = true;
-  state.donation = false;
   const onSetOption = jest.fn();
   const toggle = jest.fn();
   const props = makeDrawerProps();
@@ -62,17 +53,12 @@ describe('Component Settings - test', () => {
         <Settings
           {...props}
           setServerOption={onSetOption}
-          setCurrencyOption={onSetOption}
           setLanguageOption={onSetOption}
-          setSendAllOption={onSetOption}
-          setDonationOption={onSetOption}
           setSecurityOption={onSetOption}
           setSelectServerOption={onSetOption}
-          setRescanMenuOption={onSetOption}
           setRecoveryWalletInfoOnDeviceOption={onSetOption}
           setPerformanceLevelOption={onSetOption}
           setBlockExplorerOption={onSetOption}
-          setNymOption={onSetOption}
           toggleMenuDrawer={toggle}
         />
       </ContextAppLoadedProvider>,

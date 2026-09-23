@@ -48,30 +48,6 @@ describe('AbSummaryLine - snapshots', () => {
     ).toMatchSnapshot();
   });
 
-  test('AbSummaryLine protected address', () => {
-    expect(
-      render(
-        <ContextAppLoadedProvider value={state}>
-          <AbSummaryLine
-            index={1}
-            item={mockAddressBook[1]}
-            openAbDetail={onFn}
-            handleScrollToTop={onFn}
-            doAction={
-              onFn as (
-                a: AddressBookActionEnum,
-                l: string,
-                addr: string,
-                c: string,
-              ) => void
-            }
-            addressProtected
-          />
-        </ContextAppLoadedProvider>,
-      ).toJSON(),
-    ).toMatchSnapshot();
-  });
-
   test('AbSummaryLine readOnly mode', () => {
     const roState = { ...state, readOnly: true };
     expect(

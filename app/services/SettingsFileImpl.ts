@@ -2,7 +2,6 @@ import * as RNFS from 'react-native-fs';
 
 import {
   ChainNameEnum,
-  CurrencyEnum,
   GlobalConst,
   SecurityType,
   SecurityTypeEnum,
@@ -193,10 +192,19 @@ export default class SettingsFileImpl {
           settings.selectServer = SelectServerEnum.auto;
         }
       }
-      if (!settings.hasOwnProperty(SettingsNameEnum.donation)) {
-        // this means the App shows up an Alert asking about the tip/donation new feature.
-        settings.firstUpdateWithDonation = true;
-      }
+      // Settings the App no longer asks about are dropped from the file the
+      // first time an older settings.json loads: the donation flags of the
+      // old tip feature, the two switches that used to hide the MAX button
+      // and the Rescan menu entry, both always there now, the currency
+      // choice, now always USD, and the Nym switch: every transmission
+      // travels the mixnet, so there is nothing left to choose.
+      const obsolete = settings as unknown as Record<string, unknown>;
+      delete obsolete.donation;
+      delete obsolete.firstUpdateWithDonation;
+      delete obsolete.sendAll;
+      delete obsolete.rescanMenu;
+      delete obsolete.currency;
+      delete obsolete.nym;
       // old security options that have to be removed and to add the new one.
       if (settings.hasOwnProperty(SettingsNameEnum.security)) {
         const sec: SecurityType = settings.security;
@@ -237,18 +245,10 @@ export default class SettingsFileImpl {
         // by default medium
         settings.blockExplorer = BlockExplorerEnum.Zcashexplorer;
       }
-      if (!settings.hasOwnProperty(SettingsNameEnum.nym)) {
-        settings.nym = false;
-      }
       if (!settings.hasOwnProperty(SettingsNameEnum.ironwoodOnboardSeen)) {
         // the wallet hasn't shown the "Meet Ironwood" onboarding yet; it
         // launches once, the first time spendable Orchard funds are detected.
         settings.ironwoodOnboardSeen = false;
-      }
-      // Silent migration: legacy "USDTOR" currency is dropped in favor of "USD".
-      // Tor support has been removed; users on an older settings.json get rewritten transparently.
-      if ((settings.currency as string) === 'USDTOR') {
-        settings.currency = CurrencyEnum.USDCurrency;
       }
       return settings;
     } catch (err) {

@@ -32,8 +32,6 @@
   "support": "Email gönder",
   "view-error": "Hatayı Görüntüle/Bildir",
   "menudrawer-acc": "Menü çekmecesini aç",
-  "donation": "Zingo'ya Bağış!\nZingoLabs'i desteklediğiniz için teşekkürler!",
-  "zenny-tips-ab": "Zenny Tavsiyeleri",
   "restarting": "Error Sunucuya bağlanırken hata oluştu, uygulama birkaç saniye içinde yeniden başlayacak.",
   "change-privacy": "Yeni gizlilik politikası ",
   "email": "support@zingolabs.org",
@@ -155,8 +153,6 @@
     "alert-newwallet-body": "Yeni bir cüzdan oluşturmak istediğinizi ve mevcut cüzdana erişimi kaybetmeyi gerçekten onaylıyor musunuz.",
     "serverfirsttry": "Yukarıdaki sunucuya bağlanmaya çalışılırken bir hata oluştu, şu anda listedeki sunucular kontrol ediliyor.",
     "serversecondtry": "Sorun sunucudan kaynaklanıyor gibi görünmüyor. Başka bir şey oluyor.",
-    "alert-donation-title": "ZINGOLABS İPUCU",
-    "alert-donation-body": "ZingoLabs’in Zcash’i daha faydalı hale getirmesine yardımcı olmak ister misiniz? Her işlemde ZingoLabs’e bir Zenny (0.01 ZEC) bağışlamak için katılın! Katılmak istiyorsanız Onayla’ya, istemiyorsanız İptal’e basın.",
     "recoverkeys": "Son anahtarları geri yükle",
     "recoverkeysinstall": "Bu cihazda kullanılan son anahtarlar kurtarıldı:",
     "customserver-unreachable": "Özel sunucunuz yanıt vermedi ve cüzdan bir hata döndürdü. Farklı bir sunucu seçmek için Ayarları açın veya daha sonra tekrar deneyin.",
@@ -243,16 +239,6 @@
         "text": "Blokzincirdeki tüm notları (memo) indir. Bu durumda sunucu, hangi işlem kimliklerinin (TxID) sana ait olduğunu öğrenemez. Ancak bu işlem ÇOK FAZLA bant genişliği tüketir."
       }
     ],
-    "currencies": [
-      {
-        "value": "",
-        "text": "Sadece ZEC fiyatı alınsın, diğer para birimleri için fiyat sorgulanmasın."
-      },
-      {
-        "value": "USD",
-        "text": "Dolar fiyat bilgisi internet üzerinden alınabilir."
-      }
-    ],
     "languages": [
       {
         "value": "en",
@@ -275,26 +261,6 @@
         "text": "Tüm bilgiler Türkçe olacak."
       }
     ],
-    "sendalls": [
-      {
-        "value": true,
-        "text": "Tutar alanını tüm cüzdan bakiyenizle doldurmak için 'MAKS' düğmesini etkinleştirin."
-      },
-      {
-        "value": false,
-        "text": "Tümünü gönder butonunu devre dışı bırak, çünkü bu özelliğe sahip olmak risk oluşturabilir."
-      }
-    ],
-    "donations": [
-      {
-        "value": true,
-        "text": "Her işlemle birlikte ZingoLabs’e bir Zenny (0.01 ZEC) katkı sağla."
-      },
-      {
-        "value": false,
-        "text": "Daha güvenli bir sistemi teşvik etmek için ödeme yapmayın."
-      }
-    ],
     "privacys": [
       {
         "value": true,
@@ -313,16 +279,6 @@
       {
         "value": "advanced",
         "text": "Gelişmiş Mod: Gelişmiş kullanıcılar için."
-      }
-    ],
-    "rescanmenus": [
-      {
-        "value": true,
-        "text": "Cüzdanı yeniden tarama seçeneğini menüde etkinleştir/göster."
-      },
-      {
-        "value": false,
-        "text": "Cüzdanı yeniden tarama seçeneğini menüden devre dışı bırak/gizle."
       }
     ],
     "recoverywalletinfoondevices": [
@@ -397,26 +353,16 @@
     "value-memo-none": "Hiçbiri",
     "value-memo-wallet": "cüzdan",
     "value-memo-all": "hepsi ",
-    "currency-title": "Döviz Fiyatı",
     "language-title": "Dil",
     "islanguage": "Kaydetmek için bir dil seçmeniz gerekiyor.",
-    "sendall-title": "Tüm fonları göndermeyi etkinleştir",
-    "donation-title": "ZingoLabs’a katkıda bulun",
-    "privacy-title": "High Privacy",
+    "privacy-title": "Hassas değerleri gizle",
     "mode-title": "Temel ve Gelişmiş Mod arasında geçiş yapın.",
-    "rescanmenu-title": "Yeniden Tarama Butonunu Göster",
     "recoverywalletinfoondevice-title": "Cüzdan Kurtarma Bilgilerini Kaydet",
     "performancelevel-title": "Zingolib Performance Level",
     "blockexplorer-title": "Block Explorer",
-    "value-currency-": "Para birimi yok",
-    "value-currency-USD": "Amerikan doları",
     "value-language-en": "İngilizce",
     "value-language-es": "İspanyolca",
     "value-language-pt": "Portekizce",
-    "value-sendall-true": "Etkin",
-    "value-sendall-false": "Etkin değil",
-    "value-donation-true": "Evet",
-    "value-donation-false": "Hayır",
     "value-privacy-true": "Yüksek",
     "value-privacy-false": "Normal ",
     "privacy": "Özel:",
@@ -429,8 +375,6 @@
     "value-chainname-none": "Yok",
     "server-chain-title": "Ağ",
     "select-chain-placeholder": "Bir Ağ Seçin...",
-    "value-rescanmenu-true": "Etkin",
-    "value-rescanmenu-false": "Etkin değil",
     "value-recoverywalletinfoondevice-true": "Etkin",
     "value-recoverywalletinfoondevice-false": "Etkin değil",
     "value-performancelevel-Maximum": "Maximum",
@@ -441,7 +385,7 @@
     "value-blockexplorer-Cipherscan": "Cipherscan",
     "value-blockexplorer-Zexplorer": "Zexplorer",
     "value-blockexplorer-None": "Yok",
-    "security-title": "Apply Device Security",
+    "security-title": "Biyometrik/PIN",
     "security-all": "Tümü",
     "security-some": "Bazıları",
     "security-none": "Hiçbiri",
@@ -472,9 +416,7 @@
     "walletkeyssaved": "Son Cüzdan Kurtarma Bilgisi cihazda güvenli bir şekilde saklandı.",
     "walletkeyswarning": "Bu, kurtarma ifadesi'inizi saklamak için denetlenmemiş kodun güvenliğine bağlı olan deneysel bir özelliktir. Lütfen önemli miktarda fon içeren seed'lerle kullanmayın!",
     "value-language-tr": "Türkçe",
-    "nym-disable-warning": "Mixnet Modunu kapatmak işlemlerinizi açık ağ üzerinden yönlendirir ve etkinliğinizi IP adresinizle ilişkilendirir.",
     "nym-network": "NYM Mixnet",
-    "nym-enhanced-privacy": "Gelişmiş Gizlilik",
     "nym-diagnostics": "Mixnet tanılamasını çalıştır"
   },
   "mixnet": {
@@ -485,7 +427,8 @@
       "died": "Mixnet bağlantısı koptu",
       "unknown": "Mixnet kullanılamıyor"
     },
-    "reenable": "Mixnet'i yeniden etkinleştir"
+    "reenable": "Mixnet'i yeniden etkinleştir",
+    "reconnecting": "Mixnet'e yeniden bağlanılıyor…"
   },
   "mixnetdoctor": {
     "title": "Mixnet Doktoru",
@@ -493,6 +436,7 @@
     "intro": "Mixnet’in cihazınızdan erişilebilir olup olmadığını gerçek IP adresinizi kullanarak test eder.",
     "run": "Tanılamayı çalıştır",
     "running": "Çalışıyor…",
+    "attaching": "Uygulama hâlâ mixnet'e bağlanıyor. Taşıma bağlanana kadar kayıp olarak bildirilir, bu yüzden bu çalışma henüz bir hüküm değildir.",
     "copy-report": "Raporu kopyala",
     "report-copied": "Rapor panoya kopyalandı"
   },
@@ -620,11 +564,10 @@
     "deshielded": "Korumasız",
     "lose-address-title": "YENİ BİR ADRES SEÇ",
     "lose-address-alert": "Adres alanında zaten geçerli bir adresiniz var. Onu değiştirmek istiyor musunuz?",
-    "confirm-donation": "Bağış",
-    "donation-minimum-message": "Bağışlar için minimum tutar bir Zenny'dir (0.01 ZEC). Lütfen tekrar deneyin ve teşekkürler.",
     "nym-processing-title": "NYM üzerinden işleniyor",
     "nym-enhanced": "NYM Gelişmiş",
-    "nym-warning": "Bu işlem, gelişmiş gizlilik için NYM mixnet'i üzerinden yönlendirilecektir. Standart işlemlerden biraz daha uzun sürebilir."
+    "nym-warning": "Bu işlem, gelişmiş gizlilik için NYM mixnet'i üzerinden yönlendirilecektir. Standart işlemlerden biraz daha uzun sürebilir.",
+    "nym-blocked": "Gönderimler NYM'den gider. Ağ bekleniyor."
   },
   "receive": {
     "u-title": "Korumalı",
@@ -1096,7 +1039,5 @@
     "oneentry": "URI en az 1 girişe sahip olmalıdır",
     "memo-too-long": "Parametrede memo çok uzun",
     "error-http-not-allowed": "Error: Düz HTTP yalnızca localhost için izin verilir. Uzak sunucular için HTTPS kullanın."
-  },
-  "donation-button": "ZingoLabs’a Bağış Yap",
-  "donation-legend": "ZingoLabs'a aktif olarak bağış yapıyorsunuz, Teşekkürler"
+  }
 }

@@ -61,7 +61,6 @@ import {
   SecurityType,
   ServerUrisType,
   LanguageEnum,
-  CurrencyEnum,
   ModeEnum,
   SelectServerEnum,
   ChainNameEnum,
@@ -150,12 +149,7 @@ const activationHeight = {
 export default function LoadingApp(props: LoadingAppProps) {
   const theme = useTheme();
   const [language, setLanguage] = useState<LanguageEnum>(LanguageEnum.en);
-  const [currency, setCurrency] = useState<CurrencyEnum>(
-    CurrencyEnum.USDCurrency,
-  ); // by default USD
   const [server, setServer] = useState<ServerType>(SERVER_DEFAULT_0);
-  const [sendAll, setSendAll] = useState<boolean>(false);
-  const [donation, setDonation] = useState<boolean>(false);
   const [privacy, setPrivacy] = useState<boolean>(false);
   const [mode, setMode] = useState<ModeEnum.basic | ModeEnum.advanced>(
     ModeEnum.advanced,
@@ -182,8 +176,6 @@ export default function LoadingApp(props: LoadingAppProps) {
   const [selectServer, setSelectServer] = useState<SelectServerEnum>(
     SelectServerEnum.auto,
   );
-  const [donationAlert, setDonationAlert] = useState<boolean>(false);
-  const [rescanMenu, setRescanMenu] = useState<boolean>(false);
   const [recoveryWalletInfoOnDevice, setRecoveryWalletInfoOnDevice] =
     useState<boolean>(false);
   const [performanceLevel, setPerformanceLevel] =
@@ -232,19 +224,6 @@ export default function LoadingApp(props: LoadingAppProps) {
       ) {
         // this is an update
         setFirstLaunchingMessage(LaunchingModeEnum.updating);
-        // The App needs to set the currency opt-in to USD by default
-        // only if the currency have `none`
-        if (settings.currency === CurrencyEnum.noCurrency) {
-          await SettingsFileImpl.writeSettings(
-            SettingsNameEnum.currency,
-            CurrencyEnum.USDCurrency,
-          );
-        }
-      }
-
-      // new donation feature.
-      if (settings.firstInstall || settings.firstUpdateWithDonation) {
-        setDonationAlert(true);
       }
 
       // first I need to know if this launch is a fresh install...
@@ -293,17 +272,6 @@ export default function LoadingApp(props: LoadingAppProps) {
         i18n.locale = lang;
         await SettingsFileImpl.writeSettings(SettingsNameEnum.language, lang);
       }
-      if (
-        settings.currency === CurrencyEnum.noCurrency ||
-        settings.currency === CurrencyEnum.USDCurrency
-      ) {
-        setCurrency(settings.currency);
-      } else {
-        await SettingsFileImpl.writeSettings(
-          SettingsNameEnum.currency,
-          currency,
-        );
-      }
       if (settings.server) {
         // Offline (empty uri) still carries the user's chosen chain: create and
         // restore derive keys chain-specifically, so onboarding must never face
@@ -325,19 +293,6 @@ export default function LoadingApp(props: LoadingAppProps) {
         }
       } else {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.server, server);
-      }
-      if (settings.sendAll === true || settings.sendAll === false) {
-        setSendAll(settings.sendAll);
-      } else {
-        await SettingsFileImpl.writeSettings(SettingsNameEnum.sendAll, sendAll);
-      }
-      if (settings.donation === true || settings.donation === false) {
-        setDonation(settings.donation);
-      } else {
-        await SettingsFileImpl.writeSettings(
-          SettingsNameEnum.donation,
-          donation,
-        );
       }
       if (settings.privacy === true || settings.privacy === false) {
         setPrivacy(settings.privacy);
@@ -363,14 +318,6 @@ export default function LoadingApp(props: LoadingAppProps) {
         await SettingsFileImpl.writeSettings(
           SettingsNameEnum.selectServer,
           selectServer,
-        );
-      }
-      if (settings.rescanMenu === true || settings.rescanMenu === false) {
-        setRescanMenu(settings.rescanMenu);
-      } else {
-        await SettingsFileImpl.writeSettings(
-          SettingsNameEnum.rescanMenu,
-          rescanMenu,
         );
       }
       if (
@@ -450,18 +397,13 @@ export default function LoadingApp(props: LoadingAppProps) {
         theme={theme}
         translate={translate}
         language={language}
-        currency={currency}
         server={server}
-        sendAll={sendAll}
-        donation={donation}
         privacy={privacy}
         mode={mode}
         backgroundSyncInfo={backgroundSyncInfo}
         firstLaunchingMessage={firstLaunchingMessage}
         security={security}
         selectServer={selectServer}
-        donationAlert={donationAlert}
-        rescanMenu={rescanMenu}
         recoveryWalletInfoOnDevice={recoveryWalletInfoOnDevice}
         performanceLevel={performanceLevel}
         blockExplorer={blockExplorer}
@@ -480,18 +422,13 @@ type LoadingAppClassProps = {
   translate: (key: string) => TranslateType;
   theme: AppTheme;
   language: LanguageEnum;
-  currency: CurrencyEnum;
   server: ServerType;
-  sendAll: boolean;
-  donation: boolean;
   privacy: boolean;
   mode: ModeEnum;
   backgroundSyncInfo: BackgroundType;
   firstLaunchingMessage: LaunchingModeEnum;
   security: SecurityType;
   selectServer: SelectServerEnum;
-  donationAlert: boolean;
-  rescanMenu: boolean;
   recoveryWalletInfoOnDevice: boolean;
   performanceLevel: RPCPerformanceLevelEnum;
   blockExplorer: BlockExplorerEnum;
@@ -533,15 +470,11 @@ export class LoadingAppClass extends Component<
 
       // context settings
       server: props.server,
-      currency: props.currency,
       language: props.language,
-      sendAll: props.sendAll,
-      donation: props.donation,
       privacy: props.privacy,
       mode: props.mode,
       security: props.security,
       selectServer: props.selectServer,
-      rescanMenu: props.rescanMenu,
       recoveryWalletInfoOnDevice: props.recoveryWalletInfoOnDevice,
       performanceLevel: props.performanceLevel,
       blockExplorer: props.blockExplorer,
@@ -568,7 +501,6 @@ export class LoadingAppClass extends Component<
           ? props.route.params.startingApp
           : true,
       serverErrorTries: 0,
-      donationAlert: props.donationAlert,
       firstLaunchingMessage: props.firstLaunchingMessage,
       hasRecoveryWalletInfoSaved: false,
     };
@@ -2283,15 +2215,11 @@ export class LoadingAppClass extends Component<
 
       // settings
       server: this.state.server,
-      currency: this.state.currency,
       language: this.state.language,
-      sendAll: this.state.sendAll,
-      donation: this.state.donation,
       privacy: this.state.privacy,
       mode: this.state.mode,
       security: this.state.security,
       selectServer: this.state.selectServer,
-      rescanMenu: this.state.rescanMenu,
       recoveryWalletInfoOnDevice: this.state.recoveryWalletInfoOnDevice,
       performanceLevel: this.state.performanceLevel,
       blockExplorer: this.state.blockExplorer,

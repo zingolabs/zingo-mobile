@@ -35,7 +35,6 @@ type AddressItemProps = {
   // — and offered as the label when saving this address to the book.
   znsAlias?: string;
   withSendIcon?: boolean;
-  addressProtected?: boolean;
   ufvk?: boolean;
 };
 
@@ -49,7 +48,6 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
   withIcon,
   znsAlias,
   withSendIcon,
-  addressProtected,
   ufvk,
 }) => {
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
@@ -166,7 +164,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
             {(!oneLine || (oneLine && !contact)) && !onlyContact && (
               <TouchableOpacity
                 onPress={() => {
-                  if (address && !oneLine && !addressProtected) {
+                  if (address && !oneLine) {
                     Clipboard.setString(address);
                     addLastSnackbar(
                       ufvk
@@ -251,7 +249,6 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
             </TouchableOpacity>
           )}
           {withSendIcon &&
-            !addressProtected &&
             !!contact &&
             !readOnly &&
             selectServer !== SelectServerEnum.offline &&

@@ -353,52 +353,21 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
         ]
       }
     >
-      <View
-        style={
+      <Image
+        source={
           {
-            "alignItems": "center",
-            "flexDirection": "row",
-            "gap": 14,
+            "testUri": "../../../assets/img/logobig-zingo.png",
           }
         }
-      >
-        <View
-          accessibilityState={
-            {
-              "busy": undefined,
-              "checked": undefined,
-              "disabled": undefined,
-              "expanded": undefined,
-              "selected": undefined,
-            }
+        style={
+          {
+            "borderRadius": 6,
+            "height": 30,
+            "resizeMode": "contain",
+            "width": 30,
           }
-          accessibilityValue={
-            {
-              "max": undefined,
-              "min": undefined,
-              "now": undefined,
-              "text": undefined,
-            }
-          }
-          accessible={true}
-          collapsable={false}
-          focusable={true}
-          onClick={[Function]}
-          onResponderGrant={[Function]}
-          onResponderMove={[Function]}
-          onResponderRelease={[Function]}
-          onResponderTerminate={[Function]}
-          onResponderTerminationRequest={[Function]}
-          onStartShouldSetResponder={[Function]}
-          style={
-            {
-              "marginRight": 5,
-              "opacity": 1,
-            }
-          }
-          testID="header.settings"
-        />
-      </View>
+        }
+      />
     </View>
   </View>,
   <View

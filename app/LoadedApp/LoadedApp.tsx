@@ -53,7 +53,6 @@ import {
   MenuItemEnum,
   LanguageEnum,
   ModeEnum,
-  CurrencyEnum,
   SelectServerEnum,
   ChainNameEnum,
   SeedActionEnum,
@@ -183,6 +182,20 @@ const tr = require('@app/translations/tr.json');
 
 const Tab = createBottomTabNavigator<AppDrawerParamList>();
 
+// The `Zenny Tips` contact older versions wrote into every address book on
+// their own, in the five languages that could have created it, and the UA it
+// always pointed at. Donations are gone, so the contact is removed — matching
+// both the label and the address, to never delete a contact of the user's.
+const OBSOLETE_ZENNY_TIPS_LABELS: string[] = [
+  'Zenny Tips',
+  'Zenny Propinas',
+  'Zenny Gorjetas',
+  'Поддержать Zenny',
+  'Zenny Tavsiyeleri',
+];
+const OBSOLETE_ZENNY_TIPS_ADDRESS: string =
+  'u1p32nu0pgev5cr0u6t4ja9lcn29kaw37xch8nyglwvp7grl07f72c46hxvw0u3q58ks43ntg324fmulc2xqf4xl3pv42s232m25vaukp05s6av9z76s3evsstax4u6f5g7tql5yqwuks9t4ef6vdayfmrsymenqtshgxzj59hdydzygesqa7pdpw463hu7afqf4an29m69kfasdwr494';
+
 // for testing
 //const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -203,12 +216,7 @@ const SERVER_DEFAULT_0: ServerType = {
 export default function LoadedApp(props: LoadedAppProps) {
   const theme = useTheme();
   const [language, setLanguage] = useState<LanguageEnum>(LanguageEnum.en);
-  const [currency, setCurrency] = useState<CurrencyEnum>(
-    CurrencyEnum.USDCurrency,
-  );
   const [server, setServer] = useState<ServerType>(SERVER_DEFAULT_0);
-  const [sendAll, setSendAll] = useState<boolean>(false);
-  const [donation, setDonation] = useState<boolean>(false);
   const [privacy, setPrivacy] = useState<boolean>(false);
   const [mode, setMode] = useState<ModeEnum>(ModeEnum.advanced); // by default advanced
   const [backgroundSyncInfo, setBackgroundSyncInfo] = useState<BackgroundType>({
@@ -232,7 +240,6 @@ export default function LoadedApp(props: LoadedAppProps) {
   const [selectServer, setSelectServer] = useState<SelectServerEnum>(
     SelectServerEnum.auto,
   );
-  const [rescanMenu, setRescanMenu] = useState<boolean>(false);
   const [recoveryWalletInfoOnDevice, setRecoveryWalletInfoOnDevice] =
     useState<boolean>(false);
   const [performanceLevel, setPerformanceLevel] =
@@ -240,9 +247,6 @@ export default function LoadedApp(props: LoadedAppProps) {
   const [blockExplorer, setBlockExplorer] = useState<BlockExplorerEnum>(
     BlockExplorerEnum.Zcashexplorer,
   );
-  const [nym, setNym] = useState<boolean>(false);
-  const [zenniesDonationAddress, setZenniesDonationAddress] =
-    useState<string>('');
   const file = useMemo(
     () => ({
       en: en,
@@ -315,13 +319,9 @@ export default function LoadedApp(props: LoadedAppProps) {
       I18nManager.forceRTL(isRTL);
 
       // If the App is mounting this component,
-      // I know I have to reset the firstInstall & firstUpdateWithDonation prop in settings.
+      // I know I have to reset the firstInstall prop in settings.
       await SettingsFileImpl.writeSettings(
         SettingsNameEnum.firstInstall,
-        false,
-      );
-      await SettingsFileImpl.writeSettings(
-        SettingsNameEnum.firstUpdateWithDonation,
         false,
       );
 
@@ -359,17 +359,6 @@ export default function LoadedApp(props: LoadedAppProps) {
         i18n.locale = lang;
         await SettingsFileImpl.writeSettings(SettingsNameEnum.language, lang);
       }
-      if (
-        settings.currency === CurrencyEnum.noCurrency ||
-        settings.currency === CurrencyEnum.USDCurrency
-      ) {
-        setCurrency(settings.currency);
-      } else {
-        await SettingsFileImpl.writeSettings(
-          SettingsNameEnum.currency,
-          currency,
-        );
-      }
       if (settings.server) {
         // Offline (empty uri) has no chain. Normalize any residual chainName to
         // the empty sentinel so a stale value never reaches the wallet open (the
@@ -390,19 +379,6 @@ export default function LoadedApp(props: LoadedAppProps) {
         }
       } else {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.server, server);
-      }
-      if (settings.sendAll === true || settings.sendAll === false) {
-        setSendAll(settings.sendAll);
-      } else {
-        await SettingsFileImpl.writeSettings(SettingsNameEnum.sendAll, sendAll);
-      }
-      if (settings.donation === true || settings.donation === false) {
-        setDonation(settings.donation);
-      } else {
-        await SettingsFileImpl.writeSettings(
-          SettingsNameEnum.donation,
-          donation,
-        );
       }
       if (settings.privacy === true || settings.privacy === false) {
         setPrivacy(settings.privacy);
@@ -438,14 +414,6 @@ export default function LoadedApp(props: LoadedAppProps) {
         await SettingsFileImpl.writeSettings(
           SettingsNameEnum.selectServer,
           selectServer,
-        );
-      }
-      if (settings.rescanMenu === true || settings.rescanMenu === false) {
-        setRescanMenu(settings.rescanMenu);
-      } else {
-        await SettingsFileImpl.writeSettings(
-          SettingsNameEnum.rescanMenu,
-          rescanMenu,
         );
       }
       if (
@@ -485,35 +453,25 @@ export default function LoadedApp(props: LoadedAppProps) {
           blockExplorer,
         );
       }
-      if (settings.nym === true || settings.nym === false) {
-        setNym(settings.nym);
-      } else {
-        await SettingsFileImpl.writeSettings(SettingsNameEnum.nym, false);
-      }
 
       // reading background task info
       const backgroundSyncInfoJson = await BackgroundFileImpl.readBackground();
       setBackgroundSyncInfo(backgroundSyncInfoJson);
 
       let sort: boolean = false;
-      const zenniesAddress = await Utils.getZenniesDonationAddress(
-        server.chainName,
-      );
-      setZenniesDonationAddress(zenniesAddress);
-
-      // adding `Zenny Tips` address always.
       let ab = await AddressBookFileImpl.readAddressBook();
-      if (
-        ab.filter((a: AddressBookFileClass) => a.address === zenniesAddress)
-          .length === 0
-      ) {
-        ab = await AddressBookFileImpl.writeAddressBookItem(
-          translate('zenny-tips-ab') as string,
-          zenniesAddress,
-          '',
-          false,
+
+      // dropping the obsolete `Zenny Tips` contact wherever it is still stored.
+      const zennyTips: AddressBookFileClass[] = ab.filter(
+        (a: AddressBookFileClass) =>
+          a.address === OBSOLETE_ZENNY_TIPS_ADDRESS &&
+          OBSOLETE_ZENNY_TIPS_LABELS.includes(a.label),
+      );
+      for (const a of zennyTips) {
+        ab = await AddressBookFileImpl.removeAddressBookItem(
+          a.label,
+          a.address,
         );
-        sort = true;
       }
 
       // now make no sense to have two UA's in the same contact
@@ -568,8 +526,7 @@ export default function LoadedApp(props: LoadedAppProps) {
       // in the Address Book belong to this new/restored wallet.
       if (newWallet) {
         toUpdate = ab.filter((a: AddressBookFileClass) => !!a.address);
-        // always have one -> Zennies.
-        if (toUpdate.length > 1) {
+        if (toUpdate.length > 0) {
           for (let i = 0; i < toUpdate.length; i++) {
             const a = toUpdate[i];
             // verify this address as own or not
@@ -665,10 +622,7 @@ export default function LoadedApp(props: LoadedAppProps) {
           setLanguage(locale as LanguageEnum);
         }}
         language={language}
-        currency={currency}
         server={server}
-        sendAll={sendAll}
-        donation={donation}
         privacy={privacy}
         mode={mode}
         backgroundSyncInfo={backgroundSyncInfo}
@@ -680,13 +634,10 @@ export default function LoadedApp(props: LoadedAppProps) {
         security={security}
         selectServer={selectServer}
         walletChainName={walletChainName}
-        rescanMenu={rescanMenu}
         recoveryWalletInfoOnDevice={recoveryWalletInfoOnDevice}
-        zenniesDonationAddress={zenniesDonationAddress}
         firstLaunchingMessage={firstLaunchingMessage}
         performanceLevel={performanceLevel}
         blockExplorer={blockExplorer}
-        nym={nym}
       />
     );
   }
@@ -728,10 +679,7 @@ type LoadedAppClassProps = {
   setI18nLocale: (locale: string) => void;
   theme: AppTheme;
   language: LanguageEnum;
-  currency: CurrencyEnum;
   server: ServerType;
-  sendAll: boolean;
-  donation: boolean;
   privacy: boolean;
   mode: ModeEnum;
   backgroundSyncInfo: BackgroundType;
@@ -743,13 +691,10 @@ type LoadedAppClassProps = {
   security: SecurityType;
   selectServer: SelectServerEnum;
   walletChainName: ChainNameEnum;
-  rescanMenu: boolean;
   recoveryWalletInfoOnDevice: boolean;
-  zenniesDonationAddress: string;
   firstLaunchingMessage: LaunchingModeEnum;
   performanceLevel: RPCPerformanceLevelEnum;
   blockExplorer: BlockExplorerEnum;
-  nym: boolean;
 };
 
 type LoadedAppClassState = AppStateLoaded & AppContextLoaded;
@@ -817,29 +762,21 @@ export class LoadedAppClass extends Component<
       showSwipeableIcons: true,
       doRefresh: this.doRefresh,
       setZecPrice: this.setZecPrice,
-      zenniesDonationAddress: props.zenniesDonationAddress,
       zingolibVersion: '',
       setPrivacyOption: this.setPrivacyOption,
-      setNymOption: this.setNymOption,
       setModeOption: this.setModeOption,
-      setCurrencyOption: this.setCurrencyOption,
 
       // context settings
       server: props.server,
-      currency: props.currency,
       language: props.language,
-      sendAll: props.sendAll,
-      donation: props.donation,
       privacy: props.privacy,
       mode: props.mode,
       security: props.security,
       selectServer: props.selectServer,
       walletChainName: props.walletChainName,
-      rescanMenu: props.rescanMenu,
       recoveryWalletInfoOnDevice: props.recoveryWalletInfoOnDevice,
       performanceLevel: props.performanceLevel,
       blockExplorer: props.blockExplorer,
-      nym: props.nym,
 
       mixnetView: INITIAL_MIXNET_VIEW,
       reenableMixnet: this.reenableMixnet,
@@ -875,7 +812,6 @@ export class LoadedAppClass extends Component<
       onPersistentSyncFailure: this.recoverServer,
       onMixnetViewChanged: this.setMixnetView,
       startMixnetTransport: startMixnetTransport,
-      transmitPolicy: props.nym ? 'mixnet' : 'clearnet',
       mixnetSupported: true,
       readOnly: props.readOnly,
       server: props.server,
@@ -1197,7 +1133,7 @@ export class LoadedAppClass extends Component<
         ) {
           await ShowAddressAlertAsync(this.state.translate)
             .then(async () => {
-              // fill the fields in the screen with the donation data
+              // fill the fields in the screen with the target data
               update = true;
             })
             .catch((e: unknown) => {
@@ -1207,7 +1143,7 @@ export class LoadedAppClass extends Component<
               }
             });
         } else if (target.address) {
-          // fill the fields in the screen with the donation data
+          // fill the fields in the screen with the target data
           update = true;
         }
         if (update) {
@@ -1604,18 +1540,17 @@ export class LoadedAppClass extends Component<
 
   sendTransaction = async (
     sendPageState: SendPageStateClass,
+    sendAll: boolean = false,
   ): Promise<String> => {
     try {
       // Construct a sendJson from the sendPage state
-      const { server, donation, defaultUnifiedAddress } = this.state;
+      const { defaultUnifiedAddress } = this.state;
       const sendJson = await Utils.getSendManyJSON(
         sendPageState,
         defaultUnifiedAddress,
-        server,
-        donation,
       );
       //const start = Date.now();
-      const txid = await this.rpc.sendTransaction(sendJson);
+      const txid = await this.rpc.sendTransaction(sendJson, sendAll);
 
       return txid;
     } catch (err) {
@@ -1714,6 +1649,11 @@ export class LoadedAppClass extends Component<
           { text: translate('cancel') as string, style: 'cancel' },
         ],
       });
+    } else if (item === MenuItemEnum.Settings) {
+      // Bio gate for settingsScreen lives at the Settings screen entry
+      // (screens/Settings/Settings.tsx).
+      this.drawerNav?.navigate(RouteEnum.Settings);
+      return;
     } else if (item === MenuItemEnum.AddressBook) {
       this.drawerNav?.navigate(RouteEnum.AddressBook);
       return;
@@ -1907,13 +1847,6 @@ export class LoadedAppClass extends Component<
     }
   };
 
-  setCurrencyOption = async (value: CurrencyEnum): Promise<void> => {
-    await SettingsFileImpl.writeSettings(SettingsNameEnum.currency, value);
-    this.setState({
-      currency: value as CurrencyEnum,
-    });
-  };
-
   setLanguageOption = async (value: string): Promise<void> => {
     await SettingsFileImpl.writeSettings(SettingsNameEnum.language, value);
     this.setState({
@@ -1925,20 +1858,6 @@ export class LoadedAppClass extends Component<
     // `translate` in their deps then re-evaluate with the new locale —
     // no full remount needed.
     this.props.setI18nLocale(value);
-  };
-
-  setSendAllOption = async (value: boolean): Promise<void> => {
-    await SettingsFileImpl.writeSettings(SettingsNameEnum.sendAll, value);
-    this.setState({
-      sendAll: value as boolean,
-    });
-  };
-
-  setDonationOption = async (value: boolean): Promise<void> => {
-    await SettingsFileImpl.writeSettings(SettingsNameEnum.donation, value);
-    this.setState({
-      donation: value as boolean,
-    });
   };
 
   setPrivacyOption = async (value: boolean): Promise<void> => {
@@ -1968,13 +1887,6 @@ export class LoadedAppClass extends Component<
     await SettingsFileImpl.writeSettings(SettingsNameEnum.selectServer, value);
     this.setState({
       selectServer: value as SelectServerEnum,
-    });
-  };
-
-  setRescanMenuOption = async (value: boolean): Promise<void> => {
-    await SettingsFileImpl.writeSettings(SettingsNameEnum.rescanMenu, value);
-    this.setState({
-      rescanMenu: value as boolean,
     });
   };
 
@@ -2036,19 +1948,6 @@ export class LoadedAppClass extends Component<
     this.setState({
       blockExplorer: value as BlockExplorerEnum,
     });
-  };
-
-  setNymOption = async (value: boolean): Promise<void> => {
-    try {
-      await this.rpc.setTransmitPolicy(value ? 'mixnet' : 'clearnet');
-    } catch (error) {
-      this.setLastError(`Transmit policy: ${error}`);
-      return;
-    }
-    this.setState({
-      nym: value,
-    });
-    await SettingsFileImpl.writeSettings(SettingsNameEnum.nym, value);
   };
 
   navigateToLoadingApp = async (state: LoadingAppNavigationState) => {
@@ -2319,29 +2218,21 @@ export class LoadedAppClass extends Component<
       showSwipeableIcons: this.state.showSwipeableIcons,
       doRefresh: this.state.doRefresh,
       setZecPrice: this.state.setZecPrice,
-      zenniesDonationAddress: this.state.zenniesDonationAddress,
       zingolibVersion: this.state.zingolibVersion,
       setPrivacyOption: this.setPrivacyOption,
-      setNymOption: this.setNymOption,
       setModeOption: this.setModeOption,
-      setCurrencyOption: this.setCurrencyOption,
 
       // context settings
       server: this.state.server,
-      currency: this.state.currency,
       language: this.state.language,
-      sendAll: this.state.sendAll,
-      donation: this.state.donation,
       privacy: this.state.privacy,
       mode: this.state.mode,
       security: this.state.security,
       selectServer: this.state.selectServer,
       walletChainName: this.state.walletChainName,
-      rescanMenu: this.state.rescanMenu,
       recoveryWalletInfoOnDevice: this.state.recoveryWalletInfoOnDevice,
       performanceLevel: this.state.performanceLevel,
       blockExplorer: this.state.blockExplorer,
-      nym: this.state.nym,
       mixnetView: this.state.mixnetView,
       reenableMixnet: this.reenableMixnet,
       foregroundEpoch: this.state.foregroundEpoch,
@@ -2520,13 +2411,9 @@ export class LoadedAppClass extends Component<
                         <Settings
                           {...props}
                           setServerOption={this.setServerOption}
-                          setCurrencyOption={this.setCurrencyOption}
                           setLanguageOption={this.setLanguageOption}
-                          setSendAllOption={this.setSendAllOption}
-                          setDonationOption={this.setDonationOption}
                           setSecurityOption={this.setSecurityOption}
                           setSelectServerOption={this.setSelectServerOption}
-                          setRescanMenuOption={this.setRescanMenuOption}
                           setRecoveryWalletInfoOnDeviceOption={
                             this.setRecoveryWalletInfoOnDeviceOption
                           }
@@ -2534,7 +2421,6 @@ export class LoadedAppClass extends Component<
                             this.setPerformanceLevelOption
                           }
                           setBlockExplorerOption={this.setBlockExplorerOption}
-                          setNymOption={this.setNymOption}
                           toggleMenuDrawer={
                             () => toggleOptionsPanel() /* header */
                           }

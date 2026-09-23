@@ -28,7 +28,6 @@ import {
   mixnetPhase,
 } from '@app/walletBackend/transforms/mixnetView';
 import FadeText from '@ui/primitives/FadeText';
-import NymOn from '../../../../assets/img/nym-on.svg';
 import MixnetIcon from '@ui/primitives/Icons/MixnetIcon';
 import PrivacyToggle from './PrivacyToggle';
 
@@ -41,7 +40,6 @@ type SyncStatusBarProps = {
   syncInProgress: boolean;
   viewSyncStatus: boolean;
   opacityValue: Animated.Value;
-  nym: boolean;
   mixnetView: MixnetView | null;
   translate: (key: string) => TranslateType;
   privacy: boolean;
@@ -62,7 +60,6 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
     syncInProgress,
     viewSyncStatus,
     opacityValue,
-    nym,
     mixnetView,
     translate,
     privacy,
@@ -337,27 +334,18 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
           </View>
         )}
 
-        {/* NYM feature hidden for now — will be enabled in the future */}
-        {false && !noSyncingStatus && nym && (
-          <View
-            style={{
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <NymOn width={16} height={16} />
-          </View>
-        )}
-
-        {/* Mixnet Mode (send-over-nym): the per-session transport status,
-            icon-only. Rendered only where the policy runs (mixnetView is null
-            on platforms whose transport has not landed) and never in the `off`
-            state (deliberate clearnet: phase is null). A pulsing green halo
-            means connecting, a bare icon means ready, a coral halo means lost,
-            a traveling yellow arc means reconnecting. */}
+        {/* Mixnet transport status, icon-only, and the way into the
+            diagnostics: the icon that reports the trouble is the one that
+            opens the screen explaining it. Rendered only where the policy
+            runs (mixnetView is null on platforms whose transport has not
+            landed) and never in the `off` state (phase is null). A pulsing
+            green halo means connecting, a bare icon means ready, a coral
+            halo means lost, a traveling yellow arc means reconnecting. */}
         {mixnetView !== null && phase !== null && (
-          <View
+          <TouchableOpacity
             testID="header.mixnet-status"
+            accessibilityLabel={translate('settings.nym-diagnostics') as string}
+            onPress={() => navigation.navigate(RouteEnum.MixnetDoctor)}
             style={{
               flexDirection: 'row',
               alignItems: 'center',
@@ -371,7 +359,7 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
             }}
           >
             <MixnetIcon phase={phase} />
-          </View>
+          </TouchableOpacity>
         )}
 
         {mode !== ModeEnum.basic &&

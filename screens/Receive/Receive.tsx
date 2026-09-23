@@ -30,7 +30,6 @@ import AppSheetModal from '@ui/primitives/AppSheetModal';
 import {
   AddressKindEnum,
   ChainNameEnum,
-  CurrencyEnum,
   ModeEnum,
   SecurityType,
   UnifiedAddressClass,
@@ -119,20 +118,16 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   useEffect(() => {
     const isMainChain =
       context.server.chainName === ChainNameEnum.mainChainName;
-    const withUsd =
-      isMainChain && context.currency === CurrencyEnum.USDCurrency;
-    if (!withUsd) {
+    if (!isMainChain) {
       setUsdRowH(0);
     }
-  }, [context.currency, context.server.chainName]);
+  }, [context.server.chainName]);
 
   const receiveSnapPoints = useMemo(() => {
     const isMainChain =
       context.server.chainName === ChainNameEnum.mainChainName;
-    const withUsd =
-      isMainChain && context.currency === CurrencyEnum.USDCurrency;
     if (containerH <= 0 || headerH <= 0) {
-      return withUsd ? ['85%', '89%', '93%'] : ['89%', '93%'];
+      return isMainChain ? ['85%', '89%', '93%'] : ['89%', '93%'];
     }
     const snapBase = containerH - headerH - SNAP_GAP;
     const snapPrice = Math.max(snapBase + BALANCE_SNAP_BUMP, 100);
@@ -147,19 +142,12 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
       points.push(snapPrice);
     }
     points.push(snapLow);
-    if (withUsd && usdRowH > 0) {
+    if (isMainChain && usdRowH > 0) {
       points.push(snapMid);
     }
     points.push(snapMax);
     return points;
-  }, [
-    context.currency,
-    context.server.chainName,
-    containerH,
-    headerH,
-    usdRowH,
-    priceRowH,
-  ]);
+  }, [context.server.chainName, containerH, headerH, usdRowH, priceRowH]);
 
   // The BottomSheet `index` prop is hardcoded to 0 below (NOT reactive). This
   // is critical: gorhom v5.2.14 has an internal useEffect that fires

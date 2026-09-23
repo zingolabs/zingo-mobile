@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
-exports[`Component History - test History currency USD, privacy high & mode advanced - snapshot 1`] = `
+exports[`Component History - test History privacy high & mode advanced - snapshot 1`] = `
 <View
   onLayout={[Function]}
   style={
@@ -478,46 +478,11 @@ exports[`Component History - test History currency USD, privacy high & mode adva
               onStartShouldSetResponder={[Function]}
               style={
                 {
-                  "opacity": 1,
-                }
-              }
-              testID="header.messages"
-            />
-            <View
-              accessibilityState={
-                {
-                  "busy": undefined,
-                  "checked": undefined,
-                  "disabled": undefined,
-                  "expanded": undefined,
-                  "selected": undefined,
-                }
-              }
-              accessibilityValue={
-                {
-                  "max": undefined,
-                  "min": undefined,
-                  "now": undefined,
-                  "text": undefined,
-                }
-              }
-              accessible={true}
-              collapsable={false}
-              focusable={true}
-              onClick={[Function]}
-              onResponderGrant={[Function]}
-              onResponderMove={[Function]}
-              onResponderRelease={[Function]}
-              onResponderTerminate={[Function]}
-              onResponderTerminationRequest={[Function]}
-              onStartShouldSetResponder={[Function]}
-              style={
-                {
                   "marginRight": 5,
                   "opacity": 1,
                 }
               }
-              testID="header.settings"
+              testID="header.messages"
             />
           </View>
         </View>
@@ -1067,7 +1032,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
 </View>
 `;
 
-exports[`Component History - test History no currency, privacy normal & mode basic - snapshot 1`] = `
+exports[`Component History - test History privacy normal & mode basic - snapshot 1`] = `
 <View
   onLayout={[Function]}
   style={
@@ -1374,46 +1339,11 @@ exports[`Component History - test History no currency, privacy normal & mode bas
               onStartShouldSetResponder={[Function]}
               style={
                 {
-                  "opacity": 1,
-                }
-              }
-              testID="header.messages"
-            />
-            <View
-              accessibilityState={
-                {
-                  "busy": undefined,
-                  "checked": undefined,
-                  "disabled": undefined,
-                  "expanded": undefined,
-                  "selected": undefined,
-                }
-              }
-              accessibilityValue={
-                {
-                  "max": undefined,
-                  "min": undefined,
-                  "now": undefined,
-                  "text": undefined,
-                }
-              }
-              accessible={true}
-              collapsable={false}
-              focusable={true}
-              onClick={[Function]}
-              onResponderGrant={[Function]}
-              onResponderMove={[Function]}
-              onResponderRelease={[Function]}
-              onResponderTerminate={[Function]}
-              onResponderTerminationRequest={[Function]}
-              onStartShouldSetResponder={[Function]}
-              style={
-                {
                   "marginRight": 5,
                   "opacity": 1,
                 }
               }
-              testID="header.settings"
+              testID="header.messages"
             />
           </View>
         </View>

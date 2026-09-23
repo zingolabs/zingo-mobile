@@ -47,7 +47,6 @@ type ValueTransferLineProps = {
   setValueTransferDetailModalShow: (i: number, vt: ValueTransferType) => void;
   nextLineWithSameTxid: boolean;
   //setMessagesAddressModalShow: (vt: ValueTransferType) => void;
-  addressProtected?: boolean;
   screenName: ScreenEnum;
   registerSwipeable: (r: Swipeable | null) => void;
   closeAllSwipeables: () => void;
@@ -60,7 +59,6 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
   setValueTransferDetailModalShow,
   nextLineWithSameTxid,
   //setMessagesAddressModalShow,
-  addressProtected,
   screenName,
   registerSwipeable,
   closeAllSwipeables,
@@ -168,8 +166,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
             </View>
             {!!vt.address &&
               !readOnly &&
-              selectServer !== SelectServerEnum.offline &&
-              !addressProtected && (
+              selectServer !== SelectServerEnum.offline && (
                 <View
                   style={{
                     width: 67,

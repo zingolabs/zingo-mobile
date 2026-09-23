@@ -178,7 +178,6 @@ RCT_EXTERN_METHOD(removeTransactionProcess:
                   reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(getSpendableBalanceWithAddressInfo:
     (NSString)address 
-                  zennies:(NSString)zennies
                   resolve:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(getSpendableBalanceTotalInfo:
@@ -223,6 +222,11 @@ RCT_EXTERN_METHOD(getWalletVersionInfo:
                   reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(sendProcess:
     (NSString)send_json
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(sendAllProcess:
+    (NSString)address
+                  memo:(NSString)memo
                   resolve:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(shieldProcess:
