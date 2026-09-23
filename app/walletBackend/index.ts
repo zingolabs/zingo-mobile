@@ -61,7 +61,6 @@ export {
   sendAllPropose,
   sendPropose,
   setConfigWalletToProd,
-  setCryptoDefaultProvider,
   shieldConfirm,
   shieldPropose,
   splitStatus,

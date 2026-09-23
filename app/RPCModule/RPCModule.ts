@@ -153,7 +153,6 @@ interface RPCModuleAPI {
     performanceLevel: string,
     minConfirmations: string,
   ): Promise<string>;
-  setCryptoDefaultProvider(): Promise<string>;
 
   setBroadcastCandidates(candidatesJson: string): Promise<string>;
 

@@ -11,7 +11,6 @@ jest.mock('react-native', () => {
     getValueTransfersList: jest.fn(
       () => '{ "value_transfers": [], "total": 0 }',
     ),
-    setCryptoDefaultProvider: jest.fn(() => 'true'),
     createNewWallet: jest.fn(
       () => '{ "seed": "seed phrase test", "birthday": 0 }',
     ),

@@ -80,29 +80,6 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
             return Result.failure()
         }
 
-        try {
-            // if the App is close, it need this at first step.
-            val setCrytoProvider = uniffi.zingo.ensureCryptoDefaultProvider()
-            Log.i("SCHEDULED_TASK_RUN", "crypto provider default: $setCrytoProvider")
-        } catch (t: Throwable) {
-            Log.i("SCHEDULED_TASK_RUN", "crypto provider default error: $t")
-            // save the background JSON file
-            val timeStampError = Date().time / 1000
-            val timeStampStrError = timeStampError.toString()
-            val msg = (t.message ?: "Error: Unknown")
-            val payload = JSONObject().apply {
-                put("batches", "0")
-                put("message", "Crypto Provider Default KO.")
-                put("date", "$timeStampStrStart")
-                put("dateEnd", "$timeStampStrError")
-                put("error", "Crypto Provider Default KO. $msg")
-            }
-            val jsonBackgroundError = payload.toString()
-            rpcModule.saveBackgroundFile(jsonBackgroundError)
-            Log.i("SCHEDULED_TASK_RUN", "background json file SAVED $jsonBackgroundError")
-            return Result.failure()
-        }
-
         // checking if the wallet file exists
         val exists: Boolean = rpcModule.fileExists(WalletFileName.value)
 

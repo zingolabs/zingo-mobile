@@ -389,30 +389,6 @@ extension AppDelegate {
           return
         }
 
-        do {
-          let setCrytoProvider = try setCryptoDefaultProviderToRing()
-          NSLog("BGTask syncingProcessBackgroundTask - Crypto provider default \(setCrytoProvider)")
-        } catch {
-          NSLog("BGTask syncingProcessBackgroundTask - Crypto provider default error: \(error.localizedDescription)")
-
-          // save the background file
-          let timeStampError = Date().timeIntervalSince1970
-          let timeStampStrError = String(format: "%.0f", timeStampError)
-          let jsonBackgroundError = self.buildBackgroundJSON(message: "Crypto provider default KO.", dateEnd: timeStampStrError, error: "Crypto provider default KO. \(error.localizedDescription)")
-          do {
-            try rpcmodule.saveBackgroundFile(jsonBackgroundError)
-            NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundError)")
-          } catch {
-            NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundError) error: \(error.localizedDescription)")
-          }
-          
-          if let task = self.bgTask {
-            task.setTaskCompleted(success: false)
-          }
-          bgTask = nil
-          return
-        }
-
         var exists: String = "false"
         do {
             exists = try rpcmodule.fileExists(Constants.WalletFileName.rawValue)

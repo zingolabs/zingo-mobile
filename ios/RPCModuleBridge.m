@@ -85,9 +85,6 @@ RCT_EXTERN_METHOD(getZenniesDonationAddress:
 RCT_EXTERN_METHOD(getValueTransfersList:
     (RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(setCryptoDefaultProvider:
-    (RCTPromiseResolveBlock)resolve
-                  reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(setBroadcastCandidates:
     (NSString)candidatesJson
                   resolve:(RCTPromiseResolveBlock)resolve

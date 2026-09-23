@@ -148,15 +148,6 @@ private func isError(_ s: String) -> Bool {
     return s.lowercased().hasPrefix("error")
 }
 
-private func setCryptoProvider() {
-  do {
-    _ = try setCryptoDefaultProviderToRing()
-  } catch {
-    XCTFail("\nCrypto provider default error:\n\(error.localizedDescription)")
-    return
-  }
-}
-
 private func waitForSyncOrFail(timeoutSeconds: TimeInterval = 120) {
     let t0 = Date()
     while Date().timeIntervalSince(t0) < timeoutSeconds {
@@ -189,7 +180,6 @@ private func waitForSyncOrFail(timeoutSeconds: TimeInterval = 120) {
 
 final class ExecuteAddressesFromSeed: XCTestCase {
     func testExecuteAddressesFromSeed() throws {
-        setCryptoProvider()
 
         let serveruri = "http://127.0.0.1:20000"
         let chainhint = "regtest"
@@ -246,7 +236,6 @@ final class ExecuteAddressesFromSeed: XCTestCase {
 
 final class ExecuteAddressFromUfvk: XCTestCase {
     func testExecuteAddressFromUfvk() throws {
-        setCryptoProvider()
 
         let serveruri = "http://10.0.2.2:20000"
         let chainhint = "regtest"
@@ -315,7 +304,6 @@ final class ExecuteAddressFromUfvk: XCTestCase {
 
 final class ExecuteVersionFromSeed: XCTestCase {
     func testExecuteVersionFromSeed() throws {
-        setCryptoProvider()
         let serveruri = "http://10.0.2.2:20000"
         let chainhint = "regtest"
         let seed = Seeds.HOSPITAL
@@ -356,7 +344,6 @@ final class ExecuteVersionFromSeed: XCTestCase {
 
 final class ExecuteSyncFromSeed: XCTestCase {
     func testExecuteSyncFromSeed() throws {
-        setCryptoProvider()
         let serveruri = "http://10.0.2.2:20000"
         let chainhint = "regtest"
         let seed = Seeds.HOSPITAL
@@ -417,7 +404,6 @@ final class ExecuteSyncFromSeed: XCTestCase {
 
 final class ExecuteSendFromOrchard: XCTestCase {
     func testExecuteSendFromOrchard() throws {
-        setCryptoProvider()
         let serveruri = "http://10.0.2.2:20000"
         let chainhint = "regtest"
         let seed = Seeds.HOSPITAL
@@ -543,7 +529,6 @@ final class ExecuteSendFromOrchard: XCTestCase {
 
 final class UpdateCurrentPriceAndValueTransfersFromSeed: XCTestCase {
     func testUpdateCurrentPriceAndValueTransfersFromSeed() throws {
-        setCryptoProvider()
 
         let serveruri = "http://10.0.2.2:20000"
         let chainhint = "regtest"
@@ -626,7 +611,6 @@ final class UpdateCurrentPriceAndValueTransfersFromSeed: XCTestCase {
 
 final class ExecuteSaplingBalanceFromSeed: XCTestCase {
     func testExecuteSaplingBalanceFromSeed() throws {
-        setCryptoProvider()
 
         let serveruri = "http://10.0.2.2:20000"
         let chainhint = "regtest"
@@ -705,7 +689,6 @@ final class ExecuteSaplingBalanceFromSeed: XCTestCase {
 
 final class ExecuteParseAddressForTex: XCTestCase {
     func testExecuteParseAddressForTex() throws {
-        setCryptoProvider()
 
         let serveruri = "http://10.0.2.2:20000"
         let chainhint = "regtest"
@@ -750,7 +733,6 @@ final class ExecuteParseAddressForTex: XCTestCase {
 
 final class ExecuteParseAddressInvalid: XCTestCase {
     func testExecuteParseAddressInvalid() throws {
-        setCryptoProvider()
 
         let serveruri = "http://127.0.0.1:20000"
         let chainhint = "regtest"
@@ -1036,7 +1018,6 @@ class WalletFileDiagnosisTests: XCTestCase {
     }
 
     func testALegacyTextFileMigratesToRawBytesOnRead() throws {
-        setCryptoProvider()
         _ = try initFromSeed(
             seed: Seeds.HOSPITAL, birthday: UInt32(2_000_000), serveruri: "",
             chainhint: "main", performancelevel: "Medium", minconfirmations: UInt32(1))

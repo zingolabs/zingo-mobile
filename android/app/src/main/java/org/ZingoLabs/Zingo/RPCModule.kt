@@ -745,14 +745,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
-    fun setCryptoDefaultProvider(promise: Promise) {
-        FfiOutcome.settling(promise, "ensure_crypto_default_provider") {
-            uniffi.zingo.initLogging()
-            uniffi.zingo.ensureCryptoDefaultProvider()
-        }
-    }
-
-    @ReactMethod
     fun pollSyncInfo(promise: Promise) {
         FfiOutcome.settling(promise, "poll_sync") {
             uniffi.zingo.initLogging()
