@@ -4,7 +4,9 @@ import { useTheme } from '@app/theme';
 
 type BoldTextProps = {
   style?: TextStyle;
-  children: string | string[];
+  // Nodes, not just strings: an icon that belongs beside the last word has to
+  // flow with the text, which only works inside the same Text.
+  children: React.ReactNode;
   testID?: string;
   selectable?: boolean;
   numberOfLines?: number;

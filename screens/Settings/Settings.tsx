@@ -1649,12 +1649,19 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                         flex: 1,
                       }}
                     >
-                      {/* The title is the only thing here that may grow, so
-                          it is the only thing that shrinks: a long
-                          translation wraps instead of pushing the info icon
-                          over the switch. */}
+                      {/* This title is the longest in the screen and wraps in
+                          several languages. Beside the text the icon would
+                          then sit at the far right, against the switch, so it
+                          rides inside the text instead and follows the last
+                          word wherever it lands. Tapping the title opens the
+                          note, which is what the icon announces. */}
                       <TouchableOpacity
                         style={{ flexShrink: 1 }}
+                        onPress={() =>
+                          setOpenInfoSection(
+                            openInfoSection === 'recovery' ? null : 'recovery',
+                          )
+                        }
                         onLongPress={() => setShowDeveloperOptions(true)}
                       >
                         <BoldText>
@@ -1663,21 +1670,13 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                               'settings.recoverywalletinfoondevice-title',
                             ) as string
                           }
+                          {'  '}
+                          <FontAwesomeIcon
+                            icon={faInfoCircle}
+                            size={14}
+                            color={colors.fgDefault}
+                          />
                         </BoldText>
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        onPress={() =>
-                          setOpenInfoSection(
-                            openInfoSection === 'recovery' ? null : 'recovery',
-                          )
-                        }
-                        style={{ marginLeft: 6 }}
-                      >
-                        <FontAwesomeIcon
-                          icon={faInfoCircle}
-                          size={14}
-                          color={colors.fgDefault}
-                        />
                       </TouchableOpacity>
                     </View>
                     <TouchableOpacity
