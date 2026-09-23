@@ -265,11 +265,6 @@ export async function setConfigWalletToProd(
   );
 }
 
-// Tells zingolib which crypto provider (e.g. ring) to use. One-shot at boot.
-export async function setCryptoDefaultProvider(): Promise<FfiResult<string>> {
-  return callFfi(RPCModule.setCryptoDefaultProvider());
-}
-
 // ---------------------------------------------------------------------------
 // Wallet metadata
 // ---------------------------------------------------------------------------

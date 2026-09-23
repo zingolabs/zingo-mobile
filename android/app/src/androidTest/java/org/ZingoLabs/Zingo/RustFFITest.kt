@@ -179,9 +179,6 @@ class ExecuteAddressesFromSeed {
         val chainhint = regtestChainHint()
         val seed = Seeds.HOSPITAL
         
-        val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
-        println(setCrytoProvider)
-
         val initFromSeedJson: String = uniffi.zingo.initFromSeed(seed, 1u, serveruri, chainhint, "Medium", 1u)
         println("\nInit from seed:")
         println(initFromSeedJson)
@@ -227,9 +224,6 @@ class ExecuteAddressesFromUfvk {
         val chainhint = regtestChainHint()
         val ufvk = Ufvk.HOSPITAL
         
-        val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
-        println(setCrytoProvider)
-
         val initFromUfvkJson: String = uniffi.zingo.initFromUfvk(ufvk, 1u, serveruri, chainhint, "Medium", 1u)
         println("\nInit From UFVK:")
         println(initFromUfvkJson)
@@ -278,9 +272,6 @@ class ExecuteVersionFromSeed {
         val chainhint = regtestChainHint()
         val seed = Seeds.HOSPITAL
         
-        val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
-        println(setCrytoProvider)
-
         val initFromSeedJson: String = uniffi.zingo.initFromSeed(seed, 1u, serveruri, chainhint, "Medium", 1u)
         println("\nInit from seed:")
         println(initFromSeedJson)
@@ -312,9 +303,6 @@ class ExecuteSyncFromSeed {
         val serveruri = "http://10.0.2.2:20000"
         val chainhint = regtestChainHint()
         val seed = Seeds.HOSPITAL
-
-        val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
-        println(setCrytoProvider)
 
         val initFromSeedJson: String = uniffi.zingo.initFromSeed(seed, 1u, serveruri, chainhint, "Medium", 1u)
         println("\nInit from seed:")
@@ -379,9 +367,6 @@ class ExecuteSendFromOrchard {
         val chainhint = regtestChainHint()
         val seed = Seeds.HOSPITAL
         
-        val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
-        println(setCrytoProvider)
-
         val initFromSeedJson: String = uniffi.zingo.initFromSeed(seed, 1u, serveruri, chainhint, "Medium", 1u)
         println("\nInit from seed:")
         println(initFromSeedJson)
@@ -524,9 +509,6 @@ class UpdateCurrentPriceAndValueTransfersFromSeed {
         val chainhint = regtestChainHint()
         val seed = Seeds.HOSPITAL
 
-        val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
-        println(setCrytoProvider)
-
         val initFromSeedJson: String = uniffi.zingo.initFromSeed(seed, 1u, serveruri, chainhint, "Medium", 1u)
         println("\nInit from seed:")
         println(initFromSeedJson)
@@ -616,9 +598,6 @@ class ExecuteSaplingBalanceFromSeed {
         val chainhint = regtestChainHint()
         val seed = Seeds.HOSPITAL
         
-        val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
-        println(setCrytoProvider)
-
         val initFromSeedJson: String = uniffi.zingo.initFromSeed(seed, 1u, serveruri, chainhint, "Medium", 1u)
         println("\nInit from seed:")
         println(initFromSeedJson)
@@ -728,9 +707,6 @@ class ExecuteParseAddressForTex {
         val chainhint = regtestChainHint()
         val seed = Seeds.HOSPITAL
         
-        val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
-        println(setCrytoProvider)
-
         val initFromSeedJson: String = uniffi.zingo.initFromSeed(seed, 1u, serveruri, chainhint, "Medium", 1u)
         println("\nInit from seed:")
         println(initFromSeedJson)
@@ -774,9 +750,6 @@ class ExecuteParseAddressInvalid {
         val chainhint = regtestChainHint()
         val seed = Seeds.HOSPITAL
         
-        val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
-        println(setCrytoProvider)
-
         val initFromSeedJson: String = uniffi.zingo.initFromSeed(seed, 1u, serveruri, chainhint, "Medium", 1u)
         println("\nInit from seed:")
         println(initFromSeedJson)

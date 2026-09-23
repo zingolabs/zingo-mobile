@@ -57,7 +57,6 @@ class WalletSwapRecoveryTest {
         file(swapName).delete()
         RPCModule.walletFileClosed = false
         uniffi.zingo.initLogging()
-        uniffi.zingo.setCryptoDefaultProviderToRing()
         walletA = offlineWallet(2000000u)
         walletB = offlineWallet(2100000u)
         assertThat(walletA).isNotEqualTo(walletB)

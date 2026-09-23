@@ -827,15 +827,6 @@ class RPCModule: NSObject {
       }
   }
 
-  @objc(setCryptoDefaultProvider:reject:)
-  func setCryptoDefaultProvider(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      DispatchQueue.global(qos: .userInitiated).async {
-        FfiOutcome.of {
-          try setCryptoDefaultProviderToRing()
-        }.settle(resolve: resolve, reject: reject)
-      }
-  }
-
   // The app-supplied migration broadcast candidate pool (its indexer
   // registry); zingolib embeds no default set.
   @objc(setBroadcastCandidates:resolve:reject:)

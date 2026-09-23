@@ -40,7 +40,6 @@ import {
   restoreExistingWalletBackup,
   restoreWalletFromSeed,
   restoreWalletFromUfvk,
-  setCryptoDefaultProvider,
   walletBackupExists,
   walletExists as rpcWalletExists,
   walletFileDiagnosis,
@@ -559,11 +558,6 @@ export class LoadingAppClass extends Component<
     }
 
     this.setState({ actionButtonsDisabled: true });
-
-    // The App needs to set the crypto Provider by default to ring
-    // before anything...
-    const r = await setCryptoDefaultProvider();
-    console.log('crypto provider result', r);
 
     // has the device the Wallet Keys stored?
     const has = await hasRecoveryWalletInfo();
