@@ -59,7 +59,6 @@ import {
   ServerUrisType,
   SetServerResult,
   UfvkActionEnum,
-  ModeEnum,
   SelectServerEnum,
   ChainNameEnum,
   CurrencyNameEnum,
@@ -138,7 +137,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     server: serverContext,
     language: languageContext,
     privacy: privacyContext,
-    mode,
     netInfo,
     addLastSnackbar,
     security: securityContext,
@@ -1567,125 +1565,119 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
               </View>
 
               {/* SECTION: Privacy & Security */}
-              {mode !== ModeEnum.basic &&
-                sectionHeader('settings.section-privacysecurity')}
+              {sectionHeader('settings.section-privacysecurity')}
 
-              {mode !== ModeEnum.basic && (
-                <View style={{ marginHorizontal: 25, marginVertical: 15 }}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        flex: 1,
-                      }}
-                    >
-                      <BoldText>
-                        {translate('settings.privacy-title') as string}
-                      </BoldText>
-                      <TouchableOpacity
-                        onPress={() =>
-                          setOpenInfoSection(
-                            openInfoSection === 'privacy' ? null : 'privacy',
-                          )
-                        }
-                        style={{ marginLeft: 6 }}
-                      >
-                        <FontAwesomeIcon
-                          icon={faInfoCircle}
-                          size={14}
-                          color={colors.fgDefault}
-                        />
-                      </TouchableOpacity>
-                    </View>
-                    <TouchableOpacity onPress={() => setPrivacy(!privacy)}>
-                      {privacy ? (
-                        <SettingSwitchOn width={40} height={19} />
-                      ) : (
-                        <SwitchOff width={40} height={19} />
-                      )}
-                    </TouchableOpacity>
-                  </View>
-                  {openInfoSection === 'privacy' && (
-                    <View
-                      style={{
-                        backgroundColor: '#040E1D',
-                        borderRadius: 8,
-                        padding: 10,
-                        marginTop: 8,
-                      }}
-                    >
-                      <FadeText style={{ textAlign: 'center' }}>
-                        {PRIVACYS.find(d => String(d.value) === 'true')?.text ??
-                          ''}
-                      </FadeText>
-                    </View>
-                  )}
-                </View>
-              )}
-
-              {mode !== ModeEnum.basic && (
-                <View
-                  style={{
-                    marginLeft: 25,
-                    marginRight: 25,
-                    marginVertical: 15,
-                  }}
-                >
+              <View style={{ marginHorizontal: 25, marginVertical: 15 }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                   <View
                     style={{
                       flexDirection: 'row',
                       alignItems: 'center',
-                      justifyContent: 'space-between',
+                      flex: 1,
                     }}
                   >
-                    <BoldText testID="settings.securitytitle">
-                      {translate('settings.security-title') as string}
+                    <BoldText>
+                      {translate('settings.privacy-title') as string}
                     </BoldText>
                     <TouchableOpacity
-                      onPress={() => securityBottomSheetRef.current?.present()}
+                      onPress={() =>
+                        setOpenInfoSection(
+                          openInfoSection === 'privacy' ? null : 'privacy',
+                        )
+                      }
+                      style={{ marginLeft: 6 }}
                     >
-                      <View
-                        style={{ flexDirection: 'row', alignItems: 'center' }}
-                      >
-                        <RegText
-                          style={{
-                            marginRight: 5,
-                            fontWeight: '400',
-                            color: colors.fgMuted,
-                          }}
-                        >
-                          {securityLabel}
-                        </RegText>
-                        <FontAwesomeIcon
-                          icon={faChevronRight}
-                          size={12}
-                          color={colors.fgMuted}
-                        />
-                      </View>
+                      <FontAwesomeIcon
+                        icon={faInfoCircle}
+                        size={14}
+                        color={colors.fgDefault}
+                      />
                     </TouchableOpacity>
                   </View>
-                  {deviceSecurity.kind === 'insecure' && (
-                    <FadeText style={{ marginTop: 6 }}>
-                      {
-                        translate(
-                          'settings.security-device-locked-hint',
-                        ) as string
-                      }
-                    </FadeText>
-                  )}
+                  <TouchableOpacity onPress={() => setPrivacy(!privacy)}>
+                    {privacy ? (
+                      <SettingSwitchOn width={40} height={19} />
+                    ) : (
+                      <SwitchOff width={40} height={19} />
+                    )}
+                  </TouchableOpacity>
                 </View>
-              )}
+                {openInfoSection === 'privacy' && (
+                  <View
+                    style={{
+                      backgroundColor: '#040E1D',
+                      borderRadius: 8,
+                      padding: 10,
+                      marginTop: 8,
+                    }}
+                  >
+                    <FadeText style={{ textAlign: 'center' }}>
+                      {PRIVACYS.find(d => String(d.value) === 'true')?.text ??
+                        ''}
+                    </FadeText>
+                  </View>
+                )}
+              </View>
+
+              <View
+                style={{
+                  marginLeft: 25,
+                  marginRight: 25,
+                  marginVertical: 15,
+                }}
+              >
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                  }}
+                >
+                  <BoldText testID="settings.securitytitle">
+                    {translate('settings.security-title') as string}
+                  </BoldText>
+                  <TouchableOpacity
+                    onPress={() => securityBottomSheetRef.current?.present()}
+                  >
+                    <View
+                      style={{ flexDirection: 'row', alignItems: 'center' }}
+                    >
+                      <RegText
+                        style={{
+                          marginRight: 5,
+                          fontWeight: '400',
+                          color: colors.fgMuted,
+                        }}
+                      >
+                        {securityLabel}
+                      </RegText>
+                      <FontAwesomeIcon
+                        icon={faChevronRight}
+                        size={12}
+                        color={colors.fgMuted}
+                      />
+                    </View>
+                  </TouchableOpacity>
+                </View>
+                {deviceSecurity.kind === 'insecure' && (
+                  <FadeText style={{ marginTop: 6 }}>
+                    {
+                      translate(
+                        'settings.security-device-locked-hint',
+                      ) as string
+                    }
+                  </FadeText>
+                )}
+              </View>
 
               {/* SECTION: Network & Advanced */}
-              {mode !== ModeEnum.basic &&
-                sectionHeader('settings.section-networkadvanced')}
+              {sectionHeader('settings.section-networkadvanced')}
 
               {/* Nym is no longer a choice: every transmission travels the
                   mixnet. The row is left as the way into the diagnostics,
                   and its green says the network is the one carrying the
                   wallet's traffic. */}
-              {mode !== ModeEnum.basic && mixnetView !== null && (
+              {mixnetView !== null && (
                 <TouchableOpacity
                   testID="settings.mixnet"
                   onPress={() => navigation.navigate(RouteEnum.MixnetDoctor)}
@@ -1708,122 +1700,116 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                 </TouchableOpacity>
               )}
 
-              {mode !== ModeEnum.basic && (
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    marginLeft: 25,
-                    marginRight: 25,
-                    marginVertical: 15,
-                  }}
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  marginLeft: 25,
+                  marginRight: 25,
+                  marginVertical: 15,
+                }}
+              >
+                <BoldText>
+                  {translate('settings.server-title') as string}
+                </BoldText>
+                <TouchableOpacity
+                  disabled={disabled}
+                  onPress={() => serverBottomSheetRef.current?.present()}
+                  style={{ flex: 1, marginLeft: 12 }}
                 >
-                  <BoldText>
-                    {translate('settings.server-title') as string}
-                  </BoldText>
-                  <TouchableOpacity
-                    disabled={disabled}
-                    onPress={() => serverBottomSheetRef.current?.present()}
-                    style={{ flex: 1, marginLeft: 12 }}
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'flex-end',
+                    }}
                   >
                     <View
                       style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        justifyContent: 'flex-end',
+                        flex: 1,
+                        alignItems: 'flex-end',
+                        marginRight: 8,
                       }}
                     >
-                      <View
-                        style={{
-                          flex: 1,
-                          alignItems: 'flex-end',
-                          marginRight: 8,
-                        }}
-                      >
-                        {selectServer !== SelectServerEnum.offline && (
-                          <FadeText
-                            numberOfLines={1}
-                            style={{
-                              fontSize: 11,
-                              lineHeight: 13,
-                              color: customServerIncomplete
-                                ? colors.fgDangerEmphasis
-                                : colors.fgMuted,
-                            }}
-                          >
-                            {currentServerKindLabel}
-                          </FadeText>
-                        )}
-                        <RegText
+                      {selectServer !== SelectServerEnum.offline && (
+                        <FadeText
                           numberOfLines={1}
-                          ellipsizeMode="middle"
                           style={{
-                            fontWeight: '400',
+                            fontSize: 11,
+                            lineHeight: 13,
                             color: customServerIncomplete
                               ? colors.fgDangerEmphasis
                               : colors.fgMuted,
                           }}
                         >
-                          {currentServerLabel}
-                        </RegText>
-                      </View>
-                      <FontAwesomeIcon
-                        icon={faChevronRight}
-                        size={16}
-                        color={
-                          customServerIncomplete
-                            ? colors.fgDangerEmphasis
-                            : colors.fgMuted
-                        }
-                      />
-                    </View>
-                  </TouchableOpacity>
-                </View>
-              )}
-
-              {mode !== ModeEnum.basic && (
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    marginLeft: 25,
-                    marginRight: 25,
-                    marginVertical: 15,
-                  }}
-                >
-                  <BoldText>
-                    {translate('settings.blockexplorer-title') as string}
-                  </BoldText>
-                  <TouchableOpacity
-                    disabled={disabled}
-                    onPress={() => blockExplorerSelectRef.current?.present()}
-                  >
-                    <View
-                      style={{ flexDirection: 'row', alignItems: 'center' }}
-                    >
+                          {currentServerKindLabel}
+                        </FadeText>
+                      )}
                       <RegText
+                        numberOfLines={1}
+                        ellipsizeMode="middle"
                         style={{
-                          marginRight: 5,
                           fontWeight: '400',
-                          color: colors.fgMuted,
+                          color: customServerIncomplete
+                            ? colors.fgDangerEmphasis
+                            : colors.fgMuted,
                         }}
                       >
-                        {
-                          translate(
-                            `settings.value-blockexplorer-${blockExplorer}`,
-                          ) as string
-                        }
+                        {currentServerLabel}
                       </RegText>
-                      <FontAwesomeIcon
-                        icon={faChevronRight}
-                        size={12}
-                        color={colors.fgMuted}
-                      />
                     </View>
-                  </TouchableOpacity>
-                </View>
-              )}
+                    <FontAwesomeIcon
+                      icon={faChevronRight}
+                      size={16}
+                      color={
+                        customServerIncomplete
+                          ? colors.fgDangerEmphasis
+                          : colors.fgMuted
+                      }
+                    />
+                  </View>
+                </TouchableOpacity>
+              </View>
+
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  marginLeft: 25,
+                  marginRight: 25,
+                  marginVertical: 15,
+                }}
+              >
+                <BoldText>
+                  {translate('settings.blockexplorer-title') as string}
+                </BoldText>
+                <TouchableOpacity
+                  disabled={disabled}
+                  onPress={() => blockExplorerSelectRef.current?.present()}
+                >
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <RegText
+                      style={{
+                        marginRight: 5,
+                        fontWeight: '400',
+                        color: colors.fgMuted,
+                      }}
+                    >
+                      {
+                        translate(
+                          `settings.value-blockexplorer-${blockExplorer}`,
+                        ) as string
+                      }
+                    </RegText>
+                    <FontAwesomeIcon
+                      icon={faChevronRight}
+                      size={12}
+                      color={colors.fgMuted}
+                    />
+                  </View>
+                </TouchableOpacity>
+              </View>
 
               {/* SECTION: Other */}
               {sectionHeader('settings.section-other', () =>
@@ -1851,7 +1837,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
               </TouchableOpacity>
 
               {/* SECTION: Developer */}
-              {mode !== ModeEnum.basic && showDeveloperOptions && (
+              {showDeveloperOptions && (
                 <>
                   {sectionHeader('settings.section-developer')}
                   <View style={{ width: '100%', marginBottom: 20 }}>

@@ -33,7 +33,6 @@ import BoldText from '@ui/primitives/BoldText';
 import AppSheet from '@ui/primitives/AppSheet';
 import {
   ChainNameEnum,
-  ModeEnum,
   RouteEnum,
   ScreenEnum,
   SnackbarDurationEnum,
@@ -84,7 +83,6 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
   const {
     translate,
     server,
-    mode,
     addLastSnackbar,
     setPrivacyOption,
     security,
@@ -390,23 +388,12 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
           }}
         >
           <Button
-            type={
-              mode === ModeEnum.basic
-                ? ButtonTypeEnum.Secondary
-                : ButtonTypeEnum.Primary
-            }
-            // Same rationale as Seed.tsx: in advanced mode the button
-            // drives the ufvk-dependent confirm/change/backup/server
-            // flow; disable when the UFVK is missing so presses don't
-            // silently no-op.
-            disabled={mode !== ModeEnum.basic && !fetchedWallet.ufvk}
-            title={
-              mode === ModeEnum.basic
-                ? (translate('cancel') as string)
-                : !!texts && !!texts[action]
-                  ? texts[action][times]
-                  : ''
-            }
+            type={ButtonTypeEnum.Primary}
+            // Same rationale as Seed.tsx: the button drives the ufvk-dependent
+            // confirm/change/backup/server flow; disable when the UFVK is
+            // missing so presses don't silently no-op.
+            disabled={!fetchedWallet.ufvk}
+            title={!!texts && !!texts[action] ? texts[action][times] : ''}
             onPress={() => {
               if (!fetchedWallet.ufvk) {
                 return;
@@ -422,7 +409,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
       </BottomSheetFooter>
     ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [colors, mode, texts, action, times, fetchedWallet.ufvk, translate],
+    [colors, texts, action, times, fetchedWallet.ufvk, translate],
   );
 
   if (!authPassed) {
@@ -465,7 +452,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
               }}
             >
               <ActivityIndicator size="large" color={colors.fgAccent} />
-              {ufvkSource !== null && mode !== ModeEnum.basic && (
+              {ufvkSource !== null && (
                 <RegText style={{ marginTop: 12, textAlign: 'center' }}>
                   {
                     translate(
@@ -541,7 +528,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
                           {translate('seed.tapcopy') as string}
                         </Text>
                       </TouchableOpacity>
-                      {ufvkSource !== null && mode !== ModeEnum.basic && (
+                      {ufvkSource !== null && (
                         <FadeText
                           style={{
                             alignSelf: 'stretch',

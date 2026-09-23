@@ -18,7 +18,6 @@ import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
   ChainNameEnum,
-  ModeEnum,
   RouteEnum,
   SelectServerEnum,
   SnackbarDurationEnum,
@@ -32,7 +31,6 @@ import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
 import CurrencyAmount from '@ui/widgets/CurrencyAmount';
 import FadeText from '@ui/primitives/FadeText';
 import PriceFetcher from '@ui/widgets/PriceFetcher';
-import RegText from '@ui/primitives/RegText';
 import ZecAmount from '@ui/widgets/ZecAmount';
 import PrivacyToggle from './PrivacyToggle';
 
@@ -55,7 +53,6 @@ const materialize: EntryExitAnimationFunction = () => {
 
 type BalanceRowProps = {
   noBalance: boolean | undefined;
-  mode: ModeEnum;
   noPrivacy: boolean | undefined;
   setPrivacyOption: ((value: boolean) => Promise<void>) | undefined;
   addLastSnackbar:
@@ -73,14 +70,12 @@ type BalanceRowProps = {
   calculatePoolsToShield: () => string;
   calculateDisableButtonToShield: () => boolean;
   onPressShieldFunds: () => void;
-  receivedLegend: boolean | undefined;
   onUsdRowLayout?: (height: number) => void;
 };
 
 const BalanceRow: React.FC<BalanceRowProps> = React.memo(
   ({
     noBalance,
-    mode,
     noPrivacy,
     setPrivacyOption,
     addLastSnackbar,
@@ -97,7 +92,6 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
     calculatePoolsToShield,
     calculateDisableButtonToShield,
     onPressShieldFunds,
-    receivedLegend,
     onUsdRowLayout,
   }) => {
     const navigation = useNavigation<NavigationProp<ParamListBase>>();
@@ -122,17 +116,14 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
               marginBottom: showFiat ? 0 : BALANCE_BOTTOM_GAP,
             }}
           >
-            {mode !== ModeEnum.basic &&
-              !noPrivacy &&
-              setPrivacyOption &&
-              addLastSnackbar && (
-                <PrivacyToggle
-                  privacy={privacy}
-                  setPrivacyOption={setPrivacyOption}
-                  addLastSnackbar={addLastSnackbar}
-                  translate={translate}
-                />
-              )}
+            {!noPrivacy && setPrivacyOption && addLastSnackbar && (
+              <PrivacyToggle
+                privacy={privacy}
+                setPrivacyOption={setPrivacyOption}
+                addLastSnackbar={addLastSnackbar}
+                translate={translate}
+              />
+            )}
             <ZecAmount
               currencyName={info.currencyName}
               color={colors.fgDefault}
@@ -148,8 +139,7 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
               privacy={privacy}
               smallPrefix={true}
             />
-            {mode !== ModeEnum.basic &&
-              totalBalance &&
+            {totalBalance &&
               (totalBalance.totalOrchardBalance !==
                 totalBalance.confirmedOrchardBalance ||
                 totalBalance.totalIronwoodBalance > 0 ||
@@ -185,38 +175,6 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
               )}
           </View>
         )}
-
-        {receivedLegend &&
-          totalBalance &&
-          totalBalance.totalIronwoodBalance +
-            totalBalance.totalOrchardBalance +
-            totalBalance.totalSaplingBalance >
-            0 && (
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'center',
-                margin: 0,
-              }}
-            >
-              <RegText color={colors.fgAccent}>
-                {translate('seed.youreceived') as string}
-              </RegText>
-              <ZecAmount
-                currencyName={info.currencyName}
-                color={colors.fgAccent}
-                size={14}
-                amtZec={
-                  totalBalance.totalIronwoodBalance +
-                  totalBalance.totalOrchardBalance +
-                  totalBalance.totalSaplingBalance
-                }
-                privacy={privacy}
-              />
-              <RegText color={colors.fgAccent}>!!!</RegText>
-            </View>
-          )}
 
         {showFiat && (
           <Animated.View

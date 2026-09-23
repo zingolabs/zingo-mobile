@@ -37,7 +37,6 @@ import { createAlert } from '@app/services/createAlert';
 import { sendEmail } from '@app/services/sendEmail';
 import Utils from '@app/utils';
 import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
-//import { ModeEnum } from '@app/AppState';
 
 type SyncReportProps = NativeStackScreenProps<
   AppDrawerParamList,
@@ -60,7 +59,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
     setBackgroundError,
     addLastSnackbar,
     setBackgroundSyncErrorInfo,
-  } = context; //mode
+  } = context;
   const { colors } = useTheme();
   const screenName = ScreenEnum.SyncReport;
 

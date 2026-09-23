@@ -99,12 +99,6 @@ export default class SettingsFileImpl {
           }
         }
       }
-      if (!settings.hasOwnProperty(SettingsNameEnum.basicFirstViewSeed)) {
-        // by default we assume the user saw the seed,
-        // only if the user is basic and is creating a new wallet -> false.
-        // this means when the user have funds, the seed screen will show up.
-        settings.basicFirstViewSeed = true;
-      }
       if (!settings.hasOwnProperty(SettingsNameEnum.version)) {
         // here we know the user is updating the App, for sure.
         // from some version before.
@@ -199,7 +193,8 @@ export default class SettingsFileImpl {
       // choice, now always USD, and the Nym switch: every transmission
       // travels the mixnet, so there is nothing left to choose, and the
       // switch for keeping the wallet's recovery info on the device, now
-      // always kept.
+      // always kept, and the mode the App no longer has, with the flag that
+      // drove its one-off seed screen.
       const obsolete = settings as unknown as Record<string, unknown>;
       delete obsolete.donation;
       delete obsolete.firstUpdateWithDonation;
@@ -208,6 +203,8 @@ export default class SettingsFileImpl {
       delete obsolete.currency;
       delete obsolete.nym;
       delete obsolete.recoveryWalletInfoOnDevice;
+      delete obsolete.mode;
+      delete obsolete.basicFirstViewSeed;
       // old security options that have to be removed and to add the new one.
       if (settings.hasOwnProperty(SettingsNameEnum.security)) {
         const sec: SecurityType = settings.security;

@@ -6,14 +6,8 @@ import {
   BottomTabBarProps,
 } from '@react-navigation/bottom-tabs';
 import { TabActions } from '@react-navigation/native';
-import { useTheme, advancedTokens } from '@app/theme';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faRefresh } from '@fortawesome/free-solid-svg-icons';
-import { ModeEnum, RouteEnum } from '@app/AppState';
-import { ContextAppLoaded } from '@app/context';
-import TotalBalanceClass, {
-  hasFullyUnconfirmedPool,
-} from '@app/AppState/classes/TotalBalanceClass';
+import { useTheme, themeTokens } from '@app/theme';
+import { RouteEnum } from '@app/AppState';
 import { HouseFilledIcon } from '@ui/primitives/Icons/HouseFilledIcon';
 import { HouseOutlineIcon } from '@ui/primitives/Icons/HouseOutlineIcon';
 import { SendFilledIcon } from '@ui/primitives/Icons/SendFilledIcon';
@@ -28,7 +22,7 @@ const TAB_H_PADDING = 30;
 const TAB_V_PADDING = 10;
 // bgChrome is mode-independent, so a module-level read is safe for the
 // StyleSheet below
-const PILL_BG = advancedTokens.bgChrome;
+const PILL_BG = themeTokens.bgChrome;
 const PILL_BORDER = '#071A35';
 const PILL_HEIGHT = ICON_SIZE + 2 * TAB_V_PADDING + 2 * BUBBLE_V_MARGIN + 2;
 const WRAPPER_PADDING_BOTTOM = 25;
@@ -47,9 +41,6 @@ export const FadeOnlyTabBar = (): React.ReactElement => (
 function renderNavIcon(
   routeName: string,
   isFocused: boolean,
-  mode: ModeEnum,
-  totalBalance: TotalBalanceClass | null,
-  somePending: boolean,
   color: string,
 ): React.ReactElement {
   if (routeName === RouteEnum.History) {
@@ -60,16 +51,6 @@ function renderNavIcon(
     );
   }
   if (routeName === RouteEnum.Send) {
-    const isPending =
-      mode === ModeEnum.basic &&
-      !!totalBalance &&
-      hasFullyUnconfirmedPool(totalBalance) &&
-      somePending;
-    if (isPending) {
-      return (
-        <FontAwesomeIcon icon={faRefresh} size={SEND_SIZE} color={color} />
-      );
-    }
     return isFocused ? (
       <SendFilledIcon size={SEND_SIZE} color={color} />
     ) : (
@@ -87,7 +68,6 @@ const CustomTabBar = ({
   state,
   navigation,
 }: BottomTabBarProps): React.ReactElement => {
-  const { mode, totalBalance, somePending } = useContext(ContextAppLoaded);
   const reportHeight = useContext(BottomTabBarHeightCallbackContext);
   // The active-tab bubble used to be hardcoded to the advanced-theme green
   // (#149D05), so basic mode showed an off-palette green. Pull from the
@@ -217,14 +197,7 @@ const CustomTabBar = ({
                 <Animated.View
                   style={{ transform: [{ scale: pressAnims[route.key] }] }}
                 >
-                  {renderNavIcon(
-                    route.name,
-                    isFocused,
-                    mode,
-                    totalBalance,
-                    somePending,
-                    color,
-                  )}
+                  {renderNavIcon(route.name, isFocused, color)}
                 </Animated.View>
               </Pressable>
             );

@@ -3,7 +3,6 @@ export enum SettingsNameEnum {
   server = 'server',
   language = 'language',
   privacy = 'privacy',
-  mode = 'mode',
   security = 'security',
   selectServer = 'selectServer',
   performanceLevel = 'performanceLevel',
@@ -11,7 +10,6 @@ export enum SettingsNameEnum {
 
   // internal management
   firstInstall = 'firstInstall',
-  basicFirstViewSeed = 'basicFirstViewSeed',
   version = 'version',
   ironwoodOnboardSeen = 'ironwoodOnboardSeen',
 }

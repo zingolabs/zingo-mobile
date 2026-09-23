@@ -7,24 +7,18 @@ import type {
 } from '@screens/OptionsPanel';
 import { closeOptionsPanel, useOptionsPanel } from '@app/context/optionsPanel';
 import { ContextAppLoaded } from '@app/context';
-import { MenuItemEnum, ModeEnum, SelectServerEnum } from '@app/AppState';
+import { MenuItemEnum, SelectServerEnum } from '@app/AppState';
 import { sendEmail } from '@app/services/sendEmail';
 import { walletBackupExists } from '@app/walletBackend';
-import { getZingoLogo, getZingoName } from '@app/utils/ZingoAppData';
-import { advancedTokens, basicTokens } from '@app/theme';
 
 import AddressBookIcon from '../../assets/img/options/address-book.svg';
-import AddressBookBasicIcon from '../../assets/img/options/address-book-basic.svg';
 import WalletSeedIcon from '../../assets/img/options/wallet-seed.svg';
-import WalletSeedBasicIcon from '../../assets/img/options/wallet-seed-basic.svg';
 import RescanIcon from '../../assets/img/options/rescan.svg';
 import SyncRescanReportIcon from '../../assets/img/options/sync-rescan-report.svg';
 import FundsPoolsIcon from '../../assets/img/options/funds-pools.svg';
 import FinancialInsightIcon from '../../assets/img/options/financial-insight.svg';
-import FinancialInsightBasicIcon from '../../assets/img/options/financial-insight-basic.svg';
 import RestoreBackupIcon from '../../assets/img/options/restore-backup.svg';
 import SwitchWalletIcon from '../../assets/img/options/switch-wallet.svg';
-import LoadWalletFromSeedBasicIcon from '../../assets/img/options/switch-wallet-basic.svg';
 
 const SOCIAL_X_URL = 'https://x.com/ZingoLabs';
 const SOCIAL_GITHUB_URL = 'https://github.com/zingolabs/zingo-mobile';
@@ -42,40 +36,29 @@ const MENU_TEST_IDS: Partial<Record<MenuItemEnum, string>> = {
   [MenuItemEnum.FundPools]: 'menu.fundpools',
   [MenuItemEnum.Insight]: 'menu.insight',
   [MenuItemEnum.ChangeWallet]: 'menu.changewallet',
-  [MenuItemEnum.LoadWalletFromSeed]: 'menu.loadwalletfromseed',
   [MenuItemEnum.RestoreWalletBackup]: 'menu.restorebackupwallet',
 };
 
 type LoadedAppOptionsPanelHostProps = {
   onMenuItemSelected: (item: MenuItemEnum) => void;
-  setModeOption: (mode: ModeEnum) => Promise<void>;
   zingolibVersion: string;
   children: React.ReactNode;
 };
 
 /**
  * Wires the global OptionsPanel content for the LoadedApp tree: builds the
- * actions grid from MenuItemEnum, the 3 socials (X / GitHub copy-URL, mail
- * launches the device composer) and the mode-toggle pill at the bottom.
+ * actions grid from MenuItemEnum and the 3 socials (X / GitHub copy-URL, mail
+ * launches the device composer).
  * Stays in a functional component so it can consume ContextAppLoaded and the
  * OptionsPanel context naturally (LoadedApp itself is a class).
  */
 const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
   onMenuItemSelected,
-  setModeOption,
   zingolibVersion,
   children,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const {
-    translate,
-    mode,
-    addLastSnackbar,
-    readOnly,
-    selectServer,
-    netInfo,
-    valueTransfersTotal,
-  } = context;
+  const { translate, addLastSnackbar, readOnly, selectServer } = context;
   const { isOpen } = useOptionsPanel();
 
   // Re-check the backup file each time the panel opens — same trigger as the
@@ -101,32 +84,13 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
   );
 
   // Visibility rules mirror the legacy Menu.tsx so the grid behaves the
-  // same: most "wallet-changing" items only make sense online + advanced,
-  // and basic-mode with an empty wallet hides the seed/insight cells.
+  // same: the items that reach out to a server are hidden Offline, and
+  // restoring a backup needs one to exist.
   const actions = useMemo<OptionsPanelAction[]>(() => {
-    const isBasic = mode === ModeEnum.basic;
     const isOffline = selectServer === SelectServerEnum.offline;
-    const isEmptyBasic =
-      isBasic && valueTransfersTotal !== null && valueTransfersTotal === 0;
-
-    const showSeedUfvk = !isEmptyBasic;
-    // Legacy Menu.tsx parity: advanced + online + context-flag.
-    const showRescan = !isBasic && !isOffline;
-    const showSyncReport = !isBasic && !isOffline;
-    const showFundPools = !isBasic;
-    const showInsight = !isEmptyBasic;
-    const showRestoreBackup = !isBasic && hasBackupWallet;
-    // Change wallet is a local operation (switch the loaded wallet, opened via
-    // init_from_b64 which works Offline), so it needs neither connectivity nor
-    // an online server.
-    const showChangeWallet = !isBasic;
-    // basic-only entries replicated from the legacy Menu.tsx.
-    const showLoadWalletFromSeed =
-      isBasic &&
-      valueTransfersTotal !== null &&
-      valueTransfersTotal === 0 &&
-      netInfo.isConnected &&
-      !isOffline;
+    const showRescan = !isOffline;
+    const showSyncReport = !isOffline;
+    const showRestoreBackup = hasBackupWallet;
     const list: OptionsPanelAction[] = [];
 
     // AddressBook — always visible.
@@ -134,36 +98,20 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
       id: MenuItemEnum.AddressBook,
       testID: MENU_TEST_IDS[MenuItemEnum.AddressBook],
       label: translate('loadedapp.addressbook') as string,
-      icon: isBasic ? (
-        <AddressBookBasicIcon width={28} height={28} />
-      ) : (
-        <AddressBookIcon width={28} height={28} />
-      ),
+      icon: <AddressBookIcon width={28} height={28} />,
       onPress: () => dispatch(MenuItemEnum.AddressBook),
     });
 
-    if (showSeedUfvk) {
-      // Same label-rules as Menu.tsx: 'seed' vs 'ufvk' depending on
-      // readOnly, and 'basic' suffix when the user is in basic mode.
-      const label = readOnly
-        ? isBasic
-          ? (translate('loadedapp.walletufvk-basic') as string)
-          : (translate('loadedapp.walletufvk') as string)
-        : isBasic
-          ? (translate('loadedapp.walletseed-basic') as string)
-          : (translate('loadedapp.walletseed') as string);
-      list.push({
-        id: MenuItemEnum.WalletSeedUfvk,
-        testID: MENU_TEST_IDS[MenuItemEnum.WalletSeedUfvk],
-        label,
-        icon: isBasic ? (
-          <WalletSeedBasicIcon width={28} height={28} />
-        ) : (
-          <WalletSeedIcon width={28} height={28} />
-        ),
-        onPress: () => dispatch(MenuItemEnum.WalletSeedUfvk),
-      });
-    }
+    // Same label-rule as Menu.tsx: 'seed' vs 'ufvk' depending on readOnly.
+    list.push({
+      id: MenuItemEnum.WalletSeedUfvk,
+      testID: MENU_TEST_IDS[MenuItemEnum.WalletSeedUfvk],
+      label: readOnly
+        ? (translate('loadedapp.walletufvk') as string)
+        : (translate('loadedapp.walletseed') as string),
+      icon: <WalletSeedIcon width={28} height={28} />,
+      onPress: () => dispatch(MenuItemEnum.WalletSeedUfvk),
+    });
 
     if (showRescan) {
       list.push({
@@ -185,49 +133,29 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
       });
     }
 
-    if (showFundPools) {
-      list.push({
-        id: MenuItemEnum.FundPools,
-        testID: MENU_TEST_IDS[MenuItemEnum.FundPools],
-        label: translate('loadedapp.fundpools') as string,
-        icon: <FundsPoolsIcon width={30} height={30} />,
-        onPress: () => dispatch(MenuItemEnum.FundPools),
-      });
-    }
+    list.push({
+      id: MenuItemEnum.FundPools,
+      testID: MENU_TEST_IDS[MenuItemEnum.FundPools],
+      label: translate('loadedapp.fundpools') as string,
+      icon: <FundsPoolsIcon width={30} height={30} />,
+      onPress: () => dispatch(MenuItemEnum.FundPools),
+    });
 
-    if (showInsight) {
-      list.push({
-        id: MenuItemEnum.Insight,
-        testID: MENU_TEST_IDS[MenuItemEnum.Insight],
-        label: translate('loadedapp.insight') as string,
-        icon: isBasic ? (
-          <FinancialInsightBasicIcon width={30} height={30} />
-        ) : (
-          <FinancialInsightIcon width={30} height={30} />
-        ),
-        onPress: () => dispatch(MenuItemEnum.Insight),
-      });
-    }
+    list.push({
+      id: MenuItemEnum.Insight,
+      testID: MENU_TEST_IDS[MenuItemEnum.Insight],
+      label: translate('loadedapp.insight') as string,
+      icon: <FinancialInsightIcon width={30} height={30} />,
+      onPress: () => dispatch(MenuItemEnum.Insight),
+    });
 
-    if (showChangeWallet) {
-      list.push({
-        id: MenuItemEnum.ChangeWallet,
-        testID: MENU_TEST_IDS[MenuItemEnum.ChangeWallet],
-        label: translate('loadedapp.changewallet') as string,
-        icon: <SwitchWalletIcon width={30} height={30} />,
-        onPress: () => dispatch(MenuItemEnum.ChangeWallet),
-      });
-    }
-
-    if (showLoadWalletFromSeed) {
-      list.push({
-        id: MenuItemEnum.LoadWalletFromSeed,
-        testID: MENU_TEST_IDS[MenuItemEnum.LoadWalletFromSeed],
-        label: translate('loadedapp.loadwalletfromseed-basic') as string,
-        icon: <LoadWalletFromSeedBasicIcon width={30} height={30} />,
-        onPress: () => dispatch(MenuItemEnum.LoadWalletFromSeed),
-      });
-    }
+    list.push({
+      id: MenuItemEnum.ChangeWallet,
+      testID: MENU_TEST_IDS[MenuItemEnum.ChangeWallet],
+      label: translate('loadedapp.changewallet') as string,
+      icon: <SwitchWalletIcon width={30} height={30} />,
+      onPress: () => dispatch(MenuItemEnum.ChangeWallet),
+    });
 
     if (showRestoreBackup) {
       list.push({
@@ -240,16 +168,7 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
     }
 
     return list;
-  }, [
-    translate,
-    dispatch,
-    mode,
-    readOnly,
-    selectServer,
-    netInfo.isConnected,
-    valueTransfersTotal,
-    hasBackupWallet,
-  ]);
+  }, [translate, dispatch, readOnly, selectServer, hasBackupWallet]);
 
   const socials = useMemo<OptionsPanelSocial[]>(
     () => [
@@ -266,27 +185,12 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
     [translate, zingolibVersion],
   );
 
-  const modePill = useMemo(() => {
-    const isBasic = mode === ModeEnum.basic;
-    const target = isBasic ? ModeEnum.advanced : ModeEnum.basic;
-    return {
-      walletName: getZingoName(),
-      targetModeLabel: translate(`settings.value-mode-${target}`) as string,
-      targetModeColor: isBasic ? advancedTokens.fgAccent : basicTokens.fgAccent,
-      logoSource: getZingoLogo(),
-      // Intentionally NOT closing the panel — staying open lets the user
-      // see the action grid change as it re-filters by the new mode.
-      onToggle: () => setModeOption(target),
-    };
-  }, [mode, translate, setModeOption]);
-
   return (
     <OptionsPanelHost
       title={translate('loadedapp.options') as string}
       actions={actions}
       socials={socials}
       onLinkCopied={() => addLastSnackbar(translate('linkcopied') as string)}
-      mode={modePill}
       onClose={closeOptionsPanel}
       onSettings={() => dispatch(MenuItemEnum.Settings)}
     >

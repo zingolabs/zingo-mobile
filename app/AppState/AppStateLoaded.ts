@@ -17,7 +17,6 @@ export default interface AppStateLoaded {
   scrollToBottom: boolean;
 
   // to know if the modal is open or not
-  isSeedViewModalOpen: boolean;
 
   // Address+ownership pair for the shared "Add Tag/Contact" BottomSheetModal
   // hosted at LoadedApp level. `null` while hidden.

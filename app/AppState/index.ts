@@ -30,7 +30,6 @@ import type TxDetailType from './types/TxDetailType';
 import { AddressBookActionEnum } from './enums/AddressBookActionEnum';
 import { MenuItemEnum } from './enums/MenuItemEnum';
 import { LanguageEnum } from './enums/LanguageEnum';
-import { ModeEnum } from './enums/ModeEnum';
 import { SelectServerEnum } from './enums/SelectServerEnum';
 import { ChainNameEnum } from './enums/ChainNameEnum';
 import { SnackbarDurationEnum } from './enums/SnackbarDurationEnum';
@@ -86,7 +85,6 @@ export {
   AddressBookActionEnum,
   MenuItemEnum,
   LanguageEnum,
-  ModeEnum,
   SelectServerEnum,
   ChainNameEnum,
   SnackbarDurationEnum,

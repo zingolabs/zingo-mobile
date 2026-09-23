@@ -54,7 +54,7 @@ const base = {
   fgDangerEmphasis: '#dc2626',
 } as const;
 
-export const advancedTokens: ThemeColors = {
+export const themeTokens: ThemeColors = {
   ...base,
   fgAccent: '#43a637',
   borderAccent: '#43a637',
@@ -67,18 +67,4 @@ export const advancedTokens: ThemeColors = {
   fgMuted: '#7c8494',
   borderMuted: '#7c8494',
   bgMuted: '#7c8494',
-};
-
-export const basicTokens: ThemeColors = {
-  ...base,
-  fgAccent: '#60849c',
-  borderAccent: '#60849c',
-  bgAccent: '#60849c',
-  fgAccentDisabled: '#15576f',
-  borderAccentDisabled: '#15576f',
-  bgAccentDisabled: '#15576f',
-  bgSecondaryDisabled: '#123a53',
-  fgMuted: '#84848a',
-  borderMuted: '#84848a',
-  bgMuted: '#84848a',
 };

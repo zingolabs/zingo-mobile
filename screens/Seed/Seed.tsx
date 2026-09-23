@@ -42,17 +42,14 @@ import { ContextAppLoaded } from '@app/context';
 import { useBiometricGate } from '@app/hooks/useBiometricGate';
 import { useSecureScreen } from '@app/hooks/useSecureScreen';
 import {
-  ModeEnum,
   ChainNameEnum,
   SnackbarDurationEnum,
   SeedActionEnum,
-  SettingsNameEnum,
   ScreenEnum,
   RouteEnum,
 } from '@app/AppState';
 import Header from '@ui/widgets/Header';
 import Utils from '@app/utils';
-import SettingsFileImpl from '@app/services/SettingsFileImpl';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import {
   getRecoveryWalletInfo,
@@ -74,14 +71,12 @@ type TextsType = {
 type SeedProps = NativeStackScreenProps<AppDrawerParamList, RouteEnum.Seed> & {
   onClickOK: (seedPhrase: string, birthdayNumber: number) => void;
   onClickCancel: () => void;
-  keepAwake?: (v: boolean) => void;
   setIsSeedViewModalOpen?: (v: boolean) => void;
 };
 const Seed: React.FunctionComponent<SeedProps> = ({
   route,
   onClickOK,
   onClickCancel,
-  keepAwake,
   setIsSeedViewModalOpen,
 }) => {
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
@@ -92,7 +87,6 @@ const Seed: React.FunctionComponent<SeedProps> = ({
     server,
     netInfo,
     privacy,
-    mode,
     addLastSnackbar,
     setPrivacyOption,
     security,
@@ -144,7 +138,6 @@ const Seed: React.FunctionComponent<SeedProps> = ({
   const [texts, setTexts] = useState<TextsType>({} as TextsType);
   const [expandSeed, setExpandSeed] = useState<boolean>(true);
   const [expandBirthday, setExpandBithday] = useState<boolean>(true);
-  const [basicFirstViewSeed, setBasicFirstViewSeed] = useState<boolean>(true);
   const [action, setAction] = useState<SeedActionEnum>(
     !!route.params && route.params.action !== undefined
       ? route.params.action
@@ -309,20 +302,6 @@ const Seed: React.FunctionComponent<SeedProps> = ({
   }, [route, route.params, route.params?.action]);
 
   useEffect(() => {
-    if (keepAwake) {
-      (async () => {
-        const bfvs: boolean = (await SettingsFileImpl.readSettings())
-          .basicFirstViewSeed;
-        setBasicFirstViewSeed(bfvs);
-        if (!bfvs) {
-          // keep the screen awake while the user is writting the seed
-          keepAwake(true);
-        }
-      })();
-    }
-  }, [keepAwake]);
-
-  useEffect(() => {
     if (privacy) {
       setExpandSeed(false);
       setExpandBithday(false);
@@ -408,30 +387,8 @@ const Seed: React.FunctionComponent<SeedProps> = ({
     // when this screen is open from LoadingApp (new wallet)
     // is using the standard modal from react-native
     setIsSeedViewModalOpen && setIsSeedViewModalOpen(false);
-    // the user just see the seed for the first time.
-    if (mode === ModeEnum.basic && !basicFirstViewSeed) {
-      await SettingsFileImpl.writeSettings(
-        SettingsNameEnum.basicFirstViewSeed,
-        true,
-      );
-      setBasicFirstViewSeed(true);
-      keepAwake && keepAwake(false);
-      // Redirect to history screen — `reset` wipes the stack so the
-      // (already-authenticated) Seed instance can't be reached via a back
-      // gesture after onboarding.
-      navigation.reset({
-        index: 0,
-        routes: [
-          {
-            name: RouteEnum.HomeStack,
-            params: { screen: RouteEnum.History },
-          },
-        ],
-      });
-    } else {
-      if (navigation.canGoBack()) {
-        navigation.goBack();
-      }
+    if (navigation.canGoBack()) {
+      navigation.goBack();
     }
   };
 
@@ -499,25 +456,12 @@ const Seed: React.FunctionComponent<SeedProps> = ({
         >
           <Button
             testID="seed.button.ok"
-            type={
-              mode === ModeEnum.basic
-                ? ButtonTypeEnum.Secondary
-                : ButtonTypeEnum.Primary
-            }
-            // In advanced mode the button drives the seed-dependent
-            // confirm/change/backup/server flow; without the seed phrase
-            // it has nothing to act on, so disable it instead of silently
-            // ignoring presses.
-            disabled={mode !== ModeEnum.basic && !seedPhrase}
-            title={
-              mode === ModeEnum.basic
-                ? !basicFirstViewSeed
-                  ? (translate('seed.showtransactions') as string)
-                  : (translate('cancel') as string)
-                : !!texts && !!texts[action]
-                  ? texts[action][times]
-                  : ''
-            }
+            type={ButtonTypeEnum.Primary}
+            // The button drives the seed-dependent confirm/change/backup/server
+            // flow; without the seed phrase it has nothing to act on, so
+            // disable it instead of silently ignoring presses.
+            disabled={!seedPhrase}
+            title={!!texts && !!texts[action] ? texts[action][times] : ''}
             onPress={async () => {
               if (!seedPhrase) {
                 return;
@@ -533,17 +477,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
       </BottomSheetFooter>
     ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [
-      colors,
-      mode,
-      basicFirstViewSeed,
-      texts,
-      action,
-      times,
-      seedPhrase,
-      birthdayNumber,
-      translate,
-    ],
+    [colors, texts, action, times, seedPhrase, birthdayNumber, translate],
   );
 
   if (!authPassed || !secured) {
@@ -570,11 +504,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
           addLastSnackbar={addLastSnackbar}
           translate={translate}
           netInfo={netInfo}
-          mode={mode}
           privacy={privacy}
-          receivedLegend={
-            action === SeedActionEnum.view ? !basicFirstViewSeed : false
-          }
         />
       </View>
       <AppSheet
@@ -592,7 +522,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
             }}
           >
             <ActivityIndicator size="large" color={colors.fgAccent} />
-            {seedSource !== null && mode !== ModeEnum.basic && (
+            {seedSource !== null && (
               <RegText style={{ marginTop: 12, textAlign: 'center' }}>
                 {
                   translate(
@@ -677,7 +607,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
                   </TouchableOpacity>
                   <View />
                 </View>
-                {seedSource !== null && mode !== ModeEnum.basic && (
+                {seedSource !== null && (
                   <FadeText
                     style={{
                       textAlign: 'right',

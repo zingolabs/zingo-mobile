@@ -8,25 +8,6 @@ let loadRecipientWallet = async () => {
 
   // the start always is like a fress install -> create a new wallet
   // go to setting modal screen
-  await waitFor(element(by.id('header.drawmenu')))
-    .toBeVisible()
-    .withTimeout(sync_timeout);
-  await element(by.id('header.drawmenu')).tap();
-  await waitFor(element(by.id('menu.settings')))
-    .toBeVisible()
-    .withTimeout(sync_timeout);
-  await element(by.id('menu.settings')).tap();
-
-  // first we need to change the App to advanced mode
-  await waitFor(element(by.id('settings.mode-advanced')))
-    .toBeVisible()
-    .withTimeout(sync_timeout);
-  await element(by.id('settings.mode-advanced')).tap();
-  await waitFor(element(by.id('settings.button.save')))
-    .toBeVisible()
-    .withTimeout(sync_timeout);
-  await element(by.id('settings.button.save')).tap();
-
   // connect to regtest network
   await waitFor(element(by.id('header.drawmenu')))
     .toBeVisible()

@@ -12,7 +12,6 @@ import { useTheme } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
 import {
   AddressKindEnum,
-  ModeEnum,
   RouteEnum,
   SnackbarDurationEnum,
   TransparentAddressClass,
@@ -51,13 +50,12 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
 }) => {
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const context = useContext(ContextAppLoaded);
-  const { translate, privacy, addLastSnackbar, mode, addressBook } = context;
+  const { translate, privacy, addLastSnackbar, addressBook } = context;
   const { colors } = useTheme();
 
   const [expandQRAddress, setExpandQRAddress] = useState<boolean>(true);
   const scrollViewRef = useRef<ScrollView>(null);
 
-  const isBasic = ModeEnum.basic === mode;
   const isUnified = address?.addressKind === AddressKindEnum.u;
 
   useEffect(() => {
@@ -112,7 +110,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
         (address &&
           address.address !== (translate('receive.noaddress') as string)) ? (
           <>
-            {address && !isBasic && !isUnified && (
+            {address && !isUnified && (
               <View
                 style={{
                   alignSelf: 'center',
@@ -154,7 +152,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                 marginBottom: 5,
               }}
             >
-              {!isBasic && address && isUnified && (
+              {address && isUnified && (
                 <View
                   style={{
                     flexDirection: 'row',
@@ -201,7 +199,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                   </View>
                 </View>
               )}
-              {address && !isBasic && !isUnified && (
+              {address && !isUnified && (
                 <View
                   style={{
                     flexDirection: 'row',
@@ -361,7 +359,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                     />
                   </View>
                 </TouchableOpacity>
-                {address && !isBasic && (
+                {address && (
                   <>
                     <TouchableOpacity onPress={() => show('VA')}>
                       <View

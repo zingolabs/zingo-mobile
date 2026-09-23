@@ -62,6 +62,3 @@ const poolPairs = (
 
 export const hasUnconfirmedFunds = (balance: TotalBalanceClass): boolean =>
   poolPairs(balance).some(pool => pool.total !== pool.confirmed);
-
-export const hasFullyUnconfirmedPool = (balance: TotalBalanceClass): boolean =>
-  poolPairs(balance).some(pool => pool.total > 0 && pool.confirmed === 0);

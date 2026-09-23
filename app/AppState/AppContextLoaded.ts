@@ -13,7 +13,6 @@ import ServerType from './types/ServerType';
 import SecurityType from './types/SecurityType';
 
 import { LanguageEnum } from './enums/LanguageEnum';
-import { ModeEnum } from './enums/ModeEnum';
 import { SelectServerEnum } from './enums/SelectServerEnum';
 import { ChainNameEnum } from './enums/ChainNameEnum';
 import { SnackbarDurationEnum } from './enums/SnackbarDurationEnum';
@@ -131,7 +130,6 @@ export default interface AppContextLoaded {
   server: ServerType;
   language: LanguageEnum;
   privacy: boolean;
-  mode: ModeEnum;
   security: SecurityType;
   selectServer: SelectServerEnum;
   // The loaded wallet's OWN chain (main/test/regtest). Reliable even Offline,
@@ -146,7 +144,6 @@ export default interface AppContextLoaded {
   // Null where the mixnet policy does not run.
   mixnetView: MixnetView | null;
   reenableMixnet: () => Promise<void>;
-  setModeOption: (value: string) => Promise<void>;
 
   // Monotonically increasing counter incremented every time the app
   // returns from background/inactive to active. Protected screens

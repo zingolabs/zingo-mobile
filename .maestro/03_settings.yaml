@@ -4,7 +4,7 @@ appId: org.ZingoLabs.Zingo
 
 - extendedWaitUntil:
     visible:
-      id: "receive.title"
+      id: "header.drawmenu"
     timeout: 120000
 
 # Navigate to Settings: it lives in the Options panel now

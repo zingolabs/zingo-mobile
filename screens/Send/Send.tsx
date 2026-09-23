@@ -57,7 +57,6 @@ import {
   AddressBookFileClass,
   SendPageStateClass,
   ToAddrClass,
-  ModeEnum,
   ChainNameEnum,
   GlobalConst,
   ServerUrisType,
@@ -153,7 +152,6 @@ const Send: React.FunctionComponent<SendProps> = ({
     walletChainName,
     setBackgroundError,
     addLastSnackbar,
-    mode,
     somePending,
     addressBook,
     launchAddTagModal,
@@ -259,11 +257,8 @@ const Send: React.FunctionComponent<SendProps> = ({
   // Fee (`sendPropose`) and/or spendable-balance RPC error → the CTA turns into
   // a tappable "calculation error" button that opens SendErrorSheet, which
   // lists BOTH errors (they are often the same failure, shown under each label
-  // so that is explicit). Advanced-only, matching the existing raw-error
-  // surfaces (basic mode keeps RPC internals hidden; the CTA stays disabled).
-  const showCalcError =
-    !!(spendableBalanceLastError || proposeSendLastError) &&
-    mode === ModeEnum.advanced;
+  // so that is explicit).
+  const showCalcError = !!(spendableBalanceLastError || proposeSendLastError);
   const feeCalculationGenRef = useRef<number>(0);
   const { decimalSeparator } = getNumberFormatSettings();
   const keyboardHeight = useKeyboardHeight();
@@ -1127,7 +1122,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       calculatedFee: fee,
       proposalPools: proposalPools,
       confirmSend: confirmSend,
-      sendAllAmount: mode !== ModeEnum.basic && isSendAllAmount(amountText),
+      sendAllAmount: isSendAllAmount(amountText),
       calculateFeeWithPropose: calculateFeeWithPropose,
       sendPageState: buildSendState(),
     });
@@ -1592,43 +1587,41 @@ const Send: React.FunctionComponent<SendProps> = ({
                           />
                         </TouchableOpacity>
                       ) : null}
-                      {mode !== ModeEnum.basic && (
-                        <TouchableOpacity
-                          testID="send.max"
-                          onPress={() => {
-                            const maxStr = Utils.parseNumberFloatToStringLocale(
-                              maxAmount,
-                              8,
-                            );
-                            sendAllRef.current = true;
-                            updateToField(null, maxStr, null, null, null);
-                            calculateFeeWithPropose(
-                              maxStr,
-                              addressText,
-                              memoText,
-                              includeUAMemoBoolean,
-                            );
-                          }}
+                      <TouchableOpacity
+                        testID="send.max"
+                        onPress={() => {
+                          const maxStr = Utils.parseNumberFloatToStringLocale(
+                            maxAmount,
+                            8,
+                          );
+                          sendAllRef.current = true;
+                          updateToField(null, maxStr, null, null, null);
+                          calculateFeeWithPropose(
+                            maxStr,
+                            addressText,
+                            memoText,
+                            includeUAMemoBoolean,
+                          );
+                        }}
+                        style={{
+                          paddingLeft: 0,
+                          paddingRight: 8,
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                        }}
+                      >
+                        <BoldText
                           style={{
-                            paddingLeft: 0,
-                            paddingRight: 8,
-                            justifyContent: 'center',
-                            alignItems: 'center',
+                            color: colors.fgAccent,
+                            fontSize: 20,
+                            lineHeight: 20,
+                            letterSpacing: -1.5,
+                            transform: [{ scaleX: 0.8 }],
                           }}
                         >
-                          <BoldText
-                            style={{
-                              color: colors.fgAccent,
-                              fontSize: 20,
-                              lineHeight: 20,
-                              letterSpacing: -1.5,
-                              transform: [{ scaleX: 0.8 }],
-                            }}
-                          >
-                            {translate('send.max') as string}
-                          </BoldText>
-                        </TouchableOpacity>
-                      )}
+                          {translate('send.max') as string}
+                        </BoldText>
+                      </TouchableOpacity>
                     </View>
                     {server.chainName === ChainNameEnum.mainChainName && (
                       <>
@@ -1719,10 +1712,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                     <TouchableOpacity
                       style={{ alignSelf: 'flex-start' }}
                       onPress={() => {
-                        if (
-                          (spendableBalanceLastError || proposeSendLastError) &&
-                          mode === ModeEnum.advanced
-                        ) {
+                        if (spendableBalanceLastError || proposeSendLastError) {
                           sendErrorSheetRef.current?.present();
                         }
                       }}
@@ -1739,11 +1729,9 @@ const Send: React.FunctionComponent<SendProps> = ({
                         <RegText
                           style={{
                             fontSize: 14,
-                            color:
-                              spendableBalanceLastError &&
-                              mode === ModeEnum.advanced
-                                ? colors.fgDanger
-                                : colors.fgDefault,
+                            color: spendableBalanceLastError
+                              ? colors.fgDanger
+                              : colors.fgDefault,
                           }}
                         >
                           {translate('send.spendable') as string}
@@ -1756,8 +1744,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                             color={
                               stillConfirming ||
                               negativeMaxAmount ||
-                              (spendableBalanceLastError &&
-                                mode === ModeEnum.advanced)
+                              spendableBalanceLastError
                                 ? colors.fgDanger
                                 : colors.fgDefault
                             }
@@ -1805,7 +1792,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                         </View>
                       </TouchableOpacity>
                     )}
-                    {showShieldInfo && mode === ModeEnum.advanced && (
+                    {showShieldInfo && (
                       <TouchableOpacity
                         style={{ alignSelf: 'flex-start' }}
                         onPress={() => {
@@ -2091,7 +2078,6 @@ const Send: React.FunctionComponent<SendProps> = ({
                       title={
                         validAmount === 1 &&
                         amountText &&
-                        mode !== ModeEnum.basic &&
                         isSendAllAmount(amountText)
                           ? (translate('send.button-all') as string)
                           : (translate('send.button') as string)
@@ -2112,7 +2098,6 @@ const Send: React.FunctionComponent<SendProps> = ({
                         if (
                           validAmount === 1 &&
                           amountText &&
-                          mode !== ModeEnum.basic &&
                           isSendAllAmount(amountText)
                         ) {
                           addLastSnackbar(
