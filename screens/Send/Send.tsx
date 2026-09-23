@@ -44,9 +44,7 @@ import { SvgXml } from 'react-native-svg';
 import FadeText from '@ui/primitives/FadeText';
 import BoldText from '@ui/primitives/BoldText';
 import Swap from '../../assets/img/swap.svg';
-import {
-  sendGateOpen,
-} from '@app/walletBackend/transforms/mixnetView';
+import { sendGateOpen } from '@app/walletBackend/transforms/mixnetView';
 import ErrorText from '@ui/primitives/ErrorText';
 import RegText from '@ui/primitives/RegText';
 import ZecAmount from '@ui/widgets/ZecAmount';
@@ -387,9 +385,15 @@ const Send: React.FunctionComponent<SendProps> = ({
     setProposeSendLastError('');
   };
 
+  // The balance poll hands over a fresh object every tick, identical numbers
+  // included. Depending on the figure instead of the object keeps the
+  // spendable query — a proposal, and since send-all sizing landed a costly
+  // one — from running again for a balance that did not move.
+  const spendableTotal = totalBalance ? totalBalance.totalSpendableBalance : 0;
+
   const defaultValuesSpendableMaxAmount = useCallback((): void => {
-    setSpendable(totalBalance ? totalBalance.totalSpendableBalance : 0);
-    const max = totalBalance ? totalBalance.totalSpendableBalance : 0;
+    setSpendable(spendableTotal);
+    const max = spendableTotal;
     if (max > 0) {
       // if max have to be more than 0, then the user can send a memo with amount 0 & some fee.
       setMaxAmount(max);
@@ -400,8 +404,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       setNegativeMaxAmount(true);
     }
     setSpendableBalanceLastError('');
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [totalBalance, totalBalance?.totalSpendableBalance]);
+  }, [spendableTotal]);
 
   // Whether this send empties the wallet: MAX was pressed, or the amount
   // typed is the maximum itself. Both travel the send-all path, so the fee
@@ -554,9 +557,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         return;
       }
       // spendable TOTAL calculated
-      let spendableBalance = totalBalance
-        ? totalBalance.totalSpendableBalance
-        : 0;
+      let spendableBalance = spendableTotal;
       const start = Date.now();
       const runSpendableBalance =
         await getSpendableBalanceWithAddress(addressPar);
@@ -602,13 +603,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         setNegativeMaxAmount(true);
       }
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [
-      defaultValuesSpendableMaxAmount,
-      totalBalance,
-      totalBalance?.totalSpendableBalance,
-      validAddress,
-    ],
+    [defaultValuesSpendableMaxAmount, spendableTotal, validAddress],
   );
 
   const updateToField = async (
