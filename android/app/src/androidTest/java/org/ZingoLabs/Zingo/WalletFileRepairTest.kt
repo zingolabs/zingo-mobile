@@ -77,7 +77,6 @@ class WalletFileRepairTest {
         File(context.filesDir, backupName).delete()
         File(context.filesDir, swapName).delete()
         uniffi.zingo.initLogging()
-        uniffi.zingo.setCryptoDefaultProviderToRing()
         uniffi.zingo.initFromSeed(Seeds.HOSPITAL, 2000000u, "", "main", "Medium", 1u)
         plainWallet = uniffi.zingo.saveWalletBytes()!!
         walletFile().writeBytes(plainWallet)

@@ -57,7 +57,6 @@ class FfiOutcomeTest {
         "get_total_spends_to_address" to (ZingolibException.Read("boom") to "Read"),
         "get_spendable_balance_with_address" to (ZingolibException.Read("boom") to "Read"),
         "get_option_wallet" to (ZingolibException.Read("boom") to "Read"),
-        "set_crypto_default_provider_to_ring" to (ZingolibException.Panic("boom") to "Panic"),
         // Server-facing calls fail as the Indexer variant.
         "info_server" to (ZingolibException.Indexer("boom") to "Indexer"),
         "change_server" to (ZingolibException.Indexer("boom") to "Indexer"),
