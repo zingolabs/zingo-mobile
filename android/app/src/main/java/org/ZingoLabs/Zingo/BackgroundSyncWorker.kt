@@ -82,7 +82,7 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
 
         try {
             // if the App is close, it need this at first step.
-            val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
+            val setCrytoProvider = uniffi.zingo.ensureCryptoDefaultProvider()
             Log.i("SCHEDULED_TASK_RUN", "crypto provider default: $setCrytoProvider")
         } catch (t: Throwable) {
             Log.i("SCHEDULED_TASK_RUN", "crypto provider default error: $t")

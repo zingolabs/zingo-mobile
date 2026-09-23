@@ -746,9 +746,9 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     @ReactMethod
     fun setCryptoDefaultProvider(promise: Promise) {
-        FfiOutcome.settling(promise, "set_crypto_default_provider_to_ring") {
+        FfiOutcome.settling(promise, "ensure_crypto_default_provider") {
             uniffi.zingo.initLogging()
-            uniffi.zingo.setCryptoDefaultProviderToRing()
+            uniffi.zingo.ensureCryptoDefaultProvider()
         }
     }
 

@@ -831,7 +831,7 @@ class RPCModule: NSObject {
   func setCryptoDefaultProvider(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
       DispatchQueue.global(qos: .userInitiated).async {
         FfiOutcome.of {
-          try setCryptoDefaultProviderToRing()
+          try ensureCryptoDefaultProvider()
         }.settle(resolve: resolve, reject: reject)
       }
   }
