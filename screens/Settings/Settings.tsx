@@ -1649,7 +1649,12 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                         flex: 1,
                       }}
                     >
+                      {/* The title is the only thing here that may grow, so
+                          it is the only thing that shrinks: a long
+                          translation wraps instead of pushing the info icon
+                          over the switch. */}
                       <TouchableOpacity
+                        style={{ flexShrink: 1 }}
                         onLongPress={() => setShowDeveloperOptions(true)}
                       >
                         <BoldText>

@@ -328,7 +328,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                 testID="header.messages"
                 onPress={() => navigation.navigate(RouteEnum.Messages)}
               >
-                <MessagesIcon size={24} color="#B1BBC5" />
+                <MessagesIcon size={22} color="#B1BBC5" />
               </TouchableOpacity>
             </View>
           ) : (
