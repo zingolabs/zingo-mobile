@@ -56,7 +56,7 @@ const foregroundReturned = () => priceFetcherStore.foregroundReturned();
 const seedDeps = (setZecPrice: (p: number, d: number) => void) => {
   priceFetcherStore.setDeps({
     setZecPrice,
-    mixnetStatusKey: 'mixnet.status.off',
+    mixnetStatusKey: 'mixnet.status.unknown',
     priceFetchable: true,
   });
 };

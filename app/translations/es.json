@@ -421,7 +421,6 @@
   },
   "mixnet": {
     "status": {
-      "off": "Mixnet apagada (red abierta)",
       "bootstrapping": "Conectando a la mixnet…",
       "ready": "Mixnet lista",
       "died": "Conexión mixnet perdida",
