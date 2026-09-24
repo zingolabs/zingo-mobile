@@ -13,7 +13,7 @@ export const MIXNET_STATUS_KEYS: readonly MixnetStatusKey[] = [
   'mixnet.status.unknown',
 ];
 
-// `sendBlocked` is false only for `off` and `ready`.
+// `sendBlocked` is false only for `ready`.
 export type MixnetView = {
   readonly statusKey: MixnetStatusKey;
   readonly socks5Addr: string | null;
@@ -55,15 +55,6 @@ export function deriveMixnetView(
   }
 
   switch (status.indicator) {
-    case RPCMixnetIndicatorEnum.off:
-      return {
-        statusKey: 'mixnet.status.off',
-        socks5Addr: null,
-        narration: null,
-        sendBlocked: false,
-        recovery: 'reenable',
-        reconnecting: false,
-      };
     case RPCMixnetIndicatorEnum.bootstrapping:
       return {
         statusKey: 'mixnet.status.bootstrapping',
@@ -103,11 +94,11 @@ export function sendGateOpen(view: MixnetView | null): boolean {
 
 export type MixnetPhase = 'connecting' | 'ready' | 'lost' | 'reconnecting';
 
-// `off` has no phase and an active reconnect wins over the underlying status.
+// An active reconnect wins over the underlying status.
 export function mixnetPhase(
   statusKey: MixnetStatusKey,
   reconnecting: boolean,
-): MixnetPhase | null {
+): MixnetPhase {
   if (statusKey === 'mixnet.status.ready') {
     return 'ready';
   }
@@ -120,7 +111,5 @@ export function mixnetPhase(
     case 'mixnet.status.died':
     case 'mixnet.status.unknown':
       return 'lost';
-    case 'mixnet.status.off':
-      return null;
   }
 }

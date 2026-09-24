@@ -40,20 +40,8 @@ const transportBinding = {
 describe('deriveMixnetView', () => {
   const noDetail = null;
 
-  it('blocks sending in every state except off and ready', () => {
+  it('blocks sending in every state except ready', () => {
     const blocked = (view: MixnetView) => view.sendBlocked;
-    expect(
-      blocked(
-        deriveMixnetView(
-          {
-            kind: 'status',
-            indicator: RPCMixnetIndicatorEnum.off,
-            socks5Addr: null,
-          },
-          noDetail,
-        ),
-      ),
-    ).toBe(false);
     expect(
       blocked(
         deriveMixnetView(

@@ -86,7 +86,7 @@ afterEach(() => {
   jest.useRealTimers();
 });
 
-test('a switched-off transport mutes the ring and stops its fill', async () => {
+test('a died transport mutes the ring and stops its fill', async () => {
   jest.useFakeTimers();
   price.mockResolvedValue({ price: 42, error: '' });
   const setZecPrice = jest.fn();
@@ -110,10 +110,10 @@ test('a switched-off transport mutes the ring and stops its fill', async () => {
     surfaceUi(
       makeCtx({
         mixnetView: {
-          statusKey: 'mixnet.status.off',
+          statusKey: 'mixnet.status.died',
           socks5Addr: null,
           narration: null,
-          sendBlocked: false,
+          sendBlocked: true,
           recovery: 'reenable',
           reconnecting: false,
         },
@@ -123,9 +123,9 @@ test('a switched-off transport mutes the ring and stops its fill', async () => {
     ),
   );
   await jest.advanceTimersByTimeAsync(0);
-  const off = view.UNSAFE_getByType(QuoteRefreshRing).props;
-  expect(off.durationMs).toBe(0);
-  expect(off.color).not.toBe(live.color);
+  const muted = view.UNSAFE_getByType(QuoteRefreshRing).props;
+  expect(muted.durationMs).toBe(0);
+  expect(muted.color).not.toBe(live.color);
 });
 
 test('an entry flight with no armed deadline never reads full', async () => {
