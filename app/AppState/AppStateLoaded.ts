@@ -12,7 +12,6 @@ export default interface AppStateLoaded {
 
   // The seed screen the App opens by itself when the first funds arrive is
   // already up, so a second batch of transfers must not open another one.
-  seedReminderShowing: boolean;
 
   // to do scroll to top in history
   scrollToTop: boolean;

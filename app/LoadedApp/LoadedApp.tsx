@@ -731,7 +731,6 @@ export class LoadedAppClass extends Component<
           : AppState.currentState,
       newServer: {} as ServerType,
       newSelectServer: null,
-      seedReminderShowing: false,
       scrollToTop: false,
       scrollToBottom: false,
       addTagModalTarget: null,
@@ -768,6 +767,10 @@ export class LoadedAppClass extends Component<
   }
 
   componentDidMount = async () => {
+    // Once per wallet session. From here on the answer lives in memory.
+    const { seedReminderPending } = await SettingsFileImpl.readSettings();
+    this.seedReminderOwed = seedReminderPending;
+
     const netInfoState = await NetInfo.fetch();
     this.setState({
       netInfo: {
@@ -1162,9 +1165,19 @@ export class LoadedAppClass extends Component<
     await this.rpc.reenableMixnet();
   };
 
-  setSeedReminderShowing = (value: boolean) => {
-    this.setState({ seedReminderShowing: value });
-  };
+  // Whether this session still owes the owner the seed reminder.
+  //
+  // A plain field, not state, and read from disk exactly once. The decision to
+  // open the reminder is taken on every sync tick — several a second while the
+  // wallet catches up — and it used to be computed from two sources that move
+  // at different times: this flag on disk, behind an `await`, and a React
+  // "showing" flag updated by a batched `setState`. Between any two of those
+  // updates there was a tick that saw a reminder owed and nothing showing it,
+  // and reopened the screen. Chasing that window from one exit path to the
+  // next is how this feature collected its bugs; the answer is to stop having
+  // one. Here the check and the claim are a plain read and a plain assignment
+  // with no `await` between them, so no second tick can get in.
+  seedReminderOwed: boolean = false;
 
   setValueTransfersList = async (
     valueTransfers: ValueTransferType[],
@@ -1173,16 +1186,29 @@ export class LoadedAppClass extends Component<
     // The wallet just met its first money. A seed the owner saw once, at
     // creation, when it was an abstraction, is worth showing again now that it
     // stands for something — and this is the moment they are looking at the
-    // App. The flag is spent by the seed screen itself, so this fires once.
-    const { seedReminderPending } = await SettingsFileImpl.readSettings();
-    if (seedReminderPending && valueTransfersTotal > 0) {
+    // App.
+    if (this.seedReminderOwed && valueTransfersTotal > 0) {
       // Not while the App is in the background: the seed would be sitting
       // there, opened by nobody, when the phone comes back.
       const background = await AsyncStorage.getItem(GlobalConst.background);
-      if (background === GlobalConst.no && !this.state.seedReminderShowing) {
-        this.setSeedReminderShowing(true);
+      // Re-checked after the await, and claimed before anything else can
+      // yield: this is the whole of the mutual exclusion.
+      if (background === GlobalConst.no && this.seedReminderOwed) {
+        this.seedReminderOwed = false;
+        // Spent by being delivered, not by being dismissed. The App asked;
+        // whether the owner reads it, backs out, cancels the biometric prompt
+        // or swipes it away is their business, and asking again for the same
+        // funds would be nagging. This is also what makes every exit path from
+        // the screen a non-question — the errand is already over by the time
+        // the screen is on. If the App dies before this write lands the
+        // reminder simply comes back, which is the right way to fail.
+        SettingsFileImpl.writeSettings(
+          SettingsNameEnum.seedReminderPending,
+          false,
+        ).catch(e => console.log('seed reminder not spent:', e));
         this.drawerNav?.navigate(RouteEnum.Seed, {
           action: SeedActionEnum.view,
+          reminder: true,
         });
       }
     }
@@ -2309,9 +2335,6 @@ export class LoadedAppClass extends Component<
                               onClickOK={() => {}}
                               onClickCancel={() => {}}
                               keepAwake={this.keepAwake}
-                              setSeedReminderShowing={
-                                this.setSeedReminderShowing
-                              }
                             />
                           );
                         } else if (action === SeedActionEnum.change) {

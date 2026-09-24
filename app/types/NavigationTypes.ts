@@ -166,4 +166,10 @@ export type UfvkNavigationState = {
 
 export type SeedNavigationState = {
   action: SeedActionEnum;
+  // The App opened this screen by itself, to remind the owner of the seed on
+  // the wallet's first funds. Only the opener knows that, and it is settled
+  // before the screen mounts, so the screen is told instead of going looking:
+  // no read of its own to race with, and no way for a visit the user asked
+  // for to be mistaken for the App's errand.
+  reminder?: boolean;
 };

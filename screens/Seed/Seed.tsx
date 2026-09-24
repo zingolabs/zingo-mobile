@@ -45,13 +45,11 @@ import {
   ChainNameEnum,
   SnackbarDurationEnum,
   SeedActionEnum,
-  SettingsNameEnum,
   ScreenEnum,
   RouteEnum,
 } from '@app/AppState';
 import Header from '@ui/widgets/Header';
 import Utils from '@app/utils';
-import SettingsFileImpl from '@app/services/SettingsFileImpl';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import {
   createUpdateRecoveryWalletInfo,
@@ -73,14 +71,12 @@ type SeedProps = NativeStackScreenProps<AppDrawerParamList, RouteEnum.Seed> & {
   onClickOK: (seedPhrase: string, birthdayNumber: number) => void;
   onClickCancel: () => void;
   keepAwake?: (v: boolean) => void;
-  setSeedReminderShowing?: (v: boolean) => void;
 };
 const Seed: React.FunctionComponent<SeedProps> = ({
   route,
   onClickOK,
   onClickCancel,
   keepAwake,
-  setSeedReminderShowing,
 }) => {
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const context = useContext(ContextAppLoaded);
@@ -159,67 +155,31 @@ const Seed: React.FunctionComponent<SeedProps> = ({
   const [containerH, setContainerH] = useState<number>(0);
   const [headerH, setHeaderH] = useState<number>(0);
   const seedSheetRef = useRef<BottomSheet>(null);
-  // True when the App opened this screen by itself, on the wallet's first
-  // funds. The screen then belongs to that errand: it keeps the phone awake
-  // while the words are copied, says so on its button, and spends the flag on
-  // the way out.
-  const [remindingSeed, setRemindingSeed] = useState<boolean>(false);
+  // The App opened this screen by itself, to remind the owner of the seed on
+  // the wallet's first funds. It arrives on the route, settled by the opener
+  // before the screen mounts, so this is a fact the screen is handed and not
+  // one it has to go and find: nothing to read, nothing to race with, and no
+  // way for a visit through Change Wallet or Restore Backup to be mistaken
+  // for the errand.
+  //
+  // It changes nothing outside the screen either. By the time the reminder is
+  // on, it has already been delivered and spent, so no exit from here has to
+  // account for it — not the button, not the back gesture, not a cancelled
+  // biometric prompt.
+  const remindingSeed: boolean = !!route.params?.reminder;
 
   useEffect(() => {
-    // Only the App's own errand counts. The flag says a reminder is owed, not
-    // that this visit is it: reaching the screen through Change Wallet or
-    // Restore Backup while it is armed would otherwise relabel a destructive
-    // button, spend the flag, and leave by a route the user never asked for.
-    //
-    // And not before the gate passes: cancelling it leaves by `goBack`, and
-    // nothing should have been claimed on the way in.
-    if (initialAction !== SeedActionEnum.view || !authPassed) {
+    // twenty four words take a while to write down by hand. Claimed once the
+    // gate is out of the way, and given back on the way out, whichever way
+    // that is — a cancelled prompt leaves by `goBack`, not through the button.
+    if (!remindingSeed || !authPassed) {
       return;
     }
-    let cancelled = false;
-    (async () => {
-      const { seedReminderPending } = await SettingsFileImpl.readSettings();
-      if (cancelled || !seedReminderPending) {
-        return;
-      }
-      setRemindingSeed(true);
-      // twenty four words take a while to write down by hand
-      keepAwake && keepAwake(true);
-    })();
+    keepAwake && keepAwake(true);
     return () => {
-      cancelled = true;
-    };
-  }, [initialAction, authPassed, keepAwake]);
-
-  // What the screen turned out to be, where the unmount cleanup can read it:
-  // that cleanup keeps the closure it was created with, and at mount time the
-  // errand is not known yet.
-  const remindingSeedRef = useRef<boolean>(false);
-  remindingSeedRef.current = remindingSeed;
-
-  useEffect(
-    () => () => {
-      // Whatever the screen claimed, it gives back on the way out. `hiding`
-      // does this itself, but it is not the only exit: the gate's own cancel
-      // leaves by `goBack`, and without this the phone would stay awake for
-      // the rest of the session and the reminder guard would stay raised.
       keepAwake && keepAwake(false);
-      setSeedReminderShowing && setSeedReminderShowing(false);
-      if (remindingSeedRef.current) {
-        // And the errand is spent by leaving, however the user left. Lowering
-        // the guard without spending it would hand the next sync tick a
-        // reminder that is still owed and no screen showing it, and the App
-        // would open this one again — on a back gesture, over and over. The
-        // App asked; asking again for the same funds is nagging.
-        SettingsFileImpl.writeSettings(
-          SettingsNameEnum.seedReminderPending,
-          false,
-        ).catch(e => console.log('seed reminder not spent on the way out', e));
-      }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
-  );
+    };
+  }, [remindingSeed, authPassed, keepAwake]);
 
   useEffect(() => {
     // Wait for the on-mount biometric gate to pass before touching the
@@ -437,22 +397,8 @@ const Seed: React.FunctionComponent<SeedProps> = ({
     hiding();
   };
 
-  const hiding = async () => {
+  const hiding = () => {
     if (remindingSeed) {
-      // The errand is done, whether or not the user wrote anything down: the
-      // App asked, and asking twice for the same funds would be nagging.
-      //
-      // The flag goes to disk before the guard comes down, and in that order:
-      // the poller in LoadedApp re-opens this screen when it finds the flag
-      // set and the guard clear, so dropping the guard first leaves a window
-      // where a sync tick reopens the screen the user has just dismissed.
-      await SettingsFileImpl.writeSettings(
-        SettingsNameEnum.seedReminderPending,
-        false,
-      );
-      setSeedReminderShowing && setSeedReminderShowing(false);
-      setRemindingSeed(false);
-      keepAwake && keepAwake(false);
       // The App brought the user here, so there is nothing behind this screen
       // to go back to. `reset` also puts the authenticated seed screen out of
       // reach of a back gesture.
@@ -467,7 +413,6 @@ const Seed: React.FunctionComponent<SeedProps> = ({
       });
       return;
     }
-    setSeedReminderShowing && setSeedReminderShowing(false);
     if (navigation.canGoBack()) {
       navigation.goBack();
     }
@@ -601,7 +546,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
           translate={translate}
           netInfo={netInfo}
           privacy={privacy}
-          receivedLegend={action === SeedActionEnum.view && remindingSeed}
+          receivedLegend={remindingSeed}
         />
       </View>
       <AppSheet
