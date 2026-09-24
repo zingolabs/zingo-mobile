@@ -26,10 +26,10 @@ let loadRecipientWallet = async () => {
     .toBeVisible()
     .withTimeout(sync_timeout);
   await element(by.id('header.drawmenu')).tap();
-  await waitFor(element(by.id('menu.settings')))
+  await waitFor(element(by.id('header.settings')))
     .toBeVisible()
     .withTimeout(sync_timeout);
-  await element(by.id('menu.settings')).tap();
+  await element(by.id('header.settings')).tap();
 
   // waiting for custom server radio button
   await waitFor(element(by.id('settings.scroll-view')))
