@@ -1,6 +1,10 @@
 appId: org.ZingoLabs.Zingo
 ---
-- launchApp
+# Every flow starts from a clean install. Maestro does not run them in
+# file order — a nightly ran 04, 01, 02, 03 — so a flow that inherited
+# whatever the previous one left behind would pass or fail on luck.
+- launchApp:
+    clearState: true
 
 - extendedWaitUntil:
     visible:

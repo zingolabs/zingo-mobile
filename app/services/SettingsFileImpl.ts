@@ -21,22 +21,38 @@ export default class SettingsFileImpl {
     return RNFS.DocumentDirectoryPath + '/settings.json';
   }
 
+  // Writes run one at a time. Every write is a read-modify-write of the
+  // same file, so two of them in flight both rebuild it from the contents
+  // they read before either landed, and whichever finishes last drops the
+  // other one's key. On a first launch that is how `mode` could be lost to
+  // the `firstInstall` write that follows it, leaving the next launch with
+  // no mode to read and falling back to advanced.
+  private static writeQueue: Promise<void> = Promise.resolve();
+
   // Write the server setting
   static async writeSettings(
     name: SettingsNameEnum,
     value: string | boolean | ServerType | SecurityType,
-  ) {
-    const fileName = await this.getFileName();
-    const settings = await this.readSettings();
-    const newSettings: SettingsFileClass = { ...settings, [name]: value };
+  ): Promise<void> {
+    const write = this.writeQueue.then(async () => {
+      const fileName = await this.getFileName();
+      const settings = await this.readSettings();
+      const newSettings: SettingsFileClass = { ...settings, [name]: value };
 
-    RNFS.writeFile(fileName, JSON.stringify(newSettings), GlobalConst.utf8)
-      .then(() => {
-        //console.log('FILE WRITTEN!')
-      })
-      .catch(err => {
-        console.log('settings write file:', err.message);
-      });
+      try {
+        await RNFS.writeFile(
+          fileName,
+          JSON.stringify(newSettings),
+          GlobalConst.utf8,
+        );
+      } catch (err) {
+        // A settings write that cannot land must not break the caller, and
+        // must not wedge the queue for every write after it either.
+        console.log('settings write file:', (err as Error).message);
+      }
+    });
+    this.writeQueue = write;
+    return write;
   }
 
   // Read the server setting
