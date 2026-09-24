@@ -308,38 +308,9 @@ jobs:
           xcrun simctl list devices booted
           maestro --device "$SIM_UDID" test .maestro/
 
-      # Temporary diagnostic, to be removed once the identifiers are fixed.
-      #
-      # Android finds receive.unified-address, addressbook.button.new and
-      # settings.button.save; on iOS Maestro reports all three missing while
-      # the screenshots show them plainly on screen. What separates them from
-      # the ids that do work is the element they sit on: receive.title is a
-      # testID on a plain View and is found, and all three failures are a
-      # testID on the shared Button primitive's TouchableOpacity. No
-      # accessible={true} ancestor collapses them, so the reason is not the
-      # obvious one and guessing from the source has already been wrong once.
-      # Dump what XCUITest actually exposes on the Receive screen — the
-      # simplest of the three — and aim the fix at that.
-      - name: Dump the iOS view hierarchy
-        if: always()
-        run: |
-          xcrun simctl terminate "$SIM_UDID" org.ZingoLabs.Zingo || true
-          xcrun simctl launch "$SIM_UDID" org.ZingoLabs.Zingo || true
-          # The wallet is created and synced on a cold start before Receive
-          # renders its address; the flows allow 120s for the same wait.
-          sleep 90
-          maestro --device "$SIM_UDID" hierarchy > /tmp/ios-hierarchy.json 2>&1 || true
-          echo "--- first 4000 chars ---"
-          head -c 4000 /tmp/ios-hierarchy.json || true
-          echo
-          echo "--- lines mentioning the ids we care about ---"
-          grep -n "receive\.\|addressbook\.\|settings\." /tmp/ios-hierarchy.json | head -40 || true
-
       - name: Upload Maestro report on failure
-        if: always()
+        if: failure()
         uses: actions/upload-artifact@v7
         with:
           name: maestro-ios-report
-          path: |
-            ~/.maestro/tests/**
-            /tmp/ios-hierarchy.json
+          path: ~/.maestro/tests/**
