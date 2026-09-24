@@ -246,6 +246,25 @@ describe('recoveryWalletInfo - the write looks before it leaps', () => {
     expect(keychain.resetGenericPassword).not.toHaveBeenCalled();
   });
 
+  test('the same seed on an earlier birthday is written, not skipped', async () => {
+    const { keychain, service } = load();
+    // the repair restore: same words, a birthday further back
+    keychain.getGenericPassword.mockResolvedValue(
+      stored({ seed: 'twenty four words', birthday: 500000 }),
+    );
+    keychain.setGenericPassword.mockResolvedValue(written);
+
+    await service.createUpdateRecoveryWalletInfo({
+      seed: 'twenty four words',
+      birthday: 1,
+    });
+
+    // "Recover last Keys used" hands the stored birthday back to the user, so
+    // an entry left on the later one would restore a wallet blind to its own
+    // history.
+    expect(keychain.setGenericPassword).toHaveBeenCalledTimes(1);
+  });
+
   test('another wallet-s entry is replaced, and a refused write may reset it', async () => {
     const { keychain, service } = load();
     keychain.getGenericPassword.mockResolvedValue(
