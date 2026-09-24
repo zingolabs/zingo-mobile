@@ -42,18 +42,16 @@ const getOptions: Keychain.GetOptions = buildGetOptions(
   'SILENT_SECURE',
 );
 
-// The recovery info is no longer optional, so a device that refuses to store
-// or return it is a failure the user has to be told about instead of a line in
-// the log. Settings reads the outcome through `recoveryWalletInfoIsFailing`.
-//
-// Saves and reads are remembered apart because they clear differently:
-//   - a failed save stays flagged until a later save succeeds. The device
-//     answering `hasGenericPassword` proves nothing about it, since the entry
-//     being reported may well be the one an older wallet left behind.
-//   - a failed read is cleared by the next keychain call that answers, so a
-//     transient error does not pin the warning until the App restarts.
-let lastSaveFailed: boolean = false;
-let lastReadFailed: boolean = false;
+// Whether two records describe the same wallet. The birthday counts: restoring
+// the same seed from an earlier one is how a wallet that missed its funds gets
+// repaired, and the stored birthday is what "Recover last Keys used" hands
+// back. Zero and absent are the same birthday, since the two producers of the
+// entry disagree on the shape — `createNewWallet` writes `birthday || 0` while
+// `fetchWallet` leaves the field out when it is falsy.
+const holdsTheSameWallet = (stored: WalletType, wallet: WalletType): boolean =>
+  stored.seed === wallet.seed &&
+  stored.ufvk === wallet.ufvk &&
+  (stored.birthday || 0) === (wallet.birthday || 0);
 
 // `setGenericPassword` reports a refusal by resolving falsy, it does not
 // always throw. Both are the same failure here, so the falsy result is turned
@@ -88,7 +86,6 @@ export const saveRecoveryWalletInfo = async (
   const password = JSON.stringify(keys);
   try {
     await setOrThrow(password, setOptions);
-    lastSaveFailed = false;
   } catch (error) {
     // An existing entry from a previous app version may use an
     // incompatible cipher (e.g. the old auth-required AES_GCM or RSA).
@@ -98,10 +95,8 @@ export const saveRecoveryWalletInfo = async (
     try {
       await Keychain.resetGenericPassword({ service });
       await setOrThrow(password, baseOptions);
-      lastSaveFailed = false;
     } catch (retryError) {
       console.log('Error saving keys after reset:', retryError);
-      lastSaveFailed = true;
     }
   }
 };
@@ -118,7 +113,6 @@ export const readRecoveryWalletInfo = async (): Promise<{
   try {
     const credentials = await Keychain.getGenericPassword(getOptions);
     // The device answered, whatever it answered.
-    lastReadFailed = false;
     if (!credentials) {
       console.log('no recovery keys stored');
       return nothing;
@@ -146,7 +140,6 @@ export const readRecoveryWalletInfo = async (): Promise<{
     // its own reset+retry for genuine cipher incompatibilities, and a
     // wipe-on-read makes the seed unrecoverable until the next save.
     console.log('Error getting recovery keys (entry left intact):', error);
-    lastReadFailed = true;
     return { answered: false, keys: {} as WalletType };
   }
 };
@@ -158,36 +151,42 @@ export const getRecoveryWalletInfo = async (): Promise<WalletType> => {
 export const hasRecoveryWalletInfo = async (): Promise<boolean> => {
   try {
     const has = await Keychain.hasGenericPassword(baseOptions);
-    lastReadFailed = false;
     return has;
   } catch (error) {
     console.log('Error asking the device for the recovery keys:', error);
-    lastReadFailed = true;
     return false;
   }
 };
 
-// Whether the device is currently failing to keep the recovery info: the last
-// save errored, the last read errored, or the entry is missing although every
-// wallet the App opens, creates or restores writes it. Probing also refreshes
-// the read half, so a transient read error stops answering true on its own.
+// Whether the device is failing to keep this wallet's recovery info, asked of
+// the device and the wallet rather than of a memory of what happened to them.
 //
-// `expectStored` is false for a wallet with no keys of its own to store, the
-// one case where an empty keychain is the right answer instead of a failure.
+// This used to be inferred from two module booleans remembering how the last
+// save and the last read went, and every bug in this feature came out of that
+// shape: the flags outlive the wallet they describe — switching wallets does
+// not reload the JS context — so one wallet's failed save warned about the
+// next wallet's perfectly good entry, and a keyless wallet inherited a
+// complaint about a keychain that was exactly as empty as it should be. The
+// answer is a comparison, and a comparison can just be made when it is asked
+// for.
+//
+// `wallet` is what the open wallet says its keys are, or null when it has
+// none of its own to store.
 export const recoveryWalletInfoIsFailing = async (
-  expectStored: boolean = true,
+  wallet: WalletType | null,
 ): Promise<boolean> => {
-  // Probe first either way: it is what refreshes the read half.
-  const stored = await hasRecoveryWalletInfo();
-  if (!expectStored) {
-    // Nothing of this wallet's belongs in the keychain, so a missing entry is
-    // correct and a failed save says nothing about it — `lastSaveFailed` is
-    // module state and a wallet switch does not reload the JS context, so the
-    // flag it carries was set for the wallet used before this one. Only a
-    // device that will not answer at all is still worth reporting.
-    return lastReadFailed;
+  const stored = await readRecoveryWalletInfo();
+  if (!stored.answered) {
+    // A device that will not talk about the entry is a failure whatever the
+    // wallet holds: nothing can be concluded, and silence is not a backup.
+    return true;
   }
-  return lastSaveFailed || lastReadFailed || !stored;
+  if (!wallet?.seed && !wallet?.ufvk) {
+    // Nothing of this wallet's belongs in there, so an empty keychain — or
+    // somebody else's entry, which no screen will show — is the right answer.
+    return false;
+  }
+  return !holdsTheSameWallet(stored.keys, wallet);
 };
 
 // The write every caller wants: it looks before it leaps.
@@ -216,22 +215,8 @@ export const createUpdateRecoveryWalletInfo = async (
   keys: WalletType,
 ): Promise<void> => {
   const stored = await readRecoveryWalletInfo();
-  // A birthday of zero and no birthday at all are the same wallet: the two
-  // producers of this entry disagree on the shape, since `createNewWallet`
-  // writes `birthday || 0` while `fetchWallet` leaves the field out when it
-  // is falsy. Comparing them raw would rewrite the entry once for no reason,
-  // and that write would drop the field.
-  if (
-    stored.keys.seed === keys.seed &&
-    stored.keys.ufvk === keys.ufvk &&
-    (stored.keys.birthday || 0) === (keys.birthday || 0)
-  ) {
+  if (holdsTheSameWallet(stored.keys, keys)) {
     console.log('the device already holds these keys, nothing to write');
-    // The device holds what it should, which is the whole question Settings
-    // asks. A save that failed for another wallet must not outlive the
-    // finding that this one is stored: the flag is module state and switching
-    // wallets does not reload the JS context.
-    lastSaveFailed = false;
     return;
   }
   await saveRecoveryWalletInfo(keys);
