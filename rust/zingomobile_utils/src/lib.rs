@@ -4,7 +4,7 @@ use std::process::Command;
 ///
 /// `activation_heights` is the launched regtest chain's schedule in the
 /// harness's `key=height` spec form; `None` when the chain provisioner
-/// cannot report one (regchest). The script forwards it to the device as
+/// cannot report one. The script forwards it to the device as
 /// an instrumentation argument, from which the Kotlin side builds the
 /// wallet's `regtest:<schedule>` chain hint — so the wallet's schedule is
 /// derived from the chain that was actually launched, never assumed.

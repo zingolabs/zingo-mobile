@@ -46,17 +46,11 @@ flavor architecture: see [docs/release_quickstart.md](./docs/release_quickstart.
 
 ## Testing
 ### Prerequisites
-Integration tests and end-to-end tests require a regtest server. On linux hosts, these may be run
-locally by installing the lightwalletd, zcashd and zcash-cli binaries
-(https://github.com/zingolabs/zingolib#regtest). From the `rust/android/regtest/bin/` directory run: <br />
-`ln -s path/to/lightwalletd/binary path/to/zcashd/binary path/to/zcash-cli/binary ./` <br />
-From the `rust/android/lightwalletd_bin` directory run: <br />
-`ln -s path/to/lightwalletd/binary ./`
-
-Alternatively, integration tests and end-to-end tests can be run on non-linux hosts with Regchest
-(https://github.com/zingolabs/zingo-regchest). Regchest manages the zcash/lightwalletd regtest
-network in a docker container. Before running tests, pull the latest Regchest image from docker: <br />
-`docker pull zingodevops/regchest:013`
+Integration tests and end-to-end tests require a regtest network. The test harness
+(`zingolib_testutils` scenarios, built on `zcash_local_net`) launches native `zebrad`
+(validator) and `zainod` (indexer) processes for each test. Put both binaries on `$PATH`,
+or in the directory named by the `TEST_BINARIES_DIR` environment variable. CI runs these
+tests on Linux. On macOS, zebrad is a Zebra Tier 3 platform, and you must build it yourself.
 
 ### Yarn Tests
 1. From the root directory, run: <br />
@@ -97,19 +91,16 @@ commands.
    Specify to run a specific ABI and test: <br />
    `cargo nextest run android_integration::x86_64::test_name`
 
-To run tests with Regchest, add the `--features regchest` flag, for example: <br />
-`cargo nextest run android_integration --features regchest`
-
 For more information on running integration tests on non-default AVDs, run: <br />
 `./scripts/android_integration_tests.sh -h` <br />
 Without the cargo test runner these emulated android devices will not be able to connect to a
-lightwalletd/zcashd regtest network. Therefore, only tests in the "Offline Testsuite" may be tested.
+regtest network. Therefore, only tests in the "Offline Testsuite" may be tested.
 
 ### End-to-End Tests (Rust nextest, Android)
 Drives the Android app from Rust against a regtest network. Lives in
 `rust/android/tests/e2e_tests.rs`. Currently Android-only.
 
-0. Note there needs to be a lightwalletd in rust/android/lightwalletd_bin
+0. Install `zebrad` and `zainod` as described in [Prerequisites](#prerequisites).
 1. Launch the emulated AVD by clicking the 'play' icon in Android Studio's `Device Manager`.
    Alternatively, connect to a physical device. See previous section 'Launching the app' for more
    details.
