@@ -71,13 +71,11 @@ type TextsType = {
 type SeedProps = NativeStackScreenProps<AppDrawerParamList, RouteEnum.Seed> & {
   onClickOK: (seedPhrase: string, birthdayNumber: number) => void;
   onClickCancel: () => void;
-  setIsSeedViewModalOpen?: (v: boolean) => void;
 };
 const Seed: React.FunctionComponent<SeedProps> = ({
   route,
   onClickOK,
   onClickCancel,
-  setIsSeedViewModalOpen,
 }) => {
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const context = useContext(ContextAppLoaded);
@@ -105,8 +103,8 @@ const Seed: React.FunctionComponent<SeedProps> = ({
 
   // Audit Issue D — single source of truth for the seed/UFVK biometric
   // gate. Lives inside Seed.tsx so every navigation path (header, menu,
-  // basic-mode auto-trigger, chain-mismatch recovery, future callers) is
-  // funnelled through the same check.
+  // chain-mismatch recovery, future callers) is funnelled through the same
+  // check.
   //
   // The "change" and "backup" actions render the seed AND perform their
   // respective destructive operation. Each respects BOTH the per-action
@@ -384,9 +382,6 @@ const Seed: React.FunctionComponent<SeedProps> = ({
   };
 
   const hiding = async () => {
-    // when this screen is open from LoadingApp (new wallet)
-    // is using the standard modal from react-native
-    setIsSeedViewModalOpen && setIsSeedViewModalOpen(false);
     if (navigation.canGoBack()) {
       navigation.goBack();
     }

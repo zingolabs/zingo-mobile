@@ -20,23 +20,12 @@ const SEND_SIZE = 25;
 const BUBBLE_V_MARGIN = 4;
 const TAB_H_PADDING = 30;
 const TAB_V_PADDING = 10;
-// bgChrome is mode-independent, so a module-level read is safe for the
-// StyleSheet below
+// The tokens are module constants, so a module-level read is safe for the
+// StyleSheet below.
 const PILL_BG = themeTokens.bgChrome;
 const PILL_BORDER = '#071A35';
-const PILL_HEIGHT = ICON_SIZE + 2 * TAB_V_PADDING + 2 * BUBBLE_V_MARGIN + 2;
 const WRAPPER_PADDING_BOTTOM = 25;
 const FADE_COLORS = ['transparent', 'rgba(0,0,0,0.3)'];
-
-/** Bottom scrim with the tab bar's footprint. */
-export const FadeOnlyTabBar = (): React.ReactElement => (
-  <View
-    style={[styles.wrapper, { height: PILL_HEIGHT + WRAPPER_PADDING_BOTTOM }]}
-    pointerEvents="none"
-  >
-    <LinearGradient colors={FADE_COLORS} style={StyleSheet.absoluteFill} />
-  </View>
-);
 
 function renderNavIcon(
   routeName: string,

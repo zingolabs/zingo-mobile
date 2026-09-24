@@ -187,7 +187,7 @@ const styles = StyleSheet.create({
   },
   button: {
     // The boundary renders when the tree (and its providers) may be broken, so
-    // it reads the advanced accent statically instead of following the mode.
+    // it reads the accent token statically instead of going through useTheme.
     backgroundColor: themeTokens.bgAccent,
     paddingHorizontal: 18,
     paddingVertical: 14,

@@ -1538,7 +1538,7 @@ export class LoadingAppClass extends Component<
     });
   };
 
-  createNewWallet = async (goSeedScreen: boolean = true): Promise<void> => {
+  createNewWallet = async (): Promise<void> => {
     const offline = this.state.selectServer === SelectServerEnum.offline;
     // Block only when the device is genuinely offline AND not in explicit
     // Offline mode. Offline mode is a deliberate no-server flow: the wallet is
@@ -1604,13 +1604,14 @@ export class LoadingAppClass extends Component<
       };
       // storing the seed & birthday in KeyChain/KeyStore
       await createUpdateRecoveryWalletInfo(wallet);
-      // basic mode -> same screen.
-      this.setState(state => ({
+      // The seed of a new wallet is shown once, right here, before the App
+      // opens on it.
+      this.setState({
         wallet,
-        screen: goSeedScreen ? RouteEnum.NewSeed : state.screen,
+        screen: RouteEnum.NewSeed,
         actionButtonsDisabled: false,
         walletExists: true,
-      }));
+      });
     } else {
       this.walletErrorHandle(
         seed.ok ? seed.value : seed.error.message,

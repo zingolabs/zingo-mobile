@@ -68,7 +68,6 @@ type HeaderProps = {
   privacy?: boolean;
   // store the error if the App is in background
   setBackgroundError?: (title: string, error: string) => void;
-  // first funds received legend for the Seed screen
   // show messages icon next to settings
   showMessagesIcon?: boolean;
   // optional layout reporting (used by History for bottom-sheet snap points)

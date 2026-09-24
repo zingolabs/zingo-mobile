@@ -16,8 +16,6 @@ export default interface AppStateLoaded {
   // to do scroll to bottom in messages
   scrollToBottom: boolean;
 
-  // to know if the modal is open or not
-
   // Address+ownership pair for the shared "Add Tag/Contact" BottomSheetModal
   // hosted at LoadedApp level. `null` while hidden.
   addTagModalTarget: {

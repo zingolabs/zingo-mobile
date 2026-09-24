@@ -66,8 +66,8 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
   const startMenuSnapPoints = useFullSheetSnapPoints(containerH, headerH);
 
   // Consolidates the three legacy ContextMenu kebabs into one action list
-  // gated by network + mode + saved-state. Order: recoverkeys → primary
-  // action (advanced vs custom server) → restore backup.
+  // gated by network + saved-state. Order: recoverkeys → custom server →
+  // restore backup.
   const optionsActions = useMemo<ActionMenuBottomSheetAction[]>(() => {
     if (actionButtonsDisabled) {
       return [];

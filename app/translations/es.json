@@ -196,8 +196,6 @@
     "tryingnewserver": "Intentando conectar con el nuevo Servidor... Puede llevar varios segundos.",
     "tryingnewserver-error": "Después de 15 segundos el nuevo Servidor no responde.",
     "readingwallet": "Leyendo satisfactoriamente el monedero activo usando el Servidor:",
-    "restorewallet-title": "Opción Avanzada",
-    "restorewallet-alert": "Confirmar que quiere restaurar un nuevo monedero usando su frase semilla.",
     "selectingserversame": "Su servidor actual ya es el más optimizado.",
     "selectingserverbest": "En este momento este es el servidor más optimizado:",
     "incoming-funds": "Fondos entrantes\n",

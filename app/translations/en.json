@@ -196,8 +196,6 @@
     "tryingnewserver": "Trying to connect to the new Server... Can take a few seconds.",
     "tryingnewserver-error": "After 15 seconds the new server doesn't respond.",
     "readingwallet": "Reading successfully the wallet with the server:",
-    "restorewallet-title": "Advanced Option",
-    "restorewallet-alert": "Confirm that you want to restore a new wallet using your seed phrase.",
     "selectingserversame": "Your actual server is the most optimized one already.",
     "selectingserverbest": "In this moment this is the most optimized server:",
     "incoming-funds": "Incoming funds\n",
