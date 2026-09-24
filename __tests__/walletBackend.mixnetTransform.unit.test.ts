@@ -29,8 +29,7 @@ describe('describeRejection', () => {
 });
 
 describe('parseMixnetIndicator', () => {
-  it('accepts each of the four modes exactly', () => {
-    expect(parseMixnetIndicator('off')).toBe(RPCMixnetIndicatorEnum.off);
+  it('accepts each of the three modes exactly', () => {
     expect(parseMixnetIndicator('bootstrapping')).toBe(
       RPCMixnetIndicatorEnum.bootstrapping,
     );
@@ -40,6 +39,7 @@ describe('parseMixnetIndicator', () => {
 
   it('rejects anything that is not exactly an indicator string', () => {
     expect(parseMixnetIndicator('READY')).toBeNull();
+    expect(parseMixnetIndicator('off')).toBeNull();
     expect(parseMixnetIndicator('offline')).toBeNull();
     expect(parseMixnetIndicator('')).toBeNull();
     expect(parseMixnetIndicator(undefined)).toBeNull();
@@ -63,7 +63,6 @@ describe('transformMixnetStatus', () => {
 
   it('reports every non-ready indicator with a null address', () => {
     const nonReadyIndicators: readonly RPCMixnetIndicatorEnum[] = [
-      RPCMixnetIndicatorEnum.off,
       RPCMixnetIndicatorEnum.bootstrapping,
       RPCMixnetIndicatorEnum.died,
     ];

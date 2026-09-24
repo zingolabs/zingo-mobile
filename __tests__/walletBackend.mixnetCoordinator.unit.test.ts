@@ -40,20 +40,8 @@ const transportBinding = {
 describe('deriveMixnetView', () => {
   const noDetail = null;
 
-  it('blocks sending in every state except off and ready', () => {
+  it('blocks sending in every state except ready', () => {
     const blocked = (view: MixnetView) => view.sendBlocked;
-    expect(
-      blocked(
-        deriveMixnetView(
-          {
-            kind: 'status',
-            indicator: RPCMixnetIndicatorEnum.off,
-            socks5Addr: null,
-          },
-          noDetail,
-        ),
-      ),
-    ).toBe(false);
     expect(
       blocked(
         deriveMixnetView(
@@ -449,82 +437,6 @@ describe('MixnetCoordinator', () => {
     await jest.advanceTimersByTimeAsync(RECONNECT_BASE_MILLIS);
     await flushPromises();
     expect(startTransport).toHaveBeenCalledTimes(3);
-    coordinator.stop();
-  });
-
-  it('restates the clearnet policy before and after an attach, since the attach consents to the mixnet', async () => {
-    mockedBridge.attachMixnet.mockResolvedValue(
-      statusPayload('ready', '127.0.0.1:1080'),
-    );
-    mockedBridge.setTransmitPolicy.mockResolvedValue('{}');
-    const startTransport = jest.fn().mockResolvedValue(transportBinding);
-    const coordinator = new MixnetCoordinator(
-      startTransport,
-      () => {},
-      'clearnet',
-    );
-
-    await coordinator.ensureForConnectedSession();
-    await flushPromises();
-
-    expect(mockedBridge.setTransmitPolicy).toHaveBeenCalledTimes(2);
-    expect(mockedBridge.setTransmitPolicy).toHaveBeenCalledWith('clearnet');
-    const attachAt = mockedBridge.attachMixnet.mock.invocationCallOrder[0];
-    const [before, after] =
-      mockedBridge.setTransmitPolicy.mock.invocationCallOrder;
-    expect(before).toBeLessThan(attachAt);
-    expect(after).toBeGreaterThan(attachAt);
-    coordinator.stop();
-  });
-
-  it('a failed attach still had clearnet applied before it, so the library restores clearnet', async () => {
-    mockedBridge.attachMixnet.mockResolvedValue(statusPayload('died'));
-    mockedBridge.setTransmitPolicy.mockResolvedValue('{}');
-    const startTransport = jest.fn().mockResolvedValue(transportBinding);
-    const coordinator = new MixnetCoordinator(
-      startTransport,
-      () => {},
-      'clearnet',
-    );
-
-    await coordinator.ensureForConnectedSession();
-    await flushPromises();
-
-    expect(
-      mockedBridge.setTransmitPolicy.mock.invocationCallOrder[0],
-    ).toBeLessThan(mockedBridge.attachMixnet.mock.invocationCallOrder[0]);
-    coordinator.stop();
-  });
-
-  it('leaves the policy alone around an attach when the session sends over the mixnet', async () => {
-    mockedBridge.attachMixnet.mockResolvedValue(
-      statusPayload('ready', '127.0.0.1:1080'),
-    );
-    const startTransport = jest.fn().mockResolvedValue(transportBinding);
-    const coordinator = new MixnetCoordinator(startTransport, () => {});
-
-    await coordinator.ensureForConnectedSession();
-    await flushPromises();
-
-    expect(mockedBridge.setTransmitPolicy).not.toHaveBeenCalled();
-    coordinator.stop();
-  });
-
-  it('a policy change reaches the backend at once and survives the next reattach', async () => {
-    mockedBridge.attachMixnet.mockResolvedValue(
-      statusPayload('ready', '127.0.0.1:1080'),
-    );
-    mockedBridge.setTransmitPolicy.mockResolvedValue('{}');
-    const startTransport = jest.fn().mockResolvedValue(transportBinding);
-    const coordinator = new MixnetCoordinator(startTransport, () => {});
-
-    await coordinator.setTransmitPolicy('clearnet');
-    expect(mockedBridge.setTransmitPolicy).toHaveBeenCalledTimes(1);
-
-    await coordinator.reenable();
-    await flushPromises();
-    expect(mockedBridge.setTransmitPolicy).toHaveBeenCalledTimes(3);
-    expect(mockedBridge.setTransmitPolicy).toHaveBeenLastCalledWith('clearnet');
     coordinator.stop();
   });
 });

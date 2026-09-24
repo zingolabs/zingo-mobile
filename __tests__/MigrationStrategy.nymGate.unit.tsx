@@ -79,11 +79,10 @@ describe('deriveNymGateState', () => {
   });
 
   test('fails only on the died and unknown keys, across every view', () => {
-    // Every view the transform can emit: the four indicators and the failure
+    // Every view the transform can emit: the three indicators and the failure
     // report, with and without the reconnect flag, with and without a held
     // Enable tap.
     const indicators = [
-      RPCMixnetIndicatorEnum.off,
       RPCMixnetIndicatorEnum.bootstrapping,
       RPCMixnetIndicatorEnum.ready,
       RPCMixnetIndicatorEnum.died,
@@ -104,7 +103,10 @@ describe('deriveNymGateState', () => {
         ),
       ),
       deriveMixnetView(
-        { kind: 'failure', failure: { reason: 'unconsentedOff' } },
+        {
+          kind: 'failure',
+          failure: { reason: 'unrecognizedIndicator', claimed: 'off' },
+        },
         null,
         reconnecting,
       ),

@@ -7,8 +7,7 @@ import {
 export type MixnetFailure =
   | { readonly reason: 'nativeRejection'; readonly message: string }
   | { readonly reason: 'malformedPayload'; readonly payload: string }
-  | { readonly reason: 'unrecognizedIndicator'; readonly claimed: string }
-  | { readonly reason: 'unconsentedOff' };
+  | { readonly reason: 'unrecognizedIndicator'; readonly claimed: string };
 
 export type MixnetStatusReport =
   | {
@@ -22,19 +21,6 @@ export type MixnetDetailReport =
   | { readonly kind: 'detail'; readonly detail: string }
   | { readonly kind: 'failure'; readonly failure: MixnetFailure };
 
-// A polled `off` is a never-attached wallet, which must keep sends blocked.
-export function vetPolledStatus(
-  status: MixnetStatusReport,
-): MixnetStatusReport {
-  if (
-    status.kind === 'status' &&
-    status.indicator === RPCMixnetIndicatorEnum.off
-  ) {
-    return { kind: 'failure', failure: { reason: 'unconsentedOff' } };
-  }
-  return status;
-}
-
 export function describeRejection(thrown: unknown): MixnetFailure {
   const message =
     thrown instanceof Error ? thrown.message : String(thrown ?? 'unknown');
@@ -45,8 +31,6 @@ export function parseMixnetIndicator(
   candidate: unknown,
 ): RPCMixnetIndicatorEnum | null {
   switch (candidate) {
-    case RPCMixnetIndicatorEnum.off:
-      return RPCMixnetIndicatorEnum.off;
     case RPCMixnetIndicatorEnum.bootstrapping:
       return RPCMixnetIndicatorEnum.bootstrapping;
     case RPCMixnetIndicatorEnum.ready:
