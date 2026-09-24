@@ -72,18 +72,8 @@ const setOrThrow = async (
   }
 };
 
-type SaveOptions = {
-  // Whether a refused write may delete the entry before retrying. The boot
-  // paths want it: an entry an older app version left behind can carry a
-  // cipher this build cannot overwrite, and replacing it is the point. The
-  // Seed/ShowUfvk refresh does not: it runs on every visit, so a transient
-  // refusal there would destroy a good entry the App is not replacing.
-  resetOnFailure?: boolean;
-};
-
 export const saveRecoveryWalletInfo = async (
   keys: WalletType,
-  { resetOnFailure = true }: SaveOptions = {},
 ): Promise<void> => {
   if (!keys.seed && !keys.ufvk) {
     // Nothing to store, and nothing to conclude from it. `fetchWallet` answers
@@ -100,11 +90,6 @@ export const saveRecoveryWalletInfo = async (
     await setOrThrow(password, setOptions);
     lastSaveFailed = false;
   } catch (error) {
-    if (!resetOnFailure) {
-      console.log('Error saving keys, entry left intact:', error);
-      lastSaveFailed = true;
-      return;
-    }
     // An existing entry from a previous app version may use an
     // incompatible cipher (e.g. the old auth-required AES_GCM or RSA).
     // Deleting never requires auth, so reset and retry with the
@@ -219,10 +204,14 @@ export const recoveryWalletInfoIsFailing = async (
 // An entry left on the later birthday would send them back to a wallet blind
 // to its own history.
 //
-// When a write is needed, the retry may only delete what the device was
-// willing to show: if it answered the read, what is in there is another
-// wallet's or unreadable and replacing it loses nothing; if it stayed silent,
-// nothing is known about the entry, so it stands.
+// Looking first is also what makes the reset before the retry safe again: the
+// write is only reached when the entry is not this wallet's, or when the
+// device would not say what it is, so a reset always replaces something the
+// App means to replace. Gating that reset on the read having succeeded was
+// worse than useless — an entry left by an older app version with an
+// auth-required cipher is exactly the one a silent read cannot return, so the
+// one case the reset exists for was the one case it was skipped in, and the
+// legacy entry was never migrated.
 export const createUpdateRecoveryWalletInfo = async (
   keys: WalletType,
 ): Promise<void> => {
@@ -238,7 +227,12 @@ export const createUpdateRecoveryWalletInfo = async (
     (stored.keys.birthday || 0) === (keys.birthday || 0)
   ) {
     console.log('the device already holds these keys, nothing to write');
+    // The device holds what it should, which is the whole question Settings
+    // asks. A save that failed for another wallet must not outlive the
+    // finding that this one is stored: the flag is module state and switching
+    // wallets does not reload the JS context.
+    lastSaveFailed = false;
     return;
   }
-  await saveRecoveryWalletInfo(keys, { resetOnFailure: stored.answered });
+  await saveRecoveryWalletInfo(keys);
 };

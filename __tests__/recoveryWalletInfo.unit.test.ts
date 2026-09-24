@@ -141,23 +141,6 @@ describe('recoveryWalletInfo - the device is failing or it is not', () => {
     // `fetchWallet` hands back an empty object on an RPC error too.
     expect(keychain.resetGenericPassword).not.toHaveBeenCalled();
   });
-
-  test('the screen refresh never wipes the entry to retry a refused write', async () => {
-    const { keychain, service } = load();
-    keychain.setGenericPassword.mockResolvedValue(false);
-    keychain.resetGenericPassword.mockResolvedValue(true);
-    keychain.hasGenericPassword.mockResolvedValue(true);
-
-    await service.saveRecoveryWalletInfo(
-      { seed: 'twenty four words', birthday: 1 },
-      { resetOnFailure: false },
-    );
-
-    expect(keychain.setGenericPassword).toHaveBeenCalledTimes(1);
-    expect(keychain.resetGenericPassword).not.toHaveBeenCalled();
-    // still remembered as a failure, the warning has to show up
-    await expect(service.recoveryWalletInfoIsFailing()).resolves.toBe(true);
-  });
 });
 
 describe('recoveryWalletInfo - reading, and what a silent device means', () => {
@@ -296,20 +279,42 @@ describe('recoveryWalletInfo - the write looks before it leaps', () => {
     expect(keychain.setGenericPassword).toHaveBeenCalledTimes(2);
   });
 
-  test('a device that will not answer the read keeps its entry through a refused write', async () => {
+  test('an entry the device will not read is still migrated by the reset', async () => {
     const { keychain, service } = load();
-    keychain.getGenericPassword.mockRejectedValue(new Error('keystore busy'));
-    keychain.setGenericPassword.mockResolvedValue(false);
+    // what an entry left by an older app version with an auth-required cipher
+    // looks like: the silent read cannot return it, and the write over it
+    // fails too. Deleting never needs auth, so the reset is the way out.
+    keychain.getGenericPassword.mockRejectedValue(new Error('auth required'));
+    keychain.setGenericPassword.mockResolvedValueOnce(false);
+    keychain.setGenericPassword.mockResolvedValue(written);
     keychain.resetGenericPassword.mockResolvedValue(true);
 
     await service.createUpdateRecoveryWalletInfo(keys);
 
-    // nothing is known about the entry, so it stands: one attempt, no reset
-    expect(keychain.setGenericPassword).toHaveBeenCalledTimes(1);
-    expect(keychain.resetGenericPassword).not.toHaveBeenCalled();
-    // and the failure is still remembered
+    expect(keychain.resetGenericPassword).toHaveBeenCalled();
+    expect(keychain.setGenericPassword).toHaveBeenCalledTimes(2);
+    // the retry landed, so nothing is left to warn about
     keychain.hasGenericPassword.mockResolvedValue(true);
+    await expect(service.recoveryWalletInfoIsFailing()).resolves.toBe(false);
+  });
+
+  test('finding the entry already correct clears a failure left by another wallet', async () => {
+    const { keychain, service } = load();
+    keychain.setGenericPassword.mockRejectedValue(new Error('no write'));
+    keychain.resetGenericPassword.mockResolvedValue(true);
+    keychain.hasGenericPassword.mockResolvedValue(true);
+
+    // wallet A cannot be stored
+    await service.saveRecoveryWalletInfo({ seed: 'A-s words', birthday: 1 });
     await expect(service.recoveryWalletInfoIsFailing()).resolves.toBe(true);
+
+    // back on wallet B, whose keys the entry still holds: the device is doing
+    // its job, and the flag A left behind must not outlive that finding
+    keychain.getGenericPassword.mockResolvedValue(stored(keys));
+    await service.createUpdateRecoveryWalletInfo(keys);
+
+    expect(keychain.setGenericPassword).toHaveBeenCalledTimes(2);
+    await expect(service.recoveryWalletInfoIsFailing()).resolves.toBe(false);
   });
 
   test('a keyless wallet does not inherit the previous wallet-s save failure', async () => {
