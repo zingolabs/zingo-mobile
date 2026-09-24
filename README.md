@@ -44,6 +44,23 @@ source on the tagged commit and publishes them to a fresh GitHub Release.
 Full step-by-step for both stores, signing setup, and the underlying iOS/Android
 flavor architecture: see [docs/release_quickstart.md](./docs/release_quickstart.md).
 
+## Architecture decision records
+
+Architecture decision records live in
+[zingolabs/zingo-adrs](https://github.com/zingolabs/zingo-adrs). This
+repository checks in only a submodule pointer to it at `docs/adr/`, so the
+directory is empty until you materialise it, and zingo-mobile's own records
+then sit under `docs/adr/zingo-mobile/`. Propose a record in zingo-adrs, never
+here.
+
+```sh
+# materialise the records after cloning
+git submodule update --init docs/adr
+
+# advance the pointer to the current dev of zingo-adrs, then commit
+git submodule update --remote docs/adr
+```
+
 ## Testing
 ### Prerequisites
 Integration tests and end-to-end tests require a regtest network. The test harness

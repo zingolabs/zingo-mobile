@@ -4,7 +4,7 @@
  * param; the display edge resolves it with translate(). Core modules
  * never build prose. Success variants are domain-named per union
  * ('canonicalUri', 'paymentTarget', 'done'), so the tag says what the
- * caller is holding. See docs/adr/0002-error-keys-not-prose.md.
+ * caller is holding. See docs/adr/zingo-mobile/0009-error-keys-not-prose.md.
  */
 export type ErrorKeyed<K extends string> = {
   kind: 'error';

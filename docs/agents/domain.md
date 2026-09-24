@@ -4,39 +4,30 @@ How the engineering skills should consume this repo's domain documentation when 
 
 ## Before exploring, read these
 
-- **`CONTEXT.md`** at the repo root, or
-- **`CONTEXT-MAP.md`** at the repo root if it exists — it points at one `CONTEXT.md` per context. Read each one relevant to the topic.
-- **`docs/adr/`** — read ADRs that touch the area you're about to work in. In multi-context repos, also check `src/<context>/docs/adr/` for context-scoped decisions.
+- **`CONTEXT.md`** at the repo root.
+- **`docs/adr/zingo-mobile/`** — read ADRs that touch the area you're about to work in.
 
-If any of these files don't exist, **proceed silently**. Don't flag their absence; don't suggest creating them upfront. The producer skill (`/grill-with-docs`) creates them lazily when terms or decisions actually get resolved.
+`docs/adr/` is a submodule pointer to [zingolabs/zingo-adrs](https://github.com/zingolabs/zingo-adrs), so it is empty until you run `git submodule update --init docs/adr`. zingo-mobile's own records sit under `docs/adr/zingo-mobile/`; the org-scoped records that bind every zingolabs repository sit at the top of `docs/adr/`, and other repositories' scopes (such as `docs/adr/zingolib/`) sit beside ours.
+
+If any of these files don't exist, **proceed silently**. Don't flag their absence; don't suggest creating them upfront. The producer skill (`/grill-with-docs`) creates glossary terms lazily when they actually get resolved.
 
 ## File structure
-
-Single-context repo (most repos):
 
 ```
 /
 ├── CONTEXT.md
-├── docs/adr/
-│   ├── 0001-event-sourced-orders.md
-│   └── 0002-postgres-for-write-model.md
-└── src/
+├── docs/adr/            (submodule: zingolabs/zingo-adrs)
+│   ├── 001-some-org-decision.md
+│   ├── zingo-mobile/
+│   │   ├── 0001-some-decision.md
+│   │   └── 0002-another-decision.md
+│   └── zingolib/
+└── app/
 ```
 
-Multi-context repo (presence of `CONTEXT-MAP.md` at the root):
+## Proposing a record
 
-```
-/
-├── CONTEXT-MAP.md
-├── docs/adr/                          ← system-wide decisions
-└── src/
-    ├── ordering/
-    │   ├── CONTEXT.md
-    │   └── docs/adr/                  ← context-specific decisions
-    └── billing/
-        ├── CONTEXT.md
-        └── docs/adr/
-```
+Records are never proposed in this repository. Open a pull request against `dev` in zingo-adrs that adds `zingo-mobile/NNNN-kebab-title.md`, following the record shape its README describes. Then advance this repository's pointer with `git submodule update --remote docs/adr` and commit the new hash.
 
 ## Use the glossary's vocabulary
 
@@ -48,4 +39,4 @@ If the concept you need isn't in the glossary yet, that's a signal — either yo
 
 If your output contradicts an existing ADR, surface it explicitly rather than silently overriding:
 
-> _Contradicts ADR-0007 (event-sourced orders) — but worth reopening because…_
+> _Contradicts ADR-0007 (the biometric gate is a privacy shutter) — but worth reopening because…_
