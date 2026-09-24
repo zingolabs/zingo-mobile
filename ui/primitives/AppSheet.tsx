@@ -13,6 +13,11 @@ type AppSheetProps = {
   renderFooter?: (props: BottomSheetFooterProps) => React.ReactElement;
   onChange?: (index: number) => void;
   enableContentPanningGesture?: boolean;
+  // The sheet container is an accessibility element by default, which on
+  // iOS collapses everything inside it into a single node: the content is
+  // simply not in the accessibility tree any more. Off unless a caller has
+  // a reason to want the sheet announced as one thing.
+  accessible?: boolean;
 };
 
 const AppSheet = React.forwardRef<BottomSheet, AppSheetProps>(
@@ -26,6 +31,7 @@ const AppSheet = React.forwardRef<BottomSheet, AppSheetProps>(
       renderFooter,
       onChange,
       enableContentPanningGesture = false,
+      accessible = false,
     },
     ref,
   ) => {
@@ -49,6 +55,7 @@ const AppSheet = React.forwardRef<BottomSheet, AppSheetProps>(
         enableDynamicSizing={false}
         enablePanDownToClose={false}
         enableContentPanningGesture={enableContentPanningGesture}
+        accessible={accessible}
         keyboardBehavior="interactive"
         keyboardBlurBehavior="restore"
         android_keyboardInputMode="adjustResize"
