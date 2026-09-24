@@ -32,8 +32,13 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
+      # v6 like every other Gradle job here. On v4 this one job wrote the
+      # older v1 cache protocol, so the repo carried two full sets of the
+      # same Gradle state — transforms and dependencies alone were 3.5 GB
+      # of duplicate — against a cache budget that is already evicting
+      # entries other jobs need.
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v6
 
       # The analysis compiles every variant's Kotlin, which needs the
       # generated uniffi bindings on the source path.
