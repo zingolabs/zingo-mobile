@@ -191,15 +191,31 @@ const Seed: React.FunctionComponent<SeedProps> = ({
     };
   }, [initialAction, authPassed, keepAwake]);
 
+  // What the screen turned out to be, where the unmount cleanup can read it:
+  // that cleanup keeps the closure it was created with, and at mount time the
+  // errand is not known yet.
+  const remindingSeedRef = useRef<boolean>(false);
+  remindingSeedRef.current = remindingSeed;
+
   useEffect(
     () => () => {
       // Whatever the screen claimed, it gives back on the way out. `hiding`
       // does this itself, but it is not the only exit: the gate's own cancel
       // leaves by `goBack`, and without this the phone would stay awake for
-      // the rest of the session and the reminder guard would stay raised —
-      // which is also what stops the reminder firing again.
+      // the rest of the session and the reminder guard would stay raised.
       keepAwake && keepAwake(false);
       setSeedReminderShowing && setSeedReminderShowing(false);
+      if (remindingSeedRef.current) {
+        // And the errand is spent by leaving, however the user left. Lowering
+        // the guard without spending it would hand the next sync tick a
+        // reminder that is still owed and no screen showing it, and the App
+        // would open this one again — on a back gesture, over and over. The
+        // App asked; asking again for the same funds is nagging.
+        SettingsFileImpl.writeSettings(
+          SettingsNameEnum.seedReminderPending,
+          false,
+        ).catch(e => console.log('seed reminder not spent on the way out', e));
+      }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
