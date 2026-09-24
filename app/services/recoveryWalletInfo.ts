@@ -207,10 +207,17 @@ export const recoveryWalletInfoIsFailing = async (
 
 // The write every caller wants: it looks before it leaps.
 //
-// An entry that already holds these keys is left alone, which is what most
-// calls find — the boot paths used to write blind on every open, and since a
-// refused write resets the entry before retrying, a transient refusal was
-// enough to destroy a good backup the App was not even replacing.
+// An entry that already holds this wallet's keys and birthday is left alone,
+// which is what most calls find — the boot paths used to write blind on every
+// open, and since a refused write resets the entry before retrying, a
+// transient refusal was enough to destroy a good backup the App was not even
+// replacing.
+//
+// The birthday counts as part of what is stored: restoring the same seed from
+// an earlier birthday is how a wallet that missed its funds gets repaired, and
+// the stored birthday is handed back to the user by "Recover last Keys used".
+// An entry left on the later birthday would send them back to a wallet blind
+// to its own history.
 //
 // When a write is needed, the retry may only delete what the device was
 // willing to show: if it answered the read, what is in there is another
@@ -220,7 +227,11 @@ export const createUpdateRecoveryWalletInfo = async (
   keys: WalletType,
 ): Promise<void> => {
   const stored = await readRecoveryWalletInfo();
-  if (stored.keys.seed === keys.seed && stored.keys.ufvk === keys.ufvk) {
+  if (
+    stored.keys.seed === keys.seed &&
+    stored.keys.ufvk === keys.ufvk &&
+    stored.keys.birthday === keys.birthday
+  ) {
     console.log('the device already holds these keys, nothing to write');
     return;
   }
