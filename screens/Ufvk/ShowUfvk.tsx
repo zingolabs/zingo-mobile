@@ -51,9 +51,8 @@ import { useDismissSheetsOnBlur } from '@app/hooks/useDismissSheetsOnBlur';
 import ExpandedAddress from '@ui/widgets/ExpandedAddress';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import {
+  createUpdateRecoveryWalletInfo,
   getRecoveryWalletInfo,
-  readRecoveryWalletInfo,
-  saveRecoveryWalletInfo,
 } from '@app/services/recoveryWalletInfo';
 import WalletType from '@app/AppState/types/WalletType';
 import { fetchWallet } from '@app/walletBackend';
@@ -165,18 +164,12 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
       const walletInfo = await fetchWallet(true);
       if (walletInfo?.ufvk) {
         info = walletInfo;
-        // Same rule as Seed.tsx: look before writing, and only let a retry
-        // reset the entry when the device answered the read — an entry that
-        // belongs to another wallet, or that nothing can read, is worth
-        // nothing, while an entry the device would not talk about may be a
-        // perfectly good backup. Fire-and-forget: a save failure must not
-        // block the render.
-        const stored = await readRecoveryWalletInfo();
-        if (stored.keys.ufvk !== walletInfo.ufvk) {
-          saveRecoveryWalletInfo(walletInfo, {
-            resetOnFailure: stored.answered,
-          }).catch(e => console.log('Self-heal save failed', e));
-        }
+        // Same as Seed.tsx: the write itself decides whether anything needs
+        // writing and what a retry may destroy. Fire-and-forget: a save
+        // failure must not block the render.
+        createUpdateRecoveryWalletInfo(walletInfo).catch(e =>
+          console.log('Self-heal save failed', e),
+        );
       } else if (keyless) {
         // The one wallet whose kind rules the entry out: a keyless wallet has
         // no UFVK of its own, so whatever is stored is the previous wallet's.

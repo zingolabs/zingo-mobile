@@ -220,37 +220,76 @@ describe('recoveryWalletInfo - reading, and what a silent device means', () => {
   });
 });
 
-describe('recoveryWalletInfo - removing what belongs to another wallet', () => {
+describe('recoveryWalletInfo - the write looks before it leaps', () => {
   beforeEach(() => {
     jest.resetModules();
     jest.clearAllMocks();
   });
 
-  test('a refused removal is retried once with the bare options', async () => {
+  const stored = (keys: object) =>
+    ({
+      username: 'ZINGO_SEED_BIRTHDAY',
+      service: 'ZINGO',
+      password: JSON.stringify(keys),
+      storage: 'AES_GCM_NO_AUTH',
+    }) as unknown as Awaited<ReturnType<typeof Keychain.getGenericPassword>>;
+
+  const keys = { seed: 'twenty four words', birthday: 1 };
+
+  test('an entry that already holds these keys is left alone', async () => {
     const { keychain, service } = load();
-    keychain.hasGenericPassword.mockResolvedValue(true);
-    keychain.resetGenericPassword.mockResolvedValueOnce(false);
+    keychain.getGenericPassword.mockResolvedValue(stored(keys));
+
+    await service.createUpdateRecoveryWalletInfo(keys);
+
+    expect(keychain.setGenericPassword).not.toHaveBeenCalled();
+    expect(keychain.resetGenericPassword).not.toHaveBeenCalled();
+  });
+
+  test('another wallet-s entry is replaced, and a refused write may reset it', async () => {
+    const { keychain, service } = load();
+    keychain.getGenericPassword.mockResolvedValue(
+      stored({ seed: 'someone else-s words', birthday: 2 }),
+    );
+    keychain.setGenericPassword.mockResolvedValue(false);
     keychain.resetGenericPassword.mockResolvedValue(true);
 
-    await service.removeRecoveryWalletInfo();
+    await service.createUpdateRecoveryWalletInfo(keys);
 
-    expect(keychain.resetGenericPassword).toHaveBeenCalledTimes(2);
+    // the device answered the read, so what is in there is worth nothing
+    expect(keychain.resetGenericPassword).toHaveBeenCalled();
+    expect(keychain.setGenericPassword).toHaveBeenCalledTimes(2);
   });
 
-  test('a device that throws on the removal does not throw at the caller', async () => {
+  test('a device that will not answer the read keeps its entry through a refused write', async () => {
     const { keychain, service } = load();
+    keychain.getGenericPassword.mockRejectedValue(new Error('keystore busy'));
+    keychain.setGenericPassword.mockResolvedValue(false);
+    keychain.resetGenericPassword.mockResolvedValue(true);
+
+    await service.createUpdateRecoveryWalletInfo(keys);
+
+    // nothing is known about the entry, so it stands: one attempt, no reset
+    expect(keychain.setGenericPassword).toHaveBeenCalledTimes(1);
+    expect(keychain.resetGenericPassword).not.toHaveBeenCalled();
+    // and the failure is still remembered
     keychain.hasGenericPassword.mockResolvedValue(true);
-    keychain.resetGenericPassword.mockRejectedValue(new Error('no reset'));
-
-    await expect(service.removeRecoveryWalletInfo()).resolves.toBeUndefined();
+    await expect(service.recoveryWalletInfoIsFailing()).resolves.toBe(true);
   });
 
-  test('nothing stored, nothing to remove', async () => {
+  test('a keyless wallet does not inherit the previous wallet-s save failure', async () => {
     const { keychain, service } = load();
+    keychain.setGenericPassword.mockRejectedValue(new Error('no write'));
+    keychain.resetGenericPassword.mockResolvedValue(true);
     keychain.hasGenericPassword.mockResolvedValue(false);
 
-    await service.removeRecoveryWalletInfo();
+    await service.saveRecoveryWalletInfo(keys);
+    await expect(service.recoveryWalletInfoIsFailing()).resolves.toBe(true);
 
-    expect(keychain.resetGenericPassword).not.toHaveBeenCalled();
+    // same process, a keyless wallet is now open: an empty keychain is right,
+    // and the flag belongs to the wallet used before it
+    await expect(service.recoveryWalletInfoIsFailing(false)).resolves.toBe(
+      false,
+    );
   });
 });

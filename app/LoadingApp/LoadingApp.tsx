@@ -103,7 +103,6 @@ import selectingServer from '@app/services/selectingServer';
 import { isEqual } from 'lodash';
 import {
   createUpdateRecoveryWalletInfo,
-  removeRecoveryWalletInfo,
   getRecoveryWalletInfo,
   hasRecoveryWalletInfo,
 } from '@app/services/recoveryWalletInfo';
@@ -1018,12 +1017,19 @@ export class LoadingAppClass extends Component<
           // not parse is no reason to skip the write.
           try {
             if (keyless) {
-              // A wallet with no keys has nothing to store, and whatever the
-              // keychain still holds belongs to the wallet used before it.
-              // Only the wallet's own kind may decide this: a fetch that comes
-              // back empty is an error, not an answer, and must never be a
-              // reason to drop a good entry.
-              await removeRecoveryWalletInfo();
+              // Nothing to store: this wallet has no keys of its own, and what
+              // the keychain holds belongs to the wallet used before it.
+              //
+              // The entry is left where it is rather than deleted. `keyless`
+              // is `No keys found`, the kind the comment above marks as
+              // "possibly an error", so a restore that went wrong reports it
+              // too — and deleting on it would destroy the seed the user may
+              // have just recovered from this very entry, with nothing left to
+              // write it back from. A stale entry that no screen will show is
+              // the smaller harm: ShowUfvk refuses the keychain fallback for a
+              // keyless wallet, and the next wallet with keys of its own
+              // overwrites it.
+              console.log('keyless wallet: nothing of its own to store');
             } else {
               const walletToStore = await fetchWallet(readOnly);
               if (walletToStore && (walletToStore.seed || walletToStore.ufvk)) {
@@ -1893,12 +1899,19 @@ export class LoadingAppClass extends Component<
           // not parse is no reason to skip the write.
           try {
             if (keyless) {
-              // A wallet with no keys has nothing to store, and whatever the
-              // keychain still holds belongs to the wallet used before it.
-              // Only the wallet's own kind may decide this: a fetch that comes
-              // back empty is an error, not an answer, and must never be a
-              // reason to drop a good entry.
-              await removeRecoveryWalletInfo();
+              // Nothing to store: this wallet has no keys of its own, and what
+              // the keychain holds belongs to the wallet used before it.
+              //
+              // The entry is left where it is rather than deleted. `keyless`
+              // is `No keys found`, the kind the comment above marks as
+              // "possibly an error", so a restore that went wrong reports it
+              // too — and deleting on it would destroy the seed the user may
+              // have just recovered from this very entry, with nothing left to
+              // write it back from. A stale entry that no screen will show is
+              // the smaller harm: ShowUfvk refuses the keychain fallback for a
+              // keyless wallet, and the next wallet with keys of its own
+              // overwrites it.
+              console.log('keyless wallet: nothing of its own to store');
             } else {
               const walletToStore = await fetchWallet(readOnly);
               if (walletToStore && (walletToStore.seed || walletToStore.ufvk)) {
