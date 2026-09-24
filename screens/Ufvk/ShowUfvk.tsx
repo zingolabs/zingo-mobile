@@ -173,10 +173,10 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
       } else if (keyless) {
         // The one wallet whose kind rules the entry out: a keyless wallet has
         // no UFVK of its own, so whatever is stored is the previous wallet's.
-        // The boot removal asks the device to drop it, but a device that
-        // refuses says so only in the log — `removeRecoveryWalletInfo` has no
-        // warning of its own — and this screen is the only seed/UFVK screen a
-        // keyless wallet can reach. Showing nothing is the right answer here.
+        // Nothing deletes that entry — `No keys found` is too close to an
+        // error to destroy a backup over — so this guard is what keeps it off
+        // the screen, and this screen is the only seed/UFVK screen a keyless
+        // wallet can reach. Showing nothing is the right answer here.
         console.log(
           'keyless wallet: the stored entry belongs to another wallet',
         );
