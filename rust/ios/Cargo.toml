@@ -6,10 +6,8 @@ edition = "2024"
 
 [features]
 ci = []
-regchest = []
 
 [dev-dependencies]
 zingolib_testutils = { workspace = true }
 zingomobile_utils = { workspace = true }
-regchest_utils = { workspace = true }
 tokio = { workspace = true }
