@@ -1,4 +1,4 @@
-// What one `quick_split` call did (native `quickSplitProcess`), ADR 0016. The
+// What one `quick_split` call did (native `quickSplitProcess`), zingolib/0016. The
 // stateless splitting loop matches on `outcome`: sync between calls and keep
 // going until `complete`, then run startIronwoodMigration for Phase 2.
 export type RPCSplitOutcomeKind =

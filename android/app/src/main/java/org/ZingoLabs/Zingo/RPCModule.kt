@@ -1151,7 +1151,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         }
     }
 
-    // Phase 1 splitting round (ADR 0016). Proves and broadcasts, so like the
+    // Phase 1 splitting round (zingolib/0016). Proves and broadcasts, so like the
     // drain it runs long and holds the lightclient; settling launches on
     // Dispatchers.IO, which keeps it off the main queue and lets status polls
     // through.
