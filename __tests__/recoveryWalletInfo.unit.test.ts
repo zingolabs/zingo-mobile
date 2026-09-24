@@ -8,6 +8,7 @@ jest.mock('react-native', () => ({ Platform: { OS: 'ios' } }));
 
 import type * as Keychain from 'react-native-keychain';
 import type * as RecoveryWalletInfo from '@app/services/recoveryWalletInfo';
+import type WalletType from '@app/AppState/types/WalletType';
 
 // The service remembers the last save and the last read in module state, so
 // each test takes a fresh copy of it — and of the keychain mock the fresh copy
@@ -263,6 +264,21 @@ describe('recoveryWalletInfo - the write looks before it leaps', () => {
     // an entry left on the later one would restore a wallet blind to its own
     // history.
     expect(keychain.setGenericPassword).toHaveBeenCalledTimes(1);
+  });
+
+  test('a stored zero birthday and a missing one are the same wallet', async () => {
+    const { keychain, service } = load();
+    // `createNewWallet` writes `birthday || 0`, `fetchWallet` leaves the field
+    // out when it is falsy: the same wallet, two shapes.
+    keychain.getGenericPassword.mockResolvedValue(
+      stored({ seed: 'twenty four words', birthday: 0 }),
+    );
+
+    await service.createUpdateRecoveryWalletInfo({
+      seed: 'twenty four words',
+    } as WalletType);
+
+    expect(keychain.setGenericPassword).not.toHaveBeenCalled();
   });
 
   test('another wallet-s entry is replaced, and a refused write may reset it', async () => {

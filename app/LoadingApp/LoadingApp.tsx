@@ -1993,7 +1993,12 @@ export class LoadingAppClass extends Component<
     // in IOS the App + OS needs some time to close the biometric screen
     // then the Alert can be too fast.
     if (wallet.seed || wallet.ufvk) {
-      const txt = (wallet.seed || wallet.ufvk) + '\n\n' + wallet.birthday;
+      // `fetchWallet` leaves the birthday out when it is zero, so the stored
+      // record may have no field at all. The user is being handed something
+      // to paste into the restore form: zero is the answer there, the string
+      // "undefined" is not.
+      const txt =
+        (wallet.seed || wallet.ufvk) + '\n\n' + (wallet.birthday ?? 0);
       const preview = wallet.seed
         ? (() => {
             const words = wallet.seed.split(' ');

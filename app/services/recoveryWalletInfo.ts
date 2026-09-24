@@ -227,10 +227,15 @@ export const createUpdateRecoveryWalletInfo = async (
   keys: WalletType,
 ): Promise<void> => {
   const stored = await readRecoveryWalletInfo();
+  // A birthday of zero and no birthday at all are the same wallet: the two
+  // producers of this entry disagree on the shape, since `createNewWallet`
+  // writes `birthday || 0` while `fetchWallet` leaves the field out when it
+  // is falsy. Comparing them raw would rewrite the entry once for no reason,
+  // and that write would drop the field.
   if (
     stored.keys.seed === keys.seed &&
     stored.keys.ufvk === keys.ufvk &&
-    stored.keys.birthday === keys.birthday
+    (stored.keys.birthday || 0) === (keys.birthday || 0)
   ) {
     console.log('the device already holds these keys, nothing to write');
     return;
