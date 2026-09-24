@@ -204,8 +204,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
         if (walletInfo?.seed) {
           // Keep the device's copy in step with the wallet. The write looks
           // before it leaps on its own — an entry that already holds these
-          // words is left alone, and a retry only resets what the device was
-          // willing to show — so there is nothing to decide here.
+          // words is left alone — so there is nothing to decide here.
           // Fire-and-forget so a save failure doesn't block the render.
           createUpdateRecoveryWalletInfo(walletInfo).catch(e =>
             console.log('Self-heal save failed', e),

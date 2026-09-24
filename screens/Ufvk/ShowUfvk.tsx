@@ -163,8 +163,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
       if (walletInfo?.ufvk) {
         info = walletInfo;
         // Same as Seed.tsx: the write itself decides whether anything needs
-        // writing and what a retry may destroy. Fire-and-forget: a save
-        // failure must not block the render.
+        // writing. Fire-and-forget: a save failure must not block the render.
         createUpdateRecoveryWalletInfo(walletInfo).catch(e =>
           console.log('Self-heal save failed', e),
         );
