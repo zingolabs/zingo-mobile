@@ -30,13 +30,21 @@ export default class SettingsFileImpl {
     const settings = await this.readSettings();
     const newSettings: SettingsFileClass = { ...settings, [name]: value };
 
-    RNFS.writeFile(fileName, JSON.stringify(newSettings), GlobalConst.utf8)
-      .then(() => {
-        //console.log('FILE WRITTEN!')
-      })
-      .catch(err => {
-        console.log('settings write file:', err.message);
-      });
+    // Awaited: callers await this one, and some of them decide what to do
+    // next on the strength of the setting being on disk. Firing the write off
+    // and resolving early made that a race. A failure is still only logged.
+    try {
+      await RNFS.writeFile(
+        fileName,
+        JSON.stringify(newSettings),
+        GlobalConst.utf8,
+      );
+    } catch (err) {
+      console.log(
+        'settings write file:',
+        err instanceof Error ? err.message : String(err),
+      );
+    }
   }
 
   // Read the server setting

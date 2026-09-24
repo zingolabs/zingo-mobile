@@ -2089,6 +2089,13 @@ export class LoadingAppClass extends Component<
 
   restoreLastBackup = async () => {
     this.setState({ screen: RouteEnum.Launching, actionButtonsDisabled: true });
+    // Same as `doRestore`: the owner already has this wallet, and the flag is
+    // one file for every wallet, so a reminder armed by a wallet left behind
+    // must not follow them into the one they are restoring.
+    await SettingsFileImpl.writeSettings(
+      SettingsNameEnum.seedReminderPending,
+      false,
+    );
     const result = await restoreExistingWalletBackup();
     if (!resolvedTrue(result)) {
       this.addLastSnackbar(

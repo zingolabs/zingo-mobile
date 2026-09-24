@@ -166,15 +166,44 @@ const Seed: React.FunctionComponent<SeedProps> = ({
   const [remindingSeed, setRemindingSeed] = useState<boolean>(false);
 
   useEffect(() => {
+    // Only the App's own errand counts. The flag says a reminder is owed, not
+    // that this visit is it: reaching the screen through Change Wallet or
+    // Restore Backup while it is armed would otherwise relabel a destructive
+    // button, spend the flag, and leave by a route the user never asked for.
+    //
+    // And not before the gate passes: cancelling it leaves by `goBack`, and
+    // nothing should have been claimed on the way in.
+    if (initialAction !== SeedActionEnum.view || !authPassed) {
+      return;
+    }
+    let cancelled = false;
     (async () => {
       const { seedReminderPending } = await SettingsFileImpl.readSettings();
-      setRemindingSeed(seedReminderPending);
-      if (seedReminderPending) {
-        // twenty four words take a while to write down by hand
-        keepAwake && keepAwake(true);
+      if (cancelled || !seedReminderPending) {
+        return;
       }
+      setRemindingSeed(true);
+      // twenty four words take a while to write down by hand
+      keepAwake && keepAwake(true);
     })();
-  }, [keepAwake]);
+    return () => {
+      cancelled = true;
+    };
+  }, [initialAction, authPassed, keepAwake]);
+
+  useEffect(
+    () => () => {
+      // Whatever the screen claimed, it gives back on the way out. `hiding`
+      // does this itself, but it is not the only exit: the gate's own cancel
+      // leaves by `goBack`, and without this the phone would stay awake for
+      // the rest of the session and the reminder guard would stay raised —
+      // which is also what stops the reminder firing again.
+      keepAwake && keepAwake(false);
+      setSeedReminderShowing && setSeedReminderShowing(false);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
 
   useEffect(() => {
     // Wait for the on-mount biometric gate to pass before touching the
@@ -393,14 +422,19 @@ const Seed: React.FunctionComponent<SeedProps> = ({
   };
 
   const hiding = async () => {
-    setSeedReminderShowing && setSeedReminderShowing(false);
     if (remindingSeed) {
       // The errand is done, whether or not the user wrote anything down: the
       // App asked, and asking twice for the same funds would be nagging.
+      //
+      // The flag goes to disk before the guard comes down, and in that order:
+      // the poller in LoadedApp re-opens this screen when it finds the flag
+      // set and the guard clear, so dropping the guard first leaves a window
+      // where a sync tick reopens the screen the user has just dismissed.
       await SettingsFileImpl.writeSettings(
         SettingsNameEnum.seedReminderPending,
         false,
       );
+      setSeedReminderShowing && setSeedReminderShowing(false);
       setRemindingSeed(false);
       keepAwake && keepAwake(false);
       // The App brought the user here, so there is nothing behind this screen
@@ -417,6 +451,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
       });
       return;
     }
+    setSeedReminderShowing && setSeedReminderShowing(false);
     if (navigation.canGoBack()) {
       navigation.goBack();
     }
