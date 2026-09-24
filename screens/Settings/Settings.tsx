@@ -88,6 +88,7 @@ import BottomSheet, {
   BottomSheetScrollView,
 } from '@gorhom/bottom-sheet';
 import { recoveryWalletInfoIsFailing } from '@app/services/recoveryWalletInfo';
+import { fetchWallet } from '@app/walletBackend';
 import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
 import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
 import { useDismissSheetsOnBlur } from '@app/hooks/useDismissSheetsOnBlur';
@@ -149,7 +150,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     blockExplorer: blockExplorerContext,
     foregroundEpoch,
     readOnly,
-    keyless,
     setPrivacyOption,
     setBackgroundError,
     zingolibVersion,
@@ -378,9 +378,13 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     }
     let cancelled = false;
     (async () => {
-      // A keyless wallet has nothing of its own to store, so an empty
-      // keychain is the right answer there, not a failure.
-      const failing = await recoveryWalletInfoIsFailing(!keyless);
+      // Asked of the wallet and the device, here and now: what this wallet
+      // says its keys are, against what the device is holding. A wallet with
+      // no keys of its own answers null, and then an empty keychain is the
+      // right answer rather than a failure.
+      const failing = await recoveryWalletInfoIsFailing(
+        await fetchWallet(readOnly),
+      );
       if (!cancelled) {
         setRecoveryInfoFailing(failing);
       }
@@ -388,7 +392,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     return () => {
       cancelled = true;
     };
-  }, [authPassed, keyless]);
+  }, [authPassed, readOnly]);
 
   // Default server to display for the "auto" option: the `default` entry for
   // the active chain (mainnet and testnet each have one), falling back to the
