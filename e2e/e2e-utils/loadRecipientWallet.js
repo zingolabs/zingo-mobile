@@ -6,7 +6,20 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 let loadRecipientWallet = async () => {
   await sleep(2000);
 
-  // the start always is like a fress install -> create a new wallet
+  // A fresh install lands on the start menu, so the wallet the App used to
+  // create by itself has to be created here: the regtest server is set from
+  // Settings, and Settings is reached through the Header, which only exists
+  // once a wallet is open. This throwaway wallet is discarded further down,
+  // when saving the regtest server changes the chain.
+  await waitFor(element(by.id('loadingapp.createnewwallet')))
+    .toBeVisible()
+    .withTimeout(sync_timeout);
+  await element(by.id('loadingapp.createnewwallet')).tap();
+  await waitFor(element(by.id('newseed.button.ok')))
+    .toBeVisible()
+    .withTimeout(sync_timeout);
+  await element(by.id('newseed.button.ok')).tap();
+
   // go to setting modal screen
   // connect to regtest network
   await waitFor(element(by.id('header.drawmenu')))

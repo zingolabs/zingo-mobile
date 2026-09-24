@@ -6,6 +6,17 @@ describe('New Wallet', () => {
   it('New wallet creation flow works.', async () => {
     //await sleep(5000);
 
+    // A fresh install lands on the start menu: create the wallet this test
+    // then changes away from. The App no longer creates one by itself.
+    await waitFor(element(by.id('loadingapp.createnewwallet')))
+      .toBeVisible()
+      .withTimeout(sync_timeout);
+    await element(by.id('loadingapp.createnewwallet')).tap();
+    await waitFor(element(by.id('newseed.button.ok')))
+      .toBeVisible()
+      .withTimeout(sync_timeout);
+    await element(by.id('newseed.button.ok')).tap();
+
     // change to another wallet -> new wallet
     await waitFor(element(by.id('header.drawmenu')))
       .toBeVisible()
@@ -28,10 +39,11 @@ describe('New Wallet', () => {
       .toBeVisible()
       .withTimeout(sync_timeout);
     await element(by.id('loadingapp.createnewwallet')).tap();
-    await waitFor(element(by.id('seed.button.ok')))
+    // the new wallet's seed is shown on NewSeed, not on the Seed screen
+    await waitFor(element(by.id('newseed.button.ok')))
       .toBeVisible()
       .withTimeout(sync_timeout);
-    await element(by.id('seed.button.ok')).tap();
+    await element(by.id('newseed.button.ok')).tap();
 
     await waitFor(element(by.id('valuetransfer text')))
       .toBeVisible()
