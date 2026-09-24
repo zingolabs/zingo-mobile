@@ -1,4 +1,4 @@
-import { ServerUrisType, TranslateType, ChainNameEnum } from '../AppState';
+import { ServerUrisType, TranslateType, ChainNameEnum } from '@app/AppState';
 
 const serverUris = (
   translate: (key: string) => TranslateType | void,
@@ -153,7 +153,7 @@ const serverUris = (
     },
     // testnet default (1)
     {
-      uri: 'https://testnet.zec.rocks',
+      uri: 'https://testnet.zec.rocks:443',
       region: '',
       chainName: ChainNameEnum.testChainName,
       default: true,

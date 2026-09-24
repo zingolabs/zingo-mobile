@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lint>
+    <!-- UniFFI-generated bridge. Its cleaner picks java.lang.ref.Cleaner
+         (API 33) only after a Class.forName probe inside a
+         catch (ClassNotFoundException), so it is safe on minSdk 26. Lint
+         reads the call sites and not the reflective guard, and reports
+         three NewApi errors. Scoped to this generated file so NewApi stays
+         enforced everywhere we write Kotlin by hand. -->
+    <issue id="NewApi">
+        <ignore path="src/main/java/uniffi/zingo_nym_proxy_ffi/zingo_nym_proxy_ffi.kt" />
+    </issue>
+</lint>

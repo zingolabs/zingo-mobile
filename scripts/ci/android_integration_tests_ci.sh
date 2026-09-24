@@ -66,10 +66,17 @@ fi
 
 cd android
 
-# Create integration test report directory
-test_report_dir="app/build/outputs/integration_test_reports/${abi}"
+# Create integration test report directory. Keyed by test name as well as
+# ABI so tests sharing one emulator session (bucketed CI jobs) do not
+# overwrite each other's reports.
+test_report_dir="app/build/outputs/integration_test_reports/${abi}/${test_name}"
 rm -rf "${test_report_dir}"
 mkdir -p "${test_report_dir}"
+
+# A clean slate for this test's app state: the emulator may be carrying a
+# previous test's wallet data when several tests share one session.
+adb -s emulator-5554 uninstall org.ZingoLabs.Zingo &> /dev/null || true
+adb -s emulator-5554 uninstall org.ZingoLabs.Zingo.test &> /dev/null || true
 
 echo -e "\nInstalling Test APK..."
 i=0
@@ -119,8 +126,16 @@ adb -s emulator-5554 shell mkdir -p "/sdcard/Android/media/org.ZingoLabs.Zingo/a
 
 echo -e "\nRunning integration tests..."
 nohup yarn start &> "${test_report_dir}/metro.txt" &
+# The launched chain's activation-heights spec, exported by the host test
+# harness; the on-device tests build their regtest chain hint from it.
+activation_heights_args=()
+if [ -n "${ACTIVATION_HEIGHTS:-}" ]; then
+    activation_heights_args=(-e activation_heights "${ACTIVATION_HEIGHTS}")
+fi
+
 adb -s emulator-5554 shell am instrument -w -r -e class org.ZingoLabs.Zingo.$test_name \
     -e additionalTestOutputDir /sdcard/Android/media/org.ZingoLabs.Zingo/additional_integration_test_output \
+    "${activation_heights_args[@]}" \
     -e testTimeoutSeconds 31536000 org.ZingoLabs.Zingo.test/androidx.test.runner.AndroidJUnitRunner \
     | tee "${test_report_dir}/test_results.txt"
 
@@ -132,17 +147,24 @@ fi
 
 echo -e "\nTest reports saved: android/${test_report_dir}"
     
+# When several tests share one emulator session (bucketed CI jobs), the
+# session's owner — the workflow's emulator runner — does the teardown;
+# KEEP_EMULATORS tells this per-test script to leave the emulator alive.
 if [[ $(cat "${test_report_dir}/test_results.txt" | grep INSTRUMENTATION_CODE | cut -d' ' -f2) -ne -1 || \
         $(cat "${test_report_dir}/test_results.txt" | grep 'FAILURES!!!') ]]; then
     echo -e "\nIntegration tests FAILED"
 
-    # Kill all emulators
-    ../scripts/kill_emulators.sh
+    if [ -z "${KEEP_EMULATORS:-}" ]; then
+        # Kill all emulators
+        ../scripts/kill_emulators.sh
+    fi
 
     exit 1
 fi
 
 echo -e "\nIntegration tests PASSED"
 
-# Kill all emulators
-../scripts/kill_emulators.sh
+if [ -z "${KEEP_EMULATORS:-}" ]; then
+    # Kill all emulators
+    ../scripts/kill_emulators.sh
+fi

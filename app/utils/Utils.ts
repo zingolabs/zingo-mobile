@@ -1,5 +1,9 @@
 import { getNumberFormatSettings } from 'react-native-localize';
-import { format as dateFnsFormat, differenceInMinutes } from 'date-fns';
+import {
+  format as dateFnsFormat,
+  differenceInMinutes,
+  formatDistanceStrict,
+} from 'date-fns';
 import type { Locale } from 'date-fns';
 import {
   enUS,
@@ -12,26 +16,23 @@ import {
 import { ZecAmountSplitType } from './types/ZecAmountSplitType';
 import {
   ChainNameEnum,
+  ErrorKeyed,
+  GateFailure,
   GlobalConst,
   LanguageEnum,
   SendJsonToTypeType,
   SendPageStateClass,
-  ServerType,
   TranslateType,
   BlockExplorerEnum,
-} from '../AppState';
+} from '@app/AppState';
 
 import randomColor from 'randomcolor';
-import {
-  getDonationAddress,
-  getZenniesDonationAddress,
-  parseAddress,
-} from '../walletBackend';
+import { parseAddress } from '@app/walletBackend';
 import { Buffer } from 'buffer';
-import { RPCParseAddressType } from '../walletBackend/types/RPCParseAddressType';
-import { RPCParseAddressStatusEnum } from '../walletBackend/enums/RPCParseAddressStatusEnum';
-import { RPCAddressKindEnum } from '../walletBackend/enums/RPCAddressKindEnum';
-import { RPCReceiversEnum } from '../walletBackend/enums/RPCReceiversEnum';
+import { RPCParseAddressType } from '@app/walletBackend/types/RPCParseAddressType';
+import { RPCParseAddressStatusEnum } from '@app/walletBackend/enums/RPCParseAddressStatusEnum';
+import { RPCAddressKindEnum } from '@app/walletBackend/enums/RPCAddressKindEnum';
+import { RPCReceiversEnum } from '@app/walletBackend/enums/RPCReceiversEnum';
 
 export default class Utils {
   static trimToSmall(addr?: string, numChars?: number): string {
@@ -112,46 +113,6 @@ export default class Utils {
     chunks.push(s.slice((numChunks - 1) * chunkSize));
 
     return chunks;
-  }
-
-  // DONATION TO ZINGOLABS
-  static async getDonationAddress(chainName: ChainNameEnum): Promise<string> {
-    // donations only for mainnet.
-    if (chainName === ChainNameEnum.mainChainName) {
-      // UA -> we need a fresh one.
-      const ua: string = await getDonationAddress();
-      return ua;
-    }
-    return '';
-  }
-
-  static getDonationAmount(): string {
-    const { decimalSeparator } = getNumberFormatSettings();
-
-    return '0' + decimalSeparator + '01';
-  }
-
-  static getDonationMemo(translate: (key: string) => TranslateType): string {
-    return translate('donation') as string;
-  }
-
-  // ZENNIES FOR ZINGO
-  static async getZenniesDonationAddress(
-    chainName: ChainNameEnum,
-  ): Promise<string> {
-    // donations only for mainnet.
-    if (chainName === ChainNameEnum.mainChainName) {
-      // UA -> we need a fresh one.
-      const ua: string = await getZenniesDonationAddress();
-      return ua;
-    }
-    return '';
-  }
-
-  static getZenniesDonationAmount(): string {
-    const { decimalSeparator } = getNumberFormatSettings();
-
-    return '0' + decimalSeparator + '01';
   }
 
   // NYM
@@ -286,13 +247,8 @@ export default class Utils {
   static async getSendManyJSON(
     sendPageState: SendPageStateClass,
     uAddress: string,
-    server: ServerType,
-    donation: boolean,
   ): Promise<SendJsonToTypeType[]> {
     const to = sendPageState.toaddr;
-    const donationAddress: boolean =
-      to.to === (await Utils.getDonationAddress(server.chainName)) ||
-      to.to === (await Utils.getZenniesDonationAddress(server.chainName));
 
     const memo = Utils.buildMemo(to.memo, to.includeUAMemo, uAddress);
     const amount = parseInt(
@@ -330,55 +286,26 @@ export default class Utils {
       }
     }
 
-    const donationTransaction: SendJsonToTypeType[] = [];
-
-    // we need to exclude 2 use cases:
-    // 2. send to one of our donation UA's
-    // (make no sense to do a double donation)
-    if (
-      donation &&
-      server.chainName === ChainNameEnum.mainChainName &&
-      !donationAddress
-    ) {
-      donationTransaction.push({
-        address: await Utils.getZenniesDonationAddress(server.chainName),
-        amount: parseInt(
-          (
-            Utils.parseStringLocaleToNumberFloat(
-              Utils.getZenniesDonationAmount(),
-            ) *
-            10 ** 8
-          ).toFixed(0),
-          10,
-        ),
-        memo: '', // zancas decision to not leak info with no reason.
-      });
-    }
-
-    return [...jsonFlat, ...donationTransaction];
+    return jsonFlat;
   }
 
   static async isValidAddress(
     address: string,
     serverChainName: string,
-  ): Promise<{ isValid: boolean; onlyOrchardUA: string }> {
-    const result: string = await parseAddress(address);
+  ): Promise<{ isValid: boolean; shieldedOnlyUA: string }> {
+    const result = await parseAddress(address);
     let isValid: boolean = false;
     let isFullUA: boolean = false;
-    let onlyOrchardUA: string = '';
+    let shieldedOnlyUA: string = '';
 
-    if (result) {
-      if (result.toLowerCase().startsWith(GlobalConst.error)) {
-        return { isValid, onlyOrchardUA };
-      }
-    } else {
-      return { isValid, onlyOrchardUA };
+    if (!result.ok || !result.value) {
+      return { isValid, shieldedOnlyUA };
     }
     let resultJSON = {} as RPCParseAddressType;
     try {
-      resultJSON = await JSON.parse(result);
+      resultJSON = await JSON.parse(result.value);
     } catch (e) {
-      return { isValid, onlyOrchardUA };
+      return { isValid, shieldedOnlyUA };
     }
 
     isValid =
@@ -399,30 +326,26 @@ export default class Utils {
         );
       if (isFullUA) {
         // the only use case for this is: if the UA is full (3 receivers)
-        onlyOrchardUA = resultJSON.only_orchard_ua
-          ? resultJSON.only_orchard_ua
+        shieldedOnlyUA = resultJSON.shielded_only_ua
+          ? resultJSON.shielded_only_ua
           : '';
       }
     }
 
-    return { isValid, onlyOrchardUA };
+    return { isValid, shieldedOnlyUA };
   }
 
   static async isValidOrchardOrSaplingAddress(
     address: string,
     serverChainName: string,
   ): Promise<boolean> {
-    const result: string = await parseAddress(address);
-    if (result) {
-      if (result.toLowerCase().startsWith(GlobalConst.error)) {
-        return false;
-      }
-    } else {
+    const result = await parseAddress(address);
+    if (!result.ok || !result.value) {
       return false;
     }
     let resultJSON = {} as RPCParseAddressType;
     try {
-      resultJSON = await JSON.parse(result);
+      resultJSON = await JSON.parse(result.value);
     } catch (e) {
       return false;
     }
@@ -493,6 +416,13 @@ export default class Utils {
     return differenceInMinutes(from, to);
   }
 
+  // Localized rough duration ("2 hours", "45 minutes") for a span in ms.
+  static formatDurationMs(ms: number, language: LanguageEnum): string {
+    return formatDistanceStrict(0, ms, {
+      locale: Utils.getDateFnsLocale(language),
+    });
+  }
+
   /**
    * zingolib surfaces chain-mismatch errors with the raw `ChainNameEnum`
    * values ("main" / "test" / "regtest") embedded in the message (e.g.
@@ -512,5 +442,27 @@ export default class Utils {
       /\b(main|test|regtest)\b/g,
       token => translate(`settings.value-chainname-${token}`) as string,
     );
+  }
+
+  /**
+   * Renders an ErrorKeyed failure for display: the translated catalog
+   * entry, followed by the offending fragment when the error carries one.
+   * This is the display-edge counterpart of the ErrorKey convention
+   * (docs/adr/0002-error-keys-not-prose.md).
+   */
+  static renderErrorKeyed(
+    failure: ErrorKeyed<string>,
+    translate: (key: string) => TranslateType,
+  ): string {
+    const text = translate(failure.errorKey) as string;
+    return failure.param ? `${text} "${failure.param}"` : text;
+  }
+
+  /** Renders a gate failure for user copy, translating its catalog key and keeping the raw diagnostic out. */
+  static renderGateFailure(
+    failure: GateFailure,
+    translate: (key: string) => TranslateType,
+  ): string {
+    return translate(failure.errorKey) as string;
   }
 }

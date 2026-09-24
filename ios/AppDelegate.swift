@@ -29,8 +29,23 @@ struct SyncStatus: Decodable {
     let total_sapling_outputs_scanned: Int64?
     let session_orchard_outputs_scanned: Int64?
     let total_orchard_outputs_scanned: Int64?
+    let session_ironwood_outputs_scanned: Int64?
+    let total_ironwood_outputs_scanned: Int64?
     let percentage_session_outputs_scanned: Double?
     let percentage_total_outputs_scanned: Double?
+    let total_outputs_scanned: Int64?
+    let total_outputs: Int64?
+}
+
+/// What `loadWalletFile` found when preparing a background sync.
+private enum BackgroundWalletLoad {
+    /// The wallet file is open and the lightclient is initialized.
+    case loaded
+    /// The user is in offline mode (empty server URI); nothing to sync.
+    case offline
+    /// The wallet could not be loaded, carrying what went wrong so the
+    /// background report names the cause instead of the symptom.
+    case failed(String)
 }
 
 private struct BackgroundTaskResult: Encodable {
@@ -374,30 +389,6 @@ extension AppDelegate {
           return
         }
 
-        do {
-          let setCrytoProvider = try setCryptoDefaultProviderToRing()
-          NSLog("BGTask syncingProcessBackgroundTask - Crypto provider default \(setCrytoProvider)")
-        } catch {
-          NSLog("BGTask syncingProcessBackgroundTask - Crypto provider default error: \(error.localizedDescription)")
-
-          // save the background file
-          let timeStampError = Date().timeIntervalSince1970
-          let timeStampStrError = String(format: "%.0f", timeStampError)
-          let jsonBackgroundError = self.buildBackgroundJSON(message: "Crypto provider default KO.", dateEnd: timeStampStrError, error: "Crypto provider default KO. \(error.localizedDescription)")
-          do {
-            try rpcmodule.saveBackgroundFile(jsonBackgroundError)
-            NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundError)")
-          } catch {
-            NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundError) error: \(error.localizedDescription)")
-          }
-          
-          if let task = self.bgTask {
-            task.setTaskCompleted(success: false)
-          }
-          bgTask = nil
-          return
-        }
-
         var exists: String = "false"
         do {
             exists = try rpcmodule.fileExists(Constants.WalletFileName.rawValue)
@@ -407,9 +398,30 @@ extension AppDelegate {
       
         if exists == "true" {
             // load the wallet file
-            let shouldSync = self.loadWalletFile()
+            let walletLoad = self.loadWalletFile()
 
-            if !shouldSync {
+            if case .failed(let reason) = walletLoad {
+                NSLog("BGTask syncingProcessBackgroundTask - Load wallet KO: \(reason)")
+
+                // save the background file
+                let timeStampLoadError = Date().timeIntervalSince1970
+                let timeStampStrLoadError = String(format: "%.0f", timeStampLoadError)
+                let jsonBackgroundLoadError = self.buildBackgroundJSON(message: "Load wallet process KO.", dateEnd: timeStampStrLoadError, error: "Load wallet process KO. \(reason)")
+                do {
+                  try rpcmodule.saveBackgroundFile(jsonBackgroundLoadError)
+                  NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundLoadError)")
+                } catch {
+                  NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundLoadError) error: \(error.localizedDescription)")
+                }
+
+                if let task = self.bgTask {
+                  task.setTaskCompleted(success: false)
+                }
+                bgTask = nil
+                return
+            }
+
+            if case .offline = walletLoad {
                 NSLog("BGTask syncingProcessBackgroundTask - Offline mode, sync skipped")
                 let timeStampOffline = Date().timeIntervalSince1970
                 let timeStampStrOffline = String(format: "%.0f", timeStampOffline)
@@ -461,27 +473,10 @@ extension AppDelegate {
                 }
                 var syncStatusJson: String = ""
                 do {
+                  // statusSync throws on failure (typed FFI errors); the
+                  // catch below owns the error path, so the status JSON is
+                  // never inspected for an error sentinel.
                   syncStatusJson = try statusSync()
-                  if syncStatusJson.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue) {
-                    NSLog("BGTask syncingProcessBackgroundTask - sync STATUS error: \(syncStatusJson)")
-                    
-                    // save the background file
-                    let timeStampError = Date().timeIntervalSince1970
-                    let timeStampStrError = String(format: "%.0f", timeStampError)
-                    let jsonBackgroundError = self.buildBackgroundJSON(message: "Status sync process KO.", dateEnd: timeStampStrError, error: "Status sync process KO. \(syncStatusJson)")
-                    do {
-                      try rpcmodule.saveBackgroundFile(jsonBackgroundError)
-                      NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundError)")
-                    } catch {
-                      NSLog("BGTask syncingProcessBackgroundTask - Save background JSON error: \(error.localizedDescription)")
-                    }
-                    
-                    if let task = self.bgTask {
-                      task.setTaskCompleted(success: false)
-                    }
-                    bgTask = nil
-                    return
-                  }
                 } catch {
                   NSLog("BGTask syncingProcessBackgroundTask - sync STATUS error: \(error.localizedDescription)")
 
@@ -614,22 +609,25 @@ extension AppDelegate {
     }
 
     /// Reads settings.json and loads the wallet file when a server URI is
-    /// configured. Returns `true` to signal the caller may proceed with sync, or
-    /// `false` only when the user is explicitly in offline mode (empty server
-    /// URI) and sync must be skipped. On any other unexpected condition the
-    /// function returns `true` so the downstream sync path surfaces its own
-    /// error rather than masquerading as offline mode.
-    func loadWalletFile() -> Bool {
+    /// configured, reporting which of the three outcomes happened so the
+    /// caller can tell "loaded" from "offline" from "could not load".
+    ///
+    /// A failed load used to report the same "proceed" as a successful one,
+    /// on the reasoning that the sync would surface its own error. It does,
+    /// but that error is `LightclientNotInitialized`, which names the symptom
+    /// and hides the cause: an unreadable settings.json on a locked device
+    /// reads exactly like a wallet that loaded fine and then failed to sync.
+    private func loadWalletFile() -> BackgroundWalletLoad {
         let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
         guard let documentsDirectory = paths.first else {
             NSLog("Error: Unable to find documents directory")
-            return true
+            return .failed("unable to find the documents directory")
         }
 
         let fileName = "\(documentsDirectory)/settings.json"
         guard let content = try? String(contentsOfFile: fileName, encoding: .utf8) else {
             NSLog("Error: Unable to read file at path \(fileName)")
-            return true
+            return .failed("unable to read settings.json")
         }
 
         guard let contentData = content.data(using: .utf8),
@@ -638,12 +636,12 @@ extension AppDelegate {
               let serveruri = server["uri"] as? String,
               let chainhint = server["chainName"] as? String else {
             NSLog("Error: Unable to parse JSON object from file at path \(fileName)")
-            return true
+            return .failed("unable to parse settings.json")
         }
 
         if serveruri.isEmpty {
             NSLog("Offline mode detected (empty serveruri) - skipping wallet load")
-            return false
+            return .offline
         }
 
         NSLog("Opening the wallet file - No App active - serveruri: \(serveruri) chain: \(chainhint)")
@@ -652,8 +650,9 @@ extension AppDelegate {
           _ = try rpcmodule.fnLoadExistingWallet(serveruri: serveruri, chainhint: chainhint, performancelevel: "Medium", minconfirmations: "3")
         } catch {
           NSLog("Error: Unable to load the wallet. error: \(error.localizedDescription)")
+          return .failed(error.localizedDescription)
         }
-        return true
+        return .loaded
     }
 
     func cancelExecutingTask() {

@@ -1,4 +1,4 @@
-import { ServerUrisType, ChainNameEnum } from '../AppState';
+import { ServerUrisType, ChainNameEnum } from '@app/AppState';
 
 // Live lightwalletd registry published by the community server monitor
 // (zec.rocks "hosh"). It returns, per chain, a list of servers with health

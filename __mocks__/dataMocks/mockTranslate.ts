@@ -1,9 +1,5 @@
-import {
-  CurrencyEnum,
-  LanguageEnum,
-  BlockExplorerEnum,
-} from '../../app/AppState';
-import { RPCPerformanceLevelEnum } from '../../app/walletBackend/enums/RPCPerformanceLevelEnum';
+import { LanguageEnum, BlockExplorerEnum } from '@app/AppState';
+import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
 
 export const mockTranslate = (p: string) => {
   if (p === 'about.copyright') {
@@ -23,17 +19,6 @@ export const mockTranslate = (p: string) => {
         "restore": ["restore"],
         "backup": ["backup"]
       }`;
-  } else if (p === 'settings.currencies') {
-    return [
-      {
-        value: '',
-        text: 'text no currency',
-      },
-      {
-        value: CurrencyEnum.USDCurrency,
-        text: 'text USD',
-      },
-    ];
   } else if (p === 'settings.languages') {
     return [
       {
@@ -55,39 +40,6 @@ export const mockTranslate = (p: string) => {
       {
         value: LanguageEnum.tr,
         text: 'text tr',
-      },
-    ];
-  } else if (p === 'settings.sendalls') {
-    return [
-      {
-        value: true,
-        text: 'text true',
-      },
-      {
-        value: false,
-        text: 'text false',
-      },
-    ];
-  } else if (p === 'settings.donations') {
-    return [
-      {
-        value: true,
-        text: 'text true',
-      },
-      {
-        value: false,
-        text: 'text false',
-      },
-    ];
-  } else if (p === 'settings.rescanmenus') {
-    return [
-      {
-        value: true,
-        text: 'text true',
-      },
-      {
-        value: false,
-        text: 'text false',
       },
     ];
   } else if (p === 'settings.recoverywalletinfoondevices') {

@@ -7,25 +7,19 @@ import {
   withSequence,
   withTiming,
 } from 'react-native-reanimated';
-import { useOptionsPanel } from '../context/optionsPanel';
+import { useOptionsPanel } from '@app/context/optionsPanel';
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
-// Open (going down): smooth ramp at both ends — the sheet eases out of
-// rest, moves visibly through the middle, and eases into the final
-// position. With a longer duration the motion is actually perceived.
-const OPEN_DURATION_MS = 700;
-const EASING_OPEN = Easing.inOut(Easing.cubic);
-// Close (coming back up): user said this already feels right — keep
-// `out` so the sheet decelerates into its resting snap point.
-const CLOSE_DURATION_MS = 500;
-const EASING_CLOSE = Easing.out(Easing.cubic);
+// Same feel both ways: start fast, decelerate into the resting position.
+export const SLIDE_DURATION_MS = 500;
+export const SLIDE_EASING = Easing.out(Easing.cubic);
 
 // Cross-fade with the OptionsPanel overlay on open. Phase 1 mirrors the
-// panel's fade-in delay (350ms); phase 2 mirrors its fade duration (320ms).
+// panel's fade-in delay (125ms); phase 2 mirrors its fade duration (125ms).
 // While the sheet drops, it goes 1 → 0.6 → 0 so that the panel — which
 // fades 0 → 1 during phase 2 — blends in instead of replacing.
-const SHEET_FADE_PHASE1_MS = 350;
-const SHEET_FADE_PHASE2_MS = 320;
+const SHEET_FADE_PHASE1_MS = 125;
+const SHEET_FADE_PHASE2_MS = 125;
 const SHEET_PHASE1_OPACITY = 0.6;
 
 /**
@@ -48,8 +42,8 @@ export function useOptionsPanelSheetSlide() {
 
   useEffect(() => {
     translateY.value = withTiming(isOpen ? SCREEN_HEIGHT : 0, {
-      duration: isOpen ? OPEN_DURATION_MS : CLOSE_DURATION_MS,
-      easing: isOpen ? EASING_OPEN : EASING_CLOSE,
+      duration: SLIDE_DURATION_MS,
+      easing: SLIDE_EASING,
     });
     if (isOpen) {
       opacity.value = withSequence(

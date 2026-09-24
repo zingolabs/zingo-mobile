@@ -6,6 +6,13 @@ on:
       cache-key:
         required: true
         type: string
+      advisory:
+        # Advisory mode: job failures are recorded but do not fail the
+        # caller, for runs where iOS is informational (per-PR CI) rather
+        # than a gate (nightly).
+        required: false
+        default: false
+        type: boolean
 
 env:
   CACHE-KEY: ${{ inputs.cache-key }}
@@ -14,6 +21,7 @@ env:
 jobs:
   ios-check-build-cache:
     name: Check build cache
+    continue-on-error: ${{ inputs.advisory }}
     runs-on: macos-15
     outputs:
       ios-cache-found: ${{ steps.ios-set-cache-found.outputs.ios-cache-found }}
@@ -34,6 +42,8 @@ jobs:
           path: |
             ios/Zingolib.xcframework
             ios/zingo.swift
+            ios/ZingoNymProxyFFI.xcframework
+            ios/zingo_nym_proxy_ffi.swift
           key: native-ios-xcframework-${{ env.CACHE-KEY }}
           lookup-only: true
 
@@ -45,7 +55,8 @@ jobs:
     name: Build iOS Rust xcframework
     needs: ios-check-build-cache
     if: ${{ needs.ios-check-build-cache.outputs.ios-cache-found != 'true' }}
-    runs-on: macos-15
+    continue-on-error: ${{ inputs.advisory }}
+    runs-on: zingo-ios-build-12
     env:
       RUSTUP_HOME: ${{ github.workspace }}/.rustup
       CARGO_HOME:  ${{ github.workspace }}/.cargo
@@ -66,19 +77,21 @@ jobs:
 
           TOML="rust/Cargo.toml"
           REV="${GITHUB_SHA}"
+          PINS='^(zingolib|pepper-sync|zingolib_testutils|zingo-price)[[:space:]]*='
 
           sed -i '' -E \
-            "/^zingolib[[:space:]]*=/ s/rev[[:space:]]*=[[:space:]]*\"[^\"]*\"/rev = \"${REV}\"/" \
+            "/${PINS}/ s/rev[[:space:]]*=[[:space:]]*\"[^\"]*\"/rev = \"${REV}\"/" \
             "$TOML"
 
           sed -i '' -E \
-            "/^zingolib[[:space:]]*=/ s/(branch|tag)[[:space:]]*=[[:space:]]*\"[^\"]*\"/rev = \"${REV}\"/" \
+            "/${PINS}/ s/(branch|tag)[[:space:]]*=[[:space:]]*\"[^\"]*\"/rev = \"${REV}\"/" \
             "$TOML"
 
-          first_line="$(grep -E '^zingolib[[:space:]]*=' "$TOML")"
-          echo "zingolib first line => $first_line"
-          echo "$first_line" | grep -q "rev = \"${REV}\""
-          echo "$first_line" | grep -vqE '\b(branch|tag)[[:space:]]*='
+          pinned="$(grep -E "$PINS" "$TOML")"
+          echo "zingolib pins =>"
+          echo "$pinned"
+          test "$(echo "$pinned" | wc -l)" -eq "$(echo "$pinned" | grep -c "rev = \"${REV}\"")"
+          ! echo "$pinned" | grep -qE '\b(branch|tag)[[:space:]]*='
 
           cd rust
           rustup default stable
@@ -89,6 +102,34 @@ jobs:
           rustup update
           rustup upgrade
           rustup default stable
+
+      # Placed after the toolchain steps on purpose: rust-cache reads
+      # `rustc -vV` into its key, and RUSTUP_HOME here is a workspace-relative
+      # dir that has no default toolchain until the step above installs one.
+      #
+      # Two workspaces: the shim is excluded from the main one (own lockfile,
+      # see rust/Cargo.toml), so its target dir needs listing separately. It
+      # was missing from the cache this replaces, which is why the 24 minutes
+      # of nym-sdk were never cacheable at all.
+      #
+      # What it replaces: a plain actions/cache over .cargo + rust/target that
+      # never once hit. It stored 4.6 GB unpruned, the repo's cache store
+      # evicted it before the next iOS build needed it, and every run logged
+      # "Cache not found for input keys: ios-cargo-..." and then spent 8m30
+      # re-uploading it. rust-cache prunes to dependency artifacts only, which
+      # is all this job needs: zingolib and nym-sdk are git/registry deps, not
+      # workspace members, and compiling them is nearly the whole 45 minutes.
+      #
+      # Saved from dev only. A cache written on refs/pull/N/merge is invisible
+      # to every other PR, so per-PR saves buy nothing and only add eviction
+      # pressure; the dev copy is readable by all of them.
+      - name: Cargo cache (registry, git, iOS targets)
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: |
+            rust
+            rust/nym-proxy-ffi
+          save-if: ${{ github.ref == 'refs/heads/dev' }}
 
       - name: Install bindgen-cli (needed by aws-lc-sys, ring etc.)
         run: cargo install --force --locked bindgen-cli
@@ -128,10 +169,14 @@ jobs:
           path: |
             ios/Zingolib.xcframework
             ios/zingo.swift
+            ios/ZingoNymProxyFFI.xcframework
+            ios/zingo_nym_proxy_ffi.swift
+          retention-days: 3
 
   cache-native-ios-uniffi:
     name: Cache iOS xcframework
     needs: ios-build
+    continue-on-error: ${{ inputs.advisory }}
     runs-on: macos-15
     steps:
       - name: Set envs for zingolib CI
@@ -155,4 +200,6 @@ jobs:
           path: |
             ios/Zingolib.xcframework
             ios/zingo.swift
+            ios/ZingoNymProxyFFI.xcframework
+            ios/zingo_nym_proxy_ffi.swift
           key: native-ios-xcframework-${{ env.CACHE-KEY }}

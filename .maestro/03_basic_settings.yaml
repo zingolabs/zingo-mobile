@@ -7,7 +7,9 @@ appId: org.ZingoLabs.Zingo
       id: "receive.title"
     timeout: 120000
 
-# Navigate to Settings via gear icon
+# Navigate to Settings: it lives in the Options panel now
+- tapOn:
+    id: "header.drawmenu"
 - tapOn:
     id: "header.settings"
 - extendedWaitUntil:

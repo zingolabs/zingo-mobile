@@ -1,14 +1,45 @@
+use zcash_local_net::validator::Validator;
 use zingolib_testutils::scenarios;
 
+/// The launched chain's activation heights in the spec form the wallet's
+/// `regtest:<schedule>` chain hint consumes, read back from the running
+/// validator (infrastructure ADR 0003: the validator is the only heights
+/// authority) rather than restated from the launch fixture.
+async fn validator_activation_heights(validator: &impl Validator) -> String {
+    let heights = validator.get_activation_heights().await;
+    let fmt = |height: Option<u32>| height.map_or_else(|| "off".to_string(), |h| h.to_string());
+    format!(
+        "overwinter={},sapling={},blossom={},heartwood={},canopy={},nu5={},nu6={},nu6_1={},nu6_2={},nu6_3={},nu7={}",
+        fmt(heights.overwinter()),
+        fmt(heights.sapling()),
+        fmt(heights.blossom()),
+        fmt(heights.heartwood()),
+        fmt(heights.canopy()),
+        fmt(heights.nu5()),
+        fmt(heights.nu6()),
+        fmt(heights.nu6_1()),
+        fmt(heights.nu6_2()),
+        fmt(heights.nu6_3()),
+        fmt(heights.nu7()),
+    )
+}
+
 async fn execute_version_from_seed(abi: &str) {
-    let _local_net = scenarios::funded_orchard_mobileclient(1_000_000).await;
+    let local_net = scenarios::funded_orchard_mobileclient(1_000_000).await;
+    let activation_heights = Some(validator_activation_heights(local_net.validator()).await);
 
     #[cfg(not(feature = "ci"))]
-    let (exit_code, output, error) =
-        zingomobile_utils::android_integration_test(abi, "ExecuteVersionFromSeed");
+    let (exit_code, output, error) = zingomobile_utils::android_integration_test(
+        abi,
+        "ExecuteVersionFromSeed",
+        activation_heights.as_deref(),
+    );
     #[cfg(feature = "ci")]
-    let (exit_code, output, error) =
-        zingomobile_utils::android_integration_test_ci(abi, "ExecuteVersionFromSeed");
+    let (exit_code, output, error) = zingomobile_utils::android_integration_test_ci(
+        abi,
+        "ExecuteVersionFromSeed",
+        activation_heights.as_deref(),
+    );
 
     println!("Exit Code: {}", exit_code);
     println!("Output: {}", output);
@@ -18,14 +49,21 @@ async fn execute_version_from_seed(abi: &str) {
 }
 
 async fn execute_addresses_from_ufvk(abi: &str) {
-    let _local_net = scenarios::funded_orchard_mobileclient(1_000_000).await;
+    let local_net = scenarios::funded_orchard_mobileclient(1_000_000).await;
+    let activation_heights = Some(validator_activation_heights(local_net.validator()).await);
 
     #[cfg(not(feature = "ci"))]
-    let (exit_code, output, error) =
-        zingomobile_utils::android_integration_test(abi, "ExecuteAddressesFromUfvk");
+    let (exit_code, output, error) = zingomobile_utils::android_integration_test(
+        abi,
+        "ExecuteAddressesFromUfvk",
+        activation_heights.as_deref(),
+    );
     #[cfg(feature = "ci")]
-    let (exit_code, output, error) =
-        zingomobile_utils::android_integration_test_ci(abi, "ExecuteAddressesFromUfvk");
+    let (exit_code, output, error) = zingomobile_utils::android_integration_test_ci(
+        abi,
+        "ExecuteAddressesFromUfvk",
+        activation_heights.as_deref(),
+    );
 
     println!("Exit Code: {}", exit_code);
     println!("Output: {}", output);
@@ -35,14 +73,21 @@ async fn execute_addresses_from_ufvk(abi: &str) {
 }
 
 async fn execute_addresses_from_seed(abi: &str) {
-    let _local_net = scenarios::funded_orchard_mobileclient(1_000_000).await;
+    let local_net = scenarios::funded_orchard_mobileclient(1_000_000).await;
+    let activation_heights = Some(validator_activation_heights(local_net.validator()).await);
 
     #[cfg(not(feature = "ci"))]
-    let (exit_code, output, error) =
-        zingomobile_utils::android_integration_test(abi, "ExecuteAddressesFromSeed");
+    let (exit_code, output, error) = zingomobile_utils::android_integration_test(
+        abi,
+        "ExecuteAddressesFromSeed",
+        activation_heights.as_deref(),
+    );
     #[cfg(feature = "ci")]
-    let (exit_code, output, error) =
-        zingomobile_utils::android_integration_test_ci(abi, "ExecuteAddressesFromSeed");
+    let (exit_code, output, error) = zingomobile_utils::android_integration_test_ci(
+        abi,
+        "ExecuteAddressesFromSeed",
+        activation_heights.as_deref(),
+    );
 
     println!("Exit Code: {}", exit_code);
     println!("Output: {}", output);
@@ -52,14 +97,21 @@ async fn execute_addresses_from_seed(abi: &str) {
 }
 
 async fn execute_sync_from_seed(abi: &str) {
-    let _local_net = scenarios::funded_orchard_mobileclient(1_000_000).await;
+    let local_net = scenarios::funded_orchard_mobileclient(1_000_000).await;
+    let activation_heights = Some(validator_activation_heights(local_net.validator()).await);
 
     #[cfg(not(feature = "ci"))]
-    let (exit_code, output, error) =
-        zingomobile_utils::android_integration_test(abi, "ExecuteSyncFromSeed");
+    let (exit_code, output, error) = zingomobile_utils::android_integration_test(
+        abi,
+        "ExecuteSyncFromSeed",
+        activation_heights.as_deref(),
+    );
     #[cfg(feature = "ci")]
-    let (exit_code, output, error) =
-        zingomobile_utils::android_integration_test_ci(abi, "ExecuteSyncFromSeed");
+    let (exit_code, output, error) = zingomobile_utils::android_integration_test_ci(
+        abi,
+        "ExecuteSyncFromSeed",
+        activation_heights.as_deref(),
+    );
 
     println!("Exit Code: {}", exit_code);
     println!("Output: {}", output);
@@ -69,14 +121,21 @@ async fn execute_sync_from_seed(abi: &str) {
 }
 
 async fn execute_send_from_orchard(abi: &str) {
-    let _local_net = scenarios::funded_orchard_mobileclient(1_000_000).await;
+    let local_net = scenarios::funded_orchard_mobileclient(1_000_000).await;
+    let activation_heights = Some(validator_activation_heights(local_net.validator()).await);
 
     #[cfg(not(feature = "ci"))]
-    let (exit_code, output, error) =
-        zingomobile_utils::android_integration_test(abi, "ExecuteSendFromOrchard");
+    let (exit_code, output, error) = zingomobile_utils::android_integration_test(
+        abi,
+        "ExecuteSendFromOrchard",
+        activation_heights.as_deref(),
+    );
     #[cfg(feature = "ci")]
-    let (exit_code, output, error) =
-        zingomobile_utils::android_integration_test_ci(abi, "ExecuteSendFromOrchard");
+    let (exit_code, output, error) = zingomobile_utils::android_integration_test_ci(
+        abi,
+        "ExecuteSendFromOrchard",
+        activation_heights.as_deref(),
+    );
 
     println!("Exit Code: {}", exit_code);
     println!("Output: {}", output);
@@ -86,17 +145,19 @@ async fn execute_send_from_orchard(abi: &str) {
 }
 
 async fn execute_currentprice_and_value_transfers_from_seed(abi: &str) {
-    let _local_net = scenarios::funded_orchard_with_3_txs_mobileclient(1_000_000).await;
-
+    let local_net = scenarios::funded_orchard_with_3_txs_mobileclient(1_000_000).await;
+    let activation_heights = Some(validator_activation_heights(local_net.validator()).await);
     #[cfg(not(feature = "ci"))]
     let (exit_code, output, error) = zingomobile_utils::android_integration_test(
         abi,
         "UpdateCurrentPriceAndValueTransfersFromSeed",
+        activation_heights.as_deref(),
     );
     #[cfg(feature = "ci")]
     let (exit_code, output, error) = zingomobile_utils::android_integration_test_ci(
         abi,
         "UpdateCurrentPriceAndValueTransfersFromSeed",
+        activation_heights.as_deref(),
     );
 
     println!("Exit Code: {}", exit_code);
@@ -107,15 +168,21 @@ async fn execute_currentprice_and_value_transfers_from_seed(abi: &str) {
 }
 
 async fn execute_sapling_balance_from_seed(abi: &str) {
-    let _local_net =
+    let local_net =
         scenarios::funded_orchard_sapling_transparent_shielded_mobileclient(1_000_000).await;
-
+    let activation_heights = Some(validator_activation_heights(local_net.validator()).await);
     #[cfg(not(feature = "ci"))]
-    let (exit_code, output, error) =
-        zingomobile_utils::android_integration_test(abi, "ExecuteSaplingBalanceFromSeed");
+    let (exit_code, output, error) = zingomobile_utils::android_integration_test(
+        abi,
+        "ExecuteSaplingBalanceFromSeed",
+        activation_heights.as_deref(),
+    );
     #[cfg(feature = "ci")]
-    let (exit_code, output, error) =
-        zingomobile_utils::android_integration_test_ci(abi, "ExecuteSaplingBalanceFromSeed");
+    let (exit_code, output, error) = zingomobile_utils::android_integration_test_ci(
+        abi,
+        "ExecuteSaplingBalanceFromSeed",
+        activation_heights.as_deref(),
+    );
 
     println!("Exit Code: {}", exit_code);
     println!("Output: {}", output);
@@ -125,15 +192,24 @@ async fn execute_sapling_balance_from_seed(abi: &str) {
 }
 
 async fn execute_parse_address_for_tex(abi: &str) {
-    let _local_net =
-        scenarios::funded_orchard_sapling_transparent_shielded_mobileclient(1_000_000).await;
+    // Address parsing only needs a reachable server with nonzero height,
+    // so the cheap scenario suffices; the multi-pool funded scenario
+    // costs ~150s more of regtest setup per test.
+    let local_net = scenarios::funded_orchard_mobileclient(1_000_000).await;
+    let activation_heights = Some(validator_activation_heights(local_net.validator()).await);
 
     #[cfg(not(feature = "ci"))]
-    let (exit_code, output, error) =
-        zingomobile_utils::android_integration_test(abi, "ExecuteParseAddressForTex");
+    let (exit_code, output, error) = zingomobile_utils::android_integration_test(
+        abi,
+        "ExecuteParseAddressForTex",
+        activation_heights.as_deref(),
+    );
     #[cfg(feature = "ci")]
-    let (exit_code, output, error) =
-        zingomobile_utils::android_integration_test_ci(abi, "ExecuteParseAddressForTex");
+    let (exit_code, output, error) = zingomobile_utils::android_integration_test_ci(
+        abi,
+        "ExecuteParseAddressForTex",
+        activation_heights.as_deref(),
+    );
 
     println!("Exit Code: {}", exit_code);
     println!("Output: {}", output);
@@ -143,15 +219,39 @@ async fn execute_parse_address_for_tex(abi: &str) {
 }
 
 async fn execute_parse_address_invalid(abi: &str) {
-    let _local_net =
-        scenarios::funded_orchard_sapling_transparent_shielded_mobileclient(1_000_000).await;
+    // Address parsing only needs a reachable server with nonzero height,
+    // so the cheap scenario suffices; the multi-pool funded scenario
+    // costs ~150s more of regtest setup per test.
+    let local_net = scenarios::funded_orchard_mobileclient(1_000_000).await;
+    let activation_heights = Some(validator_activation_heights(local_net.validator()).await);
 
     #[cfg(not(feature = "ci"))]
+    let (exit_code, output, error) = zingomobile_utils::android_integration_test(
+        abi,
+        "ExecuteParseAddressInvalid",
+        activation_heights.as_deref(),
+    );
+    #[cfg(feature = "ci")]
+    let (exit_code, output, error) = zingomobile_utils::android_integration_test_ci(
+        abi,
+        "ExecuteParseAddressInvalid",
+        activation_heights.as_deref(),
+    );
+
+    println!("Exit Code: {}", exit_code);
+    println!("Output: {}", output);
+    println!("Error: {}", error);
+
+    assert_eq!(exit_code, 0);
+}
+
+async fn double_wrap_repro(abi: &str) {
+    #[cfg(not(feature = "ci"))]
     let (exit_code, output, error) =
-        zingomobile_utils::android_integration_test(abi, "ExecuteParseAddressInvalid");
+        zingomobile_utils::android_integration_test(abi, "DoubleWrapReproTest", None);
     #[cfg(feature = "ci")]
     let (exit_code, output, error) =
-        zingomobile_utils::android_integration_test_ci(abi, "ExecuteParseAddressInvalid");
+        zingomobile_utils::android_integration_test_ci(abi, "DoubleWrapReproTest", None);
 
     println!("Exit Code: {}", exit_code);
     println!("Output: {}", output);
@@ -163,6 +263,11 @@ async fn execute_parse_address_invalid(abi: &str) {
 mod android_integration {
     mod x86_32 {
         const ABI: &str = "x86";
+
+        #[tokio::test]
+        async fn double_wrap_repro() {
+            crate::double_wrap_repro(ABI).await;
+        }
 
         #[tokio::test]
         async fn execute_version_from_seed() {
@@ -214,6 +319,11 @@ mod android_integration {
         const ABI: &str = "x86_64";
 
         #[tokio::test]
+        async fn double_wrap_repro() {
+            crate::double_wrap_repro(ABI).await;
+        }
+
+        #[tokio::test]
         async fn execute_version_from_seed() {
             crate::execute_version_from_seed(ABI).await;
         }
@@ -263,6 +373,11 @@ mod android_integration {
         const ABI: &str = "armeabi-v7a";
 
         #[tokio::test]
+        async fn double_wrap_repro() {
+            crate::double_wrap_repro(ABI).await;
+        }
+
+        #[tokio::test]
         async fn execute_version_from_seed() {
             crate::execute_version_from_seed(ABI).await;
         }
@@ -310,6 +425,11 @@ mod android_integration {
 
     mod arm64 {
         const ABI: &str = "arm64-v8a";
+
+        #[tokio::test]
+        async fn double_wrap_repro() {
+            crate::double_wrap_repro(ABI).await;
+        }
 
         #[tokio::test]
         async fn execute_version_from_seed() {

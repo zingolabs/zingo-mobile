@@ -1,7 +1,7 @@
-import { ValueTransferType, ValueTransferKindEnum } from '../../AppState';
-import { RPCValueTransferType } from '../types/RPCValueTransferType';
-import { RPCValueTransfersKindEnum } from '../enums/RPCValueTransfersKindEnum';
-import { RPCValueTransfersStatusEnum } from '../enums/RPCValueTransfersStatusEnum';
+import { ValueTransferType, ValueTransferKindEnum } from '@app/AppState';
+import { RPCValueTransferType } from '@app/walletBackend/types/RPCValueTransferType';
+import { RPCValueTransfersKindEnum } from '@app/walletBackend/enums/RPCValueTransfersKindEnum';
+import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
 
 /**
  * Maps a raw zingolib value transfer to the app's ValueTransferType.
@@ -23,19 +23,21 @@ export function transformValueTransfer(
   result.txid = vt.txid;
   result.time = vt.datetime;
   result.kind =
-    vt.kind === RPCValueTransfersKindEnum.memoToSelf
-      ? ValueTransferKindEnum.MemoToSelf
-      : vt.kind === RPCValueTransfersKindEnum.sendToSelf
-        ? ValueTransferKindEnum.SendToSelf
-        : vt.kind === RPCValueTransfersKindEnum.received
-          ? ValueTransferKindEnum.Received
-          : vt.kind === RPCValueTransfersKindEnum.sent
-            ? ValueTransferKindEnum.Sent
-            : vt.kind === RPCValueTransfersKindEnum.shield
-              ? ValueTransferKindEnum.Shield
-              : vt.kind === RPCValueTransfersKindEnum.rejection
-                ? ValueTransferKindEnum.Rejection
-                : vt.kind;
+    vt.kind === RPCValueTransfersKindEnum.migration
+      ? ValueTransferKindEnum.Migration
+      : vt.kind === RPCValueTransfersKindEnum.memoToSelf
+        ? ValueTransferKindEnum.MemoToSelf
+        : vt.kind === RPCValueTransfersKindEnum.sendToSelf
+          ? ValueTransferKindEnum.SendToSelf
+          : vt.kind === RPCValueTransfersKindEnum.received
+            ? ValueTransferKindEnum.Received
+            : vt.kind === RPCValueTransfersKindEnum.sent
+              ? ValueTransferKindEnum.Sent
+              : vt.kind === RPCValueTransfersKindEnum.shield
+                ? ValueTransferKindEnum.Shield
+                : vt.kind === RPCValueTransfersKindEnum.rejection
+                  ? ValueTransferKindEnum.Rejection
+                  : vt.kind;
   result.fee = (!vt.transaction_fee ? 0 : vt.transaction_fee) / 10 ** 8;
   result.zecPrice = !vt.zec_price ? 0 : vt.zec_price;
 
@@ -68,7 +70,13 @@ export function transformValueTransfer(
     !vt.memos || vt.memos.length === 0 || !vt.memos.join('')
       ? undefined
       : vt.memos;
-  result.poolType = !vt.pool_received ? undefined : vt.pool_received;
+  // `pools_received` is in protocol order (transparent, sapling, orchard,
+  // ironwood); a transfer can span pools, and the app displays one, so
+  // surface the newest pool present.
+  result.poolType =
+    !vt.pools_received || vt.pools_received.length === 0
+      ? undefined
+      : vt.pools_received[vt.pools_received.length - 1];
 
   if (result.status === RPCValueTransfersStatusEnum.failed) {
     console.log('[RPC] failed value transfer (transformed):', result);

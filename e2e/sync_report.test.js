@@ -1,6 +1,6 @@
 const { log, device, by, element, fail } = require('detox');
 
-import { GlobalConst } from '../app/AppState';
+import { GlobalConst } from '@app/AppState';
 import { loadTestWallet } from './e2e-utils/loadTestWallet.js';
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));

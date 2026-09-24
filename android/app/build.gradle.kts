@@ -5,6 +5,7 @@ plugins {
     id("com.android.application")
     id("com.facebook.react")
     id("org.jetbrains.kotlin.android")
+    id("com.autonomousapps.dependency-analysis")
 }
 
 /**
@@ -120,8 +121,8 @@ android {
         applicationId = "org.ZingoLabs.Zingo" // Real
         minSdk = rootProject.extra["minSdkVersion"] as Int
         targetSdk = rootProject.extra["targetSdkVersion"] as Int
-        versionCode = 309 // Real (prod baseline; beta flavor overrides below)
-        versionName = "2.0.20" // Real
+        versionCode = 320 // Real (prod baseline; beta flavor overrides below)
+        versionName = "2.0.24" // Real
         testBuildType = System.getProperty("testBuildType", "debug")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
@@ -150,21 +151,13 @@ android {
         create("prod") {
             dimension = "channel"
             resValue("string", "app_name", "Zingo")
-            // Privacy/anti-tamper controls from the Least Authority audit.
-            // Prod enforces them; beta disables them so testers can take
-            // screenshots, record video, and so screen-recorder overlays
-            // don't drop touches. Toggling per-flavor (instead of editing
-            // MainActivity for releases) keeps prod safe by default — any
-            // future flavor MUST define this bool or compile will fail.
-            resValue("bool", "enforce_privacy_controls", "true")
         }
         create("beta") {
             dimension = "channel"
             applicationIdSuffix = ".Beta"
-            versionCode = 318 // beta override
-            versionName = "2.0.21" // beta override
+            versionCode = 331 // beta override
+            versionName = "2.0.23" // beta override
             resValue("string", "app_name", "Zingo Beta")
-            resValue("bool", "enforce_privacy_controls", "false")
         }
     }
 
@@ -234,7 +227,34 @@ android {
         }
     }
 
+    lint {
+        abortOnError = true
+        // lintVital (the pass release assembly runs) only checks FATAL issues,
+        // so an ERROR-severity NewApi violation shipped a prod crash on API
+        // 28-32 devices. Promoting it means release builds fail on it too,
+        // not just the dedicated lint job.
+        fatal += "NewApi"
+    }
+
+    sourceSets {
+        getByName("test") {
+            // The nym proxy shim's Kotlin wire-contract test, read from the
+            // crate itself. No copy lives under src/test.
+            java.srcDir("../../rust/nym-proxy-ffi/contract-tests/kotlin")
+        }
+    }
+
     testOptions {
+        unitTests.all {
+            // The golden wire-contract pins for GoldenWireContractTest, read
+            // from the crate itself.
+            it.systemProperty(
+                "zingo.golden.dir",
+                layout.projectDirectory
+                    .dir("../../rust/nym-proxy-ffi/test-data/golden")
+                    .asFile.absolutePath
+            )
+        }
         managedDevices {
             val pixel2api29 = localDevices.create("pixel2api29_x86") {
                 device = "Pixel 2"
@@ -325,8 +345,10 @@ dependencies {
 
     androidTestImplementation("com.wix:detox:20.51.4")
     implementation("androidx.appcompat:appcompat:1.7.0")
+    // DeviceAuthModule's BiometricPrompt (react-native-keychain only pulls
+    // this transitively; direct use declares it).
+    implementation("androidx.biometric:biometric:1.1.0")
 
-    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
     implementation(project(":react-native-device-info")) {
         exclude(group = "com.google.firebase")
         exclude(group = "com.google.android.gms")
@@ -334,8 +356,10 @@ dependencies {
     }
     implementation("com.facebook.soloader:soloader:0.10.5")
 
-    // Detox tests getAttributes() needs this
-    debugImplementation("com.google.android.material:material:1.12.0")
+
+    // Detox tests getAttributes() reaches this by reflection at runtime, so
+    // it is runtime-only: no source references exist for compile analysis.
+    debugRuntimeOnly("com.google.android.material:material:1.12.0")
 
     // Hermes is always enabled in RN 0.74+
     implementation("com.facebook.react:hermes-android")
@@ -343,19 +367,26 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib:${rootProject.extra["kotlinVersion"] as String}")
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.5.0")
 
+    // Coroutines are used directly (CoroutineScope/Dispatchers in RPCModule
+    // and the JVM unit tests), so the dependency is declared here rather
+    // than borrowed from another library's dependency graph.
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
+
+    // Nullability/threading annotations referenced by app sources.
+    implementation("androidx.annotation:annotation:1.8.1")
+
     val workVersion = "2.10.0"
 
-    // (Java only)
+    // BackgroundSyncWorker consumes the ListenableFuture WorkManager
+    // returns, so the class's provider must be declared, not borrowed from
+    // work-runtime's dependency graph. With notifee bringing Guava onto the
+    // runtime classpath, Guava's metadata retires the standalone
+    // listenablefuture jar (the empty 9999.0 placeholder supersedes 1.0),
+    // so Guava itself is the only real provider left.
+    implementation("com.google.guava:guava:33.3.1-android")
+
     implementation("androidx.work:work-runtime:$workVersion")
-
-    // Kotlin + coroutines
-    implementation("androidx.work:work-runtime-ktx:$workVersion")
-
-    // optional - RxJava2 support
-    implementation("androidx.work:work-rxjava2:$workVersion")
-
-    // optional - Test helpers
-    androidTestImplementation("androidx.work:work-testing:$workVersion")
 
     // optional - Multiprocess support
     implementation("androidx.work:work-multiprocess:$workVersion")
@@ -363,20 +394,23 @@ dependencies {
     // google truth testing framework
     androidTestImplementation("com.google.truth:truth:1.1.3")
 
-    // JSON parsing
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.18.3")
+    // JSON decoding in the instrumented tests.
+    androidTestImplementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.18.3")
+    androidTestImplementation("com.fasterxml.jackson.core:jackson-core:2.18.3")
+    androidTestImplementation("com.fasterxml.jackson.core:jackson-databind:2.18.3")
 
-    // JUnit test runners
+    // JVM unit tests for pure logic (no device or emulator)
+    testImplementation("junit:junit:4.13.2")
+
+    // JUnit test runners; the instrumented sources use the JUnit 4 API and
+    // the androidx.test runner/rules directly.
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
-
-    // Kotlin extensions for androidx.test.ext.junit
-    androidTestImplementation("androidx.test.ext:junit-ktx:1.2.1")
+    androidTestImplementation("junit:junit:4.13.2")
+    androidTestImplementation("androidx.test:rules:1.7.0")
+    androidTestImplementation("androidx.test:runner:1.7.0")
 
     // uniffi needs this
     implementation("net.java.dev.jna:jna:5.18.1@aar")
-
-    // back navigation implementation
-    implementation("androidx.activity:activity:1.10.1")
 
     // encrypted file storage
     implementation("androidx.security:security-crypto:1.0.0")

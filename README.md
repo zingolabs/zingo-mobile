@@ -32,6 +32,11 @@ yarn release:prod:prep <version> <build>
 yarn release:beta:prep <version> <build>
 ```
 
+Create the tag **before** rebuilding the Rust libs: the About screen shows a
+`git describe` descriptor baked into the native lib at cargo build time, so a
+`.so`/xcframework compiled before the tag ships advertising the previous one.
+See [Release order](./docs/release_quickstart.md#release-order-tag-first-then-rebuild-the-rust-libs).
+
 Pushing a `zingo-<version>-<build>` or `zingo-beta-<version>-<build>` tag
 triggers a CI workflow that builds the 4 ABI APKs + a universal APK from
 source on the tagged commit and publishes them to a fresh GitHub Release.
@@ -53,6 +58,13 @@ Additionally, from the `rust/android/lightwalletd_bin` directory run: <br />
 ### Yarn Tests
 1. From the root directory, run: <br />
    `yarn test`
+
+### Memory Benchmark
+Peak heap per wallet-file path, on a connected Android device or emulator.
+
+- `yarn bench:memory`: measure and compare against `scripts/wallet_memory_baseline.json`, non-zero exit on a regression
+- `yarn bench:memory --report`: measure only
+- `yarn bench:memory:accept`: record a new baseline
 
 ### Integration Tests
 These exercise the Rust ↔ Kotlin/Swift FFI boundary against a regtest network.
@@ -138,6 +150,16 @@ To run locally:
 The legacy Detox suite under `e2e/*.test.js` is no longer wired to CI or
 to any `yarn` script. It is being phased out in favour of Maestro and
 should not be relied on; new e2e coverage should land as Maestro flows.
+
+# Storybook & visual review
+Browse components in isolation with Storybook (on-device via
+`yarn storybook:ios`/`storybook:android`, web via `yarn storybook:web`).
+
+The web build powers per-PR visual regression: `yarn visual` captures and
+diffs components and animations against a baseline. See
+[visual/README.md](./visual/README.md) for the harness, and
+[.github/CLOUDFLARE.md](./.github/CLOUDFLARE.md) for the Cloudflare Pages deploy
+that publishes the review site.
 
 # Troubleshooting
 For notes on known issues and problems, see the [trouble-shooting notes](./TROUBLESHOOTING.md).

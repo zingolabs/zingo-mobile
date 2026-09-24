@@ -41,10 +41,19 @@ interface RPCModuleAPI {
     minConfirmations: string,
   ): Promise<string>;
   restoreExistingWalletBackup(): Promise<string>;
+  // Android only (2.0.21 double-wrap incident): per-file classification of
+  // the wallet files, and the unwrap repair. Absent on iOS.
+  walletFileDiagnosisInfo(): Promise<string>;
+  repairDoubleWrappedWalletProcess(): Promise<string>;
+  walletFileRecoveryInfo(): Promise<string>;
   deleteExistingWallet(): Promise<string>;
   deleteExistingWalletBackup(): Promise<string>;
-  doSave(): Promise<string>;
-  doSaveBackup(): Promise<string>;
+  // The save results are trimodal across the bridges: Android resolves a
+  // boolean, iOS resolves "true"/"false", and both resolve "Error: ..."
+  // prose from their catch blocks (zingo-mobile#1151). Classify with
+  // nativeSaveSucceeded, never by inspecting content ad hoc.
+  doSave(): Promise<boolean | string>;
+  doSaveBackup(): Promise<boolean | string>;
 
   // Server / network
   getLatestBlockServerInfo(serverUri: string): Promise<string>;
@@ -66,7 +75,6 @@ interface RPCModuleAPI {
   getTransparentAddressesInfo(): Promise<string>;
   createNewUnifiedAddressProcess(receivers: string): Promise<string>;
   createNewTransparentAddressProcess(): Promise<string>;
-  reserveEphemeralAddressProcess(): Promise<string>;
   checkMyAddressInfo(address: string): Promise<string>;
   parseAddressInfo(address: string): Promise<string>;
   parseUfvkInfo(ufvk: string): Promise<string>;
@@ -81,10 +89,7 @@ interface RPCModuleAPI {
 
   // Balances
   getBalanceInfo(): Promise<string>;
-  getSpendableBalanceWithAddressInfo(
-    address: string,
-    zennies: string,
-  ): Promise<string>;
+  getSpendableBalanceWithAddressInfo(address: string): Promise<string>;
   getSpendableBalanceTotalInfo(): Promise<string>;
   getTotalValueToAddressInfo(): Promise<string>;
   getTotalMemobytesToAddressInfo(): Promise<string>;
@@ -98,8 +103,47 @@ interface RPCModuleAPI {
 
   // Send / shield / confirm
   sendProcess(sendJson: string): Promise<string>;
+  sendAllProcess(address: string, memo: string): Promise<string>;
   shieldProcess(): Promise<string>;
   confirmProcess(): Promise<string>;
+
+  // Ironwood migration (Orchard -> Ironwood drain)
+  planOrchardDrainProcess(): Promise<string>;
+  drainOrchardProcess(): Promise<string>;
+  // Live progress of the in-flight drain; safe to poll concurrently with
+  // drainOrchardProcess (reads a native side channel, not the lightclient lock).
+  drainStatusProcess(): Promise<string>;
+
+  // Ironwood private migration (ZIP 318 note splitting + scheduled parts).
+  // Numeric arguments cross the bridge as strings; empty perBucket keeps
+  // zingolib's default cadence.
+  planIronwoodMigrationProcess(): Promise<string>;
+  startIronwoodMigrationProcess(
+    planHashHex: string,
+    perBucket: string,
+  ): Promise<string>;
+  continueNoteSplittingProcess(): Promise<string>;
+  // Phase 1 splitting, stateless and send-shaped (ADR 0016). One call per
+  // round; loop until the outcome is `complete`, then startIronwoodMigration.
+  quickSplitProcess(): Promise<string>;
+  // Live progress of the in-flight splitting round; safe to poll concurrently
+  // with quickSplitProcess (reads a native side channel, not the lightclient
+  // lock).
+  splitStatusProcess(): Promise<string>;
+  reschedulePartsProcess(perBucket: string): Promise<string>;
+  migrationStatusProcess(): Promise<string>;
+  // The window calendar (past, current, future) for a schedule grid, valid
+  // with or without a migration; null before the wallet has ever synced.
+  windowTimelineProcess(): Promise<string>;
+  reconcileMigrationProcess(): Promise<string>;
+  // Phase-2 execute tap: sends a scheduled window's due batch. spacingMs (the
+  // delay sequenced between the batch's sends) crosses as a string.
+  executeDuePartsProcess(spacingMs: string): Promise<string>;
+  // Live progress of the in-flight batch; safe to poll concurrently with
+  // executeDuePartsProcess (reads a native side channel, not the lightclient
+  // lock).
+  executeDuePartsStatusProcess(): Promise<string>;
+  cancelIronwoodMigrationProcess(): Promise<string>;
 
   // Wallet options / configuration
   getOptionWalletInfo(): Promise<string>;
@@ -109,7 +153,13 @@ interface RPCModuleAPI {
     performanceLevel: string,
     minConfirmations: string,
   ): Promise<string>;
-  setCryptoDefaultProvider(): Promise<string>;
+
+  setBroadcastCandidates(candidatesJson: string): Promise<string>;
+
+  attachMixnet(socks5Addr: string, exitNode: string): Promise<string>;
+  enableMixnet(proxyPath: string): Promise<string>;
+  mixnetIndicatorInfo(): Promise<string>;
+  mixnetBootstrapDetailInfo(): Promise<string>;
 }
 
 export default NativeModules.RPCModule as RPCModuleAPI;

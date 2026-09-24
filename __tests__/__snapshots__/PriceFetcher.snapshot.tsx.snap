@@ -6,68 +6,33 @@ exports[`Component PriceFetcher - test PriceFetcher - snapshot 1`] = `
     {
       "alignItems": "center",
       "backgroundColor": "#011401",
-      "columnGap": 10,
-      "flexDirection": "row",
-      "flexWrap": "wrap",
       "justifyContent": "center",
       "margin": 0,
-      "marginTop": 10,
       "minHeight": 40,
       "minWidth": 40,
       "padding": 5,
-      "rowGap": 5,
     }
   }
 >
-  <Text
-    style={
-      {
-        "color": "#c3c3c3",
-        "fontSize": 15,
-        "fontWeight": "400",
-        "opacity": 1,
-      }
-    }
-  >
-    text before
-  </Text>
   <View
-    accessibilityState={
-      {
-        "busy": undefined,
-        "checked": undefined,
-        "disabled": false,
-        "expanded": undefined,
-        "selected": undefined,
-      }
-    }
-    accessibilityValue={
-      {
-        "max": undefined,
-        "min": undefined,
-        "now": undefined,
-        "text": undefined,
-      }
-    }
+    accessibilityLabel="text translated"
+    accessibilityRole="image"
     accessible={true}
-    collapsable={false}
-    focusable={true}
-    onClick={[Function]}
-    onResponderGrant={[Function]}
-    onResponderMove={[Function]}
-    onResponderRelease={[Function]}
-    onResponderTerminate={[Function]}
-    onResponderTerminationRequest={[Function]}
-    onStartShouldSetResponder={[Function]}
     style={
-      {
-        "opacity": 1,
-      }
+      [
+        {
+          "alignItems": "center",
+          "height": 22,
+          "justifyContent": "center",
+          "width": 22,
+        },
+        undefined,
+      ]
     }
-    testID="pricefetcher.fetch"
+    testID="pricefetcher.ring"
   >
     <
-      color="#18bd18"
+      color="#888888"
       icon={
         {
           "icon": [
@@ -84,7 +49,7 @@ exports[`Component PriceFetcher - test PriceFetcher - snapshot 1`] = `
           "prefix": "fas",
         }
       }
-      size={16}
+      size={11}
     />
   </View>
 </View>

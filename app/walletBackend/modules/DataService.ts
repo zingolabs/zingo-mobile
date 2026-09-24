@@ -20,23 +20,24 @@ import {
   ValueTransferType,
   UnifiedAddressClass,
   TransparentAddressClass,
-} from '../../AppState';
-import RPCModule from '../../RPCModule';
-import { RPCUnifiedAddressType } from '../types/RPCUnifiedAddressType';
-import { RPCBalancesType } from '../types/RPCBalancesType';
-import { RPCInfoType } from '../types/RPCInfoType';
-import { RPCWalletHeight } from '../types/RPCWalletHeightType';
-import { RPCValueTransfersType } from '../types/RPCValueTransfersType';
-import { RPCValueTransferType } from '../types/RPCValueTransferType';
-import { RPCTransparentAddressType } from '../types/RPCTransparentAddressType';
-import { RPCSpendablebalanceType } from '../types/RPCSpendablebalanceType';
-import { RPCWalletSaveRequiredType } from '../types/RPCWalletSaveRequiredType';
-import { RPCConfigWalletPerformanceType } from '../types/RPCConfigWalletPerformanceType';
-import { RPCPerformanceLevelEnum } from '../enums/RPCPerformanceLevelEnum';
-import { RPCWalletVersionType } from '../types/RPCWalletVersionType';
-import { WalletBackendConfig } from '../config/WalletBackendConfig';
-import { transformValueTransfer } from '../transforms/valueTransferTransform';
-import { fetchWallet } from '../utils/walletUtils';
+  foldBlockSpacing,
+} from '@app/AppState';
+import RPCModule from '@app/RPCModule';
+import { RPCUnifiedAddressType } from '@app/walletBackend/types/RPCUnifiedAddressType';
+import { RPCBalancesType } from '@app/walletBackend/types/RPCBalancesType';
+import { RPCInfoType } from '@app/walletBackend/types/RPCInfoType';
+import { RPCWalletHeight } from '@app/walletBackend/types/RPCWalletHeightType';
+import { RPCValueTransfersType } from '@app/walletBackend/types/RPCValueTransfersType';
+import { RPCValueTransferType } from '@app/walletBackend/types/RPCValueTransferType';
+import { RPCTransparentAddressType } from '@app/walletBackend/types/RPCTransparentAddressType';
+import { RPCSpendablebalanceType } from '@app/walletBackend/types/RPCSpendablebalanceType';
+import { RPCWalletSaveRequiredType } from '@app/walletBackend/types/RPCWalletSaveRequiredType';
+import { RPCConfigWalletPerformanceType } from '@app/walletBackend/types/RPCConfigWalletPerformanceType';
+import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
+import { RPCWalletVersionType } from '@app/walletBackend/types/RPCWalletVersionType';
+import { WalletBackendConfig } from '@app/walletBackend/config/WalletBackendConfig';
+import { transformValueTransfer } from '@app/walletBackend/transforms/valueTransferTransform';
+import { fetchWallet } from '@app/walletBackend/utils/walletUtils';
 
 export class DataService {
   config: WalletBackendConfig;
@@ -44,6 +45,13 @@ export class DataService {
   lastWalletBlockHeight: number = 0;
   lastServerBlockHeight: number = 0;
   walletBirthday: number = 0;
+
+  // Block-spacing observation: the last (height, wall-clock) pair a server
+  // reading moved from, and the EMA the samples fold into. Null until two
+  // readings at different heights land.
+  blockTimeBaseHeight: number = 0;
+  blockTimeBaseMs: number = 0;
+  secondsPerBlock: number | null = null;
 
   fetchWalletHeightLock: boolean = false;
   fetchWalletBirthdaySeedUfvkLock: boolean = false;
@@ -80,12 +88,7 @@ export class DataService {
       let spendableJSON: RPCSpendablebalanceType =
         {} as RPCSpendablebalanceType;
       if (spendableStr) {
-        if (spendableStr.toLowerCase().startsWith(GlobalConst.error)) {
-          console.log(`Error spendable balance ${spendableStr}`);
-          this.config.onError(`Error spendable balance: ${spendableStr}`);
-        } else {
-          spendableJSON = await JSON.parse(spendableStr);
-        }
+        spendableJSON = await JSON.parse(spendableStr);
       } else {
         console.log('Internal Error spendable balance');
       }
@@ -98,13 +101,7 @@ export class DataService {
           Date.now() - start2,
         );
       }
-      if (balanceStr) {
-        if (balanceStr.toLowerCase().startsWith(GlobalConst.error)) {
-          console.log(`Error balance ${balanceStr}`);
-          this.config.onError(`Error balance: ${balanceStr}`);
-          return;
-        }
-      } else {
+      if (!balanceStr) {
         console.log('Internal Error balance');
         return;
       }
@@ -112,11 +109,15 @@ export class DataService {
 
       const balance: TotalBalanceClass = {
         totalOrchardBalance: (balanceJSON.total_orchard_balance || 0) / 10 ** 8,
+        totalIronwoodBalance:
+          (balanceJSON.total_ironwood_balance || 0) / 10 ** 8,
         totalSaplingBalance: (balanceJSON.total_sapling_balance || 0) / 10 ** 8,
         totalTransparentBalance:
           (balanceJSON.total_transparent_balance || 0) / 10 ** 8,
         confirmedOrchardBalance:
           (balanceJSON.confirmed_orchard_balance || 0) / 10 ** 8,
+        confirmedIronwoodBalance:
+          (balanceJSON.confirmed_ironwood_balance || 0) / 10 ** 8,
         confirmedSaplingBalance:
           (balanceJSON.confirmed_sapling_balance || 0) / 10 ** 8,
         confirmedTransparentBalance:
@@ -148,15 +149,10 @@ export class DataService {
           Date.now() - start,
         );
       }
-      if (unifiedAddressesStr) {
-        if (unifiedAddressesStr.toLowerCase().startsWith(GlobalConst.error)) {
-          console.log(`Error addresses ${unifiedAddressesStr}`);
-          this.config.onError(
-            `Error unified addresses: ${unifiedAddressesStr}`,
-          );
-          return;
-        }
-      } else {
+      // The routed getters reject on failure, so error handling lives in
+      // the owning catch; a resolved value is data, never inspected for
+      // an error sentinel (zingo-mobile#1151).
+      if (!unifiedAddressesStr) {
         console.log('Internal Error addresses');
         return;
       }
@@ -172,15 +168,7 @@ export class DataService {
           Date.now() - start2,
         );
       }
-      if (transparentAddressStr) {
-        if (transparentAddressStr.toLowerCase().startsWith(GlobalConst.error)) {
-          console.log(`Error addresses ${transparentAddressStr}`);
-          this.config.onError(
-            `Error transparent addresses: ${transparentAddressStr}`,
-          );
-          return;
-        }
-      } else {
+      if (!transparentAddressStr) {
         console.log('Internal Error addresses');
         return;
       }
@@ -240,13 +228,7 @@ export class DataService {
           Date.now() - start,
         );
       }
-      if (heightStr) {
-        if (heightStr.toLowerCase().startsWith(GlobalConst.error)) {
-          console.log(`Error wallet height ${heightStr}`);
-          this.config.onError(`Error wallet height: ${heightStr}`);
-          return;
-        }
-      } else {
+      if (!heightStr) {
         console.log('Internal Error wallet height');
         return;
       }
@@ -276,13 +258,10 @@ export class DataService {
           Date.now() - start,
         );
       }
-      if (infoStr) {
-        if (infoStr.toLowerCase().startsWith(GlobalConst.error)) {
-          console.log(`Error info & server block height ${infoStr}`);
-          this.config.onError(`Error info: ${infoStr}`);
-          infoError = true;
-        }
-      } else {
+      // infoServerInfo rejects on failure (typed FFI errors); the catch owns
+      // the error path, so a resolved value is data. Only an empty resolution
+      // — a programming error — is classified here.
+      if (!infoStr) {
         console.log('Internal Error info & server block height');
         infoError = true;
       }
@@ -310,7 +289,16 @@ export class DataService {
           infoJSON.chain_name === ChainNameEnum.mainChainName
             ? CurrencyNameEnum.ZEC
             : CurrencyNameEnum.TAZ,
+        // `?? null` collapses both "no activation scheduled" (null) and "older
+        // native lib that doesn't report it" (undefined) into the same
+        // not-yet-active answer.
+        ironwoodActivationHeight: infoJSON.ironwood_activation_height ?? null,
       };
+
+      this.observeBlockSpacing(info.latestBlock, Date.now());
+      if (this.secondsPerBlock !== null) {
+        info.secondsPerBlock = this.secondsPerBlock;
+      }
 
       this.config.onInfoChanged(info);
       this.lastServerBlockHeight = info.latestBlock;
@@ -321,6 +309,32 @@ export class DataService {
     } finally {
       this.fetchInfoAndServerHeightLock = false;
     }
+  }
+
+  // One sample per height change: the wall-clock gap since the last reading
+  // that moved, divided by how many blocks it moved. A rewound tip (server
+  // restart) just re-bases; foldBlockSpacing rejects artifact samples (staged
+  // jumps, paused miners) but the base advances regardless, so one artifact
+  // never pollutes the next sample.
+  private observeBlockSpacing(height: number, nowMs: number): void {
+    if (height <= 0) {
+      return;
+    }
+    if (this.blockTimeBaseHeight === 0 || height < this.blockTimeBaseHeight) {
+      this.blockTimeBaseHeight = height;
+      this.blockTimeBaseMs = nowMs;
+      return;
+    }
+    if (height === this.blockTimeBaseHeight) {
+      return;
+    }
+    const sample =
+      (nowMs - this.blockTimeBaseMs) /
+      1000 /
+      (height - this.blockTimeBaseHeight);
+    this.blockTimeBaseHeight = height;
+    this.blockTimeBaseMs = nowMs;
+    this.secondsPerBlock = foldBlockSpacing(this.secondsPerBlock, sample);
   }
 
   async fetchZingolibVersion(): Promise<void> {
@@ -337,13 +351,7 @@ export class DataService {
           Date.now() - start,
         );
       }
-      if (zingolibStr) {
-        if (zingolibStr.toLowerCase().startsWith(GlobalConst.error)) {
-          console.log(`Error zingolib version ${zingolibStr}`);
-          this.config.onError(`Error zingolib version: ${zingolibStr}`);
-          zingolibStr = GlobalConst.zingolibError;
-        }
-      } else {
+      if (!zingolibStr) {
         console.log('Internal Error zingolib version');
         zingolibStr = GlobalConst.zingolibNone;
       }
@@ -352,6 +360,8 @@ export class DataService {
     } catch (error) {
       console.log(`Critical Error zingolib version ${error}`);
       this.config.onError(`Error zingolib version: ${error}`);
+      // The version display still needs a value when the FFI rejects.
+      this.config.onZingolibVersionChanged(GlobalConst.zingolibError);
     } finally {
       this.fetchZingolibVersionLock = false;
     }
@@ -395,12 +405,7 @@ export class DataService {
         );
       }
       if (heightStr) {
-        if (heightStr.toLowerCase().startsWith(GlobalConst.error)) {
-          console.log(`Error server height ${heightStr}`);
-          this.config.onError(`Error server height: ${heightStr}`);
-        } else {
-          this.lastServerBlockHeight = Number(heightStr);
-        }
+        this.lastServerBlockHeight = Number(heightStr);
       } else {
         console.log('Internal Error server height');
       }
@@ -413,13 +418,7 @@ export class DataService {
           Date.now() - start2,
         );
       }
-      if (valueTransfersStr) {
-        if (valueTransfersStr.toLowerCase().startsWith(GlobalConst.error)) {
-          console.log(`Error value transfers ${valueTransfersStr}`);
-          this.config.onError(`Error value transfers: ${valueTransfersStr}`);
-          return;
-        }
-      } else {
+      if (!valueTransfersStr) {
         console.log('Internal Error value transfers');
         return;
       }
@@ -467,13 +466,7 @@ export class DataService {
           Date.now() - start,
         );
       }
-      if (messagesStr) {
-        if (messagesStr.toLowerCase().startsWith(GlobalConst.error)) {
-          console.log(`Error value transfers messages ${messagesStr}`);
-          this.config.onError(`Error value transfers messages: ${messagesStr}`);
-          return;
-        }
-      } else {
+      if (!messagesStr) {
         console.log('Internal Error value transfers messages');
         return;
       }
@@ -519,15 +512,7 @@ export class DataService {
           Date.now() - start,
         );
       }
-      if (walletSaveRequiredStr) {
-        if (walletSaveRequiredStr.toLowerCase().startsWith(GlobalConst.error)) {
-          console.log(`Error wallet save required ${walletSaveRequiredStr}`);
-          this.config.onError(
-            `Error wallet save required: ${walletSaveRequiredStr}`,
-          );
-          return false;
-        }
-      } else {
+      if (!walletSaveRequiredStr) {
         console.log('Internal Error wallet save required');
         return false;
       }
@@ -557,19 +542,7 @@ export class DataService {
           Date.now() - start,
         );
       }
-      if (configWalletPerformanceStr) {
-        if (
-          configWalletPerformanceStr.toLowerCase().startsWith(GlobalConst.error)
-        ) {
-          console.log(
-            `Error wallet config performance ${configWalletPerformanceStr}`,
-          );
-          this.config.onError(
-            `Error wallet config performance: ${configWalletPerformanceStr}`,
-          );
-          return;
-        }
-      } else {
+      if (!configWalletPerformanceStr) {
         console.log('Internal Error wallet config performance');
         return;
       }
@@ -594,13 +567,7 @@ export class DataService {
           Date.now() - start,
         );
       }
-      if (walletVersionStr) {
-        if (walletVersionStr.toLowerCase().startsWith(GlobalConst.error)) {
-          console.log(`Error wallet version ${walletVersionStr}`);
-          this.config.onError(`Error wallet version: ${walletVersionStr}`);
-          return;
-        }
-      } else {
+      if (!walletVersionStr) {
         console.log('Internal Error wallet version');
         return;
       }

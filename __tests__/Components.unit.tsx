@@ -6,13 +6,13 @@ import 'react-native';
 import React from 'react';
 
 import { render, screen } from '@testing-library/react-native';
-import CurrencyAmount from '../components/Components/CurrencyAmount';
-import ZecAmount from '../components/Components/ZecAmount';
-import BoldText from '../components/Components/BoldText';
-import FadeText from '../components/Components/FadeText';
-import ErrorText from '../components/Components/ErrorText';
-import RegText from '../components/Components/RegText';
-import { CurrencyEnum, CurrencyNameEnum } from '../app/AppState';
+import CurrencyAmount from '@ui/widgets/CurrencyAmount';
+import ZecAmount from '@ui/widgets/ZecAmount';
+import BoldText from '@ui/primitives/BoldText';
+import FadeText from '@ui/primitives/FadeText';
+import ErrorText from '@ui/primitives/ErrorText';
+import RegText from '@ui/primitives/RegText';
+import { CurrencyNameEnum } from '@app/AppState';
 
 // test suite
 describe('Component Components - test', () => {
@@ -23,7 +23,6 @@ describe('Component Components - test', () => {
         price={2.9826}
         amtZec={1.00098}
         style={{}}
-        currency={CurrencyEnum.USDCurrency}
         privacy={true}
       />,
     );
@@ -31,60 +30,27 @@ describe('Component Components - test', () => {
   });
 
   test('CurrencyAmount - price undefined should display placeholder', () => {
-    render(
-      <CurrencyAmount
-        amtZec={1}
-        style={{}}
-        currency={CurrencyEnum.USDCurrency}
-      />,
-    );
+    render(<CurrencyAmount amtZec={1} style={{}} />);
     expect(screen.getByText('$ -.--')).toBeTruthy();
   });
 
   test('CurrencyAmount - price 0 should display placeholder', () => {
-    render(
-      <CurrencyAmount
-        price={0}
-        amtZec={1}
-        style={{}}
-        currency={CurrencyEnum.USDCurrency}
-      />,
-    );
+    render(<CurrencyAmount price={0} amtZec={1} style={{}} />);
     expect(screen.getByText('$ -.--')).toBeTruthy();
   });
 
   test('CurrencyAmount - amtZec undefined should display placeholder', () => {
-    render(
-      <CurrencyAmount
-        price={1}
-        style={{}}
-        currency={CurrencyEnum.USDCurrency}
-      />,
-    );
+    render(<CurrencyAmount price={1} style={{}} />);
     expect(screen.getByText('$ -.--')).toBeTruthy();
   });
 
   test('CurrencyAmount - very small amount should display < 0.01', () => {
-    render(
-      <CurrencyAmount
-        price={0.001}
-        amtZec={1}
-        style={{}}
-        currency={CurrencyEnum.USDCurrency}
-      />,
-    );
+    render(<CurrencyAmount price={0.001} amtZec={1} style={{}} />);
     expect(screen.getByText('$ < 0.01')).toBeTruthy();
   });
 
   test('CurrencyAmount - valid amount should display calculated value', () => {
-    render(
-      <CurrencyAmount
-        price={2.9826}
-        amtZec={1.00098}
-        style={{}}
-        currency={CurrencyEnum.USDCurrency}
-      />,
-    );
+    render(<CurrencyAmount price={2.9826} amtZec={1.00098} style={{}} />);
     expect(screen.getByText('$ 2.99')).toBeTruthy();
   });
 

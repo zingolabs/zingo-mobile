@@ -6,8 +6,8 @@ import 'react-native';
 import React from 'react';
 
 import { render } from '@testing-library/react-native';
-import DetailLine from '../components/Components/DetailLine';
-import RegText from '../components/Components/RegText';
+import DetailLine from '@ui/widgets/DetailLine';
+import RegText from '@ui/primitives/RegText';
 // test suite
 describe('Component DetailLine - test', () => {
   //snapshot test

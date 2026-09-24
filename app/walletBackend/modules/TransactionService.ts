@@ -6,11 +6,11 @@
  * when done. The inSend flag is exposed so the UI can gate actions that must
  * not run during a send.
  */
-import { SendJsonToTypeType, GlobalConst } from '../../AppState';
-import RPCModule from '../../RPCModule';
-import { RPCSendProposeType } from '../types/RPCSendProposeType';
-import { RPCSendType } from '../types/RPCSendType';
-import { WalletBackendConfig } from '../config/WalletBackendConfig';
+import { SendJsonToTypeType } from '@app/AppState';
+import RPCModule from '@app/RPCModule';
+import { RPCSendProposeType } from '@app/walletBackend/types/RPCSendProposeType';
+import { RPCSendType } from '@app/walletBackend/types/RPCSendType';
+import { WalletBackendConfig } from '@app/walletBackend/config/WalletBackendConfig';
 import { SyncCoordinator } from './SyncCoordinator';
 
 export class TransactionService {
@@ -31,7 +31,16 @@ export class TransactionService {
     return this.inSend;
   }
 
-  async sendTransaction(sendJson: Array<SendJsonToTypeType>): Promise<string> {
+  // `sendAll` routes the propose phase through the native `sendAllProcess`
+  // (zingolib's `propose_send_all`) instead of `sendProcess`. The amount the
+  // Send screen shows as the maximum is sized by a send-max proposal, and an
+  // ordinary send request for it can be refused by the input selector, so the
+  // whole balance only goes out this way. The confirm phase is the same for
+  // both: the proposal is already stored.
+  async sendTransaction(
+    sendJson: Array<SendJsonToTypeType>,
+    sendAll: boolean = false,
+  ): Promise<string> {
     const sendTxPromise = new Promise<string>(async (resolve, reject) => {
       await this.syncCoordinator.clearTimers();
       this.setInSend(true);
@@ -40,15 +49,16 @@ export class TransactionService {
       let sendError: string = '';
       let sendTxids: string = '';
       try {
-        const proposeStr: string = await RPCModule.sendProcess(
-          JSON.stringify(sendJson),
-        );
-        if (proposeStr) {
-          if (proposeStr.toLowerCase().startsWith(GlobalConst.error)) {
-            console.log(`Error propose ${proposeStr}`);
-            sendError = proposeStr;
-          }
-        } else {
+        // sendProcess and confirmProcess reject on failure (typed FFI
+        // errors); the catch owns that path. Only an empty resolution — a
+        // programming error — is classified here.
+        const proposeStr: string = sendAll
+          ? await RPCModule.sendAllProcess(
+              sendJson[0].address,
+              sendJson[0].memo ?? '',
+            )
+          : await RPCModule.sendProcess(JSON.stringify(sendJson));
+        if (!proposeStr) {
           console.log('Internal Error propose');
           sendError = 'Error: Internal RPC Error: propose';
         }
@@ -60,12 +70,7 @@ export class TransactionService {
           }
           if (!sendError) {
             const sendStr: string = await RPCModule.confirmProcess();
-            if (sendStr) {
-              if (sendStr.toLowerCase().startsWith(GlobalConst.error)) {
-                console.log(`Error confirm ${sendStr}`);
-                sendError = sendStr;
-              }
-            } else {
+            if (!sendStr) {
               console.log('Internal Error confirm');
               sendError = 'Error: Internal RPC Error: confirm';
             }

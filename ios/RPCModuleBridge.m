@@ -57,8 +57,14 @@ RCT_EXTERN_METHOD(loadExistingWallet:
 RCT_EXTERN_METHOD(restoreExistingWalletBackup:
     (RCTPromiseResolveBlock)resolve 
                   reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(walletFileRecoveryInfo:
+    (RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(walletFileDiagnosisInfo:
+    (RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(doSave:
-    (RCTPromiseResolveBlock)resolve 
+    (RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(doSaveBackup:
     (RCTPromiseResolveBlock)resolve 
@@ -79,7 +85,23 @@ RCT_EXTERN_METHOD(getZenniesDonationAddress:
 RCT_EXTERN_METHOD(getValueTransfersList:
     (RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(setCryptoDefaultProvider:
+RCT_EXTERN_METHOD(setBroadcastCandidates:
+    (NSString)candidatesJson
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(attachMixnet:
+    (NSString)socks5Addr
+                  exitNode:(NSString)exitNode
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(enableMixnet:
+    (NSString)proxyPath
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(mixnetIndicatorInfo:
+    (RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(mixnetBootstrapDetailInfo:
     (RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(pollSyncInfo:
@@ -149,7 +171,6 @@ RCT_EXTERN_METHOD(removeTransactionProcess:
                   reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(getSpendableBalanceWithAddressInfo:
     (NSString)address 
-                  zennies:(NSString)zennies
                   resolve:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(getSpendableBalanceTotalInfo:
@@ -174,9 +195,6 @@ RCT_EXTERN_METHOD(createNewUnifiedAddressProcess:
 RCT_EXTERN_METHOD(createNewTransparentAddressProcess:
     (RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(reserveEphemeralAddressProcess:
-    (RCTPromiseResolveBlock)resolve
-                  reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(checkMyAddressInfo:
     (NSString)address
                   resolve:(RCTPromiseResolveBlock)resolve
@@ -199,10 +217,64 @@ RCT_EXTERN_METHOD(sendProcess:
     (NSString)send_json
                   resolve:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(sendAllProcess:
+    (NSString)address
+                  memo:(NSString)memo
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(shieldProcess:
     (RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(confirmProcess:
+    (RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(planOrchardDrainProcess:
+    (RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(drainOrchardProcess:
+    (RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(drainStatusProcess:
+    (RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(planIronwoodMigrationProcess:
+    (RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(startIronwoodMigrationProcess:
+    (NSString)plan_hash_hex
+                  perBucket:(NSString)per_bucket
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(continueNoteSplittingProcess:
+    (RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(quickSplitProcess:
+    (RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(splitStatusProcess:
+    (RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(reschedulePartsProcess:
+    (NSString)per_bucket
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(migrationStatusProcess:
+    (RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(windowTimelineProcess:
+    (RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(reconcileMigrationProcess:
+    (RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(executeDuePartsProcess:
+    (NSString)spacing_ms
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(executeDuePartsStatusProcess:
+    (RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(cancelIronwoodMigrationProcess:
     (RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 

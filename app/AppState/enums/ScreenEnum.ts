@@ -16,12 +16,12 @@ export enum ScreenEnum {
   Confirm = 'Confirm',
   ScannerAddress = 'ScannerAddress',
   Receive = 'Receive',
-  Swap = 'Swap',
   AddressList = 'AddressList',
   MessagesList = 'MessagesList',
   Settings = 'Settings',
   // Drawer
   About = 'About',
+  MixnetDoctor = 'MixnetDoctor',
   Pools = 'Pools',
   SyncReport = 'SyncReport',
   Seed = 'Seed',

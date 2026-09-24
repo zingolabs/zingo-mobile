@@ -8,13 +8,13 @@ import { render } from '@testing-library/react-native';
 import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
-} from '../app/context';
+} from '@app/context';
 
-import ScannerAddress from '../components/Send/components/ScannerAddress';
-import { RouteEnum } from '../app/AppState';
+import ScannerAddress from '@screens/ScannerAddress';
+import { RouteEnum } from '@app/AppState';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { AppStackParamList } from '../app/types';
+import { AppStackParamList } from '@app/types';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
 function makeProps(

@@ -123,8 +123,10 @@ async fn execute_sapling_balance_from_seed() {
 }
 
 async fn execute_parse_address_for_tex() {
-    let _local_net =
-        scenarios::funded_orchard_sapling_transparent_shielded_mobileclient(1_000_000).await;
+    // Address parsing only needs a reachable server with nonzero height,
+    // so the cheap scenario suffices; the multi-pool funded scenario
+    // costs ~150s more of regtest setup per test.
+    let _local_net = scenarios::funded_orchard_mobileclient(1_000_000).await;
 
     #[cfg(not(feature = "ci"))]
     let (exit_code, output, error) =
@@ -141,8 +143,10 @@ async fn execute_parse_address_for_tex() {
 }
 
 async fn execute_parse_address_invalid() {
-    let _local_net =
-        scenarios::funded_orchard_sapling_transparent_shielded_mobileclient(1_000_000).await;
+    // Address parsing only needs a reachable server with nonzero height,
+    // so the cheap scenario suffices; the multi-pool funded scenario
+    // costs ~150s more of regtest setup per test.
+    let _local_net = scenarios::funded_orchard_mobileclient(1_000_000).await;
 
     #[cfg(not(feature = "ci"))]
     let (exit_code, output, error) =

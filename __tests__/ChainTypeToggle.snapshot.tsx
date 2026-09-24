@@ -6,8 +6,8 @@ import 'react-native';
 import React from 'react';
 
 import { render } from '@testing-library/react-native';
-import ChainTypeToggle from '../components/Components/ChainTypeToggle';
-import { ChainNameEnum } from '../app/AppState';
+import ChainTypeToggle from '@ui/widgets/ChainTypeToggle';
+import { ChainNameEnum } from '@app/AppState';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 
 // test suite

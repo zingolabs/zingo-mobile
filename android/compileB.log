@@ -1,0 +1,473 @@
+> Task :gradle-plugin:settings-plugin:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :gradle-plugin:shared:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :gradle-plugin:shared:compileKotlin UP-TO-DATE
+> Task :gradle-plugin:shared:compileJava NO-SOURCE
+> Task :gradle-plugin:shared:processResources NO-SOURCE
+> Task :gradle-plugin:shared:classes UP-TO-DATE
+> Task :gradle-plugin:shared:jar UP-TO-DATE
+> Task :gradle-plugin:settings-plugin:compileKotlin UP-TO-DATE
+> Task :gradle-plugin:settings-plugin:compileJava NO-SOURCE
+> Task :gradle-plugin:settings-plugin:pluginDescriptors UP-TO-DATE
+> Task :gradle-plugin:settings-plugin:processResources UP-TO-DATE
+> Task :gradle-plugin:settings-plugin:classes UP-TO-DATE
+> Task :gradle-plugin:settings-plugin:jar UP-TO-DATE
+> Task :gradle-plugin:react-native-gradle-plugin:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :gradle-plugin:react-native-gradle-plugin:compileKotlin UP-TO-DATE
+> Task :gradle-plugin:react-native-gradle-plugin:compileJava NO-SOURCE
+> Task :gradle-plugin:react-native-gradle-plugin:pluginDescriptors UP-TO-DATE
+> Task :gradle-plugin:react-native-gradle-plugin:processResources UP-TO-DATE
+> Task :gradle-plugin:react-native-gradle-plugin:classes UP-TO-DATE
+> Task :gradle-plugin:react-native-gradle-plugin:jar UP-TO-DATE
+
+> Configure project :app
+****** DEBUG SIGNING APK ******
+
+> Configure project :notifee_react-native
+:notifee_react-native @notifee/react-native found at /tmp/claude-1000/-home-nattyb-src-zingolabs-zmobs-feat-ironwood-privacy-path/091edba5-15d0-4250-bf95-4d7232a0dc7c/scratchpad/fixtest/node_modules/@notifee/react-native
+:notifee_react-native package.json found at /tmp/claude-1000/-home-nattyb-src-zingolabs-zmobs-feat-ironwood-privacy-path/091edba5-15d0-4250-bf95-4d7232a0dc7c/scratchpad/fixtest/node_modules/@notifee/react-native/package.json
+:notifee_react-native:version set from package.json: 9.1.8 (9,1,8 - 9001008)
+:notifee_react-native:android.compileSdk using custom value: 36
+:notifee_react-native:android.targetSdk using custom value: 36
+:notifee_react-native:android.minSdk using custom value: 26
+:notifee_react-native:reactNativeAndroidDir /tmp/claude-1000/-home-nattyb-src-zingolabs-zmobs-feat-ironwood-privacy-path/091edba5-15d0-4250-bf95-4d7232a0dc7c/scratchpad/fixtest/node_modules/react-native
+
+> Configure project :react-native-vision-camera
+[VisionCamera] Thank you for using VisionCamera ❤️
+[VisionCamera] If you enjoy using VisionCamera, please consider sponsoring this project: https://github.com/sponsors/mrousavy
+[VisionCamera] node_modules found at /tmp/claude-1000/-home-nattyb-src-zingolabs-zmobs-feat-ironwood-privacy-path/091edba5-15d0-4250-bf95-4d7232a0dc7c/scratchpad/fixtest/node_modules
+[VisionCamera] VisionCamera_enableFrameProcessors is set to true!
+[VisionCamera] react-native-worklets-core not found, Frame Processors are disabled!
+[VisionCamera] VisionCamera_enableCodeScanner is set to true!
+
+> Task :app:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :app:generateAutolinkingNewArchitectureFiles UP-TO-DATE
+> Task :app:generateAutolinkingPackageList UP-TO-DATE
+> Task :app:generateCodegenSchemaFromJavaScript SKIPPED
+> Task :app:generateCodegenArtifactsFromSchema SKIPPED
+> Task :app:generateReactNativeEntryPoint UP-TO-DATE
+> Task :notifee_react-native:preBuild UP-TO-DATE
+> Task :react-native-async-storage_async-storage:generateCodegenSchemaFromJavaScript UP-TO-DATE
+> Task :react-native-async-storage_async-storage:generateCodegenArtifactsFromSchema UP-TO-DATE
+> Task :react-native-async-storage_async-storage:preBuild UP-TO-DATE
+> Task :react-native-clipboard_clipboard:generateCodegenSchemaFromJavaScript UP-TO-DATE
+> Task :react-native-clipboard_clipboard:generateCodegenArtifactsFromSchema UP-TO-DATE
+> Task :react-native-clipboard_clipboard:preBuild UP-TO-DATE
+> Task :react-native-community_netinfo:generateCodegenSchemaFromJavaScript UP-TO-DATE
+> Task :react-native-community_netinfo:generateCodegenArtifactsFromSchema UP-TO-DATE
+> Task :react-native-community_netinfo:preBuild UP-TO-DATE
+> Task :react-native-device-info:preBuild UP-TO-DATE
+> Task :react-native-encrypted-storage:preBuild UP-TO-DATE
+> Task :react-native-fs:preBuild UP-TO-DATE
+> Task :react-native-gesture-handler:generateCodegenSchemaFromJavaScript UP-TO-DATE
+> Task :react-native-gesture-handler:generateCodegenArtifactsFromSchema UP-TO-DATE
+> Task :react-native-gesture-handler:preBuild UP-TO-DATE
+> Task :react-native-keyboard-controller:generateCodegenSchemaFromJavaScript UP-TO-DATE
+> Task :react-native-keyboard-controller:generateCodegenArtifactsFromSchema UP-TO-DATE
+> Task :react-native-keyboard-controller:preBuild UP-TO-DATE
+> Task :react-native-keychain:generateCodegenSchemaFromJavaScript UP-TO-DATE
+> Task :react-native-keychain:generateCodegenArtifactsFromSchema UP-TO-DATE
+> Task :react-native-keychain:preBuild UP-TO-DATE
+> Task :react-native-linear-gradient:preBuild UP-TO-DATE
+> Task :react-native-localize:generateCodegenSchemaFromJavaScript UP-TO-DATE
+> Task :react-native-localize:generateCodegenArtifactsFromSchema UP-TO-DATE
+> Task :react-native-localize:preBuild UP-TO-DATE
+> Task :react-native-pager-view:generateCodegenSchemaFromJavaScript UP-TO-DATE
+> Task :react-native-pager-view:generateCodegenArtifactsFromSchema UP-TO-DATE
+> Task :react-native-pager-view:preBuild UP-TO-DATE
+> Task :react-native-permissions:generateCodegenSchemaFromJavaScript UP-TO-DATE
+> Task :react-native-permissions:generateCodegenArtifactsFromSchema UP-TO-DATE
+> Task :react-native-permissions:preBuild UP-TO-DATE
+> Task :react-native-reanimated:assertMinimalReactNativeVersionTask
+> Task :react-native-reanimated:assertNewArchitectureEnabledTask SKIPPED
+> Task :react-native-reanimated:assertWorkletsVersionTask
+> Task :react-native-reanimated:generateCodegenSchemaFromJavaScript UP-TO-DATE
+> Task :react-native-reanimated:generateCodegenArtifactsFromSchema UP-TO-DATE
+> Task :react-native-reanimated:prepareReanimatedHeadersForPrefabs UP-TO-DATE
+> Task :react-native-reanimated:preBuild
+> Task :react-native-restart:preBuild UP-TO-DATE
+> Task :react-native-safe-area-context:generateCodegenSchemaFromJavaScript UP-TO-DATE
+> Task :react-native-safe-area-context:generateCodegenArtifactsFromSchema UP-TO-DATE
+> Task :react-native-safe-area-context:preBuild UP-TO-DATE
+> Task :react-native-screens:generateCodegenSchemaFromJavaScript UP-TO-DATE
+> Task :react-native-screens:generateCodegenArtifactsFromSchema UP-TO-DATE
+> Task :react-native-screens:preBuild UP-TO-DATE
+> Task :react-native-svg:generateCodegenSchemaFromJavaScript UP-TO-DATE
+> Task :react-native-svg:generateCodegenArtifactsFromSchema UP-TO-DATE
+> Task :react-native-svg:preBuild UP-TO-DATE
+> Task :react-native-vision-camera:generateCodegenSchemaFromJavaScript UP-TO-DATE
+> Task :react-native-vision-camera:generateCodegenArtifactsFromSchema UP-TO-DATE
+> Task :react-native-vision-camera:prepareHeaders UP-TO-DATE
+> Task :react-native-vision-camera:preBuild UP-TO-DATE
+> Task :react-native-worklets:assertMinimalReactNativeVersionTask
+> Task :react-native-worklets:assertNewArchitectureEnabledTask SKIPPED
+> Task :react-native-worklets:generateCodegenSchemaFromJavaScript UP-TO-DATE
+> Task :react-native-worklets:generateCodegenArtifactsFromSchema UP-TO-DATE
+> Task :react-native-worklets:prepareWorkletsHeadersForPrefabs UP-TO-DATE
+> Task :react-native-worklets:preBuild
+> Task :sayem314_react-native-keep-awake:generateCodegenSchemaFromJavaScript
+> Task :sayem314_react-native-keep-awake:generateCodegenArtifactsFromSchema
+> Task :sayem314_react-native-keep-awake:preBuild
+> Task :app:preBuild
+> Task :app:preProdReleaseBuild
+> Task :app:dataBindingMergeDependencyArtifactsProdRelease UP-TO-DATE
+> Task :app:createBundleProdReleaseJsAndAssets UP-TO-DATE
+> Task :app:generateProdReleaseResValues UP-TO-DATE
+> Task :app:generateProdReleaseResources UP-TO-DATE
+> Task :notifee_react-native:preReleaseBuild UP-TO-DATE
+> Task :notifee_react-native:generateReleaseResValues UP-TO-DATE
+> Task :notifee_react-native:generateReleaseResources UP-TO-DATE
+> Task :notifee_react-native:packageReleaseResources UP-TO-DATE
+> Task :react-native-async-storage_async-storage:preReleaseBuild UP-TO-DATE
+> Task :react-native-async-storage_async-storage:generateReleaseResValues UP-TO-DATE
+> Task :react-native-async-storage_async-storage:generateReleaseResources UP-TO-DATE
+> Task :react-native-async-storage_async-storage:packageReleaseResources UP-TO-DATE
+> Task :react-native-clipboard_clipboard:preReleaseBuild UP-TO-DATE
+> Task :react-native-clipboard_clipboard:generateReleaseResValues UP-TO-DATE
+> Task :react-native-clipboard_clipboard:generateReleaseResources UP-TO-DATE
+> Task :react-native-clipboard_clipboard:packageReleaseResources UP-TO-DATE
+> Task :react-native-community_netinfo:preReleaseBuild UP-TO-DATE
+> Task :react-native-community_netinfo:generateReleaseResValues UP-TO-DATE
+> Task :react-native-community_netinfo:generateReleaseResources UP-TO-DATE
+> Task :react-native-community_netinfo:packageReleaseResources UP-TO-DATE
+> Task :react-native-device-info:preReleaseBuild UP-TO-DATE
+> Task :react-native-device-info:generateReleaseResValues UP-TO-DATE
+> Task :react-native-device-info:generateReleaseResources UP-TO-DATE
+> Task :react-native-device-info:packageReleaseResources UP-TO-DATE
+> Task :react-native-encrypted-storage:preReleaseBuild UP-TO-DATE
+> Task :react-native-encrypted-storage:generateReleaseResValues UP-TO-DATE
+> Task :react-native-encrypted-storage:generateReleaseResources UP-TO-DATE
+> Task :react-native-encrypted-storage:packageReleaseResources UP-TO-DATE
+> Task :react-native-fs:preReleaseBuild UP-TO-DATE
+> Task :react-native-fs:generateReleaseResValues UP-TO-DATE
+> Task :react-native-fs:generateReleaseResources UP-TO-DATE
+> Task :react-native-fs:packageReleaseResources UP-TO-DATE
+> Task :react-native-gesture-handler:preReleaseBuild UP-TO-DATE
+> Task :react-native-gesture-handler:generateReleaseResValues UP-TO-DATE
+> Task :react-native-gesture-handler:generateReleaseResources UP-TO-DATE
+> Task :react-native-gesture-handler:packageReleaseResources UP-TO-DATE
+> Task :react-native-keyboard-controller:preReleaseBuild UP-TO-DATE
+> Task :react-native-keyboard-controller:generateReleaseResValues UP-TO-DATE
+> Task :react-native-keyboard-controller:generateReleaseResources UP-TO-DATE
+> Task :react-native-keyboard-controller:packageReleaseResources UP-TO-DATE
+> Task :react-native-keychain:preReleaseBuild UP-TO-DATE
+> Task :react-native-keychain:generateReleaseResValues UP-TO-DATE
+> Task :react-native-keychain:generateReleaseResources UP-TO-DATE
+> Task :react-native-keychain:packageReleaseResources UP-TO-DATE
+> Task :react-native-linear-gradient:preReleaseBuild UP-TO-DATE
+> Task :react-native-linear-gradient:generateReleaseResValues UP-TO-DATE
+> Task :react-native-linear-gradient:generateReleaseResources UP-TO-DATE
+> Task :react-native-linear-gradient:packageReleaseResources UP-TO-DATE
+> Task :react-native-localize:preReleaseBuild UP-TO-DATE
+> Task :react-native-localize:generateReleaseResValues UP-TO-DATE
+> Task :react-native-localize:generateReleaseResources UP-TO-DATE
+> Task :react-native-localize:packageReleaseResources UP-TO-DATE
+> Task :react-native-pager-view:preReleaseBuild UP-TO-DATE
+> Task :react-native-pager-view:generateReleaseResValues UP-TO-DATE
+> Task :react-native-pager-view:generateReleaseResources UP-TO-DATE
+> Task :react-native-pager-view:packageReleaseResources UP-TO-DATE
+> Task :react-native-permissions:preReleaseBuild UP-TO-DATE
+> Task :react-native-permissions:generateReleaseResValues UP-TO-DATE
+> Task :react-native-permissions:generateReleaseResources UP-TO-DATE
+> Task :react-native-permissions:packageReleaseResources UP-TO-DATE
+> Task :react-native-reanimated:preReleaseBuild
+> Task :react-native-reanimated:generateReleaseResValues UP-TO-DATE
+> Task :react-native-reanimated:generateReleaseResources UP-TO-DATE
+> Task :react-native-reanimated:packageReleaseResources UP-TO-DATE
+> Task :react-native-restart:preReleaseBuild UP-TO-DATE
+> Task :react-native-restart:generateReleaseResValues UP-TO-DATE
+> Task :react-native-restart:generateReleaseResources UP-TO-DATE
+> Task :react-native-restart:packageReleaseResources UP-TO-DATE
+> Task :react-native-safe-area-context:preReleaseBuild UP-TO-DATE
+> Task :react-native-safe-area-context:generateReleaseResValues UP-TO-DATE
+> Task :react-native-safe-area-context:generateReleaseResources UP-TO-DATE
+> Task :react-native-safe-area-context:packageReleaseResources UP-TO-DATE
+> Task :react-native-screens:preReleaseBuild UP-TO-DATE
+> Task :react-native-screens:generateReleaseResValues UP-TO-DATE
+> Task :react-native-screens:generateReleaseResources UP-TO-DATE
+> Task :react-native-screens:packageReleaseResources UP-TO-DATE
+> Task :react-native-svg:preReleaseBuild UP-TO-DATE
+> Task :react-native-svg:generateReleaseResValues UP-TO-DATE
+> Task :react-native-svg:generateReleaseResources UP-TO-DATE
+> Task :react-native-svg:packageReleaseResources UP-TO-DATE
+> Task :react-native-vision-camera:preReleaseBuild UP-TO-DATE
+> Task :react-native-vision-camera:generateReleaseResValues UP-TO-DATE
+> Task :react-native-vision-camera:generateReleaseResources UP-TO-DATE
+> Task :react-native-vision-camera:packageReleaseResources UP-TO-DATE
+> Task :react-native-worklets:preReleaseBuild
+> Task :react-native-worklets:generateReleaseResValues UP-TO-DATE
+> Task :react-native-worklets:generateReleaseResources UP-TO-DATE
+> Task :react-native-worklets:packageReleaseResources UP-TO-DATE
+> Task :sayem314_react-native-keep-awake:preReleaseBuild
+> Task :sayem314_react-native-keep-awake:generateReleaseResValues UP-TO-DATE
+> Task :sayem314_react-native-keep-awake:generateReleaseResources UP-TO-DATE
+> Task :sayem314_react-native-keep-awake:packageReleaseResources UP-TO-DATE
+> Task :app:mergeProdReleaseResources UP-TO-DATE
+> Task :app:dataBindingGenBaseClassesProdRelease UP-TO-DATE
+> Task :app:generateProdReleaseBuildConfig UP-TO-DATE
+> Task :notifee_react-native:writeReleaseAarMetadata UP-TO-DATE
+> Task :react-native-async-storage_async-storage:writeReleaseAarMetadata UP-TO-DATE
+> Task :react-native-clipboard_clipboard:writeReleaseAarMetadata UP-TO-DATE
+> Task :react-native-community_netinfo:writeReleaseAarMetadata UP-TO-DATE
+> Task :react-native-device-info:writeReleaseAarMetadata UP-TO-DATE
+> Task :react-native-encrypted-storage:writeReleaseAarMetadata UP-TO-DATE
+> Task :react-native-fs:writeReleaseAarMetadata UP-TO-DATE
+> Task :react-native-gesture-handler:writeReleaseAarMetadata UP-TO-DATE
+> Task :react-native-keyboard-controller:writeReleaseAarMetadata UP-TO-DATE
+> Task :react-native-keychain:writeReleaseAarMetadata UP-TO-DATE
+> Task :react-native-linear-gradient:writeReleaseAarMetadata UP-TO-DATE
+> Task :react-native-localize:writeReleaseAarMetadata UP-TO-DATE
+> Task :react-native-pager-view:writeReleaseAarMetadata UP-TO-DATE
+> Task :react-native-permissions:writeReleaseAarMetadata UP-TO-DATE
+> Task :react-native-reanimated:writeReleaseAarMetadata UP-TO-DATE
+> Task :react-native-restart:writeReleaseAarMetadata UP-TO-DATE
+> Task :react-native-safe-area-context:writeReleaseAarMetadata UP-TO-DATE
+> Task :react-native-screens:writeReleaseAarMetadata UP-TO-DATE
+> Task :react-native-svg:writeReleaseAarMetadata UP-TO-DATE
+> Task :react-native-vision-camera:writeReleaseAarMetadata UP-TO-DATE
+> Task :react-native-worklets:writeReleaseAarMetadata UP-TO-DATE
+> Task :sayem314_react-native-keep-awake:writeReleaseAarMetadata UP-TO-DATE
+> Task :app:checkProdReleaseAarMetadata UP-TO-DATE
+> Task :app:mapProdReleaseSourceSetPaths UP-TO-DATE
+> Task :app:createProdReleaseCompatibleScreenManifests UP-TO-DATE
+> Task :app:extractDeepLinksProdRelease UP-TO-DATE
+> Task :notifee_react-native:extractDeepLinksRelease UP-TO-DATE
+> Task :notifee_react-native:processReleaseManifest UP-TO-DATE
+> Task :react-native-async-storage_async-storage:extractDeepLinksRelease UP-TO-DATE
+> Task :react-native-async-storage_async-storage:processReleaseManifest UP-TO-DATE
+> Task :react-native-clipboard_clipboard:extractDeepLinksRelease UP-TO-DATE
+> Task :react-native-clipboard_clipboard:processReleaseManifest UP-TO-DATE
+> Task :react-native-community_netinfo:extractDeepLinksRelease UP-TO-DATE
+> Task :react-native-community_netinfo:processReleaseManifest UP-TO-DATE
+> Task :react-native-device-info:extractDeepLinksRelease UP-TO-DATE
+> Task :react-native-device-info:processReleaseManifest UP-TO-DATE
+> Task :react-native-encrypted-storage:extractDeepLinksRelease UP-TO-DATE
+> Task :react-native-encrypted-storage:processReleaseManifest UP-TO-DATE
+> Task :react-native-fs:extractDeepLinksRelease UP-TO-DATE
+> Task :react-native-fs:processReleaseManifest UP-TO-DATE
+> Task :react-native-gesture-handler:extractDeepLinksRelease UP-TO-DATE
+> Task :react-native-gesture-handler:processReleaseManifest UP-TO-DATE
+> Task :react-native-keyboard-controller:extractDeepLinksRelease UP-TO-DATE
+> Task :react-native-keyboard-controller:processReleaseManifest UP-TO-DATE
+> Task :react-native-keychain:extractDeepLinksRelease UP-TO-DATE
+> Task :react-native-keychain:processReleaseManifest UP-TO-DATE
+> Task :react-native-linear-gradient:extractDeepLinksRelease UP-TO-DATE
+> Task :react-native-linear-gradient:processReleaseManifest UP-TO-DATE
+> Task :react-native-localize:extractDeepLinksRelease UP-TO-DATE
+> Task :react-native-localize:processReleaseManifest UP-TO-DATE
+> Task :react-native-pager-view:extractDeepLinksRelease UP-TO-DATE
+> Task :react-native-pager-view:processReleaseManifest UP-TO-DATE
+> Task :react-native-permissions:extractDeepLinksRelease UP-TO-DATE
+> Task :react-native-permissions:processReleaseManifest UP-TO-DATE
+> Task :react-native-reanimated:extractDeepLinksRelease UP-TO-DATE
+> Task :react-native-reanimated:processReleaseManifest UP-TO-DATE
+> Task :react-native-restart:extractDeepLinksRelease UP-TO-DATE
+> Task :react-native-restart:processReleaseManifest UP-TO-DATE
+> Task :react-native-safe-area-context:extractDeepLinksRelease UP-TO-DATE
+> Task :react-native-safe-area-context:processReleaseManifest UP-TO-DATE
+> Task :react-native-screens:extractDeepLinksRelease UP-TO-DATE
+> Task :react-native-screens:processReleaseManifest UP-TO-DATE
+> Task :react-native-svg:extractDeepLinksRelease UP-TO-DATE
+> Task :react-native-svg:processReleaseManifest UP-TO-DATE
+> Task :react-native-vision-camera:extractDeepLinksRelease UP-TO-DATE
+> Task :react-native-vision-camera:processReleaseManifest UP-TO-DATE
+> Task :react-native-worklets:extractDeepLinksRelease UP-TO-DATE
+> Task :react-native-worklets:processReleaseManifest UP-TO-DATE
+> Task :sayem314_react-native-keep-awake:extractDeepLinksRelease UP-TO-DATE
+> Task :sayem314_react-native-keep-awake:processReleaseManifest UP-TO-DATE
+> Task :app:processProdReleaseMainManifest UP-TO-DATE
+> Task :app:processProdReleaseManifest UP-TO-DATE
+> Task :app:processProdReleaseManifestForPackage UP-TO-DATE
+> Task :notifee_react-native:compileReleaseLibraryResources UP-TO-DATE
+> Task :notifee_react-native:parseReleaseLocalResources UP-TO-DATE
+> Task :notifee_react-native:generateReleaseRFile UP-TO-DATE
+> Task :react-native-async-storage_async-storage:compileReleaseLibraryResources UP-TO-DATE
+> Task :react-native-async-storage_async-storage:parseReleaseLocalResources UP-TO-DATE
+> Task :react-native-async-storage_async-storage:generateReleaseRFile UP-TO-DATE
+> Task :react-native-clipboard_clipboard:compileReleaseLibraryResources UP-TO-DATE
+> Task :react-native-clipboard_clipboard:parseReleaseLocalResources UP-TO-DATE
+> Task :react-native-clipboard_clipboard:generateReleaseRFile UP-TO-DATE
+> Task :react-native-community_netinfo:compileReleaseLibraryResources UP-TO-DATE
+> Task :react-native-community_netinfo:parseReleaseLocalResources UP-TO-DATE
+> Task :react-native-community_netinfo:generateReleaseRFile UP-TO-DATE
+> Task :react-native-device-info:compileReleaseLibraryResources UP-TO-DATE
+> Task :react-native-device-info:parseReleaseLocalResources UP-TO-DATE
+> Task :react-native-device-info:generateReleaseRFile UP-TO-DATE
+> Task :react-native-encrypted-storage:compileReleaseLibraryResources UP-TO-DATE
+> Task :react-native-encrypted-storage:parseReleaseLocalResources UP-TO-DATE
+> Task :react-native-encrypted-storage:generateReleaseRFile UP-TO-DATE
+> Task :react-native-fs:compileReleaseLibraryResources UP-TO-DATE
+> Task :react-native-fs:parseReleaseLocalResources UP-TO-DATE
+> Task :react-native-fs:generateReleaseRFile UP-TO-DATE
+> Task :react-native-gesture-handler:compileReleaseLibraryResources UP-TO-DATE
+> Task :react-native-gesture-handler:parseReleaseLocalResources UP-TO-DATE
+> Task :react-native-reanimated:parseReleaseLocalResources UP-TO-DATE
+> Task :react-native-worklets:parseReleaseLocalResources UP-TO-DATE
+> Task :react-native-worklets:generateReleaseRFile UP-TO-DATE
+> Task :react-native-reanimated:generateReleaseRFile UP-TO-DATE
+> Task :react-native-svg:parseReleaseLocalResources UP-TO-DATE
+> Task :react-native-svg:generateReleaseRFile UP-TO-DATE
+> Task :react-native-gesture-handler:generateReleaseRFile UP-TO-DATE
+> Task :react-native-keyboard-controller:compileReleaseLibraryResources UP-TO-DATE
+> Task :react-native-keyboard-controller:parseReleaseLocalResources UP-TO-DATE
+> Task :react-native-keyboard-controller:generateReleaseRFile UP-TO-DATE
+> Task :react-native-keychain:compileReleaseLibraryResources UP-TO-DATE
+> Task :react-native-keychain:parseReleaseLocalResources UP-TO-DATE
+> Task :react-native-keychain:generateReleaseRFile UP-TO-DATE
+> Task :react-native-linear-gradient:compileReleaseLibraryResources UP-TO-DATE
+> Task :react-native-linear-gradient:parseReleaseLocalResources UP-TO-DATE
+> Task :react-native-linear-gradient:generateReleaseRFile UP-TO-DATE
+> Task :react-native-localize:compileReleaseLibraryResources UP-TO-DATE
+> Task :react-native-localize:parseReleaseLocalResources UP-TO-DATE
+> Task :react-native-localize:generateReleaseRFile UP-TO-DATE
+> Task :react-native-pager-view:compileReleaseLibraryResources UP-TO-DATE
+> Task :react-native-pager-view:parseReleaseLocalResources UP-TO-DATE
+> Task :react-native-pager-view:generateReleaseRFile UP-TO-DATE
+> Task :react-native-permissions:compileReleaseLibraryResources UP-TO-DATE
+> Task :react-native-permissions:parseReleaseLocalResources UP-TO-DATE
+> Task :react-native-permissions:generateReleaseRFile UP-TO-DATE
+> Task :react-native-reanimated:compileReleaseLibraryResources UP-TO-DATE
+> Task :react-native-restart:compileReleaseLibraryResources UP-TO-DATE
+> Task :react-native-restart:parseReleaseLocalResources UP-TO-DATE
+> Task :react-native-restart:generateReleaseRFile UP-TO-DATE
+> Task :react-native-safe-area-context:compileReleaseLibraryResources UP-TO-DATE
+> Task :react-native-safe-area-context:parseReleaseLocalResources UP-TO-DATE
+> Task :react-native-safe-area-context:generateReleaseRFile UP-TO-DATE
+> Task :react-native-screens:compileReleaseLibraryResources UP-TO-DATE
+> Task :react-native-screens:parseReleaseLocalResources UP-TO-DATE
+> Task :react-native-screens:generateReleaseRFile UP-TO-DATE
+> Task :react-native-svg:compileReleaseLibraryResources UP-TO-DATE
+> Task :react-native-vision-camera:compileReleaseLibraryResources UP-TO-DATE
+> Task :react-native-vision-camera:parseReleaseLocalResources UP-TO-DATE
+> Task :react-native-vision-camera:generateReleaseRFile UP-TO-DATE
+> Task :react-native-worklets:compileReleaseLibraryResources UP-TO-DATE
+> Task :sayem314_react-native-keep-awake:compileReleaseLibraryResources UP-TO-DATE
+> Task :sayem314_react-native-keep-awake:parseReleaseLocalResources UP-TO-DATE
+> Task :sayem314_react-native-keep-awake:generateReleaseRFile UP-TO-DATE
+> Task :app:processProdReleaseResources UP-TO-DATE
+> Task :notifee_react-native:generateReleaseBuildConfig UP-TO-DATE
+> Task :notifee_react-native:javaPreCompileRelease UP-TO-DATE
+> Task :notifee_react-native:compileReleaseJavaWithJavac UP-TO-DATE
+> Task :notifee_react-native:bundleLibCompileToJarRelease UP-TO-DATE
+> Task :react-native-async-storage_async-storage:generateReleaseBuildConfig UP-TO-DATE
+> Task :react-native-async-storage_async-storage:javaPreCompileRelease UP-TO-DATE
+> Task :react-native-async-storage_async-storage:compileReleaseJavaWithJavac UP-TO-DATE
+> Task :react-native-async-storage_async-storage:bundleLibCompileToJarRelease UP-TO-DATE
+> Task :react-native-clipboard_clipboard:generateReleaseBuildConfig UP-TO-DATE
+> Task :react-native-clipboard_clipboard:javaPreCompileRelease UP-TO-DATE
+> Task :react-native-clipboard_clipboard:compileReleaseJavaWithJavac UP-TO-DATE
+> Task :react-native-clipboard_clipboard:bundleLibCompileToJarRelease UP-TO-DATE
+> Task :react-native-community_netinfo:generateReleaseBuildConfig UP-TO-DATE
+> Task :react-native-community_netinfo:javaPreCompileRelease UP-TO-DATE
+> Task :react-native-community_netinfo:compileReleaseJavaWithJavac UP-TO-DATE
+> Task :react-native-community_netinfo:bundleLibCompileToJarRelease UP-TO-DATE
+> Task :react-native-device-info:generateReleaseBuildConfig UP-TO-DATE
+> Task :react-native-device-info:javaPreCompileRelease UP-TO-DATE
+> Task :react-native-device-info:compileReleaseJavaWithJavac UP-TO-DATE
+> Task :react-native-device-info:bundleLibCompileToJarRelease UP-TO-DATE
+> Task :react-native-encrypted-storage:generateReleaseBuildConfig UP-TO-DATE
+> Task :react-native-encrypted-storage:javaPreCompileRelease UP-TO-DATE
+> Task :react-native-encrypted-storage:compileReleaseJavaWithJavac UP-TO-DATE
+> Task :react-native-encrypted-storage:bundleLibCompileToJarRelease UP-TO-DATE
+> Task :react-native-fs:generateReleaseBuildConfig UP-TO-DATE
+> Task :react-native-fs:javaPreCompileRelease UP-TO-DATE
+> Task :react-native-fs:compileReleaseJavaWithJavac UP-TO-DATE
+> Task :react-native-fs:bundleLibCompileToJarRelease UP-TO-DATE
+> Task :react-native-gesture-handler:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :react-native-gesture-handler:generateReleaseBuildConfig UP-TO-DATE
+> Task :react-native-reanimated:generateReleaseBuildConfig UP-TO-DATE
+> Task :react-native-reanimated:javaPreCompileRelease UP-TO-DATE
+> Task :react-native-worklets:generateReleaseBuildConfig UP-TO-DATE
+> Task :react-native-worklets:javaPreCompileRelease UP-TO-DATE
+> Task :react-native-worklets:compileReleaseJavaWithJavac UP-TO-DATE
+> Task :react-native-worklets:bundleLibCompileToJarRelease UP-TO-DATE
+> Task :react-native-reanimated:compileReleaseJavaWithJavac UP-TO-DATE
+> Task :react-native-reanimated:bundleLibCompileToJarRelease UP-TO-DATE
+> Task :react-native-svg:generateReleaseBuildConfig UP-TO-DATE
+> Task :react-native-svg:javaPreCompileRelease UP-TO-DATE
+> Task :react-native-svg:compileReleaseJavaWithJavac UP-TO-DATE
+> Task :react-native-svg:bundleLibCompileToJarRelease UP-TO-DATE
+> Task :react-native-gesture-handler:compileReleaseKotlin UP-TO-DATE
+> Task :react-native-gesture-handler:javaPreCompileRelease UP-TO-DATE
+> Task :react-native-gesture-handler:compileReleaseJavaWithJavac UP-TO-DATE
+> Task :react-native-gesture-handler:bundleLibCompileToJarRelease UP-TO-DATE
+> Task :react-native-keyboard-controller:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :react-native-keyboard-controller:generateReleaseBuildConfig UP-TO-DATE
+> Task :react-native-keyboard-controller:compileReleaseKotlin UP-TO-DATE
+> Task :react-native-keyboard-controller:javaPreCompileRelease UP-TO-DATE
+> Task :react-native-keyboard-controller:compileReleaseJavaWithJavac UP-TO-DATE
+> Task :react-native-keyboard-controller:bundleLibCompileToJarRelease UP-TO-DATE
+> Task :react-native-keychain:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :react-native-keychain:generateReleaseBuildConfig UP-TO-DATE
+> Task :react-native-keychain:compileReleaseKotlin UP-TO-DATE
+> Task :react-native-keychain:javaPreCompileRelease UP-TO-DATE
+> Task :react-native-keychain:compileReleaseJavaWithJavac UP-TO-DATE
+> Task :react-native-keychain:bundleLibCompileToJarRelease UP-TO-DATE
+> Task :react-native-linear-gradient:generateReleaseBuildConfig UP-TO-DATE
+> Task :react-native-linear-gradient:javaPreCompileRelease UP-TO-DATE
+> Task :react-native-linear-gradient:compileReleaseJavaWithJavac UP-TO-DATE
+> Task :react-native-linear-gradient:bundleLibCompileToJarRelease UP-TO-DATE
+> Task :react-native-localize:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :react-native-localize:generateReleaseBuildConfig UP-TO-DATE
+> Task :react-native-localize:compileReleaseKotlin UP-TO-DATE
+> Task :react-native-localize:javaPreCompileRelease UP-TO-DATE
+> Task :react-native-localize:compileReleaseJavaWithJavac UP-TO-DATE
+> Task :react-native-localize:bundleLibCompileToJarRelease UP-TO-DATE
+> Task :react-native-pager-view:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :react-native-pager-view:generateReleaseBuildConfig UP-TO-DATE
+> Task :react-native-pager-view:compileReleaseKotlin UP-TO-DATE
+> Task :react-native-pager-view:javaPreCompileRelease UP-TO-DATE
+> Task :react-native-pager-view:compileReleaseJavaWithJavac UP-TO-DATE
+> Task :react-native-pager-view:bundleLibCompileToJarRelease UP-TO-DATE
+> Task :react-native-permissions:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :react-native-permissions:generateReleaseBuildConfig UP-TO-DATE
+> Task :react-native-permissions:compileReleaseKotlin UP-TO-DATE
+> Task :react-native-permissions:javaPreCompileRelease UP-TO-DATE
+> Task :react-native-permissions:compileReleaseJavaWithJavac UP-TO-DATE
+> Task :react-native-permissions:bundleLibCompileToJarRelease UP-TO-DATE
+> Task :react-native-restart:generateReleaseBuildConfig UP-TO-DATE
+> Task :react-native-restart:javaPreCompileRelease UP-TO-DATE
+> Task :react-native-restart:compileReleaseJavaWithJavac UP-TO-DATE
+> Task :react-native-restart:bundleLibCompileToJarRelease UP-TO-DATE
+> Task :react-native-safe-area-context:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :react-native-safe-area-context:generateReleaseBuildConfig UP-TO-DATE
+> Task :react-native-safe-area-context:compileReleaseKotlin UP-TO-DATE
+> Task :react-native-safe-area-context:javaPreCompileRelease UP-TO-DATE
+> Task :react-native-safe-area-context:compileReleaseJavaWithJavac UP-TO-DATE
+> Task :react-native-safe-area-context:bundleLibCompileToJarRelease UP-TO-DATE
+> Task :react-native-screens:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :react-native-screens:generateReleaseBuildConfig UP-TO-DATE
+> Task :react-native-screens:compileReleaseKotlin UP-TO-DATE
+> Task :react-native-screens:javaPreCompileRelease UP-TO-DATE
+> Task :react-native-screens:compileReleaseJavaWithJavac UP-TO-DATE
+> Task :react-native-screens:bundleLibCompileToJarRelease UP-TO-DATE
+> Task :react-native-vision-camera:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :react-native-vision-camera:generateReleaseBuildConfig UP-TO-DATE
+> Task :react-native-vision-camera:compileReleaseKotlin UP-TO-DATE
+> Task :react-native-vision-camera:javaPreCompileRelease UP-TO-DATE
+> Task :react-native-vision-camera:compileReleaseJavaWithJavac UP-TO-DATE
+> Task :react-native-vision-camera:bundleLibCompileToJarRelease UP-TO-DATE
+> Task :sayem314_react-native-keep-awake:generateReleaseBuildConfig UP-TO-DATE
+> Task :sayem314_react-native-keep-awake:javaPreCompileRelease UP-TO-DATE
+> Task :sayem314_react-native-keep-awake:compileReleaseJavaWithJavac UP-TO-DATE
+> Task :sayem314_react-native-keep-awake:bundleLibCompileToJarRelease UP-TO-DATE
+
+> Task :app:compileProdReleaseKotlin
+w: file:///tmp/claude-1000/-home-nattyb-src-zingolabs-zmobs-feat-ironwood-privacy-path/091edba5-15d0-4250-bf95-4d7232a0dc7c/scratchpad/fixtest/android/app/src/main/java/org/ZingoLabs/Zingo/MainApplication.kt:11:8 'class ReactNativeHost : Any' is deprecated. Deprecated in Java.
+w: file:///tmp/claude-1000/-home-nattyb-src-zingolabs-zmobs-feat-ironwood-privacy-path/091edba5-15d0-4250-bf95-4d7232a0dc7c/scratchpad/fixtest/android/app/src/main/java/org/ZingoLabs/Zingo/MainApplication.kt:20:18 This declaration overrides a deprecated member but is not marked as deprecated itself. Add the '@Deprecated' annotation or suppress the diagnostic.
+w: file:///tmp/claude-1000/-home-nattyb-src-zingolabs-zmobs-feat-ironwood-privacy-path/091edba5-15d0-4250-bf95-4d7232a0dc7c/scratchpad/fixtest/android/app/src/main/java/org/ZingoLabs/Zingo/MainApplication.kt:20:35 'class ReactNativeHost : Any' is deprecated. Deprecated in Java.
+w: file:///tmp/claude-1000/-home-nattyb-src-zingolabs-zmobs-feat-ironwood-privacy-path/091edba5-15d0-4250-bf95-4d7232a0dc7c/scratchpad/fixtest/android/app/src/main/java/org/ZingoLabs/Zingo/RPCModule.kt:7:8 'class MasterKeys : Any' is deprecated. Deprecated in Java.
+w: file:///tmp/claude-1000/-home-nattyb-src-zingolabs-zmobs-feat-ironwood-privacy-path/091edba5-15d0-4250-bf95-4d7232a0dc7c/scratchpad/fixtest/android/app/src/main/java/org/ZingoLabs/Zingo/RPCModule.kt:30:30 'class MasterKeys : Any' is deprecated. Deprecated in Java.
+w: file:///tmp/claude-1000/-home-nattyb-src-zingolabs-zmobs-feat-ironwood-privacy-path/091edba5-15d0-4250-bf95-4d7232a0dc7c/scratchpad/fixtest/android/app/src/main/java/org/ZingoLabs/Zingo/RPCModule.kt:30:53 'class MasterKeys : Any' is deprecated. Deprecated in Java.
+w: file:///tmp/claude-1000/-home-nattyb-src-zingolabs-zmobs-feat-ironwood-privacy-path/091edba5-15d0-4250-bf95-4d7232a0dc7c/scratchpad/fixtest/android/app/src/main/java/org/ZingoLabs/Zingo/RPCModule.kt:31:30 'constructor(file: File, context: Context, masterKeyAlias: String, fileEncryptionScheme: EncryptedFile.FileEncryptionScheme): EncryptedFile.Builder' is deprecated. Deprecated in Java.
+w: file:///tmp/claude-1000/-home-nattyb-src-zingolabs-zmobs-feat-ironwood-privacy-path/091edba5-15d0-4250-bf95-4d7232a0dc7c/scratchpad/fixtest/android/app/src/main/java/org/ZingoLabs/Zingo/RPCPackage.kt:14:18 This declaration overrides a deprecated member but is not marked as deprecated itself. Add the '@Deprecated' annotation or suppress the diagnostic.
+
+[Incubating] Problems report is available at: file:///tmp/claude-1000/-home-nattyb-src-zingolabs-zmobs-feat-ironwood-privacy-path/091edba5-15d0-4250-bf95-4d7232a0dc7c/scratchpad/fixtest/android/build/reports/problems/problems-report.html
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.14.3/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD SUCCESSFUL in 9s
+362 actionable tasks: 6 executed, 356 up-to-date

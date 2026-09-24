@@ -8,13 +8,6 @@ edition = "2024"
 ci = []
 
 [dev-dependencies]
-zingolib = { workspace = true , features = [
-    "testutils",
-] }
-pepper-sync = { workspace = true }
 zingolib_testutils = { workspace = true }
 zingomobile_utils = { workspace = true }
-json = { workspace = true }
-env_logger = { workspace = true }
 tokio = { workspace = true }
-rustls = { workspace = true }

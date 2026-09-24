@@ -6,7 +6,7 @@ import 'react-native';
 import React from 'react';
 
 import { render } from '@testing-library/react-native';
-import Scanner from '../components/Scanner';
+import Scanner from '@ui/widgets/Scanner';
 
 // test suite
 describe('Component Scanner - test', () => {

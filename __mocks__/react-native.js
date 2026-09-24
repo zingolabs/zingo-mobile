@@ -11,7 +11,6 @@ jest.mock('react-native', () => {
     getValueTransfersList: jest.fn(
       () => '{ "value_transfers": [], "total": 0 }',
     ),
-    setCryptoDefaultProvider: jest.fn(() => 'true'),
     createNewWallet: jest.fn(
       () => '{ "seed": "seed phrase test", "birthday": 0 }',
     ),
@@ -50,9 +49,19 @@ jest.mock('react-native', () => {
     getConfigWalletPerformanceInfo: jest.fn(() => '{}'),
     getWalletVersionInfo: jest.fn(() => '{}'),
     sendProcess: jest.fn(() => '{}'),
+    sendAllProcess: jest.fn(() => '{}'),
     shieldProcess: jest.fn(() => '{}'),
     confirmProcess: jest.fn(() => '{}'),
-    getZenniesDonationAddress: jest.fn(() => '{}'),
+  };
+  RN.NativeModules.ScreenSecurity = {
+    setSecure: jest.fn(() => Promise.resolve(true)),
+  };
+  RN.NativeModules.DeviceAuth = {
+    canAuthenticate: jest.fn(async () => ({ available: true, code: '' })),
+    authenticate: jest.fn(async () => ({
+      outcome: 'authenticated',
+      code: '',
+    })),
   };
   RN.View = jest.fn();
   RN.RefreshControl = jest.fn(() => null);

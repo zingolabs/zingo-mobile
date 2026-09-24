@@ -12,13 +12,21 @@
  *
  * To add a new periodic task, push it into taskPromises inside runTaskPromises.
  */
-import { TotalBalanceClass, GlobalConst } from '../../AppState';
-import RPCModule from '../../RPCModule';
-import { RPCSyncStatusType } from '../types/RPCSyncStatusType';
-import { RPCSyncPollType } from '../types/RPCSyncPollType';
-import { RPCPerformanceLevelEnum } from '../enums/RPCPerformanceLevelEnum';
-import { WalletBackendConfig } from '../config/WalletBackendConfig';
+import { TotalBalanceClass, GlobalConst } from '@app/AppState';
+import RPCModule from '@app/RPCModule';
+import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
+import { RPCSyncPollType } from '@app/walletBackend/types/RPCSyncPollType';
+import { scanInProgress } from '@app/walletBackend/utils/syncProgress';
+import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
+import { WalletBackendConfig } from '@app/walletBackend/config/WalletBackendConfig';
 import { DataService } from './DataService';
+import { doSave } from '@app/walletBackend/utils/walletUtils';
+
+// Consecutive failed sync launches before onPersistentSyncFailure fires.
+// Three failures span ~15 s of the 5 s tick: long enough to ride out a
+// one-off blip, short enough that a dead server gets replaced before the
+// user reaches for Settings.
+const PERSISTENT_SYNC_FAILURE_THRESHOLD = 3;
 
 export class SyncCoordinator {
   config: WalletBackendConfig;
@@ -30,6 +38,8 @@ export class SyncCoordinator {
   refreshSyncLock: boolean = false;
   fetchSyncStatusLock: boolean = false;
   fetchSyncPollLock: boolean = false;
+
+  syncLaunchFailures: number = 0;
 
   walletConfigPerformanceLevel: RPCPerformanceLevelEnum | undefined;
 
@@ -67,21 +77,26 @@ export class SyncCoordinator {
         performance,
       );
       if (performance !== this.config.performanceLevel) {
-        const setConfigWallet = await RPCModule.setConfigWalletToProdProcess(
-          this.config.performanceLevel,
-          GlobalConst.minConfirmations.toString(),
-        );
-        console.log(
-          '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ SET CONFIG WALLET',
-          setConfigWallet,
-        );
-        if (
-          setConfigWallet &&
-          setConfigWallet.toLowerCase().startsWith(GlobalConst.error)
-        ) {
-          this.config.onError(`Set wallet to prod error: ${setConfigWallet}`);
+        // setConfigWalletToProdProcess rejects on failure (typed FFI errors);
+        // the catch owns the error path, and this tick's caller is a
+        // setInterval with no rejection handler, so the rejection must be
+        // contained here.
+        try {
+          const setConfigWallet = await RPCModule.setConfigWalletToProdProcess(
+            this.config.performanceLevel,
+            GlobalConst.minConfirmations.toString(),
+          );
+          console.log(
+            '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ SET CONFIG WALLET',
+            setConfigWallet,
+          );
+        } catch (error) {
+          this.config.onError(`Set wallet to prod error: ${error}`);
         }
-        await RPCModule.doSave();
+        // The seam classifies the trimodal native resolution and contains
+        // a rejection as false; this tick has no rejection handler of its
+        // own (audit Issue P).
+        await doSave();
         const performanceChanged =
           await this.dataService.getConfigWalletPerformance();
         this.walletConfigPerformanceLevel = performanceChanged;
@@ -124,7 +139,7 @@ export class SyncCoordinator {
         taskPromises.push(
           (async () => {
             const start = Date.now();
-            await RPCModule.doSave();
+            await doSave();
             if (Date.now() - start > 4000) {
               console.log(
                 '=========================================== > save wallet - ',
@@ -144,17 +159,12 @@ export class SyncCoordinator {
   async pauseSyncProcess(): Promise<void> {
     try {
       const returnPause: string = await RPCModule.pauseSyncProcess();
-      if (
-        returnPause &&
-        returnPause.toLowerCase().startsWith(GlobalConst.error)
-      ) {
-        console.log('SYNC PAUSE ERROR', returnPause);
-        this.config.onError(`Error sync pause: ${returnPause}`);
-      } else {
-        console.log('pause sync process. PAUSED', returnPause);
-      }
+      // pauseSyncProcess rejects on failure (typed FFI errors); the catch
+      // owns the error path, so the result is never inspected for a sentinel.
+      console.log('pause sync process. PAUSED', returnPause);
     } catch (error) {
       console.log(`Critical Error pause sync ${error}`);
+      this.config.onError(`Error sync pause: ${error}`);
     }
   }
 
@@ -199,10 +209,12 @@ export class SyncCoordinator {
         this.config.onMessagesChanged([], 0);
         this.config.onBalanceChanged({
           totalOrchardBalance: 0,
+          totalIronwoodBalance: 0,
           totalSaplingBalance: 0,
           totalTransparentBalance: 0,
           confirmedTransparentBalance: 0,
           confirmedOrchardBalance: 0,
+          confirmedIronwoodBalance: 0,
           confirmedSaplingBalance: 0,
           totalSpendableBalance: 0,
         } as TotalBalanceClass);
@@ -216,13 +228,7 @@ export class SyncCoordinator {
             Date.now() - start,
           );
         }
-        if (
-          rescanStr &&
-          rescanStr.toLowerCase().startsWith(GlobalConst.error)
-        ) {
-          console.log(`Error rescan: ${rescanStr}`);
-          this.config.onError(`Error rescan: ${rescanStr}`);
-        }
+        console.log('rescan RUN', rescanStr);
         await this.configure();
       } else {
         const start = Date.now();
@@ -234,13 +240,20 @@ export class SyncCoordinator {
           );
         }
         console.log('sync RUN', syncStr);
-        if (syncStr && syncStr.toLowerCase().startsWith(GlobalConst.error)) {
-          console.log(`Error sync: ${syncStr}`);
-          this.config.onError(`Error sync: ${syncStr}`);
-        }
+        this.syncLaunchFailures = 0;
       }
     } catch (error) {
+      // runSyncProcess and runRescanProcess reject on failure (typed FFI
+      // errors); this catch owns the error path for both.
       console.log(`Critical Error sync/rescan run ${error}`);
+      this.config.onError(`Error sync/rescan run: ${error}`);
+      if (!fullRescan) {
+        this.syncLaunchFailures += 1;
+        if (this.syncLaunchFailures >= PERSISTENT_SYNC_FAILURE_THRESHOLD) {
+          this.syncLaunchFailures = 0;
+          this.config.onPersistentSyncFailure?.();
+        }
+      }
     } finally {
       this.refreshSyncLock = false;
     }
@@ -260,14 +273,8 @@ export class SyncCoordinator {
           Date.now() - start,
         );
       }
-      if (
-        returnStatus &&
-        returnStatus.toLowerCase().startsWith(GlobalConst.error)
-      ) {
-        console.log('SYNC STATUS ERROR', returnStatus);
-        this.config.onError(`Error sync status: ${returnStatus}`);
-        return;
-      }
+      // statusSyncInfo rejects on failure (typed FFI errors); the catch owns
+      // the error path, and the JSON parse below is the structural check.
       let ss = {} as RPCSyncStatusType;
       try {
         ss = await JSON.parse(returnStatus);
@@ -308,12 +315,7 @@ export class SyncCoordinator {
             : Number(ss.percentage_total_blocks_scanned?.toFixed(2));
 
       // Close the poll timer if the sync finished(checked via promise above)
-      const inR: boolean =
-        !!ss.scan_ranges &&
-        ss.scan_ranges.length > 0 &&
-        (ss.percentage_total_outputs_scanned ??
-          ss.percentage_total_blocks_scanned ??
-          0) < 100;
+      const inR = scanInProgress(ss);
       if (!inR) {
         this.config.keepAwake(false);
       } else {
@@ -324,6 +326,7 @@ export class SyncCoordinator {
       this.config.onSyncStatusChanged(ss as RPCSyncStatusType);
     } catch (error) {
       console.log(`Critical Error sync status ${error}`);
+      this.config.onError(`Error sync status: ${error}`);
     } finally {
       this.fetchSyncStatusLock = false;
     }
@@ -344,15 +347,9 @@ export class SyncCoordinator {
           Date.now() - start,
         );
       }
-      if (
-        returnPoll &&
-        returnPoll.toLowerCase().startsWith(GlobalConst.error)
-      ) {
-        console.log('SYNC POLL ERROR', returnPoll);
-        this.config.onError(`Error sync poll: ${returnPoll}`);
-        return;
-      }
-
+      // pollSyncInfo rejects on failure (typed FFI errors); the catch owns
+      // the error path. The remaining checks distinguish the data channel's
+      // status prose from its JSON payload, not success from failure.
       if (
         returnPoll.toLowerCase().startsWith('sync task has not been launched')
       ) {
@@ -414,6 +411,7 @@ export class SyncCoordinator {
       }, 0);
     } catch (error) {
       console.log(`Critical Error sync poll ${error}`);
+      this.config.onError(`Error sync poll: ${error}`);
     } finally {
       this.fetchSyncPollLock = false;
     }

@@ -13,19 +13,18 @@ import ServerType from './types/ServerType';
 import SecurityType from './types/SecurityType';
 
 import { LanguageEnum } from './enums/LanguageEnum';
-import { CurrencyEnum } from './enums/CurrencyEnum';
 import { ModeEnum } from './enums/ModeEnum';
 import { SelectServerEnum } from './enums/SelectServerEnum';
 import { ChainNameEnum } from './enums/ChainNameEnum';
 import { SnackbarDurationEnum } from './enums/SnackbarDurationEnum';
-import { LoadedAppNavigationState } from '../types';
+import { LoadedAppNavigationState } from '@app/types';
 import ValueTransferType from './types/ValueTransferType';
-import { RPCSyncStatusType } from '../walletBackend/types/RPCSyncStatusType';
+import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
 import TransparentAddressClass from './classes/TransparentAddressClass';
 import { ScreenEnum } from './enums/ScreenEnum';
-import { RPCPerformanceLevelEnum } from '../walletBackend/enums/RPCPerformanceLevelEnum';
+import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
 import { BlockExplorerEnum } from './enums/BlockExplorerEnum';
-import { SwapRecordType } from '../swap';
+import { MixnetView } from '@app/walletBackend/transforms/mixnetView';
 
 export default interface AppContextLoaded {
   netInfo: NetInfoType;
@@ -39,13 +38,6 @@ export default interface AppContextLoaded {
   // List of all T and Z and O value transfers
   valueTransfers: ValueTransferType[] | null;
   valueTransfersTotal: number | null;
-
-  // Live mirror of `SwapStore` — every persistent swap record this wallet
-  // has created. Populated on app load and kept in sync with the on-disk
-  // store via `SwapStore.subscribe`. The history screen merges these with
-  // `valueTransfers` to render swap rows alongside the zingolib-reported
-  // transactions. May be `null` before the initial fetch resolves.
-  swapRecords: SwapRecordType[] | null;
 
   // List of messages
   messages: ValueTransferType[] | null;
@@ -107,7 +99,11 @@ export default interface AppContextLoaded {
   // Opens the shared "Add Tag / Add Contact" BottomSheet modal in-place,
   // pre-filled with the given address. Used from any screen that displays an
   // address (AddressItem's + icon).
-  launchAddTagModal: (address: string, swapChain?: string) => void;
+  launchAddTagModal: (
+    address: string,
+    swapChain?: string,
+    initialLabel?: string,
+  ) => void;
 
   // is calculated in the header & needed in the send screen
   shieldingAmount: number;
@@ -121,9 +117,6 @@ export default interface AppContextLoaded {
   // fetch the ZEC price in USD
   setZecPrice: (p: number, d: number) => void;
 
-  // donation address
-  zenniesDonationAddress: string;
-
   // zingolib Version
   zingolibVersion: string;
 
@@ -132,10 +125,7 @@ export default interface AppContextLoaded {
 
   // settings
   server: ServerType;
-  currency: CurrencyEnum;
   language: LanguageEnum;
-  sendAll: boolean;
-  donation: boolean;
   privacy: boolean;
   mode: ModeEnum;
   security: SecurityType;
@@ -145,14 +135,15 @@ export default interface AppContextLoaded {
   // wallet / unknown. Used to decide, on a server change, whether to open the
   // wallet directly or launch a chain switch.
   walletChainName: ChainNameEnum;
-  rescanMenu: boolean;
   recoveryWalletInfoOnDevice: boolean;
   performanceLevel: RPCPerformanceLevelEnum;
   blockExplorer: BlockExplorerEnum;
-  nym: boolean;
-  setNymOption: (value: boolean) => Promise<void>;
+  // The persisted send-route preference; the transport runs either way.
+
+  // Null where the mixnet policy does not run.
+  mixnetView: MixnetView | null;
+  reenableMixnet: () => Promise<void>;
   setModeOption: (value: string) => Promise<void>;
-  setCurrencyOption: (value: CurrencyEnum) => Promise<void>;
 
   // Monotonically increasing counter incremented every time the app
   // returns from background/inactive to active. Protected screens

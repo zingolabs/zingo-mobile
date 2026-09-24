@@ -20,6 +20,18 @@ buildscript {
 
 plugins {
     id("com.facebook.react.rootproject")
+    // Kotlin's answer to `cargo shear`: fails the build on declared
+    // dependencies nothing compiles against. Advice beyond unused
+    // dependencies (scopes, transitives) stays warning-only.
+    id("com.autonomousapps.dependency-analysis") version "3.17.0"
+}
+
+dependencyAnalysis {
+    issues {
+        all {
+            onUnusedDependencies { severity("fail") }
+        }
+    }
 }
 
 allprojects {

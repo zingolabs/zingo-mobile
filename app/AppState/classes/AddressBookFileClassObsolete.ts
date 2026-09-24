@@ -1,4 +1,4 @@
-import { ChainNameEnum } from '../enums/ChainNameEnum';
+import { ChainNameEnum } from '@app/AppState/enums/ChainNameEnum';
 
 export default class AddressBookFileClassObsolete {
   label: string;

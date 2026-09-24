@@ -6,19 +6,19 @@ import 'react-native';
 import React from 'react';
 
 import { render } from '@testing-library/react-native';
-import History from '../components/History';
+import History from '@screens/History';
 import {
   defaultAppContextLoaded,
   ContextAppLoadedProvider,
-} from '../app/context';
-import { CurrencyEnum, ModeEnum, RouteEnum } from '../app/AppState';
+} from '@app/context';
+import { ModeEnum, RouteEnum } from '@app/AppState';
 import { mockValueTransfers } from '../__mocks__/dataMocks/mockValueTransfers';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockAddresses } from '../__mocks__/dataMocks/mockAddresses';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { AppDrawerParamList } from '../app/types';
+import { AppDrawerParamList } from '@app/types';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
 function makeDrawerProps(): NativeStackScreenProps<
@@ -41,13 +41,17 @@ describe('Component History - test', () => {
   state.valueTransfers = mockValueTransfers;
   state.addresses = mockAddresses;
   state.translate = mockTranslate;
-  state.info = mockInfo;
+  // `mockInfo`'s tip predates NU6.3, which would hide the Ironwood migration
+  // banner; put the chain past activation so these snapshots keep covering it.
+  state.info = {
+    ...mockInfo,
+    latestBlock: mockInfo.ironwoodActivationHeight as number,
+  };
   state.totalBalance = mockTotalBalance;
+  // The price ring renders only for a Nym-consenting session.
   const onFunction = jest.fn();
 
-  test('History no currency, privacy normal & mode basic - snapshot', () => {
-    // no currency
-    state.currency = CurrencyEnum.noCurrency;
+  test('History privacy normal & mode basic - snapshot', () => {
     // privacy normal
     state.privacy = false;
     // mode basic
@@ -68,9 +72,7 @@ describe('Component History - test', () => {
     expect(history.toJSON()).toMatchSnapshot();
   });
 
-  test('History currency USD, privacy high & mode advanced - snapshot', () => {
-    // no currency
-    state.currency = CurrencyEnum.USDCurrency;
+  test('History privacy high & mode advanced - snapshot', () => {
     // privacy normal
     state.privacy = true;
     // mode basic
