@@ -30,15 +30,6 @@ const READY_VIEW: MixnetView = {
   reconnecting: false,
 };
 
-const OFF_VIEW: MixnetView = {
-  statusKey: 'mixnet.status.off',
-  socks5Addr: null,
-  narration: null,
-  sendBlocked: false,
-  recovery: 'reenable',
-  reconnecting: false,
-};
-
 const DIED_VIEW: MixnetView = {
   statusKey: 'mixnet.status.died',
   socks5Addr: null,
@@ -195,19 +186,6 @@ test('a died transport pauses the cadence until the status recovers', async () =
   view.rerender(surfaceUi(makeCtx({ mixnetView: READY_VIEW }), setZecPrice));
   await jest.advanceTimersByTimeAsync(0);
   expect(price).toHaveBeenCalled();
-});
-
-test('a switched-off transport starts no fetch', async () => {
-  price.mockResolvedValue({ price: 42, error: '' });
-  const setZecPrice = jest.fn();
-
-  const view = render(
-    surfaceUi(makeCtx({ mixnetView: OFF_VIEW }), setZecPrice),
-  );
-  await flush();
-  await flush();
-  expect(price).not.toHaveBeenCalled();
-  view.unmount();
 });
 
 test('an unknowable transport starts no fetch', async () => {

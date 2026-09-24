@@ -139,25 +139,7 @@ test('a price that never arrived renders no ring', async () => {
   );
 });
 
-test('a switched-off transport shows no ring', () => {
-  const view = render(
-    fetcherUi(
-      makeCtx({
-        mixnetView: {
-          statusKey: 'mixnet.status.off',
-          socks5Addr: null,
-          narration: null,
-          sendBlocked: false,
-          recovery: 'reenable',
-          reconnecting: false,
-        },
-      }),
-    ),
-  );
-  expect(view.queryByTestId('pricefetcher.ring')).toBeNull();
-});
-
-test('a refusing transport hides the ring for the same reason', () => {
+test('a refusing transport shows no ring', () => {
   const view = render(
     fetcherUi(
       makeCtx({

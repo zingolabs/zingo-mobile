@@ -3560,17 +3560,18 @@ pub fn cancel_ironwood_migration() -> Result<String, ZingolibError> {
 /// The Mixnet Mode indicator as the strings the app layer shows.
 fn mixnet_indicator_string(indicator: zingolib::mixnet::Indicator) -> &'static str {
     match indicator {
-        zingolib::mixnet::Indicator::SwitchedOff => "off",
         zingolib::mixnet::Indicator::Bootstrapping => "bootstrapping",
         // A Standing Client born on an EpochProven observation routes exactly
         // as Ready, so the app must not hold its surfaces shut waiting for a
         // round trip the library already treats as unnecessary.
         zingolib::mixnet::Indicator::Ready
         | zingolib::mixnet::Indicator::PreviouslyProvenThisEpoch => "ready",
-        // A never-attached transport (spawn/attach failed) is not consent to
+        // A never-attached or switched-off transport is not consent to
         // clearnet; report it as `died` so the app fails closed and reconnects
         // rather than opening the mixnet-only surfaces.
-        zingolib::mixnet::Indicator::Died | zingolib::mixnet::Indicator::Unattached => "died",
+        zingolib::mixnet::Indicator::Died
+        | zingolib::mixnet::Indicator::Unattached
+        | zingolib::mixnet::Indicator::SwitchedOff => "died",
     }
 }
 
@@ -3627,7 +3628,7 @@ pub fn enable_mixnet(proxy_path: String) -> Result<String, ZingolibError> {
     })
 }
 
-/// The current Mixnet Mode indicator: `off`, `bootstrapping`, `ready` (with the local
+/// The current Mixnet Mode indicator: `bootstrapping`, `ready` (with the local
 /// SOCKS5 address), or `died` (unconsented proxy loss; sends refuse — run
 /// [`attach_mixnet`] or [`enable_mixnet`] to recover).
 pub fn mixnet_indicator() -> Result<String, ZingolibError> {
@@ -3659,41 +3660,6 @@ pub fn mixnet_bootstrap_detail() -> Result<String, ZingolibError> {
         if let Some(lightclient) = &*guard {
             let detail = lightclient.mixnet_bootstrap_detail().unwrap_or_default();
             Ok(object! { "detail" => detail }.pretty(2))
-        } else {
-            Err(ZingolibError::LightclientNotInitialized)
-        }
-    })
-}
-
-/// The transmit policy as the strings the app layer sends and reads.
-fn transmit_policy_string(policy: zingolib::mixnet::TransmitPolicy) -> &'static str {
-    match policy {
-        zingolib::mixnet::TransmitPolicy::Mixnet => "mixnet",
-        zingolib::mixnet::TransmitPolicy::Clearnet => "clearnet",
-    }
-}
-
-/// Sets where this session's transactions travel, `mixnet` or `clearnet`; the price fetch stays mixnet-only.
-pub fn set_transmit_policy(policy: String) -> Result<String, ZingolibError> {
-    with_panic_guard(|| {
-        let chosen = match policy.as_str() {
-            "mixnet" => zingolib::mixnet::TransmitPolicy::Mixnet,
-            "clearnet" => zingolib::mixnet::TransmitPolicy::Clearnet,
-            other => {
-                return Err(ZingolibError::Mixnet(format!(
-                    "unknown transmit policy: {other}"
-                )));
-            }
-        };
-        let guard = LIGHTCLIENT
-            .write()
-            .map_err(|_| ZingolibError::LightclientLockPoisoned)?;
-        if let Some(lightclient) = &*guard {
-            lightclient.set_transmit_policy(chosen);
-            Ok(
-                object! { "transmit_policy" => transmit_policy_string(lightclient.transmit_policy()) }
-                    .pretty(2),
-            )
         } else {
             Err(ZingolibError::LightclientNotInitialized)
         }
