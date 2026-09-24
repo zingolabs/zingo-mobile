@@ -32,13 +32,16 @@ appId: org.ZingoLabs.Zingo
     id: "menu.addressbook"
 - assertVisible:
     id: "menu.walletseedufvk"
-- back
 
 # Server info now lives inline inside Settings (see settings.*-server rows);
-# About remains as its own navigation row. Settings now opens from the
-# Options panel, so the panel closed by the `back` above is reopened.
-- tapOn:
-    id: "header.drawmenu"
+# About remains as its own navigation row. Settings opens from the Options
+# panel, which is already open: no closing and reopening in between.
+#
+# It used to close the panel with `back` and tap the toggle again. On
+# Android `back` is the hardware button and closes the panel; on iOS it is
+# an edge-swipe, which does nothing to an overlay that is not a navigation
+# screen, so the panel stayed open, the second toggle tap closed it, and
+# header.settings was gone.
 - tapOn:
     id: "header.settings"
 - extendedWaitUntil:
