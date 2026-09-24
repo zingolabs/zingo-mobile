@@ -85,6 +85,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
     translate,
     server,
     mode,
+    keyless,
     addLastSnackbar,
     setPrivacyOption,
     security,
@@ -176,6 +177,16 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
             resetOnFailure: stored.answered,
           }).catch(e => console.log('Self-heal save failed', e));
         }
+      } else if (keyless) {
+        // The one wallet whose kind rules the entry out: a keyless wallet has
+        // no UFVK of its own, so whatever is stored is the previous wallet's.
+        // The boot removal asks the device to drop it, but a device that
+        // refuses says so only in the log — `removeRecoveryWalletInfo` has no
+        // warning of its own — and this screen is the only seed/UFVK screen a
+        // keyless wallet can reach. Showing nothing is the right answer here.
+        console.log(
+          'keyless wallet: the stored entry belongs to another wallet',
+        );
       } else {
         setUfvkSource('keychain');
         info = await getRecoveryWalletInfo();
@@ -183,7 +194,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
       setFetchedWallet(info);
       setLoadingUfvk(false);
     })();
-  }, [authPassed]);
+  }, [authPassed, keyless]);
 
   const clipboardTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const bottomSheetRef = useRef<BottomSheetModal>(null);
