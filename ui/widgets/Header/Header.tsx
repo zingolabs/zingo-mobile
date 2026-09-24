@@ -68,6 +68,9 @@ type HeaderProps = {
   privacy?: boolean;
   // store the error if the App is in background
   setBackgroundError?: (title: string, error: string) => void;
+  // the first funds this wallet received, announced on the seed screen the
+  // App opens to remind its owner of the words behind them
+  receivedLegend?: boolean;
   // show messages icon next to settings
   showMessagesIcon?: boolean;
   // optional layout reporting (used by History for bottom-sheet snap points)
@@ -91,6 +94,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   setPrivacyOption,
   addLastSnackbar,
   screenName,
+  receivedLegend,
   setShieldingAmount,
   setScrollToTop,
   setScrollToBottom,
@@ -223,6 +227,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             calculateDisableButtonToShield={calculateDisableButtonToShield}
             onPressShieldFunds={onPressShieldFunds}
             onUsdRowLayout={onUsdRowLayout}
+            receivedLegend={receivedLegend}
           />
 
           {!noBalance && (

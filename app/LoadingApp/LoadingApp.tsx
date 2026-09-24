@@ -1610,6 +1610,13 @@ export class LoadingAppClass extends Component<
       };
       // storing the seed & birthday in KeyChain/KeyStore
       await createUpdateRecoveryWalletInfo(wallet);
+      // A wallet the App creates starts owing its owner a second look at the
+      // seed: it is shown once here, and again the first time funds arrive,
+      // when it stops being an abstraction and starts being money.
+      await SettingsFileImpl.writeSettings(
+        SettingsNameEnum.seedReminderPending,
+        true,
+      );
       // The seed of a new wallet is shown once, right here, before the App
       // opens on it.
       this.setState({
@@ -1749,6 +1756,13 @@ export class LoadingAppClass extends Component<
           result.value,
         );
         if (!resultJson.error) {
+          // Restoring means the owner already has the seed in hand — and the
+          // flag is one file for every wallet, so a reminder armed by a wallet
+          // left behind must not follow them here.
+          await SettingsFileImpl.writeSettings(
+            SettingsNameEnum.seedReminderPending,
+            false,
+          );
           // Load the wallet and navigate to the vts screen
           let readOnly: boolean = false;
           let keyless: boolean = false;

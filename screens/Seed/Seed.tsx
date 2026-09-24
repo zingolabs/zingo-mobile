@@ -45,11 +45,13 @@ import {
   ChainNameEnum,
   SnackbarDurationEnum,
   SeedActionEnum,
+  SettingsNameEnum,
   ScreenEnum,
   RouteEnum,
 } from '@app/AppState';
 import Header from '@ui/widgets/Header';
 import Utils from '@app/utils';
+import SettingsFileImpl from '@app/services/SettingsFileImpl';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import {
   createUpdateRecoveryWalletInfo,
@@ -70,11 +72,15 @@ type TextsType = {
 type SeedProps = NativeStackScreenProps<AppDrawerParamList, RouteEnum.Seed> & {
   onClickOK: (seedPhrase: string, birthdayNumber: number) => void;
   onClickCancel: () => void;
+  keepAwake?: (v: boolean) => void;
+  setSeedReminderShowing?: (v: boolean) => void;
 };
 const Seed: React.FunctionComponent<SeedProps> = ({
   route,
   onClickOK,
   onClickCancel,
+  keepAwake,
+  setSeedReminderShowing,
 }) => {
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const context = useContext(ContextAppLoaded);
@@ -153,6 +159,22 @@ const Seed: React.FunctionComponent<SeedProps> = ({
   const [containerH, setContainerH] = useState<number>(0);
   const [headerH, setHeaderH] = useState<number>(0);
   const seedSheetRef = useRef<BottomSheet>(null);
+  // True when the App opened this screen by itself, on the wallet's first
+  // funds. The screen then belongs to that errand: it keeps the phone awake
+  // while the words are copied, says so on its button, and spends the flag on
+  // the way out.
+  const [remindingSeed, setRemindingSeed] = useState<boolean>(false);
+
+  useEffect(() => {
+    (async () => {
+      const { seedReminderPending } = await SettingsFileImpl.readSettings();
+      setRemindingSeed(seedReminderPending);
+      if (seedReminderPending) {
+        // twenty four words take a while to write down by hand
+        keepAwake && keepAwake(true);
+      }
+    })();
+  }, [keepAwake]);
 
   useEffect(() => {
     // Wait for the on-mount biometric gate to pass before touching the
@@ -372,6 +394,30 @@ const Seed: React.FunctionComponent<SeedProps> = ({
   };
 
   const hiding = async () => {
+    setSeedReminderShowing && setSeedReminderShowing(false);
+    if (remindingSeed) {
+      // The errand is done, whether or not the user wrote anything down: the
+      // App asked, and asking twice for the same funds would be nagging.
+      await SettingsFileImpl.writeSettings(
+        SettingsNameEnum.seedReminderPending,
+        false,
+      );
+      setRemindingSeed(false);
+      keepAwake && keepAwake(false);
+      // The App brought the user here, so there is nothing behind this screen
+      // to go back to. `reset` also puts the authenticated seed screen out of
+      // reach of a back gesture.
+      navigation.reset({
+        index: 0,
+        routes: [
+          {
+            name: RouteEnum.HomeStack,
+            params: { screen: RouteEnum.History },
+          },
+        ],
+      });
+      return;
+    }
     if (navigation.canGoBack()) {
       navigation.goBack();
     }
@@ -446,7 +492,13 @@ const Seed: React.FunctionComponent<SeedProps> = ({
             // flow; without the seed phrase it has nothing to act on, so
             // disable it instead of silently ignoring presses.
             disabled={!seedPhrase}
-            title={!!texts && !!texts[action] ? texts[action][times] : ''}
+            title={
+              remindingSeed
+                ? (translate('seed.showtransactions') as string)
+                : !!texts && !!texts[action]
+                  ? texts[action][times]
+                  : ''
+            }
             onPress={async () => {
               if (!seedPhrase) {
                 return;
@@ -462,7 +514,16 @@ const Seed: React.FunctionComponent<SeedProps> = ({
       </BottomSheetFooter>
     ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [colors, texts, action, times, seedPhrase, birthdayNumber, translate],
+    [
+      colors,
+      texts,
+      action,
+      times,
+      seedPhrase,
+      birthdayNumber,
+      translate,
+      remindingSeed,
+    ],
   );
 
   if (!authPassed || !secured) {
@@ -490,6 +551,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
           translate={translate}
           netInfo={netInfo}
           privacy={privacy}
+          receivedLegend={action === SeedActionEnum.view && remindingSeed}
         />
       </View>
       <AppSheet

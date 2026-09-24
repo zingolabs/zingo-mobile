@@ -482,7 +482,9 @@
     "recovering-from-keychain": "Восстановление начальной фразы из защищённого хранилища...",
     "recovering-from-wallet": "Загрузка начальной фразы из кошелька...",
     "from-keychain": "из защищённого хранилища",
-    "from-wallet": "из кошелька"
+    "from-wallet": "из кошелька",
+    "showtransactions": "Показать транзакции",
+    "youreceived": "Получено"
   },
   "send": {
     "Broadcast": "Успешная отправка, Tx:",

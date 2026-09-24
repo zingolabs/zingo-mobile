@@ -10,6 +10,7 @@ export enum SettingsNameEnum {
 
   // internal management
   firstInstall = 'firstInstall',
+  seedReminderPending = 'seedReminderPending',
   version = 'version',
   ironwoodOnboardSeen = 'ironwoodOnboardSeen',
 }

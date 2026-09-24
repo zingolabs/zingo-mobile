@@ -17,6 +17,9 @@ export default class SettingsFileClass {
   // - string: means it have a normal value
   security: SecurityType;
   selectServer: SelectServerEnum;
+  // The wallet still owes its owner a look at the seed: armed when the App
+  // creates a wallet, spent the first time funds arrive.
+  seedReminderPending: boolean;
   performanceLevel: RPCPerformanceLevelEnum;
   blockExplorer: BlockExplorerEnum;
   ironwoodOnboardSeen: boolean;
@@ -29,6 +32,7 @@ export default class SettingsFileClass {
     version: string,
     security: SecurityType,
     selectServer: SelectServerEnum,
+    seedReminderPending: boolean,
     performanceLevel: RPCPerformanceLevelEnum,
     blockExplorer: BlockExplorerEnum,
     ironwoodOnboardSeen: boolean,
@@ -40,6 +44,7 @@ export default class SettingsFileClass {
     this.version = version;
     this.security = security;
     this.selectServer = selectServer;
+    this.seedReminderPending = seedReminderPending;
     this.performanceLevel = performanceLevel;
     this.blockExplorer = blockExplorer;
     this.ironwoodOnboardSeen = ironwoodOnboardSeen;

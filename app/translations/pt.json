@@ -482,7 +482,9 @@
     "recovering-from-keychain": "Recuperando a frase de recuperação do armazenamento seguro...",
     "recovering-from-wallet": "Carregando a frase de recuperação da carteira...",
     "from-keychain": "do armazenamento seguro",
-    "from-wallet": "da carteira"
+    "from-wallet": "da carteira",
+    "showtransactions": "Mostrar Transações",
+    "youreceived": "Você recebeu"
   },
   "send": {
     "Broadcast": "Transmitido e aguardando confirmação Tx:",

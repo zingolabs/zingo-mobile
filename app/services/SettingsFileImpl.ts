@@ -99,6 +99,12 @@ export default class SettingsFileImpl {
           }
         }
       }
+      if (!settings.hasOwnProperty(SettingsNameEnum.seedReminderPending)) {
+        // A wallet that predates the reminder has been around long enough for
+        // its owner to have met its seed; only a wallet this App creates from
+        // here on arms it.
+        settings.seedReminderPending = false;
+      }
       if (!settings.hasOwnProperty(SettingsNameEnum.version)) {
         // here we know the user is updating the App, for sure.
         // from some version before.
@@ -193,8 +199,9 @@ export default class SettingsFileImpl {
       // choice, now always USD, and the Nym switch: every transmission
       // travels the mixnet, so there is nothing left to choose, and the
       // switch for keeping the wallet's recovery info on the device, now
-      // always kept, and the mode the App no longer has, with the flag that
-      // drove its one-off seed screen.
+      // always kept, and the mode the App no longer has. Its seed flag is
+      // dropped too: `seedReminderPending` replaces it, and it is spelled the
+      // other way round, so an old value would arm every updated wallet.
       const obsolete = settings as unknown as Record<string, unknown>;
       delete obsolete.donation;
       delete obsolete.firstUpdateWithDonation;

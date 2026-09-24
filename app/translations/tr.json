@@ -482,7 +482,9 @@
     "recovering-from-keychain": "Güvenli depolamadan seed kurtarılıyor...",
     "recovering-from-wallet": "Cüzdandan seed yükleniyor...",
     "from-keychain": "güvenli depolamadan",
-    "from-wallet": "cüzdandan"
+    "from-wallet": "cüzdandan",
+    "showtransactions": "İşlemleri Göster",
+    "youreceived": "Aldınız"
   },
   "send": {
     "Broadcast": "Yayınlandı ve onay bekliyor: İşlem (Tx)",

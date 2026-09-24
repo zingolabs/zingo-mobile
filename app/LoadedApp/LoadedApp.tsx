@@ -731,6 +731,7 @@ export class LoadedAppClass extends Component<
           : AppState.currentState,
       newServer: {} as ServerType,
       newSelectServer: null,
+      seedReminderShowing: false,
       scrollToTop: false,
       scrollToBottom: false,
       addTagModalTarget: null,
@@ -1161,10 +1162,30 @@ export class LoadedAppClass extends Component<
     await this.rpc.reenableMixnet();
   };
 
+  setSeedReminderShowing = (value: boolean) => {
+    this.setState({ seedReminderShowing: value });
+  };
+
   setValueTransfersList = async (
     valueTransfers: ValueTransferType[],
     valueTransfersTotal: number,
   ) => {
+    // The wallet just met its first money. A seed the owner saw once, at
+    // creation, when it was an abstraction, is worth showing again now that it
+    // stands for something — and this is the moment they are looking at the
+    // App. The flag is spent by the seed screen itself, so this fires once.
+    const { seedReminderPending } = await SettingsFileImpl.readSettings();
+    if (seedReminderPending && valueTransfersTotal > 0) {
+      // Not while the App is in the background: the seed would be sitting
+      // there, opened by nobody, when the phone comes back.
+      const background = await AsyncStorage.getItem(GlobalConst.background);
+      if (background === GlobalConst.no && !this.state.seedReminderShowing) {
+        this.setSeedReminderShowing(true);
+        this.drawerNav?.navigate(RouteEnum.Seed, {
+          action: SeedActionEnum.view,
+        });
+      }
+    }
     if (
       !isEqual(this.state.valueTransfers, valueTransfers) ||
       this.state.valueTransfersTotal !== valueTransfersTotal
@@ -2287,6 +2308,10 @@ export class LoadedAppClass extends Component<
                               {...props}
                               onClickOK={() => {}}
                               onClickCancel={() => {}}
+                              keepAwake={this.keepAwake}
+                              setSeedReminderShowing={
+                                this.setSeedReminderShowing
+                              }
                             />
                           );
                         } else if (action === SeedActionEnum.change) {

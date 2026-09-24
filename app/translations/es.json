@@ -482,7 +482,9 @@
     "recovering-from-keychain": "Recuperando la semilla del almacenamiento seguro...",
     "recovering-from-wallet": "Cargando la semilla del monedero...",
     "from-keychain": "del almacenamiento seguro",
-    "from-wallet": "del monedero"
+    "from-wallet": "del monedero",
+    "showtransactions": "Ver Transacciones",
+    "youreceived": "Recibiste"
   },
   "send": {
     "Broadcast": "Transmitida y esperando confirmación Tx:",

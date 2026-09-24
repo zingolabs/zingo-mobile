@@ -482,7 +482,9 @@
     "recovering-from-keychain": "Recovering seed from secure storage...",
     "recovering-from-wallet": "Loading seed from wallet...",
     "from-keychain": "from secure storage",
-    "from-wallet": "from wallet"
+    "from-wallet": "from wallet",
+    "showtransactions": "Show Transactions",
+    "youreceived": "You received"
   },
   "send": {
     "Broadcast": "Broadcasted and awaiting confirmation Tx:",

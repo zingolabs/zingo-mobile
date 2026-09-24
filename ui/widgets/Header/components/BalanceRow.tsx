@@ -31,6 +31,7 @@ import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
 import CurrencyAmount from '@ui/widgets/CurrencyAmount';
 import FadeText from '@ui/primitives/FadeText';
 import PriceFetcher from '@ui/widgets/PriceFetcher';
+import RegText from '@ui/primitives/RegText';
 import ZecAmount from '@ui/widgets/ZecAmount';
 import PrivacyToggle from './PrivacyToggle';
 
@@ -71,6 +72,9 @@ type BalanceRowProps = {
   calculateDisableButtonToShield: () => boolean;
   onPressShieldFunds: () => void;
   onUsdRowLayout?: (height: number) => void;
+  // the first funds this wallet received, announced under the balance while
+  // the App is reminding its owner of the seed behind them
+  receivedLegend?: boolean;
 };
 
 const BalanceRow: React.FC<BalanceRowProps> = React.memo(
@@ -92,6 +96,7 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
     calculatePoolsToShield,
     calculateDisableButtonToShield,
     onPressShieldFunds,
+    receivedLegend,
     onUsdRowLayout,
   }) => {
     const navigation = useNavigation<NavigationProp<ParamListBase>>();
@@ -175,6 +180,38 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
               )}
           </View>
         )}
+
+        {receivedLegend &&
+          totalBalance &&
+          totalBalance.totalIronwoodBalance +
+            totalBalance.totalOrchardBalance +
+            totalBalance.totalSaplingBalance >
+            0 && (
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: 0,
+              }}
+            >
+              <RegText color={colors.fgAccent}>
+                {translate('seed.youreceived') as string}
+              </RegText>
+              <ZecAmount
+                currencyName={info.currencyName}
+                color={colors.fgAccent}
+                size={14}
+                amtZec={
+                  totalBalance.totalIronwoodBalance +
+                  totalBalance.totalOrchardBalance +
+                  totalBalance.totalSaplingBalance
+                }
+                privacy={privacy}
+              />
+              <RegText color={colors.fgAccent}>!!!</RegText>
+            </View>
+          )}
 
         {showFiat && (
           <Animated.View
