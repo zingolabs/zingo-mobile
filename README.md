@@ -125,7 +125,7 @@ Drives the Android app from Rust against a regtest network. Lives in
 ### End-to-End Tests (Maestro UI flows)
 [Maestro](https://maestro.mobile.dev/) drives the released app from the
 outside, asserting on the rendered UI. Flows live in `.maestro/` as YAML
-(`01_basic_new_wallet.yaml`, etc.). Runs nightly in CI via
+(`01_new_wallet.yaml`, etc.). Runs nightly in CI via
 `.github/workflows/maestro-nightly.yaml` against both Android and iOS;
 this is the e2e suite that PR reviewers and releases lean on going
 forward.
@@ -142,7 +142,7 @@ To run locally:
 3. From the repo root: <br />
    `maestro test .maestro/`
    Or run a single flow: <br />
-   `maestro test .maestro/01_basic_new_wallet.yaml`
+   `maestro test .maestro/01_new_wallet.yaml`
 
 The legacy Detox suite under `e2e/*.test.js` is no longer wired to CI or
 to any `yarn` script. It is being phased out in favour of Maestro and

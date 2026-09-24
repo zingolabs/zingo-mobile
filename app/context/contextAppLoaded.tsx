@@ -12,7 +12,6 @@ import {
   AddressBookFileClass,
   SecurityType,
   LanguageEnum,
-  ModeEnum,
   SelectServerEnum,
   ChainNameEnum,
   AppContextLoaded,
@@ -59,7 +58,6 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   orchardPool: true,
   saplingPool: true,
   transparentPool: true,
-  mode: ModeEnum.advanced,
   addLastSnackbar: () => {},
   restartApp: () => {},
   somePending: false,
@@ -79,7 +77,6 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   blockExplorer: BlockExplorerEnum.Zcashexplorer,
   mixnetView: null,
   reenableMixnet: async () => {},
-  setModeOption: async () => {},
   foregroundEpoch: 0,
 };
 

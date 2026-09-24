@@ -60,8 +60,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
 }) => {
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const context = useContext(ContextAppLoading);
-  const { translate, netInfo, server, mode, addLastSnackbar, selectServer } =
-    context;
+  const { translate, netInfo, server, addLastSnackbar, selectServer } = context;
   const { colors } = useTheme();
   const screenName = ScreenEnum.ImportUfvk;
 
@@ -245,7 +244,6 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
           noUfvkIcon={true}
           translate={translate}
           netInfo={netInfo}
-          mode={mode}
         />
       </View>
       <AppSheet

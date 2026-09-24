@@ -37,11 +37,8 @@ function makeDrawerProps(): StackScreenProps<
 describe('Component LoadingApp - test', () => {
   //snapshot test
   test('LoadingApp - snapshot', () => {
-    const toggleTheme = jest.fn();
     const props = makeDrawerProps();
-    const loadingapp = render(
-      <LoadingApp {...props} toggleTheme={toggleTheme} />,
-    );
+    const loadingapp = render(<LoadingApp {...props} />);
     expect(loadingapp.toJSON()).toMatchSnapshot();
   });
 });

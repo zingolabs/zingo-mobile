@@ -25,7 +25,7 @@ import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
 import AppSheet from '@ui/primitives/AppSheet';
 import { ContextAppLoading } from '@app/context';
 import WalletType from '@app/AppState/types/WalletType';
-import { ModeEnum, SnackbarDurationEnum, ScreenEnum } from '@app/AppState';
+import { SnackbarDurationEnum, ScreenEnum } from '@app/AppState';
 import Header from '@ui/widgets/Header';
 import Utils from '@app/utils';
 import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
@@ -50,14 +50,8 @@ const NewSeed: React.FunctionComponent<NewSeedProps> = ({
   onClickOK,
 }) => {
   const context = useContext(ContextAppLoading);
-  const {
-    translate,
-    netInfo,
-    privacy,
-    mode,
-    addLastSnackbar,
-    setPrivacyOption,
-  } = context;
+  const { translate, netInfo, privacy, addLastSnackbar, setPrivacyOption } =
+    context;
   const { colors } = useTheme();
   const screenName = ScreenEnum.Seed;
 
@@ -239,25 +233,16 @@ const NewSeed: React.FunctionComponent<NewSeedProps> = ({
           }}
         >
           <Button
-            type={
-              mode === ModeEnum.basic
-                ? ButtonTypeEnum.Secondary
-                : ButtonTypeEnum.Primary
-            }
-            title={
-              mode === ModeEnum.basic
-                ? (translate('cancel') as string)
-                : !!texts && !!texts.new
-                  ? texts.new[0]
-                  : ''
-            }
+            testID="newseed.button.ok"
+            type={ButtonTypeEnum.Primary}
+            title={!!texts && !!texts.new ? texts.new[0] : ''}
             onPress={() => onClickOKHide()}
           />
         </View>
       </BottomSheetFooter>
     ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [colors, mode, texts, translate],
+    [colors, texts],
   );
 
   if (!secured) {
@@ -284,7 +269,6 @@ const NewSeed: React.FunctionComponent<NewSeedProps> = ({
           addLastSnackbar={addLastSnackbar}
           translate={translate}
           netInfo={netInfo}
-          mode={mode}
           privacy={privacy}
         />
       </View>

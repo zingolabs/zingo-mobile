@@ -6,26 +6,6 @@ describe('New Wallet', () => {
   it('New wallet creation flow works.', async () => {
     //await sleep(5000);
 
-    // go to setting modal screen
-    await waitFor(element(by.id('header.drawmenu')))
-      .toBeVisible()
-      .withTimeout(sync_timeout);
-    await element(by.id('header.drawmenu')).tap();
-    await waitFor(element(by.id('menu.settings')))
-      .toBeVisible()
-      .withTimeout(sync_timeout);
-    await element(by.id('menu.settings')).tap();
-
-    // first we need to change the App to advanced mode
-    await waitFor(element(by.id('settings.mode-advanced')))
-      .toBeVisible()
-      .withTimeout(sync_timeout);
-    await element(by.id('settings.mode-advanced')).tap();
-    await waitFor(element(by.id('settings.button.save')))
-      .toBeVisible()
-      .withTimeout(sync_timeout);
-    await element(by.id('settings.button.save')).tap();
-
     // change to another wallet -> new wallet
     await waitFor(element(by.id('header.drawmenu')))
       .toBeVisible()
@@ -48,10 +28,10 @@ describe('New Wallet', () => {
       .toBeVisible()
       .withTimeout(sync_timeout);
     await element(by.id('loadingapp.createnewwallet')).tap();
-    await waitFor(element(by.id('seed.button.ok')))
+    await waitFor(element(by.id('newseed.button.ok')))
       .toBeVisible()
       .withTimeout(sync_timeout);
-    await element(by.id('seed.button.ok')).tap();
+    await element(by.id('newseed.button.ok')).tap();
 
     await waitFor(element(by.id('valuetransfer text')))
       .toBeVisible()

@@ -43,5 +43,4 @@ export const mockTheme = {
   ...DefaultTheme,
   dark: true,
   colors,
-  toggleTheme: () => {},
 };

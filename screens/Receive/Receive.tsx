@@ -30,7 +30,6 @@ import AppSheetModal from '@ui/primitives/AppSheetModal';
 import {
   AddressKindEnum,
   ChainNameEnum,
-  ModeEnum,
   SecurityType,
   UnifiedAddressClass,
   TransparentAddressClass,
@@ -79,7 +78,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
     translate,
     addresses,
     defaultUnifiedAddress,
-    mode,
     addLastSnackbar,
     setPrivacyOption,
   } = context;
@@ -256,8 +254,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
     }
   }, [addresses]);
 
-  const isAdvanced = mode !== ModeEnum.basic;
-  const canPickScope = isAdvanced && tAddr && tAddr.length > 0;
+  const canPickScope = tAddr && tAddr.length > 0;
 
   const scopeItems = useMemo(
     () => [
@@ -422,20 +419,16 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
             </BoldText>
           )}
         </View>
-        {isAdvanced ? (
-          <Pressable
-            onPress={() => show('NA')}
-            hitSlop={8}
-            style={{
-              paddingHorizontal: 14,
-              paddingVertical: 4,
-            }}
-          >
-            <FontAwesomeIcon icon={faPlus} size={18} color={colors.fgMuted} />
-          </Pressable>
-        ) : (
-          <View style={{ width: 46 }} />
-        )}
+        <Pressable
+          onPress={() => show('NA')}
+          hitSlop={8}
+          style={{
+            paddingHorizontal: 14,
+            paddingVertical: 4,
+          }}
+        >
+          <FontAwesomeIcon icon={faPlus} size={18} color={colors.fgMuted} />
+        </Pressable>
       </View>
     </View>
   );

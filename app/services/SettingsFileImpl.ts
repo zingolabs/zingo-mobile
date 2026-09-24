@@ -24,9 +24,9 @@ export default class SettingsFileImpl {
   // Writes run one at a time. Every write is a read-modify-write of the
   // same file, so two of them in flight both rebuild it from the contents
   // they read before either landed, and whichever finishes last drops the
-  // other one's key. On a first launch that is how `mode` could be lost to
-  // the `firstInstall` write that follows it, leaving the next launch with
-  // no mode to read and falling back to advanced.
+  // other one's key. On a first launch that is how a setting could be lost
+  // to the `firstInstall` write that follows it, leaving the next launch
+  // reading a file that never recorded it.
   private static writeQueue: Promise<void> = Promise.resolve();
 
   // Write the server setting
@@ -114,12 +114,6 @@ export default class SettingsFileImpl {
             } as ServerType;
           }
         }
-      }
-      if (!settings.hasOwnProperty(SettingsNameEnum.basicFirstViewSeed)) {
-        // by default we assume the user saw the seed,
-        // only if the user is basic and is creating a new wallet -> false.
-        // this means when the user have funds, the seed screen will show up.
-        settings.basicFirstViewSeed = true;
       }
       if (!settings.hasOwnProperty(SettingsNameEnum.version)) {
         // here we know the user is updating the App, for sure.
@@ -212,8 +206,9 @@ export default class SettingsFileImpl {
       // first time an older settings.json loads: the donation flags of the
       // old tip feature, the two switches that used to hide the MAX button
       // and the Rescan menu entry, both always there now, the currency
-      // choice, now always USD, and the Nym switch: every transmission
-      // travels the mixnet, so there is nothing left to choose.
+      // choice, now always USD, the Nym switch: every transmission travels
+      // the mixnet, so there is nothing left to choose, and the mode, along
+      // with the first-view-seed flag only the basic mode ever wrote.
       const obsolete = settings as unknown as Record<string, unknown>;
       delete obsolete.donation;
       delete obsolete.firstUpdateWithDonation;
@@ -221,6 +216,8 @@ export default class SettingsFileImpl {
       delete obsolete.rescanMenu;
       delete obsolete.currency;
       delete obsolete.nym;
+      delete obsolete.mode;
+      delete obsolete.basicFirstViewSeed;
       // old security options that have to be removed and to add the new one.
       if (settings.hasOwnProperty(SettingsNameEnum.security)) {
         const sec: SecurityType = settings.security;

@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
-import { ModeEnum, SelectServerEnum } from '@app/AppState';
+import { SelectServerEnum } from '@app/AppState';
 import BalanceRow from './BalanceRow';
 import {
   mockTranslate,
@@ -19,7 +19,6 @@ const meta: Meta<typeof BalanceRow> = {
   decorators: [withAppContext(), withNavigation],
   args: {
     noBalance: false,
-    mode: ModeEnum.advanced,
     noPrivacy: false,
     setPrivacyOption: async () => {},
     addLastSnackbar: () => {},

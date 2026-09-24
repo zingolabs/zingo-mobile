@@ -9,7 +9,6 @@ import {
   AddressBookFileClass,
   SendPageStateClass,
   ToAddrClass,
-  ModeEnum,
   SnackbarDurationEnum,
   RouteEnum,
   SelectServerEnum,
@@ -59,8 +58,6 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
     launchAddTagModal,
     privacy,
     readOnly,
-    mode,
-    totalBalance,
     selectServer,
     setSendPageState,
   } = context;
@@ -251,13 +248,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
           {withSendIcon &&
             !!contact &&
             !readOnly &&
-            selectServer !== SelectServerEnum.offline &&
-            !(
-              mode === ModeEnum.basic &&
-              totalBalance &&
-              // because the action is related with `send`.
-              totalBalance.totalSpendableBalance <= 0
-            ) && (
+            selectServer !== SelectServerEnum.offline && (
               <TouchableOpacity
                 style={{ marginLeft: 10 }}
                 onPress={() => {

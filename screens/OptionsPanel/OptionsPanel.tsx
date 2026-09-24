@@ -21,7 +21,6 @@ import { MessagesIcon as BoltIcon } from '@ui/primitives/Icons/BoltIcon';
 import XSocial from '../../assets/img/options/x.svg';
 import Github from '../../assets/img/options/github.svg';
 import Mail from '../../assets/img/options/mail.svg';
-import Refresh from '../../assets/img/options/refresh.svg';
 
 export type OptionsPanelAction = {
   /** Unique key for the action (typically a MenuItemEnum value). */
@@ -56,18 +55,10 @@ export type OptionsPanelProps = {
   /** Fired after a social URL (x/github) is placed on the clipboard, so
    *  the host can show a snackbar. Not fired for `mail` (no copy). */
   onLinkCopied?: (url: string) => void;
-  /**
-   * Mode pill at the bottom. Shows the wallet brand + the mode that will
-   * become active when tapped (so the user reads the destination, mirroring
-   * the legacy drawer's switch). `logoColor` tints the rounded background
-   * behind the logo image when present.
-   */
-  mode?: {
+  /** Brand pill at the bottom: the wallet's logo and name. */
+  brand?: {
     walletName: string;
-    targetModeLabel: string;
-    targetModeColor: string;
     logoSource: ImageSourcePropType;
-    onToggle: () => void;
   };
   /** Triggered by the triple-chevron close button at top-left. */
   onClose: () => void;
@@ -85,7 +76,7 @@ const OptionsPanel: React.FC<OptionsPanelProps> = ({
   actions,
   socials,
   onLinkCopied,
-  mode,
+  brand,
   onClose,
   onSettings,
 }) => {
@@ -223,7 +214,7 @@ const OptionsPanel: React.FC<OptionsPanelProps> = ({
         </View>
       </ScrollView>
 
-      {/* Footer: socials + mode pill */}
+      {/* Footer: socials + brand pill */}
       <View style={{ paddingHorizontal: 24, paddingBottom: 24 }}>
         {/* Caption: URL copied to clipboard. Rendered ABOVE the social row
             so the Android snackbar (anchored to the bottom of the screen)
@@ -269,11 +260,7 @@ const OptionsPanel: React.FC<OptionsPanelProps> = ({
           </View>
         )}
 
-        {mode && (
-          // Only the name + mode label + refresh icon are tappable; the
-          // logo image on the left is purely decorative. Wrapping the
-          // logo and the Pressable inside one bordered View keeps the
-          // visual pill intact.
+        {brand && (
           <View
             style={{
               borderWidth: 1,
@@ -285,7 +272,7 @@ const OptionsPanel: React.FC<OptionsPanelProps> = ({
             }}
           >
             <Image
-              source={mode.logoSource}
+              source={brand.logoSource}
               style={{
                 width: 32,
                 height: 32,
@@ -294,36 +281,16 @@ const OptionsPanel: React.FC<OptionsPanelProps> = ({
                 marginRight: 12,
               }}
             />
-            <Pressable
-              onPress={mode.onToggle}
-              style={({ pressed }) => ({
+            <Text
+              style={{
                 flex: 1,
-                flexDirection: 'row',
-                alignItems: 'center',
-                opacity: pressed ? 0.7 : 1,
-              })}
+                fontWeight: 'bold',
+                fontSize: 16,
+                color: colors.fgDefault,
+              }}
             >
-              <Text
-                style={{
-                  flex: 1,
-                  fontWeight: 'bold',
-                  fontSize: 16,
-                  color: colors.fgDefault,
-                }}
-              >
-                {mode.walletName + '   '}
-                <Text
-                  style={{
-                    color: mode.targetModeColor,
-                    fontWeight: 'bold',
-                    fontSize: 14,
-                  }}
-                >
-                  {mode.targetModeLabel}
-                </Text>
-              </Text>
-              <Refresh width={18} height={18} />
-            </Pressable>
+              {brand.walletName}
+            </Text>
           </View>
         )}
       </View>

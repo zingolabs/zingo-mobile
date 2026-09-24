@@ -9,7 +9,6 @@ import {
   ServerType,
   SecurityType,
   LanguageEnum,
-  ModeEnum,
   SelectServerEnum,
   BlockExplorerEnum,
 } from '@app/AppState';
@@ -37,7 +36,6 @@ export const defaultAppContextLoading: AppContextLoading = {
   orchardPool: true,
   saplingPool: true,
   transparentPool: true,
-  mode: ModeEnum.advanced,
   addLastSnackbar: () => {},
   security: {} as SecurityType,
   selectServer: SelectServerEnum.auto,

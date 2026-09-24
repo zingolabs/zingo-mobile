@@ -11,7 +11,7 @@ import {
   defaultAppContextLoaded,
   ContextAppLoadedProvider,
 } from '@app/context';
-import { ModeEnum, RouteEnum } from '@app/AppState';
+import { RouteEnum } from '@app/AppState';
 import { mockValueTransfers } from '../__mocks__/dataMocks/mockValueTransfers';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
@@ -51,11 +51,9 @@ describe('Component History - test', () => {
   // The price ring renders only for a Nym-consenting session.
   const onFunction = jest.fn();
 
-  test('History privacy normal & mode basic - snapshot', () => {
+  test('History privacy normal - snapshot', () => {
     // privacy normal
     state.privacy = false;
-    // mode basic
-    state.mode = ModeEnum.basic;
     const props = makeDrawerProps();
     const history = render(
       <ContextAppLoadedProvider value={state}>
@@ -72,11 +70,9 @@ describe('Component History - test', () => {
     expect(history.toJSON()).toMatchSnapshot();
   });
 
-  test('History privacy high & mode advanced - snapshot', () => {
+  test('History privacy high - snapshot', () => {
     // privacy normal
     state.privacy = true;
-    // mode basic
-    state.mode = ModeEnum.advanced;
     const props = makeDrawerProps();
     const history = render(
       <ContextAppLoadedProvider value={state}>
