@@ -78,10 +78,12 @@ jobs:
         run: ./gradlew assembleProdRelease -PsplitApk=true
 
       - name: Install Maestro CLI
-        # Pin to 2.5.1 — Maestro 2.6.0 (released the week between our last
-        # green nightly on May 26 and the first red on May 27) broke the
-        # iOS driver startup; pinning here on Android too so both jobs
-        # always run on the same known-good CLI release.
+        # Pinned so both jobs always run the same CLI release. The pin went
+        # in on the theory that Maestro 2.6.0 broke the iOS driver startup.
+        # The nights since have failed for reasons that have nothing to do
+        # with the CLI — a device-auth prompt nobody can answer, a missing
+        # xcodebuild destination, an aborted cache download — so that
+        # theory is unproven. Worth retrying a newer CLI once this is green.
         env:
           MAESTRO_VERSION: '2.5.1'
         run: |
@@ -145,7 +147,26 @@ jobs:
       # Restore the xcframework produced by .github/workflows/ios-build.yaml.
       # That reusable workflow saves both artefacts directly under `ios/` so the
       # xcodebuild step below can reference them without any copying.
+      #
+      # Restored twice on purpose: on 2026-09-23 the cache service confirmed
+      # this very key as a hit and then aborted the download 40s later, and
+      # fail-on-cache-miss turned that blip into a lost night. The first
+      # attempt is allowed to fail; only the second one is fatal.
       - name: Native iOS xcframework cache
+        id: ios-xcframework-cache
+        continue-on-error: true
+        uses: actions/cache/restore@v6
+        with:
+          path: |
+            ios/Zingolib.xcframework
+            ios/zingo.swift
+            ios/ZingoNymProxyFFI.xcframework
+            ios/zingo_nym_proxy_ffi.swift
+          key: native-ios-xcframework-${{ env.CACHE-KEY }}
+          fail-on-cache-miss: true
+
+      - name: Native iOS xcframework cache (retry)
+        if: steps.ios-xcframework-cache.outcome != 'success'
         uses: actions/cache/restore@v6
         with:
           path: |
@@ -176,37 +197,14 @@ jobs:
       - name: Inspect Hermes dSYM tree
         run: find ios/vendor/hermes-dsyms -maxdepth 6 2>/dev/null || echo "ios/vendor/hermes-dsyms not found"
 
-      # Build in Release configuration. Maestro exercises the running RN app on
-      # the simulator — Debug builds expect a Metro packager on localhost:8081
-      # to load the JS bundle at runtime, which CI does not run; Release
-      # embeds the bundle in the app. The Hermes dSYM swap that previously
-      # failed here is now satisfied: Podfile.lock is pinned to hermes-engine
-      # matching the react-native version in package.json, so pod install's
-      # post_install hook downloads the matching dSYMs.
-      - name: Build app
-        # OS=latest lets xcodebuild pick whatever iOS runtime is paired with
-        # the active Xcode — pinning OS=18.5 broke when macos-15 started
-        # shipping multiple runtimes (18.5/18.6/26.x) that aren't all
-        # registered as xcodebuild destinations.
-        working-directory: ios
-        run: |
-          set -euxo pipefail
-          mkdir -p build/DerivedData
-          xcodebuild build \
-            -workspace Zingo.xcworkspace \
-            -scheme Zingo \
-            -sdk iphonesimulator \
-            -configuration Release \
-            -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
-            -derivedDataPath "build/DerivedData" \
-            -quiet
-
+      # The simulator is booted before the build, not after it, so the build
+      # and the run target the same device: `xcodebuild -destination` then
+      # names that UDID instead of matching on a name, which is what used to
+      # go wrong. This also warms CoreSimulator, which had twice (2026-09-08,
+      # 2026-09-17) not enumerated any device by the time xcodebuild asked,
+      # leaving it with a destination list holding nothing but placeholders
+      # and exiting 70.
       - name: Debug — Xcode + simulator inventory
-        # Started failing on May 27, 2026 with the same IOSDriverTimeout
-        # across Maestro 2.5.1 and 2.6.0 — strongly points to a GitHub
-        # macos-15 runner image change (Xcode/simulator catalog) that
-        # leaves us booting something other than what we built for. Dump
-        # the actual state so we can see what changed.
         run: |
           echo "--- Xcode version ---"
           xcodebuild -version
@@ -221,10 +219,9 @@ jobs:
         run: |
           # macos-15 now ships 5 iPhone 16 devices (one per iOS runtime:
           # 18.5, 18.6, 26.0, 26.1, 26.2). `simctl boot "iPhone 16"`
-          # selects the highest-iOS match (iOS 26.2), which mismatches the
-          # iOS 18.5 build target above. Pick the iPhone 16 from iOS 18.5
-          # explicitly by UDID. Also shutdown anything else booted on the
-          # runner first so Maestro can't accidentally pick a stale device.
+          # selects the highest-iOS match (iOS 26.2). Pick the iPhone 16
+          # from iOS 18.5 explicitly by UDID, and shut down anything else
+          # booted on the runner first so Maestro can't pick a stale device.
           xcrun simctl shutdown all || true
           UDID=$(xcrun simctl list devices "iPhone 16" --json | \
             jq -r '.devices["com.apple.CoreSimulator.SimRuntime.iOS-18-5"][] | select(.name=="iPhone 16") | .udid')
@@ -239,8 +236,31 @@ jobs:
           echo "--- Booted devices after our boot ---"
           xcrun simctl list devices booted
 
+      # Build in Release configuration. Maestro exercises the running RN app on
+      # the simulator — Debug builds expect a Metro packager on localhost:8081
+      # to load the JS bundle at runtime, which CI does not run; Release
+      # embeds the bundle in the app. The Hermes dSYM swap that previously
+      # failed here is now satisfied: Podfile.lock is pinned to hermes-engine
+      # matching the react-native version in package.json, so pod install's
+      # post_install hook downloads the matching dSYMs.
+      - name: Build app
+        # Built against the UDID booted above, so the app can never be built
+        # for one runtime and installed on another.
+        working-directory: ios
+        run: |
+          set -euxo pipefail
+          mkdir -p build/DerivedData
+          xcodebuild build \
+            -workspace Zingo.xcworkspace \
+            -scheme Zingo \
+            -sdk iphonesimulator \
+            -configuration Release \
+            -destination "id=$SIM_UDID" \
+            -derivedDataPath "build/DerivedData" \
+            -quiet
+
       - name: Install Maestro CLI
-        # Pinned — see comment in maestro-android job. 2.6.0 broke iOS.
+        # Pinned — see comment in maestro-android job.
         env:
           MAESTRO_VERSION: '2.5.1'
         run: |
