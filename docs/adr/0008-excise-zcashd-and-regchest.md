@@ -1,3 +1,7 @@
+---
+status: accepted
+---
+
 # Excise zcashd by removing the regchest test backend
 
 zcashd is dead, and the only functional zcashd path left in this repository was
@@ -9,7 +13,7 @@ the `regchest` features on the `rustandroid` and `rustios` crates, the gated
 arms in the test suites, and the workflow and README references. Every test
 now provisions its network exclusively through the default arm:
 `zingolib_testutils` scenarios driving `zcash_local_net` to launch a native
-zebrad validator and lightwalletd indexer, which is what gating CI already ran.
+zebrad validator and zainod indexer, which is what gating CI already ran.
 
 ## Considered options
 

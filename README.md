@@ -48,12 +48,9 @@ flavor architecture: see [docs/release_quickstart.md](./docs/release_quickstart.
 ### Prerequisites
 Integration tests and end-to-end tests require a regtest network. The test harness
 (`zingolib_testutils` scenarios, built on `zcash_local_net`) launches native `zebrad`
-(validator) and `lightwalletd` (indexer) processes for each test, so both binaries must
-be installed and discoverable via `$PATH`, or placed in the directory named by the
-`TEST_BINARIES_DIR` environment variable. This works on both Linux and macOS hosts.
-
-Additionally, from the `rust/android/lightwalletd_bin` directory run: <br />
-`ln -s path/to/lightwalletd/binary ./`
+(validator) and `zainod` (indexer) processes for each test. Put both binaries on `$PATH`,
+or in the directory named by the `TEST_BINARIES_DIR` environment variable. CI runs these
+tests on Linux. On macOS, zebrad is a Zebra Tier 3 platform, and you must build it yourself.
 
 ### Yarn Tests
 1. From the root directory, run: <br />
@@ -103,7 +100,7 @@ regtest network. Therefore, only tests in the "Offline Testsuite" may be tested.
 Drives the Android app from Rust against a regtest network. Lives in
 `rust/android/tests/e2e_tests.rs`. Currently Android-only.
 
-0. Note there needs to be a lightwalletd in rust/android/lightwalletd_bin
+0. Install `zebrad` and `zainod` as described in [Prerequisites](#prerequisites).
 1. Launch the emulated AVD by clicking the 'play' icon in Android Studio's `Device Manager`.
    Alternatively, connect to a physical device. See previous section 'Launching the app' for more
    details.
