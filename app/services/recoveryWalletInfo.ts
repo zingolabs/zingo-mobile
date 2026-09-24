@@ -89,8 +89,9 @@ export const saveRecoveryWalletInfo = async (
     // Nothing to store, and nothing to conclude from it. `fetchWallet` answers
     // with an empty object when the RPC resolves with an error body, so a
     // wallet with no keys and a wallet that failed to answer look the same
-    // here. Only the wallet-kind branch in LoadingApp tells them apart, and it
-    // drops the previous entry itself through `removeRecoveryWalletInfo`.
+    // here, and neither is a reason to touch what is stored. The entry is only
+    // ever replaced, never deleted: a wallet with keys of its own overwrites
+    // it, and the screens refuse to show one that is not theirs.
     console.log('no seed or ufvk to store');
     return;
   }
@@ -191,37 +192,37 @@ export const hasRecoveryWalletInfo = async (): Promise<boolean> => {
 export const recoveryWalletInfoIsFailing = async (
   expectStored: boolean = true,
 ): Promise<boolean> => {
+  // Probe first either way: it is what refreshes the read half.
   const stored = await hasRecoveryWalletInfo();
-  return lastSaveFailed || lastReadFailed || (expectStored && !stored);
+  if (!expectStored) {
+    // Nothing of this wallet's belongs in the keychain, so a missing entry is
+    // correct and a failed save says nothing about it — `lastSaveFailed` is
+    // module state and a wallet switch does not reload the JS context, so the
+    // flag it carries was set for the wallet used before this one. Only a
+    // device that will not answer at all is still worth reporting.
+    return lastReadFailed;
+  }
+  return lastSaveFailed || lastReadFailed || !stored;
 };
 
+// The write every caller wants: it looks before it leaps.
+//
+// An entry that already holds these keys is left alone, which is what most
+// calls find — the boot paths used to write blind on every open, and since a
+// refused write resets the entry before retrying, a transient refusal was
+// enough to destroy a good backup the App was not even replacing.
+//
+// When a write is needed, the retry may only delete what the device was
+// willing to show: if it answered the read, what is in there is another
+// wallet's or unreadable and replacing it loses nothing; if it stayed silent,
+// nothing is known about the entry, so it stands.
 export const createUpdateRecoveryWalletInfo = async (
   keys: WalletType,
 ): Promise<void> => {
-  await saveRecoveryWalletInfo(keys);
-};
-
-export const removeRecoveryWalletInfo = async (): Promise<void> => {
-  if (!(await hasRecoveryWalletInfo())) {
-    console.log('no keys to remove');
+  const stored = await readRecoveryWalletInfo();
+  if (stored.keys.seed === keys.seed && stored.keys.ufvk === keys.ufvk) {
+    console.log('the device already holds these keys, nothing to write');
     return;
   }
-  // A removal that does not go through leaves another wallet's keys on the
-  // device, so it is retried once with the bare options, the same shape the
-  // save path resets with. It never throws at the caller: the next boot of
-  // this wallet asks for the removal again.
-  try {
-    if (await Keychain.resetGenericPassword(baseOptions)) {
-      console.log('keys removed');
-      return;
-    }
-    console.log('the device refused to remove the keys, retrying');
-    if (await Keychain.resetGenericPassword({ service })) {
-      console.log('keys removed on retry');
-      return;
-    }
-    console.log('error removing keys');
-  } catch (error) {
-    console.log('Error removing keys:', error);
-  }
+  await saveRecoveryWalletInfo(keys, { resetOnFailure: stored.answered });
 };

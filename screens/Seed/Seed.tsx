@@ -52,9 +52,8 @@ import Header from '@ui/widgets/Header';
 import Utils from '@app/utils';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import {
+  createUpdateRecoveryWalletInfo,
   getRecoveryWalletInfo,
-  readRecoveryWalletInfo,
-  saveRecoveryWalletInfo,
 } from '@app/services/recoveryWalletInfo';
 import WalletType from '@app/AppState/types/WalletType';
 import { fetchWallet } from '@app/walletBackend';
@@ -181,23 +180,14 @@ const Seed: React.FunctionComponent<SeedProps> = ({
         setSeedSource('wallet');
         const walletInfo = await fetchWallet(false);
         if (walletInfo?.seed) {
-          // Keep the device's copy in step with the wallet, but look before
-          // writing: most visits find an entry that already holds these very
-          // words, and then there is nothing to do. Writing is only worth its
-          // risk when what is stored is not this wallet's.
-          //
-          // The reset before a retry is allowed only when the device answered
-          // the read: then whatever is in there is another wallet's, or
-          // something nothing can read, and replacing it loses nothing. When
-          // the device did not answer we know nothing about the entry, so it
-          // stands — a transient refusal must not cost a good backup.
+          // Keep the device's copy in step with the wallet. The write looks
+          // before it leaps on its own — an entry that already holds these
+          // words is left alone, and a retry only resets what the device was
+          // willing to show — so there is nothing to decide here.
           // Fire-and-forget so a save failure doesn't block the render.
-          const stored = await readRecoveryWalletInfo();
-          if (stored.keys.seed !== walletInfo.seed) {
-            saveRecoveryWalletInfo(walletInfo, {
-              resetOnFailure: stored.answered,
-            }).catch(e => console.log('Self-heal save failed', e));
-          }
+          createUpdateRecoveryWalletInfo(walletInfo).catch(e =>
+            console.log('Self-heal save failed', e),
+          );
           // This wallet's UFVK belongs beside its own seed, and only there.
           // When the words come from the device's copy below, they may be the
           // ones saved for the wallet used before this one, and attaching the
