@@ -132,13 +132,12 @@ Navigation furniture — tab bar, side menu (`bgChrome`).
 
 **Muted**:
 The de-emphasized neutral for secondary text, subtle borders, and quiet
-fills. Mode-dependent.
+fills.
 _Avoid_: grey, placeholder, zingo (dead legacy names)
 
 **Accent**:
-The brand color a mode selects — green in advanced, steel blue in basic.
-One value across its three surface tokens today; the split exists so text
-and fill can diverge later.
+The brand color — green. One value across its three surface tokens today;
+the split exists so text and fill can diverge later.
 _Avoid_: primary, brand color
 
 **Emphasis**:
@@ -152,16 +151,11 @@ A token named after a component instead of a role. Exactly one exists,
 `bottomSheetBorder`; a second one needs a reason the map's role set cannot
 express.
 
-**Mode**:
-`advanced` or `basic`. One theme exists; the mode selects the accent and
-the muted neutral, and gates feature visibility.
-_Avoid_: theme (for a mode), dark/light (no light mode exists)
-
 **Overlay**:
-The mode-dependent slice of the palette (the accent and accent-disabled
-families, `bgSecondaryDisabled`, and the muted trio). Everything else is
-the shared **base**. "Edit the overlay" means a per-mode change; "edit the
-base" changes both modes at once.
+The slice of the palette layered over the shared **base** (the accent and
+accent-disabled families, `bgSecondaryDisabled`, and the muted trio). It
+is where a second theme would diverge; the base is what every theme would
+share. One palette exists today, `themeTokens`.
 
 **Legacy name**:
 The pre-migration vocabulary: `primary`, `secondary`, `text`, `money`,
