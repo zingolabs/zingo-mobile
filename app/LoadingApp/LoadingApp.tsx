@@ -527,7 +527,8 @@ export class LoadingAppClass extends Component<
       await this.selectServerOnBoot(!!netInfoState.isConnected);
     }
 
-    // Second, check if a wallet exists. Do it async so the basic screen has time to render
+    // Second, check if a wallet exists. Do it async so the launching screen
+    // has time to render
     await AsyncStorage.setItem(GlobalConst.background, GlobalConst.no);
     const exists = await rpcWalletExists();
     const backupExists = await walletBackupExists();
