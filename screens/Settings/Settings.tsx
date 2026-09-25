@@ -583,6 +583,12 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   // them for the whole life of the server BS — no refresh on chain switch or
   // picker open. Each list falls back to the static `serverUris` entries (that
   // chain only, obsolete excluded) if its live request fails.
+  //
+  // An Offline session never asks. The registry is a clearnet request to a
+  // third party (hosh), outside the mixnet, so opening this screen would have
+  // told it the user's IP and that they run this wallet — the one thing
+  // Offline exists to prevent. The static list is the same fallback an
+  // unreachable registry already gets.
   useEffect(() => {
     const toItems = (list: ServerUrisType[]) =>
       list.map((item: ServerUrisType) => ({
@@ -595,6 +601,11 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
           (s: ServerUrisType) => !s.obsolete && s.chainName === chain,
         ),
       );
+    if (selectServerContext === SelectServerEnum.offline) {
+      setMainServerList(staticFor(ChainNameEnum.mainChainName));
+      setTestServerList(staticFor(ChainNameEnum.testChainName));
+      return;
+    }
     (async () => {
       const [mainLive, testLive] = await Promise.all([
         fetchServerList(ChainNameEnum.mainChainName),
