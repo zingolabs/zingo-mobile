@@ -17,13 +17,15 @@ import { SyncCoordinator } from '@app/walletBackend/modules/SyncCoordinator';
 import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
 import type { WalletBackendConfig } from '@app/walletBackend/config/WalletBackendConfig';
 import type { DataService } from '@app/walletBackend/modules/DataService';
+import type { ServerType } from '@app/AppState';
+import {
+  mockOfflineServer as OFFLINE,
+  mockServer as ONLINE,
+} from '../__mocks__/dataMocks/mockServer';
 
 const mockedBridge = RPCModule as unknown as Record<string, jest.Mock>;
 
-const OFFLINE = { uri: '', chainName: 'none' };
-const ONLINE = { uri: 'https://zec.rocks:443', chainName: 'main' };
-
-function coordinatorFor(server: typeof OFFLINE) {
+function coordinatorFor(server: ServerType) {
   const onError = jest.fn();
   const onPersistentSyncFailure = jest.fn();
   const config = {

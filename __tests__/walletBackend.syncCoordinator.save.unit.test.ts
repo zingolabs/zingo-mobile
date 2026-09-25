@@ -20,6 +20,7 @@ import { SyncCoordinator } from '@app/walletBackend/modules/SyncCoordinator';
 import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
 import type { WalletBackendConfig } from '@app/walletBackend/config/WalletBackendConfig';
 import type { DataService } from '@app/walletBackend/modules/DataService';
+import { mockServer } from '../__mocks__/dataMocks/mockServer';
 
 const mockedDoSave = RPCModule.doSave as jest.Mock;
 const mockedSetConfigWalletToProd =
@@ -37,7 +38,7 @@ function coordinatorWith(dataService: Partial<DataService>): SyncCoordinator {
     performanceLevel: RPCPerformanceLevelEnum.High,
     // A connected session: the save path under test is not the offline
     // path, and the coordinator reads this URI to tell them apart.
-    server: { uri: 'https://zec.rocks:443', chainName: 'main' },
+    server: mockServer,
   } as unknown as WalletBackendConfig;
   const coordinator = new SyncCoordinator(config, dataService as DataService);
   jest.spyOn(coordinator, 'fetchSyncPoll').mockResolvedValue(undefined);

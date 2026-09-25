@@ -27,17 +27,19 @@ export function isCurrentPublication(seq: number, latest: number): boolean {
   return seq === latest;
 }
 
-const STARTING_REPORT: MixnetStatusReport = {
-  kind: 'status',
-  indicator: RPCMixnetIndicatorEnum.bootstrapping,
-  socks5Addr: null,
-};
+// A status report for an indicator that carries no SOCKS5 address.
+function statusReport(indicator: RPCMixnetIndicatorEnum): MixnetStatusReport {
+  return { kind: 'status', indicator, socks5Addr: null };
+}
 
-const OFF_REPORT: MixnetStatusReport = {
-  kind: 'status',
-  indicator: RPCMixnetIndicatorEnum.off,
-  socks5Addr: null,
-};
+// The failure report for a rejected transport act.
+function failureReport(thrown: unknown): MixnetStatusReport {
+  return { kind: 'failure', failure: describeRejection(thrown) };
+}
+
+const STARTING_REPORT = statusReport(RPCMixnetIndicatorEnum.bootstrapping);
+
+const OFF_REPORT = statusReport(RPCMixnetIndicatorEnum.off);
 
 export const BOOTSTRAP_POLL_MILLIS = 2_000;
 
@@ -101,9 +103,7 @@ export class MixnetCoordinator {
   // Starts the transport, attaches the wallet, and polls; a failure publishes the typed failure view.
   async ensureForConnectedSession(): Promise<void> {
     const epoch = ++this.enableEpoch;
-    this.clearPolling();
-    this.clearReconnectTimer();
-    this.clearBootstrapDeadline();
+    this.clearTimers();
     this.publishStarting();
     try {
       const { socks5Addr, exitNode } = await this.startTransport();
@@ -119,7 +119,7 @@ export class MixnetCoordinator {
       if (this.enableEpoch !== epoch) {
         return;
       }
-      this.publish({ kind: 'failure', failure: describeRejection(thrown) });
+      this.publish(failureReport(thrown));
     }
     this.schedulePolling();
   }
@@ -140,10 +140,9 @@ export class MixnetCoordinator {
   // it caused itself.
   async goOffline(): Promise<void> {
     const epoch = ++this.enableEpoch;
-    this.clearPolling();
-    this.clearReconnect();
+    this.clearTimers();
+    this.resetReconnectBackoff();
     this.reconnectActive = false;
-    this.clearBootstrapDeadline();
     this.redrawsSpent = 0;
     const disabled = await disableMixnet();
     try {
@@ -154,7 +153,7 @@ export class MixnetCoordinator {
       }
       // A tunnel we failed to stop is the one thing that must not read as
       // off: it may still be carrying traffic, so it reports as trouble.
-      this.publish({ kind: 'failure', failure: describeRejection(thrown) });
+      this.publish(failureReport(thrown));
       return;
     }
     if (this.enableEpoch !== epoch) {
@@ -168,8 +167,14 @@ export class MixnetCoordinator {
   stop(): void {
     this.stopped = true;
     this.enableEpoch += 1;
+    this.clearTimers();
+    this.resetReconnectBackoff();
+  }
+
+  // Cancels the poll, the reconnect, and the bootstrap deadline.
+  private clearTimers(): void {
     this.clearPolling();
-    this.clearReconnect();
+    this.clearReconnectTimer();
     this.clearBootstrapDeadline();
   }
 
@@ -233,11 +238,6 @@ export class MixnetCoordinator {
       this.reconnectTimerID = undefined;
       this.attemptReconnect();
     }, this.reconnectDelayMillis);
-  }
-
-  private clearReconnect(): void {
-    this.clearReconnectTimer();
-    this.resetReconnectBackoff();
   }
 
   private clearReconnectTimer(): void {

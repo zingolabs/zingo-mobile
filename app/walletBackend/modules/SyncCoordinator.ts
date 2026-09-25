@@ -18,7 +18,10 @@ import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
 import { RPCSyncPollType } from '@app/walletBackend/types/RPCSyncPollType';
 import { scanInProgress } from '@app/walletBackend/utils/syncProgress';
 import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
-import { WalletBackendConfig } from '@app/walletBackend/config/WalletBackendConfig';
+import {
+  WalletBackendConfig,
+  isOffline,
+} from '@app/walletBackend/config/WalletBackendConfig';
 import { DataService } from './DataService';
 import { doSave } from '@app/walletBackend/utils/walletUtils';
 
@@ -46,14 +49,6 @@ export class SyncCoordinator {
   constructor(config: WalletBackendConfig, dataService: DataService) {
     this.config = config;
     this.dataService = dataService;
-  }
-
-  // Offline is the empty server URI — the invariant the settings file
-  // normalizes ("server empty -> offline") and the one WalletBackend reads
-  // for the transport. A session with no indexer has no sync to launch and
-  // no poll to answer it.
-  private offline(): boolean {
-    return this.config.server.uri === '';
   }
 
   async configure(): Promise<void> {
@@ -209,7 +204,7 @@ export class SyncCoordinator {
     // turned that refusal into a standing error — 120 of them in ten minutes
     // of field logs (2026-09-24) — plus a persistent-failure signal for a
     // server the user deliberately did not pick.
-    if (this.offline()) {
+    if (isOffline(this.config)) {
       return;
     }
     if (this.refreshSyncLock && !fullRescan) {
@@ -351,7 +346,7 @@ export class SyncCoordinator {
   async fetchSyncPoll(): Promise<void> {
     // Nothing to poll: an Offline session never launched a sync, and the
     // poll's own answer is what asks for one.
-    if (this.offline()) {
+    if (isOffline(this.config)) {
       return;
     }
     if (this.fetchSyncPollLock) {

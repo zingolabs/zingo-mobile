@@ -284,9 +284,11 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
           }}
         >
           <FadeText>
-            {restingOff
-              ? (translate('mixnetdoctor.offline') as string)
-              : (translate('mixnetdoctor.intro') as string)}
+            {
+              translate(
+                restingOff ? 'mixnetdoctor.offline' : 'mixnetdoctor.intro',
+              ) as string
+            }
           </FadeText>
 
           {!restingOff && (running || run !== null) && (
