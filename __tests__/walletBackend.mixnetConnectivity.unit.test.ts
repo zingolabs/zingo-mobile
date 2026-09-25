@@ -9,7 +9,11 @@
  * `Communications::Online`: "Offline sessions never transmit and skip the
  * driver entirely."
  */
-import { ChainNameEnum, ServerType } from '@app/AppState';
+import { ServerType } from '@app/AppState';
+import {
+  mockOfflineServer as OFFLINE,
+  mockServer as ONLINE,
+} from '../__mocks__/dataMocks/mockServer';
 import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
 import { MixnetView } from '@app/walletBackend/transforms/mixnetView';
 import { WalletBackendConfig } from '@app/walletBackend/config/WalletBackendConfig';
@@ -31,16 +35,6 @@ jest.mock('@app/walletBackend/modules/SyncCoordinator', () => ({
 import RPCModule from '@app/RPCModule';
 
 const mockedBridge = RPCModule as unknown as Record<string, jest.Mock>;
-
-const OFFLINE: ServerType = {
-  uri: '',
-  chainName: ChainNameEnum.noneChainName,
-};
-
-const ONLINE: ServerType = {
-  uri: 'https://zec.rocks:443',
-  chainName: ChainNameEnum.mainChainName,
-};
 
 type Harness = {
   backend: WalletBackend;

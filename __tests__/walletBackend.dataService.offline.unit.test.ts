@@ -18,13 +18,15 @@ import RPCModule from '@app/RPCModule';
 import { DataService } from '@app/walletBackend/modules/DataService';
 import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
 import type { WalletBackendConfig } from '@app/walletBackend/config/WalletBackendConfig';
+import type { ServerType } from '@app/AppState';
+import {
+  mockOfflineServer as OFFLINE,
+  mockServer as ONLINE,
+} from '../__mocks__/dataMocks/mockServer';
 
 const mockedBridge = RPCModule as unknown as Record<string, jest.Mock>;
 
-const OFFLINE = { uri: '', chainName: 'none' };
-const ONLINE = { uri: 'https://zec.rocks:443', chainName: 'main' };
-
-function serviceFor(server: typeof OFFLINE) {
+function serviceFor(server: ServerType) {
   const onValueTransfersChanged = jest.fn();
   const onInfoChanged = jest.fn();
   const onError = jest.fn();

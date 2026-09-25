@@ -1,5 +1,5 @@
 import { SendJsonToTypeType, ServerType } from '@app/AppState';
-import { WalletBackendConfig } from './config/WalletBackendConfig';
+import { WalletBackendConfig, isOffline } from './config/WalletBackendConfig';
 import { RPCPerformanceLevelEnum } from './enums/RPCPerformanceLevelEnum';
 import { DataService } from './modules/DataService';
 import { MixnetCoordinator } from './modules/MixnetCoordinator';
@@ -52,11 +52,8 @@ export default class WalletBackend {
     return this.syncCoordinator.configure();
   }
 
-  // Offline is the empty server URI — the invariant the settings file already
-  // normalizes ("server empty -> offline") — so connectivity is read off the
-  // shared config rather than restated by every caller.
   private async followConnectivity(): Promise<void> {
-    if (this.config.server.uri !== '') {
+    if (!isOffline(this.config)) {
       if (!this.mixnetOnline) {
         this.mixnetOnline = true;
         // The bootstrap is not awaited because it takes tens of seconds.
@@ -98,7 +95,7 @@ export default class WalletBackend {
   }
 
   async reenableMixnet() {
-    if (this.config.server.uri === '') {
+    if (isOffline(this.config)) {
       // An Offline session has no transport to re-enable, and a re-enable
       // must never dial behind the mode's back: it settles back at off.
       return this.mixnetCoordinator.goOffline();

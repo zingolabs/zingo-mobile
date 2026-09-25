@@ -35,9 +35,21 @@ import { RPCWalletSaveRequiredType } from '@app/walletBackend/types/RPCWalletSav
 import { RPCConfigWalletPerformanceType } from '@app/walletBackend/types/RPCConfigWalletPerformanceType';
 import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
 import { RPCWalletVersionType } from '@app/walletBackend/types/RPCWalletVersionType';
-import { WalletBackendConfig } from '@app/walletBackend/config/WalletBackendConfig';
+import {
+  WalletBackendConfig,
+  isOffline,
+} from '@app/walletBackend/config/WalletBackendConfig';
 import { transformValueTransfer } from '@app/walletBackend/transforms/valueTransferTransform';
 import { fetchWallet } from '@app/walletBackend/utils/walletUtils';
+
+// The info a session publishes when no server answered.
+function emptyInfo(): InfoType {
+  return {
+    latestBlock: 0,
+    serverUri: '',
+    version: '',
+  } as InfoType;
+}
 
 export class DataService {
   config: WalletBackendConfig;
@@ -68,14 +80,6 @@ export class DataService {
 
   constructor(config: WalletBackendConfig) {
     this.config = config;
-  }
-
-  // Offline is the empty server URI — the invariant WalletBackend reads for
-  // the transport and the SyncCoordinator for the sync. A session with no
-  // server has nobody to ask for a height, and asking rejects before any
-  // dial, which is the trap below.
-  private offline(): boolean {
-    return this.config.server.uri === '';
   }
 
   async fetchTotalBalance() {
@@ -261,12 +265,8 @@ export class DataService {
       // already publishes; rejecting instead would reach the catch, and the
       // catch calls onSyncError, which reconfigures — a loop with nothing at
       // the end of it.
-      if (this.offline()) {
-        this.config.onInfoChanged({
-          latestBlock: 0,
-          serverUri: '',
-          version: '',
-        } as InfoType);
+      if (isOffline(this.config)) {
+        this.config.onInfoChanged(emptyInfo());
         this.lastServerBlockHeight = 0;
         return;
       }
@@ -288,11 +288,7 @@ export class DataService {
       }
 
       if (infoError) {
-        this.config.onInfoChanged({
-          latestBlock: 0,
-          serverUri: '',
-          version: '',
-        } as InfoType);
+        this.config.onInfoChanged(emptyInfo());
         this.lastServerBlockHeight = 0;
         return;
       }
@@ -421,7 +417,7 @@ export class DataService {
       // waits for that first publication — so an Offline wallet span forever
       // under an empty list. Zero is the right height for a session with no
       // server, and the transform already falls back to the wallet's own.
-      if (this.offline()) {
+      if (isOffline(this.config)) {
         this.lastServerBlockHeight = 0;
       } else {
         const start = Date.now();
