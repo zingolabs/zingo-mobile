@@ -425,7 +425,7 @@ class ExecuteSendFromOrchard {
         println("\nPropose:")
         println(proposeJson)
 
-        // The transmission rides the mixnet or does not happen (ADR 0011).
+        // The transmission rides the mixnet or does not happen (zingolib/0011).
         // This wallet never attached one, so the confirm must refuse. A txid
         // here would mean the transaction reached an indexer over clearnet,
         // which is the leak the mixnet-only rule exists to prevent.
@@ -523,7 +523,7 @@ class UpdateCurrentPriceAndValueTransfersFromSeed {
         val info: Info = mapper.readValue(infoJson)
         assertThat(info.latest_block_height).isGreaterThan(0)
 
-        // Price rides the mixnet or does not happen (ADR 0011). This wallet
+        // Price rides the mixnet or does not happen (zingolib/0011). This wallet
         // never attached one, so the fetch must refuse. A price here would
         // mean the wallet reached an oracle over clearnet, which is the
         // leak the mixnet-only rule exists to prevent.

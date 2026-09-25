@@ -448,7 +448,7 @@ export default class Utils {
    * Renders an ErrorKeyed failure for display: the translated catalog
    * entry, followed by the offending fragment when the error carries one.
    * This is the display-edge counterpart of the ErrorKey convention
-   * (docs/adr/0002-error-keys-not-prose.md).
+   * (docs/adr/zingo-mobile/0009-error-keys-not-prose.md).
    */
   static renderErrorKeyed(
     failure: ErrorKeyed<string>,

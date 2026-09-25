@@ -1289,7 +1289,7 @@ class RPCModule: NSObject {
       }
   }
 
-  // Proves and broadcasts one Phase 1 splitting round (ADR 0016), so like the
+  // Proves and broadcasts one Phase 1 splitting round (zingolib/0016), so like the
   // drain it runs long; the global concurrent queue keeps it off the main
   // thread.
   @objc(quickSplitProcess:reject:)
