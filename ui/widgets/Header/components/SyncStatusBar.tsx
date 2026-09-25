@@ -296,9 +296,11 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
             diagnostics: the icon that reports the trouble is the one that
             opens the screen explaining it. Rendered only where the policy
             runs (mixnetView is null on platforms whose transport has not
-            landed) and never in the `off` state (phase is null). A pulsing
-            green halo means connecting, a bare icon means ready, a coral
-            halo means lost, a traveling yellow arc means reconnecting. */}
+            landed). A pulsing green halo means connecting, a bare icon means
+            ready, a coral halo means lost, a traveling yellow arc means
+            reconnecting, and the off glyph means the session went Offline —
+            the icon reports nym's own state, so it is never hidden to hide a
+            transport that might still be up. */}
         {mixnetView !== null && phase !== null && (
           <TouchableOpacity
             testID="header.mixnet-status"

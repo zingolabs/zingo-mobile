@@ -9,6 +9,7 @@ import {
 } from '@app/walletBackend/transforms/mixnetView';
 import {
   attachMixnet,
+  disableMixnet,
   getMixnetBootstrapDetail,
   getMixnetStatus,
 } from '@app/walletBackend/utils/mixnetUtils';
@@ -20,6 +21,8 @@ export type MixnetTransportBinding = {
 
 export type StartMixnetTransport = () => Promise<MixnetTransportBinding>;
 
+export type StopMixnetTransport = () => Promise<void>;
+
 export function isCurrentPublication(seq: number, latest: number): boolean {
   return seq === latest;
 }
@@ -27,6 +30,12 @@ export function isCurrentPublication(seq: number, latest: number): boolean {
 const STARTING_REPORT: MixnetStatusReport = {
   kind: 'status',
   indicator: RPCMixnetIndicatorEnum.bootstrapping,
+  socks5Addr: null,
+};
+
+const OFF_REPORT: MixnetStatusReport = {
+  kind: 'status',
+  indicator: RPCMixnetIndicatorEnum.off,
   socks5Addr: null,
 };
 
@@ -38,10 +47,13 @@ export const RECONNECT_BASE_MILLIS = 3_000;
 
 export const RECONNECT_MAX_MILLIS = 60_000;
 
-// Arms the mixnet transport at wallet load, polls its status, and auto-recovers a lost transport.
+// Arms the mixnet transport for a connected session, polls its status,
+// auto-recovers a lost transport, and tears the whole thing down when the
+// session goes Offline.
 export class MixnetCoordinator {
   private readonly startTransport: StartMixnetTransport;
   private readonly onChange: (view: MixnetView) => void;
+  private readonly stopTransport: StopMixnetTransport;
 
   private pollTimerID?: ReturnType<typeof setInterval>;
   private pollLock: boolean = false;
@@ -56,9 +68,11 @@ export class MixnetCoordinator {
   constructor(
     startTransport: StartMixnetTransport,
     onChange: (view: MixnetView) => void,
+    stopTransport: StopMixnetTransport,
   ) {
     this.startTransport = startTransport;
     this.onChange = onChange;
+    this.stopTransport = stopTransport;
   }
 
   // Starts the transport, attaches the wallet, and polls; a failure publishes the typed failure view.
@@ -88,6 +102,40 @@ export class MixnetCoordinator {
 
   async reenable(): Promise<void> {
     await this.ensureForConnectedSession();
+  }
+
+  // The transport half of the go-offline moment: an Offline session holds no
+  // tunnel, so the shim dies here and the mode rests at `off`. Idempotent —
+  // a session that never armed anything still lands the published `off` view,
+  // which is what the header reports.
+  //
+  // Order matters: the wallet's slot is vacated BEFORE the shim is stopped.
+  // The other way round, the standing watchdog sees a live slot lose its
+  // endpoint, calls it an unconsented death, and the app chases a reconnect
+  // it caused itself.
+  async goOffline(): Promise<void> {
+    const epoch = ++this.enableEpoch;
+    this.clearPolling();
+    this.clearReconnect();
+    this.reconnectActive = false;
+    const disabled = await disableMixnet();
+    try {
+      await this.stopTransport();
+    } catch (thrown: unknown) {
+      if (this.enableEpoch !== epoch) {
+        return;
+      }
+      // A tunnel we failed to stop is the one thing that must not read as
+      // off: it may still be carrying traffic, so it reports as trouble.
+      this.publish({ kind: 'failure', failure: describeRejection(thrown) });
+      return;
+    }
+    if (this.enableEpoch !== epoch) {
+      return;
+    }
+    // The tunnel is down, so the mode is off — whatever the wallet's own
+    // bookkeeping managed to answer.
+    this.publish(disabled.kind === 'status' ? disabled : OFF_REPORT);
   }
 
   stop(): void {

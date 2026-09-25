@@ -316,6 +316,19 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
             </Animated.View>
           )}
 
+          {/* The switch-off is the user's own act, so the screen explains the
+              resting state instead of offering a remedy for it. `runIsTerminal`
+              already withholds the re-enable here: an Offline session has no
+              transport to restart, and restarting one behind the mode's back
+              is exactly what this state exists to prevent. */}
+          {phase === 'off' && !running && (
+            <Animated.View entering={contentEnter()} layout={boxMorph()}>
+              <FadeText style={{ textAlign: 'center' }}>
+                {translate('mixnetdoctor.offline') as string}
+              </FadeText>
+            </Animated.View>
+          )}
+
           {/* No run to ask for while the screen is already following the
               transport; the button returns once the report is frozen. */}
           {!attachInFlight && (

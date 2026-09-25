@@ -35,6 +35,8 @@ export function parseMixnetIndicator(
       return RPCMixnetIndicatorEnum.bootstrapping;
     case RPCMixnetIndicatorEnum.ready:
       return RPCMixnetIndicatorEnum.ready;
+    case RPCMixnetIndicatorEnum.off:
+      return RPCMixnetIndicatorEnum.off;
     case RPCMixnetIndicatorEnum.died:
       return RPCMixnetIndicatorEnum.died;
     default:

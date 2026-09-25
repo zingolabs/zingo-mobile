@@ -8,7 +8,7 @@ const meta: Meta<typeof MixnetIcon> = {
   argTypes: {
     phase: {
       control: 'select',
-      options: ['connecting', 'reconnecting', 'lost', 'ready'],
+      options: ['connecting', 'reconnecting', 'lost', 'ready', 'off'],
     },
   },
 };
@@ -23,3 +23,4 @@ export const Reconnecting: Story = {
 };
 export const Lost: Story = { args: { phase: 'lost' } };
 export const Ready: Story = { args: { phase: 'ready' } };
+export const Off: Story = { args: { phase: 'off' } };
