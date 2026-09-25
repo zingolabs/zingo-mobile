@@ -70,6 +70,14 @@ export class DataService {
     this.config = config;
   }
 
+  // Offline is the empty server URI — the invariant WalletBackend reads for
+  // the transport and the SyncCoordinator for the sync. A session with no
+  // server has nobody to ask for a height, and asking rejects before any
+  // dial, which is the trap below.
+  private offline(): boolean {
+    return this.config.server.uri === '';
+  }
+
   async fetchTotalBalance() {
     if (this.fetchTotalBalanceLock) {
       return;
@@ -249,6 +257,19 @@ export class DataService {
     }
     this.fetchInfoAndServerHeightLock = true;
     try {
+      // No server, no info. The empty shape is what an unreadable answer
+      // already publishes; rejecting instead would reach the catch, and the
+      // catch calls onSyncError, which reconfigures — a loop with nothing at
+      // the end of it.
+      if (this.offline()) {
+        this.config.onInfoChanged({
+          latestBlock: 0,
+          serverUri: '',
+          version: '',
+        } as InfoType);
+        this.lastServerBlockHeight = 0;
+        return;
+      }
       let infoError: boolean = false;
       const start = Date.now();
       const infoStr: string = await RPCModule.infoServerInfo();
@@ -394,20 +415,30 @@ export class DataService {
     }
     this.fetchTandZandOValueTransfersLock = true;
     try {
-      const start = Date.now();
-      const heightStr: string = await RPCModule.getLatestBlockServerInfo(
-        this.config.server.uri,
-      );
-      if (Date.now() - start > 4000) {
-        console.log(
-          '=========================================== > server height - ',
-          Date.now() - start,
-        );
-      }
-      if (heightStr) {
-        this.lastServerBlockHeight = Number(heightStr);
+      // The value transfers themselves are a wallet-local read. Asking the
+      // server for its height first made the whole fetch depend on a server:
+      // Offline it rejected here, the list was never published, and History
+      // waits for that first publication — so an Offline wallet span forever
+      // under an empty list. Zero is the right height for a session with no
+      // server, and the transform already falls back to the wallet's own.
+      if (this.offline()) {
+        this.lastServerBlockHeight = 0;
       } else {
-        console.log('Internal Error server height');
+        const start = Date.now();
+        const heightStr: string = await RPCModule.getLatestBlockServerInfo(
+          this.config.server.uri,
+        );
+        if (Date.now() - start > 4000) {
+          console.log(
+            '=========================================== > server height - ',
+            Date.now() - start,
+          );
+        }
+        if (heightStr) {
+          this.lastServerBlockHeight = Number(heightStr);
+        } else {
+          console.log('Internal Error server height');
+        }
       }
 
       const start2 = Date.now();
