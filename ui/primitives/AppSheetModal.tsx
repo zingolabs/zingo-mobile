@@ -34,7 +34,10 @@ const AppSheetModal = React.forwardRef<BottomSheetModal, AppSheetModalProps>(
       onChange,
       enablePanDownToClose = true,
       dismissable = true,
-      accessible,
+      // Defaults off for the same reason AppSheet does: an accessible
+      // container collapses its contents out of the iOS accessibility
+      // tree. The call sites passing false explicitly predate this.
+      accessible = false,
       renderFooter,
     },
     ref,
