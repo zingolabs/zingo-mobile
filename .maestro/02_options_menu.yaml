@@ -51,7 +51,22 @@ appId: org.ZingoLabs.Zingo
 - assertVisible:
     id: "settings.about"
 
-# Navigate to About and verify it loads
+# Navigate to About and verify it loads.
+#
+# The Settings sheet animates in, and `extendedWaitUntil` above is
+# satisfied the moment settings.scroll-view becomes visible — which is
+# part way through that animation. Maestro then resolves this row's
+# coordinates while it is still moving, and the tap lands where the row no
+# longer is: on the 2026-09-25 nightly it was dispatched, nothing
+# navigated, and the screenshot still showed Settings.
+#
+# Waiting for the animation was tested against the alternative. Centring
+# the row first also made iOS pass, but it changed two things at once —
+# position and settling — and it broke Android, whose Settings list has
+# too little travel to centre anything. Waiting alone took both platforms
+# green, so the timing was what mattered and the row was always reachable.
+- waitForAnimationToEnd:
+    timeout: 5000
 - tapOn:
     id: "settings.about"
 - extendedWaitUntil:
