@@ -1,7 +1,7 @@
 # Proposal: release senescence instead of a remote forced-update switch
 
 Status: proposed, for discussion. If the proposal is accepted, a companion ADR
-(`docs/adr/0003-release-senescence.md`) and `CONTEXT.md` glossary entries land with the
+(`docs/adr/zingo-mobile/0011-release-senescence.md`) and `CONTEXT.md` glossary entries land with the
 implementation; both are drafted and follow this document.
 
 ## What the audit asked for
@@ -72,7 +72,7 @@ on top later if that trade ever stops being acceptable; the two mechanisms compo
    non-dismissible explanation card with Update and Export actions; server selection disabled with
    the same explanation. All copy is translation keys rendered at the display edge; the senescence
    module itself exposes state only (`fresh | warning | final | senescent` plus the estimated
-   date) and never calls `translate`, per ADR-0002.
+   date) and never calls `translate`, per ADR-0009.
 7. **Baking.** `release-prep.mjs` stamps the height: when the version/build actually changes, it
    fetches the current mainnet tip from the hosh registry (the same source the app trusts for
    server lists; a median over online servers), writes the const, and keeps its documented
@@ -119,7 +119,7 @@ humans feel a slipping cadence weeks before any user does.
 ## References
 
 - Least Authority audit report, Suggestion 1 (and Issue R context).
-- `docs/adr/0003-release-senescence.md` (proposed) and `docs/adr/0002-error-keys-not-prose.md`
+- `docs/adr/zingo-mobile/0011-release-senescence.md` (proposed) and `docs/adr/zingo-mobile/0009-error-keys-not-prose.md`
   (module/display-edge conventions the implementation follows).
 - zebrad `end_of_support.rs` (the precedent: 91/105 days, height-estimated age, mainnet only).
 - zcashd's End-of-Support halt, the original auto-senescence precedent in Zcash tooling.

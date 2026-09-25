@@ -342,7 +342,7 @@ export async function planIronwoodMigration(): Promise<FfiResult<string>> {
 }
 
 // Phase 2 of the private migration. Called once quickSplit reports `complete`
-// (ADR 0016): the notes are fully split by then, so this binds the parts to
+// (zingolib/0016): the notes are fully split by then, so this binds the parts to
 // their notes and schedules them at once. Consent is captured post-split, so
 // `planHashHex` is the hash of a fresh planIronwoodMigration read taken here,
 // not the pre-split one. `perBucket` null keeps zingolib's default cadence
@@ -371,7 +371,7 @@ export async function continueNoteSplitting(): Promise<FfiResult<string>> {
 }
 
 // Phase 1 note splitting, the send-shaped replacement for the stateful
-// startIronwoodMigration + continueNoteSplitting driver (ADR 0016). One call
+// startIronwoodMigration + continueNoteSplitting driver (zingolib/0016). One call
 // does one round: it pauses sync, plans against current notes, builds and
 // broadcasts the round, and persists no migration state. Long-running like
 // drainOrchard (Halo2 proving), dispatched on the concurrent pool. Loop it —

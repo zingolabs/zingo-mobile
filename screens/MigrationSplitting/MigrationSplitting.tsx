@@ -73,7 +73,7 @@ type StepState =
   | { kind: 'awaiting'; round: number; pending: number }
   | { kind: 'complete' };
 
-// Phase 1's interactive ceremony (ADR 0016): drives sync -> quick_split through
+// Phase 1's interactive ceremony (zingolib/0016): drives sync -> quick_split through
 // every round to `complete`, keeping the user present (like the drain:
 // keep-awake, hardware-back blocked). The terminal state is the "Split complete"
 // view whose button hands off to the Phase 2 cadence chooser. quick_split
@@ -179,7 +179,7 @@ const MigrationSplitting: React.FunctionComponent<MigrationSplittingProps> = ({
     [updateCeilingFromRows],
   );
 
-  // The splitting loop (ADR 0016). One quick_split call per tick: it builds and
+  // The splitting loop (zingolib/0016). One quick_split call per tick: it builds and
   // broadcasts the next round (slow: Halo2 proving), reports that a prior round
   // is still confirming, or reports completion. quick_split does not return a
   // round index — it persists no state — so we count rounds locally as they

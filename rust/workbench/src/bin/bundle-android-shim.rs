@@ -1,6 +1,6 @@
 //! Cross-compile the mixnet proxy shim for Android and lay out its package.
 //!
-//! The shim (`zingo-nym-proxy-ffi`, ADR 0011 mobile amendment) lives at
+//! The shim (`zingo-nym-proxy-ffi`, zingolib/0011 mobile amendment) lives at
 //! `rust/nym-proxy-ffi`, excluded from the workspace with its own lockfile, so ordinary wallet
 //! builds never produce it (nym-sdk's `crypto-common` cannot share the wallet
 //! lock). This tool release-builds it with cargo-ndk for every Android ABI

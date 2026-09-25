@@ -123,7 +123,7 @@ interface RPCModuleAPI {
     perBucket: string,
   ): Promise<string>;
   continueNoteSplittingProcess(): Promise<string>;
-  // Phase 1 splitting, stateless and send-shaped (ADR 0016). One call per
+  // Phase 1 splitting, stateless and send-shaped (zingolib/0016). One call per
   // round; loop until the outcome is `complete`, then startIronwoodMigration.
   quickSplitProcess(): Promise<string>;
   // Live progress of the in-flight splitting round; safe to poll concurrently
