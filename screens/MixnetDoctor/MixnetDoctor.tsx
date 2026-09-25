@@ -154,6 +154,11 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
       ? mixnetPhase(mixnetView.statusKey, mixnetView.reconnecting)
       : null;
   const attachInFlight = phase === 'connecting' || phase === 'reconnecting';
+  // Nym rests at `off` because the session is Offline. The probes have
+  // nothing to reach: they would time a local FFI call and report the state
+  // the header already shows, so the screen says why instead of measuring
+  // nothing and offering it for copying.
+  const restingOff = phase === 'off';
 
   const [run, setRun] = useState<MixnetDoctorRun | null>(null);
   const [running, setRunning] = useState<boolean>(false);
@@ -196,8 +201,12 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
   );
 
   // The screen is opened because something looks wrong, so it answers without
-  // being asked twice: the first run starts on entry.
+  // being asked twice: the first run starts on entry — unless nym is resting,
+  // where there is nothing to ask.
   useEffect(() => {
+    if (restingOff) {
+      return;
+    }
     runDoctor();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -217,7 +226,14 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
 
   // The settling itself is worth a run: the moment the transport lands, or
   // gives up, the report says so rather than showing the state before it.
+  // Reaching `off` is the exception: the report belonged to a transport this
+  // session no longer has, so it goes rather than lingering as stale numbers.
   useEffect(() => {
+    if (restingOff) {
+      setRun(null);
+      setRunning(false);
+      return;
+    }
     runDoctor(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase]);
@@ -267,9 +283,13 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
             gap: 20,
           }}
         >
-          <FadeText>{translate('mixnetdoctor.intro') as string}</FadeText>
+          <FadeText>
+            {restingOff
+              ? (translate('mixnetdoctor.offline') as string)
+              : (translate('mixnetdoctor.intro') as string)}
+          </FadeText>
 
-          {(running || run !== null) && (
+          {!restingOff && (running || run !== null) && (
             <Animated.View
               entering={contentEnter()}
               layout={boxMorph()}
@@ -316,19 +336,6 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
             </Animated.View>
           )}
 
-          {/* The switch-off is the user's own act, so the screen explains the
-              resting state instead of offering a remedy for it. `runIsTerminal`
-              already withholds the re-enable here: an Offline session has no
-              transport to restart, and restarting one behind the mode's back
-              is exactly what this state exists to prevent. */}
-          {phase === 'off' && !running && (
-            <Animated.View entering={contentEnter()} layout={boxMorph()}>
-              <FadeText style={{ textAlign: 'center' }}>
-                {translate('mixnetdoctor.offline') as string}
-              </FadeText>
-            </Animated.View>
-          )}
-
           {/* No run to ask for while the screen is already following the
               transport; the button returns once the report is frozen. */}
           {!attachInFlight && (
@@ -341,7 +348,7 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
                     ? (translate('mixnetdoctor.running') as string)
                     : (translate('mixnetdoctor.run') as string)
                 }
-                disabled={running}
+                disabled={running || restingOff}
                 style={{ alignSelf: 'center' }}
                 onPress={() => runDoctor()}
               />
@@ -364,7 +371,7 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
             </Animated.View>
           )}
 
-          {!running && run !== null && (
+          {!restingOff && !running && run !== null && (
             <Animated.View
               layout={boxMorph()}
               entering={contentEnter()}
