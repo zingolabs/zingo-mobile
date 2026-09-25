@@ -35,6 +35,9 @@ function coordinatorWith(dataService: Partial<DataService>): SyncCoordinator {
     onError: jest.fn(),
     keepAwake: jest.fn(),
     performanceLevel: RPCPerformanceLevelEnum.High,
+    // A connected session: the save path under test is not the offline
+    // path, and the coordinator reads this URI to tell them apart.
+    server: { uri: 'https://zec.rocks:443', chainName: 'main' },
   } as unknown as WalletBackendConfig;
   const coordinator = new SyncCoordinator(config, dataService as DataService);
   jest.spyOn(coordinator, 'fetchSyncPoll').mockResolvedValue(undefined);

@@ -93,6 +93,9 @@ describe('sync family rejections are contained and reported, never sniffed', () 
       keepAwake: jest.fn(),
       onSyncStatusChanged: jest.fn(),
       onBalanceChanged: jest.fn(),
+      // A connected session: containment of a rejected bridge call is what
+      // is under test, and an Offline session never makes the call.
+      server: { uri: 'https://zec.rocks:443', chainName: 'main' },
     } as unknown as ConstructorParameters<typeof SyncCoordinator>[0];
     const dataService = {} as ConstructorParameters<typeof SyncCoordinator>[1];
     return { coordinator: new SyncCoordinator(config, dataService), onError };

@@ -48,6 +48,14 @@ export class SyncCoordinator {
     this.dataService = dataService;
   }
 
+  // Offline is the empty server URI — the invariant the settings file
+  // normalizes ("server empty -> offline") and the one WalletBackend reads
+  // for the transport. A session with no indexer has no sync to launch and
+  // no poll to answer it.
+  private offline(): boolean {
+    return this.config.server.uri === '';
+  }
+
   async configure(): Promise<void> {
     await this.dataService.fetchTandZandOValueTransfers();
     await this.dataService.fetchAddresses();
@@ -196,6 +204,14 @@ export class SyncCoordinator {
   }
 
   async refreshSync(fullRescan?: boolean) {
+    // Launching a sync without an indexer is not a blip to retry: zingolib
+    // refuses it with `Offline: no indexer configured`, and the 5 s tick
+    // turned that refusal into a standing error — 120 of them in ten minutes
+    // of field logs (2026-09-24) — plus a persistent-failure signal for a
+    // server the user deliberately did not pick.
+    if (this.offline()) {
+      return;
+    }
     if (this.refreshSyncLock && !fullRescan) {
       return;
     }
@@ -333,6 +349,11 @@ export class SyncCoordinator {
   }
 
   async fetchSyncPoll(): Promise<void> {
+    // Nothing to poll: an Offline session never launched a sync, and the
+    // poll's own answer is what asks for one.
+    if (this.offline()) {
+      return;
+    }
     if (this.fetchSyncPollLock) {
       console.log('***************** SYNC POLL - locked');
       return;

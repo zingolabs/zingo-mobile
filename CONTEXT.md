@@ -274,6 +274,14 @@ going back Online arms one then and there. zingo-cli gates its own driver call
 the same way, on `Communications::Online`.
 _Avoid_: app start (the transport does not follow the app's lifetime)
 
+**Draw**:
+The entry gateway and Exit Node a transport binds when it is born. The shim
+draws them, so only a fresh `startMixnetTransport` redraws — the wallet's
+readiness gate retries its probe over the same draw. A draw that never
+answers is common enough to plan for, so the app gives one
+`BOOTSTRAP_DEADLINE_MILLIS` to prove itself and then draws again.
+_Avoid_: retry (names the probe, not the pair it runs over)
+
 **Route**:
 The network path a mixnet-only surface resolves to, either the Standing
 Client's tunnel or clearnet. zingolib derives it from the indicator, and the

@@ -47,6 +47,27 @@ export const RECONNECT_BASE_MILLIS = 3_000;
 
 export const RECONNECT_MAX_MILLIS = 60_000;
 
+// How long one draw gets to prove itself before the app draws again.
+//
+// The wallet's readiness gate spends ATTACH_READINESS_BUDGET on a draw that
+// never answers — two 30 s round trips plus a pause, 61 s — and it spends it
+// on the SAME gateway and exit, because it retries the probe, never the
+// draw. Field logs (2026-09-24) show roughly half the draws never answering
+// at all, so a bad one costs a full minute before anything redraws: one
+// measured Offline -> Online took 82 s, 61 of them a single dud.
+//
+// A healthy draw is listening in ~6 s and proven ~1 s later. Twenty seconds
+// is generous for a good draw, including the tails that intermittently blow
+// a 15 s bound, and a third of the wait for a bad one. Redrawing costs one
+// birth, ~6 s.
+export const BOOTSTRAP_DEADLINE_MILLIS = 20_000;
+
+// Consecutive redraws before the app stops drawing and lets the transport
+// settle into the ordinary lost-and-reconnect path with its backoff. Three
+// bad draws is where luck stops being the explanation, and redrawing forever
+// would re-fetch the whole node topology every ~26 s.
+export const BOOTSTRAP_REDRAW_LIMIT = 3;
+
 // Arms the mixnet transport for a connected session, polls its status,
 // auto-recovers a lost transport, and tears the whole thing down when the
 // session goes Offline.
@@ -59,6 +80,8 @@ export class MixnetCoordinator {
   private pollLock: boolean = false;
   private lastStatus: MixnetStatusReport | null = null;
   private reconnectTimerID?: ReturnType<typeof setTimeout>;
+  private bootstrapTimerID?: ReturnType<typeof setTimeout>;
+  private redrawsSpent: number = 0;
   private reconnectDelayMillis: number = RECONNECT_BASE_MILLIS;
   private reconnecting: boolean = false;
   private reconnectActive: boolean = false;
@@ -80,6 +103,7 @@ export class MixnetCoordinator {
     const epoch = ++this.enableEpoch;
     this.clearPolling();
     this.clearReconnectTimer();
+    this.clearBootstrapDeadline();
     this.publishStarting();
     try {
       const { socks5Addr, exitNode } = await this.startTransport();
@@ -101,6 +125,7 @@ export class MixnetCoordinator {
   }
 
   async reenable(): Promise<void> {
+    this.redrawsSpent = 0;
     await this.ensureForConnectedSession();
   }
 
@@ -118,6 +143,8 @@ export class MixnetCoordinator {
     this.clearPolling();
     this.clearReconnect();
     this.reconnectActive = false;
+    this.clearBootstrapDeadline();
+    this.redrawsSpent = 0;
     const disabled = await disableMixnet();
     try {
       await this.stopTransport();
@@ -143,6 +170,7 @@ export class MixnetCoordinator {
     this.enableEpoch += 1;
     this.clearPolling();
     this.clearReconnect();
+    this.clearBootstrapDeadline();
   }
 
   private clearPolling(): void {
@@ -150,6 +178,44 @@ export class MixnetCoordinator {
       clearInterval(this.pollTimerID);
       this.pollTimerID = undefined;
     }
+  }
+
+  private clearBootstrapDeadline(): void {
+    if (this.bootstrapTimerID !== undefined) {
+      clearTimeout(this.bootstrapTimerID);
+      this.bootstrapTimerID = undefined;
+    }
+  }
+
+  // Armed while a draw is still bootstrapping, disarmed the moment it
+  // settles either way. Past the redraw limit it is never armed again, so
+  // the last draw runs its full course into the wallet's own gate and the
+  // reconnect backoff takes it from there.
+  private armBootstrapDeadline(): void {
+    if (
+      this.stopped ||
+      this.bootstrapTimerID !== undefined ||
+      this.redrawsSpent >= BOOTSTRAP_REDRAW_LIMIT
+    ) {
+      return;
+    }
+    this.bootstrapTimerID = setTimeout(() => {
+      this.bootstrapTimerID = undefined;
+      this.redraw();
+    }, BOOTSTRAP_DEADLINE_MILLIS);
+  }
+
+  // The draw had its time and never proved itself, so the app draws again:
+  // a fresh gateway and exit, which is the one thing the wallet's readiness
+  // gate cannot do for itself. `startTransport` releases the standing proxy
+  // before it starts the next one, so this replaces the draw rather than
+  // stacking a second one behind it.
+  private async redraw(): Promise<void> {
+    if (this.stopped || !this.isBootstrapping()) {
+      return;
+    }
+    this.redrawsSpent += 1;
+    await this.ensureForConnectedSession();
   }
 
   private isLost(status: MixnetStatusReport): boolean {
@@ -257,10 +323,17 @@ export class MixnetCoordinator {
     if (settled) {
       this.reconnectActive = false;
       this.resetReconnectBackoff();
+      // A proven draw ends the streak: the next bad one starts from zero.
+      this.redrawsSpent = 0;
     } else if (this.isLost(status)) {
       this.reconnectActive = true;
     }
     this.lastStatus = status;
+    if (this.isBootstrapping()) {
+      this.armBootstrapDeadline();
+    } else {
+      this.clearBootstrapDeadline();
+    }
     this.publishSeq += 1;
     this.publishView(status, this.publishSeq);
     if (
@@ -281,6 +354,9 @@ export class MixnetCoordinator {
       return;
     }
     this.lastStatus = STARTING_REPORT;
+    // The clock starts at the attempt, not at its first status: the ~6 s
+    // birth is part of what a draw is given.
+    this.armBootstrapDeadline();
     this.publishSeq += 1;
     this.onChange(
       deriveMixnetView(STARTING_REPORT, null, this.reconnectActive),
