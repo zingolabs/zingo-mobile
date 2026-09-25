@@ -125,7 +125,6 @@
     "custom": "Özel Sunucu...",
     "nointernet-message": "İnternet bağlantısı kurulamadı. Lütfen bu sorunu giderin.",
     "offline-message": "Çevrimdışı modda yeni bir cüzdan oluşturabilir veya bir tohum ya da görüntüleme anahtarından geri yükleyebilirsiniz. Bir sunucu seçene kadar senkronize olmaz ve bakiyeleri göstermez.",
-    "advancedmode": "Gelişmiş moda geç",
     "noopenwallet-message": "Uygulama aktif cüzdanı açmaya çalışırken bir hata oluştu.",
     "walletrepair-body": "Cüzdan dosyası iki kez şifrelenmiş görünüyor; bu Zingo 2.0.21'de bilinen bir sorundur. Fonlarınız güvende. Uygulamayı kaldırmayın ve cüzdanı sıfırlamayın. Dosyayı düzeltmek için Onar'a dokunun.",
     "walletrepair-button": "Onar",
@@ -163,9 +162,8 @@
     "info": "Sunucu bilgisi",
     "options": "Seçenekler",
     "walletseed": "Cüzdan Tohumu",
-    "walletseed-basic": "Yedek Kurtarma Kelimeleri",
+    "walletbackupseed": "Yedek Kurtarma Kelimeleri",
     "walletufvk": "Cüzdan Görüntüleme Anahtarı",
-    "walletufvk-basic": "Cüzdan Yedek Görüntüleme Anahtarı",
     "rescanwallet": "Cüzdanı Yeniden Tara",
     "report": "Senkronizasyon / Yeniden Tarama Raporu",
     "changewallet": "Başka bir cüzdana geç",
@@ -173,9 +171,7 @@
     "alert-restorebackupwallet-body": "Son cüzdan yedeğini geri yüklemek istediğinizi onaylayın.",
     "fundpools": "Fon Havuzları",
     "insight": "Finansal İçgörü",
-    "loadwalletfromseed-basic": "başka bir cüzdanı geri yükle",
     "addressbook": "Adres Defteri",
-    "tipzingolabs-basic": "ZingoLabs’i Destekle",
     "support": "{name} destek mail",
     "changeservernew-error": "Error Sunucuyu yenisiyle değiştirmeye çalışırken bir hata oluştu ",
     "readingwallet-error": "Error Yeni sunucuyla cüzdanı okuma girişiminde hata oluştu:",
@@ -271,16 +267,6 @@
         "text": "Normal Gizlilik: Tüm bilgileri görebilirsiniz."
       }
     ],
-    "modes": [
-      {
-        "value": "basic",
-        "text": "Temel Mod: {name}'yu kullanmanın en basit yolu."
-      },
-      {
-        "value": "advanced",
-        "text": "Gelişmiş Mod: Gelişmiş kullanıcılar için."
-      }
-    ],
     "recoverywalletinfoondevices": [
       {
         "value": true,
@@ -356,7 +342,6 @@
     "language-title": "Dil",
     "islanguage": "Kaydetmek için bir dil seçmeniz gerekiyor.",
     "privacy-title": "Hassas değerleri gizle",
-    "mode-title": "Temel ve Gelişmiş Mod arasında geçiş yapın.",
     "recoverywalletinfoondevice-title": "Cüzdan Kurtarma Bilgilerini Kaydet",
     "performancelevel-title": "Zingolib Performance Level",
     "blockexplorer-title": "Block Explorer",
@@ -366,9 +351,6 @@
     "value-privacy-true": "Yüksek",
     "value-privacy-false": "Normal ",
     "privacy": "Özel:",
-    "value-mode-basic": "Temel",
-    "value-mode-advanced": "Gelişmiş ",
-    "mode": "Mod:",
     "value-chainname-main": "Mainnet",
     "value-chainname-test": "Testnet",
     "value-chainname-regtest": "Regtest",
@@ -577,7 +559,6 @@
     "transparent-expose-warning": "Şeffaf adresler verilerinizi açığa çıkarır.",
     "noaddress": "Adres Yok",
     "title-address": "Adresim",
-    "title-basic-alone": "Alıcı Adresim",
     "newu-option": "Yeni adres al",
     "danger-zone": "TEHLİKE BÖLGESİ",
     "go-to-transparent": "gizliliği kaldırılmış açık adres",

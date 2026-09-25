@@ -125,7 +125,6 @@
     "custom": "Custom Server...",
     "nointernet-message": "There is no established internet connection. Please fix this issue.",
     "offline-message": "In offline mode you can create a new wallet or restore one from seed or viewing key. It won't sync or show balances until you choose a server.",
-    "advancedmode": "Change to Advanced Mode",
     "noopenwallet-message": "An error occurred while the App was trying to open the active wallet.",
     "walletrepair-body": "Your wallet file looks encrypted twice, a known issue in Zingo 2.0.21. Your funds are safe. Do not uninstall the app and do not reset the wallet. Tap Repair to fix the file.",
     "walletrepair-button": "Repair",
@@ -163,9 +162,8 @@
     "info": "Server Info",
     "options": "Options",
     "walletseed": "Wallet Seed",
-    "walletseed-basic": "Wallet Backup Seed Phrase",
+    "walletbackupseed": "Wallet Backup Seed Phrase",
     "walletufvk": "Wallet Viewing Key",
-    "walletufvk-basic": "Wallet Backup Viewing Key",
     "rescanwallet": "Rescan Wallet",
     "report": "Sync / Rescan Report",
     "changewallet": "Change to another Wallet",
@@ -173,9 +171,7 @@
     "alert-restorebackupwallet-body": "Confirm that you want to restore the last wallet backup.",
     "fundpools": "Fund Pools",
     "insight": "Financial Insight",
-    "loadwalletfromseed-basic": "Restore another wallet",
     "addressbook": "Address Book",
-    "tipzingolabs-basic": "Tip ZingoLabs",
     "support": "{name} support email",
     "changeservernew-error": "Error trying to change the server to the new one: ",
     "readingwallet-error": "Error trying to read the wallet with the new server:",
@@ -271,16 +267,6 @@
         "text": "Normal Privacy, you can see all the information."
       }
     ],
-    "modes": [
-      {
-        "value": "basic",
-        "text": "Basic Mode, the most simple way to use {name}."
-      },
-      {
-        "value": "advanced",
-        "text": "Advanced Mode, for the advanced user."
-      }
-    ],
     "recoverywalletinfoondevices": [
       {
         "value": true,
@@ -356,7 +342,6 @@
     "language-title": "Language",
     "islanguage": "You need to choose a language to save.",
     "privacy-title": "Hide Sensitive Values",
-    "mode-title": "Switch between Basic or Advanced Mode",
     "recoverywalletinfoondevice-title": "Store Wallet Recovery Info",
     "performancelevel-title": "Zingolib Performance Level",
     "blockexplorer-title": "Block Explorer",
@@ -366,9 +351,6 @@
     "value-privacy-true": "High",
     "value-privacy-false": "Normal",
     "privacy": "Priv: ",
-    "value-mode-basic": "Basic",
-    "value-mode-advanced": "Advanced",
-    "mode": "Mode: ",
     "value-chainname-main": "Mainnet",
     "value-chainname-test": "Testnet",
     "value-chainname-regtest": "Regtest",
@@ -577,7 +559,6 @@
     "transparent-expose-warning": "Transparent addresses expose your details.",
     "noaddress": "No Address",
     "title-address": "My Address",
-    "title-basic-alone": "My Receiving Address",
     "newu-option": "Get new address",
     "danger-zone": "DANGER ZONE",
     "go-to-transparent": "Exposed transparent address",

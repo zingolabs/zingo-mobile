@@ -16,7 +16,6 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { NetInfoStateType } from '@react-native-community/netinfo/src/index';
 import {
-  ModeEnum,
   RouteEnum,
   SelectServerEnum,
   SnackbarDurationEnum,
@@ -35,7 +34,6 @@ type SyncStatusBarProps = {
   noSyncingStatus: boolean | undefined;
   selectServer: SelectServerEnum;
   netInfo: NetInfoType;
-  mode: ModeEnum;
   percentageOutputsScanned: number;
   syncInProgress: boolean;
   viewSyncStatus: boolean;
@@ -55,7 +53,6 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
     noSyncingStatus,
     selectServer,
     netInfo,
-    mode,
     percentageOutputsScanned,
     syncInProgress,
     viewSyncStatus,
@@ -156,7 +153,12 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
                         padding: 3,
                       }}
                     >
-                      {mode === ModeEnum.basic ? (
+                      <TouchableOpacity
+                        testID="header.playicon"
+                        onPress={() => {
+                          navigation.navigate(RouteEnum.SyncReport);
+                        }}
+                      >
                         <View
                           style={{
                             flexDirection: 'row',
@@ -185,50 +187,14 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
                             >{` ${percentageOutputsScanned}%`}</FadeText>
                           )}
                         </View>
-                      ) : (
-                        <TouchableOpacity
-                          testID="header.playicon"
-                          onPress={() => {
-                            navigation.navigate(RouteEnum.SyncReport);
-                          }}
-                        >
-                          <View
-                            style={{
-                              flexDirection: 'row',
-                              justifyContent: 'center',
-                              alignItems: 'center',
-                            }}
-                          >
-                            <FontAwesomeIcon
-                              icon={faPlay}
-                              color={colors.fgSyncing}
-                              size={16}
-                            />
-                            {viewSyncStatus && (
-                              <FadeText style={{ fontSize: 10, marginLeft: 2 }}>
-                                {translate('syncing') as string}
-                              </FadeText>
-                            )}
-                            {viewSyncStatus && percentageOutputsScanned > 0 && (
-                              <FadeText style={{ fontSize: 10, marginLeft: 2 }}>
-                                {' - '}
-                              </FadeText>
-                            )}
-                            {percentageOutputsScanned > 0 && (
-                              <FadeText
-                                style={{ fontSize: 10, marginLeft: 2 }}
-                              >{` ${percentageOutputsScanned}%`}</FadeText>
-                            )}
-                          </View>
-                        </TouchableOpacity>
-                      )}
+                      </TouchableOpacity>
                     </Animated.View>
                   </View>
                 )}
               </>
             ) : (
               <>
-                {netInfo.isConnected && mode === ModeEnum.advanced && (
+                {netInfo.isConnected && (
                   <View
                     style={{
                       alignItems: 'center',
@@ -277,25 +243,17 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
                   minHeight: 25,
                 }}
               >
-                {mode === ModeEnum.basic ? (
+                <TouchableOpacity
+                  onPress={() => {
+                    navigation.navigate(RouteEnum.SyncReport);
+                  }}
+                >
                   <FontAwesomeIcon
                     icon={faCloudDownload}
                     color={!netInfo.isConnected ? 'red' : 'yellow'}
                     size={16}
                   />
-                ) : (
-                  <TouchableOpacity
-                    onPress={() => {
-                      navigation.navigate(RouteEnum.SyncReport);
-                    }}
-                  >
-                    <FontAwesomeIcon
-                      icon={faCloudDownload}
-                      color={!netInfo.isConnected ? 'red' : 'yellow'}
-                      size={16}
-                    />
-                  </TouchableOpacity>
-                )}
+                </TouchableOpacity>
               </View>
             )}
           </View>
@@ -362,18 +320,14 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
           </TouchableOpacity>
         )}
 
-        {mode !== ModeEnum.basic &&
-          !noPrivacy &&
-          setPrivacyOption &&
-          addLastSnackbar &&
-          noBalance && (
-            <PrivacyToggle
-              privacy={privacy}
-              setPrivacyOption={setPrivacyOption}
-              addLastSnackbar={addLastSnackbar}
-              translate={translate}
-            />
-          )}
+        {!noPrivacy && setPrivacyOption && addLastSnackbar && noBalance && (
+          <PrivacyToggle
+            privacy={privacy}
+            setPrivacyOption={setPrivacyOption}
+            addLastSnackbar={addLastSnackbar}
+            translate={translate}
+          />
+        )}
       </View>
     );
   },

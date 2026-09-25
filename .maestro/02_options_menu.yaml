@@ -3,21 +3,35 @@ appId: org.ZingoLabs.Zingo
 # Every flow starts from a clean install. Maestro does not run them in
 # file order — a nightly ran 04, 01, 02, 03 — so a flow that inherited
 # whatever the previous one left behind would pass or fail on luck.
+# A fresh install lands on the start menu, so each flow creates its own
+# wallet before it has an app to drive.
 - launchApp:
     clearState: true
 
 - extendedWaitUntil:
     visible:
-      id: "receive.title"
+      id: "loadingapp.createnewwallet"
+    timeout: 120000
+- tapOn:
+    id: "loadingapp.createnewwallet"
+- extendedWaitUntil:
+    visible:
+      id: "newseed.button.ok"
+    timeout: 120000
+- tapOn:
+    id: "newseed.button.ok"
+- extendedWaitUntil:
+    visible:
+      id: "header.drawmenu"
     timeout: 120000
 
-# Open options panel and verify basic-mode items are present
+# Open the options panel and verify its items are present
 - tapOn:
     id: "header.drawmenu"
 - assertVisible:
     id: "menu.addressbook"
 - assertVisible:
-    id: "menu.loadwalletfromseed"
+    id: "menu.walletseedufvk"
 
 # Server info now lives inline inside Settings (see settings.*-server rows);
 # About remains as its own navigation row. Settings opens from the Options

@@ -2,8 +2,8 @@
  * Settings writes are read-modify-writes of a single file. Two of them in
  * flight at once used to rebuild that file from the contents each had read
  * before either landed, so the one that finished last silently dropped the
- * other one's key — the first-launch path writes `mode` and `firstInstall`
- * back to back, and losing `mode` brings the app up in advanced.
+ * other one's key — the first-launch path writes a setting and
+ * `firstInstall` back to back, and the setting was the one lost.
  */
 
 let mockFile: string | null = null;
@@ -29,7 +29,7 @@ jest.mock('@app/uris', () => ({
 }));
 
 import SettingsFileImpl from '@app/services/SettingsFileImpl';
-import { ModeEnum, SettingsNameEnum } from '@app/AppState';
+import { LanguageEnum, SettingsNameEnum } from '@app/AppState';
 
 describe('SettingsFileImpl.writeSettings', () => {
   beforeEach(() => {
@@ -37,28 +37,28 @@ describe('SettingsFileImpl.writeSettings', () => {
   });
 
   it('keeps both keys when two writes overlap', async () => {
-    const mode = SettingsFileImpl.writeSettings(
-      SettingsNameEnum.mode,
-      ModeEnum.basic,
+    const language = SettingsFileImpl.writeSettings(
+      SettingsNameEnum.language,
+      LanguageEnum.es,
     );
     const firstInstall = SettingsFileImpl.writeSettings(
       SettingsNameEnum.firstInstall,
       false,
     );
 
-    await Promise.all([mode, firstInstall]);
+    await Promise.all([language, firstInstall]);
 
     const settings = await SettingsFileImpl.readSettings();
-    expect(settings.mode).toBe(ModeEnum.basic);
+    expect(settings.language).toBe(LanguageEnum.es);
     expect(settings.firstInstall).toBe(false);
   });
 
   it('resolves only once the write has landed', async () => {
     await SettingsFileImpl.writeSettings(
-      SettingsNameEnum.mode,
-      ModeEnum.advanced,
+      SettingsNameEnum.language,
+      LanguageEnum.pt,
     );
 
-    expect(JSON.parse(mockFile as string).mode).toBe(ModeEnum.advanced);
+    expect(JSON.parse(mockFile as string).language).toBe(LanguageEnum.pt);
   });
 });

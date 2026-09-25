@@ -21,7 +21,6 @@ import { useOptionsPanel } from '@app/context/optionsPanel';
 // with the panel that's appearing over it.
 const HEADER_FADE_MS = 320;
 import {
-  ModeEnum,
   NetInfoType,
   RouteEnum,
   ScreenEnum,
@@ -66,7 +65,6 @@ type HeaderProps = {
   // seed screen - shared between AppLoading & AppLoaded - different contexts
   translate?: (key: string) => TranslateType;
   netInfo?: NetInfoType;
-  mode?: ModeEnum;
   privacy?: boolean;
   // store the error if the App is in background
   setBackgroundError?: (title: string, error: string) => void;
@@ -89,7 +87,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   testID,
   translate: translateProp,
   netInfo: netInfoProp,
-  mode: modeProp,
   privacy: privacyProp,
   setBackgroundError,
   noPrivacy,
@@ -123,7 +120,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
 
   const translate = translateProp ?? context.translate;
   const netInfo = netInfoProp ?? context.netInfo;
-  const mode = modeProp ?? context.mode;
   const privacy = privacyProp !== undefined ? privacyProp : context.privacy;
 
   const { colors } = useTheme();
@@ -198,7 +194,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             noSyncingStatus={noSyncingStatus}
             selectServer={selectServer}
             netInfo={netInfo}
-            mode={mode}
             percentageOutputsScanned={percentageOutputsScanned}
             syncInProgress={syncInProgress}
             viewSyncStatus={viewSyncStatus}
@@ -214,7 +209,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
 
           <BalanceRow
             noBalance={noBalance}
-            mode={mode}
             noPrivacy={noPrivacy}
             setPrivacyOption={setPrivacyOption}
             addLastSnackbar={addLastSnackbar}
@@ -270,33 +264,13 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             )}
             {readOnly && !noUfvkIcon && (
               <Animated.View style={headerAnimatedStyle}>
-                {!(
-                  mode === ModeEnum.basic &&
-                  valueTransfersTotal !== null &&
-                  valueTransfersTotal <= 0
-                ) &&
-                !(
-                  mode === ModeEnum.basic &&
-                  totalBalance &&
-                  totalBalance.totalIronwoodBalance +
-                    totalBalance.totalOrchardBalance +
-                    totalBalance.totalSaplingBalance <=
-                    0
-                ) ? (
-                  <TouchableOpacity onPress={ufvkShowModal}>
-                    <FontAwesomeIcon
-                      icon={faSnowflake}
-                      size={20}
-                      color={colors.fgMuted}
-                    />
-                  </TouchableOpacity>
-                ) : (
+                <TouchableOpacity onPress={ufvkShowModal}>
                   <FontAwesomeIcon
                     icon={faSnowflake}
                     size={20}
                     color={colors.fgMuted}
                   />
-                )}
+                </TouchableOpacity>
               </Animated.View>
             )}
           </View>

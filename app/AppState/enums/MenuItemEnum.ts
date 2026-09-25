@@ -7,7 +7,6 @@ export enum MenuItemEnum {
   SyncReport = 'Sync Report',
   FundPools = 'Fund Pools',
   Insight = 'Insight',
-  LoadWalletFromSeed = 'Load Wallet From Seed',
   TipZingoLabs = 'Tip ZingoLabs',
   AddressBook = 'Address Book',
   About = 'About',

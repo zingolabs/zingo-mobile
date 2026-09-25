@@ -17,7 +17,7 @@ import ActionMenuBottomSheet, {
   ActionMenuBottomSheetAction,
 } from '@ui/widgets/ActionMenuBottomSheet';
 
-import { ModeEnum, SelectServerEnum } from '@app/AppState';
+import { SelectServerEnum } from '@app/AppState';
 import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
 import AppSheet from '@ui/primitives/AppSheet';
 import { ContextAppLoading } from '@app/context';
@@ -33,7 +33,6 @@ type StartMenuProps = {
   actionButtonsDisabled: boolean;
   hasRecoveryWalletInfoSaved: boolean;
   recoverRecoveryWalletInfo: (b: boolean) => void;
-  changeMode: (v: ModeEnum) => void;
   customServer: () => void;
   walletExists: boolean;
   hasBackupWallet: boolean;
@@ -47,7 +46,6 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
   actionButtonsDisabled,
   hasRecoveryWalletInfoSaved,
   recoverRecoveryWalletInfo,
-  changeMode,
   customServer,
   walletExists,
   hasBackupWallet,
@@ -57,7 +55,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
   restoreLastBackup,
 }) => {
   const context = useContext(ContextAppLoading);
-  const { netInfo, mode, translate, server, selectServer } = context;
+  const { netInfo, translate, server, selectServer } = context;
   const { colors } = useTheme();
 
   const [containerH, setContainerH] = useState<number>(0);
@@ -68,8 +66,8 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
   const startMenuSnapPoints = useFullSheetSnapPoints(containerH, headerH);
 
   // Consolidates the three legacy ContextMenu kebabs into one action list
-  // gated by network + mode + saved-state. Order: recoverkeys → primary
-  // action (advanced vs custom server) → restore backup.
+  // gated by network + saved-state. Order: recoverkeys → custom server →
+  // restore backup.
   const optionsActions = useMemo<ActionMenuBottomSheetAction[]>(() => {
     if (actionButtonsDisabled) {
       return [];
@@ -82,35 +80,28 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
       });
     }
     if (netInfo.isConnected) {
-      if (mode === ModeEnum.basic) {
+      list.push({
+        label: translate('loadingapp.custom') as string,
+        onPress: () => customServer(),
+      });
+      if (hasBackupWallet) {
         list.push({
-          label: translate('loadingapp.advancedmode') as string,
-          onPress: () => changeMode(ModeEnum.advanced),
+          label: translate('loadedapp.restorebackupwallet') as string,
+          onPress: () =>
+            showConfirm({
+              title: translate('loadedapp.restorebackupwallet') as string,
+              message: translate(
+                'loadedapp.alert-restorebackupwallet-body',
+              ) as string,
+              buttons: [
+                {
+                  text: translate('confirm') as string,
+                  onPress: () => restoreLastBackup(),
+                },
+                { text: translate('cancel') as string, style: 'cancel' },
+              ],
+            }),
         });
-      } else {
-        list.push({
-          label: translate('loadingapp.custom') as string,
-          onPress: () => customServer(),
-        });
-        if (hasBackupWallet) {
-          list.push({
-            label: translate('loadedapp.restorebackupwallet') as string,
-            onPress: () =>
-              showConfirm({
-                title: translate('loadedapp.restorebackupwallet') as string,
-                message: translate(
-                  'loadedapp.alert-restorebackupwallet-body',
-                ) as string,
-                buttons: [
-                  {
-                    text: translate('confirm') as string,
-                    onPress: () => restoreLastBackup(),
-                  },
-                  { text: translate('cancel') as string, style: 'cancel' },
-                ],
-              }),
-          });
-        }
       }
     }
     return list;
@@ -118,11 +109,9 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
     actionButtonsDisabled,
     hasRecoveryWalletInfoSaved,
     netInfo.isConnected,
-    mode,
     hasBackupWallet,
     translate,
     recoverRecoveryWalletInfo,
-    changeMode,
     customServer,
     restoreLastBackup,
   ]);

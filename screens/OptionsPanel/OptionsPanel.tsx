@@ -1,14 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useMemo, useState } from 'react';
-import {
-  Image,
-  ImageSourcePropType,
-  Linking,
-  Pressable,
-  ScrollView,
-  Text,
-  View,
-} from 'react-native';
+import { Linking, Pressable, ScrollView, View } from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { useTheme } from '@app/theme';
 
@@ -21,7 +13,6 @@ import { MessagesIcon as BoltIcon } from '@ui/primitives/Icons/BoltIcon';
 import XSocial from '../../assets/img/options/x.svg';
 import Github from '../../assets/img/options/github.svg';
 import Mail from '../../assets/img/options/mail.svg';
-import Refresh from '../../assets/img/options/refresh.svg';
 
 export type OptionsPanelAction = {
   /** Unique key for the action (typically a MenuItemEnum value). */
@@ -56,19 +47,6 @@ export type OptionsPanelProps = {
   /** Fired after a social URL (x/github) is placed on the clipboard, so
    *  the host can show a snackbar. Not fired for `mail` (no copy). */
   onLinkCopied?: (url: string) => void;
-  /**
-   * Mode pill at the bottom. Shows the wallet brand + the mode that will
-   * become active when tapped (so the user reads the destination, mirroring
-   * the legacy drawer's switch). `logoColor` tints the rounded background
-   * behind the logo image when present.
-   */
-  mode?: {
-    walletName: string;
-    targetModeLabel: string;
-    targetModeColor: string;
-    logoSource: ImageSourcePropType;
-    onToggle: () => void;
-  };
   /** Triggered by the triple-chevron close button at top-left. */
   onClose: () => void;
   /** Settings button at top-right, the one way into the Settings screen. */
@@ -85,7 +63,6 @@ const OptionsPanel: React.FC<OptionsPanelProps> = ({
   actions,
   socials,
   onLinkCopied,
-  mode,
   onClose,
   onSettings,
 }) => {
@@ -223,7 +200,7 @@ const OptionsPanel: React.FC<OptionsPanelProps> = ({
         </View>
       </ScrollView>
 
-      {/* Footer: socials + mode pill */}
+      {/* Footer: socials */}
       <View style={{ paddingHorizontal: 24, paddingBottom: 24 }}>
         {/* Caption: URL copied to clipboard. Rendered ABOVE the social row
             so the Android snackbar (anchored to the bottom of the screen)
@@ -266,64 +243,6 @@ const OptionsPanel: React.FC<OptionsPanelProps> = ({
                 {social.id === 'mail' && <Mail width={29} height={29} />}
               </Pressable>
             ))}
-          </View>
-        )}
-
-        {mode && (
-          // Only the name + mode label + refresh icon are tappable; the
-          // logo image on the left is purely decorative. Wrapping the
-          // logo and the Pressable inside one bordered View keeps the
-          // visual pill intact.
-          <View
-            style={{
-              borderWidth: 1,
-              borderColor: colors.borderMuted,
-              borderRadius: 10,
-              padding: 10,
-              flexDirection: 'row',
-              alignItems: 'center',
-            }}
-          >
-            <Image
-              source={mode.logoSource}
-              style={{
-                width: 32,
-                height: 32,
-                resizeMode: 'contain',
-                borderRadius: 7,
-                marginRight: 12,
-              }}
-            />
-            <Pressable
-              onPress={mode.onToggle}
-              style={({ pressed }) => ({
-                flex: 1,
-                flexDirection: 'row',
-                alignItems: 'center',
-                opacity: pressed ? 0.7 : 1,
-              })}
-            >
-              <Text
-                style={{
-                  flex: 1,
-                  fontWeight: 'bold',
-                  fontSize: 16,
-                  color: colors.fgDefault,
-                }}
-              >
-                {mode.walletName + '   '}
-                <Text
-                  style={{
-                    color: mode.targetModeColor,
-                    fontWeight: 'bold',
-                    fontSize: 14,
-                  }}
-                >
-                  {mode.targetModeLabel}
-                </Text>
-              </Text>
-              <Refresh width={18} height={18} />
-            </Pressable>
           </View>
         )}
       </View>

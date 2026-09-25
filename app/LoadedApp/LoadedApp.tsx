@@ -1,14 +1,11 @@
-/* eslint-disable react-native/no-inline-styles */
 import React, { Component, useState, useMemo, useEffect } from 'react';
 import {
-  View,
   I18nManager,
   EmitterSubscription,
   AppState,
   NativeEventSubscription,
   Linking,
   Platform,
-  ActivityIndicator,
 } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useTheme } from '@app/theme';
@@ -52,7 +49,6 @@ import {
   SecurityType,
   MenuItemEnum,
   LanguageEnum,
-  ModeEnum,
   SelectServerEnum,
   ChainNameEnum,
   SeedActionEnum,
@@ -110,7 +106,7 @@ import History from '@screens/History';
 import Send from '@screens/Send';
 import Receive from '@screens/Receive';
 import Settings from '@screens/Settings';
-import CustomTabBar, { FadeOnlyTabBar } from '@app/navigation/CustomTabBar';
+import CustomTabBar from '@app/navigation/CustomTabBar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import {
   BottomSheetModal,
@@ -205,7 +201,6 @@ type LoadedAppProps = {
     RouteEnum.LoadedApp
   >['navigation'];
   route: StackScreenProps<AppStackParamList, RouteEnum.LoadedApp>['route'];
-  toggleTheme: (mode: ModeEnum) => void;
 };
 
 const SERVER_DEFAULT_0: ServerType = {
@@ -218,7 +213,6 @@ export default function LoadedApp(props: LoadedAppProps) {
   const [language, setLanguage] = useState<LanguageEnum>(LanguageEnum.en);
   const [server, setServer] = useState<ServerType>(SERVER_DEFAULT_0);
   const [privacy, setPrivacy] = useState<boolean>(false);
-  const [mode, setMode] = useState<ModeEnum>(ModeEnum.advanced); // by default advanced
   const [backgroundSyncInfo, setBackgroundSyncInfo] = useState<BackgroundType>({
     batches: 0,
     message: '',
@@ -384,16 +378,6 @@ export default function LoadedApp(props: LoadedAppProps) {
         setPrivacy(settings.privacy);
       } else {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.privacy, privacy);
-      }
-      if (
-        settings.mode === ModeEnum.basic ||
-        settings.mode === ModeEnum.advanced
-      ) {
-        setMode(settings.mode);
-        props.toggleTheme(settings.mode);
-      } else {
-        await SettingsFileImpl.writeSettings(SettingsNameEnum.mode, mode);
-        props.toggleTheme(mode);
       }
       if (settings.security) {
         setSecurity(settings.security);
@@ -624,7 +608,6 @@ export default function LoadedApp(props: LoadedAppProps) {
         language={language}
         server={server}
         privacy={privacy}
-        mode={mode}
         backgroundSyncInfo={backgroundSyncInfo}
         readOnly={readOnly}
         orchardPool={orchardPool}
@@ -643,34 +626,12 @@ export default function LoadedApp(props: LoadedAppProps) {
   }
 }
 
-type LoadingProps = {
-  backgroundColor: string;
-  spinColor: string;
-};
-
-const Loading: React.FC<LoadingProps> = ({ backgroundColor, spinColor }) => {
-  return (
-    <View
-      style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: backgroundColor,
-        height: '100%',
-      }}
-    >
-      <ActivityIndicator size="large" color={spinColor} />
-    </View>
-  );
-};
-
 type LoadedAppClassProps = {
   navigationApp: StackScreenProps<
     AppStackParamList,
     RouteEnum.LoadedApp
   >['navigation'];
   route: StackScreenProps<AppStackParamList, RouteEnum.LoadedApp>['route'];
-  toggleTheme: (mode: ModeEnum) => void;
   translate: (key: string) => TranslateType;
   // Mutates the i18n instance's active locale. Needed so language changes
   // applied without remounting LoadedApp (reset=false in setLanguageOption)
@@ -681,7 +642,6 @@ type LoadedAppClassProps = {
   language: LanguageEnum;
   server: ServerType;
   privacy: boolean;
-  mode: ModeEnum;
   backgroundSyncInfo: BackgroundType;
   readOnly: boolean;
   orchardPool: boolean;
@@ -702,8 +662,6 @@ type LoadedAppClassState = AppStateLoaded & AppContextLoaded;
 const renderTabBar = (
   props: import('@react-navigation/bottom-tabs').BottomTabBarProps,
 ) => <CustomTabBar {...props} />;
-
-const renderFadeOnlyTabBar = () => <FadeOnlyTabBar />;
 
 export class LoadedAppClass extends Component<
   LoadedAppClassProps,
@@ -764,13 +722,11 @@ export class LoadedAppClass extends Component<
       setZecPrice: this.setZecPrice,
       zingolibVersion: '',
       setPrivacyOption: this.setPrivacyOption,
-      setModeOption: this.setModeOption,
 
       // context settings
       server: props.server,
       language: props.language,
       privacy: props.privacy,
-      mode: props.mode,
       security: props.security,
       selectServer: props.selectServer,
       walletChainName: props.walletChainName,
@@ -1229,34 +1185,6 @@ export class LoadedAppClass extends Component<
     valueTransfers: ValueTransferType[],
     valueTransfersTotal: number,
   ) => {
-    const basicFirstViewSeed = (await SettingsFileImpl.readSettings())
-      .basicFirstViewSeed;
-    // only for basic mode
-    if (this.state.mode === ModeEnum.basic) {
-      // only if the user doesn't see the seed the first time
-      if (!basicFirstViewSeed) {
-        // only if the App are in foreground
-        const background = await AsyncStorage.getItem(GlobalConst.background);
-        // only if the wallet have some ValueTransfers
-        if (background === GlobalConst.no && valueTransfersTotal > 0) {
-          // I need to check this out in the seed screen.
-          if (!this.state.isSeedViewModalOpen) {
-            this.setIsSeedViewModalOpen(true);
-            this.drawerNav?.navigate(RouteEnum.Seed, {
-              action: SeedActionEnum.view,
-            });
-          }
-        }
-      }
-    } else {
-      // for advanced mode
-      if (!basicFirstViewSeed) {
-        await SettingsFileImpl.writeSettings(
-          SettingsNameEnum.basicFirstViewSeed,
-          true,
-        );
-      }
-    }
     if (
       !isEqual(this.state.valueTransfers, valueTransfers) ||
       this.state.valueTransfersTotal !== valueTransfersTotal
@@ -1632,23 +1560,6 @@ export class LoadedAppClass extends Component<
         });
       }
       return;
-    } else if (item === MenuItemEnum.LoadWalletFromSeed) {
-      const { translate } = this.state;
-      showConfirm({
-        title: translate('loadedapp.restorewallet-title') as string,
-        message: translate('loadedapp.restorewallet-alert') as string,
-        buttons: [
-          {
-            text: translate('confirm') as string,
-            onPress: async () =>
-              await this.onClickOKChangeWallet({
-                screen: RouteEnum.ImportUfvk,
-                startingApp: false,
-              }),
-          },
-          { text: translate('cancel') as string, style: 'cancel' },
-        ],
-      });
     } else if (item === MenuItemEnum.Settings) {
       // Bio gate for settingsScreen lives at the Settings screen entry
       // (screens/Settings/Settings.tsx).
@@ -1797,12 +1708,10 @@ export class LoadedAppClass extends Component<
       await SettingsFileImpl.writeSettings(SettingsNameEnum.server, next);
       this.setState({ server: next });
       this.rpc.setServer(next);
-      if (this.state.mode === ModeEnum.advanced) {
-        this.addLastSnackbar(
-          `${this.state.translate('loadedapp.selectingserverbest') as string} ${next.uri}`,
-          SnackbarDurationEnum.long,
-        );
-      }
+      this.addLastSnackbar(
+        `${this.state.translate('loadedapp.selectingserverbest') as string} ${next.uri}`,
+        SnackbarDurationEnum.long,
+      );
       return true;
     }
     return false;
@@ -1865,15 +1774,6 @@ export class LoadedAppClass extends Component<
     this.setState({
       privacy: value as boolean,
     });
-  };
-
-  setModeOption = async (value: string): Promise<void> => {
-    await SettingsFileImpl.writeSettings(SettingsNameEnum.mode, value);
-    this.setState({
-      mode: value as ModeEnum,
-    });
-    // this function change the Theme in the App component.
-    this.props.toggleTheme(value as ModeEnum);
   };
 
   setSecurityOption = async (value: SecurityType): Promise<void> => {
@@ -1952,9 +1852,6 @@ export class LoadedAppClass extends Component<
 
   navigateToLoadingApp = async (state: LoadingAppNavigationState) => {
     await this.rpc.clearTimers();
-    if (state.screen === RouteEnum.ImportUfvk) {
-      await this.setModeOption(ModeEnum.advanced);
-    }
     this.props.navigationApp.reset({
       index: 0,
       routes: [
@@ -2169,18 +2066,7 @@ export class LoadedAppClass extends Component<
   };
 
   render() {
-    const {
-      mode,
-      valueTransfersTotal,
-      readOnly,
-      totalBalance,
-      scrollToTop,
-      scrollToBottom,
-      addresses,
-      somePending,
-      selectServer,
-    } = this.state;
-    const { colors } = this.props.theme;
+    const { readOnly, scrollToTop, scrollToBottom, selectServer } = this.state;
 
     const context = {
       //context
@@ -2220,13 +2106,11 @@ export class LoadedAppClass extends Component<
       setZecPrice: this.state.setZecPrice,
       zingolibVersion: this.state.zingolibVersion,
       setPrivacyOption: this.setPrivacyOption,
-      setModeOption: this.setModeOption,
 
       // context settings
       server: this.state.server,
       language: this.state.language,
       privacy: this.state.privacy,
-      mode: this.state.mode,
       security: this.state.security,
       selectServer: this.state.selectServer,
       walletChainName: this.state.walletChainName,
@@ -2249,7 +2133,6 @@ export class LoadedAppClass extends Component<
               <OptionsPanelProvider>
                 <LoadedAppOptionsPanelHost
                   onMenuItemSelected={this.onMenuItemSelected}
-                  setModeOption={this.setModeOption}
                   zingolibVersion={this.state.zingolibVersion}
                 >
                   <RootNavigator initialRouteName={RouteEnum.HomeStack}>
@@ -2260,148 +2143,87 @@ export class LoadedAppClass extends Component<
                         });
                         return (
                           <>
-                            {mode === ModeEnum.advanced ||
-                            (valueTransfersTotal !== null &&
-                              valueTransfersTotal > 0) ||
-                            (!readOnly &&
-                              !!totalBalance &&
-                              totalBalance.confirmedOrchardBalance +
-                                totalBalance.confirmedSaplingBalance >
-                                0) ? (
-                              <Tab.Navigator
-                                detachInactiveScreens={true}
-                                initialRouteName={RouteEnum.History}
-                                backBehavior="initialRoute"
-                                tabBar={renderTabBar}
-                                screenOptions={{
-                                  headerShown: false,
-                                }}
-                              >
-                                <Tab.Screen name={RouteEnum.History}>
-                                  {propsTab => (
-                                    <History
-                                      {...propsTab}
-                                      toggleMenuDrawer={
-                                        () => toggleOptionsPanel() /* header */
-                                      }
-                                      setShieldingAmount={
-                                        this.setShieldingAmount /* header */
-                                      }
-                                      setScrollToTop={
-                                        this
-                                          .setScrollToTop /* header & history */
-                                      }
-                                      scrollToTop={scrollToTop /* history */}
-                                      setScrollToBottom={
-                                        this
-                                          .setScrollToBottom /* header & messages */
-                                      }
-                                    />
-                                  )}
-                                </Tab.Screen>
-                                {!readOnly &&
-                                  selectServer !== SelectServerEnum.offline &&
-                                  (mode === ModeEnum.advanced ||
-                                    (!!totalBalance &&
-                                      totalBalance.confirmedIronwoodBalance +
-                                        totalBalance.confirmedOrchardBalance +
-                                        totalBalance.confirmedSaplingBalance >
-                                        0) ||
-                                    (!!totalBalance &&
-                                      ((totalBalance.totalIronwoodBalance > 0 &&
-                                        totalBalance.confirmedIronwoodBalance ===
-                                          0) ||
-                                        (totalBalance.totalOrchardBalance > 0 &&
-                                          totalBalance.confirmedOrchardBalance ===
-                                            0) ||
-                                        (totalBalance.totalSaplingBalance > 0 &&
-                                          totalBalance.confirmedSaplingBalance ===
-                                            0)) &&
-                                      somePending)) && (
-                                    <Tab.Screen name={RouteEnum.Send}>
-                                      {propsTab => (
-                                        <Send
-                                          {...propsTab}
-                                          toggleMenuDrawer={
-                                            () =>
-                                              toggleOptionsPanel() /* header */
-                                          }
-                                          setShieldingAmount={
-                                            this.setShieldingAmount /* header */
-                                          }
-                                          setScrollToTop={
-                                            this
-                                              .setScrollToTop /* header & send */
-                                          }
-                                          setScrollToBottom={
-                                            this
-                                              .setScrollToBottom /* header & send */
-                                          }
-                                          sendTransaction={
-                                            this.sendTransaction /* send */
-                                          }
-                                          setServerOption={
-                                            this.setServerOption /* send */
-                                          }
-                                          clearToAddr={
-                                            this.clearToAddr /* send */
-                                          }
-                                          setSecurityOption={
-                                            this.setSecurityOption /* send */
-                                          }
-                                        />
-                                      )}
-                                    </Tab.Screen>
-                                  )}
-                                <Tab.Screen name={RouteEnum.Receive}>
-                                  {propsTab => (
-                                    <Receive
-                                      {...propsTab}
-                                      toggleMenuDrawer={
-                                        () => toggleOptionsPanel() /* header */
-                                      }
-                                      alone={false /* receive */}
-                                      setSecurityOption={this.setSecurityOption}
-                                      setAddressBook={this.setAddressBook}
-                                    />
-                                  )}
-                                </Tab.Screen>
-                              </Tab.Navigator>
-                            ) : (
-                              <>
-                                {addresses === null ? (
-                                  <Loading
-                                    backgroundColor={colors.bgCanvas}
-                                    spinColor={colors.fgAccent}
+                            <Tab.Navigator
+                              detachInactiveScreens={true}
+                              initialRouteName={RouteEnum.History}
+                              backBehavior="initialRoute"
+                              tabBar={renderTabBar}
+                              screenOptions={{
+                                headerShown: false,
+                              }}
+                            >
+                              <Tab.Screen name={RouteEnum.History}>
+                                {propsTab => (
+                                  <History
+                                    {...propsTab}
+                                    toggleMenuDrawer={
+                                      () => toggleOptionsPanel() /* header */
+                                    }
+                                    setShieldingAmount={
+                                      this.setShieldingAmount /* header */
+                                    }
+                                    setScrollToTop={
+                                      this.setScrollToTop /* header & history */
+                                    }
+                                    scrollToTop={scrollToTop /* history */}
+                                    setScrollToBottom={
+                                      this
+                                        .setScrollToBottom /* header & messages */
+                                    }
                                   />
-                                ) : (
-                                  <Tab.Navigator
-                                    initialRouteName={RouteEnum.Receive}
-                                    tabBar={renderFadeOnlyTabBar}
-                                    screenOptions={{
-                                      headerShown: false,
-                                    }}
-                                  >
-                                    <Tab.Screen name={RouteEnum.Receive}>
-                                      {propsTab => (
-                                        <Receive
-                                          {...propsTab}
-                                          toggleMenuDrawer={
-                                            () =>
-                                              toggleOptionsPanel() /* header */
-                                          }
-                                          alone={true /* receive */}
-                                          setSecurityOption={
-                                            this.setSecurityOption
-                                          }
-                                          setAddressBook={this.setAddressBook}
-                                        />
-                                      )}
-                                    </Tab.Screen>
-                                  </Tab.Navigator>
                                 )}
-                              </>
-                            )}
+                              </Tab.Screen>
+                              {!readOnly &&
+                                selectServer !== SelectServerEnum.offline && (
+                                  <Tab.Screen name={RouteEnum.Send}>
+                                    {propsTab => (
+                                      <Send
+                                        {...propsTab}
+                                        toggleMenuDrawer={
+                                          () =>
+                                            toggleOptionsPanel() /* header */
+                                        }
+                                        setShieldingAmount={
+                                          this.setShieldingAmount /* header */
+                                        }
+                                        setScrollToTop={
+                                          this
+                                            .setScrollToTop /* header & send */
+                                        }
+                                        setScrollToBottom={
+                                          this
+                                            .setScrollToBottom /* header & send */
+                                        }
+                                        sendTransaction={
+                                          this.sendTransaction /* send */
+                                        }
+                                        setServerOption={
+                                          this.setServerOption /* send */
+                                        }
+                                        clearToAddr={
+                                          this.clearToAddr /* send */
+                                        }
+                                        setSecurityOption={
+                                          this.setSecurityOption /* send */
+                                        }
+                                      />
+                                    )}
+                                  </Tab.Screen>
+                                )}
+                              <Tab.Screen name={RouteEnum.Receive}>
+                                {propsTab => (
+                                  <Receive
+                                    {...propsTab}
+                                    toggleMenuDrawer={
+                                      () => toggleOptionsPanel() /* header */
+                                    }
+                                    alone={false /* receive */}
+                                    setSecurityOption={this.setSecurityOption}
+                                    setAddressBook={this.setAddressBook}
+                                  />
+                                )}
+                              </Tab.Screen>
+                            </Tab.Navigator>
                           </>
                         );
                       }}
@@ -2509,7 +2331,6 @@ export class LoadedAppClass extends Component<
                               {...props}
                               onClickOK={() => {}}
                               onClickCancel={() => {}}
-                              keepAwake={this.keepAwake}
                               setIsSeedViewModalOpen={
                                 this.setIsSeedViewModalOpen
                               }

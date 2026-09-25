@@ -31,7 +31,7 @@ export const navigationRef = createNavigationContainerRef();
 // The provider has to sit above every consumer, so App cannot read the theme it
 // renders. The shell is what consumes it.
 const AppShell: React.FunctionComponent = () => {
-  const { colors, toggleTheme } = useTheme();
+  const { colors } = useTheme();
   const theme = useMemo(() => navigationTheme(colors), [colors]);
 
   // avoid to close the App when the user tap on
@@ -73,10 +73,10 @@ const AppShell: React.FunctionComponent = () => {
                 screenOptions={{ headerShown: false, animation: 'none' }}
               >
                 <Stack.Screen name={RouteEnum.LoadingApp}>
-                  {props => <LoadingApp {...props} toggleTheme={toggleTheme} />}
+                  {props => <LoadingApp {...props} />}
                 </Stack.Screen>
                 <Stack.Screen name={RouteEnum.LoadedApp}>
-                  {props => <LoadedApp {...props} toggleTheme={toggleTheme} />}
+                  {props => <LoadedApp {...props} />}
                 </Stack.Screen>
                 {/* ScannerAddress lives at the root Stack (above LoadedApp,
                   therefore above the BottomSheetModalProvider portal). Without

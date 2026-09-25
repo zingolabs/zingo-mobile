@@ -125,7 +125,6 @@
     "custom": "Servidor Personalizado...",
     "nointernet-message": "Não há conexão com a Internet estabelecida. Por favor, corrija esse problema.",
     "offline-message": "No modo offline você pode criar uma nova carteira ou restaurar uma a partir da semente ou da chave de visualização. Ela não será sincronizada nem mostrará saldos até você escolher um servidor.",
-    "advancedmode": "Alterar para o Modo Avançado",
     "noopenwallet-message": "Ocorreu um erro enquanto o aplicativo tentava abrir a carteira atual.",
     "walletrepair-body": "O arquivo da carteira parece criptografado duas vezes, um problema conhecido do Zingo 2.0.21. Seus fundos estão seguros. Não desinstale o aplicativo nem redefina a carteira. Toque em Reparar para corrigir o arquivo.",
     "walletrepair-button": "Reparar",
@@ -163,9 +162,8 @@
     "info": "Informações do Servidor",
     "options": "Opções",
     "walletseed": "Frases da Carteira",
-    "walletseed-basic": "Backup das Frases da Carteira",
+    "walletbackupseed": "Backup das Frases da Carteira",
     "walletufvk": "Chave de Visualização",
-    "walletufvk-basic": "Backup de Chave de Visualização",
     "rescanwallet": "Rescanear a Carteira",
     "report": "Sincronizar / Relatório de Rescan",
     "changewallet": "Abrir outra Carteira",
@@ -173,9 +171,7 @@
     "alert-restorebackupwallet-body": "Confirme que deseja restaurar o último backup da carteira.",
     "fundpools": "Fundos na Pool",
     "insight": "Visão Financeira",
-    "loadwalletfromseed-basic": "Restaurar outra Carteira",
     "addressbook": "Agenda de Endereços",
-    "tipzingolabs-basic": "Apoiar a ZingoLabs",
     "support": "E-mail de suporte do {name}",
     "changeservernew-error": "Error ao tentar alterar para um novo servidor: ",
     "readingwallet-error": "Error ao tentar ler a carteira com o novo servidor:",
@@ -271,16 +267,6 @@
         "text": "Privacidade Normal, você pode ver todas as informações."
       }
     ],
-    "modes": [
-      {
-        "value": "basic",
-        "text": "Modo Básico, a maneira mais simples de usar a {name}."
-      },
-      {
-        "value": "advanced",
-        "text": "Modo Avançado, para usuários mais avançados."
-      }
-    ],
     "recoverywalletinfoondevices": [
       {
         "value": true,
@@ -356,7 +342,6 @@
     "language-title": "Linguagem",
     "islanguage": "Você precisa escolher um idioma para salvar.",
     "privacy-title": "Ocultar valores sensíveis",
-    "mode-title": "Alterar entre o modo Básico ou Avançado",
     "recoverywalletinfoondevice-title": "Armazene informações de recuperação da carteira",
     "performancelevel-title": "Zingolib Performance Level",
     "blockexplorer-title": "Block Explorer",
@@ -366,9 +351,6 @@
     "value-privacy-true": "Alto",
     "value-privacy-false": "Média",
     "privacy": "Priv: ",
-    "value-mode-basic": "Básico",
-    "value-mode-advanced": "Avançado",
-    "mode": "Modo: ",
     "value-chainname-main": "Mainnet",
     "value-chainname-test": "Testnet",
     "value-chainname-regtest": "Regtest",
@@ -577,7 +559,6 @@
     "transparent-expose-warning": "Endereços transparentes expõem seus dados.",
     "noaddress": "Sem Endereço",
     "title-address": "Meu Endereço",
-    "title-basic-alone": "Meu Endereço de Recebimento",
     "newu-option": "Novo Endereço Unificado Diversificado",
     "danger-zone": "ZONA DE PERIGO",
     "go-to-transparent": "Ver endereço transparente",
