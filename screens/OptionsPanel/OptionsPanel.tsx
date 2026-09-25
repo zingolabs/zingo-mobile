@@ -1,14 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useMemo, useState } from 'react';
-import {
-  Image,
-  ImageSourcePropType,
-  Linking,
-  Pressable,
-  ScrollView,
-  Text,
-  View,
-} from 'react-native';
+import { Linking, Pressable, ScrollView, View } from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { useTheme } from '@app/theme';
 
@@ -55,11 +47,6 @@ export type OptionsPanelProps = {
   /** Fired after a social URL (x/github) is placed on the clipboard, so
    *  the host can show a snackbar. Not fired for `mail` (no copy). */
   onLinkCopied?: (url: string) => void;
-  /** Brand pill at the bottom: the wallet's logo and name. */
-  brand?: {
-    walletName: string;
-    logoSource: ImageSourcePropType;
-  };
   /** Triggered by the triple-chevron close button at top-left. */
   onClose: () => void;
   /** Settings button at top-right, the one way into the Settings screen. */
@@ -76,7 +63,6 @@ const OptionsPanel: React.FC<OptionsPanelProps> = ({
   actions,
   socials,
   onLinkCopied,
-  brand,
   onClose,
   onSettings,
 }) => {
@@ -214,7 +200,7 @@ const OptionsPanel: React.FC<OptionsPanelProps> = ({
         </View>
       </ScrollView>
 
-      {/* Footer: socials + brand pill */}
+      {/* Footer: socials */}
       <View style={{ paddingHorizontal: 24, paddingBottom: 24 }}>
         {/* Caption: URL copied to clipboard. Rendered ABOVE the social row
             so the Android snackbar (anchored to the bottom of the screen)
@@ -257,40 +243,6 @@ const OptionsPanel: React.FC<OptionsPanelProps> = ({
                 {social.id === 'mail' && <Mail width={29} height={29} />}
               </Pressable>
             ))}
-          </View>
-        )}
-
-        {brand && (
-          <View
-            style={{
-              borderWidth: 1,
-              borderColor: colors.borderMuted,
-              borderRadius: 10,
-              padding: 10,
-              flexDirection: 'row',
-              alignItems: 'center',
-            }}
-          >
-            <Image
-              source={brand.logoSource}
-              style={{
-                width: 32,
-                height: 32,
-                resizeMode: 'contain',
-                borderRadius: 7,
-                marginRight: 12,
-              }}
-            />
-            <Text
-              style={{
-                flex: 1,
-                fontWeight: 'bold',
-                fontSize: 16,
-                color: colors.fgDefault,
-              }}
-            >
-              {brand.walletName}
-            </Text>
           </View>
         )}
       </View>

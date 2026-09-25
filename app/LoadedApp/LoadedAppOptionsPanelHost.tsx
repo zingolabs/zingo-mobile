@@ -10,7 +10,6 @@ import { ContextAppLoaded } from '@app/context';
 import { MenuItemEnum, SelectServerEnum } from '@app/AppState';
 import { sendEmail } from '@app/services/sendEmail';
 import { walletBackupExists } from '@app/walletBackend';
-import { getZingoLogo, getZingoName } from '@app/utils/ZingoAppData';
 
 import AddressBookIcon from '../../assets/img/options/address-book.svg';
 import WalletSeedIcon from '../../assets/img/options/wallet-seed.svg';
@@ -49,7 +48,7 @@ type LoadedAppOptionsPanelHostProps = {
 /**
  * Wires the global OptionsPanel content for the LoadedApp tree: builds the
  * actions grid from MenuItemEnum, the 3 socials (X / GitHub copy-URL, mail
- * launches the device composer) and the brand pill at the bottom.
+ * launches the device composer).
  * Stays in a functional component so it can consume ContextAppLoaded and the
  * OptionsPanel context naturally (LoadedApp itself is a class).
  */
@@ -190,18 +189,12 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
     [translate, zingolibVersion],
   );
 
-  const brandPill = useMemo(
-    () => ({ walletName: getZingoName(), logoSource: getZingoLogo() }),
-    [],
-  );
-
   return (
     <OptionsPanelHost
       title={translate('loadedapp.options') as string}
       actions={actions}
       socials={socials}
       onLinkCopied={() => addLastSnackbar(translate('linkcopied') as string)}
-      brand={brandPill}
       onClose={closeOptionsPanel}
       onSettings={() => dispatch(MenuItemEnum.Settings)}
     >
