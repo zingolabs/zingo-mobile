@@ -11,7 +11,7 @@ import {
 } from '@app/context';
 
 import Confirm from '@screens/Confirm';
-import { ModeEnum, RouteEnum } from '@app/AppState';
+import { RouteEnum } from '@app/AppState';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
@@ -55,7 +55,6 @@ describe('Confirm - snapshots', () => {
   // stays inactive and the snapshot captures the actual Confirm UI rather
   // than the auth placeholder.
   state.security = { ...mockSecurity, sendConfirm: false };
-  state.mode = ModeEnum.advanced;
   state.defaultUnifiedAddress = 'u1abc123def456abc123def456abc123def456abc123';
 
   test('Confirm privacy off', () => {

@@ -4,20 +4,12 @@ let loadTestWallet = async () => {
   // waiting while app is detecting the best server
   await sleep(2000);
 
-  // the start always is like a fresh install -> create a new wallet
-  // go to setting modal screen
-  await waitFor(element(by.id('header.drawmenu')))
+  // the start always is like a fresh install -> the app lands on the
+  // start menu, where the restore action lives
+  await waitFor(element(by.id('loadingapp.restorewalletseedufvk')))
     .toBeVisible()
     .withTimeout(sync_timeout);
-  await element(by.id('header.drawmenu')).tap();
-  await waitFor(element(by.id('menu.loadwalletfromseed')))
-    .toBeVisible()
-    .withTimeout(sync_timeout);
-  await element(by.id('menu.loadwalletfromseed')).tap();
-  await waitFor(element(by.text('CONFIRM')))
-    .toBeVisible()
-    .withTimeout(sync_timeout);
-  await element(by.text('CONFIRM')).tap();
+  await element(by.id('loadingapp.restorewalletseedufvk')).tap();
 
   await waitFor(element(by.id('import.seedufvkinput')))
     .toBeVisible()

@@ -34,7 +34,7 @@ import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
 } from '@app/context';
-import { ModeEnum, RouteEnum } from '@app/AppState';
+import { RouteEnum } from '@app/AppState';
 import {
   usePriceFetcherStore,
   usePriceHealth,
@@ -79,7 +79,6 @@ const sendUi = (zecPrice: { zecPrice: number; date: number }) => {
   state.server = mockServer;
   state.totalBalance = mockTotalBalance;
   state.sendPageState = mockSendPageState;
-  state.mode = ModeEnum.advanced;
   state.zecPrice = zecPrice;
   return (
     <ContextAppLoadedProvider value={state}>
@@ -151,7 +150,6 @@ test('N7: the send-confirmation conversions dim on a stale price too', () => {
   state.totalBalance = mockTotalBalance;
   state.server = mockServer;
   state.sendPageState = mockSendPageState;
-  state.mode = ModeEnum.advanced;
   state.zecPrice = { zecPrice: 33.33, date: Date.now() - 40 * 60_000 };
   state.security = { ...state.security, sendConfirm: false };
   const confirmProps: React.ComponentProps<typeof Confirm> = {

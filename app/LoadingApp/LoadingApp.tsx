@@ -60,7 +60,6 @@ import {
   SecurityType,
   ServerUrisType,
   LanguageEnum,
-  ModeEnum,
   SelectServerEnum,
   ChainNameEnum,
   SnackbarDurationEnum,
@@ -130,7 +129,6 @@ type LoadingAppProps = {
     RouteEnum.LoadingApp
   >['navigation'];
   route: StackScreenProps<AppStackParamList, RouteEnum.LoadingApp>['route'];
-  toggleTheme: (mode: ModeEnum) => void;
 };
 
 const SERVER_DEFAULT_0: ServerType = {
@@ -150,9 +148,6 @@ export default function LoadingApp(props: LoadingAppProps) {
   const [language, setLanguage] = useState<LanguageEnum>(LanguageEnum.en);
   const [server, setServer] = useState<ServerType>(SERVER_DEFAULT_0);
   const [privacy, setPrivacy] = useState<boolean>(false);
-  const [mode, setMode] = useState<ModeEnum.basic | ModeEnum.advanced>(
-    ModeEnum.advanced,
-  ); // by default advanced
   const [backgroundSyncInfo, setBackgroundSyncInfo] = useState<BackgroundType>({
     batches: 0,
     message: '',
@@ -223,30 +218,6 @@ export default function LoadingApp(props: LoadingAppProps) {
       ) {
         // this is an update
         setFirstLaunchingMessage(LaunchingModeEnum.updating);
-      }
-
-      // first I need to know if this launch is a fresh install...
-      // if firstInstall is true -> 100% is the first time.
-      if (settings.firstInstall) {
-        // basic mode
-        setMode(ModeEnum.basic);
-        props.toggleTheme(ModeEnum.basic);
-        await SettingsFileImpl.writeSettings(
-          SettingsNameEnum.mode,
-          ModeEnum.basic,
-        );
-      } else {
-        if (
-          settings.mode === ModeEnum.basic ||
-          settings.mode === ModeEnum.advanced
-        ) {
-          setMode(settings.mode);
-          props.toggleTheme(settings.mode);
-        } else {
-          // if it is not a fresh install -> advanced
-          await SettingsFileImpl.writeSettings(SettingsNameEnum.mode, mode);
-          props.toggleTheme(mode);
-        }
       }
 
       if (
@@ -398,7 +369,6 @@ export default function LoadingApp(props: LoadingAppProps) {
         language={language}
         server={server}
         privacy={privacy}
-        mode={mode}
         backgroundSyncInfo={backgroundSyncInfo}
         firstLaunchingMessage={firstLaunchingMessage}
         security={security}
@@ -417,13 +387,11 @@ type LoadingAppClassProps = {
     RouteEnum.LoadingApp
   >['navigation'];
   route: StackScreenProps<AppStackParamList, RouteEnum.LoadingApp>['route'];
-  toggleTheme: (mode: ModeEnum) => void;
   translate: (key: string) => TranslateType;
   theme: AppTheme;
   language: LanguageEnum;
   server: ServerType;
   privacy: boolean;
-  mode: ModeEnum;
   backgroundSyncInfo: BackgroundType;
   firstLaunchingMessage: LaunchingModeEnum;
   security: SecurityType;
@@ -471,7 +439,6 @@ export class LoadingAppClass extends Component<
       server: props.server,
       language: props.language,
       privacy: props.privacy,
-      mode: props.mode,
       security: props.security,
       selectServer: props.selectServer,
       recoveryWalletInfoOnDevice: props.recoveryWalletInfoOnDevice,
@@ -577,7 +544,7 @@ export class LoadingAppClass extends Component<
       await this.selectServerOnBoot(!!netInfoState.isConnected);
     }
 
-    // Second, check if a wallet exists. Do it async so the basic screen has time to render
+    // Second, check if a wallet exists. Do it async so the screen has time to render
     await AsyncStorage.setItem(GlobalConst.background, GlobalConst.no);
     const exists = await rpcWalletExists();
     const backupExists = await walletBackupExists();
@@ -589,65 +556,15 @@ export class LoadingAppClass extends Component<
       this.setState({ walletExists: true });
       await this.loadExistingWalletOnBoot();
     } else {
-      if (this.state.mode === ModeEnum.basic) {
-        // setting the prop basicFirstViewSeed to false.
-        // this means when the user have funds, the seed screen will show up.
-        await SettingsFileImpl.writeSettings(
-          SettingsNameEnum.basicFirstViewSeed,
-          false,
-        );
-        if (this.state.hasRecoveryWalletInfoSaved) {
-          // but first we need to check if exists some key stored in the device from a previous installation (IOS)
-          await this.recoverRecoveryWalletInfo(false);
-          // go to the initial menu, giving the opportunity to the user
-          // to use the seed & birthday recovered from the device.
-          this.setState({
-            screen: RouteEnum.StartMenu,
-            walletExists: false,
-            actionButtonsDisabled: false,
-          });
-        } else {
-          // if no wallet file & basic mode -> create a new wallet & go directly to history screen.
-          // no seed screen.
-          if (
-            !netInfoState.isConnected ||
-            this.state.selectServer === SelectServerEnum.offline
-          ) {
-            this.setState({
-              screen: RouteEnum.StartMenu,
-              walletExists: false,
-              actionButtonsDisabled: false,
-            });
-          } else {
-            await this.createNewWallet(false);
-            this.setState({ actionButtonsDisabled: false });
-            this.navigateToLoadedApp(
-              false,
-              true,
-              true,
-              true,
-              true,
-              this.state.firstLaunchingMessage,
-              // create requires a live server → its chain is the wallet's chain.
-              this.state.server.chainName,
-            );
-          }
-        }
-      } else {
-        // if no wallet file & advanced mode -> go to the initial menu.
-        await SettingsFileImpl.writeSettings(
-          SettingsNameEnum.basicFirstViewSeed,
-          true,
-        );
-        this.setState(state => ({
-          screen:
-            state.screen === RouteEnum.ImportUfvk
-              ? RouteEnum.ImportUfvk
-              : RouteEnum.StartMenu,
-          walletExists: false,
-          actionButtonsDisabled: false,
-        }));
-      }
+      // no wallet file -> go to the initial menu.
+      this.setState(state => ({
+        screen:
+          state.screen === RouteEnum.ImportUfvk
+            ? RouteEnum.ImportUfvk
+            : RouteEnum.StartMenu,
+        walletExists: false,
+        actionButtonsDisabled: false,
+      }));
     }
 
     if (this.unmounted) {
@@ -884,12 +801,8 @@ export class LoadingAppClass extends Component<
       SettingsNameEnum.selectServer,
       targetMode,
     );
-    // message with the result only for advanced users (never at boot)
-    if (
-      !silent &&
-      this.state.mode === ModeEnum.advanced &&
-      someServerIsWorking
-    ) {
+    // message with the result (never at boot)
+    if (!silent && someServerIsWorking) {
       if (isEqual(actualServer, fasterServer)) {
         this.addLastSnackbar(
           this.state.translate('loadedapp.selectingserversame') as string,
@@ -924,14 +837,12 @@ export class LoadingAppClass extends Component<
       };
       this.setState({ server: best });
       await SettingsFileImpl.writeSettings(SettingsNameEnum.server, best);
-      if (this.state.mode === ModeEnum.advanced) {
-        this.addLastSnackbar(
-          (this.state.translate('loadedapp.selectingserverbest') as string) +
-            ' ' +
-            best.uri,
-          SnackbarDurationEnum.long,
-        );
-      }
+      this.addLastSnackbar(
+        (this.state.translate('loadedapp.selectingserverbest') as string) +
+          ' ' +
+          best.uri,
+        SnackbarDurationEnum.long,
+      );
       return true;
     }
     // Registry empty/unreachable → static list ranked by latency, excluding the
@@ -1692,7 +1603,6 @@ export class LoadingAppClass extends Component<
           await removeRecoveryWalletInfo();
         }
       }
-      // basic mode -> same screen.
       this.setState(state => ({
         wallet,
         screen: goSeedScreen ? RouteEnum.NewSeed : state.screen,
@@ -1830,11 +1740,6 @@ export class LoadingAppClass extends Component<
           result.value,
         );
         if (!resultJson.error) {
-          // when restore a wallet never the user needs that the seed screen shows up with the first funds received.
-          await SettingsFileImpl.writeSettings(
-            SettingsNameEnum.basicFirstViewSeed,
-            true,
-          );
           // Load the wallet and navigate to the vts screen
           let readOnly: boolean = false;
           let orchardPool: boolean = false;
@@ -2046,17 +1951,6 @@ export class LoadingAppClass extends Component<
     });
   };
 
-  changeMode = async (mode: ModeEnum.basic | ModeEnum.advanced) => {
-    await SettingsFileImpl.writeSettings(SettingsNameEnum.mode, mode);
-    this.props.toggleTheme(mode);
-    // if the user selects advanced mode & wants to change to another wallet
-    // and then the user wants to go to basic mode in the first screen
-    // the result will be the same -> create a new wallet.
-    this.setState({ mode, screen: RouteEnum.Launching }, () => {
-      this.componentDidMount();
-    });
-  };
-
   recoverRecoveryWalletInfo = async (security: boolean) => {
     // recover the wallet keys from the device
     const wallet = await getRecoveryWalletInfo();
@@ -2073,7 +1967,7 @@ export class LoadingAppClass extends Component<
       setTimeout(
         () => {
           showConfirm({
-            title: this.props.translate('loadedapp.walletseed-basic') as string,
+            title: this.props.translate('loadedapp.walletbackupseed') as string,
             message:
               (security
                 ? ''
@@ -2211,7 +2105,6 @@ export class LoadingAppClass extends Component<
       server: this.state.server,
       language: this.state.language,
       privacy: this.state.privacy,
-      mode: this.state.mode,
       security: this.state.security,
       selectServer: this.state.selectServer,
       recoveryWalletInfoOnDevice: this.state.recoveryWalletInfoOnDevice,
@@ -2240,7 +2133,6 @@ export class LoadingAppClass extends Component<
                   actionButtonsDisabled={actionButtonsDisabled}
                   hasRecoveryWalletInfoSaved={hasRecoveryWalletInfoSaved}
                   recoverRecoveryWalletInfo={this.recoverRecoveryWalletInfo}
-                  changeMode={this.changeMode}
                   customServer={this.customServer}
                   walletExists={walletExists}
                   hasBackupWallet={hasBackupWallet}

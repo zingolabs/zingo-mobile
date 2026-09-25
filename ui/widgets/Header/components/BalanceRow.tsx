@@ -18,7 +18,6 @@ import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
   ChainNameEnum,
-  ModeEnum,
   RouteEnum,
   SelectServerEnum,
   SnackbarDurationEnum,
@@ -55,7 +54,6 @@ const materialize: EntryExitAnimationFunction = () => {
 
 type BalanceRowProps = {
   noBalance: boolean | undefined;
-  mode: ModeEnum;
   noPrivacy: boolean | undefined;
   setPrivacyOption: ((value: boolean) => Promise<void>) | undefined;
   addLastSnackbar:
@@ -80,7 +78,6 @@ type BalanceRowProps = {
 const BalanceRow: React.FC<BalanceRowProps> = React.memo(
   ({
     noBalance,
-    mode,
     noPrivacy,
     setPrivacyOption,
     addLastSnackbar,
@@ -122,17 +119,14 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
               marginBottom: showFiat ? 0 : BALANCE_BOTTOM_GAP,
             }}
           >
-            {mode !== ModeEnum.basic &&
-              !noPrivacy &&
-              setPrivacyOption &&
-              addLastSnackbar && (
-                <PrivacyToggle
-                  privacy={privacy}
-                  setPrivacyOption={setPrivacyOption}
-                  addLastSnackbar={addLastSnackbar}
-                  translate={translate}
-                />
-              )}
+            {!noPrivacy && setPrivacyOption && addLastSnackbar && (
+              <PrivacyToggle
+                privacy={privacy}
+                setPrivacyOption={setPrivacyOption}
+                addLastSnackbar={addLastSnackbar}
+                translate={translate}
+              />
+            )}
             <ZecAmount
               currencyName={info.currencyName}
               color={colors.fgDefault}
@@ -148,8 +142,7 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
               privacy={privacy}
               smallPrefix={true}
             />
-            {mode !== ModeEnum.basic &&
-              totalBalance &&
+            {totalBalance &&
               (totalBalance.totalOrchardBalance !==
                 totalBalance.confirmedOrchardBalance ||
                 totalBalance.totalIronwoodBalance > 0 ||

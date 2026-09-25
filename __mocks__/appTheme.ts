@@ -7,8 +7,7 @@ export const useTheme = () => mockTheme;
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) =>
   children;
 export const navigationTheme = () => mockTheme;
-export const advancedTokens = mockTheme.colors;
-export const basicTokens = mockTheme.colors;
+export const themeTokens = mockTheme.colors;
 
 // Not themed, so re-export the real token instead of a stand-in: the mock
 // shadows the whole `app/theme` barrel, and a missing export here would

@@ -1,49 +1,22 @@
-// Owns the mode, memoizes on it, and exposes the hook under the name the 83
-// consuming files already use. A file that forgets to move its import gets
-// React Navigation's useTheme instead, and every token read fails to compile.
-import React, {
-  createContext,
-  useCallback,
-  useContext,
-  useMemo,
-  useState,
-} from 'react';
+// Exposes the token table under the name the 83 consuming files already use.
+// A file that forgets to move its import gets React Navigation's useTheme
+// instead, and every token read fails to compile.
+import React, { createContext, useContext } from 'react';
 
-import { ModeEnum } from '@app/AppState';
-import { advancedTokens, basicTokens, ThemeColors } from './tokens';
+import { themeTokens, ThemeColors } from './tokens';
 
 export type AppTheme = {
   colors: ThemeColors;
-  mode: ModeEnum;
-  toggleTheme: (mode: ModeEnum) => void;
 };
 
-const ThemeContext = createContext<AppTheme>({
-  colors: advancedTokens,
-  mode: ModeEnum.advanced,
-  toggleTheme: () => {},
-});
+const ThemeContext = createContext<AppTheme>({ colors: themeTokens });
+
+const value: AppTheme = { colors: themeTokens };
 
 export const ThemeProvider: React.FunctionComponent<{
   children: React.ReactNode;
-}> = ({ children }) => {
-  const [mode, setMode] = useState<ModeEnum>(ModeEnum.advanced);
-  const toggleTheme = useCallback((next: ModeEnum) => setMode(next), []);
-
-  // advancedTokens and basicTokens are module constants, so `colors` changes
-  // identity only when the mode flips.
-  const value = useMemo(
-    () => ({
-      colors: mode === ModeEnum.advanced ? advancedTokens : basicTokens,
-      mode,
-      toggleTheme,
-    }),
-    [mode, toggleTheme],
-  );
-
-  return (
-    <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
-  );
-};
+}> = ({ children }) => (
+  <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
+);
 
 export const useTheme = () => useContext(ThemeContext);
