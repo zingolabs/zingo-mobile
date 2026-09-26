@@ -568,6 +568,38 @@ describe('MixnetCoordinator.goOffline', () => {
     expect(latest.reconnecting).toBe(false);
   });
 
+  it('leaves the new tunnel alone when the session returns Online during the disable', async () => {
+    mockedBridge.attachMixnet.mockResolvedValue(
+      statusPayload('ready', '127.0.0.1:1080'),
+    );
+    let releaseDisable!: (payload: string) => void;
+    mockedBridge.disableMixnet.mockReturnValue(
+      new Promise<string>(resolve => {
+        releaseDisable = resolve;
+      }),
+    );
+    const stopTransport = jest.fn().mockResolvedValue(undefined);
+    const published: MixnetView[] = [];
+    const coordinator = coordinatorFor(
+      jest.fn().mockResolvedValue(transportBinding),
+      view => published.push(view),
+      stopTransport,
+    );
+
+    const goingOffline = coordinator.goOffline();
+    await coordinator.ensureForConnectedSession();
+    await flushPromises();
+    releaseDisable(statusPayload('off'));
+    await goingOffline;
+    await flushPromises();
+
+    expect(stopTransport).not.toHaveBeenCalled();
+    expect(published[published.length - 1].statusKey).toBe(
+      'mixnet.status.ready',
+    );
+    coordinator.stop();
+  });
+
   // The launch-Offline case: nothing was ever armed, and the header still has
   // to report where nym stands.
   it('lands off on a session that never armed a transport', async () => {

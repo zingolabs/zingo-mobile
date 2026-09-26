@@ -160,6 +160,9 @@ export class MixnetCoordinator {
     this.reconnectActive = false;
     this.redrawsSpent = 0;
     const disabled = await disableMixnet();
+    if (this.enableEpoch !== epoch) {
+      return;
+    }
     try {
       await this.stopTransport();
     } catch (thrown: unknown) {
