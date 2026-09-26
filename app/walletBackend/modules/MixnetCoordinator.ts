@@ -104,6 +104,7 @@ export class MixnetCoordinator {
   private phase: CoordinatorPhase = 'online';
   private startingEpoch?: number;
   private disabling?: Promise<MixnetStatusReport>;
+  private stopping?: Promise<MixnetStatusReport | null>;
 
   constructor(
     startTransport: StartMixnetTransport,
@@ -139,6 +140,12 @@ export class MixnetCoordinator {
       let binding: MixnetTransportBinding;
       this.startingEpoch = epoch;
       try {
+        if (this.stopping !== undefined) {
+          await this.stopping;
+        }
+        if (!this.isCurrent(epoch)) {
+          return;
+        }
         binding = await this.startTransport();
       } finally {
         if (this.startingEpoch === epoch) {
@@ -215,8 +222,23 @@ export class MixnetCoordinator {
     );
   }
 
-  private stopTransportReport(): Promise<MixnetStatusReport | null> {
-    return this.stopTransport().then(() => null, failureReport);
+  private async stopTransportReport(): Promise<MixnetStatusReport | null> {
+    const stopping = this.reportStop();
+    this.stopping = stopping;
+    const report = await stopping;
+    if (this.stopping === stopping) {
+      this.stopping = undefined;
+    }
+    return report;
+  }
+
+  private async reportStop(): Promise<MixnetStatusReport | null> {
+    try {
+      await this.stopTransport();
+      return null;
+    } catch (thrown: unknown) {
+      return failureReport(thrown);
+    }
   }
 
   stop(): void {
