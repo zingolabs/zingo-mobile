@@ -50,6 +50,49 @@ function failureReport(thrown: unknown): MixnetStatusReport {
   return { kind: 'failure', failure: describeRejection(thrown) };
 }
 
+async function failureOf(
+  act: () => Promise<void>,
+): Promise<MixnetStatusReport | null> {
+  try {
+    await act();
+    return null;
+  } catch (thrown: unknown) {
+    return failureReport(thrown);
+  }
+}
+
+function ignore(): void {}
+
+export function afterSettled<T>(
+  pending: Promise<unknown> | undefined,
+  work: () => Promise<T>,
+): Promise<T> {
+  if (pending !== undefined) {
+    return pending.then(ignore, ignore).then(work);
+  }
+  try {
+    return work();
+  } catch (thrown: unknown) {
+    return Promise.reject(thrown);
+  }
+}
+
+class InFlight {
+  pending?: Promise<unknown>;
+
+  run<T>(work: () => Promise<T>): Promise<T> {
+    const running = afterSettled(this.pending, work);
+    this.pending = running;
+    const release = () => {
+      if (this.pending === running) {
+        this.pending = undefined;
+      }
+    };
+    running.then(release, release);
+    return running;
+  }
+}
+
 const STARTING_REPORT = statusReport(RPCMixnetIndicatorEnum.bootstrapping);
 
 const OFF_REPORT = statusReport(RPCMixnetIndicatorEnum.off);
@@ -103,8 +146,7 @@ export class MixnetCoordinator {
   private enableEpoch: number = 0;
   private phase: CoordinatorPhase = 'online';
   private startingEpoch?: number;
-  private disabling?: Promise<MixnetStatusReport>;
-  private stopping?: Promise<MixnetStatusReport | null>;
+  private readonly teardown = new InFlight();
 
   constructor(
     startTransport: StartMixnetTransport,
@@ -140,8 +182,8 @@ export class MixnetCoordinator {
       let binding: MixnetTransportBinding;
       this.startingEpoch = epoch;
       try {
-        if (this.stopping !== undefined) {
-          await this.stopping;
+        if (this.teardown.pending !== undefined) {
+          await this.teardown.pending;
         }
         if (!this.isCurrent(epoch)) {
           return;
@@ -157,12 +199,6 @@ export class MixnetCoordinator {
         if (this.phase === 'offline') {
           await this.stopOrphanedTransport();
         }
-        return;
-      }
-      if (this.disabling !== undefined) {
-        await this.disabling;
-      }
-      if (!this.isCurrent(epoch)) {
         return;
       }
       const status = await attachMixnet(socks5Addr, exitNode);
@@ -200,12 +236,7 @@ export class MixnetCoordinator {
     this.resetReconnectBackoff();
     this.reconnectActive = false;
     this.redrawsSpent = 0;
-    const disabling = disableMixnet();
-    this.disabling = disabling;
-    const disabled = await disabling;
-    if (this.disabling === disabling) {
-      this.disabling = undefined;
-    }
+    const disabled = await this.teardown.run(disableMixnet);
     if (!this.isCurrent(epoch)) {
       return;
     }
@@ -222,23 +253,8 @@ export class MixnetCoordinator {
     );
   }
 
-  private async stopTransportReport(): Promise<MixnetStatusReport | null> {
-    const stopping = this.reportStop();
-    this.stopping = stopping;
-    const report = await stopping;
-    if (this.stopping === stopping) {
-      this.stopping = undefined;
-    }
-    return report;
-  }
-
-  private async reportStop(): Promise<MixnetStatusReport | null> {
-    try {
-      await this.stopTransport();
-      return null;
-    } catch (thrown: unknown) {
-      return failureReport(thrown);
-    }
+  private stopTransportReport(): Promise<MixnetStatusReport | null> {
+    return this.teardown.run(() => failureOf(() => this.stopTransport()));
   }
 
   stop(): void {

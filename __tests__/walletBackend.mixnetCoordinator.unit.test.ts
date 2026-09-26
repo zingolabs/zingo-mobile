@@ -1,5 +1,6 @@
 import { RPCMixnetIndicatorEnum } from '@app/walletBackend/enums/RPCMixnetIndicatorEnum';
 import {
+  afterSettled,
   BOOTSTRAP_DEADLINE_MILLIS,
   BOOTSTRAP_POLL_MILLIS,
   BOOTSTRAP_REDRAW_LIMIT,
@@ -200,6 +201,39 @@ describe('deriveMixnetView', () => {
         narration,
       ).narration,
     ).toBeNull();
+  });
+});
+
+describe('afterSettled', () => {
+  it('runs the work when nothing is pending', async () => {
+    await expect(afterSettled(undefined, async () => 'done')).resolves.toBe(
+      'done',
+    );
+  });
+
+  it('runs the work only after the pending promise settles', async () => {
+    const pending = deferred<void>();
+    const work = jest.fn().mockResolvedValue('done');
+
+    const running = afterSettled(pending.promise, work);
+    await settleMicrotasks();
+    expect(work).not.toHaveBeenCalled();
+
+    pending.resolve();
+    await expect(running).resolves.toBe('done');
+  });
+
+  it('runs the work after a pending promise that rejects', async () => {
+    await expect(
+      afterSettled(Promise.reject(new Error('gone')), async () => 'done'),
+    ).resolves.toBe('done');
+  });
+
+  it('turns a synchronous throw into a rejection', async () => {
+    const running = afterSettled(undefined, () => {
+      throw new TypeError('not registered');
+    });
+    await expect(running).rejects.toThrow('not registered');
   });
 });
 
