@@ -73,6 +73,17 @@ export function deriveMixnetView(
         recovery: 'none',
         reconnecting: false,
       };
+    // The switch-off is the user's own act, so it carries no recovery and
+    // never reads as a reconnect: an Offline session is resting, not trying.
+    case RPCMixnetIndicatorEnum.off:
+      return {
+        statusKey: 'mixnet.status.off',
+        socks5Addr: null,
+        narration: null,
+        sendBlocked: true,
+        recovery: 'none',
+        reconnecting: false,
+      };
     case RPCMixnetIndicatorEnum.died:
       return {
         statusKey: 'mixnet.status.died',
@@ -92,15 +103,20 @@ export function sendGateOpen(view: MixnetView | null): boolean {
   return view === null ? true : !view.sendBlocked;
 }
 
-export type MixnetPhase = 'connecting' | 'ready' | 'lost' | 'reconnecting';
+export type MixnetPhase =
+  'connecting' | 'ready' | 'lost' | 'reconnecting' | 'off';
 
-// An active reconnect wins over the underlying status.
+// An active reconnect wins over the underlying status, except over `off`:
+// a switched-off transport is not reconnecting, whatever a stale flag says.
 export function mixnetPhase(
   statusKey: MixnetStatusKey,
   reconnecting: boolean,
 ): MixnetPhase {
   if (statusKey === 'mixnet.status.ready') {
     return 'ready';
+  }
+  if (statusKey === 'mixnet.status.off') {
+    return 'off';
   }
   if (reconnecting) {
     return 'reconnecting';

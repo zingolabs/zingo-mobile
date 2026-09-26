@@ -3672,13 +3672,21 @@ fn mixnet_indicator_string(indicator: zingolib::mixnet::Indicator) -> &'static s
         // round trip the library already treats as unnecessary.
         zingolib::mixnet::Indicator::Ready
         | zingolib::mixnet::Indicator::PreviouslyProvenThisEpoch => "ready",
-        // A never-attached or switched-off transport is not consent to
+        // The deliberate switch-off is the one state the app must NOT recover
+        // from: it is the user's own act (going Offline), so it earns its own
+        // string and reads as a resting mode rather than as trouble.
+        zingolib::mixnet::Indicator::SwitchedOff => "off",
+        // A never-attached or unconsented-loss transport is not consent to
         // clearnet; report it as `died` so the app fails closed and reconnects
         // rather than opening the mixnet-only surfaces.
-        zingolib::mixnet::Indicator::Died
-        | zingolib::mixnet::Indicator::Unattached
-        | zingolib::mixnet::Indicator::SwitchedOff => "died",
+        zingolib::mixnet::Indicator::Died | zingolib::mixnet::Indicator::Unattached => "died",
     }
+}
+
+/// The wallet's current Mixnet Mode indicator as the JSON reply of a transport act.
+fn mixnet_indicator_json(lightclient: &LightClient) -> String {
+    object! { "mixnet_indicator" => mixnet_indicator_string(lightclient.read_mixnet_indicator()) }
+        .pretty(2)
 }
 
 /// Attach Mixnet Mode to an already-running, platform-hosted SOCKS5 endpoint
@@ -3686,26 +3694,16 @@ fn mixnet_indicator_string(indicator: zingolib::mixnet::Indicator) -> &'static s
 /// validated by a data round trip; poll [`mixnet_indicator`] for
 /// `bootstrapping` -> `ready`, or `died`.
 pub fn attach_mixnet(socks5_addr: String, exit_node: String) -> Result<String, ZingolibError> {
-    with_panic_guard(|| {
+    with_initialized_lightclient(|lightclient| {
         let exit = zingolib::mixnet::ExitNodeId::parse(&exit_node)
             .map_err(|_| ZingolibError::Mixnet("the shim reported no exit node".to_string()))?;
-        let mut guard = LIGHTCLIENT
-            .write()
-            .map_err(|_| ZingolibError::LightclientLockPoisoned)?;
-        if let Some(lightclient) = &mut *guard {
-            RT.block_on(async move {
-                lightclient
-                    .attach_mixnet(&socks5_addr, &[exit])
-                    .await
-                    .map_err(|e| ZingolibError::Mixnet(e.to_string()))?;
-                Ok(
-                    object! { "mixnet_indicator" => mixnet_indicator_string(lightclient.read_mixnet_indicator()) }
-                        .pretty(2),
-                )
-            })
-        } else {
-            Err(ZingolibError::LightclientNotInitialized)
-        }
+        RT.block_on(async move {
+            lightclient
+                .attach_mixnet(&socks5_addr, &[exit])
+                .await
+                .map_err(|e| ZingolibError::Mixnet(e.to_string()))?;
+            Ok(mixnet_indicator_json(lightclient))
+        })
     })
 }
 
@@ -3713,61 +3711,105 @@ pub fn attach_mixnet(socks5_addr: String, exit_node: String) -> Result<String, Z
 /// `proxy_path` (the exec fallback; Android-attached and iOS builds use
 /// [`attach_mixnet`] instead).
 pub fn enable_mixnet(proxy_path: String) -> Result<String, ZingolibError> {
-    with_panic_guard(|| {
-        let mut guard = LIGHTCLIENT
-            .write()
-            .map_err(|_| ZingolibError::LightclientLockPoisoned)?;
-        if let Some(lightclient) = &mut *guard {
-            RT.block_on(async move {
-                lightclient
-                    .enable_mixnet(std::path::Path::new(&proxy_path))
-                    .await
-                    .map_err(|e| ZingolibError::Mixnet(e.to_string()))?;
-                Ok(
-                    object! { "mixnet_indicator" => mixnet_indicator_string(lightclient.read_mixnet_indicator()) }
-                        .pretty(2),
-                )
-            })
-        } else {
-            Err(ZingolibError::LightclientNotInitialized)
+    with_initialized_lightclient(|lightclient| {
+        RT.block_on(async move {
+            lightclient
+                .enable_mixnet(std::path::Path::new(&proxy_path))
+                .await
+                .map_err(|e| ZingolibError::Mixnet(e.to_string()))?;
+            Ok(mixnet_indicator_json(lightclient))
+        })
+    })
+}
+
+/// The indicator wire contract (zingo-mobile#1427): the app layer switches on
+/// these strings, and the one distinction that matters to it is deliberate
+/// versus unconsented. A switch-off the app cannot tell apart from a death is
+/// a reconnect chasing the user's own choice to go Offline.
+#[cfg(test)]
+mod mixnet_indicator_wire_tests {
+    use super::*;
+
+    #[test]
+    fn a_deliberate_switch_off_is_its_own_string() {
+        assert_eq!(
+            mixnet_indicator_string(zingolib::mixnet::Indicator::SwitchedOff),
+            "off"
+        );
+    }
+
+    #[test]
+    fn an_unconsented_loss_and_a_never_attached_transport_both_fail_closed() {
+        for indicator in [
+            zingolib::mixnet::Indicator::Died,
+            zingolib::mixnet::Indicator::Unattached,
+        ] {
+            assert_eq!(
+                mixnet_indicator_string(indicator),
+                "died",
+                "{indicator:?} must fail closed rather than read as a resting mode"
+            );
         }
+    }
+
+    #[test]
+    fn a_proven_transport_routes_exactly_as_ready() {
+        for indicator in [
+            zingolib::mixnet::Indicator::Ready,
+            zingolib::mixnet::Indicator::PreviouslyProvenThisEpoch,
+        ] {
+            assert_eq!(mixnet_indicator_string(indicator), "ready");
+        }
+    }
+}
+
+/// Switch Mixnet Mode off deliberately, shutting the wallet's side of the
+/// transport down and landing `off` — the one indicator the app never
+/// recovers from on its own. The wallet half of the go-offline moment: the
+/// host stops the proxy it owns, and the slot is vacated here FIRST so the
+/// standing watchdog cannot report the death we are causing on purpose.
+///
+/// A transport act only (the transmit policy is untouched), so the
+/// mixnet-only surfaces keep refusing afterwards.
+pub fn disable_mixnet() -> Result<String, ZingolibError> {
+    with_initialized_lightclient(|lightclient| {
+        RT.block_on(async move {
+            lightclient.disable_mixnet().await;
+            Ok(mixnet_indicator_json(lightclient))
+        })
     })
 }
 
 /// The current Mixnet Mode indicator: `bootstrapping`, `ready` (with the local
-/// SOCKS5 address), or `died` (unconsented proxy loss; sends refuse — run
-/// [`attach_mixnet`] or [`enable_mixnet`] to recover).
+/// SOCKS5 address), `off` (switched off deliberately through
+/// [`disable_mixnet`]; nothing to recover), or `died` (unconsented proxy loss;
+/// sends refuse — run [`attach_mixnet`] or [`enable_mixnet`] to recover).
+///
+/// A status read, so it takes the read lock: the app polls this every two
+/// seconds while a draw is proving itself, and the write lock would have
+/// parked each poll behind whatever long act held it — a sync, a save, the
+/// attach itself.
 pub fn mixnet_indicator() -> Result<String, ZingolibError> {
-    with_panic_guard(|| {
-        let guard = LIGHTCLIENT
-            .write()
-            .map_err(|_| ZingolibError::LightclientLockPoisoned)?;
-        if let Some(lightclient) = &*guard {
-            let mut status = object! {
-                "mixnet_indicator" => mixnet_indicator_string(lightclient.read_mixnet_indicator()),
-            };
-            if let Some(addr) = lightclient.mixnet_socks5_addr() {
-                status["socks5_addr"] = addr.to_string().into();
-            }
-            Ok(status.pretty(2))
-        } else {
-            Err(ZingolibError::LightclientNotInitialized)
+    with_initialized_lightclient_read(|lightclient| {
+        let mut status = object! {
+            "mixnet_indicator" => mixnet_indicator_string(lightclient.read_mixnet_indicator()),
+        };
+        if let Some(addr) = lightclient.mixnet_socks5_addr() {
+            status["socks5_addr"] = addr.to_string().into();
         }
+        Ok(status.pretty(2))
     })
 }
 
 /// The proxy's latest bootstrap progress line while Mixnet Mode is
 /// bootstrapping, so the app can narrate the connect race; empty otherwise.
+///
+/// Read under the read lock, like [`mixnet_indicator`]: the coordinator fetches
+/// this narration on the same tick, so parking it behind a write would stall
+/// the very progress line it exists to report.
 pub fn mixnet_bootstrap_detail() -> Result<String, ZingolibError> {
-    with_panic_guard(|| {
-        let guard = LIGHTCLIENT
-            .write()
-            .map_err(|_| ZingolibError::LightclientLockPoisoned)?;
-        if let Some(lightclient) = &*guard {
-            let detail = lightclient.mixnet_bootstrap_detail().unwrap_or_default();
-            Ok(object! { "detail" => detail }.pretty(2))
-        } else {
-            Err(ZingolibError::LightclientNotInitialized)
-        }
+    with_initialized_lightclient_read(|lightclient| {
+        let detail = lightclient.mixnet_bootstrap_detail().unwrap_or_default();
+        Ok(object! { "detail" => detail }.pretty(2))
     })
 }

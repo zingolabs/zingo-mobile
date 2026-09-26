@@ -1,6 +1,8 @@
 import React, { useEffect } from 'react';
 import { Animated, Easing, StyleSheet, View } from 'react-native';
 import Svg, { Rect } from 'react-native-svg';
+import { MixnetPhase } from '@app/walletBackend/transforms/mixnetView';
+import NymOff from '../../../assets/img/nym-off.svg';
 import NymOn from '../../../assets/img/nym-on.svg';
 
 const HALO_GREEN = '#07FF94';
@@ -52,8 +54,6 @@ const dashOffset = travel.interpolate({
   outputRange: [0, -PERIMETER],
 });
 
-export type MixnetIconPhase = 'connecting' | 'ready' | 'lost' | 'reconnecting';
-
 const styles = StyleSheet.create({
   container: {
     width: RING,
@@ -84,7 +84,7 @@ const HaloRect = ({ color }: { color: string }) => (
   </Svg>
 );
 
-const MixnetIcon = ({ phase }: { phase: MixnetIconPhase }) => {
+const MixnetIcon = ({ phase }: { phase: MixnetPhase }) => {
   const animating = phase === 'connecting' || phase === 'reconnecting';
 
   useEffect(() => {
@@ -116,7 +116,13 @@ const MixnetIcon = ({ phase }: { phase: MixnetIconPhase }) => {
         </Svg>
       )}
       {phase === 'lost' && <HaloRect color={HALO_CORAL} />}
-      <NymOn width={ICON} height={ICON} />
+      {/* The switched-off glyph is the whole report for `off`: no halo, no
+          animation — a resting transport, not a failing one. */}
+      {phase === 'off' ? (
+        <NymOff width={ICON} height={ICON} />
+      ) : (
+        <NymOn width={ICON} height={ICON} />
+      )}
     </View>
   );
 };

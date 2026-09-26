@@ -18,7 +18,10 @@ import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
 import { RPCSyncPollType } from '@app/walletBackend/types/RPCSyncPollType';
 import { scanInProgress } from '@app/walletBackend/utils/syncProgress';
 import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
-import { WalletBackendConfig } from '@app/walletBackend/config/WalletBackendConfig';
+import {
+  WalletBackendConfig,
+  isOffline,
+} from '@app/walletBackend/config/WalletBackendConfig';
 import { DataService } from './DataService';
 import { doSave } from '@app/walletBackend/utils/walletUtils';
 
@@ -196,6 +199,14 @@ export class SyncCoordinator {
   }
 
   async refreshSync(fullRescan?: boolean) {
+    // Launching a sync without an indexer is not a blip to retry: zingolib
+    // refuses it with `Offline: no indexer configured`, and the 5 s tick
+    // turned that refusal into a standing error — 120 of them in ten minutes
+    // of field logs (2026-09-24) — plus a persistent-failure signal for a
+    // server the user deliberately did not pick.
+    if (isOffline(this.config)) {
+      return;
+    }
     if (this.refreshSyncLock && !fullRescan) {
       return;
     }
@@ -333,6 +344,11 @@ export class SyncCoordinator {
   }
 
   async fetchSyncPoll(): Promise<void> {
+    // Nothing to poll: an Offline session never launched a sync, and the
+    // poll's own answer is what asks for one.
+    if (isOffline(this.config)) {
+      return;
+    }
     if (this.fetchSyncPollLock) {
       console.log('***************** SYNC POLL - locked');
       return;

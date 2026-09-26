@@ -35,9 +35,21 @@ import { RPCWalletSaveRequiredType } from '@app/walletBackend/types/RPCWalletSav
 import { RPCConfigWalletPerformanceType } from '@app/walletBackend/types/RPCConfigWalletPerformanceType';
 import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
 import { RPCWalletVersionType } from '@app/walletBackend/types/RPCWalletVersionType';
-import { WalletBackendConfig } from '@app/walletBackend/config/WalletBackendConfig';
+import {
+  WalletBackendConfig,
+  isOffline,
+} from '@app/walletBackend/config/WalletBackendConfig';
 import { transformValueTransfer } from '@app/walletBackend/transforms/valueTransferTransform';
 import { fetchWallet } from '@app/walletBackend/utils/walletUtils';
+
+// The info a session publishes when no server answered.
+function emptyInfo(): InfoType {
+  return {
+    latestBlock: 0,
+    serverUri: '',
+    version: '',
+  } as InfoType;
+}
 
 export class DataService {
   config: WalletBackendConfig;
@@ -249,6 +261,15 @@ export class DataService {
     }
     this.fetchInfoAndServerHeightLock = true;
     try {
+      // No server, no info. The empty shape is what an unreadable answer
+      // already publishes; rejecting instead would reach the catch, and the
+      // catch calls onSyncError, which reconfigures — a loop with nothing at
+      // the end of it.
+      if (isOffline(this.config)) {
+        this.config.onInfoChanged(emptyInfo());
+        this.lastServerBlockHeight = 0;
+        return;
+      }
       let infoError: boolean = false;
       const start = Date.now();
       const infoStr: string = await RPCModule.infoServerInfo();
@@ -267,11 +288,7 @@ export class DataService {
       }
 
       if (infoError) {
-        this.config.onInfoChanged({
-          latestBlock: 0,
-          serverUri: '',
-          version: '',
-        } as InfoType);
+        this.config.onInfoChanged(emptyInfo());
         this.lastServerBlockHeight = 0;
         return;
       }
@@ -394,20 +411,30 @@ export class DataService {
     }
     this.fetchTandZandOValueTransfersLock = true;
     try {
-      const start = Date.now();
-      const heightStr: string = await RPCModule.getLatestBlockServerInfo(
-        this.config.server.uri,
-      );
-      if (Date.now() - start > 4000) {
-        console.log(
-          '=========================================== > server height - ',
-          Date.now() - start,
-        );
-      }
-      if (heightStr) {
-        this.lastServerBlockHeight = Number(heightStr);
+      // The value transfers themselves are a wallet-local read. Asking the
+      // server for its height first made the whole fetch depend on a server:
+      // Offline it rejected here, the list was never published, and History
+      // waits for that first publication — so an Offline wallet span forever
+      // under an empty list. Zero is the right height for a session with no
+      // server, and the transform already falls back to the wallet's own.
+      if (isOffline(this.config)) {
+        this.lastServerBlockHeight = 0;
       } else {
-        console.log('Internal Error server height');
+        const start = Date.now();
+        const heightStr: string = await RPCModule.getLatestBlockServerInfo(
+          this.config.server.uri,
+        );
+        if (Date.now() - start > 4000) {
+          console.log(
+            '=========================================== > server height - ',
+            Date.now() - start,
+          );
+        }
+        if (heightStr) {
+          this.lastServerBlockHeight = Number(heightStr);
+        } else {
+          console.log('Internal Error server height');
+        }
       }
 
       const start2 = Date.now();

@@ -1,5 +1,5 @@
 import { SendJsonToTypeType, ServerType } from '@app/AppState';
-import { WalletBackendConfig } from './config/WalletBackendConfig';
+import { WalletBackendConfig, isOffline } from './config/WalletBackendConfig';
 import { RPCPerformanceLevelEnum } from './enums/RPCPerformanceLevelEnum';
 import { DataService } from './modules/DataService';
 import { MixnetCoordinator } from './modules/MixnetCoordinator';
@@ -15,7 +15,9 @@ export default class WalletBackend {
   private transactionService: TransactionService;
   private walletLifecycle: WalletLifecycleService;
   private mixnetCoordinator: MixnetCoordinator;
-  private mixnetArmed: boolean = false;
+  // Whether the mixnet is currently armed for a connected session. Not a
+  // one-shot latch: the transport follows connectivity in both directions.
+  private mixnetOnline: boolean = false;
 
   constructor(config: WalletBackendConfig) {
     this.config = config;
@@ -24,6 +26,7 @@ export default class WalletBackend {
     this.mixnetCoordinator = new MixnetCoordinator(
       config.startMixnetTransport,
       config.onMixnetViewChanged,
+      config.stopMixnetTransport,
     );
     this.dataService.onSyncError = async () => {
       await this.syncCoordinator.clearTimers();
@@ -36,13 +39,33 @@ export default class WalletBackend {
     this.walletLifecycle = new WalletLifecycleService(this.syncCoordinator);
   }
 
-  // The mixnet bootstrap is not awaited because it takes tens of seconds.
+  // The go-online / go-offline moment: the mixnet's lifetime follows the
+  // session's connectivity, never the app's own. `configure` runs at launch
+  // and after every server change, so both transitions land here, and it is
+  // reentrant — flipping Offline <-> Online in Settings starts and stops the
+  // tunnel then and there. zingo-cli gates its own driver call the same way,
+  // on `Communications::Online`.
   async configure() {
-    if (this.config.mixnetSupported && !this.mixnetArmed) {
-      this.mixnetArmed = true;
-      this.mixnetCoordinator.ensureForConnectedSession();
+    if (this.config.mixnetSupported) {
+      await this.followConnectivity();
     }
     return this.syncCoordinator.configure();
+  }
+
+  private async followConnectivity(): Promise<void> {
+    if (!isOffline(this.config)) {
+      if (!this.mixnetOnline) {
+        this.mixnetOnline = true;
+        // The bootstrap is not awaited because it takes tens of seconds.
+        this.mixnetCoordinator.ensureForConnectedSession();
+      }
+      return;
+    }
+    // Offline tears down on every configure, not only on the transition: a
+    // session that launches Offline armed nothing to tear down, and the
+    // header still has to report where nym stands.
+    this.mixnetOnline = false;
+    await this.mixnetCoordinator.goOffline();
   }
   async clearTimers() {
     return this.syncCoordinator.clearTimers();
@@ -72,6 +95,11 @@ export default class WalletBackend {
   }
 
   async reenableMixnet() {
+    if (isOffline(this.config)) {
+      // An Offline session has no transport to re-enable, and a re-enable
+      // must never dial behind the mode's back: it settles back at off.
+      return this.mixnetCoordinator.goOffline();
+    }
     return this.mixnetCoordinator.reenable();
   }
   stopMixnetPolling() {

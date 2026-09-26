@@ -159,6 +159,7 @@ test('a return parked on a flight still arms the hop rate bound', async () => {
 const FETCH_EXPECTED: Record<MixnetStatusKey, boolean> = {
   'mixnet.status.bootstrapping': false,
   'mixnet.status.ready': true,
+  'mixnet.status.off': false,
   'mixnet.status.died': false,
   'mixnet.status.unknown': false,
 };

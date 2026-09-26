@@ -31,6 +31,12 @@ export async function enableMixnet(
   return statusCall(() => RPCModule.enableMixnet(proxyPath));
 }
 
+// The wallet's half of the go-offline moment: vacates the slot and lands the
+// deliberate `off` indicator, which no reconnect ever chases.
+export async function disableMixnet(): Promise<MixnetStatusReport> {
+  return statusCall(() => RPCModule.disableMixnet());
+}
+
 export async function getMixnetStatus(): Promise<MixnetStatusReport> {
   return statusCall(() => RPCModule.mixnetIndicatorInfo());
 }

@@ -158,6 +158,7 @@ interface RPCModuleAPI {
 
   attachMixnet(socks5Addr: string, exitNode: string): Promise<string>;
   enableMixnet(proxyPath: string): Promise<string>;
+  disableMixnet(): Promise<string>;
   mixnetIndicatorInfo(): Promise<string>;
   mixnetBootstrapDetailInfo(): Promise<string>;
 }

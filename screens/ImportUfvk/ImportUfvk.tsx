@@ -73,7 +73,10 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
   const keyboardHeight = useKeyboardHeight();
 
   useEffect(() => {
-    if (!netInfo.isConnected || selectServer !== SelectServerEnum.offline) {
+    // Both conditions must hold: a session with no server has nothing to ask,
+    // and a device with no network has nobody to ask. The disjunction this
+    // replaces entered on a downed radio in Offline mode.
+    if (netInfo.isConnected && selectServer !== SelectServerEnum.offline) {
       (async () => {
         const resp = await getLatestBlockServerInfo(server.uri);
         if (resp.ok && resp.value) {
