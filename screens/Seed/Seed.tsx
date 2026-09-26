@@ -88,7 +88,6 @@ const Seed: React.FunctionComponent<SeedProps> = ({
     privacy,
     addLastSnackbar,
     setPrivacyOption,
-    recoveryWalletInfoOnDevice,
     security,
     foregroundEpoch,
   } = context;
@@ -168,36 +167,30 @@ const Seed: React.FunctionComponent<SeedProps> = ({
     (async () => {
       setLoadingSeed(true);
       try {
-        // Prefer the recovery-info keychain entry when the user enabled
-        // the on-device cache, but always fall back to fetching the seed
-        // directly from the wallet if the keychain returns empty — that
+        // Prefer the recovery-info keychain entry, but always fall back
+        // to fetching the seed directly from the wallet if the keychain
+        // returns empty — that
         // happens on user-cancel of the keychain's own bio prompt as
         // well as on genuine read errors. Leaving the field empty would
         // surprise the user since they did not opt-in to the screen-
         // level seedUfvkScreen gate. seedSource is updated as we go so
         // the loading legend reflects what's actually being read at
         // each moment (keychain → wallet on fallback).
-        let seedInfo: WalletType = {} as WalletType;
-        if (recoveryWalletInfoOnDevice) {
-          setSeedSource('keychain');
-          seedInfo = await getRecoveryWalletInfo();
-        }
+        setSeedSource('keychain');
+        let seedInfo: WalletType = await getRecoveryWalletInfo();
         if (!seedInfo.seed) {
           setSeedSource('wallet');
           const walletInfo = await fetchWallet(false);
           if (walletInfo) {
             seedInfo = walletInfo;
-            // Self-heal: the user opted into the on-device cache but the
-            // keychain entry is missing (startup save likely failed or the
-            // toggle was flipped without auth). Write it now while the
-            // gate's recent bio auth window is still warm so subsequent
-            // visits read from the keychain. Fire-and-forget so a save
-            // failure doesn't block the render.
-            if (recoveryWalletInfoOnDevice) {
-              saveRecoveryWalletInfo(walletInfo).catch(e =>
-                console.log('Self-heal save failed', e),
-              );
-            }
+            // Self-heal: the keychain entry is missing (startup save
+            // likely failed). Write it now while the gate's recent bio
+            // auth window is still warm so subsequent visits read from
+            // the keychain. Fire-and-forget so a save failure doesn't
+            // block the render.
+            saveRecoveryWalletInfo(walletInfo).catch(e =>
+              console.log('Self-heal save failed', e),
+            );
           }
         }
         const ufvkInfo = await fetchWallet(true);
@@ -208,7 +201,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
         setLoadingSeed(false);
       }
     })();
-  }, [recoveryWalletInfoOnDevice, authPassed]);
+  }, [authPassed]);
 
   const seedPhrase = fetchedWallet.seed || '';
   const ufvk = fetchedWallet.ufvk || '';

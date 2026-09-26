@@ -267,16 +267,6 @@
         "text": "Normal Gizlilik: Tüm bilgileri görebilirsiniz."
       }
     ],
-    "recoverywalletinfoondevices": [
-      {
-        "value": true,
-        "text": "Cüzdanın Kurtarma Cümlesini (Seed Phrase) cihaza yedekle."
-      },
-      {
-        "value": false,
-        "text": "Cüzdanla ilgili hiçbir şey cihazda kaydedilmesin."
-      }
-    ],
     "performancelevels": [
       {
         "value": "Maximum",
@@ -342,7 +332,6 @@
     "language-title": "Dil",
     "islanguage": "Kaydetmek için bir dil seçmeniz gerekiyor.",
     "privacy-title": "Hassas değerleri gizle",
-    "recoverywalletinfoondevice-title": "Cüzdan Kurtarma Bilgilerini Kaydet",
     "performancelevel-title": "Zingolib Performance Level",
     "blockexplorer-title": "Block Explorer",
     "value-language-en": "İngilizce",
@@ -357,8 +346,6 @@
     "value-chainname-none": "Yok",
     "server-chain-title": "Ağ",
     "select-chain-placeholder": "Bir Ağ Seçin...",
-    "value-recoverywalletinfoondevice-true": "Etkin",
-    "value-recoverywalletinfoondevice-false": "Etkin değil",
     "value-performancelevel-Maximum": "Maximum",
     "value-performancelevel-High": "High",
     "value-performancelevel-Medium": "Medium",
@@ -395,7 +382,6 @@
     "select-language-placeholder": "Bir Dil Seçin...",
     "select-blockexplorer-placeholder": "Bir Block Explorer Seçin...",
     "value-language-ru": "Rusça",
-    "walletkeyssaved": "Son Cüzdan Kurtarma Bilgisi cihazda güvenli bir şekilde saklandı.",
     "walletkeyswarning": "Bu, kurtarma ifadesi'inizi saklamak için denetlenmemiş kodun güvenliğine bağlı olan deneysel bir özelliktir. Lütfen önemli miktarda fon içeren seed'lerle kullanmayın!",
     "value-language-tr": "Türkçe",
     "nym-network": "NYM Mixnet",

@@ -207,8 +207,10 @@ export default class SettingsFileImpl {
       // old tip feature, the two switches that used to hide the MAX button
       // and the Rescan menu entry, both always there now, the currency
       // choice, now always USD, the Nym switch: every transmission travels
-      // the mixnet, so there is nothing left to choose, and the mode, along
-      // with the first-view-seed flag only the basic mode ever wrote.
+      // the mixnet, so there is nothing left to choose, the mode, along
+      // with the first-view-seed flag only the basic mode ever wrote, and
+      // the switch that kept the recovery info off the device: it is always
+      // stored now, and the first start after the update writes it.
       const obsolete = settings as unknown as Record<string, unknown>;
       delete obsolete.donation;
       delete obsolete.firstUpdateWithDonation;
@@ -218,6 +220,7 @@ export default class SettingsFileImpl {
       delete obsolete.nym;
       delete obsolete.mode;
       delete obsolete.basicFirstViewSeed;
+      delete obsolete.recoveryWalletInfoOnDevice;
       // old security options that have to be removed and to add the new one.
       if (settings.hasOwnProperty(SettingsNameEnum.security)) {
         const sec: SecurityType = settings.security;
@@ -243,12 +246,6 @@ export default class SettingsFileImpl {
           }
           settings.security = sec;
         }
-      }
-      if (
-        !settings.hasOwnProperty(SettingsNameEnum.recoveryWalletInfoOnDevice)
-      ) {
-        // doing backup of seed & birthday in the device -> false by default.
-        settings.recoveryWalletInfoOnDevice = false;
       }
       if (!settings.hasOwnProperty(SettingsNameEnum.performanceLevel)) {
         // by default medium

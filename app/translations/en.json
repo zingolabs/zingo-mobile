@@ -267,16 +267,6 @@
         "text": "Normal Privacy, you can see all the information."
       }
     ],
-    "recoverywalletinfoondevices": [
-      {
-        "value": true,
-        "text": "Backup wallet Seed Phrase to device."
-      },
-      {
-        "value": false,
-        "text": "Do not save anything related to the wallet on the device."
-      }
-    ],
     "performancelevels": [
       {
         "value": "Maximum",
@@ -342,7 +332,6 @@
     "language-title": "Language",
     "islanguage": "You need to choose a language to save.",
     "privacy-title": "Hide Sensitive Values",
-    "recoverywalletinfoondevice-title": "Store Wallet Recovery Info",
     "performancelevel-title": "Zingolib Performance Level",
     "blockexplorer-title": "Block Explorer",
     "value-language-en": "English",
@@ -357,8 +346,6 @@
     "value-chainname-none": "None",
     "server-chain-title": "Network",
     "select-chain-placeholder": "Select a Network...",
-    "value-recoverywalletinfoondevice-true": "Enable",
-    "value-recoverywalletinfoondevice-false": "Disable",
     "value-performancelevel-Maximum": "Maximum",
     "value-performancelevel-High": "High",
     "value-performancelevel-Medium": "Medium",
@@ -395,7 +382,6 @@
     "select-language-placeholder": "Select a Language...",
     "select-blockexplorer-placeholder": "Select a Block Explorer...",
     "value-language-ru": "Russian",
-    "walletkeyssaved": "The last Wallet Recovery Info stored safely in the device.",
     "walletkeyswarning": "This is an experimental feature, that depends on the security of unaudited code to store your seed-phrase. Please do not use it with seeds that control significant funds!",
     "value-language-tr": "Turkish",
     "nym-network": "NYM Mixnet",

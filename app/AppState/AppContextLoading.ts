@@ -34,7 +34,6 @@ export default interface AppContextLoading {
   privacy: boolean;
   security: SecurityType;
   selectServer: SelectServerEnum;
-  recoveryWalletInfoOnDevice: boolean;
   performanceLevel: RPCPerformanceLevelEnum;
   blockExplorer: BlockExplorerEnum;
 }

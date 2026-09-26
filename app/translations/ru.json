@@ -267,16 +267,6 @@
         "text": "Обычный режим, вы сможете увидеть всю информацию на экране."
       }
     ],
-    "recoverywalletinfoondevices": [
-      {
-        "value": true,
-        "text": "Создайте резервную фразу кошелька на устройстве."
-      },
-      {
-        "value": false,
-        "text": "Не храните на устройстве любые данные, связанные с кошельком."
-      }
-    ],
     "performancelevels": [
       {
         "value": "Maximum",
@@ -342,7 +332,6 @@
     "language-title": "Язык",
     "islanguage": "Выберите язык для приложения.",
     "privacy-title": "Скрывать конфиденциальные значения",
-    "recoverywalletinfoondevice-title": "Сохраните данные для восстановления кошелька",
     "performancelevel-title": "Zingolib Performance Level",
     "blockexplorer-title": "Block Explorer",
     "value-language-en": "Английский",
@@ -357,8 +346,6 @@
     "value-chainname-none": "Нет",
     "server-chain-title": "Сеть",
     "select-chain-placeholder": "Выберите сеть...",
-    "value-recoverywalletinfoondevice-true": "Включить",
-    "value-recoverywalletinfoondevice-false": "Отключить",
     "value-performancelevel-Maximum": "Maximum",
     "value-performancelevel-High": "High",
     "value-performancelevel-Medium": "Medium",
@@ -395,7 +382,6 @@
     "select-language-placeholder": "Выберите язык...",
     "select-blockexplorer-placeholder": "Выберите Block Explorer...",
     "value-language-ru": "Русский",
-    "walletkeyssaved": "Ключи для восстановления кошелька сохранены на устройстве в зашифрованном виде.",
     "walletkeyswarning": "Эта экспериментальная функция! Не рекомендуется использовать её для хранения резервной фразы с крупными суммами средств!",
     "value-language-tr": "турецкий",
     "nym-network": "NYM Mixnet",

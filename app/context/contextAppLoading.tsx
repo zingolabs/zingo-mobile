@@ -39,7 +39,6 @@ export const defaultAppContextLoading: AppContextLoading = {
   addLastSnackbar: () => {},
   security: {} as SecurityType,
   selectServer: SelectServerEnum.auto,
-  recoveryWalletInfoOnDevice: false,
   zingolibVersion: '',
   performanceLevel: RPCPerformanceLevelEnum.Medium,
   setPrivacyOption: async () => {},
