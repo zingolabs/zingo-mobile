@@ -241,7 +241,7 @@ export class MixnetCoordinator {
     const epoch = this.supersede();
     this.reconnectActive = false;
     this.redrawsSpent = 0;
-    const disabled = await this.teardown.run(disableMixnet);
+    await this.teardown.run(disableMixnet);
     if (!this.isCurrent(epoch)) {
       return;
     }
@@ -249,13 +249,16 @@ export class MixnetCoordinator {
     if (!this.isCurrent(epoch)) {
       return;
     }
-    // A tunnel we failed to stop is the one thing that must not read as
-    // off: it may still be carrying traffic, so it reports as trouble.
-    // Otherwise the tunnel is down, so the mode is off — whatever the
-    // wallet's own bookkeeping managed to answer.
-    this.publish(
-      stopFailure ?? (disabled.kind === 'status' ? disabled : OFF_REPORT),
-    );
+    // A tunnel we failed to stop is the one thing that must not read as off:
+    // it may still be carrying traffic, so it reports as trouble. Otherwise
+    // the session rests at off, and NOT at whatever the disable answered: we
+    // just told the wallet to switch off, so the only honest resting states
+    // are off and "the stop refused". Publishing that answer verbatim let an
+    // Offline session rest on a live mode whenever it read as anything else —
+    // found by the interleaving harness, and the half of #1434 that its own
+    // fix left behind: it stopped the deadline such an answer armed, not the
+    // view it painted.
+    this.publish(stopFailure ?? OFF_REPORT);
   }
 
   private stopTransportReport(): Promise<MixnetStatusReport | null> {
