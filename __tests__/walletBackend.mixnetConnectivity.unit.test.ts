@@ -15,6 +15,7 @@ import {
   mockServer as ONLINE,
 } from '../__mocks__/dataMocks/mockServer';
 import { mockWalletBackendConfig } from '../__mocks__/dataMocks/mockWalletBackendConfig';
+import { mixnetStatusPayload } from '../__mocks__/dataMocks/mockMixnetStatus';
 import { MixnetView } from '@app/walletBackend/transforms/mixnetView';
 import WalletBackend from '@app/walletBackend/WalletBackend';
 
@@ -69,14 +70,9 @@ describe('the mixnet follows the session connectivity', () => {
     jest.useFakeTimers();
     jest.clearAllMocks();
     mockedBridge.attachMixnet.mockResolvedValue(
-      JSON.stringify({
-        mixnet_indicator: 'ready',
-        socks5_addr: '127.0.0.1:1080',
-      }),
+      mixnetStatusPayload('ready', '127.0.0.1:1080'),
     );
-    mockedBridge.disableMixnet.mockResolvedValue(
-      JSON.stringify({ mixnet_indicator: 'off' }),
-    );
+    mockedBridge.disableMixnet.mockResolvedValue(mixnetStatusPayload('off'));
   });
 
   afterEach(() => {
