@@ -255,6 +255,11 @@ export class DataService {
     }
   }
 
+  private publishNoServerInfo(): void {
+    this.config.onInfoChanged(emptyInfo());
+    this.lastServerBlockHeight = 0;
+  }
+
   async fetchInfoAndServerHeight(): Promise<void> {
     if (this.fetchInfoAndServerHeightLock) {
       return;
@@ -266,11 +271,9 @@ export class DataService {
       // catch calls onSyncError, which reconfigures — a loop with nothing at
       // the end of it.
       if (isOffline(this.config)) {
-        this.config.onInfoChanged(emptyInfo());
-        this.lastServerBlockHeight = 0;
+        this.publishNoServerInfo();
         return;
       }
-      let infoError: boolean = false;
       const start = Date.now();
       const infoStr: string = await RPCModule.infoServerInfo();
       if (Date.now() - start > 4000) {
@@ -284,12 +287,7 @@ export class DataService {
       // — a programming error — is classified here.
       if (!infoStr) {
         console.log('Internal Error info & server block height');
-        infoError = true;
-      }
-
-      if (infoError) {
-        this.config.onInfoChanged(emptyInfo());
-        this.lastServerBlockHeight = 0;
+        this.publishNoServerInfo();
         return;
       }
 

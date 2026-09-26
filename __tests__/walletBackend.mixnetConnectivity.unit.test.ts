@@ -14,9 +14,9 @@ import {
   mockOfflineServer as OFFLINE,
   mockServer as ONLINE,
 } from '../__mocks__/dataMocks/mockServer';
-import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
+import { mockWalletBackendConfig } from '../__mocks__/dataMocks/mockWalletBackendConfig';
+import { mixnetStatusPayload } from '../__mocks__/dataMocks/mockMixnetStatus';
 import { MixnetView } from '@app/walletBackend/transforms/mixnetView';
-import { WalletBackendConfig } from '@app/walletBackend/config/WalletBackendConfig';
 import WalletBackend from '@app/walletBackend/WalletBackend';
 
 jest.mock('@app/RPCModule', () =>
@@ -49,25 +49,13 @@ function harness(server: ServerType, mixnetSupported: boolean = true): Harness {
     .mockResolvedValue({ socks5Addr: '127.0.0.1:1080', exitNode: 'exit' });
   const stop = jest.fn().mockResolvedValue(undefined);
   const published: MixnetView[] = [];
-  const config = {
-    onBalanceChanged: jest.fn(),
-    onValueTransfersChanged: jest.fn(),
-    onMessagesChanged: jest.fn(),
-    onAddressesChanged: jest.fn(),
-    onInfoChanged: jest.fn(),
-    onSyncStatusChanged: jest.fn(),
-    onZingolibVersionChanged: jest.fn(),
-    onBirthdayChanged: jest.fn(),
-    onError: jest.fn(),
+  const config = mockWalletBackendConfig({
     onMixnetViewChanged: (view: MixnetView) => published.push(view),
     startMixnetTransport: start,
     stopMixnetTransport: stop,
     mixnetSupported,
-    keepAwake: jest.fn(),
-    readOnly: false,
     server,
-    performanceLevel: RPCPerformanceLevelEnum.Medium,
-  } as unknown as WalletBackendConfig;
+  });
   return { backend: new WalletBackend(config), start, stop, published };
 }
 
@@ -82,14 +70,9 @@ describe('the mixnet follows the session connectivity', () => {
     jest.useFakeTimers();
     jest.clearAllMocks();
     mockedBridge.attachMixnet.mockResolvedValue(
-      JSON.stringify({
-        mixnet_indicator: 'ready',
-        socks5_addr: '127.0.0.1:1080',
-      }),
+      mixnetStatusPayload('ready', '127.0.0.1:1080'),
     );
-    mockedBridge.disableMixnet.mockResolvedValue(
-      JSON.stringify({ mixnet_indicator: 'off' }),
-    );
+    mockedBridge.disableMixnet.mockResolvedValue(mixnetStatusPayload('off'));
   });
 
   afterEach(() => {
