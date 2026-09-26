@@ -1054,4 +1054,19 @@ describe('MixnetCoordinator bootstrap deadline', () => {
 
     expect(startTransport).toHaveBeenCalledTimes(1);
   });
+
+  it('never draws while Offline, even when the disable answers bootstrapping', async () => {
+    mockedBridge.disableMixnet.mockResolvedValue(
+      statusPayload('bootstrapping'),
+    );
+    const startTransport = jest.fn().mockResolvedValue(transportBinding);
+    const coordinator = coordinatorFor(startTransport, () => {});
+
+    await coordinator.goOffline();
+    await flushPromises();
+    await jest.advanceTimersByTimeAsync(BOOTSTRAP_DEADLINE_MILLIS * 2);
+    await flushPromises();
+
+    expect(startTransport).not.toHaveBeenCalled();
+  });
 });
