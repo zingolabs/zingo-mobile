@@ -14,27 +14,24 @@ jest.mock('@app/RPCModule', () =>
 
 import RPCModule from '@app/RPCModule';
 import { SyncCoordinator } from '@app/walletBackend/modules/SyncCoordinator';
-import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
-import type { WalletBackendConfig } from '@app/walletBackend/config/WalletBackendConfig';
 import type { DataService } from '@app/walletBackend/modules/DataService';
 import type { ServerType } from '@app/AppState';
 import {
   mockOfflineServer as OFFLINE,
   mockServer as ONLINE,
 } from '../__mocks__/dataMocks/mockServer';
+import { mockWalletBackendConfig } from '../__mocks__/dataMocks/mockWalletBackendConfig';
 
 const mockedBridge = RPCModule as unknown as Record<string, jest.Mock>;
 
 function coordinatorFor(server: ServerType) {
   const onError = jest.fn();
   const onPersistentSyncFailure = jest.fn();
-  const config = {
+  const config = mockWalletBackendConfig({
     onError,
     onPersistentSyncFailure,
-    keepAwake: jest.fn(),
-    performanceLevel: RPCPerformanceLevelEnum.High,
     server,
-  } as unknown as WalletBackendConfig;
+  });
   const coordinator = new SyncCoordinator(config, {} as DataService);
   return { coordinator, onError, onPersistentSyncFailure };
 }

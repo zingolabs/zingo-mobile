@@ -31,6 +31,7 @@ import {
 import { SyncCoordinator } from '@app/walletBackend/modules/SyncCoordinator';
 import { DataService } from '@app/walletBackend/modules/DataService';
 import { mockServer } from '../__mocks__/dataMocks/mockServer';
+import { mockWalletBackendConfig } from '../__mocks__/dataMocks/mockWalletBackendConfig';
 
 const bridge = RPCModule as unknown as Record<string, jest.Mock>;
 
@@ -161,12 +162,7 @@ describe('sync family rejections are contained and reported, never sniffed', () 
 describe('read getter rejections are contained and reported, never sniffed', () => {
   function makeDataService() {
     const onError = jest.fn();
-    const config = {
-      onError,
-      onAddressesChanged: jest.fn(),
-      onZingolibVersionChanged: jest.fn(),
-      server: { uri: 'https://server.example' },
-    } as unknown as ConstructorParameters<typeof DataService>[0];
+    const config = mockWalletBackendConfig({ onError });
     return { dataService: new DataService(config), onError };
   }
 

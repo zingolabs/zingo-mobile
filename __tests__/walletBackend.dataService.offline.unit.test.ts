@@ -16,13 +16,12 @@ jest.mock('@app/RPCModule', () =>
 
 import RPCModule from '@app/RPCModule';
 import { DataService } from '@app/walletBackend/modules/DataService';
-import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
-import type { WalletBackendConfig } from '@app/walletBackend/config/WalletBackendConfig';
 import type { ServerType } from '@app/AppState';
 import {
   mockOfflineServer as OFFLINE,
   mockServer as ONLINE,
 } from '../__mocks__/dataMocks/mockServer';
+import { mockWalletBackendConfig } from '../__mocks__/dataMocks/mockWalletBackendConfig';
 
 const mockedBridge = RPCModule as unknown as Record<string, jest.Mock>;
 
@@ -30,18 +29,12 @@ function serviceFor(server: ServerType) {
   const onValueTransfersChanged = jest.fn();
   const onInfoChanged = jest.fn();
   const onError = jest.fn();
-  const config = {
+  const config = mockWalletBackendConfig({
     onValueTransfersChanged,
     onInfoChanged,
     onError,
-    onMessagesChanged: jest.fn(),
-    onBalanceChanged: jest.fn(),
-    onAddressesChanged: jest.fn(),
-    onSyncStatusChanged: jest.fn(),
-    keepAwake: jest.fn(),
-    performanceLevel: RPCPerformanceLevelEnum.High,
     server,
-  } as unknown as WalletBackendConfig;
+  });
   const service = new DataService(config);
   // The reconfigure the error path triggers is out of scope here.
   service.onSyncError = jest.fn();
