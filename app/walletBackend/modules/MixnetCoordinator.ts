@@ -291,7 +291,7 @@ export class MixnetCoordinator {
   // reconnect backoff takes it from there.
   private armBootstrapDeadline(): void {
     if (
-      this.phase === 'stopped' ||
+      this.phase !== 'online' ||
       this.bootstrapTimerID !== undefined ||
       this.redrawsSpent >= BOOTSTRAP_REDRAW_LIMIT
     ) {
@@ -309,7 +309,7 @@ export class MixnetCoordinator {
   // before it starts the next one, so this replaces the draw rather than
   // stacking a second one behind it.
   private async redraw(): Promise<void> {
-    if (this.phase === 'stopped' || !this.isBootstrapping()) {
+    if (this.phase !== 'online' || !this.isBootstrapping()) {
       return;
     }
     // A start that has not returned yet gets the clock back instead of a
