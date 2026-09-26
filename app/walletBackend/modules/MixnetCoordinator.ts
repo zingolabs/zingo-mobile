@@ -90,7 +90,8 @@ export class MixnetCoordinator {
   private enableEpoch: number = 0;
   private stopped: boolean = false;
   private sessionOffline: boolean = false;
-  private startsInFlight: number = 0;
+  private startingEpoch?: number;
+  private disabling?: Promise<MixnetStatusReport>;
 
   constructor(
     startTransport: StartMixnetTransport,
@@ -113,14 +114,23 @@ export class MixnetCoordinator {
     this.clearTimers();
     this.publishStarting();
     try {
-      let binding: MixnetTransportBinding;
-      this.startsInFlight += 1;
-      try {
-        binding = await this.startTransport();
-      } finally {
-        this.startsInFlight -= 1;
+      this.startingEpoch = epoch;
+      const { socks5Addr, exitNode } = await this.startTransport().finally(
+        () => {
+          if (this.startingEpoch === epoch) {
+            this.startingEpoch = undefined;
+          }
+        },
+      );
+      if (this.enableEpoch !== epoch) {
+        if (this.sessionOffline) {
+          await this.stopOrphanedTransport();
+        }
+        return;
       }
-      const { socks5Addr, exitNode } = binding;
+      if (this.disabling !== undefined) {
+        await this.disabling;
+      }
       if (this.enableEpoch !== epoch) {
         return;
       }
@@ -159,7 +169,12 @@ export class MixnetCoordinator {
     this.resetReconnectBackoff();
     this.reconnectActive = false;
     this.redrawsSpent = 0;
-    const disabled = await disableMixnet();
+    const disabling = disableMixnet();
+    this.disabling = disabling;
+    const disabled = await disabling;
+    if (this.disabling === disabling) {
+      this.disabling = undefined;
+    }
     if (this.enableEpoch !== epoch) {
       return;
     }
@@ -234,15 +249,25 @@ export class MixnetCoordinator {
   // before it starts the next one, so this replaces the draw rather than
   // stacking a second one behind it.
   private async redraw(): Promise<void> {
-    if (
-      this.stopped ||
-      !this.isBootstrapping() ||
-      this.startsInFlight > 0
-    ) {
+    if (this.stopped || !this.isBootstrapping()) {
+      return;
+    }
+    if (this.startingEpoch === this.enableEpoch) {
+      this.armBootstrapDeadline();
       return;
     }
     this.redrawsSpent += 1;
     await this.draw();
+  }
+
+  private async stopOrphanedTransport(): Promise<void> {
+    try {
+      await this.stopTransport();
+    } catch (thrown: unknown) {
+      if (this.sessionOffline) {
+        this.publish(failureReport(thrown));
+      }
+    }
   }
 
   private isLost(status: MixnetStatusReport): boolean {
