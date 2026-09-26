@@ -23,27 +23,25 @@ export type ZecPriceErrorKey =
 export type ZecPriceOutcome =
   { kind: 'zecPrice'; usd: number } | ErrorKeyed<ZecPriceErrorKey>;
 
+/** Reads a price body as a quote only when its current_price is a positive, finite number. */
+export function parseZecQuote(body: string): ZecPriceOutcome {
+  let usd: unknown;
+  try {
+    usd = (JSON.parse(body) as RPCZecPriceType).current_price;
+  } catch (error: unknown) {
+    return errorKeyed('info.error-price-payload', String(error));
+  }
+  return typeof usd === 'number' && Number.isFinite(usd) && usd > 0
+    ? { kind: 'zecPrice', usd }
+    : errorKeyed('info.error-price-payload', String(usd));
+}
+
 /** Fetches the current ZEC/USD price, which zingolib carries over the mixnet. */
 export async function getZecPrice(): Promise<ZecPriceOutcome> {
   const result = await callFfi(RPCModule.zecPriceInfo());
-  if (!result.ok) {
-    return errorKeyed('info.error-price-fetch', result.error.message);
-  }
-  if (!result.value) {
-    return errorKeyed('info.error-price-payload');
-  }
-  try {
-    const payload: RPCZecPriceType = JSON.parse(result.value);
-    const usd = payload.current_price;
-    // A quote is a positive, finite number. Absent, NaN and non-positive are
-    // all malformed payloads, not prices, and none can reach a caller as one.
-    if (usd === undefined || !Number.isFinite(usd) || usd <= 0) {
-      return errorKeyed('info.error-price-payload', String(usd));
-    }
-    return { kind: 'zecPrice', usd };
-  } catch (error) {
-    return errorKeyed('info.error-price-payload', String(error));
-  }
+  return result.ok
+    ? parseZecQuote(result.value)
+    : errorKeyed('info.error-price-fetch', result.error.message);
 }
 
 // ---------------------------------------------------------------------------

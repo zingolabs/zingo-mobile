@@ -23,6 +23,7 @@ import {
   fetchWallet,
   getZecPrice,
   isWalletAddress,
+  parseZecQuote,
   resolvedTrue,
   restoreExistingWalletBackup,
   walletBackupExists,
@@ -91,47 +92,48 @@ describe('the existence probes contain rejections as false', () => {
   });
 });
 
-describe('getZecPrice answers on one typed outcome channel', () => {
-  it.each([
-    [
-      'a typed rejection',
-      typedRejection('Indexer', 'oracle down'),
-      'info.error-price-fetch',
-    ],
-    ['an empty resolution', Promise.resolve(''), 'info.error-price-payload'],
-    [
-      'a body without a price',
-      Promise.resolve('{}'),
-      'info.error-price-payload',
-    ],
-    [
-      'a null price',
-      Promise.resolve('{"current_price": null}'),
-      'info.error-price-payload',
-    ],
-    [
-      'a non-positive price',
-      Promise.resolve('{"current_price": 0}'),
-      'info.error-price-payload',
-    ],
-    [
-      'an unparseable body',
-      Promise.resolve('not json'),
-      'info.error-price-payload',
-    ],
-  ])('%s fails under its own key', async (_case, native, errorKey) => {
-    bridge.zecPriceInfo.mockReturnValueOnce(native);
-    const outcome = await getZecPrice();
-    expect(outcome.kind).toBe('error');
-    expect(outcome).toMatchObject({ errorKey });
-  });
-
-  it('a real price crosses the data channel', async () => {
-    bridge.zecPriceInfo.mockResolvedValueOnce('{"current_price": 42.5}');
-    await expect(getZecPrice()).resolves.toEqual({
+describe('parseZecQuote reads only a positive, finite price as a quote', () => {
+  it('reads a real price as a quote', () => {
+    expect(parseZecQuote('{"current_price": 42.5}')).toEqual({
       kind: 'zecPrice',
       usd: 42.5,
     });
+  });
+
+  it.each([
+    ['an empty body', ''],
+    ['an unparseable body', 'not json'],
+    ['a null body', 'null'],
+    ['a body without a price', '{}'],
+    ['a null price', '{"current_price": null}'],
+    ['a zero price', '{"current_price": 0}'],
+    ['a negative price', '{"current_price": -1}'],
+    ['a price written as a string', '{"current_price": "42.5"}'],
+  ])('reads %s as a malformed payload', (_case, body) => {
+    expect(parseZecQuote(body)).toMatchObject({
+      kind: 'error',
+      errorKey: 'info.error-price-payload',
+    });
+  });
+});
+
+describe('getZecPrice answers on one typed outcome channel', () => {
+  it('a typed rejection fails under the fetch key', async () => {
+    bridge.zecPriceInfo.mockReturnValueOnce(
+      typedRejection('Indexer', 'oracle down'),
+    );
+    await expect(getZecPrice()).resolves.toEqual({
+      kind: 'error',
+      errorKey: 'info.error-price-fetch',
+      param: 'oracle down',
+    });
+  });
+
+  it('a resolved body is read by parseZecQuote', async () => {
+    bridge.zecPriceInfo.mockResolvedValueOnce('{"current_price": 42.5}');
+    await expect(getZecPrice()).resolves.toEqual(
+      parseZecQuote('{"current_price": 42.5}'),
+    );
   });
 });
 
