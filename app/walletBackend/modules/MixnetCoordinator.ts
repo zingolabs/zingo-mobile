@@ -136,14 +136,16 @@ export class MixnetCoordinator {
     this.clearTimers();
     this.publishStarting();
     try {
+      let binding: MixnetTransportBinding;
       this.startingEpoch = epoch;
-      const { socks5Addr, exitNode } = await this.startTransport().finally(
-        () => {
-          if (this.startingEpoch === epoch) {
-            this.startingEpoch = undefined;
-          }
-        },
-      );
+      try {
+        binding = await this.startTransport();
+      } finally {
+        if (this.startingEpoch === epoch) {
+          this.startingEpoch = undefined;
+        }
+      }
+      const { socks5Addr, exitNode } = binding;
       if (!this.isCurrent(epoch)) {
         if (this.phase === 'offline') {
           await this.stopOrphanedTransport();
