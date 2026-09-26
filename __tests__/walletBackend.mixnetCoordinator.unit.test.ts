@@ -4,7 +4,9 @@ import {
   BOOTSTRAP_POLL_MILLIS,
   BOOTSTRAP_REDRAW_LIMIT,
   MixnetCoordinator,
+  MixnetTransportBinding,
   RECONNECT_BASE_MILLIS,
+  RECONNECT_MAX_MILLIS,
   STEADY_POLL_MILLIS,
   StartMixnetTransport,
   StopMixnetTransport,
@@ -541,6 +543,63 @@ describe('MixnetCoordinator.goOffline', () => {
     expect(latest.sendBlocked).toBe(true);
   });
 
+  it('never reconnects an Offline session whose tunnel refused to stop', async () => {
+    mockedBridge.attachMixnet.mockResolvedValue(
+      statusPayload('ready', '127.0.0.1:1080'),
+    );
+    const startTransport = jest.fn().mockResolvedValue(transportBinding);
+    const published: MixnetView[] = [];
+    const coordinator = coordinatorFor(
+      startTransport,
+      view => published.push(view),
+      jest.fn().mockRejectedValue(new Error('the shim would not die')),
+    );
+
+    await coordinator.ensureForConnectedSession();
+    await flushPromises();
+    await coordinator.goOffline();
+    await flushPromises();
+    await jest.advanceTimersByTimeAsync(RECONNECT_MAX_MILLIS * 2);
+    await flushPromises();
+
+    expect(startTransport).toHaveBeenCalledTimes(1);
+    const latest = published[published.length - 1];
+    expect(latest.statusKey).toBe('mixnet.status.unknown');
+    expect(latest.reconnecting).toBe(false);
+  });
+
+  it('leaves the new tunnel alone when the session returns Online during the disable', async () => {
+    mockedBridge.attachMixnet.mockResolvedValue(
+      statusPayload('ready', '127.0.0.1:1080'),
+    );
+    let releaseDisable!: (payload: string) => void;
+    mockedBridge.disableMixnet.mockReturnValue(
+      new Promise<string>(resolve => {
+        releaseDisable = resolve;
+      }),
+    );
+    const stopTransport = jest.fn().mockResolvedValue(undefined);
+    const published: MixnetView[] = [];
+    const coordinator = coordinatorFor(
+      jest.fn().mockResolvedValue(transportBinding),
+      view => published.push(view),
+      stopTransport,
+    );
+
+    const goingOffline = coordinator.goOffline();
+    await coordinator.ensureForConnectedSession();
+    await flushPromises();
+    releaseDisable(statusPayload('off'));
+    await goingOffline;
+    await flushPromises();
+
+    expect(stopTransport).not.toHaveBeenCalled();
+    expect(published[published.length - 1].statusKey).toBe(
+      'mixnet.status.ready',
+    );
+    coordinator.stop();
+  });
+
   // The launch-Offline case: nothing was ever armed, and the header still has
   // to report where nym stands.
   it('lands off on a session that never armed a transport', async () => {
@@ -625,6 +684,35 @@ describe('MixnetCoordinator bootstrap deadline', () => {
     expect(startTransport).toHaveBeenCalledTimes(1);
 
     await jest.advanceTimersByTimeAsync(1_000);
+    await flushPromises();
+
+    expect(startTransport).toHaveBeenCalledTimes(2);
+    coordinator.stop();
+  });
+
+  it('waits for a slow transport start instead of drawing behind it', async () => {
+    mockedBridge.attachMixnet.mockResolvedValue(statusPayload('bootstrapping'));
+    mockedBridge.mixnetIndicatorInfo.mockResolvedValue(
+      statusPayload('bootstrapping'),
+    );
+    let releaseStart!: (binding: MixnetTransportBinding) => void;
+    const startTransport = jest
+      .fn()
+      .mockReturnValueOnce(
+        new Promise<MixnetTransportBinding>(resolve => {
+          releaseStart = resolve;
+        }),
+      )
+      .mockResolvedValue(transportBinding);
+    const coordinator = coordinatorFor(startTransport, () => {});
+
+    coordinator.ensureForConnectedSession();
+    await jest.advanceTimersByTimeAsync(BOOTSTRAP_DEADLINE_MILLIS * 2);
+    expect(startTransport).toHaveBeenCalledTimes(1);
+
+    releaseStart(transportBinding);
+    await flushPromises();
+    await jest.advanceTimersByTimeAsync(BOOTSTRAP_DEADLINE_MILLIS);
     await flushPromises();
 
     expect(startTransport).toHaveBeenCalledTimes(2);
