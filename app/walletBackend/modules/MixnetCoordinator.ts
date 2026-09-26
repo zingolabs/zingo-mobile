@@ -32,6 +32,19 @@ function statusReport(indicator: RPCMixnetIndicatorEnum): MixnetStatusReport {
   return { kind: 'status', indicator, socks5Addr: null };
 }
 
+function hasIndicator(
+  report: MixnetStatusReport | null,
+  indicator: RPCMixnetIndicatorEnum,
+): boolean {
+  return (
+    report !== null &&
+    report.kind === 'status' &&
+    report.indicator === indicator
+  );
+}
+
+type CoordinatorPhase = 'online' | 'offline' | 'stopped';
+
 // The failure report for a rejected transport act.
 function failureReport(thrown: unknown): MixnetStatusReport {
   return { kind: 'failure', failure: describeRejection(thrown) };
@@ -88,8 +101,7 @@ export class MixnetCoordinator {
   private reconnecting: boolean = false;
   private reconnectActive: boolean = false;
   private enableEpoch: number = 0;
-  private stopped: boolean = false;
-  private sessionOffline: boolean = false;
+  private phase: CoordinatorPhase = 'online';
   private startingEpoch?: number;
   private disabling?: Promise<MixnetStatusReport>;
 
@@ -105,8 +117,18 @@ export class MixnetCoordinator {
 
   // Starts the transport, attaches the wallet, and polls; a failure publishes the typed failure view.
   async ensureForConnectedSession(): Promise<void> {
-    this.sessionOffline = false;
+    this.enterPhase('online');
     await this.draw();
+  }
+
+  private enterPhase(phase: Exclude<CoordinatorPhase, 'stopped'>): void {
+    if (this.phase !== 'stopped') {
+      this.phase = phase;
+    }
+  }
+
+  private isCurrent(epoch: number): boolean {
+    return this.enableEpoch === epoch;
   }
 
   private async draw(): Promise<void> {
@@ -122,8 +144,8 @@ export class MixnetCoordinator {
           }
         },
       );
-      if (this.enableEpoch !== epoch) {
-        if (this.sessionOffline) {
+      if (!this.isCurrent(epoch)) {
+        if (this.phase === 'offline') {
           await this.stopOrphanedTransport();
         }
         return;
@@ -131,16 +153,16 @@ export class MixnetCoordinator {
       if (this.disabling !== undefined) {
         await this.disabling;
       }
-      if (this.enableEpoch !== epoch) {
+      if (!this.isCurrent(epoch)) {
         return;
       }
       const status = await attachMixnet(socks5Addr, exitNode);
-      if (this.enableEpoch !== epoch) {
+      if (!this.isCurrent(epoch)) {
         return;
       }
       this.publish(status);
     } catch (thrown: unknown) {
-      if (this.enableEpoch !== epoch) {
+      if (!this.isCurrent(epoch)) {
         return;
       }
       this.publish(failureReport(thrown));
@@ -164,7 +186,7 @@ export class MixnetCoordinator {
   // it caused itself.
   async goOffline(): Promise<void> {
     const epoch = ++this.enableEpoch;
-    this.sessionOffline = true;
+    this.enterPhase('offline');
     this.clearTimers();
     this.resetReconnectBackoff();
     this.reconnectActive = false;
@@ -175,30 +197,28 @@ export class MixnetCoordinator {
     if (this.disabling === disabling) {
       this.disabling = undefined;
     }
-    if (this.enableEpoch !== epoch) {
+    if (!this.isCurrent(epoch)) {
       return;
     }
-    try {
-      await this.stopTransport();
-    } catch (thrown: unknown) {
-      if (this.enableEpoch !== epoch) {
-        return;
-      }
-      // A tunnel we failed to stop is the one thing that must not read as
-      // off: it may still be carrying traffic, so it reports as trouble.
-      this.publish(failureReport(thrown));
+    const stopFailure = await this.stopTransportReport();
+    if (!this.isCurrent(epoch)) {
       return;
     }
-    if (this.enableEpoch !== epoch) {
-      return;
-    }
-    // The tunnel is down, so the mode is off — whatever the wallet's own
-    // bookkeeping managed to answer.
-    this.publish(disabled.kind === 'status' ? disabled : OFF_REPORT);
+    // A tunnel we failed to stop is the one thing that must not read as
+    // off: it may still be carrying traffic, so it reports as trouble.
+    // Otherwise the tunnel is down, so the mode is off — whatever the
+    // wallet's own bookkeeping managed to answer.
+    this.publish(
+      stopFailure ?? (disabled.kind === 'status' ? disabled : OFF_REPORT),
+    );
+  }
+
+  private stopTransportReport(): Promise<MixnetStatusReport | null> {
+    return this.stopTransport().then(() => null, failureReport);
   }
 
   stop(): void {
-    this.stopped = true;
+    this.phase = 'stopped';
     this.enableEpoch += 1;
     this.clearTimers();
     this.resetReconnectBackoff();
@@ -231,7 +251,7 @@ export class MixnetCoordinator {
   // reconnect backoff takes it from there.
   private armBootstrapDeadline(): void {
     if (
-      this.stopped ||
+      this.phase === 'stopped' ||
       this.bootstrapTimerID !== undefined ||
       this.redrawsSpent >= BOOTSTRAP_REDRAW_LIMIT
     ) {
@@ -249,7 +269,7 @@ export class MixnetCoordinator {
   // before it starts the next one, so this replaces the draw rather than
   // stacking a second one behind it.
   private async redraw(): Promise<void> {
-    if (this.stopped || !this.isBootstrapping()) {
+    if (this.phase === 'stopped' || !this.isBootstrapping()) {
       return;
     }
     if (this.startingEpoch === this.enableEpoch) {
@@ -261,19 +281,16 @@ export class MixnetCoordinator {
   }
 
   private async stopOrphanedTransport(): Promise<void> {
-    try {
-      await this.stopTransport();
-    } catch (thrown: unknown) {
-      if (this.sessionOffline) {
-        this.publish(failureReport(thrown));
-      }
+    const stopFailure = await this.stopTransportReport();
+    if (stopFailure !== null && this.phase === 'offline') {
+      this.publish(stopFailure);
     }
   }
 
   private isLost(status: MixnetStatusReport): boolean {
     return (
       status.kind === 'failure' ||
-      status.indicator === RPCMixnetIndicatorEnum.died
+      hasIndicator(status, RPCMixnetIndicatorEnum.died)
     );
   }
 
@@ -281,7 +298,7 @@ export class MixnetCoordinator {
     if (
       this.reconnectTimerID !== undefined ||
       this.reconnecting ||
-      this.sessionOffline
+      this.phase !== 'online'
     ) {
       return;
     }
@@ -309,11 +326,7 @@ export class MixnetCoordinator {
     } finally {
       this.reconnecting = false;
     }
-    const recovered =
-      this.lastStatus !== null &&
-      this.lastStatus.kind === 'status' &&
-      this.lastStatus.indicator === RPCMixnetIndicatorEnum.ready;
-    if (!recovered) {
+    if (!hasIndicator(this.lastStatus, RPCMixnetIndicatorEnum.ready)) {
       this.reconnectDelayMillis = Math.min(
         this.reconnectDelayMillis * 2,
         RECONNECT_MAX_MILLIS,
@@ -332,7 +345,7 @@ export class MixnetCoordinator {
     const epoch = this.enableEpoch;
     try {
       const status = await getMixnetStatus();
-      if (this.enableEpoch === epoch && !this.stopped) {
+      if (this.isCurrent(epoch) && this.phase !== 'stopped') {
         this.publish(status);
       }
     } finally {
@@ -341,7 +354,7 @@ export class MixnetCoordinator {
   }
 
   private schedulePolling(): void {
-    if (this.stopped) {
+    if (this.phase === 'stopped') {
       return;
     }
     this.clearPolling();
@@ -354,29 +367,22 @@ export class MixnetCoordinator {
   }
 
   private isBootstrapping(): boolean {
-    return (
-      this.lastStatus !== null &&
-      this.lastStatus.kind === 'status' &&
-      this.lastStatus.indicator === RPCMixnetIndicatorEnum.bootstrapping
-    );
+    return hasIndicator(this.lastStatus, RPCMixnetIndicatorEnum.bootstrapping);
   }
 
   private publishSeq: number = 0;
 
   private publish(status: MixnetStatusReport): void {
-    if (this.stopped) {
+    if (this.phase === 'stopped') {
       return;
     }
     const wasBootstrapping = this.isBootstrapping();
-    const settled =
-      status.kind === 'status' &&
-      status.indicator === RPCMixnetIndicatorEnum.ready;
-    if (settled) {
+    if (hasIndicator(status, RPCMixnetIndicatorEnum.ready)) {
       this.reconnectActive = false;
       this.resetReconnectBackoff();
       // A proven draw ends the streak: the next bad one starts from zero.
       this.redrawsSpent = 0;
-    } else if (this.isLost(status) && !this.sessionOffline) {
+    } else if (this.isLost(status) && this.phase === 'online') {
       this.reconnectActive = true;
     }
     this.lastStatus = status;
@@ -401,7 +407,7 @@ export class MixnetCoordinator {
   }
 
   private publishStarting(): void {
-    if (this.stopped) {
+    if (this.phase === 'stopped') {
       return;
     }
     this.lastStatus = STARTING_REPORT;
