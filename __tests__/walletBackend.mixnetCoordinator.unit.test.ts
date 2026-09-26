@@ -38,6 +38,43 @@ async function flushPromises(): Promise<void> {
   await Promise.resolve();
 }
 
+const MICROTASK_SETTLE_TURNS = 50;
+
+async function settleMicrotasks(): Promise<void> {
+  for (let turn = 0; turn < MICROTASK_SETTLE_TURNS; turn += 1) {
+    await Promise.resolve();
+  }
+}
+
+type Deferred<T> = { promise: Promise<T>; resolve: (value: T) => void };
+
+function deferred<T>(): Deferred<T> {
+  let resolve!: (value: T) => void;
+  const promise = new Promise<T>(settle => {
+    resolve = settle;
+  });
+  return { promise, resolve };
+}
+
+type Gate<T> = {
+  called: Promise<void>;
+  release: (value: T) => void;
+  implementation: () => Promise<T>;
+};
+
+function gate<T>(): Gate<T> {
+  const call = deferred<void>();
+  const result = deferred<T>();
+  return {
+    called: call.promise,
+    release: result.resolve,
+    implementation: () => {
+      call.resolve();
+      return result.promise;
+    },
+  };
+}
+
 const transportBinding = {
   socks5Addr: '127.0.0.1:1080',
   exitNode: 'test-exit',
@@ -713,6 +750,37 @@ describe('MixnetCoordinator.goOffline', () => {
     releaseOrphanStop();
     await orphanDraw;
     await returning;
+
+    expect(startTransport).toHaveBeenCalledTimes(2);
+    coordinator.stop();
+  });
+
+  it('starts the returning session only after every queued Offline stop has finished', async () => {
+    mockedBridge.attachMixnet.mockResolvedValue(
+      statusPayload('ready', '127.0.0.1:1080'),
+    );
+    const startTransport = jest
+      .fn()
+      .mockReturnValueOnce(deferred<MixnetTransportBinding>().promise)
+      .mockResolvedValue(transportBinding);
+    const firstStop = gate<void>();
+    const stopTransport = jest
+      .fn()
+      .mockImplementationOnce(firstStop.implementation)
+      .mockResolvedValue(undefined);
+    const coordinator = coordinatorFor(startTransport, () => {}, stopTransport);
+
+    coordinator.ensureForConnectedSession();
+    const firstOffline = coordinator.goOffline();
+    await firstStop.called;
+    const secondOffline = coordinator.goOffline();
+    await settleMicrotasks();
+    const returning = coordinator.ensureForConnectedSession();
+    await settleMicrotasks();
+    expect(startTransport).toHaveBeenCalledTimes(1);
+
+    firstStop.release();
+    await Promise.all([firstOffline, secondOffline, returning]);
 
     expect(startTransport).toHaveBeenCalledTimes(2);
     coordinator.stop();
