@@ -1,5 +1,6 @@
 import { RPCMixnetIndicatorEnum } from '@app/walletBackend/enums/RPCMixnetIndicatorEnum';
 import {
+  afterSettled,
   BOOTSTRAP_DEADLINE_MILLIS,
   BOOTSTRAP_POLL_MILLIS,
   BOOTSTRAP_REDRAW_LIMIT,
@@ -36,6 +37,43 @@ function statusPayload(indicator: string, socks5Addr?: string): string {
 async function flushPromises(): Promise<void> {
   await Promise.resolve();
   await Promise.resolve();
+}
+
+const MICROTASK_SETTLE_TURNS = 50;
+
+async function settleMicrotasks(): Promise<void> {
+  for (let turn = 0; turn < MICROTASK_SETTLE_TURNS; turn += 1) {
+    await Promise.resolve();
+  }
+}
+
+type Deferred<T> = { promise: Promise<T>; resolve: (value: T) => void };
+
+function deferred<T>(): Deferred<T> {
+  let resolve!: (value: T) => void;
+  const promise = new Promise<T>(settle => {
+    resolve = settle;
+  });
+  return { promise, resolve };
+}
+
+type Gate<T> = {
+  called: Promise<void>;
+  release: (value: T) => void;
+  implementation: () => Promise<T>;
+};
+
+function gate<T>(): Gate<T> {
+  const call = deferred<void>();
+  const result = deferred<T>();
+  return {
+    called: call.promise,
+    release: result.resolve,
+    implementation: () => {
+      call.resolve();
+      return result.promise;
+    },
+  };
 }
 
 const transportBinding = {
@@ -163,6 +201,39 @@ describe('deriveMixnetView', () => {
         narration,
       ).narration,
     ).toBeNull();
+  });
+});
+
+describe('afterSettled', () => {
+  it('runs the work when nothing is pending', async () => {
+    await expect(afterSettled(undefined, async () => 'done')).resolves.toBe(
+      'done',
+    );
+  });
+
+  it('runs the work only after the pending promise settles', async () => {
+    const pending = deferred<void>();
+    const work = jest.fn().mockResolvedValue('done');
+
+    const running = afterSettled(pending.promise, work);
+    await settleMicrotasks();
+    expect(work).not.toHaveBeenCalled();
+
+    pending.resolve();
+    await expect(running).resolves.toBe('done');
+  });
+
+  it('runs the work after a pending promise that rejects', async () => {
+    await expect(
+      afterSettled(Promise.reject(new Error('gone')), async () => 'done'),
+    ).resolves.toBe('done');
+  });
+
+  it('turns a synchronous throw into a rejection', async () => {
+    const running = afterSettled(undefined, () => {
+      throw new TypeError('not registered');
+    });
+    await expect(running).rejects.toThrow('not registered');
   });
 });
 
@@ -319,12 +390,8 @@ describe('MixnetCoordinator', () => {
 
   it('a stale bootstrapping publication cannot overwrite a newer view', async () => {
     mockedBridge.attachMixnet.mockResolvedValue(statusPayload('bootstrapping'));
-    let releaseNarration!: (payload: string) => void;
-    mockedBridge.mixnetBootstrapDetailInfo.mockReturnValue(
-      new Promise<string>(resolve => {
-        releaseNarration = resolve;
-      }),
-    );
+    const narration = deferred<string>();
+    mockedBridge.mixnetBootstrapDetailInfo.mockReturnValue(narration.promise);
     mockedBridge.mixnetIndicatorInfo.mockResolvedValue(
       statusPayload('ready', '127.0.0.1:1080'),
     );
@@ -337,7 +404,7 @@ describe('MixnetCoordinator', () => {
     await coordinator.ensureForConnectedSession();
     await jest.advanceTimersByTimeAsync(BOOTSTRAP_POLL_MILLIS);
     await flushPromises();
-    releaseNarration(JSON.stringify({ detail: 'connecting to a gateway' }));
+    narration.resolve(JSON.stringify({ detail: 'connecting to a gateway' }));
     await flushPromises();
 
     const latest = published[published.length - 1];
@@ -574,15 +641,8 @@ describe('MixnetCoordinator.goOffline', () => {
       acts.push('attach');
       return statusPayload('ready', '127.0.0.1:1080');
     });
-    let releaseDisable!: () => void;
-    mockedBridge.disableMixnet.mockReturnValue(
-      new Promise<string>(resolve => {
-        releaseDisable = () => {
-          acts.push('disable');
-          resolve(statusPayload('off'));
-        };
-      }),
-    );
+    const disable = deferred<string>();
+    mockedBridge.disableMixnet.mockReturnValue(disable.promise);
     const stopTransport = jest.fn().mockResolvedValue(undefined);
     const published: MixnetView[] = [];
     const coordinator = coordinatorFor(
@@ -596,7 +656,8 @@ describe('MixnetCoordinator.goOffline', () => {
     await flushPromises();
     expect(mockedBridge.attachMixnet).not.toHaveBeenCalled();
 
-    releaseDisable();
+    acts.push('disable');
+    disable.resolve(statusPayload('off'));
     await goingOffline;
     await returning;
     await flushPromises();
@@ -610,12 +671,8 @@ describe('MixnetCoordinator.goOffline', () => {
   });
 
   it('stops a transport whose start finishes after the session went Offline', async () => {
-    let releaseStart!: (binding: MixnetTransportBinding) => void;
-    const startTransport = jest.fn().mockReturnValue(
-      new Promise<MixnetTransportBinding>(resolve => {
-        releaseStart = resolve;
-      }),
-    );
+    const start = deferred<MixnetTransportBinding>();
+    const startTransport = jest.fn().mockReturnValue(start.promise);
     const stopTransport = jest.fn().mockResolvedValue(undefined);
     const published: MixnetView[] = [];
     const coordinator = coordinatorFor(
@@ -628,13 +685,127 @@ describe('MixnetCoordinator.goOffline', () => {
     await coordinator.goOffline();
     expect(stopTransport).toHaveBeenCalledTimes(1);
 
-    releaseStart(transportBinding);
+    start.resolve(transportBinding);
     await drawing;
     await flushPromises();
 
     expect(stopTransport).toHaveBeenCalledTimes(2);
     expect(mockedBridge.attachMixnet).not.toHaveBeenCalled();
     expect(published[published.length - 1].statusKey).toBe('mixnet.status.off');
+  });
+
+  it('starts the returning session only after the Offline stop has finished', async () => {
+    mockedBridge.attachMixnet.mockResolvedValue(
+      statusPayload('ready', '127.0.0.1:1080'),
+    );
+    const startTransport = jest
+      .fn()
+      .mockReturnValueOnce(new Promise<MixnetTransportBinding>(() => {}))
+      .mockResolvedValue(transportBinding);
+    const offlineStop = gate<void>();
+    const stopTransport = jest
+      .fn()
+      .mockImplementation(offlineStop.implementation);
+    const coordinator = coordinatorFor(startTransport, () => {}, stopTransport);
+
+    coordinator.ensureForConnectedSession();
+    const goingOffline = coordinator.goOffline();
+    await offlineStop.called;
+    const returning = coordinator.ensureForConnectedSession();
+    await flushPromises();
+    expect(startTransport).toHaveBeenCalledTimes(1);
+
+    offlineStop.release();
+    await goingOffline;
+    await returning;
+
+    expect(startTransport).toHaveBeenCalledTimes(2);
+    coordinator.stop();
+  });
+
+  it('starts the returning session only after an orphaned transport has been stopped', async () => {
+    mockedBridge.attachMixnet.mockResolvedValue(
+      statusPayload('ready', '127.0.0.1:1080'),
+    );
+    const orphanStart = deferred<MixnetTransportBinding>();
+    const startTransport = jest
+      .fn()
+      .mockReturnValueOnce(orphanStart.promise)
+      .mockResolvedValue(transportBinding);
+    const orphanStop = gate<void>();
+    const stopTransport = jest
+      .fn()
+      .mockResolvedValueOnce(undefined)
+      .mockImplementationOnce(orphanStop.implementation);
+    const coordinator = coordinatorFor(startTransport, () => {}, stopTransport);
+
+    const orphanDraw = coordinator.ensureForConnectedSession();
+    await coordinator.goOffline();
+    orphanStart.resolve(transportBinding);
+    await orphanStop.called;
+    const returning = coordinator.ensureForConnectedSession();
+    await flushPromises();
+    expect(startTransport).toHaveBeenCalledTimes(1);
+
+    orphanStop.release();
+    await orphanDraw;
+    await returning;
+
+    expect(startTransport).toHaveBeenCalledTimes(2);
+    coordinator.stop();
+  });
+
+  it('starts the returning session only after every queued Offline stop has finished', async () => {
+    mockedBridge.attachMixnet.mockResolvedValue(
+      statusPayload('ready', '127.0.0.1:1080'),
+    );
+    const startTransport = jest
+      .fn()
+      .mockReturnValueOnce(new Promise<MixnetTransportBinding>(() => {}))
+      .mockResolvedValue(transportBinding);
+    const firstStop = gate<void>();
+    const stopTransport = jest
+      .fn()
+      .mockImplementationOnce(firstStop.implementation)
+      .mockResolvedValue(undefined);
+    const coordinator = coordinatorFor(startTransport, () => {}, stopTransport);
+
+    coordinator.ensureForConnectedSession();
+    const firstOffline = coordinator.goOffline();
+    await firstStop.called;
+    const secondOffline = coordinator.goOffline();
+    await settleMicrotasks();
+    const returning = coordinator.ensureForConnectedSession();
+    await settleMicrotasks();
+    expect(startTransport).toHaveBeenCalledTimes(1);
+
+    firstStop.release();
+    await Promise.all([firstOffline, secondOffline, returning]);
+
+    expect(startTransport).toHaveBeenCalledTimes(2);
+    coordinator.stop();
+  });
+
+  it('reports trouble, never a rejection, when the stop throws before it returns a promise', async () => {
+    mockedBridge.attachMixnet.mockResolvedValue(
+      statusPayload('ready', '127.0.0.1:1080'),
+    );
+    const published: MixnetView[] = [];
+    const coordinator = coordinatorFor(
+      jest.fn().mockResolvedValue(transportBinding),
+      view => published.push(view),
+      jest.fn().mockImplementation(() => {
+        throw new TypeError('NymTransportModule is not registered');
+      }),
+    );
+
+    await coordinator.ensureForConnectedSession();
+    await flushPromises();
+    await expect(coordinator.goOffline()).resolves.toBeUndefined();
+
+    const latest = published[published.length - 1];
+    expect(latest.statusKey).toBe('mixnet.status.unknown');
+    expect(latest.sendBlocked).toBe(true);
   });
 
   // The launch-Offline case: nothing was ever armed, and the header still has
@@ -732,14 +903,10 @@ describe('MixnetCoordinator bootstrap deadline', () => {
     mockedBridge.mixnetIndicatorInfo.mockResolvedValue(
       statusPayload('bootstrapping'),
     );
-    let releaseStart!: (binding: MixnetTransportBinding) => void;
+    const slowStart = deferred<MixnetTransportBinding>();
     const startTransport = jest
       .fn()
-      .mockReturnValueOnce(
-        new Promise<MixnetTransportBinding>(resolve => {
-          releaseStart = resolve;
-        }),
-      )
+      .mockReturnValueOnce(slowStart.promise)
       .mockResolvedValue(transportBinding);
     const coordinator = coordinatorFor(startTransport, () => {});
 
@@ -747,7 +914,7 @@ describe('MixnetCoordinator bootstrap deadline', () => {
     await jest.advanceTimersByTimeAsync(BOOTSTRAP_DEADLINE_MILLIS * 2);
     expect(startTransport).toHaveBeenCalledTimes(1);
 
-    releaseStart(transportBinding);
+    slowStart.resolve(transportBinding);
     await flushPromises();
     await jest.advanceTimersByTimeAsync(BOOTSTRAP_DEADLINE_MILLIS);
     await flushPromises();
@@ -758,14 +925,10 @@ describe('MixnetCoordinator bootstrap deadline', () => {
 
   it('keeps the deadline armed through a slow start, so a silent attach still draws again', async () => {
     mockedBridge.attachMixnet.mockReturnValue(new Promise<string>(() => {}));
-    let releaseStart!: (binding: MixnetTransportBinding) => void;
+    const slowStart = deferred<MixnetTransportBinding>();
     const startTransport = jest
       .fn()
-      .mockReturnValueOnce(
-        new Promise<MixnetTransportBinding>(resolve => {
-          releaseStart = resolve;
-        }),
-      )
+      .mockReturnValueOnce(slowStart.promise)
       .mockResolvedValue(transportBinding);
     const coordinator = coordinatorFor(startTransport, () => {});
 
@@ -773,7 +936,7 @@ describe('MixnetCoordinator bootstrap deadline', () => {
     await jest.advanceTimersByTimeAsync(BOOTSTRAP_DEADLINE_MILLIS);
     expect(startTransport).toHaveBeenCalledTimes(1);
 
-    releaseStart(transportBinding);
+    slowStart.resolve(transportBinding);
     await flushPromises();
     await jest.advanceTimersByTimeAsync(BOOTSTRAP_DEADLINE_MILLIS);
     await flushPromises();
