@@ -274,6 +274,11 @@ export class MixnetCoordinator {
     if (this.phase === 'stopped' || !this.isBootstrapping()) {
       return;
     }
+    // A start that has not returned yet gets the clock back instead of a
+    // redraw: drawing here would kill the very proxy it is still bringing up.
+    // Nothing is lost by waiting — the native start is bounded (discovery plus
+    // the proxy lifecycle), so one that never lands still arrives as a failure
+    // and takes the reconnect path.
     if (this.startingEpoch === this.enableEpoch) {
       this.armBootstrapDeadline();
       return;

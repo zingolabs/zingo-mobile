@@ -65,6 +65,12 @@ export default class WalletBackend {
     // session that launches Offline armed nothing to tear down, and the
     // header still has to report where nym stands.
     this.mixnetOnline = false;
+    // Not awaited, and that is the fix rather than an oversight: the teardown
+    // can wait behind a transport start that has not returned, and `configure`
+    // runs on every server change and every foreground return, so awaiting it
+    // parked the whole path behind a slow start. Neither call in this method
+    // can reject — every await inside them settles through a report — so
+    // there is nothing here to handle.
     this.mixnetCoordinator.goOffline();
   }
   async clearTimers() {
