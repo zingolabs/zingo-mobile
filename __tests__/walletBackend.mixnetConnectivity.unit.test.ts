@@ -141,6 +141,26 @@ describe('the mixnet follows the session connectivity', () => {
     backend.stopMixnetPolling();
   });
 
+  it('finishes configure while the tunnel stop waits behind a slow start', async () => {
+    const { backend, stop } = harness(ONLINE);
+    stop.mockReturnValue(new Promise<void>(() => {}));
+
+    await backend.configure();
+    await flushPromises();
+
+    backend.setServer(OFFLINE);
+    let configured = false;
+    backend.configure().then(() => {
+      configured = true;
+    });
+    await flushPromises();
+    await flushPromises();
+
+    expect(stop).toHaveBeenCalledTimes(1);
+    expect(configured).toBe(true);
+    backend.stopMixnetPolling();
+  });
+
   it('arms it at the moment the session goes back Online', async () => {
     const { backend, start, published } = harness(OFFLINE);
 
