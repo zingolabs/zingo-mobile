@@ -89,6 +89,7 @@ export class MixnetCoordinator {
   private reconnectActive: boolean = false;
   private enableEpoch: number = 0;
   private stopped: boolean = false;
+  private sessionOffline: boolean = false;
 
   constructor(
     startTransport: StartMixnetTransport,
@@ -102,6 +103,11 @@ export class MixnetCoordinator {
 
   // Starts the transport, attaches the wallet, and polls; a failure publishes the typed failure view.
   async ensureForConnectedSession(): Promise<void> {
+    this.sessionOffline = false;
+    await this.draw();
+  }
+
+  private async draw(): Promise<void> {
     const epoch = ++this.enableEpoch;
     this.clearTimers();
     this.publishStarting();
@@ -140,6 +146,7 @@ export class MixnetCoordinator {
   // it caused itself.
   async goOffline(): Promise<void> {
     const epoch = ++this.enableEpoch;
+    this.sessionOffline = true;
     this.clearTimers();
     this.resetReconnectBackoff();
     this.reconnectActive = false;
@@ -220,7 +227,7 @@ export class MixnetCoordinator {
       return;
     }
     this.redrawsSpent += 1;
-    await this.ensureForConnectedSession();
+    await this.draw();
   }
 
   private isLost(status: MixnetStatusReport): boolean {
@@ -231,7 +238,11 @@ export class MixnetCoordinator {
   }
 
   private scheduleReconnect(): void {
-    if (this.reconnectTimerID !== undefined || this.reconnecting) {
+    if (
+      this.reconnectTimerID !== undefined ||
+      this.reconnecting ||
+      this.sessionOffline
+    ) {
       return;
     }
     this.reconnectTimerID = setTimeout(() => {
@@ -254,7 +265,7 @@ export class MixnetCoordinator {
   private async attemptReconnect(): Promise<void> {
     this.reconnecting = true;
     try {
-      await this.ensureForConnectedSession();
+      await this.draw();
     } finally {
       this.reconnecting = false;
     }
@@ -325,7 +336,7 @@ export class MixnetCoordinator {
       this.resetReconnectBackoff();
       // A proven draw ends the streak: the next bad one starts from zero.
       this.redrawsSpent = 0;
-    } else if (this.isLost(status)) {
+    } else if (this.isLost(status) && !this.sessionOffline) {
       this.reconnectActive = true;
     }
     this.lastStatus = status;

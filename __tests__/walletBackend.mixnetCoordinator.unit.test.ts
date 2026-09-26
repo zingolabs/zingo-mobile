@@ -5,6 +5,7 @@ import {
   BOOTSTRAP_REDRAW_LIMIT,
   MixnetCoordinator,
   RECONNECT_BASE_MILLIS,
+  RECONNECT_MAX_MILLIS,
   STEADY_POLL_MILLIS,
   StartMixnetTransport,
   StopMixnetTransport,
@@ -539,6 +540,31 @@ describe('MixnetCoordinator.goOffline', () => {
     const latest = published[published.length - 1];
     expect(latest.statusKey).toBe('mixnet.status.unknown');
     expect(latest.sendBlocked).toBe(true);
+  });
+
+  it('never reconnects an Offline session whose tunnel refused to stop', async () => {
+    mockedBridge.attachMixnet.mockResolvedValue(
+      statusPayload('ready', '127.0.0.1:1080'),
+    );
+    const startTransport = jest.fn().mockResolvedValue(transportBinding);
+    const published: MixnetView[] = [];
+    const coordinator = coordinatorFor(
+      startTransport,
+      view => published.push(view),
+      jest.fn().mockRejectedValue(new Error('the shim would not die')),
+    );
+
+    await coordinator.ensureForConnectedSession();
+    await flushPromises();
+    await coordinator.goOffline();
+    await flushPromises();
+    await jest.advanceTimersByTimeAsync(RECONNECT_MAX_MILLIS * 2);
+    await flushPromises();
+
+    expect(startTransport).toHaveBeenCalledTimes(1);
+    const latest = published[published.length - 1];
+    expect(latest.statusKey).toBe('mixnet.status.unknown');
+    expect(latest.reconnecting).toBe(false);
   });
 
   // The launch-Offline case: nothing was ever armed, and the header still has
