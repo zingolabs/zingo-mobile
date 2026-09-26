@@ -637,6 +637,109 @@ describe('MixnetCoordinator.goOffline', () => {
     expect(published[published.length - 1].statusKey).toBe('mixnet.status.off');
   });
 
+  it('starts the returning session only after the Offline stop has finished', async () => {
+    mockedBridge.attachMixnet.mockResolvedValue(
+      statusPayload('ready', '127.0.0.1:1080'),
+    );
+    const startTransport = jest
+      .fn()
+      .mockReturnValueOnce(new Promise<MixnetTransportBinding>(() => {}))
+      .mockResolvedValue(transportBinding);
+    let stopRequested!: () => void;
+    const stopCalled = new Promise<void>(resolve => {
+      stopRequested = resolve;
+    });
+    let releaseStop!: () => void;
+    const stopTransport = jest.fn().mockImplementation(() => {
+      stopRequested();
+      return new Promise<void>(resolve => {
+        releaseStop = resolve;
+      });
+    });
+    const coordinator = coordinatorFor(startTransport, () => {}, stopTransport);
+
+    coordinator.ensureForConnectedSession();
+    const goingOffline = coordinator.goOffline();
+    await stopCalled;
+    const returning = coordinator.ensureForConnectedSession();
+    await flushPromises();
+    expect(startTransport).toHaveBeenCalledTimes(1);
+
+    releaseStop();
+    await goingOffline;
+    await returning;
+
+    expect(startTransport).toHaveBeenCalledTimes(2);
+    coordinator.stop();
+  });
+
+  it('starts the returning session only after an orphaned transport has been stopped', async () => {
+    mockedBridge.attachMixnet.mockResolvedValue(
+      statusPayload('ready', '127.0.0.1:1080'),
+    );
+    let releaseOrphanStart!: (binding: MixnetTransportBinding) => void;
+    const startTransport = jest
+      .fn()
+      .mockReturnValueOnce(
+        new Promise<MixnetTransportBinding>(resolve => {
+          releaseOrphanStart = resolve;
+        }),
+      )
+      .mockResolvedValue(transportBinding);
+    let orphanStopRequested!: () => void;
+    const orphanStopCalled = new Promise<void>(resolve => {
+      orphanStopRequested = resolve;
+    });
+    let releaseOrphanStop!: () => void;
+    const stopTransport = jest
+      .fn()
+      .mockResolvedValueOnce(undefined)
+      .mockImplementationOnce(() => {
+        orphanStopRequested();
+        return new Promise<void>(resolve => {
+          releaseOrphanStop = resolve;
+        });
+      });
+    const coordinator = coordinatorFor(startTransport, () => {}, stopTransport);
+
+    const orphanDraw = coordinator.ensureForConnectedSession();
+    await coordinator.goOffline();
+    releaseOrphanStart(transportBinding);
+    await orphanStopCalled;
+    const returning = coordinator.ensureForConnectedSession();
+    await flushPromises();
+    expect(startTransport).toHaveBeenCalledTimes(1);
+
+    releaseOrphanStop();
+    await orphanDraw;
+    await returning;
+
+    expect(startTransport).toHaveBeenCalledTimes(2);
+    coordinator.stop();
+  });
+
+  it('reports trouble, never a rejection, when the stop throws before it returns a promise', async () => {
+    mockedBridge.attachMixnet.mockResolvedValue(
+      statusPayload('ready', '127.0.0.1:1080'),
+    );
+    const published: MixnetView[] = [];
+    const coordinator = coordinatorFor(
+      jest.fn().mockResolvedValue(transportBinding),
+      view => published.push(view),
+      jest.fn().mockImplementation(() => {
+        throw new TypeError('NymTransportModule is not registered');
+      }),
+    );
+
+    await coordinator.ensureForConnectedSession();
+    await flushPromises();
+    await expect(coordinator.goOffline()).resolves.toBeUndefined();
+
+    const latest = published[published.length - 1];
+    expect(latest.statusKey).toBe('mixnet.status.unknown');
+    expect(latest.sendBlocked).toBe(true);
+  });
+
   // The launch-Offline case: nothing was ever armed, and the header still has
   // to report where nym stands.
   it('lands off on a session that never armed a transport', async () => {
