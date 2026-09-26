@@ -63,6 +63,13 @@ async function failureOf(
 
 function ignore(): void {}
 
+function cancelled<T>(id: T | undefined, clear: (id: T) => void): undefined {
+  if (id !== undefined) {
+    clear(id);
+  }
+  return undefined;
+}
+
 export function afterSettled<T>(
   pending: Promise<unknown> | undefined,
   work: () => Promise<T>,
@@ -230,10 +237,8 @@ export class MixnetCoordinator {
   // endpoint, calls it an unconsented death, and the app chases a reconnect
   // it caused itself.
   async goOffline(): Promise<void> {
-    const epoch = ++this.enableEpoch;
     this.enterPhase('offline');
-    this.clearTimers();
-    this.resetReconnectBackoff();
+    const epoch = this.supersede();
     this.reconnectActive = false;
     this.redrawsSpent = 0;
     const disabled = await this.teardown.run(disableMixnet);
@@ -259,9 +264,13 @@ export class MixnetCoordinator {
 
   stop(): void {
     this.phase = 'stopped';
-    this.enableEpoch += 1;
+    this.supersede();
+  }
+
+  private supersede(): number {
     this.clearTimers();
     this.resetReconnectBackoff();
+    return ++this.enableEpoch;
   }
 
   // Cancels the poll, the reconnect, and the bootstrap deadline.
@@ -272,17 +281,11 @@ export class MixnetCoordinator {
   }
 
   private clearPolling(): void {
-    if (this.pollTimerID !== undefined) {
-      clearInterval(this.pollTimerID);
-      this.pollTimerID = undefined;
-    }
+    this.pollTimerID = cancelled(this.pollTimerID, clearInterval);
   }
 
   private clearBootstrapDeadline(): void {
-    if (this.bootstrapTimerID !== undefined) {
-      clearTimeout(this.bootstrapTimerID);
-      this.bootstrapTimerID = undefined;
-    }
+    this.bootstrapTimerID = cancelled(this.bootstrapTimerID, clearTimeout);
   }
 
   // Armed while a draw is still bootstrapping, disarmed the moment it
@@ -354,10 +357,7 @@ export class MixnetCoordinator {
   }
 
   private clearReconnectTimer(): void {
-    if (this.reconnectTimerID !== undefined) {
-      clearTimeout(this.reconnectTimerID);
-      this.reconnectTimerID = undefined;
-    }
+    this.reconnectTimerID = cancelled(this.reconnectTimerID, clearTimeout);
   }
 
   private resetReconnectBackoff(): void {
@@ -390,7 +390,7 @@ export class MixnetCoordinator {
     const epoch = this.enableEpoch;
     try {
       const status = await getMixnetStatus();
-      if (this.isCurrent(epoch) && this.phase !== 'stopped') {
+      if (this.isCurrent(epoch)) {
         this.publish(status);
       }
     } finally {
