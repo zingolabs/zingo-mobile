@@ -4,6 +4,7 @@ import {
   BOOTSTRAP_POLL_MILLIS,
   BOOTSTRAP_REDRAW_LIMIT,
   MixnetCoordinator,
+  MixnetTransportBinding,
   RECONNECT_BASE_MILLIS,
   RECONNECT_MAX_MILLIS,
   STEADY_POLL_MILLIS,
@@ -651,6 +652,35 @@ describe('MixnetCoordinator bootstrap deadline', () => {
     expect(startTransport).toHaveBeenCalledTimes(1);
 
     await jest.advanceTimersByTimeAsync(1_000);
+    await flushPromises();
+
+    expect(startTransport).toHaveBeenCalledTimes(2);
+    coordinator.stop();
+  });
+
+  it('waits for a slow transport start instead of drawing behind it', async () => {
+    mockedBridge.attachMixnet.mockResolvedValue(statusPayload('bootstrapping'));
+    mockedBridge.mixnetIndicatorInfo.mockResolvedValue(
+      statusPayload('bootstrapping'),
+    );
+    let releaseStart!: (binding: MixnetTransportBinding) => void;
+    const startTransport = jest
+      .fn()
+      .mockReturnValueOnce(
+        new Promise<MixnetTransportBinding>(resolve => {
+          releaseStart = resolve;
+        }),
+      )
+      .mockResolvedValue(transportBinding);
+    const coordinator = coordinatorFor(startTransport, () => {});
+
+    coordinator.ensureForConnectedSession();
+    await jest.advanceTimersByTimeAsync(BOOTSTRAP_DEADLINE_MILLIS * 2);
+    expect(startTransport).toHaveBeenCalledTimes(1);
+
+    releaseStart(transportBinding);
+    await flushPromises();
+    await jest.advanceTimersByTimeAsync(BOOTSTRAP_DEADLINE_MILLIS);
     await flushPromises();
 
     expect(startTransport).toHaveBeenCalledTimes(2);

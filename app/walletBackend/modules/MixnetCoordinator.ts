@@ -90,6 +90,7 @@ export class MixnetCoordinator {
   private enableEpoch: number = 0;
   private stopped: boolean = false;
   private sessionOffline: boolean = false;
+  private startsInFlight: number = 0;
 
   constructor(
     startTransport: StartMixnetTransport,
@@ -112,7 +113,14 @@ export class MixnetCoordinator {
     this.clearTimers();
     this.publishStarting();
     try {
-      const { socks5Addr, exitNode } = await this.startTransport();
+      let binding: MixnetTransportBinding;
+      this.startsInFlight += 1;
+      try {
+        binding = await this.startTransport();
+      } finally {
+        this.startsInFlight -= 1;
+      }
+      const { socks5Addr, exitNode } = binding;
       if (this.enableEpoch !== epoch) {
         return;
       }
@@ -223,7 +231,11 @@ export class MixnetCoordinator {
   // before it starts the next one, so this replaces the draw rather than
   // stacking a second one behind it.
   private async redraw(): Promise<void> {
-    if (this.stopped || !this.isBootstrapping()) {
+    if (
+      this.stopped ||
+      !this.isBootstrapping() ||
+      this.startsInFlight > 0
+    ) {
       return;
     }
     this.redrawsSpent += 1;
