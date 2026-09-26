@@ -65,7 +65,7 @@ export default class WalletBackend {
     // session that launches Offline armed nothing to tear down, and the
     // header still has to report where nym stands.
     this.mixnetOnline = false;
-    await this.mixnetCoordinator.goOffline();
+    this.mixnetCoordinator.goOffline();
   }
   async clearTimers() {
     return this.syncCoordinator.clearTimers();
