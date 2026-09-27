@@ -98,6 +98,9 @@ RCT_EXTERN_METHOD(enableMixnet:
     (NSString)proxyPath
                   resolve:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(disableMixnet:
+    (RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(mixnetIndicatorInfo:
     (RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)

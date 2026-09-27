@@ -405,6 +405,7 @@
     "status": {
       "bootstrapping": "Conectando à mixnet…",
       "ready": "Mixnet pronta",
+      "off": "Mixnet desativada (modo offline)",
       "died": "Conexão mixnet perdida",
       "unknown": "Mixnet indisponível"
     },
@@ -419,7 +420,8 @@
     "running": "Executando…",
     "attaching": "O app ainda está se conectando à mixnet. Até o transporte se conectar, ele é relatado como perdido, portanto esta execução ainda não é um veredito.",
     "copy-report": "Copiar relatório",
-    "report-copied": "Relatório copiado para a área de transferência"
+    "report-copied": "Relatório copiado para a área de transferência",
+    "offline": "A mixnet está desativada porque esta sessão está em modo offline. Escolha um servidor nas Configurações para voltar a ativá-la."
   },
   "header": {
     "lastupdate": "Última atualização:"

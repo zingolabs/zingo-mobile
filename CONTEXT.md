@@ -259,8 +259,28 @@ persisted user opt-in, default off and sticky.
 **Indicator**:
 The state Mixnet Mode reports: `off`, `bootstrapping`, `ready`, or `died`.
 It crosses the FFI as the `mixnet_indicator` payload key and reaches the app
-as `RPCMixnetIndicatorEnum`.
+as `RPCMixnetIndicatorEnum`. `off` is the deliberate switch-off — the session
+went Offline, so there is no transport and nothing to recover — while `died`
+is an unconsented loss, which the app reconnects out of. The header's icon
+reports this state and this state alone: it is never hidden, because hiding it
+would hide a tunnel that might still be up.
 _Avoid_: mode (names the feature, not the state it reports)
+
+**Go-online moment**:
+Where a session decides its connectivity, and therefore how long the transport
+lives: `WalletBackend.configure`, which runs at launch and after every server
+change. Offline — the empty server URI — holds no tunnel and rests at `off`;
+going back Online arms one then and there. zingo-cli gates its own driver call
+the same way, on `Communications::Online`.
+_Avoid_: app start (the transport does not follow the app's lifetime)
+
+**Draw**:
+The entry gateway and Exit Node a transport binds when it is born. The shim
+draws them, so only a fresh `startMixnetTransport` redraws — the wallet's
+readiness gate retries its probe over the same draw. A draw that never
+answers is common enough to plan for, so the app gives one
+`BOOTSTRAP_DEADLINE_MILLIS` to prove itself and then draws again.
+_Avoid_: retry (names the probe, not the pair it runs over)
 
 **Route**:
 The network path a mixnet-only surface resolves to, either the Standing

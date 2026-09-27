@@ -129,7 +129,10 @@ import {
   INITIAL_MIXNET_VIEW,
   MixnetView,
 } from '@app/walletBackend/transforms/mixnetView';
-import { startMixnetTransport } from '@app/walletBackend/utils/nymTransport';
+import {
+  startMixnetTransport,
+  stopMixnetTransport,
+} from '@app/walletBackend/utils/nymTransport';
 import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
 import { AddressList } from '@screens/AddressList';
 import ValueTransferDetail from '@screens/ValueTransferDetail';
@@ -768,6 +771,7 @@ export class LoadedAppClass extends Component<
       onPersistentSyncFailure: this.recoverServer,
       onMixnetViewChanged: this.setMixnetView,
       startMixnetTransport: startMixnetTransport,
+      stopMixnetTransport: stopMixnetTransport,
       mixnetSupported: true,
       readOnly: props.readOnly,
       server: props.server,

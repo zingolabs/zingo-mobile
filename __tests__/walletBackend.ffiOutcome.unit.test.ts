@@ -30,6 +30,8 @@ import {
 } from '@app/walletBackend/utils/walletUtils';
 import { SyncCoordinator } from '@app/walletBackend/modules/SyncCoordinator';
 import { DataService } from '@app/walletBackend/modules/DataService';
+import { mockServer } from '../__mocks__/dataMocks/mockServer';
+import { mockWalletBackendConfig } from '../__mocks__/dataMocks/mockWalletBackendConfig';
 
 const bridge = RPCModule as unknown as Record<string, jest.Mock>;
 
@@ -93,6 +95,9 @@ describe('sync family rejections are contained and reported, never sniffed', () 
       keepAwake: jest.fn(),
       onSyncStatusChanged: jest.fn(),
       onBalanceChanged: jest.fn(),
+      // A connected session: containment of a rejected bridge call is what
+      // is under test, and an Offline session never makes the call.
+      server: mockServer,
     } as unknown as ConstructorParameters<typeof SyncCoordinator>[0];
     const dataService = {} as ConstructorParameters<typeof SyncCoordinator>[1];
     return { coordinator: new SyncCoordinator(config, dataService), onError };
@@ -157,12 +162,7 @@ describe('sync family rejections are contained and reported, never sniffed', () 
 describe('read getter rejections are contained and reported, never sniffed', () => {
   function makeDataService() {
     const onError = jest.fn();
-    const config = {
-      onError,
-      onAddressesChanged: jest.fn(),
-      onZingolibVersionChanged: jest.fn(),
-      server: { uri: 'https://server.example' },
-    } as unknown as ConstructorParameters<typeof DataService>[0];
+    const config = mockWalletBackendConfig({ onError });
     return { dataService: new DataService(config), onError };
   }
 

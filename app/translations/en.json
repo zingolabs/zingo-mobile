@@ -405,6 +405,7 @@
     "status": {
       "bootstrapping": "Connecting to mixnet…",
       "ready": "Mixnet ready",
+      "off": "Mixnet off (offline mode)",
       "died": "Mixnet connection lost",
       "unknown": "Mixnet unavailable"
     },
@@ -419,7 +420,8 @@
     "running": "Running…",
     "attaching": "The app is still connecting to the mixnet. Until the transport attaches it reports as lost, so this run is not a verdict yet.",
     "copy-report": "Copy report",
-    "report-copied": "Report copied to clipboard"
+    "report-copied": "Report copied to clipboard",
+    "offline": "The mixnet is off because this session is in offline mode. Pick a server in Settings to bring it back up."
   },
   "header": {
     "lastupdate": "Last update:"

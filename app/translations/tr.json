@@ -405,6 +405,7 @@
     "status": {
       "bootstrapping": "Mixnet'e bağlanılıyor…",
       "ready": "Mixnet hazır",
+      "off": "Mixnet kapalı (çevrimdışı mod)",
       "died": "Mixnet bağlantısı koptu",
       "unknown": "Mixnet kullanılamıyor"
     },
@@ -419,7 +420,8 @@
     "running": "Çalışıyor…",
     "attaching": "Uygulama hâlâ mixnet'e bağlanıyor. Taşıma bağlanana kadar kayıp olarak bildirilir, bu yüzden bu çalışma henüz bir hüküm değildir.",
     "copy-report": "Raporu kopyala",
-    "report-copied": "Rapor panoya kopyalandı"
+    "report-copied": "Rapor panoya kopyalandı",
+    "offline": "Bu oturum çevrimdışı modda olduğu için mixnet kapalı. Yeniden başlatmak için Ayarlar'dan bir sunucu seçin."
   },
   "header": {
     "lastupdate": "Son güncelleme:"
