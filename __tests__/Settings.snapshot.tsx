@@ -54,7 +54,7 @@ describe('Component Settings - test', () => {
           {...props}
           setServerOption={onSetOption}
           setLanguageOption={onSetOption}
-          setSecurityOption={onSetOption}
+          setBiometricsOption={onSetOption}
           setSelectServerOption={onSetOption}
           setRecoveryWalletInfoOnDeviceOption={onSetOption}
           setPerformanceLevelOption={onSetOption}

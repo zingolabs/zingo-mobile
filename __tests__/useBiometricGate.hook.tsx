@@ -1,7 +1,6 @@
 /**
- * The shared screen-level gate: one body for the mount and foreground
- * effects, asking the single gate controller of ADR 0007 and acting on
- * its three-way answer.
+ * The shared screen-level gate, asking the single gate controller of ADR
+ * 0007 and acting on its three-way answer.
  */
 jest.mock('@app/services/gateController', () => ({
   __esModule: true,
@@ -25,8 +24,6 @@ const gateArgs = (over?: Partial<GateProps>): GateProps => ({
   translate,
   addLastSnackbar: jest.fn(),
   onCancel: jest.fn(),
-  foregroundAppEnabled: true,
-  foregroundEpoch: 0,
   ...over,
 });
 
@@ -109,49 +106,6 @@ test('flipping needsAuth on re-gates a mounted screen', async () => {
 
   await waitFor(() => expect(gate).toHaveBeenCalledTimes(1));
   await waitFor(() => expect(result.current).toMatchObject({ kind: 'passed' }));
-});
-
-test('a foreground return re-gates only when the app-level gate is off', async () => {
-  gate.mockResolvedValue({ kind: 'passed' });
-  const { rerender } = renderHook((p: GateProps) => useBiometricGate(p), {
-    initialProps: gateArgs({ foregroundAppEnabled: false }),
-  });
-  await waitFor(() => expect(gate).toHaveBeenCalledTimes(1));
-
-  rerender(gateArgs({ foregroundAppEnabled: false, foregroundEpoch: 1 }));
-  await waitFor(() => expect(gate).toHaveBeenCalledTimes(2));
-
-  rerender(gateArgs({ foregroundAppEnabled: true, foregroundEpoch: 2 }));
-  expect(gate).toHaveBeenCalledTimes(2);
-});
-
-test('an epoch re-fire supersedes the pending run, acting once on a shared decline', async () => {
-  let settle: (a: GateAnswer) => void = () => {};
-  gate.mockReturnValue(
-    new Promise(resolve => {
-      settle = resolve;
-    }),
-  );
-  const props = gateArgs({ foregroundAppEnabled: false });
-  const { rerender } = renderHook((p: GateProps) => useBiometricGate(p), {
-    initialProps: props,
-  });
-  await waitFor(() => expect(gate).toHaveBeenCalledTimes(1));
-
-  rerender({ ...props, foregroundEpoch: 1 });
-  await waitFor(() => expect(gate).toHaveBeenCalledTimes(2));
-
-  settle({
-    kind: 'declined',
-    failure: {
-      kind: 'error',
-      errorKey: 'biometrics-failure-declined',
-      param: '10',
-    },
-  });
-
-  await waitFor(() => expect(props.onCancel).toHaveBeenCalledTimes(1));
-  expect(props.addLastSnackbar).toHaveBeenCalledTimes(1);
 });
 
 test('an unmounted screen never acts on a late answer', async () => {

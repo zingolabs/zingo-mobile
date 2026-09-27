@@ -10,7 +10,6 @@ import { TranslateType } from './types/TranslateType';
 import NetInfoType from './types/NetInfoType';
 import BackgroundErrorType from './types/BackgroundErrorType';
 import ServerType from './types/ServerType';
-import SecurityType from './types/SecurityType';
 
 import { LanguageEnum } from './enums/LanguageEnum';
 import { SelectServerEnum } from './enums/SelectServerEnum';
@@ -126,7 +125,7 @@ export default interface AppContextLoaded {
   server: ServerType;
   language: LanguageEnum;
   privacy: boolean;
-  security: SecurityType;
+  biometrics: boolean;
   selectServer: SelectServerEnum;
   // The loaded wallet's OWN chain (main/test/regtest). Reliable even Offline,
   // unlike `server.chainName` which is empty in Offline mode. Empty when no
@@ -141,12 +140,4 @@ export default interface AppContextLoaded {
   // Null where the mixnet policy does not run.
   mixnetView: MixnetView | null;
   reenableMixnet: () => Promise<void>;
-
-  // Monotonically increasing counter incremented every time the app
-  // returns from background/inactive to active. Protected screens
-  // (Seed, ShowUfvk, Settings, Rescan, Confirm) watch it to re-fire
-  // their on-mount biometric gate when security.foregroundApp is OFF
-  // and the screen is still mounted on resume — closing the gap where
-  // a sensitive screen could be revealed without a fresh auth.
-  foregroundEpoch: number;
 }

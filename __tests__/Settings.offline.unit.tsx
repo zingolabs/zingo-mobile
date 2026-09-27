@@ -59,7 +59,7 @@ function renderSettings(selectServer: SelectServerEnum) {
         setDonationOption={jest.fn()}
         setPrivacyOption={jest.fn()}
         setModeOption={jest.fn()}
-        setSecurityOption={jest.fn()}
+        setBiometricsOption={jest.fn()}
         setSelectServerOptionCustom={jest.fn()}
         closeScreen={jest.fn()}
       />

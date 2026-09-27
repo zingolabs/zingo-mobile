@@ -39,7 +39,6 @@ import FadeText from '@ui/primitives/FadeText';
 import BoldText from '@ui/primitives/BoldText';
 import SheetRim from '@ui/primitives/SheetRim';
 import AppSheet from '@ui/primitives/AppSheet';
-import AppSheetModal from '@ui/primitives/AppSheetModal';
 import {
   checkServerURI,
   fetchServerList,
@@ -53,7 +52,6 @@ import { ContextAppLoaded } from '@app/context';
 import Header from '@ui/widgets/Header';
 import {
   LanguageEnum,
-  SecurityType,
   SeedActionEnum,
   ServerType,
   ServerUrisType,
@@ -69,9 +67,7 @@ import {
   BlockExplorerEnum,
 } from '@app/AppState';
 import { getLatestBlockServerInfo } from '@app/walletBackend';
-import { isEqual } from 'lodash';
 import ChainTypeToggle from '@ui/widgets/ChainTypeToggle';
-import BouncyCheckbox from 'react-native-bouncy-checkbox';
 import {
   DeviceSecurityProbe,
   probeDeviceSecurity,
@@ -108,7 +104,7 @@ type SettingsProps = NativeStackScreenProps<
     sameServerChainName: boolean,
   ) => Promise<SetServerResult>;
   setLanguageOption: (value: LanguageEnum) => Promise<void>;
-  setSecurityOption: (value: SecurityType) => Promise<void>;
+  setBiometricsOption: (value: boolean) => Promise<void>;
   setSelectServerOption: (value: string) => Promise<void>;
   setRecoveryWalletInfoOnDeviceOption: (value: boolean) => Promise<void>;
   setPerformanceLevelOption: (value: RPCPerformanceLevelEnum) => Promise<void>;
@@ -125,7 +121,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   navigation,
   setServerOption,
   setLanguageOption,
-  setSecurityOption,
+  setBiometricsOption,
   setSelectServerOption,
   setRecoveryWalletInfoOnDeviceOption,
   setPerformanceLevelOption,
@@ -141,14 +137,13 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     privacy: privacyContext,
     netInfo,
     addLastSnackbar,
-    security: securityContext,
+    biometrics: biometricsContext,
     selectServer: selectServerContext,
     walletChainName,
     mixnetView,
     recoveryWalletInfoOnDevice: recoveryWalletInfoOnDeviceContext,
     performanceLevel: performanceLevelContext,
     blockExplorer: blockExplorerContext,
-    foregroundEpoch,
     readOnly,
     setPrivacyOption,
     setBackgroundError,
@@ -192,26 +187,14 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const { colors } = useTheme();
   const screenName = ScreenEnum.Settings;
 
-  // Audit Issue D — single source of truth for security.settingsScreen.
-  // The requirement follows the live context except while this screen's
-  // own save rewrites it. The sync runs in an effect, so the thaw is a
-  // rendered state change at a deterministic moment, never a stale ref.
-  const [savingSettings, setSavingSettings] = useState<boolean>(false);
-  const liveNeedsAuth = !!securityContext.settingsScreen;
-  const [gateRequirement, setGateRequirement] =
-    useState<boolean>(liveNeedsAuth);
-  useEffect(() => {
-    if (!savingSettings) {
-      setGateRequirement(liveNeedsAuth);
-    }
-  }, [savingSettings, liveNeedsAuth]);
+  // The requirement is read once, at mount: this screen's own save
+  // flips the switch, and that must not re-gate the open screen.
+  const [needsAuth] = useState<boolean>(biometricsContext);
   const screenGate = useBiometricGate({
-    needsAuth: gateRequirement,
+    needsAuth,
     translate,
     addLastSnackbar,
     onCancel: () => navigation.goBack(),
-    foregroundAppEnabled: !!securityContext.foregroundApp,
-    foregroundEpoch,
   });
   const authPassed = screenGate.kind === 'passed';
 
@@ -255,28 +238,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   );
   const [language, setLanguage] = useState<LanguageEnum>(languageContext);
   const [privacy, setPrivacy] = useState<boolean>(privacyContext);
-  // security checks box.
-  const [startApp, setStartApp] = useState<boolean>(securityContext.startApp);
-  const [foregroundApp, setForegroundApp] = useState<boolean>(
-    securityContext.foregroundApp,
-  );
-  const [sendConfirm, setSendConfirm] = useState<boolean>(
-    securityContext.sendConfirm,
-  );
-  const [seedUfvkScreen, setSeedUfvkScreen] = useState<boolean>(
-    securityContext.seedUfvkScreen,
-  );
-  const [rescanScreen, setRescanScreen] = useState<boolean>(
-    securityContext.rescanScreen,
-  );
-  const [settingsScreen, setSettingsScreen] = useState<boolean>(
-    securityContext.settingsScreen,
-  );
-  const [changeWalletScreen, setChangeWalletScreen] = useState<boolean>(
-    securityContext.changeWalletScreen,
-  );
-  const [restoreWalletBackupScreen, setRestoreWalletBackupScreen] =
-    useState<boolean>(securityContext.restoreWalletBackupScreen);
+  const [biometrics, setBiometrics] = useState<boolean>(biometricsContext);
   const [selectServer, setSelectServer] =
     useState<SelectServerEnum>(selectServerContext);
   const [recoveryWalletInfoOnDevice, setRecoveryWalletInfoOnDevice] =
@@ -625,28 +587,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // once, for the whole screen life
 
-  const securityObject: () => SecurityType = useCallback(() => {
-    return {
-      startApp,
-      foregroundApp,
-      sendConfirm,
-      seedUfvkScreen,
-      rescanScreen,
-      settingsScreen,
-      changeWalletScreen,
-      restoreWalletBackupScreen,
-    };
-  }, [
-    changeWalletScreen,
-    foregroundApp,
-    rescanScreen,
-    restoreWalletBackupScreen,
-    seedUfvkScreen,
-    sendConfirm,
-    settingsScreen,
-    startApp,
-  ]);
-
   useEffect(() => {
     let serverUriParsed = '';
     let chainNameParsed = '';
@@ -670,7 +610,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       serverContext.chainName === chainNameParsed &&
       languageContext === language &&
       privacyContext === privacy &&
-      isEqual(securityContext, securityObject()) &&
+      biometricsContext === biometrics &&
       selectServerContext === selectServer &&
       recoveryWalletInfoOnDeviceContext === recoveryWalletInfoOnDevice &&
       performanceLevelContext === performanceLevel &&
@@ -697,12 +637,12 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     performanceLevelContext,
     blockExplorer,
     blockExplorerContext,
-    securityContext,
+    biometrics,
+    biometricsContext,
     selectServer,
     selectServerContext,
     serverContext.chainName,
     serverContext.uri,
-    securityObject,
   ]);
 
   // Ref that always points to the latest `saveSettings`. The footer's
@@ -714,7 +654,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   // the footer's onPress always invoke the current closure.
   const saveSettingsRef = useRef<() => Promise<void>>(async () => {});
 
-  const doSaveSettings = async () => {
+  const saveSettings = async () => {
     // ───────────────────────────────────────────────────────────────
     // Phase 1: Resolve the target server URI/chain from the picker mode
     // and validate up-front (no I/O yet — purely synchronous guards).
@@ -742,7 +682,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       serverContext.chainName === chainNameParsed &&
       languageContext === language &&
       privacyContext === privacy &&
-      isEqual(securityContext, securityObject()) &&
+      biometricsContext === biometrics &&
       selectServerContext === selectServer &&
       recoveryWalletInfoOnDeviceContext === recoveryWalletInfoOnDevice &&
       performanceLevelContext === performanceLevel &&
@@ -922,8 +862,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       if (privacyContext !== privacy) {
         await setPrivacyOption(privacy);
       }
-      if (!isEqual(securityContext, securityObject())) {
-        await setSecurityOption(securityObject());
+      if (biometricsContext !== biometrics) {
+        await setBiometricsOption(biometrics);
       }
       if (recoveryWalletInfoOnDeviceContext !== recoveryWalletInfoOnDevice) {
         await setRecoveryWalletInfoOnDeviceOption(recoveryWalletInfoOnDevice);
@@ -1022,14 +962,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       navigation.navigate(RouteEnum.HomeStack);
     }
   };
-  const saveSettings = async () => {
-    setSavingSettings(true);
-    try {
-      await doSaveSettings();
-    } finally {
-      setSavingSettings(false);
-    }
-  };
   saveSettingsRef.current = saveSettings;
 
   const navigateToHome = useCallback((reset: boolean) => {
@@ -1039,14 +971,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       setPrivacy(privacyContext);
       setSelectServer(selectServerContext);
       setServer();
-      setStartApp(securityContext.startApp);
-      setForegroundApp(securityContext.foregroundApp);
-      setSendConfirm(securityContext.sendConfirm);
-      setSeedUfvkScreen(securityContext.seedUfvkScreen);
-      setRescanScreen(securityContext.rescanScreen);
-      setSettingsScreen(securityContext.settingsScreen);
-      setChangeWalletScreen(securityContext.changeWalletScreen);
-      setRestoreWalletBackupScreen(securityContext.restoreWalletBackupScreen);
+      setBiometrics(biometricsContext);
       setRecoveryWalletInfoOnDevice(recoveryWalletInfoOnDeviceContext);
       setPerformanceLevel(performanceLevelContext);
       setBlockExplorer(blockExplorerContext);
@@ -1209,7 +1134,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     setServerChain(chain);
   };
 
-  const securityBottomSheetRef = useRef<BottomSheetModal>(null);
   const serverBottomSheetRef = useRef<BottomSheetModal>(null);
   const languageSelectRef = useRef<BottomSheetModal>(null);
   const blockExplorerSelectRef = useRef<BottomSheetModal>(null);
@@ -1298,44 +1222,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     [colors, disabled, disabledButton, translate],
   );
 
-  const securityHeader = (
-    <View
-      style={{
-        paddingTop: 8,
-        paddingBottom: 6,
-        paddingHorizontal: 16,
-      }}
-    >
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-        }}
-      >
-        <View style={{ width: 48 }} />
-        <BoldText
-          numberOfLines={1}
-          style={{
-            flex: 1,
-            fontSize: 16,
-            lineHeight: 28,
-            textAlign: 'center',
-          }}
-        >
-          {translate('settings.security-title') as string}
-        </BoldText>
-        <Pressable
-          onPress={() => securityBottomSheetRef.current?.close()}
-          hitSlop={8}
-          style={{ paddingHorizontal: 14, paddingVertical: 4 }}
-        >
-          <FontAwesomeIcon icon={faXmark} size={20} color={colors.fgMuted} />
-        </Pressable>
-      </View>
-    </View>
-  );
-
   const renderServerHandle = useCallback(
     () => (
       <View
@@ -1381,7 +1267,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     [colors, translate],
   );
 
-  const renderBackdropSecurity = (props: BottomSheetBackdropProps) => (
+  const renderBackdrop = (props: BottomSheetBackdropProps) => (
     <BottomSheetBackdrop
       {...props}
       disappearsOnIndex={-1}
@@ -1389,76 +1275,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       pressBehavior="close"
     />
   );
-
-  const allSecurityChecked =
-    startApp &&
-    foregroundApp &&
-    sendConfirm &&
-    seedUfvkScreen &&
-    rescanScreen &&
-    settingsScreen &&
-    changeWalletScreen &&
-    restoreWalletBackupScreen;
-  const noneSecurityChecked =
-    !startApp &&
-    !foregroundApp &&
-    !sendConfirm &&
-    !seedUfvkScreen &&
-    !rescanScreen &&
-    !settingsScreen &&
-    !changeWalletScreen &&
-    !restoreWalletBackupScreen;
-  const securityLabel = allSecurityChecked
-    ? (translate('settings.security-all') as string)
-    : noneSecurityChecked
-      ? (translate('settings.security-none') as string)
-      : (translate('settings.security-some') as string);
-
-  const securityCheckBox = (
-    value: boolean,
-    setValue: React.Dispatch<React.SetStateAction<string | boolean>>,
-    label: string,
-  ) => {
-    return (
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          marginLeft: 20,
-          marginRight: 10,
-          marginBottom: 5,
-          maxHeight: 50,
-          minHeight: 48,
-        }}
-      >
-        <BouncyCheckbox
-          disabled={disabled}
-          disableText
-          isChecked={value}
-          useBuiltInState={false}
-          onPress={() => setValue(!value)}
-          unFillColor={colors.bgCanvas}
-          fillColor={colors.bgAccent}
-          style={{
-            marginRight: 10,
-          }}
-          innerIconStyle={{
-            borderRadius: 5,
-          }}
-          iconStyle={{
-            borderRadius: 5,
-          }}
-        />
-        <RegText
-          style={{
-            marginTop: Platform.OS === GlobalConst.platformOSios ? 5 : 3,
-          }}
-        >
-          {label}
-        </RegText>
-      </View>
-    );
-  };
 
   const reportError = (error: string) => {
     createAlert(
@@ -1750,26 +1566,15 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                     {translate('settings.security-title') as string}
                   </BoldText>
                   <TouchableOpacity
-                    onPress={() => securityBottomSheetRef.current?.present()}
+                    testID="settings.biometrics"
+                    disabled={disabled}
+                    onPress={() => setBiometrics(!biometrics)}
                   >
-                    <View
-                      style={{ flexDirection: 'row', alignItems: 'center' }}
-                    >
-                      <RegText
-                        style={{
-                          marginRight: 5,
-                          fontWeight: '400',
-                          color: colors.fgMuted,
-                        }}
-                      >
-                        {securityLabel}
-                      </RegText>
-                      <FontAwesomeIcon
-                        icon={faChevronRight}
-                        size={12}
-                        color={colors.fgMuted}
-                      />
-                    </View>
+                    {biometrics ? (
+                      <SettingSwitchOn width={40} height={19} />
+                    ) : (
+                      <SwitchOff width={40} height={19} />
+                    )}
                   </TouchableOpacity>
                 </View>
                 {deviceSecurity.kind === 'insecure' && (
@@ -1994,68 +1799,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
           </AppSheet>
         </Animated.View>
       </View>
-      <AppSheetModal
-        ref={securityBottomSheetRef}
-        header={securityHeader}
-        contentStyle={{ paddingBottom: 30 }}
-      >
-        {securityCheckBox(
-          startApp,
-          setStartApp as React.Dispatch<React.SetStateAction<string | boolean>>,
-          translate('settings.security-startapp') as string,
-        )}
-        {securityCheckBox(
-          foregroundApp,
-          setForegroundApp as React.Dispatch<
-            React.SetStateAction<string | boolean>
-          >,
-          translate('settings.security-foregroundapp') as string,
-        )}
-        {securityCheckBox(
-          sendConfirm,
-          setSendConfirm as React.Dispatch<
-            React.SetStateAction<string | boolean>
-          >,
-          translate('settings.security-sendconfirm') as string,
-        )}
-        {securityCheckBox(
-          seedUfvkScreen,
-          setSeedUfvkScreen as React.Dispatch<
-            React.SetStateAction<string | boolean>
-          >,
-          readOnly
-            ? (translate('settings.security-ufvkscreen') as string)
-            : (translate('settings.security-seedscreen') as string),
-        )}
-        {securityCheckBox(
-          rescanScreen,
-          setRescanScreen as React.Dispatch<
-            React.SetStateAction<string | boolean>
-          >,
-          translate('settings.security-rescanscreen') as string,
-        )}
-        {securityCheckBox(
-          settingsScreen,
-          setSettingsScreen as React.Dispatch<
-            React.SetStateAction<string | boolean>
-          >,
-          translate('settings.security-settingsscreen') as string,
-        )}
-        {securityCheckBox(
-          changeWalletScreen,
-          setChangeWalletScreen as React.Dispatch<
-            React.SetStateAction<string | boolean>
-          >,
-          translate('settings.security-changewalletscreen') as string,
-        )}
-        {securityCheckBox(
-          restoreWalletBackupScreen,
-          setRestoreWalletBackupScreen as React.Dispatch<
-            React.SetStateAction<string | boolean>
-          >,
-          translate('settings.security-restorewalletbackupscreen') as string,
-        )}
-      </AppSheetModal>
       <BottomSheetModal
         ref={serverBottomSheetRef}
         enableDynamicSizing={true}
@@ -2078,7 +1821,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
           borderTopLeftRadius: radiusSheet,
           borderTopRightRadius: radiusSheet,
         }}
-        backdropComponent={renderBackdropSecurity}
+        backdropComponent={renderBackdrop}
       >
         <BottomSheetScrollView
           bounces={false}

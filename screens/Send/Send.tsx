@@ -64,7 +64,6 @@ import {
   SetServerResult,
   SelectServerEnum,
   RouteEnum,
-  SecurityType,
   ScreenEnum,
   ProposalPoolsType,
 } from '@app/AppState';
@@ -125,7 +124,6 @@ type SendProps = NativeStackScreenProps<AppDrawerParamList, RouteEnum.Send> & {
     sameServerChainName: boolean,
   ) => Promise<SetServerResult>;
   clearToAddr: () => void;
-  setSecurityOption: (s: SecurityType) => Promise<void>;
 };
 
 const Send: React.FunctionComponent<SendProps> = ({
@@ -136,7 +134,6 @@ const Send: React.FunctionComponent<SendProps> = ({
   setScrollToTop,
   setScrollToBottom,
   setServerOption,
-  //setSecurityOption,
 }) => {
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const context = useContext(ContextAppLoaded);
@@ -158,7 +155,6 @@ const Send: React.FunctionComponent<SendProps> = ({
     defaultUnifiedAddress,
     shieldingAmount,
     selectServer,
-    //security,
     zingolibVersion,
     setPrivacyOption,
     mixnetView,

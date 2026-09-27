@@ -3,8 +3,6 @@ import * as RNFS from 'react-native-fs';
 import {
   ChainNameEnum,
   GlobalConst,
-  SecurityType,
-  SecurityTypeEnum,
   SelectServerEnum,
   ServerType,
   ServerUrisType,
@@ -32,7 +30,7 @@ export default class SettingsFileImpl {
   // Write the server setting
   static async writeSettings(
     name: SettingsNameEnum,
-    value: string | boolean | ServerType | SecurityType,
+    value: string | boolean | ServerType,
   ): Promise<void> {
     const write = this.writeQueue.then(async () => {
       const fileName = await this.getFileName();
@@ -120,19 +118,15 @@ export default class SettingsFileImpl {
         // from some version before.
         settings.version = '';
       }
-      if (!settings.hasOwnProperty(SettingsNameEnum.security)) {
-        // this is the first time the App implemented
-        // screen security. Default values.
-        settings.security = {
-          startApp: true,
-          foregroundApp: true,
-          sendConfirm: true,
-          seedUfvkScreen: true,
-          rescanScreen: true,
-          settingsScreen: true,
-          changeWalletScreen: true,
-          restoreWalletBackupScreen: true,
-        };
+      if (!settings.hasOwnProperty(SettingsNameEnum.biometrics)) {
+        // The per-screen options collapse into one switch: it stays on if
+        // any of them was on.
+        const legacy = (settings as unknown as Record<string, unknown>)
+          .security;
+        settings.biometrics =
+          legacy && typeof legacy === 'object'
+            ? Object.values(legacy).some(Boolean)
+            : true;
       }
       if (!settings.hasOwnProperty(SettingsNameEnum.selectServer)) {
         // First launch with server selection. Inference is chain-aware: every
@@ -207,8 +201,9 @@ export default class SettingsFileImpl {
       // old tip feature, the two switches that used to hide the MAX button
       // and the Rescan menu entry, both always there now, the currency
       // choice, now always USD, the Nym switch: every transmission travels
-      // the mixnet, so there is nothing left to choose, and the mode, along
-      // with the first-view-seed flag only the basic mode ever wrote.
+      // the mixnet, so there is nothing left to choose, the mode, along
+      // with the first-view-seed flag only the basic mode ever wrote, and
+      // the per-screen security options, now the one biometrics switch.
       const obsolete = settings as unknown as Record<string, unknown>;
       delete obsolete.donation;
       delete obsolete.firstUpdateWithDonation;
@@ -218,32 +213,7 @@ export default class SettingsFileImpl {
       delete obsolete.nym;
       delete obsolete.mode;
       delete obsolete.basicFirstViewSeed;
-      // old security options that have to be removed and to add the new one.
-      if (settings.hasOwnProperty(SettingsNameEnum.security)) {
-        const sec: SecurityType = settings.security;
-        // old security options
-        if (
-          sec.hasOwnProperty(SecurityTypeEnum.seedScreen) &&
-          sec.hasOwnProperty(SecurityTypeEnum.ufvkScreen) &&
-          !sec.hasOwnProperty(SecurityTypeEnum.seedUfvkScreen)
-        ) {
-          let numTrues: number = 0;
-          if (sec.seedScreen) {
-            numTrues += 1;
-            delete sec.seedScreen;
-          }
-          if (sec.ufvkScreen) {
-            numTrues += 1;
-            delete sec.ufvkScreen;
-          }
-          if (numTrues >= 1) {
-            sec.seedUfvkScreen = true;
-          } else {
-            sec.seedUfvkScreen = false;
-          }
-          settings.security = sec;
-        }
-      }
+      delete obsolete.security;
       if (
         !settings.hasOwnProperty(SettingsNameEnum.recoveryWalletInfoOnDevice)
       ) {
