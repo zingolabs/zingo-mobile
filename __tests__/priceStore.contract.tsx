@@ -22,6 +22,7 @@ import {
 } from '@app/context';
 import { SelectServerEnum } from '@app/AppState';
 import { getZecPrice } from '@app/walletBackend';
+import { mockZecQuote } from '../__mocks__/dataMocks/mockZecPriceOutcome';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { MixnetView } from '@app/walletBackend/transforms/mixnetView';
 
@@ -88,7 +89,7 @@ afterEach(() => {
 
 test('a died transport mutes the ring and stops its fill', async () => {
   jest.useFakeTimers();
-  price.mockResolvedValue({ price: 42, error: '' });
+  price.mockResolvedValue(mockZecQuote);
   const setZecPrice = jest.fn();
   const priceDate = Date.now();
 
@@ -147,7 +148,7 @@ test('an entry flight with no armed deadline never reads full', async () => {
 
 test('the driver writes deps when an input moves, not per render', async () => {
   jest.useFakeTimers();
-  price.mockResolvedValue({ price: 42, error: '' });
+  price.mockResolvedValue(mockZecQuote);
   const setDepsSpy = jest.spyOn(priceFetcherStore, 'setDeps');
   const setZecPrice = jest.fn();
   const ctx = makeCtx({ mixnetView: READY_VIEW });

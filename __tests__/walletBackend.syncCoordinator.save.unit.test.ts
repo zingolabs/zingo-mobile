@@ -18,8 +18,9 @@ import RPCModule from '@app/RPCModule';
 import * as walletUtils from '@app/walletBackend/utils/walletUtils';
 import { SyncCoordinator } from '@app/walletBackend/modules/SyncCoordinator';
 import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
-import type { WalletBackendConfig } from '@app/walletBackend/config/WalletBackendConfig';
 import type { DataService } from '@app/walletBackend/modules/DataService';
+import { mockServer } from '../__mocks__/dataMocks/mockServer';
+import { mockWalletBackendConfig } from '../__mocks__/dataMocks/mockWalletBackendConfig';
 
 const mockedDoSave = RPCModule.doSave as jest.Mock;
 const mockedSetConfigWalletToProd =
@@ -31,11 +32,11 @@ const mockedSetConfigWalletToProd =
 // that skips the save branch under test.) The DataService stub supplies
 // only what the exercised branch reads.
 function coordinatorWith(dataService: Partial<DataService>): SyncCoordinator {
-  const config = {
-    onError: jest.fn(),
-    keepAwake: jest.fn(),
-    performanceLevel: RPCPerformanceLevelEnum.High,
-  } as unknown as WalletBackendConfig;
+  const config = mockWalletBackendConfig({
+    // A connected session: the save path under test is not the offline
+    // path, and the coordinator reads this URI to tell them apart.
+    server: mockServer,
+  });
   const coordinator = new SyncCoordinator(config, dataService as DataService);
   jest.spyOn(coordinator, 'fetchSyncPoll').mockResolvedValue(undefined);
   return coordinator;

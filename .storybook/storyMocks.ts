@@ -85,6 +85,7 @@ export const mixnetConnecting = mixnetStatus(
   RPCMixnetIndicatorEnum.bootstrapping,
 );
 export const mixnetReady = mixnetStatus(RPCMixnetIndicatorEnum.ready);
+export const mixnetOff = mixnetStatus(RPCMixnetIndicatorEnum.off);
 export const mixnetLost = mixnetStatus(RPCMixnetIndicatorEnum.died, true);
 export const mixnetReconnecting = mixnetStatus(
   RPCMixnetIndicatorEnum.bootstrapping,

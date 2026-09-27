@@ -17,7 +17,11 @@ import {
   defaultAppContextLoaded,
 } from '@app/context';
 import { SelectServerEnum } from '@app/AppState';
-import { getZecPrice } from '@app/walletBackend';
+import { getZecPrice, ZecPriceOutcome } from '@app/walletBackend';
+import {
+  mockZecQuote,
+  mockZecRefusal,
+} from '../__mocks__/dataMocks/mockZecPriceOutcome';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import {
   MIXNET_STATUS_KEYS,
@@ -92,7 +96,7 @@ afterEach(() => {
 
 test('a ZEC-display wallet still fetches every tick', async () => {
   jest.useFakeTimers();
-  price.mockResolvedValue({ price: 42, error: '' });
+  price.mockResolvedValue(mockZecQuote);
   const setZecPrice = jest.fn();
 
   render(driverOnlyUi(makeCtx({}), setZecPrice));
@@ -105,7 +109,7 @@ test('a ZEC-display wallet still fetches every tick', async () => {
 
 test('a full ring always means a refresh really is due', async () => {
   jest.useFakeTimers();
-  price.mockResolvedValue({ price: 42, error: '' });
+  price.mockResolvedValue(mockZecQuote);
   const setZecPrice = jest.fn();
 
   render(surfaceUi(makeCtx(), setZecPrice));
@@ -126,7 +130,7 @@ test('a full ring always means a refresh really is due', async () => {
 
 test('a return parked on a flight still arms the hop rate bound', async () => {
   jest.useFakeTimers();
-  let land: (v: { price: number; error: string }) => void = () => {};
+  let land: (v: ZecPriceOutcome) => void = () => {};
   price
     .mockImplementationOnce(
       () =>
@@ -134,7 +138,7 @@ test('a return parked on a flight still arms the hop rate bound', async () => {
           land = resolve;
         }),
     )
-    .mockResolvedValue({ price: -1, error: 'refused' });
+    .mockResolvedValue(mockZecRefusal('refused'));
   const setZecPrice = jest.fn();
 
   render(surfaceUi(makeCtx(), setZecPrice));
@@ -145,7 +149,7 @@ test('a return parked on a flight still arms the hop rate bound', async () => {
   fireAppState('active');
   priceFetcherStore.foregroundReturned();
 
-  land({ price: -1, error: 'refused' });
+  land(mockZecRefusal('refused'));
   await jest.advanceTimersByTimeAsync(0);
   expect(price).toHaveBeenCalledTimes(4);
 
@@ -159,6 +163,7 @@ test('a return parked on a flight still arms the hop rate bound', async () => {
 const FETCH_EXPECTED: Record<MixnetStatusKey, boolean> = {
   'mixnet.status.bootstrapping': false,
   'mixnet.status.ready': true,
+  'mixnet.status.off': false,
   'mixnet.status.died': false,
   'mixnet.status.unknown': false,
 };
@@ -167,7 +172,7 @@ test('the transport status alone resolves a fetch', async () => {
   for (const statusKey of MIXNET_STATUS_KEYS) {
     jest.useFakeTimers();
     price.mockReset();
-    price.mockResolvedValue({ price: 42, error: '' });
+    price.mockResolvedValue(mockZecQuote);
     priceFetcherStore.resetForTests();
     const setZecPrice = jest.fn();
 
@@ -184,7 +189,7 @@ test('the transport status alone resolves a fetch', async () => {
 
 test('a re-render behind the closed gate emits no traffic', async () => {
   jest.useFakeTimers();
-  price.mockResolvedValue({ price: 42, error: '' });
+  price.mockResolvedValue(mockZecQuote);
   const setZecPrice = jest.fn();
 
   const view = render(surfaceUi(makeCtx(), setZecPrice));

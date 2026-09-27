@@ -9,6 +9,7 @@ import {
 } from '@app/walletBackend/transforms/mixnetView';
 import {
   attachMixnet,
+  disableMixnet,
   getMixnetBootstrapDetail,
   getMixnetStatus,
 } from '@app/walletBackend/utils/mixnetUtils';
@@ -20,15 +21,88 @@ export type MixnetTransportBinding = {
 
 export type StartMixnetTransport = () => Promise<MixnetTransportBinding>;
 
+export type StopMixnetTransport = () => Promise<void>;
+
 export function isCurrentPublication(seq: number, latest: number): boolean {
   return seq === latest;
 }
 
-const STARTING_REPORT: MixnetStatusReport = {
-  kind: 'status',
-  indicator: RPCMixnetIndicatorEnum.bootstrapping,
-  socks5Addr: null,
-};
+// A status report for an indicator that carries no SOCKS5 address.
+function statusReport(indicator: RPCMixnetIndicatorEnum): MixnetStatusReport {
+  return { kind: 'status', indicator, socks5Addr: null };
+}
+
+function hasIndicator(
+  report: MixnetStatusReport | null,
+  indicator: RPCMixnetIndicatorEnum,
+): boolean {
+  return (
+    report !== null &&
+    report.kind === 'status' &&
+    report.indicator === indicator
+  );
+}
+
+type CoordinatorPhase = 'online' | 'offline' | 'stopped';
+
+// The failure report for a rejected transport act.
+function failureReport(thrown: unknown): MixnetStatusReport {
+  return { kind: 'failure', failure: describeRejection(thrown) };
+}
+
+async function failureOf(
+  act: () => Promise<void>,
+): Promise<MixnetStatusReport | null> {
+  try {
+    await act();
+    return null;
+  } catch (thrown: unknown) {
+    return failureReport(thrown);
+  }
+}
+
+function ignore(): void {}
+
+function cancelled<T>(id: T | undefined, clear: (id: T) => void): undefined {
+  if (id !== undefined) {
+    clear(id);
+  }
+  return undefined;
+}
+
+export function afterSettled<T>(
+  pending: Promise<unknown> | undefined,
+  work: () => Promise<T>,
+): Promise<T> {
+  if (pending !== undefined) {
+    return pending.then(ignore, ignore).then(work);
+  }
+  try {
+    return work();
+  } catch (thrown: unknown) {
+    return Promise.reject(thrown);
+  }
+}
+
+class InFlight {
+  pending?: Promise<unknown>;
+
+  run<T>(work: () => Promise<T>): Promise<T> {
+    const running = afterSettled(this.pending, work);
+    this.pending = running;
+    const release = () => {
+      if (this.pending === running) {
+        this.pending = undefined;
+      }
+    };
+    running.then(release, release);
+    return running;
+  }
+}
+
+const STARTING_REPORT = statusReport(RPCMixnetIndicatorEnum.bootstrapping);
+
+const OFF_REPORT = statusReport(RPCMixnetIndicatorEnum.off);
 
 export const BOOTSTRAP_POLL_MILLIS = 2_000;
 
@@ -38,81 +112,245 @@ export const RECONNECT_BASE_MILLIS = 3_000;
 
 export const RECONNECT_MAX_MILLIS = 60_000;
 
-// Arms the mixnet transport at wallet load, polls its status, and auto-recovers a lost transport.
+// How long one draw gets to prove itself before the app draws again.
+//
+// The wallet's readiness gate spends ATTACH_READINESS_BUDGET on a draw that
+// never answers — two 30 s round trips plus a pause, 61 s — and it spends it
+// on the SAME gateway and exit, because it retries the probe, never the
+// draw. Field logs (2026-09-24) show roughly half the draws never answering
+// at all, so a bad one costs a full minute before anything redraws: one
+// measured Offline -> Online took 82 s, 61 of them a single dud.
+//
+// A healthy draw is listening in ~6 s and proven ~1 s later. Twenty seconds
+// is generous for a good draw, including the tails that intermittently blow
+// a 15 s bound, and a third of the wait for a bad one. Redrawing costs one
+// birth, ~6 s.
+export const BOOTSTRAP_DEADLINE_MILLIS = 20_000;
+
+// Consecutive redraws before the app stops drawing and lets the transport
+// settle into the ordinary lost-and-reconnect path with its backoff. Three
+// bad draws is where luck stops being the explanation, and redrawing forever
+// would re-fetch the whole node topology every ~26 s.
+export const BOOTSTRAP_REDRAW_LIMIT = 3;
+
+// Arms the mixnet transport for a connected session, polls its status,
+// auto-recovers a lost transport, and tears the whole thing down when the
+// session goes Offline.
 export class MixnetCoordinator {
   private readonly startTransport: StartMixnetTransport;
   private readonly onChange: (view: MixnetView) => void;
+  private readonly stopTransport: StopMixnetTransport;
 
   private pollTimerID?: ReturnType<typeof setInterval>;
   private pollLock: boolean = false;
   private lastStatus: MixnetStatusReport | null = null;
   private reconnectTimerID?: ReturnType<typeof setTimeout>;
+  private bootstrapTimerID?: ReturnType<typeof setTimeout>;
+  private redrawsSpent: number = 0;
   private reconnectDelayMillis: number = RECONNECT_BASE_MILLIS;
   private reconnecting: boolean = false;
   private reconnectActive: boolean = false;
   private enableEpoch: number = 0;
-  private stopped: boolean = false;
+  private phase: CoordinatorPhase = 'online';
+  private startingEpoch?: number;
+  private readonly teardown = new InFlight();
 
   constructor(
     startTransport: StartMixnetTransport,
     onChange: (view: MixnetView) => void,
+    stopTransport: StopMixnetTransport,
   ) {
     this.startTransport = startTransport;
     this.onChange = onChange;
+    this.stopTransport = stopTransport;
   }
 
   // Starts the transport, attaches the wallet, and polls; a failure publishes the typed failure view.
   async ensureForConnectedSession(): Promise<void> {
+    this.enterPhase('online');
+    await this.draw();
+  }
+
+  private enterPhase(phase: Exclude<CoordinatorPhase, 'stopped'>): void {
+    if (this.phase !== 'stopped') {
+      this.phase = phase;
+    }
+  }
+
+  private isCurrent(epoch: number): boolean {
+    return this.enableEpoch === epoch;
+  }
+
+  private async draw(): Promise<void> {
     const epoch = ++this.enableEpoch;
-    this.clearPolling();
-    this.clearReconnectTimer();
+    this.clearTimers();
     this.publishStarting();
     try {
-      const { socks5Addr, exitNode } = await this.startTransport();
-      if (this.enableEpoch !== epoch) {
+      let binding: MixnetTransportBinding;
+      this.startingEpoch = epoch;
+      try {
+        if (this.teardown.pending !== undefined) {
+          await this.teardown.pending;
+        }
+        if (!this.isCurrent(epoch)) {
+          return;
+        }
+        binding = await this.startTransport();
+      } finally {
+        if (this.startingEpoch === epoch) {
+          this.startingEpoch = undefined;
+        }
+      }
+      const { socks5Addr, exitNode } = binding;
+      if (!this.isCurrent(epoch)) {
+        if (this.phase === 'offline') {
+          await this.stopOrphanedTransport();
+        }
         return;
       }
       const status = await attachMixnet(socks5Addr, exitNode);
-      if (this.enableEpoch !== epoch) {
+      if (!this.isCurrent(epoch)) {
         return;
       }
       this.publish(status);
     } catch (thrown: unknown) {
-      if (this.enableEpoch !== epoch) {
+      if (!this.isCurrent(epoch)) {
         return;
       }
-      this.publish({ kind: 'failure', failure: describeRejection(thrown) });
+      this.publish(failureReport(thrown));
     }
     this.schedulePolling();
   }
 
   async reenable(): Promise<void> {
+    this.redrawsSpent = 0;
     await this.ensureForConnectedSession();
   }
 
+  // The transport half of the go-offline moment: an Offline session holds no
+  // tunnel, so the shim dies here and the mode rests at `off`. Idempotent —
+  // a session that never armed anything still lands the published `off` view,
+  // which is what the header reports.
+  //
+  // Order matters: the wallet's slot is vacated BEFORE the shim is stopped.
+  // The other way round, the standing watchdog sees a live slot lose its
+  // endpoint, calls it an unconsented death, and the app chases a reconnect
+  // it caused itself.
+  async goOffline(): Promise<void> {
+    this.enterPhase('offline');
+    const epoch = this.supersede();
+    this.reconnectActive = false;
+    this.redrawsSpent = 0;
+    await this.teardown.run(disableMixnet);
+    if (!this.isCurrent(epoch)) {
+      return;
+    }
+    const stopFailure = await this.stopTransportReport();
+    if (!this.isCurrent(epoch)) {
+      return;
+    }
+    // A tunnel we failed to stop is the one thing that must not read as off:
+    // it may still be carrying traffic, so it reports as trouble. Otherwise
+    // the session rests at off, and NOT at whatever the disable answered: we
+    // just told the wallet to switch off, so the only honest resting states
+    // are off and "the stop refused". Publishing that answer verbatim let an
+    // Offline session rest on a live mode whenever it read as anything else —
+    // found by the interleaving harness, and the half of #1434 that its own
+    // fix left behind: it stopped the deadline such an answer armed, not the
+    // view it painted.
+    this.publish(stopFailure ?? OFF_REPORT);
+  }
+
+  private stopTransportReport(): Promise<MixnetStatusReport | null> {
+    return this.teardown.run(() => failureOf(() => this.stopTransport()));
+  }
+
   stop(): void {
-    this.stopped = true;
-    this.enableEpoch += 1;
+    this.phase = 'stopped';
+    this.supersede();
+  }
+
+  private supersede(): number {
+    this.clearTimers();
+    this.resetReconnectBackoff();
+    return ++this.enableEpoch;
+  }
+
+  // Cancels the poll, the reconnect, and the bootstrap deadline.
+  private clearTimers(): void {
     this.clearPolling();
-    this.clearReconnect();
+    this.clearReconnectTimer();
+    this.clearBootstrapDeadline();
   }
 
   private clearPolling(): void {
-    if (this.pollTimerID !== undefined) {
-      clearInterval(this.pollTimerID);
-      this.pollTimerID = undefined;
+    this.pollTimerID = cancelled(this.pollTimerID, clearInterval);
+  }
+
+  private clearBootstrapDeadline(): void {
+    this.bootstrapTimerID = cancelled(this.bootstrapTimerID, clearTimeout);
+  }
+
+  // Armed while a draw is still bootstrapping, disarmed the moment it
+  // settles either way. Past the redraw limit it is never armed again, so
+  // the last draw runs its full course into the wallet's own gate and the
+  // reconnect backoff takes it from there.
+  private armBootstrapDeadline(): void {
+    if (
+      this.phase !== 'online' ||
+      this.bootstrapTimerID !== undefined ||
+      this.redrawsSpent >= BOOTSTRAP_REDRAW_LIMIT
+    ) {
+      return;
+    }
+    this.bootstrapTimerID = setTimeout(() => {
+      this.bootstrapTimerID = undefined;
+      this.redraw();
+    }, BOOTSTRAP_DEADLINE_MILLIS);
+  }
+
+  // The draw had its time and never proved itself, so the app draws again:
+  // a fresh gateway and exit, which is the one thing the wallet's readiness
+  // gate cannot do for itself. `startTransport` releases the standing proxy
+  // before it starts the next one, so this replaces the draw rather than
+  // stacking a second one behind it.
+  private async redraw(): Promise<void> {
+    if (this.phase !== 'online' || !this.isBootstrapping()) {
+      return;
+    }
+    // A start that has not returned yet gets the clock back instead of a
+    // redraw: drawing here would kill the very proxy it is still bringing up.
+    // Nothing is lost by waiting — the native start is bounded (discovery plus
+    // the proxy lifecycle), so one that never lands still arrives as a failure
+    // and takes the reconnect path.
+    if (this.startingEpoch === this.enableEpoch) {
+      this.armBootstrapDeadline();
+      return;
+    }
+    this.redrawsSpent += 1;
+    await this.draw();
+  }
+
+  private async stopOrphanedTransport(): Promise<void> {
+    const stopFailure = await this.stopTransportReport();
+    if (stopFailure !== null && this.phase === 'offline') {
+      this.publish(stopFailure);
     }
   }
 
   private isLost(status: MixnetStatusReport): boolean {
     return (
       status.kind === 'failure' ||
-      status.indicator === RPCMixnetIndicatorEnum.died
+      hasIndicator(status, RPCMixnetIndicatorEnum.died)
     );
   }
 
   private scheduleReconnect(): void {
-    if (this.reconnectTimerID !== undefined || this.reconnecting) {
+    if (
+      this.reconnectTimerID !== undefined ||
+      this.reconnecting ||
+      this.phase !== 'online'
+    ) {
       return;
     }
     this.reconnectTimerID = setTimeout(() => {
@@ -121,16 +359,8 @@ export class MixnetCoordinator {
     }, this.reconnectDelayMillis);
   }
 
-  private clearReconnect(): void {
-    this.clearReconnectTimer();
-    this.resetReconnectBackoff();
-  }
-
   private clearReconnectTimer(): void {
-    if (this.reconnectTimerID !== undefined) {
-      clearTimeout(this.reconnectTimerID);
-      this.reconnectTimerID = undefined;
-    }
+    this.reconnectTimerID = cancelled(this.reconnectTimerID, clearTimeout);
   }
 
   private resetReconnectBackoff(): void {
@@ -140,15 +370,11 @@ export class MixnetCoordinator {
   private async attemptReconnect(): Promise<void> {
     this.reconnecting = true;
     try {
-      await this.ensureForConnectedSession();
+      await this.draw();
     } finally {
       this.reconnecting = false;
     }
-    const recovered =
-      this.lastStatus !== null &&
-      this.lastStatus.kind === 'status' &&
-      this.lastStatus.indicator === RPCMixnetIndicatorEnum.ready;
-    if (!recovered) {
+    if (!hasIndicator(this.lastStatus, RPCMixnetIndicatorEnum.ready)) {
       this.reconnectDelayMillis = Math.min(
         this.reconnectDelayMillis * 2,
         RECONNECT_MAX_MILLIS,
@@ -167,7 +393,7 @@ export class MixnetCoordinator {
     const epoch = this.enableEpoch;
     try {
       const status = await getMixnetStatus();
-      if (this.enableEpoch === epoch && !this.stopped) {
+      if (this.isCurrent(epoch)) {
         this.publish(status);
       }
     } finally {
@@ -176,7 +402,7 @@ export class MixnetCoordinator {
   }
 
   private schedulePolling(): void {
-    if (this.stopped) {
+    if (this.phase === 'stopped') {
       return;
     }
     this.clearPolling();
@@ -189,30 +415,30 @@ export class MixnetCoordinator {
   }
 
   private isBootstrapping(): boolean {
-    return (
-      this.lastStatus !== null &&
-      this.lastStatus.kind === 'status' &&
-      this.lastStatus.indicator === RPCMixnetIndicatorEnum.bootstrapping
-    );
+    return hasIndicator(this.lastStatus, RPCMixnetIndicatorEnum.bootstrapping);
   }
 
   private publishSeq: number = 0;
 
   private publish(status: MixnetStatusReport): void {
-    if (this.stopped) {
+    if (this.phase === 'stopped') {
       return;
     }
     const wasBootstrapping = this.isBootstrapping();
-    const settled =
-      status.kind === 'status' &&
-      status.indicator === RPCMixnetIndicatorEnum.ready;
-    if (settled) {
+    if (hasIndicator(status, RPCMixnetIndicatorEnum.ready)) {
       this.reconnectActive = false;
       this.resetReconnectBackoff();
-    } else if (this.isLost(status)) {
+      // A proven draw ends the streak: the next bad one starts from zero.
+      this.redrawsSpent = 0;
+    } else if (this.isLost(status) && this.phase === 'online') {
       this.reconnectActive = true;
     }
     this.lastStatus = status;
+    if (this.isBootstrapping()) {
+      this.armBootstrapDeadline();
+    } else {
+      this.clearBootstrapDeadline();
+    }
     this.publishSeq += 1;
     this.publishView(status, this.publishSeq);
     if (
@@ -229,10 +455,13 @@ export class MixnetCoordinator {
   }
 
   private publishStarting(): void {
-    if (this.stopped) {
+    if (this.phase === 'stopped') {
       return;
     }
     this.lastStatus = STARTING_REPORT;
+    // The clock starts at the attempt, not at its first status: the ~6 s
+    // birth is part of what a draw is given.
+    this.armBootstrapDeadline();
     this.publishSeq += 1;
     this.onChange(
       deriveMixnetView(STARTING_REPORT, null, this.reconnectActive),

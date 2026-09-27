@@ -141,4 +141,22 @@ class NymTransportModule internal constructor(reactContext: ReactApplicationCont
             }
         }
     }
+
+    /**
+     * Stops the hosted proxy, if one is running. Idempotent: stopping
+     * nothing is a success, so a session that never went online can still
+     * go Offline through the same call — the outcome, not the transition,
+     * is the contract.
+     */
+    @ReactMethod
+    fun stopMixnetTransport(promise: Promise) {
+        FfiOutcome.settling(promise, "stop_mixnet_transport") {
+            guardingLinkage<Any?> {
+                synchronized(handleLock) {
+                    releaseHandle()
+                    null
+                }
+            }
+        }
+    }
 }

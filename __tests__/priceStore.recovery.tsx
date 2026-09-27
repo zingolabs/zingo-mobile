@@ -22,6 +22,7 @@ import {
 } from '@app/context';
 import { SelectServerEnum } from '@app/AppState';
 import { getZecPrice } from '@app/walletBackend';
+import { mockZecQuote } from '../__mocks__/dataMocks/mockZecPriceOutcome';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { MixnetView } from '@app/walletBackend/transforms/mixnetView';
 
@@ -80,7 +81,7 @@ afterEach(() => {
 
 test('a lost market takes the cadence down now, and publishes it', async () => {
   jest.useFakeTimers();
-  price.mockResolvedValue({ price: 42, error: '' });
+  price.mockResolvedValue(mockZecQuote);
   const setZecPrice = jest.fn();
 
   const view = render(
@@ -108,7 +109,7 @@ test('a lost market takes the cadence down now, and publishes it', async () => {
 
 test('no wedged deadline across an outage, and the recovery entry fires', async () => {
   jest.useFakeTimers();
-  price.mockResolvedValue({ price: 42, error: '' });
+  price.mockResolvedValue(mockZecQuote);
   const setZecPrice = jest.fn();
 
   const view = render(
@@ -138,7 +139,7 @@ test('no wedged deadline across an outage, and the recovery entry fires', async 
 
 test('a flapping transport rides the cadence, one fetch per window', async () => {
   jest.useFakeTimers();
-  price.mockResolvedValue({ price: 42, error: '' });
+  price.mockResolvedValue(mockZecQuote);
   const setZecPrice = jest.fn();
 
   const view = render(

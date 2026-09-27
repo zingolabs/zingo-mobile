@@ -391,6 +391,7 @@
     "status": {
       "bootstrapping": "Conectando a la mixnet…",
       "ready": "Mixnet lista",
+      "off": "Mixnet desactivada (modo offline)",
       "died": "Conexión mixnet perdida",
       "unknown": "Mixnet no disponible"
     },
@@ -405,12 +406,15 @@
     "running": "Ejecutando…",
     "attaching": "La app todavía se está conectando a la mixnet. Hasta que el transporte se enganche se informa como perdido, así que esta pasada aún no es un veredicto.",
     "copy-report": "Copiar informe",
-    "report-copied": "Informe copiado al portapapeles"
+    "report-copied": "Informe copiado al portapapeles",
+    "offline": "La mixnet está desactivada porque esta sesión está en modo offline. Elige un servidor en Ajustes para volver a levantarla."
   },
   "header": {
     "lastupdate": "Última actualización:"
   },
   "info": {
+    "error-price-fetch": "No se pudo obtener el precio de ZEC.",
+    "error-price-payload": "El precio de ZEC llegó con un formato incorrecto.",
     "version": "Versión",
     "serverversion": "Versión del Servidor",
     "zainod": "URL del servidor",

@@ -20,7 +20,7 @@ test('F10: every derivable view stays inside the closed key set', () => {
     deriveMixnetView(
       {
         kind: 'failure',
-        failure: { reason: 'unrecognizedIndicator', claimed: 'off' },
+        failure: { reason: 'unrecognizedIndicator', claimed: 'sideways' },
       },
       null,
     ),
@@ -37,6 +37,14 @@ test('F10: every derivable view stays inside the closed key set', () => {
         kind: 'status',
         indicator: RPCMixnetIndicatorEnum.ready,
         socks5Addr: '127.0.0.1:1',
+      },
+      null,
+    ),
+    deriveMixnetView(
+      {
+        kind: 'status',
+        indicator: RPCMixnetIndicatorEnum.off,
+        socks5Addr: null,
       },
       null,
     ),

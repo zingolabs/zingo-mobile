@@ -37,5 +37,10 @@ export function deriveNymGateState(
       return { kind: 'failed', failureKey: view.statusKey };
     case 'mixnet.status.bootstrapping':
       return { kind: 'connecting' };
+    // Deliberately off: not enabled, not failing, nothing in flight. The
+    // migration surfaces need a server, so an Offline session does not reach
+    // this sheet — the arm exists because the key set is closed.
+    case 'mixnet.status.off':
+      return { kind: 'idle' };
   }
 }

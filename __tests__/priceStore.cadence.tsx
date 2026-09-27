@@ -19,6 +19,7 @@ import {
 } from '@app/context';
 import { SelectServerEnum } from '@app/AppState';
 import { getZecPrice } from '@app/walletBackend';
+import { mockZecQuote } from '../__mocks__/dataMocks/mockZecPriceOutcome';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { MixnetView } from '@app/walletBackend/transforms/mixnetView';
 
@@ -89,7 +90,7 @@ afterEach(() => {
 
 test('a boot fetches at once, price age notwithstanding', async () => {
   jest.useFakeTimers();
-  price.mockResolvedValue({ price: 42, error: '' });
+  price.mockResolvedValue(mockZecQuote);
   const setZecPrice = jest.fn();
 
   render(
@@ -104,7 +105,7 @@ test('a boot fetches at once, price age notwithstanding', async () => {
 
 test('the transport turning ready mid-session fetches at once', async () => {
   jest.useFakeTimers();
-  price.mockResolvedValue({ price: 42, error: '' });
+  price.mockResolvedValue(mockZecQuote);
   const setZecPrice = jest.fn();
 
   const view = render(
@@ -120,7 +121,7 @@ test('the transport turning ready mid-session fetches at once', async () => {
 
 test('every gate-open return from the background fetches', async () => {
   jest.useFakeTimers();
-  price.mockResolvedValue({ price: 42, error: '' });
+  price.mockResolvedValue(mockZecQuote);
   const setZecPrice = jest.fn();
 
   render(driverUi(makeCtx(), setZecPrice));
@@ -137,7 +138,7 @@ test('every gate-open return from the background fetches', async () => {
 
 test('the next fetch follows the last inside the jitter window', async () => {
   jest.useFakeTimers();
-  price.mockResolvedValue({ price: 42, error: '' });
+  price.mockResolvedValue(mockZecQuote);
   const setZecPrice = jest.fn();
 
   render(driverUi(makeCtx(), setZecPrice));
@@ -155,7 +156,7 @@ test('the next fetch follows the last inside the jitter window', async () => {
 
 test('every tick draws its own delay from the jitter window', async () => {
   jest.useFakeTimers();
-  price.mockResolvedValue({ price: 42, error: '' });
+  price.mockResolvedValue(mockZecQuote);
   const setZecPrice = jest.fn();
 
   render(driverUi(makeCtx(), setZecPrice));
