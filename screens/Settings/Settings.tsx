@@ -1757,13 +1757,13 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                 <>
                   {sectionHeader('settings.section-developer')}
                   <View style={{ width: '100%', marginBottom: 20 }}>
-                    <View style={{ display: 'flex', margin: 10 }}>
+                    <View style={{ marginHorizontal: 25, marginVertical: 15 }}>
                       <BoldText>
                         {translate('settings.performancelevel-title') as string}
                       </BoldText>
                     </View>
 
-                    <View style={{ display: 'flex', marginLeft: 25 }}>
+                    <View style={{ marginLeft: 40, marginRight: 25 }}>
                       {optionsRadio(
                         PERFORMANCELEVELMENU,
                         setPerformanceLevel as React.Dispatch<
@@ -1776,11 +1776,13 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                     </View>
                     {!!lastError && (
                       <>
-                        <View style={{ display: 'flex', margin: 10 }}>
+                        <View
+                          style={{ marginHorizontal: 25, marginVertical: 15 }}
+                        >
                           <BoldText>{'LAST ERROR'}</BoldText>
                         </View>
 
-                        <View style={{ display: 'flex', marginLeft: 25 }}>
+                        <View style={{ marginLeft: 40, marginRight: 25 }}>
                           <Button
                             type={ButtonTypeEnum.Primary}
                             title={translate('view-error') as string}
