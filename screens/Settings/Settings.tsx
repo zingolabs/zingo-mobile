@@ -995,42 +995,67 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     valueOption: string | boolean,
     label: string, // in lowercase to match with the translation json files.
   ) => {
-    return DATA.map(item => (
-      <View key={'view-' + item.value}>
-        <TouchableOpacity
-          testID={`settings.${label}-${item.value}`}
-          disabled={disabled}
-          style={{
-            marginRight: 10,
-            marginBottom: 5,
-            maxHeight: 50,
-            minHeight: 48,
-          }}
-          onPress={() => setOption(typeOption(item.value))}
-        >
+    return DATA.map(item => {
+      const infoSection = `${label}-${item.value}`;
+      return (
+        <View key={'view-' + item.value} style={{ marginBottom: 5 }}>
           <View
             style={{
-              display: 'flex',
               flexDirection: 'row',
               alignItems: 'center',
               marginTop: 10,
+              minHeight: 48,
             }}
           >
-            <FontAwesomeIcon
-              icon={
-                typeOption(item.value) === valueOption ? faDotCircle : farCircle
+            <TouchableOpacity
+              testID={`settings.${label}-${item.value}`}
+              disabled={disabled}
+              style={{ flexDirection: 'row', alignItems: 'center' }}
+              onPress={() => setOption(typeOption(item.value))}
+            >
+              <FontAwesomeIcon
+                icon={
+                  typeOption(item.value) === valueOption
+                    ? faDotCircle
+                    : farCircle
+                }
+                size={16}
+                color={colors.fgMuted}
+              />
+              <RegText style={{ marginLeft: 10 }}>
+                {translate(`settings.value-${label}-${item.value}`) as string}
+              </RegText>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() =>
+                setOpenInfoSection(
+                  openInfoSection === infoSection ? null : infoSection,
+                )
               }
-              size={16}
-              color={colors.fgMuted}
-            />
-            <RegText key={'text-' + item.value} style={{ marginLeft: 10 }}>
-              {translate(`settings.value-${label}-${item.value}`) as string}
-            </RegText>
+              hitSlop={8}
+              style={{ marginLeft: 6 }}
+            >
+              <FontAwesomeIcon
+                icon={faInfoCircle}
+                size={14}
+                color={colors.fgDefault}
+              />
+            </TouchableOpacity>
           </View>
-        </TouchableOpacity>
-        <FadeText key={'fade-' + item.value}>{item.text}</FadeText>
-      </View>
-    ));
+          {openInfoSection === infoSection && (
+            <View
+              style={{
+                backgroundColor: '#040E1D',
+                borderRadius: 8,
+                padding: 10,
+              }}
+            >
+              <FadeText style={{ textAlign: 'center' }}>{item.text}</FadeText>
+            </View>
+          )}
+        </View>
+      );
+    });
   };
 
   // Auto/List need a PUBLIC chain (main/test). Pressing them while on None or
