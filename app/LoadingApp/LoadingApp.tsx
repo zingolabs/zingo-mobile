@@ -901,11 +901,9 @@ export class LoadingAppClass extends Component<
             orchardPool = walletKindJSON.orchard;
             saplingPool = walletKindJSON.sapling;
             transparentPool = walletKindJSON.transparent;
-            // if the seed & birthday are not stored in Keychain/Keystore, do it now.
-            const wallet = await fetchWallet(readOnly);
-            if (wallet) {
-              await createUpdateRecoveryWalletInfo(wallet);
-            }
+            // store this wallet's recovery info in the Keychain/Keystore; if
+            // it can't be read, whatever the device holds is removed.
+            await createUpdateRecoveryWalletInfo(await fetchWallet(readOnly));
             this.setState({
               readOnly,
               orchardPool,
@@ -1741,11 +1739,9 @@ export class LoadingAppClass extends Component<
             orchardPool = walletKindJSON.orchard;
             saplingPool = walletKindJSON.sapling;
             transparentPool = walletKindJSON.transparent;
-            // if the seed & birthday are not stored in Keychain/Keystore, do it now.
-            const wallet = await fetchWallet(readOnly);
-            if (wallet) {
-              await createUpdateRecoveryWalletInfo(wallet);
-            }
+            // store this wallet's recovery info in the Keychain/Keystore; if
+            // it can't be read, whatever the device holds is removed.
+            await createUpdateRecoveryWalletInfo(await fetchWallet(readOnly));
             this.setState({
               readOnly,
               orchardPool,

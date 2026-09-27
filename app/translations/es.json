@@ -220,6 +220,7 @@
     "section-privacysecurity": "Privacidad y Seguridad",
     "section-networkadvanced": "Red y Avanzado",
     "section-other": "Otros",
+    "recoveryinfo-notstored": "La información de recuperación del monedero no está almacenada en este dispositivo. Asegúrate de tener apuntada tu frase semilla (o clave de visualización).",
     "section-developer": "Desarrollador",
     "memos": [
       {

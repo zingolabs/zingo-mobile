@@ -220,6 +220,7 @@
     "section-privacysecurity": "Gizlilik ve Güvenlik",
     "section-networkadvanced": "Ağ ve Gelişmiş",
     "section-other": "Diğer",
+    "recoveryinfo-notstored": "Cüzdan kurtarma bilgileri bu cihazda saklanmıyor. Tohum ifadenizi (veya görüntüleme anahtarınızı) bir yere yazdığınızdan emin olun.",
     "section-developer": "Geliştirici",
     "memos": [
       {

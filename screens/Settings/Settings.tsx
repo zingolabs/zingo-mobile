@@ -89,6 +89,7 @@ import BottomSheet, {
 import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
 import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
 import { useDismissSheetsOnBlur } from '@app/hooks/useDismissSheetsOnBlur';
+import { hasRecoveryWalletInfo } from '@app/services/recoveryWalletInfo';
 import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { createAlert } from '@app/services/createAlert';
@@ -280,6 +281,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const [disabledButton, setDisabledButton] = useState<boolean>(false);
   const [showDeveloperOptions, setShowDeveloperOptions] =
     useState<boolean>(false);
+  // Assumed stored until checked, so the warning doesn't flash on open.
+  const [recoveryInfoStored, setRecoveryInfoStored] = useState<boolean>(true);
   const [openInfoSection, setOpenInfoSection] = useState<string | null>(null);
   // Seeded optimistically. The union names the probe's answer instead of
   // collapsing it to a bit at this edge.
@@ -340,6 +343,19 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   );
 
   const settingsSnapPoints = useFullSheetSnapPoints(containerH, headerH);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const stored = await hasRecoveryWalletInfo();
+      if (!cancelled) {
+        setRecoveryInfoStored(stored);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const probedRef = useRef<boolean>(false);
   useEffect(() => {
@@ -1815,6 +1831,19 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                   color={colors.fgMuted}
                 />
               </TouchableOpacity>
+
+              {!recoveryInfoStored && (
+                <FadeText
+                  style={{
+                    color: colors.fgWarning,
+                    textAlign: 'center',
+                    marginHorizontal: 25,
+                    marginVertical: 15,
+                  }}
+                >
+                  {translate('settings.recoveryinfo-notstored') as string}
+                </FadeText>
+              )}
 
               {/* SECTION: Developer */}
               {showDeveloperOptions && (

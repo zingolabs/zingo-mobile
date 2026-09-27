@@ -220,6 +220,7 @@
     "section-privacysecurity": "Privacy & Security",
     "section-networkadvanced": "Network & Advanced",
     "section-other": "Other",
+    "recoveryinfo-notstored": "The wallet recovery info is not stored on this device. Make sure you have your seed phrase (or viewing key) written down.",
     "section-developer": "Developer",
     "memos": [
       {

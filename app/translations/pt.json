@@ -220,6 +220,7 @@
     "section-privacysecurity": "Privacidade e Segurança",
     "section-networkadvanced": "Rede e Avançado",
     "section-other": "Outros",
+    "recoveryinfo-notstored": "As informações de recuperação da carteira não estão armazenadas neste dispositivo. Certifique-se de ter anotado sua frase semente (ou chave de visualização).",
     "section-developer": "Desenvolvedor",
     "memos": [
       {
