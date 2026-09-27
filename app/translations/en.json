@@ -425,6 +425,8 @@
     "lastupdate": "Last update:"
   },
   "info": {
+    "error-price-fetch": "The ZEC price could not be fetched.",
+    "error-price-payload": "The ZEC price arrived malformed.",
     "version": "Version",
     "serverversion": "Server Version",
     "zainod": "Server URL",

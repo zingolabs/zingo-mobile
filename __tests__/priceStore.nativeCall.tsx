@@ -19,7 +19,11 @@ import {
   defaultAppContextLoaded,
 } from '@app/context';
 import { SelectServerEnum } from '@app/AppState';
-import { getZecPrice } from '@app/walletBackend';
+import { getZecPrice, ZecPriceOutcome } from '@app/walletBackend';
+import {
+  mockZecQuote,
+  mockZecRefusal,
+} from '../__mocks__/dataMocks/mockZecPriceOutcome';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { MixnetView } from '@app/walletBackend/transforms/mixnetView';
 
@@ -89,7 +93,7 @@ afterEach(() => {
 
 test('a market-less surface renders no ring at all', async () => {
   jest.useFakeTimers();
-  price.mockResolvedValue({ price: 42, error: '' });
+  price.mockResolvedValue(mockZecQuote);
   const setZecPrice = jest.fn();
 
   const view = render(
@@ -125,7 +129,7 @@ test('a session detached mid-flight leaves no loading behind', async () => {
   jest.useFakeTimers();
   price
     .mockImplementationOnce(() => new Promise(() => {}))
-    .mockResolvedValue({ price: 42, error: '' });
+    .mockResolvedValue(mockZecQuote);
   const setZecPrice = jest.fn();
 
   const view = render(surfaceUi(makeCtx(), setZecPrice));
@@ -142,7 +146,7 @@ test('a session detached mid-flight leaves no loading behind', async () => {
 
 test('a price landing while the app is away is recorded', async () => {
   jest.useFakeTimers();
-  let land: (v: { price: number; error: string }) => void = () => {};
+  let land: (v: ZecPriceOutcome) => void = () => {};
   price.mockImplementationOnce(
     () =>
       new Promise(resolve => {
@@ -156,7 +160,7 @@ test('a price landing while the app is away is recorded', async () => {
   expect(price).toHaveBeenCalledTimes(1);
 
   fireAppState('background');
-  land({ price: 42, error: '' });
+  land(mockZecQuote);
   await jest.advanceTimersByTimeAsync(0);
 
   expect(setZecPrice).toHaveBeenCalledWith(42, expect.any(Number));
@@ -164,7 +168,7 @@ test('a price landing while the app is away is recorded', async () => {
 
 test('a parked return the landing declines is consumed, not doubled', async () => {
   jest.useFakeTimers();
-  let land: (v: { price: number; error: string }) => void = () => {};
+  let land: (v: ZecPriceOutcome) => void = () => {};
   price
     .mockImplementationOnce(
       () =>
@@ -172,7 +176,7 @@ test('a parked return the landing declines is consumed, not doubled', async () =
           land = resolve;
         }),
     )
-    .mockResolvedValue({ price: -1, error: 'refused' });
+    .mockResolvedValue(mockZecRefusal('refused'));
   const setZecPrice = jest.fn();
 
   const view = render(
@@ -183,7 +187,7 @@ test('a parked return the landing declines is consumed, not doubled', async () =
 
   priceFetcherStore.foregroundReturned();
   view.rerender(surfaceUi(makeCtx({ mixnetView: DIED_VIEW }), setZecPrice));
-  land({ price: -1, error: 'refused' });
+  land(mockZecRefusal('refused'));
   await jest.advanceTimersByTimeAsync(0);
 
   await jest.advanceTimersByTimeAsync(6_000);
