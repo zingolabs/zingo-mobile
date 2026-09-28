@@ -2,7 +2,9 @@
 
 use std::io::Write;
 use std::path::{Path, PathBuf};
-use std::{env, fs::File, process::Command};
+use std::{env, fs, fs::File, process::Command};
+
+const WORKSPACE_LOCK: &str = "../Cargo.lock";
 
 // Emitting any directive disables cargo's whole-package fallback, so the
 // watch set must cover the uniffi scaffolding inputs (src/) as well as
@@ -10,6 +12,7 @@ use std::{env, fs::File, process::Command};
 fn register_rerun_watches() {
     println!("cargo:rerun-if-changed=build.rs");
     println!("cargo:rerun-if-changed=src");
+    println!("cargo:rerun-if-changed={WORKSPACE_LOCK}");
     println!("cargo:rerun-if-env-changed=ZINGO_MOBILE_GIT_DESCRIBE");
     if let Some(git_dir) = git_path_query("--git-dir") {
         println!("cargo:rerun-if-changed={}", git_dir.join("HEAD").display());
@@ -74,6 +77,50 @@ fn descriptor(raw: &str, tag_prefix: &str, part: &str) -> String {
     }
 }
 
+fn locked_zingolib(lock: &str) -> String {
+    let mut version = "unknown";
+    let mut inside = false;
+    for line in lock.lines() {
+        if line == "name = \"zingolib\"" {
+            inside = true;
+        } else if inside {
+            if let Some(rest) = line.strip_prefix("version = \"") {
+                version = rest.trim_end_matches('"');
+            }
+            if let Some((_, commit)) = line
+                .strip_prefix("source = \"")
+                .and_then(|rest| rest.trim_end_matches('"').rsplit_once('#'))
+            {
+                let hash5: String = commit.chars().take(5).collect();
+                return format!("zl_{hash5}");
+            }
+            if line.is_empty() {
+                break;
+            }
+        }
+    }
+    format!("zl_{version}")
+}
+
+// The lockfile carries the resolved zingolib commit. `git describe` inside
+// the cargo checkout reads whatever tags that machine's ~/.cargo/git holds,
+// which differs between hosts and between hosts and containers.
+fn zl_description() {
+    let lock = fs::read_to_string(WORKSPACE_LOCK).expect("workspace Cargo.lock");
+    let description = locked_zingolib(&lock);
+    let out_dir = env::var("OUT_DIR").unwrap();
+    let dest_path = Path::new(&out_dir).join("zl_description.rs");
+    let mut f = File::create(dest_path).unwrap();
+    writeln!(
+        f,
+        "/// The zingolib part of the build descriptor: `zl_<hash5>` of the\n\
+        /// commit the workspace lockfile pins, or `zl_<version>` when a path\n\
+        /// override replaces the git dependency\n\
+        pub fn zl_description() -> &'static str {{\"{description}\"}}"
+    )
+    .unwrap();
+}
+
 // The docker build context is rust/ and carries no .git, so the host
 // build script passes the raw describe output through this env var.
 fn zm_description() {
@@ -117,5 +164,6 @@ fn zm_description() {
 fn main() {
     register_rerun_watches();
     uniffi_build::generate_scaffolding("src/zingo.udl").expect("A valid UDL file");
+    zl_description();
     zm_description();
 }

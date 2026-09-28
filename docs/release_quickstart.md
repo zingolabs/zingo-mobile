@@ -56,10 +56,12 @@ the AAB / archive just packages whatever is already sitting there.
 That ordering is visible to users. `rust/lib/build.rs` runs
 `git describe --long --match=zingo-*` **at cargo build time** and bakes the
 result into the binary; `get_version()` returns
-`<zingolib descriptor>-zm_<tag>[_<commits-since-tag>_<hash5>][_dirty]`, which is
-the string on the **zingolib** line of the About screen. So it describes the
-commit the `.so` was compiled at — not the app around it. (The version in the
-About header, and what the stores show, is unrelated: it comes from
+`zl_<hash5>-zm_<tag>[_<commits-since-tag>_<hash5>][_dirty]`, which is
+the string on the **zingolib** line of the About screen. The `zm_` half
+describes the commit the `.so` was compiled at. The `zl_` half is the zingolib
+commit the workspace lockfile pins, read from `rust/Cargo.lock` by the same
+build script, which makes it identical on every build machine. (The version in
+the About header, and what the stores show, is unrelated: it comes from
 `versionName`/`versionCode` at runtime via `app/utils/ZingoAppData.ts`.)
 
 Build the Rust libs before creating the tag and the About screen advertises the

@@ -1,5 +1,6 @@
 uniffi::include_scaffolding!("zingo");
 
+include!(concat!(env!("OUT_DIR"), "/zl_description.rs"));
 include!(concat!(env!("OUT_DIR"), "/zm_description.rs"));
 
 #[macro_use]
@@ -2309,13 +2310,7 @@ pub fn parse_ufvk(ufvk: String) -> Result<String, ZingolibError> {
 }
 
 pub fn get_version() -> Result<String, ZingolibError> {
-    with_panic_guard(|| {
-        Ok(format!(
-            "{}-{}",
-            zingolib::git_description(),
-            zm_description()
-        ))
-    })
+    with_panic_guard(|| Ok(format!("{}-{}", zl_description(), zm_description())))
 }
 
 pub fn get_messages(address: String) -> Result<String, ZingolibError> {
