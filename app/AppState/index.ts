@@ -16,7 +16,6 @@ import type BackgroundType from './types/BackgroundType';
 import type BackgroundErrorType from './types/BackgroundErrorType';
 import type ServerType from './types/ServerType';
 import type ZecPriceType from './types/ZecPriceType';
-import type SecurityType from './types/SecurityType';
 import type ServerUrisType from './types/ServerUrisType';
 import type { SetServerResult } from './types/SetServerResult';
 import type { ErrorKeyed, Done } from './types/Result';
@@ -45,7 +44,6 @@ import { AppStateStatusEnum } from './enums/AppStateStatusEnum';
 import { CurrencyNameEnum } from './enums/CurrencyNameEnum';
 import { AddressKindEnum } from './enums/AddressKindEnum';
 import { ReceiverEnum } from './enums/ReceiverEnum';
-import { SecurityTypeEnum } from './enums/SecurityTypeEnum';
 import { EventListenerEnum } from './enums/EventListenerEnum';
 import { ValueTransferKindEnum } from './enums/ValueTransferKindEnum';
 import { FilterEnum } from './enums/FilterEnum';
@@ -100,7 +98,6 @@ export {
   CurrencyNameEnum,
   AddressKindEnum,
   ReceiverEnum,
-  SecurityTypeEnum,
   EventListenerEnum,
   ValueTransferKindEnum,
   FilterEnum,
@@ -133,7 +130,6 @@ export type {
   TranslateType,
   NetInfoType,
   ServerType,
-  SecurityType,
   ServerUrisType,
   SetServerResult,
   ErrorKeyed,

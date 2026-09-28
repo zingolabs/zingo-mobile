@@ -62,3 +62,30 @@ describe('SettingsFileImpl.writeSettings', () => {
     expect(JSON.parse(mockFile as string).language).toBe(LanguageEnum.pt);
   });
 });
+
+describe('SettingsFileImpl.readSettings biometrics', () => {
+  const legacy = (security: Record<string, boolean>) =>
+    JSON.stringify({ server: { uri: 'u', chainName: 'main' }, security });
+
+  it('keeps the switch on when any legacy per-screen option was on', async () => {
+    mockFile = legacy({ startApp: false, sendConfirm: true });
+
+    const settings = await SettingsFileImpl.readSettings();
+    expect(settings.biometrics).toBe(true);
+    expect(settings).not.toHaveProperty('security');
+  });
+
+  it('turns the switch off when every legacy per-screen option was off', async () => {
+    mockFile = legacy({ startApp: false, sendConfirm: false });
+
+    const settings = await SettingsFileImpl.readSettings();
+    expect(settings.biometrics).toBe(false);
+  });
+
+  it('turns the switch on for a file with no security settings', async () => {
+    mockFile = JSON.stringify({ server: { uri: 'u', chainName: 'main' } });
+
+    const settings = await SettingsFileImpl.readSettings();
+    expect(settings.biometrics).toBe(true);
+  });
+});

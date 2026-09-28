@@ -3,7 +3,7 @@ export enum SettingsNameEnum {
   server = 'server',
   language = 'language',
   privacy = 'privacy',
-  security = 'security',
+  biometrics = 'biometrics',
   selectServer = 'selectServer',
   recoveryWalletInfoOnDevice = 'recoveryWalletInfoOnDevice',
   performanceLevel = 'performanceLevel',

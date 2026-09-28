@@ -1160,11 +1160,6 @@
   dependencies:
     humps "^2.0.1"
 
-"@freakycoder/react-native-bounceable@^1.0.3":
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/@freakycoder/react-native-bounceable/-/react-native-bounceable-1.0.3.tgz#79de6fa99fb8357a5e52cc095ecdb1786f4b1514"
-  integrity sha512-+iMq2tnqxCwFjitbPUz9nZ+VfJ8OU9waIlDJAAsoq1229QEwCmERCNy5zVtDsz75q3i4FLXX/n7fimdMzmP21A==
-
 "@gorhom/bottom-sheet@^5.2.6":
   version "5.2.14"
   resolved "https://registry.yarnpkg.com/@gorhom/bottom-sheet/-/bottom-sheet-5.2.14.tgz#2b74ad9293b0ad40518487c6dcd151cadd5b3de3"
@@ -8870,14 +8865,6 @@ react-is@^19.1.0, react-is@^19.1.4:
   version "19.2.7"
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-19.2.7.tgz#57668ee86a78574a542b0a539455212b2c086df2"
   integrity sha512-kZFnouyVv7eP/Phmrlo9FK+zcAdriZJvzxXHF1Sl1P377WSGe2G/JxVolhTrB/jeV47lKImhNUsijjHAAbcl/A==
-
-react-native-bouncy-checkbox@^4.1.2:
-  version "4.1.4"
-  resolved "https://registry.yarnpkg.com/react-native-bouncy-checkbox/-/react-native-bouncy-checkbox-4.1.4.tgz#9ff0dda7c3c8e47be15b9a464c04bf30b47ccb8d"
-  integrity sha512-JK/ib8nICVhbi6RJpRQwozqEr6mHneAECSHYh6ZreMj8f27t95xiihZPrTF/rVPHWcC3FQm7+eSfgtihMXDncg==
-  dependencies:
-    "@freakycoder/react-native-bounceable" "^1.0.3"
-    react-native-bouncy-checkbox "^4.1.2"
 
 react-native-device-info@^15.0.2:
   version "15.0.2"

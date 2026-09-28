@@ -17,7 +17,6 @@ import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import { mockZecPrice } from '../__mocks__/dataMocks/mockZecPrice';
 import { mockServer } from '../__mocks__/dataMocks/mockServer';
-import { mockSecurity } from '../__mocks__/dataMocks/mockSecurity';
 import mockSendPageState from '../__mocks__/dataMocks/mockSendPageState';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AppDrawerParamList } from '@app/types';
@@ -54,7 +53,7 @@ describe('Confirm - snapshots', () => {
   // sendConfirm disabled here so the on-mount biometric gate in Confirm.tsx
   // stays inactive and the snapshot captures the actual Confirm UI rather
   // than the auth placeholder.
-  state.security = { ...mockSecurity, sendConfirm: false };
+  state.biometrics = false;
   state.defaultUnifiedAddress = 'u1abc123def456abc123def456abc123def456abc123';
 
   test('Confirm privacy off', () => {
