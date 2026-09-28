@@ -15,3 +15,10 @@ buildscript {
 rootProject.name = "Zingo"
 include(":app")
 includeBuild("../node_modules/@react-native/gradle-plugin")
+
+// Gate 4 consumes the Binding Layer from a zingolib checkout of the copy
+val zingolibDir: String = providers.gradleProperty("zingolibDir")
+    .orElse(providers.environmentVariable("ZINGOLIB_DIR"))
+    .orNull
+    ?: error("Set ZINGOLIB_DIR, or -PzingolibDir, to a zingolib checkout of the Binding Layer copy")
+includeBuild("$zingolibDir/bindings/android")
