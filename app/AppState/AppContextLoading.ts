@@ -4,7 +4,6 @@ import { TranslateType } from './types/TranslateType';
 import NetInfoType from './types/NetInfoType';
 import BackgroundErrorType from './types/BackgroundErrorType';
 import ServerType from './types/ServerType';
-import SecurityType from './types/SecurityType';
 
 import { LanguageEnum } from './enums/LanguageEnum';
 import { SelectServerEnum } from './enums/SelectServerEnum';
@@ -32,7 +31,7 @@ export default interface AppContextLoading {
   server: ServerType;
   language: LanguageEnum;
   privacy: boolean;
-  security: SecurityType;
+  biometrics: boolean;
   selectServer: SelectServerEnum;
   performanceLevel: RPCPerformanceLevelEnum;
   blockExplorer: BlockExplorerEnum;

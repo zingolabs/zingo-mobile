@@ -57,7 +57,6 @@ import {
   TranslateType,
   NetInfoType,
   ServerType,
-  SecurityType,
   ServerUrisType,
   LanguageEnum,
   SelectServerEnum,
@@ -156,16 +155,7 @@ export default function LoadingApp(props: LoadingAppProps) {
   const [firstLaunchingMessage, setFirstLaunchingMessage] =
     useState<LaunchingModeEnum>(LaunchingModeEnum.opening);
   const [loading, setLoading] = useState<boolean>(true);
-  const [security, setSecurity] = useState<SecurityType>({
-    startApp: true,
-    foregroundApp: true,
-    sendConfirm: true,
-    seedUfvkScreen: true,
-    rescanScreen: true,
-    settingsScreen: true,
-    changeWalletScreen: true,
-    restoreWalletBackupScreen: true,
-  });
+  const [biometrics, setBiometrics] = useState<boolean>(true);
   const [selectServer, setSelectServer] = useState<SelectServerEnum>(
     SelectServerEnum.auto,
   );
@@ -266,12 +256,12 @@ export default function LoadingApp(props: LoadingAppProps) {
       } else {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.privacy, privacy);
       }
-      if (settings.security) {
-        setSecurity(settings.security);
+      if (settings.biometrics === true || settings.biometrics === false) {
+        setBiometrics(settings.biometrics);
       } else {
         await SettingsFileImpl.writeSettings(
-          SettingsNameEnum.security,
-          security,
+          SettingsNameEnum.biometrics,
+          biometrics,
         );
       }
       if (
@@ -357,7 +347,7 @@ export default function LoadingApp(props: LoadingAppProps) {
         privacy={privacy}
         backgroundSyncInfo={backgroundSyncInfo}
         firstLaunchingMessage={firstLaunchingMessage}
-        security={security}
+        biometrics={biometrics}
         selectServer={selectServer}
         performanceLevel={performanceLevel}
         blockExplorer={blockExplorer}
@@ -379,7 +369,7 @@ type LoadingAppClassProps = {
   privacy: boolean;
   backgroundSyncInfo: BackgroundType;
   firstLaunchingMessage: LaunchingModeEnum;
-  security: SecurityType;
+  biometrics: boolean;
   selectServer: SelectServerEnum;
   performanceLevel: RPCPerformanceLevelEnum;
   blockExplorer: BlockExplorerEnum;
@@ -423,7 +413,7 @@ export class LoadingAppClass extends Component<
       server: props.server,
       language: props.language,
       privacy: props.privacy,
-      security: props.security,
+      biometrics: props.biometrics,
       selectServer: props.selectServer,
       performanceLevel: props.performanceLevel,
       blockExplorer: props.blockExplorer,
@@ -490,7 +480,7 @@ export class LoadingAppClass extends Component<
       // as data, so this trigger never runs a second ceremony behind it.
       const startGate: GateAnswer = await resolveTriggerGate(
         this.consumeRetryAnswer(),
-        this.state.security.startApp,
+        this.state.biometrics,
         { translate: this.state.translate },
       );
       const proceed = enactGateAnswer(
@@ -1876,7 +1866,7 @@ export class LoadingAppClass extends Component<
   };
 
   // The locked screen's retry runs its own ceremony unconditionally: the
-  // security toggles enable triggers, they never bypass a retry
+  // biometrics switch enables triggers, it never bypasses a retry
   // (ADR 0007). The answer rides into the boot path as data, so the
   // startApp trigger consumes it instead of asking again and the
   // fail-open notice shows once, from the boot path's own handling.
@@ -1910,7 +1900,7 @@ export class LoadingAppClass extends Component<
     });
   };
 
-  recoverRecoveryWalletInfo = async (security: boolean) => {
+  recoverRecoveryWalletInfo = async () => {
     // recover the wallet keys from the device
     const wallet = await getRecoveryWalletInfo();
     // in IOS the App + OS needs some time to close the biometric screen
@@ -1928,10 +1918,6 @@ export class LoadingAppClass extends Component<
           showConfirm({
             title: this.props.translate('loadedapp.walletbackupseed') as string,
             message:
-              (security
-                ? ''
-                : ((this.props.translate('loadingapp.recoverkeysinstall') +
-                    '\n\n') as string)) +
               preview +
               '\n\n' +
               // Audit Suggestion 5 — append the clipboard-exposure warning so
@@ -2064,7 +2050,7 @@ export class LoadingAppClass extends Component<
       server: this.state.server,
       language: this.state.language,
       privacy: this.state.privacy,
-      security: this.state.security,
+      biometrics: this.state.biometrics,
       selectServer: this.state.selectServer,
       performanceLevel: this.state.performanceLevel,
       blockExplorer: this.state.blockExplorer,

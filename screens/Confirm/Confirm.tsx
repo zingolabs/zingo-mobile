@@ -88,26 +88,23 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     privacy,
     addLastSnackbar,
     server,
-    security,
-    foregroundEpoch,
+    biometrics,
   } = context;
   const { colors } = useTheme();
   const screenName = ScreenEnum.Confirm;
   const isMainChain = server.chainName === ChainNameEnum.mainChainName;
 
-  // Audit Issue D — bio gate for security.sendConfirm lives at the
+  // Audit Issue D — the biometric gate lives at the
   // Confirm screen entry. Mirrors Seed / Ufvk / Settings / Rescan via
   // the shared hook. Trade-off vs. the previous bio-on-press model: a
   // brief window after auth where the Confirm button can be pressed
   // without re-authenticating. Native stack remounts the screen on each
   // navigation, so leaving and coming back forces a fresh prompt.
   const screenGate = useBiometricGate({
-    needsAuth: !!security?.sendConfirm,
+    needsAuth: biometrics,
     translate,
     addLastSnackbar,
     onCancel: () => navigation.goBack(),
-    foregroundAppEnabled: !!security?.foregroundApp,
-    foregroundEpoch,
   });
   const authPassed = screenGate.kind === 'passed';
 

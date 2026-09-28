@@ -2,7 +2,6 @@ import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformance
 import { BlockExplorerEnum } from '@app/AppState/enums/BlockExplorerEnum';
 import { LanguageEnum } from '@app/AppState/enums/LanguageEnum';
 import { SelectServerEnum } from '@app/AppState/enums/SelectServerEnum';
-import SecurityType from '@app/AppState/types/SecurityType';
 import ServerType from '@app/AppState/types/ServerType';
 
 export default class SettingsFileClass {
@@ -15,7 +14,7 @@ export default class SettingsFileClass {
   // - '': means the prior version doesn't have this field in settings
   // - null: means is a fresh install
   // - string: means it have a normal value
-  security: SecurityType;
+  biometrics: boolean;
   selectServer: SelectServerEnum;
   performanceLevel: RPCPerformanceLevelEnum;
   blockExplorer: BlockExplorerEnum;
@@ -27,7 +26,7 @@ export default class SettingsFileClass {
     privacy: boolean,
     firstInstall: boolean,
     version: string,
-    security: SecurityType,
+    biometrics: boolean,
     selectServer: SelectServerEnum,
     performanceLevel: RPCPerformanceLevelEnum,
     blockExplorer: BlockExplorerEnum,
@@ -38,7 +37,7 @@ export default class SettingsFileClass {
     this.privacy = privacy;
     this.firstInstall = firstInstall;
     this.version = version;
-    this.security = security;
+    this.biometrics = biometrics;
     this.selectServer = selectServer;
     this.performanceLevel = performanceLevel;
     this.blockExplorer = blockExplorer;

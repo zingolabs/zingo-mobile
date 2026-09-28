@@ -79,44 +79,19 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
   onClickCancel,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const {
-    translate,
-    server,
-    addLastSnackbar,
-    setPrivacyOption,
-    security,
-    foregroundEpoch,
-  } = context;
+  const { translate, server, addLastSnackbar, setPrivacyOption, biometrics } =
+    context;
   const { colors } = useTheme();
   const screenName = ScreenEnum.ShowUfvk;
 
   // Audit Issue D — single source of truth for the seed/UFVK biometric
   // gate. Lives inside ShowUfvk.tsx so every navigation path is funnelled
   // through the same check.
-  //
-  // The "change" and "backup" actions render the UFVK AND perform their
-  // respective destructive operation. Each respects BOTH the per-action
-  // toggle (changeWalletScreen / restoreWalletBackupScreen) and the
-  // generic seedUfvkScreen toggle — if the user has asked for bio in
-  // either of the two contexts, the gate fires.
-  const initialAction: UfvkActionEnum =
-    !!route.params && route.params.action !== undefined
-      ? route.params.action
-      : UfvkActionEnum.view;
-  const needsAuth: boolean =
-    (initialAction === UfvkActionEnum.view && !!security?.seedUfvkScreen) ||
-    (initialAction === UfvkActionEnum.change &&
-      (!!security?.seedUfvkScreen || !!security?.changeWalletScreen)) ||
-    (initialAction === UfvkActionEnum.backup &&
-      (!!security?.seedUfvkScreen || !!security?.restoreWalletBackupScreen)) ||
-    (initialAction === UfvkActionEnum.server && !!security?.seedUfvkScreen);
   const screenGate = useBiometricGate({
-    needsAuth,
+    needsAuth: biometrics,
     translate,
     addLastSnackbar,
     onCancel: () => navigation.goBack(),
-    foregroundAppEnabled: !!security?.foregroundApp,
-    foregroundEpoch,
   });
   const authPassed = screenGate.kind === 'passed';
 

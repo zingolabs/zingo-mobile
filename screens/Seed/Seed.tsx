@@ -88,8 +88,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
     privacy,
     addLastSnackbar,
     setPrivacyOption,
-    security,
-    foregroundEpoch,
+    biometrics,
   } = context;
   const { colors } = useTheme();
   // when this screen is open from LoadingApp (new wallet)
@@ -106,30 +105,11 @@ const Seed: React.FunctionComponent<SeedProps> = ({
   // gate. Lives inside Seed.tsx so every navigation path (header, menu,
   // chain-mismatch recovery, future callers) is funnelled through the
   // same check.
-  //
-  // The "change" and "backup" actions render the seed AND perform their
-  // respective destructive operation. Each respects BOTH the per-action
-  // toggle (changeWalletScreen / restoreWalletBackupScreen) and the
-  // generic seedUfvkScreen toggle — if the user has asked for bio in
-  // either of the two contexts, the gate fires.
-  const initialAction: SeedActionEnum =
-    !!route.params && route.params.action !== undefined
-      ? route.params.action
-      : SeedActionEnum.view;
-  const needsAuth: boolean =
-    (initialAction === SeedActionEnum.view && !!security?.seedUfvkScreen) ||
-    (initialAction === SeedActionEnum.change &&
-      (!!security?.seedUfvkScreen || !!security?.changeWalletScreen)) ||
-    (initialAction === SeedActionEnum.backup &&
-      (!!security?.seedUfvkScreen || !!security?.restoreWalletBackupScreen)) ||
-    (initialAction === SeedActionEnum.server && !!security?.seedUfvkScreen);
   const screenGate = useBiometricGate({
-    needsAuth,
+    needsAuth: biometrics,
     translate,
     addLastSnackbar,
     onCancel: () => navigation.goBack(),
-    foregroundAppEnabled: !!security?.foregroundApp,
-    foregroundEpoch,
   });
   const authPassed = screenGate.kind === 'passed';
 

@@ -10,7 +10,6 @@ import {
   NetInfoType,
   ServerType,
   AddressBookFileClass,
-  SecurityType,
   LanguageEnum,
   SelectServerEnum,
   ChainNameEnum,
@@ -63,7 +62,7 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   somePending: false,
   addressBook: [] as AddressBookFileClass[],
   launchAddTagModal: () => {},
-  security: {} as SecurityType,
+  biometrics: false,
   selectServer: SelectServerEnum.auto,
   walletChainName: ChainNameEnum.noneChainName,
   shieldingAmount: 0,
@@ -76,7 +75,6 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   blockExplorer: BlockExplorerEnum.Zcashexplorer,
   mixnetView: null,
   reenableMixnet: async () => {},
-  foregroundEpoch: 0,
 };
 
 export const ContextAppLoaded = React.createContext(defaultAppContextLoaded);

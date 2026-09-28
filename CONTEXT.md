@@ -330,9 +330,9 @@ One OS authentication prompt, run by the gate controller. One ceremony
 answers every trigger waiting on it, including a cancel.
 
 **Trigger**:
-A surface that asks the gate controller (app foreground, screen entry, a
-security toggle flipping on). Each trigger owns its own decline
-consequence; none owns a prompt.
+A surface that asks the gate controller (app start, app foreground, screen
+entry). The biometrics switch enables every trigger at once. Each trigger
+owns its own decline consequence; none owns a prompt.
 
 **Freshness window**:
 The period after a successful ceremony during which any trigger passes

@@ -13,7 +13,6 @@ import {
   GlobalConst,
   RouteEnum,
   ScreenEnum,
-  //SecurityType,
 } from '@app/AppState';
 import RegText from '@ui/primitives/RegText';
 import ErrorText from '@ui/primitives/ErrorText';

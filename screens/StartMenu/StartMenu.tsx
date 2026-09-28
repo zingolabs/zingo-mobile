@@ -32,7 +32,7 @@ import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
 type StartMenuProps = {
   actionButtonsDisabled: boolean;
   hasRecoveryWalletInfoSaved: boolean;
-  recoverRecoveryWalletInfo: (b: boolean) => void;
+  recoverRecoveryWalletInfo: () => void;
   customServer: () => void;
   walletExists: boolean;
   hasBackupWallet: boolean;
@@ -76,7 +76,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
     if (hasRecoveryWalletInfoSaved) {
       list.push({
         label: translate('loadingapp.recoverkeys') as string,
-        onPress: () => recoverRecoveryWalletInfo(true),
+        onPress: recoverRecoveryWalletInfo,
       });
     }
     if (netInfo.isConnected) {

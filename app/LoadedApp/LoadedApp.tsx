@@ -46,7 +46,6 @@ import {
   ServerUrisType,
   SetServerResult,
   AddressBookFileClass,
-  SecurityType,
   MenuItemEnum,
   LanguageEnum,
   SelectServerEnum,
@@ -220,16 +219,7 @@ export default function LoadedApp(props: LoadedAppProps) {
   });
   const [addressBook, setAddressBook] = useState<AddressBookFileClass[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [security, setSecurity] = useState<SecurityType>({
-    startApp: true,
-    foregroundApp: true,
-    sendConfirm: true,
-    seedUfvkScreen: true,
-    rescanScreen: true,
-    settingsScreen: true,
-    changeWalletScreen: true,
-    restoreWalletBackupScreen: true,
-  });
+  const [biometrics, setBiometrics] = useState<boolean>(true);
   const [selectServer, setSelectServer] = useState<SelectServerEnum>(
     SelectServerEnum.auto,
   );
@@ -376,12 +366,12 @@ export default function LoadedApp(props: LoadedAppProps) {
       } else {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.privacy, privacy);
       }
-      if (settings.security) {
-        setSecurity(settings.security);
+      if (settings.biometrics === true || settings.biometrics === false) {
+        setBiometrics(settings.biometrics);
       } else {
         await SettingsFileImpl.writeSettings(
-          SettingsNameEnum.security,
-          security,
+          SettingsNameEnum.biometrics,
+          biometrics,
         );
       }
       if (
@@ -600,7 +590,7 @@ export default function LoadedApp(props: LoadedAppProps) {
         saplingPool={saplingPool}
         transparentPool={transparentPool}
         addressBook={addressBook}
-        security={security}
+        biometrics={biometrics}
         selectServer={selectServer}
         walletChainName={walletChainName}
         firstLaunchingMessage={firstLaunchingMessage}
@@ -633,7 +623,7 @@ type LoadedAppClassProps = {
   saplingPool: boolean;
   transparentPool: boolean;
   addressBook: AddressBookFileClass[];
-  security: SecurityType;
+  biometrics: boolean;
   selectServer: SelectServerEnum;
   walletChainName: ChainNameEnum;
   firstLaunchingMessage: LaunchingModeEnum;
@@ -711,7 +701,7 @@ export class LoadedAppClass extends Component<
       server: props.server,
       language: props.language,
       privacy: props.privacy,
-      security: props.security,
+      biometrics: props.biometrics,
       selectServer: props.selectServer,
       walletChainName: props.walletChainName,
       performanceLevel: props.performanceLevel,
@@ -731,10 +721,6 @@ export class LoadedAppClass extends Component<
       scrollToBottom: false,
       isSeedViewModalOpen: false,
       addTagModalTarget: null,
-      // Bumped each time the app returns from background → active so
-      // protected screens currently mounted can re-fire their gate
-      // when security.foregroundApp is OFF.
-      foregroundEpoch: 0,
     };
 
     this.rpc = new WalletBackend({
@@ -847,14 +833,6 @@ export class LoadedAppClass extends Component<
           if (Platform.OS === GlobalConst.platformOSios) {
             this.setState({ appStateStatus: nextAppState });
           }
-          // Bump the foreground epoch so any currently-mounted
-          // protected screen (Seed/Ufvk/Settings/Rescan/Confirm) can
-          // re-fire its biometric gate when security.foregroundApp is
-          // OFF. Done before the foregroundApp askGate so the
-          // screen-level effects don't race against the app-level one.
-          this.setState(state => ({
-            foregroundEpoch: state.foregroundEpoch + 1,
-          }));
           // A parked earlier pass resumes with this same event and acts
           // once; a second concurrent actor would double-run the restore
           // work or the navigation reset.
@@ -973,7 +951,7 @@ export class LoadedAppClass extends Component<
   runForegroundGate = async () => {
     const foregroundGate: GateAnswer = await resolveTriggerGate(
       undefined,
-      this.state.security.foregroundApp,
+      this.state.biometrics,
       { translate: this.state.translate },
     );
     const proceed = enactGateAnswer(
@@ -1760,11 +1738,9 @@ export class LoadedAppClass extends Component<
     });
   };
 
-  setSecurityOption = async (value: SecurityType): Promise<void> => {
-    await SettingsFileImpl.writeSettings(SettingsNameEnum.security, value);
-    this.setState({
-      security: value as SecurityType,
-    });
+  setBiometricsOption = async (value: boolean): Promise<void> => {
+    await SettingsFileImpl.writeSettings(SettingsNameEnum.biometrics, value);
+    this.setState({ biometrics: value });
   };
 
   setSelectServerOption = async (value: string): Promise<void> => {
@@ -2074,14 +2050,13 @@ export class LoadedAppClass extends Component<
       server: this.state.server,
       language: this.state.language,
       privacy: this.state.privacy,
-      security: this.state.security,
+      biometrics: this.state.biometrics,
       selectServer: this.state.selectServer,
       walletChainName: this.state.walletChainName,
       performanceLevel: this.state.performanceLevel,
       blockExplorer: this.state.blockExplorer,
       mixnetView: this.state.mixnetView,
       reenableMixnet: this.reenableMixnet,
-      foregroundEpoch: this.state.foregroundEpoch,
     };
 
     return (
@@ -2165,9 +2140,6 @@ export class LoadedAppClass extends Component<
                                         clearToAddr={
                                           this.clearToAddr /* send */
                                         }
-                                        setSecurityOption={
-                                          this.setSecurityOption /* send */
-                                        }
                                       />
                                     )}
                                   </Tab.Screen>
@@ -2180,7 +2152,6 @@ export class LoadedAppClass extends Component<
                                       () => toggleOptionsPanel() /* header */
                                     }
                                     alone={false /* receive */}
-                                    setSecurityOption={this.setSecurityOption}
                                     setAddressBook={this.setAddressBook}
                                   />
                                 )}
@@ -2196,7 +2167,7 @@ export class LoadedAppClass extends Component<
                           {...props}
                           setServerOption={this.setServerOption}
                           setLanguageOption={this.setLanguageOption}
-                          setSecurityOption={this.setSecurityOption}
+                          setBiometricsOption={this.setBiometricsOption}
                           setSelectServerOption={this.setSelectServerOption}
                           setPerformanceLevelOption={
                             this.setPerformanceLevelOption

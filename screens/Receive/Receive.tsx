@@ -30,7 +30,6 @@ import AppSheetModal from '@ui/primitives/AppSheetModal';
 import {
   AddressKindEnum,
   ChainNameEnum,
-  SecurityType,
   UnifiedAddressClass,
   TransparentAddressClass,
   AddressBookFileClass,
@@ -58,7 +57,6 @@ type ReceiveProps = NativeStackScreenProps<
 > & {
   toggleMenuDrawer: () => void;
   alone: boolean;
-  setSecurityOption: (s: SecurityType) => Promise<void>;
   setAddressBook: (ab: AddressBookFileClass[]) => void;
 };
 

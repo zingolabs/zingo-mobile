@@ -3,8 +3,6 @@ import * as RNFS from 'react-native-fs';
 import {
   ChainNameEnum,
   GlobalConst,
-  SecurityType,
-  SecurityTypeEnum,
   SelectServerEnum,
   ServerType,
   ServerUrisType,
@@ -32,7 +30,7 @@ export default class SettingsFileImpl {
   // Write the server setting
   static async writeSettings(
     name: SettingsNameEnum,
-    value: string | boolean | ServerType | SecurityType,
+    value: string | boolean | ServerType,
   ): Promise<void> {
     const write = this.writeQueue.then(async () => {
       const fileName = await this.getFileName();
@@ -120,19 +118,15 @@ export default class SettingsFileImpl {
         // from some version before.
         settings.version = '';
       }
-      if (!settings.hasOwnProperty(SettingsNameEnum.security)) {
-        // this is the first time the App implemented
-        // screen security. Default values.
-        settings.security = {
-          startApp: true,
-          foregroundApp: true,
-          sendConfirm: true,
-          seedUfvkScreen: true,
-          rescanScreen: true,
-          settingsScreen: true,
-          changeWalletScreen: true,
-          restoreWalletBackupScreen: true,
-        };
+      if (!settings.hasOwnProperty(SettingsNameEnum.biometrics)) {
+        // The per-screen options collapse into one switch: it stays on if
+        // any of them was on.
+        const legacy = (settings as unknown as Record<string, unknown>)
+          .security;
+        settings.biometrics =
+          legacy && typeof legacy === 'object'
+            ? Object.values(legacy).some(Boolean)
+            : true;
       }
       if (!settings.hasOwnProperty(SettingsNameEnum.selectServer)) {
         // First launch with server selection. Inference is chain-aware: every
@@ -209,6 +203,7 @@ export default class SettingsFileImpl {
       // choice, now always USD, the Nym switch: every transmission travels
       // the mixnet, so there is nothing left to choose, the mode, along
       // with the first-view-seed flag only the basic mode ever wrote, and
+      // the per-screen security options, now the one biometrics switch, and
       // the switch that kept the recovery info off the device: it is always
       // stored now, and the first start after the update writes it.
       const obsolete = settings as unknown as Record<string, unknown>;
@@ -220,33 +215,8 @@ export default class SettingsFileImpl {
       delete obsolete.nym;
       delete obsolete.mode;
       delete obsolete.basicFirstViewSeed;
+      delete obsolete.security;
       delete obsolete.recoveryWalletInfoOnDevice;
-      // old security options that have to be removed and to add the new one.
-      if (settings.hasOwnProperty(SettingsNameEnum.security)) {
-        const sec: SecurityType = settings.security;
-        // old security options
-        if (
-          sec.hasOwnProperty(SecurityTypeEnum.seedScreen) &&
-          sec.hasOwnProperty(SecurityTypeEnum.ufvkScreen) &&
-          !sec.hasOwnProperty(SecurityTypeEnum.seedUfvkScreen)
-        ) {
-          let numTrues: number = 0;
-          if (sec.seedScreen) {
-            numTrues += 1;
-            delete sec.seedScreen;
-          }
-          if (sec.ufvkScreen) {
-            numTrues += 1;
-            delete sec.ufvkScreen;
-          }
-          if (numTrues >= 1) {
-            sec.seedUfvkScreen = true;
-          } else {
-            sec.seedUfvkScreen = false;
-          }
-          settings.security = sec;
-        }
-      }
       if (!settings.hasOwnProperty(SettingsNameEnum.performanceLevel)) {
         // by default medium
         settings.performanceLevel = RPCPerformanceLevelEnum.Medium;
