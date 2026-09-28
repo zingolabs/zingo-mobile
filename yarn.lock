@@ -2378,12 +2378,12 @@
   dependencies:
     nanoid "^3.3.11"
 
-"@react-navigation/stack@^7.10.22":
-  version "7.10.24"
-  resolved "https://registry.yarnpkg.com/@react-navigation/stack/-/stack-7.10.24.tgz#703e231bfdfd9be5d3c8cc546dea861ca2878c03"
-  integrity sha512-XUt90zH+xmJLWj1Mx3sz5d/nWxfhv0JF+FIhyHTHvlrx57xbMSi5GYS33h9LbYwhN2wHkiQvtTGzg6frJsAE+g==
+"@react-navigation/stack@^7.11.2":
+  version "7.11.2"
+  resolved "https://registry.yarnpkg.com/@react-navigation/stack/-/stack-7.11.2.tgz#a151e84d24f7873810c42977f5e108215c713da8"
+  integrity sha512-uz5RtTCTmcSsH1Lwas20wE8puW/DCTuKjQ/UBKk2obp+dSPreTCcJZG2W6sTIaz6WBp1zcUZWsajhDMfH6+CvA==
   dependencies:
-    "@react-navigation/elements" "^2.9.40"
+    "@react-navigation/elements" "^2.9.43"
     color "^4.2.3"
     use-latest-callback "^0.2.4"
 
