@@ -219,6 +219,7 @@
     "section-privacysecurity": "Privacidad y Seguridad",
     "section-networkadvanced": "Red y Avanzado",
     "section-other": "Otros",
+    "recoveryinfo-notstored": "La información de recuperación del monedero no está almacenada en este dispositivo. Asegúrate de tener apuntada tu frase semilla (o clave de visualización).",
     "section-developer": "Desarrollador",
     "memos": [
       {
@@ -264,16 +265,6 @@
       {
         "value": false,
         "text": "Privacidad Normal, se puede ver toda la información."
-      }
-    ],
-    "recoverywalletinfoondevices": [
-      {
-        "value": true,
-        "text": "Hacer copia de seguridad de la Frase Semilla del monedero en el dispositivo."
-      },
-      {
-        "value": false,
-        "text": "No guardar absolutamente nada en el dispositivo referente al monedero."
       }
     ],
     "performancelevels": [
@@ -341,7 +332,6 @@
     "language-title": "Idioma",
     "islanguage": "Necesitas escoger un Idioma para poder guardar.",
     "privacy-title": "Ocultar valores sensibles",
-    "recoverywalletinfoondevice-title": "Almacenar la información de recuperación del monedero",
     "performancelevel-title": "Zingolib Performance Level",
     "blockexplorer-title": "Block Explorer",
     "value-language-en": "Inglés",
@@ -356,8 +346,6 @@
     "value-chainname-none": "Ninguna",
     "server-chain-title": "Red",
     "select-chain-placeholder": "Selecciona una Red...",
-    "value-recoverywalletinfoondevice-true": "Activar",
-    "value-recoverywalletinfoondevice-false": "Desactivar",
     "value-performancelevel-Maximum": "Maximum",
     "value-performancelevel-High": "High",
     "value-performancelevel-Medium": "Medium",
@@ -382,7 +370,6 @@
     "select-language-placeholder": "Selecciona un Idioma...",
     "select-blockexplorer-placeholder": "Selecciona un Block Explorer...",
     "value-language-ru": "Ruso",
-    "walletkeyssaved": "La ultima información de recuperacion del Monedero almacenada de forma segura en el dispositivo.",
     "walletkeyswarning": "Esta es una función experimental que depende de la seguridad de código no auditado para almacenar tu frase semilla. ¡Por favor, no la utilices con semillas que controlen fondos significativos!",
     "value-language-tr": "Turco",
     "nym-network": "NYM Mixnet",

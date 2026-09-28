@@ -16,7 +16,6 @@ export default class SettingsFileClass {
   // - string: means it have a normal value
   biometrics: boolean;
   selectServer: SelectServerEnum;
-  recoveryWalletInfoOnDevice: boolean;
   performanceLevel: RPCPerformanceLevelEnum;
   blockExplorer: BlockExplorerEnum;
   ironwoodOnboardSeen: boolean;
@@ -29,7 +28,6 @@ export default class SettingsFileClass {
     version: string,
     biometrics: boolean,
     selectServer: SelectServerEnum,
-    recoveryWalletInfoOnDevice: boolean,
     performanceLevel: RPCPerformanceLevelEnum,
     blockExplorer: BlockExplorerEnum,
     ironwoodOnboardSeen: boolean,
@@ -41,7 +39,6 @@ export default class SettingsFileClass {
     this.version = version;
     this.biometrics = biometrics;
     this.selectServer = selectServer;
-    this.recoveryWalletInfoOnDevice = recoveryWalletInfoOnDevice;
     this.performanceLevel = performanceLevel;
     this.blockExplorer = blockExplorer;
     this.ironwoodOnboardSeen = ironwoodOnboardSeen;

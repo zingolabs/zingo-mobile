@@ -5,7 +5,6 @@ export enum SettingsNameEnum {
   privacy = 'privacy',
   biometrics = 'biometrics',
   selectServer = 'selectServer',
-  recoveryWalletInfoOnDevice = 'recoveryWalletInfoOnDevice',
   performanceLevel = 'performanceLevel',
   blockExplorer = 'blockExplorer',
 

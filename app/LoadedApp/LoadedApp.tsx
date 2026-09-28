@@ -23,7 +23,7 @@ import {
   deactivateKeepAwake,
 } from '@sayem314/react-native-keep-awake';
 
-import WalletBackend, { fetchWallet } from '@app/walletBackend';
+import WalletBackend from '@app/walletBackend';
 import {
   changeServer,
   doSave,
@@ -96,10 +96,6 @@ import {
   resolveTriggerGate,
 } from '@app/services/gateController';
 import ShowAddressAlertAsync from '@app/services/showAddressAlertAsync';
-import {
-  createUpdateRecoveryWalletInfo,
-  removeRecoveryWalletInfo,
-} from '@app/services/recoveryWalletInfo';
 
 import History from '@screens/History';
 import Send from '@screens/Send';
@@ -227,8 +223,6 @@ export default function LoadedApp(props: LoadedAppProps) {
   const [selectServer, setSelectServer] = useState<SelectServerEnum>(
     SelectServerEnum.auto,
   );
-  const [recoveryWalletInfoOnDevice, setRecoveryWalletInfoOnDevice] =
-    useState<boolean>(false);
   const [performanceLevel, setPerformanceLevel] =
     useState<RPCPerformanceLevelEnum>(RPCPerformanceLevelEnum.Medium);
   const [blockExplorer, setBlockExplorer] = useState<BlockExplorerEnum>(
@@ -391,17 +385,6 @@ export default function LoadedApp(props: LoadedAppProps) {
         await SettingsFileImpl.writeSettings(
           SettingsNameEnum.selectServer,
           selectServer,
-        );
-      }
-      if (
-        settings.recoveryWalletInfoOnDevice === true ||
-        settings.recoveryWalletInfoOnDevice === false
-      ) {
-        setRecoveryWalletInfoOnDevice(settings.recoveryWalletInfoOnDevice);
-      } else {
-        await SettingsFileImpl.writeSettings(
-          SettingsNameEnum.recoveryWalletInfoOnDevice,
-          recoveryWalletInfoOnDevice,
         );
       }
       if (
@@ -610,7 +593,6 @@ export default function LoadedApp(props: LoadedAppProps) {
         biometrics={biometrics}
         selectServer={selectServer}
         walletChainName={walletChainName}
-        recoveryWalletInfoOnDevice={recoveryWalletInfoOnDevice}
         firstLaunchingMessage={firstLaunchingMessage}
         performanceLevel={performanceLevel}
         blockExplorer={blockExplorer}
@@ -644,7 +626,6 @@ type LoadedAppClassProps = {
   biometrics: boolean;
   selectServer: SelectServerEnum;
   walletChainName: ChainNameEnum;
-  recoveryWalletInfoOnDevice: boolean;
   firstLaunchingMessage: LaunchingModeEnum;
   performanceLevel: RPCPerformanceLevelEnum;
   blockExplorer: BlockExplorerEnum;
@@ -723,7 +704,6 @@ export class LoadedAppClass extends Component<
       biometrics: props.biometrics,
       selectServer: props.selectServer,
       walletChainName: props.walletChainName,
-      recoveryWalletInfoOnDevice: props.recoveryWalletInfoOnDevice,
       performanceLevel: props.performanceLevel,
       blockExplorer: props.blockExplorer,
 
@@ -1770,27 +1750,6 @@ export class LoadedAppClass extends Component<
     });
   };
 
-  setRecoveryWalletInfoOnDeviceOption = async (
-    value: boolean,
-  ): Promise<void> => {
-    await SettingsFileImpl.writeSettings(
-      SettingsNameEnum.recoveryWalletInfoOnDevice,
-      value,
-    );
-    this.setState({
-      recoveryWalletInfoOnDevice: value as boolean,
-    });
-
-    if (!value) {
-      await removeRecoveryWalletInfo();
-    } else {
-      const wallet = await fetchWallet(this.state.readOnly);
-      if (wallet) {
-        await createUpdateRecoveryWalletInfo(wallet);
-      }
-    }
-  };
-
   setPerformanceLevelOption = async (
     value: RPCPerformanceLevelEnum,
   ): Promise<void> => {
@@ -2094,7 +2053,6 @@ export class LoadedAppClass extends Component<
       biometrics: this.state.biometrics,
       selectServer: this.state.selectServer,
       walletChainName: this.state.walletChainName,
-      recoveryWalletInfoOnDevice: this.state.recoveryWalletInfoOnDevice,
       performanceLevel: this.state.performanceLevel,
       blockExplorer: this.state.blockExplorer,
       mixnetView: this.state.mixnetView,
@@ -2211,9 +2169,6 @@ export class LoadedAppClass extends Component<
                           setLanguageOption={this.setLanguageOption}
                           setBiometricsOption={this.setBiometricsOption}
                           setSelectServerOption={this.setSelectServerOption}
-                          setRecoveryWalletInfoOnDeviceOption={
-                            this.setRecoveryWalletInfoOnDeviceOption
-                          }
                           setPerformanceLevelOption={
                             this.setPerformanceLevelOption
                           }

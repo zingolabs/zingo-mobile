@@ -203,7 +203,9 @@ export default class SettingsFileImpl {
       // choice, now always USD, the Nym switch: every transmission travels
       // the mixnet, so there is nothing left to choose, the mode, along
       // with the first-view-seed flag only the basic mode ever wrote, and
-      // the per-screen security options, now the one biometrics switch.
+      // the per-screen security options, now the one biometrics switch, and
+      // the switch that kept the recovery info off the device: it is always
+      // stored now, and the first start after the update writes it.
       const obsolete = settings as unknown as Record<string, unknown>;
       delete obsolete.donation;
       delete obsolete.firstUpdateWithDonation;
@@ -214,12 +216,7 @@ export default class SettingsFileImpl {
       delete obsolete.mode;
       delete obsolete.basicFirstViewSeed;
       delete obsolete.security;
-      if (
-        !settings.hasOwnProperty(SettingsNameEnum.recoveryWalletInfoOnDevice)
-      ) {
-        // doing backup of seed & birthday in the device -> false by default.
-        settings.recoveryWalletInfoOnDevice = false;
-      }
+      delete obsolete.recoveryWalletInfoOnDevice;
       if (!settings.hasOwnProperty(SettingsNameEnum.performanceLevel)) {
         // by default medium
         settings.performanceLevel = RPCPerformanceLevelEnum.Medium;

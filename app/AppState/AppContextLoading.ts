@@ -33,7 +33,6 @@ export default interface AppContextLoading {
   privacy: boolean;
   biometrics: boolean;
   selectServer: SelectServerEnum;
-  recoveryWalletInfoOnDevice: boolean;
   performanceLevel: RPCPerformanceLevelEnum;
   blockExplorer: BlockExplorerEnum;
 }

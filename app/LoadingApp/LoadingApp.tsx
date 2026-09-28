@@ -103,7 +103,6 @@ import {
   createUpdateRecoveryWalletInfo,
   getRecoveryWalletInfo,
   hasRecoveryWalletInfo,
-  removeRecoveryWalletInfo,
 } from '@app/services/recoveryWalletInfo';
 
 // no lazy load because slowing down screens.
@@ -160,8 +159,6 @@ export default function LoadingApp(props: LoadingAppProps) {
   const [selectServer, setSelectServer] = useState<SelectServerEnum>(
     SelectServerEnum.auto,
   );
-  const [recoveryWalletInfoOnDevice, setRecoveryWalletInfoOnDevice] =
-    useState<boolean>(false);
   const [performanceLevel, setPerformanceLevel] =
     useState<RPCPerformanceLevelEnum>(RPCPerformanceLevelEnum.Medium);
   const [blockExplorer, setBlockExplorer] = useState<BlockExplorerEnum>(
@@ -281,17 +278,6 @@ export default function LoadingApp(props: LoadingAppProps) {
         );
       }
       if (
-        settings.recoveryWalletInfoOnDevice === true ||
-        settings.recoveryWalletInfoOnDevice === false
-      ) {
-        setRecoveryWalletInfoOnDevice(settings.recoveryWalletInfoOnDevice);
-      } else {
-        await SettingsFileImpl.writeSettings(
-          SettingsNameEnum.recoveryWalletInfoOnDevice,
-          recoveryWalletInfoOnDevice,
-        );
-      }
-      if (
         settings.performanceLevel === RPCPerformanceLevelEnum.High ||
         settings.performanceLevel === RPCPerformanceLevelEnum.Low ||
         settings.performanceLevel === RPCPerformanceLevelEnum.Maximum ||
@@ -363,7 +349,6 @@ export default function LoadingApp(props: LoadingAppProps) {
         firstLaunchingMessage={firstLaunchingMessage}
         biometrics={biometrics}
         selectServer={selectServer}
-        recoveryWalletInfoOnDevice={recoveryWalletInfoOnDevice}
         performanceLevel={performanceLevel}
         blockExplorer={blockExplorer}
       />
@@ -386,7 +371,6 @@ type LoadingAppClassProps = {
   firstLaunchingMessage: LaunchingModeEnum;
   biometrics: boolean;
   selectServer: SelectServerEnum;
-  recoveryWalletInfoOnDevice: boolean;
   performanceLevel: RPCPerformanceLevelEnum;
   blockExplorer: BlockExplorerEnum;
 };
@@ -431,7 +415,6 @@ export class LoadingAppClass extends Component<
       privacy: props.privacy,
       biometrics: props.biometrics,
       selectServer: props.selectServer,
-      recoveryWalletInfoOnDevice: props.recoveryWalletInfoOnDevice,
       performanceLevel: props.performanceLevel,
       blockExplorer: props.blockExplorer,
 
@@ -908,18 +891,9 @@ export class LoadingAppClass extends Component<
             orchardPool = walletKindJSON.orchard;
             saplingPool = walletKindJSON.sapling;
             transparentPool = walletKindJSON.transparent;
-            // if the seed & birthday are not stored in Keychain/Keystore, do it now.
-            if (this.state.recoveryWalletInfoOnDevice) {
-              const wallet = await fetchWallet(readOnly);
-              if (wallet) {
-                await createUpdateRecoveryWalletInfo(wallet);
-              }
-            } else {
-              // needs to delete the seed from the Keychain/Keystore, do it now.
-              if (this.state.hasRecoveryWalletInfoSaved) {
-                await removeRecoveryWalletInfo();
-              }
-            }
+            // store this wallet's recovery info in the Keychain/Keystore; if
+            // it can't be read, whatever the device holds is removed.
+            await createUpdateRecoveryWalletInfo(await fetchWallet(readOnly));
             this.setState({
               readOnly,
               orchardPool,
@@ -1586,13 +1560,7 @@ export class LoadingAppClass extends Component<
         birthday: seedJSON.birthday || 0,
       };
       // storing the seed & birthday in KeyChain/KeyStore
-      if (this.state.recoveryWalletInfoOnDevice) {
-        await createUpdateRecoveryWalletInfo(wallet);
-      } else {
-        if (this.state.hasRecoveryWalletInfoSaved) {
-          await removeRecoveryWalletInfo();
-        }
-      }
+      await createUpdateRecoveryWalletInfo(wallet);
       this.setState(state => ({
         wallet,
         screen: goSeedScreen ? RouteEnum.NewSeed : state.screen,
@@ -1761,18 +1729,9 @@ export class LoadingAppClass extends Component<
             orchardPool = walletKindJSON.orchard;
             saplingPool = walletKindJSON.sapling;
             transparentPool = walletKindJSON.transparent;
-            // if the seed & birthday are not stored in Keychain/Keystore, do it now.
-            if (this.state.recoveryWalletInfoOnDevice) {
-              const wallet = await fetchWallet(readOnly);
-              if (wallet) {
-                await createUpdateRecoveryWalletInfo(wallet);
-              }
-            } else {
-              // needs to delete the seed from the Keychain/Keystore, do it now.
-              if (this.state.hasRecoveryWalletInfoSaved) {
-                await removeRecoveryWalletInfo();
-              }
-            }
+            // store this wallet's recovery info in the Keychain/Keystore; if
+            // it can't be read, whatever the device holds is removed.
+            await createUpdateRecoveryWalletInfo(await fetchWallet(readOnly));
             this.setState({
               readOnly,
               orchardPool,
@@ -2093,7 +2052,6 @@ export class LoadingAppClass extends Component<
       privacy: this.state.privacy,
       biometrics: this.state.biometrics,
       selectServer: this.state.selectServer,
-      recoveryWalletInfoOnDevice: this.state.recoveryWalletInfoOnDevice,
       performanceLevel: this.state.performanceLevel,
       blockExplorer: this.state.blockExplorer,
     };

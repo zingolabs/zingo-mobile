@@ -219,6 +219,7 @@
     "section-privacysecurity": "Privacidade e Segurança",
     "section-networkadvanced": "Rede e Avançado",
     "section-other": "Outros",
+    "recoveryinfo-notstored": "As informações de recuperação da carteira não estão armazenadas neste dispositivo. Certifique-se de ter anotado sua frase semente (ou chave de visualização).",
     "section-developer": "Desenvolvedor",
     "memos": [
       {
@@ -264,16 +265,6 @@
       {
         "value": false,
         "text": "Privacidade Normal, você pode ver todas as informações."
-      }
-    ],
-    "recoverywalletinfoondevices": [
-      {
-        "value": true,
-        "text": "Faça backup da carteira Seed Phrase no dispositivo."
-      },
-      {
-        "value": false,
-        "text": "Não salve nada relacionado à carteira no dispositivo."
       }
     ],
     "performancelevels": [
@@ -341,7 +332,6 @@
     "language-title": "Linguagem",
     "islanguage": "Você precisa escolher um idioma para salvar.",
     "privacy-title": "Ocultar valores sensíveis",
-    "recoverywalletinfoondevice-title": "Armazene informações de recuperação da carteira",
     "performancelevel-title": "Zingolib Performance Level",
     "blockexplorer-title": "Block Explorer",
     "value-language-en": "Inglês",
@@ -356,8 +346,6 @@
     "value-chainname-none": "Nenhuma",
     "server-chain-title": "Rede",
     "select-chain-placeholder": "Selecione uma Rede...",
-    "value-recoverywalletinfoondevice-true": "Habilitar",
-    "value-recoverywalletinfoondevice-false": "Desabilitar",
     "value-performancelevel-Maximum": "Maximum",
     "value-performancelevel-High": "High",
     "value-performancelevel-Medium": "Medium",
@@ -382,7 +370,6 @@
     "select-language-placeholder": "Selecione um Idioma...",
     "select-blockexplorer-placeholder": "Selecione um Block Explorer...",
     "value-language-ru": "Russo",
-    "walletkeyssaved": "As últimas informações de recuperação da carteira armazenadas com segurança no dispositivo.",
     "walletkeyswarning": "Este é um recurso experimental que depende da segurança de código não auditado para armazenar sua frase-semente. Por favor, não o use com sementes que controlam fundos significativos!",
     "value-language-tr": "Turco",
     "nym-network": "NYM Mixnet",

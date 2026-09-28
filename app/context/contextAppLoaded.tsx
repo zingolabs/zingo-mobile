@@ -65,7 +65,6 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   biometrics: false,
   selectServer: SelectServerEnum.auto,
   walletChainName: ChainNameEnum.noneChainName,
-  recoveryWalletInfoOnDevice: false,
   shieldingAmount: 0,
   showSwipeableIcons: true,
   doRefresh: () => {},
