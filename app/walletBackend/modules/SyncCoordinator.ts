@@ -22,7 +22,7 @@
  *
  * To add a new periodic task, push it into taskPromises inside runTaskPromises.
  */
-import { Epoch } from '@app/walletBackend/controller/syncController';
+import { Epoch, isCurrent } from '@app/walletBackend/controller/syncController';
 import { TotalBalanceClass, GlobalConst, ServerType } from '@app/AppState';
 import RPCModule from '@app/RPCModule';
 import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
@@ -62,6 +62,11 @@ export class SyncCoordinator {
   // not re-enter, so overlapping ticks cannot both read the save-required gate.
   tickInFlight: boolean = false;
 
+  // A rescan issued while the lane was held, released when the lane clears.
+  queuedRescan: { kind: 'none' } | { kind: 'queued'; epoch: Epoch } = {
+    kind: 'none',
+  };
+
   syncLaunchFailures: number = 0;
 
   walletConfigPerformanceLevel: RPCPerformanceLevelEnum | undefined;
@@ -98,15 +103,26 @@ export class SyncCoordinator {
 
   async loopTick(): Promise<void> {
     const armedHandle = this.updateTimerID;
-    await this.runTaskPromises();
-    // Re-arm only while this loop is still the live one. A boundary landing
-    // during the tick (clearTimers) sets updateTimerID undefined and stops it.
-    if (this.updateTimerID !== armedHandle) {
-      return;
+    try {
+      await this.runTaskPromises();
+    } finally {
+      // Re-arm only while this loop is still the live one. A boundary landing
+      // during the tick (clearTimers) sets updateTimerID undefined and stops it.
+      if (this.updateTimerID === armedHandle) {
+        this.timers = this.timers.filter(t => t !== armedHandle);
+        this.updateTimerID = undefined;
+        this.armNextTick();
+      }
     }
-    this.timers = this.timers.filter(t => t !== armedHandle);
-    this.updateTimerID = undefined;
-    this.armNextTick();
+  }
+
+  // Runs the task on the next macrotask unless an invalidating boundary passes first.
+  private deferUnder(epoch: Epoch, task: () => Promise<void>): void {
+    setTimeout(async () => {
+      if (isCurrent(epoch, this.controllerEpoch)) {
+        await task();
+      }
+    }, 0);
   }
 
   async runTaskPromises(): Promise<void> {
@@ -276,10 +292,12 @@ export class SyncCoordinator {
       return;
     }
     // Single in-flight command (ADR 0017): a launch and a rescan share one lane.
-    // A rescan issued while a sync is in flight is dropped, not run beside it,
-    // so its finally can no longer release the launch's lock. The caller
-    // re-issues once the lane clears.
+    // A rescan issued while the lane is held waits in queuedRescan, and the
+    // holder's finally releases it.
     if (this.refreshSyncLock) {
+      if (fullRescan) {
+        this.queuedRescan = { kind: 'queued', epoch: this.controllerEpoch };
+      }
       return;
     }
     this.refreshSyncLock = true;
@@ -339,6 +357,11 @@ export class SyncCoordinator {
       }
     } finally {
       this.refreshSyncLock = false;
+      const queued = this.queuedRescan;
+      this.queuedRescan = { kind: 'none' };
+      if (queued.kind === 'queued') {
+        this.deferUnder(queued.epoch, () => this.refreshSync(true));
+      }
     }
   }
 
@@ -355,7 +378,7 @@ export class SyncCoordinator {
       const returnStatus: string = await RPCModule.statusSyncInfo();
       // A boundary during the read (a server switch) bumped the epoch: this
       // snapshot was begun under the old server, drop it unread.
-      if (issuedEpoch !== this.controllerEpoch) {
+      if (!isCurrent(issuedEpoch, this.controllerEpoch)) {
         return;
       }
       if (Date.now() - start > 4000) {
@@ -453,24 +476,15 @@ export class SyncCoordinator {
         returnPoll.toLowerCase().startsWith('sync task has not been launched')
       ) {
         console.log('SYNC POLL -> RUN SYNC', returnPoll);
-        setTimeout(async () => {
-          if (issuedEpoch !== this.controllerEpoch) return;
-          await this.refreshSync();
-        }, 0);
+        this.deferUnder(issuedEpoch, () => this.refreshSync());
         return;
       }
 
       if (returnPoll.toLowerCase().startsWith('sync task is not complete')) {
         console.log('SYNC POLL -> FETCH STATUS', returnPoll);
-        setTimeout(async () => {
-          if (issuedEpoch !== this.controllerEpoch) return;
-          await this.fetchSyncStatus();
-        }, 0);
+        this.deferUnder(issuedEpoch, () => this.fetchSyncStatus());
         console.log('SYNC POLL -> RUN SYNC', returnPoll);
-        setTimeout(async () => {
-          if (issuedEpoch !== this.controllerEpoch) return;
-          await this.refreshSync();
-        }, 0);
+        this.deferUnder(issuedEpoch, () => this.refreshSync());
         return;
       }
 
@@ -508,10 +522,7 @@ export class SyncCoordinator {
       console.log('SYNC POLL', sp);
 
       console.log('SYNC POLL -> FETCH STATUS');
-      setTimeout(async () => {
-        if (issuedEpoch !== this.controllerEpoch) return;
-        await this.fetchSyncStatus();
-      }, 0);
+      this.deferUnder(issuedEpoch, () => this.fetchSyncStatus());
     } catch (error) {
       console.log(`Critical Error sync poll ${error}`);
       this.config.onError(`Error sync poll: ${error}`);

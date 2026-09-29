@@ -291,6 +291,25 @@ describe('SyncCoordinator seam-A fence — scheduling machine, current behavior'
     await c.clearTimers();
   });
 
+  it('Tests that a rescan runs once the lane clears when the user issues it during a sync launch.', async () => {
+    const launch = deferred<string>();
+    bridge.runSyncProcess.mockReturnValue(launch.promise);
+    bridge.runRescanProcess.mockResolvedValue('Launching rescan...');
+    const c = new SyncCoordinator(fakeConfig(), fakeDataService());
+
+    const sync = c.refreshSync();
+    await flushPromises();
+    await c.refreshSync(true);
+    launch.resolve('Launching sync task...');
+    await sync;
+    await jest.advanceTimersByTimeAsync(0);
+    await flushPromises();
+
+    expect(bridge.runRescanProcess).toHaveBeenCalledTimes(1);
+
+    await c.clearTimers();
+  });
+
   describe('A.8: save-required gate — three branches', () => {
     it('save not required pushes only the poll', async () => {
       const ds = fakeDataService();

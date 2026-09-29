@@ -14,6 +14,10 @@ import { FfiErrorCode } from '@app/walletBackend/ffi';
 
 export type Epoch = number;
 
+// Work issued under an epoch applies only while that epoch is still current.
+export const isCurrent = (issued: Epoch, current: Epoch): boolean =>
+  issued === current;
+
 // The catalog keys the controller surfaces. Resolved to prose only at the
 // display edge (ADR 0002); this core module holds keys, never prose.
 export type SyncControllerErrorKey =
@@ -117,7 +121,7 @@ const failed = (
 // reconcile: pure and total. The stale-epoch drop is the first branch, so a
 // result issued before an invalidating boundary is discarded unread.
 export const reconcile = (m: SyncMachine, obs: Observation): SyncMachine => {
-  if (obs.issuedEpoch !== m.epoch) {
+  if (!isCurrent(obs.issuedEpoch, m.epoch)) {
     return m;
   }
 
