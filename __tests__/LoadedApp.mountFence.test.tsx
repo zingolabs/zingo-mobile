@@ -105,11 +105,12 @@ const netInfoUnsubscribe = jest.fn();
 
 // appStateStatus moved off container state to the UI atom; the fg/bg handler
 // reads its `prior` from here, so the test seeds the atom, not setState.
-function controllerStoreOf(instance: LoadedAppClass): ReturnType<
-  typeof createStore
-> {
-  return (instance as unknown as { controllerStore: ReturnType<typeof createStore> })
-    .controllerStore;
+function controllerStoreOf(
+  instance: LoadedAppClass,
+): ReturnType<typeof createStore> {
+  return (
+    instance as unknown as { controllerStore: ReturnType<typeof createStore> }
+  ).controllerStore;
 }
 
 type DrawerProps = StackScreenProps<AppStackParamList, RouteEnum.LoadedApp>;
@@ -147,9 +148,7 @@ async function flushMicrotasks(times = 100): Promise<void> {
 async function mountCommitted(
   params?: Partial<AppStackParamList[RouteEnum.LoadedApp]>,
 ) {
-  const utils = render(
-    <LoadedApp {...makeDrawerProps(params)} />,
-  );
+  const utils = render(<LoadedApp {...makeDrawerProps(params)} />);
   await act(async () => {
     await flushMicrotasks();
   });
@@ -168,7 +167,9 @@ function routePresent(
 ): boolean {
   return (
     utils.UNSAFE_root.findAll(
-      n => (n.type as unknown as string) === 'MockNavRoute' && n.props.name === name,
+      n =>
+        (n.type as unknown as string) === 'MockNavRoute' &&
+        n.props.name === name,
     ).length > 0
   );
 }
@@ -340,9 +341,7 @@ describe('LoadedApp seam-B mount fence — current container behavior', () => {
 
       expect(mockNavigation.reset).toHaveBeenCalledWith(
         expect.objectContaining({
-          routes: [
-            expect.objectContaining({ name: RouteEnum.LoadingApp }),
-          ],
+          routes: [expect.objectContaining({ name: RouteEnum.LoadingApp })],
         }),
       );
     });

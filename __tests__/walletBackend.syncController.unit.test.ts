@@ -30,7 +30,10 @@ describe('syncController — reconcile poll mapping', () => {
   });
 
   it("'not launched' returns sync to idle", () => {
-    const m: SyncMachine = { ...fresh(), sync: { kind: 'syncing', percent: 40 } };
+    const m: SyncMachine = {
+      ...fresh(),
+      sync: { kind: 'syncing', percent: 40 },
+    };
     const out = reconcile(m, {
       kind: 'poll',
       issuedEpoch: 0,
@@ -40,7 +43,10 @@ describe('syncController — reconcile poll mapping', () => {
   });
 
   it("'not complete' is syncing and keeps the last percent", () => {
-    const m: SyncMachine = { ...fresh(), sync: { kind: 'syncing', percent: 40 } };
+    const m: SyncMachine = {
+      ...fresh(),
+      sync: { kind: 'syncing', percent: 40 },
+    };
     const out = reconcile(m, {
       kind: 'poll',
       issuedEpoch: 0,
@@ -60,7 +66,10 @@ describe('syncController — reconcile poll mapping', () => {
   });
 
   it('reaching the tip returns sync to idle', () => {
-    const m: SyncMachine = { ...fresh(), sync: { kind: 'syncing', percent: 99 } };
+    const m: SyncMachine = {
+      ...fresh(),
+      sync: { kind: 'syncing', percent: 99 },
+    };
     const out = reconcile(m, {
       kind: 'poll',
       issuedEpoch: 0,
@@ -102,7 +111,11 @@ describe('syncController — reconcile command acks clear the in-flight slot', (
 
   it('a changeServer ack sets configuredServer and clears the slot', () => {
     const target = 'https://backup.example:443';
-    const issued = issueCommand(fresh(), { kind: 'changeServer', target }, 1_000);
+    const issued = issueCommand(
+      fresh(),
+      { kind: 'changeServer', target },
+      1_000,
+    );
     const out = reconcile(issued, {
       kind: 'commandAck',
       issuedEpoch: issued.epoch,
@@ -186,7 +199,11 @@ describe('syncController — issueCommand serializes writes', () => {
 
   it('drops a poll issued before a changeServer bump', () => {
     const target = 'https://backup.example:443';
-    const switched = issueCommand(fresh(), { kind: 'changeServer', target }, 1_000);
+    const switched = issueCommand(
+      fresh(),
+      { kind: 'changeServer', target },
+      1_000,
+    );
     const out = reconcile(switched, {
       kind: 'poll',
       issuedEpoch: switched.epoch - 1, // stamped under the pre-switch epoch

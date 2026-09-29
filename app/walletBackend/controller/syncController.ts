@@ -27,7 +27,11 @@ export type SyncControllerErrorKey =
 export type SyncState =
   | { kind: 'idle' }
   | { kind: 'syncing'; percent: number }
-  | { kind: 'error'; errorKey: SyncControllerErrorKey; consecutiveFailures: number }
+  | {
+      kind: 'error';
+      errorKey: SyncControllerErrorKey;
+      consecutiveFailures: number;
+    }
   | { kind: 'persistentFailure'; errorKey: SyncControllerErrorKey };
 
 export type Command =

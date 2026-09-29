@@ -126,8 +126,9 @@ function makeProps(): React.ComponentProps<typeof LoadingAppClass> {
 function instanceOf(
   utils: ReturnType<typeof render>,
 ): InstanceType<typeof LoadingAppClass> {
-  return utils.UNSAFE_root.findByType(LoadingAppClass)
-    .instance as InstanceType<typeof LoadingAppClass>;
+  return utils.UNSAFE_root.findByType(LoadingAppClass).instance as InstanceType<
+    typeof LoadingAppClass
+  >;
 }
 
 describe('LoadingApp boot restructure — current boot behavior', () => {

@@ -443,7 +443,9 @@ describe('SyncCoordinator seam-A fence — scheduling machine, current behavior'
     // Fixed (ticket 12): no lifecycle method ran from the data-fetch catch, so the
     // loop was not rebuilt mid-tick. fetchInfoAndServerHeight runs once for the
     // batch, never again from a re-driven configure(); the next tick retries.
-    expect((ds.fetchInfoAndServerHeight as jest.Mock).mock.calls.length).toBe(1);
+    expect((ds.fetchInfoAndServerHeight as jest.Mock).mock.calls.length).toBe(
+      1,
+    );
     expect(config.onError).toHaveBeenCalledTimes(2);
 
     await c.clearTimers();

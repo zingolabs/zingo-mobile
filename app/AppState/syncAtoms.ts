@@ -43,7 +43,11 @@ export const snapshotObservation = (
   ss: RPCSyncStatusType,
 ): Observation => {
   if (!ss.scan_ranges || ss.scan_ranges.length === 0) {
-    return { kind: 'poll', issuedEpoch: epoch, result: { kind: 'notLaunched' } };
+    return {
+      kind: 'poll',
+      issuedEpoch: epoch,
+      result: { kind: 'notLaunched' },
+    };
   }
   const percent =
     ss.percentage_total_outputs_scanned ??

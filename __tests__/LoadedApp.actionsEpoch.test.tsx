@@ -67,11 +67,7 @@ const { AppState, Linking } =
 
 import { LoadedApp, LoadedAppClass } from '@app/LoadedApp';
 import { resolveTriggerGate } from '@app/services/gateController';
-import {
-  ChainNameEnum,
-  LaunchingModeEnum,
-  RouteEnum,
-} from '@app/AppState';
+import { ChainNameEnum, LaunchingModeEnum, RouteEnum } from '@app/AppState';
 import { StackScreenProps } from '@react-navigation/stack';
 import { AppStackParamList } from '@app/types';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
@@ -112,9 +108,7 @@ async function flushMicrotasks(times = 100): Promise<void> {
 }
 
 async function mountCommitted() {
-  const utils = render(
-    <LoadedApp {...makeDrawerProps()} />,
-  );
+  const utils = render(<LoadedApp {...makeDrawerProps()} />);
   await act(async () => {
     await flushMicrotasks();
   });

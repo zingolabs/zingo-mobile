@@ -73,8 +73,12 @@ const Button: React.FunctionComponent<ButtonProps> = ({
               }
             : type === ButtonTypeEnum.Warning
               ? {
-                  backgroundColor: disabled ? colors.bgSecondaryDisabled : colors.bgWarning,
-                  borderColor: disabled ? colors.borderAccentDisabled : colors.borderWarning,
+                  backgroundColor: disabled
+                    ? colors.bgSecondaryDisabled
+                    : colors.bgWarning,
+                  borderColor: disabled
+                    ? colors.borderAccentDisabled
+                    : colors.borderWarning,
                   borderWidth: 2,
                   width: twoButtons ? '40%' : '80%',
                 }

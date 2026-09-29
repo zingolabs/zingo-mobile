@@ -77,10 +77,7 @@ import {
   LaunchingModeEnum,
   RouteEnum,
 } from '@app/AppState';
-import {
-  appStateStatusAtom,
-  addTagModalAtom,
-} from '@app/AppState/uiAtoms';
+import { appStateStatusAtom, addTagModalAtom } from '@app/AppState/uiAtoms';
 import { syncStatusAtom } from '@app/AppState/syncAtoms';
 import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
 import { StackScreenProps } from '@react-navigation/stack';
@@ -95,11 +92,12 @@ const syncing = (percent: number): RPCSyncStatusType => ({
   percentage_total_outputs_scanned: percent,
 });
 
-function controllerStoreOf(instance: LoadedAppClass): ReturnType<
-  typeof createStore
-> {
-  return (instance as unknown as { controllerStore: ReturnType<typeof createStore> })
-    .controllerStore;
+function controllerStoreOf(
+  instance: LoadedAppClass,
+): ReturnType<typeof createStore> {
+  return (
+    instance as unknown as { controllerStore: ReturnType<typeof createStore> }
+  ).controllerStore;
 }
 
 function captureAppStateHandler(): (s: string) => Promise<void> {
@@ -136,9 +134,7 @@ async function flushMicrotasks(times = 100): Promise<void> {
 }
 
 async function mountCommitted() {
-  const utils = render(
-    <LoadedApp {...makeDrawerProps()} />,
-  );
+  const utils = render(<LoadedApp {...makeDrawerProps()} />);
   await act(async () => {
     await flushMicrotasks();
   });

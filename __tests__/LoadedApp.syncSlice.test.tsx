@@ -70,11 +70,7 @@ const { AppState, Linking } =
 
 import { LoadedApp, LoadedAppClass } from '@app/LoadedApp';
 import { resolveTriggerGate } from '@app/services/gateController';
-import {
-  ChainNameEnum,
-  LaunchingModeEnum,
-  RouteEnum,
-} from '@app/AppState';
+import { ChainNameEnum, LaunchingModeEnum, RouteEnum } from '@app/AppState';
 import {
   walletViewSourceAtom,
   walletViewAtom,
@@ -94,11 +90,12 @@ const syncing = (percent: number): RPCSyncStatusType => ({
   percentage_total_outputs_scanned: percent,
 });
 
-function controllerStoreOf(instance: LoadedAppClass): ReturnType<
-  typeof createStore
-> {
-  return (instance as unknown as { controllerStore: ReturnType<typeof createStore> })
-    .controllerStore;
+function controllerStoreOf(
+  instance: LoadedAppClass,
+): ReturnType<typeof createStore> {
+  return (
+    instance as unknown as { controllerStore: ReturnType<typeof createStore> }
+  ).controllerStore;
 }
 
 type DrawerProps = StackScreenProps<AppStackParamList, RouteEnum.LoadedApp>;
@@ -129,9 +126,7 @@ async function flushMicrotasks(times = 100): Promise<void> {
 }
 
 async function mountCommitted() {
-  const utils = render(
-    <LoadedApp {...makeDrawerProps()} />,
-  );
+  const utils = render(<LoadedApp {...makeDrawerProps()} />);
   await act(async () => {
     await flushMicrotasks();
   });
@@ -240,7 +235,8 @@ describe('live-wiring — the container routes snapshots through reconcile', () 
 
   it('the held machine is seeded to idle at mount', async () => {
     const { instance } = await mountCommitted();
-    const machine: SyncMachine = controllerStoreOf(instance).get(syncMachineAtom);
+    const machine: SyncMachine =
+      controllerStoreOf(instance).get(syncMachineAtom);
     expect(machine.sync).toEqual({ kind: 'idle' });
   });
 });
