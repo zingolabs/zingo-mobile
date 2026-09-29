@@ -7,7 +7,7 @@ How the engineering skills should consume this repo's domain documentation when 
 - **`CONTEXT.md`** at the repo root.
 - **`docs/adr/zingo-mobile/`** — read ADRs that touch the area you're about to work in.
 
-`docs/adr/` is a submodule pointer to [zingolabs/zingo-adrs](https://github.com/zingolabs/zingo-adrs), so it is empty until you run `git submodule update --init docs/adr`. zingo-mobile's own records sit under `docs/adr/zingo-mobile/`; the org-scoped records that bind every zingolabs repository sit at the top of `docs/adr/`, and other repositories' scopes (such as `docs/adr/zingolib/`) sit beside ours.
+`docs/adr/` is a submodule of zingo-adrs. The [zingo-adrs README](https://github.com/zingolabs/zingo-adrs#pointing-a-code-repository-at-zingo-adrs) explains how to initialise it and how its scopes map onto `docs/adr/`.
 
 If any of these files don't exist, **proceed silently**. Don't flag their absence; don't suggest creating them upfront. The producer skill (`/grill-with-docs`) creates glossary terms lazily when they actually get resolved.
 
@@ -27,7 +27,7 @@ If any of these files don't exist, **proceed silently**. Don't flag their absenc
 
 ## Proposing a record
 
-Records are never proposed in this repository. Open a pull request against `dev` in zingo-adrs that adds `zingo-mobile/NNNN-kebab-title.md`, following the record shape its README describes. Then advance this repository's pointer with `git submodule update --remote docs/adr` and commit the new hash.
+Records are never proposed in this repository. The [zingo-adrs README](https://github.com/zingolabs/zingo-adrs#proposing-a-record) explains how, and a zingo-mobile record goes in the `zingo-mobile/` scope there.
 
 ## Use the glossary's vocabulary
 
