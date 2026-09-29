@@ -87,6 +87,7 @@ import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
 import { StackScreenProps } from '@react-navigation/stack';
 import { AppStackParamList } from '@app/types';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
+import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 
 const resolveTriggerGateMock = resolveTriggerGate as jest.Mock;
 const netInfoUnsubscribe = jest.fn();
@@ -271,5 +272,16 @@ describe('whole-tree re-render proof', () => {
       instance.setShieldingAmount(999);
     });
     expect(renderSpy).toHaveBeenCalled();
+  });
+
+  it('Tests that the container stays asleep when a balance poll changes the balance.', async () => {
+    const { instance } = await mountCommitted();
+    const renderSpy = jest.spyOn(instance, 'render');
+
+    act(() => {
+      instance.setTotalBalance(mockTotalBalance);
+    });
+
+    expect(renderSpy).not.toHaveBeenCalled();
   });
 });
