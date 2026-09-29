@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Animated } from 'react-native';
-import { isEqual } from 'lodash';
 import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
-import { scanInProgress } from '@app/walletBackend/utils/syncProgress';
+import { scanProgress } from '@app/walletBackend/utils/syncProgress';
 
 /**
  * Derives display-ready sync state from the raw RPC sync status.
@@ -31,34 +30,10 @@ export function useSyncStatus({
 }: UseSyncStatusInput): UseSyncStatusResult {
   const opacityValue = useRef(new Animated.Value(1)).current;
   const animationRef = useRef<Animated.CompositeAnimation | null>(null);
-  const [percentageOutputsScanned, setPercentageOutputsScanned] =
-    useState<number>(0);
-  const [syncInProgress, setSyncInProgress] = useState<boolean>(true);
   const [viewSyncStatus, setViewSyncStatus] = useState<boolean>(false);
-
-  useEffect(() => {
-    if (
-      !syncingStatus ||
-      isEqual(syncingStatus, {} as RPCSyncStatusType) ||
-      (!!syncingStatus.scan_ranges && syncingStatus.scan_ranges.length === 0) ||
-      syncingStatus.percentage_total_outputs_scanned === 0
-    ) {
-      setPercentageOutputsScanned(0);
-      setSyncInProgress(true);
-    } else {
-      setPercentageOutputsScanned(
-        syncingStatus.percentage_total_outputs_scanned ??
-          syncingStatus.percentage_total_blocks_scanned ??
-          0,
-      );
-      setSyncInProgress(scanInProgress(syncingStatus));
-    }
-  }, [
-    syncingStatus,
-    syncingStatus.percentage_total_outputs_scanned,
-    syncingStatus.percentage_total_blocks_scanned,
-    syncingStatus.scan_ranges,
-  ]);
+  const progress = scanProgress(syncingStatus);
+  const percentageOutputsScanned = progress.percent;
+  const syncInProgress = progress.kind === 'scanning';
 
   useEffect(() => {
     let timeoutId: ReturnType<typeof setTimeout> | undefined;
