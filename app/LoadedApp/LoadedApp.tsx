@@ -95,7 +95,7 @@ import {
   seedModalOpenAtom,
   addTagModalAtom,
 } from '@app/AppState/uiAtoms';
-import { classifyLifecycle } from '@app/AppState/lifecycle';
+import { classifyLifecycle, toAppStateStatus } from '@app/AppState/lifecycle';
 import { changes, lastUnified } from '@app/AppState/statePatch';
 import SettingsFileImpl from '@app/services/SettingsFileImpl';
 import { PriceTrafficDriver } from '@ui/widgets/PriceFetcher';
@@ -777,7 +777,7 @@ export class LoadedAppClass extends Component<
       appStateStatusAtom,
       Platform.OS === GlobalConst.platformOSios
         ? AppStateStatusEnum.active
-        : (AppState.currentState as AppStateStatusEnum),
+        : toAppStateStatus(AppState.currentState),
     );
     this.publishWalletView();
   }
@@ -825,7 +825,7 @@ export class LoadedAppClass extends Component<
       EventListenerEnum.change,
       async nextAppState => {
         const prior = this.controllerStore.get(appStateStatusAtom);
-        const next = nextAppState as AppStateStatusEnum;
+        const next = toAppStateStatus(nextAppState);
         const transition = classifyLifecycle(Platform.OS, prior, next);
         if (transition === 'ignore') {
           return;
