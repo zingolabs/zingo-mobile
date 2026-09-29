@@ -87,7 +87,6 @@ import Utils from '@app/utils';
 import { safeSnapToIndex } from '@app/utils/safeSnapToIndex';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
-import PriceFetcher from '@ui/widgets/PriceFetcher';
 import Header from '@ui/widgets/Header';
 import BottomSheet, { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
@@ -1694,11 +1693,6 @@ const Send: React.FunctionComponent<SendProps> = ({
                             }
                             privacy={privacy}
                           />
-                        )}
-                        {zecPrice.date > 0 && (
-                          <View style={{ marginLeft: inputZec ? 5 : 2 }}>
-                            <PriceFetcher backgroundColor={colors.bgSurface} />
-                          </View>
                         )}
                       </>
                     )}
