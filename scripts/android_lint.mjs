@@ -19,22 +19,14 @@ const isWindows = process.platform === 'win32';
 const variant = process.argv[2] ?? 'prodRelease';
 const task = `:app:lint${variant[0].toUpperCase()}${variant.slice(1)}`;
 
-// The app module compiles the UniFFI bindings. Generate them first. The
-// shim builds for the host; no NDK.
-console.log('\nGenerating UniFFI bindings...');
-const generated = spawnSync(
-  process.execPath,
-  [join(SCRIPTS_DIR, 'generate_kotlin_bindings.mjs'), '--variants', 'release'],
-  { stdio: 'inherit' },
-);
-if (generated.status !== 0) {
-  process.exit(generated.status ?? 1);
-}
+// The app module compiles the UniFFI bindings, which the Binding Layer build
+// in the zingolib submodule produces. One ABI is enough for lint.
+const BINDING_LAYER_ABI = 'x86_64';
 
 console.log(`\nLinting ${variant}...`);
 // Node refuses to spawn .bat/.cmd without a shell (CVE-2024-27980).
 const gradlew = join(ANDROID_DIR, isWindows ? 'gradlew.bat' : 'gradlew');
-const { status } = spawnSync(gradlew, [task], {
+const { status } = spawnSync(gradlew, [task, `-PbindingLayerAbi=${BINDING_LAYER_ABI}`], {
   cwd: ANDROID_DIR,
   stdio: 'inherit',
   shell: isWindows,

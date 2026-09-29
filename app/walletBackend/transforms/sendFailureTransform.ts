@@ -36,8 +36,9 @@ const DUPLICATE_NULLIFIER_MARKERS = [
 
 /**
  * The mobile-owned refusal marker (#1229): the display prefix of our own
- * `ZingolibError::Mixnet`, minted in rust/lib/src/lib.rs. It survives any
- * zingolib rewording, because both sides of it live in this repository.
+ * `ZingolibError::Mixnet`, minted in zingolib/zingo-ffi/lib/src/lib.rs. It
+ * survives any zingolib rewording, because the submodule pin moves both sides
+ * of it together.
  */
 const OWNED_MIXNET_MARKER = 'Error: mixnet:';
 

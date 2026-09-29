@@ -61,6 +61,18 @@ git submodule update --init docs/adr
 git submodule update --remote docs/adr
 ```
 
+## The Binding Layer
+
+The Rust wallet and the mixnet proxy, with their Kotlin and Swift bindings,
+live in [zingolabs/zingolib](https://github.com/zingolabs/zingolib). This
+repository pins them as a submodule at `zingolib/` (ADR zingo-mobile/0016).
+The Android build and the integration harnesses in `rust/` build from that
+checkout, so initialise it before any build.
+
+```sh
+git submodule update --init zingolib
+```
+
 ## Testing
 ### Prerequisites
 Integration tests and end-to-end tests require a regtest network. The test harness

@@ -10,6 +10,7 @@ import UIKit
 
 import React
 import XCTest
+import ZingoBindings
 
 enum Seeds {
     static let HOSPITAL = "hospital museum valve antique skate museum unfold vocal weird milk scale social vessel identify crowd hospital control album rib bulb path oven civil tank"
