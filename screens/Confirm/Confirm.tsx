@@ -37,8 +37,8 @@ import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
 
 import { AppDrawerParamList } from '@app/types';
 import Utils from '@app/utils';
+import { fiatEligible } from '@app/price/fiatQuote';
 import {
-  ChainNameEnum,
   GlobalConst,
   ScreenEnum,
   RouteEnum,
@@ -88,11 +88,12 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     privacy,
     addLastSnackbar,
     server,
+    selectServer,
     biometrics,
   } = context;
   const { colors } = useTheme();
   const screenName = ScreenEnum.Confirm;
-  const isMainChain = server.chainName === ChainNameEnum.mainChainName;
+  const showFiat = fiatEligible(server.chainName, selectServer);
 
   // Audit Issue D — the biometric gate lives at the
   // Confirm screen entry. Mirrors Seed / Ufvk / Settings / Rescan via
@@ -357,7 +358,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                 size={28}
                 smallPrefix={true}
               />
-              {isMainChain && (
+              {showFiat && (
                 <CurrencyAmount
                   amtZec={sendingTotal}
                   price={zecPrice.zecPrice}
@@ -409,7 +410,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                 amtZec={calculatedFee}
                 privacy={privacy}
               />
-              {isMainChain && (
+              {showFiat && (
                 <CurrencyAmount
                   style={{ fontSize: 18 }}
                   amtZec={calculatedFee}
@@ -447,7 +448,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                       amtZec={Utils.parseStringLocaleToNumberFloat(to.amount)}
                       privacy={privacy}
                     />
-                    {isMainChain && (
+                    {showFiat && (
                       <CurrencyAmount
                         style={{ fontSize: 18 }}
                         amtZec={Utils.parseStringLocaleToNumberFloat(to.amount)}
