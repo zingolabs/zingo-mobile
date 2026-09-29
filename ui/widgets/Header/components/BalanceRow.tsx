@@ -208,7 +208,7 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
             </View>
           )}
 
-        {!noBalance && quote.kind === 'quote' && (
+        {showFiat && (
           <Animated.View
             entering={reducedMotion ? FadeIn.duration(REVEAL_MS) : materialize}
             onLayout={e => onUsdRowLayout?.(e.nativeEvent.layout.height)}

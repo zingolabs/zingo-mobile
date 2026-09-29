@@ -37,7 +37,7 @@ import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
 
 import { AppDrawerParamList } from '@app/types';
 import Utils from '@app/utils';
-import { fiatEligible } from '@app/price/fiatQuote';
+import { fiatQuote } from '@app/price/fiatQuote';
 import {
   GlobalConst,
   ScreenEnum,
@@ -93,7 +93,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
   } = context;
   const { colors } = useTheme();
   const screenName = ScreenEnum.Confirm;
-  const showFiat = fiatEligible(server.chainName, selectServer);
+  const quote = fiatQuote(zecPrice, server.chainName, selectServer);
 
   // Audit Issue D — the biometric gate lives at the
   // Confirm screen entry. Mirrors Seed / Ufvk / Settings / Rescan via
@@ -358,11 +358,11 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                 size={28}
                 smallPrefix={true}
               />
-              {showFiat && (
+              {quote.kind === 'quote' && (
                 <CurrencyAmount
                   amtZec={sendingTotal}
-                  price={zecPrice.zecPrice}
-                  priceDate={zecPrice.date}
+                  price={quote.price}
+                  priceDate={quote.date}
                   privacy={false}
                 />
               )}
@@ -410,12 +410,12 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                 amtZec={calculatedFee}
                 privacy={privacy}
               />
-              {showFiat && (
+              {quote.kind === 'quote' && (
                 <CurrencyAmount
                   style={{ fontSize: 18 }}
                   amtZec={calculatedFee}
-                  price={zecPrice.zecPrice}
-                  priceDate={zecPrice.date}
+                  price={quote.price}
+                  priceDate={quote.date}
                   privacy={privacy}
                 />
               )}
@@ -448,12 +448,12 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                       amtZec={Utils.parseStringLocaleToNumberFloat(to.amount)}
                       privacy={privacy}
                     />
-                    {showFiat && (
+                    {quote.kind === 'quote' && (
                       <CurrencyAmount
                         style={{ fontSize: 18 }}
                         amtZec={Utils.parseStringLocaleToNumberFloat(to.amount)}
-                        price={zecPrice.zecPrice}
-                        priceDate={zecPrice.date}
+                        price={quote.price}
+                        priceDate={quote.date}
                         privacy={privacy}
                       />
                     )}
