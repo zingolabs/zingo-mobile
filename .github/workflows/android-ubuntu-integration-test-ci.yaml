@@ -335,8 +335,36 @@ jobs:
           echo "CI_BUILD_TAG=$TAG" >> "$GITHUB_ENV"
           echo "Computed ci-build tag: $TAG"
 
+      # A runner can lose registry egress for minutes at a time (2026-07-25:
+      # four consecutive 60s dial timeouts to registry-1.docker.io cancelled
+      # a whole run through fail-all). Space the attempts across ~13 minutes
+      # to outlast such an outage. The runner's podman rejects `--retry`, so
+      # the loop lives here. A tag that was never published fails on the
+      # first attempt, because waiting cannot make it appear.
       - name: Pull ci-build image
-        run: podman pull docker.io/zingodevops/ci-build:${CI_BUILD_TAG}
+        env:
+          PULL_ATTEMPTS: 9
+          PULL_RETRY_DELAY_SECONDS: 45
+        run: |
+          set -uo pipefail
+          image="docker.io/zingodevops/ci-build:${CI_BUILD_TAG}"
+          for attempt in $(seq 1 "$PULL_ATTEMPTS"); do
+            if podman pull "$image" 2> pull-error.txt; then
+              exit 0
+            fi
+            cat pull-error.txt >&2
+            if grep --quiet --ignore-case --extended-regexp \
+              'manifest unknown|not found|unauthorized|denied' pull-error.txt; then
+              echo "::error::$image is not pullable; not retrying"
+              exit 1
+            fi
+            if [ "$attempt" -lt "$PULL_ATTEMPTS" ]; then
+              echo "Pull attempt $attempt of $PULL_ATTEMPTS failed; retrying in ${PULL_RETRY_DELAY_SECONDS}s"
+              sleep "$PULL_RETRY_DELAY_SECONDS"
+            fi
+          done
+          echo "::error::$image did not pull after $PULL_ATTEMPTS attempts"
+          exit 1
 
       - name: Extract binaries & params from image
         run: |
