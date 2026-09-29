@@ -1,4 +1,8 @@
-export default class TotalBalanceClass {
+import { atom } from 'jotai';
+
+import type { Polled } from './polled';
+
+export type Balance = {
   // Total transparent, confirmed and unconfirmed
   totalTransparentBalance: number;
 
@@ -25,22 +29,13 @@ export default class TotalBalanceClass {
 
   // Total spendable
   totalSpendableBalance: number;
+};
 
-  constructor() {
-    this.totalTransparentBalance = 0;
-    this.totalSaplingBalance = 0;
-    this.totalOrchardBalance = 0;
-    this.totalIronwoodBalance = 0;
-    this.confirmedTransparentBalance = 0;
-    this.confirmedSaplingBalance = 0;
-    this.confirmedOrchardBalance = 0;
-    this.confirmedIronwoodBalance = 0;
-    this.totalSpendableBalance = 0;
-  }
-}
+// The wallet balance as last reported by the native runtime's poll.
+export const balanceAtom = atom<Polled<Balance>>({ kind: 'awaiting' });
 
 const poolPairs = (
-  balance: TotalBalanceClass,
+  balance: Balance,
 ): { total: number; confirmed: number }[] => [
   {
     total: balance.totalIronwoodBalance,
@@ -60,8 +55,8 @@ const poolPairs = (
   },
 ];
 
-export const hasUnconfirmedFunds = (balance: TotalBalanceClass): boolean =>
+export const hasUnconfirmedFunds = (balance: Balance): boolean =>
   poolPairs(balance).some(pool => pool.total !== pool.confirmed);
 
-export const hasFullyUnconfirmedPool = (balance: TotalBalanceClass): boolean =>
+export const hasFullyUnconfirmedPool = (balance: Balance): boolean =>
   poolPairs(balance).some(pool => pool.total > 0 && pool.confirmed === 0);

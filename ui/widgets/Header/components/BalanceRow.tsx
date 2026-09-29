@@ -1,6 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import { TouchableOpacity, View } from 'react-native';
+import { useAtomValue } from 'jotai';
 import Animated, {
   Easing,
   EntryExitAnimationFunction,
@@ -23,7 +24,7 @@ import {
   SnackbarDurationEnum,
   TranslateType,
 } from '@app/AppState';
-import TotalBalanceClass from '@app/AppState/classes/TotalBalanceClass';
+import { balanceAtom } from '@app/AppState/balance';
 import InfoType from '@app/AppState/types/InfoType';
 import ZecPriceType from '@app/AppState/types/ZecPriceType';
 import Utils from '@app/utils';
@@ -60,7 +61,6 @@ type BalanceRowProps = {
     ((msg: string, duration?: SnackbarDurationEnum) => void) | undefined;
   privacy: boolean;
   translate: (key: string) => TranslateType;
-  totalBalance: TotalBalanceClass | null;
   info: InfoType;
   zecPrice: ZecPriceType;
   selectServer: SelectServerEnum;
@@ -83,7 +83,6 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
     addLastSnackbar,
     privacy,
     translate,
-    totalBalance,
     info,
     zecPrice,
     selectServer,
@@ -100,6 +99,7 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
     const navigation = useNavigation<NavigationProp<ParamListBase>>();
     const { colors } = useTheme();
     const reducedMotion = useReducedMotion();
+    const balance = useAtomValue(balanceAtom);
     const showFiat =
       !noBalance &&
       selectServer !== SelectServerEnum.offline &&
@@ -132,22 +132,22 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
               color={colors.fgDefault}
               size={36}
               amtZec={
-                totalBalance
-                  ? totalBalance.totalIronwoodBalance +
-                    totalBalance.totalOrchardBalance +
-                    totalBalance.totalSaplingBalance +
-                    totalBalance.totalTransparentBalance
+                balance.kind === 'polled'
+                  ? balance.latest.totalIronwoodBalance +
+                    balance.latest.totalOrchardBalance +
+                    balance.latest.totalSaplingBalance +
+                    balance.latest.totalTransparentBalance
                   : 0
               }
               privacy={privacy}
               smallPrefix={true}
             />
-            {totalBalance &&
-              (totalBalance.totalOrchardBalance !==
-                totalBalance.confirmedOrchardBalance ||
-                totalBalance.totalIronwoodBalance > 0 ||
-                totalBalance.totalSaplingBalance > 0 ||
-                totalBalance.totalTransparentBalance > 0) && (
+            {balance.kind === 'polled' &&
+              (balance.latest.totalOrchardBalance !==
+                balance.latest.confirmedOrchardBalance ||
+                balance.latest.totalIronwoodBalance > 0 ||
+                balance.latest.totalSaplingBalance > 0 ||
+                balance.latest.totalTransparentBalance > 0) && (
                 <TouchableOpacity
                   onPress={() => {
                     navigation.navigate(RouteEnum.Pools);
@@ -180,10 +180,10 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
         )}
 
         {receivedLegend &&
-          totalBalance &&
-          totalBalance.totalIronwoodBalance +
-            totalBalance.totalOrchardBalance +
-            totalBalance.totalSaplingBalance >
+          balance.kind === 'polled' &&
+          balance.latest.totalIronwoodBalance +
+            balance.latest.totalOrchardBalance +
+            balance.latest.totalSaplingBalance >
             0 && (
             <View
               style={{
@@ -201,9 +201,9 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
                 color={colors.fgAccent}
                 size={14}
                 amtZec={
-                  totalBalance.totalIronwoodBalance +
-                  totalBalance.totalOrchardBalance +
-                  totalBalance.totalSaplingBalance
+                  balance.latest.totalIronwoodBalance +
+                  balance.latest.totalOrchardBalance +
+                  balance.latest.totalSaplingBalance
                 }
                 privacy={privacy}
               />
@@ -222,11 +222,11 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
               priceDate={zecPrice.date}
               price={zecPrice.zecPrice}
               amtZec={
-                totalBalance
-                  ? totalBalance.totalIronwoodBalance +
-                    totalBalance.totalOrchardBalance +
-                    totalBalance.totalSaplingBalance +
-                    totalBalance.totalTransparentBalance
+                balance.kind === 'polled'
+                  ? balance.latest.totalIronwoodBalance +
+                    balance.latest.totalOrchardBalance +
+                    balance.latest.totalSaplingBalance +
+                    balance.latest.totalTransparentBalance
                   : 0
               }
               privacy={privacy}

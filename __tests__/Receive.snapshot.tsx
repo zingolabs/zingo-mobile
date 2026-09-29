@@ -6,6 +6,10 @@ import 'react-native';
 import React from 'react';
 
 import { render } from '@testing-library/react-native';
+import { Provider } from 'jotai';
+import { balanceAtom } from '@app/AppState/balance';
+import { polledMockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
+import { seed, storeWith } from '../.storybook/storeWith';
 import Receive from '@screens/Receive';
 import {
   ContextAppLoadedProvider,
@@ -14,7 +18,6 @@ import {
 import { mockAddresses } from '../__mocks__/dataMocks/mockAddresses';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
-import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AppDrawerParamList } from '@app/types';
 import { RouteEnum } from '@app/AppState';
@@ -41,19 +44,20 @@ describe('Component Receive - test', () => {
     state.addresses = mockAddresses;
     state.translate = mockTranslate;
     state.info = mockInfo;
-    state.totalBalance = mockTotalBalance;
     // The price ring renders only for a Nym-consenting session.
     const onFunction = jest.fn();
     const props = makeDrawerProps();
     const receive = render(
-      <ContextAppLoadedProvider value={state}>
-        <Receive
-          {...props}
-          toggleMenuDrawer={onFunction}
-          alone={false}
-          setAddressBook={onFunction}
-        />
-      </ContextAppLoadedProvider>,
+      <Provider store={storeWith(seed(balanceAtom, polledMockTotalBalance))}>
+        <ContextAppLoadedProvider value={state}>
+          <Receive
+            {...props}
+            toggleMenuDrawer={onFunction}
+            alone={false}
+            setAddressBook={onFunction}
+          />
+        </ContextAppLoadedProvider>
+      </Provider>,
     );
     expect(receive.toJSON()).toMatchSnapshot();
   });

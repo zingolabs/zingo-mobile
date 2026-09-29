@@ -11,7 +11,6 @@
  * the self-rescheduling poll loop retries on its next tick (ADR 0017).
  */
 import {
-  TotalBalanceClass,
   InfoType,
   ChainNameEnum,
   CurrencyNameEnum,
@@ -22,6 +21,7 @@ import {
   TransparentAddressClass,
   foldBlockSpacing,
 } from '@app/AppState';
+import type { Balance } from '@app/AppState/balance';
 import RPCModule from '@app/RPCModule';
 import { RPCUnifiedAddressType } from '@app/walletBackend/types/RPCUnifiedAddressType';
 import { RPCBalancesType } from '@app/walletBackend/types/RPCBalancesType';
@@ -116,7 +116,7 @@ export class DataService {
       }
       const balanceJSON: RPCBalancesType = await JSON.parse(balanceStr);
 
-      const balance: TotalBalanceClass = {
+      const balance: Balance = {
         totalOrchardBalance: (balanceJSON.total_orchard_balance || 0) / 10 ** 8,
         totalIronwoodBalance:
           (balanceJSON.total_ironwood_balance || 0) / 10 ** 8,
@@ -133,7 +133,7 @@ export class DataService {
           (balanceJSON.confirmed_transparent_balance || 0) / 10 ** 8,
         totalSpendableBalance: (spendableJSON.spendable_balance || 0) / 10 ** 8,
       };
-      this.config.onBalanceChanged(balance);
+      this.config.onBalanceChanged({ kind: 'polled', latest: balance });
     } catch (error) {
       console.log(`Critical Error balances ${error}`);
       this.config.onError(`Error balance: ${error}`);

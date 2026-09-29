@@ -87,7 +87,8 @@ import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
 import { StackScreenProps } from '@react-navigation/stack';
 import { AppStackParamList } from '@app/types';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
-import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
+import { polledMockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
+import { balanceAtom } from '@app/AppState/balance';
 
 const resolveTriggerGateMock = resolveTriggerGate as jest.Mock;
 const netInfoUnsubscribe = jest.fn();
@@ -279,9 +280,21 @@ describe('whole-tree re-render proof', () => {
     const renderSpy = jest.spyOn(instance, 'render');
 
     act(() => {
-      instance.setTotalBalance(mockTotalBalance);
+      instance.setBalance(polledMockTotalBalance);
     });
 
     expect(renderSpy).not.toHaveBeenCalled();
+  });
+
+  it('Tests that the balance atom holds the polled balance when the backend reports one.', async () => {
+    const { instance } = await mountCommitted();
+    const store = controllerStoreOf(instance);
+    expect(store.get(balanceAtom)).toEqual({ kind: 'awaiting' });
+
+    act(() => {
+      instance.setBalance(polledMockTotalBalance);
+    });
+
+    expect(store.get(balanceAtom)).toEqual(polledMockTotalBalance);
   });
 });

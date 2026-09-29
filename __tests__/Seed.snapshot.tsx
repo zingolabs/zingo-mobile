@@ -17,7 +17,6 @@ import { RouteEnum, SeedActionEnum } from '@app/AppState';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockWallet } from '../__mocks__/dataMocks/mockWallet';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
-import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AppDrawerParamList } from '@app/types';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
@@ -44,7 +43,6 @@ describe('Component Seed - test', () => {
   stateLoaded.translate = mockTranslate;
   stateLoaded.birthday = mockWallet.birthday || 0;
   stateLoaded.info = mockInfo;
-  stateLoaded.totalBalance = mockTotalBalance;
   const onOk = jest.fn();
   const onCancel = jest.fn();
   let props = makeDrawerProps(SeedActionEnum.view);
@@ -85,7 +83,6 @@ describe('Component Seed - test', () => {
   });
   const contextLoading = defaultAppContextLoading;
   contextLoading.translate = mockTranslate;
-  //contextLoading.totalBalance = mockTotalBalance;
   test('Seed New - snapshot', () => {
     const seed = render(
       <ContextAppLoadingProvider value={contextLoading}>

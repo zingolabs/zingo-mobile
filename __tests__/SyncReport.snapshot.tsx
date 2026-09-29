@@ -16,7 +16,6 @@ import { syncStatusAtom } from '@app/AppState/syncAtoms';
 import { mockWallet } from '../__mocks__/dataMocks/mockWallet';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
-import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import mockSyncingStatus from '../__mocks__/dataMocks/mockSyncingStatus';
 import { mockNetInfo } from '../__mocks__/dataMocks/mockNetInfo';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -43,7 +42,6 @@ describe('Component SyncReport - test', () => {
   const state = { ...defaultAppContextLoaded };
   state.translate = mockTranslate;
   state.info = mockInfo;
-  state.totalBalance = mockTotalBalance;
   state.birthday = mockWallet.birthday || 0;
   state.netInfo = mockNetInfo;
   const props = makeDrawerProps();

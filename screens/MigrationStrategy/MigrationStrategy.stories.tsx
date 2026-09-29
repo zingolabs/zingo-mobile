@@ -1,9 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
+import { balanceAtom } from '@app/AppState/balance';
+import { seed } from '../../.storybook/storeWith';
 import { RouteEnum } from '@app/AppState';
 import MigrationStrategy from './MigrationStrategy';
 import {
   screenProps,
   withAppContext,
+  withAtoms,
   withBottomSheet,
   withNavigation,
 } from '../../.storybook/storyDecorators';
@@ -11,14 +14,15 @@ import {
   mixnetConnecting,
   mixnetLost,
   mockInfo,
-  mockTotalBalance,
+  polledMockBalance,
 } from '../../.storybook/storyMocks';
 
 const meta: Meta<typeof MigrationStrategy> = {
   title: 'Migration/Strategy',
   component: MigrationStrategy,
   decorators: [
-    withAppContext({ info: mockInfo, totalBalance: mockTotalBalance }),
+    withAppContext({ info: mockInfo }),
+    withAtoms(seed(balanceAtom, polledMockBalance)),
     withNavigation,
     withBottomSheet,
   ],
@@ -42,7 +46,6 @@ export const NymSheetConnecting: Story = {
   decorators: [
     withAppContext({
       info: mockInfo,
-      totalBalance: mockTotalBalance,
       mixnetView: mixnetConnecting,
     }),
   ],
@@ -54,7 +57,6 @@ export const NymSheetLost: Story = {
   decorators: [
     withAppContext({
       info: mockInfo,
-      totalBalance: mockTotalBalance,
       mixnetView: mixnetLost,
     }),
   ],
