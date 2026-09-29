@@ -1,0 +1,52 @@
+name: Binding Layer for Android
+description: >
+  Restores one ABI of the Binding Layer that android-build.yaml built, and
+  points Gradle at it, so the app build packages it without rebuilding it.
+  Call it once per ABI; the ABIs share one output directory.
+
+inputs:
+  abi:
+    description: The Android ABI to restore.
+    required: true
+  cache-key:
+    description: The key from create-cache-key.yaml.
+    required: true
+
+runs:
+  using: composite
+  steps:
+    # The Actions cache is evictable under the repo quota's LRU policy, so
+    # the restore falls back to the build's durable artifact, and only the
+    # final presence check can fail the job.
+    - name: Binding Layer cache
+      id: binding-layer-cache
+      uses: actions/cache/restore@v6
+      with:
+        path: zingolib/bindings/android/build/binding-layer
+        key: binding-layer-android-${{ inputs.abi }}-${{ inputs.cache-key }}
+
+    - name: Binding Layer artifact fallback
+      if: ${{ steps.binding-layer-cache.outputs.cache-hit != 'true' }}
+      continue-on-error: true
+      uses: actions/download-artifact@v4
+      with:
+        name: binding-layer-android-${{ inputs.abi }}-${{ inputs.cache-key }}
+        path: zingolib/bindings/android/build/binding-layer
+
+    - name: Verify the Binding Layer is present
+      shell: bash
+      env:
+        OUTPUT: zingolib/bindings/android/build/binding-layer
+        ABI: ${{ inputs.abi }}
+      run: |
+        set -eu
+        test -f "$OUTPUT/jniLibs/$ABI/libuniffi_zingo.so"
+        test -f "$OUTPUT/jniLibs/$ABI/libzingo_nym_proxy_ffi.so"
+        test -f "$OUTPUT/kotlin/uniffi/zingo/zingo.kt"
+        test -f "$OUTPUT/kotlin/uniffi/zingo_nym_proxy_ffi/zingo_nym_proxy_ffi.kt"
+
+    # Gradle reads ORG_GRADLE_PROJECT_<name> as the project property <name>,
+    # and the included Binding Layer build then skips its own build.
+    - name: Point Gradle at the prebuilt Binding Layer
+      shell: bash
+      run: echo "ORG_GRADLE_PROJECT_bindingLayerPrebuilt=$GITHUB_WORKSPACE/zingolib/bindings/android/build/binding-layer" >> "$GITHUB_ENV"

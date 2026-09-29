@@ -50,19 +50,14 @@ jobs:
           gradle-version: wrapper
           cache-read-only: true
 
-      - name: Native rust cache
-        uses: actions/cache/restore@v6
-        with:
-          path: android/app/src/main/jniLibs/${{ env.ABI }}
-          key: native-android-uniffi-${{ env.ABI }}-${{ env.CACHE-KEY }}
-          fail-on-cache-miss: true
+      - name: Check out zingolib
+        uses: ./.github/actions/zingolib-submodule
 
-      - name: Kotlin uniffi cache
-        uses: actions/cache/restore@v6
+      - name: Restore the Binding Layer
+        uses: ./.github/actions/binding-layer-android
         with:
-          path: android/app/build/generated/source/uniffi/release/java/uniffi
-          key: kotlin-android-uniffi-${{ env.ABI }}-${{ env.CACHE-KEY }}
-          fail-on-cache-miss: true
+          abi: ${{ env.ABI }}
+          cache-key: ${{ env.CACHE-KEY }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -144,37 +139,31 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v7
 
-      # Restore the xcframework produced by .github/workflows/ios-build.yaml.
-      # That reusable workflow saves both artefacts directly under `ios/` so the
-      # xcodebuild step below can reference them without any copying.
+      - name: Check out zingolib
+        uses: ./.github/actions/zingolib-submodule
+
+      # Restore the Binding Layer produced by .github/workflows/ios-build.yaml
+      # into the zingolib submodule, where the Xcode project takes it from.
       #
       # Restored twice on purpose: on 2026-09-23 the cache service confirmed
       # this very key as a hit and then aborted the download 40s later, and
       # fail-on-cache-miss turned that blip into a lost night. The first
       # attempt is allowed to fail; only the second one is fatal.
-      - name: Native iOS xcframework cache
+      - name: iOS Binding Layer cache
         id: ios-xcframework-cache
         continue-on-error: true
         uses: actions/cache/restore@v6
         with:
-          path: |
-            ios/Zingolib.xcframework
-            ios/zingo.swift
-            ios/ZingoNymProxyFFI.xcframework
-            ios/zingo_nym_proxy_ffi.swift
-          key: native-ios-xcframework-${{ env.CACHE-KEY }}
+          path: zingolib/bindings/swift/build
+          key: binding-layer-ios-${{ env.CACHE-KEY }}
           fail-on-cache-miss: true
 
-      - name: Native iOS xcframework cache (retry)
+      - name: iOS Binding Layer cache (retry)
         if: steps.ios-xcframework-cache.outcome != 'success'
         uses: actions/cache/restore@v6
         with:
-          path: |
-            ios/Zingolib.xcframework
-            ios/zingo.swift
-            ios/ZingoNymProxyFFI.xcframework
-            ios/zingo_nym_proxy_ffi.swift
-          key: native-ios-xcframework-${{ env.CACHE-KEY }}
+          path: zingolib/bindings/swift/build
+          key: binding-layer-ios-${{ env.CACHE-KEY }}
           fail-on-cache-miss: true
 
       - name: Setup Node.js

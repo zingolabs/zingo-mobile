@@ -18,6 +18,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v7
 
+      # The harness workspace takes zingolib_testutils by path from the
+      # submodule, and cargo reads that manifest to resolve the workspace.
+      - name: Check out zingolib
+        uses: ./.github/actions/zingolib-submodule
+
       # Pinned so a new shear release cannot fail CI on untouched code.
       - name: Install cargo-shear
         uses: taiki-e/install-action@v2

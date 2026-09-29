@@ -45,15 +45,15 @@ jobs:
         with:
           repository: ${{ env.REPO-OWNER }}/zingo-mobile
 
-      - name: Restore iOS xcframework cache
+      - name: Check out zingolib
+        uses: ./.github/actions/zingolib-submodule
+
+      # The Xcode project takes the Binding Layer from the zingolib submodule.
+      - name: Restore the iOS Binding Layer
         uses: actions/cache/restore@v6
         with:
-          path: |
-            ios/Zingolib.xcframework
-            ios/zingo.swift
-            ios/ZingoNymProxyFFI.xcframework
-            ios/zingo_nym_proxy_ffi.swift
-          key: native-ios-xcframework-${{ env.CACHE-KEY }}
+          path: zingolib/bindings/swift/build
+          key: binding-layer-ios-${{ env.CACHE-KEY }}
           fail-on-cache-miss: true
 
       - name: Setup Node.js
@@ -85,7 +85,7 @@ jobs:
           mkdir -p build/reports build/DerivedData
           # The destination pins no arch: it resolves arm64 on Apple-silicon
           # runners and x86_64 on the Intel larger-runner pool; the
-          # xcframework's simulator slice is a fat arm64+x86_64 binary
+          # XCFrameworks' simulator slices are fat arm64+x86_64 binaries
           # either way.
           xcodebuild build-for-testing \
             -workspace Zingo.xcworkspace \
