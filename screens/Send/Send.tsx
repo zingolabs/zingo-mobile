@@ -1690,7 +1690,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                         >
                           {translate('send.spendable') as string}
                         </RegText>
-                        {inputZec || !showFiat ? (
+                        {inputZec || quote.kind === 'none' ? (
                           <ZecAmount
                             style={{ marginLeft: 0 }}
                             currencyName={info.currencyName}
@@ -1708,8 +1708,8 @@ const Send: React.FunctionComponent<SendProps> = ({
                         ) : (
                           <CurrencyAmount
                             style={{ fontSize: 14 }}
-                            priceDate={zecPrice.date}
-                            price={zecPrice.zecPrice}
+                            priceDate={quote.date}
+                            price={quote.price}
                             amtZec={maxAmount}
                             privacy={privacy}
                           />
