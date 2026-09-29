@@ -60,6 +60,10 @@ jest.mock('@screens/Receive', () => ({
   __esModule: true,
   default: 'MockReceiveScreen',
 }));
+jest.mock('@ui/widgets/NewAddressTag', () => ({
+  __esModule: true,
+  default: 'MockNewAddressTag',
+}));
 
 import React from 'react';
 import NetInfo from '@react-native-community/netinfo/src/index';
@@ -196,6 +200,27 @@ describe('fg/bg + residual UI slice', () => {
       own: false,
     });
     expect(renderSpy).not.toHaveBeenCalled();
+  });
+
+  it('Tests that the add-tag sheet presents with its form rendered when a contact launch opens it.', async () => {
+    const { utils, instance } = await mountCommitted();
+    const formRenderedAtPresent: boolean[] = [];
+    const sheet = {
+      present: () => {
+        formRenderedAtPresent.push(
+          utils.UNSAFE_queryAllByProps({ address: 'zs1recipient' }).length > 0,
+        );
+      },
+      dismiss: jest.fn(),
+    };
+    (instance.addTagModalRef as React.MutableRefObject<unknown>).current =
+      sheet;
+
+    act(() => {
+      instance.launchAddTagModal('zs1recipient');
+    });
+
+    expect(formRenderedAtPresent).toEqual([true]);
   });
 });
 

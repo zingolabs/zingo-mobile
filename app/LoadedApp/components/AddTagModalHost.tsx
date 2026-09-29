@@ -7,21 +7,17 @@ import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 
 import { AddressBookFileClass, TranslateType } from '@app/AppState';
+import type { AddTagModalState } from '@app/AppState/uiAtoms';
 import BoldText from '@ui/primitives/BoldText';
 import AppSheetModal from '@ui/primitives/AppSheetModal';
 import NewAddressTag from '@ui/widgets/NewAddressTag';
 import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
 
 type AddTagModalHostProps = {
-  // Latest target the host should render. Pass `null` while the modal is
-  // hidden. Bump `key` (via the address/own pair) to force-remount the inner
-  // form so its local state resets between presentations.
-  target: {
-    address: string;
-    own: boolean;
-    swapChain: string;
-    initialLabel?: string;
-  } | null;
+  // Latest target the host should render. Bump `key` (via the address/own
+  // pair) to force-remount the inner form so its local state resets between
+  // presentations.
+  target: AddTagModalState;
   setAddressBook: (ab: AddressBookFileClass[]) => void;
   translate: (key: string) => TranslateType;
 };
@@ -56,7 +52,7 @@ const AddTagModalHost = forwardRef<
         style={{ flex: 1, fontSize: 16, lineHeight: 28, textAlign: 'center' }}
       >
         {
-          (target?.own
+          (target.kind === 'shown' && target.own
             ? translate('addressbook.add-tag')
             : translate('addressbook.add-contact')) as string
         }
@@ -79,7 +75,7 @@ const AddTagModalHost = forwardRef<
         paddingBottom: keyboardHeight > 0 ? keyboardHeight + 20 : 30,
       }}
     >
-      {target && (
+      {target.kind === 'shown' && (
         <NewAddressTag
           key={`${target.address}-${target.own}-${target.initialLabel ?? ''}`}
           address={target.address}

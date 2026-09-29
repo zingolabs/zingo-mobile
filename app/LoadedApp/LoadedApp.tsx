@@ -1,11 +1,4 @@
-import React, {
-  Component,
-  useState,
-  useMemo,
-  useEffect,
-  memo,
-  forwardRef,
-} from 'react';
+import React, { Component, useState, useMemo, useEffect, memo } from 'react';
 import { Provider, createStore, useAtomValue } from 'jotai';
 import {
   I18nManager,
@@ -1986,7 +1979,6 @@ export class LoadedAppClass extends Component<
       swapChain,
       initialLabel,
     });
-    this.addTagModalRef.current?.present();
   };
 
   setScrollToTop = (value: boolean) => {
@@ -2355,7 +2347,7 @@ export class LoadedAppClass extends Component<
                 </LoadedAppOptionsPanelHost>
               </OptionsPanelProvider>
               <AddTagModalSlice
-                ref={this.addTagModalRef}
+                sheet={this.addTagModalRef}
                 setAddressBook={this.setAddressBook}
                 translate={this.state.translate}
               />
@@ -2370,28 +2362,35 @@ export class LoadedAppClass extends Component<
 
 type AddTagModalSliceProps = Omit<
   React.ComponentProps<typeof AddTagModalHost>,
-  'target'
->;
+  'target' | 'ref'
+> & { sheet: LoadedAppClass['addTagModalRef'] };
 
 // The add-tag modal, isolated. It reads its target from addTagModalAtom, so
 // launchAddTagModal writes the atom and opening the sheet wakes only that atom's
-// readers, without committing container state or re-rendering the context tree. The ref forwards
-// to the underlying modal so the container can present() it.
-const AddTagModalSlice = forwardRef<
-  React.ComponentRef<typeof BottomSheetModal>,
-  AddTagModalSliceProps
->(function AddTagModalSlice({ setAddressBook, translate }, ref) {
+// readers, without committing container state or re-rendering the context tree.
+// The sheet presents after the new target has rendered, so it sizes to the form.
+function AddTagModalSlice({
+  sheet,
+  setAddressBook,
+  translate,
+}: AddTagModalSliceProps) {
   const modal = useAtomValue(addTagModalAtom);
-  const target = modal.kind === 'shown' ? modal : null;
+
+  useEffect(() => {
+    if (modal.kind === 'shown') {
+      sheet.current?.present();
+    }
+  }, [modal, sheet]);
+
   return (
     <AddTagModalHost
-      ref={ref}
-      target={target}
+      ref={sheet}
+      target={modal}
       setAddressBook={setAddressBook}
       translate={translate}
     />
   );
-});
+}
 
 type HomeStackBodyProps = {
   navigation: NativeStackNavigationProp<AppDrawerParamList>;
