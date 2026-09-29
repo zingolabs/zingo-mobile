@@ -88,12 +88,11 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     privacy,
     addLastSnackbar,
     server,
-    selectServer,
     biometrics,
   } = context;
   const { colors } = useTheme();
   const screenName = ScreenEnum.Confirm;
-  const showFiat = fiatEligible(server.chainName, selectServer);
+  const showFiat = fiatEligible(server, server.chainName);
 
   // Audit Issue D — the biometric gate lives at the
   // Confirm screen entry. Mirrors Seed / Ufvk / Settings / Rescan via

@@ -18,7 +18,7 @@ import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
   RouteEnum,
-  SelectServerEnum,
+  ServerType,
   SnackbarDurationEnum,
   TranslateType,
 } from '@app/AppState';
@@ -63,7 +63,7 @@ type BalanceRowProps = {
   totalBalance: TotalBalanceClass | null;
   info: InfoType;
   zecPrice: ZecPriceType;
-  selectServer: SelectServerEnum;
+  server: ServerType;
   showShieldButton: boolean;
   shieldingFee: number;
   valueTransfersTotal: number | null;
@@ -86,7 +86,7 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
     totalBalance,
     info,
     zecPrice,
-    selectServer,
+    server,
     showShieldButton,
     shieldingFee,
     valueTransfersTotal,
@@ -100,7 +100,7 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
     const navigation = useNavigation<NavigationProp<ParamListBase>>();
     const { colors } = useTheme();
     const reducedMotion = useReducedMotion();
-    const quote = fiatQuote(zecPrice, info.chainName, selectServer);
+    const quote = fiatQuote(zecPrice, server, info.chainName);
     const showFiat = !noBalance && quote.kind === 'quote';
 
     return (

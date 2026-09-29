@@ -9,10 +9,62 @@ import {
   SettingsFileClass,
   SettingsNameEnum,
   BlockExplorerEnum,
+  nativeUri,
+  offlineServer,
+  remoteServer,
 } from '@app/AppState';
 import { serverUris } from '@app/uris';
 import { isEqual } from 'lodash';
 import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
+
+type ServerWire = { uri: string; chainName: ChainNameEnum };
+type SelectServerWire = SelectServerEnum | 'offline';
+type SettingsWire = Omit<SettingsFileClass, 'server' | 'selectServer'> & {
+  server: ServerWire;
+  selectServer: SelectServerWire;
+};
+type ServerSettings = Pick<SettingsFileClass, 'server' | 'selectServer'>;
+
+const defaultWire = (): ServerWire => ({
+  uri: serverUris(() => {})[0].uri,
+  chainName: serverUris(() => {})[0].chainName,
+});
+
+const listed = (wire: ServerWire, filter: (s: ServerUrisType) => boolean) =>
+  serverUris(() => {})
+    .filter(filter)
+    .some((s: ServerUrisType) =>
+      isEqual({ uri: s.uri, chainName: s.chainName }, wire),
+    );
+
+/** Encodes a server choice as the empty-uri form the native background sync reads. */
+const encodeServer = (
+  server: ServerType,
+  selectServer: SelectServerEnum,
+): Pick<SettingsWire, 'server' | 'selectServer'> => ({
+  server: { uri: nativeUri(server), chainName: server.chainName },
+  selectServer: server.kind === 'offline' ? 'offline' : selectServer,
+});
+
+/** Decodes the stored server and selection into one server choice and its remote mode. */
+const decodeServer = (
+  server: ServerWire,
+  selectServer: SelectServerWire,
+): ServerSettings => {
+  if (selectServer === 'offline') {
+    return {
+      server: offlineServer(server.chainName),
+      selectServer: SelectServerEnum.auto,
+    };
+  }
+  const remote = server.uri ? server : defaultWire();
+  return {
+    server: remoteServer(remote.uri, remote.chainName),
+    selectServer: Object.values(SelectServerEnum).includes(selectServer)
+      ? selectServer
+      : SelectServerEnum.auto,
+  };
+};
 
 export default class SettingsFileImpl {
   static async getFileName() {
@@ -27,15 +79,29 @@ export default class SettingsFileImpl {
   // reading a file that never recorded it.
   private static writeQueue: Promise<void> = Promise.resolve();
 
-  // Write the server setting
   static async writeSettings(
-    name: SettingsNameEnum,
-    value: string | boolean | ServerType,
+    name: Exclude<
+      SettingsNameEnum,
+      SettingsNameEnum.server | SettingsNameEnum.selectServer
+    >,
+    value: string | boolean,
   ): Promise<void> {
+    return this.writePatch({ [name]: value });
+  }
+
+  /** Persists the server choice and its remote mode in one write. */
+  static async writeServer(
+    server: ServerType,
+    selectServer: SelectServerEnum,
+  ): Promise<void> {
+    return this.writePatch(encodeServer(server, selectServer));
+  }
+
+  private static async writePatch(patch: Partial<SettingsWire>): Promise<void> {
     const write = this.writeQueue.then(async () => {
       const fileName = await this.getFileName();
-      const settings = await this.readSettings();
-      const newSettings: SettingsFileClass = { ...settings, [name]: value };
+      const settings = await this.readWire();
+      const newSettings: SettingsWire = { ...settings, ...patch };
 
       try {
         await RNFS.writeFile(
@@ -53,52 +119,42 @@ export default class SettingsFileImpl {
     return write;
   }
 
-  // Read the server setting
   static async readSettings(): Promise<SettingsFileClass> {
+    const { server, selectServer, ...rest } = await this.readWire();
+    return server
+      ? { ...rest, ...decodeServer(server, selectServer) }
+      : (rest as SettingsFileClass);
+  }
+
+  private static async readWire(): Promise<SettingsWire> {
     try {
       const fileName = await this.getFileName();
       const fileExits: boolean = await RNFS.exists(fileName);
       if (!fileExits) {
         console.log('settings read file: The file does not exists');
-        const settings: SettingsFileClass = {
+        const settings: SettingsWire = {
           firstInstall: true,
           version: null,
-        } as SettingsFileClass;
+        } as SettingsWire;
         return settings;
       }
 
-      const settings: SettingsFileClass = await JSON.parse(
+      const settings: SettingsWire = await JSON.parse(
         (await RNFS.readFile(fileName, GlobalConst.utf8)).toString(),
       );
-      // If server as string is found, I need to convert to: ServerType
+      // If server as string is found, I need to convert to: ServerWire
       // if not, I'm losing the value
       if (!settings.hasOwnProperty(SettingsNameEnum.server)) {
-        settings.server = {
-          uri: serverUris(() => {})[0].uri,
-          chainName: serverUris(() => {})[0].chainName,
-        } as ServerType;
+        settings.server = defaultWire();
       } else {
         if (typeof settings.server === 'string') {
-          const ss: ServerType = {
+          const ss: ServerWire = {
             uri: settings.server,
             chainName: ChainNameEnum.mainChainName,
           };
-          const standard = serverUris(() => {}).find((s: ServerUrisType) =>
-            isEqual(
-              { uri: s.uri, chainName: s.chainName } as ServerType,
-              ss as ServerType,
-            ),
-          );
-          if (standard) {
-            settings.server = ss as ServerType;
-          } else {
-            // here probably the user have a cumtom server, but we don't know
-            // what is the chainName -> we assign the default server.
-            settings.server = {
-              uri: serverUris(() => {})[0].uri,
-              chainName: serverUris(() => {})[0].chainName,
-            } as ServerType;
-          }
+          // here probably the user have a cumtom server, but we don't know
+          // what is the chainName -> we assign the default server.
+          settings.server = listed(ss, () => true) ? ss : defaultWire();
         } else {
           if (settings.server.uri && !settings.server.chainName) {
             // Only repair a REAL server (non-empty uri) that is missing its
@@ -109,7 +165,7 @@ export default class SettingsFileImpl {
             settings.server = {
               uri: settings.server.uri,
               chainName: ChainNameEnum.mainChainName,
-            } as ServerType;
+            };
           }
         }
       }
@@ -139,39 +195,14 @@ export default class SettingsFileImpl {
         // - non-default listed server (any chain) -> list
         // - server not in the list (any chain) -> custom
         if (!settings.server.uri) {
-          settings.selectServer = SelectServerEnum.offline;
-        } else if (
-          serverUris(() => {})
-            .filter((s: ServerUrisType) => s.obsolete)
-            .find((s: ServerUrisType) =>
-              isEqual(
-                { uri: s.uri, chainName: s.chainName } as ServerType,
-                settings.server as ServerType,
-              ),
-            )
-        ) {
+          settings.selectServer = 'offline';
+        } else if (listed(settings.server, s => s.obsolete)) {
           // obsolete servers -> auto - to make easier and faster UX to the user
           settings.selectServer = SelectServerEnum.auto;
-        } else if (
-          serverUris(() => {})
-            .filter((s: ServerUrisType) => s.default)
-            .find((s: ServerUrisType) =>
-              isEqual(
-                { uri: s.uri, chainName: s.chainName } as ServerType,
-                settings.server as ServerType,
-              ),
-            )
-        ) {
+        } else if (listed(settings.server, s => s.default)) {
           // default servers -> auto - to make easier and faster UX to the user
           settings.selectServer = SelectServerEnum.auto;
-        } else if (
-          serverUris(() => {}).find((s: ServerUrisType) =>
-            isEqual(
-              { uri: s.uri, chainName: s.chainName } as ServerType,
-              settings.server as ServerType,
-            ),
-          )
-        ) {
+        } else if (listed(settings.server, () => true)) {
           // new servers (not default & not obsolete) -> in the list - the user changed the default server in some point
           settings.selectServer = SelectServerEnum.list;
         } else {
@@ -182,14 +213,7 @@ export default class SettingsFileImpl {
         // this is not the first time, but I have to change the obsolete servers to `auto`.
         // do nothing if the user select a obsolte one as a custom server, this is user's choice.
         if (
-          serverUris(() => {})
-            .filter((s: ServerUrisType) => s.obsolete)
-            .find((s: ServerUrisType) =>
-              isEqual(
-                { uri: s.uri, chainName: s.chainName } as ServerType,
-                settings.server as ServerType,
-              ),
-            ) &&
+          listed(settings.server, s => s.obsolete) &&
           settings.selectServer !== SelectServerEnum.custom
         ) {
           // obsolete servers -> auto - to make easier and faster UX to the user
@@ -235,10 +259,10 @@ export default class SettingsFileImpl {
       // The File doesn't exist, so return nothing
       // Here I know 100% it is a fresh install or the user cleaned the device staorage
       console.log('settings read file:', err);
-      const settings: SettingsFileClass = {
+      const settings: SettingsWire = {
         firstInstall: true,
         version: null,
-      } as SettingsFileClass;
+      } as SettingsWire;
       return settings;
     }
   }

@@ -60,6 +60,7 @@ import {
   GlobalConst,
   ServerUrisType,
   ServerType,
+  remoteServer,
   SetServerResult,
   SelectServerEnum,
   RouteEnum,
@@ -167,8 +168,8 @@ const Send: React.FunctionComponent<SendProps> = ({
   // USD entry derives the ZEC actually sent from the price, so that
   // figure carries the same stale/absent dim as the USD conversions.
   const priceMuted = usePriceHealth(zecPrice.date) !== 'live';
-  const showFiat = fiatEligible(server.chainName, selectServer);
-  const quote = fiatQuote(zecPrice, server.chainName, selectServer);
+  const showFiat = fiatEligible(server, server.chainName);
+  const quote = fiatQuote(zecPrice, server, server.chainName);
 
   const screenName = ScreenEnum.Send;
   const zecIconXml = `<?xml version="1.0" encoding="UTF-8"?>
@@ -945,7 +946,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     // The MAX send travels the send-all path all the way: quoted and sent by
     // the same proposal, so the amount confirmed is the amount broadcast.
     const sendAllSend = isSendAllAmount(sendPageStatePar.toaddr.amount);
-    if (!netInfo.isConnected || selectServer === SelectServerEnum.offline) {
+    if (!netInfo.isConnected || server.kind === 'offline') {
       addLastSnackbar(translate('loadedapp.connection-error') as string);
       return;
     }
@@ -979,16 +980,16 @@ const Send: React.FunctionComponent<SendProps> = ({
         // Pick a working server, same pattern as boot/recovery: the live
         // registry first (best, excluding the failed server, no probe), then
         // the static list ranked by latency (also excluding the failed one).
-        let fasterServer: ServerType = {} as ServerType;
+        let fasterServer: ServerType = server;
         const live = await fetchServerList(server.chainName);
         const liveCandidates = live.filter(
           (s: ServerUrisType) => s.uri !== server.uri,
         );
         if (liveCandidates.length > 0) {
-          fasterServer = {
-            uri: liveCandidates[0].uri,
-            chainName: liveCandidates[0].chainName,
-          };
+          fasterServer = remoteServer(
+            liveCandidates[0].uri,
+            liveCandidates[0].chainName,
+          );
         } else {
           const serverChecked = await selectingServer(
             serverUris(translate).filter(
@@ -998,17 +999,15 @@ const Send: React.FunctionComponent<SendProps> = ({
                 s.uri !== server.uri,
             ),
           );
+          // no latency: likely a connection problem, all servers unreachable.
           if (serverChecked && serverChecked.latency) {
-            fasterServer = {
-              uri: serverChecked.uri,
-              chainName: serverChecked.chainName,
-            };
-          } else {
-            fasterServer = server;
-            // likely a connection problem — all servers unreachable / timeout.
+            fasterServer = remoteServer(
+              serverChecked.uri,
+              serverChecked.chainName,
+            );
           }
         }
-        if (fasterServer.uri !== server.uri) {
+        if (fasterServer !== server) {
           await setServerOption(fasterServer, selectServer, false, true);
         }
 
@@ -2040,10 +2039,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                       onPress={async () => {
                         setSendButtonEnabled(false);
                         updateToField(null, null, null, memoText, null);
-                        if (
-                          !netInfo.isConnected ||
-                          selectServer === SelectServerEnum.offline
-                        ) {
+                        if (!netInfo.isConnected || server.kind === 'offline') {
                           addLastSnackbar(
                             translate('loadedapp.connection-error') as string,
                           );

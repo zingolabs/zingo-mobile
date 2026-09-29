@@ -20,7 +20,7 @@ import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
 } from '@app/context';
-import { SelectServerEnum } from '@app/AppState';
+import { ChainNameEnum, SelectServerEnum, offlineServer } from '@app/AppState';
 import { getZecPrice } from '@app/walletBackend';
 import { mockZecQuote } from '../__mocks__/dataMocks/mockZecPriceOutcome';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
@@ -96,7 +96,7 @@ test('a lost market takes the cadence down now, and publishes it', async () => {
     surfaceUi(
       makeCtx({
         mixnetView: READY_VIEW,
-        selectServer: SelectServerEnum.offline,
+        server: offlineServer(ChainNameEnum.noneChainName),
       }),
       setZecPrice,
     ),
@@ -122,7 +122,7 @@ test('no wedged deadline across an outage, and the recovery entry fires', async 
     surfaceUi(
       makeCtx({
         mixnetView: READY_VIEW,
-        selectServer: SelectServerEnum.offline,
+        server: offlineServer(ChainNameEnum.noneChainName),
       }),
       setZecPrice,
     ),

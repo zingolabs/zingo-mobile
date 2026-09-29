@@ -27,7 +27,6 @@ import {
   SendPageStateClass,
   ToAddrClass,
   RouteEnum,
-  SelectServerEnum,
 } from '@app/AppState';
 import Utils from '@app/utils';
 import { ContextAppLoaded } from '@app/context';
@@ -56,7 +55,7 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
 }) => {
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const context = useContext(ContextAppLoaded);
-  const { translate, readOnly, selectServer, setSendPageState } = context;
+  const { translate, readOnly, server, setSendPageState } = context;
   const { colors } = useTheme();
 
   const displayAddress: string = item.address
@@ -230,7 +229,7 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
           </TouchableOpacity>
         </View>
         {!readOnly &&
-          selectServer !== SelectServerEnum.offline &&
+          server.kind !== 'offline' &&
           // The wallet can only send to Zcash addresses — hide the send action
           // for non-ZEC (swap) contacts.
           item.swapChain === GlobalConst.zecSwapChain && (

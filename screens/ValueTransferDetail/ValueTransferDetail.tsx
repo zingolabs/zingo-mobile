@@ -26,7 +26,6 @@ import {
   ValueTransferType,
   ValueTransferKindEnum,
   GlobalConst,
-  SelectServerEnum,
   RouteEnum,
   TransactionActionEnum,
   UnifiedAddressClass,
@@ -83,7 +82,6 @@ const ValueTransferDetail: React.FunctionComponent<
     addresses,
     setBackgroundError,
     netInfo,
-    selectServer,
     setPrivacyOption,
     blockExplorer,
   } = context;
@@ -296,7 +294,7 @@ const ValueTransferDetail: React.FunctionComponent<
     if (!setBackgroundError || !addLastSnackbar) {
       return;
     }
-    if (!netInfo.isConnected || selectServer === SelectServerEnum.offline) {
+    if (!netInfo.isConnected || server.kind === 'offline') {
       addLastSnackbar(translate('loadedapp.connection-error') as string);
       return;
     }

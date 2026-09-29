@@ -1,26 +1,23 @@
-import { ChainNameEnum, SelectServerEnum, ZecPriceType } from '@app/AppState';
+import { ChainNameEnum, ServerType, ZecPriceType } from '@app/AppState';
 import Utils from '@app/utils';
 
 export type FiatQuote =
   { kind: 'quote'; price: number; date: number } | { kind: 'none' };
 
-/** Reports whether the chain and server selection admit a fiat price. */
+/** Reports whether a remote server on the main chain admits a fiat price. */
 export const fiatEligible = (
+  server: ServerType,
   chainName: ChainNameEnum,
-  selectServer: SelectServerEnum,
 ): boolean =>
-  chainName === ChainNameEnum.mainChainName &&
-  selectServer !== SelectServerEnum.offline;
+  server.kind === 'remote' && chainName === ChainNameEnum.mainChainName;
 
 /** Resolves the fetched price the UI converts with, or none when no conversion applies. */
 export const fiatQuote = (
   zecPrice: ZecPriceType,
+  server: ServerType,
   chainName: ChainNameEnum,
-  selectServer: SelectServerEnum,
 ): FiatQuote =>
-  fiatEligible(chainName, selectServer) &&
-  zecPrice.zecPrice > 0 &&
-  zecPrice.date > 0
+  fiatEligible(server, chainName) && zecPrice.zecPrice > 0 && zecPrice.date > 0
     ? { kind: 'quote', price: zecPrice.zecPrice, date: zecPrice.date }
     : { kind: 'none' };
 
