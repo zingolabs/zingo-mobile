@@ -37,6 +37,14 @@ jest.mock('@app/services/gateController', () => ({
   resolveTriggerGate: jest.fn().mockResolvedValue({ kind: 'passed' }),
 }));
 
+// dev's PriceTrafficDriver attaches the price store's own AppState listener.
+// The price surface has its own tests, so the container fences render the
+// driver inert and see only the container's listener.
+jest.mock('@ui/widgets/PriceFetcher', () => ({
+  ...jest.requireActual('@ui/widgets/PriceFetcher'),
+  PriceTrafficDriver: () => null,
+}));
+
 jest.mock('@screens/History', () => ({
   __esModule: true,
   default: 'MockHistoryScreen',
