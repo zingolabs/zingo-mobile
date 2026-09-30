@@ -11,3 +11,7 @@ serde_json = { workspace = true }
 [[bin]]
 name = "ci-gate"
 path = "src/main.rs"
+
+[[bin]]
+name = "zm-descriptor"
+path = "src/bin/zm_descriptor.rs"

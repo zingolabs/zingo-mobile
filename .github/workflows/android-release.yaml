@@ -49,6 +49,8 @@ jobs:
 
       - name: Check out zingolib
         uses: ./.github/actions/zingolib-submodule
+        with:
+          tags: true
 
       - name: Cargo default stable
         run: |
@@ -77,8 +79,8 @@ jobs:
       # The About screen shows this descriptor, so it names the release tag.
       - name: Record zingo-mobile's descriptor
         run: |
-          describe="$(git describe --dirty --always --long --match 'zingo-*')"
-          echo "ZINGO_MOBILE_GIT_DESCRIBE=$describe" >> "$GITHUB_ENV"
+          descriptor="$(cargo run --quiet --manifest-path rust/Cargo.toml --bin zm-descriptor)"
+          echo "ZINGO_MOBILE_DESCRIPTOR=$descriptor" >> "$GITHUB_ENV"
 
       # The builder takes the git root of its working directory as the
       # zingolib root.

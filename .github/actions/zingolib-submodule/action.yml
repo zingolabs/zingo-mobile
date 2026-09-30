@@ -4,6 +4,14 @@ description: >
   pinned commit. zingolib's own CI calls these workflows to test a zingolib
   commit, so there the submodule moves to that commit instead.
 
+inputs:
+  tags:
+    description: >
+      Whether to fetch the submodule's tags, which the zl_ descriptor of
+      a native build reads.
+    required: false
+    default: 'false'
+
 runs:
   using: composite
   steps:
@@ -25,6 +33,13 @@ runs:
       run: |
         git -C zingolib fetch --depth 1 origin "$GITHUB_SHA"
         git -C zingolib checkout --detach FETCH_HEAD
+
+    # The zl_ descriptor names the release tag that points at HEAD, and
+    # a depth-1 fetch carries the tags.
+    - name: Fetch the tags for the descriptor
+      if: ${{ inputs.tags == 'true' }}
+      shell: bash
+      run: git -C zingolib fetch --tags --depth 1 origin
 
     - name: Report the zingolib commit
       shell: bash
