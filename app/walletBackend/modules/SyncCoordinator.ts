@@ -317,7 +317,7 @@ export class SyncCoordinator {
     // A rescan issued while a sync holds the lane waits in queuedRescan, and
     // the holder's finally releases it. A rescan issued while a rescan holds
     // the lane is served by that rescan.
-    if (this.laneHolder !== 'none') {
+    if (this.refreshSyncLock) {
       if (fullRescan && this.laneHolder === 'sync') {
         this.queuedRescan = { kind: 'queued', epoch: this.controllerEpoch };
       }
@@ -325,8 +325,9 @@ export class SyncCoordinator {
     }
     this.laneHolder = fullRescan ? 'rescan' : 'sync';
     // A rescan tears the loop down before the native call. The epoch after
-    // that teardown marks the rescan's own boundary; the finally re-arms the
-    // loop while that boundary is still the current one.
+    // that teardown marks the rescan's own boundary; the finally reconfigures
+    // while that boundary is still the current one, on success and on
+    // rejection alike.
     let rescanEpoch: Epoch | undefined;
     try {
       this.config.keepAwake(true);
@@ -358,9 +359,6 @@ export class SyncCoordinator {
           );
         }
         console.log('rescan RUN', rescanStr);
-        if (isCurrent(rescanEpoch, this.controllerEpoch)) {
-          await this.configure();
-        }
       } else {
         const start = Date.now();
         const syncStr: string = await RPCModule.runSyncProcess();
@@ -389,10 +387,9 @@ export class SyncCoordinator {
       this.laneHolder = 'none';
       if (
         rescanEpoch !== undefined &&
-        isCurrent(rescanEpoch, this.controllerEpoch) &&
-        this.updateTimerID === undefined
+        isCurrent(rescanEpoch, this.controllerEpoch)
       ) {
-        this.armNextTick();
+        await this.configure();
       }
       const queued = this.queuedRescan;
       this.queuedRescan = { kind: 'none' };

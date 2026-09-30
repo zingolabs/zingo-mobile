@@ -1165,10 +1165,7 @@ export class LoadedAppClass extends Component<
     valueTransfers: ValueTransferType[],
     valueTransfersTotal: number,
   ) => {
-    if (
-      !isEqual(this.state.valueTransfers, valueTransfers) ||
-      this.state.valueTransfersTotal !== valueTransfersTotal
-    ) {
+    if (changes(this.state, { valueTransfers, valueTransfersTotal })) {
       // set somePending as well here when I know there is something new in ValueTransfers
       const pending: number =
         valueTransfersTotal > 0
@@ -1381,44 +1378,39 @@ export class LoadedAppClass extends Component<
       zecPrice: newZecPrice,
       date: newDate,
     } as ZecPriceType;
-    if (!isEqual(this.state.zecPrice, zecPrice)) {
-      this.setState({ zecPrice });
-    }
+    this.commitPatch({ zecPrice });
   };
 
   setInfo = (newInfo: InfoType) => {
-    if (!isEqual(this.state.info, newInfo)) {
-      // Offline (or any info-fetch failure) leaves chainName/currencyName empty.
-      // Derive them from the WALLET's own chain (walletChainName) — reliable
-      // even Offline — rather than the server's chain, which in Offline mode is
-      // only the user's onboarding pick and may not match the wallet (e.g. a
-      // mainnet wallet opened while Testnet was left selected showed TAZ).
-      // noneChainName is '' (falsy), so `|| server.chainName` covers the
-      // unknown-wallet-chain case without an explicit noneChainName check.
-      const fallbackChain =
-        this.state.walletChainName || this.state.server.chainName;
-      // if currencyName is empty,
-      // I need to rescue the last value from the state,
-      // or rescue the value from the wallet/server chain.
-      if (!newInfo.currencyName) {
-        if (this.state.info.currencyName) {
-          newInfo.currencyName = this.state.info.currencyName;
-        } else {
-          newInfo.currencyName =
-            fallbackChain === ChainNameEnum.mainChainName
-              ? CurrencyNameEnum.ZEC
-              : CurrencyNameEnum.TAZ;
-        }
+    // Offline (or any info-fetch failure) leaves chainName/currencyName empty.
+    // Derive them from the WALLET's own chain (walletChainName) — reliable
+    // even Offline — rather than the server's chain, which in Offline mode is
+    // only the user's onboarding pick and may not match the wallet (e.g. a
+    // mainnet wallet opened while Testnet was left selected showed TAZ).
+    // noneChainName is '' (falsy), so `|| server.chainName` covers the
+    // unknown-wallet-chain case without an explicit noneChainName check.
+    const fallbackChain =
+      this.state.walletChainName || this.state.server.chainName;
+    // if currencyName is empty,
+    // I need to rescue the last value from the state,
+    // or rescue the value from the wallet/server chain.
+    if (!newInfo.currencyName) {
+      if (this.state.info.currencyName) {
+        newInfo.currencyName = this.state.info.currencyName;
+      } else {
+        newInfo.currencyName =
+          fallbackChain === ChainNameEnum.mainChainName
+            ? CurrencyNameEnum.ZEC
+            : CurrencyNameEnum.TAZ;
       }
-      if (!newInfo.chainName) {
-        newInfo.chainName = fallbackChain;
-      }
-      if (!newInfo.serverUri) {
-        newInfo.serverUri = nativeUri(this.state.server);
-      }
-      //const start = Date.now();
-      this.commit(() => this.setState({ info: newInfo }));
     }
+    if (!newInfo.chainName) {
+      newInfo.chainName = fallbackChain;
+    }
+    if (!newInfo.serverUri) {
+      newInfo.serverUri = nativeUri(this.state.server);
+    }
+    this.commitPatch({ info: newInfo });
   };
 
   setZingolibVersion = (newZingolibVersion: string) => {
