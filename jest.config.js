@@ -2,6 +2,7 @@ process.env.TZ = 'UTC';
 
 module.exports = {
   preset: 'react-native',
+  resolver: '<rootDir>/jest.resolver.js',
   testEnvironment: '<rootDir>/jest-environment-react-native.js',
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   modulePathIgnorePatterns: ['e2e', '<rootDir>/.claude/'],
