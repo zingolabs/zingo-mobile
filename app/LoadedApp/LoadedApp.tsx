@@ -1938,9 +1938,9 @@ export class LoadedAppClass extends Component<
     this.commit(() => this.setState({ lastError: error }));
   };
 
-  // Determines `own` via RPC, then opens the shared modal so the user can
-  // attach a label without leaving their current screen. Used from AddressItem
-  // anywhere an address is displayed with a tappable "+ contact" icon.
+  // Opens the shared "Add contact" modal for an address, on the user's
+  // current screen. Used from AddressItem wherever an address shows a tappable
+  // "+ contact" icon.
   launchAddTagModal = (
     address: string,
     swapChain: string = GlobalConst.zecSwapChain,

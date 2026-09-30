@@ -72,6 +72,9 @@ const AddTagModalHost = forwardRef<
         <NewAddressTag
           key={target.launch}
           address={target.address}
+          // Every launcher (Send, address rows) saves a recipient, a contact.
+          // Tagging one of the wallet's own addresses is the Receive flow,
+          // which renders NewAddressTag with own={true} directly.
           own={false}
           swapChain={target.swapChain}
           initialLabel={target.initialLabel}
