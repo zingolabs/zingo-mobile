@@ -71,11 +71,7 @@ const { AppState, Linking } =
 
 import { LoadedApp, LoadedAppClass } from '@app/LoadedApp';
 import { resolveTriggerGate } from '@app/services/gateController';
-import {
-  ChainNameEnum,
-  LaunchingModeEnum,
-  RouteEnum,
-} from '@app/AppState';
+import { ChainNameEnum, LaunchingModeEnum, RouteEnum } from '@app/AppState';
 import {
   walletViewSourceAtom,
   walletViewAtom,
