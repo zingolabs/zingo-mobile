@@ -75,18 +75,28 @@ jest.mock('@ui/widgets/NewAddressTag', () => {
 // gate: children render only after present() lands its requestAnimationFrame.
 jest.mock('@gorhom/bottom-sheet', () => {
   const ReactActual = jest.requireActual<typeof import('react')>('react');
+  const CLOSE_ANIMATION_MS = 250;
   const BottomSheetModal = ReactActual.forwardRef(function GatedModal(
     { children }: { children?: unknown },
     ref,
   ) {
     const [mounted, setMounted] = ReactActual.useState(false);
+    const closing = ReactActual.useRef<
+      ReturnType<typeof setTimeout> | undefined
+    >(undefined);
     ReactActual.useImperativeHandle(ref, () => ({
+      // A present during the close animation keeps the content mounted.
       present: () => {
+        globalThis.clearTimeout(closing.current);
+        closing.current = undefined;
         globalThis.requestAnimationFrame(() => setMounted(true));
       },
       // v5 unmounts the content when the close animation ends.
       dismiss: () => {
-        globalThis.setTimeout(() => setMounted(false), 250);
+        closing.current = globalThis.setTimeout(
+          () => setMounted(false),
+          CLOSE_ANIMATION_MS,
+        );
       },
     }));
     return mounted
@@ -96,6 +106,7 @@ jest.mock('@gorhom/bottom-sheet', () => {
   return {
     ...jest.requireActual('../__mocks__/@gorhom/bottom-sheet'),
     BottomSheetModal,
+    CLOSE_ANIMATION_MS,
   };
 });
 
@@ -110,6 +121,13 @@ import {
 const { mountedWith } = jest.requireMock<{ mountedWith: jest.Mock }>(
   '@ui/widgets/NewAddressTag',
 );
+
+const { CLOSE_ANIMATION_MS } = jest.requireMock<{
+  CLOSE_ANIMATION_MS: number;
+}>('@gorhom/bottom-sheet');
+
+const FRAME_MS = 16;
+const MID_CLOSE_MS = CLOSE_ANIMATION_MS / 2;
 
 const mountedAddresses = (): string[] =>
   mountedWith.mock.calls.map(([address]) => address);
@@ -133,9 +151,9 @@ describe('the add-tag sheet under the real mount gate', () => {
       instance.launchAddTagModal('zs1recipient');
       await flushMicrotasks();
     });
-    expect(mountedAddresses()).toEqual([]); // nothing mounts before the frame
+    expect(mountedAddresses()).toEqual([]);
     await act(async () => {
-      jest.advanceTimersByTime(16); // the requestAnimationFrame lands
+      jest.advanceTimersByTime(FRAME_MS);
       await flushMicrotasks();
     });
 
@@ -151,7 +169,7 @@ describe('the add-tag sheet under the real mount gate', () => {
         await flushMicrotasks();
       });
       await act(async () => {
-        jest.advanceTimersByTime(16); // the requestAnimationFrame lands
+        jest.advanceTimersByTime(FRAME_MS);
         await flushMicrotasks();
       });
     };
@@ -161,7 +179,7 @@ describe('the add-tag sheet under the real mount gate', () => {
 
     await act(async () => {
       instance.addTagModalRef.current?.dismiss();
-      jest.advanceTimersByTime(100); // the close animation is still running
+      jest.advanceTimersByTime(MID_CLOSE_MS);
     });
     await launch('zs1recipient');
 
