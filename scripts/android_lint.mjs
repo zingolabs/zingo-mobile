@@ -4,7 +4,8 @@
 // the Binding Layer's Kotlin bindings from a host build of the proxy crate,
 // and Gradle compiles against them. Catches NewApi (a call above minSdk
 // behind a too-low SDK_INT guard), which otherwise only shows up as a crash
-// on a user's older device.
+// on a user's older device. Needs cargo and protoc on the host, because the
+// kotlin mode builds the proxy crate and its protobuf dependencies.
 // Cross-platform: Linux, macOS, Windows.
 //
 // Usage: node scripts/android_lint.mjs [variant]   # default prodRelease
@@ -29,11 +30,13 @@ const isWindows = process.platform === 'win32';
 const variant = process.argv[2] ?? 'prodRelease';
 const task = `:app:lint${variant[0].toUpperCase()}${variant.slice(1)}`;
 
-function run(cmd, args, cwd) {
+// With a shell, Node joins the arguments unquoted, so a caller that needs
+// the shell quotes any argument that may hold a space.
+function run(cmd, args, cwd, shell = false) {
   const { status } = spawnSync(cmd, args, {
     cwd,
     stdio: 'inherit',
-    shell: isWindows,
+    shell,
   });
   if (status !== 0) {
     console.error(`${cmd} ${args.join(' ')} failed (${status})`);
@@ -41,6 +44,7 @@ function run(cmd, args, cwd) {
   }
 }
 
+// cargo is an executable on every platform, so it needs no shell.
 console.log('\nGenerating the Kotlin bindings...');
 run(
   'cargo',
@@ -60,9 +64,18 @@ run(
 );
 
 console.log(`\nLinting ${variant}...`);
-// Node refuses to spawn .bat/.cmd without a shell (CVE-2024-27980).
-const gradlew = join(ANDROID_DIR, isWindows ? 'gradlew.bat' : 'gradlew');
-run(gradlew, [task, `-PbindingLayerPrebuilt=${BINDINGS_DIR}`], ANDROID_DIR);
+// Node refuses to spawn .bat/.cmd without a shell (CVE-2024-27980), and
+// the shell splits an unquoted path on its spaces.
+const quoted = value => (isWindows ? `"${value}"` : value);
+const gradlew = quoted(
+  join(ANDROID_DIR, isWindows ? 'gradlew.bat' : 'gradlew'),
+);
+run(
+  gradlew,
+  [task, quoted(`-PbindingLayerPrebuilt=${BINDINGS_DIR}`)],
+  ANDROID_DIR,
+  isWindows,
+);
 
 console.log(
   `\nReport: ${join('android', 'app', 'build', 'reports', `lint-results-${variant}.html`)}`,

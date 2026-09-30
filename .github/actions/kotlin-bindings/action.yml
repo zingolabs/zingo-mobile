@@ -9,6 +9,13 @@ inputs:
   cache-key:
     description: The key from create-cache-key.yaml.
     required: true
+  save-cache:
+    description: >
+      Whether this job saves the host build to the cache. The four Gradle
+      checks generate the same bindings in parallel, so one of them saves
+      and the others only restore.
+    required: false
+    default: 'false'
 
 runs:
   using: composite
@@ -19,32 +26,49 @@ runs:
       shell: bash
       run: sudo apt-get update && sudo apt-get install -y protobuf-compiler
 
-    - name: Rust stable
-      shell: bash
-      run: rustup default stable
-
     # The proxy crate's host build and the bindgen binaries. The key
     # follows the Binding Layer's, which names the pin and the toolchain.
-    - name: Cache the host build
-      uses: actions/cache@v6
+    # The restore key takes the newest entry for any pin, so a pin bump
+    # rebuilds only what changed. The paths leave out the registry's
+    # extracted sources, which cargo re-extracts from the crate archives.
+    - name: Restore the host build
+      id: host-build-cache
+      uses: actions/cache/restore@v6
       with:
         path: |
-          ~/.cargo/registry
-          ~/.cargo/git
+          ~/.cargo/registry/index
+          ~/.cargo/registry/cache
+          ~/.cargo/git/db
           zingolib/target/binding-layer/host
-        key: kotlin-bindings-${{ runner.os }}-${{ inputs.cache-key }}
+        key: kotlin-host-build-${{ runner.os }}-${{ inputs.cache-key }}
+        restore-keys: kotlin-host-build-${{ runner.os }}-
 
-    # The kotlin mode compiles nothing that embeds the descriptor, and it
-    # takes none.
+    # RUSTUP_TOOLCHAIN overrides zingolib's toolchain pin for the workbench
+    # build, and the builder sets the same toolchain for its own steps.
+    # CARGO_INCREMENTAL keeps the incremental state out of the cached
+    # target directory, which nothing edits between runs. The kotlin mode
+    # compiles nothing that embeds the descriptor, and it takes none.
     - name: Generate the Kotlin bindings
       shell: bash
       env:
         RUSTUP_TOOLCHAIN: stable
+        CARGO_INCREMENTAL: '0'
       run: |
         cargo run \
           --manifest-path zingolib/tools/workbench/Cargo.toml \
           --bin build-binding-layer -- \
           kotlin --out zingolib/bindings/android/build/binding-layer
+
+    - name: Save the host build
+      if: ${{ inputs.save-cache == 'true' && steps.host-build-cache.outputs.cache-hit != 'true' }}
+      uses: actions/cache/save@v6
+      with:
+        path: |
+          ~/.cargo/registry/index
+          ~/.cargo/registry/cache
+          ~/.cargo/git/db
+          zingolib/target/binding-layer/host
+        key: kotlin-host-build-${{ runner.os }}-${{ inputs.cache-key }}
 
     - name: Verify the Kotlin bindings are present
       shell: bash

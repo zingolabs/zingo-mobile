@@ -41,7 +41,9 @@ jobs:
         uses: gradle/actions/setup-gradle@v6
 
       # The app module compiles the Binding Layer's Kotlin bindings, which
-      # the kotlin-bindings action generates on the host.
+      # the kotlin-bindings action generates on the host. This check is the
+      # one that saves the host build to the cache, and the other three
+      # checks restore it.
       - name: Check out zingolib
         uses: ./.github/actions/zingolib-submodule
 
@@ -49,6 +51,7 @@ jobs:
         uses: ./.github/actions/kotlin-bindings
         with:
           cache-key: ${{ inputs.cache-key }}
+          save-cache: 'true'
 
       - name: Compile release Kotlin
         working-directory: ./android
