@@ -25,6 +25,8 @@
 		39916E0E0696D2BA46897D37 /* NymTransportModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0A6912D48B65F0E8D6E7619 /* NymTransportModule.swift */; };
 		406B854C612CDFA4B10C5B0A /* NymTransportModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0A6912D48B65F0E8D6E7619 /* NymTransportModule.swift */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		A0161467000000000000B001 /* ZingoBindings in Frameworks */ = {isa = PBXBuildFile; productRef = A0161467000000000000D001 /* ZingoBindings */; };
+		A0161467000000000000B002 /* ZingoBindings in Frameworks */ = {isa = PBXBuildFile; productRef = A0161467000000000000D002 /* ZingoBindings */; };
 		C15AEBBCEC942FCAC1519FEA /* libPods-Zingo-ZingoTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96E8D7BC5D3F3F73EA296DFA /* libPods-Zingo-ZingoTests.a */; };
 		D07A0007DA1CE0DE00000003 /* DeviceAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = D07A0007DA1CE0DE00000001 /* DeviceAuth.swift */; };
 		D07A0007DA1CE0DE00000004 /* DeviceAuthBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = D07A0007DA1CE0DE00000002 /* DeviceAuthBridge.m */; };
@@ -33,8 +35,6 @@
 		E3B3E80957D603CCE394CAF9 /* NymTransportModuleBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = DD87BEDB3F10BB201D3845B8 /* NymTransportModuleBridge.m */; };
 		F2BBD0386AE916EE94551101 /* NymTransportModuleBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = DD87BEDB3F10BB201D3845B8 /* NymTransportModuleBridge.m */; };
 		FBBD6650421A473A90DAF827 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DB06295A2A14F70A7A5B566 /* SceneDelegate.swift */; };
-		A0161467000000000000B001 /* ZingoBindings in Frameworks */ = {isa = PBXBuildFile; productRef = A0161467000000000000D001 /* ZingoBindings */; };
-		A0161467000000000000B002 /* ZingoBindings in Frameworks */ = {isa = PBXBuildFile; productRef = A0161467000000000000D002 /* ZingoBindings */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -74,6 +74,7 @@
 		8E84DCC50BD0296D0F292579 /* Pods-Zingo-ZingoTests.debug-beta.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Zingo-ZingoTests.debug-beta.xcconfig"; path = "Target Support Files/Pods-Zingo-ZingoTests/Pods-Zingo-ZingoTests.debug-beta.xcconfig"; sourceTree = "<group>"; };
 		96E8D7BC5D3F3F73EA296DFA /* libPods-Zingo-ZingoTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Zingo-ZingoTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		9A651BC798997B244C79A0F6 /* Pods-Zingo-ZingoTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Zingo-ZingoTests.release.xcconfig"; path = "Target Support Files/Pods-Zingo-ZingoTests/Pods-Zingo-ZingoTests.release.xcconfig"; sourceTree = "<group>"; };
+		A0161467000000000000F001 /* swift */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = swift; path = ../zingolib/bindings/swift; sourceTree = "<group>"; };
 		D07A0007DA1CE0DE00000001 /* DeviceAuth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceAuth.swift; sourceTree = "<group>"; };
 		D07A0007DA1CE0DE00000002 /* DeviceAuthBridge.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DeviceAuthBridge.m; sourceTree = "<group>"; };
 		DD87BEDB3F10BB201D3845B8 /* NymTransportModuleBridge.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = NymTransportModuleBridge.m; sourceTree = "<group>"; };
@@ -81,7 +82,6 @@
 		F0A6912D48B65F0E8D6E7619 /* NymTransportModule.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NymTransportModule.swift; sourceTree = "<group>"; };
 		F2A2758701DF7B0BD33CA9F0 /* Pods-Zingo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Zingo.debug.xcconfig"; path = "Target Support Files/Pods-Zingo/Pods-Zingo.debug.xcconfig"; sourceTree = "<group>"; };
 		FB533652A711DBB0ED4E4306 /* Pods-Zingo.release-beta.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Zingo.release-beta.xcconfig"; path = "Target Support Files/Pods-Zingo/Pods-Zingo.release-beta.xcconfig"; sourceTree = "<group>"; };
-		A0161467000000000000F001 /* swift */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = swift; path = ../zingolib/bindings/swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
