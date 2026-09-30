@@ -267,7 +267,10 @@ const Send: React.FunctionComponent<SendProps> = ({
   const showCalcError = !!(spendableBalanceLastError || proposeSendLastError);
   const feeCalculationGenRef = useRef<number>(0);
   const recipientRevision = useRef(0);
-  const recipientInput = useRef(recipientIdentity(sendPageState.toaddr.to));
+  const [recipientKey, setRecipientKey] = useState(() =>
+    recipientIdentity(sendPageState.toaddr.to),
+  );
+  const recipientInput = useRef(recipientKey);
   const { decimalSeparator } = getNumberFormatSettings();
   const keyboardHeight = useKeyboardHeight();
   useDismissSheetsOnBlur();
@@ -623,6 +626,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   ) => {
     if (addressPar !== null) {
       recipientInput.current = recipientIdentity(addressPar);
+      setRecipientKey(recipientInput.current);
       recipientRevision.current += 1;
       const revision = recipientRevision.current;
       //Alert.alert('', addressPar);
@@ -651,6 +655,7 @@ const Send: React.FunctionComponent<SendProps> = ({
           [target].forEach(tgt => {
             if (tgt.address) {
               recipientInput.current = recipientIdentity(tgt.address);
+              setRecipientKey(recipientInput.current);
               setAddressText(tgt.address);
             }
             if (tgt.amount) {
@@ -738,10 +743,13 @@ const Send: React.FunctionComponent<SendProps> = ({
       );
       return;
     }
+    const alias = recipientIdentity(addressText);
+    if (alias !== recipientKey) {
+      return;
+    }
     // Neither valid nor invalid until the indexer answers.
     setValidAddress(0);
     setZnsNotFound(false);
-    const alias = recipientIdentity(addressText);
     let cancelled = false;
     const timerId = setTimeout(async () => {
       const resolution = await resolveZnsName(addressText, server.chainName);
@@ -768,7 +776,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     // updateToField is redefined on every render; depending on it would restart
     // the debounce continuously.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [addressText, server.chainName]);
+  }, [addressText, server.chainName, recipientKey]);
 
   useEffect(() => {
     const getMemoEnabled = async (
@@ -911,6 +919,7 @@ const Send: React.FunctionComponent<SendProps> = ({
 
   useEffect(() => {
     recipientInput.current = recipientIdentity(sendPageState.toaddr.to);
+    setRecipientKey(recipientInput.current);
     recipientRevision.current += 1;
     setAddressText(sendPageState.toaddr.to);
     setAmountText(sendPageState.toaddr.amount);
@@ -940,6 +949,7 @@ const Send: React.FunctionComponent<SendProps> = ({
 
   const clearState = () => {
     recipientInput.current = '';
+    setRecipientKey('');
     recipientRevision.current += 1;
     feeCalculationGenRef.current += 1;
     sendAllRef.current = false;

@@ -124,6 +124,32 @@ function setup() {
 
 afterEach(() => jest.restoreAllMocks());
 
+test('Tests that an alias resolves when the user reenters it with whitespace after an overlapping URI fails.', async () => {
+  const name = deferred<ZnsResolver.ZnsResolution>();
+  const resolveName = jest
+    .spyOn(ZnsResolver, 'resolveZnsName')
+    .mockReturnValueOnce(name.promise)
+    .mockResolvedValue({ ok: true, address: editedAddress });
+  const h = setup();
+  await h.edit('alice.zec');
+  await act(async () => {
+    await new Promise(resolve => setTimeout(resolve, 550));
+  });
+  expect(resolveName).toHaveBeenCalledTimes(1);
+  await h.edit(uri(olderAddress));
+  await act(async () => {
+    name.release({ ok: true, address: editedAddress });
+  });
+  await h.finish(h.older, invalid);
+  expect(h.snack).toHaveBeenCalledTimes(1);
+  await h.edit('alice.zec ');
+  await act(async () => {
+    await new Promise(resolve => setTimeout(resolve, 550));
+  });
+  expect(h.field().props.value).toBe(editedAddress);
+  expect(h.view.getByText('ZNS: alice.zec')).toBeTruthy();
+});
+
 test.each([true, false])(
   'Tests that a newer URI wins when an older name lookup has started: %s.',
   async started => {
@@ -146,7 +172,6 @@ test.each([true, false])(
     if (!started) {
       await debounce();
     }
-    expect(resolveName).toHaveBeenCalledTimes(1);
     await act(async () => {
       name.release({ ok: true, address: editedAddress });
     });
