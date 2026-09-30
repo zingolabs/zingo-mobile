@@ -44,6 +44,11 @@ const PERSISTENT_SYNC_FAILURE_THRESHOLD = 3;
 
 type LaneHolder = 'none' | 'sync' | 'rescan';
 
+// What a deferred task's drop means: a user-issued task reports its drop
+// through onError; a poll-scheduled task drops silently, because the next
+// tick schedules it again.
+type DropReport = 'report' | 'silent';
+
 export class SyncCoordinator {
   config: WalletBackendConfig;
   dataService: DataService;
@@ -128,15 +133,21 @@ export class SyncCoordinator {
   }
 
   // Runs the task on the next macrotask while its epoch is current. A drop
-  // and a throwing task each report through onError under the task's name.
+  // reports through onError when the task asks for it, and a throwing task
+  // always reports, under the task's name.
   private deferUnder(
     epoch: Epoch,
     name: string,
+    onDrop: DropReport,
     task: () => Promise<void>,
   ): void {
     setTimeout(async () => {
       if (!isCurrent(epoch, this.controllerEpoch)) {
-        this.config.onError(`${name} dropped: a boundary passed before it ran`);
+        if (onDrop === 'report') {
+          this.config.onError(
+            `${name} dropped: a boundary passed before it ran`,
+          );
+        }
         return;
       }
       try {
@@ -394,7 +405,7 @@ export class SyncCoordinator {
       const queued = this.queuedRescan;
       this.queuedRescan = { kind: 'none' };
       if (queued.kind === 'queued') {
-        this.deferUnder(queued.epoch, 'queued rescan', () =>
+        this.deferUnder(queued.epoch, 'queued rescan', 'report', () =>
           this.refreshSync(true),
         );
       }
@@ -512,7 +523,7 @@ export class SyncCoordinator {
         returnPoll.toLowerCase().startsWith('sync task has not been launched')
       ) {
         console.log('SYNC POLL -> RUN SYNC', returnPoll);
-        this.deferUnder(issuedEpoch, 'poll-scheduled launch', () =>
+        this.deferUnder(issuedEpoch, 'poll-scheduled launch', 'silent', () =>
           this.refreshSync(),
         );
         return;
@@ -520,11 +531,14 @@ export class SyncCoordinator {
 
       if (returnPoll.toLowerCase().startsWith('sync task is not complete')) {
         console.log('SYNC POLL -> FETCH STATUS', returnPoll);
-        this.deferUnder(issuedEpoch, 'poll-scheduled status read', () =>
-          this.fetchSyncStatus(),
+        this.deferUnder(
+          issuedEpoch,
+          'poll-scheduled status read',
+          'silent',
+          () => this.fetchSyncStatus(),
         );
         console.log('SYNC POLL -> RUN SYNC', returnPoll);
-        this.deferUnder(issuedEpoch, 'poll-scheduled launch', () =>
+        this.deferUnder(issuedEpoch, 'poll-scheduled launch', 'silent', () =>
           this.refreshSync(),
         );
         return;
@@ -564,7 +578,7 @@ export class SyncCoordinator {
       console.log('SYNC POLL', sp);
 
       console.log('SYNC POLL -> FETCH STATUS');
-      this.deferUnder(issuedEpoch, 'poll-scheduled status read', () =>
+      this.deferUnder(issuedEpoch, 'poll-scheduled status read', 'silent', () =>
         this.fetchSyncStatus(),
       );
     } catch (error) {

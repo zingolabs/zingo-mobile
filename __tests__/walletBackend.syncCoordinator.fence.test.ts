@@ -395,6 +395,20 @@ describe('SyncCoordinator seam-A fence — scheduling machine, current behavior'
     await c.clearTimers();
   });
 
+  it('Tests that a poll-scheduled launch dropped by a boundary reports nothing.', async () => {
+    bridge.pollSyncInfo.mockResolvedValue('Sync task has not been launched.');
+    const config = fakeConfig();
+    const c = new SyncCoordinator(config, fakeDataService());
+
+    await c.fetchSyncPoll(); // defers the poll-scheduled launch
+    await c.clearTimers(); // a routine boundary: the next tick polls again
+    await jest.advanceTimersByTimeAsync(0);
+    await flushPromises();
+
+    expect(bridge.runSyncProcess).not.toHaveBeenCalled();
+    expect(config.onError).not.toHaveBeenCalled();
+  });
+
   describe('A.8: save-required gate — three branches', () => {
     it('save not required pushes only the poll', async () => {
       const ds = fakeDataService();
