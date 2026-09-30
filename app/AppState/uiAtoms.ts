@@ -3,8 +3,10 @@
 // subscribers, without committing container state. The container is the only
 // writer.
 
+import type { ComponentProps } from 'react';
 import { atom } from 'jotai';
 
+import type NewAddressTag from '@ui/widgets/NewAddressTag';
 import { AppStateStatusEnum } from './enums/AppStateStatusEnum';
 
 // The foreground/background status the AppState listener reads as `prior` and
@@ -19,21 +21,30 @@ export const appStateStatusAtom = atom<AppStateStatusEnum>(
 // opening the modal writes only this atom, not container state.
 export const seedModalOpenAtom = atom<boolean>(false);
 
-export type AddTagTarget = {
-  // Counts launches. The host keys the form on this number.
-  launch: number;
-  address: string;
-  swapChain: string;
-  initialLabel?: string;
-};
+// What a launch of the "Add contact" sheet hands the form.
+export type AddTagTarget = Pick<
+  ComponentProps<typeof NewAddressTag>,
+  'address' | 'swapChain' | 'initialLabel'
+>;
 
-// The shared "Add contact" BottomSheet's target, as a discriminated union so
-// the hidden case names itself rather than riding a null. launchAddTagModal
-// writes `shown`, and the modal host reads it.
-export type AddTagModalState =
-  { kind: 'hidden'; launch: number } | ({ kind: 'shown' } & AddTagTarget);
+// The "Add contact" sheet's launches. `launch` counts launches so far, on both
+// arms. The host mounts one sheet instance per launch, keyed on that count,
+// and the sheet's own dismissal ends it, so no arm names visibility.
+export type AddTagModalState = { launch: number } & (
+  { kind: 'none' } | ({ kind: 'launched' } & AddTagTarget)
+);
 
 export const addTagModalAtom = atom<AddTagModalState>({
-  kind: 'hidden',
+  kind: 'none',
   launch: 0,
+});
+
+// The only transition: a launch for a target, numbered after the prior ones.
+export const launchAddTagAtom = atom(null, (get, set, target: AddTagTarget) => {
+  const prior = get(addTagModalAtom);
+  set(addTagModalAtom, {
+    kind: 'launched',
+    launch: prior.launch + 1,
+    ...target,
+  });
 });

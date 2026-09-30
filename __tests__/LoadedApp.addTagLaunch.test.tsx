@@ -1,14 +1,13 @@
 /**
- * The add-tag sheet's launch, under the mount gate of the installed
- * @gorhom/bottom-sheet v5. The shared mock renders a modal's children at all
- * times; the installed BottomSheetModal renders nothing until present() sets
- * `mount` inside a requestAnimationFrame, and it unmounts the content when the
- * close animation ends. The mock here carries both, and the form mock records
- * each mount.
+ * The add-tag sheet's launch, under the shared bottom-sheet mock, which
+ * carries the installed library's lifecycle: present() mounts the content a
+ * frame later, a present() during the close animation is dropped, and the
+ * content unmounts when the close animation ends. The form mock records each
+ * mount and unmount, and hands out the sheet dismiss it received.
  *
- * Two pins: the form mounts with the launched address a frame after
- * present(), and a relaunch during the close animation mounts a fresh form,
- * because the host keys the form on the launch number (#1457).
+ * Two pins: the form mounts with the launched address a frame after the
+ * launch, and a relaunch during the close animation leaves only the second
+ * form mounted once the close animation has elapsed (#1457).
  */
 
 jest.mock('@app/RPCModule', () =>
@@ -57,70 +56,54 @@ jest.mock('@screens/Receive', () => ({
   default: 'MockReceiveScreen',
 }));
 
-// The form records each mount, like the real NewAddressTag's label state,
-// which lives for the mount's lifetime.
+// The form numbers each mount, records the mount and the unmount, and keeps
+// the sheet dismiss it read from the enclosing sheet.
 jest.mock('@ui/widgets/NewAddressTag', () => {
   const ReactActual = jest.requireActual<typeof import('react')>('react');
-  const mountedWith = jest.fn();
+  const { useSheetDismiss } = jest.requireActual<
+    typeof import('@ui/primitives/AppSheetModal')
+  >('@ui/primitives/AppSheetModal');
+  const mounted = jest.fn();
+  const unmounted = jest.fn();
+  const dismissers: (() => void)[] = [];
+  let mounts = 0;
   const MockNewAddressTag = ({ address }: { address: string }) => {
+    const dismiss = useSheetDismiss();
     ReactActual.useEffect(() => {
-      mountedWith(address);
+      mounts += 1;
+      const mount = mounts;
+      dismissers.push(dismiss);
+      mounted(mount, address);
+      return () => {
+        unmounted(mount);
+      };
     }, []);
     return null;
   };
-  return { __esModule: true, default: MockNewAddressTag, mountedWith };
-});
-
-// The shared mock, with a BottomSheetModal that carries the real v5 mount
-// gate: children render only after present() lands its requestAnimationFrame.
-jest.mock('@gorhom/bottom-sheet', () => {
-  const ReactActual = jest.requireActual<typeof import('react')>('react');
-  const CLOSE_ANIMATION_MS = 250;
-  const BottomSheetModal = ReactActual.forwardRef(function GatedModal(
-    { children }: { children?: unknown },
-    ref,
-  ) {
-    const [mounted, setMounted] = ReactActual.useState(false);
-    const closing = ReactActual.useRef<
-      ReturnType<typeof setTimeout> | undefined
-    >(undefined);
-    ReactActual.useImperativeHandle(ref, () => ({
-      // A present during the close animation keeps the content mounted.
-      present: () => {
-        globalThis.clearTimeout(closing.current);
-        closing.current = undefined;
-        globalThis.requestAnimationFrame(() => setMounted(true));
-      },
-      // v5 unmounts the content when the close animation ends.
-      dismiss: () => {
-        closing.current = globalThis.setTimeout(
-          () => setMounted(false),
-          CLOSE_ANIMATION_MS,
-        );
-      },
-    }));
-    return mounted
-      ? ReactActual.createElement(ReactActual.Fragment, null, children as never)
-      : null;
-  });
   return {
-    ...jest.requireActual('../__mocks__/@gorhom/bottom-sheet'),
-    BottomSheetModal,
-    CLOSE_ANIMATION_MS,
+    __esModule: true,
+    default: MockNewAddressTag,
+    mounted,
+    unmounted,
+    dismissers,
   };
 });
 
 import { act } from '@testing-library/react-native';
 
+import { addTagModalAtom } from '@app/AppState/uiAtoms';
 import {
+  controllerStoreOf,
   flushMicrotasks,
   mountCommitted,
   spyOnLifecycleListeners,
 } from './helpers/loadedAppHarness';
 
-const { mountedWith } = jest.requireMock<{ mountedWith: jest.Mock }>(
-  '@ui/widgets/NewAddressTag',
-);
+const { mounted, unmounted, dismissers } = jest.requireMock<{
+  mounted: jest.Mock;
+  unmounted: jest.Mock;
+  dismissers: (() => void)[];
+}>('@ui/widgets/NewAddressTag');
 
 const { CLOSE_ANIMATION_MS } = jest.requireMock<{
   CLOSE_ANIMATION_MS: number;
@@ -129,13 +112,22 @@ const { CLOSE_ANIMATION_MS } = jest.requireMock<{
 const FRAME_MS = 16;
 const MID_CLOSE_MS = CLOSE_ANIMATION_MS / 2;
 
-const mountedAddresses = (): string[] =>
-  mountedWith.mock.calls.map(([address]) => address);
+const mountedForms = (): number[] =>
+  mounted.mock.calls
+    .map(([mount]) => mount as number)
+    .filter(
+      mount =>
+        !unmounted.mock.calls.some(([gone]) => (gone as number) === mount),
+    );
 
-describe('the add-tag sheet under the real mount gate', () => {
+const mountedAddresses = (): string[] =>
+  mounted.mock.calls.map(([, address]) => address as string);
+
+describe('the add-tag sheet under the shared mount gate', () => {
   beforeEach(() => {
     jest.useFakeTimers();
     jest.clearAllMocks();
+    dismissers.length = 0;
     spyOnLifecycleListeners();
   });
 
@@ -144,12 +136,31 @@ describe('the add-tag sheet under the real mount gate', () => {
     jest.restoreAllMocks();
   });
 
-  it('Tests that the form mounts with the launched address, a frame after present.', async () => {
+  const launch = async (
+    instance: Awaited<ReturnType<typeof mountCommitted>>['instance'],
+    address: string,
+  ) => {
+    await act(async () => {
+      instance.launchAddTagModal(address);
+      await flushMicrotasks();
+    });
+    await act(async () => {
+      jest.advanceTimersByTime(FRAME_MS);
+      await flushMicrotasks();
+    });
+  };
+
+  it('Tests that the form mounts with the launched address, a frame after the launch.', async () => {
     const { instance } = await mountCommitted();
 
     await act(async () => {
       instance.launchAddTagModal('zs1recipient');
       await flushMicrotasks();
+    });
+    expect(controllerStoreOf(instance).get(addTagModalAtom)).toMatchObject({
+      kind: 'launched',
+      launch: 1,
+      address: 'zs1recipient',
     });
     expect(mountedAddresses()).toEqual([]);
     await act(async () => {
@@ -160,31 +171,25 @@ describe('the add-tag sheet under the real mount gate', () => {
     expect(mountedAddresses()).toEqual(['zs1recipient']);
   });
 
-  it('Tests that a relaunch for the same address during the close animation mounts a fresh form.', async () => {
+  it('Tests that a relaunch during the close animation leaves only the second form mounted after the close.', async () => {
     const { instance } = await mountCommitted();
 
-    const launch = async (address: string) => {
-      await act(async () => {
-        instance.launchAddTagModal(address);
-        await flushMicrotasks();
-      });
-      await act(async () => {
-        jest.advanceTimersByTime(FRAME_MS);
-        await flushMicrotasks();
-      });
-    };
-
-    await launch('zs1recipient');
-    expect(mountedAddresses()).toEqual(['zs1recipient']);
+    await launch(instance, 'zs1recipient');
+    expect(mountedForms()).toEqual([1]);
 
     await act(async () => {
-      instance.addTagModalRef.current?.dismiss();
+      dismissers[0]();
       jest.advanceTimersByTime(MID_CLOSE_MS);
     });
-    await launch('zs1recipient');
+    await launch(instance, 'zs1recipient');
+    expect(controllerStoreOf(instance).get(addTagModalAtom)).toMatchObject({
+      launch: 2,
+    });
+    await act(async () => {
+      jest.advanceTimersByTime(CLOSE_ANIMATION_MS);
+      await flushMicrotasks();
+    });
 
-    // A launch is a new form. The typed label of the closing form must not
-    // carry over into the one the user just opened.
-    expect(mountedAddresses()).toEqual(['zs1recipient', 'zs1recipient']);
+    expect(mountedForms()).toEqual([2]);
   });
 });

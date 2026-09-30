@@ -66,18 +66,17 @@ jest.mock('@ui/widgets/NewAddressTag', () => ({
 }));
 
 import { act } from '@testing-library/react-native';
-import { createStore } from 'jotai';
 
 const { AppState } =
   jest.requireActual<typeof import('react-native')>('react-native');
 
-import { LoadedAppClass } from '@app/LoadedApp';
 import { resolveTriggerGate } from '@app/services/gateController';
 import { AppStateStatusEnum } from '@app/AppState';
 import { appStateStatusAtom, addTagModalAtom } from '@app/AppState/uiAtoms';
 import { syncStatusAtom } from '@app/AppState/syncAtoms';
 import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
 import {
+  controllerStoreOf,
   flushMicrotasks,
   mountCommitted,
   spyOnLifecycleListeners,
@@ -90,14 +89,6 @@ const syncing = (percent: number): RPCSyncStatusType => ({
   scan_ranges: [{} as never],
   percentage_total_outputs_scanned: percent,
 });
-
-function controllerStoreOf(
-  instance: LoadedAppClass,
-): ReturnType<typeof createStore> {
-  return (
-    instance as unknown as { controllerStore: ReturnType<typeof createStore> }
-  ).controllerStore;
-}
 
 function captureAppStateHandler(): (s: string) => Promise<void> {
   const spy = AppState.addEventListener as unknown as jest.Mock;
@@ -146,7 +137,8 @@ describe('fg/bg + residual UI slice', () => {
     });
 
     expect(store.get(addTagModalAtom)).toMatchObject({
-      kind: 'shown',
+      kind: 'launched',
+      launch: 1,
       address: 'zs1recipient',
     });
     expect(renderSpy).not.toHaveBeenCalled();

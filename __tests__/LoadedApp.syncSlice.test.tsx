@@ -64,7 +64,6 @@ import React from 'react';
 import { act, render } from '@testing-library/react-native';
 import { Provider, createStore, useAtomValue } from 'jotai';
 
-import { LoadedAppClass } from '@app/LoadedApp';
 import { resolveTriggerGate } from '@app/services/gateController';
 import {
   walletViewSourceAtom,
@@ -74,6 +73,7 @@ import { syncStatusAtom, syncMachineAtom } from '@app/AppState/syncAtoms';
 import type { SyncMachine } from '@app/walletBackend/controller/syncController';
 import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
 import {
+  controllerStoreOf,
   flushMicrotasks,
   mountCommitted,
   spyOnLifecycleListeners,
@@ -86,14 +86,6 @@ const syncing = (percent: number): RPCSyncStatusType => ({
   scan_ranges: [{} as never],
   percentage_total_outputs_scanned: percent,
 });
-
-function controllerStoreOf(
-  instance: LoadedAppClass,
-): ReturnType<typeof createStore> {
-  return (
-    instance as unknown as { controllerStore: ReturnType<typeof createStore> }
-  ).controllerStore;
-}
 
 describe('sync blast-radius — a sync tick wakes only sync consumers', () => {
   let syncRenders = 0;

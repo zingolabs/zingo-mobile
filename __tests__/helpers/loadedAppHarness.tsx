@@ -8,6 +8,7 @@ import React from 'react';
 import NetInfo from '@react-native-community/netinfo/src/index';
 import { act, render } from '@testing-library/react-native';
 import { StackScreenProps } from '@react-navigation/stack';
+import { createStore } from 'jotai';
 
 import { LoadedApp, LoadedAppClass } from '@app/LoadedApp';
 import { ChainNameEnum, LaunchingModeEnum, RouteEnum } from '@app/AppState';
@@ -23,6 +24,8 @@ export type DrawerProps = StackScreenProps<
 >;
 
 export type LoadedAppParams = Partial<AppStackParamList[RouteEnum.LoadedApp]>;
+
+export type ListenerSubscription = { remove: jest.Mock };
 
 export function makeDrawerProps(params: LoadedAppParams = {}): DrawerProps {
   return {
@@ -62,17 +65,32 @@ export async function mountCommitted(params?: LoadedAppParams) {
   return { utils, instance };
 }
 
+export function controllerStoreOf(
+  instance: LoadedAppClass,
+): ReturnType<typeof createStore> {
+  return (
+    instance as unknown as { controllerStore: ReturnType<typeof createStore> }
+  ).controllerStore;
+}
+
 // The listener spies every LoadedApp mount needs. NetInfo hands back the
-// given unsubscribe, and AppState and Linking hand back inert subscriptions.
+// given unsubscribe, and AppState and Linking hand back the returned
+// subscriptions, whose remove mocks a test can assert on.
 export function spyOnLifecycleListeners(
   netInfoUnsubscribe: jest.Mock = jest.fn(),
-): void {
+): {
+  appStateSubscription: ListenerSubscription;
+  linkingSubscription: ListenerSubscription;
+} {
+  const appStateSubscription = { remove: jest.fn() };
+  const linkingSubscription = { remove: jest.fn() };
   (NetInfo.addEventListener as jest.Mock).mockReturnValue(netInfoUnsubscribe);
   jest
     .spyOn(AppState, 'addEventListener')
-    .mockReturnValue({ remove: jest.fn() } as never);
+    .mockReturnValue(appStateSubscription as never);
   jest
     .spyOn(Linking, 'addEventListener')
-    .mockReturnValue({ remove: jest.fn() } as never);
+    .mockReturnValue(linkingSubscription as never);
   jest.spyOn(Linking, 'getInitialURL').mockResolvedValue(null);
+  return { appStateSubscription, linkingSubscription };
 }

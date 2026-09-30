@@ -1,4 +1,11 @@
-import React from 'react';
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+} from 'react';
 import { Keyboard, StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 import {
   BottomSheetBackdrop,
@@ -21,7 +28,17 @@ type AppSheetModalProps = {
   dismissable?: boolean;
   accessible?: boolean;
   renderFooter?: (props: BottomSheetFooterProps) => React.ReactElement;
+  // A sheet mounted once per launch presents itself when it mounts, so no
+  // caller holds its ref.
+  presentOnMount?: boolean;
 };
+
+// The dismiss of the enclosing AppSheetModal instance. Outside a sheet it is
+// a no-op.
+const SheetDismissContext = createContext<() => void>(() => {});
+
+export const useSheetDismiss = (): (() => void) =>
+  useContext(SheetDismissContext);
 
 const AppSheetModal = React.forwardRef<BottomSheetModal, AppSheetModalProps>(
   (
@@ -39,11 +56,24 @@ const AppSheetModal = React.forwardRef<BottomSheetModal, AppSheetModalProps>(
       // tree. The call sites passing false explicitly predate this.
       accessible = false,
       renderFooter,
+      presentOnMount = false,
     },
     ref,
   ) => {
     const { colors } = useTheme();
     const fixed = snapPoints !== undefined;
+    const sheet = useRef<BottomSheetModal>(null);
+    useImperativeHandle(ref, () => sheet.current as BottomSheetModal);
+
+    useEffect(() => {
+      if (presentOnMount) {
+        sheet.current?.present();
+      }
+    }, [presentOnMount]);
+
+    const dismiss = useCallback(() => {
+      sheet.current?.dismiss();
+    }, []);
 
     const renderBackdrop = (props: BottomSheetBackdropProps) => (
       <BottomSheetBackdrop
@@ -56,7 +86,7 @@ const AppSheetModal = React.forwardRef<BottomSheetModal, AppSheetModalProps>(
 
     return (
       <BottomSheetModal
-        ref={ref}
+        ref={sheet}
         accessible={accessible}
         enableDynamicSizing={!fixed}
         snapPoints={snapPoints}
@@ -81,19 +111,21 @@ const AppSheetModal = React.forwardRef<BottomSheetModal, AppSheetModalProps>(
         backdropComponent={renderBackdrop}
         footerComponent={renderFooter}
       >
-        <BottomSheetView style={fixed ? styles.fill : undefined}>
-          <View
-            style={[
-              fixed ? styles.maskFill : styles.mask,
-              { backgroundColor: colors.bgSurface },
-              contentStyle,
-            ]}
-          >
-            {header}
-            {children}
-          </View>
-          <SheetRim />
-        </BottomSheetView>
+        <SheetDismissContext.Provider value={dismiss}>
+          <BottomSheetView style={fixed ? styles.fill : undefined}>
+            <View
+              style={[
+                fixed ? styles.maskFill : styles.mask,
+                { backgroundColor: colors.bgSurface },
+                contentStyle,
+              ]}
+            >
+              {header}
+              {children}
+            </View>
+            <SheetRim />
+          </BottomSheetView>
+        </SheetDismissContext.Provider>
       </BottomSheetModal>
     );
   },

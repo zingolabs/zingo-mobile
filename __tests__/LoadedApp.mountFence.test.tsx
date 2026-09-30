@@ -73,7 +73,6 @@ jest.mock('@screens/Receive', () => ({
 
 import NetInfo from '@react-native-community/netinfo/src/index';
 import { act } from '@testing-library/react-native';
-import { createStore } from 'jotai';
 
 // The manual react-native mock exposes only a partial shim through the ESM
 // named-import interop; the source module reaches AppState/Linking via the same
@@ -94,22 +93,18 @@ import {
 } from '@app/AppState';
 import { appStateStatusAtom } from '@app/AppState/uiAtoms';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
-import { flushMicrotasks, mountCommitted } from './helpers/loadedAppHarness';
+import {
+  ListenerSubscription,
+  controllerStoreOf,
+  flushMicrotasks,
+  mountCommitted,
+  spyOnLifecycleListeners,
+} from './helpers/loadedAppHarness';
 import { mockOfflineServer } from '../__mocks__/dataMocks/mockServer';
 
 const doSaveMock = doSave as jest.Mock;
 const resolveTriggerGateMock = resolveTriggerGate as jest.Mock;
 const netInfoUnsubscribe = jest.fn();
-
-// appStateStatus moved off container state to the UI atom; the fg/bg handler
-// reads its `prior` from here, so the test seeds the atom, not setState.
-function controllerStoreOf(
-  instance: LoadedAppClass,
-): ReturnType<typeof createStore> {
-  return (
-    instance as unknown as { controllerStore: ReturnType<typeof createStore> }
-  ).controllerStore;
-}
 
 // Route presence, read off the react-test-renderer tree rather than RNTL's
 // testID matcher (which trips over the custom marker host under the shimmed
@@ -135,25 +130,16 @@ function captureAppStateHandler(): (s: string) => Promise<void> {
 }
 
 describe('LoadedApp seam-B mount fence — current container behavior', () => {
-  let appStateSubscription: { remove: jest.Mock };
-  let linkingSubscription: { remove: jest.Mock };
+  let appStateSubscription: ListenerSubscription;
+  let linkingSubscription: ListenerSubscription;
 
   beforeEach(() => {
     jest.useFakeTimers();
     jest.clearAllMocks();
 
     resolveTriggerGateMock.mockResolvedValue({ kind: 'passed' });
-    (NetInfo.addEventListener as jest.Mock).mockReturnValue(netInfoUnsubscribe);
-
-    appStateSubscription = { remove: jest.fn() };
-    linkingSubscription = { remove: jest.fn() };
-    jest
-      .spyOn(AppState, 'addEventListener')
-      .mockReturnValue(appStateSubscription as never);
-    jest
-      .spyOn(Linking, 'addEventListener')
-      .mockReturnValue(linkingSubscription as never);
-    jest.spyOn(Linking, 'getInitialURL').mockResolvedValue(null);
+    ({ appStateSubscription, linkingSubscription } =
+      spyOnLifecycleListeners(netInfoUnsubscribe));
   });
 
   afterEach(() => {

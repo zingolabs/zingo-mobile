@@ -14,7 +14,6 @@ const meta: Meta<typeof NewAddressTag> = {
   args: {
     address: uAddress,
     own: false,
-    closeSheet: () => {},
     setAddressBook: () => {},
   },
 };
