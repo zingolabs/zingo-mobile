@@ -123,11 +123,18 @@ export class SyncCoordinator {
     }
   }
 
-  // Runs the task on the next macrotask unless an invalidating boundary passes first.
-  private deferUnder(epoch: Epoch, task: () => Promise<void>): void {
+  // Runs the task on the next macrotask unless an invalidating boundary passes
+  // first, in which case the drop is logged under the task's name.
+  private deferUnder(
+    epoch: Epoch,
+    name: string,
+    task: () => Promise<void>,
+  ): void {
     setTimeout(async () => {
       if (isCurrent(epoch, this.controllerEpoch)) {
         await task();
+      } else {
+        console.log(`${name} dropped: a boundary passed before it ran`);
       }
     }, 0);
   }
@@ -368,7 +375,9 @@ export class SyncCoordinator {
       const queued = this.queuedRescan;
       this.queuedRescan = { kind: 'none' };
       if (queued.kind === 'queued') {
-        this.deferUnder(queued.epoch, () => this.refreshSync(true));
+        this.deferUnder(queued.epoch, 'queued rescan', () =>
+          this.refreshSync(true),
+        );
       }
     }
   }
@@ -484,15 +493,21 @@ export class SyncCoordinator {
         returnPoll.toLowerCase().startsWith('sync task has not been launched')
       ) {
         console.log('SYNC POLL -> RUN SYNC', returnPoll);
-        this.deferUnder(issuedEpoch, () => this.refreshSync());
+        this.deferUnder(issuedEpoch, 'poll-scheduled launch', () =>
+          this.refreshSync(),
+        );
         return;
       }
 
       if (returnPoll.toLowerCase().startsWith('sync task is not complete')) {
         console.log('SYNC POLL -> FETCH STATUS', returnPoll);
-        this.deferUnder(issuedEpoch, () => this.fetchSyncStatus());
+        this.deferUnder(issuedEpoch, 'poll-scheduled status read', () =>
+          this.fetchSyncStatus(),
+        );
         console.log('SYNC POLL -> RUN SYNC', returnPoll);
-        this.deferUnder(issuedEpoch, () => this.refreshSync());
+        this.deferUnder(issuedEpoch, 'poll-scheduled launch', () =>
+          this.refreshSync(),
+        );
         return;
       }
 
@@ -530,7 +545,9 @@ export class SyncCoordinator {
       console.log('SYNC POLL', sp);
 
       console.log('SYNC POLL -> FETCH STATUS');
-      this.deferUnder(issuedEpoch, () => this.fetchSyncStatus());
+      this.deferUnder(issuedEpoch, 'poll-scheduled status read', () =>
+        this.fetchSyncStatus(),
+      );
     } catch (error) {
       console.log(`Critical Error sync poll ${error}`);
       this.config.onError(`Error sync poll: ${error}`);

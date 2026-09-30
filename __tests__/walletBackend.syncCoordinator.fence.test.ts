@@ -328,6 +328,31 @@ describe('SyncCoordinator seam-A fence — scheduling machine, current behavior'
     await c.clearTimers();
   });
 
+  it('Tests that a queued rescan is dropped with a log when a boundary passes before it runs.', async () => {
+    const launch = deferred<string>();
+    bridge.runSyncProcess.mockReturnValue(launch.promise);
+    bridge.runRescanProcess.mockResolvedValue('Launching rescan...');
+    const log = jest.spyOn(console, 'log').mockImplementation(() => {});
+    const c = new SyncCoordinator(fakeConfig(), fakeDataService());
+
+    const sync = c.refreshSync();
+    await flushPromises();
+    await c.refreshSync(true); // queued under the current epoch
+    await c.clearTimers(); // the boundary: the epoch moves on
+    launch.resolve('Launching sync task...');
+    await sync;
+    await jest.advanceTimersByTimeAsync(0);
+    await flushPromises();
+
+    expect(bridge.runRescanProcess).not.toHaveBeenCalled();
+    expect(log).toHaveBeenCalledWith(
+      'queued rescan dropped: a boundary passed before it ran',
+    );
+
+    log.mockRestore();
+    await c.clearTimers();
+  });
+
   describe('A.8: save-required gate — three branches', () => {
     it('save not required pushes only the poll', async () => {
       const ds = fakeDataService();
