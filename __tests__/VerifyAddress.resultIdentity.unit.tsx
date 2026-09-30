@@ -88,12 +88,24 @@ function setup() {
   };
 }
 
-beforeEach(() => {
+function mockNativeAnswers() {
   jest.resetAllMocks();
   jest.mocked(RPCModule.parseAddressInfo).mockResolvedValue(valid);
   jest
     .mocked(RPCModule.checkMyAddressInfo)
     .mockImplementation(async address => ownership(address, address === owned));
+}
+
+// Loads React Native's lazily required components before the timed tests.
+beforeAll(async () => {
+  mockNativeAnswers();
+  const warm = setup();
+  await warm.enter(owned);
+  warm.unmount();
+}, 30000);
+
+beforeEach(() => {
+  mockNativeAnswers();
 });
 
 test('Tests that current ownership is displayed when verification succeeds.', async () => {
