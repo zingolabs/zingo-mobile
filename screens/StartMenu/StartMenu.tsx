@@ -26,6 +26,7 @@ import {
   getZingoVersion,
 } from '@app/utils/ZingoAppData';
 import BoldText from '@ui/primitives/BoldText';
+import WelcomeBranches from '@ui/widgets/WelcomeBranches';
 import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
 
 type StartMenuProps = {
@@ -58,6 +59,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
   const { colors } = useTheme();
 
   const [containerH, setContainerH] = useState<number>(0);
+  const [containerW, setContainerW] = useState<number>(0);
   const [headerH, setHeaderH] = useState<number>(0);
   const startMenuSheetRef = useRef<BottomSheet>(null);
   const optionsMenuRef = useRef<BottomSheetModal>(null);
@@ -151,8 +153,12 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
         flex: 1,
         backgroundColor: colors.bgCanvas,
       }}
-      onLayout={e => setContainerH(e.nativeEvent.layout.height)}
+      onLayout={e => {
+        setContainerH(e.nativeEvent.layout.height);
+        setContainerW(e.nativeEvent.layout.width);
+      }}
     >
+      <WelcomeBranches width={containerW} height={headerH} />
       <View onLayout={e => setHeaderH(e.nativeEvent.layout.height)}>
         <View
           style={{
