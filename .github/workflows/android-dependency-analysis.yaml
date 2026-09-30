@@ -3,8 +3,8 @@ name: Android dependency analysis
 on:
   workflow_call:
     inputs:
-      # The key from create-cache-key.yaml, which names the Binding Layer
-      # that android-build.yaml built for this run.
+      # The key from create-cache-key.yaml, which names the pin and the
+      # toolchain that the Kotlin bindings come from.
       cache-key:
         required: true
         type: string
@@ -50,10 +50,9 @@ jobs:
       - name: Check out zingolib
         uses: ./.github/actions/zingolib-submodule
 
-      - name: Restore the Binding Layer
-        uses: ./.github/actions/binding-layer-android
+      - name: Generate the Kotlin bindings
+        uses: ./.github/actions/kotlin-bindings
         with:
-          abi: x86_64
           cache-key: ${{ inputs.cache-key }}
 
       # Fails on dependencies nothing compiles against (the Kotlin analog

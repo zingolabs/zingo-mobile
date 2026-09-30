@@ -1,0 +1,62 @@
+name: Kotlin bindings
+description: >
+  Generates the Binding Layer's Kotlin sources on the host with the
+  builder's kotlin mode, and points Gradle at them. The Gradle checks
+  compile against the sources and need no native library. The zingolib
+  submodule is checked out before this action runs.
+
+inputs:
+  cache-key:
+    description: The key from create-cache-key.yaml.
+    required: true
+
+runs:
+  using: composite
+  steps:
+    # zingo-netutils reaches lightwallet-protocol, whose build script
+    # generates its prost bindings with protoc.
+    - name: Install protobuf-compiler
+      shell: bash
+      run: sudo apt-get update && sudo apt-get install -y protobuf-compiler
+
+    - name: Rust stable
+      shell: bash
+      run: rustup default stable
+
+    # The proxy crate's host build and the bindgen binaries. The key
+    # follows the Binding Layer's, which names the pin and the toolchain.
+    - name: Cache the host build
+      uses: actions/cache@v6
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+          zingolib/target/binding-layer/host
+        key: kotlin-bindings-${{ runner.os }}-${{ inputs.cache-key }}
+
+    # The kotlin mode compiles nothing that embeds the descriptor, and it
+    # takes none.
+    - name: Generate the Kotlin bindings
+      shell: bash
+      env:
+        RUSTUP_TOOLCHAIN: stable
+      run: |
+        cargo run \
+          --manifest-path zingolib/tools/workbench/Cargo.toml \
+          --bin build-binding-layer -- \
+          kotlin --out zingolib/bindings/android/build/binding-layer
+
+    - name: Verify the Kotlin bindings are present
+      shell: bash
+      env:
+        OUTPUT: zingolib/bindings/android/build/binding-layer
+      run: |
+        set -eu
+        test -f "$OUTPUT/kotlin/uniffi/zingo/zingo.kt"
+        test -f "$OUTPUT/kotlin/uniffi/zingo_nym_proxy_ffi/zingo_nym_proxy_ffi.kt"
+
+    # Gradle reads ORG_GRADLE_PROJECT_<name> as the project property <name>,
+    # and the included Binding Layer build then skips its own build.
+    - name: Point Gradle at the Kotlin bindings
+      shell: bash
+      run: echo "ORG_GRADLE_PROJECT_bindingLayerPrebuilt=$GITHUB_WORKSPACE/zingolib/bindings/android/build/binding-layer" >> "$GITHUB_ENV"
