@@ -16,6 +16,7 @@ import {
   remoteServer,
 } from '@app/AppState';
 import Utils from '@app/utils';
+import * as ZnsResolver from '@app/uris/resolveZnsName';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import { mockServer } from '../__mocks__/dataMocks/mockServer';
@@ -122,6 +123,57 @@ function setup() {
 }
 
 afterEach(() => jest.restoreAllMocks());
+
+test.each([true, false])(
+  'Tests that a newer URI wins when an older name lookup has started: %s.',
+  async started => {
+    const name = deferred<ZnsResolver.ZnsResolution>();
+    const resolveName = jest
+      .spyOn(ZnsResolver, 'resolveZnsName')
+      .mockReturnValue(name.promise);
+    const h = setup();
+    const debounce = async () => {
+      await act(async () => {
+        await new Promise(resolve => setTimeout(resolve, 550));
+      });
+    };
+    await h.edit('alice.zec');
+    if (started) {
+      await debounce();
+    }
+    expect(resolveName).toHaveBeenCalledTimes(started ? 1 : 0);
+    await h.edit(uri(olderAddress, '2', 'Latest URI memo'));
+    if (!started) {
+      await debounce();
+    }
+    expect(resolveName).toHaveBeenCalledTimes(1);
+    await act(async () => {
+      name.release({ ok: true, address: editedAddress });
+    });
+    await h.finish(h.older);
+    expect(h.field().props.value).toBe(olderAddress);
+    expect(h.view.getByTestId('send.amount').props.value).toBe('2.00000000');
+    expect(h.memo().props.value).toBe('Latest URI memo');
+  },
+);
+
+test('Tests that a name resolves into the recipient when its lookup remains current.', async () => {
+  const name = deferred<ZnsResolver.ZnsResolution>();
+  const resolveName = jest
+    .spyOn(ZnsResolver, 'resolveZnsName')
+    .mockReturnValue(name.promise);
+  const h = setup();
+  await h.edit('alice.zec');
+  await act(async () => {
+    await new Promise(resolve => setTimeout(resolve, 550));
+  });
+  expect(resolveName).toHaveBeenCalledWith('alice.zec', mockServer.chainName);
+  await act(async () => {
+    name.release({ ok: true, address: editedAddress });
+  });
+  expect(h.field().props.value).toBe(editedAddress);
+  expect(h.view.getByText('ZNS: alice.zec')).toBeTruthy();
+});
 
 test.each([editedAddress, ''])(
   'Tests that the latest recipient remains when an older URI completes after editing to %s.',

@@ -735,10 +735,11 @@ const Send: React.FunctionComponent<SendProps> = ({
     // Neither valid nor invalid until the indexer answers.
     setValidAddress(0);
     setZnsNotFound(false);
+    const revision = recipientRevision.current;
     let cancelled = false;
     const timerId = setTimeout(async () => {
       const resolution = await resolveZnsName(addressText, server.chainName);
-      if (cancelled) {
+      if (cancelled || revision !== recipientRevision.current) {
         return;
       }
       if (resolution.ok) {
