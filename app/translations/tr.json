@@ -675,7 +675,9 @@
     "birthday": "Doğum günü",
     "text": "Tohum ifadesinden veya görüntüleme anahtarından geri yükleme, yeniden tarama gerektirir ve tamamlanması uzun sürebilir.",
     "button": "Cüzdanı Geri Yükle",
-    "birthday-acc": "Doğum günü alanı"
+    "birthday-acc": "Doğum günü alanı",
+    "viewing-key": "Görüntüleme anahtarı",
+    "word-invalid": "Bu kelime kurtarma kelime listesinde yok. Yazımı kontrol edin."
   },
   "about": {
     "copyright": [

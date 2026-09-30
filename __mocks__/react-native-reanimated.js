@@ -60,6 +60,8 @@ const FadeInUp = new AnimationBuilder();
 const FadeInDown = new AnimationBuilder();
 const FadeOut = new AnimationBuilder();
 const LinearTransition = new AnimationBuilder();
+const ZoomIn = new AnimationBuilder();
+const ZoomOut = new AnimationBuilder();
 const Layout = new AnimationBuilder();
 
 const ReduceMotion = { System: 'system', Always: 'always', Never: 'never' };
@@ -127,4 +129,6 @@ export {
   withSequence,
   withSpring,
   withTiming,
+  ZoomIn,
+  ZoomOut,
 };

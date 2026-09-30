@@ -677,7 +677,9 @@
     "birthday": "Birthday",
     "text": "Restoring from Seed Phrase or Viewing Key requires a rescan, and may take a long time to complete.",
     "button": "Restore Wallet",
-    "birthday-acc": "Birthday Field"
+    "birthday-acc": "Birthday Field",
+    "viewing-key": "Viewing key",
+    "word-invalid": "That word is not in the recovery word list. Check the spelling."
   },
   "about": {
     "copyright": [

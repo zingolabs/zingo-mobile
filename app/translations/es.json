@@ -677,7 +677,9 @@
     "birthday": "Cumpleaños",
     "text": "Importar una Semilla / Clave de Visualización implica un Re-escaneo completo, y puede tomar mucho tiempo completarlo.",
     "button": "Restaurar Monedero",
-    "birthday-acc": "Campo Cumpleaños"
+    "birthday-acc": "Campo Cumpleaños",
+    "viewing-key": "Clave de visualización",
+    "word-invalid": "Esa palabra no está en la lista de palabras de recuperación. Revisa la ortografía."
   },
   "about": {
     "copyright": [

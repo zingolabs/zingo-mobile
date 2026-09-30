@@ -33,6 +33,7 @@ import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
 import AppSheet from '@ui/primitives/AppSheet';
 import { ContextAppLoading } from '@app/context';
 import Header from '@ui/widgets/Header';
+import SeedPhraseInput from '@ui/widgets/SeedPhraseInput';
 import { getLatestBlockServerInfo } from '@app/walletBackend';
 import { GlobalConst, RouteEnum, ScreenEnum } from '@app/AppState';
 import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
@@ -270,70 +271,47 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
           <View
             style={{
               margin: 10,
-              padding: 10,
-              borderWidth: 1,
-              borderRadius: 12,
-              borderColor: colors.borderMuted,
               flexDirection: 'row',
-              justifyContent: 'space-between',
+              alignItems: 'flex-start',
             }}
           >
             <View
-              accessible={true}
               accessibilityLabel={translate('seed.seed-acc') as string}
-              style={{
-                marginRight: 5,
-                width: 'auto',
-                flex: 1,
-                justifyContent: 'center',
-              }}
+              style={{ flex: 1, marginRight: 8 }}
             >
-              <TextInput
+              <SeedPhraseInput
                 testID="import.seedufvkinput"
-                multiline
-                autoCorrect={false}
-                autoComplete="off"
-                spellCheck={false}
-                textContentType="none"
-                keyboardType="visible-password"
-                style={{
-                  color: colors.fgDefault,
-                  fontWeight: '600',
-                  fontSize: 16,
-                  minHeight: 100,
-                  marginHorizontal: 5,
-                  backgroundColor: 'transparent',
-                  textAlignVertical: 'top',
-                }}
                 value={seedufvkText}
-                onChangeText={setSeedufvkText}
+                onChangeValue={setSeedufvkText}
+                translate={translate}
               />
             </View>
-            {seedufvkText && (
+            <View style={{ alignItems: 'center', gap: 12, paddingTop: 10 }}>
               <TouchableOpacity
                 onPress={() => {
-                  setSeedufvkText('');
+                  showQrcodeModalVisible();
                 }}
               >
                 <FontAwesomeIcon
-                  style={{ margin: 0 }}
-                  size={20}
-                  icon={faXmark}
-                  color={colors.fgAccentDisabled}
+                  size={28}
+                  icon={faQrcode}
+                  color={colors.fgMuted}
                 />
               </TouchableOpacity>
-            )}
-            <TouchableOpacity
-              onPress={() => {
-                showQrcodeModalVisible();
-              }}
-            >
-              <FontAwesomeIcon
-                size={28}
-                icon={faQrcode}
-                color={colors.fgMuted}
-              />
-            </TouchableOpacity>
+              {!!seedufvkText && (
+                <TouchableOpacity
+                  onPress={() => {
+                    setSeedufvkText('');
+                  }}
+                >
+                  <FontAwesomeIcon
+                    size={20}
+                    icon={faXmark}
+                    color={colors.fgAccentDisabled}
+                  />
+                </TouchableOpacity>
+              )}
+            </View>
           </View>
 
           <View style={{ marginTop: 10, alignItems: 'center' }}>

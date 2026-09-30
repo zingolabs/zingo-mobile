@@ -677,7 +677,9 @@
     "birthday": "Aniversário",
     "text": "A restauração da frases de recuperação / chave de visualização requer uma nova verificação e pode levar muito tempo para ser concluída.",
     "button": "Restaurar Carteira",
-    "birthday-acc": "Campo de Aniversário"
+    "birthday-acc": "Campo de Aniversário",
+    "viewing-key": "Chave de visualização",
+    "word-invalid": "Essa palavra não está na lista de palavras de recuperação. Verifique a ortografia."
   },
   "about": {
     "copyright": [
