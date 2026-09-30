@@ -6,7 +6,19 @@ import React, {
   useState,
   useRef,
 } from 'react';
-import { View, TouchableOpacity, TextInput, Keyboard } from 'react-native';
+import {
+  View,
+  TouchableOpacity,
+  TextInput,
+  Keyboard,
+  Pressable,
+} from 'react-native';
+import Animated, {
+  interpolateColor,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
 
 import {
   NavigationProp,
@@ -29,15 +41,18 @@ import BottomSheet, {
 import FadeText from '@ui/primitives/FadeText';
 import RegText from '@ui/primitives/RegText';
 import BoldText from '@ui/primitives/BoldText';
-import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
 import AppSheet from '@ui/primitives/AppSheet';
 import { ContextAppLoading } from '@app/context';
 import Header from '@ui/widgets/Header';
 import SeedPhraseInput from '@ui/widgets/SeedPhraseInput';
+import BusyButton from '@ui/widgets/BusyButton';
+import InfoTooltip from '@ui/widgets/InfoTooltip';
 import { getLatestBlockServerInfo } from '@app/walletBackend';
 import { GlobalConst, RouteEnum, ScreenEnum } from '@app/AppState';
 import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
 import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
+import { seedStatus } from '@app/utils/seedPhrase';
+import { duration, ease } from '@app/theme/motion';
 
 const activationHeight = {
   main: 419200,
@@ -47,10 +62,12 @@ const activationHeight = {
 };
 
 type ImportUfvkProps = {
+  busy: boolean;
   onClickCancel: () => void;
   onClickOK: (keyText: string, birthday: number) => void;
 };
 const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
+  busy,
   onClickCancel,
   onClickOK,
 }) => {
@@ -65,8 +82,39 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
   const [latestBlock, setLatestBlock] = useState<number>(0);
   const [containerH, setContainerH] = useState<number>(0);
   const [headerH, setHeaderH] = useState<number>(0);
+  const [tipOpen, setTipOpen] = useState<boolean>(false);
   const importUfvkSheetRef = useRef<BottomSheet>(null);
   const keyboardHeight = useKeyboardHeight();
+
+  const activation = activationHeight[server.chainName];
+  const status = seedStatus(seedufvkText);
+  const keyReady =
+    status.kind === 'ufvk' || (status.kind === 'seed' && status.complete);
+  const birthdayLow = !!birthday && Number(birthday) < activation;
+  const ready = keyReady && !birthdayLow;
+
+  const birthdayFocus = useSharedValue(0);
+  const birthdayBorder = useAnimatedStyle(() => ({
+    borderColor: interpolateColor(
+      birthdayFocus.value,
+      [0, 1],
+      [colors.borderMuted, colors.borderAccent],
+    ),
+  }));
+  const setBirthdayFocused = (focused: boolean) => {
+    birthdayFocus.value = withTiming(focused ? 1 : 0, {
+      duration: duration.base,
+      easing: ease.standard,
+    });
+  };
+
+  const rangeText =
+    server.kind === 'offline'
+      ? (translate('seed.birthday-no-readonly') as string).split('\n')[0]
+      : translate('seed.birthday-no-readonly') +
+        ` (${activation}, ` +
+        (latestBlock ? latestBlock.toString() : '--') +
+        ')';
 
   useEffect(() => {
     // Both conditions must hold: a session with no server has nothing to ask,
@@ -209,19 +257,27 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
             alignItems: 'center',
           }}
         >
-          <Button
+          <BusyButton
             testID="import.button.ok"
-            type={ButtonTypeEnum.Primary}
             title={translate('import.button') as string}
+            enabled={ready}
+            busy={busy}
             onPress={() => {
               okButton();
             }}
+            onDisabledPress={() =>
+              addLastSnackbar(
+                translate(
+                  keyReady ? 'import.need-birthday' : 'import.need-words',
+                ) as string,
+              )
+            }
           />
         </View>
       </BottomSheetFooter>
     ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [colors, translate, seedufvkText, birthday, keyboardHeight],
+    [colors, translate, seedufvkText, birthday, keyboardHeight, ready, busy],
   );
 
   return (
@@ -255,6 +311,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
           keyboardShouldPersistTaps="handled"
           bounces={false}
           alwaysBounceVertical={false}
+          onScrollBeginDrag={() => setTipOpen(false)}
           style={{
             flex: 1,
           }}
@@ -265,6 +322,19 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
             paddingBottom: keyboardHeight > 0 ? keyboardHeight + 80 : 80,
           }}
         >
+          {tipOpen && (
+            <Pressable
+              onPress={() => setTipOpen(false)}
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                zIndex: 1,
+              }}
+            />
+          )}
           <FadeText style={{ marginTop: 0, padding: 20, textAlign: 'center' }}>
             {translate('import.key-label') as string}
           </FadeText>
@@ -315,36 +385,39 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
           </View>
 
           <View style={{ marginTop: 10, alignItems: 'center' }}>
-            <FadeText>{translate('import.birthday') as string}</FadeText>
-            {server.kind !== 'offline' && (
-              <FadeText style={{ textAlign: 'center' }}>
-                {translate('seed.birthday-no-readonly') +
-                  ` (${activationHeight[server.chainName]}, ` +
-                  (latestBlock ? latestBlock.toString() : '--') +
-                  ')'}
-              </FadeText>
-            )}
-            <View
+            <InfoTooltip
+              testID="import.birthdayinfo"
+              label={translate('import.birthday') as string}
+              text={rangeText}
+              open={tipOpen}
+              onToggle={setTipOpen}
+            />
+            <Animated.View
               accessible={true}
               accessibilityLabel={translate('import.birthday-acc') as string}
-              style={{
-                margin: 10,
-                borderWidth: 1,
-                borderRadius: 12,
-                borderColor: colors.borderMuted,
-                width: '30%',
-                maxWidth: '40%',
-                maxHeight: 48,
-                minWidth: '20%',
-                minHeight: 48,
-                flexDirection: 'row',
-                alignItems: 'center',
-              }}
+              style={[
+                {
+                  margin: 10,
+                  borderWidth: 1,
+                  borderRadius: 12,
+                  width: '30%',
+                  maxWidth: '40%',
+                  maxHeight: 48,
+                  minWidth: '20%',
+                  minHeight: 48,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                },
+                birthdayBorder,
+                birthdayLow && { borderColor: colors.fgDangerEmphasis },
+              ]}
             >
               <TextInput
                 testID="import.birthdayinput"
                 placeholder={'#'}
                 placeholderTextColor={colors.fgMuted}
+                onFocus={() => setBirthdayFocused(true)}
+                onBlur={() => setBirthdayFocused(false)}
                 style={{
                   color: colors.fgDefault,
                   fontWeight: '600',
@@ -384,7 +457,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
                   />
                 </TouchableOpacity>
               )}
-            </View>
+            </Animated.View>
 
             <RegText style={{ margin: 20, marginBottom: 30 }}>
               {translate('import.text') as string}

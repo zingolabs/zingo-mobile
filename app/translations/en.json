@@ -679,7 +679,9 @@
     "button": "Restore Wallet",
     "birthday-acc": "Birthday Field",
     "viewing-key": "Viewing key",
-    "word-invalid": "That word is not in the recovery word list. Check the spelling."
+    "word-invalid": "That word is not in the recovery word list. Check the spelling.",
+    "need-words": "Enter all 24 words, or a viewing key.",
+    "need-birthday": "Enter a block height inside the range, or leave it empty."
   },
   "about": {
     "copyright": [

@@ -55,6 +55,8 @@ class AnimationBuilder {
   }
 }
 
+class Keyframe extends AnimationBuilder {}
+
 const FadeIn = new AnimationBuilder();
 const FadeInUp = new AnimationBuilder();
 const FadeInDown = new AnimationBuilder();
@@ -112,6 +114,7 @@ export {
   FadeOut,
   interpolate,
   interpolateColor,
+  Keyframe,
   Layout,
   LinearTransition,
   ReduceMotion,

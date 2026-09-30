@@ -2074,6 +2074,7 @@ export class LoadingAppClass extends Component<
               )}
               {screen === RouteEnum.ImportUfvk && (
                 <ImportUfvk
+                  busy={this.state.actionButtonsDisabled}
                   onClickOK={(s: string, b: number) => this.doRestore(s, b)}
                   onClickCancel={() =>
                     this.setState({ screen: RouteEnum.StartMenu })

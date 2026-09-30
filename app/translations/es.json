@@ -679,7 +679,9 @@
     "button": "Restaurar Monedero",
     "birthday-acc": "Campo Cumpleaños",
     "viewing-key": "Clave de visualización",
-    "word-invalid": "Esa palabra no está en la lista de palabras de recuperación. Revisa la ortografía."
+    "word-invalid": "Esa palabra no está en la lista de palabras de recuperación. Revisa la ortografía.",
+    "need-words": "Introduce las 24 palabras, o una clave de visualización.",
+    "need-birthday": "Introduce una altura de bloque dentro del rango, o déjala vacía."
   },
   "about": {
     "copyright": [
