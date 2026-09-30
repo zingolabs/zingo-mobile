@@ -409,6 +409,25 @@ describe('SyncCoordinator seam-A fence — scheduling machine, current behavior'
     expect(config.onError).not.toHaveBeenCalled();
   });
 
+  it('Tests that a rejected reconfigure after a rescan reports through onError and resolves.', async () => {
+    bridge.runRescanProcess.mockResolvedValue('Launching rescan...');
+    const ds = fakeDataService();
+    (ds.fetchAddresses as jest.Mock).mockRejectedValue(
+      new Error('addresses blew up'),
+    );
+    const config = fakeConfig();
+    const c = new SyncCoordinator(config, ds);
+
+    await expect(c.refreshSync(true)).resolves.toBeUndefined();
+
+    expect(config.onError).toHaveBeenCalledWith(
+      expect.stringContaining('addresses blew up'),
+    );
+    expect(c.refreshSyncLock).toBe(false);
+
+    await c.clearTimers();
+  });
+
   describe('A.8: save-required gate — three branches', () => {
     it('save not required pushes only the poll', async () => {
       const ds = fakeDataService();

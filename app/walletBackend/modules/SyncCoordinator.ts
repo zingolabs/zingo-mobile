@@ -396,18 +396,24 @@ export class SyncCoordinator {
       }
     } finally {
       this.laneHolder = 'none';
-      if (
-        rescanEpoch !== undefined &&
-        isCurrent(rescanEpoch, this.controllerEpoch)
-      ) {
-        await this.configure();
-      }
       const queued = this.queuedRescan;
       this.queuedRescan = { kind: 'none' };
       if (queued.kind === 'queued') {
         this.deferUnder(queued.epoch, 'queued rescan', 'report', () =>
           this.refreshSync(true),
         );
+      }
+      if (
+        rescanEpoch !== undefined &&
+        isCurrent(rescanEpoch, this.controllerEpoch)
+      ) {
+        // This catch owns a rejected reconfigure, so refreshSync resolves for
+        // its caller either way.
+        try {
+          await this.configure();
+        } catch (error) {
+          this.config.onError(`Error rescan reconfigure: ${error}`);
+        }
       }
     }
   }
