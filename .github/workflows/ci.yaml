@@ -71,6 +71,13 @@ jobs:
     with:
       fail-all: true
 
+  # zingolib's CI leaves the wallet crate and the proxy crate untested, and
+  # this job tests both at the pinned commit.
+  binding-layer-check:
+    uses: ./.github/workflows/binding-layer-check.yaml
+    with:
+      fail-all: true
+
   js-depcheck:
     uses: ./.github/workflows/js-depcheck.yaml
     with:
@@ -172,6 +179,7 @@ jobs:
       - andr-unit-test
       - jest-test
       - rust-shear
+      - binding-layer-check
       - js-depcheck
       - js-static-checks
       - andr-dependency-analysis
