@@ -21,11 +21,11 @@ jest.mock('../app/walletBackend/utils/walletUtils', () => ({
 
 import RPCModule from '../app/RPCModule';
 import { SyncCoordinator } from '../app/walletBackend/modules/SyncCoordinator';
-import { DataService } from '../app/walletBackend/modules/DataService';
 import { WalletBackendConfig } from '../app/walletBackend/config/WalletBackendConfig';
 import { RPCPerformanceLevelEnum } from '../app/walletBackend/enums/RPCPerformanceLevelEnum';
 import { doSave } from '../app/walletBackend/utils/walletUtils';
 import { mockServer } from '../__mocks__/dataMocks/mockServer';
+import { mockDataService as fakeDataService } from '../__mocks__/dataMocks/mockDataService';
 
 const bridge = RPCModule as unknown as Record<string, jest.Mock>;
 const doSaveMock = doSave as jest.Mock;
@@ -65,37 +65,6 @@ function fakeConfig(): WalletBackendConfig {
     server: mockServer,
     performanceLevel: RPCPerformanceLevelEnum.Low,
   } as unknown as WalletBackendConfig;
-}
-
-// The coordinator reaches into DataService only for the eight configure()
-// fetches, the save-required gate, and the lock flags. A stub is the honest
-// seam for the coordinator's OWN scheduling logic; DataService internals are a
-// separate fence.
-function fakeDataService(): DataService {
-  const resolved = () => jest.fn().mockResolvedValue(undefined);
-  return {
-    fetchTandZandOValueTransfers: resolved(),
-    fetchAddresses: resolved(),
-    fetchTotalBalance: resolved(),
-    fetchInfoAndServerHeight: resolved(),
-    fetchZingolibVersion: resolved(),
-    fetchTandZandOMessages: resolved(),
-    fetchWalletHeight: resolved(),
-    fetchWalletBirthdaySeedUfvk: resolved(),
-    getWalletSaveRequired: jest.fn().mockResolvedValue(false),
-    getConfigWalletPerformance: jest
-      .fn()
-      .mockResolvedValue(RPCPerformanceLevelEnum.Low),
-    fetchWalletHeightLock: false,
-    fetchWalletBirthdaySeedUfvkLock: false,
-    fetchInfoAndServerHeightLock: false,
-    fetchTandZandOValueTransfersLock: false,
-    fetchTandZandOMessagesLock: false,
-    fetchTotalBalanceLock: false,
-    fetchAddressesLock: false,
-    fetchZingolibVersionLock: false,
-    getWalletSaveRequiredLock: false,
-  } as unknown as DataService;
 }
 
 // Holds the launch lane with a deferred native call of the given kind, runs
