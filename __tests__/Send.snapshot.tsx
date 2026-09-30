@@ -6,6 +6,10 @@ import 'react-native';
 import React from 'react';
 
 import { render } from '@testing-library/react-native';
+import { Provider } from 'jotai';
+import { balanceAtom } from '@app/AppState/balance';
+import { polledMockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
+import { seed, storeWith } from '../.storybook/storeWith';
 import Send from '@screens/Send';
 import {
   defaultAppContextLoaded,
@@ -17,7 +21,6 @@ import { mockAddresses } from '../__mocks__/dataMocks/mockAddresses';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockZecPrice } from '../__mocks__/dataMocks/mockZecPrice';
-import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import mockSendPageState from '../__mocks__/dataMocks/mockSendPageState';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AppDrawerParamList } from '@app/types';
@@ -45,7 +48,6 @@ describe('Component Send - test', () => {
   state.translate = mockTranslate;
   state.info = mockInfo;
   state.zecPrice = mockZecPrice;
-  state.totalBalance = mockTotalBalance;
   // The price ring renders only for a Nym-consenting session.
   state.sendPageState = mockSendPageState;
   const onFunction = jest.fn();
@@ -55,18 +57,20 @@ describe('Component Send - test', () => {
     state.privacy = false;
     const props = makeDrawerProps();
     const send = render(
-      <ContextAppLoadedProvider value={state}>
-        <Send
-          {...props}
-          sendTransaction={onFunction}
-          clearToAddr={onFunction}
-          toggleMenuDrawer={onFunction}
-          setShieldingAmount={onFunction}
-          setScrollToTop={onFunction}
-          setScrollToBottom={onFunction}
-          setServerOption={onFunction}
-        />
-      </ContextAppLoadedProvider>,
+      <Provider store={storeWith(seed(balanceAtom, polledMockTotalBalance))}>
+        <ContextAppLoadedProvider value={state}>
+          <Send
+            {...props}
+            sendTransaction={onFunction}
+            clearToAddr={onFunction}
+            toggleMenuDrawer={onFunction}
+            setShieldingAmount={onFunction}
+            setScrollToTop={onFunction}
+            setScrollToBottom={onFunction}
+            setServerOption={onFunction}
+          />
+        </ContextAppLoadedProvider>
+      </Provider>,
     );
     expect(send.toJSON()).toMatchSnapshot();
   });
@@ -76,18 +80,20 @@ describe('Component Send - test', () => {
     state.privacy = true;
     const props = makeDrawerProps();
     const send = render(
-      <ContextAppLoadedProvider value={state}>
-        <Send
-          {...props}
-          sendTransaction={onFunction}
-          clearToAddr={onFunction}
-          toggleMenuDrawer={onFunction}
-          setShieldingAmount={onFunction}
-          setScrollToTop={onFunction}
-          setScrollToBottom={onFunction}
-          setServerOption={onFunction}
-        />
-      </ContextAppLoadedProvider>,
+      <Provider store={storeWith(seed(balanceAtom, polledMockTotalBalance))}>
+        <ContextAppLoadedProvider value={state}>
+          <Send
+            {...props}
+            sendTransaction={onFunction}
+            clearToAddr={onFunction}
+            toggleMenuDrawer={onFunction}
+            setShieldingAmount={onFunction}
+            setScrollToTop={onFunction}
+            setScrollToBottom={onFunction}
+            setServerOption={onFunction}
+          />
+        </ContextAppLoadedProvider>
+      </Provider>,
     );
     expect(send.toJSON()).toMatchSnapshot();
   });

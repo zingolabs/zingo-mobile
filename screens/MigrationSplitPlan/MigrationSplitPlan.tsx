@@ -10,6 +10,8 @@ import StepperHeader from '@ui/widgets/StepperHeader';
 import { AppDrawerParamList } from '@app/types';
 import { AppTheme } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
+import { useAtomValue } from 'jotai';
+import { balanceAtom } from '@app/AppState/balance';
 import { RouteEnum } from '@app/AppState';
 import Utils from '@app/utils';
 import { planIronwoodMigration } from '@app/walletBackend';
@@ -91,7 +93,8 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
   navigation,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, info, totalBalance } = context;
+  const balance = useAtomValue(balanceAtom);
+  const { translate, info } = context;
   const { colors } = useTheme();
 
   const [plan, setPlan] = useState<RPCMigrationPlanType | null>(null);
@@ -161,7 +164,8 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
   const roundCount = splitRounds.length;
   const txCount = splitRounds.reduce((sum, round) => sum + round.length, 0);
   const noteCount = plan?.parts?.length ?? 0;
-  const orchardHeld = totalBalance ? totalBalance.confirmedOrchardBalance : 0;
+  const orchardHeld =
+    balance.kind === 'polled' ? balance.latest.confirmedOrchardBalance : 0;
   const noPlan = !loading && !errorMsg && txCount === 0 && noteCount === 0;
   const isPending = noPlan && (plan?.residual ?? 0) === 0 && orchardHeld > 0;
   const isEmpty = noPlan && !isPending;

@@ -22,7 +22,6 @@ import {
 import { RouteEnum, SelectServerEnum } from '@app/AppState';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
-import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import { mockServer } from '../__mocks__/dataMocks/mockServer';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
@@ -44,7 +43,6 @@ function renderSettings(selectServer: SelectServerEnum) {
         ...defaultAppContextLoaded,
         translate: mockTranslate,
         info: mockInfo,
-        totalBalance: mockTotalBalance,
         server: mockServer,
         selectServer,
       }}

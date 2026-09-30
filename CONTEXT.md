@@ -433,6 +433,15 @@ _Avoid_: token (overloaded), version.
 Updating the controller from a poll result, closing the window where JS intent and native
 reality disagreed.
 
+**Polled value**:
+A piece of wallet state the app learns only from the native runtime's poll. It is either Awaiting
+or holds the latest poll result.
+
+**Awaiting**:
+The state of a polled value that has no poll result yet: before the first poll after launch,
+and from the start of a rescan until the next poll. Distinct from a zero balance or an empty list.
+_Avoid_: loading, null, unset.
+
 **WalletView**:
 The derived render state, full with Send or full without Send, as a total function of the
 controller's source union. One value at a time.

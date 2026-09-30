@@ -1,13 +1,16 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
+import { balanceAtom } from '@app/AppState/balance';
+import { seed } from '../../.storybook/storeWith';
 import { RouteEnum } from '@app/AppState';
 import MigrationTransactions from './MigrationTransactions';
 import {
   screenProps,
   withAppContext,
+  withAtoms,
   withNavigation,
   withRpc,
 } from '../../.storybook/storyDecorators';
-import { mockInfo, mockTotalBalance } from '../../.storybook/storyMocks';
+import { mockInfo, polledMockBalance } from '../../.storybook/storyMocks';
 import { json, pending, rejection } from '../../.storybook/storyRpc';
 import {
   drainPlan,
@@ -19,7 +22,8 @@ const meta: Meta<typeof MigrationTransactions> = {
   title: 'Migration/Transactions',
   component: MigrationTransactions,
   decorators: [
-    withAppContext({ info: mockInfo, totalBalance: mockTotalBalance }),
+    withAppContext({ info: mockInfo }),
+    withAtoms(seed(balanceAtom, polledMockBalance)),
     withNavigation,
   ],
   args: screenProps(RouteEnum.MigrationTransactions),

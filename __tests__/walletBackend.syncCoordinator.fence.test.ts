@@ -395,6 +395,9 @@ describe('SyncCoordinator seam-A fence — scheduling machine, current behavior'
       expect(config.onValueTransfersChanged).toHaveBeenCalledWith([], 0);
       expect(config.onMessagesChanged).toHaveBeenCalledWith([], 0);
       expect(config.onBalanceChanged).toHaveBeenCalledTimes(1);
+      expect(config.onBalanceChanged).toHaveBeenCalledWith({
+        kind: 'awaiting',
+      });
       expect(config.onSyncStatusChanged).toHaveBeenCalledWith({});
       await c.clearTimers();
     });

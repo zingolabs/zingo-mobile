@@ -14,6 +14,7 @@ import {
   BottomSheetModalProvider,
 } from '@gorhom/bottom-sheet';
 
+import { Provider } from 'jotai';
 import { I18n } from 'i18n-js';
 import {
   ContextAppLoadedProvider,
@@ -24,6 +25,7 @@ import { AppDrawerParamList } from '@app/types';
 import { substituteZingoName } from '@app/utils/ZingoAppData';
 import en from '@app/translations/en.json';
 import { RpcFixture, setRpcFixtures } from './storyRpc';
+import { Seed, storeWith } from './storeWith';
 
 // Resolve the real English catalog so stories read like the app, not raw keys.
 const i18n = new I18n({ en });
@@ -45,6 +47,15 @@ export const withAppContext =
     >
       <Story />
     </ContextAppLoadedProvider>
+  );
+
+// Wrap a story in a Jotai store seeded with the atom values a component reads.
+export const withAtoms =
+  (...seeds: Seed[]): Decorator =>
+  Story => (
+    <Provider store={storeWith(...seeds)}>
+      <Story />
+    </Provider>
   );
 
 // A navigate and goBack sink so useNavigation() resolves off-navigator.

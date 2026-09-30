@@ -6,6 +6,10 @@ import 'react-native';
 import React from 'react';
 
 import { render } from '@testing-library/react-native';
+import { Provider } from 'jotai';
+import { balanceAtom } from '@app/AppState/balance';
+import { polledMockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
+import { seed, storeWith } from '../.storybook/storeWith';
 import Pools from '@screens/Pools';
 import {
   defaultAppContextLoaded,
@@ -13,7 +17,6 @@ import {
 } from '@app/context';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
-import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AppDrawerParamList } from '@app/types';
 import { RouteEnum } from '@app/AppState';
@@ -38,13 +41,14 @@ describe('Component Pools - test', () => {
   const state = { ...defaultAppContextLoaded };
   state.translate = mockTranslate;
   state.info = mockInfo;
-  state.totalBalance = mockTotalBalance;
   const props = makeDrawerProps();
   test('Pools - snapshot', () => {
     const pools = render(
-      <ContextAppLoadedProvider value={state}>
-        <Pools {...props} />
-      </ContextAppLoadedProvider>,
+      <Provider store={storeWith(seed(balanceAtom, polledMockTotalBalance))}>
+        <ContextAppLoadedProvider value={state}>
+          <Pools {...props} />
+        </ContextAppLoadedProvider>
+      </Provider>,
     );
     expect(pools.toJSON()).toMatchSnapshot();
   });

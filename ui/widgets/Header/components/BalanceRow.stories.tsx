@@ -1,22 +1,29 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
+import { balanceAtom } from '@app/AppState/balance';
+import { seed } from '../../../../.storybook/storeWith';
 import { SelectServerEnum } from '@app/AppState';
 import BalanceRow from './BalanceRow';
 import {
   mockTranslate,
   withAppContext,
+  withAtoms,
   withNavigation,
 } from '../../../../.storybook/storyDecorators';
 import {
   mockInfo,
-  mockTotalBalance,
   mockZecPrice,
+  polledMockBalance,
 } from '../../../../.storybook/storyMocks';
 
 // BalanceRow nests PriceFetcher (context) and navigates on tap (navigation). It needs both decorators
 const meta: Meta<typeof BalanceRow> = {
   title: 'Header/BalanceRow',
   component: BalanceRow,
-  decorators: [withAppContext(), withNavigation],
+  decorators: [
+    withAppContext(),
+    withAtoms(seed(balanceAtom, polledMockBalance)),
+    withNavigation,
+  ],
   args: {
     noBalance: false,
     noPrivacy: false,
@@ -24,7 +31,6 @@ const meta: Meta<typeof BalanceRow> = {
     addLastSnackbar: () => {},
     privacy: false,
     translate: mockTranslate,
-    totalBalance: mockTotalBalance,
     info: mockInfo,
     zecPrice: mockZecPrice,
     selectServer: SelectServerEnum.auto,

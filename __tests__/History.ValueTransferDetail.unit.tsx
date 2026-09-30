@@ -13,7 +13,6 @@ import {
 } from '@app/context';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
-import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import { mockValueTransfers } from '../__mocks__/dataMocks/mockValueTransfers';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AppDrawerParamList } from '@app/types';
@@ -43,7 +42,6 @@ describe('Component History ValueTransferDetail - test', () => {
   const state = { ...defaultAppContextLoaded };
   state.translate = mockTranslate;
   state.info = mockInfo;
-  state.totalBalance = mockTotalBalance;
   state.valueTransfers = mockValueTransfers;
   const props_0 = makeDrawerProps(0);
   test('History ValueTransferDetail - sent ValueTransfer with 2 addresses', () => {

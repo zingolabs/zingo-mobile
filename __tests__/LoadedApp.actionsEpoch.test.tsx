@@ -78,9 +78,16 @@ import { RPCAddressScopeEnum } from '@app/walletBackend/enums/RPCAddressScopeEnu
 import { StackScreenProps } from '@react-navigation/stack';
 import { AppStackParamList } from '@app/types';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
+import { polledMockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
+import { balanceAtom } from '@app/AppState/balance';
+import type { Store } from '../.storybook/storeWith';
 
 const resolveTriggerGateMock = resolveTriggerGate as jest.Mock;
 const netInfoUnsubscribe = jest.fn();
+
+function controllerStoreOf(instance: LoadedAppClass): Store {
+  return (instance as unknown as { controllerStore: Store }).controllerStore;
+}
 
 function drawerNavOf(instance: LoadedAppClass): { navigate: jest.Mock } {
   return (instance as unknown as { drawerNav: { navigate: jest.Mock } })
@@ -147,32 +154,34 @@ describe('callback-boundary epoch', () => {
   it('drops a backend write that resolves after teardown', async () => {
     const { utils, instance } = await mountCommitted();
     // The wired backend callback, captured before teardown.
-    const onBalanceChanged = instance.setTotalBalance;
+    const onBalanceChanged = instance.setBalance;
 
     await act(async () => {
       utils.unmount();
       await flushMicrotasks();
     });
 
-    const setState = jest.spyOn(instance, 'setState');
-    onBalanceChanged({ orchardBal: 12345 } as never);
+    onBalanceChanged(polledMockTotalBalance);
 
     // The write carried the mount epoch; teardown bumped past it, so the
-    // dispatch dropped it — no setState reached the dead instance.
-    expect(setState).not.toHaveBeenCalled();
+    // dispatch dropped it — the dead instance's balance stays awaiting.
+    expect(controllerStoreOf(instance).get(balanceAtom)).toEqual({
+      kind: 'awaiting',
+    });
   });
 
   it('lands a backend write while the instance is mounted', async () => {
     const { instance } = await mountCommitted();
-    const setState = jest.spyOn(instance, 'setState');
 
     act(() => {
-      instance.setTotalBalance({ orchardBal: 67890 } as never);
+      instance.setBalance(polledMockTotalBalance);
     });
 
     // The positive control: the guard passes while mounted, so the same write
     // that dropped above lands here.
-    expect(setState).toHaveBeenCalled();
+    expect(controllerStoreOf(instance).get(balanceAtom)).toEqual(
+      polledMockTotalBalance,
+    );
   });
 
   it('Tests that the default unified address clears when the address list holds only transparent addresses.', async () => {

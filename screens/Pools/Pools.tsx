@@ -10,6 +10,8 @@ import AppSheet from '@ui/primitives/AppSheet';
 import DetailLine from '@ui/widgets/DetailLine';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
+import { useAtomValue } from 'jotai';
+import { balanceAtom } from '@app/AppState/balance';
 import Header from '@ui/widgets/Header';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import FadeText from '@ui/primitives/FadeText';
@@ -24,8 +26,8 @@ type PoolsProps = NativeStackScreenProps<AppDrawerParamList, RouteEnum.Pools>;
 
 const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
   const context = useContext(ContextAppLoaded);
+  const balance = useAtomValue(balanceAtom);
   const {
-    totalBalance,
     info,
     translate,
     privacy,
@@ -132,7 +134,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
           }}
         >
           <View style={{ display: 'flex', margin: 20, marginBottom: 30 }}>
-            {totalBalance && (
+            {balance.kind === 'polled' && (
               <>
                 {!orchardPool && !saplingPool && !transparentPool && (
                   <ActivityIndicator
@@ -154,14 +156,14 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
                     >
                       <ZecAmount
                         testID="ironwood-total-balance"
-                        amtZec={totalBalance.totalIronwoodBalance}
+                        amtZec={balance.latest.totalIronwoodBalance}
                         size={14}
                         currencyName={info.currencyName}
                         style={{
                           opacity:
-                            totalBalance.confirmedIronwoodBalance > 0 &&
-                            totalBalance.confirmedIronwoodBalance ===
-                              totalBalance.totalIronwoodBalance
+                            balance.latest.confirmedIronwoodBalance > 0 &&
+                            balance.latest.confirmedIronwoodBalance ===
+                              balance.latest.totalIronwoodBalance
                               ? 1
                               : 0.5,
                         }}
@@ -175,13 +177,13 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
                     >
                       <ZecAmount
                         testID="ironwood-confirmed-balance"
-                        amtZec={totalBalance.confirmedIronwoodBalance}
+                        amtZec={balance.latest.confirmedIronwoodBalance}
                         size={14}
                         currencyName={info.currencyName}
                         color={
-                          totalBalance.confirmedIronwoodBalance > 0 &&
-                          totalBalance.confirmedIronwoodBalance ===
-                            totalBalance.totalIronwoodBalance
+                          balance.latest.confirmedIronwoodBalance > 0 &&
+                          balance.latest.confirmedIronwoodBalance ===
+                            balance.latest.totalIronwoodBalance
                             ? colors.fgAccent
                             : 'red'
                         }
@@ -213,14 +215,14 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
                       >
                         <ZecAmount
                           testID="orchard-total-balance"
-                          amtZec={totalBalance.totalOrchardBalance}
+                          amtZec={balance.latest.totalOrchardBalance}
                           size={14}
                           currencyName={info.currencyName}
                           style={{
                             opacity:
-                              totalBalance.confirmedOrchardBalance > 0 &&
-                              totalBalance.confirmedOrchardBalance ===
-                                totalBalance.totalOrchardBalance
+                              balance.latest.confirmedOrchardBalance > 0 &&
+                              balance.latest.confirmedOrchardBalance ===
+                                balance.latest.totalOrchardBalance
                                 ? 1
                                 : 0.5,
                           }}
@@ -234,13 +236,13 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
                       >
                         <ZecAmount
                           testID="orchard-confirmed-balance"
-                          amtZec={totalBalance.confirmedOrchardBalance}
+                          amtZec={balance.latest.confirmedOrchardBalance}
                           size={14}
                           currencyName={info.currencyName}
                           color={
-                            totalBalance.confirmedOrchardBalance > 0 &&
-                            totalBalance.confirmedOrchardBalance ===
-                              totalBalance.totalOrchardBalance
+                            balance.latest.confirmedOrchardBalance > 0 &&
+                            balance.latest.confirmedOrchardBalance ===
+                              balance.latest.totalOrchardBalance
                               ? colors.fgAccent
                               : 'red'
                           }
@@ -273,14 +275,14 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
                       >
                         <ZecAmount
                           testID="sapling-total-balance"
-                          amtZec={totalBalance.totalSaplingBalance}
+                          amtZec={balance.latest.totalSaplingBalance}
                           size={14}
                           currencyName={info.currencyName}
                           style={{
                             opacity:
-                              totalBalance.confirmedSaplingBalance > 0 &&
-                              totalBalance.confirmedSaplingBalance ===
-                                totalBalance.totalSaplingBalance
+                              balance.latest.confirmedSaplingBalance > 0 &&
+                              balance.latest.confirmedSaplingBalance ===
+                                balance.latest.totalSaplingBalance
                                 ? 1
                                 : 0.5,
                           }}
@@ -294,13 +296,13 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
                       >
                         <ZecAmount
                           testID="sapling-confirmed-balance"
-                          amtZec={totalBalance.confirmedSaplingBalance}
+                          amtZec={balance.latest.confirmedSaplingBalance}
                           size={14}
                           currencyName={info.currencyName}
                           color={
-                            totalBalance.confirmedSaplingBalance > 0 &&
-                            totalBalance.confirmedSaplingBalance ===
-                              totalBalance.totalSaplingBalance
+                            balance.latest.confirmedSaplingBalance > 0 &&
+                            balance.latest.confirmedSaplingBalance ===
+                              balance.latest.totalSaplingBalance
                               ? colors.fgSyncing
                               : 'red'
                           }
@@ -333,7 +335,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
                       >
                         <ZecAmount
                           testID="transparent-balance"
-                          amtZec={totalBalance.totalTransparentBalance}
+                          amtZec={balance.latest.totalTransparentBalance}
                           size={14}
                           currencyName={info.currencyName}
                           color={'red'}
@@ -349,7 +351,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
                       >
                         <ZecAmount
                           testID="transparent-confirmed-balance"
-                          amtZec={totalBalance.confirmedTransparentBalance}
+                          amtZec={balance.latest.confirmedTransparentBalance}
                           size={14}
                           currencyName={info.currencyName}
                           color={'red'}
@@ -361,7 +363,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
                 )}
 
                 {transparentPool &&
-                  totalBalance.confirmedTransparentBalance > 0 &&
+                  balance.latest.confirmedTransparentBalance > 0 &&
                   shieldingAmount === 0 &&
                   !somePending && (
                     <View
