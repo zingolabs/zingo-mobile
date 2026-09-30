@@ -284,7 +284,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
     <View
       style={{
         flex: 1,
-        backgroundColor: colors.bgCanvas,
+        backgroundColor: 'transparent',
       }}
       onLayout={e => setContainerH(e.nativeEvent.layout.height)}
     >

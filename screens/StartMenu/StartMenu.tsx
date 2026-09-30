@@ -1,6 +1,11 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useMemo, useRef, useState } from 'react';
-import { Text, View, ActivityIndicator, Image, Pressable } from 'react-native';
+import { View, ActivityIndicator, Pressable } from 'react-native';
+import Animated, {
+  FadeIn,
+  FadeInUp,
+  ReduceMotion,
+} from 'react-native-reanimated';
 import { showConfirm } from '@app/services/showConfirm';
 import { useTheme } from '@app/theme';
 
@@ -26,8 +31,22 @@ import {
   getZingoVersion,
 } from '@app/utils/ZingoAppData';
 import BoldText from '@ui/primitives/BoldText';
-import WelcomeBranches from '@ui/widgets/WelcomeBranches';
 import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
+import { ease } from '@app/theme/motion';
+
+const nameEnter = () =>
+  FadeInUp.duration(400)
+    .delay(500)
+    .easing(ease.out)
+    .withInitialValues({ opacity: 0, transform: [{ translateY: 12 }] })
+    .reduceMotion(ReduceMotion.System);
+const versionEnter = () =>
+  FadeIn.duration(300).delay(700).reduceMotion(ReduceMotion.System);
+const logoEnter = () =>
+  FadeIn.duration(400)
+    .delay(800)
+    .easing(ease.out)
+    .reduceMotion(ReduceMotion.System);
 
 type StartMenuProps = {
   actionButtonsDisabled: boolean;
@@ -59,7 +78,6 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
   const { colors } = useTheme();
 
   const [containerH, setContainerH] = useState<number>(0);
-  const [containerW, setContainerW] = useState<number>(0);
   const [headerH, setHeaderH] = useState<number>(0);
   const startMenuSheetRef = useRef<BottomSheet>(null);
   const optionsMenuRef = useRef<BottomSheetModal>(null);
@@ -151,18 +169,13 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
     <View
       style={{
         flex: 1,
-        backgroundColor: colors.bgCanvas,
+        backgroundColor: 'transparent',
       }}
-      onLayout={e => {
-        setContainerH(e.nativeEvent.layout.height);
-        setContainerW(e.nativeEvent.layout.width);
-      }}
+      onLayout={e => setContainerH(e.nativeEvent.layout.height)}
     >
-      <WelcomeBranches width={containerW} height={headerH} />
       <View onLayout={e => setHeaderH(e.nativeEvent.layout.height)}>
         <View
           style={{
-            backgroundColor: colors.bgCanvas,
             padding: 10,
             position: 'absolute',
             top: 0,
@@ -186,15 +199,20 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
             paddingBottom: 20,
           }}
         >
-          <Text
+          <Animated.Text
+            entering={nameEnter()}
             style={{ color: colors.fgMuted, fontSize: 40, fontWeight: 'bold' }}
           >
             {getZingoName()}
-          </Text>
-          <Text style={{ color: colors.fgMuted, fontSize: 15 }}>
+          </Animated.Text>
+          <Animated.Text
+            entering={versionEnter()}
+            style={{ color: colors.fgMuted, fontSize: 15 }}
+          >
             {getZingoVersion()}
-          </Text>
-          <Image
+          </Animated.Text>
+          <Animated.Image
+            entering={logoEnter()}
             source={getZingoLogo()}
             style={{
               width: 100,

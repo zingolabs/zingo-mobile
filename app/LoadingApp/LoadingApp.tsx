@@ -110,6 +110,7 @@ import {
 
 // no lazy load because slowing down screens.
 import ImportUfvk from '@screens/ImportUfvk';
+import OnboardingStage from '@ui/widgets/OnboardingStage';
 import { sendEmail } from '@app/services/sendEmail';
 import { RPCWalletKindEnum } from '@app/walletBackend/enums/RPCWalletKindEnum';
 import StartMenu from '@screens/StartMenu';
@@ -2027,19 +2028,49 @@ export class LoadingAppClass extends Component<
                   tryAgain={this.retryGate}
                 />
               )}
-              {screen === RouteEnum.StartMenu && (
-                <StartMenu
-                  actionButtonsDisabled={actionButtonsDisabled}
-                  hasRecoveryWalletInfoSaved={hasRecoveryWalletInfoSaved}
-                  recoverRecoveryWalletInfo={this.recoverRecoveryWalletInfo}
-                  customServer={this.customServer}
-                  walletExists={walletExists}
-                  hasBackupWallet={hasBackupWallet}
-                  openCurrentWallet={this.openCurrentWallet}
-                  createNewWallet={this.createNewWallet}
-                  getwalletToRestore={this.getwalletToRestore}
-                  restoreLastBackup={this.restoreLastBackup}
-                />
+              {screen !== RouteEnum.Launching && (
+                <OnboardingStage screen={screen}>
+                  {screen === RouteEnum.StartMenu && (
+                    <StartMenu
+                      actionButtonsDisabled={actionButtonsDisabled}
+                      hasRecoveryWalletInfoSaved={hasRecoveryWalletInfoSaved}
+                      recoverRecoveryWalletInfo={this.recoverRecoveryWalletInfo}
+                      customServer={this.customServer}
+                      walletExists={walletExists}
+                      hasBackupWallet={hasBackupWallet}
+                      openCurrentWallet={this.openCurrentWallet}
+                      createNewWallet={this.createNewWallet}
+                      getwalletToRestore={this.getwalletToRestore}
+                      restoreLastBackup={this.restoreLastBackup}
+                    />
+                  )}
+                  {screen === RouteEnum.NewSeed && wallet && (
+                    <NewSeed
+                      wallet={this.state.wallet}
+                      onClickOK={() =>
+                        this.navigateToLoadedApp(
+                          readOnly,
+                          orchardPool,
+                          saplingPool,
+                          transparentPool,
+                          true,
+                          firstLaunchingMessage,
+                          // advanced create is online → server chain = wallet chain.
+                          this.state.server.chainName,
+                        )
+                      }
+                    />
+                  )}
+                  {screen === RouteEnum.ImportUfvk && (
+                    <ImportUfvk
+                      busy={this.state.actionButtonsDisabled}
+                      onClickOK={(s: string, b: number) => this.doRestore(s, b)}
+                      onClickCancel={() =>
+                        this.setState({ screen: RouteEnum.StartMenu })
+                      }
+                    />
+                  )}
+                </OnboardingStage>
               )}
               <CustomServerModalHost
                 ref={this.customServerModalRef}
@@ -2055,32 +2086,6 @@ export class LoadingAppClass extends Component<
                 usingCustomServer={this.usingCustomServer}
                 translate={translate}
               />
-              {screen === RouteEnum.NewSeed && wallet && (
-                <NewSeed
-                  wallet={this.state.wallet}
-                  onClickOK={() =>
-                    this.navigateToLoadedApp(
-                      readOnly,
-                      orchardPool,
-                      saplingPool,
-                      transparentPool,
-                      true,
-                      firstLaunchingMessage,
-                      // advanced create is online → server chain = wallet chain.
-                      this.state.server.chainName,
-                    )
-                  }
-                />
-              )}
-              {screen === RouteEnum.ImportUfvk && (
-                <ImportUfvk
-                  busy={this.state.actionButtonsDisabled}
-                  onClickOK={(s: string, b: number) => this.doRestore(s, b)}
-                  onClickCancel={() =>
-                    this.setState({ screen: RouteEnum.StartMenu })
-                  }
-                />
-              )}
             </BottomSheetModalProvider>
           </GestureHandlerRootView>
         </ContextAppLoadingProvider>

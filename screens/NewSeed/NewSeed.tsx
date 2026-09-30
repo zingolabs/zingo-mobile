@@ -246,14 +246,14 @@ const NewSeed: React.FunctionComponent<NewSeedProps> = ({
   );
 
   if (!secured) {
-    return <View style={{ flex: 1, backgroundColor: colors.bgCanvas }} />;
+    return <View style={{ flex: 1, backgroundColor: 'transparent' }} />;
   }
 
   return (
     <View
       style={{
         flex: 1,
-        backgroundColor: colors.bgCanvas,
+        backgroundColor: 'transparent',
       }}
       onLayout={e => setContainerH(e.nativeEvent.layout.height)}
     >

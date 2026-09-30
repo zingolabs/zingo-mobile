@@ -61,6 +61,8 @@ const FadeIn = new AnimationBuilder();
 const FadeInUp = new AnimationBuilder();
 const FadeInDown = new AnimationBuilder();
 const FadeOut = new AnimationBuilder();
+const FadeOutUp = new AnimationBuilder();
+const FadeOutDown = new AnimationBuilder();
 const LinearTransition = new AnimationBuilder();
 const ZoomIn = new AnimationBuilder();
 const ZoomOut = new AnimationBuilder();
@@ -112,6 +114,8 @@ export {
   FadeInDown,
   FadeInUp,
   FadeOut,
+  FadeOutDown,
+  FadeOutUp,
   interpolate,
   interpolateColor,
   Keyframe,
