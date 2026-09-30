@@ -12,6 +12,7 @@ module.exports = [
       'node_modules/**',
       'coverage/**',
       'rust/**',
+      'zingolib/**',
       'scripts/release/**',
     ],
   },

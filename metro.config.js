@@ -32,8 +32,12 @@ const config = {
     sourceExts: [...sourceExts, 'svg'],
     // Cargo creates and deletes temp files under the Rust target directories
     // while a build runs. Without watchman, Metro's fallback watcher follows
-    // one, then exits on ENOENT.
-    blockList: exclusionList([/\/rust\/(?:[^/]+\/)?target\/.*/]),
+    // one, then exits on ENOENT. The zingolib submodule holds the Binding
+    // Layer's target and build directories, and no JavaScript.
+    blockList: exclusionList([
+      /\/rust\/(?:[^/]+\/)?target\/.*/,
+      /\/zingolib\/.*/,
+    ]),
   },
 };
 
