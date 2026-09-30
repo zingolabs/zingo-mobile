@@ -110,6 +110,7 @@
   },
   "loadingapp": {
     "welcome": "Hoş geldiniz",
+    "tagline": "Zcash için özel bir cüzdan.",
     "actualserver": "Mevcut sunucu:",
     "createnewwallet": "Yeni Cüzdan Oluştur",
     "opencurrentwallet": "Mevcut Cüzdanı Aç",
@@ -683,7 +684,14 @@
     "importing-title": "Cüzdanınız içe aktarılıyor",
     "importing-body": "Eşitleme hazırlanıyor…",
     "imported-title": "Cüzdan içe aktarıldı",
-    "imported-body": "Cüzdanınız açılıyor…"
+    "imported-body": "Cüzdanınız açılıyor…",
+    "screen-title": "Cüzdanı içe aktar",
+    "seed-label": "Tohum ifadesi (24 kelime) / Görüntüleme anahtarı",
+    "submit": "İçe aktar",
+    "birthday-placeholder": "Blok yüksekliğini girin",
+    "birthday-tip-title": "İlk işleminizin blok yüksekliği.",
+    "birthday-tip-body": "Bilmiyorsanız sorun değil.",
+    "birthday-tip-range": "Aralık: {from} – {to}"
   },
   "about": {
     "copyright": [

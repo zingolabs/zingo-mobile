@@ -110,6 +110,7 @@
   },
   "loadingapp": {
     "welcome": "Welcome",
+    "tagline": "A private wallet for your Zcash.",
     "actualserver": "Actual server:",
     "createnewwallet": "Create New Wallet",
     "opencurrentwallet": "Open Current Wallet",
@@ -685,7 +686,14 @@
     "importing-title": "Importing your wallet",
     "importing-body": "Preparing sync…",
     "imported-title": "Wallet imported",
-    "imported-body": "Opening your wallet…"
+    "imported-body": "Opening your wallet…",
+    "screen-title": "Import wallet",
+    "seed-label": "Seed phrase (24 words) / Viewing key",
+    "submit": "Import",
+    "birthday-placeholder": "Enter block height",
+    "birthday-tip-title": "Block height of your first transaction.",
+    "birthday-tip-body": "It's fine if you don't know it.",
+    "birthday-tip-range": "Range: {from} – {to}"
   },
   "about": {
     "copyright": [

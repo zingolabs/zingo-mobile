@@ -110,6 +110,7 @@
   },
   "loadingapp": {
     "welcome": "Bienvenido",
+    "tagline": "Un monedero privado para tu Zcash.",
     "actualserver": "Servidor Activo:",
     "createnewwallet": "Crear Nuevo Monedero",
     "opencurrentwallet": "Abrir Monedero Activo",
@@ -685,7 +686,14 @@
     "importing-title": "Importando tu monedero",
     "importing-body": "Preparando la sincronización…",
     "imported-title": "Monedero importado",
-    "imported-body": "Abriendo tu monedero…"
+    "imported-body": "Abriendo tu monedero…",
+    "screen-title": "Importar monedero",
+    "seed-label": "Semilla (24 palabras) / Clave de visualización",
+    "submit": "Importar",
+    "birthday-placeholder": "Introduce la altura de bloque",
+    "birthday-tip-title": "Altura de bloque de tu primera transacción.",
+    "birthday-tip-body": "No pasa nada si no la sabes.",
+    "birthday-tip-range": "Rango: {from} – {to}"
   },
   "about": {
     "copyright": [

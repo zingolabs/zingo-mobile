@@ -20,9 +20,6 @@ type OnboardingStageProps = {
   children: React.ReactNode;
 };
 
-const BRANCH_AREA_RATIO = 0.34;
-const BRANCH_AREA_MAX = 260;
-
 const welcomeEnter = () =>
   FadeIn.duration(300).delay(520).reduceMotion(ReduceMotion.System);
 const welcomeExit = () =>
@@ -71,11 +68,7 @@ const OnboardingStage: React.FunctionComponent<OnboardingStageProps> = ({
       }
       style={{ flex: 1, backgroundColor: colors.bgCanvas }}
     >
-      <WelcomeBranches
-        width={size.w}
-        height={Math.min(size.h * BRANCH_AREA_RATIO, BRANCH_AREA_MAX)}
-        parted={!welcome}
-      />
+      <WelcomeBranches width={size.w} height={size.h} parted={!welcome} />
       <Animated.View
         key={screen}
         entering={

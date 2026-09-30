@@ -1,57 +1,28 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useRef, useState } from 'react';
+import React, { useContext } from 'react';
 import { View } from 'react-native';
-import BottomSheet from '@gorhom/bottom-sheet';
 
-import { useTheme } from '@app/theme';
 import { ContextAppLoading } from '@app/context';
-import { ScreenEnum } from '@app/AppState';
-import AppSheet from '@ui/primitives/AppSheet';
-import Header from '@ui/widgets/Header';
 import ProgressState from '@ui/widgets/ProgressState';
-import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
 
 type ImportingProps = {
   done: boolean;
 };
 
+const CENTER_TOP = 300 / 874;
+
 const Importing: React.FunctionComponent<ImportingProps> = ({ done }) => {
-  const context = useContext(ContextAppLoading);
-  const { translate, netInfo } = context;
-  const { colors } = useTheme();
-  const [containerH, setContainerH] = useState<number>(0);
-  const [headerH, setHeaderH] = useState<number>(0);
-  const sheetRef = useRef<BottomSheet>(null);
-  const snapPoints = useFullSheetSnapPoints(containerH, headerH);
+  const { translate } = useContext(ContextAppLoading);
 
   return (
-    <View
-      style={{ flex: 1, backgroundColor: 'transparent' }}
-      onLayout={e => setContainerH(e.nativeEvent.layout.height)}
-    >
-      <View onLayout={e => setHeaderH(e.nativeEvent.layout.height)}>
-        <Header
-          title={''}
-          screenName={ScreenEnum.ImportUfvk}
-          noBalance={true}
-          noSyncingStatus={true}
-          noDrawMenu={true}
-          noPrivacy={true}
-          noUfvkIcon={true}
-          translate={translate}
-          netInfo={netInfo}
-        />
-      </View>
-      <AppSheet
-        ref={sheetRef}
-        snapPoints={snapPoints}
-        contentStyle={{
-          paddingHorizontal: 24,
-          paddingTop: 106,
-          paddingBottom: 106,
+    <View style={{ flex: 1, backgroundColor: 'transparent' }}>
+      <View
+        style={{
+          position: 'absolute',
+          left: 32,
+          right: 32,
+          top: `${CENTER_TOP * 100}%`,
           alignItems: 'center',
-          justifyContent: 'center',
-          backgroundColor: colors.bgSurface,
         }}
       >
         <ProgressState
@@ -67,7 +38,7 @@ const Importing: React.FunctionComponent<ImportingProps> = ({ done }) => {
             ) as string
           }
         />
-      </AppSheet>
+      </View>
     </View>
   );
 };

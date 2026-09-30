@@ -110,6 +110,7 @@
   },
   "loadingapp": {
     "welcome": "Добро пожаловать",
+    "tagline": "Приватный кошелёк для ваших Zcash.",
     "actualserver": "Текущий сервер:",
     "createnewwallet": "Создать новый кошелёк",
     "opencurrentwallet": "Открыть текущий кошелёк",
@@ -683,7 +684,14 @@
     "importing-title": "Импорт кошелька",
     "importing-body": "Подготовка синхронизации…",
     "imported-title": "Кошелёк импортирован",
-    "imported-body": "Открываем кошелёк…"
+    "imported-body": "Открываем кошелёк…",
+    "screen-title": "Импорт кошелька",
+    "seed-label": "Начальная фраза (24 слова) / ключ просмотра",
+    "submit": "Импортировать",
+    "birthday-placeholder": "Введите высоту блока",
+    "birthday-tip-title": "Высота блока вашей первой транзакции.",
+    "birthday-tip-body": "Ничего страшного, если вы её не знаете.",
+    "birthday-tip-range": "Диапазон: {from} – {to}"
   },
   "about": {
     "copyright": [

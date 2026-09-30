@@ -14,38 +14,41 @@ import { faEllipsisV } from '@fortawesome/free-solid-svg-icons';
 
 import { NetInfoStateType } from '@react-native-community/netinfo/src/index';
 
-import BottomSheet, {
-  BottomSheetModal,
-  BottomSheetScrollView,
-} from '@gorhom/bottom-sheet';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import ActionMenuBottomSheet, {
   ActionMenuBottomSheetAction,
 } from '@ui/widgets/ActionMenuBottomSheet';
 
-import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
-import AppSheet from '@ui/primitives/AppSheet';
 import { ContextAppLoading } from '@app/context';
-import {
-  getZingoLogo,
-  getZingoName,
-  getZingoVersion,
-} from '@app/utils/ZingoAppData';
-import BoldText from '@ui/primitives/BoldText';
-import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
+import { getZingoName, getZingoVersion } from '@app/utils/ZingoAppData';
+import RegText from '@ui/primitives/RegText';
 import { ease } from '@app/theme/motion';
 
-const nameEnter = () =>
+// Vertical positions from the 402 x 874 design, as fractions of the height.
+const TITLE_TOP = 294 / 874;
+const BOTTOM_MARGIN = 60;
+const PILL_WIDTH = 270;
+const PILL_HEIGHT = 44;
+
+const titleEnter = () =>
   FadeInUp.duration(400)
     .delay(500)
     .easing(ease.out)
     .withInitialValues({ opacity: 0, transform: [{ translateY: 12 }] })
     .reduceMotion(ReduceMotion.System);
-const versionEnter = () =>
-  FadeIn.duration(300).delay(700).reduceMotion(ReduceMotion.System);
-const logoEnter = () =>
-  FadeIn.duration(400)
-    .delay(800)
+const brandEnter = () =>
+  FadeIn.duration(420)
+    .delay(620)
     .easing(ease.out)
+    .withInitialValues({ opacity: 0, transform: [{ scale: 1.03 }] })
+    .reduceMotion(ReduceMotion.System);
+const tagEnter = () =>
+  FadeIn.duration(300).delay(780).reduceMotion(ReduceMotion.System);
+const actionsEnter = () =>
+  FadeInUp.duration(360)
+    .delay(900)
+    .easing(ease.out)
+    .withInitialValues({ opacity: 0, transform: [{ translateY: 8 }] })
     .reduceMotion(ReduceMotion.System);
 
 type StartMenuProps = {
@@ -78,11 +81,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
   const { colors } = useTheme();
 
   const [containerH, setContainerH] = useState<number>(0);
-  const [headerH, setHeaderH] = useState<number>(0);
-  const startMenuSheetRef = useRef<BottomSheet>(null);
   const optionsMenuRef = useRef<BottomSheetModal>(null);
-
-  const startMenuSnapPoints = useFullSheetSnapPoints(containerH, headerH);
 
   // Consolidates the three legacy ContextMenu kebabs into one action list
   // gated by network + saved-state. Order: recoverkeys → custom server →
@@ -135,364 +134,254 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
     restoreLastBackup,
   ]);
 
-  const startMenuHeader = (
-    <View
-      style={{
-        paddingTop: 12,
-        paddingBottom: 8,
-        paddingHorizontal: 16,
-      }}
+  const canAct = netInfo.isConnected || server.kind === 'offline';
+  const chainLabel = translate(
+    `settings.value-chainname-${server.chainName}`,
+  ) as string;
+  const serverLine =
+    server.kind === 'remote'
+      ? `[${chainLabel}] ${server.uri}`
+      : server.kind === 'offline'
+        ? `[${chainLabel}] ${translate('settings.server-offline') as string}`
+        : '';
+  const warning = !netInfo.isConnected
+    ? (translate('report.nointernet') as string)
+    : netInfo.type === NetInfoStateType.cellular
+      ? (translate('report.cellulardata') as string)
+      : netInfo.isConnectionExpensive
+        ? (translate('report.connectionexpensive') as string)
+        : '';
+  const note = walletExists
+    ? (translate('loadingapp.noopenwallet-message') as string)
+    : !netInfo.isConnected
+      ? (translate('loadingapp.nointernet-message') as string)
+      : server.kind === 'offline'
+        ? (translate('loadingapp.offline-message') as string)
+        : '';
+
+  const onCreate = () => {
+    if (walletExists) {
+      showConfirm({
+        title: translate('loadingapp.alert-newwallet-title') as string,
+        message: translate('loadingapp.alert-newwallet-body') as string,
+        buttons: [
+          {
+            text: translate('confirm') as string,
+            style: 'destructive',
+            onPress: () => createNewWallet(),
+          },
+          { text: translate('cancel') as string, style: 'cancel' },
+        ],
+      });
+    } else {
+      createNewWallet();
+    }
+  };
+
+  const link = (title: string, onPress: () => void, testID: string) => (
+    <Pressable
+      testID={testID}
+      disabled={actionButtonsDisabled}
+      onPress={onPress}
+      hitSlop={8}
+      style={({ pressed }) => ({
+        paddingHorizontal: 10,
+        paddingVertical: 4,
+        opacity: pressed ? 0.6 : 1,
+      })}
     >
-      <View
+      <RegText
         style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'center',
+          color: actionButtonsDisabled
+            ? colors.fgAccentDisabled
+            : colors.fgAccent,
+          fontSize: 16,
+          fontWeight: '500',
         }}
       >
-        <BoldText
-          numberOfLines={1}
-          style={{
-            flex: 1,
-            fontSize: 16,
-            lineHeight: 28,
-            textAlign: 'center',
-          }}
-        >
-          {translate('loadingapp.welcome') as string}
-        </BoldText>
-      </View>
-    </View>
+        {title}
+      </RegText>
+    </Pressable>
+  );
+
+  const pill = (title: string, onPress: () => void, testID: string) => (
+    <Pressable
+      testID={testID}
+      disabled={actionButtonsDisabled}
+      onPress={onPress}
+      style={({ pressed }) => ({
+        width: PILL_WIDTH,
+        height: PILL_HEIGHT,
+        borderRadius: PILL_HEIGHT / 2,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: actionButtonsDisabled
+          ? colors.bgAccentDisabled
+          : colors.bgAccent,
+        transform: [{ scale: pressed ? 0.97 : 1 }],
+      })}
+    >
+      <RegText
+        style={{ color: colors.bgCanvas, fontSize: 16, fontWeight: '500' }}
+      >
+        {title}
+      </RegText>
+    </Pressable>
   );
 
   return (
     <View
-      style={{
-        flex: 1,
-        backgroundColor: 'transparent',
-      }}
+      style={{ flex: 1, backgroundColor: 'transparent' }}
       onLayout={e => setContainerH(e.nativeEvent.layout.height)}
     >
-      <View onLayout={e => setHeaderH(e.nativeEvent.layout.height)}>
-        <View
+      {optionsActions.length > 0 && (
+        <Pressable
+          onPress={() => optionsMenuRef.current?.present()}
+          hitSlop={8}
           style={{
-            padding: 10,
             position: 'absolute',
-            top: 0,
-            right: 0,
-          }}
-        >
-          {optionsActions.length > 0 && (
-            <Pressable
-              onPress={() => optionsMenuRef.current?.present()}
-              style={{ width: 40, padding: 10 }}
-              hitSlop={8}
-            >
-              <FontAwesomeIcon icon={faEllipsisV} color={'#ffffff'} size={32} />
-            </Pressable>
-          )}
-        </View>
-        <View
-          style={{
+            top: 37,
+            right: 20,
+            width: 32,
+            height: 32,
             alignItems: 'center',
-            paddingTop: 20,
-            paddingBottom: 20,
+            justifyContent: 'center',
           }}
         >
-          <Animated.Text
-            entering={nameEnter()}
-            style={{ color: colors.fgMuted, fontSize: 40, fontWeight: 'bold' }}
-          >
-            {getZingoName()}
-          </Animated.Text>
-          <Animated.Text
-            entering={versionEnter()}
-            style={{ color: colors.fgMuted, fontSize: 15 }}
-          >
-            {getZingoVersion()}
-          </Animated.Text>
-          <Animated.Image
-            entering={logoEnter()}
-            source={getZingoLogo()}
-            style={{
-              width: 100,
-              height: 100,
-              resizeMode: 'contain',
-              marginTop: 10,
-              borderRadius: 22,
-            }}
+          <FontAwesomeIcon
+            icon={faEllipsisV}
+            color={colors.fgMuted}
+            size={22}
           />
-        </View>
-      </View>
-      <AppSheet
-        ref={startMenuSheetRef}
-        snapPoints={startMenuSnapPoints}
-        header={startMenuHeader}
+        </Pressable>
+      )}
+
+      <View
+        pointerEvents="none"
+        style={{
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          top: containerH * TITLE_TOP,
+          alignItems: 'center',
+        }}
       >
-        <BottomSheetScrollView
-          keyboardShouldPersistTaps={'handled'}
-          bounces={false}
-          alwaysBounceVertical={false}
+        <Animated.Text
+          entering={titleEnter()}
+          style={{ color: colors.fgDefault, fontSize: 35 }}
+        >
+          {translate('loadingapp.welcome') as string}
+        </Animated.Text>
+        <Animated.Text
+          entering={brandEnter()}
           style={{
-            flex: 1,
-          }}
-          contentContainerStyle={{
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'flex-start',
-            paddingHorizontal: 20,
-            paddingBottom: 30,
+            color: colors.fgDefault,
+            fontSize: 49,
+            letterSpacing: -0.2,
+            marginTop: 10,
           }}
         >
-          {server.kind === 'remote' && (
-            <>
-              <BoldText style={{ fontSize: 15, marginBottom: 3 }}>
-                {`${translate('loadingapp.actualserver') as string} [${
-                  translate(
-                    `settings.value-chainname-${server.chainName}`,
-                  ) as string
-                }]`}
-              </BoldText>
-              <BoldText style={{ fontSize: 15, marginBottom: 10 }}>
-                {server.uri}
-              </BoldText>
-            </>
-          )}
-          {server.kind === 'offline' && (
-            <>
-              <View style={{ flexDirection: 'row' }}>
-                <BoldText style={{ fontSize: 15, marginBottom: 3 }}>
-                  {translate('loadingapp.actualserver') as string}
-                </BoldText>
-                <BoldText
-                  style={{ fontSize: 15, marginBottom: 3, color: 'red' }}
-                >
-                  {' ' + (translate('settings.server-offline') as string)}
-                </BoldText>
-              </View>
-              {/* Offline has no server URI, but the chain is still configured
-                  (create/restore derive keys chain-specifically). Show the same
-                  [Network] label the other modes display. */}
-              <BoldText style={{ fontSize: 15, marginBottom: 10 }}>
-                {`[${
-                  translate(
-                    `settings.value-chainname-${server.chainName}`,
-                  ) as string
-                }]`}
-              </BoldText>
-            </>
-          )}
+          {getZingoName()}
+        </Animated.Text>
+        <Animated.Text
+          entering={tagEnter()}
+          style={{
+            color: colors.fgMuted,
+            fontSize: 13.5,
+            marginTop: 20,
+            textAlign: 'center',
+            paddingHorizontal: 32,
+          }}
+        >
+          {translate('loadingapp.tagline') as string}
+        </Animated.Text>
+      </View>
 
-          {(!netInfo.isConnected ||
-            netInfo.type === NetInfoStateType.cellular ||
-            netInfo.isConnectionExpensive) && (
-            <>
-              <BoldText style={{ fontSize: 15, marginBottom: 3 }}>
-                {translate('report.networkstatus') as string}
-              </BoldText>
-              <View
-                style={{
-                  display: 'flex',
-                  flexDirection: 'row',
-                  alignItems: 'flex-end',
-                  marginHorizontal: 20,
-                }}
-              >
-                <View
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    marginBottom: 10,
-                  }}
-                >
-                  {!netInfo.isConnected && (
-                    <BoldText style={{ fontSize: 15, color: 'red' }}>
-                      {' '}
-                      {translate('report.nointernet') as string}{' '}
-                    </BoldText>
-                  )}
-                  {netInfo.type === NetInfoStateType.cellular && (
-                    <BoldText style={{ fontSize: 15, color: 'yellow' }}>
-                      {' '}
-                      {translate('report.cellulardata') as string}{' '}
-                    </BoldText>
-                  )}
-                  {netInfo.isConnectionExpensive && (
-                    <BoldText style={{ fontSize: 15, color: 'yellow' }}>
-                      {' '}
-                      {translate('report.connectionexpensive') as string}{' '}
-                    </BoldText>
-                  )}
-                </View>
-              </View>
-            </>
+      <Animated.View
+        entering={actionsEnter()}
+        style={{
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          bottom: BOTTOM_MARGIN,
+          alignItems: 'center',
+          paddingHorizontal: 32,
+        }}
+      >
+        {!!note && (
+          <RegText
+            style={{
+              color: colors.fgAccentDisabled,
+              fontSize: 12,
+              textAlign: 'center',
+              marginBottom: 16,
+            }}
+          >
+            {note}
+          </RegText>
+        )}
+        {!!warning && (
+          <RegText
+            style={{
+              color: colors.fgWarning,
+              fontSize: 12,
+              textAlign: 'center',
+              marginBottom: 12,
+            }}
+          >
+            {warning}
+          </RegText>
+        )}
+        {actionButtonsDisabled && (
+          <ActivityIndicator
+            size="small"
+            color={colors.fgAccent}
+            style={{ marginBottom: 16 }}
+          />
+        )}
+        {canAct &&
+          link(
+            translate('import.screen-title') as string,
+            getwalletToRestore,
+            'loadingapp.restorewalletseedufvk',
           )}
+        {canAct && walletExists && (
+          <View style={{ marginTop: 6 }}>
+            {link(
+              translate('loadingapp.createnewwallet') as string,
+              onCreate,
+              'loadingapp.createnewwallet',
+            )}
+          </View>
+        )}
+        <View style={{ marginTop: 27 }}>
+          {walletExists
+            ? pill(
+                translate('loadingapp.opencurrentwallet') as string,
+                openCurrentWallet,
+                'loadingapp.opencurrentwallet',
+              )
+            : canAct &&
+              pill(
+                translate('loadingapp.createnewwallet') as string,
+                onCreate,
+                'loadingapp.createnewwallet',
+              )}
+        </View>
+        <RegText
+          style={{
+            color: colors.fgMuted,
+            fontSize: 11,
+            marginTop: 18,
+            textAlign: 'center',
+          }}
+        >
+          {serverLine
+            ? `${getZingoVersion()} · ${serverLine}`
+            : getZingoVersion()}
+        </RegText>
+      </Animated.View>
 
-          {walletExists && (
-            <>
-              <View
-                style={{
-                  display: 'flex',
-                  flexDirection: 'row',
-                  alignItems: 'flex-end',
-                  marginHorizontal: 20,
-                  marginBottom: 20,
-                }}
-              >
-                <View
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    marginTop: 10,
-                    borderColor: colors.borderAccent,
-                    borderWidth: 1,
-                    borderRadius: 5,
-                    padding: 5,
-                  }}
-                >
-                  <BoldText
-                    style={{ fontSize: 15, color: colors.fgAccentDisabled }}
-                  >
-                    {translate('loadingapp.noopenwallet-message') as string}
-                  </BoldText>
-                </View>
-              </View>
-              <Button
-                type={ButtonTypeEnum.Primary}
-                title={translate('loadingapp.opencurrentwallet') as string}
-                disabled={actionButtonsDisabled}
-                onPress={() => openCurrentWallet()}
-                style={{ marginBottom: 20 }}
-              />
-            </>
-          )}
-
-          {/* Create works Offline too: the seed is generated locally and its
-              birthday falls back to the chain's activation height (the wallet
-              just won't sync until a server is chosen). Show it both online and
-              in Offline mode. */}
-          {(netInfo.isConnected || server.kind === 'offline') && (
-            <Button
-              testID="loadingapp.createnewwallet"
-              type={ButtonTypeEnum.Primary}
-              title={translate('loadingapp.createnewwallet') as string}
-              disabled={actionButtonsDisabled}
-              onPress={() => {
-                if (walletExists) {
-                  showConfirm({
-                    title: translate(
-                      'loadingapp.alert-newwallet-title',
-                    ) as string,
-                    message: translate(
-                      'loadingapp.alert-newwallet-body',
-                    ) as string,
-                    buttons: [
-                      {
-                        text: translate('confirm') as string,
-                        style: 'destructive',
-                        onPress: () => createNewWallet(),
-                      },
-                      { text: translate('cancel') as string, style: 'cancel' },
-                    ],
-                  });
-                } else {
-                  createNewWallet();
-                }
-              }}
-              style={{ marginBottom: 10, marginTop: 10 }}
-            />
-          )}
-
-          {/* Restore works Offline: seed/UFVK derivation needs no Indexer
-              (the wallet just won't sync until a server is chosen). Show it
-              both online and in Offline mode. */}
-          {(netInfo.isConnected || server.kind === 'offline') && (
-            <View
-              style={{
-                marginTop: 10,
-                display: 'flex',
-                alignItems: 'center',
-                width: '100%',
-              }}
-            >
-              <Button
-                testID="loadingapp.restorewalletseedufvk"
-                type={ButtonTypeEnum.Secondary}
-                title={translate('loadingapp.restorewalletseedufvk') as string}
-                disabled={actionButtonsDisabled}
-                onPress={() => getwalletToRestore()}
-                style={{ marginBottom: 10 }}
-              />
-            </View>
-          )}
-
-          {!netInfo.isConnected && !walletExists && (
-            <View
-              style={{
-                display: 'flex',
-                flexDirection: 'row',
-                alignItems: 'flex-end',
-                marginHorizontal: 20,
-              }}
-            >
-              <View
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  marginTop: 20,
-                  borderColor: colors.borderAccent,
-                  borderWidth: 1,
-                  borderRadius: 5,
-                  padding: 5,
-                }}
-              >
-                <BoldText
-                  style={{ fontSize: 15, color: colors.fgAccentDisabled }}
-                >
-                  {translate('loadingapp.nointernet-message') as string}
-                </BoldText>
-              </View>
-            </View>
-          )}
-
-          {server.kind === 'offline' && !walletExists && (
-            <View
-              style={{
-                display: 'flex',
-                flexDirection: 'row',
-                alignItems: 'flex-end',
-                marginHorizontal: 20,
-              }}
-            >
-              <View
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  marginTop: 20,
-                  borderColor: colors.borderAccent,
-                  borderWidth: 1,
-                  borderRadius: 5,
-                  padding: 5,
-                }}
-              >
-                <BoldText
-                  style={{ fontSize: 15, color: colors.fgAccentDisabled }}
-                >
-                  {translate('loadingapp.offline-message') as string}
-                </BoldText>
-              </View>
-            </View>
-          )}
-
-          {actionButtonsDisabled && (
-            <ActivityIndicator
-              size="large"
-              color={colors.fgAccent}
-              style={{ marginVertical: 20 }}
-            />
-          )}
-        </BottomSheetScrollView>
-      </AppSheet>
       <ActionMenuBottomSheet
         ref={optionsMenuRef}
         title={translate('loadedapp.options') as string}

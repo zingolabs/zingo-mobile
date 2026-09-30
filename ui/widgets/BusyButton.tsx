@@ -21,7 +21,7 @@ type BusyButtonProps = {
   testID?: string;
 };
 
-const HEIGHT = 48;
+const HEIGHT = 42;
 const BUSY_SIZE = 42;
 const NUDGE_PX = 4;
 
@@ -57,7 +57,7 @@ const BusyButton: React.FunctionComponent<BusyButtonProps> = ({
     const bg = interpolateColor(
       on.value,
       [0, 1],
-      [colors.bgAccentDisabled, colors.bgAccent],
+      [colors.bgSecondaryDisabled, colors.bgAccent],
     );
     const width =
       naturalWidth.value > 0
@@ -104,7 +104,7 @@ const BusyButton: React.FunctionComponent<BusyButtonProps> = ({
         {
           borderWidth: 2,
           minWidth: BUSY_SIZE,
-          paddingHorizontal: busy ? 0 : 40,
+          paddingHorizontal: busy ? 0 : 24,
           alignItems: 'center',
           justifyContent: 'center',
           overflow: 'hidden',
@@ -130,7 +130,7 @@ const BusyButton: React.FunctionComponent<BusyButtonProps> = ({
             {
               color: colors.bgCanvas,
               fontWeight: '600',
-              fontSize: 16,
+              fontSize: 14.5,
               textAlign: 'center',
             },
             label,

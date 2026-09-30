@@ -13,11 +13,12 @@ import { faCircleInfo } from '@fortawesome/free-solid-svg-icons';
 
 import { useTheme } from '@app/theme';
 import { duration, ease } from '@app/theme/motion';
-import FadeText from '@ui/primitives/FadeText';
+import BoldText from '@ui/primitives/BoldText';
 import RegText from '@ui/primitives/RegText';
 
 type InfoTooltipProps = {
   label: string;
+  title?: string;
   text: string;
   open: boolean;
   onToggle: (open: boolean) => void;
@@ -44,6 +45,7 @@ const bubbleExit = () =>
 
 const InfoTooltip: React.FunctionComponent<InfoTooltipProps> = ({
   label,
+  title,
   text,
   open,
   onToggle,
@@ -87,7 +89,7 @@ const InfoTooltip: React.FunctionComponent<InfoTooltipProps> = ({
       style={{ alignSelf: 'stretch', alignItems: 'center' }}
     >
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-        <FadeText>{label}</FadeText>
+        <BoldText style={{ fontSize: 12.5, lineHeight: 18 }}>{label}</BoldText>
         <Pressable
           ref={iconRef}
           testID={testID}
@@ -100,7 +102,7 @@ const InfoTooltip: React.FunctionComponent<InfoTooltipProps> = ({
           <Animated.View style={spinStyle}>
             <FontAwesomeIcon
               icon={faCircleInfo}
-              size={16}
+              size={14}
               color={colors.fgMuted}
             />
           </Animated.View>
@@ -116,21 +118,33 @@ const InfoTooltip: React.FunctionComponent<InfoTooltipProps> = ({
             bottom: '100%',
             left,
             marginBottom: GAP,
-            maxWidth: 300,
+            width: 236,
             opacity: bubbleW ? 1 : 0,
           }}
         >
           <View
             style={{
-              backgroundColor: colors.bgChrome,
+              backgroundColor: colors.bgSurface,
               borderColor: colors.bottomSheetBorder,
               borderWidth: 1,
               borderRadius: 10,
               paddingHorizontal: 12,
-              paddingVertical: 10,
+              paddingTop: 9,
+              paddingBottom: 10,
             }}
           >
-            <RegText style={{ fontSize: 13 }}>{text}</RegText>
+            {!!title && (
+              <BoldText
+                style={{ fontSize: 10.5, lineHeight: 14, marginBottom: 3 }}
+              >
+                {title}
+              </BoldText>
+            )}
+            <RegText
+              style={{ fontSize: 10, lineHeight: 13, color: colors.fgMuted }}
+            >
+              {text}
+            </RegText>
           </View>
           <View
             style={{
@@ -139,7 +153,7 @@ const InfoTooltip: React.FunctionComponent<InfoTooltipProps> = ({
               left: iconCenter - left - ARROW / 2,
               width: ARROW,
               height: ARROW,
-              backgroundColor: colors.bgChrome,
+              backgroundColor: colors.bgSurface,
               borderColor: colors.bottomSheetBorder,
               borderRightWidth: 1,
               borderBottomWidth: 1,

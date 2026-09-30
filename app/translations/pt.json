@@ -110,6 +110,7 @@
   },
   "loadingapp": {
     "welcome": "Bem-vindo",
+    "tagline": "Uma carteira privada para o seu Zcash.",
     "actualserver": "Servidor atual:",
     "createnewwallet": "Criar uma nova carteira",
     "opencurrentwallet": "Abrir Carteira Atual",
@@ -685,7 +686,14 @@
     "importing-title": "Importando sua carteira",
     "importing-body": "Preparando a sincronização…",
     "imported-title": "Carteira importada",
-    "imported-body": "Abrindo sua carteira…"
+    "imported-body": "Abrindo sua carteira…",
+    "screen-title": "Importar carteira",
+    "seed-label": "Frase de recuperação (24 palavras) / Chave de visualização",
+    "submit": "Importar",
+    "birthday-placeholder": "Insira a altura do bloco",
+    "birthday-tip-title": "Altura do bloco da sua primeira transação.",
+    "birthday-tip-body": "Tudo bem se você não souber.",
+    "birthday-tip-range": "Intervalo: {from} – {to}"
   },
   "about": {
     "copyright": [

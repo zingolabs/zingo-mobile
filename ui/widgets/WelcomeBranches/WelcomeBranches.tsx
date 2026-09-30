@@ -25,7 +25,7 @@ type WelcomeBranchesProps = {
 };
 
 const DESIGN_WIDTH = 402;
-const DESIGN_HEIGHT = 330;
+const DESIGN_HEIGHT = 874;
 const GUST_PERIOD_S = 8;
 const BRANCH_BEND_DEG = 1.7;
 const TREMBLE_DEG = 1.2;
