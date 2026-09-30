@@ -679,7 +679,11 @@
     "viewing-key": "Görüntüleme anahtarı",
     "word-invalid": "Bu kelime kurtarma kelime listesinde yok. Yazımı kontrol edin.",
     "need-words": "24 kelimenin tamamını veya bir görüntüleme anahtarı girin.",
-    "need-birthday": "Aralık içinde bir blok yüksekliği girin veya boş bırakın."
+    "need-birthday": "Aralık içinde bir blok yüksekliği girin veya boş bırakın.",
+    "importing-title": "Cüzdanınız içe aktarılıyor",
+    "importing-body": "Eşitleme hazırlanıyor…",
+    "imported-title": "Cüzdan içe aktarıldı",
+    "imported-body": "Cüzdanınız açılıyor…"
   },
   "about": {
     "copyright": [

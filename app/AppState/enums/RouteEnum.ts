@@ -4,6 +4,7 @@ export enum RouteEnum {
   StartMenu = 'StartMenu',
   NewSeed = 'NewSeed',
   ImportUfvk = 'ImportUfvk',
+  Importing = 'Importing',
 
   // Stack
   LoadingApp = 'LoadingApp',

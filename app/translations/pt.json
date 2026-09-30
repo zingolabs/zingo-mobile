@@ -681,7 +681,11 @@
     "viewing-key": "Chave de visualização",
     "word-invalid": "Essa palavra não está na lista de palavras de recuperação. Verifique a ortografia.",
     "need-words": "Insira as 24 palavras, ou uma chave de visualização.",
-    "need-birthday": "Insira uma altura de bloco dentro do intervalo, ou deixe em branco."
+    "need-birthday": "Insira uma altura de bloco dentro do intervalo, ou deixe em branco.",
+    "importing-title": "Importando sua carteira",
+    "importing-body": "Preparando a sincronização…",
+    "imported-title": "Carteira importada",
+    "imported-body": "Abrindo sua carteira…"
   },
   "about": {
     "copyright": [

@@ -111,6 +111,10 @@ import {
 // no lazy load because slowing down screens.
 import ImportUfvk from '@screens/ImportUfvk';
 import OnboardingStage from '@ui/widgets/OnboardingStage';
+import Importing from '@screens/Importing';
+import { duration as motionDuration } from '@app/theme/motion';
+
+const IMPORTED_HOLD_MS = 700;
 import { sendEmail } from '@app/services/sendEmail';
 import { RPCWalletKindEnum } from '@app/walletBackend/enums/RPCWalletKindEnum';
 import StartMenu from '@screens/StartMenu';
@@ -401,6 +405,7 @@ export class LoadingAppClass extends Component<
           ? props.route.params.screen
           : RouteEnum.Launching,
       actionButtonsDisabled: false,
+      importDone: false,
       walletExists: false,
       hasBackupWallet: false,
       customServerUri: '',
@@ -1612,7 +1617,11 @@ export class LoadingAppClass extends Component<
       return;
     }
 
-    this.setState({ actionButtonsDisabled: true });
+    this.setState({ actionButtonsDisabled: true, importDone: false });
+    const showImporting = setTimeout(
+      () => this.setState({ screen: RouteEnum.Importing }),
+      motionDuration.emphasized,
+    );
     let type: RestoreFromTypeEnum = RestoreFromTypeEnum.seedRestoreFrom;
     if (
       seedUfvk.toLowerCase().startsWith(GlobalConst.uview) ||
@@ -1704,6 +1713,9 @@ export class LoadingAppClass extends Component<
             });
             this.addLastSnackbar(walletKindStr);
           }
+          clearTimeout(showImporting);
+          this.setState({ screen: RouteEnum.Importing, importDone: true });
+          await new Promise(resolve => setTimeout(resolve, IMPORTED_HOLD_MS));
           this.navigateToLoadedApp(
             readOnly,
             orchardPool,
@@ -1727,6 +1739,7 @@ export class LoadingAppClass extends Component<
       errorText = result.ok ? result.value : result.error.message;
     }
     if (error) {
+      clearTimeout(showImporting);
       this.walletErrorHandle(
         errorText,
         this.state.translate('loadingapp.readingwallet-label') as string,
@@ -2060,6 +2073,9 @@ export class LoadingAppClass extends Component<
                         )
                       }
                     />
+                  )}
+                  {screen === RouteEnum.Importing && (
+                    <Importing done={this.state.importDone} />
                   )}
                   {screen === RouteEnum.ImportUfvk && (
                     <ImportUfvk

@@ -4,8 +4,9 @@ import { View } from 'react-native';
 import Animated, {
   FadeIn,
   FadeInUp,
-  FadeOutDown,
+  FadeOut,
   FadeOutUp,
+  Keyframe,
   ReduceMotion,
 } from 'react-native-reanimated';
 
@@ -36,9 +37,19 @@ const formEnter = () =>
     .withInitialValues({ opacity: 0, transform: [{ translateY: 16 }] })
     .reduceMotion(ReduceMotion.System);
 const formExit = () =>
-  FadeOutDown.duration(duration.base)
-    .easing(ease.in)
+  new Keyframe({
+    0: { opacity: 1, transform: [{ translateY: 0 }, { scale: 1 }] },
+    100: { opacity: 0, transform: [{ translateY: 8 }, { scale: 0.97 }] },
+  })
+    .duration(duration.base)
     .reduceMotion(ReduceMotion.System);
+const importingEnter = () =>
+  FadeIn.duration(duration.screen)
+    .easing(ease.emphasized)
+    .withInitialValues({ opacity: 0, transform: [{ scale: 1.04 }] })
+    .reduceMotion(ReduceMotion.System);
+const importingExit = () =>
+  FadeOut.duration(duration.base).reduceMotion(ReduceMotion.System);
 
 const OnboardingStage: React.FunctionComponent<OnboardingStageProps> = ({
   screen,
@@ -47,6 +58,7 @@ const OnboardingStage: React.FunctionComponent<OnboardingStageProps> = ({
   const { colors } = useTheme();
   const [size, setSize] = useState({ w: 0, h: 0 });
   const welcome = screen === RouteEnum.StartMenu;
+  const importing = screen === RouteEnum.Importing;
 
   return (
     <View
@@ -66,8 +78,12 @@ const OnboardingStage: React.FunctionComponent<OnboardingStageProps> = ({
       />
       <Animated.View
         key={screen}
-        entering={welcome ? welcomeEnter() : formEnter()}
-        exiting={welcome ? welcomeExit() : formExit()}
+        entering={
+          welcome ? welcomeEnter() : importing ? importingEnter() : formEnter()
+        }
+        exiting={
+          welcome ? welcomeExit() : importing ? importingExit() : formExit()
+        }
         style={{ flex: 1 }}
       >
         {children}

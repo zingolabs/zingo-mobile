@@ -681,7 +681,11 @@
     "viewing-key": "Viewing key",
     "word-invalid": "That word is not in the recovery word list. Check the spelling.",
     "need-words": "Enter all 24 words, or a viewing key.",
-    "need-birthday": "Enter a block height inside the range, or leave it empty."
+    "need-birthday": "Enter a block height inside the range, or leave it empty.",
+    "importing-title": "Importing your wallet",
+    "importing-body": "Preparing sync…",
+    "imported-title": "Wallet imported",
+    "imported-body": "Opening your wallet…"
   },
   "about": {
     "copyright": [
