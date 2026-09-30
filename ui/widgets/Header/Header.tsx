@@ -114,7 +114,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     valueTransfersTotal,
     somePending,
     shieldingAmount,
-    selectServer,
+    server,
     mixnetView,
   } = context;
 
@@ -153,7 +153,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   } = useShieldFunds({
     readOnly,
     setShieldingAmount,
-    selectServer,
+    server,
     somePending,
     totalBalance,
     shieldingAmount,
@@ -192,7 +192,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         >
           <SyncStatusBar
             noSyncingStatus={noSyncingStatus}
-            selectServer={selectServer}
+            server={server}
             netInfo={netInfo}
             percentageOutputsScanned={percentageOutputsScanned}
             syncInProgress={syncInProgress}
@@ -217,7 +217,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             totalBalance={totalBalance}
             info={info}
             zecPrice={zecPrice}
-            selectServer={selectServer}
+            server={server}
             showShieldButton={showShieldButton}
             shieldingFee={shieldingFee}
             valueTransfersTotal={valueTransfersTotal}
@@ -234,7 +234,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               translate={translate}
               zecPrice={zecPrice}
               info={info}
-              selectServer={selectServer}
+              server={server}
               onLayout={onPriceRowLayout}
             />
           )}

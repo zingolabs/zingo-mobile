@@ -37,8 +37,8 @@ import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
 
 import { AppDrawerParamList } from '@app/types';
 import Utils from '@app/utils';
+import { fiatQuote } from '@app/price/fiatQuote';
 import {
-  ChainNameEnum,
   GlobalConst,
   ScreenEnum,
   RouteEnum,
@@ -92,7 +92,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
   } = context;
   const { colors } = useTheme();
   const screenName = ScreenEnum.Confirm;
-  const isMainChain = server.chainName === ChainNameEnum.mainChainName;
+  const quote = fiatQuote(zecPrice, server, server.chainName);
 
   // Audit Issue D — the biometric gate lives at the
   // Confirm screen entry. Mirrors Seed / Ufvk / Settings / Rescan via
@@ -357,11 +357,11 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                 size={28}
                 smallPrefix={true}
               />
-              {isMainChain && (
+              {quote.kind === 'quote' && (
                 <CurrencyAmount
                   amtZec={sendingTotal}
-                  price={zecPrice.zecPrice}
-                  priceDate={zecPrice.date}
+                  price={quote.price}
+                  priceDate={quote.date}
                   privacy={false}
                 />
               )}
@@ -409,12 +409,12 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                 amtZec={calculatedFee}
                 privacy={privacy}
               />
-              {isMainChain && (
+              {quote.kind === 'quote' && (
                 <CurrencyAmount
                   style={{ fontSize: 18 }}
                   amtZec={calculatedFee}
-                  price={zecPrice.zecPrice}
-                  priceDate={zecPrice.date}
+                  price={quote.price}
+                  priceDate={quote.date}
                   privacy={privacy}
                 />
               )}
@@ -447,12 +447,12 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                       amtZec={Utils.parseStringLocaleToNumberFloat(to.amount)}
                       privacy={privacy}
                     />
-                    {isMainChain && (
+                    {quote.kind === 'quote' && (
                       <CurrencyAmount
                         style={{ fontSize: 18 }}
                         amtZec={Utils.parseStringLocaleToNumberFloat(to.amount)}
-                        price={zecPrice.zecPrice}
-                        priceDate={zecPrice.date}
+                        price={quote.price}
+                        priceDate={quote.date}
                         privacy={privacy}
                       />
                     )}

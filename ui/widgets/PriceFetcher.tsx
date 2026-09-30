@@ -2,7 +2,7 @@ import React, { useContext, useEffect } from 'react';
 import { View, ViewStyle } from 'react-native';
 import { useTheme } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
-import { ChainNameEnum, SelectServerEnum } from '@app/AppState';
+import { fiatEligible } from '@app/price/fiatQuote';
 import QuoteRefreshRing from '@ui/primitives/QuoteRefreshRing';
 import {
   PRICE_REFRESH_MAX_MS,
@@ -14,14 +14,12 @@ import {
 // LoadedApp mounts exactly one driver, which owns the session's price traffic.
 export const PriceTrafficDriver: React.FunctionComponent = () => {
   const context = useContext(ContextAppLoaded);
-  const { mixnetView, setZecPrice, selectServer, info } = context;
+  const { mixnetView, setZecPrice, server, info } = context;
 
   const mixnetStatusKey = mixnetView
     ? mixnetView.statusKey
     : 'mixnet.status.unknown';
-  const priceFetchable =
-    selectServer !== SelectServerEnum.offline &&
-    info.chainName === ChainNameEnum.mainChainName;
+  const priceFetchable = fiatEligible(server, info.chainName);
 
   useEffect(() => {
     priceFetcherStore.setDeps({

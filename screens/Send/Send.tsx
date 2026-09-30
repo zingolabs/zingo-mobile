@@ -57,10 +57,10 @@ import {
   AddressBookFileClass,
   SendPageStateClass,
   ToAddrClass,
-  ChainNameEnum,
   GlobalConst,
   ServerUrisType,
   ServerType,
+  remoteServer,
   SetServerResult,
   SelectServerEnum,
   RouteEnum,
@@ -84,6 +84,12 @@ import {
   sendFailureText,
 } from '@app/walletBackend/transforms/sendFailureTransform';
 import Utils from '@app/utils';
+import {
+  fiatEligible,
+  fiatQuote,
+  toFiatText,
+  toZecText,
+} from '@app/price/fiatQuote';
 import { safeSnapToIndex } from '@app/utils/safeSnapToIndex';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
@@ -162,6 +168,8 @@ const Send: React.FunctionComponent<SendProps> = ({
   // USD entry derives the ZEC actually sent from the price, so that
   // figure carries the same stale/absent dim as the USD conversions.
   const priceMuted = usePriceHealth(zecPrice.date) !== 'live';
+  const showFiat = fiatEligible(server, server.chainName);
+  const quote = fiatQuote(zecPrice, server, server.chainName);
 
   const screenName = ScreenEnum.Send;
   const zecIconXml = `<?xml version="1.0" encoding="UTF-8"?>
@@ -268,16 +276,14 @@ const Send: React.FunctionComponent<SendProps> = ({
   const BALANCE_SNAP_BUMP = 10;
 
   useEffect(() => {
-    const isMainChain = server.chainName === ChainNameEnum.mainChainName;
-    if (!isMainChain) {
+    if (!showFiat) {
       setUsdRowH(0);
     }
-  }, [server.chainName]);
+  }, [showFiat]);
 
   const sendSnapPoints = useMemo(() => {
-    const isMainChain = server.chainName === ChainNameEnum.mainChainName;
     if (containerH <= 0 || headerH <= 0) {
-      return isMainChain ? ['85%', '89%', '93%'] : ['89%', '93%'];
+      return showFiat ? ['85%', '89%', '93%'] : ['89%', '93%'];
     }
     const snapBase = containerH - headerH - SNAP_GAP;
     const snapPrice = Math.max(snapBase + BALANCE_SNAP_BUMP, 100);
@@ -292,12 +298,12 @@ const Send: React.FunctionComponent<SendProps> = ({
       points.push(snapPrice);
     }
     points.push(snapLow);
-    if (isMainChain && usdRowH > 0) {
+    if (showFiat && usdRowH > 0) {
       points.push(snapMid);
     }
     points.push(snapMax);
     return points;
-  }, [server.chainName, containerH, headerH, usdRowH, priceRowH]);
+  }, [showFiat, containerH, headerH, usdRowH, priceRowH]);
 
   const priceSnapIndex = priceRowH > 0 ? 0 : null;
   const onPriceSnapChange = usePriceSnapAutoClose(
@@ -645,37 +651,13 @@ const Send: React.FunctionComponent<SendProps> = ({
 
     if (amountPar !== null) {
       const amountTemp = amountPar.substring(0, 20);
-      if (isNaN(Utils.parseStringLocaleToNumberFloat(amountTemp))) {
-        setAmountCurrencyText('');
-      } else if (amountTemp && zecPrice && zecPrice.zecPrice > 0) {
-        setAmountCurrencyText(
-          Utils.parseNumberFloatToStringLocale(
-            Utils.parseStringLocaleToNumberFloat(amountTemp) *
-              zecPrice.zecPrice,
-            2,
-          ),
-        );
-      } else {
-        setAmountCurrencyText('');
-      }
+      setAmountCurrencyText(toFiatText(amountTemp, zecPrice.zecPrice));
       setAmountText(amountTemp);
     }
 
     if (amountCurrencyPar !== null) {
       const amountCurrencyTemp = amountCurrencyPar.substring(0, 15);
-      if (isNaN(Utils.parseStringLocaleToNumberFloat(amountCurrencyTemp))) {
-        setAmountText('');
-      } else if (amountCurrencyTemp && zecPrice && zecPrice.zecPrice > 0) {
-        setAmountText(
-          Utils.parseNumberFloatToStringLocale(
-            Utils.parseStringLocaleToNumberFloat(amountCurrencyTemp) /
-              zecPrice.zecPrice,
-            8,
-          ),
-        );
-      } else {
-        setAmountText('');
-      }
+      setAmountText(toZecText(amountCurrencyTemp, zecPrice.zecPrice));
       setAmountCurrencyText(amountCurrencyTemp);
     }
 
@@ -964,7 +946,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     // The MAX send travels the send-all path all the way: quoted and sent by
     // the same proposal, so the amount confirmed is the amount broadcast.
     const sendAllSend = isSendAllAmount(sendPageStatePar.toaddr.amount);
-    if (!netInfo.isConnected || selectServer === SelectServerEnum.offline) {
+    if (!netInfo.isConnected || server.kind === 'offline') {
       addLastSnackbar(translate('loadedapp.connection-error') as string);
       return;
     }
@@ -998,16 +980,16 @@ const Send: React.FunctionComponent<SendProps> = ({
         // Pick a working server, same pattern as boot/recovery: the live
         // registry first (best, excluding the failed server, no probe), then
         // the static list ranked by latency (also excluding the failed one).
-        let fasterServer: ServerType = {} as ServerType;
+        let fasterServer: ServerType = server;
         const live = await fetchServerList(server.chainName);
         const liveCandidates = live.filter(
           (s: ServerUrisType) => s.uri !== server.uri,
         );
         if (liveCandidates.length > 0) {
-          fasterServer = {
-            uri: liveCandidates[0].uri,
-            chainName: liveCandidates[0].chainName,
-          };
+          fasterServer = remoteServer(
+            liveCandidates[0].uri,
+            liveCandidates[0].chainName,
+          );
         } else {
           const serverChecked = await selectingServer(
             serverUris(translate).filter(
@@ -1017,17 +999,15 @@ const Send: React.FunctionComponent<SendProps> = ({
                 s.uri !== server.uri,
             ),
           );
+          // no latency: likely a connection problem, all servers unreachable.
           if (serverChecked && serverChecked.latency) {
-            fasterServer = {
-              uri: serverChecked.uri,
-              chainName: serverChecked.chainName,
-            };
-          } else {
-            fasterServer = server;
-            // likely a connection problem — all servers unreachable / timeout.
+            fasterServer = remoteServer(
+              serverChecked.uri,
+              serverChecked.chainName,
+            );
           }
         }
-        if (fasterServer.uri !== server.uri) {
+        if (fasterServer !== server) {
           await setServerOption(fasterServer, selectServer, false, true);
         }
 
@@ -1618,34 +1598,18 @@ const Send: React.FunctionComponent<SendProps> = ({
                         </BoldText>
                       </TouchableOpacity>
                     </View>
-                    {server.chainName === ChainNameEnum.mainChainName && (
+                    {showFiat && (
                       <>
                         <TouchableOpacity
                           onPress={() => {
-                            if (
-                              inputZec &&
-                              !amountCurrencyText &&
-                              amountText &&
-                              zecPrice.zecPrice > 0
-                            ) {
-                              const zecVal =
-                                Utils.parseStringLocaleToNumberFloat(
-                                  amountText,
-                                );
-                              if (!isNaN(zecVal)) {
-                                setAmountCurrencyText(
-                                  Utils.parseNumberFloatToStringLocale(
-                                    zecVal * zecPrice.zecPrice,
-                                    2,
-                                  ),
-                                );
-                              }
+                            if (inputZec && !amountCurrencyText) {
+                              setAmountCurrencyText(
+                                toFiatText(amountText, zecPrice.zecPrice),
+                              );
                             }
                             setInputZec(!inputZec);
                           }}
-                          disabled={
-                            !zecPrice.zecPrice || zecPrice.zecPrice <= 0
-                          }
+                          disabled={quote.kind === 'none'}
                           style={{ marginHorizontal: 8 }}
                           testID="send.swap-entry"
                         >
@@ -1653,22 +1617,22 @@ const Send: React.FunctionComponent<SendProps> = ({
                             width={28}
                             height={28}
                             color={
-                              !zecPrice.zecPrice || zecPrice.zecPrice <= 0
+                              quote.kind === 'none'
                                 ? colors.fgAccentDisabled
                                 : colors.fgAccent
                             }
                           />
                         </TouchableOpacity>
                         {inputZec ? (
-                          zecPrice.date > 0 && (
+                          quote.kind === 'quote' && (
                             <CurrencyAmount
                               style={{
                                 marginTop: 0,
                                 marginBottom: 0,
                                 fontSize: 16,
                               }}
-                              priceDate={zecPrice.date}
-                              price={zecPrice.zecPrice}
+                              priceDate={quote.date}
+                              price={quote.price}
                               amtZec={
                                 Utils.parseStringLocaleToNumberFloat(
                                   amountText,
@@ -1726,8 +1690,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                         >
                           {translate('send.spendable') as string}
                         </RegText>
-                        {inputZec ||
-                        server.chainName !== ChainNameEnum.mainChainName ? (
+                        {inputZec || quote.kind === 'none' ? (
                           <ZecAmount
                             style={{ marginLeft: 0 }}
                             currencyName={info.currencyName}
@@ -1745,8 +1708,8 @@ const Send: React.FunctionComponent<SendProps> = ({
                         ) : (
                           <CurrencyAmount
                             style={{ fontSize: 14 }}
-                            priceDate={zecPrice.date}
-                            price={zecPrice.zecPrice}
+                            priceDate={quote.date}
+                            price={quote.price}
                             amtZec={maxAmount}
                             privacy={privacy}
                           />
@@ -2076,10 +2039,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                       onPress={async () => {
                         setSendButtonEnabled(false);
                         updateToField(null, null, null, memoText, null);
-                        if (
-                          !netInfo.isConnected ||
-                          selectServer === SelectServerEnum.offline
-                        ) {
+                        if (!netInfo.isConnected || server.kind === 'offline') {
                           addLastSnackbar(
                             translate('loadedapp.connection-error') as string,
                           );

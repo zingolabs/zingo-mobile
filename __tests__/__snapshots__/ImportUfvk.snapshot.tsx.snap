@@ -249,7 +249,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
           }
         }
       >
-         (undefined, --)
+         (1, --)
       </Text>
       <View
         accessibilityLabel=""
