@@ -424,6 +424,21 @@ describe('SyncCoordinator seam-A fence — scheduling machine, current behavior'
       expect.stringContaining('addresses blew up'),
     );
     expect(c.refreshSyncLock).toBe(false);
+    expect(c.updateTimerID).toBeDefined();
+
+    await c.clearTimers();
+  });
+
+  it('Tests that configure arms the loop when one of its fetches rejects.', async () => {
+    const ds = fakeDataService();
+    (ds.fetchTotalBalance as jest.Mock).mockRejectedValue(
+      new Error('balance blew up'),
+    );
+    const c = new SyncCoordinator(fakeConfig(), ds);
+
+    await expect(c.configure()).rejects.toThrow('balance blew up');
+
+    expect(c.updateTimerID).toBeDefined();
 
     await c.clearTimers();
   });

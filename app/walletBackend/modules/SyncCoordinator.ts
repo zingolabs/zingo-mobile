@@ -89,17 +89,21 @@ export class SyncCoordinator {
   }
 
   async configure(): Promise<void> {
-    await this.dataService.fetchTandZandOValueTransfers();
-    await this.dataService.fetchAddresses();
-    await this.dataService.fetchTotalBalance();
-    await this.dataService.fetchInfoAndServerHeight();
-    await this.dataService.fetchZingolibVersion();
-    await this.dataService.fetchTandZandOMessages();
-    await this.dataService.fetchWalletHeight();
-    await this.dataService.fetchWalletBirthdaySeedUfvk();
-
-    if (this.updateTimerID === undefined) {
-      this.armNextTick();
+    // The loop is armed in the finally, so a rejected fetch still leaves the
+    // coordinator polling.
+    try {
+      await this.dataService.fetchTandZandOValueTransfers();
+      await this.dataService.fetchAddresses();
+      await this.dataService.fetchTotalBalance();
+      await this.dataService.fetchInfoAndServerHeight();
+      await this.dataService.fetchZingolibVersion();
+      await this.dataService.fetchTandZandOMessages();
+      await this.dataService.fetchWalletHeight();
+      await this.dataService.fetchWalletBirthdaySeedUfvk();
+    } finally {
+      if (this.updateTimerID === undefined) {
+        this.armNextTick();
+      }
     }
 
     await this.sanitizeTimers();
