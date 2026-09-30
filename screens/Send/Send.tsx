@@ -263,6 +263,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   // so that is explicit).
   const showCalcError = !!(spendableBalanceLastError || proposeSendLastError);
   const feeCalculationGenRef = useRef<number>(0);
+  const recipientRevision = useRef(0);
   const { decimalSeparator } = getNumberFormatSettings();
   const keyboardHeight = useKeyboardHeight();
   useDismissSheetsOnBlur();
@@ -274,6 +275,13 @@ const Send: React.FunctionComponent<SendProps> = ({
   // Bump applied to the snaps that sit just below a balance row (low + mid);
   // the max snap (just below the top icons strip) doesn't need it.
   const BALANCE_SNAP_BUMP = 10;
+
+  useEffect(
+    () => () => {
+      recipientRevision.current += 1;
+    },
+    [server.chainName],
+  );
 
   useEffect(() => {
     if (!showFiat) {
@@ -610,6 +618,8 @@ const Send: React.FunctionComponent<SendProps> = ({
     includeUAMemoPar: boolean | null,
   ) => {
     if (addressPar !== null) {
+      recipientRevision.current += 1;
+      const revision = recipientRevision.current;
       //Alert.alert('', addressPar);
       //setAddressText(addressPar);
       // Attempt to parse as URI if it starts with zcash
@@ -618,6 +628,9 @@ const Send: React.FunctionComponent<SendProps> = ({
         addressPar.toLowerCase().includes(':')
       ) {
         const parsed = await parseZcashURI(addressPar, server);
+        if (revision !== recipientRevision.current) {
+          return;
+        }
 
         // Audit Issue H — surface the parser error and abort before any
         // Send-state mutation. A failure result carries no target, so a
@@ -890,6 +903,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   }, [addressBook, walletChainName, server.chainName]);
 
   useEffect(() => {
+    recipientRevision.current += 1;
     setAddressText(sendPageState.toaddr.to);
     setAmountText(sendPageState.toaddr.amount);
     setAmountCurrencyText(sendPageState.toaddr.amountCurrency);
@@ -917,6 +931,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   };
 
   const clearState = () => {
+    recipientRevision.current += 1;
     feeCalculationGenRef.current += 1;
     sendAllRef.current = false;
     setAddressText('');
