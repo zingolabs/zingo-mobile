@@ -19,12 +19,7 @@ import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
 import { useBiometricGate } from '@app/hooks/useBiometricGate';
 import Header from '@ui/widgets/Header';
-import {
-  RouteEnum,
-  ScreenEnum,
-  SelectServerEnum,
-  SnackbarDurationEnum,
-} from '@app/AppState';
+import { RouteEnum, ScreenEnum, SnackbarDurationEnum } from '@app/AppState';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
 
@@ -40,14 +35,8 @@ const Rescan: React.FunctionComponent<RescanProps> = ({
   doRescan,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const {
-    birthday,
-    translate,
-    netInfo,
-    addLastSnackbar,
-    selectServer,
-    biometrics,
-  } = context;
+  const { birthday, translate, netInfo, addLastSnackbar, server, biometrics } =
+    context;
   const { colors } = useTheme();
   const screenName = ScreenEnum.Rescan;
 
@@ -70,7 +59,7 @@ const Rescan: React.FunctionComponent<RescanProps> = ({
   }, [navigation]);
 
   const doRescanAndClose = useCallback(async () => {
-    if (!netInfo.isConnected || selectServer === SelectServerEnum.offline) {
+    if (!netInfo.isConnected || server.kind === 'offline') {
       addLastSnackbar(translate('loadedapp.connection-error') as string);
       return;
     }
@@ -84,7 +73,7 @@ const Rescan: React.FunctionComponent<RescanProps> = ({
         SnackbarDurationEnum.longer,
       );
     }, 3 * 1000);
-  }, [netInfo, selectServer, addLastSnackbar, translate, doRescan, navigation]);
+  }, [netInfo, server, addLastSnackbar, translate, doRescan, navigation]);
 
   const rescanSnapPoints = useFullSheetSnapPoints(containerH, headerH);
 

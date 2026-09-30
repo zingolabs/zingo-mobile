@@ -8,7 +8,7 @@ import {
 import {
   PoolToShieldEnum,
   RouteEnum,
-  SelectServerEnum,
+  ServerType,
   SnackbarDurationEnum,
   TranslateType,
 } from '@app/AppState';
@@ -23,7 +23,7 @@ import Utils from '@app/utils';
 type UseShieldFundsInput = {
   readOnly: boolean;
   setShieldingAmount: ((value: number) => void) | undefined;
-  selectServer: SelectServerEnum;
+  server: ServerType;
   somePending: boolean;
   totalBalance: TotalBalanceClass | null;
   shieldingAmount: number;
@@ -61,7 +61,7 @@ type UseShieldFundsResult = {
 export function useShieldFunds({
   readOnly,
   setShieldingAmount,
-  selectServer,
+  server,
   somePending,
   totalBalance,
   shieldingAmount,
@@ -98,7 +98,7 @@ export function useShieldFunds({
     if (
       !readOnly &&
       !!setShieldingAmount &&
-      selectServer !== SelectServerEnum.offline &&
+      server.kind !== 'offline' &&
       (somePending ? 0 : (totalBalance?.confirmedTransparentBalance ?? 0)) > 0
     ) {
       (async () => {
@@ -139,22 +139,22 @@ export function useShieldFunds({
     totalBalance,
     totalBalance?.confirmedTransparentBalance,
     somePending,
-    selectServer,
+    server,
   ]);
 
   useEffect(() => {
     setShowShieldButton(
       !readOnly &&
-        selectServer !== SelectServerEnum.offline &&
+        server.kind !== 'offline' &&
         (somePending ? 0 : shieldingAmount) > 0,
     );
-  }, [readOnly, shieldingAmount, somePending, selectServer]);
+  }, [readOnly, shieldingAmount, somePending, server]);
 
   const handleShieldFunds = useCallback(async () => {
     if (!setBackgroundError || !addLastSnackbar) {
       return;
     }
-    if (!netInfo.isConnected || selectServer === SelectServerEnum.offline) {
+    if (!netInfo.isConnected || server.kind === 'offline') {
       addLastSnackbar(translate('loadedapp.connection-error') as string);
       return;
     }
@@ -194,7 +194,7 @@ export function useShieldFunds({
     setBackgroundError,
     addLastSnackbar,
     netInfo.isConnected,
-    selectServer,
+    server,
     translate,
     navigation,
     setScrollToTop,

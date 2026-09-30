@@ -7,7 +7,7 @@ import type {
 } from '@screens/OptionsPanel';
 import { closeOptionsPanel, useOptionsPanel } from '@app/context/optionsPanel';
 import { ContextAppLoaded } from '@app/context';
-import { MenuItemEnum, SelectServerEnum } from '@app/AppState';
+import { MenuItemEnum } from '@app/AppState';
 import { sendEmail } from '@app/services/sendEmail';
 import { walletBackupExists } from '@app/walletBackend';
 
@@ -58,7 +58,7 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
   children,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, addLastSnackbar, readOnly, selectServer } = context;
+  const { translate, addLastSnackbar, readOnly, server } = context;
   const { isOpen } = useOptionsPanel();
 
   // Re-check the backup file each time the panel opens — same trigger as the
@@ -87,7 +87,7 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
   // same: the two items that talk to a server are the only ones the panel
   // ever hides, and the wallet backup cell waits for a backup to exist.
   const actions = useMemo<OptionsPanelAction[]>(() => {
-    const isOffline = selectServer === SelectServerEnum.offline;
+    const isOffline = server.kind === 'offline';
 
     const showRescan = !isOffline;
     const showSyncReport = !isOffline;
@@ -172,7 +172,7 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
     }
 
     return list;
-  }, [translate, dispatch, readOnly, selectServer, hasBackupWallet]);
+  }, [translate, dispatch, readOnly, server, hasBackupWallet]);
 
   const socials = useMemo<OptionsPanelSocial[]>(
     () => [

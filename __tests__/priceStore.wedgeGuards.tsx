@@ -16,7 +16,7 @@ import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
 } from '@app/context';
-import { ChainNameEnum, SelectServerEnum } from '@app/AppState';
+import { ChainNameEnum, SelectServerEnum, offlineServer } from '@app/AppState';
 import { getZecPrice, ZecPriceOutcome } from '@app/walletBackend';
 import {
   mockZecQuote,
@@ -179,7 +179,7 @@ test('no market, no traffic: offline and non-mainnet fetch nothing', async () =>
 
   const offline = render(
     driverOnlyUi(
-      makeCtx({ selectServer: SelectServerEnum.offline }),
+      makeCtx({ server: offlineServer(ChainNameEnum.noneChainName) }),
       setZecPrice,
     ),
   );

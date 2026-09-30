@@ -98,6 +98,7 @@ import { appStateStatusAtom } from '@app/AppState/uiAtoms';
 import { StackScreenProps } from '@react-navigation/stack';
 import { AppStackParamList } from '@app/types';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
+import { mockOfflineServer } from '../__mocks__/dataMocks/mockServer';
 
 const doSaveMock = doSave as jest.Mock;
 const resolveTriggerGateMock = resolveTriggerGate as jest.Mock;
@@ -249,7 +250,7 @@ describe('LoadedApp seam-B mount fence — current container behavior', () => {
       const { utils, instance } = await mountCommitted();
 
       act(() => {
-        instance.setState({ selectServer: SelectServerEnum.offline });
+        instance.setState({ server: mockOfflineServer });
       });
 
       expect(routePresent(utils, RouteEnum.History)).toBe(true);
@@ -379,7 +380,7 @@ describe('LoadedApp seam-B mount fence — current container behavior', () => {
     act(() => {
       instance.setState({
         walletChainName: ChainNameEnum.mainChainName,
-        server: { uri: '', chainName: ChainNameEnum.noneChainName },
+        server: mockOfflineServer,
         info: {} as never,
       });
     });

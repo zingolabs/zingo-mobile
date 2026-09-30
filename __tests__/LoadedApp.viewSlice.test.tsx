@@ -71,17 +71,13 @@ const { AppState, Linking } =
 
 import { LoadedApp, LoadedAppClass } from '@app/LoadedApp';
 import { resolveTriggerGate } from '@app/services/gateController';
-import {
-  ChainNameEnum,
-  LaunchingModeEnum,
-  RouteEnum,
-  SelectServerEnum,
-} from '@app/AppState';
+import { ChainNameEnum, LaunchingModeEnum, RouteEnum } from '@app/AppState';
 import {
   walletViewSourceAtom,
   walletViewAtom,
   initialWalletViewSource,
 } from '@app/AppState/walletViewAtoms';
+import { remoteServer } from '@app/AppState/types/ServerType';
 import { StackScreenProps } from '@react-navigation/stack';
 import { AppStackParamList } from '@app/types';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
@@ -140,8 +136,11 @@ describe('view slice — the view wakes only on a view change', () => {
 
   it('a container field that leaves the WalletView unchanged wakes no view consumer', () => {
     const store = createStore();
-    // online and spendable → the view is fullWithSend
-    store.set(walletViewSourceAtom, initialWalletViewSource);
+    // remote and spendable → the view is fullWithSend
+    store.set(walletViewSourceAtom, {
+      ...initialWalletViewSource,
+      server: remoteServer('https://one.test', ChainNameEnum.mainChainName),
+    });
     viewRenders = 0;
     render(
       <Provider store={store}>
@@ -150,12 +149,12 @@ describe('view slice — the view wakes only on a view change', () => {
     );
     const base = viewRenders;
 
-    // A server switch between online selections changes the source, but the
+    // A switch between two remote servers changes the source, but the
     // outcome does not.
     act(() => {
       store.set(walletViewSourceAtom, prev => ({
         ...prev,
-        selectServer: SelectServerEnum.list,
+        server: remoteServer('https://two.test', ChainNameEnum.mainChainName),
       }));
     });
     expect(viewRenders).toBe(base); // the view did not re-render

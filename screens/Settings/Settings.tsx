@@ -54,6 +54,8 @@ import {
   LanguageEnum,
   SeedActionEnum,
   ServerType,
+  offlineServer,
+  remoteServer,
   ServerUrisType,
   SetServerResult,
   UfvkActionEnum,
@@ -93,6 +95,8 @@ import { sendEmail } from '@app/services/sendEmail';
 import SwitchOff from '../../assets/img/switch-off.svg';
 import SettingSwitchOn from '../../assets/img/setting-switch-on.svg';
 
+type ServerPick = SelectServerEnum | 'offline';
+
 type SettingsProps = NativeStackScreenProps<
   AppDrawerParamList,
   RouteEnum.Settings
@@ -105,7 +109,7 @@ type SettingsProps = NativeStackScreenProps<
   ) => Promise<SetServerResult>;
   setLanguageOption: (value: LanguageEnum) => Promise<void>;
   setBiometricsOption: (value: boolean) => Promise<void>;
-  setSelectServerOption: (value: string) => Promise<void>;
+  setSelectServerOption: (value: SelectServerEnum) => Promise<void>;
   setPerformanceLevelOption: (value: RPCPerformanceLevelEnum) => Promise<void>;
   setBlockExplorerOption: (value: BlockExplorerEnum) => Promise<void>;
   toggleMenuDrawer: () => void;
@@ -148,6 +152,9 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     lastError,
     setLastError,
   } = context;
+  const pickContext: ServerPick =
+    serverContext.kind === 'offline' ? 'offline' : selectServerContext;
+  const activeUri = serverContext.kind === 'remote' ? serverContext.uri : '';
 
   const languagesArray = translate('settings.languages');
   let LANGUAGES: Options[] = [];
@@ -200,9 +207,9 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   // testnet server while a mainnet wallet is open. `noneChainName` ('') means
   // Offline (no server, no chain).
   const [serverChain, setServerChain] = useState<ChainNameEnum>(
-    selectServerContext === SelectServerEnum.offline
+    serverContext.kind === 'offline'
       ? ChainNameEnum.noneChainName
-      : (serverContext.chainName as ChainNameEnum),
+      : serverContext.chainName,
   );
   // Server lists for the two public chains, fetched ONCE when the screen opens
   // (see the mount effect below) and reused for the whole life of the server BS
@@ -228,8 +235,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const [language, setLanguage] = useState<LanguageEnum>(languageContext);
   const [privacy, setPrivacy] = useState<boolean>(privacyContext);
   const [biometrics, setBiometrics] = useState<boolean>(biometricsContext);
-  const [selectServer, setSelectServer] =
-    useState<SelectServerEnum>(selectServerContext);
+  const [selectServer, setSelectServer] = useState<ServerPick>(pickContext);
   const [performanceLevel, setPerformanceLevel] =
     useState<RPCPerformanceLevelEnum>(performanceLevelContext);
   const [blockExplorer, setBlockExplorer] =
@@ -262,7 +268,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   // BottomSheetModal so the row stays compact like other selectors.
   const currentServerLabel = useMemo(() => {
     switch (selectServer) {
-      case SelectServerEnum.offline:
+      case 'offline':
         return translate('settings.server-offline') as string;
       case SelectServerEnum.auto:
         return autoServerUri || (translate('settings.server-auto') as string);
@@ -282,7 +288,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   // without opening the selector.
   const currentServerKindLabel = useMemo(() => {
     switch (selectServer) {
-      case SelectServerEnum.offline:
+      case 'offline':
         return translate('settings.server-offline') as string;
       case SelectServerEnum.auto:
         return translate('settings.server-auto') as string;
@@ -352,49 +358,49 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   // leaves a stale, previously-picked server showing. The list picker then
   // highlights the active server until the user explicitly picks another.
   const syncSelectableServersToActive = () => {
-    setAutoServerUri(serverContext.uri);
+    setAutoServerUri(activeUri);
     setAutoServerChainName(serverContext.chainName);
-    setListServerUri(serverContext.uri);
+    setListServerUri(activeUri);
     setListServerChainName(serverContext.chainName);
   };
 
   const setServer = () => {
-    if (selectServerContext === SelectServerEnum.auto) {
-      setAutoIcon(faDotCircle); // ->
-      setListIcon(farCircle);
-      setCustomIcon(farCircle);
-      setOfflineIcon(farCircle);
-      setAutoServerUri(serverContext.uri);
-      setAutoServerChainName(serverContext.chainName);
-    } else if (selectServerContext === SelectServerEnum.list) {
-      setAutoIcon(farCircle);
-      setListIcon(faDotCircle); // ->
-      setCustomIcon(farCircle);
-      setOfflineIcon(farCircle);
-      setListServerUri(serverContext.uri);
-      setListServerChainName(serverContext.chainName);
-      // I have to update them in auto as well
-      // with the same server
-      setAutoServerUri(serverContext.uri);
-      setAutoServerChainName(serverContext.chainName);
-    } else if (selectServerContext === SelectServerEnum.custom) {
+    if (serverContext.kind === 'offline') {
       setAutoIcon(farCircle);
       setListIcon(farCircle);
-      setCustomIcon(faDotCircle); // ->
-      setOfflineIcon(farCircle);
-      setCustomServerUri(serverContext.uri);
-      setCustomServerChainName(serverContext.chainName);
+      setCustomIcon(farCircle);
+      setOfflineIcon(faDotCircle); // ->
       // I have to update them in auto as well
       // with the default server for the active chain
       setAutoServerUri(autoDefaultForChain(serverContext.chainName).uri);
       setAutoServerChainName(
         autoDefaultForChain(serverContext.chainName).chainName,
       );
-    } else if (selectServerContext === SelectServerEnum.offline) {
-      setAutoIcon(farCircle);
+    } else if (selectServerContext === SelectServerEnum.auto) {
+      setAutoIcon(faDotCircle); // ->
       setListIcon(farCircle);
       setCustomIcon(farCircle);
-      setOfflineIcon(faDotCircle); // ->
+      setOfflineIcon(farCircle);
+      setAutoServerUri(activeUri);
+      setAutoServerChainName(serverContext.chainName);
+    } else if (selectServerContext === SelectServerEnum.list) {
+      setAutoIcon(farCircle);
+      setListIcon(faDotCircle); // ->
+      setCustomIcon(farCircle);
+      setOfflineIcon(farCircle);
+      setListServerUri(activeUri);
+      setListServerChainName(serverContext.chainName);
+      // I have to update them in auto as well
+      // with the same server
+      setAutoServerUri(activeUri);
+      setAutoServerChainName(serverContext.chainName);
+    } else if (selectServerContext === SelectServerEnum.custom) {
+      setAutoIcon(farCircle);
+      setListIcon(farCircle);
+      setCustomIcon(faDotCircle); // ->
+      setOfflineIcon(farCircle);
+      setCustomServerUri(activeUri);
+      setCustomServerChainName(serverContext.chainName);
       // I have to update them in auto as well
       // with the default server for the active chain
       setAutoServerUri(autoDefaultForChain(serverContext.chainName).uri);
@@ -546,7 +552,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
           (s: ServerUrisType) => !s.obsolete && s.chainName === chain,
         ),
       );
-    if (selectServerContext === SelectServerEnum.offline) {
+    if (serverContext.kind === 'offline') {
       setMainServerList(staticFor(ChainNameEnum.mainChainName));
       setTestServerList(staticFor(ChainNameEnum.testChainName));
       return;
@@ -582,19 +588,19 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     } else if (selectServer === SelectServerEnum.custom) {
       serverUriParsed = customServerUri;
       chainNameParsed = customServerChainName;
-    } else if (selectServer === SelectServerEnum.offline) {
+    } else if (selectServer === 'offline') {
       serverUriParsed = '';
       // Offline = no server → no chain. Clear the residual chainName; the real
       // chain is derived from the wallet when it is opened offline.
       chainNameParsed = ChainNameEnum.noneChainName;
     }
     if (
-      serverContext.uri === serverUriParsed &&
+      activeUri === serverUriParsed &&
       serverContext.chainName === chainNameParsed &&
       languageContext === language &&
       privacyContext === privacy &&
       biometricsContext === biometrics &&
-      selectServerContext === selectServer &&
+      pickContext === selectServer &&
       performanceLevelContext === performanceLevel &&
       blockExplorerContext === blockExplorer
     ) {
@@ -620,9 +626,9 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     biometrics,
     biometricsContext,
     selectServer,
-    selectServerContext,
+    pickContext,
     serverContext.chainName,
-    serverContext.uri,
+    activeUri,
   ]);
 
   // Ref that always points to the latest `saveSettings`. The footer's
@@ -650,7 +656,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     } else if (selectServer === SelectServerEnum.custom) {
       serverUriParsed = customServerUri;
       chainNameParsed = customServerChainName;
-    } else if (selectServer === SelectServerEnum.offline) {
+    } else if (selectServer === 'offline') {
       serverUriParsed = '';
       // Offline = no server → no chain. Clear the residual chainName; the real
       // chain is derived from the wallet when it is opened offline.
@@ -658,22 +664,19 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     }
 
     if (
-      serverContext.uri === serverUriParsed &&
+      activeUri === serverUriParsed &&
       serverContext.chainName === chainNameParsed &&
       languageContext === language &&
       privacyContext === privacy &&
       biometricsContext === biometrics &&
-      selectServerContext === selectServer &&
+      pickContext === selectServer &&
       performanceLevelContext === performanceLevel &&
       blockExplorerContext === blockExplorer
     ) {
       addLastSnackbar(translate('settings.nochanges') as string);
       return;
     }
-    if (
-      (!serverUriParsed || !chainNameParsed) &&
-      selectServer !== SelectServerEnum.offline
-    ) {
+    if ((!serverUriParsed || !chainNameParsed) && selectServer !== 'offline') {
       addLastSnackbar(translate('settings.isserver') as string);
       return;
     }
@@ -687,10 +690,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     // also catches malformed strings (`http:/host` without the double
     // slash etc.) that url-parse silently accepts.
     // ───────────────────────────────────────────────────────────────
-    if (
-      serverContext.uri !== serverUriParsed &&
-      selectServer !== SelectServerEnum.offline
-    ) {
+    if (activeUri !== serverUriParsed && selectServer !== 'offline') {
       const parsedServer = parseServerURI(serverUriParsed);
       if (parsedServer.kind === 'error') {
         // Surface the parser's specific message (bad URI, plaintext
@@ -711,10 +711,9 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       }
     }
     if (
-      (serverContext.uri !== serverUriParsed ||
-        selectServerContext !== selectServer) &&
+      (activeUri !== serverUriParsed || pickContext !== selectServer) &&
       !serverUriParsed &&
-      selectServer !== SelectServerEnum.offline
+      selectServer !== 'offline'
     ) {
       addLastSnackbar(translate('settings.isuri') as string);
       return;
@@ -734,17 +733,14 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     //   the wallet opens directly (Offline is compatible with any chain).
     // ───────────────────────────────────────────────────────────────
     const serverChanged =
-      serverContext.uri !== serverUriParsed ||
+      activeUri !== serverUriParsed ||
       serverContext.chainName !== chainNameParsed;
     let sameServerChainName = true;
 
     if (serverChanged) {
       if (
         !netInfo.isConnected &&
-        !(
-          selectServerContext !== SelectServerEnum.offline &&
-          selectServer === SelectServerEnum.offline
-        )
+        !(serverContext.kind !== 'offline' && selectServer === 'offline')
       ) {
         addLastSnackbar(translate('loadedapp.connection-error') as string);
         return;
@@ -785,7 +781,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         // the wallet directly — it is compatible with any chain — so
         // `sameServerChainName` stays true and we fall straight through.
         const { result, timeout, newChainName, errorDetail } =
-          await checkServerURI(serverUriParsed, serverContext.uri);
+          await checkServerURI(serverUriParsed, activeUri);
         if (!result) {
           // Native/JS error string kept out of the user snackbar but logged so
           // it surfaces in `adb logcat` / Xcode console for diagnosis.
@@ -879,9 +875,12 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     // ───────────────────────────────────────────────────────────────
     try {
       if (serverChanged) {
+        const chain = chainNameParsed as ChainNameEnum;
         const result = await setServerOption(
-          { uri: serverUriParsed, chainName: chainNameParsed } as ServerType,
-          selectServer,
+          selectServer === 'offline'
+            ? offlineServer(chain)
+            : remoteServer(serverUriParsed, chain),
+          selectServer === 'offline' ? selectServerContext : selectServer,
           true,
           sameServerChainName,
         );
@@ -907,7 +906,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         }
         // result.kind === 'ok' — fall through to the final goBack().
       } else {
-        if (selectServerContext !== selectServer) {
+        if (pickContext !== selectServer && selectServer !== 'offline') {
           await setSelectServerOption(selectServer);
         }
         setDisabled(false);
@@ -936,7 +935,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       // reset all settings - no save changes
       setLanguage(languageContext);
       setPrivacy(privacyContext);
-      setSelectServer(selectServerContext);
+      setSelectServer(pickContext);
       setServer();
       setBiometrics(biometricsContext);
       setPerformanceLevel(performanceLevelContext);
@@ -1078,7 +1077,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       setAutoIcon(farCircle);
       setListIcon(farCircle);
       setCustomIcon(farCircle);
-      setSelectServer(SelectServerEnum.offline);
+      setSelectServer('offline');
       updateSelectedInfo('', ChainNameEnum.noneChainName);
       return;
     }
@@ -1559,7 +1558,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                         marginRight: 8,
                       }}
                     >
-                      {selectServer !== SelectServerEnum.offline && (
+                      {selectServer !== 'offline' && (
                         <FadeText
                           numberOfLines={1}
                           style={{
@@ -1801,7 +1800,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
           </View>
 
           {/* Offline has no server → hide the info header. */}
-          {selectServer !== SelectServerEnum.offline && (
+          {selectServer !== 'offline' && (
             <View
               style={{
                 borderWidth: 1,
@@ -1890,7 +1889,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                 setAutoIcon(farCircle);
                 setListIcon(farCircle);
                 setCustomIcon(farCircle);
-                setSelectServer(SelectServerEnum.offline);
+                setSelectServer('offline');
                 setServerChain(ChainNameEnum.noneChainName);
                 syncSelectableServersToActive();
                 updateSelectedInfo('', ChainNameEnum.noneChainName);
@@ -1953,7 +1952,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                     ? testServerList
                     : mainServerList;
                 const best =
-                  (chain === serverContext.chainName && serverContext.uri) ||
+                  (chain === serverContext.chainName && activeUri) ||
                   (list.length > 0
                     ? list[0].value
                     : autoDefaultForChain(chain).uri);

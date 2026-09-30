@@ -31,6 +31,7 @@ import {
 import { SyncCoordinator } from '@app/walletBackend/modules/SyncCoordinator';
 import { DataService } from '@app/walletBackend/modules/DataService';
 import { mockServer } from '../__mocks__/dataMocks/mockServer';
+import { mockDataService } from '../__mocks__/dataMocks/mockDataService';
 import { mockWalletBackendConfig } from '../__mocks__/dataMocks/mockWalletBackendConfig';
 
 const bridge = RPCModule as unknown as Record<string, jest.Mock>;
@@ -99,7 +100,7 @@ describe('sync family rejections are contained and reported, never sniffed', () 
       // is under test, and an Offline session never makes the call.
       server: mockServer,
     } as unknown as ConstructorParameters<typeof SyncCoordinator>[0];
-    const dataService = {} as ConstructorParameters<typeof SyncCoordinator>[1];
+    const dataService = mockDataService();
     return { coordinator: new SyncCoordinator(config, dataService), onError };
   }
 
