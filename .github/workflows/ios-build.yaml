@@ -128,7 +128,9 @@ jobs:
           EOF
 
       - name: Record zingo-mobile's descriptor
-        run: echo "ZINGO_MOBILE_GIT_DESCRIBE=$(git describe --dirty --always --long --match 'zingo-*')" >> "$GITHUB_ENV"
+        run: |
+          describe="$(git describe --dirty --always --long --match 'zingo-*')"
+          echo "ZINGO_MOBILE_GIT_DESCRIBE=$describe" >> "$GITHUB_ENV"
 
       # The two XCFrameworks and the Swift sources of the ZingoBindings
       # package, which the Xcode project takes from the zingolib submodule.

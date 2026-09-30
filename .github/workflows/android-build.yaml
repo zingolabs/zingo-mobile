@@ -133,7 +133,9 @@ jobs:
           esac
 
       - name: Record zingo-mobile's descriptor
-        run: echo "ZINGO_MOBILE_GIT_DESCRIBE=$(git describe --dirty --always --long --match 'zingo-*')" >> "$GITHUB_ENV"
+        run: |
+          describe="$(git describe --dirty --always --long --match 'zingo-*')"
+          echo "ZINGO_MOBILE_GIT_DESCRIBE=$describe" >> "$GITHUB_ENV"
 
       - name: Build the Binding Layer
         env:
@@ -179,3 +181,14 @@ jobs:
         with:
           path: zingolib/bindings/android/build/binding-layer
           key: binding-layer-android-${{ env.ARCH }}-${{ env.CACHE-KEY }}
+
+      - name: Cancel the run on failure (fail-all)
+        if: ${{ failure() && inputs.fail-all }}
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.actions.cancelWorkflowRun({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.runId,
+            });
