@@ -138,15 +138,14 @@ jobs:
 
       # The two XCFrameworks and the Swift sources of the ZingoBindings
       # package, which the Xcode project takes from the zingolib submodule. The
-      # builder takes the git root of its working directory as the zingolib
-      # root.
+      # builder finds the zingolib root from its own crate directory, so it
+      # runs from the zingo-mobile root.
       - name: Build the Binding Layer
-        working-directory: ./zingolib
         run: |
           cargo run \
-            --manifest-path tools/workbench/Cargo.toml \
+            --manifest-path zingolib/tools/workbench/Cargo.toml \
             --bin build-binding-layer -- \
-            ios --out bindings/swift/build
+            ios --out zingolib/bindings/swift/build
 
       - name: Upload the Binding Layer
         uses: actions/upload-artifact@v7
