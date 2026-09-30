@@ -35,12 +35,10 @@ const DUPLICATE_NULLIFIER_MARKERS = [
 ] as const;
 
 /**
- * The mobile-owned refusal marker (#1229): the display prefix of our own
- * `ZingolibError::Mixnet`, minted in zingolib/zingo-ffi/lib/src/lib.rs. It
- * survives any zingolib rewording, because the submodule pin moves both sides
- * of it together.
+ * The display prefix of `ZingolibError::Mixnet`, which a jest test compares
+ * with zingolib/zingo-ffi/lib/src/lib.rs at the pinned commit.
  */
-const OWNED_MIXNET_MARKER = 'Error: mixnet:';
+export const OWNED_MIXNET_MARKER = 'Error: mixnet:';
 
 /**
  * Both fail-closed refusal texts (bootstrapping and died) carry this phrase;

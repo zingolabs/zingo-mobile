@@ -18,6 +18,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v7
 
+      # One jest test compares a TypeScript marker with the Rust source in
+      # the submodule.
+      - name: Check out zingolib
+        uses: ./.github/actions/zingolib-submodule
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
