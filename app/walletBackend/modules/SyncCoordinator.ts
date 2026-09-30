@@ -22,7 +22,7 @@
  *
  * To add a new periodic task, push it into taskPromises inside runTaskPromises.
  */
-import { Epoch } from '@app/walletBackend/controller/syncController';
+import { Epoch, isCurrent } from '@app/walletBackend/controller/syncController';
 import { TotalBalanceClass, GlobalConst, ServerType } from '@app/AppState';
 import RPCModule from '@app/RPCModule';
 import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
@@ -42,6 +42,13 @@ import { doSave } from '@app/walletBackend/utils/walletUtils';
 // user reaches for Settings.
 const PERSISTENT_SYNC_FAILURE_THRESHOLD = 3;
 
+type LaneHolder = 'none' | 'sync' | 'rescan';
+
+// What a deferred task's drop means: a user-issued task reports its drop
+// through onError; a poll-scheduled task drops silently, because the next
+// tick schedules it again.
+type DropReport = 'report' | 'silent';
+
 export class SyncCoordinator {
   config: WalletBackendConfig;
   dataService: DataService;
@@ -49,7 +56,12 @@ export class SyncCoordinator {
   updateTimerID?: NodeJS.Timeout;
   timers: NodeJS.Timeout[] = [];
 
-  refreshSyncLock: boolean = false;
+  // The command holding the single-flight launch lane, or none. The lock the
+  // tick's gate reads is derived from this record.
+  laneHolder: LaneHolder = 'none';
+  get refreshSyncLock(): boolean {
+    return this.laneHolder !== 'none';
+  }
   fetchSyncStatusLock: boolean = false;
   fetchSyncPollLock: boolean = false;
 
@@ -62,6 +74,11 @@ export class SyncCoordinator {
   // not re-enter, so overlapping ticks cannot both read the save-required gate.
   tickInFlight: boolean = false;
 
+  // A rescan issued while the lane was held, released when the lane clears.
+  queuedRescan: { kind: 'none' } | { kind: 'queued'; epoch: Epoch } = {
+    kind: 'none',
+  };
+
   syncLaunchFailures: number = 0;
 
   walletConfigPerformanceLevel: RPCPerformanceLevelEnum | undefined;
@@ -72,17 +89,21 @@ export class SyncCoordinator {
   }
 
   async configure(): Promise<void> {
-    await this.dataService.fetchTandZandOValueTransfers();
-    await this.dataService.fetchAddresses();
-    await this.dataService.fetchTotalBalance();
-    await this.dataService.fetchInfoAndServerHeight();
-    await this.dataService.fetchZingolibVersion();
-    await this.dataService.fetchTandZandOMessages();
-    await this.dataService.fetchWalletHeight();
-    await this.dataService.fetchWalletBirthdaySeedUfvk();
-
-    if (this.updateTimerID === undefined) {
-      this.armNextTick();
+    // The loop is armed in the finally, so a rejected fetch still leaves the
+    // coordinator polling.
+    try {
+      await this.dataService.fetchTandZandOValueTransfers();
+      await this.dataService.fetchAddresses();
+      await this.dataService.fetchTotalBalance();
+      await this.dataService.fetchInfoAndServerHeight();
+      await this.dataService.fetchZingolibVersion();
+      await this.dataService.fetchTandZandOMessages();
+      await this.dataService.fetchWalletHeight();
+      await this.dataService.fetchWalletBirthdaySeedUfvk();
+    } finally {
+      if (this.updateTimerID === undefined) {
+        this.armNextTick();
+      }
     }
 
     await this.sanitizeTimers();
@@ -98,15 +119,47 @@ export class SyncCoordinator {
 
   async loopTick(): Promise<void> {
     const armedHandle = this.updateTimerID;
-    await this.runTaskPromises();
-    // Re-arm only while this loop is still the live one. A boundary landing
-    // during the tick (clearTimers) sets updateTimerID undefined and stops it.
-    if (this.updateTimerID !== armedHandle) {
-      return;
+    try {
+      await this.runTaskPromises();
+    } catch (error) {
+      // The tick runs from a setTimeout callback. This catch owns a rejected
+      // tick, and the finally below re-arms the loop.
+      this.config.onError(`Error sync tick: ${error}`);
+    } finally {
+      // Re-arm only while this loop is still the live one. A boundary landing
+      // during the tick (clearTimers) sets updateTimerID undefined and stops it.
+      if (this.updateTimerID === armedHandle) {
+        this.timers = this.timers.filter(t => t !== armedHandle);
+        this.updateTimerID = undefined;
+        this.armNextTick();
+      }
     }
-    this.timers = this.timers.filter(t => t !== armedHandle);
-    this.updateTimerID = undefined;
-    this.armNextTick();
+  }
+
+  // Runs the task on the next macrotask while its epoch is current. A drop
+  // reports through onError when the task asks for it, and a throwing task
+  // always reports, under the task's name.
+  private deferUnder(
+    epoch: Epoch,
+    name: string,
+    onDrop: DropReport,
+    task: () => Promise<void>,
+  ): void {
+    setTimeout(async () => {
+      if (!isCurrent(epoch, this.controllerEpoch)) {
+        if (onDrop === 'report') {
+          this.config.onError(
+            `${name} dropped: a boundary passed before it ran`,
+          );
+        }
+        return;
+      }
+      try {
+        await task();
+      } catch (error) {
+        this.config.onError(`Error ${name}: ${error}`);
+      }
+    }, 0);
   }
 
   async runTaskPromises(): Promise<void> {
@@ -276,18 +329,27 @@ export class SyncCoordinator {
       return;
     }
     // Single in-flight command (ADR 0017): a launch and a rescan share one lane.
-    // A rescan issued while a sync is in flight is dropped, not run beside it,
-    // so its finally can no longer release the launch's lock. The caller
-    // re-issues once the lane clears.
+    // A rescan issued while a sync holds the lane waits in queuedRescan, and
+    // the holder's finally releases it. A rescan issued while a rescan holds
+    // the lane is served by that rescan.
     if (this.refreshSyncLock) {
+      if (fullRescan && this.laneHolder === 'sync') {
+        this.queuedRescan = { kind: 'queued', epoch: this.controllerEpoch };
+      }
       return;
     }
-    this.refreshSyncLock = true;
+    this.laneHolder = fullRescan ? 'rescan' : 'sync';
+    // A rescan tears the loop down before the native call. The epoch after
+    // that teardown marks the rescan's own boundary; the finally reconfigures
+    // while that boundary is still the current one, on success and on
+    // rejection alike.
+    let rescanEpoch: Epoch | undefined;
     try {
       this.config.keepAwake(true);
 
       if (fullRescan) {
         await this.clearTimers();
+        rescanEpoch = this.controllerEpoch;
         this.config.onValueTransfersChanged([], 0);
         this.config.onMessagesChanged([], 0);
         this.config.onBalanceChanged({
@@ -312,7 +374,6 @@ export class SyncCoordinator {
           );
         }
         console.log('rescan RUN', rescanStr);
-        await this.configure();
       } else {
         const start = Date.now();
         const syncStr: string = await RPCModule.runSyncProcess();
@@ -338,7 +399,26 @@ export class SyncCoordinator {
         }
       }
     } finally {
-      this.refreshSyncLock = false;
+      this.laneHolder = 'none';
+      const queued = this.queuedRescan;
+      this.queuedRescan = { kind: 'none' };
+      if (queued.kind === 'queued') {
+        this.deferUnder(queued.epoch, 'queued rescan', 'report', () =>
+          this.refreshSync(true),
+        );
+      }
+      if (
+        rescanEpoch !== undefined &&
+        isCurrent(rescanEpoch, this.controllerEpoch)
+      ) {
+        // This catch owns a rejected reconfigure, so refreshSync resolves for
+        // its caller either way.
+        try {
+          await this.configure();
+        } catch (error) {
+          this.config.onError(`Error rescan reconfigure: ${error}`);
+        }
+      }
     }
   }
 
@@ -355,7 +435,7 @@ export class SyncCoordinator {
       const returnStatus: string = await RPCModule.statusSyncInfo();
       // A boundary during the read (a server switch) bumped the epoch: this
       // snapshot was begun under the old server, drop it unread.
-      if (issuedEpoch !== this.controllerEpoch) {
+      if (!isCurrent(issuedEpoch, this.controllerEpoch)) {
         return;
       }
       if (Date.now() - start > 4000) {
@@ -453,24 +533,24 @@ export class SyncCoordinator {
         returnPoll.toLowerCase().startsWith('sync task has not been launched')
       ) {
         console.log('SYNC POLL -> RUN SYNC', returnPoll);
-        setTimeout(async () => {
-          if (issuedEpoch !== this.controllerEpoch) return;
-          await this.refreshSync();
-        }, 0);
+        this.deferUnder(issuedEpoch, 'poll-scheduled launch', 'silent', () =>
+          this.refreshSync(),
+        );
         return;
       }
 
       if (returnPoll.toLowerCase().startsWith('sync task is not complete')) {
         console.log('SYNC POLL -> FETCH STATUS', returnPoll);
-        setTimeout(async () => {
-          if (issuedEpoch !== this.controllerEpoch) return;
-          await this.fetchSyncStatus();
-        }, 0);
+        this.deferUnder(
+          issuedEpoch,
+          'poll-scheduled status read',
+          'silent',
+          () => this.fetchSyncStatus(),
+        );
         console.log('SYNC POLL -> RUN SYNC', returnPoll);
-        setTimeout(async () => {
-          if (issuedEpoch !== this.controllerEpoch) return;
-          await this.refreshSync();
-        }, 0);
+        this.deferUnder(issuedEpoch, 'poll-scheduled launch', 'silent', () =>
+          this.refreshSync(),
+        );
         return;
       }
 
@@ -508,10 +588,9 @@ export class SyncCoordinator {
       console.log('SYNC POLL', sp);
 
       console.log('SYNC POLL -> FETCH STATUS');
-      setTimeout(async () => {
-        if (issuedEpoch !== this.controllerEpoch) return;
-        await this.fetchSyncStatus();
-      }, 0);
+      this.deferUnder(issuedEpoch, 'poll-scheduled status read', 'silent', () =>
+        this.fetchSyncStatus(),
+      );
     } catch (error) {
       console.log(`Critical Error sync poll ${error}`);
       this.config.onError(`Error sync poll: ${error}`);

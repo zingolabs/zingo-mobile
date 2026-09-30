@@ -67,7 +67,14 @@ const { AppState, Linking } =
 
 import { LoadedApp, LoadedAppClass } from '@app/LoadedApp';
 import { resolveTriggerGate } from '@app/services/gateController';
-import { ChainNameEnum, LaunchingModeEnum, RouteEnum } from '@app/AppState';
+import {
+  AddressKindEnum,
+  ChainNameEnum,
+  LaunchingModeEnum,
+  RouteEnum,
+  TransparentAddressClass,
+} from '@app/AppState';
+import { RPCAddressScopeEnum } from '@app/walletBackend/enums/RPCAddressScopeEnum';
 import { StackScreenProps } from '@react-navigation/stack';
 import { AppStackParamList } from '@app/types';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
@@ -166,6 +173,23 @@ describe('callback-boundary epoch', () => {
     // The positive control: the guard passes while mounted, so the same write
     // that dropped above lands here.
     expect(setState).toHaveBeenCalled();
+  });
+
+  it('Tests that the default unified address clears when the address list holds only transparent addresses.', async () => {
+    const { instance } = await mountCommitted();
+    const transparent = new TransparentAddressClass(
+      0,
+      't1transparent',
+      AddressKindEnum.t,
+      RPCAddressScopeEnum.external,
+    );
+
+    act(() => {
+      instance.setAllAddresses([transparent]);
+    });
+
+    expect(instance.state.addresses).toEqual([transparent]);
+    expect(instance.state.defaultUnifiedAddress).toBe('');
   });
 });
 

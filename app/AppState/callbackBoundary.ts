@@ -12,7 +12,10 @@
 
 import { atom } from 'jotai';
 
-import type { Epoch } from '@app/walletBackend/controller/syncController';
+import {
+  type Epoch,
+  isCurrent,
+} from '@app/walletBackend/controller/syncController';
 
 // The boundary epoch. Only the container writes it: it bumps once, at teardown.
 export const callbackEpochAtom = atom<Epoch>(0);
@@ -26,7 +29,7 @@ export type BoundaryWrite = { issuedEpoch: Epoch; write: () => void };
 export const boundaryDispatchAtom = atom(
   null,
   (get, _set, action: BoundaryWrite) => {
-    if (action.issuedEpoch === get(callbackEpochAtom)) {
+    if (isCurrent(action.issuedEpoch, get(callbackEpochAtom))) {
       action.write();
     }
   },

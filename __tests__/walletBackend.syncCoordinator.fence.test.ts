@@ -21,11 +21,11 @@ jest.mock('../app/walletBackend/utils/walletUtils', () => ({
 
 import RPCModule from '../app/RPCModule';
 import { SyncCoordinator } from '../app/walletBackend/modules/SyncCoordinator';
-import { DataService } from '../app/walletBackend/modules/DataService';
 import { WalletBackendConfig } from '../app/walletBackend/config/WalletBackendConfig';
 import { RPCPerformanceLevelEnum } from '../app/walletBackend/enums/RPCPerformanceLevelEnum';
 import { doSave } from '../app/walletBackend/utils/walletUtils';
 import { mockServer } from '../__mocks__/dataMocks/mockServer';
+import { mockDataService as fakeDataService } from '../__mocks__/dataMocks/mockDataService';
 
 const bridge = RPCModule as unknown as Record<string, jest.Mock>;
 const doSaveMock = doSave as jest.Mock;
@@ -67,35 +67,27 @@ function fakeConfig(): WalletBackendConfig {
   } as unknown as WalletBackendConfig;
 }
 
-// The coordinator reaches into DataService only for the eight configure()
-// fetches, the save-required gate, and the lock flags. A stub is the honest
-// seam for the coordinator's OWN scheduling logic; DataService internals are a
-// separate fence.
-function fakeDataService(): DataService {
-  const resolved = () => jest.fn().mockResolvedValue(undefined);
-  return {
-    fetchTandZandOValueTransfers: resolved(),
-    fetchAddresses: resolved(),
-    fetchTotalBalance: resolved(),
-    fetchInfoAndServerHeight: resolved(),
-    fetchZingolibVersion: resolved(),
-    fetchTandZandOMessages: resolved(),
-    fetchWalletHeight: resolved(),
-    fetchWalletBirthdaySeedUfvk: resolved(),
-    getWalletSaveRequired: jest.fn().mockResolvedValue(false),
-    getConfigWalletPerformance: jest
-      .fn()
-      .mockResolvedValue(RPCPerformanceLevelEnum.Low),
-    fetchWalletHeightLock: false,
-    fetchWalletBirthdaySeedUfvkLock: false,
-    fetchInfoAndServerHeightLock: false,
-    fetchTandZandOValueTransfersLock: false,
-    fetchTandZandOMessagesLock: false,
-    fetchTotalBalanceLock: false,
-    fetchAddressesLock: false,
-    fetchZingolibVersionLock: false,
-    getWalletSaveRequiredLock: false,
-  } as unknown as DataService;
+// Holds the launch lane with a deferred native call of the given kind, runs
+// `during` while it is held, then releases the lane and settles the deferred
+// follow-ups the release schedules.
+async function whileLaneHeld(
+  c: SyncCoordinator,
+  holder: 'sync' | 'rescan',
+  during: () => Promise<void>,
+): Promise<void> {
+  const native = deferred<string>();
+  const call =
+    holder === 'sync' ? bridge.runSyncProcess : bridge.runRescanProcess;
+  call.mockReturnValue(native.promise);
+  const held = c.refreshSync(holder === 'rescan');
+  await flushPromises();
+  await during();
+  native.resolve(
+    holder === 'sync' ? 'Launching sync task...' : 'Launching rescan...',
+  );
+  await held;
+  await jest.advanceTimersByTimeAsync(0);
+  await flushPromises();
 }
 
 describe('SyncCoordinator seam-A fence — scheduling machine, current behavior', () => {
@@ -246,7 +238,7 @@ describe('SyncCoordinator seam-A fence — scheduling machine, current behavior'
     const c = new SyncCoordinator(fakeConfig(), fakeDataService());
     await c.configure();
 
-    c.refreshSyncLock = true;
+    c.laneHolder = 'sync';
     await c.clearTimers();
 
     expect(c.updateTimerID).toBeUndefined();
@@ -279,7 +271,7 @@ describe('SyncCoordinator seam-A fence — scheduling machine, current behavior'
     bridge.runRescanProcess.mockResolvedValue('Launching rescan...');
     const c = new SyncCoordinator(fakeConfig(), fakeDataService());
 
-    c.refreshSyncLock = true; // a normal sync is in flight
+    c.laneHolder = 'sync'; // a normal sync is in flight
     await c.refreshSync(true); // rescan now shares the launch's single lane
 
     // Fixed (ticket 10): the single in-flight command drops the concurrent
@@ -287,6 +279,166 @@ describe('SyncCoordinator seam-A fence — scheduling machine, current behavior'
     // never releases the sync's lock.
     expect(bridge.runRescanProcess).not.toHaveBeenCalled();
     expect(c.refreshSyncLock).toBe(true);
+
+    await c.clearTimers();
+  });
+
+  it('Tests that a rescan runs once the lane clears when the user issues it during a sync launch.', async () => {
+    bridge.runRescanProcess.mockResolvedValue('Launching rescan...');
+    const c = new SyncCoordinator(fakeConfig(), fakeDataService());
+
+    await whileLaneHeld(c, 'sync', () => c.refreshSync(true));
+
+    expect(bridge.runRescanProcess).toHaveBeenCalledTimes(1);
+
+    await c.clearTimers();
+  });
+
+  it('Tests that a rescan issued while a rescan holds the lane is not queued a second time.', async () => {
+    const c = new SyncCoordinator(fakeConfig(), fakeDataService());
+
+    // The rescan already in flight serves the second request.
+    await whileLaneHeld(c, 'rescan', () => c.refreshSync(true));
+
+    expect(bridge.runRescanProcess).toHaveBeenCalledTimes(1);
+
+    await c.clearTimers();
+  });
+
+  it('Tests that a queued rescan dropped by a boundary reports through onError.', async () => {
+    bridge.runRescanProcess.mockResolvedValue('Launching rescan...');
+    const config = fakeConfig();
+    const c = new SyncCoordinator(config, fakeDataService());
+
+    await whileLaneHeld(c, 'sync', async () => {
+      await c.refreshSync(true); // queued under the current epoch
+      await c.clearTimers(); // the boundary: the epoch moves on
+    });
+
+    expect(bridge.runRescanProcess).not.toHaveBeenCalled();
+    expect(config.onError).toHaveBeenCalledWith(
+      expect.stringContaining('queued rescan dropped'),
+    );
+
+    await c.clearTimers();
+  });
+
+  it('Tests that a tick whose gate read rejects reports through onError and re-arms the loop.', async () => {
+    const ds = fakeDataService();
+    (ds.getWalletSaveRequired as jest.Mock).mockRejectedValue(
+      new Error('gate blew up'),
+    );
+    const config = fakeConfig();
+    const c = new SyncCoordinator(config, ds);
+    c.walletConfigPerformanceLevel = RPCPerformanceLevelEnum.Low;
+
+    await c.configure();
+    await jest.advanceTimersByTimeAsync(5 * 1000);
+    await flushPromises();
+
+    expect(config.onError).toHaveBeenCalledWith(
+      expect.stringContaining('gate blew up'),
+    );
+    // The rejection did not escape the timer callback, and the loop lives on.
+    expect(c.updateTimerID).toBeDefined();
+    expect(c.tickInFlight).toBe(false);
+
+    await c.clearTimers();
+  });
+
+  it('Tests that a rejected rescan re-arms the poll loop.', async () => {
+    bridge.runRescanProcess.mockRejectedValue(new Error('indexer hiccup'));
+    const config = fakeConfig();
+    const c = new SyncCoordinator(config, fakeDataService());
+    c.walletConfigPerformanceLevel = RPCPerformanceLevelEnum.Low;
+    await c.configure(); // the loop is armed
+
+    await c.refreshSync(true); // clearTimers, then the native call rejects
+
+    expect(config.onError).toHaveBeenCalledWith(
+      expect.stringContaining('indexer hiccup'),
+    );
+    expect(c.updateTimerID).toBeDefined();
+
+    await c.clearTimers();
+  });
+
+  it('Tests that a teardown during a rescan leaves the poll loop stopped.', async () => {
+    const c = new SyncCoordinator(fakeConfig(), fakeDataService());
+    c.walletConfigPerformanceLevel = RPCPerformanceLevelEnum.Low;
+    await c.configure();
+
+    // The teardown boundary passes after the rescan's own.
+    await whileLaneHeld(c, 'rescan', () => c.clearTimers());
+
+    expect(c.updateTimerID).toBeUndefined();
+  });
+
+  it('Tests that a deferred task that throws reports through onError.', async () => {
+    bridge.pollSyncInfo.mockResolvedValue('Sync task has not been launched.');
+    bridge.runSyncProcess.mockRejectedValue(new Error('launch blew up'));
+    const config = fakeConfig();
+    (config.onPersistentSyncFailure as jest.Mock).mockImplementation(() => {
+      throw new Error('host callback blew up');
+    });
+    const c = new SyncCoordinator(config, fakeDataService());
+    c.syncLaunchFailures = 2; // the next failure fires onPersistentSyncFailure
+
+    await c.fetchSyncPoll(); // defers the poll-scheduled launch
+    await jest.advanceTimersByTimeAsync(0);
+    await flushPromises();
+
+    expect(config.onError).toHaveBeenCalledWith(
+      expect.stringContaining('host callback blew up'),
+    );
+
+    await c.clearTimers();
+  });
+
+  it('Tests that a poll-scheduled launch dropped by a boundary reports nothing.', async () => {
+    bridge.pollSyncInfo.mockResolvedValue('Sync task has not been launched.');
+    const config = fakeConfig();
+    const c = new SyncCoordinator(config, fakeDataService());
+
+    await c.fetchSyncPoll(); // defers the poll-scheduled launch
+    await c.clearTimers(); // a routine boundary: the next tick polls again
+    await jest.advanceTimersByTimeAsync(0);
+    await flushPromises();
+
+    expect(bridge.runSyncProcess).not.toHaveBeenCalled();
+    expect(config.onError).not.toHaveBeenCalled();
+  });
+
+  it('Tests that a rejected reconfigure after a rescan reports through onError and resolves.', async () => {
+    bridge.runRescanProcess.mockResolvedValue('Launching rescan...');
+    const ds = fakeDataService();
+    (ds.fetchAddresses as jest.Mock).mockRejectedValue(
+      new Error('addresses blew up'),
+    );
+    const config = fakeConfig();
+    const c = new SyncCoordinator(config, ds);
+
+    await expect(c.refreshSync(true)).resolves.toBeUndefined();
+
+    expect(config.onError).toHaveBeenCalledWith(
+      expect.stringContaining('addresses blew up'),
+    );
+    expect(c.refreshSyncLock).toBe(false);
+    expect(c.updateTimerID).toBeDefined();
+
+    await c.clearTimers();
+  });
+
+  it('Tests that configure arms the loop when one of its fetches rejects.', async () => {
+    const ds = fakeDataService();
+    (ds.fetchTotalBalance as jest.Mock).mockRejectedValue(
+      new Error('balance blew up'),
+    );
+    const c = new SyncCoordinator(fakeConfig(), ds);
+
+    await expect(c.configure()).rejects.toThrow('balance blew up');
+
+    expect(c.updateTimerID).toBeDefined();
 
     await c.clearTimers();
   });
