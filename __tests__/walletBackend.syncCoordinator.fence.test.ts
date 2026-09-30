@@ -328,12 +328,12 @@ describe('SyncCoordinator seam-A fence — scheduling machine, current behavior'
     await c.clearTimers();
   });
 
-  it('Tests that a queued rescan is dropped with a log when a boundary passes before it runs.', async () => {
+  it('Tests that a queued rescan dropped by a boundary reports through onError.', async () => {
     const launch = deferred<string>();
     bridge.runSyncProcess.mockReturnValue(launch.promise);
     bridge.runRescanProcess.mockResolvedValue('Launching rescan...');
-    const log = jest.spyOn(console, 'log').mockImplementation(() => {});
-    const c = new SyncCoordinator(fakeConfig(), fakeDataService());
+    const config = fakeConfig();
+    const c = new SyncCoordinator(config, fakeDataService());
 
     const sync = c.refreshSync();
     await flushPromises();
@@ -345,11 +345,10 @@ describe('SyncCoordinator seam-A fence — scheduling machine, current behavior'
     await flushPromises();
 
     expect(bridge.runRescanProcess).not.toHaveBeenCalled();
-    expect(log).toHaveBeenCalledWith(
-      'queued rescan dropped: a boundary passed before it ran',
+    expect(config.onError).toHaveBeenCalledWith(
+      expect.stringContaining('queued rescan dropped'),
     );
 
-    log.mockRestore();
     await c.clearTimers();
   });
 
@@ -367,7 +366,7 @@ describe('SyncCoordinator seam-A fence — scheduling machine, current behavior'
     await flushPromises();
 
     expect(config.onError).toHaveBeenCalledWith(
-      'Error sync tick: Error: gate blew up',
+      expect.stringContaining('gate blew up'),
     );
     // The rejection did not escape the timer callback, and the loop lives on.
     expect(c.updateTimerID).toBeDefined();
@@ -407,6 +406,27 @@ describe('SyncCoordinator seam-A fence — scheduling machine, current behavior'
     await running;
 
     expect(c.updateTimerID).toBeUndefined();
+  });
+
+  it('Tests that a deferred task that throws reports through onError.', async () => {
+    bridge.pollSyncInfo.mockResolvedValue('Sync task has not been launched.');
+    bridge.runSyncProcess.mockRejectedValue(new Error('launch blew up'));
+    const config = fakeConfig();
+    (config.onPersistentSyncFailure as jest.Mock).mockImplementation(() => {
+      throw new Error('host callback blew up');
+    });
+    const c = new SyncCoordinator(config, fakeDataService());
+    c.syncLaunchFailures = 2; // the next failure fires onPersistentSyncFailure
+
+    await c.fetchSyncPoll(); // defers the poll-scheduled launch
+    await jest.advanceTimersByTimeAsync(0);
+    await flushPromises();
+
+    expect(config.onError).toHaveBeenCalledWith(
+      expect.stringContaining('host callback blew up'),
+    );
+
+    await c.clearTimers();
   });
 
   describe('A.8: save-required gate — three branches', () => {

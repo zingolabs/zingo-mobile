@@ -52,7 +52,7 @@ export class SyncCoordinator {
   timers: NodeJS.Timeout[] = [];
 
   // The command holding the single-flight launch lane, or none. The lock the
-  // tick's gate reads is derived from it, so the two cannot disagree.
+  // tick's gate reads is derived from this record.
   laneHolder: LaneHolder = 'none';
   get refreshSyncLock(): boolean {
     return this.laneHolder !== 'none';
@@ -113,10 +113,8 @@ export class SyncCoordinator {
     try {
       await this.runTaskPromises();
     } catch (error) {
-      // The tick runs from a setTimeout callback, which has no rejection
-      // handler, so a throw from runTick would surface as an unhandled
-      // rejection and skip the re-arm below.
-      console.log(`Critical Error sync tick ${error}`);
+      // The tick runs from a setTimeout callback. This catch owns a rejected
+      // tick, and the finally below re-arms the loop.
       this.config.onError(`Error sync tick: ${error}`);
     } finally {
       // Re-arm only while this loop is still the live one. A boundary landing
@@ -129,18 +127,22 @@ export class SyncCoordinator {
     }
   }
 
-  // Runs the task on the next macrotask unless an invalidating boundary passes
-  // first, in which case the drop is logged under the task's name.
+  // Runs the task on the next macrotask while its epoch is current. A drop
+  // and a throwing task each report through onError under the task's name.
   private deferUnder(
     epoch: Epoch,
     name: string,
     task: () => Promise<void>,
   ): void {
     setTimeout(async () => {
-      if (isCurrent(epoch, this.controllerEpoch)) {
+      if (!isCurrent(epoch, this.controllerEpoch)) {
+        this.config.onError(`${name} dropped: a boundary passed before it ran`);
+        return;
+      }
+      try {
         await task();
-      } else {
-        console.log(`${name} dropped: a boundary passed before it ran`);
+      } catch (error) {
+        this.config.onError(`Error ${name}: ${error}`);
       }
     }, 0);
   }
@@ -314,7 +316,7 @@ export class SyncCoordinator {
     // Single in-flight command (ADR 0017): a launch and a rescan share one lane.
     // A rescan issued while a sync holds the lane waits in queuedRescan, and
     // the holder's finally releases it. A rescan issued while a rescan holds
-    // the lane is already being served, so it is not queued again.
+    // the lane is served by that rescan.
     if (this.laneHolder !== 'none') {
       if (fullRescan && this.laneHolder === 'sync') {
         this.queuedRescan = { kind: 'queued', epoch: this.controllerEpoch };
