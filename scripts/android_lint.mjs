@@ -1,8 +1,9 @@
 #!/usr/bin/env node
-// Android Lint on the app module. Static analysis only: no emulator, no
-// device, no NDK. Catches NewApi (a call above minSdk behind a
-// too-low SDK_INT guard), which otherwise only shows up as a crash on a
-// user's older device.
+// Android Lint on the app module. Static analysis on the host, with no
+// emulator and no device. Gradle first builds the x86_64 Binding Layer in the
+// builder container, unless -PbindingLayerPrebuilt names a built one. Catches
+// NewApi (a call above minSdk behind a too-low SDK_INT guard), which otherwise
+// only shows up as a crash on a user's older device.
 // Cross-platform: Linux, macOS, Windows.
 //
 // Usage: node scripts/android_lint.mjs [variant]   # default prodRelease

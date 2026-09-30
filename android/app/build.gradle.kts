@@ -391,7 +391,7 @@ dependencies {
     androidTestImplementation("androidx.test:rules:1.7.0")
     androidTestImplementation("androidx.test:runner:1.7.0")
 
-    // The Binding Layer from the zingolib submodule; it brings JNA with it
+    // The Binding Layer from the zingolib submodule. It brings JNA with it.
     implementation("org.zingolabs:zingo-binding-layer")
 
     // encrypted file storage

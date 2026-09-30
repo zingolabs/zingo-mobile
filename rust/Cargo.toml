@@ -7,8 +7,8 @@ members = [
 ]
 resolver = "2"
 
-# The Binding Layer lives in the zingolib submodule (zingo-mobile/0016); the
-# integration harnesses take zingolib by path so both build from one tree.
+# The Binding Layer lives in the zingolib submodule (zingo-mobile/0016). The
+# integration harnesses take zingolib by path, and both build from one tree.
 [workspace.dependencies]
 zingolib_testutils = { path = "../zingolib/zingolib_testutils" }
 zingomobile_utils = { path = "zingomobile_utils" }

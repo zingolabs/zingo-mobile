@@ -1,8 +1,8 @@
 name: Binding Layer for Android
 description: >
   Restores one ABI of the Binding Layer that android-build.yaml built, and
-  points Gradle at it, so the app build packages it without rebuilding it.
-  Call it once per ABI; the ABIs share one output directory.
+  points Gradle at it. The app build then packages the prebuilt libraries.
+  Call it once per ABI. The ABIs share one output directory.
 
 inputs:
   abi:
