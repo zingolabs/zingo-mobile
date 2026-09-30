@@ -376,6 +376,39 @@ describe('SyncCoordinator seam-A fence — scheduling machine, current behavior'
     await c.clearTimers();
   });
 
+  it('Tests that a rejected rescan re-arms the poll loop.', async () => {
+    bridge.runRescanProcess.mockRejectedValue(new Error('indexer hiccup'));
+    const config = fakeConfig();
+    const c = new SyncCoordinator(config, fakeDataService());
+    c.walletConfigPerformanceLevel = RPCPerformanceLevelEnum.Low;
+    await c.configure(); // the loop is armed
+
+    await c.refreshSync(true); // clearTimers, then the native call rejects
+
+    expect(config.onError).toHaveBeenCalledWith(
+      expect.stringContaining('indexer hiccup'),
+    );
+    expect(c.updateTimerID).toBeDefined();
+
+    await c.clearTimers();
+  });
+
+  it('Tests that a teardown during a rescan leaves the poll loop stopped.', async () => {
+    const rescan = deferred<string>();
+    bridge.runRescanProcess.mockReturnValue(rescan.promise);
+    const c = new SyncCoordinator(fakeConfig(), fakeDataService());
+    c.walletConfigPerformanceLevel = RPCPerformanceLevelEnum.Low;
+    await c.configure();
+
+    const running = c.refreshSync(true);
+    await flushPromises();
+    await c.clearTimers(); // the teardown boundary, after the rescan's own
+    rescan.resolve('Launching rescan...');
+    await running;
+
+    expect(c.updateTimerID).toBeUndefined();
+  });
+
   describe('A.8: save-required gate — three branches', () => {
     it('save not required pushes only the poll', async () => {
       const ds = fakeDataService();
