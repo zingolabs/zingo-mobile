@@ -175,6 +175,26 @@ test('Tests that a name resolves into the recipient when its lookup remains curr
   expect(h.view.getByText('ZNS: alice.zec')).toBeTruthy();
 });
 
+test('Tests that the current alias resolves when a whitespace edit preserves its normalized recipient.', async () => {
+  const name = deferred<ZnsResolver.ZnsResolution>();
+  const resolveName = jest
+    .spyOn(ZnsResolver, 'resolveZnsName')
+    .mockReturnValue(name.promise);
+  const h = setup();
+  await h.edit('alice.zec');
+  await act(async () => {
+    await new Promise(resolve => setTimeout(resolve, 550));
+  });
+  expect(resolveName).toHaveBeenCalledTimes(1);
+  await h.edit('alice.zec ');
+  expect(h.field().props.value).toBe('alice.zec');
+  await act(async () => {
+    name.release({ ok: true, address: editedAddress });
+  });
+  expect(h.field().props.value).toBe(editedAddress);
+  expect(h.view.getByText('ZNS: alice.zec')).toBeTruthy();
+});
+
 test.each([editedAddress, ''])(
   'Tests that the latest recipient remains when an older URI completes after editing to %s.',
   async recipient => {

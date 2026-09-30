@@ -131,6 +131,9 @@ type SendProps = NativeStackScreenProps<AppDrawerParamList, RouteEnum.Send> & {
   clearToAddr: () => void;
 };
 
+const recipientIdentity = (address: string) =>
+  address.replace(/[ \t\n\r]+/g, '').toLowerCase();
+
 const Send: React.FunctionComponent<SendProps> = ({
   sendTransaction,
   clearToAddr,
@@ -264,6 +267,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   const showCalcError = !!(spendableBalanceLastError || proposeSendLastError);
   const feeCalculationGenRef = useRef<number>(0);
   const recipientRevision = useRef(0);
+  const recipientInput = useRef(recipientIdentity(sendPageState.toaddr.to));
   const { decimalSeparator } = getNumberFormatSettings();
   const keyboardHeight = useKeyboardHeight();
   useDismissSheetsOnBlur();
@@ -618,6 +622,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     includeUAMemoPar: boolean | null,
   ) => {
     if (addressPar !== null) {
+      recipientInput.current = recipientIdentity(addressPar);
       recipientRevision.current += 1;
       const revision = recipientRevision.current;
       //Alert.alert('', addressPar);
@@ -645,6 +650,7 @@ const Send: React.FunctionComponent<SendProps> = ({
           // redo the to addresses
           [target].forEach(tgt => {
             if (tgt.address) {
+              recipientInput.current = recipientIdentity(tgt.address);
               setAddressText(tgt.address);
             }
             if (tgt.amount) {
@@ -735,11 +741,11 @@ const Send: React.FunctionComponent<SendProps> = ({
     // Neither valid nor invalid until the indexer answers.
     setValidAddress(0);
     setZnsNotFound(false);
-    const revision = recipientRevision.current;
+    const alias = recipientIdentity(addressText);
     let cancelled = false;
     const timerId = setTimeout(async () => {
       const resolution = await resolveZnsName(addressText, server.chainName);
-      if (cancelled || revision !== recipientRevision.current) {
+      if (cancelled || alias !== recipientInput.current) {
         return;
       }
       if (resolution.ok) {
@@ -904,6 +910,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   }, [addressBook, walletChainName, server.chainName]);
 
   useEffect(() => {
+    recipientInput.current = recipientIdentity(sendPageState.toaddr.to);
     recipientRevision.current += 1;
     setAddressText(sendPageState.toaddr.to);
     setAmountText(sendPageState.toaddr.amount);
@@ -932,6 +939,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   };
 
   const clearState = () => {
+    recipientInput.current = '';
     recipientRevision.current += 1;
     feeCalculationGenRef.current += 1;
     sendAllRef.current = false;
