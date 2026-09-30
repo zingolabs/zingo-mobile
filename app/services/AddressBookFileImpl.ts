@@ -7,6 +7,31 @@ import {
 } from '@app/AppState';
 
 export default class AddressBookFileImpl {
+  private static pending: Promise<void> = Promise.resolve();
+
+  private static enqueue(write: () => Promise<AddressBookFileClass[]>) {
+    const pending = this.pending.then(write);
+    this.pending = pending.then(
+      () => undefined,
+      () => undefined,
+    );
+    return pending;
+  }
+
+  private static mutate(
+    change: (book: AddressBookFileClass[]) => AddressBookFileClass[],
+  ) {
+    return this.enqueue(async () => {
+      const book = await this.readAddressBook();
+      const changed = change(book);
+      if (changed === book) {
+        return book;
+      }
+      changed.sort((a, b) => a.label.localeCompare(b.label));
+      return this.persist(changed);
+    });
+  }
+
   static async getFileName() {
     return RNFS.DocumentDirectoryPath + '/addressbook.json';
   }
@@ -17,7 +42,18 @@ export default class AddressBookFileImpl {
     color: string,
     own: boolean,
   ): Promise<AddressBookFileClass[]> {
-    const addressBook = await this.readAddressBook();
+    return this.mutate(book =>
+      this.updateEntry(book, label, address, color, own),
+    );
+  }
+
+  private static updateEntry(
+    addressBook: AddressBookFileClass[],
+    label: string,
+    address: string,
+    color: string,
+    own: boolean,
+  ) {
     const existing = addressBook.find(
       item => item.label === label && item.address === address,
     );
@@ -40,7 +76,7 @@ export default class AddressBookFileImpl {
       ),
       newItem,
     ];
-    return await this.writeAddressBook(newAddressBook);
+    return newAddressBook;
   }
 
   // Write only one item
@@ -55,46 +91,47 @@ export default class AddressBookFileImpl {
     chain: ChainNameEnum = ChainNameEnum.mainChainName,
     swapChain: string = GlobalConst.zecSwapChain,
   ): Promise<AddressBookFileClass[]> {
-    const addressBook = await this.readAddressBook();
-    if (
-      addressBook.filter(
-        item => item.label === label && item.address === address,
-      ).length > 0
-    ) {
-      // already exists the combination of label & address -> update fields
-      // (updateColorAndOwnItem preserves chain/swapChain via spread).
-      return await this.updateColorAndOwnItem(label, address, color, own);
-    }
+    return this.mutate(addressBook => {
+      if (
+        addressBook.filter(
+          item => item.label === label && item.address === address,
+        ).length > 0
+      ) {
+        // already exists the combination of label & address -> update fields
+        // (updateColorAndOwnItem preserves chain/swapChain via spread).
+        return this.updateEntry(addressBook, label, address, color, own);
+      }
 
-    let newAddressBook: AddressBookFileClass[];
-    const newItem: AddressBookFileClass = {
-      label,
-      address,
-      color,
-      own,
-      chain,
-      swapChain,
-    };
+      let newAddressBook: AddressBookFileClass[];
+      const newItem: AddressBookFileClass = {
+        label,
+        address,
+        color,
+        own,
+        chain,
+        swapChain,
+      };
 
-    if (addressBook.filter(item => item.label === label).length > 0) {
-      // already exists the label -> update the address
-      newAddressBook = [
-        ...addressBook.filter(item => item.label !== label),
-        newItem,
-      ];
-    } else if (
-      addressBook.filter(item => item.address === address).length > 0
-    ) {
-      // already exists the address -> update the label
-      newAddressBook = [
-        ...addressBook.filter(item => item.address !== address),
-        newItem,
-      ];
-    } else {
-      // this is new item -> add it
-      newAddressBook = [...addressBook, newItem];
-    }
-    return await this.writeAddressBook(newAddressBook);
+      if (addressBook.filter(item => item.label === label).length > 0) {
+        // already exists the label -> update the address
+        newAddressBook = [
+          ...addressBook.filter(item => item.label !== label),
+          newItem,
+        ];
+      } else if (
+        addressBook.filter(item => item.address === address).length > 0
+      ) {
+        // already exists the address -> update the label
+        newAddressBook = [
+          ...addressBook.filter(item => item.address !== address),
+          newItem,
+        ];
+      } else {
+        // this is new item -> add it
+        newAddressBook = [...addressBook, newItem];
+      }
+      return newAddressBook;
+    });
   }
 
   // remove one item
@@ -102,12 +139,11 @@ export default class AddressBookFileImpl {
     label: string,
     address: string,
   ): Promise<AddressBookFileClass[]> {
-    const addressBook = await this.readAddressBook();
-    // the rest of the items
-    let newAddressBook: AddressBookFileClass[] = addressBook.filter(
-      item => !(item.label === label && item.address === address),
+    return this.mutate(addressBook =>
+      addressBook.filter(
+        item => !(item.label === label && item.address === address),
+      ),
     );
-    return await this.writeAddressBook(newAddressBook);
   }
 
   // Read the entire address book
@@ -132,6 +168,12 @@ export default class AddressBookFileImpl {
 
   // Write the entire address book
   static async writeAddressBook(
+    newAddressBook: AddressBookFileClass[],
+  ): Promise<AddressBookFileClass[]> {
+    return this.enqueue(() => this.persist(newAddressBook));
+  }
+
+  private static async persist(
     newAddressBook: AddressBookFileClass[],
   ): Promise<AddressBookFileClass[]> {
     try {
