@@ -237,6 +237,13 @@ android {
     }
 
     sourceSets {
+        getByName("main") {
+            // The Binding Layer AAR carries the native libraries. A build from
+            // before the zingolib submodule left copies under the gitignored
+            // src/main/jniLibs, and packaging them beside the AAR's copies
+            // fails the merge or ships the stale library.
+            jniLibs.setSrcDirs(emptyList<String>())
+        }
         getByName("test") {
             // The nym proxy shim's Kotlin wire-contract test, read from the
             // crate itself. No copy lives under src/test.
