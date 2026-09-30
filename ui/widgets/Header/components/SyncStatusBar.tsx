@@ -17,7 +17,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { NetInfoStateType } from '@react-native-community/netinfo/src/index';
 import {
   RouteEnum,
-  SelectServerEnum,
+  ServerType,
   SnackbarDurationEnum,
   TranslateType,
 } from '@app/AppState';
@@ -32,7 +32,7 @@ import PrivacyToggle from './PrivacyToggle';
 
 type SyncStatusBarProps = {
   noSyncingStatus: boolean | undefined;
-  selectServer: SelectServerEnum;
+  server: ServerType;
   netInfo: NetInfoType;
   percentageOutputsScanned: number;
   syncInProgress: boolean;
@@ -51,7 +51,7 @@ type SyncStatusBarProps = {
 const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
   ({
     noSyncingStatus,
-    selectServer,
+    server,
     netInfo,
     percentageOutputsScanned,
     syncInProgress,
@@ -85,7 +85,7 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
           gap: 8,
         }}
       >
-        {!noSyncingStatus && selectServer !== SelectServerEnum.offline && (
+        {!noSyncingStatus && server.kind !== 'offline' && (
           <View
             style={{
               minHeight: 29,
@@ -259,7 +259,7 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
           </View>
         )}
 
-        {selectServer === SelectServerEnum.offline && (
+        {server.kind === 'offline' && (
           <View
             style={{
               alignItems: 'center',

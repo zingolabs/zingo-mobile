@@ -188,7 +188,7 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
       const detail = await getMixnetBootstrapDetail();
       const detailMillis = Date.now() - detailStart;
       setRun({
-        serverUri: server.uri,
+        serverUri: server.kind === 'remote' ? server.uri : 'offline',
         chainName: server.chainName,
         status,
         statusMillis,
@@ -197,7 +197,7 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
       });
       setRunning(false);
     },
-    [server.chainName, server.uri],
+    [server],
   );
 
   // The screen is opened because something looks wrong, so it answers without

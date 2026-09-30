@@ -415,12 +415,13 @@ export class DataService {
       // waits for that first publication — so an Offline wallet span forever
       // under an empty list. Zero is the right height for a session with no
       // server, and the transform already falls back to the wallet's own.
-      if (isOffline(this.config)) {
+      const { server } = this.config;
+      if (server.kind === 'offline') {
         this.lastServerBlockHeight = 0;
       } else {
         const start = Date.now();
         const heightStr: string = await RPCModule.getLatestBlockServerInfo(
-          this.config.server.uri,
+          server.uri,
         );
         if (Date.now() - start > 4000) {
           console.log(

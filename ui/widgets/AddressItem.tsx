@@ -11,7 +11,6 @@ import {
   ToAddrClass,
   SnackbarDurationEnum,
   RouteEnum,
-  SelectServerEnum,
   ScreenEnum,
 } from '@app/AppState';
 import {
@@ -58,7 +57,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
     launchAddTagModal,
     privacy,
     readOnly,
-    selectServer,
+    server,
     setSendPageState,
   } = context;
   const { colors } = useTheme();
@@ -248,7 +247,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
           {withSendIcon &&
             !!contact &&
             !readOnly &&
-            selectServer !== SelectServerEnum.offline && (
+            server.kind !== 'offline' && (
               <TouchableOpacity
                 style={{ marginLeft: 10 }}
                 onPress={() => {

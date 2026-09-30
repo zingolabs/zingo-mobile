@@ -4,7 +4,7 @@
  * Every method calls syncCoordinator.pauseSyncProcess() first to ensure no
  * sync task is running while the wallet file is being replaced. All methods
  * return DONE on success or an ErrorKeyed failure the display edge
- * translates (docs/adr/zingo-mobile/0009-error-keys-not-prose.md).
+ * translates (zingo-adrs zingo-mobile/0009).
  */
 import { GlobalConst, Done, DONE, ErrorKeyed, errorKeyed } from '@app/AppState';
 import RPCModule from '@app/RPCModule';
