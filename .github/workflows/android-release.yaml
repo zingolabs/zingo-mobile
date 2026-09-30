@@ -80,16 +80,19 @@ jobs:
           describe="$(git describe --dirty --always --long --match 'zingo-*')"
           echo "ZINGO_MOBILE_GIT_DESCRIBE=$describe" >> "$GITHUB_ENV"
 
+      # The builder takes the git root of its working directory as the
+      # zingolib root.
       - name: Build the Binding Layer
+        working-directory: ./zingolib
         env:
           ARCH: ${{ matrix.arch }}
           RUSTUP_TOOLCHAIN: stable
         run: |
           cargo run \
-            --manifest-path zingolib/tools/workbench/Cargo.toml \
+            --manifest-path tools/workbench/Cargo.toml \
             --bin build-binding-layer -- \
             android --in-image --abi "$ARCH" \
-            --out zingolib/bindings/android/build/binding-layer
+            --out bindings/android/build/binding-layer
 
       - name: Upload the Binding Layer
         uses: actions/upload-artifact@v7

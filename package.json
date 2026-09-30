@@ -44,7 +44,7 @@
     "cargo:clean": "cd rust && cargo clean && cd ..",
     "cargo:check": "cd rust && cargo check && cd ..",
     "rust:android": "cd android && ./gradlew :zingo-binding-layer:buildBindingLayer && cd ..",
-    "rust:ios": "ZINGO_MOBILE_GIT_DESCRIBE=$(git describe --dirty --always --long --match 'zingo-*') cargo run --quiet --manifest-path zingolib/tools/workbench/Cargo.toml --bin build-binding-layer -- ios --out zingolib/bindings/swift/build",
+    "rust:ios": "export ZINGO_MOBILE_GIT_DESCRIBE=$(git describe --dirty --always --long --match 'zingo-*') && cd zingolib && cargo run --quiet --manifest-path tools/workbench/Cargo.toml --bin build-binding-layer -- ios --out bindings/swift/build && cd ..",
     "release:prod:prep": "node scripts/release/release-prep.mjs prod",
     "release:beta:prep": "node scripts/release/release-prep.mjs beta",
     "pods": "cd ios && pod install && cd .."
