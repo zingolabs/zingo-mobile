@@ -24,7 +24,6 @@ export type AddTagTarget = {
   // host keys the form on this number.
   launch: number;
   address: string;
-  own: boolean;
   swapChain: string;
   initialLabel?: string;
 };
@@ -33,6 +32,9 @@ export type AddTagTarget = {
 // the hidden case names itself rather than riding a null. launchAddTagModal
 // writes `shown`, and the modal host reads it.
 export type AddTagModalState =
-  { kind: 'hidden' } | ({ kind: 'shown' } & AddTagTarget);
+  { kind: 'hidden'; launch: number } | ({ kind: 'shown' } & AddTagTarget);
 
-export const addTagModalAtom = atom<AddTagModalState>({ kind: 'hidden' });
+export const addTagModalAtom = atom<AddTagModalState>({
+  kind: 'hidden',
+  launch: 0,
+});

@@ -61,23 +61,20 @@ jest.mock('@screens/Receive', () => ({
 // which lives for the mount's lifetime.
 jest.mock('@ui/widgets/NewAddressTag', () => {
   const ReactActual = jest.requireActual<typeof import('react')>('react');
+  const mountedWith = jest.fn();
   const MockNewAddressTag = ({ address }: { address: string }) => {
     ReactActual.useEffect(() => {
-      (globalThis as { mountedAddresses?: string[] }).mountedAddresses?.push(
-        address,
-      );
+      mountedWith(address);
     }, []);
     return null;
   };
-  return { __esModule: true, default: MockNewAddressTag };
+  return { __esModule: true, default: MockNewAddressTag, mountedWith };
 });
 
-// A BottomSheetModal with the real v5 mount gate: children render only after
-// present() lands its requestAnimationFrame.
+// The shared mock, with a BottomSheetModal that carries the real v5 mount
+// gate: children render only after present() lands its requestAnimationFrame.
 jest.mock('@gorhom/bottom-sheet', () => {
   const ReactActual = jest.requireActual<typeof import('react')>('react');
-  const passthrough = ({ children }: { children?: unknown }) =>
-    ReactActual.createElement(ReactActual.Fragment, null, children as never);
   const BottomSheetModal = ReactActual.forwardRef(function GatedModal(
     { children }: { children?: unknown },
     ref,
@@ -97,84 +94,31 @@ jest.mock('@gorhom/bottom-sheet', () => {
       : null;
   });
   return {
-    __esModule: true,
-    default: passthrough,
+    ...jest.requireActual('../__mocks__/@gorhom/bottom-sheet'),
     BottomSheetModal,
-    BottomSheetView: passthrough,
-    BottomSheetScrollView: passthrough,
-    BottomSheetBackdrop: passthrough,
-    BottomSheetFooter: passthrough,
-    BottomSheetModalProvider: passthrough,
-    useBottomSheetModal: () => ({ dismiss: () => false, dismissAll: () => {} }),
   };
 });
 
-import React from 'react';
-import NetInfo from '@react-native-community/netinfo/src/index';
-import { act, render } from '@testing-library/react-native';
+import { act } from '@testing-library/react-native';
 
-const { AppState, Linking } =
-  jest.requireActual<typeof import('react-native')>('react-native');
+import {
+  flushMicrotasks,
+  mountCommitted,
+  spyOnLifecycleListeners,
+} from './helpers/loadedAppHarness';
 
-import { LoadedApp, LoadedAppClass } from '@app/LoadedApp';
-import { ChainNameEnum, LaunchingModeEnum, RouteEnum } from '@app/AppState';
-import { StackScreenProps } from '@react-navigation/stack';
-import { AppStackParamList } from '@app/types';
-import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
-
-type DrawerProps = StackScreenProps<AppStackParamList, RouteEnum.LoadedApp>;
-
-function makeDrawerProps(): DrawerProps {
-  return {
-    navigation: mockNavigation,
-    route: {
-      key: 'Key-1',
-      name: RouteEnum.LoadedApp,
-      params: {
-        readOnly: false,
-        orchardPool: true,
-        saplingPool: true,
-        transparentPool: true,
-        newWallet: false,
-        firstLaunchingMessage: LaunchingModeEnum.opening,
-        walletChainName: ChainNameEnum.mainChainName,
-      },
-    },
-  } as DrawerProps;
-}
-
-async function flushMicrotasks(times = 100): Promise<void> {
-  for (let i = 0; i < times; i++) {
-    await Promise.resolve();
-  }
-}
-
-async function mountCommitted() {
-  const utils = render(<LoadedApp {...makeDrawerProps()} />);
-  await act(async () => {
-    await flushMicrotasks();
-  });
-  const instance = utils.UNSAFE_root.findByType(LoadedAppClass)
-    .instance as LoadedAppClass;
-  return { utils, instance };
-}
+const { mountedWith } = jest.requireMock<{ mountedWith: jest.Mock }>(
+  '@ui/widgets/NewAddressTag',
+);
 
 const mountedAddresses = (): string[] =>
-  (globalThis as { mountedAddresses?: string[] }).mountedAddresses ?? [];
+  mountedWith.mock.calls.map(([address]) => address);
 
 describe('the add-tag sheet under the real mount gate', () => {
   beforeEach(() => {
     jest.useFakeTimers();
     jest.clearAllMocks();
-    (globalThis as { mountedAddresses?: string[] }).mountedAddresses = [];
-    (NetInfo.addEventListener as jest.Mock).mockReturnValue(jest.fn());
-    jest
-      .spyOn(AppState, 'addEventListener')
-      .mockReturnValue({ remove: jest.fn() } as never);
-    jest
-      .spyOn(Linking, 'addEventListener')
-      .mockReturnValue({ remove: jest.fn() } as never);
-    jest.spyOn(Linking, 'getInitialURL').mockResolvedValue(null);
+    spyOnLifecycleListeners();
   });
 
   afterEach(() => {

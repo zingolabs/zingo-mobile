@@ -71,9 +71,8 @@ jest.mock('@screens/Receive', () => ({
   default: 'MockReceiveScreen',
 }));
 
-import React from 'react';
 import NetInfo from '@react-native-community/netinfo/src/index';
-import { act, render } from '@testing-library/react-native';
+import { act } from '@testing-library/react-native';
 import { createStore } from 'jotai';
 
 // The manual react-native mock exposes only a partial shim through the ESM
@@ -83,21 +82,19 @@ import { createStore } from 'jotai';
 const { AppState, Linking } =
   jest.requireActual<typeof import('react-native')>('react-native');
 
-import { LoadedApp, LoadedAppClass } from '@app/LoadedApp';
+import { LoadedAppClass } from '@app/LoadedApp';
 import { doSave } from '@app/walletBackend/utils/walletUtils';
 import { resolveTriggerGate } from '@app/services/gateController';
 import {
   AppStateStatusEnum,
   ChainNameEnum,
-  LaunchingModeEnum,
   RouteEnum,
   SelectServerEnum,
   errorKeyed,
 } from '@app/AppState';
 import { appStateStatusAtom } from '@app/AppState/uiAtoms';
-import { StackScreenProps } from '@react-navigation/stack';
-import { AppStackParamList } from '@app/types';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
+import { flushMicrotasks, mountCommitted } from './helpers/loadedAppHarness';
 import { mockOfflineServer } from '../__mocks__/dataMocks/mockServer';
 
 const doSaveMock = doSave as jest.Mock;
@@ -112,50 +109,6 @@ function controllerStoreOf(
   return (
     instance as unknown as { controllerStore: ReturnType<typeof createStore> }
   ).controllerStore;
-}
-
-type DrawerProps = StackScreenProps<AppStackParamList, RouteEnum.LoadedApp>;
-
-function makeDrawerProps(
-  params: Partial<AppStackParamList[RouteEnum.LoadedApp]> = {},
-): DrawerProps {
-  return {
-    navigation: mockNavigation,
-    route: {
-      key: 'Key-1',
-      name: RouteEnum.LoadedApp,
-      params: {
-        readOnly: false,
-        orchardPool: true,
-        saplingPool: true,
-        transparentPool: true,
-        newWallet: false,
-        firstLaunchingMessage: LaunchingModeEnum.opening,
-        walletChainName: ChainNameEnum.mainChainName,
-        ...params,
-      },
-    },
-  } as DrawerProps;
-}
-
-async function flushMicrotasks(times = 100): Promise<void> {
-  for (let i = 0; i < times; i++) {
-    await Promise.resolve();
-  }
-}
-
-// Render, then drive the wrapper's async boot effect (setLoading(false)) and the
-// class componentDidMount to completion so the container commits.
-async function mountCommitted(
-  params?: Partial<AppStackParamList[RouteEnum.LoadedApp]>,
-) {
-  const utils = render(<LoadedApp {...makeDrawerProps(params)} />);
-  await act(async () => {
-    await flushMicrotasks();
-  });
-  const instance = utils.UNSAFE_root.findByType(LoadedAppClass)
-    .instance as LoadedAppClass;
-  return { utils, instance };
 }
 
 // Route presence, read off the react-test-renderer tree rather than RNTL's

@@ -1954,9 +1954,8 @@ export class LoadedAppClass extends Component<
     const prior = this.controllerStore.get(addTagModalAtom);
     this.controllerStore.set(addTagModalAtom, {
       kind: 'shown',
-      launch: prior.kind === 'shown' ? prior.launch + 1 : 1,
+      launch: prior.launch + 1,
       address,
-      own: false,
       swapChain,
       initialLabel,
     });

@@ -6,7 +6,11 @@ module.exports = {
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   modulePathIgnorePatterns: ['e2e', '<rootDir>/.claude/'],
   // visual/ holds Playwright specs, run by `yarn visual:capture`.
-  testPathIgnorePatterns: ['/node_modules/', '<rootDir>/visual/'],
+  testPathIgnorePatterns: [
+    '/node_modules/',
+    '<rootDir>/visual/',
+    '<rootDir>/__tests__/helpers/',
+  ],
   transform: {
     '\\.[jt]sx?$': 'babel-jest',
     '^.+\\.(bmp|gif|jpg|jpeg|mp4|png|psd|webp)$':

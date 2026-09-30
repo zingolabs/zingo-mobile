@@ -65,28 +65,23 @@ jest.mock('@ui/widgets/NewAddressTag', () => ({
   default: 'MockNewAddressTag',
 }));
 
-import React from 'react';
-import NetInfo from '@react-native-community/netinfo/src/index';
-import { act, render } from '@testing-library/react-native';
+import { act } from '@testing-library/react-native';
 import { createStore } from 'jotai';
 
-const { AppState, Linking } =
+const { AppState } =
   jest.requireActual<typeof import('react-native')>('react-native');
 
-import { LoadedApp, LoadedAppClass } from '@app/LoadedApp';
+import { LoadedAppClass } from '@app/LoadedApp';
 import { resolveTriggerGate } from '@app/services/gateController';
-import {
-  AppStateStatusEnum,
-  ChainNameEnum,
-  LaunchingModeEnum,
-  RouteEnum,
-} from '@app/AppState';
+import { AppStateStatusEnum } from '@app/AppState';
 import { appStateStatusAtom, addTagModalAtom } from '@app/AppState/uiAtoms';
 import { syncStatusAtom } from '@app/AppState/syncAtoms';
 import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
-import { StackScreenProps } from '@react-navigation/stack';
-import { AppStackParamList } from '@app/types';
-import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
+import {
+  flushMicrotasks,
+  mountCommitted,
+  spyOnLifecycleListeners,
+} from './helpers/loadedAppHarness';
 
 const resolveTriggerGateMock = resolveTriggerGate as jest.Mock;
 const netInfoUnsubscribe = jest.fn();
@@ -110,56 +105,12 @@ function captureAppStateHandler(): (s: string) => Promise<void> {
   return call![1];
 }
 
-type DrawerProps = StackScreenProps<AppStackParamList, RouteEnum.LoadedApp>;
-
-function makeDrawerProps(): DrawerProps {
-  return {
-    navigation: mockNavigation,
-    route: {
-      key: 'Key-1',
-      name: RouteEnum.LoadedApp,
-      params: {
-        readOnly: false,
-        orchardPool: true,
-        saplingPool: true,
-        transparentPool: true,
-        newWallet: false,
-        firstLaunchingMessage: LaunchingModeEnum.opening,
-        walletChainName: ChainNameEnum.mainChainName,
-      },
-    },
-  } as DrawerProps;
-}
-
-async function flushMicrotasks(times = 100): Promise<void> {
-  for (let i = 0; i < times; i++) {
-    await Promise.resolve();
-  }
-}
-
-async function mountCommitted() {
-  const utils = render(<LoadedApp {...makeDrawerProps()} />);
-  await act(async () => {
-    await flushMicrotasks();
-  });
-  const instance = utils.UNSAFE_root.findByType(LoadedAppClass)
-    .instance as LoadedAppClass;
-  return { utils, instance };
-}
-
 describe('fg/bg + residual UI slice', () => {
   beforeEach(() => {
     jest.useFakeTimers();
     jest.clearAllMocks();
     resolveTriggerGateMock.mockResolvedValue({ kind: 'passed' });
-    (NetInfo.addEventListener as jest.Mock).mockReturnValue(netInfoUnsubscribe);
-    jest
-      .spyOn(AppState, 'addEventListener')
-      .mockReturnValue({ remove: jest.fn() } as never);
-    jest
-      .spyOn(Linking, 'addEventListener')
-      .mockReturnValue({ remove: jest.fn() } as never);
-    jest.spyOn(Linking, 'getInitialURL').mockResolvedValue(null);
+    spyOnLifecycleListeners(netInfoUnsubscribe);
   });
 
   afterEach(() => {
@@ -197,7 +148,6 @@ describe('fg/bg + residual UI slice', () => {
     expect(store.get(addTagModalAtom)).toMatchObject({
       kind: 'shown',
       address: 'zs1recipient',
-      own: false,
     });
     expect(renderSpy).not.toHaveBeenCalled();
   });
@@ -208,14 +158,7 @@ describe('whole-tree re-render proof', () => {
     jest.useFakeTimers();
     jest.clearAllMocks();
     resolveTriggerGateMock.mockResolvedValue({ kind: 'passed' });
-    (NetInfo.addEventListener as jest.Mock).mockReturnValue(netInfoUnsubscribe);
-    jest
-      .spyOn(AppState, 'addEventListener')
-      .mockReturnValue({ remove: jest.fn() } as never);
-    jest
-      .spyOn(Linking, 'addEventListener')
-      .mockReturnValue({ remove: jest.fn() } as never);
-    jest.spyOn(Linking, 'getInitialURL').mockResolvedValue(null);
+    spyOnLifecycleListeners(netInfoUnsubscribe);
   });
 
   afterEach(() => {

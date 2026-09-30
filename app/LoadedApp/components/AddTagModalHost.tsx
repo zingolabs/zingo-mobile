@@ -14,8 +14,6 @@ import NewAddressTag from '@ui/widgets/NewAddressTag';
 import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
 
 type AddTagModalHostProps = {
-  // The target the host renders. The form is keyed on the target's launch
-  // number, and each launch mounts a fresh form.
   target: AddTagModalState;
   setAddressBook: (ab: AddressBookFileClass[]) => void;
   translate: (key: string) => TranslateType;
@@ -50,11 +48,7 @@ const AddTagModalHost = forwardRef<
         numberOfLines={1}
         style={{ flex: 1, fontSize: 16, lineHeight: 28, textAlign: 'center' }}
       >
-        {
-          (target.kind === 'shown' && target.own
-            ? translate('addressbook.add-tag')
-            : translate('addressbook.add-contact')) as string
-        }
+        {translate('addressbook.add-contact') as string}
       </BoldText>
       <Pressable
         onPress={dismiss}
@@ -78,7 +72,7 @@ const AddTagModalHost = forwardRef<
         <NewAddressTag
           key={target.launch}
           address={target.address}
-          own={target.own}
+          own={false}
           swapChain={target.swapChain}
           initialLabel={target.initialLabel}
           closeSheet={dismiss}
