@@ -1944,8 +1944,10 @@ export class LoadedAppClass extends Component<
     // Tagging an own address is the Receive flow, which renders NewAddressTag
     // with own={true} directly. So this modal is always a contact (own=false),
     // "Add contact", not "Add tag".
+    const prior = this.controllerStore.get(addTagModalAtom);
     this.controllerStore.set(addTagModalAtom, {
       kind: 'shown',
+      launch: prior.kind === 'shown' ? prior.launch + 1 : 1,
       address,
       own: false,
       swapChain,

@@ -20,6 +20,9 @@ export const appStateStatusAtom = atom<AppStateStatusEnum>(
 export const seedModalOpenAtom = atom<boolean>(false);
 
 export type AddTagTarget = {
+  // Counts launches. Each launch is a new form, whatever its address: the
+  // host keys the form on this number.
+  launch: number;
   address: string;
   own: boolean;
   swapChain: string;

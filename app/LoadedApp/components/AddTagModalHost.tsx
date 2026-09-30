@@ -14,9 +14,8 @@ import NewAddressTag from '@ui/widgets/NewAddressTag';
 import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
 
 type AddTagModalHostProps = {
-  // Latest target the host should render. Bump `key` (via the address/own
-  // pair) to force-remount the inner form so its local state resets between
-  // presentations.
+  // The target the host renders. The form is keyed on the target's launch
+  // number, and each launch mounts a fresh form.
   target: AddTagModalState;
   setAddressBook: (ab: AddressBookFileClass[]) => void;
   translate: (key: string) => TranslateType;
@@ -77,7 +76,7 @@ const AddTagModalHost = forwardRef<
     >
       {target.kind === 'shown' && (
         <NewAddressTag
-          key={`${target.address}-${target.own}-${target.initialLabel ?? ''}`}
+          key={target.launch}
           address={target.address}
           own={target.own}
           swapChain={target.swapChain}
