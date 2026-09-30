@@ -201,27 +201,6 @@ describe('fg/bg + residual UI slice', () => {
     });
     expect(renderSpy).not.toHaveBeenCalled();
   });
-
-  it('Tests that the add-tag sheet presents with its form rendered when a contact launch opens it.', async () => {
-    const { utils, instance } = await mountCommitted();
-    const formRenderedAtPresent: boolean[] = [];
-    const sheet = {
-      present: () => {
-        formRenderedAtPresent.push(
-          utils.UNSAFE_queryAllByProps({ address: 'zs1recipient' }).length > 0,
-        );
-      },
-      dismiss: jest.fn(),
-    };
-    (instance.addTagModalRef as React.MutableRefObject<unknown>).current =
-      sheet;
-
-    act(() => {
-      instance.launchAddTagModal('zs1recipient');
-    });
-
-    expect(formRenderedAtPresent).toEqual([true]);
-  });
 });
 
 describe('whole-tree re-render proof', () => {

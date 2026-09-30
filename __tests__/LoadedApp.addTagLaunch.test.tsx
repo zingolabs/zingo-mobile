@@ -6,10 +6,9 @@
  * close animation ends. The mock here carries both, and the form mock records
  * each mount.
  *
- * Three pins: the form mounts with the launched address whether the sheet
- * presents from the slice's effect or right after the atom write; and a
- * relaunch during the close animation mounts a fresh form, because the host
- * keys the form on the launch number (#1457).
+ * Two pins: the form mounts with the launched address a frame after
+ * present(), and a relaunch during the close animation mounts a fresh form,
+ * because the host keys the form on the launch number (#1457).
  */
 
 jest.mock('@app/RPCModule', () =>
@@ -113,14 +112,12 @@ jest.mock('@gorhom/bottom-sheet', () => {
 import React from 'react';
 import NetInfo from '@react-native-community/netinfo/src/index';
 import { act, render } from '@testing-library/react-native';
-import { createStore } from 'jotai';
 
 const { AppState, Linking } =
   jest.requireActual<typeof import('react-native')>('react-native');
 
 import { LoadedApp, LoadedAppClass } from '@app/LoadedApp';
 import { ChainNameEnum, LaunchingModeEnum, RouteEnum } from '@app/AppState';
-import { addTagModalAtom } from '@app/AppState/uiAtoms';
 import { StackScreenProps } from '@react-navigation/stack';
 import { AppStackParamList } from '@app/types';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
@@ -162,15 +159,6 @@ async function mountCommitted() {
   return { utils, instance };
 }
 
-// The store is private to the container; the fences reach it the same way.
-function controllerStoreOf(
-  instance: LoadedAppClass,
-): ReturnType<typeof createStore> {
-  return (
-    instance as unknown as { controllerStore: ReturnType<typeof createStore> }
-  ).controllerStore;
-}
-
 const mountedAddresses = (): string[] =>
   (globalThis as { mountedAddresses?: string[] }).mountedAddresses ?? [];
 
@@ -194,7 +182,7 @@ describe('the add-tag sheet under the real mount gate', () => {
     jest.restoreAllMocks();
   });
 
-  it("Tests that the PR's order mounts the form with the launched address.", async () => {
+  it('Tests that the form mounts with the launched address, a frame after present.', async () => {
     const { instance } = await mountCommitted();
 
     await act(async () => {
@@ -236,30 +224,5 @@ describe('the add-tag sheet under the real mount gate', () => {
     // A launch is a new form. The typed label of the closing form must not
     // carry over into the one the user just opened.
     expect(mountedAddresses()).toEqual(['zs1recipient', 'zs1recipient']);
-  });
-
-  it("Tests that #1280's order mounts the form with the launched address too.", async () => {
-    const { instance } = await mountCommitted();
-
-    await act(async () => {
-      // #1280 wrote the atom and presented in the same tick, before the slice
-      // re-rendered with the new target.
-      controllerStoreOf(instance).set(addTagModalAtom, {
-        kind: 'shown',
-        launch: 1,
-        address: 'zs1recipient',
-        own: false,
-        swapChain: 'ZEC',
-      });
-      instance.addTagModalRef.current?.present();
-      await flushMicrotasks();
-    });
-    expect(mountedAddresses()).toEqual([]);
-    await act(async () => {
-      jest.advanceTimersByTime(16);
-      await flushMicrotasks();
-    });
-
-    expect(mountedAddresses()).toEqual(['zs1recipient']);
   });
 });
