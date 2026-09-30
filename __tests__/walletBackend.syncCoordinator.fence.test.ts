@@ -98,6 +98,29 @@ function fakeDataService(): DataService {
   } as unknown as DataService;
 }
 
+// Holds the launch lane with a deferred native call of the given kind, runs
+// `during` while it is held, then releases the lane and settles the deferred
+// follow-ups the release schedules.
+async function whileLaneHeld(
+  c: SyncCoordinator,
+  holder: 'sync' | 'rescan',
+  during: () => Promise<void>,
+): Promise<void> {
+  const native = deferred<string>();
+  const call =
+    holder === 'sync' ? bridge.runSyncProcess : bridge.runRescanProcess;
+  call.mockReturnValue(native.promise);
+  const held = c.refreshSync(holder === 'rescan');
+  await flushPromises();
+  await during();
+  native.resolve(
+    holder === 'sync' ? 'Launching sync task...' : 'Launching rescan...',
+  );
+  await held;
+  await jest.advanceTimersByTimeAsync(0);
+  await flushPromises();
+}
+
 describe('SyncCoordinator seam-A fence — scheduling machine, current behavior', () => {
   beforeEach(() => {
     jest.useFakeTimers();
@@ -292,18 +315,10 @@ describe('SyncCoordinator seam-A fence — scheduling machine, current behavior'
   });
 
   it('Tests that a rescan runs once the lane clears when the user issues it during a sync launch.', async () => {
-    const launch = deferred<string>();
-    bridge.runSyncProcess.mockReturnValue(launch.promise);
     bridge.runRescanProcess.mockResolvedValue('Launching rescan...');
     const c = new SyncCoordinator(fakeConfig(), fakeDataService());
 
-    const sync = c.refreshSync();
-    await flushPromises();
-    await c.refreshSync(true);
-    launch.resolve('Launching sync task...');
-    await sync;
-    await jest.advanceTimersByTimeAsync(0);
-    await flushPromises();
+    await whileLaneHeld(c, 'sync', () => c.refreshSync(true));
 
     expect(bridge.runRescanProcess).toHaveBeenCalledTimes(1);
 
@@ -311,17 +326,10 @@ describe('SyncCoordinator seam-A fence — scheduling machine, current behavior'
   });
 
   it('Tests that a rescan issued while a rescan holds the lane is not queued a second time.', async () => {
-    const rescan = deferred<string>();
-    bridge.runRescanProcess.mockReturnValue(rescan.promise);
     const c = new SyncCoordinator(fakeConfig(), fakeDataService());
 
-    const first = c.refreshSync(true);
-    await flushPromises();
-    await c.refreshSync(true); // the rescan already in flight serves this
-    rescan.resolve('Launching rescan...');
-    await first;
-    await jest.advanceTimersByTimeAsync(0);
-    await flushPromises();
+    // The rescan already in flight serves the second request.
+    await whileLaneHeld(c, 'rescan', () => c.refreshSync(true));
 
     expect(bridge.runRescanProcess).toHaveBeenCalledTimes(1);
 
@@ -329,20 +337,14 @@ describe('SyncCoordinator seam-A fence — scheduling machine, current behavior'
   });
 
   it('Tests that a queued rescan dropped by a boundary reports through onError.', async () => {
-    const launch = deferred<string>();
-    bridge.runSyncProcess.mockReturnValue(launch.promise);
     bridge.runRescanProcess.mockResolvedValue('Launching rescan...');
     const config = fakeConfig();
     const c = new SyncCoordinator(config, fakeDataService());
 
-    const sync = c.refreshSync();
-    await flushPromises();
-    await c.refreshSync(true); // queued under the current epoch
-    await c.clearTimers(); // the boundary: the epoch moves on
-    launch.resolve('Launching sync task...');
-    await sync;
-    await jest.advanceTimersByTimeAsync(0);
-    await flushPromises();
+    await whileLaneHeld(c, 'sync', async () => {
+      await c.refreshSync(true); // queued under the current epoch
+      await c.clearTimers(); // the boundary: the epoch moves on
+    });
 
     expect(bridge.runRescanProcess).not.toHaveBeenCalled();
     expect(config.onError).toHaveBeenCalledWith(
@@ -393,17 +395,12 @@ describe('SyncCoordinator seam-A fence — scheduling machine, current behavior'
   });
 
   it('Tests that a teardown during a rescan leaves the poll loop stopped.', async () => {
-    const rescan = deferred<string>();
-    bridge.runRescanProcess.mockReturnValue(rescan.promise);
     const c = new SyncCoordinator(fakeConfig(), fakeDataService());
     c.walletConfigPerformanceLevel = RPCPerformanceLevelEnum.Low;
     await c.configure();
 
-    const running = c.refreshSync(true);
-    await flushPromises();
-    await c.clearTimers(); // the teardown boundary, after the rescan's own
-    rescan.resolve('Launching rescan...');
-    await running;
+    // The teardown boundary passes after the rescan's own.
+    await whileLaneHeld(c, 'rescan', () => c.clearTimers());
 
     expect(c.updateTimerID).toBeUndefined();
   });
