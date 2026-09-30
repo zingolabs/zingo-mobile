@@ -14,12 +14,12 @@ import {
 // LoadedApp mounts exactly one driver, which owns the session's price traffic.
 export const PriceTrafficDriver: React.FunctionComponent = () => {
   const context = useContext(ContextAppLoaded);
-  const { mixnetView, setZecPrice, selectServer, info } = context;
+  const { mixnetView, setZecPrice, server, info } = context;
 
   const mixnetStatusKey = mixnetView
     ? mixnetView.statusKey
     : 'mixnet.status.unknown';
-  const priceFetchable = fiatEligible(info.chainName, selectServer);
+  const priceFetchable = fiatEligible(server, info.chainName);
 
   useEffect(() => {
     priceFetcherStore.setDeps({

@@ -3,7 +3,7 @@ import React from 'react';
 import { Image, View } from 'react-native';
 import { useTheme } from '@app/theme';
 
-import { SelectServerEnum, TranslateType } from '@app/AppState';
+import { ServerType, TranslateType } from '@app/AppState';
 import { fiatQuote } from '@app/price/fiatQuote';
 import InfoType from '@app/AppState/types/InfoType';
 import ZecPriceType from '@app/AppState/types/ZecPriceType';
@@ -17,7 +17,7 @@ type PriceRowProps = {
   translate: (key: string) => TranslateType;
   zecPrice: ZecPriceType;
   info: InfoType;
-  selectServer: SelectServerEnum;
+  server: ServerType;
   onLayout?: (height: number) => void;
 };
 
@@ -39,10 +39,10 @@ const formatLastUpdate = (date: number): string => {
 };
 
 const PriceRow: React.FC<PriceRowProps> = React.memo(
-  ({ translate, zecPrice, info, selectServer, onLayout }) => {
+  ({ translate, zecPrice, info, server, onLayout }) => {
     const { colors } = useTheme();
 
-    const quote = fiatQuote(zecPrice, info.chainName, selectServer);
+    const quote = fiatQuote(zecPrice, server, info.chainName);
     if (quote.kind === 'none') {
       return null;
     }

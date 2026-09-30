@@ -21,6 +21,7 @@ import type { SetServerResult } from './types/SetServerResult';
 import type { ErrorKeyed, Done } from './types/Result';
 import type { GateFailure, GateFailureKey } from './types/GateFailure';
 import { DONE, errorKeyed } from './types/Result';
+import { nativeUri, offlineServer, remoteServer } from './types/ServerType';
 import type ValueTransferType from './types/ValueTransferType';
 import type ProposalPoolsType from './types/ProposalPoolsType';
 import type TransactionType from './types/TransactionType';
@@ -80,6 +81,9 @@ export {
   AddressBookFileClassObsolete,
   DONE,
   errorKeyed,
+  nativeUri,
+  offlineServer,
+  remoteServer,
   AddressBookActionEnum,
   MenuItemEnum,
   LanguageEnum,

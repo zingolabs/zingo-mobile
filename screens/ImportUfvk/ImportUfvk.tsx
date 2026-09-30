@@ -34,12 +34,7 @@ import AppSheet from '@ui/primitives/AppSheet';
 import { ContextAppLoading } from '@app/context';
 import Header from '@ui/widgets/Header';
 import { getLatestBlockServerInfo } from '@app/walletBackend';
-import {
-  GlobalConst,
-  RouteEnum,
-  ScreenEnum,
-  SelectServerEnum,
-} from '@app/AppState';
+import { GlobalConst, RouteEnum, ScreenEnum } from '@app/AppState';
 import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
 import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
 
@@ -60,7 +55,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
 }) => {
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const context = useContext(ContextAppLoading);
-  const { translate, netInfo, server, addLastSnackbar, selectServer } = context;
+  const { translate, netInfo, server, addLastSnackbar } = context;
   const { colors } = useTheme();
   const screenName = ScreenEnum.ImportUfvk;
 
@@ -76,7 +71,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
     // Both conditions must hold: a session with no server has nothing to ask,
     // and a device with no network has nobody to ask. The disjunction this
     // replaces entered on a downed radio in Offline mode.
-    if (netInfo.isConnected && selectServer !== SelectServerEnum.offline) {
+    if (netInfo.isConnected && server.kind !== 'offline') {
       (async () => {
         const resp = await getLatestBlockServerInfo(server.uri);
         if (resp.ok && resp.value) {
@@ -84,7 +79,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
         }
       })();
     }
-  }, [server, selectServer, netInfo.isConnected]);
+  }, [server, netInfo.isConnected]);
 
   useEffect(() => {
     if (seedufvkText) {
@@ -141,7 +136,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
     // the user is NOT in explicit Offline mode — mirroring createNewWallet.
     // (Previously this also blocked whenever Offline mode was selected, which
     // rejected restores even with a working internet connection.)
-    if (!netInfo.isConnected && selectServer !== SelectServerEnum.offline) {
+    if (!netInfo.isConnected && server.kind !== 'offline') {
       addLastSnackbar(translate('loadedapp.connection-error') as string);
       return;
     }
@@ -343,7 +338,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
 
           <View style={{ marginTop: 10, alignItems: 'center' }}>
             <FadeText>{translate('import.birthday') as string}</FadeText>
-            {selectServer !== SelectServerEnum.offline && (
+            {server.kind !== 'offline' && (
               <FadeText style={{ textAlign: 'center' }}>
                 {translate('seed.birthday-no-readonly') +
                   ` (${activationHeight[server.chainName]}, ` +
@@ -387,8 +382,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
                     setBirthday('');
                   } else if (
                     Number(text) <= 0 ||
-                    (Number(text) > latestBlock &&
-                      selectServer !== SelectServerEnum.offline)
+                    (Number(text) > latestBlock && server.kind !== 'offline')
                   ) {
                     setBirthday('');
                   } else {
@@ -398,26 +392,20 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
                   }
                 }}
                 editable={
-                  latestBlock
-                    ? true
-                    : selectServer !== SelectServerEnum.offline
-                      ? false
-                      : true
+                  latestBlock ? true : server.kind !== 'offline' ? false : true
                 }
                 keyboardType="numeric"
               />
-              {!!birthday &&
-                (!!latestBlock ||
-                  selectServer === SelectServerEnum.offline) && (
-                  <TouchableOpacity onPress={() => setBirthday('')}>
-                    <FontAwesomeIcon
-                      style={{ marginRight: 5 }}
-                      size={20}
-                      icon={faXmark}
-                      color={colors.fgAccentDisabled}
-                    />
-                  </TouchableOpacity>
-                )}
+              {!!birthday && (!!latestBlock || server.kind === 'offline') && (
+                <TouchableOpacity onPress={() => setBirthday('')}>
+                  <FontAwesomeIcon
+                    style={{ marginRight: 5 }}
+                    size={20}
+                    icon={faXmark}
+                    color={colors.fgAccentDisabled}
+                  />
+                </TouchableOpacity>
+              )}
             </View>
 
             <RegText style={{ margin: 20, marginBottom: 30 }}>
