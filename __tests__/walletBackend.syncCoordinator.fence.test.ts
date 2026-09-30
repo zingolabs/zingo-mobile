@@ -246,7 +246,7 @@ describe('SyncCoordinator seam-A fence — scheduling machine, current behavior'
     const c = new SyncCoordinator(fakeConfig(), fakeDataService());
     await c.configure();
 
-    c.refreshSyncLock = true;
+    c.laneHolder = 'sync';
     await c.clearTimers();
 
     expect(c.updateTimerID).toBeUndefined();
@@ -279,7 +279,7 @@ describe('SyncCoordinator seam-A fence — scheduling machine, current behavior'
     bridge.runRescanProcess.mockResolvedValue('Launching rescan...');
     const c = new SyncCoordinator(fakeConfig(), fakeDataService());
 
-    c.refreshSyncLock = true; // a normal sync is in flight
+    c.laneHolder = 'sync'; // a normal sync is in flight
     await c.refreshSync(true); // rescan now shares the launch's single lane
 
     // Fixed (ticket 10): the single in-flight command drops the concurrent
@@ -302,6 +302,24 @@ describe('SyncCoordinator seam-A fence — scheduling machine, current behavior'
     await c.refreshSync(true);
     launch.resolve('Launching sync task...');
     await sync;
+    await jest.advanceTimersByTimeAsync(0);
+    await flushPromises();
+
+    expect(bridge.runRescanProcess).toHaveBeenCalledTimes(1);
+
+    await c.clearTimers();
+  });
+
+  it('Tests that a rescan issued while a rescan holds the lane is not queued a second time.', async () => {
+    const rescan = deferred<string>();
+    bridge.runRescanProcess.mockReturnValue(rescan.promise);
+    const c = new SyncCoordinator(fakeConfig(), fakeDataService());
+
+    const first = c.refreshSync(true);
+    await flushPromises();
+    await c.refreshSync(true); // the rescan already in flight serves this
+    rescan.resolve('Launching rescan...');
+    await first;
     await jest.advanceTimersByTimeAsync(0);
     await flushPromises();
 

@@ -42,6 +42,8 @@ import { doSave } from '@app/walletBackend/utils/walletUtils';
 // user reaches for Settings.
 const PERSISTENT_SYNC_FAILURE_THRESHOLD = 3;
 
+type LaneHolder = 'none' | 'sync' | 'rescan';
+
 export class SyncCoordinator {
   config: WalletBackendConfig;
   dataService: DataService;
@@ -49,7 +51,12 @@ export class SyncCoordinator {
   updateTimerID?: NodeJS.Timeout;
   timers: NodeJS.Timeout[] = [];
 
-  refreshSyncLock: boolean = false;
+  // The command holding the single-flight launch lane, or none. The lock the
+  // tick's gate reads is derived from it, so the two cannot disagree.
+  laneHolder: LaneHolder = 'none';
+  get refreshSyncLock(): boolean {
+    return this.laneHolder !== 'none';
+  }
   fetchSyncStatusLock: boolean = false;
   fetchSyncPollLock: boolean = false;
 
@@ -292,15 +299,16 @@ export class SyncCoordinator {
       return;
     }
     // Single in-flight command (ADR 0017): a launch and a rescan share one lane.
-    // A rescan issued while the lane is held waits in queuedRescan, and the
-    // holder's finally releases it.
-    if (this.refreshSyncLock) {
-      if (fullRescan) {
+    // A rescan issued while a sync holds the lane waits in queuedRescan, and
+    // the holder's finally releases it. A rescan issued while a rescan holds
+    // the lane is already being served, so it is not queued again.
+    if (this.laneHolder !== 'none') {
+      if (fullRescan && this.laneHolder === 'sync') {
         this.queuedRescan = { kind: 'queued', epoch: this.controllerEpoch };
       }
       return;
     }
-    this.refreshSyncLock = true;
+    this.laneHolder = fullRescan ? 'rescan' : 'sync';
     try {
       this.config.keepAwake(true);
 
@@ -356,7 +364,7 @@ export class SyncCoordinator {
         }
       }
     } finally {
-      this.refreshSyncLock = false;
+      this.laneHolder = 'none';
       const queued = this.queuedRescan;
       this.queuedRescan = { kind: 'none' };
       if (queued.kind === 'queued') {
