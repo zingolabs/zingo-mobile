@@ -72,7 +72,7 @@ jobs:
   # of starting a container. The output holds the ABI's two libraries and
   # the Kotlin bindings.
   android-build:
-    name: Build the Binding Layer
+    name: Build native rust & kotlin uniffi
     needs: android-check-build-cache
     if: ${{ needs.android-check-build-cache.outputs.binding-layer-found != 'true' }}
     runs-on: ${{ inputs.runner }}
@@ -172,7 +172,7 @@ jobs:
             });
 
   cache-binding-layer:
-    name: Cache the Binding Layer
+    name: Cache native rust
     needs: android-build
     runs-on: ubuntu-24.04
     steps:
