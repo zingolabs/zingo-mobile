@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
-import { SelectServerEnum } from '@app/AppState';
+import { ChainNameEnum, remoteServer } from '@app/AppState';
 import BalanceRow from './BalanceRow';
 import {
   mockTranslate,
@@ -27,7 +27,7 @@ const meta: Meta<typeof BalanceRow> = {
     totalBalance: mockTotalBalance,
     info: mockInfo,
     zecPrice: mockZecPrice,
-    selectServer: SelectServerEnum.auto,
+    server: remoteServer(mockInfo.serverUri, ChainNameEnum.mainChainName),
     showShieldButton: false,
     shieldingFee: 0,
     valueTransfersTotal: 12,

@@ -83,6 +83,7 @@ import {
   SelectServerEnum,
 } from '@app/AppState';
 import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
+import { offlineServer } from '@app/AppState/types/ServerType';
 import { mockTheme } from '../__mocks__/dataMocks/mockTheme';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
@@ -110,12 +111,12 @@ function makeProps(): React.ComponentProps<typeof LoadingAppClass> {
     translate: mockTranslate,
     theme: mockTheme,
     language: LanguageEnum.en,
-    server: { uri: '', chainName: ChainNameEnum.mainChainName },
+    server: offlineServer(ChainNameEnum.mainChainName),
     privacy: false,
     backgroundSyncInfo: {} as BackgroundType,
     firstLaunchingMessage: LaunchingModeEnum.opening,
     biometrics: false,
-    selectServer: SelectServerEnum.offline,
+    selectServer: SelectServerEnum.auto,
     performanceLevel: RPCPerformanceLevelEnum.Medium,
     blockExplorer: BlockExplorerEnum.Zcashexplorer,
     // mockTheme / mockTranslate stand in for AppTheme / TranslateType, which do

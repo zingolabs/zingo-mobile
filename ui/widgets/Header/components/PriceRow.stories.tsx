@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
-import { SelectServerEnum } from '@app/AppState';
+import { ChainNameEnum, remoteServer } from '@app/AppState';
 import PriceRow from './PriceRow';
 import { mockInfo, mockZecPrice } from '../../../../.storybook/storyMocks';
 import { mockTranslate } from '../../../../.storybook/storyDecorators';
@@ -11,7 +11,7 @@ const meta: Meta<typeof PriceRow> = {
     translate: mockTranslate,
     zecPrice: mockZecPrice,
     info: mockInfo,
-    selectServer: SelectServerEnum.auto,
+    server: remoteServer(mockInfo.serverUri, ChainNameEnum.mainChainName),
   },
 };
 

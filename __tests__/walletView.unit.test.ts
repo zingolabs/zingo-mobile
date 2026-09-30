@@ -7,16 +7,23 @@ import {
   type WalletViewSource,
   selectWalletView,
 } from '@app/AppState/walletView';
-import { SelectServerEnum } from '@app/AppState/enums/SelectServerEnum';
+import { ChainNameEnum } from '@app/AppState/enums/ChainNameEnum';
+import { offlineServer, remoteServer } from '@app/AppState/types/ServerType';
+
+const remote = remoteServer(
+  'https://indexer.test',
+  ChainNameEnum.mainChainName,
+);
+const offline = offlineServer(ChainNameEnum.mainChainName);
 
 const source = (over: Partial<WalletViewSource> = {}): WalletViewSource => ({
   readOnly: false,
-  selectServer: SelectServerEnum.auto,
+  server: remote,
   ...over,
 });
 
 describe('selectWalletView — the two render outcomes', () => {
-  it('fullWithSend: spendable and online', () => {
+  it('fullWithSend: spendable and remote', () => {
     expect(selectWalletView(source())).toBe('fullWithSend');
   });
 
@@ -26,17 +33,9 @@ describe('selectWalletView — the two render outcomes', () => {
     );
   });
 
-  it('fullWithoutSend: offline hides Send', () => {
-    expect(
-      selectWalletView(source({ selectServer: SelectServerEnum.offline })),
-    ).toBe('fullWithoutSend');
-  });
-
-  it.each([
-    SelectServerEnum.auto,
-    SelectServerEnum.list,
-    SelectServerEnum.custom,
-  ])('every online selection (%s) shows Send', selectServer => {
-    expect(selectWalletView(source({ selectServer }))).toBe('fullWithSend');
+  it('fullWithoutSend: an offline server hides Send', () => {
+    expect(selectWalletView(source({ server: offline }))).toBe(
+      'fullWithoutSend',
+    );
   });
 });

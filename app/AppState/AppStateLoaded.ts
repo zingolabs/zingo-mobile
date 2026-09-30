@@ -8,8 +8,9 @@ import { SelectServerEnum } from './enums/SelectServerEnum';
 // gates live in app/AppState/uiAtoms.ts.
 export default interface AppStateLoaded {
   // change server helper
-  newServer: ServerType;
-  newSelectServer: SelectServerEnum | null;
+  pendingServer:
+    | { kind: 'none' }
+    | { kind: 'pending'; server: ServerType; selectServer: SelectServerEnum };
 
   // to do scroll to top in history
   scrollToTop: boolean;
