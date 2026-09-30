@@ -32,7 +32,7 @@ import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 // picked, not on catalog prose.
 const keyTranslate = (key: string) => key;
 
-function renderScreen(mixnetView: MixnetView) {
+function renderScreen(mixnetView: MixnetView, nymSheetOpen?: boolean) {
   const navigate = jest.fn();
   const props: any = {
     navigation: { ...mockNavigation, navigate },
@@ -41,6 +41,7 @@ function renderScreen(mixnetView: MixnetView) {
       name: RouteEnum.MigrationStrategy,
       params: undefined,
     },
+    nymSheetOpen,
   };
   const context = {
     ...defaultAppContextLoaded,
@@ -129,20 +130,24 @@ describe('MigrationStrategy nym gate sheet', () => {
     jest.clearAllMocks();
   });
 
-  test('a reconnecting bootstrap shows the connecting wait, not red failure copy', () => {
-    const { queryByText, getByText } = renderScreen(mixnetReconnecting);
+  // The sheet renders its content a frame after it presents, so the tests
+  // open it through the prop and await the copy.
+  test('a reconnecting bootstrap shows the connecting wait, not red failure copy', async () => {
+    const { queryByText, findByText } = renderScreen(mixnetReconnecting, true);
 
+    expect(
+      await findByText('migrationstrategy.nym-gate-connecting'),
+    ).toBeTruthy();
     // The old phase-based guard leaked 'mixnet.status.bootstrapping' into the
     // failure slot, painting "Connecting to mixnet…" as danger copy beside a
     // live Enable button.
     expect(queryByText('mixnet.status.bootstrapping')).toBeNull();
-    expect(getByText('migrationstrategy.nym-gate-connecting')).toBeTruthy();
   });
 
-  test('a lost transport shows its status key and a live Enable button', () => {
-    const { getByText } = renderScreen(mixnetLost);
+  test('a lost transport shows its status key and a live Enable button', async () => {
+    const { findByText, getByText } = renderScreen(mixnetLost, true);
 
-    expect(getByText('mixnet.status.died')).toBeTruthy();
+    expect(await findByText('mixnet.status.died')).toBeTruthy();
     expect(getByText('migrationstrategy.nym-gate-enable')).toBeTruthy();
   });
 

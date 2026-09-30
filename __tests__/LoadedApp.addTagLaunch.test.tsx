@@ -56,8 +56,8 @@ jest.mock('@screens/Receive', () => ({
   default: 'MockReceiveScreen',
 }));
 
-// The form numbers each mount, records the mount and the unmount, and keeps
-// the sheet dismiss it read from the enclosing sheet.
+// The form numbers each mount from the recorded mounts, records the mount and
+// the unmount, and keeps the sheet dismiss it read from the enclosing sheet.
 jest.mock('@ui/widgets/NewAddressTag', () => {
   const ReactActual = jest.requireActual<typeof import('react')>('react');
   const { useSheetDismiss } = jest.requireActual<
@@ -66,12 +66,10 @@ jest.mock('@ui/widgets/NewAddressTag', () => {
   const mounted = jest.fn();
   const unmounted = jest.fn();
   const dismissers: (() => void)[] = [];
-  let mounts = 0;
   const MockNewAddressTag = ({ address }: { address: string }) => {
     const dismiss = useSheetDismiss();
     ReactActual.useEffect(() => {
-      mounts += 1;
-      const mount = mounts;
+      const mount = mounted.mock.calls.length + 1;
       dismissers.push(dismiss);
       mounted(mount, address);
       return () => {
