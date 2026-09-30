@@ -112,6 +112,12 @@ export class SyncCoordinator {
     const armedHandle = this.updateTimerID;
     try {
       await this.runTaskPromises();
+    } catch (error) {
+      // The tick runs from a setTimeout callback, which has no rejection
+      // handler, so a throw from runTick would surface as an unhandled
+      // rejection and skip the re-arm below.
+      console.log(`Critical Error sync tick ${error}`);
+      this.config.onError(`Error sync tick: ${error}`);
     } finally {
       // Re-arm only while this loop is still the live one. A boundary landing
       // during the tick (clearTimers) sets updateTimerID undefined and stops it.

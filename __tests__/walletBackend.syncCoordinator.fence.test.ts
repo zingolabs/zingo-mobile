@@ -353,6 +353,29 @@ describe('SyncCoordinator seam-A fence — scheduling machine, current behavior'
     await c.clearTimers();
   });
 
+  it('Tests that a tick whose gate read rejects reports through onError and re-arms the loop.', async () => {
+    const ds = fakeDataService();
+    (ds.getWalletSaveRequired as jest.Mock).mockRejectedValue(
+      new Error('gate blew up'),
+    );
+    const config = fakeConfig();
+    const c = new SyncCoordinator(config, ds);
+    c.walletConfigPerformanceLevel = RPCPerformanceLevelEnum.Low;
+
+    await c.configure();
+    await jest.advanceTimersByTimeAsync(5 * 1000);
+    await flushPromises();
+
+    expect(config.onError).toHaveBeenCalledWith(
+      'Error sync tick: Error: gate blew up',
+    );
+    // The rejection did not escape the timer callback, and the loop lives on.
+    expect(c.updateTimerID).toBeDefined();
+    expect(c.tickInFlight).toBe(false);
+
+    await c.clearTimers();
+  });
+
   describe('A.8: save-required gate — three branches', () => {
     it('save not required pushes only the poll', async () => {
       const ds = fakeDataService();
