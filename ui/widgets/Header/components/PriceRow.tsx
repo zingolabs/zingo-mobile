@@ -3,7 +3,8 @@ import React from 'react';
 import { Image, View } from 'react-native';
 import { useTheme } from '@app/theme';
 
-import { ChainNameEnum, SelectServerEnum, TranslateType } from '@app/AppState';
+import { ServerType, TranslateType } from '@app/AppState';
+import { fiatQuote } from '@app/price/fiatQuote';
 import InfoType from '@app/AppState/types/InfoType';
 import ZecPriceType from '@app/AppState/types/ZecPriceType';
 import BoldText from '@ui/primitives/BoldText';
@@ -16,7 +17,7 @@ type PriceRowProps = {
   translate: (key: string) => TranslateType;
   zecPrice: ZecPriceType;
   info: InfoType;
-  selectServer: SelectServerEnum;
+  server: ServerType;
   onLayout?: (height: number) => void;
 };
 
@@ -38,18 +39,15 @@ const formatLastUpdate = (date: number): string => {
 };
 
 const PriceRow: React.FC<PriceRowProps> = React.memo(
-  ({ translate, zecPrice, info, selectServer, onLayout }) => {
+  ({ translate, zecPrice, info, server, onLayout }) => {
     const { colors } = useTheme();
 
-    if (
-      zecPrice.zecPrice <= 0 ||
-      selectServer === SelectServerEnum.offline ||
-      info.chainName !== ChainNameEnum.mainChainName
-    ) {
+    const quote = fiatQuote(zecPrice, server, info.chainName);
+    if (quote.kind === 'none') {
       return null;
     }
 
-    const lastUpdate = formatLastUpdate(zecPrice.date);
+    const lastUpdate = formatLastUpdate(quote.date);
 
     return (
       <View
@@ -84,8 +82,8 @@ const PriceRow: React.FC<PriceRowProps> = React.memo(
         <View style={{ alignItems: 'flex-end' }}>
           <CurrencyAmount
             style={{ fontSize: 14 }}
-            priceDate={zecPrice.date}
-            price={zecPrice.zecPrice}
+            priceDate={quote.date}
+            price={quote.price}
             amtZec={1}
             privacy={false}
           />

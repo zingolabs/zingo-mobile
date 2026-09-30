@@ -8,7 +8,7 @@ import {
   SendPageStateClass,
   ToAddrClass,
   NetInfoType,
-  ServerType,
+  remoteServer,
   AddressBookFileClass,
   LanguageEnum,
   SelectServerEnum,
@@ -34,7 +34,7 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   info: {} as InfoType,
   birthday: 0,
   defaultUnifiedAddress: '',
-  server: {} as ServerType,
+  server: remoteServer('', ChainNameEnum.noneChainName),
   language: LanguageEnum.en,
   zecPrice: {
     zecPrice: 0,

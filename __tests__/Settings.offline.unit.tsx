@@ -19,11 +19,14 @@ import {
   defaultAppContextLoaded,
   ContextAppLoadedProvider,
 } from '@app/context';
-import { RouteEnum, SelectServerEnum } from '@app/AppState';
+import { RouteEnum, SelectServerEnum, ServerType } from '@app/AppState';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
-import { mockServer } from '../__mocks__/dataMocks/mockServer';
+import {
+  mockOfflineServer,
+  mockServer,
+} from '../__mocks__/dataMocks/mockServer';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
 const mockedFetchServerList = jest.fn().mockResolvedValue([]);
@@ -33,7 +36,7 @@ jest.mock('@app/uris/fetchServerList', () => ({
   default: (...args: unknown[]) => mockedFetchServerList(...args),
 }));
 
-function renderSettings(selectServer: SelectServerEnum) {
+function renderSettings(server: ServerType) {
   const props: any = {
     navigation: mockNavigation,
     route: { key: 'Key-1', name: RouteEnum.Settings, params: undefined },
@@ -45,8 +48,8 @@ function renderSettings(selectServer: SelectServerEnum) {
         translate: mockTranslate,
         info: mockInfo,
         totalBalance: mockTotalBalance,
-        server: mockServer,
-        selectServer,
+        server,
+        selectServer: SelectServerEnum.auto,
       }}
     >
       <Settings
@@ -73,7 +76,7 @@ afterEach(() => {
 
 describe('the Settings screen follows the session connectivity', () => {
   it('never asks the live registry while the session is Offline', async () => {
-    renderSettings(SelectServerEnum.offline);
+    renderSettings(mockOfflineServer);
 
     // The effect is synchronous up to its first await, so a flush is enough
     // to catch a request that was going to be made.
@@ -82,7 +85,7 @@ describe('the Settings screen follows the session connectivity', () => {
 
   // The control: a connected session still fills the picker from the registry.
   it('asks it for a connected session', async () => {
-    renderSettings(SelectServerEnum.auto);
+    renderSettings(mockServer);
 
     await waitFor(() => expect(mockedFetchServerList).toHaveBeenCalled());
   });

@@ -7,8 +7,9 @@ export default interface AppStateLoaded {
   appStateStatus: AppStateStatus;
 
   // change server helper
-  newServer: ServerType;
-  newSelectServer: SelectServerEnum | null;
+  pendingServer:
+    | { kind: 'none' }
+    | { kind: 'pending'; server: ServerType; selectServer: SelectServerEnum };
 
   // to do scroll to top in history
   scrollToTop: boolean;
