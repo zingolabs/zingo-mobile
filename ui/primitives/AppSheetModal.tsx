@@ -3,7 +3,6 @@ import React, {
   useCallback,
   useContext,
   useEffect,
-  useImperativeHandle,
   useRef,
 } from 'react';
 import { Keyboard, StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
@@ -23,6 +22,8 @@ type AppSheetModalProps = {
   contentStyle?: StyleProp<ViewStyle>;
   snapPoints?: (string | number)[];
   onDismiss?: () => void;
+  // Fires when the close animation starts, before onDismiss fires at its end.
+  onClosing?: () => void;
   onChange?: (index: number) => void;
   enablePanDownToClose?: boolean;
   dismissable?: boolean;
@@ -48,6 +49,7 @@ const AppSheetModal = React.forwardRef<BottomSheetModal, AppSheetModalProps>(
       contentStyle,
       snapPoints,
       onDismiss,
+      onClosing,
       onChange,
       enablePanDownToClose = true,
       dismissable = true,
@@ -62,8 +64,20 @@ const AppSheetModal = React.forwardRef<BottomSheetModal, AppSheetModalProps>(
   ) => {
     const { colors } = useTheme();
     const fixed = snapPoints !== undefined;
-    const sheet = useRef<BottomSheetModal>(null);
-    useImperativeHandle(ref, () => sheet.current as BottomSheetModal);
+    const sheet = useRef<BottomSheetModal | null>(null);
+    // One callback ref feeds the inner handle to both holders, so the
+    // forwarded ref always sees the modal's current handle.
+    const attachSheet = useCallback(
+      (node: BottomSheetModal | null) => {
+        sheet.current = node;
+        if (typeof ref === 'function') {
+          ref(node);
+        } else if (ref) {
+          ref.current = node;
+        }
+      },
+      [ref],
+    );
 
     useEffect(() => {
       if (presentOnMount) {
@@ -86,7 +100,7 @@ const AppSheetModal = React.forwardRef<BottomSheetModal, AppSheetModalProps>(
 
     return (
       <BottomSheetModal
-        ref={sheet}
+        ref={attachSheet}
         accessible={accessible}
         enableDynamicSizing={!fixed}
         snapPoints={snapPoints}
@@ -98,6 +112,9 @@ const AppSheetModal = React.forwardRef<BottomSheetModal, AppSheetModalProps>(
         onAnimate={(from, to) => {
           if (from === -1 && to >= 0) {
             Keyboard.dismiss();
+          }
+          if (to === -1 && from >= 0) {
+            onClosing?.();
           }
         }}
         onChange={onChange}

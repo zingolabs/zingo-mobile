@@ -5,9 +5,11 @@
  * content unmounts when the close animation ends. The form mock records each
  * mount and unmount, and hands out the sheet dismiss it received.
  *
- * Two pins: the form mounts with the launched address a frame after the
- * launch, and a relaunch during the close animation leaves only the second
- * form mounted once the close animation has elapsed (#1457).
+ * Four pins: the form mounts with the launched address a frame after the
+ * launch; a relaunch during the close animation mounts only the second form,
+ * a frame after the close ends (#1457); a second launch before the first
+ * frame retargets the one pending instance; and a launch while the sheet is
+ * open swaps the form without a dismissal.
  */
 
 jest.mock('@app/RPCModule', () =>
@@ -88,6 +90,7 @@ jest.mock('@ui/widgets/NewAddressTag', () => {
 });
 
 import { act } from '@testing-library/react-native';
+import * as bottomSheetMock from '@gorhom/bottom-sheet';
 
 import { addTagModalAtom } from '@app/AppState/uiAtoms';
 import {
@@ -103,9 +106,12 @@ const { mounted, unmounted, dismissers } = jest.requireMock<{
   dismissers: (() => void)[];
 }>('@ui/widgets/NewAddressTag');
 
-const { CLOSE_ANIMATION_MS } = jest.requireMock<{
+// The mock's extras, read through the same import the app code uses, so the
+// queue observed here is the one the sheets write.
+const { CLOSE_ANIMATION_MS, sheetsQueue } = bottomSheetMock as unknown as {
   CLOSE_ANIMATION_MS: number;
-}>('@gorhom/bottom-sheet');
+  sheetsQueue: number[];
+};
 
 const FRAME_MS = 16;
 const MID_CLOSE_MS = CLOSE_ANIMATION_MS / 2;
@@ -126,6 +132,7 @@ describe('the add-tag sheet under the shared mount gate', () => {
     jest.useFakeTimers();
     jest.clearAllMocks();
     dismissers.length = 0;
+    sheetsQueue.length = 0;
     spyOnLifecycleListeners();
   });
 
@@ -169,7 +176,7 @@ describe('the add-tag sheet under the shared mount gate', () => {
     expect(mountedAddresses()).toEqual(['zs1recipient']);
   });
 
-  it('Tests that a relaunch during the close animation leaves only the second form mounted after the close.', async () => {
+  it('Tests that a relaunch during the close animation mounts only the second form, a frame after the close ends.', async () => {
     const { instance } = await mountCommitted();
 
     await launch(instance, 'zs1recipient');
@@ -187,7 +194,51 @@ describe('the add-tag sheet under the shared mount gate', () => {
       jest.advanceTimersByTime(CLOSE_ANIMATION_MS);
       await flushMicrotasks();
     });
+    // The waiting instance mounts when the dismissal lands and presents a
+    // frame later.
+    expect(mountedForms()).toEqual([]);
+    await act(async () => {
+      jest.advanceTimersByTime(FRAME_MS);
+      await flushMicrotasks();
+    });
 
     expect(mountedForms()).toEqual([2]);
+  });
+
+  it('Tests that a second launch before the first frame retargets the pending instance.', async () => {
+    const { instance } = await mountCommitted();
+
+    // Two taps, two events, both before the first frame lands.
+    await act(async () => {
+      instance.launchAddTagModal('zs1first');
+      await flushMicrotasks();
+    });
+    await act(async () => {
+      instance.launchAddTagModal('zs1second');
+      await flushMicrotasks();
+    });
+    await act(async () => {
+      jest.advanceTimersByTime(FRAME_MS);
+      await flushMicrotasks();
+    });
+
+    // One instance presented once, and the only form ever mounted is the
+    // second launch's.
+    expect(mountedAddresses()).toEqual(['zs1second']);
+    expect(mountedForms()).toEqual([1]);
+    // One sheet in the provider's queue; a stale entry would hold the back
+    // handler forever.
+    expect(sheetsQueue).toHaveLength(1);
+  });
+
+  it('Tests that a launch while the sheet is open swaps the form without a dismissal.', async () => {
+    const { instance } = await mountCommitted();
+
+    await launch(instance, 'zs1first');
+    await launch(instance, 'zs1second');
+
+    expect(mountedAddresses()).toEqual(['zs1first', 'zs1second']);
+    expect(mountedForms()).toEqual([2]);
+    expect(dismissers).toHaveLength(2); // both forms received a dismiss; none ran
   });
 });

@@ -1,12 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
-import React from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Pressable, View } from 'react-native';
 import { useTheme } from '@app/theme';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
 
 import { AddressBookFileClass, TranslateType } from '@app/AppState';
-import type { AddTagModalState } from '@app/AppState/uiAtoms';
+import type { AddTagModalState, AddTagTarget } from '@app/AppState/uiAtoms';
 import BoldText from '@ui/primitives/BoldText';
 import AppSheetModal, { useSheetDismiss } from '@ui/primitives/AppSheetModal';
 import NewAddressTag from '@ui/widgets/NewAddressTag';
@@ -50,22 +50,67 @@ const AddTagHeader = ({ title }: { title: string }) => {
   );
 };
 
-// One sheet instance per launch, keyed on the launch count. The instance
-// presents itself when it mounts, and a relaunch during its close animation
-// replaces it.
+// One launched target, held by the sheet instance that shows it.
+type Shown =
+  { kind: 'none' } | { kind: 'shown'; sheet: number; target: Launched };
+type Launched = Extract<AddTagModalState, { kind: 'launched' }>;
+
+// The sheet instance is keyed on the launch that opened it, and the form on
+// the launch it shows. A launch while the sheet is open retargets the open
+// instance. A launch during the close animation waits for the dismissal, and
+// a fresh instance then mounts and presents. The library drops a present()
+// during a close and keeps the closing node until the close ends, so the
+// instance never unmounts mid-close and never presents into a close.
 const AddTagModalHost = ({
   target,
   setAddressBook,
   translate,
 }: AddTagModalHostProps) => {
   const keyboardHeight = useKeyboardHeight();
-  if (target.kind === 'none') {
+  const [shown, setShown] = useState<Shown>({ kind: 'none' });
+  const closing = useRef(false);
+  const pending = useRef<Launched | undefined>(undefined);
+
+  useEffect(() => {
+    if (target.kind !== 'launched') {
+      return;
+    }
+    if (closing.current) {
+      pending.current = target;
+      return;
+    }
+    setShown(prior =>
+      prior.kind === 'shown'
+        ? { ...prior, target }
+        : { kind: 'shown', sheet: target.launch, target },
+    );
+  }, [target]);
+
+  const onClosing = useCallback(() => {
+    closing.current = true;
+  }, []);
+
+  const onDismiss = useCallback(() => {
+    closing.current = false;
+    const next = pending.current;
+    pending.current = undefined;
+    setShown(
+      next === undefined
+        ? { kind: 'none' }
+        : { kind: 'shown', sheet: next.launch, target: next },
+    );
+  }, []);
+
+  if (shown.kind === 'none') {
     return null;
   }
+  const form: AddTagTarget = shown.target;
   return (
     <AppSheetModal
-      key={target.launch}
+      key={shown.sheet}
       presentOnMount
+      onClosing={onClosing}
+      onDismiss={onDismiss}
       header={
         <AddTagHeader title={translate('addressbook.add-contact') as string} />
       }
@@ -74,13 +119,14 @@ const AddTagModalHost = ({
       }}
     >
       <NewAddressTag
-        address={target.address}
+        key={shown.target.launch}
+        address={form.address}
         // Every launcher (Send, address rows) saves a recipient, a contact.
         // Tagging one of the wallet's own addresses is the Receive flow,
         // which renders NewAddressTag with own={true} directly.
         own={false}
-        swapChain={target.swapChain}
-        initialLabel={target.initialLabel}
+        swapChain={form.swapChain}
+        initialLabel={form.initialLabel}
         setAddressBook={setAddressBook}
       />
     </AppSheetModal>
