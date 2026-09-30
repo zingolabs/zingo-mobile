@@ -72,7 +72,6 @@ import {
   CurrencyNameEnum,
   UnifiedAddressClass,
   TransparentAddressClass,
-  AddressKindEnum,
   AddressBookFileClassObsolete,
   ScreenEnum,
   LaunchingModeEnum,
@@ -104,6 +103,7 @@ import {
   addTagModalAtom,
 } from '@app/AppState/uiAtoms';
 import { classifyLifecycle } from '@app/AppState/lifecycle';
+import { changes, lastUnified } from '@app/AppState/statePatch';
 import SettingsFileImpl from '@app/services/SettingsFileImpl';
 import { PriceTrafficDriver } from '@ui/widgets/PriceFetcher';
 import { priceFetcherStore } from '@ui/widgets/priceFetcherStore';
@@ -1095,11 +1095,7 @@ export class LoadedAppClass extends Component<
   fetchBackgroundSyncInfo = async () => {
     const backgroundSyncInfoJson: BackgroundType =
       await BackgroundFileImpl.readBackground();
-    this.commit(() => {
-      if (!isEqual(this.state.backgroundSyncInfo, backgroundSyncInfoJson)) {
-        this.setState({ backgroundSyncInfo: backgroundSyncInfoJson });
-      }
-    });
+    this.commitPatch({ backgroundSyncInfo: backgroundSyncInfoJson });
   };
 
   setBackgroundSyncErrorInfo = async (error: string) => {
@@ -1118,6 +1114,17 @@ export class LoadedAppClass extends Component<
     });
   };
 
+  // Commits the patch through the boundary guard when it alters container state.
+  private commitPatch = <K extends keyof LoadedAppClassState>(
+    patch: Pick<LoadedAppClassState, K>,
+  ) => {
+    this.commit(() => {
+      if (changes(this.state, patch)) {
+        this.setState(patch);
+      }
+    });
+  };
+
   setShieldingAmount = (value: number) => {
     //const start = Date.now();
     this.setState({ shieldingAmount: value });
@@ -1128,11 +1135,7 @@ export class LoadedAppClass extends Component<
   };
 
   setTotalBalance = (totalBalance: TotalBalanceClass) => {
-    this.commit(() => {
-      if (!isEqual(this.state.totalBalance, totalBalance)) {
-        this.setState({ totalBalance });
-      }
-    });
+    this.commitPatch({ totalBalance });
   };
 
   setSyncingStatus = (syncingStatus: RPCSyncStatusType) => {
@@ -1158,11 +1161,7 @@ export class LoadedAppClass extends Component<
   };
 
   setMixnetView = (mixnetView: MixnetView) => {
-    this.commit(() => {
-      if (!isEqual(this.state.mixnetView, mixnetView)) {
-        this.setState({ mixnetView });
-      }
-    });
+    this.commitPatch({ mixnetView });
   };
 
   reenableMixnet = async (): Promise<void> => {
@@ -1357,39 +1356,15 @@ export class LoadedAppClass extends Component<
   };
 
   setMessagesList = (messages: ValueTransferType[], messagesTotal: number) => {
-    this.commit(() => {
-      if (
-        !isEqual(this.state.messages, messages) ||
-        this.state.messagesTotal !== messagesTotal
-      ) {
-        //const start = Date.now();
-        this.setState({ messages, messagesTotal });
-      }
-    });
+    this.commitPatch({ messages, messagesTotal });
   };
 
   setAllAddresses = (
     addresses: (UnifiedAddressClass | TransparentAddressClass)[],
   ) => {
-    this.commit(() => {
-      if (!isEqual(this.state.addresses, addresses)) {
-        //const start = Date.now();
-        this.setState({ addresses });
-      }
-      if (addresses.length > 0) {
-        // the last Unified Address created.
-        const defaultUAArray = addresses.filter(
-          (a: UnifiedAddressClass | TransparentAddressClass) =>
-            a.addressKind === AddressKindEnum.u,
-        );
-        const defaultUA: string =
-          defaultUAArray[defaultUAArray.length - 1].address;
-        if (this.state.defaultUnifiedAddress !== defaultUA) {
-          this.setState({ defaultUnifiedAddress: defaultUA });
-        }
-      } else {
-        this.setState({ defaultUnifiedAddress: '' });
-      }
+    this.commitPatch({
+      addresses,
+      defaultUnifiedAddress: lastUnified(addresses),
     });
   };
 
@@ -1454,11 +1429,8 @@ export class LoadedAppClass extends Component<
   };
 
   setZingolibVersion = (newZingolibVersion: string) => {
-    this.commit(() => {
-      if (!this.state.zingolibVersion) {
-        //const start = Date.now();
-        this.setState({ zingolibVersion: newZingolibVersion });
-      }
+    this.commitPatch({
+      zingolibVersion: this.state.zingolibVersion || newZingolibVersion,
     });
   };
 
@@ -1500,12 +1472,7 @@ export class LoadedAppClass extends Component<
   };
 
   setBirthday = async (birthday: number) => {
-    this.commit(() => {
-      if (!isEqual(this.state.birthday, birthday)) {
-        //const start = Date.now();
-        this.setState({ birthday });
-      }
-    });
+    this.commitPatch({ birthday });
   };
 
   onMenuItemSelected = async (item: MenuItemEnum) => {
