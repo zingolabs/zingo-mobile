@@ -51,6 +51,9 @@ import {
   BackgroundType,
   TranslateType,
   ServerType,
+  nativeUri,
+  offlineServer,
+  remoteServer,
   ServerUrisType,
   SetServerResult,
   AddressBookFileClass,
@@ -231,10 +234,10 @@ type LoadedAppProps = {
   route: StackScreenProps<AppStackParamList, RouteEnum.LoadedApp>['route'];
 };
 
-const SERVER_DEFAULT_0: ServerType = {
-  uri: serverUris(() => {})[0].uri,
-  chainName: serverUris(() => {})[0].chainName,
-} as ServerType;
+const SERVER_DEFAULT_0: ServerType = remoteServer(
+  serverUris(() => {})[0].uri,
+  serverUris(() => {})[0].chainName,
+);
 
 export default function LoadedApp(props: LoadedAppProps) {
   const theme = useTheme();
@@ -371,25 +374,26 @@ export default function LoadedApp(props: LoadedAppProps) {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.language, lang);
       }
       if (settings.server) {
-        // Offline (empty uri) has no chain. Normalize any residual chainName to
-        // the empty sentinel so a stale value never reaches the wallet open (the
-        // real chain is derived from the wallet). Persist it only when we
-        // actually cleared a residual, so we don't rewrite on every boot.
-        const normalizedServer: ServerType = settings.server.uri
-          ? settings.server
-          : { uri: '', chainName: ChainNameEnum.noneChainName };
+        // Offline has no chain. Normalize any residual chainName to the empty
+        // sentinel so a stale value never reaches the wallet open (the real
+        // chain is derived from the wallet). Persist it only when we actually
+        // cleared a residual, so we don't rewrite on every boot.
+        const residual =
+          settings.server.kind === 'offline' &&
+          settings.server.chainName !== ChainNameEnum.noneChainName;
+        const normalizedServer = residual
+          ? offlineServer(ChainNameEnum.noneChainName)
+          : settings.server;
         setServer(normalizedServer);
-        if (
-          !settings.server.uri &&
-          settings.server.chainName !== ChainNameEnum.noneChainName
-        ) {
-          await SettingsFileImpl.writeSettings(
-            SettingsNameEnum.server,
+        setSelectServer(settings.selectServer);
+        if (residual) {
+          await SettingsFileImpl.writeServer(
             normalizedServer,
+            settings.selectServer,
           );
         }
       } else {
-        await SettingsFileImpl.writeSettings(SettingsNameEnum.server, server);
+        await SettingsFileImpl.writeServer(server, selectServer);
       }
       if (settings.privacy === true || settings.privacy === false) {
         setPrivacy(settings.privacy);
@@ -402,19 +406,6 @@ export default function LoadedApp(props: LoadedAppProps) {
         await SettingsFileImpl.writeSettings(
           SettingsNameEnum.biometrics,
           biometrics,
-        );
-      }
-      if (
-        settings.selectServer === SelectServerEnum.auto ||
-        settings.selectServer === SelectServerEnum.custom ||
-        settings.selectServer === SelectServerEnum.list ||
-        settings.selectServer === SelectServerEnum.offline
-      ) {
-        setSelectServer(settings.selectServer);
-      } else {
-        await SettingsFileImpl.writeSettings(
-          SettingsNameEnum.selectServer,
-          selectServer,
         );
       }
       if (
@@ -748,8 +739,7 @@ export class LoadedAppClass extends Component<
       reenableMixnet: this.reenableMixnet,
 
       // state
-      newServer: {} as ServerType,
-      newSelectServer: null,
+      pendingServer: { kind: 'none' },
       scrollToTop: false,
       scrollToBottom: false,
     };
@@ -779,7 +769,10 @@ export class LoadedAppClass extends Component<
     this.linking = {} as EmitterSubscription;
     this.unsubscribeNetInfo = {} as NetInfoSubscription;
     this.addTagModalRef = React.createRef();
-    this.controllerStore.set(syncMachineAtom, initialMachine(props.server.uri));
+    this.controllerStore.set(
+      syncMachineAtom,
+      initialMachine(nativeUri(props.server)),
+    );
     this.controllerStore.set(
       appStateStatusAtom,
       Platform.OS === GlobalConst.platformOSios
@@ -1421,7 +1414,7 @@ export class LoadedAppClass extends Component<
         newInfo.chainName = fallbackChain;
       }
       if (!newInfo.serverUri) {
-        newInfo.serverUri = this.state.server.uri;
+        newInfo.serverUri = nativeUri(this.state.server);
       }
       //const start = Date.now();
       this.commit(() => this.setState({ info: newInfo }));
@@ -1560,16 +1553,15 @@ export class LoadedAppClass extends Component<
     // navigate from here — navigation policy lives in the caller now.
     if (!sameServerChainName) {
       const oldSettings = await SettingsFileImpl.readSettings();
-      await changeServer(oldSettings.server.uri);
+      await changeServer(nativeUri(oldSettings.server));
       this.setState({
-        newServer: value as ServerType,
-        newSelectServer: selectServer,
+        pendingServer: { kind: 'pending', server: value, selectServer },
         server: oldSettings.server,
         selectServer: oldSettings.selectServer,
       });
       if (toast) {
         this.addLastSnackbar(
-          `${this.state.translate('loadedapp.readingwallet-error')} ${value.uri}`,
+          `${this.state.translate('loadedapp.readingwallet-error')} ${nativeUri(value)}`,
         );
       }
       return { kind: 'chain-changed' };
@@ -1577,7 +1569,7 @@ export class LoadedAppClass extends Component<
 
     // Same chain — try to open the wallet on the new server.
     const result = await loadExistingWallet(
-      value.uri,
+      nativeUri(value),
       value.chainName,
       this.state.performanceLevel,
       GlobalConst.minConfirmations.toString(),
@@ -1603,16 +1595,12 @@ export class LoadedAppClass extends Component<
 
     if (openError === null) {
       // Success path.
-      if (toast && selectServer !== SelectServerEnum.offline) {
+      if (toast && value.kind === 'remote') {
         this.addLastSnackbar(
           `${this.state.translate('loadedapp.readingwallet')} ${value.uri}`,
         );
       }
-      await SettingsFileImpl.writeSettings(SettingsNameEnum.server, value);
-      await SettingsFileImpl.writeSettings(
-        SettingsNameEnum.selectServer,
-        selectServer,
-      );
+      await SettingsFileImpl.writeServer(value, selectServer);
       this.setState({
         server: value,
         selectServer: selectServer,
@@ -1631,14 +1619,14 @@ export class LoadedAppClass extends Component<
     // Seed/Ufvk on any RPC blip was the root cause of the "Settings save
     // sometimes doesn't apply" reports.
     const oldSettings = await SettingsFileImpl.readSettings();
-    await changeServer(oldSettings.server.uri);
+    await changeServer(nativeUri(oldSettings.server));
     this.setState({
       server: oldSettings.server,
       selectServer: oldSettings.selectServer,
     });
     if (toast) {
       this.addLastSnackbar(
-        `${this.state.translate('loadedapp.readingwallet-error')} ${value.uri}`,
+        `${this.state.translate('loadedapp.readingwallet-error')} ${nativeUri(value)}`,
       );
     }
     return {
@@ -1655,14 +1643,11 @@ export class LoadedAppClass extends Component<
       if (!candidate.uri) {
         continue;
       }
-      const next: ServerType = {
-        uri: candidate.uri,
-        chainName: candidate.chainName,
-      };
+      const next = remoteServer(candidate.uri, candidate.chainName);
       // Cap each dial: a dead candidate's changeServer can otherwise block for
       // minutes (see checkServerURI), stalling the whole rotation.
       const changed = await Promise.race([
-        changeServer(next.uri).then(result => result.ok),
+        changeServer(candidate.uri).then(result => result.ok),
         new Promise<boolean>(resolve =>
           setTimeout(() => resolve(false), 15_000),
         ),
@@ -1670,11 +1655,11 @@ export class LoadedAppClass extends Component<
       if (!changed) {
         continue;
       }
-      await SettingsFileImpl.writeSettings(SettingsNameEnum.server, next);
+      await SettingsFileImpl.writeServer(next, this.state.selectServer);
       this.setState({ server: next });
       this.rpc.setServer(next);
       this.addLastSnackbar(
-        `${this.state.translate('loadedapp.selectingserverbest') as string} ${next.uri}`,
+        `${this.state.translate('loadedapp.selectingserverbest') as string} ${candidate.uri}`,
         SnackbarDurationEnum.long,
       );
       return true;
@@ -1688,9 +1673,11 @@ export class LoadedAppClass extends Component<
   // Custom and offline modes are exempt: custom users opted out of automatic
   // selection (Audit Issue S) and offline has no server at all.
   recoverServer = async (): Promise<void> => {
+    const current = this.state.server;
     if (
       this.recoveringServer ||
       !this.state.netInfo.isConnected ||
+      current.kind === 'offline' ||
       (this.state.selectServer !== SelectServerEnum.auto &&
         this.state.selectServer !== SelectServerEnum.list)
     ) {
@@ -1698,7 +1685,6 @@ export class LoadedAppClass extends Component<
     }
     this.recoveringServer = true;
     try {
-      const current = this.state.server;
       const live = (await fetchServerList(current.chainName)).filter(
         (s: ServerUrisType) => s.uri !== current.uri,
       );
@@ -1746,11 +1732,9 @@ export class LoadedAppClass extends Component<
     this.setState({ biometrics: value });
   };
 
-  setSelectServerOption = async (value: string): Promise<void> => {
-    await SettingsFileImpl.writeSettings(SettingsNameEnum.selectServer, value);
-    this.setState({
-      selectServer: value as SelectServerEnum,
-    });
+  setSelectServerOption = async (value: SelectServerEnum): Promise<void> => {
+    await SettingsFileImpl.writeServer(this.state.server, value);
+    this.setState({ selectServer: value });
   };
 
   setPerformanceLevelOption = async (
@@ -1855,11 +1839,12 @@ export class LoadedAppClass extends Component<
   };
 
   onClickOKServerWallet = async () => {
-    if (this.state.newServer && this.state.newSelectServer) {
+    const { pendingServer } = this.state;
+    if (pendingServer.kind === 'pending') {
       // No `await` here so Promise.race can actually enforce the 15s cap.
       // With `await` the RPC call resolves before the race starts and the
       // timer becomes a no-op (a failing server then blocks ~minutes).
-      const resultServerPromise = changeServer(this.state.newServer.uri);
+      const resultServerPromise = changeServer(nativeUri(pendingServer.server));
       const timeoutServerPromise = new Promise<never>((_, reject) => {
         setTimeout(() => {
           reject(new Error('Promise changeserver Timeout 15 seconds'));
@@ -1878,23 +1863,18 @@ export class LoadedAppClass extends Component<
         return;
       }
 
-      await SettingsFileImpl.writeSettings(
-        SettingsNameEnum.server,
-        this.state.newServer,
-      );
-      await SettingsFileImpl.writeSettings(
-        SettingsNameEnum.selectServer,
-        this.state.newSelectServer,
+      await SettingsFileImpl.writeServer(
+        pendingServer.server,
+        pendingServer.selectServer,
       );
       this.setState({
-        server: this.state.newServer,
-        selectServer: this.state.newSelectServer,
-        newServer: {} as ServerType,
-        newSelectServer: null,
+        server: pendingServer.server,
+        selectServer: pendingServer.selectServer,
+        pendingServer: { kind: 'none' },
       });
       // Propagate to WalletBackend's shared config so sub-services pick up
       // the new URI without needing the instance to be recreated.
-      this.rpc.setServer(this.state.newServer);
+      this.rpc.setServer(pendingServer.server);
 
       await this.rpc.fetchInfoAndServerHeight();
 
@@ -2012,7 +1992,7 @@ export class LoadedAppClass extends Component<
   private publishWalletView = () => {
     const source: WalletViewSource = {
       readOnly: this.state.readOnly,
-      selectServer: this.state.selectServer,
+      server: this.state.server,
     };
     this.controllerStore.set(walletViewSourceAtom, source);
   };

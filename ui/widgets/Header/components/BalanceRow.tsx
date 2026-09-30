@@ -17,14 +17,14 @@ import { useTheme } from '@app/theme';
 import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
-  ChainNameEnum,
   RouteEnum,
-  SelectServerEnum,
+  ServerType,
   SnackbarDurationEnum,
   TranslateType,
 } from '@app/AppState';
 import TotalBalanceClass from '@app/AppState/classes/TotalBalanceClass';
 import InfoType from '@app/AppState/types/InfoType';
+import { fiatQuote } from '@app/price/fiatQuote';
 import ZecPriceType from '@app/AppState/types/ZecPriceType';
 import Utils from '@app/utils';
 import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
@@ -63,7 +63,7 @@ type BalanceRowProps = {
   totalBalance: TotalBalanceClass | null;
   info: InfoType;
   zecPrice: ZecPriceType;
-  selectServer: SelectServerEnum;
+  server: ServerType;
   showShieldButton: boolean;
   shieldingFee: number;
   valueTransfersTotal: number | null;
@@ -86,7 +86,7 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
     totalBalance,
     info,
     zecPrice,
-    selectServer,
+    server,
     showShieldButton,
     shieldingFee,
     valueTransfersTotal,
@@ -100,11 +100,8 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
     const navigation = useNavigation<NavigationProp<ParamListBase>>();
     const { colors } = useTheme();
     const reducedMotion = useReducedMotion();
-    const showFiat =
-      !noBalance &&
-      selectServer !== SelectServerEnum.offline &&
-      info.chainName === ChainNameEnum.mainChainName &&
-      zecPrice.date > 0;
+    const quote = fiatQuote(zecPrice, server, info.chainName);
+    const showFiat = !noBalance && quote.kind === 'quote';
 
     return (
       <>
@@ -219,8 +216,8 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
           >
             <CurrencyAmount
               style={{ marginTop: 0, marginBottom: 0 }}
-              priceDate={zecPrice.date}
-              price={zecPrice.zecPrice}
+              priceDate={quote.date}
+              price={quote.price}
               amtZec={
                 totalBalance
                   ? totalBalance.totalIronwoodBalance +

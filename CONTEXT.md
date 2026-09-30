@@ -378,11 +378,9 @@ repository's subdirectory of zingo-adrs (`zingo-mobile/` for zingo-mobile).
 _Avoid_: local ADR, project ADR
 
 **Record citation**:
-Each scope of zingo-adrs numbers its records in its own sequence.
-A bare `ADR-NNNN` cites a record in the citing repository's own scope; a
-citation into another scope carries the path (`zingolib/0054`, or the
-org-level `003`).
-_Avoid_: bare numbers across scopes, "zingolib ADR NNNN" in new text
+A reference to a zingo-adrs record, in the form its medium requires. The
+[zingo-adrs README](https://github.com/zingolabs/zingo-adrs#citing-a-record) defines each form.
+_Avoid_: bare numbers across scopes, checkout paths, "zingolib ADR NNNN" in new text
 
 **Record status**:
 The first line under a record's `## Status` heading, one of `proposed`,

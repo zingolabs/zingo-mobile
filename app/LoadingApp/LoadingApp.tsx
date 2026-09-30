@@ -57,6 +57,9 @@ import {
   TranslateType,
   NetInfoType,
   ServerType,
+  nativeUri,
+  offlineServer,
+  remoteServer,
   ServerUrisType,
   LanguageEnum,
   SelectServerEnum,
@@ -129,10 +132,10 @@ type LoadingAppProps = {
   route: StackScreenProps<AppStackParamList, RouteEnum.LoadingApp>['route'];
 };
 
-const SERVER_DEFAULT_0: ServerType = {
-  uri: serverUris(() => {})[0].uri,
-  chainName: serverUris(() => {})[0].chainName,
-} as ServerType;
+const SERVER_DEFAULT_0: ServerType = remoteServer(
+  serverUris(() => {})[0].uri,
+  serverUris(() => {})[0].chainName,
+);
 
 const activationHeight = {
   main: 419200,
@@ -237,19 +240,18 @@ export default function LoadingApp(props: LoadingAppProps) {
         // Only fall back to mainnet when a chain is genuinely absent (e.g. an
         // old config persisted before offline carried a chain), and persist
         // that migration once.
-        const normalizedServer: ServerType =
-          settings.server.uri || settings.server.chainName
-            ? settings.server
-            : { uri: '', chainName: ChainNameEnum.mainChainName };
+        const normalizedServer =
+          settings.server.kind === 'offline' && !settings.server.chainName
+            ? offlineServer(ChainNameEnum.mainChainName)
+            : settings.server;
         setServer(normalizedServer);
-        if (!settings.server.uri && !settings.server.chainName) {
-          await SettingsFileImpl.writeSettings(
-            SettingsNameEnum.server,
-            normalizedServer,
-          );
-        }
+        setSelectServer(settings.selectServer);
+        await SettingsFileImpl.writeServer(
+          normalizedServer,
+          settings.selectServer,
+        );
       } else {
-        await SettingsFileImpl.writeSettings(SettingsNameEnum.server, server);
+        await SettingsFileImpl.writeServer(server, selectServer);
       }
       if (settings.privacy === true || settings.privacy === false) {
         setPrivacy(settings.privacy);
@@ -262,19 +264,6 @@ export default function LoadingApp(props: LoadingAppProps) {
         await SettingsFileImpl.writeSettings(
           SettingsNameEnum.biometrics,
           biometrics,
-        );
-      }
-      if (
-        settings.selectServer === SelectServerEnum.auto ||
-        settings.selectServer === SelectServerEnum.custom ||
-        settings.selectServer === SelectServerEnum.list ||
-        settings.selectServer === SelectServerEnum.offline
-      ) {
-        setSelectServer(settings.selectServer);
-      } else {
-        await SettingsFileImpl.writeSettings(
-          SettingsNameEnum.selectServer,
-          selectServer,
         );
       }
       if (
@@ -302,20 +291,6 @@ export default function LoadingApp(props: LoadingAppProps) {
           SettingsNameEnum.blockExplorer,
           blockExplorer,
         );
-      }
-
-      // if server uri is empty, fix this.
-      // it is a weird edge case
-      if (settings.server && !settings.server.uri) {
-        if (
-          (settings.selectServer &&
-            settings.selectServer === SelectServerEnum.auto) ||
-          settings.selectServer === SelectServerEnum.custom ||
-          settings.selectServer === SelectServerEnum.list
-        ) {
-          setServer(server);
-          await SettingsFileImpl.writeSettings(SettingsNameEnum.server, server);
-        }
       }
 
       // reading background task info
@@ -674,9 +649,7 @@ export class LoadingAppClass extends Component<
     const found = serverUris(this.state.translate).find(
       (s: ServerUrisType) => s.chainName === chainName && s.default,
     );
-    return found
-      ? { uri: found.uri, chainName: found.chainName }
-      : SERVER_DEFAULT_0;
+    return found ? remoteServer(found.uri, found.chainName) : SERVER_DEFAULT_0;
   };
 
   // Boot-time server selection driven by the persisted mode:
@@ -688,23 +661,24 @@ export class LoadingAppClass extends Component<
   //  - custom / offline: respected, never touched here.
   selectServerOnBoot = async (isConnected: boolean): Promise<boolean> => {
     const mode = this.state.selectServer;
-    const chainName = this.state.server.chainName;
+    const current = this.state.server;
+    if (current.kind === 'offline') {
+      return true;
+    }
+    const chainName = current.chainName;
 
     if (mode === SelectServerEnum.auto) {
       if (!isConnected) {
         const s = this.defaultServerForChain(chainName);
         this.setState({ server: s });
-        await SettingsFileImpl.writeSettings(SettingsNameEnum.server, s);
+        await SettingsFileImpl.writeServer(s, mode);
         return false;
       }
       const list = await fetchServerList(chainName);
       if (list.length > 0) {
-        const best: ServerType = {
-          uri: list[0].uri,
-          chainName: list[0].chainName,
-        };
+        const best = remoteServer(list[0].uri, list[0].chainName);
         this.setState({ server: best });
-        await SettingsFileImpl.writeSettings(SettingsNameEnum.server, best);
+        await SettingsFileImpl.writeServer(best, mode);
         return true;
       }
       // Registry unreachable → current static latency probe, staying in auto.
@@ -723,23 +697,16 @@ export class LoadingAppClass extends Component<
         return true;
       }
       const stillListed = list.some(
-        (s: ServerUrisType) => s.uri === this.state.server.uri,
+        (s: ServerUrisType) => s.uri === current.uri,
       );
       if (stillListed) {
         return true;
       }
       // The chosen server dropped off the list → activate the best one and
       // promote the mode to auto (it is no longer a manual list choice).
-      const best: ServerType = {
-        uri: list[0].uri,
-        chainName: list[0].chainName,
-      };
+      const best = remoteServer(list[0].uri, list[0].chainName);
       this.setState({ server: best, selectServer: SelectServerEnum.auto });
-      await SettingsFileImpl.writeSettings(SettingsNameEnum.server, best);
-      await SettingsFileImpl.writeSettings(
-        SettingsNameEnum.selectServer,
-        SelectServerEnum.auto,
-      );
+      await SettingsFileImpl.writeServer(best, SelectServerEnum.auto);
       return true;
     }
 
@@ -757,6 +724,9 @@ export class LoadingAppClass extends Component<
     // avoiding obsolete ones
     let someServerIsWorking: boolean = true;
     const actualServer = this.state.server;
+    if (actualServer.kind === 'offline') {
+      return false;
+    }
     const server = await selectingServer(
       serverUris(this.state.translate).filter(
         (s: ServerUrisType) =>
@@ -768,11 +738,10 @@ export class LoadingAppClass extends Component<
           s.uri !== (aDifferentOne ? actualServer.uri : ''),
       ),
     );
-    let fasterServer: ServerType = {} as ServerType;
+    let fasterServer = actualServer;
     if (server && server.latency) {
-      fasterServer = { uri: server.uri, chainName: server.chainName };
+      fasterServer = remoteServer(server.uri, server.chainName);
     } else {
-      fasterServer = actualServer;
       // likely here there is a internet/wifi conection problem
       // all of the servers return an error because they are unreachable probably.
       // the 15 seconds timout was fired.
@@ -783,11 +752,7 @@ export class LoadingAppClass extends Component<
       server: fasterServer,
       selectServer: targetMode,
     });
-    await SettingsFileImpl.writeSettings(SettingsNameEnum.server, fasterServer);
-    await SettingsFileImpl.writeSettings(
-      SettingsNameEnum.selectServer,
-      targetMode,
-    );
+    await SettingsFileImpl.writeServer(fasterServer, targetMode);
     // message with the result (never at boot)
     if (!silent && someServerIsWorking) {
       if (isEqual(actualServer, fasterServer)) {
@@ -813,21 +778,24 @@ export class LoadingAppClass extends Component<
   // latency (also excluding the failed server). The current mode is preserved.
   selectRecoveryServer = async (): Promise<boolean> => {
     const actualServer = this.state.server;
+    if (actualServer.kind === 'offline') {
+      return false;
+    }
     const live = await fetchServerList(actualServer.chainName);
     const liveCandidates = live.filter(
       (s: ServerUrisType) => s.uri !== actualServer.uri,
     );
     if (liveCandidates.length > 0) {
-      const best: ServerType = {
-        uri: liveCandidates[0].uri,
-        chainName: liveCandidates[0].chainName,
-      };
+      const best = remoteServer(
+        liveCandidates[0].uri,
+        liveCandidates[0].chainName,
+      );
       this.setState({ server: best });
-      await SettingsFileImpl.writeSettings(SettingsNameEnum.server, best);
+      await SettingsFileImpl.writeServer(best, this.state.selectServer);
       this.addLastSnackbar(
         (this.state.translate('loadedapp.selectingserverbest') as string) +
           ' ' +
-          best.uri,
+          liveCandidates[0].uri,
         SnackbarDurationEnum.long,
       );
       return true;
@@ -840,6 +808,9 @@ export class LoadingAppClass extends Component<
   checkServer: (s: ServerType) => Promise<boolean> = async (
     server: ServerType,
   ) => {
+    if (server.kind === 'offline') {
+      return false;
+    }
     const s = {
       uri: server.uri,
       chainName: server.chainName,
@@ -861,7 +832,7 @@ export class LoadingAppClass extends Component<
     generation: number = this.bootGeneration,
   ) => {
     const result = await loadExistingWallet(
-      this.state.server.uri,
+      nativeUri(this.state.server),
       this.state.server.chainName,
       this.state.performanceLevel,
       GlobalConst.minConfirmations.toString(),
@@ -1190,7 +1161,7 @@ export class LoadingAppClass extends Component<
     if (
       start &&
       this.state.netInfo.isConnected &&
-      this.state.selectServer !== SelectServerEnum.offline
+      this.state.server.kind !== 'offline'
     ) {
       this.addLastSnackbar(
         this.state.translate('restarting') as string,
@@ -1201,7 +1172,7 @@ export class LoadingAppClass extends Component<
     // if Offline mode -> show the error.
     if (
       !this.state.netInfo.isConnected ||
-      this.state.selectServer === SelectServerEnum.offline
+      this.state.server.kind === 'offline'
     ) {
       createAlert(
         this.setBackgroundError,
@@ -1391,10 +1362,7 @@ export class LoadingAppClass extends Component<
           () => resolve(),
         ),
       );
-      await SettingsFileImpl.writeSettings(
-        SettingsNameEnum.selectServer,
-        SelectServerEnum.auto,
-      );
+      await SettingsFileImpl.writeServer(fallback, SelectServerEnum.auto);
       await this.selectServerOnBoot(!!this.state.netInfo.isConnected);
       this.customServerModalRef.current?.dismiss();
       this.setState({ actionButtonsDisabled: false });
@@ -1407,18 +1375,10 @@ export class LoadingAppClass extends Component<
       // empty field. The wallet-open path ignores this value (it tries every
       // chain and adopts the wallet's real one), so a mismatch self-corrects on
       // open.
-      const offlineChainName = this.state.customServerChainName;
-      await SettingsFileImpl.writeSettings(SettingsNameEnum.server, {
-        uri: '',
-        chainName: offlineChainName,
-      });
-      await SettingsFileImpl.writeSettings(
-        SettingsNameEnum.selectServer,
-        SelectServerEnum.offline,
-      );
+      const offline = offlineServer(this.state.customServerChainName);
+      await SettingsFileImpl.writeServer(offline, this.state.selectServer);
       this.setState({
-        selectServer: SelectServerEnum.offline,
-        server: { uri: '', chainName: offlineChainName },
+        server: offline,
         customServerUri: '',
         customServerChainName: this.state.server.chainName,
         customServerOffline: false,
@@ -1466,17 +1426,11 @@ export class LoadingAppClass extends Component<
         this.setState({ actionButtonsDisabled: false });
         return;
       }
-      await SettingsFileImpl.writeSettings(SettingsNameEnum.server, {
-        uri,
-        chainName,
-      });
-      await SettingsFileImpl.writeSettings(
-        SettingsNameEnum.selectServer,
-        SelectServerEnum.custom,
-      );
+      const custom = remoteServer(uri, chainName);
+      await SettingsFileImpl.writeServer(custom, SelectServerEnum.custom);
       this.setState({
         selectServer: SelectServerEnum.custom,
-        server: { uri, chainName },
+        server: custom,
         customServerUri: '',
         customServerChainName: this.state.server.chainName,
         customServerOffline: false,
@@ -1516,7 +1470,7 @@ export class LoadingAppClass extends Component<
   };
 
   createNewWallet = async (goSeedScreen: boolean = true): Promise<void> => {
-    const offline = this.state.selectServer === SelectServerEnum.offline;
+    const offline = this.state.server.kind === 'offline';
     // Block only when the device is genuinely offline AND not in explicit
     // Offline mode. Offline mode is a deliberate no-server flow: the wallet is
     // created locally and simply won't sync until a server is chosen.
@@ -1533,7 +1487,7 @@ export class LoadingAppClass extends Component<
     // cut, so a brand-new wallet starts its first sync from that recent floor
     // instead of scanning the whole chain from Sapling activation (zingolib
     // ADR 0007). A non-zero value here would act as an explicit override.
-    const serverUri = offline ? '' : this.state.server.uri;
+    const serverUri = nativeUri(this.state.server);
     const birthday = '0';
     const seed = await createNewWallet(
       serverUri,
@@ -1693,7 +1647,7 @@ export class LoadingAppClass extends Component<
       result = await restoreWalletFromSeed(
         seedUfvk.toLowerCase(),
         walletBirthday || '0',
-        this.state.server.uri,
+        nativeUri(this.state.server),
         this.state.server.chainName,
         this.state.performanceLevel,
         GlobalConst.minConfirmations.toString(),
@@ -1702,7 +1656,7 @@ export class LoadingAppClass extends Component<
       result = await restoreWalletFromUfvk(
         seedUfvk.toLowerCase(),
         walletBirthday || '0',
-        this.state.server.uri,
+        nativeUri(this.state.server),
         this.state.server.chainName,
         this.state.performanceLevel,
         GlobalConst.minConfirmations.toString(),
@@ -1818,15 +1772,16 @@ export class LoadingAppClass extends Component<
     // chip here) opens with none selected so the user picks explicitly. The
     // active server itself is shown on the StartMenu behind the modal.
     const s = this.state.selectServer;
+    const { server } = this.state;
+    const remote = server.kind === 'remote';
     this.setState(
       {
-        customServerOffline: s === SelectServerEnum.offline,
-        customServerAuto: s === SelectServerEnum.auto,
-        customServerCustom: s === SelectServerEnum.custom,
-        customServerChainName:
-          this.state.server.chainName || ChainNameEnum.mainChainName,
+        customServerOffline: !remote,
+        customServerAuto: remote && s === SelectServerEnum.auto,
+        customServerCustom: remote && s === SelectServerEnum.custom,
+        customServerChainName: server.chainName || ChainNameEnum.mainChainName,
         customServerUri:
-          s === SelectServerEnum.custom ? this.state.server.uri : '',
+          remote && s === SelectServerEnum.custom ? server.uri : '',
       },
       () => {
         this.customServerModalRef.current?.present();

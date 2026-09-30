@@ -6,7 +6,8 @@ import {
   ZecPriceType,
   BackgroundType,
   NetInfoType,
-  ServerType,
+  ChainNameEnum,
+  remoteServer,
   LanguageEnum,
   SelectServerEnum,
   BlockExplorerEnum,
@@ -15,7 +16,7 @@ import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformance
 
 export const defaultAppContextLoading: AppContextLoading = {
   netInfo: {} as NetInfoType,
-  server: {} as ServerType,
+  server: remoteServer('', ChainNameEnum.noneChainName),
   language: LanguageEnum.en,
   zecPrice: {
     zecPrice: 0,
