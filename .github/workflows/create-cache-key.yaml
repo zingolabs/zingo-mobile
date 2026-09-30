@@ -29,14 +29,21 @@ jobs:
       - name: Check out zingolib
         uses: ./.github/actions/zingolib-submodule
 
-      # This key decides whether the Binding Layer is rebuilt or restored, so
-      # it has to name every input that changes it. Every such input lives in
-      # the zingolib submodule, whose commit names them all: the crates, the
-      # builder, and the builder image. Under zingolib CI the submodule is the
-      # commit under test. The version prefix invalidates every entry when
-      # these workflows change how they build or where they put the output.
+      # The builders update to the newest stable toolchain before they build.
+      - name: Store the stable Rust version
+        run: |
+          rustup toolchain install stable --profile minimal
+          rustc +stable --version > rust-version.txt
+
+      # This key decides whether the Binding Layer is rebuilt or restored, and
+      # it names every input that changes the libraries. The zingolib commit
+      # names the crates, the builder, and the builder image. Under zingolib
+      # CI the submodule is the commit under test. The hash names the stable
+      # toolchain and the workflows that run the builder. The version prefix
+      # invalidates every entry when the output layout changes.
       - name: Create cache key
         id: create-cache-key
         env:
           KEY_VERSION: binding-layer-v1
-        run: echo "cache-key=${KEY_VERSION}-$(git -C zingolib rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          BUILD_INPUTS: ${{ hashFiles('rust-version.txt', '.github/workflows/android-build.yaml', '.github/workflows/ios-build.yaml') }}
+        run: echo "cache-key=${KEY_VERSION}-$(git -C zingolib rev-parse HEAD)-${BUILD_INPUTS}" >> "$GITHUB_OUTPUT"
