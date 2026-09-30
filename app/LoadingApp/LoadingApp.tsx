@@ -111,7 +111,7 @@ import {
 // no lazy load because slowing down screens.
 import ImportUfvk from '@screens/ImportUfvk';
 import OnboardingStage from '@ui/widgets/OnboardingStage';
-import Importing from '@screens/Importing';
+import WalletProgress from '@screens/WalletProgress';
 import { duration as motionDuration } from '@app/theme/motion';
 
 const IMPORTED_HOLD_MS = 700;
@@ -120,7 +120,6 @@ import { RPCWalletKindEnum } from '@app/walletBackend/enums/RPCWalletKindEnum';
 import StartMenu from '@screens/StartMenu';
 import { RPCUfvkType } from '@app/walletBackend/types/RPCUfvkType';
 import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
-import NewSeed from '@screens/NewSeed';
 import { AppStackParamList } from '@app/types';
 
 const en = require('@app/translations/en.json');
@@ -405,7 +404,8 @@ export class LoadingAppClass extends Component<
           ? props.route.params.screen
           : RouteEnum.Launching,
       actionButtonsDisabled: false,
-      importDone: false,
+      progressKind: 'import',
+      progressDone: false,
       walletExists: false,
       hasBackupWallet: false,
       customServerUri: '',
@@ -1455,7 +1455,7 @@ export class LoadingAppClass extends Component<
     });
   };
 
-  createNewWallet = async (goSeedScreen: boolean = true): Promise<void> => {
+  createNewWallet = async (): Promise<void> => {
     const offline = this.state.server.kind === 'offline';
     // Block only when the device is genuinely offline AND not in explicit
     // Offline mode. Offline mode is a deliberate no-server flow: the wallet is
@@ -1466,7 +1466,12 @@ export class LoadingAppClass extends Component<
       );
       return;
     }
-    this.setState({ actionButtonsDisabled: true });
+    this.setState({
+      actionButtonsDisabled: true,
+      screen: RouteEnum.WalletProgress,
+      progressKind: 'create',
+      progressDone: false,
+    });
     // Pass "0" in both modes. Online, the Indexer supplies the chain tip.
     // Offline (Indexerless), the FFI falls back to zingolib's Library Birthday
     // — a per-chain height already mined when the linked zingolib release was
@@ -1488,7 +1493,10 @@ export class LoadingAppClass extends Component<
       try {
         seedJSON = await JSON.parse(seed.value);
         if (seedJSON.error) {
-          this.setState({ actionButtonsDisabled: false });
+          this.setState({
+            actionButtonsDisabled: false,
+            screen: RouteEnum.StartMenu,
+          });
           createAlert(
             this.setBackgroundError,
             this.addLastSnackbar,
@@ -1502,7 +1510,10 @@ export class LoadingAppClass extends Component<
           return;
         }
       } catch (e: unknown) {
-        this.setState({ actionButtonsDisabled: false });
+        this.setState({
+          actionButtonsDisabled: false,
+          screen: RouteEnum.StartMenu,
+        });
         createAlert(
           this.setBackgroundError,
           this.addLastSnackbar,
@@ -1521,12 +1532,22 @@ export class LoadingAppClass extends Component<
       };
       // storing the seed & birthday in KeyChain/KeyStore
       await createUpdateRecoveryWalletInfo(wallet);
-      this.setState(state => ({
+      this.setState({
         wallet,
-        screen: goSeedScreen ? RouteEnum.NewSeed : state.screen,
         actionButtonsDisabled: false,
         walletExists: true,
-      }));
+        progressDone: true,
+      });
+      await new Promise(resolve => setTimeout(resolve, IMPORTED_HOLD_MS));
+      this.navigateToLoadedApp(
+        this.state.readOnly,
+        this.state.orchardPool,
+        this.state.saplingPool,
+        this.state.transparentPool,
+        true,
+        this.state.firstLaunchingMessage,
+        this.state.server.chainName,
+      );
     } else {
       this.walletErrorHandle(
         seed.ok ? seed.value : seed.error.message,
@@ -1617,9 +1638,13 @@ export class LoadingAppClass extends Component<
       return;
     }
 
-    this.setState({ actionButtonsDisabled: true, importDone: false });
+    this.setState({
+      actionButtonsDisabled: true,
+      progressKind: 'import',
+      progressDone: false,
+    });
     const showImporting = setTimeout(
-      () => this.setState({ screen: RouteEnum.Importing }),
+      () => this.setState({ screen: RouteEnum.WalletProgress }),
       motionDuration.emphasized,
     );
     let type: RestoreFromTypeEnum = RestoreFromTypeEnum.seedRestoreFrom;
@@ -1714,7 +1739,10 @@ export class LoadingAppClass extends Component<
             this.addLastSnackbar(walletKindStr);
           }
           clearTimeout(showImporting);
-          this.setState({ screen: RouteEnum.Importing, importDone: true });
+          this.setState({
+            screen: RouteEnum.WalletProgress,
+            progressDone: true,
+          });
           await new Promise(resolve => setTimeout(resolve, IMPORTED_HOLD_MS));
           this.navigateToLoadedApp(
             readOnly,
@@ -1981,7 +2009,6 @@ export class LoadingAppClass extends Component<
   render() {
     const {
       screen,
-      wallet,
       actionButtonsDisabled,
       walletExists,
       hasBackupWallet,
@@ -1993,10 +2020,6 @@ export class LoadingAppClass extends Component<
       biometricGate,
       translate,
       hasRecoveryWalletInfoSaved,
-      readOnly,
-      orchardPool,
-      saplingPool,
-      transparentPool,
     } = this.state;
 
     const context = {
@@ -2057,25 +2080,11 @@ export class LoadingAppClass extends Component<
                       restoreLastBackup={this.restoreLastBackup}
                     />
                   )}
-                  {screen === RouteEnum.NewSeed && wallet && (
-                    <NewSeed
-                      wallet={this.state.wallet}
-                      onClickOK={() =>
-                        this.navigateToLoadedApp(
-                          readOnly,
-                          orchardPool,
-                          saplingPool,
-                          transparentPool,
-                          true,
-                          firstLaunchingMessage,
-                          // advanced create is online → server chain = wallet chain.
-                          this.state.server.chainName,
-                        )
-                      }
+                  {screen === RouteEnum.WalletProgress && (
+                    <WalletProgress
+                      kind={this.state.progressKind}
+                      done={this.state.progressDone}
                     />
-                  )}
-                  {screen === RouteEnum.Importing && (
-                    <Importing done={this.state.importDone} />
                   )}
                   {screen === RouteEnum.ImportUfvk && (
                     <ImportUfvk

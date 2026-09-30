@@ -111,6 +111,9 @@
   "loadingapp": {
     "welcome": "Добро пожаловать",
     "tagline": "Приватный кошелёк для ваших Zcash.",
+    "creating-title": "Создание кошелька",
+    "creating-body": "Генерация ключей…",
+    "created-title": "Кошелёк создан",
     "actualserver": "Текущий сервер:",
     "createnewwallet": "Создать новый кошелёк",
     "opencurrentwallet": "Открыть текущий кошелёк",

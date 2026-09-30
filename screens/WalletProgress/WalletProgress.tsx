@@ -5,13 +5,19 @@ import { View } from 'react-native';
 import { ContextAppLoading } from '@app/context';
 import ProgressState from '@ui/widgets/ProgressState';
 
-type ImportingProps = {
+export type WalletProgressKind = 'import' | 'create';
+
+type WalletProgressProps = {
+  kind: WalletProgressKind;
   done: boolean;
 };
 
 const CENTER_TOP = 300 / 874;
 
-const Importing: React.FunctionComponent<ImportingProps> = ({ done }) => {
+const WalletProgress: React.FunctionComponent<WalletProgressProps> = ({
+  kind,
+  done,
+}) => {
   const { translate } = useContext(ContextAppLoading);
 
   return (
@@ -29,12 +35,22 @@ const Importing: React.FunctionComponent<ImportingProps> = ({ done }) => {
           state={done ? 'done' : 'working'}
           title={
             translate(
-              done ? 'import.imported-title' : 'import.importing-title',
+              kind === 'import'
+                ? done
+                  ? 'import.imported-title'
+                  : 'import.importing-title'
+                : done
+                  ? 'loadingapp.created-title'
+                  : 'loadingapp.creating-title',
             ) as string
           }
           body={
             translate(
-              done ? 'import.imported-body' : 'import.importing-body',
+              done
+                ? 'import.imported-body'
+                : kind === 'import'
+                  ? 'import.importing-body'
+                  : 'loadingapp.creating-body',
             ) as string
           }
         />
@@ -43,4 +59,4 @@ const Importing: React.FunctionComponent<ImportingProps> = ({ done }) => {
   );
 };
 
-export default Importing;
+export default WalletProgress;

@@ -111,6 +111,9 @@
   "loadingapp": {
     "welcome": "Bem-vindo",
     "tagline": "Uma carteira privada para o seu Zcash.",
+    "creating-title": "Criando sua carteira",
+    "creating-body": "Gerando suas chaves…",
+    "created-title": "Carteira criada",
     "actualserver": "Servidor atual:",
     "createnewwallet": "Criar uma nova carteira",
     "opencurrentwallet": "Abrir Carteira Atual",

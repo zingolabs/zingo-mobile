@@ -15,7 +15,8 @@ export default interface AppStateLoading {
   appStateStatus: AppStateStatus;
   screen: RouteEnum;
   actionButtonsDisabled: boolean;
-  importDone: boolean;
+  progressKind: 'import' | 'create';
+  progressDone: boolean;
   walletExists: boolean;
   hasBackupWallet: boolean;
   customServerUri: string;

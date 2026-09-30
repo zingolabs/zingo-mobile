@@ -111,6 +111,9 @@
   "loadingapp": {
     "welcome": "Bienvenido",
     "tagline": "Un monedero privado para tu Zcash.",
+    "creating-title": "Creando tu monedero",
+    "creating-body": "Generando tus claves…",
+    "created-title": "Monedero creado",
     "actualserver": "Servidor Activo:",
     "createnewwallet": "Crear Nuevo Monedero",
     "opencurrentwallet": "Abrir Monedero Activo",

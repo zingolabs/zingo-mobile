@@ -31,7 +31,7 @@ const BRANCH_BEND_DEG = 1.7;
 const TREMBLE_DEG = 1.2;
 const WIND_DELAY_S_PER_PT = 0.004;
 const CLOCK_HORIZON_S = 100000;
-const PART_SHIFT_PT = 70;
+const PART_SHIFT_PT = 120;
 const PART_TURN_DEG = 12;
 
 const gust = (u: number): number => {
@@ -172,7 +172,7 @@ const BranchView: React.FC<BranchViewProps> = ({
     const bend = side * BRANCH_BEND_DEG * gust(clock.value);
     const away = corner === 'topLeft' ? -1 : 1;
     return {
-      opacity: 1 - 0.6 * part.value,
+      opacity: 1 - part.value,
       transform: [
         { translateX: away * PART_SHIFT_PT * part.value },
         { translateY: away * PART_SHIFT_PT * part.value },

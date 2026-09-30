@@ -55,7 +55,7 @@ const OnboardingStage: React.FunctionComponent<OnboardingStageProps> = ({
   const { colors } = useTheme();
   const [size, setSize] = useState({ w: 0, h: 0 });
   const welcome = screen === RouteEnum.StartMenu;
-  const importing = screen === RouteEnum.Importing;
+  const importing = screen === RouteEnum.WalletProgress;
 
   return (
     <View

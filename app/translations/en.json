@@ -111,6 +111,9 @@
   "loadingapp": {
     "welcome": "Welcome",
     "tagline": "A private wallet for your Zcash.",
+    "creating-title": "Creating your wallet",
+    "creating-body": "Generating your keys…",
+    "created-title": "Wallet created",
     "actualserver": "Actual server:",
     "createnewwallet": "Create New Wallet",
     "opencurrentwallet": "Open Current Wallet",
