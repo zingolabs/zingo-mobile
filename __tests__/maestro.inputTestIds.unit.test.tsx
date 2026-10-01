@@ -113,7 +113,11 @@ describe('Maestro reaches each typed field on iOS', () => {
         />
       </ContextAppLoadedProvider>,
     );
-    for (const id of ['send.addressplaceholder', 'send.memo-field']) {
+    for (const id of [
+      'send.addressplaceholder',
+      'send.address.clear',
+      'send.memo-field',
+    ]) {
       expect(accessibleAncestor(send.getByTestId(id))).toBeUndefined();
     }
   });
