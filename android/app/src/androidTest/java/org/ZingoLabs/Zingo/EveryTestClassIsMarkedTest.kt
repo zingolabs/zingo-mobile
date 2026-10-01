@@ -13,6 +13,7 @@ private val TEST_KIND_MARKERS = listOf(
     OfflineDeviceTest::class.java,
     StaticChainTest::class.java,
     LiveChainTest::class.java,
+    PublicChainTest::class.java,
 )
 
 @OfflineDeviceTest

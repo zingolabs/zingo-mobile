@@ -62,6 +62,11 @@ object Seeds {
     const val HOSPITAL = "hospital museum valve antique skate museum unfold vocal weird milk scale social vessel identify crowd hospital control album rib bulb path oven civil tank"
 }
 
+object MainnetServers {
+    const val PRIMARY = "https://zec.rocks:443"
+    const val FALLBACK = "https://zcash.mysideoftheweb.com:9067"
+}
+
 object Ufvk {
     const val HOSPITAL = "uviewregtest1zd5hsn447739jr5pk879pn06wan8gewam949xjqvwgfc7zec29x2ezqyeq6vmtwkcmn0kkfl447caqsccg582dp50ax972dfm4eh5f4mqj730fgr7hygvjeqxlgpwynrmcu57fjjqlns95chfjfq4xg7v977x603un9fuw73zvn2t32pfcfewrh67tzv04wstjg0yx4r3lpmpaea9nsyll6juu9jtyc0fstdwde06l4tvzlerytyutfd3yptq5r5csfck9c5ks8rzaj5r9tgltarejfdxu8h79sxmc6knxtnglp0pa7y3kw708rueg984ty6lhyrlzmk2swyqqfe0q2nmzhcxme9rsvprcw50ms463twx4suldhm0p94lem8ryan4e4y8fpp8grr5kmlygm70h2zhl0d7mfra5qs78jq9wqctvk8fhdu9cv78q00v7qzl9w50j242xr0945pmsu2vrh6jcvq8fxad420m8kxpd3cgyd6wxy6"
 }
@@ -277,29 +282,44 @@ class BuildDescriptorTest {
     }
 }
 
-@StaticChainTest
+@PublicChainTest
 class ExecuteSyncFromSeed {
     @Test
     fun executeSyncFromSeed() {
         val mapper = testMapper()
 
-        val serveruri = "http://10.0.2.2:20000"
-        val chainhint = regtestChainHint()
+        val window = 10_000L
+        val deadlineSeconds = 5 * 60
         val seed = Seeds.HOSPITAL
+        val servers = listOf(MainnetServers.PRIMARY, MainnetServers.FALLBACK)
+        val start = System.nanoTime()
+        val elapsedSeconds = { (System.nanoTime() - start) / 1e9 }
 
-        val initFromSeedJson: String = uniffi.zingo.initFromSeed(seed, 1u, serveruri, chainhint, "Medium", 1u)
+        val refusals = mutableMapOf<String, Exception>()
+        val (serveruri, tip) = servers.firstNotNullOfOrNull { uri ->
+            try {
+                uri to uniffi.zingo.getLatestBlockServer(uri).toLong()
+            } catch (e: Exception) {
+                refusals[uri] = e
+                null
+            }
+        } ?: throw AssertionError("no mainnet server answered: $refusals", refusals.values.last())
+        println("\nTip of $serveruri: $tip")
+
+        val birthday = tip - window
+        val initFromSeedJson: String = uniffi.zingo.initFromSeed(seed, birthday.toUInt(), serveruri, "main", "Medium", 1u)
         println("\nInit from seed:")
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
 
         assertThat(initFromSeed.seed_phrase).isEqualTo(seed)
-        assertThat(initFromSeed.birthday).isEqualTo(1)
+        assertThat(initFromSeed.birthday).isEqualTo(birthday)
 
         val infoJson: String = uniffi.zingo.infoServer()
         println("\nInfo:")
         println(infoJson)
         val info: Info = mapper.readValue(infoJson)
-        assertThat(info.latest_block_height).isGreaterThan(0)
+        assertThat(info.latest_block_height).isAtLeast(tip)
 
         var heightJson: String = uniffi.zingo.getLatestBlockWallet()
         println("\nHeight pre-sync:")
@@ -311,33 +331,26 @@ class ExecuteSyncFromSeed {
         println("\nSync:")
         println(syncJson)
 
-        var syncStatus: SyncStatus
-        while (true) {
-            val syncStatusJson: String = uniffi.zingo.statusSync()
-            println("\nSync status:")
-            println(syncStatusJson)
-            if (syncStatusJson.lowercase().startsWith("error")) {
-                println("Sync Error!:")
-                break
+        val syncStart = System.nanoTime()
+        try {
+            while (!uniffi.zingo.pollSync().contains("sync_complete")) {
+                if (elapsedSeconds() > deadlineSeconds) {
+                    val status = runCatching { uniffi.zingo.statusSync() }
+                        .getOrElse { "status unavailable: ${it.message}" }
+                    throw AssertionError("the test passed its $deadlineSeconds s deadline while syncing $window mainnet blocks: $status")
+                }
+                Thread.sleep(1000)
             }
-            syncStatus = mapper.readValue(syncStatusJson)
-
-            val progress = syncStatus.percentage_total_outputs_scanned
-               ?: syncStatus.percentage_total_blocks_scanned
-
-            if (progress != null && progress >= 100.0) {
-                println("Sync completed!")
-                break
-            }
-
-            Thread.sleep(1000)
+        } catch (e: uniffi.zingo.ZingolibException) {
+            throw AssertionError("the sync of $window mainnet blocks failed after ${elapsedSeconds()} s: ${e.message}", e)
         }
+        println("\nSynced $window mainnet blocks in ${(System.nanoTime() - syncStart) / 1e9} s")
 
         heightJson = uniffi.zingo.getLatestBlockWallet()
         println("\nHeight post-sync:")
         println(heightJson)
         val heightPostSync: Height = mapper.readValue(heightJson)
-        assertThat(heightPostSync.height).isEqualTo(info.latest_block_height)
+        assertThat(heightPostSync.height).isAtLeast(info.latest_block_height)
     }
 }
 
