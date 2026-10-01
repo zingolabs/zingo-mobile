@@ -38,11 +38,30 @@ const CUSTOM_SERVER = 'https://na.zec.rocks:443';
 const LIST_SERVER = 'https://zec.rocks:443';
 
 /**
- * Whether a selector names exactly the given server, once the regex escapes
- * and the optional trailing slash are removed.
+ * Whether a selector names exactly the given server, once the regex escapes,
+ * the leading wildcard and the optional trailing slash are removed.
  */
 function names(selector: unknown, server: string): boolean {
-  return String(selector).replace(/\\/g, '').replace(/\/\?$/, '') === server;
+  return (
+    String(selector)
+      .replace(/\\/g, '')
+      .replace(/^\.\*/, '')
+      .replace(/\/\?$/, '') === server
+  );
+}
+
+/**
+ * The read-back assertions that follow the save, which name the given
+ * server.
+ */
+function readBacks(flow: Step[], server: string): string[] {
+  const save = flow.findIndex(
+    step => (step.tapOn as Step)?.id === 'settings.button.save',
+  );
+  return flow
+    .slice(save)
+    .map(step => String((step.assertVisible as Step)?.text))
+    .filter(text => names(text, server));
 }
 
 function androidScriptLines(): string[] {
@@ -173,6 +192,21 @@ describe('the Maestro flows', () => {
     const tap = flow.findIndex(step => inList(step.tapOn as Step));
     expect(scroll).toBeGreaterThanOrEqual(0);
     expect(tap).toBeGreaterThan(scroll);
+  });
+
+  /**
+   * Tests that each read-back allows text before the address. On iOS the
+   * server row is one element, and its text joins the mode and the server.
+   */
+  test('06 and 07 read the row back with text allowed before the address', () => {
+    for (const [file, server] of [
+      ['06_custom_server.yaml', CUSTOM_SERVER],
+      ['07_server_from_list.yaml', LIST_SERVER],
+    ]) {
+      const texts = readBacks(steps(file), server);
+      expect([file, texts.length]).toEqual([file, 1]);
+      expect([file, texts[0].startsWith('.*https://')]).toEqual([file, true]);
+    }
   });
 
   /**

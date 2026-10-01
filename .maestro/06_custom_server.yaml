@@ -74,7 +74,9 @@ appId: org.ZingoLabs.Zingo
       id: "header.checkicon"
     timeout: 300000
 
-# The server row shows the saved server after the wallet reconnected.
+# The server row shows the saved server after the wallet reconnected. On
+# iOS the row is one element whose text joins the mode and the server, so
+# the selector allows text before the address.
 - tapOn:
     id: "header.drawmenu"
 - tapOn:
@@ -87,4 +89,4 @@ appId: org.ZingoLabs.Zingo
     element:
       id: "settings.server"
 - assertVisible:
-    text: "https://na\\.zec\\.rocks:443/?"
+    text: ".*https://na\\.zec\\.rocks:443/?"
