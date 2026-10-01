@@ -879,7 +879,6 @@ exports[`Component History - test History privacy high - snapshot 1`] = `
                       "marginTop": 20,
                     }
                   }
-                  testID="history.end"
                 >
                   <Text
                     style={
@@ -1926,7 +1925,6 @@ exports[`Component History - test History privacy normal - snapshot 1`] = `
                       "marginTop": 20,
                     }
                   }
-                  testID="history.end"
                 >
                   <Text
                     style={

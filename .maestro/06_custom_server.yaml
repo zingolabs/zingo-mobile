@@ -68,15 +68,17 @@ appId: org.ZingoLabs.Zingo
 
 # Save reaches the server, reloads the wallet against it, and returns to
 # History. A same-chain change shows no confirmation screen. The check
-# icon renders only on History, and only once the wallet is synced.
+# icon renders only on History, and only while no sync is in progress.
 - extendedWaitUntil:
     visible:
       id: "header.checkicon"
     timeout: 300000
 
-# The server row shows the saved server after the wallet reconnected. On
-# iOS the row is one element whose text joins the mode and the server, so
-# the selector allows text before the address.
+# The server row shows the saved mode and the saved server after the
+# wallet reconnected. The mode matters when the automatic choice was
+# already this server, because the address alone would then read the same
+# before the save. On Android the mode and the address are two texts
+# inside the row. On iOS the row is one element whose text joins them.
 - tapOn:
     id: "header.drawmenu"
 - tapOn:
@@ -88,5 +90,22 @@ appId: org.ZingoLabs.Zingo
 - scrollUntilVisible:
     element:
       id: "settings.server"
-- assertVisible:
-    text: ".*https://na\\.zec\\.rocks:443/?"
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - assertVisible:
+          text: "Custom"
+          childOf:
+            id: "settings.server"
+      - assertVisible:
+          text: "https://na\\.zec\\.rocks:443/?"
+          childOf:
+            id: "settings.server"
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - assertVisible:
+          id: "settings.server"
+          text: "Custom, https://na\\.zec\\.rocks:443/?"

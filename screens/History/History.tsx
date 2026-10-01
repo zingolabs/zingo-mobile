@@ -859,7 +859,6 @@ const History: React.FunctionComponent<HistoryProps> = ({
                       ) : !!valueTransfersSliced &&
                         !!valueTransfersSliced.length ? (
                         <View
-                          testID="history.end"
                           style={{
                             display: 'flex',
                             alignItems: 'center',
