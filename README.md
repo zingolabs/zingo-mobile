@@ -66,7 +66,7 @@ git submodule update --init zingolib
 
 ## Testing
 ### Prerequisites
-Integration tests and end-to-end tests require a regtest network. The test harness
+Integration tests require a regtest network. The test harness
 (`zingolib_testutils` scenarios, built on `zcash_local_net`) launches native `zebrad`
 (validator) and `zainod` (indexer) processes for each test. Put both binaries on `$PATH`,
 or in the directory named by the `TEST_BINARIES_DIR` environment variable. CI runs these
@@ -116,32 +116,6 @@ For more information on running integration tests on non-default AVDs, run: <br 
 Without the cargo test runner these emulated android devices will not be able to connect to a
 regtest network. Therefore, only tests in the "Offline Testsuite" may be tested.
 
-### End-to-End Tests (Rust nextest, Android)
-Drives the Android app from Rust against a regtest network. Lives in
-`rust/android/tests/e2e_tests.rs`. Currently Android-only.
-
-0. Install `zebrad` and `zainod` as described in [Prerequisites](#prerequisites).
-1. Launch the emulated AVD by clicking the 'play' icon in Android Studio's `Device Manager`.
-   Alternatively, connect to a physical device. See previous section 'Launching the app' for more
-   details.
-2. In a terminal, run: <br />
-   `yarn start`
-3. Create quick-boot snapshots to speed up AVD launch times. From the root directory, run: <br />
-   `./scripts/e2e_tests.sh -a x86_64 -s` <br />
-   `./scripts/e2e_tests.sh -a x86 -s` <br />
-   By default, this uses default API 29 system images. Other images may be used for testing
-   by specifying the api level and target. However, using other images with the cargo test runner
-   is still under development.
-4. In a separate terminal, from the `rust` directory, run all tests: <br />
-   `cargo nextest run e2e`
-   Specify to run specific ABI: <br />
-   `cargo nextest run e2e::x86_64` <br />
-   `cargo nextest run e2e::x86_32` <br />
-   `cargo nextest run e2e::arm64` <br />
-   `cargo nextest run e2e::arm32` <br />
-   Specify to run a specific ABI and test: <br />
-   `cargo nextest run e2e::x86_64::test_name`
-
 ### End-to-End Tests (Maestro UI flows)
 [Maestro](https://maestro.mobile.dev/) drives the released app from the
 outside, asserting on the rendered UI. Flows live in `.maestro/` as YAML
@@ -160,13 +134,14 @@ To run locally:
    selected by `adb` / `xcrun simctl`.
 
 3. From the repo root: <br />
-   `maestro test .maestro/`
+   `maestro test --exclude-tags=screen-awake .maestro/`
    Or run a single flow: <br />
    `maestro test .maestro/01_new_wallet.yaml`
 
-The legacy Detox suite under `e2e/*.test.js` is no longer wired to CI or
-to any `yarn` script. It is being phased out in favour of Maestro and
-should not be relied on; new e2e coverage should land as Maestro flows.
+The flows restore or create their wallets on mainnet, and need network
+access. The `screen-awake` flow runs alone in CI, after a step that
+shortens the device's screen-off timeout. New e2e coverage lands as
+Maestro flows.
 
 # Storybook & visual review
 Browse components in isolation with Storybook (on-device via
