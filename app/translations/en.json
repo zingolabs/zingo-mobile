@@ -114,6 +114,17 @@
     "creating-title": "Creating your wallet",
     "previous-install-title": "Wallet from a previous install",
     "previous-install-body": "Zingo found a recovery phrase saved on this device. Creating or importing another wallet replaces it.",
+    "net-testnet": "Testnet",
+    "net-regtest": "Regtest",
+    "connected-to": "Connected to {host}",
+    "no-internet": "No internet connection",
+    "back-online": "Back online",
+    "offline-line": "You can create or import a wallet now, it syncs when you're back online.",
+    "card-words": "24 words",
+    "card-key": "Viewing key",
+    "card-birthday": "Birthday · block {height}",
+    "import-this": "Import this wallet",
+    "view-seed": "View seed & birthday",
     "actualserver": "Actual server:",
     "createnewwallet": "Create New Wallet",
     "opencurrentwallet": "Open Current Wallet",
@@ -674,6 +685,12 @@
     "refetching": "Refetching spends...",
     "lowpriority": "Low priority",
     "highpriority": "High priority"
+  },
+  "seedsheet": {
+    "title": "Seed phrase",
+    "title-key": "Viewing key",
+    "birthday": "Wallet birthday",
+    "done": "Done"
   },
   "import": {
     "title": "Seed Phrase / Viewing Key",

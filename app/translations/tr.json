@@ -114,6 +114,17 @@
     "creating-title": "Cüzdanınız oluşturuluyor",
     "previous-install-title": "Önceki kurulumdan cüzdan",
     "previous-install-body": "Zingo bu cihazda kayıtlı bir kurtarma ifadesi buldu. Başka bir cüzdan oluşturmak veya içe aktarmak onu değiştirir.",
+    "net-testnet": "Testnet",
+    "net-regtest": "Regtest",
+    "connected-to": "{host} sunucusuna bağlı",
+    "no-internet": "İnternet bağlantısı yok",
+    "back-online": "Yeniden çevrimiçi",
+    "offline-line": "Şimdi bir cüzdan oluşturabilir veya içe aktarabilirsiniz; çevrimiçi olduğunuzda eşitlenir.",
+    "card-words": "24 kelime",
+    "card-key": "Görüntüleme anahtarı",
+    "card-birthday": "Doğum günü · blok {height}",
+    "import-this": "Bu cüzdanı içe aktar",
+    "view-seed": "Tohumu ve doğum gününü gör",
     "actualserver": "Mevcut sunucu:",
     "createnewwallet": "Yeni Cüzdan Oluştur",
     "opencurrentwallet": "Mevcut Cüzdanı Aç",
@@ -672,6 +683,12 @@
     "refetching": "Masraflar yeniden yükleniyor...",
     "lowpriority": "Düşük öncelikli",
     "highpriority": "Yüksek oncelikli"
+  },
+  "seedsheet": {
+    "title": "Tohum ifadesi",
+    "title-key": "Görüntüleme anahtarı",
+    "birthday": "Cüzdan doğum günü",
+    "done": "Bitti"
   },
   "import": {
     "title": "Tohum ifadesi / Görüntüleme anahtarı",

@@ -20,6 +20,7 @@ type BusyButtonProps = {
   onDisabledPress: () => void;
   testID?: string;
   labelSize?: number;
+  height?: number;
 };
 
 const HEIGHT = 42;
@@ -34,7 +35,9 @@ const BusyButton: React.FunctionComponent<BusyButtonProps> = ({
   onDisabledPress,
   testID,
   labelSize = 14.5,
+  height = HEIGHT,
 }) => {
+  const busySize = Math.min(BUSY_SIZE, height);
   const { colors } = useTheme();
   const naturalWidth = useSharedValue(0);
   const on = useSharedValue(enabled ? 1 : 0);
@@ -63,14 +66,14 @@ const BusyButton: React.FunctionComponent<BusyButtonProps> = ({
     );
     const width =
       naturalWidth.value > 0
-        ? naturalWidth.value + (BUSY_SIZE - naturalWidth.value) * collapse.value
+        ? naturalWidth.value + (busySize - naturalWidth.value) * collapse.value
         : undefined;
     return {
       backgroundColor: bg,
       borderColor: bg,
       width,
-      height: HEIGHT + (BUSY_SIZE - HEIGHT) * collapse.value,
-      borderRadius: HEIGHT / 2,
+      height: height + (busySize - height) * collapse.value,
+      borderRadius: height / 2,
       transform: [{ translateX: nudge.value }],
     };
   });
@@ -105,7 +108,7 @@ const BusyButton: React.FunctionComponent<BusyButtonProps> = ({
       style={[
         {
           borderWidth: 2,
-          minWidth: BUSY_SIZE,
+          minWidth: busySize,
           paddingHorizontal: busy ? 0 : 24,
           alignItems: 'center',
           justifyContent: 'center',

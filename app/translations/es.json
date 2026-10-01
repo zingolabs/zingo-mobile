@@ -114,6 +114,17 @@
     "creating-title": "Creando tu monedero",
     "previous-install-title": "Monedero de una instalación anterior",
     "previous-install-body": "Zingo ha encontrado una frase de recuperación guardada en este dispositivo. Crear o importar otro monedero la reemplaza.",
+    "net-testnet": "Testnet",
+    "net-regtest": "Regtest",
+    "connected-to": "Conectado a {host}",
+    "no-internet": "Sin conexión a internet",
+    "back-online": "Conexión recuperada",
+    "offline-line": "Puedes crear o importar un monedero ahora; se sincronizará cuando vuelvas a tener conexión.",
+    "card-words": "24 palabras",
+    "card-key": "Clave de visualización",
+    "card-birthday": "Cumpleaños · bloque {height}",
+    "import-this": "Importar este monedero",
+    "view-seed": "Ver semilla y cumpleaños",
     "actualserver": "Servidor Activo:",
     "createnewwallet": "Crear Nuevo Monedero",
     "opencurrentwallet": "Abrir Monedero Activo",
@@ -674,6 +685,12 @@
     "refetching": "Recargando gastos...",
     "lowpriority": "Baja prioridad",
     "highpriority": "Alta prioridad"
+  },
+  "seedsheet": {
+    "title": "Semilla",
+    "title-key": "Clave de visualización",
+    "birthday": "Cumpleaños del monedero",
+    "done": "Hecho"
   },
   "import": {
     "title": "Semilla / Clave de Visualización",

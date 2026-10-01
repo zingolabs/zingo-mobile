@@ -1,9 +1,10 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useMemo, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { View, Pressable } from 'react-native';
 import Animated, {
   FadeIn,
   FadeInUp,
+  FadeOut,
   ReduceMotion,
 } from 'react-native-reanimated';
 import { showConfirm } from '@app/services/showConfirm';
@@ -11,28 +12,26 @@ import { useTheme } from '@app/theme';
 
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
+  faCheck,
   faDatabase,
   faTriangleExclamation,
+  faWifi,
 } from '@fortawesome/free-solid-svg-icons';
 
-import { NetInfoStateType } from '@react-native-community/netinfo/src/index';
-
-import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import ActionMenuBottomSheet, {
-  ActionMenuBottomSheetAction,
-} from '@ui/widgets/ActionMenuBottomSheet';
-
 import { ContextAppLoading } from '@app/context';
+import { WalletType } from '@app/AppState';
 import { getZingoName, getZingoVersion } from '@app/utils/ZingoAppData';
 import RegText from '@ui/primitives/RegText';
 import BoldText from '@ui/primitives/BoldText';
 import BusyButton from '@ui/widgets/BusyButton';
-import { ease } from '@app/theme/motion';
+import { duration, ease } from '@app/theme/motion';
 
 // Vertical positions from the 402 x 874 design, as fractions of the height.
 const TITLE_TOP = 294 / 874;
+const CARD_TOP = 422 / 874;
 const BOTTOM_MARGIN = 60;
 const PILL_WIDTH = 270;
+const BACK_ONLINE_MS = 1600;
 
 const titleEnter = () =>
   FadeInUp.duration(400)
@@ -46,8 +45,6 @@ const brandEnter = () =>
     .easing(ease.out)
     .withInitialValues({ opacity: 0, transform: [{ scale: 1.03 }] })
     .reduceMotion(ReduceMotion.System);
-const noticeEnter = () =>
-  FadeIn.duration(300).delay(860).reduceMotion(ReduceMotion.System);
 const tagEnter = () =>
   FadeIn.duration(300).delay(780).reduceMotion(ReduceMotion.System);
 const actionsEnter = () =>
@@ -56,113 +53,68 @@ const actionsEnter = () =>
     .easing(ease.out)
     .withInitialValues({ opacity: 0, transform: [{ translateY: 8 }] })
     .reduceMotion(ReduceMotion.System);
+const pillEnter = () =>
+  FadeIn.duration(duration.emphasized).reduceMotion(ReduceMotion.System);
+const pillExit = () => FadeOut.duration(300).reduceMotion(ReduceMotion.System);
 
 type StartMenuProps = {
   actionButtonsDisabled: boolean;
-  hasRecoveryWalletInfoSaved: boolean;
-  recoverRecoveryWalletInfo: () => void;
+  recoveryWallet: WalletType | null;
+  importRecoveryWallet: () => void;
+  viewRecoveryWallet: () => void;
   customServer: () => void;
   walletExists: boolean;
-  hasBackupWallet: boolean;
   openCurrentWallet: () => void;
   createNewWallet: () => void;
   getwalletToRestore: () => void;
-  restoreLastBackup: () => void;
 };
 
 const StartMenu: React.FunctionComponent<StartMenuProps> = ({
   actionButtonsDisabled,
-  hasRecoveryWalletInfoSaved,
-  recoverRecoveryWalletInfo,
+  recoveryWallet,
+  importRecoveryWallet,
+  viewRecoveryWallet,
   customServer,
   walletExists,
-  hasBackupWallet,
   openCurrentWallet,
   createNewWallet,
   getwalletToRestore,
-  restoreLastBackup,
 }) => {
   const context = useContext(ContextAppLoading);
   const { netInfo, translate, server } = context;
   const { colors } = useTheme();
 
   const [containerH, setContainerH] = useState<number>(0);
-  const optionsMenuRef = useRef<BottomSheetModal>(null);
+  const [backOnline, setBackOnline] = useState<boolean>(false);
+  const wasOffline = useRef<boolean>(!netInfo.isConnected);
 
-  // Consolidates the three legacy ContextMenu kebabs into one action list
-  // gated by network + saved-state. Order: recoverkeys → custom server →
-  // restore backup.
-  const optionsActions = useMemo<ActionMenuBottomSheetAction[]>(() => {
-    if (actionButtonsDisabled) {
-      return [];
+  useEffect(() => {
+    if (netInfo.isConnected && wasOffline.current) {
+      setBackOnline(true);
+      const t = setTimeout(() => setBackOnline(false), BACK_ONLINE_MS);
+      wasOffline.current = false;
+      return () => clearTimeout(t);
     }
-    const list: ActionMenuBottomSheetAction[] = [];
-    if (hasRecoveryWalletInfoSaved) {
-      list.push({
-        label: translate('loadingapp.recoverkeys') as string,
-        onPress: recoverRecoveryWalletInfo,
-      });
+    if (!netInfo.isConnected) {
+      wasOffline.current = true;
+      setBackOnline(false);
     }
-    if (netInfo.isConnected) {
-      list.push({
-        label: translate('loadingapp.custom') as string,
-        onPress: () => customServer(),
-      });
-      if (hasBackupWallet) {
-        list.push({
-          label: translate('loadedapp.restorebackupwallet') as string,
-          onPress: () =>
-            showConfirm({
-              title: translate('loadedapp.restorebackupwallet') as string,
-              message: translate(
-                'loadedapp.alert-restorebackupwallet-body',
-              ) as string,
-              buttons: [
-                {
-                  text: translate('confirm') as string,
-                  onPress: () => restoreLastBackup(),
-                },
-                { text: translate('cancel') as string, style: 'cancel' },
-              ],
-            }),
-        });
-      }
-    }
-    return list;
-  }, [
-    actionButtonsDisabled,
-    hasRecoveryWalletInfoSaved,
-    netInfo.isConnected,
-    hasBackupWallet,
-    translate,
-    recoverRecoveryWalletInfo,
-    customServer,
-    restoreLastBackup,
-  ]);
+  }, [netInfo.isConnected]);
 
-  const canAct = netInfo.isConnected || server.kind === 'offline';
-  const chainLabel = translate(
-    `settings.value-chainname-${server.chainName}`,
-  ) as string;
-  const serverLine =
-    server.kind === 'remote'
-      ? `[${chainLabel}] ${server.uri}`
-      : server.kind === 'offline'
-        ? `[${chainLabel}] ${translate('settings.server-offline') as string}`
-        : '';
-  const warning = !netInfo.isConnected
-    ? (translate('report.nointernet') as string)
-    : netInfo.type === NetInfoStateType.cellular
-      ? (translate('report.cellulardata') as string)
-      : netInfo.isConnectionExpensive
-        ? (translate('report.connectionexpensive') as string)
-        : '';
-  const note = walletExists
-    ? (translate('loadingapp.noopenwallet-message') as string)
-    : !netInfo.isConnected
-      ? (translate('loadingapp.nointernet-message') as string)
-      : server.kind === 'offline'
-        ? (translate('loadingapp.offline-message') as string)
+  const offline = server.kind === 'offline';
+  const noInternet = !netInfo.isConnected;
+  const canAct = netInfo.isConnected || offline;
+  const nonMain = server.chainName !== 'main';
+  const dotColor = noInternet
+    ? colors.fgDangerEmphasis
+    : offline
+      ? colors.fgMuted
+      : colors.fgAccent;
+  const netLabel =
+    server.chainName === 'test'
+      ? (translate('loadingapp.net-testnet') as string)
+      : server.chainName === 'regtest'
+        ? (translate('loadingapp.net-regtest') as string)
         : '';
 
   const onCreate = () => {
@@ -184,7 +136,12 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
     }
   };
 
-  const link = (title: string, onPress: () => void, testID: string) => (
+  const link = (
+    title: string,
+    onPress: () => void,
+    testID: string,
+    size = 16,
+  ) => (
     <Pressable
       testID={testID}
       disabled={actionButtonsDisabled}
@@ -201,8 +158,8 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
           color: actionButtonsDisabled
             ? colors.fgAccentDisabled
             : colors.fgAccent,
-          fontSize: 16,
-          fontWeight: '500',
+          fontSize: size,
+          fontWeight: size < 16 ? '700' : '500',
         }}
       >
         {title}
@@ -224,19 +181,71 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
     </View>
   );
 
+  const chip = (label: string, ok: boolean, icon?: React.ReactNode) => (
+    <View
+      style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+        height: 30,
+        paddingHorizontal: 14,
+        borderRadius: 15,
+        borderWidth: 1,
+        borderColor: ok ? colors.borderAccent : colors.bottomSheetBorder,
+        backgroundColor: ok ? colors.bgSecondaryDisabled : colors.bgSurface,
+      }}
+    >
+      {icon}
+      <RegText style={{ fontSize: 11.5, fontWeight: '500' }}>{label}</RegText>
+    </View>
+  );
+
   return (
     <View
       style={{ flex: 1, backgroundColor: 'transparent' }}
       onLayout={e => setContainerH(e.nativeEvent.layout.height)}
     >
-      {optionsActions.length > 0 && (
+      <Animated.View
+        entering={tagEnter()}
+        style={{
+          position: 'absolute',
+          top: 37,
+          right: 20,
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: 8,
+        }}
+      >
+        {!!netLabel && (
+          <View
+            style={{
+              height: 23,
+              paddingHorizontal: 11,
+              borderRadius: 12,
+              borderWidth: 1,
+              borderColor: colors.borderWarning,
+              backgroundColor: colors.bgWarning,
+              justifyContent: 'center',
+            }}
+          >
+            <RegText
+              style={{
+                fontSize: 11.5,
+                fontWeight: '600',
+                color: colors.fgWarningEmphasis,
+              }}
+            >
+              {netLabel}
+            </RegText>
+          </View>
+        )}
         <Pressable
-          onPress={() => optionsMenuRef.current?.present()}
+          testID="loadingapp.server"
+          onPress={customServer}
+          disabled={actionButtonsDisabled}
           hitSlop={8}
+          accessibilityRole="button"
           style={{
-            position: 'absolute',
-            top: 37,
-            right: 20,
             width: 32,
             height: 32,
             alignItems: 'center',
@@ -244,7 +253,56 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
           }}
         >
           <FontAwesomeIcon icon={faDatabase} color={colors.fgMuted} size={22} />
+          <View
+            style={{
+              position: 'absolute',
+              right: 2,
+              bottom: 3,
+              width: 8,
+              height: 8,
+              borderRadius: 4,
+              backgroundColor: dotColor,
+              borderWidth: 2,
+              borderColor: colors.bgCanvas,
+            }}
+          />
         </Pressable>
+      </Animated.View>
+
+      {(noInternet || backOnline) && (
+        <Animated.View
+          key={backOnline ? 'online' : 'offline'}
+          entering={pillEnter()}
+          exiting={pillExit()}
+          pointerEvents="none"
+          style={{
+            position: 'absolute',
+            top: 42,
+            left: 0,
+            right: 0,
+            alignItems: 'center',
+          }}
+        >
+          {backOnline
+            ? chip(
+                translate('loadingapp.back-online') as string,
+                true,
+                <FontAwesomeIcon
+                  icon={faCheck}
+                  size={12}
+                  color={colors.fgAccent}
+                />,
+              )
+            : chip(
+                translate('loadingapp.no-internet') as string,
+                false,
+                <FontAwesomeIcon
+                  icon={faWifi}
+                  size={12}
+                  color={colors.fgDangerEmphasis}
+                />,
+              )}
+        </Animated.View>
       )}
 
       <View
@@ -286,46 +344,94 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
         >
           {translate('loadingapp.tagline') as string}
         </Animated.Text>
-        {hasRecoveryWalletInfoSaved && (
-          <Animated.View
-            entering={noticeEnter()}
+        {noInternet && !recoveryWallet && (
+          <Animated.Text
+            entering={tagEnter()}
             style={{
-              marginTop: 34,
-              marginHorizontal: 46,
-              alignSelf: 'stretch',
-              borderWidth: 1,
-              borderColor: colors.bottomSheetBorder,
-              borderRadius: 12,
-              backgroundColor: colors.bgSurface,
-              paddingHorizontal: 14,
-              paddingVertical: 12,
+              color: colors.fgMuted,
+              fontSize: 10,
+              lineHeight: 15,
+              marginTop: 10,
+              textAlign: 'center',
+              paddingHorizontal: 46,
             }}
           >
-            <View
-              style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}
-            >
-              <FontAwesomeIcon
-                icon={faTriangleExclamation}
-                size={12}
-                color={colors.fgDefault}
-              />
-              <BoldText style={{ fontSize: 12.5 }}>
-                {translate('loadingapp.previous-install-title') as string}
-              </BoldText>
-            </View>
-            <RegText
-              style={{
-                marginTop: 6,
-                fontSize: 12,
-                lineHeight: 16,
-                color: colors.fgMuted,
-              }}
-            >
-              {translate('loadingapp.previous-install-body') as string}
-            </RegText>
-          </Animated.View>
+            {translate('loadingapp.offline-line') as string}
+          </Animated.Text>
         )}
       </View>
+
+      {recoveryWallet && (
+        <Animated.View
+          entering={tagEnter()}
+          style={{
+            position: 'absolute',
+            left: 46,
+            right: 46,
+            top: containerH * CARD_TOP,
+            borderRadius: 10,
+            borderWidth: 1,
+            borderColor: colors.bottomSheetBorder,
+            backgroundColor: colors.bgSurface,
+            paddingHorizontal: 15,
+            paddingTop: 13,
+            paddingBottom: 8,
+          }}
+        >
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 7 }}>
+            <FontAwesomeIcon
+              icon={faTriangleExclamation}
+              size={11}
+              color={colors.fgDefault}
+            />
+            <BoldText style={{ fontSize: 11, lineHeight: 16 }}>
+              {translate('loadingapp.previous-install-title') as string}
+            </BoldText>
+          </View>
+          <RegText
+            style={{
+              marginTop: 6,
+              fontSize: 10.5,
+              lineHeight: 14,
+              color: colors.fgMuted,
+            }}
+          >
+            {translate('loadingapp.previous-install-body') as string}
+          </RegText>
+          <RegText style={{ marginTop: 9, fontSize: 10.5, lineHeight: 16 }}>
+            {`${
+              translate(
+                recoveryWallet.seed
+                  ? 'loadingapp.card-words'
+                  : 'loadingapp.card-key',
+              ) as string
+            }  ·  ${(translate('loadingapp.card-birthday') as string).replace(
+              '{height}',
+              recoveryWallet.birthday.toLocaleString(),
+            )}`}
+          </RegText>
+          <View style={{ marginTop: 12 }}>
+            <BusyButton
+              testID="loadingapp.importthis"
+              title={translate('loadingapp.import-this') as string}
+              labelSize={11}
+              height={30}
+              enabled={true}
+              busy={actionButtonsDisabled}
+              onPress={importRecoveryWallet}
+              onDisabledPress={() => {}}
+            />
+          </View>
+          <View style={{ alignItems: 'center', marginTop: 6 }}>
+            {link(
+              translate('loadingapp.view-seed') as string,
+              viewRecoveryWallet,
+              'loadingapp.viewseed',
+              10.5,
+            )}
+          </View>
+        </Animated.View>
+      )}
 
       <Animated.View
         entering={actionsEnter()}
@@ -338,29 +444,16 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
           paddingHorizontal: 32,
         }}
       >
-        {!!note && (
-          <RegText
-            style={{
-              color: colors.fgAccentDisabled,
-              fontSize: 12,
-              textAlign: 'center',
-              marginBottom: 16,
-            }}
-          >
-            {note}
-          </RegText>
-        )}
-        {!!warning && (
-          <RegText
-            style={{
-              color: colors.fgWarning,
-              fontSize: 12,
-              textAlign: 'center',
-              marginBottom: 12,
-            }}
-          >
-            {warning}
-          </RegText>
+        {nonMain && server.kind === 'remote' && (
+          <View style={{ marginBottom: 18 }}>
+            {chip(
+              (translate('loadingapp.connected-to') as string).replace(
+                '{host}',
+                server.uri.replace(/^https?:\/\//, ''),
+              ),
+              false,
+            )}
+          </View>
         )}
         {canAct &&
           link(
@@ -399,17 +492,9 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
             textAlign: 'center',
           }}
         >
-          {serverLine
-            ? `${getZingoVersion()} · ${serverLine}`
-            : getZingoVersion()}
+          {getZingoVersion()}
         </RegText>
       </Animated.View>
-
-      <ActionMenuBottomSheet
-        ref={optionsMenuRef}
-        title={translate('loadedapp.options') as string}
-        actions={optionsActions}
-      />
     </View>
   );
 };

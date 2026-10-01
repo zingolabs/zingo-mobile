@@ -30,4 +30,5 @@ export default interface AppStateLoading {
   serverErrorTries: number;
   firstLaunchingMessage: LaunchingModeEnum;
   hasRecoveryWalletInfoSaved: boolean;
+  recoveryWallet: WalletType | null;
 }

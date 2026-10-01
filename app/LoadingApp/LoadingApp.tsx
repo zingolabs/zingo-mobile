@@ -111,6 +111,7 @@ import {
 // no lazy load because slowing down screens.
 import ImportUfvk from '@screens/ImportUfvk';
 import OnboardingStage from '@ui/widgets/OnboardingStage';
+import SeedSheet from '@ui/widgets/SeedSheet';
 import WalletProgress from '@screens/WalletProgress';
 import { duration as motionDuration } from '@app/theme/motion';
 
@@ -361,7 +362,7 @@ export class LoadingAppClass extends Component<
 > {
   appstate?: NativeEventSubscription;
   unsubscribeNetInfo?: NetInfoSubscription;
-  clipboardTimer: ReturnType<typeof setTimeout> | null = null;
+  seedSheetRef = React.createRef<BottomSheetModal>();
   customServerModalRef: React.RefObject<React.ComponentRef<
     typeof BottomSheetModal
   > | null>;
@@ -421,6 +422,7 @@ export class LoadingAppClass extends Component<
       serverErrorTries: 0,
       firstLaunchingMessage: props.firstLaunchingMessage,
       hasRecoveryWalletInfoSaved: false,
+      recoveryWallet: null,
     };
 
     this.customServerModalRef = React.createRef();
@@ -480,7 +482,12 @@ export class LoadingAppClass extends Component<
 
     // has the device the Wallet Keys stored?
     const has = await hasRecoveryWalletInfo();
-    this.setState({ hasRecoveryWalletInfoSaved: has });
+    const recovery = has ? await getRecoveryWalletInfo() : null;
+    this.setState({
+      hasRecoveryWalletInfoSaved: has,
+      recoveryWallet:
+        recovery && (recovery.seed || recovery.ufvk) ? recovery : null,
+    });
 
     // Boot-time server selection. `auto` refetches the live list and activates
     // the best server on every launch; `list` validates that the user's server
@@ -1893,72 +1900,20 @@ export class LoadingAppClass extends Component<
     });
   };
 
-  recoverRecoveryWalletInfo = async () => {
-    // recover the wallet keys from the device
-    const wallet = await getRecoveryWalletInfo();
-    // in IOS the App + OS needs some time to close the biometric screen
-    // then the Alert can be too fast.
-    if (wallet.seed || wallet.ufvk) {
-      const txt = (wallet.seed || wallet.ufvk) + '\n\n' + wallet.birthday;
-      const preview = wallet.seed
-        ? (() => {
-            const words = wallet.seed.split(' ');
-            return `${words[0]} ... ${words[words.length - 1]}`;
-          })()
-        : `${(wallet.ufvk || '').slice(0, 5)} ... ${(wallet.ufvk || '').slice(-5)}`;
-      setTimeout(
-        () => {
-          showConfirm({
-            title: this.props.translate('loadedapp.walletbackupseed') as string,
-            message:
-              preview +
-              '\n\n' +
-              // Audit Suggestion 5 — append the clipboard-exposure warning so
-              // the existing recover-keys confirm makes the security risk
-              // explicit before the user taps Copy.
-              ((this.props.translate(
-                Platform.OS === 'ios'
-                  ? 'seed.clipboard-confirm-message-ios'
-                  : 'seed.clipboard-confirm-message-android',
-              ) as string) || ''),
-            buttons: [
-              {
-                text: this.props.translate('copy') as string,
-                onPress: () => {
-                  if (this.clipboardTimer) {
-                    clearTimeout(this.clipboardTimer);
-                  }
-                  Clipboard.setString(txt);
-                  this.addLastSnackbar(
-                    this.props.translate(
-                      wallet.seed
-                        ? 'seed.tapcopy-seed-message'
-                        : 'seed.tapcopy-ufvk-message',
-                    ) as string,
-                    SnackbarDurationEnum.longer,
-                  );
-                  this.clipboardTimer = setTimeout(() => {
-                    Clipboard.setString('');
-                    this.clipboardTimer = null;
-                    this.addLastSnackbar(
-                      this.props.translate('seed.clipboard-cleared') as string,
-                      SnackbarDurationEnum.long,
-                    );
-                  }, 60 * 1000);
-                },
-              },
-              {
-                text: this.props.translate('cancel') as string,
-                style: 'cancel',
-              },
-            ],
-          });
-          // IOS needs time to close the biometric screen.
-          // but Android I don't think so, a little bit Just in case.
-        },
-        Platform.OS === GlobalConst.platformOSios ? 2 * 1000 : 100,
-      );
+  importRecoveryWallet = () => {
+    const wallet = this.state.recoveryWallet;
+    if (!wallet) {
+      return;
     }
+    this.doRestore(wallet.seed || wallet.ufvk || '', wallet.birthday);
+  };
+
+  viewRecoveryWallet = async () => {
+    const answer = await askGate({ translate: this.state.translate });
+    if (answer.kind === 'declined') {
+      return;
+    }
+    this.seedSheetRef.current?.present();
   };
 
   openCurrentWallet = () => {
@@ -2007,7 +1962,6 @@ export class LoadingAppClass extends Component<
       screen,
       actionButtonsDisabled,
       walletExists,
-      hasBackupWallet,
       customServerUri,
       customServerChainName,
       customServerOffline,
@@ -2015,7 +1969,6 @@ export class LoadingAppClass extends Component<
       firstLaunchingMessage,
       biometricGate,
       translate,
-      hasRecoveryWalletInfoSaved,
     } = this.state;
 
     const context = {
@@ -2065,15 +2018,14 @@ export class LoadingAppClass extends Component<
                   {screen === RouteEnum.StartMenu && (
                     <StartMenu
                       actionButtonsDisabled={actionButtonsDisabled}
-                      hasRecoveryWalletInfoSaved={hasRecoveryWalletInfoSaved}
-                      recoverRecoveryWalletInfo={this.recoverRecoveryWalletInfo}
+                      recoveryWallet={this.state.recoveryWallet}
+                      importRecoveryWallet={this.importRecoveryWallet}
+                      viewRecoveryWallet={this.viewRecoveryWallet}
                       customServer={this.customServer}
                       walletExists={walletExists}
-                      hasBackupWallet={hasBackupWallet}
                       openCurrentWallet={this.openCurrentWallet}
                       createNewWallet={this.createNewWallet}
                       getwalletToRestore={this.getwalletToRestore}
-                      restoreLastBackup={this.restoreLastBackup}
                     />
                   )}
                   {screen === RouteEnum.WalletProgress && (
@@ -2090,6 +2042,11 @@ export class LoadingAppClass extends Component<
                   )}
                 </OnboardingStage>
               )}
+              <SeedSheet
+                ref={this.seedSheetRef}
+                wallet={this.state.recoveryWallet}
+                translate={translate}
+              />
               <CustomServerModalHost
                 ref={this.customServerModalRef}
                 actionButtonsDisabled={actionButtonsDisabled}

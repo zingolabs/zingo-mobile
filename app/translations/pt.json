@@ -114,6 +114,17 @@
     "creating-title": "Criando sua carteira",
     "previous-install-title": "Carteira de uma instalação anterior",
     "previous-install-body": "O Zingo encontrou uma frase de recuperação salva neste dispositivo. Criar ou importar outra carteira a substitui.",
+    "net-testnet": "Testnet",
+    "net-regtest": "Regtest",
+    "connected-to": "Conectado a {host}",
+    "no-internet": "Sem conexão com a internet",
+    "back-online": "Conexão restabelecida",
+    "offline-line": "Você pode criar ou importar uma carteira agora; ela sincroniza quando a conexão voltar.",
+    "card-words": "24 palavras",
+    "card-key": "Chave de visualização",
+    "card-birthday": "Aniversário · bloco {height}",
+    "import-this": "Importar esta carteira",
+    "view-seed": "Ver frase e aniversário",
     "actualserver": "Servidor atual:",
     "createnewwallet": "Criar uma nova carteira",
     "opencurrentwallet": "Abrir Carteira Atual",
@@ -674,6 +685,12 @@
     "refetching": "Recarregando despesas...",
     "lowpriority": "Baixa prioridade",
     "highpriority": "Alta prioridade"
+  },
+  "seedsheet": {
+    "title": "Frase de recuperação",
+    "title-key": "Chave de visualização",
+    "birthday": "Aniversário da carteira",
+    "done": "Concluído"
   },
   "import": {
     "title": "Frases de recuperação / Chave de Visualização",
