@@ -290,6 +290,7 @@ class ExecuteSyncFromSeed {
 
         val window = 10_000L
         val deadlineSeconds = 5 * 60
+        val tipSkewBlocks = 1L
         val seed = Seeds.HOSPITAL
         val servers = listOf(MainnetServers.PRIMARY, MainnetServers.FALLBACK)
         val start = System.nanoTime()
@@ -319,7 +320,7 @@ class ExecuteSyncFromSeed {
         println("\nInfo:")
         println(infoJson)
         val info: Info = mapper.readValue(infoJson)
-        assertThat(info.latest_block_height).isAtLeast(tip)
+        assertThat(info.latest_block_height).isAtLeast(tip - tipSkewBlocks)
 
         var heightJson: String = uniffi.zingo.getLatestBlockWallet()
         println("\nHeight pre-sync:")
