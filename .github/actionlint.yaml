@@ -7,3 +7,4 @@ self-hosted-runner:
     - zingo-android-native-16
     - zingo-android-gradle-16
     - zingo-ios-build-12
+    - zingo-ios-build-m2

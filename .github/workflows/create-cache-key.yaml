@@ -44,9 +44,8 @@ jobs:
       # The zingolib commit names the crates, the builder, and the builder
       # image. Under zingolib CI the submodule is the commit under test.
       # The hash names the stable toolchain and the one workflow that runs
-      # the platform's builder, so an edit to the Android workflow leaves
-      # the iOS entry valid and the reverse. The version prefix invalidates
-      # every entry when the output layout changes.
+      # the platform's builder. The version prefix invalidates every entry
+      # when the output layout changes.
       - name: Create cache key
         id: create-cache-key
         env:
