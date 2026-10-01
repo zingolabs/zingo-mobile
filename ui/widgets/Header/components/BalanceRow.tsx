@@ -18,15 +18,20 @@ import { useTheme } from '@app/theme';
 import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
-  ChainNameEnum,
   RouteEnum,
-  SelectServerEnum,
+  ServerType,
   SnackbarDurationEnum,
   TranslateType,
 } from '@app/AppState';
 import { balanceAtom } from '@app/AppState/balance';
 import InfoType from '@app/AppState/types/InfoType';
+import { fiatQuote } from '@app/price/fiatQuote';
 import ZecPriceType from '@app/AppState/types/ZecPriceType';
+import {
+  MixnetView,
+  sendGateOpen,
+  shownStatusKey,
+} from '@app/walletBackend/transforms/mixnetView';
 import Utils from '@app/utils';
 import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
 import CurrencyAmount from '@ui/widgets/CurrencyAmount';
@@ -63,7 +68,7 @@ type BalanceRowProps = {
   translate: (key: string) => TranslateType;
   info: InfoType;
   zecPrice: ZecPriceType;
-  selectServer: SelectServerEnum;
+  server: ServerType;
   showShieldButton: boolean;
   shieldingFee: number;
   valueTransfersTotal: number | null;
@@ -72,6 +77,7 @@ type BalanceRowProps = {
   calculateDisableButtonToShield: () => boolean;
   onPressShieldFunds: () => void;
   receivedLegend: boolean | undefined;
+  mixnetView: MixnetView | null;
   onUsdRowLayout?: (height: number) => void;
 };
 
@@ -85,7 +91,7 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
     translate,
     info,
     zecPrice,
-    selectServer,
+    server,
     showShieldButton,
     shieldingFee,
     valueTransfersTotal,
@@ -94,17 +100,15 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
     calculateDisableButtonToShield,
     onPressShieldFunds,
     receivedLegend,
+    mixnetView,
     onUsdRowLayout,
   }) => {
     const navigation = useNavigation<NavigationProp<ParamListBase>>();
     const { colors } = useTheme();
     const reducedMotion = useReducedMotion();
     const balance = useAtomValue(balanceAtom);
-    const showFiat =
-      !noBalance &&
-      selectServer !== SelectServerEnum.offline &&
-      info.chainName === ChainNameEnum.mainChainName &&
-      zecPrice.date > 0;
+    const quote = fiatQuote(zecPrice, server, info.chainName);
+    const showFiat = !noBalance && quote.kind === 'quote';
 
     return (
       <>
@@ -219,8 +223,8 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
           >
             <CurrencyAmount
               style={{ marginTop: 0, marginBottom: 0 }}
-              priceDate={zecPrice.date}
-              price={zecPrice.zecPrice}
+              priceDate={quote.date}
+              price={quote.price}
               amtZec={
                 balance.kind === 'polled'
                   ? balance.latest.totalIronwoodBalance +
@@ -242,16 +246,30 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
           !calculateDisableButtonToShield() &&
           valueTransfersTotal !== null && (
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-              <FadeText style={{ fontSize: 8 }}>
-                {(translate(
-                  `history.shield-legend-${calculatePoolsToShield()}`,
-                ) as string) +
-                  ` ${calculateAmountToShield()} ` +
-                  (translate('send.fee') as string) +
-                  ': ' +
-                  Utils.parseNumberFloatToStringLocale(shieldingFee, 8) +
-                  ' '}
-              </FadeText>
+              {mixnetView !== null && mixnetView.sendBlocked ? (
+                <View
+                  style={{ alignItems: 'center' }}
+                  testID="header.shield-blocked"
+                >
+                  <FadeText style={{ fontSize: 8 }}>
+                    {translate('send.nym-blocked') as string}
+                  </FadeText>
+                  <FadeText style={{ fontSize: 8 }}>
+                    {translate(shownStatusKey(mixnetView)) as string}
+                  </FadeText>
+                </View>
+              ) : (
+                <FadeText style={{ fontSize: 8 }}>
+                  {(translate(
+                    `history.shield-legend-${calculatePoolsToShield()}`,
+                  ) as string) +
+                    ` ${calculateAmountToShield()} ` +
+                    (translate('send.fee') as string) +
+                    ': ' +
+                    Utils.parseNumberFloatToStringLocale(shieldingFee, 8) +
+                    ' '}
+                </FadeText>
+              )}
               <View style={{ margin: 5, flexDirection: 'row' }}>
                 <Button
                   testID="header.shield"
@@ -262,7 +280,7 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
                     ) as string
                   }
                   onPress={onPressShieldFunds}
-                  disabled={calculateDisableButtonToShield()}
+                  disabled={!sendGateOpen(mixnetView)}
                 />
               </View>
             </View>

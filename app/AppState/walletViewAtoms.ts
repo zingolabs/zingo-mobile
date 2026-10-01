@@ -6,12 +6,13 @@
 import { atom } from 'jotai';
 import { selectAtom } from 'jotai/utils';
 
-import { SelectServerEnum } from './enums/SelectServerEnum';
+import { ChainNameEnum } from './enums/ChainNameEnum';
+import { offlineServer } from './types/ServerType';
 import { type WalletViewSource, selectWalletView } from './walletView';
 
 export const initialWalletViewSource: WalletViewSource = {
   readOnly: false,
-  selectServer: SelectServerEnum.auto,
+  server: offlineServer(ChainNameEnum.mainChainName),
 };
 
 // The controller-held view source. Only the container writes it.

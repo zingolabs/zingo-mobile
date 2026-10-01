@@ -62,72 +62,29 @@ jest.mock('@screens/Receive', () => ({
 }));
 
 import React from 'react';
-import NetInfo from '@react-native-community/netinfo/src/index';
 import { act, render } from '@testing-library/react-native';
 import { Provider, createStore, useAtomValue } from 'jotai';
 
-const { AppState, Linking } =
-  jest.requireActual<typeof import('react-native')>('react-native');
-
-import { LoadedApp, LoadedAppClass } from '@app/LoadedApp';
+import { LoadedAppClass } from '@app/LoadedApp';
 import { resolveTriggerGate } from '@app/services/gateController';
-import {
-  ChainNameEnum,
-  LaunchingModeEnum,
-  RouteEnum,
-  SelectServerEnum,
-} from '@app/AppState';
+import { ChainNameEnum } from '@app/AppState';
 import {
   walletViewSourceAtom,
   walletViewAtom,
   initialWalletViewSource,
 } from '@app/AppState/walletViewAtoms';
-import { StackScreenProps } from '@react-navigation/stack';
-import { AppStackParamList } from '@app/types';
-import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
+import { remoteServer } from '@app/AppState/types/ServerType';
+import {
+  flushMicrotasks,
+  mountCommitted,
+  spyOnLifecycleListeners,
+} from './helpers/loadedAppHarness';
 
 const resolveTriggerGateMock = resolveTriggerGate as jest.Mock;
 const netInfoUnsubscribe = jest.fn();
 
 function drawerNavRef(instance: LoadedAppClass): { drawerNav: unknown } {
   return instance as unknown as { drawerNav: unknown };
-}
-
-type DrawerProps = StackScreenProps<AppStackParamList, RouteEnum.LoadedApp>;
-
-function makeDrawerProps(): DrawerProps {
-  return {
-    navigation: mockNavigation,
-    route: {
-      key: 'Key-1',
-      name: RouteEnum.LoadedApp,
-      params: {
-        readOnly: false,
-        orchardPool: true,
-        saplingPool: true,
-        transparentPool: true,
-        newWallet: false,
-        firstLaunchingMessage: LaunchingModeEnum.opening,
-        walletChainName: ChainNameEnum.mainChainName,
-      },
-    },
-  } as DrawerProps;
-}
-
-async function flushMicrotasks(times = 100): Promise<void> {
-  for (let i = 0; i < times; i++) {
-    await Promise.resolve();
-  }
-}
-
-async function mountCommitted() {
-  const utils = render(<LoadedApp {...makeDrawerProps()} />);
-  await act(async () => {
-    await flushMicrotasks();
-  });
-  const instance = utils.UNSAFE_root.findByType(LoadedAppClass)
-    .instance as LoadedAppClass;
-  return { utils, instance };
 }
 
 describe('view slice — the view wakes only on a view change', () => {
@@ -140,8 +97,11 @@ describe('view slice — the view wakes only on a view change', () => {
 
   it('a container field that leaves the WalletView unchanged wakes no view consumer', () => {
     const store = createStore();
-    // online and spendable → the view is fullWithSend
-    store.set(walletViewSourceAtom, initialWalletViewSource);
+    // remote and spendable → the view is fullWithSend
+    store.set(walletViewSourceAtom, {
+      ...initialWalletViewSource,
+      server: remoteServer('https://one.test', ChainNameEnum.mainChainName),
+    });
     viewRenders = 0;
     render(
       <Provider store={store}>
@@ -150,12 +110,12 @@ describe('view slice — the view wakes only on a view change', () => {
     );
     const base = viewRenders;
 
-    // A server switch between online selections changes the source, but the
+    // A switch between two remote servers changes the source, but the
     // outcome does not.
     act(() => {
       store.set(walletViewSourceAtom, prev => ({
         ...prev,
-        selectServer: SelectServerEnum.list,
+        server: remoteServer('https://two.test', ChainNameEnum.mainChainName),
       }));
     });
     expect(viewRenders).toBe(base); // the view did not re-render
@@ -173,14 +133,7 @@ describe('setNavigationHome runs once, not on every commit', () => {
     jest.useFakeTimers();
     jest.clearAllMocks();
     resolveTriggerGateMock.mockResolvedValue({ kind: 'passed' });
-    (NetInfo.addEventListener as jest.Mock).mockReturnValue(netInfoUnsubscribe);
-    jest.spyOn(AppState, 'addEventListener').mockReturnValue({
-      remove: jest.fn(),
-    } as never);
-    jest.spyOn(Linking, 'addEventListener').mockReturnValue({
-      remove: jest.fn(),
-    } as never);
-    jest.spyOn(Linking, 'getInitialURL').mockResolvedValue(null);
+    spyOnLifecycleListeners(netInfoUnsubscribe);
   });
 
   afterEach(() => {

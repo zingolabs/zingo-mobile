@@ -3,6 +3,11 @@ name: Android lint
 on:
   workflow_call:
     inputs:
+      # The key from create-cache-key.yaml, which names the pin and the
+      # toolchain that the Kotlin bindings come from.
+      cache-key:
+        required: true
+        type: string
       # Fail-all (see CONTEXT.md): when true, a failure here cancels the
       # whole run. PR CI opts in; ci-nightly does not.
       fail-all:
@@ -35,11 +40,16 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v6
 
-      # Same script developers run locally, so a green CI lint and a green
-      # local lint mean the same thing. It stages the checked-in UniFFI
-      # bindings itself, skipping the ~20-minute native build.
-      - name: Generate UniFFI bindings
+      # The lint below is the same script developers run locally, so a green
+      # CI lint and a green local lint mean the same thing. Both take the
+      # Kotlin bindings that the builder's kotlin mode generates on the host.
+      - name: Check out zingolib
+        uses: ./.github/actions/zingolib-submodule
+
+      - name: Generate the Kotlin bindings
         uses: ./.github/actions/kotlin-bindings
+        with:
+          cache-key: ${{ inputs.cache-key }}
 
       - name: Lint release
         run: yarn lint:android
@@ -54,7 +64,7 @@ jobs:
 
       - name: Cancel the run on failure (fail-all)
         if: ${{ failure() && inputs.fail-all }}
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9
         with:
           script: |
             await github.rest.actions.cancelWorkflowRun({

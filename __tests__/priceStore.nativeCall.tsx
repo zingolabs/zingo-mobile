@@ -18,7 +18,7 @@ import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
 } from '@app/context';
-import { SelectServerEnum } from '@app/AppState';
+import { ChainNameEnum, SelectServerEnum, offlineServer } from '@app/AppState';
 import { getZecPrice, ZecPriceOutcome } from '@app/walletBackend';
 import {
   mockZecQuote,
@@ -100,7 +100,7 @@ test('a market-less surface renders no ring at all', async () => {
     surfaceUi(
       makeCtx({
         mixnetView: READY_VIEW,
-        selectServer: SelectServerEnum.offline,
+        server: offlineServer(ChainNameEnum.noneChainName),
       }),
       setZecPrice,
     ),

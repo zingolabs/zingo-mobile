@@ -114,7 +114,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     valueTransfersTotal,
     somePending,
     shieldingAmount,
-    selectServer,
+    server,
     mixnetView,
   } = context;
 
@@ -157,7 +157,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   } = useShieldFunds({
     readOnly,
     setShieldingAmount,
-    selectServer,
+    server,
     somePending,
     shieldingAmount,
     translate,
@@ -166,6 +166,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     setBackgroundError,
     setScrollToTop,
     setScrollToBottom,
+    mixnetView,
   });
 
   // Audit Issue D — bio gate for seedUfvkScreen lives at the Ufvk screen
@@ -195,7 +196,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         >
           <SyncStatusBar
             noSyncingStatus={noSyncingStatus}
-            selectServer={selectServer}
+            server={server}
             netInfo={netInfo}
             percentageOutputsScanned={percentageOutputsScanned}
             syncInProgress={syncInProgress}
@@ -219,7 +220,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             translate={translate}
             info={info}
             zecPrice={zecPrice}
-            selectServer={selectServer}
+            server={server}
             showShieldButton={showShieldButton}
             shieldingFee={shieldingFee}
             valueTransfersTotal={valueTransfersTotal}
@@ -228,6 +229,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             calculateDisableButtonToShield={calculateDisableButtonToShield}
             onPressShieldFunds={onPressShieldFunds}
             receivedLegend={receivedLegend}
+            mixnetView={mixnetView}
             onUsdRowLayout={onUsdRowLayout}
           />
 
@@ -236,7 +238,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               translate={translate}
               zecPrice={zecPrice}
               info={info}
-              selectServer={selectServer}
+              server={server}
               onLayout={onPriceRowLayout}
             />
           )}

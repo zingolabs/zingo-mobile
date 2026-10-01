@@ -25,7 +25,6 @@ describe('NewAddressTag - snapshot', () => {
           <NewAddressTag
             address="u1abc123def456abc123def456abc123def456abc123"
             own={true}
-            closeSheet={onFn}
             setAddressBook={onFn}
           />
         </ContextAppLoadedProvider>,
@@ -46,7 +45,6 @@ describe('NewAddressTag - snapshot', () => {
           address="u1abc123def456abc123def456abc123def456abc123"
           own={false}
           initialLabel="pepe.zcash"
-          closeSheet={onFn}
           setAddressBook={onFn}
         />
       </ContextAppLoadedProvider>,

@@ -17,7 +17,6 @@ import ActionMenuBottomSheet, {
   ActionMenuBottomSheetAction,
 } from '@ui/widgets/ActionMenuBottomSheet';
 
-import { SelectServerEnum } from '@app/AppState';
 import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
 import AppSheet from '@ui/primitives/AppSheet';
 import { ContextAppLoading } from '@app/context';
@@ -55,7 +54,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
   restoreLastBackup,
 }) => {
   const context = useContext(ContextAppLoading);
-  const { netInfo, translate, server, selectServer } = context;
+  const { netInfo, translate, server } = context;
   const { colors } = useTheme();
 
   const [containerH, setContainerH] = useState<number>(0);
@@ -221,7 +220,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
             paddingBottom: 30,
           }}
         >
-          {selectServer !== SelectServerEnum.offline && (
+          {server.kind === 'remote' && (
             <>
               <BoldText style={{ fontSize: 15, marginBottom: 3 }}>
                 {`${translate('loadingapp.actualserver') as string} [${
@@ -235,7 +234,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
               </BoldText>
             </>
           )}
-          {selectServer === SelectServerEnum.offline && (
+          {server.kind === 'offline' && (
             <>
               <View style={{ flexDirection: 'row' }}>
                 <BoldText style={{ fontSize: 15, marginBottom: 3 }}>
@@ -348,9 +347,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
               birthday falls back to the chain's activation height (the wallet
               just won't sync until a server is chosen). Show it both online and
               in Offline mode. */}
-          {((netInfo.isConnected &&
-            selectServer !== SelectServerEnum.offline) ||
-            selectServer === SelectServerEnum.offline) && (
+          {(netInfo.isConnected || server.kind === 'offline') && (
             <Button
               testID="loadingapp.createnewwallet"
               type={ButtonTypeEnum.Primary}
@@ -385,9 +382,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
           {/* Restore works Offline: seed/UFVK derivation needs no Indexer
               (the wallet just won't sync until a server is chosen). Show it
               both online and in Offline mode. */}
-          {((netInfo.isConnected &&
-            selectServer !== SelectServerEnum.offline) ||
-            selectServer === SelectServerEnum.offline) && (
+          {(netInfo.isConnected || server.kind === 'offline') && (
             <View
               style={{
                 marginTop: 10,
@@ -436,7 +431,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
             </View>
           )}
 
-          {selectServer === SelectServerEnum.offline && !walletExists && (
+          {server.kind === 'offline' && !walletExists && (
             <View
               style={{
                 display: 'flex',

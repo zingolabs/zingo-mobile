@@ -9,7 +9,7 @@ import {
 import {
   PoolToShieldEnum,
   RouteEnum,
-  SelectServerEnum,
+  ServerType,
   SnackbarDurationEnum,
   TranslateType,
 } from '@app/AppState';
@@ -19,12 +19,16 @@ import { shieldConfirm, shieldPropose } from '@app/walletBackend';
 import type { FfiResult } from '@app/walletBackend';
 import { RPCShieldProposeType } from '@app/walletBackend/types/RPCShieldProposeType';
 import { RPCShieldType } from '@app/walletBackend/types/RPCShieldType';
+import {
+  MixnetView,
+  sendGateOpen,
+} from '@app/walletBackend/transforms/mixnetView';
 import Utils from '@app/utils';
 
 type UseShieldFundsInput = {
   readOnly: boolean;
   setShieldingAmount: ((value: number) => void) | undefined;
-  selectServer: SelectServerEnum;
+  server: ServerType;
   somePending: boolean;
   shieldingAmount: number;
   translate: (key: string) => TranslateType;
@@ -34,6 +38,7 @@ type UseShieldFundsInput = {
   setBackgroundError: ((title: string, err: string) => void) | undefined;
   setScrollToTop: ((v: boolean) => void) | undefined;
   setScrollToBottom: ((v: boolean) => void) | undefined;
+  mixnetView: MixnetView | null;
 };
 
 type UseShieldFundsResult = {
@@ -61,7 +66,7 @@ type UseShieldFundsResult = {
 export function useShieldFunds({
   readOnly,
   setShieldingAmount,
-  selectServer,
+  server,
   somePending,
   shieldingAmount,
   translate,
@@ -70,6 +75,7 @@ export function useShieldFunds({
   setBackgroundError,
   setScrollToTop,
   setScrollToBottom,
+  mixnetView,
 }: UseShieldFundsInput): UseShieldFundsResult {
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const balance = useAtomValue(balanceAtom);
@@ -79,6 +85,12 @@ export function useShieldFunds({
   const [shieldingFee, setShieldingFee] = useState<number>(0);
   // useRef so the lock persists across re-renders (a `let` inside useEffect resets every invocation)
   const shieldProposeLockRef = useRef<boolean>(false);
+  // The confirm dialog holds the handler of the render that opened it, so the
+  // handler reads the view through a ref to see the view at confirm time.
+  const mixnetViewRef = useRef(mixnetView);
+  useEffect(() => {
+    mixnetViewRef.current = mixnetView;
+  }, [mixnetView]);
 
   useEffect(() => {
     const runShieldPropose = async (): Promise<FfiResult<string>> => {
@@ -100,7 +112,7 @@ export function useShieldFunds({
     if (
       !readOnly &&
       !!setShieldingAmount &&
-      selectServer !== SelectServerEnum.offline &&
+      server.kind !== 'offline' &&
       (somePending ? 0 : confirmedTransparent) > 0
     ) {
       (async () => {
@@ -141,23 +153,27 @@ export function useShieldFunds({
     balance,
     confirmedTransparent,
     somePending,
-    selectServer,
+    server,
   ]);
 
   useEffect(() => {
     setShowShieldButton(
       !readOnly &&
-        selectServer !== SelectServerEnum.offline &&
+        server.kind !== 'offline' &&
         (somePending ? 0 : shieldingAmount) > 0,
     );
-  }, [readOnly, shieldingAmount, somePending, selectServer]);
+  }, [readOnly, shieldingAmount, somePending, server]);
 
   const handleShieldFunds = useCallback(async () => {
     if (!setBackgroundError || !addLastSnackbar) {
       return;
     }
-    if (!netInfo.isConnected || selectServer === SelectServerEnum.offline) {
+    if (!netInfo.isConnected || server.kind === 'offline') {
       addLastSnackbar(translate('loadedapp.connection-error') as string);
+      return;
+    }
+    if (!sendGateOpen(mixnetViewRef.current)) {
+      addLastSnackbar(translate('send.nym-blocked') as string);
       return;
     }
 
@@ -196,7 +212,7 @@ export function useShieldFunds({
     setBackgroundError,
     addLastSnackbar,
     netInfo.isConnected,
-    selectServer,
+    server,
     translate,
     navigation,
     setScrollToTop,

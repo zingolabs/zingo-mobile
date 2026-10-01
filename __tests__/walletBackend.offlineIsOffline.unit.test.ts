@@ -38,7 +38,7 @@
  * and a previous script's 5 s tick firing inside the next one. Both are why the
  * mutation table above exists rather than a green run.
  */
-import { ChainNameEnum, ServerType } from '@app/AppState';
+import { ChainNameEnum, offlineServer, remoteServer } from '@app/AppState';
 import WalletBackend from '@app/walletBackend';
 import { mockWalletBackendConfig } from '../__mocks__/dataMocks/mockWalletBackendConfig';
 
@@ -141,15 +141,12 @@ const WALLET_LOCAL = new Set([
   'initLogging',
 ]);
 
-const OFFLINE: ServerType = {
-  uri: '',
-  chainName: ChainNameEnum.noneChainName,
-};
+const OFFLINE = offlineServer(ChainNameEnum.noneChainName);
 
-const ONLINE: ServerType = {
-  uri: 'https://zec.rocks:443',
-  chainName: ChainNameEnum.mainChainName,
-};
+const ONLINE = remoteServer(
+  'https://zec.rocks:443',
+  ChainNameEnum.mainChainName,
+);
 
 type Act = 'offline' | 'online' | 'tick';
 

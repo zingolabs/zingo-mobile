@@ -41,7 +41,7 @@ export type WalletBackendConfig = {
   performanceLevel: RPCPerformanceLevelEnum;
 };
 
-// Offline is the empty server URI, the invariant the settings file normalizes.
+// Offline is the server choice with no indexer.
 export function isOffline(config: WalletBackendConfig): boolean {
-  return config.server.uri === '';
+  return config.server.kind === 'offline';
 }

@@ -1,7 +1,7 @@
 # Proposal: release senescence instead of a remote forced-update switch
 
 Status: proposed, for discussion. If the proposal is accepted, a companion ADR
-(`docs/adr/zingo-mobile/0011-release-senescence.md`) and `CONTEXT.md` glossary entries land with the
+(`zingo-adrs zingo-mobile/0011`) and `CONTEXT.md` glossary entries land with the
 implementation; both are drafted and follow this document.
 
 ## What the audit asked for
@@ -119,7 +119,7 @@ humans feel a slipping cadence weeks before any user does.
 ## References
 
 - Least Authority audit report, Suggestion 1 (and Issue R context).
-- `docs/adr/zingo-mobile/0011-release-senescence.md` (proposed) and `docs/adr/zingo-mobile/0009-error-keys-not-prose.md`
+- `zingo-adrs zingo-mobile/0011` (proposed) and [zingo-adrs zingo-mobile/0009](https://github.com/zingolabs/zingo-adrs/blob/dev/zingo-mobile/0009-error-keys-not-prose.md)
   (module/display-edge conventions the implementation follows).
 - zebrad `end_of_support.rs` (the precedent: 91/105 days, height-estimated age, mainnet only).
 - zcashd's End-of-Support halt, the original auto-senescence precedent in Zcash tooling.

@@ -198,9 +198,10 @@ IO, alerts, email, biometrics. Home: `app/services`.
 ## CI
 
 **Blocking check** — a PR CI job whose failure fails the pull request.
-Jest, rust-shear, js-depcheck, andr-dependency-analysis, the Android
-Kotlin compile, the Android JVM unit tests, the Android build chain, and
-the Android integration buckets are blocking checks.
+Jest, rust-shear, the workbench tests, js-depcheck,
+andr-dependency-analysis, the Android Kotlin compile, the Android JVM
+unit tests, the Android build chain, and the Android integration buckets
+are blocking checks.
 
 **Advisory stage** — a PR CI job that records its result without
 affecting the pull request verdict. No PR stage currently runs in
@@ -215,6 +216,23 @@ the verdict path.
 so runner setup and emulator boot amortize across the group instead of
 being paid once per test. Unrelated to the migration API's `per_bucket`
 windowing sense, which UI copy avoids entirely.
+
+**Offline device test** — an instrumented test that runs on a device or
+emulator with an empty server URI and no chain. It exercises the Binding
+Layer and the platform alone.
+
+**Static-chain test** — an instrumented test that only reads a chain that
+exists before the test starts.
+
+**Live-chain test** — an instrumented test that broadcasts a transaction
+or needs a block mined while it runs.
+
+**Public-chain test** — a test that reads a chain the project does not
+control, such as mainnet or testnet.
+
+**Fixture wallet** — a wallet on a public chain whose seed, birthday, and
+transaction history are published for tests to read. A refresh replaces it
+with a new seed and a new history.
 
 **Fail-all** — the policy that the first failure of any blocking check
 cancels the entire run at once, rather than letting the surviving checks
@@ -378,11 +396,9 @@ repository's subdirectory of zingo-adrs (`zingo-mobile/` for zingo-mobile).
 _Avoid_: local ADR, project ADR
 
 **Record citation**:
-Each scope of zingo-adrs numbers its records in its own sequence.
-A bare `ADR-NNNN` cites a record in the citing repository's own scope; a
-citation into another scope carries the path (`zingolib/0054`, or the
-org-level `003`).
-_Avoid_: bare numbers across scopes, "zingolib ADR NNNN" in new text
+A reference to a zingo-adrs record, in the form its medium requires. The
+[zingo-adrs README](https://github.com/zingolabs/zingo-adrs#citing-a-record) defines each form.
+_Avoid_: bare numbers across scopes, checkout paths, "zingolib ADR NNNN" in new text
 
 **Record status**:
 The first line under a record's `## Status` heading, one of `proposed`,

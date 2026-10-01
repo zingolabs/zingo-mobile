@@ -12,6 +12,7 @@ module.exports = [
       'node_modules/**',
       'coverage/**',
       'rust/**',
+      'zingolib/**',
       'scripts/release/**',
     ],
   },
@@ -46,17 +47,17 @@ module.exports = [
         {
           selector: "CallExpression[callee.name='translate']",
           message:
-            'Core modules must not translate. Return an ErrorKey and let the display edge translate it (docs/adr/zingo-mobile/0009-error-keys-not-prose.md).',
+            'Core modules must not translate. Return an ErrorKey and let the display edge translate it (zingo-adrs zingo-mobile/0009).',
         },
         {
           selector: "CallExpression[callee.property.name='translate']",
           message:
-            'Core modules must not translate. Return an ErrorKey and let the display edge translate it (docs/adr/zingo-mobile/0009-error-keys-not-prose.md).',
+            'Core modules must not translate. Return an ErrorKey and let the display edge translate it (zingo-adrs zingo-mobile/0009).',
         },
         {
           selector: "ImportSpecifier[imported.name='TranslateType']",
           message:
-            'Core modules take no translate callback. Return an ErrorKey and let the display edge translate it (docs/adr/zingo-mobile/0009-error-keys-not-prose.md).',
+            'Core modules take no translate callback. Return an ErrorKey and let the display edge translate it (zingo-adrs zingo-mobile/0009).',
         },
       ],
     },

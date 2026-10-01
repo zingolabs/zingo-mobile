@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
 import { balanceAtom } from '@app/AppState/balance';
 import { seed } from '../../../../.storybook/storeWith';
-import { SelectServerEnum } from '@app/AppState';
+import { ChainNameEnum, remoteServer } from '@app/AppState';
 import BalanceRow from './BalanceRow';
 import {
   mockTranslate,
@@ -10,6 +10,8 @@ import {
   withNavigation,
 } from '../../../../.storybook/storyDecorators';
 import {
+  mixnetOff,
+  mixnetReady,
   mockInfo,
   mockZecPrice,
   polledMockBalance,
@@ -33,7 +35,7 @@ const meta: Meta<typeof BalanceRow> = {
     translate: mockTranslate,
     info: mockInfo,
     zecPrice: mockZecPrice,
-    selectServer: SelectServerEnum.auto,
+    server: remoteServer(mockInfo.serverUri, ChainNameEnum.mainChainName),
     showShieldButton: false,
     shieldingFee: 0,
     valueTransfersTotal: 12,
@@ -42,6 +44,7 @@ const meta: Meta<typeof BalanceRow> = {
     calculateDisableButtonToShield: () => true,
     onPressShieldFunds: () => {},
     receivedLegend: false,
+    mixnetView: mixnetReady,
   },
 };
 
@@ -55,5 +58,11 @@ export const WithShield: Story = {
     showShieldButton: true,
     calculateDisableButtonToShield: () => false,
     calculateAmountToShield: () => '0.5',
+  },
+};
+export const WithShieldBlocked: Story = {
+  args: {
+    ...WithShield.args,
+    mixnetView: mixnetOff,
   },
 };

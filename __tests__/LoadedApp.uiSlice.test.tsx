@@ -65,30 +65,24 @@ jest.mock('@ui/widgets/NewAddressTag', () => ({
   default: 'MockNewAddressTag',
 }));
 
-import React from 'react';
-import NetInfo from '@react-native-community/netinfo/src/index';
-import { act, render } from '@testing-library/react-native';
-import { createStore } from 'jotai';
+import { act } from '@testing-library/react-native';
 
-const { AppState, Linking } =
+const { AppState } =
   jest.requireActual<typeof import('react-native')>('react-native');
 
-import { LoadedApp, LoadedAppClass } from '@app/LoadedApp';
 import { resolveTriggerGate } from '@app/services/gateController';
-import {
-  AppStateStatusEnum,
-  ChainNameEnum,
-  LaunchingModeEnum,
-  RouteEnum,
-} from '@app/AppState';
+import { AppStateStatusEnum } from '@app/AppState';
 import { appStateStatusAtom, addTagModalAtom } from '@app/AppState/uiAtoms';
 import { syncStatusAtom } from '@app/AppState/syncAtoms';
 import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
-import { StackScreenProps } from '@react-navigation/stack';
-import { AppStackParamList } from '@app/types';
-import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 import { polledMockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import { balanceAtom } from '@app/AppState/balance';
+import {
+  controllerStoreOf,
+  flushMicrotasks,
+  mountCommitted,
+  spyOnLifecycleListeners,
+} from './helpers/loadedAppHarness';
 
 const resolveTriggerGateMock = resolveTriggerGate as jest.Mock;
 const netInfoUnsubscribe = jest.fn();
@@ -98,55 +92,10 @@ const syncing = (percent: number): RPCSyncStatusType => ({
   percentage_total_outputs_scanned: percent,
 });
 
-function controllerStoreOf(
-  instance: LoadedAppClass,
-): ReturnType<typeof createStore> {
-  return (
-    instance as unknown as { controllerStore: ReturnType<typeof createStore> }
-  ).controllerStore;
-}
-
 function captureAppStateHandler(): (s: string) => Promise<void> {
   const spy = AppState.addEventListener as unknown as jest.Mock;
   const call = spy.mock.calls.find(c => c[0] === 'change');
   return call![1];
-}
-
-type DrawerProps = StackScreenProps<AppStackParamList, RouteEnum.LoadedApp>;
-
-function makeDrawerProps(): DrawerProps {
-  return {
-    navigation: mockNavigation,
-    route: {
-      key: 'Key-1',
-      name: RouteEnum.LoadedApp,
-      params: {
-        readOnly: false,
-        orchardPool: true,
-        saplingPool: true,
-        transparentPool: true,
-        newWallet: false,
-        firstLaunchingMessage: LaunchingModeEnum.opening,
-        walletChainName: ChainNameEnum.mainChainName,
-      },
-    },
-  } as DrawerProps;
-}
-
-async function flushMicrotasks(times = 100): Promise<void> {
-  for (let i = 0; i < times; i++) {
-    await Promise.resolve();
-  }
-}
-
-async function mountCommitted() {
-  const utils = render(<LoadedApp {...makeDrawerProps()} />);
-  await act(async () => {
-    await flushMicrotasks();
-  });
-  const instance = utils.UNSAFE_root.findByType(LoadedAppClass)
-    .instance as LoadedAppClass;
-  return { utils, instance };
 }
 
 describe('fg/bg + residual UI slice', () => {
@@ -154,14 +103,7 @@ describe('fg/bg + residual UI slice', () => {
     jest.useFakeTimers();
     jest.clearAllMocks();
     resolveTriggerGateMock.mockResolvedValue({ kind: 'passed' });
-    (NetInfo.addEventListener as jest.Mock).mockReturnValue(netInfoUnsubscribe);
-    jest
-      .spyOn(AppState, 'addEventListener')
-      .mockReturnValue({ remove: jest.fn() } as never);
-    jest
-      .spyOn(Linking, 'addEventListener')
-      .mockReturnValue({ remove: jest.fn() } as never);
-    jest.spyOn(Linking, 'getInitialURL').mockResolvedValue(null);
+    spyOnLifecycleListeners(netInfoUnsubscribe);
   });
 
   afterEach(() => {
@@ -197,32 +139,11 @@ describe('fg/bg + residual UI slice', () => {
     });
 
     expect(store.get(addTagModalAtom)).toMatchObject({
-      kind: 'shown',
+      kind: 'launched',
+      launch: 1,
       address: 'zs1recipient',
-      own: false,
     });
     expect(renderSpy).not.toHaveBeenCalled();
-  });
-
-  it('Tests that the add-tag sheet presents with its form rendered when a contact launch opens it.', async () => {
-    const { utils, instance } = await mountCommitted();
-    const formRenderedAtPresent: boolean[] = [];
-    const sheet = {
-      present: () => {
-        formRenderedAtPresent.push(
-          utils.UNSAFE_queryAllByProps({ address: 'zs1recipient' }).length > 0,
-        );
-      },
-      dismiss: jest.fn(),
-    };
-    (instance.addTagModalRef as React.MutableRefObject<unknown>).current =
-      sheet;
-
-    act(() => {
-      instance.launchAddTagModal('zs1recipient');
-    });
-
-    expect(formRenderedAtPresent).toEqual([true]);
   });
 });
 
@@ -231,14 +152,7 @@ describe('whole-tree re-render proof', () => {
     jest.useFakeTimers();
     jest.clearAllMocks();
     resolveTriggerGateMock.mockResolvedValue({ kind: 'passed' });
-    (NetInfo.addEventListener as jest.Mock).mockReturnValue(netInfoUnsubscribe);
-    jest
-      .spyOn(AppState, 'addEventListener')
-      .mockReturnValue({ remove: jest.fn() } as never);
-    jest
-      .spyOn(Linking, 'addEventListener')
-      .mockReturnValue({ remove: jest.fn() } as never);
-    jest.spyOn(Linking, 'getInitialURL').mockResolvedValue(null);
+    spyOnLifecycleListeners(netInfoUnsubscribe);
   });
 
   afterEach(() => {
