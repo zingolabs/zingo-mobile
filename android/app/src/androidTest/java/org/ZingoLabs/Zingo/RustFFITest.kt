@@ -3,9 +3,6 @@ package org.ZingoLabs.Zingo
 import android.os.Bundle
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
-import kotlin.time.Duration.Companion.minutes
-import kotlin.time.DurationUnit
-import kotlin.time.TimeSource
 import org.junit.Test
 import org.junit.experimental.categories.Category
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -285,7 +282,7 @@ class ExecuteSyncFromSeed {
         val mapper = testMapper()
 
         val window = 10_000L
-        val deadline = 30.minutes
+        val deadlineSeconds = 30 * 60
         val seed = Seeds.HOSPITAL
         val servers = listOf(MainnetServers.PRIMARY, MainnetServers.FALLBACK)
 
@@ -322,24 +319,25 @@ class ExecuteSyncFromSeed {
         println("\nSync:")
         println(syncJson)
 
-        val start = TimeSource.Monotonic.markNow()
+        val start = System.nanoTime()
+        val elapsedSeconds = { (System.nanoTime() - start) / 1e9 }
         try {
             while (!uniffi.zingo.pollSync().contains("sync_complete")) {
-                if (start.elapsedNow() > deadline) {
-                    throw AssertionError("the sync of $window mainnet blocks passed its $deadline deadline: ${uniffi.zingo.statusSync()}")
+                if (elapsedSeconds() > deadlineSeconds) {
+                    throw AssertionError("the sync of $window mainnet blocks passed its $deadlineSeconds s deadline: ${uniffi.zingo.statusSync()}")
                 }
                 Thread.sleep(5000)
             }
         } catch (e: uniffi.zingo.ZingolibException) {
-            throw AssertionError("the sync of $window mainnet blocks failed after ${start.elapsedNow()}: ${e.message}", e)
+            throw AssertionError("the sync of $window mainnet blocks failed after ${elapsedSeconds()} s: ${e.message}", e)
         }
-        val elapsed = start.elapsedNow()
-        println("\nSynced $window mainnet blocks in $elapsed")
+        val elapsed = elapsedSeconds()
+        println("\nSynced $window mainnet blocks in $elapsed s")
         InstrumentationRegistry.getInstrumentation().sendStatus(
             2,
             Bundle().apply {
                 putString("sync_blocks", window.toString())
-                putString("sync_seconds", elapsed.toDouble(DurationUnit.SECONDS).toString())
+                putString("sync_seconds", elapsed.toString())
             },
         )
 
