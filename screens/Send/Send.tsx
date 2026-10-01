@@ -1304,6 +1304,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                     >
                       {addressText && (
                         <TouchableOpacity
+                          testID="send.address.clear"
                           onPress={() => {
                             updateToField('', null, null, null, null);
                           }}
