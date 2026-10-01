@@ -149,6 +149,7 @@ jobs:
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
       abi: x86_64
       fail-all: true
+      gradle-cache-writer: ${{ github.event_name == 'push' && github.ref_name == github.event.repository.default_branch }}
 
   # Deliberately NO needs-edge on andr-apk-build: the buckets start
   # at workflow launch, front-load all APK-independent setup, and hold

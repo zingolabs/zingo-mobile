@@ -37,12 +37,8 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      # Read-only: android-dependency-analysis.yaml is the one writer of
-      # the Gradle caches.
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v6
-        with:
-          cache-read-only: true
+      - name: Gradle cache
+        uses: ./.github/actions/gradle-cache
 
       # The lint below is the same script developers run locally, so a green
       # CI lint and a green local lint mean the same thing. Both take the

@@ -165,10 +165,7 @@ jobs:
       # Maven dependency caching only — content-addressed, immutable, signed
       # by upstream. No build outputs are cached cross-run.
       - name: Gradle setup (Maven dep cache only)
-        uses: gradle/actions/setup-gradle@v6
-        with:
-          gradle-version: wrapper
-          cache-read-only: true
+        uses: ./.github/actions/gradle-cache
 
       # Gradle includes the Binding Layer from the zingolib submodule, and
       # takes the libraries that the binding-layer jobs built.

@@ -81,16 +81,6 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Gradle setup cache (read-only)
-        uses: gradle/actions/setup-gradle@v6
-        with:
-          gradle-version: wrapper
-          # Read-only: android-dependency-analysis.yaml is the one writer of
-          # the Gradle caches. This job runs no Gradle task, and the entry
-          # that it wrote from dev held no dependency.
-          cache-write-only: false
-          cache-read-only: true
-
       - name: Check AVD cache
         uses: actions/cache/restore@v6
         id: avd-cache
@@ -236,13 +226,6 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
-
-      - name: Gradle setup cache (read-only)
-        uses: gradle/actions/setup-gradle@v6
-        with:
-          gradle-version: wrapper
-          cache-write-only: false
-          cache-read-only: true
 
       - name: Restore AVD cache
         uses: actions/cache/restore@v6

@@ -22,6 +22,13 @@ on:
         required: false
         type: boolean
         default: false
+      # When true, this job saves the Gradle cache that every Gradle job
+      # restores. One caller passes true, the CI run of a push to the
+      # default branch.
+      gradle-cache-writer:
+        required: false
+        type: boolean
+        default: false
 
 env:
   REPO-OWNER: ${{ github.repository_owner }}
@@ -51,13 +58,10 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Gradle setup cache (read-only)
-        uses: gradle/actions/setup-gradle@v6
+      - name: Gradle cache
+        uses: ./.github/actions/gradle-cache
         with:
-          gradle-version: wrapper
-          # Read-only: android-dependency-analysis.yaml is the one writer of
-          # the Gradle caches.
-          cache-read-only: true
+          writer: ${{ inputs.gradle-cache-writer }}
 
       - name: Check out zingolib
         uses: ./.github/actions/zingolib-submodule
@@ -120,6 +124,14 @@ jobs:
           path: |
             android/app/build/outputs
           retention-days: 3
+
+      # setup-gradle saves the files that this job's builds used. These are
+      # the tasks of the other Gradle jobs.
+      - name: Fill the Gradle cache
+        if: ${{ inputs.gradle-cache-writer }}
+        continue-on-error: true
+        working-directory: android
+        run: ./gradlew --continue buildHealth :app:lintProdRelease :app:testProdReleaseUnitTest
 
       - name: Cancel the run on failure (fail-all)
         if: ${{ failure() && inputs.fail-all }}
