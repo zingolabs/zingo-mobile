@@ -114,7 +114,6 @@ import OnboardingStage from '@ui/widgets/OnboardingStage';
 import WalletProgress from '@screens/WalletProgress';
 import { duration as motionDuration } from '@app/theme/motion';
 
-const IMPORTED_HOLD_MS = 700;
 import { sendEmail } from '@app/services/sendEmail';
 import { RPCWalletKindEnum } from '@app/walletBackend/enums/RPCWalletKindEnum';
 import StartMenu from '@screens/StartMenu';
@@ -405,7 +404,6 @@ export class LoadingAppClass extends Component<
           : RouteEnum.Launching,
       actionButtonsDisabled: false,
       progressKind: 'import',
-      progressDone: false,
       walletExists: false,
       hasBackupWallet: false,
       customServerUri: '',
@@ -1469,7 +1467,6 @@ export class LoadingAppClass extends Component<
     this.setState({
       actionButtonsDisabled: true,
       progressKind: 'create',
-      progressDone: false,
     });
     const showProgress = setTimeout(
       () => this.setState({ screen: RouteEnum.WalletProgress }),
@@ -1540,12 +1537,9 @@ export class LoadingAppClass extends Component<
       clearTimeout(showProgress);
       this.setState({
         wallet,
-        screen: RouteEnum.WalletProgress,
         actionButtonsDisabled: false,
         walletExists: true,
-        progressDone: true,
       });
-      await new Promise(resolve => setTimeout(resolve, IMPORTED_HOLD_MS));
       this.navigateToLoadedApp(
         this.state.readOnly,
         this.state.orchardPool,
@@ -1649,7 +1643,6 @@ export class LoadingAppClass extends Component<
     this.setState({
       actionButtonsDisabled: true,
       progressKind: 'import',
-      progressDone: false,
     });
     const showImporting = setTimeout(
       () => this.setState({ screen: RouteEnum.WalletProgress }),
@@ -1747,11 +1740,6 @@ export class LoadingAppClass extends Component<
             this.addLastSnackbar(walletKindStr);
           }
           clearTimeout(showImporting);
-          this.setState({
-            screen: RouteEnum.WalletProgress,
-            progressDone: true,
-          });
-          await new Promise(resolve => setTimeout(resolve, IMPORTED_HOLD_MS));
           this.navigateToLoadedApp(
             readOnly,
             orchardPool,
@@ -2089,10 +2077,7 @@ export class LoadingAppClass extends Component<
                     />
                   )}
                   {screen === RouteEnum.WalletProgress && (
-                    <WalletProgress
-                      kind={this.state.progressKind}
-                      done={this.state.progressDone}
-                    />
+                    <WalletProgress kind={this.state.progressKind} />
                   )}
                   {screen === RouteEnum.ImportUfvk && (
                     <ImportUfvk

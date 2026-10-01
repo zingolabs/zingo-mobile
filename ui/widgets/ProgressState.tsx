@@ -3,14 +3,20 @@ import React, { useEffect } from 'react';
 import { View } from 'react-native';
 import Animated, {
   Easing,
+  FadeIn,
+  ReduceMotion,
+  ZoomIn,
+  ZoomOut,
   useAnimatedStyle,
   useSharedValue,
+  withDelay,
   withRepeat,
   withSequence,
   withTiming,
 } from 'react-native-reanimated';
 
 import { useTheme } from '@app/theme';
+import { duration, ease } from '@app/theme/motion';
 import RegText from '@ui/primitives/RegText';
 import BoldText from '@ui/primitives/BoldText';
 import TransactionCreatedIcon from '../../assets/img/transaction-created.svg';
@@ -19,54 +25,59 @@ import TransactionFailedIcon from '../../assets/img/transaction-failed.svg';
 export const RING_GREEN = '#149D05';
 export const RING_RED = '#822929';
 
-// "Typing" dot animation timing (Signal-style indicator). Each dot fades in
-// and out over (DOT_PULSE_MS * 2) ms; consecutive dots are offset by
-// DOT_OFFSET_MS so the wave travels left-to-right. After all three finish,
-// there's a DOT_PAUSE_MS gap before the next round starts.
-const DOT_PULSE_MS = 500;
-const DOT_OFFSET_MS = 400;
-const DOT_PAUSE_MS = 1100;
-const DOT_COUNT = 3;
-const DOT_OPACITY_MIN = 0.25;
-const DOT_CYCLE_MS =
-  (DOT_COUNT - 1) * DOT_OFFSET_MS + DOT_PULSE_MS * 2 + DOT_PAUSE_MS;
+// One dot grows from 0.55 to 1 and from 35% to full opacity and back over
+// the first 80% of a 1.1 s loop; the next dot starts 160 ms later.
+const LOOP_MS = 1100;
+const RISE_MS = LOOP_MS * 0.4;
+const HOLD_MS = LOOP_MS * 0.2;
+const DOT_OFFSET_MS = 160;
+const DOT_MIN_SCALE = 0.55;
+const DOT_MIN_OPACITY = 0.35;
+const RING = 56;
 
-type TypingDotProps = {
+type DotProps = {
+  size: number;
+  gap: number;
   delay: number;
   color: string;
 };
 
-const TypingDot: React.FC<TypingDotProps> = ({ delay, color }) => {
-  const opacity = useSharedValue(DOT_OPACITY_MIN);
+const Dot: React.FC<DotProps> = ({ size, gap, delay, color }) => {
+  const t = useSharedValue(0);
   useEffect(() => {
-    const tailWait = DOT_CYCLE_MS - delay - DOT_PULSE_MS * 2;
-    opacity.value = withRepeat(
-      withSequence(
-        withTiming(DOT_OPACITY_MIN, { duration: delay }),
-        withTiming(1, {
-          duration: DOT_PULSE_MS,
-          easing: Easing.inOut(Easing.ease),
-        }),
-        withTiming(DOT_OPACITY_MIN, {
-          duration: DOT_PULSE_MS,
-          easing: Easing.inOut(Easing.ease),
-        }),
-        withTiming(DOT_OPACITY_MIN, { duration: tailWait }),
+    t.value = withDelay(
+      delay,
+      withRepeat(
+        withSequence(
+          withTiming(1, {
+            duration: RISE_MS,
+            easing: Easing.inOut(Easing.ease),
+          }),
+          withTiming(0, {
+            duration: RISE_MS,
+            easing: Easing.inOut(Easing.ease),
+          }),
+          withTiming(0, { duration: HOLD_MS }),
+        ),
+        -1,
       ),
-      -1,
     );
     return () => {
-      opacity.value = DOT_OPACITY_MIN;
+      t.value = 0;
     };
-  }, [delay, opacity]);
-  const style = useAnimatedStyle(() => ({ opacity: opacity.value }));
+  }, [delay, t]);
+  const style = useAnimatedStyle(() => ({
+    opacity: DOT_MIN_OPACITY + (1 - DOT_MIN_OPACITY) * t.value,
+    transform: [{ scale: DOT_MIN_SCALE + (1 - DOT_MIN_SCALE) * t.value }],
+  }));
   return (
     <Animated.View
       style={[
         {
-          width: 10,
-          height: 10,
-          borderRadius: 5,
+          width: size,
+          height: size,
+          borderRadius: size / 2,
+          marginHorizontal: gap / 2,
           backgroundColor: color,
         },
         style,
@@ -75,16 +86,33 @@ const TypingDot: React.FC<TypingDotProps> = ({ delay, color }) => {
   );
 };
 
-export const TypingDots: React.FC = () => {
+type LoadingDotsProps = {
+  size?: number;
+  gap?: number;
+  color?: string;
+  testID?: string;
+};
+
+export const LoadingDots: React.FC<LoadingDotsProps> = ({
+  size = 11,
+  gap = 11,
+  color,
+  testID,
+}) => {
   const { colors } = useTheme();
+  const tint = color ?? colors.fgMuted;
   return (
     <View
-      testID="progress.dots"
-      style={{ flexDirection: 'row', marginTop: 24, gap: 12 }}
+      testID={testID}
+      style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
     >
-      <TypingDot delay={0} color={colors.bgMuted} />
-      <TypingDot delay={DOT_OFFSET_MS} color={colors.bgMuted} />
-      <TypingDot delay={DOT_OFFSET_MS * 2} color={colors.bgMuted} />
+      <Dot size={size} gap={gap} delay={0} color={tint} />
+      <Dot size={size} gap={gap} delay={DOT_OFFSET_MS} color={tint} />
+      <Dot size={size} gap={gap} delay={DOT_OFFSET_MS * 2} color={tint} />
     </View>
   );
 };
@@ -94,60 +122,79 @@ export type ProgressStateKind = 'working' | 'done' | 'failed';
 type ProgressStateProps = {
   state: ProgressStateKind;
   title: string;
-  body: string;
+  body?: string;
 };
 
-// The 100x100 circle keeps its size in every state so the title stays at
-// the same height when the ring and icon appear.
+const dotsExit = () =>
+  ZoomOut.duration(160).reduceMotion(ReduceMotion.System);
+const ringEnter = () =>
+  ZoomIn.duration(360)
+    .easing(ease.spring)
+    .withInitialValues({ transform: [{ scale: 0.6 }] })
+    .reduceMotion(ReduceMotion.System);
+const checkEnter = () =>
+  FadeIn.duration(320).delay(duration.base).reduceMotion(ReduceMotion.System);
+
+// The dots and the ring share one 56 pt box so the title never moves.
 const ProgressState: React.FC<ProgressStateProps> = ({
   state,
   title,
   body,
 }) => {
   const { colors } = useTheme();
-  const terminal = state !== 'working';
 
   return (
     <>
       <View
-        testID={`progress.${state}`}
         style={{
-          width: 100,
-          height: 100,
-          borderRadius: 50,
-          borderWidth: terminal ? 3 : 0,
-          borderColor:
-            state === 'done'
-              ? RING_GREEN
-              : state === 'failed'
-                ? RING_RED
-                : 'transparent',
+          height: RING,
+          marginBottom: 26,
           alignItems: 'center',
           justifyContent: 'center',
         }}
       >
-        {state === 'done' && <TransactionCreatedIcon width={30} height={30} />}
-        {state === 'failed' && <TransactionFailedIcon width={30} height={30} />}
+        {state === 'working' ? (
+          <Animated.View exiting={dotsExit()}>
+            <LoadingDots testID="progress.dots" />
+          </Animated.View>
+        ) : (
+          <Animated.View
+            testID={`progress.${state}`}
+            entering={ringEnter()}
+            style={{
+              width: RING,
+              height: RING,
+              borderRadius: RING / 2,
+              borderWidth: 2,
+              borderColor: state === 'done' ? RING_GREEN : RING_RED,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <Animated.View entering={checkEnter()}>
+              {state === 'done' ? (
+                <TransactionCreatedIcon width={26} height={26} />
+              ) : (
+                <TransactionFailedIcon width={26} height={26} />
+              )}
+            </Animated.View>
+          </Animated.View>
+        )}
       </View>
-      <BoldText
-        style={{
-          fontSize: 20,
-          marginTop: 48,
-          textAlign: 'center',
-        }}
-      >
-        {title}
-      </BoldText>
-      <RegText
-        style={{
-          marginTop: 12,
-          textAlign: 'center',
-          color: colors.fgMuted,
-        }}
-      >
-        {body}
-      </RegText>
-      {!terminal && <TypingDots />}
+      <BoldText style={{ fontSize: 17, textAlign: 'center' }}>{title}</BoldText>
+      {!!body && (
+        <RegText
+          style={{
+            marginTop: 8,
+            fontSize: 11.5,
+            lineHeight: 18,
+            textAlign: 'center',
+            color: colors.fgMuted,
+          }}
+        >
+          {body}
+        </RegText>
+      )}
     </>
   );
 };

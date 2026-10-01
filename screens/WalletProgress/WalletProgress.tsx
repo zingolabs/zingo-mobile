@@ -9,14 +9,12 @@ export type WalletProgressKind = 'import' | 'create';
 
 type WalletProgressProps = {
   kind: WalletProgressKind;
-  done: boolean;
 };
 
 const CENTER_TOP = 300 / 874;
 
 const WalletProgress: React.FunctionComponent<WalletProgressProps> = ({
   kind,
-  done,
 }) => {
   const { translate } = useContext(ContextAppLoading);
 
@@ -32,25 +30,12 @@ const WalletProgress: React.FunctionComponent<WalletProgressProps> = ({
         }}
       >
         <ProgressState
-          state={done ? 'done' : 'working'}
+          state="working"
           title={
             translate(
               kind === 'import'
-                ? done
-                  ? 'import.imported-title'
-                  : 'import.importing-title'
-                : done
-                  ? 'loadingapp.created-title'
-                  : 'loadingapp.creating-title',
-            ) as string
-          }
-          body={
-            translate(
-              done
-                ? 'import.imported-body'
-                : kind === 'import'
-                  ? 'import.importing-body'
-                  : 'loadingapp.creating-body',
+                ? 'import.importing-title'
+                : 'loadingapp.creating-title',
             ) as string
           }
         />

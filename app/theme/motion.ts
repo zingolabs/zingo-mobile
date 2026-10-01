@@ -5,11 +5,16 @@ export const duration = {
   fast: 140,
   base: 200,
   medium: 260,
+  axis: 300,
+  axisOut: 180,
   emphasized: 320,
   screen: 420,
+  sheet: 420,
+  sheetClose: 260,
   leavesPart: 640,
   leavesReturn: 720,
   hero: 1100,
+  hold: 1500,
 } as const;
 
 export const ease = {
