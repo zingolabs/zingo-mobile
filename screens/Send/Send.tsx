@@ -44,7 +44,10 @@ import { SvgXml } from 'react-native-svg';
 import FadeText from '@ui/primitives/FadeText';
 import BoldText from '@ui/primitives/BoldText';
 import Swap from '../../assets/img/swap.svg';
-import { sendGateOpen } from '@app/walletBackend/transforms/mixnetView';
+import {
+  sendGateOpen,
+  shownStatusKey,
+} from '@app/walletBackend/transforms/mixnetView';
 import ErrorText from '@ui/primitives/ErrorText';
 import RegText from '@ui/primitives/RegText';
 import ZecAmount from '@ui/widgets/ZecAmount';
@@ -1991,13 +1994,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                       {translate('send.nym-blocked') as string}
                     </FadeText>
                     <RegText color={colors.fgDefault} style={{ fontSize: 13 }}>
-                      {
-                        translate(
-                          mixnetView.reconnecting
-                            ? 'mixnet.reconnecting'
-                            : mixnetView.statusKey,
-                        ) as string
-                      }
+                      {translate(shownStatusKey(mixnetView)) as string}
                     </RegText>
                   </View>
                 )}

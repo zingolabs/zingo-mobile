@@ -22,7 +22,10 @@ import {
   mockZecPrice,
 } from '../.storybook/storyMocks';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
-import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
+
+// Rendering the raw key keeps the assertions on which translation the row
+// picked, not on catalog prose.
+const keyTranslate = (key: string) => key;
 
 function renderRow(
   mixnetView: MixnetView | null,
@@ -36,7 +39,7 @@ function renderRow(
         setPrivacyOption={undefined}
         addLastSnackbar={undefined}
         privacy={false}
-        translate={mockTranslate}
+        translate={keyTranslate}
         totalBalance={mockTotalBalance}
         info={mockInfo}
         zecPrice={mockZecPrice}
@@ -93,5 +96,26 @@ describe('BalanceRow shield button', () => {
     const { getByTestId } = renderRow(mixnetReady, onPressShieldFunds);
     fireEvent.press(getByTestId('header.shield'));
     expect(onPressShieldFunds).toHaveBeenCalledTimes(1);
+  });
+
+  test('Tests that the blocked reason replaces the shield legend when the mixnet view blocks sends. The mixnet is off.', () => {
+    const { getByTestId, queryByText } = renderRow(mixnetOff);
+    const reason = getByTestId('header.shield-blocked');
+    expect(reason).toHaveTextContent(/send\.nym-blocked/);
+    expect(reason).toHaveTextContent(new RegExp(mixnetOff.statusKey));
+    expect(queryByText(/history\.shield-legend/)).toBeNull();
+  });
+
+  test('Tests that the blocked reason shows the reconnecting status when a lost transport is reconnecting.', () => {
+    const { getByTestId } = renderRow(mixnetLost);
+    expect(getByTestId('header.shield-blocked')).toHaveTextContent(
+      /mixnet\.reconnecting/,
+    );
+  });
+
+  test('Tests that the shield legend shows, without a blocked reason, when the mixnet view is ready.', () => {
+    const { queryByTestId, getByText } = renderRow(mixnetReady);
+    expect(queryByTestId('header.shield-blocked')).toBeNull();
+    expect(getByText(/history\.shield-legend/)).toBeTruthy();
   });
 });

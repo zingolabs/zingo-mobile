@@ -29,6 +29,7 @@ import ZecPriceType from '@app/AppState/types/ZecPriceType';
 import {
   MixnetView,
   sendGateOpen,
+  shownStatusKey,
 } from '@app/walletBackend/transforms/mixnetView';
 import Utils from '@app/utils';
 import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
@@ -245,16 +246,30 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
           !calculateDisableButtonToShield() &&
           valueTransfersTotal !== null && (
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-              <FadeText style={{ fontSize: 8 }}>
-                {(translate(
-                  `history.shield-legend-${calculatePoolsToShield()}`,
-                ) as string) +
-                  ` ${calculateAmountToShield()} ` +
-                  (translate('send.fee') as string) +
-                  ': ' +
-                  Utils.parseNumberFloatToStringLocale(shieldingFee, 8) +
-                  ' '}
-              </FadeText>
+              {mixnetView !== null && mixnetView.sendBlocked ? (
+                <View
+                  style={{ alignItems: 'center' }}
+                  testID="header.shield-blocked"
+                >
+                  <FadeText style={{ fontSize: 8 }}>
+                    {translate('send.nym-blocked') as string}
+                  </FadeText>
+                  <FadeText style={{ fontSize: 8 }}>
+                    {translate(shownStatusKey(mixnetView)) as string}
+                  </FadeText>
+                </View>
+              ) : (
+                <FadeText style={{ fontSize: 8 }}>
+                  {(translate(
+                    `history.shield-legend-${calculatePoolsToShield()}`,
+                  ) as string) +
+                    ` ${calculateAmountToShield()} ` +
+                    (translate('send.fee') as string) +
+                    ': ' +
+                    Utils.parseNumberFloatToStringLocale(shieldingFee, 8) +
+                    ' '}
+                </FadeText>
+              )}
               <View style={{ margin: 5, flexDirection: 'row' }}>
                 <Button
                   testID="header.shield"
