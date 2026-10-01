@@ -1,0 +1,58 @@
+appId: org.ZingoLabs.Zingo
+tags:
+  - screen-awake
+---
+# The default nightly run excludes this flow. The Android job runs it on
+# its own, between two steps that set a ten-second screen-off timeout and
+# then read the power state through adb. The app holds a keep-awake lock
+# while it syncs, and the screen must still be on after twenty idle
+# seconds.
+#
+# Every flow starts from a clean install. Maestro does not run flows in
+# file order, and a flow that inherited the state of the previous one
+# would pass or fail on luck. A fresh install lands on the start menu on
+# mainnet, and each flow creates or restores its own wallet there.
+- launchApp:
+    clearState: true
+
+# The mainnet test wallet of the retired Detox suite. Its birthday sits
+# more than a million blocks below the tip, and the sync outlasts the
+# wait.
+- extendedWaitUntil:
+    visible:
+      id: "loadingapp.restorewalletseedufvk"
+    timeout: 120000
+- tapOn:
+    id: "loadingapp.restorewalletseedufvk"
+- extendedWaitUntil:
+    visible:
+      id: "import.seedufvkinput"
+    timeout: 120000
+- tapOn:
+    id: "import.seedufvkinput"
+- inputText: "lottery multiply patient simple ivory leisure swift square west despair beauty match crowd margin reject box always title photo remind word diet ecology badge"
+
+# The birthday field accepts input once the server reports its latest
+# block, which the hint under the label then shows next to the Sapling
+# activation height.
+- extendedWaitUntil:
+    visible:
+      text: "(?s).*\\(419200, [0-9]+\\).*"
+    timeout: 60000
+- tapOn:
+    id: "import.birthdayinput"
+- inputText: "1994579"
+- tapOn:
+    id: "import.button.ok"
+- extendedWaitUntil:
+    visible:
+      id: "header.drawmenu"
+    timeout: 120000
+
+# Twenty seconds with no input. No element carries this id, and the wait
+# always runs to its timeout. Maestro reports the miss as a warning.
+- extendedWaitUntil:
+    visible:
+      id: "screen-awake.idle"
+    timeout: 20000
+    optional: true
