@@ -437,7 +437,7 @@ jobs:
   # Android Test Orchestrator gives each test its own process and cleared
   # app data.
   android-device-test:
-    name: device tests
+    name: offline device tests
     needs:
       - android-ubuntu-integration-test-ci-avd-cache
     runs-on: ${{ startsWith(inputs.runner, '[') && fromJSON(inputs.runner) || inputs.runner }}
