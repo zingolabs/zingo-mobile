@@ -1,6 +1,5 @@
 package org.ZingoLabs.Zingo
 
-import android.os.Bundle
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
@@ -65,7 +64,7 @@ object Seeds {
 
 object MainnetServers {
     const val PRIMARY = "https://zec.rocks:443"
-    const val FALLBACK = "https://na.zec.rocks:443"
+    const val FALLBACK = "https://zcash.mysideoftheweb.com:9067"
 }
 
 object Ufvk {
@@ -293,13 +292,18 @@ class ExecuteSyncFromSeed {
         val deadlineSeconds = 5 * 60
         val seed = Seeds.HOSPITAL
         val servers = listOf(MainnetServers.PRIMARY, MainnetServers.FALLBACK)
+        val start = System.nanoTime()
+        val elapsedSeconds = { (System.nanoTime() - start) / 1e9 }
 
+        val refusals = mutableMapOf<String, Exception>()
         val (serveruri, tip) = servers.firstNotNullOfOrNull { uri ->
-            runCatching { uniffi.zingo.getLatestBlockServer(uri).toLong() }
-                .onFailure { println("\n$uri did not answer: ${it.message}") }
-                .getOrNull()
-                ?.let { uri to it }
-        } ?: throw AssertionError("no mainnet server answered: $servers")
+            try {
+                uri to uniffi.zingo.getLatestBlockServer(uri).toLong()
+            } catch (e: Exception) {
+                refusals[uri] = e
+                null
+            }
+        } ?: throw AssertionError("no mainnet server answered: $refusals", refusals.values.last())
         println("\nTip of $serveruri: $tip")
 
         val birthday = tip - window
@@ -327,27 +331,20 @@ class ExecuteSyncFromSeed {
         println("\nSync:")
         println(syncJson)
 
-        val start = System.nanoTime()
-        val elapsedSeconds = { (System.nanoTime() - start) / 1e9 }
+        val syncStart = System.nanoTime()
         try {
             while (!uniffi.zingo.pollSync().contains("sync_complete")) {
                 if (elapsedSeconds() > deadlineSeconds) {
-                    throw AssertionError("the sync of $window mainnet blocks passed its $deadlineSeconds s deadline: ${uniffi.zingo.statusSync()}")
+                    val status = runCatching { uniffi.zingo.statusSync() }
+                        .getOrElse { "status unavailable: ${it.message}" }
+                    throw AssertionError("the test passed its $deadlineSeconds s deadline while syncing $window mainnet blocks: $status")
                 }
-                Thread.sleep(5000)
+                Thread.sleep(1000)
             }
         } catch (e: uniffi.zingo.ZingolibException) {
             throw AssertionError("the sync of $window mainnet blocks failed after ${elapsedSeconds()} s: ${e.message}", e)
         }
-        val elapsed = elapsedSeconds()
-        println("\nSynced $window mainnet blocks in $elapsed s")
-        InstrumentationRegistry.getInstrumentation().sendStatus(
-            2,
-            Bundle().apply {
-                putString("sync_blocks", window.toString())
-                putString("sync_seconds", elapsed.toString())
-            },
-        )
+        println("\nSynced $window mainnet blocks in ${(System.nanoTime() - syncStart) / 1e9} s")
 
         heightJson = uniffi.zingo.getLatestBlockWallet()
         println("\nHeight post-sync:")
