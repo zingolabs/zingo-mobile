@@ -4,7 +4,7 @@ appId: org.ZingoLabs.Zingo
     file: common/create_wallet.yaml
 
 # A new wallet has its birthday at the chain tip. The check icon shows
-# once the sync reaches the tip.
+# while no sync is in progress.
 - extendedWaitUntil:
     visible:
       id: "header.checkicon"

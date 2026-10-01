@@ -35,9 +35,9 @@ appId: org.ZingoLabs.Zingo
 # holds only the servers that the registry reports online, and the rows
 # and their order vary from night to night. The flow picks the row by its
 # server name, and scrolls to it, because the row can sit below the fold.
-# The first row could be the server already in use, and a save then
-# reconnects nothing. The Settings screen under the sheet can show the
-# same name, so the selector takes the row inside the list.
+# The Settings screen under the sheet can show the same name, so the
+# selector takes the row inside the list. The automatic choice can
+# already be this server, and the read-back below then relies on the mode.
 - extendedWaitUntil:
     visible:
       id: "settings.list-server-select"
@@ -62,16 +62,18 @@ appId: org.ZingoLabs.Zingo
 - tapOn:
     id: "settings.button.save"
 
-# Settings returns to History, where the check icon renders once the
-# wallet has synced on the saved server.
+# Settings returns to History, where the check icon renders while no
+# sync is in progress on the saved server.
 - extendedWaitUntil:
     visible:
       id: "header.checkicon"
     timeout: 300000
 
-# The server row shows the saved server after the wallet reconnected. On
-# iOS the row is one element whose text joins the mode and the server, so
-# the selector allows text before the address.
+# The server row shows the saved mode and the saved server after the
+# wallet reconnected. The mode matters when the automatic choice was
+# already this server, because the address alone would then read the same
+# before the save. On Android the mode and the address are two texts
+# inside the row. On iOS the row is one element whose text joins them.
 - tapOn:
     id: "header.drawmenu"
 - tapOn:
@@ -83,5 +85,22 @@ appId: org.ZingoLabs.Zingo
 - scrollUntilVisible:
     element:
       id: "settings.server"
-- assertVisible:
-    text: ".*https://zec\\.rocks:443/?"
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - assertVisible:
+          text: "List"
+          childOf:
+            id: "settings.server"
+      - assertVisible:
+          text: "https://zec\\.rocks:443/?"
+          childOf:
+            id: "settings.server"
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - assertVisible:
+          id: "settings.server"
+          text: "List, https://zec\\.rocks:443/?"
