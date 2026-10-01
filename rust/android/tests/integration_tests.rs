@@ -24,78 +24,6 @@ async fn validator_activation_heights(validator: &impl Validator) -> String {
     )
 }
 
-async fn execute_version_from_seed(abi: &str) {
-    let local_net = scenarios::funded_orchard_mobileclient(1_000_000).await;
-    let activation_heights = Some(validator_activation_heights(local_net.validator()).await);
-
-    #[cfg(not(feature = "ci"))]
-    let (exit_code, output, error) = zingomobile_utils::android_integration_test(
-        abi,
-        "ExecuteVersionFromSeed",
-        activation_heights.as_deref(),
-    );
-    #[cfg(feature = "ci")]
-    let (exit_code, output, error) = zingomobile_utils::android_integration_test_ci(
-        abi,
-        "ExecuteVersionFromSeed",
-        activation_heights.as_deref(),
-    );
-
-    println!("Exit Code: {}", exit_code);
-    println!("Output: {}", output);
-    println!("Error: {}", error);
-
-    assert_eq!(exit_code, 0);
-}
-
-async fn execute_addresses_from_ufvk(abi: &str) {
-    let local_net = scenarios::funded_orchard_mobileclient(1_000_000).await;
-    let activation_heights = Some(validator_activation_heights(local_net.validator()).await);
-
-    #[cfg(not(feature = "ci"))]
-    let (exit_code, output, error) = zingomobile_utils::android_integration_test(
-        abi,
-        "ExecuteAddressesFromUfvk",
-        activation_heights.as_deref(),
-    );
-    #[cfg(feature = "ci")]
-    let (exit_code, output, error) = zingomobile_utils::android_integration_test_ci(
-        abi,
-        "ExecuteAddressesFromUfvk",
-        activation_heights.as_deref(),
-    );
-
-    println!("Exit Code: {}", exit_code);
-    println!("Output: {}", output);
-    println!("Error: {}", error);
-
-    assert_eq!(exit_code, 0);
-}
-
-async fn execute_addresses_from_seed(abi: &str) {
-    let local_net = scenarios::funded_orchard_mobileclient(1_000_000).await;
-    let activation_heights = Some(validator_activation_heights(local_net.validator()).await);
-
-    #[cfg(not(feature = "ci"))]
-    let (exit_code, output, error) = zingomobile_utils::android_integration_test(
-        abi,
-        "ExecuteAddressesFromSeed",
-        activation_heights.as_deref(),
-    );
-    #[cfg(feature = "ci")]
-    let (exit_code, output, error) = zingomobile_utils::android_integration_test_ci(
-        abi,
-        "ExecuteAddressesFromSeed",
-        activation_heights.as_deref(),
-    );
-
-    println!("Exit Code: {}", exit_code);
-    println!("Output: {}", output);
-    println!("Error: {}", error);
-
-    assert_eq!(exit_code, 0);
-}
-
 async fn execute_sync_from_seed(abi: &str) {
     let local_net = scenarios::funded_orchard_mobileclient(1_000_000).await;
     let activation_heights = Some(validator_activation_heights(local_net.validator()).await);
@@ -191,98 +119,9 @@ async fn execute_sapling_balance_from_seed(abi: &str) {
     assert_eq!(exit_code, 0);
 }
 
-async fn execute_parse_address_for_tex(abi: &str) {
-    // Address parsing only needs a reachable server with nonzero height,
-    // so the cheap scenario suffices; the multi-pool funded scenario
-    // costs ~150s more of regtest setup per test.
-    let local_net = scenarios::funded_orchard_mobileclient(1_000_000).await;
-    let activation_heights = Some(validator_activation_heights(local_net.validator()).await);
-
-    #[cfg(not(feature = "ci"))]
-    let (exit_code, output, error) = zingomobile_utils::android_integration_test(
-        abi,
-        "ExecuteParseAddressForTex",
-        activation_heights.as_deref(),
-    );
-    #[cfg(feature = "ci")]
-    let (exit_code, output, error) = zingomobile_utils::android_integration_test_ci(
-        abi,
-        "ExecuteParseAddressForTex",
-        activation_heights.as_deref(),
-    );
-
-    println!("Exit Code: {}", exit_code);
-    println!("Output: {}", output);
-    println!("Error: {}", error);
-
-    assert_eq!(exit_code, 0);
-}
-
-async fn execute_parse_address_invalid(abi: &str) {
-    // Address parsing only needs a reachable server with nonzero height,
-    // so the cheap scenario suffices; the multi-pool funded scenario
-    // costs ~150s more of regtest setup per test.
-    let local_net = scenarios::funded_orchard_mobileclient(1_000_000).await;
-    let activation_heights = Some(validator_activation_heights(local_net.validator()).await);
-
-    #[cfg(not(feature = "ci"))]
-    let (exit_code, output, error) = zingomobile_utils::android_integration_test(
-        abi,
-        "ExecuteParseAddressInvalid",
-        activation_heights.as_deref(),
-    );
-    #[cfg(feature = "ci")]
-    let (exit_code, output, error) = zingomobile_utils::android_integration_test_ci(
-        abi,
-        "ExecuteParseAddressInvalid",
-        activation_heights.as_deref(),
-    );
-
-    println!("Exit Code: {}", exit_code);
-    println!("Output: {}", output);
-    println!("Error: {}", error);
-
-    assert_eq!(exit_code, 0);
-}
-
-async fn double_wrap_repro(abi: &str) {
-    #[cfg(not(feature = "ci"))]
-    let (exit_code, output, error) =
-        zingomobile_utils::android_integration_test(abi, "DoubleWrapReproTest", None);
-    #[cfg(feature = "ci")]
-    let (exit_code, output, error) =
-        zingomobile_utils::android_integration_test_ci(abi, "DoubleWrapReproTest", None);
-
-    println!("Exit Code: {}", exit_code);
-    println!("Output: {}", output);
-    println!("Error: {}", error);
-
-    assert_eq!(exit_code, 0);
-}
-
 mod android_integration {
     mod x86_32 {
         const ABI: &str = "x86";
-
-        #[tokio::test]
-        async fn double_wrap_repro() {
-            crate::double_wrap_repro(ABI).await;
-        }
-
-        #[tokio::test]
-        async fn execute_version_from_seed() {
-            crate::execute_version_from_seed(ABI).await;
-        }
-
-        #[tokio::test]
-        async fn execute_addresses_from_ufvk() {
-            crate::execute_addresses_from_ufvk(ABI).await;
-        }
-
-        #[tokio::test]
-        async fn execute_addresses_from_seed() {
-            crate::execute_addresses_from_seed(ABI).await;
-        }
 
         #[tokio::test]
         async fn execute_sync_from_seed() {
@@ -302,16 +141,6 @@ mod android_integration {
         #[tokio::test]
         async fn execute_sapling_balance_from_seed() {
             crate::execute_sapling_balance_from_seed(ABI).await;
-        }
-
-        #[tokio::test]
-        async fn execute_parse_address_for_tex() {
-            crate::execute_parse_address_for_tex(ABI).await;
-        }
-
-        #[tokio::test]
-        async fn execute_parse_address_invalid() {
-            crate::execute_parse_address_invalid(ABI).await;
         }
     }
 
@@ -319,26 +148,6 @@ mod android_integration {
         const ABI: &str = "x86_64";
 
         #[tokio::test]
-        async fn double_wrap_repro() {
-            crate::double_wrap_repro(ABI).await;
-        }
-
-        #[tokio::test]
-        async fn execute_version_from_seed() {
-            crate::execute_version_from_seed(ABI).await;
-        }
-
-        #[tokio::test]
-        async fn execute_addresses_from_ufvk() {
-            crate::execute_addresses_from_ufvk(ABI).await;
-        }
-
-        #[tokio::test]
-        async fn execute_addresses_from_seed() {
-            crate::execute_addresses_from_seed(ABI).await;
-        }
-
-        #[tokio::test]
         async fn execute_sync_from_seed() {
             crate::execute_sync_from_seed(ABI).await;
         }
@@ -356,16 +165,6 @@ mod android_integration {
         #[tokio::test]
         async fn execute_sapling_balance_from_seed() {
             crate::execute_sapling_balance_from_seed(ABI).await;
-        }
-
-        #[tokio::test]
-        async fn execute_parse_address_for_tex() {
-            crate::execute_parse_address_for_tex(ABI).await;
-        }
-
-        #[tokio::test]
-        async fn execute_parse_address_invalid() {
-            crate::execute_parse_address_invalid(ABI).await;
         }
     }
 
@@ -373,26 +172,6 @@ mod android_integration {
         const ABI: &str = "armeabi-v7a";
 
         #[tokio::test]
-        async fn double_wrap_repro() {
-            crate::double_wrap_repro(ABI).await;
-        }
-
-        #[tokio::test]
-        async fn execute_version_from_seed() {
-            crate::execute_version_from_seed(ABI).await;
-        }
-
-        #[tokio::test]
-        async fn execute_addresses_from_ufvk() {
-            crate::execute_addresses_from_ufvk(ABI).await;
-        }
-
-        #[tokio::test]
-        async fn execute_addresses_from_seed() {
-            crate::execute_addresses_from_seed(ABI).await;
-        }
-
-        #[tokio::test]
         async fn execute_sync_from_seed() {
             crate::execute_sync_from_seed(ABI).await;
         }
@@ -410,16 +189,6 @@ mod android_integration {
         #[tokio::test]
         async fn execute_sapling_balance_from_seed() {
             crate::execute_sapling_balance_from_seed(ABI).await;
-        }
-
-        #[tokio::test]
-        async fn execute_parse_address_for_tex() {
-            crate::execute_parse_address_for_tex(ABI).await;
-        }
-
-        #[tokio::test]
-        async fn execute_parse_address_invalid() {
-            crate::execute_parse_address_invalid(ABI).await;
         }
     }
 
@@ -427,26 +196,6 @@ mod android_integration {
         const ABI: &str = "arm64-v8a";
 
         #[tokio::test]
-        async fn double_wrap_repro() {
-            crate::double_wrap_repro(ABI).await;
-        }
-
-        #[tokio::test]
-        async fn execute_version_from_seed() {
-            crate::execute_version_from_seed(ABI).await;
-        }
-
-        #[tokio::test]
-        async fn execute_addresses_from_ufvk() {
-            crate::execute_addresses_from_ufvk(ABI).await;
-        }
-
-        #[tokio::test]
-        async fn execute_addresses_from_seed() {
-            crate::execute_addresses_from_seed(ABI).await;
-        }
-
-        #[tokio::test]
         async fn execute_sync_from_seed() {
             crate::execute_sync_from_seed(ABI).await;
         }
@@ -464,16 +213,6 @@ mod android_integration {
         #[tokio::test]
         async fn execute_sapling_balance_from_seed() {
             crate::execute_sapling_balance_from_seed(ABI).await;
-        }
-
-        #[tokio::test]
-        async fn execute_parse_address_for_tex() {
-            crate::execute_parse_address_for_tex(ABI).await;
-        }
-
-        #[tokio::test]
-        async fn execute_parse_address_invalid() {
-            crate::execute_parse_address_invalid(ABI).await;
         }
     }
 }

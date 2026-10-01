@@ -161,7 +161,9 @@ jobs:
         config:
           - { abi: x86_64, api-level: 34, target: default }
     uses: ./.github/workflows/android-ubuntu-integration-test-ci.yaml
-    needs: [create-timestamp, create-cache-key]
+    # The offline device test job builds the debug app in the job, and
+    # that build packages the Binding Layer that andr-build produces.
+    needs: [create-timestamp, create-cache-key, andr-build]
     secrets: inherit
     with:
       timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
