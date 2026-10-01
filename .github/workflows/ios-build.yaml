@@ -13,6 +13,14 @@ on:
         required: false
         default: false
         type: boolean
+      # Runner label for the build job. zingo-ios-build-m2 is the org's
+      # pool of m2-5-core machines on GitHub's Apple silicon fleet. The
+      # Intel pool is zingo-ios-build-12, and the stock macos-15 label has
+      # three cores.
+      runner:
+        required: false
+        type: string
+        default: zingo-ios-build-m2
 
 env:
   CACHE-KEY: ${{ inputs.cache-key }}
@@ -52,7 +60,7 @@ jobs:
     needs: ios-check-build-cache
     if: ${{ needs.ios-check-build-cache.outputs.ios-cache-found != 'true' }}
     continue-on-error: ${{ inputs.advisory }}
-    runs-on: zingo-ios-build-12
+    runs-on: ${{ inputs.runner }}
     env:
       RUSTUP_HOME: ${{ github.workspace }}/.rustup
       CARGO_HOME:  ${{ github.workspace }}/.cargo
@@ -96,20 +104,30 @@ jobs:
       # is all this job needs: zingolib and nym-sdk dominate the build, and
       # their compiled dependencies are what the cache keeps.
       #
-      # Saved from dev only. A cache written on refs/pull/N/merge is invisible
-      # to every other PR, so per-PR saves buy nothing and only add eviction
-      # pressure; the dev copy is readable by all of them.
+      # Every run saves the cache. A PR reads its own entries and the dev
+      # entry.
       - name: Cargo cache (registry, git, iOS targets)
+        id: cargo-cache
         uses: Swatinem/rust-cache@v2
         with:
           workspaces: |
             zingolib/zingo-ffi -> ../target/binding-layer/ios/wallet
             zingolib/zingo-netutils/nym-proxy-ffi -> ../../target/binding-layer/ios/proxy
             zingolib/tools/workbench
-          save-if: ${{ github.ref == 'refs/heads/dev' }}
+
+      # rust-cache reports a hit for an exact key match only. A restore
+      # through a restore-key leaves the wallet target dir in place.
+      - name: Record the cargo cache state
+        env:
+          CARGO_CACHE_HIT: ${{ steps.cargo-cache.outputs.cache-hit }}
+        run: |
+          cargo_cache="miss"
+          test -d zingolib/target/binding-layer/ios/wallet && cargo_cache="partial"
+          test "$CARGO_CACHE_HIT" = "true" && cargo_cache="exact"
+          echo "CARGO_CACHE=$cargo_cache" >> "$GITHUB_ENV"
 
       - name: Install bindgen-cli (needed by aws-lc-sys, ring etc.)
-        run: cargo install --force --locked bindgen-cli
+        run: cargo install --locked bindgen-cli
 
       - name: Install protoc
         run: brew install protobuf
@@ -142,10 +160,27 @@ jobs:
       # runs from the zingo-mobile root.
       - name: Build the Binding Layer
         run: |
+          started="$(date +%s)"
           cargo run \
             --manifest-path zingolib/tools/workbench/Cargo.toml \
             --bin build-binding-layer -- \
             ios --out zingolib/bindings/swift/build
+          echo "BUILD_SECONDS=$(( $(date +%s) - started ))" >> "$GITHUB_ENV"
+
+      # One table row per run in the job summary.
+      - name: Report the build in the job summary
+        env:
+          RUNNER: ${{ inputs.runner }}
+        run: |
+          minutes="$(( BUILD_SECONDS / 60 ))"
+          seconds="$(( BUILD_SECONDS % 60 ))"
+          printf '%s\n' \
+            "## iOS Binding Layer" \
+            "" \
+            "| Runner | Cargo cache | Build time | Descriptor | zingolib |" \
+            "|---|---|---|---|---|" \
+            "| $RUNNER | $CARGO_CACHE | ${minutes}m ${seconds}s | $ZINGO_MOBILE_DESCRIPTOR | $(git -C zingolib rev-parse --short HEAD) |" \
+            >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload the Binding Layer
         uses: actions/upload-artifact@v7
