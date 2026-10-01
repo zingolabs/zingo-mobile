@@ -39,9 +39,12 @@ jobs:
         with:
           tool: cargo-nextest@0.9.98
 
+      - name: Update the stable toolchain
+        run: rustup update stable
+
       - name: Tests
         working-directory: ./rust
-        run: cargo nextest run --locked --package workbench
+        run: cargo nextest run --package workbench
 
       - name: Cancel the run on failure (fail-all)
         if: ${{ failure() && inputs.fail-all }}
