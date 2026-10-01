@@ -26,10 +26,16 @@ class EveryTestClassIsMarkedTest {
         @Suppress("DEPRECATION")
         val classNames = DexFile(testApk.packageCodePath).entries().toList()
 
-        val unmarked = classNames
+        val testClasses = classNames
             .filter { it.startsWith("$TEST_PACKAGE.") && it != DETOX_TEST_CLASS }
             .map { Class.forName(it, false, javaClass.classLoader) }
             .filter { testClass -> testClass.declaredMethods.any { it.isAnnotationPresent(Test::class.java) } }
+
+        assertWithMessage("the scan of the test APK finds this test class")
+            .that(testClasses)
+            .contains(javaClass)
+
+        val unmarked = testClasses
             .filter { testClass -> TEST_KIND_MARKERS.count { testClass.isAnnotationPresent(it) } != 1 }
             .map { it.name }
 
