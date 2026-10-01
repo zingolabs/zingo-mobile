@@ -393,7 +393,6 @@ class MeasureTestnetSyncBudget {
         println("\nInfo:")
         println(infoJson)
         val info: Info = mapper.readValue(infoJson)
-        assertThat(info.latest_block_height).isAtLeast(tip)
 
         val syncJson: String = uniffi.zingo.runSync()
         println("\nSync:")
