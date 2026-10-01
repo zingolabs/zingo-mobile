@@ -157,7 +157,7 @@ jobs:
       matrix:
         bucket:
           - name: chain
-            tests: execute_sync_from_seed execute_send_from_orchard execute_currentprice_and_value_transfers_from_seed
+            tests: execute_send_from_orchard execute_currentprice_and_value_transfers_from_seed
           - name: ledger-and-parsing
             tests: execute_sapling_balance_from_seed
     env:
@@ -419,17 +419,20 @@ jobs:
               run_id: context.runId,
             });
 
-  # Offline device tests: one Gradle connected-test run on the debug build.
-  # It selects every class that carries @OfflineDeviceTest. The Android
-  # Test Orchestrator gives each test its own process and cleared app data.
-  android-offline-device-test:
-    name: offline device tests
+  # Device tests without the Rust harness: two Gradle connected-test runs
+  # on the debug build. The first selects every class that carries
+  # @OfflineDeviceTest. The second selects every class that carries
+  # @PublicChainTest and reads mainnet through a public server. The
+  # Android Test Orchestrator gives each test its own process and cleared
+  # app data.
+  android-device-test:
+    name: device tests
     needs:
       - android-ubuntu-integration-test-ci-avd-cache
     runs-on: ubuntu-24.04
-    # Bounds the debug build, the emulator boot, and the test run. Each
+    # Bounds the debug build, two emulator boots, and both test runs. Each
     # test has its own limit in android/app/build.gradle.kts.
-    timeout-minutes: 30
+    timeout-minutes: 40
     env:
       CACHE-KEY: ${{ inputs.cache-key }}
     steps:
@@ -517,11 +520,37 @@ jobs:
           # for that ABI alone.
           script: ./gradlew :app:connectedProdDebugAndroidTest -PreactNativeArchitectures=${{ env.ABI }} -Pandroid.testInstrumentationRunnerArguments.annotation=org.ZingoLabs.Zingo.OfflineDeviceTest
 
-      - name: Upload test reports
+      - name: Upload offline device test reports
         if: ${{ always() && !cancelled() }}
         uses: actions/upload-artifact@v7
         with:
           name: test-android-offline-device-reports-${{ env.ABI }}-${{ env.TIMESTAMP }}
+          path: |
+            android/app/build/reports/androidTests
+            android/app/build/outputs/androidTest-results
+          retention-days: 7
+
+      - name: Run public-chain tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ env.API-LEVEL }}
+          arch: ${{ env.AVD-ARCH }}
+          target: ${{ env.TARGET }}
+          force-avd-creation: true
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -no-metrics
+          disable-animations: true
+          working-directory: ./android
+          # A mainnet sync of 10,000 blocks took 50 seconds on this
+          # emulator. The 6-minute per-test limit replaces the 60 seconds
+          # of the offline run and outlasts the 5-minute deadline of
+          # ExecuteSyncFromSeed.
+          script: ./gradlew :app:connectedProdDebugAndroidTest -PreactNativeArchitectures=${{ env.ABI }} -Pandroid.testInstrumentationRunnerArguments.annotation=org.ZingoLabs.Zingo.PublicChainTest -Pandroid.testInstrumentationRunnerArguments.timeout_msec=360000
+
+      - name: Upload public-chain test reports
+        if: ${{ always() && !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-android-public-chain-reports-${{ env.ABI }}-${{ env.TIMESTAMP }}
           path: |
             android/app/build/reports/androidTests
             android/app/build/outputs/androidTest-results
@@ -541,17 +570,17 @@ jobs:
   # Transitional alias. The dev branch protection requires a check with
   # the name "accounts". Issue 1510 removes this job together with that
   # requirement. A skipped job reports success to branch protection, and
-  # this job therefore always runs and fails unless the offline device
-  # tests passed.
+  # this job therefore always runs and fails unless the device tests
+  # passed.
   accounts:
     name: accounts
     needs:
-      - android-offline-device-test
+      - android-device-test
     if: ${{ always() }}
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
-      - name: Report the result of the offline device tests
+      - name: Report the result of the device tests
         env:
-          RESULT: ${{ needs.android-offline-device-test.result }}
+          RESULT: ${{ needs.android-device-test.result }}
         run: test "$RESULT" = "success"
