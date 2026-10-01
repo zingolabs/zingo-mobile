@@ -31,9 +31,18 @@ function stepsOf(flow: Step[], command: string): Record<string, unknown>[] {
     .map(step => step[command] as Record<string, unknown>);
 }
 
-/** Whether a selector, with the regex escapes removed, names the lwd2 server. */
-function namesLwd2(selector: unknown): boolean {
-  return String(selector).replace(/\\/g, '').includes('lwd2.zcash-infra.com');
+/** The server that flow 06 types into the custom server field. */
+const CUSTOM_SERVER = 'https://na.zec.rocks:443';
+
+/** The server that flow 07 picks from the list. */
+const LIST_SERVER = 'https://zec.rocks:443';
+
+/**
+ * Whether a selector names exactly the given server, once the regex escapes
+ * and the optional trailing slash are removed.
+ */
+function names(selector: unknown, server: string): boolean {
+  return String(selector).replace(/\\/g, '').replace(/\/\?$/, '') === server;
 }
 
 function androidScriptLines(): string[] {
@@ -138,14 +147,43 @@ describe('the Maestro flows', () => {
     expect(
       taps.filter(tap => /list-server-select\.\d+$/.test(String(tap.id))),
     ).toEqual([]);
-    expect(taps.some(tap => namesLwd2(tap.text))).toBe(true);
+    expect(taps.some(tap => names(tap.text, LIST_SERVER))).toBe(true);
     const save = flow.findIndex(
       step => (step.tapOn as Step)?.id === 'settings.button.save',
     );
     const readBack = flow
       .slice(save)
-      .some(step => namesLwd2((step.assertVisible as Step)?.text));
+      .some(step => names((step.assertVisible as Step)?.text, LIST_SERVER));
     expect(readBack).toBe(true);
+  });
+
+  /**
+   * Tests that flow 07 scrolls the list to its row before the tap, and
+   * takes the row inside the list, because the list can run below the fold
+   * and the screen under the sheet can show the same server name.
+   */
+  test('07 scrolls to the row inside the list', () => {
+    const flow = steps('07_server_from_list.yaml');
+    const inList = (selector: Step | undefined): boolean =>
+      names(selector?.text, LIST_SERVER) &&
+      (selector?.childOf as Step)?.id === 'settings.list-server-select';
+    const scroll = flow.findIndex(step =>
+      inList((step.scrollUntilVisible as Step)?.element as Step),
+    );
+    const tap = flow.findIndex(step => inList(step.tapOn as Step));
+    expect(scroll).toBeGreaterThanOrEqual(0);
+    expect(tap).toBeGreaterThan(scroll);
+  });
+
+  /**
+   * Tests that no flow names a zcash-infra server, because the registry
+   * reports every one of them offline and the list leaves them out.
+   */
+  test('name no zcash-infra server', () => {
+    for (const file of topLevelFlows()) {
+      const text = readFileSync(join(FLOWS_DIR, file), 'utf8');
+      expect([file, text.includes('zcash-infra')]).toEqual([file, false]);
+    }
   });
 
   /**
@@ -160,8 +198,31 @@ describe('the Maestro flows', () => {
     expect(save).toBeGreaterThan(0);
     const readBack = flow
       .slice(save)
-      .some(step => namesLwd2((step.assertVisible as Step)?.text));
+      .some(step => names((step.assertVisible as Step)?.text, CUSTOM_SERVER));
     expect(readBack).toBe(true);
+  });
+
+  /**
+   * Tests that flow 06 types the custom server inside a retry that reads the
+   * field back, because the driver can drop characters while it types.
+   */
+  test('06 reads the typed field back and retries the entry', () => {
+    const flow = steps('06_custom_server.yaml');
+    const retries = stepsOf(flow, 'retry');
+    expect(retries).toHaveLength(1);
+    const commands = retries[0].commands as Step[];
+    const typed = commands.findIndex(
+      command => command.inputText === CUSTOM_SERVER,
+    );
+    const read = commands.findIndex(command => {
+      const assertion = command.assertVisible as Step;
+      return (
+        assertion?.id === 'settings.custom-server-field' &&
+        names(assertion?.text, CUSTOM_SERVER)
+      );
+    });
+    expect(typed).toBeGreaterThanOrEqual(0);
+    expect(read).toBeGreaterThan(typed);
   });
 
   /**
