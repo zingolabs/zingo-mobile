@@ -1259,10 +1259,6 @@ const Send: React.FunctionComponent<SendProps> = ({
                 >
                   <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <View
-                      accessible={true}
-                      accessibilityLabel={
-                        translate('send.address-acc') as string
-                      }
                       style={{
                         flex: 1,
                         justifyContent: 'center',
@@ -1270,6 +1266,10 @@ const Send: React.FunctionComponent<SendProps> = ({
                     >
                       <TextInput
                         testID="send.addressplaceholder"
+                        accessible={true}
+                        accessibilityLabel={
+                          translate('send.address-acc') as string
+                        }
                         placeholder={
                           translate('send.addressplaceholder') as string
                         }
@@ -1798,10 +1798,6 @@ const Send: React.FunctionComponent<SendProps> = ({
                       }}
                     >
                       <View
-                        accessible={true}
-                        accessibilityLabel={
-                          translate('send.memo-acc') as string
-                        }
                         style={{
                           flexGrow: 1,
                           flexDirection: 'row',
@@ -1815,6 +1811,10 @@ const Send: React.FunctionComponent<SendProps> = ({
                       >
                         <TextInput
                           testID="send.memo-field"
+                          accessible={true}
+                          accessibilityLabel={
+                            translate('send.memo-acc') as string
+                          }
                           placeholder={
                             translate('send.memo-placeholder') as string
                           }

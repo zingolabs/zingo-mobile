@@ -2162,10 +2162,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                   </View>
                 )}
                 <View
-                  accessible={true}
-                  accessibilityLabel={
-                    translate('settings.server-acc') as string
-                  }
                   style={{
                     borderColor: colors.borderMuted,
                     borderWidth: 1,
@@ -2182,6 +2178,10 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                 >
                   <TextInput
                     testID="settings.custom-server-field"
+                    accessible={true}
+                    accessibilityLabel={
+                      translate('settings.server-acc') as string
+                    }
                     placeholder={GlobalConst.serverPlaceHolder}
                     placeholderTextColor={colors.fgMuted}
                     style={{
