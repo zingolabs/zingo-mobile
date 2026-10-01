@@ -513,7 +513,9 @@ jobs:
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -no-metrics
           disable-animations: true
           working-directory: ./android
-          script: ./gradlew :app:connectedProdDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.annotation=org.ZingoLabs.Zingo.OfflineDeviceTest
+          # The emulator runs one ABI, and the build compiles native code
+          # for that ABI alone.
+          script: ./gradlew :app:connectedProdDebugAndroidTest -PreactNativeArchitectures=${{ env.ABI }} -Pandroid.testInstrumentationRunnerArguments.annotation=org.ZingoLabs.Zingo.OfflineDeviceTest
 
       - name: Upload test reports
         if: ${{ always() && !cancelled() }}
