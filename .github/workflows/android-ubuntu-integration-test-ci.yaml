@@ -161,11 +161,16 @@ jobs:
     strategy:
       fail-fast: ${{ inputs.fail-all }}
       # The tests of a bucket share one job. The runner setup and the
-      # emulator boot are paid once per bucket.
+      # emulator boot are paid once per bucket. The three live-chain tests
+      # each have a bucket of their own and run side by side.
       matrix:
         bucket:
-          - name: chain
-            tests: execute_sync_from_seed execute_send_from_orchard execute_currentprice_and_value_transfers_from_seed
+          - name: sync
+            tests: execute_sync_from_seed
+          - name: send
+            tests: execute_send_from_orchard
+          - name: price-and-value-transfers
+            tests: execute_currentprice_and_value_transfers_from_seed
           - name: ledger-and-parsing
             tests: execute_sapling_balance_from_seed
     env:
