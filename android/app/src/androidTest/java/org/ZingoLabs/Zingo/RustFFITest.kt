@@ -357,6 +357,84 @@ class ExecuteSyncFromSeed {
     }
 }
 
+object TestnetServers {
+    const val PRIMARY = "https://testnet.zec.rocks:443"
+    const val FALLBACK = "https://zaino.testnet.unsafe.zec.rocks:443"
+}
+
+/** Measures the duration of a 100,000-block testnet sync on the CI emulator, for measurement 3 of #1490. */
+@PublicChainTest
+class MeasureTestnetSyncBudget {
+    @Test
+    fun measureTestnetSyncBudget() {
+        val mapper = testMapper()
+
+        val window = 100_000L
+        val deadlineSeconds = 40 * 60
+        val seed = Seeds.HOSPITAL
+        val servers = listOf(TestnetServers.PRIMARY, TestnetServers.FALLBACK)
+
+        val (serveruri, tip) = servers.firstNotNullOfOrNull { uri ->
+            runCatching { uniffi.zingo.getLatestBlockServer(uri).toLong() }
+                .onFailure { println("\n$uri did not answer: ${it.message}") }
+                .getOrNull()
+                ?.let { uri to it }
+        } ?: throw AssertionError("no testnet server answered: $servers")
+        println("\nTip of $serveruri: $tip")
+
+        val birthday = tip - window
+        val initFromSeedJson: String = uniffi.zingo.initFromSeed(seed, birthday.toUInt(), serveruri, "test", "Medium", 1u)
+        println("\nInit from seed:")
+        println(initFromSeedJson)
+        val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
+        assertThat(initFromSeed.birthday).isEqualTo(birthday)
+
+        val infoJson: String = uniffi.zingo.infoServer()
+        println("\nInfo:")
+        println(infoJson)
+        val info: Info = mapper.readValue(infoJson)
+        assertThat(info.latest_block_height).isAtLeast(tip)
+
+        val syncJson: String = uniffi.zingo.runSync()
+        println("\nSync:")
+        println(syncJson)
+
+        val start = System.nanoTime()
+        val elapsedSeconds = { (System.nanoTime() - start) / 1e9 }
+        var lastReport = 0.0
+        try {
+            while (!uniffi.zingo.pollSync().contains("sync_complete")) {
+                if (elapsedSeconds() > deadlineSeconds) {
+                    throw AssertionError("the sync of $window testnet blocks passed its $deadlineSeconds s deadline: ${uniffi.zingo.statusSync()}")
+                }
+                if (elapsedSeconds() - lastReport >= 60) {
+                    lastReport = elapsedSeconds()
+                    println("\nAfter ${lastReport.toInt()} s: ${uniffi.zingo.statusSync()}")
+                }
+                Thread.sleep(5000)
+            }
+        } catch (e: uniffi.zingo.ZingolibException) {
+            throw AssertionError("the sync of $window testnet blocks failed after ${elapsedSeconds()} s: ${e.message}", e)
+        }
+        val elapsed = elapsedSeconds()
+        println("\nSynced $window testnet blocks in $elapsed s")
+        InstrumentationRegistry.getInstrumentation().sendStatus(
+            2,
+            Bundle().apply {
+                putString("sync_chain", "test")
+                putString("sync_blocks", window.toString())
+                putString("sync_seconds", elapsed.toString())
+            },
+        )
+
+        val heightJson: String = uniffi.zingo.getLatestBlockWallet()
+        println("\nHeight post-sync:")
+        println(heightJson)
+        val heightPostSync: Height = mapper.readValue(heightJson)
+        assertThat(heightPostSync.height).isAtLeast(info.latest_block_height)
+    }
+}
+
 @LiveChainTest
 class ExecuteSendFromOrchard {
     @Test

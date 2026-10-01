@@ -443,7 +443,7 @@ jobs:
     runs-on: ${{ startsWith(inputs.runner, '[') && fromJSON(inputs.runner) || inputs.runner }}
     # Bounds the debug build, two emulator boots, and both test runs. Each
     # test has its own limit in android/app/build.gradle.kts.
-    timeout-minutes: 40
+    timeout-minutes: 90
     env:
       CACHE-KEY: ${{ inputs.cache-key }}
     steps:
@@ -555,7 +555,7 @@ jobs:
           # emulator. The 6-minute per-test limit replaces the 60 seconds
           # of the offline run and outlasts the 5-minute deadline of
           # ExecuteSyncFromSeed.
-          script: ./gradlew :app:connectedProdDebugAndroidTest -PreactNativeArchitectures=${{ env.ABI }} -Pandroid.testInstrumentationRunnerArguments.annotation=org.ZingoLabs.Zingo.PublicChainTest -Pandroid.testInstrumentationRunnerArguments.timeout_msec=360000
+          script: ./gradlew :app:connectedProdDebugAndroidTest -PreactNativeArchitectures=${{ env.ABI }} -Pandroid.testInstrumentationRunnerArguments.annotation=org.ZingoLabs.Zingo.PublicChainTest -Pandroid.testInstrumentationRunnerArguments.timeout_msec=2700000
 
       - name: Upload public-chain test reports
         if: ${{ always() && !cancelled() }}
