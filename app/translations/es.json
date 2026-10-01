@@ -114,6 +114,8 @@
     "creating-title": "Creando tu monedero",
     "creating-body": "Generando tus claves…",
     "created-title": "Monedero creado",
+    "previous-install-title": "Monedero de una instalación anterior",
+    "previous-install-body": "Zingo ha encontrado una frase de recuperación guardada en este dispositivo. Crear o importar otro monedero la reemplaza.",
     "actualserver": "Servidor Activo:",
     "createnewwallet": "Crear Nuevo Monedero",
     "opencurrentwallet": "Abrir Monedero Activo",

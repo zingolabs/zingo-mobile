@@ -114,6 +114,8 @@
     "creating-title": "Cüzdanınız oluşturuluyor",
     "creating-body": "Anahtarlarınız oluşturuluyor…",
     "created-title": "Cüzdan oluşturuldu",
+    "previous-install-title": "Önceki kurulumdan cüzdan",
+    "previous-install-body": "Zingo bu cihazda kayıtlı bir kurtarma ifadesi buldu. Başka bir cüzdan oluşturmak veya içe aktarmak onu değiştirir.",
     "actualserver": "Mevcut sunucu:",
     "createnewwallet": "Yeni Cüzdan Oluştur",
     "opencurrentwallet": "Mevcut Cüzdanı Aç",

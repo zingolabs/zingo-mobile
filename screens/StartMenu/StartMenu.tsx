@@ -10,7 +10,10 @@ import { showConfirm } from '@app/services/showConfirm';
 import { useTheme } from '@app/theme';
 
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faEllipsisV } from '@fortawesome/free-solid-svg-icons';
+import {
+  faDatabase,
+  faTriangleExclamation,
+} from '@fortawesome/free-solid-svg-icons';
 
 import { NetInfoStateType } from '@react-native-community/netinfo/src/index';
 
@@ -22,6 +25,7 @@ import ActionMenuBottomSheet, {
 import { ContextAppLoading } from '@app/context';
 import { getZingoName, getZingoVersion } from '@app/utils/ZingoAppData';
 import RegText from '@ui/primitives/RegText';
+import BoldText from '@ui/primitives/BoldText';
 import BusyButton from '@ui/widgets/BusyButton';
 import { ease } from '@app/theme/motion';
 
@@ -42,6 +46,8 @@ const brandEnter = () =>
     .easing(ease.out)
     .withInitialValues({ opacity: 0, transform: [{ scale: 1.03 }] })
     .reduceMotion(ReduceMotion.System);
+const noticeEnter = () =>
+  FadeIn.duration(300).delay(860).reduceMotion(ReduceMotion.System);
 const tagEnter = () =>
   FadeIn.duration(300).delay(780).reduceMotion(ReduceMotion.System);
 const actionsEnter = () =>
@@ -237,11 +243,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
             justifyContent: 'center',
           }}
         >
-          <FontAwesomeIcon
-            icon={faEllipsisV}
-            color={colors.fgMuted}
-            size={22}
-          />
+          <FontAwesomeIcon icon={faDatabase} color={colors.fgMuted} size={22} />
         </Pressable>
       )}
 
@@ -284,6 +286,45 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
         >
           {translate('loadingapp.tagline') as string}
         </Animated.Text>
+        {hasRecoveryWalletInfoSaved && (
+          <Animated.View
+            entering={noticeEnter()}
+            style={{
+              marginTop: 34,
+              marginHorizontal: 46,
+              alignSelf: 'stretch',
+              borderWidth: 1,
+              borderColor: colors.bottomSheetBorder,
+              borderRadius: 12,
+              backgroundColor: colors.bgSurface,
+              paddingHorizontal: 14,
+              paddingVertical: 12,
+            }}
+          >
+            <View
+              style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}
+            >
+              <FontAwesomeIcon
+                icon={faTriangleExclamation}
+                size={12}
+                color={colors.fgDefault}
+              />
+              <BoldText style={{ fontSize: 12.5 }}>
+                {translate('loadingapp.previous-install-title') as string}
+              </BoldText>
+            </View>
+            <RegText
+              style={{
+                marginTop: 6,
+                fontSize: 12,
+                lineHeight: 16,
+                color: colors.fgMuted,
+              }}
+            >
+              {translate('loadingapp.previous-install-body') as string}
+            </RegText>
+          </Animated.View>
+        )}
       </View>
 
       <Animated.View

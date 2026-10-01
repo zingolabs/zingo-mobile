@@ -114,6 +114,8 @@
     "creating-title": "Criando sua carteira",
     "creating-body": "Gerando suas chaves…",
     "created-title": "Carteira criada",
+    "previous-install-title": "Carteira de uma instalação anterior",
+    "previous-install-body": "O Zingo encontrou uma frase de recuperação salva neste dispositivo. Criar ou importar outra carteira a substitui.",
     "actualserver": "Servidor atual:",
     "createnewwallet": "Criar uma nova carteira",
     "opencurrentwallet": "Abrir Carteira Atual",
