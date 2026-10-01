@@ -168,5 +168,4 @@ fonts shift, every story changes at once. Accept that in one PR of its own.
 This tool covers the web build only. Native is the shipping target. Native
 renders through Yoga and native views, not through RNW and CSS. Therefore a web
 pass does not certify the native appearance. Native visual review is a separate
-tier. It uses an on-device Storybook with `simctl` or `adb`. It does not use
-Detox or Maestro.
+tier. It uses an on-device Storybook with `simctl` or `adb`.

@@ -3,7 +3,7 @@ appId: org.ZingoLabs.Zingo
 - runFlow:
     file: common/restore_wallet.yaml
 
-# The Detox spec allowed sixteen minutes for the first row.
+# The first row can take sixteen minutes to appear.
 - extendedWaitUntil:
     visible:
       id: "vt-1"

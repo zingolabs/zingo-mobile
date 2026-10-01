@@ -342,7 +342,6 @@ dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
 
-    androidTestImplementation("com.wix:detox:20.51.4")
     implementation("androidx.appcompat:appcompat:1.7.0")
     // DeviceAuthModule's BiometricPrompt (react-native-keychain only pulls
     // this transitively; direct use declares it).
@@ -354,11 +353,6 @@ dependencies {
         exclude(group = "com.android.installreferrer")
     }
     implementation("com.facebook.soloader:soloader:0.10.5")
-
-
-    // Detox tests getAttributes() reaches this by reflection at runtime, so
-    // it is runtime-only: no source references exist for compile analysis.
-    debugRuntimeOnly("com.google.android.material:material:1.12.0")
 
     // Hermes is always enabled in RN 0.74+
     implementation("com.facebook.react:hermes-android")
@@ -401,11 +395,9 @@ dependencies {
     // JVM unit tests for pure logic (no device or emulator)
     testImplementation("junit:junit:4.13.2")
 
-    // JUnit test runners; the instrumented sources use the JUnit 4 API and
-    // the androidx.test runner/rules directly.
-    androidTestImplementation("androidx.test.ext:junit:1.2.1")
+    // The instrumented sources use the JUnit 4 API, and the androidx.test
+    // runner executes them.
     androidTestImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test:rules:1.7.0")
     androidTestImplementation("androidx.test:runner:1.7.0")
     androidTestUtil("androidx.test:orchestrator:1.6.1")
 

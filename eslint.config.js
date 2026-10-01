@@ -8,7 +8,6 @@ const compat = new FlatCompat({
 module.exports = [
   {
     ignores: [
-      'e2e/**',
       'node_modules/**',
       'coverage/**',
       'rust/**',
