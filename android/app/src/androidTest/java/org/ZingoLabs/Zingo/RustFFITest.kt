@@ -175,23 +175,15 @@ class ExecuteAddressesFromSeed {
     fun executeAddressesFromSeed() {
         val mapper = testMapper()
 
-        val serveruri = "http://10.0.2.2:20000"
-        val chainhint = regtestChainHint()
         val seed = Seeds.HOSPITAL
-        
-        val initFromSeedJson: String = uniffi.zingo.initFromSeed(seed, 1u, serveruri, chainhint, "Medium", 1u)
+
+        val initFromSeedJson: String = uniffi.zingo.initFromSeed(seed, 1u, "", "regtest", "Medium", 1u)
         println("\nInit from seed:")
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
 
         assertThat(initFromSeed.seed_phrase).isEqualTo(seed)
         assertThat(initFromSeed.birthday).isEqualTo(1)
-
-        val infoJson: String = uniffi.zingo.infoServer()
-        println("\nInfo:")
-        println(infoJson)
-        val info: Info = mapper.readValue(infoJson)
-        assertThat(info.latest_block_height).isGreaterThan(0)
 
         val exportUfvkJson: String = uniffi.zingo.getUfvk()
         println("\nExport Ufvk:")
@@ -220,23 +212,15 @@ class ExecuteAddressesFromUfvk {
     fun executeAddressFromUfvk() {
         val mapper = testMapper()
 
-        val serveruri = "http://10.0.2.2:20000"
-        val chainhint = regtestChainHint()
         val ufvk = Ufvk.HOSPITAL
-        
-        val initFromUfvkJson: String = uniffi.zingo.initFromUfvk(ufvk, 1u, serveruri, chainhint, "Medium", 1u)
+
+        val initFromUfvkJson: String = uniffi.zingo.initFromUfvk(ufvk, 1u, "", "regtest", "Medium", 1u)
         println("\nInit From UFVK:")
         println(initFromUfvkJson)
         val initFromUfvk: InitFromUfvk = mapper.readValue(initFromUfvkJson)
 
         assertThat(initFromUfvk.ufvk).isEqualTo(ufvk)
         assertThat(initFromUfvk.birthday).isEqualTo(1)
-
-        val infoJson: String = uniffi.zingo.infoServer()
-        println("\nInfo:")
-        println(infoJson)
-        val info: Info = mapper.readValue(infoJson)
-        assertThat(info.latest_block_height).isGreaterThan(0)
 
         val exportUfvkJson: String = uniffi.zingo.getUfvk()
         println("\nExport Ufvk:")
@@ -268,11 +252,9 @@ class ExecuteVersionFromSeed {
     fun executeVersionFromSeed() {
         val mapper = testMapper()
 
-        val serveruri = "http://10.0.2.2:20000"
-        val chainhint = regtestChainHint()
         val seed = Seeds.HOSPITAL
-        
-        val initFromSeedJson: String = uniffi.zingo.initFromSeed(seed, 1u, serveruri, chainhint, "Medium", 1u)
+
+        val initFromSeedJson: String = uniffi.zingo.initFromSeed(seed, 1u, "", "regtest", "Medium", 1u)
         println("\nInit from seed:")
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
@@ -280,18 +262,11 @@ class ExecuteVersionFromSeed {
         assertThat(initFromSeed.seed_phrase).isEqualTo(seed)
         assertThat(initFromSeed.birthday).isEqualTo(1)
 
-        val infoJson: String = uniffi.zingo.infoServer()
-        println("\nInfo:")
-        println(infoJson)
-        val info: Info = mapper.readValue(infoJson)
-        assertThat(info.latest_block_height).isGreaterThan(0)
-
         val version: String = uniffi.zingo.getVersion()
         println("\nVersion:")
         println(version)
-        assertThat(version).isNotNull()
-        assertThat(version).isNotEmpty()
-        assertThat(version).isNotEqualTo("")
+        val part = """[0-9A-Za-z.+-]+(_[0-9a-f]{5})?(_dirty)?"""
+        assertThat(version).matches("zl_$part-zm_$part")
     }
 }
 
@@ -523,14 +498,6 @@ class UpdateCurrentPriceAndValueTransfersFromSeed {
         val info: Info = mapper.readValue(infoJson)
         assertThat(info.latest_block_height).isGreaterThan(0)
 
-        // Price rides the mixnet or does not happen (zingolib/0011). This wallet
-        // never attached one, so the fetch must refuse. A price here would
-        // mean the wallet reached an oracle over clearnet, which is the
-        // leak the mixnet-only rule exists to prevent.
-        val refusal: String? = refusedWithoutMixnet("price fetch") { uniffi.zingo.zecPrice() }
-        println("\nPrice refused without a mixnet:")
-        println(refusal)
-
         val syncJson: String = uniffi.zingo.runSync()
         println("\nSync:")
         println(syncJson)
@@ -584,6 +551,26 @@ class UpdateCurrentPriceAndValueTransfersFromSeed {
         assertThat(valueTranfers.value_transfers[2].pools_received).isEqualTo(listOf("Orchard"))
         assertThat(valueTranfers.value_transfers[2].status).isEqualTo("confirmed")
         assertThat(valueTranfers.value_transfers[2].value).isEqualTo(1000000)
+    }
+}
+
+class PriceRefusedWithoutMixnet {
+    @Test
+    fun priceRefusedWithoutMixnet() {
+        val mapper = testMapper()
+
+        val seed = Seeds.HOSPITAL
+
+        val initFromSeedJson: String = uniffi.zingo.initFromSeed(seed, 1u, "", "regtest", "Medium", 1u)
+        println("\nInit from seed:")
+        println(initFromSeedJson)
+        val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
+
+        assertThat(initFromSeed.seed_phrase).isEqualTo(seed)
+
+        val refusal: String? = refusedWithoutMixnet("price fetch") { uniffi.zingo.zecPrice() }
+        println("\nPrice refused without a mixnet:")
+        println(refusal)
     }
 }
 
@@ -703,27 +690,6 @@ class ExecuteParseAddressForTex {
     fun executeParseAddressForTex() {
         val mapper = testMapper()
 
-        val serveruri = "http://10.0.2.2:20000"
-        val chainhint = regtestChainHint()
-        val seed = Seeds.HOSPITAL
-        
-        val initFromSeedJson: String = uniffi.zingo.initFromSeed(seed, 1u, serveruri, chainhint, "Medium", 1u)
-        println("\nInit from seed:")
-        println(initFromSeedJson)
-        val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
-
-        val seedResult = initFromSeed.seed_phrase
-        val birthdayResult = initFromSeed.birthday
-
-        assertThat(seedResult).isEqualTo(seed)
-        assertThat(birthdayResult).isEqualTo(1)
-
-        val infoJson: String = uniffi.zingo.infoServer()
-        println("\nInfo:")
-        println(infoJson)
-        val info: Info = mapper.readValue(infoJson)
-        assertThat(info.latest_block_height).isGreaterThan(0)
-
         val resultJson: String = uniffi.zingo.parseAddress("texregtest1z754rp9kk9vdewx4wm7pstvm0u2rwlgy4zp82v")
         val result: ParseResult = mapper.readValue(resultJson)
         println("\nParsed Address:")
@@ -745,27 +711,6 @@ class ExecuteParseAddressInvalid {
     @Test
     fun executeParseAddressInvalid() {
         val mapper = testMapper()
-
-        val serveruri = "http://10.0.2.2:20000"
-        val chainhint = regtestChainHint()
-        val seed = Seeds.HOSPITAL
-        
-        val initFromSeedJson: String = uniffi.zingo.initFromSeed(seed, 1u, serveruri, chainhint, "Medium", 1u)
-        println("\nInit from seed:")
-        println(initFromSeedJson)
-        val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
-
-        val seedResult = initFromSeed.seed_phrase
-        val birthdayResult = initFromSeed.birthday
-
-        assertThat(seedResult).isEqualTo(seed)
-        assertThat(birthdayResult).isEqualTo(1)
-
-        val infoJson: String = uniffi.zingo.infoServer()
-        println("\nInfo:")
-        println(infoJson)
-        val info: Info = mapper.readValue(infoJson)
-        assertThat(info.latest_block_height).isGreaterThan(0)
 
         val wrongResultJson: String = uniffi.zingo.parseAddress("thiswontwork")
         val wrongResult: ParseResult = mapper.readValue(wrongResultJson)
