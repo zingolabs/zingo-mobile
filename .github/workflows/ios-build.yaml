@@ -13,6 +13,14 @@ on:
         required: false
         default: false
         type: boolean
+      # Runner label for the build job. zingo-ios-build-m2 is the org's
+      # pool of m2-5-core machines on GitHub's Apple silicon fleet. The
+      # Intel pool is zingo-ios-build-12, and the stock macos-15 label has
+      # three cores.
+      runner:
+        required: false
+        type: string
+        default: zingo-ios-build-m2
 
 env:
   CACHE-KEY: ${{ inputs.cache-key }}
@@ -35,16 +43,12 @@ jobs:
         with:
           repository: ${{ env.REPO-OWNER }}/zingo-mobile
 
-      - name: Check if iOS xcframework cache exists
+      - name: Check if the Binding Layer cache exists
         id: ios-check-build-cache
         uses: actions/cache/restore@v6
         with:
-          path: |
-            ios/Zingolib.xcframework
-            ios/zingo.swift
-            ios/ZingoNymProxyFFI.xcframework
-            ios/zingo_nym_proxy_ffi.swift
-          key: native-ios-xcframework-${{ env.CACHE-KEY }}
+          path: zingolib/bindings/swift/build
+          key: binding-layer-ios-${{ env.CACHE-KEY }}
           lookup-only: true
 
       - name: Set cache-found
@@ -52,11 +56,11 @@ jobs:
         run: echo "ios-cache-found=${{ steps.ios-check-build-cache.outputs.cache-hit }}" >> $GITHUB_OUTPUT
 
   ios-build:
-    name: Build iOS Rust xcframework
+    name: Build the iOS Binding Layer
     needs: ios-check-build-cache
     if: ${{ needs.ios-check-build-cache.outputs.ios-cache-found != 'true' }}
     continue-on-error: ${{ inputs.advisory }}
-    runs-on: zingo-ios-build-12
+    runs-on: ${{ inputs.runner }}
     env:
       RUSTUP_HOME: ${{ github.workspace }}/.rustup
       CARGO_HOME:  ${{ github.workspace }}/.cargo
@@ -65,37 +69,17 @@ jobs:
         if: ${{ contains(github.repository, 'zingolib') }}
         run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
 
+      # The descriptor step reads the zingo-* tag that points at HEAD.
       - name: Checkout repository
         uses: actions/checkout@v7
         with:
           repository: ${{ env.REPO-OWNER }}/zingo-mobile
+          fetch-tags: true
 
-      - name: Cargo update for zingolib CI
-        if: ${{ contains(github.repository, 'zingolib') }}
-        run: |
-          set -euo pipefail
-
-          TOML="rust/Cargo.toml"
-          REV="${GITHUB_SHA}"
-          PINS='^(zingolib|pepper-sync|zingolib_testutils|zingo-price)[[:space:]]*='
-
-          sed -i '' -E \
-            "/${PINS}/ s/rev[[:space:]]*=[[:space:]]*\"[^\"]*\"/rev = \"${REV}\"/" \
-            "$TOML"
-
-          sed -i '' -E \
-            "/${PINS}/ s/(branch|tag)[[:space:]]*=[[:space:]]*\"[^\"]*\"/rev = \"${REV}\"/" \
-            "$TOML"
-
-          pinned="$(grep -E "$PINS" "$TOML")"
-          echo "zingolib pins =>"
-          echo "$pinned"
-          test "$(echo "$pinned" | wc -l)" -eq "$(echo "$pinned" | grep -c "rev = \"${REV}\"")"
-          ! echo "$pinned" | grep -qE '\b(branch|tag)[[:space:]]*='
-
-          cd rust
-          rustup default stable
-          cargo update -p zingolib --aggressive
+      - name: Check out zingolib
+        uses: ./.github/actions/zingolib-submodule
+        with:
+          tags: true
 
       - name: Cargo default stable
         run: |
@@ -107,32 +91,43 @@ jobs:
       # `rustc -vV` into its key, and RUSTUP_HOME here is a workspace-relative
       # dir that has no default toolchain until the step above installs one.
       #
-      # Two workspaces: the shim is excluded from the main one (own lockfile,
-      # see rust/Cargo.toml), so its target dir needs listing separately. It
-      # was missing from the cache this replaces, which is why the 24 minutes
-      # of nym-sdk were never cacheable at all.
+      # Three workspaces in the zingolib submodule: the wallet crate, the
+      # proxy crate, and the workbench that runs the builder. The builder puts
+      # each crate's iOS target dir under zingolib/target/binding-layer, so
+      # those dirs are listed explicitly.
       #
       # What it replaces: a plain actions/cache over .cargo + rust/target that
       # never once hit. It stored 4.6 GB unpruned, the repo's cache store
       # evicted it before the next iOS build needed it, and every run logged
       # "Cache not found for input keys: ios-cargo-..." and then spent 8m30
       # re-uploading it. rust-cache prunes to dependency artifacts only, which
-      # is all this job needs: zingolib and nym-sdk are git/registry deps, not
-      # workspace members, and compiling them is nearly the whole 45 minutes.
+      # is all this job needs: zingolib and nym-sdk dominate the build, and
+      # their compiled dependencies are what the cache keeps.
       #
-      # Saved from dev only. A cache written on refs/pull/N/merge is invisible
-      # to every other PR, so per-PR saves buy nothing and only add eviction
-      # pressure; the dev copy is readable by all of them.
+      # Every run saves the cache. A PR reads its own entries and the dev
+      # entry.
       - name: Cargo cache (registry, git, iOS targets)
+        id: cargo-cache
         uses: Swatinem/rust-cache@v2
         with:
           workspaces: |
-            rust
-            rust/nym-proxy-ffi
-          save-if: ${{ github.ref == 'refs/heads/dev' }}
+            zingolib/zingo-ffi -> ../target/binding-layer/ios/wallet
+            zingolib/zingo-netutils/nym-proxy-ffi -> ../../target/binding-layer/ios/proxy
+            zingolib/tools/workbench
+
+      # rust-cache reports a hit for an exact key match only. A restore
+      # through a restore-key leaves the wallet target dir in place.
+      - name: Record the cargo cache state
+        env:
+          CARGO_CACHE_HIT: ${{ steps.cargo-cache.outputs.cache-hit }}
+        run: |
+          cargo_cache="miss"
+          test -d zingolib/target/binding-layer/ios/wallet && cargo_cache="partial"
+          test "$CARGO_CACHE_HIT" = "true" && cargo_cache="exact"
+          echo "CARGO_CACHE=$cargo_cache" >> "$GITHUB_ENV"
 
       - name: Install bindgen-cli (needed by aws-lc-sys, ring etc.)
-        run: cargo install --force --locked bindgen-cli
+        run: cargo install --locked bindgen-cli
 
       - name: Install protoc
         run: brew install protobuf
@@ -154,27 +149,48 @@ jobs:
           CXXFLAGS_aarch64_apple_ios_sim = "--target=arm64-apple-ios-simulator -isysroot $SDKROOT"
           EOF
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22.18.0
+      - name: Record zingo-mobile's descriptor
+        run: |
+          descriptor="$(cargo run --quiet --manifest-path rust/Cargo.toml --bin zm-descriptor)"
+          echo "ZINGO_MOBILE_DESCRIPTOR=$descriptor" >> "$GITHUB_ENV"
 
-      - name: Build iOS Rust xcframework
-        run: node rust/ios/build_ios.mjs
+      # The two XCFrameworks and the Swift sources of the ZingoBindings
+      # package, which the Xcode project takes from the zingolib submodule. The
+      # builder finds the zingolib root from its own crate directory, so it
+      # runs from the zingo-mobile root.
+      - name: Build the Binding Layer
+        run: |
+          started="$(date +%s)"
+          cargo run \
+            --manifest-path zingolib/tools/workbench/Cargo.toml \
+            --bin build-binding-layer -- \
+            ios --out zingolib/bindings/swift/build
+          echo "BUILD_SECONDS=$(( $(date +%s) - started ))" >> "$GITHUB_ENV"
 
-      - name: Upload xcframework artifact
+      # One table row per run in the job summary.
+      - name: Report the build in the job summary
+        env:
+          RUNNER: ${{ inputs.runner }}
+        run: |
+          minutes="$(( BUILD_SECONDS / 60 ))"
+          seconds="$(( BUILD_SECONDS % 60 ))"
+          printf '%s\n' \
+            "## iOS Binding Layer" \
+            "" \
+            "| Runner | Cargo cache | Build time | Descriptor | zingolib |" \
+            "|---|---|---|---|---|" \
+            "| $RUNNER | $CARGO_CACHE | ${minutes}m ${seconds}s | $ZINGO_MOBILE_DESCRIPTOR | $(git -C zingolib rev-parse --short HEAD) |" \
+            >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload the Binding Layer
         uses: actions/upload-artifact@v7
         with:
-          name: native-ios-xcframework-${{ env.CACHE-KEY }}
-          path: |
-            ios/Zingolib.xcframework
-            ios/zingo.swift
-            ios/ZingoNymProxyFFI.xcframework
-            ios/zingo_nym_proxy_ffi.swift
+          name: binding-layer-ios-${{ env.CACHE-KEY }}
+          path: zingolib/bindings/swift/build
           retention-days: 3
 
-  cache-native-ios-uniffi:
-    name: Cache iOS xcframework
+  cache-binding-layer-ios:
+    name: Cache the iOS Binding Layer
     needs: ios-build
     continue-on-error: ${{ inputs.advisory }}
     runs-on: macos-15
@@ -188,18 +204,14 @@ jobs:
         with:
           repository: ${{ env.REPO-OWNER }}/zingo-mobile
 
-      - name: Download xcframework artifact
+      - name: Download the Binding Layer
         uses: actions/download-artifact@v4
         with:
-          name: native-ios-xcframework-${{ env.CACHE-KEY }}
-          path: ios
+          name: binding-layer-ios-${{ env.CACHE-KEY }}
+          path: zingolib/bindings/swift/build
 
-      - name: Cache xcframework
+      - name: Cache the Binding Layer
         uses: actions/cache/save@v6
         with:
-          path: |
-            ios/Zingolib.xcframework
-            ios/zingo.swift
-            ios/ZingoNymProxyFFI.xcframework
-            ios/zingo_nym_proxy_ffi.swift
-          key: native-ios-xcframework-${{ env.CACHE-KEY }}
+          path: zingolib/bindings/swift/build
+          key: binding-layer-ios-${{ env.CACHE-KEY }}

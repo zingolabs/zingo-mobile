@@ -103,6 +103,14 @@ export function sendGateOpen(view: MixnetView | null): boolean {
   return view === null ? true : !view.sendBlocked;
 }
 
+// The status line a blocked gate shows beside its reason: the reconnecting
+// notice while a reconnect runs, and the transport's own status otherwise.
+export function shownStatusKey(
+  view: MixnetView,
+): 'mixnet.reconnecting' | MixnetStatusKey {
+  return view.reconnecting ? 'mixnet.reconnecting' : view.statusKey;
+}
+
 export type MixnetPhase =
   'connecting' | 'ready' | 'lost' | 'reconnecting' | 'off';
 
