@@ -1468,10 +1468,13 @@ export class LoadingAppClass extends Component<
     }
     this.setState({
       actionButtonsDisabled: true,
-      screen: RouteEnum.WalletProgress,
       progressKind: 'create',
       progressDone: false,
     });
+    const showProgress = setTimeout(
+      () => this.setState({ screen: RouteEnum.WalletProgress }),
+      motionDuration.emphasized,
+    );
     // Pass "0" in both modes. Online, the Indexer supplies the chain tip.
     // Offline (Indexerless), the FFI falls back to zingolib's Library Birthday
     // — a per-chain height already mined when the linked zingolib release was
@@ -1493,6 +1496,7 @@ export class LoadingAppClass extends Component<
       try {
         seedJSON = await JSON.parse(seed.value);
         if (seedJSON.error) {
+          clearTimeout(showProgress);
           this.setState({
             actionButtonsDisabled: false,
             screen: RouteEnum.StartMenu,
@@ -1510,6 +1514,7 @@ export class LoadingAppClass extends Component<
           return;
         }
       } catch (e: unknown) {
+        clearTimeout(showProgress);
         this.setState({
           actionButtonsDisabled: false,
           screen: RouteEnum.StartMenu,
@@ -1532,8 +1537,10 @@ export class LoadingAppClass extends Component<
       };
       // storing the seed & birthday in KeyChain/KeyStore
       await createUpdateRecoveryWalletInfo(wallet);
+      clearTimeout(showProgress);
       this.setState({
         wallet,
+        screen: RouteEnum.WalletProgress,
         actionButtonsDisabled: false,
         walletExists: true,
         progressDone: true,
@@ -1549,6 +1556,7 @@ export class LoadingAppClass extends Component<
         this.state.server.chainName,
       );
     } else {
+      clearTimeout(showProgress);
       this.walletErrorHandle(
         seed.ok ? seed.value : seed.error.message,
         this.state.translate('loadingapp.creatingwallet-label') as string,

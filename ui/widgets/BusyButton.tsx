@@ -19,6 +19,7 @@ type BusyButtonProps = {
   onPress: () => void;
   onDisabledPress: () => void;
   testID?: string;
+  labelSize?: number;
 };
 
 const HEIGHT = 42;
@@ -32,6 +33,7 @@ const BusyButton: React.FunctionComponent<BusyButtonProps> = ({
   onPress,
   onDisabledPress,
   testID,
+  labelSize = 14.5,
 }) => {
   const { colors } = useTheme();
   const naturalWidth = useSharedValue(0);
@@ -130,7 +132,7 @@ const BusyButton: React.FunctionComponent<BusyButtonProps> = ({
             {
               color: colors.bgCanvas,
               fontWeight: '600',
-              fontSize: 14.5,
+              fontSize: labelSize,
               textAlign: 'center',
             },
             label,

@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useMemo, useRef, useState } from 'react';
-import { View, ActivityIndicator, Pressable } from 'react-native';
+import { View, Pressable } from 'react-native';
 import Animated, {
   FadeIn,
   FadeInUp,
@@ -22,13 +22,13 @@ import ActionMenuBottomSheet, {
 import { ContextAppLoading } from '@app/context';
 import { getZingoName, getZingoVersion } from '@app/utils/ZingoAppData';
 import RegText from '@ui/primitives/RegText';
+import BusyButton from '@ui/widgets/BusyButton';
 import { ease } from '@app/theme/motion';
 
 // Vertical positions from the 402 x 874 design, as fractions of the height.
 const TITLE_TOP = 294 / 874;
 const BOTTOM_MARGIN = 60;
 const PILL_WIDTH = 270;
-const PILL_HEIGHT = 44;
 
 const titleEnter = () =>
   FadeInUp.duration(400)
@@ -205,28 +205,17 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
   );
 
   const pill = (title: string, onPress: () => void, testID: string) => (
-    <Pressable
-      testID={testID}
-      disabled={actionButtonsDisabled}
-      onPress={onPress}
-      style={({ pressed }) => ({
-        width: PILL_WIDTH,
-        height: PILL_HEIGHT,
-        borderRadius: PILL_HEIGHT / 2,
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: actionButtonsDisabled
-          ? colors.bgAccentDisabled
-          : colors.bgAccent,
-        transform: [{ scale: pressed ? 0.97 : 1 }],
-      })}
-    >
-      <RegText
-        style={{ color: colors.bgCanvas, fontSize: 16, fontWeight: '500' }}
-      >
-        {title}
-      </RegText>
-    </Pressable>
+    <View style={{ width: PILL_WIDTH }}>
+      <BusyButton
+        testID={testID}
+        title={title}
+        labelSize={16}
+        enabled={true}
+        busy={actionButtonsDisabled}
+        onPress={onPress}
+        onDisabledPress={() => {}}
+      />
+    </View>
   );
 
   return (
@@ -331,13 +320,6 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
           >
             {warning}
           </RegText>
-        )}
-        {actionButtonsDisabled && (
-          <ActivityIndicator
-            size="small"
-            color={colors.fgAccent}
-            style={{ marginBottom: 16 }}
-          />
         )}
         {canAct &&
           link(
