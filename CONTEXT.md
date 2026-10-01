@@ -198,9 +198,10 @@ IO, alerts, email, biometrics. Home: `app/services`.
 ## CI
 
 **Blocking check** — a PR CI job whose failure fails the pull request.
-Jest, rust-shear, js-depcheck, andr-dependency-analysis, the Android
-Kotlin compile, the Android JVM unit tests, the Android build chain, and
-the Android integration buckets are blocking checks.
+Jest, rust-shear, the workbench tests, js-depcheck,
+andr-dependency-analysis, the Android Kotlin compile, the Android JVM
+unit tests, the Android build chain, and the Android integration buckets
+are blocking checks.
 
 **Advisory stage** — a PR CI job that records its result without
 affecting the pull request verdict. No PR stage currently runs in
