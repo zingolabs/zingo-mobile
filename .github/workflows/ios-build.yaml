@@ -104,8 +104,10 @@ jobs:
       # is all this job needs: zingolib and nym-sdk dominate the build, and
       # their compiled dependencies are what the cache keeps.
       #
-      # Every run saves the cache. A PR reads its own entries and the dev
-      # entry.
+      # Only dev saves the cache, and every PR reads the dev entry. An entry
+      # is about 4 GB and a PR's entry is readable by that PR alone. After a
+      # PR's first green build the Binding Layer cache skips this job, so
+      # the PR would seldom read its own entry.
       - name: Cargo cache (registry, git, iOS targets)
         id: cargo-cache
         uses: Swatinem/rust-cache@v2
@@ -114,6 +116,7 @@ jobs:
             zingolib/zingo-ffi -> ../target/binding-layer/ios/wallet
             zingolib/zingo-netutils/nym-proxy-ffi -> ../../target/binding-layer/ios/proxy
             zingolib/tools/workbench
+          save-if: ${{ github.ref == 'refs/heads/dev' }}
 
       # rust-cache reports a hit for an exact key match only. A restore
       # through a restore-key leaves the wallet target dir in place.
