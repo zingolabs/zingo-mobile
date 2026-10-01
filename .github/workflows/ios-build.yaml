@@ -13,14 +13,15 @@ on:
         required: false
         default: false
         type: boolean
-      # Runner label for the build job. The stock Apple silicon runner
-      # has the capacity of GitHub's whole fleet, and the Intel pool
-      # zingo-ios-build-12 serves one job at a time. The release path
-      # passes the pool for its faster cold build.
+      # Runner label for the build job. zingo-ios-build-m2 is the org's
+      # pool of two m2-5-core machines, which draws on GitHub's Apple
+      # silicon fleet. The Intel pool zingo-ios-build-12 received one
+      # machine at a time whatever its cap, and the stock macos-15 label
+      # is the fallback with three cores.
       runner:
         required: false
         type: string
-        default: macos-15
+        default: zingo-ios-build-m2
 
 env:
   CACHE-KEY: ${{ inputs.cache-key }}
