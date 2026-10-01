@@ -108,10 +108,12 @@ const { mounted, unmounted, dismissers } = jest.requireMock<{
 
 // The mock's extras, read through the same import the app code uses, so the
 // queue observed here is the one the sheets write.
-const { CLOSE_ANIMATION_MS, sheetsQueue } = bottomSheetMock as unknown as {
-  CLOSE_ANIMATION_MS: number;
-  sheetsQueue: number[];
-};
+const { CLOSE_ANIMATION_MS, sheetsQueue, sheetHandles } =
+  bottomSheetMock as unknown as {
+    CLOSE_ANIMATION_MS: number;
+    sheetsQueue: number[];
+    sheetHandles: Map<number, { snapToIndex: (index: number) => void }>;
+  };
 
 const FRAME_MS = 16;
 const MID_CLOSE_MS = CLOSE_ANIMATION_MS / 2;
@@ -240,5 +242,32 @@ describe('the add-tag sheet under the shared mount gate', () => {
     expect(mountedAddresses()).toEqual(['zs1first', 'zs1second']);
     expect(mountedForms()).toEqual([2]);
     expect(dismissers).toHaveLength(2); // both forms received a dismiss; none ran
+  });
+
+  it('Tests that a launch parked during a caught close swaps into the sheet once it settles open.', async () => {
+    const { instance } = await mountCommitted();
+
+    await launch(instance, 'zs1first');
+    await act(async () => {
+      dismissers[0]();
+      jest.advanceTimersByTime(MID_CLOSE_MS);
+    });
+    await launch(instance, 'zs1second');
+    expect(mountedForms()).toEqual([1]);
+
+    // The user catches the closing sheet and drags it open again, so the
+    // dismissal never lands.
+    await act(async () => {
+      [...sheetHandles.values()].at(-1)?.snapToIndex(0);
+      await flushMicrotasks();
+    });
+    await act(async () => {
+      jest.advanceTimersByTime(CLOSE_ANIMATION_MS);
+      await flushMicrotasks();
+    });
+
+    expect(mountedAddresses()).toEqual(['zs1first', 'zs1second']);
+    expect(mountedForms()).toEqual([2]);
+    expect(sheetsQueue).toHaveLength(1);
   });
 });

@@ -90,6 +90,24 @@ const AddTagModalHost = ({
     closing.current = true;
   }, []);
 
+  // A caught close settles open again and never dismisses, so the close
+  // flag clears here, and a launch parked during the close shows now.
+  const onChange = useCallback((index: number) => {
+    if (index < 0) {
+      return;
+    }
+    closing.current = false;
+    const next = pending.current;
+    pending.current = undefined;
+    if (next !== undefined) {
+      setShown(prior =>
+        prior.kind === 'shown'
+          ? { ...prior, target: next }
+          : { kind: 'shown', sheet: next.launch, target: next },
+      );
+    }
+  }, []);
+
   const onDismiss = useCallback(() => {
     closing.current = false;
     const next = pending.current;
@@ -110,6 +128,7 @@ const AddTagModalHost = ({
       key={shown.sheet}
       presentOnMount
       onClosing={onClosing}
+      onChange={onChange}
       onDismiss={onDismiss}
       header={
         <AddTagHeader title={translate('addressbook.add-contact') as string} />
