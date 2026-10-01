@@ -3,6 +3,7 @@ export enum RouteEnum {
   Launching = 'Launching',
   StartMenu = 'StartMenu',
   NewSeed = 'NewSeed',
+  ImportChooser = 'ImportChooser',
   ImportUfvk = 'ImportUfvk',
   WalletProgress = 'WalletProgress',
 

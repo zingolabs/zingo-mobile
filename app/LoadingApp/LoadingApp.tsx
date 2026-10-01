@@ -110,6 +110,7 @@ import {
 
 // no lazy load because slowing down screens.
 import ImportUfvk from '@screens/ImportUfvk';
+import ImportChooser from '@screens/ImportChooser';
 import OnboardingStage from '@ui/widgets/OnboardingStage';
 import SeedSheet from '@ui/widgets/SeedSheet';
 import WalletProgress from '@screens/WalletProgress';
@@ -1568,7 +1569,20 @@ export class LoadingAppClass extends Component<
   };
 
   getwalletToRestore = async () => {
-    this.setState({ wallet: {} as WalletType, screen: RouteEnum.ImportUfvk });
+    this.setState({
+      wallet: {} as WalletType,
+      screen: this.state.recoveryWallet
+        ? RouteEnum.ImportChooser
+        : RouteEnum.ImportUfvk,
+    });
+  };
+
+  leaveImport = () => {
+    this.setState({
+      screen: this.state.recoveryWallet
+        ? RouteEnum.ImportChooser
+        : RouteEnum.StartMenu,
+    });
   };
 
   doRestore = async (seedUfvk: string, birthday: number) => {
@@ -2031,13 +2045,23 @@ export class LoadingAppClass extends Component<
                   {screen === RouteEnum.WalletProgress && (
                     <WalletProgress kind={this.state.progressKind} />
                   )}
+                  {screen === RouteEnum.ImportChooser && (
+                    <ImportChooser
+                      busy={actionButtonsDisabled}
+                      onPrevious={this.importRecoveryWallet}
+                      onSeed={() =>
+                        this.setState({ screen: RouteEnum.ImportUfvk })
+                      }
+                      onBack={() =>
+                        this.setState({ screen: RouteEnum.StartMenu })
+                      }
+                    />
+                  )}
                   {screen === RouteEnum.ImportUfvk && (
                     <ImportUfvk
                       busy={this.state.actionButtonsDisabled}
                       onClickOK={(s: string, b: number) => this.doRestore(s, b)}
-                      onClickCancel={() =>
-                        this.setState({ screen: RouteEnum.StartMenu })
-                      }
+                      onClickCancel={this.leaveImport}
                     />
                   )}
                 </OnboardingStage>
