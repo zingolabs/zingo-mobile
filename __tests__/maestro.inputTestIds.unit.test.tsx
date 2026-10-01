@@ -51,6 +51,22 @@ function accessibleAncestor(element: ReactTestInstance): string | undefined {
   return undefined;
 }
 
+/**
+ * The `accessible` prop of the bottom sheet modal that holds an element.
+ * The modal is one accessibility element unless the prop is false, and on
+ * iOS it then swallows the test IDs of the whole sheet.
+ */
+function sheetAccessible(element: ReactTestInstance): unknown {
+  let ancestor = element.parent;
+  while (ancestor) {
+    if ('enablePanDownToClose' in ancestor.props) {
+      return ancestor.props.accessible;
+    }
+    ancestor = ancestor.parent;
+  }
+  throw new Error('the element is in no bottom sheet modal');
+}
+
 function drawerProps<R extends RouteEnum.Send | RouteEnum.Settings>(
   name: R,
 ): NativeStackScreenProps<AppDrawerParamList, R> {
@@ -102,7 +118,7 @@ describe('Maestro reaches each typed field on iOS', () => {
     }
   });
 
-  test('the custom server field', () => {
+  test('the custom server field and the server options', () => {
     const state = loadedState();
     state.server = mockServer;
     state.selectServer = SelectServerEnum.custom;
@@ -125,6 +141,11 @@ describe('Maestro reaches each typed field on iOS', () => {
     expect(
       accessibleAncestor(settings.getByTestId('settings.custom-server-field')),
     ).toBeUndefined();
+    for (const id of ['settings.list-server', 'settings.custom-server']) {
+      const option = settings.getByTestId(id);
+      expect([id, accessibleAncestor(option)]).toEqual([id, undefined]);
+      expect([id, sheetAccessible(option)]).toEqual([id, false]);
+    }
   });
 
   test('the restore seed and birthday fields', () => {

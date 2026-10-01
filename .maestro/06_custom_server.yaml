@@ -42,10 +42,20 @@ appId: org.ZingoLabs.Zingo
     element:
       id: "settings.custom-server-field"
     direction: UP
-- tapOn:
-    id: "settings.custom-server-field"
-- eraseText: 100
-- inputText: "https://lwd2.zcash-infra.com:9067"
+
+# The driver can drop characters while it types, and a save then targets
+# a host that does not exist. The field is read back, and the entry is
+# typed again when the text differs.
+- retry:
+    maxRetries: 3
+    commands:
+      - tapOn:
+          id: "settings.custom-server-field"
+      - eraseText: 100
+      - inputText: "https://na.zec.rocks:443"
+      - assertVisible:
+          id: "settings.custom-server-field"
+          text: "https://na\\.zec\\.rocks:443"
 
 # The server sheet covers the Save button. Closing the sheet unmounts the
 # field and takes the keyboard with it.
@@ -64,7 +74,9 @@ appId: org.ZingoLabs.Zingo
       id: "header.checkicon"
     timeout: 300000
 
-# The server row shows the saved server after the wallet reconnected.
+# The server row shows the saved server after the wallet reconnected. On
+# iOS the row is one element whose text joins the mode and the server, so
+# the selector allows text before the address.
 - tapOn:
     id: "header.drawmenu"
 - tapOn:
@@ -77,4 +89,4 @@ appId: org.ZingoLabs.Zingo
     element:
       id: "settings.server"
 - assertVisible:
-    text: ".*lwd2\\.zcash-infra\\.com:9067"
+    text: ".*https://na\\.zec\\.rocks:443/?"

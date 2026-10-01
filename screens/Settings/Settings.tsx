@@ -1727,6 +1727,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       </View>
       <BottomSheetModal
         ref={serverBottomSheetRef}
+        accessible={false}
         enableDynamicSizing={true}
         enablePanDownToClose
         stackBehavior="push"
@@ -2003,6 +2004,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
 
           <View>
             <TouchableOpacity
+              testID="settings.list-server"
               disabled={disabled}
               onPress={() => {
                 // criterion 2: pressing List while on None/Regtest jumps to
@@ -2043,10 +2045,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                     color={colors.fgMuted}
                   />
                 )}
-                <RegText
-                  testID="settings.list-server"
-                  style={{ marginLeft: 10 }}
-                >
+                <RegText style={{ marginLeft: 10 }}>
                   {translate('settings.server-list') as string}
                 </RegText>
                 {listIcon === faDotCircle && (

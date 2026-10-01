@@ -31,16 +31,26 @@ appId: org.ZingoLabs.Zingo
     id: "settings.list-server"
 
 # Settings fetches the mainnet list from a live registry when it opens,
-# and falls back to the built-in servers when the fetch fails. The rows
-# and their order vary from night to night, and the flow picks the row by
-# its server name. The first row could be the server already in use, and
-# a save then reconnects nothing.
+# and falls back to the built-in servers when the fetch fails. The list
+# holds only the servers that the registry reports online, and the rows
+# and their order vary from night to night. The flow picks the row by its
+# server name, and scrolls to it, because the row can sit below the fold.
+# The first row could be the server already in use, and a save then
+# reconnects nothing. The Settings screen under the sheet can show the
+# same name, so the selector takes the row inside the list.
 - extendedWaitUntil:
     visible:
-      text: ".*lwd2\\.zcash-infra\\.com:9067"
+      id: "settings.list-server-select"
     timeout: 30000
+- scrollUntilVisible:
+    element:
+      text: "https://zec\\.rocks:443"
+      childOf:
+        id: "settings.list-server-select"
 - tapOn:
-    text: ".*lwd2\\.zcash-infra\\.com:9067"
+    text: "https://zec\\.rocks:443"
+    childOf:
+      id: "settings.list-server-select"
 - waitForAnimationToEnd:
     timeout: 5000
 
@@ -59,7 +69,9 @@ appId: org.ZingoLabs.Zingo
       id: "header.checkicon"
     timeout: 300000
 
-# The server row shows the saved server after the wallet reconnected.
+# The server row shows the saved server after the wallet reconnected. On
+# iOS the row is one element whose text joins the mode and the server, so
+# the selector allows text before the address.
 - tapOn:
     id: "header.drawmenu"
 - tapOn:
@@ -72,4 +84,4 @@ appId: org.ZingoLabs.Zingo
     element:
       id: "settings.server"
 - assertVisible:
-    text: ".*lwd2\\.zcash-infra\\.com:9067"
+    text: ".*https://zec\\.rocks:443/?"
