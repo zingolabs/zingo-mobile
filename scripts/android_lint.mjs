@@ -1,8 +1,9 @@
 #!/usr/bin/env node
-// Android Lint on the app module. Static analysis only: no emulator, no
-// device, no NDK. Catches NewApi (a call above minSdk behind a
-// too-low SDK_INT guard), which otherwise only shows up as a crash on a
-// user's older device.
+// Android Lint on the app module. Static analysis on the host, with no
+// emulator and no device. Gradle first builds the x86_64 Binding Layer in the
+// builder container, unless -PbindingLayerPrebuilt names a built one. Catches
+// NewApi (a call above minSdk behind a too-low SDK_INT guard), which otherwise
+// only shows up as a crash on a user's older device.
 // Cross-platform: Linux, macOS, Windows.
 //
 // Usage: node scripts/android_lint.mjs [variant]   # default prodRelease
@@ -19,22 +20,14 @@ const isWindows = process.platform === 'win32';
 const variant = process.argv[2] ?? 'prodRelease';
 const task = `:app:lint${variant[0].toUpperCase()}${variant.slice(1)}`;
 
-// The app module compiles the UniFFI bindings. Generate them first. The
-// shim builds for the host; no NDK.
-console.log('\nGenerating UniFFI bindings...');
-const generated = spawnSync(
-  process.execPath,
-  [join(SCRIPTS_DIR, 'generate_kotlin_bindings.mjs'), '--variants', 'release'],
-  { stdio: 'inherit' },
-);
-if (generated.status !== 0) {
-  process.exit(generated.status ?? 1);
-}
+// The app module compiles the UniFFI bindings, which the Binding Layer build
+// in the zingolib submodule produces. One ABI is enough for lint.
+const BINDING_LAYER_ABI = 'x86_64';
 
 console.log(`\nLinting ${variant}...`);
 // Node refuses to spawn .bat/.cmd without a shell (CVE-2024-27980).
 const gradlew = join(ANDROID_DIR, isWindows ? 'gradlew.bat' : 'gradlew');
-const { status } = spawnSync(gradlew, [task], {
+const { status } = spawnSync(gradlew, [task, `-PbindingLayerAbi=${BINDING_LAYER_ABI}`], {
   cwd: ANDROID_DIR,
   stdio: 'inherit',
   shell: isWindows,

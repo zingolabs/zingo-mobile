@@ -1,4 +1,5 @@
 rust/target
+zingolib
 android/build
 node_modules
 .storybook/storybook.requires.ts

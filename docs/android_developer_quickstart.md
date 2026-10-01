@@ -3,8 +3,8 @@
 1. Yarn
 2. NodeJS (recommended version 22.18.0 or higher)
 3. Rust (https://www.rust-lang.org/tools/install)
-4. Docker (Docker Engine) — required only for `yarn rust:android` (reproducible build).
-   Not needed for `yarn rust:android-local`.
+4. Podman or Docker. The Binding Layer build runs in zingo-mobile's Android
+   builder image, and it tries Podman first.
 5. OpenJDK 18 (https://jdk.java.net/archive/)
    - **macOS**: `brew install openjdk@18` or via SDKMAN: `sdk install java 18.0.2-zulu`
    - **Linux**: download from the link above and extract, or `sudo apt install openjdk-18-jdk`
@@ -52,26 +52,19 @@ And append to `Path`:
 - `%ANDROID_HOME%\emulator`
 
 ## Building
-1. Clone the repository.
+1. Clone the repository with its submodules:
+   `git clone --recurse-submodules https://github.com/zingolabs/zingo-mobile.git`.
+   In an existing clone, run `git submodule update --init zingolib`.
 2. Go to the cloned repo `cd zingo-mobile`.
 3. From the root of the project, install JS deps: `yarn`
-4. Build the Rust libraries for the 4 Android ABIs (Docker, reproducible):
-   `yarn rust:android` — may take a long time on first run.
+4. Build the Rust libraries for the 4 Android ABIs: `yarn rust:android` — may
+   take a long time on first run. The app's Gradle build also runs this step
+   whenever the libraries are missing or stale.
 
-For faster iteration during development you can also build natively on the host
-(no Docker), optionally restricted to a single ABI:
-- `yarn rust:android-local` _(all 4 ABIs)_
-- `yarn rust:android-local arm64` _(only arm64-v8a)_
-
-Native mode requires these extras on the host (NDK is already listed above):
-- `cargo install --version 4.0.1 cargo-ndk`
-- `cargo install --force --locked bindgen-cli`
-- `rustup target add aarch64-linux-android armv7-linux-androideabi i686-linux-android x86_64-linux-android`
-- protoc (must be on `PATH`). The Rust build regenerates the lightwalletd
-  protos, and the generator calls protoc.
-  - **macOS**: `brew install protobuf`
-  - **Linux**: `sudo apt install protobuf-compiler`
-  - **Windows**: `winget install Google.Protobuf`
+The Rust libraries come from the Binding Layer in the `zingolib` submodule
+(`zingolib/bindings/android`). To build one ABI only, pass
+`-PbindingLayerAbi=<abi>` to Gradle, for example `-PbindingLayerAbi=x86_64`.
+To use libraries built elsewhere, pass `-PbindingLayerPrebuilt=<directory>`.
 
 ## Launching the app
 ### Android Studio

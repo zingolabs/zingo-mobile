@@ -2,6 +2,15 @@ const { getDefaultConfig, mergeConfig } = require('@react-native/metro-config');
 const withStorybook = require('@storybook/react-native/metro/withStorybook');
 const exclusionList =
   require('metro-config/private/defaults/exclusionList').default;
+const path = require('path');
+
+// The submodule's absolute path with forward slashes, escaped for a RegExp.
+// exclusionList swaps the slashes for the platform separator.
+const zingolibDir = path
+  .join(__dirname, 'zingolib')
+  .split(path.sep)
+  .join('/')
+  .replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 /**
  * Metro configuration
@@ -32,8 +41,14 @@ const config = {
     sourceExts: [...sourceExts, 'svg'],
     // Cargo creates and deletes temp files under the Rust target directories
     // while a build runs. Without watchman, Metro's fallback watcher follows
-    // one, then exits on ENOENT.
-    blockList: exclusionList([/\/rust\/(?:[^/]+\/)?target\/.*/]),
+    // one, then exits on ENOENT. The zingolib submodule holds the Binding
+    // Layer's target and build directories, and no JavaScript. The submodule
+    // pattern is anchored to this checkout, so a clone that itself lives
+    // under a directory named zingolib keeps its own sources.
+    blockList: exclusionList([
+      /\/rust\/(?:[^/]+\/)?target\/.*/,
+      new RegExp(`^${zingolibDir}/.*`),
+    ]),
   },
 };
 

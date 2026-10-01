@@ -13,7 +13,8 @@ Zingo ships as two parallel apps from this single repo:
 | **Beta** | `org.ZingoLabs.Zingo.Beta` | `org.ZingoLabs.Zingo.Beta` | "Zingo Beta" | TestFlight External / Play Open Testing |
 
 Both apps share the same JS bundle (`app/`, `screens/`, `ui/`),
-the same Rust libs (`libuniffi_zingo.so`, `Zingolib.xcframework`), the same
+the same Rust libs (`libuniffi_zingo.so`, `Zingolib.xcframework`, both built
+from the `zingolib` submodule), the same
 keystores and certificates. They differ only in bundle ID, display name, and
 app icon (Beta has a red `BETA` band). The channel is detected at runtime from
 the native binary — there is no JS-side toggle.
@@ -48,21 +49,26 @@ workflow described below.
 
 ## Release order: tag first, then rebuild the Rust libs
 
-Gradle never invokes cargo, and Xcode never invokes cargo. The native libs
-(`android/app/src/main/jniLibs/<abi>/libuniffi_zingo.so`, `ios/Zingolib.xcframework`)
-are produced by the separate `yarn rust:android` / `yarn rust:ios` steps, and
-the AAB / archive just packages whatever is already sitting there.
+The native libs come from the Binding Layer in the `zingolib` submodule. On
+Android, the app's Gradle build includes the submodule's
+`bindings/android` build, which compiles them when they are missing or stale;
+`yarn rust:android` runs that step alone. On iOS, Xcode never invokes cargo:
+`yarn rust:ios` writes the XCFrameworks into `zingolib/bindings/swift/build`,
+and the archive packages whatever is already there.
 
-That ordering is visible to users. `rust/lib/build.rs` runs
-`git describe --long --match=zingo-*` **at cargo build time** and bakes the
-result into the binary; `get_version()` returns
-`zl_<hash5>-zm_<tag>[_<commits-since-tag>_<hash5>][_dirty]`, which is
-the string on the **zingolib** line of the About screen. The `zm_` half
-describes the commit the `.so` was compiled at. The `zl_` half is the zingolib
-commit the workspace lockfile pins, read from `rust/Cargo.lock` by the same
-build script, which makes it identical on every build machine. (The version in
-the About header, and what the stores show, is unrelated: it comes from
-`versionName`/`versionCode` at runtime via `app/utils/ZingoAppData.ts`.)
+That ordering is visible to users. The build passes the output of
+`git describe --long --match=zingo-*`, run in this repository, to the wallet
+crate **at cargo build time**, which bakes it into the binary; `get_version()`
+returns `<zingolib descriptor>-zm_<tag>[_<commits-since-tag>_<hash5>][_dirty]`,
+which is the string on the **zingolib** line of the About screen. The `zm_`
+half describes the zingo-mobile commit the libs were compiled at. On iOS, the
+zingolib half is `git describe` of the submodule checkout, so it names the
+pinned zingolib commit. The Android builder's container mounts only the
+submodule's tree, not its git directory, so on Android the zingolib half falls
+back to `zl_<crate version>`; a zingolib follow-up restores a commit-exact
+descriptor there. (The version in the About header, and what the stores show,
+is unrelated: it comes from `versionName`/`versionCode` at runtime via
+`app/utils/ZingoAppData.ts`.)
 
 Build the Rust libs before creating the tag and the About screen advertises the
 *previous* tag plus a commit count — e.g. build 327 shipped showing
@@ -74,7 +80,7 @@ Correct order for any store build:
 1. `yarn release:<channel>:prep <ver> <build>`
 2. `git commit` the bump
 3. `git tag ...` — the tag must exist locally before step 4; push it whenever
-4. `yarn rust:android` / `yarn rust:ios` — recompiles the native libs sitting
+4. `yarn rust:android` / `yarn rust:ios` — compiles the native libs sitting
    exactly on the tag, so the descriptor collapses to a clean `zm_<tag>`
 5. Build the AAB (Android Studio / gradle) or Archive in Xcode
 
@@ -249,4 +255,4 @@ the source descriptor compiled into the native lib, see
 ### Known caveats
 - **Bundle ID case sensitivity**: both iOS and Android use `.Beta` (capital B). The `applicationIdSuffix` in `build.gradle.kts` is intentionally capital to match what's registered in App Store Connect and Play Console.
 - **AAB / APK never committed**: gitignored (`*.aab`, `*.apk`, `android/app/beta/release/`, `android/app/release/`).
-- **UniFFI bindings refresh**: the Kotlin bindings are generated, not checked in. `yarn rust:android` writes them into `android/app/build/generated/source/uniffi/{debug,release}/...`, and `node scripts/generate_kotlin_bindings.mjs` writes them on their own. After a `gradle clean`, run one of the two before the Kotlin compile.
+- **UniFFI bindings refresh**: the Kotlin bindings are generated, not checked in. The `zingo-binding-layer` Gradle build writes them into `zingolib/bindings/android/build/binding-layer/kotlin` and regenerates them whenever the submodule's sources change.

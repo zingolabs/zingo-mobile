@@ -26,45 +26,24 @@ jobs:
         with:
           repository: ${{ env.REPO-OWNER }}/zingo-mobile
 
-      - name: Cargo update for zingolib CI
-        if: ${{ contains(github.repository, 'zingolib') }}
+      - name: Check out zingolib
+        uses: ./.github/actions/zingolib-submodule
+
+      # The builders update to the newest stable toolchain before they build.
+      - name: Store the stable Rust version
         run: |
-          set -euo pipefail
+          rustup toolchain install stable --profile minimal
+          rustc +stable --version > rust-version.txt
 
-          TOML="rust/Cargo.toml"
-          REV="${GITHUB_SHA}"
-          PINS='^(zingolib|pepper-sync|zingolib_testutils|zingo-price)[[:space:]]*='
-
-          sed -i -E "/${PINS}/ s/(rev[[:space:]]*=[[:space:]]*\")[^\"]*(\")/\1${REV}\2/" "$TOML"
-
-          sed -i -E "/${PINS}/ s/(branch|tag)[[:space:]]*=[[:space:]]*\"[^\"]*\"/rev = \"${REV}\"/" "$TOML"
-
-          pinned="$(grep -E "$PINS" "$TOML")"
-          echo "zingolib pins =>"
-          echo "$pinned"
-          test "$(echo "$pinned" | wc -l)" -eq "$(echo "$pinned" | grep -c "rev = \"${REV}\"")"
-          ! echo "$pinned" | grep -qE '\b(branch|tag)[[:space:]]*='
-
-      - name: Store Cargo version
-        run: echo $(cargo --version) >> rust/cargo_version.txt
-
-      # This key decides whether the native artefacts are rebuilt or restored,
-      # so it has to name every input that changes them. A pattern missing here
-      # fails silently and in the worst way: the build is skipped, a stale
-      # artefact is restored, and the mismatch surfaces somewhere else.
-      #
-      # *.udl is the UniFFI interface. It generates ios/zingo.swift and the
-      # Kotlin bindings and compiles into the library, so editing it alone — a
-      # changed signature, a new method — used to leave this key untouched and
-      # hand the nightly the previous build's bindings.
-      #
-      # build_ios.mjs is the script ios-build.yaml runs to produce the
-      # xcframework; its targets and flags are build inputs like any other.
-      #
-      # Deliberately absent: rust/android/build_android.mjs and the builder
-      # Dockerfiles. CI does not run them — android-build.yaml drives cargo-ndk
-      # through its own steps — so naming them here would only invalidate this
-      # key for edits that cannot reach the artefacts.
+      # This key decides whether the Binding Layer is rebuilt or restored, and
+      # it names every input that changes the libraries. The zingolib commit
+      # names the crates, the builder, and the builder image. Under zingolib
+      # CI the submodule is the commit under test. The hash names the stable
+      # toolchain and the workflows that run the builder. The version prefix
+      # invalidates every entry when the output layout changes.
       - name: Create cache key
         id: create-cache-key
-        run: echo "cache-key=${{ hashFiles('rust/**/Cargo.toml', 'rust/**/Cargo.lock', 'rust/**/uniffi.toml', 'rust/**/*.rs', 'rust/**/*.udl', 'rust/ios/build_ios.mjs', 'rust/cargo_version.txt') }}" >> $GITHUB_OUTPUT
+        env:
+          KEY_VERSION: binding-layer-v1
+          BUILD_INPUTS: ${{ hashFiles('rust-version.txt', '.github/workflows/android-build.yaml', '.github/workflows/ios-build.yaml') }}
+        run: echo "cache-key=${KEY_VERSION}-$(git -C zingolib rev-parse HEAD)-${BUILD_INPUTS}" >> "$GITHUB_OUTPUT"
