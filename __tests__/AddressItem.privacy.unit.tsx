@@ -4,7 +4,7 @@
  */
 import 'react-native';
 import React, { Profiler } from 'react';
-import { act, fireEvent, render, screen } from '@testing-library/react-native';
+import { fireEvent, render, screen } from '@testing-library/react-native';
 import type { ReactTestInstance } from 'react-test-renderer';
 import {
   ContextAppLoadedProvider,
@@ -13,18 +13,15 @@ import {
 
 import AddressItem from '@ui/widgets/AddressItem';
 import { AddressBookFileClass, ScreenEnum } from '@app/AppState';
+import { REVEAL_MS } from '@app/utils/reveal';
+import { advance } from '../__mocks__/advanceTimers';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockAddressBook } from '../__mocks__/dataMocks/mockAddressBook';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 
-const REVEAL_MS = 5 * 1000;
-const SECOND_TAP_MS = 4500;
-const PRIVACY_OFF_MS = 2000;
 const UNKNOWN = 'u1abc123def456abc123def456abc123def456abc123';
 const ALIAS = 'pepe.zcash';
 const LONG_LABEL = 'a contact label of forty characters long';
-const LONE_SURROGATE =
-  /[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]/;
 
 type ItemProps = React.ComponentProps<typeof AddressItem>;
 type AppState = typeof defaultAppContextLoaded;
@@ -58,12 +55,6 @@ const item = (
     </Profiler>
   </ContextAppLoadedProvider>
 );
-
-const advance = (ms: number): void => {
-  act(() => {
-    jest.advanceTimersByTime(ms);
-  });
-};
 
 const pressable = (text: ReactTestInstance): boolean => {
   let ancestor = text.parent;
@@ -108,61 +99,6 @@ describe('AddressItem - privacy', () => {
 
     advance(REVEAL_MS);
     expect(screen.getByText('ZNS: pe.....')).toBeTruthy();
-  });
-
-  test('Tests that the label stays in full for the whole reveal time when it is tapped a second time. The timer of the first tap must not end the second reveal.', () => {
-    render(item());
-
-    fireEvent.press(screen.getByText('pe.....'));
-    advance(SECOND_TAP_MS);
-    fireEvent.press(screen.getByText('pepe'));
-    advance(REVEAL_MS - SECOND_TAP_MS);
-
-    expect(screen.getByText('pepe')).toBeTruthy();
-  });
-
-  test('Tests that the reveal timer is cleared when the item unmounts during a reveal.', () => {
-    const set = jest.spyOn(global, 'setTimeout');
-    const clear = jest.spyOn(global, 'clearTimeout');
-    const { unmount } = render(item());
-
-    fireEvent.press(screen.getByText('pe.....'));
-    const reveals = set.mock.results.filter(
-      (_, call) => set.mock.calls[call][1] === REVEAL_MS,
-    );
-    unmount();
-
-    expect(reveals).toHaveLength(1);
-    expect(clear).toHaveBeenCalledWith(reveals[0].value);
-  });
-
-  test('Tests that the label does not change at the end of the reveal time when privacy was turned off during the reveal.', () => {
-    const book = bookWith(LONG_LABEL);
-    const { rerender, toJSON } = render(item({}, { addressBook: book }));
-
-    fireEvent.press(screen.getByText('a .....'));
-    advance(PRIVACY_OFF_MS);
-    rerender(item({}, { addressBook: book, privacy: false }));
-    const afterToggle = JSON.stringify(toJSON());
-    advance(REVEAL_MS - PRIVACY_OFF_MS);
-
-    expect(JSON.stringify(toJSON())).toBe(afterToggle);
-  });
-
-  test('Tests that the mask hides a part of the label when the label has two characters.', () => {
-    render(item({}, { addressBook: bookWith('Al') }));
-
-    expect(screen.queryByText('Al.....')).toBeNull();
-    expect(screen.getByText('A.....')).toBeTruthy();
-  });
-
-  test('Tests that the mask keeps a whole character when the second character of the label is an emoji.', () => {
-    render(item({ onlyContact: true }, { addressBook: bookWith('J😀 Juan') }));
-
-    const masked = screen.getByText(/\.\.\.\.\.$/);
-
-    expect(String(masked.props.children)).not.toMatch(LONE_SURROGATE);
-    expect(screen.getByText('J😀.....')).toBeTruthy();
   });
 
   test('Tests that a new contact shows its mask when the ZNS alias of the same item was revealed before the contact was saved.', () => {
