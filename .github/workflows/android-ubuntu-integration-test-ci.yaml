@@ -441,7 +441,7 @@ jobs:
     needs:
       - android-ubuntu-integration-test-ci-avd-cache
     runs-on: ${{ startsWith(inputs.runner, '[') && fromJSON(inputs.runner) || inputs.runner }}
-    # Bounds the debug build, two emulator boots, and both test runs. Each
+    # Bounds the debug build, the emulator boot, and both test runs. Each
     # test has its own limit in android/app/build.gradle.kts.
     timeout-minutes: 40
     env:
@@ -517,7 +517,7 @@ jobs:
           key: avd-${{ env.ABI }}-api-${{ env.API-LEVEL }}-integ
           fail-on-cache-miss: true
 
-      - name: Run offline device tests
+      - name: Run the offline device tests, then the public-chain tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ env.API-LEVEL }}
@@ -528,43 +528,23 @@ jobs:
           disable-animations: true
           working-directory: ./android
           # The emulator runs one ABI, and the build compiles native code
-          # for that ABI alone.
-          script: ./gradlew :app:connectedProdDebugAndroidTest -PreactNativeArchitectures=${{ env.ABI }} -Pandroid.testInstrumentationRunnerArguments.annotation=org.ZingoLabs.Zingo.OfflineDeviceTest
+          # for that ABI alone. The offline run's reports move aside before
+          # the public-chain run writes its own. The public-chain run gives
+          # each test 7 minutes, and ExecuteSyncFromSeed holds itself to 5.
+          script: |
+            ./gradlew :app:connectedProdDebugAndroidTest -PreactNativeArchitectures=${{ env.ABI }} -Pandroid.testInstrumentationRunnerArguments.annotation=org.ZingoLabs.Zingo.OfflineDeviceTest
+            mv app/build/reports/androidTests app/build/reports/androidTests-offline
+            mv app/build/outputs/androidTest-results app/build/outputs/androidTest-results-offline
+            ./gradlew :app:connectedProdDebugAndroidTest -PreactNativeArchitectures=${{ env.ABI }} -Pandroid.testInstrumentationRunnerArguments.annotation=org.ZingoLabs.Zingo.PublicChainTest -Pandroid.testInstrumentationRunnerArguments.timeout_msec=420000
 
-      - name: Upload offline device test reports
+      - name: Upload device test reports
         if: ${{ always() && !cancelled() }}
         uses: actions/upload-artifact@v7
         with:
-          name: test-android-offline-device-reports-${{ env.ABI }}-${{ env.TIMESTAMP }}
+          name: test-android-device-reports-${{ env.ABI }}-${{ env.TIMESTAMP }}
           path: |
-            android/app/build/reports/androidTests
-            android/app/build/outputs/androidTest-results
-          retention-days: 7
-
-      - name: Run public-chain tests
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: ${{ env.API-LEVEL }}
-          arch: ${{ env.AVD-ARCH }}
-          target: ${{ env.TARGET }}
-          force-avd-creation: true
-          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -no-metrics
-          disable-animations: true
-          working-directory: ./android
-          # A mainnet sync of 10,000 blocks took 50 seconds on this
-          # emulator. The 6-minute per-test limit replaces the 60 seconds
-          # of the offline run and outlasts the 5-minute deadline of
-          # ExecuteSyncFromSeed.
-          script: ./gradlew :app:connectedProdDebugAndroidTest -PreactNativeArchitectures=${{ env.ABI }} -Pandroid.testInstrumentationRunnerArguments.annotation=org.ZingoLabs.Zingo.PublicChainTest -Pandroid.testInstrumentationRunnerArguments.timeout_msec=360000
-
-      - name: Upload public-chain test reports
-        if: ${{ always() && !cancelled() }}
-        uses: actions/upload-artifact@v7
-        with:
-          name: test-android-public-chain-reports-${{ env.ABI }}-${{ env.TIMESTAMP }}
-          path: |
-            android/app/build/reports/androidTests
-            android/app/build/outputs/androidTest-results
+            android/app/build/reports/androidTests*
+            android/app/build/outputs/androidTest-results*
           retention-days: 7
 
       - name: Cancel the run on failure (fail-all)
@@ -578,11 +558,8 @@ jobs:
               run_id: context.runId,
             });
 
-  # Transitional alias. The dev branch protection requires a check with
-  # the name "accounts". Issue 1510 removes this job together with that
-  # requirement. A skipped job reports success to branch protection, and
-  # this job therefore always runs and fails unless the device tests
-  # passed.
+  # Reports the combined result of the integration buckets under the
+  # required check name "chain".
   chain:
     name: chain
     needs:
@@ -596,6 +573,11 @@ jobs:
           RESULT: ${{ needs.android-ubuntu-integration-test-ci.result }}
         run: test "$RESULT" = "success"
 
+  # Transitional alias. The dev branch protection requires a check with
+  # the name "accounts". Issue 1510 removes this job together with that
+  # requirement. A skipped job reports success to branch protection, and
+  # this job therefore always runs and fails unless the device tests
+  # passed.
   accounts:
     name: accounts
     needs:
