@@ -216,6 +216,23 @@ so runner setup and emulator boot amortize across the group instead of
 being paid once per test. Unrelated to the migration API's `per_bucket`
 windowing sense, which UI copy avoids entirely.
 
+**Offline device test** — an instrumented test that runs on a device or
+emulator with an empty server URI and no chain. It exercises the Binding
+Layer and the platform alone.
+
+**Static-chain test** — an instrumented test that only reads a chain that
+exists before the test starts.
+
+**Live-chain test** — an instrumented test that broadcasts a transaction
+or needs a block mined while it runs.
+
+**Public-chain test** — a test that reads a chain the project does not
+control, such as mainnet or testnet.
+
+**Fixture wallet** — a wallet on a public chain whose seed, birthday, and
+transaction history are published for tests to read. A refresh replaces it
+with a new seed and a new history.
+
 **Fail-all** — the policy that the first failure of any blocking check
 cancels the entire run at once, rather than letting the surviving checks
 run to completion for diagnostic completeness. Under fail-all, one red
