@@ -51,13 +51,13 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Gradle setup cache (read/write)
+      - name: Gradle setup cache (read-only)
         uses: gradle/actions/setup-gradle@v6
         with:
           gradle-version: wrapper
-          # Only dev writes Gradle caches; see the cache-discipline notes in
-          # android-ubuntu-integration-test-ci.yaml.
-          cache-read-only: ${{ github.ref != 'refs/heads/dev' }}
+          # Read-only: android-dependency-analysis.yaml is the one writer of
+          # the Gradle caches.
+          cache-read-only: true
 
       - name: Check out zingolib
         uses: ./.github/actions/zingolib-submodule

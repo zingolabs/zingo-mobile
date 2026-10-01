@@ -42,8 +42,18 @@ jobs:
       # same Gradle state — transforms and dependencies alone were 3.5 GB
       # of duplicate — against a cache budget that is already evicting
       # entries other jobs need.
+      #
+      # This job is the one writer of the Gradle caches, and it writes from
+      # dev alone. It compiles every variant, the unit tests included, so
+      # its entry holds the widest set of dependencies. Every other Gradle
+      # job is read-only and falls back to this job's entry. A second
+      # writer would leave that fallback to chance: on 2026-10-01 this job
+      # fell back to the APK build's entry, which holds no unit test jar,
+      # and one failed download from Maven Central then failed the run.
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v6
+        with:
+          cache-read-only: ${{ github.ref != 'refs/heads/dev' }}
 
       # The analysis compiles every variant's Kotlin, which needs the Binding
       # Layer's Kotlin bindings. Every variant takes the same bindings.

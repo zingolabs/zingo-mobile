@@ -81,15 +81,15 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Gradle setup cache (write-only)
+      - name: Gradle setup cache (read-only)
         uses: gradle/actions/setup-gradle@v6
         with:
           gradle-version: wrapper
-          # Only the default branch seeds Gradle caches; PR refs write ~1 GiB
-          # per job into the 10 GiB repo quota, and the resulting LRU
-          # eviction has raced (and lost) same-run cache handoffs.
-          cache-write-only: ${{ github.ref == 'refs/heads/dev' }}
-          cache-read-only: ${{ github.ref != 'refs/heads/dev' }}
+          # Read-only: android-dependency-analysis.yaml is the one writer of
+          # the Gradle caches. This job runs no Gradle task, and the entry
+          # that it wrote from dev held no dependency.
+          cache-write-only: false
+          cache-read-only: true
 
       - name: Check AVD cache
         uses: actions/cache/restore@v6
