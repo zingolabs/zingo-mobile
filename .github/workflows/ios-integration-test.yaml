@@ -54,6 +54,13 @@ jobs:
       - name: Check out zingolib
         uses: ./.github/actions/zingolib-submodule
 
+      # The artifact gate runs cargo and gh. This step fails the job at
+      # its start when the runner image lacks one of them.
+      - name: Report the tools of the artifact gate
+        run: |
+          cargo --version
+          gh --version
+
       # The Xcode project takes the Binding Layer from the zingolib submodule.
       # A cache hit supplies it here. On a miss, the artifact gate below
       # supplies it from the build that runs in parallel.
@@ -86,10 +93,14 @@ jobs:
           xcrun simctl list runtimes
           xcrun simctl list devices
 
-      # Everything above needs nothing from the Binding Layer build. Hold
-      # here until its artifact lands; abort promptly if it can never land.
+      # The steps above are independent of the Binding Layer build. This
+      # step holds until the artifact of that build lands, and it ends
+      # early when the build concludes without success. The job continues
+      # past a failed gate to the cache restore below.
       - name: Wait for the Binding Layer artifact (ci-gate)
+        id: gate
         if: ${{ steps.binding-layer.outputs.cache-hit != 'true' }}
+        continue-on-error: true
         working-directory: ./rust
         env:
           GH_TOKEN: ${{ github.token }}
@@ -101,11 +112,22 @@ jobs:
             --poll-secs 20
 
       - name: Download the Binding Layer
-        if: ${{ steps.binding-layer.outputs.cache-hit != 'true' }}
+        if: ${{ steps.gate.outcome == 'success' }}
         uses: actions/download-artifact@v4
         with:
           name: binding-layer-ios-${{ env.CACHE-KEY }}
           path: zingolib/bindings/swift/build
+
+      # The build is skipped when another run saves the cache after the
+      # restore above. The gate then fails, and the cache holds the
+      # Binding Layer.
+      - name: Restore the iOS Binding Layer after a failed gate
+        if: ${{ steps.gate.outcome == 'failure' }}
+        uses: actions/cache/restore@v6
+        with:
+          path: zingolib/bindings/swift/build
+          key: binding-layer-ios-${{ env.CACHE-KEY }}
+          fail-on-cache-miss: true
 
       - name: Build for testing
         working-directory: ios
