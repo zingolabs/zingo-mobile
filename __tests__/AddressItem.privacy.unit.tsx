@@ -1,6 +1,6 @@
 /**
  * Privacy mode masks the contact label the same way it masks the address:
- * the first character and dots, with a tap revealing the full label for 5 s.
+ * the first two characters and dots, with a tap revealing the full label for 5 s.
  */
 import 'react-native';
 import React from 'react';
@@ -39,7 +39,7 @@ describe('AddressItem - privacy', () => {
       </ContextAppLoadedProvider>,
     );
 
-    expect(screen.getByText('p.....')).toBeTruthy();
+    expect(screen.getByText('pe.....')).toBeTruthy();
     expect(screen.queryByText('pepe')).toBeNull();
   });
 
@@ -53,12 +53,28 @@ describe('AddressItem - privacy', () => {
       </ContextAppLoadedProvider>,
     );
 
-    fireEvent.press(screen.getByText('p.....'));
+    fireEvent.press(screen.getByText('pe.....'));
     expect(screen.getByText('pepe')).toBeTruthy();
 
     act(() => {
       jest.advanceTimersByTime(5 * 1000);
     });
-    expect(screen.getByText('p.....')).toBeTruthy();
+    expect(screen.getByText('pe.....')).toBeTruthy();
+  });
+
+  it('masks the ZNS alias when privacy is on', () => {
+    render(
+      <ContextAppLoadedProvider value={privateState()}>
+        <AddressItem
+          address="u1abc123def456abc123def456abc123def456abc123"
+          screenName={ScreenEnum.Confirm}
+          znsAlias="pepe.zcash"
+        />
+      </ContextAppLoadedProvider>,
+    );
+
+    expect(screen.getByText('ZNS: pe.....')).toBeTruthy();
+    fireEvent.press(screen.getByText('ZNS: pe.....'));
+    expect(screen.getByText('ZNS: pepe.zcash')).toBeTruthy();
   });
 });

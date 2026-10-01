@@ -140,7 +140,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
                   {!expandContact && (
                     <RegText>
                       {privacy
-                        ? `${contact.slice(0, 1)}.....`
+                        ? `${contact.slice(0, 2)}.....`
                         : numLinesContact > 1
                           ? Utils.trimToSmall(contact, 7)
                           : contact}
@@ -157,9 +157,22 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
               </TouchableOpacity>
             )}
             {!contact && !!znsAlias && (
-              <RegText style={{ color: colors.fgAccent, fontWeight: '600' }}>
-                {`ZNS: ${znsAlias}`}
-              </RegText>
+              <TouchableOpacity
+                onPress={() => {
+                  setExpandContact(true);
+                  if (privacy) {
+                    setTimeout(() => {
+                      setExpandContact(false);
+                    }, 5 * 1000);
+                  }
+                }}
+              >
+                <RegText style={{ color: colors.fgAccent, fontWeight: '600' }}>
+                  {privacy && !expandContact
+                    ? `ZNS: ${znsAlias.slice(0, 2)}.....`
+                    : `ZNS: ${znsAlias}`}
+                </RegText>
+              </TouchableOpacity>
             )}
             {(!oneLine || (oneLine && !contact)) && !onlyContact && (
               <TouchableOpacity
