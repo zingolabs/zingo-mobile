@@ -156,7 +156,7 @@ jobs:
       matrix:
         bucket:
           - name: chain
-            tests: execute_sync_from_seed execute_send_from_orchard execute_currentprice_and_value_transfers_from_seed
+            tests: execute_send_from_orchard execute_currentprice_and_value_transfers_from_seed
           - name: ledger-and-parsing
             tests: execute_sapling_balance_from_seed
     env:
@@ -418,9 +418,10 @@ jobs:
               run_id: context.runId,
             });
 
-  # Offline device tests: each bucket runs its instrumented classes on
-  # the emulator with no harness, no validator and no indexer. The dev
-  # branch protection requires the bucket name "accounts".
+  # Device tests without the Rust harness: each bucket runs its
+  # instrumented classes on the emulator with no validator and no
+  # indexer. The public-chain bucket reads mainnet through a public
+  # server. The dev branch protection requires the bucket name "accounts".
   android-ubuntu-offline-device-test:
     name: ${{ matrix.bucket.name }}
     needs:
@@ -434,6 +435,8 @@ jobs:
             classes: ExecuteVersionFromSeed ExecuteAddressesFromSeed ExecuteAddressesFromUfvk ExecuteParseAddressForTex ExecuteParseAddressInvalid PriceRefusedWithoutMixnet
           - name: wallet-files
             classes: DoubleWrapReproTest WalletFileMemoryTest WalletFileRepairTest WalletSeedSalvageTest
+          - name: public-chain
+            classes: ExecuteSyncFromSeed
     env:
       CACHE-KEY: ${{ inputs.cache-key }}
     steps:
