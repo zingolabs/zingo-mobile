@@ -21,11 +21,11 @@ env:
 jobs:
   build-for-testing:
     continue-on-error: ${{ inputs.advisory }}
-    # Stock runners, deliberately: the huge macos-15 fleet queues in seconds,
-    # while the max-4 zingo-ios-build-m2 pool is left to the xcframework
-    # build alone. The xcodebuild destination pins no arch (see the
-    # build-for-testing step), so Apple-silicon stock runners are fine.
-    runs-on: macos-15
+    # The CI_IOS_RUNNER repository variable sets the runner label. The
+    # fallback warp-macos-15-arm64-12x is WarpBuild's 12-vCPU M4 Pro
+    # machine; the stock macos-15 label has three cores. The xcodebuild
+    # destination pins no arch (see the build-for-testing step).
+    runs-on: ${{ vars.CI_IOS_RUNNER || 'warp-macos-15-arm64-12x' }}
     steps:
       - name: Xcode 16.4
         uses: maxim-lobanov/setup-xcode@v1
