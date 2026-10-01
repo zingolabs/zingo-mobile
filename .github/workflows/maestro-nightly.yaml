@@ -109,8 +109,19 @@ jobs:
             adb logcat > /tmp/maestro-logcat.log 2>&1 &
             LOGCAT_PID=$!
             set +e
-            maestro test .maestro/
+            maestro test --exclude-tags=screen-awake .maestro/
             EXIT=$?
+            # The flow tagged screen-awake idles for twenty seconds against a
+            # ten-second screen-off timeout while the app syncs. The emulator
+            # runner starts a new shell for each script line, and the saved
+            # timeout passes from line to line in a file.
+            adb shell settings get system screen_off_timeout > /tmp/screen-off-timeout.txt
+            adb shell settings put global stay_on_while_plugged_in 0
+            adb shell settings put system screen_off_timeout 10000
+            maestro test --include-tags=screen-awake .maestro/
+            adb shell dumpsys power > /tmp/dumpsys-power.txt
+            adb shell settings put system screen_off_timeout "$(cat /tmp/screen-off-timeout.txt)"
+            grep --quiet 'mWakefulness=Awake' /tmp/dumpsys-power.txt
             kill $LOGCAT_PID 2>/dev/null || true
             exit $EXIT
 
@@ -295,7 +306,7 @@ jobs:
         run: |
           echo "--- Devices booted right before maestro test ---"
           xcrun simctl list devices booted
-          maestro --device "$SIM_UDID" test .maestro/
+          maestro --device "$SIM_UDID" test --exclude-tags=screen-awake .maestro/
 
       - name: Upload Maestro report on failure
         if: failure()
