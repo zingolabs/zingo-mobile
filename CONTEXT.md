@@ -231,9 +231,9 @@ integration buckets.
 check has passed. Its failure fails the run and leaves the merge verdict
 unchanged. No PR CI job currently runs as a trailing stage.
 
-**Bucket** — a group of Android integration tests that share one CI job,
-so runner setup and emulator boot amortize across the group instead of
-being paid once per test. Unrelated to the migration API's `per_bucket`
+**Bucket** — a CI job that runs one or more Android integration tests on
+its own emulator. Buckets run side by side, and each pays its own runner
+setup and emulator boot. Unrelated to the migration API's `per_bucket`
 windowing sense, which UI copy avoids entirely.
 
 **Offline device test** — an instrumented test that runs on a device or
