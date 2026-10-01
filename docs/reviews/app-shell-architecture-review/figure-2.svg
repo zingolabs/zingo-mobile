@@ -1,0 +1,122 @@
+<svg viewBox="0 0 900 470" role="img" aria-label="Implicit boot state machine" xmlns="http://www.w3.org/2000/svg"><style>
+  :root {
+    --bg: #fbfbfa; --fg: #1d1d1b; --muted: #5f5f5a; --line: #d9d9d3;
+    --box: #ffffff; --accent: #b3421b; --accent2: #1f5f8b; --warn: #fff3e8; --ok: #eef6ee;
+    --code: #f1f1ec; --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #161615; --fg: #ebebe6; --muted: #a3a39c; --line: #3a3a36; --box: #1f1f1d;
+            --accent: #f08a5d; --accent2: #7db6dc; --warn: #2b211a; --ok: #1c261c; --code: #23231f; }
+  }
+  html { font-size: 17px; }
+  body { margin: 0; background: var(--bg); color: var(--fg);
+         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+         line-height: 1.55; }
+  main { max-width: 920px; margin: 0 auto; padding: 2.5rem 1.25rem 5rem; }
+  h1 { font-size: 2rem; line-height: 1.2; margin: 0 0 .5rem; letter-spacing: -0.01em; }
+  h2 { font-size: 1.45rem; margin: 3rem 0 .75rem; padding-top: 1rem; border-top: 1px solid var(--line); }
+  h3 { font-size: 1.1rem; margin: 1.75rem 0 .5rem; }
+  p { margin: .6rem 0 .9rem; }
+  .lede { color: var(--muted); font-size: 1.05rem; margin-bottom: 1.5rem; }
+  code { font-family: var(--mono); font-size: .88em; background: var(--code); padding: .08em .35em; border-radius: 4px; }
+  pre { background: var(--code); padding: .9rem 1rem; border-radius: 6px; overflow-x: auto; font-size: .85rem; line-height: 1.45; }
+  pre code { background: none; padding: 0; font-size: 1em; }
+  table { border-collapse: collapse; width: 100%; margin: 1rem 0; font-size: .95rem; }
+  th, td { text-align: left; padding: .45rem .6rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; font-size: .85rem; text-transform: uppercase; letter-spacing: .04em; }
+  td.num { font-family: var(--mono); text-align: right; white-space: nowrap; }
+  .note { border-left: 4px solid var(--accent2); background: var(--box); padding: .7rem 1rem; margin: 1rem 0; border-radius: 0 6px 6px 0; }
+  .bad  { border-left: 4px solid var(--accent);  background: var(--warn); padding: .7rem 1rem; margin: 1rem 0; border-radius: 0 6px 6px 0; }
+  .good { border-left: 4px solid #3d8b4f; background: var(--ok); padding: .7rem 1rem; margin: 1rem 0; border-radius: 0 6px 6px 0; }
+  .term { display: grid; grid-template-columns: 11rem 1fr; gap: .4rem 1rem; margin: 1rem 0; }
+  .term dt { font-weight: 600; }
+  .term dd { margin: 0; }
+  figure { margin: 1.5rem 0; }
+  figcaption { color: var(--muted); font-size: .88rem; margin-top: .5rem; }
+  svg { width: 100%; height: auto; display: block; }
+  svg text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; fill: var(--fg); }
+  svg .mono { font-family: var(--mono); }
+  svg .box { fill: var(--box); stroke: var(--line); stroke-width: 1.2; }
+  svg .hot { fill: var(--warn); stroke: var(--accent); stroke-width: 1.4; }
+  svg .cold { fill: var(--ok); stroke: #3d8b4f; }
+  svg .edge { stroke: var(--muted); stroke-width: 1.4; fill: none; marker-end: url(#arrow); }
+  svg .edge.hot { stroke: var(--accent); fill: none; }
+  svg .lbl { font-size: 11px; fill: var(--muted); }
+  svg .t { font-size: 13px; }
+  svg .b { font-size: 13px; font-weight: 600; }
+  svg .s { font-size: 11px; }
+  .stack { display: flex; flex-direction: column; gap: 0; margin: 1.25rem 0; }
+  .stack .layer { background: var(--box); border: 1px solid var(--line); border-radius: 6px; padding: .6rem .9rem; }
+  .stack .layer.hot { border-color: var(--accent); background: var(--warn); }
+  .stack .layer b { display: block; }
+  .stack .layer span { color: var(--muted); font-size: .9rem; }
+  .stack .arrow { text-align: center; color: var(--muted); font-size: .85rem; padding: .15rem 0; }
+  ul, ol { padding-left: 1.4rem; }
+  li { margin: .3rem 0; }
+  .small { font-size: .9rem; color: var(--muted); }
+  a { color: var(--accent2); }
+</style>
+  <rect x="20" y="20" width="200" height="54" rx="8" class="box"/>
+  <text x="120" y="42" text-anchor="middle" class="b">Launching</text>
+  <text x="120" y="60" text-anchor="middle" class="s">screen=Launching, startingApp=true</text>
+
+  <rect x="20" y="130" width="200" height="54" rx="8" class="hot"/>
+  <text x="120" y="152" text-anchor="middle" class="b">Locked</text>
+  <text x="120" y="170" text-anchor="middle" class="s">same screen, biometricGate=declined</text>
+
+  <rect x="300" y="20" width="220" height="54" rx="8" class="box"/>
+  <text x="410" y="42" text-anchor="middle" class="b">Boot chain (async)</text>
+  <text x="410" y="60" text-anchor="middle" class="s">actionButtonsDisabled=true</text>
+
+  <rect x="300" y="130" width="220" height="54" rx="8" class="box"/>
+  <text x="410" y="152" text-anchor="middle" class="b">StartMenu</text>
+  <text x="410" y="170" text-anchor="middle" class="s">walletExists=false</text>
+
+  <rect x="300" y="240" width="100" height="54" rx="8" class="box"/>
+  <text x="350" y="262" text-anchor="middle" class="b">NewSeed</text>
+  <text x="350" y="280" text-anchor="middle" class="s">screen=NewSeed</text>
+  <rect x="420" y="240" width="100" height="54" rx="8" class="box"/>
+  <text x="470" y="262" text-anchor="middle" class="b">ImportUfvk</text>
+  <text x="470" y="280" text-anchor="middle" class="s">via params</text>
+
+  <rect x="620" y="20" width="260" height="54" rx="8" class="box"/>
+  <text x="750" y="42" text-anchor="middle" class="b">LoadedApp, loading=true</text>
+  <text x="750" y="60" text-anchor="middle" class="s">wrapper re-reads settings</text>
+
+  <rect x="620" y="130" width="260" height="54" rx="8" class="cold"/>
+  <text x="750" y="152" text-anchor="middle" class="b">LoadedApp running</text>
+  <text x="750" y="170" text-anchor="middle" class="s">timers on, context live</text>
+
+  <rect x="620" y="240" width="260" height="54" rx="8" class="hot"/>
+  <text x="750" y="262" text-anchor="middle" class="b">Foreground gate declined</text>
+  <text x="750" y="280" text-anchor="middle" class="s">runForegroundGate, line 1097</text>
+
+  <path d="M220 47 L298 47" class="edge"/>
+  <text x="259" y="40" text-anchor="middle" class="lbl">gate passed</text>
+  <path d="M120 74 L120 128" class="edge"/>
+  <text x="128" y="105" class="lbl">setState({biometricGate})</text>
+  <path d="M120 130 C 60 100, 60 60, 100 74" class="edge hot"/>
+  <text x="26" y="112" class="lbl">retryGate → this.componentDidMount()</text>
+  <path d="M410 74 L410 128" class="edge"/>
+  <text x="418" y="105" class="lbl">no wallet</text>
+  <path d="M520 47 L618 47" class="edge"/>
+  <text x="569" y="40" text-anchor="middle" class="lbl">wallet ok → reset()</text>
+  <path d="M370 184 L355 238" class="edge"/>
+  <path d="M450 184 L465 238" class="edge"/>
+  <path d="M520 157 C 560 157, 560 47, 618 47" class="edge"/>
+  <text x="545" y="120" class="lbl">create/restore</text>
+  <path d="M400 267 C 560 267, 560 47, 618 47" class="edge"/>
+  <path d="M750 74 L750 128" class="edge"/>
+  <text x="758" y="105" class="lbl">loading=false</text>
+  <path d="M750 184 L750 238" class="edge"/>
+  <text x="758" y="215" class="lbl">AppState → active, gate declined</text>
+  <path d="M620 267 C 250 380, 120 380, 120 186" class="edge hot"/>
+  <text x="330" y="372" class="lbl">navigateToLoadingApp({startingApp:true, biometricGate}) → reset()</text>
+  <path d="M620 157 C 300 420, 120 420, 120 74" class="edge hot"/>
+  <text x="330" y="418" class="lbl">change wallet / restore backup / change server → reset() to Launching</text>
+
+  <path d="M350 130 C 330 100, 340 92, 380 90" class="edge hot"/>
+  <text x="222" y="205" class="lbl">changeMode / openCurrentWallet → this.componentDidMount() again</text>
+  <rect x="20" y="430" width="860" height="28" rx="6" class="box"/>
+  <text x="450" y="449" text-anchor="middle" class="s">Orange edges cross component boundaries or re-run a lifecycle method by hand. Nothing in the type system names these states or forbids invalid combinations.</text>
+</svg>

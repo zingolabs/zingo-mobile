@@ -1,0 +1,91 @@
+<svg viewBox="0 0 900 330" role="img" aria-label="Two sandwiches connected by navigation resets" xmlns="http://www.w3.org/2000/svg"><style>
+  :root {
+    --bg: #fbfbfa; --fg: #1d1d1b; --muted: #5f5f5a; --line: #d9d9d3;
+    --box: #ffffff; --accent: #b3421b; --accent2: #1f5f8b; --warn: #fff3e8; --ok: #eef6ee;
+    --code: #f1f1ec; --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #161615; --fg: #ebebe6; --muted: #a3a39c; --line: #3a3a36; --box: #1f1f1d;
+            --accent: #f08a5d; --accent2: #7db6dc; --warn: #2b211a; --ok: #1c261c; --code: #23231f; }
+  }
+  html { font-size: 17px; }
+  body { margin: 0; background: var(--bg); color: var(--fg);
+         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+         line-height: 1.55; }
+  main { max-width: 920px; margin: 0 auto; padding: 2.5rem 1.25rem 5rem; }
+  h1 { font-size: 2rem; line-height: 1.2; margin: 0 0 .5rem; letter-spacing: -0.01em; }
+  h2 { font-size: 1.45rem; margin: 3rem 0 .75rem; padding-top: 1rem; border-top: 1px solid var(--line); }
+  h3 { font-size: 1.1rem; margin: 1.75rem 0 .5rem; }
+  p { margin: .6rem 0 .9rem; }
+  .lede { color: var(--muted); font-size: 1.05rem; margin-bottom: 1.5rem; }
+  code { font-family: var(--mono); font-size: .88em; background: var(--code); padding: .08em .35em; border-radius: 4px; }
+  pre { background: var(--code); padding: .9rem 1rem; border-radius: 6px; overflow-x: auto; font-size: .85rem; line-height: 1.45; }
+  pre code { background: none; padding: 0; font-size: 1em; }
+  table { border-collapse: collapse; width: 100%; margin: 1rem 0; font-size: .95rem; }
+  th, td { text-align: left; padding: .45rem .6rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; font-size: .85rem; text-transform: uppercase; letter-spacing: .04em; }
+  td.num { font-family: var(--mono); text-align: right; white-space: nowrap; }
+  .note { border-left: 4px solid var(--accent2); background: var(--box); padding: .7rem 1rem; margin: 1rem 0; border-radius: 0 6px 6px 0; }
+  .bad  { border-left: 4px solid var(--accent);  background: var(--warn); padding: .7rem 1rem; margin: 1rem 0; border-radius: 0 6px 6px 0; }
+  .good { border-left: 4px solid #3d8b4f; background: var(--ok); padding: .7rem 1rem; margin: 1rem 0; border-radius: 0 6px 6px 0; }
+  .term { display: grid; grid-template-columns: 11rem 1fr; gap: .4rem 1rem; margin: 1rem 0; }
+  .term dt { font-weight: 600; }
+  .term dd { margin: 0; }
+  figure { margin: 1.5rem 0; }
+  figcaption { color: var(--muted); font-size: .88rem; margin-top: .5rem; }
+  svg { width: 100%; height: auto; display: block; }
+  svg text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; fill: var(--fg); }
+  svg .mono { font-family: var(--mono); }
+  svg .box { fill: var(--box); stroke: var(--line); stroke-width: 1.2; }
+  svg .hot { fill: var(--warn); stroke: var(--accent); stroke-width: 1.4; }
+  svg .cold { fill: var(--ok); stroke: #3d8b4f; }
+  svg .edge { stroke: var(--muted); stroke-width: 1.4; fill: none; marker-end: url(#arrow); }
+  svg .edge.hot { stroke: var(--accent); fill: none; }
+  svg .lbl { font-size: 11px; fill: var(--muted); }
+  svg .t { font-size: 13px; }
+  svg .b { font-size: 13px; font-weight: 600; }
+  svg .s { font-size: 11px; }
+  .stack { display: flex; flex-direction: column; gap: 0; margin: 1.25rem 0; }
+  .stack .layer { background: var(--box); border: 1px solid var(--line); border-radius: 6px; padding: .6rem .9rem; }
+  .stack .layer.hot { border-color: var(--accent); background: var(--warn); }
+  .stack .layer b { display: block; }
+  .stack .layer span { color: var(--muted); font-size: .9rem; }
+  .stack .arrow { text-align: center; color: var(--muted); font-size: .85rem; padding: .15rem 0; }
+  ul, ol { padding-left: 1.4rem; }
+  li { margin: .3rem 0; }
+  .small { font-size: .9rem; color: var(--muted); }
+  a { color: var(--accent2); }
+</style>
+  <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor" style="fill: var(--muted)"/></marker></defs>
+  <rect x="20" y="20" width="860" height="40" rx="6" class="box"/>
+  <text x="450" y="45" text-anchor="middle" class="b">App.tsx → ThemeProvider → NavigationContainer → Stack.Navigator (two routes)</text>
+
+  <rect x="40" y="90" width="380" height="210" rx="8" class="box"/>
+  <text x="230" y="112" text-anchor="middle" class="b">Route: LoadingApp</text>
+  <rect x="60" y="125" width="340" height="70" rx="6" class="box"/>
+  <text x="70" y="145" class="t">function LoadingApp (line 150)</text>
+  <text x="70" y="162" class="s">19 × useState. Reads settings.json. Builds i18n.</text>
+  <text x="70" y="178" class="s">Shows Launching until loading=false, then mounts ↓</text>
+  <rect x="60" y="205" width="340" height="80" rx="6" class="hot"/>
+  <text x="70" y="225" class="t">class LoadingAppClass (line 502, ~1,875 lines)</text>
+  <text x="70" y="242" class="s">Copies all 19 props into this.state. 66 × this.setState.</text>
+  <text x="70" y="258" class="s">Boot chain, biometric gate, server pick, wallet load,</text>
+  <text x="70" y="274" class="s">wallet repair, create, restore, custom server, recovery.</text>
+
+  <rect x="480" y="90" width="380" height="210" rx="8" class="box"/>
+  <text x="670" y="112" text-anchor="middle" class="b">Route: LoadedApp</text>
+  <rect x="500" y="125" width="340" height="70" rx="6" class="box"/>
+  <text x="510" y="145" class="t">function LoadedApp (line 203)</text>
+  <text x="510" y="162" class="s">20 × useState. Reads settings.json again. Builds i18n again.</text>
+  <text x="510" y="178" class="s">Migrates address book. Then mounts ↓</text>
+  <rect x="500" y="205" width="340" height="80" rx="6" class="hot"/>
+  <text x="510" y="225" class="t">class LoadedAppClass (line 763, ~2,030 lines)</text>
+  <text x="510" y="242" class="s">Copies all 20 props into this.state. 52 × this.setState.</text>
+  <text x="510" y="258" class="s">Owns WalletBackend, timers, AppState, Linking, NetInfo,</text>
+  <text x="510" y="274" class="s">settings writes, 26 routes, context Provider.</text>
+
+  <path d="M420 160 C 450 160, 450 160, 478 160" class="edge"/>
+  <text x="449" y="150" text-anchor="middle" class="lbl">reset(params: 7 fields)</text>
+  <path d="M480 250 C 450 250, 450 250, 422 250" class="edge"/>
+  <text x="451" y="270" text-anchor="middle" class="lbl">reset(params: 4 fields)</text>
+</svg>
