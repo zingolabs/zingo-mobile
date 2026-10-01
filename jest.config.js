@@ -16,6 +16,7 @@ module.exports = {
     '/node_modules/',
     '<rootDir>/visual/',
     '<rootDir>/zingolib/',
+    '<rootDir>/__tests__/helpers/',
   ],
   transform: {
     '\\.[jt]sx?$': 'babel-jest',
