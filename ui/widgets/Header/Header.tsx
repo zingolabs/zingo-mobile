@@ -226,6 +226,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             calculateDisableButtonToShield={calculateDisableButtonToShield}
             onPressShieldFunds={onPressShieldFunds}
             receivedLegend={receivedLegend}
+            mixnetView={mixnetView}
             onUsdRowLayout={onUsdRowLayout}
           />
 

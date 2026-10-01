@@ -7,6 +7,7 @@ import {
   withNavigation,
 } from '../../../../.storybook/storyDecorators';
 import {
+  mixnetReady,
   mockInfo,
   mockTotalBalance,
   mockZecPrice,
@@ -36,6 +37,7 @@ const meta: Meta<typeof BalanceRow> = {
     calculateDisableButtonToShield: () => true,
     onPressShieldFunds: () => {},
     receivedLegend: false,
+    mixnetView: mixnetReady,
   },
 };
 

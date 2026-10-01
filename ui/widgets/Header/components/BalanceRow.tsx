@@ -26,6 +26,10 @@ import TotalBalanceClass from '@app/AppState/classes/TotalBalanceClass';
 import InfoType from '@app/AppState/types/InfoType';
 import { fiatQuote } from '@app/price/fiatQuote';
 import ZecPriceType from '@app/AppState/types/ZecPriceType';
+import {
+  MixnetView,
+  sendGateOpen,
+} from '@app/walletBackend/transforms/mixnetView';
 import Utils from '@app/utils';
 import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
 import CurrencyAmount from '@ui/widgets/CurrencyAmount';
@@ -72,6 +76,7 @@ type BalanceRowProps = {
   calculateDisableButtonToShield: () => boolean;
   onPressShieldFunds: () => void;
   receivedLegend: boolean | undefined;
+  mixnetView: MixnetView | null;
   onUsdRowLayout?: (height: number) => void;
 };
 
@@ -95,6 +100,7 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
     calculateDisableButtonToShield,
     onPressShieldFunds,
     receivedLegend,
+    mixnetView,
     onUsdRowLayout,
   }) => {
     const navigation = useNavigation<NavigationProp<ParamListBase>>();
@@ -259,7 +265,10 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
                     ) as string
                   }
                   onPress={onPressShieldFunds}
-                  disabled={calculateDisableButtonToShield()}
+                  disabled={
+                    calculateDisableButtonToShield() ||
+                    !sendGateOpen(mixnetView)
+                  }
                 />
               </View>
             </View>
