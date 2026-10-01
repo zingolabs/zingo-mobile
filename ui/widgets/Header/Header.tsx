@@ -163,6 +163,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     setBackgroundError,
     setScrollToTop,
     setScrollToBottom,
+    mixnetView,
   });
 
   // Audit Issue D — bio gate for seedUfvkScreen lives at the Ufvk screen
@@ -226,6 +227,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             calculateDisableButtonToShield={calculateDisableButtonToShield}
             onPressShieldFunds={onPressShieldFunds}
             receivedLegend={receivedLegend}
+            mixnetView={mixnetView}
             onUsdRowLayout={onUsdRowLayout}
           />
 
