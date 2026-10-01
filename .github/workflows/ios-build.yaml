@@ -108,6 +108,7 @@ jobs:
       # the later pushes of that PR, and the dev copy serves the first
       # push of every PR. The repository's cache quota carries both.
       - name: Cargo cache (registry, git, iOS targets)
+        id: cargo-cache
         uses: Swatinem/rust-cache@v2
         with:
           workspaces: |
@@ -149,10 +150,31 @@ jobs:
       # runs from the zingo-mobile root.
       - name: Build the Binding Layer
         run: |
+          started="$(date +%s)"
           cargo run \
             --manifest-path zingolib/tools/workbench/Cargo.toml \
             --bin build-binding-layer -- \
             ios --out zingolib/bindings/swift/build
+          echo "BUILD_SECONDS=$(( $(date +%s) - started ))" >> "$GITHUB_ENV"
+
+      # One line per run in the job summary, which turns every run into a
+      # data point for the runner and cache choices.
+      - name: Report the build in the job summary
+        env:
+          CARGO_CACHE_HIT: ${{ steps.cargo-cache.outputs.cache-hit }}
+          RUNNER: ${{ inputs.runner }}
+        run: |
+          minutes="$(( BUILD_SECONDS / 60 ))"
+          seconds="$(( BUILD_SECONDS % 60 ))"
+          cargo_cache="miss"
+          test "$CARGO_CACHE_HIT" = "true" && cargo_cache="hit"
+          printf '%s\n' \
+            "## iOS Binding Layer" \
+            "" \
+            "| Runner | Cargo cache | Build time | Descriptor | zingolib |" \
+            "|---|---|---|---|---|" \
+            "| $RUNNER | $cargo_cache | ${minutes}m ${seconds}s | $ZINGO_MOBILE_DESCRIPTOR | $(git -C zingolib rev-parse --short HEAD) |" \
+            >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload the Binding Layer
         uses: actions/upload-artifact@v7
