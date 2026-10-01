@@ -160,12 +160,17 @@ jobs:
     timeout-minutes: 45
     strategy:
       fail-fast: ${{ inputs.fail-all }}
-      # The tests of a bucket share one job. The runner setup and the
-      # emulator boot are paid once per bucket.
+      # Each bucket is one job with its own runner setup and emulator
+      # boot. The buckets run side by side, and the chain job below
+      # reports their combined result.
       matrix:
         bucket:
-          - name: chain
-            tests: execute_sync_from_seed execute_send_from_orchard execute_currentprice_and_value_transfers_from_seed
+          - name: sync
+            tests: execute_sync_from_seed
+          - name: send
+            tests: execute_send_from_orchard
+          - name: price-and-value-transfers
+            tests: execute_currentprice_and_value_transfers_from_seed
           - name: ledger-and-parsing
             tests: execute_sapling_balance_from_seed
     env:
@@ -380,7 +385,7 @@ jobs:
             --artifact "android-build-outputs-${{ env.ABI }}-${{ env.CACHE-KEY }}" \
             --upstream "Andr APK build" \
             --timeout-secs 2700 \
-            --poll-secs 20
+            --poll-secs 60
 
       - name: Download Android build outputs
         uses: actions/download-artifact@v4
@@ -551,6 +556,19 @@ jobs:
   # requirement. A skipped job reports success to branch protection, and
   # this job therefore always runs and fails unless the offline device
   # tests passed.
+  chain:
+    name: chain
+    needs:
+      - android-ubuntu-integration-test-ci
+    if: ${{ always() }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Report the result of the integration buckets
+        env:
+          RESULT: ${{ needs.android-ubuntu-integration-test-ci.result }}
+        run: test "$RESULT" = "success"
+
   accounts:
     name: accounts
     needs:
