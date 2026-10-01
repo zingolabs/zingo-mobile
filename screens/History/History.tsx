@@ -48,6 +48,8 @@ import RingBorder from '@ui/primitives/RingBorder';
 import ValueTransferLine from './components/ValueTransferLine';
 import IronwoodMigrationBanner from './components/IronwoodMigrationBanner';
 import { ContextAppLoaded } from '@app/context';
+import { useAtomValue } from 'jotai';
+import { balanceAtom } from '@app/AppState/balance';
 import { useDismissSheetsOnBlur } from '@app/hooks/useDismissSheetsOnBlur';
 import { useOptionsPanelSheetSlide } from '@app/hooks/useOptionsPanelSheetSlide';
 import { usePriceSnapAutoClose } from '@app/hooks/usePriceSnapAutoClose';
@@ -112,6 +114,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
 }) => {
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const context = useContext(ContextAppLoaded);
+  const balance = useAtomValue(balanceAtom);
   const {
     translate,
     valueTransfers,
@@ -121,7 +124,6 @@ const History: React.FunctionComponent<HistoryProps> = ({
     server,
     doRefresh,
     setPrivacyOption,
-    totalBalance,
     readOnly,
     info,
   } = context;
@@ -174,9 +176,10 @@ const History: React.FunctionComponent<HistoryProps> = ({
   const showIronwoodBanner =
     !readOnly &&
     isIronwoodActive(info) &&
-    !!totalBalance &&
-    totalBalance.confirmedOrchardBalance > 0;
-  const orchardAmount = totalBalance ? totalBalance.totalOrchardBalance : 0;
+    balance.kind === 'polled' &&
+    balance.latest.confirmedOrchardBalance > 0;
+  const orchardAmount =
+    balance.kind === 'polled' ? balance.latest.totalOrchardBalance : 0;
 
   const bottomSheetRef = useRef<BottomSheetModal>(null);
   const historySheetRef = useRef<BottomSheet>(null);

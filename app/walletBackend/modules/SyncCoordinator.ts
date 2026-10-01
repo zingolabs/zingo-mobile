@@ -23,7 +23,7 @@
  * To add a new periodic task, push it into taskPromises inside runTaskPromises.
  */
 import { Epoch, isCurrent } from '@app/walletBackend/controller/syncController';
-import { TotalBalanceClass, GlobalConst, ServerType } from '@app/AppState';
+import { GlobalConst, ServerType } from '@app/AppState';
 import RPCModule from '@app/RPCModule';
 import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
 import { RPCSyncPollType } from '@app/walletBackend/types/RPCSyncPollType';
@@ -352,17 +352,7 @@ export class SyncCoordinator {
         rescanEpoch = this.controllerEpoch;
         this.config.onValueTransfersChanged([], 0);
         this.config.onMessagesChanged([], 0);
-        this.config.onBalanceChanged({
-          totalOrchardBalance: 0,
-          totalIronwoodBalance: 0,
-          totalSaplingBalance: 0,
-          totalTransparentBalance: 0,
-          confirmedTransparentBalance: 0,
-          confirmedOrchardBalance: 0,
-          confirmedIronwoodBalance: 0,
-          confirmedSaplingBalance: 0,
-          totalSpendableBalance: 0,
-        } as TotalBalanceClass);
+        this.config.onBalanceChanged({ kind: 'awaiting' });
         this.config.onSyncStatusChanged({} as RPCSyncStatusType);
 
         const start = Date.now();

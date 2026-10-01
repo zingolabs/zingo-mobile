@@ -44,7 +44,6 @@ const hookInput = (
   setShieldingAmount: jest.fn(),
   server: remoteServer(mockInfo.serverUri, ChainNameEnum.mainChainName),
   somePending: false,
-  totalBalance: null,
   shieldingAmount: 0.5,
   translate,
   netInfo: {

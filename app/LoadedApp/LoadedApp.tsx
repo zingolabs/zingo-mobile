@@ -36,7 +36,6 @@ import {
 } from '@app/walletBackend';
 import {
   AppStateLoaded,
-  TotalBalanceClass,
   SendPageStateClass,
   InfoType,
   ToAddrClass,
@@ -99,8 +98,10 @@ import {
   addTagModalAtom,
   launchAddTagAtom,
 } from '@app/AppState/uiAtoms';
-import { classifyLifecycle } from '@app/AppState/lifecycle';
+import { classifyLifecycle, toAppStateStatus } from '@app/AppState/lifecycle';
 import { changes, lastUnified } from '@app/AppState/statePatch';
+import { type Balance, balanceAtom } from '@app/AppState/balance';
+import type { Polled } from '@app/AppState/polled';
 import SettingsFileImpl from '@app/services/SettingsFileImpl';
 import { PriceTrafficDriver } from '@ui/widgets/PriceFetcher';
 import { priceFetcherStore } from '@ui/widgets/priceFetcherStore';
@@ -675,7 +676,6 @@ export class LoadedAppClass extends Component<
     this.state = {
       //context
       netInfo: {} as NetInfoType,
-      totalBalance: null,
       addresses: null,
       valueTransfers: null,
       valueTransfersTotal: null,
@@ -733,7 +733,7 @@ export class LoadedAppClass extends Component<
     };
 
     this.rpc = new WalletBackend({
-      onBalanceChanged: this.setTotalBalance,
+      onBalanceChanged: this.setBalance,
       onValueTransfersChanged: this.setValueTransfersList,
       onMessagesChanged: this.setMessagesList,
       onAddressesChanged: this.setAllAddresses,
@@ -764,7 +764,7 @@ export class LoadedAppClass extends Component<
       appStateStatusAtom,
       Platform.OS === GlobalConst.platformOSios
         ? AppStateStatusEnum.active
-        : (AppState.currentState as AppStateStatusEnum),
+        : toAppStateStatus(AppState.currentState),
     );
     this.publishWalletView();
   }
@@ -812,7 +812,7 @@ export class LoadedAppClass extends Component<
       EventListenerEnum.change,
       async nextAppState => {
         const prior = this.controllerStore.get(appStateStatusAtom);
-        const next = nextAppState as AppStateStatusEnum;
+        const next = toAppStateStatus(nextAppState);
         const transition = classifyLifecycle(Platform.OS, prior, next);
         if (transition === 'ignore') {
           return;
@@ -1114,8 +1114,12 @@ export class LoadedAppClass extends Component<
     this.setState({ showSwipeableIcons: value });
   };
 
-  setTotalBalance = (totalBalance: TotalBalanceClass) => {
-    this.commitPatch({ totalBalance });
+  setBalance = (next: Polled<Balance>) => {
+    this.commit(() => {
+      if (!isEqual(this.controllerStore.get(balanceAtom), next)) {
+        this.controllerStore.set(balanceAtom, next);
+      }
+    });
   };
 
   setSyncingStatus = (syncingStatus: RPCSyncStatusType) => {
@@ -1975,7 +1979,6 @@ export class LoadedAppClass extends Component<
       //context
       netInfo: this.state.netInfo,
       birthday: this.state.birthday,
-      totalBalance: this.state.totalBalance,
       addresses: this.state.addresses,
       valueTransfers: this.state.valueTransfers,
       valueTransfersTotal: this.state.valueTransfersTotal,

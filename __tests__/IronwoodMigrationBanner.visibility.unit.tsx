@@ -6,12 +6,15 @@ import 'react-native';
 import React from 'react';
 
 import { render } from '@testing-library/react-native';
+import { Provider } from 'jotai';
 import History from '@screens/History';
 import {
   defaultAppContextLoaded,
   ContextAppLoadedProvider,
 } from '@app/context';
-import { InfoType, RouteEnum, TotalBalanceClass } from '@app/AppState';
+import { InfoType, RouteEnum } from '@app/AppState';
+import { type Balance, balanceAtom } from '@app/AppState/balance';
+import { seed, storeWith } from '../.storybook/storeWith';
 import { mockValueTransfers } from '../__mocks__/dataMocks/mockValueTransfers';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
@@ -39,7 +42,7 @@ const activeInfo = {
 
 function renderHistory(overrides: {
   info?: InfoType;
-  totalBalance?: TotalBalanceClass;
+  balance?: Balance;
   readOnly?: boolean;
 }) {
   const state = {
@@ -48,26 +51,30 @@ function renderHistory(overrides: {
     addresses: mockAddresses,
     translate: mockTranslate,
     info: overrides.info ?? activeInfo,
-    totalBalance: overrides.totalBalance ?? mockTotalBalance,
     readOnly: overrides.readOnly ?? false,
   };
+  const balance = overrides.balance ?? mockTotalBalance;
   const props = makeDrawerProps();
   const onFunction = jest.fn();
   return render(
-    <ContextAppLoadedProvider value={state}>
-      <History
-        {...props}
-        toggleMenuDrawer={onFunction}
-        setShieldingAmount={onFunction}
-        setScrollToTop={onFunction}
-        scrollToTop={false}
-        setScrollToBottom={onFunction}
-      />
-    </ContextAppLoadedProvider>,
+    <Provider
+      store={storeWith(seed(balanceAtom, { kind: 'polled', latest: balance }))}
+    >
+      <ContextAppLoadedProvider value={state}>
+        <History
+          {...props}
+          toggleMenuDrawer={onFunction}
+          setShieldingAmount={onFunction}
+          setScrollToTop={onFunction}
+          scrollToTop={false}
+          setScrollToBottom={onFunction}
+        />
+      </ContextAppLoadedProvider>
+    </Provider>,
   );
 }
 
-const withOrchard = (confirmedOrchardBalance: number): TotalBalanceClass => ({
+const withOrchard = (confirmedOrchardBalance: number): Balance => ({
   ...mockTotalBalance,
   confirmedOrchardBalance,
 });
@@ -75,7 +82,7 @@ const withOrchard = (confirmedOrchardBalance: number): TotalBalanceClass => ({
 describe('Ironwood migration banner visibility', () => {
   test('shows while spendable orchard funds remain', () => {
     const { queryByTestId } = renderHistory({
-      totalBalance: withOrchard(0.3),
+      balance: withOrchard(0.3),
     });
 
     expect(queryByTestId('ironwoodbanner.start')).not.toBeNull();
@@ -86,7 +93,7 @@ describe('Ironwood migration banner visibility', () => {
     // the auto-launch. Completing onboarding does not move the funds, so the
     // way back into the migration has to survive it.
     const { queryByTestId } = renderHistory({
-      totalBalance: withOrchard(0.3),
+      balance: withOrchard(0.3),
     });
 
     expect(queryByTestId('ironwoodbanner.start')).not.toBeNull();
@@ -96,7 +103,7 @@ describe('Ironwood migration banner visibility', () => {
     // zingolib excludes dust from confirmed_orchard_balance, so a wallet left
     // holding only dust lands here too.
     const { queryByTestId } = renderHistory({
-      totalBalance: withOrchard(0),
+      balance: withOrchard(0),
     });
 
     expect(queryByTestId('ironwoodbanner.start')).toBeNull();
@@ -108,7 +115,7 @@ describe('Ironwood migration banner visibility', () => {
         ...activeInfo,
         latestBlock: (mockInfo.ironwoodActivationHeight as number) - 1,
       },
-      totalBalance: withOrchard(0.3),
+      balance: withOrchard(0.3),
     });
 
     expect(queryByTestId('ironwoodbanner.start')).toBeNull();
@@ -116,7 +123,7 @@ describe('Ironwood migration banner visibility', () => {
 
   test('hides for watch-only wallets, which cannot spend', () => {
     const { queryByTestId } = renderHistory({
-      totalBalance: withOrchard(0.3),
+      balance: withOrchard(0.3),
       readOnly: true,
     });
 

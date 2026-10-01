@@ -43,7 +43,6 @@ import { mockValueTransfers } from '../__mocks__/dataMocks/mockValueTransfers';
 import { mockAddresses } from '../__mocks__/dataMocks/mockAddresses';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
-import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import { mockServer } from '../__mocks__/dataMocks/mockServer';
 import mockSendPageState from '../__mocks__/dataMocks/mockSendPageState';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -77,7 +76,6 @@ const sendUi = (zecPrice: { zecPrice: number; date: number }) => {
   state.translate = mockTranslate;
   state.info = mockInfo;
   state.server = mockServer;
-  state.totalBalance = mockTotalBalance;
   state.sendPageState = mockSendPageState;
   state.zecPrice = zecPrice;
   return (
@@ -146,7 +144,6 @@ test('N7: the send-confirmation conversions dim on a stale price too', () => {
   const state = { ...defaultAppContextLoaded };
   state.translate = mockTranslate;
   state.info = mockInfo;
-  state.totalBalance = mockTotalBalance;
   state.server = mockServer;
   state.sendPageState = mockSendPageState;
   state.zecPrice = { zecPrice: 33.33, date: Date.now() - 40 * 60_000 };

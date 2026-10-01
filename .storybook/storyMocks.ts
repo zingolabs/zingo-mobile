@@ -7,7 +7,8 @@ import {
   InfoType,
   ZecPriceType,
 } from '@app/AppState';
-import TotalBalanceClass from '@app/AppState/classes/TotalBalanceClass';
+import type { Balance } from '@app/AppState/balance';
+import type { Polled } from '@app/AppState/polled';
 import UnifiedAddressClass from '@app/AppState/classes/UnifiedAddressClass';
 import TransparentAddressClass from '@app/AppState/classes/TransparentAddressClass';
 import AddressBookFileClass from '@app/AppState/classes/AddressBookFileClass';
@@ -29,13 +30,22 @@ export const mockInfo = {
   ironwoodActivationHeight: null,
 } as InfoType;
 
-export const mockTotalBalance = (() => {
-  const b = new TotalBalanceClass();
-  b.totalOrchardBalance = 1.2345;
-  b.confirmedOrchardBalance = 1.2345;
-  b.totalSpendableBalance = 1.2345;
-  return b;
-})();
+export const mockTotalBalance: Balance = {
+  totalTransparentBalance: 0,
+  totalSaplingBalance: 0,
+  totalOrchardBalance: 1.2345,
+  totalIronwoodBalance: 0,
+  confirmedTransparentBalance: 0,
+  confirmedSaplingBalance: 0,
+  confirmedOrchardBalance: 1.2345,
+  confirmedIronwoodBalance: 0,
+  totalSpendableBalance: 1.2345,
+};
+
+export const polledMockBalance: Polled<Balance> = {
+  kind: 'polled',
+  latest: mockTotalBalance,
+};
 
 export const uAddress =
   'u1l9f0l4348negsncgr9pxd9d3qgm4yca9pj3ecx0zvh4hkje8vd0zjq2y8xj4nq3';

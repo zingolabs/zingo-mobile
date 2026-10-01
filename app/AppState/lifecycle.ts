@@ -8,12 +8,28 @@
 // (the status did not change). The appStateStatus itself is written on every
 // non-ignore transition, so it is not part of the outcome.
 
+import type { AppStateStatus } from 'react-native';
+
 import { AppStateStatusEnum } from './enums/AppStateStatusEnum';
 import { GlobalConst } from './const/GlobalConst';
 
 export type LifecycleTransition = 'suspend' | 'resume' | 'track' | 'ignore';
 
-const { active, inactive, background } = AppStateStatusEnum;
+const { active, inactive, background, unknown } = AppStateStatusEnum;
+
+// Maps a React Native app state onto the app's enum, with iOS `extension` read as unknown.
+export const toAppStateStatus = (s: AppStateStatus): AppStateStatusEnum => {
+  switch (s) {
+    case 'active':
+      return active;
+    case 'inactive':
+      return inactive;
+    case 'background':
+      return background;
+    default:
+      return unknown;
+  }
+};
 
 // iOS reports active → inactive → background, so entering background is the
 // suspend and active↔inactive is a bare status track. A resume counts only from

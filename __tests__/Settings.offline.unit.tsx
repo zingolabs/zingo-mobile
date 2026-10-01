@@ -22,7 +22,6 @@ import {
 import { RouteEnum, SelectServerEnum, ServerType } from '@app/AppState';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
-import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import {
   mockOfflineServer,
   mockServer,
@@ -47,7 +46,6 @@ function renderSettings(server: ServerType) {
         ...defaultAppContextLoaded,
         translate: mockTranslate,
         info: mockInfo,
-        totalBalance: mockTotalBalance,
         server,
         selectServer: SelectServerEnum.auto,
       }}

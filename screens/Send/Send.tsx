@@ -70,7 +70,6 @@ import {
   ScreenEnum,
   ProposalPoolsType,
 } from '@app/AppState';
-import { hasUnconfirmedFunds } from '@app/AppState/classes/TotalBalanceClass';
 import { parseZcashURI, serverUris, fetchServerList } from '@app/uris';
 // Imported straight from the module rather than through the `uris` barrel, so
 // the ZNS SDK stays out of the module graph of everything else that barrel
@@ -96,6 +95,8 @@ import {
 import { safeSnapToIndex } from '@app/utils/safeSnapToIndex';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
+import { useAtomValue } from 'jotai';
+import { balanceAtom, hasUnconfirmedFunds } from '@app/AppState/balance';
 import Header from '@ui/widgets/Header';
 import BottomSheet, { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
@@ -145,10 +146,10 @@ const Send: React.FunctionComponent<SendProps> = ({
 }) => {
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const context = useContext(ContextAppLoaded);
+  const balance = useAtomValue(balanceAtom);
   const {
     translate,
     info,
-    totalBalance,
     sendPageState,
     zecPrice,
     netInfo,
@@ -388,7 +389,8 @@ const Send: React.FunctionComponent<SendProps> = ({
   // included. Depending on the figure instead of the object keeps the
   // spendable query — a proposal, and since send-all sizing landed a costly
   // one — from running again for a balance that did not move.
-  const spendableTotal = totalBalance ? totalBalance.totalSpendableBalance : 0;
+  const spendableTotal =
+    balance.kind === 'polled' ? balance.latest.totalSpendableBalance : 0;
 
   const defaultValuesSpendableMaxAmount = useCallback((): void => {
     setSpendable(spendableTotal);
@@ -675,13 +677,12 @@ const Send: React.FunctionComponent<SendProps> = ({
 
   useEffect(() => {
     const stillConf =
-      (!!totalBalance && hasUnconfirmedFunds(totalBalance)) || somePending;
+      (balance.kind === 'polled' && hasUnconfirmedFunds(balance.latest)) ||
+      somePending;
     const showShield = (somePending ? 0 : shieldingAmount) > 0;
-    //const showUpgrade =
-    //  (somePending ? 0 : totalBalance.transparentBal) === 0 && totalBalance.spendablePrivate > fee;
     setStillConfirming(stillConf);
     setShowShieldInfo(showShield);
-  }, [shieldingAmount, somePending, totalBalance]);
+  }, [shieldingAmount, somePending, balance]);
 
   useEffect(() => {
     calculateFeeWithPropose(

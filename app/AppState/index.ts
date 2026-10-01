@@ -4,7 +4,6 @@ import AddressBookFileClass from './classes/AddressBookFileClass';
 import SendPageStateClass from './classes/SendPageStateClass';
 import SettingsFileClass from './classes/SettingsFileClass';
 import ToAddrClass from './classes/ToAddrClass';
-import TotalBalanceClass from './classes/TotalBalanceClass';
 import AddressBookFileClassObsolete from './classes/AddressBookFileClassObsolete';
 
 import type InfoType from './types/InfoType';
@@ -77,7 +76,6 @@ export {
   SendPageStateClass,
   SettingsFileClass,
   ToAddrClass,
-  TotalBalanceClass,
   AddressBookFileClassObsolete,
   DONE,
   errorKeyed,

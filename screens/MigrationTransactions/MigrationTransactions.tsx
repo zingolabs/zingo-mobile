@@ -9,6 +9,8 @@ import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
 import { AppDrawerParamList } from '@app/types';
 import { AppTheme } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
+import { useAtomValue } from 'jotai';
+import { balanceAtom } from '@app/AppState/balance';
 import { RouteEnum } from '@app/AppState';
 import Utils from '@app/utils';
 import { planOrchardDrain } from '@app/walletBackend';
@@ -94,7 +96,8 @@ const MigrationTransactions: React.FunctionComponent<
   MigrationTransactionsProps
 > = ({ navigation }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, info, totalBalance } = context;
+  const balance = useAtomValue(balanceAtom);
+  const { translate, info } = context;
   const { colors } = useTheme();
 
   const [plan, setPlan] = useState<RPCDrainPlanType | null>(null);
@@ -153,7 +156,8 @@ const MigrationTransactions: React.FunctionComponent<
   const transactions = plan?.transactions ?? [];
   const txCount = transactions.length;
   const noteCount = transactions.reduce((sum, tx) => sum + tx.inputs.length, 0);
-  const orchardHeld = totalBalance ? totalBalance.confirmedOrchardBalance : 0;
+  const orchardHeld =
+    balance.kind === 'polled' ? balance.latest.confirmedOrchardBalance : 0;
   const noPlan = !loading && !errorMsg && txCount === 0;
   const isPending = noPlan && (plan?.residual ?? 0) === 0 && orchardHeld > 0;
   const isEmpty = noPlan && !isPending;

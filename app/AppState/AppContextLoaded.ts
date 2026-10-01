@@ -1,4 +1,3 @@
-import TotalBalanceClass from './classes/TotalBalanceClass';
 import UnifiedAddressClass from './classes/UnifiedAddressClass';
 import SendPageStateClass from './classes/SendPageStateClass';
 import AddressBookFileClass from './classes/AddressBookFileClass';
@@ -25,9 +24,6 @@ import { MixnetView } from '@app/walletBackend/transforms/mixnetView';
 
 export default interface AppContextLoaded {
   netInfo: NetInfoType;
-
-  // The total confirmed and pending balance in this wallet
-  totalBalance: TotalBalanceClass | null;
 
   // List of all diversified addresses of the wallet
   addresses: (UnifiedAddressClass | TransparentAddressClass)[] | null;

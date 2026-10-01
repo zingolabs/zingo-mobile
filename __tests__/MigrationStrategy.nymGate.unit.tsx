@@ -6,6 +6,8 @@ import 'react-native';
 import React from 'react';
 
 import { fireEvent, render } from '@testing-library/react-native';
+import { Provider } from 'jotai';
+import { balanceAtom } from '@app/AppState/balance';
 import MigrationStrategy from '@screens/MigrationStrategy';
 import { deriveNymGateState } from '@screens/MigrationStrategy/components/nymGateState';
 import {
@@ -24,8 +26,9 @@ import {
   mixnetReady,
   mixnetReconnecting,
   mockInfo,
-  mockTotalBalance,
+  polledMockBalance,
 } from '../.storybook/storyMocks';
+import { seed, storeWith } from '../.storybook/storeWith';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
 // Rendering the raw key keeps the assertions on which translation the sheet
@@ -47,19 +50,23 @@ function renderScreen(mixnetView: MixnetView, nymSheetOpen?: boolean) {
     ...defaultAppContextLoaded,
     translate: keyTranslate,
     info: mockInfo,
-    totalBalance: mockTotalBalance,
     mixnetView,
   };
+  const store = storeWith(seed(balanceAtom, polledMockBalance));
   const utils = render(
-    <ContextAppLoadedProvider value={context}>
-      <MigrationStrategy {...props} />
-    </ContextAppLoadedProvider>,
+    <Provider store={store}>
+      <ContextAppLoadedProvider value={context}>
+        <MigrationStrategy {...props} />
+      </ContextAppLoadedProvider>
+    </Provider>,
   );
   const rerenderWith = (view: MixnetView) =>
     utils.rerender(
-      <ContextAppLoadedProvider value={{ ...context, mixnetView: view }}>
-        <MigrationStrategy {...props} />
-      </ContextAppLoadedProvider>,
+      <Provider store={store}>
+        <ContextAppLoadedProvider value={{ ...context, mixnetView: view }}>
+          <MigrationStrategy {...props} />
+        </ContextAppLoadedProvider>
+      </Provider>,
     );
   return { ...utils, navigate, rerenderWith };
 }

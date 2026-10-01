@@ -14,13 +14,11 @@ import AddressItem from '@ui/widgets/AddressItem';
 import { ScreenEnum } from '@app/AppState';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockAddressBook } from '../__mocks__/dataMocks/mockAddressBook';
-import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 
 describe('AddressItem - snapshots', () => {
   const state = { ...defaultAppContextLoaded };
   state.translate = mockTranslate;
   state.addressBook = mockAddressBook;
-  state.totalBalance = mockTotalBalance;
 
   test('AddressItem unknown address, no contact', () => {
     expect(

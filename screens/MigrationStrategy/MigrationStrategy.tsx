@@ -19,6 +19,8 @@ import { deriveNymGateState } from './components/nymGateState';
 import { AppDrawerParamList } from '@app/types';
 import { AppTheme } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
+import { useAtomValue } from 'jotai';
+import { balanceAtom } from '@app/AppState/balance';
 import { RouteEnum } from '@app/AppState';
 import Utils from '@app/utils';
 
@@ -200,7 +202,8 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
   nymSheetOpen,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, totalBalance, info, mixnetView, reenableMixnet } = context;
+  const balance = useAtomValue(balanceAtom);
+  const { translate, info, mixnetView, reenableMixnet } = context;
   const { colors } = useTheme();
   const [selected, setSelected] = useState<StrategyOption>('none');
 
@@ -255,7 +258,8 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
 
   // Orchard balance shown so the user sees what would cross the pool boundary
   // (and become publicly visible) on the immediate path.
-  const orchardAmount = totalBalance ? totalBalance.totalOrchardBalance : 0;
+  const orchardAmount =
+    balance.kind === 'polled' ? balance.latest.totalOrchardBalance : 0;
   const amountStr = `${Utils.parseNumberFloatToStringLocale(
     orchardAmount,
     4,
