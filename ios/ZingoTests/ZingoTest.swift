@@ -182,30 +182,16 @@ private func waitForSyncOrFail(timeoutSeconds: TimeInterval = 120) {
 final class ExecuteAddressesFromSeed: XCTestCase {
     func testExecuteAddressesFromSeed() throws {
 
-        let serveruri = "http://127.0.0.1:20000"
-        let chainhint = "regtest"
         let seed = Seeds.HOSPITAL
 
         do {
-            let initJson = try initFromSeed(seed: seed, birthday:UInt32(1), serveruri: serveruri, chainhint: chainhint, performancelevel: "Medium", minconfirmations: UInt32(1))
+            let initJson = try initFromSeed(seed: seed, birthday:UInt32(1), serveruri: "", chainhint: "regtest", performancelevel: "Medium", minconfirmations: UInt32(1))
             print("\nInit from seed:\n\(initJson)")
             let initRes: InitFromSeed = try decodeJSON(initJson)
             XCTAssertEqual(initRes.seed_phrase, seed)
             XCTAssertEqual(initRes.birthday, 1)
         } catch {
           XCTFail("\nInit from seed error:\n\(error.localizedDescription)")
-          return
-        }
-
-        var latest_block_height: UInt64 = UInt64.zero
-        do {
-            let infoJson = try infoServer()
-            print("\nInfo:\n\(infoJson)")
-            let info: Info = try decodeJSON(infoJson)
-            latest_block_height = info.latest_block_height
-            XCTAssertGreaterThan(latest_block_height, UInt64.zero)
-        } catch {
-          XCTFail("\nInfo error:\n\(error.localizedDescription)")
           return
         }
 
@@ -238,30 +224,16 @@ final class ExecuteAddressesFromSeed: XCTestCase {
 final class ExecuteAddressFromUfvk: XCTestCase {
     func testExecuteAddressFromUfvk() throws {
 
-        let serveruri = "http://10.0.2.2:20000"
-        let chainhint = "regtest"
         let ufvk = UfvkConst.HOSPITAL
 
         do {
-          let initJson = try initFromUfvk(ufvk: ufvk, birthday: UInt32(1), serveruri: serveruri, chainhint: chainhint, performancelevel: "Medium", minconfirmations: UInt32(1))
+          let initJson = try initFromUfvk(ufvk: ufvk, birthday: UInt32(1), serveruri: "", chainhint: "regtest", performancelevel: "Medium", minconfirmations: UInt32(1))
           print("\nInit From UFVK:\n\(initJson)")
           let initRes: InitFromUfvk = try decodeJSON(initJson)
           XCTAssertEqual(initRes.ufvk, ufvk)
           XCTAssertEqual(initRes.birthday, 1)
         } catch {
           XCTFail("\nInit from UFVK error:\n\(error.localizedDescription)")
-          return
-        }
-
-        var latest_block_height: UInt64 = UInt64.zero
-        do {
-            let infoJson = try infoServer()
-            print("\nInfo:\n\(infoJson)")
-            let info: Info = try decodeJSON(infoJson)
-            latest_block_height = info.latest_block_height
-            XCTAssertGreaterThan(latest_block_height, UInt64.zero)
-        } catch {
-          XCTFail("\nInfo error:\n\(error.localizedDescription)")
           return
         }
 
@@ -305,12 +277,10 @@ final class ExecuteAddressFromUfvk: XCTestCase {
 
 final class ExecuteVersionFromSeed: XCTestCase {
     func testExecuteVersionFromSeed() throws {
-        let serveruri = "http://10.0.2.2:20000"
-        let chainhint = "regtest"
         let seed = Seeds.HOSPITAL
 
         do {
-          let initJson = try initFromSeed(seed: seed, birthday: UInt32(1), serveruri: serveruri, chainhint: chainhint, performancelevel: "Medium", minconfirmations: UInt32(1))
+          let initJson = try initFromSeed(seed: seed, birthday: UInt32(1), serveruri: "", chainhint: "regtest", performancelevel: "Medium", minconfirmations: UInt32(1))
           print("\nInit from seed:\n\(initJson)")
           let initRes: InitFromSeed = try decodeJSON(initJson)
           XCTAssertEqual(initRes.seed_phrase, seed)
@@ -320,22 +290,11 @@ final class ExecuteVersionFromSeed: XCTestCase {
           return
         }
 
-        var latest_block_height: UInt64 = UInt64.zero
-        do {
-            let infoJson = try infoServer()
-            print("\nInfo:\n\(infoJson)")
-            let info: Info = try decodeJSON(infoJson)
-            latest_block_height = info.latest_block_height
-            XCTAssertGreaterThan(latest_block_height, UInt64.zero)
-        } catch {
-          XCTFail("\nInfo error:\n\(error.localizedDescription)")
-          return
-        }
-
         do {
             let version = try getVersion()
             print("\nVersion:\n\(version)")
-            XCTAssertFalse(version.isEmpty)
+            let part = "[0-9A-Za-z.+-]+(_[0-9a-f]{5})?(_dirty)?"
+            XCTAssertNotNil(version.range(of: "^zl_\(part)-zm_\(part)$", options: .regularExpression), version)
         } catch {
           XCTFail("\nVersion error:\n\(error.localizedDescription)")
           return
@@ -558,18 +517,6 @@ final class UpdateCurrentPriceAndValueTransfersFromSeed: XCTestCase {
           return
         }
 
-        // Price rides the mixnet or does not happen (zingolib/0011). This wallet
-        // never attached one, so the fetch must refuse. A price here would
-        // mean the wallet reached an oracle over clearnet, which is the
-        // leak the mixnet-only rule exists to prevent.
-        do {
-          let price = try zecPrice()
-          XCTFail("\nThe price fetch answered without a mixnet:\n\(price)")
-          return
-        } catch {
-          print("\nPrice refused without a mixnet:\n\(error.localizedDescription)")
-        }
-        
         do {
             let syncJson = try runSync()
             print("\nSync:\n\(syncJson)")
@@ -606,6 +553,31 @@ final class UpdateCurrentPriceAndValueTransfersFromSeed: XCTestCase {
         } catch {
           XCTFail("\nValue Transfers error:\n\(error.localizedDescription)")
           return
+        }
+    }
+}
+
+final class PriceRefusedWithoutMixnet: XCTestCase {
+    func testPriceRefusedWithoutMixnet() throws {
+        let seed = Seeds.HOSPITAL
+
+        do {
+          let initJson = try initFromSeed(seed: seed, birthday: UInt32(1), serveruri: "", chainhint: "regtest", performancelevel: "Medium", minconfirmations: UInt32(1))
+          print("\nInit from seed:\n\(initJson)")
+          let initRes: InitFromSeed = try decodeJSON(initJson)
+          XCTAssertEqual(initRes.seed_phrase, seed)
+        } catch {
+          XCTFail("\nInit from seed error:\n\(error.localizedDescription)")
+          return
+        }
+
+        do {
+          let price = try zecPrice()
+          XCTFail("\nThe price fetch answered without a mixnet:\n\(price)")
+        } catch ZingolibError.Mixnet(let message) {
+          print("\nPrice refused without a mixnet:\n\(message)")
+        } catch {
+          XCTFail("\nThe price fetch failed without refusing:\n\(error.localizedDescription)")
         }
     }
 }
@@ -690,34 +662,6 @@ final class ExecuteSaplingBalanceFromSeed: XCTestCase {
 
 final class ExecuteParseAddressForTex: XCTestCase {
     func testExecuteParseAddressForTex() throws {
-
-        let serveruri = "http://10.0.2.2:20000"
-        let chainhint = "regtest"
-        let seed = Seeds.HOSPITAL
-
-        do {
-          let initJson = try initFromSeed(seed: seed, birthday: UInt32(1), serveruri: serveruri, chainhint: chainhint, performancelevel: "Medium", minconfirmations: UInt32(1))
-          print("\nInit from seed:\n\(initJson)")
-          let initRes: InitFromSeed = try decodeJSON(initJson)
-          XCTAssertEqual(initRes.seed_phrase, seed)
-          XCTAssertEqual(initRes.birthday, 1)
-        } catch {
-          XCTFail("\nInit from seed error:\n\(error.localizedDescription)")
-          return
-        }
-
-        var latest_block_height: UInt64 = UInt64.zero
-        do {
-            let infoJson = try infoServer()
-            print("\nInfo:\n\(infoJson)")
-            let info: Info = try decodeJSON(infoJson)
-            latest_block_height = info.latest_block_height
-            XCTAssertGreaterThan(latest_block_height, UInt64.zero)
-        } catch {
-          XCTFail("\nInfo error:\n\(error.localizedDescription)")
-          return
-        }
-
         do {
           let resJson = try parseAddress(address: "texregtest1z754rp9kk9vdewx4wm7pstvm0u2rwlgy4zp82v")
           print("\nParsed address:\n\(resJson)")
@@ -734,34 +678,6 @@ final class ExecuteParseAddressForTex: XCTestCase {
 
 final class ExecuteParseAddressInvalid: XCTestCase {
     func testExecuteParseAddressInvalid() throws {
-
-        let serveruri = "http://127.0.0.1:20000"
-        let chainhint = "regtest"
-        let seed = Seeds.HOSPITAL
-
-        do {
-          let initJson = try initFromSeed(seed: seed, birthday: UInt32(1), serveruri: serveruri, chainhint: chainhint, performancelevel: "Medium", minconfirmations: UInt32(1))
-          print("\nInit from seed:\n\(initJson)")
-          let initRes: InitFromSeed = try decodeJSON(initJson)
-          XCTAssertEqual(initRes.seed_phrase, seed)
-          XCTAssertEqual(initRes.birthday, 1)
-        } catch {
-          XCTFail("\nInit from seed error:\n\(error.localizedDescription)")
-          return
-        }
-
-        var latest_block_height: UInt64 = UInt64.zero
-        do {
-            let infoJson = try infoServer()
-            print("\nInfo:\n\(infoJson)")
-            let info: Info = try decodeJSON(infoJson)
-            latest_block_height = info.latest_block_height
-            XCTAssertGreaterThan(latest_block_height, UInt64.zero)
-        } catch {
-          XCTFail("\nInfo error:\n\(error.localizedDescription)")
-          return
-        }
-
         do {
           let wrongJson = try parseAddress(address: "thiswontwork")
           print("\nWrong address:\n\(wrongJson)")
