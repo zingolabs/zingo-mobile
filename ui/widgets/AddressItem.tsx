@@ -89,8 +89,9 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
   }, [address, addressBook]);
 
   useEffect(() => {
-    if (!oneLine) {
-      if (privacy) {
+    if (privacy) {
+      setExpandContact(false);
+      if (!oneLine) {
         setExpandAddress(false);
       }
     }
@@ -136,11 +137,14 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
                     flexWrap: 'wrap',
                   }}
                 >
-                  {!expandContact && numLinesContact > 1 && (
-                    <RegText>{Utils.trimToSmall(contact, 7)}</RegText>
-                  )}
-                  {!expandContact && numLinesContact === 1 && (
-                    <RegText>{contact}</RegText>
+                  {!expandContact && (
+                    <RegText>
+                      {privacy
+                        ? `${contact.slice(0, 1)}.....`
+                        : numLinesContact > 1
+                          ? Utils.trimToSmall(contact, 7)
+                          : contact}
+                    </RegText>
                   )}
                   {expandContact &&
                     Utils.splitStringIntoChunks(
