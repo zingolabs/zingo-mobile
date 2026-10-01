@@ -141,7 +141,11 @@ describe('Maestro reaches each typed field on iOS', () => {
     expect(
       accessibleAncestor(settings.getByTestId('settings.custom-server-field')),
     ).toBeUndefined();
-    for (const id of ['settings.list-server', 'settings.custom-server']) {
+    for (const id of [
+      'settings.list-server',
+      'settings.custom-server',
+      'settings.custom-server-clear',
+    ]) {
       const option = settings.getByTestId(id);
       expect([id, accessibleAncestor(option)]).toEqual([id, undefined]);
       expect([id, sheetAccessible(option)]).toEqual([id, false]);
