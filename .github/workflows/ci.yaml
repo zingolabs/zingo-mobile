@@ -47,6 +47,7 @@ jobs:
     needs: create-cache-key
     with:
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
+      runner: ${{ vars.CI_GRADLE_RUNNER || 'ubuntu-24.04' }}
       fail-all: true
 
   # The plain-JVM bridge-contract tests (FfiOutcome, FfiArgs): the only
@@ -101,6 +102,7 @@ jobs:
     secrets: inherit
     with:
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
+      runner: ${{ vars.CI_GRADLE_RUNNER || 'ubuntu-24.04' }}
       fail-all: true
 
   create-timestamp:
@@ -123,13 +125,15 @@ jobs:
     with:
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
       arch: ${{ matrix.arch }}
+      runner: ${{ vars.CI_NATIVE_RUNNER || 'zingo-android-native-16' }}
       fail-all: true
 
   # The other three ABIs cross-compile per PR: proof that the Rust code
   # still builds for the device ABIs and 32-bit x86 without waiting for
-  # ci-nightly. They block like every other check. Standard runners keep
-  # these off the zingo-android-native-16 pool; the per-arch caches make
-  # them no-ops on pushes that leave the zingolib pin untouched.
+  # ci-nightly. They block like every other check. The standard-runner
+  # fallback keeps these off the zingo-android-native-16 pool; the
+  # per-arch caches make them no-ops on pushes that leave the zingolib
+  # pin untouched.
   andr-build-other-abis:
     strategy:
       matrix:
@@ -139,7 +143,7 @@ jobs:
     with:
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
       arch: ${{ matrix.arch }}
-      runner: ubuntu-24.04
+      runner: ${{ vars.CI_NATIVE_RUNNER || 'ubuntu-24.04' }}
       fail-all: true
 
   andr-apk-build:
@@ -148,6 +152,7 @@ jobs:
     with:
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
       abi: x86_64
+      runner: ${{ vars.CI_GRADLE_RUNNER || 'zingo-android-gradle-16' }}
       fail-all: true
 
   # Deliberately NO needs-edge on andr-apk-build: the buckets start
@@ -171,6 +176,7 @@ jobs:
       abi: ${{ matrix.config.abi }}
       api-level: ${{ matrix.config['api-level'] }}
       target: ${{ matrix.config.target }}
+      runner: ${{ vars.CI_EMULATOR_RUNNER || 'ubuntu-24.04' }}
       fail-all: true
 
   # iOS runs per-PR as a trailing stage: it starts only after every

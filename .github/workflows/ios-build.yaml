@@ -13,14 +13,15 @@ on:
         required: false
         default: false
         type: boolean
-      # Runner label for the build job. zingo-ios-build-m2 is the org's
-      # pool of m2-5-core machines on GitHub's Apple silicon fleet. The
-      # Intel pool is zingo-ios-build-12, and the stock macos-15 label has
-      # three cores.
+      # Runner label for the build job. The CI_IOS_RUNNER repository
+      # variable sets it for every caller. The fallback zingo-ios-build-m2
+      # is the org's pool of m2-5-core machines on GitHub's Apple silicon
+      # fleet. The Intel pool is zingo-ios-build-12, and the stock macos-15
+      # label has three cores.
       runner:
         required: false
         type: string
-        default: zingo-ios-build-m2
+        default: ${{ vars.CI_IOS_RUNNER || 'zingo-ios-build-m2' }}
 
 env:
   CACHE-KEY: ${{ inputs.cache-key }}
