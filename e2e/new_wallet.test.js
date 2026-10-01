@@ -28,10 +28,6 @@ describe('New Wallet', () => {
       .toBeVisible()
       .withTimeout(sync_timeout);
     await element(by.id('loadingapp.createnewwallet')).tap();
-    await waitFor(element(by.id('newseed.button.ok')))
-      .toBeVisible()
-      .withTimeout(sync_timeout);
-    await element(by.id('newseed.button.ok')).tap();
 
     await waitFor(element(by.id('valuetransfer text')))
       .toBeVisible()

@@ -16,12 +16,6 @@ appId: org.ZingoLabs.Zingo
     id: "loadingapp.createnewwallet"
 - extendedWaitUntil:
     visible:
-      id: "newseed.button.ok"
-    timeout: 120000
-- tapOn:
-    id: "newseed.button.ok"
-- extendedWaitUntil:
-    visible:
       id: "header.drawmenu"
     timeout: 120000
 

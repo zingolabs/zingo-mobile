@@ -3,8 +3,8 @@ appId: org.ZingoLabs.Zingo
 - launchApp:
     clearState: true
 
-# A fresh install lands on the start menu: the wallet is created from there,
-# and the seed is shown once before the app opens it.
+# A fresh install lands on the start menu: the wallet is created from there
+# and opens straight away.
 - extendedWaitUntil:
     visible:
       id: "loadingapp.createnewwallet"
@@ -12,12 +12,6 @@ appId: org.ZingoLabs.Zingo
 - tapOn:
     id: "loadingapp.createnewwallet"
 
-- extendedWaitUntil:
-    visible:
-      id: "newseed.button.ok"
-    timeout: 120000
-- tapOn:
-    id: "newseed.button.ok"
 
 - extendedWaitUntil:
     visible:
