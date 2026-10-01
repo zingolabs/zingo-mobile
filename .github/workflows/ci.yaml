@@ -187,9 +187,12 @@ jobs:
       cache-key: ${{ needs.create-cache-key.outputs.ios-cache-key }}
       fail-all: true
 
+  # The test job starts at workflow launch and front-loads its setup. On
+  # a cache miss it holds at the ci-gate artifact gate until the Binding
+  # Layer artifact lands.
   ios-integration-test:
     uses: ./.github/workflows/ios-integration-test.yaml
-    needs: [create-cache-key, ios-build]
+    needs: create-cache-key
     secrets: inherit
     with:
       cache-key: ${{ needs.create-cache-key.outputs.ios-cache-key }}
