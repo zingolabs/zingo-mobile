@@ -55,12 +55,14 @@ jobs:
         uses: ./.github/actions/zingolib-submodule
 
       # The Xcode project takes the Binding Layer from the zingolib submodule.
+      # A cache hit supplies it here. On a miss, the artifact gate below
+      # supplies it from the build that runs in parallel.
       - name: Restore the iOS Binding Layer
+        id: binding-layer
         uses: actions/cache/restore@v6
         with:
           path: zingolib/bindings/swift/build
           key: binding-layer-ios-${{ env.CACHE-KEY }}
-          fail-on-cache-miss: true
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -83,6 +85,27 @@ jobs:
         run: |
           xcrun simctl list runtimes
           xcrun simctl list devices
+
+      # Everything above needs nothing from the Binding Layer build. Hold
+      # here until its artifact lands; abort promptly if it can never land.
+      - name: Wait for the Binding Layer artifact (ci-gate)
+        if: ${{ steps.binding-layer.outputs.cache-hit != 'true' }}
+        working-directory: ./rust
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cargo run -p workbench --bin ci-gate -- \
+            --artifact "binding-layer-ios-${{ env.CACHE-KEY }}" \
+            --upstream "Build the iOS Binding Layer" \
+            --timeout-secs 2700 \
+            --poll-secs 20
+
+      - name: Download the Binding Layer
+        if: ${{ steps.binding-layer.outputs.cache-hit != 'true' }}
+        uses: actions/download-artifact@v4
+        with:
+          name: binding-layer-ios-${{ env.CACHE-KEY }}
+          path: zingolib/bindings/swift/build
 
       - name: Build for testing
         working-directory: ios
