@@ -197,10 +197,12 @@ IO, alerts, email, biometrics. Home: `app/services`.
 
 ## CI
 
-**Blocking check** — a PR CI job whose failure fails the pull request.
-Jest, rust-shear, the workbench tests, js-depcheck,
-andr-dependency-analysis, the Android Kotlin compile, the Android JVM
-unit tests, the Android build chain, and the Android integration buckets
+**Blocking check** — a PR CI job that runs under fail-all and that
+branch protection requires; its failure withholds the merge verdict.
+Jest, rust-shear, the workbench tests, the Binding Layer crate tests,
+js-depcheck, the JS static checks, andr-dependency-analysis, the Android
+Kotlin compile, the Android JVM unit tests, the Android build chain for
+every ABI, the offline device tests, and the Android integration buckets
 are blocking checks.
 
 **Advisory stage** — a PR CI job that records its result without
@@ -208,9 +210,27 @@ affecting the pull request verdict. No PR stage currently runs in
 advisory mode: every job's failure fails its run. ci-nightly remains
 the enforced gate for the device ABIs and iOS.
 
+**Merge verdict** — the moment every status check that branch protection
+requires has passed and the pull request can land.
+
+**Run verdict** — the conclusion of the whole PR CI run, trailing stages
+included. It arrives after the merge verdict.
+
 **Verdict path** — the longest chain of blocking checks; its wall-clock
-length is the time from push to PR verdict. Advisory stages are never on
-the verdict path.
+length, queue waits included, is the time from push to merge verdict.
+Advisory stages and trailing stages are never on the verdict path.
+
+**Hit path** — the verdict path of a run whose Binding Layer caches
+already hold every ABI. The native builds are absent from it.
+
+**Miss path** — the verdict path of a run that must build the Binding
+Layer. It runs through the native build, the APK build, and the
+integration buckets.
+
+**Trailing stage** — a PR CI job that starts only after every blocking
+check has passed. Its failure fails the run and leaves the merge verdict
+unchanged. The iOS build and the iOS integration test are trailing
+stages.
 
 **Bucket** — a group of Android integration tests that share one CI job,
 so runner setup and emulator boot amortize across the group instead of
