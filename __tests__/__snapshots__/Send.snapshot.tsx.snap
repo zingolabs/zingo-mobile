@@ -668,6 +668,7 @@ exports[`Component Send - test Send privacy high - snapshot 1`] = `
                           "opacity": 1,
                         }
                       }
+                      testID="send.address.clear"
                     >
                       <
                         color="#5a8c5a"
@@ -2696,6 +2697,7 @@ exports[`Component Send - test Send privacy normal - snapshot 1`] = `
                           "opacity": 1,
                         }
                       }
+                      testID="send.address.clear"
                     >
                       <
                         color="#5a8c5a"
