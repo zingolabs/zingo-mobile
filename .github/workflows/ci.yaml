@@ -26,16 +26,15 @@ jobs:
   # the whole run (see CONTEXT.md). Nightly leaves fail-all off to keep
   # the complete picture.
 
-  # The four Gradle checks below compile against the Binding Layer that
-  # andr-build builds for x86_64. The cache key follows the zingolib
-  # submodule, so andr-build restores from cache and finishes in about a
-  # minute unless the pin moved.
+  # The four Gradle checks below compile against the Kotlin bindings that
+  # the kotlin-bindings action generates on the host at workflow launch.
+  # They start before any cross build and finish while andr-build runs.
 
   # Catches app-module Kotlin compile breakage (e.g. classpath conflicts) in
   # a few minutes, long before the emulator jobs report.
   andr-kotlin-compile:
     uses: ./.github/workflows/android-kotlin-compile.yaml
-    needs: [create-cache-key, andr-build]
+    needs: create-cache-key
     with:
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
       fail-all: true
@@ -45,7 +44,7 @@ jobs:
   # as a crash on a user's older device.
   andr-lint:
     uses: ./.github/workflows/android-lint.yaml
-    needs: [create-cache-key, andr-build]
+    needs: create-cache-key
     with:
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
       fail-all: true
@@ -55,7 +54,7 @@ jobs:
   # the compile check.
   andr-unit-test:
     uses: ./.github/workflows/android-unit-test.yaml
-    needs: [create-cache-key, andr-build]
+    needs: create-cache-key
     with:
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
       fail-all: true
@@ -98,7 +97,7 @@ jobs:
 
   andr-dependency-analysis:
     uses: ./.github/workflows/android-dependency-analysis.yaml
-    needs: [create-cache-key, andr-build]
+    needs: create-cache-key
     secrets: inherit
     with:
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
