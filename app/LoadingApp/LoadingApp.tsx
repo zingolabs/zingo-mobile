@@ -1,12 +1,6 @@
 import React, { Component, useState, useMemo, useEffect } from 'react';
-import {
-  I18nManager,
-  AppState,
-  NativeEventSubscription,
-  Platform,
-} from 'react-native';
+import { I18nManager, AppState, NativeEventSubscription } from 'react-native';
 
-import Clipboard from '@react-native-clipboard/clipboard';
 import { useTheme } from '@app/theme';
 import { I18n } from 'i18n-js';
 import * as RNLocalize from 'react-native-localize';
@@ -24,12 +18,11 @@ import {
 import CustomServerModalHost from './components/CustomServerModalHost';
 import { BottomSheetBackHandler } from '@app/hooks/useBottomSheetBackHandler';
 import ConfirmBottomSheet from '@ui/widgets/ConfirmBottomSheet';
-import WalletRecoveryHost from './components/WalletRecoveryHost';
 import { showConfirm } from '@app/services/showConfirm';
-import { showWalletRecovery } from '@app/services/showWalletRecovery';
 
 import {
   createNewWallet,
+  deleteExistingWallet,
   getVersionInfo,
   getWalletKind,
   hasRepairableWalletFile,
@@ -37,18 +30,11 @@ import {
   repairDoubleWrappedWallet,
   repairSucceeded,
   resolvedTrue,
-  restoreExistingWalletBackup,
   restoreWalletFromSeed,
   restoreWalletFromUfvk,
-  walletBackupExists,
   walletExists as rpcWalletExists,
   walletFileDiagnosis,
-  walletSeedSalvage,
   WalletFileDiagnosis,
-  WalletFileDiagnosisReport,
-  WalletFileRepairOutcome,
-  WALLET_FILE_NAME,
-  WALLET_BACKUP_FILE_NAME,
 } from '@app/walletBackend';
 import {
   AppStateLoading,
@@ -114,6 +100,11 @@ import ImportChooser from '@screens/ImportChooser';
 import OnboardingStage from '@ui/widgets/OnboardingStage';
 import SeedSheet from '@ui/widgets/SeedSheet';
 import WalletProgress from '@screens/WalletProgress';
+import WalletError from '@screens/WalletError';
+import DeleteWalletSheet from '@ui/widgets/DeleteWalletSheet';
+import { DeleteWalletContext } from '@app/AppState/types/DeleteWalletContext';
+import { walletErrorKind } from './walletErrorKind';
+import { sanitizePaths } from '@app/utils/sanitizePaths';
 import { duration as motionDuration } from '@app/theme/motion';
 
 import { sendEmail } from '@app/services/sendEmail';
@@ -357,6 +348,8 @@ type LoadingAppClassProps = {
 
 type LoadingAppClassState = AppStateLoading & AppContextLoading;
 
+const RETRY_MIN_MS = 1400;
+
 export class LoadingAppClass extends Component<
   LoadingAppClassProps,
   LoadingAppClassState
@@ -364,6 +357,10 @@ export class LoadingAppClass extends Component<
   appstate?: NativeEventSubscription;
   unsubscribeNetInfo?: NetInfoSubscription;
   seedSheetRef = React.createRef<BottomSheetModal>();
+  deleteSheetRef = React.createRef<BottomSheetModal>();
+  // Runs once the hold completes; set with the sheet's context.
+  afterDelete: () => void = () => {};
+  retryStartedAt = 0;
   customServerModalRef: React.RefObject<React.ComponentRef<
     typeof BottomSheetModal
   > | null>;
@@ -407,7 +404,6 @@ export class LoadingAppClass extends Component<
       actionButtonsDisabled: false,
       progressKind: 'import',
       walletExists: false,
-      hasBackupWallet: false,
       customServerUri: '',
       customServerChainName: ChainNameEnum.mainChainName,
       customServerOffline: false,
@@ -420,10 +416,13 @@ export class LoadingAppClass extends Component<
         !!props.route.params && props.route.params.startingApp !== undefined
           ? props.route.params.startingApp
           : true,
-      serverErrorTries: 0,
       firstLaunchingMessage: props.firstLaunchingMessage,
       hasRecoveryWalletInfoSaved: false,
       recoveryWallet: null,
+      walletError: null,
+      retrying: false,
+      errorShake: 0,
+      deleteContext: 'import',
     };
 
     this.customServerModalRef = React.createRef();
@@ -507,10 +506,6 @@ export class LoadingAppClass extends Component<
     // Second, check if a wallet exists. Do it async so the screen has time to render
     await AsyncStorage.setItem(GlobalConst.background, GlobalConst.no);
     const exists = await rpcWalletExists();
-    const backupExists = await walletBackupExists();
-    if (backupExists) {
-      this.setState({ hasBackupWallet: true });
-    }
 
     if (exists) {
       this.setState({ walletExists: true });
@@ -577,7 +572,6 @@ export class LoadingAppClass extends Component<
 
     this.unsubscribeNetInfo = NetInfo.addEventListener(
       (state: NetInfoState) => {
-        const { screen } = this.state;
         const { isConnected, type, isConnectionExpensive } = this.state.netInfo;
         if (
           isConnected !== state.isConnected ||
@@ -591,31 +585,9 @@ export class LoadingAppClass extends Component<
               isConnectionExpensive:
                 state.details && state.details.isConnectionExpensive,
             },
-            screen:
-              screen === RouteEnum.ImportUfvk
-                ? RouteEnum.ImportUfvk
-                : screen !== RouteEnum.Launching
-                  ? RouteEnum.StartMenu
-                  : RouteEnum.Launching,
-            //actionButtonsDisabled: true,
           });
-          if (isConnected !== state.isConnected) {
-            if (!state.isConnected) {
-              this.customServerModalRef.current?.dismiss();
-            } else {
-              // Offline onboarding is no longer an empty dead-end (create /
-              // restore are available), so we do not force the server modal
-              // open on reconnect. The user opens it from the gear when they
-              // want to change server/chain.
-              if (screen !== RouteEnum.Launching) {
-                this.setState({
-                  screen:
-                    screen === RouteEnum.ImportUfvk
-                      ? RouteEnum.ImportUfvk
-                      : RouteEnum.StartMenu,
-                });
-              }
-            }
+          if (isConnected !== state.isConnected && !state.isConnected) {
+            this.customServerModalRef.current?.dismiss();
           }
         }
       },
@@ -770,61 +742,6 @@ export class LoadingAppClass extends Component<
     return someServerIsWorking;
   };
 
-  // On a wallet/RPC failure with an unreachable server, pick the next one with
-  // the same pattern as boot: first the best from the live registry (excluding
-  // the failed server, no probe), then fall back to the static list ranked by
-  // latency (also excluding the failed server). The current mode is preserved.
-  selectRecoveryServer = async (): Promise<boolean> => {
-    const actualServer = this.state.server;
-    if (actualServer.kind === 'offline') {
-      return false;
-    }
-    const live = await fetchServerList(actualServer.chainName);
-    const liveCandidates = live.filter(
-      (s: ServerUrisType) => s.uri !== actualServer.uri,
-    );
-    if (liveCandidates.length > 0) {
-      const best = remoteServer(
-        liveCandidates[0].uri,
-        liveCandidates[0].chainName,
-      );
-      this.setState({ server: best });
-      await SettingsFileImpl.writeServer(best, this.state.selectServer);
-      this.addLastSnackbar(
-        (this.state.translate('loadedapp.selectingserverbest') as string) +
-          ' ' +
-          liveCandidates[0].uri,
-        SnackbarDurationEnum.long,
-      );
-      return true;
-    }
-    // Registry empty/unreachable → static list ranked by latency, excluding the
-    // failed server, staying in the current mode.
-    return await this.selectTheBestServer(true, this.state.selectServer);
-  };
-
-  checkServer: (s: ServerType) => Promise<boolean> = async (
-    server: ServerType,
-  ) => {
-    if (server.kind === 'offline') {
-      return false;
-    }
-    const s = {
-      uri: server.uri,
-      chainName: server.chainName,
-      region: '',
-      default: false,
-      latency: null,
-      obsolete: false,
-    } as ServerUrisType;
-    const serverChecked = await selectingServer([s]);
-    if (serverChecked && serverChecked.latency) {
-      return true;
-    } else {
-      return false;
-    }
-  };
-
   // Loads the wallet file found on disk. Also the retry after a file repair.
   loadExistingWalletOnBoot = async () => {
     const result = await loadExistingWallet(
@@ -932,61 +849,28 @@ export class LoadingAppClass extends Component<
     }
   };
 
-  // A repairable file is repaired and reloaded, and a broken main that no repair fixes opens the recovery dialog.
+  // A repairable file is repaired and reloaded once; anything else lands on
+  // the error screen with the error text behind its details toggle.
   walletLoadFailed = async (errorText: string) => {
-    const title = this.state.translate(
-      'loadingapp.readingwallet-label',
-    ) as string;
     const report = await walletFileDiagnosis();
-    this.setState({
-      actionButtonsDisabled: false,
-      serverErrorTries: 0,
-      screen: RouteEnum.StartMenu,
-    });
-    if (hasRepairableWalletFile(report.files)) {
+    if (!this.state.retrying && hasRepairableWalletFile(report.files)) {
       this.addLastSnackbar(
         this.state.translate('loadingapp.walletrepair-running') as string,
       );
-      await this.repairWalletFiles(title, errorText);
-      return;
+      const outcomes = await repairDoubleWrappedWallet();
+      if (repairSucceeded(outcomes)) {
+        this.addLastSnackbar(
+          this.state.translate('loadingapp.walletrepair-success') as string,
+        );
+        await this.loadExistingWalletOnBoot();
+        return;
+      }
     }
-    // encryptedLegacy opens through the load path's legacy recovery, so only undecryptable, doubleWrapped, and unknown count as broken.
-    const main = report.files.find(f => f.name === WALLET_FILE_NAME);
-    const openableStates: ReadonlySet<WalletFileDiagnosis['state']> = new Set([
-      'plainWallet',
-      'encryptedLegacy',
-      'missing',
-    ]);
-    const mainBroken = !!main && !openableStates.has(main.state);
-    // A load failure with a plain-looking main means the file is damaged
-    // past its stable prefix (truncated), so the dialog offers seed salvage.
-    const mainSalvageable = !!main && main.state === 'plainWallet';
-    if (mainBroken || mainSalvageable) {
-      this.walletRecoveryAlert(
-        title,
-        errorText,
-        report,
-        undefined,
-        mainSalvageable,
-      );
-      return;
-    }
-    // Wallet-open failures are local and deterministic (undecodable
-    // file, chain mismatch, bad settings): the native layer opens
-    // Indexerless when only the server dial fails, so no open failure
-    // is server-caused. walletErrorHandle would diagnose this local
-    // error by probing the server, racing against its current state,
-    // and pick the alert text from whatever it happens to answer.
     const diagnosisLines = this.walletFileDiagnosisLines(report.files);
-    createAlert(
-      this.setBackgroundError,
-      this.addLastSnackbar,
-      title,
-      diagnosisLines ? `${errorText}\n\n${diagnosisLines}` : errorText,
-      false,
-      this.state.translate,
-      sendEmail,
-      this.state.zingolibVersion,
+    this.showWalletError(
+      sanitizePaths(
+        diagnosisLines ? `${errorText}\n\n${diagnosisLines}` : errorText,
+      ),
     );
   };
 
@@ -1001,312 +885,68 @@ export class LoadingAppClass extends Component<
       )
       .join('\n');
 
-  // Builds the untranslated support report copied and emailed from the dialog.
-  walletRecoveryReportText = (
-    errorText: string,
-    report: WalletFileDiagnosisReport,
-    outcomes?: Record<string, WalletFileRepairOutcome>,
-  ): string => {
-    const lines = [
-      `zingolib: ${this.state.zingolibVersion}`,
-      `platform: ${Platform.OS}`,
-      `error: ${errorText}`,
-    ];
-    for (const f of report.files) {
-      const mtime = f.mtime > 0 ? new Date(f.mtime).toISOString() : 'n/a';
-      lines.push(
-        `${f.name}: state=${f.state} size=${f.size} mtime=${mtime} ` +
-          `depth=${f.depth} repairable=${f.repairable}` +
-          (f.head ? ` head=${f.head}` : ''),
-      );
-      if (f.readError) {
-        lines.push(`  readError: ${f.readError}`);
-      }
-      for (const unwrapError of f.unwrapErrors) {
-        lines.push(`  unwrap: ${unwrapError}`);
-      }
-    }
-    if (outcomes) {
-      for (const [name, outcome] of Object.entries(outcomes)) {
-        lines.push(`repair ${name}: ${outcome}`);
-      }
-    }
-    return lines.join('\n');
-  };
-
-  walletRecoveryAlert = (
-    title: string,
-    errorText: string,
-    report: WalletFileDiagnosisReport,
-    outcomes?: Record<string, WalletFileRepairOutcome>,
-    salvage?: boolean,
-  ) => {
-    const reportText = this.walletRecoveryReportText(
-      errorText,
-      report,
-      outcomes,
-    );
-    const backup = report.files.find(f => f.name === WALLET_BACKUP_FILE_NAME);
-    const backupRestorable =
-      !!backup &&
-      (backup.state === 'plainWallet' || backup.state === 'encryptedLegacy');
-    const message = this.state.translate(
-      outcomes
-        ? 'loadingapp.walletrepair-failed'
-        : 'loadingapp.walletrecovery-body',
-    ) as string;
-    showWalletRecovery({
-      title,
-      message,
-      diagnosisLines: this.walletFileDiagnosisLines(report.files),
-      translate: this.state.translate,
-      onCopy: () => {
-        Clipboard.setString(reportText);
-        this.addLastSnackbar(this.state.translate('txtcopied') as string);
-      },
-      onRestoreBackup: backupRestorable
-        ? () => this.confirmRestoreBackupFromRecovery()
-        : undefined,
-      onSalvageSeed: salvage
-        ? () => this.salvageSeedFromWalletFile()
-        : undefined,
-      onSupport: () =>
-        sendEmail(
-          this.state.translate,
-          this.state.zingolibVersion,
-          title,
-          reportText,
-        ),
-      onCancel: () => {},
-    });
-  };
-
-  confirmRestoreBackupFromRecovery = () => {
-    showConfirm({
-      title: this.state.translate('loadedapp.restorebackupwallet') as string,
-      message: `${this.state.translate(
-        'loadedapp.alert-restorebackupwallet-body',
-      )}\n\n${
-        this.state.translate('loadingapp.walletrecovery-verifyseed') as string
-      }`,
-      buttons: [
-        {
-          text: this.state.translate('confirm') as string,
-          onPress: () => this.restoreLastBackup(),
-        },
-        { text: this.state.translate('cancel') as string, style: 'cancel' },
-      ],
-    });
-  };
-
-  // Salvages the seed from the damaged wallet file and, on the user's
-  // confirmation, restores the wallet from it (rescan included).
-  salvageSeedFromWalletFile = async () => {
-    const salvage = await walletSeedSalvage();
-    if (salvage.kind === 'error') {
-      this.addLastSnackbar(this.state.translate(salvage.errorKey) as string);
-      return;
-    }
-    showConfirm({
-      title: this.state.translate('loadingapp.walletsalvage-title') as string,
-      message:
-        `${this.state.translate('loadingapp.walletsalvage-body')}\n\n` +
-        `${salvage.seedPhrase}\n\n` +
-        `${this.state.translate('loadingapp.walletsalvage-birthday')}: ${
-          salvage.birthday
-        }`,
-      buttons: [
-        {
-          text: this.state.translate('confirm') as string,
-          onPress: () => this.doRestore(salvage.seedPhrase, salvage.birthday),
-        },
-        { text: this.state.translate('cancel') as string, style: 'cancel' },
-      ],
-    });
-  };
-
-  repairWalletFiles = async (title: string, errorText: string) => {
-    this.setState({ actionButtonsDisabled: true });
-    const outcomes = await repairDoubleWrappedWallet();
-    if (repairSucceeded(outcomes)) {
-      this.addLastSnackbar(
-        this.state.translate('loadingapp.walletrepair-success') as string,
-      );
-      await this.loadExistingWalletOnBoot();
-      return;
-    }
-    // Re-diagnose so the report carries the per-depth unwrap errors of the
-    // attempt that just failed.
-    const report = await walletFileDiagnosis();
-    this.setState({ actionButtonsDisabled: false });
-    this.walletRecoveryAlert(title, errorText, report, outcomes);
-  };
-
-  walletErrorHandle = async (
-    result: string,
-    title: string,
-    screen: RouteEnum,
-    start: boolean,
-  ) => {
-    // first check the actual server
-    // if the server is not working properly sometimes can take more than one minute to fail.
-    if (
-      start &&
-      this.state.netInfo.isConnected &&
-      this.state.server.kind !== 'offline'
-    ) {
-      this.addLastSnackbar(
-        this.state.translate('restarting') as string,
-        SnackbarDurationEnum.long,
-      );
-    }
-    // if no internet connection -> show the error.
-    // if Offline mode -> show the error.
-    if (
-      !this.state.netInfo.isConnected ||
-      this.state.server.kind === 'offline'
-    ) {
-      createAlert(
-        this.setBackgroundError,
-        this.addLastSnackbar,
-        title,
-        result,
-        false,
-        this.state.translate,
-        sendEmail,
-        this.state.zingolibVersion,
-      );
-      this.setState({
-        actionButtonsDisabled: false,
-        serverErrorTries: 0,
-        screen,
-      });
-    } else {
-      const workingServer = await this.checkServer(this.state.server);
-      if (workingServer) {
-        // the server is working -> this error is something not related with the server availability
-        createAlert(
-          this.setBackgroundError,
-          this.addLastSnackbar,
-          title,
-          result,
-          false,
-          this.state.translate,
-          sendEmail,
-          this.state.zingolibVersion,
+  // A retry that fails again shakes the icon and says so; its dots stay up
+  // for at least RETRY_MIN_MS so the attempt reads as one.
+  showWalletError = (details: string) => {
+    const kind = walletErrorKind(details);
+    const again = this.state.screen === RouteEnum.WalletError;
+    const apply = () => {
+      if (again) {
+        this.addLastSnackbar(
+          this.state.translate(
+            kind === 'server'
+              ? 'walleterror.still-server'
+              : 'walleterror.still-open',
+          ) as string,
         );
-        this.setState({
-          actionButtonsDisabled: false,
-          serverErrorTries: 0,
-          screen,
-        });
-      } else {
-        // Audit Issue S — custom server users opted out of automatic
-        // server selection (almost always for privacy / self-hosting).
-        // The checkServer probe above is a 15-second latency check, not
-        // a causal diagnosis: even if it returns false, the original
-        // wallet error may or may not be server-related. Silently
-        // swapping the user's custom URI for a default would leak
-        // metadata to that default server. Surface the situation and
-        // let the user decide from Settings.
-        if (this.state.selectServer === SelectServerEnum.custom) {
-          createAlert(
-            this.setBackgroundError,
-            this.addLastSnackbar,
-            title,
-            this.state.translate(
-              'loadingapp.customserver-unreachable',
-            ) as string,
-            false,
-            this.state.translate,
-            sendEmail,
-            this.state.zingolibVersion,
+      }
+      this.setState(state => ({
+        walletError: { kind, details },
+        retrying: false,
+        errorShake: again ? state.errorShake + 1 : state.errorShake,
+        actionButtonsDisabled: false,
+        screen: RouteEnum.WalletError,
+      }));
+    };
+    const elapsed = Date.now() - this.retryStartedAt;
+    const wait = this.state.retrying ? Math.max(0, RETRY_MIN_MS - elapsed) : 0;
+    setTimeout(apply, wait);
+  };
+
+  retryOpenWallet = async () => {
+    this.retryStartedAt = Date.now();
+    this.setState({ retrying: true, actionButtonsDisabled: true });
+    await this.loadExistingWalletOnBoot();
+  };
+
+  // The sheet's hold runs `next` after the wallet file is gone; replacing a
+  // Keychain phrase has nothing to delete first.
+  confirmDelete = (context: DeleteWalletContext, next: () => void) => {
+    this.afterDelete = async () => {
+      if (context !== 'replace') {
+        const result = await deleteExistingWallet();
+        if (!resolvedTrue(result)) {
+          this.addLastSnackbar(
+            this.state.translate('rpc.deletewallet-error') as string,
           );
-          this.setState({
-            actionButtonsDisabled: false,
-            serverErrorTries: 0,
-            screen,
-          });
           return;
         }
-
-        // let's change to another server
-        if (this.state.serverErrorTries === 0) {
-          // first try
-          this.setState({ screen, actionButtonsDisabled: true });
-          this.addLastSnackbar(
-            this.state.translate('loadingapp.serverfirsttry') as string,
-            SnackbarDurationEnum.longer,
-          );
-          // a different server (live registry first, then static by latency).
-          const someServerIsWorking = await this.selectRecoveryServer();
-          if (someServerIsWorking) {
-            if (start) {
-              this.setState(
-                { startingApp: false, serverErrorTries: 1, screen },
-                () => {
-                  this.componentDidMount();
-                },
-              );
-            } else {
-              createAlert(
-                this.setBackgroundError,
-                this.addLastSnackbar,
-                title,
-                result,
-                false,
-                this.state.translate,
-                sendEmail,
-                this.state.zingolibVersion,
-              );
-              this.setState({
-                actionButtonsDisabled: false,
-                serverErrorTries: 0,
-                screen,
-              });
-            }
-          } else {
-            createAlert(
-              this.setBackgroundError,
-              this.addLastSnackbar,
-              title,
-              this.state.translate('loadingapp.noservers') as string,
-              false,
-              this.state.translate,
-              sendEmail,
-              this.state.zingolibVersion,
-            );
-            this.setState({
-              actionButtonsDisabled: false,
-              serverErrorTries: 0,
-              screen,
-            });
-          }
-        } else {
-          // second try
-          this.addLastSnackbar(
-            this.state.translate('loadingapp.serversecondtry') as string,
-            SnackbarDurationEnum.longer,
-          );
-          setTimeout(() => {
-            createAlert(
-              this.setBackgroundError,
-              this.addLastSnackbar,
-              title,
-              result,
-              false,
-              this.state.translate,
-              sendEmail,
-              this.state.zingolibVersion,
-            );
-            this.setState({
-              actionButtonsDisabled: false,
-              serverErrorTries: 0,
-              screen,
-            });
-          }, 1 * 1000);
-        }
+        this.setState({ walletExists: false, walletError: null });
       }
+      next();
+    };
+    this.setState({ deleteContext: context }, () =>
+      this.deleteSheetRef.current?.present(),
+    );
+  };
+
+  createNewWalletChecked = () => {
+    if (this.state.walletExists) {
+      this.confirmDelete('create', this.createNewWallet);
+    } else if (this.state.recoveryWallet) {
+      this.confirmDelete('replace', this.createNewWallet);
+    } else {
+      this.createNewWallet();
     }
   };
 
@@ -1559,11 +1199,19 @@ export class LoadingAppClass extends Component<
       );
     } else {
       clearTimeout(showProgress);
-      this.walletErrorHandle(
-        seed.ok ? seed.value : seed.error.message,
+      this.setState({
+        actionButtonsDisabled: false,
+        screen: RouteEnum.StartMenu,
+      });
+      createAlert(
+        this.setBackgroundError,
+        this.addLastSnackbar,
         this.state.translate('loadingapp.creatingwallet-label') as string,
-        RouteEnum.StartMenu,
+        seed.ok ? seed.value : seed.error.message,
         false,
+        this.state.translate,
+        sendEmail,
+        this.state.zingolibVersion,
       );
     }
   };
@@ -1585,7 +1233,11 @@ export class LoadingAppClass extends Component<
     });
   };
 
-  doRestore = async (seedUfvk: string, birthday: number) => {
+  doRestore = async (
+    seedUfvk: string,
+    birthday: number,
+    origin: RouteEnum = RouteEnum.ImportUfvk,
+  ) => {
     if (!seedUfvk) {
       // no reporting button, no needed.
       createAlert(
@@ -1785,11 +1437,16 @@ export class LoadingAppClass extends Component<
     }
     if (error) {
       clearTimeout(showImporting);
-      this.walletErrorHandle(
-        errorText,
+      this.setState({ actionButtonsDisabled: false, screen: origin });
+      createAlert(
+        this.setBackgroundError,
+        this.addLastSnackbar,
         this.state.translate('loadingapp.readingwallet-label') as string,
-        RouteEnum.ImportUfvk,
+        errorText,
         false,
+        this.state.translate,
+        sendEmail,
+        this.state.zingolibVersion,
       );
     }
   };
@@ -1919,7 +1576,11 @@ export class LoadingAppClass extends Component<
     if (!wallet) {
       return;
     }
-    this.doRestore(wallet.seed || wallet.ufvk || '', wallet.birthday);
+    this.doRestore(
+      wallet.seed || wallet.ufvk || '',
+      wallet.birthday,
+      this.state.screen,
+    );
   };
 
   viewRecoveryWallet = async () => {
@@ -1936,22 +1597,6 @@ export class LoadingAppClass extends Component<
       startingApp: false,
     });
     this.componentDidMount();
-  };
-
-  restoreLastBackup = async () => {
-    this.setState({ screen: RouteEnum.Launching, actionButtonsDisabled: true });
-    const result = await restoreExistingWalletBackup();
-    if (!resolvedTrue(result)) {
-      this.addLastSnackbar(
-        this.state.translate('rpc.backupnotfound-error') as string,
-      );
-      this.setState({
-        screen: RouteEnum.StartMenu,
-        actionButtonsDisabled: false,
-      });
-      return;
-    }
-    this.openCurrentWallet();
   };
 
   async fetchZingolibVersion(): Promise<void> {
@@ -2018,7 +1663,6 @@ export class LoadingAppClass extends Component<
             <BottomSheetModalProvider>
               <BottomSheetBackHandler />
               <ConfirmBottomSheet />
-              <WalletRecoveryHost />
               {screen === RouteEnum.Launching && (
                 <Launching
                   translate={translate}
@@ -2038,7 +1682,7 @@ export class LoadingAppClass extends Component<
                       customServer={this.customServer}
                       walletExists={walletExists}
                       openCurrentWallet={this.openCurrentWallet}
-                      createNewWallet={this.createNewWallet}
+                      createNewWallet={this.createNewWalletChecked}
                       getwalletToRestore={this.getwalletToRestore}
                     />
                   )}
@@ -2057,6 +1701,23 @@ export class LoadingAppClass extends Component<
                       }
                     />
                   )}
+                  {screen === RouteEnum.WalletError &&
+                    this.state.walletError && (
+                      <WalletError
+                        kind={this.state.walletError.kind}
+                        details={this.state.walletError.details}
+                        busy={this.state.retrying}
+                        shake={this.state.errorShake}
+                        onRetry={this.retryOpenWallet}
+                        onImport={() =>
+                          this.confirmDelete('import', this.getwalletToRestore)
+                        }
+                        onCreate={() =>
+                          this.confirmDelete('create', this.createNewWallet)
+                        }
+                        onServer={this.customServer}
+                      />
+                    )}
                   {screen === RouteEnum.ImportUfvk && (
                     <ImportUfvk
                       busy={this.state.actionButtonsDisabled}
@@ -2070,6 +1731,18 @@ export class LoadingAppClass extends Component<
                 ref={this.seedSheetRef}
                 wallet={this.state.recoveryWallet}
                 translate={translate}
+              />
+              <DeleteWalletSheet
+                ref={this.deleteSheetRef}
+                context={this.state.deleteContext}
+                translate={translate}
+                onConfirmed={() => this.afterDelete()}
+                onReleasedEarly={() =>
+                  this.addLastSnackbar(
+                    translate('deletesheet.keep-holding') as string,
+                    SnackbarDurationEnum.short,
+                  )
+                }
               />
               <CustomServerModalHost
                 ref={this.customServerModalRef}

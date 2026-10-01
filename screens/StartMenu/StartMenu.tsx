@@ -7,7 +7,6 @@ import Animated, {
   FadeOut,
   ReduceMotion,
 } from 'react-native-reanimated';
-import { showConfirm } from '@app/services/showConfirm';
 import { useTheme } from '@app/theme';
 
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -116,25 +115,6 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
       : server.chainName === 'regtest'
         ? (translate('loadingapp.net-regtest') as string)
         : '';
-
-  const onCreate = () => {
-    if (walletExists) {
-      showConfirm({
-        title: translate('loadingapp.alert-newwallet-title') as string,
-        message: translate('loadingapp.alert-newwallet-body') as string,
-        buttons: [
-          {
-            text: translate('confirm') as string,
-            style: 'destructive',
-            onPress: () => createNewWallet(),
-          },
-          { text: translate('cancel') as string, style: 'cancel' },
-        ],
-      });
-    } else {
-      createNewWallet();
-    }
-  };
 
   const link = (
     title: string,
@@ -465,7 +445,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
           <View style={{ marginTop: 6 }}>
             {link(
               translate('loadingapp.createnewwallet') as string,
-              onCreate,
+              createNewWallet,
               'loadingapp.createnewwallet',
             )}
           </View>
@@ -480,7 +460,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
             : canAct &&
               pill(
                 translate('loadingapp.createnewwallet') as string,
-                onCreate,
+                createNewWallet,
                 'loadingapp.createnewwallet',
               )}
         </View>

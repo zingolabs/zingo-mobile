@@ -6,6 +6,7 @@ export enum RouteEnum {
   ImportChooser = 'ImportChooser',
   ImportUfvk = 'ImportUfvk',
   WalletProgress = 'WalletProgress',
+  WalletError = 'WalletError',
 
   // Stack
   LoadingApp = 'LoadingApp',

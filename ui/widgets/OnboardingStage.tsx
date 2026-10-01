@@ -55,6 +55,8 @@ const importingEnter = () =>
     .easing(ease.emphasized)
     .withInitialValues({ opacity: 0, transform: [{ scale: 1.04 }] })
     .reduceMotion(ReduceMotion.System);
+const errorEnter = () =>
+  FadeIn.duration(300).easing(ease.standard).reduceMotion(ReduceMotion.System);
 const importingExit = () =>
   FadeOut.duration(duration.base).reduceMotion(ReduceMotion.System);
 const axisEnter = (fromX: number) =>
@@ -76,6 +78,7 @@ const axisExit = (toX: number) =>
 const depth = (screen: RouteEnum): number => {
   switch (screen) {
     case RouteEnum.StartMenu:
+    case RouteEnum.WalletError:
       return 0;
     case RouteEnum.ImportChooser:
       return 1;
@@ -87,14 +90,17 @@ const depth = (screen: RouteEnum): number => {
 };
 
 // Leaving or returning to the welcome parts or returns the leaves; the
-// progress screen fades in whole; everything else inside the import stack
-// moves on the shared axis.
+// progress and error screens fade in whole; everything else inside the
+// import stack moves on the shared axis.
 const enterFor = (from: RouteEnum | null, to: RouteEnum) => {
   if (to === RouteEnum.StartMenu) {
     return welcomeEnter();
   }
   if (to === RouteEnum.WalletProgress) {
     return importingEnter();
+  }
+  if (to === RouteEnum.WalletError) {
+    return errorEnter();
   }
   if (from === null || from === RouteEnum.StartMenu) {
     return formEnter();

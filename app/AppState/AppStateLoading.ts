@@ -4,6 +4,8 @@ import { LaunchingModeEnum } from './enums/LaunchingModeEnum';
 import { RouteEnum } from './enums/RouteEnum';
 import WalletType from './types/WalletType';
 import { GateFailure } from './types/GateFailure';
+import { WalletErrorInfo } from './types/WalletErrorInfo';
+import { DeleteWalletContext } from './types/DeleteWalletContext';
 
 /** The launch gate's outcome, carried whole so the locked screen renders the reason it was locked for. */
 export type BiometricGateOutcome =
@@ -17,7 +19,6 @@ export default interface AppStateLoading {
   actionButtonsDisabled: boolean;
   progressKind: 'import' | 'create';
   walletExists: boolean;
-  hasBackupWallet: boolean;
   customServerUri: string;
   customServerChainName: ChainNameEnum;
   customServerOffline: boolean;
@@ -27,8 +28,11 @@ export default interface AppStateLoading {
   // so a locked screen without a reason is unrepresentable.
   biometricGate: BiometricGateOutcome;
   startingApp: boolean;
-  serverErrorTries: number;
   firstLaunchingMessage: LaunchingModeEnum;
   hasRecoveryWalletInfoSaved: boolean;
   recoveryWallet: WalletType | null;
+  walletError: WalletErrorInfo | null;
+  retrying: boolean;
+  errorShake: number;
+  deleteContext: DeleteWalletContext;
 }
