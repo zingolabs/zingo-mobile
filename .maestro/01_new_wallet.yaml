@@ -23,3 +23,56 @@ appId: org.ZingoLabs.Zingo
     visible:
       id: "header.drawmenu"
     timeout: 120000
+
+# A new wallet has its birthday at the chain tip. The check icon shows
+# once the sync reaches the tip.
+- extendedWaitUntil:
+    visible:
+      id: "header.checkicon"
+    timeout: 300000
+
+# Changing wallets shows the open wallet's seed first, then asks for
+# confirmation, then returns to the start menu.
+- tapOn:
+    id: "header.drawmenu"
+- tapOn:
+    id: "menu.changewallet"
+- extendedWaitUntil:
+    visible:
+      id: "seed.button.ok"
+    timeout: 120000
+
+# The button is disabled until the seed loads from the keychain, and a
+# tap before then does nothing.
+- retry:
+    maxRetries: 3
+    commands:
+      - tapOn:
+          id: "seed.button.ok"
+      - extendedWaitUntil:
+          visible:
+            text: "Confirm"
+          timeout: 10000
+- tapOn:
+    text: "Confirm"
+
+- extendedWaitUntil:
+    visible:
+      id: "loadingapp.createnewwallet"
+    timeout: 120000
+- tapOn:
+    id: "loadingapp.createnewwallet"
+- extendedWaitUntil:
+    visible:
+      id: "newseed.button.ok"
+    timeout: 120000
+- tapOn:
+    id: "newseed.button.ok"
+- extendedWaitUntil:
+    visible:
+      id: "header.drawmenu"
+    timeout: 120000
+- extendedWaitUntil:
+    visible:
+      id: "header.checkicon"
+    timeout: 300000
