@@ -7,7 +7,7 @@ module.exports = {
   // The zingolib submodule holds the Binding Layer's target and build
   // directories, and no JavaScript, so the haste map skips it as Metro does.
   modulePathIgnorePatterns: [
-    'e2e',
+    '<rootDir>/e2e/',
     '<rootDir>/.claude/',
     '<rootDir>/zingolib/',
   ],

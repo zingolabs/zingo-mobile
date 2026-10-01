@@ -279,8 +279,6 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
             }}
           >
             <View
-              accessible={true}
-              accessibilityLabel={translate('seed.seed-acc') as string}
               style={{
                 marginRight: 5,
                 width: 'auto',
@@ -290,6 +288,8 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
             >
               <TextInput
                 testID="import.seedufvkinput"
+                accessible={true}
+                accessibilityLabel={translate('seed.seed-acc') as string}
                 multiline
                 autoCorrect={false}
                 autoComplete="off"
@@ -347,8 +347,6 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
               </FadeText>
             )}
             <View
-              accessible={true}
-              accessibilityLabel={translate('import.birthday-acc') as string}
               style={{
                 margin: 10,
                 borderWidth: 1,
@@ -365,6 +363,8 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
             >
               <TextInput
                 testID="import.birthdayinput"
+                accessible={true}
+                accessibilityLabel={translate('import.birthday-acc') as string}
                 placeholder={'#'}
                 placeholderTextColor={colors.fgMuted}
                 style={{

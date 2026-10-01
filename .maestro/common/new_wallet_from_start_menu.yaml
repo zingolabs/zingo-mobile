@@ -1,0 +1,20 @@
+appId: org.ZingoLabs.Zingo
+---
+# The wallet is created from the start menu, and the seed is shown once
+# before the app opens it.
+- extendedWaitUntil:
+    visible:
+      id: "loadingapp.createnewwallet"
+    timeout: 120000
+- tapOn:
+    id: "loadingapp.createnewwallet"
+- extendedWaitUntil:
+    visible:
+      id: "newseed.button.ok"
+    timeout: 120000
+- tapOn:
+    id: "newseed.button.ok"
+- extendedWaitUntil:
+    visible:
+      id: "header.drawmenu"
+    timeout: 120000
