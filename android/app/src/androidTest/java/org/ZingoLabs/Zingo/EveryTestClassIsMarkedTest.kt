@@ -8,9 +8,6 @@ import org.junit.Test
 /** The package that holds the instrumented test classes. */
 private const val TEST_PACKAGE = "org.ZingoLabs.Zingo"
 
-/** The Detox entry class, which carries no marker and leaves the repository with Detox. */
-private const val DETOX_TEST_CLASS = "org.ZingoLabs.Zingo.DetoxTest"
-
 /** The markers, one of which every instrumented test class carries. */
 private val TEST_KIND_MARKERS = listOf(
     OfflineDeviceTest::class.java,
@@ -28,7 +25,7 @@ class EveryTestClassIsMarkedTest {
         val classNames = DexFile(testApk.packageCodePath).entries().toList()
 
         val testClasses = classNames
-            .filter { it.startsWith("$TEST_PACKAGE.") && it != DETOX_TEST_CLASS }
+            .filter { it.startsWith("$TEST_PACKAGE.") }
             .map { Class.forName(it, false, javaClass.classLoader) }
             .filter { testClass -> testClass.declaredMethods.any { it.isAnnotationPresent(Test::class.java) } }
 

@@ -14,11 +14,16 @@ on:
         required: false
         type: boolean
         default: false
+      # Runner label for the analysis job. PR CI passes CI_GRADLE_RUNNER.
+      runner:
+        required: false
+        type: string
+        default: ubuntu-24.04
 
 jobs:
   android-dependency-analysis:
     name: Andr dependency analysis
-    runs-on: ubuntu-24.04
+    runs-on: ${{ inputs.runner }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
