@@ -148,11 +148,12 @@ jobs:
     needs:
       - android-ubuntu-integration-test-ci-avd-cache
     runs-on: ubuntu-24.04
+    # Bounds the harness build, the regtest launch, and the test run.
+    timeout-minutes: 45
     strategy:
       fail-fast: ${{ inputs.fail-all }}
-      # The tests of a bucket share one job, so the runner setup and
-      # emulator boot amortize across the bucket instead of being paid
-      # once per test.
+      # The tests of a bucket share one job. The runner setup and the
+      # emulator boot are paid once per bucket.
       matrix:
         bucket:
           - name: chain
@@ -418,22 +419,17 @@ jobs:
               run_id: context.runId,
             });
 
-  # Offline device tests: each bucket runs its instrumented classes on
-  # the emulator with no harness, no validator and no indexer. The dev
-  # branch protection requires the bucket name "accounts".
-  android-ubuntu-offline-device-test:
-    name: ${{ matrix.bucket.name }}
+  # Offline device tests: one Gradle connected-test run on the debug build.
+  # It selects every class that carries @OfflineDeviceTest. The Android
+  # Test Orchestrator gives each test its own process and cleared app data.
+  android-offline-device-test:
+    name: offline device tests
     needs:
       - android-ubuntu-integration-test-ci-avd-cache
     runs-on: ubuntu-24.04
-    strategy:
-      fail-fast: ${{ inputs.fail-all }}
-      matrix:
-        bucket:
-          - name: accounts
-            classes: ExecuteVersionFromSeed ExecuteAddressesFromSeed ExecuteAddressesFromUfvk ExecuteParseAddressForTex ExecuteParseAddressInvalid PriceRefusedWithoutMixnet
-          - name: wallet-files
-            classes: DoubleWrapReproTest WalletFileMemoryTest WalletFileRepairTest WalletSeedSalvageTest
+    # Bounds the debug build, the emulator boot, and the test run. Each
+    # test has its own limit in android/app/build.gradle.kts.
+    timeout-minutes: 30
     env:
       CACHE-KEY: ${{ inputs.cache-key }}
     steps:
@@ -446,10 +442,14 @@ jobs:
         with:
           repository: ${{ env.REPO-OWNER }}/zingo-mobile
 
-      # The ci-gate binary builds in the Rust workspace, which reads the
-      # zingolib submodule's manifests.
       - name: Check out zingolib
         uses: ./.github/actions/zingolib-submodule
+
+      - name: Restore the Binding Layer
+        uses: ./.github/actions/binding-layer-android
+        with:
+          abi: ${{ env.ABI }}
+          cache-key: ${{ env.CACHE-KEY }}
 
       - name: Set envs for x86_64
         if: ${{ env.ABI == 'x86_64' }}
@@ -467,27 +467,32 @@ jobs:
         if: ${{ env.ABI == 'armeabi-v7a' }}
         run: echo "AVD-ARCH=arm64-v8a" >> $GITHUB_ENV
 
-      - name: Grant permissions
-        run: |
-          sudo chmod 777 ./scripts/ci/android_integration_tests_ci.sh
-
       - name: Enable KVM
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
-      - name: Rust toolchain
-        uses: actions-rust-lang/setup-rust-toolchain@v2
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          toolchain: stable
-          cache: false
+          node-version: 22.18.0
+          cache: yarn
+
+      - name: Yarn install
+        run: yarn
 
       - name: Setup Java
         uses: actions/setup-java@v6
         with:
           distribution: 'temurin'
           java-version: '17'
+
+      - name: Gradle setup cache (read-only off dev)
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          gradle-version: wrapper
+          cache-read-only: ${{ github.ref != 'refs/heads/dev' }}
 
       - name: Restore AVD cache
         uses: actions/cache/restore@v6
@@ -498,23 +503,6 @@ jobs:
           key: avd-${{ env.ABI }}-api-${{ env.API-LEVEL }}-integ
           fail-on-cache-miss: true
 
-      - name: Wait for the APK artifact (ci-gate)
-        working-directory: ./rust
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          cargo run -p workbench --bin ci-gate -- \
-            --artifact "android-build-outputs-${{ env.ABI }}-${{ env.CACHE-KEY }}" \
-            --upstream "Andr APK build" \
-            --timeout-secs 2700 \
-            --poll-secs 20
-
-      - name: Download Android build outputs
-        uses: actions/download-artifact@v4
-        with:
-          name: android-build-outputs-${{ env.ABI }}-${{ env.CACHE-KEY }}
-          path: android/app/build/outputs
-
       - name: Run offline device tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
@@ -524,17 +512,17 @@ jobs:
           force-avd-creation: true
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -no-metrics
           disable-animations: true
-          # One line only: the emulator-runner action executes each line
-          # of `script` as its own `sh -c`. Every class runs, and the step
-          # fails when any class fails.
-          script: failed=0; for class in ${{ matrix.bucket.classes }}; do KEEP_EMULATORS=1 ./scripts/ci/android_integration_tests_ci.sh -a ${{ env.ABI }} -e "$class" || failed=1; done; exit $failed
+          working-directory: ./android
+          script: ./gradlew :app:connectedProdDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.annotation=org.ZingoLabs.Zingo.OfflineDeviceTest
 
       - name: Upload test reports
         if: ${{ always() && !cancelled() }}
         uses: actions/upload-artifact@v7
         with:
-          name: test-android-integration-reports-${{ env.ABI }}-${{ matrix.bucket.name }}-${{ env.TIMESTAMP }}
-          path: android/app/build/outputs/integration_test_reports
+          name: test-android-offline-device-reports-${{ env.ABI }}-${{ env.TIMESTAMP }}
+          path: |
+            android/app/build/reports/androidTests
+            android/app/build/outputs/androidTest-results
           retention-days: 7
 
       - name: Cancel the run on failure (fail-all)
@@ -547,3 +535,21 @@ jobs:
               repo: context.repo.repo,
               run_id: context.runId,
             });
+
+  # Transitional alias. The dev branch protection requires a check with
+  # the name "accounts". Issue 1510 removes this job together with that
+  # requirement. A skipped job reports success to branch protection, and
+  # this job therefore always runs and fails unless the offline device
+  # tests passed.
+  accounts:
+    name: accounts
+    needs:
+      - android-offline-device-test
+    if: ${{ always() }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Report the result of the offline device tests
+        env:
+          RESULT: ${{ needs.android-offline-device-test.result }}
+        run: test "$RESULT" = "success"

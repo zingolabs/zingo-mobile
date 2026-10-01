@@ -16,6 +16,7 @@ import java.io.File
  * Run: ./gradlew :app:connectedProdDebugAndroidTest \
  *   -Pandroid.testInstrumentationRunnerArguments.class=org.ZingoLabs.Zingo.WalletSeedSalvageTest
  */
+@OfflineDeviceTest
 class WalletSeedSalvageTest {
     private val fileName = Constants.WalletFileName.value
     private val context = InstrumentationRegistry.getInstrumentation().targetContext

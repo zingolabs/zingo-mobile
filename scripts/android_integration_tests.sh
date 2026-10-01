@@ -15,7 +15,7 @@ else
     intel_host_os=true
 fi
 create_snapshot=false
-test_name_default="ExecuteVersionFromSeed"
+test_name_default="BuildDescriptorTest"
 valid_api_levels=("26" "27" "28" "29" "30" "31" "32" "33" "34" "35" "36")
 valid_api_targets=("default" "google_apis" "google_apis_playstore" "google_atd" "google-tv" \
     "aosp_atd" "android-tv" "android-desktop" "android-wear" "android-wear-cn")
@@ -121,7 +121,7 @@ while getopts 'a:Al:e:t:sx:h' OPTION; do
             echo -e "\n  -A\t\tSets default system image of arm abis to arm instead of x86 (optional)"
             echo -e "      \t\t  ARM hosts are auto-detected; this flag forces the ARM mapping"
             echo -e "\n  -e\t\tSelect test name or test suite (optional)"
-            echo -e "      \t\t  Default: ExecuteVersionFromSeed"
+            echo -e "      \t\t  Default: BuildDescriptorTest"
             echo -e "\n  -l\t\tSelect API level (optional)"
             echo -e "      \t\t  Minimum API level: 23"
             echo -e "\n  -t\t\tSelect API target (optional)"
