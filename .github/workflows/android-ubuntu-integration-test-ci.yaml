@@ -433,7 +433,7 @@ jobs:
           - name: accounts
             classes: ExecuteVersionFromSeed ExecuteAddressesFromSeed ExecuteAddressesFromUfvk ExecuteParseAddressForTex ExecuteParseAddressInvalid PriceRefusedWithoutMixnet
           - name: wallet-files
-            classes: DoubleWrapReproTest WalletFileMemoryTest WalletFileRepairTest WalletSeedSalvageTest
+            classes: DoubleWrapReproTest WalletFileMemoryTest WalletFileRepairTest WalletSeedSalvageTest WalletSwapRecoveryTest WalletDeleteTest
     env:
       CACHE-KEY: ${{ inputs.cache-key }}
     steps:
