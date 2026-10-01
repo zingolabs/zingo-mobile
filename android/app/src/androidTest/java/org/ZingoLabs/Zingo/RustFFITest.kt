@@ -283,14 +283,14 @@ class BuildDescriptorTest {
     }
 }
 
-@StaticChainTest
+@PublicChainTest
 class ExecuteSyncFromSeed {
     @Test
     fun executeSyncFromSeed() {
         val mapper = testMapper()
 
         val window = 10_000L
-        val deadlineSeconds = 30 * 60
+        val deadlineSeconds = 5 * 60
         val seed = Seeds.HOSPITAL
         val servers = listOf(MainnetServers.PRIMARY, MainnetServers.FALLBACK)
 
