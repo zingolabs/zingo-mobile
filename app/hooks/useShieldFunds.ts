@@ -18,6 +18,10 @@ import { shieldConfirm, shieldPropose } from '@app/walletBackend';
 import type { FfiResult } from '@app/walletBackend';
 import { RPCShieldProposeType } from '@app/walletBackend/types/RPCShieldProposeType';
 import { RPCShieldType } from '@app/walletBackend/types/RPCShieldType';
+import {
+  MixnetView,
+  sendGateOpen,
+} from '@app/walletBackend/transforms/mixnetView';
 import Utils from '@app/utils';
 
 type UseShieldFundsInput = {
@@ -34,6 +38,7 @@ type UseShieldFundsInput = {
   setBackgroundError: ((title: string, err: string) => void) | undefined;
   setScrollToTop: ((v: boolean) => void) | undefined;
   setScrollToBottom: ((v: boolean) => void) | undefined;
+  mixnetView: MixnetView | null;
 };
 
 type UseShieldFundsResult = {
@@ -71,12 +76,19 @@ export function useShieldFunds({
   setBackgroundError,
   setScrollToTop,
   setScrollToBottom,
+  mixnetView,
 }: UseShieldFundsInput): UseShieldFundsResult {
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const [showShieldButton, setShowShieldButton] = useState<boolean>(false);
   const [shieldingFee, setShieldingFee] = useState<number>(0);
   // useRef so the lock persists across re-renders (a `let` inside useEffect resets every invocation)
   const shieldProposeLockRef = useRef<boolean>(false);
+  // The confirm dialog holds the handler of the render that opened it, so the
+  // handler reads the view through a ref to see the view at confirm time.
+  const mixnetViewRef = useRef(mixnetView);
+  useEffect(() => {
+    mixnetViewRef.current = mixnetView;
+  }, [mixnetView]);
 
   useEffect(() => {
     const runShieldPropose = async (): Promise<FfiResult<string>> => {
@@ -156,6 +168,10 @@ export function useShieldFunds({
     }
     if (!netInfo.isConnected || server.kind === 'offline') {
       addLastSnackbar(translate('loadedapp.connection-error') as string);
+      return;
+    }
+    if (!sendGateOpen(mixnetViewRef.current)) {
+      addLastSnackbar(translate('send.nym-blocked') as string);
       return;
     }
 

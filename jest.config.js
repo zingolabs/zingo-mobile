@@ -4,11 +4,18 @@ module.exports = {
   preset: 'react-native',
   testEnvironment: '<rootDir>/jest-environment-react-native.js',
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
-  modulePathIgnorePatterns: ['e2e', '<rootDir>/.claude/'],
+  // The zingolib submodule holds the Binding Layer's target and build
+  // directories, and no JavaScript, so the haste map skips it as Metro does.
+  modulePathIgnorePatterns: [
+    'e2e',
+    '<rootDir>/.claude/',
+    '<rootDir>/zingolib/',
+  ],
   // visual/ holds Playwright specs, run by `yarn visual:capture`.
   testPathIgnorePatterns: [
     '/node_modules/',
     '<rootDir>/visual/',
+    '<rootDir>/zingolib/',
     '<rootDir>/__tests__/helpers/',
   ],
   transform: {

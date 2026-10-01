@@ -26,12 +26,17 @@ jobs:
   # the whole run (see CONTEXT.md). Nightly leaves fail-all off to keep
   # the complete picture.
 
-  # Runs from t=0 with no dependencies: catches app-module Kotlin compile
-  # breakage (e.g. classpath conflicts) in a few minutes, long before the
-  # native builds and emulator jobs report.
+  # The four Gradle checks below compile against the Kotlin bindings that
+  # the kotlin-bindings action generates on the host at workflow launch.
+  # They start before any cross build and finish while andr-build runs.
+
+  # Catches app-module Kotlin compile breakage (e.g. classpath conflicts) in
+  # a few minutes, long before the emulator jobs report.
   andr-kotlin-compile:
     uses: ./.github/workflows/android-kotlin-compile.yaml
+    needs: create-cache-key
     with:
+      cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
       fail-all: true
 
   # Static analysis of the app module. NewApi is the one that matters here:
@@ -39,7 +44,9 @@ jobs:
   # as a crash on a user's older device.
   andr-lint:
     uses: ./.github/workflows/android-lint.yaml
+    needs: create-cache-key
     with:
+      cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
       fail-all: true
 
   # The plain-JVM bridge-contract tests (FfiOutcome, FfiArgs): the only
@@ -47,7 +54,9 @@ jobs:
   # the compile check.
   andr-unit-test:
     uses: ./.github/workflows/android-unit-test.yaml
+    needs: create-cache-key
     with:
+      cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
       fail-all: true
 
   jest-test:
@@ -61,8 +70,15 @@ jobs:
     with:
       fail-all: true
 
-  nym-proxy-ffi-check:
-    uses: ./.github/workflows/nym-proxy-ffi-check.yaml
+  workbench-test:
+    uses: ./.github/workflows/workbench-test.yaml
+    with:
+      fail-all: true
+
+  # zingolib's CI leaves the wallet crate and the proxy crate untested, and
+  # this job tests both at the pinned commit.
+  binding-layer-check:
+    uses: ./.github/workflows/binding-layer-check.yaml
     with:
       fail-all: true
 
@@ -81,8 +97,10 @@ jobs:
 
   andr-dependency-analysis:
     uses: ./.github/workflows/android-dependency-analysis.yaml
+    needs: create-cache-key
     secrets: inherit
     with:
+      cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
       fail-all: true
 
   create-timestamp:
@@ -111,7 +129,7 @@ jobs:
   # still builds for the device ABIs and 32-bit x86 without waiting for
   # ci-nightly. They block like every other check. Standard runners keep
   # these off the zingo-android-native-16 pool; the per-arch caches make
-  # them no-ops on pushes that leave the Rust inputs untouched.
+  # them no-ops on pushes that leave the zingolib pin untouched.
   andr-build-other-abis:
     strategy:
       matrix:
@@ -165,17 +183,19 @@ jobs:
       - andr-unit-test
       - jest-test
       - rust-shear
+      - workbench-test
+      - binding-layer-check
       - js-depcheck
       - js-static-checks
       - andr-dependency-analysis
       - create-cache-key
       - andr-ubu-integra-test-ci
     with:
-      cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
+      cache-key: ${{ needs.create-cache-key.outputs.ios-cache-key }}
 
   ios-integration-test:
     uses: ./.github/workflows/ios-integration-test.yaml
     needs: [create-cache-key, ios-build]
     secrets: inherit
     with:
-      cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
+      cache-key: ${{ needs.create-cache-key.outputs.ios-cache-key }}
