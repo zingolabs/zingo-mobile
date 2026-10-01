@@ -265,10 +265,7 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
                     ) as string
                   }
                   onPress={onPressShieldFunds}
-                  disabled={
-                    calculateDisableButtonToShield() ||
-                    !sendGateOpen(mixnetView)
-                  }
+                  disabled={!sendGateOpen(mixnetView)}
                 />
               </View>
             </View>

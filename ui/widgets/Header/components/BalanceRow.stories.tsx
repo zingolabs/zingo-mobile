@@ -7,6 +7,7 @@ import {
   withNavigation,
 } from '../../../../.storybook/storyDecorators';
 import {
+  mixnetOff,
   mixnetReady,
   mockInfo,
   mockTotalBalance,
@@ -51,5 +52,11 @@ export const WithShield: Story = {
     showShieldButton: true,
     calculateDisableButtonToShield: () => false,
     calculateAmountToShield: () => '0.5',
+  },
+};
+export const WithShieldBlocked: Story = {
+  args: {
+    ...WithShield.args,
+    mixnetView: mixnetOff,
   },
 };
