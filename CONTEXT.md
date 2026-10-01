@@ -202,13 +202,13 @@ branch protection requires; its failure withholds the merge verdict.
 Jest, rust-shear, the workbench tests, the Binding Layer crate tests,
 js-depcheck, the JS static checks, andr-dependency-analysis, the Android
 Kotlin compile, the Android JVM unit tests, the Android build chain for
-every ABI, the offline device tests, and the Android integration buckets
-are blocking checks.
+every ABI, the offline device tests, the Android integration buckets,
+the iOS Binding Layer build, and the iOS integration test are blocking
+checks.
 
 **Advisory stage** — a PR CI job that records its result without
 affecting the pull request verdict. No PR stage currently runs in
-advisory mode: every job's failure fails its run. ci-nightly remains
-the enforced gate for the device ABIs and iOS.
+advisory mode: every job's failure fails its run.
 
 **Merge verdict** — the moment every status check that branch protection
 requires has passed and the pull request can land.
@@ -229,8 +229,7 @@ integration buckets.
 
 **Trailing stage** — a PR CI job that starts only after every blocking
 check has passed. Its failure fails the run and leaves the merge verdict
-unchanged. The iOS build and the iOS integration test are trailing
-stages.
+unchanged. No PR CI job currently runs as a trailing stage.
 
 **Bucket** — a group of Android integration tests that share one CI job,
 so runner setup and emulator boot amortize across the group instead of

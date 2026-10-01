@@ -6,6 +6,12 @@ on:
       cache-key:
         required: true
         type: string
+      # Fail-all (see CONTEXT.md): when true, a failure here cancels the
+      # whole run. PR CI opts in; ci-nightly does not.
+      fail-all:
+        required: false
+        type: boolean
+        default: false
       advisory:
         # Advisory mode: job failures are recorded but do not fail the
         # caller, for runs where iOS is informational (per-PR CI) rather
@@ -159,3 +165,14 @@ jobs:
       - name: Cleaning up build
         run: |
           rm -rf build/reports build/DerivedData || true
+
+      - name: Cancel the run on failure (fail-all)
+        if: ${{ failure() && inputs.fail-all }}
+        uses: actions/github-script@v9
+        with:
+          script: |
+            await github.rest.actions.cancelWorkflowRun({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.runId,
+            });

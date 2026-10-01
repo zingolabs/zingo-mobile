@@ -6,6 +6,12 @@ on:
       cache-key:
         required: true
         type: string
+      # Fail-all (see CONTEXT.md): when true, a failure here cancels the
+      # whole run. PR CI opts in; ci-nightly does not.
+      fail-all:
+        required: false
+        type: boolean
+        default: false
       advisory:
         # Advisory mode: job failures are recorded but do not fail the
         # caller, for runs where iOS is informational (per-PR CI) rather
@@ -56,6 +62,17 @@ jobs:
       - name: Set cache-found
         id: ios-set-cache-found
         run: echo "ios-cache-found=${{ steps.ios-check-build-cache.outputs.cache-hit }}" >> $GITHUB_OUTPUT
+
+      - name: Cancel the run on failure (fail-all)
+        if: ${{ failure() && inputs.fail-all }}
+        uses: actions/github-script@v9
+        with:
+          script: |
+            await github.rest.actions.cancelWorkflowRun({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.runId,
+            });
 
   ios-build:
     name: Build the iOS Binding Layer
@@ -191,6 +208,17 @@ jobs:
           path: zingolib/bindings/swift/build
           retention-days: 3
 
+      - name: Cancel the run on failure (fail-all)
+        if: ${{ failure() && inputs.fail-all }}
+        uses: actions/github-script@v9
+        with:
+          script: |
+            await github.rest.actions.cancelWorkflowRun({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.runId,
+            });
+
   cache-binding-layer-ios:
     name: Cache the iOS Binding Layer
     needs: ios-build
@@ -217,3 +245,14 @@ jobs:
         with:
           path: zingolib/bindings/swift/build
           key: binding-layer-ios-${{ env.CACHE-KEY }}
+
+      - name: Cancel the run on failure (fail-all)
+        if: ${{ failure() && inputs.fail-all }}
+        uses: actions/github-script@v9
+        with:
+          script: |
+            await github.rest.actions.cancelWorkflowRun({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.runId,
+            });
