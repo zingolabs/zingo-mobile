@@ -152,11 +152,12 @@ const SelectBottomSheet = forwardRef<BottomSheetModal, SelectBottomSheetProps>(
             searchable && keyboardHeight > 0 ? keyboardHeight + 20 : 30,
         }}
       >
-        {filteredItems.map(item => {
+        {filteredItems.map((item, index) => {
           const selected = item.value === value;
           return (
             <Pressable
               key={item.value}
+              testID={testID ? `${testID}.${index}` : undefined}
               onPress={() => {
                 onChange(item.value);
                 dismiss();

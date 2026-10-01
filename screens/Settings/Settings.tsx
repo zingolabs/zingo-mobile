@@ -1245,6 +1245,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
             {translate('settings.server-title') as string}
           </BoldText>
           <Pressable
+            testID="settings.server.close"
             onPress={() => serverBottomSheetRef.current?.close()}
             hitSlop={8}
             style={{ paddingHorizontal: 14, paddingVertical: 4 }}
@@ -1540,6 +1541,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                   {translate('settings.server-title') as string}
                 </BoldText>
                 <TouchableOpacity
+                  testID="settings.server"
                   disabled={disabled}
                   onPress={() => serverBottomSheetRef.current?.present()}
                   style={{ flex: 1, marginLeft: 12 }}
@@ -2287,6 +2289,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       />
       <SelectBottomSheet
         ref={listServerSelectRef}
+        testID="settings.list-server-select"
         title={translate('settings.select-placeholder') as string}
         items={itemsPicker}
         value={listServerUri ?? ''}
