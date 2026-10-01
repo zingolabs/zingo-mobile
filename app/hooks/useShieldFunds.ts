@@ -18,10 +18,8 @@ import { shieldConfirm, shieldPropose } from '@app/walletBackend';
 import type { FfiResult } from '@app/walletBackend';
 import { RPCShieldProposeType } from '@app/walletBackend/types/RPCShieldProposeType';
 import { RPCShieldType } from '@app/walletBackend/types/RPCShieldType';
-import {
-  MixnetView,
-  sendGateOpen,
-} from '@app/walletBackend/transforms/mixnetView';
+import { MixnetView } from '@app/walletBackend/transforms/mixnetView';
+import { useSendGate } from '@app/hooks/useSendGate';
 import Utils from '@app/utils';
 
 type UseShieldFundsInput = {
@@ -83,12 +81,7 @@ export function useShieldFunds({
   const [shieldingFee, setShieldingFee] = useState<number>(0);
   // useRef so the lock persists across re-renders (a `let` inside useEffect resets every invocation)
   const shieldProposeLockRef = useRef<boolean>(false);
-  // The confirm dialog holds the handler of the render that opened it, so the
-  // handler reads the view through a ref to see the view at confirm time.
-  const mixnetViewRef = useRef(mixnetView);
-  useEffect(() => {
-    mixnetViewRef.current = mixnetView;
-  }, [mixnetView]);
+  const sendGateOpenNow = useSendGate(mixnetView);
 
   useEffect(() => {
     const runShieldPropose = async (): Promise<FfiResult<string>> => {
@@ -170,7 +163,7 @@ export function useShieldFunds({
       addLastSnackbar(translate('loadedapp.connection-error') as string);
       return;
     }
-    if (!sendGateOpen(mixnetViewRef.current)) {
+    if (!sendGateOpenNow()) {
       addLastSnackbar(translate('send.nym-blocked') as string);
       return;
     }
@@ -211,6 +204,7 @@ export function useShieldFunds({
     addLastSnackbar,
     netInfo.isConnected,
     server,
+    sendGateOpenNow,
     translate,
     navigation,
     setScrollToTop,

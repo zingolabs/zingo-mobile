@@ -45,6 +45,7 @@ import FadeText from '@ui/primitives/FadeText';
 import BoldText from '@ui/primitives/BoldText';
 import Swap from '../../assets/img/swap.svg';
 import { sendGateOpen } from '@app/walletBackend/transforms/mixnetView';
+import { useSendGate } from '@app/hooks/useSendGate';
 import ErrorText from '@ui/primitives/ErrorText';
 import RegText from '@ui/primitives/RegText';
 import ZecAmount from '@ui/widgets/ZecAmount';
@@ -193,6 +194,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   const [validAmount, setValidAmount] = useState<number>(0); // 1 - OK, 0 - Empty, -1 - Invalid number, -2 - Invalid Amount
   const [validMemo, setValidMemo] = useState<number>(0); // 1 - OK, 0 - Empty, -1 - KO
   const [sendButtonEnabled, setSendButtonEnabled] = useState<boolean>(false);
+  const sendGateOpenNow = useSendGate(mixnetView);
   const [itemsPicker, setItemsPicker] = useState<
     { label: string; value: string }[]
   >([]);
@@ -948,6 +950,10 @@ const Send: React.FunctionComponent<SendProps> = ({
     const sendAllSend = isSendAllAmount(sendPageStatePar.toaddr.amount);
     if (!netInfo.isConnected || server.kind === 'offline') {
       addLastSnackbar(translate('loadedapp.connection-error') as string);
+      return;
+    }
+    if (!sendGateOpenNow()) {
+      addLastSnackbar(translate('send.nym-blocked') as string);
       return;
     }
 
