@@ -114,8 +114,7 @@ jobs:
   # PR CI executes tests on the emulator ABI (x86_64 / API 34), not the
   # device ABIs: KVM accelerates an AVD only when the guest matches the
   # x86_64 host, so arm64-v8a and armeabi-v7a can never run on hosted
-  # runners. The x86 / API 29 emulator lane and the iOS pipeline — whose
-  # macOS-runner queue dominated PR wall-clock — run on ci-nightly.
+  # runners. The x86 / API 29 emulator lane runs on ci-nightly.
   andr-build:
     strategy:
       matrix:
@@ -179,27 +178,14 @@ jobs:
       runner: ${{ vars.CI_EMULATOR_RUNNER || 'ubuntu-24.04' }}
       fail-all: true
 
-  # iOS runs per-PR as a trailing stage: it starts only after every
-  # blocking check has passed, so the fast path's verdict is never
-  # delayed by the macOS-runner queue and a red fast path skips iOS
-  # entirely. Its failures fail the run like any other job.
+  # iOS starts at workflow launch, in parallel with the Android chain,
+  # and its jobs are blocking checks.
   ios-build:
     uses: ./.github/workflows/ios-build.yaml
-    needs:
-      - andr-kotlin-compile
-      - andr-lint
-      - andr-unit-test
-      - jest-test
-      - rust-shear
-      - workbench-test
-      - binding-layer-check
-      - js-depcheck
-      - js-static-checks
-      - andr-dependency-analysis
-      - create-cache-key
-      - andr-ubu-integra-test-ci
+    needs: create-cache-key
     with:
       cache-key: ${{ needs.create-cache-key.outputs.ios-cache-key }}
+      fail-all: true
 
   ios-integration-test:
     uses: ./.github/workflows/ios-integration-test.yaml
@@ -207,3 +193,4 @@ jobs:
     secrets: inherit
     with:
       cache-key: ${{ needs.create-cache-key.outputs.ios-cache-key }}
+      fail-all: true
