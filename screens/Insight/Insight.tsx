@@ -28,6 +28,7 @@ import ZecAmount from '@ui/widgets/ZecAmount';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
 import Utils from '@app/utils';
+import { mask } from '@app/utils/reveal';
 import FadeText from '@ui/primitives/FadeText';
 import Header from '@ui/widgets/Header';
 import {
@@ -284,12 +285,14 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
                 )}
                 {!expandAddress[index] && !!item.address && (
                   <RegText>
-                    {item.address.length > (dimensions.width < 500 ? 10 : 20)
-                      ? Utils.trimToSmall(
-                          item.address,
-                          dimensions.width < 500 ? 5 : 10,
-                        )
-                      : item.address}
+                    {privacy && item.address !== 'fee'
+                      ? mask(item.address)
+                      : item.address.length > (dimensions.width < 500 ? 10 : 20)
+                        ? Utils.trimToSmall(
+                            item.address,
+                            dimensions.width < 500 ? 5 : 10,
+                          )
+                        : item.address}
                   </RegText>
                 )}
                 {expandAddress[index] &&

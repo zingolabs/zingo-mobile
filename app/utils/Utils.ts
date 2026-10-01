@@ -14,6 +14,7 @@ import {
 } from 'date-fns/locale';
 
 import { ZecAmountSplitType } from './types/ZecAmountSplitType';
+import { TRIM_KEEP_DEFAULT, chunks, trim } from './reveal';
 import {
   ChainNameEnum,
   ErrorKeyed,
@@ -36,11 +37,7 @@ import { RPCReceiversEnum } from '@app/walletBackend/enums/RPCReceiversEnum';
 
 export default class Utils {
   static trimToSmall(addr?: string, numChars?: number): string {
-    if (!addr) {
-      return '';
-    }
-    const trimSize = numChars || 5;
-    return `${addr.slice(0, trimSize)}...${addr.slice(addr.length - trimSize)}`;
+    return addr ? trim(addr, numChars || TRIM_KEEP_DEFAULT) : '';
   }
 
   static splitZecAmountIntoBigSmall(zecValue?: number): ZecAmountSplitType {
@@ -97,22 +94,7 @@ export default class Utils {
   }
 
   static splitStringIntoChunks(s: string, numChunks: number): string[] {
-    if (!s || numChunks > s.length) {
-      return [s];
-    }
-    if (s.length < 16) {
-      return [s];
-    }
-
-    const chunkSize = Math.round(s.length / numChunks);
-    const chunks = [];
-    for (let i = 0; i < numChunks - 1; i++) {
-      chunks.push(s.slice(i * chunkSize, i * chunkSize + chunkSize));
-    }
-    // Last chunk might contain un-even length
-    chunks.push(s.slice((numChunks - 1) * chunkSize));
-
-    return chunks;
+    return chunks(s, numChunks);
   }
 
   // NYM
