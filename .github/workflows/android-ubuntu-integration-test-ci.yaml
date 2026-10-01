@@ -25,6 +25,14 @@ on:
         required: false
         type: boolean
         default: false
+      # Runner label for the emulator jobs: the buckets and the offline
+      # device tests. PR CI passes CI_EMULATOR_RUNNER. The runner must
+      # expose /dev/kvm. The value is one label, or a JSON array of labels
+      # such as ["warp-ubuntu-latest-x64-8x", "nested-virtualization.enabled=true"].
+      runner:
+        required: false
+        type: string
+        default: ubuntu-24.04
 
 env:
   REPO-OWNER: ${{ github.repository_owner }}
@@ -147,7 +155,7 @@ jobs:
     name: ${{ matrix.bucket.name }}
     needs:
       - android-ubuntu-integration-test-ci-avd-cache
-    runs-on: ubuntu-24.04
+    runs-on: ${{ startsWith(inputs.runner, '[') && fromJSON(inputs.runner) || inputs.runner }}
     # Bounds the harness build, the regtest launch, and the test run.
     timeout-minutes: 45
     strategy:
@@ -426,7 +434,7 @@ jobs:
     name: offline device tests
     needs:
       - android-ubuntu-integration-test-ci-avd-cache
-    runs-on: ubuntu-24.04
+    runs-on: ${{ startsWith(inputs.runner, '[') && fromJSON(inputs.runner) || inputs.runner }}
     # Bounds the debug build, the emulator boot, and the test run. Each
     # test has its own limit in android/app/build.gradle.kts.
     timeout-minutes: 30

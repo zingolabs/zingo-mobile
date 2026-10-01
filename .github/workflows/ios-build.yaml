@@ -13,14 +13,16 @@ on:
         required: false
         default: false
         type: boolean
-      # Runner label for the build job. warp-macos-15-arm64-12x is
-      # WarpBuild's 12-vCPU M4 Pro machine. The org's GitHub pools are
-      # zingo-ios-build-m2 (m2-5-core) and zingo-ios-build-12 (Intel), and
-      # the stock macos-15 label has three cores.
+      # Runner label for the build job. The CI_IOS_RUNNER repository
+      # variable sets it for every caller. The fallback
+      # warp-macos-15-arm64-12x is WarpBuild's 12-vCPU M4 Pro machine. The
+      # org's GitHub pools are zingo-ios-build-m2 (m2-5-core) and
+      # zingo-ios-build-12 (Intel), and the stock macos-15 label has three
+      # cores.
       runner:
         required: false
         type: string
-        default: warp-macos-15-arm64-12x
+        default: ${{ vars.CI_IOS_RUNNER || 'warp-macos-15-arm64-12x' }}
 
 env:
   CACHE-KEY: ${{ inputs.cache-key }}
