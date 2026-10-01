@@ -305,6 +305,12 @@ The network path a mixnet-only surface resolves to, either the Standing
 Client's tunnel or clearnet. zingolib derives it from the indicator, and the
 app never sees it.
 
+**Mixnet refusal**:
+The typed error a mixnet-only surface raises when the indicator is not
+`ready`. The surface refuses, and it does not fall back to clearnet.
+_Avoid_: refusal test (two tests check a mixnet refusal: the price refusal
+test and the transmission refusal test)
+
 ## Price surface
 
 Vocabulary for the ZEC/USD display and its fetch lifecycle.
