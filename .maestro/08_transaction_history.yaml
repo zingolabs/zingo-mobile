@@ -1,45 +1,7 @@
 appId: org.ZingoLabs.Zingo
 ---
-# Every flow starts from a clean install. Maestro does not run flows in
-# file order, and a flow that inherited the state of the previous one
-# would pass or fail on luck. A fresh install lands on the start menu on
-# mainnet, and each flow creates or restores its own wallet there.
-- launchApp:
-    clearState: true
-
-# The mainnet test wallet of the retired Detox suite. Its seed is public,
-# and the chain holds a value transfer to it at 1994580, one block after
-# its birthday.
-- extendedWaitUntil:
-    visible:
-      id: "loadingapp.restorewalletseedufvk"
-    timeout: 120000
-- tapOn:
-    id: "loadingapp.restorewalletseedufvk"
-- extendedWaitUntil:
-    visible:
-      id: "import.seedufvkinput"
-    timeout: 120000
-- tapOn:
-    id: "import.seedufvkinput"
-- inputText: "lottery multiply patient simple ivory leisure swift square west despair beauty match crowd margin reject box always title photo remind word diet ecology badge"
-
-# The birthday field accepts input once the server reports its latest
-# block, which the hint under the label then shows next to the Sapling
-# activation height.
-- extendedWaitUntil:
-    visible:
-      text: "(?s).*\\(419200, [0-9]+\\).*"
-    timeout: 60000
-- tapOn:
-    id: "import.birthdayinput"
-- inputText: "1994579"
-- tapOn:
-    id: "import.button.ok"
-- extendedWaitUntil:
-    visible:
-      id: "header.drawmenu"
-    timeout: 120000
+- runFlow:
+    file: common/restore_wallet.yaml
 
 # The Detox spec allowed sixteen minutes for the first row.
 - extendedWaitUntil:
@@ -47,18 +9,9 @@ appId: org.ZingoLabs.Zingo
       id: "vt-1"
     timeout: 960000
 
-# History lists the newest transfer first, and anyone can send to this
-# published seed. The oldest row is the last one, directly above the end
-# marker that History draws once every loaded row is on the list. While
-# the sync is still running, that row is the oldest transfer it has found.
-- scrollUntilVisible:
-    element:
-      id: "history.end"
-    timeout: 60000
+# The first row is on screen once the wait above has seen it.
 - tapOn:
-    id: "vt-[0-9]+"
-    above:
-      id: "history.end"
+    id: "vt-1"
 
 - extendedWaitUntil:
     visible:

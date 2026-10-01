@@ -1,28 +1,7 @@
 appId: org.ZingoLabs.Zingo
 ---
-# Every flow starts from a clean install. Maestro does not run flows in
-# file order, and a flow that inherited the state of the previous one
-# would pass or fail on luck. A fresh install lands on the start menu on
-# mainnet, and each flow creates or restores its own wallet there.
-- launchApp:
-    clearState: true
-
-- extendedWaitUntil:
-    visible:
-      id: "loadingapp.createnewwallet"
-    timeout: 120000
-- tapOn:
-    id: "loadingapp.createnewwallet"
-- extendedWaitUntil:
-    visible:
-      id: "newseed.button.ok"
-    timeout: 120000
-- tapOn:
-    id: "newseed.button.ok"
-- extendedWaitUntil:
-    visible:
-      id: "header.drawmenu"
-    timeout: 120000
+- runFlow:
+    file: common/create_wallet.yaml
 
 # The Send tab shows for every remote server, with a zero balance and
 # before the mixnet is ready. The mixnet gates only the send button, and
