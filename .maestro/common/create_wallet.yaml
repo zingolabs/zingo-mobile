@@ -1,0 +1,11 @@
+appId: org.ZingoLabs.Zingo
+---
+# Every flow starts from a clean install. Maestro does not run flows in
+# file order, and a flow that inherited the state of the previous one
+# would pass or fail on luck. A fresh install lands on the start menu on
+# mainnet, and each flow creates or restores its own wallet there.
+- launchApp:
+    clearState: true
+
+- runFlow:
+    file: new_wallet_from_start_menu.yaml
