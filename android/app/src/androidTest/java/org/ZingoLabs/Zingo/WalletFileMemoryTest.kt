@@ -20,6 +20,7 @@ import java.io.File
  * Run: ./gradlew :app:connectedProdDebugAndroidTest \
  *   -Pandroid.testInstrumentationRunnerArguments.class=org.ZingoLabs.Zingo.WalletFileMemoryTest
  */
+@OfflineDeviceTest
 class WalletFileMemoryTest {
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
     private val dir get() = context.filesDir

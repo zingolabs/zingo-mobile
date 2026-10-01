@@ -1,0 +1,19 @@
+appId: org.ZingoLabs.Zingo
+---
+- runFlow:
+    file: common/restore_wallet.yaml
+
+# The Detox spec allowed sixteen minutes for the first row.
+- extendedWaitUntil:
+    visible:
+      id: "vt-1"
+    timeout: 960000
+
+# The first row is on screen once the wait above has seen it.
+- tapOn:
+    id: "vt-1"
+
+- extendedWaitUntil:
+    visible:
+      id: "valuetransferdetail.scroll-view"
+    timeout: 10000

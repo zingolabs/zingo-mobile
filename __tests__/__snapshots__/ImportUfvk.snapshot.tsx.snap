@@ -137,8 +137,6 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
       }
     >
       <View
-        accessibilityLabel=""
-        accessible={true}
         style={
           {
             "flex": 1,
@@ -149,6 +147,8 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
         }
       >
         <TextInput
+          accessibilityLabel=""
+          accessible={true}
           autoComplete="off"
           autoCorrect={false}
           keyboardType="visible-password"
@@ -252,8 +252,6 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
          (1, --)
       </Text>
       <View
-        accessibilityLabel=""
-        accessible={true}
         style={
           {
             "alignItems": "center",
@@ -271,6 +269,8 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
         }
       >
         <TextInput
+          accessibilityLabel=""
+          accessible={true}
           editable={false}
           keyboardType="numeric"
           onChangeText={[Function]}

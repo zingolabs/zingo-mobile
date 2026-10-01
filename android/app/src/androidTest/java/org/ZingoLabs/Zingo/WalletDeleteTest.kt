@@ -15,6 +15,7 @@ import java.io.File
  * Run: ./gradlew :app:connectedProdDebugAndroidTest \
  *   -Pandroid.testInstrumentationRunnerArguments.class=org.ZingoLabs.Zingo.WalletDeleteTest
  */
+@OfflineDeviceTest
 class WalletDeleteTest {
     private val mainName = Constants.WalletFileName.value
     private val backupName = Constants.WalletBackupFileName.value
