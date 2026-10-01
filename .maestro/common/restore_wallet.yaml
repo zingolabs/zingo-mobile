@@ -7,9 +7,8 @@ appId: org.ZingoLabs.Zingo
 - launchApp:
     clearState: true
 
-# The mainnet test wallet of the retired Detox suite. Its seed is public,
-# and the chain holds a value transfer to it at 1994580, one block after
-# its birthday.
+# The mainnet test wallet. Its seed is public, and the chain holds a
+# value transfer to it at 1994580, one block after its birthday.
 - extendedWaitUntil:
     visible:
       id: "loadingapp.restorewalletseedufvk"
