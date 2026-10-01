@@ -1,7 +1,5 @@
-/** The time a timed reveal lasts. */
 export const REVEAL_MS = 5 * 1000;
 
-/** The number of characters that a trimmed text keeps at each end by default. */
 export const TRIM_KEEP_DEFAULT = 5;
 
 const MASK_KEEP = 2;
@@ -21,7 +19,6 @@ export type Reveal = { kind: 'hidden' } | { kind: 'shown'; timed: boolean };
 /** A text with the number of lines of its full form and whether its short form is trimmed. */
 export type Field = { text: string; lines: number; trims: boolean };
 
-/** The one form in which a field shows. */
 export type TextView =
   | { kind: 'masked'; text: string }
   | { kind: 'trimmed'; text: string }
@@ -35,7 +32,6 @@ export const shown = (reveal: Reveal, timed: boolean): boolean =>
 export const visible = (reveal: Reveal, timed: boolean): boolean =>
   !timed || shown(reveal, timed);
 
-/** The two ends of a text around three dots. */
 export const trim = (text: string, keep: number): string =>
   `${text.slice(0, keep)}...${text.slice(text.length - keep)}`;
 
@@ -63,7 +59,6 @@ export const mask = (text: string): string => {
   return `${chars.slice(0, keep).join('')}${MASK_DOTS}`;
 };
 
-/** The number of lines that a full address takes. */
 export const addressLines = (address: string): number =>
   address.length === 0
     ? 0
@@ -71,7 +66,6 @@ export const addressLines = (address: string): number =>
       ? ADDRESS_SHORT_LINES
       : address.length / ADDRESS_LINE;
 
-/** The number of lines that a full contact label takes. */
 export const labelLines = (label: string): number =>
   label.length === 0
     ? 0
@@ -96,6 +90,5 @@ export const textView = (
         ? { kind: 'trimmed', text: trim(field.text, TRIM_KEEP) }
         : { kind: 'full', lines: [field.text] };
 
-/** The lines of text that a view renders. */
 export const viewLines = (view: TextView): string[] =>
   view.kind === 'full' ? view.lines : [view.text];
