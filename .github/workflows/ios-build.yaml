@@ -13,6 +13,14 @@ on:
         required: false
         default: false
         type: boolean
+      # Runner label for the build job. The stock Apple silicon runner
+      # has the capacity of GitHub's whole fleet, and the Intel pool
+      # zingo-ios-build-12 serves one job at a time. The release path
+      # passes the pool for its faster cold build.
+      runner:
+        required: false
+        type: string
+        default: macos-15
 
 env:
   CACHE-KEY: ${{ inputs.cache-key }}
@@ -52,7 +60,7 @@ jobs:
     needs: ios-check-build-cache
     if: ${{ needs.ios-check-build-cache.outputs.ios-cache-found != 'true' }}
     continue-on-error: ${{ inputs.advisory }}
-    runs-on: zingo-ios-build-12
+    runs-on: ${{ inputs.runner }}
     env:
       RUSTUP_HOME: ${{ github.workspace }}/.rustup
       CARGO_HOME:  ${{ github.workspace }}/.cargo
@@ -96,9 +104,9 @@ jobs:
       # is all this job needs: zingolib and nym-sdk dominate the build, and
       # their compiled dependencies are what the cache keeps.
       #
-      # Saved from dev only. A cache written on refs/pull/N/merge is invisible
-      # to every other PR, so per-PR saves buy nothing and only add eviction
-      # pressure; the dev copy is readable by all of them.
+      # Saved from every run. A cache written on refs/pull/N/merge serves
+      # the later pushes of that PR, and the dev copy serves the first
+      # push of every PR. The repository's cache quota carries both.
       - name: Cargo cache (registry, git, iOS targets)
         uses: Swatinem/rust-cache@v2
         with:
@@ -106,7 +114,6 @@ jobs:
             zingolib/zingo-ffi -> ../target/binding-layer/ios/wallet
             zingolib/zingo-netutils/nym-proxy-ffi -> ../../target/binding-layer/ios/proxy
             zingolib/tools/workbench
-          save-if: ${{ github.ref == 'refs/heads/dev' }}
 
       - name: Install bindgen-cli (needed by aws-lc-sys, ring etc.)
         run: cargo install --force --locked bindgen-cli
