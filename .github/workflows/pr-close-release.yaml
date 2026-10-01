@@ -1,0 +1,77 @@
+name: PR close release
+
+# When a PR closes (merged or not), release the CI resources that it still
+# holds: cancel its queued and in-progress workflow runs, and delete the
+# Actions caches scoped to its merge ref. A merge does not cancel a run, and
+# a cache of a closed PR's merge ref can serve no later run.
+
+on:
+  pull_request:
+    types: [closed]
+
+permissions:
+  actions: write
+  contents: read
+
+concurrency:
+  group: pr-close-release-${{ github.event.number }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Cancel runs and delete caches
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REPO: ${{ github.repository }}
+    steps:
+      - name: Cancel the PR's unfinished workflow runs
+        env:
+          HEAD_BRANCH: ${{ github.event.pull_request.head.ref }}
+          CLOSED_AT: ${{ github.event.pull_request.closed_at }}
+        run: |
+          set -euo pipefail
+          # The close starts runs of its own, which do the releasing. Those
+          # are created at or after the close, so only earlier runs are
+          # cancelled. Push runs on the branch belong to no PR and stay.
+          ids=$(gh api --paginate \
+            "repos/${REPO}/actions/runs?branch=${HEAD_BRANCH}&event=pull_request&per_page=100" \
+            | jq -r --arg closed "$CLOSED_AT" \
+              '.workflow_runs[]
+               | select(.status != "completed")
+               | select(.created_at < $closed)
+               | .id')
+
+          cancelled=0
+          failed=0
+          for id in $ids; do
+            if gh run cancel "$id" --repo "$REPO"; then
+              cancelled=$((cancelled + 1))
+            else
+              echo "::warning::cancel of run ${id} failed"
+              failed=$((failed + 1))
+            fi
+          done
+          echo "Cancelled ${cancelled} run(s) of ${HEAD_BRANCH} (${failed} failed)."
+
+      - name: Delete the PR's Actions caches
+        env:
+          MERGE_REF: refs/pull/${{ github.event.number }}/merge
+        run: |
+          set -euo pipefail
+          ids=$(gh cache list --repo "$REPO" --ref "$MERGE_REF" --limit 100 \
+            --json id --jq '.[].id')
+
+          deleted=0
+          failed=0
+          for id in $ids; do
+            if gh cache delete "$id" --repo "$REPO"; then
+              deleted=$((deleted + 1))
+            else
+              echo "::warning::delete of cache ${id} failed"
+              failed=$((failed + 1))
+            fi
+          done
+          echo "Deleted ${deleted} cache(s) of ${MERGE_REF} (${failed} failed)."
