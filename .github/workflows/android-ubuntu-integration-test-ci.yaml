@@ -165,10 +165,6 @@ jobs:
       # reports their combined result.
       matrix:
         bucket:
-          - name: send
-            tests: execute_send_from_orchard
-          - name: price-and-value-transfers
-            tests: execute_currentprice_and_value_transfers_from_seed
           - name: ledger-and-parsing
             tests: execute_sapling_balance_from_seed
     env:
@@ -433,9 +429,9 @@ jobs:
   # Device tests without the Rust harness: two Gradle connected-test runs
   # on the debug build. The first selects every class that carries
   # @OfflineDeviceTest. The second selects every class that carries
-  # @PublicChainTest and reads mainnet through a public server. The
-  # Android Test Orchestrator gives each test its own process and cleared
-  # app data.
+  # @PublicChainTest and reads mainnet or testnet through a public server.
+  # The Android Test Orchestrator gives each test its own process and
+  # cleared app data.
   android-device-test:
     name: offline device tests
     needs:
@@ -530,7 +526,8 @@ jobs:
           # The emulator runs one ABI, and the build compiles native code
           # for that ABI alone. The offline run's reports move aside before
           # the public-chain run writes its own. The public-chain run gives
-          # each test 7 minutes, and ExecuteSyncFromSeed holds itself to 5.
+          # each test 7 minutes. ExecuteSyncFromSeed and the testnet fixture
+          # tests hold themselves to 5.
           script: |
             ./gradlew :app:connectedProdDebugAndroidTest -PreactNativeArchitectures=${{ env.ABI }} -Pandroid.testInstrumentationRunnerArguments.annotation=org.ZingoLabs.Zingo.OfflineDeviceTest
             mv app/build/reports/androidTests app/build/reports/androidTests-offline
