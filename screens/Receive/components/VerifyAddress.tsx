@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { View, Keyboard } from 'react-native';
 import { NavigationProp, ParamListBase } from '@react-navigation/native';
 import { useTheme } from '@app/theme';
@@ -23,6 +23,9 @@ type VerifyAddressProps = {
   // from the host (Receive) so the QR button can navigate to ScannerAddress.
   navigation: NavigationProp<ParamListBase>;
 };
+type Verification =
+  { kind: 'unchecked' } | { kind: 'checked'; isWalletAddress: boolean };
+
 const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
   closeSheet,
   screenName,
@@ -34,11 +37,32 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
 
   const [address, setAddress] = useState<string>('');
   const [errorAddress, setErrorAddress] = useState<string>('');
-  const [verifyOK, setVerifyOK] = useState<boolean | null>(null);
+  const [verification, setVerification] = useState<Verification>({
+    kind: 'unchecked',
+  });
+  const [parsing, setParsing] = useState(false);
+  const revision = useRef(0);
+
+  useEffect(() => {
+    setVerification({ kind: 'unchecked' });
+    setParsing(false);
+    return () => {
+      revision.current += 1;
+    };
+  }, [server.chainName]);
 
   const verifyAddress = async () => {
+    if (!address || errorAddress || parsing) {
+      return;
+    }
+    const request = ++revision.current;
+    setVerification({ kind: 'unchecked' });
+    Keyboard.dismiss();
     try {
       const verifyAddressResult = await checkMyAddress(address);
+      if (request !== revision.current) {
+        return;
+      }
       if (!verifyAddressResult.ok) {
         addLastSnackbar(
           verifyAddressResult.error.message,
@@ -46,19 +70,28 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
         );
         setErrorAddress(verifyAddressResult.error.message);
       } else {
-        const verifyAddressJSON: RPCCheckAddressType = await JSON.parse(
+        const verifyAddressJSON: RPCCheckAddressType = JSON.parse(
           verifyAddressResult.value,
         );
-        setVerifyOK(verifyAddressJSON.is_wallet_address);
+        setVerification({
+          kind: 'checked',
+          isWalletAddress: verifyAddressJSON.is_wallet_address,
+        });
       }
     } catch (error) {
-      console.log(`Critical Error new address ${error}`);
+      if (request !== revision.current) {
+        return;
+      }
+      const message = error instanceof Error ? error.message : String(error);
+      addLastSnackbar(message, SnackbarDurationEnum.short);
+      setErrorAddress(message);
     }
-
-    Keyboard.dismiss();
   };
 
   const updateAddress = async (addr: string) => {
+    const request = ++revision.current;
+    setVerification({ kind: 'unchecked' });
+    setParsing(false);
     if (!addr) {
       setAddress('');
       return;
@@ -68,7 +101,12 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
       addr.toLowerCase().startsWith(GlobalConst.zcash) ||
       addr.toLowerCase().includes(':')
     ) {
+      setParsing(true);
       const parsed = await parseZcashURI(addr, server);
+      if (request !== revision.current) {
+        return;
+      }
+      setParsing(false);
 
       // Audit Issue H — surface the parser error and abort before any
       // address-state mutation. A failure result carries no target, so a
@@ -120,7 +158,7 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
           <FadeText style={{ color: colors.fgAccent }}>{errorAddress}</FadeText>
         </View>
       )}
-      {verifyOK !== null && (
+      {verification.kind === 'checked' && (
         <View
           style={{
             flexGrow: 1,
@@ -130,7 +168,7 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
             marginVertical: 5,
           }}
         >
-          {verifyOK ? (
+          {verification.isWalletAddress ? (
             <View
               style={{
                 flexDirection: 'row',
@@ -183,7 +221,7 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
             type={ButtonTypeEnum.Secondary}
             title={translate('cancel') as string}
             onPress={() => {
-              setAddress('');
+              updateAddress('');
               Keyboard.dismiss();
               setTimeout(() => {
                 closeSheet();
@@ -198,7 +236,7 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
               verifyAddress();
             }}
             twoButtons={true}
-            disabled={!address || !!errorAddress}
+            disabled={!address || !!errorAddress || parsing}
           />
         </View>
       </View>
