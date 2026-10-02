@@ -114,6 +114,15 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
   const scrollViewRef = useRef<ScrollView>(null);
   const addressBookSheetRef = useRef<BottomSheet>(null);
   const abDetailSheetRef = useRef<BottomSheetModal>(null);
+  const editSession = useRef(0);
+  const editingAddress = useRef('');
+
+  useEffect(() => {
+    editSession.current += 1;
+    return () => {
+      editSession.current += 1;
+    };
+  }, [route.params?.currentAddress]);
   const keyboardHeight = useKeyboardHeight();
 
   useScrollToTop(scrollViewRef as unknown as React.RefObject<ScrollView>);
@@ -200,6 +209,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
       setAddressBookSliced(abf.slice(0, numAb));
       // find the current address
       if (currentAddress) {
+        editingAddress.current = currentAddress;
         const index: number = abf.findIndex(
           (i: AddressBookFileClass) => i.address === currentAddress,
         );
@@ -226,20 +236,27 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
 
   const openAbDetail = useCallback(
     (newItem: number, newAction: AddressBookActionEnum) => {
+      editSession.current += 1;
+      editingAddress.current = addressBookSliced[newItem]?.address ?? '';
       setCurrentItem(newItem);
       setAction(newAction);
       setAbDetailKey(k => k + 1);
       abDetailSheetRef.current?.present();
     },
-    [],
+    [addressBookSliced],
   );
 
   const newAddressBookItem = useCallback(() => {
     openAbDetail(-1, AddressBookActionEnum.Add);
   }, [openAbDetail]);
 
-  const cancel = () => {
+  const dismissEditor = () => {
+    editSession.current += 1;
     abDetailSheetRef.current?.dismiss();
+  };
+
+  const cancel = () => {
+    dismissEditor();
     setCurrentItem(null);
     setAction(null);
     if (currentAddress) {
@@ -261,6 +278,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
     if (!label || !address) {
       return;
     }
+    const session = editSession.current;
     let ab: AddressBookFileClass[] = [];
     if (a === AddressBookActionEnum.Delete) {
       ab = await AddressBookFileImpl.removeAddressBookItem(label, address);
@@ -282,8 +300,9 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
       return aLabel.localeCompare(bLabel);
     });
     setAddressBook(abSorted);
-    await AddressBookFileImpl.writeAddressBook(abSorted);
-    cancel();
+    if (session === editSession.current) {
+      cancel();
+    }
   };
 
   const handleScrollToTop = useCallback(() => {
@@ -337,6 +356,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
   const addressBookSnapPoints = useFullSheetSnapPoints(containerH, headerH);
 
   const closeScreenAction = useCallback(() => {
+    editSession.current += 1;
     setCurrentItem(null);
     setAction(null);
     setCurrentAddress('');
@@ -445,7 +465,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
         {abDetailTitle}
       </BoldText>
       <Pressable
-        onPress={() => abDetailSheetRef.current?.dismiss()}
+        onPress={dismissEditor}
         hitSlop={8}
         style={{ paddingHorizontal: 14, paddingVertical: 4 }}
       >
@@ -851,6 +871,9 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
       )}
       <AppSheetModal
         ref={abDetailSheetRef}
+        onDismiss={() => {
+          editSession.current += 1;
+        }}
         header={abDetailXHeader}
         contentStyle={{
           paddingBottom: keyboardHeight > 0 ? keyboardHeight + 20 : 30,
@@ -860,10 +883,10 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
           key={`detail-${abDetailKey}`}
           index={currentItem ?? -1}
           item={
-            currentItem !== null &&
-            currentItem > -1 &&
-            addressBookSliced[currentItem]
-              ? addressBookSliced[currentItem]
+            currentItem !== null && currentItem > -1
+              ? (addressBook.find(
+                  entry => entry.address === editingAddress.current,
+                ) ?? ({} as AddressBookFileClass))
               : ({} as AddressBookFileClass)
           }
           cancel={cancel}
