@@ -39,6 +39,7 @@ type HookInput = Parameters<typeof useShieldFunds>[0];
 const hookInput = (
   mixnetView: MixnetView | null,
   addLastSnackbar: jest.Mock,
+  isConnected: boolean = true,
 ): HookInput => ({
   readOnly: false,
   setShieldingAmount: jest.fn(),
@@ -48,7 +49,7 @@ const hookInput = (
   shieldingAmount: 0.5,
   translate,
   netInfo: {
-    isConnected: true,
+    isConnected,
     type: NetInfoStateType.wifi,
     isConnectionExpensive: false,
   },
@@ -92,6 +93,24 @@ describe('useShieldFunds mixnet send gate', () => {
 
     expect(confirmMock).not.toHaveBeenCalled();
     expect(addLastSnackbar).toHaveBeenCalledWith('send.nym-blocked');
+  });
+
+  test('Tests that confirming does not shield when the device disconnects while the confirm dialog is open. The dialog opened on a connected device.', async () => {
+    const addLastSnackbar = jest.fn();
+    const { result, rerender } = renderHook(
+      ({ isConnected }: { isConnected: boolean }) =>
+        useShieldFunds(hookInput(mixnetReady, addLastSnackbar, isConnected)),
+      { initialProps: { isConnected: true } },
+    );
+    const confirm = openConfirmDialog(result.current.onPressShieldFunds);
+
+    rerender({ isConnected: false });
+    await act(async () => {
+      await confirm();
+    });
+
+    expect(confirmMock).not.toHaveBeenCalled();
+    expect(addLastSnackbar).toHaveBeenCalledWith('loadedapp.connection-error');
   });
 
   test('Tests that confirming does not shield when the mixnet view blocks sends from the start.', async () => {

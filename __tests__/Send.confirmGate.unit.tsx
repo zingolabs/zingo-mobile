@@ -28,10 +28,19 @@ jest.mock('@app/RPCModule', () =>
   require('../__mocks__/rpcModuleProxy').rpcModuleProxyMock(),
 );
 
+jest.mock('@app/uris', () => ({
+  ...jest.requireActual('@app/uris'),
+  fetchServerList: jest.fn(),
+}));
+
+jest.mock('@app/services/selectingServer', () => ({
+  __esModule: true,
+  default: jest.fn(),
+}));
+
 /**
- * The send flow's own mixnet send gate. The Send button's disabled state is
- * one guard; the Confirm screen holds the confirm handler of the render that
- * opened it, so the handler checks the gate again when the user confirms.
+ * The Confirm screen holds the confirm handler of the render that opened it.
+ * These tests change the app state after that render and then confirm.
  */
 
 import 'react-native';
@@ -46,18 +55,29 @@ import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
 } from '@app/context';
-import { RouteEnum, SendPageStateClass, ToAddrClass } from '@app/AppState';
+import {
+  ChainNameEnum,
+  RouteEnum,
+  SendPageStateClass,
+  ToAddrClass,
+  offlineServer,
+} from '@app/AppState';
+import type { TranslateType } from '@app/AppState';
+import { errorKeyed } from '@app/AppState/types/Result';
 import { AppDrawerParamList } from '@app/types';
+import { fetchServerList } from '@app/uris';
 import Utils from '@app/utils';
 import RPCModule from '@app/RPCModule';
-import { MixnetView } from '@app/walletBackend/transforms/mixnetView';
+import {
+  SendPermitInputs,
+  sendPermit,
+} from '@app/walletBackend/transforms/sendPermit';
 import { mixnetLost, mixnetReady } from '../.storybook/storyMocks';
 import { mockAddresses } from '../__mocks__/dataMocks/mockAddresses';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 import { mockServer } from '../__mocks__/dataMocks/mockServer';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
-import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockValueTransfers } from '../__mocks__/dataMocks/mockValueTransfers';
 
 const FEE_ZATOSHIS = 10_000;
@@ -84,26 +104,39 @@ function makeDrawerProps(): NativeStackScreenProps<
   };
 }
 
-const sendUi = (
-  mixnetView: MixnetView,
-  sendTransaction: jest.Mock,
-  addLastSnackbar: jest.Mock,
-) => {
-  const state = { ...defaultAppContextLoaded };
-  state.valueTransfers = mockValueTransfers;
-  state.addresses = mockAddresses;
-  state.translate = mockTranslate;
-  state.info = mockInfo;
-  state.server = mockServer;
-  state.totalBalance = mockTotalBalance;
-  state.sendPageState = sendPageState;
-  state.mixnetView = mixnetView;
-  state.addLastSnackbar = addLastSnackbar;
-  state.netInfo = {
+const translate = (key: string): TranslateType => key;
+
+const online: SendPermitInputs = {
+  netInfo: {
     isConnected: true,
     type: NetInfoStateType.wifi,
     isConnectionExpensive: false,
-  };
+  },
+  server: mockServer,
+  mixnetView: mixnetReady,
+};
+
+// The state that LoadedApp holds. `sendPermitNow` reads it at call time.
+let appState = online;
+
+const sendUi = (
+  inputs: SendPermitInputs,
+  sendTransaction: jest.Mock,
+  addLastSnackbar: jest.Mock,
+) => {
+  appState = inputs;
+  const state = { ...defaultAppContextLoaded };
+  state.valueTransfers = mockValueTransfers;
+  state.addresses = mockAddresses;
+  state.translate = translate;
+  state.info = mockInfo;
+  state.totalBalance = mockTotalBalance;
+  state.sendPageState = sendPageState;
+  state.addLastSnackbar = addLastSnackbar;
+  state.server = inputs.server;
+  state.netInfo = inputs.netInfo;
+  state.mixnetView = inputs.mixnetView;
+  state.sendPermitNow = () => sendPermit(appState);
   return (
     <ContextAppLoadedProvider value={state}>
       <Send
@@ -153,30 +186,94 @@ afterEach(() => {
   jest.restoreAllMocks();
 });
 
-describe('Send confirm mixnet send gate', () => {
+const sent = { kind: 'sent', receipt: 'txid' };
+
+describe('Send confirm send permit', () => {
   test('Tests that confirming does not send when the transport dies while the Confirm screen is open. The screen opened on a ready view.', async () => {
-    const sendTransaction = jest.fn().mockResolvedValue('txid');
+    const sendTransaction = jest.fn().mockResolvedValue(sent);
     const addLastSnackbar = jest.fn();
-    const view = render(sendUi(mixnetReady, sendTransaction, addLastSnackbar));
+    const view = render(sendUi(online, sendTransaction, addLastSnackbar));
     const confirmSend = await openConfirmScreen(view);
 
-    view.rerender(sendUi(mixnetLost, sendTransaction, addLastSnackbar));
+    view.rerender(
+      sendUi(
+        { ...online, mixnetView: mixnetLost },
+        sendTransaction,
+        addLastSnackbar,
+      ),
+    );
     await confirmSend(sendPageState);
 
     expect(sendTransaction).not.toHaveBeenCalled();
-    expect(addLastSnackbar).toHaveBeenCalledWith(
-      mockTranslate('send.nym-blocked'),
-    );
+    expect(addLastSnackbar).toHaveBeenCalledWith('send.nym-blocked');
   });
 
-  test('Tests that confirming sends when the mixnet view is ready.', async () => {
-    const sendTransaction = jest.fn().mockResolvedValue('txid');
+  test('Tests that confirming does not send when the device disconnects while the Confirm screen is open. The screen opened on a connected device.', async () => {
+    const sendTransaction = jest.fn().mockResolvedValue(sent);
     const addLastSnackbar = jest.fn();
-    const view = render(sendUi(mixnetReady, sendTransaction, addLastSnackbar));
+    const view = render(sendUi(online, sendTransaction, addLastSnackbar));
+    const confirmSend = await openConfirmScreen(view);
+
+    view.rerender(
+      sendUi(
+        { ...online, netInfo: { ...online.netInfo, isConnected: false } },
+        sendTransaction,
+        addLastSnackbar,
+      ),
+    );
+    await confirmSend(sendPageState);
+
+    expect(sendTransaction).not.toHaveBeenCalled();
+    expect(addLastSnackbar).toHaveBeenCalledWith('loadedapp.connection-error');
+  });
+
+  test('Tests that confirming does not send when the server goes offline while the Confirm screen is open. The screen opened on a remote server.', async () => {
+    const sendTransaction = jest.fn().mockResolvedValue(sent);
+    const addLastSnackbar = jest.fn();
+    const view = render(sendUi(online, sendTransaction, addLastSnackbar));
+    const confirmSend = await openConfirmScreen(view);
+
+    view.rerender(
+      sendUi(
+        { ...online, server: offlineServer(ChainNameEnum.mainChainName) },
+        sendTransaction,
+        addLastSnackbar,
+      ),
+    );
+    await confirmSend(sendPageState);
+
+    expect(sendTransaction).not.toHaveBeenCalled();
+    expect(addLastSnackbar).toHaveBeenCalledWith('loadedapp.connection-error');
+  });
+
+  test('Tests that the Computing screen reports the refusal when the retry on another server is refused. The first attempt fails with a server error.', async () => {
+    (fetchServerList as jest.Mock).mockResolvedValue([]);
+    const sendTransaction = jest
+      .fn()
+      .mockRejectedValueOnce('Error: server unreachable')
+      .mockResolvedValueOnce(errorKeyed('send.nym-blocked'));
+    const view = render(sendUi(online, sendTransaction, jest.fn()));
+    const confirmSend = await openConfirmScreen(view);
+
+    await confirmSend(sendPageState);
+
+    expect(sendTransaction).toHaveBeenCalledTimes(2);
+    expect(navigate).toHaveBeenLastCalledWith(RouteEnum.Computing, {
+      phase: 'failed',
+      errorMessage: 'send.nym-blocked',
+    });
+  });
+
+  test('Tests that confirming sends when the permit is granted.', async () => {
+    const sendTransaction = jest.fn().mockResolvedValue(sent);
+    const view = render(sendUi(online, sendTransaction, jest.fn()));
     const confirmSend = await openConfirmScreen(view);
 
     await confirmSend(sendPageState);
 
     expect(sendTransaction).toHaveBeenCalledTimes(1);
+    expect(navigate).toHaveBeenLastCalledWith(RouteEnum.Computing, {
+      phase: 'created',
+    });
   });
 });
