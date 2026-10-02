@@ -199,7 +199,7 @@ IO, alerts, email, biometrics. Home: `app/services`.
 
 **Blocking check** — a PR CI job that runs under fail-all and that
 branch protection requires; its failure withholds the merge verdict.
-Jest, rust-shear, the workbench tests, the Binding Layer crate tests,
+Jest, the Binding Layer crate tests,
 js-depcheck, the JS static checks, andr-dependency-analysis, the Android
 Kotlin compile, the Android JVM unit tests, the Android build chain for
 every ABI, the offline device tests, the iOS Binding Layer build, and

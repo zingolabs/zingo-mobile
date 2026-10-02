@@ -1,8 +1,0 @@
-[workspace]
-members = [
-    "workbench",
-]
-resolver = "2"
-
-[workspace.dependencies]
-serde_json = "1"
