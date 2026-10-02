@@ -1,6 +1,5 @@
 package org.ZingoLabs.Zingo
 
-import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import org.junit.Assume.assumeTrue
 import org.junit.Test
@@ -14,18 +13,6 @@ import com.fasterxml.jackson.core.type.TypeReference
 // Jackson can use the no-arg constructor + setter injection.
 fun testMapper(): ObjectMapper = ObjectMapper()
     .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-
-// The regtest chain hint for the wallet under test. The host harness reads
-// the launched chain's activation heights back from the running validator
-// and forwards them as the `activation_heights` instrumentation argument
-// (see scripts/android_integration_tests.sh); the extended hint hands them
-// to the FFI so the wallet's schedule is the chain's, never a guess. With
-// no argument (a chain whose provisioner cannot report a schedule) the
-// bare hint keeps the FFI's historical default.
-fun regtestChainHint(): String {
-    val heights = InstrumentationRegistry.getArguments().getString("activation_heights")
-    return if (heights.isNullOrEmpty()) "regtest" else "regtest:$heights"
-}
 
 /** The server URI of an offline wallet, which names no server. */
 const val OFFLINE_SERVER_URI = ""
@@ -85,6 +72,24 @@ object TestnetFixture {
 
     const val DEADLINE_SECONDS = 5 * 60
     const val TIP_SKEW_BLOCKS = 10L
+}
+
+/** The testnet fixture wallet that nobody spends from, whose pool balances the pool-balance test checks exactly. */
+object PoolBalanceFixture {
+    const val SEED = "away win exhibit affair resource basic film radio bomb bone protect gentle logic pelican wreck air buyer nominee baby raw panic witness hair cream"
+    const val BIRTHDAY = 4_431_742L
+    const val UNIFIED_ADDRESS = "utest1d3awxkkpft8c2arx6g443wp97uhvh7uyuk58ghk35tnlx37fdg8mtwf2l7shtaacrj6gnhhxr647uq2yzwtszwn22z8xlghmwv4dzfyu"
+    const val TRANSPARENT_ADDRESS = "tmVqqboEGhqUDoVnDRk1vVumKPrieJz6btY"
+
+    const val IRONWOOD_BALANCE = 1_210_000L
+    const val ORCHARD_BALANCE = 0L
+    const val SAPLING_BALANCE = 115_000L
+    const val TRANSPARENT_BALANCE = 0L
+
+    const val RECEIPT_TXID = "5875d2ef17dcd8010e09e63942c901478fdfa93e5e5883f4c01b96cfda9bf669"
+    const val SHIELD_TXID = "40c75700d939ed5b0ee7e2b65bbb55dbd632689cb070171fa0d8be88b037c7cc"
+    const val SHIELD_HEIGHT = 4_432_065L
+    const val VALUE_TRANSFER_COUNT = 9
 }
 
 /** Skips the test while the fixture names no consolidation transaction. */
@@ -563,115 +568,76 @@ class PriceRefusedWithoutMixnet {
     }
 }
 
-@StaticChainTest
-class ExecuteSaplingBalanceFromSeed {
+@PublicChainTest
+class RecoversPoolBalances {
     @Test
-    fun executeSaplingBalanceFromSeed() {
+    fun recoversPoolBalances() {
         val mapper = testMapper()
 
-        val rpcModule = RPCModule(MainApplication.getAppReactContext())
+        val start = System.nanoTime()
+        val elapsedSeconds = { (System.nanoTime() - start) / 1e9 }
 
-        val serveruri = "http://10.0.2.2:20000"
-        val chainhint = regtestChainHint()
-        val seed = Seeds.HOSPITAL
-        
-        val initFromSeedJson: String = uniffi.zingo.initFromSeed(seed, 1u, serveruri, chainhint, "Medium", 1u)
+        val (serveruri, tip) = firstAnsweringServer("testnet", TestnetFixture.SERVERS)
+
+        val initFromSeedJson: String = uniffi.zingo.initFromSeed(PoolBalanceFixture.SEED, PoolBalanceFixture.BIRTHDAY.toUInt(), serveruri, TestnetFixture.CHAIN_HINT, "Medium", 1u)
         println("\nInit from seed:")
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
 
-        assertThat(initFromSeed.seed_phrase).isEqualTo(seed)
-        assertThat(initFromSeed.birthday).isEqualTo(1)
+        assertThat(initFromSeed.seed_phrase).isEqualTo(PoolBalanceFixture.SEED)
+        assertThat(initFromSeed.birthday).isEqualTo(PoolBalanceFixture.BIRTHDAY)
 
         val infoJson: String = uniffi.zingo.infoServer()
         println("\nInfo:")
         println(infoJson)
         val info: Info = mapper.readValue(infoJson)
-        assertThat(info.latest_block_height).isGreaterThan(0)
+        assertThat(info.latest_block_height).isAtLeast(tip - TestnetFixture.TIP_SKEW_BLOCKS)
 
-        val syncJson:String = uniffi.zingo.runSync()
-        println("\nSync:")
-        println(syncJson)
+        val addressesJson: String = uniffi.zingo.getUnifiedAddresses()
+        println("\nAddresses:")
+        println(addressesJson)
+        val addresses: List<UnifiedAddress> = mapper.readValue(addressesJson)
+        assertThat(addresses[0].encoded_address).isEqualTo(PoolBalanceFixture.UNIFIED_ADDRESS)
 
-        var syncStatus: SyncStatus
-        while (true) {
-            val syncStatusJson: String = uniffi.zingo.statusSync()
-            println("\nSync status:")
-            println(syncStatusJson)
-            if (syncStatusJson.lowercase().startsWith("error")) {
-                println("Sync Error!:")
-                break
-            }
-            syncStatus = mapper.readValue(syncStatusJson)
+        val taddressesJson: String = uniffi.zingo.getTransparentAddresses()
+        println("\nT Addresses:")
+        println(taddressesJson)
+        val taddresses: List<TransparentAddress> = mapper.readValue(taddressesJson)
+        assertThat(taddresses[0].encoded_address).isEqualTo(PoolBalanceFixture.TRANSPARENT_ADDRESS)
 
-            val progress = syncStatus.percentage_total_outputs_scanned
-               ?: syncStatus.percentage_total_blocks_scanned
+        syncToCompletion("${tip - PoolBalanceFixture.BIRTHDAY} testnet blocks", TestnetFixture.DEADLINE_SECONDS, elapsedSeconds)
 
-            if (progress != null && progress >= 100.0) {
-                println("Sync completed!")
-                break
-            }
+        val heightJson: String = uniffi.zingo.getLatestBlockWallet()
+        println("\nHeight post-sync:")
+        println(heightJson)
+        val heightPostSync: Height = mapper.readValue(heightJson)
+        assertThat(heightPostSync.height).isAtLeast(tip - TestnetFixture.TIP_SKEW_BLOCKS)
 
-            Thread.sleep(1000)
-        }
-
-        val valueTranfersJson: String = uniffi.zingo.getValueTransfers()
+        val valueTransfersJson: String = uniffi.zingo.getValueTransfers()
         println("\nValue Transfers:")
-        println(valueTranfersJson)
+        println(valueTransfersJson)
+        val valueTransfers: ValueTransfers = mapper.readValue(valueTransfersJson)
+        assertThat(valueTransfers.value_transfers).hasSize(PoolBalanceFixture.VALUE_TRANSFER_COUNT)
+        assertThat(valueTransfers.value_transfers.map { it.status }.toSet()).containsExactly("confirmed")
+        assertThat(valueTransfers.value_transfers.last().txid).isEqualTo(PoolBalanceFixture.RECEIPT_TXID)
+        val shield = valueTransfers.value_transfers.first()
+        assertThat(shield.txid).isEqualTo(PoolBalanceFixture.SHIELD_TXID)
+        assertThat(shield.kind).isEqualTo("shield")
+        assertThat(shield.blockheight).isEqualTo(PoolBalanceFixture.SHIELD_HEIGHT)
 
-        // Value Transfers, on the ironwood-activated regtest chain. Shield
-        // and self-send outputs prefer the Ironwood pool (confirmed policy),
-        // so part of the orchard change and the shielded transparent funds
-        // land in Ironwood rather than Orchard.
-        // 1. Received in orchard pool =         +500_000
-        // 2. Received in sapling pool =         +250_000
-        // 3. Received in transparent pool =     +250_000
-        // 4. Send - 100_000 + 20_000fee =       -120_000
-        // 5. MemoToSelf orchard pool =           -20_000 fee,
-        //    100_000 of orchard change lands in ironwood
-        // 6. MemoToSelf sapling pool =           -10_000 fee
-        // 7. MemoToSelf sapling->transparent =   -15_000 fee,
-        //    100_000 moves to transparent
-        // 8. Shield transparent->ironwood =      -20_000 fee,
-        //    330_000 lands in ironwood
-        //
-        // ironwood pool    = 430_000
-        // orchard pool     = 260_000
-        // sapling pool     = 125_000
-        // transparent pool = 0
-
-        val balanceJson:String = uniffi.zingo.getBalance()
+        val balanceJson: String = uniffi.zingo.getBalance()
         println("\nBalance:")
         println(balanceJson)
         val balance: Balance = mapper.readValue(balanceJson)
 
-        assertThat(balance.total_ironwood_balance).isEqualTo(430000)
-        assertThat(balance.confirmed_ironwood_balance).isEqualTo(430000)
-        assertThat(balance.total_orchard_balance).isEqualTo(260000)
-        assertThat(balance.confirmed_orchard_balance).isEqualTo(260000)
-        assertThat(balance.total_sapling_balance).isEqualTo(125000)
-        assertThat(balance.confirmed_sapling_balance).isEqualTo(125000)
-        assertThat(balance.confirmed_transparent_balance).isEqualTo(0)
-
-        // save the wallet file
-        rpcModule.saveWalletFile()
-
-        // Offline-mode round trip temporarily disabled — `changeServer("")`
-        // currently returns an error from zingolib and trips the assertion
-        // on every run, masking the rest of this test class in CI. Re-enable
-        // once the underlying offline-mode regression is investigated.
-        /*
-        // change to Offline mode
-        val changeServerJson:String = uniffi.zingo.changeServer("")
-        println("\nChange Serveruri:")
-        println(changeServerJson)
-        assertThat(changeServerJson.lowercase().startsWith("error")).isFalse()
-
-        // open the wallet with no server - Offline mode - Main by default
-        val loadWalletJson: String = rpcModule.loadExistingWalletNative("", "main", "Medium", "1")
-        println("\nLoad Wallet:")
-        println(loadWalletJson)
-        */
+        assertThat(balance.total_ironwood_balance).isEqualTo(PoolBalanceFixture.IRONWOOD_BALANCE)
+        assertThat(balance.confirmed_ironwood_balance).isEqualTo(PoolBalanceFixture.IRONWOOD_BALANCE)
+        assertThat(balance.total_orchard_balance).isEqualTo(PoolBalanceFixture.ORCHARD_BALANCE)
+        assertThat(balance.confirmed_orchard_balance).isEqualTo(PoolBalanceFixture.ORCHARD_BALANCE)
+        assertThat(balance.total_sapling_balance).isEqualTo(PoolBalanceFixture.SAPLING_BALANCE)
+        assertThat(balance.confirmed_sapling_balance).isEqualTo(PoolBalanceFixture.SAPLING_BALANCE)
+        assertThat(balance.total_transparent_balance).isEqualTo(PoolBalanceFixture.TRANSPARENT_BALANCE)
+        assertThat(balance.confirmed_transparent_balance).isEqualTo(PoolBalanceFixture.TRANSPARENT_BALANCE)
     }
 }
 
