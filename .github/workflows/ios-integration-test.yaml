@@ -54,12 +54,10 @@ jobs:
       - name: Check out zingolib
         uses: ./.github/actions/zingolib-submodule
 
-      # The artifact gate runs cargo and gh. This step fails the job at
-      # its start when the runner image lacks one of them.
-      - name: Report the tools of the artifact gate
-        run: |
-          cargo --version
-          gh --version
+      # The artifact gate runs gh. This step fails the job at its start
+      # when the runner image lacks it.
+      - name: Report the tool of the artifact gate
+        run: gh --version
 
       # The Xcode project takes the Binding Layer from the zingolib submodule.
       # A cache hit supplies it here. On a miss, the artifact gate below
@@ -97,19 +95,40 @@ jobs:
       # step holds until the artifact of that build lands, and it ends
       # early when the build concludes without success. The job continues
       # past a failed gate to the cache restore below.
-      - name: Wait for the Binding Layer artifact (ci-gate)
+      #
+      # An artifact that exists opens the gate. A failed read of the API
+      # counts as no answer, and the loop reads again.
+      - name: Wait for the Binding Layer artifact (artifact gate)
         id: gate
         if: ${{ steps.binding-layer.outputs.cache-hit != 'true' }}
         continue-on-error: true
-        working-directory: ./rust
         env:
           GH_TOKEN: ${{ github.token }}
+          ARTIFACT: binding-layer-ios-${{ env.CACHE-KEY }}
+          UPSTREAM: Build the iOS Binding Layer
+          TIMEOUT_SECS: 2700
+          POLL_SECS: 20
         run: |
-          cargo run -p workbench --bin ci-gate -- \
-            --artifact "binding-layer-ios-${{ env.CACHE-KEY }}" \
-            --upstream "Build the iOS Binding Layer" \
-            --timeout-secs 2700 \
-            --poll-secs 20
+          run="repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+          gone='[.jobs[] | select(.name | contains($ENV.UPSTREAM)) | select(.status == "completed" and .conclusion != "success")][0] | select(. != null) | "\"\(.name)\" concluded \"\(.conclusion)\""'
+          echo "artifact gate: waiting up to ${TIMEOUT_SECS}s for the artifact \"$ARTIFACT\" (producer: jobs matching \"$UPSTREAM\")"
+          while true; do
+            names="$(gh api "$run/artifacts?per_page=100" --jq '.artifacts[].name' || true)"
+            if printf '%s\n' "$names" | grep --quiet --line-regexp --fixed-strings "$ARTIFACT"; then
+              echo "artifact gate: the artifact \"$ARTIFACT\" is ready"
+              exit 0
+            fi
+            failure="$(gh api "$run/jobs?per_page=100" --jq "$gone" || true)"
+            if [ -n "$failure" ]; then
+              echo "artifact gate: the upstream job $failure, and the artifact \"$ARTIFACT\" will never appear" >&2
+              exit 1
+            fi
+            if [ "$SECONDS" -ge "$TIMEOUT_SECS" ]; then
+              echo "artifact gate: the deadline passed before the artifact \"$ARTIFACT\" appeared" >&2
+              exit 1
+            fi
+            sleep "$POLL_SECS"
+          done
 
       - name: Download the Binding Layer
         if: ${{ steps.gate.outcome == 'success' }}

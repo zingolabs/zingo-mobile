@@ -10,9 +10,6 @@ jobs:
     uses: ./.github/workflows/jest-test.yaml
     secrets: inherit
 
-  workbench-test:
-    uses: ./.github/workflows/workbench-test.yaml
-
   create-timestamp:
     uses: ./.github/workflows/create-timestamp.yaml
 

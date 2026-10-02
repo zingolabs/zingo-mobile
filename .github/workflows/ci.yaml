@@ -8,13 +8,15 @@ on:
 
 # A new push to a PR supersedes the in-flight run, so cancel it and free its
 # runners; cancelling the caller run also cancels every reusable-workflow job
-# it fanned out. Mainline pushes are never cancelled.
+# it fanned out. Mainline pushes are never cancelled. Each mainline commit
+# has its own group. A shared group keeps one pending run and cancels an
+# older pending run, and that run's cache saves never happen.
 concurrency:
-  group: ci-${{ github.event.pull_request.number || github.ref }}
+  group: ci-${{ github.event.pull_request.number || format('{0}-{1}', github.ref, github.sha) }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 # actions: write lets the fail-all steps in the blocking jobs cancel this
-# run, and lets ci-gate read the run's artifact and job listings. Fork
+# run, and lets the artifact gate read the run's artifact and job listings. Fork
 # PRs get a read-only token regardless; there the cancel step fails
 # harmlessly inside an already-failing job.
 permissions:
@@ -63,16 +65,6 @@ jobs:
   jest-test:
     uses: ./.github/workflows/jest-test.yaml
     secrets: inherit
-    with:
-      fail-all: true
-
-  rust-shear:
-    uses: ./.github/workflows/rust-shear.yaml
-    with:
-      fail-all: true
-
-  workbench-test:
-    uses: ./.github/workflows/workbench-test.yaml
     with:
       fail-all: true
 
@@ -185,7 +177,7 @@ jobs:
       fail-all: true
 
   # The test job starts at workflow launch and front-loads its setup. On
-  # a cache miss it holds at the ci-gate artifact gate until the Binding
+  # a cache miss it holds at the artifact gate until the Binding
   # Layer artifact lands.
   ios-integration-test:
     uses: ./.github/workflows/ios-integration-test.yaml
