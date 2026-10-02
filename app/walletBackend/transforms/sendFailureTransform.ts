@@ -1,3 +1,6 @@
+import { ErrorKeyed, errorKeyed } from '@app/AppState/types/Result';
+import type { SendRefusalKey } from './sendPermit';
+
 /**
  * Why a confirmed send failed, enumerated over the real error families the
  * send path produces, as a compile-time-enforced classification.
@@ -101,10 +104,9 @@ export function retryOnAnotherServer(failure: SendFailureClass): boolean {
  * What the failed screen shows for a classified failure.
  */
 export type SendFailureText =
-  | {
-      readonly kind: 'key';
-      readonly errorKey: 'send.duplicate-nullifier-error' | 'send.dust-error';
-    }
+  | ErrorKeyed<
+      'send.duplicate-nullifier-error' | 'send.dust-error' | SendRefusalKey
+    >
   | { readonly kind: 'verbatim'; readonly text: string };
 
 /**
@@ -114,9 +116,9 @@ export type SendFailureText =
 export function sendFailureText(failure: SendFailureClass): SendFailureText {
   switch (failure.kind) {
     case 'duplicateNullifier':
-      return { kind: 'key', errorKey: 'send.duplicate-nullifier-error' };
+      return errorKeyed('send.duplicate-nullifier-error');
     case 'dust':
-      return { kind: 'key', errorKey: 'send.dust-error' };
+      return errorKeyed('send.dust-error');
     case 'mixnetRefusal':
     case 'internalRpcFailure':
     case 'serverSuspect':

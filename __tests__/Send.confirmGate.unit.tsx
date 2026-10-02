@@ -49,7 +49,6 @@ import React from 'react';
 import { fireEvent, render, waitFor } from '@testing-library/react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { NetInfoStateType } from '@react-native-community/netinfo/src/index';
 import Send from '@screens/Send';
 import {
   ContextAppLoadedProvider,
@@ -61,6 +60,7 @@ import {
   SendPageStateClass,
   ToAddrClass,
   offlineServer,
+  remoteServer,
 } from '@app/AppState';
 import type { TranslateType } from '@app/AppState';
 import { errorKeyed } from '@app/AppState/types/Result';
@@ -72,11 +72,11 @@ import {
   SendPermitInputs,
   sendPermit,
 } from '@app/walletBackend/transforms/sendPermit';
-import { mixnetLost, mixnetReady } from '../.storybook/storyMocks';
+import { mixnetLost } from '../.storybook/storyMocks';
 import { mockAddresses } from '../__mocks__/dataMocks/mockAddresses';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
-import { mockServer } from '../__mocks__/dataMocks/mockServer';
+import { mockOnline } from '../__mocks__/dataMocks/mockOnline';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import { mockValueTransfers } from '../__mocks__/dataMocks/mockValueTransfers';
 
@@ -106,15 +106,7 @@ function makeDrawerProps(): NativeStackScreenProps<
 
 const translate = (key: string): TranslateType => key;
 
-const online: SendPermitInputs = {
-  netInfo: {
-    isConnected: true,
-    type: NetInfoStateType.wifi,
-    isConnectionExpensive: false,
-  },
-  server: mockServer,
-  mixnetView: mixnetReady,
-};
+const online = mockOnline;
 
 // The state that LoadedApp holds. `sendPermitNow` reads it at call time.
 let appState = online;
@@ -123,6 +115,7 @@ const sendUi = (
   inputs: SendPermitInputs,
   sendTransaction: jest.Mock,
   addLastSnackbar: jest.Mock,
+  setServerOption: jest.Mock = jest.fn(),
 ) => {
   appState = inputs;
   const state = { ...defaultAppContextLoaded };
@@ -147,7 +140,7 @@ const sendUi = (
         setShieldingAmount={jest.fn()}
         setScrollToTop={jest.fn()}
         setScrollToBottom={jest.fn()}
-        setServerOption={jest.fn()}
+        setServerOption={setServerOption}
       />
     </ContextAppLoadedProvider>
   );
@@ -246,21 +239,41 @@ describe('Send confirm send permit', () => {
     expect(addLastSnackbar).toHaveBeenCalledWith('loadedapp.connection-error');
   });
 
-  test('Tests that the Computing screen reports the refusal when the retry on another server is refused. The first attempt fails with a server error.', async () => {
-    (fetchServerList as jest.Mock).mockResolvedValue([]);
+  test('Tests that the Computing screen receives the refusal when the retry on another server is refused. The first attempt fails with a server error, and the live list holds one other server.', async () => {
+    const other = {
+      uri: 'https://other.example:443',
+      chainName: ChainNameEnum.mainChainName,
+      region: '',
+      default: false,
+      latency: 1,
+      obsolete: false,
+    };
+    (fetchServerList as jest.Mock).mockResolvedValue([other]);
     const sendTransaction = jest
       .fn()
       .mockRejectedValueOnce('Error: server unreachable')
       .mockResolvedValueOnce(errorKeyed('send.nym-blocked'));
-    const view = render(sendUi(online, sendTransaction, jest.fn()));
+    const setServerOption = jest.fn();
+    const view = render(
+      sendUi(online, sendTransaction, jest.fn(), setServerOption),
+    );
     const confirmSend = await openConfirmScreen(view);
 
     await confirmSend(sendPageState);
 
+    expect(setServerOption).toHaveBeenCalledWith(
+      remoteServer(other.uri, other.chainName),
+      defaultAppContextLoaded.selectServer,
+      false,
+      true,
+    );
     expect(sendTransaction).toHaveBeenCalledTimes(2);
+    expect(setServerOption.mock.invocationCallOrder[0]).toBeLessThan(
+      sendTransaction.mock.invocationCallOrder[1],
+    );
     expect(navigate).toHaveBeenLastCalledWith(RouteEnum.Computing, {
       phase: 'failed',
-      errorMessage: 'send.nym-blocked',
+      failure: errorKeyed('send.nym-blocked'),
     });
   });
 
