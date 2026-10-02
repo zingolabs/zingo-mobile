@@ -57,21 +57,13 @@ pointer, and propose a record.
 The Rust wallet and the mixnet proxy, with their Kotlin and Swift bindings,
 live in [zingolabs/zingolib](https://github.com/zingolabs/zingolib). This
 repository pins them as a submodule at `zingolib/` (ADR zingo-mobile/0016).
-The Android build and the integration harnesses in `rust/` build from that
-checkout, so initialise it before any build.
+The Android and iOS builds read that checkout. Initialise it before any build.
 
 ```sh
 git submodule update --init zingolib
 ```
 
 ## Testing
-### Prerequisites
-Integration tests and end-to-end tests require a regtest network. The test harness
-(`zingolib_testutils` scenarios, built on `zcash_local_net`) launches native `zebrad`
-(validator) and `zainod` (indexer) processes for each test. Put both binaries on `$PATH`,
-or in the directory named by the `TEST_BINARIES_DIR` environment variable. CI runs these
-tests on Linux. On macOS, zebrad is a Zebra Tier 3 platform, and you must build it yourself.
-
 ### Yarn Tests
 1. From the root directory, run: <br />
    `yarn test`
@@ -83,64 +75,37 @@ Peak heap per wallet-file path, on a connected Android device or emulator.
 - `yarn bench:memory --report`: measure only
 - `yarn bench:memory:accept`: record a new baseline
 
-### Integration Tests
-These exercise the Rust ↔ Kotlin/Swift FFI boundary against a regtest network.
+### Device Tests
+The device tests exercise the Binding Layer through Kotlin and Swift on an
+emulator or a simulator. An annotation on each Android test class names its
+kind (`CONTEXT.md` defines the terms).
 
-The Android suite (`rust/android/tests/integration_tests.rs`) runs on every PR
-via the `android-ubuntu-integration-test-ci` workflow. The iOS suite
-(`rust/ios/tests/integration_tests.rs`) exists but its `cargo nextest run`
-invocation is currently commented out in `ios-integration-test.yaml`, so it
-does **not** gate PRs — you can still run it locally with the same nextest
-commands.
+- An offline device test (`@OfflineDeviceTest`) opens a wallet with an empty
+  server URI and reads no chain.
+- A public-chain test (`@PublicChainTest`) reads mainnet or testnet through a
+  public server. A test that needs funds reads a testnet fixture wallet
+  (`docs/testnet_fixture_wallets.md`).
 
-1. Create quick-boot snapshots to speed up AVD launch times. From the root directory, run: <br />
-   `./scripts/android_integration_tests.sh -a x86_64 -s` <br />
-   `./scripts/android_integration_tests.sh -a x86 -s` <br />
-   By default, this uses default API 29 system images. Other images may be used for testing
-   by specifying the api level and target. However, using other images with the cargo test runner
-   is still under development.
-2. To run the integration tests. From the `rust` directory, run: <br />
-   `cargo nextest run android_integration` <br />
-   Specify to run specific ABI: <br />
-   `cargo nextest run android_integration::x86_64` <br />
-   `cargo nextest run android_integration::x86_32` <br />
-   `cargo nextest run android_integration::arm64` <br />
-   `cargo nextest run android_integration::arm32` <br />
-   Specify to run a specific test on all ABIs: <br />
-   `cargo nextest run test_name` <br />
-   Specify to run a specific ABI and test: <br />
-   `cargo nextest run android_integration::x86_64::test_name`
+The `android-ubuntu-integration-test-ci` workflow runs both kinds on every
+pull request, and `ios-integration-test` runs the XCTest classes of
+`ios/ZingoTests`.
 
-For more information on running integration tests on non-default AVDs, run: <br />
-`./scripts/android_integration_tests.sh -h` <br />
-Without the cargo test runner these emulated android devices will not be able to connect to a
-regtest network. Therefore, only tests in the "Offline Testsuite" may be tested.
+To run the Android tests, boot an emulator and run these commands from the
+`android` directory. Replace `x86_64` with the ABI of the emulator.
 
-### End-to-End Tests (Rust nextest, Android)
-Drives the Android app from Rust against a regtest network. Lives in
-`rust/android/tests/e2e_tests.rs`. Currently Android-only.
+```sh
+./gradlew :app:connectedProdDebugAndroidTest \
+  -PreactNativeArchitectures=x86_64 \
+  -Pandroid.testInstrumentationRunnerArguments.annotation=org.ZingoLabs.Zingo.OfflineDeviceTest
 
-0. Install `zebrad` and `zainod` as described in [Prerequisites](#prerequisites).
-1. Launch the emulated AVD by clicking the 'play' icon in Android Studio's `Device Manager`.
-   Alternatively, connect to a physical device. See previous section 'Launching the app' for more
-   details.
-2. In a terminal, run: <br />
-   `yarn start`
-3. Create quick-boot snapshots to speed up AVD launch times. From the root directory, run: <br />
-   `./scripts/e2e_tests.sh -a x86_64 -s` <br />
-   `./scripts/e2e_tests.sh -a x86 -s` <br />
-   By default, this uses default API 29 system images. Other images may be used for testing
-   by specifying the api level and target. However, using other images with the cargo test runner
-   is still under development.
-4. In a separate terminal, from the `rust` directory, run all tests: <br />
-   `cargo nextest run e2e`
-   Specify to run specific ABI: <br />
-   `cargo nextest run e2e::x86_64` <br />
-   `cargo nextest run e2e::x86_32` <br />
-   `cargo nextest run e2e::arm64` <br />
-   `cargo nextest run e2e::arm32` <br />
-   Specify to run a specific ABI and test: <br />
-   `cargo nextest run e2e::x86_64::test_name`
+./gradlew :app:connectedProdDebugAndroidTest \
+  -PreactNativeArchitectures=x86_64 \
+  -Pandroid.testInstrumentationRunnerArguments.annotation=org.ZingoLabs.Zingo.PublicChainTest \
+  -Pandroid.testInstrumentationRunnerArguments.timeout_msec=420000
+```
+
+To run the iOS tests, open `ios/Zingo.xcworkspace` in Xcode and run the
+`ZingoTests` target on a simulator.
 
 ### End-to-End Tests (Maestro UI flows)
 [Maestro](https://maestro.mobile.dev/) drives the released app from the
@@ -160,13 +125,14 @@ To run locally:
    selected by `adb` / `xcrun simctl`.
 
 3. From the repo root: <br />
-   `maestro test .maestro/`
+   `maestro test --exclude-tags=screen-awake .maestro/`
    Or run a single flow: <br />
    `maestro test .maestro/01_new_wallet.yaml`
 
-The legacy Detox suite under `e2e/*.test.js` is no longer wired to CI or
-to any `yarn` script. It is being phased out in favour of Maestro and
-should not be relied on; new e2e coverage should land as Maestro flows.
+The flows restore or create their wallets on mainnet, and need network
+access. The `screen-awake` flow runs alone in CI, after a step that
+shortens the device's screen-off timeout. New e2e coverage lands as
+Maestro flows.
 
 # Storybook & visual review
 Browse components in isolation with Storybook (on-device via

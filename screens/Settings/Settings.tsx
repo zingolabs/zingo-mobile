@@ -1245,6 +1245,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
             {translate('settings.server-title') as string}
           </BoldText>
           <Pressable
+            testID="settings.server.close"
             onPress={() => serverBottomSheetRef.current?.close()}
             hitSlop={8}
             style={{ paddingHorizontal: 14, paddingVertical: 4 }}
@@ -1540,6 +1541,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                   {translate('settings.server-title') as string}
                 </BoldText>
                 <TouchableOpacity
+                  testID="settings.server"
                   disabled={disabled}
                   onPress={() => serverBottomSheetRef.current?.present()}
                   style={{ flex: 1, marginLeft: 12 }}
@@ -1725,6 +1727,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       </View>
       <BottomSheetModal
         ref={serverBottomSheetRef}
+        accessible={false}
         enableDynamicSizing={true}
         enablePanDownToClose
         stackBehavior="push"
@@ -2001,6 +2004,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
 
           <View>
             <TouchableOpacity
+              testID="settings.list-server"
               disabled={disabled}
               onPress={() => {
                 // criterion 2: pressing List while on None/Regtest jumps to
@@ -2041,10 +2045,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                     color={colors.fgMuted}
                   />
                 )}
-                <RegText
-                  testID="settings.list-server"
-                  style={{ marginLeft: 10 }}
-                >
+                <RegText style={{ marginLeft: 10 }}>
                   {translate('settings.server-list') as string}
                 </RegText>
                 {listIcon === faDotCircle && (
@@ -2160,10 +2161,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                   </View>
                 )}
                 <View
-                  accessible={true}
-                  accessibilityLabel={
-                    translate('settings.server-acc') as string
-                  }
                   style={{
                     borderColor: colors.borderMuted,
                     borderWidth: 1,
@@ -2180,6 +2177,10 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                 >
                   <TextInput
                     testID="settings.custom-server-field"
+                    accessible={true}
+                    accessibilityLabel={
+                      translate('settings.server-acc') as string
+                    }
                     placeholder={GlobalConst.serverPlaceHolder}
                     placeholderTextColor={colors.fgMuted}
                     style={{
@@ -2206,7 +2207,10 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                     textContentType="URL"
                   />
                   {customServerUri && !disabled && (
-                    <TouchableOpacity onPress={() => setCustomServerUri('')}>
+                    <TouchableOpacity
+                      testID="settings.custom-server-clear"
+                      onPress={() => setCustomServerUri('')}
+                    >
                       <FontAwesomeIcon
                         style={{ marginRight: 10 }}
                         size={20}
@@ -2287,6 +2291,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       />
       <SelectBottomSheet
         ref={listServerSelectRef}
+        testID="settings.list-server-select"
         title={translate('settings.select-placeholder') as string}
         items={itemsPicker}
         value={listServerUri ?? ''}

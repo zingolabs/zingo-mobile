@@ -6,6 +6,7 @@ import { getNumberFormatSettings } from 'react-native-localize';
 
 import Utils from '@app/utils';
 import { usePriceHealth } from './priceFetcherStore';
+import { useTimedReveal } from '@app/hooks/useTimedReveal';
 
 type CurrencyAmountProps = {
   price?: number;
@@ -26,7 +27,8 @@ const CurrencyAmount: React.FunctionComponent<CurrencyAmountProps> = ({
   selectable,
   priceDate,
 }) => {
-  const [privacyHigh, setPrivacyHigh] = useState<boolean>(privacy || false);
+  const { visible, reveal } = useTimedReveal(!!privacy);
+  const privacyHigh: boolean = !visible;
   const [currencyString, setCurrencyString] = useState<string>('');
   const { colors } = useTheme();
   const { decimalSeparator } = getNumberFormatSettings();
@@ -35,16 +37,6 @@ const CurrencyAmount: React.FunctionComponent<CurrencyAmountProps> = ({
   // omit priceDate and never dim.
   const health = usePriceHealth(priceDate);
   const baseColor = health === 'live' ? colors.fgDefault : colors.fgMuted;
-
-  useEffect(() => {
-    setPrivacyHigh(privacy || false);
-  }, [privacy]);
-
-  useEffect(() => {
-    if (privacyHigh && !privacy) {
-      setPrivacyHigh(false);
-    }
-  }, [privacyHigh, privacy]);
 
   useEffect(() => {
     const zeroString = '0' + decimalSeparator + '00';
@@ -66,14 +58,9 @@ const CurrencyAmount: React.FunctionComponent<CurrencyAmountProps> = ({
     setCurrencyString(currencyStr);
   }, [amtZec, decimalSeparator, price]);
 
-  const onPress = () => {
-    setPrivacyHigh(false);
-    setTimeout(() => setPrivacyHigh(true), 5 * 1000);
-  };
-
   return (
     <View style={{ flexDirection: 'row', alignItems: 'baseline' }}>
-      <TouchableOpacity disabled={!privacyHigh} onPress={onPress}>
+      <TouchableOpacity disabled={!privacyHigh} onPress={reveal}>
         <View style={{ flexDirection: 'row', alignItems: 'baseline' }}>
           {privacyHigh ? (
             <Text
