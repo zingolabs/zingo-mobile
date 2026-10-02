@@ -175,12 +175,36 @@ jobs:
             -resultBundlePath "build/reports/Zingo-Test.xcresult" \
             "${only[@]}"
 
+      - name: Run public-chain XCTest classes
+        working-directory: ios
+        run: |
+          set -euxo pipefail
+          xctestrun="$(find build/DerivedData/Build/Products -name '*.xctestrun' | head -n 1)"
+          only=()
+          for class in \
+            ExecuteSyncFromSeed \
+            ConfirmRefusesWithoutMixnet \
+            RecoversConsolidationTransfer
+          do
+            only+=("-only-testing:ZingoTests/$class")
+          done
+          xcodebuild test-without-building \
+            -xctestrun "$xctestrun" \
+            -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.5' \
+            -resultBundlePath "build/reports/Zingo-PublicChainTest.xcresult" \
+            -test-timeouts-enabled YES \
+            -default-test-execution-time-allowance 420 \
+            -maximum-test-execution-time-allowance 420 \
+            "${only[@]}"
+
       - name: Upload IOS test reports (.xcresult)
         if: ${{ failure() }}
         uses: actions/upload-artifact@v7
         with:
           name: test-ios-integration-test-reports.xcresult
-          path: ios/build/reports/Zingo-Test.xcresult
+          path: |
+            ios/build/reports/Zingo-Test.xcresult
+            ios/build/reports/Zingo-PublicChainTest.xcresult
           if-no-files-found: ignore
 
       - name: Upload Build Result
