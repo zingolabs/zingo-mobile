@@ -157,7 +157,6 @@ struct ValueTransfer: Codable, Equatable {
 
 struct ValueTransfers: Codable {
     let value_transfers: [ValueTransfer]
-    let total: Int64
 }
 
 struct ParseResult: Codable, Equatable {
