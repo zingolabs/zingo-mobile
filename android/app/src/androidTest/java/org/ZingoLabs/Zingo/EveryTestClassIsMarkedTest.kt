@@ -11,7 +11,6 @@ private const val TEST_PACKAGE = "org.ZingoLabs.Zingo"
 /** The markers, one of which every instrumented test class carries. */
 private val TEST_KIND_MARKERS = listOf(
     OfflineDeviceTest::class.java,
-    StaticChainTest::class.java,
     LiveChainTest::class.java,
     PublicChainTest::class.java,
 )
