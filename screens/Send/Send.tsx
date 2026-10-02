@@ -136,6 +136,9 @@ type SendProps = NativeStackScreenProps<AppDrawerParamList, RouteEnum.Send> & {
   clearToAddr: () => void;
 };
 
+const recipientIdentity = (address: string) =>
+  address.replace(/[ \t\n\r]+/g, '').toLowerCase();
+
 const Send: React.FunctionComponent<SendProps> = ({
   sendTransaction,
   clearToAddr,
@@ -269,6 +272,11 @@ const Send: React.FunctionComponent<SendProps> = ({
   // so that is explicit).
   const showCalcError = !!(spendableBalanceLastError || proposeSendLastError);
   const feeCalculationGenRef = useRef<number>(0);
+  const recipientRevision = useRef(0);
+  const [recipientKey, setRecipientKey] = useState(() =>
+    recipientIdentity(sendPageState.toaddr.to),
+  );
+  const recipientInput = useRef(recipientKey);
   const { decimalSeparator } = getNumberFormatSettings();
   const keyboardHeight = useKeyboardHeight();
   useDismissSheetsOnBlur();
@@ -280,6 +288,13 @@ const Send: React.FunctionComponent<SendProps> = ({
   // Bump applied to the snaps that sit just below a balance row (low + mid);
   // the max snap (just below the top icons strip) doesn't need it.
   const BALANCE_SNAP_BUMP = 10;
+
+  useEffect(
+    () => () => {
+      recipientRevision.current += 1;
+    },
+    [server.chainName],
+  );
 
   useEffect(() => {
     if (!showFiat) {
@@ -616,6 +631,10 @@ const Send: React.FunctionComponent<SendProps> = ({
     includeUAMemoPar: boolean | null,
   ) => {
     if (addressPar !== null) {
+      recipientInput.current = recipientIdentity(addressPar);
+      setRecipientKey(recipientInput.current);
+      recipientRevision.current += 1;
+      const revision = recipientRevision.current;
       //Alert.alert('', addressPar);
       //setAddressText(addressPar);
       // Attempt to parse as URI if it starts with zcash
@@ -624,6 +643,9 @@ const Send: React.FunctionComponent<SendProps> = ({
         addressPar.toLowerCase().includes(':')
       ) {
         const parsed = await parseZcashURI(addressPar, server);
+        if (revision !== recipientRevision.current) {
+          return;
+        }
 
         // Audit Issue H — surface the parser error and abort before any
         // Send-state mutation. A failure result carries no target, so a
@@ -638,6 +660,8 @@ const Send: React.FunctionComponent<SendProps> = ({
           // redo the to addresses
           [target].forEach(tgt => {
             if (tgt.address) {
+              recipientInput.current = recipientIdentity(tgt.address);
+              setRecipientKey(recipientInput.current);
               setAddressText(tgt.address);
             }
             if (tgt.amount) {
@@ -725,13 +749,17 @@ const Send: React.FunctionComponent<SendProps> = ({
       );
       return;
     }
+    const alias = recipientIdentity(addressText);
+    if (alias !== recipientKey) {
+      return;
+    }
     // Neither valid nor invalid until the indexer answers.
     setValidAddress(0);
     setZnsNotFound(false);
     let cancelled = false;
     const timerId = setTimeout(async () => {
       const resolution = await resolveZnsName(addressText, server.chainName);
-      if (cancelled) {
+      if (cancelled || alias !== recipientInput.current) {
         return;
       }
       if (resolution.ok) {
@@ -754,7 +782,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     // updateToField is redefined on every render; depending on it would restart
     // the debounce continuously.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [addressText, server.chainName]);
+  }, [addressText, server.chainName, recipientKey]);
 
   useEffect(() => {
     const getMemoEnabled = async (
@@ -896,6 +924,9 @@ const Send: React.FunctionComponent<SendProps> = ({
   }, [addressBook, walletChainName, server.chainName]);
 
   useEffect(() => {
+    recipientInput.current = recipientIdentity(sendPageState.toaddr.to);
+    setRecipientKey(recipientInput.current);
+    recipientRevision.current += 1;
     setAddressText(sendPageState.toaddr.to);
     setAmountText(sendPageState.toaddr.amount);
     setAmountCurrencyText(sendPageState.toaddr.amountCurrency);
@@ -923,6 +954,9 @@ const Send: React.FunctionComponent<SendProps> = ({
   };
 
   const clearState = () => {
+    recipientInput.current = '';
+    setRecipientKey('');
+    recipientRevision.current += 1;
     feeCalculationGenRef.current += 1;
     sendAllRef.current = false;
     setAddressText('');
