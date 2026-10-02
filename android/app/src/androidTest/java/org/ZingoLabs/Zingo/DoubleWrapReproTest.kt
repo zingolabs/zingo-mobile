@@ -18,6 +18,7 @@ import java.io.IOException
  * Run: ./gradlew :app:connectedProdDebugAndroidTest \
  *   -Pandroid.testInstrumentationRunnerArguments.class=org.ZingoLabs.Zingo.DoubleWrapReproTest
  */
+@OfflineDeviceTest
 class DoubleWrapReproTest {
     private val fileName = Constants.WalletFileName.value
     private val context = InstrumentationRegistry.getInstrumentation().targetContext

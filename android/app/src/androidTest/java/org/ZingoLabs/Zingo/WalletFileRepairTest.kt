@@ -17,6 +17,7 @@ import java.io.File
  * `encryptedLegacy`, the double wrap repairs back to plain bytes, and a
  * restore over an undecryptable main keeps the raw evidence aside.
  */
+@OfflineDeviceTest
 class WalletFileRepairTest {
     private val fileName = Constants.WalletFileName.value
     private val backupName = Constants.WalletBackupFileName.value

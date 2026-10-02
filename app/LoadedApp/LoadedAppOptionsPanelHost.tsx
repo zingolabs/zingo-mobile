@@ -24,10 +24,8 @@ const SOCIAL_X_URL = 'https://x.com/ZingoLabs';
 const SOCIAL_GITHUB_URL = 'https://github.com/zingolabs/zingo-mobile';
 
 // Legacy `menu.*` testID slugs, kept stable across the drawer→OptionsPanel
-// migration so existing Maestro flows (.maestro/*.yaml) and the detox
-// helper (e2e/e2e-utils/loadTestWallet.js) continue to resolve their
-// selectors. Add a new entry here when a new MenuItemEnum surfaces in
-// the grid.
+// migration. The Maestro flows (.maestro/*.yaml) select by these slugs.
+// Add a new entry here when a new MenuItemEnum surfaces in the grid.
 const MENU_TEST_IDS: Partial<Record<MenuItemEnum, string>> = {
   [MenuItemEnum.AddressBook]: 'menu.addressbook',
   [MenuItemEnum.WalletSeedUfvk]: 'menu.walletseedufvk',
