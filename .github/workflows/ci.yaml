@@ -47,6 +47,7 @@ jobs:
     needs: create-cache-key
     with:
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
+      runner: ${{ vars.CI_GRADLE_RUNNER || 'ubuntu-24.04' }}
       fail-all: true
 
   # The plain-JVM bridge-contract tests (FfiOutcome, FfiArgs): the only
@@ -101,6 +102,7 @@ jobs:
     secrets: inherit
     with:
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
+      runner: ${{ vars.CI_GRADLE_RUNNER || 'ubuntu-24.04' }}
       fail-all: true
 
   create-timestamp:
@@ -112,8 +114,7 @@ jobs:
   # PR CI executes tests on the emulator ABI (x86_64 / API 34), not the
   # device ABIs: KVM accelerates an AVD only when the guest matches the
   # x86_64 host, so arm64-v8a and armeabi-v7a can never run on hosted
-  # runners. The x86 / API 29 emulator lane and the iOS pipeline — whose
-  # macOS-runner queue dominated PR wall-clock — run on ci-nightly.
+  # runners. The x86 / API 29 emulator lane runs on ci-nightly.
   andr-build:
     strategy:
       matrix:
@@ -123,13 +124,15 @@ jobs:
     with:
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
       arch: ${{ matrix.arch }}
+      runner: ${{ vars.CI_NATIVE_RUNNER || 'zingo-android-native-16' }}
       fail-all: true
 
   # The other three ABIs cross-compile per PR: proof that the Rust code
   # still builds for the device ABIs and 32-bit x86 without waiting for
-  # ci-nightly. They block like every other check. Standard runners keep
-  # these off the zingo-android-native-16 pool; the per-arch caches make
-  # them no-ops on pushes that leave the zingolib pin untouched.
+  # ci-nightly. They block like every other check. The standard-runner
+  # fallback keeps these off the zingo-android-native-16 pool; the
+  # per-arch caches make them no-ops on pushes that leave the zingolib
+  # pin untouched.
   andr-build-other-abis:
     strategy:
       matrix:
@@ -139,7 +142,7 @@ jobs:
     with:
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
       arch: ${{ matrix.arch }}
-      runner: ubuntu-24.04
+      runner: ${{ vars.CI_NATIVE_RUNNER || 'ubuntu-24.04' }}
       fail-all: true
 
   andr-apk-build:
@@ -148,6 +151,7 @@ jobs:
     with:
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
       abi: x86_64
+      runner: ${{ vars.CI_GRADLE_RUNNER || 'zingo-android-gradle-16' }}
       fail-all: true
 
   # Deliberately NO needs-edge on andr-apk-build: the buckets start
@@ -161,7 +165,9 @@ jobs:
         config:
           - { abi: x86_64, api-level: 34, target: default }
     uses: ./.github/workflows/android-ubuntu-integration-test-ci.yaml
-    needs: [create-timestamp, create-cache-key]
+    # The offline device test job builds the debug app in the job, and
+    # that build packages the Binding Layer that andr-build produces.
+    needs: [create-timestamp, create-cache-key, andr-build]
     secrets: inherit
     with:
       timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
@@ -169,33 +175,25 @@ jobs:
       abi: ${{ matrix.config.abi }}
       api-level: ${{ matrix.config['api-level'] }}
       target: ${{ matrix.config.target }}
+      runner: ${{ vars.CI_EMULATOR_RUNNER || 'ubuntu-24.04' }}
       fail-all: true
 
-  # iOS runs per-PR as a trailing stage: it starts only after every
-  # blocking check has passed, so the fast path's verdict is never
-  # delayed by the macOS-runner queue and a red fast path skips iOS
-  # entirely. Its failures fail the run like any other job.
+  # iOS starts at workflow launch, in parallel with the Android chain,
+  # and its jobs are blocking checks.
   ios-build:
     uses: ./.github/workflows/ios-build.yaml
-    needs:
-      - andr-kotlin-compile
-      - andr-lint
-      - andr-unit-test
-      - jest-test
-      - rust-shear
-      - workbench-test
-      - binding-layer-check
-      - js-depcheck
-      - js-static-checks
-      - andr-dependency-analysis
-      - create-cache-key
-      - andr-ubu-integra-test-ci
+    needs: create-cache-key
     with:
       cache-key: ${{ needs.create-cache-key.outputs.ios-cache-key }}
+      fail-all: true
 
+  # The test job starts at workflow launch and front-loads its setup. On
+  # a cache miss it holds at the ci-gate artifact gate until the Binding
+  # Layer artifact lands.
   ios-integration-test:
     uses: ./.github/workflows/ios-integration-test.yaml
-    needs: [create-cache-key, ios-build]
+    needs: create-cache-key
     secrets: inherit
     with:
       cache-key: ${{ needs.create-cache-key.outputs.ios-cache-key }}
+      fail-all: true

@@ -6,11 +6,7 @@ module.exports = {
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   // The zingolib submodule holds the Binding Layer's target and build
   // directories, and no JavaScript, so the haste map skips it as Metro does.
-  modulePathIgnorePatterns: [
-    'e2e',
-    '<rootDir>/.claude/',
-    '<rootDir>/zingolib/',
-  ],
+  modulePathIgnorePatterns: ['<rootDir>/.claude/', '<rootDir>/zingolib/'],
   // visual/ holds Playwright specs, run by `yarn visual:capture`.
   testPathIgnorePatterns: [
     '/node_modules/',

@@ -1,0 +1,123 @@
+appId: org.ZingoLabs.Zingo
+---
+- runFlow:
+    file: common/create_wallet.yaml
+
+- tapOn:
+    id: "header.drawmenu"
+- tapOn:
+    id: "header.settings"
+- extendedWaitUntil:
+    visible:
+      id: "settings.scroll-view"
+    timeout: 10000
+# The Settings sheet is still moving when settings.scroll-view first
+# shows. A tap resolved during that animation lands where the row no
+# longer is (see 02_options_menu.yaml).
+- waitForAnimationToEnd:
+    timeout: 5000
+
+# The server choices live in a sheet that the server row opens.
+- scrollUntilVisible:
+    element:
+      id: "settings.server"
+- tapOn:
+    id: "settings.server"
+- extendedWaitUntil:
+    visible:
+      id: "settings.custom-server"
+    timeout: 10000
+- tapOn:
+    id: "settings.custom-server"
+
+# The chain toggle shows once Custom is chosen. A mainnet wallet already
+# has mainnet selected, and the tap keeps it.
+- scrollUntilVisible:
+    element:
+      id: "settings.custom-server-chain.mainnet"
+- tapOn:
+    id: "settings.custom-server-chain.mainnet"
+
+- scrollUntilVisible:
+    element:
+      id: "settings.custom-server-field"
+    direction: UP
+
+# The driver can drop characters while it types, and a save then targets
+# a host that does not exist. The field is read back, and the entry is
+# typed again when the text differs.
+#
+# Each attempt starts from an empty field. The clear button empties the
+# field whatever it holds, and it shows only while the field holds text.
+# A tap on the field puts the cursor where the tap lands, so an erase
+# from there leaves the text after the cursor, and the next attempt then
+# types into what is left.
+- retry:
+    maxRetries: 3
+    commands:
+      - runFlow:
+          when:
+            visible:
+              id: "settings.custom-server-clear"
+          commands:
+            - tapOn:
+                id: "settings.custom-server-clear"
+      - tapOn:
+          id: "settings.custom-server-field"
+      - inputText: "https://na.zec.rocks:443"
+      - assertVisible:
+          id: "settings.custom-server-field"
+          text: "https://na\\.zec\\.rocks:443"
+
+# The server sheet covers the Save button. Closing the sheet unmounts the
+# field and takes the keyboard with it.
+- tapOn:
+    id: "settings.server.close"
+- waitForAnimationToEnd:
+    timeout: 5000
+- tapOn:
+    id: "settings.button.save"
+
+# Save reaches the server, reloads the wallet against it, and returns to
+# History. A same-chain change shows no confirmation screen. The check
+# icon renders only on History, and only while no sync is in progress.
+- extendedWaitUntil:
+    visible:
+      id: "header.checkicon"
+    timeout: 300000
+
+# The server row shows the saved mode and the saved server after the
+# wallet reconnected. The mode matters when the automatic choice was
+# already this server, because the address alone would then read the same
+# before the save. On Android the mode and the address are two texts
+# inside the row. On iOS the row is one element whose text joins them.
+- tapOn:
+    id: "header.drawmenu"
+- tapOn:
+    id: "header.settings"
+- extendedWaitUntil:
+    visible:
+      id: "settings.scroll-view"
+    timeout: 10000
+- scrollUntilVisible:
+    element:
+      id: "settings.server"
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - assertVisible:
+          text: "Custom"
+          childOf:
+            id: "settings.server"
+      - assertVisible:
+          text: "https://na\\.zec\\.rocks:443/?"
+          childOf:
+            id: "settings.server"
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - assertVisible:
+          id: "settings.server"
+          text: "Custom, https://na\\.zec\\.rocks:443/?"

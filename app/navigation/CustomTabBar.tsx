@@ -165,6 +165,7 @@ const CustomTabBar = ({
             return (
               <Pressable
                 key={route.key}
+                testID={`tab.${route.name.toLowerCase()}`}
                 style={styles.tabItem}
                 onPressIn={() => handlePressIn(route.key)}
                 onPressOut={() => handlePressOut(route.key)}

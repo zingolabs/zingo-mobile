@@ -6,6 +6,12 @@ on:
       cache-key:
         required: true
         type: string
+      # Fail-all (see CONTEXT.md): when true, a failure here cancels the
+      # whole run. PR CI opts in; ci-nightly does not.
+      fail-all:
+        required: false
+        type: boolean
+        default: false
       advisory:
         # Advisory mode: job failures are recorded but do not fail the
         # caller, for runs where iOS is informational (per-PR CI) rather
@@ -21,11 +27,11 @@ env:
 jobs:
   build-for-testing:
     continue-on-error: ${{ inputs.advisory }}
-    # Stock runners, deliberately: the huge macos-15 fleet queues in seconds,
-    # while the max-4 zingo-ios-build-m2 pool is left to the xcframework
-    # build alone. The xcodebuild destination pins no arch (see the
-    # build-for-testing step), so Apple-silicon stock runners are fine.
-    runs-on: macos-15
+    # The CI_IOS_RUNNER repository variable sets the runner label. The
+    # fallback warp-macos-15-arm64-12x is WarpBuild's 12-vCPU M4 Pro
+    # machine; the stock macos-15 label has three cores. The xcodebuild
+    # destination pins no arch (see the build-for-testing step).
+    runs-on: ${{ vars.CI_IOS_RUNNER || 'warp-macos-15-arm64-12x' }}
     steps:
       - name: Xcode 16.4
         uses: maxim-lobanov/setup-xcode@v1
@@ -48,13 +54,22 @@ jobs:
       - name: Check out zingolib
         uses: ./.github/actions/zingolib-submodule
 
+      # The artifact gate runs cargo and gh. This step fails the job at
+      # its start when the runner image lacks one of them.
+      - name: Report the tools of the artifact gate
+        run: |
+          cargo --version
+          gh --version
+
       # The Xcode project takes the Binding Layer from the zingolib submodule.
+      # A cache hit supplies it here. On a miss, the artifact gate below
+      # supplies it from the build that runs in parallel.
       - name: Restore the iOS Binding Layer
+        id: binding-layer
         uses: actions/cache/restore@v6
         with:
           path: zingolib/bindings/swift/build
           key: binding-layer-ios-${{ env.CACHE-KEY }}
-          fail-on-cache-miss: true
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -78,6 +93,42 @@ jobs:
           xcrun simctl list runtimes
           xcrun simctl list devices
 
+      # The steps above are independent of the Binding Layer build. This
+      # step holds until the artifact of that build lands, and it ends
+      # early when the build concludes without success. The job continues
+      # past a failed gate to the cache restore below.
+      - name: Wait for the Binding Layer artifact (ci-gate)
+        id: gate
+        if: ${{ steps.binding-layer.outputs.cache-hit != 'true' }}
+        continue-on-error: true
+        working-directory: ./rust
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cargo run -p workbench --bin ci-gate -- \
+            --artifact "binding-layer-ios-${{ env.CACHE-KEY }}" \
+            --upstream "Build the iOS Binding Layer" \
+            --timeout-secs 2700 \
+            --poll-secs 20
+
+      - name: Download the Binding Layer
+        if: ${{ steps.gate.outcome == 'success' }}
+        uses: actions/download-artifact@v4
+        with:
+          name: binding-layer-ios-${{ env.CACHE-KEY }}
+          path: zingolib/bindings/swift/build
+
+      # The build is skipped when another run saves the cache after the
+      # restore above. The gate then fails, and the cache holds the
+      # Binding Layer.
+      - name: Restore the iOS Binding Layer after a failed gate
+        if: ${{ steps.gate.outcome == 'failure' }}
+        uses: actions/cache/restore@v6
+        with:
+          path: zingolib/bindings/swift/build
+          key: binding-layer-ios-${{ env.CACHE-KEY }}
+          fail-on-cache-miss: true
+
       - name: Build for testing
         working-directory: ios
         run: |
@@ -96,6 +147,41 @@ jobs:
             -derivedDataPath "build/DerivedData" \
             -resultBundlePath "build/reports/Zingo-BuildForTesting.xcresult" \
             -quiet
+
+      - name: Run offline XCTest classes
+        working-directory: ios
+        run: |
+          set -euxo pipefail
+          xctestrun="$(find build/DerivedData/Build/Products -name '*.xctestrun' | head -n 1)"
+          only=()
+          for class in \
+            ExecuteVersionFromSeed \
+            ExecuteAddressesFromSeed \
+            ExecuteAddressFromUfvk \
+            ExecuteParseAddressForTex \
+            ExecuteParseAddressInvalid \
+            PriceRefusedWithoutMixnet \
+            FfiOutcomeTests \
+            FfiArgsTests \
+            WalletFileProtectionTests \
+            WalletFileDiagnosisTests \
+            WalletSwapRecoveryTests
+          do
+            only+=("-only-testing:ZingoTests/$class")
+          done
+          xcodebuild test-without-building \
+            -xctestrun "$xctestrun" \
+            -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.5' \
+            -resultBundlePath "build/reports/Zingo-Test.xcresult" \
+            "${only[@]}"
+
+      - name: Upload IOS test reports (.xcresult)
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-ios-integration-test-reports.xcresult
+          path: ios/build/reports/Zingo-Test.xcresult
+          if-no-files-found: ignore
 
       - name: Upload Build Result
         uses: actions/upload-artifact@v7
@@ -125,113 +211,13 @@ jobs:
         run: |
           rm -rf build/reports build/DerivedData || true
 
-  # ios-integration-test:
-  #   name: IOS Integration test
-  #   needs: build-for-testing
-  #   runs-on: macos-15
-  #   strategy:
-  #     fail-fast: false
-  #     matrix:
-  #       test: [
-  #         "execute_version_from_seed",
-  #         "execute_addresses_from_ufvk",
-  #         "execute_addresses_from_seed",
-  #         "execute_sync_from_seed",
-  #         "execute_send_from_orchard",
-  #         "execute_currentprice_and_value_transfers_from_seed",
-  #         "execute_sapling_balance_from_seed",
-  #         "execute_parse_address_for_tex",
-  #         "execute_parse_address_invalid"
-  #       ]
-  #   env:
-  #     RUSTFLAGS: -D warnings
-  #   steps:
-  #     - name: Xcode 16.4
-  #       uses: maxim-lobanov/setup-xcode@v1
-  #       with:
-  #         xcode-version: '16.4'
-
-  #     - name: First launch
-  #       run: |
-  #         xcodebuild -runFirstLaunch || true
-
-  #     - name: Info 1
-  #       run: |
-  #         xcrun simctl list runtimes
-  #         xcrun simctl list devices
-
-  #     - name: Set envs for zingolib CI
-  #       if: ${{ contains(github.repository, 'zingolib') }}
-  #       run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
-
-  #     - name: Checkout repository
-  #       uses: actions/checkout@v7
-  #       with:
-  #         repository: ${{ env.REPO-OWNER }}/zingo-mobile
-
-  #     - name: Grant permissions
-  #       run: |
-  #         sudo chmod 777 ./scripts/ci/ios_integration_tests_ci.sh
-
-  #     - name: Rust toolchain
-  #       uses: actions-rust-lang/setup-rust-toolchain@v1
-  #       with:
-  #         toolchain: stable
-  #         cache-workspaces: rust -> rust/target
-
-  #     - name: Install nextest
-  #       uses: taiki-e/install-action@v2
-  #       with:
-  #         tool: nextest
-
-  #     - name: Install nvm with node 22.18.0
-  #       run: |
-  #         curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
-  #         export NVM_DIR="$HOME/.nvm"
-  #           [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-  #           [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-  #         nvm install 22.18.0
-  #         nvm use 22.18.0
-
-  #     - name: Yarn
-  #       run: yarn
-
-  #     - name: Pod Install
-  #       working-directory: ios
-  #       run: pod install
-
-  #     - name: Download Build Result
-  #       uses: actions/download-artifact@v4
-  #       with:
-  #         name: xctestrun-and-products
-  #         path: ios/build/DerivedData/Build/Products
-
-  #     - name: Info 2
-  #       run: |
-  #         xcrun simctl list runtimes
-  #         xcrun simctl list devices
-
-  #     - name: Run IOS integration tests
-  #       working-directory: ./rust
-  #       run: cargo nextest run ios_integration::universal::${{ matrix.test }} --features "ci" --verbose --release
-
-  #     - name: Upload IOS test reports (.xcresult)
-  #       if: ${{ always() && !cancelled() }}
-  #       uses: actions/upload-artifact@v7
-  #       with:
-  #         name: test-ios-integration-test-reports-${{ matrix.test }}.xcresult
-  #         path: ios/build/reports/Zingo-Test.xcresult
-
-  #     - name: Upload IOS DerivedData logs (optional)
-  #       if: ${{ always() && !cancelled() }}
-  #       uses: actions/upload-artifact@v7
-  #       with:
-  #         name: test-ios-integration-test-derived-logs-${{ matrix.test }}
-  #         path: |
-  #           ios/build/DerivedData/Logs/Test
-  #           ios/build/DerivedData/Logs/CrashReporter
-  #         if-no-files-found: ignore
-
-  #     - name: Cleaning up test
-  #       run: |
-  #         rm -rf build/reports build/DerivedData || true
+      - name: Cancel the run on failure (fail-all)
+        if: ${{ failure() && inputs.fail-all }}
+        uses: actions/github-script@v9
+        with:
+          script: |
+            await github.rest.actions.cancelWorkflowRun({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.runId,
+            });
