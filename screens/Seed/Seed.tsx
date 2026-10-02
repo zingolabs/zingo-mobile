@@ -41,6 +41,7 @@ import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
 import { useBiometricGate } from '@app/hooks/useBiometricGate';
 import { useSecureScreen } from '@app/hooks/useSecureScreen';
+import { useTimedReveal } from '@app/hooks/useTimedReveal';
 import {
   ChainNameEnum,
   SnackbarDurationEnum,
@@ -115,8 +116,9 @@ const Seed: React.FunctionComponent<SeedProps> = ({
 
   const [times, setTimes] = useState<number>(0);
   const [texts, setTexts] = useState<TextsType>({} as TextsType);
-  const [expandSeed, setExpandSeed] = useState<boolean>(true);
-  const [expandBirthday, setExpandBithday] = useState<boolean>(true);
+  const { visible: expandSeed, reveal: revealSeed } = useTimedReveal(privacy);
+  const { visible: expandBirthday, reveal: revealBirthday } =
+    useTimedReveal(privacy);
   const [action, setAction] = useState<SeedActionEnum>(
     !!route.params && route.params.action !== undefined
       ? route.params.action
@@ -231,10 +233,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
               );
             }
             if (expandOnCopy) {
-              setExpandSeed(true);
-              if (privacy) {
-                setTimeout(() => setExpandSeed(false), 5 * 1000);
-              }
+              revealSeed();
             }
             clipboardTimer.current = setTimeout(() => {
               Clipboard.setString('');
@@ -263,28 +262,6 @@ const Seed: React.FunctionComponent<SeedProps> = ({
         : SeedActionEnum.view;
     setAction(_action);
   }, [route, route.params, route.params?.action]);
-
-  useEffect(() => {
-    if (privacy) {
-      setExpandSeed(false);
-      setExpandBithday(false);
-    } else {
-      setExpandSeed(true);
-      setExpandBithday(true);
-    }
-  }, [privacy]);
-
-  useEffect(() => {
-    if (!expandSeed && !privacy) {
-      setExpandSeed(true);
-    }
-  }, [expandSeed, privacy]);
-
-  useEffect(() => {
-    if (!expandBirthday && !privacy) {
-      setExpandBithday(true);
-    }
-  }, [expandBirthday, privacy]);
 
   useEffect(() => {
     const buttonTextsArray = translate('seed.buttontexts');
@@ -604,12 +581,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
                           SnackbarDurationEnum.short,
                         );
                       }
-                      setExpandBithday(true);
-                      if (privacy) {
-                        setTimeout(() => {
-                          setExpandBithday(false);
-                        }, 5 * 1000);
-                      }
+                      revealBirthday();
                     }
                   }}
                 >
