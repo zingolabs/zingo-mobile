@@ -60,8 +60,8 @@ jobs:
         with:
           cache-key: ${{ inputs.cache-key }}
 
-      # Fails on dependencies nothing compiles against (the Kotlin analog
-      # of the rust-shear job); scope and transitive advice is warn-only.
+      # Fails on dependencies nothing compiles against; scope and
+      # transitive advice is warn-only.
       - name: Dependency analysis
         working-directory: ./android
         run: ./gradlew buildHealth
