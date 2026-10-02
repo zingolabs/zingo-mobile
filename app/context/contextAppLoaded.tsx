@@ -1,5 +1,6 @@
 import React, { ReactNode } from 'react';
 import { useShallowMemo } from './useShallowMemo';
+import { PERMITTED } from '@app/walletBackend/transforms/sendPermit';
 
 import {
   InfoType,
@@ -73,6 +74,7 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   blockExplorer: BlockExplorerEnum.Zcashexplorer,
   mixnetView: null,
   reenableMixnet: async () => {},
+  sendPermitNow: () => PERMITTED,
 };
 
 export const ContextAppLoaded = React.createContext(defaultAppContextLoaded);

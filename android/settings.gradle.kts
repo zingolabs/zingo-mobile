@@ -17,4 +17,4 @@ include(":app")
 includeBuild("../node_modules/@react-native/gradle-plugin")
 
 // The Binding Layer, built from the zingolib submodule (zingo-mobile/0016)
-includeBuild("../zingolib/bindings/android")
+includeBuild("../zingolib/bindings/android") { name = "zingo-binding-layer" }

@@ -149,6 +149,12 @@ import {
   MixnetView,
 } from '@app/walletBackend/transforms/mixnetView';
 import {
+  SendOutcome,
+  SendPermit,
+  sendPermit,
+  sendWhenPermitted,
+} from '@app/walletBackend/transforms/sendPermit';
+import {
   startMixnetTransport,
   stopMixnetTransport,
 } from '@app/walletBackend/utils/nymTransport';
@@ -413,7 +419,7 @@ export default function LoadedApp(props: LoadedAppProps) {
         );
       }
       if (
-        settings.blockExplorer === BlockExplorerEnum.Cipherscan ||
+        settings.blockExplorer === BlockExplorerEnum.ZecBlock ||
         settings.blockExplorer === BlockExplorerEnum.Zcashexplorer ||
         settings.blockExplorer === BlockExplorerEnum.Zexplorer ||
         settings.blockExplorer === BlockExplorerEnum.None
@@ -725,6 +731,7 @@ export class LoadedAppClass extends Component<
 
       mixnetView: INITIAL_MIXNET_VIEW,
       reenableMixnet: this.reenableMixnet,
+      sendPermitNow: this.sendPermitNow,
 
       // state
       pendingServer: { kind: 'none' },
@@ -1148,6 +1155,8 @@ export class LoadedAppClass extends Component<
     await this.rpc.reenableMixnet();
   };
 
+  sendPermitNow = (): SendPermit => sendPermit(this.state);
+
   setValueTransfersList = async (
     valueTransfers: ValueTransferType[],
     valueTransfersTotal: number,
@@ -1406,25 +1415,17 @@ export class LoadedAppClass extends Component<
     });
   };
 
-  sendTransaction = async (
+  sendTransaction = (
     sendPageState: SendPageStateClass,
     sendAll: boolean = false,
-  ): Promise<String> => {
-    try {
-      // Construct a sendJson from the sendPage state
-      const { defaultUnifiedAddress } = this.state;
+  ): Promise<SendOutcome<string>> =>
+    sendWhenPermitted(this.sendPermitNow, async () => {
       const sendJson = await Utils.getSendManyJSON(
         sendPageState,
-        defaultUnifiedAddress,
+        this.state.defaultUnifiedAddress,
       );
-      //const start = Date.now();
-      const txid = await this.rpc.sendTransaction(sendJson, sendAll);
-
-      return txid;
-    } catch (err) {
-      throw err;
-    }
-  };
+      return this.rpc.sendTransaction(sendJson, sendAll);
+    });
 
   doRefresh = (screen: ScreenEnum) => {
     if (screen === ScreenEnum.History) {
@@ -2020,6 +2021,7 @@ export class LoadedAppClass extends Component<
       blockExplorer: this.state.blockExplorer,
       mixnetView: this.state.mixnetView,
       reenableMixnet: this.reenableMixnet,
+      sendPermitNow: this.sendPermitNow,
     };
 
     return (

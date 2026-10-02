@@ -22,6 +22,7 @@ import { ScreenEnum } from './enums/ScreenEnum';
 import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
 import { BlockExplorerEnum } from './enums/BlockExplorerEnum';
 import { MixnetView } from '@app/walletBackend/transforms/mixnetView';
+import type { SendPermit } from '@app/walletBackend/transforms/sendPermit';
 
 export default interface AppContextLoaded {
   netInfo: NetInfoType;
@@ -135,4 +136,6 @@ export default interface AppContextLoaded {
   // Null where the mixnet policy does not run.
   mixnetView: MixnetView | null;
   reenableMixnet: () => Promise<void>;
+  // Reads the send permit from the state at call time.
+  sendPermitNow: () => SendPermit;
 }

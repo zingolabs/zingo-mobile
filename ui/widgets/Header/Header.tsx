@@ -117,6 +117,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     shieldingAmount,
     server,
     mixnetView,
+    sendPermitNow,
   } = context;
 
   // The sync slice reads from its own atom, so a scan tick wakes the
@@ -163,12 +164,11 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     totalBalance,
     shieldingAmount,
     translate,
-    netInfo,
     addLastSnackbar,
     setBackgroundError,
     setScrollToTop,
     setScrollToBottom,
-    mixnetView,
+    sendPermitNow,
   });
 
   // Audit Issue D — bio gate for seedUfvkScreen lives at the Ufvk screen

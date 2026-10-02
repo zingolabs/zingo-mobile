@@ -102,17 +102,23 @@ jobs:
           disable-animations: true
           script: |
             adb install -r android/app/build/outputs/apk/prod/release/app-prod-x86_64-release.apk
-            # Start a background logcat capture so we have device-side logs in
-            # case Maestro times out waiting on a UI element. The maestro run
-            # itself decides exit code.
+            # The runner starts a new shell for each line and stops at the
+            # first line that fails. The logcat capture is a background
+            # process that outlives its shell, and the emulator is discarded
+            # after the job.
             adb logcat -c
             adb logcat > /tmp/maestro-logcat.log 2>&1 &
-            LOGCAT_PID=$!
-            set +e
-            maestro test .maestro/
-            EXIT=$?
-            kill $LOGCAT_PID 2>/dev/null || true
-            exit $EXIT
+            maestro test --exclude-tags=screen-awake .maestro/
+            # The flow tagged screen-awake ends with the wallet loaded and
+            # syncing in the foreground, where the app holds a keep-awake
+            # lock. The ten-second timeout is armed after it, and the power
+            # state is read twenty idle seconds later.
+            maestro test --include-tags=screen-awake .maestro/
+            adb shell settings put global stay_on_while_plugged_in 0
+            adb shell settings put system screen_off_timeout 10000
+            sleep 20
+            adb shell dumpsys power > /tmp/dumpsys-power.txt
+            grep --quiet 'mWakefulness=Awake' /tmp/dumpsys-power.txt
 
       - name: Upload Maestro report on failure
         if: failure()
@@ -122,6 +128,7 @@ jobs:
           path: |
             ~/.maestro/tests/**
             /tmp/maestro-logcat.log
+            /tmp/dumpsys-power.txt
 
   maestro-ios:
     name: Maestro — iOS
@@ -295,7 +302,7 @@ jobs:
         run: |
           echo "--- Devices booted right before maestro test ---"
           xcrun simctl list devices booted
-          maestro --device "$SIM_UDID" test .maestro/
+          maestro --device "$SIM_UDID" test --exclude-tags=screen-awake .maestro/
 
       - name: Upload Maestro report on failure
         if: failure()

@@ -2,6 +2,7 @@ package org.ZingoLabs.Zingo
 
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
+import org.junit.Assume.assumeTrue
 import org.junit.Test
 import org.junit.experimental.categories.Category
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -26,6 +27,26 @@ fun regtestChainHint(): String {
     return if (heights.isNullOrEmpty()) "regtest" else "regtest:$heights"
 }
 
+/** The server URI of an offline wallet, which names no server. */
+const val OFFLINE_SERVER_URI = ""
+
+/** The chain hint of an offline wallet, which selects regtest parameters and launches no chain. */
+const val OFFLINE_CHAIN_HINT = "regtest"
+
+/** The zingo-mobile part of a build descriptor that received no descriptor from the build. */
+const val UNDESCRIBED_BUILD = "zm_unknown"
+
+/** Creates an offline wallet from [seed] and returns what the Binding Layer reports of it. */
+fun initOfflineWalletFromSeed(mapper: ObjectMapper, seed: String): InitFromSeed {
+    val initFromSeedJson: String =
+        uniffi.zingo.initFromSeed(seed, 1u, OFFLINE_SERVER_URI, OFFLINE_CHAIN_HINT, "Medium", 1u)
+    println("\nInit from seed:")
+    println(initFromSeedJson)
+    val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
+    assertThat(initFromSeed.seed_phrase).isEqualTo(seed)
+    return initFromSeed
+}
+
 inline fun <reified T> ObjectMapper.readValue(src: String): T =
     readValue(src, object : TypeReference<T>() {})
 
@@ -40,6 +61,92 @@ fun <T> refusedWithoutMixnet(what: String, attempt: () -> T): String? =
 
 object Seeds {
     const val HOSPITAL = "hospital museum valve antique skate museum unfold vocal weird milk scale social vessel identify crowd hospital control album rib bulb path oven civil tank"
+}
+
+object MainnetServers {
+    const val PRIMARY = "https://zec.rocks:443"
+    const val FALLBACK = "https://zcash.mysideoftheweb.com:9067"
+}
+
+/** The shared testnet fixture wallet, which is zingolib's GloryGoddess example wallet. */
+object TestnetFixture {
+    const val SEED = "glory goddess cargo action guilt ball coral employ phone baby oxygen flavor solid climb situate frequent blade pet enough milk access try swift benefit"
+    const val BIRTHDAY = 4_431_500L
+    val SERVERS = listOf("https://testnet.zec.rocks:443", "https://zaino.testnet.unsafe.zec.rocks:443")
+    const val CHAIN_HINT = "test"
+    const val UNIFIED_ADDRESS = "utest1dmu08vg5wt5m9w0ejwgeqdndzzkfka7c94heuz5llxv5vx4lhcethmm6p5ean3wcj8l0m6tf8k8cau9r636gq7sxq3wa6zey2sysfteh"
+    const val TRANSPARENT_ADDRESS = "tmF7QpuKsLF7nsMvThu4wQBpiKVGJXGCSJF"
+
+    const val CONSOLIDATION_TXID = "256fc8dcb3dd730439157301a027f7b243d69aa30e31fc7a9b619e726321d19f"
+    const val CONSOLIDATION_HEIGHT = 4_431_582L
+    const val CONSOLIDATION_KIND = "memo-to-self"
+    const val CONSOLIDATION_VALUE = 3_995_811_890L
+    const val CONSOLIDATION_FEE = 285_000L
+
+    const val DEADLINE_SECONDS = 5 * 60
+    const val TIP_SKEW_BLOCKS = 10L
+}
+
+/** Skips the test while the fixture names no consolidation transaction. */
+fun assumeConsolidationPublished() =
+    assumeTrue(
+        "TestnetFixture names no consolidation transaction yet",
+        TestnetFixture.CONSOLIDATION_TXID.isNotEmpty(),
+    )
+
+/** Returns the first of [servers] that reports its tip, paired with that tip, and fails with every refusal when no [chain] server answers. */
+fun firstAnsweringServer(chain: String, servers: List<String>): Pair<String, Long> {
+    val refusals = mutableMapOf<String, Exception>()
+    val answer = servers.firstNotNullOfOrNull { uri ->
+        try {
+            uri to uniffi.zingo.getLatestBlockServer(uri).toLong()
+        } catch (e: Exception) {
+            refusals[uri] = e
+            null
+        }
+    } ?: throw AssertionError("no $chain server answered: $refusals", refusals.values.last())
+    println("\nTip of ${answer.first}: ${answer.second}")
+    return answer
+}
+
+/** Returns the sync status of the open wallet, or the reason it is unavailable. */
+fun syncStatusOrReason(): String =
+    runCatching { uniffi.zingo.statusSync() }
+        .getOrElse { "status unavailable: ${it.message}" }
+
+/** Launches a sync of [what] and polls it each second to completion, failing with the elapsed time and the sync status at the deadline or on a sync error. */
+fun syncToCompletion(what: String, deadlineSeconds: Int, elapsedSeconds: () -> Double) {
+    val syncJson: String = uniffi.zingo.runSync()
+    println("\nSync:")
+    println(syncJson)
+
+    val syncStart = System.nanoTime()
+    try {
+        while (!uniffi.zingo.pollSync().contains("sync_complete")) {
+            if (elapsedSeconds() > deadlineSeconds) {
+                throw AssertionError("the test passed its $deadlineSeconds s deadline after ${elapsedSeconds()} s while syncing $what: ${syncStatusOrReason()}")
+            }
+            Thread.sleep(1000)
+        }
+    } catch (e: uniffi.zingo.ZingolibException) {
+        throw AssertionError("the sync of $what failed after ${elapsedSeconds()} s: ${e.message}: ${syncStatusOrReason()}", e)
+    }
+    println("\nSynced $what in ${(System.nanoTime() - syncStart) / 1e9} s")
+}
+
+/** Syncs every 20 seconds until the spendable shielded balance reaches [minimum], failing at the deadline with the balance the wallet holds. */
+fun syncUntilSpendable(mapper: ObjectMapper, minimum: Long, deadlineSeconds: Int, elapsedSeconds: () -> Double) {
+    while (true) {
+        val spendable: SpendableBalance = mapper.readValue(uniffi.zingo.getSpendableBalanceTotal())
+        if (spendable.spendable_balance >= minimum) {
+            return
+        }
+        if (elapsedSeconds() > deadlineSeconds) {
+            throw AssertionError("the fixture wallet held ${spendable.spendable_balance} spendable zatoshis of the $minimum the test needs at its $deadlineSeconds s deadline: ${uniffi.zingo.getBalance()}")
+        }
+        Thread.sleep(20_000)
+        syncToCompletion("the blocks mined while a spend from the published seed confirms", deadlineSeconds, elapsedSeconds)
+    }
 }
 
 object Ufvk {
@@ -136,6 +243,10 @@ data class Balance (
     var unconfirmed_transparent_balance : Long = 0L
 )
 
+data class SpendableBalance (
+    var spendable_balance : Long = 0L
+)
+
 data class Send (
     var address : String = "",
     var amount : Long = 0L,
@@ -170,28 +281,16 @@ data class ParseResult (
 
 val context = MainApplication.getAppContext()!!
 
+@OfflineDeviceTest
 class ExecuteAddressesFromSeed {
     @Test
     fun executeAddressesFromSeed() {
         val mapper = testMapper()
 
-        val serveruri = "http://10.0.2.2:20000"
-        val chainhint = regtestChainHint()
         val seed = Seeds.HOSPITAL
-        
-        val initFromSeedJson: String = uniffi.zingo.initFromSeed(seed, 1u, serveruri, chainhint, "Medium", 1u)
-        println("\nInit from seed:")
-        println(initFromSeedJson)
-        val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
 
-        assertThat(initFromSeed.seed_phrase).isEqualTo(seed)
+        val initFromSeed: InitFromSeed = initOfflineWalletFromSeed(mapper, seed)
         assertThat(initFromSeed.birthday).isEqualTo(1)
-
-        val infoJson: String = uniffi.zingo.infoServer()
-        println("\nInfo:")
-        println(infoJson)
-        val info: Info = mapper.readValue(infoJson)
-        assertThat(info.latest_block_height).isGreaterThan(0)
 
         val exportUfvkJson: String = uniffi.zingo.getUfvk()
         println("\nExport Ufvk:")
@@ -215,28 +314,21 @@ class ExecuteAddressesFromSeed {
     }
 }
 
+@OfflineDeviceTest
 class ExecuteAddressesFromUfvk {
     @Test
     fun executeAddressFromUfvk() {
         val mapper = testMapper()
 
-        val serveruri = "http://10.0.2.2:20000"
-        val chainhint = regtestChainHint()
         val ufvk = Ufvk.HOSPITAL
-        
-        val initFromUfvkJson: String = uniffi.zingo.initFromUfvk(ufvk, 1u, serveruri, chainhint, "Medium", 1u)
+
+        val initFromUfvkJson: String = uniffi.zingo.initFromUfvk(ufvk, 1u, OFFLINE_SERVER_URI, OFFLINE_CHAIN_HINT, "Medium", 1u)
         println("\nInit From UFVK:")
         println(initFromUfvkJson)
         val initFromUfvk: InitFromUfvk = mapper.readValue(initFromUfvkJson)
 
         assertThat(initFromUfvk.ufvk).isEqualTo(ufvk)
         assertThat(initFromUfvk.birthday).isEqualTo(1)
-
-        val infoJson: String = uniffi.zingo.infoServer()
-        println("\nInfo:")
-        println(infoJson)
-        val info: Info = mapper.readValue(infoJson)
-        assertThat(info.latest_block_height).isGreaterThan(0)
 
         val exportUfvkJson: String = uniffi.zingo.getUfvk()
         println("\nExport Ufvk:")
@@ -263,60 +355,49 @@ class ExecuteAddressesFromUfvk {
     }    
 }
 
-class ExecuteVersionFromSeed {
+@OfflineDeviceTest
+class BuildDescriptorTest {
     @Test
-    fun executeVersionFromSeed() {
-        val mapper = testMapper()
-
-        val serveruri = "http://10.0.2.2:20000"
-        val chainhint = regtestChainHint()
-        val seed = Seeds.HOSPITAL
-        
-        val initFromSeedJson: String = uniffi.zingo.initFromSeed(seed, 1u, serveruri, chainhint, "Medium", 1u)
-        println("\nInit from seed:")
-        println(initFromSeedJson)
-        val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
-
-        assertThat(initFromSeed.seed_phrase).isEqualTo(seed)
-        assertThat(initFromSeed.birthday).isEqualTo(1)
-
-        val infoJson: String = uniffi.zingo.infoServer()
-        println("\nInfo:")
-        println(infoJson)
-        val info: Info = mapper.readValue(infoJson)
-        assertThat(info.latest_block_height).isGreaterThan(0)
-
-        val version: String = uniffi.zingo.getVersion()
-        println("\nVersion:")
-        println(version)
-        assertThat(version).isNotNull()
-        assertThat(version).isNotEmpty()
-        assertThat(version).isNotEqualTo("")
+    fun buildDescriptorNamesBothRepositories() {
+        val descriptor: String = uniffi.zingo.getVersion()
+        println("\nBuild descriptor:")
+        println(descriptor)
+        val part = """[0-9A-Za-z.+-]+(_[0-9a-f]{5})?(_dirty)?"""
+        assertThat(descriptor).matches("zl_$part-zm_$part")
+        assertThat(descriptor).doesNotContain(UNDESCRIBED_BUILD)
     }
 }
 
+@PublicChainTest
 class ExecuteSyncFromSeed {
     @Test
     fun executeSyncFromSeed() {
         val mapper = testMapper()
 
-        val serveruri = "http://10.0.2.2:20000"
-        val chainhint = regtestChainHint()
+        val window = 10_000L
+        val deadlineSeconds = 5 * 60
+        val tipSkewBlocks = 1L
         val seed = Seeds.HOSPITAL
+        val servers = listOf(MainnetServers.PRIMARY, MainnetServers.FALLBACK)
+        val start = System.nanoTime()
+        val elapsedSeconds = { (System.nanoTime() - start) / 1e9 }
 
-        val initFromSeedJson: String = uniffi.zingo.initFromSeed(seed, 1u, serveruri, chainhint, "Medium", 1u)
+        val (serveruri, tip) = firstAnsweringServer("mainnet", servers)
+
+        val birthday = tip - window
+        val initFromSeedJson: String = uniffi.zingo.initFromSeed(seed, birthday.toUInt(), serveruri, "main", "Medium", 1u)
         println("\nInit from seed:")
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
 
         assertThat(initFromSeed.seed_phrase).isEqualTo(seed)
-        assertThat(initFromSeed.birthday).isEqualTo(1)
+        assertThat(initFromSeed.birthday).isEqualTo(birthday)
 
         val infoJson: String = uniffi.zingo.infoServer()
         println("\nInfo:")
         println(infoJson)
         val info: Info = mapper.readValue(infoJson)
-        assertThat(info.latest_block_height).isGreaterThan(0)
+        assertThat(info.latest_block_height).isAtLeast(tip - tipSkewBlocks)
 
         var heightJson: String = uniffi.zingo.getLatestBlockWallet()
         println("\nHeight pre-sync:")
@@ -324,131 +405,86 @@ class ExecuteSyncFromSeed {
         val heightPreSync: Height = mapper.readValue(heightJson)
         assertThat(heightPreSync.height).isEqualTo(0)
 
-        val syncJson: String = uniffi.zingo.runSync()
-        println("\nSync:")
-        println(syncJson)
-
-        var syncStatus: SyncStatus
-        while (true) {
-            val syncStatusJson: String = uniffi.zingo.statusSync()
-            println("\nSync status:")
-            println(syncStatusJson)
-            if (syncStatusJson.lowercase().startsWith("error")) {
-                println("Sync Error!:")
-                break
-            }
-            syncStatus = mapper.readValue(syncStatusJson)
-
-            val progress = syncStatus.percentage_total_outputs_scanned
-               ?: syncStatus.percentage_total_blocks_scanned
-
-            if (progress != null && progress >= 100.0) {
-                println("Sync completed!")
-                break
-            }
-
-            Thread.sleep(1000)
-        }
+        syncToCompletion("$window mainnet blocks", deadlineSeconds, elapsedSeconds)
 
         heightJson = uniffi.zingo.getLatestBlockWallet()
         println("\nHeight post-sync:")
         println(heightJson)
         val heightPostSync: Height = mapper.readValue(heightJson)
-        assertThat(heightPostSync.height).isEqualTo(info.latest_block_height)
+        assertThat(heightPostSync.height).isAtLeast(info.latest_block_height)
     }
 }
 
-class ExecuteSendFromOrchard {
+@PublicChainTest
+class ConfirmRefusesWithoutMixnet {
     @Test
-    fun executeSendFromOrchard() {
+    fun confirmRefusesWithoutMixnet() {
+        assumeConsolidationPublished()
         val mapper = testMapper()
 
-        val serveruri = "http://10.0.2.2:20000"
-        val chainhint = regtestChainHint()
-        val seed = Seeds.HOSPITAL
-        
-        val initFromSeedJson: String = uniffi.zingo.initFromSeed(seed, 1u, serveruri, chainhint, "Medium", 1u)
+        val amount = 100_000L
+        val fee = 20_000L
+        val start = System.nanoTime()
+        val elapsedSeconds = { (System.nanoTime() - start) / 1e9 }
+
+        val (serveruri, tip) = firstAnsweringServer("testnet", TestnetFixture.SERVERS)
+
+        val initFromSeedJson: String = uniffi.zingo.initFromSeed(TestnetFixture.SEED, TestnetFixture.BIRTHDAY.toUInt(), serveruri, TestnetFixture.CHAIN_HINT, "Medium", 1u)
         println("\nInit from seed:")
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
 
-        assertThat(initFromSeed.seed_phrase).isEqualTo(seed)
-        assertThat(initFromSeed.birthday).isEqualTo(1)
+        assertThat(initFromSeed.seed_phrase).isEqualTo(TestnetFixture.SEED)
+        assertThat(initFromSeed.birthday).isEqualTo(TestnetFixture.BIRTHDAY)
 
         val infoJson: String = uniffi.zingo.infoServer()
         println("\nInfo:")
         println(infoJson)
         val info: Info = mapper.readValue(infoJson)
-        assertThat(info.latest_block_height).isGreaterThan(0)
+        assertThat(info.latest_block_height).isAtLeast(tip - TestnetFixture.TIP_SKEW_BLOCKS)
 
-        var syncJson: String = uniffi.zingo.runSync()
-        println("\nSync:")
-        println(syncJson)
-
-        var syncStatusBefore: SyncStatus
-        while (true) {
-            val syncStatusBeforeJson: String = uniffi.zingo.statusSync()
-            println("\nSync status:")
-            println(syncStatusBeforeJson)
-            if (syncStatusBeforeJson.lowercase().startsWith("error")) {
-                println("Sync Error!:")
-                break
-            }
-            syncStatusBefore = mapper.readValue(syncStatusBeforeJson)
-
-            val progress = syncStatusBefore.percentage_total_outputs_scanned
-               ?: syncStatusBefore.percentage_total_blocks_scanned
-
-            if (progress != null && progress >= 100.0) {
-                println("Sync completed!")
-                break
-            }
-
-            Thread.sleep(1000)
-        }
-
-        var balanceJson: String = uniffi.zingo.getBalance()
-        println("\nBalance pre-send:")
-        println(balanceJson)
-        val balancePreSend: Balance = mapper.readValue(balanceJson)
-        assertThat(balancePreSend.confirmed_orchard_balance).isEqualTo(1000000)
-        assertThat(balancePreSend.confirmed_transparent_balance).isEqualTo(0)
+        val addressesJson: String = uniffi.zingo.getUnifiedAddresses()
+        println("\nAddresses:")
+        println(addressesJson)
+        val addresses: List<UnifiedAddress> = mapper.readValue(addressesJson)
+        assertThat(addresses[0].encoded_address).isEqualTo(TestnetFixture.UNIFIED_ADDRESS)
 
         val taddressesJson: String = uniffi.zingo.getTransparentAddresses()
         println("\nT Addresses:")
         println(taddressesJson)
         val taddresses: List<TransparentAddress> = mapper.readValue(taddressesJson)
+        assertThat(taddresses[0].encoded_address).isEqualTo(TestnetFixture.TRANSPARENT_ADDRESS)
 
-        val send = taddresses[0].encoded_address?.let { Send(it, 100000, null) }
+        syncToCompletion("${tip - TestnetFixture.BIRTHDAY} testnet blocks", TestnetFixture.DEADLINE_SECONDS, elapsedSeconds)
+
+        val heightJson: String = uniffi.zingo.getLatestBlockWallet()
+        println("\nHeight post-sync:")
+        println(heightJson)
+        val heightPostSync: Height = mapper.readValue(heightJson)
+        assertThat(heightPostSync.height).isAtLeast(tip - TestnetFixture.TIP_SKEW_BLOCKS)
+
+        val valueTransfersJson: String = uniffi.zingo.getValueTransfers()
+        val valueTransfers: ValueTransfers = mapper.readValue(valueTransfersJson)
+        assertThat(valueTransfers.value_transfers.map { it.txid }).contains(TestnetFixture.CONSOLIDATION_TXID)
+
+        syncUntilSpendable(mapper, amount + fee, TestnetFixture.DEADLINE_SECONDS, elapsedSeconds)
+
+        var balanceJson: String = uniffi.zingo.getBalance()
+        println("\nBalance pre-send:")
+        println(balanceJson)
+        val balancePreSend: Balance = mapper.readValue(balanceJson)
+
+        val send = Send(TestnetFixture.TRANSPARENT_ADDRESS, amount, null)
 
         val proposeJson: String = uniffi.zingo.send(mapper.writeValueAsString(listOf(send)))
         println("\nPropose:")
         println(proposeJson)
 
-        // The transmission rides the mixnet or does not happen (zingolib/0011).
-        // This wallet never attached one, so the confirm must refuse. A txid
-        // here would mean the transaction reached an indexer over clearnet,
-        // which is the leak the mixnet-only rule exists to prevent.
-        val refusal: String? = try {
-            val txid = uniffi.zingo.confirm()
-            throw AssertionError("the transmission answered without a mixnet: $txid")
-        } catch (e: uniffi.zingo.ZingolibException.Mixnet) {
-            e.message
-        }
+        val refusal: String? = refusedWithoutMixnet("transmission") { uniffi.zingo.confirm() }
         println("\nTransmission refused without a mixnet:")
         println(refusal)
-        // The refusal names the unattached state, because waiting out a
-        // bootstrap and restarting a dead proxy are different remedies.
         assertThat(refusal).contains("the Nym mixnet is not enabled")
 
-        // The refusal consumed the stored proposal. A confirm takes the
-        // proposal before it attempts the transmission, so a refusal discards
-        // it exactly as any other failure does. A retry therefore reports no
-        // stored proposal rather than repeating the refusal, and an app that
-        // wants the send after the user enables Mixnet Mode must propose it
-        // again. A repeated Mixnet refusal here would mean the proposal
-        // survived, and a txid would mean the retry transmitted one that the
-        // first call had already taken.
         val retry: String? = try {
             val txid = uniffi.zingo.confirm()
             throw AssertionError("a consumed proposal confirmed on retry: $txid")
@@ -458,135 +494,76 @@ class ExecuteSendFromOrchard {
         println("\nRetry after the refusal:")
         println(retry)
 
-        // A second launch while the first sync still runs is idempotent:
-        // the bridge answers with status on the data channel ("Sync task
-        // already running."), and the polling loop below observes the sync
-        // to completion either way.
-        syncJson = uniffi.zingo.runSync()
-        println("\nSync:")
-        println(syncJson)
-
-        var syncStatus: SyncStatus
-        while (true) {
-            val syncStatusJson: String = uniffi.zingo.statusSync()
-            println("\nSync status:")
-            println(syncStatusJson)
-            if (syncStatusJson.lowercase().startsWith("error")) {
-                println("Sync Error!:")
-                break
-            }
-            syncStatus = mapper.readValue(syncStatusJson)
-
-            val progress = syncStatus.percentage_total_outputs_scanned
-               ?: syncStatus.percentage_total_blocks_scanned
-
-            if (progress != null && progress >= 100.0) {
-                println("Sync completed!")
-                break
-            }
-
-            Thread.sleep(1000)
-        }
+        syncToCompletion("the blocks mined since the first sync", TestnetFixture.DEADLINE_SECONDS, elapsedSeconds)
 
         balanceJson = uniffi.zingo.getBalance()
         println("\nBalance post-refusal:")
         println(balanceJson)
         val balancePostRefusal: Balance = mapper.readValue(balanceJson)
-        // Nothing reached the chain, so the transparent recipient holds no
-        // confirmed funds. The unconfirmed side is deliberately unasserted:
-        // the proposal is still Calculated, and a Calculated transaction
-        // counts as pending whether or not it was ever transmitted.
-        assertThat(balancePostRefusal.confirmed_transparent_balance).isEqualTo(0)
+        assertThat(balancePostRefusal.confirmed_transparent_balance).isEqualTo(balancePreSend.confirmed_transparent_balance)
     }
 }
 
-class UpdateCurrentPriceAndValueTransfersFromSeed {
+@PublicChainTest
+class RecoversConsolidationTransfer {
     @Test
-    fun updateCurrentPriceAndValueTransfersFromSeed() {
+    fun recoversConsolidationTransfer() {
+        assumeConsolidationPublished()
         val mapper = testMapper()
 
-        val serveruri = "http://10.0.2.2:20000"
-        val chainhint = regtestChainHint()
-        val seed = Seeds.HOSPITAL
+        val start = System.nanoTime()
+        val elapsedSeconds = { (System.nanoTime() - start) / 1e9 }
 
-        val initFromSeedJson: String = uniffi.zingo.initFromSeed(seed, 1u, serveruri, chainhint, "Medium", 1u)
+        val (serveruri, tip) = firstAnsweringServer("testnet", TestnetFixture.SERVERS)
+
+        val initFromSeedJson: String = uniffi.zingo.initFromSeed(TestnetFixture.SEED, TestnetFixture.BIRTHDAY.toUInt(), serveruri, TestnetFixture.CHAIN_HINT, "Medium", 1u)
         println("\nInit from seed:")
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
 
-        assertThat(initFromSeed.seed_phrase).isEqualTo(seed)
-        assertThat(initFromSeed.birthday).isEqualTo(1)
+        assertThat(initFromSeed.seed_phrase).isEqualTo(TestnetFixture.SEED)
+        assertThat(initFromSeed.birthday).isEqualTo(TestnetFixture.BIRTHDAY)
 
         val infoJson: String = uniffi.zingo.infoServer()
         println("\nInfo:")
         println(infoJson)
         val info: Info = mapper.readValue(infoJson)
-        assertThat(info.latest_block_height).isGreaterThan(0)
+        assertThat(info.latest_block_height).isAtLeast(tip - TestnetFixture.TIP_SKEW_BLOCKS)
 
-        // Price rides the mixnet or does not happen (zingolib/0011). This wallet
-        // never attached one, so the fetch must refuse. A price here would
-        // mean the wallet reached an oracle over clearnet, which is the
-        // leak the mixnet-only rule exists to prevent.
-        val refusal: String? = refusedWithoutMixnet("price fetch") { uniffi.zingo.zecPrice() }
-        println("\nPrice refused without a mixnet:")
-        println(refusal)
+        syncToCompletion("${tip - TestnetFixture.BIRTHDAY} testnet blocks", TestnetFixture.DEADLINE_SECONDS, elapsedSeconds)
 
-        val syncJson: String = uniffi.zingo.runSync()
-        println("\nSync:")
-        println(syncJson)
-
-        var syncStatus: SyncStatus
-        while (true) {
-            val syncStatusJson: String = uniffi.zingo.statusSync()
-            println("\nSync status:")
-            println(syncStatusJson)
-            if (syncStatusJson.lowercase().startsWith("error")) {
-                println("Sync Error!:")
-                break
-            }
-            syncStatus = mapper.readValue(syncStatusJson)
-
-            val progress = syncStatus.percentage_total_outputs_scanned
-               ?: syncStatus.percentage_total_blocks_scanned
-
-            if (progress != null && progress >= 100.0) {
-                println("Sync completed!")
-                break
-            }
-
-            Thread.sleep(1000)
-        }
-
-        val recipientAddress = "uregtest1az7w9w3tdegf0srnsgqyqfhyfrpx2h6u4pkc2yq3ja552vzhwkjqgy4fu6a6kcu9280ppajamj2gcq9lx9x0zxdrsns94ml3e443a7t2dm50382mhtkleydrq74q5xlh6sel5u0qlrvflf20qgljzszd2ht9jmerwwahct9rtuc3nqdk"
-
-        val valueTranfersJson: String = uniffi.zingo.getValueTransfers()
+        val valueTransfersJson: String = uniffi.zingo.getValueTransfers()
         println("\nValue Transfers:")
-        println(valueTranfersJson)
-        val valueTranfers: ValueTransfers = mapper.readValue(valueTranfersJson)
-        // the value transfers have 3 items for 3 different txs
-        // 1. Received - 1_000_000 - orchard (1 item)
-        // 2. Sent - 110_000 - uregtest1az7w9w3t... (1 item)
-        // 3. memoToSelf - 870_000 (1 item)
-        assertThat(valueTranfers.value_transfers.size).isEqualTo(3)
-        // third item have to be a `fee` from the last `Sent` with the same txid
-        assertThat(valueTranfers.value_transfers[0].kind).isEqualTo("memo-to-self")
-        assertThat(valueTranfers.value_transfers[0].status).isEqualTo("confirmed")
-        assertThat(valueTranfers.value_transfers[0].value).isEqualTo(870000)
-        assertThat(valueTranfers.value_transfers[0].transaction_fee).isEqualTo(20000)
-        // second item have to be a `Sent`
-        assertThat(valueTranfers.value_transfers[1].kind).isEqualTo("sent")
-        assertThat(valueTranfers.value_transfers[1].recipient_address).isEqualTo(recipientAddress)
-        assertThat(valueTranfers.value_transfers[1].status).isEqualTo("confirmed")
-        assertThat(valueTranfers.value_transfers[1].value).isEqualTo(100000)
-        assertThat(valueTranfers.value_transfers[1].transaction_fee).isEqualTo(10000)
-        // first item have to be a `Received`
-        assertThat(valueTranfers.value_transfers[2].kind).isEqualTo("received")
-        assertThat(valueTranfers.value_transfers[2].pools_received).isEqualTo(listOf("Orchard"))
-        assertThat(valueTranfers.value_transfers[2].status).isEqualTo("confirmed")
-        assertThat(valueTranfers.value_transfers[2].value).isEqualTo(1000000)
+        println(valueTransfersJson)
+        val valueTransfers: ValueTransfers = mapper.readValue(valueTransfersJson)
+
+        val consolidations = valueTransfers.value_transfers.filter {
+            it.txid == TestnetFixture.CONSOLIDATION_TXID && it.kind == TestnetFixture.CONSOLIDATION_KIND
+        }
+        assertThat(consolidations).hasSize(1)
+        val consolidation = consolidations[0]
+        assertThat(consolidation.status).isEqualTo("confirmed")
+        assertThat(consolidation.blockheight).isEqualTo(TestnetFixture.CONSOLIDATION_HEIGHT)
+        assertThat(consolidation.value).isEqualTo(TestnetFixture.CONSOLIDATION_VALUE)
+        assertThat(consolidation.transaction_fee).isEqualTo(TestnetFixture.CONSOLIDATION_FEE)
     }
 }
 
+@OfflineDeviceTest
+class PriceRefusedWithoutMixnet {
+    @Test
+    fun priceRefusedWithoutMixnet() {
+        val mapper = testMapper()
+
+        initOfflineWalletFromSeed(mapper, Seeds.HOSPITAL)
+
+        val refusal: String? = refusedWithoutMixnet("price fetch") { uniffi.zingo.zecPrice() }
+        println("\nPrice refused without a mixnet:")
+        println(refusal)
+    }
+}
+
+@StaticChainTest
 class ExecuteSaplingBalanceFromSeed {
     @Test
     fun executeSaplingBalanceFromSeed() {
@@ -698,31 +675,11 @@ class ExecuteSaplingBalanceFromSeed {
     }
 }
 
+@OfflineDeviceTest
 class ExecuteParseAddressForTex {
     @Test
     fun executeParseAddressForTex() {
         val mapper = testMapper()
-
-        val serveruri = "http://10.0.2.2:20000"
-        val chainhint = regtestChainHint()
-        val seed = Seeds.HOSPITAL
-        
-        val initFromSeedJson: String = uniffi.zingo.initFromSeed(seed, 1u, serveruri, chainhint, "Medium", 1u)
-        println("\nInit from seed:")
-        println(initFromSeedJson)
-        val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
-
-        val seedResult = initFromSeed.seed_phrase
-        val birthdayResult = initFromSeed.birthday
-
-        assertThat(seedResult).isEqualTo(seed)
-        assertThat(birthdayResult).isEqualTo(1)
-
-        val infoJson: String = uniffi.zingo.infoServer()
-        println("\nInfo:")
-        println(infoJson)
-        val info: Info = mapper.readValue(infoJson)
-        assertThat(info.latest_block_height).isGreaterThan(0)
 
         val resultJson: String = uniffi.zingo.parseAddress("texregtest1z754rp9kk9vdewx4wm7pstvm0u2rwlgy4zp82v")
         val result: ParseResult = mapper.readValue(resultJson)
@@ -741,31 +698,11 @@ class ExecuteParseAddressForTex {
     }
 }
 
+@OfflineDeviceTest
 class ExecuteParseAddressInvalid {
     @Test
     fun executeParseAddressInvalid() {
         val mapper = testMapper()
-
-        val serveruri = "http://10.0.2.2:20000"
-        val chainhint = regtestChainHint()
-        val seed = Seeds.HOSPITAL
-        
-        val initFromSeedJson: String = uniffi.zingo.initFromSeed(seed, 1u, serveruri, chainhint, "Medium", 1u)
-        println("\nInit from seed:")
-        println(initFromSeedJson)
-        val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
-
-        val seedResult = initFromSeed.seed_phrase
-        val birthdayResult = initFromSeed.birthday
-
-        assertThat(seedResult).isEqualTo(seed)
-        assertThat(birthdayResult).isEqualTo(1)
-
-        val infoJson: String = uniffi.zingo.infoServer()
-        println("\nInfo:")
-        println(infoJson)
-        val info: Info = mapper.readValue(infoJson)
-        assertThat(info.latest_block_height).isGreaterThan(0)
 
         val wrongResultJson: String = uniffi.zingo.parseAddress("thiswontwork")
         val wrongResult: ParseResult = mapper.readValue(wrongResultJson)
