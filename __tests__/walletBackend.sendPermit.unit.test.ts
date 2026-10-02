@@ -28,9 +28,9 @@ describe('sendPermit', () => {
   });
 
   test('Tests that the permit is granted when the platform has no mixnet transport.', () => {
-    expect(
-      sendPermit({ ...online, mixnetView: ABSENT_MIXNET_VIEW }),
-    ).toEqual(PERMITTED);
+    expect(sendPermit({ ...online, mixnetView: ABSENT_MIXNET_VIEW })).toEqual(
+      PERMITTED,
+    );
   });
 
   test('Tests that the permit is refused with the connection key when the device is disconnected.', () => {

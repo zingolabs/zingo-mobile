@@ -30,10 +30,7 @@ import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 // picked, not on catalog prose.
 const keyTranslate = (key: string) => key;
 
-function renderRow(
-  mixnetView: MixnetView,
-  onPressShieldFunds = jest.fn(),
-) {
+function renderRow(mixnetView: MixnetView, onPressShieldFunds = jest.fn()) {
   return render(
     <ContextAppLoadedProvider value={defaultAppContextLoaded}>
       <BalanceRow
