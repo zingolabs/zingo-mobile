@@ -270,24 +270,3 @@ jobs:
               repo: context.repo.repo,
               run_id: context.runId,
             });
-
-  # Transitional aliases. The dev branch protection requires checks with
-  # the names "chain", "ledger-and-parsing", and "accounts". Issue 1510
-  # removes these jobs together with those requirements. A skipped job
-  # reports success to branch protection, and each alias therefore always
-  # runs and fails unless the device tests passed.
-  required-check-alias:
-    name: ${{ matrix.name }}
-    needs:
-      - android-device-test
-    if: ${{ always() }}
-    runs-on: ubuntu-24.04
-    timeout-minutes: 5
-    strategy:
-      matrix:
-        name: [chain, ledger-and-parsing, accounts]
-    steps:
-      - name: Report the result of the device tests
-        env:
-          RESULT: ${{ needs.android-device-test.result }}
-        run: test "$RESULT" = "success"
