@@ -84,6 +84,7 @@ import {
 } from '@app/walletBackend';
 import {
   SendFailureClass,
+  SendFailureText,
   classifySendFailure,
   retryOnAnotherServer,
   sendFailureText,
@@ -960,11 +961,8 @@ const Send: React.FunctionComponent<SendProps> = ({
 
     navigation.navigate(RouteEnum.Computing);
 
-    const fail = (errorMessage: string) =>
-      navigation.navigate(RouteEnum.Computing, {
-        phase: 'failed',
-        errorMessage,
-      });
+    const fail = (failure: SendFailureText) =>
+      navigation.navigate(RouteEnum.Computing, { phase: 'failed', failure });
 
     // Sends once. A send or a refusal settles the Computing screen, and a
     // failure of the backend is returned.
@@ -974,7 +972,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       try {
         const outcome = await sendTransaction(sendPageStatePar, sendAllSend);
         if (outcome.kind === 'error') {
-          fail(translate(outcome.errorKey) as string);
+          fail(outcome);
         } else {
           clearState();
           setScrollToTop(true);
@@ -1041,12 +1039,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       }
     }
 
-    const failureText = sendFailureText(failure);
-    fail(
-      failureText.kind === 'key'
-        ? (translate(failureText.errorKey) as string)
-        : failureText.text,
-    );
+    fail(sendFailureText(failure));
   };
 
   const scrollToEnd = () => {

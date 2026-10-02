@@ -189,7 +189,10 @@ export function useShieldFunds({
     setShieldingAmount?.(0);
     navigation.navigate(RouteEnum.Computing, {
       phase: success ? 'created' : 'failed',
-      errorMessage: success ? undefined : errorMessage,
+      failure:
+        errorMessage === undefined
+          ? undefined
+          : { kind: 'verbatim', text: errorMessage },
     });
   }, [
     setBackgroundError,

@@ -10,6 +10,7 @@ import {
   ValueTransferType,
   ProposalPoolsType,
 } from '@app/AppState';
+import type { SendFailureText } from '@app/walletBackend/transforms/sendFailureTransform';
 import { RPCDrainTxType } from '@app/walletBackend/types/RPCDrainPlanType';
 import { RPCMigrationPlanType } from '@app/walletBackend/types/RPCMigrationPlanType';
 
@@ -74,7 +75,7 @@ export type AppDrawerParamList = {
   [RouteEnum.Rescan]: undefined;
   [RouteEnum.Insight]: undefined;
   [RouteEnum.Computing]:
-    { phase?: 'created' | 'failed'; errorMessage?: string } | undefined;
+    { phase?: 'created' | 'failed'; failure?: SendFailureText } | undefined;
   [RouteEnum.SyncReport]: undefined;
   [RouteEnum.Pools]: undefined;
   [RouteEnum.MeetIronwood]: undefined;

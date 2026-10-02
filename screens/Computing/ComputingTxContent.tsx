@@ -131,7 +131,7 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
 
   const computingSnapPoints = useFullSheetSnapPoints(containerH, headerH);
   const phase = route.params?.phase ?? 'computing';
-  const errorMessage = route.params?.errorMessage;
+  const failure = route.params?.failure;
   const isCreated = phase === 'created';
   const isFailed = phase === 'failed';
   const isTerminal = isCreated || isFailed;
@@ -296,7 +296,7 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
             <TypingDot delay={DOT_OFFSET_MS * 2} color={colors.bgMuted} />
           </View>
         )}
-        {isFailed && !!errorMessage && (
+        {isFailed && failure !== undefined && (
           <View style={{ marginTop: 16, alignItems: 'center' }}>
             <TouchableOpacity
               onPress={() => setShowErrorDetails(v => !v)}
@@ -320,7 +320,9 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
                   fontSize: 12,
                 }}
               >
-                {errorMessage}
+                {failure.kind === 'error'
+                  ? (translate(failure.errorKey) as string)
+                  : failure.text}
               </RegText>
             )}
           </View>
