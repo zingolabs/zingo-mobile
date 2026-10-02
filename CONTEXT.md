@@ -202,9 +202,8 @@ branch protection requires; its failure withholds the merge verdict.
 Jest, rust-shear, the workbench tests, the Binding Layer crate tests,
 js-depcheck, the JS static checks, andr-dependency-analysis, the Android
 Kotlin compile, the Android JVM unit tests, the Android build chain for
-every ABI, the offline device tests, the Android integration buckets,
-the iOS Binding Layer build, and the iOS integration test are blocking
-checks.
+every ABI, the offline device tests, the iOS Binding Layer build, and
+the iOS integration test are blocking checks.
 
 **Advisory stage** — a PR CI job that records its result without
 affecting the pull request verdict. No PR stage currently runs in
@@ -224,17 +223,11 @@ Advisory stages and trailing stages are never on the verdict path.
 already hold every ABI. The native builds are absent from it.
 
 **Miss path** — the verdict path of a run that must build the Binding
-Layer. It runs through the native build, the APK build, and the
-integration buckets.
+Layer. It runs through the native build and the device tests.
 
 **Trailing stage** — a PR CI job that starts only after every blocking
 check has passed. Its failure fails the run and leaves the merge verdict
 unchanged. No PR CI job currently runs as a trailing stage.
-
-**Bucket** — a CI job that runs one or more Android integration tests on
-its own emulator. Buckets run side by side, and each pays its own runner
-setup and emulator boot. Unrelated to the migration API's `per_bucket`
-windowing sense, which UI copy avoids entirely.
 
 **Offline device test** — an instrumented test that runs on a device or
 emulator with an empty server URI and no chain. It exercises the Binding

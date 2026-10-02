@@ -1,28 +1,8 @@
 [workspace]
 members = [
-    "android",
-    "ios",
-    "zingomobile_utils",
     "workbench",
 ]
 resolver = "2"
 
-# The Binding Layer lives in the zingolib submodule (zingo-mobile/0016). The
-# integration harnesses take zingolib by path, and both build from one tree.
 [workspace.dependencies]
-zingolib_testutils = { path = "../zingolib/zingolib_testutils" }
-zingomobile_utils = { path = "zingomobile_utils" }
-
-tokio = { version = "1", features = ["rt-multi-thread", "time"] }
 serde_json = "1"
-
-[profile.test]
-opt-level = 3
-debug = 1
-
-[patch.crates-io]
-# Ironwood (NU6.3) proto fields (CompactTx.ironwoodActions, TreeState.ironwoodTree,
-# ShieldedProtocol.ironwood, ChainMetadata.ironwoodCommitmentTreeSize). Must match
-# the patch in the zingolib submodule so the dependency graph resolves to a single
-# ironwood-aware lightwallet-protocol.
-lightwallet-protocol = { git = "https://github.com/zingolabs/lightwallet-protocol-rust", rev = "9bdfdc77eb283f2a3d26c27100cc2ac90148cd93" }

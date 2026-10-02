@@ -154,11 +154,8 @@ jobs:
       runner: ${{ vars.CI_GRADLE_RUNNER || 'zingo-android-gradle-16' }}
       fail-all: true
 
-  # Deliberately NO needs-edge on andr-apk-build: the buckets start
-  # at workflow launch, front-load all APK-independent setup, and hold
-  # at the ci-gate artifact gate until the APK artifact lands (or abort
-  # when the APK build concludes without success). This overlaps ~10
-  # minutes of bucket setup with the build path.
+  # The device tests need the Binding Layer and build their own debug
+  # app, and they start beside andr-apk-build.
   andr-ubu-integra-test-ci:
     strategy:
       matrix:
