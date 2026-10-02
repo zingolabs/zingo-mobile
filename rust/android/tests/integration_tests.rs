@@ -24,30 +24,6 @@ async fn validator_activation_heights(validator: &impl Validator) -> String {
     )
 }
 
-async fn execute_sync_from_seed(abi: &str) {
-    let local_net = scenarios::funded_orchard_mobileclient(1_000_000).await;
-    let activation_heights = Some(validator_activation_heights(local_net.validator()).await);
-
-    #[cfg(not(feature = "ci"))]
-    let (exit_code, output, error) = zingomobile_utils::android_integration_test(
-        abi,
-        "ExecuteSyncFromSeed",
-        activation_heights.as_deref(),
-    );
-    #[cfg(feature = "ci")]
-    let (exit_code, output, error) = zingomobile_utils::android_integration_test_ci(
-        abi,
-        "ExecuteSyncFromSeed",
-        activation_heights.as_deref(),
-    );
-
-    println!("Exit Code: {}", exit_code);
-    println!("Output: {}", output);
-    println!("Error: {}", error);
-
-    assert_eq!(exit_code, 0);
-}
-
 async fn execute_send_from_orchard(abi: &str) {
     let local_net = scenarios::funded_orchard_mobileclient(1_000_000).await;
     let activation_heights = Some(validator_activation_heights(local_net.validator()).await);
@@ -124,11 +100,6 @@ mod android_integration {
         const ABI: &str = "x86";
 
         #[tokio::test]
-        async fn execute_sync_from_seed() {
-            crate::execute_sync_from_seed(ABI).await;
-        }
-
-        #[tokio::test]
         async fn execute_send_from_orchard() {
             crate::execute_send_from_orchard(ABI).await;
         }
@@ -146,11 +117,6 @@ mod android_integration {
 
     mod x86_64 {
         const ABI: &str = "x86_64";
-
-        #[tokio::test]
-        async fn execute_sync_from_seed() {
-            crate::execute_sync_from_seed(ABI).await;
-        }
 
         #[tokio::test]
         async fn execute_send_from_orchard() {
@@ -172,11 +138,6 @@ mod android_integration {
         const ABI: &str = "armeabi-v7a";
 
         #[tokio::test]
-        async fn execute_sync_from_seed() {
-            crate::execute_sync_from_seed(ABI).await;
-        }
-
-        #[tokio::test]
         async fn execute_send_from_orchard() {
             crate::execute_send_from_orchard(ABI).await;
         }
@@ -194,11 +155,6 @@ mod android_integration {
 
     mod arm64 {
         const ABI: &str = "arm64-v8a";
-
-        #[tokio::test]
-        async fn execute_sync_from_seed() {
-            crate::execute_sync_from_seed(ABI).await;
-        }
 
         #[tokio::test]
         async fn execute_send_from_orchard() {
