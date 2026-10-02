@@ -70,6 +70,16 @@ test('Tests that an untimed reveal hides in the same render when the mode become
   expect(result.current.visible).toBe(false);
 });
 
+test('Tests that a reveal does not return when the mode changes and then changes back.', () => {
+  const { result, rerender } = timedHook(false);
+
+  act(() => result.current.reveal());
+  rerender(true);
+  rerender(false);
+
+  expect(result.current.revealed).toBe(false);
+});
+
 test('Tests that a text that hides only in the timed mode shows when the mode is untimed, and hides when the mode is timed and nothing revealed it.', () => {
   const { result, rerender } = timedHook(false);
   expect(result.current.visible).toBe(true);

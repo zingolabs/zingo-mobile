@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext } from 'react';
+import React, { useContext, useMemo } from 'react';
 import { TextStyle, TouchableOpacity, View, ViewStyle } from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { ContextAppLoaded } from '@app/context';
@@ -11,7 +11,7 @@ import {
   labelLines,
   textView,
   viewLines,
-} from '@app/utils/reveal';
+} from './addressItemText';
 import { useTimedReveal } from '@app/hooks/useTimedReveal';
 import {
   AddressBookFileClass,
@@ -94,10 +94,14 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
   const aliasReveal = useTimedReveal(privacy);
   const addressReveal = useTimedReveal(privacy);
 
-  const contact: string = addressBook
-    .filter((ab: AddressBookFileClass) => ab.address === address)
-    .map((ab: AddressBookFileClass) => ab.label)
-    .join(' ');
+  const contact: string = useMemo(
+    () =>
+      addressBook
+        .filter((ab: AddressBookFileClass) => ab.address === address)
+        .map((ab: AddressBookFileClass) => ab.label)
+        .join(' '),
+    [address, addressBook],
+  );
   const contactField: Field = {
     text: contact,
     lines: labelLines(contact),
