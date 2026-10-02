@@ -489,7 +489,6 @@
     "somefunds": "Some funds still confirming or syncing",
     "memo": "Memo(s)",
     "memo-placeholder": "Encrypted message (optional)",
-    "max": "MAX",
     "button": "Send",
     "button-all": "Send All",
     "confirm-title": "Confirm Transaction",

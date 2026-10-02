@@ -930,65 +930,6 @@ exports[`Component Send - test Send privacy high - snapshot 1`] = `
                         }
                       />
                     </View>
-                    <View
-                      accessibilityState={
-                        {
-                          "busy": undefined,
-                          "checked": undefined,
-                          "disabled": undefined,
-                          "expanded": undefined,
-                          "selected": undefined,
-                        }
-                      }
-                      accessibilityValue={
-                        {
-                          "max": undefined,
-                          "min": undefined,
-                          "now": undefined,
-                          "text": undefined,
-                        }
-                      }
-                      accessible={true}
-                      collapsable={false}
-                      focusable={true}
-                      onClick={[Function]}
-                      onResponderGrant={[Function]}
-                      onResponderMove={[Function]}
-                      onResponderRelease={[Function]}
-                      onResponderTerminate={[Function]}
-                      onResponderTerminationRequest={[Function]}
-                      onStartShouldSetResponder={[Function]}
-                      style={
-                        {
-                          "alignItems": "center",
-                          "justifyContent": "center",
-                          "opacity": 1,
-                          "paddingLeft": 0,
-                          "paddingRight": 8,
-                        }
-                      }
-                      testID="send.max"
-                    >
-                      <Text
-                        style={
-                          {
-                            "color": "#18bd18",
-                            "fontSize": 20,
-                            "fontWeight": "bold",
-                            "letterSpacing": -1.5,
-                            "lineHeight": 20,
-                            "opacity": 0.87,
-                            "transform": [
-                              {
-                                "scaleX": 0.8,
-                              },
-                            ],
-                          }
-                        }
-                      >
-                        text translated
-                      </Text>
-                    </View>
                   </View>
                 </View>
                 <View
@@ -1033,6 +974,7 @@ exports[`Component Send - test Send privacy high - snapshot 1`] = `
                         "opacity": 1,
                       }
                     }
+                    testID="send.max"
                   >
                     <View
                       style={
@@ -1060,69 +1002,80 @@ exports[`Component Send - test Send privacy high - snapshot 1`] = `
                       <View
                         style={
                           {
-                            "flexDirection": "row",
-                            "marginHorizontal": 5,
-                            "marginLeft": 0,
+                            "borderBottomColor": "#FFB972",
+                            "borderBottomWidth": 1,
+                            "marginRight": 5,
                           }
                         }
                       >
                         <View
-                          accessibilityState={
-                            {
-                              "busy": undefined,
-                              "checked": undefined,
-                              "disabled": false,
-                              "expanded": undefined,
-                              "selected": undefined,
-                            }
-                          }
-                          accessibilityValue={
-                            {
-                              "max": undefined,
-                              "min": undefined,
-                              "now": undefined,
-                              "text": undefined,
-                            }
-                          }
-                          accessible={true}
-                          collapsable={false}
-                          focusable={true}
-                          onClick={[Function]}
-                          onResponderGrant={[Function]}
-                          onResponderMove={[Function]}
-                          onResponderRelease={[Function]}
-                          onResponderTerminate={[Function]}
-                          onResponderTerminationRequest={[Function]}
-                          onStartShouldSetResponder={[Function]}
                           style={
                             {
-                              "opacity": 1,
+                              "flexDirection": "row",
+                              "marginHorizontal": 5,
+                              "marginLeft": 0,
+                              "marginRight": 0,
                             }
                           }
                         >
                           <View
+                            accessibilityState={
+                              {
+                                "busy": undefined,
+                                "checked": undefined,
+                                "disabled": false,
+                                "expanded": undefined,
+                                "selected": undefined,
+                              }
+                            }
+                            accessibilityValue={
+                              {
+                                "max": undefined,
+                                "min": undefined,
+                                "now": undefined,
+                                "text": undefined,
+                              }
+                            }
+                            accessible={true}
+                            collapsable={false}
+                            focusable={true}
+                            onClick={[Function]}
+                            onResponderGrant={[Function]}
+                            onResponderMove={[Function]}
+                            onResponderRelease={[Function]}
+                            onResponderTerminate={[Function]}
+                            onResponderTerminationRequest={[Function]}
+                            onStartShouldSetResponder={[Function]}
                             style={
                               {
-                                "alignItems": "flex-end",
-                                "flexDirection": "row",
-                                "margin": 0,
-                                "padding": 0,
+                                "opacity": 1,
                               }
                             }
                           >
-                            <Text
+                            <View
                               style={
                                 {
-                                  "color": "#FFB972",
-                                  "fontSize": 14,
-                                  "fontWeight": "700",
+                                  "alignItems": "flex-end",
+                                  "flexDirection": "row",
                                   "margin": 0,
                                   "padding": 0,
                                 }
                               }
                             >
-                               -.----
-                            </Text>
+                              <Text
+                                style={
+                                  {
+                                    "color": "#FFB972",
+                                    "fontSize": 14,
+                                    "fontWeight": "700",
+                                    "margin": 0,
+                                    "padding": 0,
+                                  }
+                                }
+                              >
+                                 -.----
+                              </Text>
+                            </View>
                           </View>
                         </View>
                       </View>
@@ -2958,65 +2911,6 @@ exports[`Component Send - test Send privacy normal - snapshot 1`] = `
                         }
                       />
                     </View>
-                    <View
-                      accessibilityState={
-                        {
-                          "busy": undefined,
-                          "checked": undefined,
-                          "disabled": undefined,
-                          "expanded": undefined,
-                          "selected": undefined,
-                        }
-                      }
-                      accessibilityValue={
-                        {
-                          "max": undefined,
-                          "min": undefined,
-                          "now": undefined,
-                          "text": undefined,
-                        }
-                      }
-                      accessible={true}
-                      collapsable={false}
-                      focusable={true}
-                      onClick={[Function]}
-                      onResponderGrant={[Function]}
-                      onResponderMove={[Function]}
-                      onResponderRelease={[Function]}
-                      onResponderTerminate={[Function]}
-                      onResponderTerminationRequest={[Function]}
-                      onStartShouldSetResponder={[Function]}
-                      style={
-                        {
-                          "alignItems": "center",
-                          "justifyContent": "center",
-                          "opacity": 1,
-                          "paddingLeft": 0,
-                          "paddingRight": 8,
-                        }
-                      }
-                      testID="send.max"
-                    >
-                      <Text
-                        style={
-                          {
-                            "color": "#18bd18",
-                            "fontSize": 20,
-                            "fontWeight": "bold",
-                            "letterSpacing": -1.5,
-                            "lineHeight": 20,
-                            "opacity": 0.87,
-                            "transform": [
-                              {
-                                "scaleX": 0.8,
-                              },
-                            ],
-                          }
-                        }
-                      >
-                        text translated
-                      </Text>
-                    </View>
                   </View>
                 </View>
                 <View
@@ -3061,6 +2955,7 @@ exports[`Component Send - test Send privacy normal - snapshot 1`] = `
                         "opacity": 1,
                       }
                     }
+                    testID="send.max"
                   >
                     <View
                       style={
@@ -3088,84 +2983,95 @@ exports[`Component Send - test Send privacy normal - snapshot 1`] = `
                       <View
                         style={
                           {
-                            "flexDirection": "row",
-                            "marginHorizontal": 5,
-                            "marginLeft": 0,
+                            "borderBottomColor": "#FFB972",
+                            "borderBottomWidth": 1,
+                            "marginRight": 5,
                           }
                         }
                       >
                         <View
-                          accessibilityState={
-                            {
-                              "busy": undefined,
-                              "checked": undefined,
-                              "disabled": true,
-                              "expanded": undefined,
-                              "selected": undefined,
-                            }
-                          }
-                          accessibilityValue={
-                            {
-                              "max": undefined,
-                              "min": undefined,
-                              "now": undefined,
-                              "text": undefined,
-                            }
-                          }
-                          accessible={true}
-                          collapsable={false}
-                          focusable={false}
-                          onClick={[Function]}
-                          onResponderGrant={[Function]}
-                          onResponderMove={[Function]}
-                          onResponderRelease={[Function]}
-                          onResponderTerminate={[Function]}
-                          onResponderTerminationRequest={[Function]}
-                          onStartShouldSetResponder={[Function]}
                           style={
                             {
-                              "opacity": 1,
+                              "flexDirection": "row",
+                              "marginHorizontal": 5,
+                              "marginLeft": 0,
+                              "marginRight": 0,
                             }
                           }
                         >
                           <View
+                            accessibilityState={
+                              {
+                                "busy": undefined,
+                                "checked": undefined,
+                                "disabled": true,
+                                "expanded": undefined,
+                                "selected": undefined,
+                              }
+                            }
+                            accessibilityValue={
+                              {
+                                "max": undefined,
+                                "min": undefined,
+                                "now": undefined,
+                                "text": undefined,
+                              }
+                            }
+                            accessible={true}
+                            collapsable={false}
+                            focusable={false}
+                            onClick={[Function]}
+                            onResponderGrant={[Function]}
+                            onResponderMove={[Function]}
+                            onResponderRelease={[Function]}
+                            onResponderTerminate={[Function]}
+                            onResponderTerminationRequest={[Function]}
+                            onStartShouldSetResponder={[Function]}
                             style={
                               {
-                                "alignItems": "flex-end",
-                                "flexDirection": "row",
-                                "margin": 0,
-                                "padding": 0,
+                                "opacity": 1,
                               }
                             }
                           >
-                            <Text
+                            <View
                               style={
                                 {
-                                  "color": "#FFB972",
-                                  "fontSize": 14,
-                                  "fontWeight": "700",
+                                  "alignItems": "flex-end",
+                                  "flexDirection": "row",
                                   "margin": 0,
                                   "padding": 0,
                                 }
                               }
-                              testID="undefined.big-part"
                             >
-                               1.1234
-                            </Text>
-                            <Text
-                              style={
-                                {
-                                  "color": "#FFB972",
-                                  "fontSize": 9.799999999999999,
-                                  "margin": 0,
-                                  "marginBottom": 0.9333333333333333,
-                                  "padding": 0,
+                              <Text
+                                style={
+                                  {
+                                    "color": "#FFB972",
+                                    "fontSize": 14,
+                                    "fontWeight": "700",
+                                    "margin": 0,
+                                    "padding": 0,
+                                  }
                                 }
-                              }
-                              testID="undefined.small-part"
-                            >
-                              5678
-                            </Text>
+                                testID="undefined.big-part"
+                              >
+                                 1.1234
+                              </Text>
+                              <Text
+                                style={
+                                  {
+                                    "color": "#FFB972",
+                                    "fontSize": 9.799999999999999,
+                                    "margin": 0,
+                                    "marginBottom": 0.9333333333333333,
+                                    "padding": 0,
+                                  }
+                                }
+                                testID="undefined.small-part"
+                              >
+                                5678
+                              </Text>
+                            </View>
                           </View>
                         </View>
                       </View>
