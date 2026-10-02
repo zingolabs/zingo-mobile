@@ -443,7 +443,7 @@ jobs:
     runs-on: ${{ startsWith(inputs.runner, '[') && fromJSON(inputs.runner) || inputs.runner }}
     # Bounds the debug build, the emulator boot, and both test runs. Each
     # test has its own limit in android/app/build.gradle.kts.
-    timeout-minutes: 40
+    timeout-minutes: 60
     env:
       CACHE-KEY: ${{ inputs.cache-key }}
     steps:
@@ -535,7 +535,7 @@ jobs:
             ./gradlew :app:connectedProdDebugAndroidTest -PreactNativeArchitectures=${{ env.ABI }} -Pandroid.testInstrumentationRunnerArguments.annotation=org.ZingoLabs.Zingo.OfflineDeviceTest
             mv app/build/reports/androidTests app/build/reports/androidTests-offline
             mv app/build/outputs/androidTest-results app/build/outputs/androidTest-results-offline
-            ./gradlew :app:connectedProdDebugAndroidTest -PreactNativeArchitectures=${{ env.ABI }} -Pandroid.testInstrumentationRunnerArguments.annotation=org.ZingoLabs.Zingo.PublicChainTest -Pandroid.testInstrumentationRunnerArguments.timeout_msec=420000
+            ./gradlew :app:connectedProdDebugAndroidTest -PreactNativeArchitectures=${{ env.ABI }} -Pandroid.testInstrumentationRunnerArguments.annotation=org.ZingoLabs.Zingo.PublicChainTest -Pandroid.testInstrumentationRunnerArguments.timeout_msec=900000
 
       - name: Upload device test reports
         if: ${{ always() && !cancelled() }}

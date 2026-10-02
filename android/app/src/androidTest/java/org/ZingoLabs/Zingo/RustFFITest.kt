@@ -355,6 +355,100 @@ class ExecuteSyncFromSeed {
     }
 }
 
+/** Measures the mixnet bootstrap on the CI emulator, for measurement 4 of #1490. */
+@PublicChainTest
+class MeasureMixnetBootstrap {
+    private class RecordingObserver : uniffi.zingo_nym_proxy_ffi.ProxyDeathObserver {
+        val deaths = mutableListOf<String>()
+        override fun onDeath(reason: uniffi.zingo_nym_proxy_ffi.ProxyDeathReason) {
+            deaths.add(reason.toString())
+            println("\nProxy death: $reason")
+        }
+    }
+
+    private fun report(values: Map<String, String>) {
+        InstrumentationRegistry.getInstrumentation().sendStatus(
+            2,
+            Bundle().apply { values.forEach { (key, value) -> putString(key, value) } },
+        )
+    }
+
+    @Test
+    fun measureMixnetBootstrap() {
+        val mapper = testMapper()
+        val readyDeadlineSeconds = 6 * 60
+        val reportEverySeconds = 30
+        val seed = Seeds.HOSPITAL
+        val servers = listOf(MainnetServers.PRIMARY, MainnetServers.FALLBACK)
+
+        val (serveruri, tip) = servers.firstNotNullOfOrNull { uri ->
+            runCatching { uniffi.zingo.getLatestBlockServer(uri).toLong() }
+                .onFailure { println("\n$uri did not answer: ${it.message}") }
+                .getOrNull()
+                ?.let { uri to it }
+        } ?: throw AssertionError("no mainnet server answered: $servers")
+        println("\nTip of $serveruri: $tip")
+        println("\nInit from seed:")
+        println(uniffi.zingo.initFromSeed(seed, tip.toUInt(), serveruri, "main", "Medium", 1u))
+
+        val observer = RecordingObserver()
+        val start = System.nanoTime()
+        val elapsed = { (System.nanoTime() - start) / 1e9 }
+        val handle = try {
+            uniffi.zingo_nym_proxy_ffi.MixnetProxyHandle.start(observer)
+        } catch (e: Exception) {
+            report(mapOf("proxy_started" to "false", "proxy_start_seconds" to elapsed().toString(), "proxy_error" to e.toString()))
+            throw AssertionError("the proxy shim did not start after ${elapsed()} s: $e", e)
+        }
+        val proxyStartSeconds = elapsed()
+        val endpoint = handle.socks5Endpoint()
+        val exitNode = handle.exitNode()
+        println("\nProxy started in $proxyStartSeconds s at ${endpoint.host}:${endpoint.port}, exit node $exitNode")
+
+        try {
+            val attachJson = uniffi.zingo.attachMixnet(
+                "${endpoint.host}:${endpoint.port}",
+                exitNode ?: throw AssertionError("the started proxy reported no exit node"),
+            )
+            println("\nAttach:")
+            println(attachJson)
+
+            var indicator = ""
+            var lastReport = 0.0
+            while (true) {
+                val status: Map<String, Any?> = mapper.readValue(
+                    uniffi.zingo.mixnetIndicator(),
+                    object : TypeReference<Map<String, Any?>>() {},
+                )
+                indicator = status["mixnet_indicator"].toString()
+                if (indicator == "ready" || indicator == "died" || elapsed() > readyDeadlineSeconds) {
+                    break
+                }
+                if (elapsed() - lastReport >= reportEverySeconds) {
+                    lastReport = elapsed()
+                    println("\nAfter ${lastReport.toInt()} s: $indicator ${uniffi.zingo.mixnetBootstrapDetail()}")
+                }
+                Thread.sleep(5000)
+            }
+            val readySeconds = elapsed()
+            println("\nIndicator $indicator after $readySeconds s; deaths: ${observer.deaths}")
+            println(uniffi.zingo.mixnetBootstrapDetail())
+            report(
+                mapOf(
+                    "proxy_started" to "true",
+                    "proxy_start_seconds" to proxyStartSeconds.toString(),
+                    "indicator" to indicator,
+                    "ready_seconds" to readySeconds.toString(),
+                    "deaths" to observer.deaths.joinToString("; "),
+                ),
+            )
+            assertThat(indicator).isEqualTo("ready")
+        } finally {
+            handle.destroy()
+        }
+    }
+}
+
 @LiveChainTest
 class ExecuteSendFromOrchard {
     @Test
