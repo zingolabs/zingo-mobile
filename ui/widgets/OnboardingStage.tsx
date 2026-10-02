@@ -81,6 +81,7 @@ const depth = (screen: RouteEnum): number => {
     case RouteEnum.WalletError:
       return 0;
     case RouteEnum.ImportChooser:
+    case RouteEnum.Server:
       return 1;
     case RouteEnum.WalletProgress:
       return 3;

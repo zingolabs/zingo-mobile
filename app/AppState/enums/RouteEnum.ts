@@ -7,6 +7,8 @@ export enum RouteEnum {
   ImportUfvk = 'ImportUfvk',
   WalletProgress = 'WalletProgress',
   WalletError = 'WalletError',
+  Server = 'Server',
+  ServerList = 'ServerList',
 
   // Stack
   LoadingApp = 'LoadingApp',

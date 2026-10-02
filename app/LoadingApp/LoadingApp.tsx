@@ -15,7 +15,6 @@ import {
   BottomSheetModal,
   BottomSheetModalProvider,
 } from '@gorhom/bottom-sheet';
-import CustomServerModalHost from './components/CustomServerModalHost';
 import { BottomSheetBackHandler } from '@app/hooks/useBottomSheetBackHandler';
 import ConfirmBottomSheet from '@ui/widgets/ConfirmBottomSheet';
 import { showConfirm } from '@app/services/showConfirm';
@@ -23,6 +22,7 @@ import { showConfirm } from '@app/services/showConfirm';
 import {
   createNewWallet,
   deleteExistingWallet,
+  getLatestBlockServerInfo,
   getVersionInfo,
   getWalletKind,
   hasRepairableWalletFile,
@@ -101,6 +101,8 @@ import OnboardingStage from '@ui/widgets/OnboardingStage';
 import SeedSheet from '@ui/widgets/SeedSheet';
 import WalletProgress from '@screens/WalletProgress';
 import WalletError from '@screens/WalletError';
+import Server from '@screens/Server';
+import ServerList from '@screens/ServerList';
 import DeleteWalletSheet from '@ui/widgets/DeleteWalletSheet';
 import { DeleteWalletContext } from '@app/AppState/types/DeleteWalletContext';
 import { walletErrorKind } from './walletErrorKind';
@@ -349,6 +351,7 @@ type LoadingAppClassProps = {
 type LoadingAppClassState = AppStateLoading & AppContextLoading;
 
 const RETRY_MIN_MS = 1400;
+const PROBE_TIMEOUT_MS = 15 * 1000;
 
 export class LoadingAppClass extends Component<
   LoadingAppClassProps,
@@ -361,9 +364,6 @@ export class LoadingAppClass extends Component<
   // Runs once the hold completes; set with the sheet's context.
   afterDelete: () => void = () => {};
   retryStartedAt = 0;
-  customServerModalRef: React.RefObject<React.ComponentRef<
-    typeof BottomSheetModal
-  > | null>;
   screenName = ScreenEnum.LoadingApp;
 
   constructor(props: LoadingAppClassProps) {
@@ -404,11 +404,6 @@ export class LoadingAppClass extends Component<
       actionButtonsDisabled: false,
       progressKind: 'import',
       walletExists: false,
-      customServerUri: '',
-      customServerChainName: ChainNameEnum.mainChainName,
-      customServerOffline: false,
-      customServerAuto: false,
-      customServerCustom: false,
       // The gate outcome arrives with the navigation whole (see
       // LoadingAppNavigationState), never from module state.
       biometricGate: props.route.params?.biometricGate ?? { kind: 'passed' },
@@ -423,9 +418,11 @@ export class LoadingAppClass extends Component<
       retrying: false,
       errorShake: 0,
       deleteContext: 'import',
+      serverStatus: 'ok',
+      serverBlockHeight: '',
+      serverLatencies: {},
+      serverReturn: RouteEnum.StartMenu,
     };
-
-    this.customServerModalRef = React.createRef();
   }
 
   componentDidMount = async () => {
@@ -586,9 +583,6 @@ export class LoadingAppClass extends Component<
                 state.details && state.details.isConnectionExpensive,
             },
           });
-          if (isConnected !== state.isConnected && !state.isConnected) {
-            this.customServerModalRef.current?.dismiss();
-          }
         }
       },
     );
@@ -954,122 +948,6 @@ export class LoadingAppClass extends Component<
     const backgroundSyncInfoJson: BackgroundType =
       await BackgroundFileImpl.readBackground();
     this.setState({ backgroundSyncInfo: backgroundSyncInfoJson });
-  };
-
-  setCustomServerUri = (customServerUri: string) => {
-    this.setState({
-      customServerUri,
-    });
-  };
-
-  usingCustomServer = async () => {
-    if (
-      !this.state.customServerUri &&
-      !this.state.customServerOffline &&
-      !this.state.customServerAuto
-    ) {
-      return;
-    }
-    this.setState({ actionButtonsDisabled: true });
-    if (this.state.customServerAuto) {
-      // Automatic: enter `auto` mode on the user's chosen chain, then let the
-      // standard boot-time picker fetch the live server list for that chain
-      // (falling back to the static latency probe when the registry is
-      // unreachable, and to the chain's static default when offline).
-      // `selectServerOnBoot` reads `server.chainName`, so seed it with the
-      // chosen chain's default; the best live server replaces it and shows in
-      // the UI.
-      const autoChainName = this.state.customServerChainName;
-      const fallback = this.defaultServerForChain(autoChainName);
-      await new Promise<void>(resolve =>
-        this.setState(
-          {
-            selectServer: SelectServerEnum.auto,
-            server: fallback,
-            customServerUri: '',
-            customServerChainName: this.state.server.chainName,
-            customServerOffline: false,
-            customServerAuto: false,
-          },
-          () => resolve(),
-        ),
-      );
-      await SettingsFileImpl.writeServer(fallback, SelectServerEnum.auto);
-      await this.selectServerOnBoot(!!this.state.netInfo.isConnected);
-      this.customServerModalRef.current?.dismiss();
-      this.setState({ actionButtonsDisabled: false });
-      return;
-    }
-    if (this.state.customServerOffline) {
-      // Offline = no server, but the chain is still the user's choice. Create
-      // and restore derive keys chain-specifically, so we always persist a
-      // concrete chain — never an empty one — and onboarding never faces an
-      // empty field. The wallet-open path ignores this value (it tries every
-      // chain and adopts the wallet's real one), so a mismatch self-corrects on
-      // open.
-      const offline = offlineServer(this.state.customServerChainName);
-      await SettingsFileImpl.writeServer(offline, this.state.selectServer);
-      this.setState({
-        server: offline,
-        customServerUri: '',
-        customServerChainName: this.state.server.chainName,
-        customServerOffline: false,
-      });
-      this.customServerModalRef.current?.dismiss();
-    } else {
-      const parsed = parseServerURI(this.state.customServerUri);
-      const chainName = this.state.customServerChainName;
-      if (parsed.kind === 'error') {
-        // Surface the parser's specific message (bad URI, plaintext
-        // HTTP not allowed, etc.) instead of the generic "fill out a
-        // valid Server URI" snackbar so the user can fix the input.
-        this.addLastSnackbar(this.state.translate(parsed.errorKey) as string);
-        this.setState({ actionButtonsDisabled: false });
-        return;
-      }
-      const uri = parsed.uri;
-
-      this.addLastSnackbar(
-        this.state.translate('loadedapp.tryingnewserver') as string,
-      );
-
-      // In LoadingApp there is no lightclient instance yet, so we can't
-      // use `checkServerURI` (which calls `changeServerProcess` /
-      // `infoServerInfo` — both require an open wallet). The right probe
-      // at this stage is a wallet-less latency check against the URI:
-      // `getLatestBlockServerInfo` only hits the gRPC endpoint to fetch
-      // the tip height, no client state needed. Chain selection is taken
-      // from the user's toggle on the modal — it's a config choice, not
-      // something we can introspect without a wallet.
-      const cs = {
-        uri,
-        chainName,
-        region: '',
-        default: false,
-        latency: null,
-        obsolete: false,
-      } as ServerUrisType;
-      const serverChecked = await selectingServer([cs]);
-      if (!serverChecked || !serverChecked.latency) {
-        this.addLastSnackbar(
-          (this.state.translate('loadedapp.changeservernew-error') as string) +
-            uri,
-        );
-        this.setState({ actionButtonsDisabled: false });
-        return;
-      }
-      const custom = remoteServer(uri, chainName);
-      await SettingsFileImpl.writeServer(custom, SelectServerEnum.custom);
-      this.setState({
-        selectServer: SelectServerEnum.custom,
-        server: custom,
-        customServerUri: '',
-        customServerChainName: this.state.server.chainName,
-        customServerOffline: false,
-      });
-      this.customServerModalRef.current?.dismiss();
-    }
-    this.setState({ actionButtonsDisabled: false });
   };
 
   navigateToLoadedApp = (
@@ -1462,68 +1340,143 @@ export class LoadingAppClass extends Component<
     this.setState({ backgroundError: { title, error } });
   };
 
-  customServer = () => {
-    // Reflect the current persisted mode in the modal's chips when it opens:
-    // offline / auto / custom light the matching chip; `list` (which has no
-    // chip here) opens with none selected so the user picks explicitly. The
-    // active server itself is shown on the StartMenu behind the modal.
-    const s = this.state.selectServer;
-    const { server } = this.state;
-    const remote = server.kind === 'remote';
+  openServer = () => {
     this.setState(
-      {
-        customServerOffline: !remote,
-        customServerAuto: remote && s === SelectServerEnum.auto,
-        customServerCustom: remote && s === SelectServerEnum.custom,
-        customServerChainName: server.chainName || ChainNameEnum.mainChainName,
-        customServerUri:
-          remote && s === SelectServerEnum.custom ? server.uri : '',
-      },
-      () => {
-        this.customServerModalRef.current?.present();
-      },
+      state => ({ serverReturn: state.screen, screen: RouteEnum.Server }),
+      () => this.probeCurrentServer(),
     );
   };
 
-  onPressServerChainName = (chain: ChainNameEnum) => {
-    // Regtest has no public auto/offline server — it only works against a
-    // locally-run node reachable via a custom URI, so selecting it forces the
-    // Custom mode. Main/test keep the freedom to pick any of the three modes.
-    if (chain === ChainNameEnum.regtestChainName) {
-      this.setState({
-        customServerChainName: chain,
-        customServerOffline: false,
-        customServerAuto: false,
-        customServerCustom: true,
-      });
-    } else {
-      this.setState({ customServerChainName: chain });
+  closeServer = () => {
+    this.setState(state => ({ screen: state.serverReturn }));
+  };
+
+  // Times one tip request; a server that does not answer in time has no latency.
+  probeUri = async (
+    uri: string,
+  ): Promise<{ latency: number | null; height: string }> => {
+    const start = Date.now();
+    const resp = await Promise.race([
+      getLatestBlockServerInfo(uri),
+      new Promise<null>(resolve =>
+        setTimeout(() => resolve(null), PROBE_TIMEOUT_MS),
+      ),
+    ]);
+    if (!resp || !resp.ok || !resp.value) {
+      return { latency: null, height: '' };
     }
+    return { latency: Date.now() - start, height: resp.value };
   };
 
-  onPressServerOffline = (value: boolean) => {
-    // The three chips are mutually exclusive; turning one on clears the others.
-    this.setState({
-      customServerOffline: value,
-      customServerAuto: value ? false : this.state.customServerAuto,
-      customServerCustom: value ? false : this.state.customServerCustom,
-    });
+  probeCurrentServer = async () => {
+    const { server } = this.state;
+    if (server.kind === 'offline') {
+      this.setState({ serverStatus: 'ok' });
+      return;
+    }
+    this.setState({ serverStatus: 'wait' });
+    const probe = await this.probeUri(server.uri);
+    const now = this.state.server;
+    if (this.unmounted || now.kind !== 'remote' || now.uri !== server.uri) {
+      return;
+    }
+    this.setState(state => ({
+      serverStatus: probe.latency === null ? 'bad' : 'ok',
+      serverBlockHeight: probe.height,
+      serverLatencies: {
+        ...state.serverLatencies,
+        [server.uri]: probe.latency,
+      },
+    }));
   };
 
-  onPressServerAuto = (value: boolean) => {
-    this.setState({
-      customServerAuto: value,
-      customServerOffline: value ? false : this.state.customServerOffline,
-      customServerCustom: value ? false : this.state.customServerCustom,
-    });
+  // Each listed server of a chain is probed once per visit to the screen.
+  probeServers = async (chain: ChainNameEnum) => {
+    const pending = serverUris(this.state.translate).filter(
+      s =>
+        s.chainName === chain &&
+        !s.obsolete &&
+        this.state.serverLatencies[s.uri] === undefined,
+    );
+    await Promise.all(
+      pending.map(async s => {
+        const probe = await this.probeUri(s.uri);
+        if (this.unmounted) {
+          return;
+        }
+        this.setState(state => ({
+          serverLatencies: { ...state.serverLatencies, [s.uri]: probe.latency },
+        }));
+      }),
+    );
   };
 
-  onPressServerCustom = (value: boolean) => {
-    this.setState({
-      customServerCustom: value,
-      customServerOffline: value ? false : this.state.customServerOffline,
-      customServerAuto: value ? false : this.state.customServerAuto,
-    });
+  applyServer = async (server: ServerType, mode: SelectServerEnum) => {
+    await SettingsFileImpl.writeServer(server, mode);
+    await new Promise<void>(resolve =>
+      this.setState(
+        { server, selectServer: mode, serverBlockHeight: '' },
+        resolve,
+      ),
+    );
+  };
+
+  // Automatic seeds the chain's default and lets the boot picker replace it
+  // with the best live server.
+  chooseAutomatic = async (chain: ChainNameEnum) => {
+    this.setState({ actionButtonsDisabled: true, serverStatus: 'wait' });
+    await this.applyServer(
+      this.defaultServerForChain(chain),
+      SelectServerEnum.auto,
+    );
+    await this.selectServerOnBoot(!!this.state.netInfo.isConnected);
+    this.setState({ actionButtonsDisabled: false });
+    await this.probeCurrentServer();
+  };
+
+  pickServer = async (s: ServerUrisType) => {
+    await this.applyServer(
+      remoteServer(s.uri, s.chainName),
+      SelectServerEnum.list,
+    );
+    await this.probeCurrentServer();
+  };
+
+  // A custom server is adopted only once it answers.
+  testCustomServer = async (
+    chain: ChainNameEnum,
+    uri: string,
+  ): Promise<boolean> => {
+    const parsed = parseServerURI(uri);
+    if (parsed.kind === 'error') {
+      this.addLastSnackbar(this.state.translate(parsed.errorKey) as string);
+      return false;
+    }
+    const probe = await this.probeUri(parsed.uri);
+    if (probe.latency === null) {
+      return false;
+    }
+    await this.applyServer(
+      remoteServer(parsed.uri, chain),
+      SelectServerEnum.custom,
+    );
+    this.setState({ serverStatus: 'ok', serverBlockHeight: probe.height });
+    return true;
+  };
+
+  // Offline keeps the chain shown so create and restore derive keys for it;
+  // leaving Offline goes back to Automatic, on mainnet when regtest was shown.
+  setOffline = async (on: boolean, chain: ChainNameEnum) => {
+    if (on) {
+      await this.applyServer(offlineServer(chain), this.state.selectServer);
+      this.setState({ serverStatus: 'ok' });
+      return;
+    }
+    await this.chooseAutomatic(
+      chain === ChainNameEnum.regtestChainName
+        ? ChainNameEnum.mainChainName
+        : chain,
+    );
   };
 
   // The retry's non-declined answer, parked for the boot path to consume
@@ -1621,10 +1574,6 @@ export class LoadingAppClass extends Component<
       screen,
       actionButtonsDisabled,
       walletExists,
-      customServerUri,
-      customServerChainName,
-      customServerOffline,
-      customServerAuto,
       firstLaunchingMessage,
       biometricGate,
       translate,
@@ -1679,7 +1628,7 @@ export class LoadingAppClass extends Component<
                       recoveryWallet={this.state.recoveryWallet}
                       importRecoveryWallet={this.importRecoveryWallet}
                       viewRecoveryWallet={this.viewRecoveryWallet}
-                      customServer={this.customServer}
+                      customServer={this.openServer}
                       walletExists={walletExists}
                       openCurrentWallet={this.openCurrentWallet}
                       createNewWallet={this.createNewWalletChecked}
@@ -1715,9 +1664,54 @@ export class LoadingAppClass extends Component<
                         onCreate={() =>
                           this.confirmDelete('create', this.createNewWallet)
                         }
-                        onServer={this.customServer}
+                        onServer={this.openServer}
                       />
                     )}
+                  {screen === RouteEnum.Server && (
+                    <Server
+                      server={this.state.server}
+                      selectServer={this.state.selectServer}
+                      status={this.state.serverStatus}
+                      blockHeight={this.state.serverBlockHeight}
+                      busy={actionButtonsDisabled}
+                      servers={serverUris(translate)}
+                      latencies={this.state.serverLatencies}
+                      onAuto={this.chooseAutomatic}
+                      onPick={this.pickServer}
+                      onTestCustom={this.testCustomServer}
+                      onOffline={this.setOffline}
+                      onChoose={() =>
+                        this.setState({ screen: RouteEnum.ServerList })
+                      }
+                      onProbe={this.probeServers}
+                      onBack={this.closeServer}
+                    />
+                  )}
+                  {screen === RouteEnum.ServerList && (
+                    <ServerList
+                      servers={serverUris(translate).filter(
+                        s =>
+                          s.chainName === ChainNameEnum.mainChainName &&
+                          !s.obsolete,
+                      )}
+                      latencies={this.state.serverLatencies}
+                      selectedUri={
+                        this.state.server.kind === 'remote' &&
+                        this.state.selectServer === SelectServerEnum.list
+                          ? this.state.server.uri
+                          : null
+                      }
+                      busy={actionButtonsDisabled}
+                      onPick={this.pickServer}
+                      onUnreachable={() =>
+                        this.addLastSnackbar(
+                          translate('server.server-unreachable') as string,
+                          SnackbarDurationEnum.short,
+                        )
+                      }
+                      onBack={() => this.setState({ screen: RouteEnum.Server })}
+                    />
+                  )}
                   {screen === RouteEnum.ImportUfvk && (
                     <ImportUfvk
                       busy={this.state.actionButtonsDisabled}
@@ -1743,20 +1737,6 @@ export class LoadingAppClass extends Component<
                     SnackbarDurationEnum.short,
                   )
                 }
-              />
-              <CustomServerModalHost
-                ref={this.customServerModalRef}
-                actionButtonsDisabled={actionButtonsDisabled}
-                customServerOffline={customServerOffline}
-                onPressServerOffline={this.onPressServerOffline}
-                customServerAuto={customServerAuto}
-                onPressServerAuto={this.onPressServerAuto}
-                customServerChainName={customServerChainName}
-                onPressServerChainName={this.onPressServerChainName}
-                customServerUri={customServerUri}
-                setCustomServerUri={this.setCustomServerUri}
-                usingCustomServer={this.usingCustomServer}
-                translate={translate}
               />
             </BottomSheetModalProvider>
           </GestureHandlerRootView>
