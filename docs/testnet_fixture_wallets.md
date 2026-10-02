@@ -16,7 +16,7 @@ and iOS.
 
 | Test                                                 | What it reads                                                                                                                                                                                          |
 | ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Mixnet refusal test, `ConfirmRefusesWithoutMixnet`   | The published addresses, the consolidation txid, and a confirmed shielded balance above a minimum. The test proposes a send to the wallet's own transparent address and expects the confirm to refuse. |
+| Mixnet refusal test, `ConfirmRefusesWithoutMixnet`   | The published addresses, the consolidation txid, and a spendable shielded balance above a minimum. The test proposes a send to the wallet's own transparent address and expects the confirm to refuse. |
 | Value-transfer test, `RecoversConsolidationTransfer` | The consolidation entry, found by txid and kind, with its status, height, value, and fee.                                                                                                              |
 | Pool-balance test, `ExecuteSaplingBalanceFromSeed`   | The exact total and confirmed balances of the Ironwood, Orchard, and Sapling pools, and a confirmed transparent balance of zero. This test still runs on regtest.                                      |
 | Funded sync check                                    | A note the sync finds, and the pool balance after the sync. `ConfirmRefusesWithoutMixnet` carries it.                                                                                                  |
@@ -53,13 +53,15 @@ The shared fixture wallet started from this seed on 2026-10-02. The wallet sent
 its whole balance to itself in one transaction, txid
 `256fc8dcb3dd730439157301a027f7b243d69aa30e31fc7a9b619e726321d19f`, which
 confirmed in block 4,431,582, and then shielded its transparent funds in block
-4,431,584. The fixture birthday is 4,378,218, the block mined ten days before
-the consolidation by block timestamp. A wallet restored from that birthday
-holds one entry for the consolidation, kind `memo-to-self`, value 3,995,811,890
-zatoshis, fee 285,000, and a confirmed Ironwood balance of 3,995,846,890
+4,431,584. The fixture birthday is 4,431,500, 82 blocks before the
+consolidation. A wallet restored from that birthday holds one entry for the
+consolidation, kind `memo-to-self`, value 3,995,811,890 zatoshis, fee 285,000.
+Before any later spend it held a confirmed Ironwood balance of 3,995,846,890
 zatoshis. `TestnetFixture` in `RustFFITest.kt` holds those values. A later
 spend from the seed by zingolib's tests adds entries after the consolidation
-and lowers the balance, and the fixture tests tolerate both.
+and lowers the balance, and the fixture tests tolerate both. While the change
+of such a spend waits for its confirmations, the refusal test syncs every 20
+seconds until the spendable shielded balance reaches its minimum.
 
 The birthday and the current history of this wallet come from one sync of the
 saved wallet. Read them from that sync.
@@ -264,7 +266,10 @@ birthday has finished.
 - The birthday. For a new seed, it is the height of the block that holds step
   1, the `blockheight` of the oldest entry of `value_transfers`. The `birthday`
   command of a new wallet prints its creation height, which is lower.
-- The testnet server, `https://testnet.zec.rocks:443`.
+- The testnet servers. The fixture tests read the first one that answers,
+  `https://testnet.zec.rocks:443` and then
+  `https://zaino.testnet.unsafe.zec.rocks:443`, which zingolib lists in
+  `zingolib/zingo-netutils/src/indexers.rs`.
 - The txid of each step.
 - The value transfers as the Binding Layer reports them.
 - The total and confirmed balances of the Ironwood, Orchard, Sapling, and
@@ -303,15 +308,16 @@ grpcurl -max-time 20 \
 ```
 
 On 2026-10-02 the server reported a `blockHeight` of `4430915`. The shared
-wallet's birthday 4,378,218 passes a budget of 100,000 blocks at height
-4,478,218, about nine days later.
+wallet's birthday 4,431,500 passes a budget of 100,000 blocks at height
+4,531,500, about 19 days later.
 
 Refresh the fixture wallets in these cases.
 
 - The range from the birthday to the tip passes the budget. The budget is
   100,000 blocks for now, about 19 days. On 2026-10-02 the CI emulator synced
-  the shared wallet over 53,500 blocks in under 90 seconds, inside a deadline of
-  5 minutes, and a later run sets the final number.
+  the shared wallet over 53,500 blocks from an earlier birthday in under 90
+  seconds, inside a deadline of 5 minutes, and a later run sets the final
+  number.
 - A deposit or a sweep breaks a fixture test.
 
 A wallet that starts from `GloryGoddess` keeps its seed and its birthday. When

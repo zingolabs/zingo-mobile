@@ -71,8 +71,8 @@ object MainnetServers {
 /** The shared testnet fixture wallet, which is zingolib's GloryGoddess example wallet. */
 object TestnetFixture {
     const val SEED = "glory goddess cargo action guilt ball coral employ phone baby oxygen flavor solid climb situate frequent blade pet enough milk access try swift benefit"
-    const val BIRTHDAY = 4_378_218L
-    const val SERVER = "https://testnet.zec.rocks:443"
+    const val BIRTHDAY = 4_431_500L
+    val SERVERS = listOf("https://testnet.zec.rocks:443", "https://zaino.testnet.unsafe.zec.rocks:443")
     const val CHAIN_HINT = "test"
     const val UNIFIED_ADDRESS = "utest1dmu08vg5wt5m9w0ejwgeqdndzzkfka7c94heuz5llxv5vx4lhcethmm6p5ean3wcj8l0m6tf8k8cau9r636gq7sxq3wa6zey2sysfteh"
     const val TRANSPARENT_ADDRESS = "tmF7QpuKsLF7nsMvThu4wQBpiKVGJXGCSJF"
@@ -93,6 +93,21 @@ fun assumeConsolidationPublished() =
         "TestnetFixture names no consolidation transaction yet",
         TestnetFixture.CONSOLIDATION_TXID.isNotEmpty(),
     )
+
+/** Returns the first of [servers] that reports its tip, paired with that tip, and fails with every refusal when no [chain] server answers. */
+fun firstAnsweringServer(chain: String, servers: List<String>): Pair<String, Long> {
+    val refusals = mutableMapOf<String, Exception>()
+    val answer = servers.firstNotNullOfOrNull { uri ->
+        try {
+            uri to uniffi.zingo.getLatestBlockServer(uri).toLong()
+        } catch (e: Exception) {
+            refusals[uri] = e
+            null
+        }
+    } ?: throw AssertionError("no $chain server answered: $refusals", refusals.values.last())
+    println("\nTip of ${answer.first}: ${answer.second}")
+    return answer
+}
 
 /** Returns the sync status of the open wallet, or the reason it is unavailable. */
 fun syncStatusOrReason(): String =
@@ -117,6 +132,21 @@ fun syncToCompletion(what: String, deadlineSeconds: Int, elapsedSeconds: () -> D
         throw AssertionError("the sync of $what failed after ${elapsedSeconds()} s: ${e.message}: ${syncStatusOrReason()}", e)
     }
     println("\nSynced $what in ${(System.nanoTime() - syncStart) / 1e9} s")
+}
+
+/** Syncs every 20 seconds until the spendable shielded balance reaches [minimum], failing at the deadline with the balance the wallet holds. */
+fun syncUntilSpendable(mapper: ObjectMapper, minimum: Long, deadlineSeconds: Int, elapsedSeconds: () -> Double) {
+    while (true) {
+        val spendable: SpendableBalance = mapper.readValue(uniffi.zingo.getSpendableBalanceTotal())
+        if (spendable.spendable_balance >= minimum) {
+            return
+        }
+        if (elapsedSeconds() > deadlineSeconds) {
+            throw AssertionError("the fixture wallet held ${spendable.spendable_balance} spendable zatoshis of the $minimum the test needs at its $deadlineSeconds s deadline: ${uniffi.zingo.getBalance()}")
+        }
+        Thread.sleep(20_000)
+        syncToCompletion("the blocks mined while a spend from the published seed confirms", deadlineSeconds, elapsedSeconds)
+    }
 }
 
 object Ufvk {
@@ -211,6 +241,10 @@ data class Balance (
     var total_transparent_balance : Long = 0L,
     var confirmed_transparent_balance : Long = 0L,
     var unconfirmed_transparent_balance : Long = 0L
+)
+
+data class SpendableBalance (
+    var spendable_balance : Long = 0L
 )
 
 data class Send (
@@ -348,16 +382,7 @@ class ExecuteSyncFromSeed {
         val start = System.nanoTime()
         val elapsedSeconds = { (System.nanoTime() - start) / 1e9 }
 
-        val refusals = mutableMapOf<String, Exception>()
-        val (serveruri, tip) = servers.firstNotNullOfOrNull { uri ->
-            try {
-                uri to uniffi.zingo.getLatestBlockServer(uri).toLong()
-            } catch (e: Exception) {
-                refusals[uri] = e
-                null
-            }
-        } ?: throw AssertionError("no mainnet server answered: $refusals", refusals.values.last())
-        println("\nTip of $serveruri: $tip")
+        val (serveruri, tip) = firstAnsweringServer("mainnet", servers)
 
         val birthday = tip - window
         val initFromSeedJson: String = uniffi.zingo.initFromSeed(seed, birthday.toUInt(), serveruri, "main", "Medium", 1u)
@@ -402,14 +427,9 @@ class ConfirmRefusesWithoutMixnet {
         val start = System.nanoTime()
         val elapsedSeconds = { (System.nanoTime() - start) / 1e9 }
 
-        val tip = try {
-            uniffi.zingo.getLatestBlockServer(TestnetFixture.SERVER).toLong()
-        } catch (e: uniffi.zingo.ZingolibException) {
-            throw AssertionError("the testnet server ${TestnetFixture.SERVER} did not answer: ${e.message}", e)
-        }
-        println("\nTip of ${TestnetFixture.SERVER}: $tip")
+        val (serveruri, tip) = firstAnsweringServer("testnet", TestnetFixture.SERVERS)
 
-        val initFromSeedJson: String = uniffi.zingo.initFromSeed(TestnetFixture.SEED, TestnetFixture.BIRTHDAY.toUInt(), TestnetFixture.SERVER, TestnetFixture.CHAIN_HINT, "Medium", 1u)
+        val initFromSeedJson: String = uniffi.zingo.initFromSeed(TestnetFixture.SEED, TestnetFixture.BIRTHDAY.toUInt(), serveruri, TestnetFixture.CHAIN_HINT, "Medium", 1u)
         println("\nInit from seed:")
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
@@ -447,12 +467,12 @@ class ConfirmRefusesWithoutMixnet {
         val valueTransfers: ValueTransfers = mapper.readValue(valueTransfersJson)
         assertThat(valueTransfers.value_transfers.map { it.txid }).contains(TestnetFixture.CONSOLIDATION_TXID)
 
+        syncUntilSpendable(mapper, amount + fee, TestnetFixture.DEADLINE_SECONDS, elapsedSeconds)
+
         var balanceJson: String = uniffi.zingo.getBalance()
         println("\nBalance pre-send:")
         println(balanceJson)
         val balancePreSend: Balance = mapper.readValue(balanceJson)
-        assertThat(balancePreSend.confirmed_orchard_balance + balancePreSend.confirmed_ironwood_balance)
-            .isAtLeast(amount + fee)
 
         val send = Send(TestnetFixture.TRANSPARENT_ADDRESS, amount, null)
 
@@ -480,7 +500,7 @@ class ConfirmRefusesWithoutMixnet {
         println("\nBalance post-refusal:")
         println(balanceJson)
         val balancePostRefusal: Balance = mapper.readValue(balanceJson)
-        assertThat(balancePostRefusal.confirmed_transparent_balance).isAtLeast(balancePreSend.confirmed_transparent_balance)
+        assertThat(balancePostRefusal.confirmed_transparent_balance).isEqualTo(balancePreSend.confirmed_transparent_balance)
     }
 }
 
@@ -494,14 +514,9 @@ class RecoversConsolidationTransfer {
         val start = System.nanoTime()
         val elapsedSeconds = { (System.nanoTime() - start) / 1e9 }
 
-        val tip = try {
-            uniffi.zingo.getLatestBlockServer(TestnetFixture.SERVER).toLong()
-        } catch (e: uniffi.zingo.ZingolibException) {
-            throw AssertionError("the testnet server ${TestnetFixture.SERVER} did not answer: ${e.message}", e)
-        }
-        println("\nTip of ${TestnetFixture.SERVER}: $tip")
+        val (serveruri, tip) = firstAnsweringServer("testnet", TestnetFixture.SERVERS)
 
-        val initFromSeedJson: String = uniffi.zingo.initFromSeed(TestnetFixture.SEED, TestnetFixture.BIRTHDAY.toUInt(), TestnetFixture.SERVER, TestnetFixture.CHAIN_HINT, "Medium", 1u)
+        val initFromSeedJson: String = uniffi.zingo.initFromSeed(TestnetFixture.SEED, TestnetFixture.BIRTHDAY.toUInt(), serveruri, TestnetFixture.CHAIN_HINT, "Medium", 1u)
         println("\nInit from seed:")
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
