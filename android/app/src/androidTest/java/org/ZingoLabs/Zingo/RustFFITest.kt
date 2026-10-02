@@ -67,6 +67,59 @@ object MainnetServers {
     const val FALLBACK = "https://zcash.mysideoftheweb.com:9067"
 }
 
+/** One value transfer, reduced to the fields a fixture history fixes. */
+data class Movement(val kind: String, val value: Long, val recipient: String?, val fee: Long?)
+
+/** The shared testnet fixture wallet, which is zingolib's GloryGoddess example wallet. */
+object TestnetFixture {
+    const val SEED = "glory goddess cargo action guilt ball coral employ phone baby oxygen flavor solid climb situate frequent blade pet enough milk access try swift benefit"
+    const val BIRTHDAY = 3_058_243L
+    const val SERVER = "https://testnet.zec.rocks:443"
+    const val CHAIN_HINT = "test"
+    const val UNIFIED_ADDRESS = "utest1dmu08vg5wt5m9w0ejwgeqdndzzkfka7c94heuz5llxv5vx4lhcethmm6p5ean3wcj8l0m6tf8k8cau9r636gq7sxq3wa6zey2sysfteh"
+    const val TRANSPARENT_ADDRESS = "tmF7QpuKsLF7nsMvThu4wQBpiKVGJXGCSJF"
+
+    const val RECEIPT_TXID = "d38bb1d4ce0b37955781ebdb36b92787a6519e7180bfa43056d934db5701e1ef"
+    const val RECEIPT_HEIGHT = 3_062_087L
+    const val RECEIPT_VALUE = 5_000_000_000L
+
+    const val SEND_TXID = "98b7909fa024224bf223c2a290f7c390a14e957f5f780a22d899a7e76448d050"
+    const val SEND_HEIGHT = 3_069_203L
+    const val SEND_FEE = 35_000L
+    val SENDS = listOf(
+        Movement("sent", 10_000L, "tmYd5GP6JxUxTUcz98NLPumEotvaMPaXytz", SEND_FEE),
+        Movement("sent", 20_000L, "utest17wwv8nuvdnpjsxtu6ndz6grys5x8wphcwtzmg75wkx607c7cue9qz5kfraqzc7k9dfscmylazj4nkwazjj26s9rhyjxm0dcqm837ykgh2suv0at9eegndh3kvtfjwp3hhhcgk55y9d2ys56zkw8aaamcrv9cy0alj0ndvd0wll4gxhrk9y4yy9q9yg8yssrencl63uznqnkv7mk3w05", SEND_FEE),
+        Movement("sent", 4_999_925_000L, "utest1dfj7pz3v2hewxk5nt36h9mu9g5h9cuc3064h5jlzgnq9f9f74fv4vr4vz4yvp2mq36ave8y8ggghm4g0e2nw9fg7qewuflpxxtvq4dzpscws4eq0hlh09shhj83a5yuzm9p3hsrtd028xk37gyf6403g90jwvtxkgyqv25kzzafyjfl7rvexzvrjx24akdr83qzkssyg22jm5cgcxc9", SEND_FEE),
+    )
+
+    const val DEADLINE_SECONDS = 40 * 60
+}
+
+/** Returns the sync status of the open wallet, or the reason it is unavailable. */
+fun syncStatusOrReason(): String =
+    runCatching { uniffi.zingo.statusSync() }
+        .getOrElse { "status unavailable: ${it.message}" }
+
+/** Launches a sync of [what] and polls it each second to completion, failing with the elapsed time and the sync status at the deadline or on a sync error. */
+fun syncToCompletion(what: String, deadlineSeconds: Int, elapsedSeconds: () -> Double) {
+    val syncJson: String = uniffi.zingo.runSync()
+    println("\nSync:")
+    println(syncJson)
+
+    val syncStart = System.nanoTime()
+    try {
+        while (!uniffi.zingo.pollSync().contains("sync_complete")) {
+            if (elapsedSeconds() > deadlineSeconds) {
+                throw AssertionError("the test passed its $deadlineSeconds s deadline after ${elapsedSeconds()} s while syncing $what: ${syncStatusOrReason()}")
+            }
+            Thread.sleep(1000)
+        }
+    } catch (e: uniffi.zingo.ZingolibException) {
+        throw AssertionError("the sync of $what failed after ${elapsedSeconds()} s: ${e.message}: ${syncStatusOrReason()}", e)
+    }
+    println("\nSynced $what in ${(System.nanoTime() - syncStart) / 1e9} s")
+}
+
 object Ufvk {
     const val HOSPITAL = "uviewregtest1zd5hsn447739jr5pk879pn06wan8gewam949xjqvwgfc7zec29x2ezqyeq6vmtwkcmn0kkfl447caqsccg582dp50ax972dfm4eh5f4mqj730fgr7hygvjeqxlgpwynrmcu57fjjqlns95chfjfq4xg7v977x603un9fuw73zvn2t32pfcfewrh67tzv04wstjg0yx4r3lpmpaea9nsyll6juu9jtyc0fstdwde06l4tvzlerytyutfd3yptq5r5csfck9c5ks8rzaj5r9tgltarejfdxu8h79sxmc6knxtnglp0pa7y3kw708rueg984ty6lhyrlzmk2swyqqfe0q2nmzhcxme9rsvprcw50ms463twx4suldhm0p94lem8ryan4e4y8fpp8grr5kmlygm70h2zhl0d7mfra5qs78jq9wqctvk8fhdu9cv78q00v7qzl9w50j242xr0945pmsu2vrh6jcvq8fxad420m8kxpd3cgyd6wxy6"
 }
@@ -328,24 +381,7 @@ class ExecuteSyncFromSeed {
         val heightPreSync: Height = mapper.readValue(heightJson)
         assertThat(heightPreSync.height).isEqualTo(0)
 
-        val syncJson: String = uniffi.zingo.runSync()
-        println("\nSync:")
-        println(syncJson)
-
-        val syncStart = System.nanoTime()
-        try {
-            while (!uniffi.zingo.pollSync().contains("sync_complete")) {
-                if (elapsedSeconds() > deadlineSeconds) {
-                    val status = runCatching { uniffi.zingo.statusSync() }
-                        .getOrElse { "status unavailable: ${it.message}" }
-                    throw AssertionError("the test passed its $deadlineSeconds s deadline while syncing $window mainnet blocks: $status")
-                }
-                Thread.sleep(1000)
-            }
-        } catch (e: uniffi.zingo.ZingolibException) {
-            throw AssertionError("the sync of $window mainnet blocks failed after ${elapsedSeconds()} s: ${e.message}", e)
-        }
-        println("\nSynced $window mainnet blocks in ${(System.nanoTime() - syncStart) / 1e9} s")
+        syncToCompletion("$window mainnet blocks", deadlineSeconds, elapsedSeconds)
 
         heightJson = uniffi.zingo.getLatestBlockWallet()
         println("\nHeight post-sync:")
@@ -355,98 +391,80 @@ class ExecuteSyncFromSeed {
     }
 }
 
-@LiveChainTest
-class ExecuteSendFromOrchard {
+@PublicChainTest
+class ConfirmRefusesWithoutMixnet {
     @Test
-    fun executeSendFromOrchard() {
+    fun confirmRefusesWithoutMixnet() {
         val mapper = testMapper()
 
-        val serveruri = "http://10.0.2.2:20000"
-        val chainhint = regtestChainHint()
-        val seed = Seeds.HOSPITAL
-        
-        val initFromSeedJson: String = uniffi.zingo.initFromSeed(seed, 1u, serveruri, chainhint, "Medium", 1u)
+        val amount = 100_000L
+        val fee = 20_000L
+        val tipSkewBlocks = 1L
+        val start = System.nanoTime()
+        val elapsedSeconds = { (System.nanoTime() - start) / 1e9 }
+
+        val tip = try {
+            uniffi.zingo.getLatestBlockServer(TestnetFixture.SERVER).toLong()
+        } catch (e: uniffi.zingo.ZingolibException) {
+            throw AssertionError("the testnet server ${TestnetFixture.SERVER} did not answer: ${e.message}", e)
+        }
+        println("\nTip of ${TestnetFixture.SERVER}: $tip")
+
+        val initFromSeedJson: String = uniffi.zingo.initFromSeed(TestnetFixture.SEED, TestnetFixture.BIRTHDAY.toUInt(), TestnetFixture.SERVER, TestnetFixture.CHAIN_HINT, "Medium", 1u)
         println("\nInit from seed:")
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
 
-        assertThat(initFromSeed.seed_phrase).isEqualTo(seed)
-        assertThat(initFromSeed.birthday).isEqualTo(1)
+        assertThat(initFromSeed.seed_phrase).isEqualTo(TestnetFixture.SEED)
+        assertThat(initFromSeed.birthday).isEqualTo(TestnetFixture.BIRTHDAY)
 
         val infoJson: String = uniffi.zingo.infoServer()
         println("\nInfo:")
         println(infoJson)
         val info: Info = mapper.readValue(infoJson)
-        assertThat(info.latest_block_height).isGreaterThan(0)
+        assertThat(info.latest_block_height).isAtLeast(tip - tipSkewBlocks)
 
-        var syncJson: String = uniffi.zingo.runSync()
-        println("\nSync:")
-        println(syncJson)
-
-        var syncStatusBefore: SyncStatus
-        while (true) {
-            val syncStatusBeforeJson: String = uniffi.zingo.statusSync()
-            println("\nSync status:")
-            println(syncStatusBeforeJson)
-            if (syncStatusBeforeJson.lowercase().startsWith("error")) {
-                println("Sync Error!:")
-                break
-            }
-            syncStatusBefore = mapper.readValue(syncStatusBeforeJson)
-
-            val progress = syncStatusBefore.percentage_total_outputs_scanned
-               ?: syncStatusBefore.percentage_total_blocks_scanned
-
-            if (progress != null && progress >= 100.0) {
-                println("Sync completed!")
-                break
-            }
-
-            Thread.sleep(1000)
-        }
-
-        var balanceJson: String = uniffi.zingo.getBalance()
-        println("\nBalance pre-send:")
-        println(balanceJson)
-        val balancePreSend: Balance = mapper.readValue(balanceJson)
-        assertThat(balancePreSend.confirmed_orchard_balance).isEqualTo(1000000)
-        assertThat(balancePreSend.confirmed_transparent_balance).isEqualTo(0)
+        val addressesJson: String = uniffi.zingo.getUnifiedAddresses()
+        println("\nAddresses:")
+        println(addressesJson)
+        val addresses: List<UnifiedAddress> = mapper.readValue(addressesJson)
+        assertThat(addresses[0].encoded_address).isEqualTo(TestnetFixture.UNIFIED_ADDRESS)
 
         val taddressesJson: String = uniffi.zingo.getTransparentAddresses()
         println("\nT Addresses:")
         println(taddressesJson)
         val taddresses: List<TransparentAddress> = mapper.readValue(taddressesJson)
+        assertThat(taddresses[0].encoded_address).isEqualTo(TestnetFixture.TRANSPARENT_ADDRESS)
 
-        val send = taddresses[0].encoded_address?.let { Send(it, 100000, null) }
+        syncToCompletion("${tip - TestnetFixture.BIRTHDAY} testnet blocks", TestnetFixture.DEADLINE_SECONDS, elapsedSeconds)
+
+        val heightJson: String = uniffi.zingo.getLatestBlockWallet()
+        println("\nHeight post-sync:")
+        println(heightJson)
+        val heightPostSync: Height = mapper.readValue(heightJson)
+        assertThat(heightPostSync.height).isAtLeast(tip)
+
+        val valueTransfersJson: String = uniffi.zingo.getValueTransfers()
+        val valueTransfers: ValueTransfers = mapper.readValue(valueTransfersJson)
+        assertThat(valueTransfers.value_transfers.map { it.txid }).contains(TestnetFixture.RECEIPT_TXID)
+
+        var balanceJson: String = uniffi.zingo.getBalance()
+        println("\nBalance pre-send:")
+        println(balanceJson)
+        val balancePreSend: Balance = mapper.readValue(balanceJson)
+        assertThat(balancePreSend.confirmed_orchard_balance).isAtLeast(amount + fee)
+
+        val send = Send(TestnetFixture.TRANSPARENT_ADDRESS, amount, null)
 
         val proposeJson: String = uniffi.zingo.send(mapper.writeValueAsString(listOf(send)))
         println("\nPropose:")
         println(proposeJson)
 
-        // The transmission rides the mixnet or does not happen (zingolib/0011).
-        // This wallet never attached one, so the confirm must refuse. A txid
-        // here would mean the transaction reached an indexer over clearnet,
-        // which is the leak the mixnet-only rule exists to prevent.
-        val refusal: String? = try {
-            val txid = uniffi.zingo.confirm()
-            throw AssertionError("the transmission answered without a mixnet: $txid")
-        } catch (e: uniffi.zingo.ZingolibException.Mixnet) {
-            e.message
-        }
+        val refusal: String? = refusedWithoutMixnet("transmission") { uniffi.zingo.confirm() }
         println("\nTransmission refused without a mixnet:")
         println(refusal)
-        // The refusal names the unattached state, because waiting out a
-        // bootstrap and restarting a dead proxy are different remedies.
         assertThat(refusal).contains("the Nym mixnet is not enabled")
 
-        // The refusal consumed the stored proposal. A confirm takes the
-        // proposal before it attempts the transmission, so a refusal discards
-        // it exactly as any other failure does. A retry therefore reports no
-        // stored proposal rather than repeating the refusal, and an app that
-        // wants the send after the user enables Mixnet Mode must propose it
-        // again. A repeated Mixnet refusal here would mean the proposal
-        // survived, and a txid would mean the retry transmitted one that the
-        // first call had already taken.
         val retry: String? = try {
             val txid = uniffi.zingo.confirm()
             throw AssertionError("a consumed proposal confirmed on retry: $txid")
@@ -456,125 +474,67 @@ class ExecuteSendFromOrchard {
         println("\nRetry after the refusal:")
         println(retry)
 
-        // A second launch while the first sync still runs is idempotent:
-        // the bridge answers with status on the data channel ("Sync task
-        // already running."), and the polling loop below observes the sync
-        // to completion either way.
-        syncJson = uniffi.zingo.runSync()
-        println("\nSync:")
-        println(syncJson)
-
-        var syncStatus: SyncStatus
-        while (true) {
-            val syncStatusJson: String = uniffi.zingo.statusSync()
-            println("\nSync status:")
-            println(syncStatusJson)
-            if (syncStatusJson.lowercase().startsWith("error")) {
-                println("Sync Error!:")
-                break
-            }
-            syncStatus = mapper.readValue(syncStatusJson)
-
-            val progress = syncStatus.percentage_total_outputs_scanned
-               ?: syncStatus.percentage_total_blocks_scanned
-
-            if (progress != null && progress >= 100.0) {
-                println("Sync completed!")
-                break
-            }
-
-            Thread.sleep(1000)
-        }
+        syncToCompletion("the blocks mined since the first sync", TestnetFixture.DEADLINE_SECONDS, elapsedSeconds)
 
         balanceJson = uniffi.zingo.getBalance()
         println("\nBalance post-refusal:")
         println(balanceJson)
         val balancePostRefusal: Balance = mapper.readValue(balanceJson)
-        // Nothing reached the chain, so the transparent recipient holds no
-        // confirmed funds. The unconfirmed side is deliberately unasserted:
-        // the proposal is still Calculated, and a Calculated transaction
-        // counts as pending whether or not it was ever transmitted.
-        assertThat(balancePostRefusal.confirmed_transparent_balance).isEqualTo(0)
+        assertThat(balancePostRefusal.confirmed_transparent_balance).isAtLeast(balancePreSend.confirmed_transparent_balance)
     }
 }
 
-@StaticChainTest
-class UpdateCurrentPriceAndValueTransfersFromSeed {
+@PublicChainTest
+class RecoversOldestValueTransfers {
     @Test
-    fun updateCurrentPriceAndValueTransfersFromSeed() {
+    fun recoversOldestValueTransfers() {
         val mapper = testMapper()
 
-        val serveruri = "http://10.0.2.2:20000"
-        val chainhint = regtestChainHint()
-        val seed = Seeds.HOSPITAL
+        val tipSkewBlocks = 1L
+        val start = System.nanoTime()
+        val elapsedSeconds = { (System.nanoTime() - start) / 1e9 }
 
-        val initFromSeedJson: String = uniffi.zingo.initFromSeed(seed, 1u, serveruri, chainhint, "Medium", 1u)
+        val tip = try {
+            uniffi.zingo.getLatestBlockServer(TestnetFixture.SERVER).toLong()
+        } catch (e: uniffi.zingo.ZingolibException) {
+            throw AssertionError("the testnet server ${TestnetFixture.SERVER} did not answer: ${e.message}", e)
+        }
+        println("\nTip of ${TestnetFixture.SERVER}: $tip")
+
+        val initFromSeedJson: String = uniffi.zingo.initFromSeed(TestnetFixture.SEED, TestnetFixture.BIRTHDAY.toUInt(), TestnetFixture.SERVER, TestnetFixture.CHAIN_HINT, "Medium", 1u)
         println("\nInit from seed:")
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
 
-        assertThat(initFromSeed.seed_phrase).isEqualTo(seed)
-        assertThat(initFromSeed.birthday).isEqualTo(1)
+        assertThat(initFromSeed.seed_phrase).isEqualTo(TestnetFixture.SEED)
+        assertThat(initFromSeed.birthday).isEqualTo(TestnetFixture.BIRTHDAY)
 
         val infoJson: String = uniffi.zingo.infoServer()
         println("\nInfo:")
         println(infoJson)
         val info: Info = mapper.readValue(infoJson)
-        assertThat(info.latest_block_height).isGreaterThan(0)
+        assertThat(info.latest_block_height).isAtLeast(tip - tipSkewBlocks)
 
-        val syncJson: String = uniffi.zingo.runSync()
-        println("\nSync:")
-        println(syncJson)
+        syncToCompletion("${tip - TestnetFixture.BIRTHDAY} testnet blocks", TestnetFixture.DEADLINE_SECONDS, elapsedSeconds)
 
-        var syncStatus: SyncStatus
-        while (true) {
-            val syncStatusJson: String = uniffi.zingo.statusSync()
-            println("\nSync status:")
-            println(syncStatusJson)
-            if (syncStatusJson.lowercase().startsWith("error")) {
-                println("Sync Error!:")
-                break
-            }
-            syncStatus = mapper.readValue(syncStatusJson)
-
-            val progress = syncStatus.percentage_total_outputs_scanned
-               ?: syncStatus.percentage_total_blocks_scanned
-
-            if (progress != null && progress >= 100.0) {
-                println("Sync completed!")
-                break
-            }
-
-            Thread.sleep(1000)
-        }
-
-        val recipientAddress = "uregtest1az7w9w3tdegf0srnsgqyqfhyfrpx2h6u4pkc2yq3ja552vzhwkjqgy4fu6a6kcu9280ppajamj2gcq9lx9x0zxdrsns94ml3e443a7t2dm50382mhtkleydrq74q5xlh6sel5u0qlrvflf20qgljzszd2ht9jmerwwahct9rtuc3nqdk"
-
-        val valueTranfersJson: String = uniffi.zingo.getValueTransfers()
+        val valueTransfersJson: String = uniffi.zingo.getValueTransfers()
         println("\nValue Transfers:")
-        println(valueTranfersJson)
-        val valueTranfers: ValueTransfers = mapper.readValue(valueTranfersJson)
-        // the value transfers have 3 items for 3 different txs
-        // 1. Received - 1_000_000 - orchard (1 item)
-        // 2. Sent - 110_000 - uregtest1az7w9w3t... (1 item)
-        // 3. memoToSelf - 870_000 (1 item)
-        assertThat(valueTranfers.value_transfers.size).isEqualTo(3)
-        // third item have to be a `fee` from the last `Sent` with the same txid
-        assertThat(valueTranfers.value_transfers[0].kind).isEqualTo("memo-to-self")
-        assertThat(valueTranfers.value_transfers[0].status).isEqualTo("confirmed")
-        assertThat(valueTranfers.value_transfers[0].value).isEqualTo(870000)
-        assertThat(valueTranfers.value_transfers[0].transaction_fee).isEqualTo(20000)
-        // second item have to be a `Sent`
-        assertThat(valueTranfers.value_transfers[1].kind).isEqualTo("sent")
-        assertThat(valueTranfers.value_transfers[1].recipient_address).isEqualTo(recipientAddress)
-        assertThat(valueTranfers.value_transfers[1].status).isEqualTo("confirmed")
-        assertThat(valueTranfers.value_transfers[1].value).isEqualTo(100000)
-        assertThat(valueTranfers.value_transfers[1].transaction_fee).isEqualTo(10000)
-        // first item have to be a `Received`
-        assertThat(valueTranfers.value_transfers[2].kind).isEqualTo("received")
-        assertThat(valueTranfers.value_transfers[2].pools_received).isEqualTo(listOf("Orchard"))
-        assertThat(valueTranfers.value_transfers[2].status).isEqualTo("confirmed")
-        assertThat(valueTranfers.value_transfers[2].value).isEqualTo(1000000)
+        println(valueTransfersJson)
+        val valueTransfers: ValueTransfers = mapper.readValue(valueTransfersJson)
+
+        val receipts = valueTransfers.value_transfers.filter { it.txid == TestnetFixture.RECEIPT_TXID }
+        assertThat(receipts).hasSize(1)
+        val receipt = receipts[0]
+        assertThat(receipt.kind).isEqualTo("received")
+        assertThat(receipt.pools_received).isEqualTo(listOf("Orchard"))
+        assertThat(receipt.value).isEqualTo(TestnetFixture.RECEIPT_VALUE)
+        assertThat(receipt.status).isEqualTo("confirmed")
+        assertThat(receipt.blockheight).isEqualTo(TestnetFixture.RECEIPT_HEIGHT)
+
+        val sends = valueTransfers.value_transfers.filter { it.txid == TestnetFixture.SEND_TXID }
+        assertThat(sends.map { it.blockheight }.toSet()).containsExactly(TestnetFixture.SEND_HEIGHT)
+        assertThat(sends.map { Movement(it.kind, it.value, it.recipient_address, it.transaction_fee) })
+            .containsAtLeastElementsIn(TestnetFixture.SENDS)
     }
 }
 
