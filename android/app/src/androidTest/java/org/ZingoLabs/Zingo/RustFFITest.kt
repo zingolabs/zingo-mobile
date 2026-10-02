@@ -71,17 +71,17 @@ object MainnetServers {
 /** The shared testnet fixture wallet, which is zingolib's GloryGoddess example wallet. */
 object TestnetFixture {
     const val SEED = "glory goddess cargo action guilt ball coral employ phone baby oxygen flavor solid climb situate frequent blade pet enough milk access try swift benefit"
-    const val BIRTHDAY = 3_058_243L
+    const val BIRTHDAY = 4_378_218L
     const val SERVER = "https://testnet.zec.rocks:443"
     const val CHAIN_HINT = "test"
     const val UNIFIED_ADDRESS = "utest1dmu08vg5wt5m9w0ejwgeqdndzzkfka7c94heuz5llxv5vx4lhcethmm6p5ean3wcj8l0m6tf8k8cau9r636gq7sxq3wa6zey2sysfteh"
     const val TRANSPARENT_ADDRESS = "tmF7QpuKsLF7nsMvThu4wQBpiKVGJXGCSJF"
 
-    const val CONSOLIDATION_TXID = ""
-    const val CONSOLIDATION_HEIGHT = 0L
-    const val CONSOLIDATION_KIND = "send-to-self"
-    const val CONSOLIDATION_VALUE = 0L
-    const val CONSOLIDATION_FEE = 0L
+    const val CONSOLIDATION_TXID = "256fc8dcb3dd730439157301a027f7b243d69aa30e31fc7a9b619e726321d19f"
+    const val CONSOLIDATION_HEIGHT = 4_431_582L
+    const val CONSOLIDATION_KIND = "memo-to-self"
+    const val CONSOLIDATION_VALUE = 3_995_811_890L
+    const val CONSOLIDATION_FEE = 285_000L
 
     const val DEADLINE_SECONDS = 5 * 60
     const val TIP_SKEW_BLOCKS = 10L
