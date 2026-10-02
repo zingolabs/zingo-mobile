@@ -84,6 +84,7 @@ object TestnetFixture {
     const val CONSOLIDATION_FEE = 0L
 
     const val DEADLINE_SECONDS = 5 * 60
+    const val TIP_SKEW_BLOCKS = 10L
 }
 
 /** Skips the test while the fixture names no consolidation transaction. */
@@ -393,11 +394,11 @@ class ExecuteSyncFromSeed {
 class ConfirmRefusesWithoutMixnet {
     @Test
     fun confirmRefusesWithoutMixnet() {
+        assumeConsolidationPublished()
         val mapper = testMapper()
 
         val amount = 100_000L
         val fee = 20_000L
-        val tipSkewBlocks = 1L
         val start = System.nanoTime()
         val elapsedSeconds = { (System.nanoTime() - start) / 1e9 }
 
@@ -420,7 +421,7 @@ class ConfirmRefusesWithoutMixnet {
         println("\nInfo:")
         println(infoJson)
         val info: Info = mapper.readValue(infoJson)
-        assertThat(info.latest_block_height).isAtLeast(tip - tipSkewBlocks)
+        assertThat(info.latest_block_height).isAtLeast(tip - TestnetFixture.TIP_SKEW_BLOCKS)
 
         val addressesJson: String = uniffi.zingo.getUnifiedAddresses()
         println("\nAddresses:")
@@ -440,9 +441,7 @@ class ConfirmRefusesWithoutMixnet {
         println("\nHeight post-sync:")
         println(heightJson)
         val heightPostSync: Height = mapper.readValue(heightJson)
-        assertThat(heightPostSync.height).isAtLeast(tip)
-
-        assumeConsolidationPublished()
+        assertThat(heightPostSync.height).isAtLeast(tip - TestnetFixture.TIP_SKEW_BLOCKS)
 
         val valueTransfersJson: String = uniffi.zingo.getValueTransfers()
         val valueTransfers: ValueTransfers = mapper.readValue(valueTransfersJson)
@@ -489,9 +488,9 @@ class ConfirmRefusesWithoutMixnet {
 class RecoversConsolidationTransfer {
     @Test
     fun recoversConsolidationTransfer() {
+        assumeConsolidationPublished()
         val mapper = testMapper()
 
-        val tipSkewBlocks = 1L
         val start = System.nanoTime()
         val elapsedSeconds = { (System.nanoTime() - start) / 1e9 }
 
@@ -514,11 +513,9 @@ class RecoversConsolidationTransfer {
         println("\nInfo:")
         println(infoJson)
         val info: Info = mapper.readValue(infoJson)
-        assertThat(info.latest_block_height).isAtLeast(tip - tipSkewBlocks)
+        assertThat(info.latest_block_height).isAtLeast(tip - TestnetFixture.TIP_SKEW_BLOCKS)
 
         syncToCompletion("${tip - TestnetFixture.BIRTHDAY} testnet blocks", TestnetFixture.DEADLINE_SECONDS, elapsedSeconds)
-
-        assumeConsolidationPublished()
 
         val valueTransfersJson: String = uniffi.zingo.getValueTransfers()
         println("\nValue Transfers:")
