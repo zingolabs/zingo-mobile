@@ -1,6 +1,7 @@
 import React, { ReactNode } from 'react';
 import { useShallowMemo } from './useShallowMemo';
 import { PERMITTED } from '@app/walletBackend/transforms/sendPermit';
+import { ABSENT_MIXNET_VIEW } from '@app/walletBackend/transforms/mixnetView';
 
 import {
   InfoType,
@@ -74,7 +75,7 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   performanceLevel: RPCPerformanceLevelEnum.Medium,
   setPrivacyOption: async () => {},
   blockExplorer: BlockExplorerEnum.Zcashexplorer,
-  mixnetView: null,
+  mixnetView: ABSENT_MIXNET_VIEW,
   reenableMixnet: async () => {},
   sendPermitNow: () => PERMITTED,
 };

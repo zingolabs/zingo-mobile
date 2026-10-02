@@ -9,6 +9,7 @@ import {
   sendPermit,
   sendWhenPermitted,
 } from '@app/walletBackend/transforms/sendPermit';
+import { ABSENT_MIXNET_VIEW } from '@app/walletBackend/transforms/mixnetView';
 import { mixnetLost, mixnetReady, mockInfo } from '../.storybook/storyMocks';
 
 const online: SendPermitInputs = {
@@ -26,8 +27,10 @@ describe('sendPermit', () => {
     expect(sendPermit(online)).toEqual(PERMITTED);
   });
 
-  test('Tests that the permit is granted when the mixnet view is null. A null view marks a platform with no mixnet policy.', () => {
-    expect(sendPermit({ ...online, mixnetView: null })).toEqual(PERMITTED);
+  test('Tests that the permit is granted when the platform has no mixnet transport.', () => {
+    expect(
+      sendPermit({ ...online, mixnetView: ABSENT_MIXNET_VIEW }),
+    ).toEqual(PERMITTED);
   });
 
   test('Tests that the permit is refused with the connection key when the device is disconnected.', () => {

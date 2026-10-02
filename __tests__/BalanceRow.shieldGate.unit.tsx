@@ -12,7 +12,10 @@ import {
   defaultAppContextLoaded,
 } from '@app/context';
 import { ChainNameEnum, remoteServer } from '@app/AppState';
-import { MixnetView } from '@app/walletBackend/transforms/mixnetView';
+import {
+  ABSENT_MIXNET_VIEW,
+  MixnetView,
+} from '@app/walletBackend/transforms/mixnetView';
 import {
   mixnetConnecting,
   mixnetLost,
@@ -28,7 +31,7 @@ import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 const keyTranslate = (key: string) => key;
 
 function renderRow(
-  mixnetView: MixnetView | null,
+  mixnetView: MixnetView,
   onPressShieldFunds = jest.fn(),
 ) {
   return render(
@@ -80,7 +83,7 @@ describe('BalanceRow shield button', () => {
   });
 
   test('Tests that the shield button is enabled when the platform has no mixnet view. The wallet holds a transparent balance.', () => {
-    const { getByTestId } = renderRow(null);
+    const { getByTestId } = renderRow(ABSENT_MIXNET_VIEW);
     expect(getByTestId('header.shield')).toBeEnabled();
   });
 

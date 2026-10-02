@@ -19,14 +19,13 @@ export type NymGateState =
   | { kind: 'idle' };
 
 // A lost transport fails the gate whether or not a reconnect is in flight;
-// a bootstrapping one connects, whether first-time or reconnecting. A null
-// view is the context's "no publication yet": idle, or connecting while an
-// Enable tap is held.
+// a bootstrapping one connects, whether first-time or reconnecting. An absent
+// view is idle, or connecting while an Enable tap is held.
 export function deriveNymGateState(
   enabling: boolean,
-  view: MixnetView | null,
+  view: MixnetView,
 ): NymGateState {
-  if (view === null) {
+  if (view.kind === 'absent') {
     return enabling ? { kind: 'connecting' } : { kind: 'idle' };
   }
   switch (view.statusKey) {
