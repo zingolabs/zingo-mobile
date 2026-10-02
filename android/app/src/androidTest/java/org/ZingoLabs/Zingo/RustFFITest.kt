@@ -1,5 +1,6 @@
 package org.ZingoLabs.Zingo
 
+import android.os.Bundle
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
