@@ -42,7 +42,6 @@ ESLint enforces the zone.
 
 - In comments, never narrate.
 - In comments, never include justifications or logical connectors.
-- In functions, explain what the function does in one sentence, if possible.
 - No tutorial narration ("Now we...", "Step 1:") and no banner comments
   (`// ===== HELPERS =====`).
 - If a workaround needs a paragraph of justification, the code is wrong. Fix
@@ -108,7 +107,6 @@ without losing meaning, the "so" was decorative. Delete it.
 - Never add inline comments.
 - Comment why, not what. No line-by-line narration of obvious operations.
 - No tutorial narration ("Now we...", "Step 1:", "First, let's...") and no banner comments (`// ===== HELPERS =====`).
-- No docstrings that just restate the signature.
 - Names: concise and domain-specific. Avoid generic placeholders (`data`, `result`, `output`, `item`, `value`, `temp`, `handleData`, a helper named `helper`) and avoid over-long descriptive names where a short one is idiomatic.
 - No completeness theater: no unrequested demo/usage blocks, no logs narrating execution ("Starting...", "Done!"), no emoji in output, no unprompted complexity analysis in comments.
 - Don't add guards for conditions that can't occur. Don't wrap non-throwing code in try/catch. Don't swallow-and-log errors; let them propagate.
@@ -116,9 +114,17 @@ without losing meaning, the "so" was decorative. Delete it.
 
 ### Documentation in code
 
-Every item doc-comment (Rust `///`, KDoc, Swift doc-comment) is one sentence
-and references no ADR, issue, or other document. Module headers (Rust `//!`,
-file- or class-level blocks) are NOT exempt.
+A doc-comment holds ONLY a terse bulleted list of side effects, doc-tests, or
+both. The rule covers every doc-comment form: KDoc, Swift doc-comments, JSDoc,
+and file- or class-level blocks. Ruled 2026-10-02.
+
+- Each bullet names one side effect of the item: a write to disk, a network
+  call, a lock it takes, a mutation of shared state, a spawned task, a crash.
+- A doc-test is an example that the toolchain compiles and runs.
+- A doc-comment holds no summary line, no prose sentence, no parameter or
+  return description, and no restatement of the signature.
+- A doc-comment references no ADR, issue, or other document.
+- An item with no side effect and no doc-test carries no doc-comment.
 
 ### Rust
 
