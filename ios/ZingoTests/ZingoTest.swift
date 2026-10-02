@@ -18,7 +18,7 @@ enum Seeds {
 
 enum MainnetServers {
     static let PRIMARY = "https://zec.rocks:443"
-    static let FALLBACK = "https://zcash.mysideoftheweb.com:9067"
+    static let FALLBACK = "https://na.zec.rocks:443"
 }
 
 /// The shared testnet fixture wallet, which is zingolib's GloryGoddess example wallet.
