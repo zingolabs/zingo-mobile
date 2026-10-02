@@ -7,19 +7,27 @@ appId: org.ZingoLabs.Zingo
 - launchApp:
     clearState: true
 
-# The mainnet test wallet of the retired Detox suite. Its seed is public,
-# and the chain holds a value transfer to it at 1994580, one block after
-# its birthday.
+# The mainnet test wallet. Its seed is public, and the chain holds a
+# value transfer to it at 1994580, one block after its birthday.
+# A screen that is still moving when its element first shows can take a
+# tap at a place the element has left, and the tap then changes nothing
+# (see 02_options_menu.yaml). The wait lets the screen settle, and a tap
+# that changes nothing is tapped again.
 - extendedWaitUntil:
     visible:
       id: "loadingapp.restorewalletseedufvk"
     timeout: 120000
+- waitForAnimationToEnd:
+    timeout: 5000
 - tapOn:
     id: "loadingapp.restorewalletseedufvk"
+    retryTapIfNoChange: true
 - extendedWaitUntil:
     visible:
       id: "import.seedufvkinput"
     timeout: 120000
+- waitForAnimationToEnd:
+    timeout: 5000
 - tapOn:
     id: "import.seedufvkinput"
 - inputText: "lottery multiply patient simple ivory leisure swift square west despair beauty match crowd margin reject box always title photo remind word diet ecology badge"
@@ -36,6 +44,7 @@ appId: org.ZingoLabs.Zingo
 - inputText: "1994579"
 - tapOn:
     id: "import.button.ok"
+    retryTapIfNoChange: true
 - extendedWaitUntil:
     visible:
       id: "header.drawmenu"

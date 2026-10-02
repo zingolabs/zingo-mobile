@@ -6,6 +6,12 @@ on:
       cache-key:
         required: true
         type: string
+      # Fail-all (see CONTEXT.md): when true, a failure here cancels the
+      # whole run. PR CI opts in; ci-nightly does not.
+      fail-all:
+        required: false
+        type: boolean
+        default: false
       advisory:
         # Advisory mode: job failures are recorded but do not fail the
         # caller, for runs where iOS is informational (per-PR CI) rather
@@ -17,15 +23,20 @@ on:
 env:
   CACHE-KEY: ${{ inputs.cache-key }}
   REPO-OWNER: ${{ github.repository_owner }}
+  # The destination pins no arch: it resolves arm64 on Apple-silicon
+  # runners and x86_64 on the Intel larger-runner pool; the
+  # XCFrameworks' simulator slices are fat arm64+x86_64 binaries
+  # either way.
+  SIMULATOR_DESTINATION: platform=iOS Simulator,name=iPhone 16,OS=18.5
 
 jobs:
   build-for-testing:
     continue-on-error: ${{ inputs.advisory }}
-    # Stock runners, deliberately: the huge macos-15 fleet queues in seconds,
-    # while the max-4 zingo-ios-build-m2 pool is left to the xcframework
-    # build alone. The xcodebuild destination pins no arch (see the
-    # build-for-testing step), so Apple-silicon stock runners are fine.
-    runs-on: macos-15
+    # The CI_IOS_RUNNER repository variable sets the runner label. The
+    # fallback warp-macos-15-arm64-12x is WarpBuild's 12-vCPU M4 Pro
+    # machine; the stock macos-15 label has three cores. The xcodebuild
+    # destination pins no arch (see the build-for-testing step).
+    runs-on: ${{ vars.CI_IOS_RUNNER || 'warp-macos-15-arm64-12x' }}
     steps:
       - name: Xcode 16.4
         uses: maxim-lobanov/setup-xcode@v1
@@ -48,13 +59,20 @@ jobs:
       - name: Check out zingolib
         uses: ./.github/actions/zingolib-submodule
 
+      # The artifact gate runs gh. This step fails the job at its start
+      # when the runner image lacks it.
+      - name: Report the tool of the artifact gate
+        run: gh --version
+
       # The Xcode project takes the Binding Layer from the zingolib submodule.
+      # A cache hit supplies it here. On a miss, the artifact gate below
+      # supplies it from the build that runs in parallel.
       - name: Restore the iOS Binding Layer
+        id: binding-layer
         uses: actions/cache/restore@v6
         with:
           path: zingolib/bindings/swift/build
           key: binding-layer-ios-${{ env.CACHE-KEY }}
-          fail-on-cache-miss: true
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -78,30 +96,85 @@ jobs:
           xcrun simctl list runtimes
           xcrun simctl list devices
 
+      # The steps above are independent of the Binding Layer build. This
+      # step holds until the artifact of that build lands, and it ends
+      # early when the build concludes without success. The job continues
+      # past a failed gate to the cache restore below.
+      #
+      # An artifact that exists opens the gate. A failed read of the API
+      # counts as no answer, and the loop reads again.
+      - name: Wait for the Binding Layer artifact (artifact gate)
+        id: gate
+        if: ${{ steps.binding-layer.outputs.cache-hit != 'true' }}
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ARTIFACT: binding-layer-ios-${{ env.CACHE-KEY }}
+          UPSTREAM: Build the iOS Binding Layer
+          TIMEOUT_SECS: 2700
+          POLL_SECS: 20
+        run: |
+          run="repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+          gone='[.jobs[] | select(.name | contains($ENV.UPSTREAM)) | select(.status == "completed" and .conclusion != "success")][0] | select(. != null) | "\"\(.name)\" concluded \"\(.conclusion)\""'
+          echo "artifact gate: waiting up to ${TIMEOUT_SECS}s for the artifact \"$ARTIFACT\" (producer: jobs matching \"$UPSTREAM\")"
+          while true; do
+            names="$(gh api "$run/artifacts?per_page=100" --jq '.artifacts[].name' || true)"
+            if printf '%s\n' "$names" | grep --quiet --line-regexp --fixed-strings "$ARTIFACT"; then
+              echo "artifact gate: the artifact \"$ARTIFACT\" is ready"
+              exit 0
+            fi
+            failure="$(gh api "$run/jobs?per_page=100" --jq "$gone" || true)"
+            if [ -n "$failure" ]; then
+              echo "artifact gate: the upstream job $failure, and the artifact \"$ARTIFACT\" will never appear" >&2
+              exit 1
+            fi
+            if [ "$SECONDS" -ge "$TIMEOUT_SECS" ]; then
+              echo "artifact gate: the deadline passed before the artifact \"$ARTIFACT\" appeared" >&2
+              exit 1
+            fi
+            sleep "$POLL_SECS"
+          done
+
+      - name: Download the Binding Layer
+        if: ${{ steps.gate.outcome == 'success' }}
+        uses: actions/download-artifact@v4
+        with:
+          name: binding-layer-ios-${{ env.CACHE-KEY }}
+          path: zingolib/bindings/swift/build
+
+      # The build is skipped when another run saves the cache after the
+      # restore above. The gate then fails, and the cache holds the
+      # Binding Layer.
+      - name: Restore the iOS Binding Layer after a failed gate
+        if: ${{ steps.gate.outcome == 'failure' }}
+        uses: actions/cache/restore@v6
+        with:
+          path: zingolib/bindings/swift/build
+          key: binding-layer-ios-${{ env.CACHE-KEY }}
+          fail-on-cache-miss: true
+
       - name: Build for testing
         working-directory: ios
         run: |
           set -euxo pipefail
           mkdir -p build/reports build/DerivedData
-          # The destination pins no arch: it resolves arm64 on Apple-silicon
-          # runners and x86_64 on the Intel larger-runner pool; the
-          # XCFrameworks' simulator slices are fat arm64+x86_64 binaries
-          # either way.
           xcodebuild build-for-testing \
             -workspace Zingo.xcworkspace \
             -scheme Zingo \
             -sdk iphonesimulator \
             -configuration Debug \
-            -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.5' \
+            -destination "$SIMULATOR_DESTINATION" \
             -derivedDataPath "build/DerivedData" \
             -resultBundlePath "build/reports/Zingo-BuildForTesting.xcresult" \
             -quiet
+          # The two test steps below run the one xctestrun this build wrote.
+          xctestrun="$(find build/DerivedData/Build/Products -name '*.xctestrun' | head -n 1)"
+          echo "XCTESTRUN=$xctestrun" >> "$GITHUB_ENV"
 
       - name: Run offline XCTest classes
         working-directory: ios
         run: |
           set -euxo pipefail
-          xctestrun="$(find build/DerivedData/Build/Products -name '*.xctestrun' | head -n 1)"
           only=()
           for class in \
             ExecuteVersionFromSeed \
@@ -119,9 +192,30 @@ jobs:
             only+=("-only-testing:ZingoTests/$class")
           done
           xcodebuild test-without-building \
-            -xctestrun "$xctestrun" \
-            -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.5' \
+            -xctestrun "$XCTESTRUN" \
+            -destination "$SIMULATOR_DESTINATION" \
             -resultBundlePath "build/reports/Zingo-Test.xcresult" \
+            "${only[@]}"
+
+      - name: Run public-chain XCTest classes
+        working-directory: ios
+        run: |
+          set -euxo pipefail
+          only=()
+          for class in \
+            ExecuteSyncFromSeed \
+            ConfirmRefusesWithoutMixnet \
+            RecoversConsolidationTransfer
+          do
+            only+=("-only-testing:ZingoTests/$class")
+          done
+          xcodebuild test-without-building \
+            -xctestrun "$XCTESTRUN" \
+            -destination "$SIMULATOR_DESTINATION" \
+            -resultBundlePath "build/reports/Zingo-PublicChainTest.xcresult" \
+            -test-timeouts-enabled YES \
+            -default-test-execution-time-allowance 420 \
+            -maximum-test-execution-time-allowance 420 \
             "${only[@]}"
 
       - name: Upload IOS test reports (.xcresult)
@@ -129,7 +223,9 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: test-ios-integration-test-reports.xcresult
-          path: ios/build/reports/Zingo-Test.xcresult
+          path: |
+            ios/build/reports/Zingo-Test.xcresult
+            ios/build/reports/Zingo-PublicChainTest.xcresult
           if-no-files-found: ignore
 
       - name: Upload Build Result
@@ -159,3 +255,14 @@ jobs:
       - name: Cleaning up build
         run: |
           rm -rf build/reports build/DerivedData || true
+
+      - name: Cancel the run on failure (fail-all)
+        if: ${{ failure() && inputs.fail-all }}
+        uses: actions/github-script@v9
+        with:
+          script: |
+            await github.rest.actions.cancelWorkflowRun({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.runId,
+            });

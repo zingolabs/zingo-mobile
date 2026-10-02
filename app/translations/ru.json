@@ -291,8 +291,8 @@
         "text": "ZcashExplorer.App"
       },
       {
-        "value": "Cipherscan",
-        "text": "CipherScan.App"
+        "value": "ZecBlock",
+        "text": "ZecBlock.com"
       },
       {
         "value": "Zexplorer",
@@ -351,7 +351,7 @@
     "value-performancelevel-Medium": "Medium",
     "value-performancelevel-Low": "Low",
     "value-blockexplorer-Zcashexplorer": "Zcashexplorer",
-    "value-blockexplorer-Cipherscan": "Cipherscan",
+    "value-blockexplorer-ZecBlock": "ZecBlock",
     "value-blockexplorer-Zexplorer": "Zexplorer",
     "value-blockexplorer-None": "Нет",
     "security-title": "Биометрия/PIN",

@@ -2207,7 +2207,10 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                     textContentType="URL"
                   />
                   {customServerUri && !disabled && (
-                    <TouchableOpacity onPress={() => setCustomServerUri('')}>
+                    <TouchableOpacity
+                      testID="settings.custom-server-clear"
+                      onPress={() => setCustomServerUri('')}
+                    >
                       <FontAwesomeIcon
                         style={{ marginRight: 10 }}
                         size={20}

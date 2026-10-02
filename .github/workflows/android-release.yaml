@@ -76,10 +76,15 @@ jobs:
             *)           echo "unknown ABI $ARCH"; exit 1 ;;
           esac
 
+      - name: Setup Node.js for the descriptor
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.18.0
+
       # The About screen shows this descriptor, so it names the release tag.
       - name: Record zingo-mobile's descriptor
         run: |
-          descriptor="$(cargo run --quiet --manifest-path rust/Cargo.toml --bin zm-descriptor)"
+          descriptor="$(node scripts/zm_descriptor.mjs)"
           echo "ZINGO_MOBILE_DESCRIPTOR=$descriptor" >> "$GITHUB_ENV"
 
       # The builder finds the zingolib root from its own crate directory, so

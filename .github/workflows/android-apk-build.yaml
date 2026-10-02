@@ -15,9 +15,7 @@ on:
         required: true
         type: string
       # Fail-all (see CONTEXT.md): when true, a failure here cancels the
-      # whole run. PR CI opts in; ci-nightly does not. The PR integration
-      # buckets also watch this job through the ci-gate artifact gate, so
-      # they abort even if the cancellation races.
+      # whole run. PR CI opts in; ci-nightly does not.
       fail-all:
         required: false
         type: boolean
@@ -29,6 +27,11 @@ on:
         required: false
         type: boolean
         default: false
+      # Runner label for the APK build job. PR CI passes CI_GRADLE_RUNNER.
+      runner:
+        required: false
+        type: string
+        default: zingo-android-gradle-16
 
 env:
   REPO-OWNER: ${{ github.repository_owner }}
@@ -37,7 +40,7 @@ env:
 jobs:
   android-apk-build:
     name: Andr APK build
-    runs-on: zingo-android-gradle-16
+    runs-on: ${{ inputs.runner }}
     env:
       RUSTFLAGS: -D warnings
       CACHE-KEY: ${{ inputs.cache-key }}

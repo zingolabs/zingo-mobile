@@ -64,8 +64,8 @@ export const mockTranslate = (p: string) => {
   } else if (p === 'settings.blockexplorers') {
     return [
       {
-        value: BlockExplorerEnum.Cipherscan,
-        text: 'text Cipherscan',
+        value: BlockExplorerEnum.ZecBlock,
+        text: 'text ZecBlock',
       },
       {
         value: BlockExplorerEnum.Zcashexplorer,
