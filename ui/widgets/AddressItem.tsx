@@ -89,8 +89,9 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
   }, [address, addressBook]);
 
   useEffect(() => {
-    if (!oneLine) {
-      if (privacy) {
+    if (privacy) {
+      setExpandContact(false);
+      if (!oneLine) {
         setExpandAddress(false);
       }
     }
@@ -136,11 +137,14 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
                     flexWrap: 'wrap',
                   }}
                 >
-                  {!expandContact && numLinesContact > 1 && (
-                    <RegText>{Utils.trimToSmall(contact, 7)}</RegText>
-                  )}
-                  {!expandContact && numLinesContact === 1 && (
-                    <RegText>{contact}</RegText>
+                  {!expandContact && (
+                    <RegText>
+                      {privacy
+                        ? `${contact.slice(0, 2)}.....`
+                        : numLinesContact > 1
+                          ? Utils.trimToSmall(contact, 7)
+                          : contact}
+                    </RegText>
                   )}
                   {expandContact &&
                     Utils.splitStringIntoChunks(
@@ -153,9 +157,22 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
               </TouchableOpacity>
             )}
             {!contact && !!znsAlias && (
-              <RegText style={{ color: colors.fgAccent, fontWeight: '600' }}>
-                {`ZNS: ${znsAlias}`}
-              </RegText>
+              <TouchableOpacity
+                onPress={() => {
+                  setExpandContact(true);
+                  if (privacy) {
+                    setTimeout(() => {
+                      setExpandContact(false);
+                    }, 5 * 1000);
+                  }
+                }}
+              >
+                <RegText style={{ color: colors.fgAccent, fontWeight: '600' }}>
+                  {privacy && !expandContact
+                    ? `ZNS: ${znsAlias.slice(0, 2)}.....`
+                    : `ZNS: ${znsAlias}`}
+                </RegText>
+              </TouchableOpacity>
             )}
             {(!oneLine || (oneLine && !contact)) && !onlyContact && (
               <TouchableOpacity
