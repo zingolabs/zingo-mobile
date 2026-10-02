@@ -22,6 +22,11 @@ on:
         required: false
         type: boolean
         default: false
+      # Runner label for the APK build job. PR CI passes CI_GRADLE_RUNNER.
+      runner:
+        required: false
+        type: string
+        default: zingo-android-gradle-16
 
 env:
   REPO-OWNER: ${{ github.repository_owner }}
@@ -30,7 +35,7 @@ env:
 jobs:
   android-apk-build:
     name: Andr APK build
-    runs-on: zingo-android-gradle-16
+    runs-on: ${{ inputs.runner }}
     env:
       RUSTFLAGS: -D warnings
       CACHE-KEY: ${{ inputs.cache-key }}
