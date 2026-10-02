@@ -180,11 +180,11 @@ export default class Utils {
       } else {
         return `https://mainnet.zcashexplorer.app/transactions/${txid}`;
       }
-    } else if (blockExplorer === BlockExplorerEnum.Cipherscan) {
+    } else if (blockExplorer === BlockExplorerEnum.ZecBlock) {
       if (chainName === ChainNameEnum.testChainName) {
-        return `https://testnet.cipherscan.app/tx/${txid}`;
+        return `https://testnet.zecblock.com/tx/${txid}`;
       } else {
-        return `https://cipherscan.app/tx/${txid}`;
+        return `https://zecblock.com/tx/${txid}`;
       }
     } else if (blockExplorer === BlockExplorerEnum.Zexplorer) {
       if (chainName === ChainNameEnum.testChainName) {
