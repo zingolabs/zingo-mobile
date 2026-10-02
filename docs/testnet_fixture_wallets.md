@@ -16,7 +16,7 @@ and iOS.
 
 | Test                                                 | What it reads                                                                                                                                                                                          |
 | ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Mixnet refusal test, `ConfirmRefusesWithoutMixnet`   | The published addresses, the consolidation txid, and a confirmed shielded balance above a minimum. The test proposes a send to the wallet's own transparent address and expects the confirm to refuse. |
+| Mixnet refusal test, `ConfirmRefusesWithoutMixnet`   | The published addresses, the consolidation txid, and a spendable shielded balance above a minimum. The test proposes a send to the wallet's own transparent address and expects the confirm to refuse. |
 | Value-transfer test, `RecoversConsolidationTransfer` | The consolidation entry, found by txid and kind, with its status, height, value, and fee.                                                                                                              |
 | Pool-balance test, `ExecuteSaplingBalanceFromSeed`   | The exact total and confirmed balances of the Ironwood, Orchard, and Sapling pools, and a confirmed transparent balance of zero. This test still runs on regtest.                                      |
 | Funded sync check                                    | A note the sync finds, and the pool balance after the sync. `ConfirmRefusesWithoutMixnet` carries it.                                                                                                  |
@@ -59,7 +59,9 @@ holds one entry for the consolidation, kind `memo-to-self`, value 3,995,811,890
 zatoshis, fee 285,000, and a confirmed Ironwood balance of 3,995,846,890
 zatoshis. `TestnetFixture` in `RustFFITest.kt` holds those values. A later
 spend from the seed by zingolib's tests adds entries after the consolidation
-and lowers the balance, and the fixture tests tolerate both.
+and lowers the balance, and the fixture tests tolerate both. While the change
+of such a spend waits for its confirmations, the refusal test syncs every 20
+seconds until the spendable shielded balance reaches its minimum.
 
 The birthday and the current history of this wallet come from one sync of the
 saved wallet. Read them from that sync.
@@ -264,7 +266,10 @@ birthday has finished.
 - The birthday. For a new seed, it is the height of the block that holds step
   1, the `blockheight` of the oldest entry of `value_transfers`. The `birthday`
   command of a new wallet prints its creation height, which is lower.
-- The testnet server, `https://testnet.zec.rocks:443`.
+- The testnet servers. The fixture tests read the first one that answers,
+  `https://testnet.zec.rocks:443` and then
+  `https://zaino.testnet.unsafe.zec.rocks:443`, which zingolib lists in
+  `zingolib/zingo-netutils/src/indexers.rs`.
 - The txid of each step.
 - The value transfers as the Binding Layer reports them.
 - The total and confirmed balances of the Ironwood, Orchard, Sapling, and
