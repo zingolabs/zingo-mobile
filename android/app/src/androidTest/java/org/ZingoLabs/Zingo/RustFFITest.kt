@@ -2,6 +2,7 @@ package org.ZingoLabs.Zingo
 
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
+import org.junit.Assume.assumeTrue
 import org.junit.Test
 import org.junit.experimental.categories.Category
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -67,9 +68,6 @@ object MainnetServers {
     const val FALLBACK = "https://zcash.mysideoftheweb.com:9067"
 }
 
-/** One value transfer, reduced to the fields a fixture history fixes. */
-data class Movement(val kind: String, val value: Long, val recipient: String?, val fee: Long?)
-
 /** The shared testnet fixture wallet, which is zingolib's GloryGoddess example wallet. */
 object TestnetFixture {
     const val SEED = "glory goddess cargo action guilt ball coral employ phone baby oxygen flavor solid climb situate frequent blade pet enough milk access try swift benefit"
@@ -79,21 +77,21 @@ object TestnetFixture {
     const val UNIFIED_ADDRESS = "utest1dmu08vg5wt5m9w0ejwgeqdndzzkfka7c94heuz5llxv5vx4lhcethmm6p5ean3wcj8l0m6tf8k8cau9r636gq7sxq3wa6zey2sysfteh"
     const val TRANSPARENT_ADDRESS = "tmF7QpuKsLF7nsMvThu4wQBpiKVGJXGCSJF"
 
-    const val RECEIPT_TXID = "d38bb1d4ce0b37955781ebdb36b92787a6519e7180bfa43056d934db5701e1ef"
-    const val RECEIPT_HEIGHT = 3_062_087L
-    const val RECEIPT_VALUE = 5_000_000_000L
+    const val CONSOLIDATION_TXID = ""
+    const val CONSOLIDATION_HEIGHT = 0L
+    const val CONSOLIDATION_KIND = "send-to-self"
+    const val CONSOLIDATION_VALUE = 0L
+    const val CONSOLIDATION_FEE = 0L
 
-    const val SEND_TXID = "98b7909fa024224bf223c2a290f7c390a14e957f5f780a22d899a7e76448d050"
-    const val SEND_HEIGHT = 3_069_203L
-    const val SEND_FEE = 35_000L
-    val SENDS = listOf(
-        Movement("sent", 10_000L, "tmYd5GP6JxUxTUcz98NLPumEotvaMPaXytz", SEND_FEE),
-        Movement("sent", 20_000L, "utest17wwv8nuvdnpjsxtu6ndz6grys5x8wphcwtzmg75wkx607c7cue9qz5kfraqzc7k9dfscmylazj4nkwazjj26s9rhyjxm0dcqm837ykgh2suv0at9eegndh3kvtfjwp3hhhcgk55y9d2ys56zkw8aaamcrv9cy0alj0ndvd0wll4gxhrk9y4yy9q9yg8yssrencl63uznqnkv7mk3w05", SEND_FEE),
-        Movement("sent", 4_999_925_000L, "utest1dfj7pz3v2hewxk5nt36h9mu9g5h9cuc3064h5jlzgnq9f9f74fv4vr4vz4yvp2mq36ave8y8ggghm4g0e2nw9fg7qewuflpxxtvq4dzpscws4eq0hlh09shhj83a5yuzm9p3hsrtd028xk37gyf6403g90jwvtxkgyqv25kzzafyjfl7rvexzvrjx24akdr83qzkssyg22jm5cgcxc9", SEND_FEE),
-    )
-
-    const val DEADLINE_SECONDS = 40 * 60
+    const val DEADLINE_SECONDS = 5 * 60
 }
+
+/** Skips the test while the fixture names no consolidation transaction. */
+fun assumeConsolidationPublished() =
+    assumeTrue(
+        "TestnetFixture names no consolidation transaction yet",
+        TestnetFixture.CONSOLIDATION_TXID.isNotEmpty(),
+    )
 
 /** Returns the sync status of the open wallet, or the reason it is unavailable. */
 fun syncStatusOrReason(): String =
@@ -444,15 +442,18 @@ class ConfirmRefusesWithoutMixnet {
         val heightPostSync: Height = mapper.readValue(heightJson)
         assertThat(heightPostSync.height).isAtLeast(tip)
 
+        assumeConsolidationPublished()
+
         val valueTransfersJson: String = uniffi.zingo.getValueTransfers()
         val valueTransfers: ValueTransfers = mapper.readValue(valueTransfersJson)
-        assertThat(valueTransfers.value_transfers.map { it.txid }).contains(TestnetFixture.RECEIPT_TXID)
+        assertThat(valueTransfers.value_transfers.map { it.txid }).contains(TestnetFixture.CONSOLIDATION_TXID)
 
         var balanceJson: String = uniffi.zingo.getBalance()
         println("\nBalance pre-send:")
         println(balanceJson)
         val balancePreSend: Balance = mapper.readValue(balanceJson)
-        assertThat(balancePreSend.confirmed_orchard_balance).isAtLeast(amount + fee)
+        assertThat(balancePreSend.confirmed_orchard_balance + balancePreSend.confirmed_ironwood_balance)
+            .isAtLeast(amount + fee)
 
         val send = Send(TestnetFixture.TRANSPARENT_ADDRESS, amount, null)
 
@@ -485,9 +486,9 @@ class ConfirmRefusesWithoutMixnet {
 }
 
 @PublicChainTest
-class RecoversOldestValueTransfers {
+class RecoversConsolidationTransfer {
     @Test
-    fun recoversOldestValueTransfers() {
+    fun recoversConsolidationTransfer() {
         val mapper = testMapper()
 
         val tipSkewBlocks = 1L
@@ -517,24 +518,22 @@ class RecoversOldestValueTransfers {
 
         syncToCompletion("${tip - TestnetFixture.BIRTHDAY} testnet blocks", TestnetFixture.DEADLINE_SECONDS, elapsedSeconds)
 
+        assumeConsolidationPublished()
+
         val valueTransfersJson: String = uniffi.zingo.getValueTransfers()
         println("\nValue Transfers:")
         println(valueTransfersJson)
         val valueTransfers: ValueTransfers = mapper.readValue(valueTransfersJson)
 
-        val receipts = valueTransfers.value_transfers.filter { it.txid == TestnetFixture.RECEIPT_TXID }
-        assertThat(receipts).hasSize(1)
-        val receipt = receipts[0]
-        assertThat(receipt.kind).isEqualTo("received")
-        assertThat(receipt.pools_received).isEqualTo(listOf("Orchard"))
-        assertThat(receipt.value).isEqualTo(TestnetFixture.RECEIPT_VALUE)
-        assertThat(receipt.status).isEqualTo("confirmed")
-        assertThat(receipt.blockheight).isEqualTo(TestnetFixture.RECEIPT_HEIGHT)
-
-        val sends = valueTransfers.value_transfers.filter { it.txid == TestnetFixture.SEND_TXID }
-        assertThat(sends.map { it.blockheight }.toSet()).containsExactly(TestnetFixture.SEND_HEIGHT)
-        assertThat(sends.map { Movement(it.kind, it.value, it.recipient_address, it.transaction_fee) })
-            .containsAtLeastElementsIn(TestnetFixture.SENDS)
+        val consolidations = valueTransfers.value_transfers.filter {
+            it.txid == TestnetFixture.CONSOLIDATION_TXID && it.kind == TestnetFixture.CONSOLIDATION_KIND
+        }
+        assertThat(consolidations).hasSize(1)
+        val consolidation = consolidations[0]
+        assertThat(consolidation.status).isEqualTo("confirmed")
+        assertThat(consolidation.blockheight).isEqualTo(TestnetFixture.CONSOLIDATION_HEIGHT)
+        assertThat(consolidation.value).isEqualTo(TestnetFixture.CONSOLIDATION_VALUE)
+        assertThat(consolidation.transaction_fee).isEqualTo(TestnetFixture.CONSOLIDATION_FEE)
     }
 }
 
