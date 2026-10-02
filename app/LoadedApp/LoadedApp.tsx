@@ -128,8 +128,10 @@ import {
   MixnetView,
 } from '@app/walletBackend/transforms/mixnetView';
 import {
+  SendOutcome,
   SendPermit,
   sendPermit,
+  sendWhenPermitted,
 } from '@app/walletBackend/transforms/sendPermit';
 import {
   startMixnetTransport,
@@ -1425,25 +1427,17 @@ export class LoadedAppClass extends Component<
     }
   };
 
-  sendTransaction = async (
+  sendTransaction = (
     sendPageState: SendPageStateClass,
     sendAll: boolean = false,
-  ): Promise<String> => {
-    try {
-      // Construct a sendJson from the sendPage state
-      const { defaultUnifiedAddress } = this.state;
+  ): Promise<SendOutcome<string>> =>
+    sendWhenPermitted(this.sendPermitNow, async () => {
       const sendJson = await Utils.getSendManyJSON(
         sendPageState,
-        defaultUnifiedAddress,
+        this.state.defaultUnifiedAddress,
       );
-      //const start = Date.now();
-      const txid = await this.rpc.sendTransaction(sendJson, sendAll);
-
-      return txid;
-    } catch (err) {
-      throw err;
-    }
-  };
+      return this.rpc.sendTransaction(sendJson, sendAll);
+    });
 
   doRefresh = (screen: ScreenEnum) => {
     if (screen === ScreenEnum.History) {

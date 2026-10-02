@@ -1,3 +1,21 @@
+// The shared mock of the bottom sheet drops the footer. The confirm button
+// is in the footer, and this mock renders it below the sheet's children.
+jest.mock('@gorhom/bottom-sheet', () => {
+  const actual = jest.requireActual('../__mocks__/@gorhom/bottom-sheet');
+  const { Fragment, createElement } = require('react');
+  return {
+    ...actual,
+    __esModule: true,
+    default: ({
+      children,
+      footerComponent,
+    }: {
+      children: unknown;
+      footerComponent: (props: object) => unknown;
+    }) => createElement(Fragment, {}, children, footerComponent({})),
+  };
+});
+
 import 'react-native';
 import React from 'react';
 

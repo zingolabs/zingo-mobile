@@ -48,7 +48,7 @@ import {
   sendGateOpen,
   shownStatusKey,
 } from '@app/walletBackend/transforms/mixnetView';
-import { useSendGate } from '@app/hooks/useSendGate';
+import { SendOutcome } from '@app/walletBackend/transforms/sendPermit';
 import ErrorText from '@ui/primitives/ErrorText';
 import RegText from '@ui/primitives/RegText';
 import ZecAmount from '@ui/widgets/ZecAmount';
@@ -83,6 +83,7 @@ import {
   sendPropose,
 } from '@app/walletBackend';
 import {
+  SendFailureClass,
   classifySendFailure,
   retryOnAnotherServer,
   sendFailureText,
@@ -125,7 +126,7 @@ type SendProps = NativeStackScreenProps<AppDrawerParamList, RouteEnum.Send> & {
   sendTransaction: (
     s: SendPageStateClass,
     sendAll?: boolean,
-  ) => Promise<String>;
+  ) => Promise<SendOutcome<string>>;
   setServerOption: (
     value: ServerType,
     selectServer: SelectServerEnum,
@@ -167,6 +168,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     zingolibVersion,
     setPrivacyOption,
     mixnetView,
+    sendPermitNow,
   } = context;
   const { colors } = useTheme();
   // USD entry derives the ZEC actually sent from the price, so that
@@ -197,7 +199,6 @@ const Send: React.FunctionComponent<SendProps> = ({
   const [validAmount, setValidAmount] = useState<number>(0); // 1 - OK, 0 - Empty, -1 - Invalid number, -2 - Invalid Amount
   const [validMemo, setValidMemo] = useState<number>(0); // 1 - OK, 0 - Empty, -1 - KO
   const [sendButtonEnabled, setSendButtonEnabled] = useState<boolean>(false);
-  const sendGateOpenNow = useSendGate(mixnetView);
   const [itemsPicker, setItemsPicker] = useState<
     { label: string; value: string }[]
   >([]);
@@ -951,102 +952,101 @@ const Send: React.FunctionComponent<SendProps> = ({
     // The MAX send travels the send-all path all the way: quoted and sent by
     // the same proposal, so the amount confirmed is the amount broadcast.
     const sendAllSend = isSendAllAmount(sendPageStatePar.toaddr.amount);
-    if (!netInfo.isConnected || server.kind === 'offline') {
-      addLastSnackbar(translate('loadedapp.connection-error') as string);
-      return;
-    }
-    if (!sendGateOpenNow()) {
-      addLastSnackbar(translate('send.nym-blocked') as string);
+    const permit = sendPermitNow();
+    if (permit.kind === 'error') {
+      addLastSnackbar(translate(permit.errorKey) as string);
       return;
     }
 
     navigation.navigate(RouteEnum.Computing);
 
-    try {
-      await sendTransaction(sendPageStatePar, sendAllSend);
-
-      // Clear the fields
-      clearState();
-
-      // scroll to top in history, just in case.
-      setScrollToTop(true);
-      setScrollToBottom(true);
-
-      // the app send successfully on the first attemp.
-      navigation.navigate(RouteEnum.Computing, { phase: 'created' });
-      return;
-    } catch (err1) {
-      let failure = classifySendFailure(err1 as string);
-
-      // The transform decides which families a server switch can plausibly
-      // help; the wallet's own verdicts (dust, duplicate nullifier, a
-      // fail-closed mixnet refusal) are excluded there. If the user selected
-      // a `custom` server, we cannot change it regardless.
-      if (
-        retryOnAnotherServer(failure) &&
-        selectServer !== SelectServerEnum.custom
-      ) {
-        // Pick a working server, same pattern as boot/recovery: the live
-        // registry first (best, excluding the failed server, no probe), then
-        // the static list ranked by latency (also excluding the failed one).
-        let fasterServer: ServerType = server;
-        const live = await fetchServerList(server.chainName);
-        const liveCandidates = live.filter(
-          (s: ServerUrisType) => s.uri !== server.uri,
-        );
-        if (liveCandidates.length > 0) {
-          fasterServer = remoteServer(
-            liveCandidates[0].uri,
-            liveCandidates[0].chainName,
-          );
-        } else {
-          const serverChecked = await selectingServer(
-            serverUris(translate).filter(
-              (s: ServerUrisType) =>
-                !s.obsolete &&
-                s.chainName === server.chainName &&
-                s.uri !== server.uri,
-            ),
-          );
-          // no latency: likely a connection problem, all servers unreachable.
-          if (serverChecked && serverChecked.latency) {
-            fasterServer = remoteServer(
-              serverChecked.uri,
-              serverChecked.chainName,
-            );
-          }
-        }
-        if (fasterServer !== server) {
-          await setServerOption(fasterServer, selectServer, false, true);
-        }
-
-        try {
-          await sendTransaction(sendPageStatePar, sendAllSend);
-
-          // Clear the fields
-          clearState();
-
-          // scroll to top in history, just in case.
-          setScrollToTop(true);
-          setScrollToBottom(true);
-
-          // the app send successfully on the second attemp.
-          navigation.navigate(RouteEnum.Computing, { phase: 'created' });
-          return;
-        } catch (err2) {
-          failure = classifySendFailure(err2 as string);
-        }
-      }
-
-      const failureText = sendFailureText(failure);
+    const fail = (errorMessage: string) =>
       navigation.navigate(RouteEnum.Computing, {
         phase: 'failed',
-        errorMessage:
-          failureText.kind === 'key'
-            ? (translate(failureText.errorKey) as string)
-            : failureText.text,
+        errorMessage,
       });
+
+    // Sends once. A send or a refusal settles the Computing screen, and a
+    // failure of the backend is returned.
+    const attempt = async (): Promise<
+      SendFailureClass | { kind: 'settled' }
+    > => {
+      try {
+        const outcome = await sendTransaction(sendPageStatePar, sendAllSend);
+        if (outcome.kind === 'error') {
+          fail(translate(outcome.errorKey) as string);
+        } else {
+          clearState();
+          setScrollToTop(true);
+          setScrollToBottom(true);
+          navigation.navigate(RouteEnum.Computing, { phase: 'created' });
+        }
+        return { kind: 'settled' };
+      } catch (err) {
+        return classifySendFailure(err as string);
+      }
+    };
+
+    let failure = await attempt();
+    if (failure.kind === 'settled') {
+      return;
     }
+
+    // The transform decides which families a server switch can plausibly
+    // help; the wallet's own verdicts (dust, duplicate nullifier, a
+    // fail-closed mixnet refusal) are excluded there. If the user selected
+    // a `custom` server, we cannot change it regardless.
+    if (
+      retryOnAnotherServer(failure) &&
+      selectServer !== SelectServerEnum.custom &&
+      server.kind !== 'offline'
+    ) {
+      // Pick a working server, same pattern as boot/recovery: the live
+      // registry first (best, excluding the failed server, no probe), then
+      // the static list ranked by latency (also excluding the failed one).
+      let fasterServer: ServerType = server;
+      const live = await fetchServerList(server.chainName);
+      const liveCandidates = live.filter(
+        (s: ServerUrisType) => s.uri !== server.uri,
+      );
+      if (liveCandidates.length > 0) {
+        fasterServer = remoteServer(
+          liveCandidates[0].uri,
+          liveCandidates[0].chainName,
+        );
+      } else {
+        const serverChecked = await selectingServer(
+          serverUris(translate).filter(
+            (s: ServerUrisType) =>
+              !s.obsolete &&
+              s.chainName === server.chainName &&
+              s.uri !== server.uri,
+          ),
+        );
+        // no latency: likely a connection problem, all servers unreachable.
+        if (serverChecked && serverChecked.latency) {
+          fasterServer = remoteServer(
+            serverChecked.uri,
+            serverChecked.chainName,
+          );
+        }
+      }
+      if (fasterServer !== server) {
+        await setServerOption(fasterServer, selectServer, false, true);
+      }
+
+      failure = await attempt();
+      if (failure.kind === 'settled') {
+        return;
+      }
+    }
+
+    const failureText = sendFailureText(failure);
+    fail(
+      failureText.kind === 'key'
+        ? (translate(failureText.errorKey) as string)
+        : failureText.text,
+    );
   };
 
   const scrollToEnd = () => {

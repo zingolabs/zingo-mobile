@@ -1,7 +1,6 @@
 /**
- * The shield flow's own mixnet send gate. The button's disabled state is one
- * guard; the confirm dialog outlives the render that opened it, so the hook
- * checks the gate again when the user confirms.
+ * The confirm dialog holds the confirm handler of the render that opened it.
+ * These tests change the app state after that render and then confirm.
  */
 jest.mock('@app/walletBackend', () => ({
   shieldPropose: jest.fn(),
@@ -21,7 +20,10 @@ import type { TranslateType } from '@app/AppState';
 import { useShieldFunds } from '@app/hooks/useShieldFunds';
 import { showConfirm } from '@app/services/showConfirm';
 import { shieldConfirm, shieldPropose } from '@app/walletBackend';
-import { MixnetView } from '@app/walletBackend/transforms/mixnetView';
+import {
+  SendPermitInputs,
+  sendPermit,
+} from '@app/walletBackend/transforms/sendPermit';
 import {
   mixnetLost,
   mixnetOff,
@@ -36,29 +38,39 @@ const translate = (key: string): TranslateType => key;
 
 type HookInput = Parameters<typeof useShieldFunds>[0];
 
-const hookInput = (
-  mixnetView: MixnetView | null,
-  addLastSnackbar: jest.Mock,
-  isConnected: boolean = true,
-): HookInput => ({
-  readOnly: false,
-  setShieldingAmount: jest.fn(),
-  server: remoteServer(mockInfo.serverUri, ChainNameEnum.mainChainName),
-  somePending: false,
-  totalBalance: null,
-  shieldingAmount: 0.5,
-  translate,
+const online: SendPermitInputs = {
   netInfo: {
-    isConnected,
+    isConnected: true,
     type: NetInfoStateType.wifi,
     isConnectionExpensive: false,
   },
-  addLastSnackbar,
-  setBackgroundError: jest.fn(),
-  setScrollToTop: jest.fn(),
-  setScrollToBottom: jest.fn(),
-  mixnetView,
-});
+  server: remoteServer(mockInfo.serverUri, ChainNameEnum.mainChainName),
+  mixnetView: mixnetReady,
+};
+
+// The state that LoadedApp holds. `sendPermitNow` reads it at call time.
+let appState = online;
+
+const hookInput = (
+  inputs: SendPermitInputs,
+  addLastSnackbar: jest.Mock,
+): HookInput => {
+  appState = inputs;
+  return {
+    readOnly: false,
+    setShieldingAmount: jest.fn(),
+    server: inputs.server,
+    somePending: false,
+    totalBalance: null,
+    shieldingAmount: 0.5,
+    translate,
+    addLastSnackbar,
+    setBackgroundError: jest.fn(),
+    setScrollToTop: jest.fn(),
+    setScrollToBottom: jest.fn(),
+    sendPermitNow: () => sendPermit(appState),
+  };
+};
 
 // Presses the shield button and returns the confirm dialog's Confirm handler.
 const openConfirmDialog = (onPressShieldFunds: () => void) => {
@@ -69,6 +81,24 @@ const openConfirmDialog = (onPressShieldFunds: () => void) => {
   return buttons[0].onPress as () => Promise<void>;
 };
 
+// Opens the dialog on `opened`, moves the app state to `confirmed`, and confirms.
+const confirmAfter = async (
+  opened: SendPermitInputs,
+  confirmed: SendPermitInputs,
+  addLastSnackbar: jest.Mock,
+) => {
+  const { result, rerender } = renderHook(
+    ({ inputs }: { inputs: SendPermitInputs }) =>
+      useShieldFunds(hookInput(inputs, addLastSnackbar)),
+    { initialProps: { inputs: opened } },
+  );
+  const confirm = openConfirmDialog(result.current.onPressShieldFunds);
+  rerender({ inputs: confirmed });
+  await act(async () => {
+    await confirm();
+  });
+};
+
 beforeEach(() => {
   jest.clearAllMocks();
   (useNavigation as jest.Mock).mockReturnValue({ navigate: jest.fn() });
@@ -76,20 +106,15 @@ beforeEach(() => {
   confirmMock.mockResolvedValue({ ok: true, value: '{"txids":["txid"]}' });
 });
 
-describe('useShieldFunds mixnet send gate', () => {
+describe('useShieldFunds send permit', () => {
   test('Tests that confirming does not shield when the transport dies while the confirm dialog is open. The dialog opened on a ready view.', async () => {
     const addLastSnackbar = jest.fn();
-    const { result, rerender } = renderHook(
-      ({ view }: { view: MixnetView | null }) =>
-        useShieldFunds(hookInput(view, addLastSnackbar)),
-      { initialProps: { view: mixnetReady } },
-    );
-    const confirm = openConfirmDialog(result.current.onPressShieldFunds);
 
-    rerender({ view: mixnetLost });
-    await act(async () => {
-      await confirm();
-    });
+    await confirmAfter(
+      online,
+      { ...online, mixnetView: mixnetLost },
+      addLastSnackbar,
+    );
 
     expect(confirmMock).not.toHaveBeenCalled();
     expect(addLastSnackbar).toHaveBeenCalledWith('send.nym-blocked');
@@ -97,17 +122,12 @@ describe('useShieldFunds mixnet send gate', () => {
 
   test('Tests that confirming does not shield when the device disconnects while the confirm dialog is open. The dialog opened on a connected device.', async () => {
     const addLastSnackbar = jest.fn();
-    const { result, rerender } = renderHook(
-      ({ isConnected }: { isConnected: boolean }) =>
-        useShieldFunds(hookInput(mixnetReady, addLastSnackbar, isConnected)),
-      { initialProps: { isConnected: true } },
-    );
-    const confirm = openConfirmDialog(result.current.onPressShieldFunds);
 
-    rerender({ isConnected: false });
-    await act(async () => {
-      await confirm();
-    });
+    await confirmAfter(
+      online,
+      { ...online, netInfo: { ...online.netInfo, isConnected: false } },
+      addLastSnackbar,
+    );
 
     expect(confirmMock).not.toHaveBeenCalled();
     expect(addLastSnackbar).toHaveBeenCalledWith('loadedapp.connection-error');
@@ -115,29 +135,18 @@ describe('useShieldFunds mixnet send gate', () => {
 
   test('Tests that confirming does not shield when the mixnet view blocks sends from the start.', async () => {
     const addLastSnackbar = jest.fn();
-    const { result } = renderHook(() =>
-      useShieldFunds(hookInput(mixnetOff, addLastSnackbar)),
-    );
-    const confirm = openConfirmDialog(result.current.onPressShieldFunds);
+    const blocked = { ...online, mixnetView: mixnetOff };
 
-    await act(async () => {
-      await confirm();
-    });
+    await confirmAfter(blocked, blocked, addLastSnackbar);
 
     expect(confirmMock).not.toHaveBeenCalled();
     expect(addLastSnackbar).toHaveBeenCalledWith('send.nym-blocked');
   });
 
-  test('Tests that confirming shields when the mixnet view is ready.', async () => {
+  test('Tests that confirming shields when the permit is granted.', async () => {
     const addLastSnackbar = jest.fn();
-    const { result } = renderHook(() =>
-      useShieldFunds(hookInput(mixnetReady, addLastSnackbar)),
-    );
-    const confirm = openConfirmDialog(result.current.onPressShieldFunds);
 
-    await act(async () => {
-      await confirm();
-    });
+    await confirmAfter(online, online, addLastSnackbar);
 
     expect(confirmMock).toHaveBeenCalledTimes(1);
     expect(addLastSnackbar).not.toHaveBeenCalled();
