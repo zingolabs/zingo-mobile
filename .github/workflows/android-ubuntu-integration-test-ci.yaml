@@ -437,10 +437,9 @@ jobs:
     needs:
       - android-ubuntu-integration-test-ci-avd-cache
     runs-on: ${{ startsWith(inputs.runner, '[') && fromJSON(inputs.runner) || inputs.runner }}
-    # Bounds the debug build, the emulator boot, and both test runs. The
-    # job took 14 minutes before the testnet fixture tests. Each of the two
-    # fixture tests may take 45 minutes.
-    timeout-minutes: 120
+    # Bounds the debug build, the emulator boot, and both test runs. Each
+    # test has its own limit in android/app/build.gradle.kts.
+    timeout-minutes: 40
     env:
       CACHE-KEY: ${{ inputs.cache-key }}
     steps:
@@ -527,13 +526,13 @@ jobs:
           # The emulator runs one ABI, and the build compiles native code
           # for that ABI alone. The offline run's reports move aside before
           # the public-chain run writes its own. The public-chain run gives
-          # each test 45 minutes. ExecuteSyncFromSeed holds itself to 5, and
-          # each testnet fixture test holds itself to 40.
+          # each test 7 minutes. ExecuteSyncFromSeed and the testnet fixture
+          # tests hold themselves to 5.
           script: |
             ./gradlew :app:connectedProdDebugAndroidTest -PreactNativeArchitectures=${{ env.ABI }} -Pandroid.testInstrumentationRunnerArguments.annotation=org.ZingoLabs.Zingo.OfflineDeviceTest
             mv app/build/reports/androidTests app/build/reports/androidTests-offline
             mv app/build/outputs/androidTest-results app/build/outputs/androidTest-results-offline
-            ./gradlew :app:connectedProdDebugAndroidTest -PreactNativeArchitectures=${{ env.ABI }} -Pandroid.testInstrumentationRunnerArguments.annotation=org.ZingoLabs.Zingo.PublicChainTest -Pandroid.testInstrumentationRunnerArguments.timeout_msec=2700000
+            ./gradlew :app:connectedProdDebugAndroidTest -PreactNativeArchitectures=${{ env.ABI }} -Pandroid.testInstrumentationRunnerArguments.annotation=org.ZingoLabs.Zingo.PublicChainTest -Pandroid.testInstrumentationRunnerArguments.timeout_msec=420000
 
       - name: Upload device test reports
         if: ${{ always() && !cancelled() }}
