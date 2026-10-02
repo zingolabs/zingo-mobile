@@ -145,6 +145,7 @@ jobs:
       abi: x86_64
       runner: ${{ vars.CI_GRADLE_RUNNER || 'zingo-android-gradle-16' }}
       fail-all: true
+      gradle-cache-writer: ${{ github.event_name == 'push' && github.ref_name == github.event.repository.default_branch }}
 
   # The device tests need the Binding Layer and build their own debug
   # app, and they start beside andr-apk-build.
