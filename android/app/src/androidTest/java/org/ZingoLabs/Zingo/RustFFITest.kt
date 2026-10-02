@@ -65,7 +65,7 @@ object Seeds {
 
 object MainnetServers {
     const val PRIMARY = "https://zec.rocks:443"
-    const val FALLBACK = "https://zcash.mysideoftheweb.com:9067"
+    const val FALLBACK = "https://na.zec.rocks:443"
 }
 
 /** The shared testnet fixture wallet, which is zingolib's GloryGoddess example wallet. */

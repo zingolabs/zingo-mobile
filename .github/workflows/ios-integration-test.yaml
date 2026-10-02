@@ -23,6 +23,11 @@ on:
 env:
   CACHE-KEY: ${{ inputs.cache-key }}
   REPO-OWNER: ${{ github.repository_owner }}
+  # The destination pins no arch: it resolves arm64 on Apple-silicon
+  # runners and x86_64 on the Intel larger-runner pool; the
+  # XCFrameworks' simulator slices are fat arm64+x86_64 binaries
+  # either way.
+  SIMULATOR_DESTINATION: platform=iOS Simulator,name=iPhone 16,OS=18.5
 
 jobs:
   build-for-testing:
@@ -134,25 +139,23 @@ jobs:
         run: |
           set -euxo pipefail
           mkdir -p build/reports build/DerivedData
-          # The destination pins no arch: it resolves arm64 on Apple-silicon
-          # runners and x86_64 on the Intel larger-runner pool; the
-          # XCFrameworks' simulator slices are fat arm64+x86_64 binaries
-          # either way.
           xcodebuild build-for-testing \
             -workspace Zingo.xcworkspace \
             -scheme Zingo \
             -sdk iphonesimulator \
             -configuration Debug \
-            -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.5' \
+            -destination "$SIMULATOR_DESTINATION" \
             -derivedDataPath "build/DerivedData" \
             -resultBundlePath "build/reports/Zingo-BuildForTesting.xcresult" \
             -quiet
+          # The two test steps below run the one xctestrun this build wrote.
+          xctestrun="$(find build/DerivedData/Build/Products -name '*.xctestrun' | head -n 1)"
+          echo "XCTESTRUN=$xctestrun" >> "$GITHUB_ENV"
 
       - name: Run offline XCTest classes
         working-directory: ios
         run: |
           set -euxo pipefail
-          xctestrun="$(find build/DerivedData/Build/Products -name '*.xctestrun' | head -n 1)"
           only=()
           for class in \
             ExecuteVersionFromSeed \
@@ -170,8 +173,8 @@ jobs:
             only+=("-only-testing:ZingoTests/$class")
           done
           xcodebuild test-without-building \
-            -xctestrun "$xctestrun" \
-            -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.5' \
+            -xctestrun "$XCTESTRUN" \
+            -destination "$SIMULATOR_DESTINATION" \
             -resultBundlePath "build/reports/Zingo-Test.xcresult" \
             "${only[@]}"
 
@@ -179,7 +182,6 @@ jobs:
         working-directory: ios
         run: |
           set -euxo pipefail
-          xctestrun="$(find build/DerivedData/Build/Products -name '*.xctestrun' | head -n 1)"
           only=()
           for class in \
             ExecuteSyncFromSeed \
@@ -189,8 +191,8 @@ jobs:
             only+=("-only-testing:ZingoTests/$class")
           done
           xcodebuild test-without-building \
-            -xctestrun "$xctestrun" \
-            -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.5' \
+            -xctestrun "$XCTESTRUN" \
+            -destination "$SIMULATOR_DESTINATION" \
             -resultBundlePath "build/reports/Zingo-PublicChainTest.xcresult" \
             -test-timeouts-enabled YES \
             -default-test-execution-time-allowance 420 \

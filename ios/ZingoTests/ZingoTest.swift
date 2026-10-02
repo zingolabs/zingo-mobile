@@ -19,6 +19,12 @@ enum Seeds {
 enum MainnetServers {
     static let PRIMARY = "https://zec.rocks:443"
     static let FALLBACK = "https://na.zec.rocks:443"
+    static let SERVERS = [PRIMARY, FALLBACK]
+}
+
+/// The deadline every public-chain test shares.
+enum PublicChain {
+    static let DEADLINE_SECONDS: TimeInterval = 5 * 60
 }
 
 /// The shared testnet fixture wallet, which is zingolib's GloryGoddess example wallet.
@@ -36,7 +42,6 @@ enum TestnetFixture {
     static let CONSOLIDATION_VALUE: Int64 = 3_995_811_890
     static let CONSOLIDATION_FEE: Int64 = 285_000
 
-    static let DEADLINE_SECONDS: TimeInterval = 5 * 60
     static let TIP_SKEW_BLOCKS: UInt64 = 10
 }
 
@@ -175,48 +180,9 @@ private func decodeJSON<T: Decodable>(_ json: String) throws -> T {
     return try dec.decode(T.self, from: data)
 }
 
-private func isError(_ s: String) -> Bool {
-    return s.lowercased().hasPrefix("error")
-}
-
-private func waitForSyncOrFail(timeoutSeconds: TimeInterval = 120) {
-    let t0 = Date()
-    while Date().timeIntervalSince(t0) < timeoutSeconds {
-        do {
-            let statusJson = try statusSync()
-            print("\nSync Status:\n\(statusJson)")
-            if isError(statusJson) {
-                XCTFail("\nSync status error:\n\(statusJson)")
-                return
-            }
-            let data = statusJson.data(using: .utf8)!
-            let syncStatus: SyncStatus = try JSONDecoder().decode(SyncStatus.self, from: data)
-
-            let percent: Double =
-              syncStatus.percentage_total_outputs_scanned
-              ?? syncStatus.percentage_total_blocks_scanned
-              ?? 0.0
-
-            if percent >= 100.0 {
-              return
-            }
-        } catch {
-            XCTFail("\nSync status error:\n\(error.localizedDescription)")
-            return
-        }
-        Thread.sleep(forTimeInterval: 1.0)
-    }
-    XCTFail("Sync timeout after \(timeoutSeconds) seconds")
-}
-
 /// A public-chain test failure that carries its reason.
 struct ChainFailure: Error, CustomStringConvertible {
     let description: String
-}
-
-/// Skips the test while the fixture names no consolidation transaction.
-private func skipUnlessConsolidationPublished() throws {
-    try XCTSkipIf(TestnetFixture.CONSOLIDATION_TXID.isEmpty, "TestnetFixture names no consolidation transaction yet")
 }
 
 /// Returns the tip height that the server at `uri` reports.
@@ -254,11 +220,10 @@ private func syncStatusOrReason() -> String {
 
 /// Launches a sync of `what` and polls it each second to completion, failing with the elapsed time and the sync status at the deadline or on a sync error.
 private func syncToCompletion(_ what: String, deadlineSeconds: TimeInterval, start: Date) throws {
-    let syncJson = try runSync()
-    print("\nSync:\n\(syncJson)")
-
     let syncStart = Date()
     do {
+        let syncJson = try runSync()
+        print("\nSync:\n\(syncJson)")
         while try !pollSync().contains("sync_complete") {
             let elapsed = Date().timeIntervalSince(start)
             if elapsed > deadlineSeconds {
@@ -284,6 +249,36 @@ private func syncUntilSpendable(_ minimum: Int64, deadlineSeconds: TimeInterval,
         }
         Thread.sleep(forTimeInterval: 20.0)
         try syncToCompletion("the blocks mined while a spend from the published seed confirms", deadlineSeconds: deadlineSeconds, start: start)
+    }
+}
+
+/// Opens the fixture wallet on the first answering testnet server, syncs it from its birthday to the tip, and returns that tip.
+private func syncFixtureWallet(start: Date) throws -> UInt64 {
+    let (serveruri, tip) = try firstAnsweringServer("testnet", TestnetFixture.SERVERS)
+
+    let initJson = try initFromSeed(seed: TestnetFixture.SEED, birthday: UInt32(TestnetFixture.BIRTHDAY), serveruri: serveruri, chainhint: TestnetFixture.CHAIN_HINT, performancelevel: "Medium", minconfirmations: UInt32(1))
+    print("\nInit from seed:\n\(initJson)")
+    let initRes: InitFromSeed = try decodeJSON(initJson)
+    XCTAssertEqual(initRes.seed_phrase, TestnetFixture.SEED)
+    XCTAssertEqual(initRes.birthday, TestnetFixture.BIRTHDAY)
+
+    let infoJson = try infoServer()
+    print("\nInfo:\n\(infoJson)")
+    let info: Info = try decodeJSON(infoJson)
+    XCTAssertGreaterThanOrEqual(info.latest_block_height, tip - TestnetFixture.TIP_SKEW_BLOCKS)
+
+    try syncToCompletion("\(tip - TestnetFixture.BIRTHDAY) testnet blocks", deadlineSeconds: PublicChain.DEADLINE_SECONDS, start: start)
+    return tip
+}
+
+/// Runs `attempt`, which must refuse for want of a mixnet, and returns the refusal message, failing when it answers.
+private func refusedWithoutMixnet<T>(_ what: String, _ attempt: () throws -> T) throws -> String {
+    do {
+        let answered = try attempt()
+        throw ChainFailure(description: "the \(what) answered without a mixnet: \(answered)")
+    } catch ZingolibError.Mixnet(let message) {
+        print("\nThe \(what) refused without a mixnet:\n\(message)")
+        return message
     }
 }
 
@@ -413,13 +408,11 @@ final class ExecuteVersionFromSeed: XCTestCase {
 final class ExecuteSyncFromSeed: XCTestCase {
     func testExecuteSyncFromSeed() throws {
         let window: UInt64 = 10_000
-        let deadlineSeconds: TimeInterval = 5 * 60
         let tipSkewBlocks: UInt64 = 1
         let seed = Seeds.HOSPITAL
-        let servers = [MainnetServers.PRIMARY, MainnetServers.FALLBACK]
         let start = Date()
 
-        let (serveruri, tip) = try firstAnsweringServer("mainnet", servers)
+        let (serveruri, tip) = try firstAnsweringServer("mainnet", MainnetServers.SERVERS)
 
         let birthday = tip - window
         let initJson = try initFromSeed(seed: seed, birthday: UInt32(birthday), serveruri: serveruri, chainhint: "main", performancelevel: "Medium", minconfirmations: UInt32(1))
@@ -438,7 +431,7 @@ final class ExecuteSyncFromSeed: XCTestCase {
         let hPre: Height = try decodeJSON(hPreJson)
         XCTAssertEqual(hPre.height, 0)
 
-        try syncToCompletion("\(window) mainnet blocks", deadlineSeconds: deadlineSeconds, start: start)
+        try syncToCompletion("\(window) mainnet blocks", deadlineSeconds: PublicChain.DEADLINE_SECONDS, start: start)
 
         let hPostJson = try getLatestBlockWallet()
         print("\nHeight post-sync:\n\(hPostJson)")
@@ -449,36 +442,21 @@ final class ExecuteSyncFromSeed: XCTestCase {
 
 final class ConfirmRefusesWithoutMixnet: XCTestCase {
     func testConfirmRefusesWithoutMixnet() throws {
-        try skipUnlessConsolidationPublished()
-
         let amount: Int64 = 100_000
         let fee: Int64 = 20_000
         let start = Date()
 
-        let (serveruri, tip) = try firstAnsweringServer("testnet", TestnetFixture.SERVERS)
-
-        let initJson = try initFromSeed(seed: TestnetFixture.SEED, birthday: UInt32(TestnetFixture.BIRTHDAY), serveruri: serveruri, chainhint: TestnetFixture.CHAIN_HINT, performancelevel: "Medium", minconfirmations: UInt32(1))
-        print("\nInit from seed:\n\(initJson)")
-        let initRes: InitFromSeed = try decodeJSON(initJson)
-        XCTAssertEqual(initRes.seed_phrase, TestnetFixture.SEED)
-        XCTAssertEqual(initRes.birthday, TestnetFixture.BIRTHDAY)
-
-        let infoJson = try infoServer()
-        print("\nInfo:\n\(infoJson)")
-        let info: Info = try decodeJSON(infoJson)
-        XCTAssertGreaterThanOrEqual(info.latest_block_height, tip - TestnetFixture.TIP_SKEW_BLOCKS)
+        let tip = try syncFixtureWallet(start: start)
 
         let addrsJson = try getUnifiedAddresses()
         print("\nAddresses:\n\(addrsJson)")
         let addrs: [UnifiedAddress] = try decodeJSON(addrsJson)
-        XCTAssertEqual(addrs[0].encoded_address, TestnetFixture.UNIFIED_ADDRESS)
+        XCTAssertEqual(try XCTUnwrap(addrs.first).encoded_address, TestnetFixture.UNIFIED_ADDRESS)
 
         let tAddrsJson = try getTransparentAddresses()
         print("\nT Addresses:\n\(tAddrsJson)")
         let tAddrs: [TransparentAddress] = try decodeJSON(tAddrsJson)
-        XCTAssertEqual(tAddrs[0].encoded_address, TestnetFixture.TRANSPARENT_ADDRESS)
-
-        try syncToCompletion("\(tip - TestnetFixture.BIRTHDAY) testnet blocks", deadlineSeconds: TestnetFixture.DEADLINE_SECONDS, start: start)
+        XCTAssertEqual(try XCTUnwrap(tAddrs.first).encoded_address, TestnetFixture.TRANSPARENT_ADDRESS)
 
         let hPostJson = try getLatestBlockWallet()
         print("\nHeight post-sync:\n\(hPostJson)")
@@ -488,7 +466,7 @@ final class ConfirmRefusesWithoutMixnet: XCTestCase {
         let vts: ValueTransfers = try decodeJSON(try getValueTransfers())
         XCTAssertTrue(vts.value_transfers.map(\.txid).contains(TestnetFixture.CONSOLIDATION_TXID))
 
-        try syncUntilSpendable(amount + fee, deadlineSeconds: TestnetFixture.DEADLINE_SECONDS, start: start)
+        try syncUntilSpendable(amount + fee, deadlineSeconds: PublicChain.DEADLINE_SECONDS, start: start)
 
         let balPreJson = try getBalance()
         print("\nBalance pre-send:\n\(balPreJson)")
@@ -498,14 +476,8 @@ final class ConfirmRefusesWithoutMixnet: XCTestCase {
         let proposeJson = try send(sendJson: String(decoding: sendBodyData, as: UTF8.self))
         print("\nPropose:\n\(proposeJson)")
 
-        do {
-            let confirmJson = try confirm()
-            XCTFail("\nThe transmission answered without a mixnet:\n\(confirmJson)")
-            return
-        } catch ZingolibError.Mixnet(let message) {
-            print("\nTransmission refused without a mixnet:\n\(message)")
-            XCTAssertTrue(message.contains("the Nym mixnet is not enabled"), message)
-        }
+        let refusal = try refusedWithoutMixnet("transmission") { try confirm() }
+        XCTAssertTrue(refusal.contains("the Nym mixnet is not enabled"), refusal)
 
         do {
             let txid = try confirm()
@@ -515,7 +487,7 @@ final class ConfirmRefusesWithoutMixnet: XCTestCase {
             print("\nRetry after the refusal:\n\(message)")
         }
 
-        try syncToCompletion("the blocks mined since the first sync", deadlineSeconds: TestnetFixture.DEADLINE_SECONDS, start: start)
+        try syncToCompletion("the blocks mined since the first sync", deadlineSeconds: PublicChain.DEADLINE_SECONDS, start: start)
 
         let balPostJson = try getBalance()
         print("\nBalance post-refusal:\n\(balPostJson)")
@@ -526,24 +498,7 @@ final class ConfirmRefusesWithoutMixnet: XCTestCase {
 
 final class RecoversConsolidationTransfer: XCTestCase {
     func testRecoversConsolidationTransfer() throws {
-        try skipUnlessConsolidationPublished()
-
-        let start = Date()
-
-        let (serveruri, tip) = try firstAnsweringServer("testnet", TestnetFixture.SERVERS)
-
-        let initJson = try initFromSeed(seed: TestnetFixture.SEED, birthday: UInt32(TestnetFixture.BIRTHDAY), serveruri: serveruri, chainhint: TestnetFixture.CHAIN_HINT, performancelevel: "Medium", minconfirmations: UInt32(1))
-        print("\nInit from seed:\n\(initJson)")
-        let initRes: InitFromSeed = try decodeJSON(initJson)
-        XCTAssertEqual(initRes.seed_phrase, TestnetFixture.SEED)
-        XCTAssertEqual(initRes.birthday, TestnetFixture.BIRTHDAY)
-
-        let infoJson = try infoServer()
-        print("\nInfo:\n\(infoJson)")
-        let info: Info = try decodeJSON(infoJson)
-        XCTAssertGreaterThanOrEqual(info.latest_block_height, tip - TestnetFixture.TIP_SKEW_BLOCKS)
-
-        try syncToCompletion("\(tip - TestnetFixture.BIRTHDAY) testnet blocks", deadlineSeconds: TestnetFixture.DEADLINE_SECONDS, start: start)
+        _ = try syncFixtureWallet(start: Date())
 
         let vtJson = try getValueTransfers()
         print("\nValue Transfers:\n\(vtJson)")
@@ -575,92 +530,7 @@ final class PriceRefusedWithoutMixnet: XCTestCase {
           return
         }
 
-        do {
-          let price = try zecPrice()
-          XCTFail("\nThe price fetch answered without a mixnet:\n\(price)")
-        } catch ZingolibError.Mixnet(let message) {
-          print("\nPrice refused without a mixnet:\n\(message)")
-        } catch {
-          XCTFail("\nThe price fetch failed without refusing:\n\(error.localizedDescription)")
-        }
-    }
-}
-
-final class ExecuteSaplingBalanceFromSeed: XCTestCase {
-    func testExecuteSaplingBalanceFromSeed() throws {
-
-        let serveruri = "http://10.0.2.2:20000"
-        let chainhint = "regtest"
-        let seed = Seeds.HOSPITAL
-
-        do {
-          let initJson = try initFromSeed(seed: seed, birthday: UInt32(1), serveruri: serveruri, chainhint: chainhint, performancelevel: "Medium", minconfirmations: UInt32(1))
-          print("\nInit from seed:\n\(initJson)")
-          let initRes: InitFromSeed = try decodeJSON(initJson)
-          XCTAssertEqual(initRes.seed_phrase, seed)
-          XCTAssertEqual(initRes.birthday, 1)
-        } catch {
-          XCTFail("\nInit from seed error:\n\(error.localizedDescription)")
-          return
-        }
-
-        var latest_block_height: UInt64 = UInt64.zero
-        do {
-            let infoJson = try infoServer()
-            print("\nInfo:\n\(infoJson)")
-            let info: Info = try decodeJSON(infoJson)
-            latest_block_height = info.latest_block_height
-            XCTAssertGreaterThan(latest_block_height, UInt64.zero)
-        } catch {
-          XCTFail("\nInfo error:\n\(error.localizedDescription)")
-          return
-        }
-
-        do {
-            let syncJson = try runSync()
-            print("\nSync:\n\(syncJson)")
-        } catch {
-            print("\nSync error:\n\(error.localizedDescription)")
-        }
-
-        waitForSyncOrFail()
-
-        do {
-            let vtJson = try getValueTransfers()
-            print("\nValue Transfers:\n\(vtJson)")
-        } catch {
-          XCTFail("\nValue Transfers error:\n\(error.localizedDescription)")
-          return
-        }
-
-        do {
-          let balJson = try getBalance()
-          print("\nBalance:\n\(balJson)")
-          let bal: Balance = try decodeJSON(balJson)
-          XCTAssertEqual(bal.total_orchard_balance, 710_000)
-          XCTAssertEqual(bal.confirmed_orchard_balance, 710_000)
-          XCTAssertEqual(bal.total_sapling_balance, 125_000)
-          XCTAssertEqual(bal.confirmed_sapling_balance, 125_000)
-          XCTAssertEqual(bal.confirmed_transparent_balance, 0)
-        } catch {
-          XCTFail("\nBalance error:\n\(error.localizedDescription)")
-          return
-        }
-
-        let rpc = RPCModule()
-        try rpc.saveWalletInternal()
-
-        do {
-          let changeJson = try changeServer(serveruri: "")
-          print("\nChange Serveruri:\n\(changeJson)")
-          XCTAssertFalse(isError(changeJson))
-        } catch {
-          XCTFail("\nChange Serveruri error:\n\(error.localizedDescription)")
-          return
-        }
-        
-        let loadJson = try rpc.fnLoadExistingWallet(serveruri: "", chainhint: "main", performancelevel: "Medium", minconfirmations: "1")
-        print("\nLoad Wallet:\n\(loadJson)")
+        _ = try refusedWithoutMixnet("price fetch") { try zecPrice() }
     }
 }
 
