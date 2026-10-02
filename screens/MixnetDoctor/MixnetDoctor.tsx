@@ -29,7 +29,7 @@ import {
   getMixnetStatus,
 } from '@app/walletBackend/utils/mixnetUtils';
 import { RPCMixnetIndicatorEnum } from '@app/walletBackend/enums/RPCMixnetIndicatorEnum';
-import { mixnetPhase } from '@app/walletBackend/transforms/mixnetView';
+import { viewPhase } from '@app/walletBackend/transforms/mixnetView';
 import {
   MixnetDoctorRow,
   MixnetDoctorRun,
@@ -149,10 +149,7 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
 
   // The coordinator's own view of the session, which the probes cannot see:
   // it knows an attach is under way while the library still answers `died`.
-  const phase =
-    mixnetView !== null
-      ? mixnetPhase(mixnetView.statusKey, mixnetView.reconnecting)
-      : null;
+  const phase = viewPhase(mixnetView);
   const attachInFlight = phase === 'connecting' || phase === 'reconnecting';
   // Nym rests at `off` because the session is Offline. The probes have
   // nothing to reach: they would time a local FFI call and report the state

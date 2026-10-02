@@ -1988,7 +1988,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                     transaction, and with no switch left to flip the user is
                     owed the reason: why the wait exists, and what the
                     transport is doing right now. */}
-                {mixnetView !== null && mixnetView.sendBlocked && (
+                {mixnetView.kind === 'transport' && mixnetView.sendBlocked && (
                   <View
                     style={{
                       alignItems: 'center',

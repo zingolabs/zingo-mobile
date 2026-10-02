@@ -22,12 +22,13 @@ import {
   mockZecQuote,
   mockZecRefusal,
 } from '../__mocks__/dataMocks/mockZecPriceOutcome';
-import { MixnetView } from '@app/walletBackend/transforms/mixnetView';
+import { MixnetTransportView } from '@app/walletBackend/transforms/mixnetView';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 
 const price = getZecPrice as jest.MockedFunction<typeof getZecPrice>;
 
-const READY_VIEW: MixnetView = {
+const READY_VIEW: MixnetTransportView = {
+  kind: 'transport',
   statusKey: 'mixnet.status.ready',
   socks5Addr: '127.0.0.1:1080',
   narration: null,
@@ -35,7 +36,8 @@ const READY_VIEW: MixnetView = {
   recovery: 'none',
   reconnecting: false,
 };
-const DIED_VIEW: MixnetView = {
+const DIED_VIEW: MixnetTransportView = {
+  kind: 'transport',
   statusKey: 'mixnet.status.died',
   socks5Addr: null,
   narration: null,

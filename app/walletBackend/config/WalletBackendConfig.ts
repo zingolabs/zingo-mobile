@@ -12,7 +12,7 @@ import {
   StartMixnetTransport,
   StopMixnetTransport,
 } from '@app/walletBackend/modules/MixnetCoordinator';
-import { MixnetView } from '@app/walletBackend/transforms/mixnetView';
+import { MixnetTransportView } from '@app/walletBackend/transforms/mixnetView';
 
 // Every sub-service shares one reference to this config.
 export type WalletBackendConfig = {
@@ -29,7 +29,7 @@ export type WalletBackendConfig = {
   onError: (error: string) => void;
   // Called after several consecutive sync-launch failures.
   onPersistentSyncFailure?: () => void;
-  onMixnetViewChanged: (view: MixnetView) => void;
+  onMixnetViewChanged: (view: MixnetTransportView) => void;
   startMixnetTransport: StartMixnetTransport;
   stopMixnetTransport: StopMixnetTransport;
   // Tests inject false to keep the coordinator unstarted.
