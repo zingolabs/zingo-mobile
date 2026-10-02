@@ -12,6 +12,10 @@ appId: org.ZingoLabs.Zingo
     visible:
       id: "send.addressplaceholder"
     timeout: 10000
+# The Send screen is still moving when the field first shows, and a tap
+# resolved during that animation does not focus the field.
+- waitForAnimationToEnd:
+    timeout: 5000
 
 # The parser rejects a string that is no Zcash address.
 - tapOn:
