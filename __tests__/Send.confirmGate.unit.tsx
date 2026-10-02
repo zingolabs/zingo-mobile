@@ -49,7 +49,6 @@ import React from 'react';
 import { fireEvent, render, waitFor } from '@testing-library/react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { NetInfoStateType } from '@react-native-community/netinfo/src/index';
 import Send from '@screens/Send';
 import {
   ContextAppLoadedProvider,
@@ -73,11 +72,11 @@ import {
   SendPermitInputs,
   sendPermit,
 } from '@app/walletBackend/transforms/sendPermit';
-import { mixnetLost, mixnetReady } from '../.storybook/storyMocks';
+import { mixnetLost } from '../.storybook/storyMocks';
 import { mockAddresses } from '../__mocks__/dataMocks/mockAddresses';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
-import { mockServer } from '../__mocks__/dataMocks/mockServer';
+import { mockOnline } from '../__mocks__/dataMocks/mockOnline';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import { mockValueTransfers } from '../__mocks__/dataMocks/mockValueTransfers';
 
@@ -107,15 +106,7 @@ function makeDrawerProps(): NativeStackScreenProps<
 
 const translate = (key: string): TranslateType => key;
 
-const online: SendPermitInputs = {
-  netInfo: {
-    isConnected: true,
-    type: NetInfoStateType.wifi,
-    isConnectionExpensive: false,
-  },
-  server: mockServer,
-  mixnetView: mixnetReady,
-};
+const online = mockOnline;
 
 // The state that LoadedApp holds. `sendPermitNow` reads it at call time.
 let appState = online;

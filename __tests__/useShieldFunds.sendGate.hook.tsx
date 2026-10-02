@@ -13,9 +13,7 @@ jest.mock('@app/services/showConfirm', () => ({
 
 import { act, renderHook } from '@testing-library/react-native';
 import { useNavigation } from '@react-navigation/native';
-import { NetInfoStateType } from '@react-native-community/netinfo/src/index';
 
-import { ChainNameEnum, remoteServer } from '@app/AppState';
 import type { TranslateType } from '@app/AppState';
 import { useShieldFunds } from '@app/hooks/useShieldFunds';
 import { showConfirm } from '@app/services/showConfirm';
@@ -24,12 +22,8 @@ import {
   SendPermitInputs,
   sendPermit,
 } from '@app/walletBackend/transforms/sendPermit';
-import {
-  mixnetLost,
-  mixnetOff,
-  mixnetReady,
-  mockInfo,
-} from '../.storybook/storyMocks';
+import { mixnetLost, mixnetOff } from '../.storybook/storyMocks';
+import { mockOnline } from '../__mocks__/dataMocks/mockOnline';
 
 const confirmMock = shieldConfirm as jest.Mock;
 const proposeMock = shieldPropose as jest.Mock;
@@ -38,15 +32,7 @@ const translate = (key: string): TranslateType => key;
 
 type HookInput = Parameters<typeof useShieldFunds>[0];
 
-const online: SendPermitInputs = {
-  netInfo: {
-    isConnected: true,
-    type: NetInfoStateType.wifi,
-    isConnectionExpensive: false,
-  },
-  server: remoteServer(mockInfo.serverUri, ChainNameEnum.mainChainName),
-  mixnetView: mixnetReady,
-};
+const online = mockOnline;
 
 // The state that LoadedApp holds. `sendPermitNow` reads it at call time.
 let appState = online;

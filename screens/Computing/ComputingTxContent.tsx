@@ -130,8 +130,9 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
   const computingSheetRef = useRef<BottomSheet>(null);
 
   const computingSnapPoints = useFullSheetSnapPoints(containerH, headerH);
-  const phase = route.params?.phase ?? 'computing';
-  const failure = route.params?.failure;
+  const end = route.params;
+  const phase = end?.phase ?? 'computing';
+  const failure = end?.phase === 'failed' ? end.failure : undefined;
   const isCreated = phase === 'created';
   const isFailed = phase === 'failed';
   const isTerminal = isCreated || isFailed;

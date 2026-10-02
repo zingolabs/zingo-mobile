@@ -21,7 +21,6 @@ import React from 'react';
 
 import { render } from '@testing-library/react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { NetInfoStateType } from '@react-native-community/netinfo/src/index';
 import Confirm from '@screens/Confirm';
 import {
   ContextAppLoadedProvider,
@@ -31,25 +30,17 @@ import { RouteEnum } from '@app/AppState';
 import type { TranslateType } from '@app/AppState';
 import { AppDrawerParamList } from '@app/types';
 import { SendPermitInputs } from '@app/walletBackend/transforms/sendPermit';
-import { mixnetLost, mixnetReady } from '../.storybook/storyMocks';
+import { mixnetLost } from '../.storybook/storyMocks';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
+import { mockOnline } from '../__mocks__/dataMocks/mockOnline';
 import mockSendPageState from '../__mocks__/dataMocks/mockSendPageState';
-import { mockServer } from '../__mocks__/dataMocks/mockServer';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import { mockZecPrice } from '../__mocks__/dataMocks/mockZecPrice';
 
 const translate = (key: string): TranslateType => key;
 
-const online: SendPermitInputs = {
-  netInfo: {
-    isConnected: true,
-    type: NetInfoStateType.wifi,
-    isConnectionExpensive: false,
-  },
-  server: mockServer,
-  mixnetView: mixnetReady,
-};
+const online = mockOnline;
 
 function makeProps(): NativeStackScreenProps<
   AppDrawerParamList,
