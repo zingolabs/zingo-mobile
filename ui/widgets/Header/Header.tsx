@@ -116,6 +116,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     shieldingAmount,
     server,
     mixnetView,
+    sendPermitNow,
   } = context;
 
   const translate = translateProp ?? context.translate;
@@ -158,12 +159,11 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     totalBalance,
     shieldingAmount,
     translate,
-    netInfo,
     addLastSnackbar,
     setBackgroundError,
     setScrollToTop,
     setScrollToBottom,
-    mixnetView,
+    sendPermitNow,
   });
 
   // Audit Issue D — bio gate for seedUfvkScreen lives at the Ufvk screen

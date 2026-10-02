@@ -38,6 +38,7 @@ import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
 import { AppDrawerParamList } from '@app/types';
 import Utils from '@app/utils';
 import { fiatQuote } from '@app/price/fiatQuote';
+import { sendPermit } from '@app/walletBackend/transforms/sendPermit';
 import {
   GlobalConst,
   ScreenEnum,
@@ -93,6 +94,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
   const { colors } = useTheme();
   const screenName = ScreenEnum.Confirm;
   const quote = fiatQuote(zecPrice, server, server.chainName);
+  const permit = sendPermit(context);
 
   // Audit Issue D — the biometric gate lives at the
   // Confirm screen entry. Mirrors Seed / Ufvk / Settings / Rescan via
@@ -265,12 +267,19 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
             backgroundColor: colors.bgSurface,
             paddingTop: 10,
             paddingBottom: 24,
-            flexDirection: 'row',
             justifyContent: 'center',
             alignItems: 'center',
           }}
         >
+          {permit.kind === 'error' && (
+            <View style={{ marginBottom: 10 }} testID="send.confirm.refusal">
+              <FadeText style={{ textAlign: 'center', fontSize: 12 }}>
+                {translate(permit.errorKey) as string}
+              </FadeText>
+            </View>
+          )}
           <Button
+            testID="send.confirm.button"
             type={ButtonTypeEnum.Nym}
             title={
               sendAllAmount
@@ -278,12 +287,13 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                 : (translate('confirm') as string)
             }
             onPress={async () => await confirmSend(sendPageState)}
+            disabled={permit.kind === 'error'}
           />
         </View>
       </BottomSheetFooter>
     ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [colors, sendAllAmount, translate],
+    [colors, sendAllAmount, translate, permit],
   );
 
   if (!authPassed) {
