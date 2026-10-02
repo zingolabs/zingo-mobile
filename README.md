@@ -57,21 +57,13 @@ pointer, and propose a record.
 The Rust wallet and the mixnet proxy, with their Kotlin and Swift bindings,
 live in [zingolabs/zingolib](https://github.com/zingolabs/zingolib). This
 repository pins them as a submodule at `zingolib/` (ADR zingo-mobile/0016).
-The Android build and the integration harnesses in `rust/` build from that
-checkout, so initialise it before any build.
+The Android and iOS builds read that checkout. Initialise it before any build.
 
 ```sh
 git submodule update --init zingolib
 ```
 
 ## Testing
-### Prerequisites
-Integration tests require a regtest network. The test harness
-(`zingolib_testutils` scenarios, built on `zcash_local_net`) launches native `zebrad`
-(validator) and `zainod` (indexer) processes for each test. Put both binaries on `$PATH`,
-or in the directory named by the `TEST_BINARIES_DIR` environment variable. CI runs these
-tests on Linux. On macOS, zebrad is a Zebra Tier 3 platform, and you must build it yourself.
-
 ### Yarn Tests
 1. From the root directory, run: <br />
    `yarn test`
@@ -83,38 +75,37 @@ Peak heap per wallet-file path, on a connected Android device or emulator.
 - `yarn bench:memory --report`: measure only
 - `yarn bench:memory:accept`: record a new baseline
 
-### Integration Tests
-These exercise the Rust ↔ Kotlin/Swift FFI boundary against a regtest network.
+### Device Tests
+The device tests exercise the Binding Layer through Kotlin and Swift on an
+emulator or a simulator. An annotation on each Android test class names its
+kind (`CONTEXT.md` defines the terms).
 
-The Android suite (`rust/android/tests/integration_tests.rs`) runs on every PR
-via the `android-ubuntu-integration-test-ci` workflow. The iOS suite
-(`rust/ios/tests/integration_tests.rs`) exists but its `cargo nextest run`
-invocation is currently commented out in `ios-integration-test.yaml`, so it
-does **not** gate PRs — you can still run it locally with the same nextest
-commands.
+- An offline device test (`@OfflineDeviceTest`) opens a wallet with an empty
+  server URI and reads no chain.
+- A public-chain test (`@PublicChainTest`) reads mainnet or testnet through a
+  public server. A test that needs funds reads a testnet fixture wallet
+  (`docs/testnet_fixture_wallets.md`).
 
-1. Create quick-boot snapshots to speed up AVD launch times. From the root directory, run: <br />
-   `./scripts/android_integration_tests.sh -a x86_64 -s` <br />
-   `./scripts/android_integration_tests.sh -a x86 -s` <br />
-   By default, this uses default API 29 system images. Other images may be used for testing
-   by specifying the api level and target. However, using other images with the cargo test runner
-   is still under development.
-2. To run the integration tests. From the `rust` directory, run: <br />
-   `cargo nextest run android_integration` <br />
-   Specify to run specific ABI: <br />
-   `cargo nextest run android_integration::x86_64` <br />
-   `cargo nextest run android_integration::x86_32` <br />
-   `cargo nextest run android_integration::arm64` <br />
-   `cargo nextest run android_integration::arm32` <br />
-   Specify to run a specific test on all ABIs: <br />
-   `cargo nextest run test_name` <br />
-   Specify to run a specific ABI and test: <br />
-   `cargo nextest run android_integration::x86_64::test_name`
+The `android-ubuntu-integration-test-ci` workflow runs both kinds on every
+pull request, and `ios-integration-test` runs the XCTest classes of
+`ios/ZingoTests`.
 
-For more information on running integration tests on non-default AVDs, run: <br />
-`./scripts/android_integration_tests.sh -h` <br />
-Without the cargo test runner these emulated android devices will not be able to connect to a
-regtest network. Therefore, only tests in the "Offline Testsuite" may be tested.
+To run the Android tests, boot an emulator and run these commands from the
+`android` directory. Replace `x86_64` with the ABI of the emulator.
+
+```sh
+./gradlew :app:connectedProdDebugAndroidTest \
+  -PreactNativeArchitectures=x86_64 \
+  -Pandroid.testInstrumentationRunnerArguments.annotation=org.ZingoLabs.Zingo.OfflineDeviceTest
+
+./gradlew :app:connectedProdDebugAndroidTest \
+  -PreactNativeArchitectures=x86_64 \
+  -Pandroid.testInstrumentationRunnerArguments.annotation=org.ZingoLabs.Zingo.PublicChainTest \
+  -Pandroid.testInstrumentationRunnerArguments.timeout_msec=420000
+```
+
+To run the iOS tests, open `ios/Zingo.xcworkspace` in Xcode and run the
+`ZingoTests` target on a simulator.
 
 ### End-to-End Tests (Maestro UI flows)
 [Maestro](https://maestro.mobile.dev/) drives the released app from the

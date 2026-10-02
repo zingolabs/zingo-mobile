@@ -10,7 +10,6 @@ module.exports = [
     ignores: [
       'node_modules/**',
       'coverage/**',
-      'rust/**',
       'zingolib/**',
       'scripts/release/**',
     ],
