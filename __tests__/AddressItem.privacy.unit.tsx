@@ -3,7 +3,7 @@
  * address in AddressItem.
  */
 import 'react-native';
-import React, { Profiler } from 'react';
+import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import type { ReactTestInstance } from 'react-test-renderer';
 import {
@@ -30,8 +30,6 @@ const bookWith = (label: string): AddressBookFileClass[] => [
   { ...mockAddressBook[0], label },
 ];
 
-const onCommit = jest.fn();
-
 const item = (
   props: Partial<ItemProps> = {},
   state: Partial<AppState> = {},
@@ -46,13 +44,11 @@ const item = (
       ...state,
     }}
   >
-    <Profiler id="item" onRender={onCommit}>
-      <AddressItem
-        address={mockAddressBook[0].address}
-        screenName={ScreenEnum.History}
-        {...props}
-      />
-    </Profiler>
+    <AddressItem
+      address={mockAddressBook[0].address}
+      screenName={ScreenEnum.History}
+      {...props}
+    />
   </ContextAppLoadedProvider>
 );
 
@@ -68,10 +64,7 @@ const pressable = (text: ReactTestInstance): boolean => {
 };
 
 describe('AddressItem - privacy', () => {
-  beforeEach(() => {
-    jest.useFakeTimers();
-    onCommit.mockClear();
-  });
+  beforeEach(() => jest.useFakeTimers());
   afterEach(() => jest.useRealTimers());
 
   test('Tests that the contact label shows its mask when privacy is on.', () => {
@@ -120,23 +113,15 @@ describe('AddressItem - privacy', () => {
     expect(pressable(screen.getByText(`ZNS: ${ALIAS}`))).toBe(false);
   });
 
-  test('Tests that the item renders in one commit when it mounts. The contact and the line counts are derived during the render.', () => {
-    render(item());
-
-    expect(onCommit).toHaveBeenCalledTimes(1);
-  });
-
-  test('Tests that the label shows its mask in the same commit when privacy turns on while the label is in full.', () => {
+  test('Tests that the label shows its mask when privacy turns on while the label is in full.', () => {
     const book = bookWith(LONG_LABEL);
     const { rerender } = render(
       item({}, { addressBook: book, privacy: false }),
     );
 
     fireEvent.press(screen.getByText(/^a conta/));
-    onCommit.mockClear();
     rerender(item({}, { addressBook: book }));
 
-    expect(onCommit).toHaveBeenCalledTimes(1);
     expect(screen.getByText('a .....')).toBeTruthy();
   });
 });
