@@ -25,8 +25,8 @@ on:
         required: false
         type: boolean
         default: false
-      # Runner label for the emulator jobs: the buckets and the offline
-      # device tests. PR CI passes CI_EMULATOR_RUNNER. The runner must
+      # Runner label for the device test job. PR CI passes
+      # CI_EMULATOR_RUNNER. The runner must
       # expose /dev/kvm. The value is one label, or a JSON array of labels
       # such as ["warp-ubuntu-latest-x64-8x", "nested-virtualization.enabled=true"].
       runner:
@@ -142,292 +142,8 @@ jobs:
               run_id: context.runId,
             });
 
-  # The app and androidTest APKs are assembled once per ABI by the
-  # android-apk-build workflow at the caller level; this workflow only
-  # consumes its android-build-outputs artifact. PR CI calls this
-  # workflow WITHOUT a needs-edge on the APK build: the buckets start at
-  # workflow launch, run every APK-independent step (setup, harness
-  # prebuild, regtest binaries), and then hold at the ci-gate artifact
-  # gate until the APK artifact lands — overlapping ~10 minutes of setup
-  # with the build path. ci-nightly keeps its needs-edge, so there the
-  # gate opens instantly.
-  android-ubuntu-integration-test-ci:
-    name: ${{ matrix.bucket.name }}
-    needs:
-      - android-ubuntu-integration-test-ci-avd-cache
-    runs-on: ${{ startsWith(inputs.runner, '[') && fromJSON(inputs.runner) || inputs.runner }}
-    # Bounds the harness build, the regtest launch, and the test run.
-    timeout-minutes: 45
-    strategy:
-      fail-fast: ${{ inputs.fail-all }}
-      # Each bucket is one job with its own runner setup and emulator
-      # boot. The buckets run side by side, and the chain job below
-      # reports their combined result.
-      matrix:
-        bucket:
-          - name: ledger-and-parsing
-            tests: execute_sapling_balance_from_seed
-    env:
-      RUSTFLAGS: -D warnings
-      CACHE-KEY: ${{ inputs.cache-key }}
-    steps:
-      - name: Set envs for zingolib CI
-        if: ${{ contains(github.repository, 'zingolib') }}
-        run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
-
-      - name: Checkout repository
-        uses: actions/checkout@v7
-        with:
-          repository: ${{ env.REPO-OWNER }}/zingo-mobile
-
-      # The Rust harness takes zingolib_testutils by path from the submodule,
-      # so it tests the zingolib that the app ships.
-      - name: Check out zingolib
-        uses: ./.github/actions/zingolib-submodule
-
-      - name: Set envs for x86_64
-        if: ${{ env.ABI == 'x86_64' }}
-        run: |
-          echo "AVD-ARCH=x86_64" >> $GITHUB_ENV
-          echo "NEXTEST-ABI=x86_64" >> $GITHUB_ENV
-
-      - name: Set envs for x86
-        if: ${{ env.ABI == 'x86' }}
-        run: |
-          echo "AVD-ARCH=x86" >> $GITHUB_ENV
-          echo "NEXTEST-ABI=x86_32" >> $GITHUB_ENV
-
-      - name: Set envs for arm64-v8a
-        if: ${{ env.ABI == 'arm64-v8a' }}
-        run: |
-          echo "AVD-ARCH=arm64-v8a" >> $GITHUB_ENV
-          echo "NEXTEST-ABI=arm64" >> $GITHUB_ENV
-
-      - name: Set envs for armeabi-v7a
-        if: ${{ env.ABI == 'armeabi-v7a' }}
-        run: |
-          echo "AVD-ARCH=arm64-v8a" >> $GITHUB_ENV
-          echo "NEXTEST-ABI=arm32" >> $GITHUB_ENV
-
-      - name: Grant permissions
-        run: |
-          sudo chmod 777 ./scripts/ci/android_integration_tests_ci.sh
-
-      - name: Enable KVM
-        run: |
-          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
-          sudo udevadm control --reload-rules
-          sudo udevadm trigger --name-match=kvm
-
-      - name: Install protoc
-        run: |
-          sudo apt update
-          sudo apt install -y protobuf-compiler
-
-      - name: Rust toolchain
-        uses: actions-rust-lang/setup-rust-toolchain@v2
-        with:
-          toolchain: stable
-          cache-workspaces: rust -> rust/target
-
-      - name: Install nextest
-        uses: taiki-e/install-action@v2
-        with:
-          tool: nextest
-
-      - name: Setup Java
-        uses: actions/setup-java@v6
-        with:
-          distribution: 'temurin'
-          java-version: '17'
-
-      - name: Gradle setup cache (read-only)
-        uses: gradle/actions/setup-gradle@v6
-        with:
-          gradle-version: wrapper
-          cache-write-only: false
-          cache-read-only: true
-
-      - name: Restore AVD cache
-        uses: actions/cache/restore@v6
-        with:
-          path: |
-            ~/.android/avd/*
-            ~/.android/adb*
-          key: avd-${{ env.ABI }}-api-${{ env.API-LEVEL }}-integ
-          fail-on-cache-miss: true
-
-      - name: Remove unnecessary directories to free up space
-        run: |
-          set -eux
-          echo "Disk space before cleanup:"
-          df -h
-
-          sudo apt-get update
-
-          sudo apt-get remove -y '^dotnet-.*' || true
-          sudo apt-get remove -y 'php.*' || true
-          sudo apt-get remove -y '^mongodb-.*' || true
-          sudo apt-get remove -y '^mysql-.*' || true
-          sudo apt-get remove -y azure-cli google-cloud-sdk hhvm google-chrome-stable firefox powershell mono-devel libgl1-mesa-dri || true
-          sudo apt-get autoremove -y || true
-          sudo apt-get clean || true
-
-          sudo rm -rf /usr/local/graalvm/
-          sudo rm -rf /usr/local/share/powershell
-          sudo rm -rf /usr/local/share/chromium
-          sudo rm -rf /usr/local/.ghcup
-          sudo rm -rf /opt/hostedtoolcache/CodeQL
-          sudo rm -rf /usr/local/lib/android/sdk/ndk
-          sudo rm -rf /usr/share/dotnet /etc/mysql /etc/php /etc/apt/sources.list.d
-          sudo rm -rf /opt/ghc
-          sudo rm -rf /usr/local/share/boost
-
-          podman image prune --all --force || true
-          podman system prune --all --force || true
-
-          echo "Disk space after cleanup:"
-          df -h
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22.18.0
-          cache: yarn
-
-      - name: Yarn install
-        run: yarn
-
-      # The ci-build image tag is content-addressed from the zingolib
-      # commit's .env.testing-artifacts + rust-toolchain.toml + docker-ci/,
-      # so deriving it from the submodule keeps the zainod/zebrad binaries in
-      # lockstep with the zingolib we build against (a fixed tag like 011
-      # drifts out of sync). Under zingolib CI the submodule is the commit
-      # under test.
-      - name: Install cargo-make
-        uses: taiki-e/install-action@v2
-        with:
-          tool: cargo-make
-
-      - name: Compute ci-build image tag from the zingolib submodule
-        run: |
-          set -euo pipefail
-          TAG="$(cd zingolib && cargo make compute-image-tag | grep -E '^[0-9a-f]{14}$')"
-          test -n "$TAG"
-          echo "CI_BUILD_TAG=$TAG" >> "$GITHUB_ENV"
-          echo "Computed ci-build tag: $TAG"
-
-      # A runner can lose registry egress for minutes at a time (2026-07-25:
-      # four consecutive 60s dial timeouts to registry-1.docker.io cancelled
-      # a whole run through fail-all). Space the attempts across ~13 minutes
-      # to outlast such an outage. The runner's podman rejects `--retry`, so
-      # the loop lives here. A tag that was never published fails on the
-      # first attempt, because waiting cannot make it appear.
-      - name: Pull ci-build image
-        env:
-          PULL_ATTEMPTS: 9
-          PULL_RETRY_DELAY_SECONDS: 45
-        run: |
-          set -uo pipefail
-          image="docker.io/zingodevops/ci-build:${CI_BUILD_TAG}"
-          for attempt in $(seq 1 "$PULL_ATTEMPTS"); do
-            if podman pull "$image" 2> pull-error.txt; then
-              exit 0
-            fi
-            cat pull-error.txt >&2
-            if grep --quiet --ignore-case --extended-regexp \
-              'manifest unknown|not found|unauthorized|denied' pull-error.txt; then
-              echo "::error::$image is not pullable; not retrying"
-              exit 1
-            fi
-            if [ "$attempt" -lt "$PULL_ATTEMPTS" ]; then
-              echo "Pull attempt $attempt of $PULL_ATTEMPTS failed; retrying in ${PULL_RETRY_DELAY_SECONDS}s"
-              sleep "$PULL_RETRY_DELAY_SECONDS"
-            fi
-          done
-          echo "::error::$image did not pull after $PULL_ATTEMPTS attempts"
-          exit 1
-
-      - name: Extract binaries & params from image
-        run: |
-          set -euxo pipefail
-          cid=$(podman create docker.io/zingodevops/ci-build:${CI_BUILD_TAG})
-          mkdir -p rust/test_binaries/bins
-          podman cp "$cid":/usr/bin/zainod rust/test_binaries/bins/
-          podman cp "$cid":/usr/bin/zebrad rust/test_binaries/bins/
-          podman rm "$cid"
-
-      - name: binaries env var
-        run: |
-          TEST_BINARIES_DIR="$(pwd)/rust/test_binaries/bins"
-          echo "TEST_BINARIES_DIR=$TEST_BINARIES_DIR" >> "$GITHUB_ENV"
-
-      # Compile the nextest harness while the APK build is still running;
-      # the emulator step then reuses the warm target directory.
-      - name: Prebuild test harness
-        working-directory: ./rust
-        run: cargo nextest run --no-run --features ci --release
-
-      # Everything above needs nothing from the APK build. Hold here
-      # until its artifact lands; abort promptly if it can never land.
-      - name: Wait for the APK artifact (ci-gate)
-        working-directory: ./rust
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          cargo run -p workbench --bin ci-gate -- \
-            --artifact "android-build-outputs-${{ env.ABI }}-${{ env.CACHE-KEY }}" \
-            --upstream "Andr APK build" \
-            --timeout-secs 2700 \
-            --poll-secs 60
-
-      - name: Download Android build outputs
-        uses: actions/download-artifact@v4
-        with:
-          name: android-build-outputs-${{ env.ABI }}-${{ env.CACHE-KEY }}
-          path: android/app/build/outputs
-
-      - name: Run Android Integration Test
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: ${{ env.API-LEVEL }}
-          arch: ${{ env.AVD-ARCH }}
-          target: ${{ env.TARGET }}
-          force-avd-creation: true
-          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -no-metrics
-          disable-animations: true
-          # KEEP_EMULATORS: the per-test runner script must not shut the
-          # emulator down between the bucket's tests — this action boots
-          # it once for the whole bucket and tears it down afterwards.
-          # One line only: the emulator-runner action executes each line
-          # of `script` as its own `sh -c`, so multi-line shell constructs
-          # never parse.
-          script: KEEP_EMULATORS=1 cargo nextest run $(for t in ${{ matrix.bucket.tests }}; do printf 'android_integration::${{ env.NEXTEST-ABI }}::%s ' "$t"; done) --features "ci" --verbose --release
-          working-directory: ./rust
-        env:
-          TEST_BINARIES_DIR: ${{ env.TEST_BINARIES_DIR }}
-
-      - name: Upload test reports
-        if: ${{ always() && !cancelled() }}
-        uses: actions/upload-artifact@v7
-        with:
-          name: test-android-integration-reports-${{ env.ABI }}-${{ matrix.bucket.name }}-${{ env.TIMESTAMP }}
-          path: android/app/build/outputs/integration_test_reports
-          retention-days: 7
-
-      - name: Cancel the run on failure (fail-all)
-        if: ${{ failure() && inputs.fail-all }}
-        uses: actions/github-script@v9
-        with:
-          script: |
-            await github.rest.actions.cancelWorkflowRun({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              run_id: context.runId,
-            });
-
-  # Device tests without the Rust harness: two Gradle connected-test runs
-  # on the debug build. The first selects every class that carries
+  # Device tests: two Gradle connected-test runs on the debug build. The
+  # first selects every class that carries
   # @OfflineDeviceTest. The second selects every class that carries
   # @PublicChainTest and reads mainnet or testnet through a public server.
   # The Android Test Orchestrator gives each test its own process and
@@ -555,33 +271,21 @@ jobs:
               run_id: context.runId,
             });
 
-  # Reports the combined result of the integration buckets under the
-  # required check name "chain".
-  chain:
-    name: chain
-    needs:
-      - android-ubuntu-integration-test-ci
-    if: ${{ always() }}
-    runs-on: ubuntu-24.04
-    timeout-minutes: 5
-    steps:
-      - name: Report the result of the integration buckets
-        env:
-          RESULT: ${{ needs.android-ubuntu-integration-test-ci.result }}
-        run: test "$RESULT" = "success"
-
-  # Transitional alias. The dev branch protection requires a check with
-  # the name "accounts". Issue 1510 removes this job together with that
-  # requirement. A skipped job reports success to branch protection, and
-  # this job therefore always runs and fails unless the device tests
-  # passed.
-  accounts:
-    name: accounts
+  # Transitional aliases. The dev branch protection requires checks with
+  # the names "chain", "ledger-and-parsing", and "accounts". Issue 1510
+  # removes these jobs together with those requirements. A skipped job
+  # reports success to branch protection, and each alias therefore always
+  # runs and fails unless the device tests passed.
+  required-check-alias:
+    name: ${{ matrix.name }}
     needs:
       - android-device-test
     if: ${{ always() }}
     runs-on: ubuntu-24.04
     timeout-minutes: 5
+    strategy:
+      matrix:
+        name: [chain, ledger-and-parsing, accounts]
     steps:
       - name: Report the result of the device tests
         env:
