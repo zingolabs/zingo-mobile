@@ -18,7 +18,7 @@ and iOS.
 | ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Mixnet refusal test, `ConfirmRefusesWithoutMixnet`   | The published addresses, the consolidation txid, and a spendable shielded balance above a minimum. The test proposes a send to the wallet's own transparent address and expects the confirm to refuse. |
 | Value-transfer test, `RecoversConsolidationTransfer` | The consolidation entry, found by txid and kind, with its status, height, value, and fee.                                                                                                              |
-| Pool-balance test, `ExecuteSaplingBalanceFromSeed`   | The exact total and confirmed balances of the Ironwood, Orchard, and Sapling pools, and a confirmed transparent balance of zero. This test still runs on regtest.                                      |
+| Pool-balance test, `RecoversPoolBalances`            | The pool-balance wallet: its addresses, its nine confirmed value transfers, and the exact total and confirmed balances of the Ironwood, Orchard, Sapling, and transparent pools.                       |
 | Funded sync check                                    | A note the sync finds, and the pool balance after the sync. `ConfirmRefusesWithoutMixnet` carries it.                                                                                                  |
 
 The transparent fixture wallet holds one transparent note that nobody shields.
@@ -45,9 +45,9 @@ which later transactions leave in place. Its expected values then come from
 the oldest entries of this wallet.
 
 The pool-balance test checks exact balances, and those need a wallet that
-nobody else spends from. The maintainer chooses one of two paths. The test can
-read its own wallet, created from a new seed with the history below. The test
-can also relax its check to what a shared wallet can guarantee.
+nobody else spends from. It reads its own wallet, the pool-balance wallet,
+created from a new seed with the history below and funded from the
+GloryGoddess wallet. The section "The wallets as created" records it.
 
 The shared fixture wallet started from this seed on 2026-10-02. The wallet sent
 its whole balance to itself in one transaction, txid
@@ -106,9 +106,10 @@ The history reproduces the two regtest scenarios that the tests replace,
 of 1,000,000 zatoshis. The amounts below keep that value, and the Kotlin
 expectations change as little as possible.
 
-A third wallet, the funding wallet, sends every receipt. The maintainer holds
-its seed and keeps it out of the repository. The spending wallet of the
-broadcast tests (#1489) can serve as the funding wallet.
+A third wallet, the funding wallet, sends every receipt. On 2026-10-02 the
+GloryGoddess wallet served as the funding wallet. A funding wallet with a
+private seed, such as the spending wallet of the broadcast tests (#1489), can
+serve at the next refresh.
 
 | Step | From           | To                                      | Zatoshis  | Memo                     | What the step gives the tests        |
 | ---- | -------------- | --------------------------------------- | --------- | ------------------------ | ------------------------------------ |
@@ -140,6 +141,51 @@ lands in follows the funding wallet's policy for a payment to a unified address
 (verify). The regtest numbers in the Kotlin tests change on testnet.
 The maintainer records the balances and value transfers that a fresh sync
 reports, and those become the test constants.
+
+## The wallets as created
+
+The pool-balance wallet and the transparent wallet were created on 2026-10-02
+with the history above, funded from the GloryGoddess wallet. Both seeds are
+published here and in the test constants.
+
+The pool-balance wallet has the seed `away win exhibit affair resource basic
+film radio bomb bone protect gentle logic pelican wreck air buyer nominee baby
+raw panic witness hair cream`, the birthday 4,431,742 (the block of step 1), the
+unified address `utest1d3awxkkpft8c2arx6g443wp97uhvh7uyuk58ghk35tnlx37fdg8mtwf2l7shtaacrj6gnhhxr647uq2yzwtszwn22z8xlghmwv4dzfyu`,
+the Sapling address `utest16f4ta230yxflwxj2ks63hl3t7zj4rjxq49q0ufe2asjhlv9gguelax6lrnuw520ux38dlgj6vdpa7uv65gk5r2tw498l5edwngmzzmm0`,
+and the transparent address `tmVqqboEGhqUDoVnDRk1vVumKPrieJz6btY`. The steps
+confirmed in this order, which differs from the table because step 3 failed
+twice at the mixnet transport before it went through.
+
+| Step | Txid        | Block     | Kind           | Value     | Fee    |
+| ---- | ----------- | --------- | -------------- | --------- | ------ |
+| 1    | `5875d2ef…` | 4,431,742 | `received`     | 1,000,000 | 10,000 |
+| 2    | `4ba12a82…` | 4,431,749 | `sent`         | 100,000   | 10,000 |
+| 4    | `88ffac1d…` | 4,431,758 | `received`     | 250,000   | 20,000 |
+| 5    | `d227083a…` | 4,431,947 | `received`     | 250,000   | 15,000 |
+| 6    | `89f40dad…` | 4,431,991 | `send-to-self` | 880,000   | 10,000 |
+| 7    | `e547ef7f…` | 4,432,021 | `send-to-self` | 240,000   | 10,000 |
+| 8    | `14245075…` | 4,432,043 | `send-to-self` | 125,000   | 15,000 |
+| 3    | `66a12b24…` | 4,432,056 | `memo-to-self` | 115,000   | 10,000 |
+| 9    | `40c75700…` | 4,432,065 | `shield`       | 330,000   | 20,000 |
+
+The receipt of step 1 landed in the Ironwood pool. The pinned zingolib funded
+steps 7, 8, and 3 from the Sapling note, and the change of each returned to
+Sapling. A restore from the birthday reports an Ironwood balance of 1,210,000
+zatoshis, a Sapling balance of 115,000, and no Orchard or transparent balance.
+`PoolBalanceFixture` in `RustFFITest.kt` holds these values. The full txids are
+in the value transfers of that wallet, and the first and last are in the Kotlin
+object.
+
+The transparent wallet has the seed `ball tissue mistake mistake tunnel hamster
+stem decide tunnel oyster mean unfold actual glide degree upgrade flavor crater
+average whisper vapor glare slow jump`, the birthday 4,431,747 (the block of
+step 10), and the transparent address `tmPZHbcyZLppzmKjbJz3Qi65CVvsZ1FABNT`.
+Step 10 is txid
+`6775073c219c8ae0db900d02ac0519bfa091a3f657f29261bc3bce8d53580e2e`, a receipt
+of 250,000 zatoshis with a fee of 15,000. A `shield` proposal from this wallet
+reports a value to shield of 235,000 zatoshis and a fee of 15,000. Nobody
+confirms that proposal.
 
 ## The tool
 
@@ -292,7 +338,9 @@ in `android/app/src/androidTest/java/org/ZingoLabs/Zingo/RustFFITest.kt` beside
 `ios/ZingoTests/ZingoTest.swift` beside `enum Seeds`. Each holds the seed, the
 birthday, the server, and the expected values. A refresh edits one object on
 each platform. The constants of the transparent wallet live in the shield-offer
-flow (#1493). The Kotlin object exists. The Swift twin follows with #1497.
+flow (#1493). The constants of the pool-balance wallet live in the Kotlin
+object `PoolBalanceFixture` beside `TestnetFixture`. The Swift twins follow
+with #1497.
 
 ## Refreshing
 
@@ -335,14 +383,15 @@ range keeps its old start. A refresh needs a new seed.
 
 ## Published seeds
 
-Both seeds are public in this repository. Anyone can send coins to a fixture
-address or sweep a fixture wallet.
+All three seeds are public in this repository. Anyone can send coins to a
+fixture address or sweep a fixture wallet.
 
-A deposit into the shared wallet breaks the pool-balance test, which checks
-exact values. The refusal test checks a minimum and passes. A sweep of the
-shared wallet breaks the refusal test, the funded sync check, and the
-pool-balance test. A shield or a spend of the transparent note breaks the
-shield-offer flow. The remedy for each case is a refresh.
+A deposit into the pool-balance wallet breaks the pool-balance test, which
+checks exact values. The refusal test checks a minimum and passes. A sweep of
+the shared wallet breaks the refusal test and the funded sync check. A sweep of
+the pool-balance wallet breaks the pool-balance test. A shield or a spend of the
+transparent note breaks the shield-offer flow. The remedy for each case is a
+refresh.
 
 The `GloryGoddess` seed is also public, in zingolib. Its history changes each
 time someone runs zingolib's networked testnet tests. A test that reads it
