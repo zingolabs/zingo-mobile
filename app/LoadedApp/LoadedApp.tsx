@@ -128,6 +128,10 @@ import {
   MixnetView,
 } from '@app/walletBackend/transforms/mixnetView';
 import {
+  SendPermit,
+  sendPermit,
+} from '@app/walletBackend/transforms/sendPermit';
+import {
   startMixnetTransport,
   stopMixnetTransport,
 } from '@app/walletBackend/utils/nymTransport';
@@ -700,6 +704,7 @@ export class LoadedAppClass extends Component<
 
       mixnetView: INITIAL_MIXNET_VIEW,
       reenableMixnet: this.reenableMixnet,
+      sendPermitNow: this.sendPermitNow,
 
       // state
       appStateStatus:
@@ -1132,6 +1137,8 @@ export class LoadedAppClass extends Component<
   reenableMixnet = async (): Promise<void> => {
     await this.rpc.reenableMixnet();
   };
+
+  sendPermitNow = (): SendPermit => sendPermit(this.state);
 
   setValueTransfersList = async (
     valueTransfers: ValueTransferType[],
@@ -2034,6 +2041,7 @@ export class LoadedAppClass extends Component<
       blockExplorer: this.state.blockExplorer,
       mixnetView: this.state.mixnetView,
       reenableMixnet: this.reenableMixnet,
+      sendPermitNow: this.sendPermitNow,
     };
 
     return (
