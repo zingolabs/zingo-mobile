@@ -71,7 +71,7 @@ object MainnetServers {
 /** The shared testnet fixture wallet, which is zingolib's GloryGoddess example wallet. */
 object TestnetFixture {
     const val SEED = "glory goddess cargo action guilt ball coral employ phone baby oxygen flavor solid climb situate frequent blade pet enough milk access try swift benefit"
-    const val BIRTHDAY = 4_378_218L
+    const val BIRTHDAY = 4_431_500L
     val SERVERS = listOf("https://testnet.zec.rocks:443", "https://zaino.testnet.unsafe.zec.rocks:443")
     const val CHAIN_HINT = "test"
     const val UNIFIED_ADDRESS = "utest1dmu08vg5wt5m9w0ejwgeqdndzzkfka7c94heuz5llxv5vx4lhcethmm6p5ean3wcj8l0m6tf8k8cau9r636gq7sxq3wa6zey2sysfteh"

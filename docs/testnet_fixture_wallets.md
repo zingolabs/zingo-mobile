@@ -53,10 +53,10 @@ The shared fixture wallet started from this seed on 2026-10-02. The wallet sent
 its whole balance to itself in one transaction, txid
 `256fc8dcb3dd730439157301a027f7b243d69aa30e31fc7a9b619e726321d19f`, which
 confirmed in block 4,431,582, and then shielded its transparent funds in block
-4,431,584. The fixture birthday is 4,378,218, the block mined ten days before
-the consolidation by block timestamp. A wallet restored from that birthday
-holds one entry for the consolidation, kind `memo-to-self`, value 3,995,811,890
-zatoshis, fee 285,000, and a confirmed Ironwood balance of 3,995,846,890
+4,431,584. The fixture birthday is 4,431,500, 82 blocks before the
+consolidation. A wallet restored from that birthday holds one entry for the
+consolidation, kind `memo-to-self`, value 3,995,811,890 zatoshis, fee 285,000.
+Before any later spend it held a confirmed Ironwood balance of 3,995,846,890
 zatoshis. `TestnetFixture` in `RustFFITest.kt` holds those values. A later
 spend from the seed by zingolib's tests adds entries after the consolidation
 and lowers the balance, and the fixture tests tolerate both. While the change
@@ -308,15 +308,16 @@ grpcurl -max-time 20 \
 ```
 
 On 2026-10-02 the server reported a `blockHeight` of `4430915`. The shared
-wallet's birthday 4,378,218 passes a budget of 100,000 blocks at height
-4,478,218, about nine days later.
+wallet's birthday 4,431,500 passes a budget of 100,000 blocks at height
+4,531,500, about 19 days later.
 
 Refresh the fixture wallets in these cases.
 
 - The range from the birthday to the tip passes the budget. The budget is
   100,000 blocks for now, about 19 days. On 2026-10-02 the CI emulator synced
-  the shared wallet over 53,500 blocks in under 90 seconds, inside a deadline of
-  5 minutes, and a later run sets the final number.
+  the shared wallet over 53,500 blocks from an earlier birthday in under 90
+  seconds, inside a deadline of 5 minutes, and a later run sets the final
+  number.
 - A deposit or a sweep breaks a fixture test.
 
 A wallet that starts from `GloryGoddess` keeps its seed and its birthday. When
