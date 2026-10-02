@@ -398,7 +398,7 @@ export default function LoadedApp(props: LoadedAppProps) {
         );
       }
       if (
-        settings.blockExplorer === BlockExplorerEnum.Cipherscan ||
+        settings.blockExplorer === BlockExplorerEnum.ZecBlock ||
         settings.blockExplorer === BlockExplorerEnum.Zcashexplorer ||
         settings.blockExplorer === BlockExplorerEnum.Zexplorer ||
         settings.blockExplorer === BlockExplorerEnum.None
