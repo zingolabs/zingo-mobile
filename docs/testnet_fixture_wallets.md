@@ -14,12 +14,12 @@ Values in angle brackets are values the maintainer supplies. Items marked
 The shared fixture wallet holds a full history. These tests read it on Android
 and iOS.
 
-| Test                                                               | What it reads                                                                                                                                           |
-| ------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Mixnet refusal test, `ExecuteSendFromOrchard`                      | A confirmed balance above a minimum. The test proposes 100,000 zatoshis to the wallet's own transparent address and expects the transmission to refuse. |
-| Value-transfer test, `UpdateCurrentPriceAndValueTransfersFromSeed` | The oldest three value transfers: the receipt, the send with its recipient address, and the memo-to-self, each with its value and fee.                  |
-| Pool-balance test, `ExecuteSaplingBalanceFromSeed`                 | The exact total and confirmed balances of the Ironwood, Orchard, and Sapling pools, and a confirmed transparent balance of zero.                        |
-| Funded sync check                                                  | A note the sync finds, and the pool balance after the sync.                                                                                             |
+| Test                                                 | What it reads                                                                                                                                                                                          |
+| ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Mixnet refusal test, `ConfirmRefusesWithoutMixnet`   | The published addresses, the consolidation txid, and a confirmed shielded balance above a minimum. The test proposes a send to the wallet's own transparent address and expects the confirm to refuse. |
+| Value-transfer test, `RecoversConsolidationTransfer` | The consolidation entry, found by txid and kind, with its status, height, value, and fee.                                                                                                              |
+| Pool-balance test, `ExecuteSaplingBalanceFromSeed`   | The exact total and confirmed balances of the Ironwood, Orchard, and Sapling pools, and a confirmed transparent balance of zero. This test still runs on regtest.                                      |
+| Funded sync check                                    | A note the sync finds, and the pool balance after the sync. `ConfirmRefusesWithoutMixnet` carries it.                                                                                                  |
 
 The transparent fixture wallet holds one transparent note that nobody shields.
 The Maestro shield-offer flow (#1493) restores it and checks that the app offers
@@ -48,6 +48,18 @@ The pool-balance test checks exact balances, and those need a wallet that
 nobody else spends from. The maintainer chooses one of two paths. The test can
 read its own wallet, created from a new seed with the history below. The test
 can also relax its check to what a shared wallet can guarantee.
+
+The shared fixture wallet started from this seed on 2026-10-02. The wallet sent
+its whole balance to itself in one transaction, txid
+`256fc8dcb3dd730439157301a027f7b243d69aa30e31fc7a9b619e726321d19f`, which
+confirmed in block 4,431,582, and then shielded its transparent funds in block
+4,431,584. The fixture birthday is 4,378,218, the block mined ten days before
+the consolidation by block timestamp. A wallet restored from that birthday
+holds one entry for the consolidation, kind `memo-to-self`, value 3,995,811,890
+zatoshis, fee 285,000, and a confirmed Ironwood balance of 3,995,846,890
+zatoshis. `TestnetFixture` in `RustFFITest.kt` holds those values. A later
+spend from the seed by zingolib's tests adds entries after the consolidation
+and lowers the balance, and the fixture tests tolerate both.
 
 The birthday and the current history of this wallet come from one sync of the
 saved wallet. Read them from that sync.
@@ -275,12 +287,13 @@ in `android/app/src/androidTest/java/org/ZingoLabs/Zingo/RustFFITest.kt` beside
 `ios/ZingoTests/ZingoTest.swift` beside `enum Seeds`. Each holds the seed, the
 birthday, the server, and the expected values. A refresh edits one object on
 each platform. The constants of the transparent wallet live in the shield-offer
-flow (#1493). Piece 3 of #1492 creates these objects.
+flow (#1493). The Kotlin object exists. The Swift twin follows with #1497.
 
 ## Refreshing
 
-A test syncs from the birthday to the tip, and that range grows by about 1,150
-blocks each day. Read the tip from the server with `grpcurl`.
+A test syncs from the birthday to the tip, and that range grows by about 5,300
+blocks each day. Testnet mined 53,390 blocks in the ten days before 2026-10-02,
+one block every 16 seconds. Read the tip from the server with `grpcurl`.
 
 ```bash
 # Ask the testnet indexer for its chain tip.
@@ -289,14 +302,16 @@ grpcurl -max-time 20 \
   cash.z.wallet.sdk.rpc.CompactTxStreamer/GetLightdInfo
 ```
 
-On 2026-10-02 the server reported a `blockHeight` of `4430915`. A wallet with
-that birthday passes a budget of 100,000 blocks at height 4,530,915.
+On 2026-10-02 the server reported a `blockHeight` of `4430915`. The shared
+wallet's birthday 4,378,218 passes a budget of 100,000 blocks at height
+4,478,218, about nine days later.
 
 Refresh the fixture wallets in these cases.
 
 - The range from the birthday to the tip passes the budget. The budget is
-  100,000 blocks for now, about 87 days. The first CI sync of a fixture test
-  sets the final number.
+  100,000 blocks for now, about 19 days. On 2026-10-02 the CI emulator synced
+  the shared wallet over 53,500 blocks in under 90 seconds, inside a deadline of
+  5 minutes, and a later run sets the final number.
 - A deposit or a sweep breaks a fixture test.
 
 A wallet that starts from `GloryGoddess` keeps its seed and its birthday. When
