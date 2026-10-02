@@ -168,9 +168,14 @@ jobs:
           CXXFLAGS_aarch64_apple_ios_sim = "--target=arm64-apple-ios-simulator -isysroot $SDKROOT"
           EOF
 
+      - name: Setup Node.js for the descriptor
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.18.0
+
       - name: Record zingo-mobile's descriptor
         run: |
-          descriptor="$(cargo run --quiet --manifest-path rust/Cargo.toml --bin zm-descriptor)"
+          descriptor="$(node scripts/zm_descriptor.mjs)"
           echo "ZINGO_MOBILE_DESCRIPTOR=$descriptor" >> "$GITHUB_ENV"
 
       # The two XCFrameworks and the Swift sources of the ZingoBindings
