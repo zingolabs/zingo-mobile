@@ -15,9 +15,7 @@ on:
         required: true
         type: string
       # Fail-all (see CONTEXT.md): when true, a failure here cancels the
-      # whole run. PR CI opts in; ci-nightly does not. The PR integration
-      # buckets also watch this job through the ci-gate artifact gate, so
-      # they abort even if the cancellation races.
+      # whole run. PR CI opts in; ci-nightly does not.
       fail-all:
         required: false
         type: boolean
