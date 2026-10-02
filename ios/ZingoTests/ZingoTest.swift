@@ -24,8 +24,8 @@ enum MainnetServers {
 /// The shared testnet fixture wallet, which is zingolib's GloryGoddess example wallet.
 enum TestnetFixture {
     static let SEED = "glory goddess cargo action guilt ball coral employ phone baby oxygen flavor solid climb situate frequent blade pet enough milk access try swift benefit"
-    static let BIRTHDAY: UInt64 = 4_378_218
-    static let SERVER = "https://testnet.zec.rocks:443"
+    static let BIRTHDAY: UInt64 = 4_431_500
+    static let SERVERS = ["https://testnet.zec.rocks:443", "https://zaino.testnet.unsafe.zec.rocks:443"]
     static let CHAIN_HINT = "test"
     static let UNIFIED_ADDRESS = "utest1dmu08vg5wt5m9w0ejwgeqdndzzkfka7c94heuz5llxv5vx4lhcethmm6p5ean3wcj8l0m6tf8k8cau9r636gq7sxq3wa6zey2sysfteh"
     static let TRANSPARENT_ADDRESS = "tmF7QpuKsLF7nsMvThu4wQBpiKVGJXGCSJF"
@@ -134,6 +134,10 @@ struct Balance: Codable {
     let unconfirmed_transparent_balance: Int64
 }
 
+struct SpendableBalance: Codable {
+    let spendable_balance: Int64
+}
+
 struct SendResult: Codable {
     let address: String
     let amount: Int64
@@ -224,13 +228,19 @@ private func tipOf(_ uri: String) throws -> UInt64 {
     return tip
 }
 
-/// Returns the tip of the testnet fixture server, failing with the server's error when it does not answer.
-private func testnetTip() throws -> UInt64 {
-    do {
-        return try tipOf(TestnetFixture.SERVER)
-    } catch let error as ZingolibError {
-        throw ChainFailure(description: "the testnet server \(TestnetFixture.SERVER) did not answer: \(error)")
+/// Returns the first of `servers` that reports its tip, paired with that tip, and fails with every refusal when no `chain` server answers.
+private func firstAnsweringServer(_ chain: String, _ servers: [String]) throws -> (uri: String, tip: UInt64) {
+    var refusals: [String: Error] = [:]
+    for uri in servers {
+        do {
+            let tip = try tipOf(uri)
+            print("\nTip of \(uri): \(tip)")
+            return (uri, tip)
+        } catch {
+            refusals[uri] = error
+        }
     }
+    throw ChainFailure(description: "no \(chain) server answered: \(refusals)")
 }
 
 /// Returns the sync status of the open wallet, or the reason it is unavailable.
@@ -260,6 +270,21 @@ private func syncToCompletion(_ what: String, deadlineSeconds: TimeInterval, sta
         throw ChainFailure(description: "the sync of \(what) failed after \(Date().timeIntervalSince(start)) s: \(error): \(syncStatusOrReason())")
     }
     print("\nSynced \(what) in \(Date().timeIntervalSince(syncStart)) s")
+}
+
+/// Syncs every 20 seconds until the spendable shielded balance reaches `minimum`, failing at the deadline with the balance the wallet holds.
+private func syncUntilSpendable(_ minimum: Int64, deadlineSeconds: TimeInterval, start: Date) throws {
+    while true {
+        let spendable: SpendableBalance = try decodeJSON(try getSpendableBalanceTotal())
+        if spendable.spendable_balance >= minimum {
+            return
+        }
+        if Date().timeIntervalSince(start) > deadlineSeconds {
+            throw ChainFailure(description: "the fixture wallet held \(spendable.spendable_balance) spendable zatoshis of the \(minimum) the test needs at its \(Int(deadlineSeconds)) s deadline: \(try getBalance())")
+        }
+        Thread.sleep(forTimeInterval: 20.0)
+        try syncToCompletion("the blocks mined while a spend from the published seed confirms", deadlineSeconds: deadlineSeconds, start: start)
+    }
 }
 
 final class ExecuteAddressesFromSeed: XCTestCase {
@@ -394,21 +419,7 @@ final class ExecuteSyncFromSeed: XCTestCase {
         let servers = [MainnetServers.PRIMARY, MainnetServers.FALLBACK]
         let start = Date()
 
-        var refusals: [String: Error] = [:]
-        var answer: (uri: String, tip: UInt64)?
-        for uri in servers {
-            do {
-                answer = (uri, try tipOf(uri))
-                break
-            } catch {
-                refusals[uri] = error
-            }
-        }
-        guard let answer else {
-            throw ChainFailure(description: "no mainnet server answered: \(refusals)")
-        }
-        let (serveruri, tip) = answer
-        print("\nTip of \(serveruri): \(tip)")
+        let (serveruri, tip) = try firstAnsweringServer("mainnet", servers)
 
         let birthday = tip - window
         let initJson = try initFromSeed(seed: seed, birthday: UInt32(birthday), serveruri: serveruri, chainhint: "main", performancelevel: "Medium", minconfirmations: UInt32(1))
@@ -444,10 +455,9 @@ final class ConfirmRefusesWithoutMixnet: XCTestCase {
         let fee: Int64 = 20_000
         let start = Date()
 
-        let tip = try testnetTip()
-        print("\nTip of \(TestnetFixture.SERVER): \(tip)")
+        let (serveruri, tip) = try firstAnsweringServer("testnet", TestnetFixture.SERVERS)
 
-        let initJson = try initFromSeed(seed: TestnetFixture.SEED, birthday: UInt32(TestnetFixture.BIRTHDAY), serveruri: TestnetFixture.SERVER, chainhint: TestnetFixture.CHAIN_HINT, performancelevel: "Medium", minconfirmations: UInt32(1))
+        let initJson = try initFromSeed(seed: TestnetFixture.SEED, birthday: UInt32(TestnetFixture.BIRTHDAY), serveruri: serveruri, chainhint: TestnetFixture.CHAIN_HINT, performancelevel: "Medium", minconfirmations: UInt32(1))
         print("\nInit from seed:\n\(initJson)")
         let initRes: InitFromSeed = try decodeJSON(initJson)
         XCTAssertEqual(initRes.seed_phrase, TestnetFixture.SEED)
@@ -478,10 +488,11 @@ final class ConfirmRefusesWithoutMixnet: XCTestCase {
         let vts: ValueTransfers = try decodeJSON(try getValueTransfers())
         XCTAssertTrue(vts.value_transfers.map(\.txid).contains(TestnetFixture.CONSOLIDATION_TXID))
 
+        try syncUntilSpendable(amount + fee, deadlineSeconds: TestnetFixture.DEADLINE_SECONDS, start: start)
+
         let balPreJson = try getBalance()
         print("\nBalance pre-send:\n\(balPreJson)")
         let balPre: Balance = try decodeJSON(balPreJson)
-        XCTAssertGreaterThanOrEqual(balPre.confirmed_orchard_balance + balPre.confirmed_ironwood_balance, amount + fee)
 
         let sendBodyData = try JSONEncoder().encode([SendResult(address: TestnetFixture.TRANSPARENT_ADDRESS, amount: amount, memo: nil)])
         let proposeJson = try send(sendJson: String(decoding: sendBodyData, as: UTF8.self))
@@ -509,7 +520,7 @@ final class ConfirmRefusesWithoutMixnet: XCTestCase {
         let balPostJson = try getBalance()
         print("\nBalance post-refusal:\n\(balPostJson)")
         let balPost: Balance = try decodeJSON(balPostJson)
-        XCTAssertGreaterThanOrEqual(balPost.confirmed_transparent_balance, balPre.confirmed_transparent_balance)
+        XCTAssertEqual(balPost.confirmed_transparent_balance, balPre.confirmed_transparent_balance)
     }
 }
 
@@ -519,10 +530,9 @@ final class RecoversConsolidationTransfer: XCTestCase {
 
         let start = Date()
 
-        let tip = try testnetTip()
-        print("\nTip of \(TestnetFixture.SERVER): \(tip)")
+        let (serveruri, tip) = try firstAnsweringServer("testnet", TestnetFixture.SERVERS)
 
-        let initJson = try initFromSeed(seed: TestnetFixture.SEED, birthday: UInt32(TestnetFixture.BIRTHDAY), serveruri: TestnetFixture.SERVER, chainhint: TestnetFixture.CHAIN_HINT, performancelevel: "Medium", minconfirmations: UInt32(1))
+        let initJson = try initFromSeed(seed: TestnetFixture.SEED, birthday: UInt32(TestnetFixture.BIRTHDAY), serveruri: serveruri, chainhint: TestnetFixture.CHAIN_HINT, performancelevel: "Medium", minconfirmations: UInt32(1))
         print("\nInit from seed:\n\(initJson)")
         let initRes: InitFromSeed = try decodeJSON(initJson)
         XCTAssertEqual(initRes.seed_phrase, TestnetFixture.SEED)
