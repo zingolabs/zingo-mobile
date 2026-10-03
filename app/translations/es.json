@@ -112,6 +112,7 @@
     "tagline": "Un monedero privado para tu Zcash.",
     "creating-title": "Creando tu monedero",
     "previous-install-title": "Monedero de una instalación anterior",
+    "saved-wallet-title": "Monedero guardado en este dispositivo",
     "previous-install-body": "Zingo ha encontrado una frase de recuperación guardada en este dispositivo. Crear o importar otro monedero la reemplaza.",
     "net-testnet": "Testnet",
     "net-regtest": "Regtest",

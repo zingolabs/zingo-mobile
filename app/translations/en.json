@@ -112,6 +112,7 @@
     "tagline": "A private wallet for your Zcash.",
     "creating-title": "Creating your wallet",
     "previous-install-title": "Wallet from a previous install",
+    "saved-wallet-title": "Wallet saved on this device",
     "previous-install-body": "Zingo found a recovery phrase saved on this device. Creating or importing another wallet replaces it.",
     "net-testnet": "Testnet",
     "net-regtest": "Regtest",

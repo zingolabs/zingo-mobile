@@ -112,6 +112,7 @@
     "tagline": "Приватный кошелёк для ваших Zcash.",
     "creating-title": "Создание кошелька",
     "previous-install-title": "Кошелёк из предыдущей установки",
+    "saved-wallet-title": "Кошелёк, сохранённый на этом устройстве",
     "previous-install-body": "Zingo нашёл фразу восстановления, сохранённую на этом устройстве. Создание или импорт другого кошелька заменит её.",
     "net-testnet": "Testnet",
     "net-regtest": "Regtest",

@@ -1626,6 +1626,9 @@ export class LoadingAppClass extends Component<
                     <StartMenu
                       actionButtonsDisabled={actionButtonsDisabled}
                       recoveryWallet={this.state.recoveryWallet}
+                      freshInstall={
+                        firstLaunchingMessage === LaunchingModeEnum.installing
+                      }
                       importRecoveryWallet={this.importRecoveryWallet}
                       viewRecoveryWallet={this.viewRecoveryWallet}
                       customServer={this.openServer}

@@ -112,6 +112,7 @@
     "tagline": "Zcash için özel bir cüzdan.",
     "creating-title": "Cüzdanınız oluşturuluyor",
     "previous-install-title": "Önceki kurulumdan cüzdan",
+    "saved-wallet-title": "Bu cihazda kayıtlı cüzdan",
     "previous-install-body": "Zingo bu cihazda kayıtlı bir kurtarma ifadesi buldu. Başka bir cüzdan oluşturmak veya içe aktarmak onu değiştirir.",
     "net-testnet": "Testnet",
     "net-regtest": "Regtest",

@@ -59,6 +59,8 @@ const pillExit = () => FadeOut.duration(300).reduceMotion(ReduceMotion.System);
 type StartMenuProps = {
   actionButtonsDisabled: boolean;
   recoveryWallet: WalletType | null;
+  // The saved phrase outlived an uninstall: only then is it "from a previous install".
+  freshInstall: boolean;
   importRecoveryWallet: () => void;
   viewRecoveryWallet: () => void;
   customServer: () => void;
@@ -71,6 +73,7 @@ type StartMenuProps = {
 const StartMenu: React.FunctionComponent<StartMenuProps> = ({
   actionButtonsDisabled,
   recoveryWallet,
+  freshInstall,
   importRecoveryWallet,
   viewRecoveryWallet,
   customServer,
@@ -365,7 +368,13 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
               color={colors.fgDefault}
             />
             <BoldText style={{ fontSize: 11, lineHeight: 16 }}>
-              {translate('loadingapp.previous-install-title') as string}
+              {
+                translate(
+                  freshInstall
+                    ? 'loadingapp.previous-install-title'
+                    : 'loadingapp.saved-wallet-title',
+                ) as string
+              }
             </BoldText>
           </View>
           <RegText

@@ -112,6 +112,7 @@
     "tagline": "Uma carteira privada para o seu Zcash.",
     "creating-title": "Criando sua carteira",
     "previous-install-title": "Carteira de uma instalação anterior",
+    "saved-wallet-title": "Carteira salva neste dispositivo",
     "previous-install-body": "O Zingo encontrou uma frase de recuperação salva neste dispositivo. Criar ou importar outra carteira a substitui.",
     "net-testnet": "Testnet",
     "net-regtest": "Regtest",
