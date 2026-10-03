@@ -88,6 +88,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
 
   const [containerH, setContainerH] = useState<number>(0);
   const [backOnline, setBackOnline] = useState<boolean>(false);
+  const [started, setStarted] = useState<string | null>(null);
   const wasOffline = useRef<boolean>(!netInfo.isConnected);
 
   useEffect(() => {
@@ -150,6 +151,18 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
     </Pressable>
   );
 
+  // Only the button that started the work collapses into its spinner; the
+  // other one stays as it is and ignores presses until the work ends.
+  const press = (testID: string, onPress: () => void) => () => {
+    if (actionButtonsDisabled) {
+      return;
+    }
+    setStarted(testID);
+    onPress();
+  };
+  const busyFor = (testID: string) =>
+    actionButtonsDisabled && started === testID;
+
   const pill = (title: string, onPress: () => void, testID: string) => (
     <View style={{ width: PILL_WIDTH }}>
       <BusyButton
@@ -157,8 +170,8 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
         title={title}
         labelSize={16}
         enabled={true}
-        busy={actionButtonsDisabled}
-        onPress={onPress}
+        busy={busyFor(testID)}
+        onPress={press(testID, onPress)}
         onDisabledPress={() => {}}
       />
     </View>
@@ -406,8 +419,8 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
               labelSize={11}
               height={30}
               enabled={true}
-              busy={actionButtonsDisabled}
-              onPress={importRecoveryWallet}
+              busy={busyFor('loadingapp.importthis')}
+              onPress={press('loadingapp.importthis', importRecoveryWallet)}
               onDisabledPress={() => {}}
             />
           </View>

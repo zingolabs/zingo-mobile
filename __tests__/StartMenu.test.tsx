@@ -1,6 +1,6 @@
 import 'react-native';
 import React from 'react';
-import { render, screen } from '@testing-library/react-native';
+import { fireEvent, render, screen } from '@testing-library/react-native';
 import {
   ContextAppLoadingProvider,
   defaultAppContextLoading,
@@ -41,4 +41,30 @@ test('Tests that the saved wallet card speaks of a wallet saved on the device wh
   mount(false);
   expect(screen.getByText('loadingapp.saved-wallet-title')).toBeOnTheScreen();
   expect(screen.queryByText('loadingapp.previous-install-title')).toBeNull();
+});
+
+test('Tests that only the pressed button shows its spinner when the work starts', () => {
+  const tree = (busy: boolean) => (
+    <ContextAppLoadingProvider
+      value={{ ...defaultAppContextLoading, translate: (key: string) => key }}
+    >
+      <StartMenu
+        actionButtonsDisabled={busy}
+        recoveryWallet={{ seed: 'abandon ability', birthday: 1994579 }}
+        freshInstall={false}
+        importRecoveryWallet={jest.fn()}
+        viewRecoveryWallet={jest.fn()}
+        customServer={jest.fn()}
+        walletExists={false}
+        openCurrentWallet={jest.fn()}
+        createNewWallet={jest.fn()}
+        getwalletToRestore={jest.fn()}
+      />
+    </ContextAppLoadingProvider>
+  );
+  render(tree(false));
+  fireEvent.press(screen.getByTestId('loadingapp.importthis'));
+  screen.rerender(tree(true));
+  expect(screen.getByTestId('loadingapp.importthis.spinner')).toBeOnTheScreen();
+  expect(screen.queryByTestId('loadingapp.createnewwallet.spinner')).toBeNull();
 });
