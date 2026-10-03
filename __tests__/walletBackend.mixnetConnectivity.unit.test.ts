@@ -24,9 +24,18 @@ jest.mock('@app/RPCModule', () =>
 );
 
 // The sync side is out of scope here: this suite judges the connectivity
-// decision alone, so the coordinator that would dial an indexer is inert.
+// decision alone, so the coordinator that would dial an indexer is inert. It
+// keeps the one duty the decision reads: a server switch lands on the shared
+// config, as the real changeServer does.
 jest.mock('@app/walletBackend/modules/SyncCoordinator', () => ({
   SyncCoordinator: class {
+    private readonly shared: { server: ServerType };
+    constructor(shared: { server: ServerType }) {
+      this.shared = shared;
+    }
+    changeServer(server: ServerType): void {
+      this.shared.server = server;
+    }
     async configure(): Promise<void> {}
     async clearTimers(): Promise<void> {}
   },
