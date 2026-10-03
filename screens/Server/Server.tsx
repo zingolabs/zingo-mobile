@@ -536,13 +536,6 @@ const Server: React.FunctionComponent<ServerProps> = ({
 
   return (
     <View style={{ flex: 1, backgroundColor: 'transparent' }}>
-      <ScreenHeader
-        testID="server.back"
-        title={translate('server.title') as string}
-        onBack={onBack}
-        disabled={busy}
-      />
-
       <View
         testID="server.card"
         style={{
@@ -709,6 +702,12 @@ const Server: React.FunctionComponent<ServerProps> = ({
         testID="server.done"
         title={translate('server.done') as string}
         onPress={onBack}
+        disabled={busy}
+      />
+      <ScreenHeader
+        testID="server.back"
+        title={translate('server.title') as string}
+        onBack={onBack}
         disabled={busy}
       />
     </View>

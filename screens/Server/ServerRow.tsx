@@ -224,7 +224,7 @@ export const ScreenHeader: React.FC<{
         testID={testID}
         onPress={onBack}
         disabled={disabled}
-        hitSlop={8}
+        hitSlop={14}
         accessibilityRole="button"
         style={({ pressed }) => ({
           position: 'absolute',

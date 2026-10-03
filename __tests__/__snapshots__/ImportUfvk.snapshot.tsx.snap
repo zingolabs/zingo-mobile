@@ -9,75 +9,6 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
     }
   }
 >
-  <View
-    accessibilityRole="button"
-    accessibilityState={
-      {
-        "busy": undefined,
-        "checked": undefined,
-        "disabled": false,
-        "expanded": undefined,
-        "selected": undefined,
-      }
-    }
-    accessibilityValue={
-      {
-        "max": undefined,
-        "min": undefined,
-        "now": undefined,
-        "text": undefined,
-      }
-    }
-    accessible={true}
-    collapsable={false}
-    focusable={true}
-    hitSlop={8}
-    onBlur={[Function]}
-    onClick={[Function]}
-    onFocus={[Function]}
-    onResponderGrant={[Function]}
-    onResponderMove={[Function]}
-    onResponderRelease={[Function]}
-    onResponderTerminate={[Function]}
-    onResponderTerminationRequest={[Function]}
-    onStartShouldSetResponder={[Function]}
-    style={
-      {
-        "alignItems": "center",
-        "backgroundColor": "transparent",
-        "borderRadius": 10,
-        "height": 44,
-        "justifyContent": "center",
-        "left": 17,
-        "opacity": 1,
-        "position": "absolute",
-        "top": 38,
-        "width": 44,
-        "zIndex": 3,
-      }
-    }
-    testID="import.back"
-  >
-    <
-      color="#18bd18"
-      icon={
-        {
-          "icon": [
-            320,
-            512,
-            [
-              9001,
-            ],
-            "f053",
-            "M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l192 192c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256 246.6 86.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-192 192z",
-          ],
-          "iconName": "chevron-left",
-          "prefix": "fas",
-        }
-      }
-      size={18}
-    />
-  </View>
   <Text
     style={
       {
@@ -635,6 +566,75 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
         </View>
       </View>
     </View>
+  </View>
+  <View
+    accessibilityRole="button"
+    accessibilityState={
+      {
+        "busy": undefined,
+        "checked": undefined,
+        "disabled": false,
+        "expanded": undefined,
+        "selected": undefined,
+      }
+    }
+    accessibilityValue={
+      {
+        "max": undefined,
+        "min": undefined,
+        "now": undefined,
+        "text": undefined,
+      }
+    }
+    accessible={true}
+    collapsable={false}
+    focusable={true}
+    hitSlop={14}
+    onBlur={[Function]}
+    onClick={[Function]}
+    onFocus={[Function]}
+    onResponderGrant={[Function]}
+    onResponderMove={[Function]}
+    onResponderRelease={[Function]}
+    onResponderTerminate={[Function]}
+    onResponderTerminationRequest={[Function]}
+    onStartShouldSetResponder={[Function]}
+    style={
+      {
+        "alignItems": "center",
+        "backgroundColor": "transparent",
+        "borderRadius": 10,
+        "height": 44,
+        "justifyContent": "center",
+        "left": 17,
+        "opacity": 1,
+        "position": "absolute",
+        "top": 38,
+        "width": 44,
+        "zIndex": 3,
+      }
+    }
+    testID="import.back"
+  >
+    <
+      color="#18bd18"
+      icon={
+        {
+          "icon": [
+            320,
+            512,
+            [
+              9001,
+            ],
+            "f053",
+            "M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l192 192c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256 246.6 86.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-192 192z",
+          ],
+          "iconName": "chevron-left",
+          "prefix": "fas",
+        }
+      }
+      size={18}
+    />
   </View>
 </View>
 `;

@@ -42,12 +42,6 @@ const ServerList: React.FunctionComponent<ServerListProps> = ({
 
   return (
     <View style={{ flex: 1, backgroundColor: 'transparent' }}>
-      <ScreenHeader
-        testID="serverlist.back"
-        title={translate('server.choose-title') as string}
-        onBack={onBack}
-        disabled={busy}
-      />
       <ScrollView
         style={{
           position: 'absolute',
@@ -94,6 +88,12 @@ const ServerList: React.FunctionComponent<ServerListProps> = ({
         testID="serverlist.done"
         title={translate('server.done') as string}
         onPress={onBack}
+        disabled={busy}
+      />
+      <ScreenHeader
+        testID="serverlist.back"
+        title={translate('server.choose-title') as string}
+        onBack={onBack}
         disabled={busy}
       />
     </View>

@@ -110,30 +110,6 @@ const ImportChooser: React.FunctionComponent<ImportChooserProps> = ({
 
   return (
     <View style={{ flex: 1, backgroundColor: 'transparent' }}>
-      <Pressable
-        testID="import.chooser.back"
-        onPress={onBack}
-        disabled={busy}
-        hitSlop={8}
-        accessibilityRole="button"
-        style={({ pressed }) => ({
-          position: 'absolute',
-          left: 17,
-          top: 38,
-          width: 44,
-          height: 44,
-          borderRadius: 10,
-          alignItems: 'center',
-          justifyContent: 'center',
-          backgroundColor: pressed ? colors.bgSurface : 'transparent',
-        })}
-      >
-        <FontAwesomeIcon
-          icon={faChevronLeft}
-          size={18}
-          color={colors.fgAccent}
-        />
-      </Pressable>
       <BoldText
         style={{
           position: 'absolute',
@@ -203,6 +179,30 @@ const ImportChooser: React.FunctionComponent<ImportChooserProps> = ({
           onPress={onSeed}
         />
       </View>
+      <Pressable
+        testID="import.chooser.back"
+        onPress={onBack}
+        disabled={busy}
+        hitSlop={14}
+        accessibilityRole="button"
+        style={({ pressed }) => ({
+          position: 'absolute',
+          left: 17,
+          top: 38,
+          width: 44,
+          height: 44,
+          borderRadius: 10,
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: pressed ? colors.bgSurface : 'transparent',
+        })}
+      >
+        <FontAwesomeIcon
+          icon={faChevronLeft}
+          size={18}
+          color={colors.fgAccent}
+        />
+      </Pressable>
     </View>
   );
 };
