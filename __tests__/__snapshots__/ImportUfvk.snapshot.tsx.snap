@@ -197,144 +197,142 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
           </View>
         </View>
       </View>
-      <View
-        accessibilityLabel=""
-      >
-        <View>
+      <View>
+        <View
+          style={
+            [
+              {
+                "backgroundColor": "#031124",
+                "borderColor": "#05234C",
+                "borderRadius": 12,
+                "borderWidth": 1,
+                "minHeight": 135,
+                "paddingBottom": 32,
+                "paddingHorizontal": 12,
+                "paddingTop": 14,
+              },
+              {},
+            ]
+          }
+        >
           <View
+            accessibilityState={
+              {
+                "busy": undefined,
+                "checked": undefined,
+                "disabled": undefined,
+                "expanded": undefined,
+                "selected": undefined,
+              }
+            }
+            accessibilityValue={
+              {
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
+              }
+            }
+            accessible={false}
+            collapsable={false}
+            focusable={true}
+            onBlur={[Function]}
+            onClick={[Function]}
+            onFocus={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              {
+                "alignItems": "center",
+                "columnGap": 11,
+                "flexDirection": "row",
+                "flexWrap": "wrap",
+                "rowGap": 15,
+              }
+            }
+          >
+            <View
+              layout={AnimationBuilder {}}
+              style={
+                {
+                  "flexGrow": 1,
+                  "height": 25,
+                  "justifyContent": "center",
+                  "minWidth": 90,
+                }
+              }
+            >
+              <Text
+                pointerEvents="none"
+                style={
+                  {
+                    "color": "#888888",
+                    "fontSize": 15,
+                    "left": 3,
+                    "position": "absolute",
+                  }
+                }
+              >
+                <Text
+                  style={
+                    {
+                      "color": "transparent",
+                    }
+                  }
+                />
+              </Text>
+              <TextInput
+                accessibilityLabel=""
+                accessible={true}
+                autoCapitalize="none"
+                autoComplete="off"
+                autoCorrect={false}
+                blurOnSubmit={false}
+                cursorColor="#18bd18"
+                keyboardType="visible-password"
+                onBlur={[Function]}
+                onChangeText={[Function]}
+                onFocus={[Function]}
+                onKeyPress={[Function]}
+                onSubmitEditing={[Function]}
+                spellCheck={false}
+                style={
+                  {
+                    "backgroundColor": "transparent",
+                    "color": "#c3c3c3",
+                    "fontSize": 15,
+                    "height": 25,
+                    "paddingLeft": 3,
+                    "paddingRight": 0,
+                    "paddingVertical": 0,
+                  }
+                }
+                testID="import.seedufvkinput"
+                textContentType="none"
+                value=""
+              />
+            </View>
+          </View>
+          <Text
             style={
               [
                 {
-                  "backgroundColor": "#031124",
-                  "borderColor": "#05234C",
-                  "borderRadius": 12,
-                  "borderWidth": 1,
-                  "minHeight": 135,
-                  "paddingBottom": 32,
-                  "paddingHorizontal": 12,
-                  "paddingTop": 14,
+                  "bottom": 12,
+                  "color": "#888888",
+                  "fontSize": 11,
+                  "position": "absolute",
+                  "right": 13,
                 },
                 {},
               ]
             }
           >
-            <View
-              accessibilityState={
-                {
-                  "busy": undefined,
-                  "checked": undefined,
-                  "disabled": undefined,
-                  "expanded": undefined,
-                  "selected": undefined,
-                }
-              }
-              accessibilityValue={
-                {
-                  "max": undefined,
-                  "min": undefined,
-                  "now": undefined,
-                  "text": undefined,
-                }
-              }
-              accessible={true}
-              collapsable={false}
-              focusable={true}
-              onBlur={[Function]}
-              onClick={[Function]}
-              onFocus={[Function]}
-              onResponderGrant={[Function]}
-              onResponderMove={[Function]}
-              onResponderRelease={[Function]}
-              onResponderTerminate={[Function]}
-              onResponderTerminationRequest={[Function]}
-              onStartShouldSetResponder={[Function]}
-              style={
-                {
-                  "alignItems": "center",
-                  "columnGap": 11,
-                  "flexDirection": "row",
-                  "flexWrap": "wrap",
-                  "rowGap": 15,
-                }
-              }
-            >
-              <View
-                layout={AnimationBuilder {}}
-                style={
-                  {
-                    "flexGrow": 1,
-                    "height": 25,
-                    "justifyContent": "center",
-                    "minWidth": 90,
-                  }
-                }
-              >
-                <Text
-                  pointerEvents="none"
-                  style={
-                    {
-                      "color": "#888888",
-                      "fontSize": 15,
-                      "left": 3,
-                      "position": "absolute",
-                    }
-                  }
-                >
-                  <Text
-                    style={
-                      {
-                        "color": "transparent",
-                      }
-                    }
-                  />
-                </Text>
-                <TextInput
-                  autoCapitalize="none"
-                  autoComplete="off"
-                  autoCorrect={false}
-                  blurOnSubmit={false}
-                  cursorColor="#18bd18"
-                  keyboardType="visible-password"
-                  onBlur={[Function]}
-                  onChangeText={[Function]}
-                  onFocus={[Function]}
-                  onKeyPress={[Function]}
-                  onSubmitEditing={[Function]}
-                  spellCheck={false}
-                  style={
-                    {
-                      "backgroundColor": "transparent",
-                      "color": "#c3c3c3",
-                      "fontSize": 15,
-                      "height": 25,
-                      "paddingLeft": 3,
-                      "paddingRight": 0,
-                      "paddingVertical": 0,
-                    }
-                  }
-                  testID="import.seedufvkinput"
-                  textContentType="none"
-                  value=""
-                />
-              </View>
-            </View>
-            <Text
-              style={
-                [
-                  {
-                    "bottom": 12,
-                    "color": "#888888",
-                    "fontSize": 11,
-                    "position": "absolute",
-                    "right": 13,
-                  },
-                  {},
-                ]
-              }
-            >
-              0 / 24
-            </Text>
-          </View>
+            0 / 24
+          </Text>
         </View>
       </View>
       <View
@@ -436,8 +434,6 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
           </View>
         </View>
         <View
-          accessibilityLabel=""
-          accessible={true}
           style={
             [
               {
@@ -457,6 +453,8 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
           }
         >
           <TextInput
+            accessibilityLabel=""
+            accessible={true}
             editable={false}
             keyboardType="numeric"
             onBlur={[Function]}

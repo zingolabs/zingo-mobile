@@ -24,7 +24,7 @@ import {
 import NetInfoType from '@app/AppState/types/NetInfoType';
 import {
   MixnetView,
-  mixnetPhase,
+  viewPhase,
 } from '@app/walletBackend/transforms/mixnetView';
 import FadeText from '@ui/primitives/FadeText';
 import MixnetIcon from '@ui/primitives/Icons/MixnetIcon';
@@ -38,7 +38,7 @@ type SyncStatusBarProps = {
   syncInProgress: boolean;
   viewSyncStatus: boolean;
   opacityValue: Animated.Value;
-  mixnetView: MixnetView | null;
+  mixnetView: MixnetView;
   translate: (key: string) => TranslateType;
   privacy: boolean;
   noPrivacy: boolean | undefined;
@@ -67,10 +67,7 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
   }) => {
     const navigation = useNavigation<NavigationProp<ParamListBase>>();
     const { colors } = useTheme();
-    const phase =
-      mixnetView !== null
-        ? mixnetPhase(mixnetView.statusKey, mixnetView.reconnecting)
-        : null;
+    const phase = viewPhase(mixnetView);
 
     return (
       <View
@@ -294,14 +291,13 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
 
         {/* Mixnet transport status, icon-only, and the way into the
             diagnostics: the icon that reports the trouble is the one that
-            opens the screen explaining it. Rendered only where the policy
-            runs (mixnetView is null on platforms whose transport has not
-            landed). A pulsing green halo means connecting, a bare icon means
-            ready, a coral halo means lost, a traveling yellow arc means
-            reconnecting, and the off glyph means the session went Offline —
+            opens the screen explaining it. Rendered only where the platform
+            has a transport. A pulsing green halo means connecting, a bare
+            icon means ready, a coral halo means lost, a traveling yellow arc
+            means reconnecting, and the off glyph means the session went Offline —
             the icon reports nym's own state, so it is never hidden to hide a
             transport that might still be up. */}
-        {mixnetView !== null && phase !== null && (
+        {phase !== 'absent' && (
           <TouchableOpacity
             testID="header.mixnet-status"
             accessibilityLabel={translate('settings.nym-diagnostics') as string}

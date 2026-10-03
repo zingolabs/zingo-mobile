@@ -70,8 +70,6 @@ const Memo: React.FunctionComponent<MemoProps> = ({
       }}
     >
       <View
-        accessible={true}
-        accessibilityLabel={translate('send.memo-acc') as string}
         style={{
           flexGrow: 1,
           borderWidth: 1,
@@ -86,6 +84,8 @@ const Memo: React.FunctionComponent<MemoProps> = ({
         <TextInput
           ref={inputRef}
           testID="send.memo-field"
+          accessible={true}
+          accessibilityLabel={translate('send.memo-acc') as string}
           multiline
           placeholder={translate('send.memo-placeholder') as string}
           placeholderTextColor={colors.fgMuted}

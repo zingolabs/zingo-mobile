@@ -62,6 +62,7 @@ const SeedSheet = forwardRef<BottomSheetModal, SeedSheetProps>(
     return (
       <BottomSheetModal
         ref={ref}
+        accessible={false}
         enableDynamicSizing
         enablePanDownToClose
         backdropComponent={renderBackdrop}

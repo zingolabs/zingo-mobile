@@ -1,0 +1,46 @@
+name: zingolib submodule
+description: >
+  Checks out the zingolib submodule, which holds the Binding Layer, at its
+  pinned commit. zingolib's own CI calls these workflows to test a zingolib
+  commit, so there the submodule moves to that commit instead.
+
+inputs:
+  tags:
+    description: >
+      Whether to fetch the submodule's tags, which the zl_ descriptor of
+      a native build reads.
+    required: false
+    default: 'false'
+
+runs:
+  using: composite
+  steps:
+    # A container job's workspace belongs to another user, and git refuses
+    # to read a repository it does not own.
+    - name: Trust the workspace and the submodule
+      shell: bash
+      run: |
+        git config --global --add safe.directory "$GITHUB_WORKSPACE"
+        git config --global --add safe.directory "$GITHUB_WORKSPACE/zingolib"
+
+    - name: Check out the pinned zingolib
+      shell: bash
+      run: git submodule update --init --depth 1 zingolib
+
+    - name: Move zingolib to the commit under test (zingolib CI)
+      if: ${{ contains(github.repository, 'zingolib') }}
+      shell: bash
+      run: |
+        git -C zingolib fetch --depth 1 origin "$GITHUB_SHA"
+        git -C zingolib checkout --detach FETCH_HEAD
+
+    # The zl_ descriptor names the release tag that points at HEAD, and
+    # a depth-1 fetch carries the tags.
+    - name: Fetch the tags for the descriptor
+      if: ${{ inputs.tags == 'true' }}
+      shell: bash
+      run: git -C zingolib fetch --tags --depth 1 origin
+
+    - name: Report the zingolib commit
+      shell: bash
+      run: echo "zingolib at $(git -C zingolib rev-parse HEAD)"

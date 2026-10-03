@@ -1,19 +1,43 @@
 appId: org.ZingoLabs.Zingo
 ---
-- launchApp:
-    clearState: true
+- runFlow:
+    file: common/create_wallet.yaml
 
-# A fresh install lands on the start menu: the wallet is created from there
-# and opens straight away.
+# A new wallet has its birthday at the chain tip. The check icon shows
+# while no sync is in progress.
 - extendedWaitUntil:
     visible:
-      id: "loadingapp.createnewwallet"
-    timeout: 120000
+      id: "header.checkicon"
+    timeout: 300000
+
+# Changing wallets shows the open wallet's seed first, then asks for
+# confirmation, then returns to the start menu.
 - tapOn:
-    id: "loadingapp.createnewwallet"
-
-
+    id: "header.drawmenu"
+- tapOn:
+    id: "menu.changewallet"
 - extendedWaitUntil:
     visible:
-      id: "header.drawmenu"
+      id: "seed.button.ok"
     timeout: 120000
+
+# The button is disabled until the seed loads from the keychain, and a
+# tap before then does nothing.
+- retry:
+    maxRetries: 3
+    commands:
+      - tapOn:
+          id: "seed.button.ok"
+      - extendedWaitUntil:
+          visible:
+            text: "Confirm"
+          timeout: 10000
+- tapOn:
+    text: "Confirm"
+
+- runFlow:
+    file: common/new_wallet_from_start_menu.yaml
+- extendedWaitUntil:
+    visible:
+      id: "header.checkicon"
+    timeout: 300000

@@ -1,0 +1,67 @@
+appId: org.ZingoLabs.Zingo
+---
+# Every flow starts from a clean install. Maestro does not run flows in
+# file order, and a flow that inherited the state of the previous one
+# would pass or fail on luck. A fresh install lands on the start menu on
+# mainnet, and each flow creates or restores its own wallet there.
+- launchApp:
+    clearState: true
+
+# The mainnet test wallet. Its seed is public, and the chain holds a
+# value transfer to it at 1994580, one block after its birthday.
+# A screen that is still moving when its element first shows can take a
+# tap at a place the element has left, and the tap then changes nothing
+# (see 02_options_menu.yaml). The wait lets the screen settle, and a tap
+# that changes nothing is tapped again.
+- extendedWaitUntil:
+    visible:
+      id: "loadingapp.restorewalletseedufvk"
+    timeout: 120000
+- waitForAnimationToEnd:
+    timeout: 5000
+- tapOn:
+    id: "loadingapp.restorewalletseedufvk"
+    retryTapIfNoChange: true
+
+# A recovery phrase left in the Keychain by an earlier install on iOS
+# puts a chooser before the seed form.
+- waitForAnimationToEnd:
+    timeout: 5000
+- runFlow:
+    when:
+      visible:
+        id: "import.chooser.seed"
+    commands:
+      - tapOn:
+          id: "import.chooser.seed"
+- extendedWaitUntil:
+    visible:
+      id: "import.seedufvkinput"
+    timeout: 120000
+- waitForAnimationToEnd:
+    timeout: 5000
+- tapOn:
+    id: "import.seedufvkinput"
+- inputText: "lottery multiply patient simple ivory leisure swift square west despair beauty match crowd margin reject box always title photo remind word diet ecology badge"
+
+# The birthday field accepts input once the server reports its latest
+# block, which the tooltip beside the label then shows as the end of
+# its range.
+- tapOn:
+    id: "import.birthdayinfo"
+- extendedWaitUntil:
+    visible:
+      text: "(?s).*Range: [0-9.,]+ – [0-9][0-9.,]*.*"
+    timeout: 60000
+- tapOn:
+    id: "import.birthdayinfo"
+- tapOn:
+    id: "import.birthdayinput"
+- inputText: "1994579"
+- tapOn:
+    id: "import.button.ok"
+    retryTapIfNoChange: true
+- extendedWaitUntil:
+    visible:
+      id: "header.drawmenu"
+    timeout: 120000

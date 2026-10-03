@@ -4,12 +4,18 @@ module.exports = {
   preset: 'react-native',
   resolver: '<rootDir>/jest.resolver.js',
   testEnvironment: '<rootDir>/jest-environment-react-native.js',
-  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
-  modulePathIgnorePatterns: ['e2e', '<rootDir>/.claude/'],
+  moduleFileExtensions: ['ts', 'tsx', 'js', 'mjs', 'jsx', 'json', 'node'],
+  // The zingolib submodule holds the Binding Layer's target and build
+  // directories, and no JavaScript, so the haste map skips it as Metro does.
+  modulePathIgnorePatterns: ['<rootDir>/.claude/', '<rootDir>/zingolib/'],
   // visual/ holds Playwright specs, run by `yarn visual:capture`.
-  testPathIgnorePatterns: ['/node_modules/', '<rootDir>/visual/'],
+  testPathIgnorePatterns: [
+    '/node_modules/',
+    '<rootDir>/visual/',
+    '<rootDir>/zingolib/',
+  ],
   transform: {
-    '\\.[jt]sx?$': 'babel-jest',
+    '\\.(mjs|[jt]sx?)$': 'babel-jest',
     '^.+\\.(bmp|gif|jpg|jpeg|mp4|png|psd|webp)$':
       '<rootDir>/node_modules/react-native/jest/assetFileTransformer.js',
   },

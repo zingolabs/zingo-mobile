@@ -288,14 +288,13 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
             </TouchableOpacity>
           </View>
         </View>
-        <View accessibilityLabel={translate('seed.seed-acc') as string}>
-          <SeedPhraseInput
-            testID="import.seedufvkinput"
-            value={seedufvkText}
-            onChangeValue={setSeedufvkText}
-            translate={translate}
-          />
-        </View>
+        <SeedPhraseInput
+          testID="import.seedufvkinput"
+          accessibilityLabel={translate('seed.seed-acc') as string}
+          value={seedufvkText}
+          onChangeValue={setSeedufvkText}
+          translate={translate}
+        />
 
         <View style={{ marginTop: 39, alignItems: 'center' }}>
           <InfoTooltip
@@ -307,8 +306,6 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
             onToggle={setTipOpen}
           />
           <Animated.View
-            accessible={true}
-            accessibilityLabel={translate('import.birthday-acc') as string}
             style={[
               {
                 marginTop: 14,
@@ -327,6 +324,8 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
           >
             <TextInput
               testID="import.birthdayinput"
+              accessible={true}
+              accessibilityLabel={translate('import.birthday-acc') as string}
               placeholder={translate('import.birthday-placeholder') as string}
               placeholderTextColor={colors.fgMuted}
               onFocus={() => setBirthdayFocused(true)}

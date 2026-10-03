@@ -11,6 +11,7 @@ import BackgroundTasks
 import Network
 import React_RCTAppDelegate
 import ReactAppDependencyProvider
+import ZingoBindings
 
 struct ScanRanges: Decodable {
     let priority: String

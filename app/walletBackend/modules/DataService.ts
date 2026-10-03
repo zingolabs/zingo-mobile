@@ -403,38 +403,43 @@ export class DataService {
     }
   }
 
+  // History waits for the first value-transfer publication, and the list is
+  // a wallet-local read. A failed height request keeps the last known height
+  // and lets the list publish. The transform falls back to the wallet height.
+  private async fetchServerHeight() {
+    const { server } = this.config;
+    if (server.kind === 'offline') {
+      this.lastServerBlockHeight = 0;
+      return;
+    }
+    try {
+      const start = Date.now();
+      const heightStr: string = await RPCModule.getLatestBlockServerInfo(
+        server.uri,
+      );
+      if (Date.now() - start > 4000) {
+        console.log(
+          '=========================================== > server height - ',
+          Date.now() - start,
+        );
+      }
+      if (heightStr) {
+        this.lastServerBlockHeight = Number(heightStr);
+      } else {
+        console.log('Internal Error server height');
+      }
+    } catch (error) {
+      this.config.onError(`Error server height: ${error}`);
+    }
+  }
+
   async fetchTandZandOValueTransfers() {
     if (this.fetchTandZandOValueTransfersLock) {
       return;
     }
     this.fetchTandZandOValueTransfersLock = true;
     try {
-      // The value transfers themselves are a wallet-local read. Asking the
-      // server for its height first made the whole fetch depend on a server:
-      // Offline it rejected here, the list was never published, and History
-      // waits for that first publication — so an Offline wallet span forever
-      // under an empty list. Zero is the right height for a session with no
-      // server, and the transform already falls back to the wallet's own.
-      const { server } = this.config;
-      if (server.kind === 'offline') {
-        this.lastServerBlockHeight = 0;
-      } else {
-        const start = Date.now();
-        const heightStr: string = await RPCModule.getLatestBlockServerInfo(
-          server.uri,
-        );
-        if (Date.now() - start > 4000) {
-          console.log(
-            '=========================================== > server height - ',
-            Date.now() - start,
-          );
-        }
-        if (heightStr) {
-          this.lastServerBlockHeight = Number(heightStr);
-        } else {
-          console.log('Internal Error server height');
-        }
-      }
+      await this.fetchServerHeight();
 
       const start2 = Date.now();
       const valueTransfersStr: string = await RPCModule.getValueTransfersList();

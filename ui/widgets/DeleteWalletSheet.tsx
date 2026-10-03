@@ -156,6 +156,7 @@ const DeleteWalletSheet = forwardRef<BottomSheetModal, DeleteWalletSheetProps>(
     return (
       <BottomSheetModal
         ref={ref}
+        accessible={false}
         enableDynamicSizing
         enablePanDownToClose
         backdropComponent={renderBackdrop}

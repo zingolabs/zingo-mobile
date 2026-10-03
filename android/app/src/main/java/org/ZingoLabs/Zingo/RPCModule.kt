@@ -51,6 +51,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         // init: a stray save of the in-memory wallet must not resurrect a
         // file the user replaced.
         @Volatile
+        @JvmField
         internal var walletFileClosed = false
     }
 

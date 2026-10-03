@@ -7,6 +7,7 @@
 
 import Foundation
 import React
+import ZingoBindings
 
 /// The outcome of an FFI call, classified by channel alone
 /// (zingo-mobile#1151): the value a call returns is resolved verbatim —

@@ -4,7 +4,7 @@ import {
   describeRejection,
 } from '@app/walletBackend/transforms/mixnetTransform';
 import {
-  MixnetView,
+  MixnetTransportView,
   deriveMixnetView,
 } from '@app/walletBackend/transforms/mixnetView';
 import {
@@ -138,7 +138,7 @@ export const BOOTSTRAP_REDRAW_LIMIT = 3;
 // session goes Offline.
 export class MixnetCoordinator {
   private readonly startTransport: StartMixnetTransport;
-  private readonly onChange: (view: MixnetView) => void;
+  private readonly onChange: (view: MixnetTransportView) => void;
   private readonly stopTransport: StopMixnetTransport;
 
   private pollTimerID?: ReturnType<typeof setInterval>;
@@ -157,7 +157,7 @@ export class MixnetCoordinator {
 
   constructor(
     startTransport: StartMixnetTransport,
-    onChange: (view: MixnetView) => void,
+    onChange: (view: MixnetTransportView) => void,
     stopTransport: StopMixnetTransport,
   ) {
     this.startTransport = startTransport;

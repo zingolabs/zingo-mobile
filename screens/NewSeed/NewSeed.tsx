@@ -30,6 +30,7 @@ import Header from '@ui/widgets/Header';
 import Utils from '@app/utils';
 import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
 import { useSecureScreen } from '@app/hooks/useSecureScreen';
+import { useTimedReveal } from '@app/hooks/useTimedReveal';
 import { showConfirm } from '@app/services/showConfirm';
 
 type TextsType = {
@@ -61,8 +62,9 @@ const NewSeed: React.FunctionComponent<NewSeedProps> = ({
   const secured = useSecureScreen();
 
   const [texts, setTexts] = useState<TextsType>({} as TextsType);
-  const [expandSeed, setExpandSeed] = useState<boolean>(true);
-  const [expandBirthday, setExpandBithday] = useState<boolean>(true);
+  const { visible: expandSeed, reveal: revealSeed } = useTimedReveal(privacy);
+  const { visible: expandBirthday, reveal: revealBirthday } =
+    useTimedReveal(privacy);
   const [containerH, setContainerH] = useState<number>(0);
   const [headerH, setHeaderH] = useState<number>(0);
   const newSeedSheetRef = useRef<BottomSheet>(null);
@@ -112,10 +114,7 @@ const NewSeed: React.FunctionComponent<NewSeedProps> = ({
               );
             }
             if (expandOnCopy) {
-              setExpandSeed(true);
-              if (privacy) {
-                setTimeout(() => setExpandSeed(false), 5 * 1000);
-              }
+              revealSeed();
             }
             clipboardTimer.current = setTimeout(() => {
               Clipboard.setString('');
@@ -136,28 +135,6 @@ const NewSeed: React.FunctionComponent<NewSeedProps> = ({
       ],
     });
   };
-
-  useEffect(() => {
-    if (privacy) {
-      setExpandSeed(false);
-      setExpandBithday(false);
-    } else {
-      setExpandSeed(true);
-      setExpandBithday(true);
-    }
-  }, [privacy]);
-
-  useEffect(() => {
-    if (!expandSeed && !privacy) {
-      setExpandSeed(true);
-    }
-  }, [expandSeed, privacy]);
-
-  useEffect(() => {
-    if (!expandBirthday && !privacy) {
-      setExpandBithday(true);
-    }
-  }, [expandBirthday, privacy]);
 
   useEffect(() => {
     const buttonTextsArray = translate('seed.buttontexts');
@@ -357,12 +334,7 @@ const NewSeed: React.FunctionComponent<NewSeedProps> = ({
                       SnackbarDurationEnum.short,
                     );
                   }
-                  setExpandBithday(true);
-                  if (privacy) {
-                    setTimeout(() => {
-                      setExpandBithday(false);
-                    }, 5 * 1000);
-                  }
+                  revealBirthday();
                 }
               }}
             >

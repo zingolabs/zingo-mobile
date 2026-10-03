@@ -37,6 +37,7 @@ type SeedPhraseInputProps = {
   onChangeValue: (value: string) => void;
   translate: (key: string) => TranslateType;
   testID?: string;
+  accessibilityLabel?: string;
 };
 
 const chipEnter = () =>
@@ -71,6 +72,7 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
   onChangeValue,
   translate,
   testID,
+  accessibilityLabel,
 }) => {
   const { colors } = useTheme();
   const [draft, setDraft] = useState('');
@@ -178,9 +180,7 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
     commit([...words, ...parts]);
   };
 
-  const onKeyPress = (
-    e: NativeSyntheticEvent<TextInputKeyPressEventData>,
-  ) => {
+  const onKeyPress = (e: NativeSyntheticEvent<TextInputKeyPressEventData>) => {
     if (e.nativeEvent.key === 'Backspace' && draft === '' && words.length) {
       removeWordAt(words.length - 1);
     }
@@ -221,6 +221,7 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
         ]}
       >
         <Pressable
+          accessible={false}
           onPress={() => inputRef.current?.focus()}
           style={{
             flexDirection: 'row',
@@ -315,6 +316,8 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
               <TextInput
                 ref={inputRef}
                 testID={testID}
+                accessible={true}
+                accessibilityLabel={accessibilityLabel}
                 value={draft}
                 onChangeText={onChangeText}
                 onKeyPress={onKeyPress}
