@@ -13,11 +13,11 @@ import {
   TranslateType,
 } from '@app/AppState';
 import TotalBalanceClass from '@app/AppState/classes/TotalBalanceClass';
-import NetInfoType from '@app/AppState/types/NetInfoType';
 import { shieldConfirm, shieldPropose } from '@app/walletBackend';
 import type { FfiResult } from '@app/walletBackend';
 import { RPCShieldProposeType } from '@app/walletBackend/types/RPCShieldProposeType';
 import { RPCShieldType } from '@app/walletBackend/types/RPCShieldType';
+import { SendPermit } from '@app/walletBackend/transforms/sendPermit';
 import Utils from '@app/utils';
 
 type UseShieldFundsInput = {
@@ -28,12 +28,12 @@ type UseShieldFundsInput = {
   totalBalance: TotalBalanceClass | null;
   shieldingAmount: number;
   translate: (key: string) => TranslateType;
-  netInfo: NetInfoType;
   addLastSnackbar:
     ((msg: string, duration?: SnackbarDurationEnum) => void) | undefined;
   setBackgroundError: ((title: string, err: string) => void) | undefined;
   setScrollToTop: ((v: boolean) => void) | undefined;
   setScrollToBottom: ((v: boolean) => void) | undefined;
+  sendPermitNow: () => SendPermit;
 };
 
 type UseShieldFundsResult = {
@@ -66,11 +66,11 @@ export function useShieldFunds({
   totalBalance,
   shieldingAmount,
   translate,
-  netInfo,
   addLastSnackbar,
   setBackgroundError,
   setScrollToTop,
   setScrollToBottom,
+  sendPermitNow,
 }: UseShieldFundsInput): UseShieldFundsResult {
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const [showShieldButton, setShowShieldButton] = useState<boolean>(false);
@@ -154,8 +154,9 @@ export function useShieldFunds({
     if (!setBackgroundError || !addLastSnackbar) {
       return;
     }
-    if (!netInfo.isConnected || server.kind === 'offline') {
-      addLastSnackbar(translate('loadedapp.connection-error') as string);
+    const permit = sendPermitNow();
+    if (permit.kind === 'error') {
+      addLastSnackbar(translate(permit.errorKey) as string);
       return;
     }
 
@@ -193,8 +194,7 @@ export function useShieldFunds({
   }, [
     setBackgroundError,
     addLastSnackbar,
-    netInfo.isConnected,
-    server,
+    sendPermitNow,
     translate,
     navigation,
     setScrollToTop,

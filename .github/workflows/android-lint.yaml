@@ -3,17 +3,27 @@ name: Android lint
 on:
   workflow_call:
     inputs:
+      # The key from create-cache-key.yaml, which names the pin and the
+      # toolchain that the Kotlin bindings come from.
+      cache-key:
+        required: true
+        type: string
       # Fail-all (see CONTEXT.md): when true, a failure here cancels the
       # whole run. PR CI opts in; ci-nightly does not.
       fail-all:
         required: false
         type: boolean
         default: false
+      # Runner label for the lint job. PR CI passes CI_GRADLE_RUNNER.
+      runner:
+        required: false
+        type: string
+        default: ubuntu-24.04
 
 jobs:
   android-lint:
     name: Andr lint (fast)
-    runs-on: ubuntu-24.04
+    runs-on: ${{ inputs.runner }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
@@ -32,14 +42,19 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v6
+      - name: Gradle cache
+        uses: ./.github/actions/gradle-cache
 
-      # Same script developers run locally, so a green CI lint and a green
-      # local lint mean the same thing. It stages the checked-in UniFFI
-      # bindings itself, skipping the ~20-minute native build.
-      - name: Generate UniFFI bindings
+      # The lint below is the same script developers run locally, so a green
+      # CI lint and a green local lint mean the same thing. Both take the
+      # Kotlin bindings that the builder's kotlin mode generates on the host.
+      - name: Check out zingolib
+        uses: ./.github/actions/zingolib-submodule
+
+      - name: Generate the Kotlin bindings
         uses: ./.github/actions/kotlin-bindings
+        with:
+          cache-key: ${{ inputs.cache-key }}
 
       - name: Lint release
         run: yarn lint:android
@@ -54,7 +69,7 @@ jobs:
 
       - name: Cancel the run on failure (fail-all)
         if: ${{ failure() && inputs.fail-all }}
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9
         with:
           script: |
             await github.rest.actions.cancelWorkflowRun({

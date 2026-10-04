@@ -1,4 +1,8 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
 import {
+  OWNED_MIXNET_MARKER,
   SendFailureClass,
   classifySendFailure,
   retryOnAnotherServer,
@@ -169,6 +173,18 @@ describe('the mobile-owned refusal marker (#1229)', () => {
     const failure = classifySendFailure(reworded);
     expect(failure.kind).toBe('mixnetRefusal');
     expect(retryOnAnotherServer(failure)).toBe(false);
+  });
+
+  /**
+   * Tests that the marker equals the display prefix of `ZingolibError::Mixnet`
+   * when the zingolib submodule sits at its pinned commit.
+   */
+  it('matches the display prefix that the pinned zingolib mints', () => {
+    const ffi = readFileSync(
+      join(__dirname, '..', 'zingolib', 'zingo-ffi', 'lib', 'src', 'lib.rs'),
+      'utf8',
+    );
+    expect(ffi).toContain(`#[error("${OWNED_MIXNET_MARKER} {0}")]`);
   });
 
   it('the excluded-indexer exhaustion is a deliberate serverSuspect: switching servers changes eligibility', () => {

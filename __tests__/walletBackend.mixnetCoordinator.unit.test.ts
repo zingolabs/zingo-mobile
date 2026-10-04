@@ -13,10 +13,11 @@ import {
   StopMixnetTransport,
 } from '@app/walletBackend/modules/MixnetCoordinator';
 import {
+  ABSENT_MIXNET_VIEW,
+  MixnetTransportView,
   deriveMixnetView,
   sendGateOpen,
 } from '@app/walletBackend/transforms/mixnetView';
-import { MixnetView } from '@app/walletBackend/transforms/mixnetView';
 import { mixnetStatusPayload as statusPayload } from '../__mocks__/dataMocks/mockMixnetStatus';
 
 jest.mock('@app/RPCModule', () =>
@@ -78,8 +79,8 @@ const READY = statusPayload('ready', transportBinding.socks5Addr);
 
 type RecordingCoordinator = {
   coordinator: MixnetCoordinator;
-  published: MixnetView[];
-  lastView: () => MixnetView;
+  published: MixnetTransportView[];
+  lastView: () => MixnetTransportView;
 };
 
 // Every construction here injects a stub transport stop: these tests judge the
@@ -89,7 +90,7 @@ function recordingCoordinator(
   startTransport: StartMixnetTransport,
   stopTransport: StopMixnetTransport = jest.fn().mockResolvedValue(undefined),
 ): RecordingCoordinator {
-  const published: MixnetView[] = [];
+  const published: MixnetTransportView[] = [];
   const coordinator = new MixnetCoordinator(
     startTransport,
     view => published.push(view),
@@ -113,7 +114,7 @@ describe('deriveMixnetView', () => {
   const noDetail = null;
 
   it('blocks sending in every state except ready', () => {
-    const blocked = (view: MixnetView) => view.sendBlocked;
+    const blocked = (view: MixnetTransportView) => view.sendBlocked;
     expect(
       blocked(
         deriveMixnetView(
@@ -255,19 +256,21 @@ describe('afterSettled', () => {
 });
 
 describe('sendGateOpen', () => {
-  const view = (statusKey: MixnetView['statusKey'], sendBlocked: boolean) =>
-    ({
-      ...deriveMixnetView(
-        {
-          kind: 'status',
-          indicator: RPCMixnetIndicatorEnum.ready,
-          socks5Addr: '127.0.0.1:1080',
-        },
-        null,
-      ),
-      statusKey,
-      sendBlocked,
-    }) as MixnetView;
+  const view = (
+    statusKey: MixnetTransportView['statusKey'],
+    sendBlocked: boolean,
+  ): MixnetTransportView => ({
+    ...deriveMixnetView(
+      {
+        kind: 'status',
+        indicator: RPCMixnetIndicatorEnum.ready,
+        socks5Addr: '127.0.0.1:1080',
+      },
+      null,
+    ),
+    statusKey,
+    sendBlocked,
+  });
 
   it('follows the fail-closed verdict: a send waits for a usable transport', () => {
     expect(sendGateOpen(view('mixnet.status.died', true))).toBe(false);
@@ -275,8 +278,8 @@ describe('sendGateOpen', () => {
     expect(sendGateOpen(view('mixnet.status.ready', false))).toBe(true);
   });
 
-  it('opens where no mixnet policy runs', () => {
-    expect(sendGateOpen(null)).toBe(true);
+  it('Tests that the gate opens when the platform has no mixnet transport.', () => {
+    expect(sendGateOpen(ABSENT_MIXNET_VIEW)).toBe(true);
   });
 });
 

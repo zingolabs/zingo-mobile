@@ -30,7 +30,7 @@ import {
   MixnetCoordinator,
   MixnetTransportBinding,
 } from '@app/walletBackend/modules/MixnetCoordinator';
-import { MixnetView } from '@app/walletBackend/transforms/mixnetView';
+import { MixnetTransportView } from '@app/walletBackend/transforms/mixnetView';
 import { mixnetStatusPayload as statusPayload } from '../__mocks__/dataMocks/mockMixnetStatus';
 
 jest.mock('@app/RPCModule', () =>
@@ -87,7 +87,7 @@ type Scenario = {
 
 type Trace = {
   readonly events: readonly string[];
-  readonly views: readonly MixnetView[];
+  readonly views: readonly MixnetTransportView[];
   // The shim's state at rest: the proxy still running, if any.
   readonly liveProxy: number | null;
   readonly timersLeft: number;
@@ -192,7 +192,7 @@ async function run(scenario: Scenario): Promise<Trace> {
     JSON.stringify({ detail: '' }),
   );
 
-  const views: MixnetView[] = [];
+  const views: MixnetTransportView[] = [];
   const coordinator = new MixnetCoordinator(
     startTransport,
     view => {

@@ -106,3 +106,26 @@ describe('the wallet-local reads an Offline session still needs', () => {
     );
   });
 });
+
+describe('a failed server height request', () => {
+  // Tests that the value transfers publish when the height request rejects.
+  // iOS rejects the first dial after a resume from background with ENOTCONN.
+  it('publishes the value transfers and keeps the last known height', async () => {
+    mockedBridge.getLatestBlockServerInfo.mockRejectedValue(
+      new Error(
+        'Error: read: transport error: Socket is not connected (os error 57)',
+      ),
+    );
+    const { service, onValueTransfersChanged, onError } = serviceFor(ONLINE);
+    service.lastServerBlockHeight = 3495276;
+
+    await service.fetchTandZandOValueTransfers();
+
+    expect(onValueTransfersChanged).toHaveBeenCalledWith([], 0);
+    expect(service.lastServerBlockHeight).toBe(3495276);
+    expect(onError).toHaveBeenCalledWith(
+      expect.stringContaining('Error server height'),
+    );
+    expect(service.onSyncError).not.toHaveBeenCalled();
+  });
+});
