@@ -421,6 +421,7 @@ export class LoadingAppClass extends Component<
       serverStatus: 'ok',
       serverBlockHeight: '',
       serverLatencies: {},
+      serverLists: {},
       serverReturn: RouteEnum.StartMenu,
     };
   }
@@ -1390,13 +1391,39 @@ export class LoadingAppClass extends Component<
     }));
   };
 
-  // Each listed server of a chain is probed once per visit to the screen.
+  // The servers offered for a chain: the live registry once it has
+  // answered, the static list until then and whenever it does not.
+  serversFor = (chain: ChainNameEnum): ServerUrisType[] =>
+    this.state.serverLists[chain] ??
+    serverUris(this.state.translate).filter(
+      s => s.chainName === chain && !s.obsolete,
+    );
+
+  // Loads a chain's list from the registry once, then times every server
+  // in it from this device.
   probeServers = async (chain: ChainNameEnum) => {
-    const pending = serverUris(this.state.translate).filter(
-      s =>
-        s.chainName === chain &&
-        !s.obsolete &&
-        this.state.serverLatencies[s.uri] === undefined,
+    if (!this.state.serverLists[chain] && this.state.netInfo.isConnected) {
+      const regions = new Map(
+        serverUris(this.state.translate).map(s => [s.uri, s.region]),
+      );
+      const live = (await fetchServerList(chain)).map(s => ({
+        ...s,
+        region: regions.get(s.uri) ?? '',
+      }));
+      if (this.unmounted) {
+        return;
+      }
+      if (live.length > 0) {
+        await new Promise<void>(resolve =>
+          this.setState(
+            state => ({ serverLists: { ...state.serverLists, [chain]: live } }),
+            resolve,
+          ),
+        );
+      }
+    }
+    const pending = this.serversFor(chain).filter(
+      s => this.state.serverLatencies[s.uri] === undefined,
     );
     await Promise.all(
       pending.map(async s => {
@@ -1677,7 +1704,10 @@ export class LoadingAppClass extends Component<
                       status={this.state.serverStatus}
                       blockHeight={this.state.serverBlockHeight}
                       busy={actionButtonsDisabled}
-                      servers={serverUris(translate)}
+                      servers={[
+                        ...this.serversFor(ChainNameEnum.mainChainName),
+                        ...this.serversFor(ChainNameEnum.testChainName),
+                      ]}
                       latencies={this.state.serverLatencies}
                       onAuto={this.chooseAutomatic}
                       onPick={this.pickServer}
@@ -1692,11 +1722,7 @@ export class LoadingAppClass extends Component<
                   )}
                   {screen === RouteEnum.ServerList && (
                     <ServerList
-                      servers={serverUris(translate).filter(
-                        s =>
-                          s.chainName === ChainNameEnum.mainChainName &&
-                          !s.obsolete,
-                      )}
+                      servers={this.serversFor(ChainNameEnum.mainChainName)}
                       latencies={this.state.serverLatencies}
                       selectedUri={
                         this.state.server.kind === 'remote' &&
