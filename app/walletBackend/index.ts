@@ -54,6 +54,7 @@ export {
   reconcileMigration,
   removeTransaction,
   rescheduleParts,
+  deleteExistingWallet,
   resolvedTrue,
   restoreExistingWalletBackup,
   restoreWalletFromSeed,

@@ -22,6 +22,18 @@ appId: org.ZingoLabs.Zingo
 - tapOn:
     id: "loadingapp.restorewalletseedufvk"
     retryTapIfNoChange: true
+
+# A recovery phrase left in the Keychain by an earlier install on iOS
+# puts a chooser before the seed form.
+- waitForAnimationToEnd:
+    timeout: 5000
+- runFlow:
+    when:
+      visible:
+        id: "import.chooser.seed"
+    commands:
+      - tapOn:
+          id: "import.chooser.seed"
 - extendedWaitUntil:
     visible:
       id: "import.seedufvkinput"
@@ -33,12 +45,16 @@ appId: org.ZingoLabs.Zingo
 - inputText: "lottery multiply patient simple ivory leisure swift square west despair beauty match crowd margin reject box always title photo remind word diet ecology badge"
 
 # The birthday field accepts input once the server reports its latest
-# block, which the hint under the label then shows next to the Sapling
-# activation height.
+# block, which the tooltip beside the label then shows as the end of
+# its range.
+- tapOn:
+    id: "import.birthdayinfo"
 - extendedWaitUntil:
     visible:
-      text: "(?s).*\\(419200, [0-9]+\\).*"
+      text: "(?s).*Range: [0-9.,]+ – [0-9][0-9.,]*.*"
     timeout: 60000
+- tapOn:
+    id: "import.birthdayinfo"
 - tapOn:
     id: "import.birthdayinput"
 - inputText: "1994579"
