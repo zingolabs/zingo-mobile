@@ -19,6 +19,7 @@ import { mockZecPrice } from '../__mocks__/dataMocks/mockZecPrice';
 import { mockServer } from '../__mocks__/dataMocks/mockServer';
 import mockSendPageState from '../__mocks__/dataMocks/mockSendPageState';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { NetInfoStateType } from '@react-native-community/netinfo/src/index';
 import { AppDrawerParamList } from '@app/types';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
@@ -50,6 +51,11 @@ describe('Confirm - snapshots', () => {
   state.totalBalance = mockTotalBalance;
   state.zecPrice = mockZecPrice;
   state.server = mockServer;
+  state.netInfo = {
+    isConnected: true,
+    type: NetInfoStateType.wifi,
+    isConnectionExpensive: false,
+  };
   // sendConfirm disabled here so the on-mount biometric gate in Confirm.tsx
   // stays inactive and the snapshot captures the actual Confirm UI rather
   // than the auth placeholder.

@@ -22,6 +22,7 @@
 
 import Foundation
 import React
+import ZingoBindings
 
 /// The identity decision for a proxy death report (#1227): a death may clear
 /// only the handle its observer was started for. Closed so the observer must

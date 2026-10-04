@@ -16,7 +16,7 @@ import {
 } from '../__mocks__/dataMocks/mockServer';
 import { mockWalletBackendConfig } from '../__mocks__/dataMocks/mockWalletBackendConfig';
 import { mixnetStatusPayload } from '../__mocks__/dataMocks/mockMixnetStatus';
-import { MixnetView } from '@app/walletBackend/transforms/mixnetView';
+import { MixnetTransportView } from '@app/walletBackend/transforms/mixnetView';
 import WalletBackend from '@app/walletBackend/WalletBackend';
 
 jest.mock('@app/RPCModule', () =>
@@ -40,7 +40,7 @@ type Harness = {
   backend: WalletBackend;
   start: jest.Mock;
   stop: jest.Mock;
-  published: MixnetView[];
+  published: MixnetTransportView[];
 };
 
 function harness(server: ServerType, mixnetSupported: boolean = true): Harness {
@@ -48,9 +48,9 @@ function harness(server: ServerType, mixnetSupported: boolean = true): Harness {
     .fn()
     .mockResolvedValue({ socks5Addr: '127.0.0.1:1080', exitNode: 'exit' });
   const stop = jest.fn().mockResolvedValue(undefined);
-  const published: MixnetView[] = [];
+  const published: MixnetTransportView[] = [];
   const config = mockWalletBackendConfig({
-    onMixnetViewChanged: (view: MixnetView) => published.push(view),
+    onMixnetViewChanged: (view: MixnetTransportView) => published.push(view),
     startMixnetTransport: start,
     stopMixnetTransport: stop,
     mixnetSupported,
