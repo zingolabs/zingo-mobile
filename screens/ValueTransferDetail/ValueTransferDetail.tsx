@@ -411,6 +411,7 @@ const ValueTransferDetail: React.FunctionComponent<
           </View>
         )}
         <BottomSheetScrollView
+          testID="valuetransferdetail.scroll-view"
           showsVerticalScrollIndicator={true}
           persistentScrollbar={true}
           indicatorStyle={'white'}

@@ -25,7 +25,7 @@ export type OptionsPanelAction = {
   /** Greys out the cell and disables onPress. */
   disabled?: boolean;
   /** testID for the action cell. Matches the legacy `menu.*` slugs used by
-   *  Maestro flows and detox helpers. */
+   *  Maestro flows. */
   testID?: string;
 };
 
