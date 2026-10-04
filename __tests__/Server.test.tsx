@@ -60,6 +60,7 @@ const mount = (
       blockHeight="3473752"
       busy={false}
       servers={servers}
+      loadedChains={[ChainNameEnum.mainChainName, ChainNameEnum.testChainName]}
       latencies={{}}
       {...h}
       {...props}
@@ -126,6 +127,7 @@ test('Tests that a server that did not answer is refused and a reachable one is 
         'https://na.zec.rocks:443': 142,
       }}
       selectedUri={null}
+      loading={false}
       busy={false}
       onPick={onPick}
       onUnreachable={onUnreachable}
@@ -137,4 +139,26 @@ test('Tests that a server that did not answer is refused and a reachable one is 
   expect(onPick).not.toHaveBeenCalled();
   fireEvent.press(screen.getByTestId('serverlist.pick.na.zec.rocks:443'));
   expect(onPick).toHaveBeenCalledWith(servers[1]);
+});
+
+test('Tests that loading dots stand in for the listed servers until the chain list arrives', () => {
+  mount({ loadedChains: [] });
+  fireEvent.press(
+    screen.getByTestId(`server.net.${ChainNameEnum.testChainName}`),
+  );
+  expect(screen.getByTestId('server.list.loading')).toBeOnTheScreen();
+
+  wrap(
+    <ServerList
+      servers={[]}
+      loading={true}
+      latencies={{}}
+      selectedUri={null}
+      busy={false}
+      onPick={jest.fn()}
+      onUnreachable={jest.fn()}
+      onBack={jest.fn()}
+    />,
+  );
+  expect(screen.getByTestId('serverlist.loading')).toBeOnTheScreen();
 });

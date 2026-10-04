@@ -1391,36 +1391,35 @@ export class LoadingAppClass extends Component<
     }));
   };
 
-  // The servers offered for a chain: the live registry once it has
-  // answered, the static list until then and whenever it does not.
+  // The servers offered for a chain; empty until its list has loaded.
   serversFor = (chain: ChainNameEnum): ServerUrisType[] =>
-    this.state.serverLists[chain] ??
-    serverUris(this.state.translate).filter(
-      s => s.chainName === chain && !s.obsolete,
-    );
+    this.state.serverLists[chain] ?? [];
 
-  // Loads a chain's list from the registry once, then times every server
-  // in it from this device.
+  // Loads a chain's list once, from the registry or, when that gives
+  // nothing, from the static list; then times every server from this device.
   probeServers = async (chain: ChainNameEnum) => {
-    if (!this.state.serverLists[chain] && this.state.netInfo.isConnected) {
-      const regions = new Map(
-        serverUris(this.state.translate).map(s => [s.uri, s.region]),
-      );
-      const live = (await fetchServerList(chain)).map(s => ({
-        ...s,
-        region: regions.get(s.uri) ?? '',
-      }));
+    if (!this.state.serverLists[chain]) {
+      const known = serverUris(this.state.translate);
+      const regions = new Map(known.map(s => [s.uri, s.region]));
+      const live = this.state.netInfo.isConnected
+        ? (await fetchServerList(chain)).map(s => ({
+            ...s,
+            region: regions.get(s.uri) ?? '',
+          }))
+        : [];
       if (this.unmounted) {
         return;
       }
-      if (live.length > 0) {
-        await new Promise<void>(resolve =>
-          this.setState(
-            state => ({ serverLists: { ...state.serverLists, [chain]: live } }),
-            resolve,
-          ),
-        );
-      }
+      const list =
+        live.length > 0
+          ? live
+          : known.filter(s => s.chainName === chain && !s.obsolete);
+      await new Promise<void>(resolve =>
+        this.setState(
+          state => ({ serverLists: { ...state.serverLists, [chain]: list } }),
+          resolve,
+        ),
+      );
     }
     const pending = this.serversFor(chain).filter(
       s => this.state.serverLatencies[s.uri] === undefined,
@@ -1708,6 +1707,7 @@ export class LoadingAppClass extends Component<
                         ...this.serversFor(ChainNameEnum.mainChainName),
                         ...this.serversFor(ChainNameEnum.testChainName),
                       ]}
+                      loadedChains={Object.keys(this.state.serverLists)}
                       latencies={this.state.serverLatencies}
                       onAuto={this.chooseAutomatic}
                       onPick={this.pickServer}
@@ -1723,6 +1723,9 @@ export class LoadingAppClass extends Component<
                   {screen === RouteEnum.ServerList && (
                     <ServerList
                       servers={this.serversFor(ChainNameEnum.mainChainName)}
+                      loading={
+                        !this.state.serverLists[ChainNameEnum.mainChainName]
+                      }
                       latencies={this.state.serverLatencies}
                       selectedUri={
                         this.state.server.kind === 'remote' &&

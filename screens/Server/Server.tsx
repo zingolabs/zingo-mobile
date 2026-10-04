@@ -42,6 +42,8 @@ type ServerProps = {
   blockHeight: string;
   busy: boolean;
   servers: ServerUrisType[];
+  // Chains whose server list has arrived; the others show loading dots.
+  loadedChains: string[];
   latencies: Record<string, number | null>;
   onAuto: (chain: ChainNameEnum) => void;
   onPick: (server: ServerUrisType) => void;
@@ -176,6 +178,7 @@ const Server: React.FunctionComponent<ServerProps> = ({
   blockHeight,
   busy,
   servers,
+  loadedChains,
   latencies,
   onAuto,
   onPick,
@@ -480,6 +483,19 @@ const Server: React.FunctionComponent<ServerProps> = ({
     body = (
       <RowCard>
         {automaticRow}
+        {!loadedChains.includes(onTab) && (
+          <View
+            testID="server.list.loading"
+            style={{
+              height: 55,
+              justifyContent: 'center',
+              borderTopWidth: 1,
+              borderTopColor: ROW_DIVIDER,
+            }}
+          >
+            <LoadingDots size={6} gap={5} />
+          </View>
+        )}
         {rows.map(s => (
           <ServerRow
             key={s.uri}

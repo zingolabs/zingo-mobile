@@ -4,6 +4,7 @@ import { ScrollView, View } from 'react-native';
 
 import { ContextAppLoading } from '@app/context';
 import { ServerUrisType } from '@app/AppState';
+import { LoadingDots } from '@ui/widgets/ProgressState';
 import ServerRow, {
   DoneButton,
   Latency,
@@ -13,6 +14,7 @@ import ServerRow, {
 
 type ServerListProps = {
   servers: ServerUrisType[];
+  loading: boolean;
   latencies: Record<string, number | null>;
   selectedUri: string | null;
   busy: boolean;
@@ -30,6 +32,7 @@ const hostOf = (uri: string) => uri.replace(/^https?:\/\//, '');
 // shakes instead of being picked.
 const ServerList: React.FunctionComponent<ServerListProps> = ({
   servers,
+  loading,
   latencies,
   selectedUri,
   busy,
@@ -53,36 +56,43 @@ const ServerList: React.FunctionComponent<ServerListProps> = ({
         contentContainerStyle={{ paddingBottom: 16 }}
         showsVerticalScrollIndicator={false}
       >
-        <RowCard>
-          {servers.map((s, i) => (
-            <ServerRow
-              key={s.uri}
-              testID={`serverlist.pick.${hostOf(s.uri)}`}
-              first={i === 0}
-              title={hostOf(s.uri)}
-              sub={s.region}
-              selected={selectedUri === s.uri}
-              disabled={busy}
-              shake={shakes[s.uri] ?? 0}
-              right={
-                <Latency
-                  ms={latencies[s.uri]}
-                  notResponding={translate('server.not-responding') as string}
-                />
-              }
-              onPress={() => {
-                if (latencies[s.uri] === null) {
-                  setShakes(k => ({ ...k, [s.uri]: (k[s.uri] ?? 0) + 1 }));
-                  onUnreachable();
-                  return;
+        {loading && (
+          <View style={{ paddingTop: 40 }}>
+            <LoadingDots testID="serverlist.loading" />
+          </View>
+        )}
+        {!loading && (
+          <RowCard>
+            {servers.map((s, i) => (
+              <ServerRow
+                key={s.uri}
+                testID={`serverlist.pick.${hostOf(s.uri)}`}
+                first={i === 0}
+                title={hostOf(s.uri)}
+                sub={s.region}
+                selected={selectedUri === s.uri}
+                disabled={busy}
+                shake={shakes[s.uri] ?? 0}
+                right={
+                  <Latency
+                    ms={latencies[s.uri]}
+                    notResponding={translate('server.not-responding') as string}
+                  />
                 }
-                if (selectedUri !== s.uri) {
-                  onPick(s);
-                }
-              }}
-            />
-          ))}
-        </RowCard>
+                onPress={() => {
+                  if (latencies[s.uri] === null) {
+                    setShakes(k => ({ ...k, [s.uri]: (k[s.uri] ?? 0) + 1 }));
+                    onUnreachable();
+                    return;
+                  }
+                  if (selectedUri !== s.uri) {
+                    onPick(s);
+                  }
+                }}
+              />
+            ))}
+          </RowCard>
+        )}
       </ScrollView>
       <DoneButton
         testID="serverlist.done"

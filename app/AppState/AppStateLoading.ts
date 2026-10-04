@@ -35,7 +35,7 @@ export default interface AppStateLoading {
   serverBlockHeight: string;
   // uri → latency in ms, null when the server did not answer the probe.
   serverLatencies: Record<string, number | null>;
-  // chain → servers from the live registry; absent until it answers.
+  // chain → servers offered for it; absent until its list has loaded.
   serverLists: Record<string, ServerUrisType[]>;
   // Where Done on the Server screen goes back to.
   serverReturn: RouteEnum;
