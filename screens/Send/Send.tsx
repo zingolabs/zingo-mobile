@@ -62,9 +62,7 @@ import {
   SendPageStateClass,
   ToAddrClass,
   GlobalConst,
-  ServerUrisType,
   ServerType,
-  remoteServer,
   SetServerResult,
   SelectServerEnum,
   RouteEnum,
@@ -72,7 +70,7 @@ import {
   ProposalPoolsType,
 } from '@app/AppState';
 import { hasUnconfirmedFunds } from '@app/AppState/classes/TotalBalanceClass';
-import { parseZcashURI, serverUris, fetchServerList } from '@app/uris';
+import { parseZcashURI } from '@app/uris';
 // Imported straight from the module rather than through the `uris` barrel, so
 // the ZNS SDK stays out of the module graph of everything else that barrel
 // serves (the wallet backend among them).
@@ -83,11 +81,9 @@ import {
   sendPropose,
 } from '@app/walletBackend';
 import {
-  SendFailureClass,
-  classifySendFailure,
-  retryOnAnotherServer,
-  sendFailureText,
-} from '@app/walletBackend/transforms/sendFailureTransform';
+  computingEnd,
+  settleSend,
+} from '@app/walletBackend/transforms/sendSettlement';
 import Utils from '@app/utils';
 import {
   fiatEligible,
@@ -110,7 +106,7 @@ import ShowAddressAlertAsync from '@app/services/showAddressAlertAsync';
 import Memo from './components/Memo';
 import SendErrorSheet from './components/SendErrorSheet';
 import { sendEmail } from '@app/services/sendEmail';
-import selectingServer from '@app/services/selectingServer';
+import { retryServer } from '@app/services/retryServer';
 import { RPCSpendablebalanceType } from '@app/walletBackend/types/RPCSpendablebalanceType';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
@@ -953,9 +949,6 @@ const Send: React.FunctionComponent<SendProps> = ({
   };
 
   const confirmSend = async (sendPageStatePar: SendPageStateClass) => {
-    // The MAX send travels the send-all path all the way: quoted and sent by
-    // the same proposal, so the amount confirmed is the amount broadcast.
-    const sendAllSend = isSendAllAmount(sendPageStatePar.toaddr.amount);
     const permit = sendPermitNow();
     if (permit.kind === 'error') {
       addLastSnackbar(translate(permit.errorKey) as string);
@@ -964,93 +957,27 @@ const Send: React.FunctionComponent<SendProps> = ({
 
     navigation.navigate(RouteEnum.Computing);
 
-    const fail = (errorMessage: string) =>
-      navigation.navigate(RouteEnum.Computing, {
-        phase: 'failed',
-        errorMessage,
-      });
-
-    // Sends once. A send or a refusal settles the Computing screen, and a
-    // failure of the backend is returned.
-    const attempt = async (): Promise<
-      SendFailureClass | { kind: 'settled' }
-    > => {
-      try {
-        const outcome = await sendTransaction(sendPageStatePar, sendAllSend);
-        if (outcome.kind === 'error') {
-          fail(translate(outcome.errorKey) as string);
-        } else {
-          clearState();
-          setScrollToTop(true);
-          setScrollToBottom(true);
-          navigation.navigate(RouteEnum.Computing, { phase: 'created' });
+    // The MAX send travels the send-all path all the way: quoted and sent by
+    // the same proposal, so the amount confirmed is the amount broadcast.
+    const sendAllSend = isSendAllAmount(sendPageStatePar.toaddr.amount);
+    const settlement = await settleSend(
+      () => sendTransaction(sendPageStatePar, sendAllSend),
+      async () => {
+        const target = await retryServer(server, translate);
+        if (target !== server) {
+          await setServerOption(target, selectServer, false, true);
         }
-        return { kind: 'settled' };
-      } catch (err) {
-        return classifySendFailure(err as string);
-      }
-    };
-
-    let failure = await attempt();
-    if (failure.kind === 'settled') {
-      return;
-    }
-
-    // The transform decides which families a server switch can plausibly
-    // help; the wallet's own verdicts (dust, duplicate nullifier, a
-    // fail-closed mixnet refusal) are excluded there. If the user selected
-    // a `custom` server, we cannot change it regardless.
-    if (
-      retryOnAnotherServer(failure) &&
-      selectServer !== SelectServerEnum.custom &&
-      server.kind !== 'offline'
-    ) {
-      // Pick a working server, same pattern as boot/recovery: the live
-      // registry first (best, excluding the failed server, no probe), then
-      // the static list ranked by latency (also excluding the failed one).
-      let fasterServer: ServerType = server;
-      const live = await fetchServerList(server.chainName);
-      const liveCandidates = live.filter(
-        (s: ServerUrisType) => s.uri !== server.uri,
-      );
-      if (liveCandidates.length > 0) {
-        fasterServer = remoteServer(
-          liveCandidates[0].uri,
-          liveCandidates[0].chainName,
-        );
-      } else {
-        const serverChecked = await selectingServer(
-          serverUris(translate).filter(
-            (s: ServerUrisType) =>
-              !s.obsolete &&
-              s.chainName === server.chainName &&
-              s.uri !== server.uri,
-          ),
-        );
-        // no latency: likely a connection problem, all servers unreachable.
-        if (serverChecked && serverChecked.latency) {
-          fasterServer = remoteServer(
-            serverChecked.uri,
-            serverChecked.chainName,
-          );
-        }
-      }
-      if (fasterServer !== server) {
-        await setServerOption(fasterServer, selectServer, false, true);
-      }
-
-      failure = await attempt();
-      if (failure.kind === 'settled') {
-        return;
-      }
-    }
-
-    const failureText = sendFailureText(failure);
-    fail(
-      failureText.kind === 'key'
-        ? (translate(failureText.errorKey) as string)
-        : failureText.text,
+      },
+      // A `custom` server is the user's own choice, and the retry keeps it.
+      selectServer !== SelectServerEnum.custom && server.kind !== 'offline',
     );
+
+    if (settlement.kind === 'sent') {
+      clearState();
+      setScrollToTop(true);
+      setScrollToBottom(true);
+    }
+    navigation.navigate(RouteEnum.Computing, computingEnd(settlement));
   };
 
   const scrollToEnd = () => {

@@ -82,6 +82,7 @@ import { PriceTrafficDriver } from '@ui/widgets/PriceFetcher';
 import { priceFetcherStore } from '@ui/widgets/priceFetcherStore';
 import { ContextAppLoadedProvider } from '@app/context';
 import { parseZcashURI, serverUris, fetchServerList } from '@app/uris';
+import { otherServers, staticAlternatives } from '@app/uris/serverChoice';
 import selectingServer from '@app/services/selectingServer';
 import BackgroundFileImpl from '@app/services/BackgroundFileImpl';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -1680,19 +1681,15 @@ export class LoadedAppClass extends Component<
     }
     this.recoveringServer = true;
     try {
-      const live = (await fetchServerList(current.chainName)).filter(
-        (s: ServerUrisType) => s.uri !== current.uri,
+      const live = otherServers(
+        await fetchServerList(current.chainName),
+        current,
       );
       if (await this.activateReachableServer(live)) {
         return;
       }
       const fallback = await selectingServer(
-        serverUris(this.state.translate).filter(
-          (s: ServerUrisType) =>
-            !s.obsolete &&
-            s.chainName === current.chainName &&
-            s.uri !== current.uri,
-        ),
+        staticAlternatives(serverUris(this.state.translate), current),
       );
       if (fallback) {
         await this.activateReachableServer([fallback]);
