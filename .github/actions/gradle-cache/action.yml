@@ -2,7 +2,8 @@ name: Gradle cache
 description: >
   Sets up Gradle with the one Gradle cache entry that every Gradle job
   shares. Each job restores the entry, and the job that passes writer saves
-  it.
+  it. The one writer is the APK build of a push to the default branch,
+  which ci.yaml selects.
 
 inputs:
   writer:

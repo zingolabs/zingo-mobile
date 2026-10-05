@@ -72,6 +72,7 @@ import {
   SendPermitInputs,
   sendPermit,
 } from '@app/walletBackend/transforms/sendPermit';
+import { ABSENT_MIXNET_VIEW } from '@app/walletBackend/transforms/mixnetView';
 import { mixnetLost } from '../.storybook/storyMocks';
 import { mockAddresses } from '../__mocks__/dataMocks/mockAddresses';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
@@ -288,5 +289,17 @@ describe('Send confirm send permit', () => {
     expect(navigate).toHaveBeenLastCalledWith(RouteEnum.Computing, {
       phase: 'created',
     });
+  });
+
+  test('Tests that confirming sends when the platform has no mixnet transport. The Send screen shows no blocked reason.', async () => {
+    const sendTransaction = jest.fn().mockResolvedValue(sent);
+    const absent = { ...online, mixnetView: ABSENT_MIXNET_VIEW };
+    const view = render(sendUi(absent, sendTransaction, jest.fn()));
+    const confirmSend = await openConfirmScreen(view);
+
+    expect(view.queryByTestId('send.mixnet-blocked')).toBeNull();
+    await confirmSend(sendPageState);
+
+    expect(sendTransaction).toHaveBeenCalledTimes(1);
   });
 });

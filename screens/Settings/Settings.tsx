@@ -1505,7 +1505,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                   mixnet. The row is left as the way into the diagnostics,
                   and its green says the network is the one carrying the
                   wallet's traffic. */}
-              {mixnetView !== null && (
+              {mixnetView.kind === 'transport' && (
                 <TouchableOpacity
                   testID="settings.mixnet"
                   onPress={() => navigation.navigate(RouteEnum.MixnetDoctor)}

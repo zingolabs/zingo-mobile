@@ -47,11 +47,17 @@ appId: org.ZingoLabs.Zingo
 # a host that does not exist. The field is read back, and the entry is
 # typed again when the text differs.
 #
-# Each attempt starts from an empty field. The clear button empties the
-# field whatever it holds, and it shows only while the field holds text.
-# A tap on the field puts the cursor where the tap lands, so an erase
-# from there leaves the text after the cursor, and the next attempt then
-# types into what is left.
+# Each attempt has to start from an empty field. The clear button empties
+# it whatever it holds, and it shows only while the field holds text — so
+# waiting for the button to go is waiting for the field to be empty. That
+# wait is the point: the clear is a state update, and without it the next
+# tap and inputText win the race and type into the text that is still
+# there. On 2026-10-03 that turned one dropped character into
+# "htts://na.zec.rocks:https://n.zec.r:443skco443" and every retry made it
+# worse instead of recovering.
+#
+# An erase is not the alternative: a tap on the field puts the cursor
+# where the tap lands, so erasing from there leaves whatever follows it.
 - retry:
     maxRetries: 3
     commands:
@@ -62,6 +68,10 @@ appId: org.ZingoLabs.Zingo
           commands:
             - tapOn:
                 id: "settings.custom-server-clear"
+            - extendedWaitUntil:
+                notVisible:
+                  id: "settings.custom-server-clear"
+                timeout: 5000
       - tapOn:
           id: "settings.custom-server-field"
       - inputText: "https://na.zec.rocks:443"

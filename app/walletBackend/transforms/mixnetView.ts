@@ -14,7 +14,8 @@ export const MIXNET_STATUS_KEYS: readonly MixnetStatusKey[] = [
 ];
 
 // `sendBlocked` is false only for `ready`.
-export type MixnetView = {
+export type MixnetTransportView = {
+  readonly kind: 'transport';
   readonly statusKey: MixnetStatusKey;
   readonly socks5Addr: string | null;
   readonly narration: string | null;
@@ -23,7 +24,12 @@ export type MixnetView = {
   readonly reconnecting: boolean;
 };
 
-export const INITIAL_MIXNET_VIEW: MixnetView = {
+export type MixnetView = MixnetTransportView | { readonly kind: 'absent' };
+
+export const ABSENT_MIXNET_VIEW: MixnetView = { kind: 'absent' };
+
+export const INITIAL_MIXNET_VIEW: MixnetTransportView = {
+  kind: 'transport',
   statusKey: 'mixnet.status.bootstrapping',
   socks5Addr: null,
   narration: null,
@@ -37,7 +43,7 @@ export function deriveMixnetView(
   status: MixnetStatusReport,
   detail: MixnetDetailReport | null,
   reconnecting: boolean = false,
-): MixnetView {
+): MixnetTransportView {
   const narration =
     detail !== null && detail.kind === 'detail' && detail.detail !== ''
       ? detail.detail
@@ -45,6 +51,7 @@ export function deriveMixnetView(
 
   if (status.kind === 'failure') {
     return {
+      kind: 'transport',
       statusKey: 'mixnet.status.unknown',
       socks5Addr: null,
       narration: null,
@@ -57,6 +64,7 @@ export function deriveMixnetView(
   switch (status.indicator) {
     case RPCMixnetIndicatorEnum.bootstrapping:
       return {
+        kind: 'transport',
         statusKey: 'mixnet.status.bootstrapping',
         socks5Addr: null,
         narration,
@@ -66,6 +74,7 @@ export function deriveMixnetView(
       };
     case RPCMixnetIndicatorEnum.ready:
       return {
+        kind: 'transport',
         statusKey: 'mixnet.status.ready',
         socks5Addr: status.socks5Addr,
         narration: null,
@@ -77,6 +86,7 @@ export function deriveMixnetView(
     // never reads as a reconnect: an Offline session is resting, not trying.
     case RPCMixnetIndicatorEnum.off:
       return {
+        kind: 'transport',
         statusKey: 'mixnet.status.off',
         socks5Addr: null,
         narration: null,
@@ -86,6 +96,7 @@ export function deriveMixnetView(
       };
     case RPCMixnetIndicatorEnum.died:
       return {
+        kind: 'transport',
         statusKey: 'mixnet.status.died',
         socks5Addr: null,
         narration: null,
@@ -97,16 +108,20 @@ export function deriveMixnetView(
 }
 
 // Every transmission travels the mixnet, so a send waits for a transport
-// that can carry it. A null view is a platform whose transport has not
-// landed: nothing to wait for there.
-export function sendGateOpen(view: MixnetView | null): boolean {
-  return view === null ? true : !view.sendBlocked;
+// that can carry it. A platform without a transport has nothing to wait for.
+export function sendGateOpen(view: MixnetView): boolean {
+  switch (view.kind) {
+    case 'absent':
+      return true;
+    case 'transport':
+      return !view.sendBlocked;
+  }
 }
 
 // The status line a blocked gate shows beside its reason: the reconnecting
 // notice while a reconnect runs, and the transport's own status otherwise.
 export function shownStatusKey(
-  view: MixnetView,
+  view: MixnetTransportView,
 ): 'mixnet.reconnecting' | MixnetStatusKey {
   return view.reconnecting ? 'mixnet.reconnecting' : view.statusKey;
 }
@@ -135,5 +150,15 @@ export function mixnetPhase(
     case 'mixnet.status.died':
     case 'mixnet.status.unknown':
       return 'lost';
+  }
+}
+
+/** Names the phase of a view, with `absent` for a platform without a transport. */
+export function viewPhase(view: MixnetView): MixnetPhase | 'absent' {
+  switch (view.kind) {
+    case 'absent':
+      return 'absent';
+    case 'transport':
+      return mixnetPhase(view.statusKey, view.reconnecting);
   }
 }

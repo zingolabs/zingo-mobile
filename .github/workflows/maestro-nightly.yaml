@@ -301,9 +301,35 @@ jobs:
           xcrun simctl list devices booted
           maestro --device "$SIM_UDID" test --exclude-tags=screen-awake .maestro/
 
+      # Android captures logcat for the whole run; iOS captured nothing, so a
+      # failure there left a screenshot and no way to tell what the app was
+      # doing. On 2026-10-04 it hung on the splash after a clear-state launch
+      # and Maestro reported "App crashed or stopped ... check diagnostic
+      # logs", pointing at a directory this job never collected.
+      #
+      # A crash leaves a report; a hang does not, and only the app's own log
+      # says where it stopped. Both are gathered here, and none of it may
+      # fail the step: this runs when the job has already failed and its only
+      # purpose is to hand over evidence.
+      - name: Collect iOS diagnostics on failure
+        if: failure()
+        run: |
+          mkdir -p /tmp/ios-diagnostics
+          cp -R ~/Library/Logs/DiagnosticReports \
+            /tmp/ios-diagnostics/host-diagnostic-reports 2>/dev/null || true
+          cp -R ~/Library/Logs/CoreSimulator/"$SIM_UDID" \
+            /tmp/ios-diagnostics/simulator-logs 2>/dev/null || true
+          xcrun simctl spawn "$SIM_UDID" log show --last 20m --style syslog \
+            --predicate 'processImagePath CONTAINS "Zingo" OR senderImagePath CONTAINS "Zingo"' \
+            > /tmp/ios-diagnostics/zingo-os-log.txt 2>&1 || true
+          echo "--- collected ---"
+          find /tmp/ios-diagnostics -type f | head -40 || true
+
       - name: Upload Maestro report on failure
         if: failure()
         uses: actions/upload-artifact@v7
         with:
           name: maestro-ios-report
-          path: ~/.maestro/tests/**
+          path: |
+            ~/.maestro/tests/**
+            /tmp/ios-diagnostics/**
