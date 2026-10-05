@@ -5,6 +5,7 @@ export type ThemeColors = {
   bgSurface: string;
   bgChrome: string;
   bottomSheetBorder: string;
+  borderFocus: string;
 
   fgDefault: string;
 
@@ -39,6 +40,7 @@ const base = {
   bgSurface: '#05101E',
   bgChrome: '#040C17',
   bottomSheetBorder: '#05234C',
+  borderFocus: '#0B3A75',
   fgDefault: '#c0cbdc',
 
   fgSyncing: '#ebff5a',

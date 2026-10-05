@@ -28,7 +28,7 @@ react {
     //   The list of variants to that are debuggable. For those we're going to
     //   skip the bundling of the JS bundle and the assets. By default is just 'debug'.
     //   If you add flavors like lite, prod, etc. you'll have to list your debuggableVariants.
-    // debuggableVariants = ["liteDebug", "prodDebug"]
+    debuggableVariants = listOf("prodDebug", "betaDebug")
 
     /* Bundling */
     //   A list containing the node command and its flags. Default is just 'node'.
