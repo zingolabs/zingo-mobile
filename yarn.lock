@@ -8487,10 +8487,10 @@ react-native-is-edge-to-edge@^1.2.1:
   resolved "https://registry.yarnpkg.com/react-native-is-edge-to-edge/-/react-native-is-edge-to-edge-1.3.1.tgz#feb9a6a8faf0874298947edd556e5af22044e139"
   integrity sha512-NIXU/iT5+ORyCc7p0z2nnlkouYKX425vuU1OEm6bMMtWWR9yvb+Xg5AZmImTKoF9abxCPqrKC3rOZsKzUYgYZA==
 
-react-native-keyboard-controller@^1.22.5:
-  version "1.22.5"
-  resolved "https://registry.yarnpkg.com/react-native-keyboard-controller/-/react-native-keyboard-controller-1.22.5.tgz#5cfb97d2f26e766fae3f6803042e03cd799b76a6"
-  integrity sha512-JS989QM4OpO17WmxoG/TK734ypfCL2ypMS1lClN7HAP0fNccfXkF+oIKhw25QDXOBZIcd/jhnLmoel7LFh1z9g==
+react-native-keyboard-controller@^1.22.6:
+  version "1.22.6"
+  resolved "https://registry.yarnpkg.com/react-native-keyboard-controller/-/react-native-keyboard-controller-1.22.6.tgz#7047b8716ee762be868bca0dff0a91d31ecbf948"
+  integrity sha512-gwJAI3Bhbqs/Ja3uaeBz7EFQSFcem8q4wsXkrC9sy1CL14gjWhBICLu2Ecn7HmezpIu33uhLbirLGyqSawxRtg==
   dependencies:
     react-native-is-edge-to-edge "^1.2.1"
 
