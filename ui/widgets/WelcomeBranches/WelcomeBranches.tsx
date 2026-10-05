@@ -103,10 +103,7 @@ const Leaf: React.FC<LeafProps> = ({
       opacity: green
         ? 0.78 + 0.22 * (0.5 + 0.5 * Math.sin((2 * Math.PI * t) / 3.2))
         : 1,
-      transform: [
-        { rotate: `${opening + wind}deg` },
-        { scale: unfold.value },
-      ],
+      transform: [{ rotate: `${opening + wind}deg` }, { scale: unfold.value }],
     };
   });
 

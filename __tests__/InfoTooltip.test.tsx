@@ -18,11 +18,15 @@ const Host: React.FunctionComponent = () => {
 
 test('tapping the icon opens the bubble and a second tap closes it', () => {
   render(<Host />);
-  expect(screen.queryByText('Block height of your first transaction.')).toBeNull();
+  expect(
+    screen.queryByText('Block height of your first transaction.'),
+  ).toBeNull();
   fireEvent.press(screen.getByTestId('info'));
   expect(
     screen.getByText('Block height of your first transaction.'),
   ).toBeOnTheScreen();
   fireEvent.press(screen.getByTestId('info'));
-  expect(screen.queryByText('Block height of your first transaction.')).toBeNull();
+  expect(
+    screen.queryByText('Block height of your first transaction.'),
+  ).toBeNull();
 });

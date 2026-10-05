@@ -12,10 +12,7 @@ module.exports = (request, options) => {
     const m = request.match(/^(.*)\.(png|jpg|jpeg|gif|webp)$/);
     if (m) {
       for (const scale of ['@3x', '@2x']) {
-        const scaled = path.resolve(
-          options.basedir,
-          `${m[1]}${scale}.${m[2]}`,
-        );
+        const scaled = path.resolve(options.basedir, `${m[1]}${scale}.${m[2]}`);
         if (fs.existsSync(scaled)) {
           return scaled;
         }

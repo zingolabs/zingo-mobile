@@ -125,8 +125,7 @@ type ProgressStateProps = {
   body?: string;
 };
 
-const dotsExit = () =>
-  ZoomOut.duration(160).reduceMotion(ReduceMotion.System);
+const dotsExit = () => ZoomOut.duration(160).reduceMotion(ReduceMotion.System);
 const ringEnter = () =>
   ZoomIn.duration(360)
     .easing(ease.spring)
