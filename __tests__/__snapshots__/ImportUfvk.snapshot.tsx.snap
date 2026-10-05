@@ -482,87 +482,95 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
       <View
         onLayout={[Function]}
         style={
-          [
-            {
-              "alignItems": "center",
-              "borderWidth": 2,
-              "justifyContent": "center",
-              "minWidth": 42,
-              "overflow": "hidden",
-              "paddingHorizontal": 24,
-            },
-            {},
-          ]
+          {
+            "alignItems": "center",
+          }
         }
       >
         <View
-          accessibilityRole="button"
-          accessibilityState={
-            {
-              "busy": undefined,
-              "checked": undefined,
-              "disabled": true,
-              "expanded": undefined,
-              "selected": undefined,
-            }
-          }
-          accessibilityValue={
-            {
-              "max": undefined,
-              "min": undefined,
-              "now": undefined,
-              "text": undefined,
-            }
-          }
-          accessible={true}
-          collapsable={false}
-          focusable={true}
-          onBlur={[Function]}
-          onClick={[Function]}
-          onFocus={[Function]}
-          onResponderGrant={[Function]}
-          onResponderMove={[Function]}
-          onResponderRelease={[Function]}
-          onResponderTerminate={[Function]}
-          onResponderTerminationRequest={[Function]}
-          onStartShouldSetResponder={[Function]}
           style={
-            {
-              "alignItems": "center",
-              "alignSelf": "stretch",
-              "flex": 1,
-              "justifyContent": "center",
-            }
+            [
+              {
+                "alignItems": "center",
+                "borderWidth": 2,
+                "justifyContent": "center",
+                "minWidth": 42,
+                "overflow": "hidden",
+                "paddingHorizontal": 24,
+              },
+              {},
+            ]
           }
-          testID="import.button.ok"
         >
-          <Text
-            numberOfLines={1}
-            style={
-              [
-                {
-                  "color": "#011401",
-                  "fontSize": 14.5,
-                  "fontWeight": "600",
-                  "textAlign": "center",
-                },
-                {},
-              ]
-            }
-          />
           <View
-            pointerEvents="none"
-            style={
-              [
-                {
-                  "alignItems": "center",
-                  "justifyContent": "center",
-                  "position": "absolute",
-                },
-                {},
-              ]
+            accessibilityRole="button"
+            accessibilityState={
+              {
+                "busy": undefined,
+                "checked": undefined,
+                "disabled": true,
+                "expanded": undefined,
+                "selected": undefined,
+              }
             }
-          />
+            accessibilityValue={
+              {
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
+              }
+            }
+            accessible={true}
+            collapsable={false}
+            focusable={true}
+            onBlur={[Function]}
+            onClick={[Function]}
+            onFocus={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              {
+                "alignItems": "center",
+                "alignSelf": "stretch",
+                "flex": 1,
+                "justifyContent": "center",
+              }
+            }
+            testID="import.button.ok"
+          >
+            <Text
+              numberOfLines={1}
+              style={
+                [
+                  {
+                    "color": "#011401",
+                    "fontSize": 14.5,
+                    "fontWeight": "600",
+                    "textAlign": "center",
+                  },
+                  {},
+                ]
+              }
+            />
+            <View
+              pointerEvents="none"
+              style={
+                [
+                  {
+                    "alignItems": "center",
+                    "justifyContent": "center",
+                    "position": "absolute",
+                  },
+                  {},
+                ]
+              }
+            />
+          </View>
         </View>
       </View>
     </View>

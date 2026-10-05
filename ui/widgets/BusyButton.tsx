@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useEffect } from 'react';
-import { ActivityIndicator, Pressable } from 'react-native';
+import { ActivityIndicator, Pressable, View } from 'react-native';
 import Animated, {
   interpolateColor,
   useAnimatedStyle,
@@ -67,7 +67,7 @@ const BusyButton: React.FunctionComponent<BusyButtonProps> = ({
     const width =
       naturalWidth.value > 0
         ? naturalWidth.value + (busySize - naturalWidth.value) * collapse.value
-        : undefined;
+        : '100%';
     return {
       backgroundColor: bg,
       borderColor: bg,
@@ -98,72 +98,78 @@ const BusyButton: React.FunctionComponent<BusyButtonProps> = ({
     onDisabledPress();
   };
 
+  // The frame shrinks around its centre, inside a slot that keeps the
+  // button's full width.
   return (
-    <Animated.View
+    <View
+      style={{ alignItems: 'center' }}
       onLayout={e => {
         if (!busy && naturalWidth.value === 0) {
           naturalWidth.value = e.nativeEvent.layout.width;
         }
       }}
-      style={[
-        {
-          borderWidth: 2,
-          minWidth: busySize,
-          paddingHorizontal: busy ? 0 : 24,
-          alignItems: 'center',
-          justifyContent: 'center',
-          overflow: 'hidden',
-        },
-        frame,
-      ]}
     >
-      <Pressable
-        testID={testID}
-        accessibilityRole="button"
-        accessibilityState={{ disabled: !enabled || busy }}
-        onPress={press}
-        style={{
-          alignSelf: 'stretch',
-          flex: 1,
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
+      <Animated.View
+        style={[
+          {
+            borderWidth: 2,
+            minWidth: busySize,
+            paddingHorizontal: busy ? 0 : 24,
+            alignItems: 'center',
+            justifyContent: 'center',
+            overflow: 'hidden',
+          },
+          frame,
+        ]}
       >
-        <Animated.Text
-          numberOfLines={1}
-          style={[
-            {
-              color: colors.bgCanvas,
-              fontWeight: '600',
-              fontSize: labelSize,
-              textAlign: 'center',
-            },
-            label,
-          ]}
+        <Pressable
+          testID={testID}
+          accessibilityRole="button"
+          accessibilityState={{ disabled: !enabled || busy }}
+          onPress={press}
+          style={{
+            alignSelf: 'stretch',
+            flex: 1,
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
         >
-          {title}
-        </Animated.Text>
-        <Animated.View
-          pointerEvents="none"
-          style={[
-            {
-              position: 'absolute',
-              alignItems: 'center',
-              justifyContent: 'center',
-            },
-            spinner,
-          ]}
-        >
-          {busy && (
-            <ActivityIndicator
-              testID={testID ? `${testID}.spinner` : undefined}
-              size="small"
-              color={colors.bgCanvas}
-            />
-          )}
-        </Animated.View>
-      </Pressable>
-    </Animated.View>
+          <Animated.Text
+            numberOfLines={1}
+            style={[
+              {
+                color: colors.bgCanvas,
+                fontWeight: '600',
+                fontSize: labelSize,
+                textAlign: 'center',
+              },
+              label,
+            ]}
+          >
+            {title}
+          </Animated.Text>
+          <Animated.View
+            pointerEvents="none"
+            style={[
+              {
+                position: 'absolute',
+                alignItems: 'center',
+                justifyContent: 'center',
+              },
+              spinner,
+            ]}
+          >
+            {busy && (
+              <ActivityIndicator
+                testID={testID ? `${testID}.spinner` : undefined}
+                size="small"
+                color={colors.bgCanvas}
+              />
+            )}
+          </Animated.View>
+        </Pressable>
+      </Animated.View>
+    </View>
   );
 };
 
