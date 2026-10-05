@@ -7,7 +7,7 @@ import React from 'react';
 
 import { render } from '@testing-library/react-native';
 import { LoadedApp } from '@app/LoadedApp';
-import { StackScreenProps } from '@react-navigation/stack';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AppStackParamList } from '@app/types';
 import { ChainNameEnum, LaunchingModeEnum, RouteEnum } from '@app/AppState';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
@@ -20,7 +20,7 @@ jest.mock('react-native-localize', () => ({
 
 jest.mock('i18n-js');
 
-function makeDrawerProps(): StackScreenProps<
+function makeDrawerProps(): NativeStackScreenProps<
   AppStackParamList,
   RouteEnum.LoadedApp
 > {
