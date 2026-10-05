@@ -5,7 +5,8 @@
 import 'react-native';
 import React from 'react';
 
-import { render } from '@testing-library/react-native';
+import { act, render } from '@testing-library/react-native';
+import * as bottomSheetMock from '@gorhom/bottom-sheet';
 import type { ReactTestInstance } from 'react-test-renderer';
 import Send from '@screens/Send';
 import Settings from '@screens/Settings';
@@ -67,6 +68,22 @@ function sheetAccessible(element: ReactTestInstance): unknown {
   throw new Error('the element is in no bottom sheet modal');
 }
 
+// The mock's extras, read through the same import the app code uses.
+const { sheetHandles } = bottomSheetMock as unknown as {
+  sheetHandles: Map<number, { present: () => void }>;
+};
+
+/**
+ * Presents every bottom sheet the screen holds and waits the frame in which
+ * the sheet mounts its content, as the installed library does.
+ */
+async function presentSheets(): Promise<void> {
+  await act(async () => {
+    sheetHandles.forEach(handle => handle.present());
+    await new Promise<void>(resolve => requestAnimationFrame(() => resolve()));
+  });
+}
+
 function drawerProps<R extends RouteEnum.Send | RouteEnum.Settings>(
   name: R,
 ): NativeStackScreenProps<AppDrawerParamList, R> {
@@ -93,7 +110,7 @@ function loadedState() {
 describe('Maestro reaches each typed field on iOS', () => {
   const onFunction = jest.fn();
 
-  test('the Send address and memo fields', () => {
+  test('the Send address and memo fields', async () => {
     const state = loadedState();
     state.valueTransfers = mockValueTransfers;
     state.addresses = mockAddresses;
@@ -113,6 +130,7 @@ describe('Maestro reaches each typed field on iOS', () => {
         />
       </ContextAppLoadedProvider>,
     );
+    await presentSheets();
     for (const id of [
       'send.addressplaceholder',
       'send.address.clear',
@@ -122,7 +140,7 @@ describe('Maestro reaches each typed field on iOS', () => {
     }
   });
 
-  test('the custom server field and the server options', () => {
+  test('the custom server field and the server options', async () => {
     const state = loadedState();
     state.server = mockServer;
     state.selectServer = SelectServerEnum.custom;
@@ -142,6 +160,7 @@ describe('Maestro reaches each typed field on iOS', () => {
         />
       </ContextAppLoadedProvider>,
     );
+    await presentSheets();
     expect(
       accessibleAncestor(settings.getByTestId('settings.custom-server-field')),
     ).toBeUndefined();

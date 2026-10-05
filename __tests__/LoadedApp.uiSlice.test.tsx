@@ -1,0 +1,189 @@
+/**
+ * The fg/bg and modal UI slice, and the whole-tree re-render proof. Three claims
+ * over the committing mount:
+ *
+ *  - the fg/bg blast-radius pin: a foreground/background status transition writes
+ *    appStateStatusAtom and does not re-render the container.
+ *  - the modal slice: launchAddTagModal writes addTagModalAtom, so opening the
+ *    shared modal writes only the atom, not container state.
+ *  - the whole-tree proof: against the real committed container, a sync tick
+ *    and a fg/bg edge each leave the container asleep; a field still
+ *    held in container state (shieldingAmount) wakes it. This proves the atom
+ *    shape against the real tree.
+ */
+
+jest.mock('@app/RPCModule', () =>
+  require('../__mocks__/rpcModuleProxy').rpcModuleProxyMock(),
+);
+
+jest.mock('@app/walletBackend/utils/walletUtils', () => ({
+  ...jest.requireActual('@app/walletBackend/utils/walletUtils'),
+  doSave: jest.fn().mockResolvedValue(true),
+}));
+
+jest.mock('react-native-localize', () => ({
+  findBestLanguageTag: jest.fn().mockImplementation(supportedLocales => ({
+    languageTag: supportedLocales?.[0] || 'en',
+    isRTL: false,
+  })),
+}));
+
+jest.mock('i18n-js');
+
+jest.mock('react-native-toast-message', () => ({
+  __esModule: true,
+  default: Object.assign(() => null, { show: jest.fn(), hide: jest.fn() }),
+}));
+
+jest.mock('@app/services/gateController', () => ({
+  ...jest.requireActual('@app/services/gateController'),
+  resolveTriggerGate: jest.fn().mockResolvedValue({ kind: 'passed' }),
+}));
+
+// dev's PriceTrafficDriver attaches the price store's own AppState listener.
+// The price surface has its own tests, so the container fences render the
+// driver inert and see only the container's listener.
+jest.mock('@ui/widgets/PriceFetcher', () => ({
+  ...jest.requireActual('@ui/widgets/PriceFetcher'),
+  PriceTrafficDriver: () => null,
+}));
+
+jest.mock('@screens/History', () => ({
+  __esModule: true,
+  default: 'MockHistoryScreen',
+}));
+jest.mock('@screens/Send', () => ({
+  __esModule: true,
+  default: 'MockSendScreen',
+}));
+jest.mock('@screens/Receive', () => ({
+  __esModule: true,
+  default: 'MockReceiveScreen',
+}));
+jest.mock('@ui/widgets/NewAddressTag', () => ({
+  __esModule: true,
+  default: 'MockNewAddressTag',
+}));
+
+import { act } from '@testing-library/react-native';
+
+const { AppState } =
+  jest.requireActual<typeof import('react-native')>('react-native');
+
+import { resolveTriggerGate } from '@app/services/gateController';
+import { AppStateStatusEnum } from '@app/AppState';
+import { appStateStatusAtom, addTagModalAtom } from '@app/AppState/uiAtoms';
+import { syncStatusAtom } from '@app/AppState/syncAtoms';
+import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
+import {
+  controllerStoreOf,
+  flushMicrotasks,
+  mountCommitted,
+  spyOnLifecycleListeners,
+} from './helpers/loadedAppHarness';
+
+const resolveTriggerGateMock = resolveTriggerGate as jest.Mock;
+const netInfoUnsubscribe = jest.fn();
+
+const syncing = (percent: number): RPCSyncStatusType => ({
+  scan_ranges: [{} as never],
+  percentage_total_outputs_scanned: percent,
+});
+
+function captureAppStateHandler(): (s: string) => Promise<void> {
+  const spy = AppState.addEventListener as unknown as jest.Mock;
+  const call = spy.mock.calls.find(c => c[0] === 'change');
+  return call![1];
+}
+
+describe('fg/bg + residual UI slice', () => {
+  beforeEach(() => {
+    jest.useFakeTimers();
+    jest.clearAllMocks();
+    resolveTriggerGateMock.mockResolvedValue({ kind: 'passed' });
+    spyOnLifecycleListeners(netInfoUnsubscribe);
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+    jest.restoreAllMocks();
+  });
+
+  it('the fg/bg blast-radius pin: a status transition writes the atom without re-rendering the container', async () => {
+    const { instance } = await mountCommitted();
+    const store = controllerStoreOf(instance);
+    // background → inactive is a bare status track on either platform: no
+    // suspend or resume work, just the status write.
+    store.set(appStateStatusAtom, AppStateStatusEnum.background);
+    const handler = captureAppStateHandler();
+    const renderSpy = jest.spyOn(instance, 'render');
+
+    await act(async () => {
+      await handler(AppStateStatusEnum.inactive);
+      await flushMicrotasks();
+    });
+
+    expect(store.get(appStateStatusAtom)).toBe(AppStateStatusEnum.inactive);
+    expect(renderSpy).not.toHaveBeenCalled();
+  });
+
+  it('the modal slice: launching the add-tag modal writes the atom without re-rendering the container', async () => {
+    const { instance } = await mountCommitted();
+    const store = controllerStoreOf(instance);
+    const renderSpy = jest.spyOn(instance, 'render');
+
+    act(() => {
+      instance.launchAddTagModal('zs1recipient');
+    });
+
+    expect(store.get(addTagModalAtom)).toMatchObject({
+      kind: 'launched',
+      launch: 1,
+      address: 'zs1recipient',
+    });
+    expect(renderSpy).not.toHaveBeenCalled();
+  });
+});
+
+describe('whole-tree re-render proof', () => {
+  beforeEach(() => {
+    jest.useFakeTimers();
+    jest.clearAllMocks();
+    resolveTriggerGateMock.mockResolvedValue({ kind: 'passed' });
+    spyOnLifecycleListeners(netInfoUnsubscribe);
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+    jest.restoreAllMocks();
+  });
+
+  it('sliced changes leave the container asleep; a field still in container state wakes it', async () => {
+    const { instance } = await mountCommitted();
+    const store = controllerStoreOf(instance);
+    const renderSpy = jest.spyOn(instance, 'render');
+
+    // A sync tick — the detailed snapshot atom moves.
+    act(() => {
+      store.set(syncStatusAtom, syncing(40));
+    });
+    // A fg/bg edge — the lifecycle atom moves.
+    store.set(appStateStatusAtom, AppStateStatusEnum.background);
+    const handler = captureAppStateHandler();
+    await act(async () => {
+      await handler(AppStateStatusEnum.inactive);
+      await flushMicrotasks();
+    });
+
+    // None of the three woke the container: the sliced fields are isolated,
+    // proven against the real tree.
+    expect(renderSpy).not.toHaveBeenCalled();
+
+    // Positive control: a field still read off the context object re-renders the
+    // container, so the harness does detect a real wake.
+    act(() => {
+      instance.setShieldingAmount(999);
+    });
+    expect(renderSpy).toHaveBeenCalled();
+  });
+});

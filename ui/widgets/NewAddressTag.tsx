@@ -11,6 +11,7 @@ import {
   GlobalConst,
 } from '@app/AppState';
 import RegText from '@ui/primitives/RegText';
+import { useSheetDismiss } from '@ui/primitives/AppSheetModal';
 import { ContextAppLoaded } from '@app/context';
 import { showConfirm } from '@app/services/showConfirm';
 import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
@@ -28,7 +29,6 @@ type NewAddressTagProps = {
   // Suggested label, when whoever opened the form already knows a name for the
   // address. Editable like any other: it is a starting point, not a value.
   initialLabel?: string;
-  closeSheet: () => void;
   setAddressBook: (ab: AddressBookFileClass[]) => void;
 };
 const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
@@ -36,10 +36,10 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
   own,
   swapChain,
   initialLabel,
-  closeSheet,
   setAddressBook,
 }) => {
   const context = useContext(ContextAppLoaded);
+  const closeSheet = useSheetDismiss();
   const { translate, server } = context;
   const { colors } = useTheme();
 

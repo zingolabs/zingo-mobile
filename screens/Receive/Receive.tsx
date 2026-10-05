@@ -513,7 +513,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                   : ''
             }
             own={true}
-            closeSheet={hide}
             setAddressBook={setAddressBook}
           />
         )}
