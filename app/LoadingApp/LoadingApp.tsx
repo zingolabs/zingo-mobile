@@ -1073,7 +1073,7 @@ export class LoadingAppClass extends Component<
         this.state.saplingPool,
         this.state.transparentPool,
         true,
-        this.state.firstLaunchingMessage,
+        LaunchingModeEnum.opening,
         this.state.server.chainName,
       );
     } else {
@@ -1298,7 +1298,7 @@ export class LoadingAppClass extends Component<
             saplingPool,
             transparentPool,
             true,
-            this.state.firstLaunchingMessage,
+            LaunchingModeEnum.opening,
             // restore requires a live server → its chain is the wallet's chain.
             this.state.server.chainName,
           );
@@ -1641,7 +1641,14 @@ export class LoadingAppClass extends Component<
               {screen === RouteEnum.Launching && (
                 <Launching
                   translate={translate}
-                  firstLaunchingMessage={firstLaunchingMessage}
+                  // Optimizing is said only of a wallet that exists and is
+                  // being opened by a new version of the app.
+                  firstLaunchingMessage={
+                    walletExists &&
+                    firstLaunchingMessage === LaunchingModeEnum.updating
+                      ? LaunchingModeEnum.updating
+                      : LaunchingModeEnum.opening
+                  }
                   biometricGate={biometricGate}
                   tryAgain={this.retryGate}
                 />

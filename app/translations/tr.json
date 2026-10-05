@@ -5,11 +5,6 @@
     "firstlaunchingmessage-body": "Bu işlem, işlem geçmişine bağlı olarak biraz zaman alabilir. Lütfen işlem tamamlanana kadar uygulamayı açık tutun.",
     "firstlaunchingmessage-footer": "Teşekkürler."
   },
-  "installing": {
-    "firstlaunchingmessage-title": "Yeni bir cüzdan oluşturuluyor",
-    "firstlaunchingmessage-body": "Lütfen işlem bitene kadar uygulamayı açık tutun.",
-    "firstlaunchingmessage-footer": "Teşekkürler."
-  },
   "biometricsfailed-title": "Hoş geldiniz!",
   "biometricsfailed-body": "Güvenlik Nedeniyle, uygulama kilitlendi.",
   "biometricsfailed-footer": "Kilidi açmak için kimlik doğrulama yöntemini kullanın.",

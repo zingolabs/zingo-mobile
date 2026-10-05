@@ -5,11 +5,6 @@
     "firstlaunchingmessage-body": "Isso pode demorar um pouco, dependendo do histórico de transações. Por favor, mantenha o aplicativo aberto até que o processo termine.",
     "firstlaunchingmessage-footer": "Obrigado."
   },
-  "installing": {
-    "firstlaunchingmessage-title": "Criando uma nova carteira",
-    "firstlaunchingmessage-body": "Mantenha o aplicativo aberto até que o processo seja concluído.",
-    "firstlaunchingmessage-footer": "Obrigado."
-  },
   "biometricsfailed-title": "Bem-vindo!",
   "biometricsfailed-body": "Por questões de segurança, o aplicativo está bloqueado.",
   "biometricsfailed-footer": "Use o método de autenticação para desbloquear.",
