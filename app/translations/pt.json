@@ -729,7 +729,7 @@
     "screen-title": "Importar carteira",
     "chooser-sub": "Escolha de onde restaurar",
     "chooser-previous": "Backup da carteira anterior",
-    "chooser-previous-sub": "Salvo no Keychain",
+    "chooser-previous-sub": "Salvo no {store}",
     "chooser-or": "ou",
     "chooser-seed": "Inserir uma frase de recuperação ou chave de visualização",
     "chooser-seed-sub": "Substitui a carteira neste dispositivo.",

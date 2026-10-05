@@ -727,7 +727,7 @@
     "screen-title": "Cüzdanı içe aktar",
     "chooser-sub": "Nereden geri yükleneceğini seçin",
     "chooser-previous": "Önceki cüzdan yedeği",
-    "chooser-previous-sub": "Keychain içinde kayıtlı",
+    "chooser-previous-sub": "{store} içinde kayıtlı",
     "chooser-or": "veya",
     "chooser-seed": "Tohum ifadesi veya görüntüleme anahtarı girin",
     "chooser-seed-sub": "Bu cihazdaki cüzdanı değiştirir.",

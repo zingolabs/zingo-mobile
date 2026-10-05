@@ -729,7 +729,7 @@
     "screen-title": "Import wallet",
     "chooser-sub": "Choose what to restore from",
     "chooser-previous": "Previous wallet backup",
-    "chooser-previous-sub": "Saved in the Keychain",
+    "chooser-previous-sub": "Saved in the {store}",
     "chooser-or": "or",
     "chooser-seed": "Enter a seed phrase or viewing key",
     "chooser-seed-sub": "Replaces the wallet on this device.",

@@ -729,7 +729,7 @@
     "screen-title": "Importar monedero",
     "chooser-sub": "Elige desde dónde restaurar",
     "chooser-previous": "Copia del monedero anterior",
-    "chooser-previous-sub": "Guardada en el Keychain",
+    "chooser-previous-sub": "Guardada en el {store}",
     "chooser-or": "o",
     "chooser-seed": "Introducir una semilla o clave de visualización",
     "chooser-seed-sub": "Reemplaza el monedero de este dispositivo.",

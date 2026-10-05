@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
-import { Pressable, View } from 'react-native';
+import { Platform, Pressable, View } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
   IconDefinition,
@@ -22,6 +22,8 @@ type ImportChooserProps = {
   onBack: () => void;
 };
 
+// The system store that keeps the recovery phrase, by its platform name.
+const SECURE_STORE = Platform.OS === 'ios' ? 'Keychain' : 'Keystore';
 const SIDE = 22.5;
 const FIRST_TOP = 150.5;
 
@@ -151,7 +153,10 @@ const ImportChooser: React.FunctionComponent<ImportChooserProps> = ({
           iconBg="#0A2A1E"
           iconColor={colors.fgAccent}
           title={translate('import.chooser-previous') as string}
-          sub={translate('import.chooser-previous-sub') as string}
+          sub={(translate('import.chooser-previous-sub') as string).replace(
+            '{store}',
+            SECURE_STORE,
+          )}
           subColor={colors.fgMuted}
           disabled={busy}
           onPress={onPrevious}
