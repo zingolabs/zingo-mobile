@@ -4,7 +4,8 @@ import { I18nManager, AppState, NativeEventSubscription } from 'react-native';
 import { useTheme } from '@app/theme';
 import { I18n } from 'i18n-js';
 import * as RNLocalize from 'react-native-localize';
-import { StackScreenProps } from '@react-navigation/stack';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { useSession } from '@app/navigation/session';
 import NetInfo, {
   NetInfoSubscription,
   NetInfoState,
@@ -120,7 +121,7 @@ import { RPCWalletKindEnum } from '@app/walletBackend/enums/RPCWalletKindEnum';
 import StartMenu from '@screens/StartMenu';
 import { RPCUfvkType } from '@app/walletBackend/types/RPCUfvkType';
 import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
-import { AppStackParamList } from '@app/types';
+import { AppStackParamList, LoadedAppNavigationState } from '@app/types';
 
 const en = require('@app/translations/en.json');
 const es = require('@app/translations/es.json');
@@ -128,13 +129,10 @@ const pt = require('@app/translations/pt.json');
 const ru = require('@app/translations/ru.json');
 const tr = require('@app/translations/tr.json');
 
-type LoadingAppProps = {
-  navigation: StackScreenProps<
-    AppStackParamList,
-    RouteEnum.LoadingApp
-  >['navigation'];
-  route: StackScreenProps<AppStackParamList, RouteEnum.LoadingApp>['route'];
-};
+type LoadingAppProps = NativeStackScreenProps<
+  AppStackParamList,
+  RouteEnum.LoadingApp
+>;
 
 const SERVER_DEFAULT_0: ServerType = remoteServer(
   serverUris(() => {})[0].uri,
@@ -150,6 +148,7 @@ const activationHeight = {
 
 export default function LoadingApp(props: LoadingAppProps) {
   const theme = useTheme();
+  const { setSession } = useSession();
   const [language, setLanguage] = useState<LanguageEnum>(LanguageEnum.en);
   const [server, setServer] = useState<ServerType>(SERVER_DEFAULT_0);
   const [privacy, setPrivacy] = useState<boolean>(false);
@@ -318,7 +317,7 @@ export default function LoadingApp(props: LoadingAppProps) {
     return (
       <LoadingAppClass
         {...props}
-        navigationApp={props.navigation}
+        openWallet={params => setSession({ kind: 'wallet', params })}
         theme={theme}
         translate={translate}
         language={language}
@@ -336,11 +335,8 @@ export default function LoadingApp(props: LoadingAppProps) {
 }
 
 type LoadingAppClassProps = {
-  navigationApp: StackScreenProps<
-    AppStackParamList,
-    RouteEnum.LoadingApp
-  >['navigation'];
-  route: StackScreenProps<AppStackParamList, RouteEnum.LoadingApp>['route'];
+  openWallet: (params: LoadedAppNavigationState) => void;
+  route: LoadingAppProps['route'];
   translate: (key: string) => TranslateType;
   theme: AppTheme;
   language: LanguageEnum;
@@ -979,22 +975,14 @@ export class LoadingAppClass extends Component<
     walletChainName: ChainNameEnum,
   ) => {
     this.setState(s => ({ wallet: { ...s.wallet, seed: '', ufvk: '' } }));
-    this.props.navigationApp.reset({
-      index: 0,
-      routes: [
-        {
-          name: RouteEnum.LoadedApp,
-          params: {
-            readOnly,
-            orchardPool,
-            saplingPool,
-            transparentPool,
-            newWallet,
-            firstLaunchingMessage,
-            walletChainName,
-          },
-        },
-      ],
+    this.props.openWallet({
+      readOnly,
+      orchardPool,
+      saplingPool,
+      transparentPool,
+      newWallet,
+      firstLaunchingMessage,
+      walletChainName,
     });
   };
 

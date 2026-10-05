@@ -5,7 +5,7 @@ import {
   createNavigationContainerRef,
   NavigationContainer,
 } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import { LoadedApp } from './LoadedApp';
 import { LoadingApp } from './LoadingApp';
@@ -18,21 +18,28 @@ import { ThemeProvider, useTheme, navigationTheme } from './theme';
 import { BackHandler, LogBox, StatusBar } from 'react-native';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import AppErrorBoundary from './AppErrorBoundary';
+import { SessionProvider, useSession } from './navigation/session';
 import BiometricBlankingOverlay from '@ui/widgets/BiometricBlankingOverlay';
 
 LogBox.ignoreLogs([
   '[Reanimated] Reduced motion setting is enabled on this device.',
 ]);
 
-const Stack = createStackNavigator<AppStackParamList>();
+const Stack = createNativeStackNavigator<AppStackParamList>();
 
 export const navigationRef = createNavigationContainerRef();
+
+const SCANNER_OPTIONS = {
+  presentation: 'transparentModal',
+  animation: 'slide_from_bottom',
+} as const;
 
 // The provider has to sit above every consumer, so App cannot read the theme it
 // renders. The shell is what consumes it.
 const AppShell: React.FunctionComponent = () => {
   const { colors } = useTheme();
   const theme = useMemo(() => navigationTheme(colors), [colors]);
+  const { session } = useSession();
 
   // avoid to close the App when the user tap on
   // the back button of the device.
@@ -69,34 +76,38 @@ const AppShell: React.FunctionComponent = () => {
               }}
             >
               <Stack.Navigator
-                initialRouteName={RouteEnum.LoadingApp}
                 screenOptions={{ headerShown: false, animation: 'none' }}
               >
-                <Stack.Screen name={RouteEnum.LoadingApp}>
-                  {props => <LoadingApp {...props} />}
-                </Stack.Screen>
-                <Stack.Screen name={RouteEnum.LoadedApp}>
-                  {props => <LoadedApp {...props} />}
-                </Stack.Screen>
-                {/* ScannerAddress lives at the root Stack (above LoadedApp,
-                  therefore above the BottomSheetModalProvider portal). Without
-                  this, any open BottomSheetModal renders ON TOP of the camera,
-                  hiding the preview.
-                  presentation: 'transparentModal' avoids the iOS UIKit modal
-                  freeze on the underlying view — with 'modal' or default
-                  'card' the BottomSheetModal backdrop below stays
-                  unresponsive for several seconds after the camera is
-                  dismissed because iOS pauses the underlying scene during
-                  the native modal presentation. */}
+                {/* The session picks the section; the one it leaves is
+                  removed from the tree, so it unmounts. */}
+                {session.kind === 'wallet' ? (
+                  <Stack.Screen
+                    name={RouteEnum.LoadedApp}
+                    initialParams={session.params}
+                  >
+                    {props => <LoadedApp {...props} />}
+                  </Stack.Screen>
+                ) : (
+                  <Stack.Screen
+                    name={RouteEnum.LoadingApp}
+                    initialParams={session.params}
+                  >
+                    {props => <LoadingApp {...props} />}
+                  </Stack.Screen>
+                )}
+                {/* The scanners live at the root, above every section and
+                  its bottom-sheet portal, so an open sheet never covers the
+                  camera. A transparent modal keeps the screen beneath it
+                  mounted and live. */}
                 <Stack.Screen
                   name={RouteEnum.ScannerAddress}
                   component={ScannerAddress}
-                  options={{ presentation: 'transparentModal' }}
+                  options={SCANNER_OPTIONS}
                 />
                 <Stack.Screen
                   name={RouteEnum.ScannerUfvk}
                   component={ScannerUfvk}
-                  options={{ presentation: 'transparentModal' }}
+                  options={SCANNER_OPTIONS}
                 />
               </Stack.Navigator>
             </SafeAreaView>
@@ -109,7 +120,9 @@ const AppShell: React.FunctionComponent = () => {
 
 const App: React.FunctionComponent = () => (
   <ThemeProvider>
-    <AppShell />
+    <SessionProvider>
+      <AppShell />
+    </SessionProvider>
   </ThemeProvider>
 );
 

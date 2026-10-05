@@ -1,8 +1,8 @@
-import { StackNavigationProp } from '@react-navigation/stack';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AppStackParamList } from '@app/types';
 import { RouteEnum } from '@app/AppState';
 
-export const mockLoadedAppNavigation: StackNavigationProp<
+export const mockLoadedAppNavigation: NativeStackNavigationProp<
   AppStackParamList,
   RouteEnum.LoadedApp
 > = {
