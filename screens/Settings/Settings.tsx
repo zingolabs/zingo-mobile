@@ -321,6 +321,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
 
   // The system store that keeps the recovery info, by its platform name.
   const secureStore = Platform.OS === 'ios' ? 'Keychain' : 'Keystore';
+  // A watch-only wallet keeps its viewing key; any other, its seed phrase.
+  const keyKind = readOnly ? 'ufvk' : 'seed';
 
   // Writes this wallet's seed (or viewing key) to the secure store now and
   // reports how it went right under the warning.
@@ -339,7 +341,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       : recoveryInfoSave?.kind === 'saved'
         ? 'settings.recoveryinfo-saved'
         : recoveryInfoSave?.kind === 'no-keys'
-          ? 'settings.recoveryinfo-nokeys'
+          ? `settings.recoveryinfo-nokeys-${keyKind}`
           : 'settings.recoveryinfo-failed';
     const error =
       recoveryInfoSave?.kind === 'write-failed' ? recoveryInfoSave.error : '';
@@ -1716,7 +1718,11 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                           textDecorationLine: 'underline',
                         }}
                       >
-                        {translate('settings.recoveryinfo-notstored') as string}
+                        {
+                          translate(
+                            `settings.recoveryinfo-notstored-${keyKind}`,
+                          ) as string
+                        }
                       </FadeText>
                     </TouchableOpacity>
                   )}
