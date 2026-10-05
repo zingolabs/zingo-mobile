@@ -61,7 +61,7 @@ jobs:
     uses: ./.github/workflows/ios-build.yaml
     needs: create-cache-key
     with:
-      cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
+      cache-key: ${{ needs.create-cache-key.outputs.ios-cache-key }}
 
   ios-integration-test:
     strategy:
@@ -70,4 +70,4 @@ jobs:
     needs: [ create-cache-key, ios-build ]
     secrets: inherit
     with:
-      cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
+      cache-key: ${{ needs.create-cache-key.outputs.ios-cache-key }}

@@ -26,6 +26,11 @@ import TotalBalanceClass from '@app/AppState/classes/TotalBalanceClass';
 import InfoType from '@app/AppState/types/InfoType';
 import { fiatQuote } from '@app/price/fiatQuote';
 import ZecPriceType from '@app/AppState/types/ZecPriceType';
+import {
+  MixnetView,
+  sendGateOpen,
+  shownStatusKey,
+} from '@app/walletBackend/transforms/mixnetView';
 import Utils from '@app/utils';
 import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
 import CurrencyAmount from '@ui/widgets/CurrencyAmount';
@@ -72,6 +77,7 @@ type BalanceRowProps = {
   calculateDisableButtonToShield: () => boolean;
   onPressShieldFunds: () => void;
   receivedLegend: boolean | undefined;
+  mixnetView: MixnetView;
   onUsdRowLayout?: (height: number) => void;
 };
 
@@ -95,6 +101,7 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
     calculateDisableButtonToShield,
     onPressShieldFunds,
     receivedLegend,
+    mixnetView,
     onUsdRowLayout,
   }) => {
     const navigation = useNavigation<NavigationProp<ParamListBase>>();
@@ -239,16 +246,30 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
           !calculateDisableButtonToShield() &&
           valueTransfersTotal !== null && (
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-              <FadeText style={{ fontSize: 8 }}>
-                {(translate(
-                  `history.shield-legend-${calculatePoolsToShield()}`,
-                ) as string) +
-                  ` ${calculateAmountToShield()} ` +
-                  (translate('send.fee') as string) +
-                  ': ' +
-                  Utils.parseNumberFloatToStringLocale(shieldingFee, 8) +
-                  ' '}
-              </FadeText>
+              {mixnetView.kind === 'transport' && mixnetView.sendBlocked ? (
+                <View
+                  style={{ alignItems: 'center' }}
+                  testID="header.shield-blocked"
+                >
+                  <FadeText style={{ fontSize: 8 }}>
+                    {translate('send.nym-blocked') as string}
+                  </FadeText>
+                  <FadeText style={{ fontSize: 8 }}>
+                    {translate(shownStatusKey(mixnetView)) as string}
+                  </FadeText>
+                </View>
+              ) : (
+                <FadeText style={{ fontSize: 8 }}>
+                  {(translate(
+                    `history.shield-legend-${calculatePoolsToShield()}`,
+                  ) as string) +
+                    ` ${calculateAmountToShield()} ` +
+                    (translate('send.fee') as string) +
+                    ': ' +
+                    Utils.parseNumberFloatToStringLocale(shieldingFee, 8) +
+                    ' '}
+                </FadeText>
+              )}
               <View style={{ margin: 5, flexDirection: 'row' }}>
                 <Button
                   testID="header.shield"
@@ -259,7 +280,7 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
                     ) as string
                   }
                   onPress={onPressShieldFunds}
-                  disabled={calculateDisableButtonToShield()}
+                  disabled={!sendGateOpen(mixnetView)}
                 />
               </View>
             </View>

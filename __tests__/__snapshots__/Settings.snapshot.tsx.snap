@@ -626,6 +626,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
                 "opacity": 1,
               }
             }
+            testID="settings.server"
           >
             <View
               style={
@@ -1420,6 +1421,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
           "opacity": 1,
         }
       }
+      testID="settings.list-server"
     >
       <View
         style={
@@ -1475,7 +1477,6 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               "opacity": 1,
             }
           }
-          testID="settings.list-server"
         >
           text translated
         </Text>

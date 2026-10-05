@@ -3,6 +3,11 @@ name: Android Kotlin compile
 on:
   workflow_call:
     inputs:
+      # The key from create-cache-key.yaml, which names the pin and the
+      # toolchain that the Kotlin bindings come from.
+      cache-key:
+        required: true
+        type: string
       # Fail-all (see CONTEXT.md): when true, a failure here cancels the
       # whole run. PR CI opts in; ci-nightly does not.
       fail-all:
@@ -32,14 +37,21 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v6
+      - name: Gradle cache
+        uses: ./.github/actions/gradle-cache
 
-      # The app module compiles the UniFFI bindings from
-      # build/generated/source/uniffi/release/java. This step generates them
-      # without the NDK build.
-      - name: Generate UniFFI bindings
+      # The app module compiles the Binding Layer's Kotlin bindings, which
+      # the kotlin-bindings action generates on the host. This check is the
+      # one that saves the host build to the cache, and the other three
+      # checks restore it.
+      - name: Check out zingolib
+        uses: ./.github/actions/zingolib-submodule
+
+      - name: Generate the Kotlin bindings
         uses: ./.github/actions/kotlin-bindings
+        with:
+          cache-key: ${{ inputs.cache-key }}
+          save-cache: 'true'
 
       - name: Compile release Kotlin
         working-directory: ./android
@@ -47,7 +59,7 @@ jobs:
 
       - name: Cancel the run on failure (fail-all)
         if: ${{ failure() && inputs.fail-all }}
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9
         with:
           script: |
             await github.rest.actions.cancelWorkflowRun({

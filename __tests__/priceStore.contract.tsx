@@ -24,11 +24,12 @@ import { SelectServerEnum } from '@app/AppState';
 import { getZecPrice } from '@app/walletBackend';
 import { mockZecQuote } from '../__mocks__/dataMocks/mockZecPriceOutcome';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
-import { MixnetView } from '@app/walletBackend/transforms/mixnetView';
+import { MixnetTransportView } from '@app/walletBackend/transforms/mixnetView';
 
 const price = getZecPrice as jest.MockedFunction<typeof getZecPrice>;
 
-const READY_VIEW: MixnetView = {
+const READY_VIEW: MixnetTransportView = {
+  kind: 'transport',
   statusKey: 'mixnet.status.ready',
   socks5Addr: '127.0.0.1:1080',
   narration: null,
@@ -111,6 +112,7 @@ test('a died transport mutes the ring and stops its fill', async () => {
     surfaceUi(
       makeCtx({
         mixnetView: {
+          kind: 'transport',
           statusKey: 'mixnet.status.died',
           socks5Addr: null,
           narration: null,

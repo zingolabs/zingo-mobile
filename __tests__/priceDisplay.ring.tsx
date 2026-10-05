@@ -23,13 +23,14 @@ import {
 } from '@app/context';
 import { SelectServerEnum } from '@app/AppState';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
-import { MixnetView } from '@app/walletBackend/transforms/mixnetView';
+import { MixnetTransportView } from '@app/walletBackend/transforms/mixnetView';
 
 beforeEach(() => {
   priceFetcherStore.resetForTests();
 });
 
-const READY_VIEW: MixnetView = {
+const READY_VIEW: MixnetTransportView = {
+  kind: 'transport',
   statusKey: 'mixnet.status.ready',
   socks5Addr: '127.0.0.1:1080',
   narration: null,
@@ -148,6 +149,7 @@ test('a refusing transport shows no ring', () => {
     fetcherUi(
       makeCtx({
         mixnetView: {
+          kind: 'transport',
           statusKey: 'mixnet.status.died',
           socks5Addr: null,
           narration: null,

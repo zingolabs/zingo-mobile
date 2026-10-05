@@ -36,9 +36,6 @@ dependencyAnalysis {
 
 allprojects {
     repositories {
-        maven {
-            url = uri("$rootDir/../node_modules/detox/Detox-android")
-        }
         google()
         mavenCentral()
         maven { url = uri("https://www.jitpack.io") }

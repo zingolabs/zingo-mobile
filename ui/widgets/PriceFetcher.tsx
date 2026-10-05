@@ -16,9 +16,10 @@ export const PriceTrafficDriver: React.FunctionComponent = () => {
   const context = useContext(ContextAppLoaded);
   const { mixnetView, setZecPrice, server, info } = context;
 
-  const mixnetStatusKey = mixnetView
-    ? mixnetView.statusKey
-    : 'mixnet.status.unknown';
+  const mixnetStatusKey =
+    mixnetView.kind === 'transport'
+      ? mixnetView.statusKey
+      : 'mixnet.status.unknown';
   const priceFetchable = fiatEligible(server, info.chainName);
 
   useEffect(() => {

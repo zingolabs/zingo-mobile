@@ -5,25 +5,8 @@ appId: org.ZingoLabs.Zingo
 # whatever the previous one left behind would pass or fail on luck.
 # A fresh install lands on the start menu, so each flow creates its own
 # wallet before it has an app to drive.
-- launchApp:
-    clearState: true
-
-- extendedWaitUntil:
-    visible:
-      id: "loadingapp.createnewwallet"
-    timeout: 120000
-- tapOn:
-    id: "loadingapp.createnewwallet"
-- extendedWaitUntil:
-    visible:
-      id: "newseed.button.ok"
-    timeout: 120000
-- tapOn:
-    id: "newseed.button.ok"
-- extendedWaitUntil:
-    visible:
-      id: "header.drawmenu"
-    timeout: 120000
+- runFlow:
+    file: common/create_wallet.yaml
 
 # Open the options panel and navigate to Address Book
 - tapOn:

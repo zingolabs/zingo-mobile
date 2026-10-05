@@ -13,11 +13,11 @@ import {
   TranslateType,
 } from '@app/AppState';
 import TotalBalanceClass from '@app/AppState/classes/TotalBalanceClass';
-import NetInfoType from '@app/AppState/types/NetInfoType';
 import { shieldConfirm, shieldPropose } from '@app/walletBackend';
 import type { FfiResult } from '@app/walletBackend';
 import { RPCShieldProposeType } from '@app/walletBackend/types/RPCShieldProposeType';
-import { RPCShieldType } from '@app/walletBackend/types/RPCShieldType';
+import { shieldEnd } from '@app/walletBackend/transforms/sendSettlement';
+import { SendPermit } from '@app/walletBackend/transforms/sendPermit';
 import Utils from '@app/utils';
 
 type UseShieldFundsInput = {
@@ -28,12 +28,12 @@ type UseShieldFundsInput = {
   totalBalance: TotalBalanceClass | null;
   shieldingAmount: number;
   translate: (key: string) => TranslateType;
-  netInfo: NetInfoType;
   addLastSnackbar:
     ((msg: string, duration?: SnackbarDurationEnum) => void) | undefined;
   setBackgroundError: ((title: string, err: string) => void) | undefined;
   setScrollToTop: ((v: boolean) => void) | undefined;
   setScrollToBottom: ((v: boolean) => void) | undefined;
+  sendPermitNow: () => SendPermit;
 };
 
 type UseShieldFundsResult = {
@@ -66,11 +66,11 @@ export function useShieldFunds({
   totalBalance,
   shieldingAmount,
   translate,
-  netInfo,
   addLastSnackbar,
   setBackgroundError,
   setScrollToTop,
   setScrollToBottom,
+  sendPermitNow,
 }: UseShieldFundsInput): UseShieldFundsResult {
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const [showShieldButton, setShowShieldButton] = useState<boolean>(false);
@@ -154,8 +154,9 @@ export function useShieldFunds({
     if (!setBackgroundError || !addLastSnackbar) {
       return;
     }
-    if (!netInfo.isConnected || server.kind === 'offline') {
-      addLastSnackbar(translate('loadedapp.connection-error') as string);
+    const permit = sendPermitNow();
+    if (permit.kind === 'error') {
+      addLastSnackbar(translate(permit.errorKey) as string);
       return;
     }
 
@@ -163,38 +164,15 @@ export function useShieldFunds({
     await shieldPropose();
     const shield = await shieldConfirm();
 
-    let success = false;
-    let errorMessage: string | undefined;
-    if (!shield.ok) {
-      errorMessage = shield.error.message;
-    } else {
-      try {
-        const shieldJSON: RPCShieldType = JSON.parse(shield.value);
-        if (shieldJSON.error) {
-          errorMessage = shieldJSON.error;
-        } else if (shieldJSON.txids) {
-          success = true;
-        }
-      } catch (e) {
-        // An unparseable SUCCESS payload is most likely a quirky success
-        // shape — treat it as success and let the user land on the
-        // "created" confirmation.
-        success = true;
-      }
-    }
     setScrollToTop?.(true);
     setScrollToBottom?.(true);
     setShieldingFee(0);
     setShieldingAmount?.(0);
-    navigation.navigate(RouteEnum.Computing, {
-      phase: success ? 'created' : 'failed',
-      errorMessage: success ? undefined : errorMessage,
-    });
+    navigation.navigate(RouteEnum.Computing, shieldEnd(shield));
   }, [
     setBackgroundError,
     addLastSnackbar,
-    netInfo.isConnected,
-    server,
+    sendPermitNow,
     translate,
     navigation,
     setScrollToTop,
