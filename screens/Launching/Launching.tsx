@@ -138,8 +138,7 @@ const Launching: React.FunctionComponent<LaunchingProps> = props => {
               <ActivityIndicator
                 size="large"
                 color={
-                  props.firstLaunchingMessage === LaunchingModeEnum.updating ||
-                  props.firstLaunchingMessage === LaunchingModeEnum.installing
+                  props.firstLaunchingMessage === LaunchingModeEnum.updating
                     ? colors.fgAccent
                     : 'transparent'
                 }
@@ -151,25 +150,19 @@ const Launching: React.FunctionComponent<LaunchingProps> = props => {
                   fontWeight: 'bold',
                   marginTop: 10,
                   opacity:
-                    (props.firstLaunchingMessage ===
-                      LaunchingModeEnum.updating ||
-                      props.firstLaunchingMessage ===
-                        LaunchingModeEnum.installing) &&
-                    !biometricsFailed
+                    props.firstLaunchingMessage ===
+                      LaunchingModeEnum.updating && !biometricsFailed
                       ? 1
                       : 0,
                   textAlign: 'center',
                 }}
                 selectable
               >
-                {props.firstLaunchingMessage === LaunchingModeEnum.updating ||
-                props.firstLaunchingMessage === LaunchingModeEnum.opening
-                  ? (props.translate(
-                      'updating.firstlaunchingmessage-title',
-                    ) as string)
-                  : (props.translate(
-                      'installing.firstlaunchingmessage-title',
-                    ) as string)}
+                {
+                  props.translate(
+                    'updating.firstlaunchingmessage-title',
+                  ) as string
+                }
               </Text>
               <Text
                 style={{
@@ -177,25 +170,19 @@ const Launching: React.FunctionComponent<LaunchingProps> = props => {
                   fontSize: 15,
                   marginTop: 10,
                   opacity:
-                    (props.firstLaunchingMessage ===
-                      LaunchingModeEnum.updating ||
-                      props.firstLaunchingMessage ===
-                        LaunchingModeEnum.installing) &&
-                    !biometricsFailed
+                    props.firstLaunchingMessage ===
+                      LaunchingModeEnum.updating && !biometricsFailed
                       ? 1
                       : 0,
                   textAlign: 'center',
                 }}
                 selectable
               >
-                {props.firstLaunchingMessage === LaunchingModeEnum.updating ||
-                props.firstLaunchingMessage === LaunchingModeEnum.opening
-                  ? (props.translate(
-                      'updating.firstlaunchingmessage-body',
-                    ) as string)
-                  : (props.translate(
-                      'installing.firstlaunchingmessage-body',
-                    ) as string)}
+                {
+                  props.translate(
+                    'updating.firstlaunchingmessage-body',
+                  ) as string
+                }
               </Text>
               <Text
                 style={{
@@ -204,25 +191,19 @@ const Launching: React.FunctionComponent<LaunchingProps> = props => {
                   marginTop: 10,
                   marginBottom: 10,
                   opacity:
-                    (props.firstLaunchingMessage ===
-                      LaunchingModeEnum.updating ||
-                      props.firstLaunchingMessage ===
-                        LaunchingModeEnum.installing) &&
-                    !biometricsFailed
+                    props.firstLaunchingMessage ===
+                      LaunchingModeEnum.updating && !biometricsFailed
                       ? 1
                       : 0,
                   textAlign: 'center',
                 }}
                 selectable
               >
-                {props.firstLaunchingMessage === LaunchingModeEnum.updating ||
-                props.firstLaunchingMessage === LaunchingModeEnum.opening
-                  ? (props.translate(
-                      'updating.firstlaunchingmessage-footer',
-                    ) as string)
-                  : (props.translate(
-                      'installing.firstlaunchingmessage-footer',
-                    ) as string)}
+                {
+                  props.translate(
+                    'updating.firstlaunchingmessage-footer',
+                  ) as string
+                }
               </Text>
             </>
           )}

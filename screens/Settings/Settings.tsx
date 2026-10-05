@@ -68,7 +68,7 @@ import {
   ScreenEnum,
   BlockExplorerEnum,
 } from '@app/AppState';
-import { getLatestBlockServerInfo } from '@app/walletBackend';
+import { fetchWallet, getLatestBlockServerInfo } from '@app/walletBackend';
 import ChainTypeToggle from '@ui/widgets/ChainTypeToggle';
 import {
   DeviceSecurityProbe,
@@ -87,7 +87,11 @@ import BottomSheet, {
 import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
 import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
 import { useDismissSheetsOnBlur } from '@app/hooks/useDismissSheetsOnBlur';
-import { hasRecoveryWalletInfo } from '@app/services/recoveryWalletInfo';
+import {
+  RecoveryInfoSaveResult,
+  hasRecoveryWalletInfo,
+  saveRecoveryWalletInfo,
+} from '@app/services/recoveryWalletInfo';
 import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { createAlert } from '@app/services/createAlert';
@@ -251,6 +255,9 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     useState<boolean>(false);
   // Assumed stored until checked, so the warning doesn't flash on open.
   const [recoveryInfoStored, setRecoveryInfoStored] = useState<boolean>(true);
+  const [savingRecoveryInfo, setSavingRecoveryInfo] = useState<boolean>(false);
+  const [recoveryInfoSave, setRecoveryInfoSave] =
+    useState<RecoveryInfoSaveResult | null>(null);
   const [openInfoSection, setOpenInfoSection] = useState<string | null>(null);
   // Seeded optimistically. The union names the probe's answer instead of
   // collapsing it to a bit at this edge.
@@ -311,6 +318,38 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   );
 
   const settingsSnapPoints = useFullSheetSnapPoints(containerH, headerH);
+
+  // The system store that keeps the recovery info, by its platform name.
+  const secureStore = Platform.OS === 'ios' ? 'Keychain' : 'Keystore';
+  // A watch-only wallet keeps its viewing key; any other, its seed phrase.
+  const keyKind = readOnly ? 'ufvk' : 'seed';
+
+  // Writes this wallet's seed (or viewing key) to the secure store now and
+  // reports how it went right under the warning.
+  const saveRecoveryInfoNow = async () => {
+    setSavingRecoveryInfo(true);
+    setRecoveryInfoSave(null);
+    const result = await saveRecoveryWalletInfo(await fetchWallet(readOnly));
+    setRecoveryInfoSave(result);
+    setRecoveryInfoStored(result.kind === 'saved');
+    setSavingRecoveryInfo(false);
+  };
+
+  const recoveryInfoSaveText = (): string => {
+    const key = savingRecoveryInfo
+      ? 'settings.recoveryinfo-saving'
+      : recoveryInfoSave?.kind === 'saved'
+        ? 'settings.recoveryinfo-saved'
+        : recoveryInfoSave?.kind === 'no-keys'
+          ? `settings.recoveryinfo-nokeys-${keyKind}`
+          : 'settings.recoveryinfo-failed';
+    const error =
+      recoveryInfoSave?.kind === 'write-failed' ? recoveryInfoSave.error : '';
+    return (translate(key) as string)
+      .replace('{store}', secureStore)
+      .replace('{error}', error)
+      .trim();
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -1663,17 +1702,49 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                 />
               </TouchableOpacity>
 
-              {!recoveryInfoStored && (
-                <FadeText
-                  style={{
-                    color: colors.fgWarning,
-                    textAlign: 'center',
-                    marginHorizontal: 25,
-                    marginVertical: 15,
-                  }}
-                >
-                  {translate('settings.recoveryinfo-notstored') as string}
-                </FadeText>
+              {(!recoveryInfoStored || recoveryInfoSave) && (
+                <View style={{ marginHorizontal: 25, marginVertical: 15 }}>
+                  {!recoveryInfoStored && (
+                    <TouchableOpacity
+                      testID="settings.recoveryinfo.save"
+                      disabled={savingRecoveryInfo}
+                      onPress={saveRecoveryInfoNow}
+                      accessibilityRole="button"
+                    >
+                      <FadeText
+                        style={{
+                          color: colors.fgWarning,
+                          textAlign: 'center',
+                          textDecorationLine: 'underline',
+                        }}
+                      >
+                        {
+                          translate(
+                            `settings.recoveryinfo-notstored-${keyKind}`,
+                          ) as string
+                        }
+                      </FadeText>
+                    </TouchableOpacity>
+                  )}
+                  {(savingRecoveryInfo || recoveryInfoSave) && (
+                    <FadeText
+                      testID="settings.recoveryinfo.result"
+                      selectable
+                      style={{
+                        marginTop: recoveryInfoStored ? 0 : 8,
+                        textAlign: 'center',
+                        opacity: 1,
+                        color: savingRecoveryInfo
+                          ? colors.fgMuted
+                          : recoveryInfoSave?.kind === 'saved'
+                            ? colors.fgAccent
+                            : colors.fgDanger,
+                      }}
+                    >
+                      {recoveryInfoSaveText()}
+                    </FadeText>
+                  )}
+                </View>
               )}
 
               {/* SECTION: Developer */}

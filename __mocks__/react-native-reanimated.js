@@ -55,11 +55,17 @@ class AnimationBuilder {
   }
 }
 
+class Keyframe extends AnimationBuilder {}
+
 const FadeIn = new AnimationBuilder();
 const FadeInUp = new AnimationBuilder();
 const FadeInDown = new AnimationBuilder();
 const FadeOut = new AnimationBuilder();
+const FadeOutUp = new AnimationBuilder();
+const FadeOutDown = new AnimationBuilder();
 const LinearTransition = new AnimationBuilder();
+const ZoomIn = new AnimationBuilder();
+const ZoomOut = new AnimationBuilder();
 const Layout = new AnimationBuilder();
 
 const ReduceMotion = { System: 'system', Always: 'always', Never: 'never' };
@@ -108,8 +114,11 @@ export {
   FadeInDown,
   FadeInUp,
   FadeOut,
+  FadeOutDown,
+  FadeOutUp,
   interpolate,
   interpolateColor,
+  Keyframe,
   Layout,
   LinearTransition,
   ReduceMotion,
@@ -127,4 +136,6 @@ export {
   withSequence,
   withSpring,
   withTiming,
+  ZoomIn,
+  ZoomOut,
 };

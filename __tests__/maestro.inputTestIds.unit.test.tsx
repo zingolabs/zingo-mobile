@@ -159,7 +159,11 @@ describe('Maestro reaches each typed field on iOS', () => {
   test('the restore seed and birthday fields', () => {
     const importUfvk = render(
       <ContextAppLoadedProvider value={loadedState()}>
-        <ImportUfvk onClickCancel={onFunction} onClickOK={onFunction} />
+        <ImportUfvk
+          busy={false}
+          onClickCancel={onFunction}
+          onClickOK={onFunction}
+        />
       </ContextAppLoadedProvider>,
     );
     for (const id of ['import.seedufvkinput', 'import.birthdayinput']) {
