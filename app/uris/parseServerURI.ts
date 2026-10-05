@@ -22,6 +22,9 @@ export type ServerUriErrorKey = 'uris.baduri' | 'uris.error-http-not-allowed';
 export type ParseServerUriResult =
   { kind: 'canonicalUri'; uri: string } | ErrorKeyed<ServerUriErrorKey>;
 
+const authority = (uri: string): string =>
+  uri.replace(/^[^/]*\/\//, '').split(/[/?#]/)[0];
+
 const parseServerURI = (uri: string): ParseServerUriResult => {
   if (!uri) {
     return { kind: 'error', errorKey: 'uris.baduri' };
@@ -52,14 +55,14 @@ const parseServerURI = (uri: string): ParseServerUriResult => {
     // I need to verify if the URI have a standard port like `443` or `80`
     if (
       parsedUri.protocol === GlobalConst.http &&
-      uri.endsWith(':' + GlobalConst.port80)
+      authority(uri).endsWith(':' + GlobalConst.port80)
     ) {
       // looking for 80
       port = GlobalConst.port80;
     }
     if (
       parsedUri.protocol === GlobalConst.https &&
-      uri.endsWith(':' + GlobalConst.port443)
+      authority(uri).endsWith(':' + GlobalConst.port443)
     ) {
       // looking for 443
       port = GlobalConst.port443;
