@@ -135,6 +135,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
   );
 
   useEffect(() => {
+    let cancelled = false;
     (async () => {
       setLoading(true);
       let resultStr: string = '';
@@ -162,6 +163,9 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
         resultJSON = await JSON.parse(resultStr);
       } catch (e) {
         resultJSON = {};
+      }
+      if (cancelled) {
+        return;
       }
       let amounts: { value: number; address: string; tag: string }[] = [];
       const resultJSONEntries: [string, number][] = Object.entries(
@@ -206,6 +210,9 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
       setExpandAddress(newExpandAddress);
       setLoading(false);
     })();
+    return () => {
+      cancelled = true;
+    };
   }, [colors.bgMuted, colors.fgMuted, tab]);
 
   const selectExpandAddress = (index: number) => {
