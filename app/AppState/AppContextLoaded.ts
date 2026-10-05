@@ -133,8 +133,7 @@ export default interface AppContextLoaded {
   blockExplorer: BlockExplorerEnum;
   // The persisted send-route preference; the transport runs either way.
 
-  // Null where the mixnet policy does not run.
-  mixnetView: MixnetView | null;
+  mixnetView: MixnetView;
   reenableMixnet: () => Promise<void>;
   // Reads the send permit from the state at call time.
   sendPermitNow: () => SendPermit;

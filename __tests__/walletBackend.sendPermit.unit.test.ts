@@ -1,33 +1,26 @@
-import { NetInfoStateType } from '@react-native-community/netinfo/src/index';
-
-import { ChainNameEnum, offlineServer, remoteServer } from '@app/AppState';
+import { ChainNameEnum, offlineServer } from '@app/AppState';
 import { errorKeyed } from '@app/AppState/types/Result';
 import {
   PERMITTED,
   SendPermit,
-  SendPermitInputs,
   sendPermit,
   sendWhenPermitted,
 } from '@app/walletBackend/transforms/sendPermit';
-import { mixnetLost, mixnetReady, mockInfo } from '../.storybook/storyMocks';
+import { ABSENT_MIXNET_VIEW } from '@app/walletBackend/transforms/mixnetView';
+import { mixnetLost } from '../.storybook/storyMocks';
+import { mockOnline } from '../__mocks__/dataMocks/mockOnline';
 
-const online: SendPermitInputs = {
-  netInfo: {
-    isConnected: true,
-    type: NetInfoStateType.wifi,
-    isConnectionExpensive: false,
-  },
-  server: remoteServer(mockInfo.serverUri, ChainNameEnum.mainChainName),
-  mixnetView: mixnetReady,
-};
+const online = mockOnline;
 
 describe('sendPermit', () => {
   test('Tests that the permit is granted when the device is connected, the server is remote, and the mixnet view is ready.', () => {
     expect(sendPermit(online)).toEqual(PERMITTED);
   });
 
-  test('Tests that the permit is granted when the mixnet view is null. A null view marks a platform with no mixnet policy.', () => {
-    expect(sendPermit({ ...online, mixnetView: null })).toEqual(PERMITTED);
+  test('Tests that the permit is granted when the platform has no mixnet transport.', () => {
+    expect(sendPermit({ ...online, mixnetView: ABSENT_MIXNET_VIEW })).toEqual(
+      PERMITTED,
+    );
   });
 
   test('Tests that the permit is refused with the connection key when the device is disconnected.', () => {

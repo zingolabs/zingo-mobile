@@ -26,12 +26,13 @@ import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import {
   MIXNET_STATUS_KEYS,
   MixnetStatusKey,
-  MixnetView,
+  MixnetTransportView,
 } from '@app/walletBackend/transforms/mixnetView';
 
 const price = getZecPrice as jest.MockedFunction<typeof getZecPrice>;
 
-const viewFor = (statusKey: MixnetStatusKey): MixnetView => ({
+const viewFor = (statusKey: MixnetStatusKey): MixnetTransportView => ({
+  kind: 'transport',
   statusKey,
   socks5Addr: null,
   narration: null,
