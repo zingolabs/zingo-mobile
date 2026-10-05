@@ -10,6 +10,7 @@ import {
   ValueTransferType,
   ProposalPoolsType,
 } from '@app/AppState';
+import type { ComputingEnd } from '@app/walletBackend/transforms/sendSettlement';
 import { RPCDrainTxType } from '@app/walletBackend/types/RPCDrainPlanType';
 import { RPCMigrationPlanType } from '@app/walletBackend/types/RPCMigrationPlanType';
 
@@ -73,8 +74,7 @@ export type AppDrawerParamList = {
   [RouteEnum.MixnetDoctor]: undefined;
   [RouteEnum.Rescan]: undefined;
   [RouteEnum.Insight]: undefined;
-  [RouteEnum.Computing]:
-    { phase?: 'created' | 'failed'; errorMessage?: string } | undefined;
+  [RouteEnum.Computing]: ComputingEnd | undefined;
   [RouteEnum.SyncReport]: undefined;
   [RouteEnum.Pools]: undefined;
   [RouteEnum.MeetIronwood]: undefined;

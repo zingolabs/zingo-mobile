@@ -130,14 +130,14 @@ describe('retryOnAnotherServer is exhaustive over the enumeration', () => {
 describe('sendFailureText', () => {
   it('carries a catalog key for the wallet verdicts', () => {
     expect(sendFailureText(classifySendFailure('64: dust'))).toEqual({
-      kind: 'key',
+      kind: 'error',
       errorKey: 'send.dust-error',
     });
     expect(
       sendFailureText(
         classifySendFailure('18: bad-txns-orchard-duplicate-nullifier'),
       ),
-    ).toEqual({ kind: 'key', errorKey: 'send.duplicate-nullifier-error' });
+    ).toEqual({ kind: 'error', errorKey: 'send.duplicate-nullifier-error' });
   });
 
   it('carries a mixnet refusal verbatim, untranslated', () => {

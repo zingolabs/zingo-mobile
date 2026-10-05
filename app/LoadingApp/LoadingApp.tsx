@@ -78,6 +78,11 @@ import {
   BlockExplorerEnum,
 } from '@app/AppState';
 import { parseServerURI, serverUris, fetchServerList } from '@app/uris';
+import {
+  otherServers,
+  staticAlternatives,
+  staticServers,
+} from '@app/uris/serverChoice';
 import SettingsFileImpl from '@app/services/SettingsFileImpl';
 import { fetchWallet } from '@app/walletBackend';
 import { AppTheme } from '@app/theme';
@@ -713,16 +718,14 @@ export class LoadingAppClass extends Component<
     if (actualServer.kind === 'offline') {
       return false;
     }
+    // stay on the active wallet's chain — the static list now also
+    // carries a testnet default, and picking it for a mainnet wallet
+    // (or vice versa) would swap chains under the wallet.
+    const list = serverUris(this.state.translate);
     const server = await selectingServer(
-      serverUris(this.state.translate).filter(
-        (s: ServerUrisType) =>
-          !s.obsolete &&
-          // stay on the active wallet's chain — the static list now also
-          // carries a testnet default, and picking it for a mainnet wallet
-          // (or vice versa) would swap chains under the wallet.
-          s.chainName === actualServer.chainName &&
-          s.uri !== (aDifferentOne ? actualServer.uri : ''),
-      ),
+      aDifferentOne
+        ? staticAlternatives(list, actualServer)
+        : staticServers(list, actualServer.chainName),
     );
     let fasterServer = actualServer;
     if (server && server.latency) {
@@ -767,9 +770,9 @@ export class LoadingAppClass extends Component<
     if (actualServer.kind === 'offline') {
       return false;
     }
-    const live = await fetchServerList(actualServer.chainName);
-    const liveCandidates = live.filter(
-      (s: ServerUrisType) => s.uri !== actualServer.uri,
+    const liveCandidates = otherServers(
+      await fetchServerList(actualServer.chainName),
+      actualServer,
     );
     if (liveCandidates.length > 0) {
       const best = remoteServer(
