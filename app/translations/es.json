@@ -211,6 +211,10 @@
     "section-networkadvanced": "Red y Avanzado",
     "section-other": "Otros",
     "recoveryinfo-notstored": "La información de recuperación del monedero no está almacenada en este dispositivo. Asegúrate de tener apuntada tu frase semilla (o clave de visualización).",
+    "recoveryinfo-saving": "Guardándola en el {store}…",
+    "recoveryinfo-saved": "Guardada en el {store}.",
+    "recoveryinfo-nokeys": "No se pudo leer la semilla o la clave de visualización de este monedero, así que no se guardó nada.",
+    "recoveryinfo-failed": "No se pudo guardar en el {store}. {error}",
     "section-developer": "Desarrollador",
     "memos": [
       {

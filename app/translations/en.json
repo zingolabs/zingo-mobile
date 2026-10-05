@@ -211,6 +211,10 @@
     "section-networkadvanced": "Network & Advanced",
     "section-other": "Other",
     "recoveryinfo-notstored": "The wallet recovery info is not stored on this device. Make sure you have your seed phrase (or viewing key) written down.",
+    "recoveryinfo-saving": "Saving it in the {store}…",
+    "recoveryinfo-saved": "Saved in the {store}.",
+    "recoveryinfo-nokeys": "Couldn't read this wallet's seed phrase or viewing key, so nothing was saved.",
+    "recoveryinfo-failed": "Couldn't save it in the {store}. {error}",
     "section-developer": "Developer",
     "memos": [
       {

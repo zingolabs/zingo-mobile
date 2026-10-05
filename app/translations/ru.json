@@ -211,6 +211,10 @@
     "section-networkadvanced": "Сеть и расширенные",
     "section-other": "Прочее",
     "recoveryinfo-notstored": "Данные для восстановления кошелька не сохранены на этом устройстве. Убедитесь, что вы записали сид-фразу (или ключ просмотра).",
+    "recoveryinfo-saving": "Сохранение в {store}…",
+    "recoveryinfo-saved": "Сохранено в {store}.",
+    "recoveryinfo-nokeys": "Не удалось прочитать начальную фразу или ключ просмотра этого кошелька, поэтому ничего не сохранено.",
+    "recoveryinfo-failed": "Не удалось сохранить в {store}. {error}",
     "section-developer": "Разработчик",
     "memos": [
       {

@@ -211,6 +211,10 @@
     "section-networkadvanced": "Ağ ve Gelişmiş",
     "section-other": "Diğer",
     "recoveryinfo-notstored": "Cüzdan kurtarma bilgileri bu cihazda saklanmıyor. Tohum ifadenizi (veya görüntüleme anahtarınızı) bir yere yazdığınızdan emin olun.",
+    "recoveryinfo-saving": "{store} içine kaydediliyor…",
+    "recoveryinfo-saved": "{store} içine kaydedildi.",
+    "recoveryinfo-nokeys": "Bu cüzdanın tohum ifadesi veya görüntüleme anahtarı okunamadı, bu yüzden hiçbir şey kaydedilmedi.",
+    "recoveryinfo-failed": "{store} içine kaydedilemedi. {error}",
     "section-developer": "Geliştirici",
     "memos": [
       {

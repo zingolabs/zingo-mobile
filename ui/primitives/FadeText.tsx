@@ -9,6 +9,7 @@ type FadeTextProps = {
   numberOfLines?: number;
   ellipsizeMode?: 'head' | 'middle' | 'tail' | 'clip';
   selectable?: boolean;
+  testID?: string;
 };
 
 const FadeText: React.FunctionComponent<FadeTextProps> = ({
@@ -17,11 +18,13 @@ const FadeText: React.FunctionComponent<FadeTextProps> = ({
   numberOfLines,
   ellipsizeMode,
   selectable,
+  testID,
 }) => {
   const { colors } = useTheme();
 
   return (
     <Text
+      testID={testID}
       numberOfLines={numberOfLines}
       ellipsizeMode={ellipsizeMode}
       style={{ opacity: 0.65, color: colors.fgDefault, ...style }}
