@@ -1,5 +1,6 @@
 import java.util.Properties
 import java.io.FileInputStream
+import kotlin.time.Duration.Companion.seconds
 
 plugins {
     id("com.android.application")
@@ -88,6 +89,9 @@ val jscFlavor = "io.github.react-native-community:jsc-android:2026004.+"
  * e.g. ./gradlew assembleRelease -PsplitApk=true -PincludeUniversalApk=true
  */
 val splitApk = (project.findProperty("splitApk") as? String)?.toBoolean() ?: false
+
+// The limit that the instrumentation runner gives one instrumented test.
+val instrumentedTestTimeout = 60.seconds
 val includeUniversalApk = (project.findProperty("includeUniversalApk") as? String)?.toBoolean() ?: false
 
 val keystoreProperties = Properties()
@@ -125,6 +129,10 @@ android {
         versionName = "2.0.24" // Real
         testBuildType = System.getProperty("testBuildType", "debug")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunnerArguments["timeout_msec"] =
+            instrumentedTestTimeout.inWholeMilliseconds.toString()
+        // The orchestrator clears the app's data between tests.
+        testInstrumentationRunnerArguments["clearPackageData"] = "true"
         externalNativeBuild {
             ndkBuild {
                 arguments(
@@ -252,6 +260,8 @@ android {
     }
 
     testOptions {
+        // Each instrumented test runs in its own process.
+        execution = "ANDROIDX_TEST_ORCHESTRATOR"
         unitTests.all {
             // The golden wire-contract pins for GoldenWireContractTest, read
             // from the crate itself.
@@ -332,7 +342,6 @@ dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
 
-    androidTestImplementation("com.wix:detox:20.51.4")
     implementation("androidx.appcompat:appcompat:1.7.0")
     // DeviceAuthModule's BiometricPrompt (react-native-keychain only pulls
     // this transitively; direct use declares it).
@@ -344,11 +353,6 @@ dependencies {
         exclude(group = "com.android.installreferrer")
     }
     implementation("com.facebook.soloader:soloader:0.10.5")
-
-
-    // Detox tests getAttributes() reaches this by reflection at runtime, so
-    // it is runtime-only: no source references exist for compile analysis.
-    debugRuntimeOnly("com.google.android.material:material:1.12.0")
 
     // Hermes is always enabled in RN 0.74+
     implementation("com.facebook.react:hermes-android")
@@ -391,12 +395,11 @@ dependencies {
     // JVM unit tests for pure logic (no device or emulator)
     testImplementation("junit:junit:4.13.2")
 
-    // JUnit test runners; the instrumented sources use the JUnit 4 API and
-    // the androidx.test runner/rules directly.
-    androidTestImplementation("androidx.test.ext:junit:1.2.1")
+    // The instrumented sources use the JUnit 4 API, and the androidx.test
+    // runner executes them.
     androidTestImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test:rules:1.7.0")
     androidTestImplementation("androidx.test:runner:1.7.0")
+    androidTestUtil("androidx.test:orchestrator:1.6.1")
 
     // The Binding Layer from the zingolib submodule. It brings JNA with it.
     implementation("org.zingolabs:zingo-binding-layer")

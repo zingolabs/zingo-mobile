@@ -107,6 +107,7 @@ import { PriceTrafficDriver } from '@ui/widgets/PriceFetcher';
 import { priceFetcherStore } from '@ui/widgets/priceFetcherStore';
 import { ContextAppLoadedProvider } from '@app/context';
 import { parseZcashURI, serverUris, fetchServerList } from '@app/uris';
+import { otherServers, staticAlternatives } from '@app/uris/serverChoice';
 import selectingServer from '@app/services/selectingServer';
 import BackgroundFileImpl from '@app/services/BackgroundFileImpl';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -149,6 +150,12 @@ import {
   INITIAL_MIXNET_VIEW,
   MixnetView,
 } from '@app/walletBackend/transforms/mixnetView';
+import {
+  SendOutcome,
+  SendPermit,
+  sendPermit,
+  sendWhenPermitted,
+} from '@app/walletBackend/transforms/sendPermit';
 import {
   startMixnetTransport,
   stopMixnetTransport,
@@ -414,7 +421,7 @@ export default function LoadedApp(props: LoadedAppProps) {
         );
       }
       if (
-        settings.blockExplorer === BlockExplorerEnum.Cipherscan ||
+        settings.blockExplorer === BlockExplorerEnum.ZecBlock ||
         settings.blockExplorer === BlockExplorerEnum.Zcashexplorer ||
         settings.blockExplorer === BlockExplorerEnum.Zexplorer ||
         settings.blockExplorer === BlockExplorerEnum.None
@@ -725,6 +732,7 @@ export class LoadedAppClass extends Component<
 
       mixnetView: INITIAL_MIXNET_VIEW,
       reenableMixnet: this.reenableMixnet,
+      sendPermitNow: this.sendPermitNow,
 
       // state
       pendingServer: { kind: 'none' },
@@ -1152,6 +1160,8 @@ export class LoadedAppClass extends Component<
     await this.rpc.reenableMixnet();
   };
 
+  sendPermitNow = (): SendPermit => sendPermit(this.state);
+
   setValueTransfersList = async (
     valueTransfers: ValueTransferType[],
     valueTransfersTotal: number,
@@ -1410,25 +1420,17 @@ export class LoadedAppClass extends Component<
     });
   };
 
-  sendTransaction = async (
+  sendTransaction = (
     sendPageState: SendPageStateClass,
     sendAll: boolean = false,
-  ): Promise<String> => {
-    try {
-      // Construct a sendJson from the sendPage state
-      const { defaultUnifiedAddress } = this.state;
+  ): Promise<SendOutcome<string>> =>
+    sendWhenPermitted(this.sendPermitNow, async () => {
       const sendJson = await Utils.getSendManyJSON(
         sendPageState,
-        defaultUnifiedAddress,
+        this.state.defaultUnifiedAddress,
       );
-      //const start = Date.now();
-      const txid = await this.rpc.sendTransaction(sendJson, sendAll);
-
-      return txid;
-    } catch (err) {
-      throw err;
-    }
-  };
+      return this.rpc.sendTransaction(sendJson, sendAll);
+    });
 
   doRefresh = (screen: ScreenEnum) => {
     if (screen === ScreenEnum.History) {
@@ -1668,19 +1670,15 @@ export class LoadedAppClass extends Component<
     }
     this.recoveringServer = true;
     try {
-      const live = (await fetchServerList(current.chainName)).filter(
-        (s: ServerUrisType) => s.uri !== current.uri,
+      const live = otherServers(
+        await fetchServerList(current.chainName),
+        current,
       );
       if (await this.activateReachableServer(live)) {
         return;
       }
       const fallback = await selectingServer(
-        serverUris(this.state.translate).filter(
-          (s: ServerUrisType) =>
-            !s.obsolete &&
-            s.chainName === current.chainName &&
-            s.uri !== current.uri,
-        ),
+        staticAlternatives(serverUris(this.state.translate), current),
       );
       if (fallback) {
         await this.activateReachableServer([fallback]);
@@ -2023,6 +2021,7 @@ export class LoadedAppClass extends Component<
       blockExplorer: this.state.blockExplorer,
       mixnetView: this.state.mixnetView,
       reenableMixnet: this.reenableMixnet,
+      sendPermitNow: this.sendPermitNow,
     };
 
     return (

@@ -15,13 +15,23 @@ on:
         required: true
         type: string
       # Fail-all (see CONTEXT.md): when true, a failure here cancels the
-      # whole run. PR CI opts in; ci-nightly does not. The PR integration
-      # buckets also watch this job through the ci-gate artifact gate, so
-      # they abort even if the cancellation races.
+      # whole run. PR CI opts in; ci-nightly does not.
       fail-all:
         required: false
         type: boolean
         default: false
+      # When true, this job saves the Gradle cache that every Gradle job
+      # restores. One caller passes true, the CI run of a push to the
+      # default branch.
+      gradle-cache-writer:
+        required: false
+        type: boolean
+        default: false
+      # Runner label for the APK build job. PR CI passes CI_GRADLE_RUNNER.
+      runner:
+        required: false
+        type: string
+        default: zingo-android-gradle-16
 
 env:
   REPO-OWNER: ${{ github.repository_owner }}
@@ -30,7 +40,7 @@ env:
 jobs:
   android-apk-build:
     name: Andr APK build
-    runs-on: zingo-android-gradle-16
+    runs-on: ${{ inputs.runner }}
     env:
       RUSTFLAGS: -D warnings
       CACHE-KEY: ${{ inputs.cache-key }}
@@ -51,13 +61,10 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Gradle setup cache (read/write)
-        uses: gradle/actions/setup-gradle@v6
+      - name: Gradle cache
+        uses: ./.github/actions/gradle-cache
         with:
-          gradle-version: wrapper
-          # Only dev writes Gradle caches; see the cache-discipline notes in
-          # android-ubuntu-integration-test-ci.yaml.
-          cache-read-only: ${{ github.ref != 'refs/heads/dev' }}
+          writer: ${{ inputs.gradle-cache-writer }}
 
       - name: Check out zingolib
         uses: ./.github/actions/zingolib-submodule
@@ -120,6 +127,14 @@ jobs:
           path: |
             android/app/build/outputs
           retention-days: 3
+
+      # setup-gradle saves the files that this job's builds used. These are
+      # the tasks of the other Gradle jobs.
+      - name: Fill the Gradle cache
+        if: ${{ inputs.gradle-cache-writer }}
+        continue-on-error: true
+        working-directory: android
+        run: ./gradlew --continue buildHealth :app:lintProdRelease :app:testProdReleaseUnitTest
 
       - name: Cancel the run on failure (fail-all)
         if: ${{ failure() && inputs.fail-all }}

@@ -246,8 +246,11 @@ export default class SettingsFileImpl {
         settings.performanceLevel = RPCPerformanceLevelEnum.Medium;
       }
       if (!settings.hasOwnProperty(SettingsNameEnum.blockExplorer)) {
-        // by default medium
+        // by default Zcashexplorer
         settings.blockExplorer = BlockExplorerEnum.Zcashexplorer;
+      } else if ((settings.blockExplorer as string) === 'Cipherscan') {
+        // Cipherscan was renamed ZecBlock (zecblock.com); keep the user's choice.
+        settings.blockExplorer = BlockExplorerEnum.ZecBlock;
       }
       if (!settings.hasOwnProperty(SettingsNameEnum.ironwoodOnboardSeen)) {
         // the wallet hasn't shown the "Meet Ironwood" onboarding yet; it

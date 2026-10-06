@@ -1,0 +1,30 @@
+appId: org.ZingoLabs.Zingo
+---
+# The wallet is created from the start menu, and the seed is shown once
+# before the app opens it.
+# A screen that is still moving when its element first shows can take a
+# tap at a place the element has left, and the tap then changes nothing
+# (see 02_options_menu.yaml). The wait lets the screen settle, and a tap
+# that changes nothing is tapped again.
+- extendedWaitUntil:
+    visible:
+      id: "loadingapp.createnewwallet"
+    timeout: 120000
+- waitForAnimationToEnd:
+    timeout: 5000
+- tapOn:
+    id: "loadingapp.createnewwallet"
+    retryTapIfNoChange: true
+- extendedWaitUntil:
+    visible:
+      id: "newseed.button.ok"
+    timeout: 120000
+- waitForAnimationToEnd:
+    timeout: 5000
+- tapOn:
+    id: "newseed.button.ok"
+    retryTapIfNoChange: true
+- extendedWaitUntil:
+    visible:
+      id: "header.drawmenu"
+    timeout: 120000

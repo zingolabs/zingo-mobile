@@ -14,11 +14,16 @@ on:
         required: false
         type: boolean
         default: false
+      # Runner label for the lint job. PR CI passes CI_GRADLE_RUNNER.
+      runner:
+        required: false
+        type: string
+        default: ubuntu-24.04
 
 jobs:
   android-lint:
     name: Andr lint (fast)
-    runs-on: ubuntu-24.04
+    runs-on: ${{ inputs.runner }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
@@ -37,8 +42,8 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v6
+      - name: Gradle cache
+        uses: ./.github/actions/gradle-cache
 
       # The lint below is the same script developers run locally, so a green
       # CI lint and a green local lint mean the same thing. Both take the

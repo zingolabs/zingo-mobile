@@ -48,6 +48,7 @@ import {
   sendGateOpen,
   shownStatusKey,
 } from '@app/walletBackend/transforms/mixnetView';
+import { SendOutcome } from '@app/walletBackend/transforms/sendPermit';
 import ErrorText from '@ui/primitives/ErrorText';
 import RegText from '@ui/primitives/RegText';
 import ZecAmount from '@ui/widgets/ZecAmount';
@@ -61,16 +62,14 @@ import {
   SendPageStateClass,
   ToAddrClass,
   GlobalConst,
-  ServerUrisType,
   ServerType,
-  remoteServer,
   SetServerResult,
   SelectServerEnum,
   RouteEnum,
   ScreenEnum,
   ProposalPoolsType,
 } from '@app/AppState';
-import { parseZcashURI, serverUris, fetchServerList } from '@app/uris';
+import { parseZcashURI } from '@app/uris';
 // Imported straight from the module rather than through the `uris` barrel, so
 // the ZNS SDK stays out of the module graph of everything else that barrel
 // serves (the wallet backend among them).
@@ -81,10 +80,9 @@ import {
   sendPropose,
 } from '@app/walletBackend';
 import {
-  classifySendFailure,
-  retryOnAnotherServer,
-  sendFailureText,
-} from '@app/walletBackend/transforms/sendFailureTransform';
+  computingEnd,
+  settleSend,
+} from '@app/walletBackend/transforms/sendSettlement';
 import Utils from '@app/utils';
 import {
   fiatEligible,
@@ -109,7 +107,7 @@ import ShowAddressAlertAsync from '@app/services/showAddressAlertAsync';
 import Memo from './components/Memo';
 import SendErrorSheet from './components/SendErrorSheet';
 import { sendEmail } from '@app/services/sendEmail';
-import selectingServer from '@app/services/selectingServer';
+import { retryServer } from '@app/services/retryServer';
 import { RPCSpendablebalanceType } from '@app/walletBackend/types/RPCSpendablebalanceType';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
@@ -125,7 +123,7 @@ type SendProps = NativeStackScreenProps<AppDrawerParamList, RouteEnum.Send> & {
   sendTransaction: (
     s: SendPageStateClass,
     sendAll?: boolean,
-  ) => Promise<String>;
+  ) => Promise<SendOutcome<string>>;
   setServerOption: (
     value: ServerType,
     selectServer: SelectServerEnum,
@@ -167,6 +165,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     zingolibVersion,
     setPrivacyOption,
     mixnetView,
+    sendPermitNow,
   } = context;
   const { colors } = useTheme();
   // USD entry derives the ZEC actually sent from the price, so that
@@ -947,101 +946,35 @@ const Send: React.FunctionComponent<SendProps> = ({
   };
 
   const confirmSend = async (sendPageStatePar: SendPageStateClass) => {
-    // The MAX send travels the send-all path all the way: quoted and sent by
-    // the same proposal, so the amount confirmed is the amount broadcast.
-    const sendAllSend = isSendAllAmount(sendPageStatePar.toaddr.amount);
-    if (!netInfo.isConnected || server.kind === 'offline') {
-      addLastSnackbar(translate('loadedapp.connection-error') as string);
+    const permit = sendPermitNow();
+    if (permit.kind === 'error') {
+      addLastSnackbar(translate(permit.errorKey) as string);
       return;
     }
 
     navigation.navigate(RouteEnum.Computing);
 
-    try {
-      await sendTransaction(sendPageStatePar, sendAllSend);
+    // The MAX send travels the send-all path all the way: quoted and sent by
+    // the same proposal, so the amount confirmed is the amount broadcast.
+    const sendAllSend = isSendAllAmount(sendPageStatePar.toaddr.amount);
+    const settlement = await settleSend(
+      () => sendTransaction(sendPageStatePar, sendAllSend),
+      async () => {
+        const target = await retryServer(server, translate);
+        if (target !== server) {
+          await setServerOption(target, selectServer, false, true);
+        }
+      },
+      // A `custom` server is the user's own choice, and the retry keeps it.
+      selectServer !== SelectServerEnum.custom && server.kind !== 'offline',
+    );
 
-      // Clear the fields
+    if (settlement.kind === 'sent') {
       clearState();
-
-      // scroll to top in history, just in case.
       setScrollToTop(true);
       setScrollToBottom(true);
-
-      // the app send successfully on the first attemp.
-      navigation.navigate(RouteEnum.Computing, { phase: 'created' });
-      return;
-    } catch (err1) {
-      let failure = classifySendFailure(err1 as string);
-
-      // The transform decides which families a server switch can plausibly
-      // help; the wallet's own verdicts (dust, duplicate nullifier, a
-      // fail-closed mixnet refusal) are excluded there. If the user selected
-      // a `custom` server, we cannot change it regardless.
-      if (
-        retryOnAnotherServer(failure) &&
-        selectServer !== SelectServerEnum.custom
-      ) {
-        // Pick a working server, same pattern as boot/recovery: the live
-        // registry first (best, excluding the failed server, no probe), then
-        // the static list ranked by latency (also excluding the failed one).
-        let fasterServer: ServerType = server;
-        const live = await fetchServerList(server.chainName);
-        const liveCandidates = live.filter(
-          (s: ServerUrisType) => s.uri !== server.uri,
-        );
-        if (liveCandidates.length > 0) {
-          fasterServer = remoteServer(
-            liveCandidates[0].uri,
-            liveCandidates[0].chainName,
-          );
-        } else {
-          const serverChecked = await selectingServer(
-            serverUris(translate).filter(
-              (s: ServerUrisType) =>
-                !s.obsolete &&
-                s.chainName === server.chainName &&
-                s.uri !== server.uri,
-            ),
-          );
-          // no latency: likely a connection problem, all servers unreachable.
-          if (serverChecked && serverChecked.latency) {
-            fasterServer = remoteServer(
-              serverChecked.uri,
-              serverChecked.chainName,
-            );
-          }
-        }
-        if (fasterServer !== server) {
-          await setServerOption(fasterServer, selectServer, false, true);
-        }
-
-        try {
-          await sendTransaction(sendPageStatePar, sendAllSend);
-
-          // Clear the fields
-          clearState();
-
-          // scroll to top in history, just in case.
-          setScrollToTop(true);
-          setScrollToBottom(true);
-
-          // the app send successfully on the second attemp.
-          navigation.navigate(RouteEnum.Computing, { phase: 'created' });
-          return;
-        } catch (err2) {
-          failure = classifySendFailure(err2 as string);
-        }
-      }
-
-      const failureText = sendFailureText(failure);
-      navigation.navigate(RouteEnum.Computing, {
-        phase: 'failed',
-        errorMessage:
-          failureText.kind === 'key'
-            ? (translate(failureText.errorKey) as string)
-            : failureText.text,
-      });
     }
+    navigation.navigate(RouteEnum.Computing, computingEnd(settlement));
   };
 
   const scrollToEnd = () => {
@@ -1263,10 +1196,6 @@ const Send: React.FunctionComponent<SendProps> = ({
                 >
                   <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <View
-                      accessible={true}
-                      accessibilityLabel={
-                        translate('send.address-acc') as string
-                      }
                       style={{
                         flex: 1,
                         justifyContent: 'center',
@@ -1274,6 +1203,10 @@ const Send: React.FunctionComponent<SendProps> = ({
                     >
                       <TextInput
                         testID="send.addressplaceholder"
+                        accessible={true}
+                        accessibilityLabel={
+                          translate('send.address-acc') as string
+                        }
                         placeholder={
                           translate('send.addressplaceholder') as string
                         }
@@ -1305,6 +1238,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                     >
                       {addressText && (
                         <TouchableOpacity
+                          testID="send.address.clear"
                           onPress={() => {
                             updateToField('', null, null, null, null);
                           }}
@@ -1802,10 +1736,6 @@ const Send: React.FunctionComponent<SendProps> = ({
                       }}
                     >
                       <View
-                        accessible={true}
-                        accessibilityLabel={
-                          translate('send.memo-acc') as string
-                        }
                         style={{
                           flexGrow: 1,
                           flexDirection: 'row',
@@ -1819,6 +1749,10 @@ const Send: React.FunctionComponent<SendProps> = ({
                       >
                         <TextInput
                           testID="send.memo-field"
+                          accessible={true}
+                          accessibilityLabel={
+                            translate('send.memo-acc') as string
+                          }
                           placeholder={
                             translate('send.memo-placeholder') as string
                           }
@@ -1982,7 +1916,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                     transaction, and with no switch left to flip the user is
                     owed the reason: why the wait exists, and what the
                     transport is doing right now. */}
-                {mixnetView !== null && mixnetView.sendBlocked && (
+                {mixnetView.kind === 'transport' && mixnetView.sendBlocked && (
                   <View
                     style={{
                       alignItems: 'center',

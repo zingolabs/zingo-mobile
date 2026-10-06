@@ -113,6 +113,7 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
           newAddress,
           randomColors[0],
           true,
+          context.walletChainName || context.server.chainName,
         );
         //console.log(ab);
         setAddressBook(ab);

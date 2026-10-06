@@ -1,0 +1,24 @@
+appId: org.ZingoLabs.Zingo
+---
+# Every flow starts from a clean install. Maestro does not run flows in
+# file order, and a flow that inherited the state of the previous one
+# would pass or fail on luck. A fresh install lands on the start menu on
+# mainnet, and each flow creates or restores its own wallet there.
+#
+# On iOS a clean install is an uninstall, a reinstall and two relaunches
+# within seconds, and the driver's first query can arrive before it sees
+# the app. It then answers "not running", which Maestro reports as a crash
+# while the app is starting normally. Retrying the launch absorbs that; an
+# app that really fails to start fails every attempt.
+- retry:
+    maxRetries: 2
+    commands:
+      - launchApp:
+          clearState: true
+      - extendedWaitUntil:
+          visible:
+            id: "loadingapp.createnewwallet"
+          timeout: 120000
+
+- runFlow:
+    file: new_wallet_from_start_menu.yaml

@@ -77,7 +77,7 @@ type BalanceRowProps = {
   calculateDisableButtonToShield: () => boolean;
   onPressShieldFunds: () => void;
   receivedLegend: boolean | undefined;
-  mixnetView: MixnetView | null;
+  mixnetView: MixnetView;
   onUsdRowLayout?: (height: number) => void;
 };
 
@@ -246,7 +246,7 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
           !calculateDisableButtonToShield() &&
           valueTransfersTotal !== null && (
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-              {mixnetView !== null && mixnetView.sendBlocked ? (
+              {mixnetView.kind === 'transport' && mixnetView.sendBlocked ? (
                 <View
                   style={{ alignItems: 'center' }}
                   testID="header.shield-blocked"

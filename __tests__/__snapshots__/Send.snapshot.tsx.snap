@@ -598,8 +598,6 @@ exports[`Component Send - test Send privacy high - snapshot 1`] = `
                   }
                 >
                   <View
-                    accessibilityLabel="text translated"
-                    accessible={true}
                     style={
                       {
                         "flex": 1,
@@ -608,6 +606,8 @@ exports[`Component Send - test Send privacy high - snapshot 1`] = `
                     }
                   >
                     <TextInput
+                      accessibilityLabel="text translated"
+                      accessible={true}
                       editable={true}
                       onChangeText={[Function]}
                       placeholder="text translated"
@@ -668,6 +668,7 @@ exports[`Component Send - test Send privacy high - snapshot 1`] = `
                           "opacity": 1,
                         }
                       }
+                      testID="send.address.clear"
                     >
                       <
                         color="#5a8c5a"
@@ -1937,8 +1938,6 @@ exports[`Component Send - test Send privacy normal - snapshot 1`] = `
                   }
                 >
                   <View
-                    accessibilityLabel="text translated"
-                    accessible={true}
                     style={
                       {
                         "flex": 1,
@@ -1947,6 +1946,8 @@ exports[`Component Send - test Send privacy normal - snapshot 1`] = `
                     }
                   >
                     <TextInput
+                      accessibilityLabel="text translated"
+                      accessible={true}
                       editable={true}
                       onChangeText={[Function]}
                       placeholder="text translated"
@@ -2007,6 +2008,7 @@ exports[`Component Send - test Send privacy normal - snapshot 1`] = `
                           "opacity": 1,
                         }
                       }
+                      testID="send.address.clear"
                     >
                       <
                         color="#5a8c5a"
