@@ -341,8 +341,29 @@ describe('SyncCoordinator seam-A fence — scheduling machine, current behavior'
     );
     // The rejection did not escape the timer callback, and the loop lives on.
     expect(c.updateTimerID).toBeDefined();
-    expect(c.tickInFlight).toBe(false);
+    expect(c.tickInFlight).toBeUndefined();
 
+    await c.clearTimers();
+  });
+
+  it('Tests that a tick that never settles stops holding the lane when a boundary restarts the loop.', async () => {
+    const ds = fakeDataService();
+    const gate = ds.getWalletSaveRequired as jest.Mock;
+    gate.mockReturnValueOnce(new Promise(() => {}));
+    const c = new SyncCoordinator(fakeConfig(), ds);
+    c.walletConfigPerformanceLevel = RPCPerformanceLevelEnum.Low;
+
+    await c.configure();
+    await jest.advanceTimersByTimeAsync(5 * 1000);
+    await flushPromises();
+    expect(gate).toHaveBeenCalledTimes(1);
+
+    await c.clearTimers();
+    await c.configure();
+    await jest.advanceTimersByTimeAsync(5 * 1000);
+    await flushPromises();
+
+    expect(gate).toHaveBeenCalledTimes(2);
     await c.clearTimers();
   });
 

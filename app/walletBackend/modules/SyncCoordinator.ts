@@ -70,9 +70,10 @@ export class SyncCoordinator {
   // follow-up drops when the epoch it captured no longer matches.
   controllerEpoch: Epoch = 0;
 
-  // Single-flight lane: a tick arriving while one is in flight does
-  // not re-enter, so overlapping ticks cannot both read the save-required gate.
-  tickInFlight: boolean = false;
+  // The epoch of the tick in flight. Ticks of that epoch do not re-enter, so
+  // they cannot both read the save-required gate; a boundary releases the lane
+  // from a tick that never settles.
+  tickInFlight: Epoch | undefined = undefined;
 
   // A rescan issued while the lane was held, released when the lane clears.
   queuedRescan: { kind: 'none' } | { kind: 'queued'; epoch: Epoch } = {
@@ -166,14 +167,20 @@ export class SyncCoordinator {
     // Single-flight lane: a tick arriving while one is in flight does
     // not re-enter. The self-rescheduling loop keeps the scheduled path from
     // overlapping; this guard also covers a direct re-entrant call.
-    if (this.tickInFlight) {
+    const epoch = this.controllerEpoch;
+    if (
+      this.tickInFlight !== undefined &&
+      isCurrent(this.tickInFlight, epoch)
+    ) {
       return;
     }
-    this.tickInFlight = true;
+    this.tickInFlight = epoch;
     try {
       await this.runTick();
     } finally {
-      this.tickInFlight = false;
+      if (this.tickInFlight === epoch) {
+        this.tickInFlight = undefined;
+      }
     }
   }
 
