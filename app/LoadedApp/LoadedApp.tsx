@@ -657,9 +657,7 @@ export class LoadedAppClass extends Component<
   screenName = ScreenEnum.LoadedApp;
   private drawerNav: NativeStackNavigationProp<AppDrawerParamList> | null =
     null;
-  // The per-instance controller store. Holds the view slice, the sync slice,
-  // and the price slice: the class publishes each field here and the derived
-  // atoms gate re-renders to the slice that actually changed.
+  // The per-instance store for the view, sync, balance and UI slices, so a change wakes only the consumers of its slice.
   private controllerStore = createStore();
   // Set at the start of teardown; a backend callback resolving after it drops
   // its write.
