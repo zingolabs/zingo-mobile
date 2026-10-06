@@ -134,6 +134,14 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
           }}
         >
           <View style={{ display: 'flex', margin: 20, marginBottom: 30 }}>
+            {balance.kind === 'awaiting' && (
+              <ActivityIndicator
+                testID="pools.awaiting"
+                size="large"
+                color={colors.fgAccent}
+                style={{ marginVertical: 20 }}
+              />
+            )}
             {balance.kind === 'polled' && (
               <>
                 {!orchardPool && !saplingPool && !transparentPool && (

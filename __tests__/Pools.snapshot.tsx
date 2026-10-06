@@ -53,3 +53,19 @@ describe('Component Pools - test', () => {
     expect(pools.toJSON()).toMatchSnapshot();
   });
 });
+
+test('Tests that Pools shows a loading indicator while the balance is awaited after a rescan', () => {
+  const state = {
+    ...defaultAppContextLoaded,
+    translate: mockTranslate,
+    info: mockInfo,
+  };
+  const pools = render(
+    <Provider store={storeWith(seed(balanceAtom, { kind: 'awaiting' }))}>
+      <ContextAppLoadedProvider value={state}>
+        <Pools {...makeDrawerProps()} />
+      </ContextAppLoadedProvider>
+    </Provider>,
+  );
+  expect(pools.getByTestId('pools.awaiting')).toBeOnTheScreen();
+});
