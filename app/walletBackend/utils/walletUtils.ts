@@ -102,12 +102,7 @@ export async function createNewWallet(
 ): Promise<FfiResult<string>> {
   await applyBroadcastCandidates(serverUri, chainHint);
   return callFfi(
-    RPCModule.createNewWallet(
-      serverUri,
-      birthday,
-      chainHint,
-      minConfirmations,
-    ),
+    RPCModule.createNewWallet(serverUri, birthday, chainHint, minConfirmations),
   );
 }
 
@@ -159,11 +154,7 @@ export async function loadExistingWallet(
 ): Promise<FfiResult<string>> {
   await applyBroadcastCandidates(serverUri, chainHint);
   return callFfi(
-    RPCModule.loadExistingWallet(
-      serverUri,
-      chainHint,
-      minConfirmations,
-    ),
+    RPCModule.loadExistingWallet(serverUri, chainHint, minConfirmations),
   );
 }
 
