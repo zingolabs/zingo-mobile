@@ -1,12 +1,7 @@
-// The Jotai holder for the sync slice. The live poll path routes through the
-// pure controller: the container feeds each scan snapshot to `observeAtom`,
-// which reconciles it into `syncMachineAtom`. The detailed snapshot rides its
-// own `syncStatusAtom`, the read surface the two sync consumers (Header,
-// SyncReport) subscribe to, so a sync tick wakes only them.
-//
-// Command issuance (issueCommand) and the epoch unification with
-// SyncCoordinator.controllerEpoch live in the callback-boundary layer. This
-// module holds the machine and drives its observe path.
+// The Jotai holder for the sync slice. The container publishes each scan
+// snapshot to `syncStatusAtom`, the read surface of the two sync consumers
+// (Header, SyncReport), so a sync tick wakes only them. The controller machine
+// below has no production reader yet, so nothing feeds it.
 
 import { atom } from 'jotai';
 

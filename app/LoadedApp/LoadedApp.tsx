@@ -80,13 +80,7 @@ import {
   walletViewAtom,
 } from '@app/AppState/walletViewAtoms';
 import type { WalletViewSource } from '@app/AppState/walletView';
-import {
-  syncStatusAtom,
-  syncMachineAtom,
-  observeAtom,
-  snapshotObservation,
-} from '@app/AppState/syncAtoms';
-import { initialMachine } from '@app/walletBackend/controller/syncController';
+import { syncStatusAtom } from '@app/AppState/syncAtoms';
 import {
   callbackEpochAtom,
   boundaryDispatchAtom,
@@ -764,10 +758,6 @@ export class LoadedAppClass extends Component<
     this.linking = {} as EmitterSubscription;
     this.unsubscribeNetInfo = {} as NetInfoSubscription;
     this.controllerStore.set(
-      syncMachineAtom,
-      initialMachine(nativeUri(props.server)),
-    );
-    this.controllerStore.set(
       appStateStatusAtom,
       toAppStateStatus(AppState.currentState),
     );
@@ -1135,14 +1125,8 @@ export class LoadedAppClass extends Component<
       return;
     }
     // The sync slice, isolated: publish the detailed snapshot the two sync
-    // consumers read, and route it through reconcile so the held machine tracks
-    // the live scan. Neither wakes the wider context tree.
+    // consumers read, without waking the wider context tree.
     store.set(syncStatusAtom, syncingStatus);
-    const machine = store.get(syncMachineAtom);
-    store.set(
-      observeAtom,
-      snapshotObservation(machine.epoch, machine.saveRequired, syncingStatus),
-    );
   };
 
   setIsSeedViewModalOpen = (value: boolean) => {
