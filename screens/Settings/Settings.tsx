@@ -468,6 +468,11 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   >(null);
   // True while a reachability probe is in flight (shows a spinner + text).
   const [checkingServer, setCheckingServer] = useState<boolean>(false);
+  // Why the last check failed, shown under the field; empty when it did not.
+  const [serverCheckFailure, setServerCheckFailure] = useState<string>('');
+  // Bumped by every check and every edit, so a probe that resolves after the
+  // URI changed does not overwrite the newer state.
+  const serverCheckSeq = useRef<number>(0);
 
   // Build the local InfoType for a server. `chainName` may be '' (the
   // *ServerChainName states use '' as an unset sentinel), so it's a plain
@@ -495,6 +500,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     uri: string,
     chainName: string,
   ): Promise<void> => {
+    const seq = ++serverCheckSeq.current;
+    setServerCheckFailure('');
     if (uri && uri === info.serverUri) {
       // the currently-connected server → keep the full context info (version).
       setCheckingServer(false);
@@ -525,10 +532,22 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
           ),
       ),
     ]);
+    if (seq !== serverCheckSeq.current) {
+      return;
+    }
     const heightStr = height.ok ? height.value : '';
     const working = /^\d+$/.test(heightStr);
     setCheckingServer(false);
     setSelectedServerActive(working);
+    setServerCheckFailure(
+      working
+        ? ''
+        : !height.ok
+          ? height.error.message === 'timeout'
+            ? (translate('settings.server-timeout') as string)
+            : height.error.message
+          : (translate('settings.server-unexpected') as string),
+    );
     setSelectedInfo(
       buildSelectedInfo(uri, working ? Number(heightStr) : 0, chainName),
     );
@@ -545,27 +564,34 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     }
     const parsed = parseServerURI(customServerUri);
     if (parsed.kind === 'error') {
+      serverCheckSeq.current += 1;
       setCheckingServer(false);
       setSelectedInfo(
         buildSelectedInfo(customServerUri, 0, customServerChainName),
       );
       setSelectedServerActive(false);
+      setServerCheckFailure(translate(parsed.errorKey) as string);
       return;
     }
     updateSelectedInfo(parsed.uri, customServerChainName);
   };
 
-  // Debounced custom-server check: each keystroke restarts the timer
-  // (clearTimeout cleanup), so the check runs once ~1s after the user stops
-  // typing, not on every key.
+  // A custom server is checked only from its Check button. Editing the URI or
+  // the chain clears the last result; the connected server reads as checked.
   useEffect(() => {
     if (selectServer !== SelectServerEnum.custom) {
       return;
     }
-    const timer = setTimeout(() => {
-      checkCustomServer();
-    }, 1000);
-    return () => clearTimeout(timer);
+    const parsed = parseServerURI(customServerUri);
+    if (parsed.kind !== 'error' && parsed.uri === info.serverUri) {
+      updateSelectedInfo(parsed.uri, customServerChainName);
+      return;
+    }
+    serverCheckSeq.current += 1;
+    setCheckingServer(false);
+    setSelectedServerActive(null);
+    setServerCheckFailure('');
+    setSelectedInfo(buildSelectedInfo('', 0, customServerChainName));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [customServerUri, customServerChainName]);
 
@@ -2290,7 +2316,43 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                       />
                     </TouchableOpacity>
                   )}
+                  <TouchableOpacity
+                    testID="settings.custom-server-check"
+                    onPress={checkCustomServer}
+                    disabled={disabled || checkingServer || !customServerUri}
+                    accessibilityRole="button"
+                    style={{
+                      alignSelf: 'stretch',
+                      justifyContent: 'center',
+                      paddingHorizontal: 14,
+                      borderLeftWidth: 1,
+                      borderLeftColor: colors.borderMuted,
+                      opacity:
+                        disabled || checkingServer || !customServerUri
+                          ? 0.4
+                          : 1,
+                    }}
+                  >
+                    <BoldText style={{ fontSize: 14, color: colors.fgAccent }}>
+                      {translate('settings.server-check') as string}
+                    </BoldText>
+                  </TouchableOpacity>
                 </View>
+                {!checkingServer && !!serverCheckFailure && (
+                  <FadeText
+                    testID="settings.custom-server-failure"
+                    selectable
+                    style={{
+                      marginHorizontal: 10,
+                      marginTop: 6,
+                      fontSize: 12,
+                      opacity: 1,
+                      color: colors.fgDanger,
+                    }}
+                  >
+                    {serverCheckFailure}
+                  </FadeText>
+                )}
                 <View
                   accessible={true}
                   accessibilityLabel={
