@@ -145,6 +145,7 @@
   ],
   "resolutions": {
     "fast-xml-parser": ">=4.5.4",
+    "shell-quote": ">=1.11.0",
     "jest": "30.5.2",
     "jest-circus": "30.5.0",
     "jest-runtime": "30.5.0",
