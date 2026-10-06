@@ -64,7 +64,7 @@ class WalletDeleteTest {
         file(swapName).delete()
         RPCModule.walletFileClosed = false
         uniffi.zingo.initLogging()
-        uniffi.zingo.initFromSeed(Seeds.HOSPITAL, 2000000u, "", "main", "Medium", 1u)
+        uniffi.zingo.initFromSeed(Seeds.HOSPITAL, 2000000u, "", "main", 1u)
         plainWallet = uniffi.zingo.saveWalletBytes()!!
         file(mainName).writeBytes(plainWallet)
     }
@@ -77,7 +77,7 @@ class WalletDeleteTest {
         assertThat(file(mainName).exists()).isFalse()
 
         file(mainName).writeBytes(plainWallet)
-        rpcModule.loadExistingWalletNative("", "main", "Medium", "1")
+        rpcModule.loadExistingWalletNative("", "main", "1")
         assertThat(rpcModule.saveWalletFile()).isTrue()
     }
 

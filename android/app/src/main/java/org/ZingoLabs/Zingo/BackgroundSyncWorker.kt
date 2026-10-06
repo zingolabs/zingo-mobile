@@ -250,7 +250,7 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
                 "SCHEDULED_TASK_RUN",
                 "Opening the wallet file - No App active - serveruri: $serveruri chain: $chainhint"
             )
-            rpcModule.loadExistingWalletNative(serveruri, chainhint, "Medium", "3")
+            rpcModule.loadExistingWalletNative(serveruri, chainhint, "3")
         }
         return shouldSync
     }

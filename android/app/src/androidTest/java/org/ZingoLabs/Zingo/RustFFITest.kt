@@ -26,7 +26,7 @@ const val UNDESCRIBED_BUILD = "zm_unknown"
 /** Creates an offline wallet from [seed] and returns what the Binding Layer reports of it. */
 fun initOfflineWalletFromSeed(mapper: ObjectMapper, seed: String): InitFromSeed {
     val initFromSeedJson: String =
-        uniffi.zingo.initFromSeed(seed, 1u, OFFLINE_SERVER_URI, OFFLINE_CHAIN_HINT, "Medium", 1u)
+        uniffi.zingo.initFromSeed(seed, 1u, OFFLINE_SERVER_URI, OFFLINE_CHAIN_HINT, 1u)
     println("\nInit from seed:")
     println(initFromSeedJson)
     val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
@@ -327,7 +327,7 @@ class ExecuteAddressesFromUfvk {
 
         val ufvk = Ufvk.HOSPITAL
 
-        val initFromUfvkJson: String = uniffi.zingo.initFromUfvk(ufvk, 1u, OFFLINE_SERVER_URI, OFFLINE_CHAIN_HINT, "Medium", 1u)
+        val initFromUfvkJson: String = uniffi.zingo.initFromUfvk(ufvk, 1u, OFFLINE_SERVER_URI, OFFLINE_CHAIN_HINT, 1u)
         println("\nInit From UFVK:")
         println(initFromUfvkJson)
         val initFromUfvk: InitFromUfvk = mapper.readValue(initFromUfvkJson)
@@ -390,7 +390,7 @@ class ExecuteSyncFromSeed {
         val (serveruri, tip) = firstAnsweringServer("mainnet", servers)
 
         val birthday = tip - window
-        val initFromSeedJson: String = uniffi.zingo.initFromSeed(seed, birthday.toUInt(), serveruri, "main", "Medium", 1u)
+        val initFromSeedJson: String = uniffi.zingo.initFromSeed(seed, birthday.toUInt(), serveruri, "main", 1u)
         println("\nInit from seed:")
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
@@ -434,7 +434,7 @@ class ConfirmRefusesWithoutMixnet {
 
         val (serveruri, tip) = firstAnsweringServer("testnet", TestnetFixture.SERVERS)
 
-        val initFromSeedJson: String = uniffi.zingo.initFromSeed(TestnetFixture.SEED, TestnetFixture.BIRTHDAY.toUInt(), serveruri, TestnetFixture.CHAIN_HINT, "Medium", 1u)
+        val initFromSeedJson: String = uniffi.zingo.initFromSeed(TestnetFixture.SEED, TestnetFixture.BIRTHDAY.toUInt(), serveruri, TestnetFixture.CHAIN_HINT, 1u)
         println("\nInit from seed:")
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
@@ -521,7 +521,7 @@ class RecoversConsolidationTransfer {
 
         val (serveruri, tip) = firstAnsweringServer("testnet", TestnetFixture.SERVERS)
 
-        val initFromSeedJson: String = uniffi.zingo.initFromSeed(TestnetFixture.SEED, TestnetFixture.BIRTHDAY.toUInt(), serveruri, TestnetFixture.CHAIN_HINT, "Medium", 1u)
+        val initFromSeedJson: String = uniffi.zingo.initFromSeed(TestnetFixture.SEED, TestnetFixture.BIRTHDAY.toUInt(), serveruri, TestnetFixture.CHAIN_HINT, 1u)
         println("\nInit from seed:")
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
@@ -579,7 +579,7 @@ class RecoversPoolBalances {
 
         val (serveruri, tip) = firstAnsweringServer("testnet", TestnetFixture.SERVERS)
 
-        val initFromSeedJson: String = uniffi.zingo.initFromSeed(PoolBalanceFixture.SEED, PoolBalanceFixture.BIRTHDAY.toUInt(), serveruri, TestnetFixture.CHAIN_HINT, "Medium", 1u)
+        val initFromSeedJson: String = uniffi.zingo.initFromSeed(PoolBalanceFixture.SEED, PoolBalanceFixture.BIRTHDAY.toUInt(), serveruri, TestnetFixture.CHAIN_HINT, 1u)
         println("\nInit from seed:")
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)

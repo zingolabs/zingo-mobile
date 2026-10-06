@@ -45,7 +45,7 @@ class WalletSwapRecoveryTest {
     private fun file(name: String) = File(context.filesDir, name)
 
     private fun offlineWallet(birthday: UInt): ByteArray {
-        uniffi.zingo.initFromSeed(Seeds.HOSPITAL, birthday, "", "main", "Medium", 1u)
+        uniffi.zingo.initFromSeed(Seeds.HOSPITAL, birthday, "", "main", 1u)
         return uniffi.zingo.saveWalletBytes()!!
     }
 

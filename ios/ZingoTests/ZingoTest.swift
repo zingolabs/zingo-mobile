@@ -256,7 +256,7 @@ private func syncUntilSpendable(_ minimum: Int64, deadlineSeconds: TimeInterval,
 private func syncFixtureWallet(start: Date) throws -> UInt64 {
     let (serveruri, tip) = try firstAnsweringServer("testnet", TestnetFixture.SERVERS)
 
-    let initJson = try initFromSeed(seed: TestnetFixture.SEED, birthday: UInt32(TestnetFixture.BIRTHDAY), serveruri: serveruri, chainhint: TestnetFixture.CHAIN_HINT, performancelevel: "Medium", minconfirmations: UInt32(1))
+    let initJson = try initFromSeed(seed: TestnetFixture.SEED, birthday: UInt32(TestnetFixture.BIRTHDAY), serveruri: serveruri, chainhint: TestnetFixture.CHAIN_HINT, minconfirmations: UInt32(1))
     print("\nInit from seed:\n\(initJson)")
     let initRes: InitFromSeed = try decodeJSON(initJson)
     XCTAssertEqual(initRes.seed_phrase, TestnetFixture.SEED)
@@ -288,7 +288,7 @@ final class ExecuteAddressesFromSeed: XCTestCase {
         let seed = Seeds.HOSPITAL
 
         do {
-            let initJson = try initFromSeed(seed: seed, birthday:UInt32(1), serveruri: "", chainhint: "regtest", performancelevel: "Medium", minconfirmations: UInt32(1))
+            let initJson = try initFromSeed(seed: seed, birthday:UInt32(1), serveruri: "", chainhint: "regtest", minconfirmations: UInt32(1))
             print("\nInit from seed:\n\(initJson)")
             let initRes: InitFromSeed = try decodeJSON(initJson)
             XCTAssertEqual(initRes.seed_phrase, seed)
@@ -330,7 +330,7 @@ final class ExecuteAddressFromUfvk: XCTestCase {
         let ufvk = UfvkConst.HOSPITAL
 
         do {
-          let initJson = try initFromUfvk(ufvk: ufvk, birthday: UInt32(1), serveruri: "", chainhint: "regtest", performancelevel: "Medium", minconfirmations: UInt32(1))
+          let initJson = try initFromUfvk(ufvk: ufvk, birthday: UInt32(1), serveruri: "", chainhint: "regtest", minconfirmations: UInt32(1))
           print("\nInit From UFVK:\n\(initJson)")
           let initRes: InitFromUfvk = try decodeJSON(initJson)
           XCTAssertEqual(initRes.ufvk, ufvk)
@@ -383,7 +383,7 @@ final class ExecuteVersionFromSeed: XCTestCase {
         let seed = Seeds.HOSPITAL
 
         do {
-          let initJson = try initFromSeed(seed: seed, birthday: UInt32(1), serveruri: "", chainhint: "regtest", performancelevel: "Medium", minconfirmations: UInt32(1))
+          let initJson = try initFromSeed(seed: seed, birthday: UInt32(1), serveruri: "", chainhint: "regtest", minconfirmations: UInt32(1))
           print("\nInit from seed:\n\(initJson)")
           let initRes: InitFromSeed = try decodeJSON(initJson)
           XCTAssertEqual(initRes.seed_phrase, seed)
@@ -415,7 +415,7 @@ final class ExecuteSyncFromSeed: XCTestCase {
         let (serveruri, tip) = try firstAnsweringServer("mainnet", MainnetServers.SERVERS)
 
         let birthday = tip - window
-        let initJson = try initFromSeed(seed: seed, birthday: UInt32(birthday), serveruri: serveruri, chainhint: "main", performancelevel: "Medium", minconfirmations: UInt32(1))
+        let initJson = try initFromSeed(seed: seed, birthday: UInt32(birthday), serveruri: serveruri, chainhint: "main", minconfirmations: UInt32(1))
         print("\nInit from seed:\n\(initJson)")
         let initRes: InitFromSeed = try decodeJSON(initJson)
         XCTAssertEqual(initRes.seed_phrase, seed)
@@ -521,7 +521,7 @@ final class PriceRefusedWithoutMixnet: XCTestCase {
         let seed = Seeds.HOSPITAL
 
         do {
-          let initJson = try initFromSeed(seed: seed, birthday: UInt32(1), serveruri: "", chainhint: "regtest", performancelevel: "Medium", minconfirmations: UInt32(1))
+          let initJson = try initFromSeed(seed: seed, birthday: UInt32(1), serveruri: "", chainhint: "regtest", minconfirmations: UInt32(1))
           print("\nInit from seed:\n\(initJson)")
           let initRes: InitFromSeed = try decodeJSON(initJson)
           XCTAssertEqual(initRes.seed_phrase, seed)
@@ -811,7 +811,7 @@ class WalletFileDiagnosisTests: XCTestCase {
     func testALegacyTextFileMigratesToRawBytesOnRead() throws {
         _ = try initFromSeed(
             seed: Seeds.HOSPITAL, birthday: UInt32(2_000_000), serveruri: "",
-            chainhint: "main", performancelevel: "Medium", minconfirmations: UInt32(1))
+            chainhint: "main", minconfirmations: UInt32(1))
         let wallet = try XCTUnwrap(try saveWalletBytes())
 
         let rpc = RPCModule()

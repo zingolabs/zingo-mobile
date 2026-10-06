@@ -520,7 +520,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
-    fun createNewWallet(serveruri: String, birthday: String, chainhint: String, performancelevel: String, minconfirmations: String, promise: Promise) {
+    fun createNewWallet(serveruri: String, birthday: String, chainhint: String, minconfirmations: String, promise: Promise) {
         FfiOutcome.settling(promise, "init_new") {
             uniffi.zingo.initLogging()
 
@@ -528,7 +528,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             // implies the wallet exists. Offline (empty serveruri) uses
             // `birthday` in place of the chain tip; online it is ignored
             // (pass "0").
-            val resp = uniffi.zingo.initNew(serveruri, birthday.toUInt(), chainhint, performancelevel, minconfirmations.toUInt())
+            val resp = uniffi.zingo.initNew(serveruri, birthday.toUInt(), chainhint, minconfirmations.toUInt())
             walletFileClosed = false
             saveWalletFile()
             resp
@@ -536,11 +536,11 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
-    fun restoreWalletFromSeed(seed: String, birthday: String, serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String, promise: Promise) {
+    fun restoreWalletFromSeed(seed: String, birthday: String, serveruri: String, chainhint: String, minconfirmations: String, promise: Promise) {
         FfiOutcome.settling(promise, "init_from_seed") {
             uniffi.zingo.initLogging()
 
-            val resp = uniffi.zingo.initFromSeed(seed, birthday.toUInt(), serveruri, chainhint, performancelevel, minconfirmations.toUInt())
+            val resp = uniffi.zingo.initFromSeed(seed, birthday.toUInt(), serveruri, chainhint, minconfirmations.toUInt())
             walletFileClosed = false
             saveWalletFile()
             resp
@@ -548,11 +548,11 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
-    fun restoreWalletFromUfvk(ufvk: String, birthday: String, serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String, promise: Promise) {
+    fun restoreWalletFromUfvk(ufvk: String, birthday: String, serveruri: String, chainhint: String, minconfirmations: String, promise: Promise) {
         FfiOutcome.settling(promise, "init_from_ufvk") {
             uniffi.zingo.initLogging()
 
-            val resp = uniffi.zingo.initFromUfvk(ufvk, birthday.toUInt(), serveruri, chainhint, performancelevel, minconfirmations.toUInt())
+            val resp = uniffi.zingo.initFromUfvk(ufvk, birthday.toUInt(), serveruri, chainhint, minconfirmations.toUInt())
             walletFileClosed = false
             saveWalletFile()
             resp
@@ -560,21 +560,21 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 }
 
     @ReactMethod
-    fun loadExistingWallet(serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String, promise: Promise) {
+    fun loadExistingWallet(serveruri: String, chainhint: String, minconfirmations: String, promise: Promise) {
         FfiOutcome.settling(promise, "init_from_bytes") {
-            loadExistingWalletNative(serveruri, chainhint, performancelevel, minconfirmations)
+            loadExistingWalletNative(serveruri, chainhint, minconfirmations)
         }
     }
 
     // Throws on failure; callers own the error channel (a rejected promise
     // here, the worker's catch in BackgroundSyncWorker).
-    fun loadExistingWalletNative(serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String): String {
+    fun loadExistingWalletNative(serveruri: String, chainhint: String, minconfirmations: String): String {
         uniffi.zingo.initLogging()
 
         val walletBytes = readWalletBytes(WalletFileName.value)
         Log.i("MAIN", "file size: ${walletBytes.size} bytes")
 
-        val resp = uniffi.zingo.initFromBytes(walletBytes, serveruri, chainhint, performancelevel, minconfirmations.toUInt())
+        val resp = uniffi.zingo.initFromBytes(walletBytes, serveruri, chainhint, minconfirmations.toUInt())
         walletFileClosed = false
         migrateRetainedWallet()
         return resp
@@ -1041,22 +1041,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         FfiOutcome.settling(promise, "get_wallet_save_required") {
             uniffi.zingo.initLogging()
             uniffi.zingo.getWalletSaveRequired()
-        }
-    }
-
-    @ReactMethod
-    fun setConfigWalletToProdProcess(performancelevel: String, minconfirmations: String, promise: Promise) {
-        FfiOutcome.settling(promise, "set_config_wallet_to_prod") {
-            uniffi.zingo.initLogging()
-            uniffi.zingo.setConfigWalletToProd(performancelevel, minconfirmations.toUInt())
-        }
-    }
-    
-    @ReactMethod
-    fun getConfigWalletPerformanceInfo(promise: Promise) {
-        FfiOutcome.settling(promise, "get_config_wallet_performance") {
-            uniffi.zingo.initLogging()
-            uniffi.zingo.getConfigWalletPerformance()
         }
     }
 
