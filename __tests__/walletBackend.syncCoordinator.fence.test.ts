@@ -203,6 +203,38 @@ describe('SyncCoordinator seam-A fence — scheduling machine, current behavior'
       await c.clearTimers();
     });
 
+    it("Tests that the 'not complete' status read and launch drop when a server switch lands before they run", async () => {
+      bridge.pollSyncInfo.mockResolvedValue('Sync task is not complete.');
+      bridge.statusSyncInfo.mockResolvedValue('{}');
+      bridge.runSyncProcess.mockResolvedValue('Sync task already running.');
+      const c = new SyncCoordinator(fakeConfig(), fakeDataService());
+
+      await c.fetchSyncPoll();
+      c.changeServer(mockServer);
+      await jest.advanceTimersByTimeAsync(0);
+      await flushPromises();
+
+      expect(bridge.statusSyncInfo).not.toHaveBeenCalled();
+      expect(bridge.runSyncProcess).not.toHaveBeenCalled();
+      await c.clearTimers();
+    });
+
+    it('Tests that the status read a JSON payload schedules drops when a server switch lands before it runs', async () => {
+      bridge.pollSyncInfo.mockResolvedValue(
+        '{"sync_complete":{"percentage_total_outputs_scanned":50}}',
+      );
+      bridge.statusSyncInfo.mockResolvedValue('{}');
+      const c = new SyncCoordinator(fakeConfig(), fakeDataService());
+
+      await c.fetchSyncPoll();
+      c.changeServer(mockServer);
+      await jest.advanceTimersByTimeAsync(0);
+      await flushPromises();
+
+      expect(bridge.statusSyncInfo).not.toHaveBeenCalled();
+      await c.clearTimers();
+    });
+
     it('a JSON-parse failure calls onError and schedules nothing', async () => {
       bridge.pollSyncInfo.mockResolvedValue('not-json-and-not-a-status-prose');
       const config = fakeConfig();
@@ -343,6 +375,21 @@ describe('SyncCoordinator seam-A fence — scheduling machine, current behavior'
     expect(c.updateTimerID).toBeDefined();
     expect(c.tickInFlight).toBeUndefined();
 
+    await c.clearTimers();
+  });
+
+  it('Tests that the loop keeps ticking every 5 s after its first tick.', async () => {
+    const ds = fakeDataService();
+    const c = new SyncCoordinator(fakeConfig(), ds);
+    c.walletConfigPerformanceLevel = RPCPerformanceLevelEnum.Low;
+
+    await c.configure();
+    await jest.advanceTimersByTimeAsync(5 * 1000);
+    await flushPromises();
+    await jest.advanceTimersByTimeAsync(5 * 1000);
+    await flushPromises();
+
+    expect(ds.getWalletSaveRequired).toHaveBeenCalledTimes(2);
     await c.clearTimers();
   });
 
