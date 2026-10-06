@@ -1,4 +1,5 @@
 import {
+  checksumValid,
   isViewingKey,
   resolveWord,
   seedStatus,
@@ -36,10 +37,24 @@ describe('seedStatus', () => {
       kind: 'seed',
       words: tokenize(seed),
       invalid: 0,
+      badChecksum: false,
       complete: true,
     });
     const status = seedStatus(seed.replace('art', 'arte'));
     expect(status).toMatchObject({ kind: 'seed', invalid: 1, complete: false });
+  });
+
+  it('Tests that 24 list words whose last word breaks the BIP-39 checksum are not complete and are flagged, when every word is in the list.', () => {
+    const wrongLast = seed.replace(/art$/, 'abandon');
+    expect(seedStatus(wrongLast)).toMatchObject({
+      kind: 'seed',
+      invalid: 0,
+      badChecksum: true,
+      complete: false,
+    });
+    expect(seedStatus(seed.replace('art', 'arte'))).toMatchObject({
+      badChecksum: false,
+    });
   });
 
   it('Tests that a uview prefix is classified as a viewing key whatever its case, and blank input is empty.', () => {
@@ -58,5 +73,27 @@ describe('seedStatus', () => {
       'able',
       'about',
     ]);
+  });
+});
+
+describe('checksumValid', () => {
+  it('Tests that the BIP-39 reference phrases pass and a changed word fails, for 12 and 24 words.', () => {
+    const twelve =
+      'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about';
+    const twentyFour =
+      'zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo vote';
+    expect(checksumValid(tokenize(twelve))).toBe(true);
+    expect(checksumValid(tokenize(twentyFour))).toBe(true);
+    expect(checksumValid(tokenize(twelve.replace(/about$/, 'above')))).toBe(
+      false,
+    );
+    expect(checksumValid(tokenize(twentyFour.replace(/vote$/, 'zoo')))).toBe(
+      false,
+    );
+  });
+
+  it('Tests that a phrase of the wrong length or with a word outside the list is not valid.', () => {
+    expect(checksumValid(tokenize('abandon about'))).toBe(false);
+    expect(checksumValid(tokenize('abandon '.repeat(23) + 'xyz'))).toBe(false);
   });
 });

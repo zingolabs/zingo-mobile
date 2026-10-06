@@ -1,3 +1,4 @@
+import { sha256 } from '@noble/hashes/sha2.js';
 import { BIP39_ENGLISH } from './bip39English';
 import { GlobalConst } from '@app/AppState';
 
@@ -13,7 +14,14 @@ const KEY_PREFIXES = [
 export type SeedStatus =
   | { kind: 'empty' }
   | { kind: 'ufvk'; key: string }
-  | { kind: 'seed'; words: string[]; invalid: number; complete: boolean };
+  | {
+      kind: 'seed';
+      words: string[];
+      invalid: number;
+      // Every word is in the list but the last bits do not match the checksum.
+      badChecksum: boolean;
+      complete: boolean;
+    };
 
 export const isViewingKey = (text: string): boolean => {
   const lower = text.trim().toLowerCase();
@@ -43,6 +51,33 @@ const lowerBound = (prefix: string): number => {
 export const isSeedWord = (word: string): boolean => {
   const i = lowerBound(word);
   return BIP39_ENGLISH[i] === word;
+};
+
+const toBits = (n: number, width: number): string =>
+  n.toString(2).padStart(width, '0');
+
+// True when the words carry the checksum BIP-39 appends: the first ENT/32 bits
+// of SHA-256 over the entropy the other bits encode.
+export const checksumValid = (words: string[]): boolean => {
+  if (
+    words.length < 12 ||
+    words.length > 24 ||
+    words.length % 3 !== 0 ||
+    !words.every(isSeedWord)
+  ) {
+    return false;
+  }
+  const bits = words.map(w => toBits(lowerBound(w), 11)).join('');
+  const checksumBits = words.length / 3;
+  const entropyBits = bits.slice(0, bits.length - checksumBits);
+  const entropy = new Uint8Array(entropyBits.length / 8);
+  for (let i = 0; i < entropy.length; i++) {
+    entropy[i] = parseInt(entropyBits.slice(i * 8, i * 8 + 8), 2);
+  }
+  const hashBits = Array.from(sha256(entropy))
+    .map(b => toBits(b, 8))
+    .join('');
+  return hashBits.slice(0, checksumBits) === bits.slice(-checksumBits);
 };
 
 export const suggestWords = (
@@ -85,10 +120,13 @@ export const seedStatus = (value: string): SeedStatus => {
   }
   const words = tokenize(trimmed);
   const invalid = words.filter(w => !isSeedWord(w)).length;
+  const full = invalid === 0 && words.length === SEED_WORD_COUNT;
+  const checksumOk = full && checksumValid(words);
   return {
     kind: 'seed',
     words,
     invalid,
-    complete: invalid === 0 && words.length === SEED_WORD_COUNT,
+    badChecksum: full && !checksumOk,
+    complete: checksumOk,
   };
 };

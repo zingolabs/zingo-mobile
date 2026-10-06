@@ -10,7 +10,13 @@
  * rejection channel (typed FFI errors); resolved values are data, never
  * inspected for an error sentinel.
  */
-import { WalletType, GlobalConst, ErrorKeyed, errorKeyed } from '@app/AppState';
+import {
+  WalletType,
+  GlobalConst,
+  ErrorKeyed,
+  errorKeyed,
+  ChainNameEnum,
+} from '@app/AppState';
 import RPCModule from '@app/RPCModule';
 import { callFfi, FfiResult } from '@app/walletBackend/ffi';
 import { serverUris } from '@app/uris';
@@ -465,6 +471,35 @@ export async function parseAddress(
   address: string,
 ): Promise<FfiResult<string>> {
   return callFfi(RPCModule.parseAddressInfo(address));
+}
+
+export type UfvkCheck =
+  | { kind: 'ufvk'; chainName: ChainNameEnum }
+  | { kind: 'invalid' }
+  | { kind: 'unknown' };
+
+const KEY_CHAINS: readonly string[] = [
+  ChainNameEnum.mainChainName,
+  ChainNameEnum.testChainName,
+  ChainNameEnum.regtestChainName,
+];
+
+// Decodes a viewing key on the device, checksum included: a key with its
+// network, text that is not a key, or unknown when the native call failed.
+export async function checkUfvk(ufvk: string): Promise<UfvkCheck> {
+  const result = await callFfi(RPCModule.parseUfvkInfo(ufvk));
+  if (!result.ok) {
+    return { kind: 'unknown' };
+  }
+  try {
+    const info = JSON.parse(result.value);
+    if (info.status === 'success' && KEY_CHAINS.includes(info.chain_name)) {
+      return { kind: 'ufvk', chainName: info.chain_name as ChainNameEnum };
+    }
+    return { kind: 'invalid' };
+  } catch {
+    return { kind: 'unknown' };
+  }
 }
 
 // Aggregated lifetime spending metrics, used by the Insight pie chart.
