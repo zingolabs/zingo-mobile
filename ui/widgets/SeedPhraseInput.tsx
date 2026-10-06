@@ -39,6 +39,8 @@ type SeedPhraseInputProps = {
   translate: (key: string) => TranslateType;
   testID?: string;
   accessibilityLabel?: string;
+  // Why the viewing key in the field cannot be used, already translated.
+  keyError?: string;
 };
 
 const chipEnter = () =>
@@ -74,6 +76,7 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
   translate,
   testID,
   accessibilityLabel,
+  keyError,
 }) => {
   const { colors } = useTheme();
   const [draft, setDraft] = useState('');
@@ -89,17 +92,21 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
   const full = words.length >= SEED_WORD_COUNT;
   const badWords = full && status.kind === 'seed' && status.invalid > 0;
   const badChecksum = status.kind === 'seed' && status.badChecksum;
+  const keyFault = status.kind === 'ufvk' && !!keyError;
   const complete =
-    status.kind === 'ufvk' || (status.kind === 'seed' && status.complete);
-  const fieldError: string | undefined = invalidDraft
-    ? 'import.word-invalid'
-    : overflow && full
-      ? 'import.seed-full'
-      : badWords
-        ? 'import.seed-words-invalid'
-        : badChecksum
-          ? 'import.seed-checksum'
-          : undefined;
+    (status.kind === 'ufvk' && !keyFault) ||
+    (status.kind === 'seed' && status.complete);
+  const fieldError: string | undefined = keyFault
+    ? keyError
+    : invalidDraft
+      ? 'import.word-invalid'
+      : overflow && full
+        ? 'import.seed-full'
+        : badWords
+          ? 'import.seed-words-invalid'
+          : badChecksum
+            ? 'import.seed-checksum'
+            : undefined;
   const suggestions = useMemo(() => suggestWords(draft), [draft]);
   const ghost =
     suggestions.length > 0 && suggestions[0] !== draft
@@ -244,11 +251,11 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
 
   // The 24th word that breaks the checksum shakes the field once.
   useEffect(() => {
-    if (badChecksum || badWords) {
+    if (badChecksum || badWords || keyFault) {
       shakeField();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [badChecksum, badWords]);
+  }, [badChecksum, badWords, keyFault]);
 
   const borderColor = fieldError
     ? colors.fgDangerEmphasis
@@ -490,7 +497,7 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
             lineHeight: 15,
           }}
         >
-          {(translate(fieldError) as string).replace(
+          {(keyFault ? fieldError : (translate(fieldError) as string)).replace(
             '{count}',
             String(status.kind === 'seed' ? status.invalid : 0),
           )}
