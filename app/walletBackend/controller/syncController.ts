@@ -1,15 +1,4 @@
-/**
- * The controller machine — the pure model ADR 0017 fixes, as amended by the
- * command-scheduler design. A discriminated union over the native runtime:
- * illegal states are unrepresentable, `reconcile` is total and pure, and
- * nothing here reads a clock or touches I/O. A test drives it without a device.
- *
- * This module holds and unit-tests the model. `SyncCoordinator` applies its
- * epoch in-place to drop stale deferred launches, and the poll and the commands
- * route through `reconcile`/`issueCommand`.
- *
- * Model: docs/adr/zingo-mobile/0017-the-controller-machine-is-a-discriminated-union-over-the-native-runtime.md
- */
+// The sync controller as a pure discriminated union, with no clock and no I/O.
 import { FfiErrorCode } from '@app/walletBackend/ffi';
 
 export type Epoch = number;
@@ -18,8 +7,7 @@ export type Epoch = number;
 export const isCurrent = (issued: Epoch, current: Epoch): boolean =>
   issued === current;
 
-// The catalog keys the controller surfaces. Resolved to prose only at the
-// display edge (ADR 0002); this core module holds keys, never prose.
+// The catalog keys the controller surfaces, resolved to prose only for display.
 export type SyncControllerErrorKey =
   | 'sync.fetch-failed'
   | 'sync.offline'
@@ -56,15 +44,20 @@ export type SyncMachine = {
   epoch: Epoch;
   sync: SyncState;
   saveRequired: boolean;
-  configuredServer: string; // the server the next launch will bind
-  boundServer: string; // the server the running sync captured at its launch
+  // The server the next launch will bind.
+  configuredServer: string;
+  // The server the running sync captured at its launch.
+  boundServer: string;
   inFlight: InFlight;
 };
 
 export type PollResult =
-  | { kind: 'notLaunched' } // "Sync task has not been launched."
-  | { kind: 'notComplete' } // "Sync task is not complete."
-  | { kind: 'complete'; percent: number; saveRequired: boolean }; // sync_complete JSON
+  // "Sync task has not been launched."
+  | { kind: 'notLaunched' }
+  // "Sync task is not complete."
+  | { kind: 'notComplete' }
+  // The sync_complete JSON.
+  | { kind: 'complete'; percent: number; saveRequired: boolean };
 
 export type Ack = { kind: 'ok' } | { kind: 'rejected'; code: FfiErrorCode };
 
@@ -74,7 +67,7 @@ export type Observation =
 
 export const PERSISTENT_FAILURE_AT = 3;
 
-// The FfiErrorCode → ErrorKey mapping ADR 0017 places at the reconcile boundary.
+// Maps a native error code to the catalog key the controller surfaces.
 const classify = (code: FfiErrorCode): SyncControllerErrorKey => {
   switch (code) {
     case 'Sync':

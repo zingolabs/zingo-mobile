@@ -136,11 +136,7 @@ export default class WalletBackend {
     return this.config.readOnly;
   }
 
-  // Active server. Routes through the coordinator's changeServer so the switch
-  // bumps the controller epoch (ADR 0017): a status read or poll begun under the
-  // old server drops rather than applying its stale snapshot. It still
-  // mutates the shared config reference, so every sub-service picks up the new
-  // URI on its next call without recreating the WalletBackend instance.
+  // Switches the shared config to the server, which every sub-service reads on its next call.
   setServer(server: ServerType) {
     this.syncCoordinator.changeServer(server);
   }
