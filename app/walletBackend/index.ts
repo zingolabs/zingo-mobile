@@ -48,6 +48,7 @@ export {
   loadExistingWallet,
   migrationStatus,
   parseAddress,
+  checkUfvk,
   planIronwoodMigration,
   planOrchardDrain,
   quickSplit,
@@ -69,7 +70,7 @@ export {
   walletExists,
   windowTimeline,
 } from './utils/walletUtils';
-export type { ZecPriceOutcome } from './utils/walletUtils';
+export type { UfvkCheck, ZecPriceOutcome } from './utils/walletUtils';
 export {
   hasRepairableWalletFile,
   repairDoubleWrappedWallet,

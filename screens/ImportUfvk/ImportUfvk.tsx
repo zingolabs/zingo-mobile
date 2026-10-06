@@ -35,8 +35,12 @@ import { ContextAppLoading } from '@app/context';
 import SeedPhraseInput from '@ui/widgets/SeedPhraseInput';
 import BusyButton from '@ui/widgets/BusyButton';
 import InfoTooltip from '@ui/widgets/InfoTooltip';
-import { getLatestBlockServerInfo } from '@app/walletBackend';
-import { GlobalConst, RouteEnum } from '@app/AppState';
+import {
+  UfvkCheck,
+  checkUfvk,
+  getLatestBlockServerInfo,
+} from '@app/walletBackend';
+import { ChainNameEnum, GlobalConst, RouteEnum } from '@app/AppState';
 import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
 import { seedStatus } from '@app/utils/seedPhrase';
 import { duration, ease } from '@app/theme/motion';
@@ -61,6 +65,9 @@ type ImportUfvkProps = {
   onClickCancel: () => void;
   onClickOK: (keyText: string, birthday: number) => void;
 };
+// Waits for typing to pause before decoding the key.
+const KEY_CHECK_DELAY_MS = 300;
+
 const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
   busy,
   onClickCancel,
@@ -79,8 +86,49 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
 
   const activation = activationHeight[server.chainName];
   const status = seedStatus(seedufvkText);
+  const typedKey = status.kind === 'ufvk' ? status.key : '';
+  // The check of the key in the field; unknown while it runs, or when the
+  // native call failed and the restore itself will report.
+  const [keyCheck, setKeyCheck] = useState<{ key: string; check: UfvkCheck }>({
+    key: '',
+    check: { kind: 'unknown' },
+  });
+  const check: UfvkCheck =
+    keyCheck.key === typedKey ? keyCheck.check : { kind: 'unknown' };
+  const keyChainMismatch =
+    check.kind === 'ufvk' &&
+    server.chainName !== ChainNameEnum.noneChainName &&
+    check.chainName !== server.chainName;
+  const chainLabel = (chain: ChainNameEnum) =>
+    translate(`settings.value-chainname-${chain}`) as string;
+  const keyError =
+    check.kind === 'invalid'
+      ? (translate('import.key-invalid') as string)
+      : check.kind === 'ufvk' && keyChainMismatch
+        ? (translate('import.key-wrong-chain') as string)
+            .replace('{key}', chainLabel(check.chainName))
+            .replace('{server}', chainLabel(server.chainName))
+        : undefined;
   const keyReady =
-    status.kind === 'ufvk' || (status.kind === 'seed' && status.complete);
+    (status.kind === 'ufvk' && keyCheck.key === typedKey && !keyError) ||
+    (status.kind === 'seed' && status.complete);
+
+  useEffect(() => {
+    if (!typedKey) {
+      return;
+    }
+    let live = true;
+    const timer = setTimeout(async () => {
+      const result = await checkUfvk(typedKey);
+      if (live) {
+        setKeyCheck({ key: typedKey, check: result });
+      }
+    }, KEY_CHECK_DELAY_MS);
+    return () => {
+      live = false;
+      clearTimeout(timer);
+    };
+  }, [typedKey]);
   const birthdayLow = !!birthday && Number(birthday) < activation;
   const ready = keyReady && !birthdayLow;
 
@@ -268,6 +316,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
           value={seedufvkText}
           onChangeValue={setSeedufvkText}
           translate={translate}
+          keyError={keyError}
         />
 
         <View style={{ marginTop: 39, alignItems: 'center' }}>
