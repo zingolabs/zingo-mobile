@@ -367,6 +367,23 @@ describe('SyncCoordinator seam-A fence — scheduling machine, current behavior'
     await c.clearTimers();
   });
 
+  it('Tests that a tick with no save pending runs the fetches that failed before.', async () => {
+    const retried = jest.fn().mockResolvedValue(undefined);
+    const ds = fakeDataService({
+      retryFailedFetches: jest.fn(() => [retried()]),
+    } as never);
+    const c = new SyncCoordinator(fakeConfig(), ds);
+    c.walletConfigPerformanceLevel = RPCPerformanceLevelEnum.Low;
+
+    await c.configure();
+    await jest.advanceTimersByTimeAsync(5 * 1000);
+    await flushPromises();
+
+    expect(ds.retryFailedFetches).toHaveBeenCalledTimes(1);
+    expect(retried).toHaveBeenCalledTimes(1);
+    await c.clearTimers();
+  });
+
   it('Tests that a rejected rescan re-arms the poll loop.', async () => {
     bridge.runRescanProcess.mockRejectedValue(new Error('indexer hiccup'));
     const config = fakeConfig();

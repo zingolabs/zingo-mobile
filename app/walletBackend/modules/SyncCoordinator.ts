@@ -230,6 +230,7 @@ export class SyncCoordinator {
     if (!(await this.dataService.getWalletSaveRequired())) {
       console.log('***************** NOT SAVE REQUIRED: No fetching data');
       taskPromises.push(this.fetchSyncPoll());
+      taskPromises.push(...this.dataService.retryFailedFetches());
     } else {
       if (
         this.dataService.getWalletSaveRequiredLock ||

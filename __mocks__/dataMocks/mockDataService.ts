@@ -19,6 +19,7 @@ export function mockDataService(
     fetchWalletHeight: resolved(),
     fetchWalletBirthdaySeedUfvk: resolved(),
     getWalletSaveRequired: jest.fn().mockResolvedValue(false),
+    retryFailedFetches: jest.fn().mockReturnValue([]),
     getConfigWalletPerformance: jest
       .fn()
       .mockResolvedValue(RPCPerformanceLevelEnum.Low),

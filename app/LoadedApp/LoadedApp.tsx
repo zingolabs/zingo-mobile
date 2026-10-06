@@ -1544,6 +1544,7 @@ export class LoadedAppClass extends Component<
         server: oldSettings.server,
         selectServer: oldSettings.selectServer,
       });
+      await this.rpc.configure();
       if (toast) {
         this.addLastSnackbar(
           `${this.state.translate('loadedapp.readingwallet-error')} ${nativeUri(value)}`,
@@ -1609,6 +1610,8 @@ export class LoadedAppClass extends Component<
       server: oldSettings.server,
       selectServer: oldSettings.selectServer,
     });
+    // The loop stopped at the top keeps syncing the restored server.
+    await this.rpc.configure();
     if (toast) {
       this.addLastSnackbar(
         `${this.state.translate('loadedapp.readingwallet-error')} ${nativeUri(value)}`,
