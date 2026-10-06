@@ -136,7 +136,6 @@ describe('Maestro reaches each typed field on iOS', () => {
           setLanguageOption={onFunction}
           setBiometricsOption={onFunction}
           setSelectServerOption={onFunction}
-          setPerformanceLevelOption={onFunction}
           setBlockExplorerOption={onFunction}
           toggleMenuDrawer={onFunction}
         />

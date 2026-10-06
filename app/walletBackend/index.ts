@@ -61,7 +61,6 @@ export {
   restoreWalletFromUfvk,
   sendAllPropose,
   sendPropose,
-  setConfigWalletToProd,
   shieldConfirm,
   shieldPropose,
   splitStatus,

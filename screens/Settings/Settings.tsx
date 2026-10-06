@@ -92,7 +92,6 @@ import {
   hasRecoveryWalletInfo,
   saveRecoveryWalletInfo,
 } from '@app/services/recoveryWalletInfo';
-import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { createAlert } from '@app/services/createAlert';
 import { sendEmail } from '@app/services/sendEmail';
@@ -114,7 +113,6 @@ type SettingsProps = NativeStackScreenProps<
   setLanguageOption: (value: LanguageEnum) => Promise<void>;
   setBiometricsOption: (value: boolean) => Promise<void>;
   setSelectServerOption: (value: SelectServerEnum) => Promise<void>;
-  setPerformanceLevelOption: (value: RPCPerformanceLevelEnum) => Promise<void>;
   setBlockExplorerOption: (value: BlockExplorerEnum) => Promise<void>;
   toggleMenuDrawer: () => void;
 };
@@ -130,7 +128,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   setLanguageOption,
   setBiometricsOption,
   setSelectServerOption,
-  setPerformanceLevelOption,
   setBlockExplorerOption,
   toggleMenuDrawer,
 }) => {
@@ -147,7 +144,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     selectServer: selectServerContext,
     walletChainName,
     mixnetView,
-    performanceLevel: performanceLevelContext,
     blockExplorer: blockExplorerContext,
     readOnly,
     setPrivacyOption,
@@ -170,12 +166,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   let PRIVACYS: Options[] = [];
   if (typeof privacysArray === 'object') {
     PRIVACYS = privacysArray as Options[];
-  }
-
-  const performanceLevelsArray = translate('settings.performancelevels');
-  let PERFORMANCELEVELMENU: Options[] = [];
-  if (typeof performanceLevelsArray === 'object') {
-    PERFORMANCELEVELMENU = performanceLevelsArray as Options[];
   }
 
   const blockExplorersArray = translate('settings.blockexplorers');
@@ -240,8 +230,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const [privacy, setPrivacy] = useState<boolean>(privacyContext);
   const [biometrics, setBiometrics] = useState<boolean>(biometricsContext);
   const [selectServer, setSelectServer] = useState<ServerPick>(pickContext);
-  const [performanceLevel, setPerformanceLevel] =
-    useState<RPCPerformanceLevelEnum>(performanceLevelContext);
   const [blockExplorer, setBlockExplorer] =
     useState<BlockExplorerEnum>(blockExplorerContext);
 
@@ -640,7 +628,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       privacyContext === privacy &&
       biometricsContext === biometrics &&
       pickContext === selectServer &&
-      performanceLevelContext === performanceLevel &&
       blockExplorerContext === blockExplorer
     ) {
       setDisabledButton(true);
@@ -658,8 +645,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     listServerUri,
     privacy,
     privacyContext,
-    performanceLevel,
-    performanceLevelContext,
     blockExplorer,
     blockExplorerContext,
     biometrics,
@@ -709,7 +694,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       privacyContext === privacy &&
       biometricsContext === biometrics &&
       pickContext === selectServer &&
-      performanceLevelContext === performanceLevel &&
       blockExplorerContext === blockExplorer
     ) {
       addLastSnackbar(translate('settings.nochanges') as string);
@@ -879,9 +863,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       if (biometricsContext !== biometrics) {
         await setBiometricsOption(biometrics);
       }
-      if (performanceLevelContext !== performanceLevel) {
-        await setPerformanceLevelOption(performanceLevel);
-      }
       if (blockExplorerContext !== blockExplorer) {
         await setBlockExplorerOption(blockExplorer);
       }
@@ -977,7 +958,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       setSelectServer(pickContext);
       setServer();
       setBiometrics(biometricsContext);
-      setPerformanceLevel(performanceLevelContext);
       setBlockExplorer(blockExplorerContext);
     }
     // `goBack()` pops Settings off the stack — using `navigate(HomeStack)`
@@ -991,76 +971,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const optionsRadio = (
-    DATA: Options[],
-    setOption: React.Dispatch<React.SetStateAction<string | boolean>>,
-    typeOption: StringConstructor | BooleanConstructor,
-    valueOption: string | boolean,
-    label: string, // in lowercase to match with the translation json files.
-  ) => {
-    return DATA.map(item => {
-      const infoSection = `${label}-${item.value}`;
-      return (
-        <View key={'view-' + item.value} style={{ marginBottom: 5 }}>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              marginTop: 10,
-              minHeight: 48,
-            }}
-          >
-            <TouchableOpacity
-              testID={`settings.${label}-${item.value}`}
-              disabled={disabled}
-              style={{ flexDirection: 'row', alignItems: 'center' }}
-              onPress={() => setOption(typeOption(item.value))}
-            >
-              <FontAwesomeIcon
-                icon={
-                  typeOption(item.value) === valueOption
-                    ? faDotCircle
-                    : farCircle
-                }
-                size={16}
-                color={colors.fgMuted}
-              />
-              <RegText style={{ marginLeft: 10 }}>
-                {translate(`settings.value-${label}-${item.value}`) as string}
-              </RegText>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() =>
-                setOpenInfoSection(
-                  openInfoSection === infoSection ? null : infoSection,
-                )
-              }
-              hitSlop={8}
-              style={{ marginLeft: 6 }}
-            >
-              <FontAwesomeIcon
-                icon={faInfoCircle}
-                size={14}
-                color={colors.fgDefault}
-              />
-            </TouchableOpacity>
-          </View>
-          {openInfoSection === infoSection && (
-            <View
-              style={{
-                backgroundColor: '#040E1D',
-                borderRadius: 8,
-                padding: 10,
-              }}
-            >
-              <FadeText style={{ textAlign: 'center' }}>{item.text}</FadeText>
-            </View>
-          )}
-        </View>
-      );
-    });
-  };
 
   // Auto/List need a PUBLIC chain (main/test). Pressing them while on None or
   // Regtest jumps to Mainnet (criterion 2).
@@ -1748,47 +1658,24 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
               )}
 
               {/* SECTION: Developer */}
-              {showDeveloperOptions && (
+              {showDeveloperOptions && !!lastError && (
                 <>
                   {sectionHeader('settings.section-developer')}
                   <View style={{ width: '100%', marginBottom: 20 }}>
                     <View style={{ marginHorizontal: 25, marginVertical: 15 }}>
-                      <BoldText>
-                        {translate('settings.performancelevel-title') as string}
-                      </BoldText>
+                      <BoldText>{'LAST ERROR'}</BoldText>
                     </View>
 
                     <View style={{ marginLeft: 40, marginRight: 25 }}>
-                      {optionsRadio(
-                        PERFORMANCELEVELMENU,
-                        setPerformanceLevel as React.Dispatch<
-                          React.SetStateAction<string | boolean>
-                        >,
-                        String,
-                        performanceLevel,
-                        'performancelevel',
-                      )}
+                      <Button
+                        type={ButtonTypeEnum.Primary}
+                        title={translate('view-error') as string}
+                        onPress={() => {
+                          reportError(lastError);
+                        }}
+                        twoButtons={true}
+                      />
                     </View>
-                    {!!lastError && (
-                      <>
-                        <View
-                          style={{ marginHorizontal: 25, marginVertical: 15 }}
-                        >
-                          <BoldText>{'LAST ERROR'}</BoldText>
-                        </View>
-
-                        <View style={{ marginLeft: 40, marginRight: 25 }}>
-                          <Button
-                            type={ButtonTypeEnum.Primary}
-                            title={translate('view-error') as string}
-                            onPress={() => {
-                              reportError(lastError);
-                            }}
-                            twoButtons={true}
-                          />
-                        </View>
-                      </>
-                    )}
                   </View>
                 </>
               )}

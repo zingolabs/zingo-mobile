@@ -7,7 +7,6 @@ import {
   ServerType,
 } from '@app/AppState';
 import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
-import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
 import {
   StartMixnetTransport,
   StopMixnetTransport,
@@ -37,7 +36,6 @@ export type WalletBackendConfig = {
   keepAwake: (keep: boolean) => void;
   readOnly: boolean;
   server: ServerType;
-  performanceLevel: RPCPerformanceLevelEnum;
 };
 
 // Offline is the server choice with no indexer.

@@ -7,8 +7,8 @@
  * promise rejection on iOS (whose doSave rejects on failure) and aborts the
  * rest of that tick.
  *
- * These tests pin both save sites inside runTaskPromises: the save after a
- * performance-level reconfiguration, and the periodic save-required save.
+ * This test pins the save site inside runTaskPromises: the periodic
+ * save-required save.
  */
 jest.mock('@app/RPCModule', () =>
   require('../__mocks__/rpcModuleProxy').rpcModuleProxyMock(),
@@ -17,14 +17,11 @@ jest.mock('@app/RPCModule', () =>
 import RPCModule from '@app/RPCModule';
 import * as walletUtils from '@app/walletBackend/utils/walletUtils';
 import { SyncCoordinator } from '@app/walletBackend/modules/SyncCoordinator';
-import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
 import type { DataService } from '@app/walletBackend/modules/DataService';
 import { mockServer } from '../__mocks__/dataMocks/mockServer';
 import { mockWalletBackendConfig } from '../__mocks__/dataMocks/mockWalletBackendConfig';
 
 const mockedDoSave = RPCModule.doSave as jest.Mock;
-const mockedSetConfigWalletToProd =
-  RPCModule.setConfigWalletToProdProcess as jest.Mock;
 
 // A coordinator whose poll task is stubbed out: the poll path is out of
 // scope here and schedules timers the tests must not leak. (Its lock flag
@@ -48,27 +45,6 @@ afterEach(() => {
 });
 
 describe('SyncCoordinator.runTaskPromises', () => {
-  it('contains a failing save after reconfiguration and still re-reads the performance level', async () => {
-    const getConfigWalletPerformance = jest
-      .fn()
-      .mockResolvedValueOnce(RPCPerformanceLevelEnum.Low)
-      .mockResolvedValueOnce(RPCPerformanceLevelEnum.High);
-    const coordinator = coordinatorWith({
-      getConfigWalletPerformance,
-      getWalletSaveRequired: jest.fn().mockResolvedValue(false),
-    });
-    mockedSetConfigWalletToProd.mockResolvedValue('wallet set to prod');
-    mockedDoSave.mockRejectedValue(new Error('bridge exploded'));
-
-    // The tick's promise must never reject — its caller is a setInterval
-    // with no rejection handler.
-    await expect(coordinator.runTaskPromises()).resolves.toBeUndefined();
-
-    // The tick must finish its work after the failed save; the follow-up
-    // performance re-read is the observable remainder.
-    expect(getConfigWalletPerformance).toHaveBeenCalledTimes(2);
-  });
-
   it('routes the periodic save-required save through the classifying seam', async () => {
     const doSaveSeam = jest.spyOn(walletUtils, 'doSave');
     const coordinator = coordinatorWith({
@@ -81,9 +57,6 @@ describe('SyncCoordinator.runTaskPromises', () => {
       fetchTandZandOValueTransfers: jest.fn().mockResolvedValue(undefined),
       fetchTandZandOMessages: jest.fn().mockResolvedValue(undefined),
     });
-    // The performance level already matches config: only the periodic
-    // save-required branch runs.
-    coordinator.walletConfigPerformanceLevel = RPCPerformanceLevelEnum.High;
     mockedDoSave.mockRejectedValue(new Error('bridge exploded'));
 
     await expect(coordinator.runTaskPromises()).resolves.toBeUndefined();

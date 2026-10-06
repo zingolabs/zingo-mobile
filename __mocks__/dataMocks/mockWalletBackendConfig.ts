@@ -1,5 +1,4 @@
 import { WalletBackendConfig } from '@app/walletBackend/config/WalletBackendConfig';
-import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
 import { mockServer } from './mockServer';
 
 export function mockWalletBackendConfig(
@@ -23,7 +22,6 @@ export function mockWalletBackendConfig(
     keepAwake: jest.fn(),
     readOnly: false,
     server: mockServer,
-    performanceLevel: RPCPerformanceLevelEnum.High,
     ...overrides,
   };
 }

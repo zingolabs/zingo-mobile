@@ -264,24 +264,6 @@
         "text": "Normal Privacy, you can see all the information."
       }
     ],
-    "performancelevels": [
-      {
-        "value": "Maximum",
-        "text": "For very powerful devices."
-      },
-      {
-        "value": "High",
-        "text": "For devices with a lot of Memory."
-      },
-      {
-        "value": "Medium",
-        "text": "For regular devices."
-      },
-      {
-        "value": "Low",
-        "text": "For old devices."
-      }
-    ],
     "blockexplorers": [
       {
         "value": "Zcashexplorer",
@@ -329,7 +311,6 @@
     "language-title": "Language",
     "islanguage": "You need to choose a language to save.",
     "privacy-title": "Hide Sensitive Values",
-    "performancelevel-title": "Zingolib Performance Level",
     "blockexplorer-title": "Block Explorer",
     "value-language-en": "English",
     "value-language-es": "Spanish",
@@ -343,10 +324,6 @@
     "value-chainname-none": "None",
     "server-chain-title": "Network",
     "select-chain-placeholder": "Select a Network...",
-    "value-performancelevel-Maximum": "Maximum",
-    "value-performancelevel-High": "High",
-    "value-performancelevel-Medium": "Medium",
-    "value-performancelevel-Low": "Low",
     "value-blockexplorer-Zcashexplorer": "Zcashexplorer",
     "value-blockexplorer-ZecBlock": "ZecBlock",
     "value-blockexplorer-Zexplorer": "Zexplorer",

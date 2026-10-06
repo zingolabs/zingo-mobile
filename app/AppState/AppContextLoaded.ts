@@ -20,7 +20,6 @@ import ValueTransferType from './types/ValueTransferType';
 import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
 import TransparentAddressClass from './classes/TransparentAddressClass';
 import { ScreenEnum } from './enums/ScreenEnum';
-import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
 import { BlockExplorerEnum } from './enums/BlockExplorerEnum';
 import { MixnetView } from '@app/walletBackend/transforms/mixnetView';
 import type { SendPermit } from '@app/walletBackend/transforms/sendPermit';
@@ -133,7 +132,6 @@ export default interface AppContextLoaded {
   // wallet / unknown. Used to decide, on a server change, whether to open the
   // wallet directly or launch a chain switch.
   walletChainName: ChainNameEnum;
-  performanceLevel: RPCPerformanceLevelEnum;
   blockExplorer: BlockExplorerEnum;
   // The persisted send-route preference; the transport runs either way.
 

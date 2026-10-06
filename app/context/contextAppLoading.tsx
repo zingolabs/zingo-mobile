@@ -12,7 +12,6 @@ import {
   SelectServerEnum,
   BlockExplorerEnum,
 } from '@app/AppState';
-import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
 
 export const defaultAppContextLoading: AppContextLoading = {
   netInfo: {} as NetInfoType,
@@ -40,7 +39,6 @@ export const defaultAppContextLoading: AppContextLoading = {
   biometrics: false,
   selectServer: SelectServerEnum.auto,
   zingolibVersion: '',
-  performanceLevel: RPCPerformanceLevelEnum.Medium,
   setPrivacyOption: async () => {},
   blockExplorer: BlockExplorerEnum.Zcashexplorer,
 };

@@ -98,7 +98,6 @@ export async function createNewWallet(
   serverUri: string,
   birthday: string,
   chainHint: string,
-  performanceLevel: string,
   minConfirmations: string,
 ): Promise<FfiResult<string>> {
   await applyBroadcastCandidates(serverUri, chainHint);
@@ -107,7 +106,6 @@ export async function createNewWallet(
       serverUri,
       birthday,
       chainHint,
-      performanceLevel,
       minConfirmations,
     ),
   );
@@ -119,7 +117,6 @@ export async function restoreWalletFromSeed(
   birthday: string,
   serverUri: string,
   chainHint: string,
-  performanceLevel: string,
   minConfirmations: string,
 ): Promise<FfiResult<string>> {
   await applyBroadcastCandidates(serverUri, chainHint);
@@ -129,7 +126,6 @@ export async function restoreWalletFromSeed(
       birthday,
       serverUri,
       chainHint,
-      performanceLevel,
       minConfirmations,
     ),
   );
@@ -141,7 +137,6 @@ export async function restoreWalletFromUfvk(
   birthday: string,
   serverUri: string,
   chainHint: string,
-  performanceLevel: string,
   minConfirmations: string,
 ): Promise<FfiResult<string>> {
   await applyBroadcastCandidates(serverUri, chainHint);
@@ -151,7 +146,6 @@ export async function restoreWalletFromUfvk(
       birthday,
       serverUri,
       chainHint,
-      performanceLevel,
       minConfirmations,
     ),
   );
@@ -161,7 +155,6 @@ export async function restoreWalletFromUfvk(
 export async function loadExistingWallet(
   serverUri: string,
   chainHint: string,
-  performanceLevel: string,
   minConfirmations: string,
 ): Promise<FfiResult<string>> {
   await applyBroadcastCandidates(serverUri, chainHint);
@@ -169,7 +162,6 @@ export async function loadExistingWallet(
     RPCModule.loadExistingWallet(
       serverUri,
       chainHint,
-      performanceLevel,
       minConfirmations,
     ),
   );
@@ -243,17 +235,6 @@ export async function changeServer(
 // (parseable as RPCInfoType).
 export async function getServerInfo(): Promise<FfiResult<string>> {
   return callFfi(RPCModule.infoServerInfo());
-}
-
-// Persists the runtime performance level + min-confirmations into the
-// wallet config so the next boot uses them.
-export async function setConfigWalletToProd(
-  performanceLevel: string,
-  minConfirmations: string,
-): Promise<FfiResult<string>> {
-  return callFfi(
-    RPCModule.setConfigWalletToProdProcess(performanceLevel, minConfirmations),
-  );
 }
 
 // ---------------------------------------------------------------------------
