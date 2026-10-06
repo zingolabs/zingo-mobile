@@ -6,6 +6,8 @@ import 'react-native';
 import React from 'react';
 
 import { fireEvent, render } from '@testing-library/react-native';
+import { Provider } from 'jotai';
+import { balanceAtom } from '@app/AppState/balance';
 import BalanceRow from '@ui/widgets/Header/components/BalanceRow';
 import {
   ContextAppLoadedProvider,
@@ -24,7 +26,8 @@ import {
   mockInfo,
   mockZecPrice,
 } from '../.storybook/storyMocks';
-import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
+import { seed, storeWith } from '../.storybook/storeWith';
+import { polledMockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 
 // Rendering the raw key keeps the assertions on which translation the row
 // picked, not on catalog prose.
@@ -32,29 +35,30 @@ const keyTranslate = (key: string) => key;
 
 function renderRow(mixnetView: MixnetView, onPressShieldFunds = jest.fn()) {
   return render(
-    <ContextAppLoadedProvider value={defaultAppContextLoaded}>
-      <BalanceRow
-        noBalance={false}
-        noPrivacy={true}
-        setPrivacyOption={undefined}
-        addLastSnackbar={undefined}
-        privacy={false}
-        translate={keyTranslate}
-        totalBalance={mockTotalBalance}
-        info={mockInfo}
-        zecPrice={mockZecPrice}
-        server={remoteServer(mockInfo.serverUri, ChainNameEnum.mainChainName)}
-        showShieldButton={true}
-        shieldingFee={0.0001}
-        valueTransfersTotal={12}
-        calculateAmountToShield={() => '0.5'}
-        calculatePoolsToShield={() => 'transparent'}
-        calculateDisableButtonToShield={() => false}
-        onPressShieldFunds={onPressShieldFunds}
-        receivedLegend={false}
-        mixnetView={mixnetView}
-      />
-    </ContextAppLoadedProvider>,
+    <Provider store={storeWith(seed(balanceAtom, polledMockTotalBalance))}>
+      <ContextAppLoadedProvider value={defaultAppContextLoaded}>
+        <BalanceRow
+          noBalance={false}
+          noPrivacy={true}
+          setPrivacyOption={undefined}
+          addLastSnackbar={undefined}
+          privacy={false}
+          translate={keyTranslate}
+          info={mockInfo}
+          zecPrice={mockZecPrice}
+          server={remoteServer(mockInfo.serverUri, ChainNameEnum.mainChainName)}
+          showShieldButton={true}
+          shieldingFee={0.0001}
+          valueTransfersTotal={12}
+          calculateAmountToShield={() => '0.5'}
+          calculatePoolsToShield={() => 'transparent'}
+          calculateDisableButtonToShield={() => false}
+          onPressShieldFunds={onPressShieldFunds}
+          receivedLegend={false}
+          mixnetView={mixnetView}
+        />
+      </ContextAppLoadedProvider>
+    </Provider>,
   );
 }
 

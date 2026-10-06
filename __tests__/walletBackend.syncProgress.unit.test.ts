@@ -1,4 +1,7 @@
-import { scanInProgress } from '@app/walletBackend/utils/syncProgress';
+import {
+  scanInProgress,
+  scanProgress,
+} from '@app/walletBackend/utils/syncProgress';
 import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
 
 const status = (s: Partial<RPCSyncStatusType>) => s as RPCSyncStatusType;
@@ -56,4 +59,8 @@ describe('scanInProgress', () => {
       ),
     ).toBe(true);
   });
+});
+
+test('Tests that a missing snapshot reads as a scan starting at 0% instead of throwing', () => {
+  expect(scanProgress(undefined)).toEqual({ kind: 'scanning', percent: 0 });
 });

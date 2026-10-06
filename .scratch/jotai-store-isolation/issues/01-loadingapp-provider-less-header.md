@@ -2,11 +2,13 @@
 
 **Type:** Research (investigate and decide, do not implement yet)
 
-**What to build:** A decision on how `Header` should resolve its jotai atoms when it renders under `LoadingApp`. Today `Header` reads `syncStatusAtom` and `usePrice()` (`priceViewAtom`). Under `LoadedApp` it reads the per-instance `controllerStore` through `<Provider>`. Under `LoadingApp` (import-UFVK and new-seed screens) there is no jotai `<Provider>`, so per the jotai docs those reads fall to the process-global default store ("provider-less mode"). Same component, two stores, chosen by tree position. The finding is latent, not firing: nothing in production writes the default store, so it stays at atom defaults (blank sync, unpriced), which is the correct onboarding display. The research decides whether to close the isolation hole and how.
+**What to build:** A decision on how `Header` should resolve its jotai atoms when it renders under `LoadingApp`. Today `Header` reads `syncStatusAtom`. Under `LoadedApp` it reads the per-instance `controllerStore` through `<Provider>`. Under `LoadingApp` (import-UFVK and new-seed screens) there is no jotai `<Provider>`, so per the jotai docs those reads fall to the process-global default store ("provider-less mode"). Same component, two stores, chosen by tree position. The finding is latent, not firing: nothing in production writes the default store, so it stays at atom defaults (blank sync), which is the correct onboarding display. The research decides whether to close the isolation hole and how.
 
 **Blocked by:** None — can start immediately.
 
 **Status:** ready-for-agent
+
+**Update:** since the onboarding rewrite (#1558) no mounted `LoadingApp` screen renders `Header`; only `NewSeed` does, and it is no longer mounted.
 
 ## Questions to answer
 

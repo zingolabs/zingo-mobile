@@ -47,7 +47,6 @@ const hookInput = (
     setShieldingAmount: jest.fn(),
     server: inputs.server,
     somePending: false,
-    totalBalance: null,
     shieldingAmount: 0.5,
     translate,
     addLastSnackbar,

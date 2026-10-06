@@ -23,7 +23,6 @@ import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformance
 
 export const defaultAppContextLoaded: AppContextLoaded = {
   netInfo: {} as NetInfoType,
-  totalBalance: null,
   addresses: null,
   valueTransfers: null,
   valueTransfersTotal: null,

@@ -92,6 +92,8 @@ import {
   errorKeyed,
 } from '@app/AppState';
 import { appStateStatusAtom } from '@app/AppState/uiAtoms';
+import { syncStatusAtom } from '@app/AppState/syncAtoms';
+import { walletViewAtom } from '@app/AppState/walletViewAtoms';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 import {
   ListenerSubscription,
@@ -262,6 +264,27 @@ describe('LoadedApp seam-B mount fence — current container behavior', () => {
       expect(configure).toHaveBeenCalled();
     });
 
+    it('Tests that on iOS a wallet mounted while the app is in the background resumes on the next return', async () => {
+      const { Platform } =
+        jest.requireActual<typeof import('react-native')>('react-native');
+      const os = jest.replaceProperty(Platform, 'OS', 'ios');
+      const appState = AppState as unknown as { currentState: unknown };
+      const realState = appState.currentState;
+      appState.currentState = AppStateStatusEnum.background;
+      const { instance } = await mountCommitted();
+      const configure = jest.spyOn(instance.rpc, 'configure');
+
+      const handler = captureAppStateHandler();
+      await act(async () => {
+        await handler(AppStateStatusEnum.active);
+        await flushMicrotasks();
+      });
+
+      expect(configure).toHaveBeenCalled();
+      appState.currentState = realState;
+      os.restore();
+    });
+
     it('a declined foreground gate routes back to LoadingApp', async () => {
       const { instance } = await mountCommitted();
       controllerStoreOf(instance).set(
@@ -292,7 +315,7 @@ describe('LoadedApp seam-B mount fence — current container behavior', () => {
       const { instance } = await mountCommitted();
       act(() => {
         instance.setState({
-          somePending: false,
+          somePending: true,
           valueTransfers: null,
           valueTransfersTotal: null,
         });
@@ -312,6 +335,37 @@ describe('LoadedApp seam-B mount fence — current container behavior', () => {
       expect(instance.state.valueTransfersTotal).toBe(1);
       expect(instance.state.somePending).toBe(false);
     });
+  });
+
+  it('B.7: Tests that a sync tick publishes the snapshot to the sync atom without a container commit', async () => {
+    const { instance } = await mountCommitted();
+    const setState = jest.spyOn(instance, 'setState');
+    const snapshot = {
+      scan_ranges: [{} as never],
+      percentage_total_outputs_scanned: 40,
+    };
+
+    act(() => {
+      instance.setSyncingStatus(snapshot);
+    });
+
+    expect(controllerStoreOf(instance).get(syncStatusAtom)).toEqual(snapshot);
+    expect(setState).not.toHaveBeenCalled();
+  });
+
+  it('B.8: Tests that a read-only wallet reaches the view atom without the Send tab', async () => {
+    const { instance } = await mountCommitted();
+    expect(controllerStoreOf(instance).get(walletViewAtom)).toBe(
+      'fullWithSend',
+    );
+
+    act(() => {
+      instance.setState({ readOnly: true });
+    });
+
+    expect(controllerStoreOf(instance).get(walletViewAtom)).toBe(
+      'fullWithoutSend',
+    );
   });
 
   it('B.6: setInfo falls back to the wallet chain when the server chain is empty', async () => {

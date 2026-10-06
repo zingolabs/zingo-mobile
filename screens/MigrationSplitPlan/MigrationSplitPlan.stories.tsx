@@ -1,13 +1,16 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
+import { balanceAtom } from '@app/AppState/balance';
+import { seed } from '../../.storybook/storeWith';
 import { RouteEnum } from '@app/AppState';
 import MigrationSplitPlan from './MigrationSplitPlan';
 import {
   screenProps,
   withAppContext,
+  withAtoms,
   withNavigation,
   withRpc,
 } from '../../.storybook/storyDecorators';
-import { mockInfo, mockTotalBalance } from '../../.storybook/storyMocks';
+import { mockInfo, polledMockBalance } from '../../.storybook/storyMocks';
 import { json, pending, rejection } from '../../.storybook/storyRpc';
 import {
   dustPlan,
@@ -19,7 +22,8 @@ const meta: Meta<typeof MigrationSplitPlan> = {
   title: 'Migration/SplitPlan',
   component: MigrationSplitPlan,
   decorators: [
-    withAppContext({ info: mockInfo, totalBalance: mockTotalBalance }),
+    withAppContext({ info: mockInfo }),
+    withAtoms(seed(balanceAtom, polledMockBalance)),
     withNavigation,
   ],
   args: screenProps(RouteEnum.MigrationSplitPlan),

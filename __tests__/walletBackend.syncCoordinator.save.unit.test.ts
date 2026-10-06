@@ -37,7 +37,10 @@ function coordinatorWith(dataService: Partial<DataService>): SyncCoordinator {
     // path, and the coordinator reads this URI to tell them apart.
     server: mockServer,
   });
-  const coordinator = new SyncCoordinator(config, dataService as DataService);
+  const coordinator = new SyncCoordinator(config, {
+    retryFailedFetches: () => [],
+    ...dataService,
+  } as DataService);
   jest.spyOn(coordinator, 'fetchSyncPoll').mockResolvedValue(undefined);
   return coordinator;
 }

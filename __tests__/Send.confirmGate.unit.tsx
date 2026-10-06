@@ -78,7 +78,6 @@ import { mockAddresses } from '../__mocks__/dataMocks/mockAddresses';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 import { mockOnline } from '../__mocks__/dataMocks/mockOnline';
-import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import { mockValueTransfers } from '../__mocks__/dataMocks/mockValueTransfers';
 
 const FEE_ZATOSHIS = 10_000;
@@ -124,7 +123,6 @@ const sendUi = (
   state.addresses = mockAddresses;
   state.translate = translate;
   state.info = mockInfo;
-  state.totalBalance = mockTotalBalance;
   state.sendPageState = sendPageState;
   state.addLastSnackbar = addLastSnackbar;
   state.server = inputs.server;

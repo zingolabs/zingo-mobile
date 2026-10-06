@@ -39,6 +39,10 @@ jest.mock('@app/services/recoveryWalletInfo', () => ({
   removeRecoveryWalletInfo: jest.fn().mockResolvedValue(undefined),
 }));
 
+// The welcome branches hold their own AppState listener and remount with the
+// welcome; the counts below are LoadingApp's own.
+jest.mock('@ui/widgets/WelcomeBranches', () => () => null);
+
 jest.mock('react-native-localize', () => ({
   findBestLanguageTag: jest.fn().mockImplementation(supportedLocales => ({
     languageTag: supportedLocales?.[0] || 'en',

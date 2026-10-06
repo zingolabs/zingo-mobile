@@ -108,7 +108,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const context = useContext(ContextAppLoaded);
   const {
-    totalBalance,
     info,
     zecPrice,
     readOnly,
@@ -161,7 +160,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     setShieldingAmount,
     server,
     somePending,
-    totalBalance,
     shieldingAmount,
     translate,
     addLastSnackbar,
@@ -220,7 +218,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             addLastSnackbar={addLastSnackbar}
             privacy={privacy}
             translate={translate}
-            totalBalance={totalBalance}
             info={info}
             zecPrice={zecPrice}
             server={server}

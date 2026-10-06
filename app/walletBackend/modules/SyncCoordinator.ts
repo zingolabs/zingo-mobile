@@ -12,18 +12,16 @@
  * fetchSyncPollLock) and on DataService are checked before scheduling
  * new work so no operation is enqueued twice.
  *
- * The controller epoch (ADR 0017) bumps on every invalidating boundary. Reset,
- * teardown, foreground resume, and wallet change reach clearTimers(); a server
- * switch bumps through changeServer() without tearing the loop down, because the
- * running sync finishes its catch-up on the old server. A deferred poll
+ * The controller epoch bumps on every invalidating boundary. Reset, teardown,
+ * foreground resume, and wallet change reach clearTimers(); a server switch
+ * bumps it through changeServer() and leaves the loop running. A deferred poll
  * follow-up and an in-flight fetchSyncStatus each capture the epoch and drop
- * once a boundary has passed, so neither a launch nor a status read applies
- * against the new server/wallet.
+ * once a boundary has passed.
  *
  * To add a new periodic task, push it into taskPromises inside runTaskPromises.
  */
 import { Epoch, isCurrent } from '@app/walletBackend/controller/syncController';
-import { TotalBalanceClass, GlobalConst, ServerType } from '@app/AppState';
+import { GlobalConst, ServerType } from '@app/AppState';
 import RPCModule from '@app/RPCModule';
 import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
 import { RPCSyncPollType } from '@app/walletBackend/types/RPCSyncPollType';
@@ -65,14 +63,13 @@ export class SyncCoordinator {
   fetchSyncStatusLock: boolean = false;
   fetchSyncPollLock: boolean = false;
 
-  // The controller epoch (ADR 0017): a monotonic counter bumped on every
-  // invalidating boundary, all of which reach clearTimers(). A deferred poll
-  // follow-up drops when the epoch it captured no longer matches.
+  // A counter bumped at every invalidating boundary; work that captured an older value drops.
   controllerEpoch: Epoch = 0;
 
-  // Single-flight lane: a tick arriving while one is in flight does
-  // not re-enter, so overlapping ticks cannot both read the save-required gate.
-  tickInFlight: boolean = false;
+  // The epoch of the tick in flight. Ticks of that epoch do not re-enter, so
+  // they cannot both read the save-required gate; a boundary releases the lane
+  // from a tick that never settles.
+  tickInFlight: Epoch | undefined = undefined;
 
   // A rescan issued while the lane was held, released when the lane clears.
   queuedRescan: { kind: 'none' } | { kind: 'queued'; epoch: Epoch } = {
@@ -166,14 +163,20 @@ export class SyncCoordinator {
     // Single-flight lane: a tick arriving while one is in flight does
     // not re-enter. The self-rescheduling loop keeps the scheduled path from
     // overlapping; this guard also covers a direct re-entrant call.
-    if (this.tickInFlight) {
+    const epoch = this.controllerEpoch;
+    if (
+      this.tickInFlight !== undefined &&
+      isCurrent(this.tickInFlight, epoch)
+    ) {
       return;
     }
-    this.tickInFlight = true;
+    this.tickInFlight = epoch;
     try {
       await this.runTick();
     } finally {
-      this.tickInFlight = false;
+      if (this.tickInFlight === epoch) {
+        this.tickInFlight = undefined;
+      }
     }
   }
 
@@ -223,6 +226,7 @@ export class SyncCoordinator {
     if (!(await this.dataService.getWalletSaveRequired())) {
       console.log('***************** NOT SAVE REQUIRED: No fetching data');
       taskPromises.push(this.fetchSyncPoll());
+      taskPromises.push(...this.dataService.retryFailedFetches());
     } else {
       if (
         this.dataService.getWalletSaveRequiredLock ||
@@ -279,10 +283,7 @@ export class SyncCoordinator {
     }
   }
 
-  // A server switch is an invalidating boundary (ADR 0017): bump the epoch so a
-  // status read or deferred poll begun under the old server drops instead of
-  // applying its stale snapshot. The loop keeps running — the launched
-  // sync finishes its catch-up on the old server, the next launch binds the new.
+  // Bumps the epoch so a status read or deferred poll begun under the old server drops, and keeps the loop running.
   changeServer(server: ServerType): void {
     this.controllerEpoch += 1;
     this.config.server = server;
@@ -328,10 +329,9 @@ export class SyncCoordinator {
     if (isOffline(this.config)) {
       return;
     }
-    // Single in-flight command (ADR 0017): a launch and a rescan share one lane.
-    // A rescan issued while a sync holds the lane waits in queuedRescan, and
-    // the holder's finally releases it. A rescan issued while a rescan holds
-    // the lane is served by that rescan.
+    // A launch and a rescan share one lane. A rescan issued while a sync holds
+    // it waits in queuedRescan until the holder's finally releases it; one
+    // issued while a rescan holds it is served by that rescan.
     if (this.refreshSyncLock) {
       if (fullRescan && this.laneHolder === 'sync') {
         this.queuedRescan = { kind: 'queued', epoch: this.controllerEpoch };
@@ -352,17 +352,7 @@ export class SyncCoordinator {
         rescanEpoch = this.controllerEpoch;
         this.config.onValueTransfersChanged([], 0);
         this.config.onMessagesChanged([], 0);
-        this.config.onBalanceChanged({
-          totalOrchardBalance: 0,
-          totalIronwoodBalance: 0,
-          totalSaplingBalance: 0,
-          totalTransparentBalance: 0,
-          confirmedTransparentBalance: 0,
-          confirmedOrchardBalance: 0,
-          confirmedIronwoodBalance: 0,
-          confirmedSaplingBalance: 0,
-          totalSpendableBalance: 0,
-        } as TotalBalanceClass);
+        this.config.onBalanceChanged({ kind: 'awaiting' });
         this.config.onSyncStatusChanged({} as RPCSyncStatusType);
 
         const start = Date.now();

@@ -203,6 +203,38 @@ describe('SyncCoordinator seam-A fence — scheduling machine, current behavior'
       await c.clearTimers();
     });
 
+    it("Tests that the 'not complete' status read and launch drop when a server switch lands before they run", async () => {
+      bridge.pollSyncInfo.mockResolvedValue('Sync task is not complete.');
+      bridge.statusSyncInfo.mockResolvedValue('{}');
+      bridge.runSyncProcess.mockResolvedValue('Sync task already running.');
+      const c = new SyncCoordinator(fakeConfig(), fakeDataService());
+
+      await c.fetchSyncPoll();
+      c.changeServer(mockServer);
+      await jest.advanceTimersByTimeAsync(0);
+      await flushPromises();
+
+      expect(bridge.statusSyncInfo).not.toHaveBeenCalled();
+      expect(bridge.runSyncProcess).not.toHaveBeenCalled();
+      await c.clearTimers();
+    });
+
+    it('Tests that the status read a JSON payload schedules drops when a server switch lands before it runs', async () => {
+      bridge.pollSyncInfo.mockResolvedValue(
+        '{"sync_complete":{"percentage_total_outputs_scanned":50}}',
+      );
+      bridge.statusSyncInfo.mockResolvedValue('{}');
+      const c = new SyncCoordinator(fakeConfig(), fakeDataService());
+
+      await c.fetchSyncPoll();
+      c.changeServer(mockServer);
+      await jest.advanceTimersByTimeAsync(0);
+      await flushPromises();
+
+      expect(bridge.statusSyncInfo).not.toHaveBeenCalled();
+      await c.clearTimers();
+    });
+
     it('a JSON-parse failure calls onError and schedules nothing', async () => {
       bridge.pollSyncInfo.mockResolvedValue('not-json-and-not-a-status-prose');
       const config = fakeConfig();
@@ -341,8 +373,61 @@ describe('SyncCoordinator seam-A fence — scheduling machine, current behavior'
     );
     // The rejection did not escape the timer callback, and the loop lives on.
     expect(c.updateTimerID).toBeDefined();
-    expect(c.tickInFlight).toBe(false);
+    expect(c.tickInFlight).toBeUndefined();
 
+    await c.clearTimers();
+  });
+
+  it('Tests that the loop keeps ticking every 5 s after its first tick.', async () => {
+    const ds = fakeDataService();
+    const c = new SyncCoordinator(fakeConfig(), ds);
+    c.walletConfigPerformanceLevel = RPCPerformanceLevelEnum.Low;
+
+    await c.configure();
+    await jest.advanceTimersByTimeAsync(5 * 1000);
+    await flushPromises();
+    await jest.advanceTimersByTimeAsync(5 * 1000);
+    await flushPromises();
+
+    expect(ds.getWalletSaveRequired).toHaveBeenCalledTimes(2);
+    await c.clearTimers();
+  });
+
+  it('Tests that a tick that never settles stops holding the lane when a boundary restarts the loop.', async () => {
+    const ds = fakeDataService();
+    const gate = ds.getWalletSaveRequired as jest.Mock;
+    gate.mockReturnValueOnce(new Promise(() => {}));
+    const c = new SyncCoordinator(fakeConfig(), ds);
+    c.walletConfigPerformanceLevel = RPCPerformanceLevelEnum.Low;
+
+    await c.configure();
+    await jest.advanceTimersByTimeAsync(5 * 1000);
+    await flushPromises();
+    expect(gate).toHaveBeenCalledTimes(1);
+
+    await c.clearTimers();
+    await c.configure();
+    await jest.advanceTimersByTimeAsync(5 * 1000);
+    await flushPromises();
+
+    expect(gate).toHaveBeenCalledTimes(2);
+    await c.clearTimers();
+  });
+
+  it('Tests that a tick with no save pending runs the fetches that failed before.', async () => {
+    const retried = jest.fn().mockResolvedValue(undefined);
+    const ds = fakeDataService({
+      retryFailedFetches: jest.fn(() => [retried()]),
+    } as never);
+    const c = new SyncCoordinator(fakeConfig(), ds);
+    c.walletConfigPerformanceLevel = RPCPerformanceLevelEnum.Low;
+
+    await c.configure();
+    await jest.advanceTimersByTimeAsync(5 * 1000);
+    await flushPromises();
+
+    expect(ds.retryFailedFetches).toHaveBeenCalledTimes(1);
+    expect(retried).toHaveBeenCalledTimes(1);
     await c.clearTimers();
   });
 
@@ -528,6 +613,9 @@ describe('SyncCoordinator seam-A fence — scheduling machine, current behavior'
       expect(config.onValueTransfersChanged).toHaveBeenCalledWith([], 0);
       expect(config.onMessagesChanged).toHaveBeenCalledWith([], 0);
       expect(config.onBalanceChanged).toHaveBeenCalledTimes(1);
+      expect(config.onBalanceChanged).toHaveBeenCalledWith({
+        kind: 'awaiting',
+      });
       expect(config.onSyncStatusChanged).toHaveBeenCalledWith({});
       await c.clearTimers();
     });

@@ -1,8 +1,8 @@
 /**
- * Actions and the callback-boundary epoch. Two pins over the committing mount:
+ * Actions after teardown. Two pins over the committing mount:
  *
- *  - the callback-boundary epoch: a backend callback that resolves after the
- *    container is torn down drops its write; it cannot setState a dead instance.
+ *  - a backend callback that resolves after the container is torn down drops
+ *    its write; it cannot setState a dead instance.
  *  - the poll-driven navigation: the poll callback writes the model only and
  *    never navigates.
  *
@@ -64,7 +64,10 @@ import { LoadedAppClass } from '@app/LoadedApp';
 import { resolveTriggerGate } from '@app/services/gateController';
 import { AddressKindEnum, TransparentAddressClass } from '@app/AppState';
 import { RPCAddressScopeEnum } from '@app/walletBackend/enums/RPCAddressScopeEnum';
+import { polledMockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
+import { balanceAtom } from '@app/AppState/balance';
 import {
+  controllerStoreOf,
   flushMicrotasks,
   mountCommitted,
   spyOnLifecycleListeners,
@@ -78,7 +81,7 @@ function drawerNavOf(instance: LoadedAppClass): { navigate: jest.Mock } {
     .drawerNav;
 }
 
-describe('callback-boundary epoch', () => {
+describe('writes after teardown', () => {
   beforeEach(() => {
     jest.useFakeTimers();
     jest.clearAllMocks();
@@ -94,32 +97,33 @@ describe('callback-boundary epoch', () => {
   it('drops a backend write that resolves after teardown', async () => {
     const { utils, instance } = await mountCommitted();
     // The wired backend callback, captured before teardown.
-    const onBalanceChanged = instance.setTotalBalance;
+    const onBalanceChanged = instance.setBalance;
 
     await act(async () => {
       utils.unmount();
       await flushMicrotasks();
     });
 
-    const setState = jest.spyOn(instance, 'setState');
-    onBalanceChanged({ orchardBal: 12345 } as never);
+    onBalanceChanged(polledMockTotalBalance);
 
-    // The write carried the mount epoch; teardown bumped past it, so the
-    // dispatch dropped it — no setState reached the dead instance.
-    expect(setState).not.toHaveBeenCalled();
+    // Teardown had started, so the write dropped and the balance stays awaiting.
+    expect(controllerStoreOf(instance).get(balanceAtom)).toEqual({
+      kind: 'awaiting',
+    });
   });
 
   it('lands a backend write while the instance is mounted', async () => {
     const { instance } = await mountCommitted();
-    const setState = jest.spyOn(instance, 'setState');
 
     act(() => {
-      instance.setTotalBalance({ orchardBal: 67890 } as never);
+      instance.setBalance(polledMockTotalBalance);
     });
 
     // The positive control: the guard passes while mounted, so the same write
     // that dropped above lands here.
-    expect(setState).toHaveBeenCalled();
+    expect(controllerStoreOf(instance).get(balanceAtom)).toEqual(
+      polledMockTotalBalance,
+    );
   });
 
   it('Tests that the default unified address clears when the address list holds only transparent addresses.', async () => {

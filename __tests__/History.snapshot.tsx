@@ -6,6 +6,10 @@ import 'react-native';
 import React from 'react';
 
 import { render } from '@testing-library/react-native';
+import { Provider } from 'jotai';
+import { balanceAtom } from '@app/AppState/balance';
+import { polledMockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
+import { seed, storeWith } from '../.storybook/storeWith';
 import History from '@screens/History';
 import {
   defaultAppContextLoaded,
@@ -14,7 +18,6 @@ import {
 import { RouteEnum } from '@app/AppState';
 import { mockValueTransfers } from '../__mocks__/dataMocks/mockValueTransfers';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
-import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockAddresses } from '../__mocks__/dataMocks/mockAddresses';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -47,7 +50,6 @@ describe('Component History - test', () => {
     ...mockInfo,
     latestBlock: mockInfo.ironwoodActivationHeight as number,
   };
-  state.totalBalance = mockTotalBalance;
   // The price ring renders only for a Nym-consenting session.
   const onFunction = jest.fn();
 
@@ -56,16 +58,18 @@ describe('Component History - test', () => {
     state.privacy = false;
     const props = makeDrawerProps();
     const history = render(
-      <ContextAppLoadedProvider value={state}>
-        <History
-          {...props}
-          toggleMenuDrawer={onFunction}
-          setShieldingAmount={onFunction}
-          setScrollToTop={onFunction}
-          scrollToTop={false}
-          setScrollToBottom={onFunction}
-        />
-      </ContextAppLoadedProvider>,
+      <Provider store={storeWith(seed(balanceAtom, polledMockTotalBalance))}>
+        <ContextAppLoadedProvider value={state}>
+          <History
+            {...props}
+            toggleMenuDrawer={onFunction}
+            setShieldingAmount={onFunction}
+            setScrollToTop={onFunction}
+            scrollToTop={false}
+            setScrollToBottom={onFunction}
+          />
+        </ContextAppLoadedProvider>
+      </Provider>,
     );
     expect(history.toJSON()).toMatchSnapshot();
   });
@@ -75,16 +79,18 @@ describe('Component History - test', () => {
     state.privacy = true;
     const props = makeDrawerProps();
     const history = render(
-      <ContextAppLoadedProvider value={state}>
-        <History
-          {...props}
-          toggleMenuDrawer={onFunction}
-          setShieldingAmount={onFunction}
-          setScrollToTop={onFunction}
-          scrollToTop={false}
-          setScrollToBottom={onFunction}
-        />
-      </ContextAppLoadedProvider>,
+      <Provider store={storeWith(seed(balanceAtom, polledMockTotalBalance))}>
+        <ContextAppLoadedProvider value={state}>
+          <History
+            {...props}
+            toggleMenuDrawer={onFunction}
+            setShieldingAmount={onFunction}
+            setScrollToTop={onFunction}
+            scrollToTop={false}
+            setScrollToBottom={onFunction}
+          />
+        </ContextAppLoadedProvider>
+      </Provider>,
     );
     expect(history.toJSON()).toMatchSnapshot();
   });

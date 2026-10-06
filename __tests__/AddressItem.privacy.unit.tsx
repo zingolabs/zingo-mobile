@@ -17,7 +17,6 @@ import { REVEAL_MS } from '@app/utils/reveal';
 import { advance } from '../__mocks__/advanceTimers';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockAddressBook } from '../__mocks__/dataMocks/mockAddressBook';
-import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 
 const UNKNOWN = 'u1abc123def456abc123def456abc123def456abc123';
 const ALIAS = 'pepe.zcash';
@@ -39,7 +38,6 @@ const item = (
       ...defaultAppContextLoaded,
       translate: mockTranslate,
       addressBook: mockAddressBook,
-      totalBalance: mockTotalBalance,
       privacy: true,
       ...state,
     }}

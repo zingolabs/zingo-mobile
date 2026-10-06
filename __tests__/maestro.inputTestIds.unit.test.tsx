@@ -26,7 +26,6 @@ import { mockAddresses } from '../__mocks__/dataMocks/mockAddresses';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockZecPrice } from '../__mocks__/dataMocks/mockZecPrice';
-import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import { mockServer } from '../__mocks__/dataMocks/mockServer';
 import mockSendPageState from '../__mocks__/dataMocks/mockSendPageState';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
@@ -97,7 +96,6 @@ function loadedState() {
   const state = { ...defaultAppContextLoaded };
   state.translate = mockTranslate;
   state.info = mockInfo;
-  state.totalBalance = mockTotalBalance;
   return state;
 }
 
@@ -178,7 +176,11 @@ describe('Maestro reaches each typed field on iOS', () => {
   test('the restore seed and birthday fields', () => {
     const importUfvk = render(
       <ContextAppLoadedProvider value={loadedState()}>
-        <ImportUfvk onClickCancel={onFunction} onClickOK={onFunction} />
+        <ImportUfvk
+          busy={false}
+          onClickCancel={onFunction}
+          onClickOK={onFunction}
+        />
       </ContextAppLoadedProvider>,
     );
     for (const id of ['import.seedufvkinput', 'import.birthdayinput']) {

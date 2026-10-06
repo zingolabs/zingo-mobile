@@ -13,7 +13,6 @@ import {
 } from '@app/context';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
-import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AppDrawerParamList } from '@app/types';
 import { RouteEnum } from '@app/AppState';
@@ -39,7 +38,6 @@ describe('Component Insight - test', () => {
     const state = { ...defaultAppContextLoaded };
     state.translate = mockTranslate;
     state.info = mockInfo;
-    state.totalBalance = mockTotalBalance;
     const props = makeDrawerProps();
     const insight = render(
       <ContextAppLoadedProvider value={state}>

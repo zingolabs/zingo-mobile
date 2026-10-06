@@ -1,11 +1,12 @@
 import {
-  TotalBalanceClass,
   InfoType,
   ValueTransferType,
   UnifiedAddressClass,
   TransparentAddressClass,
   ServerType,
 } from '@app/AppState';
+import type { Balance } from '@app/AppState/balance';
+import type { Polled } from '@app/AppState/polled';
 import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
 import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
 import {
@@ -16,7 +17,7 @@ import { MixnetTransportView } from '@app/walletBackend/transforms/mixnetView';
 
 // Every sub-service shares one reference to this config.
 export type WalletBackendConfig = {
-  onBalanceChanged: (balance: TotalBalanceClass) => void;
+  onBalanceChanged: (balance: Polled<Balance>) => void;
   onValueTransfersChanged: (list: ValueTransferType[], total: number) => void;
   onMessagesChanged: (list: ValueTransferType[], total: number) => void;
   onAddressesChanged: (

@@ -12,7 +12,6 @@ import {
   defaultAppContextLoaded,
 } from '@app/context';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
-import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AppDrawerParamList } from '@app/types';
@@ -39,7 +38,6 @@ describe('Component About - test', () => {
     const state = { ...defaultAppContextLoaded };
     state.translate = mockTranslate;
     state.info = mockInfo;
-    state.totalBalance = mockTotalBalance;
     const props = makeDrawerProps();
     const about = render(
       <ContextAppLoadedProvider value={state}>

@@ -17,10 +17,6 @@ export const appStateStatusAtom = atom<AppStateStatusEnum>(
   AppStateStatusEnum.unknown,
 );
 
-// Whether the Seed screen's modal is open. The Seed screen clears it on close;
-// opening the modal writes only this atom, not container state.
-export const seedModalOpenAtom = atom<boolean>(false);
-
 // What a launch of the "Add contact" sheet hands the form.
 export type AddTagTarget = Pick<
   ComponentProps<typeof NewAddressTag>,

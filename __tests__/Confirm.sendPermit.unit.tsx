@@ -35,7 +35,6 @@ import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 import { mockOnline } from '../__mocks__/dataMocks/mockOnline';
 import mockSendPageState from '../__mocks__/dataMocks/mockSendPageState';
-import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import { mockZecPrice } from '../__mocks__/dataMocks/mockZecPrice';
 
 const translate = (key: string): TranslateType => key;
@@ -67,7 +66,6 @@ const confirmUi = (inputs: SendPermitInputs) => {
   const state = { ...defaultAppContextLoaded };
   state.translate = translate;
   state.info = mockInfo;
-  state.totalBalance = mockTotalBalance;
   state.zecPrice = mockZecPrice;
   state.biometrics = false;
   state.server = inputs.server;

@@ -6,12 +6,10 @@
  * dropped rather than queued. SyncCoordinator reads these lock flags to decide
  * whether to skip a polling cycle entirely.
  *
- * A fetch failure surfaces through config.onError and returns. It never drives a
- * lifecycle method: clearTimers()/configure() belong to the lifecycle alone, so
- * the self-rescheduling poll loop retries on its next tick (ADR 0017).
+ * A fetch failure surfaces through config.onError and is recorded; it never
+ * drives a lifecycle method, and the poll loop runs it again on its next tick.
  */
 import {
-  TotalBalanceClass,
   InfoType,
   ChainNameEnum,
   CurrencyNameEnum,
@@ -22,6 +20,7 @@ import {
   TransparentAddressClass,
   foldBlockSpacing,
 } from '@app/AppState';
+import type { Balance } from '@app/AppState/balance';
 import RPCModule from '@app/RPCModule';
 import { RPCUnifiedAddressType } from '@app/walletBackend/types/RPCUnifiedAddressType';
 import { RPCBalancesType } from '@app/walletBackend/types/RPCBalancesType';
@@ -51,6 +50,16 @@ function emptyInfo(): InfoType {
   } as InfoType;
 }
 
+type RetriableFetch =
+  | 'fetchTotalBalance'
+  | 'fetchAddresses'
+  | 'fetchWalletHeight'
+  | 'fetchInfoAndServerHeight'
+  | 'fetchZingolibVersion'
+  | 'fetchWalletBirthdaySeedUfvk'
+  | 'fetchTandZandOValueTransfers'
+  | 'fetchTandZandOMessages';
+
 export class DataService {
   config: WalletBackendConfig;
 
@@ -75,8 +84,15 @@ export class DataService {
   fetchZingolibVersionLock: boolean = false;
   getWalletSaveRequiredLock: boolean = false;
 
+  // The fetches whose last run failed; the poll tick runs them again.
+  failedFetches: Set<RetriableFetch> = new Set();
+
   constructor(config: WalletBackendConfig) {
     this.config = config;
+  }
+
+  retryFailedFetches(): Promise<void>[] {
+    return [...this.failedFetches].map(name => this[name]());
   }
 
   async fetchTotalBalance() {
@@ -84,6 +100,7 @@ export class DataService {
       return;
     }
     this.fetchTotalBalanceLock = true;
+    this.failedFetches.delete('fetchTotalBalance');
     try {
       const start = Date.now();
       const spendableStr: string =
@@ -116,7 +133,7 @@ export class DataService {
       }
       const balanceJSON: RPCBalancesType = await JSON.parse(balanceStr);
 
-      const balance: TotalBalanceClass = {
+      const balance: Balance = {
         totalOrchardBalance: (balanceJSON.total_orchard_balance || 0) / 10 ** 8,
         totalIronwoodBalance:
           (balanceJSON.total_ironwood_balance || 0) / 10 ** 8,
@@ -133,10 +150,11 @@ export class DataService {
           (balanceJSON.confirmed_transparent_balance || 0) / 10 ** 8,
         totalSpendableBalance: (spendableJSON.spendable_balance || 0) / 10 ** 8,
       };
-      this.config.onBalanceChanged(balance);
+      this.config.onBalanceChanged({ kind: 'polled', latest: balance });
     } catch (error) {
       console.log(`Critical Error balances ${error}`);
       this.config.onError(`Error balance: ${error}`);
+      this.failedFetches.add('fetchTotalBalance');
     } finally {
       this.fetchTotalBalanceLock = false;
     }
@@ -147,6 +165,7 @@ export class DataService {
       return;
     }
     this.fetchAddressesLock = true;
+    this.failedFetches.delete('fetchAddresses');
     try {
       const start = Date.now();
       const unifiedAddressesStr: string =
@@ -216,6 +235,7 @@ export class DataService {
     } catch (error) {
       console.log(`Critical Error addresses ${error}`);
       this.config.onError(`Error addresses: ${error}`);
+      this.failedFetches.add('fetchAddresses');
     } finally {
       this.fetchAddressesLock = false;
     }
@@ -226,6 +246,7 @@ export class DataService {
       return;
     }
     this.fetchWalletHeightLock = true;
+    this.failedFetches.delete('fetchWalletHeight');
     try {
       const start = Date.now();
       const heightStr: string = await RPCModule.getLatestBlockWalletInfo();
@@ -244,6 +265,7 @@ export class DataService {
     } catch (error) {
       console.log(`Critical Error wallet height ${error}`);
       this.config.onError(`Error wallet height: ${error}`);
+      this.failedFetches.add('fetchWalletHeight');
     } finally {
       this.fetchWalletHeightLock = false;
     }
@@ -259,6 +281,7 @@ export class DataService {
       return;
     }
     this.fetchInfoAndServerHeightLock = true;
+    this.failedFetches.delete('fetchInfoAndServerHeight');
     try {
       // No server, no info. The empty shape is what an unreadable answer
       // already publishes; rejecting instead would reach the catch, which
@@ -313,6 +336,7 @@ export class DataService {
     } catch (error) {
       console.log(`Critical Error info & server block height ${error}`);
       this.config.onError(`Error info: ${error}`);
+      this.failedFetches.add('fetchInfoAndServerHeight');
     } finally {
       this.fetchInfoAndServerHeightLock = false;
     }
@@ -349,6 +373,7 @@ export class DataService {
       return;
     }
     this.fetchZingolibVersionLock = true;
+    this.failedFetches.delete('fetchZingolibVersion');
     try {
       const start = Date.now();
       let zingolibStr: string = await RPCModule.getVersionInfo();
@@ -367,6 +392,7 @@ export class DataService {
     } catch (error) {
       console.log(`Critical Error zingolib version ${error}`);
       this.config.onError(`Error zingolib version: ${error}`);
+      this.failedFetches.add('fetchZingolibVersion');
       // The version display still needs a value when the FFI rejects.
       this.config.onZingolibVersionChanged(GlobalConst.zingolibError);
     } finally {
@@ -379,6 +405,7 @@ export class DataService {
       return;
     }
     this.fetchWalletBirthdaySeedUfvkLock = true;
+    this.failedFetches.delete('fetchWalletBirthdaySeedUfvk');
     try {
       const wallet = await fetchWallet(this.config.readOnly);
 
@@ -389,6 +416,7 @@ export class DataService {
     } catch (error) {
       console.log(`Critical Error wallet birthday ${error}`);
       this.config.onError(`Error wallet birthday: ${error}`);
+      this.failedFetches.add('fetchWalletBirthdaySeedUfvk');
     } finally {
       this.fetchWalletBirthdaySeedUfvkLock = false;
     }
@@ -429,6 +457,7 @@ export class DataService {
       return;
     }
     this.fetchTandZandOValueTransfersLock = true;
+    this.failedFetches.delete('fetchTandZandOValueTransfers');
     try {
       await this.fetchServerHeight();
 
@@ -468,6 +497,7 @@ export class DataService {
     } catch (error) {
       console.log(`Critical Error value transfers ${error}`);
       this.config.onError(`Error value transfers: ${error}`);
+      this.failedFetches.add('fetchTandZandOValueTransfers');
     } finally {
       this.fetchTandZandOValueTransfersLock = false;
     }
@@ -478,6 +508,7 @@ export class DataService {
       return;
     }
     this.fetchTandZandOMessagesLock = true;
+    this.failedFetches.delete('fetchTandZandOMessages');
     try {
       const start = Date.now();
       const messagesStr: string = await RPCModule.getMessagesInfo('');
@@ -512,6 +543,7 @@ export class DataService {
     } catch (error) {
       console.log(`Critical Error value transfers messages ${error}`);
       this.config.onError(`Error value transfers messages: ${error}`);
+      this.failedFetches.add('fetchTandZandOMessages');
     } finally {
       this.fetchTandZandOMessagesLock = false;
     }

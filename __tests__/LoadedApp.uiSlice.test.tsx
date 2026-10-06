@@ -75,6 +75,8 @@ import { AppStateStatusEnum } from '@app/AppState';
 import { appStateStatusAtom, addTagModalAtom } from '@app/AppState/uiAtoms';
 import { syncStatusAtom } from '@app/AppState/syncAtoms';
 import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
+import { polledMockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
+import { balanceAtom } from '@app/AppState/balance';
 import {
   controllerStoreOf,
   flushMicrotasks,
@@ -185,5 +187,28 @@ describe('whole-tree re-render proof', () => {
       instance.setShieldingAmount(999);
     });
     expect(renderSpy).toHaveBeenCalled();
+  });
+
+  it('Tests that the container stays asleep when a balance poll changes the balance.', async () => {
+    const { instance } = await mountCommitted();
+    const renderSpy = jest.spyOn(instance, 'render');
+
+    act(() => {
+      instance.setBalance(polledMockTotalBalance);
+    });
+
+    expect(renderSpy).not.toHaveBeenCalled();
+  });
+
+  it('Tests that the balance atom holds the polled balance when the backend reports one.', async () => {
+    const { instance } = await mountCommitted();
+    const store = controllerStoreOf(instance);
+    expect(store.get(balanceAtom)).toEqual({ kind: 'awaiting' });
+
+    act(() => {
+      instance.setBalance(polledMockTotalBalance);
+    });
+
+    expect(store.get(balanceAtom)).toEqual(polledMockTotalBalance);
   });
 });

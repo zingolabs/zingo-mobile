@@ -31,7 +31,6 @@ import NewAddress from '@screens/Receive/components/NewAddress';
 import AddressBook from '@screens/AddressBook/AddressBook';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
-import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 
 let mockDirectory = '';
 
@@ -112,7 +111,6 @@ function walletContext(
     walletChainName: chain,
     server: remoteServer('https://native-fixture.invalid', chain),
     info: { ...mockInfo, chainName: chain },
-    totalBalance: mockTotalBalance,
     addressBook,
   };
 }

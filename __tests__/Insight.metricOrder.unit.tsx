@@ -14,7 +14,6 @@ import {
   getTotalMemobytesToAddress,
 } from '@app/walletBackend';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
-import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
 jest.mock('@app/RPCModule', () =>
@@ -54,7 +53,6 @@ function setup() {
       value={{
         ...defaultAppContextLoaded,
         info: mockInfo,
-        totalBalance: mockTotalBalance,
         translate: key => key,
       }}
     >

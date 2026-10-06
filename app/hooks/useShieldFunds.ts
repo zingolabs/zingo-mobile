@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useAtomValue } from 'jotai';
 import { showConfirm } from '@app/services/showConfirm';
 import {
   NavigationProp,
@@ -12,7 +13,7 @@ import {
   SnackbarDurationEnum,
   TranslateType,
 } from '@app/AppState';
-import TotalBalanceClass from '@app/AppState/classes/TotalBalanceClass';
+import { balanceAtom } from '@app/AppState/balance';
 import { shieldConfirm, shieldPropose } from '@app/walletBackend';
 import type { FfiResult } from '@app/walletBackend';
 import { RPCShieldProposeType } from '@app/walletBackend/types/RPCShieldProposeType';
@@ -25,7 +26,6 @@ type UseShieldFundsInput = {
   setShieldingAmount: ((value: number) => void) | undefined;
   server: ServerType;
   somePending: boolean;
-  totalBalance: TotalBalanceClass | null;
   shieldingAmount: number;
   translate: (key: string) => TranslateType;
   addLastSnackbar:
@@ -63,7 +63,6 @@ export function useShieldFunds({
   setShieldingAmount,
   server,
   somePending,
-  totalBalance,
   shieldingAmount,
   translate,
   addLastSnackbar,
@@ -73,6 +72,9 @@ export function useShieldFunds({
   sendPermitNow,
 }: UseShieldFundsInput): UseShieldFundsResult {
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
+  const balance = useAtomValue(balanceAtom);
+  const confirmedTransparent =
+    balance.kind === 'polled' ? balance.latest.confirmedTransparentBalance : 0;
   const [showShieldButton, setShowShieldButton] = useState<boolean>(false);
   const [shieldingFee, setShieldingFee] = useState<number>(0);
   // useRef so the lock persists across re-renders (a `let` inside useEffect resets every invocation)
@@ -99,7 +101,7 @@ export function useShieldFunds({
       !readOnly &&
       !!setShieldingAmount &&
       server.kind !== 'offline' &&
-      (somePending ? 0 : (totalBalance?.confirmedTransparentBalance ?? 0)) > 0
+      (somePending ? 0 : confirmedTransparent) > 0
     ) {
       (async () => {
         let proposeFee = 0;
@@ -136,8 +138,8 @@ export function useShieldFunds({
   }, [
     readOnly,
     setShieldingAmount,
-    totalBalance,
-    totalBalance?.confirmedTransparentBalance,
+    balance,
+    confirmedTransparent,
     somePending,
     server,
   ]);

@@ -1,16 +1,12 @@
-// The Jotai holder for the sync slice. The live poll path routes through the
-// pure controller: the container feeds each scan snapshot to `observeAtom`,
-// which reconciles it into `syncMachineAtom`. The detailed snapshot rides its
-// own `syncStatusAtom`, the read surface the two sync consumers (Header,
-// SyncReport) subscribe to, so a sync tick wakes only them.
-//
-// Command issuance (issueCommand) and the epoch unification with
-// SyncCoordinator.controllerEpoch live in the callback-boundary layer. This
-// module holds the machine and drives its observe path.
+// The Jotai holder for the sync slice. The container publishes each scan
+// snapshot to `syncStatusAtom`, the read surface of the two sync consumers
+// (Header, SyncReport), so a sync tick wakes only them. The controller machine
+// below has no production reader yet, so nothing feeds it.
 
 import { atom } from 'jotai';
 
 import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
+import { scanProgress } from '@app/walletBackend/utils/syncProgress';
 import {
   type Epoch,
   type Observation,
@@ -32,30 +28,19 @@ export const observeAtom = atom(null, (get, set, obs: Observation) => {
   set(syncMachineAtom, reconcile(get(syncMachineAtom), obs));
 });
 
-// Maps a scan snapshot to the poll observation the machine reconciles. A blank
-// snapshot reads as `notLaunched` (idle); otherwise the scan percent drives the
-// coarse sync state. saveRequired is carried forward — the poll payload that
-// sets it is applied in the callback-boundary layer, so this preserves the
-// machine's current value.
+// Maps a scan snapshot to the poll observation the machine reconciles, through the same projection the header reads.
 export const snapshotObservation = (
   epoch: Epoch,
   saveRequired: boolean,
   ss: RPCSyncStatusType,
 ): Observation => {
-  if (!ss.scan_ranges || ss.scan_ranges.length === 0) {
-    return {
-      kind: 'poll',
-      issuedEpoch: epoch,
-      result: { kind: 'notLaunched' },
-    };
-  }
-  const percent =
-    ss.percentage_total_outputs_scanned ??
-    ss.percentage_total_blocks_scanned ??
-    0;
+  const progress = scanProgress(ss);
   return {
     kind: 'poll',
     issuedEpoch: epoch,
-    result: { kind: 'complete', percent, saveRequired },
+    result:
+      progress.kind === 'scanning'
+        ? { kind: 'complete', percent: progress.percent, saveRequired }
+        : { kind: 'notLaunched' },
   };
 };

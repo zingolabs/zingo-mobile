@@ -36,7 +36,6 @@ import {
 } from '@app/walletBackend';
 import {
   AppStateLoaded,
-  TotalBalanceClass,
   SendPageStateClass,
   InfoType,
   ToAddrClass,
@@ -58,7 +57,6 @@ import {
   UfvkActionEnum,
   SettingsNameEnum,
   RouteEnum,
-  AppStateStatusEnum,
   GlobalConst,
   EventListenerEnum,
   AppContextLoaded,
@@ -82,25 +80,16 @@ import {
   walletViewAtom,
 } from '@app/AppState/walletViewAtoms';
 import type { WalletViewSource } from '@app/AppState/walletView';
-import {
-  syncStatusAtom,
-  syncMachineAtom,
-  observeAtom,
-  snapshotObservation,
-} from '@app/AppState/syncAtoms';
-import { initialMachine } from '@app/walletBackend/controller/syncController';
-import {
-  callbackEpochAtom,
-  boundaryDispatchAtom,
-} from '@app/AppState/callbackBoundary';
+import { syncStatusAtom } from '@app/AppState/syncAtoms';
 import {
   appStateStatusAtom,
-  seedModalOpenAtom,
   addTagModalAtom,
   launchAddTagAtom,
 } from '@app/AppState/uiAtoms';
-import { classifyLifecycle } from '@app/AppState/lifecycle';
+import { classifyLifecycle, toAppStateStatus } from '@app/AppState/lifecycle';
 import { changes, lastUnified } from '@app/AppState/statePatch';
+import { type Balance, balanceAtom } from '@app/AppState/balance';
+import type { Polled } from '@app/AppState/polled';
 import SettingsFileImpl from '@app/services/SettingsFileImpl';
 import { PriceTrafficDriver } from '@ui/widgets/PriceFetcher';
 import { priceFetcherStore } from '@ui/widgets/priceFetcherStore';
@@ -668,21 +657,17 @@ export class LoadedAppClass extends Component<
   screenName = ScreenEnum.LoadedApp;
   private drawerNav: NativeStackNavigationProp<AppDrawerParamList> | null =
     null;
-  // The per-instance controller store. Holds the view slice, the sync slice,
-  // and the price slice: the class publishes each field here and the derived
-  // atoms gate re-renders to the slice that actually changed.
+  // The per-instance store for the view, sync, balance and UI slices, so a change wakes only the consumers of its slice.
   private controllerStore = createStore();
-  // The callback-boundary epoch this instance was wired under. Every
-  // backend-callback write carries it; componentWillUnmount bumps the store's
-  // epoch past it, so a callback resolving after teardown drops.
-  private boundaryEpoch = this.controllerStore.get(callbackEpochAtom);
+  // Set at the start of teardown; a backend callback resolving after it drops
+  // its write.
+  private unmounted = false;
   constructor(props: LoadedAppClassProps) {
     super(props);
 
     this.state = {
       //context
       netInfo: {} as NetInfoType,
-      totalBalance: null,
       addresses: null,
       valueTransfers: null,
       valueTransfersTotal: null,
@@ -741,7 +726,7 @@ export class LoadedAppClass extends Component<
     };
 
     this.rpc = new WalletBackend({
-      onBalanceChanged: this.setTotalBalance,
+      onBalanceChanged: this.setBalance,
       onValueTransfersChanged: this.setValueTransfersList,
       onMessagesChanged: this.setMessagesList,
       onAddressesChanged: this.setAllAddresses,
@@ -765,14 +750,8 @@ export class LoadedAppClass extends Component<
     this.linking = {} as EmitterSubscription;
     this.unsubscribeNetInfo = {} as NetInfoSubscription;
     this.controllerStore.set(
-      syncMachineAtom,
-      initialMachine(nativeUri(props.server)),
-    );
-    this.controllerStore.set(
       appStateStatusAtom,
-      Platform.OS === GlobalConst.platformOSios
-        ? AppStateStatusEnum.active
-        : (AppState.currentState as AppStateStatusEnum),
+      toAppStateStatus(AppState.currentState),
     );
     this.publishWalletView();
   }
@@ -820,7 +799,7 @@ export class LoadedAppClass extends Component<
       EventListenerEnum.change,
       async nextAppState => {
         const prior = this.controllerStore.get(appStateStatusAtom);
-        const next = nextAppState as AppStateStatusEnum;
+        const next = toAppStateStatus(nextAppState);
         const transition = classifyLifecycle(Platform.OS, prior, next);
         if (transition === 'ignore') {
           return;
@@ -983,11 +962,9 @@ export class LoadedAppClass extends Component<
   };
 
   componentWillUnmount = async () => {
-    // Close the async-unmount gap: bump the callback-boundary epoch
-    // synchronously, before the awaits below, so a backend callback that fires
-    // while teardown is in flight drops its write; it cannot reach this
-    // dead instance.
-    this.controllerStore.set(callbackEpochAtom, this.boundaryEpoch + 1);
+    // Set before the awaits below, so a backend callback that fires while
+    // teardown is in flight cannot reach this dead instance.
+    this.unmounted = true;
     await this.rpc.clearTimers();
     this.rpc.stopMixnetPolling();
     const safeRemove = (listener: unknown, name: string) => {
@@ -1092,14 +1069,11 @@ export class LoadedAppClass extends Component<
     await BackgroundFileImpl.writeBackground(newBackgroundSyncInfo);
   };
 
-  // Run a backend-callback write through the boundary guard: it lands only while
-  // this instance's wiring epoch is still current, so a callback resolving after
-  // teardown drops; it cannot setState a dead instance.
+  // Runs a backend-callback write unless teardown has started.
   private commit = (write: () => void) => {
-    this.controllerStore.set(boundaryDispatchAtom, {
-      issuedEpoch: this.boundaryEpoch,
-      write,
-    });
+    if (!this.unmounted) {
+      write();
+    }
   };
 
   // Commits the patch through the boundary guard when it alters container state.
@@ -1122,8 +1096,12 @@ export class LoadedAppClass extends Component<
     this.setState({ showSwipeableIcons: value });
   };
 
-  setTotalBalance = (totalBalance: TotalBalanceClass) => {
-    this.commitPatch({ totalBalance });
+  setBalance = (next: Polled<Balance>) => {
+    this.commit(() => {
+      if (!isEqual(this.controllerStore.get(balanceAtom), next)) {
+        this.controllerStore.set(balanceAtom, next);
+      }
+    });
   };
 
   setSyncingStatus = (syncingStatus: RPCSyncStatusType) => {
@@ -1134,18 +1112,8 @@ export class LoadedAppClass extends Component<
       return;
     }
     // The sync slice, isolated: publish the detailed snapshot the two sync
-    // consumers read, and route it through reconcile so the held machine tracks
-    // the live scan. Neither wakes the wider context tree.
+    // consumers read, without waking the wider context tree.
     store.set(syncStatusAtom, syncingStatus);
-    const machine = store.get(syncMachineAtom);
-    store.set(
-      observeAtom,
-      snapshotObservation(machine.epoch, machine.saveRequired, syncingStatus),
-    );
-  };
-
-  setIsSeedViewModalOpen = (value: boolean) => {
-    this.controllerStore.set(seedModalOpenAtom, value);
   };
 
   setMixnetView = (mixnetView: MixnetView) => {
@@ -1540,6 +1508,7 @@ export class LoadedAppClass extends Component<
         server: oldSettings.server,
         selectServer: oldSettings.selectServer,
       });
+      await this.rpc.configure();
       if (toast) {
         this.addLastSnackbar(
           `${this.state.translate('loadedapp.readingwallet-error')} ${nativeUri(value)}`,
@@ -1605,6 +1574,8 @@ export class LoadedAppClass extends Component<
       server: oldSettings.server,
       selectServer: oldSettings.selectServer,
     });
+    // The loop stopped at the top keeps syncing the restored server.
+    await this.rpc.configure();
     if (toast) {
       this.addLastSnackbar(
         `${this.state.translate('loadedapp.readingwallet-error')} ${nativeUri(value)}`,
@@ -1973,7 +1944,6 @@ export class LoadedAppClass extends Component<
       //context
       netInfo: this.state.netInfo,
       birthday: this.state.birthday,
-      totalBalance: this.state.totalBalance,
       addresses: this.state.addresses,
       valueTransfers: this.state.valueTransfers,
       valueTransfersTotal: this.state.valueTransfersTotal,
@@ -2151,9 +2121,6 @@ export class LoadedAppClass extends Component<
                               {...props}
                               onClickOK={() => {}}
                               onClickCancel={() => {}}
-                              setIsSeedViewModalOpen={
-                                this.setIsSeedViewModalOpen
-                              }
                             />
                           );
                         } else if (action === SeedActionEnum.change) {
