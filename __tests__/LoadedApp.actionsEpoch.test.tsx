@@ -1,8 +1,8 @@
 /**
- * Actions and the callback-boundary epoch. Two pins over the committing mount:
+ * Actions after teardown. Two pins over the committing mount:
  *
- *  - the callback-boundary epoch: a backend callback that resolves after the
- *    container is torn down drops its write; it cannot setState a dead instance.
+ *  - a backend callback that resolves after the container is torn down drops
+ *    its write; it cannot setState a dead instance.
  *  - the poll-driven navigation: the poll callback writes the model only and
  *    never navigates.
  *
@@ -81,7 +81,7 @@ function drawerNavOf(instance: LoadedAppClass): { navigate: jest.Mock } {
     .drawerNav;
 }
 
-describe('callback-boundary epoch', () => {
+describe('writes after teardown', () => {
   beforeEach(() => {
     jest.useFakeTimers();
     jest.clearAllMocks();
@@ -106,8 +106,7 @@ describe('callback-boundary epoch', () => {
 
     onBalanceChanged(polledMockTotalBalance);
 
-    // The write carried the mount epoch; teardown bumped past it, so the
-    // dispatch dropped it — the dead instance's balance stays awaiting.
+    // Teardown had started, so the write dropped and the balance stays awaiting.
     expect(controllerStoreOf(instance).get(balanceAtom)).toEqual({
       kind: 'awaiting',
     });

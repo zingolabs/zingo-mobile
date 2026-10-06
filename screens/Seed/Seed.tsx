@@ -71,13 +71,11 @@ type TextsType = {
 type SeedProps = NativeStackScreenProps<AppDrawerParamList, RouteEnum.Seed> & {
   onClickOK: (seedPhrase: string, birthdayNumber: number) => void;
   onClickCancel: () => void;
-  setIsSeedViewModalOpen?: (v: boolean) => void;
 };
 const Seed: React.FunctionComponent<SeedProps> = ({
   route,
   onClickOK,
   onClickCancel,
-  setIsSeedViewModalOpen,
 }) => {
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const context = useContext(ContextAppLoaded);
@@ -324,9 +322,6 @@ const Seed: React.FunctionComponent<SeedProps> = ({
   };
 
   const hiding = async () => {
-    // when this screen is open from LoadingApp (new wallet)
-    // is using the standard modal from react-native
-    setIsSeedViewModalOpen && setIsSeedViewModalOpen(false);
     if (navigation.canGoBack()) {
       navigation.goBack();
     }

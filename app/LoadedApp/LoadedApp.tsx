@@ -82,12 +82,7 @@ import {
 import type { WalletViewSource } from '@app/AppState/walletView';
 import { syncStatusAtom } from '@app/AppState/syncAtoms';
 import {
-  callbackEpochAtom,
-  boundaryDispatchAtom,
-} from '@app/AppState/callbackBoundary';
-import {
   appStateStatusAtom,
-  seedModalOpenAtom,
   addTagModalAtom,
   launchAddTagAtom,
 } from '@app/AppState/uiAtoms';
@@ -666,10 +661,9 @@ export class LoadedAppClass extends Component<
   // and the price slice: the class publishes each field here and the derived
   // atoms gate re-renders to the slice that actually changed.
   private controllerStore = createStore();
-  // The callback-boundary epoch this instance was wired under. Every
-  // backend-callback write carries it; componentWillUnmount bumps the store's
-  // epoch past it, so a callback resolving after teardown drops.
-  private boundaryEpoch = this.controllerStore.get(callbackEpochAtom);
+  // Set at the start of teardown; a backend callback resolving after it drops
+  // its write.
+  private unmounted = false;
   constructor(props: LoadedAppClassProps) {
     super(props);
 
@@ -970,11 +964,9 @@ export class LoadedAppClass extends Component<
   };
 
   componentWillUnmount = async () => {
-    // Close the async-unmount gap: bump the callback-boundary epoch
-    // synchronously, before the awaits below, so a backend callback that fires
-    // while teardown is in flight drops its write; it cannot reach this
-    // dead instance.
-    this.controllerStore.set(callbackEpochAtom, this.boundaryEpoch + 1);
+    // Set before the awaits below, so a backend callback that fires while
+    // teardown is in flight cannot reach this dead instance.
+    this.unmounted = true;
     await this.rpc.clearTimers();
     this.rpc.stopMixnetPolling();
     const safeRemove = (listener: unknown, name: string) => {
@@ -1079,14 +1071,11 @@ export class LoadedAppClass extends Component<
     await BackgroundFileImpl.writeBackground(newBackgroundSyncInfo);
   };
 
-  // Run a backend-callback write through the boundary guard: it lands only while
-  // this instance's wiring epoch is still current, so a callback resolving after
-  // teardown drops; it cannot setState a dead instance.
+  // Runs a backend-callback write unless teardown has started.
   private commit = (write: () => void) => {
-    this.controllerStore.set(boundaryDispatchAtom, {
-      issuedEpoch: this.boundaryEpoch,
-      write,
-    });
+    if (!this.unmounted) {
+      write();
+    }
   };
 
   // Commits the patch through the boundary guard when it alters container state.
@@ -1127,10 +1116,6 @@ export class LoadedAppClass extends Component<
     // The sync slice, isolated: publish the detailed snapshot the two sync
     // consumers read, without waking the wider context tree.
     store.set(syncStatusAtom, syncingStatus);
-  };
-
-  setIsSeedViewModalOpen = (value: boolean) => {
-    this.controllerStore.set(seedModalOpenAtom, value);
   };
 
   setMixnetView = (mixnetView: MixnetView) => {
@@ -2138,9 +2123,6 @@ export class LoadedAppClass extends Component<
                               {...props}
                               onClickOK={() => {}}
                               onClickCancel={() => {}}
-                              setIsSeedViewModalOpen={
-                                this.setIsSeedViewModalOpen
-                              }
                             />
                           );
                         } else if (action === SeedActionEnum.change) {
