@@ -60,13 +60,17 @@ const readRecoveryWalletInfo = async (): Promise<string | null> => {
   return null;
 };
 
-const writeRecoveryWalletInfo = async (password: string): Promise<void> => {
+// The error that kept the entry from being written, or null when it was.
+const writeRecoveryWalletInfo = async (
+  password: string,
+): Promise<string | null> => {
   try {
     await Keychain.setGenericPassword(
       GlobalConst.keyKeyChain,
       password,
       setOptions,
     );
+    return null;
   } catch (error) {
     // An existing entry from a previous app version may use an
     // incompatible cipher (e.g. the old auth-required AES_GCM or RSA).
@@ -80,11 +84,22 @@ const writeRecoveryWalletInfo = async (password: string): Promise<void> => {
         password,
         baseOptions,
       );
+      return null;
     } catch (retryError) {
       console.log('Error saving keys after reset:', retryError);
+      return retryError instanceof Error
+        ? retryError.message
+        : String(retryError);
     }
   }
 };
+
+// Why recovery info did not end up on the device, or none when it did.
+export type RecoveryInfoSaveResult =
+  | { kind: 'saved' }
+  | { kind: 'no-keys' }
+  | { kind: 'write-failed'; error: string }
+  | { kind: 'mismatch' };
 
 // Only recovery info known to be right stays on the device: it is written
 // and read back, and anything else is removed. That covers a wallet that
@@ -92,15 +107,18 @@ const writeRecoveryWalletInfo = async (password: string): Promise<void> => {
 // read that failed, so the entry never holds another wallet's keys.
 export const saveRecoveryWalletInfo = async (
   keys: WalletType | null,
-): Promise<void> => {
+): Promise<RecoveryInfoSaveResult> => {
+  let result: RecoveryInfoSaveResult = { kind: 'no-keys' };
   if (keys && (keys.seed || keys.ufvk)) {
     const password = JSON.stringify(keys);
-    await writeRecoveryWalletInfo(password);
+    const error = await writeRecoveryWalletInfo(password);
     if ((await readRecoveryWalletInfo()) === password) {
-      return;
+      return { kind: 'saved' };
     }
+    result = error ? { kind: 'write-failed', error } : { kind: 'mismatch' };
   }
   await removeRecoveryWalletInfo();
+  return result;
 };
 
 export const getRecoveryWalletInfo = async (): Promise<WalletType> => {
@@ -126,9 +144,7 @@ export const hasRecoveryWalletInfo = async (): Promise<boolean> => {
 
 export const createUpdateRecoveryWalletInfo = async (
   keys: WalletType | null,
-): Promise<void> => {
-  await saveRecoveryWalletInfo(keys);
-};
+): Promise<RecoveryInfoSaveResult> => saveRecoveryWalletInfo(keys);
 
 export const removeRecoveryWalletInfo = async (): Promise<void> => {
   try {

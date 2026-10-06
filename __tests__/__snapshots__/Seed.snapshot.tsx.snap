@@ -449,7 +449,7 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
   onLayout={[Function]}
   style={
     {
-      "backgroundColor": "#011401",
+      "backgroundColor": "transparent",
       "flex": 1,
     }
   }

@@ -265,6 +265,10 @@ const Send: React.FunctionComponent<SendProps> = ({
   // lists BOTH errors (they are often the same failure, shown under each label
   // so that is explicit).
   const showCalcError = !!(spendableBalanceLastError || proposeSendLastError);
+  const spendableColor =
+    stillConfirming || negativeMaxAmount || spendableBalanceLastError
+      ? colors.fgDanger
+      : colors.fgDefault;
   const feeCalculationGenRef = useRef<number>(0);
   const { decimalSeparator } = getNumberFormatSettings();
   const keyboardHeight = useKeyboardHeight();
@@ -1500,41 +1504,6 @@ const Send: React.FunctionComponent<SendProps> = ({
                           />
                         </TouchableOpacity>
                       ) : null}
-                      <TouchableOpacity
-                        testID="send.max"
-                        onPress={() => {
-                          const maxStr = Utils.parseNumberFloatToStringLocale(
-                            maxAmount,
-                            8,
-                          );
-                          sendAllRef.current = true;
-                          updateToField(null, maxStr, null, null, null);
-                          calculateFeeWithPropose(
-                            maxStr,
-                            addressText,
-                            memoText,
-                            includeUAMemoBoolean,
-                          );
-                        }}
-                        style={{
-                          paddingLeft: 0,
-                          paddingRight: 8,
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                        }}
-                      >
-                        <BoldText
-                          style={{
-                            color: colors.fgAccent,
-                            fontSize: 20,
-                            lineHeight: 20,
-                            letterSpacing: -1.5,
-                            transform: [{ scaleX: 0.8 }],
-                          }}
-                        >
-                          {translate('send.max') as string}
-                        </BoldText>
-                      </TouchableOpacity>
                     </View>
                     {showFiat && (
                       <>
@@ -1602,11 +1571,28 @@ const Send: React.FunctionComponent<SendProps> = ({
 
                   <View style={{ display: 'flex', flexDirection: 'column' }}>
                     <TouchableOpacity
+                      testID="send.max"
                       style={{ alignSelf: 'flex-start' }}
                       onPress={() => {
                         if (spendableBalanceLastError || proposeSendLastError) {
                           sendErrorSheetRef.current?.present();
+                          return;
                         }
+                        if (maxAmount <= 0) {
+                          return;
+                        }
+                        const maxStr = Utils.parseNumberFloatToStringLocale(
+                          maxAmount,
+                          8,
+                        );
+                        sendAllRef.current = true;
+                        updateToField(null, maxStr, null, null, null);
+                        calculateFeeWithPropose(
+                          maxStr,
+                          addressText,
+                          memoText,
+                          includeUAMemoBoolean,
+                        );
                       }}
                     >
                       <View
@@ -1628,30 +1614,32 @@ const Send: React.FunctionComponent<SendProps> = ({
                         >
                           {translate('send.spendable') as string}
                         </RegText>
-                        {inputZec || quote.kind === 'none' ? (
-                          <ZecAmount
-                            style={{ marginLeft: 0 }}
-                            currencyName={info.currencyName}
-                            color={
-                              stillConfirming ||
-                              negativeMaxAmount ||
-                              spendableBalanceLastError
-                                ? colors.fgDanger
-                                : colors.fgDefault
-                            }
-                            size={14}
-                            amtZec={maxAmount}
-                            privacy={privacy}
-                          />
-                        ) : (
-                          <CurrencyAmount
-                            style={{ fontSize: 14 }}
-                            priceDate={quote.date}
-                            price={quote.price}
-                            amtZec={maxAmount}
-                            privacy={privacy}
-                          />
-                        )}
+                        <View
+                          style={{
+                            marginRight: 5,
+                            borderBottomWidth: 1,
+                            borderBottomColor: spendableColor,
+                          }}
+                        >
+                          {inputZec || quote.kind === 'none' ? (
+                            <ZecAmount
+                              style={{ marginLeft: 0, marginRight: 0 }}
+                              currencyName={info.currencyName}
+                              color={spendableColor}
+                              size={14}
+                              amtZec={maxAmount}
+                              privacy={privacy}
+                            />
+                          ) : (
+                            <CurrencyAmount
+                              style={{ fontSize: 14 }}
+                              priceDate={quote.date}
+                              price={quote.price}
+                              amtZec={maxAmount}
+                              privacy={privacy}
+                            />
+                          )}
+                        </View>
                       </View>
                     </TouchableOpacity>
                     {stillConfirming && (

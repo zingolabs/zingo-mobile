@@ -28,7 +28,7 @@ bridge (`WalletFileState` in `walletFileRepair.ts`).
 | `plainWallet` | raw zingolib bytes, u64-LE version 0..1000 | Zingo ≤ 2.0.20, a restored `.migrating` copy, or a Step 1 write | open directly, no Keystore involved |
 | `encryptedLegacy` | Tink envelope, payload is base64 text of plain bytes | normal 2.0.21+ save path | decrypt once, verify, migrate to plain via temp then atomic rename |
 | `doubleWrapped` | Tink envelope whose payload is another envelope, depth 1..3 | the #965 trial-decrypt bug | decrypt, unwrap each layer, keep the original at `.prerepair`, write plain |
-| `undecryptable` | Tink header, keyset gone, or garbage | OEM Keystore loss, app data restored onto another install | typed load error, recovery dialog with diagnosis report |
+| `undecryptable` | Tink header, keyset gone, or garbage | OEM Keystore loss, app data restored onto another install | typed load error, the wallet error screen with the diagnosis behind its details toggle |
 
 The plain state and the Step 1 write format are the same bytes a desktop
 zingolib wallet file holds. zingolib's parser is the only judge of
@@ -65,6 +65,6 @@ lands. The Android encrypted states never occur there.
   bytes (`WalletFileEnvelope`), never a trial decrypt, so a transient
   Keystore failure can only fail the load with a typed error. The next
   launch retries from unchanged bytes.
-- Anything unreadable routes to the recovery dialog
-  (`walletFileDiagnosisInfo` feeding `WalletRecoveryModal`) instead of
-  reaching zingolib as garbage.
+- Anything unreadable routes to the wallet error screen
+  (`walletFileDiagnosis` feeding `WalletError`) instead of reaching
+  zingolib as garbage.

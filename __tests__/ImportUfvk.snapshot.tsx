@@ -25,7 +25,7 @@ describe('Component ImportUfvk - test', () => {
     const onOK = jest.fn();
     const importUfvk = render(
       <ContextAppLoadedProvider value={state}>
-        <ImportUfvk onClickCancel={onCancel} onClickOK={onOK} />
+        <ImportUfvk busy={false} onClickCancel={onCancel} onClickOK={onOK} />
       </ContextAppLoadedProvider>,
     );
     expect(importUfvk.toJSON()).toMatchSnapshot();

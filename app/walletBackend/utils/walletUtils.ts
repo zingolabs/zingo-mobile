@@ -175,6 +175,11 @@ export async function loadExistingWallet(
   );
 }
 
+// Removes the wallet file from the device; the keys stay in the Keychain.
+export async function deleteExistingWallet(): Promise<FfiResult<string>> {
+  return callFfi(RPCModule.deleteExistingWallet());
+}
+
 // Restores the wallet from its on-device backup file (the `.migrating`
 // twin EncryptedFile manages). The success value is the native "true"/"false"
 // data protocol.
