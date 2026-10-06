@@ -262,6 +262,27 @@ describe('LoadedApp seam-B mount fence — current container behavior', () => {
       expect(configure).toHaveBeenCalled();
     });
 
+    it('Tests that on iOS a wallet mounted while the app is in the background resumes on the next return', async () => {
+      const { Platform } =
+        jest.requireActual<typeof import('react-native')>('react-native');
+      const os = jest.replaceProperty(Platform, 'OS', 'ios');
+      const appState = AppState as unknown as { currentState: unknown };
+      const realState = appState.currentState;
+      appState.currentState = AppStateStatusEnum.background;
+      const { instance } = await mountCommitted();
+      const configure = jest.spyOn(instance.rpc, 'configure');
+
+      const handler = captureAppStateHandler();
+      await act(async () => {
+        await handler(AppStateStatusEnum.active);
+        await flushMicrotasks();
+      });
+
+      expect(configure).toHaveBeenCalled();
+      appState.currentState = realState;
+      os.restore();
+    });
+
     it('a declined foreground gate routes back to LoadingApp', async () => {
       const { instance } = await mountCommitted();
       controllerStoreOf(instance).set(

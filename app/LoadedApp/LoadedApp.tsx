@@ -57,7 +57,6 @@ import {
   UfvkActionEnum,
   SettingsNameEnum,
   RouteEnum,
-  AppStateStatusEnum,
   GlobalConst,
   EventListenerEnum,
   AppContextLoaded,
@@ -770,9 +769,7 @@ export class LoadedAppClass extends Component<
     );
     this.controllerStore.set(
       appStateStatusAtom,
-      Platform.OS === GlobalConst.platformOSios
-        ? AppStateStatusEnum.active
-        : toAppStateStatus(AppState.currentState),
+      toAppStateStatus(AppState.currentState),
     );
     this.publishWalletView();
   }
