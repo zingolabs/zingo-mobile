@@ -1,6 +1,6 @@
 import 'react-native';
 import React, { useState } from 'react';
-import { fireEvent, render, screen } from '@testing-library/react-native';
+import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import SeedPhraseInput from '@ui/widgets/SeedPhraseInput';
 
 const translate = (key: string) => key;
@@ -122,4 +122,89 @@ test('Tests that a pasted viewing key can be edited in place, and turns back int
 
   fireEvent.changeText(screen.getByTestId('seed'), 'abandon ');
   expect(screen.getByText('1 / 24')).toBeOnTheScreen();
+});
+
+// The value the field last handed up.
+let handedUp = '';
+
+const ValueHost: React.FunctionComponent = () => {
+  const [value, setValue] = useState('');
+  return (
+    <SeedPhraseInput
+      value={value}
+      onChangeValue={next => {
+        handedUp = next;
+        setValue(next);
+      }}
+      translate={translate}
+      testID="seed"
+    />
+  );
+};
+
+// Several keys reaching the same handler before the field renders, each with
+// the native text as it then stands. fireEvent renders after every call,
+// which is why the tests above never met this.
+const typeWithoutRendering = (texts: string[]) => {
+  const input = screen.getByTestId('seed');
+  act(() => {
+    texts.forEach(text => input.props.onChangeText(text));
+  });
+};
+
+// A keyboard faster than the field renders: the native text grows one key at
+// a time and only takes the rendered value back every `keysPerRender` keys.
+const typeFast = (text: string, keysPerRender: number) => {
+  let native: string = screen.getByTestId('seed').props.value;
+  for (let i = 0; i < text.length; i += keysPerRender) {
+    const typed: string[] = [];
+    for (const key of text.slice(i, i + keysPerRender)) {
+      native += key;
+      typed.push(native);
+    }
+    typeWithoutRendering(typed);
+    native = screen.getByTestId('seed').props.value;
+  }
+};
+
+const PHRASE =
+  'lottery multiply patient simple ivory leisure swift square west despair beauty match crowd margin reject box always title photo remind word diet ecology badge';
+
+test('Tests that a key landing before the cleared field renders does not read the accepted word twice', () => {
+  handedUp = '';
+  render(<ValueHost />);
+  typeWithoutRendering(['west ', 'west d']);
+  expect(handedUp).toBe('west');
+  expect(screen.getByTestId('seed').props.value).toBe('d');
+});
+
+test.each([2, 3, 5])(
+  'Tests that a whole phrase typed %i keys per render comes out word for word',
+  keysPerRender => {
+    handedUp = '';
+    render(<ValueHost />);
+    typeFast(PHRASE + ' ', keysPerRender);
+    expect(handedUp).toBe(PHRASE);
+    expect(screen.getByText('24 / 24')).toBeOnTheScreen();
+  },
+);
+
+test('Tests that a key landing right after a suggestion is taken starts the next word', () => {
+  handedUp = '';
+  render(<ValueHost />);
+  fireEvent.changeText(screen.getByTestId('seed'), 'acti');
+  const input = screen.getByTestId('seed');
+  act(() => {
+    fireEvent.press(screen.getByRole('button', { name: 'action' }));
+    input.props.onChangeText('actia');
+  });
+  expect(handedUp).toBe('action');
+  expect(screen.getByTestId('seed').props.value).toBe('a');
+});
+
+test('Tests that the same word typed twice in a row is kept twice', () => {
+  render(<Host />);
+  fireEvent.changeText(screen.getByTestId('seed'), 'abandon ');
+  fireEvent.changeText(screen.getByTestId('seed'), 'abandon ');
+  expect(screen.getByText('2 / 24')).toBeOnTheScreen();
 });
