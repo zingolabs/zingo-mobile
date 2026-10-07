@@ -446,17 +446,17 @@ export class LoadingAppClass extends Component<
     // invites stale-entry reuse. Fire-and-forget, best-effort, idempotent.
     retireSentinelEntries();
 
-    // The start gate guards the wallet file and the recovery info stored in
-    // the Keychain/Keystore, which the start menu can restore without a gate
-    // of its own. With neither there is nothing behind it, and asking anyway
-    // only puts the fail-open notice on the Welcome, over Create New Wallet,
-    // on any device without a screen lock.
+    // The start gate guards the wallet file. Without one there is nothing
+    // behind it: viewing or importing the recovery info stored in the
+    // Keychain/Keystore runs its own gate (viewRecoveryWallet,
+    // importRecoveryWallet), so the rest of the app opens without one. Asking
+    // anyway only puts the fail-open notice on the Welcome, over Create New
+    // Wallet, on any device without a screen lock.
     const exists = await rpcWalletExists();
-    const has = await hasRecoveryWalletInfo();
 
     // to start the App the first time in this session
     // the user have to pass the security of the device
-    if (this.state.startingApp && (exists || has)) {
+    if (this.state.startingApp && exists) {
       if (this.state.biometricGate.kind === 'declined') {
         // A biometric fail, likely from the foreground check: keep the App
         // on the first screen so the user can try again.
@@ -487,6 +487,8 @@ export class LoadingAppClass extends Component<
 
     this.setState({ actionButtonsDisabled: true });
 
+    // has the device the Wallet Keys stored?
+    const has = await hasRecoveryWalletInfo();
     const recovery = has ? await getRecoveryWalletInfo() : null;
     this.setState({
       hasRecoveryWalletInfoSaved: has,
@@ -1554,12 +1556,18 @@ export class LoadingAppClass extends Component<
     });
   };
 
-  importRecoveryWallet = () => {
+  // Importing the stored recovery info asks first, as viewing it does: the
+  // start gate does not cover it when there is no wallet file.
+  importRecoveryWallet = async () => {
     const wallet = this.state.recoveryWallet;
     if (!wallet) {
       return;
     }
-    this.doRestore(
+    const answer = await askGate({ translate: this.state.translate });
+    if (answer.kind === 'declined') {
+      return;
+    }
+    await this.doRestore(
       wallet.seed || wallet.ufvk || '',
       wallet.birthday,
       this.state.screen,

@@ -13,12 +13,9 @@ import {
   SelectServerEnum,
 } from '@app/AppState';
 import { remoteServer } from '@app/AppState/types/ServerType';
-import { resolveTriggerGate } from '@app/services/gateController';
+import { askGate, resolveTriggerGate } from '@app/services/gateController';
 import RPCModule from '@app/RPCModule';
-import {
-  getRecoveryWalletInfo,
-  hasRecoveryWalletInfo,
-} from '@app/services/recoveryWalletInfo';
+import { hasRecoveryWalletInfo } from '@app/services/recoveryWalletInfo';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
 jest.mock('@app/RPCModule', () =>
@@ -28,6 +25,7 @@ jest.mock('@app/RPCModule', () =>
 jest.mock('@app/services/gateController', () => ({
   ...jest.requireActual('@app/services/gateController'),
   resolveTriggerGate: jest.fn(async () => ({ kind: 'passed' })),
+  askGate: jest.fn(async () => ({ kind: 'passed' })),
 }));
 
 jest.mock('@app/services/recoveryWalletInfo', () => ({
@@ -59,17 +57,18 @@ const bootApp = () =>
     selectServer: SelectServerEnum.custom,
   } as never);
 
-// The start gate guards the wallet file and the stored recovery info. On a
-// device with neither there is nothing behind it, and asking only put the
-// fail-open notice over Create New Wallet on the Welcome.
+// The start gate guards the wallet file. On a device without one there is
+// nothing behind it, and asking only put the fail-open notice over Create
+// New Wallet on the Welcome. The recovery info stored on the device is
+// gated where it is used, when it is viewed or imported.
 describe('LoadingApp start gate', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  test('is not asked on a device with no wallet and no recovery info', async () => {
+  test('is not asked on a device with no wallet, even with recovery info stored', async () => {
     walletExists.mockResolvedValue('false');
-    hasRecovery.mockResolvedValue(false);
+    hasRecovery.mockResolvedValue(true);
 
     await bootApp().componentDidMount();
 
@@ -77,18 +76,32 @@ describe('LoadingApp start gate', () => {
     expect(resolveTriggerGate).not.toHaveBeenCalled();
   });
 
-  test('is asked when recovery info is stored without a wallet, and a decline keeps it unread', async () => {
+  test('is asked when the stored recovery info is imported, and a decline does not restore', async () => {
     walletExists.mockResolvedValue('false');
-    hasRecovery.mockResolvedValue(true);
-    (resolveTriggerGate as jest.Mock).mockResolvedValueOnce({
+    hasRecovery.mockResolvedValue(false);
+    const app = bootApp();
+    app.state = {
+      ...app.state,
+      recoveryWallet: {
+        seed: 'abandon '.repeat(24).trim(),
+        ufvk: '',
+        birthday: 1,
+      },
+    };
+    const restore = jest.spyOn(app, 'doRestore').mockResolvedValue(undefined);
+    (askGate as jest.Mock).mockResolvedValueOnce({
       kind: 'declined',
       failure: { errorKey: 'biometrics-failure-declined' },
     });
 
-    await bootApp().componentDidMount();
+    await app.importRecoveryWallet();
 
-    expect(resolveTriggerGate).toHaveBeenCalledTimes(1);
-    expect(getRecoveryWalletInfo).not.toHaveBeenCalled();
+    expect(askGate).toHaveBeenCalledTimes(1);
+    expect(restore).not.toHaveBeenCalled();
+
+    await app.importRecoveryWallet();
+
+    expect(restore).toHaveBeenCalledTimes(1);
   });
 
   test('is still asked when a wallet exists, and a decline stops the boot', async () => {
