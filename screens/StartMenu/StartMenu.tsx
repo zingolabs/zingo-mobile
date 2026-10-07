@@ -12,7 +12,6 @@ import { useTheme } from '@app/theme';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
   faCheck,
-  faDatabase,
   faTriangleExclamation,
   faWifi,
 } from '@fortawesome/free-solid-svg-icons';
@@ -23,6 +22,7 @@ import { getZingoName, getZingoVersion } from '@app/utils/ZingoAppData';
 import RegText from '@ui/primitives/RegText';
 import BoldText from '@ui/primitives/BoldText';
 import BusyButton from '@ui/widgets/BusyButton';
+import ServerIcon from '@ui/widgets/ServerIcon';
 import { duration, ease } from '@app/theme/motion';
 
 // Vertical positions from the 402 x 874 design, as fractions of the height.
@@ -108,11 +108,6 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
   const noInternet = !netInfo.isConnected;
   const canAct = netInfo.isConnected || offline;
   const nonMain = server.chainName !== 'main';
-  const dotColor = noInternet
-    ? colors.fgDangerEmphasis
-    : offline
-      ? colors.fgMuted
-      : colors.fgAccent;
   const netLabel =
     server.chainName === 'test'
       ? (translate('loadingapp.net-testnet') as string)
@@ -241,27 +236,8 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
           disabled={actionButtonsDisabled}
           hitSlop={8}
           accessibilityRole="button"
-          style={{
-            width: 32,
-            height: 32,
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
         >
-          <FontAwesomeIcon icon={faDatabase} color={colors.fgMuted} size={22} />
-          <View
-            style={{
-              position: 'absolute',
-              right: 2,
-              bottom: 3,
-              width: 8,
-              height: 8,
-              borderRadius: 4,
-              backgroundColor: dotColor,
-              borderWidth: 2,
-              borderColor: colors.bgCanvas,
-            }}
-          />
+          <ServerIcon noInternet={noInternet} offline={offline} />
         </Pressable>
       </Animated.View>
 

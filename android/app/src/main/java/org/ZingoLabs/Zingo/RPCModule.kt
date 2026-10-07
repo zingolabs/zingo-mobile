@@ -714,6 +714,14 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
+    fun probeServerInfo(serveruri: String, promise: Promise) {
+        FfiOutcome.settling(promise, "probe_server") {
+            uniffi.zingo.initLogging()
+            uniffi.zingo.probeServer(serveruri)
+        }
+    }
+
+    @ReactMethod
     fun getLatestBlockWalletInfo(promise: Promise) {
         FfiOutcome.settling(promise, "get_latest_block_wallet") {
             uniffi.zingo.initLogging()

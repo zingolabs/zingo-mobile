@@ -1,9 +1,10 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useEffect, useRef, useState } from 'react';
-import { Pressable, ScrollView, TextInput, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Pressable, ScrollView, View } from 'react-native';
 import Animated, {
   FadeIn,
   FadeOut,
+  LinearTransition,
   ReduceMotion,
   useAnimatedStyle,
   useSharedValue,
@@ -11,21 +12,18 @@ import Animated, {
   withSequence,
   withTiming,
 } from 'react-native-reanimated';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faCheck, faXmark } from '@fortawesome/free-solid-svg-icons';
 
 import { useTheme } from '@app/theme';
 import { duration, ease } from '@app/theme/motion';
-import { ContextAppLoading } from '@app/context';
 import {
   ChainNameEnum,
   SelectServerEnum,
   ServerType,
   ServerUrisType,
+  TranslateType,
 } from '@app/AppState';
 import RegText from '@ui/primitives/RegText';
 import BoldText from '@ui/primitives/BoldText';
-import { LoadingDots } from '@ui/widgets/ProgressState';
 import { ServerStatus } from '@app/AppState/types/ServerStatus';
 import ServerRow, {
   DoneButton,
@@ -34,24 +32,35 @@ import ServerRow, {
   RowCard,
   ScreenHeader,
 } from './ServerRow';
+import CustomServerBox from './CustomServerBox';
+import SaveSheet from './SaveSheet';
+import { LogLine } from './ServerLog';
+import { hostOf, useCustomServer } from './useCustomServer';
 
-type ServerProps = {
+export type ServerProps = {
+  translate: (key: string) => TranslateType;
   server: ServerType;
   selectServer: SelectServerEnum;
   status: ServerStatus;
   blockHeight: string;
+  // True while the host applies a choice.
   busy: boolean;
-  servers: ServerUrisType[];
-  // Chains whose server list has arrived; the others show loading dots.
-  loadedChains: string[];
+  online: boolean;
+  // The recommended (Zaino) servers of every network.
+  recommended: ServerUrisType[];
   latencies: Record<string, number | null>;
   onAuto: (chain: ChainNameEnum) => void;
   onPick: (server: ServerUrisType) => void;
-  onTestCustom: (chain: ChainNameEnum, uri: string) => Promise<boolean>;
+  // Uses a custom server that passed a test; true once Zingo uses it.
+  onSaveCustom: (chain: ChainNameEnum, uri: string) => Promise<boolean>;
   onOffline: (on: boolean, chain: ChainNameEnum) => void;
-  onChoose: () => void;
+  onOther: (chain: ChainNameEnum) => void;
   onProbe: (chain: ChainNameEnum) => void;
+  onUnreachable: () => void;
   onBack: () => void;
+  // Set to a guard the host calls on a system back; true when the screen
+  // handled it (an unsaved custom server asks first).
+  backGuard?: React.MutableRefObject<(() => boolean) | null>;
 };
 
 const CARD_TOP = 98.5 / 874;
@@ -66,15 +75,19 @@ const CHAINS: ChainNameEnum[] = [
 const THUMB_BG = '#0A2A1A';
 const THUMB_BORDER = '#1E6B2A';
 const WAIT = '#E6B43C';
-const PLACEHOLDER = '#3F5677';
-const OK_TEXT = '#6FD35C';
-
-const hostOf = (uri: string) => uri.replace(/^https?:\/\//, '');
+const LEAVE_AFTER_SAVE_MS = 1500;
 
 const fadeIn = () =>
   FadeIn.duration(duration.base).reduceMotion(ReduceMotion.System);
 const fadeOut = () =>
   FadeOut.duration(duration.fast).reduceMotion(ReduceMotion.System);
+const layout = () =>
+  LinearTransition.duration(240)
+    .easing(ease.emphasized)
+    .reduceMotion(ReduceMotion.System);
+
+const fill = (text: string, values: Record<string, string>) =>
+  Object.entries(values).reduce((s, [k, v]) => s.split(`{${k}}`).join(v), text);
 
 type StatusDotProps = { status: ServerStatus; offline: boolean };
 
@@ -172,61 +185,38 @@ const Toggle: React.FC<ToggleProps> = ({ on, disabled, onToggle }) => {
 };
 
 const Server: React.FunctionComponent<ServerProps> = ({
+  translate,
   server,
   selectServer,
   status,
   blockHeight,
   busy,
-  servers,
-  loadedChains,
+  online,
+  recommended,
   latencies,
   onAuto,
   onPick,
-  onTestCustom,
+  onSaveCustom,
   onOffline,
-  onChoose,
+  onOther,
   onProbe,
+  onUnreachable,
   onBack,
+  backGuard,
 }) => {
-  const { translate } = useContext(ContextAppLoading);
   const { colors } = useTheme();
+  const t = (key: string, values: Record<string, string> = {}) =>
+    fill(translate(`server.${key}`) as string, values);
   const offline = server.kind === 'offline';
   const [tab, setTab] = useState<ChainNameEnum>(
     CHAINS.includes(server.chainName) ? server.chainName : CHAINS[0],
   );
-  const [customUri, setCustomUri] = useState<Record<string, string>>({
-    [server.chainName]:
-      server.kind === 'remote' && selectServer === SelectServerEnum.custom
-        ? server.uri
-        : '',
-  });
-  const [testResult, setTestResult] = useState<Record<string, boolean>>({});
-  const [testing, setTesting] = useState(false);
-  const [customOpen, setCustomOpen] = useState<Record<string, boolean>>({});
-  const [focused, setFocused] = useState(false);
+  // The network whose Custom row is open without being the saved choice.
+  const [customOpen, setCustomOpen] = useState<ChainNameEnum | null>(null);
+  const [asking, setAsking] = useState(false);
+  const [shakes, setShakes] = useState<Record<string, number>>({});
   const [segmentW, setSegmentW] = useState(0);
   const thumb = useSharedValue(CHAINS.indexOf(tab));
-  const fieldX = useSharedValue(0);
-  const input = useRef<TextInput>(null);
-
-  useEffect(() => {
-    onProbe(tab);
-  }, [tab, onProbe]);
-
-  useEffect(() => {
-    thumb.value = withTiming(CHAINS.indexOf(tab), {
-      duration: duration.medium,
-      easing: ease.emphasized,
-    });
-  }, [tab, thumb]);
-
-  const segment = (segmentW - 4) / 3;
-  const thumbStyle = useAnimatedStyle(() => ({
-    transform: [{ translateX: thumb.value * segment }],
-  }));
-  const fieldStyle = useAnimatedStyle(() => ({
-    transform: [{ translateX: fieldX.value }],
-  }));
 
   const netName = (chain: ChainNameEnum) =>
     translate(
@@ -237,265 +227,220 @@ const Server: React.FunctionComponent<ServerProps> = ({
           : 'settings.value-chainname-main',
     ) as string;
 
-  const onTab = tab;
+  const custom = useCustomServer({
+    translate,
+    online,
+    savedUri: chain =>
+      server.kind === 'remote' &&
+      selectServer === SelectServerEnum.custom &&
+      server.chainName === chain
+        ? server.uri
+        : null,
+    netName,
+    onSave: onSaveCustom,
+  });
+
+  useEffect(() => {
+    onProbe(tab);
+  }, [tab, onProbe]);
+
+  useEffect(() => {
+    thumb.value = withTiming(CHAINS.indexOf(tab), {
+      duration: 260,
+      easing: ease.emphasized,
+    });
+  }, [tab, thumb]);
+
+  const segment = (segmentW - 4) / 3;
+  const thumbStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: thumb.value * segment }],
+  }));
+
+  const regtest = tab === ChainNameEnum.regtestChainName;
+  const onTab = !offline && server.chainName === tab;
+  const customSelected =
+    regtest ||
+    customOpen === tab ||
+    (onTab && customOpen === null && selectServer === SelectServerEnum.custom);
   const isAuto =
-    !offline &&
-    server.chainName === onTab &&
-    selectServer === SelectServerEnum.auto;
-  const isCustom =
-    !offline &&
-    server.chainName === onTab &&
-    selectServer === SelectServerEnum.custom;
+    onTab && customOpen !== tab && selectServer === SelectServerEnum.auto;
   const pickedUri =
-    !offline &&
+    onTab &&
+    customOpen !== tab &&
     server.kind === 'remote' &&
-    server.chainName === onTab &&
     selectServer === SelectServerEnum.list
       ? server.uri
       : null;
-  const rows = servers.filter(s => s.chainName === onTab && !s.obsolete);
+  const rows = recommended.filter(s => s.chainName === tab && !s.obsolete);
+  const otherPicked = !!pickedUri && !rows.some(s => s.uri === pickedUri);
   const fastest = rows
     .filter(s => typeof latencies[s.uri] === 'number')
     .sort(
       (a, b) => (latencies[a.uri] as number) - (latencies[b.uri] as number),
     )[0];
-  const picked = rows.find(s => s.uri === pickedUri);
+
+  const draft = custom.draft(tab);
+  const saved = custom.savedSame(tab);
+  const dirty = !offline && !!draft.host.trim() && customSelected && !saved;
+  const working = custom.working !== null;
+  const locked = busy || offline || working;
 
   const cardName = offline
-    ? (translate('server.offline') as string)
+    ? t('offline')
     : server.kind === 'remote'
       ? selectServer === SelectServerEnum.auto
-        ? `${hostOf(server.uri)} ${translate('server.automatic-suffix')}`
+        ? `${hostOf(server.uri)} ${t('automatic-suffix')}`
         : hostOf(server.uri)
       : '';
   const cardSub = offline
-    ? (translate('server.offline-card') as string)
-    : status === 'wait'
-      ? (translate('server.connecting') as string)
-      : status === 'bad'
-        ? (translate('server.card-bad') as string).replace(
-            '{net}',
-            netName(server.chainName),
-          )
-        : (translate('server.card-connected') as string)
-            .replace('{net}', netName(server.chainName))
-            .replace('{height}', blockHeight);
+    ? t('offline-card')
+    : !online && status !== 'wait'
+      ? t('card-no-internet')
+      : status === 'wait'
+        ? t('connecting')
+        : status === 'bad'
+          ? t('card-bad', { net: netName(server.chainName) })
+          : t('card-connected', {
+              net: netName(server.chainName),
+              height: blockHeight,
+            });
+  const cardStatus: ServerStatus =
+    !offline && !online && status !== 'wait' ? 'bad' : status;
 
-  const test = async () => {
-    const uri = (customUri[onTab] ?? '').trim();
-    if (testing || !uri) {
+  // A saved custom server says how it is doing until it is tested again.
+  const log: LogLine[] =
+    draft.log.length === 0 && saved && status !== 'wait'
+      ? [
+          {
+            final: true,
+            tone: status === 'bad' ? 'bad' : 'ok',
+            text: t(status === 'bad' ? 'saved-bad' : 'saved-ok'),
+          },
+        ]
+      : draft.log;
+  const result =
+    draft.tested !== null
+      ? true
+      : log.some(l => l.final && l.tone === 'bad')
+        ? false
+        : undefined;
+
+  const leave = () => {
+    if (working || asking) {
       return;
     }
-    setTesting(true);
-    input.current?.blur();
-    const ok = await onTestCustom(onTab, uri);
-    setTesting(false);
-    setTestResult(r => ({ ...r, [onTab]: ok }));
-    if (!ok) {
-      const step = { duration: 56, easing: ease.standard };
-      fieldX.value = withSequence(
-        withTiming(-5, step),
-        withTiming(5, step),
-        withTiming(-3, step),
-        withTiming(0, step),
-      );
+    if (dirty) {
+      setAsking(true);
+      return;
+    }
+    onBack();
+  };
+  if (backGuard) {
+    backGuard.current = () => {
+      if (working || asking || dirty) {
+        leave();
+        return true;
+      }
+      return false;
+    };
+  }
+
+  const changeTab = (chain: ChainNameEnum) => {
+    if (working || chain === tab) {
+      return;
+    }
+    setCustomOpen(null);
+    setTab(chain);
+  };
+
+  const switchTo = (chain: ChainNameEnum) => {
+    custom.seed(chain, draft.host, draft.port);
+    setCustomOpen(
+      chain === ChainNameEnum.regtestChainName ||
+        (server.chainName === chain && selectServer === SelectServerEnum.custom)
+        ? null
+        : chain,
+    );
+    setTab(chain);
+    custom.test(chain);
+  };
+
+  const pickRecommended = (s: ServerUrisType) => {
+    if (latencies[s.uri] === null) {
+      setShakes(k => ({ ...k, [s.uri]: (k[s.uri] ?? 0) + 1 }));
+      onUnreachable();
+      return;
+    }
+    setCustomOpen(null);
+    if (pickedUri !== s.uri) {
+      onPick(s);
     }
   };
 
-  const result = testResult[onTab];
-  const fieldBorder =
-    result === true
-      ? colors.fgAccent
-      : result === false
-        ? colors.fgDangerEmphasis
-        : focused
-          ? colors.borderFocus
-          : colors.bottomSheetBorder;
-
   const customBlock = (
-    <View style={{ paddingHorizontal: 14.5, paddingBottom: 14 }}>
-      <Animated.View
-        style={[
-          {
-            flexDirection: 'row',
-            height: 41,
-            borderRadius: 10,
-            borderWidth: 1,
-            borderColor: fieldBorder,
-            backgroundColor: colors.bgSurface,
-            overflow: 'hidden',
-          },
-          fieldStyle,
-        ]}
+    <CustomServerBox
+      chain={tab}
+      host={draft.host}
+      port={draft.port}
+      log={log}
+      shown={draft.log.length === 0 ? log.length : draft.shown}
+      result={result}
+      saved={saved}
+      working={custom.working}
+      disabled={busy || offline}
+      shake={custom.shake}
+      pulse={custom.pulse}
+      autoFocus={customOpen === tab}
+      labels={{
+        test: t('test'),
+        save: t('save'),
+        saved: t('saved'),
+        details: t('details'),
+        host: t('host-placeholder'),
+        hostRegtest: t('host-placeholder-regtest'),
+        port: t('port'),
+      }}
+      onHost={text => custom.setHost(tab, text)}
+      onPort={text => custom.setPort(tab, text)}
+      onTest={() => custom.test(tab)}
+      onSave={() => custom.save(tab)}
+      onSwitch={switchTo}
+    />
+  );
+
+  const body = regtest ? (
+    <>
+      <BoldText
+        style={{
+          marginHorizontal: 21.5,
+          marginTop: 8,
+          marginBottom: 18,
+          fontSize: 12.5,
+        }}
       >
-        <TextInput
-          ref={input}
-          testID="server.custom.uri"
-          value={customUri[onTab] ?? ''}
-          onChangeText={t => {
-            setCustomUri(u => ({ ...u, [onTab]: t }));
-            setTestResult(r => {
-              const next = { ...r };
-              delete next[onTab];
-              return next;
-            });
-          }}
-          onFocus={() => setFocused(true)}
-          onBlur={() => setFocused(false)}
-          onSubmitEditing={test}
-          editable={!busy && !testing}
-          placeholder={
-            translate(
-              onTab === ChainNameEnum.regtestChainName
-                ? 'server.placeholder-regtest'
-                : 'server.placeholder',
-            ) as string
+        {t('regtest-label')}
+      </BoldText>
+      <View style={{ marginHorizontal: 21.5 }}>{customBlock}</View>
+    </>
+  ) : (
+    <>
+      <RowCard>
+        <ServerRow
+          testID="server.auto"
+          first
+          title={t('automatic')}
+          sub={
+            fastest ? t('fastest', { host: hostOf(fastest.uri) }) : undefined
           }
-          placeholderTextColor={PLACEHOLDER}
-          keyboardType="url"
-          autoCapitalize="none"
-          autoCorrect={false}
-          spellCheck={false}
-          textContentType="URL"
-          returnKeyType="go"
-          style={{
-            flex: 1,
-            minWidth: 0,
-            paddingHorizontal: 12,
-            fontSize: 13,
-            color: colors.fgDefault,
+          selected={isAuto}
+          disabled={locked}
+          onPress={() => {
+            setCustomOpen(null);
+            if (!isAuto) {
+              onAuto(tab);
+            }
           }}
         />
-        <Pressable
-          testID="server.custom.test"
-          onPress={test}
-          disabled={busy || testing || !(customUri[onTab] ?? '').trim()}
-          accessibilityRole="button"
-          style={{
-            width: 60,
-            borderLeftWidth: 1,
-            borderLeftColor: colors.bottomSheetBorder,
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          {testing ? (
-            <LoadingDots size={5} gap={4} color={colors.fgAccent} />
-          ) : (
-            <BoldText style={{ fontSize: 12, color: colors.fgAccent }}>
-              {translate('server.test') as string}
-            </BoldText>
-          )}
-        </Pressable>
-      </Animated.View>
-      {result !== undefined && (
-        <Animated.View
-          key={result ? 'ok' : 'bad'}
-          entering={fadeIn()}
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            gap: 7,
-            marginTop: 10,
-            minHeight: 16,
-          }}
-        >
-          <FontAwesomeIcon
-            icon={result ? faCheck : faXmark}
-            size={11}
-            color={result ? OK_TEXT : colors.fgDanger}
-          />
-          <RegText
-            style={{
-              fontSize: 11.5,
-              color: result ? OK_TEXT : colors.fgDanger,
-            }}
-          >
-            {
-              translate(
-                result ? 'server.connected' : 'server.unreachable',
-              ) as string
-            }
-          </RegText>
-        </Animated.View>
-      )}
-    </View>
-  );
-
-  const automaticRow = (
-    <ServerRow
-      testID="server.auto"
-      first
-      title={translate('server.automatic') as string}
-      sub={
-        fastest
-          ? (translate('server.fastest') as string).replace(
-              '{host}',
-              hostOf(fastest.uri),
-            )
-          : undefined
-      }
-      selected={isAuto}
-      disabled={busy || offline}
-      onPress={() => !isAuto && onAuto(onTab)}
-    />
-  );
-  const customRow = (
-    <ServerRow
-      testID="server.custom"
-      title={translate('server.custom') as string}
-      sub={
-        isCustom || onTab === ChainNameEnum.testChainName
-          ? (translate('server.custom-sub') as string)
-          : undefined
-      }
-      selected={isCustom}
-      disabled={busy || offline}
-      onPress={() => {
-        if (customOpen[onTab]) {
-          return;
-        }
-        setCustomOpen(o => ({ ...o, [onTab]: true }));
-        setTimeout(() => input.current?.focus(), duration.medium);
-      }}
-    />
-  );
-  const showCustom = isCustom || !!customOpen[onTab];
-
-  let body: React.ReactNode;
-  if (onTab === ChainNameEnum.regtestChainName) {
-    body = (
-      <>
-        <BoldText
-          style={{
-            marginHorizontal: 21.5,
-            marginTop: 8,
-            marginBottom: 18,
-            fontSize: 12.5,
-          }}
-        >
-          {translate('server.regtest-label') as string}
-        </BoldText>
-        <View style={{ marginHorizontal: 7 }}>{customBlock}</View>
-      </>
-    );
-  } else if (onTab === ChainNameEnum.testChainName) {
-    body = (
-      <RowCard>
-        {automaticRow}
-        {!loadedChains.includes(onTab) && (
-          <View
-            testID="server.list.loading"
-            style={{
-              height: 55,
-              justifyContent: 'center',
-              borderTopWidth: 1,
-              borderTopColor: ROW_DIVIDER,
-            }}
-          >
-            <LoadingDots size={6} gap={5} />
-          </View>
-        )}
         {rows.map(s => (
           <ServerRow
             key={s.uri}
@@ -503,57 +448,59 @@ const Server: React.FunctionComponent<ServerProps> = ({
             title={hostOf(s.uri)}
             sub={s.region}
             selected={pickedUri === s.uri}
-            disabled={busy || offline}
+            disabled={locked}
+            shake={shakes[s.uri] ?? 0}
             right={
               <Latency
                 ms={latencies[s.uri]}
-                notResponding={translate('server.not-responding') as string}
+                notResponding={t('not-responding')}
               />
             }
-            onPress={() => pickedUri !== s.uri && onPick(s)}
+            onPress={() => pickRecommended(s)}
           />
         ))}
-        {customRow}
-        {showCustom && (
-          <Animated.View entering={fadeIn()} exiting={fadeOut()}>
-            {customBlock}
-          </Animated.View>
-        )}
       </RowCard>
-    );
-  } else {
-    body = (
-      <RowCard>
-        {automaticRow}
-        <ServerRow
-          testID="server.choose"
-          title={translate('server.choose') as string}
-          sub={
-            picked
-              ? typeof latencies[picked.uri] === 'number'
-                ? `${hostOf(picked.uri)} · ${latencies[picked.uri]} ms`
-                : hostOf(picked.uri)
-              : undefined
-          }
-          selected={!!picked}
-          disabled={busy || offline}
-          chevron
-          onPress={onChoose}
-        />
-        {customRow}
-        {showCustom && (
-          <Animated.View entering={fadeIn()} exiting={fadeOut()}>
-            {customBlock}
-          </Animated.View>
-        )}
-      </RowCard>
-    );
-  }
+      <Animated.View layout={layout()} style={{ marginTop: 14 }}>
+        <RowCard>
+          <ServerRow
+            testID="server.other"
+            first
+            title={t('other')}
+            selected={otherPicked}
+            disabled={locked}
+            chevron
+            onPress={() => onOther(tab)}
+          />
+          <ServerRow
+            testID="server.custom"
+            title={t('custom')}
+            selected={customSelected}
+            disabled={locked}
+            onPress={() => {
+              if (!customSelected) {
+                setCustomOpen(tab);
+              }
+            }}
+          />
+          {customSelected && (
+            <Animated.View
+              entering={fadeIn()}
+              exiting={fadeOut()}
+              style={{ paddingHorizontal: 14.5, paddingBottom: 14 }}
+            >
+              {customBlock}
+            </Animated.View>
+          )}
+        </RowCard>
+      </Animated.View>
+    </>
+  );
 
   return (
     <View style={{ flex: 1, backgroundColor: 'transparent' }}>
       <View
         testID="server.card"
+        accessible
         style={{
           position: 'absolute',
           left: 22.5,
@@ -571,7 +518,7 @@ const Server: React.FunctionComponent<ServerProps> = ({
           gap: 12,
         }}
       >
-        <StatusDot status={status} offline={offline} />
+        <StatusDot status={cardStatus} offline={offline} />
         <Animated.View
           key={`${cardName}|${cardSub}`}
           entering={fadeIn()}
@@ -585,6 +532,7 @@ const Server: React.FunctionComponent<ServerProps> = ({
             {cardName}
           </RegText>
           <RegText
+            testID="server.card.sub"
             numberOfLines={1}
             style={{
               fontSize: 11,
@@ -638,17 +586,17 @@ const Server: React.FunctionComponent<ServerProps> = ({
           <Pressable
             key={chain}
             testID={`server.net.${chain}`}
-            onPress={() => setTab(chain)}
-            disabled={busy || offline}
+            onPress={() => changeTab(chain)}
+            disabled={locked}
             accessibilityRole="tab"
-            accessibilityState={{ selected: chain === onTab }}
+            accessibilityState={{ selected: chain === tab }}
             style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
           >
             <RegText
               style={{
                 fontSize: 12.5,
                 fontWeight: '500',
-                color: chain === onTab ? colors.fgDefault : colors.fgMuted,
+                color: chain === tab ? colors.fgDefault : colors.fgMuted,
               }}
             >
               {netName(chain)}
@@ -670,18 +618,22 @@ const Server: React.FunctionComponent<ServerProps> = ({
         showsVerticalScrollIndicator={false}
       >
         <Animated.View
-          key={onTab}
-          entering={fadeIn()}
-          exiting={fadeOut()}
+          key={tab}
+          entering={FadeIn.duration(200)
+            .delay(120)
+            .reduceMotion(ReduceMotion.System)}
+          exiting={FadeOut.duration(120).reduceMotion(ReduceMotion.System)}
           style={{ opacity: offline ? 0.4 : 1 }}
+          pointerEvents={offline ? 'none' : 'auto'}
         >
           {body}
         </Animated.View>
-        <View
+        <Animated.View
+          layout={layout()}
           style={{
             marginHorizontal: 21.5,
-            marginTop: 14,
-            minHeight: 55,
+            marginTop: 17,
+            minHeight: 66,
             borderRadius: 14,
             backgroundColor: colors.bgSurface,
             borderWidth: 1,
@@ -689,43 +641,76 @@ const Server: React.FunctionComponent<ServerProps> = ({
             flexDirection: 'row',
             alignItems: 'center',
             paddingVertical: 10,
-            paddingLeft: 14.5,
+            paddingLeft: 16.5,
             paddingRight: 16,
-            gap: 13,
+            gap: 12,
           }}
         >
           <View style={{ flex: 1 }}>
+            <BoldText style={{ fontSize: 13.5, lineHeight: 19 }}>
+              {t('offline')}
+            </BoldText>
             <RegText
-              style={{ fontSize: 13.5, lineHeight: 19, fontWeight: '500' }}
+              style={{ fontSize: 11, lineHeight: 17, color: colors.fgMuted }}
             >
-              {translate('server.offline') as string}
-            </RegText>
-            <RegText
-              style={{ fontSize: 11, lineHeight: 16, color: colors.fgMuted }}
-            >
-              {translate('server.offline-sub') as string}
+              {t('offline-sub')}
             </RegText>
           </View>
           <Toggle
             on={offline}
-            disabled={busy}
-            onToggle={() => onOffline(!offline, onTab)}
+            disabled={busy || working}
+            onToggle={() => {
+              setCustomOpen(null);
+              if (offline && regtest) {
+                setTab(ChainNameEnum.mainChainName);
+              }
+              onOffline(!offline, tab);
+            }}
           />
-        </View>
+        </Animated.View>
       </ScrollView>
 
       <DoneButton
         testID="server.done"
-        title={translate('server.done') as string}
-        onPress={onBack}
-        disabled={busy}
+        title={t('done')}
+        onPress={leave}
+        disabled={busy || working}
       />
       <ScreenHeader
         testID="server.back"
-        title={translate('server.title') as string}
-        onBack={onBack}
-        disabled={busy}
+        title={t('title')}
+        onBack={leave}
+        disabled={busy || working}
       />
+      {asking && (
+        <SaveSheet
+          title={t('unsaved-title')}
+          body={
+            t(draft.tested !== null ? 'unsaved-tested' : 'unsaved-untested', {
+              host: draft.host.trim(),
+            }) +
+            t('unsaved-keeps', {
+              current: offline ? t('unsaved-offline') : cardName,
+            })
+          }
+          saveLabel={t('save')}
+          discardLabel={t('dont-save')}
+          keepLabel={t('keep-editing')}
+          onKeep={() => setAsking(false)}
+          onDiscard={() => {
+            setAsking(false);
+            custom.forget(tab);
+            setCustomOpen(null);
+            onBack();
+          }}
+          onSave={async () => {
+            setAsking(false);
+            if (await custom.save(tab)) {
+              setTimeout(onBack, LEAVE_AFTER_SAVE_MS);
+            }
+          }}
+        />
+      )}
     </View>
   );
 };

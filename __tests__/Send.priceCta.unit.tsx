@@ -192,3 +192,20 @@ test('H3: the USD-entry derived ZEC amount dims on a stale price', () => {
   expect(derived).toBeTruthy();
   expect(derived?.props.color).toBe('#888888');
 });
+
+test('the amount being typed shows in both currencies with privacy on', () => {
+  const ui = sendUi({ zecPrice: 33.33, date: Date.now() });
+  const view = render(
+    <ContextAppLoadedProvider value={{ ...ui.props.value, privacy: true }}>
+      {ui.props.children}
+    </ContextAppLoadedProvider>,
+  );
+
+  const { StyleSheet } = require('react-native');
+  // A masked amount reads "$ -.--"; a shown one starts with a digit.
+  const derived = view
+    .queryAllByText(/^\$ \d/)
+    .map(t => StyleSheet.flatten(t.props.style))
+    .filter((s: { fontSize?: number }) => s.fontSize === 16);
+  expect(derived.length).toBeGreaterThan(0);
+});

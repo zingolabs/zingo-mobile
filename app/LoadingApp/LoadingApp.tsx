@@ -22,7 +22,6 @@ import { showConfirm } from '@app/services/showConfirm';
 import {
   createNewWallet,
   deleteExistingWallet,
-  getLatestBlockServerInfo,
   getVersionInfo,
   getWalletKind,
   hasRepairableWalletFile,
@@ -63,7 +62,7 @@ import {
   LaunchingModeEnum,
   BlockExplorerEnum,
 } from '@app/AppState';
-import { parseServerURI, serverUris, fetchServerList } from '@app/uris';
+import { serverUris } from '@app/uris';
 import { staticAlternatives, staticServers } from '@app/uris/serverChoice';
 import SettingsFileImpl from '@app/services/SettingsFileImpl';
 import { fetchWallet } from '@app/walletBackend';
@@ -88,6 +87,12 @@ import {
   retireSentinelEntries,
 } from '@app/services/gateController';
 import selectingServer from '@app/services/selectingServer';
+import {
+  otherServersFor,
+  pickAutomatic,
+  probeUri,
+  recommendedServers,
+} from '@app/services/serverPicking';
 import { isEqual } from 'lodash';
 import {
   createUpdateRecoveryWalletInfo,
@@ -352,7 +357,6 @@ type LoadingAppClassProps = {
 type LoadingAppClassState = AppStateLoading & AppContextLoading;
 
 const RETRY_MIN_MS = 1400;
-const PROBE_TIMEOUT_MS = 15 * 1000;
 
 export class LoadingAppClass extends Component<
   LoadingAppClassProps,
@@ -423,6 +427,7 @@ export class LoadingAppClass extends Component<
       serverBlockHeight: '',
       serverLatencies: {},
       serverLists: {},
+      serverListChain: ChainNameEnum.mainChainName,
       serverReturn: RouteEnum.StartMenu,
     };
   }
@@ -647,9 +652,13 @@ export class LoadingAppClass extends Component<
         await SettingsFileImpl.writeServer(s, mode);
         return false;
       }
-      const list = await fetchServerList(chainName);
-      if (list.length > 0) {
-        const best = remoteServer(list[0].uri, list[0].chainName);
+      const pick = await pickAutomatic(
+        this.state.translate,
+        chainName,
+        isConnected,
+      );
+      if (pick) {
+        const best = remoteServer(pick.uri, pick.chainName);
         this.setState({ server: best });
         await SettingsFileImpl.writeServer(best, mode);
         return true;
@@ -665,7 +674,10 @@ export class LoadingAppClass extends Component<
       if (!isConnected) {
         return true;
       }
-      const list = await fetchServerList(chainName);
+      const list = [
+        ...recommendedServers(this.state.translate, chainName),
+        ...(await otherServersFor(this.state.translate, chainName, true)),
+      ];
       if (list.length === 0) {
         return true;
       }
@@ -1358,23 +1370,6 @@ export class LoadingAppClass extends Component<
     this.setState(state => ({ screen: state.serverReturn }));
   };
 
-  // Times one tip request; a server that does not answer in time has no latency.
-  probeUri = async (
-    uri: string,
-  ): Promise<{ latency: number | null; height: string }> => {
-    const start = Date.now();
-    const resp = await Promise.race([
-      getLatestBlockServerInfo(uri),
-      new Promise<null>(resolve =>
-        setTimeout(() => resolve(null), PROBE_TIMEOUT_MS),
-      ),
-    ]);
-    if (!resp || !resp.ok || !resp.value) {
-      return { latency: null, height: '' };
-    }
-    return { latency: Date.now() - start, height: resp.value };
-  };
-
   probeCurrentServer = async () => {
     const { server } = this.state;
     if (server.kind === 'offline') {
@@ -1382,7 +1377,7 @@ export class LoadingAppClass extends Component<
       return;
     }
     this.setState({ serverStatus: 'wait' });
-    const probe = await this.probeUri(server.uri);
+    const probe = await probeUri(server.uri);
     const now = this.state.server;
     if (this.unmounted || now.kind !== 'remote' || now.uri !== server.uri) {
       return;
@@ -1397,29 +1392,22 @@ export class LoadingAppClass extends Component<
     }));
   };
 
-  // The servers offered for a chain; empty until its list has loaded.
+  // The servers under Other servers for a chain; empty until loaded.
   serversFor = (chain: ChainNameEnum): ServerUrisType[] =>
     this.state.serverLists[chain] ?? [];
 
-  // Loads a chain's list once, from the registry or, when that gives
-  // nothing, from the static list; then times every server from this device.
+  // Loads a chain's Other servers once, then times them and the recommended
+  // servers from this device.
   probeServers = async (chain: ChainNameEnum) => {
     if (!this.state.serverLists[chain]) {
-      const known = serverUris(this.state.translate);
-      const regions = new Map(known.map(s => [s.uri, s.region]));
-      const live = this.state.netInfo.isConnected
-        ? (await fetchServerList(chain)).map(s => ({
-            ...s,
-            region: regions.get(s.uri) ?? '',
-          }))
-        : [];
+      const list = await otherServersFor(
+        this.state.translate,
+        chain,
+        !!this.state.netInfo.isConnected,
+      );
       if (this.unmounted) {
         return;
       }
-      const list =
-        live.length > 0
-          ? live
-          : known.filter(s => s.chainName === chain && !s.obsolete);
       await new Promise<void>(resolve =>
         this.setState(
           state => ({ serverLists: { ...state.serverLists, [chain]: list } }),
@@ -1427,12 +1415,13 @@ export class LoadingAppClass extends Component<
         ),
       );
     }
-    const pending = this.serversFor(chain).filter(
-      s => this.state.serverLatencies[s.uri] === undefined,
-    );
+    const pending = [
+      ...recommendedServers(this.state.translate, chain),
+      ...this.serversFor(chain),
+    ].filter(s => this.state.serverLatencies[s.uri] === undefined);
     await Promise.all(
       pending.map(async s => {
-        const probe = await this.probeUri(s.uri);
+        const probe = await probeUri(s.uri);
         if (this.unmounted) {
           return;
         }
@@ -1454,7 +1443,7 @@ export class LoadingAppClass extends Component<
   };
 
   // Automatic seeds the chain's default and lets the boot picker replace it
-  // with the best live server.
+  // with the fastest recommended server, or the best live one.
   chooseAutomatic = async (chain: ChainNameEnum) => {
     this.setState({ actionButtonsDisabled: true, serverStatus: 'wait' });
     await this.applyServer(
@@ -1474,27 +1463,21 @@ export class LoadingAppClass extends Component<
     await this.probeCurrentServer();
   };
 
-  // A custom server is adopted only once it answers.
-  testCustomServer = async (
+  // The Server screen saves a custom server only after it passed a test.
+  saveCustomServer = async (
     chain: ChainNameEnum,
     uri: string,
   ): Promise<boolean> => {
-    const parsed = parseServerURI(uri);
-    if (parsed.kind === 'error') {
-      this.addLastSnackbar(this.state.translate(parsed.errorKey) as string);
-      return false;
-    }
-    const probe = await this.probeUri(parsed.uri);
-    if (probe.latency === null) {
-      return false;
-    }
-    await this.applyServer(
-      remoteServer(parsed.uri, chain),
-      SelectServerEnum.custom,
-    );
-    this.setState({ serverStatus: 'ok', serverBlockHeight: probe.height });
+    await this.applyServer(remoteServer(uri, chain), SelectServerEnum.custom);
+    await this.probeCurrentServer();
     return true;
   };
+
+  serverUnreachable = () =>
+    this.addLastSnackbar(
+      this.state.translate('server.server-unreachable') as string,
+      SnackbarDurationEnum.short,
+    );
 
   // Offline keeps the chain shown so create and restore derive keys for it;
   // leaving Offline goes back to Automatic, on mainnet when regtest was shown.
@@ -1717,33 +1700,38 @@ export class LoadingAppClass extends Component<
                     )}
                   {screen === RouteEnum.Server && (
                     <Server
+                      translate={translate}
                       server={this.state.server}
                       selectServer={this.state.selectServer}
                       status={this.state.serverStatus}
                       blockHeight={this.state.serverBlockHeight}
                       busy={actionButtonsDisabled}
-                      servers={[
-                        ...this.serversFor(ChainNameEnum.mainChainName),
-                        ...this.serversFor(ChainNameEnum.testChainName),
-                      ]}
-                      loadedChains={Object.keys(this.state.serverLists)}
+                      online={!!this.state.netInfo.isConnected}
+                      recommended={serverUris(translate).filter(
+                        s => s.recommended,
+                      )}
                       latencies={this.state.serverLatencies}
                       onAuto={this.chooseAutomatic}
                       onPick={this.pickServer}
-                      onTestCustom={this.testCustomServer}
+                      onSaveCustom={this.saveCustomServer}
                       onOffline={this.setOffline}
-                      onChoose={() =>
-                        this.setState({ screen: RouteEnum.ServerList })
+                      onOther={chain =>
+                        this.setState({
+                          serverListChain: chain,
+                          screen: RouteEnum.ServerList,
+                        })
                       }
                       onProbe={this.probeServers}
+                      onUnreachable={this.serverUnreachable}
                       onBack={this.closeServer}
                     />
                   )}
                   {screen === RouteEnum.ServerList && (
                     <ServerList
-                      servers={this.serversFor(ChainNameEnum.mainChainName)}
+                      translate={translate}
+                      servers={this.serversFor(this.state.serverListChain)}
                       loading={
-                        !this.state.serverLists[ChainNameEnum.mainChainName]
+                        !this.state.serverLists[this.state.serverListChain]
                       }
                       latencies={this.state.serverLatencies}
                       selectedUri={
@@ -1754,12 +1742,7 @@ export class LoadingAppClass extends Component<
                       }
                       busy={actionButtonsDisabled}
                       onPick={this.pickServer}
-                      onUnreachable={() =>
-                        this.addLastSnackbar(
-                          translate('server.server-unreachable') as string,
-                          SnackbarDurationEnum.short,
-                        )
-                      }
+                      onUnreachable={this.serverUnreachable}
                       onBack={() => this.setState({ screen: RouteEnum.Server })}
                     />
                   )}
