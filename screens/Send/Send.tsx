@@ -264,10 +264,11 @@ const Send: React.FunctionComponent<SendProps> = ({
   // lists BOTH errors (they are often the same failure, shown under each label
   // so that is explicit).
   const showCalcError = !!(spendableBalanceLastError || proposeSendLastError);
-  const spendableColor =
-    stillConfirming || negativeMaxAmount || spendableBalanceLastError
-      ? colors.fgDanger
-      : colors.fgDefault;
+  // Nothing to spend, a balance still confirming or a failed read turn the
+  // spendable red, in ZEC and in the currency alike.
+  const spendableWarn =
+    stillConfirming || negativeMaxAmount || !!spendableBalanceLastError;
+  const spendableColor = spendableWarn ? colors.fgDanger : colors.fgDefault;
   const feeCalculationGenRef = useRef<number>(0);
   const { decimalSeparator } = getNumberFormatSettings();
   const keyboardHeight = useKeyboardHeight();
@@ -1638,6 +1639,9 @@ const Send: React.FunctionComponent<SendProps> = ({
                               price={quote.price}
                               amtZec={maxAmount}
                               privacy={privacy}
+                              color={
+                                spendableWarn ? colors.fgDanger : undefined
+                              }
                             />
                           )}
                         </View>

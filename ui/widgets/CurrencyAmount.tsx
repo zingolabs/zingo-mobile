@@ -17,6 +17,8 @@ type CurrencyAmountProps = {
   // The live price's date: a conversion older than the stale threshold
   // dims. Omit for historical conversions, which never dim.
   priceDate?: number;
+  // Overrides the color the price's health gives, as a warning does.
+  color?: string;
 };
 
 const CurrencyAmount: React.FunctionComponent<CurrencyAmountProps> = ({
@@ -26,6 +28,7 @@ const CurrencyAmount: React.FunctionComponent<CurrencyAmountProps> = ({
   privacy,
   selectable,
   priceDate,
+  color,
 }) => {
   const { visible, reveal } = useTimedReveal(!!privacy);
   const privacyHigh: boolean = !visible;
@@ -36,7 +39,8 @@ const CurrencyAmount: React.FunctionComponent<CurrencyAmountProps> = ({
   // a stale one, matching the ring beside it; historical conversions
   // omit priceDate and never dim.
   const health = usePriceHealth(priceDate);
-  const baseColor = health === 'live' ? colors.fgDefault : colors.fgMuted;
+  const baseColor =
+    color ?? (health === 'live' ? colors.fgDefault : colors.fgMuted);
 
   useEffect(() => {
     const zeroString = '0' + decimalSeparator + '00';
