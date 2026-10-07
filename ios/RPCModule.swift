@@ -494,6 +494,22 @@ class RPCModule: NSObject {
     try self.saveWalletBackupFile(try readWalletBytes())
   }
 
+  private func syncSettings(performancelevel: String, minconfirmations: String) -> SyncSettings {
+    SyncSettings(performanceLevel: performancelevel, minConfirmations: UInt32(minconfirmations) ?? 0)
+  }
+
+  private func connection(
+    serveruri: String,
+    chainhint: String,
+    performancelevel: String,
+    minconfirmations: String
+  ) -> Connection {
+    Connection(
+      serverUri: serveruri,
+      chainHint: chainhint,
+      sync: syncSettings(performancelevel: performancelevel, minconfirmations: minconfirmations))
+  }
+
   func fnCreateNewWallet(
     serveruri: String,
     birthday: String,
@@ -504,7 +520,7 @@ class RPCModule: NSObject {
     // initNew throws on failure, so reaching the save implies the wallet
     // exists. Offline (empty serveruri) uses `birthday` in place of the
     // chain tip; online it is ignored (pass "0").
-    let seed = try initNew(serveruri: serveruri, birthday: UInt32(birthday) ?? 0, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: UInt32(minconfirmations) ?? 0)
+    let seed = try initNew(connection: connection(serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: minconfirmations), birthday: UInt32(birthday) ?? 0)
     reopenWalletFile()
     let seedStr = String(seed)
     try self.saveWalletInternal()
@@ -535,7 +551,7 @@ class RPCModule: NSObject {
     minconfirmations: String
   ) throws -> String {
     // initFromSeed throws on failure, so reaching the save implies the wallet exists.
-    let seed = try initFromSeed(seed: restoreSeed, birthday: UInt32(birthday) ?? 0, serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: UInt32(minconfirmations) ?? 0)
+    let seed = try initFromSeed(seed: restoreSeed, birthday: UInt32(birthday) ?? 0, connection: connection(serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: minconfirmations))
     let seedStr = String(seed)
     reopenWalletFile()
     try self.saveWalletInternal()
@@ -567,7 +583,7 @@ class RPCModule: NSObject {
     minconfirmations: String
   ) throws -> String {
     // initFromUfvk throws on failure, so reaching the save implies the wallet exists.
-    let ufvk = try initFromUfvk(ufvk: restoreUfvk, birthday: UInt32(birthday) ?? 0, serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: UInt32(minconfirmations) ?? 0)
+    let ufvk = try initFromUfvk(ufvk: restoreUfvk, birthday: UInt32(birthday) ?? 0, connection: connection(serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: minconfirmations))
     let ufvkStr = String(ufvk)
     reopenWalletFile()
     try self.saveWalletInternal()
@@ -596,7 +612,7 @@ class RPCModule: NSObject {
     performancelevel: String, 
     minconfirmations: String
   ) throws -> String {
-    let seed = try initFromBytes(walletBytes: try self.readWalletBytes(), serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: UInt32(minconfirmations) ?? 0)
+    let seed = try initFromBytes(walletBytes: try self.readWalletBytes(), connection: connection(serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: minconfirmations))
     reopenWalletFile()
     let seedStr = String(seed)
     return seedStr
@@ -787,7 +803,7 @@ class RPCModule: NSObject {
   func getLatestBlockServerInfo(_ serveruri: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
       DispatchQueue.global(qos: .userInitiated).async {
         FfiOutcome.of {
-          try getLatestBlockServer(serveruri: serveruri)
+          try getLatestBlockServer(serverUri: serveruri)
         }.settle(resolve: resolve, reject: reject)
       }
   }
@@ -967,7 +983,7 @@ class RPCModule: NSObject {
   func changeServerProcess(_ serveruri: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
       DispatchQueue.global(qos: .userInitiated).async {
         FfiOutcome.of {
-          try changeServer(serveruri: serveruri)
+          try changeServer(serverUri: serveruri)
         }.settle(resolve: resolve, reject: reject)
       }
   }
@@ -1165,7 +1181,7 @@ class RPCModule: NSObject {
   func setConfigWalletToProdProcess(_ performancelevel: String, minconfirmations: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
       DispatchQueue.global(qos: .userInitiated).async {
         FfiOutcome.of {
-          try setConfigWalletToProd(performancelevel: performancelevel, minconfirmations: UInt32(minconfirmations) ?? 0)
+          try setConfigWalletToProd(settings: syncSettings(performancelevel: performancelevel, minconfirmations: minconfirmations))
         }.settle(resolve: resolve, reject: reject)
       }
   }

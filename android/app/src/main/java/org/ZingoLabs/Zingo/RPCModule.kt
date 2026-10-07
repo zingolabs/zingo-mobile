@@ -91,7 +91,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     // The full zingolib parse behind every destructive file decision.
     private fun isIntactWallet(bytes: ByteArray): Boolean = try {
-        uniffi.zingo.validateWalletBytes(bytes)
+        uniffi.zingo.validateWalletBytes(walletBytes = bytes)
         true
     } catch (e: Exception) {
         Log.w("MAIN", "[Native] wallet bytes failed validation: $e")
@@ -100,7 +100,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     // Writes validated plain wallet bytes.
     private fun writeWalletBytes(fileName: String, bytes: ByteArray) {
-        uniffi.zingo.validateWalletBytes(bytes)
+        uniffi.zingo.validateWalletBytes(walletBytes = bytes)
         PlainWalletFile.write(applicationContext.filesDir, fileName, bytes)
     }
 
@@ -165,7 +165,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 )
         }
         try {
-            uniffi.zingo.validateWalletBytes(plain)
+            uniffi.zingo.validateWalletBytes(walletBytes = plain)
             if (PlainWalletFile.migrateIfStillLegacy(filesDir, fileName, plain)) {
                 Log.i("MAIN", "[$fileName] migrated to plain wallet bytes")
             }
@@ -467,7 +467,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         if (WalletFileEnvelope.classify(payload) != WalletFileEnvelope.PayloadKind.TINK_ENVELOPE) return "skipped"
         val unwrapped = unwrapToPlainWallet(fileName, payload) ?: return "failed"
         return try {
-            uniffi.zingo.validateWalletBytes(unwrapped.first)
+            uniffi.zingo.validateWalletBytes(walletBytes = unwrapped.first)
             file.copyTo(File(filesDir, "$fileName.prerepair"), overwrite = true)
             PlainWalletFile.write(filesDir, fileName, unwrapped.first)
             val verified = PlainWalletFile.readIfPlain(filesDir, fileName) != null
@@ -483,7 +483,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     // file and keeps the damaged bytes at "$fileName.broken".
     internal fun walletFileRecoveryInfoNative(): String {
         val file = File(applicationContext.filesDir, WalletFileName.value)
-        val salvaged = uniffi.zingo.readWalletRecoveryInfo(file.readBytes())
+        val salvaged = uniffi.zingo.readWalletRecoveryInfo(walletBytes = file.readBytes())
         file.copyTo(File(applicationContext.filesDir, "${WalletFileName.value}.broken"), overwrite = true)
         return salvaged
     }
@@ -519,6 +519,12 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         }
     }
 
+    private fun syncSettings(performancelevel: String, minconfirmations: String) =
+        uniffi.zingo.SyncSettings(performanceLevel = performancelevel, minConfirmations = minconfirmations.toUInt())
+
+    private fun connection(serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String) =
+        uniffi.zingo.Connection(serverUri = serveruri, chainHint = chainhint, sync = syncSettings(performancelevel, minconfirmations))
+
     @ReactMethod
     fun createNewWallet(serveruri: String, birthday: String, chainhint: String, performancelevel: String, minconfirmations: String, promise: Promise) {
         FfiOutcome.settling(promise, "init_new") {
@@ -528,7 +534,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             // implies the wallet exists. Offline (empty serveruri) uses
             // `birthday` in place of the chain tip; online it is ignored
             // (pass "0").
-            val resp = uniffi.zingo.initNew(serveruri, birthday.toUInt(), chainhint, performancelevel, minconfirmations.toUInt())
+            val resp = uniffi.zingo.initNew(connection = connection(serveruri, chainhint, performancelevel, minconfirmations), birthday = birthday.toUInt())
             walletFileClosed = false
             saveWalletFile()
             resp
@@ -540,7 +546,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         FfiOutcome.settling(promise, "init_from_seed") {
             uniffi.zingo.initLogging()
 
-            val resp = uniffi.zingo.initFromSeed(seed, birthday.toUInt(), serveruri, chainhint, performancelevel, minconfirmations.toUInt())
+            val resp = uniffi.zingo.initFromSeed(seed = seed, birthday = birthday.toUInt(), connection = connection(serveruri, chainhint, performancelevel, minconfirmations))
             walletFileClosed = false
             saveWalletFile()
             resp
@@ -552,7 +558,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         FfiOutcome.settling(promise, "init_from_ufvk") {
             uniffi.zingo.initLogging()
 
-            val resp = uniffi.zingo.initFromUfvk(ufvk, birthday.toUInt(), serveruri, chainhint, performancelevel, minconfirmations.toUInt())
+            val resp = uniffi.zingo.initFromUfvk(ufvk = ufvk, birthday = birthday.toUInt(), connection = connection(serveruri, chainhint, performancelevel, minconfirmations))
             walletFileClosed = false
             saveWalletFile()
             resp
@@ -574,7 +580,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         val walletBytes = readWalletBytes(WalletFileName.value)
         Log.i("MAIN", "file size: ${walletBytes.size} bytes")
 
-        val resp = uniffi.zingo.initFromBytes(walletBytes, serveruri, chainhint, performancelevel, minconfirmations.toUInt())
+        val resp = uniffi.zingo.initFromBytes(walletBytes = walletBytes, connection = connection(serveruri, chainhint, performancelevel, minconfirmations))
         walletFileClosed = false
         migrateRetainedWallet()
         return resp
@@ -709,7 +715,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun getLatestBlockServerInfo(serveruri: String, promise: Promise) {
         FfiOutcome.settling(promise, "get_latest_block_server") {
             uniffi.zingo.initLogging()
-            uniffi.zingo.getLatestBlockServer(serveruri)
+            uniffi.zingo.getLatestBlockServer(serverUri = serveruri)
         }
     }
 
@@ -820,7 +826,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun changeServerProcess(serveruri: String, promise: Promise) {
         FfiOutcome.settling(promise, "change_server") {
             uniffi.zingo.initLogging()
-            uniffi.zingo.changeServer(serveruri)
+            uniffi.zingo.changeServer(serverUri = serveruri)
         }
     }
 
@@ -836,7 +842,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun parseAddressInfo(address: String, promise: Promise) {
         FfiOutcome.settling(promise, "parse_address") {
             uniffi.zingo.initLogging()
-            uniffi.zingo.parseAddress(address)
+            uniffi.zingo.parseAddress(address = address)
         }
     }
 
@@ -844,7 +850,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun parseUfvkInfo(ufvk: String, promise: Promise) {
         FfiOutcome.settling(promise, "parse_ufvk") {
             uniffi.zingo.initLogging()
-            uniffi.zingo.parseUfvk(ufvk)
+            uniffi.zingo.parseUfvk(ufvk = ufvk)
         }
     }
 
@@ -860,7 +866,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun getMessagesInfo(address: String, promise: Promise) {
         FfiOutcome.settling(promise, "get_messages") {
             uniffi.zingo.initLogging()
-            uniffi.zingo.getMessages(address)
+            uniffi.zingo.getMessages(address = address)
         }
     }
 
@@ -908,7 +914,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun removeTransactionProcess(txid: String, promise: Promise) {
         FfiOutcome.settling(promise, "remove_transaction") {
             uniffi.zingo.initLogging()
-            uniffi.zingo.removeTransaction(txid)
+            uniffi.zingo.removeTransaction(txid = txid)
         }
     }
 
@@ -920,7 +926,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     @ReactMethod
     fun setBroadcastCandidates(candidatesJson: String, promise: Promise) {
         FfiOutcome.settling(promise, "set_broadcast_candidates") {
-            uniffi.zingo.setBroadcastCandidates(candidatesJson)
+            uniffi.zingo.setBroadcastCandidates(candidatesJson = candidatesJson)
         }
     }
 
@@ -928,7 +934,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun attachMixnet(socks5Addr: String, exitNode: String, promise: Promise) {
         FfiOutcome.settling(promise, "attach_mixnet") {
             uniffi.zingo.initLogging()
-            uniffi.zingo.attachMixnet(socks5Addr, exitNode)
+            uniffi.zingo.attachMixnet(socks5Addr = socks5Addr, exitNode = exitNode)
         }
     }
 
@@ -936,7 +942,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun enableMixnet(proxyPath: String, promise: Promise) {
         FfiOutcome.settling(promise, "enable_mixnet") {
             uniffi.zingo.initLogging()
-            uniffi.zingo.enableMixnet(proxyPath)
+            uniffi.zingo.enableMixnet(proxyPath = proxyPath)
         }
     }
 
@@ -968,7 +974,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun getSpendableBalanceWithAddressInfo(address: String, promise: Promise) {
         FfiOutcome.settling(promise, "get_spendable_balance_with_address") {
             uniffi.zingo.initLogging()
-            uniffi.zingo.getSpendableBalanceWithAddress(address)
+            uniffi.zingo.getSpendableBalanceWithAddress(address = address)
         }
     }
 
@@ -1016,7 +1022,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun createNewUnifiedAddressProcess(receivers: String, promise: Promise) {
         FfiOutcome.settling(promise, "create_new_unified_address") {
             uniffi.zingo.initLogging()
-            uniffi.zingo.createNewUnifiedAddress(receivers)
+            uniffi.zingo.createNewUnifiedAddress(receivers = receivers)
         }
     }
 
@@ -1032,7 +1038,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun checkMyAddressInfo(address: String, promise: Promise) {
         FfiOutcome.settling(promise, "check_my_address") {
             uniffi.zingo.initLogging()
-            uniffi.zingo.checkMyAddress(address)
+            uniffi.zingo.checkMyAddress(address = address)
         }
     }
 
@@ -1048,7 +1054,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun setConfigWalletToProdProcess(performancelevel: String, minconfirmations: String, promise: Promise) {
         FfiOutcome.settling(promise, "set_config_wallet_to_prod") {
             uniffi.zingo.initLogging()
-            uniffi.zingo.setConfigWalletToProd(performancelevel, minconfirmations.toUInt())
+            uniffi.zingo.setConfigWalletToProd(settings = syncSettings(performancelevel, minconfirmations))
         }
     }
     
@@ -1072,7 +1078,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun sendProcess(send_json: String, promise: Promise) {
         FfiOutcome.settling(promise, "send") {
             uniffi.zingo.initLogging()
-            uniffi.zingo.send(send_json)
+            uniffi.zingo.send(sendJson = send_json)
         }
     }
 
@@ -1080,7 +1086,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun sendAllProcess(address: String, memo: String, promise: Promise) {
         FfiOutcome.settling(promise, "send_all") {
             uniffi.zingo.initLogging()
-            uniffi.zingo.sendAll(address, memo)
+            uniffi.zingo.sendAll(address = address, memo = memo)
         }
     }
 
@@ -1142,10 +1148,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun startIronwoodMigrationProcess(planHashHex: String, perBucket: String, promise: Promise) {
         FfiOutcome.settling(promise, "start_ironwood_migration") {
             uniffi.zingo.initLogging()
-            uniffi.zingo.startIronwoodMigration(
-                planHashHex,
-                FfiArgs.optionalU32(perBucket, "per_bucket")
-            )
+            uniffi.zingo.startIronwoodMigration(planHashHex = planHashHex, perBucket = FfiArgs.optionalU32(perBucket, "per_bucket"))
         }
     }
 
@@ -1186,7 +1189,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun reschedulePartsProcess(perBucket: String, promise: Promise) {
         FfiOutcome.settling(promise, "reschedule_parts") {
             uniffi.zingo.initLogging()
-            uniffi.zingo.rescheduleParts(FfiArgs.requiredU32(perBucket, "per_bucket"))
+            uniffi.zingo.rescheduleParts(perBucket = FfiArgs.requiredU32(perBucket, "per_bucket"))
         }
     }
 
@@ -1221,7 +1224,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun executeDuePartsProcess(spacingMs: String, promise: Promise) {
         FfiOutcome.settling(promise, "execute_due_parts") {
             uniffi.zingo.initLogging()
-            uniffi.zingo.executeDueParts(FfiArgs.requiredU64(spacingMs, "spacing_ms"))
+            uniffi.zingo.executeDueParts(spacingMs = FfiArgs.requiredU64(spacingMs, "spacing_ms"))
         }
     }
 
