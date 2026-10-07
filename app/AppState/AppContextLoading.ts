@@ -8,7 +8,6 @@ import ServerType from './types/ServerType';
 import { LanguageEnum } from './enums/LanguageEnum';
 import { SelectServerEnum } from './enums/SelectServerEnum';
 import { SnackbarDurationEnum } from './enums/SnackbarDurationEnum';
-import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
 import { BlockExplorerEnum } from './enums/BlockExplorerEnum';
 
 export default interface AppContextLoading {
@@ -33,6 +32,5 @@ export default interface AppContextLoading {
   privacy: boolean;
   biometrics: boolean;
   selectServer: SelectServerEnum;
-  performanceLevel: RPCPerformanceLevelEnum;
   blockExplorer: BlockExplorerEnum;
 }

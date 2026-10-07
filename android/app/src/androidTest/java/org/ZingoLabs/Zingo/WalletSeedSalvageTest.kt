@@ -31,7 +31,7 @@ class WalletSeedSalvageTest {
         walletFile().delete()
         brokenFile().delete()
         uniffi.zingo.initLogging()
-        uniffi.zingo.initFromSeed(Seeds.HOSPITAL, 2000000u, "", "main", "Medium", 1u)
+        uniffi.zingo.initFromSeed(Seeds.HOSPITAL, 2000000u, "", "main", 1u)
         plainWallet = uniffi.zingo.saveWalletBytes()!!
     }
 

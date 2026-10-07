@@ -44,22 +44,22 @@ describe('init family wrappers pass resolutions through and type rejections', ()
     [
       'init_new',
       'createNewWallet',
-      () => createNewWallet('uri', '0', 'main', 'Medium', '1'),
+      () => createNewWallet('uri', '0', 'main', '1'),
     ],
     [
       'init_from_seed',
       'restoreWalletFromSeed',
-      () => restoreWalletFromSeed('seed', '1', 'uri', 'main', 'Medium', '1'),
+      () => restoreWalletFromSeed('seed', '1', 'uri', 'main', '1'),
     ],
     [
       'init_from_ufvk',
       'restoreWalletFromUfvk',
-      () => restoreWalletFromUfvk('ufvk', '1', 'uri', 'main', 'Medium', '1'),
+      () => restoreWalletFromUfvk('ufvk', '1', 'uri', 'main', '1'),
     ],
     [
       'init_from_bytes',
       'loadExistingWallet',
-      () => loadExistingWallet('uri', 'main', 'Medium', '1'),
+      () => loadExistingWallet('uri', 'main', '1'),
     ],
   ];
 
@@ -186,11 +186,6 @@ describe('read getter rejections are contained and reported, never sniffed', () 
       'get_wallet_save_required',
       'getWalletSaveRequiredInfo',
       ds => ds.getWalletSaveRequired(),
-    ],
-    [
-      'get_config_wallet_performance',
-      'getConfigWalletPerformanceInfo',
-      ds => ds.getConfigWalletPerformance(),
     ],
     ['get_wallet_version', 'getWalletVersionInfo', ds => ds.getWalletVersion()],
     ['get_balance', 'getBalanceInfo', ds => ds.fetchTotalBalance()],

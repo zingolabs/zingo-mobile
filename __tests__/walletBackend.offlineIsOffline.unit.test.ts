@@ -71,7 +71,6 @@ const mockAnswers: Record<string, string> = {
   mixnetIndicatorInfo: JSON.stringify({ mixnet_indicator: 'off' }),
   mixnetBootstrapDetailInfo: JSON.stringify({ detail: '' }),
   disableMixnet: JSON.stringify({ mixnet_indicator: 'off' }),
-  getConfigWalletPerformance: JSON.stringify({ performance: 'High' }),
   pollSyncInfo: 'Sync task has not been launched.',
 };
 
@@ -106,8 +105,6 @@ const WALLET_LOCAL = new Set([
   'getWalletSaveRequiredInfo',
   'doSave',
   'doSaveBackup',
-  'getConfigWalletPerformanceInfo',
-  'setConfigWalletToProdProcess',
   'getOptionWalletInfo',
   'setOptionWalletProcess',
   'removeTransactionProcess',

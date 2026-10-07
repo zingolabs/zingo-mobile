@@ -15,7 +15,6 @@ interface RPCModuleAPI {
     serverUri: string,
     birthday: string,
     chainHint: string,
-    performanceLevel: string,
     minConfirmations: string,
   ): Promise<string>;
   restoreWalletFromSeed(
@@ -23,7 +22,6 @@ interface RPCModuleAPI {
     birthday: string,
     serverUri: string,
     chainHint: string,
-    performanceLevel: string,
     minConfirmations: string,
   ): Promise<string>;
   restoreWalletFromUfvk(
@@ -31,13 +29,11 @@ interface RPCModuleAPI {
     birthday: string,
     serverUri: string,
     chainHint: string,
-    performanceLevel: string,
     minConfirmations: string,
   ): Promise<string>;
   loadExistingWallet(
     serverUri: string,
     chainHint: string,
-    performanceLevel: string,
     minConfirmations: string,
   ): Promise<string>;
   restoreExistingWalletBackup(): Promise<string>;
@@ -148,11 +144,6 @@ interface RPCModuleAPI {
   // Wallet options / configuration
   getOptionWalletInfo(): Promise<string>;
   setOptionWalletProcess(): Promise<string>;
-  getConfigWalletPerformanceInfo(): Promise<string>;
-  setConfigWalletToProdProcess(
-    performanceLevel: string,
-    minConfirmations: string,
-  ): Promise<string>;
 
   setBroadcastCandidates(candidatesJson: string): Promise<string>;
 

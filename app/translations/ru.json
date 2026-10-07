@@ -264,24 +264,6 @@
         "text": "Обычный режим, вы сможете увидеть всю информацию на экране."
       }
     ],
-    "performancelevels": [
-      {
-        "value": "Maximum",
-        "text": "For very powerful devices."
-      },
-      {
-        "value": "High",
-        "text": "For devices with a lot of Memory."
-      },
-      {
-        "value": "Medium",
-        "text": "For regular devices."
-      },
-      {
-        "value": "Low",
-        "text": "For old devices."
-      }
-    ],
     "blockexplorers": [
       {
         "value": "Zcashexplorer",
@@ -329,7 +311,6 @@
     "language-title": "Язык",
     "islanguage": "Выберите язык для приложения.",
     "privacy-title": "Скрывать конфиденциальные значения",
-    "performancelevel-title": "Zingolib Performance Level",
     "blockexplorer-title": "Block Explorer",
     "value-language-en": "Английский",
     "value-language-es": "Испанский",
@@ -343,10 +324,6 @@
     "value-chainname-none": "Нет",
     "server-chain-title": "Сеть",
     "select-chain-placeholder": "Выберите сеть...",
-    "value-performancelevel-Maximum": "Maximum",
-    "value-performancelevel-High": "High",
-    "value-performancelevel-Medium": "Medium",
-    "value-performancelevel-Low": "Low",
     "value-blockexplorer-Zcashexplorer": "Zcashexplorer",
     "value-blockexplorer-ZecBlock": "ZecBlock",
     "value-blockexplorer-Zexplorer": "Zexplorer",

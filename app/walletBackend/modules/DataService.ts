@@ -32,8 +32,6 @@ import { RPCValueTransferType } from '@app/walletBackend/types/RPCValueTransferT
 import { RPCTransparentAddressType } from '@app/walletBackend/types/RPCTransparentAddressType';
 import { RPCSpendablebalanceType } from '@app/walletBackend/types/RPCSpendablebalanceType';
 import { RPCWalletSaveRequiredType } from '@app/walletBackend/types/RPCWalletSaveRequiredType';
-import { RPCConfigWalletPerformanceType } from '@app/walletBackend/types/RPCConfigWalletPerformanceType';
-import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
 import { RPCWalletVersionType } from '@app/walletBackend/types/RPCWalletVersionType';
 import {
   WalletBackendConfig,
@@ -557,34 +555,6 @@ export class DataService {
       return false;
     } finally {
       this.getWalletSaveRequiredLock = false;
-    }
-  }
-
-  async getConfigWalletPerformance(): Promise<
-    RPCPerformanceLevelEnum | undefined
-  > {
-    try {
-      const start = Date.now();
-      const configWalletPerformanceStr: string =
-        await RPCModule.getConfigWalletPerformanceInfo();
-      if (Date.now() - start > 4000) {
-        console.log(
-          '=========================================== > wallet config performance - ',
-          Date.now() - start,
-        );
-      }
-      if (!configWalletPerformanceStr) {
-        console.log('Internal Error wallet config performance');
-        return;
-      }
-      const configWalletPerformanceJSON: RPCConfigWalletPerformanceType =
-        await JSON.parse(configWalletPerformanceStr);
-
-      return configWalletPerformanceJSON.performance_level;
-    } catch (error) {
-      console.log(`Critical Error wallet config performance ${error}`);
-      this.config.onError(`Error wallet config performance: ${error}`);
-      return;
     }
   }
 

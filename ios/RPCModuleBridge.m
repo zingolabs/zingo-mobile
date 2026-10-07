@@ -25,7 +25,6 @@ RCT_EXTERN_METHOD(createNewWallet:
     (NSString)serveruri
                   birthday:(NSString)birthday
                   chainhint:(NSString)chainhint
-                  performancelevel:(NSString)performancelevel
                   minconfirmations:(NSString)minconfirmations
                   resolve:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
@@ -34,7 +33,6 @@ RCT_EXTERN_METHOD(restoreWalletFromSeed:
                   birthday:(NSString)birthday
                   serveruri:(NSString)serveruri
                   chainhint:(NSString)chainhint
-                  performancelevel:(NSString)performancelevel
                   minconfirmations:(NSString)minconfirmations
                   resolve:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
@@ -43,14 +41,12 @@ RCT_EXTERN_METHOD(restoreWalletFromUfvk:
                   birthday:(NSString)birthday
                   serveruri:(NSString)serveruri
                   chainhint:(NSString)chainhint
-                  performancelevel:(NSString)performancelevel
                   minconfirmations:(NSString)minconfirmations
                   resolve:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(loadExistingWallet:
     (NSString)serveruri 
                   chainhint:(NSString)chainhint
-                  performancelevel:(NSString)performancelevel
                   minconfirmations:(NSString)minconfirmations
                   resolve:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
@@ -203,14 +199,6 @@ RCT_EXTERN_METHOD(checkMyAddressInfo:
                   resolve:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(getWalletSaveRequiredInfo:
-    (RCTPromiseResolveBlock)resolve
-                  reject:(RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(setConfigWalletToProdProcess:
-    (NSString)performancelevel
-                  minconfirmations:(NSString)minconfirmations
-                  resolve:(RCTPromiseResolveBlock)resolve
-                  reject:(RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(getConfigWalletPerformanceInfo:
     (RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(getWalletVersionInfo:

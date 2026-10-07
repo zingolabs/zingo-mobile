@@ -1,4 +1,3 @@
-import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
 import { BlockExplorerEnum } from '@app/AppState/enums/BlockExplorerEnum';
 import { LanguageEnum } from '@app/AppState/enums/LanguageEnum';
 import { SelectServerEnum } from '@app/AppState/enums/SelectServerEnum';
@@ -16,7 +15,6 @@ export default class SettingsFileClass {
   // - string: means it have a normal value
   biometrics: boolean;
   selectServer: SelectServerEnum;
-  performanceLevel: RPCPerformanceLevelEnum;
   blockExplorer: BlockExplorerEnum;
   ironwoodOnboardSeen: boolean;
 
@@ -28,7 +26,6 @@ export default class SettingsFileClass {
     version: string,
     biometrics: boolean,
     selectServer: SelectServerEnum,
-    performanceLevel: RPCPerformanceLevelEnum,
     blockExplorer: BlockExplorerEnum,
     ironwoodOnboardSeen: boolean,
   ) {
@@ -39,7 +36,6 @@ export default class SettingsFileClass {
     this.version = version;
     this.biometrics = biometrics;
     this.selectServer = selectServer;
-    this.performanceLevel = performanceLevel;
     this.blockExplorer = blockExplorer;
     this.ironwoodOnboardSeen = ironwoodOnboardSeen;
   }

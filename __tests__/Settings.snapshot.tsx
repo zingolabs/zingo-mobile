@@ -55,7 +55,6 @@ describe('Component Settings - test', () => {
           setLanguageOption={onSetOption}
           setBiometricsOption={onSetOption}
           setSelectServerOption={onSetOption}
-          setPerformanceLevelOption={onSetOption}
           setBlockExplorerOption={onSetOption}
           toggleMenuDrawer={toggle}
         />

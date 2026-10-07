@@ -42,7 +42,6 @@ import {
   removeTransaction,
   sendAllPropose,
   sendPropose,
-  setConfigWalletToProd,
   shieldConfirm,
   shieldPropose,
 } from '@app/walletBackend/utils/walletUtils';
@@ -57,11 +56,6 @@ const proseLikeData = 'Error: looks like prose but is legitimate data';
 const wrappers: Array<[string, string, () => Promise<FfiResult<string>>]> = [
   ['changeServerProcess', 'changeServer', () => changeServer('uri')],
   ['infoServerInfo', 'getServerInfo', () => getServerInfo()],
-  [
-    'setConfigWalletToProdProcess',
-    'setConfigWalletToProd',
-    () => setConfigWalletToProd('Medium', '1'),
-  ],
   ['getBalanceInfo', 'getBalanceInfo', () => getBalanceInfo()],
   ['getVersionInfo', 'getVersionInfo', () => getVersionInfo()],
   ['walletKindInfo', 'getWalletKind', () => getWalletKind()],

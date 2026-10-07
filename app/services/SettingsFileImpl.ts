@@ -15,7 +15,6 @@ import {
 } from '@app/AppState';
 import { serverUris } from '@app/uris';
 import { isEqual } from 'lodash';
-import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
 
 type ServerWire = { uri: string; chainName: ChainNameEnum };
 type SelectServerWire = SelectServerEnum | 'offline';
@@ -241,10 +240,7 @@ export default class SettingsFileImpl {
       delete obsolete.basicFirstViewSeed;
       delete obsolete.security;
       delete obsolete.recoveryWalletInfoOnDevice;
-      if (!settings.hasOwnProperty(SettingsNameEnum.performanceLevel)) {
-        // by default medium
-        settings.performanceLevel = RPCPerformanceLevelEnum.Medium;
-      }
+      delete obsolete.performanceLevel;
       if (!settings.hasOwnProperty(SettingsNameEnum.blockExplorer)) {
         // by default Zcashexplorer
         settings.blockExplorer = BlockExplorerEnum.Zcashexplorer;

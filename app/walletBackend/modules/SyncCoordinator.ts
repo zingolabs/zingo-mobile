@@ -2,9 +2,8 @@
  * Drives the wallet sync lifecycle.
  *
  * A single 5 s setInterval (updateTimerID) calls runTaskPromises() which:
- *   1. Adjusts performance level if it drifted from config.
- *   2. Calls fetchSyncPoll() to check whether a sync task is running.
- *   3. If save_required, also fetches all wallet state and persists to disk.
+ *   1. Calls fetchSyncPoll() to check whether a sync task is running.
+ *   2. If save_required, also fetches all wallet state and persists to disk.
  *
  * Lock flags on this class (refreshSyncLock, fetchSyncStatusLock,
  * fetchSyncPollLock) and on DataService are checked before scheduling
@@ -12,12 +11,11 @@
  *
  * To add a new periodic task, push it into taskPromises inside runTaskPromises.
  */
-import { TotalBalanceClass, GlobalConst } from '@app/AppState';
+import { TotalBalanceClass } from '@app/AppState';
 import RPCModule from '@app/RPCModule';
 import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
 import { RPCSyncPollType } from '@app/walletBackend/types/RPCSyncPollType';
 import { scanInProgress } from '@app/walletBackend/utils/syncProgress';
-import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
 import {
   WalletBackendConfig,
   isOffline,
@@ -44,8 +42,6 @@ export class SyncCoordinator {
 
   syncLaunchFailures: number = 0;
 
-  walletConfigPerformanceLevel: RPCPerformanceLevelEnum | undefined;
-
   constructor(config: WalletBackendConfig, dataService: DataService) {
     this.config = config;
     this.dataService = dataService;
@@ -71,44 +67,6 @@ export class SyncCoordinator {
 
   async runTaskPromises(): Promise<void> {
     this.sanitizeTimers();
-
-    if (this.walletConfigPerformanceLevel !== this.config.performanceLevel) {
-      const performance = await this.dataService.getConfigWalletPerformance();
-      this.walletConfigPerformanceLevel = performance;
-      console.log(
-        '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ PERFORMANCE LEVEL',
-        performance,
-      );
-      if (performance !== this.config.performanceLevel) {
-        // setConfigWalletToProdProcess rejects on failure (typed FFI errors);
-        // the catch owns the error path, and this tick's caller is a
-        // setInterval with no rejection handler, so the rejection must be
-        // contained here.
-        try {
-          const setConfigWallet = await RPCModule.setConfigWalletToProdProcess(
-            this.config.performanceLevel,
-            GlobalConst.minConfirmations.toString(),
-          );
-          console.log(
-            '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ SET CONFIG WALLET',
-            setConfigWallet,
-          );
-        } catch (error) {
-          this.config.onError(`Set wallet to prod error: ${error}`);
-        }
-        // The seam classifies the trimodal native resolution and contains
-        // a rejection as false; this tick has no rejection handler of its
-        // own (audit Issue P).
-        await doSave();
-        const performanceChanged =
-          await this.dataService.getConfigWalletPerformance();
-        this.walletConfigPerformanceLevel = performanceChanged;
-        console.log(
-          '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ PERFORMANCE LEVEL CHANGED',
-          performanceChanged,
-        );
-      }
-    }
 
     const taskPromises: Promise<void>[] = [];
 

@@ -1,5 +1,4 @@
 import { LanguageEnum, BlockExplorerEnum } from '@app/AppState';
-import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
 
 export const mockTranslate = (p: string) => {
   if (p === 'about.copyright') {
@@ -40,25 +39,6 @@ export const mockTranslate = (p: string) => {
       {
         value: LanguageEnum.tr,
         text: 'text tr',
-      },
-    ];
-  } else if (p === 'settings.performancelevels') {
-    return [
-      {
-        value: RPCPerformanceLevelEnum.High,
-        text: 'text high',
-      },
-      {
-        value: RPCPerformanceLevelEnum.Low,
-        text: 'text low',
-      },
-      {
-        value: RPCPerformanceLevelEnum.Maximum,
-        text: 'text maximum',
-      },
-      {
-        value: RPCPerformanceLevelEnum.Medium,
-        text: 'text medium',
       },
     ];
   } else if (p === 'settings.blockexplorers') {

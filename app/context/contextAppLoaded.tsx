@@ -20,7 +20,6 @@ import {
 } from '@app/AppState';
 
 import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
-import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
 
 export const defaultAppContextLoaded: AppContextLoaded = {
   netInfo: {} as NetInfoType,
@@ -72,7 +71,6 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   doRefresh: () => {},
   setZecPrice: () => {},
   zingolibVersion: '',
-  performanceLevel: RPCPerformanceLevelEnum.Medium,
   setPrivacyOption: async () => {},
   blockExplorer: BlockExplorerEnum.Zcashexplorer,
   mixnetView: ABSENT_MIXNET_VIEW,
