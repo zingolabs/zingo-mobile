@@ -446,9 +446,16 @@ export class LoadingAppClass extends Component<
     // invites stale-entry reuse. Fire-and-forget, best-effort, idempotent.
     retireSentinelEntries();
 
+    // The start gate guards the wallet file. Without one there is nothing
+    // behind it — viewing a stored recovery phrase runs its own gate
+    // (viewRecoveryWallet) — and asking anyway only puts the fail-open
+    // notice on the Welcome, over Create New Wallet, on any device without
+    // a screen lock.
+    const exists = await rpcWalletExists();
+
     // to start the App the first time in this session
     // the user have to pass the security of the device
-    if (this.state.startingApp) {
+    if (this.state.startingApp && exists) {
       if (this.state.biometricGate.kind === 'declined') {
         // A biometric fail, likely from the foreground check: keep the App
         // on the first screen so the user can try again.
@@ -502,9 +509,8 @@ export class LoadingAppClass extends Component<
       await this.selectServerOnBoot(!!netInfoState.isConnected);
     }
 
-    // Second, check if a wallet exists. Do it async so the screen has time to render
+    // Second, open the wallet when there is one.
     await AsyncStorage.setItem(GlobalConst.background, GlobalConst.no);
-    const exists = await rpcWalletExists();
 
     if (exists) {
       this.setState({ walletExists: true });
