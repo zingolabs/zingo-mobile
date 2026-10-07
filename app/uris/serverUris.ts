@@ -13,28 +13,10 @@ const serverUris = (
       latency: null,
       obsolete: false,
     },
-    // recommended Zaino servers. Placeholders until the real list arrives.
+    // recommended Zaino servers
     {
-      uri: 'https://sa.zaino.example:443',
-      region: translate('settings.sa') as string,
-      chainName: ChainNameEnum.mainChainName,
-      default: false,
-      latency: null,
-      obsolete: false,
-      recommended: true,
-    },
-    {
-      uri: 'https://na.zaino.example:443',
+      uri: 'https://mainnet.zainod.zingolabs.dev:443',
       region: translate('settings.na') as string,
-      chainName: ChainNameEnum.mainChainName,
-      default: false,
-      latency: null,
-      obsolete: false,
-      recommended: true,
-    },
-    {
-      uri: 'https://eu.zaino.example:443',
-      region: translate('settings.ea') as string,
       chainName: ChainNameEnum.mainChainName,
       default: false,
       latency: null,
