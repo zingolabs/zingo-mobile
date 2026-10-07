@@ -500,6 +500,7 @@ const Server: React.FunctionComponent<ServerProps> = ({
     <View style={{ flex: 1, backgroundColor: 'transparent' }}>
       <View
         testID="server.card"
+        accessible
         style={{
           position: 'absolute',
           left: 22.5,

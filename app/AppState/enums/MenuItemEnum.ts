@@ -11,5 +11,6 @@ export enum MenuItemEnum {
   AddressBook = 'Address Book',
   About = 'About',
   Support = 'Support',
+  Server = 'Server',
   //Chats = 'Chats',
 }
