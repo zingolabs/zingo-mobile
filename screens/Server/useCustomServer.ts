@@ -109,15 +109,22 @@ export const useCustomServer = ({
     return !!saved && !!d.host.trim() && uriOf(chain, d) === saved;
   };
 
-  const setHost = (chain: ChainNameEnum, text: string) => {
-    let host = text;
+  // The scheme is fixed, so a typed or pasted one is dropped; a port after
+  // the host moves to its own box. True when it did, for the focus to follow.
+  const setHost = (chain: ChainNameEnum, text: string): boolean => {
+    // "https:" on its way to "https://" is a scheme, not a host and a port.
+    const scheme = /^\s*https?:?\/{0,2}$/i.test(text);
+    let host = scheme ? text : text.replace(/^\s*https?:\/\//i, '');
     let port = draft(chain).port;
-    if (/:\/\/|:\d/.test(text)) {
-      const [h, p] = splitUrl(text);
-      host = h;
-      port = p || port;
+    const split = scheme ? null : /^([^/:\s]+):(\d*)/.exec(host);
+    if (split) {
+      host = split[1];
+      port = split[2].slice(0, 5) || port;
+    } else if (!scheme) {
+      host = host.replace(/\/.*$/, '');
     }
     update(chain, d => ({ ...d, host, port, log: [], shown: 0, tested: null }));
+    return !!split;
   };
   const setPort = (chain: ChainNameEnum, text: string) =>
     update(chain, d => ({

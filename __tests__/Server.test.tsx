@@ -158,6 +158,21 @@ test('Tests that pasting a full address splits it into host and port', () => {
   expect(screen.getByTestId('server.custom.port').props.value).toBe('9067');
 });
 
+test('Tests that typing a scheme drops it and a colon after the host moves to the port', () => {
+  mount({});
+  fireEvent.press(screen.getByTestId('server.custom'));
+  const typed = 'https://na.zec.rocks:';
+  for (let i = 1; i <= typed.length; i++) {
+    const field = screen.getByTestId('server.custom.host');
+    fireEvent.changeText(field, field.props.value + typed[i - 1]);
+  }
+  expect(screen.getByTestId('server.custom.host').props.value).toBe(
+    'na.zec.rocks',
+  );
+  fireEvent.changeText(screen.getByTestId('server.custom.port'), '443');
+  expect(screen.getByTestId('server.custom.port').props.value).toBe('443');
+});
+
 test('Tests that a passing test logs each step and asks to save, without switching', async () => {
   const h = handlers();
   probe.mockResolvedValue(verified());

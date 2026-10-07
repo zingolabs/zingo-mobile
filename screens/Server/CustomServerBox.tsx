@@ -48,7 +48,8 @@ type CustomServerBoxProps = {
     hostRegtest: string;
     port: string;
   };
-  onHost: (text: string) => void;
+  // True when the text carried a port, which moved to its own box.
+  onHost: (text: string) => boolean;
   onPort: (text: string) => void;
   onTest: () => void;
   onSave: () => void;
@@ -168,7 +169,12 @@ const CustomServerBox: React.FC<CustomServerBoxProps> = ({
           testID="server.custom.host"
           accessibilityLabel={labels.host}
           value={host}
-          onChangeText={onHost}
+          onChangeText={text => {
+            if (onHost(text)) {
+              portInput.current?.focus();
+            }
+          }}
+          selectTextOnFocus
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
           onSubmitEditing={() => {
@@ -214,6 +220,7 @@ const CustomServerBox: React.FC<CustomServerBoxProps> = ({
             accessibilityLabel={labels.port}
             value={port}
             onChangeText={onPort}
+            selectTextOnFocus
             onFocus={() => setFocused(true)}
             onBlur={() => setFocused(false)}
             onSubmitEditing={() => {
