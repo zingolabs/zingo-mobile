@@ -8,25 +8,20 @@ import React from 'react';
 import { render } from '@testing-library/react-native';
 import type { ReactTestInstance } from 'react-test-renderer';
 import Send from '@screens/Send';
-import Settings from '@screens/Settings';
 import ImportUfvk from '@screens/ImportUfvk';
+import Server from '@screens/Server';
 import {
   defaultAppContextLoaded,
   ContextAppLoadedProvider,
 } from '@app/context';
-import {
-  BlockExplorerEnum,
-  LanguageEnum,
-  RouteEnum,
-  SelectServerEnum,
-} from '@app/AppState';
+import { ChainNameEnum, RouteEnum, SelectServerEnum } from '@app/AppState';
+import { remoteServer } from '@app/AppState/types/ServerType';
 import { mockValueTransfers } from '../__mocks__/dataMocks/mockValueTransfers';
 import { mockAddresses } from '../__mocks__/dataMocks/mockAddresses';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockZecPrice } from '../__mocks__/dataMocks/mockZecPrice';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
-import { mockServer } from '../__mocks__/dataMocks/mockServer';
 import mockSendPageState from '../__mocks__/dataMocks/mockSendPageState';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -49,22 +44,6 @@ function accessibleAncestor(element: ReactTestInstance): string | undefined {
     ancestor = ancestor.parent;
   }
   return undefined;
-}
-
-/**
- * The `accessible` prop of the bottom sheet modal that holds an element.
- * The modal is one accessibility element unless the prop is false, and on
- * iOS it then swallows the test IDs of the whole sheet.
- */
-function sheetAccessible(element: ReactTestInstance): unknown {
-  let ancestor = element.parent;
-  while (ancestor) {
-    if ('enablePanDownToClose' in ancestor.props) {
-      return ancestor.props.accessible;
-    }
-    ancestor = ancestor.parent;
-  }
-  throw new Error('the element is in no bottom sheet modal');
 }
 
 function drawerProps<R extends RouteEnum.Send | RouteEnum.Settings>(
@@ -122,40 +101,6 @@ describe('Maestro reaches each typed field on iOS', () => {
     }
   });
 
-  test('the custom server field and the server options', () => {
-    const state = loadedState();
-    state.server = mockServer;
-    state.selectServer = SelectServerEnum.custom;
-    state.language = LanguageEnum.en;
-    state.blockExplorer = BlockExplorerEnum.Zcashexplorer;
-    const settings = render(
-      <ContextAppLoadedProvider value={state}>
-        <Settings
-          {...drawerProps(RouteEnum.Settings)}
-          setServerOption={onFunction}
-          setLanguageOption={onFunction}
-          setBiometricsOption={onFunction}
-          setSelectServerOption={onFunction}
-          setPerformanceLevelOption={onFunction}
-          setBlockExplorerOption={onFunction}
-          toggleMenuDrawer={onFunction}
-        />
-      </ContextAppLoadedProvider>,
-    );
-    expect(
-      accessibleAncestor(settings.getByTestId('settings.custom-server-field')),
-    ).toBeUndefined();
-    for (const id of [
-      'settings.list-server',
-      'settings.custom-server',
-      'settings.custom-server-clear',
-    ]) {
-      const option = settings.getByTestId(id);
-      expect([id, accessibleAncestor(option)]).toEqual([id, undefined]);
-      expect([id, sheetAccessible(option)]).toEqual([id, false]);
-    }
-  });
-
   test('the restore seed and birthday fields', () => {
     const importUfvk = render(
       <ContextAppLoadedProvider value={loadedState()}>
@@ -168,6 +113,44 @@ describe('Maestro reaches each typed field on iOS', () => {
     );
     for (const id of ['import.seedufvkinput', 'import.birthdayinput']) {
       expect(accessibleAncestor(importUfvk.getByTestId(id))).toBeUndefined();
+    }
+  });
+
+  test('the custom server host, port and buttons', () => {
+    const server = render(
+      <Server
+        translate={mockTranslate}
+        server={remoteServer(
+          'https://node.myhome.net:9067',
+          ChainNameEnum.mainChainName,
+        )}
+        selectServer={SelectServerEnum.custom}
+        status="ok"
+        blockHeight="1"
+        busy={false}
+        online={true}
+        recommended={[]}
+        latencies={{}}
+        onAuto={onFunction}
+        onPick={onFunction}
+        onSaveCustom={async () => true}
+        onOffline={onFunction}
+        onOther={onFunction}
+        onProbe={onFunction}
+        onUnreachable={onFunction}
+        onBack={onFunction}
+      />,
+    );
+    for (const id of [
+      'server.custom.host',
+      'server.custom.port',
+      'server.custom.test',
+      'server.custom.save',
+      'server.custom.log.final.ok',
+      'server.other',
+      'server.custom',
+    ]) {
+      expect(accessibleAncestor(server.getByTestId(id))).toBeUndefined();
     }
   });
 });
