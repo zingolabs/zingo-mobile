@@ -9,6 +9,7 @@ import {
   waitFor,
 } from '@testing-library/react-native';
 import * as Keychain from 'react-native-keychain';
+import RPCModule from '@app/RPCModule';
 import Settings from '@screens/Settings';
 import {
   defaultAppContextLoaded,
@@ -21,16 +22,19 @@ import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import { mockServer } from '../__mocks__/dataMocks/mockServer';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
-const mockedFetchWallet = jest.fn();
+// Every member of the mocked bridge is a lazily created jest.fn; the wallet
+// the warning saves is read through getSeedInfo.
+jest.mock('@app/RPCModule', () => {
+  const members: Record<PropertyKey, jest.Mock> = {};
+  return {
+    __esModule: true,
+    default: new Proxy(members, {
+      get: (target, prop) => (target[prop] ??= jest.fn()),
+    }),
+  };
+});
 
-jest.mock('@app/uris/fetchServerList', () => ({
-  __esModule: true,
-  default: jest.fn().mockResolvedValue([]),
-}));
-jest.mock('@app/walletBackend', () => ({
-  ...jest.requireActual('@app/walletBackend'),
-  fetchWallet: (...args: unknown[]) => mockedFetchWallet(...args),
-}));
+const nativeRpc = RPCModule as unknown as Record<string, jest.Mock>;
 
 const keychain = Keychain as jest.Mocked<typeof Keychain>;
 const wallet = { seed: 'abandon ability able', birthday: 1994579 };
@@ -70,7 +74,9 @@ test('Tests that tapping the warning in Settings saves the recovery info and sho
   keychain.hasGenericPassword.mockResolvedValue(false);
   keychain.setGenericPassword.mockRejectedValue(new Error('keystore locked'));
   keychain.getGenericPassword.mockResolvedValue(false);
-  mockedFetchWallet.mockResolvedValue(wallet);
+  nativeRpc.getSeedInfo.mockResolvedValueOnce(
+    JSON.stringify({ seed_phrase: wallet.seed, birthday: wallet.birthday }),
+  );
   const props: any = {
     navigation: mockNavigation,
     route: { key: 'Key-1', name: RouteEnum.Settings, params: undefined },
@@ -88,8 +94,6 @@ test('Tests that tapping the warning in Settings saves the recovery info and sho
     >
       <Settings
         {...props}
-        setServerOption={jest.fn()}
-        setSelectServerOption={jest.fn()}
         setCurrencyOption={jest.fn()}
         setLanguageOption={jest.fn()}
         setSendAllOption={jest.fn()}
@@ -97,7 +101,6 @@ test('Tests that tapping the warning in Settings saves the recovery info and sho
         setPrivacyOption={jest.fn()}
         setModeOption={jest.fn()}
         setBiometricsOption={jest.fn()}
-        setSelectServerOptionCustom={jest.fn()}
         closeScreen={jest.fn()}
       />
     </ContextAppLoadedProvider>,
@@ -111,5 +114,5 @@ test('Tests that tapping the warning in Settings saves the recovery info and sho
       screen.getByTestId('settings.recoveryinfo.result').props.children,
     ).toBe('settings.recoveryinfo-failed'),
   );
-  expect(mockedFetchWallet).toHaveBeenCalledWith(false);
+  expect(nativeRpc.getSeedInfo).toHaveBeenCalled();
 });
