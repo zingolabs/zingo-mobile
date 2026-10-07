@@ -180,7 +180,7 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
         <ServerIcon
           noInternet={!netInfo.isConnected}
           offline={isOffline}
-          size={24}
+          background="#111c2c"
         />
       ),
       onPress: () => dispatch(MenuItemEnum.Server),
