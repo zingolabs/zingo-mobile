@@ -25,6 +25,8 @@ const CHAINS: string[] = [
   ChainNameEnum.regtestChainName,
 ];
 const HOST = /^[a-z0-9.-]+$/i;
+// The port a server gets when its box is left empty.
+export const DEFAULT_PORT = '443';
 
 export const schemeFor = (chain: ChainNameEnum) =>
   chain === ChainNameEnum.regtestChainName ? 'http://' : 'https://';
@@ -99,7 +101,7 @@ export const useCustomServer = ({
   // The address in the field, as Zingo stores it; null while it is not one.
   const uriOf = (chain: ChainNameEnum, d: Draft = draft(chain)) => {
     const parsed = parseServerURI(
-      `${schemeFor(chain)}${d.host.trim()}:${d.port.trim()}`,
+      `${schemeFor(chain)}${d.host.trim()}:${d.port.trim() || DEFAULT_PORT}`,
     );
     return parsed.kind === 'error' ? null : parsed.uri;
   };
@@ -156,16 +158,13 @@ export const useCustomServer = ({
   ): Promise<boolean> => {
     const d = draft(chain);
     const host = d.host.trim();
-    const port = d.port.trim();
+    const port = d.port.trim() || DEFAULT_PORT;
     update(chain, x => ({ ...x, log: [], shown: 0, tested: null }));
     if (!host) {
       return fail(chain, [final('bad', t('need-host'))]);
     }
     if (!HOST.test(host)) {
       return fail(chain, [final('bad', t('host-only'))]);
-    }
-    if (!port) {
-      return fail(chain, [final('bad', t('need-port'))]);
     }
     const parsed = parseServerURI(`${schemeFor(chain)}${host}:${port}`);
     if (parsed.kind === 'error') {

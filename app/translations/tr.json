@@ -698,7 +698,6 @@
     "port": "Port",
     "need-host": "Önce sunucu adresini girin.",
     "host-only": "Buraya yalnızca adresi yazın, örneğin your-node.example.",
-    "need-port": "Portu ekleyin, örneğin 9067 veya 443.",
     "log-testing": "{host}:{port} test ediliyor…",
     "log-dns": "DNS çözümlendi: {ip}",
     "log-literal": "Adres kullanılıyor: {ip}",

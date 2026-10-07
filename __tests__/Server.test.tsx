@@ -226,6 +226,17 @@ test('Tests that a server on another network fails the test and offers to switch
   expect(screen.getByTestId('server.custom.switch')).toBeOnTheScreen();
 });
 
+test('Tests that an empty port box means port 443', async () => {
+  probe.mockResolvedValue(verified());
+  mount({});
+  typeCustom('node.myhome.net');
+  await act(async () => {
+    fireEvent.press(screen.getByTestId('server.custom.test'));
+  });
+  expect(probe).toHaveBeenCalledWith('https://node.myhome.net:443');
+  expect(screen.getByText('Testing node.myhome.net:443…')).toBeTruthy();
+});
+
 test('Tests that a host that does not resolve says what to fix', async () => {
   probe.mockResolvedValue({
     ok: true,

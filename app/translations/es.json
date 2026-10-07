@@ -700,7 +700,6 @@
     "port": "Puerto",
     "need-host": "Escribe primero el host del servidor.",
     "host-only": "Escribe aquí solo el host, como tu-nodo.example.",
-    "need-port": "Añade el puerto, como 9067 o 443.",
     "log-testing": "Probando {host}:{port}…",
     "log-dns": "DNS resuelto a {ip}",
     "log-literal": "Usando la dirección {ip}",

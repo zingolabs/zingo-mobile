@@ -18,7 +18,7 @@ import RegText from '@ui/primitives/RegText';
 import BoldText from '@ui/primitives/BoldText';
 import { LoadingDots } from '@ui/widgets/ProgressState';
 import ServerLog, { LogLine } from './ServerLog';
-import { schemeFor } from './useCustomServer';
+import { DEFAULT_PORT, schemeFor } from './useCustomServer';
 
 const PLACEHOLDER = '#3F5677';
 const SAVE_OFF_BG = '#0F3A12';
@@ -228,7 +228,7 @@ const CustomServerBox: React.FC<CustomServerBoxProps> = ({
               onTest();
             }}
             editable={!disabled && !busy}
-            placeholder="9067"
+            placeholder={DEFAULT_PORT}
             placeholderTextColor={PLACEHOLDER}
             keyboardType="number-pad"
             maxLength={5}

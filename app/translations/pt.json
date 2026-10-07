@@ -700,7 +700,6 @@
     "port": "Porta",
     "need-host": "Digite primeiro o host do servidor.",
     "host-only": "Use aqui apenas o host, como seu-no.example.",
-    "need-port": "Adicione a porta, como 9067 ou 443.",
     "log-testing": "Testando {host}:{port}…",
     "log-dns": "DNS resolvido para {ip}",
     "log-literal": "Usando o endereço {ip}",

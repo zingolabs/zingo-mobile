@@ -698,7 +698,6 @@
     "port": "Порт",
     "need-host": "Сначала введите хост сервера.",
     "host-only": "Введите здесь только хост, например your-node.example.",
-    "need-port": "Добавьте порт, например 9067 или 443.",
     "log-testing": "Проверка {host}:{port}…",
     "log-dns": "DNS: {ip}",
     "log-literal": "Адрес {ip}",
