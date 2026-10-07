@@ -1,9 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { ScrollView, View } from 'react-native';
 
-import { ContextAppLoading } from '@app/context';
-import { ServerUrisType } from '@app/AppState';
+import { ServerUrisType, TranslateType } from '@app/AppState';
 import { LoadingDots } from '@ui/widgets/ProgressState';
 import ServerRow, {
   DoneButton,
@@ -13,6 +12,7 @@ import ServerRow, {
 } from '@screens/Server/ServerRow';
 
 type ServerListProps = {
+  translate: (key: string) => TranslateType;
   servers: ServerUrisType[];
   loading: boolean;
   latencies: Record<string, number | null>;
@@ -28,9 +28,10 @@ const BODY_BOTTOM = 110;
 
 const hostOf = (uri: string) => uri.replace(/^https?:\/\//, '');
 
-// Mainnet servers one per row; a server that did not answer the probe
-// shakes instead of being picked.
+// Other servers of a network, one per row; a server that did not answer
+// the probe shakes instead of being picked.
 const ServerList: React.FunctionComponent<ServerListProps> = ({
+  translate,
   servers,
   loading,
   latencies,
@@ -40,7 +41,6 @@ const ServerList: React.FunctionComponent<ServerListProps> = ({
   onUnreachable,
   onBack,
 }) => {
-  const { translate } = useContext(ContextAppLoading);
   const [shakes, setShakes] = useState<Record<string, number>>({});
 
   return (
@@ -102,7 +102,7 @@ const ServerList: React.FunctionComponent<ServerListProps> = ({
       />
       <ScreenHeader
         testID="serverlist.back"
-        title={translate('server.choose-title') as string}
+        title={translate('server.other') as string}
         onBack={onBack}
         disabled={busy}
       />
