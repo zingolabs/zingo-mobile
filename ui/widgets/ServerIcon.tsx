@@ -3,7 +3,8 @@ import { Svg, Path, Circle } from 'react-native-svg';
 
 import { useTheme } from '@app/theme';
 
-const STROKE = '#FFFFFF';
+// The tone the option icons are drawn in.
+const STROKE = '#B1BBC5';
 
 type ServerIconProps = {
   // No internet turns the dot red, Offline grey; otherwise it is green.
