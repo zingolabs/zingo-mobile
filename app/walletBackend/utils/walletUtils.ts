@@ -589,6 +589,97 @@ export async function getLatestBlockServerInfo(
   return callFfi(RPCModule.getLatestBlockServerInfo(serverUri));
 }
 
+// Where a probe sent its requests: the host as typed, the port, and the
+// addresses it resolved to (the host itself when it is an IP literal).
+export type ProbeTarget = {
+  host: string;
+  port: number;
+  resolved: string[];
+  literal: boolean;
+};
+
+// How far a wallet-less check of a server got (zingolib probe_server).
+export type ServerProbe =
+  | (ProbeTarget & {
+      outcome: 'verified';
+      latencyMs: number;
+      chainName: string;
+      blockHeight: number;
+      // The whole LightdInfo the server answered, for the Details view.
+      details: string;
+    })
+  | { outcome: 'unresolved'; host: string; port: number; cause: string }
+  | (ProbeTarget & { outcome: 'unreachable'; cause: string })
+  | (ProbeTarget & { outcome: 'noAnswer'; afterSeconds: number })
+  | (ProbeTarget & { outcome: 'refused'; cause: string });
+
+function probeTarget(report: Record<string, unknown>): ProbeTarget {
+  return {
+    host: String(report.host ?? ''),
+    port: Number(report.port ?? 0),
+    resolved: Array.isArray(report.resolved) ? report.resolved.map(String) : [],
+    literal: report.literal === true,
+  };
+}
+
+function toServerProbe(report: Record<string, unknown>): ServerProbe | null {
+  const cause = String(report.cause ?? '');
+  switch (report.outcome) {
+    case 'verified':
+      return {
+        ...probeTarget(report),
+        outcome: 'verified',
+        latencyMs: Number(report.latency_ms ?? 0),
+        chainName: String(report.chain_name ?? ''),
+        blockHeight: Number(report.block_height ?? 0),
+        details: String(report.details ?? ''),
+      };
+    case 'unresolved':
+      return {
+        outcome: 'unresolved',
+        host: String(report.host ?? ''),
+        port: Number(report.port ?? 0),
+        cause,
+      };
+    case 'unreachable':
+      return { ...probeTarget(report), outcome: 'unreachable', cause };
+    case 'noAnswer':
+      return {
+        ...probeTarget(report),
+        outcome: 'noAnswer',
+        afterSeconds: Number(report.after_seconds ?? 0),
+      };
+    case 'refused':
+      return { ...probeTarget(report), outcome: 'refused', cause };
+    default:
+      return null;
+  }
+}
+
+// Checks a server without a wallet: resolves its host, connects and asks for
+// its LightdInfo. A URI zingolib cannot use arrives as an InvalidInput error.
+export async function probeServer(
+  serverUri: string,
+): Promise<FfiResult<ServerProbe>> {
+  const result = await callFfi(RPCModule.probeServerInfo(serverUri));
+  if (!result.ok) {
+    return result;
+  }
+  try {
+    const probe = toServerProbe(JSON.parse(result.value));
+    if (probe) {
+      return { ok: true, value: probe };
+    }
+  } catch {}
+  return {
+    ok: false,
+    error: {
+      code: 'Unknown',
+      message: `unexpected probe report: ${result.value}`,
+    },
+  };
+}
+
 // Pre-calculates the shielding fee and shieldable amount without broadcasting.
 // Mirrors the native `shieldProcess` (propose phase). Pair with `shieldConfirm`
 // to actually execute the shield.

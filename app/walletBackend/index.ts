@@ -36,6 +36,7 @@ export {
   fetchWallet,
   getBalanceInfo,
   getLatestBlockServerInfo,
+  probeServer,
   getServerInfo,
   getSpendableBalanceWithAddress,
   getTotalMemobytesToAddress,
@@ -71,7 +72,12 @@ export {
   walletExists,
   windowTimeline,
 } from './utils/walletUtils';
-export type { UfvkCheck, ZecPriceOutcome } from './utils/walletUtils';
+export type {
+  ProbeTarget,
+  ServerProbe,
+  UfvkCheck,
+  ZecPriceOutcome,
+} from './utils/walletUtils';
 export {
   hasRepairableWalletFile,
   repairDoubleWrappedWallet,

@@ -57,6 +57,7 @@ interface RPCModuleAPI {
 
   // Server / network
   getLatestBlockServerInfo(serverUri: string): Promise<string>;
+  probeServerInfo(serverUri: string): Promise<string>;
   getLatestBlockWalletInfo(): Promise<string>;
   changeServerProcess(serverUri: string): Promise<string>;
   infoServerInfo(): Promise<string>;
