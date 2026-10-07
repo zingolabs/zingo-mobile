@@ -91,16 +91,19 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
   const [overflow, setOverflow] = useState(false);
   const [focused, setFocused] = useState(false);
   const inputRef = useRef<TextInput>(null);
-  // A fast keyboard sends the next key before the last change renders. Until
-  // it does, the props still hold the words from before it, and the native
-  // field still holds the text that was turned into words. These two carry
-  // the newer state across that gap; every render catches up and clears them.
+  // A fast keyboard sends the next key before the last change renders, so the
+  // props can still hold the words from before it. Every render catches up.
   const pendingWordsRef = useRef<string[] | null>(null);
-  const consumedRef = useRef('');
   useLayoutEffect(() => {
     pendingWordsRef.current = null;
-    consumedRef.current = '';
   });
+  // The native text already turned into words. A TextInput keeps its own text
+  // while newer keys are pending instead of taking the emptied draft, so the
+  // next change can still start with it, render or not. It is dropped once a
+  // change no longer does: the field has emptied.
+  const consumedRef = useRef('');
+  // The native text as the last change reported it.
+  const nativeRef = useRef('');
 
   const ufvk = isViewingKey(value) ? value : '';
   const status = useMemo(() => seedStatus(value), [value]);
@@ -165,7 +168,7 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
   const currentWords = () => pendingWordsRef.current ?? words;
 
   // Empties the draft. `used` is the native text it came from, which the field
-  // keeps showing until the empty draft renders.
+  // may keep showing.
   const clearDraft = (used: string) => {
     consumedRef.current = used;
     setDraft('');
@@ -205,7 +208,7 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
 
   const acceptDraft = () => {
     if (draft) {
-      acceptDraftFrom(draft, draft);
+      acceptDraftFrom(draft, nativeRef.current);
     }
   };
 
@@ -215,12 +218,12 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
   };
 
   const onChangeText = (native: string) => {
+    nativeRef.current = native;
     // Text already turned into words is not read again.
-    const consumed = consumedRef.current;
-    const text =
-      consumed && native.startsWith(consumed)
-        ? native.slice(consumed.length)
-        : native;
+    if (!native.startsWith(consumedRef.current)) {
+      consumedRef.current = '';
+    }
+    const text = native.slice(consumedRef.current.length);
     const before = currentWords();
     setInvalidDraft(false);
     if (isViewingKey(text)) {
@@ -470,7 +473,7 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
             {suggestions.map((s, i) => (
               <Pressable
                 key={s}
-                onPress={() => acceptWord(s, draft)}
+                onPress={() => acceptWord(s, nativeRef.current)}
                 accessibilityRole="button"
                 style={{
                   height: CHIP_HEIGHT,

@@ -153,19 +153,31 @@ const typeWithoutRendering = (texts: string[]) => {
 };
 
 // A keyboard faster than the field renders: the native text grows one key at
-// a time and only takes the rendered value back every `keysPerRender` keys.
-const typeFast = (text: string, keysPerRender: number) => {
+// a time, and the field renders every `keysPerRender` keys. Whether the native
+// text then takes the rendered value back is up to the platform: a TextInput
+// keeps its own text while newer keys are pending, so on a device it may not.
+// `takeBackEvery` takes it back every that many renders, never when 0.
+const typeFast = (
+  text: string,
+  keysPerRender: number,
+  takeBackEvery: number,
+) => {
   let native: string = screen.getByTestId('seed').props.value;
-  for (let i = 0; i < text.length; i += keysPerRender) {
+  for (let i = 0, burst = 1; i < text.length; i += keysPerRender, burst++) {
     const typed: string[] = [];
     for (const key of text.slice(i, i + keysPerRender)) {
       native += key;
       typed.push(native);
     }
     typeWithoutRendering(typed);
-    native = screen.getByTestId('seed').props.value;
+    if (takeBackEvery > 0 && burst % takeBackEvery === 0) {
+      native = screen.getByTestId('seed').props.value;
+    }
   }
 };
+
+const keystrokes = (text: string) =>
+  Array.from({ length: text.length }, (_, i) => text.slice(0, i + 1));
 
 const PHRASE =
   'lottery multiply patient simple ivory leisure swift square west despair beauty match crowd margin reject box always title photo remind word diet ecology badge';
@@ -178,12 +190,20 @@ test('Tests that a key landing before the cleared field renders does not read th
   expect(screen.getByTestId('seed').props.value).toBe('d');
 });
 
-test.each([2, 3, 5])(
-  'Tests that a whole phrase typed %i keys per render comes out word for word',
-  keysPerRender => {
+test.each([
+  [2, 1],
+  [3, 1],
+  [5, 1],
+  [2, 0],
+  [3, 0],
+  [3, 2],
+  [5, 3],
+])(
+  'Tests that a whole phrase typed %i keys per render, the field taking its text back every %i renders, comes out word for word',
+  (keysPerRender, takeBackEvery) => {
     handedUp = '';
     render(<ValueHost />);
-    typeFast(PHRASE + ' ', keysPerRender);
+    typeFast(PHRASE + ' ', keysPerRender, takeBackEvery);
     expect(handedUp).toBe(PHRASE);
     expect(screen.getByText('24 / 24')).toBeOnTheScreen();
   },
@@ -205,6 +225,16 @@ test('Tests that a key landing right after a suggestion is taken starts the next
 test('Tests that the same word typed twice in a row is kept twice', () => {
   render(<Host />);
   fireEvent.changeText(screen.getByTestId('seed'), 'abandon ');
-  fireEvent.changeText(screen.getByTestId('seed'), 'abandon ');
+  keystrokes('abandon ').forEach(text =>
+    fireEvent.changeText(screen.getByTestId('seed'), text),
+  );
   expect(screen.getByText('2 / 24')).toBeOnTheScreen();
+});
+
+test('Tests that deleting the start of the next word does not bring back the last one', () => {
+  handedUp = '';
+  render(<ValueHost />);
+  typeWithoutRendering(['west ', 'west d', 'west ']);
+  expect(handedUp).toBe('west');
+  expect(screen.getByTestId('seed').props.value).toBe('');
 });
