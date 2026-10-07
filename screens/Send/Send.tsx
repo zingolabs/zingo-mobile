@@ -1544,7 +1544,9 @@ const Send: React.FunctionComponent<SendProps> = ({
                                   amountText,
                                 ) || 0
                               }
-                              privacy={privacy}
+                              // The amount being typed is shown whole in
+                              // both currencies; privacy hides balances.
+                              privacy={false}
                             />
                           )
                         ) : (
@@ -1561,7 +1563,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                                 amountText,
                               ) || 0
                             }
-                            privacy={privacy}
+                            privacy={false}
                           />
                         )}
                       </>
