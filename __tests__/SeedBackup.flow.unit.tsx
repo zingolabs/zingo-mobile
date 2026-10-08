@@ -109,3 +109,23 @@ test('Tests that I saved it stays on the words when the paper box is unchecked.'
   expect(screen.queryByTestId('seedbackup.word')).toBeNull();
   expect(screen.getByText(WORDS[0])).toBeTruthy();
 });
+
+test('Tests that the screenshot warning covers the words when a screenshot is taken on iOS.', async () => {
+  const { DeviceEventEmitter, NativeModules } =
+    jest.requireActual('react-native');
+  NativeModules.PrivacyGuard = {
+    isCaptured: jest.fn(async () => false),
+    addListener: jest.fn(),
+    removeListeners: jest.fn(),
+  };
+  renderFlow();
+  await act(async () => {
+    fireEvent.press(screen.getByTestId('seedbackup.info.primary'));
+  });
+  await act(async () => {});
+  act(() => {
+    DeviceEventEmitter.emit('screenshot');
+  });
+  expect(screen.getByText('seedbackup.shot-title')).toBeTruthy();
+  delete NativeModules.PrivacyGuard;
+});

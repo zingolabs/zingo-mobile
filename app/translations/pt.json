@@ -1134,6 +1134,9 @@
     "confirm": "Confirmar",
     "done-title": "Carteira com backup",
     "done-body": "Agora você pode restaurar esta carteira em qualquer dispositivo com suas 24 palavras.",
-    "done": "Concluir"
+    "done": "Concluir",
+    "shot-title": "Capturas de tela não são seguras",
+    "shot-body": "Quem entrar nas suas fotos entra na sua carteira. Anote as palavras em papel.",
+    "shot-ok": "Entendi"
   }
 }

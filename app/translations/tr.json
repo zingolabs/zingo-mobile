@@ -1132,6 +1132,9 @@
     "confirm": "Onayla",
     "done-title": "Cüzdan yedeklendi",
     "done-body": "Artık bu cüzdanı 24 kelimenizle herhangi bir cihazda geri yükleyebilirsiniz.",
-    "done": "Bitti"
+    "done": "Bitti",
+    "shot-title": "Ekran görüntüleri güvenli değil",
+    "shot-body": "Fotoğraflarınıza erişen cüzdanınıza da erişir. Kelimeleri kağıda yazın.",
+    "shot-ok": "Anladım"
   }
 }

@@ -1134,6 +1134,9 @@
     "confirm": "Confirmar",
     "done-title": "Cartera respaldada",
     "done-body": "Ya puedes restaurar esta cartera en cualquier dispositivo con tus 24 palabras.",
-    "done": "Hecho"
+    "done": "Hecho",
+    "shot-title": "Las capturas no son seguras",
+    "shot-body": "Quien entre en tus fotos entra en tu cartera. Escribe las palabras en papel.",
+    "shot-ok": "Entendido"
   }
 }

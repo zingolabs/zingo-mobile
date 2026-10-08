@@ -1,5 +1,11 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import {
   BackHandler,
   Pressable,
@@ -28,6 +34,7 @@ import { RouteEnum, SnackbarDurationEnum } from '@app/AppState';
 import { AppDrawerParamList } from '@app/types';
 import { useSecureScreen } from '@app/hooks/useSecureScreen';
 import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
+import { useScreenCapture } from '@app/hooks/useScreenCapture';
 import {
   enactGateAnswer,
   resolveTriggerGate,
@@ -44,6 +51,7 @@ import InfoStep from './components/InfoStep';
 import WordsStep from './components/WordsStep';
 import ConfirmStep, { useWordCheck } from './components/ConfirmStep';
 import DoneStep from './components/DoneStep';
+import ScreenshotSheet from './components/ScreenshotSheet';
 import { SIDE, StepActions } from './components/StepParts';
 
 type SeedBackupProps = NativeStackScreenProps<
@@ -144,6 +152,8 @@ const SeedBackup: React.FunctionComponent<SeedBackupProps> = ({
   const window = useWindowDimensions();
   const keyboard = useKeyboardHeight();
   const secured = useSecureScreen();
+  const [shot, setShot] = useState<'none' | 'on' | 'leaving'>('none');
+  const shotGone = useCallback(() => setShot('none'), []);
   const from = route.params.from;
 
   const [move, setMove] = useState<Move>({ step: 'info', dir: 1 });
@@ -178,6 +188,9 @@ const SeedBackup: React.FunctionComponent<SeedBackupProps> = ({
   }, [move, shown]);
 
   const step = shown.step;
+  const captured = useScreenCapture(step === 'words', () =>
+    setShot(s => (s === 'none' ? 'on' : s)),
+  );
 
   const close = () => {
     if (closing.current) {
@@ -320,7 +333,7 @@ const SeedBackup: React.FunctionComponent<SeedBackupProps> = ({
               <WordsStep
                 words={words}
                 hidden={hidden}
-                veiled={hidden}
+                veiled={hidden || shot !== 'none' || captured}
                 onToggleHide={() => setHidden(h => !h)}
                 onCopy={copy}
                 checked={checked}
@@ -448,6 +461,13 @@ const SeedBackup: React.FunctionComponent<SeedBackupProps> = ({
           </Animated.View>
         )}
       </Animated.View>
+      {shot !== 'none' && (
+        <ScreenshotSheet
+          leaving={shot === 'leaving'}
+          onGotIt={() => setShot('leaving')}
+          onGone={shotGone}
+        />
+      )}
     </View>
   );
 };

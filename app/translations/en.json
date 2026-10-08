@@ -1134,6 +1134,9 @@
     "confirm": "Confirm",
     "done-title": "Wallet backed up",
     "done-body": "You can now restore this wallet on any device using your 24 words.",
-    "done": "Done"
+    "done": "Done",
+    "shot-title": "Screenshots aren't safe",
+    "shot-body": "Anyone who gets into your photos gets into your wallet. Write the words down on paper.",
+    "shot-ok": "Got it"
   }
 }
