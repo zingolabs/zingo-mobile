@@ -187,7 +187,7 @@ struct ChainFailure: Error, CustomStringConvertible {
 
 /// Returns the tip height that the server at `uri` reports.
 private func tipOf(_ uri: String) throws -> UInt64 {
-    let height = try getLatestBlockServer(serveruri: uri)
+    let height = try getLatestBlockServer(serverUri: uri)
     guard let tip = UInt64(height) else {
         throw ChainFailure(description: "\(uri) reported a malformed tip: \(height)")
     }
@@ -256,7 +256,7 @@ private func syncUntilSpendable(_ minimum: Int64, deadlineSeconds: TimeInterval,
 private func syncFixtureWallet(start: Date) throws -> UInt64 {
     let (serveruri, tip) = try firstAnsweringServer("testnet", TestnetFixture.SERVERS)
 
-    let initJson = try initFromSeed(seed: TestnetFixture.SEED, birthday: UInt32(TestnetFixture.BIRTHDAY), serveruri: serveruri, chainhint: TestnetFixture.CHAIN_HINT, performancelevel: "Medium", minconfirmations: UInt32(1))
+    let initJson = try initFromSeed(seed: TestnetFixture.SEED, birthday: UInt32(TestnetFixture.BIRTHDAY), connection: Connection(serverUri: serveruri, chainHint: TestnetFixture.CHAIN_HINT, sync: SyncSettings(performanceLevel: "Medium", minConfirmations: UInt32(1))))
     print("\nInit from seed:\n\(initJson)")
     let initRes: InitFromSeed = try decodeJSON(initJson)
     XCTAssertEqual(initRes.seed_phrase, TestnetFixture.SEED)
@@ -288,7 +288,7 @@ final class ExecuteAddressesFromSeed: XCTestCase {
         let seed = Seeds.HOSPITAL
 
         do {
-            let initJson = try initFromSeed(seed: seed, birthday:UInt32(1), serveruri: "", chainhint: "regtest", performancelevel: "Medium", minconfirmations: UInt32(1))
+            let initJson = try initFromSeed(seed: seed, birthday:UInt32(1), connection: Connection(serverUri: "", chainHint: "regtest", sync: SyncSettings(performanceLevel: "Medium", minConfirmations: UInt32(1))))
             print("\nInit from seed:\n\(initJson)")
             let initRes: InitFromSeed = try decodeJSON(initJson)
             XCTAssertEqual(initRes.seed_phrase, seed)
@@ -330,7 +330,7 @@ final class ExecuteAddressFromUfvk: XCTestCase {
         let ufvk = UfvkConst.HOSPITAL
 
         do {
-          let initJson = try initFromUfvk(ufvk: ufvk, birthday: UInt32(1), serveruri: "", chainhint: "regtest", performancelevel: "Medium", minconfirmations: UInt32(1))
+          let initJson = try initFromUfvk(ufvk: ufvk, birthday: UInt32(1), connection: Connection(serverUri: "", chainHint: "regtest", sync: SyncSettings(performanceLevel: "Medium", minConfirmations: UInt32(1))))
           print("\nInit From UFVK:\n\(initJson)")
           let initRes: InitFromUfvk = try decodeJSON(initJson)
           XCTAssertEqual(initRes.ufvk, ufvk)
@@ -383,7 +383,7 @@ final class ExecuteVersionFromSeed: XCTestCase {
         let seed = Seeds.HOSPITAL
 
         do {
-          let initJson = try initFromSeed(seed: seed, birthday: UInt32(1), serveruri: "", chainhint: "regtest", performancelevel: "Medium", minconfirmations: UInt32(1))
+          let initJson = try initFromSeed(seed: seed, birthday: UInt32(1), connection: Connection(serverUri: "", chainHint: "regtest", sync: SyncSettings(performanceLevel: "Medium", minConfirmations: UInt32(1))))
           print("\nInit from seed:\n\(initJson)")
           let initRes: InitFromSeed = try decodeJSON(initJson)
           XCTAssertEqual(initRes.seed_phrase, seed)
@@ -397,7 +397,8 @@ final class ExecuteVersionFromSeed: XCTestCase {
             let version = try getVersion()
             print("\nVersion:\n\(version)")
             let part = "[0-9A-Za-z.+-]+(_[0-9a-f]{5})?(_dirty)?"
-            XCTAssertNotNil(version.range(of: "^zl_\(part)-zm_\(part)$", options: .regularExpression), version)
+            // The zm_ part is the app build's, joined by RPCModule.
+            XCTAssertNotNil(version.range(of: "^zl_\(part)$", options: .regularExpression), version)
         } catch {
           XCTFail("\nVersion error:\n\(error.localizedDescription)")
           return
@@ -415,7 +416,7 @@ final class ExecuteSyncFromSeed: XCTestCase {
         let (serveruri, tip) = try firstAnsweringServer("mainnet", MainnetServers.SERVERS)
 
         let birthday = tip - window
-        let initJson = try initFromSeed(seed: seed, birthday: UInt32(birthday), serveruri: serveruri, chainhint: "main", performancelevel: "Medium", minconfirmations: UInt32(1))
+        let initJson = try initFromSeed(seed: seed, birthday: UInt32(birthday), connection: Connection(serverUri: serveruri, chainHint: "main", sync: SyncSettings(performanceLevel: "Medium", minConfirmations: UInt32(1))))
         print("\nInit from seed:\n\(initJson)")
         let initRes: InitFromSeed = try decodeJSON(initJson)
         XCTAssertEqual(initRes.seed_phrase, seed)
@@ -521,7 +522,7 @@ final class PriceRefusedWithoutMixnet: XCTestCase {
         let seed = Seeds.HOSPITAL
 
         do {
-          let initJson = try initFromSeed(seed: seed, birthday: UInt32(1), serveruri: "", chainhint: "regtest", performancelevel: "Medium", minconfirmations: UInt32(1))
+          let initJson = try initFromSeed(seed: seed, birthday: UInt32(1), connection: Connection(serverUri: "", chainHint: "regtest", sync: SyncSettings(performanceLevel: "Medium", minConfirmations: UInt32(1))))
           print("\nInit from seed:\n\(initJson)")
           let initRes: InitFromSeed = try decodeJSON(initJson)
           XCTAssertEqual(initRes.seed_phrase, seed)
@@ -810,8 +811,7 @@ class WalletFileDiagnosisTests: XCTestCase {
 
     func testALegacyTextFileMigratesToRawBytesOnRead() throws {
         _ = try initFromSeed(
-            seed: Seeds.HOSPITAL, birthday: UInt32(2_000_000), serveruri: "",
-            chainhint: "main", performancelevel: "Medium", minconfirmations: UInt32(1))
+            seed: Seeds.HOSPITAL, birthday: UInt32(2_000_000), connection: Connection(serverUri: "", chainHint: "main", sync: SyncSettings(performanceLevel: "Medium", minConfirmations: UInt32(1))))
         let wallet = try XCTUnwrap(try saveWalletBytes())
 
         let rpc = RPCModule()

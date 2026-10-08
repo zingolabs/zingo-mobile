@@ -64,7 +64,7 @@ class WalletDeleteTest {
         file(swapName).delete()
         RPCModule.walletFileClosed = false
         uniffi.zingo.initLogging()
-        uniffi.zingo.initFromSeed(Seeds.HOSPITAL, 2000000u, "", "main", "Medium", 1u)
+        uniffi.zingo.initFromSeed(seed = Seeds.HOSPITAL, birthday = 2000000u, connection = testConnection("", "main"))
         plainWallet = uniffi.zingo.saveWalletBytes()!!
         file(mainName).writeBytes(plainWallet)
     }
