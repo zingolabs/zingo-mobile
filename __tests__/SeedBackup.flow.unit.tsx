@@ -11,16 +11,14 @@ import SeedBackup from '@screens/SeedBackup';
 import { pickPositions } from '@screens/SeedBackup/components/ConfirmStep';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
-const WORDS = Array.from(
-  { length: 24 },
-  (_, i) => `word${'abcdefghijklmnopqrstuvwx'[i]}`,
+const WORDS = Array.from({ length: 24 }, (_, i) =>
+  'abcdefghijklmnopqrstuvwx'[i].repeat(3 + (i % 6)),
 );
 
 jest.mock('@app/services/recoveryWalletInfo', () => ({
   getRecoveryWalletInfo: jest.fn(async () => ({
-    seed: Array.from(
-      { length: 24 },
-      (_, i) => `word${'abcdefghijklmnopqrstuvwx'[i]}`,
+    seed: Array.from({ length: 24 }, (_, i) =>
+      'abcdefghijklmnopqrstuvwx'[i].repeat(3 + (i % 6)),
     ).join(' '),
     birthday: 1,
   })),
@@ -128,4 +126,19 @@ test('Tests that the screenshot warning covers the words when a screenshot is ta
   });
   expect(screen.getByText('seedbackup.shot-title')).toBeTruthy();
   delete NativeModules.PrivacyGuard;
+});
+
+test('Tests that the placeholder shows one dash per letter of the asked word.', async () => {
+  renderFlow();
+  await act(async () => {
+    fireEvent.press(screen.getByTestId('seedbackup.info.primary'));
+  });
+  fireEvent.press(screen.getByTestId('seedbackup.check'));
+  fireEvent.press(screen.getByTestId('seedbackup.words.primary'));
+  const label = screen.getByTestId('seedbackup.word').props
+    .accessibilityLabel as string;
+  const n = Number(label.replace(/\D/g, ''));
+  expect(screen.getAllByTestId('seedbackup.dash')).toHaveLength(
+    WORDS[n - 1].length,
+  );
 });

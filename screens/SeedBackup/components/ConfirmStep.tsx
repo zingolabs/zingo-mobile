@@ -28,6 +28,8 @@ const DONE_MS = 620;
 const FIELD_BG = '#041834';
 const HINT_INK = '#5B70A0';
 const DASH = '#33486A';
+const DASH_W = 20;
+const DASH_GAP = 12;
 const TRACK = '#13263F';
 const ERROR_INK = '#F2878A';
 
@@ -48,6 +50,8 @@ type Status = 'idle' | 'ok' | 'err';
 
 export type WordCheck = {
   position: number;
+  // Letters in the asked word, one placeholder dash each.
+  letters: number;
   index: number;
   value: string;
   status: Status;
@@ -79,6 +83,7 @@ export const useWordCheck = (
   useEffect(() => () => clearTimeout(timer.current), []);
 
   const position = positions[Math.min(index, positions.length - 1)];
+  const letters = words[position - 1]?.length ?? 0;
 
   const type = (text: string) => {
     if (checking.current) {
@@ -150,6 +155,7 @@ export const useWordCheck = (
 
   return {
     position,
+    letters,
     index,
     value,
     status,
@@ -308,14 +314,15 @@ const ConfirmStep: React.FunctionComponent<{ check: WordCheck }> = ({
                   right: 0,
                   flexDirection: 'row',
                   justifyContent: 'center',
-                  gap: 17,
+                  gap: DASH_GAP,
                 }}
               >
-                {[0, 1, 2].map(i => (
+                {Array.from({ length: check.letters }, (_, i) => (
                   <View
                     key={i}
+                    testID="seedbackup.dash"
                     style={{
-                      width: 25,
+                      width: DASH_W,
                       height: 2.5,
                       borderRadius: 2,
                       backgroundColor: DASH,
