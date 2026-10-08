@@ -93,6 +93,8 @@ const WordsStep: React.FunctionComponent<WordsStepProps> = ({
   const { translate } = useContext(ContextAppLoaded);
   const { colors } = useTheme();
   const [tipOpen, setTipOpen] = useState(false);
+  // The box pops as feedback to a tap, not when the step mounts checked.
+  const [tapped, setTapped] = useState(false);
 
   const flash = useSharedValue(0);
   useEffect(() => {
@@ -140,7 +142,10 @@ const WordsStep: React.FunctionComponent<WordsStepProps> = ({
         testID="seedbackup.check"
         accessibilityRole="checkbox"
         accessibilityState={{ checked }}
-        onPress={onCheck}
+        onPress={() => {
+          setTapped(true);
+          onCheck();
+        }}
         style={{
           flexDirection: 'row',
           alignItems: 'center',
@@ -153,7 +158,7 @@ const WordsStep: React.FunctionComponent<WordsStepProps> = ({
         <View style={{ width: 17, height: 17 }}>
           <Animated.View
             key={checked ? 'on' : 'off'}
-            entering={checked ? boxPop() : undefined}
+            entering={checked && tapped ? boxPop() : undefined}
           >
             <Animated.View
               style={[

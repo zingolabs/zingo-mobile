@@ -250,6 +250,8 @@ export const CopyShowButtons: React.FunctionComponent<{
   const { translate } = useContext(ContextAppLoaded);
   const { colors } = useTheme();
   const [copied, setCopied] = useState(false);
+  // The eye turns as feedback to a tap, not when the screen mounts.
+  const [turned, setTurned] = useState(false);
   const copiedTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   useEffect(() => () => clearTimeout(copiedTimer.current), []);
@@ -309,14 +311,20 @@ export const CopyShowButtons: React.FunctionComponent<{
       <Pressable
         testID={`${testID}.hide`}
         accessibilityRole="button"
-        onPress={onToggleHide}
+        onPress={() => {
+          setTurned(true);
+          onToggleHide();
+        }}
         style={({ pressed }) => ({
           ...outline,
           transform: [{ scale: pressed ? 0.97 : 1 }],
         })}
       >
         <View style={{ width: 15, height: 15 }}>
-          <Animated.View key={hidden ? 'show' : 'hide'} entering={iconTurn()}>
+          <Animated.View
+            key={hidden ? 'show' : 'hide'}
+            entering={turned ? iconTurn() : undefined}
+          >
             {hidden ? (
               <EyeIcon size={15} color={colors.fgDefault} />
             ) : (

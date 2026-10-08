@@ -40,9 +40,6 @@ export const WordsHidden: Story = { render: () => words(true, true) };
 export const Done: Story = { render: () => <DoneStep /> };
 export const ScreenshotWarning: Story = {
   render: () => (
-    <>
-      {words(false, false)}
-      <ScreenshotSheet leaving={false} onGotIt={() => {}} onGone={() => {}} />
-    </>
+    <ScreenshotSheet leaving={false} onGotIt={() => {}} onGone={() => {}} />
   ),
 };

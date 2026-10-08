@@ -2,7 +2,6 @@
 import React, { useContext, useEffect } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Animated, {
-  Keyframe,
   ReduceMotion,
   runOnJS,
   useAnimatedStyle,
@@ -25,22 +24,33 @@ const ALERT_INK = '#F0A63C';
 const BODY_INK = '#8DA0B8';
 const OFFSCREEN = 600;
 
-const rise = (delay: number) =>
-  new Keyframe({
-    0: { opacity: 0, transform: [{ translateY: 8 }] },
-    100: { opacity: 1, transform: [{ translateY: 0 }], easing: ease.out },
-  })
-    .duration(300)
-    .delay(delay)
-    .reduceMotion(ReduceMotion.System);
-const tilePop = () =>
-  new Keyframe({
-    0: { opacity: 0, transform: [{ scale: 0.6 }] },
-    100: { opacity: 1, transform: [{ scale: 1 }], easing: ease.spring },
-  })
-    .duration(360)
-    .delay(200)
-    .reduceMotion(ReduceMotion.System);
+// Fades in and rises 8 pt once, delay ms after it mounts.
+const Rise: React.FunctionComponent<{
+  delay: number;
+  children: React.ReactNode;
+  stretch?: boolean;
+}> = ({ delay, children, stretch }) => {
+  const shown = useSharedValue(0);
+  useEffect(() => {
+    shown.value = withDelay(
+      delay,
+      withTiming(1, {
+        duration: 300,
+        easing: ease.out,
+        reduceMotion: ReduceMotion.System,
+      }),
+    );
+  }, [delay, shown]);
+  const style = useAnimatedStyle(() => ({
+    opacity: shown.value,
+    transform: [{ translateY: 8 * (1 - shown.value) }],
+  }));
+  return (
+    <Animated.View style={[stretch ? { alignSelf: 'stretch' } : {}, style]}>
+      {children}
+    </Animated.View>
+  );
+};
 
 type ScreenshotSheetProps = {
   leaving: boolean;
@@ -60,6 +70,7 @@ const ScreenshotSheet: React.FunctionComponent<ScreenshotSheetProps> = ({
   const dim = useSharedValue(0);
   const drop = useSharedValue(OFFSCREEN);
   const wiggle = useSharedValue(0);
+  const tile = useSharedValue(0);
 
   useEffect(() => {
     if (leaving) {
@@ -97,15 +108,27 @@ const ScreenshotSheet: React.FunctionComponent<ScreenshotSheetProps> = ({
         easing: ease.standard,
         reduceMotion: ReduceMotion.System,
       });
+    tile.value = withDelay(
+      200,
+      withTiming(1, {
+        duration: 360,
+        easing: ease.spring,
+        reduceMotion: ReduceMotion.System,
+      }),
+    );
     wiggle.value = withDelay(
       480,
       withSequence(turn(-10), turn(9), turn(-6), turn(3), turn(0)),
     );
-  }, [leaving, dim, drop, wiggle, onGone]);
+  }, [leaving, dim, drop, wiggle, tile, onGone]);
 
   const dimStyle = useAnimatedStyle(() => ({ opacity: dim.value }));
   const sheetStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: drop.value }],
+  }));
+  const tileStyle = useAnimatedStyle(() => ({
+    opacity: tile.value,
+    transform: [{ scale: 0.6 + 0.4 * tile.value }],
   }));
   const wiggleStyle = useAnimatedStyle(() => ({
     transform: [{ rotate: `${wiggle.value}deg` }],
@@ -141,49 +164,53 @@ const ScreenshotSheet: React.FunctionComponent<ScreenshotSheetProps> = ({
         ]}
       >
         <Animated.View
-          entering={tilePop()}
-          style={{
-            width: 52,
-            height: 52,
-            borderRadius: 14,
-            backgroundColor: TILE_BG,
-            borderWidth: 1,
-            borderColor: TILE_BORDER,
-            alignItems: 'center',
-            justifyContent: 'center',
-            marginBottom: 18,
-          }}
+          style={[
+            {
+              width: 52,
+              height: 52,
+              borderRadius: 14,
+              backgroundColor: TILE_BG,
+              borderWidth: 1,
+              borderColor: TILE_BORDER,
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginBottom: 18,
+            },
+            tileStyle,
+          ]}
         >
           <Animated.View style={wiggleStyle}>
             <TriangleAlert size={24} color={ALERT_INK} />
           </Animated.View>
         </Animated.View>
-        <Animated.Text
-          entering={rise(260)}
-          accessibilityRole="alert"
-          style={{
-            color: colors.fgDefault,
-            fontSize: 16,
-            fontWeight: '700',
-            textAlign: 'center',
-            marginBottom: 12,
-          }}
-        >
-          {translate('seedbackup.shot-title') as string}
-        </Animated.Text>
-        <Animated.Text
-          entering={rise(300)}
-          style={{
-            color: BODY_INK,
-            fontSize: 14,
-            lineHeight: 20,
-            textAlign: 'center',
-            marginBottom: 24,
-          }}
-        >
-          {translate('seedbackup.shot-body') as string}
-        </Animated.Text>
-        <Animated.View entering={rise(340)} style={{ alignSelf: 'stretch' }}>
+        <Rise delay={260}>
+          <Text
+            accessibilityRole="alert"
+            style={{
+              color: colors.fgDefault,
+              fontSize: 16,
+              fontWeight: '700',
+              textAlign: 'center',
+              marginBottom: 12,
+            }}
+          >
+            {translate('seedbackup.shot-title') as string}
+          </Text>
+        </Rise>
+        <Rise delay={300}>
+          <Text
+            style={{
+              color: BODY_INK,
+              fontSize: 14,
+              lineHeight: 20,
+              textAlign: 'center',
+              marginBottom: 24,
+            }}
+          >
+            {translate('seedbackup.shot-body') as string}
+          </Text>
+        </Rise>
+        <Rise delay={340} stretch>
           <Pressable
             testID="seedbackup.shot.ok"
             accessibilityRole="button"
@@ -208,7 +235,7 @@ const ScreenshotSheet: React.FunctionComponent<ScreenshotSheetProps> = ({
               {translate('seedbackup.shot-ok') as string}
             </Text>
           </Pressable>
-        </Animated.View>
+        </Rise>
       </Animated.View>
     </View>
   );
