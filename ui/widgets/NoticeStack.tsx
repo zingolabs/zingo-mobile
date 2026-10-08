@@ -111,7 +111,7 @@ const Card: React.FunctionComponent<{
   };
   const frame = useAnimatedStyle(() => ({
     top: to(slot.top, move),
-    height: to(slot.height, move),
+    height: slot.height > 0 ? to(slot.height, move) : 'auto',
     opacity: to(slot.opacity, fade),
     transform: [{ scale: to(slot.scale, move) }],
   }));
