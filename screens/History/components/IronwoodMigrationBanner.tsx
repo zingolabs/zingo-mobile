@@ -5,8 +5,6 @@ import { getNumberFormatSettings } from 'react-native-localize';
 import Animated, {
   Easing,
   FadeIn,
-  FadeOut,
-  LinearTransition,
   ReduceMotion,
   useAnimatedStyle,
   useSharedValue,
@@ -31,11 +29,8 @@ const PRESS_SCALE = 0.97;
 const PRESS_MS = 160;
 const STATUS_FADE_MS = 200;
 
-// Colour and opacity are what reduced motion keeps, so the fades run either
-// way. The height change between the two variants is movement, and does not.
-const bannerLayout = () =>
-  LinearTransition.duration(260).reduceMotion(ReduceMotion.System);
-const bannerExit = () => FadeOut.duration(140).reduceMotion(ReduceMotion.Never);
+// Colour and opacity are what reduced motion keeps, so the fade runs either
+// way.
 const variantEnter = () =>
   FadeIn.duration(200).reduceMotion(ReduceMotion.Never);
 
@@ -322,13 +317,9 @@ const IronwoodMigrationBanner: React.FunctionComponent<
         : colors.fgWarning;
 
     return (
-      <Animated.View
-        style={{ paddingHorizontal: 12, paddingTop: 6, paddingBottom: 12 }}
-        layout={bannerLayout()}
-        exiting={bannerExit()}
-      >
+      <>
         {/* Keyed so the swap between variants remounts the card and fades it
-            in, while the wrapper above persists and eases the height gap. */}
+            in. The notice stack eases the height change. */}
         <Animated.View key="inflight" entering={variantEnter()}>
           <PressScale
             testID="ironwoodbanner.resume"
@@ -451,17 +442,13 @@ const IronwoodMigrationBanner: React.FunctionComponent<
             </View>
           </PressScale>
         </Animated.View>
-      </Animated.View>
+      </>
     );
   }
 
   // ----- Default variant -----
   return (
-    <Animated.View
-      style={{ paddingHorizontal: 12, paddingTop: 0, paddingBottom: 18 }}
-      layout={bannerLayout()}
-      exiting={bannerExit()}
-    >
+    <>
       <Animated.View key="default" entering={variantEnter()}>
         {/* Orchard pool card with the Start action */}
         <View
@@ -537,7 +524,7 @@ const IronwoodMigrationBanner: React.FunctionComponent<
           </PressScale>
         </View>
       </Animated.View>
-    </Animated.View>
+    </>
   );
 };
 

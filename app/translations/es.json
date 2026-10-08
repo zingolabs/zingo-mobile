@@ -1089,5 +1089,10 @@
     "oneentry": "URI Debería tener al menos una entrada",
     "memo-too-long": "Memo demasiado largo en parámetro",
     "error-http-not-allowed": "Error: HTTP en texto plano solo está permitido para localhost. Usa HTTPS para servidores remotos."
+  },
+  "notices": {
+    "more-one": "1 aviso más",
+    "more-other": "{n} avisos más",
+    "less": "Mostrar menos"
   }
 }

@@ -47,10 +47,12 @@ import AppSheetModal from '@ui/primitives/AppSheetModal';
 import RingBorder from '@ui/primitives/RingBorder';
 import ValueTransferLine from './components/ValueTransferLine';
 import IronwoodMigrationBanner from './components/IronwoodMigrationBanner';
+import NoticeStack, { Notice } from '@ui/widgets/NoticeStack';
+import { PriceCard } from '@ui/widgets/Header/components/PriceRow';
+import { fiatQuote } from '@app/price/fiatQuote';
 import { ContextAppLoaded } from '@app/context';
 import { useDismissSheetsOnBlur } from '@app/hooks/useDismissSheetsOnBlur';
 import { useOptionsPanelSheetSlide } from '@app/hooks/useOptionsPanelSheetSlide';
-import { usePriceSnapAutoClose } from '@app/hooks/usePriceSnapAutoClose';
 import { safeSnapToIndex } from '@app/utils/safeSnapToIndex';
 import Header from '@ui/widgets/Header';
 import Utils from '@app/utils';
@@ -124,6 +126,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
     totalBalance,
     readOnly,
     info,
+    zecPrice,
   } = context;
   const { colors } = useTheme();
   const screenName = ScreenEnum.History;
@@ -149,7 +152,6 @@ const History: React.FunctionComponent<HistoryProps> = ({
   const [containerH, setContainerH] = useState<number>(0);
   const [headerH, setHeaderH] = useState<number>(0);
   const [usdRowH, setUsdRowH] = useState<number>(0);
-  const [priceRowH, setPriceRowH] = useState<number>(0);
   const [bannerH, setBannerH] = useState<number>(0);
   const [handleH, setHandleH] = useState<number>(0);
   // The BottomSheet sizes its content wrapper (and therefore the list's scroll
@@ -177,12 +179,41 @@ const History: React.FunctionComponent<HistoryProps> = ({
     !!totalBalance &&
     totalBalance.confirmedOrchardBalance > 0;
   const orchardAmount = totalBalance ? totalBalance.totalOrchardBalance : 0;
+  const showPrice = fiatQuote(zecPrice, server, info.chainName).kind !== 'none';
+
+  const notices: Notice[] = [];
+  if (showIronwoodBanner) {
+    notices.push({
+      key: 'ironwood',
+      node: (
+        <IronwoodMigrationBanner
+          amount={orchardAmount}
+          currencyName={info.currencyName}
+          onStart={() => navigation.navigate(RouteEnum.MeetIronwood)}
+          onResume={route => navigation.navigate(route)}
+        />
+      ),
+    });
+  }
+  if (showPrice) {
+    notices.push({
+      key: 'price',
+      node: (
+        <PriceCard
+          translate={translate}
+          zecPrice={zecPrice}
+          info={info}
+          server={server}
+        />
+      ),
+    });
+  }
 
   const bottomSheetRef = useRef<BottomSheetModal>(null);
   const historySheetRef = useRef<BottomSheet>(null);
   const internalSnapIndexRef = useRef<number>(0);
 
-  type SnapId = 'price' | 'balance' | 'usd' | 'max';
+  type SnapId = 'balance' | 'usd' | 'max';
   const currentSnapIdRef = useRef<SnapId>('balance');
   useDismissSheetsOnBlur();
   const sheetSlideStyle = useOptionsPanelSheetSlide();
@@ -334,19 +365,13 @@ const History: React.FunctionComponent<HistoryProps> = ({
             { id: 'max', value: '93%' },
           ];
     }
-    // The banner (when shown) sits between the header and the sheet in normal
-    // flow, so the sheet's low/mid snaps must shrink by its height to leave it
-    // uncovered; the max snap still climbs over both.
+    // The notice stack (when shown) sits between the header and the sheet in
+    // normal flow, so the sheet's low/mid snaps must shrink by its height to
+    // leave it uncovered; the max snap still climbs over both.
     const snapBase = containerH - headerH - bannerH - SNAP_GAP;
-    // Smallest sheet: full header visible, including the PriceRow at the
-    // bottom of the Header (only present when zecPrice > 0).
-    const snapPrice = Math.max(snapBase + BALANCE_SNAP_BUMP, 100);
-    // "Balance visible" snap covers the PriceRow but keeps balance + USD
-    // showing — when there's no PriceRow, this collapses back to the
-    // original snapLow value.
-    const snapLow = Math.max(snapBase + priceRowH + BALANCE_SNAP_BUMP, 100);
+    const snapLow = Math.max(snapBase + BALANCE_SNAP_BUMP, 100);
     const snapMid = Math.min(
-      Math.max(snapBase + priceRowH + usdRowH + BALANCE_SNAP_BUMP, snapLow + 1),
+      Math.max(snapBase + usdRowH + BALANCE_SNAP_BUMP, snapLow + 1),
       containerH - TOP_ICONS_H - SNAP_GAP,
     );
     const snapMax = Math.max(containerH - TOP_ICONS_H - SNAP_GAP, snapLow + 1);
@@ -358,17 +383,15 @@ const History: React.FunctionComponent<HistoryProps> = ({
         { id: 'max', value: snapMax },
       ];
     }
-    const entries: { id: SnapId; value: number }[] = [];
-    if (priceRowH > 0) {
-      entries.push({ id: 'price', value: snapPrice });
-    }
-    entries.push({ id: 'balance', value: snapLow });
+    const entries: { id: SnapId; value: number }[] = [
+      { id: 'balance', value: snapLow },
+    ];
     if (isMainChain && usdRowH > 0) {
       entries.push({ id: 'usd', value: snapMid });
     }
     entries.push({ id: 'max', value: snapMax });
     return entries;
-  }, [server.chainName, containerH, headerH, usdRowH, priceRowH, bannerH]);
+  }, [server.chainName, containerH, headerH, usdRowH, bannerH]);
 
   const historySnapPoints = useMemo(
     () => snapEntries.map(e => e.value),
@@ -377,16 +400,6 @@ const History: React.FunctionComponent<HistoryProps> = ({
   const historySnapIds = useMemo(
     () => snapEntries.map(e => e.id),
     [snapEntries],
-  );
-
-  const priceIdx = historySnapIds.indexOf('price');
-  const priceSnapIndex = priceIdx >= 0 ? priceIdx : null;
-  const balanceIdx = Math.max(historySnapIds.indexOf('balance'), 0);
-  const onPriceSnapChange = usePriceSnapAutoClose(
-    historySheetRef,
-    priceSnapIndex,
-    balanceIdx,
-    historySnapPoints.length,
   );
 
   useEffect(() => {
@@ -753,24 +766,10 @@ const History: React.FunctionComponent<HistoryProps> = ({
             setBackgroundError={setBackgroundError /* context */}
             showMessagesIcon={true}
             onUsdRowLayout={setUsdRowH}
-            onPriceRowLayout={setPriceRowH}
+            noPriceRow
           />
         </View>
-        {/* Measured so the history sheet's snap points sit just below it. An
-            empty wrapper reports height 0 when the banner is hidden. */}
-        <View
-          onLayout={e => setBannerH(e.nativeEvent.layout.height)}
-          pointerEvents="box-none"
-        >
-          {showIronwoodBanner && (
-            <IronwoodMigrationBanner
-              amount={orchardAmount}
-              currencyName={info.currencyName}
-              onStart={() => navigation.navigate(RouteEnum.MeetIronwood)}
-              onResume={route => navigation.navigate(route)}
-            />
-          )}
-        </View>
+        <NoticeStack notices={notices} onHeight={setBannerH} />
       </View>
       <Animated.View
         pointerEvents="box-none"
@@ -786,7 +785,6 @@ const History: React.FunctionComponent<HistoryProps> = ({
             if (i >= 0 && historySnapIds[i]) {
               currentSnapIdRef.current = historySnapIds[i];
             }
-            onPriceSnapChange(i);
           }}
         >
           <View

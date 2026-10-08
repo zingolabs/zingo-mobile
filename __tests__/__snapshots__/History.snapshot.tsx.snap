@@ -490,161 +490,204 @@ exports[`Component History - test History privacy high - snapshot 1`] = `
       </View>
     </View>
     <View
-      onLayout={[Function]}
-      pointerEvents="box-none"
+      style={
+        {
+          "marginBottom": 12,
+          "marginHorizontal": 20,
+          "marginTop": 10,
+          "opacity": 0,
+        }
+      }
     >
       <View
-        exiting={AnimationBuilder {}}
-        layout={AnimationBuilder {}}
-        style={
-          {
-            "paddingBottom": 18,
-            "paddingHorizontal": 12,
-            "paddingTop": 0,
-          }
-        }
+        style={{}}
       >
         <View
-          entering={AnimationBuilder {}}
+          exiting={Keyframe {}}
+          pointerEvents="box-none"
+          style={
+            [
+              {
+                "borderRadius": 14,
+                "left": 0,
+                "overflow": "hidden",
+                "position": "absolute",
+                "right": 0,
+                "zIndex": 3,
+              },
+              {},
+            ]
+          }
         >
           <View
-            style={
-              {
-                "alignItems": "center",
-                "backgroundColor": "#031124",
-                "borderColor": "#05234C",
-                "borderRadius": 12,
-                "borderWidth": 1,
-                "flexDirection": "row",
-                "justifyContent": "space-between",
-                "paddingHorizontal": 16,
-                "paddingVertical": 14,
-              }
-            }
+            style={{}}
           >
             <View
-              style={
-                {
-                  "flex": 1,
-                  "marginRight": 12,
-                }
-              }
+              onLayout={[Function]}
             >
               <View
-                style={
-                  {
-                    "alignItems": "center",
-                    "flexDirection": "row",
-                    "marginBottom": 6,
-                  }
-                }
+                entering={AnimationBuilder {}}
               >
                 <View
                   style={
                     {
-                      "backgroundColor": "#F99D00",
-                      "borderRadius": 5,
-                      "height": 9,
-                      "marginRight": 8,
-                      "width": 9,
-                    }
-                  }
-                />
-                <Text
-                  style={
-                    {
-                      "color": "#c3c3c3",
-                      "fontSize": 15,
-                      "fontWeight": "700",
+                      "alignItems": "center",
+                      "backgroundColor": "#031124",
+                      "borderColor": "#05234C",
+                      "borderRadius": 12,
+                      "borderWidth": 1,
+                      "flexDirection": "row",
+                      "justifyContent": "space-between",
+                      "paddingHorizontal": 16,
+                      "paddingVertical": 14,
                     }
                   }
                 >
-                  text translated
-                </Text>
-              </View>
-              <Text
-                style={
-                  {
-                    "color": "#888888",
-                    "fontSize": 13,
-                  }
-                }
-              >
-                text translated
-                 
-                <Text
-                  style={
-                    {
-                      "color": "#c3c3c3",
-                      "fontWeight": "700",
+                  <View
+                    style={
+                      {
+                        "flex": 1,
+                        "marginRight": 12,
+                      }
                     }
-                  }
-                >
-                  -.----
-                </Text>
-                 
-                ZEC
-              </Text>
-            </View>
-            <View
-              accessibilityState={
-                {
-                  "busy": undefined,
-                  "checked": undefined,
-                  "disabled": undefined,
-                  "expanded": undefined,
-                  "selected": undefined,
-                }
-              }
-              accessibilityValue={
-                {
-                  "max": undefined,
-                  "min": undefined,
-                  "now": undefined,
-                  "text": undefined,
-                }
-              }
-              accessible={true}
-              collapsable={false}
-              focusable={true}
-              onBlur={[Function]}
-              onClick={[Function]}
-              onFocus={[Function]}
-              onResponderGrant={[Function]}
-              onResponderMove={[Function]}
-              onResponderRelease={[Function]}
-              onResponderTerminate={[Function]}
-              onResponderTerminationRequest={[Function]}
-              onStartShouldSetResponder={[Function]}
-              testID="ironwoodbanner.start"
-            >
-              <View
-                style={
-                  [
-                    {
-                      "backgroundColor": "#18bd18",
-                      "borderRadius": 24,
-                      "paddingHorizontal": 22,
-                      "paddingVertical": 10,
-                    },
-                    {},
-                  ]
-                }
-              >
-                <Text
-                  style={
-                    {
-                      "color": "#011401",
-                      "fontSize": 15,
-                      "fontWeight": "700",
+                  >
+                    <View
+                      style={
+                        {
+                          "alignItems": "center",
+                          "flexDirection": "row",
+                          "marginBottom": 6,
+                        }
+                      }
+                    >
+                      <View
+                        style={
+                          {
+                            "backgroundColor": "#F99D00",
+                            "borderRadius": 5,
+                            "height": 9,
+                            "marginRight": 8,
+                            "width": 9,
+                          }
+                        }
+                      />
+                      <Text
+                        style={
+                          {
+                            "color": "#c3c3c3",
+                            "fontSize": 15,
+                            "fontWeight": "700",
+                          }
+                        }
+                      >
+                        text translated
+                      </Text>
+                    </View>
+                    <Text
+                      style={
+                        {
+                          "color": "#888888",
+                          "fontSize": 13,
+                        }
+                      }
+                    >
+                      text translated
+                       
+                      <Text
+                        style={
+                          {
+                            "color": "#c3c3c3",
+                            "fontWeight": "700",
+                          }
+                        }
+                      >
+                        -.----
+                      </Text>
+                       
+                      ZEC
+                    </Text>
+                  </View>
+                  <View
+                    accessibilityState={
+                      {
+                        "busy": undefined,
+                        "checked": undefined,
+                        "disabled": undefined,
+                        "expanded": undefined,
+                        "selected": undefined,
+                      }
                     }
-                  }
-                >
-                  text translated
-                </Text>
+                    accessibilityValue={
+                      {
+                        "max": undefined,
+                        "min": undefined,
+                        "now": undefined,
+                        "text": undefined,
+                      }
+                    }
+                    accessible={true}
+                    collapsable={false}
+                    focusable={true}
+                    onBlur={[Function]}
+                    onClick={[Function]}
+                    onFocus={[Function]}
+                    onResponderGrant={[Function]}
+                    onResponderMove={[Function]}
+                    onResponderRelease={[Function]}
+                    onResponderTerminate={[Function]}
+                    onResponderTerminationRequest={[Function]}
+                    onStartShouldSetResponder={[Function]}
+                    testID="ironwoodbanner.start"
+                  >
+                    <View
+                      style={
+                        [
+                          {
+                            "backgroundColor": "#18bd18",
+                            "borderRadius": 24,
+                            "paddingHorizontal": 22,
+                            "paddingVertical": 10,
+                          },
+                          {},
+                        ]
+                      }
+                    >
+                      <Text
+                        style={
+                          {
+                            "color": "#011401",
+                            "fontSize": 15,
+                            "fontWeight": "700",
+                          }
+                        }
+                      >
+                        text translated
+                      </Text>
+                    </View>
+                  </View>
+                </View>
               </View>
             </View>
           </View>
+          <View
+            pointerEvents="none"
+            style={
+              [
+                {
+                  "backgroundColor": "#031124",
+                  "borderColor": "#05234C",
+                  "borderRadius": 14,
+                  "borderWidth": 1,
+                  "bottom": 0,
+                  "left": 0,
+                  "position": "absolute",
+                  "right": 0,
+                  "top": 0,
+                },
+                {},
+              ]
+            }
+          />
         </View>
       </View>
     </View>
@@ -1536,161 +1579,204 @@ exports[`Component History - test History privacy normal - snapshot 1`] = `
       </View>
     </View>
     <View
-      onLayout={[Function]}
-      pointerEvents="box-none"
+      style={
+        {
+          "marginBottom": 12,
+          "marginHorizontal": 20,
+          "marginTop": 10,
+          "opacity": 0,
+        }
+      }
     >
       <View
-        exiting={AnimationBuilder {}}
-        layout={AnimationBuilder {}}
-        style={
-          {
-            "paddingBottom": 18,
-            "paddingHorizontal": 12,
-            "paddingTop": 0,
-          }
-        }
+        style={{}}
       >
         <View
-          entering={AnimationBuilder {}}
+          exiting={Keyframe {}}
+          pointerEvents="box-none"
+          style={
+            [
+              {
+                "borderRadius": 14,
+                "left": 0,
+                "overflow": "hidden",
+                "position": "absolute",
+                "right": 0,
+                "zIndex": 3,
+              },
+              {},
+            ]
+          }
         >
           <View
-            style={
-              {
-                "alignItems": "center",
-                "backgroundColor": "#031124",
-                "borderColor": "#05234C",
-                "borderRadius": 12,
-                "borderWidth": 1,
-                "flexDirection": "row",
-                "justifyContent": "space-between",
-                "paddingHorizontal": 16,
-                "paddingVertical": 14,
-              }
-            }
+            style={{}}
           >
             <View
-              style={
-                {
-                  "flex": 1,
-                  "marginRight": 12,
-                }
-              }
+              onLayout={[Function]}
             >
               <View
-                style={
-                  {
-                    "alignItems": "center",
-                    "flexDirection": "row",
-                    "marginBottom": 6,
-                  }
-                }
+                entering={AnimationBuilder {}}
               >
                 <View
                   style={
                     {
-                      "backgroundColor": "#F99D00",
-                      "borderRadius": 5,
-                      "height": 9,
-                      "marginRight": 8,
-                      "width": 9,
-                    }
-                  }
-                />
-                <Text
-                  style={
-                    {
-                      "color": "#c3c3c3",
-                      "fontSize": 15,
-                      "fontWeight": "700",
+                      "alignItems": "center",
+                      "backgroundColor": "#031124",
+                      "borderColor": "#05234C",
+                      "borderRadius": 12,
+                      "borderWidth": 1,
+                      "flexDirection": "row",
+                      "justifyContent": "space-between",
+                      "paddingHorizontal": 16,
+                      "paddingVertical": 14,
                     }
                   }
                 >
-                  text translated
-                </Text>
-              </View>
-              <Text
-                style={
-                  {
-                    "color": "#888888",
-                    "fontSize": 13,
-                  }
-                }
-              >
-                text translated
-                 
-                <Text
-                  style={
-                    {
-                      "color": "#c3c3c3",
-                      "fontWeight": "700",
+                  <View
+                    style={
+                      {
+                        "flex": 1,
+                        "marginRight": 12,
+                      }
                     }
-                  }
-                >
-                  0.6000
-                </Text>
-                 
-                ZEC
-              </Text>
-            </View>
-            <View
-              accessibilityState={
-                {
-                  "busy": undefined,
-                  "checked": undefined,
-                  "disabled": undefined,
-                  "expanded": undefined,
-                  "selected": undefined,
-                }
-              }
-              accessibilityValue={
-                {
-                  "max": undefined,
-                  "min": undefined,
-                  "now": undefined,
-                  "text": undefined,
-                }
-              }
-              accessible={true}
-              collapsable={false}
-              focusable={true}
-              onBlur={[Function]}
-              onClick={[Function]}
-              onFocus={[Function]}
-              onResponderGrant={[Function]}
-              onResponderMove={[Function]}
-              onResponderRelease={[Function]}
-              onResponderTerminate={[Function]}
-              onResponderTerminationRequest={[Function]}
-              onStartShouldSetResponder={[Function]}
-              testID="ironwoodbanner.start"
-            >
-              <View
-                style={
-                  [
-                    {
-                      "backgroundColor": "#18bd18",
-                      "borderRadius": 24,
-                      "paddingHorizontal": 22,
-                      "paddingVertical": 10,
-                    },
-                    {},
-                  ]
-                }
-              >
-                <Text
-                  style={
-                    {
-                      "color": "#011401",
-                      "fontSize": 15,
-                      "fontWeight": "700",
+                  >
+                    <View
+                      style={
+                        {
+                          "alignItems": "center",
+                          "flexDirection": "row",
+                          "marginBottom": 6,
+                        }
+                      }
+                    >
+                      <View
+                        style={
+                          {
+                            "backgroundColor": "#F99D00",
+                            "borderRadius": 5,
+                            "height": 9,
+                            "marginRight": 8,
+                            "width": 9,
+                          }
+                        }
+                      />
+                      <Text
+                        style={
+                          {
+                            "color": "#c3c3c3",
+                            "fontSize": 15,
+                            "fontWeight": "700",
+                          }
+                        }
+                      >
+                        text translated
+                      </Text>
+                    </View>
+                    <Text
+                      style={
+                        {
+                          "color": "#888888",
+                          "fontSize": 13,
+                        }
+                      }
+                    >
+                      text translated
+                       
+                      <Text
+                        style={
+                          {
+                            "color": "#c3c3c3",
+                            "fontWeight": "700",
+                          }
+                        }
+                      >
+                        0.6000
+                      </Text>
+                       
+                      ZEC
+                    </Text>
+                  </View>
+                  <View
+                    accessibilityState={
+                      {
+                        "busy": undefined,
+                        "checked": undefined,
+                        "disabled": undefined,
+                        "expanded": undefined,
+                        "selected": undefined,
+                      }
                     }
-                  }
-                >
-                  text translated
-                </Text>
+                    accessibilityValue={
+                      {
+                        "max": undefined,
+                        "min": undefined,
+                        "now": undefined,
+                        "text": undefined,
+                      }
+                    }
+                    accessible={true}
+                    collapsable={false}
+                    focusable={true}
+                    onBlur={[Function]}
+                    onClick={[Function]}
+                    onFocus={[Function]}
+                    onResponderGrant={[Function]}
+                    onResponderMove={[Function]}
+                    onResponderRelease={[Function]}
+                    onResponderTerminate={[Function]}
+                    onResponderTerminationRequest={[Function]}
+                    onStartShouldSetResponder={[Function]}
+                    testID="ironwoodbanner.start"
+                  >
+                    <View
+                      style={
+                        [
+                          {
+                            "backgroundColor": "#18bd18",
+                            "borderRadius": 24,
+                            "paddingHorizontal": 22,
+                            "paddingVertical": 10,
+                          },
+                          {},
+                        ]
+                      }
+                    >
+                      <Text
+                        style={
+                          {
+                            "color": "#011401",
+                            "fontSize": 15,
+                            "fontWeight": "700",
+                          }
+                        }
+                      >
+                        text translated
+                      </Text>
+                    </View>
+                  </View>
+                </View>
               </View>
             </View>
           </View>
+          <View
+            pointerEvents="none"
+            style={
+              [
+                {
+                  "backgroundColor": "#031124",
+                  "borderColor": "#05234C",
+                  "borderRadius": 14,
+                  "borderWidth": 1,
+                  "bottom": 0,
+                  "left": 0,
+                  "position": "absolute",
+                  "right": 0,
+                  "top": 0,
+                },
+                {},
+              ]
+            }
+          />
         </View>
       </View>
     </View>

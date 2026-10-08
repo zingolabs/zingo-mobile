@@ -76,6 +76,8 @@ type HeaderProps = {
   onUsdRowLayout?: (height: number) => void;
   // optional layout reporting for the pull-down PriceRow snap point
   onPriceRowLayout?: (height: number) => void;
+  // History shows the price card in its notice stack
+  noPriceRow?: boolean;
 };
 
 const Header: React.FunctionComponent<HeaderProps> = ({
@@ -102,6 +104,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   showMessagesIcon,
   onUsdRowLayout,
   onPriceRowLayout,
+  noPriceRow,
 }) => {
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const context = useContext(ContextAppLoaded);
@@ -231,7 +234,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             onUsdRowLayout={onUsdRowLayout}
           />
 
-          {!noBalance && (
+          {!noBalance && !noPriceRow && (
             <PriceRow
               translate={translate}
               zecPrice={zecPrice}

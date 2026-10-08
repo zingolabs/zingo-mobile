@@ -1089,5 +1089,10 @@
     "oneentry": "URI Should have at least 1 entry",
     "memo-too-long": "Memo too long in parameter",
     "error-http-not-allowed": "Error: Plain HTTP is only allowed for localhost. Use HTTPS for remote servers."
+  },
+  "notices": {
+    "more-one": "1 more notice",
+    "more-other": "{n} more notices",
+    "less": "Show less"
   }
 }
