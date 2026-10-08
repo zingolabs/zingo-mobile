@@ -154,6 +154,7 @@ const SyncReport = React.lazy(() => import('@screens/SyncReport'));
 const Rescan = React.lazy(() => import('@screens/Rescan'));
 const Pools = React.lazy(() => import('@screens/Pools'));
 const MeetIronwood = React.lazy(() => import('@screens/MeetIronwood'));
+const SeedBackup = React.lazy(() => import('@screens/SeedBackup'));
 const MigrationStrategy = React.lazy(
   () => import('@screens/MigrationStrategy'),
 );
@@ -2308,6 +2309,17 @@ export class LoadedAppClass extends Component<
                       // One-way onboarding: no swipe-back to the screen behind
                       // it; the screen closes by resetting the stack to Home.
                       options={{ gestureEnabled: false }}
+                    />
+                    <RootNavigator.Screen
+                      name={RouteEnum.SeedBackup}
+                      component={SeedBackup}
+                      // Draws its own container transform out of the notice
+                      // card over the screen behind it.
+                      options={{
+                        presentation: 'transparentModal',
+                        animation: 'none',
+                        gestureEnabled: false,
+                      }}
                     />
                     <RootNavigator.Screen
                       name={RouteEnum.MigrationStrategy}
