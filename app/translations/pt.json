@@ -1098,9 +1098,7 @@
   "seednotice": {
     "title": "Frase semente",
     "pending": "sem backup",
-    "done": "com backup",
     "body-pending": "Se você perder o celular, esta é a única forma de recuperar seus fundos.",
-    "body-done": "Você pode restaurar esta carteira em qualquer dispositivo com suas 24 palavras.",
     "button": "Fazer backup"
   },
   "seedbackup": {
@@ -1116,9 +1114,9 @@
     "continue": "Continuar",
     "load-error": "Não foi possível ler a frase semente. Tente de novo.",
     "words-title": "Anote sua frase semente",
-    "words-sub": "24 palavras, em ordem. No final você confirmará algumas",
+    "words-sub": "Anote as 24 palavras em ordem e o número de aniversário. No final você confirmará algumas",
     "copied": "Copiada",
-    "copied-toast": "Copiada. A área de transferência é limpa em 60 s",
+    "copied-toast": "Palavras e aniversário copiados. A área de transferência é limpa em 60 s",
     "hide": "Ocultar",
     "show": "Mostrar",
     "paper": "Anotei em papel e guardei em um lugar seguro.",
@@ -1133,10 +1131,13 @@
     "view-phrase": "Ver frase",
     "confirm": "Confirmar",
     "done-title": "Carteira com backup",
-    "done-body": "Agora você pode restaurar esta carteira em qualquer dispositivo com suas 24 palavras.",
+    "done-body": "Agora você pode restaurar esta carteira em qualquer dispositivo com suas 24 palavras e o aniversário.",
     "done": "Concluir",
     "shot-title": "Capturas de tela não são seguras",
     "shot-body": "Quem entrar nas suas fotos entra na sua carteira. Anote as palavras em papel.",
-    "shot-ok": "Entendi"
+    "shot-ok": "Entendi",
+    "birthday": "Aniversário da carteira",
+    "birthday-tip-title": "O bloco em que sua carteira foi criada.",
+    "birthday-tip-body": "O Zingo começa a escanear a partir daqui em vez do início, então sincroniza muito mais rápido."
   }
 }

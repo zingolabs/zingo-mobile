@@ -27,9 +27,12 @@ const SLIDE_PT = 24;
 const DONE_MS = 620;
 const FIELD_BG = '#041834';
 const HINT_INK = '#5B70A0';
-const DASH = '#33486A';
-const DASH_W = 20;
-const DASH_GAP = 12;
+const SLOT_W = 20;
+const SLOT_H = 31;
+const SLOT_GAP = 6;
+const SLOT_FADE_MS = 140;
+const DASH_EMPTY = '#33486A';
+const DASH_FILL = '#5B70A0';
 const TRACK = '#13263F';
 const ERROR_INK = '#F2878A';
 
@@ -89,7 +92,12 @@ export const useWordCheck = (
     if (checking.current) {
       return;
     }
-    setValue(text.replace(/[^a-zA-Z]/g, '').toLowerCase());
+    setValue(
+      text
+        .replace(/[^a-zA-Z]/g, '')
+        .toLowerCase()
+        .slice(0, letters),
+    );
     setStatus('idle');
   };
 
@@ -209,6 +217,60 @@ const Segment: React.FunctionComponent<{ done: boolean; color: string }> = ({
   );
 };
 
+type SlotTone = 'empty' | 'fill' | 'cur' | 'ok' | 'err';
+
+// One letter of the asked word, on its dash.
+const Slot: React.FunctionComponent<{ letter: string; tone: SlotTone }> = ({
+  letter,
+  tone,
+}) => {
+  const { colors } = useTheme();
+  const target =
+    tone === 'ok' || tone === 'cur'
+      ? colors.fgAccent
+      : tone === 'err'
+        ? colors.fgDangerEmphasis
+        : tone === 'fill'
+          ? DASH_FILL
+          : DASH_EMPTY;
+  const dash = useAnimatedStyle(() => ({
+    backgroundColor: withTiming(target, {
+      duration: SLOT_FADE_MS,
+      easing: ease.standard,
+      reduceMotion: ReduceMotion.Never,
+    }),
+  }));
+  return (
+    <View style={{ width: SLOT_W, height: SLOT_H }}>
+      <Text
+        style={{
+          color: colors.fgDefault,
+          fontSize: 20,
+          lineHeight: 26,
+          fontWeight: '600',
+          textAlign: 'center',
+        }}
+      >
+        {letter}
+      </Text>
+      <Animated.View
+        testID="seedbackup.dash"
+        style={[
+          {
+            position: 'absolute',
+            left: 1,
+            right: 1,
+            bottom: 0,
+            height: 2.5,
+            borderRadius: 2,
+          },
+          dash,
+        ]}
+      />
+    </View>
+  );
+};
+
 // Asks for three random words of the phrase, one at a time.
 const ConfirmStep: React.FunctionComponent<{ check: WordCheck }> = ({
   check,
@@ -305,46 +367,49 @@ const ConfirmStep: React.FunctionComponent<{ check: WordCheck }> = ({
               shakeStyle,
             ]}
           >
-            {!check.value && (
-              <View
-                pointerEvents="none"
-                style={{
-                  position: 'absolute',
-                  left: 0,
-                  right: 0,
-                  flexDirection: 'row',
-                  justifyContent: 'center',
-                  gap: DASH_GAP,
-                }}
-              >
-                {Array.from({ length: check.letters }, (_, i) => (
-                  <View
-                    key={i}
-                    testID="seedbackup.dash"
-                    style={{
-                      width: DASH_W,
-                      height: 2.5,
-                      borderRadius: 2,
-                      backgroundColor: DASH,
-                    }}
-                  />
-                ))}
-              </View>
-            )}
+            <View
+              pointerEvents="none"
+              style={{
+                position: 'absolute',
+                left: 0,
+                right: 0,
+                flexDirection: 'row',
+                justifyContent: 'center',
+                gap: SLOT_GAP,
+              }}
+            >
+              {Array.from({ length: check.letters }, (_, i) => (
+                <Slot
+                  key={i}
+                  letter={check.value[i] ?? ''}
+                  tone={
+                    check.status === 'ok'
+                      ? 'ok'
+                      : check.status === 'err'
+                        ? 'err'
+                        : i < check.value.length
+                          ? 'fill'
+                          : focused && i === check.value.length
+                            ? 'cur'
+                            : 'empty'
+                  }
+                />
+              ))}
+            </View>
             <TextInput
               testID="seedbackup.word"
-              accessibilityLabel={
-                (translate('seedbackup.word-n') as string).replace(
-                  '{n}',
-                  String(check.position),
-                ) as string
-              }
+              accessibilityLabel={(
+                translate('seedbackup.word-n') as string
+              ).replace('{n}', String(check.position))}
               autoFocus
               value={check.value}
               onChangeText={check.type}
               onSubmitEditing={check.submit}
               onFocus={() => setFocused(true)}
               onBlur={() => setFocused(false)}
+              maxLength={check.letters}
+              caretHidden
+              contextMenuHidden
               submitBehavior="submit"
               returnKeyType="done"
               autoCapitalize="none"
@@ -356,14 +421,16 @@ const ConfirmStep: React.FunctionComponent<{ check: WordCheck }> = ({
               keyboardType={
                 Platform.OS === 'android' ? 'visible-password' : 'default'
               }
-              selectionColor={colors.fgAccent}
+              selectionColor="transparent"
               style={{
-                color: colors.fgDefault,
+                position: 'absolute',
+                left: 0,
+                right: 0,
+                top: 0,
+                bottom: 0,
+                color: 'transparent',
                 fontSize: 20,
-                fontWeight: '600',
                 textAlign: 'center',
-                paddingHorizontal: 44,
-                height: '100%',
               }}
             />
             {check.status === 'ok' && (

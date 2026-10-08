@@ -6,6 +6,7 @@ import {
   defaultAppContextLoaded,
 } from '@app/context';
 import { RouteEnum } from '@app/AppState';
+import Clipboard from '@react-native-clipboard/clipboard';
 
 import SeedBackup from '@screens/SeedBackup';
 import { pickPositions } from '@screens/SeedBackup/components/ConfirmStep';
@@ -139,6 +140,40 @@ test('Tests that the placeholder shows one dash per letter of the asked word.', 
     .accessibilityLabel as string;
   const n = Number(label.replace(/\D/g, ''));
   expect(screen.getAllByTestId('seedbackup.dash')).toHaveLength(
+    WORDS[n - 1].length,
+  );
+});
+
+const openWords = async () => {
+  renderFlow();
+  await act(async () => {
+    fireEvent.press(screen.getByTestId('seedbackup.info.primary'));
+  });
+};
+
+test('Tests that the words start hidden when the step opens.', async () => {
+  await openWords();
+  expect(screen.getByText('seedbackup.show')).toBeTruthy();
+});
+
+test('Tests that Copy puts the words and the birthday on the clipboard.', async () => {
+  await openWords();
+  fireEvent.press(screen.getByTestId('seedbackup.copy'));
+  expect(Clipboard.setString).toHaveBeenLastCalledWith(
+    `${WORDS.join(' ')}\nseedbackup.birthday: 1`,
+  );
+});
+
+test('Tests that typing stops at the length of the asked word.', async () => {
+  await openWords();
+  fireEvent.press(screen.getByTestId('seedbackup.check'));
+  fireEvent.press(screen.getByTestId('seedbackup.words.primary'));
+  const field = screen.getByTestId('seedbackup.word');
+  const n = Number(
+    (field.props.accessibilityLabel as string).replace(/\D/g, ''),
+  );
+  fireEvent.changeText(field, 'abcdefghijkl');
+  expect(screen.getByTestId('seedbackup.word').props.value).toHaveLength(
     WORDS[n - 1].length,
   );
 });

@@ -1096,9 +1096,7 @@
   "seednotice": {
     "title": "Kurtarma ifadesi",
     "pending": "yedeklenmedi",
-    "done": "yedeklendi",
     "body-pending": "Telefonunuzu kaybederseniz fonlarınızı kurtarmanın tek yolu budur.",
-    "body-done": "Bu cüzdanı 24 kelimenizle herhangi bir cihazda geri yükleyebilirsiniz.",
     "button": "Yedekle"
   },
   "seedbackup": {
@@ -1114,9 +1112,9 @@
     "continue": "Devam",
     "load-error": "Kurtarma ifadesi okunamadı. Tekrar deneyin.",
     "words-title": "Kurtarma ifadenizi yazın",
-    "words-sub": "Sırayla 24 kelime. Sonunda birkaçını onaylayacaksınız",
+    "words-sub": "24 kelimeyi sırayla ve doğum günü numarasını yazın. Sonunda birkaçını onaylayacaksınız",
     "copied": "Kopyalandı",
-    "copied-toast": "Kopyalandı. Pano 60 sn içinde temizlenir",
+    "copied-toast": "Kelimeler ve doğum günü kopyalandı. Pano 60 sn içinde temizlenir",
     "hide": "Gizle",
     "show": "Göster",
     "paper": "Kağıda yazdım ve güvenli bir yerde sakladım.",
@@ -1131,10 +1129,13 @@
     "view-phrase": "İfadeyi gör",
     "confirm": "Onayla",
     "done-title": "Cüzdan yedeklendi",
-    "done-body": "Artık bu cüzdanı 24 kelimenizle herhangi bir cihazda geri yükleyebilirsiniz.",
+    "done-body": "Artık bu cüzdanı 24 kelimeniz ve doğum günüyle herhangi bir cihazda geri yükleyebilirsiniz.",
     "done": "Bitti",
     "shot-title": "Ekran görüntüleri güvenli değil",
     "shot-body": "Fotoğraflarınıza erişen cüzdanınıza da erişir. Kelimeleri kağıda yazın.",
-    "shot-ok": "Anladım"
+    "shot-ok": "Anladım",
+    "birthday": "Cüzdan doğum günü",
+    "birthday-tip-title": "Cüzdanınızın oluşturulduğu blok.",
+    "birthday-tip-body": "Zingo taramaya baştan değil buradan başlar, bu yüzden çok daha hızlı senkronize olur."
   }
 }

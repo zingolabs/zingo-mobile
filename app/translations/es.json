@@ -1098,9 +1098,7 @@
   "seednotice": {
     "title": "Frase semilla",
     "pending": "sin respaldo",
-    "done": "respaldada",
     "body-pending": "Si pierdes el teléfono, es la única forma de recuperar tus fondos.",
-    "body-done": "Puedes restaurar esta cartera en cualquier dispositivo con tus 24 palabras.",
     "button": "Respaldar"
   },
   "seedbackup": {
@@ -1116,9 +1114,9 @@
     "continue": "Continuar",
     "load-error": "No se pudo leer la frase semilla. Inténtalo de nuevo.",
     "words-title": "Escribe tu frase semilla",
-    "words-sub": "24 palabras, en orden. Al final confirmarás algunas",
+    "words-sub": "Escribe las 24 palabras en orden y el número de cumpleaños. Al final confirmarás algunas",
     "copied": "Copiada",
-    "copied-toast": "Copiada. El portapapeles se vacía en 60 s",
+    "copied-toast": "Palabras y cumpleaños copiados. El portapapeles se vacía en 60 s",
     "hide": "Ocultar",
     "show": "Mostrar",
     "paper": "La escribí en papel y la guardé en un lugar seguro.",
@@ -1133,10 +1131,13 @@
     "view-phrase": "Ver frase",
     "confirm": "Confirmar",
     "done-title": "Cartera respaldada",
-    "done-body": "Ya puedes restaurar esta cartera en cualquier dispositivo con tus 24 palabras.",
+    "done-body": "Ya puedes restaurar esta cartera en cualquier dispositivo con tus 24 palabras y el cumpleaños.",
     "done": "Hecho",
     "shot-title": "Las capturas no son seguras",
     "shot-body": "Quien entre en tus fotos entra en tu cartera. Escribe las palabras en papel.",
-    "shot-ok": "Entendido"
+    "shot-ok": "Entendido",
+    "birthday": "Cumpleaños de la cartera",
+    "birthday-tip-title": "El bloque en el que se creó tu cartera.",
+    "birthday-tip-body": "Zingo empieza a escanear desde aquí en vez de desde el principio, así sincroniza mucho más rápido."
   }
 }

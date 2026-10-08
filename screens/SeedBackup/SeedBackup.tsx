@@ -65,6 +65,7 @@ const CONTENT_IN_AT = 260;
 const CONTENT_OUT_MS = 120;
 const CLOSE_AT = 100;
 const RADIUS = 14;
+const DONE_FADE_MS = 300;
 
 const motion = (ms: number, easing = ease.emphasized) => ({
   duration: ms,
@@ -126,7 +127,13 @@ const SeedBackup: React.FunctionComponent<SeedBackupProps> = ({
   route,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, biometrics, addLastSnackbar, setSeedBackedUp } = context;
+  const {
+    translate,
+    biometrics,
+    addLastSnackbar,
+    setSeedBackedUp,
+    birthday: walletBirthday,
+  } = context;
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const root = useRef<View>(null);
@@ -147,8 +154,9 @@ const SeedBackup: React.FunctionComponent<SeedBackupProps> = ({
   const previous = useRef<Step | null>(null);
   const [keychainNote, setKeychainNote] = useState(false);
   const [words, setWords] = useState<string[]>([]);
+  const [birthday, setBirthday] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [hidden, setHidden] = useState(false);
+  const [hidden, setHidden] = useState(true);
   const [checked, setChecked] = useState(false);
   const [nudge, setNudge] = useState(0);
   const [attempt, setAttempt] = useState(0);
@@ -156,6 +164,7 @@ const SeedBackup: React.FunctionComponent<SeedBackupProps> = ({
 
   const grow = useSharedValue(0);
   const content = useSharedValue(1);
+  const whole = useSharedValue(1);
   const savedShake = useSharedValue(0);
 
   const measured = screen.width > 0;
@@ -197,15 +206,40 @@ const SeedBackup: React.FunctionComponent<SeedBackupProps> = ({
     );
   };
 
+  const finish = () => {
+    if (closing.current) {
+      return;
+    }
+    closing.current = true;
+    whole.value = withTiming(
+      0,
+      motion(DONE_FADE_MS, ease.standard),
+      finished => {
+        if (finished) {
+          runOnJS(navigation.goBack)();
+        }
+      },
+    );
+  };
+
   useEffect(() => {
     const sub = BackHandler.addEventListener('hardwareBackPress', () => {
-      close();
+      if (step === 'done') {
+        finish();
+      } else {
+        close();
+      }
       return true;
     });
     return () => sub.remove();
   });
 
-  const go = (to: Step, dir: 1 | -1) => setMove({ step: to, dir });
+  const go = (to: Step, dir: 1 | -1) => {
+    if (to === 'words') {
+      setHidden(true);
+    }
+    setMove({ step: to, dir });
+  };
 
   const toWords = async () => {
     if (loading) {
@@ -227,9 +261,10 @@ const SeedBackup: React.FunctionComponent<SeedBackupProps> = ({
     let phrase = words;
     if (phrase.length === 0) {
       const stored = await getRecoveryWalletInfo();
-      const seed = stored.seed || (await fetchWallet(false))?.seed || '';
-      phrase = seed.split(' ').filter(w => !!w);
+      const wallet = stored.seed ? stored : await fetchWallet(false);
+      phrase = (wallet?.seed || '').split(' ').filter(w => !!w);
       setWords(phrase);
+      setBirthday(wallet?.birthday || walletBirthday);
     }
     setLoading(false);
     if (phrase.length === 0) {
@@ -258,7 +293,9 @@ const SeedBackup: React.FunctionComponent<SeedBackupProps> = ({
   };
 
   const copy = () => {
-    copySensitive(words.join(' '), () =>
+    const phrase = `${words.join(' ')}
+${translate('seedbackup.birthday') as string}: ${birthday}`;
+    copySensitive(phrase, () =>
       addLastSnackbar(
         translate('seed.clipboard-cleared') as string,
         SnackbarDurationEnum.long,
@@ -282,6 +319,7 @@ const SeedBackup: React.FunctionComponent<SeedBackupProps> = ({
       top: (from.y - screen.y) * (1 - g),
       width: from.width + (screen.width - from.width) * g,
       height: from.height + (screen.height - from.height) * g,
+      opacity: whole.value,
       borderRadius: RADIUS * (1 - g),
       backgroundColor: interpolateColor(
         g,
@@ -290,7 +328,9 @@ const SeedBackup: React.FunctionComponent<SeedBackupProps> = ({
       ),
     };
   });
-  const layer = useAnimatedStyle(() => ({ opacity: content.value }));
+  const layer = useAnimatedStyle(() => ({
+    opacity: content.value * whole.value,
+  }));
   const savedNudge = useAnimatedStyle(() => ({
     transform: [{ translateX: savedShake.value }],
   }));
@@ -321,6 +361,7 @@ const SeedBackup: React.FunctionComponent<SeedBackupProps> = ({
             {secured && (
               <WordsStep
                 words={words}
+                birthday={birthday}
                 hidden={hidden}
                 veiled={hidden || shot !== 'none' || captured}
                 onToggleHide={() => setHidden(h => !h)}
@@ -370,7 +411,7 @@ const SeedBackup: React.FunctionComponent<SeedBackupProps> = ({
               <Pressable
                 testID="seedbackup.done"
                 accessibilityRole="button"
-                onPress={close}
+                onPress={finish}
                 style={({ pressed }) => ({
                   height: 44,
                   borderRadius: 22,

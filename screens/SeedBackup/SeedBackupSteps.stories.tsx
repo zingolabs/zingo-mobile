@@ -24,6 +24,7 @@ export const Info: Story = { render: () => <InfoStep keychainNote /> };
 const words = (hidden: boolean, checked: boolean) => (
   <WordsStep
     words={WORDS}
+    birthday={3512840}
     hidden={hidden}
     veiled={hidden}
     onToggleHide={() => {}}

@@ -27,6 +27,7 @@ import { CopyIcon } from '@ui/primitives/Icons/CopyIcon';
 import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
 import { EyeIcon } from '@ui/primitives/Icons/EyeIcon';
 import { EyeOffIcon } from '@ui/primitives/Icons/EyeOffIcon';
+import InfoTooltip from '@ui/widgets/InfoTooltip';
 import { SIDE, StepTitle } from './StepParts';
 
 const WORD_BG = '#041936';
@@ -125,6 +126,8 @@ const DrawnTick: React.FunctionComponent<{ color: string }> = ({ color }) => {
 
 type WordsStepProps = {
   words: string[];
+  // Block height the wallet was created at, written down with the words.
+  birthday: number;
   hidden: boolean;
   // Words veil while hidden, and while the screenshot warning is up.
   veiled: boolean;
@@ -139,6 +142,7 @@ type WordsStepProps = {
 // The 24 words in order, with Copy, Hide and the paper checkbox.
 const WordsStep: React.FunctionComponent<WordsStepProps> = ({
   words,
+  birthday,
   hidden,
   veiled,
   onToggleHide,
@@ -150,6 +154,7 @@ const WordsStep: React.FunctionComponent<WordsStepProps> = ({
   const { translate } = useContext(ContextAppLoaded);
   const { colors } = useTheme();
   const [copied, setCopied] = useState(false);
+  const [tipOpen, setTipOpen] = useState(false);
   const copiedTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   const veil = useSharedValue(veiled ? 1 : 0);
@@ -209,7 +214,7 @@ const WordsStep: React.FunctionComponent<WordsStepProps> = ({
   };
 
   return (
-    <View>
+    <View onTouchStart={() => tipOpen && setTipOpen(false)}>
       <StepTitle
         title={translate('seedbackup.words-title') as string}
         sub={translate('seedbackup.words-sub') as string}
@@ -297,11 +302,54 @@ const WordsStep: React.FunctionComponent<WordsStepProps> = ({
         ))}
       </View>
       <View
+        testID="seedbackup.birthday"
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          height: 36,
+          marginHorizontal: SIDE,
+          marginTop: 12,
+          paddingLeft: 14,
+          paddingRight: 12,
+          borderRadius: 10,
+          borderWidth: 1,
+          borderColor: colors.bottomSheetBorder,
+          backgroundColor: colors.bgSurface,
+          zIndex: 2,
+        }}
+      >
+        <InfoTooltip
+          testID="seedbackup.birthday-info"
+          alignStart
+          label={translate('seedbackup.birthday') as string}
+          labelStyle={{
+            fontSize: 12,
+            fontWeight: '500',
+            color: colors.fgMuted,
+          }}
+          title={translate('seedbackup.birthday-tip-title') as string}
+          text={translate('seedbackup.birthday-tip-body') as string}
+          open={tipOpen}
+          onToggle={setTipOpen}
+        />
+        <Text
+          style={{
+            marginLeft: 'auto',
+            color: colors.fgDefault,
+            fontSize: 13,
+            fontWeight: '700',
+            fontVariant: ['tabular-nums'],
+          }}
+        >
+          {birthday.toLocaleString()}
+        </Text>
+      </View>
+      <View
         style={{
           flexDirection: 'row',
           gap: 11,
           marginHorizontal: SIDE,
-          marginTop: 16,
+          marginTop: 12,
         }}
       >
         <Pressable

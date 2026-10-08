@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useRef, useState } from 'react';
-import { Pressable, View } from 'react-native';
+import { Pressable, TextStyle, View } from 'react-native';
 import Animated, {
   Keyframe,
   ReduceMotion,
@@ -23,6 +23,9 @@ type InfoTooltipProps = {
   open: boolean;
   onToggle: (open: boolean) => void;
   testID?: string;
+  // Label and icon sit at the start of the row instead of centred.
+  alignStart?: boolean;
+  labelStyle?: TextStyle;
 };
 
 const ARROW = 10;
@@ -50,6 +53,8 @@ const InfoTooltip: React.FunctionComponent<InfoTooltipProps> = ({
   open,
   onToggle,
   testID,
+  alignStart,
+  labelStyle,
 }) => {
   const { colors } = useTheme();
   const containerRef = useRef<View>(null);
@@ -86,10 +91,16 @@ const InfoTooltip: React.FunctionComponent<InfoTooltipProps> = ({
     <View
       ref={containerRef}
       onLayout={e => setContainerW(e.nativeEvent.layout.width)}
-      style={{ alignSelf: 'stretch', alignItems: 'center' }}
+      style={
+        alignStart
+          ? { alignItems: 'flex-start' }
+          : { alignSelf: 'stretch', alignItems: 'center' }
+      }
     >
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-        <BoldText style={{ fontSize: 12.5, lineHeight: 18 }}>{label}</BoldText>
+        <BoldText style={{ fontSize: 12.5, lineHeight: 18, ...labelStyle }}>
+          {label}
+        </BoldText>
         <Pressable
           ref={iconRef}
           testID={testID}

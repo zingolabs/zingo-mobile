@@ -73,8 +73,6 @@ import BottomSheet, { BottomSheetModal } from '@gorhom/bottom-sheet';
 import Filters from './components/Filters';
 import { FiltersIcon } from '@ui/primitives/Icons/FiltersIcon';
 
-const SEED_RESOLVE_MS = 1400;
-
 const ViewTypes = {
   WITH_MONTH: 0,
   WITHOUT_MONTH: 1,
@@ -184,8 +182,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
     !!totalBalance &&
     totalBalance.confirmedOrchardBalance > 0;
   const orchardAmount = totalBalance ? totalBalance.totalOrchardBalance : 0;
-  // A notice resolved by the backup flow reads "backed up" once History is
-  // back in front, then leaves the stack.
+  // The seed notice steps aside while the backup flow grows out of it.
   const focused = useIsFocused();
   const [backingUp, setBackingUp] = useState<boolean>(false);
   useEffect(() => {
@@ -193,16 +190,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
       setBackingUp(false);
     }
   }, [focused]);
-  const [seedPending] = useState<boolean>(!seedBackedUp);
-  const [seedResolved, setSeedResolved] = useState<boolean>(false);
-  useEffect(() => {
-    if (seedBackedUp && focused && seedPending) {
-      const t = setTimeout(() => setSeedResolved(true), SEED_RESOLVE_MS);
-      return () => clearTimeout(t);
-    }
-  }, [seedBackedUp, focused, seedPending]);
-  const showSeedNotice =
-    !readOnly && (!seedBackedUp || (seedPending && !seedResolved));
+  const showSeedNotice = !readOnly && !seedBackedUp;
 
   const showPrice = fiatQuote(zecPrice, server, info.chainName).kind !== 'none';
 
@@ -225,7 +213,6 @@ const History: React.FunctionComponent<HistoryProps> = ({
       key: 'seed',
       node: (
         <SeedBackupNotice
-          backedUp={seedBackedUp && focused}
           covered={backingUp && !focused}
           onBackUp={from => {
             setBackingUp(true);
