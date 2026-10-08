@@ -428,7 +428,7 @@ const ConfirmStep: React.FunctionComponent<{ check: WordCheck }> = ({
                 right: 0,
                 top: 0,
                 bottom: 0,
-                color: 'transparent',
+                opacity: 0,
                 fontSize: 20,
                 textAlign: 'center',
               }}
