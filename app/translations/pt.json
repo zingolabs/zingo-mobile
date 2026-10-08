@@ -1094,5 +1094,13 @@
     "more-one": "Mais 1 aviso",
     "more-other": "Mais {n} avisos",
     "less": "Mostrar menos"
+  },
+  "seednotice": {
+    "title": "Frase semente",
+    "pending": "sem backup",
+    "done": "com backup",
+    "body-pending": "Se você perder o celular, esta é a única forma de recuperar seus fundos.",
+    "body-done": "Você pode restaurar esta carteira em qualquer dispositivo com suas 24 palavras.",
+    "button": "Fazer backup"
   }
 }

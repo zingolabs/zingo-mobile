@@ -20,6 +20,7 @@ import Animated from 'react-native-reanimated';
 import {
   NavigationProp,
   ParamListBase,
+  useIsFocused,
   useNavigation,
 } from '@react-navigation/native';
 import { useTheme } from '@app/theme';
@@ -47,6 +48,7 @@ import AppSheetModal from '@ui/primitives/AppSheetModal';
 import RingBorder from '@ui/primitives/RingBorder';
 import ValueTransferLine from './components/ValueTransferLine';
 import IronwoodMigrationBanner from './components/IronwoodMigrationBanner';
+import SeedBackupNotice from './components/SeedBackupNotice';
 import NoticeStack, { Notice } from '@ui/widgets/NoticeStack';
 import { PriceCard } from '@ui/widgets/Header/components/PriceRow';
 import { fiatQuote } from '@app/price/fiatQuote';
@@ -70,6 +72,8 @@ import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTr
 import BottomSheet, { BottomSheetModal } from '@gorhom/bottom-sheet';
 import Filters from './components/Filters';
 import { FiltersIcon } from '@ui/primitives/Icons/FiltersIcon';
+
+const SEED_RESOLVE_MS = 1400;
 
 const ViewTypes = {
   WITH_MONTH: 0,
@@ -127,6 +131,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
     readOnly,
     info,
     zecPrice,
+    seedBackedUp,
   } = context;
   const { colors } = useTheme();
   const screenName = ScreenEnum.History;
@@ -179,6 +184,20 @@ const History: React.FunctionComponent<HistoryProps> = ({
     !!totalBalance &&
     totalBalance.confirmedOrchardBalance > 0;
   const orchardAmount = totalBalance ? totalBalance.totalOrchardBalance : 0;
+  // A notice resolved by the backup flow reads "backed up" once History is
+  // back in front, then leaves the stack.
+  const focused = useIsFocused();
+  const [seedPending] = useState<boolean>(!seedBackedUp);
+  const [seedResolved, setSeedResolved] = useState<boolean>(false);
+  useEffect(() => {
+    if (seedBackedUp && focused && seedPending) {
+      const t = setTimeout(() => setSeedResolved(true), SEED_RESOLVE_MS);
+      return () => clearTimeout(t);
+    }
+  }, [seedBackedUp, focused, seedPending]);
+  const showSeedNotice =
+    !readOnly && (!seedBackedUp || (seedPending && !seedResolved));
+
   const showPrice = fiatQuote(zecPrice, server, info.chainName).kind !== 'none';
 
   const notices: Notice[] = [];
@@ -191,6 +210,17 @@ const History: React.FunctionComponent<HistoryProps> = ({
           currencyName={info.currencyName}
           onStart={() => navigation.navigate(RouteEnum.MeetIronwood)}
           onResume={route => navigation.navigate(route)}
+        />
+      ),
+    });
+  }
+  if (showSeedNotice) {
+    notices.push({
+      key: 'seed',
+      node: (
+        <SeedBackupNotice
+          backedUp={seedBackedUp && focused}
+          onBackUp={from => navigation.navigate(RouteEnum.SeedBackup, { from })}
         />
       ),
     });

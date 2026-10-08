@@ -1094,5 +1094,13 @@
     "more-one": "1 more notice",
     "more-other": "{n} more notices",
     "less": "Show less"
+  },
+  "seednotice": {
+    "title": "Seed phrase",
+    "pending": "not backed up",
+    "done": "backed up",
+    "body-pending": "If you lose your phone, this is the only way to recover your funds.",
+    "body-done": "You can restore this wallet on any device with your 24 words.",
+    "button": "Back up"
   }
 }

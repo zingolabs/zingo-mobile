@@ -3,4 +3,5 @@ export type {
   AppDrawerParamList,
   LoadingAppNavigationState,
   LoadedAppNavigationState,
+  CardRect,
 } from './NavigationTypes';

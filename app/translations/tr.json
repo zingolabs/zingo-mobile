@@ -1092,5 +1092,13 @@
     "more-one": "1 bildirim daha",
     "more-other": "{n} bildirim daha",
     "less": "Daha az göster"
+  },
+  "seednotice": {
+    "title": "Kurtarma ifadesi",
+    "pending": "yedeklenmedi",
+    "done": "yedeklendi",
+    "body-pending": "Telefonunuzu kaybederseniz fonlarınızı kurtarmanın tek yolu budur.",
+    "body-done": "Bu cüzdanı 24 kelimenizle herhangi bir cihazda geri yükleyebilirsiniz.",
+    "button": "Yedekle"
   }
 }

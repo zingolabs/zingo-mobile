@@ -29,6 +29,7 @@ export enum RouteEnum {
   SyncReport = 'SyncReport',
   Pools = 'Pools',
   MeetIronwood = 'MeetIronwood',
+  SeedBackup = 'SeedBackup',
   MigrationStrategy = 'MigrationStrategy',
   MigrationTransactions = 'MigrationTransactions',
   MigrationSending = 'MigrationSending',

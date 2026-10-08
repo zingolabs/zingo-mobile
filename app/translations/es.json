@@ -1094,5 +1094,13 @@
     "more-one": "1 aviso más",
     "more-other": "{n} avisos más",
     "less": "Mostrar menos"
+  },
+  "seednotice": {
+    "title": "Frase semilla",
+    "pending": "sin respaldo",
+    "done": "respaldada",
+    "body-pending": "Si pierdes el teléfono, es la única forma de recuperar tus fondos.",
+    "body-done": "Puedes restaurar esta cartera en cualquier dispositivo con tus 24 palabras.",
+    "button": "Respaldar"
   }
 }
