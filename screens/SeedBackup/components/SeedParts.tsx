@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { PixelRatio, Platform, Pressable, Text, View } from 'react-native';
 import Animated, {
   FadeIn,
   FadeOut,
@@ -33,6 +33,9 @@ export const VEIL_MS = 220;
 // The words blur by this much while hidden; the numbers stay sharp.
 const BLUR_PT = 6;
 const WORD_H = 32;
+// Native filters run on the bitmap in device pixels; web runs in points.
+const BLUR_DEVIATION =
+  Platform.OS === 'web' ? BLUR_PT : BLUR_PT * PixelRatio.get();
 const COPIED_MS = 1600;
 const COLUMNS = 3;
 
@@ -62,8 +65,8 @@ const BlurredWord: React.FunctionComponent<{ word: string; color: string }> = ({
 }) => (
   <Svg width="100%" height={WORD_H}>
     <Defs>
-      <Filter id="wordblur" x="-20%" y="-60%" width="140%" height="220%">
-        <FeGaussianBlur stdDeviation={BLUR_PT} />
+      <Filter id="wordblur" x="-30%" y="-100%" width="160%" height="300%">
+        <FeGaussianBlur stdDeviation={BLUR_DEVIATION} />
       </Filter>
     </Defs>
     <SvgText
