@@ -2,8 +2,6 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { PixelRatio, Platform, Pressable, Text, View } from 'react-native';
 import Animated, {
-  FadeIn,
-  FadeOut,
   Keyframe,
   ReduceMotion,
   useAnimatedStyle,
@@ -58,28 +56,28 @@ const iconTurn = () =>
     .duration(VEIL_MS)
     .reduceMotion(ReduceMotion.System);
 
-// A word drawn through a gaussian blur, for the hidden state.
-const BlurredWord: React.FunctionComponent<{ word: string; color: string }> = ({
-  word,
-  color,
-}) => (
-  <Svg width="100%" height={WORD_H}>
-    <Defs>
-      <Filter id="wordblur" x="-30%" y="-100%" width="160%" height="300%">
-        <FeGaussianBlur stdDeviation={BLUR_DEVIATION} />
-      </Filter>
-    </Defs>
-    <SvgText
-      x={0}
-      y={20.5}
-      fill={color}
-      fontSize={13}
-      fontWeight="700"
-      filter="url(#wordblur)"
-    >
-      {word}
-    </SvgText>
-  </Svg>
+// A word drawn through a gaussian blur, for the hidden state. Drawn once
+// and kept mounted: the filter is the costly part, the veil only fades it.
+const BlurredWord = React.memo<{ word: string; color: string }>(
+  ({ word, color }) => (
+    <Svg width="100%" height={WORD_H}>
+      <Defs>
+        <Filter id="wordblur" x="-30%" y="-100%" width="160%" height="300%">
+          <FeGaussianBlur stdDeviation={BLUR_DEVIATION} />
+        </Filter>
+      </Defs>
+      <SvgText
+        x={0}
+        y={20.5}
+        fill={color}
+        fontSize={13}
+        fontWeight="700"
+        filter="url(#wordblur)"
+      >
+        {word}
+      </SvgText>
+    </Svg>
+  ),
 );
 
 // The words in three columns, numbered; the words blur while veiled.
@@ -98,6 +96,7 @@ export const WordGrid: React.FunctionComponent<{
     });
   }, [veiled, veil]);
   const wordInk = useAnimatedStyle(() => ({ opacity: 1 - veil.value }));
+  const blurInk = useAnimatedStyle(() => ({ opacity: veil.value * 0.7 }));
   const rows = Math.ceil(words.length / COLUMNS);
 
   return (
@@ -155,27 +154,17 @@ export const WordGrid: React.FunctionComponent<{
                   >
                     {w}
                   </Animated.Text>
-                  {veiled && (
-                    <Animated.View
-                      entering={FadeIn.duration(VEIL_MS).reduceMotion(
-                        ReduceMotion.Never,
-                      )}
-                      exiting={FadeOut.duration(VEIL_MS).reduceMotion(
-                        ReduceMotion.Never,
-                      )}
-                      pointerEvents="none"
-                      accessibilityElementsHidden
-                      importantForAccessibility="no-hide-descendants"
-                      style={{
-                        position: 'absolute',
-                        left: 0,
-                        right: 0,
-                        opacity: 0.7,
-                      }}
-                    >
-                      <BlurredWord word={w} color={colors.fgDefault} />
-                    </Animated.View>
-                  )}
+                  <Animated.View
+                    pointerEvents="none"
+                    accessibilityElementsHidden
+                    importantForAccessibility="no-hide-descendants"
+                    style={[
+                      { position: 'absolute', left: 0, right: 0 },
+                      blurInk,
+                    ]}
+                  >
+                    <BlurredWord word={w} color={colors.fgDefault} />
+                  </Animated.View>
                 </View>
               </View>
             );
