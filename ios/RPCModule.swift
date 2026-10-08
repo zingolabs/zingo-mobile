@@ -1197,7 +1197,7 @@ class RPCModule: NSObject {
   func setConfigWalletToProdProcess(_ performancelevel: String, minconfirmations: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
       DispatchQueue.global(qos: .userInitiated).async {
         FfiOutcome.of {
-          try setConfigWalletToProd(settings: syncSettings(performancelevel: performancelevel, minconfirmations: minconfirmations))
+          try setConfigWalletToProd(settings: self.syncSettings(performancelevel: performancelevel, minconfirmations: minconfirmations))
         }.settle(resolve: resolve, reject: reject)
       }
   }
