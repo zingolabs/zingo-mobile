@@ -68,7 +68,7 @@ class DoubleWrapReproTest {
             File(context.filesDir, "$fileName$suffix").delete()
         }
         uniffi.zingo.initLogging()
-        uniffi.zingo.initFromSeed(Seeds.HOSPITAL, 2000000u, "", chainHint, "Medium", 1u)
+        uniffi.zingo.initFromSeed(seed = Seeds.HOSPITAL, birthday = 2000000u, connection = testConnection("", chainHint))
         plainWallet = uniffi.zingo.saveWalletBytes()!!
         assertThat(WalletFileEnvelope.looksLikePlainWallet(plainWallet)).isTrue()
 

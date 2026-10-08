@@ -95,6 +95,13 @@ test('Tests that a 25th word is refused with its message when the phrase already
   );
 });
 
+test('Tests that the end of a complete phrase handed back by the field is not taken for a 25th word', () => {
+  render(<Host initial={ABANDON_23 + ' art'} />);
+  fireEvent.changeText(screen.getByTestId('seed'), 'art ');
+  expect(screen.getByText('24 / 24')).toBeOnTheScreen();
+  expect(screen.queryByTestId('seed.error')).toBeNull();
+});
+
 test('Tests that a pasted phrase longer than 24 words keeps the first 24 and says why', () => {
   render(<Host />);
   fireEvent.changeText(screen.getByTestId('seed'), ABANDON_23 + ' art zoo zoo');
