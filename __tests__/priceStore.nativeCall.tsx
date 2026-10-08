@@ -230,10 +230,10 @@ test('the ring fills from coarse ticks, not a per-frame animation', async () => 
     <QuoteRefreshRing
       size={22}
       color="#ffffff"
+      fetchColor="#00ff00"
       trackColor="rgba(255,255,255,0.12)"
       durationMs={60_000}
       resetKey={1}
-      accessibilityLabel="ring"
       testID="ring"
     />,
   );

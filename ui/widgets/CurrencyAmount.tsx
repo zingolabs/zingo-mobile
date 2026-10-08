@@ -3,6 +3,11 @@ import React, { useState, useEffect } from 'react';
 import { Text, View, TextStyle, TouchableOpacity } from 'react-native';
 import { useTheme } from '@app/theme';
 import { getNumberFormatSettings } from 'react-native-localize';
+import Animated, {
+  ReduceMotion,
+  useAnimatedStyle,
+  withTiming,
+} from 'react-native-reanimated';
 
 import Utils from '@app/utils';
 import { usePriceHealth } from './priceFetcherStore';
@@ -19,6 +24,47 @@ type CurrencyAmountProps = {
   priceDate?: number;
   // Overrides the color the price's health gives, as a warning does.
   color?: string;
+  // Tints the amount for the direction of the last price move.
+  tint?: PriceTint;
+};
+
+export type PriceTint = 'none' | 'up' | 'down';
+
+const TINT_UP = '#3CC52A';
+const TINT_DOWN = '#F2878A';
+const TINT_MS = 500;
+
+// The amount eases to green or red for the direction of a price move.
+const TintedText: React.FunctionComponent<{
+  tint: PriceTint;
+  base: string;
+  style?: TextStyle;
+  selectable?: boolean;
+  children: string;
+}> = ({ tint, base, style, selectable, children }) => {
+  const tinted = useAnimatedStyle(() => ({
+    color: withTiming(
+      tint === 'up' ? TINT_UP : tint === 'down' ? TINT_DOWN : base,
+      { duration: TINT_MS, reduceMotion: ReduceMotion.Never },
+    ),
+  }));
+  return (
+    <Animated.Text
+      style={[
+        {
+          color: base,
+          fontSize: 20,
+          fontWeight: '700',
+          fontVariant: ['tabular-nums'],
+          ...style,
+        },
+        tinted,
+      ]}
+      selectable={selectable}
+    >
+      {children}
+    </Animated.Text>
+  );
 };
 
 const CurrencyAmount: React.FunctionComponent<CurrencyAmountProps> = ({
@@ -29,6 +75,7 @@ const CurrencyAmount: React.FunctionComponent<CurrencyAmountProps> = ({
   selectable,
   priceDate,
   color,
+  tint,
 }) => {
   const { visible, reveal } = useTimedReveal(!!privacy);
   const privacyHigh: boolean = !visible;
@@ -77,6 +124,15 @@ const CurrencyAmount: React.FunctionComponent<CurrencyAmountProps> = ({
             >
               {'$ -' + decimalSeparator + '--'}
             </Text>
+          ) : tint ? (
+            <TintedText
+              tint={tint}
+              base={baseColor}
+              style={style}
+              selectable={selectable}
+            >
+              {'$ ' + currencyString}
+            </TintedText>
           ) : (
             <Text
               style={{

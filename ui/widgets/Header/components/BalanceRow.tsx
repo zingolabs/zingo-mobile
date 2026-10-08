@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { TouchableOpacity, View } from 'react-native';
 import Animated, {
   Easing,
@@ -33,14 +33,32 @@ import {
 } from '@app/walletBackend/transforms/mixnetView';
 import Utils from '@app/utils';
 import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
-import CurrencyAmount from '@ui/widgets/CurrencyAmount';
+import CurrencyAmount, { PriceTint } from '@ui/widgets/CurrencyAmount';
 import FadeText from '@ui/primitives/FadeText';
-import PriceFetcher from '@ui/widgets/PriceFetcher';
+import PriceFetcher, { usePriceRing } from '@ui/widgets/PriceFetcher';
 import RegText from '@ui/primitives/RegText';
 import ZecAmount from '@ui/widgets/ZecAmount';
 import PrivacyToggle from './PrivacyToggle';
 
 const BALANCE_BOTTOM_GAP = 20;
+const TINT_HOLD_MS = 900;
+
+// Green or red for a moment after the price moves, by its direction.
+const usePriceTint = (price: number): PriceTint => {
+  const [tint, setTint] = useState<PriceTint>('none');
+  const last = useRef(price);
+  useEffect(() => {
+    const before = last.current;
+    last.current = price;
+    if (before <= 0 || price <= 0 || price === before) {
+      return;
+    }
+    setTint(price > before ? 'up' : 'down');
+    const t = setTimeout(() => setTint('none'), TINT_HOLD_MS);
+    return () => clearTimeout(t);
+  }, [price]);
+  return tint;
+};
 const REVEAL_MS = 220;
 const REVEAL_EASE = Easing.bezier(0.23, 1, 0.32, 1);
 
@@ -109,6 +127,33 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
     const reducedMotion = useReducedMotion();
     const quote = fiatQuote(zecPrice, server, info.chainName);
     const showFiat = !noBalance && quote.kind === 'quote';
+    const ring = usePriceRing();
+    const tint = usePriceTint(quote.kind === 'quote' ? quote.price : 0);
+    const fiatTotal = totalBalance
+      ? totalBalance.totalIronwoodBalance +
+        totalBalance.totalOrchardBalance +
+        totalBalance.totalSaplingBalance +
+        totalBalance.totalTransparentBalance
+      : 0;
+    const updatedAt =
+      quote.kind === 'quote' && quote.date
+        ? new Date(quote.date).toLocaleTimeString([], {
+            hour: 'numeric',
+            minute: '2-digit',
+          })
+        : '';
+    const fiatLabel = [
+      privacy || quote.kind !== 'quote'
+        ? ''
+        : '$ ' +
+          Utils.parseNumberFloatToStringLocale(quote.price * fiatTotal, 2),
+      translate(ring.labelKey) as string,
+      updatedAt
+        ? (translate('header.lastupdate') as string) + ' ' + updatedAt
+        : '',
+    ]
+      .filter(part => !!part)
+      .join('. ');
 
     return (
       <>
@@ -219,23 +264,19 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
           <Animated.View
             entering={reducedMotion ? FadeIn.duration(REVEAL_MS) : materialize}
             onLayout={e => onUsdRowLayout?.(e.nativeEvent.layout.height)}
+            accessible
+            accessibilityLabel={fiatLabel}
             style={{ flexDirection: 'row', alignItems: 'center' }}
           >
             <CurrencyAmount
               style={{ marginTop: 0, marginBottom: 0 }}
               priceDate={quote.date}
               price={quote.price}
-              amtZec={
-                totalBalance
-                  ? totalBalance.totalIronwoodBalance +
-                    totalBalance.totalOrchardBalance +
-                    totalBalance.totalSaplingBalance +
-                    totalBalance.totalTransparentBalance
-                  : 0
-              }
+              amtZec={fiatTotal}
               privacy={privacy}
+              tint={tint}
             />
-            <View style={{ marginLeft: 5 }}>
+            <View style={{ marginLeft: 11 }}>
               <PriceFetcher />
             </View>
           </Animated.View>
