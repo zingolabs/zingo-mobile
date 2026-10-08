@@ -187,6 +187,12 @@ const History: React.FunctionComponent<HistoryProps> = ({
   // A notice resolved by the backup flow reads "backed up" once History is
   // back in front, then leaves the stack.
   const focused = useIsFocused();
+  const [backingUp, setBackingUp] = useState<boolean>(false);
+  useEffect(() => {
+    if (focused) {
+      setBackingUp(false);
+    }
+  }, [focused]);
   const [seedPending] = useState<boolean>(!seedBackedUp);
   const [seedResolved, setSeedResolved] = useState<boolean>(false);
   useEffect(() => {
@@ -220,7 +226,11 @@ const History: React.FunctionComponent<HistoryProps> = ({
       node: (
         <SeedBackupNotice
           backedUp={seedBackedUp && focused}
-          onBackUp={from => navigation.navigate(RouteEnum.SeedBackup, { from })}
+          covered={backingUp && !focused}
+          onBackUp={from => {
+            setBackingUp(true);
+            navigation.navigate(RouteEnum.SeedBackup, { from });
+          }}
         />
       ),
     });

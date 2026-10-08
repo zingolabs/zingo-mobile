@@ -6,11 +6,11 @@ const meta: Meta<typeof SeedBackupNotice> = {
   title: 'History/SeedBackupNotice',
   component: SeedBackupNotice,
   decorators: [withAppContext()],
-  args: { backedUp: false, onBackUp: () => {} },
+  args: { backedUp: false, covered: false, onBackUp: () => {} },
 };
 
 export default meta;
 type Story = StoryObj<typeof SeedBackupNotice>;
 
 export const NotBackedUp: Story = {};
-export const BackedUp: Story = { args: { backedUp: true } };
+export const BackedUp: Story = { args: { backedUp: true, covered: false } };

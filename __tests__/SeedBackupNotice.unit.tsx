@@ -13,7 +13,11 @@ const renderNotice = (backedUp: boolean) =>
     <ContextAppLoadedProvider
       value={{ ...defaultAppContextLoaded, translate: (k: string) => k }}
     >
-      <SeedBackupNotice backedUp={backedUp} onBackUp={jest.fn()} />
+      <SeedBackupNotice
+        backedUp={backedUp}
+        covered={false}
+        onBackUp={jest.fn()}
+      />
     </ContextAppLoadedProvider>,
   );
 
