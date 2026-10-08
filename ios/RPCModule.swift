@@ -808,6 +808,15 @@ class RPCModule: NSObject {
       }
   }
 
+  @objc(probeServerInfo:resolve:reject:)
+  func probeServerInfo(_ serveruri: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      DispatchQueue.global(qos: .userInitiated).async {
+        FfiOutcome.of {
+          try probeServer(serverUri: serveruri)
+        }.settle(resolve: resolve, reject: reject)
+      }
+  }
+
   @objc(getLatestBlockWalletInfo:reject:)
   func getLatestBlockWalletInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
       DispatchQueue.global(qos: .userInitiated).async {

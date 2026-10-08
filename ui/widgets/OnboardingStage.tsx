@@ -20,7 +20,7 @@ type OnboardingStageProps = {
   children: React.ReactNode;
 };
 
-const AXIS_PT = 30;
+export const AXIS_PT = 30;
 const AXIS_OVERLAP_MS = 90;
 
 const welcomeEnter = () =>
@@ -59,7 +59,7 @@ const errorEnter = () =>
   FadeIn.duration(300).easing(ease.standard).reduceMotion(ReduceMotion.System);
 const importingExit = () =>
   FadeOut.duration(duration.base).reduceMotion(ReduceMotion.System);
-const axisEnter = (fromX: number) =>
+export const axisEnter = (fromX: number) =>
   new Keyframe({
     0: { opacity: 0, transform: [{ translateX: fromX }] },
     100: { opacity: 1, transform: [{ translateX: 0 }], easing: ease.out },
@@ -67,7 +67,7 @@ const axisEnter = (fromX: number) =>
     .duration(duration.axis)
     .delay(AXIS_OVERLAP_MS)
     .reduceMotion(ReduceMotion.System);
-const axisExit = (toX: number) =>
+export const axisExit = (toX: number) =>
   new Keyframe({
     0: { opacity: 1, transform: [{ translateX: 0 }] },
     100: { opacity: 0, transform: [{ translateX: toX }], easing: ease.in },

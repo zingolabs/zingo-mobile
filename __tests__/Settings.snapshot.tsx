@@ -51,10 +51,8 @@ describe('Component Settings - test', () => {
       <ContextAppLoadedProvider value={state}>
         <Settings
           {...props}
-          setServerOption={onSetOption}
           setLanguageOption={onSetOption}
           setBiometricsOption={onSetOption}
-          setSelectServerOption={onSetOption}
           setPerformanceLevelOption={onSetOption}
           setBlockExplorerOption={onSetOption}
           toggleMenuDrawer={toggle}

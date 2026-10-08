@@ -1,5 +1,11 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import {
   NativeSyntheticEvent,
   Pressable,
@@ -28,6 +34,7 @@ import {
   isSeedWord,
   isViewingKey,
   resolveWord,
+  seedStatus,
   suggestWords,
   tokenize,
 } from '@app/utils/seedPhrase';
@@ -38,6 +45,8 @@ type SeedPhraseInputProps = {
   translate: (key: string) => TranslateType;
   testID?: string;
   accessibilityLabel?: string;
+  // Why the viewing key in the field cannot be used, already translated.
+  keyError?: string;
 };
 
 const chipEnter = () =>
@@ -73,18 +82,50 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
   translate,
   testID,
   accessibilityLabel,
+  keyError,
 }) => {
   const { colors } = useTheme();
   const [draft, setDraft] = useState('');
   const [invalidDraft, setInvalidDraft] = useState(false);
+  // Set when typing or pasting tried to go past the 24th word.
+  const [overflow, setOverflow] = useState(false);
   const [focused, setFocused] = useState(false);
   const inputRef = useRef<TextInput>(null);
+  // A fast keyboard sends the next key before the last change renders, so the
+  // props can still hold the words from before it. Every render catches up.
+  const pendingWordsRef = useRef<string[] | null>(null);
+  useLayoutEffect(() => {
+    pendingWordsRef.current = null;
+  });
+  // The native text already turned into words. A TextInput keeps its own text
+  // while newer keys are pending instead of taking the emptied draft, so the
+  // next change can still start with it, render or not. It is dropped once a
+  // change no longer does: the field has emptied.
+  const consumedRef = useRef('');
+  // The native text as the last change reported it.
+  const nativeRef = useRef('');
 
-  const ufvk = isViewingKey(value) ? value.trim() : '';
-  const words = useMemo(() => (ufvk ? [] : tokenize(value)), [ufvk, value]);
+  const ufvk = isViewingKey(value) ? value : '';
+  const status = useMemo(() => seedStatus(value), [value]);
+  const words = status.kind === 'seed' ? status.words : [];
+  const full = words.length >= SEED_WORD_COUNT;
+  const badWords = full && status.kind === 'seed' && status.invalid > 0;
+  const badChecksum = status.kind === 'seed' && status.badChecksum;
+  const keyFault = status.kind === 'ufvk' && !!keyError;
   const complete =
-    !!ufvk ||
-    (words.length === SEED_WORD_COUNT && words.every(w => isSeedWord(w)));
+    (status.kind === 'ufvk' && !keyFault) ||
+    (status.kind === 'seed' && status.complete);
+  const fieldError: string | undefined = keyFault
+    ? keyError
+    : invalidDraft
+      ? 'import.word-invalid'
+      : overflow && full
+        ? 'import.seed-full'
+        : badWords
+          ? 'import.seed-words-invalid'
+          : badChecksum
+            ? 'import.seed-checksum'
+            : undefined;
   const suggestions = useMemo(() => suggestWords(draft), [draft]);
   const ghost =
     suggestions.length > 0 && suggestions[0] !== draft
@@ -107,8 +148,7 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
     );
   };
 
-  const rejectDraft = () => {
-    setInvalidDraft(true);
+  const shakeField = () => {
     const step = SHAKE_MS / 6;
     shake.value = withSequence(
       withTiming(-SHAKE_PX, { duration: step / 2 }),
@@ -120,21 +160,46 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
     );
   };
 
+  const rejectDraft = () => {
+    setInvalidDraft(true);
+    shakeField();
+  };
+
+  const currentWords = () => pendingWordsRef.current ?? words;
+
+  // Empties the draft. `used` is the native text it came from, which the field
+  // may keep showing.
+  const clearDraft = (used: string) => {
+    consumedRef.current = used;
+    setDraft('');
+  };
+
+  const rejectOverflow = (used: string) => {
+    clearDraft(used);
+    setOverflow(true);
+    shakeField();
+  };
+
   const commit = (next: string[]) => {
+    pendingWordsRef.current = next;
     onChangeValue(joinWords(next));
     pulseCounter();
   };
 
-  const acceptWord = (word: string) => {
-    setDraft('');
+  const acceptWord = (word: string, used: string) => {
+    clearDraft(used);
     setInvalidDraft(false);
-    commit([...words, word]);
+    if (currentWords().length >= SEED_WORD_COUNT) {
+      rejectOverflow(used);
+      return;
+    }
+    commit([...currentWords(), word]);
   };
 
-  const acceptDraftFrom = (text: string) => {
+  const acceptDraftFrom = (text: string, used: string) => {
     const word = resolveWord(text);
     if (word) {
-      acceptWord(word);
+      acceptWord(word, used);
     } else {
       setDraft(text);
       rejectDraft();
@@ -143,19 +208,31 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
 
   const acceptDraft = () => {
     if (draft) {
-      acceptDraftFrom(draft);
+      acceptDraftFrom(draft, nativeRef.current);
     }
   };
 
   const removeWordAt = (index: number) => {
-    commit(words.filter((_, i) => i !== index));
+    setOverflow(false);
+    commit(currentWords().filter((_, i) => i !== index));
   };
 
-  const onChangeText = (text: string) => {
+  const onChangeText = (native: string) => {
+    nativeRef.current = native;
+    // Text already turned into words is not read again.
+    if (!native.startsWith(consumedRef.current)) {
+      consumedRef.current = '';
+    }
+    const text = native.slice(consumedRef.current.length);
+    const before = currentWords();
     setInvalidDraft(false);
     if (isViewingKey(text)) {
-      setDraft('');
+      clearDraft(native);
       onChangeValue(text.trim());
+      return;
+    }
+    if (before.length >= SEED_WORD_COUNT && text.trim()) {
+      rejectOverflow(native);
       return;
     }
     if (!/[\s,]/.test(text)) {
@@ -165,24 +242,42 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
     const closed = /[\s,]$/.test(text);
     const parts = tokenize(text);
     if (parts.length === 0) {
-      setDraft('');
+      clearDraft(native);
       return;
     }
     if (parts.length === 1) {
       if (closed) {
-        acceptDraftFrom(parts[0]);
+        acceptDraftFrom(parts[0], native);
       } else {
         setDraft(parts[0]);
       }
       return;
     }
-    setDraft('');
-    commit([...words, ...parts]);
+    clearDraft(native);
+    const room = SEED_WORD_COUNT - before.length;
+    if (parts.length > room) {
+      setOverflow(true);
+      shakeField();
+    }
+    commit([...before, ...parts.slice(0, room)]);
+  };
+
+  // Editing the key in place; a change that leaves it no longer a key returns
+  // the field to words.
+  const onChangeKey = (text: string) => {
+    if (isViewingKey(text)) {
+      onChangeValue(text);
+      return;
+    }
+    pendingWordsRef.current = [];
+    onChangeValue('');
+    onChangeText(text);
   };
 
   const onKeyPress = (e: NativeSyntheticEvent<TextInputKeyPressEventData>) => {
-    if (e.nativeEvent.key === 'Backspace' && draft === '' && words.length) {
-      removeWordAt(words.length - 1);
+    const current = currentWords();
+    if (e.nativeEvent.key === 'Backspace' && draft === '' && current.length) {
+      removeWordAt(current.length - 1);
     }
   };
 
@@ -192,7 +287,15 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
     }
   }, [ufvk]);
 
-  const borderColor = invalidDraft
+  // The 24th word that breaks the checksum shakes the field once.
+  useEffect(() => {
+    if (badChecksum || badWords || keyFault) {
+      shakeField();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [badChecksum, badWords, keyFault]);
+
+  const borderColor = fieldError
     ? colors.fgDangerEmphasis
     : complete
       ? colors.borderAccent
@@ -232,22 +335,34 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
           }}
         >
           {ufvk ? (
-            <Pressable
-              onPress={() => onChangeValue('')}
-              accessibilityRole="button"
+            <TextInput
+              testID={testID}
+              accessible={true}
               accessibilityLabel={translate('import.viewing-key') as string}
+              value={ufvk}
+              onChangeText={onChangeKey}
+              onFocus={() => setFocused(true)}
+              onBlur={() => {
+                setFocused(false);
+                onChangeValue(ufvk.trim());
+              }}
+              multiline
+              autoCorrect={false}
+              autoCapitalize="none"
+              autoComplete="off"
+              spellCheck={false}
+              textContentType="none"
+              cursorColor={colors.fgAccent}
               style={{
                 flex: 1,
-                borderRadius: 8,
-                paddingHorizontal: 10,
-                paddingVertical: 8,
-                backgroundColor: colors.bgCanvas,
+                color: colors.fgDefault,
+                fontSize: 14,
+                lineHeight: 20,
+                padding: 0,
+                textAlignVertical: 'top',
+                backgroundColor: 'transparent',
               }}
-            >
-              <Text style={{ color: colors.fgDefault, fontSize: 14 }}>
-                {ufvk}
-              </Text>
-            </Pressable>
+            />
           ) : (
             words.map((word, i) => {
               const valid = isSeedWord(word);
@@ -358,7 +473,7 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
             {suggestions.map((s, i) => (
               <Pressable
                 key={s}
-                onPress={() => acceptWord(s)}
+                onPress={() => acceptWord(s, nativeRef.current)}
                 accessibilityRole="button"
                 style={{
                   height: CHIP_HEIGHT,
@@ -396,7 +511,11 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
               position: 'absolute',
               right: 13,
               bottom: 12,
-              color: complete ? colors.fgAccent : colors.fgMuted,
+              color: fieldError
+                ? BAD_TEXT
+                : complete
+                  ? colors.fgAccent
+                  : colors.fgMuted,
               fontSize: 11,
             },
             counterStyle,
@@ -405,8 +524,9 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
           {counter}
         </Animated.Text>
       </Animated.View>
-      {invalidDraft && (
+      {fieldError && (
         <Text
+          testID={testID ? `${testID}.error` : undefined}
           style={{
             marginTop: 6,
             marginHorizontal: 2,
@@ -415,7 +535,10 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
             lineHeight: 15,
           }}
         >
-          {translate('import.word-invalid') as string}
+          {(keyFault ? fieldError : (translate(fieldError) as string)).replace(
+            '{count}',
+            String(status.kind === 'seed' ? status.invalid : 0),
+          )}
         </Text>
       )}
     </View>

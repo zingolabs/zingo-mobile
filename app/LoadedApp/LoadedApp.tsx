@@ -116,6 +116,7 @@ import { BottomSheetBackHandler } from '@app/hooks/useBottomSheetBackHandler';
 import ConfirmBottomSheet from '@ui/widgets/ConfirmBottomSheet';
 import { showConfirm } from '@app/services/showConfirm';
 import RootNavigator from '@app/navigation/RootNavigator';
+import WalletServer from '@screens/Server/WalletServer';
 import {
   OptionsPanelProvider,
   toggleOptionsPanel,
@@ -1522,6 +1523,9 @@ export class LoadedAppClass extends Component<
     } else if (item === MenuItemEnum.AddressBook) {
       this.drawerNav?.navigate(RouteEnum.AddressBook);
       return;
+    } else if (item === MenuItemEnum.Server) {
+      this.drawerNav?.navigate(RouteEnum.Server);
+      return;
     } else if (item === MenuItemEnum.Support) {
       this.setShowSwipeableIcons(false);
       await sendEmail(this.state.translate, this.state.zingolibVersion);
@@ -1722,11 +1726,6 @@ export class LoadedAppClass extends Component<
   setBiometricsOption = async (value: boolean): Promise<void> => {
     await SettingsFileImpl.writeSettings(SettingsNameEnum.biometrics, value);
     this.setState({ biometrics: value });
-  };
-
-  setSelectServerOption = async (value: SelectServerEnum): Promise<void> => {
-    await SettingsFileImpl.writeServer(this.state.server, value);
-    this.setState({ selectServer: value });
   };
 
   setPerformanceLevelOption = async (
@@ -2136,10 +2135,8 @@ export class LoadedAppClass extends Component<
                       {props => (
                         <Settings
                           {...props}
-                          setServerOption={this.setServerOption}
                           setLanguageOption={this.setLanguageOption}
                           setBiometricsOption={this.setBiometricsOption}
-                          setSelectServerOption={this.setSelectServerOption}
                           setPerformanceLevelOption={
                             this.setPerformanceLevelOption
                           }
@@ -2147,6 +2144,14 @@ export class LoadedAppClass extends Component<
                           toggleMenuDrawer={
                             () => toggleOptionsPanel() /* header */
                           }
+                        />
+                      )}
+                    </RootNavigator.Screen>
+                    <RootNavigator.Screen name={RouteEnum.Server}>
+                      {props => (
+                        <WalletServer
+                          {...props}
+                          setServerOption={this.setServerOption}
                         />
                       )}
                     </RootNavigator.Screen>

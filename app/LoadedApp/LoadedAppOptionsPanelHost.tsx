@@ -10,6 +10,7 @@ import { ContextAppLoaded } from '@app/context';
 import { MenuItemEnum } from '@app/AppState';
 import { sendEmail } from '@app/services/sendEmail';
 import { walletBackupExists } from '@app/walletBackend';
+import ServerIcon from '@ui/widgets/ServerIcon';
 
 import AddressBookIcon from '../../assets/img/options/address-book.svg';
 import WalletSeedIcon from '../../assets/img/options/wallet-seed.svg';
@@ -35,6 +36,7 @@ const MENU_TEST_IDS: Partial<Record<MenuItemEnum, string>> = {
   [MenuItemEnum.Insight]: 'menu.insight',
   [MenuItemEnum.ChangeWallet]: 'menu.changewallet',
   [MenuItemEnum.RestoreWalletBackup]: 'menu.restorebackupwallet',
+  [MenuItemEnum.Server]: 'menu.server',
 };
 
 type LoadedAppOptionsPanelHostProps = {
@@ -56,7 +58,7 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
   children,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, addLastSnackbar, readOnly, server } = context;
+  const { translate, addLastSnackbar, readOnly, server, netInfo } = context;
   const { isOpen } = useOptionsPanel();
 
   // Re-check the backup file each time the panel opens — same trigger as the
@@ -169,8 +171,23 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
       });
     }
 
+    // Server — always visible, always last; its dot says how Zingo connects.
+    list.push({
+      id: MenuItemEnum.Server,
+      testID: MENU_TEST_IDS[MenuItemEnum.Server],
+      label: translate('server.title') as string,
+      icon: (
+        <ServerIcon
+          noInternet={!netInfo.isConnected}
+          offline={isOffline}
+          background="#111c2c"
+        />
+      ),
+      onPress: () => dispatch(MenuItemEnum.Server),
+    });
+
     return list;
-  }, [translate, dispatch, readOnly, server, hasBackupWallet]);
+  }, [translate, dispatch, readOnly, server, hasBackupWallet, netInfo]);
 
   const socials = useMemo<OptionsPanelSocial[]>(
     () => [

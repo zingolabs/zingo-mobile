@@ -36,6 +36,7 @@ export {
   fetchWallet,
   getBalanceInfo,
   getLatestBlockServerInfo,
+  probeServer,
   getServerInfo,
   getSpendableBalanceWithAddress,
   getTotalMemobytesToAddress,
@@ -48,6 +49,7 @@ export {
   loadExistingWallet,
   migrationStatus,
   parseAddress,
+  checkUfvk,
   planIronwoodMigration,
   planOrchardDrain,
   quickSplit,
@@ -70,7 +72,12 @@ export {
   walletExists,
   windowTimeline,
 } from './utils/walletUtils';
-export type { ZecPriceOutcome } from './utils/walletUtils';
+export type {
+  ProbeTarget,
+  ServerProbe,
+  UfvkCheck,
+  ZecPriceOutcome,
+} from './utils/walletUtils';
 export {
   hasRepairableWalletFile,
   repairDoubleWrappedWallet,

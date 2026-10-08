@@ -246,10 +246,12 @@ options in `build_clap_app` of `zingolib/zingo-cli/src/lib.rs`.
 
 The app can also author the history (verify). Mixnet Mode is always on in the
 app. The header shows the indicator (`header.mixnet-status`), and the NYM
-Mixnet row of Settings (`settings.mixnet`) opens the Mixnet Doctor. In
-Settings, the Network row (`settings.server-chain`) selects testnet, and the
-Custom row (`settings.custom-server`, `settings.custom-server-field`) takes
-`https://testnet.zec.rocks:443`. The Save button is `settings.button.save`.
+Mixnet row of Settings (`settings.mixnet`) opens the Mixnet Doctor. The
+Server screen is the last item of the options panel (`menu.server`). Its
+Testnet segment (`server.net.test`) selects testnet, and the Custom row
+(`server.custom`) takes the host `testnet.zec.rocks` (`server.custom.host`)
+and the port `443` (`server.custom.port`). The Save button is
+`server.custom.save`.
 
 ## Funding
 

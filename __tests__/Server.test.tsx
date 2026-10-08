@@ -1,127 +1,304 @@
 import 'react-native';
 import React from 'react';
-import { fireEvent, render, screen } from '@testing-library/react-native';
 import {
-  ContextAppLoadingProvider,
-  defaultAppContextLoading,
-} from '@app/context';
-import { ChainNameEnum, SelectServerEnum, ServerUrisType } from '@app/AppState';
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react-native';
+import {
+  ChainNameEnum,
+  SelectServerEnum,
+  ServerUrisType,
+  TranslateType,
+} from '@app/AppState';
 import { offlineServer, remoteServer } from '@app/AppState/types/ServerType';
 import Server from '@screens/Server';
 import ServerList from '@screens/ServerList';
-import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
+import { probeServer } from '@app/walletBackend';
 
-const entry = (uri: string, chainName: ChainNameEnum): ServerUrisType => ({
+jest.mock('@app/walletBackend', () => ({ probeServer: jest.fn() }));
+
+const en = require('../app/translations/en.json');
+const translate = (key: string): TranslateType =>
+  key.split('.').reduce((o, k) => o?.[k], en) ?? key;
+const probe = probeServer as jest.Mock;
+
+const entry = (
+  uri: string,
+  chainName: ChainNameEnum,
+  recommended = false,
+): ServerUrisType => ({
   uri,
   chainName,
   region: 'Global',
   default: false,
   latency: null,
   obsolete: false,
+  recommended,
 });
 
-const servers = [
+const recommended = [
+  entry('https://sa.zaino.example:443', ChainNameEnum.mainChainName, true),
+  entry('https://na.zaino.example:443', ChainNameEnum.mainChainName, true),
+];
+const others = [
   entry('https://zec.rocks:443', ChainNameEnum.mainChainName),
   entry('https://na.zec.rocks:443', ChainNameEnum.mainChainName),
-  entry('https://testnet.zec.rocks:443', ChainNameEnum.testChainName),
 ];
 
 const handlers = () => ({
   onAuto: jest.fn(),
   onPick: jest.fn(),
-  onTestCustom: jest.fn().mockResolvedValue(true),
+  onSaveCustom: jest.fn().mockResolvedValue(true),
   onOffline: jest.fn(),
-  onChoose: jest.fn(),
+  onOther: jest.fn(),
   onProbe: jest.fn(),
+  onUnreachable: jest.fn(),
   onBack: jest.fn(),
 });
-
-const wrap = (node: React.ReactElement) =>
-  render(
-    <ContextAppLoadingProvider
-      value={{ ...defaultAppContextLoading, translate: mockTranslate }}
-    >
-      {node}
-    </ContextAppLoadingProvider>,
-  );
 
 const mount = (
   props: Partial<React.ComponentProps<typeof Server>>,
   h = handlers(),
 ) =>
-  wrap(
+  render(
     <Server
+      translate={translate}
       server={remoteServer(
-        'https://zec.rocks:443',
+        'https://sa.zaino.example:443',
         ChainNameEnum.mainChainName,
       )}
       selectServer={SelectServerEnum.auto}
       status="ok"
       blockHeight="3473752"
       busy={false}
-      servers={servers}
-      loadedChains={[ChainNameEnum.mainChainName, ChainNameEnum.testChainName]}
-      latencies={{}}
+      online={true}
+      recommended={recommended}
+      latencies={{
+        'https://sa.zaino.example:443': 38,
+        'https://na.zaino.example:443': null,
+      }}
       {...h}
       {...props}
     />,
   );
 
-test('Tests that the testnet servers are listed and probed when the Testnet segment is pressed', () => {
+const verified = (chainName = 'main') => ({
+  ok: true,
+  value: {
+    outcome: 'verified',
+    host: 'node.myhome.net',
+    port: 9067,
+    resolved: ['198.51.100.7'],
+    literal: false,
+    latencyMs: 120,
+    chainName,
+    blockHeight: 3473752,
+    details: 'LightdInfo { .. }',
+  },
+});
+
+const typeCustom = (text: string) => {
+  fireEvent.press(screen.getByTestId('server.custom'));
+  fireEvent.changeText(screen.getByTestId('server.custom.host'), text);
+};
+
+beforeEach(() => probe.mockReset());
+
+test('Tests that Automatic and the recommended servers are on the main screen and Other servers drills in', () => {
   const h = handlers();
   mount({}, h);
-  expect(screen.getByTestId('server.choose')).toBeOnTheScreen();
-  expect(screen.queryByTestId('server.pick.testnet.zec.rocks:443')).toBeNull();
-  fireEvent.press(
-    screen.getByTestId(`server.net.${ChainNameEnum.testChainName}`),
+  expect(screen.getByText('Fastest right now: sa.zaino.example')).toBeTruthy();
+  expect(screen.getByTestId('server.pick.na.zaino.example')).toBeOnTheScreen();
+  fireEvent.press(screen.getByTestId('server.other'));
+  expect(h.onOther).toHaveBeenCalledWith(ChainNameEnum.mainChainName);
+  expect(h.onProbe).toHaveBeenLastCalledWith(ChainNameEnum.mainChainName);
+});
+
+test('Tests that a recommended server that did not answer shakes instead of being picked', () => {
+  const h = handlers();
+  mount({}, h);
+  fireEvent.press(screen.getByTestId('server.pick.na.zaino.example'));
+  expect(h.onUnreachable).toHaveBeenCalledTimes(1);
+  expect(h.onPick).not.toHaveBeenCalled();
+});
+
+test('Tests that a recommended server that answered is picked', () => {
+  const h = handlers();
+  mount(
+    {
+      latencies: {
+        'https://sa.zaino.example:443': 38,
+        'https://na.zaino.example:443': 96,
+      },
+    },
+    h,
   );
-  expect(
-    screen.getByTestId('server.pick.testnet.zec.rocks:443'),
-  ).toBeOnTheScreen();
-  expect(h.onProbe).toHaveBeenLastCalledWith(ChainNameEnum.testChainName);
-});
-
-test('Tests that a listed server is picked and the drill-in opens the list when their rows are pressed', () => {
-  const h = handlers();
-  mount({}, h);
-  fireEvent.press(screen.getByTestId('server.choose'));
-  expect(h.onChoose).toHaveBeenCalledTimes(1);
-  fireEvent.press(
-    screen.getByTestId(`server.net.${ChainNameEnum.testChainName}`),
-  );
-  fireEvent.press(screen.getByTestId('server.pick.testnet.zec.rocks:443'));
-  expect(h.onPick).toHaveBeenCalledWith(servers[2]);
-});
-
-test('Tests that Automatic is not chosen again when it is already the mode', () => {
-  const h = handlers();
-  mount({}, h);
-  fireEvent.press(screen.getByTestId('server.auto'));
-  expect(h.onAuto).not.toHaveBeenCalled();
-});
-
-test('Tests that the Offline switch turns offline on for the shown chain when a server is active', () => {
-  const h = handlers();
-  mount({}, h);
-  fireEvent.press(screen.getByTestId('server.offline'));
-  expect(h.onOffline).toHaveBeenCalledWith(true, ChainNameEnum.mainChainName);
+  fireEvent.press(screen.getByTestId('server.pick.na.zaino.example'));
+  expect(h.onPick).toHaveBeenCalledWith(recommended[1]);
 });
 
 test('Tests that the rows are locked and the switch turns offline off when the app is offline', () => {
   const h = handlers();
   mount({ server: offlineServer(ChainNameEnum.mainChainName) }, h);
-  fireEvent.press(screen.getByTestId('server.choose'));
-  expect(h.onChoose).not.toHaveBeenCalled();
+  fireEvent.press(screen.getByTestId('server.other'));
+  expect(h.onOther).not.toHaveBeenCalled();
   fireEvent.press(screen.getByTestId('server.offline'));
   expect(h.onOffline).toHaveBeenCalledWith(false, ChainNameEnum.mainChainName);
 });
 
-test('Tests that a server that did not answer is refused and a reachable one is picked in the server list', () => {
+test('Tests that pasting a full address splits it into host and port', () => {
+  mount({});
+  typeCustom('https://node.myhome.net:9067');
+  expect(screen.getByTestId('server.custom.host').props.value).toBe(
+    'node.myhome.net',
+  );
+  expect(screen.getByTestId('server.custom.port').props.value).toBe('9067');
+});
+
+test('Tests that typing a scheme drops it and a colon after the host moves to the port', () => {
+  mount({});
+  fireEvent.press(screen.getByTestId('server.custom'));
+  const typed = 'https://na.zec.rocks:';
+  for (let i = 1; i <= typed.length; i++) {
+    const field = screen.getByTestId('server.custom.host');
+    fireEvent.changeText(field, field.props.value + typed[i - 1]);
+  }
+  expect(screen.getByTestId('server.custom.host').props.value).toBe(
+    'na.zec.rocks',
+  );
+  fireEvent.changeText(screen.getByTestId('server.custom.port'), '443');
+  expect(screen.getByTestId('server.custom.port').props.value).toBe('443');
+});
+
+test('Tests that a passing test logs each step and asks to save, without switching', async () => {
+  const h = handlers();
+  probe.mockResolvedValue(verified());
+  mount({}, h);
+  typeCustom('node.myhome.net:9067');
+  await act(async () => {
+    fireEvent.press(screen.getByTestId('server.custom.test'));
+  });
+  expect(probe).toHaveBeenCalledWith('https://node.myhome.net:9067');
+  expect(screen.getByText('Testing node.myhome.net:9067…')).toBeTruthy();
+  expect(screen.getByText('DNS resolved to 198.51.100.7')).toBeTruthy();
+  expect(screen.getByText('GetLightdInfo responded in 120 ms')).toBeTruthy();
+  expect(
+    screen.getByText('Endpoint verified: Mainnet, block 3,473,752'),
+  ).toBeTruthy();
+  expect(
+    screen.getByText('Works, but it isn’t saved yet. Tap Save to use it.'),
+  ).toBeTruthy();
+  expect(h.onSaveCustom).not.toHaveBeenCalled();
+});
+
+test('Tests that Save tests first and hands the server over once it passed', async () => {
+  const h = handlers();
+  probe.mockResolvedValue(verified());
+  mount({}, h);
+  typeCustom('node.myhome.net:9067');
+  await act(async () => {
+    fireEvent.press(screen.getByTestId('server.custom.save'));
+  });
+  expect(probe).toHaveBeenCalledTimes(1);
+  expect(h.onSaveCustom).toHaveBeenCalledWith(
+    ChainNameEnum.mainChainName,
+    'https://node.myhome.net:9067',
+  );
+  expect(
+    screen.getByText('Saved! Zingo is now using node.myhome.net.'),
+  ).toBeTruthy();
+});
+
+test('Tests that a server on another network fails the test and offers to switch', async () => {
+  const h = handlers();
+  probe.mockResolvedValue(verified('test'));
+  mount({}, h);
+  typeCustom('node.myhome.net:9067');
+  await act(async () => {
+    fireEvent.press(screen.getByTestId('server.custom.save'));
+  });
+  expect(h.onSaveCustom).not.toHaveBeenCalled();
+  expect(screen.getByText('chainName is “test”, expected “main”')).toBeTruthy();
+  expect(screen.getByText('Not saved.')).toBeTruthy();
+  expect(screen.getByTestId('server.custom.switch')).toBeOnTheScreen();
+});
+
+test('Tests that an empty port box means port 443', async () => {
+  probe.mockResolvedValue(verified());
+  mount({});
+  typeCustom('node.myhome.net');
+  await act(async () => {
+    fireEvent.press(screen.getByTestId('server.custom.test'));
+  });
+  expect(probe).toHaveBeenCalledWith('https://node.myhome.net:443');
+  expect(screen.getByText('Testing node.myhome.net:443…')).toBeTruthy();
+});
+
+test('Tests that a host that does not resolve says what to fix', async () => {
+  probe.mockResolvedValue({
+    ok: true,
+    value: {
+      outcome: 'unresolved',
+      host: 'down.example',
+      port: 9067,
+      cause: 'no such host',
+    },
+  });
+  mount({});
+  typeCustom('down.example:9067');
+  await act(async () => {
+    fireEvent.press(screen.getByTestId('server.custom.test'));
+  });
+  expect(screen.getByText('Couldn’t resolve down.example')).toBeTruthy();
+  expect(screen.getByText('Check the host for typos.')).toBeTruthy();
+});
+
+test('Tests that leaving with an unsaved address asks first, and Don’t Save leaves', async () => {
+  const h = handlers();
+  mount({}, h);
+  typeCustom('node.myhome.net:9067');
+  fireEvent.press(screen.getByTestId('server.done'));
+  expect(h.onBack).not.toHaveBeenCalled();
+  await waitFor(() =>
+    expect(screen.getByTestId('server.unsaved')).toBeOnTheScreen(),
+  );
+  expect(
+    screen.getByText(
+      'You haven’t saved node.myhome.net. Saving tests it first. If you leave now, Zingo keeps using sa.zaino.example (automatic).',
+    ),
+  ).toBeTruthy();
+  fireEvent.press(screen.getByTestId('server.unsaved.discard'));
+  expect(h.onBack).toHaveBeenCalledTimes(1);
+});
+
+test('Tests that a saved custom server reads as saved and leaves without asking', () => {
+  const h = handlers();
+  mount(
+    {
+      server: remoteServer(
+        'https://node.myhome.net:9067',
+        ChainNameEnum.mainChainName,
+      ),
+      selectServer: SelectServerEnum.custom,
+    },
+    h,
+  );
+  expect(screen.getByText('Saved')).toBeTruthy();
+  expect(screen.getByText('Saved. Zingo is using this server.')).toBeTruthy();
+  fireEvent.press(screen.getByTestId('server.back'));
+  expect(h.onBack).toHaveBeenCalledTimes(1);
+});
+
+test('Tests that a server that did not answer is refused and a reachable one is picked in Other servers', () => {
   const onPick = jest.fn();
   const onUnreachable = jest.fn();
-  wrap(
+  render(
     <ServerList
-      servers={servers.slice(0, 2)}
+      translate={translate}
+      servers={others}
       latencies={{
         'https://zec.rocks:443': null,
         'https://na.zec.rocks:443': 142,
@@ -134,31 +311,10 @@ test('Tests that a server that did not answer is refused and a reachable one is 
       onBack={jest.fn()}
     />,
   );
+  expect(screen.getByText('Other servers')).toBeTruthy();
   fireEvent.press(screen.getByTestId('serverlist.pick.zec.rocks:443'));
   expect(onUnreachable).toHaveBeenCalledTimes(1);
   expect(onPick).not.toHaveBeenCalled();
   fireEvent.press(screen.getByTestId('serverlist.pick.na.zec.rocks:443'));
-  expect(onPick).toHaveBeenCalledWith(servers[1]);
-});
-
-test('Tests that loading dots stand in for the listed servers until the chain list arrives', () => {
-  mount({ loadedChains: [] });
-  fireEvent.press(
-    screen.getByTestId(`server.net.${ChainNameEnum.testChainName}`),
-  );
-  expect(screen.getByTestId('server.list.loading')).toBeOnTheScreen();
-
-  wrap(
-    <ServerList
-      servers={[]}
-      loading={true}
-      latencies={{}}
-      selectedUri={null}
-      busy={false}
-      onPick={jest.fn()}
-      onUnreachable={jest.fn()}
-      onBack={jest.fn()}
-    />,
-  );
-  expect(screen.getByTestId('serverlist.loading')).toBeOnTheScreen();
+  expect(onPick).toHaveBeenCalledWith(others[1]);
 });

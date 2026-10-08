@@ -7,6 +7,7 @@ import { WalletErrorInfo } from './types/WalletErrorInfo';
 import { DeleteWalletContext } from './types/DeleteWalletContext';
 import { ServerStatus } from './types/ServerStatus';
 import ServerUrisType from './types/ServerUrisType';
+import { ChainNameEnum } from './enums/ChainNameEnum';
 
 /** The launch gate's outcome, carried whole so the locked screen renders the reason it was locked for. */
 export type BiometricGateOutcome =
@@ -35,8 +36,10 @@ export default interface AppStateLoading {
   serverBlockHeight: string;
   // uri → latency in ms, null when the server did not answer the probe.
   serverLatencies: Record<string, number | null>;
-  // chain → servers offered for it; absent until its list has loaded.
+  // chain → servers under Other servers; absent until its list has loaded.
   serverLists: Record<string, ServerUrisType[]>;
+  // The network Other servers lists.
+  serverListChain: ChainNameEnum;
   // Where Done on the Server screen goes back to.
   serverReturn: RouteEnum;
 }
