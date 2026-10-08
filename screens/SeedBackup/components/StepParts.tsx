@@ -97,13 +97,13 @@ export const StepActions: React.FunctionComponent<StepActionsProps> = ({
             borderRadius: 22,
             alignItems: 'center',
             justifyContent: 'center',
-            backgroundColor: off ? colors.bgSecondaryDisabled : colors.bgAccent,
+            backgroundColor: off ? colors.bgAccentDisabled : colors.bgAccent,
             transform: [{ scale: pressed ? 0.97 : 1 }],
           })}
         >
           <Text
             style={{
-              color: off ? colors.fgAccentDisabled : colors.bgCanvas,
+              color: colors.bgCanvas,
               fontSize: 15,
               fontWeight: '700',
             }}
