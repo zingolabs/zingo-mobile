@@ -78,7 +78,7 @@ class WalletFileRepairTest {
         File(context.filesDir, backupName).delete()
         File(context.filesDir, swapName).delete()
         uniffi.zingo.initLogging()
-        uniffi.zingo.initFromSeed(Seeds.HOSPITAL, 2000000u, "", "main", "Medium", 1u)
+        uniffi.zingo.initFromSeed(seed = Seeds.HOSPITAL, birthday = 2000000u, connection = testConnection("", "main"))
         plainWallet = uniffi.zingo.saveWalletBytes()!!
         walletFile().writeBytes(plainWallet)
         assertThat(state(fileName)).isEqualTo("plainWallet")
