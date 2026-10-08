@@ -58,7 +58,14 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
   children,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, addLastSnackbar, readOnly, server, netInfo } = context;
+  const {
+    translate,
+    addLastSnackbar,
+    readOnly,
+    server,
+    netInfo,
+    seedBackedUp,
+  } = context;
   const { isOpen } = useOptionsPanel();
 
   // Re-check the backup file each time the panel opens — same trigger as the
@@ -111,6 +118,7 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
         ? (translate('loadedapp.walletufvk') as string)
         : (translate('loadedapp.walletseed') as string),
       icon: <WalletSeedIcon width={28} height={28} />,
+      badge: !readOnly && !seedBackedUp,
       onPress: () => dispatch(MenuItemEnum.WalletSeedUfvk),
     });
 
@@ -187,7 +195,15 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
     });
 
     return list;
-  }, [translate, dispatch, readOnly, server, hasBackupWallet, netInfo]);
+  }, [
+    translate,
+    dispatch,
+    readOnly,
+    seedBackedUp,
+    server,
+    hasBackupWallet,
+    netInfo,
+  ]);
 
   const socials = useMemo<OptionsPanelSocial[]>(
     () => [

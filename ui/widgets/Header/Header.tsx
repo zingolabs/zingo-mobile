@@ -120,6 +120,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     server,
     mixnetView,
     sendPermitNow,
+    seedBackedUp,
   } = context;
 
   const translate = translateProp ?? context.translate;
@@ -265,6 +266,24 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                 onPress={toggleMenuDrawer}
               >
                 <MenuMorphIcon />
+                {!readOnly && !seedBackedUp && (
+                  <View
+                    testID="header.menudot"
+                    pointerEvents="none"
+                    style={{
+                      position: 'absolute',
+                      top: -1,
+                      right: -2,
+                      width: 9,
+                      height: 9,
+                      borderRadius: 5,
+                      borderWidth: 2,
+                      borderColor: colors.bgCanvas,
+                      backgroundColor: colors.fgWarning,
+                      boxSizing: 'content-box',
+                    }}
+                  />
+                )}
               </TouchableOpacity>
             )}
             {readOnly && !noUfvkIcon && (
