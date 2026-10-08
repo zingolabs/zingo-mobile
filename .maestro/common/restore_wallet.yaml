@@ -83,6 +83,14 @@ appId: org.ZingoLabs.Zingo
 - assertVisible:
     text: "24 / 24"
 
+# With 24 chips the phrase field is tall enough to push the birthday row
+# below the screen on Android and behind the floating Import button on iOS.
+# Centring it brings it clear of both, the button and the keyboard.
+- scrollUntilVisible:
+    element:
+      id: "import.birthdayinput"
+    centerElement: true
+
 # The birthday field accepts input once the server reports its latest
 # block, which the tooltip beside the label then shows as the end of
 # its range.
