@@ -332,7 +332,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -e\n\nWITH_ENVIRONMENT=\"../node_modules/react-native/scripts/xcode/with-environment.sh\"\nREACT_NATIVE_XCODE=\"../node_modules/react-native/scripts/react-native-xcode.sh\"\n\n/bin/sh -c \". $WITH_ENVIRONMENT && $REACT_NATIVE_XCODE\"\n";
+			shellScript = "set -e\n\nWITH_ENVIRONMENT=\"../node_modules/react-native/scripts/xcode/with-environment.sh\"\nREACT_NATIVE_XCODE=\"../node_modules/react-native/scripts/react-native-xcode.sh\"\n\n# The zingo-mobile part of the build descriptor, which RPCModule joins to zingolib's.\nDESCRIPTOR=$(/bin/sh -c \". $WITH_ENVIRONMENT >/dev/null && \\\"\\$NODE_BINARY\\\" ../scripts/zm_descriptor.mjs\" || true)\n[ -n \"$DESCRIPTOR\" ] || DESCRIPTOR=zm_unknown\nPLIST=\"$TARGET_BUILD_DIR/$INFOPLIST_PATH\"\n/usr/libexec/PlistBuddy -c \"Delete :ZingoMobileDescriptor\" \"$PLIST\" 2>/dev/null || true\n/usr/libexec/PlistBuddy -c \"Add :ZingoMobileDescriptor string $DESCRIPTOR\" \"$PLIST\"\n\n/bin/sh -c \". $WITH_ENVIRONMENT && $REACT_NATIVE_XCODE\"\n";
 		};
 		175DE3CE7A4FE94269419EDC /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;

@@ -1028,9 +1028,16 @@ class RPCModule: NSObject {
   func getVersionInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
       DispatchQueue.global(qos: .userInitiated).async {
         FfiOutcome.of {
-          try getVersion()
+          "\(try getVersion())-\(RPCModule.zmDescriptor)"
         }.settle(resolve: resolve, reject: reject)
       }
+  }
+
+  // The zingo-mobile part of the build descriptor, which the app build writes
+  // into Info.plist; zm_unknown in a bundle the build did not describe.
+  static var zmDescriptor: String {
+    let value = Bundle.main.object(forInfoDictionaryKey: "ZingoMobileDescriptor") as? String ?? ""
+    return value.isEmpty ? "zm_unknown" : value
   }
 
   @objc(getMessagesInfo:resolve:reject:)

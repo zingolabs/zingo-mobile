@@ -46,8 +46,7 @@ runs:
     # RUSTUP_TOOLCHAIN overrides zingolib's toolchain pin for the workbench
     # build, and the builder sets the same toolchain for its own steps.
     # CARGO_INCREMENTAL keeps the incremental state out of the cached
-    # target directory, which nothing edits between runs. The kotlin mode
-    # compiles nothing that embeds the descriptor, and it takes none.
+    # target directory, which nothing edits between runs.
     - name: Generate the Kotlin bindings
       shell: bash
       env:

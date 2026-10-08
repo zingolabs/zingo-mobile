@@ -723,7 +723,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun probeServerInfo(serveruri: String, promise: Promise) {
         FfiOutcome.settling(promise, "probe_server") {
             uniffi.zingo.initLogging()
-            uniffi.zingo.probeServer(serveruri)
+            uniffi.zingo.probeServer(serverUri = serveruri)
         }
     }
 
@@ -866,7 +866,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun getVersionInfo(promise: Promise) {
         FfiOutcome.settling(promise, "get_version") {
             uniffi.zingo.initLogging()
-            uniffi.zingo.getVersion()
+            "${uniffi.zingo.getVersion()}-${reactContext.getString(R.string.zm_descriptor)}"
         }
     }
 

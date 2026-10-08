@@ -1,5 +1,6 @@
 package org.ZingoLabs.Zingo
 
+import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import org.junit.Assume.assumeTrue
 import org.junit.Test
@@ -364,12 +365,15 @@ class ExecuteAddressesFromUfvk {
 class BuildDescriptorTest {
     @Test
     fun buildDescriptorNamesBothRepositories() {
-        val descriptor: String = uniffi.zingo.getVersion()
+        val zingolib: String = uniffi.zingo.getVersion()
+        val mobile: String = InstrumentationRegistry.getInstrumentation()
+            .targetContext.getString(R.string.zm_descriptor)
         println("\nBuild descriptor:")
-        println(descriptor)
+        println("$zingolib-$mobile")
         val part = """[0-9A-Za-z.+-]+(_[0-9a-f]{5})?(_dirty)?"""
-        assertThat(descriptor).matches("zl_$part-zm_$part")
-        assertThat(descriptor).doesNotContain(UNDESCRIBED_BUILD)
+        assertThat(zingolib).matches("zl_$part")
+        assertThat(mobile).matches("zm_$part")
+        assertThat(mobile).isNotEqualTo(UNDESCRIBED_BUILD)
     }
 }
 
