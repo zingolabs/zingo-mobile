@@ -6,12 +6,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import {
-  BackHandler,
-  Pressable,
-  useWindowDimensions,
-  View,
-} from 'react-native';
+import { BackHandler, Pressable, StyleSheet, View } from 'react-native';
 import Animated, {
   FadeIn,
   FadeOut,
@@ -31,7 +26,7 @@ import { useTheme } from '@app/theme';
 import { ease } from '@app/theme/motion';
 import { ContextAppLoaded } from '@app/context';
 import { RouteEnum, SnackbarDurationEnum } from '@app/AppState';
-import { AppDrawerParamList } from '@app/types';
+import { AppDrawerParamList, CardRect } from '@app/types';
 import { useSecureScreen } from '@app/hooks/useSecureScreen';
 import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
 import { useScreenCapture } from '@app/hooks/useScreenCapture';
@@ -149,7 +144,13 @@ const SeedBackup: React.FunctionComponent<SeedBackupProps> = ({
   const { translate, biometrics, addLastSnackbar, setSeedBackedUp } = context;
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
-  const window = useWindowDimensions();
+  const root = useRef<View>(null);
+  const [screen, setScreen] = useState<CardRect>({
+    x: 0,
+    y: 0,
+    width: 0,
+    height: 0,
+  });
   const keyboard = useKeyboardHeight();
   const secured = useSecureScreen();
   const [shot, setShot] = useState<'none' | 'on' | 'leaving'>('none');
@@ -172,9 +173,12 @@ const SeedBackup: React.FunctionComponent<SeedBackupProps> = ({
   const content = useSharedValue(1);
   const savedShake = useSharedValue(0);
 
+  const measured = screen.width > 0;
   useEffect(() => {
-    grow.value = withTiming(1, motion(OPEN_MS));
-  }, [grow]);
+    if (measured) {
+      grow.value = withTiming(1, motion(OPEN_MS));
+    }
+  }, [grow, measured]);
 
   useEffect(() => {
     hasRecoveryWalletInfo().then(setKeychainNote);
@@ -289,10 +293,10 @@ const SeedBackup: React.FunctionComponent<SeedBackupProps> = ({
   const shell = useAnimatedStyle(() => {
     const g = grow.value;
     return {
-      left: from.x * (1 - g),
-      top: from.y * (1 - g),
-      width: from.width + (window.width - from.width) * g,
-      height: from.height + (window.height - from.height) * g,
+      left: (from.x - screen.x) * (1 - g),
+      top: (from.y - screen.y) * (1 - g),
+      width: from.width + (screen.width - from.width) * g,
+      height: from.height + (screen.height - from.height) * g,
       borderRadius: RADIUS * (1 - g),
       backgroundColor: interpolateColor(
         g,
@@ -408,20 +412,18 @@ const SeedBackup: React.FunctionComponent<SeedBackupProps> = ({
   };
 
   return (
-    <View style={{ flex: 1 }} testID="seedbackup">
+    <View
+      ref={root}
+      style={{ flex: 1 }}
+      testID="seedbackup"
+      onLayout={() =>
+        root.current?.measureInWindow((x, y, width, height) =>
+          setScreen({ x, y, width, height }),
+        )
+      }
+    >
       <Animated.View style={[{ position: 'absolute' }, shell]} />
-      <Animated.View
-        style={[
-          {
-            position: 'absolute',
-            left: 0,
-            top: 0,
-            width: window.width,
-            height: window.height,
-          },
-          layer,
-        ]}
-      >
+      <Animated.View style={[StyleSheet.absoluteFill, layer]}>
         <Animated.View
           key={step}
           entering={enterFor(previous.current, shown)}
