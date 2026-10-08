@@ -1139,5 +1139,19 @@
     "birthday": "Aniversário da carteira",
     "birthday-tip-title": "O bloco em que sua carteira foi criada.",
     "birthday-tip-body": "O Zingo começa a escanear a partir daqui em vez do início, então sincroniza muito mais rápido."
+  },
+  "walletseed": {
+    "back-acc": "Voltar",
+    "ok-title": "Com backup",
+    "ok-sub": "{date} · 3 palavras confirmadas",
+    "ok-restored": "Restaurada a partir da sua frase semente",
+    "no-title": "Sem backup",
+    "no-sub": "Anote-a para proteger seus fundos",
+    "vk": "Chave de visualização",
+    "vk-tip-title": "Permite ver a atividade desta carteira.",
+    "vk-tip-body": "Ela não pode gastar seus fundos. Compartilhe só com pessoas ou serviços de confiança.",
+    "vk-copy": "Copiar chave de visualização",
+    "vk-copied": "Chave de visualização copiada",
+    "verify": "Verificar de novo"
   }
 }

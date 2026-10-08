@@ -155,6 +155,7 @@ const Rescan = React.lazy(() => import('@screens/Rescan'));
 const Pools = React.lazy(() => import('@screens/Pools'));
 const MeetIronwood = React.lazy(() => import('@screens/MeetIronwood'));
 const SeedBackup = React.lazy(() => import('@screens/SeedBackup'));
+const WalletSeed = React.lazy(() => import('@screens/WalletSeed'));
 const MigrationStrategy = React.lazy(
   () => import('@screens/MigrationStrategy'),
 );
@@ -1504,9 +1505,7 @@ export class LoadedAppClass extends Component<
           action: UfvkActionEnum.view,
         });
       } else {
-        this.drawerNav?.navigate(RouteEnum.Seed, {
-          action: SeedActionEnum.view,
-        });
+        this.drawerNav?.navigate(RouteEnum.WalletSeed);
       }
       return;
     } else if (item === MenuItemEnum.ChangeWallet) {
@@ -2332,6 +2331,11 @@ export class LoadedAppClass extends Component<
                         animation: 'none',
                         gestureEnabled: false,
                       }}
+                    />
+                    <RootNavigator.Screen
+                      name={RouteEnum.WalletSeed}
+                      component={WalletSeed}
+                      options={{ animation: 'slide_from_right' }}
                     />
                     <RootNavigator.Screen
                       name={RouteEnum.MigrationStrategy}

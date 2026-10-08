@@ -6,6 +6,7 @@ import {
   defaultAppContextLoaded,
 } from '@app/context';
 import { RouteEnum } from '@app/AppState';
+import { SeedBackupEntry } from '@app/types';
 import Clipboard from '@react-native-clipboard/clipboard';
 
 import SeedBackup from '@screens/SeedBackup';
@@ -26,7 +27,15 @@ jest.mock('@app/services/recoveryWalletInfo', () => ({
   hasRecoveryWalletInfo: jest.fn(async () => true),
 }));
 
-const renderFlow = (setSeedBackedUp = jest.fn(async () => {})) =>
+const CARD: SeedBackupEntry = {
+  kind: 'card',
+  from: { x: 20, y: 200, width: 360, height: 80 },
+};
+
+const renderFlow = (
+  setSeedBackedUp = jest.fn(async () => {}),
+  entry: SeedBackupEntry = CARD,
+) =>
   render(
     <ContextAppLoadedProvider
       value={{
@@ -41,7 +50,7 @@ const renderFlow = (setSeedBackedUp = jest.fn(async () => {})) =>
         route={{
           key: 'k',
           name: RouteEnum.SeedBackup,
-          params: { from: { x: 20, y: 200, width: 360, height: 80 } },
+          params: { entry },
         }}
       />
     </ContextAppLoadedProvider>,
@@ -176,4 +185,14 @@ test('Tests that typing stops at the length of the asked word.', async () => {
   expect(screen.getByTestId('seedbackup.word').props.value).toHaveLength(
     WORDS[n - 1].length,
   );
+});
+
+test('Tests that the verify entry opens straight on the word check when Wallet Seed asks for it.', async () => {
+  renderFlow(
+    jest.fn(async () => {}),
+    { kind: 'verify' },
+  );
+  await act(async () => {});
+  expect(screen.getByTestId('seedbackup.word')).toBeTruthy();
+  expect(screen.queryByTestId('seedbackup.info.primary')).toBeNull();
 });

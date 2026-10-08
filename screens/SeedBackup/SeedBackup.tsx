@@ -6,7 +6,13 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { BackHandler, Pressable, StyleSheet, View } from 'react-native';
+import {
+  BackHandler,
+  Pressable,
+  StyleSheet,
+  useWindowDimensions,
+  View,
+} from 'react-native';
 import Animated, {
   FadeIn,
   FadeOut,
@@ -66,6 +72,8 @@ const CONTENT_OUT_MS = 120;
 const CLOSE_AT = 100;
 const RADIUS = 14;
 const DONE_FADE_MS = 300;
+const PUSH_IN_MS = 380;
+const PUSH_OUT_MS = 320;
 
 const motion = (ms: number, easing = ease.emphasized) => ({
   duration: ms,
@@ -73,8 +81,11 @@ const motion = (ms: number, easing = ease.emphasized) => ({
   reduceMotion: ReduceMotion.System,
 });
 
-const enterFor = (from: Step | null, move: Move) => {
+const enterFor = (from: Step | null, move: Move, pushed: boolean) => {
   if (from === null) {
+    if (pushed) {
+      return undefined;
+    }
     return FadeIn.duration(CONTENT_IN_MS)
       .delay(CONTENT_IN_AT)
       .reduceMotion(ReduceMotion.System);
@@ -121,7 +132,8 @@ const ConfirmPage: React.FunctionComponent<{
   );
 };
 
-// Back up the seed phrase: the flow grows out of the History notice card.
+// Back up the seed phrase: grown out of the History notice card, or pushed
+// from Wallet Seed, where it can also open straight on the word check.
 const SeedBackup: React.FunctionComponent<SeedBackupProps> = ({
   navigation,
   route,
@@ -147,9 +159,14 @@ const SeedBackup: React.FunctionComponent<SeedBackupProps> = ({
   const secured = useSecureScreen();
   const [shot, setShot] = useState<'none' | 'on' | 'leaving'>('none');
   const shotGone = useCallback(() => setShot('none'), []);
-  const from = route.params.from;
+  const entry = route.params.entry;
+  const pushed = entry.kind !== 'card';
+  const window = useWindowDimensions();
 
-  const [move, setMove] = useState<Move>({ step: 'info', dir: 1 });
+  const [move, setMove] = useState<Move>({
+    step: entry.kind === 'verify' ? 'confirm' : 'info',
+    dir: 1,
+  });
   const [shown, setShown] = useState<Move>(move);
   const previous = useRef<Step | null>(null);
   const [keychainNote, setKeychainNote] = useState(false);
@@ -166,13 +183,19 @@ const SeedBackup: React.FunctionComponent<SeedBackupProps> = ({
   const content = useSharedValue(1);
   const whole = useSharedValue(1);
   const savedShake = useSharedValue(0);
+  const slide = useSharedValue(pushed ? window.width : 0);
 
   const measured = screen.width > 0;
   useEffect(() => {
-    if (measured) {
+    if (!measured) {
+      return;
+    }
+    if (pushed) {
+      slide.value = withTiming(0, motion(PUSH_IN_MS));
+    } else {
       grow.value = withTiming(1, motion(OPEN_MS));
     }
-  }, [grow, measured]);
+  }, [grow, slide, measured, pushed]);
 
   useEffect(() => {
     hasRecoveryWalletInfo().then(setKeychainNote);
@@ -195,6 +218,10 @@ const SeedBackup: React.FunctionComponent<SeedBackupProps> = ({
       return;
     }
     closing.current = true;
+    if (pushed) {
+      slideOut();
+      return;
+    }
     content.value = withTiming(0, motion(CONTENT_OUT_MS, ease.standard));
     grow.value = withDelay(
       CLOSE_AT,
@@ -206,11 +233,23 @@ const SeedBackup: React.FunctionComponent<SeedBackupProps> = ({
     );
   };
 
+  const slideOut = () => {
+    slide.value = withTiming(window.width, motion(PUSH_OUT_MS), finished => {
+      if (finished) {
+        runOnJS(navigation.goBack)();
+      }
+    });
+  };
+
   const finish = () => {
     if (closing.current) {
       return;
     }
     closing.current = true;
+    if (pushed) {
+      slideOut();
+      return;
+    }
     whole.value = withTiming(
       0,
       motion(DONE_FADE_MS, ease.standard),
@@ -241,11 +280,9 @@ const SeedBackup: React.FunctionComponent<SeedBackupProps> = ({
     setMove({ step: to, dir });
   };
 
-  const toWords = async () => {
-    if (loading) {
-      return;
-    }
-    setLoading(true);
+  // Passes the device gate, then reads the phrase: the stored copy first,
+  // the wallet when the keychain has none.
+  const unlock = async (): Promise<string[]> => {
     const answer = await resolveTriggerGate(undefined, biometrics, {
       translate,
     });
@@ -255,24 +292,41 @@ const SeedBackup: React.FunctionComponent<SeedBackupProps> = ({
       translate,
     );
     if (!proceed) {
-      setLoading(false);
-      return;
+      return [];
     }
-    let phrase = words;
-    if (phrase.length === 0) {
-      const stored = await getRecoveryWalletInfo();
-      const wallet = stored.seed ? stored : await fetchWallet(false);
-      phrase = (wallet?.seed || '').split(' ').filter(w => !!w);
-      setWords(phrase);
-      setBirthday(wallet?.birthday || walletBirthday);
+    if (words.length > 0) {
+      return words;
     }
-    setLoading(false);
+    const stored = await getRecoveryWalletInfo();
+    const wallet = stored.seed ? stored : await fetchWallet(false);
+    const phrase = (wallet?.seed || '').split(' ').filter(w => !!w);
+    setWords(phrase);
+    setBirthday(wallet?.birthday || walletBirthday);
     if (phrase.length === 0) {
       addLastSnackbar(translate('seedbackup.load-error') as string);
+    }
+    return phrase;
+  };
+
+  const toWords = async () => {
+    if (loading) {
       return;
     }
-    go('words', 1);
+    setLoading(true);
+    const phrase = await unlock();
+    setLoading(false);
+    if (phrase.length > 0) {
+      go('words', 1);
+    }
   };
+
+  useEffect(() => {
+    if (entry.kind === 'verify') {
+      unlock().then(phrase => phrase.length === 0 && close());
+    }
+    // Runs once: the verify entry reads the phrase as the screen opens.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const saved = () => {
     if (!checked) {
@@ -312,8 +366,17 @@ ${translate('seedbackup.birthday') as string}: ${birthday}`;
     go('done', 1);
   };
 
+  const from =
+    entry.kind === 'card'
+      ? entry.from
+      : {
+          x: screen.x,
+          y: screen.y,
+          width: screen.width,
+          height: screen.height,
+        };
   const shell = useAnimatedStyle(() => {
-    const g = grow.value;
+    const g = pushed ? 1 : grow.value;
     return {
       left: (from.x - screen.x) * (1 - g),
       top: (from.y - screen.y) * (1 - g),
@@ -330,6 +393,9 @@ ${translate('seedbackup.birthday') as string}: ${birthday}`;
   });
   const layer = useAnimatedStyle(() => ({
     opacity: content.value * whole.value,
+  }));
+  const sliding = useAnimatedStyle(() => ({
+    transform: [{ translateX: slide.value }],
   }));
   const savedNudge = useAnimatedStyle(() => ({
     transform: [{ translateX: savedShake.value }],
@@ -385,15 +451,17 @@ ${translate('seedbackup.birthday') as string}: ${birthday}`;
           </>
         );
       case 'confirm':
-        return (
+        return words.length > 0 ? (
           <ConfirmPage
             key={attempt}
             words={words}
             onPassed={passed}
-            onViewPhrase={() => go('words', -1)}
+            onViewPhrase={
+              entry.kind === 'verify' ? close : () => go('words', -1)
+            }
             bottom={bottom}
           />
-        );
+        ) : null;
       case 'done':
         return (
           <>
@@ -448,54 +516,62 @@ ${translate('seedbackup.birthday') as string}: ${birthday}`;
         )
       }
     >
-      <Animated.View style={[{ position: 'absolute' }, shell]} />
-      <Animated.View style={[StyleSheet.absoluteFill, layer]}>
-        <Animated.View
-          key={step}
-          entering={enterFor(previous.current, shown)}
-          exiting={exitFor(move)}
-          style={{ flex: 1, paddingTop: insets.top + 64 }}
-        >
-          {page()}
-        </Animated.View>
-        {step !== 'done' && (
+      <Animated.View style={[StyleSheet.absoluteFill, sliding]}>
+        <Animated.View style={[{ position: 'absolute' }, shell]} />
+        <Animated.View style={[StyleSheet.absoluteFill, layer]}>
           <Animated.View
-            entering={FadeIn.duration(CONTENT_IN_MS)
-              .delay(CONTENT_IN_AT)
-              .reduceMotion(ReduceMotion.System)}
-            exiting={FadeOut.duration(160).reduceMotion(ReduceMotion.System)}
-            style={{
-              position: 'absolute',
-              top: insets.top + 6,
-              right: SIDE - 14,
-            }}
+            key={step}
+            entering={enterFor(previous.current, shown, pushed)}
+            exiting={exitFor(move)}
+            style={{ flex: 1, paddingTop: insets.top + 64 }}
           >
-            <Pressable
-              testID="seedbackup.close"
-              accessibilityRole="button"
-              accessibilityLabel={translate('seedbackup.close') as string}
-              onPress={close}
-              style={({ pressed }) => ({
-                width: 44,
-                height: 44,
-                borderRadius: 12,
-                alignItems: 'center',
-                justifyContent: 'center',
-                backgroundColor: pressed ? 'rgba(255,255,255,0.06)' : undefined,
-              })}
-            >
-              <XIcon size={18} color={colors.fgMuted} strokeWidth={1.8} />
-            </Pressable>
+            {page()}
           </Animated.View>
+          {step !== 'done' && (
+            <Animated.View
+              entering={
+                pushed
+                  ? undefined
+                  : FadeIn.duration(CONTENT_IN_MS)
+                      .delay(CONTENT_IN_AT)
+                      .reduceMotion(ReduceMotion.System)
+              }
+              exiting={FadeOut.duration(160).reduceMotion(ReduceMotion.System)}
+              style={{
+                position: 'absolute',
+                top: insets.top + 6,
+                right: SIDE - 14,
+              }}
+            >
+              <Pressable
+                testID="seedbackup.close"
+                accessibilityRole="button"
+                accessibilityLabel={translate('seedbackup.close') as string}
+                onPress={close}
+                style={({ pressed }) => ({
+                  width: 44,
+                  height: 44,
+                  borderRadius: 12,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: pressed
+                    ? 'rgba(255,255,255,0.06)'
+                    : undefined,
+                })}
+              >
+                <XIcon size={18} color={colors.fgMuted} strokeWidth={1.8} />
+              </Pressable>
+            </Animated.View>
+          )}
+        </Animated.View>
+        {shot !== 'none' && (
+          <ScreenshotSheet
+            leaving={shot === 'leaving'}
+            onGotIt={() => setShot('leaving')}
+            onGone={shotGone}
+          />
         )}
       </Animated.View>
-      {shot !== 'none' && (
-        <ScreenshotSheet
-          leaving={shot === 'leaving'}
-          onGotIt={() => setShot('leaving')}
-          onGone={shotGone}
-        />
-      )}
     </View>
   );
 };

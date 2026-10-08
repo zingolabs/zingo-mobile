@@ -4,4 +4,5 @@ export type {
   LoadingAppNavigationState,
   LoadedAppNavigationState,
   CardRect,
+  SeedBackupEntry,
 } from './NavigationTypes';

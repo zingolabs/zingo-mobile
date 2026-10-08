@@ -216,7 +216,9 @@ const History: React.FunctionComponent<HistoryProps> = ({
           covered={backingUp && !focused}
           onBackUp={from => {
             setBackingUp(true);
-            navigation.navigate(RouteEnum.SeedBackup, { from });
+            navigation.navigate(RouteEnum.SeedBackup, {
+              entry: { kind: 'card', from },
+            });
           }}
         />
       ),

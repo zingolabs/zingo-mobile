@@ -1139,5 +1139,19 @@
     "birthday": "Wallet birthday",
     "birthday-tip-title": "The block your wallet was created in.",
     "birthday-tip-body": "Zingo starts scanning from here instead of from the beginning, so it syncs much faster."
+  },
+  "walletseed": {
+    "back-acc": "Back",
+    "ok-title": "Backed up",
+    "ok-sub": "{date} · confirmed 3 words",
+    "ok-restored": "Restored from your seed phrase",
+    "no-title": "Not backed up",
+    "no-sub": "Write it down to protect your funds",
+    "vk": "Viewing key",
+    "vk-tip-title": "Lets someone see this wallet's activity.",
+    "vk-tip-body": "It can't spend your funds. Only share it with people or services you trust.",
+    "vk-copy": "Copy viewing key",
+    "vk-copied": "Viewing key copied",
+    "verify": "Verify again"
   }
 }

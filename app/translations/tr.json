@@ -1137,5 +1137,19 @@
     "birthday": "Cüzdan doğum günü",
     "birthday-tip-title": "Cüzdanınızın oluşturulduğu blok.",
     "birthday-tip-body": "Zingo taramaya baştan değil buradan başlar, bu yüzden çok daha hızlı senkronize olur."
+  },
+  "walletseed": {
+    "back-acc": "Geri",
+    "ok-title": "Yedeklendi",
+    "ok-sub": "{date} · 3 kelime onaylandı",
+    "ok-restored": "Kurtarma ifadenizden geri yüklendi",
+    "no-title": "Yedeklenmedi",
+    "no-sub": "Fonlarınızı korumak için yazın",
+    "vk": "Görüntüleme anahtarı",
+    "vk-tip-title": "Bu cüzdanın hareketlerini görmeyi sağlar.",
+    "vk-tip-body": "Fonlarınızı harcayamaz. Yalnızca güvendiğiniz kişi ve hizmetlerle paylaşın.",
+    "vk-copy": "Görüntüleme anahtarını kopyala",
+    "vk-copied": "Görüntüleme anahtarı kopyalandı",
+    "verify": "Yeniden doğrula"
   }
 }
