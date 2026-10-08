@@ -866,7 +866,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun getVersionInfo(promise: Promise) {
         FfiOutcome.settling(promise, "get_version") {
             uniffi.zingo.initLogging()
-            "${uniffi.zingo.getVersion()}-${reactContext.getString(R.string.zm_descriptor)}"
+            "${uniffi.zingo.getVersion()}-${applicationContext.getString(R.string.zm_descriptor)}"
         }
     }
 
