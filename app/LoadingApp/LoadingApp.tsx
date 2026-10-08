@@ -1083,6 +1083,7 @@ export class LoadingAppClass extends Component<
         SettingsNameEnum.seedBackedUp,
         false,
       );
+      await SettingsFileImpl.writeSettings(SettingsNameEnum.seedBackedUpAt, 0);
       clearTimeout(showProgress);
       this.setState({
         wallet,
@@ -1299,6 +1300,10 @@ export class LoadingAppClass extends Component<
             await SettingsFileImpl.writeSettings(
               SettingsNameEnum.seedBackedUp,
               true,
+            );
+            await SettingsFileImpl.writeSettings(
+              SettingsNameEnum.seedBackedUpAt,
+              0,
             );
             this.setState({
               readOnly,

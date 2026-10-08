@@ -233,6 +233,7 @@ export default function LoadedApp(props: LoadedAppProps) {
   const [loading, setLoading] = useState<boolean>(true);
   const [biometrics, setBiometrics] = useState<boolean>(true);
   const [seedBackedUp, setSeedBackedUp] = useState<boolean>(true);
+  const [seedBackedUpAt, setSeedBackedUpAt] = useState<number>(0);
   const [selectServer, setSelectServer] = useState<SelectServerEnum>(
     SelectServerEnum.auto,
   );
@@ -381,6 +382,11 @@ export default function LoadedApp(props: LoadedAppProps) {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.privacy, privacy);
       }
       setSeedBackedUp(settings.seedBackedUp === true);
+      setSeedBackedUpAt(
+        typeof settings.seedBackedUpAt === 'number'
+          ? settings.seedBackedUpAt
+          : 0,
+      );
       if (settings.biometrics === true || settings.biometrics === false) {
         setBiometrics(settings.biometrics);
       } else {
@@ -594,6 +600,7 @@ export default function LoadedApp(props: LoadedAppProps) {
         addressBook={addressBook}
         biometrics={biometrics}
         seedBackedUp={seedBackedUp}
+        seedBackedUpAt={seedBackedUpAt}
         selectServer={selectServer}
         walletChainName={walletChainName}
         firstLaunchingMessage={firstLaunchingMessage}
@@ -628,6 +635,7 @@ type LoadedAppClassProps = {
   addressBook: AddressBookFileClass[];
   biometrics: boolean;
   seedBackedUp: boolean;
+  seedBackedUpAt: number;
   selectServer: SelectServerEnum;
   walletChainName: ChainNameEnum;
   firstLaunchingMessage: LaunchingModeEnum;
@@ -701,6 +709,7 @@ export class LoadedAppClass extends Component<
       zingolibVersion: '',
       setPrivacyOption: this.setPrivacyOption,
       seedBackedUp: props.seedBackedUp,
+      seedBackedUpAt: props.seedBackedUpAt,
       setSeedBackedUp: this.setSeedBackedUp,
 
       // context settings
@@ -1731,8 +1740,10 @@ export class LoadedAppClass extends Component<
   };
 
   setSeedBackedUp = async (value: boolean): Promise<void> => {
+    const at = value ? Date.now() : 0;
     await SettingsFileImpl.writeSettings(SettingsNameEnum.seedBackedUp, value);
-    this.setState({ seedBackedUp: value });
+    await SettingsFileImpl.writeSettings(SettingsNameEnum.seedBackedUpAt, at);
+    this.setState({ seedBackedUp: value, seedBackedUpAt: at });
   };
 
   setBiometricsOption = async (value: boolean): Promise<void> => {
@@ -2032,6 +2043,7 @@ export class LoadedAppClass extends Component<
       zingolibVersion: this.state.zingolibVersion,
       setPrivacyOption: this.setPrivacyOption,
       seedBackedUp: this.state.seedBackedUp,
+      seedBackedUpAt: this.state.seedBackedUpAt,
       setSeedBackedUp: this.setSeedBackedUp,
 
       // context settings

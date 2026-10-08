@@ -84,7 +84,7 @@ export default class SettingsFileImpl {
       SettingsNameEnum,
       SettingsNameEnum.server | SettingsNameEnum.selectServer
     >,
-    value: string | boolean,
+    value: string | boolean | number,
   ): Promise<void> {
     return this.writePatch({ [name]: value });
   }
@@ -259,6 +259,9 @@ export default class SettingsFileImpl {
       }
       if (!settings.hasOwnProperty(SettingsNameEnum.seedBackedUp)) {
         settings.seedBackedUp = false;
+      }
+      if (!settings.hasOwnProperty(SettingsNameEnum.seedBackedUpAt)) {
+        settings.seedBackedUpAt = 0;
       }
       return settings;
     } catch (err) {

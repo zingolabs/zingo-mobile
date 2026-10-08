@@ -13,4 +13,5 @@ export enum SettingsNameEnum {
   version = 'version',
   ironwoodOnboardSeen = 'ironwoodOnboardSeen',
   seedBackedUp = 'seedBackedUp',
+  seedBackedUpAt = 'seedBackedUpAt',
 }

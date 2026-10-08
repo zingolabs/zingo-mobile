@@ -20,6 +20,8 @@ export default class SettingsFileClass {
   blockExplorer: BlockExplorerEnum;
   ironwoodOnboardSeen: boolean;
   seedBackedUp: boolean;
+  // ms since epoch of the last confirmed backup; 0 for a restored wallet
+  seedBackedUpAt: number;
 
   constructor(
     server: ServerType,
@@ -33,6 +35,7 @@ export default class SettingsFileClass {
     blockExplorer: BlockExplorerEnum,
     ironwoodOnboardSeen: boolean,
     seedBackedUp: boolean,
+    seedBackedUpAt: number,
   ) {
     this.server = server;
     this.language = language;
@@ -45,5 +48,6 @@ export default class SettingsFileClass {
     this.blockExplorer = blockExplorer;
     this.ironwoodOnboardSeen = ironwoodOnboardSeen;
     this.seedBackedUp = seedBackedUp;
+    this.seedBackedUpAt = seedBackedUpAt;
   }
 }

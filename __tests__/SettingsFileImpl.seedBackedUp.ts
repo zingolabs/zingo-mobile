@@ -39,3 +39,9 @@ test('Tests that seedBackedUp reads back true when the backup flow writes it.', 
   const settings = await SettingsFileImpl.readSettings();
   expect(settings.seedBackedUp).toBe(true);
 });
+
+test('Tests that seedBackedUpAt reads 0 when the settings file has no such key.', async () => {
+  mockFile = JSON.stringify({});
+  const settings = await SettingsFileImpl.readSettings();
+  expect(settings.seedBackedUpAt).toBe(0);
+});
