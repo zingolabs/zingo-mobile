@@ -21,6 +21,9 @@ import { SIDE, StepTitle } from './StepParts';
 
 export const CONFIRM_COUNT = 3;
 const NEXT_MS = 420;
+const SLIDE_OUT_MS = 160;
+const SLIDE_IN_MS = 260;
+const SLIDE_PT = 24;
 const DONE_MS = 620;
 const FIELD_BG = '#041834';
 const HINT_INK = '#5B70A0';
@@ -50,7 +53,10 @@ export type WordCheck = {
   status: Status;
   type: (text: string) => void;
   submit: () => void;
+  nudge: () => void;
   shake: SharedValue<number>;
+  slideX: SharedValue<number>;
+  slideOpacity: SharedValue<number>;
 };
 
 /** Holds one attempt at typing back three random words of the phrase. */
@@ -67,6 +73,8 @@ export const useWordCheck = (
   const checking = useRef(false);
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const shake = useSharedValue(0);
+  const slideX = useSharedValue(0);
+  const slideOpacity = useSharedValue(1);
 
   useEffect(() => () => clearTimeout(timer.current), []);
 
@@ -100,39 +108,60 @@ export const useWordCheck = (
     checking.current = true;
     setStatus('ok');
     const last = index === positions.length - 1;
-    timer.current = setTimeout(
-      () => {
-        if (last) {
-          onPassed();
-          return;
-        }
+    if (last) {
+      timer.current = setTimeout(onPassed, DONE_MS);
+      return;
+    }
+    timer.current = setTimeout(() => {
+      const out = {
+        duration: SLIDE_OUT_MS,
+        easing: ease.in,
+        reduceMotion: ReduceMotion.System,
+      };
+      slideX.value = withTiming(-SLIDE_PT, out);
+      slideOpacity.value = withTiming(0, out);
+      timer.current = setTimeout(() => {
         setIndex(i => i + 1);
         setValue('');
         setStatus('idle');
         checking.current = false;
-      },
-      last ? DONE_MS : NEXT_MS,
-    );
+        const back = {
+          duration: SLIDE_IN_MS,
+          easing: ease.out,
+          reduceMotion: ReduceMotion.System,
+        };
+        slideX.value = SLIDE_PT;
+        slideOpacity.value = 0;
+        slideX.value = withTiming(0, back);
+        slideOpacity.value = withTiming(1, back);
+      }, SLIDE_OUT_MS);
+    }, NEXT_MS);
   };
 
-  return { position, index, value, status, type, submit, shake };
+  const nudge = () => {
+    const step = (x: number) =>
+      withTiming(x, {
+        duration: 80,
+        easing: ease.standard,
+        reduceMotion: ReduceMotion.System,
+      });
+    shake.value = withSequence(step(-4), step(4), step(0));
+  };
+
+  return {
+    position,
+    index,
+    value,
+    status,
+    type,
+    submit,
+    nudge,
+    shake,
+    slideX,
+    slideOpacity,
+  };
 };
 
-const slideIn = () =>
-  new Keyframe({
-    0: { opacity: 0, transform: [{ translateX: 24 }] },
-    100: { opacity: 1, transform: [{ translateX: 0 }], easing: ease.out },
-  })
-    .duration(260)
-    .delay(160)
-    .reduceMotion(ReduceMotion.System);
-const slideOut = () =>
-  new Keyframe({
-    0: { opacity: 1, transform: [{ translateX: 0 }] },
-    100: { opacity: 0, transform: [{ translateX: -24 }], easing: ease.in },
-  })
-    .duration(160)
-    .reduceMotion(ReduceMotion.System);
 const markPop = () =>
   new Keyframe({
     0: { opacity: 0, transform: [{ scale: 0.3 }] },
@@ -182,6 +211,10 @@ const ConfirmStep: React.FunctionComponent<{ check: WordCheck }> = ({
   const { colors } = useTheme();
   const [focused, setFocused] = useState(false);
 
+  const slideStyle = useAnimatedStyle(() => ({
+    opacity: check.slideOpacity.value,
+    transform: [{ translateX: check.slideX.value }],
+  }));
   const shakeStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: check.shake.value }],
   }));
@@ -227,11 +260,7 @@ const ConfirmStep: React.FunctionComponent<{ check: WordCheck }> = ({
           overflow: 'hidden',
         }}
       >
-        <Animated.View
-          key={check.position}
-          entering={check.index > 0 ? slideIn() : undefined}
-          exiting={slideOut()}
-        >
+        <Animated.View style={slideStyle}>
           <Text
             style={{
               textAlign: 'center',
@@ -257,99 +286,103 @@ const ConfirmStep: React.FunctionComponent<{ check: WordCheck }> = ({
           >
             {translate('seedbackup.word-hint') as string}
           </Text>
-        </Animated.View>
-        <Animated.View
-          style={[
-            {
-              height: 60,
-              borderRadius: 12,
-              borderWidth: 1,
-              borderColor: border,
-              backgroundColor: FIELD_BG,
-              justifyContent: 'center',
-            },
-            shakeStyle,
-          ]}
-        >
-          {!check.value && (
-            <View
-              pointerEvents="none"
-              style={{
-                position: 'absolute',
-                left: 0,
-                right: 0,
-                flexDirection: 'row',
+          <Animated.View
+            style={[
+              {
+                height: 60,
+                borderRadius: 12,
+                borderWidth: 1,
+                borderColor: border,
+                backgroundColor: FIELD_BG,
                 justifyContent: 'center',
-                gap: 17,
-              }}
-            >
-              {[0, 1, 2].map(i => (
-                <View
-                  key={i}
-                  style={{
-                    width: 25,
-                    height: 2.5,
-                    borderRadius: 2,
-                    backgroundColor: DASH,
-                  }}
-                />
-              ))}
-            </View>
-          )}
-          <TextInput
-            testID="seedbackup.word"
-            accessibilityLabel={
-              (translate('seedbackup.word-n') as string).replace(
-                '{n}',
-                String(check.position),
-              ) as string
-            }
-            autoFocus
-            value={check.value}
-            onChangeText={check.type}
-            onSubmitEditing={check.submit}
-            onFocus={() => setFocused(true)}
-            onBlur={() => setFocused(false)}
-            submitBehavior="submit"
-            returnKeyType="done"
-            autoCapitalize="none"
-            autoCorrect={false}
-            spellCheck={false}
-            autoComplete="off"
-            importantForAutofill="no"
-            textContentType="none"
-            keyboardType={
-              Platform.OS === 'android' ? 'visible-password' : 'default'
-            }
-            selectionColor={colors.fgAccent}
-            style={{
-              color: colors.fgDefault,
-              fontSize: 20,
-              fontWeight: '600',
-              textAlign: 'center',
-              paddingHorizontal: 44,
-              height: '100%',
-            }}
-          />
-          {check.status === 'ok' && (
-            <Animated.View
-              entering={markPop()}
-              style={{ position: 'absolute', right: 16 }}
-            >
+              },
+              shakeStyle,
+            ]}
+          >
+            {!check.value && (
               <View
+                pointerEvents="none"
                 style={{
-                  width: 20,
-                  height: 20,
-                  borderRadius: 10,
-                  backgroundColor: colors.bgAccent,
-                  alignItems: 'center',
+                  position: 'absolute',
+                  left: 0,
+                  right: 0,
+                  flexDirection: 'row',
                   justifyContent: 'center',
+                  gap: 17,
                 }}
               >
-                <CheckIcon size={13} color={colors.bgCanvas} strokeWidth={3} />
+                {[0, 1, 2].map(i => (
+                  <View
+                    key={i}
+                    style={{
+                      width: 25,
+                      height: 2.5,
+                      borderRadius: 2,
+                      backgroundColor: DASH,
+                    }}
+                  />
+                ))}
               </View>
-            </Animated.View>
-          )}
+            )}
+            <TextInput
+              testID="seedbackup.word"
+              accessibilityLabel={
+                (translate('seedbackup.word-n') as string).replace(
+                  '{n}',
+                  String(check.position),
+                ) as string
+              }
+              autoFocus
+              value={check.value}
+              onChangeText={check.type}
+              onSubmitEditing={check.submit}
+              onFocus={() => setFocused(true)}
+              onBlur={() => setFocused(false)}
+              submitBehavior="submit"
+              returnKeyType="done"
+              autoCapitalize="none"
+              autoCorrect={false}
+              spellCheck={false}
+              autoComplete="off"
+              importantForAutofill="no"
+              textContentType="none"
+              keyboardType={
+                Platform.OS === 'android' ? 'visible-password' : 'default'
+              }
+              selectionColor={colors.fgAccent}
+              style={{
+                color: colors.fgDefault,
+                fontSize: 20,
+                fontWeight: '600',
+                textAlign: 'center',
+                paddingHorizontal: 44,
+                height: '100%',
+              }}
+            />
+            {check.status === 'ok' && (
+              <Animated.View
+                entering={markPop()}
+                style={{ position: 'absolute', right: 16 }}
+              >
+                <View
+                  style={{
+                    width: 20,
+                    height: 20,
+                    borderRadius: 10,
+                    backgroundColor: colors.bgAccent,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <CheckIcon
+                    size={13}
+                    color={colors.bgCanvas}
+                    strokeWidth={3}
+                  />
+                </View>
+              </Animated.View>
+            )}
+          </Animated.View>
         </Animated.View>
       </View>
       <Text

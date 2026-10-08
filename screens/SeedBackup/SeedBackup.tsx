@@ -103,10 +103,6 @@ const ConfirmPage: React.FunctionComponent<{
 }> = ({ words, onPassed, onViewPhrase, bottom }) => {
   const { translate } = useContext(ContextAppLoaded);
   const check = useWordCheck(words, onPassed);
-  const shake = useSharedValue(0);
-  const nudge = useAnimatedStyle(() => ({
-    transform: [{ translateX: shake.value }],
-  }));
   return (
     <>
       <ConfirmStep check={check} />
@@ -117,18 +113,7 @@ const ConfirmPage: React.FunctionComponent<{
           onLink={onViewPhrase}
           primary={translate('seedbackup.confirm') as string}
           off={!check.value}
-          primaryStyle={nudge}
-          onPrimary={() => {
-            if (!check.value) {
-              shake.value = withSequence(
-                withTiming(-4, motion(60, ease.standard)),
-                withTiming(4, motion(120, ease.standard)),
-                withTiming(0, motion(60, ease.standard)),
-              );
-              return;
-            }
-            check.submit();
-          }}
+          onPrimary={() => (check.value ? check.submit() : check.nudge())}
         />
       </View>
     </>

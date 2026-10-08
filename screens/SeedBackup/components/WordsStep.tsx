@@ -2,12 +2,23 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import Animated, {
+  FadeIn,
+  FadeOut,
   Keyframe,
   ReduceMotion,
+  useAnimatedProps,
   useAnimatedStyle,
   useSharedValue,
+  withDelay,
   withTiming,
 } from 'react-native-reanimated';
+import Svg, {
+  Defs,
+  FeGaussianBlur,
+  Filter,
+  Path,
+  Text as SvgText,
+} from 'react-native-svg';
 
 import { useTheme } from '@app/theme';
 import { ease } from '@app/theme/motion';
@@ -22,6 +33,11 @@ const WORD_BG = '#041936';
 const NUMBER_INK = '#61748F';
 const BOX_BORDER = '#1E4A80';
 const VEIL_MS = 220;
+// The words blur by this much while hidden; the numbers stay sharp.
+const BLUR_PT = 6;
+const WORD_H = 32;
+// Length of the tick path below, in viewBox units.
+const TICK_LENGTH = 21.3;
 const COPIED_MS = 1600;
 
 const iconPop = () =>
@@ -49,6 +65,63 @@ const boxPop = () =>
   })
     .duration(VEIL_MS)
     .reduceMotion(ReduceMotion.System);
+
+const AnimatedPath = Animated.createAnimatedComponent(Path);
+
+// A word drawn through a gaussian blur, for the hidden state.
+const BlurredWord: React.FunctionComponent<{ word: string; color: string }> = ({
+  word,
+  color,
+}) => (
+  <Svg width="100%" height={WORD_H}>
+    <Defs>
+      <Filter id="wordblur" x="-20%" y="-60%" width="140%" height="220%">
+        <FeGaussianBlur stdDeviation={BLUR_PT} />
+      </Filter>
+    </Defs>
+    <SvgText
+      x={0}
+      y={20.5}
+      fill={color}
+      fontSize={13}
+      fontWeight="700"
+      filter="url(#wordblur)"
+    >
+      {word}
+    </SvgText>
+  </Svg>
+);
+
+// The checkbox tick, drawn in as the box fills.
+const DrawnTick: React.FunctionComponent<{ color: string }> = ({ color }) => {
+  const drawn = useSharedValue(0);
+  useEffect(() => {
+    drawn.value = withDelay(
+      40,
+      withTiming(1, {
+        duration: 200,
+        easing: ease.out,
+        reduceMotion: ReduceMotion.System,
+      }),
+    );
+  }, [drawn]);
+  const stroke = useAnimatedProps(() => ({
+    strokeDashoffset: TICK_LENGTH * (1 - drawn.value),
+  }));
+  return (
+    <Svg width={12} height={12} viewBox="0 0 24 24" fill="none">
+      <AnimatedPath
+        d="M5 12.5 10 17.5 19.5 7"
+        stroke={color}
+        strokeWidth={3.6}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeDasharray={TICK_LENGTH}
+        animatedProps={stroke}
+      />
+    </Svg>
+  );
+};
 
 type WordsStepProps = {
   words: string[];
@@ -88,7 +161,6 @@ const WordsStep: React.FunctionComponent<WordsStepProps> = ({
     });
   }, [veiled, veil]);
   const wordInk = useAnimatedStyle(() => ({ opacity: 1 - veil.value }));
-  const wordMask = useAnimatedStyle(() => ({ opacity: veil.value * 0.7 }));
 
   const flash = useSharedValue(0);
   useEffect(() => {
@@ -196,20 +268,27 @@ const WordsStep: React.FunctionComponent<WordsStepProps> = ({
                     >
                       {w}
                     </Animated.Text>
-                    <Animated.View
-                      pointerEvents="none"
-                      style={[
-                        {
+                    {veiled && (
+                      <Animated.View
+                        entering={FadeIn.duration(VEIL_MS).reduceMotion(
+                          ReduceMotion.Never,
+                        )}
+                        exiting={FadeOut.duration(VEIL_MS).reduceMotion(
+                          ReduceMotion.Never,
+                        )}
+                        pointerEvents="none"
+                        accessibilityElementsHidden
+                        importantForAccessibility="no-hide-descendants"
+                        style={{
                           position: 'absolute',
                           left: 0,
-                          width: Math.min(w.length * 7.5, 70),
-                          height: 9,
-                          borderRadius: 5,
-                          backgroundColor: colors.fgMuted,
-                        },
-                        wordMask,
-                      ]}
-                    />
+                          right: 0,
+                          opacity: 0.7,
+                        }}
+                      >
+                        <BlurredWord word={w} color={colors.fgDefault} />
+                      </Animated.View>
+                    )}
                   </View>
                 </View>
               );
@@ -234,16 +313,22 @@ const WordsStep: React.FunctionComponent<WordsStepProps> = ({
             transform: [{ scale: pressed ? 0.97 : 1 }],
           })}
         >
-          <Animated.View
-            key={copied ? 'copied' : 'copy'}
-            entering={copied ? iconPop() : undefined}
-          >
-            {copied ? (
-              <CheckIcon size={15} color={colors.fgAccent} strokeWidth={2.6} />
-            ) : (
-              <CopyIcon size={15} color={colors.fgDefault} />
-            )}
-          </Animated.View>
+          <View style={{ width: 15, height: 15 }}>
+            <Animated.View
+              key={copied ? 'copied' : 'copy'}
+              entering={copied ? iconPop() : undefined}
+            >
+              {copied ? (
+                <CheckIcon
+                  size={15}
+                  color={colors.fgAccent}
+                  strokeWidth={2.6}
+                />
+              ) : (
+                <CopyIcon size={15} color={colors.fgDefault} />
+              )}
+            </Animated.View>
+          </View>
           <Text style={outlineText}>
             {translate(copied ? 'seedbackup.copied' : 'copy') as string}
           </Text>
@@ -257,13 +342,15 @@ const WordsStep: React.FunctionComponent<WordsStepProps> = ({
             transform: [{ scale: pressed ? 0.97 : 1 }],
           })}
         >
-          <Animated.View key={hidden ? 'show' : 'hide'} entering={iconTurn()}>
-            {hidden ? (
-              <EyeIcon size={15} color={colors.fgDefault} />
-            ) : (
-              <EyeOffIcon size={15} color={colors.fgDefault} />
-            )}
-          </Animated.View>
+          <View style={{ width: 15, height: 15 }}>
+            <Animated.View key={hidden ? 'show' : 'hide'} entering={iconTurn()}>
+              {hidden ? (
+                <EyeIcon size={15} color={colors.fgDefault} />
+              ) : (
+                <EyeOffIcon size={15} color={colors.fgDefault} />
+              )}
+            </Animated.View>
+          </View>
           <Text style={outlineText}>
             {
               translate(
@@ -287,29 +374,29 @@ const WordsStep: React.FunctionComponent<WordsStepProps> = ({
           paddingVertical: 4,
         }}
       >
-        <Animated.View
-          key={checked ? 'on' : 'off'}
-          entering={checked ? boxPop() : undefined}
-        >
+        <View style={{ width: 17, height: 17 }}>
           <Animated.View
-            style={[
-              {
-                width: 17,
-                height: 17,
-                borderRadius: 4,
-                borderWidth: 1.5,
-                alignItems: 'center',
-                justifyContent: 'center',
-                backgroundColor: checked ? colors.bgAccent : colors.bgSurface,
-              },
-              checked ? { borderColor: colors.bgAccent } : boxNudge,
-            ]}
+            key={checked ? 'on' : 'off'}
+            entering={checked ? boxPop() : undefined}
           >
-            {checked && (
-              <CheckIcon size={12} color={colors.bgCanvas} strokeWidth={3.6} />
-            )}
+            <Animated.View
+              style={[
+                {
+                  width: 17,
+                  height: 17,
+                  borderRadius: 4,
+                  borderWidth: 1.5,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: checked ? colors.bgAccent : colors.bgSurface,
+                },
+                checked ? { borderColor: colors.bgAccent } : boxNudge,
+              ]}
+            >
+              {checked && <DrawnTick color={colors.bgCanvas} />}
+            </Animated.View>
           </Animated.View>
-        </Animated.View>
+        </View>
         <Text
           style={{
             flex: 1,
