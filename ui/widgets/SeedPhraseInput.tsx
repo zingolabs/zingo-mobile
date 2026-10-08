@@ -232,6 +232,14 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
       return;
     }
     if (before.length >= SEED_WORD_COUNT && text.trim()) {
+      // The field can hand back text it kept after its words were taken.
+      // Words that only repeat the end of the phrase are that, not a 25th.
+      const echo = tokenize(text);
+      const tail = before.slice(before.length - echo.length);
+      if (echo.length <= before.length && echo.every((w, i) => w === tail[i])) {
+        clearDraft(native);
+        return;
+      }
       rejectOverflow(native);
       return;
     }
