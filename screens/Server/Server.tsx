@@ -614,6 +614,10 @@ const Server: React.FunctionComponent<ServerProps> = ({
           bottom: BODY_BOTTOM,
         }}
         contentContainerStyle={{ paddingBottom: 16 }}
+        // Dragging the list puts the keyboard away, as on any iOS list, and
+        // brings into reach what it covered. On iOS this drag is also how
+        // Maestro's hideKeyboard closes it.
+        keyboardDismissMode="on-drag"
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
