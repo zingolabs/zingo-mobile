@@ -257,6 +257,9 @@ export default class SettingsFileImpl {
         // launches once, the first time spendable Orchard funds are detected.
         settings.ironwoodOnboardSeen = false;
       }
+      if (!settings.hasOwnProperty(SettingsNameEnum.seedBackedUp)) {
+        settings.seedBackedUp = false;
+      }
       return settings;
     } catch (err) {
       // The File doesn't exist, so return nothing

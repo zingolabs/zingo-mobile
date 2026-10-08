@@ -74,6 +74,8 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   zingolibVersion: '',
   performanceLevel: RPCPerformanceLevelEnum.Medium,
   setPrivacyOption: async () => {},
+  seedBackedUp: true,
+  setSeedBackedUp: async () => {},
   blockExplorer: BlockExplorerEnum.Zcashexplorer,
   mixnetView: ABSENT_MIXNET_VIEW,
   reenableMixnet: async () => {},

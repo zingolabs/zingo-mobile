@@ -12,4 +12,5 @@ export enum SettingsNameEnum {
   firstInstall = 'firstInstall',
   version = 'version',
   ironwoodOnboardSeen = 'ironwoodOnboardSeen',
+  seedBackedUp = 'seedBackedUp',
 }

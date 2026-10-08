@@ -231,6 +231,7 @@ export default function LoadedApp(props: LoadedAppProps) {
   const [addressBook, setAddressBook] = useState<AddressBookFileClass[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [biometrics, setBiometrics] = useState<boolean>(true);
+  const [seedBackedUp, setSeedBackedUp] = useState<boolean>(true);
   const [selectServer, setSelectServer] = useState<SelectServerEnum>(
     SelectServerEnum.auto,
   );
@@ -378,6 +379,7 @@ export default function LoadedApp(props: LoadedAppProps) {
       } else {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.privacy, privacy);
       }
+      setSeedBackedUp(settings.seedBackedUp === true);
       if (settings.biometrics === true || settings.biometrics === false) {
         setBiometrics(settings.biometrics);
       } else {
@@ -590,6 +592,7 @@ export default function LoadedApp(props: LoadedAppProps) {
         transparentPool={transparentPool}
         addressBook={addressBook}
         biometrics={biometrics}
+        seedBackedUp={seedBackedUp}
         selectServer={selectServer}
         walletChainName={walletChainName}
         firstLaunchingMessage={firstLaunchingMessage}
@@ -623,6 +626,7 @@ type LoadedAppClassProps = {
   transparentPool: boolean;
   addressBook: AddressBookFileClass[];
   biometrics: boolean;
+  seedBackedUp: boolean;
   selectServer: SelectServerEnum;
   walletChainName: ChainNameEnum;
   firstLaunchingMessage: LaunchingModeEnum;
@@ -695,6 +699,8 @@ export class LoadedAppClass extends Component<
       setZecPrice: this.setZecPrice,
       zingolibVersion: '',
       setPrivacyOption: this.setPrivacyOption,
+      seedBackedUp: props.seedBackedUp,
+      setSeedBackedUp: this.setSeedBackedUp,
 
       // context settings
       server: props.server,
@@ -1723,6 +1729,11 @@ export class LoadedAppClass extends Component<
     });
   };
 
+  setSeedBackedUp = async (value: boolean): Promise<void> => {
+    await SettingsFileImpl.writeSettings(SettingsNameEnum.seedBackedUp, value);
+    this.setState({ seedBackedUp: value });
+  };
+
   setBiometricsOption = async (value: boolean): Promise<void> => {
     await SettingsFileImpl.writeSettings(SettingsNameEnum.biometrics, value);
     this.setState({ biometrics: value });
@@ -2019,6 +2030,8 @@ export class LoadedAppClass extends Component<
       setZecPrice: this.state.setZecPrice,
       zingolibVersion: this.state.zingolibVersion,
       setPrivacyOption: this.setPrivacyOption,
+      seedBackedUp: this.state.seedBackedUp,
+      setSeedBackedUp: this.setSeedBackedUp,
 
       // context settings
       server: this.state.server,
