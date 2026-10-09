@@ -12,7 +12,7 @@ import { useTheme } from '@app/theme';
 import { I18n } from 'i18n-js';
 import * as RNLocalize from 'react-native-localize';
 import { isEqual } from 'lodash';
-import { StackScreenProps } from '@react-navigation/stack';
+import { useSession } from '@app/navigation/session';
 import { LoadingAppNavigationState, AppDrawerParamList } from '@app/types';
 import NetInfo, {
   NetInfoSubscription,
@@ -144,7 +144,10 @@ import { AddressList } from '@screens/AddressList';
 import ValueTransferDetail from '@screens/ValueTransferDetail';
 import Confirm from '@screens/Confirm';
 import { AppStackParamList } from '@app/types';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import {
+  NativeStackNavigationProp,
+  NativeStackScreenProps,
+} from '@react-navigation/native-stack';
 import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
 
 const About = React.lazy(() => import('@screens/About'));
@@ -206,13 +209,10 @@ const OBSOLETE_ZENNY_TIPS_ADDRESS: string =
 // for testing
 //const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-type LoadedAppProps = {
-  navigation: StackScreenProps<
-    AppStackParamList,
-    RouteEnum.LoadedApp
-  >['navigation'];
-  route: StackScreenProps<AppStackParamList, RouteEnum.LoadedApp>['route'];
-};
+type LoadedAppProps = NativeStackScreenProps<
+  AppStackParamList,
+  RouteEnum.LoadedApp
+>;
 
 const SERVER_DEFAULT_0: ServerType = remoteServer(
   serverUris(() => {})[0].uri,
@@ -221,6 +221,7 @@ const SERVER_DEFAULT_0: ServerType = remoteServer(
 
 export default function LoadedApp(props: LoadedAppProps) {
   const theme = useTheme();
+  const { setSession } = useSession();
   const [language, setLanguage] = useState<LanguageEnum>(LanguageEnum.en);
   const [server, setServer] = useState<ServerType>(SERVER_DEFAULT_0);
   const [privacy, setPrivacy] = useState<boolean>(false);
@@ -579,7 +580,7 @@ export default function LoadedApp(props: LoadedAppProps) {
     return (
       <LoadedAppClass
         {...props}
-        navigationApp={props.navigation}
+        openLoading={params => setSession({ kind: 'loading', params })}
         theme={theme}
         translate={translate}
         setI18nLocale={(locale: string) => {
@@ -613,11 +614,8 @@ export default function LoadedApp(props: LoadedAppProps) {
 }
 
 type LoadedAppClassProps = {
-  navigationApp: StackScreenProps<
-    AppStackParamList,
-    RouteEnum.LoadedApp
-  >['navigation'];
-  route: StackScreenProps<AppStackParamList, RouteEnum.LoadedApp>['route'];
+  openLoading: (params: LoadingAppNavigationState) => void;
+  route: LoadedAppProps['route'];
   translate: (key: string) => TranslateType;
   // Mutates the i18n instance's active locale. Needed so language changes
   // applied without remounting LoadedApp (reset=false in setLanguageOption)
@@ -1791,15 +1789,7 @@ export class LoadedAppClass extends Component<
 
   navigateToLoadingApp = async (state: LoadingAppNavigationState) => {
     await this.rpc.clearTimers();
-    this.props.navigationApp.reset({
-      index: 0,
-      routes: [
-        {
-          name: RouteEnum.LoadingApp,
-          params: state,
-        },
-      ],
-    });
+    this.props.openLoading(state);
   };
 
   onClickOKChangeWallet = async (state: LoadingAppNavigationState) => {
