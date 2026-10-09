@@ -10,27 +10,24 @@ exports[`Component App - test App - snapshot 1`] = `
   }
 >
   <MockedScreen
-    name="LoadingApp"
+    name="Loading"
   />
-  <MockedScreen
-    component={[Function]}
-    name="ScannerAddress"
-    options={
+  <MockedGroup
+    screenOptions={
       {
         "animation": "slide_from_bottom",
         "presentation": "transparentModal",
       }
     }
-  />
-  <MockedScreen
-    component={[Function]}
-    name="ScannerUfvk"
-    options={
-      {
-        "animation": "slide_from_bottom",
-        "presentation": "transparentModal",
-      }
-    }
-  />
+  >
+    <MockedScreen
+      component={[Function]}
+      name="ScannerAddress"
+    />
+    <MockedScreen
+      component={[Function]}
+      name="ScannerUfvk"
+    />
+  </MockedGroup>
 </MockedNavigator>
 `;

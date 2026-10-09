@@ -7,11 +7,11 @@ import { faXmark } from '@fortawesome/free-solid-svg-icons';
 
 import Scanner from '@ui/widgets/Scanner';
 import { GlobalConst, RouteEnum } from '@app/AppState';
-import { AppStackParamList } from '@app/types';
+import { RootParamList } from '@app/types';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 type ScannerAddressProps = NativeStackScreenProps<
-  AppStackParamList,
+  RootParamList,
   RouteEnum.ScannerAddress
 >;
 

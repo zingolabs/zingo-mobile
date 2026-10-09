@@ -1,6 +1,6 @@
+import type { NavigatorScreenParams } from '@react-navigation/native';
 import {
   AddressKindEnum,
-  BiometricGateOutcome,
   ChainNameEnum,
   LaunchingModeEnum,
   RouteEnum,
@@ -14,38 +14,29 @@ import type { ComputingEnd } from '@app/walletBackend/transforms/sendSettlement'
 import { RPCDrainTxType } from '@app/walletBackend/types/RPCDrainPlanType';
 import { RPCMigrationPlanType } from '@app/walletBackend/types/RPCMigrationPlanType';
 
-/**
- * Root navigation parameter list for the main stack navigator
- * This defines the structure of parameters passed between main app screens
- */
-export type AppStackParamList = {
-  // Stack
-  [RouteEnum.LoadingApp]: LoadingAppNavigationState | undefined;
-  [RouteEnum.LoadedApp]: LoadedAppNavigationState | undefined;
-  // ScannerAddress / ScannerUfvk are presented as transparent modals at the
-  // root Stack so they overlay everything (LoadedApp, LoadingApp, and any
-  // open BottomSheet portals).
+// The root stack: one section, chosen by the session, plus the scanners,
+// which sit above every section and its bottom-sheet portal.
+export type RootParamList = {
+  [RouteEnum.Loading]: undefined;
+  [RouteEnum.Wallet]: NavigatorScreenParams<AppDrawerParamList> | undefined;
   [RouteEnum.ScannerAddress]: ScannerAddressNavigationState | undefined;
   [RouteEnum.ScannerUfvk]: ScannerUfvkNavigationState | undefined;
 };
 
-/**
- * Navigation state used for internal app navigation within LoadedApp
- * Used for methods like navigateToLoadingApp and onClickOKChangeWallet
- */
-export type LoadingAppNavigationState = {
-  screen?: RouteEnum;
-  startingApp?: boolean;
-  // The gate outcome rides with the navigation whole, so a declined gate
-  // always carries its failure and the locked screen renders the reason it
-  // was locked for.
-  biometricGate?: BiometricGateOutcome;
-  newWallet?: boolean;
+// The loading section: the boot gate, the lock, and the onboarding stage.
+export type LoadingParamList = {
+  [RouteEnum.Boot]: undefined;
+  [RouteEnum.Lock]: undefined;
+  [RouteEnum.Onboarding]: undefined;
 };
-/**
- * Navigation state used for internal app navigation within LoadedApp
- * Used for methods like navigateToLoadedApp
- */
+
+export type HomeTabParamList = {
+  [RouteEnum.History]: undefined;
+  [RouteEnum.Send]: undefined;
+  [RouteEnum.Receive]: undefined;
+};
+
+// What the loading section hands the wallet section when a wallet opens.
 export type LoadedAppNavigationState = {
   readOnly: boolean;
   orchardPool: boolean;
@@ -66,13 +57,9 @@ export type CardRect = { x: number; y: number; width: number; height: number };
 export type SeedBackupEntry =
   { kind: 'card'; from: CardRect } | { kind: 'push' } | { kind: 'verify' };
 
-/**
- * Root drawer parameter list for the main stack navigator
- * This defines the structure of parameters passed between main app screens
- */
+// The wallet section's stack: the home tabs and every screen pushed over them.
 export type AppDrawerParamList = {
-  // Drawer no params
-  [RouteEnum.HomeStack]: undefined;
+  [RouteEnum.HomeStack]: NavigatorScreenParams<HomeTabParamList> | undefined;
   [RouteEnum.History]: undefined;
   [RouteEnum.Send]: undefined;
   [RouteEnum.Receive]: undefined;
