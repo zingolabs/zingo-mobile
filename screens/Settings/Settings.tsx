@@ -42,8 +42,9 @@ import {
   RouteEnum,
   ScreenEnum,
   BlockExplorerEnum,
+  UfvkActionEnum,
 } from '@app/AppState';
-import { fetchWallet } from '@app/walletBackend';
+import { fetchWallet, walletBackupExists } from '@app/walletBackend';
 import {
   DeviceSecurityProbe,
   probeDeviceSecurity,
@@ -162,6 +163,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const [disabledButton, setDisabledButton] = useState<boolean>(false);
   const [showDeveloperOptions, setShowDeveloperOptions] =
     useState<boolean>(false);
+  const [hasWalletBackup, setHasWalletBackup] = useState<boolean>(false);
   // Assumed stored until checked, so the warning doesn't flash on open.
   const [recoveryInfoStored, setRecoveryInfoStored] = useState<boolean>(true);
   const [savingRecoveryInfo, setSavingRecoveryInfo] = useState<boolean>(false);
@@ -225,6 +227,24 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       cancelled = true;
     };
   }, []);
+
+  // Older builds kept a backup of the previous mainnet wallet on every
+  // wallet change. Its restore stays here for whoever still has one.
+  useEffect(() => {
+    if (!showDeveloperOptions) {
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      const exists = await walletBackupExists();
+      if (!cancelled) {
+        setHasWalletBackup(exists);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [showDeveloperOptions]);
 
   const probedRef = useRef<boolean>(false);
   useEffect(() => {
@@ -924,6 +944,41 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                             title={translate('view-error') as string}
                             onPress={() => {
                               reportError(lastError);
+                            }}
+                            twoButtons={true}
+                          />
+                        </View>
+                      </>
+                    )}
+                    {hasWalletBackup && (
+                      <>
+                        <View
+                          style={{ marginHorizontal: 25, marginVertical: 15 }}
+                        >
+                          <BoldText>
+                            {
+                              translate(
+                                'loadedapp.restorebackupwallet',
+                              ) as string
+                            }
+                          </BoldText>
+                        </View>
+
+                        <View style={{ marginLeft: 40, marginRight: 25 }}>
+                          <Button
+                            testID="settings.restorebackupwallet"
+                            type={ButtonTypeEnum.Secondary}
+                            title={translate('walletseed.go-backup') as string}
+                            onPress={() => {
+                              if (readOnly) {
+                                navigation.navigate(RouteEnum.Ufvk, {
+                                  action: UfvkActionEnum.backup,
+                                });
+                              } else {
+                                navigation.navigate(RouteEnum.WalletSeed, {
+                                  action: 'backup',
+                                });
+                              }
                             }}
                             twoButtons={true}
                           />

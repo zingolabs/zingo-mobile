@@ -92,6 +92,7 @@ test('Tests that the viewing key shows its first and last characters only.', asy
 
 test.each([
   ['change', 'loadedapp.changewallet', 'walletseed.go-change'],
+  ['backup', 'loadedapp.restorebackupwallet', 'walletseed.go-backup'],
   ['server', 'walletseed.title-server', 'walletseed.go-server'],
 ] as const)(
   'Tests that the %s action shows its title and button instead of the backup status.',

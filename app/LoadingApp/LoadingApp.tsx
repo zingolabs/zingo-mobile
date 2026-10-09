@@ -824,12 +824,19 @@ export class LoadingAppClass extends Component<
             });
             this.addLastSnackbar(walletKindStr);
           }
+          // if the App is restoring another wallet backup...
+          // needs to recalculate the Address Book.
+          const newWallet =
+            !!this.props.route.params &&
+            this.props.route.params.newWallet !== undefined
+              ? this.props.route.params.newWallet
+              : false;
           this.navigateToLoadedApp(
             readOnly,
             orchardPool,
             saplingPool,
             transparentPool,
-            false,
+            newWallet,
             this.state.firstLaunchingMessage,
             // The wallet's own chain, surfaced by the native result (reliable
             // even Offline). The server's chain is only a pre-rebuild fallback.

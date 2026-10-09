@@ -6,6 +6,8 @@ jest.mock('react-native', () => {
     probeServerInfo: jest.fn(() => '{}'),
     getLatestBlockWalletInfo: jest.fn(() => '{}'),
     walletExists: jest.fn(() => 'false'),
+    walletBackupExists: jest.fn(() => 'false'),
+    restoreExistingWalletBackup: jest.fn(() => '{}'),
     getValueTransfersList: jest.fn(
       () => '{ "value_transfers": [], "total": 0 }',
     ),

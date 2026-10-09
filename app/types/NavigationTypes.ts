@@ -39,6 +39,7 @@ export type LoadingAppNavigationState = {
   // always carries its failure and the locked screen renders the reason it
   // was locked for.
   biometricGate?: BiometricGateOutcome;
+  newWallet?: boolean;
 };
 /**
  * Navigation state used for internal app navigation within LoadedApp
@@ -61,7 +62,7 @@ export type CardRect = { x: number; y: number; width: number; height: number };
 
 // How the backup flow opens: grown out of the History notice card, pushed
 // from Wallet Seed, or straight to the three-word check from Wallet Seed.
-export type WalletSeedAction = 'change' | 'server';
+export type WalletSeedAction = 'change' | 'backup' | 'server';
 
 export type SeedBackupEntry =
   { kind: 'card'; from: CardRect } | { kind: 'push' } | { kind: 'verify' };

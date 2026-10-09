@@ -1,11 +1,10 @@
 /**
- * Handles the wallet change: deletes the wallet file so another one can
- * take its place.
+ * Handles wallet file operations: change wallet, restore from backup.
  *
- * Calls syncCoordinator.pauseSyncProcess() first to ensure no sync task is
- * running while the wallet file is being replaced. Returns DONE on success
- * or an ErrorKeyed failure the display edge translates (zingo-adrs
- * zingo-mobile/0009).
+ * Every method calls syncCoordinator.pauseSyncProcess() first to ensure no
+ * sync task is running while the wallet file is being replaced. All methods
+ * return DONE on success or an ErrorKeyed failure the display edge
+ * translates (zingo-adrs zingo-mobile/0009).
  */
 import { GlobalConst, Done, DONE, ErrorKeyed, errorKeyed } from '@app/AppState';
 import RPCModule from '@app/RPCModule';
@@ -13,7 +12,8 @@ import { SyncCoordinator } from './SyncCoordinator';
 
 export type WalletLifecycleErrorKey =
   | 'rpc.deletewallet-error'
-  | 'rpc.walletnotfound-error';
+  | 'rpc.walletnotfound-error'
+  | 'rpc.backupnotfound-error';
 
 export type WalletLifecycleResult = Done | ErrorKeyed<WalletLifecycleErrorKey>;
 
@@ -40,6 +40,24 @@ export class WalletLifecycleService {
     if (!(result && result !== GlobalConst.false)) {
       return err('rpc.deletewallet-error');
     }
+    return DONE;
+  }
+
+  // Restores the backup that older builds took on a wallet change. No
+  // build writes new ones; the current wallet takes the backup's place.
+  async restoreBackup(): Promise<WalletLifecycleResult> {
+    const existsBackup = await RPCModule.walletBackupExists();
+
+    if (!(existsBackup && existsBackup !== GlobalConst.false)) {
+      return err('rpc.backupnotfound-error');
+    }
+    const existsWallet = await RPCModule.walletExists();
+
+    if (!(existsWallet && existsWallet !== GlobalConst.false)) {
+      return err('rpc.walletnotfound-error');
+    }
+    await this.syncCoordinator.pauseSyncProcess();
+    await RPCModule.restoreExistingWalletBackup();
     return DONE;
   }
 }

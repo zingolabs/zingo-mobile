@@ -7,11 +7,13 @@ import { ErrorKeyed } from '@app/AppState/types/Result';
 // wallet files for the recovery dialog, and Android additionally repairs
 // the 2.0.21 double-wrap incident by peeling the extra envelope layers.
 
-// Mirror of the Constants.kt and Constants.swift wallet file name. The
+// Mirror of Constants.kt and Constants.swift wallet file names. The
 // optional chain tolerates partial react-native test mocks at module
 // load.
 export const WALLET_FILE_NAME =
   Platform?.OS === 'ios' ? 'wallet.dat.txt' : 'wallet.dat';
+export const WALLET_BACKUP_FILE_NAME =
+  Platform?.OS === 'ios' ? 'wallet.backup.dat.txt' : 'wallet.backup.dat';
 
 export type WalletFileState =
   | 'missing'
@@ -100,13 +102,18 @@ export async function walletFileDiagnosis(): Promise<WalletFileDiagnosisReport> 
   }
 }
 
-// The native repair rewrites the wallet file only; a repairable twin must not trigger auto-repair.
+// The two files the native repair rewrites; a repairable twin must not trigger auto-repair.
+const REPAIR_TARGET_NAMES: ReadonlySet<string> = new Set([
+  WALLET_FILE_NAME,
+  WALLET_BACKUP_FILE_NAME,
+]);
+
 export function hasRepairableWalletFile(
   diagnosis: WalletFileDiagnosis[],
 ): boolean {
   return diagnosis.some(
     d =>
-      d.name === WALLET_FILE_NAME &&
+      REPAIR_TARGET_NAMES.has(d.name) &&
       d.state === 'doubleWrapped' &&
       d.repairable,
   );

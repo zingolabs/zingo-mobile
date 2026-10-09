@@ -17,11 +17,7 @@ HiOS observed) made files undecryptable outright. iOS never had
 app-layer encryption. Every recovery sidecar below exists to patch one
 of these failure modes.
 
-## Main file: `wallet.dat`
-
-Older builds also kept a retained wallet, `wallet.backup.dat`, for a
-mainnet-only "restore last backup". The app no longer has that feature:
-startup finishes any swap it left halfway, then deletes the file.
+## Main files: `wallet.dat`, `wallet.backup.dat`
 
 The state names are the `diagnoseWalletFile` vocabulary that crosses the
 bridge (`WalletFileState` in `walletFileRepair.ts`).
@@ -51,9 +47,9 @@ lands. The Android encrypted states never occur there.
 |---|---|---|---|
 | `<name>.write.tmp` | encrypted | `writeEncryptedFileDurably`, stash of the previous content before its delete-then-write | `completePendingWrite` keeps working: restore when the main file fails the full parse, delete only when it passes |
 | `<name>.migrating` | plain | the 2.0.21 migration, plain copy kept until the encrypted write verified | rename to main when main is missing, delete once main passes the full parse, keep otherwise |
-| `wallet.swap.tmp` | encrypted (legacy) or plain (Step 1) | the backup restore swap of older builds, copy of the original main | `completePendingSwap` keeps working, reads either format; the retained wallet stays while this file does |
+| `wallet.swap.tmp` | encrypted (legacy) or plain (Step 1) | backup restore swap, copy of the original main | `completePendingSwap` keeps working, reads either format |
 | `<name>.prerepair` | raw double-wrapped copy | double-wrap repair, and now the load path's unwrap | support evidence only, never auto-read |
-| `<name>.broken` | raw undecryptable copy | the seed salvage of an unreadable main (older builds: backup restore over it) | support evidence only, never auto-read |
+| `<name>.broken` | raw undecryptable copy | backup restore over an unreadable main | support evidence only, never auto-read |
 
 ## Rules the load path must keep
 

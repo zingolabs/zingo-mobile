@@ -186,6 +186,15 @@ export async function deleteExistingWallet(): Promise<FfiResult<string>> {
   return callFfi(RPCModule.deleteExistingWallet());
 }
 
+// Restores the wallet from its on-device backup file (the `.migrating`
+// twin EncryptedFile manages). The success value is the native "true"/"false"
+// data protocol.
+export async function restoreExistingWalletBackup(): Promise<
+  FfiResult<string>
+> {
+  return callFfi(RPCModule.restoreExistingWalletBackup());
+}
+
 /**
  * Whether a native save resolution reports success. The bridges are
  * trimodal (zingo-mobile#1151): Android resolves boolean true/false, iOS
@@ -549,6 +558,13 @@ export async function isWalletAddress(address: string): Promise<boolean> {
   } catch (error) {
     return false;
   }
+}
+
+// True iff a wallet backup file exists on disk. zingolib reports the answer
+// as the string "true"/"false"; we collapse it to a real boolean here so
+// callers don't have to repeat the GlobalConst.false comparison.
+export async function walletBackupExists(): Promise<boolean> {
+  return resolvedTrue(await callFfi(RPCModule.walletBackupExists()));
 }
 
 // Returns the latest block height the given server reports; the success

@@ -156,6 +156,7 @@
     "rescanwallet": "Re-Escanear",
     "report": "Informe de Sincronización",
     "changewallet": "Abrir otro Monedero",
+    "restorebackupwallet": "Restaurar Copia de Seguridad",
     "fundpools": "Agrupaciones de Fondos",
     "insight": "Visión Financiera",
     "addressbook": "Libreta de Direcciones",
@@ -165,6 +166,7 @@
     "differentchain-error": "Estás cambiando a un servidor con diferente tipo de cadena, ya no tendrás acceso a este monedero sin tu frase semilla.",
     "serverchain-mismatch": "El servidor reporta una cadena diferente a la seleccionada. Revisa el selector de cadena e inténtalo de nuevo.",
     "changingwallet-label": "Error cambiando de Monedero",
+    "restoringwallet-label": "Error restaurando el Monedero",
     "computingtx": "Procesando Transacción...",
     "computingtx-hangon": "Aguanta un poco,\nesto solo tardará un momento...",
     "transactioncreated-title": "Transacción creada",
@@ -197,6 +199,7 @@
   },
   "rpc": {
     "walletnotfound-error": "Error: No se encuentra ningún monedero.",
+    "backupnotfound-error": "Error: No se encuentra ninguna copia de seguridad de ningún monedero.",
     "deletewallet-error": "Error: No se pudo borrar el monedero actual."
   },
   "settings": {
@@ -410,7 +413,13 @@
         "Estás seguro/a?"
       ],
       "view": ["Ya he guardado \n la semilla"],
-      "restore": ["Restaurar Monedero"]
+      "restore": ["Restaurar Monedero"],
+      "backup": [
+        "",
+        "Restaurar",
+        "Realmente quieres \n restaurar tu \n copia de seguridad",
+        "Estás seguro/a?"
+      ]
     },
     "title": "Semilla",
     "new": "Nueva",
@@ -431,6 +440,7 @@
     "birthday-readonly": "Cumpleaños del Monedero",
     "birthday-no-readonly": "Altura de bloque de la primera transacción. (Está bien si no la sabes o no te acuerdas)\nRango de valores entre ",
     "change-warning": "Si cambias a otro monedero, ya no tendrás acceso a este monedero sin la frase semilla.",
+    "backup-warning": "Si cambias a tu monedero anterior (copia de seguridad), ya no tendrás acceso a este monedero sin la frase semilla.",
     "server-warning": "Si cambias a un servidor con diferente tipo de cadena, ya no tendrás acceso a este monedero sin la frase semilla.",
     "seedplaceholder": "Semilla (24 palabras)",
     "seed-acc": "Campo Frase Semilla",
@@ -778,14 +788,22 @@
         "Cambiar Servidor",
         "Realmente quieres \n cambiar el \n servidor activo",
         "Estás seguro/a?"
+      ],
+      "backup": [
+        "",
+        "Restaurar",
+        "Realmente quieres \n restaurar tu \n copia de seguridad",
+        "Estás seguro/a?"
       ]
     },
     "viewkey": "Clave de Visualización ",
     "tapcopy-message": "Clave copiada al portapapeles",
     "text-readonly": "Antes de cerrar esta ventana, escriba cuidadosamente esta clave de visualización. Es la única manera que puedes restaurar/acceder tu monedero actual.",
+    "text-readonly-backup": "Antes de restaurar la copia de seguridad del monedero anterior, escriba cuidadosamente esta clave de visualización. Es la única manera que puedes restaurar/acceder tu monedero actual.",
     "text-readonly-change": "Antes de acceder a otro monedero, escriba cuidadosamente esta clave de visualización. Es la única manera que puedes restaurar/acceder tu monedero actual.",
     "text-readonly-server": "Antes de usar otro servidor, escriba cuidadosamente esta clave de visualización. Es la única manera que puedes restaurar/acceder tu monedero actual.",
     "change-warning": "Si cambias a otro monedero, ya no tendrás acceso a este monedero sin la frase semilla.",
+    "backup-warning": "Si cambias a tu monedero anterior (copia de seguridad), ya no tendrás acceso a este monedero sin la frase semilla.",
     "server-warning": "Si cambias a un servidor con diferente tipo de cadena, ya no tendrás acceso a este monedero sin la frase semilla.",
     "recovering-from-keychain": "Recuperando la clave de visualización del almacenamiento seguro...",
     "recovering-from-wallet": "Cargando la clave de visualización del monedero...",
@@ -1125,8 +1143,10 @@
     "verify": "Verificar de nuevo",
     "title-server": "Cambiar servidor",
     "sub-change": "Antes de abrir otro monedero, guarda con cuidado la frase semilla, el cumpleaños y la clave de visualización de este. Los necesitarás para volver a él.",
+    "sub-backup": "Antes de restaurar la última copia de seguridad, guarda con cuidado la frase semilla, el cumpleaños y la clave de visualización de este monedero. Los necesitarás para volver a él.",
     "sub-server": "Antes de cambiar de servidor, guarda con cuidado la frase semilla, el cumpleaños y la clave de visualización de este monedero. Los necesitarás para volver a él.",
     "go-change": "Abrir otro",
+    "go-backup": "Restaurar",
     "go-server": "Cambiar",
     "confirm-title": "¿Estás seguro?"
   }

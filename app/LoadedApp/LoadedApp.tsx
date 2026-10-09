@@ -1801,6 +1801,27 @@ export class LoadedAppClass extends Component<
     this.navigateToLoadingApp(state);
   };
 
+  onClickOKRestoreBackup = async () => {
+    const restored = await this.rpc.restoreBackup();
+
+    if (restored.kind === 'error') {
+      createAlert(
+        this.setBackgroundError,
+        this.addLastSnackbar,
+        this.state.translate('loadedapp.restoringwallet-label') as string,
+        this.state.translate(restored.errorKey) as string,
+        false,
+        this.state.translate,
+        sendEmail,
+        this.state.zingolibVersion,
+      );
+      return;
+    }
+
+    this.keepAwake(false);
+    this.navigateToLoadingApp({ startingApp: false, newWallet: true });
+  };
+
   onClickOKServerWallet = async () => {
     const { pendingServer } = this.state;
     if (pendingServer.kind === 'pending') {
@@ -2166,6 +2187,16 @@ export class LoadedAppClass extends Component<
                               onClickCancel={() => {}}
                             />
                           );
+                        } else if (action === UfvkActionEnum.backup) {
+                          return (
+                            <ShowUfvk
+                              {...props}
+                              onClickOK={async () =>
+                                await this.onClickOKRestoreBackup()
+                              }
+                              onClickCancel={() => {}}
+                            />
+                          );
                         } else if (action === UfvkActionEnum.server) {
                           return (
                             <ShowUfvk
@@ -2223,6 +2254,8 @@ export class LoadedAppClass extends Component<
                                 await this.onClickOKChangeWallet({
                                   startingApp: false,
                                 });
+                              } else if (action === 'backup') {
+                                await this.onClickOKRestoreBackup();
                               } else if (action === 'server') {
                                 await this.onClickOKServerWallet();
                               }
