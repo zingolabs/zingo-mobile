@@ -184,28 +184,27 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             PlainWalletFile.digest(readWalletBytes(fileName))
         }
 
-    // Restores a wallet file from its legacy "$fileName.write.tmp" stash
+    // Restores the wallet file from its legacy "$fileName.write.tmp" stash
     // when the file fails the full parse, and drops the orphan once the
     // file passes.
     fun completePendingWrite() {
-        for (fileName in listOf(WalletFileName.value, WalletBackupFileName.value)) {
-            val tempName = "$fileName.write.tmp"
-            if (!fileExists(tempName)) continue
-            try {
-                val targetIntact = fileExists(fileName) && try {
-                    isIntactWallet(readWalletBytes(fileName))
-                } catch (_: Exception) {
-                    false
-                }
-                if (!targetIntact) {
-                    writeWalletBytes(fileName, readWalletBytes(tempName))
-                    Log.i("MAIN", "[Native] completePendingWrite: restored $fileName from $tempName")
-                }
-                deleteFile(tempName)
-            } catch (e: Exception) {
-                Log.e("MAIN", "[Native] completePendingWrite for $fileName failed: $e", e)
-                // Leave temp in place for diagnosis / next attempt.
+        val fileName = WalletFileName.value
+        val tempName = "$fileName.write.tmp"
+        if (!fileExists(tempName)) return
+        try {
+            val targetIntact = fileExists(fileName) && try {
+                isIntactWallet(readWalletBytes(fileName))
+            } catch (_: Exception) {
+                false
             }
+            if (!targetIntact) {
+                writeWalletBytes(fileName, readWalletBytes(tempName))
+                Log.i("MAIN", "[Native] completePendingWrite: restored $fileName from $tempName")
+            }
+            deleteFile(tempName)
+        } catch (e: Exception) {
+            Log.e("MAIN", "[Native] completePendingWrite for $fileName failed: $e", e)
+            // Leave temp in place for diagnosis / next attempt.
         }
     }
 
@@ -264,9 +263,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         // `.migrating` copy answers "exists". Write recovery runs before
         // swap recovery: a half-written save can leave main missing, which
         // would make a pending swap unable to read main.
-        for (fileName in listOf(WalletFileName.value, WalletBackupFileName.value)) {
-            PlainWalletFile.resolveInterruptedMigration(applicationContext.filesDir, fileName, ::isIntactWallet)
-        }
+        PlainWalletFile.resolveInterruptedMigration(applicationContext.filesDir, WalletFileName.value, ::isIntactWallet)
         completePendingWrite()
         completePendingSwap()
     }
@@ -320,7 +317,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     // Includes each .migrating twin, a plain copy that flags an interrupted migration, but not the encrypted .prerepair/.broken copies that would only read as undecryptable.
     private fun walletFileNames(): List<String> =
-        listOf(WalletFileName.value, WalletBackupFileName.value).flatMap {
+        WalletFileName.value.let {
             listOf(it, "$it.write.tmp", "$it.migrating")
         } + WalletTempSwapFileName.value
 
@@ -485,11 +482,9 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     @ReactMethod
     fun repairDoubleWrappedWalletProcess(promise: Promise) {
         FfiOutcome.settling(promise, "repair_double_wrapped_wallet") {
-            val outcome = JSONObject()
-            for (name in listOf(WalletFileName.value, WalletBackupFileName.value)) {
-                outcome.put(name, repairDoubleWrappedFile(name))
-            }
-            outcome.toString()
+            JSONObject()
+                .put(WalletFileName.value, repairDoubleWrappedFile(WalletFileName.value))
+                .toString()
         }
     }
 
@@ -568,20 +563,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
         val resp = uniffi.zingo.initFromBytes(walletBytes = walletBytes, connection = connection(serveruri, chainhint, performancelevel, minconfirmations))
         walletFileClosed = false
-        migrateRetainedWallet()
         return resp
-    }
-
-    // Best-effort after a successful load: reading the retained wallet
-    // migrates a legacy encrypted file to plain.
-    private fun migrateRetainedWallet() {
-        if (!fileExists(WalletBackupFileName.value)) return
-        if (PlainWalletFile.readsPlain(applicationContext.filesDir, WalletBackupFileName.value)) return
-        try {
-            readWalletBytes(WalletBackupFileName.value)
-        } catch (e: Exception) {
-            Log.w("MAIN", "[Native] retained wallet migration failed: $e")
-        }
     }
 
     @ReactMethod
@@ -647,7 +629,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     // A swap temp that `completePendingSwap` could not consume can hold
-    // the only copy of a wallet, and it survives both delete methods.
+    // the only copy of a wallet, and it survives the delete.
     @ReactMethod
     fun deleteExistingWallet(promise: Promise) {
         completePendingSwap()
@@ -657,19 +639,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 walletFileClosed = true
                 deleteWalletSidecars(WalletFileName.value)
                 File(applicationContext.filesDir, "${WalletTempSwapFileName.value}.plain.tmp").delete()
-            }
-            gone
-        }
-        promise.resolve(deleted)
-    }
-
-    @ReactMethod
-    fun deleteExistingWalletBackup(promise: Promise) {
-        completePendingSwap()
-        val deleted = PlainWalletFile.locked {
-            val gone = fileExists(WalletBackupFileName.value) && deleteFile(WalletBackupFileName.value)
-            if (!fileExists(WalletBackupFileName.value)) {
-                deleteWalletSidecars(WalletBackupFileName.value)
             }
             gone
         }

@@ -206,22 +206,20 @@ class RPCModule: NSObject {
     try FileManager.default.removeItem(atPath: getFileName(fileName))
   }
 
-  // Moves existing wallet files to the resting protection this build
+  // Moves the existing wallet file to the resting protection this build
   // writes: class C plus backup exclusion. Old builds wrote class A, and
   // a synced wallet can open without a save.
   func applyWalletFileProtection() {
     let fm = FileManager.default
-    for name in [Constants.WalletFileName.rawValue, Constants.WalletBackupFileName.rawValue] {
-      guard let path = try? getFileName(name), fm.fileExists(atPath: path) else { continue }
-      var fileURL = URL(fileURLWithPath: path)
-      var resourceValues = URLResourceValues()
-      resourceValues.isExcludedFromBackup = true
-      try? fileURL.setResourceValues(resourceValues)
-      try? fm.setAttributes(
-        [.protectionKey: FileProtectionType.completeUntilFirstUserAuthentication],
-        ofItemAtPath: path
-      )
-    }
+    guard let path = try? getFileName(Constants.WalletFileName.rawValue), fm.fileExists(atPath: path) else { return }
+    var fileURL = URL(fileURLWithPath: path)
+    var resourceValues = URLResourceValues()
+    resourceValues.isExcludedFromBackup = true
+    try? fileURL.setResourceValues(resourceValues)
+    try? fm.setAttributes(
+      [.protectionKey: FileProtectionType.completeUntilFirstUserAuthentication],
+      ofItemAtPath: path
+    )
   }
 
   // Audit Issue P (b) — wallet ↔ backup swap recovery.
@@ -407,36 +405,6 @@ class RPCModule: NSObject {
     }
   }
   
-  func fnDeleteExistingWalletBackup() throws {
-    completePendingSwap()
-    do {
-      try deleteFile(Constants.WalletBackupFileName.rawValue)
-    } catch {
-      throw FileError.deleteFileError("Error: [Native] deleting wallet backup error: \(error.localizedDescription)")
-    }
-  }
-
-  @objc(deleteExistingWalletBackup:reject:)
-  func deleteExistingWalletBackup(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-    do {
-      if try fileExists(Constants.WalletBackupFileName.rawValue) == "true" {
-        try self.fnDeleteExistingWalletBackup()
-        DispatchQueue.main.async {
-          resolve("true")
-        }
-      } else {
-        DispatchQueue.main.async {
-          resolve("false")
-        }
-      }
-    } catch {
-      NSLog("Error: [Native] deleting wallet backup\(error.localizedDescription)")
-      DispatchQueue.main.async {
-        resolve("false")
-      }
-    }
-  }
-
   // The FFI contract is structural (zingo-mobile#1151; audit Issue Q):
   // nil means no save was needed, bytes are the wallet export, and failure
   // throws. Nothing here classifies content — a malformed export is
@@ -723,7 +691,6 @@ class RPCModule: NSObject {
     let fm = FileManager.default
     var files: [[String: Any]] = []
     for name in [Constants.WalletFileName.rawValue,
-                 Constants.WalletBackupFileName.rawValue,
                  Constants.WalletTempSwapFileName.rawValue] {
       var entry: [String: Any] = [
         "name": name,

@@ -729,13 +729,11 @@ class WalletFileProtectionTests: XCTestCase {
         XCTAssertEqual(after, .completeUntilFirstUserAuthentication)
     }
 
-    func testMissingWalletFilesAreANoOp() throws {
+    func testAMissingWalletFileIsANoOp() throws {
         let rpc = RPCModule()
         let fm = FileManager.default
-        for name in [Constants.WalletFileName.rawValue, Constants.WalletBackupFileName.rawValue] {
-            if let path = try? rpc.getFileName(name) {
-                try? fm.removeItem(atPath: path)
-            }
+        if let path = try? rpc.getFileName(Constants.WalletFileName.rawValue) {
+            try? fm.removeItem(atPath: path)
         }
         rpc.applyWalletFileProtection()
     }

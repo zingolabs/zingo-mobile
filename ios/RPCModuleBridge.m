@@ -18,9 +18,6 @@ RCT_EXTERN_METHOD(walletBackupExists:
 RCT_EXTERN_METHOD(deleteExistingWallet:
     (RCTPromiseResolveBlock)resolve 
                   reject:(RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(deleteExistingWalletBackup:
-    (RCTPromiseResolveBlock)resolve 
-                  reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(createNewWallet:
     (NSString)serveruri
                   birthday:(NSString)birthday
