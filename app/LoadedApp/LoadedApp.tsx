@@ -154,6 +154,7 @@ const Pools = React.lazy(() => import('@screens/Pools'));
 const MeetIronwood = React.lazy(() => import('@screens/MeetIronwood'));
 const SeedBackup = React.lazy(() => import('@screens/SeedBackup'));
 const WalletSeed = React.lazy(() => import('@screens/WalletSeed'));
+const ViewingKey = React.lazy(() => import('@screens/ViewingKey'));
 const MigrationStrategy = React.lazy(
   () => import('@screens/MigrationStrategy'),
 );
@@ -1492,8 +1493,8 @@ export class LoadedAppClass extends Component<
       return;
     } else if (item === MenuItemEnum.WalletSeedUfvk) {
       if (this.state.readOnly) {
-        this.drawerNav?.navigate(RouteEnum.Ufvk, {
-          action: UfvkActionEnum.view,
+        this.drawerNav?.navigate(RouteEnum.ViewingKey, {
+          entry: { kind: 'push' },
         });
       } else {
         this.drawerNav?.navigate(RouteEnum.WalletSeed);
@@ -2246,6 +2247,17 @@ export class LoadedAppClass extends Component<
                       component={SeedBackup}
                       // Draws its own container transform out of the notice
                       // card over the screen behind it.
+                      options={{
+                        presentation: 'transparentModal',
+                        animation: 'none',
+                        gestureEnabled: false,
+                      }}
+                    />
+                    <RootNavigator.Screen
+                      name={RouteEnum.ViewingKey}
+                      component={ViewingKey}
+                      // Draws its own entrance: a circle out of the
+                      // snowflake, the view-only card growing, or a push.
                       options={{
                         presentation: 'transparentModal',
                         animation: 'none',

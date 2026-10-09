@@ -21,11 +21,10 @@ export type AppStackParamList = {
   // Stack
   [RouteEnum.LoadingApp]: LoadingAppNavigationState | undefined;
   [RouteEnum.LoadedApp]: LoadedAppNavigationState | undefined;
-  // ScannerAddress / ScannerUfvk are presented as transparent modals at the
+  // ScannerAddress is presented as a transparent modal at the
   // root Stack so they overlay everything (LoadedApp, LoadingApp, and any
   // open BottomSheet portals).
   [RouteEnum.ScannerAddress]: ScannerAddressNavigationState | undefined;
-  [RouteEnum.ScannerUfvk]: ScannerUfvkNavigationState | undefined;
 };
 
 /**
@@ -63,6 +62,12 @@ export type CardRect = { x: number; y: number; width: number; height: number };
 // How the backup flow opens: grown out of the History notice card, pushed
 // from Wallet Seed, or straight to the three-word check from Wallet Seed.
 export type WalletSeedAction = 'change' | 'server';
+// How the viewing key screen opens: a circle out of the header snowflake,
+// the view-only card growing, or pushed from the menu.
+export type ViewingKeyEntry =
+  | { kind: 'circle'; origin: { x: number; y: number } }
+  | { kind: 'card'; from: CardRect }
+  | { kind: 'push' };
 
 export type SeedBackupEntry =
   { kind: 'card'; from: CardRect } | { kind: 'push' } | { kind: 'verify' };
@@ -92,6 +97,7 @@ export type AppDrawerParamList = {
   // Absent for the plain view; set when the seed is shown before leaving
   // this wallet or its server.
   [RouteEnum.WalletSeed]: { action: WalletSeedAction } | undefined;
+  [RouteEnum.ViewingKey]: { entry: ViewingKeyEntry };
   [RouteEnum.MigrationStrategy]: undefined;
   [RouteEnum.MigrationTransactions]: undefined;
   // The immediate drain broadcasts here; `transactions` is the previewed plan,
@@ -142,11 +148,6 @@ export type ScannerAddressNavigationState = {
   // prefixing — for non-Zcash address fields (address book). The caller
   // validates it per its own chain.
   raw?: boolean;
-};
-
-export type ScannerUfvkNavigationState = {
-  setUfvkText: (k: string) => void;
-  active: boolean;
 };
 
 export type ValueTransferDetailNavigationState = {

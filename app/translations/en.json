@@ -727,6 +727,12 @@
     "done": "Done"
   },
   "import": {
+    "scan-title": "Scan QR code",
+    "scan-hint": "Point the camera at a viewing key QR code.",
+    "scan-found": "Viewing key found",
+    "scan-miss": "That code isn't a viewing key.",
+    "scan-torch": "Flashlight",
+    "scan-back": "Back",
     "title": "Seed Phrase / Viewing Key",
     "key-label": "Enter your Seed Phrase or Viewing key",
     "birthday": "Birthday",
@@ -1136,5 +1142,18 @@
     "go-change": "Open new",
     "go-server": "Change",
     "confirm-title": "Are you certain?"
+  },
+  "viewingkey": {
+    "title": "Your viewing key",
+    "sub": "Anyone with this key can see this wallet's balance and history. It can't spend funds.",
+    "label": "Unified viewing key",
+    "read": "Read-only: shows the balance, history and addresses",
+    "spend": "Can't send, swap or spend funds",
+    "share": "Share it only with people you trust. They'll see all your activity"
+  },
+  "viewonly": {
+    "title": "View-only wallet",
+    "body": "You can see the balance and history and receive funds. Spending isn't possible with a viewing key.",
+    "button": "View key"
   }
 }

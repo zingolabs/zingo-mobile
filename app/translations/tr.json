@@ -725,6 +725,12 @@
     "done": "Bitti"
   },
   "import": {
+    "scan-title": "QR kodu tara",
+    "scan-hint": "Kamerayı bir görüntüleme anahtarının QR koduna doğrultun.",
+    "scan-found": "Görüntüleme anahtarı bulundu",
+    "scan-miss": "Bu kod bir görüntüleme anahtarı değil.",
+    "scan-torch": "El feneri",
+    "scan-back": "Geri",
     "title": "Tohum ifadesi / Görüntüleme anahtarı",
     "key-label": "Tohum ifadenizi veya görüntüleme anahtarınızı girin",
     "birthday": "Doğum günü",
@@ -1134,5 +1140,18 @@
     "go-change": "Yenisini aç",
     "go-server": "Değiştir",
     "confirm-title": "Emin misiniz?"
+  },
+  "viewingkey": {
+    "title": "Görüntüleme anahtarınız",
+    "sub": "Bu anahtara sahip olan herkes bu cüzdanın bakiyesini ve geçmişini görebilir. Fon harcayamaz.",
+    "label": "Birleşik görüntüleme anahtarı",
+    "read": "Salt okunur: bakiyeyi, geçmişi ve adresleri gösterir",
+    "spend": "Gönderemez, takas edemez ve harcayamaz",
+    "share": "Yalnızca güvendiğiniz kişilerle paylaşın. Tüm hareketlerinizi görürler"
+  },
+  "viewonly": {
+    "title": "Salt görüntüleme cüzdanı",
+    "body": "Bakiyeyi ve geçmişi görebilir, fon alabilirsiniz. Görüntüleme anahtarıyla harcama yapılamaz.",
+    "button": "Anahtarı gör"
   }
 }

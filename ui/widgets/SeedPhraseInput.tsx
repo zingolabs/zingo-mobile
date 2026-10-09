@@ -47,7 +47,13 @@ type SeedPhraseInputProps = {
   accessibilityLabel?: string;
   // Why the viewing key in the field cannot be used, already translated.
   keyError?: string;
+  // Sits in the field's top-right corner, like the scan button.
+  accessory?: React.ReactNode;
+  // Bumps to flash the border green once, as a scanned key lands.
+  pulse?: number;
 };
+
+const PULSE_MS = 700;
 
 const chipEnter = () =>
   ZoomIn.duration(duration.medium)
@@ -83,6 +89,8 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
   testID,
   accessibilityLabel,
   keyError,
+  accessory,
+  pulse,
 }) => {
   const { colors } = useTheme();
   const [draft, setDraft] = useState('');
@@ -303,6 +311,19 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [badChecksum, badWords, keyFault]);
 
+  const flash = useSharedValue(0);
+  useEffect(() => {
+    if (pulse) {
+      flash.value = 1;
+      flash.value = withTiming(0, {
+        duration: PULSE_MS,
+        easing: ease.out,
+        reduceMotion: ReduceMotion.Never,
+      });
+    }
+  }, [pulse, flash]);
+  const pulseStyle = useAnimatedStyle(() => ({ opacity: flash.value }));
+
   const borderColor = fieldError
     ? colors.fgDangerEmphasis
     : complete
@@ -324,13 +345,35 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
             borderColor,
             backgroundColor: colors.bgSurface,
             paddingTop: 14,
-            paddingHorizontal: 12,
+            paddingLeft: 12,
+            paddingRight: accessory ? 42 : 12,
             paddingBottom: 32,
             minHeight: 135,
           },
           shakeStyle,
         ]}
       >
+        <Animated.View
+          pointerEvents="none"
+          style={[
+            {
+              position: 'absolute',
+              left: -1,
+              right: -1,
+              top: -1,
+              bottom: -1,
+              borderRadius: 12,
+              borderWidth: 2,
+              borderColor: colors.borderAccent,
+            },
+            pulseStyle,
+          ]}
+        />
+        {!!accessory && (
+          <View style={{ position: 'absolute', top: 6, right: 6, zIndex: 2 }}>
+            {accessory}
+          </View>
+        )}
         <Pressable
           accessible={false}
           onPress={() => inputRef.current?.focus()}

@@ -727,6 +727,12 @@
     "done": "Concluído"
   },
   "import": {
+    "scan-title": "Escanear código QR",
+    "scan-hint": "Aponte a câmera para o código QR de uma chave de visualização.",
+    "scan-found": "Chave de visualização encontrada",
+    "scan-miss": "Esse código não é uma chave de visualização.",
+    "scan-torch": "Lanterna",
+    "scan-back": "Voltar",
     "title": "Frases de recuperação / Chave de Visualização",
     "key-label": "Insira a Frases de recuperação / Chave de Visualização",
     "birthday": "Aniversário",
@@ -1136,5 +1142,18 @@
     "go-change": "Abrir nova",
     "go-server": "Mudar",
     "confirm-title": "Tem certeza?"
+  },
+  "viewingkey": {
+    "title": "Sua chave de visualização",
+    "sub": "Qualquer pessoa com esta chave pode ver o saldo e o histórico desta carteira. Ela não pode gastar fundos.",
+    "label": "Chave de visualização unificada",
+    "read": "Somente leitura: mostra o saldo, o histórico e os endereços",
+    "spend": "Não pode enviar, trocar nem gastar fundos",
+    "share": "Compartilhe só com pessoas de confiança. Elas verão toda a sua atividade"
+  },
+  "viewonly": {
+    "title": "Carteira somente leitura",
+    "body": "Você pode ver o saldo e o histórico e receber fundos. Não é possível gastar com uma chave de visualização.",
+    "button": "Ver chave"
   }
 }

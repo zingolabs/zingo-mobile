@@ -5,7 +5,6 @@ export enum ScreenEnum {
   // Launching
   // StartMenu
   ImportUfvk = 'ImportUfvk',
-  ScannerUfvk = 'ScannerUfvk',
   //
   LoadedApp = 'LoadedApp',
   ComputingTxContext = 'ComputingTxContext',

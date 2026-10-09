@@ -10,7 +10,6 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { LoadedApp } from './LoadedApp';
 import { LoadingApp } from './LoadingApp';
 import ScannerAddress from '@screens/ScannerAddress';
-import ScannerUfvk from '@screens/ScannerUfvk';
 import { AppStackParamList } from './types';
 import { RouteEnum } from './AppState';
 import { ThemeProvider, useTheme, navigationTheme } from './theme';
@@ -91,11 +90,6 @@ const AppShell: React.FunctionComponent = () => {
                 <Stack.Screen
                   name={RouteEnum.ScannerAddress}
                   component={ScannerAddress}
-                  options={{ presentation: 'transparentModal' }}
-                />
-                <Stack.Screen
-                  name={RouteEnum.ScannerUfvk}
-                  component={ScannerUfvk}
                   options={{ presentation: 'transparentModal' }}
                 />
               </Stack.Navigator>

@@ -727,6 +727,12 @@
     "done": "Hecho"
   },
   "import": {
+    "scan-title": "Escanear código QR",
+    "scan-hint": "Apunta la cámara al código QR de una clave de visualización.",
+    "scan-found": "Clave de visualización encontrada",
+    "scan-miss": "Ese código no es una clave de visualización.",
+    "scan-torch": "Linterna",
+    "scan-back": "Atrás",
     "title": "Semilla / Clave de Visualización",
     "key-label": "Introduce tu Semilla / Clave de Visualización",
     "birthday": "Cumpleaños",
@@ -1136,5 +1142,18 @@
     "go-change": "Abrir otro",
     "go-server": "Cambiar",
     "confirm-title": "¿Estás seguro?"
+  },
+  "viewingkey": {
+    "title": "Tu clave de visualización",
+    "sub": "Cualquiera con esta clave puede ver el saldo y el historial de este monedero. No puede gastar fondos.",
+    "label": "Clave de visualización unificada",
+    "read": "Solo lectura: muestra el saldo, el historial y las direcciones",
+    "spend": "No puede enviar, intercambiar ni gastar fondos",
+    "share": "Compártela solo con personas de confianza. Verán toda tu actividad"
+  },
+  "viewonly": {
+    "title": "Monedero de solo lectura",
+    "body": "Puedes ver el saldo y el historial y recibir fondos. Con una clave de visualización no se puede gastar.",
+    "button": "Ver clave"
   }
 }

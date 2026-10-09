@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import {
   View,
   TouchableOpacity,
@@ -15,16 +15,10 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-import {
-  NavigationProp,
-  ParamListBase,
-  useNavigation,
-} from '@react-navigation/native';
 import { useTheme } from '@app/theme';
 import {
   faChevronLeft,
   faCircleInfo,
-  faQrcode,
   faXmark,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -35,12 +29,15 @@ import { ContextAppLoading } from '@app/context';
 import SeedPhraseInput from '@ui/widgets/SeedPhraseInput';
 import BusyButton from '@ui/widgets/BusyButton';
 import InfoTooltip from '@ui/widgets/InfoTooltip';
+import { RevealOrigin } from '@ui/widgets/CircularReveal';
+import { ScanIcon } from '@ui/primitives/Icons/ScanIcon';
+import ScanOverlay from './components/ScanOverlay';
 import {
   UfvkCheck,
   checkUfvk,
   getLatestBlockServerInfo,
 } from '@app/walletBackend';
-import { ChainNameEnum, GlobalConst, RouteEnum } from '@app/AppState';
+import { ChainNameEnum, GlobalConst } from '@app/AppState';
 import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
 import { seedStatus } from '@app/utils/seedPhrase';
 import { duration, ease } from '@app/theme/motion';
@@ -73,7 +70,6 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
   onClickCancel,
   onClickOK,
 }) => {
-  const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const context = useContext(ContextAppLoading);
   const { translate, netInfo, server, addLastSnackbar } = context;
   const { colors } = useTheme();
@@ -82,6 +78,11 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
   const [birthday, setBirthday] = useState<string>('');
   const [latestBlock, setLatestBlock] = useState<number>(0);
   const [tipOpen, setTipOpen] = useState<boolean>(false);
+  const scanButton = useRef<View>(null);
+  const [scan, setScan] = useState<
+    { kind: 'closed' } | { kind: 'open'; origin: RevealOrigin }
+  >({ kind: 'closed' });
+  const [pulse, setPulse] = useState(0);
   const keyboardHeight = useKeyboardHeight();
 
   const activation = activationHeight[server.chainName];
@@ -231,11 +232,14 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
     Keyboard.dismiss();
   };
 
-  const showQrcodeModalVisible = () => {
-    navigation.navigate(RouteEnum.ScannerUfvk, {
-      setUfvkText: (k: string) => setSeedufvkText(k),
-      active: true,
-    });
+  const openScanner = () => {
+    Keyboard.dismiss();
+    scanButton.current?.measureInWindow((x, y, width, height) =>
+      setScan({
+        kind: 'open',
+        origin: { x: x + width / 2, y: y + height / 2 },
+      }),
+    );
   };
 
   const buttonBottom = keyboardHeight > 0 ? keyboardHeight + 12 : BUTTON_BOTTOM;
@@ -301,13 +305,6 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
                 />
               </TouchableOpacity>
             )}
-            <TouchableOpacity onPress={showQrcodeModalVisible} hitSlop={8}>
-              <FontAwesomeIcon
-                size={20}
-                icon={faQrcode}
-                color={colors.fgMuted}
-              />
-            </TouchableOpacity>
           </View>
         </View>
         <SeedPhraseInput
@@ -317,6 +314,28 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
           onChangeValue={setSeedufvkText}
           translate={translate}
           keyError={keyError}
+          pulse={pulse}
+          accessory={
+            <Pressable
+              ref={scanButton}
+              testID="import.scan"
+              accessibilityRole="button"
+              accessibilityLabel={translate('import.scan-title') as string}
+              onPress={openScanner}
+              style={({ pressed }) => ({
+                width: 34,
+                height: 34,
+                borderRadius: 9,
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: pressed
+                  ? 'rgba(67,166,55,0.14)'
+                  : 'transparent',
+              })}
+            >
+              <ScanIcon size={20} color={colors.fgAccent} />
+            </Pressable>
+          }
         />
 
         <View style={{ marginTop: 39, alignItems: 'center' }}>
@@ -476,6 +495,17 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
           color={colors.fgAccent}
         />
       </Pressable>
+      {scan.kind === 'open' && (
+        <ScanOverlay
+          origin={scan.origin}
+          translate={translate}
+          onKey={key => {
+            setSeedufvkText(key);
+            setPulse(p => p + 1);
+          }}
+          onClosed={() => setScan({ kind: 'closed' })}
+        />
+      )}
     </View>
   );
 };

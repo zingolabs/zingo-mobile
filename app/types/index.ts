@@ -6,4 +6,5 @@ export type {
   CardRect,
   SeedBackupEntry,
   WalletSeedAction,
+  ViewingKeyEntry,
 } from './NavigationTypes';
