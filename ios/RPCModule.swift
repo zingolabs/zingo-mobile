@@ -206,27 +206,26 @@ class RPCModule: NSObject {
     try FileManager.default.removeItem(atPath: getFileName(fileName))
   }
 
-  // Moves existing wallet files to the resting protection this build
+  // Moves the existing wallet file to the resting protection this build
   // writes: class C plus backup exclusion. Old builds wrote class A, and
   // a synced wallet can open without a save.
   func applyWalletFileProtection() {
     let fm = FileManager.default
-    for name in [Constants.WalletFileName.rawValue, Constants.WalletBackupFileName.rawValue] {
-      guard let path = try? getFileName(name), fm.fileExists(atPath: path) else { continue }
-      var fileURL = URL(fileURLWithPath: path)
-      var resourceValues = URLResourceValues()
-      resourceValues.isExcludedFromBackup = true
-      try? fileURL.setResourceValues(resourceValues)
-      try? fm.setAttributes(
-        [.protectionKey: FileProtectionType.completeUntilFirstUserAuthentication],
-        ofItemAtPath: path
-      )
-    }
+    guard let path = try? getFileName(Constants.WalletFileName.rawValue), fm.fileExists(atPath: path) else { return }
+    var fileURL = URL(fileURLWithPath: path)
+    var resourceValues = URLResourceValues()
+    resourceValues.isExcludedFromBackup = true
+    try? fileURL.setResourceValues(resourceValues)
+    try? fm.setAttributes(
+      [.protectionKey: FileProtectionType.completeUntilFirstUserAuthentication],
+      ofItemAtPath: path
+    )
   }
 
   // Audit Issue P (b) — wallet ↔ backup swap recovery.
   //
-  // `restoreExistingWalletBackup` does its swap as three atomic renames:
+  // The retained-wallet restore of older builds swapped as three atomic
+  // renames:
   //   (1) main → temp
   //   (2) backup → main
   //   (3) temp → backup
@@ -240,7 +239,8 @@ class RPCModule: NSObject {
   //   the pre-swap main, and content comparison picks the window, as on
   //   Android.
   // Every branch ends at the intended final state. Idempotent — when no
-  // temp file is present this is a near-zero-cost no-op.
+  // temp file is present this is a near-zero-cost no-op. It still runs so
+  // a swap an older build left halfway ends with the intended main wallet.
   func completePendingSwap() {
     let fm = FileManager.default
     guard let tempPath = try? getFileName(Constants.WalletTempSwapFileName.rawValue),
@@ -280,9 +280,20 @@ class RPCModule: NSObject {
     }
   }
   
+  // The app no longer keeps a retained wallet. The copy an older build
+  // left goes once no unfinished swap still needs it.
+  func deleteRetainedWallet() {
+    let fm = FileManager.default
+    guard let tempPath = try? getFileName(Constants.WalletTempSwapFileName.rawValue),
+          !fm.fileExists(atPath: tempPath),
+          let backupPath = try? getFileName(Constants.WalletBackupFileName.rawValue) else { return }
+    try? fm.removeItem(atPath: backupPath)
+  }
+
   @objc(walletExists:reject:)
   func walletExists(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     completePendingSwap()
+    deleteRetainedWallet()
     applyWalletFileProtection()
     do {
       let result = try fileExists(Constants.WalletFileName.rawValue)
@@ -297,23 +308,6 @@ class RPCModule: NSObject {
     }
   }
 
-  @objc(walletBackupExists:reject:)
-  func walletBackupExists(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-    completePendingSwap()
-    applyWalletFileProtection()
-    do {
-      let result = try fileExists(Constants.WalletBackupFileName.rawValue)
-      DispatchQueue.main.async {
-        resolve(result)
-      }
-    } catch {
-      NSLog("Error: [Native] wallet backup exists error: \(error.localizedDescription)")
-      DispatchQueue.main.async {
-        resolve("false")
-      }
-    }
-  }
-
   func saveWalletFile(_ walletBytes: Data) throws {
     do {
       try writeFile(Constants.WalletFileName.rawValue, walletBytes: walletBytes)
@@ -322,14 +316,6 @@ class RPCModule: NSObject {
     }
   }
   
-  func saveWalletBackupFile(_ walletBytes: Data) throws {
-    do {
-      try writeFile(Constants.WalletBackupFileName.rawValue, walletBytes: walletBytes)
-    } catch {
-      throw FileError.writeFileError("Error: [Native] writting wallet backup file error: \(error.localizedDescription)")
-    }
-  }
-
   // The background sync state is written from BGAppRefreshTask paths in
   // AppDelegate while the device may be locked. It stays at the iOS
   // default protection class (`completeUntilFirstUserAuthentication`
@@ -375,10 +361,6 @@ class RPCModule: NSObject {
     try readWalletFileBytes(Constants.WalletFileName.rawValue)
   }
 
-  func readWalletBackupBytes() throws -> Data {
-    try readWalletFileBytes(Constants.WalletBackupFileName.rawValue)
-  }
-
   func fnDeleteExistingWallet() throws {
     completePendingSwap()
     do {
@@ -415,36 +397,6 @@ class RPCModule: NSObject {
     }
   }
   
-  func fnDeleteExistingWalletBackup() throws {
-    completePendingSwap()
-    do {
-      try deleteFile(Constants.WalletBackupFileName.rawValue)
-    } catch {
-      throw FileError.deleteFileError("Error: [Native] deleting wallet backup error: \(error.localizedDescription)")
-    }
-  }
-
-  @objc(deleteExistingWalletBackup:reject:)
-  func deleteExistingWalletBackup(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-    do {
-      if try fileExists(Constants.WalletBackupFileName.rawValue) == "true" {
-        try self.fnDeleteExistingWalletBackup()
-        DispatchQueue.main.async {
-          resolve("true")
-        }
-      } else {
-        DispatchQueue.main.async {
-          resolve("false")
-        }
-      }
-    } catch {
-      NSLog("Error: [Native] deleting wallet backup\(error.localizedDescription)")
-      DispatchQueue.main.async {
-        resolve("false")
-      }
-    }
-  }
-
   // The FFI contract is structural (zingo-mobile#1151; audit Issue Q):
   // nil means no save was needed, bytes are the wallet export, and failure
   // throws. Nothing here classifies content — a malformed export is
@@ -488,10 +440,6 @@ class RPCModule: NSObject {
     } catch {
       throw saveFailure(error.localizedDescription)
     }
-  }
-
-  func saveWalletBackupInternal() throws {
-    try self.saveWalletBackupFile(try readWalletBytes())
   }
 
   private func syncSettings(performancelevel: String, minconfirmations: String) -> SyncSettings {
@@ -632,64 +580,6 @@ class RPCModule: NSObject {
     }.settle(resolve: resolve, reject: reject)
   }
 
-  @objc(restoreExistingWalletBackup:reject:)
-  func restoreExistingWalletBackup(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-    do {
-      let backupBytes = try self.readWalletBackupBytes()
-      if (try? validateWalletBytes(walletBytes: backupBytes)) != nil {
-        // Closed across the swap; the reload after the restore clears it.
-        RPCModule.walletFileHold.lock()
-        RPCModule.walletFileClosed = true
-        RPCModule.walletFileHold.unlock()
-        if try fileExists(Constants.WalletFileName.rawValue) == "true" {
-          // Audit Issue P (b) — atomic swap via three renames. APFS
-          // rename is atomic AND preserves the file's protection class
-          // and isExcludedFromBackup attribute, so this is strictly
-          // safer than the previous read-into-memory + two writes
-          // pattern, which lost the original main wallet on a crash
-          // between writes. `completePendingSwap` (called early on
-          // walletExists/walletBackupExists) finishes the swap if a
-          // crash interrupts these three steps.
-          // Belt-and-braces: if a previous swap left a temp behind and
-          // `completePendingSwap` was never called (e.g. JS jumped
-          // straight into restore without checking walletExists first),
-          // recover it before starting a new swap — deleting the temp
-          // would lose the orphaned original-main content.
-          self.completePendingSwap()
-          let fm = FileManager.default
-          let mainPath   = try getFileName(Constants.WalletFileName.rawValue)
-          let backupPath = try getFileName(Constants.WalletBackupFileName.rawValue)
-          let tempPath   = try getFileName(Constants.WalletTempSwapFileName.rawValue)
-          try fm.moveItem(atPath: mainPath,   toPath: tempPath)   // (1) main → temp
-          try fm.moveItem(atPath: backupPath, toPath: mainPath)   // (2) backup → main
-          try fm.moveItem(atPath: tempPath,   toPath: backupPath) // (3) temp → backup
-        } else {
-          // No wallet exists: restore backup as wallet, but KEEP the backup
-          // file. Deleting it here left the user with no backup right after a
-          // restore, so if they then created/restored a different wallet the
-          // just-restored one was gone. Keeping a duplicate copy as backup is
-          // far safer than none.
-          try self.saveWalletFile(backupBytes)
-        }
-        DispatchQueue.main.async {
-          resolve("true")
-        }
-      } else {
-        // Audit Issue A — redact the payload. Mirrors the saveExistingWallet
-        // path at L240: log only the size, never the encoded wallet bytes.
-        NSLog("Error: [Native] Couldn't save the wallet backup. The content is not a wallet. Size: \(backupBytes.count)")
-        DispatchQueue.main.async {
-          resolve("false")
-        }
-      }
-    } catch {
-      NSLog("Error: [Native] Restoring existing wallet backup error: \(error.localizedDescription)")
-      DispatchQueue.main.async {
-        resolve("false")
-      }
-    }
-  }
-
   // Salvages seed and birthday from the closed wallet file and keeps the
   // damaged file aside as ".broken".
   @objc(walletFileRecoveryInfo:reject:)
@@ -735,7 +625,6 @@ class RPCModule: NSObject {
     let fm = FileManager.default
     var files: [[String: Any]] = []
     for name in [Constants.WalletFileName.rawValue,
-                 Constants.WalletBackupFileName.rawValue,
                  Constants.WalletTempSwapFileName.rawValue] {
       var entry: [String: Any] = [
         "name": name,
@@ -784,16 +673,6 @@ class RPCModule: NSObject {
     DispatchQueue.global(qos: .userInitiated).async {
       FfiOutcome.of {
         try self.saveWalletInternal()
-        return "true"
-      }.settle(resolve: resolve, reject: reject)
-    }
-  }
-
-  @objc(doSaveBackup:reject:)
-  func doSaveBackup(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-    DispatchQueue.global(qos: .userInitiated).async {
-      FfiOutcome.of {
-        try self.saveWalletBackupInternal()
         return "true"
       }.settle(resolve: resolve, reject: reject)
     }

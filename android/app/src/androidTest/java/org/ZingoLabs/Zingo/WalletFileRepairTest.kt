@@ -4,8 +4,6 @@ import android.util.Base64
 import androidx.security.crypto.EncryptedFile
 import androidx.security.crypto.MasterKeys
 import androidx.test.platform.app.InstrumentationRegistry
-import com.facebook.react.bridge.Promise
-import com.facebook.react.bridge.WritableMap
 import com.google.common.truth.Truth.assertThat
 import org.junit.Before
 import org.junit.Test
@@ -14,8 +12,7 @@ import java.io.File
 /**
  * Diagnosis and repair against the real Keystore under the Step 1 plain
  * format: raw plain bytes diagnose healthy, a legacy envelope diagnoses
- * `encryptedLegacy`, the double wrap repairs back to plain bytes, and a
- * restore over an undecryptable main keeps the raw evidence aside.
+ * `encryptedLegacy`, and the double wrap repairs back to plain bytes.
  */
 @OfflineDeviceTest
 class WalletFileRepairTest {
@@ -24,23 +21,6 @@ class WalletFileRepairTest {
     private val swapName = Constants.WalletTempSwapFileName.value
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
     private val rpcModule = RPCModule(MainApplication.getAppReactContext())
-
-    // Captures the single resolve the restore path settles with.
-    private class CapturingPromise : Promise {
-        val resolved = mutableListOf<Any?>()
-        override fun resolve(value: Any?) { resolved.add(value) }
-        override fun reject(code: String, message: String?) {}
-        override fun reject(code: String, throwable: Throwable?) {}
-        override fun reject(code: String, message: String?, throwable: Throwable?) {}
-        override fun reject(throwable: Throwable) {}
-        override fun reject(throwable: Throwable, userInfo: WritableMap) {}
-        override fun reject(code: String, userInfo: WritableMap) {}
-        override fun reject(code: String, throwable: Throwable?, userInfo: WritableMap) {}
-        override fun reject(code: String, message: String?, userInfo: WritableMap) {}
-        override fun reject(code: String?, message: String?, throwable: Throwable?, userInfo: WritableMap?) {}
-        @Deprecated("Deprecated in the React Native Promise interface")
-        override fun reject(message: String) {}
-    }
 
     // A real offline zingolib wallet: the recovery writes run the full
     // parse.
@@ -125,22 +105,6 @@ class WalletFileRepairTest {
         assertThat(diagnosis.getJSONArray("unwrapErrors").toString())
             .contains("still an envelope")
         assertThat(rpcModule.repairDoubleWrappedFile(fileName)).isEqualTo("failed")
-    }
-
-    @Test
-    fun restoreBackupSucceedsWhenMainIsUndecryptable() {
-        // A healthy legacy encrypted backup, as a fleet device would hold.
-        File(context.filesDir, backupName).writeBytes(plainWallet)
-        wrapAgain(File(context.filesDir, backupName))
-        walletFile().delete()
-        walletFile().writeBytes(undecryptableBytes)
-
-        val promise = CapturingPromise()
-        rpcModule.restoreExistingWalletBackup(promise)
-
-        assertThat(promise.resolved).containsExactly(true)
-        assertThat(walletFile().readBytes()).isEqualTo(plainWallet)
-        assertThat(File(context.filesDir, "$fileName.broken").exists()).isTrue()
     }
 
     @Test

@@ -184,33 +184,32 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             PlainWalletFile.digest(readWalletBytes(fileName))
         }
 
-    // Restores a wallet file from its legacy "$fileName.write.tmp" stash
+    // Restores the wallet file from its legacy "$fileName.write.tmp" stash
     // when the file fails the full parse, and drops the orphan once the
     // file passes.
     fun completePendingWrite() {
-        for (fileName in listOf(WalletFileName.value, WalletBackupFileName.value)) {
-            val tempName = "$fileName.write.tmp"
-            if (!fileExists(tempName)) continue
-            try {
-                val targetIntact = fileExists(fileName) && try {
-                    isIntactWallet(readWalletBytes(fileName))
-                } catch (_: Exception) {
-                    false
-                }
-                if (!targetIntact) {
-                    writeWalletBytes(fileName, readWalletBytes(tempName))
-                    Log.i("MAIN", "[Native] completePendingWrite: restored $fileName from $tempName")
-                }
-                deleteFile(tempName)
-            } catch (e: Exception) {
-                Log.e("MAIN", "[Native] completePendingWrite for $fileName failed: $e", e)
-                // Leave temp in place for diagnosis / next attempt.
+        val fileName = WalletFileName.value
+        val tempName = "$fileName.write.tmp"
+        if (!fileExists(tempName)) return
+        try {
+            val targetIntact = fileExists(fileName) && try {
+                isIntactWallet(readWalletBytes(fileName))
+            } catch (_: Exception) {
+                false
             }
+            if (!targetIntact) {
+                writeWalletBytes(fileName, readWalletBytes(tempName))
+                Log.i("MAIN", "[Native] completePendingWrite: restored $fileName from $tempName")
+            }
+            deleteFile(tempName)
+        } catch (e: Exception) {
+            Log.e("MAIN", "[Native] completePendingWrite for $fileName failed: $e", e)
+            // Leave temp in place for diagnosis / next attempt.
         }
     }
 
     // Wallet and retained-wallet swap recovery (audit Issue P (b)). The
-    // swap in `restoreExistingWalletBackup` runs as:
+    // retained-wallet restore of older builds swapped the files as:
     //   (1) write temp(originalMain)
     //   (2) write main(originalBackup)
     //   (3) write backup(originalMain)
@@ -223,7 +222,8 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     //   between (1)–(2): main == temp  → write main(backup), write backup(temp)
     //   between (2)–(3): main != temp AND backup != temp → write backup(temp)
     //   between (3)–(4): main != temp AND backup == temp → nothing to write
-    // Idempotent, a no-op when no temp file is present.
+    // Idempotent, a no-op when no temp file is present. It still runs so a
+    // swap an older build left halfway ends with the intended main wallet.
     fun completePendingSwap() {
         val tempFile = File(applicationContext.filesDir, WalletTempSwapFileName.value)
         if (!tempFile.exists()) return
@@ -264,23 +264,26 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         // `.migrating` copy answers "exists". Write recovery runs before
         // swap recovery: a half-written save can leave main missing, which
         // would make a pending swap unable to read main.
-        for (fileName in listOf(WalletFileName.value, WalletBackupFileName.value)) {
-            PlainWalletFile.resolveInterruptedMigration(applicationContext.filesDir, fileName, ::isIntactWallet)
-        }
+        PlainWalletFile.resolveInterruptedMigration(applicationContext.filesDir, WalletFileName.value, ::isIntactWallet)
         completePendingWrite()
         completePendingSwap()
+        deleteRetainedWallet()
+    }
+
+    // The app no longer keeps a retained wallet. The copy an older build
+    // left goes once no unfinished swap still needs it.
+    private fun deleteRetainedWallet() {
+        if (fileExists(WalletTempSwapFileName.value)) return
+        PlainWalletFile.locked {
+            File(applicationContext.filesDir, WalletBackupFileName.value).delete()
+            deleteWalletSidecars(WalletBackupFileName.value)
+        }
     }
 
     @ReactMethod
     fun walletExists(promise: Promise) {
         resolvePendingWalletFiles()
         promise.resolve(fileExists(WalletFileName.value))
-    }
-
-    @ReactMethod
-    fun walletBackupExists(promise: Promise) {
-        resolvePendingWalletFiles()
-        promise.resolve(fileExists(WalletBackupFileName.value))
     }
 
     // The FFI contract is structural (zingo-mobile#1151; audit Issue Q):
@@ -313,20 +316,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         }
     }
 
-    private fun saveWalletBackupFile(): Boolean {
-        return try {
-            if (walletFileClosed) {
-                Log.w("MAIN", "[Native] wallet file closed, backup save refused")
-                return false
-            }
-            writeWalletBytes(WalletBackupFileName.value, readWalletBytes(WalletFileName.value))
-            true
-        } catch (e: Exception) {
-            Log.e("MAIN", "[Native] Couldn't save the wallet backup: $e")
-            false
-        }
-    }
-
     // Wallet-file diagnosis and the double-wrap repair. Support tooling for
     // the 2.0.21 incident: the migration of that release re-wrapped an
     // already encrypted file after a transient Keystore failure, and
@@ -334,7 +323,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     // Includes each .migrating twin, a plain copy that flags an interrupted migration, but not the encrypted .prerepair/.broken copies that would only read as undecryptable.
     private fun walletFileNames(): List<String> =
-        listOf(WalletFileName.value, WalletBackupFileName.value).flatMap {
+        WalletFileName.value.let {
             listOf(it, "$it.write.tmp", "$it.migrating")
         } + WalletTempSwapFileName.value
 
@@ -499,11 +488,9 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     @ReactMethod
     fun repairDoubleWrappedWalletProcess(promise: Promise) {
         FfiOutcome.settling(promise, "repair_double_wrapped_wallet") {
-            val outcome = JSONObject()
-            for (name in listOf(WalletFileName.value, WalletBackupFileName.value)) {
-                outcome.put(name, repairDoubleWrappedFile(name))
-            }
-            outcome.toString()
+            JSONObject()
+                .put(WalletFileName.value, repairDoubleWrappedFile(WalletFileName.value))
+                .toString()
         }
     }
 
@@ -582,74 +569,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
         val resp = uniffi.zingo.initFromBytes(walletBytes = walletBytes, connection = connection(serveruri, chainhint, performancelevel, minconfirmations))
         walletFileClosed = false
-        migrateRetainedWallet()
         return resp
-    }
-
-    // Best-effort after a successful load: reading the retained wallet
-    // migrates a legacy encrypted file to plain.
-    private fun migrateRetainedWallet() {
-        if (!fileExists(WalletBackupFileName.value)) return
-        if (PlainWalletFile.readsPlain(applicationContext.filesDir, WalletBackupFileName.value)) return
-        try {
-            readWalletBytes(WalletBackupFileName.value)
-        } catch (e: Exception) {
-            Log.w("MAIN", "[Native] retained wallet migration failed: $e")
-        }
-    }
-
-    @ReactMethod
-    fun restoreExistingWalletBackup(promise: Promise) {
-        try {
-            val backup = readWalletBytes(WalletBackupFileName.value)
-            if (!isIntactWallet(backup)) {
-                Log.e("MAIN", "[Native] backup restore: content failed validation")
-                promise.resolve(false)
-                return
-            }
-            // Closed across the swap; the reload after a successful restore
-            // clears it.
-            walletFileClosed = true
-            if (fileExists(WalletFileName.value)) {
-                // Durable swap via temp file (audit Issue P (b)): the temp
-                // copy written at step (1) is what `completePendingSwap`
-                // restores after a crash before step (3).
-                //
-                // Recover any orphan temp from a prior crash before starting
-                // a new swap: it can hold the only copy of that crash's
-                // original main.
-                completePendingSwap()
-                val wallet = try {
-                    readWalletBytes(WalletFileName.value)
-                } catch (e: Exception) {
-                    // Keep the unreadable main's raw bytes aside and restore the backup into both slots.
-                    Log.w("MAIN", "[Native] backup restore: main unreadable, preserving raw and restoring backup: $e")
-                    File(applicationContext.filesDir, WalletFileName.value)
-                        .copyTo(File(applicationContext.filesDir, "${WalletFileName.value}.broken"), overwrite = true)
-                    writeWalletBytes(WalletFileName.value, backup)
-                    promise.resolve(true)
-                    return
-                }
-                writeWalletBytes(WalletTempSwapFileName.value, wallet)
-                writeWalletBytes(WalletFileName.value, backup)
-                writeWalletBytes(WalletBackupFileName.value, wallet)
-                deleteFile(WalletTempSwapFileName.value)
-            } else {
-                // No wallet exists: restore backup as wallet, but KEEP the
-                // backup file. Deleting it here left the user with no backup
-                // right after a restore, so if they then created/restored a
-                // different wallet the just-restored one was gone. Keeping a
-                // duplicate copy as backup is far safer than none.
-                writeWalletBytes(WalletFileName.value, backup)
-            }
-            promise.resolve(true)
-        } catch (e: FileNotFoundException) {
-            Log.e("MAIN", "[Native] file not found during backup restore", e)
-            promise.resolve(false)
-        } catch (e: Exception) {
-            Log.e("MAIN", "[Native] Unexpected error during backup restore: $e")
-            promise.resolve(false)
-        }
     }
 
     // Deletes every sidecar the recovery paths could rename or copy back
@@ -661,7 +581,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     // A swap temp that `completePendingSwap` could not consume can hold
-    // the only copy of a wallet, and it survives both delete methods.
+    // the only copy of a wallet, and it survives the delete.
     @ReactMethod
     fun deleteExistingWallet(promise: Promise) {
         completePendingSwap()
@@ -677,22 +597,9 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         promise.resolve(deleted)
     }
 
-    @ReactMethod
-    fun deleteExistingWalletBackup(promise: Promise) {
-        completePendingSwap()
-        val deleted = PlainWalletFile.locked {
-            val gone = fileExists(WalletBackupFileName.value) && deleteFile(WalletBackupFileName.value)
-            if (!fileExists(WalletBackupFileName.value)) {
-                deleteWalletSidecars(WalletBackupFileName.value)
-            }
-            gone
-        }
-        promise.resolve(deleted)
-    }
-
-    // saveWalletFile/saveWalletBackupFile still contain their own failures
-    // as a resolved false (the init flows depend on a save failure not
-    // failing the whole init), so these shells resolve that boolean
+    // saveWalletFile still contains its own failures as a resolved false
+    // (the init flows depend on a save failure not failing the whole
+    // init), so this shell resolves that boolean
     // verbatim; only an escaping exception rejects. No outcome is ever
     // re-encoded as prose in the success channel (zingo-mobile#1151).
     @ReactMethod
@@ -700,14 +607,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         FfiOutcome.settling(promise, "save_wallet_bytes") {
             uniffi.zingo.initLogging()
             saveWalletFile()
-        }
-    }
-
-    @ReactMethod
-    fun doSaveBackup(promise: Promise) {
-        FfiOutcome.settling(promise, "save_wallet_backup") {
-            uniffi.zingo.initLogging()
-            saveWalletBackupFile()
         }
     }
 
