@@ -103,29 +103,18 @@ class WalletDeleteTest {
     }
 
     @Test
-    fun theStartupCheckDeletesTheRetainedWallet() {
+    fun aSwapTempDoesNotResurrectTheDeletedBackup() {
         file(backupName).writeBytes(plainWallet)
-        file("$backupName.write.tmp").writeBytes(plainWallet)
+        file(swapName).writeBytes(plainWallet)
 
-        assertThat(walletExists()).isEqualTo(true)
+        val promise = CapturingPromise()
+        rpcModule.deleteExistingWalletBackup(promise)
+        assertThat(promise.resolved).containsExactly(true)
 
-        assertThat(file(mainName).readBytes()).isEqualTo(plainWallet)
-        assertThat(file(backupName).exists()).isFalse()
-        assertThat(file("$backupName.write.tmp").exists()).isFalse()
-    }
-
-    @Test
-    fun theStartupCheckKeepsTheRetainedWalletWhileASwapIsUnresolved() {
-        val unreadable = ByteArray(64) { i -> if (i == 0) 0x28 else (i * 13).toByte() }
-        file(backupName).writeBytes(plainWallet)
-        file(swapName).writeBytes(unreadable)
-
-        assertThat(walletExists()).isEqualTo(true)
-
-        assertThat(file(backupName).readBytes()).isEqualTo(plainWallet)
-        assertThat(file(swapName).exists()).isTrue()
-        file(swapName).delete()
-        file(backupName).delete()
+        val exists = CapturingPromise()
+        rpcModule.walletBackupExists(exists)
+        assertThat(exists.resolved).containsExactly(false)
+        assertThat(file(swapName).exists()).isFalse()
     }
 
     @Test

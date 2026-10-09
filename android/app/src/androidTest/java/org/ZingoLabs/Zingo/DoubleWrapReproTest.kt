@@ -125,6 +125,21 @@ class DoubleWrapReproTest {
     }
 
     @Test
+    fun theLoadAlsoMigratesTheRetainedWallet() {
+        val backupFile = File(context.filesDir, Constants.WalletBackupFileName.value)
+        backupFile.delete()
+        encryptedFile(backupFile).openFileOutput().use {
+            it.write(Base64.encodeToString(plainWallet, Base64.NO_WRAP).toByteArray(Charsets.UTF_8))
+        }
+
+        assertThat(loadError()).isNull()
+
+        assertThat(walletFile().readBytes()).isEqualTo(plainWallet)
+        assertThat(backupFile.readBytes()).isEqualTo(plainWallet)
+        backupFile.delete()
+    }
+
+    @Test
     fun anInterruptedMigrationRestoresFromTheMigratingCopy() {
         walletFile().delete()
         File(context.filesDir, "$fileName.migrating").writeBytes(plainWallet)

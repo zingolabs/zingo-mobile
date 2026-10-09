@@ -12,10 +12,8 @@ enum Constants: String {
     case WalletFileName = "wallet.dat.txt"
     case WalletBackupFileName = "wallet.backup.dat.txt"
     // Marker file for Audit Issue P (b) — only present mid-swap during
-    // the retained-wallet restore of older builds. Its existence at app
-    // startup signals
-    // an interrupted swap that must be completed. The retained wallet
-    // itself is deleted at startup.
+    // restoreExistingWalletBackup. Its existence at app startup signals
+    // an interrupted swap that must be completed.
     case WalletTempSwapFileName = "wallet.swap.tmp"
 
     case BackgroundFileName = "background.json"

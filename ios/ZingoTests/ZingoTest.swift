@@ -729,11 +729,13 @@ class WalletFileProtectionTests: XCTestCase {
         XCTAssertEqual(after, .completeUntilFirstUserAuthentication)
     }
 
-    func testAMissingWalletFileIsANoOp() throws {
+    func testMissingWalletFilesAreANoOp() throws {
         let rpc = RPCModule()
         let fm = FileManager.default
-        if let path = try? rpc.getFileName(Constants.WalletFileName.rawValue) {
-            try? fm.removeItem(atPath: path)
+        for name in [Constants.WalletFileName.rawValue, Constants.WalletBackupFileName.rawValue] {
+            if let path = try? rpc.getFileName(name) {
+                try? fm.removeItem(atPath: path)
+            }
         }
         rpc.applyWalletFileProtection()
     }
@@ -971,36 +973,6 @@ class WalletSwapRecoveryTests: XCTestCase {
         XCTAssertEqual(try read(files.main), walletB)
         XCTAssertEqual(try read(files.backup), walletA)
         XCTAssertFalse(FileManager.default.fileExists(atPath: files.temp))
-        clear(files)
-    }
-
-    func testTheRetainedWalletIsDeletedOnceNoSwapIsPending() throws {
-        let rpc = RPCModule()
-        let files = try paths(rpc)
-        clear(files)
-        try walletA.write(toFile: files.main, atomically: true, encoding: .utf8)
-        try walletB.write(toFile: files.backup, atomically: true, encoding: .utf8)
-
-        rpc.deleteRetainedWallet()
-
-        XCTAssertEqual(try read(files.main), walletA)
-        XCTAssertFalse(FileManager.default.fileExists(atPath: files.backup))
-        clear(files)
-    }
-
-    func testTheRetainedWalletStaysWhileASwapIsUnresolved() throws {
-        let rpc = RPCModule()
-        let files = try paths(rpc)
-        clear(files)
-        try walletA.write(toFile: files.temp, atomically: true, encoding: .utf8)
-        try walletC.write(toFile: files.main, atomically: true, encoding: .utf8)
-        try walletB.write(toFile: files.backup, atomically: true, encoding: .utf8)
-
-        rpc.completePendingSwap()
-        rpc.deleteRetainedWallet()
-
-        XCTAssertEqual(try read(files.backup), walletB)
-        XCTAssertEqual(try read(files.temp), walletA)
         clear(files)
     }
 
