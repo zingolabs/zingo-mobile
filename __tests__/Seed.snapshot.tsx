@@ -9,9 +9,7 @@ import { render } from '@testing-library/react-native';
 import Seed from '@screens/Seed';
 import {
   ContextAppLoadedProvider,
-  ContextAppLoadingProvider,
   defaultAppContextLoaded,
-  defaultAppContextLoading,
 } from '@app/context';
 import { RouteEnum, SeedActionEnum } from '@app/AppState';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
@@ -21,7 +19,6 @@ import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AppDrawerParamList } from '@app/types';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
-import NewSeed from '@screens/NewSeed';
 
 function makeDrawerProps(
   a: SeedActionEnum,
@@ -80,17 +77,6 @@ describe('Component Seed - test', () => {
       <ContextAppLoadedProvider value={stateLoaded}>
         <Seed {...props} onClickOK={onOk} onClickCancel={onCancel} />
       </ContextAppLoadedProvider>,
-    );
-    expect(seed.toJSON()).toMatchSnapshot();
-  });
-  const contextLoading = defaultAppContextLoading;
-  contextLoading.translate = mockTranslate;
-  //contextLoading.totalBalance = mockTotalBalance;
-  test('Seed New - snapshot', () => {
-    const seed = render(
-      <ContextAppLoadingProvider value={contextLoading}>
-        <NewSeed wallet={mockWallet} onClickOK={onOk} />
-      </ContextAppLoadingProvider>,
     );
     expect(seed.toJSON()).toMatchSnapshot();
   });

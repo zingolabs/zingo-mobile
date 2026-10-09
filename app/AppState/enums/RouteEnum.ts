@@ -1,18 +1,21 @@
 export enum RouteEnum {
-  // Loading screens
-  Launching = 'Launching',
-  StartMenu = 'StartMenu',
-  NewSeed = 'NewSeed',
+  // Root sections
+  Loading = 'Loading',
+  Wallet = 'Wallet',
+
+  // Loading section
+  Boot = 'Boot',
+  Lock = 'Lock',
+  Onboarding = 'Onboarding',
+
+  // Onboarding screens
+  Welcome = 'Welcome',
   ImportChooser = 'ImportChooser',
-  ImportUfvk = 'ImportUfvk',
-  WalletProgress = 'WalletProgress',
-  WalletError = 'WalletError',
+  ImportWallet = 'ImportWallet',
+  Progress = 'Progress',
+  OpenError = 'OpenError',
   Server = 'Server',
   ServerList = 'ServerList',
-
-  // Stack
-  LoadingApp = 'LoadingApp',
-  LoadedApp = 'LoadedApp',
 
   // Drawer no params
   HomeStack = 'HomeStack',

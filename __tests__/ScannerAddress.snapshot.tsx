@@ -14,12 +14,12 @@ import ScannerAddress from '@screens/ScannerAddress';
 import { RouteEnum } from '@app/AppState';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { AppStackParamList } from '@app/types';
+import { RootParamList } from '@app/types';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
 function makeProps(
   active: boolean,
-): NativeStackScreenProps<AppStackParamList, RouteEnum.ScannerAddress> {
+): NativeStackScreenProps<RootParamList, RouteEnum.ScannerAddress> {
   return {
     navigation: mockNavigation,
     route: {

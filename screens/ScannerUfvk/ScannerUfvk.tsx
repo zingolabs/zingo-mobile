@@ -8,10 +8,10 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import Scanner from '@ui/widgets/Scanner';
 import { RouteEnum } from '@app/AppState';
-import { AppStackParamList } from '@app/types';
+import { RootParamList } from '@app/types';
 
 type ScannerUfvkProps = NativeStackScreenProps<
-  AppStackParamList,
+  RootParamList,
   RouteEnum.ScannerUfvk
 >;
 

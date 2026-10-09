@@ -1,17 +1,14 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useEffect, useMemo } from 'react';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
-import {
-  createNavigationContainerRef,
-  NavigationContainer,
-} from '@react-navigation/native';
+import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import { LoadedApp } from './LoadedApp';
 import { LoadingApp } from './LoadingApp';
 import ScannerAddress from '@screens/ScannerAddress';
 import ScannerUfvk from '@screens/ScannerUfvk';
-import { AppStackParamList } from './types';
+import { RootParamList } from './types';
 import { RouteEnum } from './AppState';
 import { ThemeProvider, useTheme, navigationTheme } from './theme';
 
@@ -19,20 +16,14 @@ import { BackHandler, LogBox, StatusBar } from 'react-native';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import AppErrorBoundary from './AppErrorBoundary';
 import { SessionProvider, useSession } from './navigation/session';
+import { navigationRef } from './navigation/navigate';
 import BiometricBlankingOverlay from '@ui/widgets/BiometricBlankingOverlay';
 
 LogBox.ignoreLogs([
   '[Reanimated] Reduced motion setting is enabled on this device.',
 ]);
 
-const Stack = createNativeStackNavigator<AppStackParamList>();
-
-export const navigationRef = createNavigationContainerRef();
-
-const SCANNER_OPTIONS = {
-  presentation: 'transparentModal',
-  animation: 'slide_from_bottom',
-} as const;
+const Root = createNativeStackNavigator<RootParamList>();
 
 // The provider has to sit above every consumer, so App cannot read the theme it
 // renders. The shell is what consumes it.
@@ -41,20 +32,18 @@ const AppShell: React.FunctionComponent = () => {
   const theme = useMemo(() => navigationTheme(colors), [colors]);
   const { session } = useSession();
 
-  // avoid to close the App when the user tap on
-  // the back button of the device.
+  // Hardware back never closes the app; the user swipes it away like any
+  // other.
   useEffect(() => {
     const sub = BackHandler.addEventListener('hardwareBackPress', () => {
       if (navigationRef.isReady() && navigationRef.canGoBack()) {
         navigationRef.goBack();
-        return true;
       }
       return true;
     });
     return () => sub.remove();
   }, []);
 
-  //console.log('render App - 1');
   return (
     <AppErrorBoundary>
       <KeyboardProvider>
@@ -75,41 +64,40 @@ const AppShell: React.FunctionComponent = () => {
                 marginTop: -10,
               }}
             >
-              <Stack.Navigator
+              <Root.Navigator
                 screenOptions={{ headerShown: false, animation: 'none' }}
               >
                 {/* The session picks the section; the one it leaves is
                   removed from the tree, so it unmounts. */}
                 {session.kind === 'wallet' ? (
-                  <Stack.Screen
-                    name={RouteEnum.LoadedApp}
-                    initialParams={session.params}
-                  >
-                    {props => <LoadedApp {...props} />}
-                  </Stack.Screen>
+                  <Root.Screen name={RouteEnum.Wallet}>
+                    {props => <LoadedApp {...props} wallet={session.params} />}
+                  </Root.Screen>
                 ) : (
-                  <Stack.Screen
-                    name={RouteEnum.LoadingApp}
-                    initialParams={session.params}
-                  >
-                    {props => <LoadingApp {...props} />}
-                  </Stack.Screen>
+                  <Root.Screen name={RouteEnum.Loading}>
+                    {props => <LoadingApp {...props} session={session} />}
+                  </Root.Screen>
                 )}
                 {/* The scanners live at the root, above every section and
                   its bottom-sheet portal, so an open sheet never covers the
                   camera. A transparent modal keeps the screen beneath it
                   mounted and live. */}
-                <Stack.Screen
-                  name={RouteEnum.ScannerAddress}
-                  component={ScannerAddress}
-                  options={SCANNER_OPTIONS}
-                />
-                <Stack.Screen
-                  name={RouteEnum.ScannerUfvk}
-                  component={ScannerUfvk}
-                  options={SCANNER_OPTIONS}
-                />
-              </Stack.Navigator>
+                <Root.Group
+                  screenOptions={{
+                    presentation: 'transparentModal',
+                    animation: 'slide_from_bottom',
+                  }}
+                >
+                  <Root.Screen
+                    name={RouteEnum.ScannerAddress}
+                    component={ScannerAddress}
+                  />
+                  <Root.Screen
+                    name={RouteEnum.ScannerUfvk}
+                    component={ScannerUfvk}
+                  />
+                </Root.Group>
+              </Root.Navigator>
             </SafeAreaView>
           </NavigationContainer>
         </SafeAreaProvider>
