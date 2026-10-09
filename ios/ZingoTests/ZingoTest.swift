@@ -599,6 +599,7 @@ class FfiOutcomeTests: XCTestCase {
         (ZingolibError.MigrationSplit(message: "boom"), "MigrationSplit"),
         (ZingolibError.Migration(message: "boom"), "Migration"),
         (ZingolibError.Mixnet(message: "boom"), "Mixnet"),
+        (ZingolibError.WalletChainMismatch(message: "boom"), "WalletChainMismatch"),
     ]
 
     func testResolvedValuesPassThroughUnclassified() {

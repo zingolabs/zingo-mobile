@@ -49,6 +49,7 @@ enum FfiOutcome {
     case .MigrationSplit(let message): return ("MigrationSplit", message)
     case .Migration(let message): return ("Migration", message)
     case .Mixnet(let message): return ("Mixnet", message)
+    case .WalletChainMismatch(let message): return ("WalletChainMismatch", message)
     }
   }
 
