@@ -31,6 +31,8 @@ export const VEIL_MS = 220;
 // The words blur by this much while hidden; the numbers stay sharp.
 const BLUR_PT = 6;
 const WORD_H = 32;
+// Room left of the word for the blur to fade out round, not cut straight.
+const BLUR_PAD = BLUR_PT * 2;
 // Native filters run on the bitmap in device pixels; web runs in points.
 const BLUR_DEVIATION =
   Platform.OS === 'web' ? BLUR_PT : BLUR_PT * PixelRatio.get();
@@ -62,12 +64,19 @@ const BlurredWord = React.memo<{ word: string; color: string }>(
   ({ word, color }) => (
     <Svg width="100%" height={WORD_H}>
       <Defs>
-        <Filter id="wordblur" x="-30%" y="-100%" width="160%" height="300%">
+        <Filter
+          id="wordblur"
+          filterUnits="userSpaceOnUse"
+          x="0"
+          y="0"
+          width="100%"
+          height="100%"
+        >
           <FeGaussianBlur stdDeviation={BLUR_DEVIATION} />
         </Filter>
       </Defs>
       <SvgText
-        x={0}
+        x={BLUR_PAD}
         y={20.5}
         fill={color}
         fontSize={13}
@@ -159,7 +168,7 @@ export const WordGrid: React.FunctionComponent<{
                     accessibilityElementsHidden
                     importantForAccessibility="no-hide-descendants"
                     style={[
-                      { position: 'absolute', left: 0, right: 0 },
+                      { position: 'absolute', left: -BLUR_PAD, right: 0 },
                       blurInk,
                     ]}
                   >
