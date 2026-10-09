@@ -78,6 +78,7 @@ const Extrapolation = {
 // Styles stay empty: the callbacks are worklets, and running them here would
 // only exercise the mock's own stand-ins.
 const useAnimatedStyle = jest.fn(() => ({}));
+const useAnimatedProps = jest.fn(() => ({}));
 const useSharedValue = jest.fn(v => ({ value: v }));
 const useDerivedValue = jest.fn(fn => ({ value: fn() }));
 const useAnimatedGestureHandler = jest.fn(() => ({}));
@@ -125,6 +126,7 @@ export {
   runOnJS,
   runOnUI,
   useAnimatedGestureHandler,
+  useAnimatedProps,
   useAnimatedReaction,
   useAnimatedRef,
   useAnimatedStyle,

@@ -1079,6 +1079,11 @@ export class LoadingAppClass extends Component<
       };
       // storing the seed & birthday in KeyChain/KeyStore
       await createUpdateRecoveryWalletInfo(wallet);
+      await SettingsFileImpl.writeSettings(
+        SettingsNameEnum.seedBackedUp,
+        false,
+      );
+      await SettingsFileImpl.writeSettings(SettingsNameEnum.seedBackedUpAt, 0);
       clearTimeout(showProgress);
       this.setState({
         wallet,
@@ -1292,6 +1297,14 @@ export class LoadingAppClass extends Component<
             // store this wallet's recovery info in the Keychain/Keystore; if
             // it can't be read, whatever the device holds is removed.
             await createUpdateRecoveryWalletInfo(await fetchWallet(readOnly));
+            await SettingsFileImpl.writeSettings(
+              SettingsNameEnum.seedBackedUp,
+              true,
+            );
+            await SettingsFileImpl.writeSettings(
+              SettingsNameEnum.seedBackedUpAt,
+              0,
+            );
             this.setState({
               readOnly,
               orchardPool,

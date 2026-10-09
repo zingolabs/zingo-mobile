@@ -29,6 +29,10 @@
 		A0161467000000000000B002 /* ZingoBindings in Frameworks */ = {isa = PBXBuildFile; productRef = A0161467000000000000D002 /* ZingoBindings */; };
 		C15AEBBCEC942FCAC1519FEA /* libPods-Zingo-ZingoTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96E8D7BC5D3F3F73EA296DFA /* libPods-Zingo-ZingoTests.a */; };
 		D07A0007DA1CE0DE00000003 /* DeviceAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = D07A0007DA1CE0DE00000001 /* DeviceAuth.swift */; };
+		D07A0007DA1CE0DE000000A3 /* PrivacyGuard.swift in Sources */ = {isa = PBXBuildFile; fileRef = D07A0007DA1CE0DE000000A1 /* PrivacyGuard.swift */; };
+		D07A0007DA1CE0DE000000A4 /* PrivacyGuardBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = D07A0007DA1CE0DE000000A2 /* PrivacyGuardBridge.m */; };
+		D07A0007DA1CE0DE000000A5 /* PrivacyGuard.swift in Sources */ = {isa = PBXBuildFile; fileRef = D07A0007DA1CE0DE000000A1 /* PrivacyGuard.swift */; };
+		D07A0007DA1CE0DE000000A6 /* PrivacyGuardBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = D07A0007DA1CE0DE000000A2 /* PrivacyGuardBridge.m */; };
 		D07A0007DA1CE0DE00000004 /* DeviceAuthBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = D07A0007DA1CE0DE00000002 /* DeviceAuthBridge.m */; };
 		D07A0007DA1CE0DE00000005 /* DeviceAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = D07A0007DA1CE0DE00000001 /* DeviceAuth.swift */; };
 		D07A0007DA1CE0DE00000006 /* DeviceAuthBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = D07A0007DA1CE0DE00000002 /* DeviceAuthBridge.m */; };
@@ -77,6 +81,8 @@
 		A0161467000000000000F001 /* swift */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = swift; path = ../zingolib/bindings/swift; sourceTree = "<group>"; };
 		D07A0007DA1CE0DE00000001 /* DeviceAuth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceAuth.swift; sourceTree = "<group>"; };
 		D07A0007DA1CE0DE00000002 /* DeviceAuthBridge.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DeviceAuthBridge.m; sourceTree = "<group>"; };
+		D07A0007DA1CE0DE000000A1 /* PrivacyGuard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyGuard.swift; sourceTree = "<group>"; };
+		D07A0007DA1CE0DE000000A2 /* PrivacyGuardBridge.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PrivacyGuardBridge.m; sourceTree = "<group>"; };
 		DD87BEDB3F10BB201D3845B8 /* NymTransportModuleBridge.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = NymTransportModuleBridge.m; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		F0A6912D48B65F0E8D6E7619 /* NymTransportModule.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NymTransportModule.swift; sourceTree = "<group>"; };
@@ -135,6 +141,8 @@
 				1F5569282BBCB98100F2CD6C /* RPCModuleBridge.m */,
 				D07A0007DA1CE0DE00000001 /* DeviceAuth.swift */,
 				D07A0007DA1CE0DE00000002 /* DeviceAuthBridge.m */,
+				D07A0007DA1CE0DE000000A1 /* PrivacyGuard.swift */,
+				D07A0007DA1CE0DE000000A2 /* PrivacyGuardBridge.m */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
@@ -493,6 +501,8 @@
 				1FA935B12BE454FA00117DF5 /* RPCModuleBridge.m in Sources */,
 				D07A0007DA1CE0DE00000005 /* DeviceAuth.swift in Sources */,
 				D07A0007DA1CE0DE00000006 /* DeviceAuthBridge.m in Sources */,
+				D07A0007DA1CE0DE000000A5 /* PrivacyGuard.swift in Sources */,
+				D07A0007DA1CE0DE000000A6 /* PrivacyGuardBridge.m in Sources */,
 				1FA935B02BE4506300117DF5 /* RPCModule.swift in Sources */,
 				1FC1E2172BE443270064963B /* ZingoTest.swift in Sources */,
 				39916E0E0696D2BA46897D37 /* NymTransportModule.swift in Sources */,
@@ -511,6 +521,8 @@
 				1F5569292BBCB98100F2CD6C /* RPCModuleBridge.m in Sources */,
 				D07A0007DA1CE0DE00000003 /* DeviceAuth.swift in Sources */,
 				D07A0007DA1CE0DE00000004 /* DeviceAuthBridge.m in Sources */,
+				D07A0007DA1CE0DE000000A3 /* PrivacyGuard.swift in Sources */,
+				D07A0007DA1CE0DE000000A4 /* PrivacyGuardBridge.m in Sources */,
 				406B854C612CDFA4B10C5B0A /* NymTransportModule.swift in Sources */,
 				E3B3E80957D603CCE394CAF9 /* NymTransportModuleBridge.m in Sources */,
 			);

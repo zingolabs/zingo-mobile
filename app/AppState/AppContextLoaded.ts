@@ -122,6 +122,12 @@ export default interface AppContextLoaded {
   // Change the privacy everywhere
   setPrivacyOption: (value: boolean) => Promise<void>;
 
+  // The user confirmed the seed phrase in the backup flow, or restored it.
+  seedBackedUp: boolean;
+  // When the last backup was confirmed (ms); 0 for a restored wallet.
+  seedBackedUpAt: number;
+  setSeedBackedUp: (value: boolean) => Promise<void>;
+
   // settings
   server: ServerType;
   language: LanguageEnum;

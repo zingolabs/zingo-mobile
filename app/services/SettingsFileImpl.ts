@@ -84,7 +84,7 @@ export default class SettingsFileImpl {
       SettingsNameEnum,
       SettingsNameEnum.server | SettingsNameEnum.selectServer
     >,
-    value: string | boolean,
+    value: string | boolean | number,
   ): Promise<void> {
     return this.writePatch({ [name]: value });
   }
@@ -256,6 +256,12 @@ export default class SettingsFileImpl {
         // the wallet hasn't shown the "Meet Ironwood" onboarding yet; it
         // launches once, the first time spendable Orchard funds are detected.
         settings.ironwoodOnboardSeen = false;
+      }
+      if (!settings.hasOwnProperty(SettingsNameEnum.seedBackedUp)) {
+        settings.seedBackedUp = false;
+      }
+      if (!settings.hasOwnProperty(SettingsNameEnum.seedBackedUpAt)) {
+        settings.seedBackedUpAt = 0;
       }
       return settings;
     } catch (err) {

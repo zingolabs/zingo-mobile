@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import { Image, View } from 'react-native';
+import { Image, View, ViewStyle } from 'react-native';
 import { useTheme } from '@app/theme';
 
 import { ServerType, TranslateType } from '@app/AppState';
@@ -13,13 +13,16 @@ import FadeText from '@ui/primitives/FadeText';
 
 const zcashLogo = require('../../../../assets/img/zcash-yellow.png');
 
-type PriceRowProps = {
+type PriceCardProps = {
   translate: (key: string) => TranslateType;
   zecPrice: ZecPriceType;
   info: InfoType;
   server: ServerType;
+  style?: ViewStyle;
   onLayout?: (height: number) => void;
 };
+
+type PriceRowProps = Omit<PriceCardProps, 'style'>;
 
 // Vertical margins on the card. Reported back via onLayout so the parent
 // can size its bottom-sheet snap points to cover the whole price block
@@ -38,8 +41,9 @@ const formatLastUpdate = (date: number): string => {
   });
 };
 
-const PriceRow: React.FC<PriceRowProps> = React.memo(
-  ({ translate, zecPrice, info, server, onLayout }) => {
+// The ZEC price with its last update time, or nothing without a quote.
+export const PriceCard: React.FC<PriceCardProps> = React.memo(
+  ({ translate, zecPrice, info, server, style, onLayout }) => {
     const { colors } = useTheme();
 
     const quote = fiatQuote(zecPrice, server, info.chainName);
@@ -51,15 +55,10 @@ const PriceRow: React.FC<PriceRowProps> = React.memo(
 
     return (
       <View
-        onLayout={e =>
-          onLayout?.(e.nativeEvent.layout.height + CARD_VERTICAL_MARGINS)
-        }
+        onLayout={e => onLayout?.(e.nativeEvent.layout.height)}
         style={{
           flexDirection: 'row',
           alignItems: 'center',
-          marginHorizontal: 20,
-          marginTop: CARD_MARGIN_TOP,
-          marginBottom: CARD_MARGIN_BOTTOM,
           paddingHorizontal: 12,
           paddingVertical: 6,
           borderRadius: 10,
@@ -67,6 +66,7 @@ const PriceRow: React.FC<PriceRowProps> = React.memo(
           borderWidth: 1,
           borderColor: colors.bottomSheetBorder,
           gap: 12,
+          ...style,
         }}
       >
         <Image
@@ -96,6 +96,20 @@ const PriceRow: React.FC<PriceRowProps> = React.memo(
       </View>
     );
   },
+);
+
+const PriceRow: React.FC<PriceRowProps> = React.memo(
+  ({ onLayout, ...card }) => (
+    <PriceCard
+      {...card}
+      onLayout={h => onLayout?.(h + CARD_VERTICAL_MARGINS)}
+      style={{
+        marginHorizontal: 20,
+        marginTop: CARD_MARGIN_TOP,
+        marginBottom: CARD_MARGIN_BOTTOM,
+      }}
+    />
+  ),
 );
 
 export default PriceRow;

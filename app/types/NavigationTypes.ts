@@ -58,6 +58,14 @@ export type LoadedAppNavigationState = {
   walletChainName: ChainNameEnum;
 };
 
+// A card's rect in window coordinates.
+export type CardRect = { x: number; y: number; width: number; height: number };
+
+// How the backup flow opens: grown out of the History notice card, pushed
+// from Wallet Seed, or straight to the three-word check from Wallet Seed.
+export type SeedBackupEntry =
+  { kind: 'card'; from: CardRect } | { kind: 'push' } | { kind: 'verify' };
+
 /**
  * Root drawer parameter list for the main stack navigator
  * This defines the structure of parameters passed between main app screens
@@ -79,6 +87,8 @@ export type AppDrawerParamList = {
   [RouteEnum.SyncReport]: undefined;
   [RouteEnum.Pools]: undefined;
   [RouteEnum.MeetIronwood]: undefined;
+  [RouteEnum.SeedBackup]: { entry: SeedBackupEntry };
+  [RouteEnum.WalletSeed]: undefined;
   [RouteEnum.MigrationStrategy]: undefined;
   [RouteEnum.MigrationTransactions]: undefined;
   // The immediate drain broadcasts here; `transactions` is the previewed plan,

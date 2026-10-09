@@ -154,6 +154,8 @@ const SyncReport = React.lazy(() => import('@screens/SyncReport'));
 const Rescan = React.lazy(() => import('@screens/Rescan'));
 const Pools = React.lazy(() => import('@screens/Pools'));
 const MeetIronwood = React.lazy(() => import('@screens/MeetIronwood'));
+const SeedBackup = React.lazy(() => import('@screens/SeedBackup'));
+const WalletSeed = React.lazy(() => import('@screens/WalletSeed'));
 const MigrationStrategy = React.lazy(
   () => import('@screens/MigrationStrategy'),
 );
@@ -231,6 +233,8 @@ export default function LoadedApp(props: LoadedAppProps) {
   const [addressBook, setAddressBook] = useState<AddressBookFileClass[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [biometrics, setBiometrics] = useState<boolean>(true);
+  const [seedBackedUp, setSeedBackedUp] = useState<boolean>(true);
+  const [seedBackedUpAt, setSeedBackedUpAt] = useState<number>(0);
   const [selectServer, setSelectServer] = useState<SelectServerEnum>(
     SelectServerEnum.auto,
   );
@@ -378,6 +382,12 @@ export default function LoadedApp(props: LoadedAppProps) {
       } else {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.privacy, privacy);
       }
+      setSeedBackedUp(settings.seedBackedUp === true);
+      setSeedBackedUpAt(
+        typeof settings.seedBackedUpAt === 'number'
+          ? settings.seedBackedUpAt
+          : 0,
+      );
       if (settings.biometrics === true || settings.biometrics === false) {
         setBiometrics(settings.biometrics);
       } else {
@@ -590,6 +600,8 @@ export default function LoadedApp(props: LoadedAppProps) {
         transparentPool={transparentPool}
         addressBook={addressBook}
         biometrics={biometrics}
+        seedBackedUp={seedBackedUp}
+        seedBackedUpAt={seedBackedUpAt}
         selectServer={selectServer}
         walletChainName={walletChainName}
         firstLaunchingMessage={firstLaunchingMessage}
@@ -623,6 +635,8 @@ type LoadedAppClassProps = {
   transparentPool: boolean;
   addressBook: AddressBookFileClass[];
   biometrics: boolean;
+  seedBackedUp: boolean;
+  seedBackedUpAt: number;
   selectServer: SelectServerEnum;
   walletChainName: ChainNameEnum;
   firstLaunchingMessage: LaunchingModeEnum;
@@ -695,6 +709,9 @@ export class LoadedAppClass extends Component<
       setZecPrice: this.setZecPrice,
       zingolibVersion: '',
       setPrivacyOption: this.setPrivacyOption,
+      seedBackedUp: props.seedBackedUp,
+      seedBackedUpAt: props.seedBackedUpAt,
+      setSeedBackedUp: this.setSeedBackedUp,
 
       // context settings
       server: props.server,
@@ -1488,9 +1505,7 @@ export class LoadedAppClass extends Component<
           action: UfvkActionEnum.view,
         });
       } else {
-        this.drawerNav?.navigate(RouteEnum.Seed, {
-          action: SeedActionEnum.view,
-        });
+        this.drawerNav?.navigate(RouteEnum.WalletSeed);
       }
       return;
     } else if (item === MenuItemEnum.ChangeWallet) {
@@ -1721,6 +1736,13 @@ export class LoadedAppClass extends Component<
     this.setState({
       privacy: value as boolean,
     });
+  };
+
+  setSeedBackedUp = async (value: boolean): Promise<void> => {
+    const at = value ? Date.now() : 0;
+    await SettingsFileImpl.writeSettings(SettingsNameEnum.seedBackedUp, value);
+    await SettingsFileImpl.writeSettings(SettingsNameEnum.seedBackedUpAt, at);
+    this.setState({ seedBackedUp: value, seedBackedUpAt: at });
   };
 
   setBiometricsOption = async (value: boolean): Promise<void> => {
@@ -2019,6 +2041,9 @@ export class LoadedAppClass extends Component<
       setZecPrice: this.state.setZecPrice,
       zingolibVersion: this.state.zingolibVersion,
       setPrivacyOption: this.setPrivacyOption,
+      seedBackedUp: this.state.seedBackedUp,
+      seedBackedUpAt: this.state.seedBackedUpAt,
+      setSeedBackedUp: this.setSeedBackedUp,
 
       // context settings
       server: this.state.server,
@@ -2295,6 +2320,22 @@ export class LoadedAppClass extends Component<
                       // One-way onboarding: no swipe-back to the screen behind
                       // it; the screen closes by resetting the stack to Home.
                       options={{ gestureEnabled: false }}
+                    />
+                    <RootNavigator.Screen
+                      name={RouteEnum.SeedBackup}
+                      component={SeedBackup}
+                      // Draws its own container transform out of the notice
+                      // card over the screen behind it.
+                      options={{
+                        presentation: 'transparentModal',
+                        animation: 'none',
+                        gestureEnabled: false,
+                      }}
+                    />
+                    <RootNavigator.Screen
+                      name={RouteEnum.WalletSeed}
+                      component={WalletSeed}
+                      options={{ animation: 'slide_from_right' }}
                     />
                     <RootNavigator.Screen
                       name={RouteEnum.MigrationStrategy}
