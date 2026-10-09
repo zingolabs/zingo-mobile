@@ -5,7 +5,6 @@ import {
   NativeEventSubscription,
   Platform,
 } from 'react-native';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useTheme } from '@app/theme';
 import { I18n } from 'i18n-js';
 import * as RNLocalize from 'react-native-localize';
@@ -91,7 +90,6 @@ import Toast from 'react-native-toast-message';
 import { toastConfig } from '@ui/widgets/toastConfig';
 import { RPCSeedType } from '@app/walletBackend/types/RPCSeedType';
 import Launching from '@screens/Launching';
-import { AddressBook } from '@screens/AddressBook';
 import AddressBookFileImpl from '@app/services/AddressBookFileImpl';
 import {
   GateAnswer,
@@ -100,11 +98,6 @@ import {
 } from '@app/services/gateController';
 import ShowAddressAlertAsync from '@app/services/showAddressAlertAsync';
 
-import History from '@screens/History';
-import Send from '@screens/Send';
-import Receive from '@screens/Receive';
-import Settings from '@screens/Settings';
-import CustomTabBar from '@app/navigation/CustomTabBar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import {
   BottomSheetModal,
@@ -114,14 +107,9 @@ import AddTagModalHost from './components/AddTagModalHost';
 import { BottomSheetBackHandler } from '@app/hooks/useBottomSheetBackHandler';
 import ConfirmBottomSheet from '@ui/widgets/ConfirmBottomSheet';
 import { showConfirm } from '@app/services/showConfirm';
-import RootNavigator from '@app/navigation/RootNavigator';
-import WalletServer from '@screens/Server/WalletServer';
-import {
-  OptionsPanelProvider,
-  toggleOptionsPanel,
-} from '@app/context/optionsPanel';
+import { WalletNavigator } from '@app/navigation/WalletNavigator';
+import { OptionsPanelProvider } from '@app/context/optionsPanel';
 import LoadedAppOptionsPanelHost from './LoadedAppOptionsPanelHost';
-import { MessageList } from '@screens/Messages';
 import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
 import { RPCUfvkType } from '@app/walletBackend/types/RPCUfvkType';
 import {
@@ -139,54 +127,15 @@ import {
   stopMixnetTransport,
 } from '@app/walletBackend/utils/nymTransport';
 import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
-import { AddressList } from '@screens/AddressList';
-import ValueTransferDetail from '@screens/ValueTransferDetail';
-import Confirm from '@screens/Confirm';
-import { HomeTabParamList, RootParamList } from '@app/types';
+import { RootParamList } from '@app/types';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
-
-const About = React.lazy(() => import('@screens/About'));
-const MixnetDoctor = React.lazy(() => import('@screens/MixnetDoctor'));
-const Seed = React.lazy(() => import('@screens/Seed'));
-const SyncReport = React.lazy(() => import('@screens/SyncReport'));
-const Rescan = React.lazy(() => import('@screens/Rescan'));
-const Pools = React.lazy(() => import('@screens/Pools'));
-const MeetIronwood = React.lazy(() => import('@screens/MeetIronwood'));
-const SeedBackup = React.lazy(() => import('@screens/SeedBackup'));
-const WalletSeed = React.lazy(() => import('@screens/WalletSeed'));
-const MigrationStrategy = React.lazy(
-  () => import('@screens/MigrationStrategy'),
-);
-const MigrationTransactions = React.lazy(
-  () => import('@screens/MigrationTransactions'),
-);
-const MigrationSending = React.lazy(() => import('@screens/MigrationSending'));
-const MigrationSplitPlan = React.lazy(
-  () => import('@screens/MigrationSplitPlan'),
-);
-const MigrationSplitting = React.lazy(
-  () => import('@screens/MigrationSplitting'),
-);
-const MigrationCadence = React.lazy(() => import('@screens/MigrationCadence'));
-const MigrationSchedule = React.lazy(
-  () => import('@screens/MigrationSchedule'),
-);
-const MigrationStatus = React.lazy(() => import('@screens/MigrationStatus'));
-const MigrationBatchSending = React.lazy(
-  () => import('@screens/MigrationBatchSending'),
-);
-const Insight = React.lazy(() => import('@screens/Insight'));
-const ShowUfvk = React.lazy(() => import('@screens/Ufvk/ShowUfvk'));
-const ComputingTxContent = React.lazy(() => import('@screens/Computing'));
 
 const en = require('@app/translations/en.json');
 const es = require('@app/translations/es.json');
 const pt = require('@app/translations/pt.json');
 const ru = require('@app/translations/ru.json');
 const tr = require('@app/translations/tr.json');
-
-const Tab = createBottomTabNavigator<HomeTabParamList>();
 
 // The `Zenny Tips` contact older versions wrote into every address book on
 // their own, in the five languages that could have created it, and the UA it
@@ -626,10 +575,6 @@ type LoadedAppClassProps = {
 
 type LoadedAppClassState = AppStateLoaded & AppContextLoaded;
 
-const renderTabBar = (
-  props: import('@react-navigation/bottom-tabs').BottomTabBarProps,
-) => <CustomTabBar {...props} />;
-
 export class LoadedAppClass extends Component<
   LoadedAppClassProps,
   LoadedAppClassState
@@ -682,6 +627,23 @@ export class LoadedAppClass extends Component<
           startingApp: false,
           newWallet: false,
         }),
+      setScrollToTop: this.setScrollToTop,
+      setScrollToBottom: this.setScrollToBottom,
+      setShieldingAmount: this.setShieldingAmount,
+      sendTransaction: this.sendTransaction,
+      setServerOption: this.setServerOption,
+      clearToAddr: this.clearToAddr,
+      doRescan: this.doRescan,
+      setAddressBook: this.setAddressBook,
+      setLanguageOption: this.setLanguageOption,
+      setBiometricsOption: this.setBiometricsOption,
+      setPerformanceLevelOption: this.setPerformanceLevelOption,
+      setBlockExplorerOption: this.setBlockExplorerOption,
+      setIsSeedViewModalOpen: this.setIsSeedViewModalOpen,
+      changeWallet: this.onClickOKChangeWallet,
+      restoreBackup: this.onClickOKRestoreBackup,
+      applyPendingServer: this.onClickOKServerWallet,
+      cancelPendingServer: this.cancelPendingServer,
       somePending: false,
       addressBook: props.addressBook,
       launchAddTagModal: this.launchAddTagModal,
@@ -924,7 +886,7 @@ export class LoadedAppClass extends Component<
     this.props.clearLink();
     await this.readUrl(url);
     navigateWallet({
-      screen: RouteEnum.HomeStack,
+      screen: RouteEnum.Home,
       params: { screen: RouteEnum.Send },
     });
   };
@@ -1822,6 +1784,13 @@ export class LoadedAppClass extends Component<
     });
   };
 
+  // The server change was dropped on the seed screen: the tasks restart
+  // against the server that is still in use.
+  cancelPendingServer = async () => {
+    await this.rpc.clearTimers();
+    await this.rpc.configure();
+  };
+
   onClickOKServerWallet = async () => {
     const { pendingServer } = this.state;
     if (pendingServer.kind === 'pending') {
@@ -1968,8 +1937,6 @@ export class LoadedAppClass extends Component<
   };
 
   render() {
-    const { readOnly, scrollToTop, scrollToBottom, server } = this.state;
-
     const context = {
       //context
       netInfo: this.state.netInfo,
@@ -2024,6 +1991,27 @@ export class LoadedAppClass extends Component<
       mixnetView: this.state.mixnetView,
       reenableMixnet: this.reenableMixnet,
       sendPermitNow: this.sendPermitNow,
+
+      // scroll signals and wallet actions for the screens
+      scrollToTop: this.state.scrollToTop,
+      setScrollToTop: this.setScrollToTop,
+      scrollToBottom: this.state.scrollToBottom,
+      setScrollToBottom: this.setScrollToBottom,
+      setShieldingAmount: this.setShieldingAmount,
+      sendTransaction: this.sendTransaction,
+      setServerOption: this.setServerOption,
+      clearToAddr: this.clearToAddr,
+      doRescan: this.doRescan,
+      setAddressBook: this.setAddressBook,
+      setLanguageOption: this.setLanguageOption,
+      setBiometricsOption: this.setBiometricsOption,
+      setPerformanceLevelOption: this.setPerformanceLevelOption,
+      setBlockExplorerOption: this.setBlockExplorerOption,
+      setIsSeedViewModalOpen: this.setIsSeedViewModalOpen,
+      changeWallet: this.onClickOKChangeWallet,
+      restoreBackup: this.onClickOKRestoreBackup,
+      applyPendingServer: this.onClickOKServerWallet,
+      cancelPendingServer: this.cancelPendingServer,
     };
 
     return (
@@ -2039,356 +2027,7 @@ export class LoadedAppClass extends Component<
                   onMenuItemSelected={this.onMenuItemSelected}
                   zingolibVersion={this.state.zingolibVersion}
                 >
-                  <RootNavigator initialRouteName={RouteEnum.HomeStack}>
-                    <RootNavigator.Screen name={RouteEnum.HomeStack}>
-                      {() => {
-                        return (
-                          <>
-                            <Tab.Navigator
-                              detachInactiveScreens={true}
-                              initialRouteName={RouteEnum.History}
-                              backBehavior="initialRoute"
-                              tabBar={renderTabBar}
-                              screenOptions={{
-                                headerShown: false,
-                              }}
-                            >
-                              <Tab.Screen name={RouteEnum.History}>
-                                {propsTab => (
-                                  <History
-                                    {...propsTab}
-                                    toggleMenuDrawer={
-                                      () => toggleOptionsPanel() /* header */
-                                    }
-                                    setShieldingAmount={
-                                      this.setShieldingAmount /* header */
-                                    }
-                                    setScrollToTop={
-                                      this.setScrollToTop /* header & history */
-                                    }
-                                    scrollToTop={scrollToTop /* history */}
-                                    setScrollToBottom={
-                                      this
-                                        .setScrollToBottom /* header & messages */
-                                    }
-                                  />
-                                )}
-                              </Tab.Screen>
-                              {!readOnly && server.kind === 'remote' && (
-                                <Tab.Screen name={RouteEnum.Send}>
-                                  {propsTab => (
-                                    <Send
-                                      {...propsTab}
-                                      toggleMenuDrawer={
-                                        () => toggleOptionsPanel() /* header */
-                                      }
-                                      setShieldingAmount={
-                                        this.setShieldingAmount /* header */
-                                      }
-                                      setScrollToTop={
-                                        this.setScrollToTop /* header & send */
-                                      }
-                                      setScrollToBottom={
-                                        this
-                                          .setScrollToBottom /* header & send */
-                                      }
-                                      sendTransaction={
-                                        this.sendTransaction /* send */
-                                      }
-                                      setServerOption={
-                                        this.setServerOption /* send */
-                                      }
-                                      clearToAddr={this.clearToAddr /* send */}
-                                    />
-                                  )}
-                                </Tab.Screen>
-                              )}
-                              <Tab.Screen name={RouteEnum.Receive}>
-                                {propsTab => (
-                                  <Receive
-                                    {...propsTab}
-                                    toggleMenuDrawer={
-                                      () => toggleOptionsPanel() /* header */
-                                    }
-                                    alone={false /* receive */}
-                                    setAddressBook={this.setAddressBook}
-                                  />
-                                )}
-                              </Tab.Screen>
-                            </Tab.Navigator>
-                          </>
-                        );
-                      }}
-                    </RootNavigator.Screen>
-                    <RootNavigator.Screen name={RouteEnum.Settings}>
-                      {props => (
-                        <Settings
-                          {...props}
-                          setLanguageOption={this.setLanguageOption}
-                          setBiometricsOption={this.setBiometricsOption}
-                          setPerformanceLevelOption={
-                            this.setPerformanceLevelOption
-                          }
-                          setBlockExplorerOption={this.setBlockExplorerOption}
-                          toggleMenuDrawer={
-                            () => toggleOptionsPanel() /* header */
-                          }
-                        />
-                      )}
-                    </RootNavigator.Screen>
-                    <RootNavigator.Screen name={RouteEnum.Server}>
-                      {props => (
-                        <WalletServer
-                          {...props}
-                          setServerOption={this.setServerOption}
-                        />
-                      )}
-                    </RootNavigator.Screen>
-                    <RootNavigator.Screen
-                      name={RouteEnum.About}
-                      component={About}
-                    />
-                    <RootNavigator.Screen
-                      name={RouteEnum.MixnetDoctor}
-                      component={MixnetDoctor}
-                    />
-                    <RootNavigator.Screen name={RouteEnum.Rescan}>
-                      {props => <Rescan {...props} doRescan={this.doRescan} />}
-                    </RootNavigator.Screen>
-                    <RootNavigator.Screen
-                      name={RouteEnum.Insight}
-                      component={Insight}
-                    />
-                    <RootNavigator.Screen name={RouteEnum.Ufvk}>
-                      {props => {
-                        const action =
-                          !!props.route.params &&
-                          props.route.params.action !== undefined
-                            ? props.route.params.action
-                            : UfvkActionEnum.view;
-                        if (action === UfvkActionEnum.view) {
-                          return (
-                            <ShowUfvk
-                              {...props}
-                              onClickOK={() => {}}
-                              onClickCancel={() => {}}
-                            />
-                          );
-                        } else if (action === UfvkActionEnum.change) {
-                          return (
-                            <ShowUfvk
-                              {...props}
-                              onClickOK={async () =>
-                                await this.onClickOKChangeWallet()
-                              }
-                              onClickCancel={() => {}}
-                            />
-                          );
-                        } else if (action === UfvkActionEnum.backup) {
-                          return (
-                            <ShowUfvk
-                              {...props}
-                              onClickOK={async () =>
-                                await this.onClickOKRestoreBackup()
-                              }
-                              onClickCancel={() => {}}
-                            />
-                          );
-                        } else if (action === UfvkActionEnum.server) {
-                          return (
-                            <ShowUfvk
-                              {...props}
-                              onClickOK={async () =>
-                                await this.onClickOKServerWallet()
-                              }
-                              onClickCancel={async () => {
-                                // restart all the tasks again, nothing happen.
-                                await this.rpc.clearTimers();
-                                await this.rpc.configure();
-                              }}
-                            />
-                          );
-                        }
-                      }}
-                    </RootNavigator.Screen>
-                    <RootNavigator.Screen name={RouteEnum.Seed}>
-                      {props => {
-                        const action =
-                          !!props.route.params &&
-                          props.route.params.action !== undefined
-                            ? props.route.params.action
-                            : SeedActionEnum.view;
-                        if (action === SeedActionEnum.view) {
-                          return (
-                            <Seed
-                              {...props}
-                              onClickOK={() => {}}
-                              onClickCancel={() => {}}
-                              setIsSeedViewModalOpen={
-                                this.setIsSeedViewModalOpen
-                              }
-                            />
-                          );
-                        } else if (action === SeedActionEnum.change) {
-                          return (
-                            <Seed
-                              {...props}
-                              onClickOK={async () =>
-                                await this.onClickOKChangeWallet()
-                              }
-                              onClickCancel={() => {}}
-                            />
-                          );
-                        } else if (action === SeedActionEnum.backup) {
-                          return (
-                            <Seed
-                              {...props}
-                              onClickOK={async () =>
-                                await this.onClickOKRestoreBackup()
-                              }
-                              onClickCancel={() => {}}
-                            />
-                          );
-                        } else if (action === SeedActionEnum.server) {
-                          return (
-                            <Seed
-                              {...props}
-                              onClickOK={async () =>
-                                await this.onClickOKServerWallet()
-                              }
-                              onClickCancel={async () => {
-                                // restart all the tasks again, nothing happen.
-                                await this.rpc.clearTimers();
-                                await this.rpc.configure();
-                              }}
-                            />
-                          );
-                        }
-                      }}
-                    </RootNavigator.Screen>
-                    <RootNavigator.Screen
-                      name={RouteEnum.SyncReport}
-                      component={SyncReport}
-                    />
-                    <RootNavigator.Screen
-                      name={RouteEnum.Pools}
-                      component={Pools}
-                    />
-                    <RootNavigator.Screen
-                      name={RouteEnum.MeetIronwood}
-                      component={MeetIronwood}
-                      // One-way onboarding: no swipe-back to the screen behind
-                      // it; the screen closes by resetting the stack to Home.
-                      options={{ gestureEnabled: false }}
-                    />
-                    <RootNavigator.Screen
-                      name={RouteEnum.SeedBackup}
-                      component={SeedBackup}
-                      // Draws its own container transform out of the notice
-                      // card over the screen behind it.
-                      options={{
-                        presentation: 'transparentModal',
-                        animation: 'none',
-                        gestureEnabled: false,
-                      }}
-                    />
-                    <RootNavigator.Screen
-                      name={RouteEnum.WalletSeed}
-                      component={WalletSeed}
-                      options={{ animation: 'slide_from_right' }}
-                    />
-                    <RootNavigator.Screen
-                      name={RouteEnum.MigrationStrategy}
-                      component={MigrationStrategy}
-                      // Continues the one-way onboarding flow; back is handled
-                      // in-screen, not by swipe.
-                      options={{ gestureEnabled: false }}
-                    />
-                    <RootNavigator.Screen
-                      name={RouteEnum.MigrationTransactions}
-                      component={MigrationTransactions}
-                      options={{ gestureEnabled: false }}
-                    />
-                    <RootNavigator.Screen
-                      name={RouteEnum.MigrationSending}
-                      component={MigrationSending}
-                      // The drain broadcasts here and can't be interrupted;
-                      // swipe-back is off and hardware-back is blocked in-screen.
-                      options={{ gestureEnabled: false }}
-                    />
-                    <RootNavigator.Screen
-                      name={RouteEnum.MigrationSplitPlan}
-                      component={MigrationSplitPlan}
-                      options={{ gestureEnabled: false }}
-                    />
-                    <RootNavigator.Screen
-                      name={RouteEnum.MigrationSplitting}
-                      component={MigrationSplitting}
-                      // Splitting rounds broadcast here and can't be
-                      // interrupted; swipe-back off, hardware-back blocked
-                      // in-screen.
-                      options={{ gestureEnabled: false }}
-                    />
-                    <RootNavigator.Screen
-                      name={RouteEnum.MigrationCadence}
-                      component={MigrationCadence}
-                      options={{ gestureEnabled: false }}
-                    />
-                    <RootNavigator.Screen
-                      name={RouteEnum.MigrationSchedule}
-                      component={MigrationSchedule}
-                      options={{ gestureEnabled: false }}
-                    />
-                    <RootNavigator.Screen
-                      name={RouteEnum.MigrationStatus}
-                      component={MigrationStatus}
-                      // Reached by reset (post-confirm) and by the banner; its
-                      // own "Back to wallet" resets home, so swipe-back off.
-                      options={{ gestureEnabled: false }}
-                    />
-                    <RootNavigator.Screen
-                      name={RouteEnum.MigrationBatchSending}
-                      component={MigrationBatchSending}
-                      // The batch broadcasts here and can't be interrupted;
-                      // swipe-back is off and hardware-back is blocked in-screen.
-                      options={{ gestureEnabled: false }}
-                    />
-                    <RootNavigator.Screen name={RouteEnum.AddressBook}>
-                      {props => (
-                        <AddressBook
-                          {...props}
-                          setAddressBook={this.setAddressBook}
-                        />
-                      )}
-                    </RootNavigator.Screen>
-                    <RootNavigator.Screen
-                      name={RouteEnum.ValueTransferDetail}
-                      component={ValueTransferDetail}
-                    />
-                    <RootNavigator.Screen
-                      name={RouteEnum.AddressList}
-                      component={AddressList}
-                    />
-                    <RootNavigator.Screen name={RouteEnum.Messages}>
-                      {props => (
-                        <MessageList
-                          {...props}
-                          toggleMenuDrawer={() => toggleOptionsPanel()}
-                          closeScreen={() => props.navigation.goBack()}
-                          setScrollToBottom={this.setScrollToBottom}
-                          scrollToBottom={scrollToBottom}
-                        />
-                      )}
-                    </RootNavigator.Screen>
-                    <RootNavigator.Screen
-                      name={RouteEnum.Confirm}
-                      component={Confirm}
-                    />
-                    <RootNavigator.Screen
-                      name={RouteEnum.Computing}
-                      component={ComputingTxContent}
-                    />
-                  </RootNavigator>
+                  <WalletNavigator />
                 </LoadedAppOptionsPanelHost>
               </OptionsPanelProvider>
               <AddTagModalHost

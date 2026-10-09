@@ -14,7 +14,6 @@ import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
 test('Tests that the spendable amount fills the amount field with the maximum when it is pressed', async () => {
-  const noop = jest.fn();
   render(
     <ContextAppLoadedProvider
       value={{
@@ -29,13 +28,6 @@ test('Tests that the spendable amount fills the amount field with the maximum wh
       <Send
         navigation={mockNavigation}
         route={{ key: 'Key-1', name: RouteEnum.Send, params: undefined }}
-        sendTransaction={noop}
-        clearToAddr={noop}
-        toggleMenuDrawer={noop}
-        setShieldingAmount={noop}
-        setScrollToTop={noop}
-        setScrollToBottom={noop}
-        setServerOption={noop}
       />
     </ContextAppLoadedProvider>,
   );

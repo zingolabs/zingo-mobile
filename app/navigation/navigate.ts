@@ -1,7 +1,9 @@
 import {
   CommonActions,
   createNavigationContainerRef,
+  NavigationProp,
   NavigatorScreenParams,
+  ParamListBase,
   StackActions,
 } from '@react-navigation/native';
 import { RouteEnum } from '@app/AppState';
@@ -59,6 +61,13 @@ export const goBack = (): void => {
   if (navigationRef.isReady() && navigationRef.canGoBack()) {
     navigationRef.goBack();
   }
+};
+
+// Ends a one-way flow in the wallet: the stack holds only the home again.
+export const leaveFlow = (
+  navigation: Pick<NavigationProp<ParamListBase>, 'reset'>,
+): void => {
+  navigation.reset({ index: 0, routes: [{ name: RouteEnum.Home }] });
 };
 
 export const currentRoute = (): string | undefined =>

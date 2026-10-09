@@ -60,17 +60,15 @@ import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
 type AddressBookProps = NativeStackScreenProps<
   AppDrawerParamList,
   RouteEnum.AddressBook
-> & {
-  setAddressBook: (ab: AddressBookFileClass[]) => void;
-};
+>;
 
 const AddressBook: React.FunctionComponent<AddressBookProps> = ({
   navigation,
   route,
-  setAddressBook,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, addressBook, walletChainName, server } = context;
+  const { setAddressBook, translate, addressBook, walletChainName, server } =
+    context;
   const { colors } = useTheme();
   const screenName = ScreenEnum.AddressBook;
   // The wallet's own Zcash network (reliable even offline); the chain subfilter

@@ -47,12 +47,12 @@ const mount = (setServerOption: jest.Mock) => {
         selectServer: SelectServerEnum.list,
         walletChainName: ChainNameEnum.mainChainName,
         netInfo: { ...defaultAppContextLoaded.netInfo, isConnected: true },
+        setServerOption,
       }}
     >
       <WalletServer
         navigation={navigation as never}
         route={{ key: 'server', name: RouteEnum.Server } as never}
-        setServerOption={setServerOption}
       />
     </ContextAppLoadedProvider>,
   );

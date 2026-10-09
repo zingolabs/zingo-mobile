@@ -49,7 +49,6 @@ describe('Component History - test', () => {
   };
   state.totalBalance = mockTotalBalance;
   // The price ring renders only for a Nym-consenting session.
-  const onFunction = jest.fn();
 
   test('History privacy normal - snapshot', () => {
     // privacy normal
@@ -57,14 +56,7 @@ describe('Component History - test', () => {
     const props = makeDrawerProps();
     const history = render(
       <ContextAppLoadedProvider value={state}>
-        <History
-          {...props}
-          toggleMenuDrawer={onFunction}
-          setShieldingAmount={onFunction}
-          setScrollToTop={onFunction}
-          scrollToTop={false}
-          setScrollToBottom={onFunction}
-        />
+        <History {...props} />
       </ContextAppLoadedProvider>,
     );
     expect(history.toJSON()).toMatchSnapshot();
@@ -76,14 +68,7 @@ describe('Component History - test', () => {
     const props = makeDrawerProps();
     const history = render(
       <ContextAppLoadedProvider value={state}>
-        <History
-          {...props}
-          toggleMenuDrawer={onFunction}
-          setShieldingAmount={onFunction}
-          setScrollToTop={onFunction}
-          scrollToTop={false}
-          setScrollToBottom={onFunction}
-        />
+        <History {...props} />
       </ContextAppLoadedProvider>,
     );
     expect(history.toJSON()).toMatchSnapshot();

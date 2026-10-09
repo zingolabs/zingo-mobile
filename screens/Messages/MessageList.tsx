@@ -47,22 +47,14 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 type MessageListProps = NativeStackScreenProps<
   AppDrawerParamList,
   RouteEnum.Messages
-> & {
-  toggleMenuDrawer: () => void;
-  setScrollToBottom: (value: boolean) => void;
-  scrollToBottom: boolean;
-  closeScreen?: () => void;
-};
+>;
 
-const MessageList: React.FunctionComponent<MessageListProps> = ({
-  toggleMenuDrawer,
-  setScrollToBottom,
-  scrollToBottom,
-  closeScreen,
-}) => {
+const MessageList: React.FunctionComponent<MessageListProps> = () => {
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const context = useContext(ContextAppLoaded);
   const {
+    setScrollToBottom,
+    scrollToBottom,
     translate,
     messages,
     language,
@@ -105,21 +97,17 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
           justifyContent: 'space-between',
         }}
       >
-        {closeScreen ? (
-          <TouchableOpacity
-            onPress={closeScreen}
-            hitSlop={8}
-            style={{ paddingHorizontal: 4, paddingVertical: 4 }}
-          >
-            <FontAwesomeIcon
-              icon={faChevronLeft}
-              size={20}
-              color={colors.fgAccent}
-            />
-          </TouchableOpacity>
-        ) : (
-          <View style={{ width: 28 }} />
-        )}
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          hitSlop={8}
+          style={{ paddingHorizontal: 4, paddingVertical: 4 }}
+        >
+          <FontAwesomeIcon
+            icon={faChevronLeft}
+            size={20}
+            color={colors.fgAccent}
+          />
+        </TouchableOpacity>
         <BoldText
           numberOfLines={1}
           style={{
@@ -258,7 +246,6 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
         <Header
           title={''}
           screenName={screenName}
-          toggleMenuDrawer={toggleMenuDrawer}
           noBalance={true}
           setPrivacyOption={setPrivacyOption}
           addLastSnackbar={addLastSnackbar /* context */}

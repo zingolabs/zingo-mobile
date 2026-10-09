@@ -73,7 +73,7 @@ export type SeedBackupEntry =
 
 // The wallet section's stack: the home tabs and every screen pushed over them.
 export type AppDrawerParamList = {
-  [RouteEnum.HomeStack]: NavigatorScreenParams<HomeTabParamList> | undefined;
+  [RouteEnum.Home]: NavigatorScreenParams<HomeTabParamList> | undefined;
   [RouteEnum.History]: undefined;
   [RouteEnum.Send]: undefined;
   [RouteEnum.Receive]: undefined;

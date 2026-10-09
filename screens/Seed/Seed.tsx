@@ -68,20 +68,16 @@ type TextsType = {
   backup: string[];
 };
 
-type SeedProps = NativeStackScreenProps<AppDrawerParamList, RouteEnum.Seed> & {
-  onClickOK: (seedPhrase: string, birthdayNumber: number) => void;
-  onClickCancel: () => void;
-  setIsSeedViewModalOpen?: (v: boolean) => void;
-};
-const Seed: React.FunctionComponent<SeedProps> = ({
-  route,
-  onClickOK,
-  onClickCancel,
-  setIsSeedViewModalOpen,
-}) => {
+type SeedProps = NativeStackScreenProps<AppDrawerParamList, RouteEnum.Seed>;
+const Seed: React.FunctionComponent<SeedProps> = ({ route }) => {
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const context = useContext(ContextAppLoaded);
   const {
+    setIsSeedViewModalOpen,
+    changeWallet,
+    restoreBackup,
+    applyPendingServer,
+    cancelPendingServer,
     birthday: birthdayFromContext,
     translate,
     server,
@@ -298,7 +294,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
         {
           text: translate('confirm') as string,
           onPress: () => {
-            onClickOKHide(seedPhrase, Number(birthdayNumber));
+            onClickOKHide();
           },
         },
         {
@@ -310,23 +306,27 @@ const Seed: React.FunctionComponent<SeedProps> = ({
     });
   };
 
+  // What confirming or cancelling does depends on why the seed is shown.
   const onClickCancelHide = () => {
-    onClickCancel();
+    if (action === SeedActionEnum.server) {
+      cancelPendingServer();
+    }
     hiding();
   };
 
-  const onClickOKHide = (
-    seedPhraseParm: string,
-    birthdayNumberParm: number,
-  ) => {
-    onClickOK(seedPhraseParm, birthdayNumberParm);
+  const onClickOKHide = () => {
+    if (action === SeedActionEnum.change) {
+      changeWallet();
+    } else if (action === SeedActionEnum.backup) {
+      restoreBackup();
+    } else if (action === SeedActionEnum.server) {
+      applyPendingServer();
+    }
     hiding();
   };
 
   const hiding = async () => {
-    // when this screen is open from LoadingApp (new wallet)
-    // is using the standard modal from react-native
-    setIsSeedViewModalOpen && setIsSeedViewModalOpen(false);
+    setIsSeedViewModalOpen(false);
     if (navigation.canGoBack()) {
       navigation.goBack();
     }
@@ -407,7 +407,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
                 return;
               }
               if (times === 0) {
-                onClickOKHide(seedPhrase, Number(birthdayNumber));
+                onClickOKHide();
               } else if (times === 1) {
                 onPressOK();
               }

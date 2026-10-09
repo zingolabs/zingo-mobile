@@ -1,4 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
+import { leaveFlow } from '@app/navigation/navigate';
 import React, { useCallback, useContext, useRef, useState } from 'react';
 import { ActivityIndicator, ScrollView, Text, View } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
@@ -109,7 +110,7 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
   );
 
   const goHome = useCallback(() => {
-    navigation.reset({ index: 0, routes: [{ name: RouteEnum.HomeStack }] });
+    leaveFlow(navigation);
   }, [navigation]);
 
   // Clearing the migration frees the wallet to plan again from the notes it

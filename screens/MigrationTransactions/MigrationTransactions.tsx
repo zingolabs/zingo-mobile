@@ -1,4 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
+import { leaveFlow } from '@app/navigation/navigate';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { ActivityIndicator, ScrollView, Text, View } from 'react-native';
 import { useTheme } from '@app/theme';
@@ -112,7 +113,7 @@ const MigrationTransactions: React.FunctionComponent<
   );
 
   const goHome = useCallback(() => {
-    navigation.reset({ index: 0, routes: [{ name: RouteEnum.HomeStack }] });
+    leaveFlow(navigation);
   }, [navigation]);
 
   const fetchPlan = useCallback(async () => {

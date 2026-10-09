@@ -41,12 +41,11 @@ describe('Component Rescan - test', () => {
   state.info = mockInfo;
   state.totalBalance = mockTotalBalance;
   state.birthday = mockWallet.birthday || 0;
-  const onRescan = jest.fn();
   const props = makeDrawerProps();
   test('Rescan - snapshot', () => {
     const rescan = render(
       <ContextAppLoadedProvider value={state}>
-        <Rescan {...props} doRescan={onRescan} />
+        <Rescan {...props} />
       </ContextAppLoadedProvider>,
     );
     expect(rescan.toJSON()).toMatchSnapshot();

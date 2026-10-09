@@ -48,7 +48,6 @@ import {
   sendGateOpen,
   shownStatusKey,
 } from '@app/walletBackend/transforms/mixnetView';
-import { SendOutcome } from '@app/walletBackend/transforms/sendPermit';
 import ErrorText from '@ui/primitives/ErrorText';
 import RegText from '@ui/primitives/RegText';
 import ZecAmount from '@ui/widgets/ZecAmount';
@@ -62,8 +61,6 @@ import {
   SendPageStateClass,
   ToAddrClass,
   GlobalConst,
-  ServerType,
-  SetServerResult,
   SelectServerEnum,
   RouteEnum,
   ScreenEnum,
@@ -110,40 +107,18 @@ import { retryServer } from '@app/services/retryServer';
 import { RPCSpendablebalanceType } from '@app/walletBackend/types/RPCSpendablebalanceType';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-type SendProps = NativeStackScreenProps<AppDrawerParamList, RouteEnum.Send> & {
-  // side menu
-  toggleMenuDrawer: () => void;
-  // privacy
-  // shielding
-  setShieldingAmount: (value: number) => void;
-  setScrollToTop: (value: boolean) => void;
-  setScrollToBottom: (value: boolean) => void;
-  // for send
-  sendTransaction: (
-    s: SendPageStateClass,
-    sendAll?: boolean,
-  ) => Promise<SendOutcome<string>>;
-  setServerOption: (
-    value: ServerType,
-    selectServer: SelectServerEnum,
-    toast: boolean,
-    sameServerChainName: boolean,
-  ) => Promise<SetServerResult>;
-  clearToAddr: () => void;
-};
+type SendProps = NativeStackScreenProps<AppDrawerParamList, RouteEnum.Send>;
 
-const Send: React.FunctionComponent<SendProps> = ({
-  sendTransaction,
-  clearToAddr,
-  toggleMenuDrawer,
-  setShieldingAmount,
-  setScrollToTop,
-  setScrollToBottom,
-  setServerOption,
-}) => {
+const Send: React.FunctionComponent<SendProps> = () => {
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const context = useContext(ContextAppLoaded);
   const {
+    sendTransaction,
+    clearToAddr,
+    setScrollToTop,
+    setScrollToBottom,
+    setServerOption,
+    setShieldingAmount,
     translate,
     info,
     totalBalance,
@@ -1084,12 +1059,9 @@ const Send: React.FunctionComponent<SendProps> = ({
           <Header
             title={''}
             screenName={screenName}
-            toggleMenuDrawer={toggleMenuDrawer}
             setPrivacyOption={setPrivacyOption}
             addLastSnackbar={addLastSnackbar /* context */}
             setShieldingAmount={setShieldingAmount}
-            setScrollToTop={setScrollToTop}
-            setScrollToBottom={setScrollToBottom}
             setBackgroundError={setBackgroundError /* context */}
             showMessagesIcon={true}
             onUsdRowLayout={setUsdRowH}
