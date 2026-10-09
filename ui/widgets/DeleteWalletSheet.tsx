@@ -161,7 +161,11 @@ const DeleteWalletSheet = forwardRef<BottomSheetModal, DeleteWalletSheetProps>(
         enablePanDownToClose
         backdropComponent={renderBackdrop}
         handleComponent={SheetHandle}
-        backgroundStyle={{ backgroundColor: colors.bgSurface }}
+        backgroundStyle={{
+          backgroundColor: colors.bgSurface,
+          borderTopLeftRadius: radiusSheet,
+          borderTopRightRadius: radiusSheet,
+        }}
         onDismiss={reset}
       >
         <BottomSheetView

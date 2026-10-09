@@ -67,7 +67,11 @@ const SeedSheet = forwardRef<BottomSheetModal, SeedSheetProps>(
         enablePanDownToClose
         backdropComponent={renderBackdrop}
         handleComponent={SeedHandle}
-        backgroundStyle={{ backgroundColor: colors.bgSurface }}
+        backgroundStyle={{
+          backgroundColor: colors.bgSurface,
+          borderTopLeftRadius: radiusSheet,
+          borderTopRightRadius: radiusSheet,
+        }}
       >
         <BottomSheetView
           style={{
