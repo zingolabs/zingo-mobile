@@ -175,7 +175,7 @@ const WalletServer: React.FC<WalletServerProps> = ({ navigation }) => {
     if (navigation.canGoBack()) {
       navigation.goBack();
     } else {
-      navigation.navigate(RouteEnum.HomeStack);
+      navigation.navigate(RouteEnum.Home);
     }
   };
 

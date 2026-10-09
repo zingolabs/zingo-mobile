@@ -1,4 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
+import { leaveFlow } from '@app/navigation/navigate';
 import React, {
   useCallback,
   useContext,
@@ -317,7 +318,7 @@ const MigrationSplitting: React.FunctionComponent<MigrationSplittingProps> = ({
   }, [navigation, plan]);
 
   const goHome = useCallback(() => {
-    navigation.reset({ index: 0, routes: [{ name: RouteEnum.HomeStack }] });
+    leaveFlow(navigation);
   }, [navigation]);
 
   const statusMeta: Record<TxStatus, { key: string; color: string }> = {

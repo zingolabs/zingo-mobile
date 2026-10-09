@@ -886,7 +886,7 @@ export class LoadedAppClass extends Component<
     this.props.clearLink();
     await this.readUrl(url);
     navigateWallet({
-      screen: RouteEnum.HomeStack,
+      screen: RouteEnum.Home,
       params: { screen: RouteEnum.Send },
     });
   };

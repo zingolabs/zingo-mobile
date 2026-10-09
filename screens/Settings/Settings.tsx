@@ -330,7 +330,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
     if (navigation.canGoBack()) {
       navigation.goBack();
     } else {
-      navigation.navigate(RouteEnum.HomeStack);
+      navigation.navigate(RouteEnum.Home);
     }
   };
   saveSettingsRef.current = saveSettings;
@@ -344,14 +344,14 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
       setPerformanceLevel(performanceLevelContext);
       setBlockExplorer(blockExplorerContext);
     }
-    // `goBack()` pops Settings off the stack — using `navigate(HomeStack)`
-    // would push HomeStack on top while leaving the already-authenticated
+    // `goBack()` pops Settings off the stack — using `navigate(Home)`
+    // would push Home on top while leaving the already-authenticated
     // Settings instance alive in the stack, allowing a back gesture to
     // bypass the biometric gate.
     if (navigation.canGoBack()) {
       navigation.goBack();
     } else {
-      navigation.navigate(RouteEnum.HomeStack);
+      navigation.navigate(RouteEnum.Home);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

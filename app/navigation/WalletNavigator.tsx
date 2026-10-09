@@ -87,7 +87,7 @@ function HomeTabs() {
 export function WalletNavigator() {
   return (
     <Stack.Navigator
-      initialRouteName={RouteEnum.HomeStack}
+      initialRouteName={RouteEnum.Home}
       screenOptions={{
         headerShown: false,
         // Each screen extends edge-to-edge (BottomSheets handle their own
@@ -95,7 +95,7 @@ export function WalletNavigator() {
         contentStyle: { backgroundColor: 'transparent' },
       }}
     >
-      <Stack.Screen name={RouteEnum.HomeStack} component={HomeTabs} />
+      <Stack.Screen name={RouteEnum.Home} component={HomeTabs} />
       <Stack.Group>
         <Stack.Screen name={RouteEnum.Settings} component={Settings} />
         <Stack.Screen name={RouteEnum.Server} component={WalletServer} />

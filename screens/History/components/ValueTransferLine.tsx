@@ -180,7 +180,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                     );
                     sendPageState.toaddr.to = vt.address ? vt.address : '';
                     setSendPageState(sendPageState);
-                    navigation.navigate(RouteEnum.HomeStack, {
+                    navigation.navigate(RouteEnum.Home, {
                       screen: RouteEnum.Send,
                     });
                     closeAllSwipeables();

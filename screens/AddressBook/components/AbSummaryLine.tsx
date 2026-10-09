@@ -249,7 +249,7 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
                   );
                   sendPageState.toaddr.to = item.address;
                   setSendPageState(sendPageState);
-                  navigation.navigate(RouteEnum.HomeStack, {
+                  navigation.navigate(RouteEnum.Home, {
                     screen: RouteEnum.Send,
                   });
                 }}
