@@ -42,7 +42,6 @@ ESLint enforces the zone.
 
 - In comments, never narrate.
 - In comments, never include justifications or logical connectors.
-- In functions, explain what the function does in one sentence, if possible.
 - No tutorial narration ("Now we...", "Step 1:") and no banner comments
   (`// ===== HELPERS =====`).
 - If a workaround needs a paragraph of justification, the code is wrong. Fix
@@ -116,9 +115,16 @@ without losing meaning, the "so" was decorative. Delete it.
 
 ### Documentation in code
 
-Every item doc-comment (Rust `///`, KDoc, Swift doc-comment) is one sentence
-and references no ADR, issue, or other document. Module headers (Rust `//!`,
-file- or class-level blocks) are NOT exempt.
+A doc-comment holds only a succinct bulleted list of the item's side effects.
+The rule covers every doc-comment form: Rust `///` and `//!`, KDoc, Swift
+doc-comments, and file- or class-level blocks.
+
+- Each bullet names one side effect: a write to disk, a network call, a lock
+  taken, a mutation of shared state, a spawned task, a panic.
+- A doc-comment holds no summary sentence, no parameter or return
+  description, and no restatement of the signature.
+- A doc-comment references no ADR, issue, or other document.
+- An item with no side effect carries no doc-comment.
 
 ### Rust
 
