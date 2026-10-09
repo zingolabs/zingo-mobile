@@ -659,7 +659,11 @@
     "import": "Cüzdan içe aktar",
     "create": "Yeni cüzdan oluştur",
     "still-open": "Cüzdan hâlâ açılamıyor",
-    "still-server": "Sunucuya hâlâ ulaşılamıyor"
+    "still-server": "Sunucuya hâlâ ulaşılamıyor",
+    "chain-title": "Bu bir {net} cüzdanı",
+    "chain-sub": "Zingo bir {server} sunucusuna ayarlı ve bu sunucu cüzdanı açamaz. Açmak için bir {net} sunucusu seçin.",
+    "chain-action": "Bir {net} sunucusu seç",
+    "followed": "Bu bir {net} cüzdanı, bu yüzden Otomatik bir {net} sunucusuna bağlandı."
   },
   "deletesheet": {
     "title": "Bu cihazdaki cüzdan silinsin mi?",

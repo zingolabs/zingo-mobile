@@ -25,10 +25,13 @@ import RegText from '@ui/primitives/RegText';
 import BoldText from '@ui/primitives/BoldText';
 import { LoadingDots } from '@ui/widgets/ProgressState';
 import { WalletErrorKind } from '@app/AppState/types/WalletErrorInfo';
+import { ChainNameEnum } from '@app/AppState';
 
 type WalletErrorProps = {
   kind: WalletErrorKind;
   details: string;
+  // The wallet's network, for the 'chain' kind.
+  walletChain?: ChainNameEnum;
   busy: boolean;
   // Changes on every failed retry; the icon shakes once per change.
   shake: number;
@@ -67,6 +70,7 @@ const labelExit = () =>
 const WalletError: React.FunctionComponent<WalletErrorProps> = ({
   kind,
   details,
+  walletChain,
   busy,
   shake,
   onRetry,
@@ -119,13 +123,40 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
         : colors.fgAccent;
   const host =
     server.kind === 'remote' ? server.uri.replace(/^https?:\/\//, '') : '';
-  const title = translate(
-    kind === 'server' ? 'walleterror.server-title' : 'walleterror.open-title',
-  ) as string;
-  const sub =
-    kind === 'server'
+  const netName = (chain: ChainNameEnum) =>
+    translate(
+      chain === ChainNameEnum.testChainName
+        ? 'settings.value-chainname-test'
+        : chain === ChainNameEnum.regtestChainName
+          ? 'settings.value-chainname-regtest'
+          : 'settings.value-chainname-main',
+    ) as string;
+  // On the chain kind the retry cannot succeed, so the primary action is a
+  // server on the wallet's network.
+  const chain = kind === 'chain' && walletChain ? walletChain : null;
+  const title = chain
+    ? (translate('walleterror.chain-title') as string).replace(
+        '{net}',
+        netName(chain),
+      )
+    : (translate(
+        kind === 'server'
+          ? 'walleterror.server-title'
+          : 'walleterror.open-title',
+      ) as string);
+  const sub = chain
+    ? (translate('walleterror.chain-sub') as string)
+        .replace('{server}', netName(server.chainName))
+        .replace('{net}', netName(chain))
+    : kind === 'server'
       ? (translate('walleterror.server-sub') as string).replace('{host}', host)
       : (translate('walleterror.open-sub') as string);
+  const primaryLabel = chain
+    ? (translate('walleterror.chain-action') as string).replace(
+        '{net}',
+        netName(chain),
+      )
+    : (translate('walleterror.open') as string);
 
   const link = (
     label: string,
@@ -322,8 +353,8 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
         'walleterror.import',
       )}
       <Pressable
-        testID="walleterror.open"
-        onPress={onRetry}
+        testID={chain ? 'walleterror.chain' : 'walleterror.open'}
+        onPress={chain ? onServer : onRetry}
         disabled={busy}
         accessibilityRole="button"
         style={({ pressed }) => ({
@@ -359,7 +390,7 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
             exiting={labelExit()}
           >
             <RegText style={{ fontSize: 16, color: colors.bgCanvas }}>
-              {translate('walleterror.open') as string}
+              {primaryLabel}
             </RegText>
           </Animated.View>
         )}

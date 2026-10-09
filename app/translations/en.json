@@ -661,7 +661,11 @@
     "import": "Import wallet",
     "create": "Create new wallet",
     "still-open": "Still couldn't open the wallet",
-    "still-server": "Still can't reach the server"
+    "still-server": "Still can't reach the server",
+    "chain-title": "This is a {net} wallet",
+    "chain-sub": "Zingo is set to a {server} server, which cannot open it. Choose a {net} server to open it.",
+    "chain-action": "Choose a {net} server",
+    "followed": "This is a {net} wallet, so Automatic connected to a {net} server."
   },
   "deletesheet": {
     "title": "Delete the wallet on this device?",

@@ -39,6 +39,8 @@ import { hostOf, useCustomServer } from './useCustomServer';
 
 export type ServerProps = {
   translate: (key: string) => TranslateType;
+  // The network the screen opens on; the server's own by default.
+  initialChain?: ChainNameEnum;
   server: ServerType;
   selectServer: SelectServerEnum;
   status: ServerStatus;
@@ -186,6 +188,7 @@ const Toggle: React.FC<ToggleProps> = ({ on, disabled, onToggle }) => {
 
 const Server: React.FunctionComponent<ServerProps> = ({
   translate,
+  initialChain,
   server,
   selectServer,
   status,
@@ -209,7 +212,8 @@ const Server: React.FunctionComponent<ServerProps> = ({
     fill(translate(`server.${key}`) as string, values);
   const offline = server.kind === 'offline';
   const [tab, setTab] = useState<ChainNameEnum>(
-    CHAINS.includes(server.chainName) ? server.chainName : CHAINS[0],
+    initialChain ??
+      (CHAINS.includes(server.chainName) ? server.chainName : CHAINS[0]),
   );
   // The network whose Custom row is open without being the saved choice.
   const [customOpen, setCustomOpen] = useState<ChainNameEnum | null>(null);

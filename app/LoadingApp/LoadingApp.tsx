@@ -26,6 +26,7 @@ import {
   getWalletKind,
   hasRepairableWalletFile,
   loadExistingWallet,
+  readWalletChain,
   repairDoubleWrappedWallet,
   repairSucceeded,
   resolvedTrue,
@@ -428,6 +429,7 @@ export class LoadingAppClass extends Component<
       serverLatencies: {},
       serverLists: {},
       serverListChain: ChainNameEnum.mainChainName,
+      serverTab: null,
       serverReturn: RouteEnum.StartMenu,
     };
   }
@@ -500,6 +502,25 @@ export class LoadingAppClass extends Component<
       recoveryWallet:
         recovery && (recovery.seed || recovery.ufvk) ? recovery : null,
     });
+
+    // Automatic follows a wallet that is on another network, so the boot
+    // selection below picks a server of the wallet's network. A server the
+    // user chose is kept; opening the wallet then offers one instead.
+    if (exists && this.state.selectServer === SelectServerEnum.auto) {
+      const walletChain = await this.walletChainMismatch();
+      if (walletChain) {
+        await this.applyServer(
+          this.defaultServerForChain(walletChain),
+          SelectServerEnum.auto,
+        );
+        this.addLastSnackbar(
+          (this.state.translate('walleterror.followed') as string).replace(
+            '{net}',
+            this.netName(walletChain),
+          ),
+        );
+      }
+    }
 
     // Boot-time server selection. `auto` refetches the live list and activates
     // the best server on every launch; `list` validates that the user's server
@@ -755,8 +776,47 @@ export class LoadingAppClass extends Component<
     return someServerIsWorking;
   };
 
+  netName = (chain: ChainNameEnum): string =>
+    this.state.translate(
+      chain === ChainNameEnum.testChainName
+        ? 'settings.value-chainname-test'
+        : chain === ChainNameEnum.regtestChainName
+          ? 'settings.value-chainname-regtest'
+          : 'settings.value-chainname-main',
+    ) as string;
+
+  // The wallet file's network when it differs from the server's; null when
+  // they match, when offline (which opens any chain) or when unreadable.
+  walletChainMismatch = async (): Promise<ChainNameEnum | null> => {
+    const { server } = this.state;
+    if (server.kind !== 'remote') {
+      return null;
+    }
+    const chain = await readWalletChain();
+    return chain.ok && chain.value !== server.chainName ? chain.value : null;
+  };
+
+  // A wallet on another network than its server cannot open there, so the
+  // error screen offers a server on the wallet's network instead of a retry.
+  showChainError = (walletChain: ChainNameEnum, details: string) => {
+    this.setState({
+      walletError: { kind: 'chain', details, walletChain },
+      retrying: false,
+      actionButtonsDisabled: false,
+      screen: RouteEnum.WalletError,
+    });
+  };
+
   // Loads the wallet file found on disk. Also the retry after a file repair.
   loadExistingWalletOnBoot = async () => {
+    const walletChain = await this.walletChainMismatch();
+    if (walletChain) {
+      this.showChainError(
+        walletChain,
+        `wallet: ${walletChain}\nserver: ${this.state.server.chainName}`,
+      );
+      return;
+    }
     const result = await loadExistingWallet(
       nativeUri(this.state.server),
       this.state.server.chainName,
@@ -852,6 +912,19 @@ export class LoadingAppClass extends Component<
         errorText = e instanceof Error ? e.message : String(e);
       }
     } else {
+      if (!result.ok && result.error.code === 'WalletChainMismatch') {
+        const chain = await readWalletChain();
+        if (chain.ok) {
+          this.showChainError(
+            chain.value,
+            Utils.humanizeChainTokens(
+              result.error.message,
+              this.state.translate,
+            ),
+          );
+          return;
+        }
+      }
       error = true;
       errorText = result.ok ? result.value : result.error.message;
     }
@@ -1372,15 +1445,31 @@ export class LoadingAppClass extends Component<
     this.setState({ backgroundError: { title, error } });
   };
 
-  openServer = () => {
+  openServer = (tab?: ChainNameEnum) => {
     this.setState(
-      state => ({ serverReturn: state.screen, screen: RouteEnum.Server }),
+      state => ({
+        serverReturn: state.screen,
+        serverTab: tab ?? null,
+        screen: RouteEnum.Server,
+      }),
       () => this.probeCurrentServer(),
     );
   };
 
+  // Back on a chain error, the wallet opens by itself once the server is on
+  // its network, or offline.
   closeServer = () => {
-    this.setState(state => ({ screen: state.serverReturn }));
+    const { serverReturn, walletError, server } = this.state;
+    const fixed =
+      serverReturn === RouteEnum.WalletError &&
+      walletError?.kind === 'chain' &&
+      (server.kind === 'offline' ||
+        server.chainName === walletError.walletChain);
+    this.setState({ screen: serverReturn, serverTab: null }, () => {
+      if (fixed) {
+        this.retryOpenWallet();
+      }
+    });
   };
 
   probeCurrentServer = async () => {
@@ -1672,7 +1761,7 @@ export class LoadingAppClass extends Component<
                       }
                       importRecoveryWallet={this.importRecoveryWallet}
                       viewRecoveryWallet={this.viewRecoveryWallet}
-                      customServer={this.openServer}
+                      customServer={() => this.openServer()}
                       walletExists={walletExists}
                       openCurrentWallet={this.openCurrentWallet}
                       createNewWallet={this.createNewWalletChecked}
@@ -1699,6 +1788,7 @@ export class LoadingAppClass extends Component<
                       <WalletError
                         kind={this.state.walletError.kind}
                         details={this.state.walletError.details}
+                        walletChain={this.state.walletError.walletChain}
                         busy={this.state.retrying}
                         shake={this.state.errorShake}
                         onRetry={this.retryOpenWallet}
@@ -1708,12 +1798,15 @@ export class LoadingAppClass extends Component<
                         onCreate={() =>
                           this.confirmDelete('create', this.createNewWallet)
                         }
-                        onServer={this.openServer}
+                        onServer={() =>
+                          this.openServer(this.state.walletError?.walletChain)
+                        }
                       />
                     )}
                   {screen === RouteEnum.Server && (
                     <Server
                       translate={translate}
+                      initialChain={this.state.serverTab ?? undefined}
                       server={this.state.server}
                       selectServer={this.state.selectServer}
                       status={this.state.serverStatus}
