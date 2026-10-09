@@ -647,7 +647,11 @@
     "import": "Importar carteira",
     "create": "Criar nova carteira",
     "still-open": "Ainda não foi possível abrir a carteira",
-    "still-server": "Ainda não foi possível alcançar o servidor"
+    "still-server": "Ainda não foi possível alcançar o servidor",
+    "chain-title": "Esta é uma carteira de {net}",
+    "chain-sub": "O Zingo está configurado com um servidor de {server}, que não pode abri-la. Escolha um servidor de {net} para abri-la.",
+    "chain-action": "Escolher um servidor de {net}",
+    "followed": "Esta é uma carteira de {net}, então o Automático se conectou a um servidor de {net}."
   },
   "deletesheet": {
     "title": "Excluir a carteira deste dispositivo?",

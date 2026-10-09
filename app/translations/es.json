@@ -647,7 +647,11 @@
     "import": "Importar monedero",
     "create": "Crear monedero nuevo",
     "still-open": "Sigue sin poder abrirse el monedero",
-    "still-server": "Sigue sin poder conectar con el servidor"
+    "still-server": "Sigue sin poder conectar con el servidor",
+    "chain-title": "Este es un monedero de {net}",
+    "chain-sub": "Zingo está configurado con un servidor de {server}, que no puede abrirlo. Elige un servidor de {net} para abrirlo.",
+    "chain-action": "Elegir un servidor de {net}",
+    "followed": "Este es un monedero de {net}, así que Automático se conectó a un servidor de {net}."
   },
   "deletesheet": {
     "title": "¿Borrar el monedero de este dispositivo?",

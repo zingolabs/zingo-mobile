@@ -6,6 +6,7 @@ import {
   defaultAppContextLoading,
 } from '@app/context';
 import WalletError from '@screens/WalletError';
+import { ChainNameEnum } from '@app/AppState';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 
 const handlers = () => ({
@@ -62,4 +63,30 @@ test('Tests that the button shows dots and ignores presses while a retry is runn
   fireEvent.press(screen.getByTestId('walleterror.import'));
   expect(h.onRetry).not.toHaveBeenCalled();
   expect(h.onImport).not.toHaveBeenCalled();
+});
+
+test('Tests that a wallet on another network offers a server on its network instead of a retry', () => {
+  const en = require('../app/translations/en.json');
+  const translate = (key: string) =>
+    key.split('.').reduce((o: any, k) => o?.[k], en) ?? key;
+  const h = handlers();
+  render(
+    <ContextAppLoadingProvider
+      value={{ ...defaultAppContextLoading, translate }}
+    >
+      <WalletError
+        kind="chain"
+        walletChain={ChainNameEnum.mainChainName}
+        details="wallet: main"
+        busy={false}
+        shake={0}
+        {...h}
+      />
+    </ContextAppLoadingProvider>,
+  );
+  expect(screen.getByText('This is a Mainnet wallet')).toBeOnTheScreen();
+  expect(screen.queryByTestId('walleterror.open')).toBeNull();
+  fireEvent.press(screen.getByTestId('walleterror.chain'));
+  expect(h.onServer).toHaveBeenCalledTimes(1);
+  expect(h.onRetry).not.toHaveBeenCalled();
 });
