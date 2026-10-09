@@ -70,6 +70,7 @@ export {
   startIronwoodMigration,
   walletBackupExists,
   walletExists,
+  readWalletChain,
   windowTimeline,
 } from './utils/walletUtils';
 export type {

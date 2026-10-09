@@ -690,6 +690,16 @@ class RPCModule: NSObject {
     }
   }
 
+  // The chain the wallet file was written for: main, test or regtest.
+  @objc(walletChainInfo:reject:)
+  func walletChainInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+    DispatchQueue.global(qos: .userInitiated).async {
+      FfiOutcome.of {
+        try readWalletChain(walletBytes: try self.readWalletBytes())
+      }.settle(resolve: resolve, reject: reject)
+    }
+  }
+
   // Salvages seed and birthday from the closed wallet file and keeps the
   // damaged file aside as ".broken".
   @objc(walletFileRecoveryInfo:reject:)

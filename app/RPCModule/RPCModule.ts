@@ -46,6 +46,7 @@ interface RPCModuleAPI {
   walletFileDiagnosisInfo(): Promise<string>;
   repairDoubleWrappedWalletProcess(): Promise<string>;
   walletFileRecoveryInfo(): Promise<string>;
+  walletChainInfo(): Promise<string>;
   deleteExistingWallet(): Promise<string>;
   deleteExistingWalletBackup(): Promise<string>;
   // The save results are trimodal across the bridges: Android resolves a

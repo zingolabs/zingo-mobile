@@ -496,6 +496,15 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         }
     }
 
+    // The chain the wallet file was written for: main, test or regtest.
+    @ReactMethod
+    fun walletChainInfo(promise: Promise) {
+        FfiOutcome.settling(promise, "read_wallet_chain") {
+            uniffi.zingo.initLogging()
+            uniffi.zingo.readWalletChain(walletBytes = readWalletBytes(WalletFileName.value))
+        }
+    }
+
     @ReactMethod
     fun repairDoubleWrappedWalletProcess(promise: Promise) {
         FfiOutcome.settling(promise, "repair_double_wrapped_wallet") {

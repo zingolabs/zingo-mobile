@@ -484,6 +484,23 @@ const KEY_CHAINS: readonly string[] = [
   ChainNameEnum.regtestChainName,
 ];
 
+// The chain the wallet file on this device was written for.
+export async function readWalletChain(): Promise<FfiResult<ChainNameEnum>> {
+  const result = await callFfi(RPCModule.walletChainInfo());
+  if (!result.ok) {
+    return result;
+  }
+  return KEY_CHAINS.includes(result.value)
+    ? { ok: true, value: result.value as ChainNameEnum }
+    : {
+        ok: false,
+        error: {
+          code: 'Unknown',
+          message: `unexpected wallet chain: ${result.value}`,
+        },
+      };
+}
+
 // Decodes a viewing key on the device, checksum included: a key with its
 // network, text that is not a key, or unknown when the native call failed.
 export async function checkUfvk(ufvk: string): Promise<UfvkCheck> {
