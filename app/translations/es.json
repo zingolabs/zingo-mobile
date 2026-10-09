@@ -432,9 +432,6 @@
     "restore": "Restaurar",
     "backup": "Copia de seguridad",
     "text-readonly": "Antes de cerrar esta ventana, escriba cuidadosamente esta frase semilla. Es la única manera que puedes restaurar/acceder tu monedero actual.",
-    "text-readonly-backup": "Antes de restaurar la copia de seguridad del monedero anterior, escriba cuidadosamente esta frase semilla. Es la única manera que puedes restaurar/acceder tu monedero actual.",
-    "text-readonly-change": "Antes de acceder a otro monedero, escriba cuidadosamente esta frase semilla. Es la única manera que puedes restaurar/acceder tu monedero actual.",
-    "text-readonly-server": "Antes de usar otro servidor, escriba cuidadosamente esta frase semilla. Es la única manera que puedes restaurar/acceder tu monedero actual.",
     "text-no-readonly": "Introduce tu Frase Semilla (son 24 palabras)",
     "tapcopy": "Pulsar para copiar",
     "tapcopy-seed-message": "Frase Semilla copiada al Portapapeles (se borrará en 60s)",
@@ -455,11 +452,7 @@
     "tapreveal": "Pulsar para revelar",
     "showtransactions": "Ver Transacciones",
     "youreceived": "Recibiste",
-    "tapcopy-ufvk-message": "Clave de visualización copiada al portapapeles (se borrará en 60s)",
-    "recovering-from-keychain": "Recuperando la semilla del almacenamiento seguro...",
-    "recovering-from-wallet": "Cargando la semilla del monedero...",
-    "from-keychain": "del almacenamiento seguro",
-    "from-wallet": "del monedero"
+    "tapcopy-ufvk-message": "Clave de visualización copiada al portapapeles (se borrará en 60s)"
   },
   "send": {
     "Broadcast": "Transmitida y esperando confirmación Tx:",

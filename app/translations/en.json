@@ -432,9 +432,6 @@
     "restore": "Restore",
     "backup": "Backup",
     "text-readonly": "Before closing this screen, carefully write down this seed phrase. It is the only way you can restore/access your current wallet.",
-    "text-readonly-backup": "Before restoring the backup of the previous wallet, carefully write down this seed phrase. It is the only way you can restore/access your current wallet.",
-    "text-readonly-change": "Before accessing another wallet, carefully write down this seed phrase. It is the only way you can restore/access your current wallet.",
-    "text-readonly-server": "Before changing another server, carefully write down this seed phrase. It is the only way you can restore/access your current wallet.",
     "text-no-readonly": "Enter your seed phrase (24 words)",
     "tapcopy": "Tap to copy",
     "tapcopy-seed-message": "Seed copied to Clipboard (clears in 60s)",
@@ -455,11 +452,7 @@
     "tapreveal": "Tap to reveal",
     "showtransactions": "Show Transactions",
     "youreceived": "You received",
-    "tapcopy-ufvk-message": "Viewing Key copied to Clipboard (clears in 60s)",
-    "recovering-from-keychain": "Recovering seed from secure storage...",
-    "recovering-from-wallet": "Loading seed from wallet...",
-    "from-keychain": "from secure storage",
-    "from-wallet": "from wallet"
+    "tapcopy-ufvk-message": "Viewing Key copied to Clipboard (clears in 60s)"
   },
   "send": {
     "Broadcast": "Broadcasted and awaiting confirmation Tx:",

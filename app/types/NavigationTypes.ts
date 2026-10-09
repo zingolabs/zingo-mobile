@@ -4,7 +4,6 @@ import {
   ChainNameEnum,
   LaunchingModeEnum,
   RouteEnum,
-  SeedActionEnum,
   SendPageStateClass,
   UfvkActionEnum,
   ValueTransferType,
@@ -124,7 +123,6 @@ export type AppDrawerParamList = {
     ValueTransferDetailNavigationState | undefined;
   [RouteEnum.Confirm]: ConfirmNavigationState | undefined;
   [RouteEnum.Ufvk]: UfvkNavigationState | undefined;
-  [RouteEnum.Seed]: SeedNavigationState | undefined;
 };
 
 export type AddressBookNavigationState = {
@@ -174,8 +172,4 @@ export type ConfirmNavigationState = {
 
 export type UfvkNavigationState = {
   action: UfvkActionEnum;
-};
-
-export type SeedNavigationState = {
-  action: SeedActionEnum;
 };

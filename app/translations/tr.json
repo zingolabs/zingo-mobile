@@ -430,9 +430,6 @@
     "restore": "Geri yükle",
     "backup": "Yedekle",
     "text-readonly": "Bu ekranı kapatmadan önce bu yedekleme ifadesini dikkatlice not alın. Mecvut cüzdanınıza erişmenin/onu geri yüklemenin tek yolu budur.",
-    "text-readonly-backup": "Önceki cüzdanın yedeğini geri yüklemeden önce, bu kurtarma ifadesini dikkatlice not edin. Mevcut cüzdanınızı geri yüklemenin/erişmenin tek yolu budur.",
-    "text-readonly-change": "Başka bir cüzdana erişmeden önce, bu kurtarma ifadesini dikkatlice not alın. Mevcut cüzdanınızı geri yüklemenin / erişmenin tek yolu budur.",
-    "text-readonly-server": "Başka bir sunucuyu değiştirmeden önce, bu kurtarma ifadesini dikkatlice not alın. Mevcut cüzdanınıza erişmenin / onu geri yüklemenin tek yolu budur.",
     "text-no-readonly": "Seed ifadenizi girin (24 kelime)",
     "tapcopy": "Kopyalamak için tıkla",
     "tapcopy-seed-message": "Seed panoya kopyalandı (60 sn sonra temizlenecek)",
@@ -453,11 +450,7 @@
     "tapreveal": "Görüntülemek için dokunun",
     "showtransactions": "İşlemleri Göster",
     "youreceived": "Aldınız",
-    "tapcopy-ufvk-message": "Görüntüleme Anahtarı panoya kopyalandı (60 sn sonra temizlenecek)",
-    "recovering-from-keychain": "Güvenli depolamadan seed kurtarılıyor...",
-    "recovering-from-wallet": "Cüzdandan seed yükleniyor...",
-    "from-keychain": "güvenli depolamadan",
-    "from-wallet": "cüzdandan"
+    "tapcopy-ufvk-message": "Görüntüleme Anahtarı panoya kopyalandı (60 sn sonra temizlenecek)"
   },
   "send": {
     "Broadcast": "Yayınlandı ve onay bekliyor: İşlem (Tx)",

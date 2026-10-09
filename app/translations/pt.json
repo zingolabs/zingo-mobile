@@ -432,9 +432,6 @@
     "restore": "Restaurar",
     "backup": "Backup",
     "text-readonly": "Antes de fechar esta tela, anote cuidadosamente essas frases de recuperação. É a única maneira de restaurar/acessar sua carteira atual.",
-    "text-readonly-backup": "Antes de restaurar o backup da carteira anterior, anote cuidadosamente suas frases de recuperação. É a única maneira de restaurar/acessar sua carteira atual.",
-    "text-readonly-change": "Antes de acessar outra carteira, anote cuidadosamente essas Frases de recuperação. É a única maneira de restaurar/acessar sua carteira atual.",
-    "text-readonly-server": "Antes de mudar para outro servidor, anote cuidadosamente suas frases de recuperação. É a única maneira de restaurar/acessar sua carteira atual.",
     "text-no-readonly": "Insira suas Frases de Recuperação (24 Frases)",
     "tapcopy": "Clique para Copiar",
     "tapcopy-seed-message": "Frases de Recuperação copiada para a Área de Transferência (limpa em 60s)",
@@ -455,11 +452,7 @@
     "tapreveal": "Toque para revelar",
     "showtransactions": "Mostrar Transações",
     "youreceived": "Você recebeu",
-    "tapcopy-ufvk-message": "Chave de visualização copiada para a área de transferência (limpa em 60s)",
-    "recovering-from-keychain": "Recuperando a frase de recuperação do armazenamento seguro...",
-    "recovering-from-wallet": "Carregando a frase de recuperação da carteira...",
-    "from-keychain": "do armazenamento seguro",
-    "from-wallet": "da carteira"
+    "tapcopy-ufvk-message": "Chave de visualização copiada para a área de transferência (limpa em 60s)"
   },
   "send": {
     "Broadcast": "Transmitido e aguardando confirmação Tx:",

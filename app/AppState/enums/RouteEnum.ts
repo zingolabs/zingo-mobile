@@ -49,5 +49,4 @@ export enum RouteEnum {
   ValueTransferDetail = 'ValueTransferDetail',
   Confirm = 'Confirm',
   Ufvk = 'Ufvk',
-  Seed = 'Seed',
 }

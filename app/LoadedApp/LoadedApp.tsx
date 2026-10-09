@@ -53,7 +53,6 @@ import {
   LanguageEnum,
   SelectServerEnum,
   ChainNameEnum,
-  SeedActionEnum,
   UfvkActionEnum,
   SettingsNameEnum,
   RouteEnum,
@@ -149,7 +148,6 @@ import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTr
 
 const About = React.lazy(() => import('@screens/About'));
 const MixnetDoctor = React.lazy(() => import('@screens/MixnetDoctor'));
-const Seed = React.lazy(() => import('@screens/Seed'));
 const SyncReport = React.lazy(() => import('@screens/SyncReport'));
 const Rescan = React.lazy(() => import('@screens/Rescan'));
 const Pools = React.lazy(() => import('@screens/Pools'));
@@ -735,7 +733,6 @@ export class LoadedAppClass extends Component<
       pendingServer: { kind: 'none' },
       scrollToTop: false,
       scrollToBottom: false,
-      isSeedViewModalOpen: false,
       addTagModalTarget: null,
     };
 
@@ -1141,12 +1138,6 @@ export class LoadedAppClass extends Component<
       //const start = Date.now();
       this.setState({ syncingStatus });
     }
-  };
-
-  setIsSeedViewModalOpen = (value: boolean) => {
-    this.setState({
-      isSeedViewModalOpen: value,
-    });
   };
 
   setMixnetView = (mixnetView: MixnetView) => {
@@ -2231,63 +2222,6 @@ export class LoadedAppClass extends Component<
                         } else if (action === UfvkActionEnum.server) {
                           return (
                             <ShowUfvk
-                              {...props}
-                              onClickOK={async () =>
-                                await this.onClickOKServerWallet()
-                              }
-                              onClickCancel={async () => {
-                                // restart all the tasks again, nothing happen.
-                                await this.rpc.clearTimers();
-                                await this.rpc.configure();
-                              }}
-                            />
-                          );
-                        }
-                      }}
-                    </RootNavigator.Screen>
-                    <RootNavigator.Screen name={RouteEnum.Seed}>
-                      {props => {
-                        const action =
-                          !!props.route.params &&
-                          props.route.params.action !== undefined
-                            ? props.route.params.action
-                            : SeedActionEnum.view;
-                        if (action === SeedActionEnum.view) {
-                          return (
-                            <Seed
-                              {...props}
-                              onClickOK={() => {}}
-                              onClickCancel={() => {}}
-                              setIsSeedViewModalOpen={
-                                this.setIsSeedViewModalOpen
-                              }
-                            />
-                          );
-                        } else if (action === SeedActionEnum.change) {
-                          return (
-                            <Seed
-                              {...props}
-                              onClickOK={async () =>
-                                await this.onClickOKChangeWallet({
-                                  startingApp: false,
-                                })
-                              }
-                              onClickCancel={() => {}}
-                            />
-                          );
-                        } else if (action === SeedActionEnum.backup) {
-                          return (
-                            <Seed
-                              {...props}
-                              onClickOK={async () =>
-                                await this.onClickOKRestoreBackup()
-                              }
-                              onClickCancel={() => {}}
-                            />
-                          );
-                        } else if (action === SeedActionEnum.server) {
-                          return (
-                            <Seed
                               {...props}
                               onClickOK={async () =>
                                 await this.onClickOKServerWallet()

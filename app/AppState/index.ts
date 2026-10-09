@@ -37,7 +37,6 @@ import { TransactionTypeEnum } from './enums/TransactionTypeEnum';
 import { PoolEnum } from './enums/PoolEnum';
 import { RestoreFromTypeEnum } from './enums/RestoreFromTypeEnum';
 import { PoolToShieldEnum } from './enums/PoolToShieldEnum';
-import { SeedActionEnum } from './enums/SeedActionEnum';
 import { UfvkActionEnum } from './enums/UfvkActionEnum';
 import { SettingsNameEnum } from './enums/SettingsNameEnum';
 import { RouteEnum } from './enums/RouteEnum';
@@ -94,7 +93,6 @@ export {
   PoolEnum,
   RestoreFromTypeEnum,
   PoolToShieldEnum,
-  SeedActionEnum,
   UfvkActionEnum,
   SettingsNameEnum,
   RouteEnum,
