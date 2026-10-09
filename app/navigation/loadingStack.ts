@@ -1,4 +1,6 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { LoadingParamList } from '@app/types';
+import { LoadingParamList, OnboardingParamList } from '@app/types';
+import { createOnboardingNavigator } from './OnboardingNavigator';
 
 export const LoadingStack = createNativeStackNavigator<LoadingParamList>();
+export const Onboarding = createOnboardingNavigator<OnboardingParamList>();

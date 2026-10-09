@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { View } from 'react-native';
 import Animated, {
   FadeIn,
@@ -9,15 +9,20 @@ import Animated, {
   Keyframe,
   ReduceMotion,
 } from 'react-native-reanimated';
+import type {
+  ParamListBase,
+  StackNavigationState,
+} from '@react-navigation/native';
 
 import { useTheme } from '@app/theme';
 import { duration, ease } from '@app/theme/motion';
 import { RouteEnum } from '@app/AppState';
+import type { OnboardingDescriptor } from '@app/navigation/OnboardingNavigator';
 import WelcomeBranches from '@ui/widgets/WelcomeBranches';
 
 type OnboardingStageProps = {
-  screen: RouteEnum;
-  children: React.ReactNode;
+  state: StackNavigationState<ParamListBase>;
+  descriptors: Record<string, OnboardingDescriptor>;
 };
 
 export const AXIS_PT = 30;
@@ -75,15 +80,15 @@ export const axisExit = (toX: number) =>
     .duration(duration.axisOut)
     .reduceMotion(ReduceMotion.System);
 
-const depth = (screen: RouteEnum): number => {
+const depth = (screen: string): number => {
   switch (screen) {
-    case RouteEnum.StartMenu:
-    case RouteEnum.WalletError:
+    case RouteEnum.Welcome:
+    case RouteEnum.OpenError:
       return 0;
     case RouteEnum.ImportChooser:
     case RouteEnum.Server:
       return 1;
-    case RouteEnum.WalletProgress:
+    case RouteEnum.Progress:
       return 3;
     default:
       return 2;
@@ -93,60 +98,55 @@ const depth = (screen: RouteEnum): number => {
 // Leaving or returning to the welcome parts or returns the leaves; the
 // progress and error screens fade in whole; everything else inside the
 // import stack moves on the shared axis.
-const enterFor = (from: RouteEnum | null, to: RouteEnum) => {
-  if (to === RouteEnum.StartMenu) {
+const enterFor = (from: string | undefined, to: string) => {
+  if (to === RouteEnum.Welcome) {
     return welcomeEnter();
   }
-  if (to === RouteEnum.WalletProgress) {
+  if (to === RouteEnum.Progress) {
     return importingEnter();
   }
-  if (to === RouteEnum.WalletError) {
+  if (to === RouteEnum.OpenError) {
     return errorEnter();
   }
-  if (from === null || from === RouteEnum.StartMenu) {
+  if (from === undefined || from === RouteEnum.Welcome) {
     return formEnter();
   }
   return axisEnter(depth(to) > depth(from) ? AXIS_PT : -AXIS_PT);
 };
 
-const exitFor = (from: RouteEnum, to: RouteEnum) => {
-  if (from === RouteEnum.StartMenu) {
+const exitFor = (from: string, to: string) => {
+  if (from === RouteEnum.Welcome) {
     return welcomeExit();
   }
-  if (from === RouteEnum.WalletProgress) {
+  if (from === RouteEnum.Progress) {
     return importingExit();
   }
-  if (to === RouteEnum.StartMenu) {
+  if (to === RouteEnum.Welcome) {
     return formExit();
   }
-  if (to === RouteEnum.WalletProgress) {
+  if (to === RouteEnum.Progress) {
     return recedeExit();
   }
   return axisExit(depth(to) > depth(from) ? -AXIS_PT : AXIS_PT);
 };
 
-// The hosted screen lags the requested one by one render so the leaving
-// view is told where it is going before it unmounts.
+// The view of the onboarding navigator: only the focused route is on stage.
+// The hosted route lags the focused one by one render so the leaving view is
+// told where it is going before it unmounts.
 const OnboardingStage: React.FunctionComponent<OnboardingStageProps> = ({
-  screen,
-  children,
+  state,
+  descriptors,
 }) => {
   const { colors } = useTheme();
   const [size, setSize] = useState({ w: 0, h: 0 });
-  const [shown, setShown] = useState<RouteEnum>(screen);
-  const shownChildren = useRef<React.ReactNode>(children);
-  const previous = useRef<RouteEnum | null>(null);
+  const focused = state.routes[state.index];
+  const [shown, setShown] = useState(focused);
+  const previous = useRef<string | undefined>(undefined);
 
-  if (shown === screen) {
-    shownChildren.current = children;
+  if (shown.key !== focused.key) {
+    previous.current = shown.name;
+    setShown(focused);
   }
-
-  useEffect(() => {
-    if (shown !== screen) {
-      previous.current = shown;
-      setShown(screen);
-    }
-  }, [screen, shown]);
 
   return (
     <View
@@ -162,15 +162,15 @@ const OnboardingStage: React.FunctionComponent<OnboardingStageProps> = ({
       <WelcomeBranches
         width={size.w}
         height={size.h}
-        parted={screen !== RouteEnum.StartMenu}
+        parted={focused.name !== RouteEnum.Welcome}
       />
       <Animated.View
-        key={shown}
-        entering={enterFor(previous.current, shown)}
-        exiting={exitFor(shown, screen)}
+        key={shown.key}
+        entering={enterFor(previous.current, shown.name)}
+        exiting={exitFor(shown.name, focused.name)}
         style={{ flex: 1 }}
       >
-        {shownChildren.current}
+        {descriptors[shown.key]?.render()}
       </Animated.View>
     </View>
   );

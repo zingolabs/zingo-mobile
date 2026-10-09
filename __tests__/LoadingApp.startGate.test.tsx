@@ -9,6 +9,7 @@ import {
   ChainNameEnum,
   LanguageEnum,
   LaunchingModeEnum,
+  RouteEnum,
   SelectServerEnum,
 } from '@app/AppState';
 import { remoteServer } from '@app/AppState/types/ServerType';
@@ -94,12 +95,12 @@ describe('LoadingApp start gate', () => {
       failure: { errorKey: 'biometrics-failure-declined' },
     });
 
-    await app.importRecoveryWallet();
+    await app.importRecoveryWallet(RouteEnum.Welcome);
 
     expect(askGate).toHaveBeenCalledTimes(1);
     expect(restore).not.toHaveBeenCalled();
 
-    await app.importRecoveryWallet();
+    await app.importRecoveryWallet(RouteEnum.Welcome);
 
     expect(restore).toHaveBeenCalledTimes(1);
   });

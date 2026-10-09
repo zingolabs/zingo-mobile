@@ -9,11 +9,11 @@ export enum RouteEnum {
   Onboarding = 'Onboarding',
 
   // Onboarding screens
-  StartMenu = 'StartMenu',
+  Welcome = 'Welcome',
   ImportChooser = 'ImportChooser',
-  ImportUfvk = 'ImportUfvk',
-  WalletProgress = 'WalletProgress',
-  WalletError = 'WalletError',
+  ImportWallet = 'ImportWallet',
+  Progress = 'Progress',
+  OpenError = 'OpenError',
   Server = 'Server',
   ServerList = 'ServerList',
 

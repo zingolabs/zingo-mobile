@@ -3,7 +3,7 @@ import React from 'react';
 import type { Linking as LinkingType } from 'react-native';
 import { act, render, screen } from '@testing-library/react-native';
 import { SessionProvider, useSession } from '@app/navigation/session';
-import { ChainNameEnum, LaunchingModeEnum } from '@app/AppState';
+import { ChainNameEnum, LaunchingModeEnum, RouteEnum } from '@app/AppState';
 import RegText from '@ui/primitives/RegText';
 
 // The named import resolves to nothing under jest; the module's own getter
@@ -72,7 +72,7 @@ test('Tests that a link received during boot waits for the wallet and is cleared
 
 test('Tests that a link received during onboarding is dropped. There is no wallet to pay from', async () => {
   render(
-    <SessionProvider initial={{ kind: 'onboarding' }}>
+    <SessionProvider initial={{ kind: 'onboarding', start: RouteEnum.Welcome }}>
       <Probe />
     </SessionProvider>,
   );
