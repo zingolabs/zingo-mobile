@@ -8,7 +8,6 @@ import {
 import {
   ChainNameEnum,
   RouteEnum,
-  SeedActionEnum,
   SelectServerEnum,
   TranslateType,
 } from '@app/AppState';
@@ -99,7 +98,7 @@ test('Tests that a server on another network goes to the recovery screen', async
     true,
     false,
   );
-  expect(navigation.navigate).toHaveBeenCalledWith(RouteEnum.Seed, {
-    action: SeedActionEnum.server,
+  expect(navigation.navigate).toHaveBeenCalledWith(RouteEnum.WalletSeed, {
+    action: 'server',
   });
 });

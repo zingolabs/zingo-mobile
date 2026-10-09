@@ -5,4 +5,5 @@ export type {
   LoadedAppNavigationState,
   CardRect,
   SeedBackupEntry,
+  WalletSeedAction,
 } from './NavigationTypes';

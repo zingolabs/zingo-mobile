@@ -1152,6 +1152,14 @@
     "vk-tip-body": "Ela não pode gastar seus fundos. Compartilhe só com pessoas ou serviços de confiança.",
     "vk-copy": "Copiar chave de visualização",
     "vk-copied": "Chave de visualização copiada",
-    "verify": "Verificar de novo"
+    "verify": "Verificar de novo",
+    "title-server": "Mudar servidor",
+    "sub-change": "Antes de abrir outra carteira, guarde com cuidado a frase semente, o aniversário e a chave de visualização desta. Você vai precisar deles para voltar a ela.",
+    "sub-backup": "Antes de restaurar o último backup, guarde com cuidado a frase semente, o aniversário e a chave de visualização desta carteira. Você vai precisar deles para voltar a ela.",
+    "sub-server": "Antes de mudar de servidor, guarde com cuidado a frase semente, o aniversário e a chave de visualização desta carteira. Você vai precisar deles para voltar a ela.",
+    "go-change": "Abrir nova",
+    "go-backup": "Restaurar",
+    "go-server": "Mudar",
+    "confirm-title": "Tem certeza?"
   }
 }

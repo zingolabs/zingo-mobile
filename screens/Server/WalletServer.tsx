@@ -15,7 +15,6 @@ import { ContextAppLoaded } from '@app/context';
 import {
   ChainNameEnum,
   RouteEnum,
-  SeedActionEnum,
   SelectServerEnum,
   ServerType,
   ServerUrisType,
@@ -154,7 +153,7 @@ const WalletServer: React.FC<WalletServerProps> = ({
       if (readOnly) {
         navigation.navigate(RouteEnum.Ufvk, { action: UfvkActionEnum.server });
       } else {
-        navigation.navigate(RouteEnum.Seed, { action: SeedActionEnum.server });
+        navigation.navigate(RouteEnum.WalletSeed, { action: 'server' });
       }
       return false;
     }

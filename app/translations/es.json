@@ -1152,6 +1152,14 @@
     "vk-tip-body": "No puede gastar tus fondos. Compártela solo con personas o servicios de confianza.",
     "vk-copy": "Copiar clave de visualización",
     "vk-copied": "Clave de visualización copiada",
-    "verify": "Verificar de nuevo"
+    "verify": "Verificar de nuevo",
+    "title-server": "Cambiar servidor",
+    "sub-change": "Antes de abrir otro monedero, guarda con cuidado la frase semilla, el cumpleaños y la clave de visualización de este. Los necesitarás para volver a él.",
+    "sub-backup": "Antes de restaurar la última copia de seguridad, guarda con cuidado la frase semilla, el cumpleaños y la clave de visualización de este monedero. Los necesitarás para volver a él.",
+    "sub-server": "Antes de cambiar de servidor, guarda con cuidado la frase semilla, el cumpleaños y la clave de visualización de este monedero. Los necesitarás para volver a él.",
+    "go-change": "Abrir otro",
+    "go-backup": "Restaurar",
+    "go-server": "Cambiar",
+    "confirm-title": "¿Estás seguro?"
   }
 }

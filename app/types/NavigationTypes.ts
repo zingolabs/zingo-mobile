@@ -63,6 +63,8 @@ export type CardRect = { x: number; y: number; width: number; height: number };
 
 // How the backup flow opens: grown out of the History notice card, pushed
 // from Wallet Seed, or straight to the three-word check from Wallet Seed.
+export type WalletSeedAction = 'change' | 'backup' | 'server';
+
 export type SeedBackupEntry =
   { kind: 'card'; from: CardRect } | { kind: 'push' } | { kind: 'verify' };
 
@@ -88,7 +90,9 @@ export type AppDrawerParamList = {
   [RouteEnum.Pools]: undefined;
   [RouteEnum.MeetIronwood]: undefined;
   [RouteEnum.SeedBackup]: { entry: SeedBackupEntry };
-  [RouteEnum.WalletSeed]: undefined;
+  // Absent for the plain view; set when the seed is shown before leaving
+  // this wallet or its server.
+  [RouteEnum.WalletSeed]: { action: WalletSeedAction } | undefined;
   [RouteEnum.MigrationStrategy]: undefined;
   [RouteEnum.MigrationTransactions]: undefined;
   // The immediate drain broadcasts here; `transactions` is the previewed plan,

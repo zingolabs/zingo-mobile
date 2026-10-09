@@ -1152,6 +1152,14 @@
     "vk-tip-body": "It can't spend your funds. Only share it with people or services you trust.",
     "vk-copy": "Copy viewing key",
     "vk-copied": "Viewing key copied",
-    "verify": "Verify again"
+    "verify": "Verify again",
+    "title-server": "Change server",
+    "sub-change": "Before accessing another wallet, carefully save this wallet's seed phrase, birthday and viewing key. You'll need them to get back to it.",
+    "sub-backup": "Before restoring the last backup, carefully save this wallet's seed phrase, birthday and viewing key. You'll need them to get back to it.",
+    "sub-server": "Before changing the server, carefully save this wallet's seed phrase, birthday and viewing key. You'll need them to get back to it.",
+    "go-change": "Open new",
+    "go-backup": "Restore",
+    "go-server": "Change",
+    "confirm-title": "Are you certain?"
   }
 }

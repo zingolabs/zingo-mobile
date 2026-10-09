@@ -1150,6 +1150,14 @@
     "vk-tip-body": "Fonlarınızı harcayamaz. Yalnızca güvendiğiniz kişi ve hizmetlerle paylaşın.",
     "vk-copy": "Görüntüleme anahtarını kopyala",
     "vk-copied": "Görüntüleme anahtarı kopyalandı",
-    "verify": "Yeniden doğrula"
+    "verify": "Yeniden doğrula",
+    "title-server": "Sunucuyu değiştir",
+    "sub-change": "Başka bir cüzdana geçmeden önce bu cüzdanın kurtarma ifadesini, doğum gününü ve görüntüleme anahtarını dikkatlice kaydedin. Ona geri dönmek için bunlara ihtiyacınız olacak.",
+    "sub-backup": "Son yedeği geri yüklemeden önce bu cüzdanın kurtarma ifadesini, doğum gününü ve görüntüleme anahtarını dikkatlice kaydedin. Ona geri dönmek için bunlara ihtiyacınız olacak.",
+    "sub-server": "Sunucuyu değiştirmeden önce bu cüzdanın kurtarma ifadesini, doğum gününü ve görüntüleme anahtarını dikkatlice kaydedin. Ona geri dönmek için bunlara ihtiyacınız olacak.",
+    "go-change": "Yenisini aç",
+    "go-backup": "Geri yükle",
+    "go-server": "Değiştir",
+    "confirm-title": "Emin misiniz?"
   }
 }

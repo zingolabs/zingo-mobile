@@ -1514,9 +1514,7 @@ export class LoadedAppClass extends Component<
           action: UfvkActionEnum.change,
         });
       } else {
-        this.drawerNav?.navigate(RouteEnum.Seed, {
-          action: SeedActionEnum.change,
-        });
+        this.drawerNav?.navigate(RouteEnum.WalletSeed, { action: 'change' });
       }
       return;
     } else if (item === MenuItemEnum.RestoreWalletBackup) {
@@ -1525,9 +1523,7 @@ export class LoadedAppClass extends Component<
           action: UfvkActionEnum.backup,
         });
       } else {
-        this.drawerNav?.navigate(RouteEnum.Seed, {
-          action: SeedActionEnum.backup,
-        });
+        this.drawerNav?.navigate(RouteEnum.WalletSeed, { action: 'backup' });
       }
       return;
     } else if (item === MenuItemEnum.Settings) {
@@ -2334,9 +2330,35 @@ export class LoadedAppClass extends Component<
                     />
                     <RootNavigator.Screen
                       name={RouteEnum.WalletSeed}
-                      component={WalletSeed}
                       options={{ animation: 'slide_from_right' }}
-                    />
+                    >
+                      {props => {
+                        const action = props.route.params?.action;
+                        return (
+                          <WalletSeed
+                            {...props}
+                            onConfirm={async () => {
+                              if (action === 'change') {
+                                await this.onClickOKChangeWallet({
+                                  startingApp: false,
+                                });
+                              } else if (action === 'backup') {
+                                await this.onClickOKRestoreBackup();
+                              } else if (action === 'server') {
+                                await this.onClickOKServerWallet();
+                              }
+                            }}
+                            onCancel={async () => {
+                              if (action === 'server') {
+                                // restart all the tasks again, nothing happen.
+                                await this.rpc.clearTimers();
+                                await this.rpc.configure();
+                              }
+                            }}
+                          />
+                        );
+                      }}
+                    </RootNavigator.Screen>
                     <RootNavigator.Screen
                       name={RouteEnum.MigrationStrategy}
                       component={MigrationStrategy}
