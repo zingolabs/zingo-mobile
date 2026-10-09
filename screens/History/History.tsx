@@ -83,40 +83,15 @@ const ViewTypes = {
 type HistoryProps = NativeStackScreenProps<
   AppDrawerParamList,
   RouteEnum.History
-> & {
-  // side menu
-  toggleMenuDrawer: () => void;
-  // privacy
-  // addLastSnackbar from context
-  // shielding / sending
-  setShieldingAmount: (value: number) => void;
-  setScrollToTop: (value: boolean) => void;
-  scrollToTop: boolean;
-  setScrollToBottom: (value: boolean) => void;
-  //scrollToBottom: boolean;
-  // for messages
-  //sendTransaction: (s: SendPageStateClass) => Promise<String>;
-  //setServerOption: (
-  //  value: ServerType,
-  //  selectServer: SelectServerEnum,
-  //  toast: boolean,
-  //  sameServerChainName: boolean,
-  //) => Promise<void>;
-};
+>;
 
-const History: React.FunctionComponent<HistoryProps> = ({
-  toggleMenuDrawer,
-  setShieldingAmount,
-  setScrollToTop,
-  scrollToTop,
-  setScrollToBottom,
-  //scrollToBottom,
-  //sendTransaction,
-  //setServerOption,
-}) => {
+const History: React.FunctionComponent<HistoryProps> = () => {
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const context = useContext(ContextAppLoaded);
   const {
+    setScrollToTop,
+    scrollToTop,
+    setShieldingAmount,
     translate,
     valueTransfers,
     language,
@@ -785,13 +760,10 @@ const History: React.FunctionComponent<HistoryProps> = ({
           <Header
             testID="valuetransfer text"
             title={''}
-            toggleMenuDrawer={toggleMenuDrawer}
             setPrivacyOption={setPrivacyOption}
             addLastSnackbar={addLastSnackbar /* context */}
             screenName={screenName}
             setShieldingAmount={setShieldingAmount}
-            setScrollToTop={setScrollToTop}
-            setScrollToBottom={setScrollToBottom}
             setBackgroundError={setBackgroundError /* context */}
             showMessagesIcon={true}
             onUsdRowLayout={setUsdRowH}

@@ -73,29 +73,20 @@ import SettingSwitchOn from '../../assets/img/setting-switch-on.svg';
 type SettingsProps = NativeStackScreenProps<
   AppDrawerParamList,
   RouteEnum.Settings
-> & {
-  setLanguageOption: (value: LanguageEnum) => Promise<void>;
-  setBiometricsOption: (value: boolean) => Promise<void>;
-  setPerformanceLevelOption: (value: RPCPerformanceLevelEnum) => Promise<void>;
-  setBlockExplorerOption: (value: BlockExplorerEnum) => Promise<void>;
-  toggleMenuDrawer: () => void;
-};
+>;
 
 type Options = {
   value: string;
   text: string;
 };
 
-const Settings: React.FunctionComponent<SettingsProps> = ({
-  navigation,
-  setLanguageOption,
-  setBiometricsOption,
-  setPerformanceLevelOption,
-  setBlockExplorerOption,
-  toggleMenuDrawer,
-}) => {
+const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
   const context = useContext(ContextAppLoaded);
   const {
+    setLanguageOption,
+    setBiometricsOption,
+    setPerformanceLevelOption,
+    setBlockExplorerOption,
     translate,
     language: languageContext,
     privacy: privacyContext,
@@ -578,7 +569,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
             screenName={screenName}
             noBalance={true}
             noSyncingStatus={true}
-            toggleMenuDrawer={toggleMenuDrawer}
             noPrivacy={true}
           />
         </View>

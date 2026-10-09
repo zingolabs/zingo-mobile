@@ -42,13 +42,11 @@ describe('Component ShowUfvk - test', () => {
   state.info = mockInfo;
   state.totalBalance = mockTotalBalance;
   state.birthday = mockWallet.birthday || 0;
-  const onClose = jest.fn();
-  const onOK = jest.fn();
   const props_view = makeDrawerProps(UfvkActionEnum.view);
   test('ShowUfvk View - snapshot', () => {
     const ufvk = render(
       <ContextAppLoadedProvider value={state}>
-        <ShowUfvk {...props_view} onClickCancel={onClose} onClickOK={onOK} />
+        <ShowUfvk {...props_view} />
       </ContextAppLoadedProvider>,
     );
     expect(ufvk.toJSON()).toMatchSnapshot();
@@ -57,7 +55,7 @@ describe('Component ShowUfvk - test', () => {
   test('ShowUfvk Change - snapshot', () => {
     const ufvk = render(
       <ContextAppLoadedProvider value={state}>
-        <ShowUfvk {...props_change} onClickCancel={onClose} onClickOK={onOK} />
+        <ShowUfvk {...props_change} />
       </ContextAppLoadedProvider>,
     );
     expect(ufvk.toJSON()).toMatchSnapshot();
@@ -66,7 +64,7 @@ describe('Component ShowUfvk - test', () => {
   test('ShowUfvk Server - snapshot', () => {
     const ufvk = render(
       <ContextAppLoadedProvider value={state}>
-        <ShowUfvk {...props_server} onClickCancel={onClose} onClickOK={onOK} />
+        <ShowUfvk {...props_server} />
       </ContextAppLoadedProvider>,
     );
     expect(ufvk.toJSON()).toMatchSnapshot();
@@ -75,7 +73,7 @@ describe('Component ShowUfvk - test', () => {
   test('ShowUfvk Backup - snapshot', () => {
     const ufvk = render(
       <ContextAppLoadedProvider value={state}>
-        <ShowUfvk {...props_backup} onClickCancel={onClose} onClickOK={onOK} />
+        <ShowUfvk {...props_backup} />
       </ContextAppLoadedProvider>,
     );
     expect(ufvk.toJSON()).toMatchSnapshot();

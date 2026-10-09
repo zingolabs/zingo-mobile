@@ -46,7 +46,6 @@ type HeaderProps = {
   screenName: ScreenEnum;
   // side menu
   noDrawMenu?: boolean;
-  toggleMenuDrawer?: () => void;
   closeScreen?: () => void;
   // balance
   noBalance?: boolean;
@@ -58,10 +57,8 @@ type HeaderProps = {
   noPrivacy?: boolean;
   setPrivacyOption?: (value: boolean) => Promise<void>;
   addLastSnackbar?: (message: string, duration?: SnackbarDurationEnum) => void;
-  // shielding
+  // shielding: only the screens that pass this run the shield proposal
   setShieldingAmount?: (value: number) => void;
-  setScrollToTop?: (value: boolean) => void;
-  setScrollToBottom?: (value: boolean) => void;
   // seed screen - shared between AppLoading & AppLoaded - different contexts
   translate?: (key: string) => TranslateType;
   netInfo?: NetInfoType;
@@ -81,7 +78,6 @@ type HeaderProps = {
 };
 
 const Header: React.FunctionComponent<HeaderProps> = ({
-  toggleMenuDrawer,
   title,
   noBalance,
   noSyncingStatus,
@@ -97,8 +93,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   screenName,
   receivedLegend,
   setShieldingAmount,
-  setScrollToTop,
-  setScrollToBottom,
   closeScreen,
   noUfvkIcon,
   showMessagesIcon,
@@ -121,6 +115,8 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     mixnetView,
     sendPermitNow,
     seedBackedUp,
+    setScrollToTop,
+    setScrollToBottom,
   } = context;
 
   const translate = translateProp ?? context.translate;
@@ -129,7 +125,8 @@ const Header: React.FunctionComponent<HeaderProps> = ({
 
   const { colors } = useTheme();
 
-  const { isOpen: optionsPanelOpen } = useOptionsPanel();
+  const { isOpen: optionsPanelOpen, toggle: toggleMenuDrawer } =
+    useOptionsPanel();
   const headerOpacity = useSharedValue(1);
   useEffect(() => {
     headerOpacity.value = withTiming(optionsPanelOpen ? 0 : 1, {

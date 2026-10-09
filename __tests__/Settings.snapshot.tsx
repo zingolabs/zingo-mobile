@@ -43,20 +43,11 @@ describe('Component Settings - test', () => {
   state.server = mockServer;
   state.language = LanguageEnum.en;
   state.blockExplorer = BlockExplorerEnum.Zcashexplorer;
-  const onSetOption = jest.fn();
-  const toggle = jest.fn();
   const props = makeDrawerProps();
   test('Settings - snapshot', () => {
     const settings = render(
       <ContextAppLoadedProvider value={state}>
-        <Settings
-          {...props}
-          setLanguageOption={onSetOption}
-          setBiometricsOption={onSetOption}
-          setPerformanceLevelOption={onSetOption}
-          setBlockExplorerOption={onSetOption}
-          toggleMenuDrawer={toggle}
-        />
+        <Settings {...props} />
       </ContextAppLoadedProvider>,
     );
     expect(settings.toJSON()).toMatchSnapshot();

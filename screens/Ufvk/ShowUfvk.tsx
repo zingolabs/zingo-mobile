@@ -65,22 +65,23 @@ type TextsType = {
   backup: string[];
 };
 
-type ShowUfvkProps = NativeStackScreenProps<
-  AppDrawerParamList,
-  RouteEnum.Ufvk
-> & {
-  onClickOK: () => void;
-  onClickCancel: () => void;
-};
+type ShowUfvkProps = NativeStackScreenProps<AppDrawerParamList, RouteEnum.Ufvk>;
 const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
   navigation,
   route,
-  onClickOK,
-  onClickCancel,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, server, addLastSnackbar, setPrivacyOption, biometrics } =
-    context;
+  const {
+    translate,
+    server,
+    addLastSnackbar,
+    setPrivacyOption,
+    biometrics,
+    changeWallet,
+    restoreBackup,
+    applyPendingServer,
+    cancelPendingServer,
+  } = context;
   const { colors } = useTheme();
   const screenName = ScreenEnum.ShowUfvk;
 
@@ -231,15 +232,24 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
     });
   };
 
+  // What confirming or cancelling does depends on why the key is shown.
   const onClickCancelHide = () => {
-    onClickCancel();
+    if (action === UfvkActionEnum.server) {
+      cancelPendingServer();
+    }
     if (navigation.canGoBack()) {
       navigation.goBack();
     }
   };
 
   const onClickOKHide = () => {
-    onClickOK();
+    if (action === UfvkActionEnum.change) {
+      changeWallet();
+    } else if (action === UfvkActionEnum.backup) {
+      restoreBackup();
+    } else if (action === UfvkActionEnum.server) {
+      applyPendingServer();
+    }
     if (navigation.canGoBack()) {
       navigation.goBack();
     }

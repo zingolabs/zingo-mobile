@@ -130,7 +130,6 @@ function renderBook(
           name: RouteEnum.AddressBook,
           params: undefined,
         }}
-        setAddressBook={jest.fn()}
       />
     </ContextAppLoadedProvider>,
   );
