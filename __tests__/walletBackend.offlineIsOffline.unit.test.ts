@@ -105,7 +105,6 @@ const WALLET_LOCAL = new Set([
   'getWalletVersionInfo',
   'getWalletSaveRequiredInfo',
   'doSave',
-  'doSaveBackup',
   'getConfigWalletPerformanceInfo',
   'setConfigWalletToProdProcess',
   'getOptionWalletInfo',
@@ -117,7 +116,6 @@ const WALLET_LOCAL = new Set([
   'getDonationAddress',
   'getZenniesDonationAddress',
   'walletExists',
-  'walletBackupExists',
   'walletFileDiagnosisInfo',
   'walletFileRecoveryInfo',
   // The sync task's own state, not the indexer's: inspecting it and stopping

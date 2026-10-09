@@ -16,12 +16,10 @@ jest.mock('@app/RPCModule', () =>
 import RPCModule from '@app/RPCModule';
 import {
   doSave,
-  doSaveBackup,
   nativeSaveSucceeded,
 } from '@app/walletBackend/utils/walletUtils';
 
 const mockedDoSave = RPCModule.doSave as jest.Mock;
-const mockedDoSaveBackup = RPCModule.doSaveBackup as jest.Mock;
 
 describe('nativeSaveSucceeded', () => {
   it('accepts the Android success shape (boolean true)', () => {
@@ -43,9 +41,9 @@ describe('nativeSaveSucceeded', () => {
   it('never mistakes error prose for success', () => {
     // The attack case: both bridges' catch blocks resolve prose instead of
     // rejecting. A truthiness check classifies that prose as a successful
-    // backup, and changeWallet then deletes the wallet without one.
+    // save, and the caller then trusts a wallet file that was never written.
     expect(
-      nativeSaveSucceeded('Error: [Native] saving wallet backup: disk full'),
+      nativeSaveSucceeded('Error: [Native] saving wallet: disk full'),
     ).toBe(false);
   });
 });
@@ -58,7 +56,6 @@ describe('nativeSaveSucceeded', () => {
  */
 describe.each([
   ['doSave', doSave, () => mockedDoSave],
-  ['doSaveBackup', doSaveBackup, () => mockedDoSaveBackup],
 ])('%s', (_name, wrapper, mocked) => {
   it('reports the Android success shape (boolean true) as true', async () => {
     mocked().mockResolvedValueOnce(true);

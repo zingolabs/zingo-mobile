@@ -15,7 +15,7 @@ import { LanguageEnum } from './enums/LanguageEnum';
 import { SelectServerEnum } from './enums/SelectServerEnum';
 import { ChainNameEnum } from './enums/ChainNameEnum';
 import { SnackbarDurationEnum } from './enums/SnackbarDurationEnum';
-import { LoadedAppNavigationState } from '@app/types';
+import { LoadingAppNavigationState } from '@app/types';
 import ValueTransferType from './types/ValueTransferType';
 import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
 import TransparentAddressClass from './classes/TransparentAddressClass';
@@ -87,7 +87,7 @@ export default interface AppContextLoaded {
   addLastSnackbar: (message: string, duration?: SnackbarDurationEnum) => void;
 
   // if the App is stalled - restart is fired
-  restartApp: (s: LoadedAppNavigationState) => void;
+  restartApp: (s: LoadingAppNavigationState) => void;
 
   // some ValueTransfer is pending?
   somePending: boolean;

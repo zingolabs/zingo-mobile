@@ -28,7 +28,6 @@ export {
   createNewUnifiedAddress,
   createNewWallet,
   doSave,
-  doSaveBackup,
   drainOrchard,
   drainStatus,
   executeDueParts,
@@ -58,7 +57,6 @@ export {
   rescheduleParts,
   deleteExistingWallet,
   resolvedTrue,
-  restoreExistingWalletBackup,
   restoreWalletFromSeed,
   restoreWalletFromUfvk,
   sendAllPropose,
@@ -68,7 +66,6 @@ export {
   shieldPropose,
   splitStatus,
   startIronwoodMigration,
-  walletBackupExists,
   walletExists,
   windowTimeline,
 } from './utils/walletUtils';
@@ -85,7 +82,6 @@ export {
   walletFileDiagnosis,
   walletSeedSalvage,
   WALLET_FILE_NAME,
-  WALLET_BACKUP_FILE_NAME,
 } from './utils/walletFileRepair';
 export type {
   WalletFileDiagnosis,

@@ -16,8 +16,7 @@ export const mockTranslate = (p: string) => {
         "change": ["change"],
         "server": ["server"],
         "view": ["view"],
-        "restore": ["restore"],
-        "backup": ["backup"]
+        "restore": ["restore"]
       }`;
   } else if (p === 'settings.languages') {
     return [

@@ -1508,15 +1508,6 @@ export class LoadedAppClass extends Component<
         this.drawerNav?.navigate(RouteEnum.WalletSeed, { action: 'change' });
       }
       return;
-    } else if (item === MenuItemEnum.RestoreWalletBackup) {
-      if (this.state.readOnly) {
-        this.drawerNav?.navigate(RouteEnum.Ufvk, {
-          action: UfvkActionEnum.backup,
-        });
-      } else {
-        this.drawerNav?.navigate(RouteEnum.WalletSeed, { action: 'backup' });
-      }
-      return;
     } else if (item === MenuItemEnum.Settings) {
       // Bio gate for settingsScreen lives at the Settings screen entry
       // (screens/Settings/Settings.tsx).
@@ -1790,14 +1781,7 @@ export class LoadedAppClass extends Component<
   };
 
   onClickOKChangeWallet = async (state: LoadingAppNavigationState) => {
-    // Back up any MAINNET wallet being abandoned. The decision keys on the
-    // WALLET's own chain (walletChainName), not the server's — Offline has no
-    // server chain, yet a mainnet wallet must still be backed up when it is
-    // left. Testnet/regtest are never backed up.
-    const changed =
-      this.state.walletChainName === ChainNameEnum.mainChainName
-        ? await this.rpc.changeWallet() // backup
-        : await this.rpc.changeWalletNoBackup(); // no backup
+    const changed = await this.rpc.changeWallet();
 
     if (changed.kind === 'error') {
       createAlert(
@@ -1815,27 +1799,6 @@ export class LoadedAppClass extends Component<
 
     this.keepAwake(false);
     this.navigateToLoadingApp(state);
-  };
-
-  onClickOKRestoreBackup = async () => {
-    const restored = await this.rpc.restoreBackup();
-
-    if (restored.kind === 'error') {
-      createAlert(
-        this.setBackgroundError,
-        this.addLastSnackbar,
-        this.state.translate('loadedapp.restoringwallet-label') as string,
-        this.state.translate(restored.errorKey) as string,
-        false,
-        this.state.translate,
-        sendEmail,
-        this.state.zingolibVersion,
-      );
-      return;
-    }
-
-    this.keepAwake(false);
-    this.navigateToLoadingApp({ startingApp: false, newWallet: true });
   };
 
   onClickOKServerWallet = async () => {
@@ -1878,13 +1841,7 @@ export class LoadedAppClass extends Component<
 
       await this.rpc.fetchInfoAndServerHeight();
 
-      // Back up any MAINNET wallet being abandoned — keyed on the WALLET's own
-      // chain (walletChainName), not the server's, so a mainnet wallet left
-      // while Offline still gets backed up. Testnet/regtest are not backed up.
-      const changed =
-        this.state.walletChainName === ChainNameEnum.mainChainName
-          ? await this.rpc.changeWallet() // backup
-          : await this.rpc.changeWalletNoBackup(); // no backup
+      const changed = await this.rpc.changeWallet();
 
       if (changed.kind === 'error') {
         createAlert(
@@ -2209,16 +2166,6 @@ export class LoadedAppClass extends Component<
                               onClickCancel={() => {}}
                             />
                           );
-                        } else if (action === UfvkActionEnum.backup) {
-                          return (
-                            <ShowUfvk
-                              {...props}
-                              onClickOK={async () =>
-                                await this.onClickOKRestoreBackup()
-                              }
-                              onClickCancel={() => {}}
-                            />
-                          );
                         } else if (action === UfvkActionEnum.server) {
                           return (
                             <ShowUfvk
@@ -2276,8 +2223,6 @@ export class LoadedAppClass extends Component<
                                 await this.onClickOKChangeWallet({
                                   startingApp: false,
                                 });
-                              } else if (action === 'backup') {
-                                await this.onClickOKRestoreBackup();
                               } else if (action === 'server') {
                                 await this.onClickOKServerWallet();
                               }

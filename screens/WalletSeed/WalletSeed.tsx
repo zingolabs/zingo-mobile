@@ -21,7 +21,6 @@ import { ease } from '@app/theme/motion';
 import { ContextAppLoaded } from '@app/context';
 import { RouteEnum, SnackbarDurationEnum } from '@app/AppState';
 import { AppDrawerParamList, WalletSeedAction } from '@app/types';
-import { ChainNameEnum } from '@app/AppState';
 import { showConfirm } from '@app/services/showConfirm';
 import { useBiometricGate } from '@app/hooks/useBiometricGate';
 import { useSecureScreen } from '@app/hooks/useSecureScreen';
@@ -67,13 +66,11 @@ type Tip = 'none' | 'birthday' | 'vk';
 
 const TITLE: Record<WalletSeedAction, string> = {
   change: 'loadedapp.changewallet',
-  backup: 'loadedapp.restorebackupwallet',
   server: 'walletseed.title-server',
 };
 
 const WARNING: Record<WalletSeedAction, string> = {
   change: 'seed.change-warning',
-  backup: 'seed.backup-warning',
   server: 'seed.server-warning',
 };
 
@@ -94,7 +91,6 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
     seedBackedUp,
     seedBackedUpAt,
     language,
-    server,
     birthday: walletBirthday,
   } = context;
   const { colors } = useTheme();
@@ -200,11 +196,7 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
   const confirm = (to: WalletSeedAction) =>
     showConfirm({
       title: translate('walletseed.confirm-title') as string,
-      message:
-        (translate(WARNING[to]) as string) +
-        (server.chainName !== ChainNameEnum.mainChainName && to !== 'backup'
-          ? '\n' + (translate('seed.mainnet-warning') as string)
-          : ''),
+      message: translate(WARNING[to]) as string,
       buttons: [
         {
           text: translate('confirm') as string,

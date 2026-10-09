@@ -1,10 +1,8 @@
 /**
  * The rewritten walletUtils seams (zingo-mobile#1151): the boolean
- * collapses, the price sentinels, and the backup-restore path. The
- * regression pinned hardest here: a rejected restoreExistingWalletBackup
- * must read as failure — before the typed surface, the rejection became
- * "Error: ..." prose that the caller's truthiness check misread as
- * success and opened a wallet that was never restored.
+ * collapses and the price sentinels. A rejection must read as failure —
+ * before the typed surface, it became "Error: ..." prose that a caller's
+ * truthiness check misread as success.
  */
 // Every member of the mocked bridge is a lazily created jest.fn, so a future
 // import-time touch of some other RPCModule member cannot break this suite.
@@ -25,8 +23,6 @@ import {
   isWalletAddress,
   parseZecQuote,
   resolvedTrue,
-  restoreExistingWalletBackup,
-  walletBackupExists,
   walletExists,
 } from '@app/walletBackend/utils/walletUtils';
 
@@ -57,38 +53,14 @@ describe('resolvedTrue collapses the native "true"/"false" protocol', () => {
   });
 });
 
-describe('the backup-restore regression (the latent bug)', () => {
-  it('a rejected restore crosses as ok:false, never as resolved prose', async () => {
-    bridge.restoreExistingWalletBackup.mockReturnValueOnce(
-      typedRejection('Unknown', 'Error: could not read the backup'),
-    );
-    const result = await restoreExistingWalletBackup();
-    expect(result.ok).toBe(false);
-    expect(resolvedTrue(result)).toBe(false);
-  });
-
-  it('a "false" restore resolution reads as failure', async () => {
-    bridge.restoreExistingWalletBackup.mockResolvedValueOnce('false');
-    expect(resolvedTrue(await restoreExistingWalletBackup())).toBe(false);
-  });
-
-  it('only a "true" restore resolution reads as success', async () => {
-    bridge.restoreExistingWalletBackup.mockResolvedValueOnce('true');
-    expect(resolvedTrue(await restoreExistingWalletBackup())).toBe(true);
-  });
-});
-
-describe('the existence probes contain rejections as false', () => {
-  it.each([
-    ['walletExists', 'walletExists', walletExists],
-    ['walletBackupExists', 'walletBackupExists', walletBackupExists],
-  ])('%s', async (_name, member, probe) => {
-    bridge[member].mockResolvedValueOnce('true');
-    await expect(probe()).resolves.toBe(true);
-    bridge[member].mockResolvedValueOnce('false');
-    await expect(probe()).resolves.toBe(false);
-    bridge[member].mockReturnValueOnce(typedRejection('Save', 'boom'));
-    await expect(probe()).resolves.toBe(false);
+describe('the existence probe contains rejections as false', () => {
+  it('walletExists', async () => {
+    bridge.walletExists.mockResolvedValueOnce('true');
+    await expect(walletExists()).resolves.toBe(true);
+    bridge.walletExists.mockResolvedValueOnce('false');
+    await expect(walletExists()).resolves.toBe(false);
+    bridge.walletExists.mockReturnValueOnce(typedRejection('Save', 'boom'));
+    await expect(walletExists()).resolves.toBe(false);
   });
 });
 

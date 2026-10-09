@@ -152,13 +152,10 @@
     "info": "Sunucu bilgisi",
     "options": "Seçenekler",
     "walletseed": "Cüzdan Tohumu",
-    "walletbackupseed": "Yedek Kurtarma Kelimeleri",
     "walletufvk": "Cüzdan Görüntüleme Anahtarı",
     "rescanwallet": "Cüzdanı Yeniden Tara",
     "report": "Senkronizasyon / Yeniden Tarama Raporu",
     "changewallet": "Başka bir cüzdana geç",
-    "restorebackupwallet": "Son Cüzdan Yedeğini Geri Yükle",
-    "alert-restorebackupwallet-body": "Son cüzdan yedeğini geri yüklemek istediğinizi onaylayın.",
     "fundpools": "Fon Havuzları",
     "insight": "Finansal İçgörü",
     "addressbook": "Adres Defteri",
@@ -168,7 +165,6 @@
     "differentchain-error": "Farklı bir zincire sahip bir sunucuya geçiyorsunuz, bu kurtarma ifadesi olmadan bu cüzdana artık erişiminiz olmayacak.",
     "serverchain-mismatch": "Sunucu seçtiğinizden farklı bir zincir bildiriyor. Zincir seçiciyi kontrol edip tekrar deneyin.",
     "changingwallet-label": "Error Cüzdan değiştirilirken bir hata oluştu",
-    "restoringwallet-label": "Error Cüzdan geri yüklenirken bir hata oluştu",
     "computingtx": "İşlem Hesaplanıyor...",
     "computingtx-hangon": "Sabırlı olun,\nbir an sürecek...",
     "transactioncreated-title": "İşlem oluşturuldu",
@@ -201,9 +197,7 @@
   },
   "rpc": {
     "walletnotfound-error": "Error: Herhangi bir cüzdan bulunamadı.",
-    "backupnotfound-error": "Error: Herhangi bir cüzdan yedeği bulunamadı.",
-    "deletewallet-error": "Error: Mevcut cüzdan silinemedi.",
-    "backupwallet-error": "Error: Cüzdan yedeği kaydedilemedi."
+    "deletewallet-error": "Error: Mevcut cüzdan silinemedi."
   },
   "settings": {
     "section-preferences": "Tercihler",
@@ -414,13 +408,7 @@
         "Emin misiniz?"
       ],
       "view": ["Yedekleme ifadesini\nKaydettim"],
-      "restore": ["Cüzdanı geri yükle"],
-      "backup": [
-        "",
-        "Geri yükle",
-        "Yedek cüzdanınızı \nGeri yüklemek \nİstiyorsunuz",
-        "Emin misiniz?"
-      ]
+      "restore": ["Cüzdanı geri yükle"]
     },
     "title": "kurtarma ifadesi",
     "new": "Yeni",
@@ -441,9 +429,7 @@
     "birthday-readonly": "Cüzdan oluşturulma tarihi",
     "birthday-no-readonly": "İlk işlemin blok yüksekliği. (Bilmiyorsanız sorun değil) Değer aralığı arasında",
     "change-warning": "Başka bir cüzdana geçerseniz, bu cüzdana seed phrase olmadan artık erişemezsiniz.",
-    "backup-warning": "Yedek cüzdanınıza geçerseniz, bu cüzdana seed phrase olmadan artık erişemezsiniz.",
     "server-warning": "Farklı bir zincire sahip bir sunucuya geçerseniz, bu cüzdana seed phrase olmadan artık erişemezsiniz.",
-    "mainnet-warning": "Bu cüzdanın yedeği yok, yalnızca 'MAINNET'te mevcut.",
     "seedplaceholder": "Seed (24 kelime)",
     "seed-acc": "Seed Phrase Alanı",
     "birthday-acc": "Doğum Tarihi Alanı",
@@ -790,24 +776,15 @@
         "Sunucuyu değiştir",
         "Gerçek cüzdanınızı\nDeğiştirmek istiyor musunuz?",
         "Emin misiniz?"
-      ],
-      "backup": [
-        "",
-        "Geri yükle",
-        "Yedek cüzdanınızı \nGeri yüklemek \nİstiyorsunuz",
-        "Emin misiniz?"
       ]
     },
     "viewkey": "Görüntüleme Anahtarı",
     "tapcopy-message": "Anahtar panoya kopyalandı",
     "text-readonly": "Bu ekranı kapatmadan önce, bu görüntüleme anahtarını dikkatlice not alın. Mevcut cüzdanınızı geri yüklemenin veya erişmenin tek yolu budur.",
-    "text-readonly-backup": "Önceki cüzdanın yedeğini geri yüklemeden önce, bu görüntüleme anahtarını dikkatlice not alın. Mevcut cüzdanınıza erişmenin veya onu geri yüklemenin tek yolu budur.",
     "text-readonly-change": "Başka bir cüzdana erişmeden önce, bu görüntüleme anahtarını dikkatlice not alın. Mevcut cüzdanınıza erişmenin veya onu geri yüklemenin tek yolu budur.",
     "text-readonly-server": "Başka bir sunucuyu değiştirmeden önce, bu görüntüleme anahtarını dikkatlice not alın. Mevcut cüzdanınıza erişmenin veya onu geri yüklemenin tek yolu budur.",
     "change-warning": "Başka bir cüzdana geçerseniz, bu cüzdana bir daha erişemezsiniz tohum ifadesi elinizde yoksa.",
-    "backup-warning": "Yedek cüzdanınıza geçerseniz, tohum ifadesi olmadan bu cüzdana bir daha erişemezsiniz.",
     "server-warning": "Farklı bir blok zincirine sahip bir sunucuya geçerseniz, tohum ifadesi olmadan bu cüzdana artık erişemezsiniz.",
-    "mainnet-warning": "Bu cüzdanın yedeği yoktur, yalnızca 'MAINNET' üzerinde kullanılabilir.",
     "recovering-from-keychain": "Güvenli depolamadan görüntüleme anahtarı kurtarılıyor...",
     "recovering-from-wallet": "Cüzdandan görüntüleme anahtarı yükleniyor...",
     "from-keychain": "güvenli depolamadan",
@@ -1146,10 +1123,8 @@
     "verify": "Yeniden doğrula",
     "title-server": "Sunucuyu değiştir",
     "sub-change": "Başka bir cüzdana geçmeden önce bu cüzdanın kurtarma ifadesini, doğum gününü ve görüntüleme anahtarını dikkatlice kaydedin. Ona geri dönmek için bunlara ihtiyacınız olacak.",
-    "sub-backup": "Son yedeği geri yüklemeden önce bu cüzdanın kurtarma ifadesini, doğum gününü ve görüntüleme anahtarını dikkatlice kaydedin. Ona geri dönmek için bunlara ihtiyacınız olacak.",
     "sub-server": "Sunucuyu değiştirmeden önce bu cüzdanın kurtarma ifadesini, doğum gününü ve görüntüleme anahtarını dikkatlice kaydedin. Ona geri dönmek için bunlara ihtiyacınız olacak.",
     "go-change": "Yenisini aç",
-    "go-backup": "Geri yükle",
     "go-server": "Değiştir",
     "confirm-title": "Emin misiniz?"
   }
