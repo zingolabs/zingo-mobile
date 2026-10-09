@@ -278,7 +278,13 @@ const DeleteWalletSheet = forwardRef<BottomSheetModal, DeleteWalletSheetProps>(
               opacity: pressed ? 0.6 : 1,
             })}
           >
-            <RegText style={{ fontSize: 12.5, color: colors.fgMuted }}>
+            <RegText
+              style={{
+                fontSize: 12.5,
+                fontWeight: '700',
+                color: colors.fgMuted,
+              }}
+            >
               {translate('cancel') as string}
             </RegText>
           </Pressable>
