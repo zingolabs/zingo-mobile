@@ -203,6 +203,8 @@
     "deletewallet-error": "Error: Couldn't delete the current wallet."
   },
   "settings": {
+    "restorebackup-switch": "Switch to Mainnet",
+    "restorebackup-mainnet": "The backup is a Mainnet wallet and Zingo is on a {net} server, so it couldn't open it. Zingo switches to a Mainnet server, then the current wallet and the backup swap places.",
     "restorebackup": "Restore",
     "restorebackup-warning": "The current wallet and the backup swap places, and the app reopens with the backup. Repeat this to switch back.",
     "section-preferences": "Preferences",

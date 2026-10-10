@@ -13,7 +13,13 @@ import {
   defaultAppContextLoaded,
   ContextAppLoadedProvider,
 } from '@app/context';
-import { RouteEnum, SelectServerEnum } from '@app/AppState';
+import {
+  ChainNameEnum,
+  RouteEnum,
+  SelectServerEnum,
+  ServerType,
+  remoteServer,
+} from '@app/AppState';
 import {
   ConfirmOptions,
   registerConfirmListener,
@@ -42,7 +48,7 @@ afterEach(() => {
 
 const onRestoreWalletBackup = jest.fn(async () => {});
 
-const renderSettings = async () => {
+const renderSettings = async (server: ServerType = mockServer) => {
   const props: any = {
     navigation: mockNavigation,
     route: { key: 'Key-1', name: RouteEnum.Settings, params: undefined },
@@ -54,7 +60,7 @@ const renderSettings = async () => {
         translate: (key: string) => key,
         info: mockInfo,
         totalBalance: mockTotalBalance,
-        server: mockServer,
+        server,
         selectServer: SelectServerEnum.auto,
       }}
     >
@@ -92,6 +98,22 @@ test('Tests that the developer options swap the wallet backup in after a confirm
   expect(confirms).toHaveLength(1);
   expect(confirms[0].message).toBe('settings.restorebackup-warning');
   expect(onRestoreWalletBackup).not.toHaveBeenCalled();
+  confirms[0].buttons[0].onPress?.();
+  expect(onRestoreWalletBackup).toHaveBeenCalledTimes(1);
+});
+
+test('Tests that the backup restore offers to switch to Mainnet when Zingo is on another network.', async () => {
+  nativeRpc.walletBackupExists.mockResolvedValue('true');
+  const confirms: ConfirmOptions[] = [];
+  registerConfirmListener(options => confirms.push(options));
+  await renderSettings(
+    remoteServer('https://testnet.example:9067', ChainNameEnum.testChainName),
+  );
+
+  fireEvent.press(await screen.findByTestId('settings.restorebackupwallet'));
+
+  expect(confirms[0].message).toBe('settings.restorebackup-mainnet');
+  expect(confirms[0].buttons[0].text).toBe('settings.restorebackup-switch');
   confirms[0].buttons[0].onPress?.();
   expect(onRestoreWalletBackup).toHaveBeenCalledTimes(1);
 });

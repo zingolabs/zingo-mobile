@@ -203,6 +203,8 @@
     "deletewallet-error": "Error: No se pudo borrar el monedero actual."
   },
   "settings": {
+    "restorebackup-switch": "Cambiar a Mainnet",
+    "restorebackup-mainnet": "La copia de seguridad es un monedero de Mainnet y Zingo está en un servidor de {net}, así que no podría abrirlo. Zingo cambia a un servidor de Mainnet y después el monedero actual y la copia se intercambian.",
     "restorebackup": "Restaurar",
     "restorebackup-warning": "El monedero actual y la copia de seguridad se intercambian, y la app se reabre con la copia. Repite esto para volver.",
     "section-preferences": "Preferencias",

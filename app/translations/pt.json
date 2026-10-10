@@ -203,6 +203,8 @@
     "deletewallet-error": "Error: não foi possível excluir a carteira atual."
   },
   "settings": {
+    "restorebackup-switch": "Mudar para Mainnet",
+    "restorebackup-mainnet": "O backup é uma carteira Mainnet e o Zingo está em um servidor {net}, então não conseguiria abri-la. O Zingo muda para um servidor Mainnet e depois a carteira atual e o backup trocam de lugar.",
     "restorebackup": "Restaurar",
     "restorebackup-warning": "A carteira atual e o backup trocam de lugar, e o app reabre com o backup. Repita isso para voltar.",
     "section-preferences": "Preferências",

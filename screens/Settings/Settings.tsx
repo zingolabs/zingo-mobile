@@ -42,6 +42,7 @@ import {
   RouteEnum,
   ScreenEnum,
   BlockExplorerEnum,
+  ChainNameEnum,
 } from '@app/AppState';
 import { fetchWallet, walletBackupExists } from '@app/walletBackend';
 import {
@@ -108,6 +109,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     performanceLevel: performanceLevelContext,
     blockExplorer: blockExplorerContext,
     readOnly,
+    server,
     setPrivacyOption,
     setBackgroundError,
     zingolibVersion,
@@ -166,6 +168,10 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const [showDeveloperOptions, setShowDeveloperOptions] =
     useState<boolean>(false);
   const [hasWalletBackup, setHasWalletBackup] = useState<boolean>(false);
+  // Backups only ever held mainnet wallets.
+  const backupNeedsMainnet =
+    server.kind !== 'offline' &&
+    server.chainName !== ChainNameEnum.mainChainName;
   // Assumed stored until checked, so the warning doesn't flash on open.
   const [recoveryInfoStored, setRecoveryInfoStored] = useState<boolean>(true);
   const [savingRecoveryInfo, setSavingRecoveryInfo] = useState<boolean>(false);
@@ -976,12 +982,27 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                                 title: translate(
                                   'loadedapp.restorebackupwallet',
                                 ) as string,
-                                message: translate(
-                                  'settings.restorebackup-warning',
-                                ) as string,
+                                message: backupNeedsMainnet
+                                  ? (
+                                      translate(
+                                        'settings.restorebackup-mainnet',
+                                      ) as string
+                                    ).replace(
+                                      '{net}',
+                                      translate(
+                                        `settings.value-chainname-${server.chainName}`,
+                                      ) as string,
+                                    )
+                                  : (translate(
+                                      'settings.restorebackup-warning',
+                                    ) as string),
                                 buttons: [
                                   {
-                                    text: translate('confirm') as string,
+                                    text: translate(
+                                      backupNeedsMainnet
+                                        ? 'settings.restorebackup-switch'
+                                        : 'confirm',
+                                    ) as string,
                                     onPress: onRestoreWalletBackup,
                                   },
                                   {

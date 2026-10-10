@@ -1822,6 +1822,23 @@ export class LoadedAppClass extends Component<
     // previous wallet's flag must not carry over.
     await SettingsFileImpl.writeSettings(SettingsNameEnum.seedBackedUp, true);
     await SettingsFileImpl.writeSettings(SettingsNameEnum.seedBackedUpAt, 0);
+    // Only mainnet wallets were ever backed up, so another network's server
+    // could not open it: the restart picks the best mainnet server instead.
+    const { server } = this.state;
+    if (
+      server.kind !== 'offline' &&
+      server.chainName !== ChainNameEnum.mainChainName
+    ) {
+      const mainnet = serverUris(this.state.translate).find(
+        s => s.chainName === ChainNameEnum.mainChainName && s.default,
+      );
+      if (mainnet) {
+        await SettingsFileImpl.writeServer(
+          remoteServer(mainnet.uri, mainnet.chainName),
+          SelectServerEnum.auto,
+        );
+      }
+    }
     this.keepAwake(false);
     this.navigateToLoadingApp({ startingApp: false, newWallet: true });
   };

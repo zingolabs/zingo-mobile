@@ -203,6 +203,8 @@
     "deletewallet-error": "Error: Mevcut cüzdan silinemedi."
   },
   "settings": {
+    "restorebackup-switch": "Mainnet'e geç",
+    "restorebackup-mainnet": "Yedek bir Mainnet cüzdanı ve Zingo bir {net} sunucusunda, bu yüzden onu açamaz. Zingo bir Mainnet sunucusuna geçer, ardından mevcut cüzdan ile yedek yer değiştirir.",
     "restorebackup": "Geri yükle",
     "restorebackup-warning": "Mevcut cüzdan ile yedek yer değiştirir ve uygulama yedekle yeniden açılır. Geri dönmek için bunu tekrarlayın.",
     "section-preferences": "Tercihler",
