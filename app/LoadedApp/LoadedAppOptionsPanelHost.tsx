@@ -175,7 +175,6 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
       onPress: () => dispatch(MenuItemEnum.ChangeWallet),
     });
 
-
     // Server — always visible, always last; its dot says how Zingo connects.
     list.push({
       id: MenuItemEnum.Server,
