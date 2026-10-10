@@ -647,6 +647,39 @@ class RPCModule: NSObject {
     }
   }
 
+  // The backup takes the main wallet's place and the backup file goes:
+  // for a wallet that is never backed up (not mainnet), which is lost.
+  // A crash between the write and the delete leaves the same wallet in
+  // both files, which is harmless.
+  @objc(replaceWalletWithBackup:reject:)
+  func replaceWalletWithBackup(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+    do {
+      let backupBytes = try self.readWalletBackupBytes()
+      guard (try? validateWalletBytes(walletBytes: backupBytes)) != nil else {
+        NSLog("Error: [Native] Couldn't replace the wallet with the backup. The content is not a wallet. Size: \(backupBytes.count)")
+        DispatchQueue.main.async {
+          resolve("false")
+        }
+        return
+      }
+      // Closed until the reload after the replace.
+      RPCModule.walletFileHold.lock()
+      RPCModule.walletFileClosed = true
+      RPCModule.walletFileHold.unlock()
+      self.completePendingSwap()
+      try self.saveWalletFile(backupBytes)
+      try? FileManager.default.removeItem(atPath: try getFileName(Constants.WalletBackupFileName.rawValue))
+      DispatchQueue.main.async {
+        resolve("true")
+      }
+    } catch {
+      NSLog("Error: [Native] Replacing the wallet with the backup error: \(error.localizedDescription)")
+      DispatchQueue.main.async {
+        resolve("false")
+      }
+    }
+  }
+
   // The chain the wallet file was written for: main, test or regtest.
   @objc(walletChainInfo:reject:)
   func walletChainInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {

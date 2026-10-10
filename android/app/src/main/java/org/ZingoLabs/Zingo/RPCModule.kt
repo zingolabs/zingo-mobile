@@ -629,6 +629,37 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         }
     }
 
+    // The backup takes the main wallet's place and the backup file goes:
+    // for a wallet that is never backed up (not mainnet), which is lost.
+    // A crash between the write and the delete leaves the same wallet in
+    // both files, which is harmless.
+    @ReactMethod
+    fun replaceWalletWithBackup(promise: Promise) {
+        try {
+            val backup = readWalletBytes(WalletBackupFileName.value)
+            if (!isIntactWallet(backup)) {
+                Log.e("MAIN", "[Native] backup replace: content failed validation")
+                promise.resolve(false)
+                return
+            }
+            // Closed until the reload after the replace.
+            walletFileClosed = true
+            completePendingSwap()
+            writeWalletBytes(WalletFileName.value, backup)
+            PlainWalletFile.locked {
+                deleteFile(WalletBackupFileName.value)
+                deleteWalletSidecars(WalletBackupFileName.value)
+            }
+            promise.resolve(true)
+        } catch (e: FileNotFoundException) {
+            Log.e("MAIN", "[Native] file not found during backup replace", e)
+            promise.resolve(false)
+        } catch (e: Exception) {
+            Log.e("MAIN", "[Native] Unexpected error during backup replace: $e")
+            promise.resolve(false)
+        }
+    }
+
     // Deletes every sidecar the recovery paths could rename or copy back
     // onto the wallet path.
     private fun deleteWalletSidecars(fileName: String) {
