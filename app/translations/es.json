@@ -103,7 +103,7 @@
     "memobytes-unit": " car."
   },
   "loadingapp": {
-    "welcome": "Bienvenido",
+    "welcome": "Bienvenido a",
     "tagline": "Un monedero privado para tu Zcash.",
     "creating-title": "Creando tu monedero",
     "previous-install-title": "Monedero de una instalación anterior",
@@ -152,13 +152,11 @@
     "info": "Información del Servidor",
     "options": "Opciones",
     "walletseed": "Semilla del Monedero",
-    "walletbackupseed": "Frase Semilla de Respaldo",
     "walletufvk": "Clave de Visualización del Monedero",
     "rescanwallet": "Re-Escanear",
     "report": "Informe de Sincronización",
     "changewallet": "Abrir otro Monedero",
     "restorebackupwallet": "Restaurar Copia de Seguridad",
-    "alert-restorebackupwallet-body": "Confirma que deseas restaurar la última copia de seguridad del monedero.",
     "fundpools": "Agrupaciones de Fondos",
     "insight": "Visión Financiera",
     "addressbook": "Libreta de Direcciones",
@@ -202,10 +200,13 @@
   "rpc": {
     "walletnotfound-error": "Error: No se encuentra ningún monedero.",
     "backupnotfound-error": "Error: No se encuentra ninguna copia de seguridad de ningún monedero.",
-    "deletewallet-error": "Error: No se pudo borrar el monedero actual.",
-    "backupwallet-error": "Error: No se pudo guardar la copia de seguridad del monedero."
+    "deletewallet-error": "Error: No se pudo borrar el monedero actual."
   },
   "settings": {
+    "restorebackup-switch": "Cambiar a Mainnet",
+    "restorebackup-mainnet": "La copia de seguridad es un monedero de Mainnet y Zingo está en un servidor de {net}, así que no podría abrirlo. Zingo cambia a un servidor de Mainnet y después el monedero actual y la copia se intercambian.",
+    "restorebackup": "Restaurar",
+    "restorebackup-warning": "El monedero actual y la copia de seguridad se intercambian, y la app se reabre con la copia. Repite esto para volver.",
     "section-preferences": "Preferencias",
     "section-privacysecurity": "Privacidad y Seguridad",
     "section-networkadvanced": "Red y Avanzado",
@@ -416,13 +417,7 @@
         "Estás seguro/a?"
       ],
       "view": ["Ya he guardado \n la semilla"],
-      "restore": ["Restaurar Monedero"],
-      "backup": [
-        "",
-        "Restaurar",
-        "Realmente quieres \n restaurar tu \n copia de seguridad",
-        "Estás seguro/a?"
-      ]
+      "restore": ["Restaurar Monedero"]
     },
     "title": "Semilla",
     "new": "Nueva",
@@ -432,9 +427,6 @@
     "restore": "Restaurar",
     "backup": "Copia de seguridad",
     "text-readonly": "Antes de cerrar esta ventana, escriba cuidadosamente esta frase semilla. Es la única manera que puedes restaurar/acceder tu monedero actual.",
-    "text-readonly-backup": "Antes de restaurar la copia de seguridad del monedero anterior, escriba cuidadosamente esta frase semilla. Es la única manera que puedes restaurar/acceder tu monedero actual.",
-    "text-readonly-change": "Antes de acceder a otro monedero, escriba cuidadosamente esta frase semilla. Es la única manera que puedes restaurar/acceder tu monedero actual.",
-    "text-readonly-server": "Antes de usar otro servidor, escriba cuidadosamente esta frase semilla. Es la única manera que puedes restaurar/acceder tu monedero actual.",
     "text-no-readonly": "Introduce tu Frase Semilla (son 24 palabras)",
     "tapcopy": "Pulsar para copiar",
     "tapcopy-seed-message": "Frase Semilla copiada al Portapapeles (se borrará en 60s)",
@@ -446,20 +438,14 @@
     "birthday-readonly": "Cumpleaños del Monedero",
     "birthday-no-readonly": "Altura de bloque de la primera transacción. (Está bien si no la sabes o no te acuerdas)\nRango de valores entre ",
     "change-warning": "Si cambias a otro monedero, ya no tendrás acceso a este monedero sin la frase semilla.",
-    "backup-warning": "Si cambias a tu monedero anterior (copia de seguridad), ya no tendrás acceso a este monedero sin la frase semilla.",
     "server-warning": "Si cambias a un servidor con diferente tipo de cadena, ya no tendrás acceso a este monedero sin la frase semilla.",
-    "mainnet-warning": "No se va a hacer copia de seguridad del monedero activo, solo está disponible en: 'MAINNET'.",
     "seedplaceholder": "Semilla (24 palabras)",
     "seed-acc": "Campo Frase Semilla",
     "birthday-acc": "Campo Cumpleaños",
     "tapreveal": "Pulsar para revelar",
     "showtransactions": "Ver Transacciones",
     "youreceived": "Recibiste",
-    "tapcopy-ufvk-message": "Clave de visualización copiada al portapapeles (se borrará en 60s)",
-    "recovering-from-keychain": "Recuperando la semilla del almacenamiento seguro...",
-    "recovering-from-wallet": "Cargando la semilla del monedero...",
-    "from-keychain": "del almacenamiento seguro",
-    "from-wallet": "del monedero"
+    "tapcopy-ufvk-message": "Clave de visualización copiada al portapapeles (se borrará en 60s)"
   },
   "send": {
     "Broadcast": "Transmitida y esperando confirmación Tx:",
@@ -652,6 +638,15 @@
     "highpriority": "Alta prioridad"
   },
   "walleterror": {
+    "chain-title": "Este monedero es de {net}",
+    "chain-sub": "Zingo está conectado a un servidor de {server}, así que no puede abrir este monedero. Tu monedero y tus fondos están bien.",
+    "chain-action": "Cambiar a {net}",
+    "chip-wallet": "Monedero",
+    "chip-server": "Servidor",
+    "more": "Más opciones",
+    "more-warn": "Estas opciones sustituyen el monedero de {net} de este teléfono. No las necesitas para arreglar esto.",
+    "more-import": "Importar otro monedero",
+    "more-create": "Crear un monedero nuevo",
     "open-title": "Zingo no pudo abrir tu monedero",
     "open-sub": "Tus fondos están a salvo y tu semilla siempre puede restaurarlos.",
     "server-title": "No se puede conectar con el servidor",
@@ -741,6 +736,15 @@
     "done": "Hecho"
   },
   "import": {
+    "key-prefix": "Una clave de visualización empieza por uview1.",
+    "key-char": "“{char}” no puede aparecer en una clave de visualización. Revisa ese carácter.",
+    "key-incomplete": "Esta clave de visualización está incompleta. Revisa si faltan caracteres.",
+    "key-valid": "Clave de visualización válida",
+    "key-keep-typing": "¿Clave de visualización? Sigue escribiendo: uview1…",
+    "word-nomatch": "Ninguna palabra de recuperación empieza por “{word}”",
+    "scan-hint": "Apunta la cámara al código QR de una clave de visualización.",
+    "scan-found": "Clave de visualización encontrada",
+    "scan-miss": "Ese código no es una clave de visualización.",
     "title": "Semilla / Clave de Visualización",
     "key-label": "Introduce tu Semilla / Clave de Visualización",
     "birthday": "Cumpleaños",
@@ -752,7 +756,6 @@
     "seed-full": "Una frase semilla tiene 24 palabras. Quita una para cambiarla.",
     "seed-words-invalid": "{count} de estas palabras no están en la lista de palabras de recuperación.",
     "seed-checksum": "Estas 24 palabras no forman una frase semilla válida. Revísalas, sobre todo la última.",
-    "key-invalid": "Esta clave de visualización no es válida. Comprueba que está completa y copiada exactamente.",
     "key-wrong-chain": "Esta clave de visualización es de {key}, y la red seleccionada es {server}.",
     "need-words": "Introduce las 24 palabras, o una clave de visualización.",
     "need-birthday": "Introduce una altura de bloque dentro del rango, o déjala vacía.",
@@ -782,45 +785,15 @@
     ]
   },
   "scanner": {
+    "title": "Escanear código QR",
+    "back": "Atrás",
+    "torch": "Linterna",
+    "found": "Código QR leído",
+    "hint-address": "Apunta la cámara al código QR de una dirección Zcash.",
+    "miss-address": "Ese código no es una dirección Zcash.",
+    "hint-any": "Apunta la cámara al código QR de una dirección.",
     "text": "Escanea una Clave de Visualización Totalmente Unificada",
     "scanaddress": "Escanea una dirección Zcash"
-  },
-  "ufvk": {
-    "buttontexts": {
-      "view": ["Ya he guardado \n la clave de visualización"],
-      "change": [
-        "",
-        "Abrir Nuevo",
-        "Realmente quieres \n cambiar tu \n monedero activo",
-        "Estás seguro/a?"
-      ],
-      "server": [
-        "",
-        "Cambiar Servidor",
-        "Realmente quieres \n cambiar el \n servidor activo",
-        "Estás seguro/a?"
-      ],
-      "backup": [
-        "",
-        "Restaurar",
-        "Realmente quieres \n restaurar tu \n copia de seguridad",
-        "Estás seguro/a?"
-      ]
-    },
-    "viewkey": "Clave de Visualización ",
-    "tapcopy-message": "Clave copiada al portapapeles",
-    "text-readonly": "Antes de cerrar esta ventana, escriba cuidadosamente esta clave de visualización. Es la única manera que puedes restaurar/acceder tu monedero actual.",
-    "text-readonly-backup": "Antes de restaurar la copia de seguridad del monedero anterior, escriba cuidadosamente esta clave de visualización. Es la única manera que puedes restaurar/acceder tu monedero actual.",
-    "text-readonly-change": "Antes de acceder a otro monedero, escriba cuidadosamente esta clave de visualización. Es la única manera que puedes restaurar/acceder tu monedero actual.",
-    "text-readonly-server": "Antes de usar otro servidor, escriba cuidadosamente esta clave de visualización. Es la única manera que puedes restaurar/acceder tu monedero actual.",
-    "change-warning": "Si cambias a otro monedero, ya no tendrás acceso a este monedero sin la frase semilla.",
-    "backup-warning": "Si cambias a tu monedero anterior (copia de seguridad), ya no tendrás acceso a este monedero sin la frase semilla.",
-    "server-warning": "Si cambias a un servidor con diferente tipo de cadena, ya no tendrás acceso a este monedero sin la frase semilla.",
-    "mainnet-warning": "No se va a hacer copia de seguridad del monedero activo, solo está disponible en: 'MAINNET'.",
-    "recovering-from-keychain": "Recuperando la clave de visualización del almacenamiento seguro...",
-    "recovering-from-wallet": "Cargando la clave de visualización del monedero...",
-    "from-keychain": "del almacenamiento seguro",
-    "from-wallet": "del monedero"
   },
   "pools": {
     "title": "Agrupaciones de Fondos",
@@ -1141,6 +1114,8 @@
     "birthday-tip-body": "Zingo empieza a escanear desde aquí en vez de desde el principio, así sincroniza mucho más rápido."
   },
   "walletseed": {
+    "sub-change-vo": "Antes de abrir otro monedero, guarda con cuidado la clave de visualización y el cumpleaños de este. Los necesitarás para volver a él.",
+    "change-warning-vo": "Si cambias a otro monedero, ya no tendrás acceso a este monedero sin la clave de visualización.",
     "back-acc": "Atrás",
     "ok-title": "Respaldada",
     "ok-sub": "{date} · 3 palabras confirmadas",
@@ -1152,6 +1127,30 @@
     "vk-tip-body": "No puede gastar tus fondos. Compártela solo con personas o servicios de confianza.",
     "vk-copy": "Copiar clave de visualización",
     "vk-copied": "Clave de visualización copiada",
-    "verify": "Verificar de nuevo"
+    "verify": "Verificar de nuevo",
+    "title-server": "Cambiar servidor",
+    "sub-change": "Antes de abrir otro monedero, guarda con cuidado la frase semilla, el cumpleaños y la clave de visualización de este. Los necesitarás para volver a él.",
+    "sub-server": "Antes de cambiar de servidor, guarda con cuidado la frase semilla, el cumpleaños y la clave de visualización de este monedero. Los necesitarás para volver a él.",
+    "go-change": "Abrir otro",
+    "go-server": "Cambiar",
+    "confirm-title": "¿Estás seguro?"
+  },
+  "viewingkey": {
+    "switch-title": "Cambiar a {net}",
+    "switch-sub": "Antes de cambiar a {net}, guarda con cuidado la clave de visualización de este monedero. La necesitarás para volver a él.",
+    "switch": "Cambiar",
+    "switch-warning": "Si cambias a un servidor de otra red, ya no tendrás acceso a este monedero sin la clave de visualización.",
+    "title": "Tu clave de visualización",
+    "sub": "Cualquiera con esta clave puede ver el saldo y el historial de este monedero. No puede gastar fondos.",
+    "label": "Clave de visualización unificada",
+    "read": "Solo lectura: muestra el saldo, el historial y las direcciones",
+    "spend": "No puede enviar, intercambiar ni gastar fondos",
+    "share": "Compártela solo con personas de confianza. Verán toda tu actividad"
+  },
+  "viewonly": {
+    "dismiss-acc": "Cerrar el aviso de solo lectura",
+    "title": "Monedero de solo lectura",
+    "body": "Puedes ver el saldo y el historial y recibir fondos. Con una clave de visualización no se puede gastar.",
+    "button": "Ver clave"
   }
 }

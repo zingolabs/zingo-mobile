@@ -42,8 +42,9 @@ import {
   RouteEnum,
   ScreenEnum,
   BlockExplorerEnum,
+  ChainNameEnum,
 } from '@app/AppState';
-import { fetchWallet } from '@app/walletBackend';
+import { fetchWallet, walletBackupExists } from '@app/walletBackend';
 import {
   DeviceSecurityProbe,
   probeDeviceSecurity,
@@ -66,6 +67,7 @@ import {
 import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { createAlert } from '@app/services/createAlert';
+import { showConfirm } from '@app/services/showConfirm';
 import { sendEmail } from '@app/services/sendEmail';
 import SwitchOff from '../../assets/img/switch-off.svg';
 import SettingSwitchOn from '../../assets/img/setting-switch-on.svg';
@@ -79,6 +81,7 @@ type SettingsProps = NativeStackScreenProps<
   setPerformanceLevelOption: (value: RPCPerformanceLevelEnum) => Promise<void>;
   setBlockExplorerOption: (value: BlockExplorerEnum) => Promise<void>;
   toggleMenuDrawer: () => void;
+  onRestoreWalletBackup: () => Promise<void>;
 };
 
 type Options = {
@@ -93,6 +96,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   setPerformanceLevelOption,
   setBlockExplorerOption,
   toggleMenuDrawer,
+  onRestoreWalletBackup,
 }) => {
   const context = useContext(ContextAppLoaded);
   const {
@@ -105,6 +109,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     performanceLevel: performanceLevelContext,
     blockExplorer: blockExplorerContext,
     readOnly,
+    server,
     setPrivacyOption,
     setBackgroundError,
     zingolibVersion,
@@ -162,6 +167,11 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const [disabledButton, setDisabledButton] = useState<boolean>(false);
   const [showDeveloperOptions, setShowDeveloperOptions] =
     useState<boolean>(false);
+  const [hasWalletBackup, setHasWalletBackup] = useState<boolean>(false);
+  // Backups only ever held mainnet wallets.
+  const backupNeedsMainnet =
+    server.kind !== 'offline' &&
+    server.chainName !== ChainNameEnum.mainChainName;
   // Assumed stored until checked, so the warning doesn't flash on open.
   const [recoveryInfoStored, setRecoveryInfoStored] = useState<boolean>(true);
   const [savingRecoveryInfo, setSavingRecoveryInfo] = useState<boolean>(false);
@@ -225,6 +235,24 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       cancelled = true;
     };
   }, []);
+
+  // Older builds kept a backup of the previous mainnet wallet on every
+  // wallet change. Swapping it back in stays here for whoever has one.
+  useEffect(() => {
+    if (!showDeveloperOptions) {
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      const exists = await walletBackupExists();
+      if (!cancelled) {
+        setHasWalletBackup(exists);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [showDeveloperOptions]);
 
   const probedRef = useRef<boolean>(false);
   useEffect(() => {
@@ -925,6 +953,67 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                             onPress={() => {
                               reportError(lastError);
                             }}
+                            twoButtons={true}
+                          />
+                        </View>
+                      </>
+                    )}
+                    {hasWalletBackup && (
+                      <>
+                        <View
+                          style={{ marginHorizontal: 25, marginVertical: 15 }}
+                        >
+                          <BoldText>
+                            {
+                              translate(
+                                'loadedapp.restorebackupwallet',
+                              ) as string
+                            }
+                          </BoldText>
+                        </View>
+
+                        <View style={{ marginLeft: 40, marginRight: 25 }}>
+                          <Button
+                            testID="settings.restorebackupwallet"
+                            type={ButtonTypeEnum.Secondary}
+                            title={
+                              translate('settings.restorebackup') as string
+                            }
+                            onPress={() =>
+                              showConfirm({
+                                title: translate(
+                                  'loadedapp.restorebackupwallet',
+                                ) as string,
+                                message: backupNeedsMainnet
+                                  ? (
+                                      translate(
+                                        'settings.restorebackup-mainnet',
+                                      ) as string
+                                    ).replace(
+                                      '{net}',
+                                      translate(
+                                        `settings.value-chainname-${server.chainName}`,
+                                      ) as string,
+                                    )
+                                  : (translate(
+                                      'settings.restorebackup-warning',
+                                    ) as string),
+                                buttons: [
+                                  {
+                                    text: translate(
+                                      backupNeedsMainnet
+                                        ? 'settings.restorebackup-switch'
+                                        : 'confirm',
+                                    ) as string,
+                                    onPress: onRestoreWalletBackup,
+                                  },
+                                  {
+                                    text: translate('cancel') as string,
+                                    style: 'cancel',
+                                  },
+                                ],
+                              })
+                            }
                             twoButtons={true}
                           />
                         </View>

@@ -115,9 +115,6 @@ export default class WalletBackend {
   async changeWallet() {
     return this.walletLifecycle.changeWallet();
   }
-  async changeWalletNoBackup() {
-    return this.walletLifecycle.changeWalletNoBackup();
-  }
   async restoreBackup() {
     return this.walletLifecycle.restoreBackup();
   }

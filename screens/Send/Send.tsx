@@ -981,17 +981,49 @@ const Send: React.FunctionComponent<SendProps> = ({
     navigation.navigate(RouteEnum.Computing, computingEnd(settlement));
   };
 
+  const scanButton = useRef<View>(null);
+
   const scrollToEnd = () => {
     if (scrollViewRef.current) {
       scrollViewRef.current.scrollTo({ y: contentHeight, animated: true });
     }
   };
 
+  // The shared scanner opens from the scan button and takes a Zcash
+  // address or a zcash: URI; a bare address goes in as a URI.
   const setQrcodeModalShow = () => {
-    navigation.navigate(RouteEnum.ScannerAddress, {
-      setAddress: (a: string) => updateToField(a, null, null, null, null),
-      active: true,
-    });
+    const open = (origin?: { x: number; y: number }) =>
+      navigation.navigate(RouteEnum.ScannerAddress, {
+        setAddress: (a: string) =>
+          updateToField(
+            a.toLowerCase().startsWith(GlobalConst.zcash) || a.includes(':')
+              ? a
+              : GlobalConst.zcash + a,
+            null,
+            null,
+            null,
+            null,
+          ),
+        accepts: async (v: string) =>
+          v.toLowerCase().startsWith(GlobalConst.zcash) ||
+          (await Utils.isValidAddress(v, server.chainName)).isValid,
+        texts: {
+          title: translate('scanner.title') as string,
+          hint: translate('scanner.hint-address') as string,
+          miss: translate('scanner.miss-address') as string,
+          found: translate('scanner.found') as string,
+          back: translate('scanner.back') as string,
+          torch: translate('scanner.torch') as string,
+        },
+        origin,
+      });
+    if (scanButton.current) {
+      scanButton.current.measureInWindow((x, y, width, height) =>
+        open({ x: x + width / 2, y: y + height / 2 }),
+      );
+    } else {
+      open();
+    }
   };
 
   const setMemoModalShow = () => {
@@ -1317,6 +1349,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                         return null;
                       })()}
                       <TouchableOpacity
+                        ref={scanButton}
                         testID="send.scan-button"
                         accessible={true}
                         accessibilityLabel={

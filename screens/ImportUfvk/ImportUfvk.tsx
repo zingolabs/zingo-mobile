@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import {
   View,
   TouchableOpacity,
@@ -15,16 +15,10 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-import {
-  NavigationProp,
-  ParamListBase,
-  useNavigation,
-} from '@react-navigation/native';
 import { useTheme } from '@app/theme';
 import {
   faChevronLeft,
   faCircleInfo,
-  faQrcode,
   faXmark,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -35,14 +29,21 @@ import { ContextAppLoading } from '@app/context';
 import SeedPhraseInput from '@ui/widgets/SeedPhraseInput';
 import BusyButton from '@ui/widgets/BusyButton';
 import InfoTooltip from '@ui/widgets/InfoTooltip';
+import { RevealOrigin } from '@ui/widgets/CircularReveal';
+import { ScanIcon } from '@ui/primitives/Icons/ScanIcon';
+import ScanOverlay from '@ui/widgets/ScanOverlay';
 import {
   UfvkCheck,
   checkUfvk,
   getLatestBlockServerInfo,
 } from '@app/walletBackend';
-import { ChainNameEnum, GlobalConst, RouteEnum } from '@app/AppState';
+import { ChainNameEnum, GlobalConst } from '@app/AppState';
 import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
-import { seedStatus } from '@app/utils/seedPhrase';
+import {
+  isViewingKey,
+  seedStatus,
+  viewingKeyProblem,
+} from '@app/utils/seedPhrase';
 import { duration, ease } from '@app/theme/motion';
 
 const activationHeight = {
@@ -67,13 +68,15 @@ type ImportUfvkProps = {
 };
 // Waits for typing to pause before decoding the key.
 const KEY_CHECK_DELAY_MS = 300;
+// A key the decode rejects reads as incomplete only once typing pauses
+// this long, so it does not turn red on every keystroke.
+const KEY_PAUSE_MS = 1200;
 
 const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
   busy,
   onClickCancel,
   onClickOK,
 }) => {
-  const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const context = useContext(ContextAppLoading);
   const { translate, netInfo, server, addLastSnackbar } = context;
   const { colors } = useTheme();
@@ -82,6 +85,11 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
   const [birthday, setBirthday] = useState<string>('');
   const [latestBlock, setLatestBlock] = useState<number>(0);
   const [tipOpen, setTipOpen] = useState<boolean>(false);
+  const scanButton = useRef<View>(null);
+  const [scan, setScan] = useState<
+    { kind: 'closed' } | { kind: 'open'; origin: RevealOrigin }
+  >({ kind: 'closed' });
+  const [pulse, setPulse] = useState(0);
   const keyboardHeight = useKeyboardHeight();
 
   const activation = activationHeight[server.chainName];
@@ -101,16 +109,31 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
     check.chainName !== server.chainName;
   const chainLabel = (chain: ChainNameEnum) =>
     translate(`settings.value-chainname-${chain}`) as string;
+  const problem = viewingKeyProblem(typedKey);
+  // Set once typing pauses or the key loses focus.
+  const [keyPaused, setKeyPaused] = useState(false);
   const keyError =
-    check.kind === 'invalid'
-      ? (translate('import.key-invalid') as string)
-      : check.kind === 'ufvk' && keyChainMismatch
-        ? (translate('import.key-wrong-chain') as string)
-            .replace('{key}', chainLabel(check.chainName))
-            .replace('{server}', chainLabel(server.chainName))
-        : undefined;
+    problem.kind === 'prefix'
+      ? (translate('import.key-prefix') as string)
+      : problem.kind === 'char'
+        ? (translate('import.key-char') as string).replace(
+            '{char}',
+            problem.char,
+          )
+        : check.kind === 'ufvk' && keyChainMismatch
+          ? (translate('import.key-wrong-chain') as string)
+              .replace('{key}', chainLabel(check.chainName))
+              .replace('{server}', chainLabel(server.chainName))
+          : check.kind === 'invalid' && keyPaused
+            ? (translate('import.key-incomplete') as string)
+            : undefined;
+  const keyValid =
+    problem.kind === 'none' && check.kind === 'ufvk' && !keyChainMismatch;
+  // A key whose decode could not run passes on; the restore reports.
   const keyReady =
-    (status.kind === 'ufvk' && keyCheck.key === typedKey && !keyError) ||
+    (status.kind === 'ufvk' &&
+      keyCheck.key === typedKey &&
+      (keyValid || (problem.kind === 'none' && check.kind === 'unknown'))) ||
     (status.kind === 'seed' && status.complete);
 
   useEffect(() => {
@@ -128,6 +151,15 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
       live = false;
       clearTimeout(timer);
     };
+  }, [typedKey]);
+
+  useEffect(() => {
+    setKeyPaused(false);
+    if (!typedKey) {
+      return;
+    }
+    const timer = setTimeout(() => setKeyPaused(true), KEY_PAUSE_MS);
+    return () => clearTimeout(timer);
   }, [typedKey]);
   const birthdayLow = !!birthday && Number(birthday) < activation;
   const ready = keyReady && !birthdayLow;
@@ -231,11 +263,14 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
     Keyboard.dismiss();
   };
 
-  const showQrcodeModalVisible = () => {
-    navigation.navigate(RouteEnum.ScannerUfvk, {
-      setUfvkText: (k: string) => setSeedufvkText(k),
-      active: true,
-    });
+  const openScanner = () => {
+    Keyboard.dismiss();
+    scanButton.current?.measureInWindow((x, y, width, height) =>
+      setScan({
+        kind: 'open',
+        origin: { x: x + width / 2, y: y + height / 2 },
+      }),
+    );
   };
 
   const buttonBottom = keyboardHeight > 0 ? keyboardHeight + 12 : BUTTON_BOTTOM;
@@ -291,7 +326,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
           <BoldText style={{ fontSize: 12.5, lineHeight: 16 }}>
             {translate('import.seed-label') as string}
           </BoldText>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
             {!!seedufvkText && (
               <TouchableOpacity onPress={() => setSeedufvkText('')} hitSlop={8}>
                 <FontAwesomeIcon
@@ -301,13 +336,27 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
                 />
               </TouchableOpacity>
             )}
-            <TouchableOpacity onPress={showQrcodeModalVisible} hitSlop={8}>
-              <FontAwesomeIcon
-                size={20}
-                icon={faQrcode}
-                color={colors.fgMuted}
-              />
-            </TouchableOpacity>
+            <Pressable
+              ref={scanButton}
+              testID="import.scan"
+              accessibilityRole="button"
+              accessibilityLabel={translate('scanner.title') as string}
+              onPress={openScanner}
+              style={({ pressed }) => ({
+                width: 34,
+                height: 34,
+                marginVertical: -9,
+                marginRight: -6,
+                borderRadius: 9,
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: pressed
+                  ? 'rgba(211,226,248,0.08)'
+                  : 'transparent',
+              })}
+            >
+              <ScanIcon size={22} color={colors.fgMuted} />
+            </Pressable>
           </View>
         </View>
         <SeedPhraseInput
@@ -317,6 +366,9 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
           onChangeValue={setSeedufvkText}
           translate={translate}
           keyError={keyError}
+          keyValid={keyValid}
+          onKeyBlur={() => setKeyPaused(true)}
+          pulse={pulse}
         />
 
         <View style={{ marginTop: 39, alignItems: 'center' }}>
@@ -476,6 +528,26 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
           color={colors.fgAccent}
         />
       </Pressable>
+      {scan.kind === 'open' && (
+        <ScanOverlay
+          testID="import.scanner"
+          origin={scan.origin}
+          texts={{
+            title: translate('scanner.title') as string,
+            hint: translate('import.scan-hint') as string,
+            miss: translate('import.scan-miss') as string,
+            found: translate('import.scan-found') as string,
+            back: translate('scanner.back') as string,
+            torch: translate('scanner.torch') as string,
+          }}
+          accepts={isViewingKey}
+          onRead={key => {
+            setSeedufvkText(key);
+            setPulse(p => p + 1);
+          }}
+          onClosed={() => setScan({ kind: 'closed' })}
+        />
+      )}
     </View>
   );
 };

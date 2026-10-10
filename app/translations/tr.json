@@ -152,13 +152,11 @@
     "info": "Sunucu bilgisi",
     "options": "Seçenekler",
     "walletseed": "Cüzdan Tohumu",
-    "walletbackupseed": "Yedek Kurtarma Kelimeleri",
     "walletufvk": "Cüzdan Görüntüleme Anahtarı",
     "rescanwallet": "Cüzdanı Yeniden Tara",
     "report": "Senkronizasyon / Yeniden Tarama Raporu",
     "changewallet": "Başka bir cüzdana geç",
     "restorebackupwallet": "Son Cüzdan Yedeğini Geri Yükle",
-    "alert-restorebackupwallet-body": "Son cüzdan yedeğini geri yüklemek istediğinizi onaylayın.",
     "fundpools": "Fon Havuzları",
     "insight": "Finansal İçgörü",
     "addressbook": "Adres Defteri",
@@ -202,10 +200,13 @@
   "rpc": {
     "walletnotfound-error": "Error: Herhangi bir cüzdan bulunamadı.",
     "backupnotfound-error": "Error: Herhangi bir cüzdan yedeği bulunamadı.",
-    "deletewallet-error": "Error: Mevcut cüzdan silinemedi.",
-    "backupwallet-error": "Error: Cüzdan yedeği kaydedilemedi."
+    "deletewallet-error": "Error: Mevcut cüzdan silinemedi."
   },
   "settings": {
+    "restorebackup-switch": "Mainnet'e geç",
+    "restorebackup-mainnet": "Yedek bir Mainnet cüzdanı ve Zingo bir {net} sunucusunda, bu yüzden onu açamaz. Zingo bir Mainnet sunucusuna geçer, ardından mevcut cüzdan ile yedek yer değiştirir.",
+    "restorebackup": "Geri yükle",
+    "restorebackup-warning": "Mevcut cüzdan ile yedek yer değiştirir ve uygulama yedekle yeniden açılır. Geri dönmek için bunu tekrarlayın.",
     "section-preferences": "Tercihler",
     "section-privacysecurity": "Gizlilik ve Güvenlik",
     "section-networkadvanced": "Ağ ve Gelişmiş",
@@ -414,13 +415,7 @@
         "Emin misiniz?"
       ],
       "view": ["Yedekleme ifadesini\nKaydettim"],
-      "restore": ["Cüzdanı geri yükle"],
-      "backup": [
-        "",
-        "Geri yükle",
-        "Yedek cüzdanınızı \nGeri yüklemek \nİstiyorsunuz",
-        "Emin misiniz?"
-      ]
+      "restore": ["Cüzdanı geri yükle"]
     },
     "title": "kurtarma ifadesi",
     "new": "Yeni",
@@ -430,9 +425,6 @@
     "restore": "Geri yükle",
     "backup": "Yedekle",
     "text-readonly": "Bu ekranı kapatmadan önce bu yedekleme ifadesini dikkatlice not alın. Mecvut cüzdanınıza erişmenin/onu geri yüklemenin tek yolu budur.",
-    "text-readonly-backup": "Önceki cüzdanın yedeğini geri yüklemeden önce, bu kurtarma ifadesini dikkatlice not edin. Mevcut cüzdanınızı geri yüklemenin/erişmenin tek yolu budur.",
-    "text-readonly-change": "Başka bir cüzdana erişmeden önce, bu kurtarma ifadesini dikkatlice not alın. Mevcut cüzdanınızı geri yüklemenin / erişmenin tek yolu budur.",
-    "text-readonly-server": "Başka bir sunucuyu değiştirmeden önce, bu kurtarma ifadesini dikkatlice not alın. Mevcut cüzdanınıza erişmenin / onu geri yüklemenin tek yolu budur.",
     "text-no-readonly": "Seed ifadenizi girin (24 kelime)",
     "tapcopy": "Kopyalamak için tıkla",
     "tapcopy-seed-message": "Seed panoya kopyalandı (60 sn sonra temizlenecek)",
@@ -444,20 +436,14 @@
     "birthday-readonly": "Cüzdan oluşturulma tarihi",
     "birthday-no-readonly": "İlk işlemin blok yüksekliği. (Bilmiyorsanız sorun değil) Değer aralığı arasında",
     "change-warning": "Başka bir cüzdana geçerseniz, bu cüzdana seed phrase olmadan artık erişemezsiniz.",
-    "backup-warning": "Yedek cüzdanınıza geçerseniz, bu cüzdana seed phrase olmadan artık erişemezsiniz.",
     "server-warning": "Farklı bir zincire sahip bir sunucuya geçerseniz, bu cüzdana seed phrase olmadan artık erişemezsiniz.",
-    "mainnet-warning": "Bu cüzdanın yedeği yok, yalnızca 'MAINNET'te mevcut.",
     "seedplaceholder": "Seed (24 kelime)",
     "seed-acc": "Seed Phrase Alanı",
     "birthday-acc": "Doğum Tarihi Alanı",
     "tapreveal": "Görüntülemek için dokunun",
     "showtransactions": "İşlemleri Göster",
     "youreceived": "Aldınız",
-    "tapcopy-ufvk-message": "Görüntüleme Anahtarı panoya kopyalandı (60 sn sonra temizlenecek)",
-    "recovering-from-keychain": "Güvenli depolamadan seed kurtarılıyor...",
-    "recovering-from-wallet": "Cüzdandan seed yükleniyor...",
-    "from-keychain": "güvenli depolamadan",
-    "from-wallet": "cüzdandan"
+    "tapcopy-ufvk-message": "Görüntüleme Anahtarı panoya kopyalandı (60 sn sonra temizlenecek)"
   },
   "send": {
     "Broadcast": "Yayınlandı ve onay bekliyor: İşlem (Tx)",
@@ -650,6 +636,15 @@
     "highpriority": "Yüksek oncelikli"
   },
   "walleterror": {
+    "chain-title": "Bu cüzdan {net} ağında",
+    "chain-sub": "Zingo bir {server} sunucusuna bağlı, bu yüzden bu cüzdanı açamıyor. Cüzdanınız ve fonlarınız güvende.",
+    "chain-action": "{net} ağına geç",
+    "chip-wallet": "Cüzdan",
+    "chip-server": "Sunucu",
+    "more": "Diğer seçenekler",
+    "more-warn": "Bunlar bu telefondaki {net} cüzdanının yerine geçer. Bunu düzeltmek için gerekmezler.",
+    "more-import": "Başka bir cüzdan içe aktar",
+    "more-create": "Yeni cüzdan oluştur",
     "open-title": "Zingo cüzdanınızı açamadı",
     "open-sub": "Fonlarınız güvende ve tohum ifadeniz onları her zaman geri yükleyebilir.",
     "server-title": "Sunucuya bağlanılamıyor",
@@ -739,6 +734,15 @@
     "done": "Bitti"
   },
   "import": {
+    "key-prefix": "Görüntüleme anahtarı uview1 ile başlar.",
+    "key-char": "“{char}” bir görüntüleme anahtarında bulunamaz. Bu karakteri kontrol edin.",
+    "key-incomplete": "Bu görüntüleme anahtarı eksik. Eksik karakter olup olmadığını kontrol edin.",
+    "key-valid": "Geçerli görüntüleme anahtarı",
+    "key-keep-typing": "Görüntüleme anahtarı mı? Yazmaya devam edin: uview1…",
+    "word-nomatch": "“{word}” ile başlayan kurtarma kelimesi yok",
+    "scan-hint": "Kamerayı bir görüntüleme anahtarının QR koduna doğrultun.",
+    "scan-found": "Görüntüleme anahtarı bulundu",
+    "scan-miss": "Bu kod bir görüntüleme anahtarı değil.",
     "title": "Tohum ifadesi / Görüntüleme anahtarı",
     "key-label": "Tohum ifadenizi veya görüntüleme anahtarınızı girin",
     "birthday": "Doğum günü",
@@ -750,7 +754,6 @@
     "seed-full": "Tohum ifadesi 24 kelimeden oluşur. Değiştirmek için birini kaldırın.",
     "seed-words-invalid": "Bu kelimelerden {count} tanesi kurtarma kelime listesinde yok.",
     "seed-checksum": "Bu 24 kelime geçerli bir tohum ifadesi oluşturmuyor. Her birini, özellikle sonuncusunu kontrol edin.",
-    "key-invalid": "Bu görüntüleme anahtarı geçerli değil. Eksiksiz ve aynen kopyalandığını kontrol edin.",
     "key-wrong-chain": "Bu görüntüleme anahtarı {key} için, seçili ağ ise {server}.",
     "need-words": "24 kelimenin tamamını veya bir görüntüleme anahtarı girin.",
     "need-birthday": "Aralık içinde bir blok yüksekliği girin veya boş bırakın.",
@@ -780,45 +783,15 @@
     ]
   },
   "scanner": {
+    "title": "QR kodu tara",
+    "back": "Geri",
+    "torch": "El feneri",
+    "found": "QR kod okundu",
+    "hint-address": "Kamerayı bir Zcash adresinin QR koduna doğrultun.",
+    "miss-address": "Bu kod bir Zcash adresi değil.",
+    "hint-any": "Kamerayı bir adresin QR koduna doğrultun.",
     "text": "Birleştirilmiş Tam Görüntüleme Anahtarını Tara",
     "scanaddress": "Bir Zcash Adresini Tara"
-  },
-  "ufvk": {
-    "buttontexts": {
-      "view": ["Görüntüleme anahtarını\nKaydettim"],
-      "change": [
-        "",
-        "Yeni aç",
-        "Gerçek cüzdanınızı\nDeğiştirmek istiyor musunuz?",
-        "Emin misiniz?"
-      ],
-      "server": [
-        "",
-        "Sunucuyu değiştir",
-        "Gerçek cüzdanınızı\nDeğiştirmek istiyor musunuz?",
-        "Emin misiniz?"
-      ],
-      "backup": [
-        "",
-        "Geri yükle",
-        "Yedek cüzdanınızı \nGeri yüklemek \nİstiyorsunuz",
-        "Emin misiniz?"
-      ]
-    },
-    "viewkey": "Görüntüleme Anahtarı",
-    "tapcopy-message": "Anahtar panoya kopyalandı",
-    "text-readonly": "Bu ekranı kapatmadan önce, bu görüntüleme anahtarını dikkatlice not alın. Mevcut cüzdanınızı geri yüklemenin veya erişmenin tek yolu budur.",
-    "text-readonly-backup": "Önceki cüzdanın yedeğini geri yüklemeden önce, bu görüntüleme anahtarını dikkatlice not alın. Mevcut cüzdanınıza erişmenin veya onu geri yüklemenin tek yolu budur.",
-    "text-readonly-change": "Başka bir cüzdana erişmeden önce, bu görüntüleme anahtarını dikkatlice not alın. Mevcut cüzdanınıza erişmenin veya onu geri yüklemenin tek yolu budur.",
-    "text-readonly-server": "Başka bir sunucuyu değiştirmeden önce, bu görüntüleme anahtarını dikkatlice not alın. Mevcut cüzdanınıza erişmenin veya onu geri yüklemenin tek yolu budur.",
-    "change-warning": "Başka bir cüzdana geçerseniz, bu cüzdana bir daha erişemezsiniz tohum ifadesi elinizde yoksa.",
-    "backup-warning": "Yedek cüzdanınıza geçerseniz, tohum ifadesi olmadan bu cüzdana bir daha erişemezsiniz.",
-    "server-warning": "Farklı bir blok zincirine sahip bir sunucuya geçerseniz, tohum ifadesi olmadan bu cüzdana artık erişemezsiniz.",
-    "mainnet-warning": "Bu cüzdanın yedeği yoktur, yalnızca 'MAINNET' üzerinde kullanılabilir.",
-    "recovering-from-keychain": "Güvenli depolamadan görüntüleme anahtarı kurtarılıyor...",
-    "recovering-from-wallet": "Cüzdandan görüntüleme anahtarı yükleniyor...",
-    "from-keychain": "güvenli depolamadan",
-    "from-wallet": "cüzdandan"
   },
   "pools": {
     "title": "Fon Havuzları",
@@ -1139,6 +1112,8 @@
     "birthday-tip-body": "Zingo taramaya baştan değil buradan başlar, bu yüzden çok daha hızlı senkronize olur."
   },
   "walletseed": {
+    "sub-change-vo": "Başka bir cüzdana geçmeden önce bu cüzdanın görüntüleme anahtarını ve doğum gününü dikkatlice kaydedin. Ona geri dönmek için bunlara ihtiyacınız olacak.",
+    "change-warning-vo": "Başka bir cüzdana geçerseniz, görüntüleme anahtarı olmadan bu cüzdana artık erişemezsiniz.",
     "back-acc": "Geri",
     "ok-title": "Yedeklendi",
     "ok-sub": "{date} · 3 kelime onaylandı",
@@ -1150,6 +1125,30 @@
     "vk-tip-body": "Fonlarınızı harcayamaz. Yalnızca güvendiğiniz kişi ve hizmetlerle paylaşın.",
     "vk-copy": "Görüntüleme anahtarını kopyala",
     "vk-copied": "Görüntüleme anahtarı kopyalandı",
-    "verify": "Yeniden doğrula"
+    "verify": "Yeniden doğrula",
+    "title-server": "Sunucuyu değiştir",
+    "sub-change": "Başka bir cüzdana geçmeden önce bu cüzdanın kurtarma ifadesini, doğum gününü ve görüntüleme anahtarını dikkatlice kaydedin. Ona geri dönmek için bunlara ihtiyacınız olacak.",
+    "sub-server": "Sunucuyu değiştirmeden önce bu cüzdanın kurtarma ifadesini, doğum gününü ve görüntüleme anahtarını dikkatlice kaydedin. Ona geri dönmek için bunlara ihtiyacınız olacak.",
+    "go-change": "Yenisini aç",
+    "go-server": "Değiştir",
+    "confirm-title": "Emin misiniz?"
+  },
+  "viewingkey": {
+    "switch-title": "{net} ağına geç",
+    "switch-sub": "{net} ağına geçmeden önce bu cüzdanın görüntüleme anahtarını dikkatlice kaydedin. Ona geri dönmek için buna ihtiyacınız olacak.",
+    "switch": "Geç",
+    "switch-warning": "Başka bir ağdaki sunucuya geçerseniz, görüntüleme anahtarı olmadan bu cüzdana artık erişemezsiniz.",
+    "title": "Görüntüleme anahtarınız",
+    "sub": "Bu anahtara sahip olan herkes bu cüzdanın bakiyesini ve geçmişini görebilir. Fon harcayamaz.",
+    "label": "Birleşik görüntüleme anahtarı",
+    "read": "Salt okunur: bakiyeyi, geçmişi ve adresleri gösterir",
+    "spend": "Gönderemez, takas edemez ve harcayamaz",
+    "share": "Yalnızca güvendiğiniz kişilerle paylaşın. Tüm hareketlerinizi görürler"
+  },
+  "viewonly": {
+    "dismiss-acc": "Salt görüntüleme bildirimini kapat",
+    "title": "Salt görüntüleme cüzdanı",
+    "body": "Bakiyeyi ve geçmişi görebilir, fon alabilirsiniz. Görüntüleme anahtarıyla harcama yapılamaz.",
+    "button": "Anahtarı gör"
   }
 }

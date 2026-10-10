@@ -46,14 +46,13 @@ interface RPCModuleAPI {
   walletFileDiagnosisInfo(): Promise<string>;
   repairDoubleWrappedWalletProcess(): Promise<string>;
   walletFileRecoveryInfo(): Promise<string>;
+  walletChainInfo(): Promise<string>;
   deleteExistingWallet(): Promise<string>;
-  deleteExistingWalletBackup(): Promise<string>;
   // The save results are trimodal across the bridges: Android resolves a
   // boolean, iOS resolves "true"/"false", and both resolve "Error: ..."
   // prose from their catch blocks (zingo-mobile#1151). Classify with
   // nativeSaveSucceeded, never by inspecting content ad hoc.
   doSave(): Promise<boolean | string>;
-  doSaveBackup(): Promise<boolean | string>;
 
   // Server / network
   getLatestBlockServerInfo(serverUri: string): Promise<string>;

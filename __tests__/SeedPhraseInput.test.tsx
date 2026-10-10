@@ -77,29 +77,21 @@ test('Tests that the field reports a broken checksum when the 24th word lands, a
     'import.seed-checksum',
   );
 
-  fireEvent(screen.getByTestId('seed'), 'keyPress', {
-    nativeEvent: { key: 'Backspace' },
-  });
+  fireEvent.press(screen.getAllByRole('button', { name: 'abandon' }).at(-1)!);
   fireEvent.changeText(screen.getByTestId('seed'), 'art ');
   expect(screen.getByText('24 / 24')).toBeOnTheScreen();
   expect(screen.queryByTestId('seed.error')).toBeNull();
 });
 
-test('Tests that a 25th word is refused with its message when the phrase already has 24', () => {
-  render(<Host initial={ABANDON_23 + ' art'} />);
-  fireEvent.changeText(screen.getByTestId('seed'), 'zoo ');
-  expect(screen.getByText('24 / 24')).toBeOnTheScreen();
-  expect(screen.queryByText('zoo')).toBeNull();
-  expect(screen.getByTestId('seed.error').props.children).toBe(
-    'import.seed-full',
-  );
-});
-
-test('Tests that the end of a complete phrase handed back by the field is not taken for a 25th word', () => {
-  render(<Host initial={ABANDON_23 + ' art'} />);
+test('Tests that the typing spot goes away at 24 words and comes back when one is removed', () => {
+  render(<Host initial={ABANDON_23} />);
   fireEvent.changeText(screen.getByTestId('seed'), 'art ');
   expect(screen.getByText('24 / 24')).toBeOnTheScreen();
-  expect(screen.queryByTestId('seed.error')).toBeNull();
+  expect(screen.queryByTestId('seed')).toBeNull();
+
+  fireEvent.press(screen.getByRole('button', { name: 'art' }));
+  expect(screen.getByText('23 / 24')).toBeOnTheScreen();
+  expect(screen.getByTestId('seed')).toBeOnTheScreen();
 });
 
 test('Tests that a pasted phrase longer than 24 words keeps the first 24 and says why', () => {
@@ -177,8 +169,10 @@ const typeFast = (
       typed.push(native);
     }
     typeWithoutRendering(typed);
-    if (takeBackEvery > 0 && burst % takeBackEvery === 0) {
-      native = screen.getByTestId('seed').props.value;
+    // The field leaves once the 24th word lands.
+    const field = screen.queryByTestId('seed');
+    if (takeBackEvery > 0 && burst % takeBackEvery === 0 && field) {
+      native = field.props.value;
     }
   }
 };

@@ -263,6 +263,9 @@ export default class SettingsFileImpl {
       if (!settings.hasOwnProperty(SettingsNameEnum.seedBackedUpAt)) {
         settings.seedBackedUpAt = 0;
       }
+      if (!settings.hasOwnProperty(SettingsNameEnum.viewOnlyNoticeDismissed)) {
+        settings.viewOnlyNoticeDismissed = false;
+      }
       return settings;
     } catch (err) {
       // The File doesn't exist, so return nothing

@@ -1,5 +1,5 @@
 /**
- * Handles wallet file operations: delete, restore from backup, change wallet.
+ * Handles wallet file operations: change wallet, restore from backup.
  *
  * Every method calls syncCoordinator.pauseSyncProcess() first to ensure no
  * sync task is running while the wallet file is being replaced. All methods
@@ -9,10 +9,8 @@
 import { GlobalConst, Done, DONE, ErrorKeyed, errorKeyed } from '@app/AppState';
 import RPCModule from '@app/RPCModule';
 import { SyncCoordinator } from './SyncCoordinator';
-import { doSaveBackup } from '@app/walletBackend/utils/walletUtils';
 
 export type WalletLifecycleErrorKey =
-  | 'rpc.backupwallet-error'
   | 'rpc.deletewallet-error'
   | 'rpc.walletnotfound-error'
   | 'rpc.backupnotfound-error';
@@ -37,28 +35,6 @@ export class WalletLifecycleService {
       return err('rpc.walletnotfound-error');
     }
     await this.syncCoordinator.pauseSyncProcess();
-
-    // doSaveBackup classifies the trimodal native resolution and contains
-    // rejections, so failure — including a rejected bridge promise — always
-    // lands on this branch instead of escaping changeWallet.
-    if (!(await doSaveBackup())) {
-      return err('rpc.backupwallet-error');
-    }
-
-    const result = await RPCModule.deleteExistingWallet();
-    if (!(result && result !== GlobalConst.false)) {
-      return err('rpc.deletewallet-error');
-    }
-    return DONE;
-  }
-
-  async changeWalletNoBackup(): Promise<WalletLifecycleResult> {
-    const exists = await RPCModule.walletExists();
-
-    if (!(exists && exists !== GlobalConst.false)) {
-      return err('rpc.walletnotfound-error');
-    }
-    await this.syncCoordinator.pauseSyncProcess();
     const result = await RPCModule.deleteExistingWallet();
 
     if (!(result && result !== GlobalConst.false)) {
@@ -67,6 +43,8 @@ export class WalletLifecycleService {
     return DONE;
   }
 
+  // Restores the backup that older builds took on a wallet change. No
+  // build writes new ones; the current wallet takes the backup's place.
   async restoreBackup(): Promise<WalletLifecycleResult> {
     const existsBackup = await RPCModule.walletBackupExists();
 

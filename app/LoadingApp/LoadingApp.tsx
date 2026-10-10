@@ -1,5 +1,10 @@
 import React, { Component, useState, useMemo, useEffect } from 'react';
-import { I18nManager, AppState, NativeEventSubscription } from 'react-native';
+import {
+  I18nManager,
+  AppState,
+  BackHandler,
+  NativeEventSubscription,
+} from 'react-native';
 
 import { useTheme } from '@app/theme';
 import { I18n } from 'i18n-js';
@@ -26,6 +31,7 @@ import {
   getWalletKind,
   hasRepairableWalletFile,
   loadExistingWallet,
+  readWalletChain,
   repairDoubleWrappedWallet,
   repairSucceeded,
   resolvedTrue,
@@ -357,6 +363,7 @@ type LoadingAppClassProps = {
 type LoadingAppClassState = AppStateLoading & AppContextLoading;
 
 const RETRY_MIN_MS = 1400;
+const ERROR_RESOLVE_MS = 200;
 
 export class LoadingAppClass extends Component<
   LoadingAppClassProps,
@@ -428,11 +435,51 @@ export class LoadingAppClass extends Component<
       serverLatencies: {},
       serverLists: {},
       serverListChain: ChainNameEnum.mainChainName,
+      serverTab: null,
+      errorResolved: false,
       serverReturn: RouteEnum.StartMenu,
     };
   }
 
+  // Set by Server while a custom address is unsaved: back asks first.
+  serverBackGuard: React.MutableRefObject<(() => boolean) | null> = {
+    current: null,
+  };
+  backSub: { remove: () => void } | null = null;
+
+  // System back on Server, its list and the import chooser goes one screen
+  // up, as their back arrows do. Other screens leave it to the handlers
+  // below (open sheets) and the app shell.
+  onHardwareBack = (): boolean => {
+    const { screen, actionButtonsDisabled } = this.state;
+    if (screen === RouteEnum.Server) {
+      if (!actionButtonsDisabled && !this.serverBackGuard.current?.()) {
+        this.closeServer();
+      }
+      return true;
+    }
+    if (screen === RouteEnum.ServerList) {
+      if (!actionButtonsDisabled) {
+        this.setState({ screen: RouteEnum.Server });
+      }
+      return true;
+    }
+    if (screen === RouteEnum.ImportChooser) {
+      if (!actionButtonsDisabled) {
+        this.setState({ screen: RouteEnum.StartMenu });
+      }
+      return true;
+    }
+    return false;
+  };
+
   componentDidMount = async () => {
+    if (!this.backSub) {
+      this.backSub = BackHandler.addEventListener(
+        'hardwareBackPress',
+        this.onHardwareBack,
+      );
+    }
     const netInfoState = await NetInfo.fetch();
     this.setState({
       netInfo: {
@@ -618,6 +665,8 @@ export class LoadingAppClass extends Component<
   componentWillUnmount = () => {
     this.unmounted = true;
     this.detachListeners();
+    this.backSub?.remove();
+    this.backSub = null;
   };
 
   // Default server for a chain = the `default` entry for that chain in the
@@ -646,26 +695,19 @@ export class LoadingAppClass extends Component<
     const chainName = current.chainName;
 
     if (mode === SelectServerEnum.auto) {
-      if (!isConnected) {
-        const s = this.defaultServerForChain(chainName);
-        this.setState({ server: s });
-        await SettingsFileImpl.writeServer(s, mode);
-        return false;
-      }
+      // Recommended, then the registry, then the static list, then the
+      // chain's default; true when some server answered.
       const pick = await pickAutomatic(
         this.state.translate,
         chainName,
         isConnected,
       );
-      if (pick) {
-        const best = remoteServer(pick.uri, pick.chainName);
-        this.setState({ server: best });
-        await SettingsFileImpl.writeServer(best, mode);
-        return true;
-      }
-      // Registry unreachable → current static latency probe, staying in auto.
-      // Silent: this is still boot-time selection.
-      return await this.selectTheBestServer(false, SelectServerEnum.auto, true);
+      const best = pick
+        ? remoteServer(pick.server.uri, pick.server.chainName)
+        : this.defaultServerForChain(chainName);
+      this.setState({ server: best });
+      await SettingsFileImpl.writeServer(best, mode);
+      return !!pick && pick.tier !== 'default';
     }
 
     if (mode === SelectServerEnum.list) {
@@ -755,8 +797,54 @@ export class LoadingAppClass extends Component<
     return someServerIsWorking;
   };
 
+  // The wallet file's network when it differs from the server's; null when
+  // they match, when offline (which opens any chain) or when unreadable.
+  walletChainMismatch = async (): Promise<ChainNameEnum | null> => {
+    const { server } = this.state;
+    if (server.kind !== 'remote') {
+      return null;
+    }
+    const chain = await readWalletChain();
+    return chain.ok && chain.value !== server.chainName ? chain.value : null;
+  };
+
+  // Both chains, the server's host and the wallet files, for the details.
+  chainDetails = async (walletChain: ChainNameEnum): Promise<string> => {
+    const { server } = this.state;
+    const host =
+      server.kind === 'remote' ? server.uri.replace(/^https?:\/\//, '') : '';
+    const { files } = await walletFileDiagnosis();
+    const fileLines = files
+      .filter(f => f.state !== 'missing')
+      .map(f => `${f.name}: ${f.state === 'plainWallet' ? 'ok' : f.state}`);
+    return [
+      `Wallet chain: ${walletChain}`,
+      `Server chain: ${server.chainName}${host ? ` (${host})` : ''}`,
+      ...(fileLines.length ? ['', ...fileLines] : []),
+    ].join('\n');
+  };
+
+  // A wallet on another network than its server cannot open there, so the
+  // error screen offers to switch to the wallet's network instead of a retry.
+  // Whatever the server choice, Automatic included.
+  showChainError = async (walletChain: ChainNameEnum) => {
+    const details = await this.chainDetails(walletChain);
+    this.setState({
+      walletError: { kind: 'chain', details, walletChain },
+      errorResolved: false,
+      retrying: false,
+      actionButtonsDisabled: false,
+      screen: RouteEnum.WalletError,
+    });
+  };
+
   // Loads the wallet file found on disk. Also the retry after a file repair.
   loadExistingWalletOnBoot = async () => {
+    const walletChain = await this.walletChainMismatch();
+    if (walletChain) {
+      await this.showChainError(walletChain);
+      return;
+    }
     const result = await loadExistingWallet(
       nativeUri(this.state.server),
       this.state.server.chainName,
@@ -852,6 +940,13 @@ export class LoadingAppClass extends Component<
         errorText = e instanceof Error ? e.message : String(e);
       }
     } else {
+      if (!result.ok && result.error.code === 'WalletChainMismatch') {
+        const chain = await readWalletChain();
+        if (chain.ok) {
+          await this.showChainError(chain.value);
+          return;
+        }
+      }
       error = true;
       errorText = result.ok ? result.value : result.error.message;
     }
@@ -915,6 +1010,7 @@ export class LoadingAppClass extends Component<
       }
       this.setState(state => ({
         walletError: { kind, details },
+        errorResolved: false,
         retrying: false,
         errorShake: again ? state.errorShake + 1 : state.errorShake,
         actionButtonsDisabled: false,
@@ -929,6 +1025,19 @@ export class LoadingAppClass extends Component<
   retryOpenWallet = async () => {
     this.retryStartedAt = Date.now();
     this.setState({ retrying: true, actionButtonsDisabled: true });
+    await this.loadExistingWalletOnBoot();
+  };
+
+  // Moves to Automatic on the wallet's network, then opens the wallet. A
+  // custom server on the other network stays saved as it was.
+  switchToWalletChain = async (chain: ChainNameEnum) => {
+    this.retryStartedAt = Date.now();
+    this.setState({ retrying: true, actionButtonsDisabled: true });
+    await this.applyServer(
+      this.defaultServerForChain(chain),
+      SelectServerEnum.auto,
+    );
+    await this.selectServerOnBoot(!!this.state.netInfo.isConnected);
     await this.loadExistingWalletOnBoot();
   };
 
@@ -978,6 +1087,28 @@ export class LoadingAppClass extends Component<
     firstLaunchingMessage: LaunchingModeEnum,
     walletChainName: ChainNameEnum,
   ) => {
+    // Leaving the error screen after a retry worked: its badge shrinks and
+    // the server dot turns green first.
+    if (
+      this.state.screen === RouteEnum.WalletError &&
+      !this.state.errorResolved
+    ) {
+      this.setState({ errorResolved: true });
+      setTimeout(
+        () =>
+          this.navigateToLoadedApp(
+            readOnly,
+            orchardPool,
+            saplingPool,
+            transparentPool,
+            newWallet,
+            firstLaunchingMessage,
+            walletChainName,
+          ),
+        ERROR_RESOLVE_MS,
+      );
+      return;
+    }
     this.setState(s => ({ wallet: { ...s.wallet, seed: '', ufvk: '' } }));
     this.props.navigationApp.reset({
       index: 0,
@@ -1013,9 +1144,11 @@ export class LoadingAppClass extends Component<
       actionButtonsDisabled: true,
       progressKind: 'create',
     });
+    // The leaves part at once and the creating screen fades up in their
+    // place; no button collapse first.
     const showProgress = setTimeout(
       () => this.setState({ screen: RouteEnum.WalletProgress }),
-      motionDuration.emphasized,
+      0,
     );
     // Pass "0" in both modes. Online, the Indexer supplies the chain tip.
     // Offline (Indexerless), the FFI falls back to zingolib's Library Birthday
@@ -1084,6 +1217,10 @@ export class LoadingAppClass extends Component<
         false,
       );
       await SettingsFileImpl.writeSettings(SettingsNameEnum.seedBackedUpAt, 0);
+      await SettingsFileImpl.writeSettings(
+        SettingsNameEnum.viewOnlyNoticeDismissed,
+        false,
+      );
       clearTimeout(showProgress);
       this.setState({
         wallet,
@@ -1219,9 +1356,11 @@ export class LoadingAppClass extends Component<
       actionButtonsDisabled: true,
       progressKind: 'import',
     });
+    // From the form, the Import button collapses first; from the Keychain
+    // card, the leaves part at once.
     const showImporting = setTimeout(
       () => this.setState({ screen: RouteEnum.WalletProgress }),
-      motionDuration.emphasized,
+      origin === RouteEnum.ImportUfvk ? motionDuration.emphasized : 0,
     );
     let type: RestoreFromTypeEnum = RestoreFromTypeEnum.seedRestoreFrom;
     if (
@@ -1305,6 +1444,10 @@ export class LoadingAppClass extends Component<
               SettingsNameEnum.seedBackedUpAt,
               0,
             );
+            await SettingsFileImpl.writeSettings(
+              SettingsNameEnum.viewOnlyNoticeDismissed,
+              false,
+            );
             this.setState({
               readOnly,
               orchardPool,
@@ -1372,15 +1515,31 @@ export class LoadingAppClass extends Component<
     this.setState({ backgroundError: { title, error } });
   };
 
-  openServer = () => {
+  openServer = (tab?: ChainNameEnum) => {
     this.setState(
-      state => ({ serverReturn: state.screen, screen: RouteEnum.Server }),
+      state => ({
+        serverReturn: state.screen,
+        serverTab: tab ?? null,
+        screen: RouteEnum.Server,
+      }),
       () => this.probeCurrentServer(),
     );
   };
 
+  // Back on a chain error, the wallet opens by itself once the server is on
+  // its network, or offline.
   closeServer = () => {
-    this.setState(state => ({ screen: state.serverReturn }));
+    const { serverReturn, walletError, server } = this.state;
+    const fixed =
+      serverReturn === RouteEnum.WalletError &&
+      walletError?.kind === 'chain' &&
+      (server.kind === 'offline' ||
+        server.chainName === walletError.walletChain);
+    this.setState({ screen: serverReturn, serverTab: null }, () => {
+      if (fixed) {
+        this.retryOpenWallet();
+      }
+    });
   };
 
   probeCurrentServer = async () => {
@@ -1672,7 +1831,7 @@ export class LoadingAppClass extends Component<
                       }
                       importRecoveryWallet={this.importRecoveryWallet}
                       viewRecoveryWallet={this.viewRecoveryWallet}
-                      customServer={this.openServer}
+                      customServer={() => this.openServer()}
                       walletExists={walletExists}
                       openCurrentWallet={this.openCurrentWallet}
                       createNewWallet={this.createNewWalletChecked}
@@ -1699,6 +1858,8 @@ export class LoadingAppClass extends Component<
                       <WalletError
                         kind={this.state.walletError.kind}
                         details={this.state.walletError.details}
+                        walletChain={this.state.walletError.walletChain}
+                        resolved={this.state.errorResolved}
                         busy={this.state.retrying}
                         shake={this.state.errorShake}
                         onRetry={this.retryOpenWallet}
@@ -1708,12 +1869,16 @@ export class LoadingAppClass extends Component<
                         onCreate={() =>
                           this.confirmDelete('create', this.createNewWallet)
                         }
-                        onServer={this.openServer}
+                        onServer={() =>
+                          this.openServer(this.state.walletError?.walletChain)
+                        }
+                        onSwitchChain={this.switchToWalletChain}
                       />
                     )}
                   {screen === RouteEnum.Server && (
                     <Server
                       translate={translate}
+                      initialChain={this.state.serverTab ?? undefined}
                       server={this.state.server}
                       selectServer={this.state.selectServer}
                       status={this.state.serverStatus}
@@ -1737,6 +1902,7 @@ export class LoadingAppClass extends Component<
                       onProbe={this.probeServers}
                       onUnreachable={this.serverUnreachable}
                       onBack={this.closeServer}
+                      backGuard={this.serverBackGuard}
                     />
                   )}
                   {screen === RouteEnum.ServerList && (

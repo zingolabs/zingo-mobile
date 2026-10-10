@@ -1,6 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
 import { Platform, Pressable, View } from 'react-native';
+import Animated, {
+  interpolateColor,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
   IconDefinition,
@@ -11,6 +17,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 
 import { useTheme } from '@app/theme';
+import { ease } from '@app/theme/motion';
 import { ContextAppLoading } from '@app/context';
 import RegText from '@ui/primitives/RegText';
 import BoldText from '@ui/primitives/BoldText';
@@ -26,6 +33,9 @@ type ImportChooserProps = {
 const SECURE_STORE = Platform.OS === 'ios' ? 'Keychain' : 'Keystore';
 const SIDE = 22.5;
 const FIRST_TOP = 150.5;
+// On touch the card shrinks a little and its border brightens.
+const PRESS_MS = 100;
+const PRESS_SCALE = 0.985;
 
 type OptionProps = {
   icon: IconDefinition;
@@ -51,52 +61,74 @@ const Option: React.FC<OptionProps> = ({
   testID,
 }) => {
   const { colors } = useTheme();
+  const press = useSharedValue(0);
+  const to = (v: number) => {
+    press.value = withTiming(v, { duration: PRESS_MS, easing: ease.out });
+  };
+  const pressStyle = useAnimatedStyle(() => ({
+    borderColor: interpolateColor(
+      press.value,
+      [0, 1],
+      [colors.bottomSheetBorder, colors.borderFocus],
+    ),
+    transform: [{ scale: 1 - (1 - PRESS_SCALE) * press.value }],
+  }));
   return (
     <Pressable
       testID={testID}
       onPress={onPress}
+      onPressIn={() => to(1)}
+      onPressOut={() => to(0)}
       disabled={disabled}
       accessibilityRole="button"
-      style={({ pressed }) => ({
-        height: 69,
-        borderRadius: 14,
-        borderWidth: 1,
-        borderColor: pressed ? colors.borderFocus : colors.bottomSheetBorder,
-        backgroundColor: colors.bgSurface,
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingLeft: 15,
-        paddingRight: 16,
-        gap: 15,
-        transform: [{ scale: pressed ? 0.985 : 1 }],
-      })}
     >
-      <View
-        style={{
-          width: 39,
-          height: 39,
-          borderRadius: 20,
-          backgroundColor: iconBg,
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
+      <Animated.View
+        style={[
+          {
+            height: 69,
+            borderRadius: 14,
+            borderWidth: 1,
+            backgroundColor: colors.bgSurface,
+            flexDirection: 'row',
+            alignItems: 'center',
+            paddingLeft: 15,
+            paddingRight: 16,
+            gap: 15,
+          },
+          pressStyle,
+        ]}
       >
-        <FontAwesomeIcon icon={icon} size={17} color={iconColor} />
-      </View>
-      <View style={{ flex: 1 }}>
-        <BoldText style={{ fontSize: 14, lineHeight: 19 }}>{title}</BoldText>
-        <RegText
+        <View
           style={{
-            fontSize: 11.5,
-            lineHeight: 17,
-            marginTop: 1,
-            color: subColor,
+            width: 39,
+            height: 39,
+            borderRadius: 20,
+            backgroundColor: iconBg,
+            alignItems: 'center',
+            justifyContent: 'center',
           }}
         >
-          {sub}
-        </RegText>
-      </View>
-      <FontAwesomeIcon icon={faChevronRight} size={12} color={colors.fgMuted} />
+          <FontAwesomeIcon icon={icon} size={17} color={iconColor} />
+        </View>
+        <View style={{ flex: 1 }}>
+          <BoldText style={{ fontSize: 14, lineHeight: 19 }}>{title}</BoldText>
+          <RegText
+            style={{
+              fontSize: 11.5,
+              lineHeight: 17,
+              marginTop: 1,
+              color: subColor,
+            }}
+          >
+            {sub}
+          </RegText>
+        </View>
+        <FontAwesomeIcon
+          icon={faChevronRight}
+          size={12}
+          color={colors.fgMuted}
+        />
+      </Animated.View>
     </Pressable>
   );
 };

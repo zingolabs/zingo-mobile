@@ -15,13 +15,11 @@ import { ContextAppLoaded } from '@app/context';
 import {
   ChainNameEnum,
   RouteEnum,
-  SeedActionEnum,
   SelectServerEnum,
   ServerType,
   ServerUrisType,
   SetServerResult,
   SnackbarDurationEnum,
-  UfvkActionEnum,
 } from '@app/AppState';
 import { offlineServer, remoteServer } from '@app/AppState/types/ServerType';
 import { ServerStatus } from '@app/AppState/types/ServerStatus';
@@ -152,9 +150,12 @@ const WalletServer: React.FC<WalletServerProps> = ({
     if (result.kind === 'chain-changed') {
       leaving.current = true;
       if (readOnly) {
-        navigation.navigate(RouteEnum.Ufvk, { action: UfvkActionEnum.server });
+        navigation.navigate(RouteEnum.ViewingKey, {
+          entry: { kind: 'push' },
+          switchTo: target.chainName,
+        });
       } else {
-        navigation.navigate(RouteEnum.Seed, { action: SeedActionEnum.server });
+        navigation.navigate(RouteEnum.WalletSeed, { action: 'server' });
       }
       return false;
     }
@@ -177,7 +178,11 @@ const WalletServer: React.FC<WalletServerProps> = ({
       probeCurrent(server);
       return;
     }
-    await apply(remoteServer(pick.uri, chain), SelectServerEnum.auto);
+    // No server answered: Automatic still settles on the chain's default.
+    if (pick.tier === 'default') {
+      addLastSnackbar(translate('loadedapp.connection-error') as string);
+    }
+    await apply(remoteServer(pick.server.uri, chain), SelectServerEnum.auto);
   };
 
   const close = () => {

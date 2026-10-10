@@ -186,17 +186,8 @@ export async function deleteExistingWallet(): Promise<FfiResult<string>> {
   return callFfi(RPCModule.deleteExistingWallet());
 }
 
-// Restores the wallet from its on-device backup file (the `.migrating`
-// twin EncryptedFile manages). The success value is the native "true"/"false"
-// data protocol.
-export async function restoreExistingWalletBackup(): Promise<
-  FfiResult<string>
-> {
-  return callFfi(RPCModule.restoreExistingWalletBackup());
-}
-
 /**
- * Whether a native save/backup resolution reports success. The bridges are
+ * Whether a native save resolution reports success. The bridges are
  * trimodal (zingo-mobile#1151): Android resolves boolean true/false, iOS
  * resolves "true"/"false", and both resolve "Error: ..." prose from their
  * catch blocks. Success is knowable only from the two success shapes; any
@@ -216,19 +207,6 @@ export async function doSave(): Promise<boolean> {
     return nativeSaveSucceeded(await RPCModule.doSave());
   } catch (error) {
     console.log(`Critical Error doSave ${error}`);
-    return false;
-  }
-}
-
-// Snapshots the wallet file to its on-device backup twin. Same contract as
-// doSave: the trimodal native resolution is classified at this seam and a
-// rejection is contained as false, so no caller ever awaits doSaveBackup
-// without failure handling (audit Issue P, scenario three).
-export async function doSaveBackup(): Promise<boolean> {
-  try {
-    return nativeSaveSucceeded(await RPCModule.doSaveBackup());
-  } catch (error) {
-    console.log(`Critical Error doSaveBackup ${error}`);
     return false;
   }
 }
@@ -483,6 +461,23 @@ const KEY_CHAINS: readonly string[] = [
   ChainNameEnum.testChainName,
   ChainNameEnum.regtestChainName,
 ];
+
+// The chain the wallet file on this device was written for.
+export async function readWalletChain(): Promise<FfiResult<ChainNameEnum>> {
+  const result = await callFfi(RPCModule.walletChainInfo());
+  if (!result.ok) {
+    return result;
+  }
+  return KEY_CHAINS.includes(result.value)
+    ? { ok: true, value: result.value as ChainNameEnum }
+    : {
+        ok: false,
+        error: {
+          code: 'Unknown',
+          message: `unexpected wallet chain: ${result.value}`,
+        },
+      };
+}
 
 // Decodes a viewing key on the device, checksum included: a key with its
 // network, text that is not a key, or unknown when the native call failed.

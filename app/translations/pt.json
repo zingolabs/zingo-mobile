@@ -103,7 +103,7 @@
     "memobytes-unit": " chars."
   },
   "loadingapp": {
-    "welcome": "Bem-vindo",
+    "welcome": "Bem-vindo ao",
     "tagline": "Uma carteira privada para o seu Zcash.",
     "creating-title": "Criando sua carteira",
     "previous-install-title": "Carteira de uma instalação anterior",
@@ -152,13 +152,11 @@
     "info": "Informações do Servidor",
     "options": "Opções",
     "walletseed": "Frases da Carteira",
-    "walletbackupseed": "Backup das Frases da Carteira",
     "walletufvk": "Chave de Visualização",
     "rescanwallet": "Rescanear a Carteira",
     "report": "Sincronizar / Relatório de Rescan",
     "changewallet": "Abrir outra Carteira",
     "restorebackupwallet": "Restaurar Último Backup da Carteira",
-    "alert-restorebackupwallet-body": "Confirme que deseja restaurar o último backup da carteira.",
     "fundpools": "Fundos na Pool",
     "insight": "Visão Financeira",
     "addressbook": "Agenda de Endereços",
@@ -202,10 +200,13 @@
   "rpc": {
     "walletnotfound-error": "Error: não foi possível encontrar nenhuma carteira.",
     "backupnotfound-error": "Error: não foi possível encontrar nenhum backup de nenhuma carteira.",
-    "deletewallet-error": "Error: não foi possível excluir a carteira atual.",
-    "backupwallet-error": "Error: não foi possível salvar o backup da carteira."
+    "deletewallet-error": "Error: não foi possível excluir a carteira atual."
   },
   "settings": {
+    "restorebackup-switch": "Mudar para Mainnet",
+    "restorebackup-mainnet": "O backup é uma carteira Mainnet e o Zingo está em um servidor {net}, então não conseguiria abri-la. O Zingo muda para um servidor Mainnet e depois a carteira atual e o backup trocam de lugar.",
+    "restorebackup": "Restaurar",
+    "restorebackup-warning": "A carteira atual e o backup trocam de lugar, e o app reabre com o backup. Repita isso para voltar.",
     "section-preferences": "Preferências",
     "section-privacysecurity": "Privacidade e Segurança",
     "section-networkadvanced": "Rede e Avançado",
@@ -416,13 +417,7 @@
         "Tem certeza?"
       ],
       "view": ["Eu salvei as \n Frases de Recuperação"],
-      "restore": ["Restaurar Carteira"],
-      "backup": [
-        "",
-        "Restaurar",
-        "Você realmente deseja \n restaurar sua \n carteira de backup",
-        "Tem certeza?"
-      ]
+      "restore": ["Restaurar Carteira"]
     },
     "title": "Frases de Recuperação",
     "new": "Novo",
@@ -432,9 +427,6 @@
     "restore": "Restaurar",
     "backup": "Backup",
     "text-readonly": "Antes de fechar esta tela, anote cuidadosamente essas frases de recuperação. É a única maneira de restaurar/acessar sua carteira atual.",
-    "text-readonly-backup": "Antes de restaurar o backup da carteira anterior, anote cuidadosamente suas frases de recuperação. É a única maneira de restaurar/acessar sua carteira atual.",
-    "text-readonly-change": "Antes de acessar outra carteira, anote cuidadosamente essas Frases de recuperação. É a única maneira de restaurar/acessar sua carteira atual.",
-    "text-readonly-server": "Antes de mudar para outro servidor, anote cuidadosamente suas frases de recuperação. É a única maneira de restaurar/acessar sua carteira atual.",
     "text-no-readonly": "Insira suas Frases de Recuperação (24 Frases)",
     "tapcopy": "Clique para Copiar",
     "tapcopy-seed-message": "Frases de Recuperação copiada para a Área de Transferência (limpa em 60s)",
@@ -446,20 +438,14 @@
     "birthday-readonly": "Aniversário da Carteira",
     "birthday-no-readonly": "Altura do bloco da primeira transação. (Tudo bem, se você não sabe)\nIntervalo de valores entre ",
     "change-warning": "Se você alterar para outra carteira, não será possível ter acesso a essa carteira sem as Frases de Recuperação.",
-    "backup-warning": "Se você alterar para sua carteira de backup, não será possível ter acesso a essa carteira sem as Frases de Recuperação.",
     "server-warning": "Se você alterar para um servidor com uma rede diferente, não terá mais acesso a essa carteira sem as Frases de Recuperação.",
-    "mainnet-warning": "Nenhum backup desta carteira, disponível apenas na 'Mainnet'.",
     "seedplaceholder": "Frases de Recuperação (24 Frases)",
     "seed-acc": "Campo das Frases de Recuperação",
     "birthday-acc": "Campo de Aniversário",
     "tapreveal": "Toque para revelar",
     "showtransactions": "Mostrar Transações",
     "youreceived": "Você recebeu",
-    "tapcopy-ufvk-message": "Chave de visualização copiada para a área de transferência (limpa em 60s)",
-    "recovering-from-keychain": "Recuperando a frase de recuperação do armazenamento seguro...",
-    "recovering-from-wallet": "Carregando a frase de recuperação da carteira...",
-    "from-keychain": "do armazenamento seguro",
-    "from-wallet": "da carteira"
+    "tapcopy-ufvk-message": "Chave de visualização copiada para a área de transferência (limpa em 60s)"
   },
   "send": {
     "Broadcast": "Transmitido e aguardando confirmação Tx:",
@@ -652,6 +638,15 @@
     "highpriority": "Alta prioridade"
   },
   "walleterror": {
+    "chain-title": "Esta carteira é da {net}",
+    "chain-sub": "O Zingo está conectado a um servidor {server}, então não consegue abrir esta carteira. Sua carteira e seus fundos estão bem.",
+    "chain-action": "Mudar para {net}",
+    "chip-wallet": "Carteira",
+    "chip-server": "Servidor",
+    "more": "Mais opções",
+    "more-warn": "Estas opções substituem a carteira {net} deste telefone. Você não precisa delas para resolver isto.",
+    "more-import": "Importar outra carteira",
+    "more-create": "Criar nova carteira",
     "open-title": "O Zingo não conseguiu abrir sua carteira",
     "open-sub": "Seus fundos estão seguros e sua frase de recuperação sempre pode restaurá-los.",
     "server-title": "Não foi possível conectar ao servidor",
@@ -741,6 +736,15 @@
     "done": "Concluído"
   },
   "import": {
+    "key-prefix": "Uma chave de visualização começa com uview1.",
+    "key-char": "“{char}” não pode aparecer em uma chave de visualização. Verifique esse caractere.",
+    "key-incomplete": "Esta chave de visualização está incompleta. Verifique se faltam caracteres.",
+    "key-valid": "Chave de visualização válida",
+    "key-keep-typing": "Chave de visualização? Continue digitando: uview1…",
+    "word-nomatch": "Nenhuma palavra de recuperação começa com “{word}”",
+    "scan-hint": "Aponte a câmera para o código QR de uma chave de visualização.",
+    "scan-found": "Chave de visualização encontrada",
+    "scan-miss": "Esse código não é uma chave de visualização.",
     "title": "Frases de recuperação / Chave de Visualização",
     "key-label": "Insira a Frases de recuperação / Chave de Visualização",
     "birthday": "Aniversário",
@@ -752,7 +756,6 @@
     "seed-full": "Uma frase de recuperação tem 24 palavras. Remova uma para alterá-la.",
     "seed-words-invalid": "{count} destas palavras não estão na lista de palavras de recuperação.",
     "seed-checksum": "Estas 24 palavras não formam uma frase de recuperação válida. Confira cada uma, principalmente a última.",
-    "key-invalid": "Esta chave de visualização não é válida. Verifique se está completa e copiada exatamente.",
     "key-wrong-chain": "Esta chave de visualização é de {key}, e a rede selecionada é {server}.",
     "need-words": "Insira as 24 palavras, ou uma chave de visualização.",
     "need-birthday": "Insira uma altura de bloco dentro do intervalo, ou deixe em branco.",
@@ -782,45 +785,15 @@
     ]
   },
   "scanner": {
+    "title": "Escanear código QR",
+    "back": "Voltar",
+    "torch": "Lanterna",
+    "found": "Código QR lido",
+    "hint-address": "Aponte a câmera para o código QR de um endereço Zcash.",
+    "miss-address": "Esse código não é um endereço Zcash.",
+    "hint-any": "Aponte a câmera para o código QR de um endereço.",
     "text": "Faça o Scan de uma Chave de Visualização Unificada completa",
     "scanaddress": "Escaneie um Endereço Zcash"
-  },
-  "ufvk": {
-    "buttontexts": {
-      "view": ["Eu salvei a \n chave de visualização"],
-      "change": [
-        "",
-        "Abrir Nova Carteira",
-        "Você realmente quer\n alterar para a sua \n carteira atual",
-        "Tem certeza?"
-      ],
-      "server": [
-        "",
-        "Alterar Servidor",
-        "Você realmente quer \n alterar para o seu \n servidor atual",
-        "Tem certeza?"
-      ],
-      "backup": [
-        "",
-        "Restaurar",
-        "Você realmente deseja \n restaurar sua \n carteira de backup",
-        "Tem certeza?"
-      ]
-    },
-    "viewkey": "Chave de Visualização ",
-    "tapcopy-message": "Chave Copiada para a Área de Transferência",
-    "text-readonly": "Antes de fechar esta tela, anote cuidadosamente esta chave de visualização. É a única maneira de restaurar/acessar sua carteira atual.",
-    "text-readonly-backup": "Antes de restaurar o backup da carteira anterior, anote cuidadosamente esta chave de visualização. É a única maneira de restaurar/acessar sua carteira atual.",
-    "text-readonly-change": "Antes de acessar outra carteira, anote cuidadosamente esta chave de visualização. É a única maneira de restaurar/acessar sua carteira atual.",
-    "text-readonly-server": "Antes de alterar outro servidor, anote cuidadosamente esta chave de visualização. É a única maneira de restaurar/acessar sua carteira atual.",
-    "change-warning": "Se você mudar para outra carteira, não terá mais acesso a esta carteira sem as frases de recuperação.",
-    "backup-warning": "Se você mudar para sua carteira de backup, não terá mais acesso a esta carteira sem as Frases de recuperação.",
-    "server-warning": "Se você mudar para um servidor com uma rede diferente, não terá mais acesso a esta carteira sem as frases de recuperação.",
-    "mainnet-warning": "Nenhum backup desta carteira, disponível apenas na 'MAINNET'.",
-    "recovering-from-keychain": "Recuperando a chave de visualização do armazenamento seguro...",
-    "recovering-from-wallet": "Carregando a chave de visualização da carteira...",
-    "from-keychain": "do armazenamento seguro",
-    "from-wallet": "da carteira"
   },
   "pools": {
     "title": "Fundos nas Pools",
@@ -1141,6 +1114,8 @@
     "birthday-tip-body": "O Zingo começa a escanear a partir daqui em vez do início, então sincroniza muito mais rápido."
   },
   "walletseed": {
+    "sub-change-vo": "Antes de acessar outra carteira, guarde com cuidado a chave de visualização e o aniversário desta carteira. Você vai precisar deles para voltar a ela.",
+    "change-warning-vo": "Se você mudar para outra carteira, não terá mais acesso a esta carteira sem a chave de visualização.",
     "back-acc": "Voltar",
     "ok-title": "Com backup",
     "ok-sub": "{date} · 3 palavras confirmadas",
@@ -1152,6 +1127,30 @@
     "vk-tip-body": "Ela não pode gastar seus fundos. Compartilhe só com pessoas ou serviços de confiança.",
     "vk-copy": "Copiar chave de visualização",
     "vk-copied": "Chave de visualização copiada",
-    "verify": "Verificar de novo"
+    "verify": "Verificar de novo",
+    "title-server": "Mudar servidor",
+    "sub-change": "Antes de abrir outra carteira, guarde com cuidado a frase semente, o aniversário e a chave de visualização desta. Você vai precisar deles para voltar a ela.",
+    "sub-server": "Antes de mudar de servidor, guarde com cuidado a frase semente, o aniversário e a chave de visualização desta carteira. Você vai precisar deles para voltar a ela.",
+    "go-change": "Abrir nova",
+    "go-server": "Mudar",
+    "confirm-title": "Tem certeza?"
+  },
+  "viewingkey": {
+    "switch-title": "Mudar para {net}",
+    "switch-sub": "Antes de mudar para {net}, guarde com cuidado a chave de visualização desta carteira. Você vai precisar dela para voltar a ela.",
+    "switch": "Mudar",
+    "switch-warning": "Se você mudar para um servidor de outra rede, não terá mais acesso a esta carteira sem a chave de visualização.",
+    "title": "Sua chave de visualização",
+    "sub": "Qualquer pessoa com esta chave pode ver o saldo e o histórico desta carteira. Ela não pode gastar fundos.",
+    "label": "Chave de visualização unificada",
+    "read": "Somente leitura: mostra o saldo, o histórico e os endereços",
+    "spend": "Não pode enviar, trocar nem gastar fundos",
+    "share": "Compartilhe só com pessoas de confiança. Elas verão toda a sua atividade"
+  },
+  "viewonly": {
+    "dismiss-acc": "Fechar o aviso de somente leitura",
+    "title": "Carteira somente leitura",
+    "body": "Você pode ver o saldo e o histórico e receber fundos. Não é possível gastar com uma chave de visualização.",
+    "button": "Ver chave"
   }
 }

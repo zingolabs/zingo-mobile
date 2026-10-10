@@ -105,7 +105,6 @@ const WALLET_LOCAL = new Set([
   'getWalletVersionInfo',
   'getWalletSaveRequiredInfo',
   'doSave',
-  'doSaveBackup',
   'getConfigWalletPerformanceInfo',
   'setConfigWalletToProdProcess',
   'getOptionWalletInfo',

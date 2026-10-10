@@ -20,7 +20,8 @@ import { useTheme } from '@app/theme';
 import { ease } from '@app/theme/motion';
 import { ContextAppLoaded } from '@app/context';
 import { RouteEnum, SnackbarDurationEnum } from '@app/AppState';
-import { AppDrawerParamList } from '@app/types';
+import { AppDrawerParamList, WalletSeedAction } from '@app/types';
+import { showConfirm } from '@app/services/showConfirm';
 import { useBiometricGate } from '@app/hooks/useBiometricGate';
 import { useSecureScreen } from '@app/hooks/useSecureScreen';
 import { useScreenCapture } from '@app/hooks/useScreenCapture';
@@ -38,11 +39,17 @@ import {
 } from '@screens/SeedBackup/components/SeedParts';
 import { SIDE, StepActions } from '@screens/SeedBackup/components/StepParts';
 import ScreenshotSheet from '@screens/SeedBackup/components/ScreenshotSheet';
+import KeyCard from '@screens/ViewingKey/components/KeyCard';
 
 type WalletSeedProps = NativeStackScreenProps<
   AppDrawerParamList,
   RouteEnum.WalletSeed
->;
+> & {
+  // Leaves this wallet or its server once the user confirms.
+  onConfirm: () => Promise<void>;
+  // Runs when the user backs out without leaving.
+  onCancel: () => Promise<void>;
+};
 
 const PUSHED_SHIFT = 0.28;
 const PUSHED_DIM = 0.55;
@@ -50,6 +57,7 @@ const PUSH_IN_MS = 380;
 const PUSH_OUT_MS = 320;
 const VK_HEAD = 10;
 const VK_TAIL = 6;
+const KEY_QR = 190;
 
 const STRIP = {
   ok: { border: '#0E4A12', bg: '#04160B', tile: '#052520' },
@@ -58,10 +66,30 @@ const STRIP = {
 
 type Tip = 'none' | 'birthday' | 'vk';
 
-// The seed phrase with its backup status, birthday and viewing key.
+const TITLE: Record<WalletSeedAction, string> = {
+  change: 'loadedapp.changewallet',
+  server: 'walletseed.title-server',
+};
+
+const WARNING: Record<WalletSeedAction, string> = {
+  change: 'seed.change-warning',
+  server: 'seed.server-warning',
+};
+
+// A view-only wallet only gets here through Switch Wallet: its server
+// change shows the viewing key screen instead.
+const WARNING_VIEW_ONLY = 'walletseed.change-warning-vo';
+
+// The seed phrase with its backup status, birthday and viewing key. With an
+// action, the last look at them before leaving this wallet or its server.
+// A view-only wallet shows its viewing key in place of the words.
 const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
   navigation,
+  route,
+  onConfirm,
+  onCancel,
 }) => {
+  const action = route.params?.action;
   const context = useContext(ContextAppLoaded);
   const {
     translate,
@@ -71,6 +99,7 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
     seedBackedUpAt,
     language,
     birthday: walletBirthday,
+    readOnly,
   } = context;
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
@@ -81,7 +110,7 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
     needsAuth: biometrics,
     translate,
     addLastSnackbar,
-    onCancel: () => navigation.goBack(),
+    onCancel: () => leave(),
   });
   const passed = gate.kind === 'passed';
 
@@ -100,12 +129,18 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
     }
     (async () => {
       const stored = await getRecoveryWalletInfo();
+      if (readOnly) {
+        const viewOnly = stored.ufvk ? stored : await fetchWallet(true);
+        setBirthday(viewOnly?.birthday || walletBirthday);
+        setVk(viewOnly?.ufvk || '');
+        return;
+      }
       const wallet = stored.seed ? stored : await fetchWallet(false);
       setWords((wallet?.seed || '').split(' ').filter(w => !!w));
       setBirthday(wallet?.birthday || walletBirthday);
       setVk((await fetchWallet(true))?.ufvk || '');
     })();
-  }, [passed, walletBirthday]);
+  }, [passed, walletBirthday, readOnly]);
 
   useEffect(() => {
     if (focused) {
@@ -146,7 +181,7 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
 
   const copyWords = () => {
     copySensitive(
-      `${words.join(' ')}\n${translate('seedbackup.birthday') as string}: ${birthday}`,
+      `${readOnly ? vk : words.join(' ')}\n${translate('seedbackup.birthday') as string}: ${birthday}`,
       () =>
         addLastSnackbar(
           translate('seed.clipboard-cleared') as string,
@@ -167,6 +202,29 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
     );
   };
 
+  const leave = async () => {
+    await onCancel();
+    navigation.goBack();
+  };
+
+  const confirm = (to: WalletSeedAction) =>
+    showConfirm({
+      title: translate('walletseed.confirm-title') as string,
+      message: translate(readOnly ? WARNING_VIEW_ONLY : WARNING[to]) as string,
+      buttons: [
+        {
+          text: translate('confirm') as string,
+          onPress: async () => {
+            await onConfirm();
+            if (navigation.canGoBack()) {
+              navigation.goBack();
+            }
+          },
+        },
+        { text: translate('cancel') as string, style: 'cancel' },
+      ],
+    });
+
   const toggle = (which: Tip) => (open: boolean) =>
     setTip(open ? which : 'none');
 
@@ -181,6 +239,8 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
       )
     : (translate('walletseed.ok-restored') as string);
   const strip = seedBackedUp ? STRIP.ok : STRIP.no;
+  const ready = readOnly ? !!vk : words.length > 0;
+  const veiled = hidden || shot !== 'none' || captured;
   const vkShort =
     vk.length > VK_HEAD + VK_TAIL
       ? `${vk.slice(0, VK_HEAD)}…${vk.slice(-VK_TAIL)}`
@@ -209,7 +269,7 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
             testID="walletseed.back"
             accessibilityRole="button"
             accessibilityLabel={translate('walletseed.back-acc') as string}
-            onPress={() => navigation.goBack()}
+            onPress={leave}
             style={({ pressed }) => ({
               position: 'absolute',
               left: 10,
@@ -221,105 +281,137 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
               backgroundColor: pressed ? 'rgba(255,255,255,0.06)' : undefined,
             })}
           >
-            <ChevronLeft size={22} color={colors.fgDefault} strokeWidth={2.2} />
+            <ChevronLeft size={22} color={colors.fgAccent} strokeWidth={2.2} />
           </Pressable>
           <Text
             accessibilityRole="header"
             style={{ color: colors.fgDefault, fontSize: 18, fontWeight: '700' }}
           >
-            {translate('loadedapp.walletseed') as string}
+            {
+              translate(
+                action ? TITLE[action] : 'loadedapp.walletseed',
+              ) as string
+            }
           </Text>
         </View>
 
-        <View
-          testID={seedBackedUp ? 'walletseed.ok' : 'walletseed.no'}
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            gap: 12,
-            height: 58,
-            marginHorizontal: SIDE,
-            marginBottom: 14,
-            paddingLeft: 13,
-            paddingRight: 12,
-            borderRadius: 16,
-            borderWidth: 1,
-            borderColor: strip.border,
-            backgroundColor: strip.bg,
-          }}
-        >
-          <View
+        {action && (
+          <Text
+            testID="walletseed.leaving"
             style={{
-              width: 34,
-              height: 34,
-              borderRadius: 10,
-              backgroundColor: strip.tile,
-              alignItems: 'center',
-              justifyContent: 'center',
+              marginHorizontal: SIDE,
+              marginBottom: 16,
+              textAlign: 'center',
+              color: colors.fgMuted,
+              fontSize: 14,
+              lineHeight: 20,
             }}
           >
-            {seedBackedUp ? (
-              <ShieldCheckIcon
-                size={17}
-                color={colors.fgAccent}
-                strokeWidth={1.9}
-              />
-            ) : (
-              <TriangleAlert size={17} color={colors.fgWarning} />
-            )}
-          </View>
-          <View style={{ flex: 1 }}>
-            <Text
+            {
+              translate(
+                `walletseed.sub-${action}${readOnly ? '-vo' : ''}`,
+              ) as string
+            }
+          </Text>
+        )}
+        {!action && (
+          <View
+            testID={seedBackedUp ? 'walletseed.ok' : 'walletseed.no'}
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 12,
+              height: 58,
+              marginHorizontal: SIDE,
+              marginBottom: 14,
+              paddingLeft: 13,
+              paddingRight: 12,
+              borderRadius: 16,
+              borderWidth: 1,
+              borderColor: strip.border,
+              backgroundColor: strip.bg,
+            }}
+          >
+            <View
               style={{
-                color: seedBackedUp ? colors.fgAccent : colors.fgWarning,
-                fontSize: 14,
-                fontWeight: '700',
+                width: 34,
+                height: 34,
+                borderRadius: 10,
+                backgroundColor: strip.tile,
+                alignItems: 'center',
+                justifyContent: 'center',
               }}
             >
-              {
-                translate(
-                  seedBackedUp ? 'walletseed.ok-title' : 'walletseed.no-title',
-                ) as string
-              }
-            </Text>
-            <Text style={{ color: colors.fgMuted, fontSize: 12 }}>
-              {seedBackedUp
-                ? backedUpOn
-                : (translate('walletseed.no-sub') as string)}
-            </Text>
-          </View>
-          {!seedBackedUp && (
-            <Pressable
-              testID="walletseed.backup"
-              accessibilityRole="button"
-              onPress={() => openFlow('push')}
-              style={({ pressed }) => ({
-                height: 30,
-                paddingHorizontal: 14,
-                borderRadius: 15,
-                justifyContent: 'center',
-                backgroundColor: colors.bgAccent,
-                transform: [{ scale: pressed ? 0.95 : 1 }],
-              })}
-            >
+              {seedBackedUp ? (
+                <ShieldCheckIcon
+                  size={17}
+                  color={colors.fgAccent}
+                  strokeWidth={1.9}
+                />
+              ) : (
+                <TriangleAlert size={17} color={colors.fgWarning} />
+              )}
+            </View>
+            <View style={{ flex: 1 }}>
               <Text
                 style={{
-                  color: colors.bgCanvas,
-                  fontSize: 13,
+                  color: seedBackedUp ? colors.fgAccent : colors.fgWarning,
+                  fontSize: 14,
                   fontWeight: '700',
                 }}
               >
-                {translate('seednotice.button') as string}
+                {
+                  translate(
+                    seedBackedUp
+                      ? 'walletseed.ok-title'
+                      : 'walletseed.no-title',
+                  ) as string
+                }
               </Text>
-            </Pressable>
-          )}
-        </View>
+              <Text style={{ color: colors.fgMuted, fontSize: 12 }}>
+                {seedBackedUp
+                  ? backedUpOn
+                  : (translate('walletseed.no-sub') as string)}
+              </Text>
+            </View>
+            {!seedBackedUp && (
+              <Pressable
+                testID="walletseed.backup"
+                accessibilityRole="button"
+                onPress={() => openFlow('push')}
+                style={({ pressed }) => ({
+                  height: 30,
+                  paddingHorizontal: 14,
+                  borderRadius: 15,
+                  justifyContent: 'center',
+                  backgroundColor: colors.bgAccent,
+                  transform: [{ scale: pressed ? 0.95 : 1 }],
+                })}
+              >
+                <Text
+                  style={{
+                    color: colors.bgCanvas,
+                    fontSize: 13,
+                    fontWeight: '700',
+                  }}
+                >
+                  {translate('seednotice.button') as string}
+                </Text>
+              </Pressable>
+            )}
+          </View>
+        )}
 
-        <WordGrid
-          testID="walletseed.words"
-          words={words}
-          veiled={hidden || shot !== 'none' || captured}
-        />
+        {readOnly ? (
+          <KeyCard
+            testID="walletseed.vkcard"
+            value={vk}
+            hidden={veiled}
+            qrSize={KEY_QR}
+          />
+        ) : (
+          <WordGrid testID="walletseed.words" words={words} veiled={veiled} />
+        )}
         <View style={{ marginTop: 12, zIndex: tip === 'birthday' ? 3 : 2 }}>
           <InfoRow
             testID="walletseed.birthday"
@@ -331,39 +423,41 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
             value={birthday.toLocaleString()}
           />
         </View>
-        <View style={{ marginTop: 8, zIndex: tip === 'vk' ? 3 : 1 }}>
-          <InfoRow
-            testID="walletseed.vk"
-            label={translate('walletseed.vk') as string}
-            tipTitle={translate('walletseed.vk-tip-title') as string}
-            tipBody={translate('walletseed.vk-tip-body') as string}
-            open={tip === 'vk'}
-            onToggle={toggle('vk')}
-            value={vkShort}
-            trailing={
-              <Pressable
-                testID="walletseed.vk-copy"
-                accessibilityRole="button"
-                accessibilityLabel={translate('walletseed.vk-copy') as string}
-                onPress={copyVk}
-                style={({ pressed }) => ({
-                  width: 26,
-                  height: 26,
-                  marginLeft: 6,
-                  marginRight: -6,
-                  borderRadius: 8,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  backgroundColor: pressed
-                    ? 'rgba(211,226,248,0.08)'
-                    : undefined,
-                })}
-              >
-                <CopyIcon size={15} color={colors.fgDefault} />
-              </Pressable>
-            }
-          />
-        </View>
+        {!readOnly && (
+          <View style={{ marginTop: 8, zIndex: tip === 'vk' ? 3 : 1 }}>
+            <InfoRow
+              testID="walletseed.vk"
+              label={translate('walletseed.vk') as string}
+              tipTitle={translate('walletseed.vk-tip-title') as string}
+              tipBody={translate('walletseed.vk-tip-body') as string}
+              open={tip === 'vk'}
+              onToggle={toggle('vk')}
+              value={vkShort}
+              trailing={
+                <Pressable
+                  testID="walletseed.vk-copy"
+                  accessibilityRole="button"
+                  accessibilityLabel={translate('walletseed.vk-copy') as string}
+                  onPress={copyVk}
+                  style={({ pressed }) => ({
+                    width: 26,
+                    height: 26,
+                    marginLeft: 6,
+                    marginRight: -6,
+                    borderRadius: 8,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: pressed
+                      ? 'rgba(211,226,248,0.08)'
+                      : undefined,
+                  })}
+                >
+                  <CopyIcon size={15} color={colors.fgDefault} />
+                </Pressable>
+              }
+            />
+          </View>
+        )}
         <View style={{ marginTop: 12 }}>
           <CopyShowButtons
             testID="walletseed"
@@ -381,7 +475,35 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
             bottom: insets.bottom + 16,
           }}
         >
-          {seedBackedUp ? (
+          {action ? (
+            <Pressable
+              testID="walletseed.go"
+              accessibilityRole="button"
+              disabled={!ready}
+              onPress={() => confirm(action)}
+              style={({ pressed }) => ({
+                height: 44,
+                marginHorizontal: 52,
+                borderRadius: 22,
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: ready
+                  ? colors.bgAccent
+                  : colors.bgAccentDisabled,
+                transform: [{ scale: pressed ? 0.97 : 1 }],
+              })}
+            >
+              <Text
+                style={{
+                  color: colors.bgCanvas,
+                  fontSize: 15,
+                  fontWeight: '700',
+                }}
+              >
+                {translate(`walletseed.go-${action}`) as string}
+              </Text>
+            </Pressable>
+          ) : seedBackedUp ? (
             <StepActions
               testID="walletseed.actions"
               link={translate('walletseed.verify') as string}

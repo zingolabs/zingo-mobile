@@ -21,15 +21,7 @@ exports[`Component App - test App - snapshot 1`] = `
     name="ScannerAddress"
     options={
       {
-        "presentation": "transparentModal",
-      }
-    }
-  />
-  <MockedScreen
-    component={[Function]}
-    name="ScannerUfvk"
-    options={
-      {
+        "animation": "none",
         "presentation": "transparentModal",
       }
     }

@@ -49,6 +49,7 @@ import RingBorder from '@ui/primitives/RingBorder';
 import ValueTransferLine from './components/ValueTransferLine';
 import IronwoodMigrationBanner from './components/IronwoodMigrationBanner';
 import SeedBackupNotice from './components/SeedBackupNotice';
+import ViewOnlyNotice from './components/ViewOnlyNotice';
 import NoticeStack, { Notice } from '@ui/widgets/NoticeStack';
 import { PriceCard } from '@ui/widgets/Header/components/PriceRow';
 import { fiatQuote } from '@app/price/fiatQuote';
@@ -130,6 +131,8 @@ const History: React.FunctionComponent<HistoryProps> = ({
     info,
     zecPrice,
     seedBackedUp,
+    viewOnlyNoticeDismissed,
+    dismissViewOnlyNotice,
   } = context;
   const { colors } = useTheme();
   const screenName = ScreenEnum.History;
@@ -195,6 +198,21 @@ const History: React.FunctionComponent<HistoryProps> = ({
   const showPrice = fiatQuote(zecPrice, server, info.chainName).kind !== 'none';
 
   const notices: Notice[] = [];
+  if (readOnly && !viewOnlyNoticeDismissed) {
+    notices.push({
+      key: 'viewonly',
+      node: (
+        <ViewOnlyNotice
+          onDismiss={dismissViewOnlyNotice}
+          onViewKey={from =>
+            navigation.navigate(RouteEnum.ViewingKey, {
+              entry: { kind: 'card', from },
+            })
+          }
+        />
+      ),
+    });
+  }
   if (showIronwoodBanner) {
     notices.push({
       key: 'ironwood',
