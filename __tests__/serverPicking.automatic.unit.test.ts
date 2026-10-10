@@ -32,24 +32,40 @@ beforeEach(() => {
 
 test('Tests that a recommended server that answers is picked first', async () => {
   mockAnswering.add(ZAINO).add(REGISTRY).add(STATIC);
-  const pick = await pickAutomatic(translate, ChainNameEnum.mainChainName, true);
+  const pick = await pickAutomatic(
+    translate,
+    ChainNameEnum.mainChainName,
+    true,
+  );
   expect(pick).toMatchObject({ server: { uri: ZAINO }, tier: 'recommended' });
 });
 
 test('Tests that the registry is used when no recommended server answers', async () => {
   mockAnswering.add(REGISTRY).add(STATIC);
-  const pick = await pickAutomatic(translate, ChainNameEnum.mainChainName, true);
+  const pick = await pickAutomatic(
+    translate,
+    ChainNameEnum.mainChainName,
+    true,
+  );
   expect(pick).toMatchObject({ server: { uri: REGISTRY }, tier: 'registry' });
 });
 
 test('Tests that the static list is used when the registry gives nothing that answers', async () => {
   mockAnswering.add(STATIC);
-  const pick = await pickAutomatic(translate, ChainNameEnum.mainChainName, true);
+  const pick = await pickAutomatic(
+    translate,
+    ChainNameEnum.mainChainName,
+    true,
+  );
   expect(pick).toMatchObject({ server: { uri: STATIC }, tier: 'static' });
 });
 
 test('Tests that the default server is used when nothing answers or there is no internet', async () => {
-  const none = await pickAutomatic(translate, ChainNameEnum.mainChainName, true);
+  const none = await pickAutomatic(
+    translate,
+    ChainNameEnum.mainChainName,
+    true,
+  );
   expect(none).toMatchObject({ server: { uri: ZAINO }, tier: 'default' });
   mockAnswering.add(STATIC);
   const offline = await pickAutomatic(
