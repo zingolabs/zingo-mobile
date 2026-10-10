@@ -1,12 +1,7 @@
 import 'react-native';
 import React from 'react';
 
-import {
-  act,
-  fireEvent,
-  render,
-  screen,
-} from '@testing-library/react-native';
+import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import RPCModule from '@app/RPCModule';
 import Settings from '@screens/Settings';
 import {

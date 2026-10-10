@@ -54,40 +54,43 @@ describe('nativeSaveSucceeded', () => {
  * a rejected bridge promise — is always false, never re-encoded as prose
  * and never an escaping exception.
  */
-describe.each([
-  ['doSave', doSave, () => mockedDoSave],
-])('%s', (_name, wrapper, mocked) => {
-  it('reports the Android success shape (boolean true) as true', async () => {
-    mocked().mockResolvedValueOnce(true);
+describe.each([['doSave', doSave, () => mockedDoSave]])(
+  '%s',
+  (_name, wrapper, mocked) => {
+    it('reports the Android success shape (boolean true) as true', async () => {
+      mocked().mockResolvedValueOnce(true);
 
-    await expect(wrapper()).resolves.toBe(true);
-  });
+      await expect(wrapper()).resolves.toBe(true);
+    });
 
-  it('reports the iOS success shape (the string "true") as true', async () => {
-    mocked().mockResolvedValueOnce('true');
+    it('reports the iOS success shape (the string "true") as true', async () => {
+      mocked().mockResolvedValueOnce('true');
 
-    await expect(wrapper()).resolves.toBe(true);
-  });
+      await expect(wrapper()).resolves.toBe(true);
+    });
 
-  it('reports the failure shapes as false', async () => {
-    mocked().mockResolvedValueOnce(false);
-    await expect(wrapper()).resolves.toBe(false);
+    it('reports the failure shapes as false', async () => {
+      mocked().mockResolvedValueOnce(false);
+      await expect(wrapper()).resolves.toBe(false);
 
-    mocked().mockResolvedValueOnce('false');
-    await expect(wrapper()).resolves.toBe(false);
-  });
+      mocked().mockResolvedValueOnce('false');
+      await expect(wrapper()).resolves.toBe(false);
+    });
 
-  it('never mistakes resolved error prose for success', async () => {
-    // The attack case: both bridges' catch blocks still resolve prose
-    // instead of rejecting. That prose must classify as failure.
-    mocked().mockResolvedValueOnce('Error: [Native] saving wallet: disk full');
+    it('never mistakes resolved error prose for success', async () => {
+      // The attack case: both bridges' catch blocks still resolve prose
+      // instead of rejecting. That prose must classify as failure.
+      mocked().mockResolvedValueOnce(
+        'Error: [Native] saving wallet: disk full',
+      );
 
-    await expect(wrapper()).resolves.toBe(false);
-  });
+      await expect(wrapper()).resolves.toBe(false);
+    });
 
-  it('contains a native rejection as false instead of throwing', async () => {
-    mocked().mockRejectedValueOnce(new Error('bridge exploded'));
+    it('contains a native rejection as false instead of throwing', async () => {
+      mocked().mockRejectedValueOnce(new Error('bridge exploded'));
 
-    await expect(wrapper()).resolves.toBe(false);
-  });
-});
+      await expect(wrapper()).resolves.toBe(false);
+    });
+  },
+);
