@@ -103,6 +103,9 @@
     "memobytes-unit": " chars."
   },
   "loadingapp": {
+    "saved-wallet-net-title": "Esta carteira é de outra rede",
+    "saved-wallet-net-body": "O aniversário dela, o bloco {birthday}, é posterior ao último bloco da {net} ({tip}), então ela foi criada em outra rede. Escolha um servidor dessa rede para importá-la.",
+    "saved-wallet-net-server": "Escolher servidor",
     "welcome": "Bem-vindo ao",
     "tagline": "Uma carteira privada para o seu Zcash.",
     "creating-title": "Criando sua carteira",

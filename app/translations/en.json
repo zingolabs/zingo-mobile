@@ -103,6 +103,9 @@
     "memobytes-unit": " chars."
   },
   "loadingapp": {
+    "saved-wallet-net-title": "This wallet is from another network",
+    "saved-wallet-net-body": "Its birthday, block {birthday}, is past the latest {net} block ({tip}), so it was made on another network. Choose a server of that network to import it.",
+    "saved-wallet-net-server": "Choose a server",
     "welcome": "Welcome to",
     "tagline": "A private wallet for your Zcash.",
     "creating-title": "Creating your wallet",
