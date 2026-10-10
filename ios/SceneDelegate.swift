@@ -18,8 +18,35 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         appDelegate.reactNativeFactory?.startReactNative(
             withModuleName: "Zingo",
             in: window,
-            launchOptions: nil
+            launchOptions: SceneDelegate.launchOptions(from: connectionOptions)
         )
+    }
+
+    // With the scene life cycle UIKit delivers opened URLs and universal links to the scene
+    // delegate; AppDelegate's application(_:open:options:) and application(_:continue:...) are
+    // no longer called, so zcash: links never reached Linking.addEventListener.
+    func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
+        guard let url = URLContexts.first?.url else { return }
+        RCTLinkingManager.application(UIApplication.shared, open: url, options: [:])
+    }
+
+    func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
+        _ = RCTLinkingManager.application(UIApplication.shared, continue: userActivity, restorationHandler: { _ in })
+    }
+
+    // A link that launches the app arrives in the connection options. Linking.getInitialURL()
+    // reads it from the launch options React Native is started with.
+    static func launchOptions(from options: UIScene.ConnectionOptions) -> [UIApplication.LaunchOptionsKey: Any]? {
+        if let url = options.urlContexts.first?.url {
+            return [.url: url]
+        }
+        if let activity = options.userActivities.first(where: { $0.activityType == NSUserActivityTypeBrowsingWeb }) {
+            return [.userActivityDictionary: [
+                UIApplication.LaunchOptionsKey.userActivityType: activity.activityType,
+                "UIApplicationLaunchOptionsUserActivityKey": activity,
+            ]]
+        }
+        return nil
     }
 
     func sceneWillEnterForeground(_ scene: UIScene) {
