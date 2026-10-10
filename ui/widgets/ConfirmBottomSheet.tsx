@@ -158,13 +158,15 @@ const ConfirmBottomSheet: React.FC = () => {
       >
         {!!options?.message && (
           <RegText
+            testID="confirm.message"
+            color={
+              options.messageTone === 'danger' ? colors.fgDanger : undefined
+            }
             style={{
               fontSize: 14,
               lineHeight: 21,
               textAlign: options.messageAlign ?? 'left',
               marginBottom: 20,
-              color:
-                options.messageTone === 'danger' ? colors.fgDanger : undefined,
             }}
           >
             {options.message}
