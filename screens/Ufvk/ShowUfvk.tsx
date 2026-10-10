@@ -78,8 +78,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
   onClickCancel,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, addLastSnackbar, setPrivacyOption, biometrics } =
-    context;
+  const { translate, addLastSnackbar, setPrivacyOption, biometrics } = context;
   const { colors } = useTheme();
   const screenName = ScreenEnum.ShowUfvk;
 
@@ -179,8 +178,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
       setTexts(buttonTexts);
     }
     setTimes(
-      action === UfvkActionEnum.change ||
-        action === UfvkActionEnum.server
+      action === UfvkActionEnum.change || action === UfvkActionEnum.server
         ? 1
         : 0,
     );

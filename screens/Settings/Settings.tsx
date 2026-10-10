@@ -976,7 +976,9 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                           <Button
                             testID="settings.restorebackupwallet"
                             type={ButtonTypeEnum.Secondary}
-                            title={translate('settings.restorebackup') as string}
+                            title={
+                              translate('settings.restorebackup') as string
+                            }
                             onPress={() =>
                               showConfirm({
                                 title: translate(
