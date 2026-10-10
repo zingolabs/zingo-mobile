@@ -6,6 +6,7 @@ import Animated, {
   FadeOut,
   Keyframe,
   ReduceMotion,
+  runOnJS,
   useAnimatedStyle,
   useSharedValue,
   withSequence,
@@ -42,6 +43,8 @@ type WalletErrorProps = {
   onServer: () => void;
   // The 'chain' kind's fix: Automatic on the wallet's network, then open.
   onSwitchChain: (chain: ChainNameEnum) => void;
+  // A retry worked: the badge shrinks away and the server dot turns green.
+  resolved?: boolean;
 };
 
 const ICON_TOP = 226 / 874;
@@ -49,6 +52,9 @@ const COLUMN_TOP = 328 / 874;
 const ICON = 75;
 const BADGE = 17;
 const SHAKE_STEP_MS = 64;
+const BADGE_OUT_MS = 200;
+const DETAILS_OPEN_MS = 240;
+const DETAILS_CLOSE_MS = 180;
 const MONO = Platform.select({ ios: 'Menlo', default: 'monospace' });
 // The network pill on the wallet icon and the chips: amber for a network
 // other than Mainnet, green for Mainnet.
@@ -64,12 +70,64 @@ const badgeEnter = () =>
     .duration(300)
     .delay(200)
     .reduceMotion(ReduceMotion.System);
-const boxEnter = () =>
-  FadeIn.duration(240)
-    .easing(ease.emphasized)
-    .reduceMotion(ReduceMotion.System);
-const boxExit = () =>
-  FadeOut.duration(180).easing(ease.standard).reduceMotion(ReduceMotion.System);
+// The details grow from 0 to their height while fading in, and fold back.
+// The text is measured in a free copy: inside the clipped box it would never
+// lay out while the box is at height 0.
+const DetailsBox: React.FunctionComponent<{
+  open: boolean;
+  children: React.ReactNode;
+}> = ({ open, children }) => {
+  const [shown, setShown] = useState(open);
+  const [height, setHeight] = useState(0);
+  const progress = useSharedValue(0);
+  useEffect(() => {
+    if (open) {
+      setShown(true);
+    }
+  }, [open]);
+  useEffect(() => {
+    if (!shown || !height) {
+      return;
+    }
+    progress.value = withTiming(
+      open ? 1 : 0,
+      {
+        duration: open ? DETAILS_OPEN_MS : DETAILS_CLOSE_MS,
+        easing: ease.emphasized,
+        reduceMotion: ReduceMotion.System,
+      },
+      finished => {
+        if (finished && !open) {
+          runOnJS(setShown)(false);
+        }
+      },
+    );
+  }, [open, shown, height, progress]);
+  const style = useAnimatedStyle(() => ({
+    height: progress.value * height,
+    opacity: progress.value,
+  }));
+  if (!shown) {
+    return null;
+  }
+  return (
+    <>
+      <View
+        pointerEvents="none"
+        onLayout={e => setHeight(e.nativeEvent.layout.height)}
+        style={{ position: 'absolute', left: 0, right: 0, opacity: 0 }}
+      >
+        {children}
+      </View>
+      <Animated.View
+        testID="walleterror.details.box"
+        style={[{ alignSelf: 'stretch', overflow: 'hidden' }, style]}
+      >
+        {children}
+      </Animated.View>
+    </>
+  );
+};
 const labelEnter = () =>
   FadeIn.duration(duration.fast).reduceMotion(ReduceMotion.System);
 const labelExit = () =>
@@ -86,6 +144,7 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
   onCreate,
   onServer,
   onSwitchChain,
+  resolved = false,
 }) => {
   const { translate, netInfo, server } = useContext(ContextAppLoading);
   const { colors } = useTheme();
@@ -111,10 +170,24 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
 
   useEffect(() => {
     chevron.value = withTiming(open ? 180 : 0, {
-      duration: 240,
+      duration: open ? DETAILS_OPEN_MS : DETAILS_CLOSE_MS,
       easing: ease.emphasized,
     });
   }, [open, chevron]);
+
+  const badgeScale = useSharedValue(1);
+  useEffect(() => {
+    if (resolved) {
+      badgeScale.value = withTiming(0, {
+        duration: BADGE_OUT_MS,
+        easing: ease.in,
+        reduceMotion: ReduceMotion.System,
+      });
+    }
+  }, [resolved, badgeScale]);
+  const badgeStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: badgeScale.value }],
+  }));
 
   const iconStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: shakeX.value }],
@@ -124,8 +197,9 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
   }));
 
   const offline = server.kind === 'offline';
-  const dotColor =
-    !netInfo.isConnected || kind === 'server'
+  const dotColor = resolved
+    ? colors.fgAccent
+    : !netInfo.isConnected || kind === 'server'
       ? colors.fgDangerEmphasis
       : offline
         ? colors.fgMuted
@@ -305,54 +379,62 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
           color={colors.fgDefault}
           size={28}
         />
-        {chain ? (
-          <Animated.View
-            testID="walleterror.netbadge"
-            entering={badgeEnter()}
-            style={{
-              position: 'absolute',
-              left: 55,
-              top: -2,
-              height: 20,
-              paddingHorizontal: 7,
-              borderRadius: 10,
-              borderWidth: 1,
-              borderColor: NET_AMBER.border,
-              backgroundColor: NET_AMBER.bg,
-              justifyContent: 'center',
-            }}
-          >
-            <BoldText
-              numberOfLines={1}
-              style={{ fontSize: 9.5, lineHeight: 12, color: NET_AMBER.ink }}
+        <Animated.View
+          pointerEvents="none"
+          style={[
+            { position: 'absolute', left: 0, top: 0, right: 0, bottom: 0 },
+            badgeStyle,
+          ]}
+        >
+          {chain ? (
+            <Animated.View
+              testID="walleterror.netbadge"
+              entering={badgeEnter()}
+              style={{
+                position: 'absolute',
+                left: 55,
+                top: -2,
+                height: 20,
+                paddingHorizontal: 7,
+                borderRadius: 10,
+                borderWidth: 1,
+                borderColor: NET_AMBER.border,
+                backgroundColor: NET_AMBER.bg,
+                justifyContent: 'center',
+              }}
             >
-              {netName(chain)}
-            </BoldText>
-          </Animated.View>
-        ) : (
-          <Animated.View
-            entering={badgeEnter()}
-            style={{
-              position: 'absolute',
-              left: 57,
-              top: 0,
-              width: BADGE,
-              height: BADGE,
-              borderRadius: BADGE / 2,
-              backgroundColor: colors.fgDangerEmphasis,
-              borderWidth: 2,
-              borderColor: colors.bgCanvas,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <BoldText
-              style={{ fontSize: 10, lineHeight: 12, color: '#FFFFFF' }}
+              <BoldText
+                numberOfLines={1}
+                style={{ fontSize: 9.5, lineHeight: 12, color: NET_AMBER.ink }}
+              >
+                {netName(chain)}
+              </BoldText>
+            </Animated.View>
+          ) : (
+            <Animated.View
+              entering={badgeEnter()}
+              style={{
+                position: 'absolute',
+                left: 57,
+                top: 0,
+                width: BADGE,
+                height: BADGE,
+                borderRadius: BADGE / 2,
+                backgroundColor: colors.fgDangerEmphasis,
+                borderWidth: 2,
+                borderColor: colors.bgCanvas,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
             >
-              !
-            </BoldText>
-          </Animated.View>
-        )}
+              <BoldText
+                style={{ fontSize: 10, lineHeight: 12, color: '#FFFFFF' }}
+              >
+                !
+              </BoldText>
+            </Animated.View>
+          )}
+        </Animated.View>
       </Animated.View>
 
       <View
@@ -433,29 +515,27 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
             />
           </Animated.View>
         </Pressable>
-        {open && (
-          <Animated.View
-            testID="walleterror.details.box"
-            entering={boxEnter()}
-            exiting={boxExit()}
-            style={{
-              alignSelf: 'stretch',
-              marginTop: 6,
-              padding: 10,
-              borderRadius: 8,
-              backgroundColor: colors.bgSurface,
-              borderWidth: 1,
-              borderColor: colors.bottomSheetBorder,
-            }}
-          >
-            <RegText
-              selectable
-              style={{ fontFamily: MONO, fontSize: 10.5, lineHeight: 16 }}
+        <View style={{ alignSelf: 'stretch' }}>
+          <DetailsBox open={open}>
+            <View
+              style={{
+                marginTop: 6,
+                padding: 10,
+                borderRadius: 8,
+                backgroundColor: colors.bgSurface,
+                borderWidth: 1,
+                borderColor: colors.bottomSheetBorder,
+              }}
             >
-              {details}
-            </RegText>
-          </Animated.View>
-        )}
+              <RegText
+                selectable
+                style={{ fontFamily: MONO, fontSize: 10.5, lineHeight: 16 }}
+              >
+                {details}
+              </RegText>
+            </View>
+          </DetailsBox>
+        </View>
       </View>
 
       {chain

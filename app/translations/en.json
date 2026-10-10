@@ -103,7 +103,7 @@
     "memobytes-unit": " chars."
   },
   "loadingapp": {
-    "welcome": "Welcome",
+    "welcome": "Welcome to",
     "tagline": "A private wallet for your Zcash.",
     "creating-title": "Creating your wallet",
     "previous-install-title": "Wallet from a previous install",

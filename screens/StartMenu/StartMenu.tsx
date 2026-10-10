@@ -23,7 +23,7 @@ import RegText from '@ui/primitives/RegText';
 import BoldText from '@ui/primitives/BoldText';
 import BusyButton from '@ui/widgets/BusyButton';
 import ServerIcon from '@ui/widgets/ServerIcon';
-import { duration, ease } from '@app/theme/motion';
+import { ease } from '@app/theme/motion';
 
 // Vertical positions from the 402 x 874 design, as fractions of the height.
 const TITLE_TOP = 294 / 874;
@@ -32,29 +32,40 @@ const BOTTOM_MARGIN = 60;
 const PILL_WIDTH = 270;
 const BACK_ONLINE_MS = 1600;
 
+// The launch sequence, about 1.1 s: "Welcome to" rises, "Zingo" settles,
+// the tagline fades, the actions arrive last.
+const LAUNCH_MS = 1100;
 const titleEnter = () =>
-  FadeInUp.duration(400)
-    .delay(500)
+  FadeInUp.duration(500)
+    .delay(250)
     .easing(ease.out)
     .withInitialValues({ opacity: 0, transform: [{ translateY: 12 }] })
     .reduceMotion(ReduceMotion.System);
 const brandEnter = () =>
-  FadeIn.duration(420)
-    .delay(620)
+  FadeInUp.duration(650)
+    .delay(370)
     .easing(ease.out)
-    .withInitialValues({ opacity: 0, transform: [{ scale: 1.03 }] })
+    .withInitialValues({
+      opacity: 0,
+      transform: [{ translateY: 14 }, { scale: 0.97 }],
+    })
     .reduceMotion(ReduceMotion.System);
 const tagEnter = () =>
-  FadeIn.duration(300).delay(780).reduceMotion(ReduceMotion.System);
+  FadeIn.duration(450).delay(600).reduceMotion(ReduceMotion.System);
 const actionsEnter = () =>
-  FadeInUp.duration(360)
-    .delay(900)
+  FadeInUp.duration(480)
+    .delay(740)
     .easing(ease.out)
     .withInitialValues({ opacity: 0, transform: [{ translateY: 8 }] })
     .reduceMotion(ReduceMotion.System);
-const pillEnter = () =>
-  FadeIn.duration(duration.emphasized).reduceMotion(ReduceMotion.System);
+// Going offline after the launch: the pill and the line fade in at once.
+const offlineEnter = () =>
+  FadeIn.duration(240).reduceMotion(ReduceMotion.System);
+const offlineExit = () =>
+  FadeOut.duration(240).reduceMotion(ReduceMotion.System);
 const pillExit = () => FadeOut.duration(300).reduceMotion(ReduceMotion.System);
+// Back online, only the pill's icon and text change.
+const pillSwap = () => FadeIn.duration(200).reduceMotion(ReduceMotion.System);
 
 type StartMenuProps = {
   actionButtonsDisabled: boolean;
@@ -90,6 +101,15 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
   const [backOnline, setBackOnline] = useState<boolean>(false);
   const [started, setStarted] = useState<string | null>(null);
   const wasOffline = useRef<boolean>(!netInfo.isConnected);
+  // Past the launch sequence, what appears no longer waits for it.
+  const launched = useRef(false);
+  useEffect(() => {
+    const t = setTimeout(() => {
+      launched.current = true;
+    }, LAUNCH_MS);
+    return () => clearTimeout(t);
+  }, []);
+  const lateEnter = () => (launched.current ? offlineEnter() : tagEnter());
 
   useEffect(() => {
     if (netInfo.isConnected && wasOffline.current) {
@@ -243,8 +263,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
 
       {(noInternet || backOnline) && (
         <Animated.View
-          key={backOnline ? 'online' : 'offline'}
-          entering={pillEnter()}
+          entering={lateEnter()}
           exiting={pillExit()}
           pointerEvents="none"
           style={{
@@ -255,25 +274,30 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
             alignItems: 'center',
           }}
         >
-          {backOnline
-            ? chip(
-                translate('loadingapp.back-online') as string,
-                true,
-                <FontAwesomeIcon
-                  icon={faCheck}
-                  size={12}
-                  color={colors.fgAccent}
-                />,
-              )
-            : chip(
-                translate('loadingapp.no-internet') as string,
-                false,
-                <FontAwesomeIcon
-                  icon={faWifi}
-                  size={12}
-                  color={colors.fgDangerEmphasis}
-                />,
-              )}
+          <Animated.View
+            key={backOnline ? 'online' : 'offline'}
+            entering={pillSwap()}
+          >
+            {backOnline
+              ? chip(
+                  translate('loadingapp.back-online') as string,
+                  true,
+                  <FontAwesomeIcon
+                    icon={faCheck}
+                    size={12}
+                    color={colors.fgAccent}
+                  />,
+                )
+              : chip(
+                  translate('loadingapp.no-internet') as string,
+                  false,
+                  <FontAwesomeIcon
+                    icon={faWifi}
+                    size={12}
+                    color={colors.fgDangerEmphasis}
+                  />,
+                )}
+          </Animated.View>
         </Animated.View>
       )}
 
@@ -318,7 +342,8 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
         </Animated.Text>
         {noInternet && !recoveryWallet && (
           <Animated.Text
-            entering={tagEnter()}
+            entering={lateEnter()}
+            exiting={offlineExit()}
             style={{
               color: colors.fgMuted,
               fontSize: 10,

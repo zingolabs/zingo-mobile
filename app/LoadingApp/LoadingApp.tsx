@@ -1,5 +1,10 @@
 import React, { Component, useState, useMemo, useEffect } from 'react';
-import { I18nManager, AppState, NativeEventSubscription } from 'react-native';
+import {
+  I18nManager,
+  AppState,
+  BackHandler,
+  NativeEventSubscription,
+} from 'react-native';
 
 import { useTheme } from '@app/theme';
 import { I18n } from 'i18n-js';
@@ -358,6 +363,7 @@ type LoadingAppClassProps = {
 type LoadingAppClassState = AppStateLoading & AppContextLoading;
 
 const RETRY_MIN_MS = 1400;
+const ERROR_RESOLVE_MS = 200;
 
 export class LoadingAppClass extends Component<
   LoadingAppClassProps,
@@ -430,11 +436,50 @@ export class LoadingAppClass extends Component<
       serverLists: {},
       serverListChain: ChainNameEnum.mainChainName,
       serverTab: null,
+      errorResolved: false,
       serverReturn: RouteEnum.StartMenu,
     };
   }
 
+  // Set by Server while a custom address is unsaved: back asks first.
+  serverBackGuard: React.MutableRefObject<(() => boolean) | null> = {
+    current: null,
+  };
+  backSub: { remove: () => void } | null = null;
+
+  // System back on Server, its list and the import chooser goes one screen
+  // up, as their back arrows do. Other screens leave it to the handlers
+  // below (open sheets) and the app shell.
+  onHardwareBack = (): boolean => {
+    const { screen, actionButtonsDisabled } = this.state;
+    if (screen === RouteEnum.Server) {
+      if (!actionButtonsDisabled && !this.serverBackGuard.current?.()) {
+        this.closeServer();
+      }
+      return true;
+    }
+    if (screen === RouteEnum.ServerList) {
+      if (!actionButtonsDisabled) {
+        this.setState({ screen: RouteEnum.Server });
+      }
+      return true;
+    }
+    if (screen === RouteEnum.ImportChooser) {
+      if (!actionButtonsDisabled) {
+        this.setState({ screen: RouteEnum.StartMenu });
+      }
+      return true;
+    }
+    return false;
+  };
+
   componentDidMount = async () => {
+    if (!this.backSub) {
+      this.backSub = BackHandler.addEventListener(
+        'hardwareBackPress',
+        this.onHardwareBack,
+      );
+    }
     const netInfoState = await NetInfo.fetch();
     this.setState({
       netInfo: {
@@ -620,6 +665,8 @@ export class LoadingAppClass extends Component<
   componentWillUnmount = () => {
     this.unmounted = true;
     this.detachListeners();
+    this.backSub?.remove();
+    this.backSub = null;
   };
 
   // Default server for a chain = the `default` entry for that chain in the
@@ -791,6 +838,7 @@ export class LoadingAppClass extends Component<
     const details = await this.chainDetails(walletChain);
     this.setState({
       walletError: { kind: 'chain', details, walletChain },
+      errorResolved: false,
       retrying: false,
       actionButtonsDisabled: false,
       screen: RouteEnum.WalletError,
@@ -969,6 +1017,7 @@ export class LoadingAppClass extends Component<
       }
       this.setState(state => ({
         walletError: { kind, details },
+        errorResolved: false,
         retrying: false,
         errorShake: again ? state.errorShake + 1 : state.errorShake,
         actionButtonsDisabled: false,
@@ -1045,6 +1094,28 @@ export class LoadingAppClass extends Component<
     firstLaunchingMessage: LaunchingModeEnum,
     walletChainName: ChainNameEnum,
   ) => {
+    // Leaving the error screen after a retry worked: its badge shrinks and
+    // the server dot turns green first.
+    if (
+      this.state.screen === RouteEnum.WalletError &&
+      !this.state.errorResolved
+    ) {
+      this.setState({ errorResolved: true });
+      setTimeout(
+        () =>
+          this.navigateToLoadedApp(
+            readOnly,
+            orchardPool,
+            saplingPool,
+            transparentPool,
+            newWallet,
+            firstLaunchingMessage,
+            walletChainName,
+          ),
+        ERROR_RESOLVE_MS,
+      );
+      return;
+    }
     this.setState(s => ({ wallet: { ...s.wallet, seed: '', ufvk: '' } }));
     this.props.navigationApp.reset({
       index: 0,
@@ -1080,9 +1151,11 @@ export class LoadingAppClass extends Component<
       actionButtonsDisabled: true,
       progressKind: 'create',
     });
+    // The leaves part at once and the creating screen fades up in their
+    // place; no button collapse first.
     const showProgress = setTimeout(
       () => this.setState({ screen: RouteEnum.WalletProgress }),
-      motionDuration.emphasized,
+      0,
     );
     // Pass "0" in both modes. Online, the Indexer supplies the chain tip.
     // Offline (Indexerless), the FFI falls back to zingolib's Library Birthday
@@ -1290,9 +1363,11 @@ export class LoadingAppClass extends Component<
       actionButtonsDisabled: true,
       progressKind: 'import',
     });
+    // From the form, the Import button collapses first; from the Keychain
+    // card, the leaves part at once.
     const showImporting = setTimeout(
       () => this.setState({ screen: RouteEnum.WalletProgress }),
-      motionDuration.emphasized,
+      origin === RouteEnum.ImportUfvk ? motionDuration.emphasized : 0,
     );
     let type: RestoreFromTypeEnum = RestoreFromTypeEnum.seedRestoreFrom;
     if (
@@ -1791,6 +1866,7 @@ export class LoadingAppClass extends Component<
                         kind={this.state.walletError.kind}
                         details={this.state.walletError.details}
                         walletChain={this.state.walletError.walletChain}
+                        resolved={this.state.errorResolved}
                         busy={this.state.retrying}
                         shake={this.state.errorShake}
                         onRetry={this.retryOpenWallet}
@@ -1833,6 +1909,7 @@ export class LoadingAppClass extends Component<
                       onProbe={this.probeServers}
                       onUnreachable={this.serverUnreachable}
                       onBack={this.closeServer}
+                      backGuard={this.serverBackGuard}
                     />
                   )}
                   {screen === RouteEnum.ServerList && (

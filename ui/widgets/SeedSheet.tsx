@@ -2,6 +2,7 @@
 import React, { forwardRef, useCallback } from 'react';
 import { Pressable, View } from 'react-native';
 import { radiusSheet, useTheme } from '@app/theme';
+import { ease } from '@app/theme/motion';
 import {
   BottomSheetBackdrop,
   BottomSheetBackdropProps,
@@ -30,6 +31,10 @@ const SeedHandle: React.FC = () => {
   );
 };
 
+// Rises in 420 ms emphasized; drops quickly, 260 ms ease-in.
+const OPEN = { duration: 420, easing: ease.emphasized };
+const CLOSE = { duration: 260, easing: ease.in };
+
 type SeedSheetProps = {
   wallet: WalletType | null;
   translate: (key: string) => TranslateType;
@@ -43,7 +48,7 @@ const SeedSheet = forwardRef<BottomSheetModal, SeedSheetProps>(
     const columns = [0, 1, 2].map(c => words.filter((_, i) => i % 3 === c));
 
     const dismiss = useCallback(() => {
-      (ref as React.RefObject<BottomSheetModal>)?.current?.dismiss();
+      (ref as React.RefObject<BottomSheetModal>)?.current?.dismiss(CLOSE);
     }, [ref]);
 
     const renderBackdrop = useCallback(
@@ -53,10 +58,11 @@ const SeedSheet = forwardRef<BottomSheetModal, SeedSheetProps>(
           disappearsOnIndex={-1}
           appearsOnIndex={0}
           opacity={0.62}
-          pressBehavior="close"
+          pressBehavior="none"
+          onPress={dismiss}
         />
       ),
-      [],
+      [dismiss],
     );
 
     return (
@@ -65,6 +71,7 @@ const SeedSheet = forwardRef<BottomSheetModal, SeedSheetProps>(
         accessible={false}
         enableDynamicSizing
         enablePanDownToClose
+        animationConfigs={OPEN}
         backdropComponent={renderBackdrop}
         handleComponent={SeedHandle}
         backgroundStyle={{

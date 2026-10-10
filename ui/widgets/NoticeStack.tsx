@@ -5,6 +5,8 @@ import Animated, {
   Keyframe,
   ReduceMotion,
   useAnimatedStyle,
+  useSharedValue,
+  withDelay,
   withTiming,
   WithTimingConfig,
 } from 'react-native-reanimated';
@@ -32,6 +34,15 @@ const MARGIN_BOTTOM = 12;
 const SCALE_STEP = 0.06;
 const OPACITY_STEP = 0.1;
 const RADIUS = 14;
+
+// As the wallet opens, the stack drops in 8 pt once its cards are measured.
+const DROP_PT = 8;
+const drop: WithTimingConfig = {
+  duration: 420,
+  easing: ease.out,
+  reduceMotion: ReduceMotion.System,
+};
+const DROP_DELAY_MS = 200;
 
 const move: WithTimingConfig = {
   duration: duration.sheet,
@@ -186,6 +197,17 @@ const NoticeStack: React.FunctionComponent<NoticeStackProps> = ({
     onHeight(ready || shown.length === 0 ? height : 0);
   }, [height, ready, shown.length, onHeight]);
 
+  const enter = useSharedValue(0);
+  useEffect(() => {
+    if (ready && enter.value === 0) {
+      enter.value = withDelay(DROP_DELAY_MS, withTiming(1, drop));
+    }
+  }, [ready, enter]);
+  const enterStyle = useAnimatedStyle(() => ({
+    opacity: enter.value,
+    transform: [{ translateY: (enter.value - 1) * DROP_PT }],
+  }));
+
   useEffect(() => {
     if (ready && !animate) {
       const id = requestAnimationFrame(() => setAnimate(true));
@@ -218,13 +240,15 @@ const NoticeStack: React.FunctionComponent<NoticeStackProps> = ({
   const more = shown.length - 1;
 
   return (
-    <View
-      style={{
-        marginHorizontal: 20,
-        marginTop: MARGIN_TOP,
-        marginBottom: MARGIN_BOTTOM,
-        opacity: ready ? 1 : 0,
-      }}
+    <Animated.View
+      style={[
+        {
+          marginHorizontal: 20,
+          marginTop: MARGIN_TOP,
+          marginBottom: MARGIN_BOTTOM,
+        },
+        enterStyle,
+      ]}
     >
       <Animated.View style={box}>
         {shown.map((n, i) => (
@@ -303,7 +327,7 @@ const NoticeStack: React.FunctionComponent<NoticeStackProps> = ({
           </Animated.View>
         )}
       </Animated.View>
-    </View>
+    </Animated.View>
   );
 };
 

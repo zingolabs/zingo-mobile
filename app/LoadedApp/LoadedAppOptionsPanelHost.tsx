@@ -1,11 +1,12 @@
-import React, { useContext, useMemo } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 
 import { OptionsPanelHost } from '@screens/OptionsPanel';
 import type {
   OptionsPanelAction,
   OptionsPanelSocial,
 } from '@screens/OptionsPanel';
-import { closeOptionsPanel } from '@app/context/optionsPanel';
+import { closeOptionsPanel, useOptionsPanel } from '@app/context/optionsPanel';
+import { probeUri } from '@app/services/serverPicking';
 import { ContextAppLoaded } from '@app/context';
 import { MenuItemEnum } from '@app/AppState';
 import { sendEmail } from '@app/services/sendEmail';
@@ -63,6 +64,26 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
     netInfo,
     seedBackedUp,
   } = context;
+  const { isOpen } = useOptionsPanel();
+
+  // The Server tile's dot turns red when the server doesn't answer; it is
+  // asked each time the panel opens.
+  const [unreachable, setUnreachable] = useState(false);
+  useEffect(() => {
+    if (!isOpen || server.kind !== 'remote' || !netInfo.isConnected) {
+      return;
+    }
+    let live = true;
+    (async () => {
+      const probe = await probeUri(server.uri);
+      if (live) {
+        setUnreachable(probe.latency === null);
+      }
+    })();
+    return () => {
+      live = false;
+    };
+  }, [isOpen, server, netInfo.isConnected]);
 
   // Audit Issue D — bio gates moved into the destination screens
   // themselves (WalletSeed.tsx, ViewingKey.tsx, Rescan.tsx, Settings.tsx) so
@@ -163,6 +184,7 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
       icon: (
         <ServerIcon
           noInternet={!netInfo.isConnected}
+          unreachable={unreachable}
           offline={isOffline}
           background="#111c2c"
         />
@@ -178,6 +200,7 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
     seedBackedUp,
     server,
     netInfo,
+    unreachable,
   ]);
 
   const socials = useMemo<OptionsPanelSocial[]>(

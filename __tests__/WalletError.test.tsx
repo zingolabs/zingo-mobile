@@ -44,7 +44,7 @@ test('Tests that the error text stays hidden until the details toggle is pressed
   mount({});
   expect(screen.queryByText('failed to read wallet file')).toBeNull();
   fireEvent.press(screen.getByTestId('walleterror.details'));
-  expect(screen.getByText('failed to read wallet file')).toBeOnTheScreen();
+  expect(screen.getAllByText('failed to read wallet file').length).toBeGreaterThan(0);
 });
 
 test('Tests that each action reaches its handler when the screen is idle', () => {

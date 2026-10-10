@@ -44,4 +44,6 @@ export default interface AppStateLoading {
   serverReturn: RouteEnum;
   // The network the Server screen opens on, when it is not the server's.
   serverTab: ChainNameEnum | null;
+  // A retry from the error screen worked: its badge shrinks before Home.
+  errorResolved: boolean;
 }

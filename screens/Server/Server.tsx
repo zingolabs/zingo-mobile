@@ -143,12 +143,17 @@ const StatusDot: React.FC<StatusDotProps> = ({ status, offline }) => {
 
 type ToggleProps = { on: boolean; disabled: boolean; onToggle: () => void };
 
+const KNOB_MS = 220;
+// Offline fades the network switch and the lists to 40%.
+const LOCK_MS = 200;
+const LOCKED_OPACITY = 0.4;
+
 const Toggle: React.FC<ToggleProps> = ({ on, disabled, onToggle }) => {
   const { colors } = useTheme();
   const knob = useSharedValue(on ? 1 : 0);
   useEffect(() => {
     knob.value = withTiming(on ? 1 : 0, {
-      duration: duration.base,
+      duration: KNOB_MS,
       easing: ease.emphasized,
     });
   }, [on, knob]);
@@ -288,6 +293,14 @@ const Server: React.FunctionComponent<ServerProps> = ({
   const dirty = !offline && !!draft.host.trim() && customSelected && !saved;
   const working = custom.working !== null;
   const locked = busy || offline || working;
+  const lock = useSharedValue(offline ? LOCKED_OPACITY : 1);
+  useEffect(() => {
+    lock.value = withTiming(offline ? LOCKED_OPACITY : 1, {
+      duration: LOCK_MS,
+      easing: ease.standard,
+    });
+  }, [offline, lock]);
+  const lockStyle = useAnimatedStyle(() => ({ opacity: lock.value }));
 
   const cardName = offline
     ? t('offline')
@@ -550,22 +563,24 @@ const Server: React.FunctionComponent<ServerProps> = ({
         </Animated.View>
       </View>
 
-      <View
+      <Animated.View
         testID="server.segments"
         onLayout={e => setSegmentW(e.nativeEvent.layout.width)}
-        style={{
-          position: 'absolute',
-          left: 22.5,
-          right: 22.5,
-          top: `${SEGMENT_TOP * 100}%`,
-          height: 37,
-          borderRadius: 999,
-          backgroundColor: colors.bgSurface,
-          borderWidth: 1,
-          borderColor: colors.bottomSheetBorder,
-          flexDirection: 'row',
-          opacity: offline ? 0.4 : 1,
-        }}
+        style={[
+          {
+            position: 'absolute',
+            left: 22.5,
+            right: 22.5,
+            top: `${SEGMENT_TOP * 100}%`,
+            height: 37,
+            borderRadius: 999,
+            backgroundColor: colors.bgSurface,
+            borderWidth: 1,
+            borderColor: colors.bottomSheetBorder,
+            flexDirection: 'row',
+          },
+          lockStyle,
+        ]}
       >
         {segmentW > 0 && (
           <Animated.View
@@ -607,7 +622,7 @@ const Server: React.FunctionComponent<ServerProps> = ({
             </RegText>
           </Pressable>
         ))}
-      </View>
+      </Animated.View>
 
       <ScrollView
         style={{
@@ -627,7 +642,7 @@ const Server: React.FunctionComponent<ServerProps> = ({
             .delay(120)
             .reduceMotion(ReduceMotion.System)}
           exiting={FadeOut.duration(120).reduceMotion(ReduceMotion.System)}
-          style={{ opacity: offline ? 0.4 : 1 }}
+          style={lockStyle}
           pointerEvents={offline ? 'none' : 'auto'}
         >
           {body}

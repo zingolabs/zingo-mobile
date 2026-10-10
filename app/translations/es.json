@@ -103,7 +103,7 @@
     "memobytes-unit": " car."
   },
   "loadingapp": {
-    "welcome": "Bienvenido",
+    "welcome": "Bienvenido a",
     "tagline": "Un monedero privado para tu Zcash.",
     "creating-title": "Creando tu monedero",
     "previous-install-title": "Monedero de una instalación anterior",
