@@ -31,7 +31,7 @@ import BusyButton from '@ui/widgets/BusyButton';
 import InfoTooltip from '@ui/widgets/InfoTooltip';
 import { RevealOrigin } from '@ui/widgets/CircularReveal';
 import { ScanIcon } from '@ui/primitives/Icons/ScanIcon';
-import ScanOverlay from './components/ScanOverlay';
+import ScanOverlay from '@ui/widgets/ScanOverlay';
 import {
   UfvkCheck,
   checkUfvk,
@@ -39,7 +39,11 @@ import {
 } from '@app/walletBackend';
 import { ChainNameEnum, GlobalConst } from '@app/AppState';
 import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
-import { seedStatus, viewingKeyProblem } from '@app/utils/seedPhrase';
+import {
+  isViewingKey,
+  seedStatus,
+  viewingKeyProblem,
+} from '@app/utils/seedPhrase';
 import { duration, ease } from '@app/theme/motion';
 
 const activationHeight = {
@@ -336,7 +340,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
               ref={scanButton}
               testID="import.scan"
               accessibilityRole="button"
-              accessibilityLabel={translate('import.scan-title') as string}
+              accessibilityLabel={translate('scanner.title') as string}
               onPress={openScanner}
               style={({ pressed }) => ({
                 width: 34,
@@ -526,9 +530,18 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
       </Pressable>
       {scan.kind === 'open' && (
         <ScanOverlay
+          testID="import.scanner"
           origin={scan.origin}
-          translate={translate}
-          onKey={key => {
+          texts={{
+            title: translate('scanner.title') as string,
+            hint: translate('import.scan-hint') as string,
+            miss: translate('import.scan-miss') as string,
+            found: translate('import.scan-found') as string,
+            back: translate('scanner.back') as string,
+            torch: translate('scanner.torch') as string,
+          }}
+          accepts={isViewingKey}
+          onRead={key => {
             setSeedufvkText(key);
             setPulse(p => p + 1);
           }}

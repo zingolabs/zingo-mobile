@@ -742,12 +742,9 @@
     "key-valid": "Chave de visualização válida",
     "key-keep-typing": "Chave de visualização? Continue digitando: uview1…",
     "word-nomatch": "Nenhuma palavra de recuperação começa com “{word}”",
-    "scan-title": "Escanear código QR",
     "scan-hint": "Aponte a câmera para o código QR de uma chave de visualização.",
     "scan-found": "Chave de visualização encontrada",
     "scan-miss": "Esse código não é uma chave de visualização.",
-    "scan-torch": "Lanterna",
-    "scan-back": "Voltar",
     "title": "Frases de recuperação / Chave de Visualização",
     "key-label": "Insira a Frases de recuperação / Chave de Visualização",
     "birthday": "Aniversário",
@@ -788,6 +785,13 @@
     ]
   },
   "scanner": {
+    "title": "Escanear código QR",
+    "back": "Voltar",
+    "torch": "Lanterna",
+    "found": "Código QR lido",
+    "hint-address": "Aponte a câmera para o código QR de um endereço Zcash.",
+    "miss-address": "Esse código não é um endereço Zcash.",
+    "hint-any": "Aponte a câmera para o código QR de um endereço.",
     "text": "Faça o Scan de uma Chave de Visualização Unificada completa",
     "scanaddress": "Escaneie um Endereço Zcash"
   },

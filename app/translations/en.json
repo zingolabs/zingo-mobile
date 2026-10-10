@@ -742,12 +742,9 @@
     "key-valid": "Valid viewing key",
     "key-keep-typing": "Viewing key? Keep typing: uview1…",
     "word-nomatch": "No recovery word starts with “{word}”",
-    "scan-title": "Scan QR code",
     "scan-hint": "Point the camera at a viewing key QR code.",
     "scan-found": "Viewing key found",
     "scan-miss": "That code isn't a viewing key.",
-    "scan-torch": "Flashlight",
-    "scan-back": "Back",
     "title": "Seed Phrase / Viewing Key",
     "key-label": "Enter your Seed Phrase or Viewing key",
     "birthday": "Birthday",
@@ -788,6 +785,13 @@
     ]
   },
   "scanner": {
+    "title": "Scan QR code",
+    "back": "Back",
+    "torch": "Flashlight",
+    "found": "QR code read",
+    "hint-address": "Point the camera at a Zcash address QR code.",
+    "miss-address": "That code isn't a Zcash address.",
+    "hint-any": "Point the camera at an address QR code.",
     "text": "Scan a Unified Full Viewing Key",
     "scanaddress": "Scan a Zcash Address"
   },
