@@ -736,6 +736,12 @@
     "done": "Done"
   },
   "import": {
+    "key-prefix": "A viewing key starts with uview1.",
+    "key-char": "“{char}” can’t appear in a viewing key. Check that character.",
+    "key-incomplete": "This viewing key is incomplete. Check for missing characters.",
+    "key-valid": "Valid viewing key",
+    "key-keep-typing": "Viewing key? Keep typing: uview1…",
+    "word-nomatch": "No recovery word starts with “{word}”",
     "scan-title": "Scan QR code",
     "scan-hint": "Point the camera at a viewing key QR code.",
     "scan-found": "Viewing key found",
@@ -753,7 +759,6 @@
     "seed-full": "A seed phrase has 24 words. Remove one to change it.",
     "seed-words-invalid": "{count} of these words are not in the recovery word list.",
     "seed-checksum": "These 24 words are not a valid seed phrase. Check each one, the last word above all.",
-    "key-invalid": "This viewing key is not valid. Check that it is complete and copied exactly.",
     "key-wrong-chain": "This viewing key is for {key}, and the selected network is {server}.",
     "need-words": "Enter all 24 words, or a viewing key.",
     "need-birthday": "Enter a block height inside the range, or leave it empty.",

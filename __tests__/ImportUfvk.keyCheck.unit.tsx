@@ -59,16 +59,40 @@ afterEach(() => {
   jest.clearAllMocks();
 });
 
-test('Tests that a pasted key the decoder rejects is reported in the field', async () => {
+const fieldError = () =>
+  screen.queryByTestId('import.seedufvkinput.error')?.props.children;
+
+test('Tests that a key the decoder rejects reads as incomplete only once typing pauses', async () => {
   mockedCheckUfvk.mockResolvedValue({ kind: 'invalid' });
   mount();
-  await pasteKey('uview1broken');
-  await waitFor(() =>
-    expect(
-      screen.getByTestId('import.seedufvkinput.error').props.children,
-    ).toBe('import.key-invalid'),
-  );
-  expect(mockedCheckUfvk).toHaveBeenCalledWith('uview1broken');
+  await pasteKey('uview1qqqq');
+  expect(mockedCheckUfvk).toHaveBeenCalledWith('uview1qqqq');
+  expect(fieldError()).toBeUndefined();
+  await act(async () => {
+    jest.advanceTimersByTime(900);
+  });
+  expect(fieldError()).toBe('import.key-incomplete');
+});
+
+test('Tests that a character a key cannot hold is named at once', async () => {
+  mockedCheckUfvk.mockResolvedValue({ kind: 'invalid' });
+  mount();
+  fireEvent.changeText(screen.getByTestId('import.seedufvkinput'), 'uview1qb');
+  expect(fieldError()).toBe('import.key-char');
+});
+
+test('Tests that a key with the wrong start says how a key starts', async () => {
+  mockedCheckUfvk.mockResolvedValue({ kind: 'invalid' });
+  mount();
+  fireEvent.changeText(screen.getByTestId('import.seedufvkinput'), 'uview2q');
+  expect(fieldError()).toBe('import.key-prefix');
+});
+
+test('Tests that spaces and capitals typed into a key are dropped', async () => {
+  mockedCheckUfvk.mockResolvedValue({ kind: 'invalid' });
+  mount();
+  await pasteKey('UVIEW1 QQ\nQQ');
+  expect(mockedCheckUfvk).toHaveBeenCalledWith('uview1qqqq');
 });
 
 test('Tests that a key for another network names both networks', async () => {
@@ -77,21 +101,34 @@ test('Tests that a key for another network names both networks', async () => {
     chainName: ChainNameEnum.testChainName,
   });
   mount();
-  await pasteKey('uviewtest1abc');
-  await waitFor(() =>
-    expect(
-      screen.getByTestId('import.seedufvkinput.error').props.children,
-    ).toBe('import.key-wrong-chain'),
-  );
+  await pasteKey('uviewtest1qqq');
+  await waitFor(() => expect(fieldError()).toBe('import.key-wrong-chain'));
 });
 
-test('Tests that a valid key for the selected network shows no error', async () => {
+test('Tests that a valid key for the selected network reads as valid', async () => {
   mockedCheckUfvk.mockResolvedValue({
     kind: 'ufvk',
     chainName: ChainNameEnum.mainChainName,
   });
   mount();
-  await pasteKey('uview1good');
+  await pasteKey('uview1qqqq');
   await waitFor(() => expect(mockedCheckUfvk).toHaveBeenCalled());
-  expect(screen.queryByTestId('import.seedufvkinput.error')).toBeNull();
+  expect(fieldError()).toBeUndefined();
+  expect(screen.getByText('import.key-valid')).toBeTruthy();
+});
+
+test('Tests that the start of a viewing key asks to keep typing', () => {
+  mount();
+  fireEvent.changeText(screen.getByTestId('import.seedufvkinput'), 'uv');
+  expect(
+    screen.getByTestId('import.seedufvkinput.hint').props.children,
+  ).toBe('import.key-keep-typing');
+});
+
+test('Tests that a typo no recovery word starts with is pointed out', () => {
+  mount();
+  fireEvent.changeText(screen.getByTestId('import.seedufvkinput'), 'xq');
+  expect(
+    screen.getByTestId('import.seedufvkinput.hint').props.children,
+  ).toBe('import.word-nomatch');
 });

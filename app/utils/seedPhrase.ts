@@ -28,6 +28,32 @@ export const isViewingKey = (text: string): boolean => {
   return KEY_PREFIXES.some(p => lower.startsWith(p));
 };
 
+// True while the text could still grow into a viewing key prefix: u, uv,
+// uvi… up to "uview".
+export const startsLikeViewingKey = (text: string): boolean => {
+  const lower = text.trim().toLowerCase();
+  return !!lower && GlobalConst.uview.startsWith(lower);
+};
+
+const BECH32_CHARSET = 'qpzry9x8gf2tvdw0s3jn54khce6mua7l';
+const KEY_HEAD = /^(uview(?:test|regtest)?1)(.*)$/;
+
+// What the text shows is wrong with it as a viewing key: its start, or a
+// character a key can't hold. Whether it is complete only the decode knows.
+export type ViewingKeyProblem =
+  | { kind: 'none' }
+  | { kind: 'prefix' }
+  | { kind: 'char'; char: string };
+
+export const viewingKeyProblem = (key: string): ViewingKeyProblem => {
+  const head = KEY_HEAD.exec(key);
+  if (!head) {
+    return /^uview[a-z]*$/.test(key) ? { kind: 'none' } : { kind: 'prefix' };
+  }
+  const bad = [...head[2]].find(c => !BECH32_CHARSET.includes(c));
+  return bad ? { kind: 'char', char: bad } : { kind: 'none' };
+};
+
 export const tokenize = (text: string): string[] =>
   text
     .toLowerCase()

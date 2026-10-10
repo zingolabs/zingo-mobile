@@ -8,6 +8,7 @@ import React, {
 } from 'react';
 import {
   NativeSyntheticEvent,
+  Platform,
   Pressable,
   Text,
   TextInput,
@@ -35,6 +36,7 @@ import {
   isViewingKey,
   resolveWord,
   seedStatus,
+  startsLikeViewingKey,
   suggestWords,
   tokenize,
 } from '@app/utils/seedPhrase';
@@ -47,6 +49,10 @@ type SeedPhraseInputProps = {
   accessibilityLabel?: string;
   // Why the viewing key in the field cannot be used, already translated.
   keyError?: string;
+  // The decode accepted the viewing key in the field.
+  keyValid?: boolean;
+  // The viewing key text lost focus.
+  onKeyBlur?: () => void;
   // Bumps to flash the border green once, as a scanned key lands.
   pulse?: number;
 };
@@ -78,7 +84,11 @@ const OK_BG = 'rgba(20,157,5,0.15)';
 const OK_BORDER = 'rgba(20,157,5,0.55)';
 const OK_TEXT = '#9FE092';
 
+const MONO = Platform.OS === 'ios' ? 'Menlo' : 'monospace';
+
 const joinWords = (words: string[]) => words.join(' ');
+// A key keeps no spaces or line breaks and is always lowercase.
+const normalizeKey = (text: string) => text.replace(/\s+/g, '').toLowerCase();
 
 const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
   value,
@@ -87,6 +97,8 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
   testID,
   accessibilityLabel,
   keyError,
+  keyValid,
+  onKeyBlur,
   pulse,
 }) => {
   const { colors } = useTheme();
@@ -109,6 +121,8 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
   const consumedRef = useRef('');
   // The native text as the last change reported it.
   const nativeRef = useRef('');
+  // Words from this index on arrived in one paste and appear without the pop.
+  const pastedFromRef = useRef(Number.MAX_SAFE_INTEGER);
 
   const ufvk = isViewingKey(value) ? value : '';
   const status = useMemo(() => seedStatus(value), [value]);
@@ -118,7 +132,7 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
   const badChecksum = status.kind === 'seed' && status.badChecksum;
   const keyFault = status.kind === 'ufvk' && !!keyError;
   const complete =
-    (status.kind === 'ufvk' && !keyFault) ||
+    (status.kind === 'ufvk' && !keyFault && !!keyValid) ||
     (status.kind === 'seed' && status.complete);
   const fieldError: string | undefined = keyFault
     ? keyError
@@ -132,6 +146,16 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
             ? 'import.seed-checksum'
             : undefined;
   const suggestions = useMemo(() => suggestWords(draft), [draft]);
+  // A draft no word starts with: the start of a viewing key, or a typo.
+  const draftHint =
+    !ufvk && !!draft && suggestions.length === 0 && !invalidDraft
+      ? words.length === 0 && startsLikeViewingKey(draft)
+        ? (translate('import.key-keep-typing') as string)
+        : (translate('import.word-nomatch') as string).replace(
+            '{word}',
+            draft.toLowerCase(),
+          )
+      : '';
   const ghost =
     suggestions.length > 0 && suggestions[0] !== draft
       ? suggestions[0].slice(draft.length)
@@ -186,6 +210,9 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
   };
 
   const commit = (next: string[]) => {
+    const before = currentWords().length;
+    pastedFromRef.current =
+      next.length - before > 1 ? before : Number.MAX_SAFE_INTEGER;
     pendingWordsRef.current = next;
     onChangeValue(joinWords(next));
     pulseCounter();
@@ -233,7 +260,7 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
     setInvalidDraft(false);
     if (isViewingKey(text)) {
       clearDraft(native);
-      onChangeValue(text.trim());
+      onChangeValue(normalizeKey(text));
       return;
     }
     if (before.length >= SEED_WORD_COUNT && text.trim()) {
@@ -277,14 +304,15 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
 
   // Editing the key in place; a change that leaves it no longer a key returns
   // the field to words.
-  const onChangeKey = (text: string) => {
+  const onChangeKey = (raw: string) => {
+    const text = normalizeKey(raw);
     if (isViewingKey(text)) {
       onChangeValue(text);
       return;
     }
     pendingWordsRef.current = [];
     onChangeValue('');
-    onChangeText(text);
+    onChangeText(raw);
   };
 
   const onKeyPress = (e: NativeSyntheticEvent<TextInputKeyPressEventData>) => {
@@ -300,13 +328,21 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
     }
   }, [ufvk]);
 
-  // The 24th word that breaks the checksum shakes the field once.
+  // The 24th word that breaks the checksum shakes the field once. A
+  // viewing key only turns red.
   useEffect(() => {
-    if (badChecksum || badWords || keyFault) {
+    if (badChecksum || badWords) {
       shakeField();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [badChecksum, badWords, keyFault]);
+  }, [badChecksum, badWords]);
+
+  useEffect(() => {
+    if (keyValid) {
+      pulseCounter();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [keyValid]);
 
   const flash = useSharedValue(0);
   useEffect(() => {
@@ -329,7 +365,9 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
         ? colors.borderFocus
         : colors.bottomSheetBorder;
   const counter = ufvk
-    ? (translate('import.viewing-key') as string)
+    ? (translate(
+        keyValid ? 'import.key-valid' : 'import.viewing-key',
+      ) as string)
     : `${words.length} / ${SEED_WORD_COUNT}`;
 
   return (
@@ -387,7 +425,7 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
               onFocus={() => setFocused(true)}
               onBlur={() => {
                 setFocused(false);
-                onChangeValue(ufvk.trim());
+                onKeyBlur?.();
               }}
               multiline
               autoCorrect={false}
@@ -399,8 +437,9 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
               style={{
                 flex: 1,
                 color: colors.fgDefault,
-                fontSize: 14,
-                lineHeight: 20,
+                fontFamily: MONO,
+                fontSize: 13,
+                lineHeight: 21,
                 padding: 0,
                 textAlignVertical: 'top',
                 backgroundColor: 'transparent',
@@ -412,7 +451,9 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
               return (
                 <Animated.View
                   key={`${i}-${word}`}
-                  entering={chipEnter()}
+                  entering={
+                    i >= pastedFromRef.current ? undefined : chipEnter()
+                  }
                   exiting={chipExit()}
                   layout={chipLayout()}
                 >
@@ -449,7 +490,7 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
               );
             })
           )}
-          {!ufvk && (
+          {!ufvk && !full && (
             <Animated.View
               layout={chipLayout()}
               style={{
@@ -503,6 +544,18 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
             </Animated.View>
           )}
         </Pressable>
+        {!!draftHint && (
+          <Text
+            testID={testID ? `${testID}.hint` : undefined}
+            style={{
+              marginTop: 14,
+              color: colors.fgMuted,
+              fontSize: 12.5,
+            }}
+          >
+            {draftHint}
+          </Text>
+        )}
         {suggestions.length > 0 && !invalidDraft && (
           <Animated.View
             entering={suggestionsEnter()}
