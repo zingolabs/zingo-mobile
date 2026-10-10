@@ -12,9 +12,7 @@ import {
 
 const seed = {
   key: 'seed',
-  node: (
-    <SeedBackupNotice covered={false} onBackUp={() => {}} />
-  ),
+  node: <SeedBackupNotice covered={false} onBackUp={() => {}} />,
 };
 const price = {
   key: 'price',
