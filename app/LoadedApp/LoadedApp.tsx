@@ -1818,6 +1818,10 @@ export class LoadedAppClass extends Component<
       return;
     }
 
+    // The swapped-in wallet is a restore, which counts as backed up. The
+    // previous wallet's flag must not carry over.
+    await SettingsFileImpl.writeSettings(SettingsNameEnum.seedBackedUp, true);
+    await SettingsFileImpl.writeSettings(SettingsNameEnum.seedBackedUpAt, 0);
     this.keepAwake(false);
     this.navigateToLoadingApp({ startingApp: false, newWallet: true });
   };
