@@ -56,6 +56,7 @@ describe('Component Settings - test', () => {
           setPerformanceLevelOption={onSetOption}
           setBlockExplorerOption={onSetOption}
           toggleMenuDrawer={toggle}
+          onRestoreWalletBackup={onSetOption}
         />
       </ContextAppLoadedProvider>,
     );

@@ -1,10 +1,8 @@
 /**
  * The rewritten walletUtils seams (zingo-mobile#1151): the boolean
- * collapses, the price sentinels, and the backup-restore path. The
- * regression pinned hardest here: a rejected restoreExistingWalletBackup
- * must read as failure — before the typed surface, the rejection became
- * "Error: ..." prose that the caller's truthiness check misread as
- * success and opened a wallet that was never restored.
+ * collapses and the price sentinels. A rejection must read as failure —
+ * before the typed surface, it became "Error: ..." prose that a caller's
+ * truthiness check misread as success.
  */
 // Every member of the mocked bridge is a lazily created jest.fn, so a future
 // import-time touch of some other RPCModule member cannot break this suite.
@@ -25,7 +23,6 @@ import {
   isWalletAddress,
   parseZecQuote,
   resolvedTrue,
-  restoreExistingWalletBackup,
   walletBackupExists,
   walletExists,
 } from '@app/walletBackend/utils/walletUtils';
@@ -54,27 +51,6 @@ describe('resolvedTrue collapses the native "true"/"false" protocol', () => {
         error: { code: 'Unknown', message: 'Error: could not read wallet' },
       }),
     ).toBe(false);
-  });
-});
-
-describe('the backup-restore regression (the latent bug)', () => {
-  it('a rejected restore crosses as ok:false, never as resolved prose', async () => {
-    bridge.restoreExistingWalletBackup.mockReturnValueOnce(
-      typedRejection('Unknown', 'Error: could not read the backup'),
-    );
-    const result = await restoreExistingWalletBackup();
-    expect(result.ok).toBe(false);
-    expect(resolvedTrue(result)).toBe(false);
-  });
-
-  it('a "false" restore resolution reads as failure', async () => {
-    bridge.restoreExistingWalletBackup.mockResolvedValueOnce('false');
-    expect(resolvedTrue(await restoreExistingWalletBackup())).toBe(false);
-  });
-
-  it('only a "true" restore resolution reads as success', async () => {
-    bridge.restoreExistingWalletBackup.mockResolvedValueOnce('true');
-    expect(resolvedTrue(await restoreExistingWalletBackup())).toBe(true);
   });
 });
 

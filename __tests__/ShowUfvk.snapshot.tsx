@@ -71,13 +71,4 @@ describe('Component ShowUfvk - test', () => {
     );
     expect(ufvk.toJSON()).toMatchSnapshot();
   });
-  const props_backup = makeDrawerProps(UfvkActionEnum.backup);
-  test('ShowUfvk Backup - snapshot', () => {
-    const ufvk = render(
-      <ContextAppLoadedProvider value={state}>
-        <ShowUfvk {...props_backup} onClickCancel={onClose} onClickOK={onOK} />
-      </ContextAppLoadedProvider>,
-    );
-    expect(ufvk.toJSON()).toMatchSnapshot();
-  });
 });

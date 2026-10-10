@@ -2134,6 +2134,7 @@ export class LoadedAppClass extends Component<
                           toggleMenuDrawer={
                             () => toggleOptionsPanel() /* header */
                           }
+                          onRestoreWalletBackup={this.onClickOKRestoreBackup}
                         />
                       )}
                     </RootNavigator.Screen>
@@ -2183,16 +2184,6 @@ export class LoadedAppClass extends Component<
                                 await this.onClickOKChangeWallet({
                                   startingApp: false,
                                 })
-                              }
-                              onClickCancel={() => {}}
-                            />
-                          );
-                        } else if (action === UfvkActionEnum.backup) {
-                          return (
-                            <ShowUfvk
-                              {...props}
-                              onClickOK={async () =>
-                                await this.onClickOKRestoreBackup()
                               }
                               onClickCancel={() => {}}
                             />
@@ -2254,8 +2245,6 @@ export class LoadedAppClass extends Component<
                                 await this.onClickOKChangeWallet({
                                   startingApp: false,
                                 });
-                              } else if (action === 'backup') {
-                                await this.onClickOKRestoreBackup();
                               } else if (action === 'server') {
                                 await this.onClickOKServerWallet();
                               }

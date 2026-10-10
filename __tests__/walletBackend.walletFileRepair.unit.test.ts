@@ -22,7 +22,6 @@ import {
   WalletFileDiagnosis,
   WalletFileState,
   WALLET_FILE_NAME,
-  WALLET_BACKUP_FILE_NAME,
 } from '@app/walletBackend/utils/walletFileRepair';
 
 const bridge = RPCModule as unknown as Record<string, jest.Mock>;
@@ -48,20 +47,13 @@ describe('hasRepairableWalletFile', () => {
     ).toBe(true);
   });
 
-  it('is true for a repairable backup wallet', () => {
-    expect(
-      hasRepairableWalletFile([
-        diag(WALLET_BACKUP_FILE_NAME, 'doubleWrapped', true),
-      ]),
-    ).toBe(true);
-  });
-
   it('ignores a repairable twin the native repair never rewrites', () => {
     // A repairable twin the native repair never rewrites must not start auto-repair.
     expect(
       hasRepairableWalletFile([
         diag(`${WALLET_FILE_NAME}.write.tmp`, 'doubleWrapped', true),
         diag('wallet.swap.tmp', 'doubleWrapped', true),
+        diag('wallet.backup.dat', 'doubleWrapped', true),
       ]),
     ).toBe(false);
   });
@@ -119,7 +111,7 @@ describe('walletFileDiagnosis', () => {
             repairable: false,
           },
           {
-            name: WALLET_BACKUP_FILE_NAME,
+            name: 'wallet.swap.tmp',
             state: 'plainLegacy',
             size: 42,
             mtime: 0,

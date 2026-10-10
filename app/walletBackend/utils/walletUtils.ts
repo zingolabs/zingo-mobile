@@ -186,15 +186,6 @@ export async function deleteExistingWallet(): Promise<FfiResult<string>> {
   return callFfi(RPCModule.deleteExistingWallet());
 }
 
-// Restores the wallet from its on-device backup file (the `.migrating`
-// twin EncryptedFile manages). The success value is the native "true"/"false"
-// data protocol.
-export async function restoreExistingWalletBackup(): Promise<
-  FfiResult<string>
-> {
-  return callFfi(RPCModule.restoreExistingWalletBackup());
-}
-
 /**
  * Whether a native save resolution reports success. The bridges are
  * trimodal (zingo-mobile#1151): Android resolves boolean true/false, iOS

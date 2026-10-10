@@ -66,13 +66,11 @@ type Tip = 'none' | 'birthday' | 'vk';
 
 const TITLE: Record<WalletSeedAction, string> = {
   change: 'loadedapp.changewallet',
-  backup: 'loadedapp.restorebackupwallet',
   server: 'walletseed.title-server',
 };
 
 const WARNING: Record<WalletSeedAction, string> = {
   change: 'seed.change-warning',
-  backup: 'seed.backup-warning',
   server: 'seed.server-warning',
 };
 

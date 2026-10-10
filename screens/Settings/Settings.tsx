@@ -42,7 +42,6 @@ import {
   RouteEnum,
   ScreenEnum,
   BlockExplorerEnum,
-  UfvkActionEnum,
 } from '@app/AppState';
 import { fetchWallet, walletBackupExists } from '@app/walletBackend';
 import {
@@ -67,6 +66,7 @@ import {
 import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { createAlert } from '@app/services/createAlert';
+import { showConfirm } from '@app/services/showConfirm';
 import { sendEmail } from '@app/services/sendEmail';
 import SwitchOff from '../../assets/img/switch-off.svg';
 import SettingSwitchOn from '../../assets/img/setting-switch-on.svg';
@@ -80,6 +80,7 @@ type SettingsProps = NativeStackScreenProps<
   setPerformanceLevelOption: (value: RPCPerformanceLevelEnum) => Promise<void>;
   setBlockExplorerOption: (value: BlockExplorerEnum) => Promise<void>;
   toggleMenuDrawer: () => void;
+  onRestoreWalletBackup: () => Promise<void>;
 };
 
 type Options = {
@@ -94,6 +95,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   setPerformanceLevelOption,
   setBlockExplorerOption,
   toggleMenuDrawer,
+  onRestoreWalletBackup,
 }) => {
   const context = useContext(ContextAppLoaded);
   const {
@@ -229,7 +231,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   }, []);
 
   // Older builds kept a backup of the previous mainnet wallet on every
-  // wallet change. Its restore stays here for whoever still has one.
+  // wallet change. Swapping it back in stays here for whoever has one.
   useEffect(() => {
     if (!showDeveloperOptions) {
       return;
@@ -968,18 +970,27 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                           <Button
                             testID="settings.restorebackupwallet"
                             type={ButtonTypeEnum.Secondary}
-                            title={translate('walletseed.go-backup') as string}
-                            onPress={() => {
-                              if (readOnly) {
-                                navigation.navigate(RouteEnum.Ufvk, {
-                                  action: UfvkActionEnum.backup,
-                                });
-                              } else {
-                                navigation.navigate(RouteEnum.WalletSeed, {
-                                  action: 'backup',
-                                });
-                              }
-                            }}
+                            title={translate('settings.restorebackup') as string}
+                            onPress={() =>
+                              showConfirm({
+                                title: translate(
+                                  'loadedapp.restorebackupwallet',
+                                ) as string,
+                                message: translate(
+                                  'settings.restorebackup-warning',
+                                ) as string,
+                                buttons: [
+                                  {
+                                    text: translate('confirm') as string,
+                                    onPress: onRestoreWalletBackup,
+                                  },
+                                  {
+                                    text: translate('cancel') as string,
+                                    style: 'cancel',
+                                  },
+                                ],
+                              })
+                            }
                             twoButtons={true}
                           />
                         </View>

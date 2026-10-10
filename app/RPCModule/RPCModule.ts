@@ -47,7 +47,6 @@ interface RPCModuleAPI {
   repairDoubleWrappedWalletProcess(): Promise<string>;
   walletFileRecoveryInfo(): Promise<string>;
   deleteExistingWallet(): Promise<string>;
-  deleteExistingWalletBackup(): Promise<string>;
   // The save results are trimodal across the bridges: Android resolves a
   // boolean, iOS resolves "true"/"false", and both resolve "Error: ..."
   // prose from their catch blocks (zingo-mobile#1151). Classify with

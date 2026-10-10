@@ -203,6 +203,8 @@
     "deletewallet-error": "Error: não foi possível excluir a carteira atual."
   },
   "settings": {
+    "restorebackup": "Restaurar",
+    "restorebackup-warning": "A carteira atual e o backup trocam de lugar, e o app reabre com o backup. Repita isso para voltar.",
     "section-preferences": "Preferências",
     "section-privacysecurity": "Privacidade e Segurança",
     "section-networkadvanced": "Rede e Avançado",
@@ -413,13 +415,7 @@
         "Tem certeza?"
       ],
       "view": ["Eu salvei as \n Frases de Recuperação"],
-      "restore": ["Restaurar Carteira"],
-      "backup": [
-        "",
-        "Restaurar",
-        "Você realmente deseja \n restaurar sua \n carteira de backup",
-        "Tem certeza?"
-      ]
+      "restore": ["Restaurar Carteira"]
     },
     "title": "Frases de Recuperação",
     "new": "Novo",
@@ -440,7 +436,6 @@
     "birthday-readonly": "Aniversário da Carteira",
     "birthday-no-readonly": "Altura do bloco da primeira transação. (Tudo bem, se você não sabe)\nIntervalo de valores entre ",
     "change-warning": "Se você alterar para outra carteira, não será possível ter acesso a essa carteira sem as Frases de Recuperação.",
-    "backup-warning": "Se você alterar para sua carteira de backup, não será possível ter acesso a essa carteira sem as Frases de Recuperação.",
     "server-warning": "Se você alterar para um servidor com uma rede diferente, não terá mais acesso a essa carteira sem as Frases de Recuperação.",
     "seedplaceholder": "Frases de Recuperação (24 Frases)",
     "seed-acc": "Campo das Frases de Recuperação",
@@ -788,22 +783,14 @@
         "Alterar Servidor",
         "Você realmente quer \n alterar para o seu \n servidor atual",
         "Tem certeza?"
-      ],
-      "backup": [
-        "",
-        "Restaurar",
-        "Você realmente deseja \n restaurar sua \n carteira de backup",
-        "Tem certeza?"
       ]
     },
     "viewkey": "Chave de Visualização ",
     "tapcopy-message": "Chave Copiada para a Área de Transferência",
     "text-readonly": "Antes de fechar esta tela, anote cuidadosamente esta chave de visualização. É a única maneira de restaurar/acessar sua carteira atual.",
-    "text-readonly-backup": "Antes de restaurar o backup da carteira anterior, anote cuidadosamente esta chave de visualização. É a única maneira de restaurar/acessar sua carteira atual.",
     "text-readonly-change": "Antes de acessar outra carteira, anote cuidadosamente esta chave de visualização. É a única maneira de restaurar/acessar sua carteira atual.",
     "text-readonly-server": "Antes de alterar outro servidor, anote cuidadosamente esta chave de visualização. É a única maneira de restaurar/acessar sua carteira atual.",
     "change-warning": "Se você mudar para outra carteira, não terá mais acesso a esta carteira sem as frases de recuperação.",
-    "backup-warning": "Se você mudar para sua carteira de backup, não terá mais acesso a esta carteira sem as Frases de recuperação.",
     "server-warning": "Se você mudar para um servidor com uma rede diferente, não terá mais acesso a esta carteira sem as frases de recuperação.",
     "recovering-from-keychain": "Recuperando a chave de visualização do armazenamento seguro...",
     "recovering-from-wallet": "Carregando a chave de visualização da carteira...",
@@ -1143,10 +1130,8 @@
     "verify": "Verificar de novo",
     "title-server": "Mudar servidor",
     "sub-change": "Antes de abrir outra carteira, guarde com cuidado a frase semente, o aniversário e a chave de visualização desta. Você vai precisar deles para voltar a ela.",
-    "sub-backup": "Antes de restaurar o último backup, guarde com cuidado a frase semente, o aniversário e a chave de visualização desta carteira. Você vai precisar deles para voltar a ela.",
     "sub-server": "Antes de mudar de servidor, guarde com cuidado a frase semente, o aniversário e a chave de visualização desta carteira. Você vai precisar deles para voltar a ela.",
     "go-change": "Abrir nova",
-    "go-backup": "Restaurar",
     "go-server": "Mudar",
     "confirm-title": "Tem certeza?"
   }

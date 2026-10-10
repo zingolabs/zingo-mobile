@@ -180,7 +180,6 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
     }
     setTimes(
       action === UfvkActionEnum.change ||
-        action === UfvkActionEnum.backup ||
         action === UfvkActionEnum.server
         ? 1
         : 0,
@@ -207,11 +206,9 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
       message:
         action === UfvkActionEnum.change
           ? (translate('ufvk.change-warning') as string)
-          : action === UfvkActionEnum.backup
-            ? (translate('ufvk.backup-warning') as string)
-            : action === UfvkActionEnum.server
-              ? (translate('ufvk.server-warning') as string)
-              : '',
+          : action === UfvkActionEnum.server
+            ? (translate('ufvk.server-warning') as string)
+            : '',
       buttons: [
         {
           text: translate('confirm') as string,
@@ -450,8 +447,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
                     fontWeight: '900',
                   }}
                 >
-                  {action === UfvkActionEnum.backup ||
-                  action === UfvkActionEnum.change ||
+                  {action === UfvkActionEnum.change ||
                   action === UfvkActionEnum.server
                     ? (translate(`ufvk.text-readonly-${action}`) as string)
                     : (translate('ufvk.text-readonly') as string)}

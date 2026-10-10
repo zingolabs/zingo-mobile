@@ -13,7 +13,11 @@ import {
   defaultAppContextLoaded,
   ContextAppLoadedProvider,
 } from '@app/context';
-import { RouteEnum, SelectServerEnum, UfvkActionEnum } from '@app/AppState';
+import { RouteEnum, SelectServerEnum } from '@app/AppState';
+import {
+  ConfirmOptions,
+  registerConfirmListener,
+} from '@app/services/showConfirm';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import { mockServer } from '../__mocks__/dataMocks/mockServer';
@@ -33,9 +37,12 @@ const nativeRpc = RPCModule as unknown as Record<string, jest.Mock>;
 
 afterEach(() => {
   jest.clearAllMocks();
+  registerConfirmListener(null);
 });
 
-const renderSettings = async (readOnly: boolean) => {
+const onRestoreWalletBackup = jest.fn(async () => {});
+
+const renderSettings = async () => {
   const props: any = {
     navigation: mockNavigation,
     route: { key: 'Key-1', name: RouteEnum.Settings, params: undefined },
@@ -49,7 +56,6 @@ const renderSettings = async (readOnly: boolean) => {
         totalBalance: mockTotalBalance,
         server: mockServer,
         selectServer: SelectServerEnum.auto,
-        readOnly,
       }}
     >
       <Settings
@@ -59,6 +65,7 @@ const renderSettings = async (readOnly: boolean) => {
         setPerformanceLevelOption={jest.fn()}
         setBlockExplorerOption={jest.fn()}
         toggleMenuDrawer={jest.fn()}
+        onRestoreWalletBackup={onRestoreWalletBackup}
       />
     </ContextAppLoadedProvider>,
   );
@@ -70,19 +77,21 @@ const renderSettings = async (readOnly: boolean) => {
 
 test('Tests that the developer options offer no backup restore when there is no wallet backup.', async () => {
   nativeRpc.walletBackupExists.mockResolvedValue('false');
-  await renderSettings(false);
+  await renderSettings();
   expect(screen.queryByTestId('settings.restorebackupwallet')).toBeNull();
 });
 
-test.each([
-  [false, RouteEnum.WalletSeed, { action: 'backup' }],
-  [true, RouteEnum.Ufvk, { action: UfvkActionEnum.backup }],
-])(
-  'Tests that the developer options open the backup restore when a wallet backup exists (read only: %s).',
-  async (readOnly, route, params) => {
-    nativeRpc.walletBackupExists.mockResolvedValue('true');
-    await renderSettings(readOnly);
-    fireEvent.press(await screen.findByTestId('settings.restorebackupwallet'));
-    expect(mockNavigation.navigate).toHaveBeenCalledWith(route, params);
-  },
-);
+test('Tests that the developer options swap the wallet backup in after a confirm when a backup exists.', async () => {
+  nativeRpc.walletBackupExists.mockResolvedValue('true');
+  const confirms: ConfirmOptions[] = [];
+  registerConfirmListener(options => confirms.push(options));
+  await renderSettings();
+
+  fireEvent.press(await screen.findByTestId('settings.restorebackupwallet'));
+
+  expect(confirms).toHaveLength(1);
+  expect(confirms[0].message).toBe('settings.restorebackup-warning');
+  expect(onRestoreWalletBackup).not.toHaveBeenCalled();
+  confirms[0].buttons[0].onPress?.();
+  expect(onRestoreWalletBackup).toHaveBeenCalledTimes(1);
+});
