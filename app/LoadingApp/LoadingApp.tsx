@@ -646,26 +646,19 @@ export class LoadingAppClass extends Component<
     const chainName = current.chainName;
 
     if (mode === SelectServerEnum.auto) {
-      if (!isConnected) {
-        const s = this.defaultServerForChain(chainName);
-        this.setState({ server: s });
-        await SettingsFileImpl.writeServer(s, mode);
-        return false;
-      }
+      // Recommended, then the registry, then the static list, then the
+      // chain's default; true when some server answered.
       const pick = await pickAutomatic(
         this.state.translate,
         chainName,
         isConnected,
       );
-      if (pick) {
-        const best = remoteServer(pick.uri, pick.chainName);
-        this.setState({ server: best });
-        await SettingsFileImpl.writeServer(best, mode);
-        return true;
-      }
-      // Registry unreachable → current static latency probe, staying in auto.
-      // Silent: this is still boot-time selection.
-      return await this.selectTheBestServer(false, SelectServerEnum.auto, true);
+      const best = pick
+        ? remoteServer(pick.server.uri, pick.server.chainName)
+        : this.defaultServerForChain(chainName);
+      this.setState({ server: best });
+      await SettingsFileImpl.writeServer(best, mode);
+      return !!pick && pick.tier !== 'default';
     }
 
     if (mode === SelectServerEnum.list) {

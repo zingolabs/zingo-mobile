@@ -177,7 +177,11 @@ const WalletServer: React.FC<WalletServerProps> = ({
       probeCurrent(server);
       return;
     }
-    await apply(remoteServer(pick.uri, chain), SelectServerEnum.auto);
+    // No server answered: Automatic still settles on the chain's default.
+    if (pick.tier === 'default') {
+      addLastSnackbar(translate('loadedapp.connection-error') as string);
+    }
+    await apply(remoteServer(pick.server.uri, chain), SelectServerEnum.auto);
   };
 
   const close = () => {
