@@ -636,6 +636,15 @@
     "highpriority": "Yüksek oncelikli"
   },
   "walleterror": {
+    "chain-title": "Bu cüzdan {net} ağında",
+    "chain-sub": "Zingo bir {server} sunucusuna bağlı, bu yüzden bu cüzdanı açamıyor. Cüzdanınız ve fonlarınız güvende.",
+    "chain-action": "{net} ağına geç",
+    "chip-wallet": "Cüzdan",
+    "chip-server": "Sunucu",
+    "more": "Diğer seçenekler",
+    "more-warn": "Bunlar bu telefondaki {net} cüzdanının yerine geçer. Bunu düzeltmek için gerekmezler.",
+    "more-import": "Başka bir cüzdan içe aktar",
+    "more-create": "Yeni cüzdan oluştur",
     "open-title": "Zingo cüzdanınızı açamadı",
     "open-sub": "Fonlarınız güvende ve tohum ifadeniz onları her zaman geri yükleyebilir.",
     "server-title": "Sunucuya bağlanılamıyor",
@@ -645,11 +654,7 @@
     "import": "Cüzdan içe aktar",
     "create": "Yeni cüzdan oluştur",
     "still-open": "Cüzdan hâlâ açılamıyor",
-    "still-server": "Sunucuya hâlâ ulaşılamıyor",
-    "chain-title": "Bu bir {net} cüzdanı",
-    "chain-sub": "Zingo bir {server} sunucusuna ayarlı ve bu sunucu cüzdanı açamaz. Açmak için bir {net} sunucusu seçin.",
-    "chain-action": "Bir {net} sunucusu seç",
-    "followed": "Bu bir {net} cüzdanı, bu yüzden Otomatik bir {net} sunucusuna bağlandı."
+    "still-server": "Sunucuya hâlâ ulaşılamıyor"
   },
   "deletesheet": {
     "title": "Bu cihazdaki cüzdan silinsin mi?",

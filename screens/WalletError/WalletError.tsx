@@ -26,6 +26,7 @@ import BoldText from '@ui/primitives/BoldText';
 import { LoadingDots } from '@ui/widgets/ProgressState';
 import { WalletErrorKind } from '@app/AppState/types/WalletErrorInfo';
 import { ChainNameEnum } from '@app/AppState';
+import { showConfirm } from '@app/services/showConfirm';
 
 type WalletErrorProps = {
   kind: WalletErrorKind;
@@ -39,6 +40,8 @@ type WalletErrorProps = {
   onImport: () => void;
   onCreate: () => void;
   onServer: () => void;
+  // The 'chain' kind's fix: Automatic on the wallet's network, then open.
+  onSwitchChain: (chain: ChainNameEnum) => void;
 };
 
 const ICON_TOP = 226 / 874;
@@ -47,6 +50,11 @@ const ICON = 75;
 const BADGE = 17;
 const SHAKE_STEP_MS = 64;
 const MONO = Platform.select({ ios: 'Menlo', default: 'monospace' });
+// The network pill on the wallet icon and the chips: amber for a network
+// other than Mainnet, green for Mainnet.
+const NET_AMBER = { bg: '#1C170A', border: '#8A6D1E', ink: '#E6C46A' };
+const NET_GREEN = { bg: '#0A2412', border: '#1E6B2A', ink: '#8FDC80' };
+const CHIP_LABEL = '#8DA0B8';
 
 const badgeEnter = () =>
   new Keyframe({
@@ -77,6 +85,7 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
   onImport,
   onCreate,
   onServer,
+  onSwitchChain,
 }) => {
   const { translate, netInfo, server } = useContext(ContextAppLoading);
   const { colors } = useTheme();
@@ -157,6 +166,56 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
         netName(chain),
       )
     : (translate('walleterror.open') as string);
+
+  // Import and Create are not needed to fix a network mismatch; they wait in
+  // a sheet that says they replace this wallet.
+  const moreOptions = () =>
+    chain &&
+    showConfirm({
+      title: translate('walleterror.more') as string,
+      message: (translate('walleterror.more-warn') as string).replace(
+        '{net}',
+        netName(chain),
+      ),
+      messageTone: 'danger',
+      buttons: [
+        {
+          text: translate('walleterror.more-import') as string,
+          style: 'destructive',
+          onPress: onImport,
+        },
+        {
+          text: translate('walleterror.more-create') as string,
+          style: 'destructive',
+          onPress: onCreate,
+        },
+        { text: translate('cancel') as string, style: 'cancel' },
+      ],
+    });
+
+  const netChip = (net: ChainNameEnum, label: string, testID: string) => {
+    const tone = net === ChainNameEnum.mainChainName ? NET_GREEN : NET_AMBER;
+    return (
+      <View testID={testID} style={{ alignItems: 'center', gap: 5 }}>
+        <View
+          style={{
+            height: 24,
+            paddingHorizontal: 11,
+            borderRadius: 12,
+            borderWidth: 1,
+            borderColor: tone.border,
+            backgroundColor: tone.bg,
+            justifyContent: 'center',
+          }}
+        >
+          <BoldText style={{ fontSize: 11.5, color: tone.ink }}>
+            {netName(net)}
+          </BoldText>
+        </View>
+        <RegText style={{ fontSize: 10.5, color: CHIP_LABEL }}>{label}</RegText>
+      </View>
+    );
+  };
 
   const link = (
     label: string,
@@ -246,26 +305,54 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
           color={colors.fgDefault}
           size={28}
         />
-        <Animated.View
-          entering={badgeEnter()}
-          style={{
-            position: 'absolute',
-            left: 57,
-            top: 0,
-            width: BADGE,
-            height: BADGE,
-            borderRadius: BADGE / 2,
-            backgroundColor: colors.fgDangerEmphasis,
-            borderWidth: 2,
-            borderColor: colors.bgCanvas,
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <BoldText style={{ fontSize: 10, lineHeight: 12, color: '#FFFFFF' }}>
-            !
-          </BoldText>
-        </Animated.View>
+        {chain ? (
+          <Animated.View
+            testID="walleterror.netbadge"
+            entering={badgeEnter()}
+            style={{
+              position: 'absolute',
+              left: 55,
+              top: -2,
+              height: 20,
+              paddingHorizontal: 7,
+              borderRadius: 10,
+              borderWidth: 1,
+              borderColor: NET_AMBER.border,
+              backgroundColor: NET_AMBER.bg,
+              justifyContent: 'center',
+            }}
+          >
+            <BoldText
+              numberOfLines={1}
+              style={{ fontSize: 9.5, lineHeight: 12, color: NET_AMBER.ink }}
+            >
+              {netName(chain)}
+            </BoldText>
+          </Animated.View>
+        ) : (
+          <Animated.View
+            entering={badgeEnter()}
+            style={{
+              position: 'absolute',
+              left: 57,
+              top: 0,
+              width: BADGE,
+              height: BADGE,
+              borderRadius: BADGE / 2,
+              backgroundColor: colors.fgDangerEmphasis,
+              borderWidth: 2,
+              borderColor: colors.bgCanvas,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <BoldText
+              style={{ fontSize: 10, lineHeight: 12, color: '#FFFFFF' }}
+            >
+              !
+            </BoldText>
+          </Animated.View>
+        )}
       </Animated.View>
 
       <View
@@ -294,6 +381,32 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
         >
           {sub}
         </RegText>
+        {chain && (
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 10,
+              marginTop: 18,
+            }}
+          >
+            {netChip(
+              chain,
+              translate('walleterror.chip-wallet') as string,
+              'walleterror.chip.wallet',
+            )}
+            <BoldText
+              style={{ fontSize: 14, color: '#5A6F8F', marginBottom: 16 }}
+            >
+              ≠
+            </BoldText>
+            {netChip(
+              server.chainName,
+              translate('walleterror.chip-server') as string,
+              'walleterror.chip.server',
+            )}
+          </View>
+        )}
         <Pressable
           testID="walleterror.details"
           onPress={() => setOpen(o => !o)}
@@ -345,16 +458,24 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
         )}
       </View>
 
-      {link(
-        translate('walleterror.import') as string,
-        onImport,
-        140,
-        14,
-        'walleterror.import',
-      )}
+      {chain
+        ? link(
+            translate('walleterror.more') as string,
+            moreOptions,
+            140,
+            12.5,
+            'walleterror.more',
+          )
+        : link(
+            translate('walleterror.import') as string,
+            onImport,
+            140,
+            14,
+            'walleterror.import',
+          )}
       <Pressable
         testID={chain ? 'walleterror.chain' : 'walleterror.open'}
-        onPress={chain ? onServer : onRetry}
+        onPress={chain ? () => onSwitchChain(chain) : onRetry}
         disabled={busy}
         accessibilityRole="button"
         style={({ pressed }) => ({
@@ -395,13 +516,14 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
           </Animated.View>
         )}
       </Pressable>
-      {link(
-        translate('walleterror.create') as string,
-        onCreate,
-        34,
-        13.5,
-        'walleterror.create',
-      )}
+      {!chain &&
+        link(
+          translate('walleterror.create') as string,
+          onCreate,
+          34,
+          13.5,
+          'walleterror.create',
+        )}
     </View>
   );
 };

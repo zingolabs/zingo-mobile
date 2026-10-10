@@ -638,6 +638,15 @@
     "highpriority": "Alta prioridad"
   },
   "walleterror": {
+    "chain-title": "Este monedero es de {net}",
+    "chain-sub": "Zingo está conectado a un servidor de {server}, así que no puede abrir este monedero. Tu monedero y tus fondos están bien.",
+    "chain-action": "Cambiar a {net}",
+    "chip-wallet": "Monedero",
+    "chip-server": "Servidor",
+    "more": "Más opciones",
+    "more-warn": "Estas opciones sustituyen el monedero de {net} de este teléfono. No las necesitas para arreglar esto.",
+    "more-import": "Importar otro monedero",
+    "more-create": "Crear un monedero nuevo",
     "open-title": "Zingo no pudo abrir tu monedero",
     "open-sub": "Tus fondos están a salvo y tu semilla siempre puede restaurarlos.",
     "server-title": "No se puede conectar con el servidor",
@@ -647,11 +656,7 @@
     "import": "Importar monedero",
     "create": "Crear monedero nuevo",
     "still-open": "Sigue sin poder abrirse el monedero",
-    "still-server": "Sigue sin poder conectar con el servidor",
-    "chain-title": "Este es un monedero de {net}",
-    "chain-sub": "Zingo está configurado con un servidor de {server}, que no puede abrirlo. Elige un servidor de {net} para abrirlo.",
-    "chain-action": "Elegir un servidor de {net}",
-    "followed": "Este es un monedero de {net}, así que Automático se conectó a un servidor de {net}."
+    "still-server": "Sigue sin poder conectar con el servidor"
   },
   "deletesheet": {
     "title": "¿Borrar el monedero de este dispositivo?",

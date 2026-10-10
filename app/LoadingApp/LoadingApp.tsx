@@ -503,25 +503,6 @@ export class LoadingAppClass extends Component<
         recovery && (recovery.seed || recovery.ufvk) ? recovery : null,
     });
 
-    // Automatic follows a wallet that is on another network, so the boot
-    // selection below picks a server of the wallet's network. A server the
-    // user chose is kept; opening the wallet then offers one instead.
-    if (exists && this.state.selectServer === SelectServerEnum.auto) {
-      const walletChain = await this.walletChainMismatch();
-      if (walletChain) {
-        await this.applyServer(
-          this.defaultServerForChain(walletChain),
-          SelectServerEnum.auto,
-        );
-        this.addLastSnackbar(
-          (this.state.translate('walleterror.followed') as string).replace(
-            '{net}',
-            this.netName(walletChain),
-          ),
-        );
-      }
-    }
-
     // Boot-time server selection. `auto` refetches the live list and activates
     // the best server on every launch; `list` validates that the user's server
     // is still listed (else promotes to auto). `custom`/`offline` are respected.
@@ -776,15 +757,6 @@ export class LoadingAppClass extends Component<
     return someServerIsWorking;
   };
 
-  netName = (chain: ChainNameEnum): string =>
-    this.state.translate(
-      chain === ChainNameEnum.testChainName
-        ? 'settings.value-chainname-test'
-        : chain === ChainNameEnum.regtestChainName
-          ? 'settings.value-chainname-regtest'
-          : 'settings.value-chainname-main',
-    ) as string;
-
   // The wallet file's network when it differs from the server's; null when
   // they match, when offline (which opens any chain) or when unreadable.
   walletChainMismatch = async (): Promise<ChainNameEnum | null> => {
@@ -796,9 +768,27 @@ export class LoadingAppClass extends Component<
     return chain.ok && chain.value !== server.chainName ? chain.value : null;
   };
 
+  // Both chains, the server's host and the wallet files, for the details.
+  chainDetails = async (walletChain: ChainNameEnum): Promise<string> => {
+    const { server } = this.state;
+    const host =
+      server.kind === 'remote' ? server.uri.replace(/^https?:\/\//, '') : '';
+    const { files } = await walletFileDiagnosis();
+    const fileLines = files
+      .filter(f => f.state !== 'missing')
+      .map(f => `${f.name}: ${f.state === 'plainWallet' ? 'ok' : f.state}`);
+    return [
+      `Wallet chain: ${walletChain}`,
+      `Server chain: ${server.chainName}${host ? ` (${host})` : ''}`,
+      ...(fileLines.length ? ['', ...fileLines] : []),
+    ].join('\n');
+  };
+
   // A wallet on another network than its server cannot open there, so the
-  // error screen offers a server on the wallet's network instead of a retry.
-  showChainError = (walletChain: ChainNameEnum, details: string) => {
+  // error screen offers to switch to the wallet's network instead of a retry.
+  // Whatever the server choice, Automatic included.
+  showChainError = async (walletChain: ChainNameEnum) => {
+    const details = await this.chainDetails(walletChain);
     this.setState({
       walletError: { kind: 'chain', details, walletChain },
       retrying: false,
@@ -811,10 +801,7 @@ export class LoadingAppClass extends Component<
   loadExistingWalletOnBoot = async () => {
     const walletChain = await this.walletChainMismatch();
     if (walletChain) {
-      this.showChainError(
-        walletChain,
-        `wallet: ${walletChain}\nserver: ${this.state.server.chainName}`,
-      );
+      await this.showChainError(walletChain);
       return;
     }
     const result = await loadExistingWallet(
@@ -915,13 +902,7 @@ export class LoadingAppClass extends Component<
       if (!result.ok && result.error.code === 'WalletChainMismatch') {
         const chain = await readWalletChain();
         if (chain.ok) {
-          this.showChainError(
-            chain.value,
-            Utils.humanizeChainTokens(
-              result.error.message,
-              this.state.translate,
-            ),
-          );
+          await this.showChainError(chain.value);
           return;
         }
       }
@@ -1002,6 +983,19 @@ export class LoadingAppClass extends Component<
   retryOpenWallet = async () => {
     this.retryStartedAt = Date.now();
     this.setState({ retrying: true, actionButtonsDisabled: true });
+    await this.loadExistingWalletOnBoot();
+  };
+
+  // Moves to Automatic on the wallet's network, then opens the wallet. A
+  // custom server on the other network stays saved as it was.
+  switchToWalletChain = async (chain: ChainNameEnum) => {
+    this.retryStartedAt = Date.now();
+    this.setState({ retrying: true, actionButtonsDisabled: true });
+    await this.applyServer(
+      this.defaultServerForChain(chain),
+      SelectServerEnum.auto,
+    );
+    await this.selectServerOnBoot(!!this.state.netInfo.isConnected);
     await this.loadExistingWalletOnBoot();
   };
 
@@ -1809,6 +1803,7 @@ export class LoadingAppClass extends Component<
                         onServer={() =>
                           this.openServer(this.state.walletError?.walletChain)
                         }
+                        onSwitchChain={this.switchToWalletChain}
                       />
                     )}
                   {screen === RouteEnum.Server && (

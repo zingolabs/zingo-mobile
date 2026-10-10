@@ -65,35 +65,21 @@ describe('A wallet on another network than its server', () => {
     bridge.walletExists.mockResolvedValue('true');
   });
 
-  test('moves Automatic to the wallet network', async () => {
-    bridge.walletChainInfo.mockResolvedValue('main');
-    const { app, applyServer } = bootApp(SelectServerEnum.auto);
+  test.each([SelectServerEnum.auto, SelectServerEnum.custom])(
+    'Tests that the %s server is kept and the wallet offers its network instead of opening',
+    async selectServer => {
+      bridge.walletChainInfo.mockResolvedValue('main');
+      const { app, applyServer, showChainError } = bootApp(selectServer);
 
-    await app.componentDidMount();
+      await app.componentDidMount();
 
-    expect(applyServer).toHaveBeenCalledWith(
-      expect.objectContaining({ chainName: ChainNameEnum.mainChainName }),
-      SelectServerEnum.auto,
-    );
-  });
+      expect(applyServer).not.toHaveBeenCalled();
+      expect(showChainError).toHaveBeenCalledWith(ChainNameEnum.mainChainName);
+      expect(bridge.loadExistingWallet).not.toHaveBeenCalled();
+    },
+  );
 
-  test('keeps a server the user chose and offers one instead of opening', async () => {
-    bridge.walletChainInfo.mockResolvedValue('main');
-    const { app, applyServer, showChainError } = bootApp(
-      SelectServerEnum.custom,
-    );
-
-    await app.componentDidMount();
-
-    expect(applyServer).not.toHaveBeenCalled();
-    expect(showChainError).toHaveBeenCalledWith(
-      ChainNameEnum.mainChainName,
-      expect.any(String),
-    );
-    expect(bridge.loadExistingWallet).not.toHaveBeenCalled();
-  });
-
-  test('turns a typed mismatch from the open into the same offer', async () => {
+  test('Tests that a typed mismatch from the open lands on the same offer', async () => {
     bridge.walletChainInfo
       .mockResolvedValueOnce('test')
       .mockResolvedValue('main');
@@ -106,9 +92,30 @@ describe('A wallet on another network than its server', () => {
 
     await app.loadExistingWalletOnBoot();
 
-    expect(showChainError).toHaveBeenCalledWith(
-      ChainNameEnum.mainChainName,
-      expect.stringContaining('wallet chain name mainnet'),
+    expect(showChainError).toHaveBeenCalledWith(ChainNameEnum.mainChainName);
+  });
+
+  test('Tests that the details name both chains and the server host', async () => {
+    const { app } = bootApp(SelectServerEnum.custom);
+
+    const details = await app.chainDetails(ChainNameEnum.mainChainName);
+
+    expect(details).toContain('Wallet chain: main');
+    expect(details).toContain('Server chain: test (testnet.example:443)');
+  });
+
+  test('Tests that Switch moves to Automatic on the wallet network and then opens the wallet', async () => {
+    const { app, applyServer } = bootApp(SelectServerEnum.custom);
+    const open = jest
+      .spyOn(app, 'loadExistingWalletOnBoot')
+      .mockResolvedValue(undefined);
+
+    await app.switchToWalletChain(ChainNameEnum.mainChainName);
+
+    expect(applyServer).toHaveBeenCalledWith(
+      expect.objectContaining({ chainName: ChainNameEnum.mainChainName }),
+      SelectServerEnum.auto,
     );
+    expect(open).toHaveBeenCalledTimes(1);
   });
 });

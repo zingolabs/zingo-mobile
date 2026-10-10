@@ -638,6 +638,15 @@
     "highpriority": "High priority"
   },
   "walleterror": {
+    "chain-title": "This wallet is on {net}",
+    "chain-sub": "Zingo is connected to a {server} server, so it can't open this wallet. Your wallet and funds are fine.",
+    "chain-action": "Switch to {net}",
+    "chip-wallet": "Wallet",
+    "chip-server": "Server",
+    "more": "More options",
+    "more-warn": "These replace the {net} wallet on this phone. You don't need them to fix this.",
+    "more-import": "Import another wallet",
+    "more-create": "Create new wallet",
     "open-title": "Zingo couldn't open your wallet",
     "open-sub": "Your funds are safe and your seed phrase can always restore them.",
     "server-title": "Can't connect to the server",
@@ -647,11 +656,7 @@
     "import": "Import wallet",
     "create": "Create new wallet",
     "still-open": "Still couldn't open the wallet",
-    "still-server": "Still can't reach the server",
-    "chain-title": "This is a {net} wallet",
-    "chain-sub": "Zingo is set to a {server} server, which cannot open it. Choose a {net} server to open it.",
-    "chain-action": "Choose a {net} server",
-    "followed": "This is a {net} wallet, so Automatic connected to a {net} server."
+    "still-server": "Still can't reach the server"
   },
   "deletesheet": {
     "title": "Delete the wallet on this device?",

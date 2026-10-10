@@ -163,6 +163,8 @@ const ConfirmBottomSheet: React.FC = () => {
               lineHeight: 21,
               textAlign: options.messageAlign ?? 'left',
               marginBottom: 20,
+              color:
+                options.messageTone === 'danger' ? colors.fgDanger : undefined,
             }}
           >
             {options.message}

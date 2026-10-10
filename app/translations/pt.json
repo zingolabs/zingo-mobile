@@ -638,6 +638,15 @@
     "highpriority": "Alta prioridade"
   },
   "walleterror": {
+    "chain-title": "Esta carteira é da {net}",
+    "chain-sub": "O Zingo está conectado a um servidor {server}, então não consegue abrir esta carteira. Sua carteira e seus fundos estão bem.",
+    "chain-action": "Mudar para {net}",
+    "chip-wallet": "Carteira",
+    "chip-server": "Servidor",
+    "more": "Mais opções",
+    "more-warn": "Estas opções substituem a carteira {net} deste telefone. Você não precisa delas para resolver isto.",
+    "more-import": "Importar outra carteira",
+    "more-create": "Criar nova carteira",
     "open-title": "O Zingo não conseguiu abrir sua carteira",
     "open-sub": "Seus fundos estão seguros e sua frase de recuperação sempre pode restaurá-los.",
     "server-title": "Não foi possível conectar ao servidor",
@@ -647,11 +656,7 @@
     "import": "Importar carteira",
     "create": "Criar nova carteira",
     "still-open": "Ainda não foi possível abrir a carteira",
-    "still-server": "Ainda não foi possível alcançar o servidor",
-    "chain-title": "Esta é uma carteira de {net}",
-    "chain-sub": "O Zingo está configurado com um servidor de {server}, que não pode abri-la. Escolha um servidor de {net} para abri-la.",
-    "chain-action": "Escolher um servidor de {net}",
-    "followed": "Esta é uma carteira de {net}, então o Automático se conectou a um servidor de {net}."
+    "still-server": "Ainda não foi possível alcançar o servidor"
   },
   "deletesheet": {
     "title": "Excluir a carteira deste dispositivo?",
