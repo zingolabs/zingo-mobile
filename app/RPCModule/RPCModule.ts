@@ -41,6 +41,7 @@ interface RPCModuleAPI {
     minConfirmations: string,
   ): Promise<string>;
   restoreExistingWalletBackup(): Promise<string>;
+  replaceWalletWithBackup(): Promise<string>;
   // Android only (2.0.21 double-wrap incident): per-file classification of
   // the wallet files, and the unwrap repair. Absent on iOS.
   walletFileDiagnosisInfo(): Promise<string>;

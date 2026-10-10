@@ -43,9 +43,11 @@ export class WalletLifecycleService {
     return DONE;
   }
 
-  // Restores the backup that older builds took on a wallet change. No
-  // build writes new ones; the current wallet takes the backup's place.
-  async restoreBackup(): Promise<WalletLifecycleResult> {
+  // Restores the mainnet backup that older builds took on a wallet change.
+  // A mainnet wallet swaps places with it. Any other wallet is never backed
+  // up (`replace`): the backup takes its place, it is lost, and the backup
+  // file goes.
+  async restoreBackup(replace: boolean): Promise<WalletLifecycleResult> {
     const existsBackup = await RPCModule.walletBackupExists();
 
     if (!(existsBackup && existsBackup !== GlobalConst.false)) {
@@ -57,7 +59,11 @@ export class WalletLifecycleService {
       return err('rpc.walletnotfound-error');
     }
     await this.syncCoordinator.pauseSyncProcess();
-    await RPCModule.restoreExistingWalletBackup();
+    if (replace) {
+      await RPCModule.replaceWalletWithBackup();
+    } else {
+      await RPCModule.restoreExistingWalletBackup();
+    }
     return DONE;
   }
 }

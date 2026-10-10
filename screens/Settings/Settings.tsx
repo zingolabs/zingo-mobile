@@ -110,6 +110,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     blockExplorer: blockExplorerContext,
     readOnly,
     server,
+    walletChainName,
     setPrivacyOption,
     setBackgroundError,
     zingolibVersion,
@@ -168,10 +169,13 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const [showDeveloperOptions, setShowDeveloperOptions] =
     useState<boolean>(false);
   const [hasWalletBackup, setHasWalletBackup] = useState<boolean>(false);
-  // Backups only ever held mainnet wallets.
-  const backupNeedsMainnet =
-    server.kind !== 'offline' &&
-    server.chainName !== ChainNameEnum.mainChainName;
+  // Backups only ever held mainnet wallets, and only a mainnet wallet is
+  // backed up: any other wallet is replaced by the backup and lost.
+  const openNet =
+    walletChainName !== ChainNameEnum.noneChainName
+      ? walletChainName
+      : server.chainName;
+  const backupReplaces = openNet !== ChainNameEnum.mainChainName;
   // Assumed stored until checked, so the warning doesn't flash on open.
   const [recoveryInfoStored, setRecoveryInfoStored] = useState<boolean>(true);
   const [savingRecoveryInfo, setSavingRecoveryInfo] = useState<boolean>(false);
@@ -984,15 +988,15 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                                 title: translate(
                                   'loadedapp.restorebackupwallet',
                                 ) as string,
-                                message: backupNeedsMainnet
+                                message: backupReplaces
                                   ? (
                                       translate(
-                                        'settings.restorebackup-mainnet',
+                                        'settings.restorebackup-replace',
                                       ) as string
                                     ).replace(
                                       '{net}',
                                       translate(
-                                        `settings.value-chainname-${server.chainName}`,
+                                        `settings.value-chainname-${openNet}`,
                                       ) as string,
                                     )
                                   : (translate(
@@ -1001,7 +1005,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                                 buttons: [
                                   {
                                     text: translate(
-                                      backupNeedsMainnet
+                                      backupReplaces
                                         ? 'settings.restorebackup-switch'
                                         : 'confirm',
                                     ) as string,

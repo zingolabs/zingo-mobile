@@ -43,7 +43,10 @@ afterEach(() => {
 
 const onRestoreWalletBackup = jest.fn(async () => {});
 
-const renderSettings = async (server: ServerType = mockServer) => {
+const renderSettings = async (
+  server: ServerType = mockServer,
+  walletChainName: ChainNameEnum = ChainNameEnum.mainChainName,
+) => {
   const props: any = {
     navigation: mockNavigation,
     route: { key: 'Key-1', name: RouteEnum.Settings, params: undefined },
@@ -56,6 +59,7 @@ const renderSettings = async (server: ServerType = mockServer) => {
         info: mockInfo,
         totalBalance: mockTotalBalance,
         server,
+        walletChainName,
         selectServer: SelectServerEnum.auto,
       }}
     >
@@ -97,17 +101,18 @@ test('Tests that the developer options swap the wallet backup in after a confirm
   expect(onRestoreWalletBackup).toHaveBeenCalledTimes(1);
 });
 
-test('Tests that the backup restore offers to switch to Mainnet when Zingo is on another network.', async () => {
+test('Tests that restoring over a wallet of another network warns it is lost and offers to switch to Mainnet.', async () => {
   nativeRpc.walletBackupExists.mockResolvedValue('true');
   const confirms: ConfirmOptions[] = [];
   registerConfirmListener(options => confirms.push(options));
   await renderSettings(
     remoteServer('https://testnet.example:9067', ChainNameEnum.testChainName),
+    ChainNameEnum.testChainName,
   );
 
   fireEvent.press(await screen.findByTestId('settings.restorebackupwallet'));
 
-  expect(confirms[0].message).toBe('settings.restorebackup-mainnet');
+  expect(confirms[0].message).toBe('settings.restorebackup-replace');
   expect(confirms[0].buttons[0].text).toBe('settings.restorebackup-switch');
   confirms[0].buttons[0].onPress?.();
   expect(onRestoreWalletBackup).toHaveBeenCalledTimes(1);

@@ -1814,7 +1814,11 @@ export class LoadedAppClass extends Component<
   };
 
   onClickOKRestoreBackup = async () => {
-    const restored = await this.rpc.restoreBackup();
+    // Only mainnet wallets are backed up: any other wallet is replaced by
+    // the backup instead of swapping places with it.
+    const restored = await this.rpc.restoreBackup(
+      this.state.walletChainName !== ChainNameEnum.mainChainName,
+    );
 
     if (restored.kind === 'error') {
       createAlert(

@@ -9,6 +9,7 @@ jest.mock('react-native', () => {
     walletChainInfo: jest.fn(() => 'main'),
     walletBackupExists: jest.fn(() => 'false'),
     restoreExistingWalletBackup: jest.fn(() => '{}'),
+    replaceWalletWithBackup: jest.fn(() => 'true'),
     getValueTransfersList: jest.fn(
       () => '{ "value_transfers": [], "total": 0 }',
     ),
