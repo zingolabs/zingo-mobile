@@ -1,3 +1,5 @@
+import type { ScanTexts } from '@ui/widgets/ScanOverlay';
+import type { RevealOrigin } from '@ui/widgets/CircularReveal';
 import {
   AddressKindEnum,
   BiometricGateOutcome,
@@ -144,11 +146,11 @@ export type AddressListNavigationState = {
 
 export type ScannerAddressNavigationState = {
   setAddress: (a: string) => void;
-  active: boolean;
-  // When true the scanner returns the scanned string verbatim — no `zcash:`
-  // prefixing — for non-Zcash address fields (address book). The caller
-  // validates it per its own chain.
-  raw?: boolean;
+  // What the scan is for, and its words, set by the caller.
+  accepts: (value: string) => boolean | Promise<boolean>;
+  texts: ScanTexts;
+  // The scan button's centre, where the camera opens from.
+  origin?: RevealOrigin;
 };
 
 export type ValueTransferDetailNavigationState = {

@@ -28,8 +28,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useTheme } from '@app/theme';
 import { ease } from '@app/theme/motion';
-import { TranslateType } from '@app/AppState';
-import { isViewingKey } from '@app/utils/seedPhrase';
 import CircularReveal, { RevealOrigin } from '@ui/widgets/CircularReveal';
 import { ChevronLeft } from '@ui/primitives/Icons/Chevron';
 import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
@@ -51,23 +49,40 @@ const pillPop = () =>
     .duration(260)
     .reduceMotion(ReduceMotion.System);
 
+// Already translated: the header, the line under the frame while looking,
+// when a code is refused, the pill once one is taken, and the two buttons.
+export type ScanTexts = {
+  title: string;
+  hint: string;
+  miss: string;
+  found: string;
+  back: string;
+  torch: string;
+};
+
 type ScanOverlayProps = {
   origin: RevealOrigin;
-  translate: (key: string) => TranslateType;
-  // A scanned viewing key, handed over once the camera has closed.
-  onKey: (key: string) => void;
+  texts: ScanTexts;
+  // Whether a scanned code is what this scan is for.
+  accepts: (value: string) => boolean | Promise<boolean>;
+  // The accepted code, handed over once the camera has closed.
+  onRead: (value: string) => void;
   onClosed: () => void;
+  testID?: string;
 };
 
 type Stage = 'looking' | 'miss' | 'found';
 
 // The camera, revealed from the scan button and collapsed back into it,
-// that reads one viewing key QR code.
+// that reads one QR code `accepts` takes; others are refused and it keeps
+// looking.
 const ScanOverlay: React.FunctionComponent<ScanOverlayProps> = ({
   origin,
-  translate,
-  onKey,
+  texts,
+  accepts,
+  onRead,
   onClosed,
+  testID = 'scanner',
 }) => {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
@@ -78,6 +93,8 @@ const ScanOverlay: React.FunctionComponent<ScanOverlayProps> = ({
   const [torch, setTorch] = useState(false);
   const [stage, setStage] = useState<Stage>('looking');
   const found = useRef('');
+  // A code being checked; the camera keeps reporting it meanwhile.
+  const checking = useRef(false);
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   useEffect(() => {
@@ -110,11 +127,14 @@ const ScanOverlay: React.FunctionComponent<ScanOverlayProps> = ({
   }));
 
   const read = useCallback(
-    (value: string) => {
-      if (stage === 'found') {
+    async (value: string) => {
+      if (stage === 'found' || checking.current) {
         return;
       }
-      if (!isViewingKey(value)) {
+      checking.current = true;
+      const ok = await accepts(value);
+      checking.current = false;
+      if (!ok) {
         setStage('miss');
         clearTimeout(timer.current);
         timer.current = setTimeout(() => setStage('looking'), MISS_HOLD_MS);
@@ -133,7 +153,7 @@ const ScanOverlay: React.FunctionComponent<ScanOverlayProps> = ({
       clearTimeout(timer.current);
       timer.current = setTimeout(() => setOpen(false), FOUND_HOLD_MS);
     },
-    [stage, closing],
+    [stage, closing, accepts],
   );
 
   const codeScanner = useCodeScanner({
@@ -148,10 +168,10 @@ const ScanOverlay: React.FunctionComponent<ScanOverlayProps> = ({
 
   const closed = useCallback(() => {
     if (found.current) {
-      onKey(found.current);
+      onRead(found.current);
     }
     onClosed();
-  }, [onKey, onClosed]);
+  }, [onRead, onClosed]);
 
   const frameLeft = (size.width - FRAME) / 2;
   const frameTop = (size.height - FRAME) / 2;
@@ -181,7 +201,7 @@ const ScanOverlay: React.FunctionComponent<ScanOverlayProps> = ({
     >
       <CircularReveal origin={origin} open={open} onClosed={closed}>
         <View
-          testID="import.scanner"
+          testID={testID}
           style={[StyleSheet.absoluteFill, { backgroundColor: '#000' }]}
         >
           {hasPermission && device && (
@@ -267,9 +287,9 @@ const ScanOverlay: React.FunctionComponent<ScanOverlayProps> = ({
             }}
           >
             <Pressable
-              testID="import.scanner.back"
+              testID={`${testID}.back`}
               accessibilityRole="button"
-              accessibilityLabel={translate('import.scan-back') as string}
+              accessibilityLabel={texts.back}
               onPress={() => setOpen(false)}
               hitSlop={8}
               style={{ position: 'absolute', left: 10, padding: 10 }}
@@ -284,7 +304,7 @@ const ScanOverlay: React.FunctionComponent<ScanOverlayProps> = ({
               accessibilityRole="header"
               style={{ color: '#FFFFFF', fontSize: 16, fontWeight: '700' }}
             >
-              {translate('import.scan-title') as string}
+              {texts.title}
             </Text>
           </View>
 
@@ -318,7 +338,7 @@ const ScanOverlay: React.FunctionComponent<ScanOverlayProps> = ({
                     fontWeight: '700',
                   }}
                 >
-                  {translate('import.scan-found') as string}
+                  {texts.found}
                 </Text>
               </Animated.View>
             ) : (
@@ -331,19 +351,15 @@ const ScanOverlay: React.FunctionComponent<ScanOverlayProps> = ({
                   lineHeight: 20,
                 }}
               >
-                {
-                  translate(
-                    stage === 'miss' ? 'import.scan-miss' : 'import.scan-hint',
-                  ) as string
-                }
+                {stage === 'miss' ? texts.miss : texts.hint}
               </Text>
             )}
           </View>
 
           <Pressable
-            testID="import.scanner.torch"
+            testID={`${testID}.torch`}
             accessibilityRole="button"
-            accessibilityLabel={translate('import.scan-torch') as string}
+            accessibilityLabel={texts.torch}
             accessibilityState={{ selected: torch }}
             onPress={() => setTorch(t => !t)}
             style={{

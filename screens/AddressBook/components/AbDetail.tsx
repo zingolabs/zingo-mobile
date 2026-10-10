@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect, useRef } from 'react';
 import { View, TextInput, Keyboard, TouchableOpacity } from 'react-native';
 import { NavigationProp, ParamListBase } from '@react-navigation/native';
 import { useTheme } from '@app/theme';
@@ -298,23 +298,37 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
     znsNotFound,
   ]);
 
-  // Same navigation the working Send / Swap / ImportUfvk scanners use: go to the
-  // ScannerAddress screen and let its callback write the value straight back
-  // into this (still-mounted) sheet. No dismiss-on-blur here, so the sheet
-  // survives the round-trip.
+  // The shared scanner, opened from the scan button; its callback writes the
+  // value straight back into this (still-mounted) sheet. No dismiss-on-blur
+  // here, so the sheet survives the round-trip.
+  // Any code is taken verbatim: the book holds other chains' addresses too,
+  // and a `zcash:` prefix on a BTC/SOL address would make the ZEC parser
+  // reject it. `updateAddress` handles `zcash:` URIs and bare ZEC addresses,
+  // and the chain auto-detect below picks the matching chain.
+  const scanButton = useRef<View>(null);
   const onScanAddress = () => {
     Keyboard.dismiss();
-    navigation.navigate(RouteEnum.ScannerAddress, {
-      setAddress: (a: string) => updateAddress(a),
-      active: true,
-      // Always take the scan verbatim: adding a `zcash:` prefix to a non-ZEC
-      // address (e.g. scanning a BTC/SOL QR while the selector still shows
-      // Zcash) makes the ZEC parser reject it — the field stays empty and an
-      // error pops the sheet. Verbatim lets `updateAddress` set it and the
-      // chain auto-detect below pick the matching chain. `zcash:` URIs and bare
-      // ZEC addresses are still handled by `updateAddress` itself.
-      raw: true,
-    });
+    const open = (origin?: { x: number; y: number }) =>
+      navigation.navigate(RouteEnum.ScannerAddress, {
+        setAddress: (a: string) => updateAddress(a),
+        accepts: () => true,
+        texts: {
+          title: translate('scanner.title') as string,
+          hint: translate('scanner.hint-any') as string,
+          miss: '',
+          found: translate('scanner.found') as string,
+          back: translate('scanner.back') as string,
+          torch: translate('scanner.torch') as string,
+        },
+        origin,
+      });
+    if (scanButton.current) {
+      scanButton.current.measureInWindow((x, y, width, height) =>
+        open({ x: x + width / 2, y: y + height / 2 }),
+      );
+    } else {
+      open();
+    }
   };
 
   //console.log('render Ab Detail - 5', index, address, label);
@@ -393,6 +407,7 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
               </TouchableOpacity>
             ) : null}
             <TouchableOpacity
+              ref={scanButton}
               testID="addressbook.scan-button"
               onPress={onScanAddress}
               hitSlop={8}

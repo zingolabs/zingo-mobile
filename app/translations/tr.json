@@ -725,12 +725,9 @@
     "done": "Bitti"
   },
   "import": {
-    "scan-title": "QR kodu tara",
     "scan-hint": "Kamerayı bir görüntüleme anahtarının QR koduna doğrultun.",
     "scan-found": "Görüntüleme anahtarı bulundu",
     "scan-miss": "Bu kod bir görüntüleme anahtarı değil.",
-    "scan-torch": "El feneri",
-    "scan-back": "Geri",
     "title": "Tohum ifadesi / Görüntüleme anahtarı",
     "key-label": "Tohum ifadenizi veya görüntüleme anahtarınızı girin",
     "birthday": "Doğum günü",
@@ -772,6 +769,13 @@
     ]
   },
   "scanner": {
+    "title": "QR kodu tara",
+    "back": "Geri",
+    "torch": "El feneri",
+    "found": "QR kod okundu",
+    "hint-address": "Kamerayı bir Zcash adresinin QR koduna doğrultun.",
+    "miss-address": "Bu kod bir Zcash adresi değil.",
+    "hint-any": "Kamerayı bir adresin QR koduna doğrultun.",
     "text": "Birleştirilmiş Tam Görüntüleme Anahtarını Tara",
     "scanaddress": "Bir Zcash Adresini Tara"
   },
