@@ -13,7 +13,8 @@ import { SyncCoordinator } from './SyncCoordinator';
 export type WalletLifecycleErrorKey =
   | 'rpc.deletewallet-error'
   | 'rpc.walletnotfound-error'
-  | 'rpc.backupnotfound-error';
+  | 'rpc.backupnotfound-error'
+  | 'rpc.restorebackup-error';
 
 export type WalletLifecycleResult = Done | ErrorKeyed<WalletLifecycleErrorKey>;
 
@@ -59,10 +60,19 @@ export class WalletLifecycleService {
       return err('rpc.walletnotfound-error');
     }
     await this.syncCoordinator.pauseSyncProcess();
-    if (replace) {
-      await RPCModule.replaceWalletWithBackup();
-    } else {
-      await RPCModule.restoreExistingWalletBackup();
+    // Android answers a boolean, iOS "true"/"false"; a throw (a bridge
+    // without the method) is a failure too.
+    let result: string | boolean;
+    try {
+      result = replace
+        ? await RPCModule.replaceWalletWithBackup()
+        : await RPCModule.restoreExistingWalletBackup();
+    } catch (e) {
+      console.log(`restoreBackup failed: ${e}`);
+      return err('rpc.restorebackup-error');
+    }
+    if (!(result === true || result === GlobalConst.true)) {
+      return err('rpc.restorebackup-error');
     }
     return DONE;
   }

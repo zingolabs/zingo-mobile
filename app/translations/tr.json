@@ -198,6 +198,7 @@
     "migration-body": "Cüzdanınızı yeni senkronizasyon sistemine taşıyoruz. Cihazınızı güç ve Wi-Fi'a bağlı tutun.\n\nBakiyeniz, taşıma işlemi ilerledikçe değişecektir. Endişelenmeyin, paranız güvende!"
   },
   "rpc": {
+    "restorebackup-error": "Hata: Cüzdan yedeği geri yüklenemedi.",
     "walletnotfound-error": "Error: Herhangi bir cüzdan bulunamadı.",
     "backupnotfound-error": "Error: Herhangi bir cüzdan yedeği bulunamadı.",
     "deletewallet-error": "Error: Mevcut cüzdan silinemedi."

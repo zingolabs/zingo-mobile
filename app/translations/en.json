@@ -198,6 +198,7 @@
     "migration-body": "We are migrating your wallet to the new synchronization system. Keep your device connected to power and WiFi.\n\nYour balance will change as the migration progresses. Don't worry, your funds are safe!"
   },
   "rpc": {
+    "restorebackup-error": "Error: Couldn't restore the wallet backup.",
     "walletnotfound-error": "Error: Couldn't find any wallet.",
     "backupnotfound-error": "Error: Couldn't find any backup of any wallet.",
     "deletewallet-error": "Error: Couldn't delete the current wallet."

@@ -1813,7 +1813,26 @@ export class LoadedAppClass extends Component<
     this.navigateToLoadingApp(state);
   };
 
+  // Runs from a confirm button, where a throw would vanish: every failure
+  // ends in the alert.
   onClickOKRestoreBackup = async () => {
+    try {
+      await this.restoreBackupAndRestart();
+    } catch (e) {
+      createAlert(
+        this.setBackgroundError,
+        this.addLastSnackbar,
+        this.state.translate('loadedapp.restoringwallet-label') as string,
+        `${this.state.translate('rpc.restorebackup-error') as string} ${e}`,
+        false,
+        this.state.translate,
+        sendEmail,
+        this.state.zingolibVersion,
+      );
+    }
+  };
+
+  restoreBackupAndRestart = async () => {
     // Only mainnet wallets are backed up: any other wallet is replaced by
     // the backup instead of swapping places with it.
     const restored = await this.rpc.restoreBackup(

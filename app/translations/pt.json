@@ -198,6 +198,7 @@
     "migration-body": "Estamos migrando sua carteira para o novo sistema de sincronização. Mantenha seu dispositivo conectado à energia e ao Wi-Fi.\n\nSeu saldo mudará conforme a migração avança. Não se preocupe, seus fundos estão seguros!"
   },
   "rpc": {
+    "restorebackup-error": "Erro: Não foi possível restaurar o backup da carteira.",
     "walletnotfound-error": "Error: não foi possível encontrar nenhuma carteira.",
     "backupnotfound-error": "Error: não foi possível encontrar nenhum backup de nenhuma carteira.",
     "deletewallet-error": "Error: não foi possível excluir a carteira atual."

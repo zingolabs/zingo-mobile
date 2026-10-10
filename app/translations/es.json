@@ -198,6 +198,7 @@
     "migration-body": "Estamos migrando tu billetera al nuevo sistema de sincronización. Mantén tu dispositivo conectado a la corriente y al wifi.\n\nTu saldo cambiará a medida que avance la migración. ¡No te preocupes, tus fondos están seguros!"
   },
   "rpc": {
+    "restorebackup-error": "Error: No se pudo restaurar la copia de seguridad del monedero.",
     "walletnotfound-error": "Error: No se encuentra ningún monedero.",
     "backupnotfound-error": "Error: No se encuentra ninguna copia de seguridad de ningún monedero.",
     "deletewallet-error": "Error: No se pudo borrar el monedero actual."
