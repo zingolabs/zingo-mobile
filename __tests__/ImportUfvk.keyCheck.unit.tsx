@@ -120,15 +120,15 @@ test('Tests that a valid key for the selected network reads as valid', async () 
 test('Tests that the start of a viewing key asks to keep typing', () => {
   mount();
   fireEvent.changeText(screen.getByTestId('import.seedufvkinput'), 'uv');
-  expect(
-    screen.getByTestId('import.seedufvkinput.hint').props.children,
-  ).toBe('import.key-keep-typing');
+  expect(screen.getByTestId('import.seedufvkinput.hint').props.children).toBe(
+    'import.key-keep-typing',
+  );
 });
 
 test('Tests that a typo no recovery word starts with is pointed out', () => {
   mount();
   fireEvent.changeText(screen.getByTestId('import.seedufvkinput'), 'xq');
-  expect(
-    screen.getByTestId('import.seedufvkinput.hint').props.children,
-  ).toBe('import.word-nomatch');
+  expect(screen.getByTestId('import.seedufvkinput.hint').props.children).toBe(
+    'import.word-nomatch',
+  );
 });
