@@ -41,9 +41,7 @@ const KEY_HEAD = /^(uview(?:test|regtest)?1)(.*)$/;
 // What the text shows is wrong with it as a viewing key: its start, or a
 // character a key can't hold. Whether it is complete only the decode knows.
 export type ViewingKeyProblem =
-  | { kind: 'none' }
-  | { kind: 'prefix' }
-  | { kind: 'char'; char: string };
+  { kind: 'none' } | { kind: 'prefix' } | { kind: 'char'; char: string };
 
 export const viewingKeyProblem = (key: string): ViewingKeyProblem => {
   const head = KEY_HEAD.exec(key);
