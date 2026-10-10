@@ -48,5 +48,4 @@ export enum RouteEnum {
   ScannerAddress = 'ScannerAddress',
   ValueTransferDetail = 'ValueTransferDetail',
   Confirm = 'Confirm',
-  Ufvk = 'Ufvk',
 }

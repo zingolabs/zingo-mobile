@@ -65,7 +65,7 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
   } = context;
 
   // Audit Issue D — bio gates moved into the destination screens
-  // themselves (Seed.tsx, ShowUfvk.tsx, Rescan.tsx, Settings.tsx) so
+  // themselves (WalletSeed.tsx, ViewingKey.tsx, Rescan.tsx, Settings.tsx) so
   // every navigation path is funnelled through the same check. Dispatch
   // just closes the panel and forwards the menu selection.
   const dispatch = useMemo(

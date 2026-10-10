@@ -777,34 +777,6 @@
     "text": "Scan a Unified Full Viewing Key",
     "scanaddress": "Scan a Zcash Address"
   },
-  "ufvk": {
-    "buttontexts": {
-      "view": ["I have saved \n the viewing key"],
-      "change": [
-        "",
-        "Open New",
-        "You really want \n to change your \n actual wallet",
-        "Are you certain?"
-      ],
-      "server": [
-        "",
-        "Change Server",
-        "You really want \n to change your \n actual server",
-        "Are you certain?"
-      ]
-    },
-    "viewkey": "Viewing Key ",
-    "tapcopy-message": "Key copied to Clipboard",
-    "text-readonly": "Before closing this screen, carefully write down this viewing key. It is the only way you can restore/access your current wallet.",
-    "text-readonly-change": "Before accessing another wallet, carefully write down this viewing key. It is the only way you can restore/access your current wallet.",
-    "text-readonly-server": "Before changing another server, carefully write down this viewing key. It is the only way you can restore/access your current wallet.",
-    "change-warning": "If you change to another wallet, you will no longer have access to this wallet without the seed phrase.",
-    "server-warning": "If you change to a server with different chain, you will no longer have access to this wallet without the seed phrase.",
-    "recovering-from-keychain": "Recovering viewing key from secure storage...",
-    "recovering-from-wallet": "Loading viewing key from wallet...",
-    "from-keychain": "from secure storage",
-    "from-wallet": "from wallet"
-  },
   "pools": {
     "title": "Fund Pools",
     "ironwood-title": "IRONWOOD (UA)",
@@ -1124,6 +1096,8 @@
     "birthday-tip-body": "Zingo starts scanning from here instead of from the beginning, so it syncs much faster."
   },
   "walletseed": {
+    "sub-change-vo": "Before accessing another wallet, carefully save this wallet's viewing key and birthday. You'll need them to get back to it.",
+    "change-warning-vo": "If you change to another wallet, you will no longer have access to this wallet without the viewing key.",
     "back-acc": "Back",
     "ok-title": "Backed up",
     "ok-sub": "{date} · confirmed 3 words",
@@ -1144,6 +1118,10 @@
     "confirm-title": "Are you certain?"
   },
   "viewingkey": {
+    "switch-title": "Switch to {net}",
+    "switch-sub": "Before switching to {net}, carefully save this wallet's viewing key. You'll need it to get back to it.",
+    "switch": "Switch",
+    "switch-warning": "If you change to a server on another network, you will no longer have access to this wallet without the viewing key.",
     "title": "Your viewing key",
     "sub": "Anyone with this key can see this wallet's balance and history. It can't spend funds.",
     "label": "Unified viewing key",
@@ -1152,6 +1130,7 @@
     "share": "Share it only with people you trust. They'll see all your activity"
   },
   "viewonly": {
+    "dismiss-acc": "Dismiss the view-only notice",
     "title": "View-only wallet",
     "body": "You can see the balance and history and receive funds. Spending isn't possible with a viewing key.",
     "button": "View key"

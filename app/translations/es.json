@@ -777,34 +777,6 @@
     "text": "Escanea una Clave de Visualización Totalmente Unificada",
     "scanaddress": "Escanea una dirección Zcash"
   },
-  "ufvk": {
-    "buttontexts": {
-      "view": ["Ya he guardado \n la clave de visualización"],
-      "change": [
-        "",
-        "Abrir Nuevo",
-        "Realmente quieres \n cambiar tu \n monedero activo",
-        "Estás seguro/a?"
-      ],
-      "server": [
-        "",
-        "Cambiar Servidor",
-        "Realmente quieres \n cambiar el \n servidor activo",
-        "Estás seguro/a?"
-      ]
-    },
-    "viewkey": "Clave de Visualización ",
-    "tapcopy-message": "Clave copiada al portapapeles",
-    "text-readonly": "Antes de cerrar esta ventana, escriba cuidadosamente esta clave de visualización. Es la única manera que puedes restaurar/acceder tu monedero actual.",
-    "text-readonly-change": "Antes de acceder a otro monedero, escriba cuidadosamente esta clave de visualización. Es la única manera que puedes restaurar/acceder tu monedero actual.",
-    "text-readonly-server": "Antes de usar otro servidor, escriba cuidadosamente esta clave de visualización. Es la única manera que puedes restaurar/acceder tu monedero actual.",
-    "change-warning": "Si cambias a otro monedero, ya no tendrás acceso a este monedero sin la frase semilla.",
-    "server-warning": "Si cambias a un servidor con diferente tipo de cadena, ya no tendrás acceso a este monedero sin la frase semilla.",
-    "recovering-from-keychain": "Recuperando la clave de visualización del almacenamiento seguro...",
-    "recovering-from-wallet": "Cargando la clave de visualización del monedero...",
-    "from-keychain": "del almacenamiento seguro",
-    "from-wallet": "del monedero"
-  },
   "pools": {
     "title": "Agrupaciones de Fondos",
     "ironwood-title": "IRONWOOD (UA)",
@@ -1124,6 +1096,8 @@
     "birthday-tip-body": "Zingo empieza a escanear desde aquí en vez de desde el principio, así sincroniza mucho más rápido."
   },
   "walletseed": {
+    "sub-change-vo": "Antes de abrir otro monedero, guarda con cuidado la clave de visualización y el cumpleaños de este. Los necesitarás para volver a él.",
+    "change-warning-vo": "Si cambias a otro monedero, ya no tendrás acceso a este monedero sin la clave de visualización.",
     "back-acc": "Atrás",
     "ok-title": "Respaldada",
     "ok-sub": "{date} · 3 palabras confirmadas",
@@ -1144,6 +1118,10 @@
     "confirm-title": "¿Estás seguro?"
   },
   "viewingkey": {
+    "switch-title": "Cambiar a {net}",
+    "switch-sub": "Antes de cambiar a {net}, guarda con cuidado la clave de visualización de este monedero. La necesitarás para volver a él.",
+    "switch": "Cambiar",
+    "switch-warning": "Si cambias a un servidor de otra red, ya no tendrás acceso a este monedero sin la clave de visualización.",
     "title": "Tu clave de visualización",
     "sub": "Cualquiera con esta clave puede ver el saldo y el historial de este monedero. No puede gastar fondos.",
     "label": "Clave de visualización unificada",
@@ -1152,6 +1130,7 @@
     "share": "Compártela solo con personas de confianza. Verán toda tu actividad"
   },
   "viewonly": {
+    "dismiss-acc": "Cerrar el aviso de solo lectura",
     "title": "Monedero de solo lectura",
     "body": "Puedes ver el saldo y el historial y recibir fondos. Con una clave de visualización no se puede gastar.",
     "button": "Ver clave"

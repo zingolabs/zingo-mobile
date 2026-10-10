@@ -8,6 +8,7 @@ import {
 import { RouteEnum } from '@app/AppState';
 import { WalletSeedAction } from '@app/types';
 import { showConfirm } from '@app/services/showConfirm';
+import { copySensitive } from '@app/utils/sensitiveClipboard';
 
 import WalletSeed from '@screens/WalletSeed';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
@@ -22,6 +23,9 @@ jest.mock('@app/services/recoveryWalletInfo', () => ({
 }));
 
 jest.mock('@app/services/showConfirm', () => ({ showConfirm: jest.fn() }));
+jest.mock('@app/utils/sensitiveClipboard', () => ({
+  copySensitive: jest.fn(),
+}));
 
 jest.mock('@app/walletBackend', () => ({
   fetchWallet: jest.fn(async () => ({
@@ -34,6 +38,7 @@ const renderScreen = (
   seedBackedUpAt = 0,
   action?: WalletSeedAction,
   onConfirm = jest.fn(async () => {}),
+  readOnly = false,
 ) =>
   render(
     <ContextAppLoadedProvider
@@ -43,6 +48,8 @@ const renderScreen = (
         biometrics: false,
         seedBackedUp,
         seedBackedUpAt,
+        readOnly,
+        birthday: 3512840,
       }}
     >
       <WalletSeed
@@ -116,4 +123,27 @@ test('Tests that the action runs only after the warning is confirmed.', async ()
     await buttons[0].onPress();
   });
   expect(onConfirm).toHaveBeenCalledTimes(1);
+});
+
+test('Tests that a view-only wallet shows its hidden viewing key in place of the words and copies it with the birthday.', async () => {
+  renderScreen(true, 0, 'change', undefined, true);
+  await act(async () => {});
+  expect(screen.getByText('walletseed.sub-change-vo')).toBeTruthy();
+  expect(screen.queryByTestId('walletseed.words')).toBeNull();
+  expect(screen.queryByTestId('walletseed.vk')).toBeNull();
+  expect(
+    screen.getByTestId('walletseed.vkcard.key').props.children,
+  ).toBe(`${UFVK.slice(0, 6)}••••••…••••••••`);
+
+  fireEvent.press(screen.getByTestId('walletseed.copy'));
+  expect(copySensitive).toHaveBeenCalledWith(
+    `${UFVK}
+seedbackup.birthday: 3512840`,
+    expect.any(Function),
+  );
+
+  fireEvent.press(screen.getByTestId('walletseed.go'));
+  expect((showConfirm as jest.Mock).mock.calls.at(-1)[0].message).toBe(
+    'walletseed.change-warning-vo',
+  );
 });

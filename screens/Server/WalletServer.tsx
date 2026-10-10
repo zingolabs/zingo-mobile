@@ -20,7 +20,6 @@ import {
   ServerUrisType,
   SetServerResult,
   SnackbarDurationEnum,
-  UfvkActionEnum,
 } from '@app/AppState';
 import { offlineServer, remoteServer } from '@app/AppState/types/ServerType';
 import { ServerStatus } from '@app/AppState/types/ServerStatus';
@@ -151,7 +150,10 @@ const WalletServer: React.FC<WalletServerProps> = ({
     if (result.kind === 'chain-changed') {
       leaving.current = true;
       if (readOnly) {
-        navigation.navigate(RouteEnum.Ufvk, { action: UfvkActionEnum.server });
+        navigation.navigate(RouteEnum.ViewingKey, {
+          entry: { kind: 'push' },
+          switchTo: target.chainName,
+        });
       } else {
         navigation.navigate(RouteEnum.WalletSeed, { action: 'server' });
       }

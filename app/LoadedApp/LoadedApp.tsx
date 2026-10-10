@@ -53,7 +53,6 @@ import {
   LanguageEnum,
   SelectServerEnum,
   ChainNameEnum,
-  UfvkActionEnum,
   SettingsNameEnum,
   RouteEnum,
   AppStateStatusEnum,
@@ -177,7 +176,6 @@ const MigrationBatchSending = React.lazy(
   () => import('@screens/MigrationBatchSending'),
 );
 const Insight = React.lazy(() => import('@screens/Insight'));
-const ShowUfvk = React.lazy(() => import('@screens/Ufvk/ShowUfvk'));
 const ComputingTxContent = React.lazy(() => import('@screens/Computing'));
 
 const en = require('@app/translations/en.json');
@@ -234,6 +232,8 @@ export default function LoadedApp(props: LoadedAppProps) {
   const [biometrics, setBiometrics] = useState<boolean>(true);
   const [seedBackedUp, setSeedBackedUp] = useState<boolean>(true);
   const [seedBackedUpAt, setSeedBackedUpAt] = useState<number>(0);
+  const [viewOnlyNoticeDismissed, setViewOnlyNoticeDismissed] =
+    useState<boolean>(false);
   const [selectServer, setSelectServer] = useState<SelectServerEnum>(
     SelectServerEnum.auto,
   );
@@ -382,6 +382,7 @@ export default function LoadedApp(props: LoadedAppProps) {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.privacy, privacy);
       }
       setSeedBackedUp(settings.seedBackedUp === true);
+      setViewOnlyNoticeDismissed(settings.viewOnlyNoticeDismissed === true);
       setSeedBackedUpAt(
         typeof settings.seedBackedUpAt === 'number'
           ? settings.seedBackedUpAt
@@ -601,6 +602,7 @@ export default function LoadedApp(props: LoadedAppProps) {
         biometrics={biometrics}
         seedBackedUp={seedBackedUp}
         seedBackedUpAt={seedBackedUpAt}
+        viewOnlyNoticeDismissed={viewOnlyNoticeDismissed}
         selectServer={selectServer}
         walletChainName={walletChainName}
         firstLaunchingMessage={firstLaunchingMessage}
@@ -636,6 +638,7 @@ type LoadedAppClassProps = {
   biometrics: boolean;
   seedBackedUp: boolean;
   seedBackedUpAt: number;
+  viewOnlyNoticeDismissed: boolean;
   selectServer: SelectServerEnum;
   walletChainName: ChainNameEnum;
   firstLaunchingMessage: LaunchingModeEnum;
@@ -711,6 +714,8 @@ export class LoadedAppClass extends Component<
       seedBackedUp: props.seedBackedUp,
       seedBackedUpAt: props.seedBackedUpAt,
       setSeedBackedUp: this.setSeedBackedUp,
+      viewOnlyNoticeDismissed: props.viewOnlyNoticeDismissed,
+      dismissViewOnlyNotice: this.dismissViewOnlyNotice,
 
       // context settings
       server: props.server,
@@ -1501,13 +1506,7 @@ export class LoadedAppClass extends Component<
       }
       return;
     } else if (item === MenuItemEnum.ChangeWallet) {
-      if (this.state.readOnly) {
-        this.drawerNav?.navigate(RouteEnum.Ufvk, {
-          action: UfvkActionEnum.change,
-        });
-      } else {
-        this.drawerNav?.navigate(RouteEnum.WalletSeed, { action: 'change' });
-      }
+      this.drawerNav?.navigate(RouteEnum.WalletSeed, { action: 'change' });
       return;
     } else if (item === MenuItemEnum.Settings) {
       // Bio gate for settingsScreen lives at the Settings screen entry
@@ -1724,6 +1723,14 @@ export class LoadedAppClass extends Component<
     this.setState({ seedBackedUp: value, seedBackedUpAt: at });
   };
 
+  dismissViewOnlyNotice = async (): Promise<void> => {
+    await SettingsFileImpl.writeSettings(
+      SettingsNameEnum.viewOnlyNoticeDismissed,
+      true,
+    );
+    this.setState({ viewOnlyNoticeDismissed: true });
+  };
+
   setBiometricsOption = async (value: boolean): Promise<void> => {
     await SettingsFileImpl.writeSettings(SettingsNameEnum.biometrics, value);
     this.setState({ biometrics: value });
@@ -1823,6 +1830,10 @@ export class LoadedAppClass extends Component<
     // previous wallet's flag must not carry over.
     await SettingsFileImpl.writeSettings(SettingsNameEnum.seedBackedUp, true);
     await SettingsFileImpl.writeSettings(SettingsNameEnum.seedBackedUpAt, 0);
+    await SettingsFileImpl.writeSettings(
+      SettingsNameEnum.viewOnlyNoticeDismissed,
+      false,
+    );
     // Only mainnet wallets were ever backed up, so another network's server
     // could not open it: the restart picks the best mainnet server instead.
     const { server } = this.state;
@@ -2031,6 +2042,8 @@ export class LoadedAppClass extends Component<
       seedBackedUp: this.state.seedBackedUp,
       seedBackedUpAt: this.state.seedBackedUpAt,
       setSeedBackedUp: this.setSeedBackedUp,
+      viewOnlyNoticeDismissed: this.state.viewOnlyNoticeDismissed,
+      dismissViewOnlyNotice: this.dismissViewOnlyNotice,
 
       // context settings
       server: this.state.server,
@@ -2183,50 +2196,6 @@ export class LoadedAppClass extends Component<
                       name={RouteEnum.Insight}
                       component={Insight}
                     />
-                    <RootNavigator.Screen name={RouteEnum.Ufvk}>
-                      {props => {
-                        const action =
-                          !!props.route.params &&
-                          props.route.params.action !== undefined
-                            ? props.route.params.action
-                            : UfvkActionEnum.view;
-                        if (action === UfvkActionEnum.view) {
-                          return (
-                            <ShowUfvk
-                              {...props}
-                              onClickOK={() => {}}
-                              onClickCancel={() => {}}
-                            />
-                          );
-                        } else if (action === UfvkActionEnum.change) {
-                          return (
-                            <ShowUfvk
-                              {...props}
-                              onClickOK={async () =>
-                                await this.onClickOKChangeWallet({
-                                  startingApp: false,
-                                })
-                              }
-                              onClickCancel={() => {}}
-                            />
-                          );
-                        } else if (action === UfvkActionEnum.server) {
-                          return (
-                            <ShowUfvk
-                              {...props}
-                              onClickOK={async () =>
-                                await this.onClickOKServerWallet()
-                              }
-                              onClickCancel={async () => {
-                                // restart all the tasks again, nothing happen.
-                                await this.rpc.clearTimers();
-                                await this.rpc.configure();
-                              }}
-                            />
-                          );
-                        }
-                      }}
-                    </RootNavigator.Screen>
                     <RootNavigator.Screen
                       name={RouteEnum.SyncReport}
                       component={SyncReport}
@@ -2255,7 +2224,6 @@ export class LoadedAppClass extends Component<
                     />
                     <RootNavigator.Screen
                       name={RouteEnum.ViewingKey}
-                      component={ViewingKey}
                       // Draws its own entrance: a circle out of the
                       // snowflake, the view-only card growing, or a push.
                       options={{
@@ -2263,7 +2231,19 @@ export class LoadedAppClass extends Component<
                         animation: 'none',
                         gestureEnabled: false,
                       }}
-                    />
+                    >
+                      {props => (
+                        <ViewingKey
+                          {...props}
+                          onConfirm={this.onClickOKServerWallet}
+                          onCancel={async () => {
+                            // restart all the tasks again, nothing happen.
+                            await this.rpc.clearTimers();
+                            await this.rpc.configure();
+                          }}
+                        />
+                      )}
+                    </RootNavigator.Screen>
                     <RootNavigator.Screen
                       name={RouteEnum.WalletSeed}
                       options={{ animation: 'slide_from_right' }}

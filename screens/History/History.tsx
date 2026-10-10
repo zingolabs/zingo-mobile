@@ -131,6 +131,8 @@ const History: React.FunctionComponent<HistoryProps> = ({
     info,
     zecPrice,
     seedBackedUp,
+    viewOnlyNoticeDismissed,
+    dismissViewOnlyNotice,
   } = context;
   const { colors } = useTheme();
   const screenName = ScreenEnum.History;
@@ -196,11 +198,12 @@ const History: React.FunctionComponent<HistoryProps> = ({
   const showPrice = fiatQuote(zecPrice, server, info.chainName).kind !== 'none';
 
   const notices: Notice[] = [];
-  if (readOnly) {
+  if (readOnly && !viewOnlyNoticeDismissed) {
     notices.push({
       key: 'viewonly',
       node: (
         <ViewOnlyNotice
+          onDismiss={dismissViewOnlyNotice}
           onViewKey={from =>
             navigation.navigate(RouteEnum.ViewingKey, {
               entry: { kind: 'card', from },

@@ -5,7 +5,6 @@ import {
   LaunchingModeEnum,
   RouteEnum,
   SendPageStateClass,
-  UfvkActionEnum,
   ValueTransferType,
   ProposalPoolsType,
 } from '@app/AppState';
@@ -59,9 +58,8 @@ export type LoadedAppNavigationState = {
 // A card's rect in window coordinates.
 export type CardRect = { x: number; y: number; width: number; height: number };
 
-// How the backup flow opens: grown out of the History notice card, pushed
-// from Wallet Seed, or straight to the three-word check from Wallet Seed.
 export type WalletSeedAction = 'change' | 'server';
+
 // How the viewing key screen opens: a circle out of the header snowflake,
 // the view-only card growing, or pushed from the menu.
 export type ViewingKeyEntry =
@@ -69,6 +67,8 @@ export type ViewingKeyEntry =
   | { kind: 'card'; from: CardRect }
   | { kind: 'push' };
 
+// How the backup flow opens: grown out of the History notice card, pushed
+// from Wallet Seed, or straight to the three-word check from Wallet Seed.
 export type SeedBackupEntry =
   { kind: 'card'; from: CardRect } | { kind: 'push' } | { kind: 'verify' };
 
@@ -97,7 +97,9 @@ export type AppDrawerParamList = {
   // Absent for the plain view; set when the seed is shown before leaving
   // this wallet or its server.
   [RouteEnum.WalletSeed]: { action: WalletSeedAction } | undefined;
-  [RouteEnum.ViewingKey]: { entry: ViewingKeyEntry };
+  // `switchTo`: shown before a view-only wallet moves to a server on that
+  // network.
+  [RouteEnum.ViewingKey]: { entry: ViewingKeyEntry; switchTo?: ChainNameEnum };
   [RouteEnum.MigrationStrategy]: undefined;
   [RouteEnum.MigrationTransactions]: undefined;
   // The immediate drain broadcasts here; `transactions` is the previewed plan,
@@ -128,7 +130,6 @@ export type AppDrawerParamList = {
   [RouteEnum.ValueTransferDetail]:
     ValueTransferDetailNavigationState | undefined;
   [RouteEnum.Confirm]: ConfirmNavigationState | undefined;
-  [RouteEnum.Ufvk]: UfvkNavigationState | undefined;
 };
 
 export type AddressBookNavigationState = {
@@ -169,8 +170,4 @@ export type ConfirmNavigationState = {
     includeUAMemo: boolean,
   ) => Promise<void>;
   sendPageState: SendPageStateClass;
-};
-
-export type UfvkNavigationState = {
-  action: UfvkActionEnum;
 };

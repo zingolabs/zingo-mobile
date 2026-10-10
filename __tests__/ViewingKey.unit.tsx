@@ -5,7 +5,11 @@ import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
 } from '@app/context';
-import { RouteEnum } from '@app/AppState';
+import { ChainNameEnum, RouteEnum } from '@app/AppState';
+import {
+  ConfirmOptions,
+  registerConfirmListener,
+} from '@app/services/showConfirm';
 
 import ViewingKey from '@screens/ViewingKey';
 import ViewOnlyNotice from '@screens/History/components/ViewOnlyNotice';
@@ -31,7 +35,15 @@ const context = {
   biometrics: false,
 };
 
-const renderKey = () =>
+const onConfirm = jest.fn(async () => {});
+const onCancel = jest.fn(async () => {});
+
+afterEach(() => {
+  jest.clearAllMocks();
+  registerConfirmListener(null);
+});
+
+const renderKey = (switchTo?: ChainNameEnum) =>
   render(
     <ContextAppLoadedProvider value={context}>
       <ViewingKey
@@ -39,8 +51,10 @@ const renderKey = () =>
         route={{
           key: 'k',
           name: RouteEnum.ViewingKey,
-          params: { entry: { kind: 'push' } },
+          params: { entry: { kind: 'push' }, switchTo },
         }}
+        onConfirm={onConfirm}
+        onCancel={onCancel}
       />
     </ContextAppLoadedProvider>,
   );
@@ -68,13 +82,43 @@ test('Tests that Copy takes the whole key while it is still hidden.', async () =
   expect(copySensitive).toHaveBeenCalledWith(UFVK, expect.any(Function));
 });
 
-test('Tests that the view-only card offers the viewing key.', () => {
-  const onViewKey = jest.fn();
+test('Tests that the view-only card offers the viewing key and closes with its X.', () => {
+  const onDismiss = jest.fn();
   render(
     <ContextAppLoadedProvider value={context}>
-      <ViewOnlyNotice onViewKey={onViewKey} />
+      <ViewOnlyNotice onViewKey={jest.fn()} onDismiss={onDismiss} />
     </ContextAppLoadedProvider>,
   );
   expect(screen.getByText('viewonly.title')).toBeTruthy();
   expect(screen.getByText('viewonly.button')).toBeTruthy();
+  fireEvent.press(screen.getByTestId('viewonly.dismiss'));
+  expect(onDismiss).toHaveBeenCalledTimes(1);
+});
+
+test('Tests that Switch moves the wallet to the other network only after the confirm.', async () => {
+  const confirms: ConfirmOptions[] = [];
+  registerConfirmListener(options => confirms.push(options));
+  renderKey(ChainNameEnum.testChainName);
+  await act(async () => {});
+  expect(screen.getByText('viewingkey.switch-title')).toBeTruthy();
+  expect(screen.getByText('viewingkey.switch')).toBeTruthy();
+
+  fireEvent.press(screen.getByTestId('viewingkey.done'));
+  expect(confirms[0].message).toBe('viewingkey.switch-warning');
+  expect(onConfirm).not.toHaveBeenCalled();
+  await act(async () => {
+    await confirms[0].buttons[0].onPress?.();
+  });
+  expect(onConfirm).toHaveBeenCalledTimes(1);
+  expect(onCancel).not.toHaveBeenCalled();
+});
+
+test('Tests that the X leaves the network change without moving the wallet.', async () => {
+  renderKey(ChainNameEnum.testChainName);
+  await act(async () => {});
+  await act(async () => {
+    fireEvent.press(screen.getByTestId('viewingkey.close'));
+  });
+  expect(onCancel).toHaveBeenCalledTimes(1);
+  expect(onConfirm).not.toHaveBeenCalled();
 });

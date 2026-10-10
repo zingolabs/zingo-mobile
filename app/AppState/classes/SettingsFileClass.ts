@@ -22,6 +22,8 @@ export default class SettingsFileClass {
   seedBackedUp: boolean;
   // ms since epoch of the last confirmed backup; 0 for a restored wallet
   seedBackedUpAt: number;
+  // The user closed the view-only notice of this wallet.
+  viewOnlyNoticeDismissed: boolean = false;
 
   constructor(
     server: ServerType,

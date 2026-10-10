@@ -6,7 +6,7 @@ const meta: Meta<typeof ViewOnlyNotice> = {
   title: 'History/ViewOnlyNotice',
   component: ViewOnlyNotice,
   decorators: [withAppContext()],
-  args: { onViewKey: () => {} },
+  args: { onViewKey: () => {}, onDismiss: () => {} },
 };
 
 export default meta;

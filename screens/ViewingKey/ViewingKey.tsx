@@ -28,6 +28,7 @@ import {
   resolveTriggerGate,
 } from '@app/services/gateController';
 import { getRecoveryWalletInfo } from '@app/services/recoveryWalletInfo';
+import { showConfirm } from '@app/services/showConfirm';
 import { fetchWallet } from '@app/walletBackend';
 import { copySensitive } from '@app/utils/sensitiveClipboard';
 import { XIcon } from '@ui/primitives/Icons/XIcon';
@@ -38,23 +39,22 @@ import CircularReveal from '@ui/widgets/CircularReveal';
 import CardExpand from '@ui/widgets/CardExpand';
 import { CopyShowButtons } from '@screens/SeedBackup/components/SeedParts';
 import { SIDE } from '@screens/SeedBackup/components/StepParts';
-import KeyQr from './components/KeyQr';
+import KeyCard from './components/KeyCard';
 
 type ViewingKeyProps = NativeStackScreenProps<
   AppDrawerParamList,
   RouteEnum.ViewingKey
->;
+> & {
+  // Moves the wallet to the chosen server on another network.
+  onConfirm: () => Promise<void>;
+  // Runs when the user backs out of that move.
+  onCancel: () => Promise<void>;
+};
 
 const QR = 196;
-const HEAD = 12;
-const TAIL = 8;
 const TILE_BG = '#0A1B33';
 const PUSH_IN_MS = 380;
 const PUSH_OUT_MS = 320;
-
-const masked = (key: string) => `${key.slice(0, 6)}••••••…••••••••`;
-const truncated = (key: string) =>
-  key.length > HEAD + TAIL ? `${key.slice(0, HEAD)}…${key.slice(-TAIL)}` : key;
 
 // Moves the screen in from the right and back out, for the menu entry.
 const Slide: React.FunctionComponent<{
@@ -96,16 +96,23 @@ const Slide: React.FunctionComponent<{
   );
 };
 
-// The wallet's viewing key: a QR and its ends, hidden until Show.
+// The wallet's viewing key: a QR and its ends, hidden until Show. With
+// `switchTo`, the last look at it before the wallet moves to a server on
+// that network.
 const ViewingKey: React.FunctionComponent<ViewingKeyProps> = ({
   navigation,
   route,
+  onConfirm,
+  onCancel,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, biometrics, addLastSnackbar } = context;
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
-  const entry = route.params.entry;
+  const { entry, switchTo } = route.params;
+  const net = switchTo
+    ? (translate(`settings.value-chainname-${switchTo}`) as string)
+    : '';
 
   const [open, setOpen] = useState(true);
   const [key, setKey] = useState('');
@@ -119,16 +126,37 @@ const ViewingKey: React.FunctionComponent<ViewingKeyProps> = ({
     })();
   }, []);
 
-  const close = () => setOpen(false);
   const gone = useCallback(() => navigation.goBack(), [navigation]);
+  const close = useCallback(async () => {
+    if (switchTo) {
+      await onCancel();
+    }
+    setOpen(false);
+  }, [switchTo, onCancel]);
 
   useEffect(() => {
     const sub = BackHandler.addEventListener('hardwareBackPress', () => {
-      setOpen(false);
+      close();
       return true;
     });
     return () => sub.remove();
-  }, []);
+  }, [close]);
+
+  const confirmSwitch = () =>
+    showConfirm({
+      title: translate('walletseed.confirm-title') as string,
+      message: translate('viewingkey.switch-warning') as string,
+      buttons: [
+        {
+          text: translate('confirm') as string,
+          onPress: async () => {
+            await onConfirm();
+            setOpen(false);
+          },
+        },
+        { text: translate('cancel') as string, style: 'cancel' },
+      ],
+    });
 
   // The key starts hidden; showing or copying it passes the device gate once.
   const unlock = async (): Promise<boolean> => {
@@ -203,7 +231,12 @@ const ViewingKey: React.FunctionComponent<ViewingKeyProps> = ({
           marginHorizontal: 60,
         }}
       >
-        {translate('viewingkey.title') as string}
+        {switchTo
+          ? (translate('viewingkey.switch-title') as string).replace(
+              '{net}',
+              net,
+            )
+          : (translate('viewingkey.title') as string)}
       </Text>
       <Text
         style={{
@@ -215,45 +248,13 @@ const ViewingKey: React.FunctionComponent<ViewingKeyProps> = ({
           marginHorizontal: SIDE,
         }}
       >
-        {translate('viewingkey.sub') as string}
+        {switchTo
+          ? (translate('viewingkey.switch-sub') as string).replace('{net}', net)
+          : (translate('viewingkey.sub') as string)}
       </Text>
 
-      <View
-        style={{
-          alignItems: 'center',
-          marginTop: 22,
-          marginHorizontal: SIDE,
-          paddingVertical: 18,
-          borderRadius: 16,
-          borderWidth: 1,
-          borderColor: colors.bottomSheetBorder,
-          backgroundColor: colors.bgSurface,
-        }}
-      >
-        {!!key && <KeyQr value={key} size={QR} hidden={hidden} />}
-        <Text
-          style={{
-            color: colors.fgMuted,
-            fontSize: 12,
-            fontWeight: '700',
-            letterSpacing: 0.6,
-            marginTop: 14,
-          }}
-        >
-          {translate('viewingkey.label') as string}
-        </Text>
-        <Text
-          testID="viewingkey.key"
-          selectable={false}
-          style={{
-            color: colors.fgDefault,
-            fontSize: 14,
-            fontWeight: '700',
-            marginTop: 4,
-          }}
-        >
-          {key ? (hidden ? masked(key) : truncated(key)) : ''}
-        </Text>
+      <View style={{ marginTop: 22 }}>
+        <KeyCard testID="viewingkey" value={key} hidden={hidden} qrSize={QR} />
       </View>
 
       <View style={{ marginTop: 14 }}>
@@ -300,7 +301,8 @@ const ViewingKey: React.FunctionComponent<ViewingKeyProps> = ({
       <Pressable
         testID="viewingkey.done"
         accessibilityRole="button"
-        onPress={close}
+        disabled={!!switchTo && !key}
+        onPress={switchTo ? confirmSwitch : close}
         style={({ pressed }) => ({
           position: 'absolute',
           left: 52,
@@ -317,7 +319,11 @@ const ViewingKey: React.FunctionComponent<ViewingKeyProps> = ({
         <Text
           style={{ color: colors.bgCanvas, fontSize: 15, fontWeight: '700' }}
         >
-          {translate('seedbackup.done') as string}
+          {
+            translate(
+              switchTo ? 'viewingkey.switch' : 'seedbackup.done',
+            ) as string
+          }
         </Text>
       </Pressable>
     </View>

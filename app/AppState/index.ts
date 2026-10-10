@@ -37,7 +37,6 @@ import { TransactionTypeEnum } from './enums/TransactionTypeEnum';
 import { PoolEnum } from './enums/PoolEnum';
 import { RestoreFromTypeEnum } from './enums/RestoreFromTypeEnum';
 import { PoolToShieldEnum } from './enums/PoolToShieldEnum';
-import { UfvkActionEnum } from './enums/UfvkActionEnum';
 import { SettingsNameEnum } from './enums/SettingsNameEnum';
 import { RouteEnum } from './enums/RouteEnum';
 import { AppStateStatusEnum } from './enums/AppStateStatusEnum';
@@ -93,7 +92,6 @@ export {
   PoolEnum,
   RestoreFromTypeEnum,
   PoolToShieldEnum,
-  UfvkActionEnum,
   SettingsNameEnum,
   RouteEnum,
   AppStateStatusEnum,

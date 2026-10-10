@@ -26,6 +26,5 @@ export enum ScreenEnum {
   Seed = 'Seed',
   Rescan = 'Rescan',
   Insight = 'Insight',
-  ShowUfvk = 'ShowUfvk',
   Memo = 'Memo',
 }

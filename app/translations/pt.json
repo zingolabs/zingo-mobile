@@ -777,34 +777,6 @@
     "text": "Faça o Scan de uma Chave de Visualização Unificada completa",
     "scanaddress": "Escaneie um Endereço Zcash"
   },
-  "ufvk": {
-    "buttontexts": {
-      "view": ["Eu salvei a \n chave de visualização"],
-      "change": [
-        "",
-        "Abrir Nova Carteira",
-        "Você realmente quer\n alterar para a sua \n carteira atual",
-        "Tem certeza?"
-      ],
-      "server": [
-        "",
-        "Alterar Servidor",
-        "Você realmente quer \n alterar para o seu \n servidor atual",
-        "Tem certeza?"
-      ]
-    },
-    "viewkey": "Chave de Visualização ",
-    "tapcopy-message": "Chave Copiada para a Área de Transferência",
-    "text-readonly": "Antes de fechar esta tela, anote cuidadosamente esta chave de visualização. É a única maneira de restaurar/acessar sua carteira atual.",
-    "text-readonly-change": "Antes de acessar outra carteira, anote cuidadosamente esta chave de visualização. É a única maneira de restaurar/acessar sua carteira atual.",
-    "text-readonly-server": "Antes de alterar outro servidor, anote cuidadosamente esta chave de visualização. É a única maneira de restaurar/acessar sua carteira atual.",
-    "change-warning": "Se você mudar para outra carteira, não terá mais acesso a esta carteira sem as frases de recuperação.",
-    "server-warning": "Se você mudar para um servidor com uma rede diferente, não terá mais acesso a esta carteira sem as frases de recuperação.",
-    "recovering-from-keychain": "Recuperando a chave de visualização do armazenamento seguro...",
-    "recovering-from-wallet": "Carregando a chave de visualização da carteira...",
-    "from-keychain": "do armazenamento seguro",
-    "from-wallet": "da carteira"
-  },
   "pools": {
     "title": "Fundos nas Pools",
     "ironwood-title": "IRONWOOD (UA)",
@@ -1124,6 +1096,8 @@
     "birthday-tip-body": "O Zingo começa a escanear a partir daqui em vez do início, então sincroniza muito mais rápido."
   },
   "walletseed": {
+    "sub-change-vo": "Antes de acessar outra carteira, guarde com cuidado a chave de visualização e o aniversário desta carteira. Você vai precisar deles para voltar a ela.",
+    "change-warning-vo": "Se você mudar para outra carteira, não terá mais acesso a esta carteira sem a chave de visualização.",
     "back-acc": "Voltar",
     "ok-title": "Com backup",
     "ok-sub": "{date} · 3 palavras confirmadas",
@@ -1144,6 +1118,10 @@
     "confirm-title": "Tem certeza?"
   },
   "viewingkey": {
+    "switch-title": "Mudar para {net}",
+    "switch-sub": "Antes de mudar para {net}, guarde com cuidado a chave de visualização desta carteira. Você vai precisar dela para voltar a ela.",
+    "switch": "Mudar",
+    "switch-warning": "Se você mudar para um servidor de outra rede, não terá mais acesso a esta carteira sem a chave de visualização.",
     "title": "Sua chave de visualização",
     "sub": "Qualquer pessoa com esta chave pode ver o saldo e o histórico desta carteira. Ela não pode gastar fundos.",
     "label": "Chave de visualização unificada",
@@ -1152,6 +1130,7 @@
     "share": "Compartilhe só com pessoas de confiança. Elas verão toda a sua atividade"
   },
   "viewonly": {
+    "dismiss-acc": "Fechar o aviso de somente leitura",
     "title": "Carteira somente leitura",
     "body": "Você pode ver o saldo e o histórico e receber fundos. Não é possível gastar com uma chave de visualização.",
     "button": "Ver chave"

@@ -775,34 +775,6 @@
     "text": "Birleştirilmiş Tam Görüntüleme Anahtarını Tara",
     "scanaddress": "Bir Zcash Adresini Tara"
   },
-  "ufvk": {
-    "buttontexts": {
-      "view": ["Görüntüleme anahtarını\nKaydettim"],
-      "change": [
-        "",
-        "Yeni aç",
-        "Gerçek cüzdanınızı\nDeğiştirmek istiyor musunuz?",
-        "Emin misiniz?"
-      ],
-      "server": [
-        "",
-        "Sunucuyu değiştir",
-        "Gerçek cüzdanınızı\nDeğiştirmek istiyor musunuz?",
-        "Emin misiniz?"
-      ]
-    },
-    "viewkey": "Görüntüleme Anahtarı",
-    "tapcopy-message": "Anahtar panoya kopyalandı",
-    "text-readonly": "Bu ekranı kapatmadan önce, bu görüntüleme anahtarını dikkatlice not alın. Mevcut cüzdanınızı geri yüklemenin veya erişmenin tek yolu budur.",
-    "text-readonly-change": "Başka bir cüzdana erişmeden önce, bu görüntüleme anahtarını dikkatlice not alın. Mevcut cüzdanınıza erişmenin veya onu geri yüklemenin tek yolu budur.",
-    "text-readonly-server": "Başka bir sunucuyu değiştirmeden önce, bu görüntüleme anahtarını dikkatlice not alın. Mevcut cüzdanınıza erişmenin veya onu geri yüklemenin tek yolu budur.",
-    "change-warning": "Başka bir cüzdana geçerseniz, bu cüzdana bir daha erişemezsiniz tohum ifadesi elinizde yoksa.",
-    "server-warning": "Farklı bir blok zincirine sahip bir sunucuya geçerseniz, tohum ifadesi olmadan bu cüzdana artık erişemezsiniz.",
-    "recovering-from-keychain": "Güvenli depolamadan görüntüleme anahtarı kurtarılıyor...",
-    "recovering-from-wallet": "Cüzdandan görüntüleme anahtarı yükleniyor...",
-    "from-keychain": "güvenli depolamadan",
-    "from-wallet": "cüzdandan"
-  },
   "pools": {
     "title": "Fon Havuzları",
     "ironwood-title": "IRONWOOD (UA)",
@@ -1122,6 +1094,8 @@
     "birthday-tip-body": "Zingo taramaya baştan değil buradan başlar, bu yüzden çok daha hızlı senkronize olur."
   },
   "walletseed": {
+    "sub-change-vo": "Başka bir cüzdana geçmeden önce bu cüzdanın görüntüleme anahtarını ve doğum gününü dikkatlice kaydedin. Ona geri dönmek için bunlara ihtiyacınız olacak.",
+    "change-warning-vo": "Başka bir cüzdana geçerseniz, görüntüleme anahtarı olmadan bu cüzdana artık erişemezsiniz.",
     "back-acc": "Geri",
     "ok-title": "Yedeklendi",
     "ok-sub": "{date} · 3 kelime onaylandı",
@@ -1142,6 +1116,10 @@
     "confirm-title": "Emin misiniz?"
   },
   "viewingkey": {
+    "switch-title": "{net} ağına geç",
+    "switch-sub": "{net} ağına geçmeden önce bu cüzdanın görüntüleme anahtarını dikkatlice kaydedin. Ona geri dönmek için buna ihtiyacınız olacak.",
+    "switch": "Geç",
+    "switch-warning": "Başka bir ağdaki sunucuya geçerseniz, görüntüleme anahtarı olmadan bu cüzdana artık erişemezsiniz.",
     "title": "Görüntüleme anahtarınız",
     "sub": "Bu anahtara sahip olan herkes bu cüzdanın bakiyesini ve geçmişini görebilir. Fon harcayamaz.",
     "label": "Birleşik görüntüleme anahtarı",
@@ -1150,6 +1128,7 @@
     "share": "Yalnızca güvendiğiniz kişilerle paylaşın. Tüm hareketlerinizi görürler"
   },
   "viewonly": {
+    "dismiss-acc": "Salt görüntüleme bildirimini kapat",
     "title": "Salt görüntüleme cüzdanı",
     "body": "Bakiyeyi ve geçmişi görebilir, fon alabilirsiniz. Görüntüleme anahtarıyla harcama yapılamaz.",
     "button": "Anahtarı gör"

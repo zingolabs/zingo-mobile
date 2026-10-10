@@ -39,6 +39,7 @@ import {
 } from '@screens/SeedBackup/components/SeedParts';
 import { SIDE, StepActions } from '@screens/SeedBackup/components/StepParts';
 import ScreenshotSheet from '@screens/SeedBackup/components/ScreenshotSheet';
+import KeyCard from '@screens/ViewingKey/components/KeyCard';
 
 type WalletSeedProps = NativeStackScreenProps<
   AppDrawerParamList,
@@ -56,6 +57,7 @@ const PUSH_IN_MS = 380;
 const PUSH_OUT_MS = 320;
 const VK_HEAD = 10;
 const VK_TAIL = 6;
+const KEY_QR = 190;
 
 const STRIP = {
   ok: { border: '#0E4A12', bg: '#04160B', tile: '#052520' },
@@ -74,8 +76,13 @@ const WARNING: Record<WalletSeedAction, string> = {
   server: 'seed.server-warning',
 };
 
+// A view-only wallet only gets here through Switch Wallet: its server
+// change shows the viewing key screen instead.
+const WARNING_VIEW_ONLY = 'walletseed.change-warning-vo';
+
 // The seed phrase with its backup status, birthday and viewing key. With an
 // action, the last look at them before leaving this wallet or its server.
+// A view-only wallet shows its viewing key in place of the words.
 const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
   navigation,
   route,
@@ -92,6 +99,7 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
     seedBackedUpAt,
     language,
     birthday: walletBirthday,
+    readOnly,
   } = context;
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
@@ -121,12 +129,18 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
     }
     (async () => {
       const stored = await getRecoveryWalletInfo();
+      if (readOnly) {
+        const viewOnly = stored.ufvk ? stored : await fetchWallet(true);
+        setBirthday(viewOnly?.birthday || walletBirthday);
+        setVk(viewOnly?.ufvk || '');
+        return;
+      }
       const wallet = stored.seed ? stored : await fetchWallet(false);
       setWords((wallet?.seed || '').split(' ').filter(w => !!w));
       setBirthday(wallet?.birthday || walletBirthday);
       setVk((await fetchWallet(true))?.ufvk || '');
     })();
-  }, [passed, walletBirthday]);
+  }, [passed, walletBirthday, readOnly]);
 
   useEffect(() => {
     if (focused) {
@@ -167,7 +181,7 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
 
   const copyWords = () => {
     copySensitive(
-      `${words.join(' ')}\n${translate('seedbackup.birthday') as string}: ${birthday}`,
+      `${readOnly ? vk : words.join(' ')}\n${translate('seedbackup.birthday') as string}: ${birthday}`,
       () =>
         addLastSnackbar(
           translate('seed.clipboard-cleared') as string,
@@ -196,7 +210,7 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
   const confirm = (to: WalletSeedAction) =>
     showConfirm({
       title: translate('walletseed.confirm-title') as string,
-      message: translate(WARNING[to]) as string,
+      message: translate(readOnly ? WARNING_VIEW_ONLY : WARNING[to]) as string,
       buttons: [
         {
           text: translate('confirm') as string,
@@ -225,6 +239,8 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
       )
     : (translate('walletseed.ok-restored') as string);
   const strip = seedBackedUp ? STRIP.ok : STRIP.no;
+  const ready = readOnly ? !!vk : words.length > 0;
+  const veiled = hidden || shot !== 'none' || captured;
   const vkShort =
     vk.length > VK_HEAD + VK_TAIL
       ? `${vk.slice(0, VK_HEAD)}…${vk.slice(-VK_TAIL)}`
@@ -291,7 +307,11 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
               lineHeight: 20,
             }}
           >
-            {translate(`walletseed.sub-${action}`) as string}
+            {
+              translate(
+                `walletseed.sub-${action}${readOnly ? '-vo' : ''}`,
+              ) as string
+            }
           </Text>
         )}
         {!action && (
@@ -382,11 +402,16 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
           </View>
         )}
 
-        <WordGrid
-          testID="walletseed.words"
-          words={words}
-          veiled={hidden || shot !== 'none' || captured}
-        />
+        {readOnly ? (
+          <KeyCard
+            testID="walletseed.vkcard"
+            value={vk}
+            hidden={veiled}
+            qrSize={KEY_QR}
+          />
+        ) : (
+          <WordGrid testID="walletseed.words" words={words} veiled={veiled} />
+        )}
         <View style={{ marginTop: 12, zIndex: tip === 'birthday' ? 3 : 2 }}>
           <InfoRow
             testID="walletseed.birthday"
@@ -398,39 +423,41 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
             value={birthday.toLocaleString()}
           />
         </View>
-        <View style={{ marginTop: 8, zIndex: tip === 'vk' ? 3 : 1 }}>
-          <InfoRow
-            testID="walletseed.vk"
-            label={translate('walletseed.vk') as string}
-            tipTitle={translate('walletseed.vk-tip-title') as string}
-            tipBody={translate('walletseed.vk-tip-body') as string}
-            open={tip === 'vk'}
-            onToggle={toggle('vk')}
-            value={vkShort}
-            trailing={
-              <Pressable
-                testID="walletseed.vk-copy"
-                accessibilityRole="button"
-                accessibilityLabel={translate('walletseed.vk-copy') as string}
-                onPress={copyVk}
-                style={({ pressed }) => ({
-                  width: 26,
-                  height: 26,
-                  marginLeft: 6,
-                  marginRight: -6,
-                  borderRadius: 8,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  backgroundColor: pressed
-                    ? 'rgba(211,226,248,0.08)'
-                    : undefined,
-                })}
-              >
-                <CopyIcon size={15} color={colors.fgDefault} />
-              </Pressable>
-            }
-          />
-        </View>
+        {!readOnly && (
+          <View style={{ marginTop: 8, zIndex: tip === 'vk' ? 3 : 1 }}>
+            <InfoRow
+              testID="walletseed.vk"
+              label={translate('walletseed.vk') as string}
+              tipTitle={translate('walletseed.vk-tip-title') as string}
+              tipBody={translate('walletseed.vk-tip-body') as string}
+              open={tip === 'vk'}
+              onToggle={toggle('vk')}
+              value={vkShort}
+              trailing={
+                <Pressable
+                  testID="walletseed.vk-copy"
+                  accessibilityRole="button"
+                  accessibilityLabel={translate('walletseed.vk-copy') as string}
+                  onPress={copyVk}
+                  style={({ pressed }) => ({
+                    width: 26,
+                    height: 26,
+                    marginLeft: 6,
+                    marginRight: -6,
+                    borderRadius: 8,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: pressed
+                      ? 'rgba(211,226,248,0.08)'
+                      : undefined,
+                  })}
+                >
+                  <CopyIcon size={15} color={colors.fgDefault} />
+                </Pressable>
+              }
+            />
+          </View>
+        )}
         <View style={{ marginTop: 12 }}>
           <CopyShowButtons
             testID="walletseed"
@@ -452,7 +479,7 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
             <Pressable
               testID="walletseed.go"
               accessibilityRole="button"
-              disabled={words.length === 0}
+              disabled={!ready}
               onPress={() => confirm(action)}
               style={({ pressed }) => ({
                 height: 44,
@@ -460,10 +487,9 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
                 borderRadius: 22,
                 alignItems: 'center',
                 justifyContent: 'center',
-                backgroundColor:
-                  words.length === 0
-                    ? colors.bgAccentDisabled
-                    : colors.bgAccent,
+                backgroundColor: ready
+                  ? colors.bgAccent
+                  : colors.bgAccentDisabled,
                 transform: [{ scale: pressed ? 0.97 : 1 }],
               })}
             >
