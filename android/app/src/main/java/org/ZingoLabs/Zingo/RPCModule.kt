@@ -513,7 +513,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         uniffi.zingo.SyncSettings(performanceLevel = performancelevel, minConfirmations = minconfirmations.toUInt())
 
     private fun connection(serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String) =
-        uniffi.zingo.Connection(serverUri = serveruri, chainHint = chainhint, sync = syncSettings(performancelevel, minconfirmations))
+        uniffi.zingo.IndexerConnection(serverUri = serveruri, chainHint = chainhint, sync = syncSettings(performancelevel, minconfirmations))
 
     @ReactMethod
     fun createNewWallet(serveruri: String, birthday: String, chainhint: String, performancelevel: String, minconfirmations: String, promise: Promise) {
@@ -671,7 +671,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun getLatestBlockServerInfo(serveruri: String, promise: Promise) {
         FfiOutcome.settling(promise, "get_latest_block_server") {
             uniffi.zingo.initLogging()
-            uniffi.zingo.getLatestBlockServer(serverUri = serveruri)
+            uniffi.zingo.getLatestBlockServer(serveruri = serveruri)
         }
     }
 
@@ -790,7 +790,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun changeServerProcess(serveruri: String, promise: Promise) {
         FfiOutcome.settling(promise, "change_server") {
             uniffi.zingo.initLogging()
-            uniffi.zingo.changeServer(serverUri = serveruri)
+            uniffi.zingo.changeServer(serveruri = serveruri)
         }
     }
 

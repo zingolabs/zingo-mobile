@@ -460,8 +460,8 @@ class RPCModule: NSObject {
     chainhint: String,
     performancelevel: String,
     minconfirmations: String
-  ) -> Connection {
-    Connection(
+  ) -> IndexerConnection {
+    IndexerConnection(
       serverUri: serveruri,
       chainHint: chainhint,
       sync: syncSettings(performancelevel: performancelevel, minconfirmations: minconfirmations))
@@ -759,7 +759,7 @@ class RPCModule: NSObject {
   func getLatestBlockServerInfo(_ serveruri: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
       DispatchQueue.global(qos: .userInitiated).async {
         FfiOutcome.of {
-          try getLatestBlockServer(serverUri: serveruri)
+          try getLatestBlockServer(serveruri: serveruri)
         }.settle(resolve: resolve, reject: reject)
       }
   }
@@ -948,7 +948,7 @@ class RPCModule: NSObject {
   func changeServerProcess(_ serveruri: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
       DispatchQueue.global(qos: .userInitiated).async {
         FfiOutcome.of {
-          try changeServer(serverUri: serveruri)
+          try changeServer(serveruri: serveruri)
         }.settle(resolve: resolve, reject: reject)
       }
   }
