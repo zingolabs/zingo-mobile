@@ -69,10 +69,57 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
             {
               "alignItems": "center",
               "flexDirection": "row",
-              "gap": 14,
+              "gap": 6,
             }
           }
-        />
+        >
+          <View
+            accessibilityLabel=""
+            accessibilityRole="button"
+            accessibilityState={
+              {
+                "busy": undefined,
+                "checked": undefined,
+                "disabled": undefined,
+                "expanded": undefined,
+                "selected": undefined,
+              }
+            }
+            accessibilityValue={
+              {
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
+              }
+            }
+            accessible={true}
+            collapsable={false}
+            focusable={true}
+            onBlur={[Function]}
+            onClick={[Function]}
+            onFocus={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              {
+                "alignItems": "center",
+                "backgroundColor": "transparent",
+                "borderRadius": 9,
+                "height": 34,
+                "justifyContent": "center",
+                "marginRight": -6,
+                "marginVertical": -9,
+                "width": 34,
+              }
+            }
+            testID="import.scan"
+          />
+        </View>
       </View>
       <View>
         <View
@@ -86,7 +133,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
                 "minHeight": 135,
                 "paddingBottom": 32,
                 "paddingLeft": 12,
-                "paddingRight": 42,
+                "paddingRight": 12,
                 "paddingTop": 14,
               },
               {},
@@ -111,61 +158,6 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
               ]
             }
           />
-          <View
-            style={
-              {
-                "position": "absolute",
-                "right": 6,
-                "top": 6,
-                "zIndex": 2,
-              }
-            }
-          >
-            <View
-              accessibilityLabel=""
-              accessibilityRole="button"
-              accessibilityState={
-                {
-                  "busy": undefined,
-                  "checked": undefined,
-                  "disabled": undefined,
-                  "expanded": undefined,
-                  "selected": undefined,
-                }
-              }
-              accessibilityValue={
-                {
-                  "max": undefined,
-                  "min": undefined,
-                  "now": undefined,
-                  "text": undefined,
-                }
-              }
-              accessible={true}
-              collapsable={false}
-              focusable={true}
-              onBlur={[Function]}
-              onClick={[Function]}
-              onFocus={[Function]}
-              onResponderGrant={[Function]}
-              onResponderMove={[Function]}
-              onResponderRelease={[Function]}
-              onResponderTerminate={[Function]}
-              onResponderTerminationRequest={[Function]}
-              onStartShouldSetResponder={[Function]}
-              style={
-                {
-                  "alignItems": "center",
-                  "backgroundColor": "transparent",
-                  "borderRadius": 9,
-                  "height": 34,
-                  "justifyContent": "center",
-                  "width": 34,
-                }
-              }
-              testID="import.scan"
-            />
-          </View>
           <View
             accessibilityState={
               {

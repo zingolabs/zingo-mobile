@@ -295,7 +295,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
           <BoldText style={{ fontSize: 12.5, lineHeight: 16 }}>
             {translate('import.seed-label') as string}
           </BoldText>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
             {!!seedufvkText && (
               <TouchableOpacity onPress={() => setSeedufvkText('')} hitSlop={8}>
                 <FontAwesomeIcon
@@ -305,6 +305,27 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
                 />
               </TouchableOpacity>
             )}
+            <Pressable
+              ref={scanButton}
+              testID="import.scan"
+              accessibilityRole="button"
+              accessibilityLabel={translate('import.scan-title') as string}
+              onPress={openScanner}
+              style={({ pressed }) => ({
+                width: 34,
+                height: 34,
+                marginVertical: -9,
+                marginRight: -6,
+                borderRadius: 9,
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: pressed
+                  ? 'rgba(211,226,248,0.08)'
+                  : 'transparent',
+              })}
+            >
+              <ScanIcon size={22} color={colors.fgMuted} />
+            </Pressable>
           </View>
         </View>
         <SeedPhraseInput
@@ -315,27 +336,6 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
           translate={translate}
           keyError={keyError}
           pulse={pulse}
-          accessory={
-            <Pressable
-              ref={scanButton}
-              testID="import.scan"
-              accessibilityRole="button"
-              accessibilityLabel={translate('import.scan-title') as string}
-              onPress={openScanner}
-              style={({ pressed }) => ({
-                width: 34,
-                height: 34,
-                borderRadius: 9,
-                alignItems: 'center',
-                justifyContent: 'center',
-                backgroundColor: pressed
-                  ? 'rgba(67,166,55,0.14)'
-                  : 'transparent',
-              })}
-            >
-              <ScanIcon size={20} color={colors.fgAccent} />
-            </Pressable>
-          }
         />
 
         <View style={{ marginTop: 39, alignItems: 'center' }}>

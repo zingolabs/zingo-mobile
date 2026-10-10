@@ -47,8 +47,6 @@ type SeedPhraseInputProps = {
   accessibilityLabel?: string;
   // Why the viewing key in the field cannot be used, already translated.
   keyError?: string;
-  // Sits in the field's top-right corner, like the scan button.
-  accessory?: React.ReactNode;
   // Bumps to flash the border green once, as a scanned key lands.
   pulse?: number;
 };
@@ -89,7 +87,6 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
   testID,
   accessibilityLabel,
   keyError,
-  accessory,
   pulse,
 }) => {
   const { colors } = useTheme();
@@ -346,7 +343,7 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
             backgroundColor: colors.bgSurface,
             paddingTop: 14,
             paddingLeft: 12,
-            paddingRight: accessory ? 42 : 12,
+            paddingRight: 12,
             paddingBottom: 32,
             minHeight: 135,
           },
@@ -369,11 +366,6 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
             pulseStyle,
           ]}
         />
-        {!!accessory && (
-          <View style={{ position: 'absolute', top: 6, right: 6, zIndex: 2 }}>
-            {accessory}
-          </View>
-        )}
         <Pressable
           accessible={false}
           onPress={() => inputRef.current?.focus()}
