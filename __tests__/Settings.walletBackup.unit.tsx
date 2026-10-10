@@ -46,6 +46,7 @@ const onRestoreWalletBackup = jest.fn(async () => {});
 const renderSettings = async (
   server: ServerType = mockServer,
   walletChainName: ChainNameEnum = ChainNameEnum.mainChainName,
+  readOnly = false,
 ) => {
   const props: any = {
     navigation: mockNavigation,
@@ -60,6 +61,7 @@ const renderSettings = async (
         totalBalance: mockTotalBalance,
         server,
         walletChainName,
+        readOnly,
         selectServer: SelectServerEnum.auto,
       }}
     >
@@ -116,4 +118,19 @@ test('Tests that restoring over a wallet of another network warns it is lost and
   expect(confirms[0].buttons[0].text).toBe('settings.restorebackup-switch');
   confirms[0].buttons[0].onPress?.();
   expect(onRestoreWalletBackup).toHaveBeenCalledTimes(1);
+});
+
+test('Tests that restoring over a view-only wallet of another network names its viewing key.', async () => {
+  nativeRpc.walletBackupExists.mockResolvedValue('true');
+  const confirms: ConfirmOptions[] = [];
+  registerConfirmListener(options => confirms.push(options));
+  await renderSettings(
+    remoteServer('https://testnet.example:9067', ChainNameEnum.testChainName),
+    ChainNameEnum.testChainName,
+    true,
+  );
+
+  fireEvent.press(await screen.findByTestId('settings.restorebackupwallet'));
+
+  expect(confirms[0].message).toBe('settings.restorebackup-replace-vo');
 });

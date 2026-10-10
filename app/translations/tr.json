@@ -203,7 +203,8 @@
     "deletewallet-error": "Error: Mevcut cüzdan silinemedi."
   },
   "settings": {
-    "restorebackup-replace": "Yedek bir Mainnet cüzdanıdır ve yalnızca Mainnet cüzdanları yedeklenir. Onu açmak bu {net} cüzdanını telefondan siler: kurtarma ifadesi veya görüntüleme anahtarı yoksa ona erişiminizi kaybedersiniz. Zingo bir Mainnet sunucusuna geçer ve yedek boşalır.",
+    "restorebackup-replace": "Yedek bir Mainnet cüzdanıdır ve yalnızca Mainnet cüzdanları yedeklenir. Onu açmak bu {net} cüzdanını telefondan siler: kurtarma ifadesi yoksa ona erişiminizi kaybedersiniz. Zingo bir Mainnet sunucusuna geçer ve yedek boşalır.",
+    "restorebackup-replace-vo": "Yedek bir Mainnet cüzdanıdır ve yalnızca Mainnet cüzdanları yedeklenir. Onu açmak bu salt görüntüleme {net} cüzdanını telefondan siler: görüntüleme anahtarı (UFVK) yoksa ona erişiminizi kaybedersiniz. Zingo bir Mainnet sunucusuna geçer ve yedek boşalır.",
     "restorebackup-switch": "Mainnet'e geç",
     "restorebackup": "Geri yükle",
     "restorebackup-warning": "Mevcut cüzdan ile yedek yer değiştirir ve uygulama yedekle yeniden açılır. Geri dönmek için bunu tekrarlayın.",

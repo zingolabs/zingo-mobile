@@ -991,7 +991,9 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                                 message: backupReplaces
                                   ? (
                                       translate(
-                                        'settings.restorebackup-replace',
+                                        readOnly
+                                          ? 'settings.restorebackup-replace-vo'
+                                          : 'settings.restorebackup-replace',
                                       ) as string
                                     ).replace(
                                       '{net}',

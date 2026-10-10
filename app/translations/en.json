@@ -203,7 +203,8 @@
     "deletewallet-error": "Error: Couldn't delete the current wallet."
   },
   "settings": {
-    "restorebackup-replace": "The backup is a Mainnet wallet and only Mainnet wallets are backed up. Opening it deletes this {net} wallet from this phone: you'll lose access to it unless you have its seed phrase or viewing key. Zingo switches to a Mainnet server, and the backup is emptied.",
+    "restorebackup-replace": "The backup is a Mainnet wallet and only Mainnet wallets are backed up. Opening it deletes this {net} wallet from this phone: you'll lose access to it unless you have its seed phrase. Zingo switches to a Mainnet server, and the backup is emptied.",
+    "restorebackup-replace-vo": "The backup is a Mainnet wallet and only Mainnet wallets are backed up. Opening it deletes this view-only {net} wallet from this phone: you'll lose access to it unless you have its viewing key (UFVK). Zingo switches to a Mainnet server, and the backup is emptied.",
     "restorebackup-switch": "Switch to Mainnet",
     "restorebackup": "Restore",
     "restorebackup-warning": "The current wallet and the backup swap places, and the app reopens with the backup. Repeat this to switch back.",

@@ -203,7 +203,8 @@
     "deletewallet-error": "Error: não foi possível excluir a carteira atual."
   },
   "settings": {
-    "restorebackup-replace": "O backup é uma carteira Mainnet, e só se faz backup de carteiras Mainnet. Abri-lo apaga esta carteira {net} do telefone: você perderá o acesso a ela se não tiver a frase semente ou a chave de visualização. O Zingo muda para um servidor Mainnet e o backup fica vazio.",
+    "restorebackup-replace": "O backup é uma carteira Mainnet, e só se faz backup de carteiras Mainnet. Abri-lo apaga esta carteira {net} do telefone: você perderá o acesso a ela se não tiver a frase semente. O Zingo muda para um servidor Mainnet e o backup fica vazio.",
+    "restorebackup-replace-vo": "O backup é uma carteira Mainnet, e só se faz backup de carteiras Mainnet. Abri-lo apaga esta carteira somente leitura {net} do telefone: você perderá o acesso a ela se não tiver a chave de visualização (UFVK). O Zingo muda para um servidor Mainnet e o backup fica vazio.",
     "restorebackup-switch": "Mudar para Mainnet",
     "restorebackup": "Restaurar",
     "restorebackup-warning": "A carteira atual e o backup trocam de lugar, e o app reabre com o backup. Repita isso para voltar.",

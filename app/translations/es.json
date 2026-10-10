@@ -203,7 +203,8 @@
     "deletewallet-error": "Error: No se pudo borrar el monedero actual."
   },
   "settings": {
-    "restorebackup-replace": "La copia de seguridad es un monedero de Mainnet, y solo se guarda copia de los monederos de Mainnet. Abrirla borra este monedero de {net} del teléfono: perderás el acceso a él si no tienes su frase semilla o su clave de visualización. Zingo cambia a un servidor de Mainnet y la copia queda vacía.",
+    "restorebackup-replace": "La copia de seguridad es un monedero de Mainnet, y solo se guarda copia de los monederos de Mainnet. Abrirla borra este monedero de {net} del teléfono: perderás el acceso a él si no tienes su frase semilla. Zingo cambia a un servidor de Mainnet y la copia queda vacía.",
+    "restorebackup-replace-vo": "La copia de seguridad es un monedero de Mainnet, y solo se guarda copia de los monederos de Mainnet. Abrirla borra este monedero de solo lectura de {net} del teléfono: perderás el acceso a él si no tienes su clave de visualización (UFVK). Zingo cambia a un servidor de Mainnet y la copia queda vacía.",
     "restorebackup-switch": "Cambiar a Mainnet",
     "restorebackup": "Restaurar",
     "restorebackup-warning": "El monedero actual y la copia de seguridad se intercambian, y la app se reabre con la copia. Repite esto para volver.",
