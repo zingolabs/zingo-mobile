@@ -727,6 +727,12 @@
     "done": "Concluído"
   },
   "import": {
+    "key-prefix": "Uma chave de visualização começa com uview1.",
+    "key-char": "“{char}” não pode aparecer em uma chave de visualização. Verifique esse caractere.",
+    "key-incomplete": "Esta chave de visualização está incompleta. Verifique se faltam caracteres.",
+    "key-valid": "Chave de visualização válida",
+    "key-keep-typing": "Chave de visualização? Continue digitando: uview1…",
+    "word-nomatch": "Nenhuma palavra de recuperação começa com “{word}”",
     "scan-title": "Escanear código QR",
     "scan-hint": "Aponte a câmera para o código QR de uma chave de visualização.",
     "scan-found": "Chave de visualização encontrada",
@@ -744,7 +750,6 @@
     "seed-full": "Uma frase de recuperação tem 24 palavras. Remova uma para alterá-la.",
     "seed-words-invalid": "{count} destas palavras não estão na lista de palavras de recuperação.",
     "seed-checksum": "Estas 24 palavras não formam uma frase de recuperação válida. Confira cada uma, principalmente a última.",
-    "key-invalid": "Esta chave de visualização não é válida. Verifique se está completa e copiada exatamente.",
     "key-wrong-chain": "Esta chave de visualização é de {key}, e a rede selecionada é {server}.",
     "need-words": "Insira as 24 palavras, ou uma chave de visualização.",
     "need-birthday": "Insira uma altura de bloco dentro do intervalo, ou deixe em branco.",

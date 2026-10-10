@@ -39,7 +39,7 @@ import {
 } from '@app/walletBackend';
 import { ChainNameEnum, GlobalConst } from '@app/AppState';
 import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
-import { seedStatus } from '@app/utils/seedPhrase';
+import { seedStatus, viewingKeyProblem } from '@app/utils/seedPhrase';
 import { duration, ease } from '@app/theme/motion';
 
 const activationHeight = {
@@ -64,6 +64,9 @@ type ImportUfvkProps = {
 };
 // Waits for typing to pause before decoding the key.
 const KEY_CHECK_DELAY_MS = 300;
+// A key the decode rejects reads as incomplete only once typing pauses
+// this long, so it does not turn red on every keystroke.
+const KEY_PAUSE_MS = 1200;
 
 const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
   busy,
@@ -102,16 +105,31 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
     check.chainName !== server.chainName;
   const chainLabel = (chain: ChainNameEnum) =>
     translate(`settings.value-chainname-${chain}`) as string;
+  const problem = viewingKeyProblem(typedKey);
+  // Set once typing pauses or the key loses focus.
+  const [keyPaused, setKeyPaused] = useState(false);
   const keyError =
-    check.kind === 'invalid'
-      ? (translate('import.key-invalid') as string)
-      : check.kind === 'ufvk' && keyChainMismatch
-        ? (translate('import.key-wrong-chain') as string)
-            .replace('{key}', chainLabel(check.chainName))
-            .replace('{server}', chainLabel(server.chainName))
-        : undefined;
+    problem.kind === 'prefix'
+      ? (translate('import.key-prefix') as string)
+      : problem.kind === 'char'
+        ? (translate('import.key-char') as string).replace(
+            '{char}',
+            problem.char,
+          )
+        : check.kind === 'ufvk' && keyChainMismatch
+          ? (translate('import.key-wrong-chain') as string)
+              .replace('{key}', chainLabel(check.chainName))
+              .replace('{server}', chainLabel(server.chainName))
+          : check.kind === 'invalid' && keyPaused
+            ? (translate('import.key-incomplete') as string)
+            : undefined;
+  const keyValid =
+    problem.kind === 'none' && check.kind === 'ufvk' && !keyChainMismatch;
+  // A key whose decode could not run passes on; the restore reports.
   const keyReady =
-    (status.kind === 'ufvk' && keyCheck.key === typedKey && !keyError) ||
+    (status.kind === 'ufvk' &&
+      keyCheck.key === typedKey &&
+      (keyValid || (problem.kind === 'none' && check.kind === 'unknown'))) ||
     (status.kind === 'seed' && status.complete);
 
   useEffect(() => {
@@ -129,6 +147,15 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
       live = false;
       clearTimeout(timer);
     };
+  }, [typedKey]);
+
+  useEffect(() => {
+    setKeyPaused(false);
+    if (!typedKey) {
+      return;
+    }
+    const timer = setTimeout(() => setKeyPaused(true), KEY_PAUSE_MS);
+    return () => clearTimeout(timer);
   }, [typedKey]);
   const birthdayLow = !!birthday && Number(birthday) < activation;
   const ready = keyReady && !birthdayLow;
@@ -335,6 +362,8 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
           onChangeValue={setSeedufvkText}
           translate={translate}
           keyError={keyError}
+          keyValid={keyValid}
+          onKeyBlur={() => setKeyPaused(true)}
           pulse={pulse}
         />
 
