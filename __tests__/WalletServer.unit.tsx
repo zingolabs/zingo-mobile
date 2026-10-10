@@ -60,8 +60,11 @@ const mount = (setServerOption: jest.Mock) => {
 
 test('Tests that Automatic on the wallet’s network reconnects the wallet and stays', async () => {
   (pickAutomatic as jest.Mock).mockResolvedValue({
-    uri: 'https://na.zec.rocks:443',
-    chainName: ChainNameEnum.mainChainName,
+    server: {
+      uri: 'https://na.zec.rocks:443',
+      chainName: ChainNameEnum.mainChainName,
+    },
+    tier: 'registry',
   });
   const setServerOption = jest.fn().mockResolvedValue({ kind: 'ok' });
   const navigation = mount(setServerOption);
@@ -79,8 +82,11 @@ test('Tests that Automatic on the wallet’s network reconnects the wallet and s
 
 test('Tests that a server on another network goes to the recovery screen', async () => {
   (pickAutomatic as jest.Mock).mockResolvedValue({
-    uri: 'https://testnet.zec.rocks:443',
-    chainName: ChainNameEnum.testChainName,
+    server: {
+      uri: 'https://testnet.zec.rocks:443',
+      chainName: ChainNameEnum.testChainName,
+    },
+    tier: 'registry',
   });
   const setServerOption = jest
     .fn()
