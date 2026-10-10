@@ -131,9 +131,9 @@ test('Tests that a view-only wallet shows its hidden viewing key in place of the
   expect(screen.getByText('walletseed.sub-change-vo')).toBeTruthy();
   expect(screen.queryByTestId('walletseed.words')).toBeNull();
   expect(screen.queryByTestId('walletseed.vk')).toBeNull();
-  expect(
-    screen.getByTestId('walletseed.vkcard.key').props.children,
-  ).toBe(`${UFVK.slice(0, 6)}••••••…••••••••`);
+  expect(screen.getByTestId('walletseed.vkcard.key').props.children).toBe(
+    `${UFVK.slice(0, 6)}••••••…••••••••`,
+  );
 
   fireEvent.press(screen.getByTestId('walletseed.copy'));
   expect(copySensitive).toHaveBeenCalledWith(
