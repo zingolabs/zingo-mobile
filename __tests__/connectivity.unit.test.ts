@@ -1,5 +1,6 @@
 import { NetInfoStateType } from '@react-native-community/netinfo';
 import { connectivity } from '@app/utils/connectivity';
+import { ChainNameEnum, offlineServer, remoteServer } from '@app/AppState';
 
 const netInfo = (
   isConnected: boolean | null,
@@ -26,3 +27,25 @@ test.each([
     );
   },
 );
+
+const remote = remoteServer(
+  'https://zec.rocks:443',
+  ChainNameEnum.mainChainName,
+);
+
+test('Tests that no server answering on a connected network reads as no internet access', () => {
+  expect(
+    connectivity({ ...netInfo(true, null), serversUnreachable: true }, remote),
+  ).toBe('noAccess');
+});
+
+test('Tests that Offline mode shows no internet access warning, only the lack of a network', () => {
+  const offline = offlineServer(ChainNameEnum.mainChainName);
+  expect(
+    connectivity(
+      { ...netInfo(true, false), serversUnreachable: true },
+      offline,
+    ),
+  ).toBe('ok');
+  expect(connectivity(netInfo(false, false), offline)).toBe('none');
+});

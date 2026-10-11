@@ -230,7 +230,7 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
                 )}
               </>
             )}
-            {(connectivity(netInfo) !== 'ok' ||
+            {(connectivity(netInfo, server) !== 'ok' ||
               netInfo.type === NetInfoStateType.cellular ||
               netInfo.isConnectionExpensive) && (
               <View
@@ -248,7 +248,9 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
                 >
                   <FontAwesomeIcon
                     icon={faCloudDownload}
-                    color={connectivity(netInfo) !== 'ok' ? 'red' : 'yellow'}
+                    color={
+                      connectivity(netInfo, server) !== 'ok' ? 'red' : 'yellow'
+                    }
                     size={16}
                   />
                 </TouchableOpacity>

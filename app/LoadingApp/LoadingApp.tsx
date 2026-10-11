@@ -715,7 +715,15 @@ export class LoadingAppClass extends Component<
       const best = pick
         ? remoteServer(pick.server.uri, pick.server.chainName)
         : this.defaultServerForChain(chainName);
-      this.setState({ server: best });
+      // Connected and no server answered: likely a network without
+      // internet access.
+      this.setState(state => ({
+        server: best,
+        netInfo: {
+          ...state.netInfo,
+          serversUnreachable: isConnected && (!pick || pick.tier === 'default'),
+        },
+      }));
       await SettingsFileImpl.writeServer(best, mode);
       return !!pick && pick.tier !== 'default';
     }
@@ -1567,6 +1575,11 @@ export class LoadingAppClass extends Component<
     this.setState(state => ({
       serverStatus: probe.latency === null ? 'bad' : 'ok',
       serverBlockHeight: probe.height,
+      // A server that answers clears the no-internet guess.
+      netInfo:
+        probe.latency !== null && state.netInfo.serversUnreachable
+          ? { ...state.netInfo, serversUnreachable: false }
+          : state.netInfo,
       serverLatencies: {
         ...state.serverLatencies,
         [server.uri]: probe.latency,
@@ -1941,7 +1954,10 @@ export class LoadingAppClass extends Component<
                       blockHeight={this.state.serverBlockHeight}
                       busy={actionButtonsDisabled}
                       online={!!this.state.netInfo.isConnected}
-                      noAccess={connectivity(this.state.netInfo) === 'noAccess'}
+                      noAccess={
+                        connectivity(this.state.netInfo, this.state.server) ===
+                        'noAccess'
+                      }
                       recommended={serverUris(translate).filter(
                         s => s.recommended,
                       )}

@@ -200,7 +200,7 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
   const offline = server.kind === 'offline';
   const dotColor = resolved
     ? colors.fgAccent
-    : connectivity(netInfo) !== 'ok' || kind === 'server'
+    : connectivity(netInfo, server) !== 'ok' || kind === 'server'
       ? colors.fgDangerEmphasis
       : offline
         ? colors.fgMuted

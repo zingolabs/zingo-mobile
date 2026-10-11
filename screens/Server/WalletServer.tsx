@@ -236,7 +236,7 @@ const WalletServer: React.FC<WalletServerProps> = ({
             blockHeight={blockHeight}
             busy={busy}
             online={online}
-            noAccess={connectivity(netInfo) === 'noAccess'}
+            noAccess={connectivity(netInfo, server) === 'noAccess'}
             recommended={serverUris(translate).filter(s => s.recommended)}
             latencies={latencies}
             onAuto={chooseAutomatic}
