@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { createContext, useContext } from 'react';
 import { StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 import BottomSheet, { BottomSheetFooterProps } from '@gorhom/bottom-sheet';
 import { radiusSheet, useTheme } from '@app/theme';
@@ -20,6 +20,22 @@ type AppSheetProps = {
   accessible?: boolean;
 };
 
+// The handle takes the header through context: the sheet treats
+// handleComponent as a component type, so a new one per render would
+// remount the handle, and the rim would blink while it measures again.
+const SheetHeader = createContext<React.ReactNode>(null);
+
+const SheetHandle: React.FunctionComponent = () => {
+  const { colors } = useTheme();
+  const header = useContext(SheetHeader);
+  return (
+    <View style={[styles.handle, { backgroundColor: colors.bgSurface }]}>
+      <SheetRim />
+      {header}
+    </View>
+  );
+};
+
 const AppSheet = React.forwardRef<BottomSheet, AppSheetProps>(
   (
     {
@@ -37,47 +53,39 @@ const AppSheet = React.forwardRef<BottomSheet, AppSheetProps>(
   ) => {
     const { colors } = useTheme();
 
-    const renderHandle = useCallback(
-      () => (
-        <View style={[styles.handle, { backgroundColor: colors.bgSurface }]}>
-          <SheetRim />
-          {header}
-        </View>
-      ),
-      [colors, header],
-    );
-
     return (
-      <BottomSheet
-        ref={ref}
-        snapPoints={snapPoints}
-        index={index}
-        enableDynamicSizing={false}
-        enablePanDownToClose={false}
-        enableContentPanningGesture={enableContentPanningGesture}
-        accessible={accessible}
-        keyboardBehavior="interactive"
-        keyboardBlurBehavior="restore"
-        android_keyboardInputMode="adjustResize"
-        onChange={onChange}
-        backgroundStyle={{
-          backgroundColor: colors.bgSurface,
-          borderTopLeftRadius: radiusSheet,
-          borderTopRightRadius: radiusSheet,
-        }}
-        handleComponent={renderHandle}
-        footerComponent={renderFooter}
-      >
-        <View
-          style={[
-            styles.content,
-            { backgroundColor: colors.bgSurface },
-            contentStyle,
-          ]}
+      <SheetHeader.Provider value={header}>
+        <BottomSheet
+          ref={ref}
+          snapPoints={snapPoints}
+          index={index}
+          enableDynamicSizing={false}
+          enablePanDownToClose={false}
+          enableContentPanningGesture={enableContentPanningGesture}
+          accessible={accessible}
+          keyboardBehavior="interactive"
+          keyboardBlurBehavior="restore"
+          android_keyboardInputMode="adjustResize"
+          onChange={onChange}
+          backgroundStyle={{
+            backgroundColor: colors.bgSurface,
+            borderTopLeftRadius: radiusSheet,
+            borderTopRightRadius: radiusSheet,
+          }}
+          handleComponent={SheetHandle}
+          footerComponent={renderFooter}
         >
-          {children}
-        </View>
-      </BottomSheet>
+          <View
+            style={[
+              styles.content,
+              { backgroundColor: colors.bgSurface },
+              contentStyle,
+            ]}
+          >
+            {children}
+          </View>
+        </BottomSheet>
+      </SheetHeader.Provider>
     );
   },
 );
