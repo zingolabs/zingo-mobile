@@ -33,7 +33,10 @@ jest.mock('@app/services/serverPicking', () => ({
 
 // A mainnet server whose tip is block 3,000,000, and a phrase saved on the
 // device with the given birthday.
-const appWithSaved = (birthday: number) => {
+const appWithSaved = (
+  birthday: number,
+  saved: { seed?: string; ufvk?: string } = { seed: 'abandon ability able' },
+) => {
   const app = new LoadingAppClass({
     navigationApp: mockNavigation,
     route: { key: 'Key-1', name: RouteEnum.LoadingApp, params: undefined },
@@ -52,7 +55,7 @@ const appWithSaved = (birthday: number) => {
   app.state = {
     ...app.state,
     netInfo: { ...app.state.netInfo, isConnected: true },
-    recoveryWallet: { seed: 'abandon ability able', birthday },
+    recoveryWallet: { ...saved, birthday },
   };
   const doRestore = jest.spyOn(app, 'doRestore').mockResolvedValue(undefined);
   return { app, doRestore };
@@ -81,6 +84,32 @@ test('Tests that a saved phrase born before the network tip restores', async () 
 
   expect(doRestore).toHaveBeenCalledWith(
     'abandon ability able',
+    2900000,
+    expect.anything(),
+  );
+});
+
+test('Tests that a saved viewing key of another network offers a server of its network instead of restoring', async () => {
+  const confirms: ConfirmOptions[] = [];
+  registerConfirmListener(options => confirms.push(options));
+  const { app, doRestore } = appWithSaved(2900000, { ufvk: 'uviewtest1qqqq' });
+  const openServer = jest.spyOn(app, 'openServer').mockImplementation(() => {});
+
+  await app.importRecoveryWallet();
+
+  expect(doRestore).not.toHaveBeenCalled();
+  expect(confirms[0].message).toBe('loadingapp.saved-key-net-body');
+  confirms[0].buttons[0].onPress?.();
+  expect(openServer).toHaveBeenCalledWith(ChainNameEnum.testChainName);
+});
+
+test('Tests that a saved viewing key of the server network restores', async () => {
+  const { app, doRestore } = appWithSaved(2900000, { ufvk: 'uview1qqqq' });
+
+  await app.importRecoveryWallet();
+
+  expect(doRestore).toHaveBeenCalledWith(
+    'uview1qqqq',
     2900000,
     expect.anything(),
   );

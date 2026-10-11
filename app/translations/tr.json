@@ -103,6 +103,7 @@
     "memobytes-unit": " karakterler."
   },
   "loadingapp": {
+    "saved-key-net-body": "Bu görüntüleme anahtarı {keynet} içindir ve Zingo bir {net} sunucusuna bağlı, bu yüzden onu içe aktaramaz. İçe aktarmak için bir {keynet} sunucusu seçin.",
     "saved-wallet-net-title": "Bu cüzdan başka bir ağdan",
     "saved-wallet-net-body": "Doğum günü olan {birthday} bloğu, en son {net} bloğundan ({tip}) sonra; yani başka bir ağda oluşturulmuş. İçe aktarmak için o ağın bir sunucusunu seçin.",
     "saved-wallet-net-server": "Sunucu seç",

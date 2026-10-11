@@ -103,6 +103,7 @@
     "memobytes-unit": " car."
   },
   "loadingapp": {
+    "saved-key-net-body": "Esta clave de visualización es de {keynet} y Zingo está conectado a un servidor de {net}, así que no puede importarla. Elige un servidor de {keynet} para importarla.",
     "saved-wallet-net-title": "Este monedero es de otra red",
     "saved-wallet-net-body": "Su cumpleaños, el bloque {birthday}, es posterior al último bloque de {net} ({tip}), así que se creó en otra red. Elige un servidor de esa red para importarlo.",
     "saved-wallet-net-server": "Elegir servidor",

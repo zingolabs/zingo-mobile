@@ -1,6 +1,6 @@
 import { sha256 } from '@noble/hashes/sha2.js';
 import { BIP39_ENGLISH } from './bip39English';
-import { GlobalConst } from '@app/AppState';
+import { ChainNameEnum, GlobalConst } from '@app/AppState';
 
 export const SEED_WORD_COUNT = 24;
 export const SUGGESTION_LIMIT = 3;
@@ -26,6 +26,20 @@ export type SeedStatus =
 export const isViewingKey = (text: string): boolean => {
   const lower = text.trim().toLowerCase();
   return KEY_PREFIXES.some(p => lower.startsWith(p));
+};
+
+// The network a viewing key's prefix names; null for text that is not one.
+export const viewingKeyChain = (key: string): ChainNameEnum | null => {
+  const lower = key.trim().toLowerCase();
+  if (lower.startsWith(GlobalConst.uviewregtest)) {
+    return ChainNameEnum.regtestChainName;
+  }
+  if (lower.startsWith(GlobalConst.uviewtest)) {
+    return ChainNameEnum.testChainName;
+  }
+  return lower.startsWith(GlobalConst.uview)
+    ? ChainNameEnum.mainChainName
+    : null;
 };
 
 // True while the text could still grow into a viewing key prefix: u, uv,

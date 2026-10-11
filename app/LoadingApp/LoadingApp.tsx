@@ -23,6 +23,7 @@ import {
 import { BottomSheetBackHandler } from '@app/hooks/useBottomSheetBackHandler';
 import ConfirmBottomSheet from '@ui/widgets/ConfirmBottomSheet';
 import { showConfirm } from '@app/services/showConfirm';
+import { viewingKeyChain } from '@app/utils/seedPhrase';
 
 import {
   createNewWallet,
@@ -1718,10 +1719,31 @@ export class LoadingAppClass extends Component<
     if (!wallet) {
       return;
     }
-    // The saved phrase carries no network. A birthday past this network's
-    // tip means it was made on another one: say so instead of handing
-    // zingolib a height its server has not reached.
     const { server, translate } = this.state;
+    const netName = (chain: ChainNameEnum) =>
+      translate(`settings.value-chainname-${chain}`) as string;
+    // A saved viewing key names its network in its prefix: one for another
+    // network offers a server of its own, not an "invalid key" to fix.
+    const keyChain = wallet.ufvk ? viewingKeyChain(wallet.ufvk) : null;
+    if (keyChain && server.kind === 'remote' && keyChain !== server.chainName) {
+      showConfirm({
+        title: translate('loadingapp.saved-wallet-net-title') as string,
+        message: (translate('loadingapp.saved-key-net-body') as string)
+          .replace(/\{keynet\}/g, netName(keyChain))
+          .replace('{net}', netName(server.chainName)),
+        buttons: [
+          {
+            text: translate('loadingapp.saved-wallet-net-server') as string,
+            onPress: () => this.openServer(keyChain),
+          },
+          { text: translate('cancel') as string, style: 'cancel' },
+        ],
+      });
+      return;
+    }
+    // A saved seed phrase carries no network. A birthday past this
+    // network's tip means it was made on another one: say so instead of
+    // handing zingolib a height its server has not reached.
     if (server.kind === 'remote' && this.state.netInfo.isConnected) {
       const { height } = await probeUri(server.uri);
       const tip = Number(height);
@@ -1731,12 +1753,7 @@ export class LoadingAppClass extends Component<
           message: (translate('loadingapp.saved-wallet-net-body') as string)
             .replace('{birthday}', wallet.birthday.toLocaleString())
             .replace('{tip}', tip.toLocaleString())
-            .replace(
-              '{net}',
-              translate(
-                `settings.value-chainname-${server.chainName}`,
-              ) as string,
-            ),
+            .replace('{net}', netName(server.chainName)),
           buttons: [
             {
               text: translate('loadingapp.saved-wallet-net-server') as string,
