@@ -93,6 +93,7 @@ const Button: React.FunctionComponent<ButtonProps> = ({
     type === ButtonTypeEnum.Primary
       ? {
           color: colors.bgCanvas,
+          fontWeight: '700',
         }
       : type === ButtonTypeEnum.Secondary
         ? {

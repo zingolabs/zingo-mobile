@@ -160,7 +160,13 @@ const SaveSheet: React.FC<SaveSheetProps> = ({
               transform: [{ scale: pressed ? 0.97 : 1 }],
             })}
           >
-            <RegText style={{ fontSize: 15, color: colors.bgCanvas }}>
+            <RegText
+              style={{
+                fontSize: 15,
+                color: colors.bgCanvas,
+                fontWeight: '700',
+              }}
+            >
               {saveLabel}
             </RegText>
           </Pressable>

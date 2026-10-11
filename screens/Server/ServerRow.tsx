@@ -288,7 +288,9 @@ export const DoneButton: React.FC<{
         transform: [{ scale: pressed ? 0.97 : 1 }],
       })}
     >
-      <RegText style={{ fontSize: 16, color: colors.bgCanvas }}>
+      <RegText
+        style={{ fontSize: 16, color: colors.bgCanvas, fontWeight: '700' }}
+      >
         {title}
       </RegText>
     </Pressable>

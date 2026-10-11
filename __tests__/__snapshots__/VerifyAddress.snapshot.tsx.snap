@@ -288,7 +288,7 @@ exports[`VerifyAddress - snapshot VerifyAddress initial (empty, no result) 1`] =
               {
                 "color": "#011401",
                 "fontSize": 16,
-                "fontWeight": "600",
+                "fontWeight": "700",
                 "textAlign": "center",
                 "textTransform": "none",
               }

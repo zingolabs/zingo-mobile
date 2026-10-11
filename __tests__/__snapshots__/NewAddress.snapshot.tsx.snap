@@ -235,7 +235,7 @@ exports[`NewAddress - snapshots NewAddress transparent kind 1`] = `
               {
                 "color": "#011401",
                 "fontSize": 16,
-                "fontWeight": "600",
+                "fontWeight": "700",
                 "textAlign": "center",
                 "textTransform": "none",
               }
@@ -785,7 +785,7 @@ exports[`NewAddress - snapshots NewAddress unified kind 1`] = `
               {
                 "color": "#011401",
                 "fontSize": 16,
-                "fontWeight": "600",
+                "fontWeight": "700",
                 "textAlign": "center",
                 "textTransform": "none",
               }

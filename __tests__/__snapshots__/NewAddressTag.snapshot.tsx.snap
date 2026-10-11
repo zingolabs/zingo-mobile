@@ -676,7 +676,7 @@ exports[`NewAddressTag - snapshot NewAddressTag renders correctly 1`] = `
               {
                 "color": "#011401",
                 "fontSize": 16,
-                "fontWeight": "600",
+                "fontWeight": "700",
                 "textAlign": "center",
                 "textTransform": "none",
               }

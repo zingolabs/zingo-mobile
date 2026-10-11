@@ -736,7 +736,7 @@ exports[`Component Address Book Details - test Address Book Datails - Add - snap
             {
               "color": "#011401",
               "fontSize": 16,
-              "fontWeight": "600",
+              "fontWeight": "700",
               "textAlign": "center",
               "textTransform": "none",
             }
@@ -2183,7 +2183,7 @@ exports[`Component Address Book Details - test Address Book Datails - Modify - s
             {
               "color": "#011401",
               "fontSize": 16,
-              "fontWeight": "600",
+              "fontWeight": "700",
               "textAlign": "center",
               "textTransform": "none",
             }

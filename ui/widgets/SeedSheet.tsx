@@ -179,7 +179,7 @@ const SeedSheet = forwardRef<BottomSheetModal, SeedSheetProps>(
               style={{
                 color: colors.bgCanvas,
                 fontSize: 16,
-                fontWeight: '500',
+                fontWeight: '700',
               }}
             >
               {translate('seedsheet.done') as string}

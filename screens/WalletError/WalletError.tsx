@@ -590,7 +590,13 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
             entering={labelEnter()}
             exiting={labelExit()}
           >
-            <RegText style={{ fontSize: 16, color: colors.bgCanvas }}>
+            <RegText
+              style={{
+                fontSize: 16,
+                color: colors.bgCanvas,
+                fontWeight: '700',
+              }}
+            >
               {primaryLabel}
             </RegText>
           </Animated.View>

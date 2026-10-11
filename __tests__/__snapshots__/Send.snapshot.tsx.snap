@@ -1237,7 +1237,7 @@ exports[`Component Send - test Send privacy high - snapshot 1`] = `
                         {
                           "color": "#011401",
                           "fontSize": 16,
-                          "fontWeight": "600",
+                          "fontWeight": "700",
                           "textAlign": "center",
                           "textTransform": "none",
                         }
@@ -1631,7 +1631,7 @@ memo10"
                   {
                     "color": "#011401",
                     "fontSize": 16,
-                    "fontWeight": "600",
+                    "fontWeight": "700",
                     "textAlign": "center",
                     "textTransform": "none",
                   }
@@ -1932,7 +1932,7 @@ memo10"
             {
               "color": "#011401",
               "fontSize": 16,
-              "fontWeight": "600",
+              "fontWeight": "700",
               "textAlign": "center",
               "textTransform": "none",
             }
@@ -3211,7 +3211,7 @@ exports[`Component Send - test Send privacy normal - snapshot 1`] = `
                         {
                           "color": "#011401",
                           "fontSize": 16,
-                          "fontWeight": "600",
+                          "fontWeight": "700",
                           "textAlign": "center",
                           "textTransform": "none",
                         }
@@ -3605,7 +3605,7 @@ memo10"
                   {
                     "color": "#011401",
                     "fontSize": 16,
-                    "fontWeight": "600",
+                    "fontWeight": "700",
                     "textAlign": "center",
                     "textTransform": "none",
                   }
@@ -3906,7 +3906,7 @@ memo10"
             {
               "color": "#011401",
               "fontSize": 16,
-              "fontWeight": "600",
+              "fontWeight": "700",
               "textAlign": "center",
               "textTransform": "none",
             }

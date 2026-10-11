@@ -559,7 +559,7 @@ exports[`Filters - snapshots Filters with active sent filter and memos 1`] = `
               {
                 "color": "#011401",
                 "fontSize": 16,
-                "fontWeight": "600",
+                "fontWeight": "700",
                 "textAlign": "center",
                 "textTransform": "none",
               }
@@ -1133,7 +1133,7 @@ exports[`Filters - snapshots Filters with no active filters 1`] = `
               {
                 "color": "#011401",
                 "fontSize": 16,
-                "fontWeight": "600",
+                "fontWeight": "700",
                 "textAlign": "center",
                 "textTransform": "none",
               }
