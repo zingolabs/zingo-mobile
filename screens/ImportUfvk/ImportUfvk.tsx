@@ -502,32 +502,35 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
           />
         </View>
       </View>
-      <Pressable
-        testID="import.back"
-        onPress={onClickCancel}
-        disabled={busy}
-        hitSlop={14}
-        accessibilityRole="button"
-        style={({ pressed }) => ({
-          position: 'absolute',
-          left: 17,
-          top: 38,
-          width: 44,
-          height: 44,
-          borderRadius: 10,
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 3,
-          opacity: busy ? 0.4 : 1,
-          backgroundColor: pressed ? colors.bgSurface : 'transparent',
-        })}
-      >
-        <FontAwesomeIcon
-          icon={faChevronLeft}
-          size={18}
-          color={colors.fgAccent}
-        />
-      </Pressable>
+      {/* The scanner has its own back; this one sits above it (zIndex). */}
+      {scan.kind !== 'open' && (
+        <Pressable
+          testID="import.back"
+          onPress={onClickCancel}
+          disabled={busy}
+          hitSlop={14}
+          accessibilityRole="button"
+          style={({ pressed }) => ({
+            position: 'absolute',
+            left: 17,
+            top: 38,
+            width: 44,
+            height: 44,
+            borderRadius: 10,
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 3,
+            opacity: busy ? 0.4 : 1,
+            backgroundColor: pressed ? colors.bgSurface : 'transparent',
+          })}
+        >
+          <FontAwesomeIcon
+            icon={faChevronLeft}
+            size={18}
+            color={colors.fgAccent}
+          />
+        </Pressable>
+      )}
       {scan.kind === 'open' && (
         <ScanOverlay
           testID="import.scanner"
