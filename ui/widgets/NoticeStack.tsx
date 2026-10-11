@@ -33,7 +33,10 @@ const MARGIN_TOP = 10;
 const MARGIN_BOTTOM = 12;
 const SCALE_STEP = 0.06;
 const OPACITY_STEP = 0.1;
-const RADIUS = 14;
+// Every card is clipped to this radius; a card that draws its own border
+// uses the same one, or the clip cuts the border at the corners.
+export const NOTICE_RADIUS = 14;
+const RADIUS = NOTICE_RADIUS;
 
 // As the wallet opens, the stack drops in 8 pt once its cards are measured.
 const DROP_PT = 8;

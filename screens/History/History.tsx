@@ -50,7 +50,7 @@ import ValueTransferLine from './components/ValueTransferLine';
 import IronwoodMigrationBanner from './components/IronwoodMigrationBanner';
 import SeedBackupNotice from './components/SeedBackupNotice';
 import ViewOnlyNotice from './components/ViewOnlyNotice';
-import NoticeStack, { Notice } from '@ui/widgets/NoticeStack';
+import NoticeStack, { Notice, NOTICE_RADIUS } from '@ui/widgets/NoticeStack';
 import { PriceCard } from '@ui/widgets/Header/components/PriceRow';
 import { fiatQuote } from '@app/price/fiatQuote';
 import { ContextAppLoaded } from '@app/context';
@@ -251,6 +251,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
           zecPrice={zecPrice}
           info={info}
           server={server}
+          style={{ borderRadius: NOTICE_RADIUS }}
         />
       ),
     });
