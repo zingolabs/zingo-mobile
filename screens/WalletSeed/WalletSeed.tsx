@@ -255,7 +255,7 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
       <Animated.View
         testID="walletseed"
         onTouchStart={() => tip !== 'none' && setTip('none')}
-        style={[{ flex: 1, paddingTop: insets.top + 6 }, behind]}
+        style={[{ flex: 1, paddingTop: 18 }, behind]}
       >
         <View
           style={{

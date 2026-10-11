@@ -220,7 +220,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
         entering={tagEnter()}
         style={{
           position: 'absolute',
-          top: 37,
+          top: 1,
           right: 20,
           flexDirection: 'row',
           alignItems: 'center',
@@ -268,7 +268,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
           pointerEvents="none"
           style={{
             position: 'absolute',
-            top: 42,
+            top: 6,
             left: 0,
             right: 0,
             alignItems: 'center',

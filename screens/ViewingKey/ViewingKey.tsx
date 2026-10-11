@@ -200,7 +200,7 @@ const ViewingKey: React.FunctionComponent<ViewingKeyProps> = ({
   ];
 
   const page = (
-    <View testID="viewingkey" style={{ flex: 1, paddingTop: insets.top + 12 }}>
+    <View testID="viewingkey" style={{ flex: 1, paddingTop: 23 }}>
       <Pressable
         testID="viewingkey.close"
         accessibilityRole="button"
@@ -208,7 +208,7 @@ const ViewingKey: React.FunctionComponent<ViewingKeyProps> = ({
         onPress={close}
         style={({ pressed }) => ({
           position: 'absolute',
-          top: insets.top + 4,
+          top: 20,
           right: SIDE - 14,
           width: 44,
           height: 44,

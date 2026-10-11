@@ -332,7 +332,7 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
         style={{
           position: 'absolute',
           right: 19,
-          top: 37,
+          top: 1,
           width: 32,
           height: 32,
           alignItems: 'center',

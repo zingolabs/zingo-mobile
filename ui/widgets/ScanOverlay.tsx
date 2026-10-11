@@ -279,7 +279,7 @@ const ScanOverlay: React.FunctionComponent<ScanOverlayProps> = ({
           <View
             style={{
               position: 'absolute',
-              top: insets.top + 6,
+              top: 2,
               left: 0,
               right: 0,
               height: 44,

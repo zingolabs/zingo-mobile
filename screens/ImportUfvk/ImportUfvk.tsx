@@ -283,7 +283,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
           position: 'absolute',
           left: 0,
           right: 0,
-          top: 50,
+          top: 14,
           fontSize: 16,
           lineHeight: 22,
           textAlign: 'center',
@@ -514,7 +514,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
           style={({ pressed }) => ({
             position: 'absolute',
             left: 17,
-            top: 38,
+            top: 2,
             width: 44,
             height: 44,
             borderRadius: 10,

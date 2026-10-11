@@ -21,7 +21,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
         "position": "absolute",
         "right": 0,
         "textAlign": "center",
-        "top": 50,
+        "top": 14,
       }
     }
   />
@@ -629,7 +629,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
         "left": 17,
         "opacity": 1,
         "position": "absolute",
-        "top": 38,
+        "top": 2,
         "width": 44,
         "zIndex": 3,
       }
