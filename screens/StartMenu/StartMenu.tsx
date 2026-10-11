@@ -102,7 +102,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
   const [backOnline, setBackOnline] = useState<boolean>(false);
   const [started, setStarted] = useState<string | null>(null);
   // No network, or a network that doesn't reach the internet.
-  const reach = connectivity(netInfo, server);
+  const reach = connectivity(netInfo);
   const wasOffline = useRef<boolean>(reach !== 'ok');
   // Past the launch sequence, what appears no longer waits for it.
   const launched = useRef(false);

@@ -55,7 +55,6 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
     backgroundSyncInfo,
     language,
     netInfo,
-    server,
     info,
     zingolibVersion,
     setBackgroundError,
@@ -278,7 +277,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
             justifyContent: 'flex-start',
           }}
         >
-          {(connectivity(netInfo, server) !== 'ok' ||
+          {(connectivity(netInfo) !== 'ok' ||
             netInfo.type === NetInfoStateType.cellular ||
             netInfo.isConnectionExpensive) && (
             <View
@@ -297,7 +296,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                       {translate('report.nointernet') as string}{' '}
                     </RegText>
                   )}
-                  {connectivity(netInfo, server) === 'noAccess' && (
+                  {connectivity(netInfo) === 'noAccess' && (
                     <RegText color="red">
                       {' '}
                       {translate('report.noaccess') as string}{' '}

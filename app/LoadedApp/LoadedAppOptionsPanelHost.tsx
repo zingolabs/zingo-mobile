@@ -183,7 +183,7 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
       label: translate('server.title') as string,
       icon: (
         <ServerIcon
-          noInternet={connectivity(netInfo, server) !== 'ok'}
+          noInternet={connectivity(netInfo) !== 'ok'}
           unreachable={unreachable}
           offline={isOffline}
           background="#111c2c"
