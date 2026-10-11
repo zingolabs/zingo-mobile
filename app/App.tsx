@@ -15,6 +15,7 @@ import { RouteEnum } from './AppState';
 import { ThemeProvider, useTheme, navigationTheme } from './theme';
 
 import { BackHandler, LogBox, StatusBar } from 'react-native';
+import NetInfo from '@react-native-community/netinfo';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import AppErrorBoundary from './AppErrorBoundary';
 import BiometricBlankingOverlay from '@ui/widgets/BiometricBlankingOverlay';
@@ -22,6 +23,12 @@ import BiometricBlankingOverlay from '@ui/widgets/BiometricBlankingOverlay';
 LogBox.ignoreLogs([
   '[Reanimated] Reduced motion setting is enabled on this device.',
 ]);
+
+// NetInfo checks internet reachability itself, by requests to Google, when
+// the platform doesn't report it (iOS). Zingo makes no such requests: the
+// value comes from the system (Android's validated network) or stays
+// unknown.
+NetInfo.configure({ reachabilityShouldRun: () => false });
 
 const Stack = createStackNavigator<AppStackParamList>();
 
