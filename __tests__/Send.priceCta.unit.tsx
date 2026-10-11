@@ -102,6 +102,7 @@ beforeEach(() => {
     nextFetchAt: 0,
     nextFetchDelayMs: 0,
     surfaceActive: false,
+    failed: false,
   });
   healthHook.mockImplementation(priceDate =>
     priceDate === 0

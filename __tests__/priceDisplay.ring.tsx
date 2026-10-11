@@ -108,12 +108,14 @@ test('the display-only ring exposes no disabled tap stop', () => {
   expect(disabledStops).toEqual([]);
 });
 
-test('a stale price reaches screen readers as a label', () => {
-  const staleCtx = makeCtx({
-    zecPrice: { zecPrice: 33.33, date: Date.now() - 11 * 60_000 },
+test('a failed fetch reaches screen readers as a stale label', async () => {
+  const ctx = makeCtx({
+    zecPrice: { zecPrice: 33.33, date: Date.now() },
   });
-  const view = render(fetcherUi(staleCtx));
-  expect(view.getByLabelText('price-ring-stale')).toBeTruthy();
+  const view = render(fetcherUi(ctx));
+  await waitFor(() =>
+    expect(view.getByLabelText('price-ring-stale')).toBeTruthy(),
+  );
 });
 
 test('a current price reaches screen readers as a label too', () => {
