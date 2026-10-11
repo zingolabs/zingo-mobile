@@ -3,8 +3,9 @@ import React, { useContext, useState, useEffect, useRef } from 'react';
 import { View, TextInput, Keyboard, TouchableOpacity } from 'react-native';
 import { NavigationProp, ParamListBase } from '@react-navigation/native';
 import { useTheme } from '@app/theme';
+import { ScanIcon } from '@ui/primitives/Icons/ScanIcon';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faCheck, faQrcode, faXmark } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faXmark } from '@fortawesome/free-solid-svg-icons';
 
 import {
   AddressBookActionEnum,
@@ -412,10 +413,9 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
               onPress={onScanAddress}
               hitSlop={8}
             >
-              <FontAwesomeIcon
+              <ScanIcon
                 style={{ marginRight: 5 }}
                 size={28}
-                icon={faQrcode}
                 color={colors.fgMuted}
               />
             </TouchableOpacity>

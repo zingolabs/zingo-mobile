@@ -22,7 +22,6 @@ import {
 } from 'react-native';
 import Animated from 'react-native-reanimated';
 import {
-  faQrcode,
   faCheck,
   faInfoCircle,
   faAddressCard,
@@ -37,6 +36,7 @@ import {
   useNavigation,
 } from '@react-navigation/native';
 import { useTheme } from '@app/theme';
+import { ScanIcon } from '@ui/primitives/Icons/ScanIcon';
 import { getNumberFormatSettings } from 'react-native-localize';
 import SelectBottomSheet from '@ui/widgets/SelectBottomSheet';
 
@@ -1359,10 +1359,9 @@ const Send: React.FunctionComponent<SendProps> = ({
                           setQrcodeModalShow();
                         }}
                       >
-                        <FontAwesomeIcon
+                        <ScanIcon
                           style={{ marginRight: 5 }}
                           size={28}
-                          icon={faQrcode}
                           color={colors.fgMuted}
                         />
                       </TouchableOpacity>
