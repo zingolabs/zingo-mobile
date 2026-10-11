@@ -103,8 +103,6 @@
     "memobytes-unit": " chars."
   },
   "loadingapp": {
-    "no-access": "Esta rede não tem acesso à internet",
-    "no-access-line": "Faça login no Wi-Fi ou tente outra rede. Você ainda pode criar ou importar uma carteira; ela sincroniza quando houver internet.",
     "saved-key-net-body": "Esta chave de visualização é da {keynet} e o Zingo está conectado a um servidor {net}, então não consegue importá-la. Escolha um servidor {keynet} para importá-la.",
     "saved-wallet-net-title": "Esta carteira é de outra rede",
     "saved-wallet-net-body": "O aniversário dela, o bloco {birthday}, é posterior ao último bloco da {net} ({tip}), então ela foi criada em outra rede. Escolha um servidor dessa rede para importá-la.",
@@ -624,7 +622,6 @@
     "waiting": "Fundos aguardando as confirmações mínimas"
   },
   "report": {
-    "noaccess": "Conectado a uma rede sem acesso à internet.",
     "title": "Relatório de Sincronização / Rescan",
     "running": "Em Processo...",
     "finished": "Finalizado",
@@ -678,7 +675,6 @@
     "keep-holding": "Continue segurando para excluir"
   },
   "server": {
-    "card-no-access": "Esta rede não tem acesso à internet",
     "title": "Servidor",
     "automatic": "Automático",
     "automatic-suffix": "(automático)",

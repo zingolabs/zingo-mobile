@@ -7,7 +7,6 @@ import {
   useNavigation,
 } from '@react-navigation/native';
 import { useTheme } from '@app/theme';
-import { connectivity } from '@app/utils/connectivity';
 import {
   faCheck,
   faCloudDownload,
@@ -230,7 +229,7 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
                 )}
               </>
             )}
-            {(connectivity(netInfo) !== 'ok' ||
+            {(!netInfo.isConnected ||
               netInfo.type === NetInfoStateType.cellular ||
               netInfo.isConnectionExpensive) && (
               <View
@@ -248,7 +247,7 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
                 >
                   <FontAwesomeIcon
                     icon={faCloudDownload}
-                    color={connectivity(netInfo) !== 'ok' ? 'red' : 'yellow'}
+                    color={!netInfo.isConnected ? 'red' : 'yellow'}
                     size={16}
                   />
                 </TouchableOpacity>

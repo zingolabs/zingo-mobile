@@ -28,7 +28,6 @@ import { LoadingDots } from '@ui/widgets/ProgressState';
 import { WalletErrorKind } from '@app/AppState/types/WalletErrorInfo';
 import { ChainNameEnum } from '@app/AppState';
 import { showConfirm } from '@app/services/showConfirm';
-import { connectivity } from '@app/utils/connectivity';
 
 type WalletErrorProps = {
   kind: WalletErrorKind;
@@ -200,7 +199,7 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
   const offline = server.kind === 'offline';
   const dotColor = resolved
     ? colors.fgAccent
-    : connectivity(netInfo) !== 'ok' || kind === 'server'
+    : !netInfo.isConnected || kind === 'server'
       ? colors.fgDangerEmphasis
       : offline
         ? colors.fgMuted

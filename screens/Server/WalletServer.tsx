@@ -10,7 +10,6 @@ import { View } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-import { connectivity } from '@app/utils/connectivity';
 import { useTheme } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
 import {
@@ -236,7 +235,6 @@ const WalletServer: React.FC<WalletServerProps> = ({
             blockHeight={blockHeight}
             busy={busy}
             online={online}
-            noAccess={connectivity(netInfo) === 'noAccess'}
             recommended={serverUris(translate).filter(s => s.recommended)}
             latencies={latencies}
             onAuto={chooseAutomatic}

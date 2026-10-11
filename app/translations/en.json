@@ -103,8 +103,6 @@
     "memobytes-unit": " chars."
   },
   "loadingapp": {
-    "no-access": "No internet access on this network",
-    "no-access-line": "Sign in to the Wi-Fi or try another network. You can still create or import a wallet; it syncs once there's internet.",
     "saved-key-net-body": "This viewing key is for {keynet} and Zingo is connected to a {net} server, so it can't import it. Choose a {keynet} server to import it.",
     "saved-wallet-net-title": "This wallet is from another network",
     "saved-wallet-net-body": "Its birthday, block {birthday}, is past the latest {net} block ({tip}), so it was made on another network. Choose a server of that network to import it.",
@@ -624,7 +622,6 @@
     "waiting": "Funds waiting for the minimum confirmations"
   },
   "report": {
-    "noaccess": "Connected to a network without internet access.",
     "title": "Sync / Rescan Report",
     "running": "Syncing...",
     "finished": "Fully Synced",
@@ -678,7 +675,6 @@
     "keep-holding": "Keep holding to delete"
   },
   "server": {
-    "card-no-access": "This network has no internet access",
     "title": "Server",
     "automatic": "Automatic",
     "automatic-suffix": "(automatic)",

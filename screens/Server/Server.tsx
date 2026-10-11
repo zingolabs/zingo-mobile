@@ -48,8 +48,6 @@ export type ServerProps = {
   // True while the host applies a choice.
   busy: boolean;
   online: boolean;
-  // Connected to a network that doesn't reach the internet.
-  noAccess?: boolean;
   // The recommended (Zaino) servers of every network.
   recommended: ServerUrisType[];
   latencies: Record<string, number | null>;
@@ -202,7 +200,6 @@ const Server: React.FunctionComponent<ServerProps> = ({
   blockHeight,
   busy,
   online,
-  noAccess = false,
   recommended,
   latencies,
   onAuto,
@@ -314,20 +311,18 @@ const Server: React.FunctionComponent<ServerProps> = ({
       : '';
   const cardSub = offline
     ? t('offline-card')
-    : noAccess
-      ? t('card-no-access')
-      : !online && status !== 'wait'
-        ? t('card-no-internet')
-        : status === 'wait'
-          ? t('connecting')
-          : status === 'bad'
-            ? t('card-bad', { net: netName(server.chainName) })
-            : t('card-connected', {
-                net: netName(server.chainName),
-                height: blockHeight,
-              });
+    : !online && status !== 'wait'
+      ? t('card-no-internet')
+      : status === 'wait'
+        ? t('connecting')
+        : status === 'bad'
+          ? t('card-bad', { net: netName(server.chainName) })
+          : t('card-connected', {
+              net: netName(server.chainName),
+              height: blockHeight,
+            });
   const cardStatus: ServerStatus =
-    !offline && (noAccess || (!online && status !== 'wait')) ? 'bad' : status;
+    !offline && !online && status !== 'wait' ? 'bad' : status;
 
   // A saved custom server says how it is doing until it is tested again.
   const log: LogLine[] =
