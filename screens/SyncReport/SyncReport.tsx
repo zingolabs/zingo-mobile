@@ -10,6 +10,7 @@ import React, {
 import { View, Text, ActivityIndicator, TouchableOpacity } from 'react-native';
 
 import { useTheme } from '@app/theme';
+import { connectivity } from '@app/utils/connectivity';
 
 import { AppDrawerParamList } from '@app/types';
 import DetailLine from '@ui/widgets/DetailLine';
@@ -276,7 +277,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
             justifyContent: 'flex-start',
           }}
         >
-          {(!netInfo.isConnected ||
+          {(connectivity(netInfo) !== 'ok' ||
             netInfo.type === NetInfoStateType.cellular ||
             netInfo.isConnectionExpensive) && (
             <View
@@ -293,6 +294,12 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                     <RegText color="red">
                       {' '}
                       {translate('report.nointernet') as string}{' '}
+                    </RegText>
+                  )}
+                  {connectivity(netInfo) === 'noAccess' && (
+                    <RegText color="red">
+                      {' '}
+                      {translate('report.noaccess') as string}{' '}
                     </RegText>
                   )}
                   {netInfo.type === NetInfoStateType.cellular && (

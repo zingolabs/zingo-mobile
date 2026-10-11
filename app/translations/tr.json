@@ -103,6 +103,8 @@
     "memobytes-unit": " karakterler."
   },
   "loadingapp": {
+    "no-access": "Bu ağda internet erişimi yok",
+    "no-access-line": "Wi-Fi'ye giriş yapın veya başka bir ağ deneyin. Yine de cüzdan oluşturabilir veya içe aktarabilirsiniz; internet olduğunda senkronize olur.",
     "saved-key-net-body": "Bu görüntüleme anahtarı {keynet} içindir ve Zingo bir {net} sunucusuna bağlı, bu yüzden onu içe aktaramaz. İçe aktarmak için bir {keynet} sunucusu seçin.",
     "saved-wallet-net-title": "Bu cüzdan başka bir ağdan",
     "saved-wallet-net-body": "Doğum günü olan {birthday} bloğu, en son {net} bloğundan ({tip}) sonra; yani başka bir ağda oluşturulmuş. İçe aktarmak için o ağın bir sunucusunu seçin.",
@@ -620,6 +622,7 @@
     "waiting": "Fonlar minimum onay bekliyor"
   },
   "report": {
+    "noaccess": "İnternet erişimi olmayan bir ağa bağlı.",
     "title": "Senkronizasyon / Yeniden Tarama Raporu",
     "running": "Senkronize ediliyor...",
     "finished": "Tamamen Senkronize Edildi",
@@ -673,6 +676,7 @@
     "keep-holding": "Silmek için basılı tutmaya devam edin"
   },
   "server": {
+    "card-no-access": "Bu ağda internet erişimi yok",
     "title": "Sunucu",
     "automatic": "Otomatik",
     "automatic-suffix": "(otomatik)",

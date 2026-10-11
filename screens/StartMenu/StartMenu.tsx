@@ -17,6 +17,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 
 import { ContextAppLoading } from '@app/context';
+import { connectivity } from '@app/utils/connectivity';
 import { WalletType } from '@app/AppState';
 import { getZingoName, getZingoVersion } from '@app/utils/ZingoAppData';
 import RegText from '@ui/primitives/RegText';
@@ -100,7 +101,9 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
   const [containerH, setContainerH] = useState<number>(0);
   const [backOnline, setBackOnline] = useState<boolean>(false);
   const [started, setStarted] = useState<string | null>(null);
-  const wasOffline = useRef<boolean>(!netInfo.isConnected);
+  // No network, or a network that doesn't reach the internet.
+  const reach = connectivity(netInfo);
+  const wasOffline = useRef<boolean>(reach !== 'ok');
   // Past the launch sequence, what appears no longer waits for it.
   const launched = useRef(false);
   useEffect(() => {
@@ -112,20 +115,20 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
   const lateEnter = () => (launched.current ? offlineEnter() : tagEnter());
 
   useEffect(() => {
-    if (netInfo.isConnected && wasOffline.current) {
+    if (reach === 'ok' && wasOffline.current) {
       setBackOnline(true);
       const t = setTimeout(() => setBackOnline(false), BACK_ONLINE_MS);
       wasOffline.current = false;
       return () => clearTimeout(t);
     }
-    if (!netInfo.isConnected) {
+    if (reach !== 'ok') {
       wasOffline.current = true;
       setBackOnline(false);
     }
-  }, [netInfo.isConnected]);
+  }, [reach]);
 
   const offline = server.kind === 'offline';
-  const noInternet = !netInfo.isConnected;
+  const noInternet = reach !== 'ok';
   const canAct = netInfo.isConnected || offline;
   const nonMain = server.chainName !== 'main';
   const netLabel =
@@ -275,7 +278,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
           }}
         >
           <Animated.View
-            key={backOnline ? 'online' : 'offline'}
+            key={backOnline ? 'online' : reach}
             entering={pillSwap()}
           >
             {backOnline
@@ -289,7 +292,11 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
                   />,
                 )
               : chip(
-                  translate('loadingapp.no-internet') as string,
+                  translate(
+                    reach === 'noAccess'
+                      ? 'loadingapp.no-access'
+                      : 'loadingapp.no-internet',
+                  ) as string,
                   false,
                   <FontAwesomeIcon
                     icon={faWifi}
@@ -353,7 +360,13 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
               paddingHorizontal: 46,
             }}
           >
-            {translate('loadingapp.offline-line') as string}
+            {
+              translate(
+                reach === 'noAccess'
+                  ? 'loadingapp.no-access-line'
+                  : 'loadingapp.offline-line',
+              ) as string
+            }
           </Animated.Text>
         )}
       </View>

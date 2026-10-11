@@ -7,6 +7,7 @@ import type {
 } from '@screens/OptionsPanel';
 import { closeOptionsPanel, useOptionsPanel } from '@app/context/optionsPanel';
 import { probeUri } from '@app/services/serverPicking';
+import { connectivity } from '@app/utils/connectivity';
 import { ContextAppLoaded } from '@app/context';
 import { MenuItemEnum } from '@app/AppState';
 import { sendEmail } from '@app/services/sendEmail';
@@ -182,7 +183,7 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
       label: translate('server.title') as string,
       icon: (
         <ServerIcon
-          noInternet={!netInfo.isConnected}
+          noInternet={connectivity(netInfo) !== 'ok'}
           unreachable={unreachable}
           offline={isOffline}
           background="#111c2c"

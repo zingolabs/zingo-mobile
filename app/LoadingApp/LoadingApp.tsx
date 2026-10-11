@@ -24,6 +24,7 @@ import { BottomSheetBackHandler } from '@app/hooks/useBottomSheetBackHandler';
 import ConfirmBottomSheet from '@ui/widgets/ConfirmBottomSheet';
 import { showConfirm } from '@app/services/showConfirm';
 import { viewingKeyChain } from '@app/utils/seedPhrase';
+import { connectivity } from '@app/utils/connectivity';
 
 import {
   createNewWallet,
@@ -485,6 +486,7 @@ export class LoadingAppClass extends Component<
     this.setState({
       netInfo: {
         isConnected: netInfoState.isConnected,
+        isInternetReachable: netInfoState.isInternetReachable,
         type: netInfoState.type,
         isConnectionExpensive:
           netInfoState.details && netInfoState.details.isConnectionExpensive,
@@ -631,15 +633,22 @@ export class LoadingAppClass extends Component<
 
     this.unsubscribeNetInfo = NetInfo.addEventListener(
       (state: NetInfoState) => {
-        const { isConnected, type, isConnectionExpensive } = this.state.netInfo;
+        const {
+          isConnected,
+          isInternetReachable,
+          type,
+          isConnectionExpensive,
+        } = this.state.netInfo;
         if (
           isConnected !== state.isConnected ||
+          isInternetReachable !== state.isInternetReachable ||
           type !== state.type ||
           isConnectionExpensive !== state.details?.isConnectionExpensive
         ) {
           this.setState({
             netInfo: {
               isConnected: state.isConnected,
+              isInternetReachable: state.isInternetReachable,
               type: state.type,
               isConnectionExpensive:
                 state.details && state.details.isConnectionExpensive,
@@ -1932,6 +1941,7 @@ export class LoadingAppClass extends Component<
                       blockHeight={this.state.serverBlockHeight}
                       busy={actionButtonsDisabled}
                       online={!!this.state.netInfo.isConnected}
+                      noAccess={connectivity(this.state.netInfo) === 'noAccess'}
                       recommended={serverUris(translate).filter(
                         s => s.recommended,
                       )}

@@ -103,6 +103,8 @@
     "memobytes-unit": " car."
   },
   "loadingapp": {
+    "no-access": "Esta red no tiene acceso a internet",
+    "no-access-line": "Inicia sesión en el wifi o prueba otra red. Puedes crear o importar un monedero igualmente; se sincroniza cuando haya internet.",
     "saved-key-net-body": "Esta clave de visualización es de {keynet} y Zingo está conectado a un servidor de {net}, así que no puede importarla. Elige un servidor de {keynet} para importarla.",
     "saved-wallet-net-title": "Este monedero es de otra red",
     "saved-wallet-net-body": "Su cumpleaños, el bloque {birthday}, es posterior al último bloque de {net} ({tip}), así que se creó en otra red. Elige un servidor de esa red para importarlo.",
@@ -622,6 +624,7 @@
     "waiting": "Fondos en espera de las confirmaciones mínimas"
   },
   "report": {
+    "noaccess": "Conectado a una red sin acceso a internet.",
     "title": "Informe de Sincronización",
     "running": "Sincronizando...",
     "finished": "Totalmente sincronizado",
@@ -675,6 +678,7 @@
     "keep-holding": "Sigue pulsando para borrar"
   },
   "server": {
+    "card-no-access": "Esta red no tiene acceso a internet",
     "title": "Servidor",
     "automatic": "Automático",
     "automatic-suffix": "(automático)",

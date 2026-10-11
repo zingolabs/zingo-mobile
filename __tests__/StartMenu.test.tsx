@@ -68,3 +68,51 @@ test('Tests that only the pressed button shows its spinner when the work starts'
   expect(screen.getByTestId('loadingapp.importthis.spinner')).toBeOnTheScreen();
   expect(screen.queryByTestId('loadingapp.createnewwallet.spinner')).toBeNull();
 });
+
+const mountWithNet = (isConnected: boolean, isInternetReachable: boolean) =>
+  render(
+    <ContextAppLoadingProvider
+      value={{
+        ...defaultAppContextLoading,
+        translate: (key: string) => key,
+        netInfo: {
+          isConnected,
+          isInternetReachable,
+          type: 'wifi' as never,
+          isConnectionExpensive: false,
+        },
+      }}
+    >
+      <StartMenu
+        actionButtonsDisabled={false}
+        recoveryWallet={null}
+        freshInstall={false}
+        importRecoveryWallet={jest.fn()}
+        viewRecoveryWallet={jest.fn()}
+        customServer={jest.fn()}
+        walletExists={false}
+        openCurrentWallet={jest.fn()}
+        createNewWallet={jest.fn()}
+        getwalletToRestore={jest.fn()}
+      />
+    </ContextAppLoadingProvider>,
+  );
+
+test('Tests that a network without internet access says so, apart from no network', () => {
+  mountWithNet(true, false);
+  expect(screen.getByText('loadingapp.no-access')).toBeOnTheScreen();
+  expect(screen.getByText('loadingapp.no-access-line')).toBeOnTheScreen();
+  expect(screen.queryByText('loadingapp.no-internet')).toBeNull();
+});
+
+test('Tests that no network keeps the no internet notice', () => {
+  mountWithNet(false, false);
+  expect(screen.getByText('loadingapp.no-internet')).toBeOnTheScreen();
+  expect(screen.queryByText('loadingapp.no-access')).toBeNull();
+});
+
+test('Tests that a network that reaches the internet shows no notice', () => {
+  mountWithNet(true, true);
+  expect(screen.queryByText('loadingapp.no-access')).toBeNull();
+  expect(screen.queryByText('loadingapp.no-internet')).toBeNull();
+});

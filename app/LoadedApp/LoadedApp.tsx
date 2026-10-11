@@ -778,6 +778,7 @@ export class LoadedAppClass extends Component<
     this.setState({
       netInfo: {
         isConnected: netInfoState.isConnected,
+        isInternetReachable: netInfoState.isInternetReachable,
         type: netInfoState.type,
         isConnectionExpensive:
           netInfoState.details && netInfoState.details.isConnectionExpensive,
@@ -926,15 +927,22 @@ export class LoadedAppClass extends Component<
 
     this.unsubscribeNetInfo = NetInfo.addEventListener(
       async (state: NetInfoState) => {
-        const { isConnected, type, isConnectionExpensive } = this.state.netInfo;
+        const {
+          isConnected,
+          isInternetReachable,
+          type,
+          isConnectionExpensive,
+        } = this.state.netInfo;
         if (
           isConnected !== state.isConnected ||
+          isInternetReachable !== state.isInternetReachable ||
           type !== state.type ||
           isConnectionExpensive !== state.details?.isConnectionExpensive
         ) {
           this.setState({
             netInfo: {
               isConnected: state.isConnected,
+              isInternetReachable: state.isInternetReachable,
               type: state.type,
               isConnectionExpensive:
                 state.details && state.details.isConnectionExpensive,
