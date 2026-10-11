@@ -41,6 +41,7 @@ import { ChainNameEnum, GlobalConst } from '@app/AppState';
 import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
 import {
   isViewingKey,
+  scannedSeedPhrase,
   seedStatus,
   viewingKeyProblem,
 } from '@app/utils/seedPhrase';
@@ -539,13 +540,26 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
             title: translate('scanner.title') as string,
             hint: translate('import.scan-hint') as string,
             miss: translate('import.scan-miss') as string,
-            found: translate('import.scan-found') as string,
+            found: value =>
+              translate(
+                isViewingKey(value)
+                  ? 'import.scan-found'
+                  : 'import.scan-found-seed',
+              ) as string,
             back: translate('scanner.back') as string,
             torch: translate('scanner.torch') as string,
           }}
-          accepts={isViewingKey}
-          onRead={key => {
-            setSeedufvkText(key);
+          accepts={value => isViewingKey(value) || !!scannedSeedPhrase(value)}
+          onRead={value => {
+            const seed = scannedSeedPhrase(value);
+            if (seed) {
+              setSeedufvkText(seed.words.join(' '));
+              if (seed.birthday && !birthday) {
+                setBirthday(String(seed.birthday));
+              }
+            } else {
+              setSeedufvkText(value);
+            }
             setPulse(p => p + 1);
           }}
           onClosed={() => setScan({ kind: 'closed' })}

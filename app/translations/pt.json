@@ -746,15 +746,16 @@
     "done": "Concluído"
   },
   "import": {
+    "scan-hint": "Aponte a câmera para o código QR de uma frase semente ou de uma chave de visualização.",
+    "scan-miss": "Esse código não é uma frase semente nem uma chave de visualização.",
+    "scan-found-seed": "Frase semente encontrada",
     "key-prefix": "Uma chave de visualização começa com uview1.",
     "key-char": "“{char}” não pode aparecer em uma chave de visualização. Verifique esse caractere.",
     "key-incomplete": "Esta chave de visualização está incompleta. Verifique se faltam caracteres.",
     "key-valid": "Chave de visualização válida",
     "key-keep-typing": "Chave de visualização? Continue digitando: uview1…",
     "word-nomatch": "Nenhuma palavra de recuperação começa com “{word}”",
-    "scan-hint": "Aponte a câmera para o código QR de uma chave de visualização.",
     "scan-found": "Chave de visualização encontrada",
-    "scan-miss": "Esse código não é uma chave de visualização.",
     "title": "Frases de recuperação / Chave de Visualização",
     "key-label": "Insira a Frases de recuperação / Chave de Visualização",
     "birthday": "Aniversário",

@@ -55,7 +55,8 @@ export type ScanTexts = {
   title: string;
   hint: string;
   miss: string;
-  found: string;
+  // The pill once a code is taken; per code when it can be of two kinds.
+  found: string | ((value: string) => string);
   back: string;
   torch: string;
 };
@@ -338,7 +339,9 @@ const ScanOverlay: React.FunctionComponent<ScanOverlayProps> = ({
                     fontWeight: '700',
                   }}
                 >
-                  {texts.found}
+                  {typeof texts.found === 'function'
+                    ? texts.found(found.current)
+                    : texts.found}
                 </Text>
               </Animated.View>
             ) : (

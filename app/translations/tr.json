@@ -744,15 +744,16 @@
     "done": "Bitti"
   },
   "import": {
+    "scan-hint": "Kamerayı bir kurtarma ifadesinin veya görüntüleme anahtarının QR koduna doğrultun.",
+    "scan-miss": "Bu kod bir kurtarma ifadesi veya görüntüleme anahtarı değil.",
+    "scan-found-seed": "Kurtarma ifadesi bulundu",
     "key-prefix": "Görüntüleme anahtarı uview1 ile başlar.",
     "key-char": "“{char}” bir görüntüleme anahtarında bulunamaz. Bu karakteri kontrol edin.",
     "key-incomplete": "Bu görüntüleme anahtarı eksik. Eksik karakter olup olmadığını kontrol edin.",
     "key-valid": "Geçerli görüntüleme anahtarı",
     "key-keep-typing": "Görüntüleme anahtarı mı? Yazmaya devam edin: uview1…",
     "word-nomatch": "“{word}” ile başlayan kurtarma kelimesi yok",
-    "scan-hint": "Kamerayı bir görüntüleme anahtarının QR koduna doğrultun.",
     "scan-found": "Görüntüleme anahtarı bulundu",
-    "scan-miss": "Bu kod bir görüntüleme anahtarı değil.",
     "title": "Tohum ifadesi / Görüntüleme anahtarı",
     "key-label": "Tohum ifadenizi veya görüntüleme anahtarınızı girin",
     "birthday": "Doğum günü",

@@ -746,15 +746,16 @@
     "done": "Done"
   },
   "import": {
+    "scan-hint": "Point the camera at a seed phrase or viewing key QR code.",
+    "scan-miss": "That code isn't a seed phrase or a viewing key.",
+    "scan-found-seed": "Seed phrase found",
     "key-prefix": "A viewing key starts with uview1.",
     "key-char": "“{char}” can’t appear in a viewing key. Check that character.",
     "key-incomplete": "This viewing key is incomplete. Check for missing characters.",
     "key-valid": "Valid viewing key",
     "key-keep-typing": "Viewing key? Keep typing: uview1…",
     "word-nomatch": "No recovery word starts with “{word}”",
-    "scan-hint": "Point the camera at a viewing key QR code.",
     "scan-found": "Viewing key found",
-    "scan-miss": "That code isn't a viewing key.",
     "title": "Seed Phrase / Viewing Key",
     "key-label": "Enter your Seed Phrase or Viewing key",
     "birthday": "Birthday",

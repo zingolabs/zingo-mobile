@@ -118,6 +118,26 @@ export const checksumValid = (words: string[]): boolean => {
   return hashBits.slice(0, checksumBits) === bits.slice(-checksumBits);
 };
 
+// A scanned seed phrase: 24 recovery words with a valid checksum, and the
+// birthday when the code carries it after them as a number (Zingo copies
+// the words, a line break and "<Wallet birthday>: <height>", its label in
+// any language).
+// Null for any other text.
+export const scannedSeedPhrase = (
+  text: string,
+): { words: string[]; birthday?: number } | null => {
+  const tokens = tokenize(text);
+  const words = tokens.slice(0, SEED_WORD_COUNT);
+  const rest = tokens.slice(SEED_WORD_COUNT);
+  const last = rest[rest.length - 1];
+  if (rest.length > 0 && !/^\d+$/.test(last)) {
+    return null;
+  }
+  return words.length === SEED_WORD_COUNT && checksumValid(words)
+    ? { words, birthday: rest.length > 0 ? Number(last) : undefined }
+    : null;
+};
+
 export const suggestWords = (
   prefix: string,
   limit: number = SUGGESTION_LIMIT,
