@@ -13,6 +13,7 @@ import {
   KeyboardAvoidingView,
   Keyboard,
   StyleSheet,
+  Pressable,
 } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { useOptionsPanelSheetSlide } from '@app/hooks/useOptionsPanelSheetSlide';
@@ -23,7 +24,6 @@ import {
   faDotCircle,
   faChevronLeft,
   faChevronRight,
-  faInfoCircle,
 } from '@fortawesome/free-solid-svg-icons';
 import { faCircle as farCircle } from '@fortawesome/free-regular-svg-icons';
 
@@ -51,6 +51,7 @@ import {
 } from '@app/services/gateController';
 import { useBiometricGate } from '@app/hooks/useBiometricGate';
 import SelectBottomSheet from '@ui/widgets/SelectBottomSheet';
+import InfoTooltip from '@ui/widgets/InfoTooltip';
 import BottomSheet, {
   BottomSheetFooter,
   BottomSheetFooterProps,
@@ -410,58 +411,42 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         <View key={'view-' + item.value} style={{ marginBottom: 5 }}>
           <View
             style={{
-              flexDirection: 'row',
-              alignItems: 'center',
+              justifyContent: 'center',
               marginTop: 10,
               minHeight: 48,
             }}
           >
-            <TouchableOpacity
-              testID={`settings.${label}-${item.value}`}
-              disabled={disabled}
-              style={{ flexDirection: 'row', alignItems: 'center' }}
-              onPress={() => setOption(typeOption(item.value))}
-            >
-              <FontAwesomeIcon
-                icon={
-                  typeOption(item.value) === valueOption
-                    ? faDotCircle
-                    : farCircle
-                }
-                size={16}
-                color={colors.fgMuted}
-              />
-              <RegText style={{ marginLeft: 10 }}>
-                {translate(`settings.value-${label}-${item.value}`) as string}
-              </RegText>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() =>
-                setOpenInfoSection(
-                  openInfoSection === infoSection ? null : infoSection,
-                )
+            <InfoTooltip
+              testID={`settings.${infoSection}-info`}
+              label={
+                translate(`settings.value-${label}-${item.value}`) as string
               }
-              hitSlop={8}
-              style={{ marginLeft: 6 }}
+              text={item.text}
+              open={openInfoSection === infoSection}
+              onToggle={open => setOpenInfoSection(open ? infoSection : null)}
+              alignStart
             >
-              <FontAwesomeIcon
-                icon={faInfoCircle}
-                size={14}
-                color={colors.fgDefault}
-              />
-            </TouchableOpacity>
+              <TouchableOpacity
+                testID={`settings.${label}-${item.value}`}
+                disabled={disabled}
+                style={{ flexDirection: 'row', alignItems: 'center' }}
+                onPress={() => setOption(typeOption(item.value))}
+              >
+                <FontAwesomeIcon
+                  icon={
+                    typeOption(item.value) === valueOption
+                      ? faDotCircle
+                      : farCircle
+                  }
+                  size={16}
+                  color={colors.fgMuted}
+                />
+                <RegText style={{ marginLeft: 10 }}>
+                  {translate(`settings.value-${label}-${item.value}`) as string}
+                </RegText>
+              </TouchableOpacity>
+            </InfoTooltip>
           </View>
-          {openInfoSection === infoSection && (
-            <View
-              style={{
-                backgroundColor: '#040E1D',
-                borderRadius: 8,
-                padding: 10,
-              }}
-            >
-              <FadeText style={{ textAlign: 'center' }}>{item.text}</FadeText>
-            </View>
-          )}
         </View>
       );
     });
@@ -638,7 +623,15 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                 justifyContent: 'flex-start',
                 paddingBottom: 100,
               }}
+              onScrollBeginDrag={() => setOpenInfoSection(null)}
             >
+              {/* An open tip closes on a tap anywhere else. */}
+              {!!openInfoSection && (
+                <Pressable
+                  onPress={() => setOpenInfoSection(null)}
+                  style={[StyleSheet.absoluteFill, { zIndex: 1 }]}
+                />
+              )}
               {/* SECTION: Preferences */}
               {sectionHeader('settings.section-preferences')}
 
@@ -686,36 +679,30 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
 
               <View style={{ marginHorizontal: 25, marginVertical: 15 }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      flex: 1,
-                    }}
-                  >
-                    {/* A long press on the title opens the developer
-                          options. */}
-                    <TouchableOpacity
-                      onLongPress={() => setShowDeveloperOptions(true)}
-                    >
-                      <BoldText>
-                        {translate('settings.privacy-title') as string}
-                      </BoldText>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      onPress={() =>
-                        setOpenInfoSection(
-                          openInfoSection === 'privacy' ? null : 'privacy',
-                        )
+                  <View style={{ flex: 1 }}>
+                    <InfoTooltip
+                      testID="settings.privacy-info"
+                      label={translate('settings.privacy-title') as string}
+                      text={
+                        PRIVACYS.find(d => String(d.value) === 'true')?.text ??
+                        ''
                       }
-                      style={{ marginLeft: 6 }}
+                      open={openInfoSection === 'privacy'}
+                      onToggle={open =>
+                        setOpenInfoSection(open ? 'privacy' : null)
+                      }
+                      alignStart
                     >
-                      <FontAwesomeIcon
-                        icon={faInfoCircle}
-                        size={14}
-                        color={colors.fgDefault}
-                      />
-                    </TouchableOpacity>
+                      {/* A long press on the title opens the developer
+                          options. */}
+                      <TouchableOpacity
+                        onLongPress={() => setShowDeveloperOptions(true)}
+                      >
+                        <BoldText>
+                          {translate('settings.privacy-title') as string}
+                        </BoldText>
+                      </TouchableOpacity>
+                    </InfoTooltip>
                   </View>
                   <TouchableOpacity onPress={() => setPrivacy(!privacy)}>
                     {privacy ? (
@@ -725,21 +712,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                     )}
                   </TouchableOpacity>
                 </View>
-                {openInfoSection === 'privacy' && (
-                  <View
-                    style={{
-                      backgroundColor: '#040E1D',
-                      borderRadius: 8,
-                      padding: 10,
-                      marginTop: 8,
-                    }}
-                  >
-                    <FadeText style={{ textAlign: 'center' }}>
-                      {PRIVACYS.find(d => String(d.value) === 'true')?.text ??
-                        ''}
-                    </FadeText>
-                  </View>
-                )}
               </View>
 
               <View
