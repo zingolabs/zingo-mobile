@@ -491,12 +491,14 @@ exports[`Component History - test History privacy high - snapshot 1`] = `
     </View>
     <View
       style={
-        {
-          "marginBottom": 12,
-          "marginHorizontal": 20,
-          "marginTop": 10,
-          "opacity": 0,
-        }
+        [
+          {
+            "marginBottom": 12,
+            "marginHorizontal": 20,
+            "marginTop": 10,
+          },
+          {},
+        ]
       }
     >
       <View
@@ -534,7 +536,7 @@ exports[`Component History - test History privacy high - snapshot 1`] = `
                       "alignItems": "center",
                       "backgroundColor": "#031124",
                       "borderColor": "#05234C",
-                      "borderRadius": 12,
+                      "borderRadius": 14,
                       "borderWidth": 1,
                       "flexDirection": "row",
                       "justifyContent": "space-between",
@@ -1580,12 +1582,14 @@ exports[`Component History - test History privacy normal - snapshot 1`] = `
     </View>
     <View
       style={
-        {
-          "marginBottom": 12,
-          "marginHorizontal": 20,
-          "marginTop": 10,
-          "opacity": 0,
-        }
+        [
+          {
+            "marginBottom": 12,
+            "marginHorizontal": 20,
+            "marginTop": 10,
+          },
+          {},
+        ]
       }
     >
       <View
@@ -1623,7 +1627,7 @@ exports[`Component History - test History privacy normal - snapshot 1`] = `
                       "alignItems": "center",
                       "backgroundColor": "#031124",
                       "borderColor": "#05234C",
-                      "borderRadius": 12,
+                      "borderRadius": 14,
                       "borderWidth": 1,
                       "flexDirection": "row",
                       "justifyContent": "space-between",

@@ -90,19 +90,7 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
                 val shouldSync = loadWalletFile()
 
                 if (!shouldSync) {
-                    Log.i("SCHEDULED_TASK_RUN", "Offline mode, sync skipped")
-                    val timeStampOffline = Date().time / 1000
-                    val timeStampStrOffline = timeStampOffline.toString()
-                    val payload = JSONObject().apply {
-                        put("batches", "0")
-                        put("message", "Sync skipped - Offline mode.")
-                        put("date", "$timeStampStrStart")
-                        put("dateEnd", "$timeStampStrOffline")
-                    }
-                    val jsonBackgroundOffline = payload.toString()
-                    rpcModule.saveBackgroundFile(jsonBackgroundOffline)
-                    Log.i("SCHEDULED_TASK_RUN", "background json file SAVED $jsonBackgroundOffline")
-                    return Result.success()
+                    return skipOffline(timeStampStrStart)
                 }
 
                 // runSync throws on failure (typed FFI errors); the catch
@@ -110,6 +98,10 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
                 // inspected for an error sentinel.
                 val syncing = uniffi.zingo.runSync()
                 Log.i("SCHEDULED_TASK_RUN", "sync LAUNCH: $syncing")
+            } catch (t: uniffi.zingo.ZingolibException.Offline) {
+                // The wallet opened without an indexer: nothing to sync, the
+                // same as Offline mode, and no error to report.
+                return skipOffline(timeStampStrStart)
             } catch (t: Throwable) {
                 Log.i("SCHEDULED_TASK_RUN", "Run Sync unknown error: $t")
                 // save the background JSON file
@@ -229,6 +221,21 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
      * function returns `true` so the downstream sync path surfaces its own
      * error rather than masquerading as offline mode.
      */
+    private fun skipOffline(timeStampStrStart: String): Result {
+        Log.i("SCHEDULED_TASK_RUN", "Offline mode, sync skipped")
+        val timeStampStrOffline = (Date().time / 1000).toString()
+        val payload = JSONObject().apply {
+            put("batches", "0")
+            put("message", "Sync skipped - Offline mode.")
+            put("date", timeStampStrStart)
+            put("dateEnd", timeStampStrOffline)
+        }
+        val jsonBackgroundOffline = payload.toString()
+        rpcModule.saveBackgroundFile(jsonBackgroundOffline)
+        Log.i("SCHEDULED_TASK_RUN", "background json file SAVED $jsonBackgroundOffline")
+        return Result.success()
+    }
+
     private fun loadWalletFile(): Boolean {
         var shouldSync = true
         context.openFileInput("settings.json")?.use { file: FileInputStream ->

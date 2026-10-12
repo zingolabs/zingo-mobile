@@ -1,5 +1,15 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Svg, Path, Circle } from 'react-native-svg';
+import Animated, {
+  interpolateColor,
+  useAnimatedProps,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
+
+const AnimatedCircle = Animated.createAnimatedComponent(Circle);
+// The dot crossfades to its new color.
+const DOT_MS = 300;
 
 import { useTheme } from '@app/theme';
 
@@ -7,8 +17,10 @@ import { useTheme } from '@app/theme';
 const STROKE = '#B1BBC5';
 
 type ServerIconProps = {
-  // No internet turns the dot red, Offline grey; otherwise it is green.
+  // No internet or a server that doesn't answer turns the dot red, Offline
+  // grey; otherwise it is green.
   noInternet: boolean;
+  unreachable?: boolean;
   offline: boolean;
   size?: number;
   // The surface behind the icon, for the ring that cuts the dot out.
@@ -18,16 +30,33 @@ type ServerIconProps = {
 // The server icon: a database cylinder with a status dot.
 const ServerIcon: React.FC<ServerIconProps> = ({
   noInternet,
+  unreachable,
   offline,
   size = 32,
   background,
 }) => {
   const { colors } = useTheme();
-  const dot = noInternet
-    ? colors.fgDangerEmphasis
-    : offline
-      ? colors.fgMuted
-      : colors.fgAccent;
+  const dot =
+    noInternet || (unreachable && !offline)
+      ? colors.fgDangerEmphasis
+      : offline
+        ? colors.fgMuted
+        : colors.fgAccent;
+  const from = useSharedValue(dot);
+  const to = useSharedValue(dot);
+  const mix = useSharedValue(1);
+  useEffect(() => {
+    if (dot === to.value) {
+      return;
+    }
+    from.value = to.value;
+    to.value = dot;
+    mix.value = 0;
+    mix.value = withTiming(1, { duration: DOT_MS });
+  }, [dot, from, to, mix]);
+  const dotProps = useAnimatedProps(() => ({
+    fill: interpolateColor(mix.value, [0, 1], [from.value, to.value]),
+  }));
   return (
     <Svg width={size} height={size} viewBox="0 0 32 32" fill="none">
       <Path
@@ -44,12 +73,12 @@ const ServerIcon: React.FC<ServerIconProps> = ({
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      <Circle
+      <AnimatedCircle
         testID="server.icon.dot"
         cx={25.5}
         cy={25.5}
         r={5.5}
-        fill={dot}
+        animatedProps={dotProps}
         stroke={background ?? colors.bgCanvas}
         strokeWidth={2}
       />

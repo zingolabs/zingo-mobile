@@ -8,10 +8,7 @@ import {
 import { useBottomSheetModal } from '@gorhom/bottom-sheet';
 import { RouteEnum } from '@app/AppState';
 
-const scannerRoutes: string[] = [
-  RouteEnum.ScannerAddress,
-  RouteEnum.ScannerUfvk,
-];
+const scannerRoutes: string[] = [RouteEnum.ScannerAddress];
 
 const rootRouteName = (navigation: NavigationProp<ParamListBase>) => {
   let root = navigation;

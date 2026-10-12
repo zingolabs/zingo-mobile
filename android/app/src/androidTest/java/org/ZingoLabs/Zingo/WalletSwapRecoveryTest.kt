@@ -127,4 +127,18 @@ class WalletSwapRecoveryTest {
         assertThat(file(backupName).readBytes()).isEqualTo(walletA)
         assertThat(file(swapName).exists()).isFalse()
     }
+
+    @Test
+    fun theReplaceTakesTheBackupAndDropsTheBackupFile() {
+        file(mainName).writeBytes(walletA)
+        file(backupName).writeBytes(walletB)
+
+        val promise = CapturingPromise()
+        rpcModule.replaceWalletWithBackup(promise)
+
+        assertThat(promise.resolved).containsExactly(true)
+        assertThat(file(mainName).readBytes()).isEqualTo(walletB)
+        assertThat(file(backupName).exists()).isFalse()
+        assertThat(file(swapName).exists()).isFalse()
+    }
 }

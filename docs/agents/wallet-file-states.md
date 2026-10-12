@@ -17,7 +17,13 @@ HiOS observed) made files undecryptable outright. iOS never had
 app-layer encryption. Every recovery sidecar below exists to patch one
 of these failure modes.
 
-## Main files: `wallet.dat`, `wallet.backup.dat`
+## Main file: `wallet.dat`
+
+Older builds also wrote `wallet.backup.dat`, a copy of the previous
+mainnet wallet, on every wallet change. No build writes it now. The
+file stays on disk, and the hidden developer section of Settings can
+swap it with the main wallet when it exists. Diagnosis, repair and
+write recovery cover the main wallet only.
 
 The state names are the `diagnoseWalletFile` vocabulary that crosses the
 bridge (`WalletFileState` in `walletFileRepair.ts`).

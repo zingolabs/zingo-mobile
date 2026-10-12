@@ -318,3 +318,13 @@ test('Tests that a server that did not answer is refused and a reachable one is 
   fireEvent.press(screen.getByTestId('serverlist.pick.na.zec.rocks:443'));
   expect(onPick).toHaveBeenCalledWith(others[1]);
 });
+
+test('Tests that the screen opens on the network it is asked for', () => {
+  const h = handlers();
+  mount({ initialChain: ChainNameEnum.testChainName }, h);
+  expect(
+    screen.getByTestId(`server.net.${ChainNameEnum.testChainName}`).props
+      .accessibilityState.selected,
+  ).toBe(true);
+  expect(h.onProbe).toHaveBeenLastCalledWith(ChainNameEnum.testChainName);
+});

@@ -229,7 +229,7 @@ export const ScreenHeader: React.FC<{
         style={({ pressed }) => ({
           position: 'absolute',
           left: 17,
-          top: 38,
+          top: 2,
           width: 44,
           height: 44,
           borderRadius: 10,
@@ -250,7 +250,7 @@ export const ScreenHeader: React.FC<{
           position: 'absolute',
           left: 60,
           right: 60,
-          top: 50,
+          top: 14,
           fontSize: 16,
           lineHeight: 22,
           textAlign: 'center',
@@ -288,7 +288,9 @@ export const DoneButton: React.FC<{
         transform: [{ scale: pressed ? 0.97 : 1 }],
       })}
     >
-      <RegText style={{ fontSize: 16, color: colors.bgCanvas }}>
+      <RegText
+        style={{ fontSize: 16, color: colors.bgCanvas, fontWeight: '700' }}
+      >
         {title}
       </RegText>
     </Pressable>

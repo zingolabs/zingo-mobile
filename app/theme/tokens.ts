@@ -32,6 +32,9 @@ export type ThemeColors = {
   bgWarning: string;
 
   fgDanger: string;
+
+  // View-only (watch-only) wallet marks: the snowflake and its tiles.
+  fgViewOnly: string;
   fgDangerEmphasis: string;
 };
 
@@ -53,6 +56,8 @@ const base = {
   bgWarning: '#262527',
 
   fgDanger: '#FFB972',
+
+  fgViewOnly: '#8FB4E6',
   fgDangerEmphasis: '#dc2626',
 } as const;
 

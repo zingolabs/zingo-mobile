@@ -7,8 +7,9 @@ import {
   useNavigation,
 } from '@react-navigation/native';
 import { useTheme } from '@app/theme';
+import { ScanIcon } from '@ui/primitives/Icons/ScanIcon';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faCheck, faQrcode, faXmark } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faXmark } from '@fortawesome/free-solid-svg-icons';
 
 import { ContextAppLoaded } from '@app/context';
 import ErrorText from '@ui/primitives/ErrorText';
@@ -178,10 +179,9 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
                   setQrcodeModalShow();
                 }}
               >
-                <FontAwesomeIcon
+                <ScanIcon
                   style={{ marginRight: 5 }}
                   size={28}
-                  icon={faQrcode}
                   color={colors.fgMuted}
                 />
               </TouchableOpacity>

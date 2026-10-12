@@ -3,7 +3,6 @@ export enum MenuItemEnum {
   Rescan = 'Rescan',
   Settings = 'Settings',
   ChangeWallet = 'Change Wallet',
-  RestoreWalletBackup = 'Restore Wallet Backup',
   SyncReport = 'Sync Report',
   FundPools = 'Fund Pools',
   Insight = 'Insight',

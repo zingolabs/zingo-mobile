@@ -7,14 +7,12 @@ import * as fs from 'fs';
 import * as path from 'path';
 import 'react-native';
 import React from 'react';
-import { act, render, renderHook } from '@testing-library/react-native';
+import { render, renderHook } from '@testing-library/react-native';
 import PriceFetcher, { PriceTrafficDriver } from '@ui/widgets/PriceFetcher';
 import {
   PRICE_REFRESH_MAX_MS,
-  PRICE_STALE_MS,
   priceFetcherStore,
   usePriceHealth,
-  usePriceStale,
 } from '@ui/widgets/priceFetcherStore';
 import {
   ContextAppLoadedProvider,
@@ -175,29 +173,6 @@ test('a rejected native call reads as a refusal, not a vanish', async () => {
   expect(price).toHaveBeenCalledTimes(4);
 });
 
-test('no stale crossing outlives its consumers', () => {
-  jest.useFakeTimers();
-  const timersBefore = jest.getTimerCount();
-  const fresh = renderHook(() => usePriceStale(Date.now() - 1_000));
-  fresh.unmount();
-  expect(jest.getTimerCount()).toBe(timersBefore);
-});
-
-test('two prices each keep their own stale crossing', () => {
-  jest.useFakeTimers();
-  const older = Date.now() - PRICE_STALE_MS + 5_000;
-  const newer = Date.now() - 1_000;
-
-  const first = renderHook(() => usePriceStale(older));
-  renderHook(() => usePriceStale(newer));
-  expect(first.result.current).toBe(false);
-
-  act(() => {
-    jest.advanceTimersByTime(6_000);
-  });
-  expect(first.result.current).toBe(true);
-});
-
 test('the muting rule has one spelling, usePriceHealth', () => {
   const sites = [
     '../ui/widgets/PriceFetcher.tsx',
@@ -217,8 +192,24 @@ test('the muting rule has one spelling, usePriceHealth', () => {
   expect(renderHook(() => usePriceHealth(Date.now())).result.current).toBe(
     'live',
   );
+  // Age alone never mutes: only a failed fetch does.
   expect(
-    renderHook(() => usePriceHealth(Date.now() - PRICE_STALE_MS - 60_000))
-      .result.current,
-  ).toBe('stale');
+    renderHook(() => usePriceHealth(Date.now() - 24 * 3_600_000)).result
+      .current,
+  ).toBe('live');
+});
+
+test('a failed fetch mutes the price until one succeeds', async () => {
+  jest.useFakeTimers();
+  price.mockRejectedValue(new Error('down'));
+  const date = Date.now();
+  const health = renderHook(() => usePriceHealth(date));
+
+  render(surfaceUi(makeCtx(), jest.fn()));
+  await jest.advanceTimersByTimeAsync(0);
+  expect(health.result.current).toBe('stale');
+
+  price.mockResolvedValue(mockZecQuote);
+  await jest.advanceTimersByTimeAsync(PRICE_REFRESH_MAX_MS + 1_000);
+  expect(health.result.current).toBe('live');
 });

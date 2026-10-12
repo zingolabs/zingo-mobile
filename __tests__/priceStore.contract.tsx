@@ -166,8 +166,9 @@ test('the driver writes deps when an input moves, not per render', async () => {
   setDepsSpy.mockRestore();
 });
 
-test('the snapshot carries exactly its four read fields', () => {
+test('the snapshot carries exactly its five read fields', () => {
   expect(Object.keys(priceFetcherStore.snapshot()).sort()).toEqual([
+    'failed',
     'loading',
     'nextFetchAt',
     'nextFetchDelayMs',
