@@ -203,9 +203,9 @@ const ConfirmBottomSheet: React.FC = () => {
                 {rowButtons.map((b, i) => (
                   <Button
                     key={`${i}-${b.text}`}
-                    // Destructive actions share the Secondary (outline) shape as
-                    // cancel but carry a soft-coral border/text so the risky
-                    // choice reads as a warning rather than the positive Primary.
+                    // Destructive actions share the Secondary (text) shape as
+                    // cancel but carry soft-coral text so the risky choice
+                    // reads as a warning rather than the positive Primary.
                     type={
                       b.style === 'ghost'
                         ? ButtonTypeEnum.Ghost
@@ -214,11 +214,6 @@ const ConfirmBottomSheet: React.FC = () => {
                           : ButtonTypeEnum.Primary
                     }
                     title={b.text}
-                    style={
-                      b.style === 'destructive'
-                        ? { borderColor: colors.fgDanger }
-                        : undefined
-                    }
                     textStyle={
                       b.style === 'destructive'
                         ? { color: colors.fgDanger }

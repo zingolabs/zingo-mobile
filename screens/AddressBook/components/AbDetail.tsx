@@ -557,11 +557,6 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
               : ButtonTypeEnum.Primary
           }
           title={translate(`addressbook.${action.toLowerCase()}`) as string}
-          style={
-            action === AddressBookActionEnum.Delete
-              ? { borderColor: colors.fgDanger }
-              : undefined
-          }
           textStyle={
             action === AddressBookActionEnum.Delete
               ? { color: colors.fgDanger }
