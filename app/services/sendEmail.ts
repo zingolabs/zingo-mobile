@@ -4,7 +4,11 @@ import { GlobalConst, TranslateType } from '@app/AppState';
 import { redactReport } from '@app/utils/redactReport';
 import { getZingoName, getZingoVersion } from '@app/utils/ZingoAppData';
 import { showConfirm } from './showConfirm';
-import { privateHosts, reportDiagnostics } from './reportDiagnostics';
+import {
+  privateHosts,
+  reportDiagnostics,
+  reportState,
+} from './reportDiagnostics';
 
 export const sendEmail = async (
   translate: (key: string) => TranslateType,
@@ -16,7 +20,7 @@ export const sendEmail = async (
   // Everything the mail carries is redacted: user folders in paths (Hermes
   // embeds compile-time absolute paths into release stacks), keys,
   // addresses, hashes, IPs and a custom server.
-  const hosts = privateHosts(translate);
+  const hosts: string[] = privateHosts(reportState().served, translate);
   const subjectEmail: string = redactReport(
     subject || (translate('subject') as string),
     hosts,

@@ -145,7 +145,7 @@ import Confirm from '@screens/Confirm';
 import { AppStackParamList } from '@app/types';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
-import { updateReportState } from '@app/services/reportDiagnostics';
+import { publishReport } from '@app/services/reportDiagnostics';
 
 const About = React.lazy(() => import('@screens/About'));
 const MixnetDoctor = React.lazy(() => import('@screens/MixnetDoctor'));
@@ -969,18 +969,19 @@ export class LoadedAppClass extends Component<
     this.publishReportState();
   };
 
-  // The situation a support report describes; see reportDiagnostics.
-  publishReportState = () => {
-    const { mixnetView } = this.state;
-    updateReportState({
-      server: this.state.server,
-      selectServer: this.state.selectServer,
-      walletChain: this.state.walletChainName,
-      readOnly: this.state.readOnly,
-      syncingStatus: this.state.syncingStatus,
-      lastError: this.state.lastError,
-      mixnetStatus:
-        mixnetView.kind === 'transport' ? mixnetView.statusKey : 'absent',
+  publishReportState = (): void => {
+    const { server, selectServer, readOnly, lastError, mixnetView } =
+      this.state;
+    publishReport({
+      served: { kind: 'chosen', server, selectServer },
+      session: {
+        kind: 'open',
+        chain: this.state.walletChainName,
+        readOnly,
+        sync: this.state.syncingStatus,
+        lastError,
+        mixnetView,
+      },
     });
   };
 
@@ -1037,12 +1038,7 @@ export class LoadedAppClass extends Component<
   };
 
   componentWillUnmount = async () => {
-    updateReportState({
-      walletChain: undefined,
-      readOnly: undefined,
-      syncingStatus: undefined,
-      lastError: undefined,
-    });
+    publishReport({ session: { kind: 'closed' } });
     await this.rpc.clearTimers();
     this.rpc.stopMixnetPolling();
     const safeRemove = (listener: unknown, name: string) => {
