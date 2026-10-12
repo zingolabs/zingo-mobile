@@ -10,31 +10,23 @@ import {
 } from '@app/AppState';
 import { remoteServer } from '@app/AppState/types/ServerType';
 import RPCModule from '@app/RPCModule';
-import { NetInfoStateType } from '@react-native-community/netinfo/src/index';
+import NetInfo, {
+  NetInfoStateType,
+} from '@react-native-community/netinfo/src/index';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
 jest.mock('@app/RPCModule', () =>
   require('../__mocks__/rpcModuleProxy').rpcModuleProxyMock(),
 );
 
-jest.mock('@react-native-community/netinfo', () => ({
-  fetch: jest.fn(async () => ({
-    isConnected: true,
-    isInternetReachable: false,
-    type: 'wifi',
-    details: { isConnectionExpensive: false },
-  })),
-  addEventListener: jest.fn(() => jest.fn()),
-}));
-
 jest.mock('@app/services/recoveryWalletInfo', () => ({
   ...jest.requireActual('@app/services/recoveryWalletInfo'),
   hasRecoveryWalletInfo: jest.fn(async () => false),
-  getRecoveryWalletInfo: jest.fn(async () => null),
 }));
 
 const walletExists = RPCModule.walletExists as unknown as jest.Mock;
 const createNewWallet = RPCModule.createNewWallet as unknown as jest.Mock;
+const fetchNetInfo = NetInfo.fetch as unknown as jest.Mock;
 
 const bootApp = () =>
   new LoadingAppClass({
@@ -60,11 +52,22 @@ describe('LoadingApp create gate', () => {
 
   test('Tests that the boot keeps the internet reachability netinfo reported', async () => {
     walletExists.mockResolvedValue('false');
+    fetchNetInfo.mockResolvedValueOnce({
+      isConnected: true,
+      isInternetReachable: false,
+      type: NetInfoStateType.wifi,
+      details: { isConnectionExpensive: false },
+    });
 
     const app = bootApp();
+    const setState = jest.spyOn(app, 'setState');
     await app.componentDidMount();
 
-    expect(app.state.netInfo.isInternetReachable).toBe(false);
+    expect(setState).toHaveBeenCalledWith(
+      expect.objectContaining({
+        netInfo: expect.objectContaining({ isInternetReachable: false }),
+      }),
+    );
   });
 
   test('Tests that creation refuses to dial when netinfo reported no internet', async () => {
