@@ -57,7 +57,9 @@ const appWithSaved = (
     netInfo: { ...app.state.netInfo, isConnected: true },
     recoveryWallet: { ...saved, birthday },
   };
-  const doRestore = jest.spyOn(app, 'doRestore').mockResolvedValue(undefined);
+  const doRestore = jest
+    .spyOn(app, 'doRestore')
+    .mockResolvedValue({ kind: 'loaded' });
   return { app, doRestore };
 };
 

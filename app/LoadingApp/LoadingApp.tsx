@@ -83,7 +83,6 @@ import Utils from '@app/utils';
 import { RPCWalletKindType } from '@app/walletBackend/types/RPCWalletKindType';
 import Toast from 'react-native-toast-message';
 import { toastConfig } from '@ui/widgets/toastConfig';
-import { RPCSeedType } from '@app/walletBackend/types/RPCSeedType';
 import Launching from '@screens/Launching';
 import {
   GateAnswer,
@@ -118,23 +117,22 @@ import Server from '@screens/Server';
 import ServerList from '@screens/ServerList';
 import DeleteWalletSheet from '@ui/widgets/DeleteWalletSheet';
 import { DeleteWalletContext } from '@app/AppState/types/DeleteWalletContext';
-import { walletErrorKind } from './walletErrorKind';
 import {
   againKey,
+  failedOutcome,
   initOrigin,
-  initOutcome,
+  LoadOutcome,
+  nativeReply,
   retryOf,
   Retry,
 } from './walletFailure';
-import { InitStep, WalletErrorInfo } from '@app/AppState/types/WalletErrorInfo';
+import { restoreInput } from './restoreInput';
 import { ErrorAction } from '@screens/WalletError/walletErrorModel';
-import { sanitizePaths } from '@app/utils/sanitizePaths';
 import { duration as motionDuration } from '@app/theme/motion';
 
 import { sendEmail } from '@app/services/sendEmail';
 import { RPCWalletKindEnum } from '@app/walletBackend/enums/RPCWalletKindEnum';
 import StartMenu from '@screens/StartMenu';
-import { RPCUfvkType } from '@app/walletBackend/types/RPCUfvkType';
 import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
 import { AppStackParamList } from '@app/types';
 
@@ -156,13 +154,6 @@ const SERVER_DEFAULT_0: ServerType = remoteServer(
   serverUris(() => {})[0].uri,
   serverUris(() => {})[0].chainName,
 );
-
-const activationHeight = {
-  main: 419200,
-  test: 280000,
-  regtest: 1,
-  '': 1,
-};
 
 export default function LoadingApp(props: LoadingAppProps) {
   const theme = useTheme();
@@ -375,6 +366,39 @@ type LoadingAppClassState = AppStateLoading & AppContextLoading;
 const RETRY_MIN_MS = 1400;
 const ERROR_RESOLVE_MS = 200;
 
+// A second open skips the double-wrap repair the first one ran.
+type Repair = 'try' | 'skip';
+
+type WalletKind = Pick<
+  LoadingAppClassState,
+  'readOnly' | 'orchardPool' | 'saplingPool' | 'transparentPool'
+>;
+
+// A first attempt, or a retry settled with the retry it ran.
+type Settlement =
+  | { kind: 'first'; outcome: LoadOutcome }
+  | { kind: 'again'; retry: Retry; outcome: LoadOutcome };
+
+// The state a settlement writes: every arm of `settled` yields all of it.
+type Settled = Pick<
+  LoadingAppClassState,
+  | 'retrying'
+  | 'actionButtonsDisabled'
+  | 'walletError'
+  | 'errorResolved'
+  | 'errorShake'
+  | 'screen'
+>;
+
+const idle = { retrying: false, actionButtonsDisabled: false };
+
+const keep = (state: Readonly<LoadingAppClassState>) => ({
+  walletError: state.walletError,
+  errorResolved: state.errorResolved,
+  errorShake: state.errorShake,
+  screen: state.screen,
+});
+
 export class LoadingAppClass extends Component<
   LoadingAppClassProps,
   LoadingAppClassState
@@ -385,7 +409,6 @@ export class LoadingAppClass extends Component<
   deleteSheetRef = React.createRef<BottomSheetModal>();
   // Runs once the hold completes; set with the sheet's context.
   afterDelete: () => void = () => {};
-  retryStartedAt = 0;
   screenName = ScreenEnum.LoadingApp;
 
   constructor(props: LoadingAppClassProps) {
@@ -586,7 +609,7 @@ export class LoadingAppClass extends Component<
 
     if (exists) {
       this.setState({ walletExists: true });
-      await this.loadExistingWalletOnBoot();
+      await this.load(this.loadExistingWalletOnBoot);
     } else {
       // no wallet file -> go to the initial menu.
       this.setState(state => ({
@@ -846,141 +869,107 @@ export class LoadingAppClass extends Component<
   // A wallet on another network than its server cannot open there, so the
   // error screen offers to switch to the wallet's network instead of a retry.
   // Whatever the server choice, Automatic included.
-  showChainError = async (walletChain: ChainNameEnum) => {
-    const details = await this.chainDetails(walletChain);
-    this.setState({
-      walletError: { kind: 'chain', details, walletChain },
-      errorResolved: false,
-      retrying: false,
-      actionButtonsDisabled: false,
-      screen: RouteEnum.WalletError,
-    });
-  };
+  chainError = async (walletChain: ChainNameEnum): Promise<LoadOutcome> => ({
+    kind: 'error',
+    error: {
+      kind: 'chain',
+      details: await this.chainDetails(walletChain),
+      walletChain,
+    },
+  });
 
   // Loads the wallet file found on disk. Also the retry after a file repair.
-  loadExistingWalletOnBoot = async () => {
+  loadExistingWalletOnBoot = async (
+    repair: Repair = 'try',
+  ): Promise<LoadOutcome> => {
     const walletChain = await this.walletChainMismatch();
     if (walletChain) {
-      await this.showChainError(walletChain);
-      return;
+      return this.chainError(walletChain);
     }
-    const result = await loadExistingWallet(
-      nativeUri(this.state.server),
-      this.state.server.chainName,
-      this.state.performanceLevel,
-      GlobalConst.minConfirmations.toString(),
+    const reply = nativeReply(
+      await loadExistingWallet(
+        nativeUri(this.state.server),
+        this.state.server.chainName,
+        this.state.performanceLevel,
+        GlobalConst.minConfirmations.toString(),
+      ),
     );
-
-    let error = false;
-    let errorText = '';
-    if (result.ok && result.value) {
-      try {
-        // here result can have an `error` field for watch-only which is actually OK.
-        const resultJson: RPCSeedType & RPCUfvkType = await JSON.parse(
-          result.value,
+    switch (reply.kind) {
+      case 'json': {
+        const kind = await this.walletKind();
+        // if the App is restoring another wallet backup...
+        // needs to recalculate the Address Book.
+        const newWallet =
+          !!this.props.route.params &&
+          this.props.route.params.newWallet !== undefined
+            ? this.props.route.params.newWallet
+            : false;
+        this.navigateToLoadedApp(
+          kind.readOnly,
+          kind.orchardPool,
+          kind.saplingPool,
+          kind.transparentPool,
+          newWallet,
+          this.state.firstLaunchingMessage,
+          // The wallet's own chain, surfaced by the native result (reliable
+          // even Offline). The server's chain is only a pre-rebuild fallback.
+          (reply.json.chain_name as ChainNameEnum) ||
+            this.state.server.chainName,
         );
-        if (!resultJson.error) {
-          // Load the wallet and navigate to the vts screen
-          let readOnly: boolean = false;
-          let orchardPool: boolean = false;
-          let saplingPool: boolean = false;
-          let transparentPool: boolean = false;
-          const walletKindResult = await getWalletKind();
-          const walletKindStr: string = walletKindResult.ok
-            ? walletKindResult.value
-            : walletKindResult.error.message;
-          try {
-            const walletKindJSON: RPCWalletKindType =
-              await JSON.parse(walletKindStr);
-            console.log('KIND... JSON', walletKindJSON);
-            // there are 4 kinds:
-            // 1. seed
-            // 2. USK
-            // 3. UFVK - watch-only wallet
-            // 4. No keys - watch-only wallet (possibly an error)
-
-            if (
-              walletKindJSON.kind ===
-                RPCWalletKindEnum.LoadedFromUnifiedFullViewingKey ||
-              walletKindJSON.kind === RPCWalletKindEnum.NoKeysFound
-            ) {
-              readOnly = true;
-            } else {
-              readOnly = false;
-            }
-            orchardPool = walletKindJSON.orchard;
-            saplingPool = walletKindJSON.sapling;
-            transparentPool = walletKindJSON.transparent;
-            // store this wallet's recovery info in the Keychain/Keystore; if
-            // it can't be read, whatever the device holds is removed.
-            await createUpdateRecoveryWalletInfo(await fetchWallet(readOnly));
-            this.setState({
-              readOnly,
-              orchardPool,
-              saplingPool,
-              transparentPool,
-              actionButtonsDisabled: false,
-            });
-          } catch (e) {
-            this.setState({
-              readOnly,
-              orchardPool,
-              saplingPool,
-              transparentPool,
-              actionButtonsDisabled: false,
-            });
-            this.addLastSnackbar(walletKindStr);
-          }
-          // if the App is restoring another wallet backup...
-          // needs to recalculate the Address Book.
-          const newWallet =
-            !!this.props.route.params &&
-            this.props.route.params.newWallet !== undefined
-              ? this.props.route.params.newWallet
-              : false;
-          this.navigateToLoadedApp(
-            readOnly,
-            orchardPool,
-            saplingPool,
-            transparentPool,
-            newWallet,
-            this.state.firstLaunchingMessage,
-            // The wallet's own chain, surfaced by the native result (reliable
-            // even Offline). The server's chain is only a pre-rebuild fallback.
-            (resultJson.chain_name as ChainNameEnum) ||
-              this.state.server.chainName,
-          );
-        } else {
-          error = true;
-          errorText = resultJson.error;
-        }
-      } catch (e: unknown) {
-        error = true;
-        errorText = e instanceof Error ? e.message : String(e);
+        return { kind: 'loaded' };
       }
-    } else {
-      if (!result.ok && result.error.code === 'WalletChainMismatch') {
+      case 'chainMismatch': {
         const chain = await readWalletChain();
-        if (chain.ok) {
-          await this.showChainError(chain.value);
-          return;
-        }
+        return chain.ok
+          ? this.chainError(chain.value)
+          : this.walletLoadFailed(reply.text, repair);
       }
-      error = true;
-      errorText = result.ok ? result.value : result.error.message;
+      case 'failed':
+        return this.walletLoadFailed(reply.text, repair);
     }
-    if (error) {
-      await this.walletLoadFailed(
-        Utils.humanizeChainTokens(errorText, this.state.translate),
-      );
+  };
+
+  // Reads the wallet kind and keeps the recovery info in the Keychain; a
+  // kind that will not read is a full wallet with no pool known.
+  walletKind = async (): Promise<WalletKind> => {
+    const walletKindResult = await getWalletKind();
+    const walletKindStr = walletKindResult.ok
+      ? walletKindResult.value
+      : walletKindResult.error.message;
+    let kind: WalletKind = {
+      readOnly: false,
+      orchardPool: false,
+      saplingPool: false,
+      transparentPool: false,
+    };
+    try {
+      const walletKindJSON: RPCWalletKindType = JSON.parse(walletKindStr);
+      kind = {
+        readOnly:
+          walletKindJSON.kind ===
+            RPCWalletKindEnum.LoadedFromUnifiedFullViewingKey ||
+          walletKindJSON.kind === RPCWalletKindEnum.NoKeysFound,
+        orchardPool: walletKindJSON.orchard,
+        saplingPool: walletKindJSON.sapling,
+        transparentPool: walletKindJSON.transparent,
+      };
+      await createUpdateRecoveryWalletInfo(await fetchWallet(kind.readOnly));
+    } catch (e) {
+      this.addLastSnackbar(walletKindStr);
     }
+    this.setState(kind);
+    return kind;
   };
 
   // A repairable file is repaired and reloaded once; anything else lands on
   // the error screen with the error text behind its details toggle.
-  walletLoadFailed = async (errorText: string) => {
+  walletLoadFailed = async (
+    text: string,
+    repair: Repair,
+  ): Promise<LoadOutcome> => {
+    const errorText = Utils.humanizeChainTokens(text, this.state.translate);
     const report = await walletFileDiagnosis();
-    if (!this.state.retrying && hasRepairableWalletFile(report.files)) {
+    if (repair === 'try' && hasRepairableWalletFile(report.files)) {
       this.addLastSnackbar(
         this.state.translate('loadingapp.walletrepair-running') as string,
       );
@@ -989,15 +978,13 @@ export class LoadingAppClass extends Component<
         this.addLastSnackbar(
           this.state.translate('loadingapp.walletrepair-success') as string,
         );
-        await this.loadExistingWalletOnBoot();
-        return;
+        return this.loadExistingWalletOnBoot('skip');
       }
     }
     const diagnosisLines = this.walletFileDiagnosisLines(report.files);
-    this.showWalletError(
-      sanitizePaths(
-        diagnosisLines ? `${errorText}\n\n${diagnosisLines}` : errorText,
-      ),
+    return failedOutcome(
+      { kind: 'open' },
+      diagnosisLines ? `${errorText}\n\n${diagnosisLines}` : errorText,
     );
   };
 
@@ -1012,46 +999,33 @@ export class LoadingAppClass extends Component<
       )
       .join('\n');
 
-  // A retry that fails again shakes the icon and says so; its dots stay up
-  // for at least RETRY_MIN_MS so the attempt reads as one.
-  showError = (error: WalletErrorInfo) => {
-    const again =
-      this.state.screen === RouteEnum.WalletError || this.state.retrying;
-    const apply = () => {
-      if (again) {
-        this.addLastSnackbar(this.state.translate(againKey(error)) as string);
-      }
-      this.setState(state => ({
-        walletError: error,
-        errorResolved: false,
-        retrying: false,
-        errorShake: again ? state.errorShake + 1 : state.errorShake,
-        actionButtonsDisabled: false,
-        screen: RouteEnum.WalletError,
-      }));
-    };
-    const elapsed = Date.now() - this.retryStartedAt;
-    const wait = this.state.retrying ? Math.max(0, RETRY_MIN_MS - elapsed) : 0;
-    setTimeout(apply, wait);
-  };
-
-  showWalletError = (details: string) =>
-    this.showError({ kind: walletErrorKind(details), details });
+  // A first attempt from boot, the menu or a form.
+  load = async (loader: () => Promise<LoadOutcome>) =>
+    this.settle({ kind: 'first', outcome: await loader() });
 
   retryWalletError = async () => {
     const { walletError } = this.state;
     if (!walletError) {
       return;
     }
-    this.retryStartedAt = Date.now();
-    this.setState({ retrying: true, actionButtonsDisabled: true });
-    await this.runRetry(retryOf(walletError));
+    await this.retry(retryOf(walletError));
   };
 
-  runRetry = (retry: Retry): Promise<void> => {
+  // The one owner of the busy state: it begins here and ends in settle.
+  retry = async (retry: Retry) => {
+    const startedAt = Date.now();
+    this.setState({ retrying: true, actionButtonsDisabled: true });
+    const outcome = await this.runRetry(retry);
+    await this.hold(retry, startedAt);
+    this.settle({ kind: 'again', retry, outcome });
+  };
+
+  runRetry = (retry: Retry): Promise<LoadOutcome> => {
     switch (retry.kind) {
       case 'open':
-        return this.loadExistingWalletOnBoot();
+        return this.loadExistingWalletOnBoot('skip');
+      case 'switch':
+        return this.switchToWalletChain(retry.chain);
       case 'create':
         return this.createNewWallet();
       case 'restore':
@@ -1059,14 +1033,52 @@ export class LoadingAppClass extends Component<
     }
   };
 
-  initFailed = (step: InitStep, errorText: string) => {
-    const outcome = initOutcome(step, errorText);
+  // An in-place retry keeps its dots up for at least RETRY_MIN_MS so the
+  // attempt reads as one. A create or restore moved to the progress screen.
+  hold = (retry: Retry, startedAt: number): Promise<void> => {
+    switch (retry.kind) {
+      case 'open':
+      case 'switch':
+        return new Promise(resolve =>
+          setTimeout(
+            resolve,
+            Math.max(0, RETRY_MIN_MS - (Date.now() - startedAt)),
+          ),
+        );
+      case 'create':
+      case 'restore':
+        return Promise.resolve();
+    }
+  };
+
+  settle = (settlement: Settlement) => {
+    this.setState(this.settled(settlement));
+  };
+
+  // Every outcome ends busy; the arms differ in where the screen goes.
+  settled = (
+    settlement: Settlement,
+  ): ((state: Readonly<LoadingAppClassState>) => Settled) => {
+    const { outcome } = settlement;
     switch (outcome.kind) {
-      case 'screen':
-        this.showError(outcome.error);
-        return;
+      case 'loaded':
+        return state => ({ ...keep(state), ...idle });
+      case 'error': {
+        const again = settlement.kind === 'again';
+        if (again) {
+          this.addLastSnackbar(
+            this.state.translate(againKey(outcome.error)) as string,
+          );
+        }
+        return state => ({
+          ...idle,
+          walletError: outcome.error,
+          errorResolved: false,
+          errorShake: again ? state.errorShake + 1 : state.errorShake,
+          screen: RouteEnum.WalletError,
+        });
+      }
       case 'alert':
-        this.setState({ actionButtonsDisabled: false, screen: outcome.origin });
         createAlert(
           this.setBackgroundError,
           this.addLastSnackbar,
@@ -1077,6 +1089,22 @@ export class LoadingAppClass extends Component<
           sendEmail,
           this.state.zingolibVersion,
         );
+        return state => ({ ...keep(state), ...idle, screen: outcome.origin });
+      case 'rejected':
+        createAlert(
+          this.setBackgroundError,
+          this.addLastSnackbar,
+          this.state.translate(outcome.labelKey) as string,
+          this.state.translate(outcome.errorKey) as string,
+          false,
+          this.state.translate,
+        );
+        return state => ({ ...keep(state), ...idle, screen: outcome.origin });
+      case 'offline':
+        this.addLastSnackbar(
+          this.state.translate('loadedapp.connection-error') as string,
+        );
+        return state => ({ ...keep(state), ...idle });
     }
   };
 
@@ -1100,13 +1128,13 @@ export class LoadingAppClass extends Component<
         this.retryWalletError();
         return;
       case 'chain':
-        this.switchToWalletChain(action.chain);
+        this.retry({ kind: 'switch', chain: action.chain });
         return;
       case 'import':
         this.confirmDelete('import', this.getwalletToRestore);
         return;
       case 'create':
-        this.confirmDelete('create', this.createNewWallet);
+        this.confirmDelete('create', () => this.load(this.createNewWallet));
         return;
       case 'back':
         this.leaveInitError();
@@ -1128,15 +1156,13 @@ export class LoadingAppClass extends Component<
 
   // Moves to Automatic on the wallet's network, then opens the wallet. A
   // custom server on the other network stays saved as it was.
-  switchToWalletChain = async (chain: ChainNameEnum) => {
-    this.retryStartedAt = Date.now();
-    this.setState({ retrying: true, actionButtonsDisabled: true });
+  switchToWalletChain = async (chain: ChainNameEnum): Promise<LoadOutcome> => {
     await this.applyServer(
       this.defaultServerForChain(chain),
       SelectServerEnum.auto,
     );
     await this.selectServerOnBoot(!!this.state.netInfo.isConnected);
-    await this.loadExistingWalletOnBoot();
+    return this.loadExistingWalletOnBoot('skip');
   };
 
   // The sheet's hold runs `next` after the wallet file is gone; replacing a
@@ -1162,11 +1188,11 @@ export class LoadingAppClass extends Component<
 
   createNewWalletChecked = () => {
     if (this.state.walletExists) {
-      this.confirmDelete('create', this.createNewWallet);
+      this.confirmDelete('create', () => this.load(this.createNewWallet));
     } else if (this.state.recoveryWallet) {
-      this.confirmDelete('replace', this.createNewWallet);
+      this.confirmDelete('replace', () => this.load(this.createNewWallet));
     } else {
-      this.createNewWallet();
+      this.load(this.createNewWallet);
     }
   };
 
@@ -1227,17 +1253,13 @@ export class LoadingAppClass extends Component<
     });
   };
 
-  createNewWallet = async (): Promise<void> => {
+  createNewWallet = async (): Promise<LoadOutcome> => {
     const offline = this.state.server.kind === 'offline';
     // Block only when the device is genuinely offline AND not in explicit
     // Offline mode. Offline mode is a deliberate no-server flow: the wallet is
     // created locally and simply won't sync until a server is chosen.
     if (!this.state.netInfo.isConnected && !offline) {
-      this.addLastSnackbar(
-        this.state.translate('loadedapp.connection-error') as string,
-      );
-      this.setState({ retrying: false, actionButtonsDisabled: false });
-      return;
+      return { kind: 'offline' };
     }
     this.setState({
       actionButtonsDisabled: true,
@@ -1257,68 +1279,43 @@ export class LoadingAppClass extends Component<
     // ADR 0007). A non-zero value here would act as an explicit override.
     const serverUri = nativeUri(this.state.server);
     const birthday = '0';
-    const seed = await createNewWallet(
-      serverUri,
-      birthday,
-      this.state.server.chainName,
-      this.state.performanceLevel,
-      GlobalConst.minConfirmations.toString(),
-    );
-
-    if (seed.ok && seed.value) {
-      let seedJSON = {} as RPCSeedType;
-      try {
-        seedJSON = await JSON.parse(seed.value);
-        if (seedJSON.error) {
-          clearTimeout(showProgress);
-          this.initFailed({ kind: 'create' }, seedJSON.error);
-          return;
-        }
-      } catch (e: unknown) {
-        clearTimeout(showProgress);
-        this.initFailed(
-          { kind: 'create' },
-          e instanceof Error ? e.message : String(e),
-        );
-        return;
-      }
-      const wallet: WalletType = {
-        seed: seedJSON.seed_phrase || '',
-        birthday: seedJSON.birthday || 0,
-      };
-      // storing the seed & birthday in KeyChain/KeyStore
-      await createUpdateRecoveryWalletInfo(wallet);
-      await SettingsFileImpl.writeSettings(
-        SettingsNameEnum.seedBackedUp,
-        false,
-      );
-      await SettingsFileImpl.writeSettings(SettingsNameEnum.seedBackedUpAt, 0);
-      await SettingsFileImpl.writeSettings(
-        SettingsNameEnum.viewOnlyNoticeDismissed,
-        false,
-      );
-      clearTimeout(showProgress);
-      this.setState({
-        wallet,
-        actionButtonsDisabled: false,
-        walletExists: true,
-      });
-      this.navigateToLoadedApp(
-        this.state.readOnly,
-        this.state.orchardPool,
-        this.state.saplingPool,
-        this.state.transparentPool,
-        true,
-        LaunchingModeEnum.opening,
+    const reply = nativeReply(
+      await createNewWallet(
+        serverUri,
+        birthday,
         this.state.server.chainName,
-      );
-    } else {
+        this.state.performanceLevel,
+        GlobalConst.minConfirmations.toString(),
+      ),
+    );
+    if (reply.kind !== 'json') {
       clearTimeout(showProgress);
-      this.initFailed(
-        { kind: 'create' },
-        seed.ok ? seed.value : seed.error.message,
-      );
+      return failedOutcome({ kind: 'create' }, reply.text);
     }
+    const wallet: WalletType = {
+      seed: reply.json.seed_phrase || '',
+      birthday: reply.json.birthday || 0,
+    };
+    // storing the seed & birthday in KeyChain/KeyStore
+    await createUpdateRecoveryWalletInfo(wallet);
+    await SettingsFileImpl.writeSettings(SettingsNameEnum.seedBackedUp, false);
+    await SettingsFileImpl.writeSettings(SettingsNameEnum.seedBackedUpAt, 0);
+    await SettingsFileImpl.writeSettings(
+      SettingsNameEnum.viewOnlyNoticeDismissed,
+      false,
+    );
+    clearTimeout(showProgress);
+    this.setState({ wallet, walletExists: true });
+    this.navigateToLoadedApp(
+      this.state.readOnly,
+      this.state.orchardPool,
+      this.state.saplingPool,
+      this.state.transparentPool,
+      true,
+      LaunchingModeEnum.opening,
+      this.state.server.chainName,
+    );
+    return { kind: 'loaded' };
   };
 
   getwalletToRestore = async () => {
@@ -1342,82 +1339,16 @@ export class LoadingAppClass extends Component<
     seedUfvk: string,
     birthday: number,
     origin: RouteEnum = RouteEnum.ImportUfvk,
-  ) => {
-    if (!seedUfvk) {
-      // no reporting button, no needed.
-      createAlert(
-        this.setBackgroundError,
-        this.addLastSnackbar,
-        this.state.translate('loadingapp.emptyseedufvk-label') as string,
-        this.state.translate('loadingapp.emptyseedufvk-error') as string,
-        false,
-        this.state.translate,
-      );
-      return;
+  ): Promise<LoadOutcome> => {
+    const input = restoreInput(seedUfvk, birthday, this.state.server.chainName);
+    if (input.kind === 'rejected') {
+      return {
+        kind: 'rejected',
+        origin,
+        labelKey: input.labelKey,
+        errorKey: input.errorKey,
+      };
     }
-    if (seedUfvk.startsWith(GlobalConst.uview)) {
-      // it is a UFVK
-      let parsingError: boolean = false;
-      if (
-        this.state.server.chainName === ChainNameEnum.mainChainName &&
-        (seedUfvk.startsWith(GlobalConst.uviewtest) ||
-          seedUfvk.startsWith(GlobalConst.uviewregtest))
-      ) {
-        // the ufvk is not correct
-        parsingError = true;
-      }
-      if (
-        this.state.server.chainName === ChainNameEnum.testChainName &&
-        !seedUfvk.startsWith(GlobalConst.uviewtest)
-      ) {
-        // the ufvk is not correct
-        parsingError = true;
-      }
-      if (
-        this.state.server.chainName === ChainNameEnum.regtestChainName &&
-        !seedUfvk.startsWith(GlobalConst.uviewregtest)
-      ) {
-        // the ufvk is not correct
-        parsingError = true;
-      }
-      if (parsingError) {
-        // no reporting button, no needed.
-        createAlert(
-          this.setBackgroundError,
-          this.addLastSnackbar,
-          this.state.translate('loadingapp.invalidseedufvk-label') as string,
-          this.state.translate('loadingapp.invalidseedufvk-error') as string,
-          false,
-          this.state.translate,
-        );
-        return;
-      }
-    }
-
-    let walletBirthday = birthday.toString() || '0';
-    if (parseInt(walletBirthday, 10) < 0) {
-      walletBirthday = '0';
-    }
-    if (isNaN(parseInt(walletBirthday, 10))) {
-      walletBirthday = '0';
-    }
-
-    // birthday cannot be lower than sapling activation height
-    if (
-      Number(walletBirthday) < activationHeight[this.state.server.chainName]
-    ) {
-      // no reporting button, no needed.
-      createAlert(
-        this.setBackgroundError,
-        this.addLastSnackbar,
-        this.state.translate('loadingapp.invalidbirthday-label') as string,
-        this.state.translate('loadingapp.invalidbirthday-error') as string,
-        false,
-        this.state.translate,
-      );
-      return;
-    }
-
     this.setState({
       actionButtonsDisabled: true,
       progressKind: 'import',
@@ -1428,139 +1359,46 @@ export class LoadingAppClass extends Component<
       () => this.setState({ screen: RouteEnum.WalletProgress }),
       origin === RouteEnum.ImportUfvk ? motionDuration.emphasized : 0,
     );
-    let type: RestoreFromTypeEnum = RestoreFromTypeEnum.seedRestoreFrom;
-    if (
-      seedUfvk.toLowerCase().startsWith(GlobalConst.uview) ||
-      seedUfvk.toLowerCase().startsWith(GlobalConst.uviewtest) ||
-      seedUfvk.toLowerCase().startsWith(GlobalConst.uviewregtest)
-    ) {
-      // this is a UFVK
-      type = RestoreFromTypeEnum.ufvkRestoreFrom;
-    }
-
-    let result: Awaited<ReturnType<typeof restoreWalletFromSeed>>;
-    if (type === RestoreFromTypeEnum.seedRestoreFrom) {
-      result = await restoreWalletFromSeed(
-        seedUfvk.toLowerCase(),
-        walletBirthday || '0',
+    const restore =
+      input.from === RestoreFromTypeEnum.seedRestoreFrom
+        ? restoreWalletFromSeed
+        : restoreWalletFromUfvk;
+    const reply = nativeReply(
+      await restore(
+        input.key,
+        input.birthday,
         nativeUri(this.state.server),
         this.state.server.chainName,
         this.state.performanceLevel,
         GlobalConst.minConfirmations.toString(),
-      );
-    } else {
-      result = await restoreWalletFromUfvk(
-        seedUfvk.toLowerCase(),
-        walletBirthday || '0',
-        nativeUri(this.state.server),
-        this.state.server.chainName,
-        this.state.performanceLevel,
-        GlobalConst.minConfirmations.toString(),
-      );
-    }
-
-    let error = false;
-    let errorText = '';
-    if (result.ok && result.value) {
-      try {
-        // here result can have an `error` field for watch-only which is actually OK.
-        const resultJson: RPCSeedType & RPCUfvkType = await JSON.parse(
-          result.value,
-        );
-        if (!resultJson.error) {
-          // Load the wallet and navigate to the vts screen
-          let readOnly: boolean = false;
-          let orchardPool: boolean = false;
-          let saplingPool: boolean = false;
-          let transparentPool: boolean = false;
-          const walletKindResult = await getWalletKind();
-          const walletKindStr: string = walletKindResult.ok
-            ? walletKindResult.value
-            : walletKindResult.error.message;
-          console.log('KIND...', walletKindStr);
-          try {
-            const walletKindJSON: RPCWalletKindType =
-              await JSON.parse(walletKindStr);
-            // there are 4 kinds:
-            // 1. seed
-            // 2. USK
-            // 3. UFVK - watch-only wallet
-            // 4. No keys - watch-only wallet (possibly an error)
-
-            if (
-              walletKindJSON.kind ===
-                RPCWalletKindEnum.LoadedFromUnifiedFullViewingKey ||
-              walletKindJSON.kind === RPCWalletKindEnum.NoKeysFound
-            ) {
-              readOnly = true;
-            } else {
-              readOnly = false;
-            }
-            orchardPool = walletKindJSON.orchard;
-            saplingPool = walletKindJSON.sapling;
-            transparentPool = walletKindJSON.transparent;
-            // store this wallet's recovery info in the Keychain/Keystore; if
-            // it can't be read, whatever the device holds is removed.
-            await createUpdateRecoveryWalletInfo(await fetchWallet(readOnly));
-            await SettingsFileImpl.writeSettings(
-              SettingsNameEnum.seedBackedUp,
-              true,
-            );
-            await SettingsFileImpl.writeSettings(
-              SettingsNameEnum.seedBackedUpAt,
-              0,
-            );
-            await SettingsFileImpl.writeSettings(
-              SettingsNameEnum.viewOnlyNoticeDismissed,
-              false,
-            );
-            this.setState({
-              readOnly,
-              orchardPool,
-              saplingPool,
-              transparentPool,
-              actionButtonsDisabled: false,
-            });
-          } catch (e) {
-            this.setState({
-              readOnly,
-              orchardPool,
-              saplingPool,
-              transparentPool,
-              actionButtonsDisabled: false,
-            });
-            this.addLastSnackbar(walletKindStr);
-          }
-          clearTimeout(showImporting);
-          this.navigateToLoadedApp(
-            readOnly,
-            orchardPool,
-            saplingPool,
-            transparentPool,
-            true,
-            LaunchingModeEnum.opening,
-            // restore requires a live server → its chain is the wallet's chain.
-            this.state.server.chainName,
-          );
-        } else {
-          error = true;
-          errorText = resultJson.error;
-        }
-      } catch (e: unknown) {
-        error = true;
-        errorText = e instanceof Error ? e.message : String(e);
-      }
-    } else {
-      error = true;
-      errorText = result.ok ? result.value : result.error.message;
-    }
-    if (error) {
+      ),
+    );
+    if (reply.kind !== 'json') {
       clearTimeout(showImporting);
-      this.initFailed(
+      return failedOutcome(
         { kind: 'restore', seedUfvk, birthday, origin },
-        errorText,
+        reply.text,
       );
     }
+    const kind = await this.walletKind();
+    await SettingsFileImpl.writeSettings(SettingsNameEnum.seedBackedUp, true);
+    await SettingsFileImpl.writeSettings(SettingsNameEnum.seedBackedUpAt, 0);
+    await SettingsFileImpl.writeSettings(
+      SettingsNameEnum.viewOnlyNoticeDismissed,
+      false,
+    );
+    clearTimeout(showImporting);
+    this.navigateToLoadedApp(
+      kind.readOnly,
+      kind.orchardPool,
+      kind.saplingPool,
+      kind.transparentPool,
+      true,
+      LaunchingModeEnum.opening,
+      // restore requires a live server → its chain is the wallet's chain.
+      this.state.server.chainName,
+    );
+    return { kind: 'loaded' };
   };
 
   setPrivacyOption = async (value: boolean): Promise<void> => {
@@ -1827,10 +1665,12 @@ export class LoadingAppClass extends Component<
     if (answer.kind === 'declined') {
       return;
     }
-    await this.doRestore(
-      wallet.seed || wallet.ufvk || '',
-      wallet.birthday,
-      this.state.screen,
+    await this.load(() =>
+      this.doRestore(
+        wallet.seed || wallet.ufvk || '',
+        wallet.birthday,
+        this.state.screen,
+      ),
     );
   };
 
@@ -2021,7 +1861,9 @@ export class LoadingAppClass extends Component<
                   {screen === RouteEnum.ImportUfvk && (
                     <ImportUfvk
                       busy={this.state.actionButtonsDisabled}
-                      onClickOK={(s: string, b: number) => this.doRestore(s, b)}
+                      onClickOK={(s: string, b: number) =>
+                        this.load(() => this.doRestore(s, b))
+                      }
                       onClickCancel={this.leaveImport}
                     />
                   )}

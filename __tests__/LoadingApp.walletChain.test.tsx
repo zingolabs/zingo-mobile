@@ -55,8 +55,8 @@ const bootApp = (selectServer: SelectServerEnum) => {
     .spyOn(app, 'applyServer')
     .mockResolvedValue(undefined);
   jest.spyOn(app, 'selectServerOnBoot').mockResolvedValue(true);
-  const showChainError = jest.spyOn(app, 'showChainError');
-  return { app, applyServer, showChainError };
+  const chainError = jest.spyOn(app, 'chainError');
+  return { app, applyServer, chainError };
 };
 
 describe('A wallet on another network than its server', () => {
@@ -69,12 +69,12 @@ describe('A wallet on another network than its server', () => {
     'Tests that the %s server is kept and the wallet offers its network instead of opening',
     async selectServer => {
       bridge.walletChainInfo.mockResolvedValue('main');
-      const { app, applyServer, showChainError } = bootApp(selectServer);
+      const { app, applyServer, chainError } = bootApp(selectServer);
 
       await app.componentDidMount();
 
       expect(applyServer).not.toHaveBeenCalled();
-      expect(showChainError).toHaveBeenCalledWith(ChainNameEnum.mainChainName);
+      expect(chainError).toHaveBeenCalledWith(ChainNameEnum.mainChainName);
       expect(bridge.loadExistingWallet).not.toHaveBeenCalled();
     },
   );
@@ -88,11 +88,11 @@ describe('A wallet on another network than its server', () => {
         code: 'WalletChainMismatch',
       }),
     );
-    const { app, showChainError } = bootApp(SelectServerEnum.custom);
+    const { app, chainError } = bootApp(SelectServerEnum.custom);
 
     await app.loadExistingWalletOnBoot();
 
-    expect(showChainError).toHaveBeenCalledWith(ChainNameEnum.mainChainName);
+    expect(chainError).toHaveBeenCalledWith(ChainNameEnum.mainChainName);
   });
 
   test('Tests that the details name both chains and the server host', async () => {
@@ -108,7 +108,7 @@ describe('A wallet on another network than its server', () => {
     const { app, applyServer } = bootApp(SelectServerEnum.custom);
     const open = jest
       .spyOn(app, 'loadExistingWalletOnBoot')
-      .mockResolvedValue(undefined);
+      .mockResolvedValue({ kind: 'loaded' });
 
     await app.switchToWalletChain(ChainNameEnum.mainChainName);
 
