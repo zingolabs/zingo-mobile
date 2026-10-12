@@ -77,6 +77,8 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   seedBackedUp: true,
   seedBackedUpAt: 0,
   setSeedBackedUp: async () => {},
+  viewOnlyNoticeDismissed: false,
+  dismissViewOnlyNotice: async () => {},
   blockExplorer: BlockExplorerEnum.Zcashexplorer,
   mixnetView: ABSENT_MIXNET_VIEW,
   reenableMixnet: async () => {},

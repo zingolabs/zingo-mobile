@@ -53,22 +53,49 @@ const fastestOf = async (
     });
   });
 
-// Automatic: the fastest recommended server; while none of them answers,
-// the best server of the live registry. Null when neither gives one.
+// Where Automatic's pick came from; 'default' means no server answered.
+export type AutomaticTier = 'recommended' | 'registry' | 'static' | 'default';
+
+// The chain's one default server from the static list.
+export const defaultServer = (
+  translate: Translate,
+  chain: ChainNameEnum,
+): ServerUrisType | null =>
+  serverUris(translate).find(s => s.chainName === chain && s.default) ?? null;
+
+// Automatic, in order: the fastest recommended (Zaino) server, the fastest
+// of the live registry, the fastest of the static list, and the chain's
+// default when none answers or there is no internet. Null only for a chain
+// without a default (regtest).
 export const pickAutomatic = async (
   translate: Translate,
   chain: ChainNameEnum,
   online: boolean,
-): Promise<ServerUrisType | null> => {
-  if (!online) {
-    return null;
+): Promise<{ server: ServerUrisType; tier: AutomaticTier } | null> => {
+  if (online) {
+    const recommended = recommendedServers(translate, chain);
+    const fromRecommended = await fastestOf(recommended);
+    if (fromRecommended) {
+      return { server: fromRecommended, tier: 'recommended' };
+    }
+    const tried = new Set(recommended.map(r => r.uri));
+    const live = (await fetchServerList(chain)).filter(r => !tried.has(r.uri));
+    const fromRegistry = await fastestOf(live);
+    if (fromRegistry) {
+      return { server: fromRegistry, tier: 'registry' };
+    }
+    live.forEach(r => tried.add(r.uri));
+    const fromStatic = await fastestOf(
+      serverUris(translate).filter(
+        r => r.chainName === chain && !r.obsolete && !tried.has(r.uri),
+      ),
+    );
+    if (fromStatic) {
+      return { server: fromStatic, tier: 'static' };
+    }
   }
-  const fastest = await fastestOf(recommendedServers(translate, chain));
-  if (fastest) {
-    return fastest;
-  }
-  const live = await fetchServerList(chain);
-  return live[0] ?? null;
+  const fallback = defaultServer(translate, chain);
+  return fallback ? { server: fallback, tier: 'default' } : null;
 };
 
 // The servers under Other servers: the live registry or, when it gives

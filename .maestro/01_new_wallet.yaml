@@ -18,7 +18,7 @@ appId: org.ZingoLabs.Zingo
     id: "menu.changewallet"
 - extendedWaitUntil:
     visible:
-      id: "seed.button.ok"
+      id: "walletseed.go"
     timeout: 120000
 
 # The button is disabled until the seed loads from the keychain, and a
@@ -27,7 +27,7 @@ appId: org.ZingoLabs.Zingo
     maxRetries: 3
     commands:
       - tapOn:
-          id: "seed.button.ok"
+          id: "walletseed.go"
       - extendedWaitUntil:
           visible:
             text: "Confirm"

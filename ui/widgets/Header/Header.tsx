@@ -1,5 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
-import { faChevronLeft, faSnowflake } from '@fortawesome/free-solid-svg-icons';
+import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
+import { SnowflakeIcon } from '@ui/primitives/Icons/SnowflakeIcon';
+import { REVEAL_OPEN_MS } from '@ui/widgets/CircularReveal';
+import { ease } from '@app/theme/motion';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
   NavigationProp,
@@ -7,10 +10,11 @@ import {
   useNavigation,
 } from '@react-navigation/native';
 import { useTheme } from '@app/theme';
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useRef } from 'react';
 import { Image, TouchableOpacity, View } from 'react-native';
 import Animated, {
   Easing,
+  ReduceMotion,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
@@ -26,7 +30,6 @@ import {
   ScreenEnum,
   SnackbarDurationEnum,
   TranslateType,
-  UfvkActionEnum,
 } from '@app/AppState';
 import { ContextAppLoaded } from '@app/context';
 import { getZingoLogo } from '@app/utils/ZingoAppData';
@@ -170,12 +173,28 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     sendPermitNow,
   });
 
-  // Audit Issue D — bio gate for seedUfvkScreen lives at the Ufvk screen
-  // entry (components/Ufvk/ShowUfvk.tsx). Caller only navigates.
+  // The viewing key opens as a circle out of the snowflake, which turns 60°
+  // on the same curve and duration.
+  const snowflake = useRef<View>(null);
+  const snowTurn = useSharedValue(0);
+  const snowStyle = useAnimatedStyle(() => ({
+    transform: [{ rotate: `${snowTurn.value}deg` }],
+  }));
   const ufvkShowModal = () => {
-    navigation.navigate(RouteEnum.Ufvk, {
-      action: UfvkActionEnum.view,
+    snowTurn.value = 0;
+    snowTurn.value = withTiming(60, {
+      duration: REVEAL_OPEN_MS,
+      easing: ease.standard,
+      reduceMotion: ReduceMotion.System,
     });
+    snowflake.current?.measureInWindow((x, y, width, height) =>
+      navigation.navigate(RouteEnum.ViewingKey, {
+        entry: {
+          kind: 'circle',
+          origin: { x: x + width / 2, y: y + height / 2 },
+        },
+      }),
+    );
   };
 
   return (
@@ -288,12 +307,19 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             )}
             {readOnly && !noUfvkIcon && (
               <Animated.View style={headerAnimatedStyle}>
-                <TouchableOpacity onPress={ufvkShowModal}>
-                  <FontAwesomeIcon
-                    icon={faSnowflake}
-                    size={20}
-                    color={colors.fgMuted}
-                  />
+                <TouchableOpacity
+                  testID="header.snowflake"
+                  accessibilityRole="button"
+                  accessibilityLabel={translate('viewingkey.title') as string}
+                  onPress={ufvkShowModal}
+                >
+                  <Animated.View ref={snowflake} style={snowStyle}>
+                    <SnowflakeIcon
+                      size={22}
+                      color={colors.fgViewOnly}
+                      strokeWidth={1.8}
+                    />
+                  </Animated.View>
                 </TouchableOpacity>
               </Animated.View>
             )}

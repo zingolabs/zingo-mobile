@@ -89,3 +89,39 @@ describe('the sync follows the session connectivity', () => {
     expect(mockedBridge.runSyncProcess).toHaveBeenCalledTimes(1);
   });
 });
+
+// Leaving Offline on a network still coming up can open the wallet with no
+// indexer while the session is already online.
+describe('an online session whose wallet opened with no indexer', () => {
+  const refusal = Object.assign(
+    new Error(
+      'Error: sync: Offline: no indexer configured. Call set_indexer_uri() to connect.',
+    ),
+    { code: 'Sync' },
+  );
+
+  it('attaches its server again instead of recording an error', async () => {
+    mockedBridge.runSyncProcess.mockRejectedValue(refusal);
+    mockedBridge.changeServerProcess.mockResolvedValue('server set');
+    const { coordinator, onError } = coordinatorFor(ONLINE);
+
+    await coordinator.refreshSync();
+
+    expect(onError).not.toHaveBeenCalled();
+    expect(mockedBridge.changeServerProcess).toHaveBeenCalledWith(
+      ONLINE.kind === 'remote' ? ONLINE.uri : '',
+    );
+  });
+
+  it('still records any other sync failure', async () => {
+    mockedBridge.runSyncProcess.mockRejectedValue(
+      new Error('Error: indexer: boom'),
+    );
+    const { coordinator, onError } = coordinatorFor(ONLINE);
+
+    await coordinator.refreshSync();
+
+    expect(onError).toHaveBeenCalledTimes(1);
+    expect(mockedBridge.changeServerProcess).not.toHaveBeenCalled();
+  });
+});

@@ -1,5 +1,5 @@
 /**
- * Handles wallet file operations: delete, restore from backup, change wallet.
+ * Handles wallet file operations: change wallet, restore from backup.
  *
  * Every method calls syncCoordinator.pauseSyncProcess() first to ensure no
  * sync task is running while the wallet file is being replaced. All methods
@@ -9,13 +9,12 @@
 import { GlobalConst, Done, DONE, ErrorKeyed, errorKeyed } from '@app/AppState';
 import RPCModule from '@app/RPCModule';
 import { SyncCoordinator } from './SyncCoordinator';
-import { doSaveBackup } from '@app/walletBackend/utils/walletUtils';
 
 export type WalletLifecycleErrorKey =
-  | 'rpc.backupwallet-error'
   | 'rpc.deletewallet-error'
   | 'rpc.walletnotfound-error'
-  | 'rpc.backupnotfound-error';
+  | 'rpc.backupnotfound-error'
+  | 'rpc.restorebackup-error';
 
 export type WalletLifecycleResult = Done | ErrorKeyed<WalletLifecycleErrorKey>;
 
@@ -37,28 +36,6 @@ export class WalletLifecycleService {
       return err('rpc.walletnotfound-error');
     }
     await this.syncCoordinator.pauseSyncProcess();
-
-    // doSaveBackup classifies the trimodal native resolution and contains
-    // rejections, so failure — including a rejected bridge promise — always
-    // lands on this branch instead of escaping changeWallet.
-    if (!(await doSaveBackup())) {
-      return err('rpc.backupwallet-error');
-    }
-
-    const result = await RPCModule.deleteExistingWallet();
-    if (!(result && result !== GlobalConst.false)) {
-      return err('rpc.deletewallet-error');
-    }
-    return DONE;
-  }
-
-  async changeWalletNoBackup(): Promise<WalletLifecycleResult> {
-    const exists = await RPCModule.walletExists();
-
-    if (!(exists && exists !== GlobalConst.false)) {
-      return err('rpc.walletnotfound-error');
-    }
-    await this.syncCoordinator.pauseSyncProcess();
     const result = await RPCModule.deleteExistingWallet();
 
     if (!(result && result !== GlobalConst.false)) {
@@ -67,7 +44,11 @@ export class WalletLifecycleService {
     return DONE;
   }
 
-  async restoreBackup(): Promise<WalletLifecycleResult> {
+  // Restores the mainnet backup that older builds took on a wallet change.
+  // A mainnet wallet swaps places with it. Any other wallet is never backed
+  // up (`replace`): the backup takes its place, it is lost, and the backup
+  // file goes.
+  async restoreBackup(replace: boolean): Promise<WalletLifecycleResult> {
     const existsBackup = await RPCModule.walletBackupExists();
 
     if (!(existsBackup && existsBackup !== GlobalConst.false)) {
@@ -79,7 +60,20 @@ export class WalletLifecycleService {
       return err('rpc.walletnotfound-error');
     }
     await this.syncCoordinator.pauseSyncProcess();
-    await RPCModule.restoreExistingWalletBackup();
+    // Android answers a boolean, iOS "true"/"false"; a throw (a bridge
+    // without the method) is a failure too.
+    let result: string | boolean;
+    try {
+      result = replace
+        ? await RPCModule.replaceWalletWithBackup()
+        : await RPCModule.restoreExistingWalletBackup();
+    } catch (e) {
+      console.log(`restoreBackup failed: ${e}`);
+      return err('rpc.restorebackup-error');
+    }
+    if (!(result === true || result === GlobalConst.true)) {
+      return err('rpc.restorebackup-error');
+    }
     return DONE;
   }
 }

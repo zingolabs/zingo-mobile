@@ -38,6 +38,7 @@ const colors: ThemeColors = {
 
   fgDanger: '#FFB972',
   fgDangerEmphasis: '#dc2626',
+  fgViewOnly: '#8FB4E6',
 };
 
 export const mockTheme = {

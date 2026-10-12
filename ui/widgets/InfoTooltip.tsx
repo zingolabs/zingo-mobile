@@ -26,6 +26,9 @@ type InfoTooltipProps = {
   // Label and icon sit at the start of the row instead of centred.
   alignStart?: boolean;
   labelStyle?: TextStyle;
+  // Shown before the icon in place of the label text, which then only
+  // names the icon for accessibility.
+  children?: React.ReactNode;
 };
 
 const ARROW = 10;
@@ -55,6 +58,7 @@ const InfoTooltip: React.FunctionComponent<InfoTooltipProps> = ({
   testID,
   alignStart,
   labelStyle,
+  children,
 }) => {
   const { colors } = useTheme();
   const containerRef = useRef<View>(null);
@@ -98,9 +102,11 @@ const InfoTooltip: React.FunctionComponent<InfoTooltipProps> = ({
       }
     >
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-        <BoldText style={{ fontSize: 12.5, lineHeight: 18, ...labelStyle }}>
-          {label}
-        </BoldText>
+        {children ?? (
+          <BoldText style={{ fontSize: 12.5, lineHeight: 18, ...labelStyle }}>
+            {label}
+          </BoldText>
+        )}
         <Pressable
           ref={iconRef}
           testID={testID}

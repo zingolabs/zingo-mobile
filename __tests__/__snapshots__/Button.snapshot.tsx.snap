@@ -68,7 +68,7 @@ exports[`Component Button - test Button Primary - snapshot 1`] = `
         {
           "color": "#011401",
           "fontSize": 16,
-          "fontWeight": "600",
+          "fontWeight": "700",
           "textAlign": "center",
           "textTransform": "none",
         }
@@ -113,10 +113,8 @@ exports[`Component Button - test Button Secondary - snapshot 1`] = `
   style={
     {
       "alignItems": "center",
-      "backgroundColor": "#031124",
-      "borderColor": "#18bd18",
+      "backgroundColor": "transparent",
       "borderRadius": 24,
-      "borderWidth": 2,
       "justifyContent": "center",
       "maxWidth": "90%",
       "minHeight": 48,
@@ -148,7 +146,7 @@ exports[`Component Button - test Button Secondary - snapshot 1`] = `
         {
           "color": "#18bd18",
           "fontSize": 16,
-          "fontWeight": "600",
+          "fontWeight": "700",
           "textAlign": "center",
           "textTransform": "none",
         }

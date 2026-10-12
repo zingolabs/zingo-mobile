@@ -139,7 +139,7 @@ const BusyButton: React.FunctionComponent<BusyButtonProps> = ({
             style={[
               {
                 color: colors.bgCanvas,
-                fontWeight: '600',
+                fontWeight: '700',
                 fontSize: labelSize,
                 textAlign: 'center',
               },

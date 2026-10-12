@@ -16,7 +16,7 @@ export type ScreenGateState =
 
 /**
  * Audit Issue D — single source of truth for the screen-level biometric
- * gate used by Seed, ShowUfvk, Settings, Rescan and Confirm.
+ * gate used by WalletSeed, Settings, Rescan and Confirm.
  *
  * Behaviour:
  *   - When `needsAuth` holds (at mount, or when a settings toggle flips it

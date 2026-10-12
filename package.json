@@ -69,6 +69,7 @@
     "js-base64": "^3.9.4",
     "lodash": "^4.17.21",
     "patch-package": "^8.0.0",
+    "qrcode": "^1.5.4",
     "randomcolor": "^0.6.2",
     "react": "19.1.4",
     "react-native": "0.81.6",

@@ -523,7 +523,7 @@ ${translate('seedbackup.birthday') as string}: ${birthday}`;
             key={step}
             entering={enterFor(previous.current, shown, pushed)}
             exiting={exitFor(move)}
-            style={{ flex: 1, paddingTop: insets.top + 64 }}
+            style={{ flex: 1, paddingTop: 29 }}
           >
             {page()}
           </Animated.View>
@@ -539,7 +539,7 @@ ${translate('seedbackup.birthday') as string}: ${birthday}`;
               exiting={FadeOut.duration(160).reduceMotion(ReduceMotion.System)}
               style={{
                 position: 'absolute',
-                top: insets.top + 6,
+                top: 20,
                 right: SIDE - 14,
               }}
             >

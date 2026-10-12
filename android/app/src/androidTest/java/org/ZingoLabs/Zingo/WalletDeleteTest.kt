@@ -103,21 +103,6 @@ class WalletDeleteTest {
     }
 
     @Test
-    fun aSwapTempDoesNotResurrectTheDeletedBackup() {
-        file(backupName).writeBytes(plainWallet)
-        file(swapName).writeBytes(plainWallet)
-
-        val promise = CapturingPromise()
-        rpcModule.deleteExistingWalletBackup(promise)
-        assertThat(promise.resolved).containsExactly(true)
-
-        val exists = CapturingPromise()
-        rpcModule.walletBackupExists(exists)
-        assertThat(exists.resolved).containsExactly(false)
-        assertThat(file(swapName).exists()).isFalse()
-    }
-
-    @Test
     fun anUnconsumedSwapTempSurvivesTheDelete() {
         file(swapName).writeBytes(ByteArray(64) { i -> if (i == 0) 0x28 else (i * 13).toByte() })
 

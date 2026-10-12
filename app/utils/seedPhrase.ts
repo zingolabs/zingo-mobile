@@ -1,6 +1,6 @@
 import { sha256 } from '@noble/hashes/sha2.js';
 import { BIP39_ENGLISH } from './bip39English';
-import { GlobalConst } from '@app/AppState';
+import { ChainNameEnum, GlobalConst } from '@app/AppState';
 
 export const SEED_WORD_COUNT = 24;
 export const SUGGESTION_LIMIT = 3;
@@ -26,6 +26,44 @@ export type SeedStatus =
 export const isViewingKey = (text: string): boolean => {
   const lower = text.trim().toLowerCase();
   return KEY_PREFIXES.some(p => lower.startsWith(p));
+};
+
+// The network a viewing key's prefix names; null for text that is not one.
+export const viewingKeyChain = (key: string): ChainNameEnum | null => {
+  const lower = key.trim().toLowerCase();
+  if (lower.startsWith(GlobalConst.uviewregtest)) {
+    return ChainNameEnum.regtestChainName;
+  }
+  if (lower.startsWith(GlobalConst.uviewtest)) {
+    return ChainNameEnum.testChainName;
+  }
+  return lower.startsWith(GlobalConst.uview)
+    ? ChainNameEnum.mainChainName
+    : null;
+};
+
+// True while the text could still grow into a viewing key prefix: u, uv,
+// uvi… up to "uview".
+export const startsLikeViewingKey = (text: string): boolean => {
+  const lower = text.trim().toLowerCase();
+  return !!lower && GlobalConst.uview.startsWith(lower);
+};
+
+const BECH32_CHARSET = 'qpzry9x8gf2tvdw0s3jn54khce6mua7l';
+const KEY_HEAD = /^(uview(?:test|regtest)?1)(.*)$/;
+
+// What the text shows is wrong with it as a viewing key: its start, or a
+// character a key can't hold. Whether it is complete only the decode knows.
+export type ViewingKeyProblem =
+  { kind: 'none' } | { kind: 'prefix' } | { kind: 'char'; char: string };
+
+export const viewingKeyProblem = (key: string): ViewingKeyProblem => {
+  const head = KEY_HEAD.exec(key);
+  if (!head) {
+    return /^uview[a-z]*$/.test(key) ? { kind: 'none' } : { kind: 'prefix' };
+  }
+  const bad = [...head[2]].find(c => !BECH32_CHARSET.includes(c));
+  return bad ? { kind: 'char', char: bad } : { kind: 'none' };
 };
 
 export const tokenize = (text: string): string[] =>
@@ -78,6 +116,26 @@ export const checksumValid = (words: string[]): boolean => {
     .map(b => toBits(b, 8))
     .join('');
   return hashBits.slice(0, checksumBits) === bits.slice(-checksumBits);
+};
+
+// A scanned seed phrase: 24 recovery words with a valid checksum, and the
+// birthday when the code carries it after them as a number (Zingo copies
+// the words, a line break and "<Wallet birthday>: <height>", its label in
+// any language).
+// Null for any other text.
+export const scannedSeedPhrase = (
+  text: string,
+): { words: string[]; birthday?: number } | null => {
+  const tokens = tokenize(text);
+  const words = tokens.slice(0, SEED_WORD_COUNT);
+  const rest = tokens.slice(SEED_WORD_COUNT);
+  const last = rest[rest.length - 1];
+  if (rest.length > 0 && !/^\d+$/.test(last)) {
+    return null;
+  }
+  return words.length === SEED_WORD_COUNT && checksumValid(words)
+    ? { words, birthday: rest.length > 0 ? Number(last) : undefined }
+    : null;
 };
 
 export const suggestWords = (
