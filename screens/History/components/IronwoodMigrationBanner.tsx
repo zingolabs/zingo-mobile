@@ -16,6 +16,7 @@ import { useTheme } from '@app/theme';
 import SegmentedBar from '@ui/primitives/SegmentedBar';
 import { ContextAppLoaded } from '@app/context';
 import Utils from '@app/utils';
+import { NOTICE_RADIUS } from '@ui/widgets/NoticeStack';
 import { RouteEnum } from '@app/AppState';
 import { migrationStatus, reconcileMigration } from '@app/walletBackend';
 import {
@@ -328,7 +329,7 @@ const IronwoodMigrationBanner: React.FunctionComponent<
               backgroundColor: colors.bgSurface,
               borderColor: colors.bottomSheetBorder,
               borderWidth: 1,
-              borderRadius: 16,
+              borderRadius: NOTICE_RADIUS,
               paddingHorizontal: 18,
               paddingVertical: 12,
             }}
@@ -459,7 +460,7 @@ const IronwoodMigrationBanner: React.FunctionComponent<
             backgroundColor: colors.bgSurface,
             borderColor: colors.bottomSheetBorder,
             borderWidth: 1,
-            borderRadius: 12,
+            borderRadius: NOTICE_RADIUS,
             paddingHorizontal: 16,
             paddingVertical: 14,
           }}
