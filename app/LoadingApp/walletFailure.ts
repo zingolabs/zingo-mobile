@@ -1,19 +1,26 @@
 import { ChainNameEnum } from '@app/AppState/enums/ChainNameEnum';
 import { RouteEnum } from '@app/AppState/enums/RouteEnum';
-import { InitStep, WalletErrorInfo } from '@app/AppState/types/WalletErrorInfo';
-import { FfiResult } from '@app/walletBackend';
+import {
+  Cause,
+  InitStep,
+  Step,
+  WalletErrorInfo,
+} from '@app/AppState/types/WalletErrorInfo';
+import { FfiErrorCode, FfiResult } from '@app/walletBackend';
 import { RPCSeedType } from '@app/walletBackend/types/RPCSeedType';
 import { RPCUfvkType } from '@app/walletBackend/types/RPCUfvkType';
 import { sanitizePaths } from '@app/utils/sanitizePaths';
 import { walletErrorKind } from './walletErrorKind';
 
-export type Step = { kind: 'open' } | InitStep;
-
-// 'switch' moves the server to the wallet's chain and then opens.
+/**
+ * 'switch' moves the server to the wallet's chain and then opens.
+ */
 export type Retry = Step | { kind: 'switch'; chain: ChainNameEnum };
 
-// What a loader returns in place of touching the screen state; `settle`
-// is the one place each variant is applied.
+/**
+ * What a loader returns in place of touching the screen state; `settle`
+ * is the one place each variant is applied.
+ */
 export type LoadOutcome =
   | { kind: 'loaded' }
   | { kind: 'error'; error: WalletErrorInfo }
@@ -21,29 +28,58 @@ export type LoadOutcome =
   | { kind: 'rejected'; origin: RouteEnum; labelKey: string; errorKey: string }
   | { kind: 'offline' };
 
+/**
+ * A native failure: the FFI error code and the message that came with it.
+ */
+export type Failed = { code: FfiErrorCode; text: string };
+
 export type NativeReply =
   | { kind: 'json'; json: RPCSeedType & RPCUfvkType }
-  | { kind: 'chainMismatch'; text: string }
-  | { kind: 'failed'; text: string };
+  | ({ kind: 'chainMismatch' } & Failed)
+  | ({ kind: 'failed' } & Failed);
 
 export const nativeReply = (result: FfiResult<string>): NativeReply => {
   if (!result.ok) {
-    return result.error.code === 'WalletChainMismatch'
-      ? { kind: 'chainMismatch', text: result.error.message }
-      : { kind: 'failed', text: result.error.message };
+    const { code, message: text } = result.error;
+    return code === 'WalletChainMismatch'
+      ? { kind: 'chainMismatch', code, text }
+      : { kind: 'failed', code, text };
   }
   if (!result.value) {
-    return { kind: 'failed', text: result.value };
+    return { kind: 'failed', code: 'Unknown', text: result.value };
   }
   try {
     const json: RPCSeedType & RPCUfvkType = JSON.parse(result.value);
     return json.error
-      ? { kind: 'failed', text: json.error }
+      ? { kind: 'failed', code: 'Unknown', text: json.error }
       : { kind: 'json', json };
   } catch (e: unknown) {
-    return { kind: 'failed', text: e instanceof Error ? e.message : String(e) };
+    return {
+      kind: 'failed',
+      code: 'Unknown',
+      text: e instanceof Error ? e.message : String(e),
+    };
   }
 };
+
+const CAUSE_BY_CODE: Partial<Record<FfiErrorCode, Cause>> = {
+  InitConnection: { kind: 'connection' },
+  Indexer: { kind: 'connection' },
+  InitKey: { kind: 'key' },
+  InvalidInput: { kind: 'key' },
+  InitBirthday: { kind: 'birthday' },
+  InitWalletFile: { kind: 'file' },
+};
+
+/**
+ * The code names the cause; the message text decides only when the code
+ * says nothing, as the `Init` and `Unknown` codes do.
+ */
+export const causeOf = (failed: Failed): Cause =>
+  CAUSE_BY_CODE[failed.code] ??
+  (walletErrorKind(failed.text) === 'server'
+    ? { kind: 'connection' }
+    : { kind: 'unknown' });
 
 export const initOrigin = (step: InitStep): RouteEnum => {
   switch (step.kind) {
@@ -63,45 +99,68 @@ const initLabelKey = (step: InitStep): string => {
   }
 };
 
-// An open always lands on the error screen. A create or restore lands
-// there only when the failure names the connection, and keeps the alert
-// with its report button otherwise.
-export const failedOutcome = (step: Step, text: string): LoadOutcome => {
-  const details = sanitizePaths(text);
+/**
+ * The causes the screen has a fix to offer a create or restore: another
+ * server, another key, another birthday.
+ */
+const screenOffers = (cause: Cause): boolean => {
+  switch (cause.kind) {
+    case 'connection':
+    case 'key':
+    case 'birthday':
+      return true;
+    case 'file':
+    case 'chain':
+    case 'unknown':
+      return false;
+  }
+};
+
+/**
+ * An open always lands on the error screen. A create or restore lands
+ * there when the screen has a fix to offer, and keeps the alert with its
+ * report button otherwise.
+ */
+export const failedOutcome = (step: Step, failed: Failed): LoadOutcome => {
+  const error: WalletErrorInfo = {
+    cause: causeOf(failed),
+    step,
+    details: sanitizePaths(failed.text),
+  };
   switch (step.kind) {
     case 'open':
-      return { kind: 'error', error: { kind: walletErrorKind(text), details } };
+      return { kind: 'error', error };
     case 'create':
     case 'restore':
-      return walletErrorKind(text) === 'server'
-        ? { kind: 'error', error: { kind: 'init', details, step } }
+      return screenOffers(error.cause)
+        ? { kind: 'error', error }
         : {
             kind: 'alert',
             origin: initOrigin(step),
             labelKey: initLabelKey(step),
-            error: text,
+            error: failed.text,
           };
   }
 };
 
-export const retryOf = (error: WalletErrorInfo): Retry => {
-  switch (error.kind) {
-    case 'init':
-      return error.step;
-    case 'open':
-    case 'server':
-    case 'chain':
-      return { kind: 'open' };
-  }
-};
+export const retryOf = (error: WalletErrorInfo): Retry => error.step;
 
-export const againKey = (error: WalletErrorInfo): string => {
-  switch (error.kind) {
-    case 'open':
-      return 'walleterror.still-open';
-    case 'server':
+/**
+ * What a retry that failed again says. A cause whose screen offers no
+ * retry, and a chain mismatch, say nothing: the title already does.
+ */
+export type Again = { kind: 'say'; key: string } | { kind: 'quiet' };
+
+export const againOf = (cause: Cause): Again => {
+  switch (cause.kind) {
+    case 'connection':
+      return { kind: 'say', key: 'walleterror.still-server' };
+    case 'file':
+    case 'unknown':
+      return { kind: 'say', key: 'walleterror.still-open' };
+    case 'key':
+    case 'birthday':
     case 'chain':
-    case 'init':
-      return 'walleterror.still-server';
+      return { kind: 'quiet' };
   }
 };

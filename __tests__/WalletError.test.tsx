@@ -15,7 +15,8 @@ import {
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 
 const openError: WalletErrorInfo = {
-  kind: 'open',
+  cause: { kind: 'unknown' },
+  step: { kind: 'open' },
   details: 'failed to read wallet file',
 };
 
@@ -75,24 +76,9 @@ test('Tests that the button shows dots and ignores presses while a retry is runn
   expect(onAction).not.toHaveBeenCalled();
 });
 
-const en: Record<string, string> = {
-  'walleterror.chain-title': 'This wallet is on {net}',
-  'walleterror.chain-sub':
-    "Zingo is connected to a {server} server, so it can't open this wallet.",
-  'walleterror.chain-action': 'Switch to {net}',
-  'walleterror.more': 'More options',
-  'walleterror.more-warn': 'These replace the {net} wallet on this phone.',
-  'walleterror.more-import': 'Import another wallet',
-  'walleterror.more-create': 'Create new wallet',
-  'walleterror.server-title': "Can't connect to the server",
-  'walleterror.server-sub': "{host} isn't responding.",
-  'walleterror.retry': 'Try again',
-  'walleterror.back': 'Back',
-  'settings.value-chainname-main': 'Mainnet',
-  'settings.value-chainname-test': 'Testnet',
-  cancel: 'Cancel',
-};
-const translateEn = (key: string) => en[key] ?? key;
+const en = require('../app/translations/en.json');
+const translateEn = (key: string) =>
+  key.split('.').reduce((o: any, k) => o?.[k], en) ?? key;
 const testnet = remoteServer(
   'https://testnet.example:443',
   ChainNameEnum.testChainName,
@@ -101,9 +87,9 @@ const testnet = remoteServer(
 const mountChain = () =>
   mount(
     {
-      kind: 'chain',
+      cause: { kind: 'chain', walletChain: ChainNameEnum.mainChainName },
+      step: { kind: 'open' },
       details: 'wallet chain name mainnet',
-      walletChain: ChainNameEnum.mainChainName,
     },
     {},
     translateEn,
@@ -144,7 +130,11 @@ test('Tests that More options holds Import and Create behind a warning that they
 
 test('Tests that a failed create names the server and offers Retry and Back in place of Open, Import and Create', () => {
   const onAction = mount(
-    { kind: 'init', details: 'transport error', step: { kind: 'create' } },
+    {
+      cause: { kind: 'connection' },
+      step: { kind: 'create' },
+      details: 'transport error',
+    },
     {},
     translateEn,
     testnet,
@@ -167,7 +157,7 @@ test('Tests that a failed create names the server and offers Retry and Back in p
 test('Tests that Send report hands the host the translated title as the subject', () => {
   const onAction = mount(
     {
-      kind: 'init',
+      cause: { kind: 'connection' },
       details: 'transport error',
       step: {
         kind: 'restore',
@@ -185,4 +175,27 @@ test('Tests that Send report hands the host the translated title as the subject'
     kind: 'report',
     subject: "Can't connect to the server",
   });
+});
+
+test('Tests that a key the server refused names the key and offers only Back', () => {
+  const onAction = mount(
+    {
+      cause: { kind: 'key' },
+      step: {
+        kind: 'restore',
+        seedUfvk: 'abandon',
+        birthday: 0,
+        origin: RouteEnum.ImportUfvk,
+      },
+      details: 'Mnemonic error',
+    },
+    {},
+    translateEn,
+    testnet,
+  );
+  expect(screen.getByText("The key isn't valid")).toBeOnTheScreen();
+  expect(screen.queryByTestId('walleterror.retry')).toBeNull();
+  expect(screen.queryByTestId('walleterror.import')).toBeNull();
+  fireEvent.press(screen.getByText('Back'));
+  expect(onAction).toHaveBeenCalledWith({ kind: 'back' });
 });

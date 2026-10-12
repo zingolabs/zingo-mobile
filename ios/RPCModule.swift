@@ -50,6 +50,10 @@ enum FfiOutcome {
     case .Migration(let message): return ("Migration", message)
     case .Mixnet(let message): return ("Mixnet", message)
     case .WalletChainMismatch(let message): return ("WalletChainMismatch", message)
+    case .InitConnection(let message): return ("InitConnection", message)
+    case .InitKey(let message): return ("InitKey", message)
+    case .InitBirthday(let message): return ("InitBirthday", message)
+    case .InitWalletFile(let message): return ("InitWalletFile", message)
     }
   }
 

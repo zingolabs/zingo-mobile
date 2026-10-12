@@ -665,7 +665,13 @@
     "still-server": "Sigue sin poder conectar con el servidor",
     "retry": "Reintentar",
     "report": "Enviar informe",
-    "back": "Atrás"
+    "back": "Atrás",
+    "key-title": "La clave no es válida",
+    "key-sub": "Revisa la semilla o la clave de visualización y la red a la que pertenece.",
+    "file-title": "El archivo del monedero está dañado",
+    "file-sub": "Tus fondos están a salvo y tu semilla siempre puede restaurarlos.",
+    "birthday-title": "El cumpleaños es demasiado temprano",
+    "birthday-sub": "Escribe la altura del primer bloque posterior a la creación del monedero, o déjalo vacío."
   },
   "deletesheet": {
     "title": "¿Borrar el monedero de este dispositivo?",

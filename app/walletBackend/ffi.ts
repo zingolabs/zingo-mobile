@@ -32,6 +32,10 @@ const FFI_ERROR_CODES = [
   'Migration',
   'Mixnet',
   'WalletChainMismatch',
+  'InitConnection',
+  'InitKey',
+  'InitBirthday',
+  'InitWalletFile',
 ] as const;
 
 export type FfiErrorCode = (typeof FFI_ERROR_CODES)[number] | 'Unknown';

@@ -1,13 +1,15 @@
 import { ChainNameEnum } from '@app/AppState/enums/ChainNameEnum';
 import ServerType from '@app/AppState/types/ServerType';
-import { WalletErrorInfo } from '@app/AppState/types/WalletErrorInfo';
+import { Cause, WalletErrorInfo } from '@app/AppState/types/WalletErrorInfo';
 
 export type Text =
   | { kind: 'plain'; key: string }
   | { kind: 'host'; key: string; host: string }
   | { kind: 'nets'; key: string; net: ChainNameEnum; server: ChainNameEnum };
 
-// What the screen hands back; the host decides what each one runs.
+/**
+ * What the screen hands back; the host decides what each one runs.
+ */
 export type ErrorAction =
   | { kind: 'retry' }
   | { kind: 'chain'; chain: ChainNameEnum }
@@ -17,7 +19,9 @@ export type ErrorAction =
   | { kind: 'server' }
   | { kind: 'report'; subject: string };
 
-// 'more' opens the sheet that holds Import and Create; the screen owns it.
+/**
+ * 'more' opens the sheet that holds Import and Create; the screen owns it.
+ */
 export type LinkAction = ErrorAction | { kind: 'more'; chain: ChainNameEnum };
 
 export type Button = { label: Text; action: LinkAction; testID: string };
@@ -28,16 +32,20 @@ export type Chips =
   | { kind: 'none' }
   | { kind: 'nets'; wallet: ChainNameEnum; server: ChainNameEnum };
 
-export type ErrorScreen = {
+/**
+ * The head says why it failed; the buttons say what to do about it.
+ */
+export type Head = {
   icon: 'wallet' | 'server';
   title: Text;
   sub: Text;
   badge: Badge;
   chips: Chips;
-  primary: Button;
-  top: Slot;
-  bottom: Slot;
 };
+
+export type Actions = { primary: Button; top: Slot; bottom: Slot };
+
+export type ErrorScreen = Head & Actions;
 
 const plain = (key: string): Text => ({ kind: 'plain', key });
 
@@ -61,113 +69,139 @@ const nets = (
   server,
 });
 
-const slot = (
-  key: string,
-  action: LinkAction,
-  testID: string,
-  size: number,
-): Slot => ({
+const button = (key: string, action: LinkAction): Button => ({
+  label: plain(key),
+  action,
+  testID: key,
+});
+
+const slot = (key: string, action: LinkAction, size: number): Slot => ({
   kind: 'link',
-  link: { label: plain(key), action, testID, size },
+  link: { ...button(key, action), size },
 });
 
 const none: Slot = { kind: 'none' };
 
-// Import and Create for a wallet on disk, around the primary button.
-const diskLinks = {
-  top: slot('walleterror.import', { kind: 'import' }, 'walleterror.import', 14),
-  bottom: slot(
-    'walleterror.create',
-    { kind: 'create' },
-    'walleterror.create',
-    13.5,
-  ),
-};
+const bang = (icon: Head['icon'], title: Text, sub: Text): Head => ({
+  icon,
+  title,
+  sub,
+  badge: { kind: 'bang' },
+  chips: { kind: 'none' },
+});
 
-export const errorScreen = (
-  error: WalletErrorInfo,
-  server: ServerType,
-): ErrorScreen => {
-  switch (error.kind) {
-    case 'open':
-      return {
-        icon: 'wallet',
-        title: plain('walleterror.open-title'),
-        sub: plain('walleterror.open-sub'),
-        badge: { kind: 'bang' },
-        chips: { kind: 'none' },
-        primary: {
-          label: plain('walleterror.open'),
-          action: { kind: 'retry' },
-          testID: 'walleterror.open',
-        },
-        ...diskLinks,
-      };
-    case 'server':
-      return {
-        icon: 'server',
-        title: host('walleterror.server-title', server),
-        sub: host('walleterror.server-sub', server),
-        badge: { kind: 'bang' },
-        chips: { kind: 'none' },
-        primary: {
-          label: plain('walleterror.open'),
-          action: { kind: 'retry' },
-          testID: 'walleterror.open',
-        },
-        ...diskLinks,
-      };
-    case 'init':
-      return {
-        icon: 'server',
-        title: host('walleterror.server-title', server),
-        sub: host('walleterror.server-sub', server),
-        badge: { kind: 'bang' },
-        chips: { kind: 'none' },
-        primary: {
-          label: plain('walleterror.retry'),
-          action: { kind: 'retry' },
-          testID: 'walleterror.retry',
-        },
-        top: none,
-        bottom: slot(
-          'walleterror.back',
-          { kind: 'back' },
-          'walleterror.back',
-          13.5,
-        ),
-      };
+const head = (cause: Cause, server: ServerType): Head => {
+  switch (cause.kind) {
+    case 'connection':
+      return bang(
+        'server',
+        host('walleterror.server-title', server),
+        host('walleterror.server-sub', server),
+      );
+    case 'key':
+      return bang(
+        'wallet',
+        plain('walleterror.key-title'),
+        plain('walleterror.key-sub'),
+      );
+    case 'birthday':
+      return bang(
+        'wallet',
+        plain('walleterror.birthday-title'),
+        plain('walleterror.birthday-sub'),
+      );
+    case 'file':
+      return bang(
+        'wallet',
+        plain('walleterror.file-title'),
+        plain('walleterror.file-sub'),
+      );
+    case 'unknown':
+      return bang(
+        'wallet',
+        plain('walleterror.open-title'),
+        plain('walleterror.open-sub'),
+      );
     case 'chain':
       return {
         icon: 'wallet',
         title: nets(
           'walleterror.chain-title',
-          error.walletChain,
+          cause.walletChain,
           server.chainName,
         ),
-        sub: nets('walleterror.chain-sub', error.walletChain, server.chainName),
-        badge: { kind: 'net', chain: error.walletChain },
+        sub: nets('walleterror.chain-sub', cause.walletChain, server.chainName),
+        badge: { kind: 'net', chain: cause.walletChain },
         chips: {
           kind: 'nets',
-          wallet: error.walletChain,
+          wallet: cause.walletChain,
           server: server.chainName,
         },
-        primary: {
-          label: nets(
-            'walleterror.chain-action',
-            error.walletChain,
-            server.chainName,
-          ),
-          action: { kind: 'chain', chain: error.walletChain },
-          testID: 'walleterror.chain',
-        },
-        top: slot(
-          'walleterror.more',
-          { kind: 'more', chain: error.walletChain },
-          'walleterror.more',
-          12.5,
-        ),
-        bottom: none,
       };
   }
 };
+
+/**
+ * A wallet on disk opens again, or is replaced through Import and Create.
+ */
+const diskActions: Actions = {
+  primary: button('walleterror.open', { kind: 'retry' }),
+  top: slot('walleterror.import', { kind: 'import' }, 14),
+  bottom: slot('walleterror.create', { kind: 'create' }, 13.5),
+};
+
+/**
+ * A create or restore runs again, or goes back to where it started. A key
+ * or birthday the server refused only goes back: running it again cannot
+ * help.
+ */
+const initActions = (cause: Cause): Actions =>
+  cause.kind === 'key' || cause.kind === 'birthday'
+    ? {
+        primary: button('walleterror.back', { kind: 'back' }),
+        top: none,
+        bottom: none,
+      }
+    : {
+        primary: button('walleterror.retry', { kind: 'retry' }),
+        top: none,
+        bottom: slot('walleterror.back', { kind: 'back' }, 13.5),
+      };
+
+/**
+ * A network mismatch is fixed by a server on the wallet's network; Import
+ * and Create wait behind More options, which says they replace the wallet.
+ */
+const chainActions = (
+  server: ServerType,
+  walletChain: ChainNameEnum,
+): Actions => ({
+  primary: {
+    label: nets('walleterror.chain-action', walletChain, server.chainName),
+    action: { kind: 'chain', chain: walletChain },
+    testID: 'walleterror.chain',
+  },
+  top: slot('walleterror.more', { kind: 'more', chain: walletChain }, 12.5),
+  bottom: none,
+});
+
+const actions = (error: WalletErrorInfo, server: ServerType): Actions => {
+  if (error.cause.kind === 'chain') {
+    return chainActions(server, error.cause.walletChain);
+  }
+  switch (error.step.kind) {
+    case 'open':
+      return diskActions;
+    case 'create':
+    case 'restore':
+      return initActions(error.cause);
+  }
+};
+
+export const errorScreen = (
+  error: WalletErrorInfo,
+  server: ServerType,
+): ErrorScreen => ({
+  ...head(error.cause, server),
+  ...actions(error, server),
+});

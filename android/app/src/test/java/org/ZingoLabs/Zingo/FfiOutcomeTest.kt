@@ -17,10 +17,10 @@ import uniffi.zingo.ZingolibException
  */
 class FfiOutcomeTest {
     private val ffiFailures: Map<String, Pair<Exception, String>> = mapOf(
-        "init_new" to (ZingolibException.Init("boom") to "Init"),
-        "init_from_seed" to (ZingolibException.Init("boom") to "Init"),
-        "init_from_ufvk" to (ZingolibException.Init("boom") to "Init"),
-        "init_from_bytes" to (ZingolibException.Init("boom") to "Init"),
+        "init_new" to (ZingolibException.InitConnection("boom") to "InitConnection"),
+        "init_from_seed" to (ZingolibException.InitKey("boom") to "InitKey"),
+        "init_from_ufvk" to (ZingolibException.InitBirthday("boom") to "InitBirthday"),
+        "init_from_bytes" to (ZingolibException.InitWalletFile("boom") to "InitWalletFile"),
         "run_sync" to (ZingolibException.Sync("boom") to "Sync"),
         "pause_sync" to (ZingolibException.Sync("boom") to "Sync"),
         "status_sync" to (ZingolibException.Sync("boom") to "Sync"),

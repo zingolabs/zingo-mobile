@@ -118,7 +118,8 @@ import ServerList from '@screens/ServerList';
 import DeleteWalletSheet from '@ui/widgets/DeleteWalletSheet';
 import { DeleteWalletContext } from '@app/AppState/types/DeleteWalletContext';
 import {
-  againKey,
+  againOf,
+  Failed,
   failedOutcome,
   initOrigin,
   LoadOutcome,
@@ -503,10 +504,8 @@ export class LoadingAppClass extends Component<
       }
       return true;
     }
-    if (
-      screen === RouteEnum.WalletError &&
-      this.state.walletError?.kind === 'init'
-    ) {
+    const step = this.state.walletError?.step;
+    if (screen === RouteEnum.WalletError && step && step.kind !== 'open') {
       if (!actionButtonsDisabled) {
         this.leaveInitError();
       }
@@ -872,9 +871,9 @@ export class LoadingAppClass extends Component<
   chainError = async (walletChain: ChainNameEnum): Promise<LoadOutcome> => ({
     kind: 'error',
     error: {
-      kind: 'chain',
+      cause: { kind: 'chain', walletChain },
+      step: { kind: 'open' },
       details: await this.chainDetails(walletChain),
-      walletChain,
     },
   });
 
@@ -922,10 +921,10 @@ export class LoadingAppClass extends Component<
         const chain = await readWalletChain();
         return chain.ok
           ? this.chainError(chain.value)
-          : this.walletLoadFailed(reply.text, repair);
+          : this.walletLoadFailed(reply, repair);
       }
       case 'failed':
-        return this.walletLoadFailed(reply.text, repair);
+        return this.walletLoadFailed(reply, repair);
     }
   };
 
@@ -964,10 +963,13 @@ export class LoadingAppClass extends Component<
   // A repairable file is repaired and reloaded once; anything else lands on
   // the error screen with the error text behind its details toggle.
   walletLoadFailed = async (
-    text: string,
+    failed: Failed,
     repair: Repair,
   ): Promise<LoadOutcome> => {
-    const errorText = Utils.humanizeChainTokens(text, this.state.translate);
+    const errorText = Utils.humanizeChainTokens(
+      failed.text,
+      this.state.translate,
+    );
     const report = await walletFileDiagnosis();
     if (repair === 'try' && hasRepairableWalletFile(report.files)) {
       this.addLastSnackbar(
@@ -984,7 +986,10 @@ export class LoadingAppClass extends Component<
     const diagnosisLines = this.walletFileDiagnosisLines(report.files);
     return failedOutcome(
       { kind: 'open' },
-      diagnosisLines ? `${errorText}\n\n${diagnosisLines}` : errorText,
+      {
+        code: failed.code,
+        text: diagnosisLines ? `${errorText}\n\n${diagnosisLines}` : errorText,
+      },
     );
   };
 
@@ -1065,10 +1070,9 @@ export class LoadingAppClass extends Component<
         return state => ({ ...keep(state), ...idle });
       case 'error': {
         const again = settlement.kind === 'again';
-        if (again) {
-          this.addLastSnackbar(
-            this.state.translate(againKey(outcome.error)) as string,
-          );
+        const say = againOf(outcome.error.cause);
+        if (again && say.kind === 'say') {
+          this.addLastSnackbar(this.state.translate(say.key) as string);
         }
         return state => ({
           ...idle,
@@ -1109,15 +1113,15 @@ export class LoadingAppClass extends Component<
   };
 
   leaveInitError = () => {
-    const { walletError } = this.state;
-    if (walletError?.kind !== 'init') {
+    const step = this.state.walletError?.step;
+    if (!step || step.kind === 'open') {
       return;
     }
     this.setState({
       walletError: null,
       retrying: false,
       actionButtonsDisabled: false,
-      screen: initOrigin(walletError.step),
+      screen: initOrigin(step),
     });
   };
 
@@ -1141,7 +1145,9 @@ export class LoadingAppClass extends Component<
         return;
       case 'server':
         this.openServer(
-          walletError?.kind === 'chain' ? walletError.walletChain : undefined,
+          walletError?.cause.kind === 'chain'
+            ? walletError.cause.walletChain
+            : undefined,
         );
         return;
       case 'report':
@@ -1290,7 +1296,7 @@ export class LoadingAppClass extends Component<
     );
     if (reply.kind !== 'json') {
       clearTimeout(showProgress);
-      return failedOutcome({ kind: 'create' }, reply.text);
+      return failedOutcome({ kind: 'create' }, reply);
     }
     const wallet: WalletType = {
       seed: reply.json.seed_phrase || '',
@@ -1377,7 +1383,7 @@ export class LoadingAppClass extends Component<
       clearTimeout(showImporting);
       return failedOutcome(
         { kind: 'restore', seedUfvk, birthday, origin },
-        reply.text,
+        reply,
       );
     }
     const kind = await this.walletKind();
@@ -1429,9 +1435,9 @@ export class LoadingAppClass extends Component<
     const { serverReturn, walletError, server } = this.state;
     const fixed =
       serverReturn === RouteEnum.WalletError &&
-      walletError?.kind === 'chain' &&
+      walletError?.cause.kind === 'chain' &&
       (server.kind === 'offline' ||
-        server.chainName === walletError.walletChain);
+        server.chainName === walletError.cause.walletChain);
     this.setState({ screen: serverReturn, serverTab: null }, () => {
       if (fixed) {
         this.retryWalletError();

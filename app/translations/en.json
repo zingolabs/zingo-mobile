@@ -665,7 +665,13 @@
     "still-server": "Still can't reach the server",
     "retry": "Try again",
     "report": "Send report",
-    "back": "Back"
+    "back": "Back",
+    "key-title": "The key isn't valid",
+    "key-sub": "Check the seed phrase or viewing key and the network it belongs to.",
+    "file-title": "The wallet file is damaged",
+    "file-sub": "Your funds are safe and your seed phrase can always restore them.",
+    "birthday-title": "The birthday is too early",
+    "birthday-sub": "Enter the height of the first block after the wallet was created, or leave it empty."
   },
   "deletesheet": {
     "title": "Delete the wallet on this device?",
