@@ -10,7 +10,7 @@ exports[`Component App - test App - snapshot 1`] = `
   }
 >
   <MockedScreen
-    name="LoadingApp"
+    name="Loading"
   />
   <MockedScreen
     component={[Function]}

@@ -9,7 +9,6 @@ import {
   ChainNameEnum,
   LanguageEnum,
   LaunchingModeEnum,
-  RouteEnum,
   SelectServerEnum,
 } from '@app/AppState';
 import { remoteServer } from '@app/AppState/types/ServerType';
@@ -17,7 +16,6 @@ import {
   ConfirmOptions,
   registerConfirmListener,
 } from '@app/services/showConfirm';
-import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
 jest.mock('@app/RPCModule', () =>
   require('../__mocks__/rpcModuleProxy').rpcModuleProxyMock(),
@@ -38,8 +36,10 @@ const appWithSaved = (
   saved: { seed?: string; ufvk?: string } = { seed: 'abandon ability able' },
 ) => {
   const app = new LoadingAppClass({
-    navigationApp: mockNavigation,
-    route: { key: 'Key-1', name: RouteEnum.LoadingApp, params: undefined },
+    session: { kind: 'boot', startingApp: true, newWallet: false },
+    openWallet: jest.fn(),
+    openOnboarding: jest.fn(),
+    openBoot: jest.fn(),
     translate: (key: string) => key,
     language: LanguageEnum.en,
     server: remoteServer(

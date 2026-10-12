@@ -8,7 +8,7 @@ import React from 'react';
 import { render } from '@testing-library/react-native';
 import { LoadedApp } from '@app/LoadedApp';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { AppStackParamList } from '@app/types';
+import { LoadedAppNavigationState, RootParamList } from '@app/types';
 import { ChainNameEnum, LaunchingModeEnum, RouteEnum } from '@app/AppState';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
@@ -21,23 +21,24 @@ jest.mock('react-native-localize', () => ({
 jest.mock('i18n-js');
 
 function makeDrawerProps(): NativeStackScreenProps<
-  AppStackParamList,
-  RouteEnum.LoadedApp
-> {
+  RootParamList,
+  RouteEnum.Wallet
+> & { wallet: LoadedAppNavigationState } {
   return {
     navigation: mockNavigation,
     route: {
       key: 'Key-1',
-      name: RouteEnum.LoadedApp,
-      params: {
-        readOnly: false,
-        orchardPool: true,
-        saplingPool: true,
-        transparentPool: true,
-        newWallet: false,
-        firstLaunchingMessage: LaunchingModeEnum.opening,
-        walletChainName: ChainNameEnum.mainChainName,
-      },
+      name: RouteEnum.Wallet,
+      params: undefined,
+    },
+    wallet: {
+      readOnly: false,
+      orchardPool: true,
+      saplingPool: true,
+      transparentPool: true,
+      newWallet: false,
+      firstLaunchingMessage: LaunchingModeEnum.opening,
+      walletChainName: ChainNameEnum.mainChainName,
     },
   };
 }
