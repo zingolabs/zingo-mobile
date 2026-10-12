@@ -195,6 +195,35 @@ _Avoid_: shell
 A module that renders nothing and is called by the runtime or screens: file
 IO, alerts, email, biometrics. Home: `app/services`.
 
+## Wallet error screen
+
+**Step**:
+The wallet action a loader runs: open the wallet on disk, create a new
+wallet, or restore one from a key. A failed step is kept with the error
+so the screen can run it again.
+_Avoid_: action (names what the screen hands back), loader (the code)
+
+**Retry**:
+The error screen running its failed step again, or moving the server to
+the wallet's chain and opening. One owner begins it and settles it.
+_Avoid_: reload, reconnect
+
+**In-place retry**:
+A retry that keeps the error screen up while it runs. Opening and the
+chain switch are in place. A create or restore retry moves to the
+progress screen.
+
+**Hold**:
+The shortest time an in-place retry shows its dots, so one attempt reads
+as one. A retry off the screen has no hold.
+_Avoid_: delay, debounce
+
+**Outcome**:
+The one value a loader returns in place of touching state: loaded, error,
+alert, rejected, or offline. Settling an outcome is the only way a retry
+ends.
+_Avoid_: result (the native reply), status
+
 ## CI
 
 **Blocking check** — a PR CI job that runs under fail-all and that
