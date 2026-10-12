@@ -145,6 +145,7 @@ import Confirm from '@screens/Confirm';
 import { AppStackParamList } from '@app/types';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
+import { updateReportState } from '@app/services/reportDiagnostics';
 
 const About = React.lazy(() => import('@screens/About'));
 const MixnetDoctor = React.lazy(() => import('@screens/MixnetDoctor'));
@@ -774,6 +775,7 @@ export class LoadedAppClass extends Component<
   }
 
   componentDidMount = async () => {
+    this.publishReportState();
     const netInfoState = await NetInfo.fetch();
     this.setState({
       netInfo: {
@@ -964,6 +966,22 @@ export class LoadedAppClass extends Component<
     if (prevProps.translate !== this.props.translate) {
       this.setState({ translate: this.props.translate });
     }
+    this.publishReportState();
+  };
+
+  // The situation a support report describes; see reportDiagnostics.
+  publishReportState = () => {
+    const { mixnetView } = this.state;
+    updateReportState({
+      server: this.state.server,
+      selectServer: this.state.selectServer,
+      walletChain: this.state.walletChainName,
+      readOnly: this.state.readOnly,
+      syncingStatus: this.state.syncingStatus,
+      lastError: this.state.lastError,
+      mixnetStatus:
+        mixnetView.kind === 'transport' ? mixnetView.statusKey : 'absent',
+    });
   };
 
   foregroundGateBusy = false;
@@ -1019,6 +1037,12 @@ export class LoadedAppClass extends Component<
   };
 
   componentWillUnmount = async () => {
+    updateReportState({
+      walletChain: undefined,
+      readOnly: undefined,
+      syncingStatus: undefined,
+      lastError: undefined,
+    });
     await this.rpc.clearTimers();
     this.rpc.stopMixnetPolling();
     const safeRemove = (listener: unknown, name: string) => {
