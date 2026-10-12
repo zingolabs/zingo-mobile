@@ -119,6 +119,15 @@ import ServerList from '@screens/ServerList';
 import DeleteWalletSheet from '@ui/widgets/DeleteWalletSheet';
 import { DeleteWalletContext } from '@app/AppState/types/DeleteWalletContext';
 import { walletErrorKind } from './walletErrorKind';
+import {
+  againKey,
+  initOrigin,
+  initOutcome,
+  retryOf,
+  Retry,
+} from './walletFailure';
+import { InitStep, WalletErrorInfo } from '@app/AppState/types/WalletErrorInfo';
+import { ErrorAction } from '@screens/WalletError/walletErrorModel';
 import { sanitizePaths } from '@app/utils/sanitizePaths';
 import { duration as motionDuration } from '@app/theme/motion';
 
@@ -468,6 +477,15 @@ export class LoadingAppClass extends Component<
     if (screen === RouteEnum.ImportChooser) {
       if (!actionButtonsDisabled) {
         this.setState({ screen: RouteEnum.StartMenu });
+      }
+      return true;
+    }
+    if (
+      screen === RouteEnum.WalletError &&
+      this.state.walletError?.kind === 'init'
+    ) {
+      if (!actionButtonsDisabled) {
+        this.leaveInitError();
       }
       return true;
     }
@@ -996,21 +1014,15 @@ export class LoadingAppClass extends Component<
 
   // A retry that fails again shakes the icon and says so; its dots stay up
   // for at least RETRY_MIN_MS so the attempt reads as one.
-  showWalletError = (details: string) => {
-    const kind = walletErrorKind(details);
-    const again = this.state.screen === RouteEnum.WalletError;
+  showError = (error: WalletErrorInfo) => {
+    const again =
+      this.state.screen === RouteEnum.WalletError || this.state.retrying;
     const apply = () => {
       if (again) {
-        this.addLastSnackbar(
-          this.state.translate(
-            kind === 'server'
-              ? 'walleterror.still-server'
-              : 'walleterror.still-open',
-          ) as string,
-        );
+        this.addLastSnackbar(this.state.translate(againKey(error)) as string);
       }
       this.setState(state => ({
-        walletError: { kind, details },
+        walletError: error,
         errorResolved: false,
         retrying: false,
         errorShake: again ? state.errorShake + 1 : state.errorShake,
@@ -1023,10 +1035,95 @@ export class LoadingAppClass extends Component<
     setTimeout(apply, wait);
   };
 
-  retryOpenWallet = async () => {
+  showWalletError = (details: string) =>
+    this.showError({ kind: walletErrorKind(details), details });
+
+  retryWalletError = async () => {
+    const { walletError } = this.state;
+    if (!walletError) {
+      return;
+    }
     this.retryStartedAt = Date.now();
     this.setState({ retrying: true, actionButtonsDisabled: true });
-    await this.loadExistingWalletOnBoot();
+    await this.runRetry(retryOf(walletError));
+  };
+
+  runRetry = (retry: Retry): Promise<void> => {
+    switch (retry.kind) {
+      case 'open':
+        return this.loadExistingWalletOnBoot();
+      case 'create':
+        return this.createNewWallet();
+      case 'restore':
+        return this.doRestore(retry.seedUfvk, retry.birthday, retry.origin);
+    }
+  };
+
+  initFailed = (step: InitStep, errorText: string) => {
+    const outcome = initOutcome(step, errorText);
+    switch (outcome.kind) {
+      case 'screen':
+        this.showError(outcome.error);
+        return;
+      case 'alert':
+        this.setState({ actionButtonsDisabled: false, screen: outcome.origin });
+        createAlert(
+          this.setBackgroundError,
+          this.addLastSnackbar,
+          this.state.translate(outcome.labelKey) as string,
+          outcome.error,
+          false,
+          this.state.translate,
+          sendEmail,
+          this.state.zingolibVersion,
+        );
+    }
+  };
+
+  leaveInitError = () => {
+    const { walletError } = this.state;
+    if (walletError?.kind !== 'init') {
+      return;
+    }
+    this.setState({
+      walletError: null,
+      retrying: false,
+      actionButtonsDisabled: false,
+      screen: initOrigin(walletError.step),
+    });
+  };
+
+  onErrorAction = (action: ErrorAction) => {
+    const { walletError } = this.state;
+    switch (action.kind) {
+      case 'retry':
+        this.retryWalletError();
+        return;
+      case 'chain':
+        this.switchToWalletChain(action.chain);
+        return;
+      case 'import':
+        this.confirmDelete('import', this.getwalletToRestore);
+        return;
+      case 'create':
+        this.confirmDelete('create', this.createNewWallet);
+        return;
+      case 'back':
+        this.leaveInitError();
+        return;
+      case 'server':
+        this.openServer(
+          walletError?.kind === 'chain' ? walletError.walletChain : undefined,
+        );
+        return;
+      case 'report':
+        sendEmail(
+          this.state.translate,
+          this.state.zingolibVersion,
+          action.subject,
+          walletError?.details ?? '',
+        );
+    }
   };
 
   // Moves to Automatic on the wallet's network, then opens the wallet. A
@@ -1139,6 +1236,7 @@ export class LoadingAppClass extends Component<
       this.addLastSnackbar(
         this.state.translate('loadedapp.connection-error') as string,
       );
+      this.setState({ retrying: false, actionButtonsDisabled: false });
       return;
     }
     this.setState({
@@ -1173,37 +1271,14 @@ export class LoadingAppClass extends Component<
         seedJSON = await JSON.parse(seed.value);
         if (seedJSON.error) {
           clearTimeout(showProgress);
-          this.setState({
-            actionButtonsDisabled: false,
-            screen: RouteEnum.StartMenu,
-          });
-          createAlert(
-            this.setBackgroundError,
-            this.addLastSnackbar,
-            this.state.translate('loadingapp.creatingwallet-label') as string,
-            seedJSON.error,
-            false,
-            this.state.translate,
-            sendEmail,
-            this.state.zingolibVersion,
-          );
+          this.initFailed({ kind: 'create' }, seedJSON.error);
           return;
         }
       } catch (e: unknown) {
         clearTimeout(showProgress);
-        this.setState({
-          actionButtonsDisabled: false,
-          screen: RouteEnum.StartMenu,
-        });
-        createAlert(
-          this.setBackgroundError,
-          this.addLastSnackbar,
-          this.state.translate('loadingapp.creatingwallet-label') as string,
+        this.initFailed(
+          { kind: 'create' },
           e instanceof Error ? e.message : String(e),
-          false,
-          this.state.translate,
-          sendEmail,
-          this.state.zingolibVersion,
         );
         return;
       }
@@ -1239,19 +1314,9 @@ export class LoadingAppClass extends Component<
       );
     } else {
       clearTimeout(showProgress);
-      this.setState({
-        actionButtonsDisabled: false,
-        screen: RouteEnum.StartMenu,
-      });
-      createAlert(
-        this.setBackgroundError,
-        this.addLastSnackbar,
-        this.state.translate('loadingapp.creatingwallet-label') as string,
+      this.initFailed(
+        { kind: 'create' },
         seed.ok ? seed.value : seed.error.message,
-        false,
-        this.state.translate,
-        sendEmail,
-        this.state.zingolibVersion,
       );
     }
   };
@@ -1491,16 +1556,9 @@ export class LoadingAppClass extends Component<
     }
     if (error) {
       clearTimeout(showImporting);
-      this.setState({ actionButtonsDisabled: false, screen: origin });
-      createAlert(
-        this.setBackgroundError,
-        this.addLastSnackbar,
-        this.state.translate('loadingapp.readingwallet-label') as string,
+      this.initFailed(
+        { kind: 'restore', seedUfvk, birthday, origin },
         errorText,
-        false,
-        this.state.translate,
-        sendEmail,
-        this.state.zingolibVersion,
       );
     }
   };
@@ -1538,7 +1596,7 @@ export class LoadingAppClass extends Component<
         server.chainName === walletError.walletChain);
     this.setState({ screen: serverReturn, serverTab: null }, () => {
       if (fixed) {
-        this.retryOpenWallet();
+        this.retryWalletError();
       }
     });
   };
@@ -1903,23 +1961,11 @@ export class LoadingAppClass extends Component<
                   {screen === RouteEnum.WalletError &&
                     this.state.walletError && (
                       <WalletError
-                        kind={this.state.walletError.kind}
-                        details={this.state.walletError.details}
-                        walletChain={this.state.walletError.walletChain}
+                        error={this.state.walletError}
                         resolved={this.state.errorResolved}
                         busy={this.state.retrying}
                         shake={this.state.errorShake}
-                        onRetry={this.retryOpenWallet}
-                        onImport={() =>
-                          this.confirmDelete('import', this.getwalletToRestore)
-                        }
-                        onCreate={() =>
-                          this.confirmDelete('create', this.createNewWallet)
-                        }
-                        onServer={() =>
-                          this.openServer(this.state.walletError?.walletChain)
-                        }
-                        onSwitchChain={this.switchToWalletChain}
+                        onAction={this.onErrorAction}
                       />
                     )}
                   {screen === RouteEnum.Server && (

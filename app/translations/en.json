@@ -662,7 +662,10 @@
     "import": "Import wallet",
     "create": "Create new wallet",
     "still-open": "Still couldn't open the wallet",
-    "still-server": "Still can't reach the server"
+    "still-server": "Still can't reach the server",
+    "retry": "Try again",
+    "report": "Send report",
+    "back": "Back"
   },
   "deletesheet": {
     "title": "Delete the wallet on this device?",

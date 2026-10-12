@@ -662,7 +662,10 @@
     "import": "Importar monedero",
     "create": "Crear monedero nuevo",
     "still-open": "Sigue sin poder abrirse el monedero",
-    "still-server": "Sigue sin poder conectar con el servidor"
+    "still-server": "Sigue sin poder conectar con el servidor",
+    "retry": "Reintentar",
+    "report": "Enviar informe",
+    "back": "Atrás"
   },
   "deletesheet": {
     "title": "¿Borrar el monedero de este dispositivo?",
