@@ -71,7 +71,7 @@ describe('A wallet on another network than its server', () => {
       bridge.walletChainInfo.mockResolvedValue('main');
       const { app, applyServer, showChainError } = bootApp(selectServer);
 
-      await app.componentDidMount();
+      await app.runBoot();
 
       expect(applyServer).not.toHaveBeenCalled();
       expect(showChainError).toHaveBeenCalledWith(ChainNameEnum.mainChainName);

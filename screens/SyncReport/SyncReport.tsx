@@ -14,6 +14,8 @@ import { useTheme } from '@app/theme';
 import { AppDrawerParamList } from '@app/types';
 import DetailLine from '@ui/widgets/DetailLine';
 import { ContextAppLoaded } from '@app/context';
+import { useAtomValue } from 'jotai';
+import { syncStatusAtom } from '@app/AppState/syncAtoms';
 
 import Header from '@ui/widgets/Header';
 import { NetInfoStateType } from '@react-native-community/netinfo/src/index';
@@ -47,8 +49,8 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
   navigation,
 }) => {
   const context = useContext(ContextAppLoaded);
+  const syncingStatus = useAtomValue(syncStatusAtom);
   const {
-    syncingStatus,
     birthday,
     translate,
     backgroundSyncInfo,

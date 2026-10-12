@@ -36,8 +36,6 @@ function serviceFor(server: ServerType) {
     server,
   });
   const service = new DataService(config);
-  // The reconfigure the error path triggers is out of scope here.
-  service.onSyncError = jest.fn();
   return { service, onValueTransfersChanged, onInfoChanged, onError };
 }
 
@@ -126,6 +124,5 @@ describe('a failed server height request', () => {
     expect(onError).toHaveBeenCalledWith(
       expect.stringContaining('Error server height'),
     );
-    expect(service.onSyncError).not.toHaveBeenCalled();
   });
 });

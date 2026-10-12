@@ -38,7 +38,7 @@ const walletExists = RPCModule.walletExists as unknown as jest.Mock;
 const hasRecovery = hasRecoveryWalletInfo as jest.Mock;
 
 // The boot logic is what is under test, not the Welcome it draws, so the
-// class is built and its mount handler called without rendering. A custom
+// class is built and its boot chain called without rendering. A custom
 // server keeps the boot off the network.
 const bootApp = () =>
   new LoadingAppClass({
@@ -70,7 +70,7 @@ describe('LoadingApp start gate', () => {
     walletExists.mockResolvedValue('false');
     hasRecovery.mockResolvedValue(true);
 
-    await bootApp().componentDidMount();
+    await bootApp().runBoot();
 
     expect(walletExists).toHaveBeenCalled();
     expect(resolveTriggerGate).not.toHaveBeenCalled();
@@ -112,7 +112,7 @@ describe('LoadingApp start gate', () => {
       failure: { errorKey: 'biometrics-failure-declined' },
     });
 
-    await bootApp().componentDidMount();
+    await bootApp().runBoot();
 
     expect(resolveTriggerGate).toHaveBeenCalledTimes(1);
     expect(RPCModule.loadExistingWallet).not.toHaveBeenCalled();

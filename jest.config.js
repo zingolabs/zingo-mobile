@@ -13,6 +13,7 @@ module.exports = {
     '/node_modules/',
     '<rootDir>/visual/',
     '<rootDir>/zingolib/',
+    '<rootDir>/__tests__/helpers/',
   ],
   // @noble/hashes ships ESM only, so babel transforms it like React Native's own packages.
   transformIgnorePatterns: [

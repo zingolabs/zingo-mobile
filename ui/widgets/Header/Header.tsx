@@ -35,6 +35,8 @@ import { ContextAppLoaded } from '@app/context';
 import { getZingoLogo } from '@app/utils/ZingoAppData';
 import { useShieldFunds } from '@app/hooks/useShieldFunds';
 import { useSyncStatus } from '@app/hooks/useSyncStatus';
+import { useAtomValue } from 'jotai';
+import { syncStatusAtom } from '@app/AppState/syncAtoms';
 import BoldText from '@ui/primitives/BoldText';
 import SyncStatusBar from './components/SyncStatusBar';
 import BalanceRow from './components/BalanceRow';
@@ -114,7 +116,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   const {
     totalBalance,
     info,
-    syncingStatus,
     zecPrice,
     readOnly,
     valueTransfersTotal,
@@ -125,6 +126,10 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     sendPermitNow,
     seedBackedUp,
   } = context;
+
+  // The sync slice reads from its own atom, so a scan tick wakes the
+  // header without re-rendering the wider context tree.
+  const syncingStatus = useAtomValue(syncStatusAtom);
 
   const translate = translateProp ?? context.translate;
   const netInfo = netInfoProp ?? context.netInfo;

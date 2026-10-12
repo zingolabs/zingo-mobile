@@ -6,9 +6,9 @@
  * dropped rather than queued. SyncCoordinator reads these lock flags to decide
  * whether to skip a polling cycle entirely.
  *
- * onSyncError is intentionally a no-op at construction time. WalletBackend
- * overwrites it after SyncCoordinator is created to break the circular
- * dependency: DataService → SyncCoordinator → DataService.
+ * A fetch failure surfaces through config.onError and returns. It never drives a
+ * lifecycle method: clearTimers()/configure() belong to the lifecycle alone, so
+ * the self-rescheduling poll loop retries on its next tick (ADR 0017).
  */
 import {
   TotalBalanceClass,
@@ -75,9 +75,6 @@ export class DataService {
   fetchZingolibVersionLock: boolean = false;
   getWalletSaveRequiredLock: boolean = false;
 
-  // Set by WalletBackend after SyncCoordinator is created, to restart sync on critical errors.
-  onSyncError: () => Promise<void> = async () => {};
-
   constructor(config: WalletBackendConfig) {
     this.config = config;
   }
@@ -140,7 +137,6 @@ export class DataService {
     } catch (error) {
       console.log(`Critical Error balances ${error}`);
       this.config.onError(`Error balance: ${error}`);
-      await this.onSyncError();
     } finally {
       this.fetchTotalBalanceLock = false;
     }
@@ -220,7 +216,6 @@ export class DataService {
     } catch (error) {
       console.log(`Critical Error addresses ${error}`);
       this.config.onError(`Error addresses: ${error}`);
-      await this.onSyncError();
     } finally {
       this.fetchAddressesLock = false;
     }
@@ -249,7 +244,6 @@ export class DataService {
     } catch (error) {
       console.log(`Critical Error wallet height ${error}`);
       this.config.onError(`Error wallet height: ${error}`);
-      await this.onSyncError();
     } finally {
       this.fetchWalletHeightLock = false;
     }
@@ -267,9 +261,8 @@ export class DataService {
     this.fetchInfoAndServerHeightLock = true;
     try {
       // No server, no info. The empty shape is what an unreadable answer
-      // already publishes; rejecting instead would reach the catch, and the
-      // catch calls onSyncError, which reconfigures — a loop with nothing at
-      // the end of it.
+      // already publishes; rejecting instead would reach the catch, which
+      // reports an error on every poll tick for a server that never exists.
       if (isOffline(this.config)) {
         this.publishNoServerInfo();
         return;
@@ -320,7 +313,6 @@ export class DataService {
     } catch (error) {
       console.log(`Critical Error info & server block height ${error}`);
       this.config.onError(`Error info: ${error}`);
-      await this.onSyncError();
     } finally {
       this.fetchInfoAndServerHeightLock = false;
     }
@@ -397,7 +389,6 @@ export class DataService {
     } catch (error) {
       console.log(`Critical Error wallet birthday ${error}`);
       this.config.onError(`Error wallet birthday: ${error}`);
-      await this.onSyncError();
     } finally {
       this.fetchWalletBirthdaySeedUfvkLock = false;
     }
@@ -477,7 +468,6 @@ export class DataService {
     } catch (error) {
       console.log(`Critical Error value transfers ${error}`);
       this.config.onError(`Error value transfers: ${error}`);
-      await this.onSyncError();
     } finally {
       this.fetchTandZandOValueTransfersLock = false;
     }
@@ -522,7 +512,6 @@ export class DataService {
     } catch (error) {
       console.log(`Critical Error value transfers messages ${error}`);
       this.config.onError(`Error value transfers messages: ${error}`);
-      await this.onSyncError();
     } finally {
       this.fetchTandZandOMessagesLock = false;
     }
