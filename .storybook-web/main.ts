@@ -1,5 +1,5 @@
 import path from 'path';
-import { readFile } from 'fs/promises';
+import { access, readFile } from 'fs/promises';
 import type { Plugin } from 'vite';
 import type { StorybookConfig } from '@storybook/react-native-web-vite';
 
@@ -44,6 +44,38 @@ export default props => React.createElement(SvgXml, Object.assign({ xml }, props
   },
 });
 
+// Mirror metro's scaled images on web: a require of `name.png` with only
+// `name@3x.png` or `name@2x.png` on disk resolves to the largest one.
+const scaledImages = (): Plugin => ({
+  name: 'scaled-images',
+  enforce: 'pre',
+  async resolveId(source, importer) {
+    if (
+      !importer ||
+      !source.startsWith('.') ||
+      !/\.(png|jpe?g)$/i.test(source)
+    ) {
+      return null;
+    }
+    const file = path.resolve(path.dirname(importer.split('?')[0]), source);
+    const exists = (f: string) =>
+      access(f).then(
+        () => true,
+        () => false,
+      );
+    if (await exists(file)) {
+      return null;
+    }
+    for (const scale of ['@3x', '@2x']) {
+      const scaled = file.replace(/(\.[a-z]+)$/i, `${scale}$1`);
+      if (await exists(scaled)) {
+        return scaled;
+      }
+    }
+    return null;
+  },
+});
+
 const main: StorybookConfig = {
   stories: [
     '../screens/**/*.stories.?(ts|tsx)',
@@ -68,7 +100,7 @@ const main: StorybookConfig = {
     // Relative asset paths so the static build works served from any subpath
     // (gh-pages root for dev, /pr/<n>/storybook/ inside a PR report).
     config.base = './';
-    config.plugins = [svgAsSvgXml(), ...(config.plugins ?? [])];
+    config.plugins = [svgAsSvgXml(), scaledImages(), ...(config.plugins ?? [])];
     // Keep reanimated pre-bundled for correct interop, and run the worklet transform in the rolldown dep optimizer.
     config.optimizeDeps = config.optimizeDeps ?? {};
     config.optimizeDeps.rollupOptions = config.optimizeDeps.rollupOptions ?? {};

@@ -28,7 +28,6 @@ export {
   createNewUnifiedAddress,
   createNewWallet,
   doSave,
-  doSaveBackup,
   drainOrchard,
   drainStatus,
   executeDueParts,
@@ -36,6 +35,7 @@ export {
   fetchWallet,
   getBalanceInfo,
   getLatestBlockServerInfo,
+  probeServer,
   getServerInfo,
   getSpendableBalanceWithAddress,
   getTotalMemobytesToAddress,
@@ -48,14 +48,15 @@ export {
   loadExistingWallet,
   migrationStatus,
   parseAddress,
+  checkUfvk,
   planIronwoodMigration,
   planOrchardDrain,
   quickSplit,
   reconcileMigration,
   removeTransaction,
   rescheduleParts,
+  deleteExistingWallet,
   resolvedTrue,
-  restoreExistingWalletBackup,
   restoreWalletFromSeed,
   restoreWalletFromUfvk,
   sendAllPropose,
@@ -67,9 +68,15 @@ export {
   startIronwoodMigration,
   walletBackupExists,
   walletExists,
+  readWalletChain,
   windowTimeline,
 } from './utils/walletUtils';
-export type { ZecPriceOutcome } from './utils/walletUtils';
+export type {
+  ProbeTarget,
+  ServerProbe,
+  UfvkCheck,
+  ZecPriceOutcome,
+} from './utils/walletUtils';
 export {
   hasRepairableWalletFile,
   repairDoubleWrappedWallet,
@@ -77,7 +84,6 @@ export {
   walletFileDiagnosis,
   walletSeedSalvage,
   WALLET_FILE_NAME,
-  WALLET_BACKUP_FILE_NAME,
 } from './utils/walletFileRepair';
 export type {
   WalletFileDiagnosis,

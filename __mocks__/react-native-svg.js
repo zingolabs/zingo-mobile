@@ -7,3 +7,7 @@ export const Polygon = () => null;
 export const Rect = () => null;
 export const G = () => null;
 export const Circle = () => null;
+export const Defs = () => null;
+export const Filter = () => null;
+export const FeGaussianBlur = () => null;
+export const Text = () => null;

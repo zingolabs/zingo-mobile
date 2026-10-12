@@ -34,7 +34,10 @@ import {
   isOffline,
 } from '@app/walletBackend/config/WalletBackendConfig';
 import { DataService } from './DataService';
-import { doSave } from '@app/walletBackend/utils/walletUtils';
+import { changeServer, doSave } from '@app/walletBackend/utils/walletUtils';
+
+// zingolib's refusal to sync a client that has no indexer configured.
+const INDEXERLESS = /no indexer configured/i;
 
 // Consecutive failed sync launches before onPersistentSyncFailure fires.
 // Three failures span ~15 s of the 5 s tick: long enough to ride out a
@@ -389,8 +392,18 @@ export class SyncCoordinator {
     } catch (error) {
       // runSyncProcess and runRescanProcess reject on failure (typed FFI
       // errors); this catch owns the error path for both.
-      console.log(`Critical Error sync/rescan run ${error}`);
-      this.config.onError(`Error sync/rescan run: ${error}`);
+      const { server } = this.config;
+      if (INDEXERLESS.test(String(error)) && server.kind === 'remote') {
+        // The wallet opened without an indexer because its server did not
+        // answer then (leaving Offline mode on a network that was still
+        // coming up). Attach the server again; the next tick syncs. Not an
+        // error to record, but it still counts toward a dead server.
+        console.log(`sync: no indexer, attaching ${server.uri} again`);
+        await changeServer(server.uri);
+      } else {
+        console.log(`Critical Error sync/rescan run ${error}`);
+        this.config.onError(`Error sync/rescan run: ${error}`);
+      }
       if (!fullRescan) {
         this.syncLaunchFailures += 1;
         if (this.syncLaunchFailures >= PERSISTENT_SYNC_FAILURE_THRESHOLD) {

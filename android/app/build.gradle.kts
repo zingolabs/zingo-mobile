@@ -28,7 +28,7 @@ react {
     //   The list of variants to that are debuggable. For those we're going to
     //   skip the bundling of the JS bundle and the assets. By default is just 'debug'.
     //   If you add flavors like lite, prod, etc. you'll have to list your debuggableVariants.
-    // debuggableVariants = ["liteDebug", "prodDebug"]
+    debuggableVariants = listOf("prodDebug", "betaDebug")
 
     /* Bundling */
     //   A list containing the node command and its flags. Default is just 'node'.
@@ -92,6 +92,13 @@ val splitApk = (project.findProperty("splitApk") as? String)?.toBoolean() ?: fal
 
 // The limit that the instrumentation runner gives one instrumented test.
 val instrumentedTestTimeout = 60.seconds
+// The zingo-mobile part of the build descriptor, which RPCModule joins to the
+// zingolib part that get_version() returns.
+val zmDescriptor: String = runCatching {
+    providers.exec {
+        commandLine("node", rootProject.file("../scripts/zm_descriptor.mjs").path)
+    }.standardOutput.asText.get().trim()
+}.getOrDefault("").ifEmpty { "zm_unknown" }
 val includeUniversalApk = (project.findProperty("includeUniversalApk") as? String)?.toBoolean() ?: false
 
 val keystoreProperties = Properties()
@@ -129,6 +136,7 @@ android {
         versionName = "2.0.24" // Real
         testBuildType = System.getProperty("testBuildType", "debug")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        resValue("string", "zm_descriptor", zmDescriptor)
         testInstrumentationRunnerArguments["timeout_msec"] =
             instrumentedTestTimeout.inWholeMilliseconds.toString()
         // The orchestrator clears the app's data between tests.
@@ -163,7 +171,7 @@ android {
         create("beta") {
             dimension = "channel"
             applicationIdSuffix = ".Beta"
-            versionCode = 335 // beta override
+            versionCode = 338 // beta override
             versionName = "2.0.23" // beta override
             resValue("string", "app_name", "Zingo Beta")
         }

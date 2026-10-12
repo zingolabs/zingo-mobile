@@ -154,7 +154,7 @@ describe('LoadedApp seam-B mount fence — current container behavior', () => {
     // The RootNavigator's focused HomeStack screen rendered its render-prop body.
     expect(routePresent(utils, RouteEnum.HomeStack)).toBe(true);
     // A sibling RootNavigator screen is registered but not mounted.
-    expect(routePresent(utils, RouteEnum.Seed)).toBe(true);
+    expect(routePresent(utils, RouteEnum.WalletSeed)).toBe(true);
   });
 
   describe('B.2: the two render outcomes over the render selector inputs', () => {

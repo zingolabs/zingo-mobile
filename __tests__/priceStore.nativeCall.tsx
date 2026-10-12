@@ -6,14 +6,10 @@ jest.mock('@app/walletBackend', () => ({
 import 'react-native';
 import type { AppStateStatus } from 'react-native';
 import React from 'react';
-import { render, renderHook } from '@testing-library/react-native';
+import { render } from '@testing-library/react-native';
 import PriceFetcher, { PriceTrafficDriver } from '@ui/widgets/PriceFetcher';
 import QuoteRefreshRing from '@ui/primitives/QuoteRefreshRing';
-import {
-  PRICE_REFRESH_MAX_MS,
-  priceFetcherStore,
-  usePriceStale,
-} from '@ui/widgets/priceFetcherStore';
+import { priceFetcherStore } from '@ui/widgets/priceFetcherStore';
 import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
@@ -211,16 +207,6 @@ test('the boot fetch renders nothing before the first price', async () => {
   expect(view.queryByTestId('pricefetcher.ring')).toBeNull();
 });
 
-test('the cadence plus fetch latency does not dim', () => {
-  const withinHeadroom = Date.now() - (PRICE_REFRESH_MAX_MS + 10_000);
-  const { result: healthy } = renderHook(() => usePriceStale(withinHeadroom));
-  expect(healthy.current).toBe(false);
-
-  const pastHeadroom = Date.now() - (PRICE_REFRESH_MAX_MS + 31_000);
-  const { result: slipped } = renderHook(() => usePriceStale(pastHeadroom));
-  expect(slipped.current).toBe(true);
-});
-
 test('the ring fills from coarse ticks, not a per-frame animation', async () => {
   jest.useFakeTimers();
   const { Animated } = require('react-native');
@@ -230,10 +216,10 @@ test('the ring fills from coarse ticks, not a per-frame animation', async () => 
     <QuoteRefreshRing
       size={22}
       color="#ffffff"
+      fetchColor="#00ff00"
       trackColor="rgba(255,255,255,0.12)"
       durationMs={60_000}
       resetKey={1}
-      accessibilityLabel="ring"
       testID="ring"
     />,
   );

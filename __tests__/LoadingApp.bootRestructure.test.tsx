@@ -159,10 +159,12 @@ describe('LoadingApp boot restructure — current boot behavior', () => {
       await flushMicrotasks();
     });
 
-    expect(AppState.addEventListener).toHaveBeenCalledTimes(1);
+    // The Welcome's branches hold an AppState listener of their own, so the
+    // container's subscription is counted through its own entry point.
+    const instance = instanceOf(utils);
+    const subscribe = jest.spyOn(instance, 'subscribe');
     expect(NetInfo.addEventListener).toHaveBeenCalledTimes(1);
 
-    const instance = instanceOf(utils);
     await act(async () => {
       instance.openCurrentWallet();
       await flushMicrotasks();
@@ -170,7 +172,7 @@ describe('LoadingApp boot restructure — current boot behavior', () => {
 
     // The restart re-ran the boot chain but must not re-subscribe: the prior
     // handles are still the only ones, so nothing leaked.
-    expect(AppState.addEventListener).toHaveBeenCalledTimes(1);
+    expect(subscribe).not.toHaveBeenCalled();
     expect(NetInfo.addEventListener).toHaveBeenCalledTimes(1);
   });
 

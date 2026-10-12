@@ -17,6 +17,8 @@ export type ConfirmOptions = {
   title: string;
   message?: string;
   messageAlign?: 'left' | 'center' | 'right';
+  // 'danger' sets the message in the warning red.
+  messageTone?: 'default' | 'danger';
   buttons: ConfirmButton[];
 };
 

@@ -176,11 +176,6 @@ jobs:
         with:
           node-version: 22.18.0
 
-      - name: Record zingo-mobile's descriptor
-        run: |
-          descriptor="$(node scripts/zm_descriptor.mjs)"
-          echo "ZINGO_MOBILE_DESCRIPTOR=$descriptor" >> "$GITHUB_ENV"
-
       # The two XCFrameworks and the Swift sources of the ZingoBindings
       # package, which the Xcode project takes from the zingolib submodule. The
       # builder finds the zingolib root from its own crate directory, so it
@@ -204,9 +199,9 @@ jobs:
           printf '%s\n' \
             "## iOS Binding Layer" \
             "" \
-            "| Runner | Cargo cache | Build time | Descriptor | zingolib |" \
-            "|---|---|---|---|---|" \
-            "| $RUNNER | $CARGO_CACHE | ${minutes}m ${seconds}s | $ZINGO_MOBILE_DESCRIPTOR | $(git -C zingolib rev-parse --short HEAD) |" \
+            "| Runner | Cargo cache | Build time | zingolib |" \
+            "|---|---|---|---|" \
+            "| $RUNNER | $CARGO_CACHE | ${minutes}m ${seconds}s | $(git -C zingolib rev-parse --short HEAD) |" \
             >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload the Binding Layer

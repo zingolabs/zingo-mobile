@@ -422,7 +422,9 @@ extension AppDelegate {
                 return
             }
 
-            if case .offline = walletLoad {
+            // Nothing to sync without an indexer: recorded as skipped, not as
+            // an error.
+            let skipOffline = {
                 NSLog("BGTask syncingProcessBackgroundTask - Offline mode, sync skipped")
                 let timeStampOffline = Date().timeIntervalSince1970
                 let timeStampStrOffline = String(format: "%.0f", timeStampOffline)
@@ -436,7 +438,11 @@ extension AppDelegate {
                 if let task = self.bgTask {
                   task.setTaskCompleted(success: true)
                 }
-                bgTask = nil
+                self.bgTask = nil
+            }
+
+            if case .offline = walletLoad {
+                skipOffline()
                 return
             }
 
@@ -445,6 +451,10 @@ extension AppDelegate {
               let syncing = try runSync()
               let syncingStr = String(syncing)
               NSLog("BGTask syncingProcessBackgroundTask - sync LAUNCH \(syncingStr)")
+            } catch ZingolibError.Offline(_) {
+              // The wallet opened without an indexer: the same as Offline mode.
+              skipOffline()
+              return
             } catch {
               NSLog("BGTask syncingProcessBackgroundTask - run Sync error: \(error.localizedDescription)")
 

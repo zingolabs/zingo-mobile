@@ -3,7 +3,12 @@ export enum RouteEnum {
   Launching = 'Launching',
   StartMenu = 'StartMenu',
   NewSeed = 'NewSeed',
+  ImportChooser = 'ImportChooser',
   ImportUfvk = 'ImportUfvk',
+  WalletProgress = 'WalletProgress',
+  WalletError = 'WalletError',
+  Server = 'Server',
+  ServerList = 'ServerList',
 
   // Stack
   LoadingApp = 'LoadingApp',
@@ -24,6 +29,9 @@ export enum RouteEnum {
   SyncReport = 'SyncReport',
   Pools = 'Pools',
   MeetIronwood = 'MeetIronwood',
+  SeedBackup = 'SeedBackup',
+  WalletSeed = 'WalletSeed',
+  ViewingKey = 'ViewingKey',
   MigrationStrategy = 'MigrationStrategy',
   MigrationTransactions = 'MigrationTransactions',
   MigrationSending = 'MigrationSending',
@@ -38,9 +46,6 @@ export enum RouteEnum {
   AddressBook = 'AddressBook',
   AddressList = 'AddressList',
   ScannerAddress = 'ScannerAddress',
-  ScannerUfvk = 'ScannerUfvk',
   ValueTransferDetail = 'ValueTransferDetail',
   Confirm = 'Confirm',
-  Ufvk = 'Ufvk',
-  Seed = 'Seed',
 }

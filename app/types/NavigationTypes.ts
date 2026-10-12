@@ -1,12 +1,12 @@
+import type { ScanTexts } from '@ui/widgets/ScanOverlay';
+import type { RevealOrigin } from '@ui/widgets/CircularReveal';
 import {
   AddressKindEnum,
   BiometricGateOutcome,
   ChainNameEnum,
   LaunchingModeEnum,
   RouteEnum,
-  SeedActionEnum,
   SendPageStateClass,
-  UfvkActionEnum,
   ValueTransferType,
   ProposalPoolsType,
 } from '@app/AppState';
@@ -22,11 +22,10 @@ export type AppStackParamList = {
   // Stack
   [RouteEnum.LoadingApp]: LoadingAppNavigationState | undefined;
   [RouteEnum.LoadedApp]: LoadedAppNavigationState | undefined;
-  // ScannerAddress / ScannerUfvk are presented as transparent modals at the
+  // ScannerAddress is presented as a transparent modal at the
   // root Stack so they overlay everything (LoadedApp, LoadingApp, and any
   // open BottomSheet portals).
   [RouteEnum.ScannerAddress]: ScannerAddressNavigationState | undefined;
-  [RouteEnum.ScannerUfvk]: ScannerUfvkNavigationState | undefined;
 };
 
 /**
@@ -58,6 +57,23 @@ export type LoadedAppNavigationState = {
   walletChainName: ChainNameEnum;
 };
 
+// A card's rect in window coordinates.
+export type CardRect = { x: number; y: number; width: number; height: number };
+
+export type WalletSeedAction = 'change' | 'server';
+
+// How the viewing key screen opens: a circle out of the header snowflake,
+// the view-only card growing, or pushed from the menu.
+export type ViewingKeyEntry =
+  | { kind: 'circle'; origin: { x: number; y: number } }
+  | { kind: 'card'; from: CardRect }
+  | { kind: 'push' };
+
+// How the backup flow opens: grown out of the History notice card, pushed
+// from Wallet Seed, or straight to the three-word check from Wallet Seed.
+export type SeedBackupEntry =
+  { kind: 'card'; from: CardRect } | { kind: 'push' } | { kind: 'verify' };
+
 /**
  * Root drawer parameter list for the main stack navigator
  * This defines the structure of parameters passed between main app screens
@@ -70,6 +86,7 @@ export type AppDrawerParamList = {
   [RouteEnum.Receive]: undefined;
   [RouteEnum.Messages]: undefined;
   [RouteEnum.Settings]: undefined;
+  [RouteEnum.Server]: undefined;
   [RouteEnum.About]: undefined;
   [RouteEnum.MixnetDoctor]: undefined;
   [RouteEnum.Rescan]: undefined;
@@ -78,6 +95,13 @@ export type AppDrawerParamList = {
   [RouteEnum.SyncReport]: undefined;
   [RouteEnum.Pools]: undefined;
   [RouteEnum.MeetIronwood]: undefined;
+  [RouteEnum.SeedBackup]: { entry: SeedBackupEntry };
+  // Absent for the plain view; set when the seed is shown before leaving
+  // this wallet or its server.
+  [RouteEnum.WalletSeed]: { action: WalletSeedAction } | undefined;
+  // `switchTo`: shown before a view-only wallet moves to a server on that
+  // network.
+  [RouteEnum.ViewingKey]: { entry: ViewingKeyEntry; switchTo?: ChainNameEnum };
   [RouteEnum.MigrationStrategy]: undefined;
   [RouteEnum.MigrationTransactions]: undefined;
   // The immediate drain broadcasts here; `transactions` is the previewed plan,
@@ -108,8 +132,6 @@ export type AppDrawerParamList = {
   [RouteEnum.ValueTransferDetail]:
     ValueTransferDetailNavigationState | undefined;
   [RouteEnum.Confirm]: ConfirmNavigationState | undefined;
-  [RouteEnum.Ufvk]: UfvkNavigationState | undefined;
-  [RouteEnum.Seed]: SeedNavigationState | undefined;
 };
 
 export type AddressBookNavigationState = {
@@ -124,16 +146,11 @@ export type AddressListNavigationState = {
 
 export type ScannerAddressNavigationState = {
   setAddress: (a: string) => void;
-  active: boolean;
-  // When true the scanner returns the scanned string verbatim — no `zcash:`
-  // prefixing — for non-Zcash address fields (address book). The caller
-  // validates it per its own chain.
-  raw?: boolean;
-};
-
-export type ScannerUfvkNavigationState = {
-  setUfvkText: (k: string) => void;
-  active: boolean;
+  // What the scan is for, and its words, set by the caller.
+  accepts: (value: string) => boolean | Promise<boolean>;
+  texts: ScanTexts;
+  // The scan button's centre, where the camera opens from.
+  origin?: RevealOrigin;
 };
 
 export type ValueTransferDetailNavigationState = {
@@ -155,12 +172,4 @@ export type ConfirmNavigationState = {
     includeUAMemo: boolean,
   ) => Promise<void>;
   sendPageState: SendPageStateClass;
-};
-
-export type UfvkNavigationState = {
-  action: UfvkActionEnum;
-};
-
-export type SeedNavigationState = {
-  action: SeedActionEnum;
 };

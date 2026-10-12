@@ -45,7 +45,7 @@ class WalletSwapRecoveryTest {
     private fun file(name: String) = File(context.filesDir, name)
 
     private fun offlineWallet(birthday: UInt): ByteArray {
-        uniffi.zingo.initFromSeed(Seeds.HOSPITAL, birthday, "", "main", "Medium", 1u)
+        uniffi.zingo.initFromSeed(seed = Seeds.HOSPITAL, birthday = birthday, connection = testConnection("", "main"))
         return uniffi.zingo.saveWalletBytes()!!
     }
 
@@ -125,6 +125,20 @@ class WalletSwapRecoveryTest {
         assertThat(promise.resolved).containsExactly(true)
         assertThat(file(mainName).readBytes()).isEqualTo(walletB)
         assertThat(file(backupName).readBytes()).isEqualTo(walletA)
+        assertThat(file(swapName).exists()).isFalse()
+    }
+
+    @Test
+    fun theReplaceTakesTheBackupAndDropsTheBackupFile() {
+        file(mainName).writeBytes(walletA)
+        file(backupName).writeBytes(walletB)
+
+        val promise = CapturingPromise()
+        rpcModule.replaceWalletWithBackup(promise)
+
+        assertThat(promise.resolved).containsExactly(true)
+        assertThat(file(mainName).readBytes()).isEqualTo(walletB)
+        assertThat(file(backupName).exists()).isFalse()
         assertThat(file(swapName).exists()).isFalse()
     }
 }

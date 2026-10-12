@@ -86,7 +86,6 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     translate,
     zecPrice,
     defaultUnifiedAddress,
-    privacy,
     addLastSnackbar,
     server,
     biometrics,
@@ -417,7 +416,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                 currencyName={info.currencyName}
                 size={14}
                 amtZec={calculatedFee}
-                privacy={privacy}
+                privacy={false}
               />
               {quote.kind === 'quote' && (
                 <CurrencyAmount
@@ -425,7 +424,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                   amtZec={calculatedFee}
                   price={quote.price}
                   priceDate={quote.date}
-                  privacy={privacy}
+                  privacy={false}
                 />
               )}
             </View>
@@ -455,7 +454,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                       currencyName={info.currencyName}
                       size={14}
                       amtZec={Utils.parseStringLocaleToNumberFloat(to.amount)}
-                      privacy={privacy}
+                      privacy={false}
                     />
                     {quote.kind === 'quote' && (
                       <CurrencyAmount
@@ -463,7 +462,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                         amtZec={Utils.parseStringLocaleToNumberFloat(to.amount)}
                         price={quote.price}
                         priceDate={quote.date}
-                        privacy={privacy}
+                        privacy={false}
                       />
                     )}
                   </View>

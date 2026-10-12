@@ -3,4 +3,8 @@ export type {
   AppDrawerParamList,
   LoadingAppNavigationState,
   LoadedAppNavigationState,
+  CardRect,
+  SeedBackupEntry,
+  WalletSeedAction,
+  ViewingKeyEntry,
 } from './NavigationTypes';

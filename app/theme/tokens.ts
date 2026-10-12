@@ -5,6 +5,7 @@ export type ThemeColors = {
   bgSurface: string;
   bgChrome: string;
   bottomSheetBorder: string;
+  borderFocus: string;
 
   fgDefault: string;
 
@@ -31,6 +32,9 @@ export type ThemeColors = {
   bgWarning: string;
 
   fgDanger: string;
+
+  // View-only (watch-only) wallet marks: the snowflake and its tiles.
+  fgViewOnly: string;
   fgDangerEmphasis: string;
 };
 
@@ -39,6 +43,7 @@ const base = {
   bgSurface: '#05101E',
   bgChrome: '#040C17',
   bottomSheetBorder: '#05234C',
+  borderFocus: '#0B3A75',
   fgDefault: '#c0cbdc',
 
   fgSyncing: '#ebff5a',
@@ -51,6 +56,8 @@ const base = {
   bgWarning: '#262527',
 
   fgDanger: '#FFB972',
+
+  fgViewOnly: '#8FB4E6',
   fgDangerEmphasis: '#dc2626',
 } as const;
 

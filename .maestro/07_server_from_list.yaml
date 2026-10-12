@@ -3,104 +3,74 @@ appId: org.ZingoLabs.Zingo
 - runFlow:
     file: common/create_wallet.yaml
 
+# The Server screen is the last item of the options panel.
 - tapOn:
     id: "header.drawmenu"
 - tapOn:
-    id: "header.settings"
+    id: "menu.server"
 - extendedWaitUntil:
     visible:
-      id: "settings.scroll-view"
+      id: "server.card"
     timeout: 10000
-# The Settings sheet is still moving when settings.scroll-view first
-# shows. A tap resolved during that animation lands where the row no
-# longer is (see 02_options_menu.yaml).
+# The screen is still moving when the card first shows. A tap resolved
+# during that animation lands where the row no longer is (see
+# 02_options_menu.yaml).
 - waitForAnimationToEnd:
     timeout: 5000
 
-# The server choices live in a sheet that the server row opens.
+# Third-party servers live one level down, under Other servers. The list
+# comes from a live registry, or from the built-in servers when the fetch
+# fails, so its rows and their order vary from night to night. The flow
+# picks the row by its server, and scrolls to it, because it can sit below
+# the fold. A pick there switches to the server right away.
+- tapOn:
+    id: "server.other"
+- extendedWaitUntil:
+    visible:
+      id: "serverlist.back"
+    timeout: 10000
+- waitForAnimationToEnd:
+    timeout: 5000
 - scrollUntilVisible:
     element:
-      id: "settings.server"
-- tapOn:
-    id: "settings.server"
-- extendedWaitUntil:
-    visible:
-      id: "settings.list-server"
-    timeout: 10000
-- tapOn:
-    id: "settings.list-server"
-
-# Settings fetches the mainnet list from a live registry when it opens,
-# and falls back to the built-in servers when the fetch fails. The list
-# holds only the servers that the registry reports online, and the rows
-# and their order vary from night to night. The flow picks the row by its
-# server name, and scrolls to it, because the row can sit below the fold.
-# The Settings screen under the sheet can show the same name, so the
-# selector takes the row inside the list. The automatic choice can
-# already be this server, and the read-back below then relies on the mode.
-- extendedWaitUntil:
-    visible:
-      id: "settings.list-server-select"
+      id: "serverlist.pick.zec.rocks:443"
     timeout: 30000
-- scrollUntilVisible:
-    element:
-      text: "https://zec\\.rocks:443"
-      childOf:
-        id: "settings.list-server-select"
 - tapOn:
-    text: "https://zec\\.rocks:443"
-    childOf:
-      id: "settings.list-server-select"
+    id: "serverlist.pick.zec.rocks:443"
 - waitForAnimationToEnd:
     timeout: 5000
 
-# The server sheet covers the Save button.
+# Back on the Server screen, the card names the server once the wallet
+# reconnected. The match is whole, so an automatic choice of the same
+# server, which reads "zec.rocks (automatic)", does not pass for it. On
+# Android the name and the status are two texts inside the card. On iOS
+# the card is one element whose text joins them.
 - tapOn:
-    id: "settings.server.close"
-- waitForAnimationToEnd:
-    timeout: 5000
-- tapOn:
-    id: "settings.button.save"
-
-# Settings returns to History, where the check icon renders while no
-# sync is in progress on the saved server.
-- extendedWaitUntil:
-    visible:
-      id: "header.checkicon"
-    timeout: 300000
-
-# The server row shows the saved mode and the saved server after the
-# wallet reconnected. The mode matters when the automatic choice was
-# already this server, because the address alone would then read the same
-# before the save. On Android the mode and the address are two texts
-# inside the row. On iOS the row is one element whose text joins them.
-- tapOn:
-    id: "header.drawmenu"
-- tapOn:
-    id: "header.settings"
-- extendedWaitUntil:
-    visible:
-      id: "settings.scroll-view"
-    timeout: 10000
-- scrollUntilVisible:
-    element:
-      id: "settings.server"
+    id: "serverlist.back"
 - runFlow:
     when:
       platform: Android
     commands:
-      - assertVisible:
-          text: "List"
-          childOf:
-            id: "settings.server"
-      - assertVisible:
-          text: "https://zec\\.rocks:443/?"
-          childOf:
-            id: "settings.server"
+      - extendedWaitUntil:
+          visible:
+            text: "zec\\.rocks"
+            childOf:
+              id: "server.card"
+          timeout: 120000
 - runFlow:
     when:
       platform: iOS
     commands:
-      - assertVisible:
-          id: "settings.server"
-          text: "List, https://zec\\.rocks:443/?"
+      - extendedWaitUntil:
+          visible:
+            id: "server.card"
+            text: "zec\\.rocks, .*"
+          timeout: 120000
+
+# History shows the check icon once no sync is in progress on the server.
+- tapOn:
+    id: "server.back"
+- extendedWaitUntil:
+    visible:
+      id: "header.checkicon"
+    timeout: 300000

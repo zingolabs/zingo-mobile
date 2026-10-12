@@ -32,10 +32,10 @@ yarn release:prod:prep <version> <build>
 yarn release:beta:prep <version> <build>
 ```
 
-Create the tag **before** rebuilding the Rust libs: the About screen shows a
-`git describe` descriptor baked into the native lib at cargo build time, so a
-`.so`/xcframework compiled before the tag ships advertising the previous one.
-See [Release order](./docs/release_quickstart.md#release-order-tag-first-then-rebuild-the-rust-libs).
+Create the tag **before** building the app: the About screen shows the
+zingo-mobile descriptor that the app build computes, so an app built before the
+tag ships naming its commit instead of the tag.
+See [Release order](./docs/release_quickstart.md#release-order-tag-first-then-build).
 
 Pushing a `zingo-<version>-<build>` or `zingo-beta-<version>-<build>` tag
 triggers a CI workflow that builds the 4 ABI APKs + a universal APK from

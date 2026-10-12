@@ -6,10 +6,11 @@ import type {
   OptionsPanelSocial,
 } from '@screens/OptionsPanel';
 import { closeOptionsPanel, useOptionsPanel } from '@app/context/optionsPanel';
+import { probeUri } from '@app/services/serverPicking';
 import { ContextAppLoaded } from '@app/context';
 import { MenuItemEnum } from '@app/AppState';
 import { sendEmail } from '@app/services/sendEmail';
-import { walletBackupExists } from '@app/walletBackend';
+import ServerIcon from '@ui/widgets/ServerIcon';
 
 import AddressBookIcon from '../../assets/img/options/address-book.svg';
 import WalletSeedIcon from '../../assets/img/options/wallet-seed.svg';
@@ -17,7 +18,6 @@ import RescanIcon from '../../assets/img/options/rescan.svg';
 import SyncRescanReportIcon from '../../assets/img/options/sync-rescan-report.svg';
 import FundsPoolsIcon from '../../assets/img/options/funds-pools.svg';
 import FinancialInsightIcon from '../../assets/img/options/financial-insight.svg';
-import RestoreBackupIcon from '../../assets/img/options/restore-backup.svg';
 import SwitchWalletIcon from '../../assets/img/options/switch-wallet.svg';
 
 const SOCIAL_X_URL = 'https://x.com/ZingoLabs';
@@ -34,7 +34,7 @@ const MENU_TEST_IDS: Partial<Record<MenuItemEnum, string>> = {
   [MenuItemEnum.FundPools]: 'menu.fundpools',
   [MenuItemEnum.Insight]: 'menu.insight',
   [MenuItemEnum.ChangeWallet]: 'menu.changewallet',
-  [MenuItemEnum.RestoreWalletBackup]: 'menu.restorebackupwallet',
+  [MenuItemEnum.Server]: 'menu.server',
 };
 
 type LoadedAppOptionsPanelHostProps = {
@@ -56,21 +56,37 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
   children,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, addLastSnackbar, readOnly, server } = context;
+  const {
+    translate,
+    addLastSnackbar,
+    readOnly,
+    server,
+    netInfo,
+    seedBackedUp,
+  } = context;
   const { isOpen } = useOptionsPanel();
 
-  // Re-check the backup file each time the panel opens — same trigger as the
-  // legacy drawer's `useDrawerStatus` effect.
-  const [hasBackupWallet, setHasBackupWallet] = useState(false);
+  // The Server tile's dot turns red when the server doesn't answer; it is
+  // asked each time the panel opens.
+  const [unreachable, setUnreachable] = useState(false);
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen || server.kind !== 'remote' || !netInfo.isConnected) {
+      return;
+    }
+    let live = true;
     (async () => {
-      setHasBackupWallet(await walletBackupExists());
+      const probe = await probeUri(server.uri);
+      if (live) {
+        setUnreachable(probe.latency === null);
+      }
     })();
-  }, [isOpen]);
+    return () => {
+      live = false;
+    };
+  }, [isOpen, server, netInfo.isConnected]);
 
   // Audit Issue D — bio gates moved into the destination screens
-  // themselves (Seed.tsx, ShowUfvk.tsx, Rescan.tsx, Settings.tsx) so
+  // themselves (WalletSeed.tsx, ViewingKey.tsx, Rescan.tsx, Settings.tsx) so
   // every navigation path is funnelled through the same check. Dispatch
   // just closes the panel and forwards the menu selection.
   const dispatch = useMemo(
@@ -83,13 +99,12 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
 
   // Visibility rules mirror the legacy Menu.tsx so the grid behaves the
   // same: the two items that talk to a server are the only ones the panel
-  // ever hides, and the wallet backup cell waits for a backup to exist.
+  // ever hides.
   const actions = useMemo<OptionsPanelAction[]>(() => {
     const isOffline = server.kind === 'offline';
 
     const showRescan = !isOffline;
     const showSyncReport = !isOffline;
-    const showRestoreBackup = hasBackupWallet;
     const list: OptionsPanelAction[] = [];
 
     // AddressBook — always visible.
@@ -109,6 +124,7 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
         ? (translate('loadedapp.walletufvk') as string)
         : (translate('loadedapp.walletseed') as string),
       icon: <WalletSeedIcon width={28} height={28} />,
+      badge: !readOnly && !seedBackedUp,
       onPress: () => dispatch(MenuItemEnum.WalletSeedUfvk),
     });
 
@@ -159,18 +175,32 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
       onPress: () => dispatch(MenuItemEnum.ChangeWallet),
     });
 
-    if (showRestoreBackup) {
-      list.push({
-        id: MenuItemEnum.RestoreWalletBackup,
-        testID: MENU_TEST_IDS[MenuItemEnum.RestoreWalletBackup],
-        label: translate('loadedapp.restorebackupwallet') as string,
-        icon: <RestoreBackupIcon width={28} height={28} />,
-        onPress: () => dispatch(MenuItemEnum.RestoreWalletBackup),
-      });
-    }
+    // Server — always visible, always last; its dot says how Zingo connects.
+    list.push({
+      id: MenuItemEnum.Server,
+      testID: MENU_TEST_IDS[MenuItemEnum.Server],
+      label: translate('server.title') as string,
+      icon: (
+        <ServerIcon
+          noInternet={!netInfo.isConnected}
+          unreachable={unreachable}
+          offline={isOffline}
+          background="#111c2c"
+        />
+      ),
+      onPress: () => dispatch(MenuItemEnum.Server),
+    });
 
     return list;
-  }, [translate, dispatch, readOnly, server, hasBackupWallet]);
+  }, [
+    translate,
+    dispatch,
+    readOnly,
+    seedBackedUp,
+    server,
+    netInfo,
+    unreachable,
+  ]);
 
   const socials = useMemo<OptionsPanelSocial[]>(
     () => [

@@ -2,6 +2,7 @@ process.env.TZ = 'UTC';
 
 module.exports = {
   preset: 'react-native',
+  resolver: '<rootDir>/jest.resolver.js',
   testEnvironment: '<rootDir>/jest-environment-react-native.js',
   moduleFileExtensions: ['ts', 'tsx', 'js', 'mjs', 'jsx', 'json', 'node'],
   // The zingolib submodule holds the Binding Layer's target and build
@@ -13,6 +14,10 @@ module.exports = {
     '<rootDir>/visual/',
     '<rootDir>/zingolib/',
     '<rootDir>/__tests__/helpers/',
+  ],
+  // @noble/hashes ships ESM only, so babel transforms it like React Native's own packages.
+  transformIgnorePatterns: [
+    'node_modules/(?!((jest-)?react-native|@react-native(-community)?|@noble/hashes)/)',
   ],
   transform: {
     '\\.(mjs|[jt]sx?)$': 'babel-jest',

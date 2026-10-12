@@ -22,7 +22,6 @@ import {
 } from 'react-native';
 import Animated from 'react-native-reanimated';
 import {
-  faQrcode,
   faCheck,
   faInfoCircle,
   faAddressCard,
@@ -37,6 +36,7 @@ import {
   useNavigation,
 } from '@react-navigation/native';
 import { useTheme } from '@app/theme';
+import { ScanIcon } from '@ui/primitives/Icons/ScanIcon';
 import { getNumberFormatSettings } from 'react-native-localize';
 import SelectBottomSheet from '@ui/widgets/SelectBottomSheet';
 
@@ -264,6 +264,11 @@ const Send: React.FunctionComponent<SendProps> = ({
   // lists BOTH errors (they are often the same failure, shown under each label
   // so that is explicit).
   const showCalcError = !!(spendableBalanceLastError || proposeSendLastError);
+  // Nothing to spend, a balance still confirming or a failed read turn the
+  // spendable red, in ZEC and in the currency alike.
+  const spendableWarn =
+    stillConfirming || negativeMaxAmount || !!spendableBalanceLastError;
+  const spendableColor = spendableWarn ? colors.fgDanger : colors.fgDefault;
   const feeCalculationGenRef = useRef<number>(0);
   const { decimalSeparator } = getNumberFormatSettings();
   const keyboardHeight = useKeyboardHeight();
@@ -976,17 +981,49 @@ const Send: React.FunctionComponent<SendProps> = ({
     navigation.navigate(RouteEnum.Computing, computingEnd(settlement));
   };
 
+  const scanButton = useRef<View>(null);
+
   const scrollToEnd = () => {
     if (scrollViewRef.current) {
       scrollViewRef.current.scrollTo({ y: contentHeight, animated: true });
     }
   };
 
+  // The shared scanner opens from the scan button and takes a Zcash
+  // address or a zcash: URI; a bare address goes in as a URI.
   const setQrcodeModalShow = () => {
-    navigation.navigate(RouteEnum.ScannerAddress, {
-      setAddress: (a: string) => updateToField(a, null, null, null, null),
-      active: true,
-    });
+    const open = (origin?: { x: number; y: number }) =>
+      navigation.navigate(RouteEnum.ScannerAddress, {
+        setAddress: (a: string) =>
+          updateToField(
+            a.toLowerCase().startsWith(GlobalConst.zcash) || a.includes(':')
+              ? a
+              : GlobalConst.zcash + a,
+            null,
+            null,
+            null,
+            null,
+          ),
+        accepts: async (v: string) =>
+          v.toLowerCase().startsWith(GlobalConst.zcash) ||
+          (await Utils.isValidAddress(v, server.chainName)).isValid,
+        texts: {
+          title: translate('scanner.title') as string,
+          hint: translate('scanner.hint-address') as string,
+          miss: translate('scanner.miss-address') as string,
+          found: translate('scanner.found') as string,
+          back: translate('scanner.back') as string,
+          torch: translate('scanner.torch') as string,
+        },
+        origin,
+      });
+    if (scanButton.current) {
+      scanButton.current.measureInWindow((x, y, width, height) =>
+        open({ x: x + width / 2, y: y + height / 2 }),
+      );
+    } else {
+      open();
+    }
   };
 
   const setMemoModalShow = () => {
@@ -1312,6 +1349,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                         return null;
                       })()}
                       <TouchableOpacity
+                        ref={scanButton}
                         testID="send.scan-button"
                         accessible={true}
                         accessibilityLabel={
@@ -1321,10 +1359,9 @@ const Send: React.FunctionComponent<SendProps> = ({
                           setQrcodeModalShow();
                         }}
                       >
-                        <FontAwesomeIcon
+                        <ScanIcon
                           style={{ marginRight: 5 }}
                           size={28}
-                          icon={faQrcode}
                           color={colors.fgMuted}
                         />
                       </TouchableOpacity>
@@ -1499,41 +1536,6 @@ const Send: React.FunctionComponent<SendProps> = ({
                           />
                         </TouchableOpacity>
                       ) : null}
-                      <TouchableOpacity
-                        testID="send.max"
-                        onPress={() => {
-                          const maxStr = Utils.parseNumberFloatToStringLocale(
-                            maxAmount,
-                            8,
-                          );
-                          sendAllRef.current = true;
-                          updateToField(null, maxStr, null, null, null);
-                          calculateFeeWithPropose(
-                            maxStr,
-                            addressText,
-                            memoText,
-                            includeUAMemoBoolean,
-                          );
-                        }}
-                        style={{
-                          paddingLeft: 0,
-                          paddingRight: 8,
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                        }}
-                      >
-                        <BoldText
-                          style={{
-                            color: colors.fgAccent,
-                            fontSize: 20,
-                            lineHeight: 20,
-                            letterSpacing: -1.5,
-                            transform: [{ scaleX: 0.8 }],
-                          }}
-                        >
-                          {translate('send.max') as string}
-                        </BoldText>
-                      </TouchableOpacity>
                     </View>
                     {showFiat && (
                       <>
@@ -1575,7 +1577,9 @@ const Send: React.FunctionComponent<SendProps> = ({
                                   amountText,
                                 ) || 0
                               }
-                              privacy={privacy}
+                              // The amount being typed is shown whole in
+                              // both currencies; privacy hides balances.
+                              privacy={false}
                             />
                           )
                         ) : (
@@ -1592,7 +1596,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                                 amountText,
                               ) || 0
                             }
-                            privacy={privacy}
+                            privacy={false}
                           />
                         )}
                       </>
@@ -1601,11 +1605,28 @@ const Send: React.FunctionComponent<SendProps> = ({
 
                   <View style={{ display: 'flex', flexDirection: 'column' }}>
                     <TouchableOpacity
+                      testID="send.max"
                       style={{ alignSelf: 'flex-start' }}
                       onPress={() => {
                         if (spendableBalanceLastError || proposeSendLastError) {
                           sendErrorSheetRef.current?.present();
+                          return;
                         }
+                        if (maxAmount <= 0) {
+                          return;
+                        }
+                        const maxStr = Utils.parseNumberFloatToStringLocale(
+                          maxAmount,
+                          8,
+                        );
+                        sendAllRef.current = true;
+                        updateToField(null, maxStr, null, null, null);
+                        calculateFeeWithPropose(
+                          maxStr,
+                          addressText,
+                          memoText,
+                          includeUAMemoBoolean,
+                        );
                       }}
                     >
                       <View
@@ -1627,30 +1648,35 @@ const Send: React.FunctionComponent<SendProps> = ({
                         >
                           {translate('send.spendable') as string}
                         </RegText>
-                        {inputZec || quote.kind === 'none' ? (
-                          <ZecAmount
-                            style={{ marginLeft: 0 }}
-                            currencyName={info.currencyName}
-                            color={
-                              stillConfirming ||
-                              negativeMaxAmount ||
-                              spendableBalanceLastError
-                                ? colors.fgDanger
-                                : colors.fgDefault
-                            }
-                            size={14}
-                            amtZec={maxAmount}
-                            privacy={privacy}
-                          />
-                        ) : (
-                          <CurrencyAmount
-                            style={{ fontSize: 14 }}
-                            priceDate={quote.date}
-                            price={quote.price}
-                            amtZec={maxAmount}
-                            privacy={privacy}
-                          />
-                        )}
+                        <View
+                          style={{
+                            marginRight: 5,
+                            borderBottomWidth: 1,
+                            borderBottomColor: spendableColor,
+                          }}
+                        >
+                          {inputZec || quote.kind === 'none' ? (
+                            <ZecAmount
+                              style={{ marginLeft: 0, marginRight: 0 }}
+                              currencyName={info.currencyName}
+                              color={spendableColor}
+                              size={14}
+                              amtZec={maxAmount}
+                              privacy={privacy}
+                            />
+                          ) : (
+                            <CurrencyAmount
+                              style={{ fontSize: 14 }}
+                              priceDate={quote.date}
+                              price={quote.price}
+                              amtZec={maxAmount}
+                              privacy={privacy}
+                              color={
+                                spendableWarn ? colors.fgDanger : undefined
+                              }
+                            />
+                          )}
+                        </View>
                       </View>
                     </TouchableOpacity>
                     {stillConfirming && (

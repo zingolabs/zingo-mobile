@@ -19,6 +19,11 @@ export default class SettingsFileClass {
   performanceLevel: RPCPerformanceLevelEnum;
   blockExplorer: BlockExplorerEnum;
   ironwoodOnboardSeen: boolean;
+  seedBackedUp: boolean;
+  // ms since epoch of the last confirmed backup; 0 for a restored wallet
+  seedBackedUpAt: number;
+  // The user closed the view-only notice of this wallet.
+  viewOnlyNoticeDismissed: boolean = false;
 
   constructor(
     server: ServerType,
@@ -31,6 +36,8 @@ export default class SettingsFileClass {
     performanceLevel: RPCPerformanceLevelEnum,
     blockExplorer: BlockExplorerEnum,
     ironwoodOnboardSeen: boolean,
+    seedBackedUp: boolean,
+    seedBackedUpAt: number,
   ) {
     this.server = server;
     this.language = language;
@@ -42,5 +49,7 @@ export default class SettingsFileClass {
     this.performanceLevel = performanceLevel;
     this.blockExplorer = blockExplorer;
     this.ironwoodOnboardSeen = ironwoodOnboardSeen;
+    this.seedBackedUp = seedBackedUp;
+    this.seedBackedUpAt = seedBackedUpAt;
   }
 }

@@ -24,6 +24,8 @@ export type OptionsPanelAction = {
   onPress: () => void;
   /** Greys out the cell and disables onPress. */
   disabled?: boolean;
+  /** Orange notification badge on the icon's top-right corner. */
+  badge?: boolean;
   /** testID for the action cell. Matches the legacy `menu.*` slugs used by
    *  Maestro flows. */
   testID?: string;
@@ -184,6 +186,24 @@ const OptionsPanel: React.FC<OptionsPanelProps> = ({
                 }}
               >
                 {action.icon}
+                {action.badge && (
+                  <View
+                    testID={`${action.testID}.badge`}
+                    pointerEvents="none"
+                    style={{
+                      position: 'absolute',
+                      top: -4,
+                      right: -4,
+                      width: 11,
+                      height: 11,
+                      borderRadius: 8,
+                      borderWidth: 2.5,
+                      borderColor: colors.bgCanvas,
+                      backgroundColor: colors.fgWarning,
+                      boxSizing: 'content-box',
+                    }}
+                  />
+                )}
               </View>
               <RegText
                 numberOfLines={2}

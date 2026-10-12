@@ -81,12 +81,6 @@ jobs:
         with:
           node-version: 22.18.0
 
-      # The About screen shows this descriptor, so it names the release tag.
-      - name: Record zingo-mobile's descriptor
-        run: |
-          descriptor="$(node scripts/zm_descriptor.mjs)"
-          echo "ZINGO_MOBILE_DESCRIPTOR=$descriptor" >> "$GITHUB_ENV"
-
       # The builder finds the zingolib root from its own crate directory, so
       # it runs from the zingo-mobile root.
       - name: Build the Binding Layer

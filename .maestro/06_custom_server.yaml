@@ -3,131 +3,104 @@ appId: org.ZingoLabs.Zingo
 - runFlow:
     file: common/create_wallet.yaml
 
+# The Server screen is the last item of the options panel.
 - tapOn:
     id: "header.drawmenu"
 - tapOn:
-    id: "header.settings"
+    id: "menu.server"
 - extendedWaitUntil:
     visible:
-      id: "settings.scroll-view"
+      id: "server.card"
     timeout: 10000
-# The Settings sheet is still moving when settings.scroll-view first
-# shows. A tap resolved during that animation lands where the row no
-# longer is (see 02_options_menu.yaml).
+# The screen is still moving when the card first shows. A tap resolved
+# during that animation lands where the row no longer is (see
+# 02_options_menu.yaml).
 - waitForAnimationToEnd:
     timeout: 5000
 
-# The server choices live in a sheet that the server row opens.
-- scrollUntilVisible:
-    element:
-      id: "settings.server"
 - tapOn:
-    id: "settings.server"
+    id: "server.custom"
 - extendedWaitUntil:
     visible:
-      id: "settings.custom-server"
-    timeout: 10000
-- tapOn:
-    id: "settings.custom-server"
-
-# The chain toggle shows once Custom is chosen. A mainnet wallet already
-# has mainnet selected, and the tap keeps it.
-- scrollUntilVisible:
-    element:
-      id: "settings.custom-server-chain.mainnet"
-- tapOn:
-    id: "settings.custom-server-chain.mainnet"
-
-- scrollUntilVisible:
-    element:
-      id: "settings.custom-server-field"
-    direction: UP
+      id: "server.custom.host"
+    timeout: 5000
 
 # The driver can drop characters while it types, and a save then targets
-# a host that does not exist. The field is read back, and the entry is
-# typed again when the text differs.
-#
-# Each attempt has to start from an empty field. The clear button empties
-# it whatever it holds, and it shows only while the field holds text — so
-# waiting for the button to go is waiting for the field to be empty. That
-# wait is the point: the clear is a state update, and without it the next
-# tap and inputText win the race and type into the text that is still
-# there. On 2026-10-03 that turned one dropped character into
-# "htts://na.zec.rocks:https://n.zec.r:443skco443" and every retry made it
-# worse instead of recovering.
-#
-# An erase is not the alternative: a tap on the field puts the cursor
-# where the tap lands, so erasing from there leaves whatever follows it.
+# a host that does not exist. Each box is read back and typed again when
+# the text differs. Both boxes select their text when they take focus, so
+# moving the focus away and back makes the next entry replace what is
+# there instead of adding to it.
 - retry:
     maxRetries: 3
     commands:
-      - runFlow:
-          when:
-            visible:
-              id: "settings.custom-server-clear"
-          commands:
-            - tapOn:
-                id: "settings.custom-server-clear"
-            - extendedWaitUntil:
-                notVisible:
-                  id: "settings.custom-server-clear"
-                timeout: 5000
       - tapOn:
-          id: "settings.custom-server-field"
-      - inputText: "https://na.zec.rocks:443"
+          id: "server.custom.port"
+      - tapOn:
+          id: "server.custom.host"
+      - inputText: "na.zec.rocks"
       - assertVisible:
-          id: "settings.custom-server-field"
-          text: "https://na\\.zec\\.rocks:443"
+          id: "server.custom.host"
+          text: "na\\.zec\\.rocks"
+- retry:
+    maxRetries: 3
+    commands:
+      - tapOn:
+          id: "server.custom.host"
+      - tapOn:
+          id: "server.custom.port"
+      - inputText: "443"
+      - assertVisible:
+          id: "server.custom.port"
+          text: "443"
+- hideKeyboard
 
-# The server sheet covers the Save button. Closing the sheet unmounts the
-# field and takes the keyboard with it.
+# Save tests the server first, then reconnects the wallet to it. The
+# message box ends in a green line once Zingo uses it.
 - tapOn:
-    id: "settings.server.close"
-- waitForAnimationToEnd:
-    timeout: 5000
-- tapOn:
-    id: "settings.button.save"
+    id: "server.custom.save"
+- extendedWaitUntil:
+    visible:
+      id: "server.custom.log.final.ok"
+    timeout: 120000
 
-# Save reaches the server, reloads the wallet against it, and returns to
-# History. A same-chain change shows no confirmation screen. The check
-# icon renders only on History, and only while no sync is in progress.
+# Back on History, the check icon renders once the sync on the saved
+# server is not in progress.
+- tapOn:
+    id: "server.back"
 - extendedWaitUntil:
     visible:
       id: "header.checkicon"
     timeout: 300000
 
-# The server row shows the saved mode and the saved server after the
-# wallet reconnected. The mode matters when the automatic choice was
-# already this server, because the address alone would then read the same
-# before the save. On Android the mode and the address are two texts
-# inside the row. On iOS the row is one element whose text joins them.
+# The Server screen opens on the saved server, and the card names it.
 - tapOn:
     id: "header.drawmenu"
 - tapOn:
-    id: "header.settings"
+    id: "menu.server"
 - extendedWaitUntil:
     visible:
-      id: "settings.scroll-view"
+      id: "server.card"
     timeout: 10000
-- scrollUntilVisible:
-    element:
-      id: "settings.server"
+# On Android the name and the status are two texts inside the card. On
+# iOS the card is one element whose text joins them.
 - runFlow:
     when:
       platform: Android
     commands:
       - assertVisible:
-          text: "Custom"
+          text: "na\\.zec\\.rocks"
           childOf:
-            id: "settings.server"
-      - assertVisible:
-          text: "https://na\\.zec\\.rocks:443/?"
-          childOf:
-            id: "settings.server"
+            id: "server.card"
 - runFlow:
     when:
       platform: iOS
     commands:
       - assertVisible:
-          id: "settings.server"
-          text: "Custom, https://na\\.zec\\.rocks:443/?"
+          id: "server.card"
+          text: "na\\.zec\\.rocks, .*"
+# The custom box opens on the saved address, and its message box says
+# Zingo uses it once the card has checked the server.
+- extendedWaitUntil:
+    visible:
+      id: "server.custom.log.final.ok"
+    timeout: 30000

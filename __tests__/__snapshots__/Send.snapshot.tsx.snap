@@ -738,30 +738,7 @@ exports[`Component Send - test Send privacy high - snapshot 1`] = `
                         }
                       }
                       testID="send.scan-button"
-                    >
-                      <
-                        color="#888888"
-                        icon={
-                          {
-                            "icon": [
-                              448,
-                              512,
-                              [],
-                              "f029",
-                              "M64 160l64 0 0-64-64 0 0 64zM0 80C0 53.5 21.5 32 48 32l96 0c26.5 0 48 21.5 48 48l0 96c0 26.5-21.5 48-48 48l-96 0c-26.5 0-48-21.5-48-48L0 80zM64 416l64 0 0-64-64 0 0 64zM0 336c0-26.5 21.5-48 48-48l96 0c26.5 0 48 21.5 48 48l0 96c0 26.5-21.5 48-48 48l-96 0c-26.5 0-48-21.5-48-48l0-96zM320 96l0 64 64 0 0-64-64 0zM304 32l96 0c26.5 0 48 21.5 48 48l0 96c0 26.5-21.5 48-48 48l-96 0c-26.5 0-48-21.5-48-48l0-96c0-26.5 21.5-48 48-48zM288 352a32 32 0 1 1 0-64 32 32 0 1 1 0 64zm0 64c17.7 0 32 14.3 32 32s-14.3 32-32 32-32-14.3-32-32 14.3-32 32-32zm96 32c0-17.7 14.3-32 32-32s32 14.3 32 32-14.3 32-32 32-32-14.3-32-32zm32-96a32 32 0 1 1 0-64 32 32 0 1 1 0 64zm-32 32a32 32 0 1 1 -64 0 32 32 0 1 1 64 0z",
-                            ],
-                            "iconName": "qrcode",
-                            "prefix": "fas",
-                          }
-                        }
-                        size={28}
-                        style={
-                          {
-                            "marginRight": 5,
-                          }
-                        }
-                      />
-                    </View>
+                    />
                   </View>
                 </View>
               </View>
@@ -931,65 +908,6 @@ exports[`Component Send - test Send privacy high - snapshot 1`] = `
                         }
                       />
                     </View>
-                    <View
-                      accessibilityState={
-                        {
-                          "busy": undefined,
-                          "checked": undefined,
-                          "disabled": undefined,
-                          "expanded": undefined,
-                          "selected": undefined,
-                        }
-                      }
-                      accessibilityValue={
-                        {
-                          "max": undefined,
-                          "min": undefined,
-                          "now": undefined,
-                          "text": undefined,
-                        }
-                      }
-                      accessible={true}
-                      collapsable={false}
-                      focusable={true}
-                      onClick={[Function]}
-                      onResponderGrant={[Function]}
-                      onResponderMove={[Function]}
-                      onResponderRelease={[Function]}
-                      onResponderTerminate={[Function]}
-                      onResponderTerminationRequest={[Function]}
-                      onStartShouldSetResponder={[Function]}
-                      style={
-                        {
-                          "alignItems": "center",
-                          "justifyContent": "center",
-                          "opacity": 1,
-                          "paddingLeft": 0,
-                          "paddingRight": 8,
-                        }
-                      }
-                      testID="send.max"
-                    >
-                      <Text
-                        style={
-                          {
-                            "color": "#18bd18",
-                            "fontSize": 20,
-                            "fontWeight": "bold",
-                            "letterSpacing": -1.5,
-                            "lineHeight": 20,
-                            "opacity": 0.87,
-                            "transform": [
-                              {
-                                "scaleX": 0.8,
-                              },
-                            ],
-                          }
-                        }
-                      >
-                        text translated
-                      </Text>
-                    </View>
                   </View>
                 </View>
                 <View
@@ -1034,6 +952,7 @@ exports[`Component Send - test Send privacy high - snapshot 1`] = `
                         "opacity": 1,
                       }
                     }
+                    testID="send.max"
                   >
                     <View
                       style={
@@ -1061,69 +980,80 @@ exports[`Component Send - test Send privacy high - snapshot 1`] = `
                       <View
                         style={
                           {
-                            "flexDirection": "row",
-                            "marginHorizontal": 5,
-                            "marginLeft": 0,
+                            "borderBottomColor": "#FFB972",
+                            "borderBottomWidth": 1,
+                            "marginRight": 5,
                           }
                         }
                       >
                         <View
-                          accessibilityState={
-                            {
-                              "busy": undefined,
-                              "checked": undefined,
-                              "disabled": false,
-                              "expanded": undefined,
-                              "selected": undefined,
-                            }
-                          }
-                          accessibilityValue={
-                            {
-                              "max": undefined,
-                              "min": undefined,
-                              "now": undefined,
-                              "text": undefined,
-                            }
-                          }
-                          accessible={true}
-                          collapsable={false}
-                          focusable={true}
-                          onClick={[Function]}
-                          onResponderGrant={[Function]}
-                          onResponderMove={[Function]}
-                          onResponderRelease={[Function]}
-                          onResponderTerminate={[Function]}
-                          onResponderTerminationRequest={[Function]}
-                          onStartShouldSetResponder={[Function]}
                           style={
                             {
-                              "opacity": 1,
+                              "flexDirection": "row",
+                              "marginHorizontal": 5,
+                              "marginLeft": 0,
+                              "marginRight": 0,
                             }
                           }
                         >
                           <View
+                            accessibilityState={
+                              {
+                                "busy": undefined,
+                                "checked": undefined,
+                                "disabled": false,
+                                "expanded": undefined,
+                                "selected": undefined,
+                              }
+                            }
+                            accessibilityValue={
+                              {
+                                "max": undefined,
+                                "min": undefined,
+                                "now": undefined,
+                                "text": undefined,
+                              }
+                            }
+                            accessible={true}
+                            collapsable={false}
+                            focusable={true}
+                            onClick={[Function]}
+                            onResponderGrant={[Function]}
+                            onResponderMove={[Function]}
+                            onResponderRelease={[Function]}
+                            onResponderTerminate={[Function]}
+                            onResponderTerminationRequest={[Function]}
+                            onStartShouldSetResponder={[Function]}
                             style={
                               {
-                                "alignItems": "flex-end",
-                                "flexDirection": "row",
-                                "margin": 0,
-                                "padding": 0,
+                                "opacity": 1,
                               }
                             }
                           >
-                            <Text
+                            <View
                               style={
                                 {
-                                  "color": "#FFB972",
-                                  "fontSize": 14,
-                                  "fontWeight": "700",
+                                  "alignItems": "flex-end",
+                                  "flexDirection": "row",
                                   "margin": 0,
                                   "padding": 0,
                                 }
                               }
                             >
-                               -.----
-                            </Text>
+                              <Text
+                                style={
+                                  {
+                                    "color": "#FFB972",
+                                    "fontSize": 14,
+                                    "fontWeight": "700",
+                                    "margin": 0,
+                                    "padding": 0,
+                                  }
+                                }
+                              >
+                                 -.----
+                              </Text>
+                            </View>
                           </View>
                         </View>
                       </View>
@@ -1307,7 +1237,7 @@ exports[`Component Send - test Send privacy high - snapshot 1`] = `
                         {
                           "color": "#011401",
                           "fontSize": 16,
-                          "fontWeight": "600",
+                          "fontWeight": "700",
                           "textAlign": "center",
                           "textTransform": "none",
                         }
@@ -2078,30 +2008,7 @@ exports[`Component Send - test Send privacy normal - snapshot 1`] = `
                         }
                       }
                       testID="send.scan-button"
-                    >
-                      <
-                        color="#888888"
-                        icon={
-                          {
-                            "icon": [
-                              448,
-                              512,
-                              [],
-                              "f029",
-                              "M64 160l64 0 0-64-64 0 0 64zM0 80C0 53.5 21.5 32 48 32l96 0c26.5 0 48 21.5 48 48l0 96c0 26.5-21.5 48-48 48l-96 0c-26.5 0-48-21.5-48-48L0 80zM64 416l64 0 0-64-64 0 0 64zM0 336c0-26.5 21.5-48 48-48l96 0c26.5 0 48 21.5 48 48l0 96c0 26.5-21.5 48-48 48l-96 0c-26.5 0-48-21.5-48-48l0-96zM320 96l0 64 64 0 0-64-64 0zM304 32l96 0c26.5 0 48 21.5 48 48l0 96c0 26.5-21.5 48-48 48l-96 0c-26.5 0-48-21.5-48-48l0-96c0-26.5 21.5-48 48-48zM288 352a32 32 0 1 1 0-64 32 32 0 1 1 0 64zm0 64c17.7 0 32 14.3 32 32s-14.3 32-32 32-32-14.3-32-32 14.3-32 32-32zm96 32c0-17.7 14.3-32 32-32s32 14.3 32 32-14.3 32-32 32-32-14.3-32-32zm32-96a32 32 0 1 1 0-64 32 32 0 1 1 0 64zm-32 32a32 32 0 1 1 -64 0 32 32 0 1 1 64 0z",
-                            ],
-                            "iconName": "qrcode",
-                            "prefix": "fas",
-                          }
-                        }
-                        size={28}
-                        style={
-                          {
-                            "marginRight": 5,
-                          }
-                        }
-                      />
-                    </View>
+                    />
                   </View>
                 </View>
               </View>
@@ -2271,65 +2178,6 @@ exports[`Component Send - test Send privacy normal - snapshot 1`] = `
                         }
                       />
                     </View>
-                    <View
-                      accessibilityState={
-                        {
-                          "busy": undefined,
-                          "checked": undefined,
-                          "disabled": undefined,
-                          "expanded": undefined,
-                          "selected": undefined,
-                        }
-                      }
-                      accessibilityValue={
-                        {
-                          "max": undefined,
-                          "min": undefined,
-                          "now": undefined,
-                          "text": undefined,
-                        }
-                      }
-                      accessible={true}
-                      collapsable={false}
-                      focusable={true}
-                      onClick={[Function]}
-                      onResponderGrant={[Function]}
-                      onResponderMove={[Function]}
-                      onResponderRelease={[Function]}
-                      onResponderTerminate={[Function]}
-                      onResponderTerminationRequest={[Function]}
-                      onStartShouldSetResponder={[Function]}
-                      style={
-                        {
-                          "alignItems": "center",
-                          "justifyContent": "center",
-                          "opacity": 1,
-                          "paddingLeft": 0,
-                          "paddingRight": 8,
-                        }
-                      }
-                      testID="send.max"
-                    >
-                      <Text
-                        style={
-                          {
-                            "color": "#18bd18",
-                            "fontSize": 20,
-                            "fontWeight": "bold",
-                            "letterSpacing": -1.5,
-                            "lineHeight": 20,
-                            "opacity": 0.87,
-                            "transform": [
-                              {
-                                "scaleX": 0.8,
-                              },
-                            ],
-                          }
-                        }
-                      >
-                        text translated
-                      </Text>
-                    </View>
                   </View>
                 </View>
                 <View
@@ -2374,6 +2222,7 @@ exports[`Component Send - test Send privacy normal - snapshot 1`] = `
                         "opacity": 1,
                       }
                     }
+                    testID="send.max"
                   >
                     <View
                       style={
@@ -2401,84 +2250,95 @@ exports[`Component Send - test Send privacy normal - snapshot 1`] = `
                       <View
                         style={
                           {
-                            "flexDirection": "row",
-                            "marginHorizontal": 5,
-                            "marginLeft": 0,
+                            "borderBottomColor": "#FFB972",
+                            "borderBottomWidth": 1,
+                            "marginRight": 5,
                           }
                         }
                       >
                         <View
-                          accessibilityState={
-                            {
-                              "busy": undefined,
-                              "checked": undefined,
-                              "disabled": true,
-                              "expanded": undefined,
-                              "selected": undefined,
-                            }
-                          }
-                          accessibilityValue={
-                            {
-                              "max": undefined,
-                              "min": undefined,
-                              "now": undefined,
-                              "text": undefined,
-                            }
-                          }
-                          accessible={true}
-                          collapsable={false}
-                          focusable={false}
-                          onClick={[Function]}
-                          onResponderGrant={[Function]}
-                          onResponderMove={[Function]}
-                          onResponderRelease={[Function]}
-                          onResponderTerminate={[Function]}
-                          onResponderTerminationRequest={[Function]}
-                          onStartShouldSetResponder={[Function]}
                           style={
                             {
-                              "opacity": 1,
+                              "flexDirection": "row",
+                              "marginHorizontal": 5,
+                              "marginLeft": 0,
+                              "marginRight": 0,
                             }
                           }
                         >
                           <View
+                            accessibilityState={
+                              {
+                                "busy": undefined,
+                                "checked": undefined,
+                                "disabled": true,
+                                "expanded": undefined,
+                                "selected": undefined,
+                              }
+                            }
+                            accessibilityValue={
+                              {
+                                "max": undefined,
+                                "min": undefined,
+                                "now": undefined,
+                                "text": undefined,
+                              }
+                            }
+                            accessible={true}
+                            collapsable={false}
+                            focusable={false}
+                            onClick={[Function]}
+                            onResponderGrant={[Function]}
+                            onResponderMove={[Function]}
+                            onResponderRelease={[Function]}
+                            onResponderTerminate={[Function]}
+                            onResponderTerminationRequest={[Function]}
+                            onStartShouldSetResponder={[Function]}
                             style={
                               {
-                                "alignItems": "flex-end",
-                                "flexDirection": "row",
-                                "margin": 0,
-                                "padding": 0,
+                                "opacity": 1,
                               }
                             }
                           >
-                            <Text
+                            <View
                               style={
                                 {
-                                  "color": "#FFB972",
-                                  "fontSize": 14,
-                                  "fontWeight": "700",
+                                  "alignItems": "flex-end",
+                                  "flexDirection": "row",
                                   "margin": 0,
                                   "padding": 0,
                                 }
                               }
-                              testID="undefined.big-part"
                             >
-                               1.1234
-                            </Text>
-                            <Text
-                              style={
-                                {
-                                  "color": "#FFB972",
-                                  "fontSize": 9.799999999999999,
-                                  "margin": 0,
-                                  "marginBottom": 0.9333333333333333,
-                                  "padding": 0,
+                              <Text
+                                style={
+                                  {
+                                    "color": "#FFB972",
+                                    "fontSize": 14,
+                                    "fontWeight": "700",
+                                    "margin": 0,
+                                    "padding": 0,
+                                  }
                                 }
-                              }
-                              testID="undefined.small-part"
-                            >
-                              5678
-                            </Text>
+                                testID="undefined.big-part"
+                              >
+                                 1.1234
+                              </Text>
+                              <Text
+                                style={
+                                  {
+                                    "color": "#FFB972",
+                                    "fontSize": 9.799999999999999,
+                                    "margin": 0,
+                                    "marginBottom": 0.9333333333333333,
+                                    "padding": 0,
+                                  }
+                                }
+                                testID="undefined.small-part"
+                              >
+                                5678
+                              </Text>
+                            </View>
                           </View>
                         </View>
                       </View>
@@ -2662,7 +2522,7 @@ exports[`Component Send - test Send privacy normal - snapshot 1`] = `
                         {
                           "color": "#011401",
                           "fontSize": 16,
-                          "fontWeight": "600",
+                          "fontWeight": "700",
                           "textAlign": "center",
                           "textTransform": "none",
                         }

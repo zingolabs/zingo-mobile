@@ -166,8 +166,9 @@ test('the driver writes deps when an input moves, not per render', async () => {
   setDepsSpy.mockRestore();
 });
 
-test('the snapshot carries exactly its four read fields', () => {
+test('the snapshot carries exactly its five read fields', () => {
   expect(Object.keys(priceFetcherStore.snapshot()).sort()).toEqual([
+    'failed',
     'loading',
     'nextFetchAt',
     'nextFetchDelayMs',
@@ -218,12 +219,15 @@ test('the ring is display-only', () => {
     <QuoteRefreshRing
       size={22}
       color="#ffffff"
+      fetchColor="#00ff00"
       trackColor="#333333"
       durationMs={60_000}
       resetKey={1}
-      accessibilityLabel="ring"
       testID="h10.ring"
     />,
   );
-  expect(view.getByTestId('h10.ring').props.accessibilityRole).toBe('image');
+  expect(
+    view.getByTestId('h10.ring', { includeHiddenElements: true }).props
+      .accessibilityElementsHidden,
+  ).toBe(true);
 });

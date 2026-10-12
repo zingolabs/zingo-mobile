@@ -50,13 +50,8 @@ const Button: React.FunctionComponent<ButtonProps> = ({
         }
       : type === ButtonTypeEnum.Secondary
         ? {
-            backgroundColor: disabled
-              ? colors.bgSecondaryDisabled
-              : colors.bgSurface,
-            borderColor: disabled
-              ? colors.borderAccentDisabled
-              : colors.borderAccent,
-            borderWidth: 2,
+            // A borderless text button, as in the prototype screens.
+            backgroundColor: 'transparent',
             width: twoButtons ? '40%' : '80%',
           }
         : type === ButtonTypeEnum.Ghost
@@ -104,10 +99,12 @@ const Button: React.FunctionComponent<ButtonProps> = ({
     type === ButtonTypeEnum.Primary
       ? {
           color: colors.bgCanvas,
+          fontWeight: '700',
         }
       : type === ButtonTypeEnum.Secondary
         ? {
             color: disabled ? colors.fgAccentDisabled : colors.fgAccent,
+            fontWeight: '700',
           }
         : type === ButtonTypeEnum.Ghost
           ? {

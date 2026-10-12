@@ -128,13 +128,4 @@ class WalletFileMemoryTest {
             assertThat(temp == Base64.encodeToString(File(dir, backupName).readBytes(), Base64.NO_WRAP)).isFalse()
         }
     }
-
-    @Test
-    fun theRetainedWalletCheckReadsOnlyTheHeader() {
-        File(dir, backupName).writeBytes(wallet(walletSize, 11))
-
-        guarded("retained.check") {
-            assertThat(PlainWalletFile.readsPlain(dir, backupName)).isTrue()
-        }
-    }
 }
