@@ -18,6 +18,9 @@ export default class WalletBackend {
   // Whether the mixnet is currently armed for a connected session. Not a
   // one-shot latch: the transport follows connectivity in both directions.
   private mixnetOnline: boolean = false;
+  // The device has no network. For the mixnet that is Offline: nothing can
+  // reach a gateway, so it rests at off instead of redrawing forever.
+  private networkDown: boolean = false;
 
   constructor(config: WalletBackendConfig) {
     this.config = config;
@@ -53,7 +56,7 @@ export default class WalletBackend {
   }
 
   private async followConnectivity(): Promise<void> {
-    if (!isOffline(this.config)) {
+    if (!isOffline(this.config) && !this.networkDown) {
       if (!this.mixnetOnline) {
         this.mixnetOnline = true;
         // The bootstrap is not awaited because it takes tens of seconds.
@@ -100,8 +103,17 @@ export default class WalletBackend {
     return this.transactionService.sendTransaction(sendJson, sendAll);
   }
 
+  // The device's network came or went: the mixnet follows it the way it
+  // follows the Offline mode.
+  async networkChanged(connected: boolean) {
+    this.networkDown = !connected;
+    if (this.config.mixnetSupported) {
+      await this.followConnectivity();
+    }
+  }
+
   async reenableMixnet() {
-    if (isOffline(this.config)) {
+    if (isOffline(this.config) || this.networkDown) {
       // An Offline session has no transport to re-enable, and a re-enable
       // must never dial behind the mode's back: it settles back at off.
       return this.mixnetCoordinator.goOffline();
