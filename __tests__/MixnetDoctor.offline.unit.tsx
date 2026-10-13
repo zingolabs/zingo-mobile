@@ -16,7 +16,13 @@ import {
   defaultAppContextLoaded,
   ContextAppLoadedProvider,
 } from '@app/context';
-import { RouteEnum } from '@app/AppState';
+import {
+  ChainNameEnum,
+  RouteEnum,
+  ServerType,
+  offlineServer,
+  remoteServer,
+} from '@app/AppState';
 import { MixnetView } from '@app/walletBackend/transforms/mixnetView';
 import { mixnetOff, mixnetReady, mockInfo } from '../.storybook/storyMocks';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
@@ -33,7 +39,10 @@ const mockedBridge = RPCModule as unknown as Record<string, jest.Mock>;
 // picked, not on catalog prose.
 const keyTranslate = (key: string) => key;
 
-function renderScreen(mixnetView: MixnetView) {
+function renderScreen(
+  mixnetView: MixnetView,
+  server: ServerType = offlineServer(ChainNameEnum.mainChainName),
+) {
   const props: any = {
     navigation: mockNavigation,
     route: { key: 'Key-1', name: RouteEnum.MixnetDoctor, params: undefined },
@@ -45,6 +54,7 @@ function renderScreen(mixnetView: MixnetView) {
         translate: keyTranslate,
         info: mockInfo,
         mixnetView,
+        server,
       }}
     >
       <MixnetDoctor {...props} />
@@ -68,6 +78,17 @@ describe('the Mixnet Doctor while nym rests at off', () => {
 
     expect(queryByText('mixnetdoctor.offline')).not.toBeNull();
     expect(queryByText('mixnetdoctor.intro')).toBeNull();
+  });
+
+  it('says the device has no network when a remote session rests at off', () => {
+    const { queryByText } = renderScreen(
+      mixnetOff,
+      remoteServer('https://zec.rocks:443', ChainNameEnum.mainChainName),
+    );
+
+    expect(queryByText('mixnetdoctor.nonetwork')).not.toBeNull();
+    expect(queryByText('mixnetdoctor.offline')).toBeNull();
+    expect(mockedBridge.mixnetIndicatorInfo).not.toHaveBeenCalled();
   });
 
   it('never probes on entry', () => {
