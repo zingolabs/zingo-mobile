@@ -372,7 +372,8 @@
       "unknown": "Mixnet unavailable"
     },
     "reenable": "Re-enable mixnet",
-    "reconnecting": "Reconnecting to mixnet…"
+    "reconnecting": "Reconnecting to mixnet…",
+    "nonetwork": "No network: the mixnet waits for a connection"
   },
   "mixnetdoctor": {
     "title": "Mixnet Doctor",
