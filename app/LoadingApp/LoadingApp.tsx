@@ -136,6 +136,7 @@ import { RPCWalletKindEnum } from '@app/walletBackend/enums/RPCWalletKindEnum';
 import StartMenu from '@screens/StartMenu';
 import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
 import { AppStackParamList } from '@app/types';
+import { publishReport, reportState } from '@app/services/reportDiagnostics';
 
 const en = require('@app/translations/en.json');
 const es = require('@app/translations/es.json');
@@ -702,6 +703,13 @@ export class LoadingAppClass extends Component<
   };
 
   unmounted = false;
+
+  componentDidUpdate = (): void => {
+    const { server, selectServer } = this.state;
+    if (reportState().session.kind === 'closed') {
+      publishReport({ served: { kind: 'chosen', server, selectServer } });
+    }
+  };
 
   componentWillUnmount = () => {
     this.unmounted = true;

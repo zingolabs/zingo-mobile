@@ -383,7 +383,8 @@
     "attaching": "The app is still connecting to the mixnet. Until the transport attaches it reports as lost, so this run is not a verdict yet.",
     "copy-report": "Copy report",
     "report-copied": "Report copied to clipboard",
-    "offline": "The mixnet is off because this session is in offline mode. Pick a server in Settings to bring it back up."
+    "offline": "The mixnet is off because this session is in offline mode. Pick a server in Settings to bring it back up.",
+    "nonetwork": "The mixnet is off because your device has no network connection. It connects again by itself as soon as the network is back."
   },
   "header": {
     "lastupdate": "Last update:"

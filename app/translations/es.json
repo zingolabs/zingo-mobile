@@ -383,7 +383,8 @@
     "attaching": "La app todavía se está conectando a la mixnet. Hasta que el transporte se enganche se informa como perdido, así que esta pasada aún no es un veredicto.",
     "copy-report": "Copiar informe",
     "report-copied": "Informe copiado al portapapeles",
-    "offline": "La mixnet está desactivada porque esta sesión está en modo offline. Elige un servidor en Ajustes para volver a levantarla."
+    "offline": "La mixnet está desactivada porque esta sesión está en modo offline. Elige un servidor en Ajustes para volver a levantarla.",
+    "nonetwork": "La mixnet está desactivada porque tu dispositivo no tiene conexión de red. Se volverá a conectar sola en cuanto vuelva la red."
   },
   "header": {
     "lastupdate": "Última actualización:"
