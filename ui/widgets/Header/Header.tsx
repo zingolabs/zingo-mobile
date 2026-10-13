@@ -7,6 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
   NavigationProp,
   ParamListBase,
+  StackActions,
   useNavigation,
 } from '@react-navigation/native';
 import { useTheme } from '@app/theme';
@@ -128,8 +129,25 @@ const Header: React.FunctionComponent<HeaderProps> = ({
 
   const { colors } = useTheme();
 
-  const { isOpen: optionsPanelOpen, toggle: toggleMenuDrawer } =
-    useOptionsPanel();
+  const {
+    isOpen: optionsPanelOpen,
+    toggle: toggleOptionsPanel,
+    open: openOptionsPanel,
+  } = useOptionsPanel();
+  const homeTab =
+    screenName === ScreenEnum.History ||
+    screenName === ScreenEnum.Send ||
+    screenName === ScreenEnum.Receive;
+  // The panel lives in the home: from a pushed screen the button pops back
+  // to it and shows the panel there.
+  const toggleMenuDrawer = () => {
+    if (homeTab) {
+      toggleOptionsPanel();
+      return;
+    }
+    navigation.dispatch(StackActions.popToTop());
+    openOptionsPanel();
+  };
   const headerOpacity = useSharedValue(1);
   useEffect(() => {
     headerOpacity.value = withTiming(optionsPanelOpen ? 0 : 1, {

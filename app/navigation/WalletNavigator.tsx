@@ -9,6 +9,7 @@ import { RouteEnum } from '@app/AppState';
 import { ContextAppLoaded } from '@app/context';
 import { AppDrawerParamList, HomeTabParamList } from '@app/types';
 import CustomTabBar from './CustomTabBar';
+import LoadedAppOptionsPanelHost from '@app/LoadedApp/LoadedAppOptionsPanelHost';
 
 import { AddressBook } from '@screens/AddressBook';
 import History from '@screens/History';
@@ -80,9 +81,18 @@ function HomeTabs() {
   );
 }
 
-// The wallet section: the home tabs, the screens pushed over them, the
-// one-way flows, and the overlays. The options panel sits around it at the
-// LoadedApp level.
+// The home tabs under the options panel: a screen the panel opens is pushed
+// over both, and the panel is still open when that screen pops.
+function Home() {
+  return (
+    <LoadedAppOptionsPanelHost>
+      <HomeTabs />
+    </LoadedAppOptionsPanelHost>
+  );
+}
+
+// The wallet section: the home with its options panel, the screens pushed
+// over them, the one-way flows, and the overlays.
 export function WalletNavigator() {
   return (
     <Stack.Navigator
@@ -94,7 +104,7 @@ export function WalletNavigator() {
         contentStyle: { backgroundColor: 'transparent' },
       }}
     >
-      <Stack.Screen name={RouteEnum.Home} component={HomeTabs} />
+      <Stack.Screen name={RouteEnum.Home} component={Home} />
       <Stack.Group>
         <Stack.Screen name={RouteEnum.Settings} component={Settings} />
         <Stack.Screen
