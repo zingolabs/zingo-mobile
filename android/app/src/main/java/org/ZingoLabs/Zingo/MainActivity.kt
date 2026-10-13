@@ -1,5 +1,8 @@
 package org.ZingoLabs.Zingo
 
+import android.content.Context
+import android.content.res.Configuration
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import com.facebook.react.ReactActivity
@@ -14,6 +17,24 @@ class MainActivity : ReactActivity() {
      */
 
     override fun getMainComponentName(): String = "Zingo"
+
+    // Android's "Bold text" setting (API 31+) makes a TextView draw its
+    // default typeface bolder, but React Native measures text with the
+    // plain one, so any Text without an explicit fontWeight is laid out
+    // narrower than it draws and loses its last letters. Zeroing the
+    // adjustment for this activity keeps measure and draw on the same font.
+    // Only that field is overridden; the rest follows the system. Toggling
+    // the setting recreates the activity (it is not in configChanges), so
+    // this runs again.
+    override fun attachBaseContext(newBase: Context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
+            newBase.resources.configuration.fontWeightAdjustment != 0) {
+            val override = Configuration().apply { fontWeightAdjustment = 0 }
+            super.attachBaseContext(newBase.createConfigurationContext(override))
+        } else {
+            super.attachBaseContext(newBase)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.i("ON_CREATE", "Starting main activity")
