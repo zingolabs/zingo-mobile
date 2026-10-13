@@ -5719,10 +5719,10 @@ hyphenate-style-name@^1.0.3:
   resolved "https://registry.yarnpkg.com/hyphenate-style-name/-/hyphenate-style-name-1.1.0.tgz#1797bf50369588b47b72ca6d5e65374607cf4436"
   integrity sha512-WDC/ui2VVRrz3jOVi+XtjqkDjiVjTtFaAGiW37k6b+ohyQ5wYDOGkvCZa8+H0nx3gyvv0+BST9xuOgIyGQ00gw==
 
-i18n-js@^4.5.1:
-  version "4.5.3"
-  resolved "https://registry.yarnpkg.com/i18n-js/-/i18n-js-4.5.3.tgz#b86c5e6b8d1f09e15952edd7fb7d07445e8d5475"
-  integrity sha512-5/tT6R9t9qlYqGhxGq9I9Ap3WKUaAMq5aRuO1gqAcUqm6xGbL0jwTAjSFjgbx935BAV8QbEzvQOzE796dUlEfA==
+i18n-js@^4.5.4:
+  version "4.5.4"
+  resolved "https://registry.yarnpkg.com/i18n-js/-/i18n-js-4.5.4.tgz#b26004c5657ee363ef29afea557b1a11938f2227"
+  integrity sha512-ALYO2ZAgayAbXy/MpHmPOd7DdjUh1guowJOO0nwAVLIoGACNBxBSwjzJHEbMoLQs91ytJgykgyAjQg4gTyRRAA==
   dependencies:
     bignumber.js "*"
     lodash "*"
