@@ -19,7 +19,6 @@ import { ContextAppLoaded } from '@app/context';
 import Utils from '@app/utils';
 import { ChainLogo } from '@ui/widgets/ChainSelect';
 import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
-import { ChevronDown } from '@ui/primitives/Icons/Chevron';
 import { CopyIcon } from '@ui/primitives/Icons/CopyIcon';
 import { PencilIcon } from '@ui/primitives/Icons/PencilIcon';
 import { PlaneIcon } from '@ui/primitives/Icons/PlaneIcon';
@@ -29,7 +28,6 @@ import { isPublicAddress } from '@screens/AddressBook/zcashAddressKind';
 export const ROW_LINE = '#0A1F3D';
 const INK_SOFT = '#8DA0B8';
 const INK_CODE = '#B9C6D6';
-const INK_ICON = '#7D93B3';
 const ACT_BG = '#020B18';
 const ACT_PRESSED = '#0A1F3D';
 const RED = '#F2878A';
@@ -277,9 +275,6 @@ const ContactRow: React.FunctionComponent<ContactRowProps> = ({
     ],
   }));
   const glowStyle = useAnimatedStyle(() => ({ opacity: glow.value }));
-  const chevronStyle = useAnimatedStyle(() => ({
-    transform: [{ rotate: `${180 * unfold.value}deg` }],
-  }));
   const unfoldStyle = useAnimatedStyle(() => ({
     height: ACTIONS_H * unfold.value,
   }));
@@ -536,9 +531,6 @@ const ContactRow: React.FunctionComponent<ContactRowProps> = ({
                 )}
               </View>
             </View>
-            <Animated.View style={chevronStyle}>
-              <ChevronDown size={18} color={INK_ICON} strokeWidth={2.2} />
-            </Animated.View>
           </Pressable>
           <Animated.View style={[{ overflow: 'hidden' }, unfoldStyle]}>
             <Animated.View

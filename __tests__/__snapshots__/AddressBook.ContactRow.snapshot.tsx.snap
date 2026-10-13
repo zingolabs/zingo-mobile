@@ -235,9 +235,6 @@ exports[`ContactRow Tests that an open row offers Send, Copy, Edit and Delete wh
           </Text>
         </View>
       </View>
-      <View
-        style={{}}
-      />
     </View>
     <View
       style={
