@@ -151,11 +151,17 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
   // it knows an attach is under way while the library still answers `died`.
   const phase = viewPhase(mixnetView);
   const attachInFlight = phase === 'connecting' || phase === 'reconnecting';
-  // Nym rests at `off` because the session is Offline. The probes have
-  // nothing to reach: they would time a local FFI call and report the state
-  // the header already shows, so the screen says why instead of measuring
-  // nothing and offering it for copying.
+  // Nym rests at `off` because the session is Offline or the device has no
+  // network. The probes have nothing to reach: they would time a local FFI
+  // call and report the state the header already shows, so the screen says
+  // why instead of measuring nothing and offering it for copying.
   const restingOff = phase === 'off';
+  // Off on a remote server means the device has no network: the transport
+  // rests as in Offline and comes back by itself with the network.
+  const offReason =
+    server.kind === 'remote'
+      ? 'mixnetdoctor.nonetwork'
+      : 'mixnetdoctor.offline';
 
   const [run, setRun] = useState<MixnetDoctorRun | null>(null);
   const [running, setRunning] = useState<boolean>(false);
@@ -281,11 +287,7 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
           }}
         >
           <FadeText>
-            {
-              translate(
-                restingOff ? 'mixnetdoctor.offline' : 'mixnetdoctor.intro',
-              ) as string
-            }
+            {translate(restingOff ? offReason : 'mixnetdoctor.intro') as string}
           </FadeText>
 
           {!restingOff && (running || run !== null) && (

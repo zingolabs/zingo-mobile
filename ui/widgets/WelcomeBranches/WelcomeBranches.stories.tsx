@@ -25,5 +25,6 @@ const meta: Meta<typeof Host> = {
 export default meta;
 type Story = StoryObj<typeof Host>;
 
-export const Idle: Story = {};
+// The wind never stops, so a pixel diff catches a different frame each run.
+export const Idle: Story = { tags: ['animated'] };
 export const Parted: Story = { args: { parted: true } };
