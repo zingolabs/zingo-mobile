@@ -39,6 +39,7 @@ const viewFor = (statusKey: MixnetStatusKey): MixnetTransportView => ({
   sendBlocked: true,
   recovery: 'none',
   reconnecting: false,
+  noNetwork: false,
 });
 
 type Ctx = typeof defaultAppContextLoaded;

@@ -100,6 +100,14 @@ export default class WalletBackend {
     return this.transactionService.sendTransaction(sendJson, sendAll);
   }
 
+  // The device's network came or went. Only a connected session's mixnet
+  // cares; Offline holds no tunnel.
+  async networkChanged(connected: boolean) {
+    if (this.config.mixnetSupported) {
+      await this.mixnetCoordinator.setNetworkConnected(connected);
+    }
+  }
+
   async reenableMixnet() {
     if (isOffline(this.config)) {
       // An Offline session has no transport to re-enable, and a re-enable

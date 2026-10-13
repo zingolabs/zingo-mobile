@@ -36,6 +36,7 @@ const READY_VIEW: MixnetTransportView = {
   sendBlocked: false,
   recovery: 'none',
   reconnecting: false,
+  noNetwork: false,
 };
 
 type Ctx = typeof defaultAppContextLoaded;
@@ -119,6 +120,7 @@ test('a died transport mutes the ring and stops its fill', async () => {
           sendBlocked: true,
           recovery: 'reenable',
           reconnecting: false,
+          noNetwork: false,
         },
         zecPrice: { zecPrice: 42, date: priceDate },
       }),

@@ -35,6 +35,7 @@ const READY_VIEW: MixnetTransportView = {
   sendBlocked: false,
   recovery: 'none',
   reconnecting: false,
+  noNetwork: false,
 };
 const DIED_VIEW: MixnetTransportView = {
   kind: 'transport',
@@ -44,6 +45,7 @@ const DIED_VIEW: MixnetTransportView = {
   sendBlocked: true,
   recovery: 'reenable',
   reconnecting: false,
+  noNetwork: false,
 };
 
 type Ctx = typeof defaultAppContextLoaded;

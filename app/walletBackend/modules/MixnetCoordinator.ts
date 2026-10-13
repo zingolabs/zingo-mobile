@@ -104,6 +104,8 @@ const STARTING_REPORT = statusReport(RPCMixnetIndicatorEnum.bootstrapping);
 
 const OFF_REPORT = statusReport(RPCMixnetIndicatorEnum.off);
 
+const DIED_REPORT = statusReport(RPCMixnetIndicatorEnum.died);
+
 export const BOOTSTRAP_POLL_MILLIS = 2_000;
 
 export const STEADY_POLL_MILLIS = 30_000;
@@ -150,6 +152,8 @@ export class MixnetCoordinator {
   private reconnectDelayMillis: number = RECONNECT_BASE_MILLIS;
   private reconnecting: boolean = false;
   private reconnectActive: boolean = false;
+  // The device has no network: no gateway can answer, so nothing draws.
+  private networkDown: boolean = false;
   private enableEpoch: number = 0;
   private phase: CoordinatorPhase = 'online';
   private startingEpoch?: number;
@@ -184,6 +188,10 @@ export class MixnetCoordinator {
   private async draw(): Promise<void> {
     const epoch = ++this.enableEpoch;
     this.clearTimers();
+    if (this.networkDown) {
+      this.publishNoNetwork();
+      return;
+    }
     this.publishStarting();
     try {
       let binding: MixnetTransportBinding;
@@ -220,6 +228,36 @@ export class MixnetCoordinator {
       this.publish(failureReport(thrown));
     }
     this.schedulePolling();
+  }
+
+  // Follows the device's network. Without one no gateway can answer, and
+  // redrawing on the backoff only burns battery and topology fetches for as
+  // long as the phone stays off the network, so the coordinator stands
+  // down, says why, and draws again the moment the network is back.
+  async setNetworkConnected(connected: boolean): Promise<void> {
+    if (this.networkDown === !connected) {
+      return;
+    }
+    this.networkDown = !connected;
+    if (this.phase !== 'online') {
+      return;
+    }
+    if (connected) {
+      await this.reenable();
+      return;
+    }
+    const epoch = this.supersede();
+    this.reconnectActive = false;
+    this.redrawsSpent = 0;
+    // Same order as goOffline: vacate the wallet's slot, then stop the shim.
+    await this.teardown.run(disableMixnet);
+    if (!this.isCurrent(epoch)) {
+      return;
+    }
+    await this.stopTransportReport();
+    if (this.isCurrent(epoch)) {
+      this.publishNoNetwork();
+    }
   }
 
   async reenable(): Promise<void> {
@@ -298,6 +336,7 @@ export class MixnetCoordinator {
   private armBootstrapDeadline(): void {
     if (
       this.phase !== 'online' ||
+      this.networkDown ||
       this.bootstrapTimerID !== undefined ||
       this.redrawsSpent >= BOOTSTRAP_REDRAW_LIMIT
     ) {
@@ -349,6 +388,7 @@ export class MixnetCoordinator {
     if (
       this.reconnectTimerID !== undefined ||
       this.reconnecting ||
+      this.networkDown ||
       this.phase !== 'online'
     ) {
       return;
@@ -452,6 +492,15 @@ export class MixnetCoordinator {
     } else {
       this.clearReconnectTimer();
     }
+  }
+
+  private publishNoNetwork(): void {
+    if (this.phase === 'stopped') {
+      return;
+    }
+    this.lastStatus = DIED_REPORT;
+    this.publishSeq += 1;
+    this.onChange(deriveMixnetView(DIED_REPORT, null, false, true));
   }
 
   private publishStarting(): void {
