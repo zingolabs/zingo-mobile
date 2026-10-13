@@ -145,6 +145,7 @@ import Confirm from '@screens/Confirm';
 import { AppStackParamList } from '@app/types';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
+import { publishReport } from '@app/services/reportDiagnostics';
 
 const About = React.lazy(() => import('@screens/About'));
 const MixnetDoctor = React.lazy(() => import('@screens/MixnetDoctor'));
@@ -782,6 +783,7 @@ export class LoadedAppClass extends Component<
   }
 
   componentDidMount = async () => {
+    this.publishReportState();
     const netInfoState = await NetInfo.fetch();
     this.setState({
       netInfo: {
@@ -979,6 +981,23 @@ export class LoadedAppClass extends Component<
     if (prevProps.translate !== this.props.translate) {
       this.setState({ translate: this.props.translate });
     }
+    this.publishReportState();
+  };
+
+  publishReportState = (): void => {
+    const { server, selectServer, readOnly, lastError, mixnetView } =
+      this.state;
+    publishReport({
+      served: { kind: 'chosen', server, selectServer },
+      session: {
+        kind: 'open',
+        chain: this.state.walletChainName,
+        readOnly,
+        sync: this.state.syncingStatus,
+        lastError,
+        mixnetView,
+      },
+    });
   };
 
   foregroundGateBusy = false;
@@ -1034,6 +1053,7 @@ export class LoadedAppClass extends Component<
   };
 
   componentWillUnmount = async () => {
+    publishReport({ session: { kind: 'closed' } });
     await this.rpc.clearTimers();
     this.rpc.stopMixnetPolling();
     const safeRemove = (listener: unknown, name: string) => {
