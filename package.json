@@ -114,7 +114,7 @@
     "@storybook/react-native-web-vite": "^9.1.4",
     "@testing-library/react-native": "^13.2.0",
     "@types/jest": "^30.0.0",
-    "@types/lodash": "^4.17.25",
+    "@types/lodash": "^4.17.26",
     "@types/node": "^26.6.5",
     "@types/randomcolor": "^0.5.9",
     "@types/react": "^19.1.0",
