@@ -1,4 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
+import { leaveFlow } from '@app/navigation/navigate';
 import React, {
   useCallback,
   useContext,
@@ -418,7 +419,7 @@ const MeetIronwood: React.FunctionComponent<MeetIronwoodProps> = ({
     // modal somebody just dismissed is a nag, and the History banner is still
     // there as the way back in.
     markSeen();
-    navigation.reset({ index: 0, routes: [{ name: RouteEnum.HomeStack }] });
+    leaveFlow(navigation);
   }, [markSeen, navigation]);
 
   const onPrimary = useCallback(() => {

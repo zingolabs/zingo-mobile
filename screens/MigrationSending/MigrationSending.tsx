@@ -1,4 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
+import { leaveFlow } from '@app/navigation/navigate';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { BackHandler, ScrollView, Text, View } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
@@ -94,7 +95,7 @@ const MigrationSending: React.FunctionComponent<MigrationSendingProps> = ({
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const goHome = useCallback(() => {
-    navigation.reset({ index: 0, routes: [{ name: RouteEnum.HomeStack }] });
+    leaveFlow(navigation);
   }, [navigation]);
 
   // Broadcasting can't be interrupted, so block hardware-back for the whole

@@ -69,7 +69,6 @@ function makeDrawerProps(): NativeStackScreenProps<
   };
 }
 
-const onFunction = jest.fn();
 const sendUi = (zecPrice: { zecPrice: number; date: number }) => {
   const state = { ...defaultAppContextLoaded };
   state.valueTransfers = mockValueTransfers;
@@ -82,16 +81,7 @@ const sendUi = (zecPrice: { zecPrice: number; date: number }) => {
   state.zecPrice = zecPrice;
   return (
     <ContextAppLoadedProvider value={state}>
-      <Send
-        {...makeDrawerProps()}
-        sendTransaction={onFunction}
-        clearToAddr={onFunction}
-        toggleMenuDrawer={onFunction}
-        setShieldingAmount={onFunction}
-        setScrollToTop={onFunction}
-        setScrollToBottom={onFunction}
-        setServerOption={onFunction}
-      />
+      <Send {...makeDrawerProps()} />
     </ContextAppLoadedProvider>
   );
 };

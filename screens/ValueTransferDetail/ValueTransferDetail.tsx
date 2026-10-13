@@ -326,7 +326,7 @@ const ValueTransferDetail: React.FunctionComponent<
       );
     }
     // change to the history screen, just in case.
-    navigation.navigate(RouteEnum.HomeStack, {
+    navigation.navigate(RouteEnum.Home, {
       screen: RouteEnum.History,
     });
   };

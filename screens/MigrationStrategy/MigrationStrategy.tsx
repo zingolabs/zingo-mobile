@@ -1,4 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
+import { leaveFlow } from '@app/navigation/navigate';
 import React, {
   useCallback,
   useContext,
@@ -224,7 +225,7 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
   // one-way onboarding/migration stack isn't left underneath to return to.
   // Migration is opt-in, so the X exits straight away without a confirm.
   const closeMigration = useCallback(() => {
-    navigation.reset({ index: 0, routes: [{ name: RouteEnum.HomeStack }] });
+    leaveFlow(navigation);
   }, [navigation]);
 
   const startMigration = useCallback(() => {

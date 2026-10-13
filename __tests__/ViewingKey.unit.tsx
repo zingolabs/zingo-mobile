@@ -45,7 +45,13 @@ afterEach(() => {
 
 const renderKey = (switchTo?: ChainNameEnum) =>
   render(
-    <ContextAppLoadedProvider value={context}>
+    <ContextAppLoadedProvider
+      value={{
+        ...context,
+        applyPendingServer: onConfirm,
+        cancelPendingServer: onCancel,
+      }}
+    >
       <ViewingKey
         navigation={mockNavigation}
         route={{
@@ -53,8 +59,6 @@ const renderKey = (switchTo?: ChainNameEnum) =>
           name: RouteEnum.ViewingKey,
           params: { entry: { kind: 'push' }, switchTo },
         }}
-        onConfirm={onConfirm}
-        onCancel={onCancel}
       />
     </ContextAppLoadedProvider>,
   );
@@ -85,7 +89,13 @@ test('Tests that Copy takes the whole key while it is still hidden.', async () =
 test('Tests that the view-only card offers the viewing key and closes with its X.', () => {
   const onDismiss = jest.fn();
   render(
-    <ContextAppLoadedProvider value={context}>
+    <ContextAppLoadedProvider
+      value={{
+        ...context,
+        applyPendingServer: onConfirm,
+        cancelPendingServer: onCancel,
+      }}
+    >
       <ViewOnlyNotice onViewKey={jest.fn()} onDismiss={onDismiss} />
     </ContextAppLoadedProvider>,
   );

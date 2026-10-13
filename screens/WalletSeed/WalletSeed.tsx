@@ -41,16 +41,6 @@ import { SIDE, StepActions } from '@screens/SeedBackup/components/StepParts';
 import ScreenshotSheet from '@screens/SeedBackup/components/ScreenshotSheet';
 import KeyCard from '@screens/ViewingKey/components/KeyCard';
 
-type WalletSeedProps = NativeStackScreenProps<
-  AppDrawerParamList,
-  RouteEnum.WalletSeed
-> & {
-  // Leaves this wallet or its server once the user confirms.
-  onConfirm: () => Promise<void>;
-  // Runs when the user backs out without leaving.
-  onCancel: () => Promise<void>;
-};
-
 const PUSHED_SHIFT = 0.28;
 const PUSHED_DIM = 0.55;
 const PUSH_IN_MS = 380;
@@ -83,11 +73,14 @@ const WARNING_VIEW_ONLY = 'walletseed.change-warning-vo';
 // The seed phrase with its backup status, birthday and viewing key. With an
 // action, the last look at them before leaving this wallet or its server.
 // A view-only wallet shows its viewing key in place of the words.
+type WalletSeedProps = NativeStackScreenProps<
+  AppDrawerParamList,
+  RouteEnum.WalletSeed
+>;
+
 const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
   navigation,
   route,
-  onConfirm,
-  onCancel,
 }) => {
   const action = route.params?.action;
   const context = useContext(ContextAppLoaded);
@@ -100,7 +93,23 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
     language,
     birthday: walletBirthday,
     readOnly,
+    changeWallet,
+    applyPendingServer,
+    cancelPendingServer,
   } = context;
+  // What confirming or backing out does depends on why the seed is shown.
+  const onConfirm = async () => {
+    if (action === 'change') {
+      await changeWallet();
+    } else if (action === 'server') {
+      await applyPendingServer();
+    }
+  };
+  const onCancel = async () => {
+    if (action === 'server') {
+      await cancelPendingServer();
+    }
+  };
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const window = useWindowDimensions();

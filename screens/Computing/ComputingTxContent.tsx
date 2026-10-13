@@ -74,7 +74,7 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
   }, [isTerminal]);
 
   const onContinue = useCallback(() => {
-    navigation.navigate(RouteEnum.HomeStack, {
+    navigation.navigate(RouteEnum.Home, {
       screen: RouteEnum.History,
     });
   }, [navigation]);

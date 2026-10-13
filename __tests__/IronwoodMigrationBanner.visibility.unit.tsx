@@ -52,17 +52,9 @@ function renderHistory(overrides: {
     readOnly: overrides.readOnly ?? false,
   };
   const props = makeDrawerProps();
-  const onFunction = jest.fn();
   return render(
     <ContextAppLoadedProvider value={state}>
-      <History
-        {...props}
-        toggleMenuDrawer={onFunction}
-        setShieldingAmount={onFunction}
-        setScrollToTop={onFunction}
-        scrollToTop={false}
-        setScrollToBottom={onFunction}
-      />
+      <History {...props} />
     </ContextAppLoadedProvider>,
   );
 }

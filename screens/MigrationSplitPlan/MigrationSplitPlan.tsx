@@ -1,4 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
+import { leaveFlow } from '@app/navigation/navigate';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { ActivityIndicator, ScrollView, Text, View } from 'react-native';
 import { useTheme } from '@app/theme';
@@ -109,7 +110,7 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
   );
 
   const goHome = useCallback(() => {
-    navigation.reset({ index: 0, routes: [{ name: RouteEnum.HomeStack }] });
+    leaveFlow(navigation);
   }, [navigation]);
 
   // Fetch the split plan. Pure preview: nothing is signed or broadcast, and

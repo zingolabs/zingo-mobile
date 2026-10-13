@@ -18,7 +18,7 @@ export enum RouteEnum {
   ServerList = 'ServerList',
 
   // Drawer no params
-  HomeStack = 'HomeStack',
+  Home = 'Home',
   History = 'History',
   Send = 'Send',
   Receive = 'Receive',

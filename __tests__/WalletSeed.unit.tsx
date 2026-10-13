@@ -50,6 +50,8 @@ const renderScreen = (
         seedBackedUpAt,
         readOnly,
         birthday: 3512840,
+        changeWallet: onConfirm,
+        applyPendingServer: onConfirm,
       }}
     >
       <WalletSeed
@@ -59,8 +61,6 @@ const renderScreen = (
           name: RouteEnum.WalletSeed,
           params: action ? { action } : undefined,
         }}
-        onConfirm={onConfirm}
-        onCancel={jest.fn(async () => {})}
       />
     </ContextAppLoadedProvider>,
   );
