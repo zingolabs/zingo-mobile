@@ -395,13 +395,14 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
             lineHeight: 19,
           }}
         />
-        {address.length > 0 && (
+        <View style={{ alignItems: 'center' }}>
           <Pressable
-            testID="addressbook.address-clear"
+            ref={scanButton}
+            testID="addressbook.scan-button"
             accessibilityRole="button"
-            accessibilityLabel={translate('clear') as string}
+            accessibilityLabel={translate('scanner.title') as string}
             hitSlop={8}
-            onPress={() => setAddress('')}
+            onPress={scan}
             style={{
               width: 38,
               height: 38,
@@ -409,25 +410,26 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
               justifyContent: 'center',
             }}
           >
-            <XIcon size={18} color={SOFT_INK} strokeWidth={2.2} />
+            <ScanIcon size={24} color={SOFT_INK} />
           </Pressable>
-        )}
-        <Pressable
-          ref={scanButton}
-          testID="addressbook.scan-button"
-          accessibilityRole="button"
-          accessibilityLabel={translate('scanner.title') as string}
-          hitSlop={8}
-          onPress={scan}
-          style={{
-            width: 38,
-            height: 38,
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <ScanIcon size={24} color={SOFT_INK} />
-        </Pressable>
+          {address.length > 0 && (
+            <Pressable
+              testID="addressbook.address-clear"
+              accessibilityRole="button"
+              accessibilityLabel={translate('clear') as string}
+              hitSlop={8}
+              onPress={() => setAddress('')}
+              style={{
+                width: 38,
+                height: 38,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <XIcon size={18} color={SOFT_INK} strokeWidth={2.2} />
+            </Pressable>
+          )}
+        </View>
       </View>
       {zns.kind === 'resolved' && (
         <Text
