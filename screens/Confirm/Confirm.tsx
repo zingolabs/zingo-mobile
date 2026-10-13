@@ -37,6 +37,7 @@ import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
 
 import { AppDrawerParamList } from '@app/types';
 import Utils from '@app/utils';
+import { deliver } from '@app/navigation/results';
 import { fiatQuote } from '@app/price/fiatQuote';
 import { sendPermit } from '@app/walletBackend/transforms/sendPermit';
 import {
@@ -72,14 +73,6 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
   navigation,
   route,
 }) => {
-  const confirmSend =
-    !!route.params && route.params.confirmSend !== undefined
-      ? route.params.confirmSend
-      : async () => {};
-  const calculateFeeWithPropose =
-    !!route.params && route.params.calculateFeeWithPropose !== undefined
-      ? route.params.calculateFeeWithPropose
-      : async () => {};
   const context = useContext(ContextAppLoaded);
   const {
     info,
@@ -248,14 +241,9 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     setSendingTotal(sendingTot);
   }, [calculatedFee, sendPageState.toaddr.amount]);
 
+  // Send, beneath this screen, runs the proposal once more on entry.
   useEffect(() => {
-    calculateFeeWithPropose(
-      sendPageState.toaddr.amount,
-      sendPageState.toaddr.to,
-      sendPageState.toaddr.memo,
-      sendPageState.toaddr.includeUAMemo,
-    );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    deliver('send.propose', '');
   }, []);
 
   const renderConfirmFooter = useCallback(
@@ -285,13 +273,12 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                 ? (translate('send.confirm-button-all') as string)
                 : (translate('confirm') as string)
             }
-            onPress={async () => await confirmSend(sendPageState)}
+            onPress={() => deliver('send.confirm', '')}
             disabled={permit.kind === 'error'}
           />
         </View>
       </BottomSheetFooter>
     ),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [colors, sendAllAmount, translate, permit],
   );
 

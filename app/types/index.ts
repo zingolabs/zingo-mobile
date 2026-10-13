@@ -4,6 +4,8 @@ export type {
   OnboardingParamList,
   OnboardingRoute,
   HomeTabParamList,
+  ScanAccepts,
+  ScanRouteTexts,
   AppDrawerParamList,
   LoadedAppNavigationState,
   CardRect,

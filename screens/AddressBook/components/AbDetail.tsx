@@ -22,6 +22,7 @@ import { showConfirm } from '@app/services/showConfirm';
 import ChainSelect from '@ui/widgets/ChainSelect';
 import { chainDisplayName } from '@ui/widgets/chainDisplayName';
 import Utils from '@app/utils';
+import { useResult } from '@app/navigation/results';
 import { parseZcashURI } from '@app/uris';
 // Straight from the module rather than the `uris` barrel, as Send does, so the
 // ZNS SDK stays out of that barrel's module graph.
@@ -307,12 +308,13 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
   // reject it. `updateAddress` handles `zcash:` URIs and bare ZEC addresses,
   // and the chain auto-detect below picks the matching chain.
   const scanButton = useRef<View>(null);
+  useResult('addressbook.address', a => updateAddress(a));
   const onScanAddress = () => {
     Keyboard.dismiss();
     const open = (origin?: { x: number; y: number }) =>
       navigation.navigate(RouteEnum.ScannerAddress, {
-        setAddress: (a: string) => updateAddress(a),
-        accepts: () => true,
+        request: 'addressbook.address',
+        accepts: { kind: 'any' },
         texts: {
           title: translate('scanner.title') as string,
           hint: translate('scanner.hint-any') as string,

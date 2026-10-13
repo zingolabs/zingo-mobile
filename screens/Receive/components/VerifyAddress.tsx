@@ -107,6 +107,7 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
         showLabel={false}
         screenName={screenName}
         navigation={navigation}
+        scanRequest="receive.address"
       />
       {!!errorAddress && (
         <View
