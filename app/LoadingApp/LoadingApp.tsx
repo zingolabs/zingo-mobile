@@ -128,10 +128,7 @@ import StartMenu from '@screens/StartMenu';
 import { RPCUfvkType } from '@app/walletBackend/types/RPCUfvkType';
 import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
 import { AppStackParamList } from '@app/types';
-import {
-  reportState,
-  updateReportState,
-} from '@app/services/reportDiagnostics';
+import { publishReport, reportState } from '@app/services/reportDiagnostics';
 
 const en = require('@app/translations/en.json');
 const es = require('@app/translations/es.json');
@@ -667,14 +664,10 @@ export class LoadingAppClass extends Component<
 
   unmounted = false;
 
-  // Until a wallet opens, the server a support report describes is this
-  // screen's; LoadedApp publishes its own once it mounts.
-  componentDidUpdate = () => {
-    if (!reportState().walletChain) {
-      updateReportState({
-        server: this.state.server,
-        selectServer: this.state.selectServer,
-      });
+  componentDidUpdate = (): void => {
+    const { server, selectServer } = this.state;
+    if (reportState().session.kind === 'closed') {
+      publishReport({ served: { kind: 'chosen', server, selectServer } });
     }
   };
 

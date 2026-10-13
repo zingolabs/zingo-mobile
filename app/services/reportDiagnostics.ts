@@ -1,5 +1,7 @@
 import NetInfo from '@react-native-community/netinfo';
 import DeviceInfo from 'react-native-device-info';
+import Url from 'url-parse';
+import { defaultTo, isBoolean, sortedLastIndex, sumBy } from 'lodash';
 
 import {
   ChainNameEnum,
@@ -10,182 +12,183 @@ import {
 import { serverUris } from '@app/uris';
 import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
 import { RPCSyncScanRangePriorityStatusEnum } from '@app/walletBackend/enums/RPCSyncScanRangePriorityStatusEnum';
+import { MixnetView } from '@app/walletBackend/transforms/mixnetView';
 import { priceFetcherStore } from '@ui/widgets/priceFetcherStore';
 
-// What the app knows about its situation, kept current by LoadingApp and
-// LoadedApp so any report can read it, even from the crash screen.
-export type ReportState = {
-  server?: ServerType;
-  selectServer?: SelectServerEnum;
-  walletChain?: ChainNameEnum;
-  readOnly?: boolean;
-  syncingStatus?: RPCSyncStatusType;
-  lastError?: string;
-  mixnetStatus?: string;
-};
+export type Served =
+  | { kind: 'unknown' }
+  | { kind: 'chosen'; server: ServerType; selectServer: SelectServerEnum };
 
-let state: ReportState = {};
+export type Session =
+  | { kind: 'closed' }
+  | {
+      kind: 'open';
+      chain: ChainNameEnum;
+      readOnly: boolean;
+      sync: RPCSyncStatusType;
+      lastError: string;
+      mixnetView: MixnetView;
+    };
 
-export const updateReportState = (patch: ReportState): void => {
-  state = { ...state, ...patch };
-};
-
-export const reportState = (): ReportState => state;
-
-export const resetReportStateForTests = (): void => {
-  state = {};
-};
+export type ReportState = { served: Served; session: Session };
 
 type Translate = (key: string) => TranslateType;
 
-// A custom server can be the person's own node: its uri names them.
-const privateServer = (translate: Translate): string | null => {
-  const server = state.server;
-  if (!server || server.kind !== 'remote') {
-    return null;
-  }
-  const known = serverUris(translate).some(s => s.uri === server.uri);
-  return state.selectServer === SelectServerEnum.custom && !known
-    ? server.uri
-    : null;
+type Named =
+  | { kind: 'unknown' }
+  | { kind: 'offline'; chainName: ChainNameEnum }
+  | { kind: 'hidden'; uri: string; url: Url<string>; chainName: ChainNameEnum }
+  | { kind: 'shown'; uri: string; chainName: ChainNameEnum; mode: string };
+
+export const INITIAL: ReportState = {
+  served: { kind: 'unknown' },
+  session: { kind: 'closed' },
 };
 
-/** The uri and host of a private server, for the redaction of the report. */
-export const privateHosts = (translate: Translate): string[] => {
-  const uri = privateServer(translate);
-  if (!uri) {
-    return [];
-  }
-  const host = uri.replace(/^[a-z]+:\/\//i, '').replace(/[:/].*$/, '');
-  return [uri, host];
+let state: ReportState = INITIAL;
+
+export const reportState = (): ReportState => state;
+
+export const publishReport = (patch: Partial<ReportState>): void => {
+  state = { ...state, ...patch };
 };
 
-const serverLine = (translate: Translate): string => {
-  const server = state.server;
-  if (!server) {
-    return 'unknown';
+const flag =
+  (on: string, off: string) =>
+  (value: unknown): string =>
+    isBoolean(value) ? (value ? on : off) : 'unknown';
+
+const yesNo: (value: unknown) => string = flag('yes', 'no');
+const onOff: (value: unknown) => string = flag('on', 'off');
+
+const [MB, GB]: number[] = [1024 ** 2, 1024 ** 3];
+
+const bucket =
+  (edges: number[], labels: string[]) =>
+  (bytes: number): string =>
+    labels[sortedLastIndex(edges, bytes)];
+
+export const diskBucket: (bytes: number) => string = bucket(
+  [1, GB, 5 * GB],
+  ['unknown', '< 1 GB', '1-5 GB', '> 5 GB'],
+);
+
+export const memoryBucket: (bytes: number) => string = bucket(
+  [1, 256 * MB, 512 * MB],
+  ['unknown', '< 256 MB', '256-512 MB', '> 512 MB'],
+);
+
+export const named = (served: Served, translate: Translate): Named => {
+  if (served.kind === 'unknown') {
+    return served;
   }
+  const { server, selectServer: mode } = served;
   if (server.kind === 'offline') {
-    return `offline (${server.chainName})`;
+    return server;
   }
-  const mode = state.selectServer ?? 'unknown';
-  const hidden = privateServer(translate);
-  if (hidden) {
-    const tls = /^https:/i.test(hidden) ? 'https' : 'http';
-    const onion = /\.onion(:|\/|$)/i.test(hidden) ? 'yes' : 'no';
-    return `custom, ${tls}, onion: ${onion} (${server.chainName})`;
-  }
-  return `${server.uri} (${server.chainName}, ${mode})`;
+  const { uri, chainName } = server;
+  const listed: boolean = serverUris(translate).some(s => s.uri === uri);
+  return mode === SelectServerEnum.custom && !listed
+    ? { kind: 'hidden', uri, url: new Url(uri), chainName }
+    : { kind: 'shown', uri, chainName, mode };
 };
 
-const walletLine = (): string => {
-  if (!state.walletChain) {
-    return 'not open';
-  }
-  const kind = state.readOnly ? 'view-only' : 'seed';
-  const serverChain = state.server?.chainName;
-  const match =
-    serverChain === undefined
-      ? 'unknown'
-      : serverChain === state.walletChain
-        ? 'yes'
-        : 'no';
-  return `${kind}, ${state.walletChain}, matches server: ${match}`;
+export const privateHosts = (
+  served: Served,
+  translate: Translate,
+): string[] => {
+  const name: Named = named(served, translate);
+  return name.kind === 'hidden' ? [name.uri, name.url.hostname] : [];
 };
 
-const pending = (ss: RPCSyncStatusType): number =>
-  (ss.scan_ranges ?? [])
-    .filter(
-      r =>
-        r.priority !== RPCSyncScanRangePriorityStatusEnum.Scanned &&
-        r.priority !== RPCSyncScanRangePriorityStatusEnum.ScannedWithoutMapping,
-    )
-    .reduce((sum, r) => sum + Math.max(r.end_block - r.start_block, 0), 0);
+export const serverLine = (served: Served, translate: Translate): string => {
+  const name: Named = named(served, translate);
+  switch (name.kind) {
+    case 'unknown':
+      return 'unknown';
+    case 'offline':
+      return `offline (${name.chainName})`;
+    case 'hidden':
+      return `custom, ${name.url.protocol.replace(':', '')}, onion: ${yesNo(
+        name.url.hostname.endsWith('.onion'),
+      )} (${name.chainName})`;
+    case 'shown':
+      return `${name.uri} (${name.chainName}, ${name.mode})`;
+  }
+};
 
-const syncLine = (): string => {
-  const ss = state.syncingStatus;
-  if (!ss || !ss.scan_ranges) {
+export const syncLine = (sync: RPCSyncStatusType): string => {
+  if (!sync.scan_ranges) {
     return 'no status';
   }
-  const pct =
-    ss.percentage_total_outputs_scanned ??
-    ss.percentage_total_blocks_scanned ??
-    0;
-  return `${pct.toFixed(1)}%, ${pending(ss)} blocks left`;
+  const percent: number = defaultTo(
+    sync.percentage_total_outputs_scanned,
+    defaultTo(sync.percentage_total_blocks_scanned, 0),
+  );
+  const left: number = sumBy(sync.scan_ranges, r =>
+    r.priority === RPCSyncScanRangePriorityStatusEnum.Scanned ||
+    r.priority === RPCSyncScanRangePriorityStatusEnum.ScannedWithoutMapping
+      ? 0
+      : Math.max(r.end_block - r.start_block, 0),
+  );
+  return `${percent.toFixed(1)}%, ${left} blocks left`;
 };
 
-const GB = 1024 * 1024 * 1024;
-const MB = 1024 * 1024;
-
-// Ranges, not figures: an exact amount helps tell one device from another.
-export const diskBucket = (bytes: number): string =>
-  bytes < 0
-    ? 'unknown'
-    : bytes < GB
-      ? '< 1 GB'
-      : bytes < 5 * GB
-        ? '1-5 GB'
-        : '> 5 GB';
-
-export const memoryBucket = (bytes: number): string =>
-  bytes <= 0
-    ? 'unknown'
-    : bytes < 256 * MB
-      ? '< 256 MB'
-      : bytes < 512 * MB
-        ? '256-512 MB'
-        : '> 512 MB';
-
-// A probe that throws or rejects reads as unknown; the report still goes.
-const settle = async <T>(probe: () => Promise<T>, fallback: T): Promise<T> => {
-  try {
-    return await probe();
-  } catch {
-    return fallback;
+export const sessionLines = ({ served, session }: ReportState): string[] => {
+  if (session.kind === 'closed') {
+    return ['Wallet: not open'];
   }
+  const { chain, readOnly, mixnetView, sync, lastError } = session;
+  const match: string =
+    served.kind === 'chosen'
+      ? yesNo(served.server.chainName === chain)
+      : 'unknown';
+  return [
+    `Wallet: ${readOnly ? 'view-only' : 'seed'}, ${chain}, matches server: ${match}`,
+    `Mixnet: ${mixnetView.kind === 'transport' ? mixnetView.statusKey : 'absent'}`,
+    `Sync: ${syncLine(sync)}`,
+    `Last error: ${lastError || 'none'}`,
+  ];
 };
 
-/**
- * The diagnostics block of a report: the situation of the app and the
- * device, with nothing that names the person (no addresses, balances,
- * keys, birthday, history, region or custom server).
- */
+// A native call that throws before it returns a promise, or a reading that
+// does not render, still settles on the fallback: a probe never keeps the
+// mail from opening.
+const settle = <T>(
+  ask: () => Promise<T>,
+  render: (read: T) => string,
+  fallback: string,
+): Promise<string> =>
+  Promise.resolve()
+    .then(ask)
+    .then(render)
+    .catch(() => fallback);
+
 export const reportDiagnostics = async (
   translate: Translate,
 ): Promise<string> => {
-  const [net, disk, memory, power] = await Promise.all([
-    settle(() => NetInfo.fetch(), null),
-    settle(() => DeviceInfo.getFreeDiskStorage(), -1),
-    settle(() => DeviceInfo.getUsedMemory(), -1),
-    settle(() => DeviceInfo.getPowerState(), null),
+  const [network, power, disk, memory]: string[] = await Promise.all([
+    settle(
+      () => NetInfo.fetch(),
+      net => `${net.type}, internet: ${yesNo(net.isInternetReachable)}`,
+      'unknown, internet: unknown',
+    ),
+    settle(
+      () => DeviceInfo.getPowerState(),
+      p => onOff(p.lowPowerMode),
+      'unknown',
+    ),
+    settle(() => DeviceInfo.getFreeDiskStorage(), diskBucket, 'unknown'),
+    settle(() => DeviceInfo.getUsedMemory(), memoryBucket, 'unknown'),
   ]);
-  const reach =
-    net?.isInternetReachable === true
-      ? 'yes'
-      : net?.isInternetReachable === false
-        ? 'no'
-        : 'unknown';
-  const price = priceFetcherStore.snapshot().failed
-    ? 'last fetch failed'
-    : 'ok';
-  const lines = [
+  return [
     '--- Diagnostics ---',
     `Time (UTC): ${new Date().toISOString()}`,
-    `Server: ${serverLine(translate)}`,
-    `Wallet: ${walletLine()}`,
-    `Network: ${net?.type ?? 'unknown'}, internet: ${reach}`,
-    `Mixnet: ${state.mixnetStatus ?? 'unknown'}`,
-    `Sync: ${syncLine()}`,
-    `Last error: ${state.lastError || 'none'}`,
-    `Price: ${price}`,
-    `Power saving: ${
-      power?.lowPowerMode === undefined
-        ? 'unknown'
-        : power.lowPowerMode
-          ? 'on'
-          : 'off'
-    }`,
-    `Free disk: ${diskBucket(disk)}, app memory: ${memoryBucket(memory)}`,
-  ];
-  return lines.join('\n');
+    `Server: ${serverLine(state.served, translate)}`,
+    ...sessionLines(state),
+    `Network: ${network}`,
+    `Price: ${priceFetcherStore.snapshot().failed ? 'last fetch failed' : 'ok'}`,
+    `Power saving: ${power}`,
+    `Free disk: ${disk}, app memory: ${memory}`,
+  ].join('\n');
 };
