@@ -29,8 +29,11 @@ export const sendEmail = async (
     body || (translate('body') as string),
     hosts,
   );
+  // Diagnostics help, but a report must open without them.
   const diagnostics: string = redactReport(
-    await reportDiagnostics(translate),
+    await reportDiagnostics(translate).catch(
+      (): string => '--- Diagnostics ---\nunavailable',
+    ),
     hosts,
   );
   const appLabel: string = `${getZingoName()} ${getZingoVersion()}`;

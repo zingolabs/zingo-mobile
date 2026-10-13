@@ -1,4 +1,4 @@
-import { escapeRegExp, orderBy } from 'lodash';
+import { compact, escapeRegExp, orderBy } from 'lodash';
 import { sanitizePaths } from './sanitizePaths';
 
 const KEY: RegExp =
@@ -16,7 +16,8 @@ const hostPattern = (host: string): RegExp =>
   new RegExp(escapeRegExp(host), 'gi');
 
 export const redactReport = (text: string, hosts: string[] = []): string =>
-  orderBy(hosts, 'length', 'desc')
+  // An empty host would match between every character of the mail.
+  orderBy(compact(hosts), 'length', 'desc')
     .reduce(
       (out: string, host: string) => out.replace(hostPattern(host), '[host]'),
       sanitizePaths(text),

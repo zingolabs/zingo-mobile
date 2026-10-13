@@ -49,3 +49,9 @@ test('Tests that versions, heights, times and short ids pass through when a repo
   expect(redactReport(text)).toBe(text);
   expect(redactReport('')).toBe('');
 });
+
+test('Tests that the text passes through when a host is empty', () => {
+  expect(redactReport('abc 192.168.1.20', ['', 'node.alice.home'])).toBe(
+    'abc [host]',
+  );
+});

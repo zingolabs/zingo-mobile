@@ -164,3 +164,19 @@ test('Tests that amounts go out as ranges when a report states disk and memory',
   expect(memoryBucket(100 * 1024 ** 2)).toBe('< 256 MB');
   expect(memoryBucket(900 * 1024 ** 2)).toBe('> 512 MB');
 });
+
+test('Tests that an amount on a range edge goes to the upper range when it equals the edge', () => {
+  expect(diskBucket(1024 ** 3)).toBe('1-5 GB');
+  expect(diskBucket(5 * 1024 ** 3)).toBe('> 5 GB');
+  expect(memoryBucket(256 * 1024 ** 2)).toBe('256-512 MB');
+});
+
+test('Tests that the report still renders when a native call throws before it returns a promise', async () => {
+  const DeviceInfo = require('react-native-device-info').default;
+  DeviceInfo.getPowerState.mockImplementationOnce(() => {
+    throw new Error('native module missing');
+  });
+  const out: string = await reportDiagnostics(translate);
+  expect(out).toContain('Power saving: unknown');
+  expect(out).toContain('Free disk: 1-5 GB');
+});

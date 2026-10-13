@@ -1,7 +1,7 @@
 import NetInfo from '@react-native-community/netinfo';
 import DeviceInfo from 'react-native-device-info';
 import Url from 'url-parse';
-import { defaultTo, isBoolean, sortedIndex, sumBy } from 'lodash';
+import { defaultTo, isBoolean, sortedLastIndex, sumBy } from 'lodash';
 
 import {
   ChainNameEnum,
@@ -66,7 +66,7 @@ const [MB, GB]: number[] = [1024 ** 2, 1024 ** 3];
 const bucket =
   (edges: number[], labels: string[]) =>
   (bytes: number): string =>
-    labels[sortedIndex(edges, bytes)];
+    labels[sortedLastIndex(edges, bytes)];
 
 export const diskBucket: (bytes: number) => string = bucket(
   [1, GB, 5 * GB],
@@ -151,11 +151,18 @@ export const sessionLines = ({ served, session }: ReportState): string[] => {
   ];
 };
 
+// A native call that throws before it returns a promise, or a reading that
+// does not render, still settles on the fallback: a probe never keeps the
+// mail from opening.
 const settle = <T>(
   ask: () => Promise<T>,
   render: (read: T) => string,
   fallback: string,
-): Promise<string> => ask().then(render, () => fallback);
+): Promise<string> =>
+  Promise.resolve()
+    .then(ask)
+    .then(render)
+    .catch(() => fallback);
 
 export const reportDiagnostics = async (
   translate: Translate,
