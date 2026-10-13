@@ -129,7 +129,7 @@
     "eslint-plugin-ft-flow": "^3.0.11",
     "eslint-plugin-react-native": "^5.0.0",
     "jest": "^30.5.2",
-    "prettier": "^3.9.9",
+    "prettier": "^3.9.10",
     "react-dom": "19.1.4",
     "react-native-web": "^0.21.4",
     "react-test-renderer": "19.1.4",
