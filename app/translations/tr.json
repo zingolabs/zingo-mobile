@@ -669,7 +669,13 @@
     "file-title": "Cüzdan dosyası hasarlı",
     "file-sub": "Fonlarınız güvende ve tohum ifadeniz onları her zaman geri yükleyebilir.",
     "birthday-title": "Doğum günü çok erken",
-    "birthday-sub": "Cüzdan oluşturulduktan sonraki ilk bloğun yüksekliğini girin ya da boş bırakın."
+    "birthday-sub": "Cüzdan oluşturulduktan sonraki ilk bloğun yüksekliğini girin ya da boş bırakın.",
+    "create-title": "Zingo cüzdanı oluşturamadı",
+    "create-sub": "Tekrar deneyin. Hata sürerse hata ayrıntılarıyla bir rapor gönderin.",
+    "restore-title": "Zingo cüzdanı geri yükleyemedi",
+    "restore-sub": "Tekrar deneyin. Hata sürerse hata ayrıntılarıyla bir rapor gönderin.",
+    "still-create": "Cüzdan hâlâ oluşturulamıyor",
+    "still-restore": "Cüzdan hâlâ geri yüklenemiyor"
   },
   "deletesheet": {
     "title": "Bu cihazdaki cüzdan silinsin mi?",

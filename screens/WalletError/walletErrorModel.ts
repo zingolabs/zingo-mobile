@@ -90,7 +90,7 @@ const bang = (icon: Head['icon'], title: Text, sub: Text): Head => ({
   chips: { kind: 'none' },
 });
 
-const head = (cause: Cause, server: ServerType): Head => {
+const head = ({ cause, step }: WalletErrorInfo, server: ServerType): Head => {
   switch (cause.kind) {
     case 'connection':
       return bang(
@@ -119,8 +119,8 @@ const head = (cause: Cause, server: ServerType): Head => {
     case 'unknown':
       return bang(
         'wallet',
-        plain('walleterror.open-title'),
-        plain('walleterror.open-sub'),
+        plain(`walleterror.${step.kind}-title`),
+        plain(`walleterror.${step.kind}-sub`),
       );
     case 'chain':
       return {
@@ -202,6 +202,6 @@ export const errorScreen = (
   error: WalletErrorInfo,
   server: ServerType,
 ): ErrorScreen => ({
-  ...head(error.cause, server),
+  ...head(error, server),
   ...actions(error, server),
 });

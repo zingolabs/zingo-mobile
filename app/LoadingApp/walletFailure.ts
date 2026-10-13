@@ -100,18 +100,19 @@ const initLabelKey = (step: InitStep): string => {
 };
 
 /**
- * The causes the screen has a fix to offer a create or restore: another
- * server, another key, another birthday.
+ * The causes the screen has something to offer a create or restore: another
+ * server, another key, another birthday, or a retry and a report when the
+ * cause is unknown. A file or chain failure keeps the alert.
  */
 const screenOffers = (cause: Cause): boolean => {
   switch (cause.kind) {
     case 'connection':
     case 'key':
     case 'birthday':
+    case 'unknown':
       return true;
     case 'file':
     case 'chain':
-    case 'unknown':
       return false;
   }
 };
@@ -151,13 +152,14 @@ export const retryOf = (error: WalletErrorInfo): Retry => error.step;
  */
 export type Again = { kind: 'say'; key: string } | { kind: 'quiet' };
 
-export const againOf = (cause: Cause): Again => {
+export const againOf = ({ cause, step }: WalletErrorInfo): Again => {
   switch (cause.kind) {
     case 'connection':
       return { kind: 'say', key: 'walleterror.still-server' };
     case 'file':
-    case 'unknown':
       return { kind: 'say', key: 'walleterror.still-open' };
+    case 'unknown':
+      return { kind: 'say', key: `walleterror.still-${step.kind}` };
     case 'key':
     case 'birthday':
     case 'chain':

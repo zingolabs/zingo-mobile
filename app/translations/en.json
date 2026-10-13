@@ -671,7 +671,13 @@
     "file-title": "The wallet file is damaged",
     "file-sub": "Your funds are safe and your seed phrase can always restore them.",
     "birthday-title": "The birthday is too early",
-    "birthday-sub": "Enter the height of the first block after the wallet was created, or leave it empty."
+    "birthday-sub": "Enter the height of the first block after the wallet was created, or leave it empty.",
+    "create-title": "Zingo couldn't create the wallet",
+    "create-sub": "Try again. If it keeps failing, send a report with the error details.",
+    "restore-title": "Zingo couldn't restore the wallet",
+    "restore-sub": "Try again. If it keeps failing, send a report with the error details.",
+    "still-create": "Still couldn't create the wallet",
+    "still-restore": "Still couldn't restore the wallet"
   },
   "deletesheet": {
     "title": "Delete the wallet on this device?",

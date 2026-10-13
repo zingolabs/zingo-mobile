@@ -671,7 +671,13 @@
     "file-title": "O arquivo da carteira está danificado",
     "file-sub": "Seus fundos estão seguros e sua frase de recuperação sempre pode restaurá-los.",
     "birthday-title": "O aniversário é cedo demais",
-    "birthday-sub": "Informe a altura do primeiro bloco após a criação da carteira, ou deixe em branco."
+    "birthday-sub": "Informe a altura do primeiro bloco após a criação da carteira, ou deixe em branco.",
+    "create-title": "O Zingo não conseguiu criar a carteira",
+    "create-sub": "Tente de novo. Se continuar falhando, envie um relatório com os detalhes do erro.",
+    "restore-title": "O Zingo não conseguiu restaurar a carteira",
+    "restore-sub": "Tente de novo. Se continuar falhando, envie um relatório com os detalhes do erro.",
+    "still-create": "Ainda não foi possível criar a carteira",
+    "still-restore": "Ainda não foi possível restaurar a carteira"
   },
   "deletesheet": {
     "title": "Excluir a carteira deste dispositivo?",

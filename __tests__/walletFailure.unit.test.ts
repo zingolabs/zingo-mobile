@@ -121,7 +121,7 @@ test('Tests that a create failing on the connection becomes an error that retrie
   });
   if (outcome.kind === 'error') {
     expect(retryOf(outcome.error)).toEqual(create);
-    expect(againOf(outcome.error.cause)).toEqual({
+    expect(againOf(outcome.error)).toEqual({
       kind: 'say',
       key: 'walleterror.still-server',
     });
@@ -141,17 +141,45 @@ test('Tests that a restore whose key the server refused lands on the screen and 
       details: 'Mnemonic error. invalid checksum',
     },
   });
-  expect(againOf({ kind: 'key' })).toEqual({ kind: 'quiet' });
+  if (outcome.kind === 'error') {
+    expect(againOf(outcome.error)).toEqual({ kind: 'quiet' });
+  }
 });
 
-test('Tests that a restore failing on anything else becomes the alert that returns to the form', () => {
+test('Tests that a create or restore failing for no known cause lands on the screen and names its step on a retry', () => {
+  const failed = { code: 'Init', text: 'Not a valid chain hint' } as const;
+  const restored = failedOutcome(restore, failed);
+  expect(restored).toEqual({
+    kind: 'error',
+    error: {
+      cause: { kind: 'unknown' },
+      step: restore,
+      details: 'Not a valid chain hint',
+    },
+  });
+  if (restored.kind === 'error') {
+    expect(againOf(restored.error)).toEqual({
+      kind: 'say',
+      key: 'walleterror.still-restore',
+    });
+  }
+  const created = failedOutcome(create, failed);
+  if (created.kind === 'error') {
+    expect(againOf(created.error)).toEqual({
+      kind: 'say',
+      key: 'walleterror.still-create',
+    });
+  }
+});
+
+test('Tests that a restore failing on the wallet file becomes the alert that returns to the form', () => {
   expect(
-    failedOutcome(restore, { code: 'Init', text: 'Not a valid chain hint' }),
+    failedOutcome(restore, { code: 'InitWalletFile', text: 'bad header' }),
   ).toEqual({
     kind: 'alert',
     origin: RouteEnum.ImportUfvk,
     labelKey: 'loadingapp.readingwallet-label',
-    error: 'Not a valid chain hint',
+    error: 'bad header',
   });
   expect(initOrigin(restore)).toBe(RouteEnum.ImportUfvk);
   expect(initOrigin({ kind: 'create' })).toBe(RouteEnum.StartMenu);
@@ -183,15 +211,19 @@ test('Tests that a wallet on disk retries by opening whatever its cause', () => 
       details,
     }),
   ).toEqual(open);
-  expect(againOf({ kind: 'unknown' })).toEqual({
+  expect(againOf({ cause: { kind: 'unknown' }, step: open, details })).toEqual({
     kind: 'say',
     key: 'walleterror.still-open',
   });
-  expect(againOf({ kind: 'file' })).toEqual({
+  expect(againOf({ cause: { kind: 'file' }, step: open, details })).toEqual({
     kind: 'say',
     key: 'walleterror.still-open',
   });
   expect(
-    againOf({ kind: 'chain', walletChain: ChainNameEnum.mainChainName }),
+    againOf({
+      cause: { kind: 'chain', walletChain: ChainNameEnum.mainChainName },
+      step: open,
+      details,
+    }),
   ).toEqual({ kind: 'quiet' });
 });

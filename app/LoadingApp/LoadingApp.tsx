@@ -1070,7 +1070,7 @@ export class LoadingAppClass extends Component<
         return state => ({ ...keep(state), ...idle });
       case 'error': {
         const again = settlement.kind === 'again';
-        const say = againOf(outcome.error.cause);
+        const say = againOf(outcome.error);
         if (again && say.kind === 'say') {
           this.addLastSnackbar(this.state.translate(say.key) as string);
         }

@@ -156,3 +156,31 @@ test('Tests that a birthday the server refused names the birthday and only goes 
   expect(model.top).toEqual({ kind: 'none' });
   expect(model.bottom).toEqual({ kind: 'none' });
 });
+
+test('Tests that a create or restore failing for no known cause names its step and offers Retry and Back', () => {
+  const restored = errorScreen(
+    { cause: { kind: 'unknown' }, step: restore, details: 'boom' },
+    testnet,
+  );
+  expect(restored.title).toEqual({
+    kind: 'plain',
+    key: 'walleterror.restore-title',
+  });
+  expect(restored.sub).toEqual({
+    kind: 'plain',
+    key: 'walleterror.restore-sub',
+  });
+  expect(restored.primary.action).toEqual({ kind: 'retry' });
+  expect(restored.bottom).toMatchObject({
+    kind: 'link',
+    link: { action: { kind: 'back' } },
+  });
+  const created = errorScreen(
+    { cause: { kind: 'unknown' }, step: { kind: 'create' }, details: 'boom' },
+    testnet,
+  );
+  expect(created.title).toEqual({
+    kind: 'plain',
+    key: 'walleterror.create-title',
+  });
+});

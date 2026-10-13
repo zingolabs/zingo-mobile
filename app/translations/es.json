@@ -671,7 +671,13 @@
     "file-title": "El archivo del monedero está dañado",
     "file-sub": "Tus fondos están a salvo y tu semilla siempre puede restaurarlos.",
     "birthday-title": "El cumpleaños es demasiado temprano",
-    "birthday-sub": "Escribe la altura del primer bloque posterior a la creación del monedero, o déjalo vacío."
+    "birthday-sub": "Escribe la altura del primer bloque posterior a la creación del monedero, o déjalo vacío.",
+    "create-title": "Zingo no pudo crear el monedero",
+    "create-sub": "Inténtalo de nuevo. Si sigue fallando, envía un informe con los detalles del error.",
+    "restore-title": "Zingo no pudo restaurar el monedero",
+    "restore-sub": "Inténtalo de nuevo. Si sigue fallando, envía un informe con los detalles del error.",
+    "still-create": "Sigue sin poder crearse el monedero",
+    "still-restore": "Sigue sin poder restaurarse el monedero"
   },
   "deletesheet": {
     "title": "¿Borrar el monedero de este dispositivo?",

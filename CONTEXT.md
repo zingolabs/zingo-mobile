@@ -208,8 +208,8 @@ Why a step failed, by what the user can change about it: the server,
 the key, the birthday, the wallet file, or the network the server is
 on. It comes
 from the FFI error code; the message text decides only when the code
-says nothing. The screen's head follows the cause and its buttons
-follow the step.
+says nothing. The screen's head follows the cause, and the step when the cause is
+unknown; its buttons follow the step.
 _Avoid_: kind, type, reason
 
 **Retry**:
