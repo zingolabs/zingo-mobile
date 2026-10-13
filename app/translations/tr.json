@@ -383,7 +383,8 @@
     "attaching": "Uygulama hâlâ mixnet'e bağlanıyor. Taşıma bağlanana kadar kayıp olarak bildirilir, bu yüzden bu çalışma henüz bir hüküm değildir.",
     "copy-report": "Raporu kopyala",
     "report-copied": "Rapor panoya kopyalandı",
-    "offline": "Bu oturum çevrimdışı modda olduğu için mixnet kapalı. Yeniden başlatmak için Ayarlar'dan bir sunucu seçin."
+    "offline": "Bu oturum çevrimdışı modda olduğu için mixnet kapalı. Yeniden başlatmak için Ayarlar'dan bir sunucu seçin.",
+    "nonetwork": "Cihazınızın ağ bağlantısı olmadığı için mixnet kapalı. Ağ geri gelir gelmez kendiliğinden yeniden bağlanır."
   },
   "header": {
     "lastupdate": "Son güncelleme:"
