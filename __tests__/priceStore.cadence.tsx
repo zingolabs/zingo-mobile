@@ -31,7 +31,6 @@ const READY_VIEW: MixnetTransportView = {
   sendBlocked: false,
   recovery: 'none',
   reconnecting: false,
-  noNetwork: false,
 };
 
 const DIED_VIEW: MixnetTransportView = {
@@ -42,7 +41,6 @@ const DIED_VIEW: MixnetTransportView = {
   sendBlocked: true,
   recovery: 'reenable',
   reconnecting: false,
-  noNetwork: false,
 };
 
 const price = getZecPrice as jest.MockedFunction<typeof getZecPrice>;

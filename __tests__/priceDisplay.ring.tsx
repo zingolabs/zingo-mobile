@@ -40,7 +40,6 @@ const READY_VIEW: MixnetTransportView = {
   sendBlocked: false,
   recovery: 'none',
   reconnecting: false,
-  noNetwork: false,
 };
 
 type Ctx = typeof defaultAppContextLoaded;
@@ -170,7 +169,6 @@ test('a refusing transport shows no ring', () => {
           sendBlocked: true,
           recovery: 'reenable',
           reconnecting: false,
-          noNetwork: false,
         },
       }),
     ),

@@ -372,8 +372,7 @@
       "unknown": "Mixnet kullanılamıyor"
     },
     "reenable": "Mixnet'i yeniden etkinleştir",
-    "reconnecting": "Mixnet'e yeniden bağlanılıyor…",
-    "nonetwork": "Ağ yok: mixnet bağlantı bekliyor"
+    "reconnecting": "Mixnet'e yeniden bağlanılıyor…"
   },
   "mixnetdoctor": {
     "title": "Mixnet Doktoru",

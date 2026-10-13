@@ -22,8 +22,6 @@ export type MixnetTransportView = {
   readonly sendBlocked: boolean;
   readonly recovery: MixnetRecoveryAction;
   readonly reconnecting: boolean;
-  // The device has no network, so the transport waits for one.
-  readonly noNetwork: boolean;
 };
 
 export type MixnetView = MixnetTransportView | { readonly kind: 'absent' };
@@ -38,7 +36,6 @@ export const INITIAL_MIXNET_VIEW: MixnetTransportView = {
   sendBlocked: true,
   recovery: 'wait',
   reconnecting: false,
-  noNetwork: false,
 };
 
 // A failure report blocks sending like `bootstrapping` and `died` do.
@@ -46,19 +43,6 @@ export function deriveMixnetView(
   status: MixnetStatusReport,
   detail: MixnetDetailReport | null,
   reconnecting: boolean = false,
-  noNetwork: boolean = false,
-): MixnetTransportView {
-  const view = transportView(status, detail, reconnecting);
-  // Without a network there is nothing to re-enable: it waits for one.
-  return noNetwork
-    ? { ...view, noNetwork, recovery: 'wait', reconnecting: false }
-    : view;
-}
-
-function transportView(
-  status: MixnetStatusReport,
-  detail: MixnetDetailReport | null,
-  reconnecting: boolean,
 ): MixnetTransportView {
   const narration =
     detail !== null && detail.kind === 'detail' && detail.detail !== ''
@@ -74,7 +58,6 @@ function transportView(
       sendBlocked: true,
       recovery: 'reenable',
       reconnecting,
-      noNetwork: false,
     };
   }
 
@@ -88,7 +71,6 @@ function transportView(
         sendBlocked: true,
         recovery: 'wait',
         reconnecting,
-        noNetwork: false,
       };
     case RPCMixnetIndicatorEnum.ready:
       return {
@@ -99,7 +81,6 @@ function transportView(
         sendBlocked: false,
         recovery: 'none',
         reconnecting: false,
-        noNetwork: false,
       };
     // The switch-off is the user's own act, so it carries no recovery and
     // never reads as a reconnect: an Offline session is resting, not trying.
@@ -112,7 +93,6 @@ function transportView(
         sendBlocked: true,
         recovery: 'none',
         reconnecting: false,
-        noNetwork: false,
       };
     case RPCMixnetIndicatorEnum.died:
       return {
@@ -123,7 +103,6 @@ function transportView(
         sendBlocked: true,
         recovery: 'reenable',
         reconnecting,
-        noNetwork: false,
       };
   }
 }
@@ -139,15 +118,11 @@ export function sendGateOpen(view: MixnetView): boolean {
   }
 }
 
-// The status line a blocked gate shows beside its reason: no network when
-// the device has none, the reconnecting notice while a reconnect runs, and
-// the transport's own status otherwise.
+// The status line a blocked gate shows beside its reason: the reconnecting
+// notice while a reconnect runs, and the transport's own status otherwise.
 export function shownStatusKey(
   view: MixnetTransportView,
-): 'mixnet.reconnecting' | 'mixnet.nonetwork' | MixnetStatusKey {
-  if (view.noNetwork) {
-    return 'mixnet.nonetwork';
-  }
+): 'mixnet.reconnecting' | MixnetStatusKey {
   return view.reconnecting ? 'mixnet.reconnecting' : view.statusKey;
 }
 
