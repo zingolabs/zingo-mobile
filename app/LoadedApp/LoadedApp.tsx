@@ -144,6 +144,7 @@ import Confirm from '@screens/Confirm';
 import { HomeTabParamList, RootParamList } from '@app/types';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
+import { publishReport } from '@app/services/reportDiagnostics';
 
 const About = React.lazy(() => import('@screens/About'));
 const MixnetDoctor = React.lazy(() => import('@screens/MixnetDoctor'));
@@ -662,7 +663,15 @@ export class LoadedAppClass extends Component<
       messagesTotal: null,
       sendPageState: new SendPageStateClass(new ToAddrClass(0)),
       setSendPageState: this.setSendPageState,
-      info: {} as InfoType,
+      // The currency is the wallet's from the start: when no server answers
+      // (no network) the info never arrives, and amounts read "---".
+      info: {
+        currencyName:
+          (props.walletChainName || props.server.chainName) ===
+          ChainNameEnum.mainChainName
+            ? CurrencyNameEnum.ZEC
+            : CurrencyNameEnum.TAZ,
+      } as InfoType,
       syncingStatus: {} as RPCSyncStatusType,
       birthday: 0,
       defaultUnifiedAddress: '',
@@ -755,6 +764,7 @@ export class LoadedAppClass extends Component<
   }
 
   componentDidMount = async () => {
+    this.publishReportState();
     const netInfoState = await NetInfo.fetch();
     this.setState({
       netInfo: {
@@ -764,6 +774,10 @@ export class LoadedAppClass extends Component<
           netInfoState.details && netInfoState.details.isConnectionExpensive,
       },
     });
+    // A launch without network must not start drawing the mixnet.
+    if (netInfoState.isConnected === false) {
+      await this.rpc.networkChanged(false);
+    }
 
     // not for fresh installing
     if (this.props.firstLaunchingMessage !== LaunchingModeEnum.installing) {
@@ -894,8 +908,11 @@ export class LoadedAppClass extends Component<
             },
           });
           if (isConnected !== state.isConnected) {
-            if (!state.isConnected) {
-            } else {
+            // Only a definite answer counts: null is "not known yet".
+            if (state.isConnected === false) {
+              await this.rpc.networkChanged(false);
+            } else if (state.isConnected) {
+              await this.rpc.networkChanged(true);
               // restart the interval process again...
               await this.rpc.clearTimers();
               await this.rpc.configure();
@@ -920,6 +937,23 @@ export class LoadedAppClass extends Component<
     if (this.props.pendingLink !== prevProps.pendingLink) {
       this.deliverLink();
     }
+    this.publishReportState();
+  };
+
+  publishReportState = (): void => {
+    const { server, selectServer, readOnly, lastError, mixnetView } =
+      this.state;
+    publishReport({
+      served: { kind: 'chosen', server, selectServer },
+      session: {
+        kind: 'open',
+        chain: this.state.walletChainName,
+        readOnly,
+        sync: this.state.syncingStatus,
+        lastError,
+        mixnetView,
+      },
+    });
   };
 
   // Takes the session's `zcash:` link into Send.
@@ -986,6 +1020,7 @@ export class LoadedAppClass extends Component<
   };
 
   componentWillUnmount = async () => {
+    publishReport({ session: { kind: 'closed' } });
     await this.rpc.clearTimers();
     this.rpc.stopMixnetPolling();
     const safeRemove = (listener: unknown, name: string) => {

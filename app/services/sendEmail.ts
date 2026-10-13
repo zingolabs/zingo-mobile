@@ -1,9 +1,14 @@
 import { Linking } from 'react-native';
 import DeviceInfo from 'react-native-device-info';
 import { GlobalConst, TranslateType } from '@app/AppState';
-import { sanitizePaths } from '@app/utils/sanitizePaths';
+import { redactReport } from '@app/utils/redactReport';
 import { getZingoName, getZingoVersion } from '@app/utils/ZingoAppData';
 import { showConfirm } from './showConfirm';
+import {
+  privateHosts,
+  reportDiagnostics,
+  reportState,
+} from './reportDiagnostics';
 
 export const sendEmail = async (
   translate: (key: string) => TranslateType,
@@ -12,14 +17,24 @@ export const sendEmail = async (
   body?: string,
 ) => {
   const email: string = translate('email') as string;
-  // Sanitize subject + body so a stack-trace or path baked into an error
-  // never leaks the developer's username (Hermes embeds compile-time
-  // absolute paths into release stacks) or the user's profile folder.
-  const subjectEmail: string = sanitizePaths(
+  // Everything the mail carries is redacted: user folders in paths (Hermes
+  // embeds compile-time absolute paths into release stacks), keys,
+  // addresses, hashes, IPs and a custom server.
+  const hosts: string[] = privateHosts(reportState().served, translate);
+  const subjectEmail: string = redactReport(
     subject || (translate('subject') as string),
+    hosts,
   );
-  const bodyEmail: string = sanitizePaths(
+  const bodyEmail: string = redactReport(
     body || (translate('body') as string),
+    hosts,
+  );
+  // Diagnostics help, but a report must open without them.
+  const diagnostics: string = redactReport(
+    await reportDiagnostics(translate).catch(
+      (): string => '--- Diagnostics ---\nunavailable',
+    ),
+    hosts,
   );
   const appLabel: string = `${getZingoName()} ${getZingoVersion()}`;
   const zingolibVersionEmail: string = zingolibVersion;
@@ -42,6 +57,8 @@ export const sendEmail = async (
       (zingolibVersionEmail
         ? GlobalConst.zingolib + ': ' + zingolibVersionEmail
         : '') +
+      '\n\n' +
+      diagnostics +
       '\n\n' +
       bodyEmail,
   )}`;
