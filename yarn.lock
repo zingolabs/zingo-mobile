@@ -8483,10 +8483,10 @@ react-native-gesture-handler@2.31.2:
     hoist-non-react-statics "^3.3.0"
     invariant "^2.2.4"
 
-react-native-gifted-charts@^1.4.80:
-  version "1.4.80"
-  resolved "https://registry.yarnpkg.com/react-native-gifted-charts/-/react-native-gifted-charts-1.4.80.tgz#219993a6387d8e10b4fd35008a7ee63b446919d8"
-  integrity sha512-mjTOhRG6YZMW0wl1hlX1G3tS/i2XDbPMNtbcLjP2Y+UlVqn5GEWrMyMhdhjIJ6BDOea/tXAVEv8U67fE3Akjgg==
+react-native-gifted-charts@^1.4.81:
+  version "1.4.81"
+  resolved "https://registry.yarnpkg.com/react-native-gifted-charts/-/react-native-gifted-charts-1.4.81.tgz#e12f6229dd02ead85fc393a1b8c6ebdb4877d16e"
+  integrity sha512-AgQKtuGNs5/k3YtTIILTx8M+7c8F5XmL87VYI7H5b1vTkNmjxRoGEV6xWDvTWKAe1GqBlFgJrBUpl/tMuRalDQ==
   dependencies:
     gifted-charts-core "0.1.83"
 
