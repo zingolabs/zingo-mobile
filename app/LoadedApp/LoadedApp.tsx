@@ -686,7 +686,15 @@ export class LoadedAppClass extends Component<
       messagesTotal: null,
       sendPageState: new SendPageStateClass(new ToAddrClass(0)),
       setSendPageState: this.setSendPageState,
-      info: {} as InfoType,
+      // The currency is the wallet's from the start: when no server answers
+      // (no network) the info never arrives, and amounts read "---".
+      info: {
+        currencyName:
+          (props.walletChainName || props.server.chainName) ===
+          ChainNameEnum.mainChainName
+            ? CurrencyNameEnum.ZEC
+            : CurrencyNameEnum.TAZ,
+      } as InfoType,
       syncingStatus: {} as RPCSyncStatusType,
       birthday: 0,
       defaultUnifiedAddress: '',
@@ -785,6 +793,10 @@ export class LoadedAppClass extends Component<
           netInfoState.details && netInfoState.details.isConnectionExpensive,
       },
     });
+    // A launch without network must not start drawing the mixnet.
+    if (netInfoState.isConnected === false) {
+      await this.rpc.networkChanged(false);
+    }
 
     // not for fresh installing
     if (this.props.firstLaunchingMessage !== LaunchingModeEnum.installing) {
@@ -943,8 +955,11 @@ export class LoadedAppClass extends Component<
             },
           });
           if (isConnected !== state.isConnected) {
-            if (!state.isConnected) {
-            } else {
+            // Only a definite answer counts: null is "not known yet".
+            if (state.isConnected === false) {
+              await this.rpc.networkChanged(false);
+            } else if (state.isConnected) {
+              await this.rpc.networkChanged(true);
               // restart the interval process again...
               await this.rpc.clearTimers();
               await this.rpc.configure();
