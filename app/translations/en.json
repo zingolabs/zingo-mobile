@@ -55,37 +55,51 @@
   "addressbook": {
     "title": "Address Book",
     "end": "End",
-    "new": "New",
     "loadmore": "Load More",
-    "label": "Contact",
     "label-placeholder": "Nickname/Label/Tag",
-    "address-placeholder": "Add the address here",
-    "add": "Add",
     "add-confirm-title": "Add contact?",
     "add-confirm-message": "Please check the address and its detected network before saving.",
-    "modify": "Modify",
     "delete": "Delete",
-    "empty": "You haven't saved any new addresses yet.",
-    "nochanges": "No changes registered. ",
-    "fillboth": "Please fill out both fields. ",
-    "bothexists": "This label and this address already exists. ",
-    "labelexists": "This label already exists. ",
-    "addressexists": "This address already exists. ",
+    "empty": "No contacts yet. Add one with New contact.",
     "select-placeholder": "Choose a Contact...",
     "search-placeholder": "Search",
     "chain": "Chain",
     "select-chain-placeholder": "Choose a chain...",
-    "delete-title": "Delete Label",
-    "delete-alert": "Do you really want to delete this Contact/Nickname/Label/Tag?",
     "likely": "Likely: ",
     "thiswalletaddress": "This Wallet's Address",
-    "addto": "Add to ",
     "filter-wallet": "Wallet",
     "add-tag": "Add Tag",
     "add-contact": "Add Contact",
     "tag": "Tag",
     "contact": "Contact",
-    "address": "Address"
+    "address": "Address",
+    "hint": "Tap a contact for options · Swipe left to send",
+    "hint-vo": "Tap a contact for options",
+    "search-contacts": "Search name or address",
+    "new-contact": "New contact",
+    "edit-contact": "Edit contact",
+    "name": "Name",
+    "name-placeholder": "Name",
+    "address-placeholder": "Zcash address",
+    "send": "Send",
+    "edit": "Edit",
+    "copied": "Copied",
+    "address-copied": "Address copied",
+    "public": "Public",
+    "delete-question": "Delete {name}?",
+    "delete-body": "This removes the contact only. Past payments stay in your history.",
+    "deleted": "{name} deleted",
+    "updated": "Contact updated",
+    "added": "{name} added to your address book",
+    "dup-name": "You already have a contact called {name}.",
+    "dup-address": "This address is already in your address book.",
+    "invalid": "This isn’t a Zcash address.",
+    "no-match": "Nothing matches “{query}”.",
+    "kind-unified": "Unified address",
+    "kind-sapling": "Sapling address",
+    "kind-transparent": "Transparent address",
+    "kind-tex": "TEX address",
+    "back-acc": "Back"
   },
   "change-privacy-legend": ".\nTap to reveal the hidden values.",
   "txtcopied": "Text copied to Clipboard",
@@ -410,7 +424,9 @@
   },
   "seed": {
     "buttontexts": {
-      "new": ["I have saved \n the seed"],
+      "new": [
+        "I have saved \n the seed"
+      ],
       "change": [
         "",
         "Open New",
@@ -423,8 +439,12 @@
         "You really want \n to change your \n actual server",
         "Are you certain?"
       ],
-      "view": ["I have saved \n the seed"],
-      "restore": ["Restore Wallet"]
+      "view": [
+        "I have saved \n the seed"
+      ],
+      "restore": [
+        "Restore Wallet"
+      ]
     },
     "title": "Seed",
     "new": "New",

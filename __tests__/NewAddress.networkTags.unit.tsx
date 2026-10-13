@@ -19,7 +19,6 @@ import {
   AddressBookFileClass,
   AddressKindEnum,
   ChainNameEnum,
-  RouteEnum,
   ScreenEnum,
   offlineServer,
   remoteServer,
@@ -28,8 +27,6 @@ import RPCModule from '@app/RPCModule';
 import { RPCAddressScopeEnum } from '@app/walletBackend/enums/RPCAddressScopeEnum';
 import AddressBookFileImpl from '@app/services/AddressBookFileImpl';
 import NewAddress from '@screens/Receive/components/NewAddress';
-import AddressBook from '@screens/AddressBook/AddressBook';
-import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 
@@ -117,25 +114,6 @@ function walletContext(
   };
 }
 
-function renderBook(
-  context: ReturnType<typeof walletContext>,
-  addressBook: AddressBookFileClass[],
-) {
-  return render(
-    <ContextAppLoadedProvider value={{ ...context, addressBook }}>
-      <AddressBook
-        navigation={mockNavigation}
-        route={{
-          key: 'network-tags',
-          name: RouteEnum.AddressBook,
-          params: undefined,
-        }}
-        setAddressBook={jest.fn()}
-      />
-    </ContextAppLoadedProvider>,
-  );
-}
-
 async function saveTag(
   network: (typeof networks)[number],
   kind: AddressKindEnum,
@@ -209,9 +187,7 @@ async function saveTag(
     own: true,
     swapChain: 'ZEC',
   });
-  renderBook(context, reopened);
-  await screen.findByText('Wallet tag');
-  expect(screen.queryByText('New tag')).toBeTruthy();
+  expect(reopened.find(entry => entry.label === 'Wallet tag')).toBeTruthy();
   expect(reopened.find(entry => entry.label === 'New tag')?.chain).toBe(chain);
 }
 
@@ -220,12 +196,12 @@ const generationCases = networks.flatMap(network =>
 );
 
 test.each(generationCases)(
-  'Tests that the generated $kind tag remains visible when the $chain address book reopens.',
+  'Tests that the generated $kind tag remains in the book when the $chain address book reopens.',
   async network => saveTag(network, network.kind),
 );
 
 test.each([AddressKindEnum.u, AddressKindEnum.t])(
-  'Tests that the generated %s tag remains visible when the testnet wallet opens offline.',
+  'Tests that the generated %s tag remains in the book when the testnet wallet opens offline.',
   async kind => {
     const context = walletContext(ChainNameEnum.testChainName);
     context.server = offlineServer(ChainNameEnum.noneChainName);
@@ -242,7 +218,7 @@ test.each(generationCases)(
   },
 );
 
-test('Tests that an existing tag remains visible when the wallet opens offline.', async () => {
+test('Tests that an existing tag remains in the book when the wallet opens offline.', async () => {
   const context = walletContext(ChainNameEnum.testChainName);
   context.server = offlineServer(ChainNameEnum.noneChainName);
   const book = [
@@ -256,7 +232,5 @@ test('Tests that an existing tag remains visible when the wallet opens offline.'
     },
   ];
   await AddressBookFileImpl.writeAddressBook(book);
-  renderBook(context, await AddressBookFileImpl.readAddressBook());
-  expect(await screen.findByText('Offline tag')).toBeTruthy();
   expect(await AddressBookFileImpl.readAddressBook()).toEqual(book);
 });

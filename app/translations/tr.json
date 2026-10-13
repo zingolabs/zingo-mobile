@@ -55,37 +55,51 @@
   "addressbook": {
     "title": "Adres Defteri",
     "end": "Son",
-    "new": "Yeni",
     "loadmore": "Daha fazla yükle",
-    "label": "Kişi",
     "label-placeholder": "Kullanıcı adı/Etiket/Tag",
-    "address-placeholder": "Adresi buraya girin",
-    "add": "Ekle",
     "add-confirm-title": "Kişi eklensin mi?",
     "add-confirm-message": "Kaydetmeden önce adresi ve algılanan ağı kontrol edin.",
-    "modify": "Düzenle",
     "delete": "Sil",
-    "empty": "Henüz yeni adres kaydetmediniz.",
-    "nochanges": "Herhangi bir değişiklik kaydedilmedi. ",
-    "fillboth": "Lütfen her iki alanı da doldurun. ",
-    "bothexists": "Bu etiket ve bu adres zaten mevcut. ",
-    "labelexists": "Bu etiket zaten mevcut. ",
-    "addressexists": "Bu adres zaten mevcut. ",
+    "empty": "Henüz kişi yok. Yeni kişi ile bir tane ekleyin.",
     "select-placeholder": "Bir Kişi Seçin...",
     "search-placeholder": "Ara",
     "chain": "Ağ",
     "select-chain-placeholder": "Bir ağ seçin...",
-    "delete-title": "Etiketi Sil",
-    "delete-alert": "Bu Kişiyi/Takma Adı/Etiketi/Tag'i gerçekten silmek istiyor musunuz?",
     "likely": "Muhtemelen ",
     "thiswalletaddress": "Bu Cüzdanın Adresi",
-    "addto": "Şuraya ekle ",
     "filter-wallet": "Cüzdan",
     "add-tag": "Etiket ekle",
     "add-contact": "Kişi ekle",
     "tag": "Etiket",
     "contact": "Kişi",
-    "address": "Adres"
+    "address": "Adres",
+    "hint": "Seçenekler için bir kişiye dokunun · Göndermek için sola kaydırın",
+    "hint-vo": "Seçenekler için bir kişiye dokunun",
+    "search-contacts": "Ad veya adres ara",
+    "new-contact": "Yeni kişi",
+    "edit-contact": "Kişiyi düzenle",
+    "name": "Ad",
+    "name-placeholder": "Ad",
+    "address-placeholder": "Zcash adresi",
+    "send": "Gönder",
+    "edit": "Düzenle",
+    "copied": "Kopyalandı",
+    "address-copied": "Adres kopyalandı",
+    "public": "Herkese açık",
+    "delete-question": "{name} silinsin mi?",
+    "delete-body": "Yalnızca kişi silinir. Geçmiş ödemeler geçmişinizde kalır.",
+    "deleted": "{name} silindi",
+    "updated": "Kişi güncellendi",
+    "added": "{name} adres defterinize eklendi",
+    "dup-name": "{name} adlı bir kişiniz zaten var.",
+    "dup-address": "Bu adres zaten adres defterinizde.",
+    "invalid": "Bu bir Zcash adresi değil.",
+    "no-match": "“{query}” ile eşleşen bir şey yok.",
+    "kind-unified": "Birleşik adres",
+    "kind-sapling": "Sapling adresi",
+    "kind-transparent": "Şeffaf adres",
+    "kind-tex": "TEX adresi",
+    "back-acc": "Geri"
   },
   "change-privacy-legend": ".\nGizli değerleri göstermek için dokunun.",
   "txtcopied": "Metin panoya kopyalandı",
@@ -408,7 +422,9 @@
   },
   "seed": {
     "buttontexts": {
-      "new": ["Yedekleme ifadesini\nKaydettim"],
+      "new": [
+        "Yedekleme ifadesini\nKaydettim"
+      ],
       "change": [
         "",
         "Yeni aç",
@@ -421,8 +437,12 @@
         "Gerçek cüzdanınızı\nDeğiştirmek istiyor musunuz?",
         "Emin misiniz?"
       ],
-      "view": ["Yedekleme ifadesini\nKaydettim"],
-      "restore": ["Cüzdanı geri yükle"]
+      "view": [
+        "Yedekleme ifadesini\nKaydettim"
+      ],
+      "restore": [
+        "Cüzdanı geri yükle"
+      ]
     },
     "title": "kurtarma ifadesi",
     "new": "Yeni",

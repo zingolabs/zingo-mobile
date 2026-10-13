@@ -55,37 +55,51 @@
   "addressbook": {
     "title": "Libreta de Direcciones",
     "end": "Fin",
-    "new": "Nuevo",
     "loadmore": "Cargar más",
-    "label": "Contacto",
     "label-placeholder": "Apodo/Etiqueta",
-    "address-placeholder": "Agrega aquí la dirección",
-    "add": "Añadir",
     "add-confirm-title": "¿Agregar contacto?",
     "add-confirm-message": "Comprueba la dirección y la red detectada antes de guardar.",
-    "modify": "Modificar",
     "delete": "Borrar",
-    "empty": "Todavía no has guardado nuevas direcciones.",
-    "nochanges": "No se han registrado cambios. ",
-    "fillboth": "Por favor rellena ambos campos. ",
-    "bothexists": "Esta etiqueta y esta dirección ya existen. ",
-    "labelexists": "Esta etiqueta ya existe. ",
-    "addressexists": "Esta dirección ya existe. ",
+    "empty": "Aún no hay contactos. Añade uno con Nuevo contacto.",
     "select-placeholder": "Elige un Contacto...",
     "search-placeholder": "Buscar",
     "chain": "Cadena",
     "select-chain-placeholder": "Elige una cadena...",
-    "delete-title": "Borrar etiqueta",
-    "delete-alert": "¿Realmente quieres borrar este Contacto de tu libreta de direcciones?",
     "likely": "Probablemente: ",
     "thiswalletaddress": "La Dirección de este Monedero",
-    "addto": "Añadir a ",
     "filter-wallet": "Monedero",
     "add-tag": "Añadir etiqueta",
     "add-contact": "Añadir contacto",
     "tag": "Etiqueta",
     "contact": "Contacto",
-    "address": "Dirección"
+    "address": "Dirección",
+    "hint": "Toca un contacto para ver opciones · Desliza a la izquierda para enviar",
+    "hint-vo": "Toca un contacto para ver opciones",
+    "search-contacts": "Buscar por nombre o dirección",
+    "new-contact": "Nuevo contacto",
+    "edit-contact": "Editar contacto",
+    "name": "Nombre",
+    "name-placeholder": "Nombre",
+    "address-placeholder": "Dirección de Zcash",
+    "send": "Enviar",
+    "edit": "Editar",
+    "copied": "Copiado",
+    "address-copied": "Dirección copiada",
+    "public": "Pública",
+    "delete-question": "¿Borrar a {name}?",
+    "delete-body": "Solo se elimina el contacto. Los pagos anteriores siguen en tu historial.",
+    "deleted": "{name} borrado",
+    "updated": "Contacto actualizado",
+    "added": "{name} añadido a tu libreta de direcciones",
+    "dup-name": "Ya tienes un contacto llamado {name}.",
+    "dup-address": "Esta dirección ya está en tu libreta de direcciones.",
+    "invalid": "Esto no es una dirección de Zcash.",
+    "no-match": "Nada coincide con “{query}”.",
+    "kind-unified": "Dirección unificada",
+    "kind-sapling": "Dirección Sapling",
+    "kind-transparent": "Dirección transparente",
+    "kind-tex": "Dirección TEX",
+    "back-acc": "Atrás"
   },
   "change-privacy-legend": ".\nPulsar para revelar los valores ocultos.",
   "txtcopied": "Texto copiado al Portapapeles",
@@ -410,7 +424,9 @@
   },
   "seed": {
     "buttontexts": {
-      "new": ["Ya he guardado \n la semilla"],
+      "new": [
+        "Ya he guardado \n la semilla"
+      ],
       "change": [
         "",
         "Abrir Nuevo",
@@ -423,8 +439,12 @@
         "Realmente quieres \n cambiar el \n servidor activo",
         "Estás seguro/a?"
       ],
-      "view": ["Ya he guardado \n la semilla"],
-      "restore": ["Restaurar Monedero"]
+      "view": [
+        "Ya he guardado \n la semilla"
+      ],
+      "restore": [
+        "Restaurar Monedero"
+      ]
     },
     "title": "Semilla",
     "new": "Nueva",

@@ -55,37 +55,51 @@
   "addressbook": {
     "title": "Address Book",
     "end": "Fim",
-    "new": "Novo",
     "loadmore": "Carregar Mais",
-    "label": "Contato",
     "label-placeholder": "Apelido/Tag",
-    "address-placeholder": "Adicione o endereço aqui",
-    "add": "Adicionar",
     "add-confirm-title": "Adicionar contato?",
     "add-confirm-message": "Verifique o endereço e a rede detectada antes de salvar.",
-    "modify": "Modificar",
     "delete": "Excluir",
-    "empty": "Você ainda não salvou nenhum endereço novo.",
-    "nochanges": "Nenhuma alteração registrada.",
-    "fillboth": "Preencha todos os campos. ",
-    "bothexists": "Esse contato e endereço já existem. ",
-    "labelexists": "Esse contato já existe. ",
-    "addressexists": "Este endereço já existe. ",
+    "empty": "Ainda não há contatos. Adicione um com Novo contato.",
     "select-placeholder": "Escolha um Contato...",
     "search-placeholder": "Procurar",
     "chain": "Cadeia",
     "select-chain-placeholder": "Escolha uma cadeia...",
-    "delete-title": "Excluir Contato",
-    "delete-alert": "Você realmente deseja excluir este Contato/Apelido?",
     "likely": "Provavelmente: ",
     "thiswalletaddress": "Endereço desta Carteira",
-    "addto": "Adicionar à ",
     "filter-wallet": "Carteira",
     "add-tag": "Adicionar etiqueta",
     "add-contact": "Adicionar contato",
     "tag": "Etiqueta",
     "contact": "Contato",
-    "address": "Endereço"
+    "address": "Endereço",
+    "hint": "Toque em um contato para ver opções · Deslize para a esquerda para enviar",
+    "hint-vo": "Toque em um contato para ver opções",
+    "search-contacts": "Buscar por nome ou endereço",
+    "new-contact": "Novo contato",
+    "edit-contact": "Editar contato",
+    "name": "Nome",
+    "name-placeholder": "Nome",
+    "address-placeholder": "Endereço Zcash",
+    "send": "Enviar",
+    "edit": "Editar",
+    "copied": "Copiado",
+    "address-copied": "Endereço copiado",
+    "public": "Público",
+    "delete-question": "Excluir {name}?",
+    "delete-body": "Somente o contato é removido. Os pagamentos anteriores ficam no seu histórico.",
+    "deleted": "{name} excluído",
+    "updated": "Contato atualizado",
+    "added": "{name} adicionado à sua lista de endereços",
+    "dup-name": "Você já tem um contato chamado {name}.",
+    "dup-address": "Este endereço já está na sua lista de endereços.",
+    "invalid": "Isto não é um endereço Zcash.",
+    "no-match": "Nada corresponde a “{query}”.",
+    "kind-unified": "Endereço unificado",
+    "kind-sapling": "Endereço Sapling",
+    "kind-transparent": "Endereço transparente",
+    "kind-tex": "Endereço TEX",
+    "back-acc": "Voltar"
   },
   "change-privacy-legend": ".\nToque para revelar os valores ocultos.",
   "txtcopied": "Texto copiado para a Área de Transferência",
@@ -410,7 +424,9 @@
   },
   "seed": {
     "buttontexts": {
-      "new": ["Eu salvei \n as Frases de Recuperação"],
+      "new": [
+        "Eu salvei \n as Frases de Recuperação"
+      ],
       "change": [
         "",
         "Abrir Nova Carteira",
@@ -423,8 +439,12 @@
         "Você realmente quer \n alterar para o seu \n servidor atual",
         "Tem certeza?"
       ],
-      "view": ["Eu salvei as \n Frases de Recuperação"],
-      "restore": ["Restaurar Carteira"]
+      "view": [
+        "Eu salvei as \n Frases de Recuperação"
+      ],
+      "restore": [
+        "Restaurar Carteira"
+      ]
     },
     "title": "Frases de Recuperação",
     "new": "Novo",
