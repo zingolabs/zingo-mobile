@@ -189,3 +189,69 @@ describe('the mixnet follows the session connectivity', () => {
     backend.stopMixnetPolling();
   });
 });
+
+describe('without a device network the mixnet rests as in Offline', () => {
+  beforeEach(() => {
+    jest.useFakeTimers();
+    jest.clearAllMocks();
+    mockedBridge.attachMixnet.mockResolvedValue(
+      mixnetStatusPayload('ready', '127.0.0.1:1080'),
+    );
+    mockedBridge.disableMixnet.mockResolvedValue(mixnetStatusPayload('off'));
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  it('tears the tunnel down and reads off when the network goes', async () => {
+    const { backend, start, stop, published } = harness(ONLINE);
+    await backend.configure();
+    await flushPromises();
+
+    await backend.networkChanged(false);
+    await flushPromises();
+    await jest.advanceTimersByTimeAsync(5 * 60_000);
+
+    expect(start).toHaveBeenCalledTimes(1);
+    expect(stop).toHaveBeenCalledTimes(1);
+    expect(published[published.length - 1].statusKey).toBe('mixnet.status.off');
+    backend.stopMixnetPolling();
+  });
+
+  it('a configure or a re-enable without network never arms it', async () => {
+    const { backend, start, published } = harness(ONLINE);
+
+    await backend.networkChanged(false);
+    await backend.configure();
+    await backend.reenableMixnet();
+    await flushPromises();
+
+    expect(start).not.toHaveBeenCalled();
+    expect(published[published.length - 1].statusKey).toBe('mixnet.status.off');
+    backend.stopMixnetPolling();
+  });
+
+  it('arms it again when the network is back', async () => {
+    const { backend, start } = harness(ONLINE);
+    await backend.networkChanged(false);
+    await backend.configure();
+    await flushPromises();
+
+    await backend.networkChanged(true);
+    await flushPromises();
+
+    expect(start).toHaveBeenCalledTimes(1);
+    backend.stopMixnetPolling();
+  });
+
+  it('the network coming back leaves an Offline session off', async () => {
+    const { backend, start } = harness(OFFLINE);
+    await backend.networkChanged(false);
+    await backend.networkChanged(true);
+    await flushPromises();
+
+    expect(start).not.toHaveBeenCalled();
+    backend.stopMixnetPolling();
+  });
+});
