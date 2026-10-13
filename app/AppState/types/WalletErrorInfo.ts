@@ -1,17 +1,27 @@
 import { ChainNameEnum } from '@app/AppState/enums/ChainNameEnum';
 import { RouteEnum } from '@app/AppState/enums/RouteEnum';
 
-// The step a failed init reruns, carrying what the rerun needs.
-export type InitStep =
+/**
+ * The wallet action that failed, carrying what a rerun needs.
+ */
+export type Step =
+  | { kind: 'open' }
   | { kind: 'create' }
   | { kind: 'restore'; seedUfvk: string; birthday: number; origin: RouteEnum };
 
-// 'chain': the wallet is on another network than the server it would open on.
-// 'init': a create or restore failed on its connection to the server.
-export type WalletErrorInfo =
-  | { kind: 'open'; details: string }
-  | { kind: 'server'; details: string }
-  | { kind: 'chain'; details: string; walletChain: ChainNameEnum }
-  | { kind: 'init'; details: string; step: InitStep };
+export type InitStep = Exclude<Step, { kind: 'open' }>;
 
-export type WalletErrorKind = WalletErrorInfo['kind'];
+/**
+ * Why the step failed, by what the user can change about it: the server,
+ * the seed or viewing key, the birthday, the wallet file on disk, or the
+ * network the server is on. 'unknown' is everything else.
+ */
+export type Cause =
+  | { kind: 'connection' }
+  | { kind: 'key' }
+  | { kind: 'birthday' }
+  | { kind: 'file' }
+  | { kind: 'chain'; walletChain: ChainNameEnum }
+  | { kind: 'unknown' };
+
+export type WalletErrorInfo = { cause: Cause; step: Step; details: string };

@@ -27,13 +27,13 @@ jest.mock('@app/services/createAlert', () => ({ createAlert: jest.fn() }));
 jest.mock('@app/services/sendEmail', () => ({ sendEmail: jest.fn() }));
 
 const initError: WalletErrorInfo = {
-  kind: 'init',
-  details: 'transport error',
+  cause: { kind: 'connection' },
   step: { kind: 'create' },
+  details: 'transport error',
 };
 
 const restoreError: WalletErrorInfo = {
-  kind: 'init',
+  cause: { kind: 'connection' },
   details: 'transport error',
   step: {
     kind: 'restore',
@@ -241,11 +241,19 @@ test('Tests that an open retry holds its dots for the minimum time when it fails
   app.state = {
     ...app.state,
     screen: RouteEnum.WalletError,
-    walletError: { kind: 'server', details: 'transport error' },
+    walletError: {
+      cause: { kind: 'connection' },
+      step: { kind: 'open' },
+      details: 'transport error',
+    },
   };
   loadExistingWalletOnBoot.mockResolvedValue({
     kind: 'error',
-    error: { kind: 'server', details: 'transport error' },
+    error: {
+      cause: { kind: 'connection' },
+      step: { kind: 'open' },
+      details: 'transport error',
+    },
   });
 
   const retried = app.retryWalletError();

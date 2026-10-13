@@ -203,6 +203,15 @@ wallet, or restore one from a key. A failed step is kept with the error
 so the screen can run it again.
 _Avoid_: action (names what the screen hands back), loader (the code)
 
+**Cause**:
+Why a step failed, by what the user can change about it: the server,
+the key, the birthday, the wallet file, or the network the server is
+on. It comes
+from the FFI error code; the message text decides only when the code
+says nothing. The screen's head follows the cause, and the step when the cause is
+unknown; its buttons follow the step.
+_Avoid_: kind, type, reason
+
 **Retry**:
 The error screen running its failed step again, or moving the server to
 the wallet's chain and opening. One owner begins it and settles it.
