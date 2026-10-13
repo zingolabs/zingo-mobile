@@ -128,22 +128,22 @@ test('Tests that a create failing on the connection becomes an error that retrie
   }
 });
 
-test('Tests that a restore whose key the server refused lands on the screen and says nothing on a retry', () => {
-  const outcome = failedOutcome(restore, {
-    code: 'InitKey',
-    text: 'Mnemonic error. invalid checksum',
+test('Tests that a key or birthday the form let through keeps the alert with its report button', () => {
+  expect(
+    failedOutcome(restore, {
+      code: 'InitKey',
+      text: 'Mnemonic error. invalid checksum',
+    }),
+  ).toEqual({
+    kind: 'alert',
+    origin: RouteEnum.ImportUfvk,
+    labelKey: 'loadingapp.readingwallet-label',
+    error: 'Mnemonic error. invalid checksum',
   });
-  expect(outcome).toEqual({
-    kind: 'error',
-    error: {
-      cause: { kind: 'key' },
-      step: restore,
-      details: 'Mnemonic error. invalid checksum',
-    },
-  });
-  if (outcome.kind === 'error') {
-    expect(againOf(outcome.error)).toEqual({ kind: 'quiet' });
-  }
+  expect(
+    failedOutcome(restore, { code: 'InitBirthday', text: 'below sapling' })
+      .kind,
+  ).toBe('alert');
 });
 
 test('Tests that a create or restore failing for no known cause lands on the screen and names its step on a retry', () => {
@@ -186,14 +186,9 @@ test('Tests that a restore failing on the wallet file becomes the alert that ret
 });
 
 test('Tests that a message naming the network no longer decides when the code names the key', () => {
-  const outcome = failedOutcome(restore, {
-    code: 'InitKey',
-    text: 'ufvk network mismatch',
-  });
-  expect(outcome.kind).toBe('error');
-  if (outcome.kind === 'error') {
-    expect(outcome.error.cause).toEqual({ kind: 'key' });
-  }
+  const failed = { code: 'InitKey', text: 'ufvk network mismatch' } as const;
+  expect(causeOf(failed)).toEqual({ kind: 'key' });
+  expect(failedOutcome(restore, failed).kind).toBe('alert');
 });
 
 test('Tests that a wallet on disk retries by opening whatever its cause', () => {

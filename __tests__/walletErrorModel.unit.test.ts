@@ -42,23 +42,6 @@ test('Tests that a create that could not reach the server reads as a server erro
   });
 });
 
-test('Tests that a restore whose key the server refused names the key and only goes back', () => {
-  const model = errorScreen(
-    { cause: { kind: 'key' }, step: restore, details: 'Mnemonic error' },
-    testnet,
-  );
-  expect(model.icon).toBe('wallet');
-  expect(model.title).toEqual({ kind: 'plain', key: 'walleterror.key-title' });
-  expect(model.sub).toEqual({ kind: 'plain', key: 'walleterror.key-sub' });
-  expect(model.primary).toEqual({
-    label: { kind: 'plain', key: 'walleterror.back' },
-    action: { kind: 'back' },
-    testID: 'walleterror.back',
-  });
-  expect(model.top).toEqual({ kind: 'none' });
-  expect(model.bottom).toEqual({ kind: 'none' });
-});
-
 test('Tests that a wallet on disk keeps Open, Import and Create whatever its cause', () => {
   const causes = [
     { kind: 'unknown' },
@@ -140,21 +123,6 @@ test('Tests that the host line is empty when the server is offline', () => {
     key: 'walleterror.server-sub',
     host: '',
   });
-});
-
-test('Tests that a birthday the server refused names the birthday and only goes back', () => {
-  const model = errorScreen(
-    { cause: { kind: 'birthday' }, step: restore, details: 'below sapling' },
-    testnet,
-  );
-  expect(model.icon).toBe('wallet');
-  expect(model.title).toEqual({
-    kind: 'plain',
-    key: 'walleterror.birthday-title',
-  });
-  expect(model.primary.action).toEqual({ kind: 'back' });
-  expect(model.top).toEqual({ kind: 'none' });
-  expect(model.bottom).toEqual({ kind: 'none' });
 });
 
 test('Tests that a create or restore failing for no known cause names its step and offers Retry and Back', () => {

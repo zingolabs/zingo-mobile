@@ -1,6 +1,6 @@
 import { ChainNameEnum } from '@app/AppState/enums/ChainNameEnum';
 import ServerType from '@app/AppState/types/ServerType';
-import { Cause, WalletErrorInfo } from '@app/AppState/types/WalletErrorInfo';
+import { WalletErrorInfo } from '@app/AppState/types/WalletErrorInfo';
 
 export type Text =
   | { kind: 'plain'; key: string }
@@ -98,24 +98,14 @@ const head = ({ cause, step }: WalletErrorInfo, server: ServerType): Head => {
         host('walleterror.server-title', server),
         host('walleterror.server-sub', server),
       );
-    case 'key':
-      return bang(
-        'wallet',
-        plain('walleterror.key-title'),
-        plain('walleterror.key-sub'),
-      );
-    case 'birthday':
-      return bang(
-        'wallet',
-        plain('walleterror.birthday-title'),
-        plain('walleterror.birthday-sub'),
-      );
     case 'file':
       return bang(
         'wallet',
         plain('walleterror.file-title'),
         plain('walleterror.file-sub'),
       );
+    case 'key':
+    case 'birthday':
     case 'unknown':
       return bang(
         'wallet',
@@ -151,22 +141,13 @@ const diskActions: Actions = {
 };
 
 /**
- * A create or restore runs again, or goes back to where it started. A key
- * or birthday the server refused only goes back: running it again cannot
- * help.
+ * A create or restore runs again, or goes back to where it started.
  */
-const initActions = (cause: Cause): Actions =>
-  cause.kind === 'key' || cause.kind === 'birthday'
-    ? {
-        primary: button('walleterror.back', { kind: 'back' }),
-        top: none,
-        bottom: none,
-      }
-    : {
-        primary: button('walleterror.retry', { kind: 'retry' }),
-        top: none,
-        bottom: slot('walleterror.back', { kind: 'back' }, 13.5),
-      };
+const initActions: Actions = {
+  primary: button('walleterror.retry', { kind: 'retry' }),
+  top: none,
+  bottom: slot('walleterror.back', { kind: 'back' }, 13.5),
+};
 
 /**
  * A network mismatch is fixed by a server on the wallet's network; Import
@@ -194,7 +175,7 @@ const actions = (error: WalletErrorInfo, server: ServerType): Actions => {
       return diskActions;
     case 'create':
     case 'restore':
-      return initActions(error.cause);
+      return initActions;
   }
 };
 

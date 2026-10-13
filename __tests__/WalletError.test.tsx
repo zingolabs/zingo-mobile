@@ -176,26 +176,3 @@ test('Tests that Send report hands the host the translated title as the subject'
     subject: "Can't connect to the server",
   });
 });
-
-test('Tests that a key the server refused names the key and offers only Back', () => {
-  const onAction = mount(
-    {
-      cause: { kind: 'key' },
-      step: {
-        kind: 'restore',
-        seedUfvk: 'abandon',
-        birthday: 0,
-        origin: RouteEnum.ImportUfvk,
-      },
-      details: 'Mnemonic error',
-    },
-    {},
-    translateEn,
-    testnet,
-  );
-  expect(screen.getByText("The key isn't valid")).toBeOnTheScreen();
-  expect(screen.queryByTestId('walleterror.retry')).toBeNull();
-  expect(screen.queryByTestId('walleterror.import')).toBeNull();
-  fireEvent.press(screen.getByText('Back'));
-  expect(onAction).toHaveBeenCalledWith({ kind: 'back' });
-});

@@ -101,16 +101,17 @@ const initLabelKey = (step: InitStep): string => {
 
 /**
  * The causes the screen has something to offer a create or restore: another
- * server, another key, another birthday, or a retry and a report when the
- * cause is unknown. A file or chain failure keeps the alert.
+ * server, or a retry and a report when the cause is unknown. A key or
+ * birthday the form let through is a bug, and a file or chain failure has
+ * no fix there: those keep the alert with its report button.
  */
 const screenOffers = (cause: Cause): boolean => {
   switch (cause.kind) {
     case 'connection':
-    case 'key':
-    case 'birthday':
     case 'unknown':
       return true;
+    case 'key':
+    case 'birthday':
     case 'file':
     case 'chain':
       return false;
@@ -147,8 +148,8 @@ export const failedOutcome = (step: Step, failed: Failed): LoadOutcome => {
 export const retryOf = (error: WalletErrorInfo): Retry => error.step;
 
 /**
- * What a retry that failed again says. A cause whose screen offers no
- * retry, and a chain mismatch, say nothing: the title already does.
+ * What a retry that failed again says. A chain mismatch says nothing: the
+ * title already does.
  */
 export type Again = { kind: 'say'; key: string } | { kind: 'quiet' };
 
@@ -158,10 +159,10 @@ export const againOf = ({ cause, step }: WalletErrorInfo): Again => {
       return { kind: 'say', key: 'walleterror.still-server' };
     case 'file':
       return { kind: 'say', key: 'walleterror.still-open' };
-    case 'unknown':
-      return { kind: 'say', key: `walleterror.still-${step.kind}` };
     case 'key':
     case 'birthday':
+    case 'unknown':
+      return { kind: 'say', key: `walleterror.still-${step.kind}` };
     case 'chain':
       return { kind: 'quiet' };
   }
