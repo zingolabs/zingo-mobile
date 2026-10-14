@@ -1,6 +1,6 @@
 import type { NavigatorScreenParams } from '@react-navigation/native';
-import type { ScanTexts } from '@ui/widgets/ScanOverlay';
 import type { RevealOrigin } from '@ui/widgets/CircularReveal';
+import type { Request } from '@app/navigation/results';
 import {
   AddressKindEnum,
   ChainNameEnum,
@@ -148,14 +148,31 @@ export type AddressBookNavigationState = {
 
 export type AddressListNavigationState = {
   addressKind: AddressKindEnum;
-  setIndex: (n: number) => void;
+  // The chosen index is delivered under this request.
+  request: Request;
+};
+
+// Which codes the scanner takes: any, a Zcash address or URI on a chain, or
+// an address of a swap chain.
+export type ScanAccepts =
+  | { kind: 'any' }
+  | { kind: 'zcash'; chain: ChainNameEnum }
+  | { kind: 'chain'; chain: string };
+
+export type ScanRouteTexts = {
+  title: string;
+  hint: string;
+  miss: string;
+  found: string;
+  back: string;
+  torch: string;
 };
 
 export type ScannerAddressNavigationState = {
-  setAddress: (a: string) => void;
-  // What the scan is for, and its words, set by the caller.
-  accepts: (value: string) => boolean | Promise<boolean>;
-  texts: ScanTexts;
+  // The code read is delivered under this request.
+  request: Request;
+  accepts: ScanAccepts;
+  texts: ScanRouteTexts;
   // The scan button's centre, where the camera opens from.
   origin?: RevealOrigin;
 };
@@ -167,16 +184,11 @@ export type ValueTransferDetailNavigationState = {
   totalLength: number;
 };
 
+// The confirmation delivers `send.propose` on entry and `send.confirm` on
+// the button; Send, beneath it, runs the proposal and the send.
 export type ConfirmNavigationState = {
   calculatedFee: number;
   proposalPools: ProposalPoolsType;
-  confirmSend: (s: SendPageStateClass) => Promise<void>;
   sendAllAmount: boolean;
-  calculateFeeWithPropose: (
-    amount: string,
-    address: string,
-    memo: string,
-    includeUAMemo: boolean,
-  ) => Promise<void>;
   sendPageState: SendPageStateClass;
 };

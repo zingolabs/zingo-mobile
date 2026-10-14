@@ -150,9 +150,7 @@ test('N7: the send-confirmation conversions dim on a stale price too', () => {
       params: {
         calculatedFee: 0.00001,
         proposalPools: { source: ['ironwood'], destination: ['ironwood'] },
-        confirmSend: jest.fn(async () => {}),
         sendAllAmount: false,
-        calculateFeeWithPropose: jest.fn(async () => {}),
         sendPageState: mockSendPageState,
       },
     },

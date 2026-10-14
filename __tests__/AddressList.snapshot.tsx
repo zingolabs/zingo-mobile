@@ -28,7 +28,7 @@ function makeDrawerProps(
       name: RouteEnum.AddressList,
       params: {
         addressKind: ak,
-        setIndex: jest.fn(),
+        request: 'receive.addressIndex',
       },
     },
   };

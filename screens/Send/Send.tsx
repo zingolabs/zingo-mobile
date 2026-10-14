@@ -82,6 +82,7 @@ import {
   settleSend,
 } from '@app/walletBackend/transforms/sendSettlement';
 import Utils from '@app/utils';
+import { useResult } from '@app/navigation/results';
 import {
   fiatEligible,
   fiatQuote,
@@ -966,22 +967,33 @@ const Send: React.FunctionComponent<SendProps> = () => {
 
   // The shared scanner opens from the scan button and takes a Zcash
   // address or a zcash: URI; a bare address goes in as a URI.
+  useResult('send.address', a =>
+    updateToField(
+      a.toLowerCase().startsWith(GlobalConst.zcash) || a.includes(':')
+        ? a
+        : GlobalConst.zcash + a,
+      null,
+      null,
+      null,
+      null,
+    ),
+  );
+  // The confirmation screen, beneath which this form keeps its state, asks
+  // for the proposal on entry and for the send on its button.
+  useResult('send.propose', () =>
+    calculateFeeWithPropose(
+      amountText,
+      addressText,
+      memoText,
+      includeUAMemoBoolean,
+    ),
+  );
+  useResult('send.confirm', () => confirmSend(buildSendState()));
   const setQrcodeModalShow = () => {
     const open = (origin?: { x: number; y: number }) =>
       navigation.navigate(RouteEnum.ScannerAddress, {
-        setAddress: (a: string) =>
-          updateToField(
-            a.toLowerCase().startsWith(GlobalConst.zcash) || a.includes(':')
-              ? a
-              : GlobalConst.zcash + a,
-            null,
-            null,
-            null,
-            null,
-          ),
-        accepts: async (v: string) =>
-          v.toLowerCase().startsWith(GlobalConst.zcash) ||
-          (await Utils.isValidAddress(v, server.chainName)).isValid,
+        request: 'send.address',
+        accepts: { kind: 'zcash', chain: server.chainName },
         texts: {
           title: translate('scanner.title') as string,
           hint: translate('scanner.hint-address') as string,
@@ -1044,9 +1056,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
     navigation.navigate(RouteEnum.Confirm, {
       calculatedFee: fee,
       proposalPools: proposalPools,
-      confirmSend: confirmSend,
       sendAllAmount: isSendAllAmount(amountText),
-      calculateFeeWithPropose: calculateFeeWithPropose,
       sendPageState: buildSendState(),
     });
   };

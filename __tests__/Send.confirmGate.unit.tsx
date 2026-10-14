@@ -46,7 +46,8 @@ jest.mock('@app/services/selectingServer', () => ({
 import 'react-native';
 import React from 'react';
 
-import { fireEvent, render, waitFor } from '@testing-library/react-native';
+import { act, fireEvent, render, waitFor } from '@testing-library/react-native';
+import { deliver } from '@app/navigation/results';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import Send from '@screens/Send';
@@ -140,21 +141,22 @@ const sendUi = (
   );
 };
 
-// Presses Send on a valid form and returns the handler that the Confirm
-// screen received.
+// Presses Send on a valid form and returns what the Confirm screen's button
+// does: deliver the confirmation to the form beneath it.
 const openConfirmScreen = async (view: ReturnType<typeof render>) => {
   const sendButton = await waitFor(() => view.getByTestId('send.button'));
   fireEvent.press(sendButton);
-  const confirmCall = await waitFor(() => {
+  await waitFor(() => {
     const call = navigate.mock.calls.find(
       ([route]) => route === RouteEnum.Confirm,
     );
     expect(call).toBeDefined();
-    return call;
   });
-  return confirmCall[1].confirmSend as (
-    state: SendPageStateClass,
-  ) => Promise<void>;
+  return async () => {
+    await act(async () => {
+      deliver('send.confirm', '');
+    });
+  };
 };
 
 beforeEach(() => {
@@ -189,7 +191,7 @@ describe('Send confirm send permit', () => {
         addLastSnackbar,
       ),
     );
-    await confirmSend(sendPageState);
+    await confirmSend();
 
     expect(sendTransaction).not.toHaveBeenCalled();
     expect(addLastSnackbar).toHaveBeenCalledWith('send.nym-blocked');
@@ -208,7 +210,7 @@ describe('Send confirm send permit', () => {
         addLastSnackbar,
       ),
     );
-    await confirmSend(sendPageState);
+    await confirmSend();
 
     expect(sendTransaction).not.toHaveBeenCalled();
     expect(addLastSnackbar).toHaveBeenCalledWith('loadedapp.connection-error');
@@ -227,7 +229,7 @@ describe('Send confirm send permit', () => {
         addLastSnackbar,
       ),
     );
-    await confirmSend(sendPageState);
+    await confirmSend();
 
     expect(sendTransaction).not.toHaveBeenCalled();
     expect(addLastSnackbar).toHaveBeenCalledWith('loadedapp.connection-error');
@@ -253,7 +255,7 @@ describe('Send confirm send permit', () => {
     );
     const confirmSend = await openConfirmScreen(view);
 
-    await confirmSend(sendPageState);
+    await confirmSend();
 
     expect(setServerOption).toHaveBeenCalledWith(
       remoteServer(other.uri, other.chainName),
@@ -276,7 +278,7 @@ describe('Send confirm send permit', () => {
     const view = render(sendUi(online, sendTransaction, jest.fn()));
     const confirmSend = await openConfirmScreen(view);
 
-    await confirmSend(sendPageState);
+    await confirmSend();
 
     expect(sendTransaction).toHaveBeenCalledTimes(1);
     expect(navigate).toHaveBeenLastCalledWith(RouteEnum.Computing, {
@@ -291,7 +293,7 @@ describe('Send confirm send permit', () => {
     const confirmSend = await openConfirmScreen(view);
 
     expect(view.queryByTestId('send.mixnet-blocked')).toBeNull();
-    await confirmSend(sendPageState);
+    await confirmSend();
 
     expect(sendTransaction).toHaveBeenCalledTimes(1);
   });

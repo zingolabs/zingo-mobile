@@ -12,6 +12,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCheck, faXmark } from '@fortawesome/free-solid-svg-icons';
 
 import { ContextAppLoaded } from '@app/context';
+import { Request, useResult } from '@app/navigation/results';
 import ErrorText from '@ui/primitives/ErrorText';
 import RegText from '@ui/primitives/RegText';
 import { validateAddressForChain } from '@app/swap';
@@ -33,6 +34,8 @@ type TextInputAddressProps = {
   // useNavigation's context is lost), pass the navigation prop from the host
   // screen so the QR button can navigate to ScannerAddress reliably.
   navigation?: NavigationProp<ParamListBase>;
+  // The request the scanner answers with the code it read.
+  scanRequest: Request;
 };
 const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
   address,
@@ -45,6 +48,7 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
   // at a single Drawer-level route so a direct navigate works everywhere.
   navigation: navigationProp,
   swapChain,
+  scanRequest,
 }) => {
   const hookNavigation = useNavigation<NavigationProp<ParamListBase>>();
   const navigation = navigationProp ?? hookNavigation;
@@ -78,15 +82,25 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
     };
   }, [address, server.chainName, swapChain, setError, translate]);
 
+  useResult(scanRequest, a => setAddress(a));
+  // The scanner lives at the root, so a direct navigate works from any
+  // caller. A swap chain's address is checked by its own format.
   const setQrcodeModalShow = () => {
-    // ScannerAddress is a top-level (root Stack) screen, so a direct navigate
-    // works from any caller (Receive, Send, etc.) regardless of which stack
-    // they live in.
+    const chain = swapChain ?? GlobalConst.zecSwapChain;
     navigation.navigate(RouteEnum.ScannerAddress, {
-      setAddress: (a: string) => setAddress(a),
-      active: true,
-      // Non-ZEC chains take the scanned string verbatim (no `zcash:` prefix).
-      raw: (swapChain ?? GlobalConst.zecSwapChain) !== GlobalConst.zecSwapChain,
+      request: scanRequest,
+      accepts:
+        chain === GlobalConst.zecSwapChain
+          ? { kind: 'zcash', chain: server.chainName }
+          : { kind: 'chain', chain },
+      texts: {
+        title: translate('scanner.title') as string,
+        hint: translate('scanner.hint-address') as string,
+        miss: translate('scanner.miss-address') as string,
+        found: translate('scanner.found') as string,
+        back: translate('scanner.back') as string,
+        torch: translate('scanner.torch') as string,
+      },
     });
   };
 
