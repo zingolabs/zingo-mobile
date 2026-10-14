@@ -89,7 +89,6 @@ export type AppDrawerParamList = {
   [RouteEnum.Server]: undefined;
   [RouteEnum.About]: undefined;
   [RouteEnum.MixnetDoctor]: undefined;
-  [RouteEnum.Rescan]: undefined;
   [RouteEnum.Insight]: undefined;
   [RouteEnum.Computing]: ComputingEnd | undefined;
   [RouteEnum.SyncReport]: undefined;

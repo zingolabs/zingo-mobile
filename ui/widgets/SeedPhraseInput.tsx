@@ -328,6 +328,14 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
     }
   }, [ufvk]);
 
+  /** Emptied from outside, the text read before goes too: the same phrase or key pastes again. */
+  useEffect(() => {
+    if (!value) {
+      consumedRef.current = '';
+      nativeRef.current = '';
+    }
+  }, [value]);
+
   // The 24th word that breaks the checksum shakes the field once. A
   // viewing key only turns red.
   useEffect(() => {

@@ -49,7 +49,7 @@ describe('Component SyncReport - test', () => {
   test('SyncReport - snapshot', () => {
     const sync = render(
       <ContextAppLoadedProvider value={state}>
-        <SyncReport {...props} />
+        <SyncReport {...props} doRescan={jest.fn()} />
       </ContextAppLoadedProvider>,
     );
     expect(sync.toJSON()).toMatchSnapshot();
