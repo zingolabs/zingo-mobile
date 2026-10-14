@@ -93,7 +93,6 @@
     "added": "{name} añadido a tu libreta de direcciones",
     "dup-name": "Ya tienes un contacto llamado {name}.",
     "dup-address": "Esta dirección ya está en tu libreta de direcciones.",
-    "invalid": "Esto no es una dirección de Zcash.",
     "no-match": "Nada coincide con “{query}”.",
     "kind-unified": "Dirección unificada",
     "kind-sapling": "Dirección Sapling",

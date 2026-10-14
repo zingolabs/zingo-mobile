@@ -93,7 +93,6 @@
     "added": "{name} added to your address book",
     "dup-name": "You already have a contact called {name}.",
     "dup-address": "This address is already in your address book.",
-    "invalid": "This isn’t a Zcash address.",
     "no-match": "Nothing matches “{query}”.",
     "kind-unified": "Unified address",
     "kind-sapling": "Sapling address",

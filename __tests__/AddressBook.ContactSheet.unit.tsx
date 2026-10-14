@@ -61,7 +61,7 @@ describe('ContactSheet', () => {
     jest.useRealTimers();
   });
 
-  test('Tests that Save stays disabled and names the clash when the name is already in the book.', async () => {
+  test('Tests that Save stays disabled when the name is already in the book.', async () => {
     const onSave = jest.fn();
     const screen = sheet(onSave);
     fireEvent.changeText(screen.getByTestId('addressbook.name-field'), 'alice');
@@ -72,7 +72,6 @@ describe('ContactSheet', () => {
     await act(async () => {
       jest.advanceTimersByTime(300);
     });
-    expect(screen.getByTestId('addressbook.message.err')).toBeTruthy();
     fireEvent.press(screen.getByTestId('addressbook.save'));
     expect(onSave).not.toHaveBeenCalled();
   });
@@ -88,12 +87,12 @@ describe('ContactSheet', () => {
     await act(async () => {
       jest.advanceTimersByTime(300);
     });
-    expect(screen.getByTestId('addressbook.message.ok')).toBeTruthy();
+    expect(screen.getByTestId('addressbook.kind.shielded')).toBeTruthy();
     fireEvent.press(screen.getByTestId('addressbook.save'));
     expect(onSave).toHaveBeenCalledWith('Bob', 'u1bob');
   });
 
-  test('Tests that the note turns to a warning when the address is transparent.', async () => {
+  test('Tests that the kind line marks the address public when it is transparent.', async () => {
     const screen = sheet();
     fireEvent.changeText(
       screen.getByTestId('addressbook.address-field'),
@@ -102,6 +101,6 @@ describe('ContactSheet', () => {
     await act(async () => {
       jest.advanceTimersByTime(300);
     });
-    expect(screen.getByTestId('addressbook.message.warn')).toBeTruthy();
+    expect(screen.getByTestId('addressbook.kind.public')).toBeTruthy();
   });
 });

@@ -93,7 +93,6 @@
     "added": "{name} adres defterinize eklendi",
     "dup-name": "{name} adlı bir kişiniz zaten var.",
     "dup-address": "Bu adres zaten adres defterinizde.",
-    "invalid": "Bu bir Zcash adresi değil.",
     "no-match": "“{query}” ile eşleşen bir şey yok.",
     "kind-unified": "Birleşik adres",
     "kind-sapling": "Sapling adresi",
