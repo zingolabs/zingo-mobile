@@ -138,7 +138,7 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
                 style={{ marginRight: 10 }}
                 size={20}
                 icon={faXmark}
-                color={colors.fgAccentDisabled}
+                color={colors.fgMuted}
               />
             </TouchableOpacity>
           )}

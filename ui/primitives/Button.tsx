@@ -75,6 +75,7 @@ const Button: React.FunctionComponent<ButtonProps> = ({
               ? {
                   backgroundColor: 'transparent',
                   minHeight: 38,
+                  width: twoButtons ? '40%' : undefined,
                 }
               : type === ButtonTypeEnum.Nym
                 ? {

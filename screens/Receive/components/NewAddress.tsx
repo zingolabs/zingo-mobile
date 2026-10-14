@@ -266,7 +266,7 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
           }}
         >
           <Button
-            type={ButtonTypeEnum.Secondary}
+            type={ButtonTypeEnum.Link}
             title={translate('cancel') as string}
             onPress={() => {
               setLabel('');
