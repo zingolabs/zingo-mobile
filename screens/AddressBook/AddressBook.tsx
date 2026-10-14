@@ -14,6 +14,7 @@ import Clipboard from '@react-native-clipboard/clipboard';
 
 import { useTheme } from '@app/theme';
 import {
+  ScreenEnum,
   AddressBookFileClass,
   GlobalConst,
   RouteEnum,
@@ -28,7 +29,7 @@ import { isWalletAddress } from '@app/walletBackend';
 import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
 import Utils from '@app/utils';
 import AppSheetModal from '@ui/primitives/AppSheetModal';
-import MenuHeader from '@ui/widgets/MenuHeader';
+import Header from '@ui/widgets/Header';
 import { ChevronDown, ChevronLeft } from '@ui/primitives/Icons/Chevron';
 import { SearchIcon } from '@ui/primitives/Icons/SearchIcon';
 import { XIcon } from '@ui/primitives/Icons/XIcon';
@@ -238,7 +239,15 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
       testID="addressbook"
       style={{ flex: 1, backgroundColor: colors.bgCanvas, paddingTop: 4 }}
     >
-      <MenuHeader />
+      <Header
+        title={''}
+        screenName={ScreenEnum.AddressBook}
+        noBalance={true}
+        noSyncingStatus={true}
+        noDrawMenu={true}
+        noPrivacy={true}
+        noUfvkIcon={true}
+      />
       <View
         style={{
           height: 44,
