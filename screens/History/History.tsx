@@ -34,7 +34,7 @@ import {
   //ServerType,
   ValueTransferType,
 } from '@app/AppState';
-import { HomeTabScreenProps, WalletNavigation } from '@app/types';
+import { HomeTabNavigation, HomeTabScreenProps } from '@app/types';
 import FadeText from '@ui/primitives/FadeText';
 import BoldText from '@ui/primitives/BoldText';
 import AppSheet from '@ui/primitives/AppSheet';
@@ -77,7 +77,7 @@ const ViewTypes = {
 type HistoryProps = HomeTabScreenProps<'History'>;
 
 const History: React.FunctionComponent<HistoryProps> = () => {
-  const navigation = useNavigation<WalletNavigation>();
+  const navigation = useNavigation<HomeTabNavigation<'History'>>();
   const context = useContext(ContextAppLoaded);
   const {
     setScrollToTop,
@@ -579,6 +579,17 @@ const History: React.FunctionComponent<HistoryProps> = () => {
       setScrollToTop(false);
     }
   }, [scrollToTop, handleScrollToTop, setScrollToTop]);
+
+  // A press on the tab while it is open scrolls the list to the top.
+  useEffect(
+    () =>
+      navigation.addListener('tabPress', event => {
+        if (navigation.isFocused() && !event.defaultPrevented) {
+          handleScrollToTop();
+        }
+      }),
+    [navigation, handleScrollToTop],
+  );
 
   const handleScroll = useCallback(
     (_rawEvent: ScrollEvent, _offsetX: number, offsetY: number) => {

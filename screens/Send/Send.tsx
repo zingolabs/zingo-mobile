@@ -30,7 +30,7 @@ import {
   faXmark,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useScrollToTop } from '@react-navigation/native';
 import { useTheme } from '@app/theme';
 import { ScanIcon } from '@ui/primitives/Icons/ScanIcon';
 import { getNumberFormatSettings } from 'react-native-localize';
@@ -210,6 +210,8 @@ const Send: React.FunctionComponent<SendProps> = () => {
   const [priceRowH, setPriceRowH] = useState<number>(0);
 
   const scrollViewRef = useRef<ScrollView>(null);
+  // A press on the tab while it is open scrolls the form to the top.
+  useScrollToTop(scrollViewRef);
   // The user asked for the whole balance: MAX sets it, typing in the amount
   // field clears it. A send-all proposal can come back with less than the
   // figure MAX offered — the change output the send path always writes costs

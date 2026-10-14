@@ -10,6 +10,7 @@ export type {
   AppDrawerParamList,
   WalletNavigation,
   HomeTabScreenProps,
+  HomeTabNavigation,
   LoadedAppNavigationState,
   CardRect,
   SeedBackupEntry,

@@ -226,3 +226,7 @@ export type HomeTabScreenProps<T extends keyof HomeTabParamList> =
       NativeStackScreenProps<RootParamList>
     >
   >;
+
+// What `useNavigation()` gives inside a home tab: the tab events too.
+export type HomeTabNavigation<T extends keyof HomeTabParamList> =
+  HomeTabScreenProps<T>['navigation'];
