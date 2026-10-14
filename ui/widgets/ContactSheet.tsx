@@ -10,6 +10,7 @@ import { AddressBookFileClass, ChainNameEnum, RouteEnum } from '@app/AppState';
 import { ContextAppLoaded } from '@app/context';
 import { isZnsAlias, resolveZnsName } from '@app/uris/resolveZnsName';
 import Utils from '@app/utils';
+import BoldText from '@ui/primitives/BoldText';
 import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
 import ErrorText from '@ui/primitives/ErrorText';
 import FadeText from '@ui/primitives/FadeText';
@@ -23,7 +24,7 @@ const CHECK_AT = 250;
 const ZNS_AT = 500;
 
 export type ContactEdit =
-  | { kind: 'new'; preset: string }
+  | { kind: 'new'; preset: string; label: string }
   | { kind: 'edit'; contact: AddressBookFileClass };
 
 type Zns =
@@ -45,7 +46,7 @@ type ContactSheetProps = {
   onSave: (name: string, address: string) => Promise<void>;
   onCancel: () => void;
   /** The sheet is portaled, so the scanner opens through the host screen's navigation. */
-  navigation: NavigationProp<ParamListBase>;
+  navigation?: NavigationProp<ParamListBase>;
 };
 
 /** The catalog key naming a Zcash address kind, from its prefix. */
@@ -58,7 +59,8 @@ const kindKey = (address: string): string =>
         ? 'addressbook.kind-sapling'
         : 'addressbook.kind-unified';
 
-// The form of a contact: its name, the chain (always Zcash) and its address.
+// The form that adds or edits a contact anywhere in the app: its name, the
+// chain (always Zcash for now) and its address.
 const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
   edit,
   book,
@@ -70,7 +72,7 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
   const { translate } = useContext(ContextAppLoaded);
   const { colors } = useTheme();
   const [name, setName] = useState(
-    edit.kind === 'edit' ? edit.contact.label : '',
+    edit.kind === 'edit' ? edit.contact.label : edit.label,
   );
   const [address, setAddress] = useState(
     edit.kind === 'edit' ? edit.contact.address : edit.preset,
@@ -164,7 +166,7 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
   const scan = () => {
     Keyboard.dismiss();
     const open = (origin?: { x: number; y: number }) =>
-      navigation.navigate(RouteEnum.ScannerAddress, {
+      navigation?.navigate(RouteEnum.ScannerAddress, {
         setAddress: (scanned: string) => setAddress(scanned.trim()),
         accepts: () => true,
         texts: {
@@ -205,8 +207,24 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
   return (
     <View
       testID={`addressbook.sheet.${edit.kind}`}
-      style={{ paddingHorizontal: 10, paddingBottom: 5 }}
+      style={{ paddingHorizontal: 22 }}
     >
+      <BoldText
+        style={{
+          marginTop: 4,
+          textAlign: 'center',
+          fontSize: 15.5,
+          lineHeight: 21,
+        }}
+      >
+        {
+          translate(
+            edit.kind === 'edit'
+              ? 'addressbook.edit-contact'
+              : 'addressbook.new-contact',
+          ) as string
+        }
+      </BoldText>
       <View style={{ marginTop: 10 }}>
         {labelRow(
           translate('addressbook.name') as string,
@@ -357,34 +375,27 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
         )}
       </View>
 
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'center',
-          alignItems: 'center',
-          gap: 10,
-          marginTop: 20,
+      <Button
+        testID="addressbook.save"
+        type={ButtonTypeEnum.Primary}
+        title={translate('save') as string}
+        disabled={!ready || saving}
+        onPress={save}
+        fullWidth
+        style={{ marginTop: 20, minHeight: 46, borderRadius: 23 }}
+        textStyle={{ fontSize: 15 }}
+      />
+      <Button
+        testID="addressbook.cancel"
+        type={ButtonTypeEnum.Link}
+        title={translate('cancel') as string}
+        onPress={() => {
+          Keyboard.dismiss();
+          onCancel();
         }}
-      >
-        <Button
-          testID="addressbook.cancel"
-          type={ButtonTypeEnum.Secondary}
-          title={translate('cancel') as string}
-          onPress={() => {
-            Keyboard.dismiss();
-            onCancel();
-          }}
-          twoButtons={true}
-        />
-        <Button
-          testID="addressbook.save"
-          type={ButtonTypeEnum.Primary}
-          title={translate('save') as string}
-          disabled={!ready || saving}
-          onPress={save}
-          twoButtons={true}
-        />
-      </View>
+        fullWidth
+        style={{ marginTop: 8 }}
+      />
     </View>
   );
 };

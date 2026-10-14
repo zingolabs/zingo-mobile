@@ -7,9 +7,9 @@ import {
   withAppContext,
   withNavigation,
   withRpc,
-} from '../../../.storybook/storyDecorators';
-import { json } from '../../../.storybook/storyRpc';
-import { sampleContact } from '../../../.storybook/storyMocks';
+} from '../../.storybook/storyDecorators';
+import { json } from '../../.storybook/storyRpc';
+import { sampleContact } from '../../.storybook/storyMocks';
 import { ChainNameEnum } from '@app/AppState';
 
 const unified = json({
@@ -19,7 +19,7 @@ const unified = json({
 });
 
 const meta: Meta<typeof ContactSheet> = {
-  title: 'AddressBook/ContactSheet',
+  title: 'Components/ContactSheet',
   component: ContactSheet,
   decorators: [
     Story => (
@@ -32,7 +32,7 @@ const meta: Meta<typeof ContactSheet> = {
     withAppContext(),
   ],
   args: {
-    edit: { kind: 'new', preset: '' },
+    edit: { kind: 'new', preset: '', label: '' },
     book: [sampleContact],
     walletChain: ChainNameEnum.mainChainName,
     onSave: async () => {},

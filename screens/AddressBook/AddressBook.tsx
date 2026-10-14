@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, { useContext, useRef, useState } from 'react';
 import { Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import {
   NavigationProp,
@@ -27,17 +27,14 @@ import {
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
 import AddressBookFileImpl from '@app/services/AddressBookFileImpl';
-import { isWalletAddress } from '@app/walletBackend';
 import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
 import { showConfirm } from '@app/services/showConfirm';
-import Utils from '@app/utils';
 import AppSheetModal from '@ui/primitives/AppSheetModal';
-import BoldText from '@ui/primitives/BoldText';
 import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
 import Header from '@ui/widgets/Header';
 import { ChevronDown, ChevronLeft } from '@ui/primitives/Icons/Chevron';
 import ContactRow from './components/ContactRow';
-import ContactSheet, { ContactEdit } from './components/ContactSheet';
+import ContactSheet, { ContactEdit } from '@ui/widgets/ContactSheet';
 
 const SIDE = 22;
 const SOFT_INK = '#8DA0B8';
@@ -76,7 +73,6 @@ export const listedContacts = (
 // Other people's addresses: one list, actions under the tapped row, a sheet to add or edit.
 const AddressBook: React.FunctionComponent<AddressBookProps> = ({
   navigation,
-  route,
   setAddressBook,
 }) => {
   const {
@@ -94,13 +90,16 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
   /** The Send tab lives in another navigator, out of this route's typed params. */
   const rootNavigation = useNavigation<NavigationProp<ParamListBase>>();
   const walletChain = walletChainName || server.chainName;
-  const preset = route.params?.currentAddress ?? '';
 
   const [query, setQuery] = useState('');
   const [openAddress, setOpenAddress] = useState('');
   const [flashAddress, setFlashAddress] = useState('');
   const [leavingAddress, setLeavingAddress] = useState('');
-  const [edit, setEdit] = useState<ContactEdit>({ kind: 'new', preset });
+  const [edit, setEdit] = useState<ContactEdit>({
+    kind: 'new',
+    preset: '',
+    label: '',
+  });
   const [editNonce, setEditNonce] = useState(0);
   const [victim, setVictim] = useState<Victim>({ kind: 'none' });
 
@@ -120,18 +119,6 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
     contactSheet.current?.present();
   };
 
-  useEffect(() => {
-    if (preset) {
-      contactSheet.current?.present();
-    }
-  }, [preset]);
-
-  const leaveIfOpenedFor = () => {
-    if (preset && navigation.canGoBack()) {
-      navigation.goBack();
-    }
-  };
-
   const persist = async (book: AddressBookFileClass[]) => {
     const sorted = [...book].sort((a, b) => a.label.localeCompare(b.label));
     setAddressBook(sorted);
@@ -139,22 +126,14 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
   };
 
   const save = async (name: string, address: string) => {
-    if (edit.kind === 'edit') {
-      await AddressBookFileImpl.removeAddressBookItem(
-        edit.contact.label,
-        edit.contact.address,
-      );
-    }
-    const own = await isWalletAddress(address);
-    const book = await AddressBookFileImpl.writeAddressBookItem(
-      name,
-      address,
-      edit.kind === 'edit' ? edit.contact.color : Utils.generateColorList(1)[0],
-      own,
-      walletChain,
-      GlobalConst.zecSwapChain,
+    setAddressBook(
+      await AddressBookFileImpl.saveContact(
+        edit.kind === 'edit' ? edit.contact : undefined,
+        name,
+        address,
+        walletChain,
+      ),
     );
-    await persist(book);
     contactSheet.current?.dismiss();
     setOpenAddress('');
     setFlashAddress(address);
@@ -216,40 +195,6 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
       ),
     );
   };
-
-  const sheetHeader = (
-    <View
-      style={{
-        paddingTop: 8,
-        paddingBottom: 6,
-        paddingHorizontal: 16,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-      }}
-    >
-      <View style={{ width: 48 }} />
-      <BoldText
-        numberOfLines={1}
-        style={{ flex: 1, fontSize: 16, lineHeight: 28, textAlign: 'center' }}
-      >
-        {
-          translate(
-            edit.kind === 'edit'
-              ? 'addressbook.edit-contact'
-              : 'addressbook.new-contact',
-          ) as string
-        }
-      </BoldText>
-      <Pressable
-        onPress={() => contactSheet.current?.dismiss()}
-        hitSlop={8}
-        style={{ paddingHorizontal: 14, paddingVertical: 4 }}
-      >
-        <FontAwesomeIcon icon={faXmark} size={20} color={colors.fgMuted} />
-      </Pressable>
-    </View>
-  );
 
   const emptyLine =
     query.trim().length > 0
@@ -442,17 +387,17 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
           testID="addressbook.new"
           type={ButtonTypeEnum.Primary}
           title={translate('addressbook.new-contact') as string}
-          onPress={() => openContact({ kind: 'new', preset: '' })}
+          onPress={() => openContact({ kind: 'new', preset: '', label: '' })}
         />
       </View>
 
       <AppSheetModal
         ref={contactSheet}
-        header={sheetHeader}
+        handle
         contentStyle={{
-          paddingBottom: keyboardHeight > 0 ? keyboardHeight + 20 : 30,
+          paddingBottom:
+            keyboardHeight > 0 ? keyboardHeight + 20 : insets.bottom + 24,
         }}
-        onDismiss={leaveIfOpenedFor}
       >
         <ContactSheet
           key={`contact-${editNonce}`}

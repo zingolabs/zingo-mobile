@@ -144,6 +144,7 @@ import ValueTransferDetail from '@screens/ValueTransferDetail';
 import Confirm from '@screens/Confirm';
 import { AppStackParamList } from '@app/types';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { NavigationProp, ParamListBase } from '@react-navigation/native';
 import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
 import { publishReport } from '@app/services/reportDiagnostics';
 
@@ -2446,6 +2447,10 @@ export class LoadedAppClass extends Component<
                 target={this.state.addTagModalTarget}
                 setAddressBook={this.setAddressBook}
                 translate={this.state.translate}
+                navigation={
+                  (this.drawerNav ?? undefined) as
+                    NavigationProp<ParamListBase> | undefined
+                }
               />
             </BottomSheetModalProvider>
           </GestureHandlerRootView>

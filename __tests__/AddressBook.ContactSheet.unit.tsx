@@ -10,7 +10,7 @@ import {
   defaultAppContextLoaded,
 } from '@app/context';
 
-import ContactSheet from '@screens/AddressBook/components/ContactSheet';
+import ContactSheet from '@ui/widgets/ContactSheet';
 import { AddressBookFileClass, ChainNameEnum } from '@app/AppState';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 
@@ -42,7 +42,7 @@ const sheet = (onSave = jest.fn()) => {
   return render(
     <ContextAppLoadedProvider value={state}>
       <ContactSheet
-        edit={{ kind: 'new', preset: '' }}
+        edit={{ kind: 'new', preset: '', label: '' }}
         book={[alice]}
         walletChain={ChainNameEnum.mainChainName}
         onSave={onSave}
