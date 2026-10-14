@@ -87,7 +87,7 @@ describe('ContactSheet', () => {
     await act(async () => {
       jest.advanceTimersByTime(300);
     });
-    expect(screen.getByTestId('addressbook.kind.shielded')).toBeTruthy();
+    expect(screen.getByTestId('addressbook.note.ok')).toBeTruthy();
     fireEvent.press(screen.getByTestId('addressbook.save'));
     expect(onSave).toHaveBeenCalledWith('Bob', 'u1bob');
   });
@@ -101,6 +101,6 @@ describe('ContactSheet', () => {
     await act(async () => {
       jest.advanceTimersByTime(300);
     });
-    expect(screen.getByTestId('addressbook.kind.public')).toBeTruthy();
+    expect(screen.getByTestId('addressbook.note.warn')).toBeTruthy();
   });
 });

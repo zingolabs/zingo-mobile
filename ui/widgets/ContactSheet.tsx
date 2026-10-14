@@ -1,19 +1,25 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { Keyboard, TextInput, TouchableOpacity, View } from 'react-native';
+import Animated, {
+  ReduceMotion,
+  useAnimatedStyle,
+  useSharedValue,
+  withSequence,
+  withTiming,
+} from 'react-native-reanimated';
 import { NavigationProp, ParamListBase } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCheck, faXmark } from '@fortawesome/free-solid-svg-icons';
 
 import { useTheme } from '@app/theme';
+import { ease } from '@app/theme/motion';
 import { AddressBookFileClass, ChainNameEnum, RouteEnum } from '@app/AppState';
 import { ContextAppLoaded } from '@app/context';
 import { isZnsAlias, resolveZnsName } from '@app/uris/resolveZnsName';
 import Utils from '@app/utils';
 import BoldText from '@ui/primitives/BoldText';
 import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
-import ErrorText from '@ui/primitives/ErrorText';
-import FadeText from '@ui/primitives/FadeText';
 import RegText from '@ui/primitives/RegText';
 import { ScanIcon } from '@ui/primitives/Icons/ScanIcon';
 import ChainSelect from '@ui/widgets/ChainSelect';
@@ -22,6 +28,16 @@ const ZEC = 'ZEC';
 const NAME_MAX = 32;
 const CHECK_AT = 250;
 const ZNS_AT = 500;
+const SHAKE_MS = 60;
+const SAVE_OFF = 0.4;
+const OK_BORDER = 'rgba(20,157,5,0.6)';
+const OK_INK = '#7FD96E';
+const WARN_INK = '#E6C46A';
+const ERR_INK = '#F2878A';
+
+type Field = 'none' | 'name' | 'address';
+
+type Note = { tone: 'ok' | 'warn' | 'err'; text: string } | { tone: 'none' };
 
 export type ContactEdit =
   | { kind: 'new'; preset: string; label: string }
@@ -80,6 +96,12 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
   const [check, setCheck] = useState<Check>({ kind: 'empty' });
   const [zns, setZns] = useState<Zns>({ kind: 'none' });
   const [saving, setSaving] = useState(false);
+  const [focus, setFocus] = useState<Field>('none');
+  const [touched, setTouched] = useState(false);
+  const shake = useSharedValue(0);
+  const shakeStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: shake.value }],
+  }));
   const scanButton = useRef<View>(null);
 
   const alias = isZnsAlias(address);
@@ -147,17 +169,54 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
   const ready =
     trimmedName.length > 0 && !dupName && check.kind === 'valid' && !dupAddress;
 
+  const nameError = dupName
+    ? (translate('addressbook.dup-name') as string).replace(
+        '{name}',
+        trimmedName,
+      )
+    : '';
   const addressError =
     zns.kind === 'missing'
       ? (translate('send.znsnamenotfound') as string)
       : dupAddress
         ? (translate('addressbook.dup-address') as string)
-        : check.kind === 'invalid'
+        : check.kind === 'invalid' && touched
           ? (translate('send.invalidaddress') as string)
           : '';
   const transparent = /^t/i.test(trimmedAddress);
+  const note: Note = nameError
+    ? { tone: 'err', text: nameError }
+    : addressError
+      ? { tone: 'err', text: addressError }
+      : check.kind === 'valid'
+        ? {
+            tone: transparent ? 'warn' : 'ok',
+            text: translate(kindKey(trimmedAddress)) as string,
+          }
+        : { tone: 'none' };
+  const noteInk = { ok: OK_INK, warn: WARN_INK, err: ERR_INK };
+
+  const border = (field: Field, bad: boolean, good: boolean): string =>
+    bad
+      ? colors.bgDanger
+      : good
+        ? OK_BORDER
+        : focus === field
+          ? colors.borderFocus
+          : colors.bottomSheetBorder;
 
   const save = async () => {
+    if (!ready) {
+      setTouched(true);
+      const step = (x: number) =>
+        withTiming(x, {
+          duration: SHAKE_MS,
+          easing: ease.standard,
+          reduceMotion: ReduceMotion.System,
+        });
+      shake.value = withSequence(step(-4), step(4), step(-4), step(0));
+      return;
+    }
     Keyboard.dismiss();
     setSaving(true);
     await onSave(trimmedName, trimmedAddress);
@@ -188,22 +247,6 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
     open();
   };
 
-  const labelRow = (label: string, error: string, ok: boolean) => (
-    <View
-      style={{
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-      }}
-    >
-      <RegText>{label}</RegText>
-      {!!error && <ErrorText>{error}</ErrorText>}
-      {!error && ok && (
-        <FontAwesomeIcon icon={faCheck} color={colors.fgAccent} />
-      )}
-    </View>
-  );
-
   return (
     <View
       testID={`addressbook.sheet.${edit.kind}`}
@@ -226,16 +269,7 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
         }
       </BoldText>
       <View style={{ marginTop: 10 }}>
-        {labelRow(
-          translate('addressbook.name') as string,
-          dupName
-            ? (translate('addressbook.dup-name') as string).replace(
-                '{name}',
-                trimmedName,
-              )
-            : '',
-          false,
-        )}
+        <RegText>{translate('addressbook.name') as string}</RegText>
         <View
           style={{
             flexDirection: 'row',
@@ -244,11 +278,14 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
             marginTop: 5,
             borderWidth: 1,
             borderRadius: 12,
-            borderColor: colors.borderMuted,
+            borderColor: border('name', dupName, false),
+            backgroundColor: colors.bgCanvas,
           }}
         >
           <TextInput
             testID="addressbook.name-field"
+            onFocus={() => setFocus('name')}
+            onBlur={() => setFocus('none')}
             value={name}
             onChangeText={setName}
             maxLength={NAME_MAX}
@@ -290,22 +327,28 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
       </View>
 
       <View style={{ marginTop: 18 }}>
-        {labelRow(
-          translate('addressbook.address') as string,
-          addressError,
-          check.kind === 'valid' && !dupAddress,
-        )}
+        <RegText>{translate('addressbook.address') as string}</RegText>
         <View
           style={{
             flexDirection: 'row',
             marginTop: 5,
             borderWidth: 1,
             borderRadius: 12,
-            borderColor: colors.borderMuted,
+            borderColor: border(
+              'address',
+              !!addressError,
+              check.kind === 'valid' && !dupAddress,
+            ),
+            backgroundColor: colors.bgCanvas,
           }}
         >
           <TextInput
             testID="addressbook.address-field"
+            onFocus={() => setFocus('address')}
+            onBlur={() => {
+              setFocus('none');
+              setTouched(true);
+            }}
             value={address}
             onChangeText={text => setAddress(text.replace(/\s+/g, ''))}
             multiline
@@ -362,29 +405,47 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
             {`ZNS: ${zns.alias}`}
           </RegText>
         )}
-        {check.kind === 'valid' && !dupAddress && (
-          <FadeText
-            testID={`addressbook.kind.${transparent ? 'public' : 'shielded'}`}
-            style={{
-              marginTop: 5,
-              color: transparent ? colors.fgWarning : colors.fgMuted,
-            }}
-          >
-            {translate(kindKey(trimmedAddress)) as string}
-          </FadeText>
-        )}
+        <View
+          testID={`addressbook.note.${note.tone}`}
+          style={{
+            minHeight: 18,
+            marginTop: 6,
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 6,
+          }}
+        >
+          {note.tone === 'ok' && (
+            <FontAwesomeIcon icon={faCheck} size={11} color={OK_INK} />
+          )}
+          {note.tone !== 'none' && (
+            <RegText
+              color={noteInk[note.tone]}
+              style={{ flex: 1, fontSize: 11, lineHeight: 16 }}
+            >
+              {note.text}
+            </RegText>
+          )}
+        </View>
       </View>
 
-      <Button
-        testID="addressbook.save"
-        type={ButtonTypeEnum.Primary}
-        title={translate('save') as string}
-        disabled={!ready || saving}
-        onPress={save}
-        fullWidth
-        style={{ marginTop: 20, minHeight: 46, borderRadius: 23 }}
-        textStyle={{ fontSize: 15 }}
-      />
+      <Animated.View style={shakeStyle}>
+        <Button
+          testID="addressbook.save"
+          type={ButtonTypeEnum.Primary}
+          title={translate('save') as string}
+          disabled={saving}
+          onPress={save}
+          fullWidth
+          style={{
+            marginTop: 20,
+            minHeight: 46,
+            borderRadius: 23,
+            opacity: ready ? 1 : SAVE_OFF,
+          }}
+          textStyle={{ fontSize: 15 }}
+        />
+      </Animated.View>
       <Button
         testID="addressbook.cancel"
         type={ButtonTypeEnum.Link}

@@ -1788,61 +1788,36 @@ memo10"
       </View>
       <View
         style={
-          [
-            {
-              "alignItems": "center",
-              "borderRadius": 12,
-              "borderWidth": 1,
-              "columnGap": 8,
-              "flexDirection": "row",
-              "paddingHorizontal": 12,
-              "paddingVertical": 8,
-            },
-            {
-              "backgroundColor": "#011401",
-              "borderColor": "#888888",
-            },
-          ]
+          {
+            "alignItems": "center",
+            "backgroundColor": "#031124",
+            "borderColor": "#05234C",
+            "borderRadius": 12,
+            "borderWidth": 1,
+            "flexDirection": "row",
+            "gap": 9,
+            "height": 42,
+            "paddingHorizontal": 13,
+          }
         }
       >
-        <
-          color="#888888"
-          icon={
-            {
-              "icon": [
-                512,
-                512,
-                [
-                  128269,
-                  "search",
-                ],
-                "f002",
-                "M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376C296.3 401.1 253.9 416 208 416 93.1 416 0 322.9 0 208S93.1 0 208 0 416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z",
-              ],
-              "iconName": "magnifying-glass",
-              "prefix": "fas",
-            }
-          }
-          size={14}
-        />
         <TextInput
           autoCapitalize="none"
           autoCorrect={false}
+          onBlur={[Function]}
           onChangeText={[Function]}
+          onFocus={[Function]}
           placeholder="text translated"
-          placeholderTextColor="#888888"
+          placeholderTextColor="#6B80A0"
           spellCheck={false}
           style={
-            [
-              {
-                "flex": 1,
-                "fontSize": 14,
-                "padding": 0,
-              },
-              {
-                "color": "#c3c3c3",
-              },
-            ]
+            {
+              "color": "#c3c3c3",
+              "flex": 1,
+              "fontSize": 13.5,
+              "minWidth": 0,
+              "paddingVertical": 0,
+            }
           }
           value=""
         />
@@ -3762,61 +3737,36 @@ memo10"
       </View>
       <View
         style={
-          [
-            {
-              "alignItems": "center",
-              "borderRadius": 12,
-              "borderWidth": 1,
-              "columnGap": 8,
-              "flexDirection": "row",
-              "paddingHorizontal": 12,
-              "paddingVertical": 8,
-            },
-            {
-              "backgroundColor": "#011401",
-              "borderColor": "#888888",
-            },
-          ]
+          {
+            "alignItems": "center",
+            "backgroundColor": "#031124",
+            "borderColor": "#05234C",
+            "borderRadius": 12,
+            "borderWidth": 1,
+            "flexDirection": "row",
+            "gap": 9,
+            "height": 42,
+            "paddingHorizontal": 13,
+          }
         }
       >
-        <
-          color="#888888"
-          icon={
-            {
-              "icon": [
-                512,
-                512,
-                [
-                  128269,
-                  "search",
-                ],
-                "f002",
-                "M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376C296.3 401.1 253.9 416 208 416 93.1 416 0 322.9 0 208S93.1 0 208 0 416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z",
-              ],
-              "iconName": "magnifying-glass",
-              "prefix": "fas",
-            }
-          }
-          size={14}
-        />
         <TextInput
           autoCapitalize="none"
           autoCorrect={false}
+          onBlur={[Function]}
           onChangeText={[Function]}
+          onFocus={[Function]}
           placeholder="text translated"
-          placeholderTextColor="#888888"
+          placeholderTextColor="#6B80A0"
           spellCheck={false}
           style={
-            [
-              {
-                "flex": 1,
-                "fontSize": 14,
-                "padding": 0,
-              },
-              {
-                "color": "#c3c3c3",
-              },
-            ]
+            {
+              "color": "#c3c3c3",
+              "flex": 1,
+              "fontSize": 13.5,
+              "minWidth": 0,
+              "paddingVertical": 0,
+            }
           }
           value=""
         />

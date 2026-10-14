@@ -1,10 +1,18 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState } from 'react';
 import { Keyboard, TextInput, TouchableOpacity, View } from 'react-native';
+import Animated, {
+  ReduceMotion,
+  useAnimatedStyle,
+  useSharedValue,
+  withSequence,
+  withTiming,
+} from 'react-native-reanimated';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
 
 import { useTheme } from '@app/theme';
+import { ease } from '@app/theme/motion';
 import { AddressBookFileClass, GlobalConst } from '@app/AppState';
 import { ContextAppLoaded } from '@app/context';
 import AddressBookFileImpl from '@app/services/AddressBookFileImpl';
@@ -15,6 +23,8 @@ import RegText from '@ui/primitives/RegText';
 import ChainSelect from '@ui/widgets/ChainSelect';
 
 const NAME_MAX = 32;
+const SHAKE_MS = 60;
+const SAVE_OFF = 0.4;
 
 type NewAddressTagProps = {
   /** One of this wallet's own addresses. */
@@ -34,8 +44,24 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
   const { colors } = useTheme();
   const [label, setLabel] = useState('');
   const [saving, setSaving] = useState(false);
+  const [focused, setFocused] = useState(false);
+  const shake = useSharedValue(0);
+  const shakeStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: shake.value }],
+  }));
+  const ready = label.trim().length > 0;
 
   const save = async () => {
+    if (!ready) {
+      const step = (x: number) =>
+        withTiming(x, {
+          duration: SHAKE_MS,
+          easing: ease.standard,
+          reduceMotion: ReduceMotion.System,
+        });
+      shake.value = withSequence(step(-4), step(4), step(-4), step(0));
+      return;
+    }
     Keyboard.dismiss();
     setSaving(true);
     setAddressBook(
@@ -55,7 +81,8 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
     marginTop: 5,
     borderWidth: 1,
     borderRadius: 12,
-    borderColor: colors.borderMuted,
+    borderColor: colors.bottomSheetBorder,
+    backgroundColor: colors.bgCanvas,
   };
 
   return (
@@ -76,11 +103,20 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
         <View
           style={[
             box,
-            { flexDirection: 'row', alignItems: 'center', minHeight: 48 },
+            {
+              flexDirection: 'row',
+              alignItems: 'center',
+              minHeight: 48,
+              borderColor: focused
+                ? colors.borderFocus
+                : colors.bottomSheetBorder,
+            },
           ]}
         >
           <TextInput
             testID="addresstag.label-field"
+            onFocus={() => setFocused(true)}
+            onBlur={() => setFocused(false)}
             value={label}
             onChangeText={setLabel}
             maxLength={NAME_MAX}
@@ -132,16 +168,23 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
         </View>
       </View>
 
-      <Button
-        testID="addresstag.save"
-        type={ButtonTypeEnum.Primary}
-        title={translate('save') as string}
-        disabled={!label.trim() || saving}
-        onPress={save}
-        fullWidth
-        style={{ marginTop: 20, minHeight: 46, borderRadius: 23 }}
-        textStyle={{ fontSize: 15 }}
-      />
+      <Animated.View style={shakeStyle}>
+        <Button
+          testID="addresstag.save"
+          type={ButtonTypeEnum.Primary}
+          title={translate('save') as string}
+          disabled={saving}
+          onPress={save}
+          fullWidth
+          style={{
+            marginTop: 20,
+            minHeight: 46,
+            borderRadius: 23,
+            opacity: ready ? 1 : SAVE_OFF,
+          }}
+          textStyle={{ fontSize: 15 }}
+        />
+      </Animated.View>
       <Button
         testID="addresstag.cancel"
         type={ButtonTypeEnum.Link}
