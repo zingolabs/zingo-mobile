@@ -365,6 +365,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
         style={{
           height: 44,
           marginTop: 6,
+          zIndex: 3,
           marginBottom: 10,
           justifyContent: 'center',
           alignItems: 'center',
@@ -409,6 +410,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
           <InfoTooltip
             testID="syncreport.info"
             alignEnd
+            below
             label={translate('sync.info-acc') as string}
             title={translate('sync.tip-title') as string}
             text={translate('sync.tip-text') as string}
@@ -477,6 +479,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
               pgColor={synced ? GREEN : AMBER}
               textSize={14}
               textColor={colors.fgDefault}
+              textWeight="bold"
               text={`${pct}%`}
               progressPercent={pct}
             />
