@@ -28,6 +28,7 @@ import { isWalletAddress } from '@app/walletBackend';
 import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
 import Utils from '@app/utils';
 import AppSheetModal from '@ui/primitives/AppSheetModal';
+import MenuHeader from '@ui/widgets/MenuHeader';
 import { ChevronDown, ChevronLeft } from '@ui/primitives/Icons/Chevron';
 import { SearchIcon } from '@ui/primitives/Icons/SearchIcon';
 import { XIcon } from '@ui/primitives/Icons/XIcon';
@@ -235,11 +236,13 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
   return (
     <View
       testID="addressbook"
-      style={{ flex: 1, backgroundColor: colors.bgCanvas, paddingTop: 18 }}
+      style={{ flex: 1, backgroundColor: colors.bgCanvas, paddingTop: 4 }}
     >
+      <MenuHeader />
       <View
         style={{
           height: 44,
+          marginTop: 6,
           justifyContent: 'center',
           alignItems: 'center',
           marginBottom: 10,

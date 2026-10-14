@@ -6,7 +6,7 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
     {
       "backgroundColor": "#011401",
       "flex": 1,
-      "paddingTop": 18,
+      "paddingTop": 4,
     }
   }
   testID="addressbook"
@@ -15,9 +15,39 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
     style={
       {
         "alignItems": "center",
+        "height": 34,
+        "justifyContent": "center",
+      }
+    }
+    testID="menuheader"
+  >
+    <Image
+      source={
+        {
+          "testUri": "../../../assets/img/logobig-zingo.png",
+        }
+      }
+      style={
+        {
+          "borderRadius": 6,
+          "height": 30,
+          "position": "absolute",
+          "resizeMode": "contain",
+          "right": 16,
+          "top": 2,
+          "width": 30,
+        }
+      }
+    />
+  </View>
+  <View
+    style={
+      {
+        "alignItems": "center",
         "height": 44,
         "justifyContent": "center",
         "marginBottom": 10,
+        "marginTop": 6,
       }
     }
   >
@@ -567,11 +597,12 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
           style={
             {
               "alignItems": "center",
-              "backgroundColor": "#5a8c5a",
+              "backgroundColor": "#18bd18",
               "borderRadius": 23,
               "height": 46,
               "justifyContent": "center",
               "marginTop": 20,
+              "opacity": 0.4,
               "transform": [
                 {
                   "scale": 1,
@@ -584,7 +615,7 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
           <Text
             style={
               {
-                "color": "#5E8A5E",
+                "color": "#011401",
                 "fontSize": 15,
                 "fontWeight": "700",
               }

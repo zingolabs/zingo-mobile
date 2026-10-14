@@ -37,6 +37,7 @@ const NAME_MAX = 32;
 const CHECK_AT = 250;
 const ZNS_AT = 500;
 const SHAKE_MS = 60;
+const SAVE_OFF_OPACITY = 0.4;
 const LABEL_INK = '#B9C6D6';
 const SOFT_INK = '#8DA0B8';
 const PLACEHOLDER = '#4A5F80';
@@ -45,7 +46,6 @@ const WARN_INK = '#E6C46A';
 const ERR_INK = '#F2878A';
 const OK_BORDER = 'rgba(20,157,5,0.6)';
 const ERR_BORDER = '#E5484D';
-const SAVE_OFF_INK = '#5E8A5E';
 const MONO = Platform.select({ ios: 'Menlo', default: 'monospace' });
 
 export type ContactEdit =
@@ -477,13 +477,14 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
             borderRadius: 23,
             alignItems: 'center',
             justifyContent: 'center',
-            backgroundColor: ready ? colors.bgAccent : colors.bgAccentDisabled,
+            backgroundColor: colors.bgAccent,
+            opacity: ready ? 1 : SAVE_OFF_OPACITY,
             transform: [{ scale: pressed ? 0.97 : 1 }],
           })}
         >
           <Text
             style={{
-              color: ready ? colors.bgCanvas : SAVE_OFF_INK,
+              color: colors.bgCanvas,
               fontSize: 15,
               fontWeight: '700',
             }}
