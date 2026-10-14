@@ -23,6 +23,8 @@ jest.mock('@app/RPCModule', () => ({
         chain_name: 'main',
         address_kind: address.startsWith('t') ? 'transparent' : 'unified',
       }),
+    checkMyAddressInfo: async (address: string) =>
+      JSON.stringify({ is_wallet_address: address === 'u1mine' }),
   },
 }));
 
@@ -118,5 +120,22 @@ describe('ContactSheet', () => {
     expect(screen.getByTestId('addressbook.note.err')).toHaveTextContent(
       /called Alice/,
     );
+  });
+  test('Tests that Save stays disabled and says why when the address belongs to the wallet.', async () => {
+    const onSave = jest.fn();
+    const screen = sheet(onSave, (key: string) =>
+      key === 'addressbook.own-address' ? 'own' : mockTranslate(key),
+    );
+    fireEvent.changeText(screen.getByTestId('addressbook.name-field'), 'Mike');
+    fireEvent.changeText(
+      screen.getByTestId('addressbook.address-field'),
+      'u1mine',
+    );
+    await act(async () => {
+      jest.advanceTimersByTime(300);
+    });
+    expect(screen.getByTestId('addressbook.note.err')).toHaveTextContent('own');
+    fireEvent.press(screen.getByTestId('addressbook.save'));
+    expect(onSave).not.toHaveBeenCalled();
   });
 });

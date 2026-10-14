@@ -89,6 +89,7 @@
     "added": "{name} adres defterinize eklendi",
     "dup-name": "{name} adlı bir kişiniz zaten var.",
     "dup-address": "Bu adresle {name} adlı bir kişiniz zaten var.",
+    "own-address": "Bu adres bu cüzdana ait.",
     "no-match": "“{query}” ile eşleşen bir şey yok.",
     "kind-unified": "Birleşik adres",
     "kind-sapling": "Sapling adresi",

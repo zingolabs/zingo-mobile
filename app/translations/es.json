@@ -89,6 +89,7 @@
     "added": "{name} añadido a tu libreta de direcciones",
     "dup-name": "Ya tienes un contacto llamado {name}.",
     "dup-address": "Ya tienes un contacto llamado {name} con esta dirección.",
+    "own-address": "Esta dirección es de este monedero.",
     "no-match": "Nada coincide con “{query}”.",
     "kind-unified": "Dirección unificada",
     "kind-sapling": "Dirección Sapling",

@@ -89,6 +89,7 @@
     "added": "{name} added to your address book",
     "dup-name": "You already have a contact called {name}.",
     "dup-address": "You already have a contact called {name} with this address.",
+    "own-address": "This address belongs to this wallet.",
     "no-match": "Nothing matches “{query}”.",
     "kind-unified": "Unified address",
     "kind-sapling": "Sapling address",
