@@ -186,7 +186,6 @@
     "options": "Opções",
     "walletseed": "Frases da Carteira",
     "walletufvk": "Chave de Visualização",
-    "rescanwallet": "Rescanear a Carteira",
     "report": "Sincronizar / Relatório de Rescan",
     "changewallet": "Abrir outra Carteira",
     "restorebackupwallet": "Restaurar Último Backup da Carteira",
@@ -430,12 +429,6 @@
     "unknown": "Desconhecido",
     "title": "Informações do Servidor",
     "zingolib": "Versão Zingolib"
-  },
-  "rescan": {
-    "title": "Rescan",
-    "text-1": "Isso irá buscar novamente todas as transações e reconstruir sua carteira blindada, começando na altura do bloco ",
-    "text-2": " Pode demorar vários minutos.",
-    "button": "Rescan"
   },
   "seed": {
     "buttontexts": {

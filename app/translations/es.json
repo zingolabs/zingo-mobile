@@ -186,7 +186,6 @@
     "options": "Opciones",
     "walletseed": "Semilla del Monedero",
     "walletufvk": "Clave de Visualización del Monedero",
-    "rescanwallet": "Re-Escanear",
     "report": "Informe de Sincronización",
     "changewallet": "Abrir otro Monedero",
     "restorebackupwallet": "Restaurar Copia de Seguridad",
@@ -430,12 +429,6 @@
     "unknown": "Desconocido",
     "title": "Información del Servidor",
     "zingolib": "Versión de Zingolib"
-  },
-  "rescan": {
-    "title": "Re-Escanear",
-    "text-1": "Este proceso recuperará de nuevo todas las transacciones y reconstruirá tu monedero blindado, empezando por la altura de bloque ",
-    "text-2": " Esto puede tardar varios minutos.",
-    "button": "Re-Escanear"
   },
   "seed": {
     "buttontexts": {

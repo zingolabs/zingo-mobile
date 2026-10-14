@@ -186,7 +186,6 @@
     "options": "Options",
     "walletseed": "Wallet Seed",
     "walletufvk": "Wallet Viewing Key",
-    "rescanwallet": "Rescan Wallet",
     "report": "Sync / Rescan Report",
     "changewallet": "Change to another Wallet",
     "restorebackupwallet": "Restore Last Wallet Backup",
@@ -430,12 +429,6 @@
     "unknown": "Unknown",
     "title": "Server Info",
     "zingolib": "Zingolib Version"
-  },
-  "rescan": {
-    "title": "Rescan",
-    "text-1": "This will re-fetch all transactions and rebuild your shielded wallet, starting from block height ",
-    "text-2": " It might take several minutes.",
-    "button": "Rescan"
   },
   "seed": {
     "buttontexts": {

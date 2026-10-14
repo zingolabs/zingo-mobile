@@ -186,7 +186,6 @@
     "options": "Seçenekler",
     "walletseed": "Cüzdan Tohumu",
     "walletufvk": "Cüzdan Görüntüleme Anahtarı",
-    "rescanwallet": "Cüzdanı Yeniden Tara",
     "report": "Senkronizasyon / Yeniden Tarama Raporu",
     "changewallet": "Başka bir cüzdana geç",
     "restorebackupwallet": "Son Cüzdan Yedeğini Geri Yükle",
@@ -428,12 +427,6 @@
     "unknown": "Bilinmeyen ",
     "title": "Sunucu Bilgisi",
     "zingolib": "Zingolib Sürümü"
-  },
-  "rescan": {
-    "title": "Yeniden Tara",
-    "text-1": "Bu işlem, işlemleri yeniden alacak ver cüzdanı Başlangıç blok yüksekliğinden itibaren yeniden oluşturacaktır. ",
-    "text-2": "Birkaç dakika sürebilir.",
-    "button": "Yeniden Tara"
   },
   "seed": {
     "buttontexts": {
