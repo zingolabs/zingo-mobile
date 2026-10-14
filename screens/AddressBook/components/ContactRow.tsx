@@ -1,6 +1,13 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import {
+  Animated as RNAnimated,
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import Animated, {
   ReduceMotion,
   runOnJS,
@@ -10,7 +17,7 @@ import Animated, {
   withSequence,
   withTiming,
 } from 'react-native-reanimated';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import Swipeable from 'react-native-gesture-handler/Swipeable';
 
 import { useTheme } from '@app/theme';
 import { ease } from '@app/theme/motion';
@@ -23,7 +30,6 @@ import { CopyIcon } from '@ui/primitives/Icons/CopyIcon';
 import { PencilIcon } from '@ui/primitives/Icons/PencilIcon';
 import { PlaneIcon } from '@ui/primitives/Icons/PlaneIcon';
 import { TrashCan, TrashLid } from '@ui/primitives/Icons/TrashIcon';
-import { isPublicAddress } from '@screens/AddressBook/zcashAddressKind';
 
 export const ROW_LINE = '#0A1F3D';
 const INK_SOFT = '#8DA0B8';
@@ -45,10 +51,7 @@ const FOLD_MS = 120;
 const FLASH_HOLD_MS = 490;
 const FLASH_FADE_MS = 910;
 const COLLAPSE_MS = 260;
-const RETURN_MS = 280;
-const LEAVE_MS = 280;
 const SEND_AT = 72;
-const FLICK = 800;
 const COPY_SQUEEZE_MS = 110;
 const COPY_SPRING_MS = 150;
 const COPY_HOLD_MS = 1400;
@@ -163,8 +166,8 @@ const ContactRow: React.FunctionComponent<ContactRowProps> = ({
   const glow = useSharedValue(0);
   const gone = useSharedValue(0);
   const rowH = useSharedValue(0);
-  const rowW = useSharedValue(0);
-  const dx = useSharedValue(0);
+  const [rowW, setRowW] = useState(0);
+  const swipeable = useRef<Swipeable | null>(null);
   const copyScale = useSharedValue(1);
   const pen = useSharedValue(0);
   const lid = useSharedValue(0);
@@ -222,57 +225,9 @@ const ContactRow: React.FunctionComponent<ContactRowProps> = ({
     );
   }, [leaving, gone]);
 
-  const pan = Gesture.Pan()
-    .enabled(sendable)
-    .activeOffsetX(-12)
-    .failOffsetX(12)
-    .failOffsetY([-10, 10])
-    .onStart(() => {
-      runOnJS(onSwipe)();
-    })
-    .onUpdate(e => {
-      dx.value = Math.min(0, e.translationX);
-    })
-    .onEnd(e => {
-      if (-dx.value > SEND_AT || e.velocityX < -FLICK) {
-        dx.value = withTiming(
-          -rowW.value,
-          { duration: LEAVE_MS, easing: ease.in },
-          finished => {
-            if (finished) {
-              runOnJS(onSend)();
-              dx.value = withDelay(
-                SEND_RESET_AT,
-                withTiming(0, { duration: 0 }),
-              );
-            }
-          },
-        );
-        return;
-      }
-      dx.value = withTiming(0, {
-        duration: RETURN_MS,
-        easing: ease.emphasized,
-        reduceMotion: ReduceMotion.System,
-      });
-    });
-
   const rowStyle = useAnimatedStyle(() => ({
     opacity: 1 - gone.value,
     height: gone.value === 0 ? 'auto' : rowH.value * (1 - gone.value),
-  }));
-  const slideStyle = useAnimatedStyle(() => ({
-    transform: [{ translateX: dx.value }],
-  }));
-  const planeBehindStyle = useAnimatedStyle(() => ({
-    transform: [
-      {
-        scale: withTiming(-dx.value > SEND_AT ? 1.3 : 1, {
-          duration: 180,
-          easing: ease.standard,
-        }),
-      },
-    ],
   }));
   const glowStyle = useAnimatedStyle(() => ({ opacity: glow.value }));
   const unfoldStyle = useAnimatedStyle(() => ({
@@ -312,6 +267,37 @@ const ContactRow: React.FunctionComponent<ContactRowProps> = ({
       { scale: 1 + 0.15 * fly.value },
     ],
   }));
+
+  const renderSend = (
+    _progress: RNAnimated.AnimatedInterpolation<number>,
+    drag: RNAnimated.AnimatedInterpolation<number>,
+  ) => (
+    <View
+      style={{
+        width: rowW,
+        backgroundColor: SWIPE_BG,
+        alignItems: 'flex-end',
+        justifyContent: 'center',
+        paddingRight: 31,
+      }}
+    >
+      <RNAnimated.View
+        style={{
+          transform: [
+            {
+              scale: drag.interpolate({
+                inputRange: [-SEND_AT - 1, -SEND_AT, 0],
+                outputRange: [1.3, 1, 1],
+                extrapolate: 'clamp',
+              }),
+            },
+          ],
+        }}
+      >
+        <PlaneIcon size={26} color={SWIPE_INK} strokeWidth={1.9} />
+      </RNAnimated.View>
+    </View>
+  );
 
   const press = (button: Button) => {
     if (busy.current) {
@@ -367,7 +353,7 @@ const ContactRow: React.FunctionComponent<ContactRowProps> = ({
   };
 
   const ticker = contact.swapChain.toUpperCase();
-  const isPublic = editable && isPublicAddress(contact.address);
+  const isPublic = editable && /^t/i.test(contact.address);
   const initial = contact.label.slice(0, 1).toUpperCase();
 
   return (
@@ -375,7 +361,7 @@ const ContactRow: React.FunctionComponent<ContactRowProps> = ({
       testID={`addressbook.row.${contact.address}`}
       onLayout={e => {
         rowH.value = e.nativeEvent.layout.height;
-        rowW.value = e.nativeEvent.layout.width;
+        setRowW(e.nativeEvent.layout.width);
       }}
       style={[
         {
@@ -386,28 +372,20 @@ const ContactRow: React.FunctionComponent<ContactRowProps> = ({
         rowStyle,
       ]}
     >
-      {sendable && (
-        <View
-          pointerEvents="none"
-          style={[
-            StyleSheet.absoluteFill,
-            {
-              backgroundColor: SWIPE_BG,
-              alignItems: 'flex-end',
-              justifyContent: 'center',
-              paddingRight: 31,
-            },
-          ]}
-        >
-          <Animated.View style={planeBehindStyle}>
-            <PlaneIcon size={26} color={SWIPE_INK} strokeWidth={1.9} />
-          </Animated.View>
-        </View>
-      )}
-      <GestureDetector gesture={pan}>
-        <Animated.View
-          style={[{ backgroundColor: colors.bgSurface }, slideStyle]}
-        >
+      <Swipeable
+        ref={swipeable}
+        enabled={sendable}
+        friction={1}
+        rightThreshold={SEND_AT}
+        overshootRight={false}
+        renderRightActions={renderSend}
+        onSwipeableOpenStartDrag={onSwipe}
+        onSwipeableWillOpen={() => {
+          swipeable.current?.close();
+          onSend();
+        }}
+      >
+        <View style={{ backgroundColor: colors.bgSurface }}>
           <Animated.View
             pointerEvents="none"
             style={[
@@ -631,8 +609,8 @@ const ContactRow: React.FunctionComponent<ContactRowProps> = ({
               </Action>
             </Animated.View>
           </Animated.View>
-        </Animated.View>
-      </GestureDetector>
+        </View>
+      </Swipeable>
     </Animated.View>
   );
 };
