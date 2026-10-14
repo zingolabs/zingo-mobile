@@ -1,231 +1,158 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState } from 'react';
-import { View, TextInput, Keyboard, TouchableOpacity } from 'react-native';
-import { useTheme } from '@app/theme';
+import { Keyboard, TextInput, TouchableOpacity, View } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
 
-import {
-  AddressBookFileClass,
-  ChainNameEnum,
-  GlobalConst,
-} from '@app/AppState';
-import RegText from '@ui/primitives/RegText';
+import { useTheme } from '@app/theme';
+import { AddressBookFileClass, GlobalConst } from '@app/AppState';
 import { ContextAppLoaded } from '@app/context';
-import { showConfirm } from '@app/services/showConfirm';
-import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
-import ChainSelect from '@ui/widgets/ChainSelect';
-import { chainDisplayName } from '@ui/widgets/chainDisplayName';
-import Utils from '@app/utils';
 import AddressBookFileImpl from '@app/services/AddressBookFileImpl';
+import Utils from '@app/utils';
+import BoldText from '@ui/primitives/BoldText';
+import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
+import RegText from '@ui/primitives/RegText';
+import ChainSelect from '@ui/widgets/ChainSelect';
+
+const NAME_MAX = 32;
 
 type NewAddressTagProps = {
+  /** One of this wallet's own addresses. */
   address: string;
-  own: boolean;
-  // SwapKit chain code of the address ('ZEC' by default). Non-ZEC contacts are
-  // saved with chain = mainnet (swaps live in mainnet context).
-  swapChain?: string;
-  // Suggested label, when whoever opened the form already knows a name for the
-  // address. Editable like any other: it is a starting point, not a value.
-  initialLabel?: string;
   closeSheet: () => void;
   setAddressBook: (ab: AddressBookFileClass[]) => void;
 };
+
+// Names one of the wallet's own addresses, in the same shape as the New
+// contact sheet: the tag, the chain (Zcash) and the address it names.
 const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
   address,
-  own,
-  swapChain,
-  initialLabel,
   closeSheet,
   setAddressBook,
 }) => {
-  const context = useContext(ContextAppLoaded);
-  const { translate, server } = context;
+  const { translate, server } = useContext(ContextAppLoaded);
   const { colors } = useTheme();
+  const [label, setLabel] = useState('');
+  const [saving, setSaving] = useState(false);
 
-  const [label, setLabel] = useState<string>(initialLabel ?? '');
-  // The chain is fixed to whatever triggered the save (Send → ZEC; Swap → the
-  // selected token's chain), so the selector shows a single, non-editable
-  // option — same value used to persist the contact.
-  const effectiveSwapChain = swapChain ?? GlobalConst.zecSwapChain;
-
-  const writeContact = async () => {
-    try {
-      if (!label) {
-        return;
-      }
-      const randomColors = Utils.generateColorList(1);
-      // ZEC → the wallet's network; non-ZEC swap contacts → mainnet.
-      const chain =
-        effectiveSwapChain === GlobalConst.zecSwapChain
-          ? server.chainName
-          : ChainNameEnum.mainChainName;
-      const ab = await AddressBookFileImpl.writeAddressBookItem(
-        label,
-        address,
-        randomColors[0],
-        own,
-        chain,
-        effectiveSwapChain,
-      );
-      setAddressBook(ab);
-    } catch (error) {
-      console.log(`Critical Error new address ${error}`);
-    }
-
-    setLabel('');
+  const save = async () => {
     Keyboard.dismiss();
-    setTimeout(() => {
-      closeSheet();
-    }, 100);
+    setSaving(true);
+    setAddressBook(
+      await AddressBookFileImpl.writeAddressBookItem(
+        label.trim(),
+        address,
+        Utils.generateColorList(1)[0],
+        true,
+        server.chainName,
+        GlobalConst.zecSwapChain,
+      ),
+    );
+    closeSheet();
   };
 
-  const createAddressTag = () => {
-    if (!label) {
-      return;
-    }
-    // Own-address tags (Receive) save directly; contacts saved from Send/Swap
-    // confirm the detected network first — same safety step as the address-book
-    // add flow, so an overlapping chain format can't be saved unnoticed.
-    if (own) {
-      writeContact();
-      return;
-    }
-    Keyboard.dismiss();
-    showConfirm({
-      title: translate('addressbook.add-confirm-title') as string,
-      message: `${translate('addressbook.add-confirm-message') as string}\n\n${chainDisplayName(
-        effectiveSwapChain,
-      )}\n${address}`,
-      buttons: [
-        { text: translate('confirm') as string, onPress: writeContact },
-        { text: translate('cancel') as string, style: 'cancel' },
-      ],
-    });
+  const box = {
+    marginTop: 5,
+    borderWidth: 1,
+    borderRadius: 12,
+    borderColor: colors.borderMuted,
   };
 
   return (
-    <View
-      style={{
-        backgroundColor: colors.bgSurface,
-      }}
-    >
-      <View style={{ display: 'flex', flexDirection: 'column', margin: 10 }}>
-        <RegText style={{ marginTop: 10, paddingHorizontal: 10 }}>
-          {translate('addressbook.address') as string}
-        </RegText>
-        <View
-          style={{
-            paddingHorizontal: 10,
-            marginTop: 6,
-          }}
-        >
-          <RegText>{Utils.trimToSmall(address, 10)}</RegText>
-        </View>
+    <View testID="addresstag.sheet" style={{ paddingHorizontal: 22 }}>
+      <BoldText
+        style={{
+          marginTop: 4,
+          textAlign: 'center',
+          fontSize: 15.5,
+          lineHeight: 21,
+        }}
+      >
+        {translate('addressbook.add-tag') as string}
+      </BoldText>
 
-        <RegText style={{ marginTop: 18, paddingHorizontal: 10 }}>
-          {
-            (own
-              ? translate('addressbook.tag')
-              : translate('addressbook.contact')) as string
-          }
-        </RegText>
+      <View style={{ marginTop: 10 }}>
+        <RegText>{translate('addressbook.tag') as string}</RegText>
         <View
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'flex-start',
-            paddingHorizontal: 10,
-            marginTop: 10,
-          }}
+          style={[
+            box,
+            { flexDirection: 'row', alignItems: 'center', minHeight: 48 },
+          ]}
         >
-          <View
-            accessible={true}
+          <TextInput
+            testID="addresstag.label-field"
+            value={label}
+            onChangeText={setLabel}
+            maxLength={NAME_MAX}
+            placeholder={translate('addressbook.label-placeholder') as string}
+            placeholderTextColor={colors.fgMuted}
+            autoCorrect={false}
             style={{
-              flexGrow: 1,
-              borderWidth: 1,
-              borderRadius: 12,
-              borderColor: colors.borderMuted,
-              minWidth: 48,
-              minHeight: 48,
-              maxHeight: 150,
-              flexDirection: 'row',
-              alignItems: 'center',
+              flex: 1,
+              padding: 10,
+              color: colors.fgDefault,
+              fontWeight: '600',
+              fontSize: 14,
+              backgroundColor: 'transparent',
             }}
-          >
-            <TextInput
-              style={{
-                color: colors.fgDefault,
-                fontWeight: '600',
-                fontSize: 14,
-                flex: 1,
-                minHeight: 48,
-                padding: 10,
-                backgroundColor: 'transparent',
-              }}
-              placeholder={translate('addressbook.label-placeholder') as string}
-              placeholderTextColor={colors.fgMuted}
-              value={label}
-              onChangeText={(text: string) => setLabel(text)}
-              maxLength={50}
-            />
-            {!!label && (
-              <TouchableOpacity onPress={() => setLabel('')}>
-                <FontAwesomeIcon
-                  style={{ marginRight: 10 }}
-                  size={20}
-                  icon={faXmark}
-                  color={colors.fgAccentDisabled}
-                />
-              </TouchableOpacity>
-            )}
-          </View>
-        </View>
-
-        <View style={{ paddingHorizontal: 10, marginTop: 18 }}>
-          <ChainSelect
-            label={translate('addressbook.chain') as string}
-            value={effectiveSwapChain}
-            options={[effectiveSwapChain]}
-            onChange={() => {}}
-            translate={translate}
           />
-        </View>
-
-        <View
-          style={{
-            flexGrow: 1,
-            flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center',
-            gap: 10,
-            marginVertical: 5,
-            marginTop: 15,
-          }}
-        >
-          <Button
-            type={ButtonTypeEnum.Secondary}
-            title={translate('cancel') as string}
-            onPress={() => {
-              setLabel('');
-              Keyboard.dismiss();
-              setTimeout(() => {
-                closeSheet();
-              }, 100);
-            }}
-            twoButtons={true}
-          />
-          <Button
-            type={ButtonTypeEnum.Primary}
-            title={translate('save') as string}
-            onPress={() => {
-              createAddressTag();
-            }}
-            twoButtons={true}
-            disabled={!label}
-          />
+          {!!label && (
+            <TouchableOpacity onPress={() => setLabel('')}>
+              <FontAwesomeIcon
+                style={{ marginRight: 10 }}
+                size={20}
+                icon={faXmark}
+                color={colors.fgAccentDisabled}
+              />
+            </TouchableOpacity>
+          )}
         </View>
       </View>
+
+      <View style={{ marginTop: 18 }}>
+        <ChainSelect
+          label={translate('addressbook.chain') as string}
+          value={GlobalConst.zecSwapChain}
+          options={[GlobalConst.zecSwapChain]}
+          onChange={() => {}}
+          translate={translate}
+          disabled
+        />
+      </View>
+
+      <View style={{ marginTop: 18 }}>
+        <RegText>{translate('addressbook.address') as string}</RegText>
+        <View style={[box, { padding: 10, minHeight: 58 }]}>
+          <RegText
+            testID="addresstag.address"
+            style={{ fontWeight: '600', fontSize: 14 }}
+          >
+            {address}
+          </RegText>
+        </View>
+      </View>
+
+      <Button
+        testID="addresstag.save"
+        type={ButtonTypeEnum.Primary}
+        title={translate('save') as string}
+        disabled={!label.trim() || saving}
+        onPress={save}
+        fullWidth
+        style={{ marginTop: 20, minHeight: 46, borderRadius: 23 }}
+        textStyle={{ fontSize: 15 }}
+      />
+      <Button
+        testID="addresstag.cancel"
+        type={ButtonTypeEnum.Link}
+        title={translate('cancel') as string}
+        onPress={() => {
+          Keyboard.dismiss();
+          closeSheet();
+        }}
+        fullWidth
+        style={{ marginTop: 8 }}
+      />
     </View>
   );
 };

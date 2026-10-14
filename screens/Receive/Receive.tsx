@@ -490,7 +490,8 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
       </Animated.View>
       <AppSheetModal
         ref={bottomSheetRef}
-        header={xHeader}
+        header={sheetType === 'NAT' ? undefined : xHeader}
+        handle={sheetType === 'NAT'}
         contentStyle={{
           paddingBottom: keyboardHeight > 0 ? keyboardHeight + 20 : 30,
         }}
@@ -512,7 +513,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                   ? tAddr[tAddrIndex].address
                   : ''
             }
-            own={true}
             closeSheet={hide}
             setAddressBook={setAddressBook}
           />
