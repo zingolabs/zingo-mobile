@@ -2026,18 +2026,19 @@ export class LoadedAppClass extends Component<
   // Determines `own` via RPC, then opens the shared modal so the user can
   // attach a label without leaving their current screen. Used from AddressItem
   // anywhere an address is displayed with a tappable "+ contact" icon.
-  launchAddTagModal = (
+  /**
+   * The add button next to an address opens the New contact sheet, or the own
+   * tag sheet when the address is one of this wallet's: a self-send shows one,
+   * and the contact sheet refuses it.
+   */
+  launchAddTagModal = async (
     address: string,
     swapChain: string = GlobalConst.zecSwapChain,
     initialLabel?: string,
   ) => {
-    // Every launcher (Send, address rows) saves a recipient/destination,
-    // i.e. a contact — never a label for one of the wallet's own addresses.
-    // Tagging an own address is the Receive flow, which renders NewAddressTag
-    // with own={true} directly. So this modal is always a contact (own=false),
-    // "Add contact", not "Add tag".
+    const own = await isWalletAddress(address);
     this.setState(
-      { addTagModalTarget: { address, own: false, swapChain, initialLabel } },
+      { addTagModalTarget: { address, own, swapChain, initialLabel } },
       () => {
         this.addTagModalRef.current?.present();
       },
