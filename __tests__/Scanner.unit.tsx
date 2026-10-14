@@ -3,7 +3,7 @@ import React from 'react';
 import { act, render, screen } from '@testing-library/react-native';
 import { useCodeScanner } from 'react-native-vision-camera';
 
-import ScannerAddress from '@screens/ScannerAddress';
+import Scanner from '@screens/Scanner';
 import { ChainNameEnum, RouteEnum } from '@app/AppState';
 import { ScanAccepts } from '@app/types';
 import { useResult } from '@app/navigation/results';
@@ -29,11 +29,11 @@ const mount = (accepts: ScanAccepts, onCode = jest.fn()) =>
   render(
     <>
       <Asker onCode={onCode} />
-      <ScannerAddress
+      <Scanner
         navigation={mockNavigation}
         route={{
           key: 'k',
-          name: RouteEnum.ScannerAddress,
+          name: RouteEnum.Scanner,
           params: { request: 'send.address', accepts, texts },
         }}
       />

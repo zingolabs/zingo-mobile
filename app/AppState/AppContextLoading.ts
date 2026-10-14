@@ -16,6 +16,7 @@ import WalletType from './types/WalletType';
 import { WalletErrorInfo } from './types/WalletErrorInfo';
 import { ServerStatus } from './types/ServerStatus';
 import ServerUrisType from './types/ServerUrisType';
+import type { BiometricGateOutcome } from './AppStateLoading';
 
 // Asks the Server screen whether leaving it needs a confirmation first.
 export type BackGuard = { current: (() => boolean) | null };
@@ -49,6 +50,11 @@ export default interface AppContextLoading extends OnboardingContext {
 // The onboarding stage: what its screens show and what they run. The
 // provider owns the wallet backend and the stage's navigation.
 export interface OnboardingContext {
+  // The boot gate's outcome; the lock screen shows why it was locked.
+  biometricGate: BiometricGateOutcome;
+  retryGate: () => void;
+  // A wallet that exists is being opened by a new version of the app.
+  updating: boolean;
   busy: boolean;
   walletExists: boolean;
   recoveryWallet: WalletType | null;

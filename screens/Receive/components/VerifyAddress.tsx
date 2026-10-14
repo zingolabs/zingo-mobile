@@ -20,7 +20,7 @@ type VerifyAddressProps = {
   closeSheet: () => void;
   screenName: ScreenEnum;
   // VerifyAddress lives inside a portaled BottomSheetModal; pass navigation
-  // from the host (Receive) so the QR button can navigate to ScannerAddress.
+  // from the host (Receive) so the QR button can navigate to Scanner.
   navigation: NavigationProp<ParamListBase>;
 };
 const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({

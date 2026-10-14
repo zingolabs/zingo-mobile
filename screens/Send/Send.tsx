@@ -991,7 +991,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
   useResult('send.confirm', () => confirmSend(buildSendState()));
   const setQrcodeModalShow = () => {
     const open = (origin?: { x: number; y: number }) =>
-      navigation.navigate(RouteEnum.ScannerAddress, {
+      navigation.navigate(RouteEnum.Scanner, {
         request: 'send.address',
         accepts: { kind: 'zcash', chain: server.chainName },
         texts: {

@@ -11,16 +11,7 @@ import { I18n } from 'i18n-js';
 import * as RNLocalize from 'react-native-localize';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { LoadingSession, useSession } from '@app/navigation/session';
-import { LoadingStack, Onboarding } from '@app/navigation/loadingStack';
-import {
-  ImportChooserScreen,
-  ImportWalletScreen,
-  OpenErrorScreen,
-  ProgressScreen,
-  ServerListScreen,
-  ServerScreen,
-  WelcomeScreen,
-} from '@app/navigation/onboardingScreens';
+import { LoadingNavigator } from '@app/navigation/LoadingNavigator';
 import {
   currentRoute,
   focusedStackRouteNames,
@@ -1818,7 +1809,6 @@ export class LoadingAppClass extends Component<
       translate,
     } = this.state;
 
-    const { session } = this.props;
     const context = {
       // context
       netInfo: this.state.netInfo,
@@ -1844,7 +1834,11 @@ export class LoadingAppClass extends Component<
       performanceLevel: this.state.performanceLevel,
       blockExplorer: this.state.blockExplorer,
 
-      // the onboarding stage
+      // the loading section
+      biometricGate,
+      retryGate: this.retryGate,
+      updating:
+        walletExists && firstLaunchingMessage === LaunchingModeEnum.updating,
       busy: actionButtonsDisabled,
       walletExists,
       recoveryWallet: this.state.recoveryWallet,
@@ -1886,74 +1880,7 @@ export class LoadingAppClass extends Component<
             <BottomSheetModalProvider>
               <BottomSheetBackHandler />
               <ConfirmBottomSheet />
-              <LoadingStack.Navigator
-                screenOptions={{ headerShown: false, animation: 'none' }}
-              >
-                {session.kind === 'locked' ? (
-                  <LoadingStack.Screen name={RouteEnum.Lock}>
-                    {() => (
-                      <Launching
-                        translate={translate}
-                        firstLaunchingMessage={LaunchingModeEnum.opening}
-                        biometricGate={biometricGate}
-                        tryAgain={this.retryGate}
-                      />
-                    )}
-                  </LoadingStack.Screen>
-                ) : session.kind === 'boot' ? (
-                  <LoadingStack.Screen name={RouteEnum.Boot}>
-                    {() => (
-                      <Launching
-                        translate={translate}
-                        // Optimizing is said only of a wallet that exists and
-                        // is being opened by a new version of the app.
-                        firstLaunchingMessage={
-                          walletExists &&
-                          firstLaunchingMessage === LaunchingModeEnum.updating
-                            ? LaunchingModeEnum.updating
-                            : LaunchingModeEnum.opening
-                        }
-                        biometricGate={{ kind: 'passed' }}
-                      />
-                    )}
-                  </LoadingStack.Screen>
-                ) : (
-                  <LoadingStack.Screen name={RouteEnum.Onboarding}>
-                    {() => (
-                      <Onboarding.Navigator initialRouteName={session.start}>
-                        <Onboarding.Screen
-                          name={RouteEnum.Welcome}
-                          component={WelcomeScreen}
-                        />
-                        <Onboarding.Screen
-                          name={RouteEnum.Progress}
-                          component={ProgressScreen}
-                        />
-                        <Onboarding.Screen
-                          name={RouteEnum.ImportChooser}
-                          component={ImportChooserScreen}
-                        />
-                        <Onboarding.Screen
-                          name={RouteEnum.OpenError}
-                          component={OpenErrorScreen}
-                        />
-                        <Onboarding.Screen
-                          name={RouteEnum.Server}
-                          component={ServerScreen}
-                        />
-                        <Onboarding.Screen
-                          name={RouteEnum.ServerList}
-                          component={ServerListScreen}
-                        />
-                        <Onboarding.Screen
-                          name={RouteEnum.ImportWallet}
-                          component={ImportWalletScreen}
-                        />
-                      </Onboarding.Navigator>
-                    )}
-                  </LoadingStack.Screen>
-                )}
-              </LoadingStack.Navigator>
+              <LoadingNavigator />
               <SeedSheet
                 ref={this.seedSheetRef}
                 wallet={this.state.recoveryWallet}

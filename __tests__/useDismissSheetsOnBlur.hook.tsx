@@ -36,7 +36,7 @@ beforeEach(() => {
 });
 
 test('Tests that the open sheets survive the blur when the scanner opens over them. The scanner hands the scanned value back to the sheet that asked for it.', () => {
-  blurTo(RouteEnum.ScannerAddress);
+  blurTo(RouteEnum.Scanner);
 
   expect(mockDismissAll).not.toHaveBeenCalled();
 });

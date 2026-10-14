@@ -13,7 +13,7 @@ export enum ScreenEnum {
   ValueTransferDetail = 'ValueTransferDetail',
   Send = 'Send',
   Confirm = 'Confirm',
-  ScannerAddress = 'ScannerAddress',
+  Scanner = 'Scanner',
   Receive = 'Receive',
   AddressList = 'AddressList',
   MessagesList = 'MessagesList',

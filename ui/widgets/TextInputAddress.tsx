@@ -32,7 +32,7 @@ type TextInputAddressProps = {
   swapChain?: string;
   // When rendered inside a BottomSheetModal (or any portaled context where
   // useNavigation's context is lost), pass the navigation prop from the host
-  // screen so the QR button can navigate to ScannerAddress reliably.
+  // screen so the QR button can navigate to Scanner reliably.
   navigation?: NavigationProp<ParamListBase>;
   // The request the scanner answers with the code it read.
   scanRequest: Request;
@@ -44,7 +44,7 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
   disabled,
   showLabel,
   // screenName + routeStack are kept in the prop type for backward compat
-  // with all callers but are no longer consumed here — ScannerAddress lives
+  // with all callers but are no longer consumed here — Scanner lives
   // at a single Drawer-level route so a direct navigate works everywhere.
   navigation: navigationProp,
   swapChain,
@@ -87,7 +87,7 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
   // caller. A swap chain's address is checked by its own format.
   const setQrcodeModalShow = () => {
     const chain = swapChain ?? GlobalConst.zecSwapChain;
-    navigation.navigate(RouteEnum.ScannerAddress, {
+    navigation.navigate(RouteEnum.Scanner, {
       request: scanRequest,
       accepts:
         chain === GlobalConst.zecSwapChain

@@ -52,7 +52,7 @@ describe('TextInputAddress - snapshots', () => {
             showLabel={false}
             screenName={ScreenEnum.Send}
             scanRequest="send.address"
-            routeStack={RouteEnum.ScannerAddress}
+            routeStack={RouteEnum.Scanner}
           />
         </ContextAppLoadedProvider>,
       ).toJSON(),

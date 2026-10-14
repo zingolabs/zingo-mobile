@@ -54,7 +54,7 @@ type AbDetailProps = {
   routeStack: RouteEnum;
   // AbDetail is rendered inside a portaled BottomSheetModal; the host screen
   // (AddressBook) must pass its own `navigation` so the QR button can
-  // navigate to ScannerAddress (useNavigation context is lost in the portal).
+  // navigate to Scanner (useNavigation context is lost in the portal).
   navigation: NavigationProp<ParamListBase>;
 };
 const AbDetail: React.FunctionComponent<AbDetailProps> = ({
@@ -312,7 +312,7 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
   const onScanAddress = () => {
     Keyboard.dismiss();
     const open = (origin?: { x: number; y: number }) =>
-      navigation.navigate(RouteEnum.ScannerAddress, {
+      navigation.navigate(RouteEnum.Scanner, {
         request: 'addressbook.address',
         accepts: { kind: 'any' },
         texts: {

@@ -19,7 +19,7 @@ import { RPCMigrationPlanType } from '@app/walletBackend/types/RPCMigrationPlanT
 export type RootParamList = {
   [RouteEnum.Loading]: NavigatorScreenParams<LoadingParamList> | undefined;
   [RouteEnum.Wallet]: NavigatorScreenParams<AppDrawerParamList> | undefined;
-  [RouteEnum.ScannerAddress]: ScannerAddressNavigationState | undefined;
+  [RouteEnum.Scanner]: ScannerNavigationState | undefined;
 };
 
 // The loading section: the boot gate, the lock, and the onboarding stage.
@@ -168,7 +168,7 @@ export type ScanRouteTexts = {
   torch: string;
 };
 
-export type ScannerAddressNavigationState = {
+export type ScannerNavigationState = {
   // The code read is delivered under this request.
   request: Request;
   accepts: ScanAccepts;

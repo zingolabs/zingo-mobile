@@ -48,7 +48,7 @@ export enum RouteEnum {
   // Drawer with params
   AddressBook = 'AddressBook',
   AddressList = 'AddressList',
-  ScannerAddress = 'ScannerAddress',
+  Scanner = 'Scanner',
   ValueTransferDetail = 'ValueTransferDetail',
   Confirm = 'Confirm',
 }

@@ -9,10 +9,7 @@ import { validateAddressForChain } from '@app/swap';
 import Utils from '@app/utils';
 import ScanOverlay from '@ui/widgets/ScanOverlay';
 
-type ScannerAddressProps = NativeStackScreenProps<
-  RootParamList,
-  RouteEnum.ScannerAddress
->;
+type ScannerProps = NativeStackScreenProps<RootParamList, RouteEnum.Scanner>;
 
 const acceptsFor = (
   accepts: ScanAccepts,
@@ -31,7 +28,7 @@ const acceptsFor = (
 
 // The shared scanner over the whole app: it opens as a circle from the scan
 // button that called it and delivers the accepted code to that caller.
-const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({
+const Scanner: React.FunctionComponent<ScannerProps> = ({
   navigation,
   route,
 }) => {
@@ -56,4 +53,4 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({
   );
 };
 
-export default ScannerAddress;
+export default Scanner;
