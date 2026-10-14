@@ -97,7 +97,7 @@
   "devDependencies": {
     "@babel/core": "^7.29.7",
     "@babel/runtime": "^7.29.7",
-    "@playwright/test": "^1.63.0",
+    "@playwright/test": "^1.64.0",
     "@react-native-community/cli": "20.2.0",
     "@react-native-community/cli-platform-android": "20.2.0",
     "@react-native-community/cli-platform-ios": "20.2.0",
@@ -129,12 +129,12 @@
     "eslint-plugin-ft-flow": "^3.0.11",
     "eslint-plugin-react-native": "^5.0.0",
     "jest": "^30.5.2",
-    "prettier": "^3.9.9",
+    "prettier": "^3.9.10",
     "react-dom": "19.1.4",
     "react-native-web": "^0.21.4",
     "react-test-renderer": "19.1.4",
     "reg-cli": "^0.18.16",
-    "storybook": "^9.1.4",
+    "storybook": "^9.1.21",
     "tsx": "^4.23.15",
     "typescript": "5.5.4",
     "vite": "^8.3.4"
