@@ -30,11 +30,7 @@ import {
   faXmark,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import {
-  NavigationProp,
-  ParamListBase,
-  useNavigation,
-} from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '@app/theme';
 import { ScanIcon } from '@ui/primitives/Icons/ScanIcon';
 import { getNumberFormatSettings } from 'react-native-localize';
@@ -89,7 +85,7 @@ import {
   toZecText,
 } from '@app/price/fiatQuote';
 import { safeSnapToIndex } from '@app/utils/safeSnapToIndex';
-import { AppDrawerParamList } from '@app/types';
+import { HomeTabScreenProps, WalletNavigation } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
 import Header from '@ui/widgets/Header';
 import BottomSheet, { BottomSheetModal } from '@gorhom/bottom-sheet';
@@ -105,12 +101,11 @@ import SendErrorSheet from './components/SendErrorSheet';
 import { sendEmail } from '@app/services/sendEmail';
 import { retryServer } from '@app/services/retryServer';
 import { RPCSpendablebalanceType } from '@app/walletBackend/types/RPCSpendablebalanceType';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-type SendProps = NativeStackScreenProps<AppDrawerParamList, 'Send'>;
+type SendProps = HomeTabScreenProps<'Send'>;
 
 const Send: React.FunctionComponent<SendProps> = () => {
-  const navigation = useNavigation<NavigationProp<ParamListBase>>();
+  const navigation = useNavigation<WalletNavigation>();
   const context = useContext(ContextAppLoaded);
   const {
     sendTransaction,

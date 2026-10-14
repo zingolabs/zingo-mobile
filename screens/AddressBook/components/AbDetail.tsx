@@ -1,7 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState, useEffect, useRef } from 'react';
 import { View, TextInput, Keyboard, TouchableOpacity } from 'react-native';
-import { NavigationProp, ParamListBase } from '@react-navigation/native';
 import { useTheme } from '@app/theme';
 import { ScanIcon } from '@ui/primitives/Icons/ScanIcon';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -22,6 +21,7 @@ import ChainSelect from '@ui/widgets/ChainSelect';
 import { chainDisplayName } from '@ui/widgets/chainDisplayName';
 import Utils from '@app/utils';
 import { useResult } from '@app/navigation/results';
+import { openScanner } from '@app/navigation/navigate';
 import { parseZcashURI } from '@app/uris';
 // Straight from the module rather than the `uris` barrel, as Send does, so the
 // ZNS SDK stays out of that barrel's module graph.
@@ -50,10 +50,6 @@ type AbDetailProps = {
   ) => void;
   currentAddress?: string;
   routeStack: Route;
-  // AbDetail is rendered inside a portaled BottomSheetModal; the host screen
-  // (AddressBook) must pass its own `navigation` so the QR button can
-  // navigate to Scanner (useNavigation context is lost in the portal).
-  navigation: NavigationProp<ParamListBase>;
 };
 const AbDetail: React.FunctionComponent<AbDetailProps> = ({
   index,
@@ -62,7 +58,6 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
   action: actionProp,
   doAction,
   currentAddress,
-  navigation,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, server, addressBook } = context;
@@ -310,7 +305,7 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
   const onScanAddress = () => {
     Keyboard.dismiss();
     const open = (origin?: { x: number; y: number }) =>
-      navigation.navigate(Route.Scanner, {
+      openScanner({
         request: 'addressbook.address',
         accepts: { kind: 'any' },
         texts: {

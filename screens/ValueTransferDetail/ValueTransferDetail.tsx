@@ -11,11 +11,7 @@ import { showConfirm } from '@app/services/showConfirm';
 
 import Clipboard from '@react-native-clipboard/clipboard';
 
-import {
-  NavigationProp,
-  ParamListBase,
-  useNavigation,
-} from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '@app/theme';
 
 import {
@@ -35,7 +31,7 @@ import Utils from '@app/utils';
 import RegText from '@ui/primitives/RegText';
 import ZecAmount from '@ui/widgets/ZecAmount';
 import FadeText from '@ui/primitives/FadeText';
-import { AppDrawerParamList } from '@app/types';
+import { AppDrawerParamList, WalletNavigation } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
 import Header from '@ui/widgets/Header';
 import BoldText from '@ui/primitives/BoldText';
@@ -68,7 +64,7 @@ type ValueTransferDetailProps = NativeStackScreenProps<
 const ValueTransferDetail: React.FunctionComponent<
   ValueTransferDetailProps
 > = ({ route }) => {
-  const navigation = useNavigation<NavigationProp<ParamListBase>>();
+  const navigation = useNavigation<WalletNavigation>();
   const context = useContext(ContextAppLoaded);
   const {
     info,

@@ -8,11 +8,8 @@ import Animated, {
   useReducedMotion,
   withTiming,
 } from 'react-native-reanimated';
-import {
-  NavigationProp,
-  ParamListBase,
-  useNavigation,
-} from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
+import { WalletNavigation } from '@app/types';
 import { useTheme } from '@app/theme';
 import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -122,7 +119,7 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
     mixnetView,
     onUsdRowLayout,
   }) => {
-    const navigation = useNavigation<NavigationProp<ParamListBase>>();
+    const navigation = useNavigation<WalletNavigation>();
     const { colors } = useTheme();
     const reducedMotion = useReducedMotion();
     const quote = fiatQuote(zecPrice, server, info.chainName);

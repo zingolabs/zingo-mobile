@@ -17,12 +17,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import Animated from 'react-native-reanimated';
-import {
-  NavigationProp,
-  ParamListBase,
-  useIsFocused,
-  useNavigation,
-} from '@react-navigation/native';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
 import { useTheme } from '@app/theme';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faAngleUp, faXmark } from '@fortawesome/free-solid-svg-icons';
@@ -39,7 +34,7 @@ import {
   //ServerType,
   ValueTransferType,
 } from '@app/AppState';
-import { AppDrawerParamList } from '@app/types';
+import { HomeTabScreenProps, WalletNavigation } from '@app/types';
 import FadeText from '@ui/primitives/FadeText';
 import BoldText from '@ui/primitives/BoldText';
 import AppSheet from '@ui/primitives/AppSheet';
@@ -66,7 +61,6 @@ import {
 } from 'recyclerlistview';
 import { ScrollEvent } from 'recyclerlistview/dist/reactnative/core/scrollcomponent/BaseScrollView';
 import { RecyclerListViewState } from 'recyclerlistview/dist/reactnative/core/RecyclerListView';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Swipeable } from 'react-native-gesture-handler';
 import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
 import BottomSheet, { BottomSheetModal } from '@gorhom/bottom-sheet';
@@ -80,10 +74,10 @@ const ViewTypes = {
   WITHOUT_MONTH_REFRESH: 3,
 };
 
-type HistoryProps = NativeStackScreenProps<AppDrawerParamList, 'History'>;
+type HistoryProps = HomeTabScreenProps<'History'>;
 
 const History: React.FunctionComponent<HistoryProps> = () => {
-  const navigation = useNavigation<NavigationProp<ParamListBase>>();
+  const navigation = useNavigation<WalletNavigation>();
   const context = useContext(ContextAppLoaded);
   const {
     setScrollToTop,

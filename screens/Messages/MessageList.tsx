@@ -21,18 +21,14 @@ import {
 import Animated from 'react-native-reanimated';
 import { useOptionsPanelSheetSlide } from '@app/hooks/useOptionsPanelSheetSlide';
 
-import {
-  NavigationProp,
-  ParamListBase,
-  useNavigation,
-} from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '@app/theme';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faChevronLeft, faAngleDown } from '@fortawesome/free-solid-svg-icons';
 import BottomSheet from '@gorhom/bottom-sheet';
 
 import { Route, ValueTransferType } from '@app/AppState';
-import { AppDrawerParamList } from '@app/types';
+import { AppDrawerParamList, WalletNavigation } from '@app/types';
 import FadeText from '@ui/primitives/FadeText';
 import BoldText from '@ui/primitives/BoldText';
 import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
@@ -47,7 +43,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 type MessageListProps = NativeStackScreenProps<AppDrawerParamList, 'Messages'>;
 
 const MessageList: React.FunctionComponent<MessageListProps> = () => {
-  const navigation = useNavigation<NavigationProp<ParamListBase>>();
+  const navigation = useNavigation<WalletNavigation>();
   const context = useContext(ContextAppLoaded);
   const {
     setScrollToBottom,

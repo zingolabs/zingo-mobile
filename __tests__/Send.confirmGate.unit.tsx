@@ -49,7 +49,6 @@ import React from 'react';
 import { act, fireEvent, render, waitFor } from '@testing-library/react-native';
 import { deliver } from '@app/navigation/results';
 import { useNavigation } from '@react-navigation/native';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import Send from '@screens/Send';
 import {
   ContextAppLoadedProvider,
@@ -65,7 +64,7 @@ import {
 } from '@app/AppState';
 import type { TranslateType } from '@app/AppState';
 import { errorKeyed } from '@app/AppState/types/Result';
-import { AppDrawerParamList } from '@app/types';
+import { HomeTabScreenProps } from '@app/types';
 import { fetchServerList } from '@app/uris';
 import Utils from '@app/utils';
 import RPCModule from '@app/RPCModule';
@@ -92,7 +91,7 @@ const sendPageState = new SendPageStateClass(new ToAddrClass(0));
 sendPageState.toaddr.to = 'UA-12345678901234567890';
 sendPageState.toaddr.amount = '0.1';
 
-function makeDrawerProps(): NativeStackScreenProps<AppDrawerParamList, 'Send'> {
+function makeDrawerProps(): HomeTabScreenProps<'Send'> {
   return {
     navigation: mockNavigation,
     route: {

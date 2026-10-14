@@ -1,4 +1,13 @@
-import type { NavigatorScreenParams } from '@react-navigation/native';
+import type {
+  CompositeNavigationProp,
+  CompositeScreenProps,
+  NavigatorScreenParams,
+} from '@react-navigation/native';
+import type {
+  NativeStackNavigationProp,
+  NativeStackScreenProps,
+} from '@react-navigation/native-stack';
+import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import type { RevealOrigin } from '@ui/widgets/CircularReveal';
 import type { Request } from '@app/navigation/results';
 import {
@@ -190,3 +199,30 @@ export type ConfirmNavigationState = {
   sendAllAmount: boolean;
   sendPageState: SendPageStateClass;
 };
+
+// What `useNavigation()` gives inside the wallet: the wallet stack and the
+// root above it, so a screen or widget can reach any route of the two
+// without a cast. A home tab's own navigation is a superset of this.
+export type WalletNavigation = CompositeNavigationProp<
+  NativeStackNavigationProp<AppDrawerParamList>,
+  NativeStackNavigationProp<RootParamList>
+>;
+
+type AppRootParamList = RootParamList;
+
+declare global {
+  namespace ReactNavigation {
+    interface RootParamList extends AppRootParamList {}
+  }
+}
+
+// The props of a home tab screen: the tabs, then the reach of
+// `WalletNavigation`.
+export type HomeTabScreenProps<T extends keyof HomeTabParamList> =
+  CompositeScreenProps<
+    BottomTabScreenProps<HomeTabParamList, T>,
+    CompositeScreenProps<
+      NativeStackScreenProps<AppDrawerParamList>,
+      NativeStackScreenProps<RootParamList>
+    >
+  >;

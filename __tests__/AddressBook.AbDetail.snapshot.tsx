@@ -37,7 +37,6 @@ describe('Component Address Book Details - test', () => {
           action={AddressBookActionEnum.Add}
           doAction={onAction}
           routeStack={Route.AddressBook}
-          navigation={{ navigate: onCancel } as never}
         />
       </ContextAppLoadedProvider>,
     );
@@ -53,7 +52,6 @@ describe('Component Address Book Details - test', () => {
           action={AddressBookActionEnum.Modify}
           doAction={onAction}
           routeStack={Route.AddressBook}
-          navigation={{ navigate: onCancel } as never}
         />
       </ContextAppLoadedProvider>,
     );
@@ -69,7 +67,6 @@ describe('Component Address Book Details - test', () => {
           action={AddressBookActionEnum.Delete}
           doAction={onAction}
           routeStack={Route.AddressBook}
-          navigation={{ navigate: onCancel } as never}
         />
       </ContextAppLoadedProvider>,
     );

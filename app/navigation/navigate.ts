@@ -13,6 +13,7 @@ import type {
   OnboardingParamList,
   OnboardingRoute,
   RootParamList,
+  ScannerNavigationState,
 } from '@app/types';
 
 export const navigationRef = createNavigationContainerRef<RootParamList>();
@@ -26,6 +27,14 @@ export const navigateWallet = (
     return;
   }
   navigationRef.navigate(Route.Wallet, target);
+};
+
+// Opens the scanner, a root route, from any widget: the ones inside a
+// bottom sheet render outside the navigator tree.
+export const openScanner = (params: ScannerNavigationState): void => {
+  if (navigationRef.isReady()) {
+    navigationRef.navigate(Route.Scanner, params);
+  }
 };
 
 // Opens an onboarding screen from the loading section's provider.

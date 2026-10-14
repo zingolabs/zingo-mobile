@@ -20,11 +20,8 @@ import {
   SnackbarDurationEnum,
   Route,
 } from '@app/AppState';
-import {
-  NavigationProp,
-  ParamListBase,
-  useNavigation,
-} from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
+import { WalletNavigation } from '@app/types';
 import { useTheme } from '@app/theme';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faUserPlus, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
@@ -71,7 +68,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
   withSendIcon,
   ufvk,
 }) => {
-  const navigation = useNavigation<NavigationProp<ParamListBase>>();
+  const navigation = useNavigation<WalletNavigation>();
   const context = useContext(ContextAppLoaded);
   const {
     translate,

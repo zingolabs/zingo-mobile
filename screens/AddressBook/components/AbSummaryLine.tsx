@@ -2,11 +2,8 @@
 import React, { useContext } from 'react';
 import { View, TouchableOpacity } from 'react-native';
 import { showConfirm } from '@app/services/showConfirm';
-import {
-  NavigationProp,
-  ParamListBase,
-  useNavigation,
-} from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
+import { WalletNavigation } from '@app/types';
 import { useTheme } from '@app/theme';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
@@ -54,7 +51,7 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
   handleScrollToTop,
   doAction,
 }) => {
-  const navigation = useNavigation<NavigationProp<ParamListBase>>();
+  const navigation = useNavigation<WalletNavigation>();
   const context = useContext(ContextAppLoaded);
   const { translate, readOnly, server, setSendPageState } = context;
   const { colors } = useTheme();

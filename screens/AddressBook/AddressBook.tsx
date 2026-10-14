@@ -866,7 +866,6 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
           doAction={doAction}
           currentAddress={currentAddress}
           routeStack={routeStack}
-          navigation={navigation}
         />
       </AppSheetModal>
     </View>

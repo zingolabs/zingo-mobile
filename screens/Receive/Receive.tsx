@@ -20,7 +20,7 @@ import SelectBottomSheet from '@ui/widgets/SelectBottomSheet';
 
 import Clipboard from '@react-native-clipboard/clipboard';
 import SingleAddress from '@ui/widgets/SingleAddress';
-import { AppDrawerParamList } from '@app/types';
+import { HomeTabScreenProps } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
 import Header from '@ui/widgets/Header';
 import BoldText from '@ui/primitives/BoldText';
@@ -41,16 +41,15 @@ import VerifyAddress from './components/VerifyAddress';
 import NewAddressTag from '@ui/widgets/NewAddressTag';
 import TransparentWarning from './components/TransparentWarning';
 import ExpandedAddress from '@ui/widgets/ExpandedAddress';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
 import { useDismissSheetsOnBlur } from '@app/hooks/useDismissSheetsOnBlur';
 import { useOptionsPanelSheetSlide } from '@app/hooks/useOptionsPanelSheetSlide';
 import { usePriceSnapAutoClose } from '@app/hooks/usePriceSnapAutoClose';
 import { safeSnapToIndex } from '@app/utils/safeSnapToIndex';
 
-type ReceiveProps = NativeStackScreenProps<AppDrawerParamList, 'Receive'>;
+type ReceiveProps = HomeTabScreenProps<'Receive'>;
 
-const Receive: React.FunctionComponent<ReceiveProps> = ({ navigation }) => {
+const Receive: React.FunctionComponent<ReceiveProps> = () => {
   const context = useContext(ContextAppLoaded);
   const {
     setAddressBook,
@@ -494,9 +493,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({ navigation }) => {
             setAddressBook={setAddressBook}
           />
         )}
-        {sheetType === 'VA' && (
-          <VerifyAddress closeSheet={hide} navigation={navigation} />
-        )}
+        {sheetType === 'VA' && <VerifyAddress closeSheet={hide} />}
         {sheetType === 'TW' && (
           <TransparentWarning
             closeSheet={hide}

@@ -1,10 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { showConfirm } from '@app/services/showConfirm';
-import {
-  NavigationProp,
-  ParamListBase,
-  useNavigation,
-} from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
+import { WalletNavigation } from '@app/types';
 import {
   PoolToShieldEnum,
   Route,
@@ -72,7 +69,7 @@ export function useShieldFunds({
   setScrollToBottom,
   sendPermitNow,
 }: UseShieldFundsInput): UseShieldFundsResult {
-  const navigation = useNavigation<NavigationProp<ParamListBase>>();
+  const navigation = useNavigation<WalletNavigation>();
   const [showShieldButton, setShowShieldButton] = useState<boolean>(false);
   const [shieldingFee, setShieldingFee] = useState<number>(0);
   // useRef so the lock persists across re-renders (a `let` inside useEffect resets every invocation)

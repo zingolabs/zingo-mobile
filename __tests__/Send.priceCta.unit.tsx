@@ -46,8 +46,7 @@ import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import { mockServer } from '../__mocks__/dataMocks/mockServer';
 import mockSendPageState from '../__mocks__/dataMocks/mockSendPageState';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { AppDrawerParamList } from '@app/types';
+import { HomeTabScreenProps } from '@app/types';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
 const storeHook = usePriceFetcherStore as jest.MockedFunction<
@@ -55,7 +54,7 @@ const storeHook = usePriceFetcherStore as jest.MockedFunction<
 >;
 const healthHook = usePriceHealth as jest.MockedFunction<typeof usePriceHealth>;
 
-function makeDrawerProps(): NativeStackScreenProps<AppDrawerParamList, 'Send'> {
+function makeDrawerProps(): HomeTabScreenProps<'Send'> {
   return {
     navigation: mockNavigation,
     route: {

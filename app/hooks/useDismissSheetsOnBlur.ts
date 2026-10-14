@@ -5,6 +5,7 @@ import {
   useFocusEffect,
   useNavigation,
 } from '@react-navigation/native';
+import { WalletNavigation } from '@app/types';
 import { useBottomSheetModal } from '@gorhom/bottom-sheet';
 import { Route } from '@app/AppState';
 
@@ -29,7 +30,7 @@ const rootRouteName = (navigation: NavigationProp<ParamListBase>) => {
  */
 export function useDismissSheetsOnBlur() {
   const { dismissAll } = useBottomSheetModal();
-  const navigation = useNavigation<NavigationProp<ParamListBase>>();
+  const navigation = useNavigation<WalletNavigation>();
 
   useFocusEffect(
     useCallback(() => {

@@ -1,7 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState } from 'react';
 import { View, Keyboard } from 'react-native';
-import { NavigationProp, ParamListBase } from '@react-navigation/native';
 import { useTheme } from '@app/theme';
 
 import { GlobalConst, SnackbarDurationEnum } from '@app/AppState';
@@ -18,13 +17,9 @@ import { VerifyXIcon } from '@ui/primitives/Icons/VerifyXIcon';
 
 type VerifyAddressProps = {
   closeSheet: () => void;
-  // VerifyAddress lives inside a portaled BottomSheetModal; pass navigation
-  // from the host (Receive) so the QR button can navigate to Scanner.
-  navigation: NavigationProp<ParamListBase>;
 };
 const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
   closeSheet,
-  navigation,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, addLastSnackbar, server } = context;
@@ -103,7 +98,6 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
         setError={setErrorAddress}
         disabled={false}
         showLabel={false}
-        navigation={navigation}
         scanRequest="receive.address"
       />
       {!!errorAddress && (

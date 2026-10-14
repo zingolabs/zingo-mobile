@@ -1,11 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import { Animated, TouchableOpacity, View } from 'react-native';
-import {
-  NavigationProp,
-  ParamListBase,
-  useNavigation,
-} from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
+import { WalletNavigation } from '@app/types';
 import { useTheme } from '@app/theme';
 import {
   faCheck,
@@ -65,7 +62,7 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
     addLastSnackbar,
     noBalance,
   }) => {
-    const navigation = useNavigation<NavigationProp<ParamListBase>>();
+    const navigation = useNavigation<WalletNavigation>();
     const { colors } = useTheme();
     const phase = viewPhase(mixnetView);
 

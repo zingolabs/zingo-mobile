@@ -5,12 +5,11 @@ import { REVEAL_OPEN_MS } from '@ui/widgets/CircularReveal';
 import { ease } from '@app/theme/motion';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
-  NavigationProp,
-  ParamListBase,
   StackActions,
   useNavigation,
   useRoute,
 } from '@react-navigation/native';
+import { WalletNavigation } from '@app/types';
 import { useTheme } from '@app/theme';
 import React, { useContext, useEffect, useRef } from 'react';
 import { Image, TouchableOpacity, View } from 'react-native';
@@ -102,7 +101,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   onPriceRowLayout,
   noPriceRow,
 }) => {
-  const navigation = useNavigation<NavigationProp<ParamListBase>>();
+  const navigation = useNavigation<WalletNavigation>();
   const route = useRoute();
   const context = useContext(ContextAppLoaded);
   const {

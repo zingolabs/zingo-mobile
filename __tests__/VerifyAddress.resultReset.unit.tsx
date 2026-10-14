@@ -8,7 +8,6 @@ import {
 import { ChainNameEnum, remoteServer } from '@app/AppState';
 import RPCModule from '@app/RPCModule';
 import VerifyAddress from '@screens/Receive/components/VerifyAddress';
-import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
 jest.mock('@app/RPCModule', () =>
   require('../__mocks__/rpcModuleProxy').rpcModuleProxyMock(),
@@ -50,7 +49,7 @@ async function verified() {
   };
   const view = render(
     <ContextAppLoadedProvider value={context}>
-      <VerifyAddress closeSheet={jest.fn()} navigation={mockNavigation} />
+      <VerifyAddress closeSheet={jest.fn()} />
     </ContextAppLoadedProvider>,
   );
   await act(async () => {
