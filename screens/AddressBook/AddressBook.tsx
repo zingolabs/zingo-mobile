@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useRef, useState } from 'react';
-import { Pressable, ScrollView, Text, TextInput, View } from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 import {
   NavigationProp,
   ParamListBase,
@@ -11,8 +11,6 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Clipboard from '@react-native-clipboard/clipboard';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faMagnifyingGlass, faXmark } from '@fortawesome/free-solid-svg-icons';
 
 import { useTheme } from '@app/theme';
 import {
@@ -32,6 +30,7 @@ import { showConfirm } from '@app/services/showConfirm';
 import AppSheetModal from '@ui/primitives/AppSheetModal';
 import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
 import Header from '@ui/widgets/Header';
+import SearchField from '@ui/widgets/SearchField';
 import { ChevronDown, ChevronLeft } from '@ui/primitives/Icons/Chevron';
 import ContactRow from './components/ContactRow';
 import ContactSheet, { ContactEdit } from '@ui/widgets/ContactSheet';
@@ -253,45 +252,14 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
         </Text>
       </View>
 
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          columnGap: 8,
-          marginHorizontal: SIDE,
-          paddingHorizontal: 12,
-          paddingVertical: 8,
-          borderRadius: 12,
-          borderWidth: 1,
-          backgroundColor: colors.bgCanvas,
-          borderColor: colors.borderMuted,
-        }}
-      >
-        <FontAwesomeIcon
-          icon={faMagnifyingGlass}
-          size={14}
-          color={colors.fgMuted}
-        />
-        <TextInput
+      <View style={{ marginHorizontal: SIDE }}>
+        <SearchField
           testID="addressbook.search"
           value={query}
           onChangeText={setQuery}
           placeholder={translate('addressbook.search-contacts') as string}
-          placeholderTextColor={colors.fgMuted}
-          autoCapitalize="none"
-          autoCorrect={false}
-          spellCheck={false}
-          style={{ flex: 1, fontSize: 14, padding: 0, color: colors.fgDefault }}
+          clearLabel={translate('clear') as string}
         />
-        {query.length > 0 && (
-          <Pressable
-            testID="addressbook.search-clear"
-            onPress={() => setQuery('')}
-            hitSlop={8}
-          >
-            <FontAwesomeIcon icon={faXmark} size={14} color={colors.fgMuted} />
-          </Pressable>
-        )}
       </View>
 
       <ScrollView

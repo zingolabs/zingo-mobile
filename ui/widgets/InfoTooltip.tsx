@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useRef, useState } from 'react';
-import { Pressable, TextStyle, View } from 'react-native';
+import { Pressable, Text, TextStyle, View } from 'react-native';
 import Animated, {
   Keyframe,
   ReduceMotion,
@@ -8,8 +8,6 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faCircleInfo } from '@fortawesome/free-solid-svg-icons';
 
 import { useTheme } from '@app/theme';
 import { duration, ease } from '@app/theme/motion';
@@ -28,25 +26,29 @@ type InfoTooltipProps = {
   // Label and icon sit at the end of the row.
   alignEnd?: boolean;
   labelStyle?: TextStyle;
+  // The bubble opens under the icon instead of above it.
+  below?: boolean;
   // Shown before the icon in place of the label text, which then only
   // names the icon for accessibility.
   children?: React.ReactNode;
 };
 
 const ARROW = 10;
+const ICON_FILL = '#A8B3C4';
+const ICON_INK = '#060B12';
 const GAP = 8;
 
-const bubbleEnter = () =>
+const bubbleEnter = (rise: number) =>
   new Keyframe({
-    0: { opacity: 0, transform: [{ scale: 0.94 }, { translateY: 4 }] },
+    0: { opacity: 0, transform: [{ scale: 0.94 }, { translateY: rise }] },
     100: { opacity: 1, transform: [{ scale: 1 }, { translateY: 0 }] },
   })
     .duration(180)
     .reduceMotion(ReduceMotion.System);
-const bubbleExit = () =>
+const bubbleExit = (rise: number) =>
   new Keyframe({
     0: { opacity: 1, transform: [{ scale: 1 }, { translateY: 0 }] },
-    100: { opacity: 0, transform: [{ scale: 0.94 }, { translateY: 4 }] },
+    100: { opacity: 0, transform: [{ scale: 0.94 }, { translateY: rise }] },
   })
     .duration(120)
     .reduceMotion(ReduceMotion.System);
@@ -61,6 +63,7 @@ const InfoTooltip: React.FunctionComponent<InfoTooltipProps> = ({
   alignStart,
   alignEnd,
   labelStyle,
+  below,
   children,
 }) => {
   const { colors } = useTheme();
@@ -122,24 +125,41 @@ const InfoTooltip: React.FunctionComponent<InfoTooltipProps> = ({
           accessibilityState={{ expanded: open }}
         >
           <Animated.View style={spinStyle}>
-            <FontAwesomeIcon
-              icon={faCircleInfo}
-              size={14}
-              color={colors.fgMuted}
-            />
+            <View
+              style={{
+                width: 14,
+                height: 14,
+                borderRadius: 7,
+                backgroundColor: ICON_FILL,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Text
+                style={{
+                  color: ICON_INK,
+                  fontSize: 9.5,
+                  lineHeight: 14,
+                  fontWeight: '700',
+                }}
+              >
+                i
+              </Text>
+            </View>
           </Animated.View>
         </Pressable>
       </View>
       {open && (
         <Animated.View
-          entering={bubbleEnter()}
-          exiting={bubbleExit()}
+          entering={bubbleEnter(below ? -4 : 4)}
+          exiting={bubbleExit(below ? -4 : 4)}
           onLayout={e => setBubbleW(e.nativeEvent.layout.width)}
           style={{
             position: 'absolute',
-            bottom: '100%',
+            ...(below
+              ? { top: '100%', marginTop: GAP }
+              : { bottom: '100%', marginBottom: GAP }),
             left,
-            marginBottom: GAP,
             width: 236,
             opacity: bubbleW ? 1 : 0,
           }}
@@ -171,14 +191,15 @@ const InfoTooltip: React.FunctionComponent<InfoTooltipProps> = ({
           <View
             style={{
               position: 'absolute',
-              bottom: -ARROW / 2,
+              ...(below ? { top: -ARROW / 2 } : { bottom: -ARROW / 2 }),
               left: iconCenter - left - ARROW / 2,
               width: ARROW,
               height: ARROW,
               backgroundColor: colors.bgSurface,
               borderColor: colors.bottomSheetBorder,
-              borderRightWidth: 1,
-              borderBottomWidth: 1,
+              ...(below
+                ? { borderLeftWidth: 1, borderTopWidth: 1 }
+                : { borderRightWidth: 1, borderBottomWidth: 1 }),
               transform: [{ rotate: '45deg' }],
             }}
           />

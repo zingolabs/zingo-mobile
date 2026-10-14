@@ -52,6 +52,7 @@ const FLASH_HOLD_MS = 490;
 const FLASH_FADE_MS = 910;
 const COLLAPSE_MS = 260;
 const SEND_AT = 72;
+const LEAVE_MS = 280;
 const COPY_SQUEEZE_MS = 110;
 const COPY_SPRING_MS = 150;
 const COPY_HOLD_MS = 1400;
@@ -165,6 +166,7 @@ const ContactRow: React.FunctionComponent<ContactRowProps> = ({
   const shown = useSharedValue(open ? 1 : 0);
   const glow = useSharedValue(0);
   const gone = useSharedValue(0);
+  const leave = useSharedValue(0);
   const rowH = useSharedValue(0);
   const [rowW, setRowW] = useState(0);
   const swipeable = useRef<Swipeable | null>(null);
@@ -227,6 +229,7 @@ const ContactRow: React.FunctionComponent<ContactRowProps> = ({
 
   const rowStyle = useAnimatedStyle(() => ({
     opacity: 1 - gone.value,
+    transform: [{ translateX: leave.value }],
     height: gone.value === 0 ? 'auto' : rowH.value * (1 - gone.value),
   }));
   const glowStyle = useAnimatedStyle(() => ({ opacity: glow.value }));
@@ -381,8 +384,22 @@ const ContactRow: React.FunctionComponent<ContactRowProps> = ({
         renderRightActions={renderSend}
         onSwipeableOpenStartDrag={onSwipe}
         onSwipeableWillOpen={() => {
-          swipeable.current?.close();
-          onSend();
+          const sent = () => {
+            onSend();
+            later(SEND_RESET_AT, () => {
+              swipeable.current?.close();
+              leave.value = 0;
+            });
+          };
+          leave.value = withTiming(
+            -rowW,
+            { duration: LEAVE_MS, easing: ease.in },
+            finished => {
+              if (finished) {
+                runOnJS(sent)();
+              }
+            },
+          );
         }}
       >
         <View style={{ backgroundColor: colors.bgSurface }}>
