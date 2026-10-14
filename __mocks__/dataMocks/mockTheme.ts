@@ -38,6 +38,8 @@ const colors: ThemeColors = {
 
   fgDanger: '#FFB972',
   fgDangerEmphasis: '#dc2626',
+  bgDanger: '#E5484D',
+  sheetHandle: '#1B3C6B',
   fgViewOnly: '#8FB4E6',
 };
 
