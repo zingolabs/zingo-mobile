@@ -24,7 +24,7 @@ import { BottomSheetModal } from '@gorhom/bottom-sheet';
 
 import { useTheme } from '@app/theme';
 import { ease } from '@app/theme/motion';
-import { RouteEnum, SnackbarDurationEnum } from '@app/AppState';
+import { ScreenEnum, RouteEnum, SnackbarDurationEnum } from '@app/AppState';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
 import { useSyncStatus } from '@app/hooks/useSyncStatus';
@@ -37,7 +37,7 @@ import {
 import Utils from '@app/utils';
 import AppSheetModal from '@ui/primitives/AppSheetModal';
 import { ChevronLeft } from '@ui/primitives/Icons/Chevron';
-import MenuHeader from '@ui/widgets/MenuHeader';
+import Header from '@ui/widgets/Header';
 import {
   BlocksIcon,
   ClockIcon,
@@ -360,7 +360,15 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
       testID="syncreport"
       style={{ flex: 1, backgroundColor: colors.bgCanvas, paddingTop: 4 }}
     >
-      <MenuHeader />
+      <Header
+        title={''}
+        screenName={ScreenEnum.SyncReport}
+        noBalance={true}
+        noSyncingStatus={true}
+        noDrawMenu={true}
+        noPrivacy={true}
+        noUfvkIcon={true}
+      />
       <View
         onLayout={e => setRowTop(e.nativeEvent.layout.y)}
         style={{

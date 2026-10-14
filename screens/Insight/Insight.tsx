@@ -11,13 +11,13 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import { useTheme } from '@app/theme';
 import { ease } from '@app/theme/motion';
-import { RouteEnum } from '@app/AppState';
+import { ScreenEnum, RouteEnum } from '@app/AppState';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
 import Utils from '@app/utils';
 import { ChevronLeft } from '@ui/primitives/Icons/Chevron';
 import { UserPlusIcon } from '@ui/primitives/Icons/UserPlusIcon';
-import MenuHeader from '@ui/widgets/MenuHeader';
+import Header from '@ui/widgets/Header';
 import ActivityChart from '@screens/Insight/components/ActivityChart';
 import Donut from '@screens/Insight/components/Donut';
 import {
@@ -209,7 +209,15 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
       testID="insight"
       style={{ flex: 1, backgroundColor: colors.bgCanvas, paddingTop: 4 }}
     >
-      <MenuHeader />
+      <Header
+        title={''}
+        screenName={ScreenEnum.Insight}
+        noBalance={true}
+        noSyncingStatus={true}
+        noDrawMenu={true}
+        noPrivacy={true}
+        noUfvkIcon={true}
+      />
       <View
         style={{
           height: 44,
