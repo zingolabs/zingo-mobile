@@ -21,7 +21,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@app/theme';
 import { ease } from '@app/theme/motion';
 import { ContextAppLoaded } from '@app/context';
-import { RouteEnum, SnackbarDurationEnum } from '@app/AppState';
+import { Route, SnackbarDurationEnum } from '@app/AppState';
 import { AppDrawerParamList } from '@app/types';
 import {
   enactGateAnswer,
@@ -89,10 +89,7 @@ const Slide: React.FunctionComponent<{
 // The wallet's viewing key: a QR and its ends, hidden until Show. With
 // `switchTo`, the last look at it before the wallet moves to a server on
 // that network.
-type ViewingKeyProps = NativeStackScreenProps<
-  AppDrawerParamList,
-  RouteEnum.ViewingKey
->;
+type ViewingKeyProps = NativeStackScreenProps<AppDrawerParamList, 'ViewingKey'>;
 
 const ViewingKey: React.FunctionComponent<ViewingKeyProps> = ({
   navigation,

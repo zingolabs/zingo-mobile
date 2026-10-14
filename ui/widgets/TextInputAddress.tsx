@@ -16,7 +16,7 @@ import { Request, useResult } from '@app/navigation/results';
 import ErrorText from '@ui/primitives/ErrorText';
 import RegText from '@ui/primitives/RegText';
 import { validateAddressForChain } from '@app/swap';
-import { GlobalConst, RouteEnum, ScreenEnum } from '@app/AppState';
+import { GlobalConst, Route, ScreenEnum } from '@app/AppState';
 
 type TextInputAddressProps = {
   address: string;
@@ -25,7 +25,7 @@ type TextInputAddressProps = {
   disabled: boolean;
   showLabel: boolean;
   screenName: ScreenEnum;
-  routeStack?: RouteEnum;
+  routeStack?: Route;
   // SwapKit chain code the address is for ('ZEC' / 'BTC' / ...). Defaults to
   // 'ZEC' → the existing zingolib validation (against `server.chainName`).
   // Non-ZEC values validate by the format-only per-chain regex.
@@ -87,7 +87,7 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
   // caller. A swap chain's address is checked by its own format.
   const setQrcodeModalShow = () => {
     const chain = swapChain ?? GlobalConst.zecSwapChain;
-    navigation.navigate(RouteEnum.Scanner, {
+    navigation.navigate(Route.Scanner, {
       request: scanRequest,
       accepts:
         chain === GlobalConst.zecSwapChain

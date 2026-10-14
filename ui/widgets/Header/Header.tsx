@@ -27,7 +27,7 @@ import { useOptionsPanel } from '@app/context/optionsPanel';
 const HEADER_FADE_MS = 320;
 import {
   NetInfoType,
-  RouteEnum,
+  Route,
   ScreenEnum,
   SnackbarDurationEnum,
   TranslateType,
@@ -203,7 +203,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
       reduceMotion: ReduceMotion.System,
     });
     snowflake.current?.measureInWindow((x, y, width, height) =>
-      navigation.navigate(RouteEnum.ViewingKey, {
+      navigation.navigate(Route.ViewingKey, {
         entry: {
           kind: 'circle',
           origin: { x: x + width / 2, y: y + height / 2 },
@@ -370,7 +370,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               <TouchableOpacity
                 style={{ marginRight: 5, marginTop: 4.5 }}
                 testID="header.messages"
-                onPress={() => navigation.navigate(RouteEnum.Messages)}
+                onPress={() => navigation.navigate(Route.Messages)}
               >
                 <MessagesIcon size={22} color="#B1BBC5" />
               </TouchableOpacity>

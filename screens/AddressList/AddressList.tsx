@@ -21,7 +21,7 @@ import { useScrollToTop } from '@react-navigation/native';
 import { useTheme } from '@app/theme';
 import {
   AddressKindEnum,
-  RouteEnum,
+  Route,
   ScreenEnum,
   TransparentAddressClass,
   UnifiedAddressClass,
@@ -44,7 +44,7 @@ import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
 
 type AddressListProps = NativeStackScreenProps<
   AppDrawerParamList,
-  RouteEnum.AddressList
+  'AddressList'
 >;
 
 const AddressList: React.FunctionComponent<AddressListProps> = ({

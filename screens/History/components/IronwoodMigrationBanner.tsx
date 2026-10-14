@@ -17,7 +17,7 @@ import SegmentedBar from '@ui/primitives/SegmentedBar';
 import { ContextAppLoaded } from '@app/context';
 import Utils from '@app/utils';
 import { NOTICE_RADIUS } from '@ui/widgets/NoticeStack';
-import { RouteEnum } from '@app/AppState';
+import { Route } from '@app/AppState';
 import { migrationStatus, reconcileMigration } from '@app/walletBackend';
 import {
   RPCMigrationStatusType,
@@ -136,9 +136,7 @@ type IronwoodMigrationBannerProps = {
   onStart: () => void;
   // Deep-link back into the in-flight private migration, at whichever screen
   // its phase needs next.
-  onResume: (
-    route: RouteEnum.MigrationSplitting | RouteEnum.MigrationStatus,
-  ) => void;
+  onResume: (route: 'MigrationSplitting' | 'MigrationStatus') => void;
 };
 
 /**
@@ -226,8 +224,8 @@ const IronwoodMigrationBanner: React.FunctionComponent<
     const splitting = phaseKind === 'note_splitting';
     const scheduled = phaseKind === 'parts_scheduled';
     const resumeRoute = scheduled
-      ? RouteEnum.MigrationStatus
-      : RouteEnum.MigrationSplitting;
+      ? Route.MigrationStatus
+      : Route.MigrationSplitting;
 
     // The bar counts notes, one segment each. Batches would be the coarser
     // unit, but a cadence that fits the whole plan into one window leaves a

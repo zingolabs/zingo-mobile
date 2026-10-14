@@ -6,9 +6,9 @@ import {
   useNavigation,
 } from '@react-navigation/native';
 import { useBottomSheetModal } from '@gorhom/bottom-sheet';
-import { RouteEnum } from '@app/AppState';
+import { Route } from '@app/AppState';
 
-const scannerRoutes: string[] = [RouteEnum.Scanner];
+const scannerRoutes: string[] = [Route.Scanner];
 
 const rootRouteName = (navigation: NavigationProp<ParamListBase>) => {
   let root = navigation;

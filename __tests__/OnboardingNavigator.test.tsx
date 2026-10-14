@@ -3,7 +3,7 @@ import React from 'react';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createOnboardingNavigator } from '@app/navigation/OnboardingNavigator';
-import { RouteEnum } from '@app/AppState';
+import { Route } from '@app/AppState';
 import RegText from '@ui/primitives/RegText';
 
 jest.unmock('@react-navigation/native');
@@ -15,26 +15,26 @@ const { Pressable }: typeof import('react-native') =
   jest.requireActual('react-native');
 
 type Routes = {
-  [RouteEnum.Welcome]: undefined;
-  [RouteEnum.ImportWallet]: undefined;
+  [Route.Welcome]: undefined;
+  [Route.ImportWallet]: undefined;
 };
 
 const Onboarding = createOnboardingNavigator<Routes>();
 
 const Tree: React.FC = () => (
   <NavigationContainer>
-    <Onboarding.Navigator initialRouteName={RouteEnum.Welcome}>
-      <Onboarding.Screen name={RouteEnum.Welcome}>
+    <Onboarding.Navigator initialRouteName={Route.Welcome}>
+      <Onboarding.Screen name={Route.Welcome}>
         {({ navigation }) => (
           <Pressable
             testID="go"
-            onPress={() => navigation.navigate(RouteEnum.ImportWallet)}
+            onPress={() => navigation.navigate(Route.ImportWallet)}
           >
             <RegText>welcome</RegText>
           </Pressable>
         )}
       </Onboarding.Screen>
-      <Onboarding.Screen name={RouteEnum.ImportWallet}>
+      <Onboarding.Screen name={Route.ImportWallet}>
         {({ navigation }) => (
           <Pressable testID="back" onPress={() => navigation.goBack()}>
             <RegText>form</RegText>

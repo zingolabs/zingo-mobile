@@ -12,7 +12,7 @@ import {
   AddressBookFileClass,
   ChainNameEnum,
   GlobalConst,
-  RouteEnum,
+  Route,
   ScreenEnum,
 } from '@app/AppState';
 import RegText from '@ui/primitives/RegText';
@@ -51,7 +51,7 @@ type AbDetailProps = {
   ) => void;
   currentAddress?: string;
   screenName: ScreenEnum;
-  routeStack: RouteEnum;
+  routeStack: Route;
   // AbDetail is rendered inside a portaled BottomSheetModal; the host screen
   // (AddressBook) must pass its own `navigation` so the QR button can
   // navigate to Scanner (useNavigation context is lost in the portal).
@@ -312,7 +312,7 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
   const onScanAddress = () => {
     Keyboard.dismiss();
     const open = (origin?: { x: number; y: number }) =>
-      navigation.navigate(RouteEnum.Scanner, {
+      navigation.navigate(Route.Scanner, {
         request: 'addressbook.address',
         accepts: { kind: 'any' },
         texts: {

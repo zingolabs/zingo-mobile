@@ -38,7 +38,7 @@ import { PoolEnum } from './enums/PoolEnum';
 import { RestoreFromTypeEnum } from './enums/RestoreFromTypeEnum';
 import { PoolToShieldEnum } from './enums/PoolToShieldEnum';
 import { SettingsNameEnum } from './enums/SettingsNameEnum';
-import { RouteEnum } from './enums/RouteEnum';
+import { Route } from './enums/Route';
 import { AppStateStatusEnum } from './enums/AppStateStatusEnum';
 import { CurrencyNameEnum } from './enums/CurrencyNameEnum';
 import { AddressKindEnum } from './enums/AddressKindEnum';
@@ -94,7 +94,7 @@ export {
   RestoreFromTypeEnum,
   PoolToShieldEnum,
   SettingsNameEnum,
-  RouteEnum,
+  Route,
   AppStateStatusEnum,
   CurrencyNameEnum,
   AddressKindEnum,

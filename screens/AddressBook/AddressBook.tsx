@@ -25,7 +25,7 @@ import {
   AddressBookFileClass,
   ChainNameEnum,
   FilterEnum,
-  RouteEnum,
+  Route,
   ScreenEnum,
 } from '@app/AppState';
 import { AppDrawerParamList } from '@app/types';
@@ -59,7 +59,7 @@ import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
 
 type AddressBookProps = NativeStackScreenProps<
   AppDrawerParamList,
-  RouteEnum.AddressBook
+  'AddressBook'
 >;
 
 const AddressBook: React.FunctionComponent<AddressBookProps> = ({
@@ -101,10 +101,10 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
       ? route.params.currentAddress
       : '',
   );
-  const [routeStack, setRouteStack] = useState<RouteEnum>(
+  const [routeStack, setRouteStack] = useState<Route>(
     !!route.params && route.params.routeStack !== undefined
       ? route.params.routeStack
-      : RouteEnum.AddressBook,
+      : Route.AddressBook,
   );
   const [containerH, setContainerH] = useState<number>(0);
   const [headerH, setHeaderH] = useState<number>(0);
@@ -185,7 +185,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
     const _routeStack =
       !!route.params && route.params.routeStack !== undefined
         ? route.params.routeStack
-        : RouteEnum.AddressBook;
+        : Route.AddressBook;
     setCurrentAddress(_currentAddress);
     setRouteStack(_routeStack);
   }, [route, route.params, route.params?.currentAddress]);

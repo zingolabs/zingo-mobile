@@ -11,7 +11,7 @@ import {
   defaultAppContextLoaded,
   ContextAppLoadedProvider,
 } from '@app/context';
-import { LanguageEnum, RouteEnum, BlockExplorerEnum } from '@app/AppState';
+import { LanguageEnum, Route, BlockExplorerEnum } from '@app/AppState';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
@@ -22,13 +22,13 @@ import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
 function makeDrawerProps(): NativeStackScreenProps<
   AppDrawerParamList,
-  RouteEnum.Settings
+  'Settings'
 > {
   return {
     navigation: mockNavigation,
     route: {
       key: 'Key-1',
-      name: RouteEnum.Settings,
+      name: Route.Settings,
       params: undefined,
     },
   };

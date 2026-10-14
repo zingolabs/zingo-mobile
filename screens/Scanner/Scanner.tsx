@@ -2,14 +2,14 @@ import React from 'react';
 import { useWindowDimensions } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-import { GlobalConst, RouteEnum } from '@app/AppState';
+import { GlobalConst, Route } from '@app/AppState';
 import { RootParamList, ScanAccepts } from '@app/types';
 import { deliver } from '@app/navigation/results';
 import { validateAddressForChain } from '@app/swap';
 import Utils from '@app/utils';
 import ScanOverlay from '@ui/widgets/ScanOverlay';
 
-type ScannerProps = NativeStackScreenProps<RootParamList, RouteEnum.Scanner>;
+type ScannerProps = NativeStackScreenProps<RootParamList, 'Scanner'>;
 
 const acceptsFor = (
   accepts: ScanAccepts,

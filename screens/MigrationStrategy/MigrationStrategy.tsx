@@ -20,12 +20,12 @@ import { deriveNymGateState } from './components/nymGateState';
 import { AppDrawerParamList } from '@app/types';
 import { AppTheme } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
-import { RouteEnum } from '@app/AppState';
+import { Route } from '@app/AppState';
 import Utils from '@app/utils';
 
 type MigrationStrategyProps = NativeStackScreenProps<
   AppDrawerParamList,
-  RouteEnum.MigrationStrategy
+  'MigrationStrategy'
 > & {
   // Opens or closes the nym gate sheet from outside. Storybook sets it; the
   // app leaves it unset and the Start button drives the sheet.
@@ -231,8 +231,8 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
   const startMigration = useCallback(() => {
     navigation.navigate(
       selected === 'private'
-        ? RouteEnum.MigrationSplitPlan
-        : RouteEnum.MigrationTransactions,
+        ? Route.MigrationSplitPlan
+        : Route.MigrationTransactions,
     );
   }, [navigation, selected]);
 

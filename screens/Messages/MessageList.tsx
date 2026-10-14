@@ -31,7 +31,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faChevronLeft, faAngleDown } from '@fortawesome/free-solid-svg-icons';
 import BottomSheet from '@gorhom/bottom-sheet';
 
-import { RouteEnum, ScreenEnum, ValueTransferType } from '@app/AppState';
+import { Route, ScreenEnum, ValueTransferType } from '@app/AppState';
 import { AppDrawerParamList } from '@app/types';
 import FadeText from '@ui/primitives/FadeText';
 import BoldText from '@ui/primitives/BoldText';
@@ -44,10 +44,7 @@ import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
 import Utils from '@app/utils';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-type MessageListProps = NativeStackScreenProps<
-  AppDrawerParamList,
-  RouteEnum.Messages
->;
+type MessageListProps = NativeStackScreenProps<AppDrawerParamList, 'Messages'>;
 
 const MessageList: React.FunctionComponent<MessageListProps> = () => {
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
@@ -224,7 +221,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = () => {
   const setValueTransferDetailModalShow = useCallback(
     async (index: number, vt: ValueTransferType) => {
       const current = messagesRef.current;
-      navigation.navigate(RouteEnum.ValueTransferDetail, {
+      navigation.navigate(Route.ValueTransferDetail, {
         index,
         vt,
         valueTransfersSliced: current ?? [],

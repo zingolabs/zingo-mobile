@@ -11,7 +11,6 @@ import { SnackbarDurationEnum } from './enums/SnackbarDurationEnum';
 import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
 import { BlockExplorerEnum } from './enums/BlockExplorerEnum';
 import { ChainNameEnum } from './enums/ChainNameEnum';
-import { RouteEnum } from './enums/RouteEnum';
 import WalletType from './types/WalletType';
 import { WalletErrorInfo } from './types/WalletErrorInfo';
 import { ServerStatus } from './types/ServerStatus';
@@ -74,9 +73,7 @@ export interface OnboardingContext {
   serverLists: Record<string, ServerUrisType[]>;
   serverBackGuard: BackGuard;
   // `origin` is the screen the import started from; a failure returns there.
-  importRecoveryWallet: (
-    origin: RouteEnum.Welcome | RouteEnum.ImportChooser,
-  ) => void;
+  importRecoveryWallet: (origin: 'Welcome' | 'ImportChooser') => void;
   viewRecoveryWallet: () => void;
   openServer: (chain?: ChainNameEnum) => void;
   closeServer: () => void;

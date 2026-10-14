@@ -7,7 +7,7 @@ import {
 } from '@react-navigation/native';
 import {
   PoolToShieldEnum,
-  RouteEnum,
+  Route,
   ServerType,
   SnackbarDurationEnum,
   TranslateType,
@@ -160,7 +160,7 @@ export function useShieldFunds({
       return;
     }
 
-    navigation.navigate(RouteEnum.Computing);
+    navigation.navigate(Route.Computing);
     await shieldPropose();
     const shield = await shieldConfirm();
 
@@ -168,7 +168,7 @@ export function useShieldFunds({
     setScrollToBottom?.(true);
     setShieldingFee(0);
     setShieldingAmount?.(0);
-    navigation.navigate(RouteEnum.Computing, shieldEnd(shield));
+    navigation.navigate(Route.Computing, shieldEnd(shield));
   }, [
     setBackgroundError,
     addLastSnackbar,

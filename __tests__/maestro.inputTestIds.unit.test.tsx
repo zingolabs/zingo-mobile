@@ -14,7 +14,7 @@ import {
   defaultAppContextLoaded,
   ContextAppLoadedProvider,
 } from '@app/context';
-import { ChainNameEnum, RouteEnum, SelectServerEnum } from '@app/AppState';
+import { ChainNameEnum, Route, SelectServerEnum } from '@app/AppState';
 import { remoteServer } from '@app/AppState/types/ServerType';
 import { mockValueTransfers } from '../__mocks__/dataMocks/mockValueTransfers';
 import { mockAddresses } from '../__mocks__/dataMocks/mockAddresses';
@@ -46,7 +46,7 @@ function accessibleAncestor(element: ReactTestInstance): string | undefined {
   return undefined;
 }
 
-function drawerProps<R extends RouteEnum.Send | RouteEnum.Settings>(
+function drawerProps<R extends 'Send' | 'Settings'>(
   name: R,
 ): NativeStackScreenProps<AppDrawerParamList, R> {
   return {
@@ -80,7 +80,7 @@ describe('Maestro reaches each typed field on iOS', () => {
     state.sendPageState = mockSendPageState;
     const send = render(
       <ContextAppLoadedProvider value={state}>
-        <Send {...drawerProps(RouteEnum.Send)} />
+        <Send {...drawerProps(Route.Send)} />
       </ContextAppLoadedProvider>,
     );
     for (const id of [

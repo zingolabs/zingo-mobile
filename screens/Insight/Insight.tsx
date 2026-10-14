@@ -36,7 +36,7 @@ import {
   getTotalValueToAddress,
 } from '@app/walletBackend';
 import AddressItem from '@ui/widgets/AddressItem';
-import { RouteEnum, ScreenEnum, SnackbarDurationEnum } from '@app/AppState';
+import { Route, ScreenEnum, SnackbarDurationEnum } from '@app/AppState';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
 
@@ -60,10 +60,7 @@ const getPercent = (percent: number) => {
   );
 };
 
-type InsightProps = NativeStackScreenProps<
-  AppDrawerParamList,
-  RouteEnum.Insight
->;
+type InsightProps = NativeStackScreenProps<AppDrawerParamList, 'Insight'>;
 
 const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
   const context = useContext(ContextAppLoaded);

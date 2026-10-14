@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 
-import { LaunchingModeEnum, RouteEnum } from '@app/AppState';
+import { LaunchingModeEnum, Route } from '@app/AppState';
 import { ContextAppLoading } from '@app/context';
 import { useSession } from './session';
 import { LoadingStack, Onboarding } from './loadingStack';
@@ -49,23 +49,17 @@ function OnboardingSection() {
   const start = session.kind === 'onboarding' ? session.start : undefined;
   return (
     <Onboarding.Navigator initialRouteName={start}>
-      <Onboarding.Screen name={RouteEnum.Welcome} component={WelcomeScreen} />
-      <Onboarding.Screen name={RouteEnum.Progress} component={ProgressScreen} />
+      <Onboarding.Screen name={Route.Welcome} component={WelcomeScreen} />
+      <Onboarding.Screen name={Route.Progress} component={ProgressScreen} />
       <Onboarding.Screen
-        name={RouteEnum.ImportChooser}
+        name={Route.ImportChooser}
         component={ImportChooserScreen}
       />
+      <Onboarding.Screen name={Route.OpenError} component={OpenErrorScreen} />
+      <Onboarding.Screen name={Route.Server} component={ServerScreen} />
+      <Onboarding.Screen name={Route.ServerList} component={ServerListScreen} />
       <Onboarding.Screen
-        name={RouteEnum.OpenError}
-        component={OpenErrorScreen}
-      />
-      <Onboarding.Screen name={RouteEnum.Server} component={ServerScreen} />
-      <Onboarding.Screen
-        name={RouteEnum.ServerList}
-        component={ServerListScreen}
-      />
-      <Onboarding.Screen
-        name={RouteEnum.ImportWallet}
+        name={Route.ImportWallet}
         component={ImportWalletScreen}
       />
     </Onboarding.Navigator>
@@ -81,12 +75,12 @@ export function LoadingNavigator() {
       screenOptions={{ headerShown: false, animation: 'none' }}
     >
       {session.kind === 'locked' ? (
-        <LoadingStack.Screen name={RouteEnum.Lock} component={LockScreen} />
+        <LoadingStack.Screen name={Route.Lock} component={LockScreen} />
       ) : session.kind === 'boot' ? (
-        <LoadingStack.Screen name={RouteEnum.Boot} component={BootScreen} />
+        <LoadingStack.Screen name={Route.Boot} component={BootScreen} />
       ) : (
         <LoadingStack.Screen
-          name={RouteEnum.Onboarding}
+          name={Route.Onboarding}
           component={OnboardingSection}
         />
       )}

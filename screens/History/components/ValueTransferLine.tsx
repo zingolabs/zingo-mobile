@@ -29,7 +29,7 @@ import {
   GlobalConst,
   SendPageStateClass,
   ToAddrClass,
-  RouteEnum,
+  Route,
   ScreenEnum,
 } from '@app/AppState';
 
@@ -180,8 +180,8 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                     );
                     sendPageState.toaddr.to = vt.address ? vt.address : '';
                     setSendPageState(sendPageState);
-                    navigation.navigate(RouteEnum.Home, {
-                      screen: RouteEnum.Send,
+                    navigation.navigate(Route.Home, {
+                      screen: Route.Send,
                     });
                     closeAllSwipeables();
                   }}

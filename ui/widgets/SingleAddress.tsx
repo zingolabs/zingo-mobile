@@ -13,7 +13,7 @@ import { ContextAppLoaded } from '@app/context';
 import { useResult } from '@app/navigation/results';
 import {
   AddressKindEnum,
-  RouteEnum,
+  Route,
   SnackbarDurationEnum,
   TransparentAddressClass,
   UnifiedAddressClass,
@@ -78,7 +78,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
 
   useResult('receive.addressIndex', i => setIndex(Number(i)));
   const doAddressList = () => {
-    navigation.navigate(RouteEnum.AddressList, {
+    navigation.navigate(Route.AddressList, {
       addressKind: address ? address.addressKind : AddressKindEnum.u,
       request: 'receive.addressIndex',
     });

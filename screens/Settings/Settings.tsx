@@ -39,7 +39,7 @@ import Header from '@ui/widgets/Header';
 import {
   LanguageEnum,
   GlobalConst,
-  RouteEnum,
+  Route,
   ScreenEnum,
   BlockExplorerEnum,
   ChainNameEnum,
@@ -78,10 +78,7 @@ type Options = {
   text: string;
 };
 
-type SettingsProps = NativeStackScreenProps<
-  AppDrawerParamList,
-  RouteEnum.Settings
->;
+type SettingsProps = NativeStackScreenProps<AppDrawerParamList, 'Settings'>;
 
 const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
   const context = useContext(ContextAppLoaded);
@@ -362,7 +359,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
     if (navigation.canGoBack()) {
       navigation.goBack();
     } else {
-      navigation.navigate(RouteEnum.Home);
+      navigation.navigate(Route.Home);
     }
   };
   saveSettingsRef.current = saveSettings;
@@ -383,7 +380,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
     if (navigation.canGoBack()) {
       navigation.goBack();
     } else {
-      navigation.navigate(RouteEnum.Home);
+      navigation.navigate(Route.Home);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -753,7 +750,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
               {mixnetView.kind === 'transport' && (
                 <TouchableOpacity
                   testID="settings.mixnet"
-                  onPress={() => navigation.navigate(RouteEnum.MixnetDoctor)}
+                  onPress={() => navigation.navigate(Route.MixnetDoctor)}
                   style={{
                     flexDirection: 'row',
                     alignItems: 'center',
@@ -819,7 +816,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
               <TouchableOpacity
                 testID="settings.about"
                 disabled={disabled}
-                onPress={() => navigation.navigate(RouteEnum.About)}
+                onPress={() => navigation.navigate(Route.About)}
                 style={{
                   flexDirection: 'row',
                   alignItems: 'center',

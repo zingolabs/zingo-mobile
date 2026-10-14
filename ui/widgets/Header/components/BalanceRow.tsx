@@ -17,7 +17,7 @@ import { useTheme } from '@app/theme';
 import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
-  RouteEnum,
+  Route,
   ServerType,
   SnackbarDurationEnum,
   TranslateType,
@@ -199,7 +199,7 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
                 totalBalance.totalTransparentBalance > 0) && (
                 <TouchableOpacity
                   onPress={() => {
-                    navigation.navigate(RouteEnum.Pools);
+                    navigation.navigate(Route.Pools);
                   }}
                 >
                   <View

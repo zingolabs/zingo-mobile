@@ -11,7 +11,7 @@ import {
 } from '@app/context';
 
 import ValueTransferDetail from '@screens/ValueTransferDetail';
-import { RouteEnum } from '@app/AppState';
+import { Route } from '@app/AppState';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockValueTransfers } from '../__mocks__/dataMocks/mockValueTransfers';
@@ -35,12 +35,12 @@ const fixedValueTransfers = mockValueTransfers.map(vt => ({
 
 function makeProps(
   index: number,
-): NativeStackScreenProps<AppDrawerParamList, RouteEnum.ValueTransferDetail> {
+): NativeStackScreenProps<AppDrawerParamList, 'ValueTransferDetail'> {
   return {
     navigation: mockNavigation,
     route: {
       key: 'Key-1',
-      name: RouteEnum.ValueTransferDetail,
+      name: Route.ValueTransferDetail,
       params: {
         index,
         vt: fixedValueTransfers[index],

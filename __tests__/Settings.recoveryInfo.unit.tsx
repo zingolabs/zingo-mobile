@@ -15,7 +15,7 @@ import {
   defaultAppContextLoaded,
   ContextAppLoadedProvider,
 } from '@app/context';
-import { RouteEnum, SelectServerEnum } from '@app/AppState';
+import { Route, SelectServerEnum } from '@app/AppState';
 import { saveRecoveryWalletInfo } from '@app/services/recoveryWalletInfo';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
@@ -79,7 +79,7 @@ test('Tests that tapping the warning in Settings saves the recovery info and sho
   );
   const props: any = {
     navigation: mockNavigation,
-    route: { key: 'Key-1', name: RouteEnum.Settings, params: undefined },
+    route: { key: 'Key-1', name: Route.Settings, params: undefined },
   };
   render(
     <ContextAppLoadedProvider

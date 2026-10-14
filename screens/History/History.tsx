@@ -32,7 +32,7 @@ import {
   FilterEnum,
   GlobalConst,
   isIronwoodActive,
-  RouteEnum,
+  Route,
   ScreenEnum,
   ValueTransferKindEnum,
   //SelectServerEnum,
@@ -81,10 +81,7 @@ const ViewTypes = {
   WITHOUT_MONTH_REFRESH: 3,
 };
 
-type HistoryProps = NativeStackScreenProps<
-  AppDrawerParamList,
-  RouteEnum.History
->;
+type HistoryProps = NativeStackScreenProps<AppDrawerParamList, 'History'>;
 
 const History: React.FunctionComponent<HistoryProps> = () => {
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
@@ -180,7 +177,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
         <ViewOnlyNotice
           onDismiss={dismissViewOnlyNotice}
           onViewKey={from =>
-            navigation.navigate(RouteEnum.ViewingKey, {
+            navigation.navigate(Route.ViewingKey, {
               entry: { kind: 'card', from },
             })
           }
@@ -195,7 +192,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
         <IronwoodMigrationBanner
           amount={orchardAmount}
           currencyName={info.currencyName}
-          onStart={() => navigation.navigate(RouteEnum.MeetIronwood)}
+          onStart={() => navigation.navigate(Route.MeetIronwood)}
           onResume={route => navigation.navigate(route)}
         />
       ),
@@ -209,7 +206,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
           covered={backingUp && !focused}
           onBackUp={from => {
             setBackingUp(true);
-            navigation.navigate(RouteEnum.SeedBackup, {
+            navigation.navigate(Route.SeedBackup, {
               entry: { kind: 'card', from },
             });
           }}
@@ -617,7 +614,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
         valueTransfersFiltered !== null
           ? valueTransfersFiltered.length
           : valueTransfersSliced.length;
-      navigation.navigate(RouteEnum.ValueTransferDetail, {
+      navigation.navigate(Route.ValueTransferDetail, {
         index: targetIndex >= 0 ? targetIndex : 0,
         vt: vt,
         valueTransfersSliced: valueTransfersSliced,

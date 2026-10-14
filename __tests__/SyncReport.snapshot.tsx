@@ -19,18 +19,18 @@ import mockSyncingStatus from '../__mocks__/dataMocks/mockSyncingStatus';
 import { mockNetInfo } from '../__mocks__/dataMocks/mockNetInfo';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AppDrawerParamList } from '@app/types';
-import { RouteEnum } from '@app/AppState';
+import { Route } from '@app/AppState';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
 function makeDrawerProps(): NativeStackScreenProps<
   AppDrawerParamList,
-  RouteEnum.SyncReport
+  'SyncReport'
 > {
   return {
     navigation: mockNavigation,
     route: {
       key: 'About-1',
-      name: RouteEnum.SyncReport,
+      name: Route.SyncReport,
       params: undefined,
     },
   };

@@ -15,12 +15,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import FadeText from '@ui/primitives/FadeText';
 import { faChevronLeft, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import BottomSheet, { BottomSheetScrollView } from '@gorhom/bottom-sheet';
-import { RouteEnum, ScreenEnum } from '@app/AppState';
+import { Route, ScreenEnum } from '@app/AppState';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
 
-type PoolsProps = NativeStackScreenProps<AppDrawerParamList, RouteEnum.Pools>;
+type PoolsProps = NativeStackScreenProps<AppDrawerParamList, 'Pools'>;
 
 const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
   const context = useContext(ContextAppLoaded);

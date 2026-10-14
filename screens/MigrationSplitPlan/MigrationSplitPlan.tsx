@@ -11,7 +11,7 @@ import StepperHeader from '@ui/widgets/StepperHeader';
 import { AppDrawerParamList } from '@app/types';
 import { AppTheme } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
-import { RouteEnum } from '@app/AppState';
+import { Route } from '@app/AppState';
 import Utils from '@app/utils';
 import { planIronwoodMigration } from '@app/walletBackend';
 import {
@@ -21,7 +21,7 @@ import {
 
 type MigrationSplitPlanProps = NativeStackScreenProps<
   AppDrawerParamList,
-  RouteEnum.MigrationSplitPlan
+  'MigrationSplitPlan'
 >;
 
 const ZATS_PER_ZEC = 10 ** 8;
@@ -152,10 +152,10 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
     }
     const hasSplits = (plan.split_rounds?.length ?? 0) > 0;
     if (!hasSplits && (plan.parts?.length ?? 0) > 0) {
-      navigation.navigate(RouteEnum.MigrationCadence);
+      navigation.navigate(Route.MigrationCadence);
       return;
     }
-    navigation.navigate(RouteEnum.MigrationSplitting, { plan });
+    navigation.navigate(Route.MigrationSplitting, { plan });
   }, [plan, navigation]);
 
   const splitRounds = plan?.split_rounds ?? [];

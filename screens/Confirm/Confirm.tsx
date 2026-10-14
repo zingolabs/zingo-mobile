@@ -43,16 +43,13 @@ import { sendPermit } from '@app/walletBackend/transforms/sendPermit';
 import {
   GlobalConst,
   ScreenEnum,
-  RouteEnum,
+  Route,
   SendPageStateClass,
   ProposalPoolsType,
 } from '@app/AppState';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-type ConfirmProps = NativeStackScreenProps<
-  AppDrawerParamList,
-  RouteEnum.Confirm
->;
+type ConfirmProps = NativeStackScreenProps<AppDrawerParamList, 'Confirm'>;
 
 const poolCrossingKey = ({
   source,

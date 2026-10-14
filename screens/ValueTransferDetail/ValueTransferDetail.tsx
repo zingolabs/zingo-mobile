@@ -26,7 +26,7 @@ import {
   ValueTransferType,
   ValueTransferKindEnum,
   GlobalConst,
-  RouteEnum,
+  Route,
   TransactionActionEnum,
   UnifiedAddressClass,
   TransparentAddressClass,
@@ -63,7 +63,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 type ValueTransferDetailProps = NativeStackScreenProps<
   AppDrawerParamList,
-  RouteEnum.ValueTransferDetail
+  'ValueTransferDetail'
 >;
 
 const ValueTransferDetail: React.FunctionComponent<
@@ -300,7 +300,7 @@ const ValueTransferDetail: React.FunctionComponent<
     }
 
     // not use await here.
-    navigation.navigate(RouteEnum.Computing);
+    navigation.navigate(Route.Computing);
 
     const actionResult = await removeTransaction(valueTransfer.txid);
 
@@ -326,8 +326,8 @@ const ValueTransferDetail: React.FunctionComponent<
       );
     }
     // change to the history screen, just in case.
-    navigation.navigate(RouteEnum.Home, {
-      screen: RouteEnum.History,
+    navigation.navigate(Route.Home, {
+      screen: Route.History,
     });
   };
 

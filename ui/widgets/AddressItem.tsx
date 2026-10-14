@@ -18,7 +18,7 @@ import {
   SendPageStateClass,
   ToAddrClass,
   SnackbarDurationEnum,
-  RouteEnum,
+  Route,
   ScreenEnum,
 } from '@app/AppState';
 import {
@@ -226,8 +226,8 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
             const sendPageState = new SendPageStateClass(new ToAddrClass(0));
             sendPageState.toaddr.to = address;
             setSendPageState(sendPageState);
-            navigation.navigate(RouteEnum.Home, {
-              screen: RouteEnum.Send,
+            navigation.navigate(Route.Home, {
+              screen: Route.Send,
             });
           }}
         >

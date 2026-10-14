@@ -7,11 +7,7 @@ import React, {
   useState,
 } from 'react';
 import { Linking } from 'react-native';
-import {
-  BiometricGateOutcome,
-  EventListenerEnum,
-  RouteEnum,
-} from '@app/AppState';
+import { BiometricGateOutcome, EventListenerEnum } from '@app/AppState';
 import { LoadedAppNavigationState } from '@app/types';
 
 export type GateDeclined = Extract<BiometricGateOutcome, { kind: 'declined' }>;
@@ -26,7 +22,7 @@ export type AppSession =
   | { kind: 'locked'; gate: GateDeclined }
   // The stage opens on the welcome, or on the error of a wallet that did
   // not open.
-  | { kind: 'onboarding'; start: RouteEnum.Welcome | RouteEnum.OpenError }
+  | { kind: 'onboarding'; start: 'Welcome' | 'OpenError' }
   | { kind: 'wallet'; params: LoadedAppNavigationState };
 
 export type LoadingSession = Exclude<AppSession, { kind: 'wallet' }>;

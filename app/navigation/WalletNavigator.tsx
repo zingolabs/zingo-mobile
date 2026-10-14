@@ -5,7 +5,7 @@ import {
   createBottomTabNavigator,
 } from '@react-navigation/bottom-tabs';
 
-import { RouteEnum } from '@app/AppState';
+import { Route } from '@app/AppState';
 import { ContextAppLoaded } from '@app/context';
 import { AppDrawerParamList, HomeTabParamList } from '@app/types';
 import CustomTabBar from './CustomTabBar';
@@ -67,16 +67,16 @@ function HomeTabs() {
   return (
     <Tab.Navigator
       detachInactiveScreens={true}
-      initialRouteName={RouteEnum.History}
+      initialRouteName={Route.History}
       backBehavior="initialRoute"
       tabBar={renderTabBar}
       screenOptions={{ headerShown: false }}
     >
-      <Tab.Screen name={RouteEnum.History} component={History} />
+      <Tab.Screen name={Route.History} component={History} />
       {!readOnly && server.kind === 'remote' && (
-        <Tab.Screen name={RouteEnum.Send} component={Send} />
+        <Tab.Screen name={Route.Send} component={Send} />
       )}
-      <Tab.Screen name={RouteEnum.Receive} component={Receive} />
+      <Tab.Screen name={Route.Receive} component={Receive} />
     </Tab.Navigator>
   );
 }
@@ -96,7 +96,7 @@ function Home() {
 export function WalletNavigator() {
   return (
     <Stack.Navigator
-      initialRouteName={RouteEnum.Home}
+      initialRouteName={Route.Home}
       screenOptions={{
         headerShown: false,
         // Each screen extends edge-to-edge (BottomSheets handle their own
@@ -104,76 +104,73 @@ export function WalletNavigator() {
         contentStyle: { backgroundColor: 'transparent' },
       }}
     >
-      <Stack.Screen name={RouteEnum.Home} component={Home} />
+      <Stack.Screen name={Route.Home} component={Home} />
       <Stack.Group>
-        <Stack.Screen name={RouteEnum.Settings} component={Settings} />
+        <Stack.Screen name={Route.Settings} component={Settings} />
         <Stack.Screen
-          name={RouteEnum.Server}
+          name={Route.Server}
           component={WalletServer}
           options={{ animation: 'slide_from_right' }}
         />
-        <Stack.Screen name={RouteEnum.About} component={About} />
-        <Stack.Screen name={RouteEnum.MixnetDoctor} component={MixnetDoctor} />
-        <Stack.Screen name={RouteEnum.Rescan} component={Rescan} />
-        <Stack.Screen name={RouteEnum.Insight} component={Insight} />
-        <Stack.Screen name={RouteEnum.SyncReport} component={SyncReport} />
-        <Stack.Screen name={RouteEnum.Pools} component={Pools} />
+        <Stack.Screen name={Route.About} component={About} />
+        <Stack.Screen name={Route.MixnetDoctor} component={MixnetDoctor} />
+        <Stack.Screen name={Route.Rescan} component={Rescan} />
+        <Stack.Screen name={Route.Insight} component={Insight} />
+        <Stack.Screen name={Route.SyncReport} component={SyncReport} />
+        <Stack.Screen name={Route.Pools} component={Pools} />
         <Stack.Screen
-          name={RouteEnum.WalletSeed}
+          name={Route.WalletSeed}
           component={WalletSeed}
           options={{ animation: 'slide_from_right' }}
         />
-        <Stack.Screen name={RouteEnum.AddressBook} component={AddressBook} />
+        <Stack.Screen name={Route.AddressBook} component={AddressBook} />
         <Stack.Screen
-          name={RouteEnum.ValueTransferDetail}
+          name={Route.ValueTransferDetail}
           component={ValueTransferDetail}
         />
-        <Stack.Screen name={RouteEnum.AddressList} component={AddressList} />
-        <Stack.Screen name={RouteEnum.Messages} component={MessageList} />
-        <Stack.Screen name={RouteEnum.Confirm} component={Confirm} />
-        <Stack.Screen
-          name={RouteEnum.Computing}
-          component={ComputingTxContent}
-        />
+        <Stack.Screen name={Route.AddressList} component={AddressList} />
+        <Stack.Screen name={Route.Messages} component={MessageList} />
+        <Stack.Screen name={Route.Confirm} component={Confirm} />
+        <Stack.Screen name={Route.Computing} component={ComputingTxContent} />
       </Stack.Group>
       {/* One-way flows: no swipe back; each screen closes itself, and the
         ones that broadcast block hardware back while they run. */}
       <Stack.Group screenOptions={{ gestureEnabled: false }}>
-        <Stack.Screen name={RouteEnum.MeetIronwood} component={MeetIronwood} />
+        <Stack.Screen name={Route.MeetIronwood} component={MeetIronwood} />
         <Stack.Screen
-          name={RouteEnum.MigrationStrategy}
+          name={Route.MigrationStrategy}
           component={MigrationStrategy}
         />
         <Stack.Screen
-          name={RouteEnum.MigrationTransactions}
+          name={Route.MigrationTransactions}
           component={MigrationTransactions}
         />
         <Stack.Screen
-          name={RouteEnum.MigrationSending}
+          name={Route.MigrationSending}
           component={MigrationSending}
         />
         <Stack.Screen
-          name={RouteEnum.MigrationSplitPlan}
+          name={Route.MigrationSplitPlan}
           component={MigrationSplitPlan}
         />
         <Stack.Screen
-          name={RouteEnum.MigrationSplitting}
+          name={Route.MigrationSplitting}
           component={MigrationSplitting}
         />
         <Stack.Screen
-          name={RouteEnum.MigrationCadence}
+          name={Route.MigrationCadence}
           component={MigrationCadence}
         />
         <Stack.Screen
-          name={RouteEnum.MigrationSchedule}
+          name={Route.MigrationSchedule}
           component={MigrationSchedule}
         />
         <Stack.Screen
-          name={RouteEnum.MigrationStatus}
+          name={Route.MigrationStatus}
           component={MigrationStatus}
         />
         <Stack.Screen
-          name={RouteEnum.MigrationBatchSending}
+          name={Route.MigrationBatchSending}
           component={MigrationBatchSending}
         />
       </Stack.Group>
@@ -186,8 +183,8 @@ export function WalletNavigator() {
           gestureEnabled: false,
         }}
       >
-        <Stack.Screen name={RouteEnum.SeedBackup} component={SeedBackup} />
-        <Stack.Screen name={RouteEnum.ViewingKey} component={ViewingKey} />
+        <Stack.Screen name={Route.SeedBackup} component={SeedBackup} />
+        <Stack.Screen name={Route.ViewingKey} component={ViewingKey} />
       </Stack.Group>
     </Stack.Navigator>
   );

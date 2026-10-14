@@ -16,7 +16,7 @@ import StepperHeader from '@ui/widgets/StepperHeader';
 import { AppDrawerParamList } from '@app/types';
 import { AppTheme } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
-import { RouteEnum } from '@app/AppState';
+import { Route } from '@app/AppState';
 import {
   migrationStatus,
   planIronwoodMigration,
@@ -29,7 +29,7 @@ import { RPCMigrationPlanType } from '@app/walletBackend/types/RPCMigrationPlanT
 
 type MigrationCadenceProps = NativeStackScreenProps<
   AppDrawerParamList,
-  RouteEnum.MigrationCadence
+  'MigrationCadence'
 >;
 
 const ZATS_PER_ZEC = 10 ** 8;
@@ -222,12 +222,12 @@ const MigrationCadence: React.FunctionComponent<MigrationCadenceProps> = ({
     const route = routeStartMigration(start);
     switch (route.kind) {
       case 'proceed':
-        navigation.navigate(RouteEnum.MigrationSchedule, { perBucket });
+        navigation.navigate(Route.MigrationSchedule, { perBucket });
         return;
       // A migration already exists (re-entry after Phase 2 already started):
       // its schedule stands — review it.
       case 'resume':
-        navigation.navigate(RouteEnum.MigrationSchedule, { perBucket });
+        navigation.navigate(Route.MigrationSchedule, { perBucket });
         return;
       // ConsentStale: notes changed between the plan read and this call. Reload
       // the fresh figures so the user reviews and schedules against them.

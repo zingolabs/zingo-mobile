@@ -62,7 +62,7 @@ import {
   ToAddrClass,
   GlobalConst,
   SelectServerEnum,
-  RouteEnum,
+  Route,
   ScreenEnum,
   ProposalPoolsType,
 } from '@app/AppState';
@@ -108,7 +108,7 @@ import { retryServer } from '@app/services/retryServer';
 import { RPCSpendablebalanceType } from '@app/walletBackend/types/RPCSpendablebalanceType';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-type SendProps = NativeStackScreenProps<AppDrawerParamList, RouteEnum.Send>;
+type SendProps = NativeStackScreenProps<AppDrawerParamList, 'Send'>;
 
 const Send: React.FunctionComponent<SendProps> = () => {
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
@@ -932,7 +932,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
       return;
     }
 
-    navigation.navigate(RouteEnum.Computing);
+    navigation.navigate(Route.Computing);
 
     // The MAX send travels the send-all path all the way: quoted and sent by
     // the same proposal, so the amount confirmed is the amount broadcast.
@@ -954,7 +954,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
       setScrollToTop(true);
       setScrollToBottom(true);
     }
-    navigation.navigate(RouteEnum.Computing, computingEnd(settlement));
+    navigation.navigate(Route.Computing, computingEnd(settlement));
   };
 
   const scanButton = useRef<View>(null);
@@ -991,7 +991,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
   useResult('send.confirm', () => confirmSend(buildSendState()));
   const setQrcodeModalShow = () => {
     const open = (origin?: { x: number; y: number }) =>
-      navigation.navigate(RouteEnum.Scanner, {
+      navigation.navigate(Route.Scanner, {
         request: 'send.address',
         accepts: { kind: 'zcash', chain: server.chainName },
         texts: {
@@ -1053,7 +1053,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
   );
 
   const setConfirmModalShow = async () => {
-    navigation.navigate(RouteEnum.Confirm, {
+    navigation.navigate(Route.Confirm, {
       calculatedFee: fee,
       proposalPools: proposalPools,
       sendAllAmount: isSendAllAmount(amountText),
@@ -1665,7 +1665,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
                       <TouchableOpacity
                         style={{ alignSelf: 'flex-start' }}
                         onPress={() => {
-                          navigation.navigate(RouteEnum.Pools);
+                          navigation.navigate(Route.Pools);
                         }}
                       >
                         <View
@@ -1694,7 +1694,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
                       <TouchableOpacity
                         style={{ alignSelf: 'flex-start' }}
                         onPress={() => {
-                          navigation.navigate(RouteEnum.Pools);
+                          navigation.navigate(Route.Pools);
                         }}
                       >
                         <View

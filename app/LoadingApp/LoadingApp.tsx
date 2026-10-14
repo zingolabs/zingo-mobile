@@ -68,7 +68,7 @@ import {
   ChainNameEnum,
   SnackbarDurationEnum,
   SettingsNameEnum,
-  RouteEnum,
+  Route,
   AppStateStatusEnum,
   GlobalConst,
   EventListenerEnum,
@@ -143,10 +143,7 @@ const pt = require('@app/translations/pt.json');
 const ru = require('@app/translations/ru.json');
 const tr = require('@app/translations/tr.json');
 
-type LoadingAppProps = NativeStackScreenProps<
-  RootParamList,
-  RouteEnum.Loading
-> & {
+type LoadingAppProps = NativeStackScreenProps<RootParamList, 'Loading'> & {
   session: LoadingSession;
 };
 
@@ -357,7 +354,7 @@ export default function LoadingApp(props: LoadingAppProps) {
 type LoadingAppClassProps = {
   session: LoadingSession;
   openWallet: (params: LoadedAppNavigationState) => void;
-  openOnboarding: (start: RouteEnum.Welcome | RouteEnum.OpenError) => void;
+  openOnboarding: (start: 'Welcome' | 'OpenError') => void;
   openBoot: () => void;
   translate: (key: string) => TranslateType;
   theme: AppTheme;
@@ -459,14 +456,11 @@ export class LoadingAppClass extends Component<
   onHardwareBack = (): boolean => {
     const { actionButtonsDisabled } = this.state;
     const route = currentRoute();
-    if (route === RouteEnum.Server) {
+    if (route === Route.Server) {
       if (!actionButtonsDisabled && !this.serverBackGuard.current?.()) {
         this.closeServer();
       }
-    } else if (
-      route === RouteEnum.ServerList ||
-      route === RouteEnum.ImportChooser
-    ) {
+    } else if (route === Route.ServerList || route === Route.ImportChooser) {
       if (!actionButtonsDisabled) {
         goBack();
       }
@@ -572,7 +566,7 @@ export class LoadingAppClass extends Component<
     } else {
       // no wallet file -> go to the initial menu.
       this.setState({ walletExists: false, actionButtonsDisabled: false });
-      this.props.openOnboarding(RouteEnum.Welcome);
+      this.props.openOnboarding(Route.Welcome);
     }
 
     if (this.unmounted) {
@@ -843,13 +837,13 @@ export class LoadingAppClass extends Component<
   // Puts the error screen on stage: opening from the welcome fails on stage,
   // opening at boot opens the stage on the error.
   openError = () => {
-    if (currentRoute() === RouteEnum.OpenError) {
+    if (currentRoute() === Route.OpenError) {
       return;
     }
     if (this.props.session.kind === 'onboarding') {
-      navigateOnboarding({ screen: RouteEnum.OpenError });
+      navigateOnboarding({ screen: Route.OpenError });
     } else {
-      this.props.openOnboarding(RouteEnum.OpenError);
+      this.props.openOnboarding(Route.OpenError);
     }
   };
 
@@ -1009,7 +1003,7 @@ export class LoadingAppClass extends Component<
   // for at least RETRY_MIN_MS so the attempt reads as one.
   showWalletError = (details: string) => {
     const kind = walletErrorKind(details);
-    const again = currentRoute() === RouteEnum.OpenError;
+    const again = currentRoute() === Route.OpenError;
     const apply = () => {
       if (again) {
         this.addLastSnackbar(
@@ -1107,7 +1101,7 @@ export class LoadingAppClass extends Component<
   ) => {
     // Leaving the error screen after a retry worked: its badge shrinks and
     // the server dot turns green first.
-    if (currentRoute() === RouteEnum.OpenError && !this.state.errorResolved) {
+    if (currentRoute() === Route.OpenError && !this.state.errorResolved) {
       this.setState({ errorResolved: true });
       setTimeout(
         () =>
@@ -1153,7 +1147,7 @@ export class LoadingAppClass extends Component<
     const showProgress = setTimeout(
       () =>
         navigateOnboarding({
-          screen: RouteEnum.Progress,
+          screen: Route.Progress,
           params: { kind: 'create' },
         }),
       0,
@@ -1181,7 +1175,7 @@ export class LoadingAppClass extends Component<
         if (seedJSON.error) {
           clearTimeout(showProgress);
           this.setState({ actionButtonsDisabled: false });
-          returnTo(RouteEnum.Welcome);
+          returnTo(Route.Welcome);
           createAlert(
             this.setBackgroundError,
             this.addLastSnackbar,
@@ -1197,7 +1191,7 @@ export class LoadingAppClass extends Component<
       } catch (e: unknown) {
         clearTimeout(showProgress);
         this.setState({ actionButtonsDisabled: false });
-        returnTo(RouteEnum.Welcome);
+        returnTo(Route.Welcome);
         createAlert(
           this.setBackgroundError,
           this.addLastSnackbar,
@@ -1243,7 +1237,7 @@ export class LoadingAppClass extends Component<
     } else {
       clearTimeout(showProgress);
       this.setState({ actionButtonsDisabled: false });
-      returnTo(RouteEnum.Welcome);
+      returnTo(Route.Welcome);
       createAlert(
         this.setBackgroundError,
         this.addLastSnackbar,
@@ -1261,8 +1255,8 @@ export class LoadingAppClass extends Component<
     this.setState({ wallet: {} as WalletType });
     navigateOnboarding({
       screen: this.state.recoveryWallet
-        ? RouteEnum.ImportChooser
-        : RouteEnum.ImportWallet,
+        ? Route.ImportChooser
+        : Route.ImportWallet,
     });
   };
 
@@ -1270,7 +1264,7 @@ export class LoadingAppClass extends Component<
   doRestore = async (
     seedUfvk: string,
     birthday: number,
-    origin: OnboardingRoute = RouteEnum.ImportWallet,
+    origin: OnboardingRoute = Route.ImportWallet,
   ) => {
     if (!seedUfvk) {
       // no reporting button, no needed.
@@ -1353,10 +1347,10 @@ export class LoadingAppClass extends Component<
     const showImporting = setTimeout(
       () =>
         navigateOnboarding({
-          screen: RouteEnum.Progress,
+          screen: Route.Progress,
           params: { kind: 'import' },
         }),
-      origin === RouteEnum.ImportWallet ? motionDuration.emphasized : 0,
+      origin === Route.ImportWallet ? motionDuration.emphasized : 0,
     );
     let type: RestoreFromTypeEnum = RestoreFromTypeEnum.seedRestoreFrom;
     if (
@@ -1513,7 +1507,7 @@ export class LoadingAppClass extends Component<
   };
 
   openServer = (chain?: ChainNameEnum) => {
-    navigateOnboarding({ screen: RouteEnum.Server, params: { chain } });
+    navigateOnboarding({ screen: Route.Server, params: { chain } });
     this.probeCurrentServer();
   };
 
@@ -1523,7 +1517,7 @@ export class LoadingAppClass extends Component<
     const { walletError, server } = this.state;
     const below = focusedStackRouteNames().at(-2);
     const fixed =
-      below === RouteEnum.OpenError &&
+      below === Route.OpenError &&
       walletError?.kind === 'chain' &&
       (server.kind === 'offline' ||
         server.chainName === walletError.walletChain);

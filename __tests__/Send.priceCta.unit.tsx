@@ -34,7 +34,7 @@ import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
 } from '@app/context';
-import { RouteEnum } from '@app/AppState';
+import { Route } from '@app/AppState';
 import {
   usePriceFetcherStore,
   usePriceHealth,
@@ -55,15 +55,12 @@ const storeHook = usePriceFetcherStore as jest.MockedFunction<
 >;
 const healthHook = usePriceHealth as jest.MockedFunction<typeof usePriceHealth>;
 
-function makeDrawerProps(): NativeStackScreenProps<
-  AppDrawerParamList,
-  RouteEnum.Send
-> {
+function makeDrawerProps(): NativeStackScreenProps<AppDrawerParamList, 'Send'> {
   return {
     navigation: mockNavigation,
     route: {
       key: 'Key-1',
-      name: RouteEnum.Send,
+      name: Route.Send,
       params: undefined,
     },
   };
@@ -146,7 +143,7 @@ test('N7: the send-confirmation conversions dim on a stale price too', () => {
     navigation: mockNavigation,
     route: {
       key: 'Key-1',
-      name: RouteEnum.Confirm,
+      name: Route.Confirm,
       params: {
         calculatedFee: 0.00001,
         proposalPools: { source: ['ironwood'], destination: ['ironwood'] },

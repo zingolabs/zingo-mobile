@@ -26,7 +26,7 @@ import {
   GlobalConst,
   SendPageStateClass,
   ToAddrClass,
-  RouteEnum,
+  Route,
 } from '@app/AppState';
 import Utils from '@app/utils';
 import { ContextAppLoaded } from '@app/context';
@@ -251,8 +251,8 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
                   sendPageState.toaddr.to = item.address;
                   setSendPageState(sendPageState);
                   closeOptionsPanel();
-                  navigation.navigate(RouteEnum.Home, {
-                    screen: RouteEnum.Send,
+                  navigation.navigate(Route.Home, {
+                    screen: Route.Send,
                   });
                 }}
               >

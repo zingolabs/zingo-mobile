@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
-import { RouteEnum } from '@app/AppState';
+import { Route } from '@app/AppState';
 import MigrationSchedule from './MigrationSchedule';
 import {
   screenProps,
@@ -18,7 +18,7 @@ const meta: Meta<typeof MigrationSchedule> = {
   title: 'Migration/Schedule',
   component: MigrationSchedule,
   decorators: [withAppContext({ info: mockInfo }), withNavigation],
-  args: screenProps(RouteEnum.MigrationSchedule, { perBucket: 2 }),
+  args: screenProps(Route.MigrationSchedule, { perBucket: 2 }),
 };
 
 export default meta;

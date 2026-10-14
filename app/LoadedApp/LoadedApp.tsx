@@ -51,7 +51,7 @@ import {
   SelectServerEnum,
   ChainNameEnum,
   SettingsNameEnum,
-  RouteEnum,
+  Route,
   AppStateStatusEnum,
   GlobalConst,
   EventListenerEnum,
@@ -155,10 +155,7 @@ const OBSOLETE_ZENNY_TIPS_ADDRESS: string =
 // for testing
 //const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-type LoadedAppProps = NativeStackScreenProps<
-  RootParamList,
-  RouteEnum.Wallet
-> & {
+type LoadedAppProps = NativeStackScreenProps<RootParamList, 'Wallet'> & {
   wallet: LoadedAppNavigationState;
 };
 
@@ -929,8 +926,8 @@ export class LoadedAppClass extends Component<
     await this.readUrl(url);
     closeOptionsPanel();
     navigateWallet({
-      screen: RouteEnum.Home,
-      params: { screen: RouteEnum.Send },
+      screen: Route.Home,
+      params: { screen: Route.Send },
     });
   };
 

@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 
-import { RouteEnum, SelectServerEnum } from '@app/AppState';
+import { Route, SelectServerEnum } from '@app/AppState';
 import { ContextAppLoading } from '@app/context';
 import { OnboardingParamList } from '@app/types';
 import { serverUris } from '@app/uris';
@@ -36,7 +36,7 @@ export function WelcomeScreen() {
       actionButtonsDisabled={busy}
       recoveryWallet={recoveryWallet}
       freshInstall={freshInstall}
-      importRecoveryWallet={() => importRecoveryWallet(RouteEnum.Welcome)}
+      importRecoveryWallet={() => importRecoveryWallet(Route.Welcome)}
       viewRecoveryWallet={viewRecoveryWallet}
       customServer={() => openServer()}
       walletExists={walletExists}
@@ -49,7 +49,7 @@ export function WelcomeScreen() {
 
 export function ProgressScreen({
   route,
-}: OnboardingScreenProps<OnboardingParamList, RouteEnum.Progress>) {
+}: OnboardingScreenProps<OnboardingParamList, 'Progress'>) {
   return <WalletProgress kind={route.params.kind} />;
 }
 
@@ -58,8 +58,8 @@ export function ImportChooserScreen() {
   return (
     <ImportChooser
       busy={busy}
-      onPrevious={() => importRecoveryWallet(RouteEnum.ImportChooser)}
-      onSeed={() => navigateOnboarding({ screen: RouteEnum.ImportWallet })}
+      onPrevious={() => importRecoveryWallet(Route.ImportChooser)}
+      onSeed={() => navigateOnboarding({ screen: Route.ImportWallet })}
       onBack={goBack}
     />
   );
@@ -99,7 +99,7 @@ export function OpenErrorScreen() {
 
 export function ServerScreen({
   route,
-}: OnboardingScreenProps<OnboardingParamList, RouteEnum.Server>) {
+}: OnboardingScreenProps<OnboardingParamList, 'Server'>) {
   const {
     translate,
     server,
@@ -135,7 +135,7 @@ export function ServerScreen({
       onSaveCustom={saveCustomServer}
       onOffline={setOffline}
       onOther={chain =>
-        navigateOnboarding({ screen: RouteEnum.ServerList, params: { chain } })
+        navigateOnboarding({ screen: Route.ServerList, params: { chain } })
       }
       onProbe={probeServers}
       onUnreachable={serverUnreachable}
@@ -147,7 +147,7 @@ export function ServerScreen({
 
 export function ServerListScreen({
   route,
-}: OnboardingScreenProps<OnboardingParamList, RouteEnum.ServerList>) {
+}: OnboardingScreenProps<OnboardingParamList, 'ServerList'>) {
   const {
     translate,
     server,

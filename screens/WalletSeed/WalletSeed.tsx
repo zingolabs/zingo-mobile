@@ -19,7 +19,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@app/theme';
 import { ease } from '@app/theme/motion';
 import { ContextAppLoaded } from '@app/context';
-import { RouteEnum, SnackbarDurationEnum } from '@app/AppState';
+import { Route, SnackbarDurationEnum } from '@app/AppState';
 import { AppDrawerParamList, WalletSeedAction } from '@app/types';
 import { showConfirm } from '@app/services/showConfirm';
 import { useBiometricGate } from '@app/hooks/useBiometricGate';
@@ -73,10 +73,7 @@ const WARNING_VIEW_ONLY = 'walletseed.change-warning-vo';
 // The seed phrase with its backup status, birthday and viewing key. With an
 // action, the last look at them before leaving this wallet or its server.
 // A view-only wallet shows its viewing key in place of the words.
-type WalletSeedProps = NativeStackScreenProps<
-  AppDrawerParamList,
-  RouteEnum.WalletSeed
->;
+type WalletSeedProps = NativeStackScreenProps<AppDrawerParamList, 'WalletSeed'>;
 
 const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
   navigation,
@@ -185,7 +182,7 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
   const openFlow = (kind: 'push' | 'verify') => {
     setTip('none');
     setBackingUp(true);
-    navigation.navigate(RouteEnum.SeedBackup, { entry: { kind } });
+    navigation.navigate(Route.SeedBackup, { entry: { kind } });
   };
 
   const copyWords = () => {

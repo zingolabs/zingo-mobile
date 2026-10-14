@@ -16,7 +16,7 @@ import type {
 
 import { useTheme } from '@app/theme';
 import { duration, ease } from '@app/theme/motion';
-import { RouteEnum } from '@app/AppState';
+import { Route } from '@app/AppState';
 import type { OnboardingDescriptor } from '@app/navigation/OnboardingNavigator';
 import WelcomeBranches from '@ui/widgets/WelcomeBranches';
 
@@ -82,13 +82,13 @@ export const axisExit = (toX: number) =>
 
 const depth = (screen: string): number => {
   switch (screen) {
-    case RouteEnum.Welcome:
-    case RouteEnum.OpenError:
+    case Route.Welcome:
+    case Route.OpenError:
       return 0;
-    case RouteEnum.ImportChooser:
-    case RouteEnum.Server:
+    case Route.ImportChooser:
+    case Route.Server:
       return 1;
-    case RouteEnum.Progress:
+    case Route.Progress:
       return 3;
     default:
       return 2;
@@ -99,32 +99,32 @@ const depth = (screen: string): number => {
 // progress and error screens fade in whole; everything else inside the
 // import stack moves on the shared axis.
 const enterFor = (from: string | undefined, to: string) => {
-  if (to === RouteEnum.Welcome) {
+  if (to === Route.Welcome) {
     return welcomeEnter();
   }
-  if (to === RouteEnum.Progress) {
+  if (to === Route.Progress) {
     return importingEnter();
   }
-  if (to === RouteEnum.OpenError) {
+  if (to === Route.OpenError) {
     return errorEnter();
   }
-  if (from === undefined || from === RouteEnum.Welcome) {
+  if (from === undefined || from === Route.Welcome) {
     return formEnter();
   }
   return axisEnter(depth(to) > depth(from) ? AXIS_PT : -AXIS_PT);
 };
 
 const exitFor = (from: string, to: string) => {
-  if (from === RouteEnum.Welcome) {
+  if (from === Route.Welcome) {
     return welcomeExit();
   }
-  if (from === RouteEnum.Progress) {
+  if (from === Route.Progress) {
     return importingExit();
   }
-  if (to === RouteEnum.Welcome) {
+  if (to === Route.Welcome) {
     return formExit();
   }
-  if (to === RouteEnum.Progress) {
+  if (to === Route.Progress) {
     return recedeExit();
   }
   return axisExit(depth(to) > depth(from) ? -AXIS_PT : AXIS_PT);
@@ -162,7 +162,7 @@ const OnboardingStage: React.FunctionComponent<OnboardingStageProps> = ({
       <WelcomeBranches
         width={size.w}
         height={size.h}
-        parted={focused.name !== RouteEnum.Welcome}
+        parted={focused.name !== Route.Welcome}
       />
       <Animated.View
         key={shown.key}

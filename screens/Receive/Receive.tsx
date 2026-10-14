@@ -34,7 +34,7 @@ import {
   TransparentAddressClass,
   ScreenEnum,
   SnackbarDurationEnum,
-  RouteEnum,
+  Route,
 } from '@app/AppState';
 import { RPCAddressScopeEnum } from '@app/walletBackend/enums/RPCAddressScopeEnum';
 import BottomSheet, { BottomSheetModal } from '@gorhom/bottom-sheet';
@@ -50,10 +50,7 @@ import { useOptionsPanelSheetSlide } from '@app/hooks/useOptionsPanelSheetSlide'
 import { usePriceSnapAutoClose } from '@app/hooks/usePriceSnapAutoClose';
 import { safeSnapToIndex } from '@app/utils/safeSnapToIndex';
 
-type ReceiveProps = NativeStackScreenProps<
-  AppDrawerParamList,
-  RouteEnum.Receive
->;
+type ReceiveProps = NativeStackScreenProps<AppDrawerParamList, 'Receive'>;
 
 const Receive: React.FunctionComponent<ReceiveProps> = ({ navigation }) => {
   const context = useContext(ContextAppLoaded);

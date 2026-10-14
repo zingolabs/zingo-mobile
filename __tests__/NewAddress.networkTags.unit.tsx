@@ -19,7 +19,7 @@ import {
   AddressBookFileClass,
   AddressKindEnum,
   ChainNameEnum,
-  RouteEnum,
+  Route,
   ScreenEnum,
   offlineServer,
   remoteServer,
@@ -127,7 +127,7 @@ function renderBook(
         navigation={mockNavigation}
         route={{
           key: 'network-tags',
-          name: RouteEnum.AddressBook,
+          name: Route.AddressBook,
           params: undefined,
         }}
       />

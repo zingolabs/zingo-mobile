@@ -17,14 +17,14 @@ import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
 import SegmentedBar from '@ui/primitives/SegmentedBar';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
-import { RouteEnum } from '@app/AppState';
+import { Route } from '@app/AppState';
 import { executeDueParts, executeDuePartsStatus } from '@app/walletBackend';
 import { RPCBatchReportType } from '@app/walletBackend/types/RPCBatchReportType';
 import { RPCBatchStatusType } from '@app/walletBackend/types/RPCBatchStatusType';
 
 type MigrationBatchSendingProps = NativeStackScreenProps<
   AppDrawerParamList,
-  RouteEnum.MigrationBatchSending
+  'MigrationBatchSending'
 >;
 
 const ZATS_PER_ZEC = 10 ** 8;
@@ -65,7 +65,7 @@ const MigrationBatchSending: React.FunctionComponent<
   const goStatus = useCallback(() => {
     navigation.reset({
       index: 0,
-      routes: [{ name: RouteEnum.MigrationStatus }],
+      routes: [{ name: Route.MigrationStatus }],
     });
   }, [navigation]);
 

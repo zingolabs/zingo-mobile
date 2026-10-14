@@ -11,7 +11,7 @@ import {
   defaultAppContextLoaded,
   ContextAppLoadedProvider,
 } from '@app/context';
-import { InfoType, RouteEnum, TotalBalanceClass } from '@app/AppState';
+import { InfoType, Route, TotalBalanceClass } from '@app/AppState';
 import { mockValueTransfers } from '../__mocks__/dataMocks/mockValueTransfers';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
@@ -23,11 +23,11 @@ import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
 function makeDrawerProps(): NativeStackScreenProps<
   AppDrawerParamList,
-  RouteEnum.History
+  'History'
 > {
   return {
     navigation: mockNavigation,
-    route: { key: 'Key-1', name: RouteEnum.History, params: undefined },
+    route: { key: 'Key-1', name: Route.History, params: undefined },
   };
 }
 

@@ -24,7 +24,7 @@ import AppSheet from '@ui/primitives/AppSheet';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
 import Header from '@ui/widgets/Header';
-import { RouteEnum, ScreenEnum } from '@app/AppState';
+import { Route, ScreenEnum } from '@app/AppState';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
 
@@ -36,7 +36,7 @@ const PHASE1_DURATION_MS = 4000;
 
 type ComputingTxContentProps = NativeStackScreenProps<
   AppDrawerParamList,
-  RouteEnum.Computing
+  'Computing'
 >;
 
 const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
@@ -74,8 +74,8 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
   }, [isTerminal]);
 
   const onContinue = useCallback(() => {
-    navigation.navigate(RouteEnum.Home, {
-      screen: RouteEnum.History,
+    navigation.navigate(Route.Home, {
+      screen: Route.History,
     });
   }, [navigation]);
 

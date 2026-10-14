@@ -19,11 +19,11 @@ import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
 import { useBiometricGate } from '@app/hooks/useBiometricGate';
 import Header from '@ui/widgets/Header';
-import { RouteEnum, ScreenEnum, SnackbarDurationEnum } from '@app/AppState';
+import { Route, ScreenEnum, SnackbarDurationEnum } from '@app/AppState';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
 
-type RescanProps = NativeStackScreenProps<AppDrawerParamList, RouteEnum.Rescan>;
+type RescanProps = NativeStackScreenProps<AppDrawerParamList, 'Rescan'>;
 
 const Rescan: React.FunctionComponent<RescanProps> = ({ navigation }) => {
   const context = useContext(ContextAppLoaded);

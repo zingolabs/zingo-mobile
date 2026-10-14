@@ -12,7 +12,7 @@ import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
 import ProgressBar from '@ui/primitives/ProgressBar';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
-import { RouteEnum } from '@app/AppState';
+import { Route } from '@app/AppState';
 import Utils from '@app/utils';
 import useTrickleProgress from '@app/hooks/useTrickleProgress';
 import { drainOrchard, drainStatus } from '@app/walletBackend';
@@ -21,7 +21,7 @@ import { RPCDrainStatusType } from '@app/walletBackend/types/RPCDrainStatusType'
 
 type MigrationSendingProps = NativeStackScreenProps<
   AppDrawerParamList,
-  RouteEnum.MigrationSending
+  'MigrationSending'
 >;
 
 const ZATS_PER_ZEC = 10 ** 8;

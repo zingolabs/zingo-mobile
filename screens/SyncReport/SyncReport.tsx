@@ -30,7 +30,7 @@ import BottomSheet, { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
 import { RPCSyncScanRangeStatusType } from '@app/walletBackend/types/RPCSyncScanRangeStatusType';
 import { RPCSyncScanRangePriorityStatusEnum } from '@app/walletBackend/enums/RPCSyncScanRangePriorityStatusEnum';
-import { RouteEnum, ScreenEnum } from '@app/AppState';
+import { Route, ScreenEnum } from '@app/AppState';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
 import { createAlert } from '@app/services/createAlert';
@@ -38,10 +38,7 @@ import { sendEmail } from '@app/services/sendEmail';
 import Utils from '@app/utils';
 import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
 
-type SyncReportProps = NativeStackScreenProps<
-  AppDrawerParamList,
-  RouteEnum.SyncReport
->;
+type SyncReportProps = NativeStackScreenProps<AppDrawerParamList, 'SyncReport'>;
 
 const SyncReport: React.FunctionComponent<SyncReportProps> = ({
   navigation,

@@ -23,7 +23,7 @@ import Header from '@ui/widgets/Header';
 import { AppDrawerParamList } from '@app/types';
 import { useTheme } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
-import { RouteEnum, ScreenEnum } from '@app/AppState';
+import { Route, ScreenEnum } from '@app/AppState';
 import {
   getMixnetBootstrapDetail,
   getMixnetStatus,
@@ -39,7 +39,7 @@ import {
 
 type MixnetDoctorProps = NativeStackScreenProps<
   AppDrawerParamList,
-  RouteEnum.MixnetDoctor
+  'MixnetDoctor'
 >;
 
 const SKELETON_WIDTHS = ['70%', '90%', '55%', '80%'] as const;

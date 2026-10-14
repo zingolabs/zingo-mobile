@@ -6,7 +6,7 @@ import {
   defaultAppContextLoaded,
   ContextAppLoadedProvider,
 } from '@app/context';
-import { RouteEnum, SendPageStateClass, ToAddrClass } from '@app/AppState';
+import { Route, SendPageStateClass, ToAddrClass } from '@app/AppState';
 import { mockAddresses } from '../__mocks__/dataMocks/mockAddresses';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
@@ -27,7 +27,7 @@ test('Tests that the spendable amount fills the amount field with the maximum wh
     >
       <Send
         navigation={mockNavigation}
-        route={{ key: 'Key-1', name: RouteEnum.Send, params: undefined }}
+        route={{ key: 'Key-1', name: Route.Send, params: undefined }}
       />
     </ContextAppLoadedProvider>,
   );

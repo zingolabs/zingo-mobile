@@ -16,7 +16,7 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { NetInfoStateType } from '@react-native-community/netinfo/src/index';
 import {
-  RouteEnum,
+  Route,
   ServerType,
   SnackbarDurationEnum,
   TranslateType,
@@ -153,7 +153,7 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
                       <TouchableOpacity
                         testID="header.playicon"
                         onPress={() => {
-                          navigation.navigate(RouteEnum.SyncReport);
+                          navigation.navigate(Route.SyncReport);
                         }}
                       >
                         <View
@@ -206,7 +206,7 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
                   >
                     <TouchableOpacity
                       onPress={() => {
-                        navigation.navigate(RouteEnum.SyncReport);
+                        navigation.navigate(Route.SyncReport);
                       }}
                     >
                       <View
@@ -242,7 +242,7 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
               >
                 <TouchableOpacity
                   onPress={() => {
-                    navigation.navigate(RouteEnum.SyncReport);
+                    navigation.navigate(Route.SyncReport);
                   }}
                 >
                   <FontAwesomeIcon
@@ -301,7 +301,7 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
           <TouchableOpacity
             testID="header.mixnet-status"
             accessibilityLabel={translate('settings.nym-diagnostics') as string}
-            onPress={() => navigation.navigate(RouteEnum.MixnetDoctor)}
+            onPress={() => navigation.navigate(Route.MixnetDoctor)}
             style={{
               flexDirection: 'row',
               alignItems: 'center',
