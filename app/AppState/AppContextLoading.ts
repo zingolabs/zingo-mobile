@@ -10,8 +10,17 @@ import { SelectServerEnum } from './enums/SelectServerEnum';
 import { SnackbarDurationEnum } from './enums/SnackbarDurationEnum';
 import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
 import { BlockExplorerEnum } from './enums/BlockExplorerEnum';
+import { ChainNameEnum } from './enums/ChainNameEnum';
+import { RouteEnum } from './enums/RouteEnum';
+import WalletType from './types/WalletType';
+import { WalletErrorInfo } from './types/WalletErrorInfo';
+import { ServerStatus } from './types/ServerStatus';
+import ServerUrisType from './types/ServerUrisType';
 
-export default interface AppContextLoading {
+// Asks the Server screen whether leaving it needs a confirmation first.
+export type BackGuard = { current: (() => boolean) | null };
+
+export default interface AppContextLoading extends OnboardingContext {
   // context
   netInfo: NetInfoType;
   zecPrice: ZecPriceType;
@@ -35,4 +44,50 @@ export default interface AppContextLoading {
   selectServer: SelectServerEnum;
   performanceLevel: RPCPerformanceLevelEnum;
   blockExplorer: BlockExplorerEnum;
+}
+
+// The onboarding stage: what its screens show and what they run. The
+// provider owns the wallet backend and the stage's navigation.
+export interface OnboardingContext {
+  busy: boolean;
+  walletExists: boolean;
+  recoveryWallet: WalletType | null;
+  // The saved phrase outlived an uninstall.
+  freshInstall: boolean;
+  walletError: WalletErrorInfo | null;
+  // A retry worked: the error badge shrinks before the wallet opens.
+  errorResolved: boolean;
+  retrying: boolean;
+  // Changes on every failed retry; the error icon shakes once per change.
+  errorShake: number;
+  serverStatus: ServerStatus;
+  serverBlockHeight: string;
+  // uri → latency in ms, null when the server did not answer the probe.
+  serverLatencies: Record<string, number | null>;
+  // chain → servers under Other servers; absent until its list has loaded.
+  serverLists: Record<string, ServerUrisType[]>;
+  serverBackGuard: BackGuard;
+  // `origin` is the screen the import started from; a failure returns there.
+  importRecoveryWallet: (
+    origin: RouteEnum.Welcome | RouteEnum.ImportChooser,
+  ) => void;
+  viewRecoveryWallet: () => void;
+  openServer: (chain?: ChainNameEnum) => void;
+  closeServer: () => void;
+  openCurrentWallet: () => void;
+  createNewWallet: () => void;
+  getwalletToRestore: () => void;
+  retryOpenWallet: () => void;
+  // The hold-to-delete sheet, then the import or the create.
+  deleteThenImport: () => void;
+  deleteThenCreate: () => void;
+  switchToWalletChain: (chain: ChainNameEnum) => void;
+  chooseAutomatic: (chain: ChainNameEnum) => Promise<void>;
+  pickServer: (server: ServerUrisType) => Promise<void>;
+  saveCustomServer: (chain: ChainNameEnum, uri: string) => Promise<boolean>;
+  setOffline: (on: boolean, chain: ChainNameEnum) => Promise<void>;
+  probeServers: (chain: ChainNameEnum) => Promise<void>;
+  serverUnreachable: () => void;
+  serversFor: (chain: ChainNameEnum) => ServerUrisType[];
+  doRestore: (seedUfvk: string, birthday: number) => Promise<void>;
 }

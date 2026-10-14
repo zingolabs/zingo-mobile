@@ -66,6 +66,7 @@ import type AppStateLoaded from './AppStateLoaded';
 import type AppStateLoading from './AppStateLoading';
 import type { BiometricGateOutcome } from './AppStateLoading';
 import type AppContextLoading from './AppContextLoading';
+import type { OnboardingContext } from './AppContextLoading';
 import type AppContextLoaded from './AppContextLoaded';
 
 export {
@@ -120,6 +121,7 @@ export type {
   AppStateLoading,
   BiometricGateOutcome,
   AppContextLoading,
+  OnboardingContext,
   AppContextLoaded,
   WalletType,
   SendJsonToTypeType,
