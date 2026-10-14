@@ -37,8 +37,8 @@ const alice = new AddressBookFileClass(
 
 const navigation = { navigate: jest.fn() } as never;
 
-const sheet = (onSave = jest.fn()) => {
-  const state = { ...defaultAppContextLoaded, translate: mockTranslate };
+const sheet = (onSave = jest.fn(), translate = mockTranslate) => {
+  const state = { ...defaultAppContextLoaded, translate };
   return render(
     <ContextAppLoadedProvider value={state}>
       <ContactSheet
@@ -102,5 +102,21 @@ describe('ContactSheet', () => {
       jest.advanceTimersByTime(300);
     });
     expect(screen.getByTestId('addressbook.note.warn')).toBeTruthy();
+  });
+  test('Tests that the error names the existing contact when the address is already in the book.', async () => {
+    const screen = sheet(jest.fn(), (key: string) =>
+      key === 'addressbook.dup-address' ? 'called {name}' : mockTranslate(key),
+    );
+    fireEvent.changeText(screen.getByTestId('addressbook.name-field'), 'Mike');
+    fireEvent.changeText(
+      screen.getByTestId('addressbook.address-field'),
+      'u1alice',
+    );
+    await act(async () => {
+      jest.advanceTimersByTime(300);
+    });
+    expect(screen.getByTestId('addressbook.note.err')).toHaveTextContent(
+      /called Alice/,
+    );
   });
 });

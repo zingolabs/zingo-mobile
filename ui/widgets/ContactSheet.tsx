@@ -163,9 +163,11 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
   const dupName = others.some(
     entry => entry.label.toLowerCase() === trimmedName.toLowerCase(),
   );
-  const dupAddress =
-    check.kind === 'valid' &&
-    others.some(entry => entry.address === trimmedAddress);
+  const sameAddress =
+    check.kind === 'valid'
+      ? others.find(entry => entry.address === trimmedAddress)
+      : undefined;
+  const dupAddress = !!sameAddress;
   const ready =
     trimmedName.length > 0 && !dupName && check.kind === 'valid' && !dupAddress;
 
@@ -178,8 +180,11 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
   const addressError =
     zns.kind === 'missing'
       ? (translate('send.znsnamenotfound') as string)
-      : dupAddress
-        ? (translate('addressbook.dup-address') as string)
+      : sameAddress
+        ? (translate('addressbook.dup-address') as string).replace(
+            '{name}',
+            sameAddress.label,
+          )
         : check.kind === 'invalid' && touched
           ? (translate('send.invalidaddress') as string)
           : '';

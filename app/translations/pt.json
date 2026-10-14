@@ -88,7 +88,7 @@
     "updated": "Contato atualizado",
     "added": "{name} adicionado à sua lista de endereços",
     "dup-name": "Você já tem um contato chamado {name}.",
-    "dup-address": "Este endereço já está na sua lista de endereços.",
+    "dup-address": "Você já tem um contato chamado {name} com este endereço.",
     "no-match": "Nada corresponde a “{query}”.",
     "kind-unified": "Endereço unificado",
     "kind-sapling": "Endereço Sapling",
