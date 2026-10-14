@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import Animated, {
   ReduceMotion,
@@ -11,9 +11,6 @@ import Animated, {
 } from 'react-native-reanimated';
 import Svg, { Path, Rect, Text as SvgText } from 'react-native-svg';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faXmark } from '@fortawesome/free-solid-svg-icons';
 
 import { useTheme } from '@app/theme';
 import { ease } from '@app/theme/motion';
@@ -27,10 +24,8 @@ import {
   enactGateAnswer,
   resolveTriggerGate,
 } from '@app/services/gateController';
+import { showConfirm } from '@app/services/showConfirm';
 import Utils from '@app/utils';
-import AppSheetModal from '@ui/primitives/AppSheetModal';
-import BoldText from '@ui/primitives/BoldText';
-import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
 import CircularProgress from '@ui/primitives/CircularProgress';
 import InfoTooltip from '@ui/widgets/InfoTooltip';
 import { ChevronLeft } from '@ui/primitives/Icons/Chevron';
@@ -139,7 +134,6 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
 
   const [tip, setTip] = useState(false);
   const [cardW, setCardW] = useState(TL_W);
-  const sheet = useRef<BottomSheetModal>(null);
 
   const serverTip = info.latestBlock || 0;
   const synced = !syncInProgress && percentageOutputsScanned > 0;
@@ -175,7 +169,15 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
       easing: ease.standard,
       reduceMotion: ReduceMotion.System,
     });
-    sheet.current?.present();
+    showConfirm({
+      title: translate('sync.sheet-title') as string,
+      message: translate('sync.sheet-sub') as string,
+      content: rescanRows,
+      buttons: [
+        { text: translate('sync.rescan') as string, onPress: rescan },
+        { text: translate('cancel') as string, style: 'cancel' },
+      ],
+    });
   };
 
   const rescan = async () => {
@@ -198,7 +200,6 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
     if (!proceed) {
       return;
     }
-    sheet.current?.dismiss();
     await doRescan();
     addLastSnackbar(
       translate('sync.rescan-started') as string,
@@ -285,6 +286,66 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
 
   const startText = translate('sync.sheet-start') as string;
   const [startBefore, startAfter] = startText.split('{n}');
+  const rescanRows = (
+    <View style={{ marginTop: 10 }}>
+      {[
+        {
+          icon: <BlocksIcon />,
+          text: (
+            <Text>
+              {startBefore}
+              <Text style={{ fontWeight: '700' }}>{nf(birthday)}</Text>
+              {startAfter}
+            </Text>
+          ),
+        },
+        {
+          icon: <ClockIcon />,
+          text: translate('sync.sheet-time') as string,
+        },
+        {
+          icon: <HalfCircleIcon />,
+          text: translate('sync.sheet-incomplete') as string,
+        },
+      ].map((row, i) => (
+        <View
+          key={i}
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 12,
+            paddingVertical: 13,
+            paddingHorizontal: 4,
+            borderTopWidth: i === 0 ? 0 : 1,
+            borderTopColor: colors.bottomSheetBorder,
+          }}
+        >
+          <View
+            style={{
+              width: 32,
+              height: 32,
+              borderRadius: 9,
+              backgroundColor: TILE_BG,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            {row.icon}
+          </View>
+          <Text
+            style={{
+              flex: 1,
+              color: colors.fgDefault,
+              fontSize: 12,
+              lineHeight: 17,
+            }}
+          >
+            {row.text}
+          </Text>
+        </View>
+      ))}
+    </View>
+  );
 
   return (
     <View
@@ -659,141 +720,6 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
           </Pressable>
         )}
       </ScrollView>
-
-      <AppSheetModal
-        ref={sheet}
-        header={
-          <View
-            style={{
-              paddingTop: 8,
-              paddingBottom: 6,
-              paddingHorizontal: 16,
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-            }}
-          >
-            <View style={{ width: 48 }} />
-            <BoldText
-              numberOfLines={1}
-              style={{
-                flex: 1,
-                fontSize: 16,
-                lineHeight: 28,
-                textAlign: 'center',
-              }}
-            >
-              {translate('sync.sheet-title') as string}
-            </BoldText>
-            <Pressable
-              onPress={() => sheet.current?.dismiss()}
-              hitSlop={8}
-              style={{ paddingHorizontal: 14, paddingVertical: 4 }}
-            >
-              <FontAwesomeIcon
-                icon={faXmark}
-                size={20}
-                color={colors.fgMuted}
-              />
-            </Pressable>
-          </View>
-        }
-        contentStyle={{ paddingHorizontal: 22, paddingBottom: 34 }}
-      >
-        <Text
-          style={{
-            marginTop: 6,
-            textAlign: 'center',
-            color: SOFT_INK,
-            fontSize: 12,
-            lineHeight: 18,
-          }}
-        >
-          {translate('sync.sheet-sub') as string}
-        </Text>
-        <View style={{ marginTop: 10 }}>
-          {[
-            {
-              icon: <BlocksIcon />,
-              text: (
-                <Text>
-                  {startBefore}
-                  <Text style={{ fontWeight: '700' }}>{nf(birthday)}</Text>
-                  {startAfter}
-                </Text>
-              ),
-            },
-            {
-              icon: <ClockIcon />,
-              text: translate('sync.sheet-time') as string,
-            },
-            {
-              icon: <HalfCircleIcon />,
-              text: translate('sync.sheet-incomplete') as string,
-            },
-          ].map((row, i) => (
-            <View
-              key={i}
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                gap: 12,
-                paddingVertical: 13,
-                paddingHorizontal: 4,
-                borderTopWidth: i === 0 ? 0 : 1,
-                borderTopColor: colors.bottomSheetBorder,
-              }}
-            >
-              <View
-                style={{
-                  width: 32,
-                  height: 32,
-                  borderRadius: 9,
-                  backgroundColor: TILE_BG,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                {row.icon}
-              </View>
-              <Text
-                style={{
-                  flex: 1,
-                  color: colors.fgDefault,
-                  fontSize: 12,
-                  lineHeight: 17,
-                }}
-              >
-                {row.text}
-              </Text>
-            </View>
-          ))}
-        </View>
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center',
-            gap: 10,
-            marginTop: 20,
-          }}
-        >
-          <Button
-            testID="syncreport.rescan-cancel"
-            type={ButtonTypeEnum.Secondary}
-            title={translate('cancel') as string}
-            onPress={() => sheet.current?.dismiss()}
-            twoButtons={true}
-          />
-          <Button
-            testID="syncreport.rescan-go"
-            type={ButtonTypeEnum.Primary}
-            title={translate('sync.rescan') as string}
-            onPress={rescan}
-            twoButtons={true}
-          />
-        </View>
-      </AppSheetModal>
     </View>
   );
 };
