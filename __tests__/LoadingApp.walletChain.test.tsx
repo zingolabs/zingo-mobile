@@ -9,12 +9,10 @@ import {
   ChainNameEnum,
   LanguageEnum,
   LaunchingModeEnum,
-  RouteEnum,
   SelectServerEnum,
 } from '@app/AppState';
 import { remoteServer } from '@app/AppState/types/ServerType';
 import RPCModule from '@app/RPCModule';
-import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
 jest.mock('@app/RPCModule', () =>
   require('../__mocks__/rpcModuleProxy').rpcModuleProxyMock(),
@@ -37,8 +35,10 @@ const bridge = RPCModule as unknown as Record<string, jest.Mock>;
 // rendering, so the decisions are read from the calls it makes.
 const bootApp = (selectServer: SelectServerEnum) => {
   const app = new LoadingAppClass({
-    navigationApp: mockNavigation,
-    route: { key: 'Key-1', name: RouteEnum.LoadingApp, params: undefined },
+    session: { kind: 'boot', startingApp: true, newWallet: false },
+    openWallet: jest.fn(),
+    openOnboarding: jest.fn(),
+    openBoot: jest.fn(),
     translate: (key: string) => key,
     language: LanguageEnum.en,
     server: remoteServer(

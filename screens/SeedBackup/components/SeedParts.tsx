@@ -33,9 +33,16 @@ const BLUR_PT = 6;
 const WORD_H = 32;
 // Room left of the word for the blur to fade out round, not cut straight.
 const BLUR_PAD = BLUR_PT * 2;
-// Native filters run on the bitmap in device pixels; web runs in points.
-const BLUR_DEVIATION =
-  Platform.OS === 'web' ? BLUR_PT : BLUR_PT * PixelRatio.get();
+// react-native-svg reads stdDeviation differently per platform. Android
+// blurs the bitmap in device pixels, doubled and capped at a 25 px radius
+// (a deviation of about 10.6 px), so it gets pixels. iOS scales by the
+// screen itself, so it gets points, matched to Android: 3.5 pt is 10.5 px
+// at 3x. Scaling it again on iOS blurred the word away. Web runs in points.
+const BLUR_DEVIATION = Platform.select({
+  android: BLUR_PT * PixelRatio.get(),
+  ios: 3.5,
+  default: BLUR_PT,
+});
 const COPIED_MS = 1600;
 const COLUMNS = 3;
 

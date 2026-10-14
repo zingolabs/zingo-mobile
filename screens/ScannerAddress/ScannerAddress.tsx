@@ -3,11 +3,11 @@ import { useWindowDimensions } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import { RouteEnum } from '@app/AppState';
-import { AppStackParamList } from '@app/types';
+import { RootParamList } from '@app/types';
 import ScanOverlay from '@ui/widgets/ScanOverlay';
 
 type ScannerAddressProps = NativeStackScreenProps<
-  AppStackParamList,
+  RootParamList,
   RouteEnum.ScannerAddress
 >;
 

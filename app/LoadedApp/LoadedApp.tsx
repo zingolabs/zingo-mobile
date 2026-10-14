@@ -1,10 +1,8 @@
 import React, { Component, useState, useMemo, useEffect } from 'react';
 import {
   I18nManager,
-  EmitterSubscription,
   AppState,
   NativeEventSubscription,
-  Linking,
   Platform,
 } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -12,8 +10,9 @@ import { useTheme } from '@app/theme';
 import { I18n } from 'i18n-js';
 import * as RNLocalize from 'react-native-localize';
 import { isEqual } from 'lodash';
-import { StackScreenProps } from '@react-navigation/stack';
-import { LoadingAppNavigationState, AppDrawerParamList } from '@app/types';
+import { LoadingSession, useSession } from '@app/navigation/session';
+import { navigateWallet } from '@app/navigation/navigate';
+import { LoadedAppNavigationState } from '@app/types';
 import NetInfo, {
   NetInfoSubscription,
   NetInfoState,
@@ -142,9 +141,10 @@ import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformance
 import { AddressList } from '@screens/AddressList';
 import ValueTransferDetail from '@screens/ValueTransferDetail';
 import Confirm from '@screens/Confirm';
-import { AppStackParamList } from '@app/types';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { HomeTabParamList, RootParamList } from '@app/types';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
+import { publishReport } from '@app/services/reportDiagnostics';
 
 const About = React.lazy(() => import('@screens/About'));
 const MixnetDoctor = React.lazy(() => import('@screens/MixnetDoctor'));
@@ -185,7 +185,7 @@ const pt = require('@app/translations/pt.json');
 const ru = require('@app/translations/ru.json');
 const tr = require('@app/translations/tr.json');
 
-const Tab = createBottomTabNavigator<AppDrawerParamList>();
+const Tab = createBottomTabNavigator<HomeTabParamList>();
 
 // The `Zenny Tips` contact older versions wrote into every address book on
 // their own, in the five languages that could have created it, and the UA it
@@ -204,12 +204,11 @@ const OBSOLETE_ZENNY_TIPS_ADDRESS: string =
 // for testing
 //const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-type LoadedAppProps = {
-  navigation: StackScreenProps<
-    AppStackParamList,
-    RouteEnum.LoadedApp
-  >['navigation'];
-  route: StackScreenProps<AppStackParamList, RouteEnum.LoadedApp>['route'];
+type LoadedAppProps = NativeStackScreenProps<
+  RootParamList,
+  RouteEnum.Wallet
+> & {
+  wallet: LoadedAppNavigationState;
 };
 
 // The wallet fades in over the loading screen as it opens.
@@ -222,6 +221,7 @@ const SERVER_DEFAULT_0: ServerType = remoteServer(
 
 export default function LoadedApp(props: LoadedAppProps) {
   const theme = useTheme();
+  const { setSession, pendingLink, clearLink } = useSession();
   const [language, setLanguage] = useState<LanguageEnum>(LanguageEnum.en);
   const [server, setServer] = useState<ServerType>(SERVER_DEFAULT_0);
   const [privacy, setPrivacy] = useState<boolean>(false);
@@ -274,37 +274,17 @@ export default function LoadedApp(props: LoadedAppProps) {
     () => (key: string) => substituteZingoName(i18n.t(key) as TranslateType),
     [i18n, language], // eslint-disable-line react-hooks/exhaustive-deps
   );
-  const readOnly =
-    !!props.route.params && props.route.params.readOnly !== undefined
-      ? props.route.params.readOnly
-      : false;
-  const orchardPool =
-    !!props.route.params && props.route.params.orchardPool !== undefined
-      ? props.route.params.orchardPool
-      : false;
-  const saplingPool =
-    !!props.route.params && props.route.params.saplingPool !== undefined
-      ? props.route.params.saplingPool
-      : false;
-  const transparentPool =
-    !!props.route.params && props.route.params.transparentPool !== undefined
-      ? props.route.params.transparentPool
-      : false;
-  const newWallet =
-    !!props.route.params && props.route.params.newWallet !== undefined
-      ? props.route.params.newWallet
-      : false;
-  const firstLaunchingMessage =
-    !!props.route.params &&
-    props.route.params.firstLaunchingMessage !== undefined
-      ? props.route.params.firstLaunchingMessage
-      : LaunchingModeEnum.opening;
-  // The opened wallet's own chain, resolved by LoadingApp at open time (reliable
-  // even Offline). Empty when unknown.
-  const walletChainName =
-    !!props.route.params && props.route.params.walletChainName !== undefined
-      ? props.route.params.walletChainName
-      : ChainNameEnum.noneChainName;
+  const {
+    readOnly,
+    orchardPool,
+    saplingPool,
+    transparentPool,
+    newWallet,
+    firstLaunchingMessage,
+    // The opened wallet's own chain, resolved by LoadingApp at open time
+    // (reliable even Offline).
+    walletChainName,
+  } = props.wallet;
 
   useEffect(() => {
     (async () => {
@@ -583,7 +563,9 @@ export default function LoadedApp(props: LoadedAppProps) {
     return (
       <LoadedAppClass
         {...props}
-        navigationApp={props.navigation}
+        leaveWallet={setSession}
+        pendingLink={pendingLink}
+        clearLink={clearLink}
         theme={theme}
         translate={translate}
         setI18nLocale={(locale: string) => {
@@ -618,11 +600,10 @@ export default function LoadedApp(props: LoadedAppProps) {
 }
 
 type LoadedAppClassProps = {
-  navigationApp: StackScreenProps<
-    AppStackParamList,
-    RouteEnum.LoadedApp
-  >['navigation'];
-  route: StackScreenProps<AppStackParamList, RouteEnum.LoadedApp>['route'];
+  leaveWallet: (session: LoadingSession) => void;
+  // A `zcash:` link waiting for Send, from the session.
+  pendingLink: string | undefined;
+  clearLink: () => void;
   translate: (key: string) => TranslateType;
   // Mutates the i18n instance's active locale. Needed so language changes
   // applied without remounting LoadedApp (reset=false in setLanguageOption)
@@ -663,14 +644,11 @@ export class LoadedAppClass extends Component<
   rpc: WalletBackend;
   recoveringServer: boolean = false;
   appstate: NativeEventSubscription;
-  linking: EmitterSubscription;
   unsubscribeNetInfo: NetInfoSubscription;
   addTagModalRef: React.RefObject<React.ComponentRef<
     typeof BottomSheetModal
   > | null>;
   screenName = ScreenEnum.LoadedApp;
-  private drawerNav: NativeStackNavigationProp<AppDrawerParamList> | null =
-    null;
   constructor(props: LoadedAppClassProps) {
     super(props);
 
@@ -685,7 +663,15 @@ export class LoadedAppClass extends Component<
       messagesTotal: null,
       sendPageState: new SendPageStateClass(new ToAddrClass(0)),
       setSendPageState: this.setSendPageState,
-      info: {} as InfoType,
+      // The currency is the wallet's from the start: when no server answers
+      // (no network) the info never arrives, and amounts read "---".
+      info: {
+        currencyName:
+          (props.walletChainName || props.server.chainName) ===
+          ChainNameEnum.mainChainName
+            ? CurrencyNameEnum.ZEC
+            : CurrencyNameEnum.TAZ,
+      } as InfoType,
       syncingStatus: {} as RPCSyncStatusType,
       birthday: 0,
       defaultUnifiedAddress: '',
@@ -705,7 +691,12 @@ export class LoadedAppClass extends Component<
       saplingPool: props.saplingPool,
       transparentPool: props.transparentPool,
       addLastSnackbar: this.addLastSnackbar,
-      restartApp: this.navigateToLoadingApp,
+      restartApp: () =>
+        this.navigateToLoadingApp({
+          kind: 'boot',
+          startingApp: false,
+          newWallet: false,
+        }),
       somePending: false,
       addressBook: props.addressBook,
       launchAddTagModal: this.launchAddTagModal,
@@ -768,12 +759,12 @@ export class LoadedAppClass extends Component<
     });
 
     this.appstate = {} as NativeEventSubscription;
-    this.linking = {} as EmitterSubscription;
     this.unsubscribeNetInfo = {} as NetInfoSubscription;
     this.addTagModalRef = React.createRef();
   }
 
   componentDidMount = async () => {
+    this.publishReportState();
     const netInfoState = await NetInfo.fetch();
     this.setState({
       netInfo: {
@@ -783,6 +774,10 @@ export class LoadedAppClass extends Component<
           netInfoState.details && netInfoState.details.isConnectionExpensive,
       },
     });
+    // A launch without network must not start drawing the mixnet.
+    if (netInfoState.isConnected === false) {
+      await this.rpc.networkChanged(false);
+    }
 
     // not for fresh installing
     if (this.props.firstLaunchingMessage !== LaunchingModeEnum.installing) {
@@ -894,35 +889,7 @@ export class LoadedAppClass extends Component<
       },
     );
 
-    const initialUrl = await Linking.getInitialURL();
-    console.log('Received initial deep link URI');
-    if (initialUrl !== null) {
-      await this.readUrl(initialUrl);
-
-      // Nested navigate: HomeStack hosts the tab navigator; jump to the
-      // Send tab. Cast through `any` because AppDrawerParamList doesn't
-      // declare HomeStack's nested-screen params (would require
-      // refactoring to NavigatorScreenParams).
-      (this.drawerNav?.navigate as (...args: unknown[]) => void)?.(
-        RouteEnum.HomeStack,
-        { screen: RouteEnum.Send },
-      );
-    }
-
-    this.linking = Linking.addEventListener(
-      EventListenerEnum.url,
-      async ({ url }) => {
-        console.log('Received deep link URI event');
-        if (url !== null) {
-          await this.readUrl(url);
-        }
-
-        (this.drawerNav?.navigate as (...args: unknown[]) => void)?.(
-          RouteEnum.HomeStack,
-          { screen: RouteEnum.Send },
-        );
-      },
-    );
+    this.deliverLink();
 
     this.unsubscribeNetInfo = NetInfo.addEventListener(
       async (state: NetInfoState) => {
@@ -941,8 +908,11 @@ export class LoadedAppClass extends Component<
             },
           });
           if (isConnected !== state.isConnected) {
-            if (!state.isConnected) {
-            } else {
+            // Only a definite answer counts: null is "not known yet".
+            if (state.isConnected === false) {
+              await this.rpc.networkChanged(false);
+            } else if (state.isConnected) {
+              await this.rpc.networkChanged(true);
               // restart the interval process again...
               await this.rpc.clearTimers();
               await this.rpc.configure();
@@ -964,6 +934,40 @@ export class LoadedAppClass extends Component<
     if (prevProps.translate !== this.props.translate) {
       this.setState({ translate: this.props.translate });
     }
+    if (this.props.pendingLink !== prevProps.pendingLink) {
+      this.deliverLink();
+    }
+    this.publishReportState();
+  };
+
+  publishReportState = (): void => {
+    const { server, selectServer, readOnly, lastError, mixnetView } =
+      this.state;
+    publishReport({
+      served: { kind: 'chosen', server, selectServer },
+      session: {
+        kind: 'open',
+        chain: this.state.walletChainName,
+        readOnly,
+        sync: this.state.syncingStatus,
+        lastError,
+        mixnetView,
+      },
+    });
+  };
+
+  // Takes the session's `zcash:` link into Send.
+  deliverLink = async () => {
+    const url = this.props.pendingLink;
+    if (!url) {
+      return;
+    }
+    this.props.clearLink();
+    await this.readUrl(url);
+    navigateWallet({
+      screen: RouteEnum.HomeStack,
+      params: { screen: RouteEnum.Send },
+    });
   };
 
   foregroundGateBusy = false;
@@ -983,10 +987,7 @@ export class LoadedAppClass extends Component<
         // The narrowed answer is the gate outcome, whole; the locked
         // screen never reads mutable module state.
         lock: declined =>
-          this.navigateToLoadingApp({
-            startingApp: true,
-            biometricGate: declined,
-          }),
+          this.navigateToLoadingApp({ kind: 'locked', gate: declined }),
         notice: this.addLastSnackbar,
       },
       this.state.translate,
@@ -1019,6 +1020,7 @@ export class LoadedAppClass extends Component<
   };
 
   componentWillUnmount = async () => {
+    publishReport({ session: { kind: 'closed' } });
     await this.rpc.clearTimers();
     this.rpc.stopMixnetPolling();
     const safeRemove = (listener: unknown, name: string) => {
@@ -1036,7 +1038,6 @@ export class LoadedAppClass extends Component<
       }
     };
     safeRemove(this.appstate, 'appstate');
-    safeRemove(this.linking, 'linking');
     safeRemove(this.unsubscribeNetInfo, 'netInfo');
   };
 
@@ -1486,42 +1487,46 @@ export class LoadedAppClass extends Component<
   onMenuItemSelected = async (item: MenuItemEnum) => {
     // Depending on the menu item, open the appropriate screen
     if (item === MenuItemEnum.About) {
-      this.drawerNav?.navigate(RouteEnum.About);
+      navigateWallet({ screen: RouteEnum.About });
       return;
     } else if (item === MenuItemEnum.Rescan) {
-      this.drawerNav?.navigate(RouteEnum.Rescan);
+      navigateWallet({ screen: RouteEnum.Rescan });
       return;
     } else if (item === MenuItemEnum.SyncReport) {
-      this.drawerNav?.navigate(RouteEnum.SyncReport);
+      navigateWallet({ screen: RouteEnum.SyncReport });
       return;
     } else if (item === MenuItemEnum.FundPools) {
-      this.drawerNav?.navigate(RouteEnum.Pools);
+      navigateWallet({ screen: RouteEnum.Pools });
       return;
     } else if (item === MenuItemEnum.Insight) {
-      this.drawerNav?.navigate(RouteEnum.Insight);
+      navigateWallet({ screen: RouteEnum.Insight });
       return;
     } else if (item === MenuItemEnum.WalletSeedUfvk) {
       if (this.state.readOnly) {
-        this.drawerNav?.navigate(RouteEnum.ViewingKey, {
-          entry: { kind: 'push' },
+        navigateWallet({
+          screen: RouteEnum.ViewingKey,
+          params: { entry: { kind: 'push' } },
         });
       } else {
-        this.drawerNav?.navigate(RouteEnum.WalletSeed);
+        navigateWallet({ screen: RouteEnum.WalletSeed });
       }
       return;
     } else if (item === MenuItemEnum.ChangeWallet) {
-      this.drawerNav?.navigate(RouteEnum.WalletSeed, { action: 'change' });
+      navigateWallet({
+        screen: RouteEnum.WalletSeed,
+        params: { action: 'change' },
+      });
       return;
     } else if (item === MenuItemEnum.Settings) {
       // Bio gate for settingsScreen lives at the Settings screen entry
       // (screens/Settings/Settings.tsx).
-      this.drawerNav?.navigate(RouteEnum.Settings);
+      navigateWallet({ screen: RouteEnum.Settings });
       return;
     } else if (item === MenuItemEnum.AddressBook) {
-      this.drawerNav?.navigate(RouteEnum.AddressBook);
+      navigateWallet({ screen: RouteEnum.AddressBook });
       return;
     } else if (item === MenuItemEnum.Server) {
-      this.drawerNav?.navigate(RouteEnum.Server);
+      navigateWallet({ screen: RouteEnum.Server });
       return;
     } else if (item === MenuItemEnum.Support) {
       this.setShowSwipeableIcons(false);
@@ -1779,20 +1784,12 @@ export class LoadedAppClass extends Component<
     });
   };
 
-  navigateToLoadingApp = async (state: LoadingAppNavigationState) => {
+  navigateToLoadingApp = async (session: LoadingSession) => {
     await this.rpc.clearTimers();
-    this.props.navigationApp.reset({
-      index: 0,
-      routes: [
-        {
-          name: RouteEnum.LoadingApp,
-          params: state,
-        },
-      ],
-    });
+    this.props.leaveWallet(session);
   };
 
-  onClickOKChangeWallet = async (state: LoadingAppNavigationState) => {
+  onClickOKChangeWallet = async () => {
     const changed = await this.rpc.changeWallet();
 
     if (changed.kind === 'error') {
@@ -1810,7 +1807,11 @@ export class LoadedAppClass extends Component<
     }
 
     this.keepAwake(false);
-    this.navigateToLoadingApp(state);
+    this.navigateToLoadingApp({
+      kind: 'boot',
+      startingApp: false,
+      newWallet: false,
+    });
   };
 
   // Runs from a confirm button, where a throw would vanish: every failure
@@ -1879,7 +1880,11 @@ export class LoadedAppClass extends Component<
       }
     }
     this.keepAwake(false);
-    this.navigateToLoadingApp({ startingApp: false, newWallet: true });
+    this.navigateToLoadingApp({
+      kind: 'boot',
+      startingApp: false,
+      newWallet: true,
+    });
   };
 
   onClickOKServerWallet = async () => {
@@ -1939,7 +1944,11 @@ export class LoadedAppClass extends Component<
       }
 
       // no need to restart the tasks because is about to restart the app.
-      this.navigateToLoadingApp({ startingApp: false });
+      this.navigateToLoadingApp({
+        kind: 'boot',
+        startingApp: false,
+        newWallet: false,
+      });
     }
   };
 
@@ -2015,14 +2024,6 @@ export class LoadedAppClass extends Component<
     this.setState({
       scrollToBottom: value,
     });
-  };
-
-  setNavigationHome = (
-    navigationHome: NativeStackNavigationProp<AppDrawerParamList>,
-  ) => {
-    if (!this.drawerNav) {
-      this.drawerNav = navigationHome;
-    }
   };
 
   render() {
@@ -2102,10 +2103,7 @@ export class LoadedAppClass extends Component<
                   <FadeInOnMount duration={HOME_FADE_MS}>
                     <RootNavigator initialRouteName={RouteEnum.HomeStack}>
                       <RootNavigator.Screen name={RouteEnum.HomeStack}>
-                        {props => {
-                          useEffect(() => {
-                            this.setNavigationHome(props.navigation);
-                          });
+                        {() => {
                           return (
                             <>
                               <Tab.Navigator
@@ -2293,9 +2291,7 @@ export class LoadedAppClass extends Component<
                               {...props}
                               onConfirm={async () => {
                                 if (action === 'change') {
-                                  await this.onClickOKChangeWallet({
-                                    startingApp: false,
-                                  });
+                                  await this.onClickOKChangeWallet();
                                 } else if (action === 'server') {
                                   await this.onClickOKServerWallet();
                                 }
