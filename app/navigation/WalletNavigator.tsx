@@ -25,7 +25,6 @@ import Confirm from '@screens/Confirm';
 const About = React.lazy(() => import('@screens/About'));
 const MixnetDoctor = React.lazy(() => import('@screens/MixnetDoctor'));
 const SyncReport = React.lazy(() => import('@screens/SyncReport'));
-const Rescan = React.lazy(() => import('@screens/Rescan'));
 const Pools = React.lazy(() => import('@screens/Pools'));
 const MeetIronwood = React.lazy(() => import('@screens/MeetIronwood'));
 const SeedBackup = React.lazy(() => import('@screens/SeedBackup'));
@@ -114,7 +113,6 @@ export function WalletNavigator() {
         />
         <Stack.Screen name={Route.About} component={About} />
         <Stack.Screen name={Route.MixnetDoctor} component={MixnetDoctor} />
-        <Stack.Screen name={Route.Rescan} component={Rescan} />
         <Stack.Screen name={Route.Insight} component={Insight} />
         <Stack.Screen name={Route.SyncReport} component={SyncReport} />
         <Stack.Screen name={Route.Pools} component={Pools} />

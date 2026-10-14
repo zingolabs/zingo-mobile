@@ -4,8 +4,6 @@ import {
   Image,
   Keyboard,
   Pressable,
-  StyleSheet,
-  TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
@@ -14,7 +12,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
   faCheck,
   faChevronDown,
-  faMagnifyingGlass,
   faXmark,
 } from '@fortawesome/free-solid-svg-icons';
 import {
@@ -31,6 +28,7 @@ import BoldText from '@ui/primitives/BoldText';
 import FadeText from '@ui/primitives/FadeText';
 import RegText from '@ui/primitives/RegText';
 import SheetRim from '@ui/primitives/SheetRim';
+import SearchField from '@ui/widgets/SearchField';
 import { chainDisplayName } from './chainDisplayName';
 import { getChainIcon } from './chainIcons';
 
@@ -193,6 +191,12 @@ const ChainSelect: React.FunctionComponent<ChainSelectProps> = ({
         >
           {chainDisplayName(value)}
         </RegText>
+        <FadeText
+          testID="chainselect.ticker"
+          style={{ fontSize: 12, letterSpacing: 0.4 }}
+        >
+          {(value || '').toUpperCase()}
+        </FadeText>
         {canPick ? (
           <FontAwesomeIcon
             icon={faChevronDown}
@@ -275,45 +279,12 @@ const ChainSelect: React.FunctionComponent<ChainSelectProps> = ({
             </View>
 
             {/* Search row */}
-            <View
-              style={[
-                styles.searchRow,
-                {
-                  backgroundColor: colors.bgCanvas,
-                  borderColor: colors.borderMuted,
-                },
-              ]}
-            >
-              <FontAwesomeIcon
-                icon={faMagnifyingGlass}
-                size={14}
-                color={colors.fgMuted}
-              />
-              <TextInput
-                value={query}
-                onChangeText={setQuery}
-                placeholder={t('addressbook.search-placeholder', 'Search')}
-                placeholderTextColor={colors.fgMuted}
-                autoCapitalize="none"
-                autoCorrect={false}
-                spellCheck={false}
-                style={[styles.searchInput, { color: colors.fgDefault }]}
-                testID="chainselect.search"
-              />
-              {query.length > 0 && (
-                <Pressable
-                  onPress={() => setQuery('')}
-                  accessibilityRole="button"
-                  hitSlop={8}
-                >
-                  <FontAwesomeIcon
-                    icon={faXmark}
-                    size={14}
-                    color={colors.fgMuted}
-                  />
-                </Pressable>
-              )}
-            </View>
+            <SearchField
+              value={query}
+              onChangeText={setQuery}
+              placeholder={t('addressbook.search-placeholder', 'Search')}
+              testID={'chainselect.search'}
+            />
             <View style={{ height: 8 }} />
           </View>
 
@@ -376,22 +347,5 @@ const ChainSelect: React.FunctionComponent<ChainSelectProps> = ({
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  searchRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    columnGap: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 12,
-    borderWidth: 1,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: 14,
-    padding: 0,
-  },
-});
 
 export default ChainSelect;

@@ -9,6 +9,10 @@ export enum ButtonTypeEnum {
   Ghost = 'Ghost',
   Warning = 'Warning',
   Nym = 'Nym',
+  // A destructive action: red fill, white text.
+  Danger = 'Danger',
+  // A quiet text action, such as Cancel under a sheet's main button.
+  Link = 'Link',
 }
 
 type ButtonProps = {
@@ -22,6 +26,8 @@ type ButtonProps = {
   accessibilityLabel?: string;
   testID?: string;
   twoButtons?: boolean;
+  // Spans the whole row.
+  fullWidth?: boolean;
 };
 
 const Button: React.FunctionComponent<ButtonProps> = ({
@@ -35,6 +41,7 @@ const Button: React.FunctionComponent<ButtonProps> = ({
   accessibilityLabel,
   testID,
   twoButtons,
+  fullWidth,
 }) => {
   const { colors } = useTheme();
 
@@ -59,18 +66,29 @@ const Button: React.FunctionComponent<ButtonProps> = ({
               backgroundColor: 'transparent',
               color: colors.fgDefault,
             }
-          : type === ButtonTypeEnum.Nym
+          : type === ButtonTypeEnum.Danger
             ? {
-                backgroundColor: disabled ? '#4DAF7C' : '#07FF94',
-                borderColor: disabled ? '#4DAF7C' : '#07FF94',
-                borderWidth: 2,
+                backgroundColor: colors.bgDanger,
                 width: twoButtons ? '40%' : '80%',
               }
-            : {
-                // error
-                backgroundColor: colors.bgAccent,
-                width: twoButtons ? '40%' : '80%',
-              };
+            : type === ButtonTypeEnum.Link
+              ? {
+                  backgroundColor: 'transparent',
+                  minHeight: 38,
+                  width: twoButtons ? '40%' : undefined,
+                }
+              : type === ButtonTypeEnum.Nym
+                ? {
+                    backgroundColor: disabled ? '#4DAF7C' : '#07FF94',
+                    borderColor: disabled ? '#4DAF7C' : '#07FF94',
+                    borderWidth: 2,
+                    width: twoButtons ? '40%' : '80%',
+                  }
+                : {
+                    // error
+                    backgroundColor: colors.bgAccent,
+                    width: twoButtons ? '40%' : '80%',
+                  };
 
   const styleButtonCommon: TextStyle = {
     padding: 0,
@@ -102,14 +120,25 @@ const Button: React.FunctionComponent<ButtonProps> = ({
               color: colors.fgAccent,
               textTransform: 'none',
             }
-          : type === ButtonTypeEnum.Nym
+          : type === ButtonTypeEnum.Danger
             ? {
-                color: colors.bgCanvas,
+                color: '#ffffff',
+                fontWeight: '700',
               }
-            : {
-                // error
-                color: colors.bgCanvas,
-              };
+            : type === ButtonTypeEnum.Link
+              ? {
+                  color: colors.fgMuted,
+                  fontSize: 13,
+                  fontWeight: '500',
+                }
+              : type === ButtonTypeEnum.Nym
+                ? {
+                    color: colors.bgCanvas,
+                  }
+                : {
+                    // error
+                    color: colors.bgCanvas,
+                  };
   const styleTextCommon: TextStyle = {
     fontWeight: '600',
     textTransform: 'none',
@@ -126,6 +155,8 @@ const Button: React.FunctionComponent<ButtonProps> = ({
       style={{
         ...styleButton,
         ...styleButtonCommon,
+        ...(type === ButtonTypeEnum.Link ? { minHeight: 38 } : {}),
+        ...(fullWidth ? { width: '100%', maxWidth: '100%' } : {}),
         ...style,
       }}
       disabled={disabled}

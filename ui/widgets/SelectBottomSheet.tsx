@@ -1,13 +1,9 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { forwardRef, useCallback, useMemo, useState } from 'react';
-import { Keyboard, Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { Keyboard, Pressable, View } from 'react-native';
 import { radiusSheet, useTheme } from '@app/theme';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import {
-  faCheck,
-  faMagnifyingGlass,
-  faXmark,
-} from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faXmark } from '@fortawesome/free-solid-svg-icons';
 import {
   BottomSheetBackdrop,
   BottomSheetBackdropProps,
@@ -18,6 +14,7 @@ import {
 import BoldText from '@ui/primitives/BoldText';
 import RegText from '@ui/primitives/RegText';
 import SheetRim from '@ui/primitives/SheetRim';
+import SearchField from '@ui/widgets/SearchField';
 import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
 
 export type SelectBottomSheetItem = {
@@ -268,45 +265,12 @@ const SelectBottomSheet = forwardRef<BottomSheetModal, SelectBottomSheetProps>(
                 </Pressable>
               </View>
 
-              <View
-                style={[
-                  styles.searchRow,
-                  {
-                    backgroundColor: colors.bgCanvas,
-                    borderColor: colors.borderMuted,
-                  },
-                ]}
-              >
-                <FontAwesomeIcon
-                  icon={faMagnifyingGlass}
-                  size={14}
-                  color={colors.fgMuted}
-                />
-                <TextInput
-                  value={query}
-                  onChangeText={setQuery}
-                  placeholder={searchPlaceholder}
-                  placeholderTextColor={colors.fgMuted}
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                  spellCheck={false}
-                  style={[styles.searchInput, { color: colors.fgDefault }]}
-                  testID={testID ? `${testID}.search` : undefined}
-                />
-                {query.length > 0 && (
-                  <Pressable
-                    onPress={() => setQuery('')}
-                    accessibilityRole="button"
-                    hitSlop={8}
-                  >
-                    <FontAwesomeIcon
-                      icon={faXmark}
-                      size={14}
-                      color={colors.fgMuted}
-                    />
-                  </Pressable>
-                )}
-              </View>
+              <SearchField
+                value={query}
+                onChangeText={setQuery}
+                placeholder={searchPlaceholder ?? ''}
+                testID={testID ? `${testID}.search` : undefined}
+              />
               <View style={{ height: 8 }} />
             </View>
             {list}
@@ -318,22 +282,5 @@ const SelectBottomSheet = forwardRef<BottomSheetModal, SelectBottomSheetProps>(
     );
   },
 );
-
-const styles = StyleSheet.create({
-  searchRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    columnGap: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 12,
-    borderWidth: 1,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: 14,
-    padding: 0,
-  },
-});
 
 export default React.memo(SelectBottomSheet);

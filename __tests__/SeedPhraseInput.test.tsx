@@ -239,3 +239,44 @@ test('Tests that deleting the start of the next word does not bring back the las
   expect(handedUp).toBe('west');
   expect(screen.getByTestId('seed').props.value).toBe('');
 });
+
+/** The import screen's X empties the value from outside the field. */
+const ClearableHost: React.FunctionComponent = () => {
+  const [value, setValue] = useState('');
+  const { Pressable } =
+    jest.requireActual<typeof import('react-native')>('react-native');
+  return (
+    <>
+      <SeedPhraseInput
+        value={value}
+        onChangeValue={setValue}
+        translate={translate}
+        testID="seed"
+      />
+      <Pressable testID="clear" onPress={() => setValue('')} />
+    </>
+  );
+};
+
+test('Tests that the same phrase pastes again when the field was cleared from outside after a paste.', () => {
+  const phrase = 'abandon ability able about';
+  render(<ClearableHost />);
+  fireEvent.changeText(screen.getByTestId('seed'), phrase);
+  expect(screen.getByText('4 / 24')).toBeOnTheScreen();
+
+  fireEvent.press(screen.getByTestId('clear'));
+  expect(screen.getByText('0 / 24')).toBeOnTheScreen();
+
+  fireEvent.changeText(screen.getByTestId('seed'), phrase);
+  expect(screen.getByText('4 / 24')).toBeOnTheScreen();
+});
+
+test('Tests that the same viewing key pastes again when the field was cleared from outside after a paste.', () => {
+  render(<ClearableHost />);
+  fireEvent.changeText(screen.getByTestId('seed'), 'uview1abc');
+  expect(screen.getByText('import.viewing-key')).toBeOnTheScreen();
+
+  fireEvent.press(screen.getByTestId('clear'));
+  fireEvent.changeText(screen.getByTestId('seed'), 'uview1abc');
+  expect(screen.getByText('import.viewing-key')).toBeOnTheScreen();
+});

@@ -126,7 +126,7 @@ exports[`NewAddress - snapshots NewAddress transparent kind 1`] = `
             "borderRadius": 24,
             "justifyContent": "center",
             "maxWidth": "90%",
-            "minHeight": 48,
+            "minHeight": 38,
             "minWidth": "30%",
             "opacity": 1,
             "padding": 0,
@@ -153,9 +153,9 @@ exports[`NewAddress - snapshots NewAddress transparent kind 1`] = `
           <Text
             style={
               {
-                "color": "#18bd18",
-                "fontSize": 16,
-                "fontWeight": "700",
+                "color": "#888888",
+                "fontSize": 13,
+                "fontWeight": "500",
                 "textAlign": "center",
                 "textTransform": "none",
               }
@@ -674,7 +674,7 @@ exports[`NewAddress - snapshots NewAddress unified kind 1`] = `
             "borderRadius": 24,
             "justifyContent": "center",
             "maxWidth": "90%",
-            "minHeight": 48,
+            "minHeight": 38,
             "minWidth": "30%",
             "opacity": 1,
             "padding": 0,
@@ -701,9 +701,9 @@ exports[`NewAddress - snapshots NewAddress unified kind 1`] = `
           <Text
             style={
               {
-                "color": "#18bd18",
-                "fontSize": 16,
-                "fontWeight": "700",
+                "color": "#888888",
+                "fontSize": 13,
+                "fontWeight": "500",
                 "textAlign": "center",
                 "textTransform": "none",
               }
