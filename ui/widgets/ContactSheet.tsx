@@ -439,8 +439,6 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
           fullWidth
           style={{
             marginTop: 20,
-            minHeight: 46,
-            borderRadius: 23,
             opacity: ready ? 1 : SAVE_OFF,
           }}
           textStyle={{ fontSize: 15 }}

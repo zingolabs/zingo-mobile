@@ -3,6 +3,10 @@ import React from 'react';
 import { TouchableOpacity, Text, View, TextStyle } from 'react-native';
 import { useTheme } from '@app/theme';
 
+/** The height of every filled action button in the app. */
+export const BUTTON_HEIGHT = 44;
+const LINK_HEIGHT = 38;
+
 export enum ButtonTypeEnum {
   Primary = 'Primary',
   Secondary = 'Secondary',
@@ -74,7 +78,7 @@ const Button: React.FunctionComponent<ButtonProps> = ({
             : type === ButtonTypeEnum.Link
               ? {
                   backgroundColor: 'transparent',
-                  minHeight: 38,
+                  minHeight: LINK_HEIGHT,
                   width: twoButtons ? '40%' : undefined,
                 }
               : type === ButtonTypeEnum.Nym
@@ -97,7 +101,7 @@ const Button: React.FunctionComponent<ButtonProps> = ({
     borderRadius: 24,
     maxWidth: '90%',
     minWidth: '30%',
-    minHeight: 48,
+    minHeight: BUTTON_HEIGHT,
     alignItems: 'center',
     justifyContent: 'center',
   };
@@ -155,7 +159,7 @@ const Button: React.FunctionComponent<ButtonProps> = ({
       style={{
         ...styleButton,
         ...styleButtonCommon,
-        ...(type === ButtonTypeEnum.Link ? { minHeight: 38 } : {}),
+        ...(type === ButtonTypeEnum.Link ? { minHeight: LINK_HEIGHT } : {}),
         ...(fullWidth ? { width: '100%', maxWidth: '100%' } : {}),
         ...style,
       }}
@@ -171,7 +175,7 @@ const Button: React.FunctionComponent<ButtonProps> = ({
           margin: 0,
           padding: 0,
           minWidth: 48,
-          minHeight: 48,
+          minHeight: type === ButtonTypeEnum.Link ? LINK_HEIGHT : BUTTON_HEIGHT,
         }}
       >
         <Text

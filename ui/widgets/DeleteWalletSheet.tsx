@@ -26,6 +26,7 @@ import { DeleteWalletContext } from '@app/AppState/types/DeleteWalletContext';
 import BoldText from '@ui/primitives/BoldText';
 import RegText from '@ui/primitives/RegText';
 import SheetRim from '@ui/primitives/SheetRim';
+import { BUTTON_HEIGHT } from '@ui/primitives/Button';
 
 type DeleteWalletSheetProps = {
   context: DeleteWalletContext;
@@ -230,7 +231,7 @@ const DeleteWalletSheet = forwardRef<BottomSheetModal, DeleteWalletSheetProps>(
               accessibilityRole="button"
               style={{
                 marginTop: 24,
-                height: 45,
+                height: BUTTON_HEIGHT,
                 borderRadius: 999,
                 borderWidth: 1.5,
                 borderColor: colors.fgDangerEmphasis,
