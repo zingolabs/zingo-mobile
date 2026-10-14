@@ -173,7 +173,7 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
           }}
         >
           <Button
-            type={ButtonTypeEnum.Secondary}
+            type={ButtonTypeEnum.Link}
             title={translate('cancel') as string}
             onPress={() => {
               setAddress('');

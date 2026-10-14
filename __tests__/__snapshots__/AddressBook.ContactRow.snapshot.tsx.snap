@@ -1,0 +1,640 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`ContactRow Tests that an open row offers Send, Copy, Edit and Delete when the wallet can spend. 1`] = `
+<View
+  onLayout={[Function]}
+  style={
+    [
+      {
+        "borderTopColor": "#0A1F3D",
+        "borderTopWidth": 0,
+        "overflow": "hidden",
+      },
+      {},
+    ]
+  }
+  testID="addressbook.row.u1alice"
+>
+  <View
+    collapsable={false}
+    enabled={true}
+    handlerTag={-1}
+    handlerType="PanGestureHandler"
+    onGestureHandlerEvent={[Function]}
+    onGestureHandlerStateChange={[Function]}
+    onLayout={[Function]}
+    style={
+      {
+        "overflow": "hidden",
+      }
+    }
+  >
+    <View
+      collapsable={false}
+      style={
+        {
+          "bottom": 0,
+          "flexDirection": "row-reverse",
+          "left": 0,
+          "position": "absolute",
+          "right": 0,
+          "top": 0,
+          "transform": [
+            {
+              "translateX": -10000,
+            },
+          ],
+        }
+      }
+    >
+      <View
+        style={
+          {
+            "alignItems": "flex-end",
+            "backgroundColor": "#0E5A18",
+            "justifyContent": "center",
+            "paddingRight": 31,
+            "width": 0,
+          }
+        }
+      >
+        <View
+          collapsable={false}
+          style={
+            {
+              "transform": [
+                {
+                  "scale": 1,
+                },
+              ],
+            }
+          }
+        />
+      </View>
+      <View
+        onLayout={[Function]}
+      />
+    </View>
+    <View
+      collapsable={false}
+      enabled={false}
+      handlerTag={-1}
+      handlerType="TapGestureHandler"
+      onGestureHandlerEvent={[Function]}
+      onGestureHandlerStateChange={[Function]}
+      pointerEvents="auto"
+      style={
+        {
+          "transform": [
+            {
+              "translateX": -0,
+            },
+          ],
+        }
+      }
+    >
+      <View
+        style={
+          {
+            "backgroundColor": "#031124",
+          }
+        }
+      >
+        <View
+          pointerEvents="none"
+          style={
+            [
+              {
+                "bottom": 0,
+                "left": 0,
+                "position": "absolute",
+                "right": 0,
+                "top": 0,
+              },
+              {
+                "backgroundColor": "rgba(20,157,5,0.16)",
+              },
+              {},
+            ]
+          }
+        />
+        <View
+          accessibilityRole="button"
+          accessibilityState={
+            {
+              "busy": undefined,
+              "checked": undefined,
+              "disabled": undefined,
+              "expanded": true,
+              "selected": undefined,
+            }
+          }
+          accessibilityValue={
+            {
+              "max": undefined,
+              "min": undefined,
+              "now": undefined,
+              "text": undefined,
+            }
+          }
+          accessible={true}
+          collapsable={false}
+          focusable={true}
+          onBlur={[Function]}
+          onClick={[Function]}
+          onFocus={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          style={
+            {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "gap": 12,
+              "minHeight": 62,
+              "paddingHorizontal": 13,
+              "paddingVertical": 8,
+            }
+          }
+          testID="addressbook.row.u1alice.head"
+        >
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "backgroundColor": "#e35f3629",
+                "borderRadius": 18,
+                "height": 36,
+                "justifyContent": "center",
+                "width": 36,
+              }
+            }
+          >
+            <Text
+              style={
+                {
+                  "color": "#e35f36",
+                  "fontSize": 14,
+                  "fontWeight": "700",
+                }
+              }
+            >
+              A
+            </Text>
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "backgroundColor": "#031124",
+                  "borderColor": "#031124",
+                  "borderRadius": 11,
+                  "borderWidth": 2,
+                  "bottom": -5,
+                  "height": 22,
+                  "justifyContent": "center",
+                  "position": "absolute",
+                  "right": -5,
+                  "width": 22,
+                }
+              }
+            >
+              <Image
+                resizeMode="contain"
+                source={
+                  {
+                    "testUri": "../../../assets/img/zcash-yellow.png",
+                  }
+                }
+                style={
+                  {
+                    "borderRadius": 9,
+                    "height": 18,
+                    "width": 18,
+                  }
+                }
+              />
+            </View>
+          </View>
+          <View
+            style={
+              {
+                "flex": 1,
+                "minWidth": 0,
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "alignItems": "baseline",
+                  "flexDirection": "row",
+                }
+              }
+            >
+              <Text
+                numberOfLines={1}
+                style={
+                  {
+                    "color": "#c3c3c3",
+                    "flexShrink": 1,
+                    "fontSize": 13.5,
+                    "fontWeight": "600",
+                    "lineHeight": 18,
+                  }
+                }
+              >
+                Alice
+              </Text>
+              <Text
+                style={
+                  {
+                    "color": "#8DA0B8",
+                    "fontSize": 10,
+                    "fontWeight": "600",
+                    "letterSpacing": 0.5,
+                    "marginLeft": 8,
+                  }
+                }
+              >
+                ZEC
+              </Text>
+            </View>
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "flexDirection": "row",
+                  "gap": 7,
+                  "marginTop": 2,
+                }
+              }
+            >
+              <Text
+                style={
+                  {
+                    "color": "#B9C6D6",
+                    "fontFamily": "Menlo",
+                    "fontSize": 11.5,
+                    "fontWeight": "500",
+                  }
+                }
+              >
+                u1alice...u1alice
+              </Text>
+            </View>
+          </View>
+        </View>
+        <View
+          style={
+            [
+              {
+                "overflow": "hidden",
+              },
+              {},
+            ]
+          }
+        >
+          <View
+            style={
+              [
+                {
+                  "flexDirection": "row",
+                  "height": 92,
+                  "justifyContent": "space-around",
+                  "paddingHorizontal": 8,
+                  "paddingTop": 2,
+                },
+                {},
+              ]
+            }
+          >
+            <View
+              accessibilityLabel="text translated"
+              accessibilityRole="button"
+              accessibilityState={
+                {
+                  "busy": undefined,
+                  "checked": undefined,
+                  "disabled": undefined,
+                  "expanded": undefined,
+                  "selected": undefined,
+                }
+              }
+              accessibilityValue={
+                {
+                  "max": undefined,
+                  "min": undefined,
+                  "now": undefined,
+                  "text": undefined,
+                }
+              }
+              accessible={true}
+              collapsable={false}
+              focusable={true}
+              onBlur={[Function]}
+              onClick={[Function]}
+              onFocus={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                {
+                  "alignItems": "center",
+                  "gap": 7,
+                  "width": 68,
+                }
+              }
+              testID="addressbook.row.u1alice.send"
+            >
+              <View
+                style={
+                  {
+                    "alignItems": "center",
+                    "backgroundColor": "#020B18",
+                    "borderRadius": 26,
+                    "height": 52,
+                    "justifyContent": "center",
+                    "width": 52,
+                  }
+                }
+              >
+                <View
+                  style={{}}
+                />
+              </View>
+              <Text
+                style={
+                  {
+                    "color": "#B9C6D6",
+                    "fontSize": 11,
+                    "fontWeight": "500",
+                    "lineHeight": 15,
+                  }
+                }
+              >
+                text translated
+              </Text>
+            </View>
+            <View
+              accessibilityLabel="text translated"
+              accessibilityRole="button"
+              accessibilityState={
+                {
+                  "busy": undefined,
+                  "checked": undefined,
+                  "disabled": undefined,
+                  "expanded": undefined,
+                  "selected": undefined,
+                }
+              }
+              accessibilityValue={
+                {
+                  "max": undefined,
+                  "min": undefined,
+                  "now": undefined,
+                  "text": undefined,
+                }
+              }
+              accessible={true}
+              collapsable={false}
+              focusable={true}
+              onBlur={[Function]}
+              onClick={[Function]}
+              onFocus={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                {
+                  "alignItems": "center",
+                  "gap": 7,
+                  "width": 68,
+                }
+              }
+              testID="addressbook.row.u1alice.copy"
+            >
+              <View
+                style={
+                  {
+                    "alignItems": "center",
+                    "backgroundColor": "#020B18",
+                    "borderRadius": 26,
+                    "height": 52,
+                    "justifyContent": "center",
+                    "width": 52,
+                  }
+                }
+              >
+                <View
+                  style={{}}
+                />
+              </View>
+              <Text
+                style={
+                  {
+                    "color": "#B9C6D6",
+                    "fontSize": 11,
+                    "fontWeight": "500",
+                    "lineHeight": 15,
+                  }
+                }
+              >
+                text translated
+              </Text>
+            </View>
+            <View
+              accessibilityLabel="text translated"
+              accessibilityRole="button"
+              accessibilityState={
+                {
+                  "busy": undefined,
+                  "checked": undefined,
+                  "disabled": undefined,
+                  "expanded": undefined,
+                  "selected": undefined,
+                }
+              }
+              accessibilityValue={
+                {
+                  "max": undefined,
+                  "min": undefined,
+                  "now": undefined,
+                  "text": undefined,
+                }
+              }
+              accessible={true}
+              collapsable={false}
+              focusable={true}
+              onBlur={[Function]}
+              onClick={[Function]}
+              onFocus={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                {
+                  "alignItems": "center",
+                  "gap": 7,
+                  "width": 68,
+                }
+              }
+              testID="addressbook.row.u1alice.edit"
+            >
+              <View
+                style={
+                  {
+                    "alignItems": "center",
+                    "backgroundColor": "#020B18",
+                    "borderRadius": 26,
+                    "height": 52,
+                    "justifyContent": "center",
+                    "width": 52,
+                  }
+                }
+              >
+                <View
+                  style={{}}
+                />
+                <View
+                  style={
+                    [
+                      {
+                        "backgroundColor": "#B9C6D6",
+                        "borderRadius": 1,
+                        "bottom": 15,
+                        "height": 2,
+                        "left": 15,
+                        "position": "absolute",
+                        "transformOrigin": "left",
+                        "width": 10,
+                      },
+                      {},
+                    ]
+                  }
+                />
+              </View>
+              <Text
+                style={
+                  {
+                    "color": "#B9C6D6",
+                    "fontSize": 11,
+                    "fontWeight": "500",
+                    "lineHeight": 15,
+                  }
+                }
+              >
+                text translated
+              </Text>
+            </View>
+            <View
+              accessibilityLabel="text translated"
+              accessibilityRole="button"
+              accessibilityState={
+                {
+                  "busy": undefined,
+                  "checked": undefined,
+                  "disabled": undefined,
+                  "expanded": undefined,
+                  "selected": undefined,
+                }
+              }
+              accessibilityValue={
+                {
+                  "max": undefined,
+                  "min": undefined,
+                  "now": undefined,
+                  "text": undefined,
+                }
+              }
+              accessible={true}
+              collapsable={false}
+              focusable={true}
+              onBlur={[Function]}
+              onClick={[Function]}
+              onFocus={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                {
+                  "alignItems": "center",
+                  "gap": 7,
+                  "width": 68,
+                }
+              }
+              testID="addressbook.row.u1alice.delete"
+            >
+              <View
+                style={
+                  {
+                    "alignItems": "center",
+                    "backgroundColor": "#020B18",
+                    "borderRadius": 26,
+                    "height": 52,
+                    "justifyContent": "center",
+                    "width": 52,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "height": 20,
+                      "width": 20,
+                    }
+                  }
+                >
+                  <View
+                    style={
+                      [
+                        {
+                          "bottom": 0,
+                          "left": 0,
+                          "position": "absolute",
+                          "right": 0,
+                          "top": 0,
+                        },
+                        {
+                          "transformOrigin": "13% 25%",
+                        },
+                        {},
+                      ]
+                    }
+                  />
+                </View>
+              </View>
+              <Text
+                style={
+                  {
+                    "color": "#F2878A",
+                    "fontSize": 11,
+                    "fontWeight": "500",
+                    "lineHeight": 15,
+                  }
+                }
+              >
+                text translated
+              </Text>
+            </View>
+          </View>
+        </View>
+      </View>
+    </View>
+  </View>
+</View>
+`;

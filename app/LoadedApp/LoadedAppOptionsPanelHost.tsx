@@ -17,7 +17,6 @@ import ServerIcon from '@ui/widgets/ServerIcon';
 
 import AddressBookIcon from '../../assets/img/options/address-book.svg';
 import WalletSeedIcon from '../../assets/img/options/wallet-seed.svg';
-import RescanIcon from '../../assets/img/options/rescan.svg';
 import SyncRescanReportIcon from '../../assets/img/options/sync-rescan-report.svg';
 import FundsPoolsIcon from '../../assets/img/options/funds-pools.svg';
 import FinancialInsightIcon from '../../assets/img/options/financial-insight.svg';
@@ -32,7 +31,6 @@ const SOCIAL_GITHUB_URL = 'https://github.com/zingolabs/zingo-mobile';
 const MENU_TEST_IDS: Partial<Record<MenuItemEnum, string>> = {
   [MenuItemEnum.AddressBook]: 'menu.addressbook',
   [MenuItemEnum.WalletSeedUfvk]: 'menu.walletseedufvk',
-  [MenuItemEnum.Rescan]: 'menu.rescan',
   [MenuItemEnum.SyncReport]: 'menu.syncreport',
   [MenuItemEnum.FundPools]: 'menu.fundpools',
   [MenuItemEnum.Insight]: 'menu.insight',
@@ -43,7 +41,6 @@ const MENU_TEST_IDS: Partial<Record<MenuItemEnum, string>> = {
 type PanelItem =
   | MenuItemEnum.AddressBook
   | MenuItemEnum.WalletSeedUfvk
-  | MenuItemEnum.Rescan
   | MenuItemEnum.SyncReport
   | MenuItemEnum.FundPools
   | MenuItemEnum.Insight
@@ -63,8 +60,6 @@ const walletScreen = (
       return readOnly
         ? { screen: Route.ViewingKey, params: { entry: { kind: 'push' } } }
         : { screen: Route.WalletSeed };
-    case MenuItemEnum.Rescan:
-      return { screen: Route.Rescan };
     case MenuItemEnum.SyncReport:
       return { screen: Route.SyncReport };
     case MenuItemEnum.FundPools:
@@ -125,7 +120,7 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
   }, [isOpen, server, netInfo.isConnected]);
 
   // Audit Issue D — bio gates moved into the destination screens
-  // themselves (WalletSeed.tsx, ViewingKey.tsx, Rescan.tsx, Settings.tsx) so
+  // themselves (WalletSeed.tsx, ViewingKey.tsx, SyncReport.tsx, Settings.tsx) so
   // every navigation path is funnelled through the same check.
   const dispatch = useMemo(
     () => (item: PanelItem) => {
@@ -141,7 +136,6 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
   const actions = useMemo<OptionsPanelAction[]>(() => {
     const isOffline = server.kind === 'offline';
 
-    const showRescan = !isOffline;
     const showSyncReport = !isOffline;
     const list: OptionsPanelAction[] = [];
 
@@ -165,16 +159,6 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
       badge: !readOnly && !seedBackedUp,
       onPress: () => dispatch(MenuItemEnum.WalletSeedUfvk),
     });
-
-    if (showRescan) {
-      list.push({
-        id: MenuItemEnum.Rescan,
-        testID: MENU_TEST_IDS[MenuItemEnum.Rescan],
-        label: translate('loadedapp.rescanwallet') as string,
-        icon: <RescanIcon width={30} height={30} />,
-        onPress: () => dispatch(MenuItemEnum.Rescan),
-      });
-    }
 
     if (showSyncReport) {
       list.push({

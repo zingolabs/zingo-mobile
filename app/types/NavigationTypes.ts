@@ -104,7 +104,6 @@ export type AppDrawerParamList = {
   [Route.Server]: undefined;
   [Route.About]: undefined;
   [Route.MixnetDoctor]: undefined;
-  [Route.Rescan]: undefined;
   [Route.Insight]: undefined;
   [Route.Computing]: ComputingEnd | undefined;
   [Route.SyncReport]: undefined;
