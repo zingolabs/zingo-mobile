@@ -2269,10 +2269,11 @@ export class LoadedAppClass extends Component<
                         name={RouteEnum.Insight}
                         component={Insight}
                       />
-                      <RootNavigator.Screen
-                        name={RouteEnum.SyncReport}
-                        component={SyncReport}
-                      />
+                      <RootNavigator.Screen name={RouteEnum.SyncReport}>
+                        {props => (
+                          <SyncReport {...props} doRescan={this.doRescan} />
+                        )}
+                      </RootNavigator.Screen>
                       <RootNavigator.Screen
                         name={RouteEnum.Pools}
                         component={Pools}
