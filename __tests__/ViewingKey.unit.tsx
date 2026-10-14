@@ -5,7 +5,7 @@ import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
 } from '@app/context';
-import { ChainNameEnum, RouteEnum } from '@app/AppState';
+import { ChainNameEnum, Route } from '@app/AppState';
 import {
   ConfirmOptions,
   registerConfirmListener,
@@ -56,7 +56,7 @@ const renderKey = (switchTo?: ChainNameEnum) =>
         navigation={mockNavigation}
         route={{
           key: 'k',
-          name: RouteEnum.ViewingKey,
+          name: Route.ViewingKey,
           params: { entry: { kind: 'push' }, switchTo },
         }}
       />

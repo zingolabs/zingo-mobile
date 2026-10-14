@@ -7,12 +7,13 @@ import {
   ParamListBase,
   StackActions,
 } from '@react-navigation/native';
-import { RouteEnum } from '@app/AppState';
+import { Route } from '@app/AppState';
 import type {
   AppDrawerParamList,
   OnboardingParamList,
   OnboardingRoute,
   RootParamList,
+  ScannerNavigationState,
 } from '@app/types';
 
 export const navigationRef = createNavigationContainerRef<RootParamList>();
@@ -25,7 +26,15 @@ export const navigateWallet = (
   if (!navigationRef.isReady()) {
     return;
   }
-  navigationRef.navigate(RouteEnum.Wallet, target);
+  navigationRef.navigate(Route.Wallet, target);
+};
+
+// Opens the scanner, a root route, from any widget: the ones inside a
+// bottom sheet render outside the navigator tree.
+export const openScanner = (params: ScannerNavigationState): void => {
+  if (navigationRef.isReady()) {
+    navigationRef.navigate(Route.Scanner, params);
+  }
 };
 
 // Opens an onboarding screen from the loading section's provider.
@@ -35,8 +44,8 @@ export const navigateOnboarding = (
   if (!navigationRef.isReady()) {
     return;
   }
-  navigationRef.navigate(RouteEnum.Loading, {
-    screen: RouteEnum.Onboarding,
+  navigationRef.navigate(Route.Loading, {
+    screen: Route.Onboarding,
     params: target,
   });
 };
@@ -46,7 +55,7 @@ export const navigateOnboarding = (
 export const restartOnboarding = (): void => {
   if (navigationRef.isReady()) {
     navigationRef.dispatch(
-      CommonActions.reset({ index: 0, routes: [{ name: RouteEnum.Welcome }] }),
+      CommonActions.reset({ index: 0, routes: [{ name: Route.Welcome }] }),
     );
   }
 };
@@ -68,7 +77,7 @@ export const goBack = (): void => {
 export const leaveFlow = (
   navigation: Pick<NavigationProp<ParamListBase>, 'reset'>,
 ): void => {
-  navigation.reset({ index: 0, routes: [{ name: RouteEnum.Home }] });
+  navigation.reset({ index: 0, routes: [{ name: Route.Home }] });
 };
 
 // The route names of the stack that holds the focused route, bottom first.

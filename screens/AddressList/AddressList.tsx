@@ -21,8 +21,6 @@ import { useScrollToTop } from '@react-navigation/native';
 import { useTheme } from '@app/theme';
 import {
   AddressKindEnum,
-  RouteEnum,
-  ScreenEnum,
   TransparentAddressClass,
   UnifiedAddressClass,
 } from '@app/AppState';
@@ -44,7 +42,7 @@ import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
 
 type AddressListProps = NativeStackScreenProps<
   AppDrawerParamList,
-  RouteEnum.AddressList
+  'AddressList'
 >;
 
 const AddressList: React.FunctionComponent<AddressListProps> = ({
@@ -60,7 +58,6 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
   const context = useContext(ContextAppLoaded);
   const { translate, addresses } = context;
   const { colors } = useTheme();
-  const screenName = ScreenEnum.AddressList;
 
   const [numAl, setNumAl] = useState<number>(50);
   const [loadMoreButton, setLoadMoreButton] = useState<boolean>(false);
@@ -244,7 +241,6 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
       <View onLayout={e => setHeaderH(e.nativeEvent.layout.height)}>
         <Header
           title={''}
-          screenName={screenName}
           noBalance={true}
           noSyncingStatus={true}
           noDrawMenu={true}

@@ -14,7 +14,7 @@ import { useTheme } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
 import {
   ChainNameEnum,
-  RouteEnum,
+  Route,
   SelectServerEnum,
   ServerType,
   ServerUrisType,
@@ -36,10 +36,7 @@ import Server from './Server';
 
 // The Server screen inside the wallet: a choice reconnects the open wallet,
 // and a server on another network goes to the recovery screen.
-type WalletServerProps = NativeStackScreenProps<
-  AppDrawerParamList,
-  RouteEnum.Server
->;
+type WalletServerProps = NativeStackScreenProps<AppDrawerParamList, 'Server'>;
 
 const WalletServer: React.FC<WalletServerProps> = ({ navigation }) => {
   const { colors } = useTheme();
@@ -140,12 +137,12 @@ const WalletServer: React.FC<WalletServerProps> = ({ navigation }) => {
     if (result.kind === 'chain-changed') {
       leaving.current = true;
       if (readOnly) {
-        navigation.navigate(RouteEnum.ViewingKey, {
+        navigation.navigate(Route.ViewingKey, {
           entry: { kind: 'push' },
           switchTo: target.chainName,
         });
       } else {
-        navigation.navigate(RouteEnum.WalletSeed, { action: 'server' });
+        navigation.navigate(Route.WalletSeed, { action: 'server' });
       }
       return false;
     }
@@ -180,7 +177,7 @@ const WalletServer: React.FC<WalletServerProps> = ({ navigation }) => {
     if (navigation.canGoBack()) {
       navigation.goBack();
     } else {
-      navigation.navigate(RouteEnum.Home);
+      navigation.navigate(Route.Home);
     }
   };
 

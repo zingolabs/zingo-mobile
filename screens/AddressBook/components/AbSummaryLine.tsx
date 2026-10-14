@@ -2,11 +2,8 @@
 import React, { useContext } from 'react';
 import { View, TouchableOpacity } from 'react-native';
 import { showConfirm } from '@app/services/showConfirm';
-import {
-  NavigationProp,
-  ParamListBase,
-  useNavigation,
-} from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
+import { WalletNavigation } from '@app/types';
 import { useTheme } from '@app/theme';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
@@ -26,7 +23,7 @@ import {
   GlobalConst,
   SendPageStateClass,
   ToAddrClass,
-  RouteEnum,
+  Route,
 } from '@app/AppState';
 import Utils from '@app/utils';
 import { ContextAppLoaded } from '@app/context';
@@ -54,7 +51,7 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
   handleScrollToTop,
   doAction,
 }) => {
-  const navigation = useNavigation<NavigationProp<ParamListBase>>();
+  const navigation = useNavigation<WalletNavigation>();
   const context = useContext(ContextAppLoaded);
   const { translate, readOnly, server, setSendPageState } = context;
   const { colors } = useTheme();
@@ -251,8 +248,8 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
                   sendPageState.toaddr.to = item.address;
                   setSendPageState(sendPageState);
                   closeOptionsPanel();
-                  navigation.navigate(RouteEnum.Home, {
-                    screen: RouteEnum.Send,
+                  navigation.navigate(Route.Home, {
+                    screen: Route.Send,
                   });
                 }}
               >

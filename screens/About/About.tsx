@@ -14,18 +14,16 @@ import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
 import Header from '@ui/widgets/Header';
 import DetailLine from '@ui/widgets/DetailLine';
-import { RouteEnum, ScreenEnum } from '@app/AppState';
 import { getZingoName, getZingoVersion } from '@app/utils/ZingoAppData';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
 
-type AboutProps = NativeStackScreenProps<AppDrawerParamList, RouteEnum.About>;
+type AboutProps = NativeStackScreenProps<AppDrawerParamList, 'About'>;
 
 const About: React.FunctionComponent<AboutProps> = ({ navigation }) => {
   const context = useContext(ContextAppLoaded);
   const { zingolibVersion, translate } = context;
   const { colors } = useTheme();
-  const screenName = ScreenEnum.About;
 
   const [containerH, setContainerH] = useState<number>(0);
   const [headerH, setHeaderH] = useState<number>(0);
@@ -88,7 +86,6 @@ const About: React.FunctionComponent<AboutProps> = ({ navigation }) => {
       <View onLayout={e => setHeaderH(e.nativeEvent.layout.height)}>
         <Header
           title={''}
-          screenName={screenName}
           noBalance={true}
           noSyncingStatus={true}
           noDrawMenu={true}

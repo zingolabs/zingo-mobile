@@ -27,7 +27,7 @@ import ProgressBar from '@ui/primitives/ProgressBar';
 import StepperHeader from '@ui/widgets/StepperHeader';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
-import { RouteEnum } from '@app/AppState';
+import { Route } from '@app/AppState';
 import useTrickleProgress from '@app/hooks/useTrickleProgress';
 import { planIronwoodMigration, quickSplit } from '@app/walletBackend';
 import { RPCSplitOutcomeType } from '@app/walletBackend/types/RPCSplitOutcomeType';
@@ -35,7 +35,7 @@ import { RPCMigrationPlanType } from '@app/walletBackend/types/RPCMigrationPlanT
 
 type MigrationSplittingProps = NativeStackScreenProps<
   AppDrawerParamList,
-  RouteEnum.MigrationSplitting
+  'MigrationSplitting'
 >;
 
 const ZATS_PER_ZEC = 10 ** 8;
@@ -314,7 +314,7 @@ const MigrationSplitting: React.FunctionComponent<MigrationSplittingProps> = ({
     // Re-enter the loop by remounting the effect's world: simplest is to
     // clear the error and drive once more via a fresh navigation replace.
     setErrorMsg(null);
-    navigation.replace(RouteEnum.MigrationSplitting, { plan });
+    navigation.replace(Route.MigrationSplitting, { plan });
   }, [navigation, plan]);
 
   const goHome = useCallback(() => {
@@ -501,7 +501,7 @@ const MigrationSplitting: React.FunctionComponent<MigrationSplittingProps> = ({
             testID="migrationsplitting.continue"
             type={ButtonTypeEnum.Primary}
             title={translate('migrationsplitting.continue') as string}
-            onPress={() => navigation.navigate(RouteEnum.MigrationCadence)}
+            onPress={() => navigation.navigate(Route.MigrationCadence)}
           />
         </View>
       </View>

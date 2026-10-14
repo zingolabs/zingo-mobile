@@ -16,7 +16,7 @@ import StepperHeader from '@ui/widgets/StepperHeader';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
 import {
-  RouteEnum,
+  Route,
   TARGET_BLOCK_SPACING_SECONDS,
   estimatedTimestampMs,
   windowTargetHeight,
@@ -34,7 +34,7 @@ import {
 
 type MigrationScheduleProps = NativeStackScreenProps<
   AppDrawerParamList,
-  RouteEnum.MigrationSchedule
+  'MigrationSchedule'
 >;
 
 const ZATS_PER_ZEC = 10 ** 8;
@@ -115,7 +115,7 @@ const MigrationSchedule: React.FunctionComponent<MigrationScheduleProps> = ({
   const goStatus = useCallback(() => {
     navigation.reset({
       index: 0,
-      routes: [{ name: RouteEnum.MigrationStatus }],
+      routes: [{ name: Route.MigrationStatus }],
     });
   }, [navigation]);
 
@@ -201,7 +201,7 @@ const MigrationSchedule: React.FunctionComponent<MigrationScheduleProps> = ({
         index: 0,
         routes: [
           {
-            name: RouteEnum.MigrationBatchSending,
+            name: Route.MigrationBatchSending,
             params: { denominations: dueNow.denominations },
           },
         ],

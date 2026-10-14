@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
-import { RouteEnum } from '@app/AppState';
+import { Route } from '@app/AppState';
 import MigrationSplitPlan from './MigrationSplitPlan';
 import {
   screenProps,
@@ -22,7 +22,7 @@ const meta: Meta<typeof MigrationSplitPlan> = {
     withAppContext({ info: mockInfo, totalBalance: mockTotalBalance }),
     withNavigation,
   ],
-  args: screenProps(RouteEnum.MigrationSplitPlan),
+  args: screenProps(Route.MigrationSplitPlan),
 };
 
 export default meta;

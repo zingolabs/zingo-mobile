@@ -9,7 +9,7 @@ import { render } from '@testing-library/react-native';
 import { LoadedApp } from '@app/LoadedApp';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { LoadedAppNavigationState, RootParamList } from '@app/types';
-import { ChainNameEnum, LaunchingModeEnum, RouteEnum } from '@app/AppState';
+import { ChainNameEnum, LaunchingModeEnum, Route } from '@app/AppState';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
 jest.mock('react-native-localize', () => ({
@@ -20,15 +20,14 @@ jest.mock('react-native-localize', () => ({
 
 jest.mock('i18n-js');
 
-function makeDrawerProps(): NativeStackScreenProps<
-  RootParamList,
-  RouteEnum.Wallet
-> & { wallet: LoadedAppNavigationState } {
+function makeDrawerProps(): NativeStackScreenProps<RootParamList, 'Wallet'> & {
+  wallet: LoadedAppNavigationState;
+} {
   return {
     navigation: mockNavigation,
     route: {
       key: 'Key-1',
-      name: RouteEnum.Wallet,
+      name: Route.Wallet,
       params: undefined,
     },
     wallet: {

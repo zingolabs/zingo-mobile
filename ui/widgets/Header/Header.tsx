@@ -5,11 +5,11 @@ import { REVEAL_OPEN_MS } from '@ui/widgets/CircularReveal';
 import { ease } from '@app/theme/motion';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
-  NavigationProp,
-  ParamListBase,
   StackActions,
   useNavigation,
+  useRoute,
 } from '@react-navigation/native';
+import { WalletNavigation } from '@app/types';
 import { useTheme } from '@app/theme';
 import React, { useContext, useEffect, useRef } from 'react';
 import { Image, TouchableOpacity, View } from 'react-native';
@@ -27,8 +27,7 @@ import { useOptionsPanel } from '@app/context/optionsPanel';
 const HEADER_FADE_MS = 320;
 import {
   NetInfoType,
-  RouteEnum,
-  ScreenEnum,
+  Route,
   SnackbarDurationEnum,
   TranslateType,
 } from '@app/AppState';
@@ -47,7 +46,6 @@ type HeaderProps = {
   // general
   testID?: string;
   title: string;
-  screenName: ScreenEnum;
   // side menu
   noDrawMenu?: boolean;
   closeScreen?: () => void;
@@ -94,7 +92,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   noPrivacy,
   setPrivacyOption,
   addLastSnackbar,
-  screenName,
   receivedLegend,
   setShieldingAmount,
   closeScreen,
@@ -104,7 +101,8 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   onPriceRowLayout,
   noPriceRow,
 }) => {
-  const navigation = useNavigation<NavigationProp<ParamListBase>>();
+  const navigation = useNavigation<WalletNavigation>();
+  const route = useRoute();
   const context = useContext(ContextAppLoaded);
   const {
     totalBalance,
@@ -135,9 +133,9 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     open: openOptionsPanel,
   } = useOptionsPanel();
   const homeTab =
-    screenName === ScreenEnum.History ||
-    screenName === ScreenEnum.Send ||
-    screenName === ScreenEnum.Receive;
+    route.name === Route.History ||
+    route.name === Route.Send ||
+    route.name === Route.Receive;
   // The panel lives in the home: from a pushed screen the button pops back
   // to it and shows the panel there.
   const toggleMenuDrawer = () => {
@@ -203,7 +201,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
       reduceMotion: ReduceMotion.System,
     });
     snowflake.current?.measureInWindow((x, y, width, height) =>
-      navigation.navigate(RouteEnum.ViewingKey, {
+      navigation.navigate(Route.ViewingKey, {
         entry: {
           kind: 'circle',
           origin: { x: x + width / 2, y: y + height / 2 },
@@ -356,9 +354,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               panel's header, its single door. With only messages left,
               the corner falls back to the logo when there is nothing to
               show. */}
-          {!noDrawMenu &&
-          screenName !== ScreenEnum.Settings &&
-          showMessagesIcon ? (
+          {!noDrawMenu && route.name !== Route.Settings && showMessagesIcon ? (
             <View
               style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}
             >
@@ -370,7 +366,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               <TouchableOpacity
                 style={{ marginRight: 5, marginTop: 4.5 }}
                 testID="header.messages"
-                onPress={() => navigation.navigate(RouteEnum.Messages)}
+                onPress={() => navigation.navigate(Route.Messages)}
               >
                 <MessagesIcon size={22} color="#B1BBC5" />
               </TouchableOpacity>

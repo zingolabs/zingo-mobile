@@ -17,17 +17,17 @@ import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import { mockValueTransfers } from '../__mocks__/dataMocks/mockValueTransfers';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AppDrawerParamList } from '@app/types';
-import { RouteEnum } from '@app/AppState';
+import { Route } from '@app/AppState';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
 function makeDrawerProps(
   i: number,
-): NativeStackScreenProps<AppDrawerParamList, RouteEnum.ValueTransferDetail> {
+): NativeStackScreenProps<AppDrawerParamList, 'ValueTransferDetail'> {
   return {
     navigation: mockNavigation,
     route: {
       key: 'Key-1',
-      name: RouteEnum.ValueTransferDetail,
+      name: Route.ValueTransferDetail,
       params: {
         index: i,
         vt: mockValueTransfers[i],

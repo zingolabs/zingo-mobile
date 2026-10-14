@@ -21,18 +21,14 @@ import {
 import Animated from 'react-native-reanimated';
 import { useOptionsPanelSheetSlide } from '@app/hooks/useOptionsPanelSheetSlide';
 
-import {
-  NavigationProp,
-  ParamListBase,
-  useNavigation,
-} from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '@app/theme';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faChevronLeft, faAngleDown } from '@fortawesome/free-solid-svg-icons';
 import BottomSheet from '@gorhom/bottom-sheet';
 
-import { RouteEnum, ScreenEnum, ValueTransferType } from '@app/AppState';
-import { AppDrawerParamList } from '@app/types';
+import { Route, ValueTransferType } from '@app/AppState';
+import { AppDrawerParamList, WalletNavigation } from '@app/types';
 import FadeText from '@ui/primitives/FadeText';
 import BoldText from '@ui/primitives/BoldText';
 import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
@@ -44,13 +40,10 @@ import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
 import Utils from '@app/utils';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-type MessageListProps = NativeStackScreenProps<
-  AppDrawerParamList,
-  RouteEnum.Messages
->;
+type MessageListProps = NativeStackScreenProps<AppDrawerParamList, 'Messages'>;
 
 const MessageList: React.FunctionComponent<MessageListProps> = () => {
-  const navigation = useNavigation<NavigationProp<ParamListBase>>();
+  const navigation = useNavigation<WalletNavigation>();
   const context = useContext(ContextAppLoaded);
   const {
     setScrollToBottom,
@@ -63,7 +56,6 @@ const MessageList: React.FunctionComponent<MessageListProps> = () => {
     addLastSnackbar,
   } = context;
   const { colors } = useTheme();
-  const screenName = ScreenEnum.MessagesList;
 
   // With FlatList + `inverted`, the visual bottom (newest messages)
   // corresponds to contentOffset.y ≈ 0. We surface a jump-to-bottom
@@ -224,7 +216,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = () => {
   const setValueTransferDetailModalShow = useCallback(
     async (index: number, vt: ValueTransferType) => {
       const current = messagesRef.current;
-      navigation.navigate(RouteEnum.ValueTransferDetail, {
+      navigation.navigate(Route.ValueTransferDetail, {
         index,
         vt,
         valueTransfersSliced: current ?? [],
@@ -245,7 +237,6 @@ const MessageList: React.FunctionComponent<MessageListProps> = () => {
       <View onLayout={e => setHeaderH(e.nativeEvent.layout.height)}>
         <Header
           title={''}
-          screenName={screenName}
           noBalance={true}
           setPrivacyOption={setPrivacyOption}
           addLastSnackbar={addLastSnackbar /* context */}
@@ -278,7 +269,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = () => {
             refreshControl={
               <RefreshControl
                 refreshing={false}
-                onRefresh={() => doRefresh(screenName)}
+                onRefresh={() => doRefresh('messages')}
                 tintColor={colors.fgDefault}
                 title={translate('history.refreshing') as string}
               />
@@ -346,7 +337,6 @@ const MessageList: React.FunctionComponent<MessageListProps> = () => {
                     setValueTransferDetailModalShow={
                       setValueTransferDetailModalShow
                     }
-                    screenName={screenName}
                   />
                 ))}
                 {/* Breathing room below the newest message so it doesn't

@@ -30,11 +30,7 @@ import {
   faXmark,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import {
-  NavigationProp,
-  ParamListBase,
-  useNavigation,
-} from '@react-navigation/native';
+import { useNavigation, useScrollToTop } from '@react-navigation/native';
 import { useTheme } from '@app/theme';
 import { ScanIcon } from '@ui/primitives/Icons/ScanIcon';
 import { getNumberFormatSettings } from 'react-native-localize';
@@ -62,8 +58,7 @@ import {
   ToAddrClass,
   GlobalConst,
   SelectServerEnum,
-  RouteEnum,
-  ScreenEnum,
+  Route,
   ProposalPoolsType,
 } from '@app/AppState';
 import { hasUnconfirmedFunds } from '@app/AppState/classes/TotalBalanceClass';
@@ -90,7 +85,7 @@ import {
   toZecText,
 } from '@app/price/fiatQuote';
 import { safeSnapToIndex } from '@app/utils/safeSnapToIndex';
-import { AppDrawerParamList } from '@app/types';
+import { HomeTabScreenProps, WalletNavigation } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
 import Header from '@ui/widgets/Header';
 import BottomSheet, { BottomSheetModal } from '@gorhom/bottom-sheet';
@@ -106,12 +101,11 @@ import SendErrorSheet from './components/SendErrorSheet';
 import { sendEmail } from '@app/services/sendEmail';
 import { retryServer } from '@app/services/retryServer';
 import { RPCSpendablebalanceType } from '@app/walletBackend/types/RPCSpendablebalanceType';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-type SendProps = NativeStackScreenProps<AppDrawerParamList, RouteEnum.Send>;
+type SendProps = HomeTabScreenProps<'Send'>;
 
 const Send: React.FunctionComponent<SendProps> = () => {
-  const navigation = useNavigation<NavigationProp<ParamListBase>>();
+  const navigation = useNavigation<WalletNavigation>();
   const context = useContext(ContextAppLoaded);
   const {
     sendTransaction,
@@ -149,7 +143,6 @@ const Send: React.FunctionComponent<SendProps> = () => {
   const showFiat = fiatEligible(server, server.chainName);
   const quote = fiatQuote(zecPrice, server, server.chainName);
 
-  const screenName = ScreenEnum.Send;
   const zecIconXml = `<?xml version="1.0" encoding="UTF-8"?>
   <svg viewBox="0 0 88.03 147.85">
     <polygon points="34.44 107.62 34.44 106.98 87.19 34.17 87.19 20.12 56.09 20.12 56.09 0 35.98 0 35.98 20.12 5.04 20.12 5.04 40.24 53.93 40.24 53.93 40.88 0 114.64 0 127.73 35.98 127.73 35.98 147.85 56.09 147.85 56.09 127.73 88.03 127.73 88.03 107.62 34.44 107.62"/>
@@ -217,6 +210,8 @@ const Send: React.FunctionComponent<SendProps> = () => {
   const [priceRowH, setPriceRowH] = useState<number>(0);
 
   const scrollViewRef = useRef<ScrollView>(null);
+  // A press on the tab while it is open scrolls the form to the top.
+  useScrollToTop(scrollViewRef);
   // The user asked for the whole balance: MAX sets it, typing in the amount
   // field clears it. A send-all proposal can come back with less than the
   // figure MAX offered — the change output the send path always writes costs
@@ -932,7 +927,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
       return;
     }
 
-    navigation.navigate(RouteEnum.Computing);
+    navigation.navigate(Route.Computing);
 
     // The MAX send travels the send-all path all the way: quoted and sent by
     // the same proposal, so the amount confirmed is the amount broadcast.
@@ -954,7 +949,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
       setScrollToTop(true);
       setScrollToBottom(true);
     }
-    navigation.navigate(RouteEnum.Computing, computingEnd(settlement));
+    navigation.navigate(Route.Computing, computingEnd(settlement));
   };
 
   const scanButton = useRef<View>(null);
@@ -991,7 +986,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
   useResult('send.confirm', () => confirmSend(buildSendState()));
   const setQrcodeModalShow = () => {
     const open = (origin?: { x: number; y: number }) =>
-      navigation.navigate(RouteEnum.ScannerAddress, {
+      navigation.navigate(Route.Scanner, {
         request: 'send.address',
         accepts: { kind: 'zcash', chain: server.chainName },
         texts: {
@@ -1053,7 +1048,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
   );
 
   const setConfirmModalShow = async () => {
-    navigation.navigate(RouteEnum.Confirm, {
+    navigation.navigate(Route.Confirm, {
       calculatedFee: fee,
       proposalPools: proposalPools,
       sendAllAmount: isSendAllAmount(amountText),
@@ -1100,7 +1095,6 @@ const Send: React.FunctionComponent<SendProps> = () => {
         >
           <Header
             title={''}
-            screenName={screenName}
             setPrivacyOption={setPrivacyOption}
             addLastSnackbar={addLastSnackbar /* context */}
             setShieldingAmount={setShieldingAmount}
@@ -1162,7 +1156,6 @@ const Send: React.FunctionComponent<SendProps> = () => {
                     {validAddress === 1 && (
                       <AddressItem
                         address={addressText}
-                        screenName={screenName}
                         oneLine={true}
                         onlyContact={true}
                         // No add-to-book icon here: it would duplicate the one
@@ -1665,7 +1658,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
                       <TouchableOpacity
                         style={{ alignSelf: 'flex-start' }}
                         onPress={() => {
-                          navigation.navigate(RouteEnum.Pools);
+                          navigation.navigate(Route.Pools);
                         }}
                       >
                         <View
@@ -1694,7 +1687,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
                       <TouchableOpacity
                         style={{ alignSelf: 'flex-start' }}
                         onPress={() => {
-                          navigation.navigate(RouteEnum.Pools);
+                          navigation.navigate(Route.Pools);
                         }}
                       >
                         <View

@@ -5,7 +5,9 @@ import type { Decorator } from '@storybook/react-native';
 import {
   NavigationContext,
   NavigationProp,
+  NavigationRouteContext,
   ParamListBase,
+  Route as NavigationRoute,
 } from '@react-navigation/native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -61,9 +63,28 @@ const mockNavigation = {
   isFocused: () => true,
 } as unknown as NavigationProp<ParamListBase>;
 
-export const withNavigation: Decorator = Story => (
+// The route useRoute() reads: the story's own `route` arg when it is a
+// screen story, a placeholder otherwise.
+const storyRoute = (args: Record<string, unknown>): NavigationRoute<string> => {
+  const route = args.route;
+  if (
+    typeof route === 'object' &&
+    route !== null &&
+    'key' in route &&
+    'name' in route &&
+    typeof route.key === 'string' &&
+    typeof route.name === 'string'
+  ) {
+    return { key: route.key, name: route.name };
+  }
+  return { key: 'story', name: 'Story' };
+};
+
+export const withNavigation: Decorator = (Story, { args }) => (
   <NavigationContext.Provider value={mockNavigation}>
-    <Story />
+    <NavigationRouteContext.Provider value={storyRoute(args)}>
+      <Story />
+    </NavigationRouteContext.Provider>
   </NavigationContext.Provider>
 );
 

@@ -7,7 +7,7 @@ import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
 } from '@app/context';
-import { RouteEnum } from '@app/AppState';
+import { Route } from '@app/AppState';
 import {
   getTotalValueToAddress,
   getTotalSpendsToAddress,
@@ -60,7 +60,7 @@ function setup() {
     >
       <Insight
         navigation={mockNavigation}
-        route={{ key: 'fixture', name: RouteEnum.Insight, params: undefined }}
+        route={{ key: 'fixture', name: Route.Insight, params: undefined }}
       />
     </ContextAppLoadedProvider>,
   );

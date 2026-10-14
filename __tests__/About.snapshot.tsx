@@ -16,18 +16,18 @@ import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AppDrawerParamList } from '@app/types';
-import { RouteEnum } from '@app/AppState';
+import { Route } from '@app/AppState';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
 function makeDrawerProps(): NativeStackScreenProps<
   AppDrawerParamList,
-  RouteEnum.About
+  'About'
 > {
   return {
     navigation: mockNavigation,
     route: {
       key: 'Key-1',
-      name: RouteEnum.About,
+      name: Route.About,
       params: undefined,
     },
   };

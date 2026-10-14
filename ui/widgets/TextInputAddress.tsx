@@ -1,11 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useState } from 'react';
 import { View, TouchableOpacity, TextInput } from 'react-native';
-import {
-  NavigationProp,
-  ParamListBase,
-  useNavigation,
-} from '@react-navigation/native';
 import { useTheme } from '@app/theme';
 import { ScanIcon } from '@ui/primitives/Icons/ScanIcon';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -13,10 +8,11 @@ import { faCheck, faXmark } from '@fortawesome/free-solid-svg-icons';
 
 import { ContextAppLoaded } from '@app/context';
 import { Request, useResult } from '@app/navigation/results';
+import { openScanner } from '@app/navigation/navigate';
 import ErrorText from '@ui/primitives/ErrorText';
 import RegText from '@ui/primitives/RegText';
 import { validateAddressForChain } from '@app/swap';
-import { GlobalConst, RouteEnum, ScreenEnum } from '@app/AppState';
+import { GlobalConst, Route } from '@app/AppState';
 
 type TextInputAddressProps = {
   address: string;
@@ -24,16 +20,11 @@ type TextInputAddressProps = {
   setError: (e: string) => void;
   disabled: boolean;
   showLabel: boolean;
-  screenName: ScreenEnum;
-  routeStack?: RouteEnum;
+  routeStack?: Route;
   // SwapKit chain code the address is for ('ZEC' / 'BTC' / ...). Defaults to
   // 'ZEC' → the existing zingolib validation (against `server.chainName`).
   // Non-ZEC values validate by the format-only per-chain regex.
   swapChain?: string;
-  // When rendered inside a BottomSheetModal (or any portaled context where
-  // useNavigation's context is lost), pass the navigation prop from the host
-  // screen so the QR button can navigate to ScannerAddress reliably.
-  navigation?: NavigationProp<ParamListBase>;
   // The request the scanner answers with the code it read.
   scanRequest: Request;
 };
@@ -43,15 +34,9 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
   setError,
   disabled,
   showLabel,
-  // screenName + routeStack are kept in the prop type for backward compat
-  // with all callers but are no longer consumed here — ScannerAddress lives
-  // at a single Drawer-level route so a direct navigate works everywhere.
-  navigation: navigationProp,
   swapChain,
   scanRequest,
 }) => {
-  const hookNavigation = useNavigation<NavigationProp<ParamListBase>>();
-  const navigation = navigationProp ?? hookNavigation;
   const context = useContext(ContextAppLoaded);
   const { translate, server } = context;
   const { colors } = useTheme();
@@ -83,11 +68,10 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
   }, [address, server.chainName, swapChain, setError, translate]);
 
   useResult(scanRequest, a => setAddress(a));
-  // The scanner lives at the root, so a direct navigate works from any
-  // caller. A swap chain's address is checked by its own format.
+  // A swap chain's address is checked by its own format.
   const setQrcodeModalShow = () => {
     const chain = swapChain ?? GlobalConst.zecSwapChain;
-    navigation.navigate(RouteEnum.ScannerAddress, {
+    openScanner({
       request: scanRequest,
       accepts:
         chain === GlobalConst.zecSwapChain

@@ -14,7 +14,7 @@ exports[`Component App - test App - snapshot 1`] = `
   />
   <MockedScreen
     component={[Function]}
-    name="ScannerAddress"
+    name="Scanner"
     options={
       {
         "animation": "none",

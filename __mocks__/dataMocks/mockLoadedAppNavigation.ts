@@ -1,10 +1,9 @@
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootParamList } from '@app/types';
-import { RouteEnum } from '@app/AppState';
 
 export const mockLoadedAppNavigation: NativeStackNavigationProp<
   RootParamList,
-  RouteEnum.Wallet
+  'Wallet'
 > = {
   navigate: jest.fn(),
   goBack: jest.fn(),

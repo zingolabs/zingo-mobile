@@ -6,9 +6,9 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import { LoadedApp } from './LoadedApp';
 import { LoadingApp } from './LoadingApp';
-import ScannerAddress from '@screens/ScannerAddress';
+import Scanner from '@screens/Scanner';
 import { RootParamList } from './types';
-import { RouteEnum } from './AppState';
+import { Route } from './AppState';
 import { ThemeProvider, useTheme, navigationTheme } from './theme';
 
 import { BackHandler, LogBox, StatusBar } from 'react-native';
@@ -69,11 +69,11 @@ const AppShell: React.FunctionComponent = () => {
                 {/* The session picks the section; the one it leaves is
                   removed from the tree, so it unmounts. */}
                 {session.kind === 'wallet' ? (
-                  <Root.Screen name={RouteEnum.Wallet}>
+                  <Root.Screen name={Route.Wallet}>
                     {props => <LoadedApp {...props} wallet={session.params} />}
                   </Root.Screen>
                 ) : (
-                  <Root.Screen name={RouteEnum.Loading}>
+                  <Root.Screen name={Route.Loading}>
                     {props => <LoadingApp {...props} session={session} />}
                   </Root.Screen>
                 )}
@@ -82,8 +82,8 @@ const AppShell: React.FunctionComponent = () => {
                   camera. A transparent modal keeps the screen beneath it
                   mounted and live. */}
                 <Root.Screen
-                  name={RouteEnum.ScannerAddress}
-                  component={ScannerAddress}
+                  name={Route.Scanner}
+                  component={Scanner}
                   // Draws its own circle out of the scan button.
                   options={{
                     presentation: 'transparentModal',

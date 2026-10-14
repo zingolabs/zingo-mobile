@@ -19,11 +19,11 @@ import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
 import { useBiometricGate } from '@app/hooks/useBiometricGate';
 import Header from '@ui/widgets/Header';
-import { RouteEnum, ScreenEnum, SnackbarDurationEnum } from '@app/AppState';
+import { SnackbarDurationEnum } from '@app/AppState';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
 
-type RescanProps = NativeStackScreenProps<AppDrawerParamList, RouteEnum.Rescan>;
+type RescanProps = NativeStackScreenProps<AppDrawerParamList, 'Rescan'>;
 
 const Rescan: React.FunctionComponent<RescanProps> = ({ navigation }) => {
   const context = useContext(ContextAppLoaded);
@@ -37,7 +37,6 @@ const Rescan: React.FunctionComponent<RescanProps> = ({ navigation }) => {
     biometrics,
   } = context;
   const { colors } = useTheme();
-  const screenName = ScreenEnum.Rescan;
 
   const screenGate = useBiometricGate({
     needsAuth: biometrics,
@@ -157,7 +156,6 @@ const Rescan: React.FunctionComponent<RescanProps> = ({ navigation }) => {
       <View onLayout={e => setHeaderH(e.nativeEvent.layout.height)}>
         <Header
           title={''}
-          screenName={screenName}
           noBalance={true}
           noSyncingStatus={true}
           noDrawMenu={true}

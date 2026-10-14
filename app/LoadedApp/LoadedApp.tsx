@@ -51,7 +51,7 @@ import {
   SelectServerEnum,
   ChainNameEnum,
   SettingsNameEnum,
-  RouteEnum,
+  Route,
   AppStateStatusEnum,
   GlobalConst,
   EventListenerEnum,
@@ -64,7 +64,6 @@ import {
   TransparentAddressClass,
   AddressKindEnum,
   AddressBookFileClassObsolete,
-  ScreenEnum,
   LaunchingModeEnum,
   BlockExplorerEnum,
   SnackbarDurationEnum,
@@ -155,10 +154,7 @@ const OBSOLETE_ZENNY_TIPS_ADDRESS: string =
 // for testing
 //const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-type LoadedAppProps = NativeStackScreenProps<
-  RootParamList,
-  RouteEnum.Wallet
-> & {
+type LoadedAppProps = NativeStackScreenProps<RootParamList, 'Wallet'> & {
   wallet: LoadedAppNavigationState;
 };
 
@@ -595,7 +591,6 @@ export class LoadedAppClass extends Component<
   addTagModalRef: React.RefObject<React.ComponentRef<
     typeof BottomSheetModal
   > | null>;
-  screenName = ScreenEnum.LoadedApp;
   constructor(props: LoadedAppClassProps) {
     super(props);
 
@@ -929,8 +924,8 @@ export class LoadedAppClass extends Component<
     await this.readUrl(url);
     closeOptionsPanel();
     navigateWallet({
-      screen: RouteEnum.Home,
-      params: { screen: RouteEnum.Send },
+      screen: Route.Home,
+      params: { screen: Route.Send },
     });
   };
 
@@ -1424,8 +1419,8 @@ export class LoadedAppClass extends Component<
       return this.rpc.sendTransaction(sendJson, sendAll);
     });
 
-  doRefresh = (screen: ScreenEnum) => {
-    if (screen === ScreenEnum.History) {
+  doRefresh = (what: 'valueTransfers' | 'messages') => {
+    if (what === 'valueTransfers') {
       // Value Transfers
       this.rpc.fetchTandZandOValueTransfers();
     } else {

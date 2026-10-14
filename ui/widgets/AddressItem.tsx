@@ -18,21 +18,16 @@ import {
   SendPageStateClass,
   ToAddrClass,
   SnackbarDurationEnum,
-  RouteEnum,
-  ScreenEnum,
+  Route,
 } from '@app/AppState';
-import {
-  NavigationProp,
-  ParamListBase,
-  useNavigation,
-} from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
+import { WalletNavigation } from '@app/types';
 import { useTheme } from '@app/theme';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faUserPlus, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
 
 type AddressItemProps = {
   address: string;
-  screenName: ScreenEnum;
   oneLine?: boolean;
   onlyContact?: boolean;
   withIcon?: boolean;
@@ -66,9 +61,6 @@ const Lines = ({ view, prefix = '', style }: LinesProps) => (
 
 const AddressItem: React.FunctionComponent<AddressItemProps> = ({
   address,
-  // screenName is still in the type for backward compat with all callers but
-  // no longer consumed here — launchAddTagModal works the same regardless of
-  // where it's invoked from.
   oneLine,
   onlyContact,
   withIcon,
@@ -76,7 +68,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
   withSendIcon,
   ufvk,
 }) => {
-  const navigation = useNavigation<NavigationProp<ParamListBase>>();
+  const navigation = useNavigation<WalletNavigation>();
   const context = useContext(ContextAppLoaded);
   const {
     translate,
@@ -226,8 +218,8 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
             const sendPageState = new SendPageStateClass(new ToAddrClass(0));
             sendPageState.toaddr.to = address;
             setSendPageState(sendPageState);
-            navigation.navigate(RouteEnum.Home, {
-              screen: RouteEnum.Send,
+            navigation.navigate(Route.Home, {
+              screen: Route.Send,
             });
           }}
         >

@@ -10,14 +10,14 @@ import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
 import { AppDrawerParamList } from '@app/types';
 import { AppTheme } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
-import { RouteEnum } from '@app/AppState';
+import { Route } from '@app/AppState';
 import Utils from '@app/utils';
 import { planOrchardDrain } from '@app/walletBackend';
 import { RPCDrainPlanType } from '@app/walletBackend/types/RPCDrainPlanType';
 
 type MigrationTransactionsProps = NativeStackScreenProps<
   AppDrawerParamList,
-  RouteEnum.MigrationTransactions
+  'MigrationTransactions'
 >;
 
 const ZATS_PER_ZEC = 10 ** 8;
@@ -146,7 +146,7 @@ const MigrationTransactions: React.FunctionComponent<
   // broadcast and its live progress. We pass the previewed transactions so its
   // list matches exactly what the user just approved.
   const onAccept = useCallback(() => {
-    navigation.navigate(RouteEnum.MigrationSending, {
+    navigation.navigate(Route.MigrationSending, {
       transactions: plan?.transactions ?? [],
     });
   }, [navigation, plan]);

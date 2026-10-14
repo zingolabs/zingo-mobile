@@ -1,6 +1,16 @@
 export const useScrollToTop = jest.fn();
 export const useIsFocused = jest.fn();
-export const useNavigation = jest.fn();
+export const useNavigation = jest.fn(() => ({
+  navigate: jest.fn(),
+  goBack: jest.fn(),
+  canGoBack: jest.fn(() => false),
+  isFocused: jest.fn(() => true),
+  addListener: jest.fn(() => () => {}),
+  dispatch: jest.fn(),
+  setParams: jest.fn(),
+  getParent: jest.fn(),
+  getState: jest.fn(),
+}));
 export const useFocusEffect = jest.fn();
 export const useNavigationBuilder = jest.fn();
 export const StackRouter = jest.fn();
@@ -48,3 +58,8 @@ export const createNavigationContainerRef = jest.fn(() => {
   refImpl.current = refImpl;
   return refImpl;
 });
+export const useRoute = jest.fn(() => ({
+  key: 'route',
+  name: '',
+  params: undefined,
+}));

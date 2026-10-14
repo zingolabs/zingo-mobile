@@ -15,20 +15,16 @@ import { mockAddresses } from '../__mocks__/dataMocks/mockAddresses';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { AppDrawerParamList } from '@app/types';
-import { RouteEnum } from '@app/AppState';
+import { HomeTabScreenProps } from '@app/types';
+import { Route } from '@app/AppState';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
-function makeDrawerProps(): NativeStackScreenProps<
-  AppDrawerParamList,
-  RouteEnum.Receive
-> {
+function makeDrawerProps(): HomeTabScreenProps<'Receive'> {
   return {
     navigation: mockNavigation,
     route: {
       key: 'Key-1',
-      name: RouteEnum.Receive,
+      name: Route.Receive,
       params: undefined,
     },
   };

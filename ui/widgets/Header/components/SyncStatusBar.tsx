@@ -1,11 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import { Animated, TouchableOpacity, View } from 'react-native';
-import {
-  NavigationProp,
-  ParamListBase,
-  useNavigation,
-} from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
+import { WalletNavigation } from '@app/types';
 import { useTheme } from '@app/theme';
 import {
   faCheck,
@@ -16,7 +13,7 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { NetInfoStateType } from '@react-native-community/netinfo/src/index';
 import {
-  RouteEnum,
+  Route,
   ServerType,
   SnackbarDurationEnum,
   TranslateType,
@@ -65,7 +62,7 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
     addLastSnackbar,
     noBalance,
   }) => {
-    const navigation = useNavigation<NavigationProp<ParamListBase>>();
+    const navigation = useNavigation<WalletNavigation>();
     const { colors } = useTheme();
     const phase = viewPhase(mixnetView);
 
@@ -153,7 +150,7 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
                       <TouchableOpacity
                         testID="header.playicon"
                         onPress={() => {
-                          navigation.navigate(RouteEnum.SyncReport);
+                          navigation.navigate(Route.SyncReport);
                         }}
                       >
                         <View
@@ -206,7 +203,7 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
                   >
                     <TouchableOpacity
                       onPress={() => {
-                        navigation.navigate(RouteEnum.SyncReport);
+                        navigation.navigate(Route.SyncReport);
                       }}
                     >
                       <View
@@ -242,7 +239,7 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
               >
                 <TouchableOpacity
                   onPress={() => {
-                    navigation.navigate(RouteEnum.SyncReport);
+                    navigation.navigate(Route.SyncReport);
                   }}
                 >
                   <FontAwesomeIcon
@@ -301,7 +298,7 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
           <TouchableOpacity
             testID="header.mixnet-status"
             accessibilityLabel={translate('settings.nym-diagnostics') as string}
-            onPress={() => navigation.navigate(RouteEnum.MixnetDoctor)}
+            onPress={() => navigation.navigate(Route.MixnetDoctor)}
             style={{
               flexDirection: 'row',
               alignItems: 'center',

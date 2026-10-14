@@ -19,8 +19,7 @@ import {
   AddressBookFileClass,
   AddressKindEnum,
   ChainNameEnum,
-  RouteEnum,
-  ScreenEnum,
+  Route,
   offlineServer,
   remoteServer,
 } from '@app/AppState';
@@ -127,7 +126,7 @@ function renderBook(
         navigation={mockNavigation}
         route={{
           key: 'network-tags',
-          name: RouteEnum.AddressBook,
+          name: Route.AddressBook,
           params: undefined,
         }}
       />
@@ -185,7 +184,6 @@ async function saveTag(
         addressKind={kind}
         setAddressBook={setAddressBook}
         closeSheet={closeSheet}
-        screenName={ScreenEnum.Receive}
       />
     </ContextAppLoadedProvider>,
   );

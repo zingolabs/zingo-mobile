@@ -11,11 +11,7 @@ import { showConfirm } from '@app/services/showConfirm';
 
 import Clipboard from '@react-native-clipboard/clipboard';
 
-import {
-  NavigationProp,
-  ParamListBase,
-  useNavigation,
-} from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '@app/theme';
 
 import {
@@ -26,17 +22,16 @@ import {
   ValueTransferType,
   ValueTransferKindEnum,
   GlobalConst,
-  RouteEnum,
+  Route,
   TransactionActionEnum,
   UnifiedAddressClass,
   TransparentAddressClass,
-  ScreenEnum,
 } from '@app/AppState';
 import Utils from '@app/utils';
 import RegText from '@ui/primitives/RegText';
 import ZecAmount from '@ui/widgets/ZecAmount';
 import FadeText from '@ui/primitives/FadeText';
-import { AppDrawerParamList } from '@app/types';
+import { AppDrawerParamList, WalletNavigation } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
 import Header from '@ui/widgets/Header';
 import BoldText from '@ui/primitives/BoldText';
@@ -63,13 +58,13 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 type ValueTransferDetailProps = NativeStackScreenProps<
   AppDrawerParamList,
-  RouteEnum.ValueTransferDetail
+  'ValueTransferDetail'
 >;
 
 const ValueTransferDetail: React.FunctionComponent<
   ValueTransferDetailProps
 > = ({ route }) => {
-  const navigation = useNavigation<NavigationProp<ParamListBase>>();
+  const navigation = useNavigation<WalletNavigation>();
   const context = useContext(ContextAppLoaded);
   const {
     info,
@@ -86,7 +81,6 @@ const ValueTransferDetail: React.FunctionComponent<
     blockExplorer,
   } = context;
   const { colors } = useTheme();
-  const screenName = ScreenEnum.ValueTransferDetail;
 
   const [valueTransfer, setValueTransfer] = useState<ValueTransferType>(
     !!route.params && route.params.vt !== undefined
@@ -300,7 +294,7 @@ const ValueTransferDetail: React.FunctionComponent<
     }
 
     // not use await here.
-    navigation.navigate(RouteEnum.Computing);
+    navigation.navigate(Route.Computing);
 
     const actionResult = await removeTransaction(valueTransfer.txid);
 
@@ -326,8 +320,8 @@ const ValueTransferDetail: React.FunctionComponent<
       );
     }
     // change to the history screen, just in case.
-    navigation.navigate(RouteEnum.Home, {
-      screen: RouteEnum.History,
+    navigation.navigate(Route.Home, {
+      screen: Route.History,
     });
   };
 
@@ -356,7 +350,6 @@ const ValueTransferDetail: React.FunctionComponent<
       <View onLayout={e => setHeaderH(e.nativeEvent.layout.height)}>
         <Header
           title={''}
-          screenName={screenName}
           noBalance={true}
           noSyncingStatus={true}
           noDrawMenu={true}
@@ -847,7 +840,6 @@ const ValueTransferDetail: React.FunctionComponent<
                 <FadeText>{translate('history.address') as string}</FadeText>
                 <AddressItem
                   address={valueTransfer.address}
-                  screenName={screenName}
                   withIcon={true}
                   withSendIcon={true}
                 />
@@ -964,11 +956,7 @@ const ValueTransferDetail: React.FunctionComponent<
                             {translate('addressbook.likely') as string}
                           </RegText>
                         )}
-                        <AddressItem
-                          address={memoUA}
-                          screenName={screenName}
-                          onlyContact={true}
-                        />
+                        <AddressItem address={memoUA} onlyContact={true} />
                       </View>
                     )}
                     {!contactFound(memoUA) && thisWalletAddress(memoUA) && (

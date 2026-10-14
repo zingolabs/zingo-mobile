@@ -17,12 +17,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import Animated from 'react-native-reanimated';
-import {
-  NavigationProp,
-  ParamListBase,
-  useIsFocused,
-  useNavigation,
-} from '@react-navigation/native';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
 import { useTheme } from '@app/theme';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faAngleUp, faXmark } from '@fortawesome/free-solid-svg-icons';
@@ -32,15 +27,14 @@ import {
   FilterEnum,
   GlobalConst,
   isIronwoodActive,
-  RouteEnum,
-  ScreenEnum,
+  Route,
   ValueTransferKindEnum,
   //SelectServerEnum,
   //SendPageStateClass,
   //ServerType,
   ValueTransferType,
 } from '@app/AppState';
-import { AppDrawerParamList } from '@app/types';
+import { HomeTabNavigation, HomeTabScreenProps } from '@app/types';
 import FadeText from '@ui/primitives/FadeText';
 import BoldText from '@ui/primitives/BoldText';
 import AppSheet from '@ui/primitives/AppSheet';
@@ -67,7 +61,6 @@ import {
 } from 'recyclerlistview';
 import { ScrollEvent } from 'recyclerlistview/dist/reactnative/core/scrollcomponent/BaseScrollView';
 import { RecyclerListViewState } from 'recyclerlistview/dist/reactnative/core/RecyclerListView';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Swipeable } from 'react-native-gesture-handler';
 import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
 import BottomSheet, { BottomSheetModal } from '@gorhom/bottom-sheet';
@@ -81,13 +74,10 @@ const ViewTypes = {
   WITHOUT_MONTH_REFRESH: 3,
 };
 
-type HistoryProps = NativeStackScreenProps<
-  AppDrawerParamList,
-  RouteEnum.History
->;
+type HistoryProps = HomeTabScreenProps<'History'>;
 
 const History: React.FunctionComponent<HistoryProps> = () => {
-  const navigation = useNavigation<NavigationProp<ParamListBase>>();
+  const navigation = useNavigation<HomeTabNavigation<'History'>>();
   const context = useContext(ContextAppLoaded);
   const {
     setScrollToTop,
@@ -110,7 +100,6 @@ const History: React.FunctionComponent<HistoryProps> = () => {
     dismissViewOnlyNotice,
   } = context;
   const { colors } = useTheme();
-  const screenName = ScreenEnum.History;
 
   const PAGE_SIZE = 50;
   const [numVt, setNumVt] = useState<number>(PAGE_SIZE);
@@ -180,7 +169,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
         <ViewOnlyNotice
           onDismiss={dismissViewOnlyNotice}
           onViewKey={from =>
-            navigation.navigate(RouteEnum.ViewingKey, {
+            navigation.navigate(Route.ViewingKey, {
               entry: { kind: 'card', from },
             })
           }
@@ -195,7 +184,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
         <IronwoodMigrationBanner
           amount={orchardAmount}
           currencyName={info.currencyName}
-          onStart={() => navigation.navigate(RouteEnum.MeetIronwood)}
+          onStart={() => navigation.navigate(Route.MeetIronwood)}
           onResume={route => navigation.navigate(route)}
         />
       ),
@@ -209,7 +198,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
           covered={backingUp && !focused}
           onBackUp={from => {
             setBackingUp(true);
-            navigation.navigate(RouteEnum.SeedBackup, {
+            navigation.navigate(Route.SeedBackup, {
               entry: { kind: 'card', from },
             });
           }}
@@ -591,6 +580,17 @@ const History: React.FunctionComponent<HistoryProps> = () => {
     }
   }, [scrollToTop, handleScrollToTop, setScrollToTop]);
 
+  // A press on the tab while it is open scrolls the list to the top.
+  useEffect(
+    () =>
+      navigation.addListener('tabPress', event => {
+        if (navigation.isFocused() && !event.defaultPrevented) {
+          handleScrollToTop();
+        }
+      }),
+    [navigation, handleScrollToTop],
+  );
+
   const handleScroll = useCallback(
     (_rawEvent: ScrollEvent, _offsetX: number, offsetY: number) => {
       const isTop = offsetY <= 100;
@@ -617,7 +617,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
         valueTransfersFiltered !== null
           ? valueTransfersFiltered.length
           : valueTransfersSliced.length;
-      navigation.navigate(RouteEnum.ValueTransferDetail, {
+      navigation.navigate(Route.ValueTransferDetail, {
         index: targetIndex >= 0 ? targetIndex : 0,
         vt: vt,
         valueTransfersSliced: valueTransfersSliced,
@@ -652,7 +652,6 @@ const History: React.FunctionComponent<HistoryProps> = () => {
             ? false
             : valueTransfersSliced[index + 1].txid === data.txid
         }
-        screenName={screenName}
         registerSwipeable={registerSwipeable(index)}
         closeAllSwipeables={() => closeAllSwipeables()}
         closeOtherSwipeables={() => closeAllSwipeables(index)}
@@ -781,7 +780,6 @@ const History: React.FunctionComponent<HistoryProps> = () => {
             title={''}
             setPrivacyOption={setPrivacyOption}
             addLastSnackbar={addLastSnackbar /* context */}
-            screenName={screenName}
             setShieldingAmount={setShieldingAmount}
             setBackgroundError={setBackgroundError /* context */}
             showMessagesIcon={true}
@@ -836,7 +834,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
                       refreshControl: (
                         <RefreshControl
                           refreshing={false}
-                          onRefresh={() => doRefresh(screenName)}
+                          onRefresh={() => doRefresh('valueTransfers')}
                           tintColor={colors.fgDefault}
                           title={translate('history.refreshing') as string}
                         />

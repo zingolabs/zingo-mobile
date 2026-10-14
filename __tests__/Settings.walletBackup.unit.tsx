@@ -10,7 +10,7 @@ import {
 } from '@app/context';
 import {
   ChainNameEnum,
-  RouteEnum,
+  Route,
   SelectServerEnum,
   ServerType,
   remoteServer,
@@ -50,7 +50,7 @@ const renderSettings = async (
 ) => {
   const props: any = {
     navigation: mockNavigation,
-    route: { key: 'Key-1', name: RouteEnum.Settings, params: undefined },
+    route: { key: 'Key-1', name: Route.Settings, params: undefined },
   };
   render(
     <ContextAppLoadedProvider

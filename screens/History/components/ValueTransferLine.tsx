@@ -1,11 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useContext, useEffect, useRef } from 'react';
 import { Animated, View, TouchableOpacity } from 'react-native';
-import {
-  NavigationProp,
-  ParamListBase,
-  useNavigation,
-} from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
+import { WalletNavigation } from '@app/types';
 import { useTheme } from '@app/theme';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
@@ -29,8 +26,7 @@ import {
   GlobalConst,
   SendPageStateClass,
   ToAddrClass,
-  RouteEnum,
-  ScreenEnum,
+  Route,
 } from '@app/AppState';
 
 import { ContextAppLoaded } from '@app/context';
@@ -46,7 +42,6 @@ type ValueTransferLineProps = {
   setValueTransferDetailModalShow: (i: number, vt: ValueTransferType) => void;
   nextLineWithSameTxid: boolean;
   //setMessagesAddressModalShow: (vt: ValueTransferType) => void;
-  screenName: ScreenEnum;
   registerSwipeable: (r: Swipeable | null) => void;
   closeAllSwipeables: () => void;
   closeOtherSwipeables: () => void;
@@ -58,12 +53,11 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
   setValueTransferDetailModalShow,
   nextLineWithSameTxid,
   //setMessagesAddressModalShow,
-  screenName,
   registerSwipeable,
   closeAllSwipeables,
   closeOtherSwipeables,
 }) => {
-  const navigation = useNavigation<NavigationProp<ParamListBase>>();
+  const navigation = useNavigation<WalletNavigation>();
   const context = useContext(ContextAppLoaded);
   const {
     translate,
@@ -180,8 +174,8 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                     );
                     sendPageState.toaddr.to = vt.address ? vt.address : '';
                     setSendPageState(sendPageState);
-                    navigation.navigate(RouteEnum.Home, {
-                      screen: RouteEnum.Send,
+                    navigation.navigate(Route.Home, {
+                      screen: Route.Send,
                     });
                     closeAllSwipeables();
                   }}
@@ -310,11 +304,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                   (vt.confirmations < 0 ||
                     vt.confirmations >= GlobalConst.minConfirmations) && (
                     <View>
-                      <AddressItem
-                        address={vt.address}
-                        screenName={screenName}
-                        oneLine={true}
-                      />
+                      <AddressItem address={vt.address} oneLine={true} />
                     </View>
                   )}
                 <View

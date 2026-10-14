@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
-import { ScreenEnum } from '@app/AppState';
 import TextInputAddress from './TextInputAddress';
 import {
   withAppContext,
@@ -17,7 +16,6 @@ const meta: Meta<typeof TextInputAddress> = {
     setError: () => {},
     disabled: false,
     showLabel: true,
-    screenName: ScreenEnum.Send,
   },
 };
 

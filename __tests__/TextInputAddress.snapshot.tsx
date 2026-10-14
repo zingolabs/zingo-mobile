@@ -11,7 +11,7 @@ import {
 } from '@app/context';
 
 import TextInputAddress from '@ui/widgets/TextInputAddress';
-import { RouteEnum, ScreenEnum } from '@app/AppState';
+import { Route } from '@app/AppState';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockServer } from '../__mocks__/dataMocks/mockServer';
 
@@ -32,7 +32,6 @@ describe('TextInputAddress - snapshots', () => {
             setError={onFn}
             disabled={false}
             showLabel
-            screenName={ScreenEnum.Send}
             scanRequest="send.address"
           />
         </ContextAppLoadedProvider>,
@@ -50,9 +49,8 @@ describe('TextInputAddress - snapshots', () => {
             setError={onFn}
             disabled
             showLabel={false}
-            screenName={ScreenEnum.Send}
             scanRequest="send.address"
-            routeStack={RouteEnum.ScannerAddress}
+            routeStack={Route.Scanner}
           />
         </ContextAppLoadedProvider>,
       ).toJSON(),

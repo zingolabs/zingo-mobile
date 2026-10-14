@@ -10,7 +10,7 @@ import { closeOptionsPanel, useOptionsPanel } from '@app/context/optionsPanel';
 import { navigateWallet } from '@app/navigation/navigate';
 import { probeUri } from '@app/services/serverPicking';
 import { ContextAppLoaded } from '@app/context';
-import { MenuItemEnum, RouteEnum } from '@app/AppState';
+import { MenuItemEnum, Route } from '@app/AppState';
 import { AppDrawerParamList } from '@app/types';
 import { sendEmail } from '@app/services/sendEmail';
 import ServerIcon from '@ui/widgets/ServerIcon';
@@ -58,25 +58,25 @@ const walletScreen = (
 ): NavigatorScreenParams<AppDrawerParamList> => {
   switch (item) {
     case MenuItemEnum.AddressBook:
-      return { screen: RouteEnum.AddressBook };
+      return { screen: Route.AddressBook };
     case MenuItemEnum.WalletSeedUfvk:
       return readOnly
-        ? { screen: RouteEnum.ViewingKey, params: { entry: { kind: 'push' } } }
-        : { screen: RouteEnum.WalletSeed };
+        ? { screen: Route.ViewingKey, params: { entry: { kind: 'push' } } }
+        : { screen: Route.WalletSeed };
     case MenuItemEnum.Rescan:
-      return { screen: RouteEnum.Rescan };
+      return { screen: Route.Rescan };
     case MenuItemEnum.SyncReport:
-      return { screen: RouteEnum.SyncReport };
+      return { screen: Route.SyncReport };
     case MenuItemEnum.FundPools:
-      return { screen: RouteEnum.Pools };
+      return { screen: Route.Pools };
     case MenuItemEnum.Insight:
-      return { screen: RouteEnum.Insight };
+      return { screen: Route.Insight };
     case MenuItemEnum.ChangeWallet:
-      return { screen: RouteEnum.WalletSeed, params: { action: 'change' } };
+      return { screen: Route.WalletSeed, params: { action: 'change' } };
     case MenuItemEnum.Server:
-      return { screen: RouteEnum.Server };
+      return { screen: Route.Server };
     case MenuItemEnum.Settings:
-      return { screen: RouteEnum.Settings };
+      return { screen: Route.Settings };
   }
 };
 

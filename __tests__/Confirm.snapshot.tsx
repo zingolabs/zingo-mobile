@@ -11,7 +11,7 @@ import {
 } from '@app/context';
 
 import Confirm from '@screens/Confirm';
-import { RouteEnum } from '@app/AppState';
+import { Route } from '@app/AppState';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
@@ -23,15 +23,12 @@ import { NetInfoStateType } from '@react-native-community/netinfo/src/index';
 import { AppDrawerParamList } from '@app/types';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
-function makeProps(): NativeStackScreenProps<
-  AppDrawerParamList,
-  RouteEnum.Confirm
-> {
+function makeProps(): NativeStackScreenProps<AppDrawerParamList, 'Confirm'> {
   return {
     navigation: mockNavigation,
     route: {
       key: 'Key-1',
-      name: RouteEnum.Confirm,
+      name: Route.Confirm,
       params: {
         calculatedFee: 0.00001,
         proposalPools: { source: ['ironwood'], destination: ['ironwood'] },

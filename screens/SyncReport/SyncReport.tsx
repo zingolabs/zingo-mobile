@@ -30,7 +30,6 @@ import BottomSheet, { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
 import { RPCSyncScanRangeStatusType } from '@app/walletBackend/types/RPCSyncScanRangeStatusType';
 import { RPCSyncScanRangePriorityStatusEnum } from '@app/walletBackend/enums/RPCSyncScanRangePriorityStatusEnum';
-import { RouteEnum, ScreenEnum } from '@app/AppState';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
 import { createAlert } from '@app/services/createAlert';
@@ -38,10 +37,7 @@ import { sendEmail } from '@app/services/sendEmail';
 import Utils from '@app/utils';
 import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
 
-type SyncReportProps = NativeStackScreenProps<
-  AppDrawerParamList,
-  RouteEnum.SyncReport
->;
+type SyncReportProps = NativeStackScreenProps<AppDrawerParamList, 'SyncReport'>;
 
 const SyncReport: React.FunctionComponent<SyncReportProps> = ({
   navigation,
@@ -61,7 +57,6 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
     setBackgroundSyncErrorInfo,
   } = context; //mode
   const { colors } = useTheme();
-  const screenName = ScreenEnum.SyncReport;
 
   const [maxBlocks, setMaxBlocks] = useState<number>(0);
   const [serverServer, setServerServer] = useState<number>(0);
@@ -250,7 +245,6 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
       <View onLayout={e => setHeaderH(e.nativeEvent.layout.height)}>
         <Header
           title={''}
-          screenName={screenName}
           noBalance={true}
           noSyncingStatus={true}
           noDrawMenu={true}
