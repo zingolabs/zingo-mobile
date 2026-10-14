@@ -1,21 +1,23 @@
-/* eslint-disable react-native/no-inline-styles */
-import React, { forwardRef, useCallback } from 'react';
-import { Pressable, View } from 'react-native';
-import { useTheme } from '@app/theme';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faXmark } from '@fortawesome/free-solid-svg-icons';
+import React, { forwardRef, useCallback, useContext } from 'react';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
+import { NavigationProp, ParamListBase } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { AddressBookFileClass, TranslateType } from '@app/AppState';
-import BoldText from '@ui/primitives/BoldText';
-import AppSheetModal from '@ui/primitives/AppSheetModal';
-import NewAddressTag from '@ui/widgets/NewAddressTag';
+import {
+  AddressBookFileClass,
+  SnackbarDurationEnum,
+  TranslateType,
+} from '@app/AppState';
+import { ContextAppLoaded } from '@app/context';
+import AddressBookFileImpl from '@app/services/AddressBookFileImpl';
 import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
+import AppSheetModal from '@ui/primitives/AppSheetModal';
+import ContactSheet from '@ui/widgets/ContactSheet';
 
 type AddTagModalHostProps = {
   // Latest target the host should render. Pass `null` while the modal is
-  // hidden. Bump `key` (via the address/own pair) to force-remount the inner
-  // form so its local state resets between presentations.
+  // hidden. The address and label key the inner form, which resets between
+  // presentations.
   target: {
     address: string;
     own: boolean;
@@ -24,14 +26,21 @@ type AddTagModalHostProps = {
   } | null;
   setAddressBook: (ab: AddressBookFileClass[]) => void;
   translate: (key: string) => TranslateType;
+  /** The sheet is portaled above the navigator, so the scanner opens through this. */
+  navigation?: NavigationProp<ParamListBase>;
 };
 
+// The New contact sheet every "add to address book" button opens, with the
+// address already filled in.
 const AddTagModalHost = forwardRef<
   React.ComponentRef<typeof BottomSheetModal>,
   AddTagModalHostProps
->(({ target, setAddressBook, translate }, ref) => {
-  const { colors } = useTheme();
+>(({ target, setAddressBook, translate, navigation }, ref) => {
+  const { addressBook, walletChainName, server, addLastSnackbar } =
+    useContext(ContextAppLoaded);
+  const insets = useSafeAreaInsets();
   const keyboardHeight = useKeyboardHeight();
+  const walletChain = walletChainName || server.chainName;
 
   const dismiss = useCallback(() => {
     (
@@ -39,55 +48,44 @@ const AddTagModalHost = forwardRef<
     )?.current?.dismiss();
   }, [ref]);
 
-  const addTagHeader = (
-    <View
-      style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingTop: 8,
-        paddingBottom: 6,
-        paddingHorizontal: 16,
-      }}
-    >
-      <View style={{ width: 48 }} />
-      <BoldText
-        numberOfLines={1}
-        style={{ flex: 1, fontSize: 16, lineHeight: 28, textAlign: 'center' }}
-      >
-        {
-          (target?.own
-            ? translate('addressbook.add-tag')
-            : translate('addressbook.add-contact')) as string
-        }
-      </BoldText>
-      <Pressable
-        onPress={dismiss}
-        hitSlop={8}
-        style={{ paddingHorizontal: 14, paddingVertical: 4 }}
-      >
-        <FontAwesomeIcon icon={faXmark} size={20} color={colors.fgMuted} />
-      </Pressable>
-    </View>
-  );
+  const save = async (name: string, address: string) => {
+    setAddressBook(
+      await AddressBookFileImpl.saveContact(
+        undefined,
+        name,
+        address,
+        walletChain,
+      ),
+    );
+    dismiss();
+    addLastSnackbar(
+      (translate('addressbook.added') as string).replace('{name}', name),
+      SnackbarDurationEnum.short,
+    );
+  };
 
   return (
     <AppSheetModal
       ref={ref}
-      header={addTagHeader}
+      handle
       contentStyle={{
-        paddingBottom: keyboardHeight > 0 ? keyboardHeight + 20 : 30,
+        paddingBottom:
+          keyboardHeight > 0 ? keyboardHeight + 20 : insets.bottom + 24,
       }}
     >
       {target && (
-        <NewAddressTag
-          key={`${target.address}-${target.own}-${target.initialLabel ?? ''}`}
-          address={target.address}
-          own={target.own}
-          swapChain={target.swapChain}
-          initialLabel={target.initialLabel}
-          closeSheet={dismiss}
-          setAddressBook={setAddressBook}
+        <ContactSheet
+          key={`${target.address}-${target.initialLabel ?? ''}`}
+          edit={{
+            kind: 'new',
+            preset: target.address,
+            label: target.initialLabel ?? '',
+          }}
+          book={addressBook}
+          walletChain={walletChain}
+          onSave={save}
+          onCancel={dismiss}
+          navigation={navigation}
         />
       )}
     </AppSheetModal>

@@ -144,13 +144,13 @@ import ValueTransferDetail from '@screens/ValueTransferDetail';
 import Confirm from '@screens/Confirm';
 import { AppStackParamList } from '@app/types';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { NavigationProp, ParamListBase } from '@react-navigation/native';
 import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
 import { publishReport } from '@app/services/reportDiagnostics';
 
 const About = React.lazy(() => import('@screens/About'));
 const MixnetDoctor = React.lazy(() => import('@screens/MixnetDoctor'));
 const SyncReport = React.lazy(() => import('@screens/SyncReport'));
-const Rescan = React.lazy(() => import('@screens/Rescan'));
 const Pools = React.lazy(() => import('@screens/Pools'));
 const MeetIronwood = React.lazy(() => import('@screens/MeetIronwood'));
 const SeedBackup = React.lazy(() => import('@screens/SeedBackup'));
@@ -1523,9 +1523,6 @@ export class LoadedAppClass extends Component<
     if (item === MenuItemEnum.About) {
       this.drawerNav?.navigate(RouteEnum.About);
       return;
-    } else if (item === MenuItemEnum.Rescan) {
-      this.drawerNav?.navigate(RouteEnum.Rescan);
-      return;
     } else if (item === MenuItemEnum.SyncReport) {
       this.drawerNav?.navigate(RouteEnum.SyncReport);
       return;
@@ -2260,19 +2257,15 @@ export class LoadedAppClass extends Component<
                         name={RouteEnum.MixnetDoctor}
                         component={MixnetDoctor}
                       />
-                      <RootNavigator.Screen name={RouteEnum.Rescan}>
-                        {props => (
-                          <Rescan {...props} doRescan={this.doRescan} />
-                        )}
-                      </RootNavigator.Screen>
                       <RootNavigator.Screen
                         name={RouteEnum.Insight}
                         component={Insight}
                       />
-                      <RootNavigator.Screen
-                        name={RouteEnum.SyncReport}
-                        component={SyncReport}
-                      />
+                      <RootNavigator.Screen name={RouteEnum.SyncReport}>
+                        {props => (
+                          <SyncReport {...props} doRescan={this.doRescan} />
+                        )}
+                      </RootNavigator.Screen>
                       <RootNavigator.Screen
                         name={RouteEnum.Pools}
                         component={Pools}
@@ -2446,6 +2439,10 @@ export class LoadedAppClass extends Component<
                 target={this.state.addTagModalTarget}
                 setAddressBook={this.setAddressBook}
                 translate={this.state.translate}
+                navigation={
+                  (this.drawerNav ?? undefined) as
+                    NavigationProp<ParamListBase> | undefined
+                }
               />
             </BottomSheetModalProvider>
           </GestureHandlerRootView>

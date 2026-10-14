@@ -23,7 +23,6 @@ export enum RouteEnum {
   Settings = 'Settings',
   About = 'About',
   MixnetDoctor = 'MixnetDoctor',
-  Rescan = 'Rescan',
   Insight = 'Insight',
   Computing = 'Computing',
   SyncReport = 'SyncReport',

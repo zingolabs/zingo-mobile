@@ -24,7 +24,6 @@ export enum ScreenEnum {
   Pools = 'Pools',
   SyncReport = 'SyncReport',
   Seed = 'Seed',
-  Rescan = 'Rescan',
   Insight = 'Insight',
   Memo = 'Memo',
 }
