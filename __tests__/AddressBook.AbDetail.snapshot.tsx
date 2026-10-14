@@ -15,7 +15,6 @@ import {
   AddressBookActionEnum,
   AddressBookFileClass,
   Route,
-  ScreenEnum,
 } from '@app/AppState';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockAddressBook } from '../__mocks__/dataMocks/mockAddressBook';
@@ -37,7 +36,6 @@ describe('Component Address Book Details - test', () => {
           cancel={onCancel}
           action={AddressBookActionEnum.Add}
           doAction={onAction}
-          screenName={ScreenEnum.AddressBook}
           routeStack={Route.AddressBook}
           navigation={{ navigate: onCancel } as never}
         />
@@ -54,7 +52,6 @@ describe('Component Address Book Details - test', () => {
           cancel={onCancel}
           action={AddressBookActionEnum.Modify}
           doAction={onAction}
-          screenName={ScreenEnum.AddressBook}
           routeStack={Route.AddressBook}
           navigation={{ navigate: onCancel } as never}
         />
@@ -71,7 +68,6 @@ describe('Component Address Book Details - test', () => {
           cancel={onCancel}
           action={AddressBookActionEnum.Delete}
           doAction={onAction}
-          screenName={ScreenEnum.AddressBook}
           routeStack={Route.AddressBook}
           navigation={{ navigate: onCancel } as never}
         />

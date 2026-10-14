@@ -30,7 +30,6 @@ import {
   TransactionActionEnum,
   UnifiedAddressClass,
   TransparentAddressClass,
-  ScreenEnum,
 } from '@app/AppState';
 import Utils from '@app/utils';
 import RegText from '@ui/primitives/RegText';
@@ -86,7 +85,6 @@ const ValueTransferDetail: React.FunctionComponent<
     blockExplorer,
   } = context;
   const { colors } = useTheme();
-  const screenName = ScreenEnum.ValueTransferDetail;
 
   const [valueTransfer, setValueTransfer] = useState<ValueTransferType>(
     !!route.params && route.params.vt !== undefined
@@ -356,7 +354,6 @@ const ValueTransferDetail: React.FunctionComponent<
       <View onLayout={e => setHeaderH(e.nativeEvent.layout.height)}>
         <Header
           title={''}
-          screenName={screenName}
           noBalance={true}
           noSyncingStatus={true}
           noDrawMenu={true}
@@ -847,7 +844,6 @@ const ValueTransferDetail: React.FunctionComponent<
                 <FadeText>{translate('history.address') as string}</FadeText>
                 <AddressItem
                   address={valueTransfer.address}
-                  screenName={screenName}
                   withIcon={true}
                   withSendIcon={true}
                 />
@@ -964,11 +960,7 @@ const ValueTransferDetail: React.FunctionComponent<
                             {translate('addressbook.likely') as string}
                           </RegText>
                         )}
-                        <AddressItem
-                          address={memoUA}
-                          screenName={screenName}
-                          onlyContact={true}
-                        />
+                        <AddressItem address={memoUA} onlyContact={true} />
                       </View>
                     )}
                     {!contactFound(memoUA) && thisWalletAddress(memoUA) && (

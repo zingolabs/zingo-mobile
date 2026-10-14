@@ -26,7 +26,6 @@ import {
   ChainNameEnum,
   FilterEnum,
   Route,
-  ScreenEnum,
 } from '@app/AppState';
 import { AppDrawerParamList } from '@app/types';
 import FadeText from '@ui/primitives/FadeText';
@@ -70,7 +69,6 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
   const { setAddressBook, translate, addressBook, walletChainName, server } =
     context;
   const { colors } = useTheme();
-  const screenName = ScreenEnum.AddressBook;
   // The wallet's own Zcash network (reliable even offline); the chain subfilter
   // defaults to it.
   const walletChain = walletChainName || server.chainName;
@@ -463,7 +461,6 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
       <View onLayout={e => setHeaderH(e.nativeEvent.layout.height)}>
         <Header
           title={''}
-          screenName={screenName}
           noBalance={true}
           noSyncingStatus={true}
           noDrawMenu={true}
@@ -868,7 +865,6 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
           action={action ?? AddressBookActionEnum.Add}
           doAction={doAction}
           currentAddress={currentAddress}
-          screenName={screenName}
           routeStack={routeStack}
           navigation={navigation}
         />

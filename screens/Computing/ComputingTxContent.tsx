@@ -24,7 +24,7 @@ import AppSheet from '@ui/primitives/AppSheet';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
 import Header from '@ui/widgets/Header';
-import { Route, ScreenEnum } from '@app/AppState';
+import { Route } from '@app/AppState';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
 
@@ -46,7 +46,6 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
   const context = useContext(ContextAppLoaded);
   const { translate } = context;
   const { colors } = useTheme();
-  const screenName = ScreenEnum.ComputingTxContext;
 
   const [containerH, setContainerH] = useState<number>(0);
   const [headerH, setHeaderH] = useState<number>(0);
@@ -121,7 +120,6 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
       <View onLayout={e => setHeaderH(e.nativeEvent.layout.height)}>
         <Header
           title={''}
-          screenName={screenName}
           noBalance={true}
           noSyncingStatus={true}
           noDrawMenu={true}

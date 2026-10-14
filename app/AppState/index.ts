@@ -49,7 +49,6 @@ import { FilterEnum } from './enums/FilterEnum';
 import { TransactionActionEnum } from './enums/TransactionActionEnum';
 import { AddressUnifiedTypeEnum } from './enums/AddressUnifiedTypeEnum';
 import { ZcashUriFieldEnum } from './enums/ZcashUriFieldEnum';
-import { ScreenEnum } from './enums/ScreenEnum';
 import { LaunchingModeEnum } from './enums/LaunchingModeEnum';
 import { BlockExplorerEnum } from './enums/BlockExplorerEnum';
 
@@ -105,7 +104,6 @@ export {
   TransactionActionEnum,
   AddressUnifiedTypeEnum,
   ZcashUriFieldEnum,
-  ScreenEnum,
   LaunchingModeEnum,
   BlockExplorerEnum,
   GlobalConst,

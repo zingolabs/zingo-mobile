@@ -23,7 +23,6 @@ import Header from '@ui/widgets/Header';
 import { AppDrawerParamList } from '@app/types';
 import { useTheme } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
-import { Route, ScreenEnum } from '@app/AppState';
 import {
   getMixnetBootstrapDetail,
   getMixnetStatus,
@@ -266,7 +265,6 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
     >
       <Header
         title={translate('mixnetdoctor.title') as string}
-        screenName={ScreenEnum.MixnetDoctor}
         noBalance={true}
         noSyncingStatus={true}
         noDrawMenu={true}

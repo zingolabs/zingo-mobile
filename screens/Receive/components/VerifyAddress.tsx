@@ -4,7 +4,7 @@ import { View, Keyboard } from 'react-native';
 import { NavigationProp, ParamListBase } from '@react-navigation/native';
 import { useTheme } from '@app/theme';
 
-import { GlobalConst, ScreenEnum, SnackbarDurationEnum } from '@app/AppState';
+import { GlobalConst, SnackbarDurationEnum } from '@app/AppState';
 import { ContextAppLoaded } from '@app/context';
 import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
 import { checkMyAddress } from '@app/walletBackend';
@@ -18,14 +18,12 @@ import { VerifyXIcon } from '@ui/primitives/Icons/VerifyXIcon';
 
 type VerifyAddressProps = {
   closeSheet: () => void;
-  screenName: ScreenEnum;
   // VerifyAddress lives inside a portaled BottomSheetModal; pass navigation
   // from the host (Receive) so the QR button can navigate to Scanner.
   navigation: NavigationProp<ParamListBase>;
 };
 const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
   closeSheet,
-  screenName,
   navigation,
 }) => {
   const context = useContext(ContextAppLoaded);
@@ -105,7 +103,6 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
         setError={setErrorAddress}
         disabled={false}
         showLabel={false}
-        screenName={screenName}
         navigation={navigation}
         scanRequest="receive.address"
       />

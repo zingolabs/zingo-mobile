@@ -16,7 +16,7 @@ import { Request, useResult } from '@app/navigation/results';
 import ErrorText from '@ui/primitives/ErrorText';
 import RegText from '@ui/primitives/RegText';
 import { validateAddressForChain } from '@app/swap';
-import { GlobalConst, Route, ScreenEnum } from '@app/AppState';
+import { GlobalConst, Route } from '@app/AppState';
 
 type TextInputAddressProps = {
   address: string;
@@ -24,7 +24,6 @@ type TextInputAddressProps = {
   setError: (e: string) => void;
   disabled: boolean;
   showLabel: boolean;
-  screenName: ScreenEnum;
   routeStack?: Route;
   // SwapKit chain code the address is for ('ZEC' / 'BTC' / ...). Defaults to
   // 'ZEC' → the existing zingolib validation (against `server.chainName`).
@@ -43,9 +42,6 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
   setError,
   disabled,
   showLabel,
-  // screenName + routeStack are kept in the prop type for backward compat
-  // with all callers but are no longer consumed here — Scanner lives
-  // at a single Drawer-level route so a direct navigate works everywhere.
   navigation: navigationProp,
   swapChain,
   scanRequest,

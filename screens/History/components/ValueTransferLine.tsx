@@ -30,7 +30,6 @@ import {
   SendPageStateClass,
   ToAddrClass,
   Route,
-  ScreenEnum,
 } from '@app/AppState';
 
 import { ContextAppLoaded } from '@app/context';
@@ -46,7 +45,6 @@ type ValueTransferLineProps = {
   setValueTransferDetailModalShow: (i: number, vt: ValueTransferType) => void;
   nextLineWithSameTxid: boolean;
   //setMessagesAddressModalShow: (vt: ValueTransferType) => void;
-  screenName: ScreenEnum;
   registerSwipeable: (r: Swipeable | null) => void;
   closeAllSwipeables: () => void;
   closeOtherSwipeables: () => void;
@@ -58,7 +56,6 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
   setValueTransferDetailModalShow,
   nextLineWithSameTxid,
   //setMessagesAddressModalShow,
-  screenName,
   registerSwipeable,
   closeAllSwipeables,
   closeOtherSwipeables,
@@ -310,11 +307,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                   (vt.confirmations < 0 ||
                     vt.confirmations >= GlobalConst.minConfirmations) && (
                     <View>
-                      <AddressItem
-                        address={vt.address}
-                        screenName={screenName}
-                        oneLine={true}
-                      />
+                      <AddressItem address={vt.address} oneLine={true} />
                     </View>
                   )}
                 <View

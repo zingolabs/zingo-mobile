@@ -63,7 +63,6 @@ import {
   GlobalConst,
   SelectServerEnum,
   Route,
-  ScreenEnum,
   ProposalPoolsType,
 } from '@app/AppState';
 import { hasUnconfirmedFunds } from '@app/AppState/classes/TotalBalanceClass';
@@ -149,7 +148,6 @@ const Send: React.FunctionComponent<SendProps> = () => {
   const showFiat = fiatEligible(server, server.chainName);
   const quote = fiatQuote(zecPrice, server, server.chainName);
 
-  const screenName = ScreenEnum.Send;
   const zecIconXml = `<?xml version="1.0" encoding="UTF-8"?>
   <svg viewBox="0 0 88.03 147.85">
     <polygon points="34.44 107.62 34.44 106.98 87.19 34.17 87.19 20.12 56.09 20.12 56.09 0 35.98 0 35.98 20.12 5.04 20.12 5.04 40.24 53.93 40.24 53.93 40.88 0 114.64 0 127.73 35.98 127.73 35.98 147.85 56.09 147.85 56.09 127.73 88.03 127.73 88.03 107.62 34.44 107.62"/>
@@ -1100,7 +1098,6 @@ const Send: React.FunctionComponent<SendProps> = () => {
         >
           <Header
             title={''}
-            screenName={screenName}
             setPrivacyOption={setPrivacyOption}
             addLastSnackbar={addLastSnackbar /* context */}
             setShieldingAmount={setShieldingAmount}
@@ -1162,7 +1159,6 @@ const Send: React.FunctionComponent<SendProps> = () => {
                     {validAddress === 1 && (
                       <AddressItem
                         address={addressText}
-                        screenName={screenName}
                         oneLine={true}
                         onlyContact={true}
                         // No add-to-book icon here: it would duplicate the one

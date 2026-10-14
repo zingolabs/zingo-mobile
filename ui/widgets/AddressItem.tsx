@@ -19,7 +19,6 @@ import {
   ToAddrClass,
   SnackbarDurationEnum,
   Route,
-  ScreenEnum,
 } from '@app/AppState';
 import {
   NavigationProp,
@@ -32,7 +31,6 @@ import { faUserPlus, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
 
 type AddressItemProps = {
   address: string;
-  screenName: ScreenEnum;
   oneLine?: boolean;
   onlyContact?: boolean;
   withIcon?: boolean;
@@ -66,9 +64,6 @@ const Lines = ({ view, prefix = '', style }: LinesProps) => (
 
 const AddressItem: React.FunctionComponent<AddressItemProps> = ({
   address,
-  // screenName is still in the type for backward compat with all callers but
-  // no longer consumed here — launchAddTagModal works the same regardless of
-  // where it's invoked from.
   oneLine,
   onlyContact,
   withIcon,

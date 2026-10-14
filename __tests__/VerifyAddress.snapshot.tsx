@@ -11,7 +11,6 @@ import {
 } from '@app/context';
 
 import VerifyAddress from '@screens/Receive/components/VerifyAddress';
-import { ScreenEnum } from '@app/AppState';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockServer } from '../__mocks__/dataMocks/mockServer';
 
@@ -27,7 +26,6 @@ describe('VerifyAddress - snapshot', () => {
         <ContextAppLoadedProvider value={state}>
           <VerifyAddress
             closeSheet={onFn}
-            screenName={ScreenEnum.Receive}
             navigation={{ navigate: onFn } as never}
           />
         </ContextAppLoadedProvider>,

@@ -40,7 +40,6 @@ import {
   LanguageEnum,
   GlobalConst,
   Route,
-  ScreenEnum,
   BlockExplorerEnum,
   ChainNameEnum,
 } from '@app/AppState';
@@ -131,7 +130,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
   }
 
   const { colors } = useTheme();
-  const screenName = ScreenEnum.Settings;
 
   // The requirement is read once, at mount: this screen's own save
   // flips the switch, and that must not re-gate the open screen.
@@ -579,7 +577,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
         <View onLayout={e => setHeaderH(e.nativeEvent.layout.height)}>
           <Header
             title={''}
-            screenName={screenName}
             noBalance={true}
             noSyncingStatus={true}
             noPrivacy={true}

@@ -12,7 +12,6 @@ import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
 import ProgressBar from '@ui/primitives/ProgressBar';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
-import { Route } from '@app/AppState';
 import Utils from '@app/utils';
 import useTrickleProgress from '@app/hooks/useTrickleProgress';
 import { drainOrchard, drainStatus } from '@app/walletBackend';

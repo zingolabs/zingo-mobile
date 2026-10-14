@@ -9,6 +9,7 @@ import {
   ParamListBase,
   StackActions,
   useNavigation,
+  useRoute,
 } from '@react-navigation/native';
 import { useTheme } from '@app/theme';
 import React, { useContext, useEffect, useRef } from 'react';
@@ -28,7 +29,6 @@ const HEADER_FADE_MS = 320;
 import {
   NetInfoType,
   Route,
-  ScreenEnum,
   SnackbarDurationEnum,
   TranslateType,
 } from '@app/AppState';
@@ -47,7 +47,6 @@ type HeaderProps = {
   // general
   testID?: string;
   title: string;
-  screenName: ScreenEnum;
   // side menu
   noDrawMenu?: boolean;
   closeScreen?: () => void;
@@ -94,7 +93,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   noPrivacy,
   setPrivacyOption,
   addLastSnackbar,
-  screenName,
   receivedLegend,
   setShieldingAmount,
   closeScreen,
@@ -105,6 +103,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   noPriceRow,
 }) => {
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
+  const route = useRoute();
   const context = useContext(ContextAppLoaded);
   const {
     totalBalance,
@@ -135,9 +134,9 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     open: openOptionsPanel,
   } = useOptionsPanel();
   const homeTab =
-    screenName === ScreenEnum.History ||
-    screenName === ScreenEnum.Send ||
-    screenName === ScreenEnum.Receive;
+    route.name === Route.History ||
+    route.name === Route.Send ||
+    route.name === Route.Receive;
   // The panel lives in the home: from a pushed screen the button pops back
   // to it and shows the panel there.
   const toggleMenuDrawer = () => {
@@ -356,9 +355,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               panel's header, its single door. With only messages left,
               the corner falls back to the logo when there is nothing to
               show. */}
-          {!noDrawMenu &&
-          screenName !== ScreenEnum.Settings &&
-          showMessagesIcon ? (
+          {!noDrawMenu && route.name !== Route.Settings && showMessagesIcon ? (
             <View
               style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}
             >

@@ -18,7 +18,6 @@ import { SnackbarDurationEnum } from './enums/SnackbarDurationEnum';
 import ValueTransferType from './types/ValueTransferType';
 import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
 import TransparentAddressClass from './classes/TransparentAddressClass';
-import { ScreenEnum } from './enums/ScreenEnum';
 import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
 import { BlockExplorerEnum } from './enums/BlockExplorerEnum';
 import { MixnetView } from '@app/walletBackend/transforms/mixnetView';
@@ -146,7 +145,7 @@ export default interface AppContextLoaded {
   showSwipeableIcons: boolean;
 
   // refresh the different list in the App: history & messages
-  doRefresh: (s: ScreenEnum) => void;
+  doRefresh: (what: 'valueTransfers' | 'messages') => void;
 
   // fetch the ZEC price in USD
   setZecPrice: (p: number, d: number) => void;

@@ -48,3 +48,8 @@ export const createNavigationContainerRef = jest.fn(() => {
   refImpl.current = refImpl;
   return refImpl;
 });
+export const useRoute = jest.fn(() => ({
+  key: 'route',
+  name: '',
+  params: undefined,
+}));

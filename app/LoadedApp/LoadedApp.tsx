@@ -64,7 +64,6 @@ import {
   TransparentAddressClass,
   AddressKindEnum,
   AddressBookFileClassObsolete,
-  ScreenEnum,
   LaunchingModeEnum,
   BlockExplorerEnum,
   SnackbarDurationEnum,
@@ -592,7 +591,6 @@ export class LoadedAppClass extends Component<
   addTagModalRef: React.RefObject<React.ComponentRef<
     typeof BottomSheetModal
   > | null>;
-  screenName = ScreenEnum.LoadedApp;
   constructor(props: LoadedAppClassProps) {
     super(props);
 
@@ -1421,8 +1419,8 @@ export class LoadedAppClass extends Component<
       return this.rpc.sendTransaction(sendJson, sendAll);
     });
 
-  doRefresh = (screen: ScreenEnum) => {
-    if (screen === ScreenEnum.History) {
+  doRefresh = (what: 'valueTransfers' | 'messages') => {
+    if (what === 'valueTransfers') {
       // Value Transfers
       this.rpc.fetchTandZandOValueTransfers();
     } else {

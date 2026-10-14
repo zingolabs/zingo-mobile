@@ -42,8 +42,6 @@ import { fiatQuote } from '@app/price/fiatQuote';
 import { sendPermit } from '@app/walletBackend/transforms/sendPermit';
 import {
   GlobalConst,
-  ScreenEnum,
-  Route,
   SendPageStateClass,
   ProposalPoolsType,
 } from '@app/AppState';
@@ -81,7 +79,6 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     biometrics,
   } = context;
   const { colors } = useTheme();
-  const screenName = ScreenEnum.Confirm;
   const quote = fiatQuote(zecPrice, server, server.chainName);
   const permit = sendPermit(context);
 
@@ -295,7 +292,6 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
         <View onLayout={e => setHeaderH(e.nativeEvent.layout.height)}>
           <Header
             title={''}
-            screenName={screenName}
             noBalance={true}
             noSyncingStatus={true}
             noDrawMenu={true}
@@ -419,7 +415,6 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                   <FadeText>{translate('send.to') as string}</FadeText>
                   <AddressItem
                     address={to.to}
-                    screenName={screenName}
                     withIcon={true}
                     znsAlias={to.znsAlias}
                   />

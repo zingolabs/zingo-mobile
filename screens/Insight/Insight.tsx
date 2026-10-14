@@ -36,7 +36,7 @@ import {
   getTotalValueToAddress,
 } from '@app/walletBackend';
 import AddressItem from '@ui/widgets/AddressItem';
-import { Route, ScreenEnum, SnackbarDurationEnum } from '@app/AppState';
+import { SnackbarDurationEnum } from '@app/AppState';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
 
@@ -67,7 +67,6 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
   const { info, translate, privacy, addLastSnackbar, setPrivacyOption } =
     context;
   const { colors } = useTheme();
-  const screenName = ScreenEnum.Insight;
 
   const [pieAmounts, setPieAmounts] = useState<DataType[]>([]);
   const [expandAddress, setExpandAddress] = useState<boolean[]>([]);
@@ -280,7 +279,6 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
                 {item.address !== 'fee' && (
                   <AddressItem
                     address={item.address}
-                    screenName={screenName}
                     oneLine={true}
                     onlyContact={true}
                     withIcon={true}
@@ -365,7 +363,6 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
       <View onLayout={e => setHeaderH(e.nativeEvent.layout.height)}>
         <Header
           title={''}
-          screenName={screenName}
           noBalance={true}
           noSyncingStatus={true}
           noDrawMenu={true}

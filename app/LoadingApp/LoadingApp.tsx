@@ -76,7 +76,6 @@ import {
   OnboardingContext,
   ZecPriceType,
   RestoreFromTypeEnum,
-  ScreenEnum,
   LaunchingModeEnum,
   BlockExplorerEnum,
 } from '@app/AppState';
@@ -386,7 +385,6 @@ export class LoadingAppClass extends Component<
   // Runs once the hold completes; set with the sheet's context.
   afterDelete: () => void = () => {};
   retryStartedAt = 0;
-  screenName = ScreenEnum.LoadingApp;
 
   constructor(props: LoadingAppClassProps) {
     super(props);

@@ -32,9 +32,7 @@ import {
   ChainNameEnum,
   UnifiedAddressClass,
   TransparentAddressClass,
-  ScreenEnum,
   SnackbarDurationEnum,
-  Route,
 } from '@app/AppState';
 import { RPCAddressScopeEnum } from '@app/walletBackend/enums/RPCAddressScopeEnum';
 import BottomSheet, { BottomSheetModal } from '@gorhom/bottom-sheet';
@@ -63,7 +61,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({ navigation }) => {
     setPrivacyOption,
   } = context;
   const { colors } = useTheme();
-  const screenName = ScreenEnum.Receive;
 
   const [index, setIndex] = useState<number>(0);
   const [sheetType, setSheetType] = useState<
@@ -432,7 +429,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({ navigation }) => {
       >
         <Header
           title={''}
-          screenName={screenName}
           setPrivacyOption={setPrivacyOption}
           addLastSnackbar={addLastSnackbar}
           showMessagesIcon={true}
@@ -482,7 +478,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({ navigation }) => {
             addressKind={index === 0 ? AddressKindEnum.u : AddressKindEnum.t}
             closeSheet={hide}
             setAddressBook={setAddressBook}
-            screenName={screenName}
           />
         )}
         {sheetType === 'NAT' && (
@@ -500,11 +495,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({ navigation }) => {
           />
         )}
         {sheetType === 'VA' && (
-          <VerifyAddress
-            closeSheet={hide}
-            screenName={screenName}
-            navigation={navigation}
-          />
+          <VerifyAddress closeSheet={hide} navigation={navigation} />
         )}
         {sheetType === 'TW' && (
           <TransparentWarning

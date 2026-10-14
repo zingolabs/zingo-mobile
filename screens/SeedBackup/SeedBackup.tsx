@@ -31,7 +31,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useTheme } from '@app/theme';
 import { ease } from '@app/theme/motion';
 import { ContextAppLoaded } from '@app/context';
-import { Route, SnackbarDurationEnum } from '@app/AppState';
+import { SnackbarDurationEnum } from '@app/AppState';
 import { AppDrawerParamList, CardRect } from '@app/types';
 import { useSecureScreen } from '@app/hooks/useSecureScreen';
 import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';

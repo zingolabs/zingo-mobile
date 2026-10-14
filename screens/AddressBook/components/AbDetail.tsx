@@ -13,7 +13,6 @@ import {
   ChainNameEnum,
   GlobalConst,
   Route,
-  ScreenEnum,
 } from '@app/AppState';
 import RegText from '@ui/primitives/RegText';
 import ErrorText from '@ui/primitives/ErrorText';
@@ -50,7 +49,6 @@ type AbDetailProps = {
     swapChain: string,
   ) => void;
   currentAddress?: string;
-  screenName: ScreenEnum;
   routeStack: Route;
   // AbDetail is rendered inside a portaled BottomSheetModal; the host screen
   // (AddressBook) must pass its own `navigation` so the QR button can

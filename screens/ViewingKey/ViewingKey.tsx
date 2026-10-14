@@ -21,7 +21,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@app/theme';
 import { ease } from '@app/theme/motion';
 import { ContextAppLoaded } from '@app/context';
-import { Route, SnackbarDurationEnum } from '@app/AppState';
+import { SnackbarDurationEnum } from '@app/AppState';
 import { AppDrawerParamList } from '@app/types';
 import {
   enactGateAnswer,

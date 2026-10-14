@@ -33,7 +33,6 @@ import {
   GlobalConst,
   isIronwoodActive,
   Route,
-  ScreenEnum,
   ValueTransferKindEnum,
   //SelectServerEnum,
   //SendPageStateClass,
@@ -107,7 +106,6 @@ const History: React.FunctionComponent<HistoryProps> = () => {
     dismissViewOnlyNotice,
   } = context;
   const { colors } = useTheme();
-  const screenName = ScreenEnum.History;
 
   const PAGE_SIZE = 50;
   const [numVt, setNumVt] = useState<number>(PAGE_SIZE);
@@ -649,7 +647,6 @@ const History: React.FunctionComponent<HistoryProps> = () => {
             ? false
             : valueTransfersSliced[index + 1].txid === data.txid
         }
-        screenName={screenName}
         registerSwipeable={registerSwipeable(index)}
         closeAllSwipeables={() => closeAllSwipeables()}
         closeOtherSwipeables={() => closeAllSwipeables(index)}
@@ -778,7 +775,6 @@ const History: React.FunctionComponent<HistoryProps> = () => {
             title={''}
             setPrivacyOption={setPrivacyOption}
             addLastSnackbar={addLastSnackbar /* context */}
-            screenName={screenName}
             setShieldingAmount={setShieldingAmount}
             setBackgroundError={setBackgroundError /* context */}
             showMessagesIcon={true}
@@ -833,7 +829,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
                       refreshControl: (
                         <RefreshControl
                           refreshing={false}
-                          onRefresh={() => doRefresh(screenName)}
+                          onRefresh={() => doRefresh('valueTransfers')}
                           tintColor={colors.fgDefault}
                           title={translate('history.refreshing') as string}
                         />
