@@ -43,16 +43,10 @@ describe('Component Receive - test', () => {
     state.info = mockInfo;
     state.totalBalance = mockTotalBalance;
     // The price ring renders only for a Nym-consenting session.
-    const onFunction = jest.fn();
     const props = makeDrawerProps();
     const receive = render(
       <ContextAppLoadedProvider value={state}>
-        <Receive
-          {...props}
-          toggleMenuDrawer={onFunction}
-          alone={false}
-          setAddressBook={onFunction}
-        />
+        <Receive {...props} />
       </ContextAppLoadedProvider>,
     );
     expect(receive.toJSON()).toMatchSnapshot();

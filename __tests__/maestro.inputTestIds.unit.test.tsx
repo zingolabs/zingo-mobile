@@ -80,16 +80,7 @@ describe('Maestro reaches each typed field on iOS', () => {
     state.sendPageState = mockSendPageState;
     const send = render(
       <ContextAppLoadedProvider value={state}>
-        <Send
-          {...drawerProps(RouteEnum.Send)}
-          sendTransaction={onFunction}
-          clearToAddr={onFunction}
-          toggleMenuDrawer={onFunction}
-          setShieldingAmount={onFunction}
-          setScrollToTop={onFunction}
-          setScrollToBottom={onFunction}
-          setServerOption={onFunction}
-        />
+        <Send {...drawerProps(RouteEnum.Send)} />
       </ContextAppLoadedProvider>,
     );
     for (const id of [

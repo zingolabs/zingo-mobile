@@ -48,7 +48,6 @@ describe('Component Send - test', () => {
   state.totalBalance = mockTotalBalance;
   // The price ring renders only for a Nym-consenting session.
   state.sendPageState = mockSendPageState;
-  const onFunction = jest.fn();
 
   test('Send privacy normal - snapshot', () => {
     // privacy normal
@@ -56,16 +55,7 @@ describe('Component Send - test', () => {
     const props = makeDrawerProps();
     const send = render(
       <ContextAppLoadedProvider value={state}>
-        <Send
-          {...props}
-          sendTransaction={onFunction}
-          clearToAddr={onFunction}
-          toggleMenuDrawer={onFunction}
-          setShieldingAmount={onFunction}
-          setScrollToTop={onFunction}
-          setScrollToBottom={onFunction}
-          setServerOption={onFunction}
-        />
+        <Send {...props} />
       </ContextAppLoadedProvider>,
     );
     expect(send.toJSON()).toMatchSnapshot();
@@ -77,16 +67,7 @@ describe('Component Send - test', () => {
     const props = makeDrawerProps();
     const send = render(
       <ContextAppLoadedProvider value={state}>
-        <Send
-          {...props}
-          sendTransaction={onFunction}
-          clearToAddr={onFunction}
-          toggleMenuDrawer={onFunction}
-          setShieldingAmount={onFunction}
-          setScrollToTop={onFunction}
-          setScrollToBottom={onFunction}
-          setServerOption={onFunction}
-        />
+        <Send {...props} />
       </ContextAppLoadedProvider>,
     );
     expect(send.toJSON()).toMatchSnapshot();

@@ -18,7 +18,6 @@ import {
   SelectServerEnum,
   ServerType,
   ServerUrisType,
-  SetServerResult,
   SnackbarDurationEnum,
 } from '@app/AppState';
 import { offlineServer, remoteServer } from '@app/AppState/types/ServerType';
@@ -35,26 +34,17 @@ import { AXIS_PT, axisEnter, axisExit } from '@ui/widgets/OnboardingStage';
 import ServerList from '@screens/ServerList';
 import Server from './Server';
 
+// The Server screen inside the wallet: a choice reconnects the open wallet,
+// and a server on another network goes to the recovery screen.
 type WalletServerProps = NativeStackScreenProps<
   AppDrawerParamList,
   RouteEnum.Server
-> & {
-  setServerOption: (
-    value: ServerType,
-    selectServer: SelectServerEnum,
-    toast: boolean,
-    sameServerChainName: boolean,
-  ) => Promise<SetServerResult>;
-};
+>;
 
-// The Server screen inside the wallet: a choice reconnects the open wallet,
-// and a server on another network goes to the recovery screen.
-const WalletServer: React.FC<WalletServerProps> = ({
-  navigation,
-  setServerOption,
-}) => {
+const WalletServer: React.FC<WalletServerProps> = ({ navigation }) => {
   const { colors } = useTheme();
   const {
+    setServerOption,
     translate,
     server,
     selectServer,
@@ -190,7 +180,7 @@ const WalletServer: React.FC<WalletServerProps> = ({
     if (navigation.canGoBack()) {
       navigation.goBack();
     } else {
-      navigation.navigate(RouteEnum.HomeStack);
+      navigation.navigate(RouteEnum.Home);
     }
   };
 

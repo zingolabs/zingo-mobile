@@ -38,11 +38,10 @@ describe('Component Address Book - test', () => {
     const state = { ...defaultAppContextLoaded };
     state.addressBook = mockAddressBook;
     state.translate = mockTranslate;
-    const onSet = jest.fn();
     const props = makeDrawerProps();
     const ab: RenderResult = render(
       <ContextAppLoadedProvider value={state}>
-        <AddressBook {...props} setAddressBook={onSet} />
+        <AddressBook {...props} />
       </ContextAppLoadedProvider>,
     );
     expect(ab.toJSON()).toMatchSnapshot();

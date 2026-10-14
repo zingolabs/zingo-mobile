@@ -87,7 +87,7 @@ export type SeedBackupEntry =
  */
 export type AppDrawerParamList = {
   // Drawer no params
-  [RouteEnum.HomeStack]: NavigatorScreenParams<HomeTabParamList> | undefined;
+  [RouteEnum.Home]: NavigatorScreenParams<HomeTabParamList> | undefined;
   [RouteEnum.History]: undefined;
   [RouteEnum.Send]: undefined;
   [RouteEnum.Receive]: undefined;

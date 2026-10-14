@@ -23,20 +23,19 @@ import { RouteEnum, ScreenEnum, SnackbarDurationEnum } from '@app/AppState';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
 
-type RescanProps = NativeStackScreenProps<
-  AppDrawerParamList,
-  RouteEnum.Rescan
-> & {
-  doRescan: () => Promise<void>;
-};
+type RescanProps = NativeStackScreenProps<AppDrawerParamList, RouteEnum.Rescan>;
 
-const Rescan: React.FunctionComponent<RescanProps> = ({
-  navigation,
-  doRescan,
-}) => {
+const Rescan: React.FunctionComponent<RescanProps> = ({ navigation }) => {
   const context = useContext(ContextAppLoaded);
-  const { birthday, translate, netInfo, addLastSnackbar, server, biometrics } =
-    context;
+  const {
+    doRescan,
+    birthday,
+    translate,
+    netInfo,
+    addLastSnackbar,
+    server,
+    biometrics,
+  } = context;
   const { colors } = useTheme();
   const screenName = ScreenEnum.Rescan;
 

@@ -131,18 +131,11 @@ const sendUi = (
   state.netInfo = inputs.netInfo;
   state.mixnetView = inputs.mixnetView;
   state.sendPermitNow = () => sendPermit(appState);
+  state.sendTransaction = sendTransaction;
+  state.setServerOption = setServerOption;
   return (
     <ContextAppLoadedProvider value={state}>
-      <Send
-        {...makeDrawerProps()}
-        sendTransaction={sendTransaction}
-        clearToAddr={jest.fn()}
-        toggleMenuDrawer={jest.fn()}
-        setShieldingAmount={jest.fn()}
-        setScrollToTop={jest.fn()}
-        setScrollToBottom={jest.fn()}
-        setServerOption={setServerOption}
-      />
+      <Send {...makeDrawerProps()} />
     </ContextAppLoadedProvider>
   );
 };

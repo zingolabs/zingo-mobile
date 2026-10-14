@@ -95,13 +95,10 @@ test('Tests that tapping the warning in Settings saves the recovery info and sho
       <Settings
         {...props}
         setCurrencyOption={jest.fn()}
-        setLanguageOption={jest.fn()}
         setSendAllOption={jest.fn()}
         setDonationOption={jest.fn()}
         setPrivacyOption={jest.fn()}
         setModeOption={jest.fn()}
-        setBiometricsOption={jest.fn()}
-        closeScreen={jest.fn()}
       />
     </ContextAppLoadedProvider>,
   );

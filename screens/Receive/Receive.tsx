@@ -32,7 +32,6 @@ import {
   ChainNameEnum,
   UnifiedAddressClass,
   TransparentAddressClass,
-  AddressBookFileClass,
   ScreenEnum,
   SnackbarDurationEnum,
   RouteEnum,
@@ -54,25 +53,12 @@ import { safeSnapToIndex } from '@app/utils/safeSnapToIndex';
 type ReceiveProps = NativeStackScreenProps<
   AppDrawerParamList,
   RouteEnum.Receive
-> & {
-  toggleMenuDrawer: () => void;
-  alone: boolean;
-  setAddressBook: (ab: AddressBookFileClass[]) => void;
-};
+>;
 
-const Receive: React.FunctionComponent<ReceiveProps> = ({
-  // side menu
-  toggleMenuDrawer,
-  navigation,
-  // balance
-  // privacy
-  // shielding
-  // for receive
-  alone: _alone,
-  setAddressBook,
-}) => {
+const Receive: React.FunctionComponent<ReceiveProps> = ({ navigation }) => {
   const context = useContext(ContextAppLoaded);
   const {
+    setAddressBook,
     translate,
     addresses,
     defaultUnifiedAddress,
@@ -450,7 +436,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
         <Header
           title={''}
           screenName={screenName}
-          toggleMenuDrawer={toggleMenuDrawer}
           setPrivacyOption={setPrivacyOption}
           addLastSnackbar={addLastSnackbar}
           showMessagesIcon={true}

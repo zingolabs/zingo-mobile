@@ -130,7 +130,6 @@ function renderBook(
           name: RouteEnum.AddressBook,
           params: undefined,
         }}
-        setAddressBook={jest.fn()}
       />
     </ContextAppLoadedProvider>,
   );
@@ -184,8 +183,8 @@ async function saveTag(
     <ContextAppLoadedProvider value={context}>
       <NewAddress
         addressKind={kind}
-        closeSheet={closeSheet}
         setAddressBook={setAddressBook}
+        closeSheet={closeSheet}
         screenName={ScreenEnum.Receive}
       />
     </ContextAppLoadedProvider>,

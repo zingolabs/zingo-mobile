@@ -52,10 +52,8 @@ describe('Component Header - test', () => {
           title="title"
           screenName={ScreenEnum.History}
           testID="valuetransfer text"
-          toggleMenuDrawer={onFunction}
           setBackgroundError={onFunction}
           addLastSnackbar={onFunction}
-          setShieldingAmount={onFunction}
         />
       </ContextAppLoadedProvider>,
     );

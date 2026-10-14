@@ -63,17 +63,10 @@ const renderSettings = async (
         walletChainName,
         readOnly,
         selectServer: SelectServerEnum.auto,
+        restoreBackup: onRestoreWalletBackup,
       }}
     >
-      <Settings
-        {...props}
-        setLanguageOption={jest.fn()}
-        setBiometricsOption={jest.fn()}
-        setPerformanceLevelOption={jest.fn()}
-        setBlockExplorerOption={jest.fn()}
-        toggleMenuDrawer={jest.fn()}
-        onRestoreWalletBackup={onRestoreWalletBackup}
-      />
+      <Settings {...props} />
     </ContextAppLoadedProvider>,
   );
   const title = await screen.findByText('settings.privacy-title');

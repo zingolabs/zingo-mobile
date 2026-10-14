@@ -73,34 +73,24 @@ import { sendEmail } from '@app/services/sendEmail';
 import SwitchOff from '../../assets/img/switch-off.svg';
 import SettingSwitchOn from '../../assets/img/setting-switch-on.svg';
 
-type SettingsProps = NativeStackScreenProps<
-  AppDrawerParamList,
-  RouteEnum.Settings
-> & {
-  setLanguageOption: (value: LanguageEnum) => Promise<void>;
-  setBiometricsOption: (value: boolean) => Promise<void>;
-  setPerformanceLevelOption: (value: RPCPerformanceLevelEnum) => Promise<void>;
-  setBlockExplorerOption: (value: BlockExplorerEnum) => Promise<void>;
-  toggleMenuDrawer: () => void;
-  onRestoreWalletBackup: () => Promise<void>;
-};
-
 type Options = {
   value: string;
   text: string;
 };
 
-const Settings: React.FunctionComponent<SettingsProps> = ({
-  navigation,
-  setLanguageOption,
-  setBiometricsOption,
-  setPerformanceLevelOption,
-  setBlockExplorerOption,
-  toggleMenuDrawer,
-  onRestoreWalletBackup,
-}) => {
+type SettingsProps = NativeStackScreenProps<
+  AppDrawerParamList,
+  RouteEnum.Settings
+>;
+
+const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
   const context = useContext(ContextAppLoaded);
   const {
+    setLanguageOption,
+    setBiometricsOption,
+    setPerformanceLevelOption,
+    setBlockExplorerOption,
+    restoreBackup,
     translate,
     language: languageContext,
     privacy: privacyContext,
@@ -372,7 +362,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     if (navigation.canGoBack()) {
       navigation.goBack();
     } else {
-      navigation.navigate(RouteEnum.HomeStack);
+      navigation.navigate(RouteEnum.Home);
     }
   };
   saveSettingsRef.current = saveSettings;
@@ -386,14 +376,14 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       setPerformanceLevel(performanceLevelContext);
       setBlockExplorer(blockExplorerContext);
     }
-    // `goBack()` pops Settings off the stack — using `navigate(HomeStack)`
-    // would push HomeStack on top while leaving the already-authenticated
+    // `goBack()` pops Settings off the stack — using `navigate(Home)`
+    // would push Home on top while leaving the already-authenticated
     // Settings instance alive in the stack, allowing a back gesture to
     // bypass the biometric gate.
     if (navigation.canGoBack()) {
       navigation.goBack();
     } else {
-      navigation.navigate(RouteEnum.HomeStack);
+      navigation.navigate(RouteEnum.Home);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -595,7 +585,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
             screenName={screenName}
             noBalance={true}
             noSyncingStatus={true}
-            toggleMenuDrawer={toggleMenuDrawer}
             noPrivacy={true}
           />
         </View>
@@ -983,7 +972,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                                         ? 'settings.restorebackup-switch'
                                         : 'confirm',
                                     ) as string,
-                                    onPress: onRestoreWalletBackup,
+                                    onPress: restoreBackup,
                                   },
                                   {
                                     text: translate('cancel') as string,
