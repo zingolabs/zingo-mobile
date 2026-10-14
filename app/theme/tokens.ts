@@ -36,6 +36,10 @@ export type ThemeColors = {
   // View-only (watch-only) wallet marks: the snowflake and its tiles.
   fgViewOnly: string;
   fgDangerEmphasis: string;
+  // Fill of a destructive action.
+  bgDanger: string;
+  // The grab pill at the top of a bottom sheet.
+  sheetHandle: string;
 };
 
 const base = {
@@ -59,6 +63,8 @@ const base = {
 
   fgViewOnly: '#8FB4E6',
   fgDangerEmphasis: '#dc2626',
+  bgDanger: '#E5484D',
+  sheetHandle: '#1B3C6B',
 } as const;
 
 export const themeTokens: ThemeColors = {
