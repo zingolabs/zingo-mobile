@@ -1,6 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import React, { useEffect, useState } from 'react';
-import { Pressable, ScrollView, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import Animated, {
   FadeIn,
   FadeOut,
@@ -624,7 +625,8 @@ const Server: React.FunctionComponent<ServerProps> = ({
         ))}
       </Animated.View>
 
-      <ScrollView
+      <KeyboardAwareScrollView
+        bottomOffset={16}
         style={{
           position: 'absolute',
           left: 0,
@@ -687,7 +689,7 @@ const Server: React.FunctionComponent<ServerProps> = ({
             }}
           />
         </Animated.View>
-      </ScrollView>
+      </KeyboardAwareScrollView>
 
       <DoneButton
         testID="server.done"
