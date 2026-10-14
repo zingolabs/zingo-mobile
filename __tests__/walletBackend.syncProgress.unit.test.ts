@@ -1,4 +1,7 @@
-import { scanInProgress } from '@app/walletBackend/utils/syncProgress';
+import {
+  rescanStep,
+  scanInProgress,
+} from '@app/walletBackend/utils/syncProgress';
 import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
 
 const status = (s: Partial<RPCSyncStatusType>) => s as RPCSyncStatusType;
@@ -55,5 +58,37 @@ describe('scanInProgress', () => {
         status({ scan_ranges: [{}] as RPCSyncStatusType['scan_ranges'] }),
       ),
     ).toBe(true);
+  });
+});
+
+describe('rescanStep', () => {
+  const ranges = [{}] as RPCSyncStatusType['scan_ranges'];
+  const running = status({
+    scan_ranges: ranges,
+    percentage_total_outputs_scanned: 40,
+  });
+  const done = status({
+    scan_ranges: ranges,
+    percentage_total_outputs_scanned: 100,
+  });
+
+  test('Tests that a started rescan keeps going when a finished status of the previous sync arrives', () => {
+    expect(rescanStep('started', done)).toBe('started');
+  });
+
+  test('Tests that a started rescan turns scanning when its sync shows running', () => {
+    expect(rescanStep('started', running)).toBe('scanning');
+  });
+
+  test('Tests that a scanning rescan ends when its sync reaches the tip', () => {
+    expect(rescanStep('scanning', done)).toBe('none');
+  });
+
+  test('Tests that a scanning rescan keeps going when the status is empty', () => {
+    expect(rescanStep('scanning', status({}))).toBe('scanning');
+  });
+
+  test('Tests that no rescan stays none when a sync runs', () => {
+    expect(rescanStep('none', running)).toBe('none');
   });
 });

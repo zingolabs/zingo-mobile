@@ -123,6 +123,7 @@ import {
 import LoadedAppOptionsPanelHost from './LoadedAppOptionsPanelHost';
 import { MessageList } from '@screens/Messages';
 import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
+import { rescanStep } from '@app/walletBackend/utils/syncProgress';
 import { RPCUfvkType } from '@app/walletBackend/types/RPCUfvkType';
 import {
   INITIAL_MIXNET_VIEW,
@@ -696,6 +697,7 @@ export class LoadedAppClass extends Component<
             : CurrencyNameEnum.TAZ,
       } as InfoType,
       syncingStatus: {} as RPCSyncStatusType,
+      rescan: 'none',
       birthday: 0,
       defaultUnifiedAddress: '',
       zecPrice: {
@@ -1183,6 +1185,10 @@ export class LoadedAppClass extends Component<
       //const start = Date.now();
       this.setState({ syncingStatus });
     }
+    const rescan = rescanStep(this.state.rescan, syncingStatus);
+    if (rescan !== this.state.rescan) {
+      this.setState({ rescan });
+    }
   };
 
   setMixnetView = (mixnetView: MixnetView) => {
@@ -1508,6 +1514,7 @@ export class LoadedAppClass extends Component<
     // in the rescan case if the shield button is visible
     // we need to hide it fast.
     this.setShieldingAmount(0);
+    this.setState({ rescan: 'started' });
     await this.rpc.refreshSync(true);
   };
 
@@ -2071,6 +2078,7 @@ export class LoadedAppClass extends Component<
       messages: this.state.messages,
       messagesTotal: this.state.messagesTotal,
       syncingStatus: this.state.syncingStatus,
+      rescan: this.state.rescan,
       info: this.state.info,
       zecPrice: this.state.zecPrice,
       defaultUnifiedAddress: this.state.defaultUnifiedAddress,

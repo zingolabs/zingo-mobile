@@ -13,3 +13,23 @@ export function scanInProgress(ss: RPCSyncStatusType): boolean {
       0) < 100
   );
 }
+
+export type RescanState = 'none' | 'started' | 'scanning';
+
+/**
+ * Moves a user rescan on with each sync status. It ends only after a status
+ * has shown its sync running, so a finished status of the sync the rescan
+ * replaced, still in flight, cannot end it at once.
+ */
+export function rescanStep(
+  state: RescanState,
+  ss: RPCSyncStatusType,
+): RescanState {
+  if (state === 'started' && scanInProgress(ss)) {
+    return 'scanning';
+  }
+  if (state === 'scanning' && !!ss.scan_ranges?.length && !scanInProgress(ss)) {
+    return 'none';
+  }
+  return state;
+}

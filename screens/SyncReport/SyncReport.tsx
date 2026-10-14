@@ -113,6 +113,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
 }) => {
   const {
     syncingStatus,
+    rescan: rescanState,
     birthday,
     translate,
     backgroundSyncInfo,
@@ -145,8 +146,10 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
   const turn = useSharedValue(0);
   const pulse = useSharedValue(1);
 
+  /** Only a user rescan pulses; the sync of new blocks after it does not. */
+  const rescanning = rescanState !== 'none';
   useEffect(() => {
-    pulse.value = syncInProgress
+    pulse.value = rescanning
       ? withRepeat(
           withSequence(
             withTiming(0.45, { duration: PULSE_MS }),
@@ -155,7 +158,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
           -1,
         )
       : withTiming(1, { duration: PULSE_MS });
-  }, [syncInProgress, pulse]);
+  }, [rescanning, pulse]);
 
   const arrowsStyle = useAnimatedStyle(() => ({
     transform: [{ rotate: `${turn.value}deg` }],

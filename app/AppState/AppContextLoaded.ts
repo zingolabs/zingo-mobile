@@ -18,6 +18,7 @@ import { SnackbarDurationEnum } from './enums/SnackbarDurationEnum';
 import { LoadedAppNavigationState } from '@app/types';
 import ValueTransferType from './types/ValueTransferType';
 import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
+import { RescanState } from '@app/walletBackend/utils/syncProgress';
 import TransparentAddressClass from './classes/TransparentAddressClass';
 import { ScreenEnum } from './enums/ScreenEnum';
 import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
@@ -51,6 +52,9 @@ export default interface AppContextLoaded {
 
   // syncing Info about the status of the process
   syncingStatus: RPCSyncStatusType;
+
+  // where a user rescan stands
+  rescan: RescanState;
 
   // wallet birthday block height
   birthday: number;
