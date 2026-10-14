@@ -47,7 +47,6 @@ import {
   ServerUrisType,
   SetServerResult,
   AddressBookFileClass,
-  MenuItemEnum,
   LanguageEnum,
   SelectServerEnum,
   ChainNameEnum,
@@ -107,8 +106,10 @@ import ConfirmBottomSheet from '@ui/widgets/ConfirmBottomSheet';
 import FadeInOnMount from '@ui/widgets/FadeInOnMount';
 import { showConfirm } from '@app/services/showConfirm';
 import { WalletNavigator } from '@app/navigation/WalletNavigator';
-import { OptionsPanelProvider } from '@app/context/optionsPanel';
-import LoadedAppOptionsPanelHost from './LoadedAppOptionsPanelHost';
+import {
+  closeOptionsPanel,
+  OptionsPanelProvider,
+} from '@app/context/optionsPanel';
 import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
 import { RPCUfvkType } from '@app/walletBackend/types/RPCUfvkType';
 import {
@@ -926,6 +927,7 @@ export class LoadedAppClass extends Component<
     }
     this.props.clearLink();
     await this.readUrl(url);
+    closeOptionsPanel();
     navigateWallet({
       screen: RouteEnum.Home,
       params: { screen: RouteEnum.Send },
@@ -1443,57 +1445,6 @@ export class LoadedAppClass extends Component<
     if (!isEqual(this.state.birthday, birthday)) {
       //const start = Date.now();
       this.setState({ birthday });
-    }
-  };
-
-  onMenuItemSelected = async (item: MenuItemEnum) => {
-    // Depending on the menu item, open the appropriate screen
-    if (item === MenuItemEnum.About) {
-      navigateWallet({ screen: RouteEnum.About });
-      return;
-    } else if (item === MenuItemEnum.Rescan) {
-      navigateWallet({ screen: RouteEnum.Rescan });
-      return;
-    } else if (item === MenuItemEnum.SyncReport) {
-      navigateWallet({ screen: RouteEnum.SyncReport });
-      return;
-    } else if (item === MenuItemEnum.FundPools) {
-      navigateWallet({ screen: RouteEnum.Pools });
-      return;
-    } else if (item === MenuItemEnum.Insight) {
-      navigateWallet({ screen: RouteEnum.Insight });
-      return;
-    } else if (item === MenuItemEnum.WalletSeedUfvk) {
-      if (this.state.readOnly) {
-        navigateWallet({
-          screen: RouteEnum.ViewingKey,
-          params: { entry: { kind: 'push' } },
-        });
-      } else {
-        navigateWallet({ screen: RouteEnum.WalletSeed });
-      }
-      return;
-    } else if (item === MenuItemEnum.ChangeWallet) {
-      navigateWallet({
-        screen: RouteEnum.WalletSeed,
-        params: { action: 'change' },
-      });
-      return;
-    } else if (item === MenuItemEnum.Settings) {
-      // Bio gate for settingsScreen lives at the Settings screen entry
-      // (screens/Settings/Settings.tsx).
-      navigateWallet({ screen: RouteEnum.Settings });
-      return;
-    } else if (item === MenuItemEnum.AddressBook) {
-      navigateWallet({ screen: RouteEnum.AddressBook });
-      return;
-    } else if (item === MenuItemEnum.Server) {
-      navigateWallet({ screen: RouteEnum.Server });
-      return;
-    } else if (item === MenuItemEnum.Support) {
-      this.setShowSwipeableIcons(false);
-      await sendEmail(this.state.translate, this.state.zingolibVersion);
-      this.setShowSwipeableIcons(true);
     }
   };
 
@@ -2083,14 +2034,9 @@ export class LoadedAppClass extends Component<
               <BottomSheetBackHandler />
               <ConfirmBottomSheet />
               <OptionsPanelProvider>
-                <LoadedAppOptionsPanelHost
-                  onMenuItemSelected={this.onMenuItemSelected}
-                  zingolibVersion={this.state.zingolibVersion}
-                >
-                  <FadeInOnMount duration={HOME_FADE_MS}>
-                    <WalletNavigator />
-                  </FadeInOnMount>
-                </LoadedAppOptionsPanelHost>
+                <FadeInOnMount duration={HOME_FADE_MS}>
+                  <WalletNavigator />
+                </FadeInOnMount>
               </OptionsPanelProvider>
               <AddTagModalHost
                 ref={this.addTagModalRef}

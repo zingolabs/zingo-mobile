@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react';
+import type { NavigatorScreenParams } from '@react-navigation/native';
 
 import { OptionsPanelHost } from '@screens/OptionsPanel';
 import type {
@@ -6,9 +7,11 @@ import type {
   OptionsPanelSocial,
 } from '@screens/OptionsPanel';
 import { closeOptionsPanel, useOptionsPanel } from '@app/context/optionsPanel';
+import { navigateWallet } from '@app/navigation/navigate';
 import { probeUri } from '@app/services/serverPicking';
 import { ContextAppLoaded } from '@app/context';
-import { MenuItemEnum } from '@app/AppState';
+import { MenuItemEnum, RouteEnum } from '@app/AppState';
+import { AppDrawerParamList } from '@app/types';
 import { sendEmail } from '@app/services/sendEmail';
 import ServerIcon from '@ui/widgets/ServerIcon';
 
@@ -37,22 +40,57 @@ const MENU_TEST_IDS: Partial<Record<MenuItemEnum, string>> = {
   [MenuItemEnum.Server]: 'menu.server',
 };
 
+type PanelItem =
+  | MenuItemEnum.AddressBook
+  | MenuItemEnum.WalletSeedUfvk
+  | MenuItemEnum.Rescan
+  | MenuItemEnum.SyncReport
+  | MenuItemEnum.FundPools
+  | MenuItemEnum.Insight
+  | MenuItemEnum.ChangeWallet
+  | MenuItemEnum.Server
+  | MenuItemEnum.Settings;
+
+/** The wallet screen a panel item opens. */
+const walletScreen = (
+  item: PanelItem,
+  readOnly: boolean,
+): NavigatorScreenParams<AppDrawerParamList> => {
+  switch (item) {
+    case MenuItemEnum.AddressBook:
+      return { screen: RouteEnum.AddressBook };
+    case MenuItemEnum.WalletSeedUfvk:
+      return readOnly
+        ? { screen: RouteEnum.ViewingKey, params: { entry: { kind: 'push' } } }
+        : { screen: RouteEnum.WalletSeed };
+    case MenuItemEnum.Rescan:
+      return { screen: RouteEnum.Rescan };
+    case MenuItemEnum.SyncReport:
+      return { screen: RouteEnum.SyncReport };
+    case MenuItemEnum.FundPools:
+      return { screen: RouteEnum.Pools };
+    case MenuItemEnum.Insight:
+      return { screen: RouteEnum.Insight };
+    case MenuItemEnum.ChangeWallet:
+      return { screen: RouteEnum.WalletSeed, params: { action: 'change' } };
+    case MenuItemEnum.Server:
+      return { screen: RouteEnum.Server };
+    case MenuItemEnum.Settings:
+      return { screen: RouteEnum.Settings };
+  }
+};
+
 type LoadedAppOptionsPanelHostProps = {
-  onMenuItemSelected: (item: MenuItemEnum) => void;
-  zingolibVersion: string;
   children: React.ReactNode;
 };
 
 /**
  * Wires the global OptionsPanel content for the LoadedApp tree: builds the
  * actions grid from MenuItemEnum, the 3 socials (X / GitHub copy-URL, mail
- * launches the device composer).
- * Stays in a functional component so it can consume ContextAppLoaded and the
- * OptionsPanel context naturally (LoadedApp itself is a class).
+ * launches the device composer). An item sinks the panel under the screen
+ * it pushes, so the panel is there again when that screen pops.
  */
 const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
-  onMenuItemSelected,
-  zingolibVersion,
   children,
 }) => {
   const context = useContext(ContextAppLoaded);
@@ -63,8 +101,9 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
     server,
     netInfo,
     seedBackedUp,
+    zingolibVersion,
   } = context;
-  const { isOpen } = useOptionsPanel();
+  const { isOpen, sink } = useOptionsPanel();
 
   // The Server tile's dot turns red when the server doesn't answer; it is
   // asked each time the panel opens.
@@ -87,14 +126,13 @@ const LoadedAppOptionsPanelHost: React.FC<LoadedAppOptionsPanelHostProps> = ({
 
   // Audit Issue D — bio gates moved into the destination screens
   // themselves (WalletSeed.tsx, ViewingKey.tsx, Rescan.tsx, Settings.tsx) so
-  // every navigation path is funnelled through the same check. Dispatch
-  // just closes the panel and forwards the menu selection.
+  // every navigation path is funnelled through the same check.
   const dispatch = useMemo(
-    () => (item: MenuItemEnum) => {
-      closeOptionsPanel();
-      onMenuItemSelected(item);
+    () => (item: PanelItem) => {
+      sink();
+      navigateWallet(walletScreen(item, readOnly));
     },
-    [onMenuItemSelected],
+    [sink, readOnly],
   );
 
   // Visibility rules mirror the legacy Menu.tsx so the grid behaves the

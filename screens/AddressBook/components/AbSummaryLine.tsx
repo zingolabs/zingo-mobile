@@ -30,6 +30,7 @@ import {
 } from '@app/AppState';
 import Utils from '@app/utils';
 import { ContextAppLoaded } from '@app/context';
+import { closeOptionsPanel } from '@app/context/optionsPanel';
 import { ChainLogo } from '@ui/widgets/ChainSelect';
 
 type AbSummaryLineProps = {
@@ -249,6 +250,7 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
                   );
                   sendPageState.toaddr.to = item.address;
                   setSendPageState(sendPageState);
+                  closeOptionsPanel();
                   navigation.navigate(RouteEnum.Home, {
                     screen: RouteEnum.Send,
                   });
