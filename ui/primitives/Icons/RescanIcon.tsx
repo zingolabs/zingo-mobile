@@ -1,8 +1,5 @@
 import React from 'react';
-import Svg, { Circle, Path, Rect } from 'react-native-svg';
-import { Icon } from '@ui/primitives/Icons/Icon';
-
-const GREEN = '#37D41F';
+import Svg, { Path } from 'react-native-svg';
 
 type Sized = { size?: number };
 
@@ -33,50 +30,5 @@ export function RescanArrows({ size = 25 }: Sized) {
         fill="#149D05"
       />
     </Svg>
-  );
-}
-
-export function OkCircleIcon({ size = 18 }: Sized) {
-  return (
-    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-      <Circle cx={12} cy={12} r={10} fill="#149D05" />
-      <Path
-        d="m7.5 12.3 3 3 6-6.3"
-        stroke="#06200A"
-        strokeWidth={2.4}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </Svg>
-  );
-}
-
-export function BlocksIcon({ size = 17 }: Sized) {
-  return (
-    <Icon size={size} color={GREEN} strokeWidth={1.9}>
-      <Rect x={3} y={3} width={7} height={7} rx={1.5} />
-      <Rect x={14} y={3} width={7} height={7} rx={1.5} />
-      <Rect x={3} y={14} width={7} height={7} rx={1.5} />
-      <Rect x={14} y={14} width={7} height={7} rx={1.5} />
-    </Icon>
-  );
-}
-
-export function ClockIcon({ size = 17 }: Sized) {
-  return (
-    <Icon size={size} color={GREEN} strokeWidth={1.9}>
-      <Circle cx={12} cy={12} r={9} />
-      <Path d="M12 7v5l3 2" />
-    </Icon>
-  );
-}
-
-export function HalfIcon({ size = 17 }: Sized) {
-  return (
-    <Icon size={size} color={GREEN} strokeWidth={1.9}>
-      <Circle cx={12} cy={12} r={9} />
-      <Path d="M12 3v18" />
-      <Path d="M12 3a9 9 0 0 1 0 18" fill={GREEN} fillOpacity={0.35} />
-    </Icon>
   );
 }

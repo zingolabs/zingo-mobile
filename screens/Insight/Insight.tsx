@@ -17,6 +17,8 @@ import { ContextAppLoaded } from '@app/context';
 import Utils from '@app/utils';
 import { ChevronLeft } from '@ui/primitives/Icons/Chevron';
 import { UserPlusIcon } from '@ui/primitives/Icons/UserPlusIcon';
+import CurrencyAmount from '@ui/widgets/CurrencyAmount';
+import ZecAmount from '@ui/widgets/ZecAmount';
 import Header from '@ui/widgets/Header';
 import ActivityChart from '@screens/Insight/components/ActivityChart';
 import Donut from '@screens/Insight/components/Donut';
@@ -32,6 +34,7 @@ import {
 const SIDE = 21.5;
 const SOFT_INK = '#8DA0B8';
 const HINT_INK = '#7D93B3';
+const CODE_INK = '#B9C6D6';
 const ROW_LINE = '#0A1F3D';
 const SELECTED = 'rgba(143,180,230,0.08)';
 const THUMB_BG = '#0A2A1A';
@@ -56,14 +59,19 @@ type InsightProps = NativeStackScreenProps<
   RouteEnum.Insight
 >;
 
-const shortAddress = (address: string): string =>
-  address.length > 20 ? `${address.slice(0, 7)}…${address.slice(-7)}` : address;
-
 // What the wallet sent and to whom: weekly activity, the share per recipient
 // and the ranked recipients, by amount or by number of sends.
 const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
-  const { translate, valueTransfers, addressBook, zecPrice, language } =
-    useContext(ContextAppLoaded);
+  const {
+    translate,
+    valueTransfers,
+    addressBook,
+    zecPrice,
+    language,
+    info,
+    privacy,
+    launchAddTagModal,
+  } = useContext(ContextAppLoaded);
   const { colors } = useTheme();
   const insight = buildInsight(valueTransfers ?? [], addressBook, new Date());
   const last = insight.weeks - 1;
@@ -86,18 +94,12 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
   }));
 
   const price = zecPrice.zecPrice;
-  const usd = (zec: number): string =>
-    price > 0
-      ? '$ ' +
-        (zec * price).toLocaleString('en-US', {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        })
-      : '';
+  const zecText = (zec: number): string =>
+    privacy ? '-.----' : Utils.parseNumberFloatToStringLocale(zec, 4);
   const sendsText = (n: number): string =>
     `${n} ${translate(n === 1 ? 'insight.send' : 'insight.sends-unit') as string}`;
   const value = (v: number): string =>
-    metric === 'amount' ? v.toFixed(4) : sendsText(v);
+    metric === 'amount' ? zecText(v) : sendsText(v);
   const day = (date: Date) =>
     Utils.formatDate(date.getTime(), 'MMM d', language);
   const weekStart = (w: number) =>
@@ -107,7 +109,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
   const name = (group: Group): string =>
     group.kind === 'others'
       ? (translate('insight.others') as string)
-      : group.name || shortAddress(group.address);
+      : group.name || Utils.trimToSmall(group.address, 7);
 
   const pickMetric = (next: Metric) => {
     if (next === metric) {
@@ -156,16 +158,41 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
     .filter(s => s.value > 0);
   const total = slices.reduce((s, x) => s + x.value, 0);
   const focus = slices.find(s => s.g === selected);
-  const centerValue =
-    slices.length === 0
-      ? (translate('insight.nothing') as string)
-      : metric === 'amount'
-        ? (focus ? focus.value : total).toFixed(4)
-        : String(focus ? focus.value : total);
-  const centerUsd =
-    slices.length > 0 && metric === 'amount'
-      ? usd(focus ? focus.value : total)
-      : '';
+  const centerAmount = focus ? focus.value : total;
+  const center =
+    slices.length > 0 && metric === 'amount' ? (
+      <>
+        <ZecAmount
+          testID="insight.donut.value"
+          currencyName={info.currencyName}
+          size={20}
+          amtZec={centerAmount}
+          privacy={privacy}
+        />
+        {price > 0 && (
+          <CurrencyAmount
+            price={price}
+            amtZec={centerAmount}
+            privacy={privacy}
+            style={{ fontSize: 12.5, fontWeight: '600', color: CODE_INK }}
+          />
+        )}
+      </>
+    ) : (
+      <Text
+        testID="insight.donut.value"
+        style={{
+          color: colors.fgDefault,
+          fontSize: 22,
+          lineHeight: 26,
+          fontWeight: '700',
+        }}
+      >
+        {slices.length === 0
+          ? (translate('insight.nothing') as string)
+          : String(centerAmount)}
+      </Text>
+    );
   const caption =
     slices.length === 0
       ? (translate('insight.in-range') as string)
@@ -424,8 +451,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
             slices={slices}
             selected={selected}
             onSelect={setSelected}
-            value={centerValue}
-            usd={centerUsd}
+            center={center}
             caption={caption}
           />
         </View>
@@ -549,25 +575,52 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
                       </View>
                     </View>
                     <View style={{ alignItems: 'flex-end' }}>
-                      <Text
-                        style={{
-                          color: colors.fgDefault,
-                          fontSize: 13,
-                          lineHeight: 18,
-                          fontWeight: '700',
-                        }}
+                      {metric === 'amount' ? (
+                        <ZecAmount
+                          testID={`insight.row.${s.g}.value`}
+                          currencyName={info.currencyName}
+                          size={13}
+                          amtZec={s.value}
+                          privacy={privacy}
+                          smallPrefix
+                        />
+                      ) : (
+                        <Text
+                          style={{
+                            color: colors.fgDefault,
+                            fontSize: 13,
+                            lineHeight: 18,
+                            fontWeight: '700',
+                          }}
+                        >
+                          {sendsText(s.value)}
+                        </Text>
+                      )}
+                      <View
+                        style={{ flexDirection: 'row', alignItems: 'baseline' }}
                       >
-                        {value(s.value)}
-                      </Text>
-                      <Text
-                        style={{
-                          color: SOFT_INK,
-                          fontSize: 11.5,
-                          lineHeight: 16,
-                        }}
-                      >
-                        {`${Math.round(share * 100)}%${usd(t.amount) ? ` · ${usd(t.amount)}` : ''}`}
-                      </Text>
+                        <Text
+                          style={{
+                            color: SOFT_INK,
+                            fontSize: 11.5,
+                            lineHeight: 16,
+                          }}
+                        >
+                          {`${Math.round(share * 100)}%${price > 0 ? ' · ' : ''}`}
+                        </Text>
+                        {price > 0 && (
+                          <CurrencyAmount
+                            price={price}
+                            amtZec={t.amount}
+                            privacy={privacy}
+                            style={{
+                              fontSize: 11.5,
+                              fontWeight: '400',
+                              color: SOFT_INK,
+                            }}
+                          />
+                        )}
+                      </View>
                     </View>
                     {canAdd && (
                       <Pressable
@@ -576,12 +629,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
                         accessibilityLabel={
                           translate('insight.add-contact') as string
                         }
-                        onPress={() =>
-                          navigation.navigate(RouteEnum.AddressBook, {
-                            currentAddress: group.address,
-                            routeStack: RouteEnum.Insight,
-                          })
-                        }
+                        onPress={() => launchAddTagModal(group.address)}
                         style={({ pressed }) => ({
                           width: 36,
                           height: 36,
@@ -613,7 +661,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
                         lineHeight: 17,
                       }}
                     >
-                      {`${sendsText(t.sends)} · ZEC ${t.amount.toFixed(4)} · ${t.bytes.toLocaleString('en-US')} ${translate('insight.bytes') as string}`}
+                      {`${sendsText(t.sends)} · ZEC ${zecText(t.amount)} · ${t.bytes.toLocaleString('en-US')} ${translate('insight.bytes') as string}`}
                     </Text>
                   )}
                 </Pressable>

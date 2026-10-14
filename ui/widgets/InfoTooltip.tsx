@@ -25,6 +25,8 @@ type InfoTooltipProps = {
   testID?: string;
   // Label and icon sit at the start of the row instead of centred.
   alignStart?: boolean;
+  // Label and icon sit at the end of the row.
+  alignEnd?: boolean;
   labelStyle?: TextStyle;
   // Shown before the icon in place of the label text, which then only
   // names the icon for accessibility.
@@ -57,6 +59,7 @@ const InfoTooltip: React.FunctionComponent<InfoTooltipProps> = ({
   onToggle,
   testID,
   alignStart,
+  alignEnd,
   labelStyle,
   children,
 }) => {
@@ -98,7 +101,9 @@ const InfoTooltip: React.FunctionComponent<InfoTooltipProps> = ({
       style={
         alignStart
           ? { alignItems: 'flex-start' }
-          : { alignSelf: 'stretch', alignItems: 'center' }
+          : alignEnd
+            ? { alignSelf: 'stretch', alignItems: 'flex-end' }
+            : { alignSelf: 'stretch', alignItems: 'center' }
       }
     >
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>

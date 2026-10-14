@@ -1,26 +1,19 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import {
-  Pressable,
-  ScrollView,
-  Text,
-  useWindowDimensions,
-  View,
-} from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 import Animated, {
-  Keyframe,
   ReduceMotion,
-  useAnimatedProps,
   useAnimatedStyle,
   useSharedValue,
-  withDelay,
   withRepeat,
   withSequence,
   withTiming,
 } from 'react-native-reanimated';
-import Svg, { Circle, Path, Rect, Text as SvgText } from 'react-native-svg';
+import Svg, { Path, Rect, Text as SvgText } from 'react-native-svg';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { faXmark } from '@fortawesome/free-solid-svg-icons';
 
 import { useTheme } from '@app/theme';
 import { ease } from '@app/theme/motion';
@@ -36,16 +29,17 @@ import {
 } from '@app/services/gateController';
 import Utils from '@app/utils';
 import AppSheetModal from '@ui/primitives/AppSheetModal';
+import BoldText from '@ui/primitives/BoldText';
+import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
+import CircularProgress from '@ui/primitives/CircularProgress';
+import InfoTooltip from '@ui/widgets/InfoTooltip';
 import { ChevronLeft } from '@ui/primitives/Icons/Chevron';
 import Header from '@ui/widgets/Header';
-import {
-  BlocksIcon,
-  ClockIcon,
-  HalfIcon,
-  OkCircleIcon,
-  RescanArrows,
-  RescanCloud,
-} from '@screens/SyncReport/components/SyncIcons';
+import { BlocksIcon } from '@ui/primitives/Icons/BlocksIcon';
+import { CheckCircleIcon } from '@ui/primitives/Icons/CheckCircleIcon';
+import { ClockIcon } from '@ui/primitives/Icons/ClockIcon';
+import { HalfCircleIcon } from '@ui/primitives/Icons/HalfCircleIcon';
+import { RescanArrows, RescanCloud } from '@ui/primitives/Icons/RescanIcon';
 import {
   CellState,
   heights,
@@ -68,9 +62,6 @@ const AMBER = '#E6B43C';
 const BLUE = '#8FB4E6';
 const TRACK = '#0A1F3D';
 const TILE_BG = '#052520';
-const INFO_BG = '#A8B3C4';
-const INFO_INK = '#060B12';
-const ARROW_HALF = 6;
 
 const CELL_COLOR: Record<CellState, string> = {
   scanned: GREEN,
@@ -97,34 +88,12 @@ const LEGEND: { state: CellState; key: string }[] = [
 ];
 
 const RING = 76;
-const RING_R = 58;
-const RING_W = 12;
-const RING_C = 2 * Math.PI * RING_R;
-const RING_FILL_MS = 900;
-const RING_FILL_AT = 200;
+const RING_STROKE = 6.5;
 const TURN_MS = 700;
 const PULSE_MS = 550;
-const TIP_W = 236;
 const TL_W = 315;
 const TL_H = 88;
 const MAP_H = 63;
-
-const AnimatedCircle = Animated.createAnimatedComponent(Circle);
-
-const tipEnter = () =>
-  new Keyframe({
-    0: { opacity: 0, transform: [{ translateY: -4 }, { scale: 0.94 }] },
-    100: { opacity: 1, transform: [{ translateY: 0 }, { scale: 1 }] },
-  })
-    .duration(180)
-    .reduceMotion(ReduceMotion.System);
-const tipExit = () =>
-  new Keyframe({
-    0: { opacity: 1, transform: [{ translateY: 0 }, { scale: 1 }] },
-    100: { opacity: 0, transform: [{ translateY: -2 }, { scale: 0.97 }] },
-  })
-    .duration(120)
-    .reduceMotion(ReduceMotion.System);
 
 type SyncReportProps = NativeStackScreenProps<
   AppDrawerParamList,
@@ -163,14 +132,12 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
     setBackgroundSyncErrorInfo,
   } = useContext(ContextAppLoaded);
   const { colors } = useTheme();
-  const window = useWindowDimensions();
   const { percentageOutputsScanned, syncInProgress } = useSyncStatus({
     syncingStatus,
     noSyncingStatus: true,
   });
 
   const [tip, setTip] = useState(false);
-  const [rowTop, setRowTop] = useState(0);
   const [cardW, setCardW] = useState(TL_W);
   const sheet = useRef<BottomSheetModal>(null);
 
@@ -181,21 +148,8 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
   const cells = mapCells(syncingStatus, birthday, serverTip, synced);
   const step = phase(syncingStatus, synced);
 
-  const arc = useSharedValue(0);
   const turn = useSharedValue(0);
   const pulse = useSharedValue(1);
-  const infoTurn = useSharedValue(0);
-
-  useEffect(() => {
-    arc.value = withDelay(
-      RING_FILL_AT,
-      withTiming(pct / 100, {
-        duration: RING_FILL_MS,
-        easing: ease.out,
-        reduceMotion: ReduceMotion.System,
-      }),
-    );
-  }, [pct, arc]);
 
   useEffect(() => {
     pulse.value = syncInProgress
@@ -209,17 +163,10 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
       : withTiming(1, { duration: PULSE_MS });
   }, [syncInProgress, pulse]);
 
-  const arcProps = useAnimatedProps(() => ({
-    strokeDasharray: [Math.max(0.1, RING_C * arc.value), RING_C],
-  }));
   const arrowsStyle = useAnimatedStyle(() => ({
     transform: [{ rotate: `${turn.value}deg` }],
   }));
   const rescanStyle = useAnimatedStyle(() => ({ opacity: pulse.value }));
-  const infoStyle = useAnimatedStyle(() => ({
-    transform: [{ rotate: `${infoTurn.value}deg` }],
-  }));
-
   const openRescan = () => {
     setTip(false);
     turn.value = 0;
@@ -229,18 +176,6 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
       reduceMotion: ReduceMotion.System,
     });
     sheet.current?.present();
-  };
-
-  const toggleTip = () => {
-    if (!tip) {
-      infoTurn.value = 0;
-      infoTurn.value = withTiming(360, {
-        duration: 260,
-        easing: ease.spring,
-        reduceMotion: ReduceMotion.System,
-      });
-    }
-    setTip(!tip);
   };
 
   const rescan = async () => {
@@ -348,10 +283,6 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
         timeOf(bgEnd, bgSameDay ? 'h:mm:ss aaa' : 'MMM d, yyyy · h:mm:ss aaa')
       : '');
 
-  const tipLeft = Math.min(
-    Math.max(window.width - 65 - TIP_W / 2, 16),
-    window.width - TIP_W - 16,
-  );
   const startText = translate('sync.sheet-start') as string;
   const [startBefore, startAfter] = startText.split('{n}');
 
@@ -370,7 +301,6 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
         noUfvkIcon={true}
       />
       <View
-        onLayout={e => setRowTop(e.nativeEvent.layout.y)}
         style={{
           height: 44,
           marginTop: 6,
@@ -403,40 +333,30 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
         >
           {translate('sync.title') as string}
         </Text>
-        <Pressable
-          testID="syncreport.info"
-          accessibilityRole="button"
-          accessibilityLabel={translate('sync.info-acc') as string}
-          accessibilityState={{ expanded: tip }}
-          hitSlop={12}
-          onPress={toggleTip}
-          style={{ position: 'absolute', right: 58 }}
+        <View
+          pointerEvents="box-none"
+          style={{
+            position: 'absolute',
+            left: 16,
+            right: 54,
+            top: 0,
+            bottom: 0,
+            justifyContent: 'center',
+            zIndex: 3,
+          }}
         >
-          <Animated.View
-            style={[
-              {
-                width: 14,
-                height: 14,
-                borderRadius: 7,
-                backgroundColor: INFO_BG,
-                alignItems: 'center',
-                justifyContent: 'center',
-              },
-              infoStyle,
-            ]}
+          <InfoTooltip
+            testID="syncreport.info"
+            alignEnd
+            label={translate('sync.info-acc') as string}
+            title={translate('sync.tip-title') as string}
+            text={translate('sync.tip-text') as string}
+            open={tip}
+            onToggle={setTip}
           >
-            <Text
-              style={{
-                color: INFO_INK,
-                fontSize: 9.5,
-                lineHeight: 14,
-                fontWeight: '700',
-              }}
-            >
-              i
-            </Text>
-          </Animated.View>
-        </Pressable>
+            <View />
+          </InfoTooltip>
+        </View>
         <Pressable
           testID="syncreport.rescan"
           accessibilityRole="button"
@@ -488,51 +408,17 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
             },
           ]}
         >
-          <View style={{ width: RING, height: RING }}>
-            <Svg width={RING} height={RING} viewBox="0 0 140 140">
-              <Circle
-                cx={70}
-                cy={70}
-                r={RING_R}
-                fill="none"
-                stroke={TRACK}
-                strokeWidth={RING_W}
-              />
-              <AnimatedCircle
-                cx={70}
-                cy={70}
-                r={RING_R}
-                fill="none"
-                stroke={synced ? GREEN : AMBER}
-                strokeWidth={RING_W}
-                strokeLinecap="round"
-                transform="rotate(-90 70 70)"
-                animatedProps={arcProps}
-              />
-            </Svg>
-            <View
-              style={{
-                position: 'absolute',
-                left: 0,
-                right: 0,
-                top: 0,
-                bottom: 0,
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <Text
-                testID="syncreport.percent"
-                style={{
-                  color: colors.fgDefault,
-                  fontSize: 14,
-                  lineHeight: 18,
-                  fontWeight: '700',
-                }}
-              >
-                {`${pct}%`}
-              </Text>
-            </View>
+          <View style={{ margin: -10 }}>
+            <CircularProgress
+              size={RING}
+              strokeWidth={RING_STROKE}
+              bgColor={TRACK}
+              pgColor={synced ? GREEN : AMBER}
+              textSize={14}
+              textColor={colors.fgDefault}
+              text={`${pct}%`}
+              progressPercent={pct}
+            />
           </View>
           <View style={{ flex: 1, minWidth: 0 }}>
             <Text
@@ -734,7 +620,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
               },
             ]}
           >
-            {backgroundSyncInfo.error ? null : <OkCircleIcon />}
+            {backgroundSyncInfo.error ? null : <CheckCircleIcon />}
             <View style={{ flex: 1, minWidth: 0 }}>
               <Text
                 style={{
@@ -774,73 +660,43 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
         )}
       </ScrollView>
 
-      {tip && (
-        <Animated.View
-          testID="syncreport.tip"
-          entering={tipEnter()}
-          exiting={tipExit()}
-          pointerEvents="none"
-          style={{
-            position: 'absolute',
-            top: rowTop + 22 + 7 + 10,
-            left: tipLeft,
-            width: TIP_W,
-            paddingHorizontal: 12,
-            paddingTop: 9,
-            paddingBottom: 10,
-            borderRadius: 10,
-            borderWidth: 1,
-            borderColor: colors.bottomSheetBorder,
-            backgroundColor: colors.bgSurface,
-          }}
-        >
-          <View
-            style={{
-              position: 'absolute',
-              top: -ARROW_HALF,
-              left: window.width - 65 - tipLeft - 5,
-              width: 10,
-              height: 10,
-              borderLeftWidth: 1,
-              borderTopWidth: 1,
-              borderColor: colors.bottomSheetBorder,
-              backgroundColor: colors.bgSurface,
-              transform: [{ rotate: '45deg' }],
-            }}
-          />
-          <Text
-            style={{
-              color: colors.fgDefault,
-              fontSize: 10.5,
-              lineHeight: 14,
-              fontWeight: '600',
-              marginBottom: 3,
-            }}
-          >
-            {translate('sync.tip-title') as string}
-          </Text>
-          <Text style={{ color: colors.fgMuted, fontSize: 10, lineHeight: 13 }}>
-            {translate('sync.tip-text') as string}
-          </Text>
-        </Animated.View>
-      )}
-
       <AppSheetModal
         ref={sheet}
         header={
-          <Text
-            accessibilityRole="header"
+          <View
             style={{
-              marginTop: 10,
-              textAlign: 'center',
-              color: colors.fgDefault,
-              fontSize: 15.5,
-              lineHeight: 21,
-              fontWeight: '700',
+              paddingTop: 8,
+              paddingBottom: 6,
+              paddingHorizontal: 16,
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
             }}
           >
-            {translate('sync.sheet-title') as string}
-          </Text>
+            <View style={{ width: 48 }} />
+            <BoldText
+              numberOfLines={1}
+              style={{
+                flex: 1,
+                fontSize: 16,
+                lineHeight: 28,
+                textAlign: 'center',
+              }}
+            >
+              {translate('sync.sheet-title') as string}
+            </BoldText>
+            <Pressable
+              onPress={() => sheet.current?.dismiss()}
+              hitSlop={8}
+              style={{ paddingHorizontal: 14, paddingVertical: 4 }}
+            >
+              <FontAwesomeIcon
+                icon={faXmark}
+                size={20}
+                color={colors.fgMuted}
+              />
+            </Pressable>
+          </View>
         }
         contentStyle={{ paddingHorizontal: 22, paddingBottom: 34 }}
       >
@@ -872,7 +728,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
               text: translate('sync.sheet-time') as string,
             },
             {
-              icon: <HalfIcon />,
+              icon: <HalfCircleIcon />,
               text: translate('sync.sheet-incomplete') as string,
             },
           ].map((row, i) => (
@@ -913,42 +769,30 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
             </View>
           ))}
         </View>
-        <Pressable
-          testID="syncreport.rescan-go"
-          accessibilityRole="button"
-          onPress={rescan}
-          style={({ pressed }) => ({
-            height: 46,
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center',
+            gap: 10,
             marginTop: 20,
-            borderRadius: 23,
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: colors.bgAccent,
-            transform: [{ scale: pressed ? 0.97 : 1 }],
-          })}
+          }}
         >
-          <Text
-            style={{ color: colors.bgCanvas, fontSize: 15, fontWeight: '700' }}
-          >
-            {translate('sync.rescan') as string}
-          </Text>
-        </Pressable>
-        <Pressable
-          testID="syncreport.rescan-cancel"
-          accessibilityRole="button"
-          onPress={() => sheet.current?.dismiss()}
-          style={({ pressed }) => ({
-            minHeight: 38,
-            marginTop: 8,
-            alignItems: 'center',
-            justifyContent: 'center',
-            opacity: pressed ? 0.6 : 1,
-          })}
-        >
-          <Text style={{ color: SOFT_INK, fontSize: 13, fontWeight: '500' }}>
-            {translate('cancel') as string}
-          </Text>
-        </Pressable>
+          <Button
+            testID="syncreport.rescan-cancel"
+            type={ButtonTypeEnum.Secondary}
+            title={translate('cancel') as string}
+            onPress={() => sheet.current?.dismiss()}
+            twoButtons={true}
+          />
+          <Button
+            testID="syncreport.rescan-go"
+            type={ButtonTypeEnum.Primary}
+            title={translate('sync.rescan') as string}
+            onPress={rescan}
+            twoButtons={true}
+          />
+        </View>
       </AppSheetModal>
     </View>
   );

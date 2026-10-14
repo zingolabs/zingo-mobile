@@ -38,6 +38,8 @@ const ana = new AddressBookFileClass(
   'ZEC',
 );
 
+const launchAddTagModal = jest.fn();
+
 const renderInsight = () =>
   render(
     <ContextAppLoadedProvider
@@ -45,6 +47,7 @@ const renderInsight = () =>
         ...defaultAppContextLoaded,
         translate: (k: string) => k,
         addressBook: [ana],
+        launchAddTagModal,
         valueTransfers: [
           sent('u1ana', 2, 'a'),
           sent('u1stranger0000000000000000xyz', 1, 'b'),
@@ -59,17 +62,16 @@ const renderInsight = () =>
   );
 
 beforeEach(() => {
-  jest.mocked(mockNavigation.navigate).mockClear();
+  launchAddTagModal.mockClear();
 });
 
 test('Tests that only a recipient outside the book offers to add it when the list holds a contact and an unknown address.', () => {
   renderInsight();
   expect(screen.queryByTestId('insight.row.0.add')).toBeNull();
   fireEvent.press(screen.getByTestId('insight.row.1.add'));
-  expect(mockNavigation.navigate).toHaveBeenCalledWith(RouteEnum.AddressBook, {
-    currentAddress: 'u1stranger0000000000000000xyz',
-    routeStack: RouteEnum.Insight,
-  });
+  expect(launchAddTagModal).toHaveBeenCalledWith(
+    'u1stranger0000000000000000xyz',
+  );
 });
 
 test('Tests that a row unfolds its sends, amount and bytes when it is tapped.', () => {
@@ -81,9 +83,9 @@ test('Tests that a row unfolds its sends, amount and bytes when it is tapped.', 
 
 test('Tests that the donut center shows the total sent when nothing is selected.', () => {
   renderInsight();
-  expect(screen.getByTestId('insight.donut.value').props.children).toBe(
-    '3.0000',
-  );
+  expect(
+    screen.getByTestId('insight.donut.value.big-part').props.children,
+  ).toBe(' 3.0');
   fireEvent.press(screen.getByTestId('insight.metric.sends'));
   expect(screen.getByTestId('insight.donut.value').props.children).toBe('2');
 });

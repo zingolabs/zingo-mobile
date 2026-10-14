@@ -27,7 +27,6 @@ const IN_AT = 260;
 const TRACK = '#0A1F3D';
 const DARK_INK = '#07121F';
 const SOFT_INK = '#8DA0B8';
-const CODE_INK = '#B9C6D6';
 
 export type Slice = { g: number; value: number; color: string };
 
@@ -137,8 +136,8 @@ type DonutProps = {
   slices: Slice[];
   selected: number;
   onSelect: (g: number) => void;
-  value: string;
-  usd: string;
+  /** The total, or the selected slice's value, drawn by the caller. */
+  center: React.ReactNode;
   caption: string;
 };
 
@@ -148,8 +147,7 @@ const Donut: React.FunctionComponent<DonutProps> = ({
   slices,
   selected,
   onSelect,
-  value,
-  usd,
+  center,
   caption,
 }) => {
   const shown = useSharedValue(0);
@@ -232,30 +230,7 @@ const Donut: React.FunctionComponent<DonutProps> = ({
           justifyContent: 'center',
         }}
       >
-        <Text
-          testID="insight.donut.value"
-          style={{
-            color: '#D3E2F8',
-            fontSize: 22,
-            lineHeight: 26,
-            fontWeight: '700',
-          }}
-        >
-          {value}
-        </Text>
-        {!!usd && (
-          <Text
-            style={{
-              marginTop: 1,
-              color: CODE_INK,
-              fontSize: 12.5,
-              lineHeight: 16,
-              fontWeight: '600',
-            }}
-          >
-            {usd}
-          </Text>
-        )}
+        {center}
         <Text
           style={{
             marginTop: 2,
