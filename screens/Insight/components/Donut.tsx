@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import Animated, {
   ReduceMotion,
@@ -12,10 +12,12 @@ import Svg, { Circle, Path, Text as SvgText } from 'react-native-svg';
 
 import { ease } from '@app/theme/motion';
 
-const SIZE = 232;
-const C = SIZE / 2;
-const R = 86;
+const BASE_R = 86;
 const SW = 28;
+// Room around the ring for a slice pushed out, and between the ring's inner
+// edge and the figure in the middle.
+const EDGE = 16;
+const PAD = 14;
 const MIN_SHARE = 0.11;
 const POP = 8;
 const POP_MS = 260;
@@ -31,6 +33,32 @@ const SOFT_INK = '#8DA0B8';
 export type Slice = { g: number; value: number; color: string };
 
 type Arc = Slice & { a0: number; a1: number; share: number };
+
+/** The ring's box, centre and radius. */
+type Geometry = { size: number; c: number; r: number };
+
+const ringOf = (r: number): Geometry => {
+  const size = 2 * (r + SW / 2 + EDGE);
+  return { size, c: size / 2, r };
+};
+
+/** A ring wide enough for the middle content, capped at the room there is, and the scale the content then needs. */
+export const fitRing = (
+  content: { width: number; height: number },
+  room: number,
+): { geometry: Geometry; scale: number } => {
+  const half = Math.hypot(content.width / 2, content.height / 2);
+  const wanted = ringOf(Math.max(BASE_R, half + PAD + SW / 2));
+  if (room <= 0 || wanted.size <= room) {
+    return { geometry: wanted, scale: 1 };
+  }
+  const r = Math.max(BASE_R, room / 2 - SW / 2 - EDGE);
+  const inner = r - SW / 2 - PAD;
+  return {
+    geometry: ringOf(r),
+    scale: half > 0 ? Math.min(1, inner / half) : 1,
+  };
+};
 
 /** Whether a color is light enough to need dark text on it. */
 const light = (color: string): boolean => {
@@ -51,17 +79,24 @@ const arcs = (slices: Slice[]): Arc[] => {
   });
 };
 
-const point = (angle: number, radius = R) =>
-  `${C + Math.cos(angle) * radius} ${C + Math.sin(angle) * radius}`;
+const point = ({ c, r }: Geometry, angle: number) =>
+  `${c + Math.cos(angle) * r} ${c + Math.sin(angle) * r}`;
 
-type SliceLayerProps = { arc: Arc; alone: boolean; selected: number };
+type SliceLayerProps = {
+  arc: Arc;
+  alone: boolean;
+  selected: number;
+  geometry: Geometry;
+};
 
 // One slice on its own layer, so it can push out and dim on its own.
 const SliceLayer: React.FunctionComponent<SliceLayerProps> = ({
   arc,
   alone,
   selected,
+  geometry,
 }) => {
+  const { size: SIZE, c: C, r: R } = geometry;
   const mid = (arc.a0 + arc.a1) / 2;
   const pop = useSharedValue(0);
   const fade = useSharedValue(1);
@@ -110,7 +145,7 @@ const SliceLayer: React.FunctionComponent<SliceLayerProps> = ({
           />
         ) : (
           <Path
-            d={`M${point(s0)}A${R} ${R} 0 ${s1 - s0 > Math.PI ? 1 : 0} 1 ${point(s1)}`}
+            d={`M${point(geometry, s0)}A${R} ${R} 0 ${s1 - s0 > Math.PI ? 1 : 0} 1 ${point(geometry, s1)}`}
             fill="none"
             stroke={arc.color}
             strokeWidth={SW}
@@ -169,6 +204,10 @@ const Donut: React.FunctionComponent<DonutProps> = ({
     ],
   }));
   const all = arcs(slices);
+  const [room, setRoom] = useState(0);
+  const [content, setContent] = useState({ width: 0, height: 0 });
+  const { geometry, scale } = fitRing(content, room);
+  const { size: SIZE, c: C, r: R } = geometry;
 
   const tap = (x: number, y: number) => {
     const dx = x - C;
@@ -187,73 +226,81 @@ const Donut: React.FunctionComponent<DonutProps> = ({
 
   return (
     <View
-      testID="insight.donut"
-      style={{
-        width: SIZE,
-        height: SIZE,
-        alignSelf: 'center',
-        marginTop: 6,
-        marginBottom: 4,
-      }}
+      onLayout={e => setRoom(e.nativeEvent.layout.width)}
+      style={{ alignItems: 'center', marginTop: 6, marginBottom: 4 }}
     >
-      <Animated.View style={[{ width: SIZE, height: SIZE }, inStyle]}>
-        {all.length === 0 && (
-          <Svg width={SIZE} height={SIZE}>
-            <Circle
-              cx={C}
-              cy={C}
-              r={R}
-              fill="none"
-              stroke={TRACK}
-              strokeWidth={SW}
+      <View testID="insight.donut" style={{ width: SIZE, height: SIZE }}>
+        <Animated.View style={[{ width: SIZE, height: SIZE }, inStyle]}>
+          {all.length === 0 && (
+            <Svg width={SIZE} height={SIZE}>
+              <Circle
+                cx={C}
+                cy={C}
+                r={R}
+                fill="none"
+                stroke={TRACK}
+                strokeWidth={SW}
+              />
+            </Svg>
+          )}
+          {all.map(a => (
+            <SliceLayer
+              key={a.g}
+              arc={a}
+              alone={all.length === 1}
+              selected={selected}
+              geometry={geometry}
             />
-          </Svg>
-        )}
-        {all.map(a => (
-          <SliceLayer
-            key={a.g}
-            arc={a}
-            alone={all.length === 1}
-            selected={selected}
-          />
-        ))}
-      </Animated.View>
+          ))}
+        </Animated.View>
+        <Pressable
+          testID="insight.donut.hit"
+          style={{
+            position: 'absolute',
+            left: 0,
+            top: 0,
+            width: SIZE,
+            height: SIZE,
+          }}
+          onPress={e => tap(e.nativeEvent.locationX, e.nativeEvent.locationY)}
+        />
+      </View>
       <View
         pointerEvents="none"
         style={{
           position: 'absolute',
-          left: C - 59,
+          left: 0,
+          right: 0,
           top: 0,
-          bottom: 0,
-          width: 118,
+          height: SIZE,
           alignItems: 'center',
           justifyContent: 'center',
         }}
       >
-        {center}
-        <Text
-          style={{
-            marginTop: 2,
-            color: SOFT_INK,
-            fontSize: 11.5,
-            lineHeight: 15,
-            textAlign: 'center',
-          }}
+        <View
+          testID="insight.donut.center"
+          onLayout={e =>
+            setContent({
+              width: e.nativeEvent.layout.width,
+              height: e.nativeEvent.layout.height,
+            })
+          }
+          style={{ alignItems: 'center', transform: [{ scale }] }}
         >
-          {caption}
-        </Text>
+          {center}
+          <Text
+            style={{
+              marginTop: 2,
+              color: SOFT_INK,
+              fontSize: 11.5,
+              lineHeight: 15,
+              textAlign: 'center',
+            }}
+          >
+            {caption}
+          </Text>
+        </View>
       </View>
-      <Pressable
-        testID="insight.donut.hit"
-        style={{
-          position: 'absolute',
-          left: 0,
-          top: 0,
-          width: SIZE,
-          height: SIZE,
-        }}
-        onPress={e => tap(e.nativeEvent.locationX, e.nativeEvent.locationY)}
-      />
     </View>
   );
 };
