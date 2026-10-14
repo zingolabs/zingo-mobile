@@ -17,7 +17,7 @@ import { RPCMigrationPlanType } from '@app/walletBackend/types/RPCMigrationPlanT
 // The root stack: one section, chosen by the session, plus the scanner,
 // which sits above every section and its bottom-sheet portal.
 export type RootParamList = {
-  [RouteEnum.Loading]: undefined;
+  [RouteEnum.Loading]: NavigatorScreenParams<LoadingParamList> | undefined;
   [RouteEnum.Wallet]: NavigatorScreenParams<AppDrawerParamList> | undefined;
   [RouteEnum.ScannerAddress]: ScannerAddressNavigationState | undefined;
 };
@@ -26,8 +26,24 @@ export type RootParamList = {
 export type LoadingParamList = {
   [RouteEnum.Boot]: undefined;
   [RouteEnum.Lock]: undefined;
-  [RouteEnum.Onboarding]: undefined;
+  [RouteEnum.Onboarding]:
+    NavigatorScreenParams<OnboardingParamList> | undefined;
 };
+
+// The onboarding stage: no wallet, or one that failed to open.
+export type OnboardingParamList = {
+  [RouteEnum.Welcome]: undefined;
+  [RouteEnum.ImportChooser]: undefined;
+  [RouteEnum.ImportWallet]: undefined;
+  // `chain`: the network the screen opens on, when the wallet's network is
+  // not the server's.
+  [RouteEnum.Server]: { chain?: ChainNameEnum } | undefined;
+  [RouteEnum.ServerList]: { chain: ChainNameEnum };
+  [RouteEnum.Progress]: { kind: 'import' | 'create' };
+  [RouteEnum.OpenError]: undefined;
+};
+
+export type OnboardingRoute = keyof OnboardingParamList;
 
 export type HomeTabParamList = {
   [RouteEnum.History]: undefined;
