@@ -37,6 +37,7 @@ import { HalfCircleIcon } from '@ui/primitives/Icons/HalfCircleIcon';
 import { RescanArrows, RescanCloud } from '@ui/primitives/Icons/RescanIcon';
 import {
   CellState,
+  chainTip,
   heights,
   MAP_COLS,
   MAP_ROWS,
@@ -144,7 +145,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
   const [tip, setTip] = useState(false);
   const [cardW, setCardW] = useState(TL_W);
 
-  const serverTip = info.latestBlock || 0;
+  const serverTip = chainTip(syncingStatus, birthday, info.latestBlock || 0);
   const synced = !syncInProgress && percentageOutputsScanned > 0;
   const pct = synced ? 100 : Math.floor(percentageOutputsScanned);
   const h = heights(syncingStatus, birthday, serverTip, synced);

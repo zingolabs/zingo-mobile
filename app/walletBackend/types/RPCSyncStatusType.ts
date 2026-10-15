@@ -5,6 +5,7 @@ export type RPCSyncStatusType = {
   sync_start_height?: number;
   session_blocks_scanned?: number;
   total_blocks_scanned?: number;
+  total_blocks?: number;
   percentage_total_blocks_scanned?: number;
   session_sapling_outputs_scanned?: number;
   total_sapling_outputs_scanned?: number;

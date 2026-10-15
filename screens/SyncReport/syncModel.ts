@@ -10,6 +10,18 @@ export type CellState = 'scanned' | 'scanning' | 'refetching' | 'high' | 'low';
 
 export type Phase = 'done' | 'verifying' | 'tip' | 'notes' | 'historic';
 
+/**
+ * The chain height the wallet syncs to. zingolib reports its span from the
+ * birthday, both ends counted, the one its percentages divide by; the
+ * server's own answer stands in until a status carries it.
+ */
+export const chainTip = (
+  status: RPCSyncStatusType,
+  birthday: number,
+  fallback: number,
+): number =>
+  status.total_blocks ? birthday + status.total_blocks - 1 : fallback;
+
 export type Heights = {
   server: number;
   wallet: number;
