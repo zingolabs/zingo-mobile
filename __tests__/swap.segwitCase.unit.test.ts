@@ -61,3 +61,12 @@ test('Tests that Bitcoin rejects a Litecoin address when all letters are upperca
 test('Tests that Litecoin rejects a Bitcoin address when all letters are uppercase', () => {
   expect(isValidChainAddress('LTC', segwit[0][1].toUpperCase())).toBe(false);
 });
+
+test.each([segwit[0], segwit[3]])(
+  'Tests that %s rejects a SegWit address when a Kelvin sign replaces an ASCII letter: %s',
+  (chain, address) => {
+    const unicode = address.toUpperCase().replace('K', '\u212a');
+    expect(unicode).toContain('\u212a');
+    expect(isValidChainAddress(chain, unicode)).toBe(false);
+  },
+);

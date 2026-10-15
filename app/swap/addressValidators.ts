@@ -83,8 +83,8 @@ const TON_RAW_RE = /^-?\d+:[a-fA-F0-9]{64}$/;
 
 const isEvm: Validator = a => EVM_RE.test(a);
 const isSegwit = (address: string, pattern: RegExp): boolean =>
-  (address === address.toLowerCase() || address === address.toUpperCase()) &&
-  pattern.test(address.toLowerCase());
+  pattern.test(address) ||
+  (/^[A-Z0-9]+$/.test(address) && pattern.test(address.toLowerCase()));
 const isBtc: Validator = a =>
   BTC_LEGACY_RE.test(a) || isSegwit(a, BTC_BECH32_RE);
 const isLtc: Validator = a =>
