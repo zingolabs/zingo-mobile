@@ -110,7 +110,6 @@ const ConfirmBottomSheet: React.FC = () => {
             title={b.text}
             onPress={() => handleButton(b)}
             fullWidth
-            style={{ minHeight: 46, borderRadius: 23 }}
             textStyle={{ fontSize: 15 }}
           />
         ))}

@@ -577,6 +577,7 @@ exports[`Component History - test History privacy high - snapshot 1`] = `
                         style={
                           {
                             "color": "#c3c3c3",
+                            "flexShrink": 1,
                             "fontSize": 15,
                             "fontWeight": "700",
                           }
@@ -1668,6 +1669,7 @@ exports[`Component History - test History privacy normal - snapshot 1`] = `
                         style={
                           {
                             "color": "#c3c3c3",
+                            "flexShrink": 1,
                             "fontSize": 15,
                             "fontWeight": "700",
                           }

@@ -1,30 +1,42 @@
 // Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`Component App - test App - snapshot 1`] = `
-<MockedNavigator
-  initialRouteName="LoadingApp"
-  screenOptions={
+<View
+  style={
     {
-      "animation": "none",
-      "headerShown": false,
+      "backgroundColor": "#011401",
+      "flex": 1,
+      "paddingLeft": 0,
+      "paddingRight": 0,
+      "paddingTop": 0,
     }
   }
 >
-  <MockedScreen
-    name="LoadingApp"
-  />
-  <MockedScreen
-    name="LoadedApp"
-  />
-  <MockedScreen
-    component={[Function]}
-    name="ScannerAddress"
-    options={
+  <MockedNavigator
+    initialRouteName="LoadingApp"
+    screenOptions={
       {
         "animation": "none",
-        "presentation": "transparentModal",
+        "headerShown": false,
       }
     }
-  />
-</MockedNavigator>
+  >
+    <MockedScreen
+      name="LoadingApp"
+    />
+    <MockedScreen
+      name="LoadedApp"
+    />
+    <MockedScreen
+      component={[Function]}
+      name="ScannerAddress"
+      options={
+        {
+          "animation": "none",
+          "presentation": "transparentModal",
+        }
+      }
+    />
+  </MockedNavigator>
+</View>
 `;

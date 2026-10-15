@@ -18,6 +18,7 @@ import { AddressBookFileClass, ChainNameEnum, RouteEnum } from '@app/AppState';
 import { ContextAppLoaded } from '@app/context';
 import { isZnsAlias, resolveZnsName } from '@app/uris/resolveZnsName';
 import Utils from '@app/utils';
+import { isWalletAddress } from '@app/walletBackend';
 import BoldText from '@ui/primitives/BoldText';
 import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
 import RegText from '@ui/primitives/RegText';
@@ -53,6 +54,7 @@ type Check =
   | { kind: 'empty' }
   | { kind: 'checking' }
   | { kind: 'invalid' }
+  | { kind: 'own' }
   | { kind: 'valid' };
 
 type ContactSheetProps = {
@@ -145,8 +147,9 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
     let cancelled = false;
     const timer = setTimeout(async () => {
       const { isValid } = await Utils.isValidAddress(typed, walletChain);
+      const own = isValid && (await isWalletAddress(typed));
       if (!cancelled) {
-        setCheck({ kind: isValid ? 'valid' : 'invalid' });
+        setCheck({ kind: own ? 'own' : isValid ? 'valid' : 'invalid' });
       }
     }, CHECK_AT);
     return () => {
@@ -157,15 +160,20 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
 
   const trimmedName = name.trim();
   const trimmedAddress = address.trim();
+  /** The wallet's own tagged addresses are not contacts and are never listed, so they cannot clash with one. */
   const others = book.filter(
-    entry => edit.kind === 'new' || entry.address !== edit.contact.address,
+    entry =>
+      !entry.own &&
+      (edit.kind === 'new' || entry.address !== edit.contact.address),
   );
   const dupName = others.some(
     entry => entry.label.toLowerCase() === trimmedName.toLowerCase(),
   );
-  const dupAddress =
-    check.kind === 'valid' &&
-    others.some(entry => entry.address === trimmedAddress);
+  const sameAddress =
+    check.kind === 'valid'
+      ? others.find(entry => entry.address === trimmedAddress)
+      : undefined;
+  const dupAddress = !!sameAddress;
   const ready =
     trimmedName.length > 0 && !dupName && check.kind === 'valid' && !dupAddress;
 
@@ -178,11 +186,16 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
   const addressError =
     zns.kind === 'missing'
       ? (translate('send.znsnamenotfound') as string)
-      : dupAddress
-        ? (translate('addressbook.dup-address') as string)
-        : check.kind === 'invalid' && touched
-          ? (translate('send.invalidaddress') as string)
-          : '';
+      : sameAddress
+        ? (translate('addressbook.dup-address') as string).replace(
+            '{name}',
+            sameAddress.label,
+          )
+        : check.kind === 'own'
+          ? (translate('addressbook.own-address') as string)
+          : check.kind === 'invalid' && touched
+            ? (translate('send.invalidaddress') as string)
+            : '';
   const transparent = /^t/i.test(trimmedAddress);
   const note: Note = nameError
     ? { tone: 'err', text: nameError }
@@ -439,8 +452,6 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
           fullWidth
           style={{
             marginTop: 20,
-            minHeight: 46,
-            borderRadius: 23,
             opacity: ready ? 1 : SAVE_OFF,
           }}
           textStyle={{ fontSize: 15 }}

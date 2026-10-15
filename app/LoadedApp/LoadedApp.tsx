@@ -123,6 +123,7 @@ import {
 import LoadedAppOptionsPanelHost from './LoadedAppOptionsPanelHost';
 import { MessageList } from '@screens/Messages';
 import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
+import { rescanStep } from '@app/walletBackend/utils/syncProgress';
 import { RPCUfvkType } from '@app/walletBackend/types/RPCUfvkType';
 import {
   INITIAL_MIXNET_VIEW,
@@ -696,6 +697,7 @@ export class LoadedAppClass extends Component<
             : CurrencyNameEnum.TAZ,
       } as InfoType,
       syncingStatus: {} as RPCSyncStatusType,
+      rescan: 'none',
       birthday: 0,
       defaultUnifiedAddress: '',
       zecPrice: {
@@ -1183,6 +1185,10 @@ export class LoadedAppClass extends Component<
       //const start = Date.now();
       this.setState({ syncingStatus });
     }
+    const rescan = rescanStep(this.state.rescan, syncingStatus);
+    if (rescan !== this.state.rescan) {
+      this.setState({ rescan });
+    }
   };
 
   setMixnetView = (mixnetView: MixnetView) => {
@@ -1508,6 +1514,7 @@ export class LoadedAppClass extends Component<
     // in the rescan case if the shield button is visible
     // we need to hide it fast.
     this.setShieldingAmount(0);
+    this.setState({ rescan: 'started' });
     await this.rpc.refreshSync(true);
   };
 
@@ -2019,18 +2026,19 @@ export class LoadedAppClass extends Component<
   // Determines `own` via RPC, then opens the shared modal so the user can
   // attach a label without leaving their current screen. Used from AddressItem
   // anywhere an address is displayed with a tappable "+ contact" icon.
-  launchAddTagModal = (
+  /**
+   * The add button next to an address opens the New contact sheet, or the own
+   * tag sheet when the address is one of this wallet's: a self-send shows one,
+   * and the contact sheet refuses it.
+   */
+  launchAddTagModal = async (
     address: string,
     swapChain: string = GlobalConst.zecSwapChain,
     initialLabel?: string,
   ) => {
-    // Every launcher (Send, address rows) saves a recipient/destination,
-    // i.e. a contact — never a label for one of the wallet's own addresses.
-    // Tagging an own address is the Receive flow, which renders NewAddressTag
-    // with own={true} directly. So this modal is always a contact (own=false),
-    // "Add contact", not "Add tag".
+    const own = await isWalletAddress(address);
     this.setState(
-      { addTagModalTarget: { address, own: false, swapChain, initialLabel } },
+      { addTagModalTarget: { address, own, swapChain, initialLabel } },
       () => {
         this.addTagModalRef.current?.present();
       },
@@ -2071,6 +2079,7 @@ export class LoadedAppClass extends Component<
       messages: this.state.messages,
       messagesTotal: this.state.messagesTotal,
       syncingStatus: this.state.syncingStatus,
+      rescan: this.state.rescan,
       info: this.state.info,
       zecPrice: this.state.zecPrice,
       defaultUnifiedAddress: this.state.defaultUnifiedAddress,

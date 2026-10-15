@@ -1,4 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
+import { BUTTON_HEIGHT } from '@ui/primitives/Button';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import {
   View,
@@ -6,7 +8,6 @@ import {
   TextInput,
   Keyboard,
   Pressable,
-  ScrollView,
 } from 'react-native';
 import Animated, {
   interpolateColor,
@@ -292,15 +293,16 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
         {translate('import.screen-title') as string}
       </BoldText>
 
-      <ScrollView
+      <KeyboardAwareScrollView
         keyboardShouldPersistTaps="handled"
+        bottomOffset={BUTTON_HEIGHT + 12 + 16}
         bounces={false}
         onScrollBeginDrag={() => setTipOpen(false)}
         style={{ flex: 1 }}
         contentContainerStyle={{
           paddingTop: BODY_TOP,
           paddingHorizontal: SIDE,
-          paddingBottom: (keyboardHeight > 0 ? keyboardHeight : 0) + 200,
+          paddingBottom: 200,
         }}
       >
         {tipOpen && (
@@ -450,7 +452,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
             )}
           </Animated.View>
         </View>
-      </ScrollView>
+      </KeyboardAwareScrollView>
 
       {keyboardHeight === 0 && (
         <View

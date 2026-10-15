@@ -345,6 +345,8 @@ const IronwoodMigrationBanner: React.FunctionComponent<
             >
               <Text
                 style={{
+                  flexShrink: 1,
+                  marginRight: 12,
                   color: colors.fgMuted,
                   fontSize: 14,
                   fontWeight: '700',
@@ -411,7 +413,14 @@ const IronwoodMigrationBanner: React.FunctionComponent<
                 marginBottom: 8,
               }}
             >
-              <Text style={{ color: colors.fgMuted, fontSize: 13 }}>
+              <Text
+                style={{
+                  flexShrink: 1,
+                  marginRight: 12,
+                  color: colors.fgMuted,
+                  fontSize: 13,
+                }}
+              >
                 {translate('ironwoodbanner.next-action-label') as string}
               </Text>
               <StatusPill color={nextActionColor} label={nextActionText} />
@@ -425,10 +434,18 @@ const IronwoodMigrationBanner: React.FunctionComponent<
                 justifyContent: 'space-between',
               }}
             >
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  flexShrink: 1,
+                  marginRight: 12,
+                }}
+              >
                 <StatusDot color={statusColor} size={10} />
                 <Text
                   style={{
+                    flexShrink: 1,
                     color: colors.fgDefault,
                     fontSize: 14,
                     fontWeight: '700',
@@ -484,6 +501,7 @@ const IronwoodMigrationBanner: React.FunctionComponent<
               />
               <Text
                 style={{
+                  flexShrink: 1,
                   color: colors.fgDefault,
                   fontSize: 15,
                   fontWeight: '700',

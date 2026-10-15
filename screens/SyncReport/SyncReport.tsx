@@ -37,6 +37,7 @@ import { HalfCircleIcon } from '@ui/primitives/Icons/HalfCircleIcon';
 import { RescanArrows, RescanCloud } from '@ui/primitives/Icons/RescanIcon';
 import {
   CellState,
+  chainTip,
   heights,
   MAP_COLS,
   MAP_ROWS,
@@ -85,6 +86,14 @@ const LEGEND: { state: CellState; key: string }[] = [
 const RING = 76;
 const RING_STROKE = 6.5;
 const TURN_MS = 700;
+const RESCAN_ICON = 25;
+/**
+ * The arrows' centre, (25.33, 23.33) on the icon's 32 grid, from the icon's
+ * centre. The turn moves there, rotates and moves back: a percentage
+ * transformOrigin left the arrows circling the cloud on Android.
+ */
+const ARROWS_DX = (RESCAN_ICON * 25.333) / 32 - RESCAN_ICON / 2;
+const ARROWS_DY = (RESCAN_ICON * 23.333) / 32 - RESCAN_ICON / 2;
 const PULSE_MS = 550;
 const TL_W = 315;
 const TL_H = 88;
@@ -113,6 +122,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
 }) => {
   const {
     syncingStatus,
+    rescan: rescanState,
     birthday,
     translate,
     backgroundSyncInfo,
@@ -135,7 +145,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
   const [tip, setTip] = useState(false);
   const [cardW, setCardW] = useState(TL_W);
 
-  const serverTip = info.latestBlock || 0;
+  const serverTip = chainTip(syncingStatus, birthday, info.latestBlock || 0);
   const synced = !syncInProgress && percentageOutputsScanned > 0;
   const pct = synced ? 100 : Math.floor(percentageOutputsScanned);
   const h = heights(syncingStatus, birthday, serverTip, synced);
@@ -145,8 +155,10 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
   const turn = useSharedValue(0);
   const pulse = useSharedValue(1);
 
+  /** Only a user rescan pulses; the sync of new blocks after it does not. */
+  const rescanning = rescanState !== 'none';
   useEffect(() => {
-    pulse.value = syncInProgress
+    pulse.value = rescanning
       ? withRepeat(
           withSequence(
             withTiming(0.45, { duration: PULSE_MS }),
@@ -155,10 +167,16 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
           -1,
         )
       : withTiming(1, { duration: PULSE_MS });
-  }, [syncInProgress, pulse]);
+  }, [rescanning, pulse]);
 
   const arrowsStyle = useAnimatedStyle(() => ({
-    transform: [{ rotate: `${turn.value}deg` }],
+    transform: [
+      { translateX: ARROWS_DX },
+      { translateY: ARROWS_DY },
+      { rotate: `${turn.value}deg` },
+      { translateX: -ARROWS_DX },
+      { translateY: -ARROWS_DY },
+    ],
   }));
   const rescanStyle = useAnimatedStyle(() => ({ opacity: pulse.value }));
   const openRescan = () => {
@@ -436,20 +454,23 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
             backgroundColor: pressed ? 'rgba(255,255,255,0.06)' : undefined,
           })}
         >
-          <Animated.View style={[{ width: 25, height: 25 }, rescanStyle]}>
-            <RescanCloud size={25} />
+          <Animated.View
+            style={[{ width: RESCAN_ICON, height: RESCAN_ICON }, rescanStyle]}
+          >
+            <RescanCloud size={RESCAN_ICON} />
             <Animated.View
               style={[
                 {
                   position: 'absolute',
                   left: 0,
                   top: 0,
-                  transformOrigin: '79.2% 72.9%',
+                  width: RESCAN_ICON,
+                  height: RESCAN_ICON,
                 },
                 arrowsStyle,
               ]}
             >
-              <RescanArrows size={25} />
+              <RescanArrows size={RESCAN_ICON} />
             </Animated.View>
           </Animated.View>
         </Pressable>

@@ -1,6 +1,7 @@
 import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
 import { RPCSyncScanRangePriorityStatusEnum as Priority } from '@app/walletBackend/enums/RPCSyncScanRangePriorityStatusEnum';
 import {
+  chainTip,
   heights,
   MAP_CELLS,
   mapCells,
@@ -86,4 +87,12 @@ test('Tests that each map cell takes the state of the range under its middle blo
 
 test('Tests that the timeline ends a little past the tip on a 100k boundary when the tip is mid-range.', () => {
   expect(scaleMax(3_514_598)).toBe(3_600_000);
+});
+
+test('Tests that the chain tip is the birthday plus the reported span when the status carries it.', () => {
+  expect(chainTip({ total_blocks: 181 }, BIRTHDAY, 999)).toBe(TIP);
+});
+
+test('Tests that the chain tip is the server height when the status has no span.', () => {
+  expect(chainTip({}, BIRTHDAY, TIP)).toBe(TIP);
 });

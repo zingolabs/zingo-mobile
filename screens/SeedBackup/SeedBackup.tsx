@@ -31,7 +31,8 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useTheme } from '@app/theme';
 import { ease } from '@app/theme/motion';
 import { ContextAppLoaded } from '@app/context';
-import { RouteEnum, SnackbarDurationEnum } from '@app/AppState';
+import { RouteEnum, ScreenEnum, SnackbarDurationEnum } from '@app/AppState';
+import Header from '@ui/widgets/Header';
 import { AppDrawerParamList, CardRect } from '@app/types';
 import { useSecureScreen } from '@app/hooks/useSecureScreen';
 import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
@@ -519,50 +520,65 @@ ${translate('seedbackup.birthday') as string}: ${birthday}`;
       <Animated.View style={[StyleSheet.absoluteFill, sliding]}>
         <Animated.View style={[{ position: 'absolute' }, shell]} />
         <Animated.View style={[StyleSheet.absoluteFill, layer]}>
-          <Animated.View
-            key={step}
-            entering={enterFor(previous.current, shown, pushed)}
-            exiting={exitFor(move)}
-            style={{ flex: 1, paddingTop: 29 }}
-          >
-            {page()}
-          </Animated.View>
-          {step !== 'done' && (
+          <View style={{ paddingTop: 4 }}>
+            <Header
+              title={''}
+              screenName={ScreenEnum.Seed}
+              noBalance={true}
+              noSyncingStatus={true}
+              noDrawMenu={true}
+              noPrivacy={true}
+              noUfvkIcon={true}
+            />
+          </View>
+          <View style={{ flex: 1 }}>
             <Animated.View
-              entering={
-                pushed
-                  ? undefined
-                  : FadeIn.duration(CONTENT_IN_MS)
-                      .delay(CONTENT_IN_AT)
-                      .reduceMotion(ReduceMotion.System)
-              }
-              exiting={FadeOut.duration(160).reduceMotion(ReduceMotion.System)}
-              style={{
-                position: 'absolute',
-                top: 20,
-                right: SIDE - 14,
-              }}
+              key={step}
+              entering={enterFor(previous.current, shown, pushed)}
+              exiting={exitFor(move)}
+              style={{ flex: 1, paddingTop: 16 }}
             >
-              <Pressable
-                testID="seedbackup.close"
-                accessibilityRole="button"
-                accessibilityLabel={translate('seedbackup.close') as string}
-                onPress={close}
-                style={({ pressed }) => ({
-                  width: 44,
-                  height: 44,
-                  borderRadius: 12,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  backgroundColor: pressed
-                    ? 'rgba(255,255,255,0.06)'
-                    : undefined,
-                })}
-              >
-                <XIcon size={18} color={colors.fgMuted} strokeWidth={1.8} />
-              </Pressable>
+              {page()}
             </Animated.View>
-          )}
+            {step !== 'done' && (
+              <Animated.View
+                entering={
+                  pushed
+                    ? undefined
+                    : FadeIn.duration(CONTENT_IN_MS)
+                        .delay(CONTENT_IN_AT)
+                        .reduceMotion(ReduceMotion.System)
+                }
+                exiting={FadeOut.duration(160).reduceMotion(
+                  ReduceMotion.System,
+                )}
+                style={{
+                  position: 'absolute',
+                  top: 7,
+                  right: SIDE - 14,
+                }}
+              >
+                <Pressable
+                  testID="seedbackup.close"
+                  accessibilityRole="button"
+                  accessibilityLabel={translate('seedbackup.close') as string}
+                  onPress={close}
+                  style={({ pressed }) => ({
+                    width: 44,
+                    height: 44,
+                    borderRadius: 12,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: pressed
+                      ? 'rgba(255,255,255,0.06)'
+                      : undefined,
+                  })}
+                >
+                  <XIcon size={18} color={colors.fgMuted} strokeWidth={1.8} />
+                </Pressable>
+              </Animated.View>
+            )}
+          </View>
         </Animated.View>
         {shot !== 'none' && (
           <ScreenshotSheet

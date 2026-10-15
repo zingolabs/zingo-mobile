@@ -25,6 +25,7 @@ import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformance
 export const defaultAppContextLoaded: AppContextLoaded = {
   netInfo: {} as NetInfoType,
   syncingStatus: {} as RPCSyncStatusType,
+  rescan: 'none',
   totalBalance: null,
   addresses: null,
   valueTransfers: null,
