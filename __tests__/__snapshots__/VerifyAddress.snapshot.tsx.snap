@@ -198,7 +198,7 @@ exports[`VerifyAddress - snapshot VerifyAddress initial (empty, no result) 1`] =
               "flexDirection": "row",
               "justifyContent": "center",
               "margin": 0,
-              "minHeight": 48,
+              "minHeight": 38,
               "minWidth": 48,
               "padding": 0,
             }
@@ -257,7 +257,7 @@ exports[`VerifyAddress - snapshot VerifyAddress initial (empty, no result) 1`] =
             "borderWidth": 2,
             "justifyContent": "center",
             "maxWidth": "90%",
-            "minHeight": 48,
+            "minHeight": 44,
             "minWidth": "30%",
             "opacity": 1,
             "padding": 0,
@@ -275,7 +275,7 @@ exports[`VerifyAddress - snapshot VerifyAddress initial (empty, no result) 1`] =
               "flexDirection": "row",
               "justifyContent": "center",
               "margin": 0,
-              "minHeight": 48,
+              "minHeight": 44,
               "minWidth": 48,
               "padding": 0,
             }

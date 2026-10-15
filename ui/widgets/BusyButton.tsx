@@ -11,6 +11,7 @@ import Animated, {
 
 import { useTheme } from '@app/theme';
 import { duration, ease } from '@app/theme/motion';
+import { BUTTON_HEIGHT } from '@ui/primitives/Button';
 
 type BusyButtonProps = {
   title: string;
@@ -23,7 +24,6 @@ type BusyButtonProps = {
   height?: number;
 };
 
-const HEIGHT = 42;
 const BUSY_SIZE = 42;
 const NUDGE_PX = 4;
 
@@ -35,7 +35,7 @@ const BusyButton: React.FunctionComponent<BusyButtonProps> = ({
   onDisabledPress,
   testID,
   labelSize = 14.5,
-  height = HEIGHT,
+  height = BUTTON_HEIGHT,
 }) => {
   const busySize = Math.min(BUSY_SIZE, height);
   const { colors } = useTheme();

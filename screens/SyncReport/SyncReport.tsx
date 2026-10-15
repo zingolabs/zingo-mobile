@@ -30,13 +30,18 @@ import CircularProgress from '@ui/primitives/CircularProgress';
 import InfoTooltip from '@ui/widgets/InfoTooltip';
 import { ChevronLeft } from '@ui/primitives/Icons/Chevron';
 import Header from '@ui/widgets/Header';
+import { BanIcon } from '@ui/primitives/Icons/BanIcon';
 import { BlocksIcon } from '@ui/primitives/Icons/BlocksIcon';
 import { CheckCircleIcon } from '@ui/primitives/Icons/CheckCircleIcon';
 import { ClockIcon } from '@ui/primitives/Icons/ClockIcon';
 import { HalfCircleIcon } from '@ui/primitives/Icons/HalfCircleIcon';
 import { RescanArrows, RescanCloud } from '@ui/primitives/Icons/RescanIcon';
+import { TriangleAlert } from '@ui/primitives/Icons/TriangleAlert';
 import {
+  BackgroundOutcome,
+  backgroundOutcome,
   CellState,
+  chainTip,
   heights,
   MAP_COLS,
   MAP_ROWS,
@@ -74,6 +79,22 @@ const PHASE_KEY: Record<Phase, string> = {
   historic: 'sync.phase-historic',
 };
 
+const BG_KEY: Record<BackgroundOutcome, string> = {
+  ok: 'sync.finished-ok',
+  skipped: 'sync.skipped',
+  failed: 'sync.failed',
+  interrupted: 'sync.interrupted',
+};
+
+const BG_INK: Record<BackgroundOutcome, string> = {
+  ok: OK_INK,
+  skipped: SOFT_INK,
+  failed: RED_INK,
+  interrupted: AMBER,
+};
+
+const BG_ICON = 18;
+
 const LEGEND: { state: CellState; key: string }[] = [
   { state: 'scanned', key: 'sync.legend-scanned' },
   { state: 'scanning', key: 'sync.legend-scanning' },
@@ -85,6 +106,14 @@ const LEGEND: { state: CellState; key: string }[] = [
 const RING = 76;
 const RING_STROKE = 6.5;
 const TURN_MS = 700;
+const RESCAN_ICON = 25;
+/**
+ * The arrows' centre, (25.33, 23.33) on the icon's 32 grid, from the icon's
+ * centre. The turn moves there, rotates and moves back: a percentage
+ * transformOrigin left the arrows circling the cloud on Android.
+ */
+const ARROWS_DX = (RESCAN_ICON * 25.333) / 32 - RESCAN_ICON / 2;
+const ARROWS_DY = (RESCAN_ICON * 23.333) / 32 - RESCAN_ICON / 2;
 const PULSE_MS = 550;
 const TL_W = 315;
 const TL_H = 88;
@@ -108,6 +137,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
   const {
     doRescan,
     syncingStatus,
+    rescan: rescanState,
     birthday,
     translate,
     backgroundSyncInfo,
@@ -119,7 +149,6 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
     zingolibVersion,
     setBackgroundError,
     addLastSnackbar,
-    setBackgroundSyncErrorInfo,
   } = useContext(ContextAppLoaded);
   const { colors } = useTheme();
   const { percentageOutputsScanned, syncInProgress } = useSyncStatus({
@@ -130,7 +159,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
   const [tip, setTip] = useState(false);
   const [cardW, setCardW] = useState(TL_W);
 
-  const serverTip = info.latestBlock || 0;
+  const serverTip = chainTip(syncingStatus, birthday, info.latestBlock || 0);
   const synced = !syncInProgress && percentageOutputsScanned > 0;
   const pct = synced ? 100 : Math.floor(percentageOutputsScanned);
   const h = heights(syncingStatus, birthday, serverTip, synced);
@@ -140,8 +169,10 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
   const turn = useSharedValue(0);
   const pulse = useSharedValue(1);
 
+  /** Only a user rescan pulses; the sync of new blocks after it does not. */
+  const rescanning = rescanState !== 'none';
   useEffect(() => {
-    pulse.value = syncInProgress
+    pulse.value = rescanning
       ? withRepeat(
           withSequence(
             withTiming(0.45, { duration: PULSE_MS }),
@@ -150,10 +181,16 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
           -1,
         )
       : withTiming(1, { duration: PULSE_MS });
-  }, [syncInProgress, pulse]);
+  }, [rescanning, pulse]);
 
   const arrowsStyle = useAnimatedStyle(() => ({
-    transform: [{ rotate: `${turn.value}deg` }],
+    transform: [
+      { translateX: ARROWS_DX },
+      { translateY: ARROWS_DY },
+      { rotate: `${turn.value}deg` },
+      { translateX: -ARROWS_DX },
+      { translateY: -ARROWS_DY },
+    ],
   }));
   const rescanStyle = useAnimatedStyle(() => ({ opacity: pulse.value }));
   const openRescan = () => {
@@ -213,7 +250,6 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
       sendEmail,
       zingolibVersion,
     );
-    setBackgroundSyncErrorInfo('');
   };
 
   const card = {
@@ -272,6 +308,17 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
   const bgEnd = Number(backgroundSyncInfo.dateEnd);
   const bgSameDay =
     bgEnd > 0 && timeOf(bgStart, 'yyyyMMdd') === timeOf(bgEnd, 'yyyyMMdd');
+  const bgOutcome = backgroundOutcome(backgroundSyncInfo);
+  const bgIcon: Record<BackgroundOutcome, React.ReactNode> = {
+    ok: <CheckCircleIcon size={BG_ICON} />,
+    skipped: <BanIcon size={BG_ICON} color={SOFT_INK} />,
+    failed: <TriangleAlert size={BG_ICON} color={RED_INK} />,
+    interrupted: <TriangleAlert size={BG_ICON} color={AMBER} />,
+  };
+  const bgLabel =
+    bgOutcome === 'failed' && backgroundSyncInfo.error
+      ? 'view-error'
+      : BG_KEY[bgOutcome];
   const bgWhen =
     timeOf(bgStart, 'MMM d, yyyy · h:mm:ss') +
     (bgEnd > 0 && bgEnd !== bgStart
@@ -430,20 +477,23 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
             backgroundColor: pressed ? 'rgba(255,255,255,0.06)' : undefined,
           })}
         >
-          <Animated.View style={[{ width: 25, height: 25 }, rescanStyle]}>
-            <RescanCloud size={25} />
+          <Animated.View
+            style={[{ width: RESCAN_ICON, height: RESCAN_ICON }, rescanStyle]}
+          >
+            <RescanCloud size={RESCAN_ICON} />
             <Animated.View
               style={[
                 {
                   position: 'absolute',
                   left: 0,
                   top: 0,
-                  transformOrigin: '79.2% 72.9%',
+                  width: RESCAN_ICON,
+                  height: RESCAN_ICON,
                 },
                 arrowsStyle,
               ]}
             >
-              <RescanArrows size={25} />
+              <RescanArrows size={RESCAN_ICON} />
             </Animated.View>
           </Animated.View>
         </Pressable>
@@ -678,7 +728,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
               },
             ]}
           >
-            {backgroundSyncInfo.error ? null : <CheckCircleIcon />}
+            {bgIcon[bgOutcome]}
             <View style={{ flex: 1, minWidth: 0 }}>
               <Text
                 style={{
@@ -702,17 +752,14 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
               )}
             </View>
             <Text
+              testID="syncreport.background-outcome"
               style={{
-                color: backgroundSyncInfo.error ? RED_INK : OK_INK,
+                color: BG_INK[bgOutcome],
                 fontSize: 11.5,
                 fontWeight: '600',
               }}
             >
-              {
-                translate(
-                  backgroundSyncInfo.error ? 'view-error' : 'sync.finished-ok',
-                ) as string
-              }
+              {translate(bgLabel) as string}
             </Text>
           </Pressable>
         )}

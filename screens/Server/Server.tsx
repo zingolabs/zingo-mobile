@@ -1,6 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import React, { useEffect, useState } from 'react';
-import { Pressable, ScrollView, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import Animated, {
   FadeIn,
   FadeOut,
@@ -32,6 +33,7 @@ import ServerRow, {
   RowCard,
   ScreenHeader,
 } from './ServerRow';
+import SegmentedSwitch from '@ui/widgets/SegmentedSwitch';
 import CustomServerBox from './CustomServerBox';
 import SaveSheet from './SaveSheet';
 import { LogLine } from './ServerLog';
@@ -74,8 +76,6 @@ const CHAINS: ChainNameEnum[] = [
   ChainNameEnum.testChainName,
   ChainNameEnum.regtestChainName,
 ];
-const THUMB_BG = '#0A2A1A';
-const THUMB_BORDER = '#1E6B2A';
 const WAIT = '#E6B43C';
 const LEAVE_AFTER_SAVE_MS = 1500;
 
@@ -224,8 +224,6 @@ const Server: React.FunctionComponent<ServerProps> = ({
   const [customOpen, setCustomOpen] = useState<ChainNameEnum | null>(null);
   const [asking, setAsking] = useState(false);
   const [shakes, setShakes] = useState<Record<string, number>>({});
-  const [segmentW, setSegmentW] = useState(0);
-  const thumb = useSharedValue(CHAINS.indexOf(tab));
 
   const netName = (chain: ChainNameEnum) =>
     translate(
@@ -252,18 +250,6 @@ const Server: React.FunctionComponent<ServerProps> = ({
   useEffect(() => {
     onProbe(tab);
   }, [tab, onProbe]);
-
-  useEffect(() => {
-    thumb.value = withTiming(CHAINS.indexOf(tab), {
-      duration: 260,
-      easing: ease.emphasized,
-    });
-  }, [tab, thumb]);
-
-  const segment = (segmentW - 4) / 3;
-  const thumbStyle = useAnimatedStyle(() => ({
-    transform: [{ translateX: thumb.value * segment }],
-  }));
 
   const regtest = tab === ChainNameEnum.regtestChainName;
   const onTab = !offline && server.chainName === tab;
@@ -563,68 +549,29 @@ const Server: React.FunctionComponent<ServerProps> = ({
         </Animated.View>
       </View>
 
-      <Animated.View
+      <SegmentedSwitch
         testID="server.segments"
-        onLayout={e => setSegmentW(e.nativeEvent.layout.width)}
+        options={CHAINS.map(chain => ({
+          key: chain,
+          label: netName(chain),
+          testID: `server.net.${chain}`,
+        }))}
+        value={tab}
+        onChange={changeTab}
+        disabled={locked}
         style={[
           {
             position: 'absolute',
             left: 22.5,
             right: 22.5,
             top: `${SEGMENT_TOP * 100}%`,
-            height: 37,
-            borderRadius: 999,
-            backgroundColor: colors.bgSurface,
-            borderWidth: 1,
-            borderColor: colors.bottomSheetBorder,
-            flexDirection: 'row',
           },
           lockStyle,
         ]}
-      >
-        {segmentW > 0 && (
-          <Animated.View
-            pointerEvents="none"
-            style={[
-              {
-                position: 'absolute',
-                top: 1,
-                bottom: 1,
-                left: 1,
-                width: segment,
-                borderRadius: 999,
-                backgroundColor: THUMB_BG,
-                borderWidth: 1,
-                borderColor: THUMB_BORDER,
-              },
-              thumbStyle,
-            ]}
-          />
-        )}
-        {CHAINS.map(chain => (
-          <Pressable
-            key={chain}
-            testID={`server.net.${chain}`}
-            onPress={() => changeTab(chain)}
-            disabled={locked}
-            accessibilityRole="tab"
-            accessibilityState={{ selected: chain === tab }}
-            style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
-          >
-            <RegText
-              style={{
-                fontSize: 12.5,
-                fontWeight: '500',
-                color: chain === tab ? colors.fgDefault : colors.fgMuted,
-              }}
-            >
-              {netName(chain)}
-            </RegText>
-          </Pressable>
-        ))}
-      </Animated.View>
+      />
 
-      <ScrollView
+      <KeyboardAwareScrollView
+        bottomOffset={16}
         style={{
           position: 'absolute',
           left: 0,
@@ -687,7 +634,7 @@ const Server: React.FunctionComponent<ServerProps> = ({
             }}
           />
         </Animated.View>
-      </ScrollView>
+      </KeyboardAwareScrollView>
 
       <DoneButton
         testID="server.done"

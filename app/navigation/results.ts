@@ -6,6 +6,7 @@ export type Request =
   | 'send.address'
   | 'send.propose'
   | 'send.confirm'
+  | 'send.contact'
   | 'addressbook.address'
   | 'receive.address'
   | 'receive.addressIndex';
