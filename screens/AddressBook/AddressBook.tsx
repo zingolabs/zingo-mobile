@@ -467,7 +467,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
               <View
                 style={{
                   flexDirection: 'row',
-                  alignItems: 'center',
+                  alignItems: 'flex-start',
                   gap: 7,
                   marginHorizontal: 2,
                   marginBottom: 10,
@@ -475,7 +475,13 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
               >
                 <ChevronDown size={18} color={HINT_ICON} strokeWidth={2.2} />
                 <Text
-                  style={{ color: SOFT_INK, fontSize: 11.5, lineHeight: 16 }}
+                  style={{
+                    flexShrink: 1,
+                    marginTop: 1,
+                    color: SOFT_INK,
+                    fontSize: 11.5,
+                    lineHeight: 16,
+                  }}
                 >
                   {
                     translate(
