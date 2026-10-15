@@ -7,18 +7,6 @@ export default class BackgroundFileImpl {
     return RNFS.DocumentDirectoryPath + '/background.json';
   }
 
-  // Write the server setting
-  static async writeBackground(data: BackgroundType) {
-    const fileName = await this.getFileName();
-    const newBackground: BackgroundType = data;
-
-    await RNFS.writeFile(
-      fileName,
-      JSON.stringify(newBackground),
-      GlobalConst.utf8,
-    );
-  }
-
   // [{"batches": "622", "date": "1673817518.324613" }]
 
   // Read the server background

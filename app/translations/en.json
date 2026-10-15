@@ -428,9 +428,7 @@
   },
   "seed": {
     "buttontexts": {
-      "new": [
-        "I have saved \n the seed"
-      ],
+      "new": ["I have saved \n the seed"],
       "change": [
         "",
         "Open New",
@@ -443,12 +441,8 @@
         "You really want \n to change your \n actual server",
         "Are you certain?"
       ],
-      "view": [
-        "I have saved \n the seed"
-      ],
-      "restore": [
-        "Restore Wallet"
-      ]
+      "view": ["I have saved \n the seed"],
+      "restore": ["Restore Wallet"]
     },
     "title": "Seed",
     "new": "New",
@@ -1190,6 +1184,9 @@
     "legend-low": "Low priority",
     "last-background": "Last background sync",
     "finished-ok": "Finished OK",
+    "failed": "Failed",
+    "interrupted": "Did not finish",
+    "skipped": "Skipped, offline",
     "back-acc": "Back",
     "info-acc": "What is a rescan?",
     "rescan-acc": "Rescan wallet",

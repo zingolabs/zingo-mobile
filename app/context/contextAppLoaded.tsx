@@ -52,7 +52,6 @@ export const defaultAppContextLoaded: AppContextLoaded = {
     date: 0,
     dateEnd: 0,
   } as BackgroundType,
-  setBackgroundSyncErrorInfo: () => {},
   backgroundError: { title: '', error: '' },
   setBackgroundError: () => {},
   lastError: '',

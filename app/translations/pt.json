@@ -428,9 +428,7 @@
   },
   "seed": {
     "buttontexts": {
-      "new": [
-        "Eu salvei \n as Frases de Recuperação"
-      ],
+      "new": ["Eu salvei \n as Frases de Recuperação"],
       "change": [
         "",
         "Abrir Nova Carteira",
@@ -443,12 +441,8 @@
         "Você realmente quer \n alterar para o seu \n servidor atual",
         "Tem certeza?"
       ],
-      "view": [
-        "Eu salvei as \n Frases de Recuperação"
-      ],
-      "restore": [
-        "Restaurar Carteira"
-      ]
+      "view": ["Eu salvei as \n Frases de Recuperação"],
+      "restore": ["Restaurar Carteira"]
     },
     "title": "Frases de Recuperação",
     "new": "Novo",
@@ -1190,6 +1184,9 @@
     "legend-low": "Prioridade baixa",
     "last-background": "Última sincronização em segundo plano",
     "finished-ok": "Concluída",
+    "failed": "Falhou",
+    "interrupted": "Não terminou",
+    "skipped": "Ignorada, offline",
     "back-acc": "Voltar",
     "info-acc": "O que é um reescaneamento?",
     "rescan-acc": "Reescanear a carteira",
