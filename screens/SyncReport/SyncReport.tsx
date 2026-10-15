@@ -85,6 +85,14 @@ const LEGEND: { state: CellState; key: string }[] = [
 const RING = 76;
 const RING_STROKE = 6.5;
 const TURN_MS = 700;
+const RESCAN_ICON = 25;
+/**
+ * The arrows' centre, (25.33, 23.33) on the icon's 32 grid, from the icon's
+ * centre. The turn moves there, rotates and moves back: a percentage
+ * transformOrigin left the arrows circling the cloud on Android.
+ */
+const ARROWS_DX = (RESCAN_ICON * 25.333) / 32 - RESCAN_ICON / 2;
+const ARROWS_DY = (RESCAN_ICON * 23.333) / 32 - RESCAN_ICON / 2;
 const PULSE_MS = 550;
 const TL_W = 315;
 const TL_H = 88;
@@ -161,7 +169,13 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
   }, [rescanning, pulse]);
 
   const arrowsStyle = useAnimatedStyle(() => ({
-    transform: [{ rotate: `${turn.value}deg` }],
+    transform: [
+      { translateX: ARROWS_DX },
+      { translateY: ARROWS_DY },
+      { rotate: `${turn.value}deg` },
+      { translateX: -ARROWS_DX },
+      { translateY: -ARROWS_DY },
+    ],
   }));
   const rescanStyle = useAnimatedStyle(() => ({ opacity: pulse.value }));
   const openRescan = () => {
@@ -439,20 +453,23 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
             backgroundColor: pressed ? 'rgba(255,255,255,0.06)' : undefined,
           })}
         >
-          <Animated.View style={[{ width: 25, height: 25 }, rescanStyle]}>
-            <RescanCloud size={25} />
+          <Animated.View
+            style={[{ width: RESCAN_ICON, height: RESCAN_ICON }, rescanStyle]}
+          >
+            <RescanCloud size={RESCAN_ICON} />
             <Animated.View
               style={[
                 {
                   position: 'absolute',
                   left: 0,
                   top: 0,
-                  transformOrigin: '79.2% 72.9%',
+                  width: RESCAN_ICON,
+                  height: RESCAN_ICON,
                 },
                 arrowsStyle,
               ]}
             >
-              <RescanArrows size={25} />
+              <RescanArrows size={RESCAN_ICON} />
             </Animated.View>
           </Animated.View>
         </Pressable>
