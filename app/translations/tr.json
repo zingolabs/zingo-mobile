@@ -102,6 +102,7 @@
     "no-zcash": "Henüz Zcash kişisi yok.",
     "mine-note": "Kendi adreslerinize göndermek yalnızca ağ ücretine mal olur. Fonları havuzlar arasında taşımak için kullanın.",
     "in-use": "Kullanımda",
+    "no-tags": "Henüz etiketli adres yok. Al ekranında bir adres etiketleyin.",
     "mine-unified": "Birleşik",
     "mine-transparent": "Şeffaf"
   },

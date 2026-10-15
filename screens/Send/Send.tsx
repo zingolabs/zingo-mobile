@@ -150,6 +150,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     netInfo,
     privacy,
     server,
+    walletChainName,
     setBackgroundError,
     addLastSnackbar,
     somePending,
@@ -922,6 +923,13 @@ const Send: React.FunctionComponent<SendProps> = ({
     }
   };
 
+  /** Something the picker can list: a Zcash contact or tagged own address on this network. */
+  const bookHasEntries = addressBook.some(
+    entry =>
+      entry.swapChain === GlobalConst.zecSwapChain &&
+      entry.chain === (walletChainName || server.chainName),
+  );
+
   const openBook = () =>
     navigation.navigate(RouteEnum.AddressBook, { pick: pickFromBook });
 
@@ -1324,6 +1332,9 @@ const Send: React.FunctionComponent<SendProps> = ({
                               />
                             </TouchableOpacity>
                           );
+                        }
+                        if (!bookHasEntries) {
+                          return null;
                         }
                         return !updatingToField ? (
                           <TouchableOpacity

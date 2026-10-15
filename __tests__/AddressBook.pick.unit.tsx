@@ -49,27 +49,26 @@ describe('mineEntries', () => {
     transparent('t1change', RPCAddressScopeEnum.internal),
   ];
 
-  test('Tests that the own list numbers the unified addresses, marks the newest in use and keeps external transparent ones when the wallet has several.', () => {
-    expect(mineEntries(addresses, [], NAMES, '')).toEqual([
-      {
-        address: 'u1first',
-        name: 'Unified 1',
-        current: false,
-        transparent: false,
-      },
+  test('Tests that the own list keeps only tagged addresses, numbers the unified ones and marks the newest in use when the wallet has several.', () => {
+    const book = [tag('Main', 'u1second'), tag('Exchange', 't1outside')];
+    expect(mineEntries(addresses, book, NAMES, '')).toEqual([
       {
         address: 'u1second',
-        name: 'Unified 2',
+        name: 'Unified 2 · Main',
         current: true,
         transparent: false,
       },
       {
         address: 't1outside',
-        name: 'Transparent',
+        name: 'Transparent · Exchange',
         current: false,
         transparent: true,
       },
     ]);
+  });
+
+  test('Tests that the own list is empty when no own address has a tag.', () => {
+    expect(mineEntries(addresses, [], NAMES, '')).toEqual([]);
   });
 
   test('Tests that an own address carries its tag and the search finds it by the tag when one was given.', () => {
@@ -101,7 +100,7 @@ describe('AddressBook as a picker', () => {
         value={{
           ...defaultAppContextLoaded,
           translate: mockTranslate,
-          addressBook: [contact],
+          addressBook: [contact, tag('Savings', 'u1mine')],
           walletChainName: ChainNameEnum.mainChainName,
           addresses: [
             {

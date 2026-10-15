@@ -102,6 +102,7 @@
     "no-zcash": "Ainda não há contatos de Zcash.",
     "mine-note": "Enviar para seus próprios endereços custa apenas a taxa de rede. Use para mover fundos entre pools.",
     "in-use": "Em uso",
+    "no-tags": "Ainda não há endereços com etiqueta. Etiquete um em Receber.",
     "mine-unified": "Unificado",
     "mine-transparent": "Transparente"
   },
