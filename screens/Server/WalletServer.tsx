@@ -15,6 +15,7 @@ import { ContextAppLoaded } from '@app/context';
 import {
   ChainNameEnum,
   RouteEnum,
+  ScreenEnum,
   SelectServerEnum,
   ServerType,
   ServerUrisType,
@@ -34,6 +35,7 @@ import {
 import { AXIS_PT, axisEnter, axisExit } from '@ui/widgets/OnboardingStage';
 import ServerList from '@screens/ServerList';
 import Server from './Server';
+import Header from '@ui/widgets/Header';
 
 type WalletServerProps = NativeStackScreenProps<
   AppDrawerParamList,
@@ -219,7 +221,16 @@ const WalletServer: React.FC<WalletServerProps> = ({
     );
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.bgCanvas }}>
+    <View style={{ flex: 1, backgroundColor: colors.bgCanvas, paddingTop: 4 }}>
+      <Header
+        title={''}
+        screenName={ScreenEnum.Server}
+        noBalance={true}
+        noSyncingStatus={true}
+        noDrawMenu={true}
+        noPrivacy={true}
+        noUfvkIcon={true}
+      />
       {other === null ? (
         <Animated.View
           key="server"

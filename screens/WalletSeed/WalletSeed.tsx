@@ -19,7 +19,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@app/theme';
 import { ease } from '@app/theme/motion';
 import { ContextAppLoaded } from '@app/context';
-import { RouteEnum, SnackbarDurationEnum } from '@app/AppState';
+import { RouteEnum, ScreenEnum, SnackbarDurationEnum } from '@app/AppState';
+import Header from '@ui/widgets/Header';
 import { AppDrawerParamList, WalletSeedAction } from '@app/types';
 import { showConfirm } from '@app/services/showConfirm';
 import { useBiometricGate } from '@app/hooks/useBiometricGate';
@@ -255,11 +256,21 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
       <Animated.View
         testID="walletseed"
         onTouchStart={() => tip !== 'none' && setTip('none')}
-        style={[{ flex: 1, paddingTop: 18 }, behind]}
+        style={[{ flex: 1, paddingTop: 4 }, behind]}
       >
+        <Header
+          title={''}
+          screenName={ScreenEnum.Seed}
+          noBalance={true}
+          noSyncingStatus={true}
+          noDrawMenu={true}
+          noPrivacy={true}
+          noUfvkIcon={true}
+        />
         <View
           style={{
             height: 44,
+            marginTop: 6,
             justifyContent: 'center',
             alignItems: 'center',
             marginBottom: 10,
