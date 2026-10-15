@@ -16,6 +16,7 @@ import { useTheme } from '@app/theme';
 import {
   ScreenEnum,
   AddressBookFileClass,
+  AddressKindEnum,
   GlobalConst,
   RouteEnum,
   SendPageStateClass,
@@ -32,7 +33,10 @@ import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
 import Header from '@ui/widgets/Header';
 import SearchField from '@ui/widgets/SearchField';
 import { ChevronDown, ChevronLeft } from '@ui/primitives/Icons/Chevron';
-import ContactRow from './components/ContactRow';
+import ContactRow, { ROW_LINE } from './components/ContactRow';
+import AddressRowHead from './components/AddressRowHead';
+import SegmentedSwitch from '@ui/widgets/SegmentedSwitch';
+import { RPCAddressScopeEnum } from '@app/walletBackend/enums/RPCAddressScopeEnum';
 import ContactSheet, { ContactEdit } from '@ui/widgets/ContactSheet';
 
 const SIDE = 22;
@@ -42,6 +46,16 @@ const FLASH_MS = 1400;
 
 type Victim =
   { kind: 'none' } | { kind: 'contact'; contact: AddressBookFileClass };
+
+type Tab = 'contacts' | 'wallet';
+
+/** One of the wallet's own addresses, as Receive offers them. */
+export type MineEntry = {
+  address: string;
+  name: string;
+  current: boolean;
+  transparent: boolean;
+};
 
 type AddressBookProps = NativeStackScreenProps<
   AppDrawerParamList,
@@ -69,13 +83,65 @@ export const listedContacts = (
     .sort((a, b) => a.label.localeCompare(b.label));
 };
 
-// Other people's addresses: one list, actions under the tapped row, a sheet to add or edit.
+/**
+ * The wallet's own addresses Receive offers, unified then external
+ * transparent, each named by its kind, its number when there are several,
+ * and the tag the user gave it. The newest unified one is the one Receive
+ * shows.
+ */
+export const mineEntries = (
+  addresses: {
+    address: string;
+    addressKind: AddressKindEnum;
+    scope?: string;
+  }[],
+  book: AddressBookFileClass[],
+  names: { unified: string; transparent: string },
+  query: string,
+): MineEntry[] => {
+  const q = query.trim().toLowerCase();
+  const unified = addresses.filter(a => a.addressKind === AddressKindEnum.u);
+  const transparent = addresses.filter(
+    a =>
+      a.addressKind === AddressKindEnum.t &&
+      a.scope === RPCAddressScopeEnum.external,
+  );
+  const named = (
+    list: { address: string }[],
+    kind: string,
+    isTransparent: boolean,
+  ): MineEntry[] =>
+    list.map((a, i) => {
+      const tag = book.find(entry => entry.address === a.address)?.label;
+      const number = list.length > 1 ? ` ${i + 1}` : '';
+      return {
+        address: a.address,
+        name: `${kind}${number}${tag ? ` · ${tag}` : ''}`,
+        current: !isTransparent && i === list.length - 1,
+        transparent: isTransparent,
+      };
+    });
+  return [
+    ...named(unified, names.unified, false),
+    ...named(transparent, names.transparent, true),
+  ].filter(
+    m =>
+      q.length === 0 ||
+      m.name.toLowerCase().includes(q) ||
+      m.address.toLowerCase().includes(q),
+  );
+};
+
+// Other people's addresses: one list, actions under the tapped row, a sheet to
+// add or edit. Opened with `pick`, the same list chooses an address for Send.
 const AddressBook: React.FunctionComponent<AddressBookProps> = ({
   navigation,
+  route,
   setAddressBook,
 }) => {
   const {
     translate,
+    addresses,
     addressBook,
     walletChainName,
     server,
@@ -101,13 +167,34 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
   });
   const [editNonce, setEditNonce] = useState(0);
   const [victim, setVictim] = useState<Victim>({ kind: 'none' });
+  const [tab, setTab] = useState<Tab>('contacts');
+  const pick = route.params?.pick;
 
   const scrollRef = useRef<ScrollView>(null);
   const contactSheet = useRef<BottomSheetModal>(null);
   useScrollToTop(scrollRef);
 
   const canSend = !readOnly && server.kind !== 'offline';
-  const contacts = listedContacts(addressBook, walletChain, query);
+  const contacts = listedContacts(addressBook, walletChain, query).filter(
+    contact => !pick || contact.swapChain === GlobalConst.zecSwapChain,
+  );
+  const mine =
+    pick && tab === 'wallet'
+      ? mineEntries(
+          addresses ?? [],
+          addressBook,
+          {
+            unified: translate('addressbook.mine-unified') as string,
+            transparent: translate('addressbook.mine-transparent') as string,
+          },
+          query,
+        )
+      : [];
+
+  const choose = (address: string) => {
+    pick?.(address);
+    navigation.goBack();
+  };
 
   const toast = (text: string) =>
     addLastSnackbar(text, SnackbarDurationEnum.short);
@@ -201,7 +288,9 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
           '{query}',
           query.trim(),
         )
-      : (translate('addressbook.empty') as string);
+      : (translate(
+          pick ? 'addressbook.no-zcash' : 'addressbook.empty',
+        ) as string);
 
   return (
     <View
@@ -248,7 +337,11 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
           accessibilityRole="header"
           style={{ color: colors.fgDefault, fontSize: 18, fontWeight: '700' }}
         >
-          {translate('addressbook.title') as string}
+          {
+            translate(
+              pick ? 'addressbook.pick-title' : 'addressbook.title',
+            ) as string
+          }
         </Text>
       </View>
 
@@ -257,9 +350,35 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
           testID="addressbook.search"
           value={query}
           onChangeText={setQuery}
-          placeholder={translate('addressbook.search-contacts') as string}
+          placeholder={
+            translate(
+              tab === 'wallet'
+                ? 'addressbook.search-mine'
+                : 'addressbook.search-contacts',
+            ) as string
+          }
           clearLabel={translate('clear') as string}
         />
+        {!!pick && (
+          <SegmentedSwitch
+            testID="addressbook.tabs"
+            options={[
+              {
+                key: 'contacts',
+                label: translate('addressbook.tab-contacts') as string,
+                testID: 'addressbook.tab.contacts',
+              },
+              {
+                key: 'wallet',
+                label: translate('addressbook.tab-wallet') as string,
+                testID: 'addressbook.tab.wallet',
+              },
+            ]}
+            value={tab}
+            onChange={setTab}
+            style={{ marginTop: 12 }}
+          />
+        )}
       </View>
 
       <ScrollView
@@ -267,28 +386,105 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
         testID="addressbook.scroll-view"
         keyboardShouldPersistTaps="handled"
         style={{ flex: 1, marginTop: 12 }}
-        contentContainerStyle={{ paddingHorizontal: SIDE, paddingBottom: 16 }}
+        contentContainerStyle={{
+          paddingHorizontal: SIDE,
+          paddingBottom: pick ? insets.bottom + 16 : 16,
+        }}
       >
-        {contacts.length > 0 ? (
-          <>
-            <View
+        {tab === 'wallet' ? (
+          mine.length > 0 ? (
+            <>
+              <View
+                testID="addressbook.mine"
+                style={{
+                  borderRadius: 14,
+                  borderWidth: 1,
+                  borderColor: colors.bottomSheetBorder,
+                  backgroundColor: colors.bgSurface,
+                  overflow: 'hidden',
+                }}
+              >
+                {mine.map((m, index) => (
+                  <View
+                    key={m.address}
+                    style={{
+                      borderTopWidth: index === 0 ? 0 : 1,
+                      borderTopColor: ROW_LINE,
+                    }}
+                  >
+                    <AddressRowHead
+                      testID={`addressbook.mine.${m.address}`}
+                      name={m.name}
+                      ticker=""
+                      address={m.address}
+                      avatar={{ kind: 'wallet' }}
+                      tag={
+                        m.transparent
+                          ? 'public'
+                          : m.current
+                            ? 'current'
+                            : 'none'
+                      }
+                      expanded="none"
+                      onPress={() => choose(m.address)}
+                    />
+                  </View>
+                ))}
+              </View>
+              <Text
+                style={{
+                  marginTop: 12,
+                  marginHorizontal: 2,
+                  color: SOFT_INK,
+                  fontSize: 11.5,
+                  lineHeight: 17,
+                }}
+              >
+                {translate('addressbook.mine-note') as string}
+              </Text>
+            </>
+          ) : (
+            <Text
+              testID="addressbook.empty"
               style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                gap: 7,
-                marginHorizontal: 2,
-                marginBottom: 10,
+                marginVertical: 26,
+                marginHorizontal: 10,
+                textAlign: 'center',
+                color: SOFT_INK,
+                fontSize: 12.5,
+                lineHeight: 19,
               }}
             >
-              <ChevronDown size={18} color={HINT_ICON} strokeWidth={2.2} />
-              <Text style={{ color: SOFT_INK, fontSize: 11.5, lineHeight: 16 }}>
-                {
-                  translate(
-                    canSend ? 'addressbook.hint' : 'addressbook.hint-vo',
-                  ) as string
-                }
-              </Text>
-            </View>
+              {(translate('addressbook.no-match') as string).replace(
+                '{query}',
+                query.trim(),
+              )}
+            </Text>
+          )
+        ) : contacts.length > 0 ? (
+          <>
+            {!pick && (
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  gap: 7,
+                  marginHorizontal: 2,
+                  marginBottom: 10,
+                }}
+              >
+                <ChevronDown size={18} color={HINT_ICON} strokeWidth={2.2} />
+                <Text
+                  style={{ color: SOFT_INK, fontSize: 11.5, lineHeight: 16 }}
+                >
+                  {
+                    translate(
+                      canSend ? 'addressbook.hint' : 'addressbook.hint-vo',
+                    ) as string
+                  }
+                </Text>
+              </View>
+            )}
             <View
               testID="addressbook.list"
               style={{
@@ -306,15 +502,17 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
                     key={contact.address}
                     contact={contact}
                     first={index === 0}
-                    open={openAddress === contact.address}
-                    sendable={canSend && zcash}
+                    open={!pick && openAddress === contact.address}
+                    sendable={!pick && canSend && zcash}
                     editable={zcash}
                     flash={flashAddress === contact.address}
                     leaving={leavingAddress === contact.address}
                     onToggle={() =>
-                      setOpenAddress(current =>
-                        current === contact.address ? '' : contact.address,
-                      )
+                      pick
+                        ? choose(contact.address)
+                        : setOpenAddress(current =>
+                            current === contact.address ? '' : contact.address,
+                          )
                     }
                     onSwipe={() => setOpenAddress('')}
                     onSend={() => send(contact)}
@@ -344,20 +542,22 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
         )}
       </ScrollView>
 
-      <View
-        style={{
-          paddingTop: 12,
-          paddingBottom: insets.bottom + 16,
-          alignItems: 'center',
-        }}
-      >
-        <Button
-          testID="addressbook.new"
-          type={ButtonTypeEnum.Primary}
-          title={translate('addressbook.new-contact') as string}
-          onPress={() => openContact({ kind: 'new', preset: '', label: '' })}
-        />
-      </View>
+      {!pick && (
+        <View
+          style={{
+            paddingTop: 12,
+            paddingBottom: insets.bottom + 16,
+            alignItems: 'center',
+          }}
+        >
+          <Button
+            testID="addressbook.new"
+            type={ButtonTypeEnum.Primary}
+            title={translate('addressbook.new-contact') as string}
+            onPress={() => openContact({ kind: 'new', preset: '', label: '' })}
+          />
+        </View>
+      )}
 
       <AppSheetModal
         ref={contactSheet}
