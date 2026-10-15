@@ -1,5 +1,9 @@
 module.exports = {
   presets: ['module:@react-native/babel-preset'],
+  // The SES shim runs as a Metro polyfill, before Babel helpers exist, and
+  // must reach Hermes untouched. `[\\/]` so the pattern also matches the
+  // backslash paths Metro hands Babel on Windows.
+  ignore: [/[\\/]ses(-hermes)?\.cjs$/],
   plugins: [
     require('./babel.react-compiler'),
     'dynamic-import-node',
