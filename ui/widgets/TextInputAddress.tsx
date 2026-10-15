@@ -16,6 +16,7 @@ import ErrorText from '@ui/primitives/ErrorText';
 import RegText from '@ui/primitives/RegText';
 import { validateAddressForChain } from '@app/swap';
 import { GlobalConst, RouteEnum, ScreenEnum } from '@app/AppState';
+import { ScannerAddressNavigationState } from '@app/types/NavigationTypes';
 
 type TextInputAddressProps = {
   address: string;
@@ -82,12 +83,25 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
     // ScannerAddress is a top-level (root Stack) screen, so a direct navigate
     // works from any caller (Receive, Send, etc.) regardless of which stack
     // they live in.
-    navigation.navigate(RouteEnum.ScannerAddress, {
+    /** Typed here because this navigation is untyped and would take any params. */
+    const params: ScannerAddressNavigationState = {
       setAddress: (a: string) => setAddress(a),
-      active: true,
-      // Non-ZEC chains take the scanned string verbatim (no `zcash:` prefix).
-      raw: (swapChain ?? GlobalConst.zecSwapChain) !== GlobalConst.zecSwapChain,
-    });
+      accepts: (v: string) =>
+        validateAddressForChain(
+          swapChain ?? GlobalConst.zecSwapChain,
+          v,
+          server.chainName,
+        ),
+      texts: {
+        title: translate('scanner.title') as string,
+        hint: translate('scanner.hint-address') as string,
+        miss: translate('scanner.miss-address') as string,
+        found: translate('scanner.found') as string,
+        back: translate('scanner.back') as string,
+        torch: translate('scanner.torch') as string,
+      },
+    };
+    navigation.navigate(RouteEnum.ScannerAddress, params);
   };
 
   //console.log('render input text address');
