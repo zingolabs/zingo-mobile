@@ -63,7 +63,7 @@ jobs:
           cache: yarn
 
       - name: Yarn install
-        run: yarn
+        run: yarn setup
 
       - name: Build APK
         working-directory: android
@@ -177,7 +177,7 @@ jobs:
           cache: yarn
 
       - name: Yarn install
-        run: yarn
+        run: yarn setup
 
       - name: Pod install
         uses: nick-fields/retry@v4

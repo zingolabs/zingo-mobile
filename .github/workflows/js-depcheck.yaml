@@ -24,7 +24,7 @@ jobs:
           node-version: 22.18.0
           cache: yarn
 
-      - run: yarn
+      - run: yarn setup
 
       # Fails on any dependency or devDependency that nothing uses.
       # Known false positives are recorded, with reasons, in .depcheckrc.yml.

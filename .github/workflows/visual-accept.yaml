@@ -90,7 +90,7 @@ jobs:
           node-version: 22.18.0
           cache: yarn
 
-      - run: yarn
+      - run: yarn setup
 
       - name: Accept the baseline
         env:

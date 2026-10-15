@@ -21,7 +21,7 @@ destination — there is no separate "device build" vs "simulator build".
    `git clone --recurse-submodules https://github.com/zingolabs/zingo-mobile.git`.
    In an existing clone, run `git submodule update --init zingolib`.
 2. Go to the cloned repo `cd zingo-mobile`.
-3. From the root of the project, install JS deps: `yarn`
+3. From the root of the project, install JS deps: `yarn setup`
 4. Build the Binding Layer: `yarn rust:ios` — may take a long time on first run.
 5. In the `ios` directory, run: `pod install`
 
