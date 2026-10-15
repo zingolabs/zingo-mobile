@@ -82,8 +82,13 @@ const TON_USER_RE = /^(?:[EU]Q|kf)[A-Za-z0-9_-]{46}$/;
 const TON_RAW_RE = /^-?\d+:[a-fA-F0-9]{64}$/;
 
 const isEvm: Validator = a => EVM_RE.test(a);
-const isBtc: Validator = a => BTC_LEGACY_RE.test(a) || BTC_BECH32_RE.test(a);
-const isLtc: Validator = a => LTC_LEGACY_RE.test(a) || LTC_BECH32_RE.test(a);
+const isSegwit = (address: string, pattern: RegExp): boolean =>
+  (address === address.toLowerCase() || address === address.toUpperCase()) &&
+  pattern.test(address.toLowerCase());
+const isBtc: Validator = a =>
+  BTC_LEGACY_RE.test(a) || isSegwit(a, BTC_BECH32_RE);
+const isLtc: Validator = a =>
+  LTC_LEGACY_RE.test(a) || isSegwit(a, LTC_BECH32_RE);
 const isDoge: Validator = a => DOGE_RE.test(a);
 const isDash: Validator = a => DASH_RE.test(a);
 const isBch: Validator = a => BCH_LEGACY_RE.test(a) || BCH_CASHADDR_RE.test(a);
