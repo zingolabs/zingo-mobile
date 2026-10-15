@@ -102,7 +102,6 @@
     "no-zcash": "No Zcash contacts yet.",
     "mine-note": "Sending to your own addresses only costs the network fee. Use it to move funds between pools.",
     "in-use": "In use",
-    "no-tags": "No tagged addresses yet. Tag one in Receive.",
     "mine-unified": "Unified",
     "mine-transparent": "Transparent"
   },
