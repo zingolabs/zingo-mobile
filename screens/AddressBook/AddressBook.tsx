@@ -84,9 +84,9 @@ export const listedContacts = (
 };
 
 /**
- * The wallet's own addresses the user tagged, among those Receive offers:
- * unified then external transparent, each named by its kind, its number when
- * there are several, and its tag. The newest unified one is the one Receive
+ * The wallet's own addresses Receive offers, unified then external
+ * transparent, each named by its kind, its number when there are several,
+ * and the tag the user gave it. The newest unified one is the one Receive
  * shows.
  */
 export const mineEntries = (
@@ -111,19 +111,15 @@ export const mineEntries = (
     kind: string,
     isTransparent: boolean,
   ): MineEntry[] =>
-    list.flatMap((a, i) => {
+    list.map((a, i) => {
       const tag = book.find(entry => entry.address === a.address)?.label;
       const number = list.length > 1 ? ` ${i + 1}` : '';
-      return tag
-        ? [
-            {
-              address: a.address,
-              name: `${kind}${number} · ${tag}`,
-              current: !isTransparent && i === list.length - 1,
-              transparent: isTransparent,
-            },
-          ]
-        : [];
+      return {
+        address: a.address,
+        name: `${kind}${number}${tag ? ` · ${tag}` : ''}`,
+        current: !isTransparent && i === list.length - 1,
+        transparent: isTransparent,
+      };
     });
   return [
     ...named(unified, names.unified, false),
@@ -459,12 +455,10 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
                 lineHeight: 19,
               }}
             >
-              {query.trim().length > 0
-                ? (translate('addressbook.no-match') as string).replace(
-                    '{query}',
-                    query.trim(),
-                  )
-                : (translate('addressbook.no-tags') as string)}
+              {(translate('addressbook.no-match') as string).replace(
+                '{query}',
+                query.trim(),
+              )}
             </Text>
           )
         ) : contacts.length > 0 ? (
