@@ -113,11 +113,11 @@ test('Tests that Switch moves the wallet to the other network only after the con
   expect(onCancel).not.toHaveBeenCalled();
 });
 
-test('Tests that the X leaves the network change without moving the wallet.', async () => {
+test('Tests that Back leaves the network change without moving the wallet.', async () => {
   renderKey(ChainNameEnum.testChainName);
   await act(async () => {});
   await act(async () => {
-    fireEvent.press(screen.getByTestId('viewingkey.close'));
+    fireEvent.press(screen.getByTestId('viewingkey.back'));
   });
   expect(onCancel).toHaveBeenCalledTimes(1);
   expect(onConfirm).not.toHaveBeenCalled();

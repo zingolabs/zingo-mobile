@@ -32,7 +32,7 @@ import { getRecoveryWalletInfo } from '@app/services/recoveryWalletInfo';
 import { showConfirm } from '@app/services/showConfirm';
 import { fetchWallet } from '@app/walletBackend';
 import { copySensitive } from '@app/utils/sensitiveClipboard';
-import { XIcon } from '@ui/primitives/Icons/XIcon';
+import { ChevronLeft } from '@ui/primitives/Icons/Chevron';
 import { EyeIcon } from '@ui/primitives/Icons/EyeIcon';
 import { BanIcon } from '@ui/primitives/Icons/BanIcon';
 import { UsersIcon } from '@ui/primitives/Icons/UsersIcon';
@@ -211,51 +211,59 @@ const ViewingKey: React.FunctionComponent<ViewingKeyProps> = ({
         noPrivacy={true}
         noUfvkIcon={true}
       />
-      <View style={{ flex: 1, paddingTop: 19 }}>
-        <Pressable
-          testID="viewingkey.close"
-          accessibilityRole="button"
-          accessibilityLabel={translate('seedbackup.close') as string}
-          onPress={close}
-          style={({ pressed }) => ({
-            position: 'absolute',
-            top: 20,
-            right: SIDE - 14,
-            width: 44,
-            height: 44,
-            borderRadius: 12,
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: pressed ? 'rgba(255,255,255,0.06)' : undefined,
-          })}
-        >
-          <XIcon size={18} color={colors.fgMuted} strokeWidth={1.8} />
-        </Pressable>
-        <Text
-          accessibilityRole="header"
+      <View style={{ flex: 1 }}>
+        <View
           style={{
-            color: colors.fgDefault,
-            fontSize: 18,
-            fontWeight: '700',
-            textAlign: 'center',
+            minHeight: 44,
             marginTop: 6,
-            marginHorizontal: 60,
+            marginBottom: 10,
+            justifyContent: 'center',
+            alignItems: 'center',
           }}
         >
-          {switchTo
-            ? (translate('viewingkey.switch-title') as string).replace(
-                '{net}',
-                net,
-              )
-            : (translate('viewingkey.title') as string)}
-        </Text>
+          <Pressable
+            testID="viewingkey.back"
+            accessibilityRole="button"
+            accessibilityLabel={translate('walletseed.back-acc') as string}
+            onPress={close}
+            style={({ pressed }) => ({
+              position: 'absolute',
+              left: 10,
+              top: 0,
+              width: 44,
+              height: 44,
+              borderRadius: 12,
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: pressed ? 'rgba(255,255,255,0.06)' : undefined,
+            })}
+          >
+            <ChevronLeft size={22} color={colors.fgAccent} strokeWidth={2.2} />
+          </Pressable>
+          <Text
+            accessibilityRole="header"
+            style={{
+              color: colors.fgDefault,
+              fontSize: 18,
+              fontWeight: '700',
+              textAlign: 'center',
+              marginHorizontal: 60,
+            }}
+          >
+            {switchTo
+              ? (translate('viewingkey.switch-title') as string).replace(
+                  '{net}',
+                  net,
+                )
+              : (translate('viewingkey.title') as string)}
+          </Text>
+        </View>
         <Text
           style={{
             color: colors.fgMuted,
             fontSize: 14,
             lineHeight: 20,
             textAlign: 'center',
-            marginTop: 12,
             marginHorizontal: SIDE,
           }}
         >
