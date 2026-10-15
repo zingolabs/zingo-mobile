@@ -27,6 +27,8 @@ import RegText from '@ui/primitives/RegText';
 import BoldText from '@ui/primitives/BoldText';
 import { ServerStatus } from '@app/AppState/types/ServerStatus';
 import ServerRow, {
+  Placement,
+  useLift,
   DoneButton,
   Latency,
   ROW_DIVIDER,
@@ -65,6 +67,7 @@ export type ServerProps = {
   // Set to a guard the host calls on a system back; true when the screen
   // handled it (an unsaved custom server asks first).
   backGuard?: React.MutableRefObject<(() => boolean) | null>;
+  placement?: Placement;
 };
 
 const CARD_TOP = 98.5 / 874;
@@ -211,7 +214,9 @@ const Server: React.FunctionComponent<ServerProps> = ({
   onUnreachable,
   onBack,
   backGuard,
+  placement = 'screen',
 }) => {
+  const { lift, onLayout } = useLift(placement, CARD_TOP);
   const { colors } = useTheme();
   const t = (key: string, values: Record<string, string> = {}) =>
     fill(translate(`server.${key}`) as string, values);
@@ -500,7 +505,10 @@ const Server: React.FunctionComponent<ServerProps> = ({
   );
 
   return (
-    <View style={{ flex: 1, backgroundColor: 'transparent' }}>
+    <View
+      style={{ flex: 1, backgroundColor: 'transparent' }}
+      onLayout={onLayout}
+    >
       <View
         testID="server.card"
         accessible
@@ -509,6 +517,7 @@ const Server: React.FunctionComponent<ServerProps> = ({
           left: 22.5,
           right: 22.5,
           top: `${CARD_TOP * 100}%`,
+          marginTop: -lift,
           height: 61,
           borderRadius: 14,
           backgroundColor: colors.bgSurface,
@@ -565,6 +574,7 @@ const Server: React.FunctionComponent<ServerProps> = ({
             left: 22.5,
             right: 22.5,
             top: `${SEGMENT_TOP * 100}%`,
+            marginTop: -lift,
           },
           lockStyle,
         ]}
@@ -581,6 +591,7 @@ const Server: React.FunctionComponent<ServerProps> = ({
           left: 0,
           right: 0,
           top: `${BODY_TOP * 100}%`,
+          marginTop: -lift,
           bottom: BODY_BOTTOM,
         }}
       >
