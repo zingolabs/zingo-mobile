@@ -2,7 +2,6 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import {
   Animated as RNAnimated,
-  Platform,
   Pressable,
   StyleSheet,
   Text,
@@ -23,8 +22,7 @@ import { useTheme } from '@app/theme';
 import { ease } from '@app/theme/motion';
 import { AddressBookFileClass } from '@app/AppState';
 import { ContextAppLoaded } from '@app/context';
-import Utils from '@app/utils';
-import { ChainLogo } from '@ui/widgets/ChainSelect';
+import AddressRowHead from './AddressRowHead';
 import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
 import { CopyIcon } from '@ui/primitives/Icons/CopyIcon';
 import { PencilIcon } from '@ui/primitives/Icons/PencilIcon';
@@ -32,17 +30,13 @@ import { PlaneIcon } from '@ui/primitives/Icons/PlaneIcon';
 import { TrashCan, TrashLid } from '@ui/primitives/Icons/TrashIcon';
 
 export const ROW_LINE = '#0A1F3D';
-const INK_SOFT = '#8DA0B8';
 const INK_CODE = '#B9C6D6';
 const ACT_BG = '#020B18';
 const ACT_PRESSED = '#0A1F3D';
 const RED = '#F2878A';
-const PUBLIC_INK = '#E6C46A';
-const PUBLIC_BG = 'rgba(230,196,106,0.12)';
 const SWIPE_BG = '#0E5A18';
 const SWIPE_INK = '#D7F5D2';
 const FLASH = 'rgba(20,157,5,0.16)';
-const MONO = Platform.select({ ios: 'Menlo', default: 'monospace' });
 
 const UNFOLD_MS = 260;
 const BUTTONS_MS = 200;
@@ -357,7 +351,6 @@ const ContactRow: React.FunctionComponent<ContactRowProps> = ({
 
   const ticker = contact.swapChain.toUpperCase();
   const isPublic = editable && /^t/i.test(contact.address);
-  const initial = contact.label.slice(0, 1).toUpperCase();
 
   return (
     <Animated.View
@@ -411,122 +404,16 @@ const ContactRow: React.FunctionComponent<ContactRowProps> = ({
               glowStyle,
             ]}
           />
-          <Pressable
-            testID={`addressbook.row.${contact.address}.head`}
-            accessibilityRole="button"
-            accessibilityState={{ expanded: open }}
+          <AddressRowHead
+            testID={`addressbook.row.${contact.address}`}
+            name={contact.label}
+            ticker={ticker}
+            address={contact.address}
+            avatar={{ kind: 'initial', color: contact.color, ticker }}
+            tag={isPublic ? 'public' : 'none'}
+            expanded={open ? 'open' : 'closed'}
             onPress={onToggle}
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              gap: 12,
-              minHeight: 62,
-              paddingVertical: 8,
-              paddingHorizontal: 13,
-            }}
-          >
-            <View
-              style={{
-                width: 36,
-                height: 36,
-                borderRadius: 18,
-                backgroundColor: `${contact.color}29`,
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <Text
-                style={{
-                  color: contact.color,
-                  fontSize: 14,
-                  fontWeight: '700',
-                }}
-              >
-                {initial}
-              </Text>
-              <View
-                style={{
-                  position: 'absolute',
-                  right: -5,
-                  bottom: -5,
-                  width: 22,
-                  height: 22,
-                  borderRadius: 11,
-                  borderWidth: 2,
-                  borderColor: colors.bgSurface,
-                  backgroundColor: colors.bgSurface,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <ChainLogo chain={ticker} size={18} />
-              </View>
-            </View>
-            <View style={{ flex: 1, minWidth: 0 }}>
-              <View style={{ flexDirection: 'row', alignItems: 'baseline' }}>
-                <Text
-                  numberOfLines={1}
-                  style={{
-                    flexShrink: 1,
-                    color: colors.fgDefault,
-                    fontSize: 13.5,
-                    lineHeight: 18,
-                    fontWeight: '600',
-                  }}
-                >
-                  {contact.label}
-                </Text>
-                <Text
-                  style={{
-                    marginLeft: 8,
-                    color: INK_SOFT,
-                    fontSize: 10,
-                    fontWeight: '600',
-                    letterSpacing: 0.5,
-                  }}
-                >
-                  {ticker}
-                </Text>
-              </View>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  gap: 7,
-                  marginTop: 2,
-                }}
-              >
-                <Text
-                  style={{
-                    color: INK_CODE,
-                    fontFamily: MONO,
-                    fontSize: 11.5,
-                    fontWeight: '500',
-                  }}
-                >
-                  {Utils.trimToSmall(contact.address, 7)}
-                </Text>
-                {isPublic && (
-                  <Text
-                    testID={`addressbook.row.${contact.address}.public`}
-                    style={{
-                      color: PUBLIC_INK,
-                      backgroundColor: PUBLIC_BG,
-                      fontSize: 10,
-                      fontWeight: '600',
-                      letterSpacing: 0.4,
-                      paddingHorizontal: 6,
-                      paddingVertical: 1,
-                      borderRadius: 5,
-                      overflow: 'hidden',
-                    }}
-                  >
-                    {(translate('addressbook.public') as string).toUpperCase()}
-                  </Text>
-                )}
-              </View>
-            </View>
-          </Pressable>
+          />
           <Animated.View style={[{ overflow: 'hidden' }, unfoldStyle]}>
             <Animated.View
               style={[

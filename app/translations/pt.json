@@ -59,7 +59,6 @@
     "label-placeholder": "Apelido/Tag",
     "delete": "Excluir",
     "empty": "Ainda não há contatos. Adicione um com Novo contato.",
-    "select-placeholder": "Escolha um Contato...",
     "search-placeholder": "Procurar",
     "chain": "Cadeia",
     "select-chain-placeholder": "Escolha uma cadeia...",
@@ -95,7 +94,17 @@
     "kind-sapling": "Endereço Sapling",
     "kind-transparent": "Endereço transparente",
     "kind-tex": "Endereço TEX",
-    "back-acc": "Voltar"
+    "back-acc": "Voltar",
+    "pick-title": "Escolha um contato",
+    "tab-contacts": "Contatos",
+    "tab-wallet": "Minha carteira",
+    "search-mine": "Pesquisar meus endereços",
+    "no-zcash": "Ainda não há contatos de Zcash.",
+    "mine-note": "Enviar para seus próprios endereços custa apenas a taxa de rede. Use para mover fundos entre pools.",
+    "in-use": "Em uso",
+    "no-tags": "Ainda não há endereços com etiqueta. Etiquete um em Receber.",
+    "mine-unified": "Unificado",
+    "mine-transparent": "Transparente"
   },
   "change-privacy-legend": ".\nToque para revelar os valores ocultos.",
   "txtcopied": "Texto copiado para a Área de Transferência",
@@ -428,9 +437,7 @@
   },
   "seed": {
     "buttontexts": {
-      "new": [
-        "Eu salvei \n as Frases de Recuperação"
-      ],
+      "new": ["Eu salvei \n as Frases de Recuperação"],
       "change": [
         "",
         "Abrir Nova Carteira",
@@ -443,12 +450,8 @@
         "Você realmente quer \n alterar para o seu \n servidor atual",
         "Tem certeza?"
       ],
-      "view": [
-        "Eu salvei as \n Frases de Recuperação"
-      ],
-      "restore": [
-        "Restaurar Carteira"
-      ]
+      "view": ["Eu salvei as \n Frases de Recuperação"],
+      "restore": ["Restaurar Carteira"]
     },
     "title": "Frases de Recuperação",
     "new": "Novo",
@@ -1190,6 +1193,9 @@
     "legend-low": "Prioridade baixa",
     "last-background": "Última sincronização em segundo plano",
     "finished-ok": "Concluída",
+    "failed": "Falhou",
+    "interrupted": "Não terminou",
+    "skipped": "Ignorada, offline",
     "back-acc": "Voltar",
     "info-acc": "O que é um reescaneamento?",
     "rescan-acc": "Reescanear a carteira",
