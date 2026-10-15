@@ -437,9 +437,7 @@
   },
   "seed": {
     "buttontexts": {
-      "new": [
-        "Ya he guardado \n la semilla"
-      ],
+      "new": ["Ya he guardado \n la semilla"],
       "change": [
         "",
         "Abrir Nuevo",
@@ -452,12 +450,8 @@
         "Realmente quieres \n cambiar el \n servidor activo",
         "Estás seguro/a?"
       ],
-      "view": [
-        "Ya he guardado \n la semilla"
-      ],
-      "restore": [
-        "Restaurar Monedero"
-      ]
+      "view": ["Ya he guardado \n la semilla"],
+      "restore": ["Restaurar Monedero"]
     },
     "title": "Semilla",
     "new": "Nueva",
@@ -1199,6 +1193,9 @@
     "legend-low": "Prioridad baja",
     "last-background": "Última sincronización en segundo plano",
     "finished-ok": "Terminó bien",
+    "failed": "Falló",
+    "interrupted": "No terminó",
+    "skipped": "Omitida, sin conexión",
     "back-acc": "Atrás",
     "info-acc": "¿Qué es un reescaneo?",
     "rescan-acc": "Reescanear el monedero",

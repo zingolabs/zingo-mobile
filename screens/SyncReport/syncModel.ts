@@ -1,3 +1,4 @@
+import { BackgroundType } from '@app/AppState';
 import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
 import { RPCSyncScanRangeStatusType } from '@app/walletBackend/types/RPCSyncScanRangeStatusType';
 import { RPCSyncScanRangePriorityStatusEnum as Priority } from '@app/walletBackend/enums/RPCSyncScanRangePriorityStatusEnum';
@@ -115,3 +116,21 @@ export const mapCells = (
 /** The timeline's right edge: the tip plus a little room, rounded up to 100k blocks. */
 export const scaleMax = (tip: number): number =>
   Math.max(100_000, Math.ceil((tip * 1.02) / 100_000) * 100_000);
+
+export type BackgroundOutcome = 'ok' | 'skipped' | 'failed' | 'interrupted';
+
+/**
+ * How the last background sync ended, from the file the native task writes.
+ * The task writes its end time on every exit it controls, so a missing one
+ * means the system killed it; and the app in the foreground cancels it, so
+ * the report never watches one run. Some failures carry no error text, only
+ * a message ending in KO.
+ */
+export const backgroundOutcome = (info: BackgroundType): BackgroundOutcome =>
+  info.error || info.message.trim().endsWith('KO.')
+    ? 'failed'
+    : Number(info.dateEnd) > 0
+      ? info.message.startsWith('Sync skipped')
+        ? 'skipped'
+        : 'ok'
+      : 'interrupted';

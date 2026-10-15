@@ -435,9 +435,7 @@
   },
   "seed": {
     "buttontexts": {
-      "new": [
-        "Yedekleme ifadesini\nKaydettim"
-      ],
+      "new": ["Yedekleme ifadesini\nKaydettim"],
       "change": [
         "",
         "Yeni aç",
@@ -450,12 +448,8 @@
         "Gerçek cüzdanınızı\nDeğiştirmek istiyor musunuz?",
         "Emin misiniz?"
       ],
-      "view": [
-        "Yedekleme ifadesini\nKaydettim"
-      ],
-      "restore": [
-        "Cüzdanı geri yükle"
-      ]
+      "view": ["Yedekleme ifadesini\nKaydettim"],
+      "restore": ["Cüzdanı geri yükle"]
     },
     "title": "kurtarma ifadesi",
     "new": "Yeni",
@@ -1197,6 +1191,9 @@
     "legend-low": "Düşük öncelik",
     "last-background": "Son arka plan senkronizasyonu",
     "finished-ok": "Başarıyla bitti",
+    "failed": "Başarısız",
+    "interrupted": "Bitmedi",
+    "skipped": "Atlandı, çevrimdışı",
     "back-acc": "Geri",
     "info-acc": "Yeniden tarama nedir?",
     "rescan-acc": "Cüzdanı yeniden tara",
