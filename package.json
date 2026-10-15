@@ -98,6 +98,7 @@
     "@babel/runtime": "^7.29.7",
     "@lavamoat/allow-scripts": "^5.1.0",
     "@lavamoat/preinstall-always-fail": "^3.0.1",
+    "@lavamoat/react-native-lockdown": "^3.0.0",
     "@playwright/test": "^1.64.1",
     "@react-native-community/cli": "20.2.0",
     "@react-native-community/cli-platform-android": "20.2.0",
