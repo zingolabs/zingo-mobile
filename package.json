@@ -33,6 +33,7 @@
     "prettier:check": "prettier --check './**/*.{js,jsx,ts,tsx}'",
     "coverage": "jest --coverage",
     "postinstall": "patch-package",
+    "setup": "yarn install --frozen-lockfile && yarn allow-scripts",
     "build:prod:release": "cd android && ./gradlew assembleProdRelease && cd ..",
     "build:prod:release:split": "cd android && ./gradlew assembleProdRelease -PsplitApk=true && cd ..",
     "build:prod:debug": "cd android && ./gradlew assembleProdDebug && cd ..",
@@ -96,6 +97,8 @@
   "devDependencies": {
     "@babel/core": "^7.29.7",
     "@babel/runtime": "^7.29.7",
+    "@lavamoat/allow-scripts": "^5.1.0",
+    "@lavamoat/preinstall-always-fail": "^3.0.1",
     "@playwright/test": "^1.64.0",
     "@react-native-community/cli": "20.2.0",
     "@react-native-community/cli-platform-android": "20.2.0",
@@ -153,5 +156,14 @@
     "jest-jasmine2": "30.5.0",
     "jest-mock": "30.5.0"
   },
-  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e",
+  "lavamoat": {
+    "allowScripts": {
+      "jest>@jest/core>jest-haste-map>@parcel/watcher#2.6.0": false,
+      "jest>@jest/core>jest-resolve>unrs-resolver#1.12.2": false,
+      "tsx>esbuild#0.28.2": false,
+      "vite>esbuild#0.25.12": false,
+      "@lavamoat/preinstall-always-fail#3.0.1": false
+    }
+  }
 }
