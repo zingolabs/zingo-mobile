@@ -49,6 +49,14 @@ const REPORT_MIN_HEIGHT = 120;
 // never overlap.
 const LIVE_REFRESH_MS = 2000;
 
+/**
+ * A URI has no words to keep whole: left to the line breaker it splits at
+ * every `/` and `.`, so a long server spills over three ragged lines. A
+ * zero-width space between characters lets it fill each line instead.
+ */
+const wrapValue = (value: string) =>
+  /^[a-z]+:\/\//.test(value) ? value.split('').join('​') : value;
+
 // One iOS-style row: muted label on the left, value right-aligned.
 const DoctorRow = ({
   row,
@@ -75,7 +83,7 @@ const DoctorRow = ({
   >
     <RegText style={{ color: labelColor }}>{row.label}</RegText>
     <RegText style={{ color: valueColor, flex: 1, textAlign: 'right' }}>
-      {row.value}
+      {wrapValue(row.value)}
     </RegText>
   </View>
 );
