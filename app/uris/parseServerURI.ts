@@ -23,7 +23,11 @@ export type ParseServerUriResult =
   { kind: 'canonicalUri'; uri: string } | ErrorKeyed<ServerUriErrorKey>;
 
 const authority = (uri: string): string =>
-  uri.trim().replace(/\\/g, '/').replace(/^[^:]+:\/*/, '').split(/[/?#]/)[0];
+  uri
+    .trim()
+    .replace(/\\/g, '/')
+    .replace(/^[^:]+:\/*/, '')
+    .split(/[/?#]/)[0];
 
 const parseServerURI = (uri: string): ParseServerUriResult => {
   if (!uri) {
