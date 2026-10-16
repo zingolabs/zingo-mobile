@@ -68,3 +68,60 @@ describe('parseServerURI — Issue G plaintext rules', () => {
     });
   });
 });
+
+
+test.each([
+  ['https://example.com:443/', 'https://example.com:443'],
+  ['https://example.com:443/path', 'https://example.com:443'],
+  ['https://example.com:443?x=1', 'https://example.com:443'],
+  ['http://localhost:80/', 'http://localhost:80'],
+])(
+  'Tests that the parser keeps an explicit default port when a path or query follows it. %s',
+  (uri, canonical) => {
+    expect(parseServerURI(uri)).toEqual({
+      kind: 'canonicalUri',
+      uri: canonical,
+    });
+  },
+);
+
+test('Tests that the parser keeps port 9067 when the path ends with a default port.', () => {
+  expect(parseServerURI('https://example.com/a:443')).toEqual({
+    kind: 'canonicalUri',
+    uri: 'https://example.com:9067',
+  });
+});
+
+test.each([
+  [String.raw`https:\\example.com:443\x`, 'https://example.com:443'],
+  [String.raw`https://example.com:443\x`, 'https://example.com:443'],
+  [String.raw`http:\\localhost:80\x`, 'http://localhost:80'],
+  [String.raw`https:\example.com:443\x`, 'https://example.com:443'],
+  ['https:example.com:443/x', 'https://example.com:443'],
+  ['https:////example.com:443/x', 'https://example.com:443'],
+  [String.raw`https://example.com\a:443`, 'https://example.com:9067'],
+  [String.raw`https:\\example.com:8443\x`, 'https://example.com:8443'],
+])(
+  'Tests that the parser preserves the authority port when separators vary: %s',
+  (uri, canonical) => {
+    expect(parseServerURI(uri)).toEqual({ kind: 'canonicalUri', uri: canonical });
+  },
+);
+
+test.each([
+  ['https://example.com/?x=zec.rocks', 'https://example.com:9067'],
+  ['https://example.com/na.lightwalletd.com', 'https://example.com:9067'],
+  ['https://zec.rocks@example.com', 'https://example.com:9067'],
+  ['https://zec.rocks.evil.com', 'https://zec.rocks.evil.com:9067'],
+  ['https://fakezec.rocks', 'https://fakezec.rocks:9067'],
+  ['https://na.lightwalletd.com.evil.com', 'https://na.lightwalletd.com.evil.com:9067'],
+  ['https://zec.rocks', 'https://zec.rocks:443'],
+  ['https://EU.ZEC.ROCKS', 'https://eu.zec.rocks:443'],
+  ['https://na.lightwalletd.com', 'https://na.lightwalletd.com:443'],
+  ['https://zec.rocks:8443', 'https://zec.rocks:8443'],
+])(
+  'Tests that the parser selects a default port from the hostname when parsing %s',
+  (uri, canonical) => {
+    expect(parseServerURI(uri)).toEqual({ kind: 'canonicalUri', uri: canonical });
+  },
+);

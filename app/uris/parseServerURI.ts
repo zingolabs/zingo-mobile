@@ -23,7 +23,7 @@ export type ParseServerUriResult =
   { kind: 'canonicalUri'; uri: string } | ErrorKeyed<ServerUriErrorKey>;
 
 const authority = (uri: string): string =>
-  uri.replace(/^[^/]*\/\//, '').split(/[/?#]/)[0];
+  uri.trim().replace(/\\/g, '/').replace(/^[^:]+:\/*/, '').split(/[/?#]/)[0];
 
 const parseServerURI = (uri: string): ParseServerUriResult => {
   if (!uri) {
@@ -72,11 +72,9 @@ const parseServerURI = (uri: string): ParseServerUriResult => {
     // for `zec.rocks`         ->  443
     if (!port) {
       port =
-        uri.includes('na.lightwalletd') ||
-        uri.includes('sa.lightwalletd') ||
-        uri.includes('eu.lightwalletd') ||
-        uri.includes('ai.lightwalletd') ||
-        uri.includes('zec.rocks')
+        /^(na|sa|eu|ai)\.lightwalletd\.com$/.test(parsedUri.hostname) ||
+        parsedUri.hostname === 'zec.rocks' ||
+        parsedUri.hostname.endsWith('.zec.rocks')
           ? GlobalConst.port443
           : GlobalConst.port9067;
     }
