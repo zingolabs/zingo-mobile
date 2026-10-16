@@ -36,6 +36,7 @@ import PriceFetcher, { usePriceRing } from '@ui/widgets/PriceFetcher';
 import RegText from '@ui/primitives/RegText';
 import ZecAmount from '@ui/widgets/ZecAmount';
 import PrivacyToggle from './PrivacyToggle';
+import { poolsWorthALook } from './poolsWorthALook';
 
 const BALANCE_BOTTOM_GAP = 20;
 const TINT_HOLD_MS = 900;
@@ -188,40 +189,35 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
               privacy={privacy}
               smallPrefix={true}
             />
-            {totalBalance &&
-              (totalBalance.totalOrchardBalance !==
-                totalBalance.confirmedOrchardBalance ||
-                totalBalance.totalIronwoodBalance > 0 ||
-                totalBalance.totalSaplingBalance > 0 ||
-                totalBalance.totalTransparentBalance > 0) && (
-                <TouchableOpacity
-                  onPress={() => {
-                    navigation.navigate(Route.Pools);
+            {totalBalance && poolsWorthALook(totalBalance) && (
+              <TouchableOpacity
+                onPress={() => {
+                  navigation.navigate(Route.Pools);
+                }}
+              >
+                <View
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: colors.bgCanvas,
+                    borderRadius: 10,
+                    margin: 0,
+                    marginLeft: 5,
+                    padding: 0,
+                    minWidth: 25,
+                    minHeight: 25,
                   }}
                 >
-                  <View
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      backgroundColor: colors.bgCanvas,
-                      borderRadius: 10,
-                      margin: 0,
-                      marginLeft: 5,
-                      padding: 0,
-                      minWidth: 25,
-                      minHeight: 25,
-                    }}
-                  >
-                    <FontAwesomeIcon
-                      icon={faInfoCircle}
-                      size={20}
-                      color={colors.fgAccent}
-                    />
-                  </View>
-                </TouchableOpacity>
-              )}
+                  <FontAwesomeIcon
+                    icon={faInfoCircle}
+                    size={20}
+                    color={colors.fgAccent}
+                  />
+                </View>
+              </TouchableOpacity>
+            )}
           </View>
         )}
 
