@@ -35,6 +35,7 @@ import {
   isSeedWord,
   isViewingKey,
   resolveWord,
+  scannedSeedPhrase,
   seedStatus,
   startsLikeViewingKey,
   suggestWords,
@@ -55,6 +56,8 @@ type SeedPhraseInputProps = {
   onKeyBlur?: () => void;
   // Bumps to flash the border green once, as a scanned key lands.
   pulse?: number;
+  // The birthday a pasted phrase carried after its words, as Zingo copies it.
+  onBirthday?: (height: number) => void;
 };
 
 const PULSE_MS = 700;
@@ -100,6 +103,7 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
   keyValid,
   onKeyBlur,
   pulse,
+  onBirthday,
 }) => {
   const { colors } = useTheme();
   const [draft, setDraft] = useState('');
@@ -258,6 +262,16 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
     const text = native.slice(consumedRef.current.length);
     const before = currentWords();
     setInvalidDraft(false);
+    /** Zingo copies a phrase with its birthday after it; read it as the scanner does. */
+    const pasted = before.length === 0 ? scannedSeedPhrase(text) : null;
+    if (pasted) {
+      clearDraft(native);
+      commit(pasted.words);
+      if (pasted.birthday !== undefined) {
+        onBirthday?.(pasted.birthday);
+      }
+      return;
+    }
     if (isViewingKey(text)) {
       clearDraft(native);
       onChangeValue(normalizeKey(text));

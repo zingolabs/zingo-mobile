@@ -59,7 +59,6 @@
     "label-placeholder": "Apodo/Etiqueta",
     "delete": "Borrar",
     "empty": "Aún no hay contactos. Añade uno con Nuevo contacto.",
-    "select-placeholder": "Elige un Contacto...",
     "search-placeholder": "Buscar",
     "chain": "Cadena",
     "select-chain-placeholder": "Elige una cadena...",
@@ -95,7 +94,16 @@
     "kind-sapling": "Dirección Sapling",
     "kind-transparent": "Dirección transparente",
     "kind-tex": "Dirección TEX",
-    "back-acc": "Atrás"
+    "back-acc": "Atrás",
+    "pick-title": "Elige un contacto",
+    "tab-contacts": "Contactos",
+    "tab-wallet": "Mi monedero",
+    "search-mine": "Buscar mis direcciones",
+    "no-zcash": "Aún no hay contactos de Zcash.",
+    "mine-note": "Enviar a tus propias direcciones solo cuesta la comisión de red. Úsalo para mover fondos entre pools.",
+    "in-use": "En uso",
+    "mine-unified": "Unificada",
+    "mine-transparent": "Transparente"
   },
   "change-privacy-legend": ".\nPulsar para revelar los valores ocultos.",
   "txtcopied": "Texto copiado al Portapapeles",
@@ -428,9 +436,7 @@
   },
   "seed": {
     "buttontexts": {
-      "new": [
-        "Ya he guardado \n la semilla"
-      ],
+      "new": ["Ya he guardado \n la semilla"],
       "change": [
         "",
         "Abrir Nuevo",
@@ -443,12 +449,8 @@
         "Realmente quieres \n cambiar el \n servidor activo",
         "Estás seguro/a?"
       ],
-      "view": [
-        "Ya he guardado \n la semilla"
-      ],
-      "restore": [
-        "Restaurar Monedero"
-      ]
+      "view": ["Ya he guardado \n la semilla"],
+      "restore": ["Restaurar Monedero"]
     },
     "title": "Semilla",
     "new": "Nueva",
@@ -1190,6 +1192,9 @@
     "legend-low": "Prioridad baja",
     "last-background": "Última sincronización en segundo plano",
     "finished-ok": "Terminó bien",
+    "failed": "Falló",
+    "interrupted": "No terminó",
+    "skipped": "Omitida, sin conexión",
     "back-acc": "Atrás",
     "info-acc": "¿Qué es un reescaneo?",
     "rescan-acc": "Reescanear el monedero",

@@ -37,6 +37,25 @@ test('Tests that a verified probe comes back typed, with the chain and latency',
   });
 });
 
+test('Tests that the details read as indented JSON when zingolib reports them as an object', async () => {
+  const info = { vendor: 'zaino', chain_name: 'main' };
+  bridge.probeServerInfo.mockResolvedValue(
+    JSON.stringify({
+      outcome: 'verified',
+      host: 'zec.rocks',
+      port: 443,
+      latency_ms: 87,
+      chain_name: 'main',
+      block_height: 3100000,
+      details: info,
+    }),
+  );
+  const probe = await probeServer('https://zec.rocks:443');
+  expect(
+    probe.ok && probe.value.outcome === 'verified' && probe.value.details,
+  ).toBe(JSON.stringify(info, null, 2));
+});
+
 test('Tests that a probe that stopped early keeps its outcome and cause', async () => {
   bridge.probeServerInfo.mockResolvedValue(
     JSON.stringify({

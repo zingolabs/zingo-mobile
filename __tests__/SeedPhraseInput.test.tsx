@@ -280,3 +280,28 @@ test('Tests that the same viewing key pastes again when the field was cleared fr
   fireEvent.changeText(screen.getByTestId('seed'), 'uview1abc');
   expect(screen.getByText('import.viewing-key')).toBeOnTheScreen();
 });
+
+test('Tests that a phrase copied from Zingo fills the 24 words and hands back its birthday when pasted', () => {
+  const onBirthday = jest.fn();
+  const phrase = [...Array(23).fill('abandon'), 'art'].join(' ');
+  const Pasting: React.FunctionComponent = () => {
+    const [value, setValue] = useState('');
+    return (
+      <SeedPhraseInput
+        value={value}
+        onChangeValue={setValue}
+        translate={translate}
+        testID="seed"
+        onBirthday={onBirthday}
+      />
+    );
+  };
+  render(<Pasting />);
+  fireEvent.changeText(
+    screen.getByTestId('seed'),
+    `${phrase}\nWallet birthday: 3100000`,
+  );
+  expect(screen.getByText('24 / 24')).toBeOnTheScreen();
+  expect(screen.queryByText('import.seed-full')).toBeNull();
+  expect(onBirthday).toHaveBeenCalledWith(3100000);
+});

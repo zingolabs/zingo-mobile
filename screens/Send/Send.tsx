@@ -38,7 +38,6 @@ import {
 import { useTheme } from '@app/theme';
 import { ScanIcon } from '@ui/primitives/Icons/ScanIcon';
 import { getNumberFormatSettings } from 'react-native-localize';
-import SelectBottomSheet from '@ui/widgets/SelectBottomSheet';
 
 import { SvgXml } from 'react-native-svg';
 import FadeText from '@ui/primitives/FadeText';
@@ -58,7 +57,6 @@ import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
 import AppSheet from '@ui/primitives/AppSheet';
 import AppSheetModal from '@ui/primitives/AppSheetModal';
 import {
-  AddressBookFileClass,
   SendPageStateClass,
   ToAddrClass,
   GlobalConst,
@@ -152,7 +150,6 @@ const Send: React.FunctionComponent<SendProps> = ({
     netInfo,
     privacy,
     server,
-    walletChainName,
     setBackgroundError,
     addLastSnackbar,
     somePending,
@@ -195,9 +192,6 @@ const Send: React.FunctionComponent<SendProps> = ({
   const [validAmount, setValidAmount] = useState<number>(0); // 1 - OK, 0 - Empty, -1 - Invalid number, -2 - Invalid Amount
   const [validMemo, setValidMemo] = useState<number>(0); // 1 - OK, 0 - Empty, -1 - KO
   const [sendButtonEnabled, setSendButtonEnabled] = useState<boolean>(false);
-  const [itemsPicker, setItemsPicker] = useState<
-    { label: string; value: string }[]
-  >([]);
   const [memoIcon, setMemoIcon] = useState<boolean>(false);
   const [maxAmount, setMaxAmount] = useState<number>(0);
   const [spendable, setSpendable] = useState<number>(0);
@@ -256,7 +250,6 @@ const Send: React.FunctionComponent<SendProps> = ({
   // `sendSnapPoints`, declared later in this component.
   const prevHasPriceSnapRef = useRef<boolean>(false);
   const memoBottomSheetRef = useRef<BottomSheetModal>(null);
-  const addressBookSelectRef = useRef<BottomSheetModal>(null);
   const sendErrorSheetRef = useRef<BottomSheetModal>(null);
 
   // Fee (`sendPropose`) and/or spendable-balance RPC error → the CTA turns into
@@ -879,24 +872,6 @@ const Send: React.FunctionComponent<SendProps> = ({
   ]);
 
   useEffect(() => {
-    // Send always targets ZEC on the wallet's own network, so only offer ZEC
-    // contacts for that chain — never non-ZEC swap contacts, nor ZEC contacts
-    // saved on a different Zcash network.
-    const walletChain = walletChainName || server.chainName;
-    const items = addressBook
-      .filter(
-        (item: AddressBookFileClass) =>
-          item.swapChain === GlobalConst.zecSwapChain &&
-          item.chain === walletChain,
-      )
-      .map((item: AddressBookFileClass) => ({
-        label: item.label,
-        value: item.address,
-      }));
-    setItemsPicker(items);
-  }, [addressBook, walletChainName, server.chainName]);
-
-  useEffect(() => {
     setAddressText(sendPageState.toaddr.to);
     setAmountText(sendPageState.toaddr.amount);
     setAmountCurrencyText(sendPageState.toaddr.amountCurrency);
@@ -922,6 +897,33 @@ const Send: React.FunctionComponent<SendProps> = ({
       });
     }
   };
+
+  /** A contact or own address chosen in the book; replacing a valid address asks first. */
+  const pickFromBook = async (itemValue: string) => {
+    if (
+      validAddress === 1 &&
+      addressText &&
+      itemValue &&
+      addressText !== itemValue
+    ) {
+      setUpdatingToField(true);
+      await ShowAddressAlertAsync(translate)
+        .then(() => {
+          updateToField(itemValue, null, null, null, null);
+        })
+        .catch(() => {
+          updateToField(addressText, null, null, null, null);
+        });
+      setTimeout(() => {
+        setUpdatingToField(false);
+      }, 500);
+    } else if (addressText !== itemValue) {
+      updateToField(itemValue, null, null, null, null);
+    }
+  };
+
+  const openBook = () =>
+    navigation.navigate(RouteEnum.AddressBook, { pick: pickFromBook });
 
   const clearState = () => {
     feeCalculationGenRef.current += 1;
@@ -1323,30 +1325,26 @@ const Send: React.FunctionComponent<SendProps> = ({
                             </TouchableOpacity>
                           );
                         }
-                        if (itemsPicker.length > 0) {
-                          return !updatingToField ? (
-                            <TouchableOpacity
-                              onPress={() =>
-                                addressBookSelectRef.current?.present()
-                              }
-                            >
-                              <FontAwesomeIcon
-                                style={{ marginRight: 5 }}
-                                size={28}
-                                icon={faAddressCard}
-                                color={colors.fgAccent}
-                              />
-                            </TouchableOpacity>
-                          ) : (
+                        return !updatingToField ? (
+                          <TouchableOpacity
+                            testID="send.address-book"
+                            onPress={openBook}
+                          >
                             <FontAwesomeIcon
                               style={{ marginRight: 5 }}
                               size={28}
                               icon={faAddressCard}
-                              color={colors.fgAccentDisabled}
+                              color={colors.fgAccent}
                             />
-                          );
-                        }
-                        return null;
+                          </TouchableOpacity>
+                        ) : (
+                          <FontAwesomeIcon
+                            style={{ marginRight: 5 }}
+                            size={28}
+                            icon={faAddressCard}
+                            color={colors.fgAccentDisabled}
+                          />
+                        );
                       })()}
                       <TouchableOpacity
                         ref={scanButton}
@@ -2047,38 +2045,6 @@ const Send: React.FunctionComponent<SendProps> = ({
           translate={translate}
         />
       </AppSheetModal>
-      <SelectBottomSheet
-        ref={addressBookSelectRef}
-        title={translate('addressbook.select-placeholder') as string}
-        searchable={true}
-        searchPlaceholder={
-          translate('addressbook.search-placeholder') as string
-        }
-        items={itemsPicker}
-        value={addressText ?? ''}
-        onChange={async itemValue => {
-          if (
-            validAddress === 1 &&
-            addressText &&
-            itemValue &&
-            addressText !== itemValue
-          ) {
-            setUpdatingToField(true);
-            await ShowAddressAlertAsync(translate)
-              .then(() => {
-                updateToField(itemValue, null, null, null, null);
-              })
-              .catch(() => {
-                updateToField(addressText, null, null, null, null);
-              });
-            setTimeout(() => {
-              setUpdatingToField(false);
-            }, 500);
-          } else if (addressText !== itemValue) {
-            updateToField(itemValue, null, null, null, null);
-          }
-        }}
-      />
       <SendErrorSheet
         ref={sendErrorSheetRef}
         title={translate('send.calc-error') as string}
