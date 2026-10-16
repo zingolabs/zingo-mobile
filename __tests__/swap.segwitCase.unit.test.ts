@@ -8,6 +8,46 @@ const segwit = [
   ['LTC', 'ltc1ppu2gv0tujus0f6eggrk7eqmaf0567x6zer4fcuhz4z7ztzq9u9yseqxltc'],
 ];
 
+const otherBech32 = [
+  ['ATOM', 'cosmos1' + 'q'.repeat(38)],
+  ['ADA', 'addr1vpu5vlrf4xkxv2qpwngf6cjhtw542ayty80v8dyr49rf5eg0yu80w'],
+  ['BCH', 'bitcoincash:qpm2qsznhks23z7629mms6s4cwef74vcwvy22gdx6a'],
+  ['BCH', 'qpm2qsznhks23z7629mms6s4cwef74vcwvy22gdx6a'],
+  ['BCH', 'bitcoincash:ppm2qsznhks23z7629mms6s4cwef74vcwvn0h829pq'],
+  ['BCH', 'ppm2qsznhks23z7629mms6s4cwef74vcwvn0h829pq'],
+];
+
+test.each(otherBech32)(
+  'Tests that %s accepts an address when every letter has the same case: %s',
+  (chain, address) => {
+    expect(isValidChainAddress(chain, address)).toBe(true);
+    expect(isValidChainAddress(chain, address.toUpperCase())).toBe(true);
+  },
+);
+
+test.each(otherBech32)(
+  'Tests that %s rejects an address when its letters have mixed case: %s',
+  (chain, address) => {
+    expect(isValidChainAddress(chain, address[0].toUpperCase() + address.slice(1))).toBe(false);
+    expect(isValidChainAddress(chain, address.slice(0, 4) + address.slice(4).toUpperCase())).toBe(false);
+  },
+);
+
+test.each(otherBech32)(
+  'Tests that %s rejects an address when a colon appears inside its body: %s',
+  (chain, address) => {
+    expect(isValidChainAddress(chain, address.toUpperCase() + ':')).toBe(false);
+  },
+);
+
+test('Tests that Bitcoin Cash accepts a legacy address when its Base58 letters have mixed case', () => {
+  expect(isValidChainAddress('BCH', '1BpEi6DfDAUFd7GtittLSdBeYJvcoaVggu')).toBe(true);
+});
+
+test('Tests that Cardano accepts a Byron format when its Base58 letters have mixed case', () => {
+  expect(isValidChainAddress('ADA', 'Ae2' + 'Ab3'.repeat(14))).toBe(true);
+});
+
 test.each(segwit)(
   'Tests that %s accepts a SegWit address when every letter is uppercase: %s',
   (chain, address) => {
