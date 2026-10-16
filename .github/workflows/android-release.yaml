@@ -235,17 +235,33 @@ jobs:
           done
           ls -la "$DST"
 
+      # A prod release lists everything since the previous prod release. The
+      # default start tag is the newest release of any kind, which is a beta.
       - name: Generate release notes
         id: notes
         uses: actions/github-script@v9
+        env:
+          CHANNEL: ${{ steps.channel.outputs.channel }}
         with:
           script: |
             const tag = context.ref.replace('refs/tags/', '');
-            const { data } = await github.rest.repos.generateReleaseNotes({
+            const request = {
               owner: context.repo.owner,
               repo: context.repo.repo,
               tag_name: tag,
-            });
+            };
+            if (process.env.CHANNEL === 'prod') {
+              const releases = await github.paginate(github.rest.repos.listReleases, {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                per_page: 100,
+              });
+              const previous = releases.find(
+                (release) => !release.prerelease && !release.draft && release.tag_name !== tag,
+              );
+              if (previous) request.previous_tag_name = previous.tag_name;
+            }
+            const { data } = await github.rest.repos.generateReleaseNotes(request);
             return data.body;
           result-encoding: string
 
