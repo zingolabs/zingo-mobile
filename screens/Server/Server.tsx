@@ -27,6 +27,8 @@ import RegText from '@ui/primitives/RegText';
 import BoldText from '@ui/primitives/BoldText';
 import { ServerStatus } from '@app/AppState/types/ServerStatus';
 import ServerRow, {
+  Placement,
+  useLift,
   DoneButton,
   Latency,
   ROW_DIVIDER,
@@ -65,6 +67,7 @@ export type ServerProps = {
   // Set to a guard the host calls on a system back; true when the screen
   // handled it (an unsaved custom server asks first).
   backGuard?: React.MutableRefObject<(() => boolean) | null>;
+  placement?: Placement;
 };
 
 const CARD_TOP = 98.5 / 874;
@@ -211,7 +214,9 @@ const Server: React.FunctionComponent<ServerProps> = ({
   onUnreachable,
   onBack,
   backGuard,
+  placement = 'screen',
 }) => {
+  const { lift, onLayout } = useLift(placement, CARD_TOP);
   const { colors } = useTheme();
   const t = (key: string, values: Record<string, string> = {}) =>
     fill(translate(`server.${key}`) as string, values);
@@ -500,7 +505,10 @@ const Server: React.FunctionComponent<ServerProps> = ({
   );
 
   return (
-    <View style={{ flex: 1, backgroundColor: 'transparent' }}>
+    <View
+      style={{ flex: 1, backgroundColor: 'transparent' }}
+      onLayout={onLayout}
+    >
       <View
         testID="server.card"
         accessible
@@ -509,6 +517,7 @@ const Server: React.FunctionComponent<ServerProps> = ({
           left: 22.5,
           right: 22.5,
           top: `${CARD_TOP * 100}%`,
+          marginTop: -lift,
           height: 61,
           borderRadius: 14,
           backgroundColor: colors.bgSurface,
@@ -565,76 +574,87 @@ const Server: React.FunctionComponent<ServerProps> = ({
             left: 22.5,
             right: 22.5,
             top: `${SEGMENT_TOP * 100}%`,
+            marginTop: -lift,
           },
           lockStyle,
         ]}
       />
 
-      <KeyboardAwareScrollView
-        bottomOffset={16}
+      {/**
+       * The position sits on a wrapper: on Android the scroll view lives in
+       * a full-screen container of the library's, which took the taps of the
+       * network switch above it.
+       */}
+      <View
         style={{
           position: 'absolute',
           left: 0,
           right: 0,
           top: `${BODY_TOP * 100}%`,
+          marginTop: -lift,
           bottom: BODY_BOTTOM,
         }}
-        contentContainerStyle={{ paddingBottom: 16 }}
-        keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}
       >
-        <Animated.View
-          key={tab}
-          entering={FadeIn.duration(200)
-            .delay(120)
-            .reduceMotion(ReduceMotion.System)}
-          exiting={FadeOut.duration(120).reduceMotion(ReduceMotion.System)}
-          style={lockStyle}
-          pointerEvents={offline ? 'none' : 'auto'}
+        <KeyboardAwareScrollView
+          bottomOffset={16}
+          style={{ flex: 1 }}
+          contentContainerStyle={{ paddingBottom: 16 }}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
         >
-          {body}
-        </Animated.View>
-        <Animated.View
-          layout={layout()}
-          style={{
-            marginHorizontal: 21.5,
-            marginTop: 17,
-            minHeight: 66,
-            borderRadius: 14,
-            backgroundColor: colors.bgSurface,
-            borderWidth: 1,
-            borderColor: colors.bottomSheetBorder,
-            flexDirection: 'row',
-            alignItems: 'center',
-            paddingVertical: 10,
-            paddingLeft: 16.5,
-            paddingRight: 16,
-            gap: 12,
-          }}
-        >
-          <View style={{ flex: 1 }}>
-            <BoldText style={{ fontSize: 13.5, lineHeight: 19 }}>
-              {t('offline')}
-            </BoldText>
-            <RegText
-              style={{ fontSize: 11, lineHeight: 17, color: colors.fgMuted }}
-            >
-              {t('offline-sub')}
-            </RegText>
-          </View>
-          <Toggle
-            on={offline}
-            disabled={busy || working}
-            onToggle={() => {
-              setCustomOpen(null);
-              if (offline && regtest) {
-                setTab(ChainNameEnum.mainChainName);
-              }
-              onOffline(!offline, tab);
+          <Animated.View
+            key={tab}
+            entering={FadeIn.duration(200)
+              .delay(120)
+              .reduceMotion(ReduceMotion.System)}
+            exiting={FadeOut.duration(120).reduceMotion(ReduceMotion.System)}
+            style={lockStyle}
+            pointerEvents={offline ? 'none' : 'auto'}
+          >
+            {body}
+          </Animated.View>
+          <Animated.View
+            layout={layout()}
+            style={{
+              marginHorizontal: 21.5,
+              marginTop: 17,
+              minHeight: 66,
+              borderRadius: 14,
+              backgroundColor: colors.bgSurface,
+              borderWidth: 1,
+              borderColor: colors.bottomSheetBorder,
+              flexDirection: 'row',
+              alignItems: 'center',
+              paddingVertical: 10,
+              paddingLeft: 16.5,
+              paddingRight: 16,
+              gap: 12,
             }}
-          />
-        </Animated.View>
-      </KeyboardAwareScrollView>
+          >
+            <View style={{ flex: 1 }}>
+              <BoldText style={{ fontSize: 13.5, lineHeight: 19 }}>
+                {t('offline')}
+              </BoldText>
+              <RegText
+                style={{ fontSize: 11, lineHeight: 17, color: colors.fgMuted }}
+              >
+                {t('offline-sub')}
+              </RegText>
+            </View>
+            <Toggle
+              on={offline}
+              disabled={busy || working}
+              onToggle={() => {
+                setCustomOpen(null);
+                if (offline && regtest) {
+                  setTab(ChainNameEnum.mainChainName);
+                }
+                onOffline(!offline, tab);
+              }}
+            />
+          </Animated.View>
+        </KeyboardAwareScrollView>
+      </View>
 
       <DoneButton
         testID="server.done"

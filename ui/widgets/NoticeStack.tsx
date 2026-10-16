@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import Animated, {
   Keyframe,
@@ -119,13 +119,28 @@ const Card: React.FunctionComponent<{
   children: React.ReactNode;
 }> = ({ slot, depth, animate, onMeasure, children }) => {
   const { colors } = useTheme();
+  /**
+   * A height cannot be animated from 'auto': a card that had none, such as
+   * the one behind a front card still being measured, takes its height at
+   * once, or it stays at its natural height and covers the label.
+   */
+  const sized = useRef(false);
+  const fromSize = sized.current;
+  useEffect(() => {
+    sized.current = slot.height > 0;
+  });
   const to = (v: number, cfg: WithTimingConfig) => {
     'worklet';
     return animate ? withTiming(v, cfg) : v;
   };
   const frame = useAnimatedStyle(() => ({
     top: to(slot.top, move),
-    height: slot.height > 0 ? to(slot.height, move) : 'auto',
+    height:
+      slot.height > 0
+        ? fromSize
+          ? to(slot.height, move)
+          : slot.height
+        : 'auto',
     opacity: to(slot.opacity, fade),
     transform: [{ scale: to(slot.scale, move) }],
   }));

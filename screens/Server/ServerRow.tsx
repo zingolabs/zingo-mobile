@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useEffect } from 'react';
-import { Pressable, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { LayoutChangeEvent, Pressable, View } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -211,6 +211,36 @@ export const RowCard: React.FC<{ children: React.ReactNode }> = ({
   );
 };
 
+const TITLE_TOP = 2;
+const TITLE_H = 44;
+const BELOW_TITLE = 10;
+
+/** Where a server screen is shown: alone, or under the app's shared header. */
+export type Placement = 'screen' | 'belowHeader';
+
+/**
+ * How far to raise a server screen's content. The prototype's fractions of
+ * the screen height leave room for the top bar; under the shared header that
+ * room is already taken, so the first block moves up to sit under the title.
+ */
+export const liftFor = (
+  placement: Placement,
+  firstTop: number,
+  height: number,
+): number =>
+  placement === 'belowHeader'
+    ? Math.max(0, firstTop * height - (TITLE_TOP + TITLE_H + BELOW_TITLE))
+    : 0;
+
+export const useLift = (placement: Placement, firstTop: number) => {
+  const [height, setHeight] = useState(0);
+  const lift = liftFor(placement, firstTop, height);
+  return {
+    lift,
+    onLayout: (e: LayoutChangeEvent) => setHeight(e.nativeEvent.layout.height),
+  };
+};
+
 export const ScreenHeader: React.FC<{
   title: string;
   onBack: () => void;
@@ -229,9 +259,9 @@ export const ScreenHeader: React.FC<{
         style={({ pressed }) => ({
           position: 'absolute',
           left: 17,
-          top: 2,
-          width: 44,
-          height: 44,
+          top: TITLE_TOP,
+          width: TITLE_H,
+          height: TITLE_H,
           borderRadius: 10,
           alignItems: 'center',
           justifyContent: 'center',
