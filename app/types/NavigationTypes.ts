@@ -134,8 +134,8 @@ export type AppDrawerParamList = {
 };
 
 export type AddressBookNavigationState = {
-  currentAddress: string;
-  routeStack: RouteEnum;
+  // Opens the book as a picker that hands the chosen address back.
+  pick: (address: string) => void;
 };
 
 export type AddressListNavigationState = {

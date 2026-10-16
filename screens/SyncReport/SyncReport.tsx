@@ -30,12 +30,16 @@ import CircularProgress from '@ui/primitives/CircularProgress';
 import InfoTooltip from '@ui/widgets/InfoTooltip';
 import { ChevronLeft } from '@ui/primitives/Icons/Chevron';
 import Header from '@ui/widgets/Header';
+import { BanIcon } from '@ui/primitives/Icons/BanIcon';
 import { BlocksIcon } from '@ui/primitives/Icons/BlocksIcon';
 import { CheckCircleIcon } from '@ui/primitives/Icons/CheckCircleIcon';
 import { ClockIcon } from '@ui/primitives/Icons/ClockIcon';
 import { HalfCircleIcon } from '@ui/primitives/Icons/HalfCircleIcon';
 import { RescanArrows, RescanCloud } from '@ui/primitives/Icons/RescanIcon';
+import { TriangleAlert } from '@ui/primitives/Icons/TriangleAlert';
 import {
+  BackgroundOutcome,
+  backgroundOutcome,
   CellState,
   chainTip,
   heights,
@@ -74,6 +78,22 @@ const PHASE_KEY: Record<Phase, string> = {
   notes: 'sync.phase-notes',
   historic: 'sync.phase-historic',
 };
+
+const BG_KEY: Record<BackgroundOutcome, string> = {
+  ok: 'sync.finished-ok',
+  skipped: 'sync.skipped',
+  failed: 'sync.failed',
+  interrupted: 'sync.interrupted',
+};
+
+const BG_INK: Record<BackgroundOutcome, string> = {
+  ok: OK_INK,
+  skipped: SOFT_INK,
+  failed: RED_INK,
+  interrupted: AMBER,
+};
+
+const BG_ICON = 18;
 
 const LEGEND: { state: CellState; key: string }[] = [
   { state: 'scanned', key: 'sync.legend-scanned' },
@@ -134,7 +154,6 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
     zingolibVersion,
     setBackgroundError,
     addLastSnackbar,
-    setBackgroundSyncErrorInfo,
   } = useContext(ContextAppLoaded);
   const { colors } = useTheme();
   const { percentageOutputsScanned, syncInProgress } = useSyncStatus({
@@ -236,7 +255,6 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
       sendEmail,
       zingolibVersion,
     );
-    setBackgroundSyncErrorInfo('');
   };
 
   const card = {
@@ -295,6 +313,17 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
   const bgEnd = Number(backgroundSyncInfo.dateEnd);
   const bgSameDay =
     bgEnd > 0 && timeOf(bgStart, 'yyyyMMdd') === timeOf(bgEnd, 'yyyyMMdd');
+  const bgOutcome = backgroundOutcome(backgroundSyncInfo);
+  const bgIcon: Record<BackgroundOutcome, React.ReactNode> = {
+    ok: <CheckCircleIcon size={BG_ICON} />,
+    skipped: <BanIcon size={BG_ICON} color={SOFT_INK} />,
+    failed: <TriangleAlert size={BG_ICON} color={RED_INK} />,
+    interrupted: <TriangleAlert size={BG_ICON} color={AMBER} />,
+  };
+  const bgLabel =
+    bgOutcome === 'failed' && backgroundSyncInfo.error
+      ? 'view-error'
+      : BG_KEY[bgOutcome];
   const bgWhen =
     timeOf(bgStart, 'MMM d, yyyy · h:mm:ss') +
     (bgEnd > 0 && bgEnd !== bgStart
@@ -705,7 +734,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
               },
             ]}
           >
-            {backgroundSyncInfo.error ? null : <CheckCircleIcon />}
+            {bgIcon[bgOutcome]}
             <View style={{ flex: 1, minWidth: 0 }}>
               <Text
                 style={{
@@ -729,17 +758,14 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
               )}
             </View>
             <Text
+              testID="syncreport.background-outcome"
               style={{
-                color: backgroundSyncInfo.error ? RED_INK : OK_INK,
+                color: BG_INK[bgOutcome],
                 fontSize: 11.5,
                 fontWeight: '600',
               }}
             >
-              {
-                translate(
-                  backgroundSyncInfo.error ? 'view-error' : 'sync.finished-ok',
-                ) as string
-              }
+              {translate(bgLabel) as string}
             </Text>
           </Pressable>
         )}

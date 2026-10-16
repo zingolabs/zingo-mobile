@@ -174,6 +174,13 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
       [colors.bottomSheetBorder, colors.borderFocus],
     ),
   }));
+  /** A birthday that came with the phrase fills the field when the user left it empty. */
+  const fillBirthday = (height: number) => {
+    if (!birthday) {
+      setBirthday(String(height));
+    }
+  };
+
   const setBirthdayFocused = (focused: boolean) => {
     birthdayFocus.value = withTiming(focused ? 1 : 0, {
       duration: duration.base,
@@ -372,6 +379,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
           keyValid={keyValid}
           onKeyBlur={() => setKeyPaused(true)}
           pulse={pulse}
+          onBirthday={fillBirthday}
         />
 
         <View style={{ marginTop: 39, alignItems: 'center' }}>
@@ -556,8 +564,8 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
             const seed = scannedSeedPhrase(value);
             if (seed) {
               setSeedufvkText(seed.words.join(' '));
-              if (seed.birthday && !birthday) {
-                setBirthday(String(seed.birthday));
+              if (seed.birthday) {
+                fillBirthday(seed.birthday);
               }
             } else {
               setSeedufvkText(value);

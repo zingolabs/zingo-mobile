@@ -70,7 +70,6 @@ export default interface AppContextLoaded {
 
   // info about background syncing
   backgroundSyncInfo: BackgroundType;
-  setBackgroundSyncErrorInfo: (e: string) => void;
 
   // Error from the App when is in background
   backgroundError: BackgroundErrorType;

@@ -707,7 +707,6 @@ export class LoadedAppClass extends Component<
       translate: props.translate,
       readOnly: props.readOnly,
       backgroundSyncInfo: props.backgroundSyncInfo,
-      setBackgroundSyncErrorInfo: this.setBackgroundSyncErrorInfo,
       backgroundError: { title: '', error: '' },
       setBackgroundError: this.setBackgroundError,
       lastError: '',
@@ -1154,12 +1153,6 @@ export class LoadedAppClass extends Component<
     if (!isEqual(this.state.backgroundSyncInfo, backgroundSyncInfoJson)) {
       this.setState({ backgroundSyncInfo: backgroundSyncInfoJson });
     }
-  };
-
-  setBackgroundSyncErrorInfo = async (error: string) => {
-    const newBackgroundSyncInfo = { ...this.state.backgroundSyncInfo, error };
-    this.setState({ backgroundSyncInfo: newBackgroundSyncInfo });
-    await BackgroundFileImpl.writeBackground(newBackgroundSyncInfo);
   };
 
   setShieldingAmount = (value: number) => {
@@ -2087,7 +2080,6 @@ export class LoadedAppClass extends Component<
       setSendPageState: this.state.setSendPageState,
       translate: this.state.translate,
       backgroundSyncInfo: this.state.backgroundSyncInfo,
-      setBackgroundSyncErrorInfo: this.state.setBackgroundSyncErrorInfo,
       backgroundError: this.state.backgroundError,
       setBackgroundError: this.state.setBackgroundError,
       readOnly: this.state.readOnly,

@@ -100,8 +100,8 @@ internal QA distribution, and reproducible per-commit archives.
 
 | Channel | Tag format | GitHub Release |
 |---|---|---|
-| prod | `zingo-<version>-<build>` | latest release, `prerelease=false` |
-| beta | `zingo-beta-<version>-<build>` | new release, `prerelease=true` |
+| prod | `zingo-<version>-<build>` | latest release, `prerelease=false`, notes since the previous prod release |
+| beta | `zingo-beta-<version>-<build>` | new release, `prerelease=true`, notes since the previous release of any kind |
 
 The `.github/workflows/android-release.yaml` workflow:
 

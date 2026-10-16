@@ -239,6 +239,7 @@ const WalletServer: React.FC<WalletServerProps> = ({
           style={{ flex: 1 }}
         >
           <Server
+            placement="belowHeader"
             translate={translate}
             server={server}
             selectServer={selectServer}
@@ -279,6 +280,7 @@ const WalletServer: React.FC<WalletServerProps> = ({
           style={{ flex: 1 }}
         >
           <ServerList
+            placement="belowHeader"
             translate={translate}
             servers={lists[other] ?? []}
             loading={!lists[other]}
