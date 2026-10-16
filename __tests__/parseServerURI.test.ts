@@ -118,6 +118,8 @@ test.each([
   ['https://zec.rocks', 'https://zec.rocks:443'],
   ['https://EU.ZEC.ROCKS', 'https://eu.zec.rocks:443'],
   ['https://na.lightwalletd.com', 'https://na.lightwalletd.com:443'],
+  ['https://zec.rocks.', 'https://zec.rocks.:443'],
+  ['https://na.lightwalletd.com.', 'https://na.lightwalletd.com.:443'],
   ['https://zec.rocks:8443', 'https://zec.rocks:8443'],
 ])(
   'Tests that the parser selects a default port from the hostname when parsing %s',

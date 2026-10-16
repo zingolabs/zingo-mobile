@@ -71,10 +71,11 @@ const parseServerURI = (uri: string): ParseServerUriResult => {
     // for some `lightwalletd` ->  443
     // for `zec.rocks`         ->  443
     if (!port) {
+      const hostname = parsedUri.hostname.replace(/\.$/, '');
       port =
-        /^(na|sa|eu|ai)\.lightwalletd\.com$/.test(parsedUri.hostname) ||
-        parsedUri.hostname === 'zec.rocks' ||
-        parsedUri.hostname.endsWith('.zec.rocks')
+        /^(na|sa|eu|ai)\.lightwalletd\.com$/.test(hostname) ||
+        hostname === 'zec.rocks' ||
+        hostname.endsWith('.zec.rocks')
           ? GlobalConst.port443
           : GlobalConst.port9067;
     }
