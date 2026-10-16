@@ -7,8 +7,10 @@ import { LoadingDots } from '@ui/widgets/ProgressState';
 import ServerRow, {
   DoneButton,
   Latency,
+  Placement,
   RowCard,
   ScreenHeader,
+  useLift,
 } from '@screens/Server/ServerRow';
 
 type ServerListProps = {
@@ -21,6 +23,7 @@ type ServerListProps = {
   onPick: (server: ServerUrisType) => void;
   onUnreachable: () => void;
   onBack: () => void;
+  placement?: Placement;
 };
 
 const BODY_TOP = 104.5 / 874;
@@ -40,17 +43,23 @@ const ServerList: React.FunctionComponent<ServerListProps> = ({
   onPick,
   onUnreachable,
   onBack,
+  placement = 'screen',
 }) => {
   const [shakes, setShakes] = useState<Record<string, number>>({});
+  const { lift, onLayout } = useLift(placement, BODY_TOP);
 
   return (
-    <View style={{ flex: 1, backgroundColor: 'transparent' }}>
+    <View
+      style={{ flex: 1, backgroundColor: 'transparent' }}
+      onLayout={onLayout}
+    >
       <ScrollView
         style={{
           position: 'absolute',
           left: 0,
           right: 0,
           top: `${BODY_TOP * 100}%`,
+          marginTop: -lift,
           bottom: BODY_BOTTOM,
         }}
         contentContainerStyle={{ paddingBottom: 16 }}

@@ -59,7 +59,6 @@
     "label-placeholder": "Nickname/Label/Tag",
     "delete": "Delete",
     "empty": "No contacts yet. Add one with New contact.",
-    "select-placeholder": "Choose a Contact...",
     "search-placeholder": "Search",
     "chain": "Chain",
     "select-chain-placeholder": "Choose a chain...",
@@ -95,7 +94,16 @@
     "kind-sapling": "Sapling address",
     "kind-transparent": "Transparent address",
     "kind-tex": "TEX address",
-    "back-acc": "Back"
+    "back-acc": "Back",
+    "pick-title": "Choose a contact",
+    "tab-contacts": "Contacts",
+    "tab-wallet": "My wallet",
+    "search-mine": "Search my addresses",
+    "no-zcash": "No Zcash contacts yet.",
+    "mine-note": "Sending to your own addresses only costs the network fee. Use it to move funds between pools.",
+    "in-use": "In use",
+    "mine-unified": "Unified",
+    "mine-transparent": "Transparent"
   },
   "change-privacy-legend": ".\nTap to reveal the hidden values.",
   "txtcopied": "Text copied to Clipboard",
@@ -428,9 +436,7 @@
   },
   "seed": {
     "buttontexts": {
-      "new": [
-        "I have saved \n the seed"
-      ],
+      "new": ["I have saved \n the seed"],
       "change": [
         "",
         "Open New",
@@ -443,12 +449,8 @@
         "You really want \n to change your \n actual server",
         "Are you certain?"
       ],
-      "view": [
-        "I have saved \n the seed"
-      ],
-      "restore": [
-        "Restore Wallet"
-      ]
+      "view": ["I have saved \n the seed"],
+      "restore": ["Restore Wallet"]
     },
     "title": "Seed",
     "new": "New",
@@ -1190,6 +1192,9 @@
     "legend-low": "Low priority",
     "last-background": "Last background sync",
     "finished-ok": "Finished OK",
+    "failed": "Failed",
+    "interrupted": "Did not finish",
+    "skipped": "Skipped, offline",
     "back-acc": "Back",
     "info-acc": "What is a rescan?",
     "rescan-acc": "Rescan wallet",

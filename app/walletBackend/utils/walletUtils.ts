@@ -617,6 +617,16 @@ function probeTarget(report: Record<string, unknown>): ProbeTarget {
   };
 }
 
+/** zingolib reports the LightdInfo as a JSON object; String() of it read "[object Object]". */
+function detailsText(details: unknown): string {
+  if (details === undefined || details === null) {
+    return '';
+  }
+  return typeof details === 'string'
+    ? details
+    : JSON.stringify(details, null, 2);
+}
+
 function toServerProbe(report: Record<string, unknown>): ServerProbe | null {
   const cause = String(report.cause ?? '');
   switch (report.outcome) {
@@ -627,7 +637,7 @@ function toServerProbe(report: Record<string, unknown>): ServerProbe | null {
         latencyMs: Number(report.latency_ms ?? 0),
         chainName: String(report.chain_name ?? ''),
         blockHeight: Number(report.block_height ?? 0),
-        details: String(report.details ?? ''),
+        details: detailsText(report.details),
       };
     case 'unresolved':
       return {

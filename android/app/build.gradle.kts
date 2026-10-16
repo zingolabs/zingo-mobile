@@ -132,8 +132,8 @@ android {
         applicationId = "org.ZingoLabs.Zingo" // Real
         minSdk = rootProject.extra["minSdkVersion"] as Int
         targetSdk = rootProject.extra["targetSdkVersion"] as Int
-        versionCode = 320 // Real (prod baseline; beta flavor overrides below)
-        versionName = "2.0.24" // Real
+        versionCode = 322 // Real (prod baseline; beta flavor overrides below)
+        versionName = "2.1.0" // Real
         testBuildType = System.getProperty("testBuildType", "debug")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         resValue("string", "zm_descriptor", zmDescriptor)
@@ -171,7 +171,7 @@ android {
         create("beta") {
             dimension = "channel"
             applicationIdSuffix = ".Beta"
-            versionCode = 340 // beta override
+            versionCode = 341 // beta override
             versionName = "2.0.23" // beta override
             resValue("string", "app_name", "Zingo Beta")
         }

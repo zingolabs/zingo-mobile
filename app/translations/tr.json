@@ -59,7 +59,6 @@
     "label-placeholder": "Kullanıcı adı/Etiket/Tag",
     "delete": "Sil",
     "empty": "Henüz kişi yok. Yeni kişi ile bir tane ekleyin.",
-    "select-placeholder": "Bir Kişi Seçin...",
     "search-placeholder": "Ara",
     "chain": "Ağ",
     "select-chain-placeholder": "Bir ağ seçin...",
@@ -95,7 +94,16 @@
     "kind-sapling": "Sapling adresi",
     "kind-transparent": "Şeffaf adres",
     "kind-tex": "TEX adresi",
-    "back-acc": "Geri"
+    "back-acc": "Geri",
+    "pick-title": "Bir kişi seçin",
+    "tab-contacts": "Kişiler",
+    "tab-wallet": "Cüzdanım",
+    "search-mine": "Adreslerimde ara",
+    "no-zcash": "Henüz Zcash kişisi yok.",
+    "mine-note": "Kendi adreslerinize göndermek yalnızca ağ ücretine mal olur. Fonları havuzlar arasında taşımak için kullanın.",
+    "in-use": "Kullanımda",
+    "mine-unified": "Birleşik",
+    "mine-transparent": "Şeffaf"
   },
   "change-privacy-legend": ".\nGizli değerleri göstermek için dokunun.",
   "txtcopied": "Metin panoya kopyalandı",
@@ -426,9 +434,7 @@
   },
   "seed": {
     "buttontexts": {
-      "new": [
-        "Yedekleme ifadesini\nKaydettim"
-      ],
+      "new": ["Yedekleme ifadesini\nKaydettim"],
       "change": [
         "",
         "Yeni aç",
@@ -441,12 +447,8 @@
         "Gerçek cüzdanınızı\nDeğiştirmek istiyor musunuz?",
         "Emin misiniz?"
       ],
-      "view": [
-        "Yedekleme ifadesini\nKaydettim"
-      ],
-      "restore": [
-        "Cüzdanı geri yükle"
-      ]
+      "view": ["Yedekleme ifadesini\nKaydettim"],
+      "restore": ["Cüzdanı geri yükle"]
     },
     "title": "kurtarma ifadesi",
     "new": "Yeni",
@@ -1188,6 +1190,9 @@
     "legend-low": "Düşük öncelik",
     "last-background": "Son arka plan senkronizasyonu",
     "finished-ok": "Başarıyla bitti",
+    "failed": "Başarısız",
+    "interrupted": "Bitmedi",
+    "skipped": "Atlandı, çevrimdışı",
     "back-acc": "Geri",
     "info-acc": "Yeniden tarama nedir?",
     "rescan-acc": "Cüzdanı yeniden tara",
