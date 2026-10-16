@@ -780,6 +780,21 @@
   dependencies:
     tslib "^2.4.0"
 
+"@endo/cache-map@^1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@endo/cache-map/-/cache-map-1.1.0.tgz#e24124e35ba5081c9c899d7fd6ffb7d765c37d55"
+  integrity sha512-owFGshs/97PDw9oguZqU/px8Lv1d0KjAUtDUiPwKHNXRVUE/jyettEbRoTbNJR1OaI8biMn6bHr9kVJsOh6dXw==
+
+"@endo/env-options@^1.1.11":
+  version "1.1.11"
+  resolved "https://registry.yarnpkg.com/@endo/env-options/-/env-options-1.1.11.tgz#5e69b97d485b38913eaa205827fb1c4790c7b4fe"
+  integrity sha512-p9OnAPsdqoX4YJsE98e3NBVhIr2iW9gNZxHhAI2/Ul5TdRfoOViItzHzTqrgUVopw6XxA1u1uS6CykLMDUxarA==
+
+"@endo/immutable-arraybuffer@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@endo/immutable-arraybuffer/-/immutable-arraybuffer-2.0.0.tgz#6f3d82260c0e63d9c0c4e8fac0c86476c665ff57"
+  integrity sha512-xvfJvo4CgETh6UjSKwhNsFLZrqrTf2k4ZFpcprEN2UtCQRSOk+CcLP70kFbrOesB2Z/c1z9MaUZDS1JY6IlnUg==
+
 "@esbuild/aix-ppc64@0.25.12":
   version "0.25.12"
   resolved "https://registry.yarnpkg.com/@esbuild/aix-ppc64/-/aix-ppc64-0.25.12.tgz#80fcbe36130e58b7670511e888b8e88a259ed76c"
@@ -1766,6 +1781,13 @@
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/@lavamoat/preinstall-always-fail/-/preinstall-always-fail-3.0.1.tgz#eed79cc66d70d81f3e50879c055101fbdb19f285"
   integrity sha512-zUJQUpyUcd489c8QAd5AJPsyS89q4Xwh4bg5rdqUL8VbjRjm1uswRrTuCv0Ss+9VSvf6y8hENDilPL2LjMzkhg==
+
+"@lavamoat/react-native-lockdown@^3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@lavamoat/react-native-lockdown/-/react-native-lockdown-3.0.0.tgz#74d2deb383a390e18feae885306499f6891912d8"
+  integrity sha512-mTL1CNm9Oj1/lbDnK8sOHEhr9lNIC8u+5ev9OEPYRDXc6rOOb7DE/r7SGAJ1wtD5iL1ewRaRMxLaI3J4H2UjHg==
+  dependencies:
+    ses "2.3.0"
 
 "@napi-rs/wasm-runtime@^1.1.4":
   version "1.1.5"
@@ -9265,6 +9287,15 @@ serve-static@^1.13.1, serve-static@^1.16.2:
     escape-html "~1.0.3"
     parseurl "~1.3.3"
     send "~0.19.1"
+
+ses@2.3.0:
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/ses/-/ses-2.3.0.tgz#3ef3ecd12f18e87915789243234db57a523ba257"
+  integrity sha512-qd3iWzDqGKllI2FmExKsWLrJwt+6COWb8jUdzaCn8Cq5OTeoXdQ62Gn/xLy0GWLORC3du6yBAVe/V0B0dLVKew==
+  dependencies:
+    "@endo/cache-map" "^1.1.0"
+    "@endo/env-options" "^1.1.11"
+    "@endo/immutable-arraybuffer" "^2.0.0"
 
 set-blocking@^2.0.0:
   version "2.0.0"
