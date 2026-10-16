@@ -33,6 +33,7 @@ import {
 import { AXIS_PT, axisEnter, axisExit } from '@ui/widgets/OnboardingStage';
 import ServerList from '@screens/ServerList';
 import Server from './Server';
+import Header from '@ui/widgets/Header';
 
 // The Server screen inside the wallet: a choice reconnects the open wallet,
 // and a server on another network goes to the recovery screen.
@@ -206,7 +207,15 @@ const WalletServer: React.FC<WalletServerProps> = ({ navigation }) => {
     );
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.bgCanvas }}>
+    <View style={{ flex: 1, backgroundColor: colors.bgCanvas, paddingTop: 4 }}>
+      <Header
+        title={''}
+        noBalance={true}
+        noSyncingStatus={true}
+        noDrawMenu={true}
+        noPrivacy={true}
+        noUfvkIcon={true}
+      />
       {other === null ? (
         <Animated.View
           key="server"

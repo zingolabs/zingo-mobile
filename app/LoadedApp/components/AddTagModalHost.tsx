@@ -12,6 +12,7 @@ import AddressBookFileImpl from '@app/services/AddressBookFileImpl';
 import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
 import AppSheetModal from '@ui/primitives/AppSheetModal';
 import ContactSheet from '@ui/widgets/ContactSheet';
+import NewAddressTag from '@ui/widgets/NewAddressTag';
 
 type AddTagModalHostProps = {
   // Latest target the host should render. Pass `null` while the modal is
@@ -27,8 +28,8 @@ type AddTagModalHostProps = {
   translate: (key: string) => TranslateType;
 };
 
-// The New contact sheet every "add to address book" button opens, with the
-// address already filled in.
+// The sheet every "add to address book" button opens, with the address
+// already filled in: New contact, or the own tag sheet for the wallet's own.
 const AddTagModalHost = forwardRef<
   React.ComponentRef<typeof BottomSheetModal>,
   AddTagModalHostProps
@@ -70,7 +71,15 @@ const AddTagModalHost = forwardRef<
           keyboardHeight > 0 ? keyboardHeight + 20 : insets.bottom + 24,
       }}
     >
-      {target && (
+      {target?.own && (
+        <NewAddressTag
+          key={target.address}
+          address={target.address}
+          closeSheet={dismiss}
+          setAddressBook={setAddressBook}
+        />
+      )}
+      {target && !target.own && (
         <ContactSheet
           key={`${target.address}-${target.initialLabel ?? ''}`}
           edit={{

@@ -74,7 +74,9 @@ const SeedBackupNotice: React.FunctionComponent<SeedBackupNoticeProps> = ({
             }}
           >
             <SproutIcon size={16} color={colors.fgAccent} />
-            <Text style={{ color: colors.fgDefault, fontSize: 14 }}>
+            <Text
+              style={{ flexShrink: 1, color: colors.fgDefault, fontSize: 14 }}
+            >
               {translate('seednotice.title') as string}
             </Text>
             <View

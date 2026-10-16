@@ -22,6 +22,7 @@ import { useTheme } from '@app/theme';
 import { ease } from '@app/theme/motion';
 import { ContextAppLoaded } from '@app/context';
 import { SnackbarDurationEnum } from '@app/AppState';
+import Header from '@ui/widgets/Header';
 import { AppDrawerParamList } from '@app/types';
 import {
   enactGateAnswer,
@@ -31,7 +32,7 @@ import { getRecoveryWalletInfo } from '@app/services/recoveryWalletInfo';
 import { showConfirm } from '@app/services/showConfirm';
 import { fetchWallet } from '@app/walletBackend';
 import { copySensitive } from '@app/utils/sensitiveClipboard';
-import { XIcon } from '@ui/primitives/Icons/XIcon';
+import { ChevronLeft } from '@ui/primitives/Icons/Chevron';
 import { EyeIcon } from '@ui/primitives/Icons/EyeIcon';
 import { BanIcon } from '@ui/primitives/Icons/BanIcon';
 import { UsersIcon } from '@ui/primitives/Icons/UsersIcon';
@@ -196,132 +197,158 @@ const ViewingKey: React.FunctionComponent<ViewingKeyProps> = ({
   ];
 
   const page = (
-    <View testID="viewingkey" style={{ flex: 1, paddingTop: 23 }}>
-      <Pressable
-        testID="viewingkey.close"
-        accessibilityRole="button"
-        accessibilityLabel={translate('seedbackup.close') as string}
-        onPress={close}
-        style={({ pressed }) => ({
-          position: 'absolute',
-          top: 20,
-          right: SIDE - 14,
-          width: 44,
-          height: 44,
-          borderRadius: 12,
-          alignItems: 'center',
-          justifyContent: 'center',
-          backgroundColor: pressed ? 'rgba(255,255,255,0.06)' : undefined,
-        })}
-      >
-        <XIcon size={18} color={colors.fgMuted} strokeWidth={1.8} />
-      </Pressable>
-      <Text
-        accessibilityRole="header"
-        style={{
-          color: colors.fgDefault,
-          fontSize: 18,
-          fontWeight: '700',
-          textAlign: 'center',
-          marginTop: 6,
-          marginHorizontal: 60,
-        }}
-      >
-        {switchTo
-          ? (translate('viewingkey.switch-title') as string).replace(
-              '{net}',
-              net,
-            )
-          : (translate('viewingkey.title') as string)}
-      </Text>
-      <Text
-        style={{
-          color: colors.fgMuted,
-          fontSize: 14,
-          lineHeight: 20,
-          textAlign: 'center',
-          marginTop: 12,
-          marginHorizontal: SIDE,
-        }}
-      >
-        {switchTo
-          ? (translate('viewingkey.switch-sub') as string).replace('{net}', net)
-          : (translate('viewingkey.sub') as string)}
-      </Text>
-
-      <View style={{ marginTop: 22 }}>
-        <KeyCard testID="viewingkey" value={key} hidden={hidden} qrSize={QR} />
-      </View>
-
-      <View style={{ marginTop: 14 }}>
-        <CopyShowButtons
-          testID="viewingkey"
-          hidden={hidden}
-          onToggleHide={toggle}
-          onCopy={copy}
-        />
-      </View>
-
-      <View style={{ marginTop: 18, marginHorizontal: SIDE, gap: 12 }}>
-        {rows.map(({ id, Icon }) => (
-          <View
-            key={id}
-            style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}
-          >
-            <View
-              style={{
-                width: 32,
-                height: 32,
-                borderRadius: 9,
-                backgroundColor: TILE_BG,
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <Icon size={16} color={colors.fgViewOnly} strokeWidth={1.9} />
-            </View>
-            <Text
-              style={{
-                flex: 1,
-                color: colors.fgDefault,
-                fontSize: 13,
-                lineHeight: 18,
-              }}
-            >
-              {translate(`viewingkey.${id}`) as string}
-            </Text>
-          </View>
-        ))}
-      </View>
-
-      <Pressable
-        testID="viewingkey.done"
-        accessibilityRole="button"
-        disabled={!!switchTo && !key}
-        onPress={switchTo ? confirmSwitch : close}
-        style={({ pressed }) => ({
-          position: 'absolute',
-          left: 52,
-          right: 52,
-          bottom: insets.bottom + 24,
-          height: 44,
-          borderRadius: 22,
-          alignItems: 'center',
-          justifyContent: 'center',
-          backgroundColor: colors.bgAccent,
-          transform: [{ scale: pressed ? 0.97 : 1 }],
-        })}
-      >
-        <Text
-          style={{ color: colors.bgCanvas, fontSize: 15, fontWeight: '700' }}
+    <View testID="viewingkey" style={{ flex: 1, paddingTop: 4 }}>
+      <Header
+        title={''}
+        noBalance={true}
+        noSyncingStatus={true}
+        noDrawMenu={true}
+        noPrivacy={true}
+        noUfvkIcon={true}
+      />
+      <View style={{ flex: 1 }}>
+        <View
+          style={{
+            minHeight: 44,
+            marginTop: 6,
+            marginBottom: 10,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
         >
-          {
-            translate(
-              switchTo ? 'viewingkey.switch' : 'seedbackup.done',
-            ) as string
-          }
+          <Pressable
+            testID="viewingkey.back"
+            accessibilityRole="button"
+            accessibilityLabel={translate('walletseed.back-acc') as string}
+            onPress={close}
+            style={({ pressed }) => ({
+              position: 'absolute',
+              left: 10,
+              top: 0,
+              width: 44,
+              height: 44,
+              borderRadius: 12,
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: pressed ? 'rgba(255,255,255,0.06)' : undefined,
+            })}
+          >
+            <ChevronLeft size={22} color={colors.fgAccent} strokeWidth={2.2} />
+          </Pressable>
+          <Text
+            accessibilityRole="header"
+            style={{
+              color: colors.fgDefault,
+              fontSize: 18,
+              fontWeight: '700',
+              textAlign: 'center',
+              marginHorizontal: 60,
+            }}
+          >
+            {switchTo
+              ? (translate('viewingkey.switch-title') as string).replace(
+                  '{net}',
+                  net,
+                )
+              : (translate('viewingkey.title') as string)}
+          </Text>
+        </View>
+        <Text
+          style={{
+            color: colors.fgMuted,
+            fontSize: 14,
+            lineHeight: 20,
+            textAlign: 'center',
+            marginHorizontal: SIDE,
+          }}
+        >
+          {switchTo
+            ? (translate('viewingkey.switch-sub') as string).replace(
+                '{net}',
+                net,
+              )
+            : (translate('viewingkey.sub') as string)}
         </Text>
-      </Pressable>
+
+        <View style={{ marginTop: 22 }}>
+          <KeyCard
+            testID="viewingkey"
+            value={key}
+            hidden={hidden}
+            qrSize={QR}
+          />
+        </View>
+
+        <View style={{ marginTop: 14 }}>
+          <CopyShowButtons
+            testID="viewingkey"
+            hidden={hidden}
+            onToggleHide={toggle}
+            onCopy={copy}
+          />
+        </View>
+
+        <View style={{ marginTop: 18, marginHorizontal: SIDE, gap: 12 }}>
+          {rows.map(({ id, Icon }) => (
+            <View
+              key={id}
+              style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}
+            >
+              <View
+                style={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: 9,
+                  backgroundColor: TILE_BG,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <Icon size={16} color={colors.fgViewOnly} strokeWidth={1.9} />
+              </View>
+              <Text
+                style={{
+                  flex: 1,
+                  color: colors.fgDefault,
+                  fontSize: 13,
+                  lineHeight: 18,
+                }}
+              >
+                {translate(`viewingkey.${id}`) as string}
+              </Text>
+            </View>
+          ))}
+        </View>
+
+        <Pressable
+          testID="viewingkey.done"
+          accessibilityRole="button"
+          disabled={!!switchTo && !key}
+          onPress={switchTo ? confirmSwitch : close}
+          style={({ pressed }) => ({
+            position: 'absolute',
+            left: 52,
+            right: 52,
+            bottom: insets.bottom + 24,
+            height: 44,
+            borderRadius: 22,
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: colors.bgAccent,
+            transform: [{ scale: pressed ? 0.97 : 1 }],
+          })}
+        >
+          <Text
+            style={{ color: colors.bgCanvas, fontSize: 15, fontWeight: '700' }}
+          >
+            {
+              translate(
+                switchTo ? 'viewingkey.switch' : 'seedbackup.done',
+              ) as string
+            }
+          </Text>
+        </Pressable>
+      </View>
     </View>
   );
 

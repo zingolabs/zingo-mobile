@@ -148,8 +148,9 @@ export type AppDrawerParamList = {
 };
 
 export type AddressBookNavigationState = {
-  currentAddress: string;
-  routeStack: Route;
+  // Opens the book as a picker; the chosen address is delivered under this
+  // request.
+  pick: Request;
 };
 
 export type AddressListNavigationState = {

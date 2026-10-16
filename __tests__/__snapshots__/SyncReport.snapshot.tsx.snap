@@ -328,10 +328,11 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
           style={
             [
               {
+                "height": 25,
                 "left": 0,
                 "position": "absolute",
                 "top": 0,
-                "transformOrigin": "79.2% 72.9%",
+                "width": 25,
               },
               {},
             ]

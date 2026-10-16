@@ -34,6 +34,14 @@ function makeDrawerProps(): NativeStackScreenProps<
 }
 // test suite
 describe('Component Insight - test', () => {
+  /** The range in the header is counted back from today. */
+  beforeEach(() => {
+    jest.useFakeTimers({ now: new Date('2026-10-14T12:00:00Z') });
+  });
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
   //snapshot test
   test('Insight - snapshot', () => {
     const state = { ...defaultAppContextLoaded };
