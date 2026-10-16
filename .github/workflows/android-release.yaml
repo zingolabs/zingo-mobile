@@ -198,7 +198,7 @@ jobs:
           cache: yarn
 
       - name: Yarn install
-        run: yarn install --frozen-lockfile
+        run: yarn setup
 
       - name: Assemble APKs (4 ABI splits + universal)
         working-directory: android

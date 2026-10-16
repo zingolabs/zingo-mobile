@@ -196,7 +196,7 @@ jobs:
           cache: yarn
 
       - name: Yarn install
-        run: yarn
+        run: yarn setup
 
       - name: Setup Java
         uses: actions/setup-java@v6
