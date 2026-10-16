@@ -28,8 +28,15 @@ test.each(otherBech32)(
 test.each(otherBech32)(
   'Tests that %s rejects an address when its letters have mixed case: %s',
   (chain, address) => {
-    expect(isValidChainAddress(chain, address[0].toUpperCase() + address.slice(1))).toBe(false);
-    expect(isValidChainAddress(chain, address.slice(0, 4) + address.slice(4).toUpperCase())).toBe(false);
+    expect(
+      isValidChainAddress(chain, address[0].toUpperCase() + address.slice(1)),
+    ).toBe(false);
+    expect(
+      isValidChainAddress(
+        chain,
+        address.slice(0, 4) + address.slice(4).toUpperCase(),
+      ),
+    ).toBe(false);
   },
 );
 
@@ -41,7 +48,9 @@ test.each(otherBech32)(
 );
 
 test('Tests that Bitcoin Cash accepts a legacy address when its Base58 letters have mixed case', () => {
-  expect(isValidChainAddress('BCH', '1BpEi6DfDAUFd7GtittLSdBeYJvcoaVggu')).toBe(true);
+  expect(isValidChainAddress('BCH', '1BpEi6DfDAUFd7GtittLSdBeYJvcoaVggu')).toBe(
+    true,
+  );
 });
 
 test('Tests that Cardano accepts a Byron format when its Base58 letters have mixed case', () => {

@@ -91,7 +91,8 @@ const isLtc: Validator = a =>
   LTC_LEGACY_RE.test(a) || isUniformCase(a, LTC_BECH32_RE);
 const isDoge: Validator = a => DOGE_RE.test(a);
 const isDash: Validator = a => DASH_RE.test(a);
-const isBch: Validator = a => BCH_LEGACY_RE.test(a) || isUniformCase(a, BCH_CASHADDR_RE);
+const isBch: Validator = a =>
+  BCH_LEGACY_RE.test(a) || isUniformCase(a, BCH_CASHADDR_RE);
 const isSol: Validator = a => SOL_RE.test(a);
 const isNear: Validator = a =>
   NEAR_IMPLICIT_RE.test(a) || NEAR_NAMED_RE.test(a);
@@ -99,7 +100,8 @@ const isTrx: Validator = a => TRX_RE.test(a);
 const isAtom: Validator = a => isUniformCase(a, ATOM_RE);
 const isXrp: Validator = a => XRP_RE.test(a);
 const isXlm: Validator = a => XLM_RE.test(a);
-const isAda: Validator = a => isUniformCase(a, ADA_SHELLEY_RE) || ADA_BYRON_RE.test(a);
+const isAda: Validator = a =>
+  isUniformCase(a, ADA_SHELLEY_RE) || ADA_BYRON_RE.test(a);
 const isDot: Validator = a => DOT_RE.test(a);
 const isSui: Validator = a => SUI_RE.test(a);
 const isTon: Validator = a => TON_USER_RE.test(a) || TON_RAW_RE.test(a);
