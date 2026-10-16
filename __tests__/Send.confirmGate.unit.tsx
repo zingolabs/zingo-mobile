@@ -148,9 +148,13 @@ const sendUi = (
 };
 
 // Presses Send on a valid form and returns the handler that the Confirm
-// screen received.
+// screen received. The button enables only once the address check, the fee
+// proposal and the spendable balance settle, which on a cold CI runner can
+// take longer than waitFor's default second.
 const openConfirmScreen = async (view: ReturnType<typeof render>) => {
-  const sendButton = await waitFor(() => view.getByTestId('send.button'));
+  const sendButton = await waitFor(() => view.getByTestId('send.button'), {
+    timeout: 5000,
+  });
   fireEvent.press(sendButton);
   const confirmCall = await waitFor(() => {
     const call = navigate.mock.calls.find(
