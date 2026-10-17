@@ -285,6 +285,23 @@ describe('Send confirm send permit', () => {
     });
   });
 
+  test('Tests that confirming sends the state the Confirm screen shows when the form changes after it opened.', async () => {
+    const sendTransaction = jest.fn().mockResolvedValue(sent);
+    const view = render(sendUi(online, sendTransaction, jest.fn()));
+    const confirmSend = await openConfirmScreen(view);
+    const confirmCall = navigate.mock.calls.find(
+      ([route]) => route === Route.Confirm,
+    );
+
+    fireEvent.changeText(view.getByTestId('send.amount'), '0.0001');
+    await confirmSend();
+
+    expect(sendTransaction).toHaveBeenCalledTimes(1);
+    expect(sendTransaction.mock.calls[0][0]).toBe(
+      confirmCall?.[1].sendPageState,
+    );
+  });
+
   test('Tests that confirming sends when the platform has no mixnet transport. The Send screen shows no blocked reason.', async () => {
     const sendTransaction = jest.fn().mockResolvedValue(sent);
     const absent = { ...online, mixnetView: ABSENT_MIXNET_VIEW };

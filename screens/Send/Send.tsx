@@ -986,7 +986,13 @@ const Send: React.FunctionComponent<SendProps> = () => {
       includeUAMemoBoolean,
     ),
   );
-  useResult('send.confirm', () => confirmSend(buildSendState()));
+  // The state Confirm was opened with, so the send matches what it shows.
+  const confirmedState = useRef<SendPageStateClass | undefined>(undefined);
+  useResult('send.confirm', () => {
+    if (confirmedState.current) {
+      confirmSend(confirmedState.current);
+    }
+  });
   const setQrcodeModalShow = () => {
     const open = (origin?: { x: number; y: number }) =>
       navigation.navigate(Route.Scanner, {
@@ -1051,11 +1057,13 @@ const Send: React.FunctionComponent<SendProps> = () => {
   );
 
   const setConfirmModalShow = async () => {
+    const shown = buildSendState();
+    confirmedState.current = shown;
     navigation.navigate(Route.Confirm, {
       calculatedFee: fee,
       proposalPools: proposalPools,
       sendAllAmount: isSendAllAmount(amountText),
-      sendPageState: buildSendState(),
+      sendPageState: shown,
     });
   };
 
