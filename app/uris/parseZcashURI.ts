@@ -35,6 +35,8 @@ const err = (
   param?: string,
 ): ErrorKeyed<ZcashUriErrorKey> => errorKeyed(errorKey, param);
 
+const zecDecimal = /^\d+(\.\d{1,8})?$/;
+
 const parseZcashURI = async (
   uri: string,
   server: ServerType,
@@ -148,7 +150,7 @@ const parseZcashURI = async (
           return err('uris.duplicateparameter', qName);
         }
         const a = parseFloat(value);
-        if (isNaN(a) || a < 0 || a > 21_000_000) {
+        if (!zecDecimal.test(value) || a > 21_000_000) {
           return err('uris.amount', value);
         }
         target.amount = a;
