@@ -78,3 +78,17 @@ test('Tests that a code the scan kind accepts shows the found pill', async () =>
 
   expect(screen.getByText('found')).toBeTruthy();
 });
+
+test('Tests that the address field scan keeps looking at a payment URI and accepts an address with trailing whitespace', async () => {
+  jest.spyOn(Utils, 'isValidAddress').mockImplementation(async value => ({
+    isValid: value === 'u1valid',
+    shieldedOnlyUA: '',
+  }));
+  mount({ kind: 'chain', chain: 'ZEC', network: ChainNameEnum.mainChainName });
+
+  await scan('zcash:u1valid?amount=1');
+  expect(screen.getByText('miss')).toBeTruthy();
+
+  await scan('u1valid\n');
+  expect(screen.getByText('found')).toBeTruthy();
+});
