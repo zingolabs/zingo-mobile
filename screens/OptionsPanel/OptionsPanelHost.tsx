@@ -21,6 +21,7 @@ import { useIsFocused } from '@react-navigation/native';
 import OptionsPanel, { OptionsPanelProps } from './OptionsPanel';
 import { useOptionsPanel } from '@app/context/optionsPanel';
 import { ease } from '@app/theme/motion';
+import { useTheme } from '@app/theme';
 
 const FADE_DURATION_MS = 125;
 // Open sequence (total ≈ 250ms = slide duration):
@@ -58,6 +59,7 @@ const OptionsPanelHost: React.FC<OptionsPanelHostProps> = ({
   const { dismissAll } = useBottomSheetModal();
   const focused = useIsFocused();
   const { width } = useWindowDimensions();
+  const { colors } = useTheme();
   const opacity = useSharedValue(0);
   const shift = useSharedValue(0);
   const shown = kind !== 'closed';
@@ -117,6 +119,8 @@ const OptionsPanelHost: React.FC<OptionsPanelHostProps> = ({
 
   const overlayStyle = useAnimatedStyle(() => ({
     opacity: opacity.value,
+  }));
+  const panelStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: -width * PUSHED_SHIFT * shift.value }],
   }));
   const dimStyle = useAnimatedStyle(() => ({
@@ -135,7 +139,17 @@ const OptionsPanelHost: React.FC<OptionsPanelHostProps> = ({
         pointerEvents={front ? 'auto' : 'none'}
         style={[StyleSheet.absoluteFill, overlayStyle]}
       >
-        <OptionsPanel {...panelProps} />
+        {/* Fills the strip the shifted panel leaves, so the home never shows
+            through while a pushed screen pops off it. */}
+        <View
+          style={[
+            StyleSheet.absoluteFill,
+            { backgroundColor: colors.bgCanvas },
+          ]}
+        />
+        <Animated.View style={[StyleSheet.absoluteFill, panelStyle]}>
+          <OptionsPanel {...panelProps} />
+        </Animated.View>
         <Animated.View
           pointerEvents="none"
           style={[
