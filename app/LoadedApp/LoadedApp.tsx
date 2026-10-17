@@ -922,9 +922,15 @@ export class LoadedAppClass extends Component<
       return;
     }
     this.props.clearLink();
+    // The Send tab exists only for a spending wallet on a remote server;
+    // anywhere else the user is told why the link does not open it.
+    if (this.state.readOnly) {
+      this.addLastSnackbar(this.state.translate('link-view-only') as string);
+      return;
+    }
     await this.readUrl(url);
-    // The Send tab exists only for a spending wallet on a remote server.
-    if (this.state.readOnly || this.state.server.kind !== 'remote') {
+    if (this.state.server.kind !== 'remote') {
+      this.addLastSnackbar(this.state.translate('link-offline') as string);
       return;
     }
     closeOptionsPanel();

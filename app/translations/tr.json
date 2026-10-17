@@ -13,6 +13,8 @@
   "price-ring-stale": "ZEC fiyatı güncel değil",
   "price-ring-paused": "Fiyat yenileme duraklatıldı",
   "biometrics-message": "Lütfen kimliğinizi doğrulayın",
+  "link-view-only": "Bu yalnızca görüntüleme cüzdanı, bu yüzden bu bağlantıyı ödeyemez.",
+  "link-offline": "Zingo çevrimdışı. Ödeme bağlantısı Gönder bölümünde, bir sunucu seçtiğinizde hazır.",
   "biometrics-error": "Güvenlik nedeniyle bu işlemi gerçekleştirmek için yeniden kimlik doğrulaması yapmanız gerekiyor. Bu ayarı dilediğiniz zaman Ayarlar bölümünden değiştirebilirsiniz",
   "biometrics-failure-declined": "Kimlik doğrulama iptal edildi veya başarısız oldu.",
   "biometrics-failure-notserved": "Cihaz güvenlik denetimini reddetti.",

@@ -13,6 +13,8 @@
   "price-ring-stale": "El precio de ZEC está desactualizado",
   "price-ring-paused": "Actualización del precio en pausa",
   "biometrics-message": "Por favor autenticar",
+  "link-view-only": "Esta wallet es de solo lectura, así que no puede pagar este enlace.",
+  "link-offline": "Zingo está sin conexión. El enlace de pago está en Enviar, listo cuando elijas un servidor.",
   "biometrics-error": "Por seguridad necesitas autenticarte de nuevo para realizar esta acción. Siempre puedes cambiarlo en Parámetros",
   "biometrics-failure-declined": "La autenticación fue cancelada o falló.",
   "biometrics-failure-notserved": "El dispositivo rechazó la comprobación de seguridad.",
