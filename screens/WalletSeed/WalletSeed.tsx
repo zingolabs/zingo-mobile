@@ -1,12 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useContext, useEffect, useState } from 'react';
-import {
-  Pressable,
-  StyleSheet,
-  Text,
-  useWindowDimensions,
-  View,
-} from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Animated, {
   ReduceMotion,
   useAnimatedStyle,
@@ -42,7 +36,6 @@ import { SIDE, StepActions } from '@screens/SeedBackup/components/StepParts';
 import ScreenshotSheet from '@screens/SeedBackup/components/ScreenshotSheet';
 import KeyCard from '@screens/ViewingKey/components/KeyCard';
 
-const PUSHED_SHIFT = 0.28;
 const PUSHED_DIM = 0.55;
 const PUSH_IN_MS = 380;
 const PUSH_OUT_MS = 320;
@@ -110,7 +103,6 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
   };
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
-  const window = useWindowDimensions();
   const focused = useIsFocused();
   const secured = useSecureScreen();
   const gate = useBiometricGate({
@@ -161,17 +153,8 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
   );
 
   const covered = backingUp && !focused;
-  const behind = useAnimatedStyle(() => ({
-    transform: [
-      {
-        translateX: withTiming(covered ? -window.width * PUSHED_SHIFT : 0, {
-          duration: covered ? PUSH_IN_MS : PUSH_OUT_MS,
-          easing: ease.emphasized,
-          reduceMotion: ReduceMotion.System,
-        }),
-      },
-    ],
-  }));
+  // The backup flow dims this screen in place: it never moves, so the flow
+  // pops straight back onto it.
   const dim = useAnimatedStyle(() => ({
     opacity: withTiming(covered ? PUSHED_DIM : 0, {
       duration: covered ? PUSH_IN_MS : PUSH_OUT_MS,
@@ -262,7 +245,7 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
       <Animated.View
         testID="walletseed"
         onTouchStart={() => tip !== 'none' && setTip('none')}
-        style={[{ flex: 1, paddingTop: 4 }, behind]}
+        style={{ flex: 1, paddingTop: 4 }}
       >
         <Header
           title={''}
