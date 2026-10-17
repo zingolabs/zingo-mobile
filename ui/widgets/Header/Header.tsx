@@ -354,7 +354,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               panel's header, its single door. With only messages left,
               the corner falls back to the logo when there is nothing to
               show. */}
-          {!noDrawMenu && route.name !== Route.Settings && showMessagesIcon ? (
+          {!noDrawMenu && showMessagesIcon ? (
             <View
               style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}
             >
