@@ -848,6 +848,7 @@ export class LoadedAppClass extends Component<
       },
     );
 
+    this.linkReady = true;
     this.deliverLink();
 
     this.unsubscribeNetInfo = NetInfo.addEventListener(
@@ -915,10 +916,14 @@ export class LoadedAppClass extends Component<
     });
   };
 
+  linkReady = false;
+
   // Takes the session's `zcash:` link into Send.
   deliverLink = async () => {
     const url = this.props.pendingLink;
-    if (!url) {
+    // Until the mount has cleared Send, a link would be wiped with it; the
+    // mount takes it once it is done.
+    if (!url || !this.linkReady) {
       return;
     }
     this.props.clearLink();
@@ -928,9 +933,11 @@ export class LoadedAppClass extends Component<
       this.addLastSnackbar(this.state.translate('link-view-only') as string);
       return;
     }
-    await this.readUrl(url);
+    const filled = await this.readUrl(url);
     if (this.state.server.kind !== 'remote') {
-      this.addLastSnackbar(this.state.translate('link-offline') as string);
+      if (filled) {
+        this.addLastSnackbar(this.state.translate('link-offline') as string);
+      }
       return;
     }
     closeOptionsPanel();
@@ -1019,7 +1026,8 @@ export class LoadedAppClass extends Component<
     }
   };
 
-  readUrl = async (url: string) => {
+  // Fills Send from a `zcash:` link; true when Send now holds it.
+  readUrl = async (url: string): Promise<boolean> => {
     // Attempt to parse as URI if it starts with zcash
     // only if it is a spendable wallet
     if (url && url.startsWith(GlobalConst.zcash) && !this.state.readOnly) {
@@ -1032,7 +1040,7 @@ export class LoadedAppClass extends Component<
         this.addLastSnackbar(
           Utils.renderErrorKeyed(parsed, this.state.translate),
         );
-        return;
+        return false;
       }
 
       const target = parsed.target;
@@ -1077,9 +1085,11 @@ export class LoadedAppClass extends Component<
           newSendPageState.toaddr = uriToAddr;
 
           this.setSendPageState(newSendPageState);
+          return true;
         }
       }
     }
+    return false;
   };
 
   fetchBackgroundSyncInfo = async () => {
