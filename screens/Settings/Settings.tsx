@@ -579,6 +579,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
             title={''}
             noBalance={true}
             noSyncingStatus={true}
+            noDrawMenu={true}
             noPrivacy={true}
           />
         </View>
