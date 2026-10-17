@@ -14,17 +14,12 @@ export type Request =
 type Listener = (value: string) => void;
 
 const listeners = new Map<Request, Set<Listener>>();
-// An answer that arrived before its asker subscribed waits for it.
-const waiting = new Map<Request, string>();
 
-// Hands a value to whoever asked for it, now or when it subscribes.
+// Hands a value to whoever is asking for it now. An answer nobody listens
+// for any more (its asker unmounted, the session changed) is dropped, so it
+// can never reach a later asker.
 export const deliver = (request: Request, value: string): void => {
-  const subscribed = listeners.get(request);
-  if (subscribed && subscribed.size > 0) {
-    subscribed.forEach(listener => listener(value));
-    return;
-  }
-  waiting.set(request, value);
+  listeners.get(request)?.forEach(listener => listener(value));
 };
 
 // Receives the answers to a request while the component is mounted. The
@@ -43,11 +38,6 @@ export const useResult = (
       listeners.set(request, subscribed);
     }
     subscribed.add(listener);
-    const early = waiting.get(request);
-    if (early !== undefined) {
-      waiting.delete(request);
-      listener(early);
-    }
     return () => {
       subscribed.delete(listener);
     };
