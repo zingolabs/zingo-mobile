@@ -88,7 +88,9 @@ describe('LoadingApp start gate', () => {
         birthday: 1,
       },
     };
-    const restore = jest.spyOn(app, 'doRestore').mockResolvedValue(undefined);
+    const restore = jest
+      .spyOn(app, 'doRestore')
+      .mockResolvedValue({ kind: 'loaded' });
     (askGate as jest.Mock).mockResolvedValueOnce({
       kind: 'declined',
       failure: { errorKey: 'biometrics-failure-declined' },

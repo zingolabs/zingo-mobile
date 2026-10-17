@@ -667,7 +667,10 @@
     "import": "Importar carteira",
     "create": "Criar nova carteira",
     "still-open": "Ainda não foi possível abrir a carteira",
-    "still-server": "Ainda não foi possível alcançar o servidor"
+    "still-server": "Ainda não foi possível alcançar o servidor",
+    "retry": "Tentar de novo",
+    "report": "Enviar relatório",
+    "back": "Voltar"
   },
   "deletesheet": {
     "title": "Excluir a carteira deste dispositivo?",

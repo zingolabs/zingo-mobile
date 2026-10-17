@@ -25,24 +25,24 @@ import { ContextAppLoading } from '@app/context';
 import RegText from '@ui/primitives/RegText';
 import BoldText from '@ui/primitives/BoldText';
 import { LoadingDots } from '@ui/widgets/ProgressState';
-import { WalletErrorKind } from '@app/AppState/types/WalletErrorInfo';
+import { WalletErrorInfo } from '@app/AppState/types/WalletErrorInfo';
 import { ChainNameEnum } from '@app/AppState';
 import { showConfirm } from '@app/services/showConfirm';
+import {
+  ErrorAction,
+  Link,
+  LinkAction,
+  Slot,
+  Text,
+  errorScreen,
+} from './walletErrorModel';
 
 type WalletErrorProps = {
-  kind: WalletErrorKind;
-  details: string;
-  // The wallet's network, for the 'chain' kind.
-  walletChain?: ChainNameEnum;
+  error: WalletErrorInfo;
   busy: boolean;
   // Changes on every failed retry; the icon shakes once per change.
   shake: number;
-  onRetry: () => void;
-  onImport: () => void;
-  onCreate: () => void;
-  onServer: () => void;
-  // The 'chain' kind's fix: Automatic on the wallet's network, then open.
-  onSwitchChain: (chain: ChainNameEnum) => void;
+  onAction: (action: ErrorAction) => void;
   // A retry worked: the badge shrinks away and the server dot turns green.
   resolved?: boolean;
 };
@@ -134,16 +134,10 @@ const labelExit = () =>
   FadeOut.duration(duration.fast).reduceMotion(ReduceMotion.System);
 
 const WalletError: React.FunctionComponent<WalletErrorProps> = ({
-  kind,
-  details,
-  walletChain,
+  error,
   busy,
   shake,
-  onRetry,
-  onImport,
-  onCreate,
-  onServer,
-  onSwitchChain,
+  onAction,
   resolved = false,
 }) => {
   const { translate, netInfo, server } = useContext(ContextAppLoading);
@@ -152,6 +146,7 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
   const shakeX = useSharedValue(0);
   const chevron = useSharedValue(0);
   const firstShake = useRef(true);
+  const model = errorScreen(error, server);
 
   useEffect(() => {
     if (firstShake.current) {
@@ -199,13 +194,11 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
   const offline = server.kind === 'offline';
   const dotColor = resolved
     ? colors.fgAccent
-    : !netInfo.isConnected || kind === 'server'
+    : !netInfo.isConnected || model.icon === 'server'
       ? colors.fgDangerEmphasis
       : offline
         ? colors.fgMuted
         : colors.fgAccent;
-  const host =
-    server.kind === 'remote' ? server.uri.replace(/^https?:\/\//, '') : '';
   const netName = (chain: ChainNameEnum) =>
     translate(
       chain === ChainNameEnum.testChainName
@@ -214,37 +207,23 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
           ? 'settings.value-chainname-regtest'
           : 'settings.value-chainname-main',
     ) as string;
-  // On the chain kind the retry cannot succeed, so the primary action is a
-  // server on the wallet's network.
-  const chain = kind === 'chain' && walletChain ? walletChain : null;
-  const title = chain
-    ? (translate('walleterror.chain-title') as string).replace(
-        '{net}',
-        netName(chain),
-      )
-    : (translate(
-        kind === 'server'
-          ? 'walleterror.server-title'
-          : 'walleterror.open-title',
-      ) as string);
-  const sub = chain
-    ? (translate('walleterror.chain-sub') as string)
-        .replace('{server}', netName(server.chainName))
-        .replace('{net}', netName(chain))
-    : kind === 'server'
-      ? (translate('walleterror.server-sub') as string).replace('{host}', host)
-      : (translate('walleterror.open-sub') as string);
-  const primaryLabel = chain
-    ? (translate('walleterror.chain-action') as string).replace(
-        '{net}',
-        netName(chain),
-      )
-    : (translate('walleterror.open') as string);
+  const text = (t: Text): string => {
+    switch (t.kind) {
+      case 'plain':
+        return translate(t.key) as string;
+      case 'host':
+        return (translate(t.key) as string).replace('{host}', t.host);
+      case 'nets':
+        return (translate(t.key) as string)
+          .replace('{net}', netName(t.net))
+          .replace('{server}', netName(t.server));
+    }
+  };
+  const title = text(model.title);
 
   // Import and Create are not needed to fix a network mismatch; they wait in
   // a sheet that says they replace this wallet.
-  const moreOptions = () =>
-    chain &&
+  const moreOptions = (chain: ChainNameEnum) =>
     showConfirm({
       title: translate('walleterror.more') as string,
       message: (translate('walleterror.more-warn') as string).replace(
@@ -256,16 +235,25 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
         {
           text: translate('walleterror.more-import') as string,
           style: 'destructive',
-          onPress: onImport,
+          onPress: () => onAction({ kind: 'import' }),
         },
         {
           text: translate('walleterror.more-create') as string,
           style: 'destructive',
-          onPress: onCreate,
+          onPress: () => onAction({ kind: 'create' }),
         },
         { text: translate('cancel') as string, style: 'cancel' },
       ],
     });
+  const act = (action: LinkAction) => {
+    switch (action.kind) {
+      case 'more':
+        moreOptions(action.chain);
+        return;
+      default:
+        onAction(action);
+    }
+  };
 
   const netChip = (net: ChainNameEnum, label: string, testID: string) => {
     const tone = net === ChainNameEnum.mainChainName ? NET_GREEN : NET_AMBER;
@@ -291,16 +279,10 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
     );
   };
 
-  const link = (
-    label: string,
-    onPress: () => void,
-    bottom: number,
-    size: number,
-    testID: string,
-  ) => (
+  const link = ({ label, action, testID, size }: Link, bottom: number) => (
     <Pressable
       testID={testID}
-      onPress={onPress}
+      onPress={() => act(action)}
       disabled={busy}
       hitSlop={8}
       accessibilityRole="button"
@@ -316,16 +298,24 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
       })}
     >
       <RegText style={{ fontSize: size, color: colors.fgMuted }}>
-        {label}
+        {text(label)}
       </RegText>
     </Pressable>
   );
+  const slot = (s: Slot, bottom: number) => {
+    switch (s.kind) {
+      case 'none':
+        return null;
+      case 'link':
+        return link(s.link, bottom);
+    }
+  };
 
   return (
     <View style={{ flex: 1, backgroundColor: 'transparent' }}>
       <Pressable
         testID="walleterror.server"
-        onPress={onServer}
+        onPress={() => onAction({ kind: 'server' })}
         disabled={busy}
         hitSlop={8}
         accessibilityRole="button"
@@ -375,7 +365,7 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
         ]}
       >
         <FontAwesomeIcon
-          icon={kind === 'server' ? faDatabase : faWallet}
+          icon={model.icon === 'server' ? faDatabase : faWallet}
           color={colors.fgDefault}
           size={28}
         />
@@ -386,7 +376,7 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
             badgeStyle,
           ]}
         >
-          {chain ? (
+          {model.badge.kind === 'net' ? (
             <Animated.View
               testID="walleterror.netbadge"
               entering={badgeEnter()}
@@ -407,7 +397,7 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
                 numberOfLines={1}
                 style={{ fontSize: 9.5, lineHeight: 12, color: NET_AMBER.ink }}
               >
-                {netName(chain)}
+                {netName(model.badge.chain)}
               </BoldText>
             </Animated.View>
           ) : (
@@ -461,9 +451,9 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
             color: colors.fgMuted,
           }}
         >
-          {sub}
+          {text(model.sub)}
         </RegText>
-        {chain && (
+        {model.chips.kind === 'nets' && (
           <View
             style={{
               flexDirection: 'row',
@@ -473,7 +463,7 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
             }}
           >
             {netChip(
-              chain,
+              model.chips.wallet,
               translate('walleterror.chip-wallet') as string,
               'walleterror.chip.wallet',
             )}
@@ -483,38 +473,62 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
               ≠
             </BoldText>
             {netChip(
-              server.chainName,
+              model.chips.server,
               translate('walleterror.chip-server') as string,
               'walleterror.chip.server',
             )}
           </View>
         )}
-        <Pressable
-          testID="walleterror.details"
-          onPress={() => setOpen(o => !o)}
-          hitSlop={6}
-          accessibilityRole="button"
-          accessibilityState={{ expanded: open }}
+        <View
           style={{
             marginTop: 14,
-            paddingHorizontal: 8,
-            paddingVertical: 4,
             flexDirection: 'row',
             alignItems: 'center',
-            gap: 6,
+            gap: 18,
           }}
         >
-          <RegText style={{ fontSize: 10.5, color: colors.fgMuted }}>
-            {translate('walleterror.details') as string}
-          </RegText>
-          <Animated.View style={chevronStyle}>
-            <FontAwesomeIcon
-              icon={faChevronDown}
-              size={10}
-              color={colors.fgMuted}
-            />
-          </Animated.View>
-        </Pressable>
+          <Pressable
+            testID="walleterror.details"
+            onPress={() => setOpen(o => !o)}
+            hitSlop={6}
+            accessibilityRole="button"
+            accessibilityState={{ expanded: open }}
+            style={{
+              paddingHorizontal: 8,
+              paddingVertical: 4,
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 6,
+            }}
+          >
+            <RegText style={{ fontSize: 10.5, color: colors.fgMuted }}>
+              {translate('walleterror.details') as string}
+            </RegText>
+            <Animated.View style={chevronStyle}>
+              <FontAwesomeIcon
+                icon={faChevronDown}
+                size={10}
+                color={colors.fgMuted}
+              />
+            </Animated.View>
+          </Pressable>
+          <Pressable
+            testID="walleterror.report"
+            onPress={() => onAction({ kind: 'report', subject: title })}
+            disabled={busy}
+            hitSlop={6}
+            accessibilityRole="button"
+            style={({ pressed }) => ({
+              paddingHorizontal: 8,
+              paddingVertical: 4,
+              opacity: pressed ? 0.6 : 1,
+            })}
+          >
+            <RegText style={{ fontSize: 10.5, color: colors.fgMuted }}>
+              {translate('walleterror.report') as string}
+            </RegText>
+          </Pressable>
+        </View>
         <View style={{ alignSelf: 'stretch' }}>
           <DetailsBox open={open}>
             <View
@@ -531,31 +545,17 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
                 selectable
                 style={{ fontFamily: MONO, fontSize: 10.5, lineHeight: 16 }}
               >
-                {details}
+                {error.details}
               </RegText>
             </View>
           </DetailsBox>
         </View>
       </View>
 
-      {chain
-        ? link(
-            translate('walleterror.more') as string,
-            moreOptions,
-            140,
-            12.5,
-            'walleterror.more',
-          )
-        : link(
-            translate('walleterror.import') as string,
-            onImport,
-            140,
-            14,
-            'walleterror.import',
-          )}
+      {slot(model.top, 140)}
       <Pressable
-        testID={chain ? 'walleterror.chain' : 'walleterror.open'}
-        onPress={chain ? () => onSwitchChain(chain) : onRetry}
+        testID={model.primary.testID}
+        onPress={() => act(model.primary.action)}
         disabled={busy}
         accessibilityRole="button"
         style={({ pressed }) => ({
@@ -597,19 +597,12 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
                 fontWeight: '700',
               }}
             >
-              {primaryLabel}
+              {text(model.primary.label)}
             </RegText>
           </Animated.View>
         )}
       </Pressable>
-      {!chain &&
-        link(
-          translate('walleterror.create') as string,
-          onCreate,
-          34,
-          13.5,
-          'walleterror.create',
-        )}
+      {slot(model.bottom, 34)}
     </View>
   );
 };

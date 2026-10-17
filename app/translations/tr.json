@@ -665,7 +665,10 @@
     "import": "Cüzdan içe aktar",
     "create": "Yeni cüzdan oluştur",
     "still-open": "Cüzdan hâlâ açılamıyor",
-    "still-server": "Sunucuya hâlâ ulaşılamıyor"
+    "still-server": "Sunucuya hâlâ ulaşılamıyor",
+    "retry": "Tekrar dene",
+    "report": "Rapor gönder",
+    "back": "Geri"
   },
   "deletesheet": {
     "title": "Bu cihazdaki cüzdan silinsin mi?",
