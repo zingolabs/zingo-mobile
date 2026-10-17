@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { View } from 'react-native';
 import Animated, {
   FadeIn,
@@ -142,11 +142,18 @@ const OnboardingStage: React.FunctionComponent<OnboardingStageProps> = ({
   const focused = state.routes[state.index];
   const [shown, setShown] = useState(focused);
   const previous = useRef<string | undefined>(undefined);
-
-  if (shown.key !== focused.key) {
-    previous.current = shown.name;
-    setShown(focused);
+  // The leaving route may already be gone from the descriptors.
+  const shownView = useRef<React.ReactNode>(null);
+  if (shown.key === focused.key) {
+    shownView.current = descriptors[focused.key]?.render();
   }
+
+  useEffect(() => {
+    if (shown.key !== focused.key) {
+      previous.current = shown.name;
+      setShown(focused);
+    }
+  }, [focused, shown]);
 
   return (
     <View
@@ -170,7 +177,7 @@ const OnboardingStage: React.FunctionComponent<OnboardingStageProps> = ({
         exiting={exitFor(shown.name, focused.name)}
         style={{ flex: 1 }}
       >
-        {descriptors[shown.key]?.render()}
+        {shownView.current}
       </Animated.View>
     </View>
   );
