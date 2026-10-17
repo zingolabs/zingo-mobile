@@ -923,6 +923,10 @@ export class LoadedAppClass extends Component<
     }
     this.props.clearLink();
     await this.readUrl(url);
+    // The Send tab exists only for a spending wallet on a remote server.
+    if (this.state.readOnly || this.state.server.kind !== 'remote') {
+      return;
+    }
     closeOptionsPanel();
     navigateWallet({
       screen: Route.Home,

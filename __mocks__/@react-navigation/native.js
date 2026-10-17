@@ -14,6 +14,14 @@ export const useNavigation = jest.fn(() => ({
 export const useFocusEffect = jest.fn();
 export const useNavigationBuilder = jest.fn();
 export const StackRouter = jest.fn();
+export const CommonActions = {
+  reset: jest.fn(state => ({ type: 'RESET', payload: state })),
+  navigate: jest.fn((name, params) => ({
+    type: 'NAVIGATE',
+    payload: { name, params },
+  })),
+  goBack: jest.fn(() => ({ type: 'GO_BACK' })),
+};
 export const StackActions = {
   popTo: jest.fn(name => ({ type: 'POP_TO', payload: { name } })),
   popToTop: jest.fn(() => ({ type: 'POP_TO_TOP' })),
