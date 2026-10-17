@@ -540,7 +540,11 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
       </Animated.View>
       <Animated.View
         pointerEvents="none"
-        style={[StyleSheet.absoluteFill, { backgroundColor: '#000' }, dim]}
+        style={[
+          StyleSheet.absoluteFill,
+          { backgroundColor: colors.bgCanvas },
+          dim,
+        ]}
       />
       {shot !== 'none' && (
         <ScreenshotSheet

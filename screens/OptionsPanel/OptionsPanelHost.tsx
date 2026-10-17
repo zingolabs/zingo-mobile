@@ -15,6 +15,7 @@ import { useIsFocused } from '@react-navigation/native';
 import OptionsPanel, { OptionsPanelProps } from './OptionsPanel';
 import { useOptionsPanel } from '@app/context/optionsPanel';
 import { ease } from '@app/theme/motion';
+import { useTheme } from '@app/theme';
 
 const FADE_DURATION_MS = 125;
 // Open sequence (total ≈ 250ms = slide duration):
@@ -50,6 +51,7 @@ const OptionsPanelHost: React.FC<OptionsPanelHostProps> = ({
   const { kind, close, surface } = useOptionsPanel();
   const { dismissAll } = useBottomSheetModal();
   const focused = useIsFocused();
+  const { colors } = useTheme();
   const opacity = useSharedValue(0);
   const dim = useSharedValue(0);
   const shown = kind !== 'closed';
@@ -131,7 +133,7 @@ const OptionsPanelHost: React.FC<OptionsPanelHostProps> = ({
           pointerEvents="none"
           style={[
             StyleSheet.absoluteFill,
-            { backgroundColor: '#000' },
+            { backgroundColor: colors.bgCanvas },
             dimStyle,
           ]}
         />
