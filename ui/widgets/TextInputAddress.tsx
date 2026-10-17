@@ -12,7 +12,7 @@ import { openScanner } from '@app/navigation/navigate';
 import ErrorText from '@ui/primitives/ErrorText';
 import RegText from '@ui/primitives/RegText';
 import { validateAddressForChain } from '@app/swap';
-import { GlobalConst, Route } from '@app/AppState';
+import { GlobalConst } from '@app/AppState';
 
 type TextInputAddressProps = {
   address: string;
@@ -20,7 +20,6 @@ type TextInputAddressProps = {
   setError: (e: string) => void;
   disabled: boolean;
   showLabel: boolean;
-  routeStack?: Route;
   // SwapKit chain code the address is for ('ZEC' / 'BTC' / ...). Defaults to
   // 'ZEC' → the existing zingolib validation (against `server.chainName`).
   // Non-ZEC values validate by the format-only per-chain regex.
@@ -73,10 +72,7 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
     const chain = swapChain ?? GlobalConst.zecSwapChain;
     openScanner({
       request: scanRequest,
-      accepts:
-        chain === GlobalConst.zecSwapChain
-          ? { kind: 'zcash', chain: server.chainName }
-          : { kind: 'chain', chain },
+      accepts: { kind: 'chain', chain, network: server.chainName },
       texts: {
         title: translate('scanner.title') as string,
         hint: translate('scanner.hint-address') as string,

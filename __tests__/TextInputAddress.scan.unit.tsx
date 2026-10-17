@@ -41,7 +41,11 @@ describe('TextInputAddress - scan', () => {
     expect(openScanner).toHaveBeenCalledWith(
       expect.objectContaining({
         request: 'receive.address',
-        accepts: { kind: 'zcash', chain: mockServer.chainName },
+        accepts: {
+          kind: 'chain',
+          chain: 'ZEC',
+          network: mockServer.chainName,
+        },
         texts: expect.objectContaining({ back: expect.any(String) }),
       }),
     );

@@ -11,7 +11,6 @@ import {
 } from '@app/context';
 
 import TextInputAddress from '@ui/widgets/TextInputAddress';
-import { Route } from '@app/AppState';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockServer } from '../__mocks__/dataMocks/mockServer';
 
@@ -50,7 +49,6 @@ describe('TextInputAddress - snapshots', () => {
             disabled
             showLabel={false}
             scanRequest="send.address"
-            routeStack={Route.Scanner}
           />
         </ContextAppLoadedProvider>,
       ).toJSON(),

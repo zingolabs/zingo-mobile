@@ -164,7 +164,7 @@ export type AddressListNavigationState = {
 export type ScanAccepts =
   | { kind: 'any' }
   | { kind: 'zcash'; chain: ChainNameEnum }
-  | { kind: 'chain'; chain: string };
+  | { kind: 'chain'; chain: string; network: ChainNameEnum };
 
 export type ScanRouteTexts = {
   title: string;

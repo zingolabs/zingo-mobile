@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useWindowDimensions } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
@@ -22,7 +22,8 @@ const acceptsFor = (
         value.toLowerCase().startsWith(GlobalConst.zcash) ||
         (await Utils.isValidAddress(value, accepts.chain)).isValid;
     case 'chain':
-      return (value: string) => validateAddressForChain(accepts.chain, value);
+      return (value: string) =>
+        validateAddressForChain(accepts.chain, value, accepts.network);
   }
 };
 
@@ -34,6 +35,12 @@ const Scanner: React.FunctionComponent<ScannerProps> = ({
 }) => {
   const { width, height } = useWindowDimensions();
   const params = route.params;
+  // Nothing to read for: leave rather than sit on screen empty.
+  useEffect(() => {
+    if (!params && navigation.canGoBack()) {
+      navigation.goBack();
+    }
+  }, [params, navigation]);
   if (!params) {
     return null;
   }
