@@ -27,7 +27,6 @@ import {
   GlobalConst,
   UnifiedAddressClass,
   TransparentAddressClass,
-  ScreenEnum,
 } from '@app/AppState';
 
 import { ContextAppLoaded } from '@app/context';
@@ -42,7 +41,6 @@ type MessageLineProps = {
   vt: ValueTransferType;
   setValueTransferDetailModalShow: (i: number, vt: ValueTransferType) => void;
   messageAddress?: string;
-  screenName: ScreenEnum;
 };
 // Amounts under this are not worth a line of their own — the message is the
 // point, not the dust attached to it.
@@ -54,7 +52,6 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
   month,
   setValueTransferDetailModalShow,
   messageAddress,
-  screenName,
 }) => {
   const context = useContext(ContextAppLoaded);
   const {
@@ -164,11 +161,7 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
         >
           {!!vt.address && !messageAddress && (
             <View style={{ marginTop: -10, marginBottom: 10, marginLeft: 30 }}>
-              <AddressItem
-                address={vt.address}
-                screenName={screenName}
-                oneLine={true}
-              />
+              <AddressItem address={vt.address} oneLine={true} />
             </View>
           )}
           {(!!memo || !!memoUA) && (
@@ -226,11 +219,7 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
                               {translate('addressbook.likely') as string}
                             </RegText>
                           )}
-                          <AddressItem
-                            address={memoUA}
-                            screenName={screenName}
-                            onlyContact={true}
-                          />
+                          <AddressItem address={memoUA} onlyContact={true} />
                         </View>
                       )}
                     </>

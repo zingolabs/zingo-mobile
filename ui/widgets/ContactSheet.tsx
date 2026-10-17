@@ -8,14 +8,15 @@ import Animated, {
   withSequence,
   withTiming,
 } from 'react-native-reanimated';
-import { NavigationProp, ParamListBase } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCheck, faXmark } from '@fortawesome/free-solid-svg-icons';
 
 import { useTheme } from '@app/theme';
 import { ease } from '@app/theme/motion';
-import { AddressBookFileClass, ChainNameEnum, RouteEnum } from '@app/AppState';
+import { AddressBookFileClass, ChainNameEnum } from '@app/AppState';
 import { ContextAppLoaded } from '@app/context';
+import { openScanner } from '@app/navigation/navigate';
+import { useResult } from '@app/navigation/results';
 import { isZnsAlias, resolveZnsName } from '@app/uris/resolveZnsName';
 import Utils from '@app/utils';
 import { isWalletAddress } from '@app/walletBackend';
@@ -63,8 +64,6 @@ type ContactSheetProps = {
   walletChain: ChainNameEnum;
   onSave: (name: string, address: string) => Promise<void>;
   onCancel: () => void;
-  /** The sheet is portaled, so the scanner opens through the host screen's navigation. */
-  navigation?: NavigationProp<ParamListBase>;
 };
 
 /** The catalog key naming a Zcash address kind, from its prefix. */
@@ -85,7 +84,6 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
   walletChain,
   onSave,
   onCancel,
-  navigation,
 }) => {
   const { translate } = useContext(ContextAppLoaded);
   const { colors } = useTheme();
@@ -235,12 +233,13 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
     await onSave(trimmedName, trimmedAddress);
   };
 
+  useResult('addressbook.address', scanned => setAddress(scanned.trim()));
   const scan = () => {
     Keyboard.dismiss();
     const open = (origin?: { x: number; y: number }) =>
-      navigation?.navigate(RouteEnum.ScannerAddress, {
-        setAddress: (scanned: string) => setAddress(scanned.trim()),
-        accepts: () => true,
+      openScanner({
+        request: 'addressbook.address',
+        accepts: { kind: 'any' },
         texts: {
           title: translate('scanner.title') as string,
           hint: translate('scanner.hint-any') as string,

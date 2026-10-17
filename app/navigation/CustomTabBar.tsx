@@ -7,7 +7,7 @@ import {
 } from '@react-navigation/bottom-tabs';
 import { TabActions } from '@react-navigation/native';
 import { useTheme, themeTokens } from '@app/theme';
-import { RouteEnum } from '@app/AppState';
+import { Route } from '@app/AppState';
 import { HouseFilledIcon } from '@ui/primitives/Icons/HouseFilledIcon';
 import { HouseOutlineIcon } from '@ui/primitives/Icons/HouseOutlineIcon';
 import { SendFilledIcon } from '@ui/primitives/Icons/SendFilledIcon';
@@ -30,14 +30,14 @@ function renderNavIcon(
   isFocused: boolean,
   color: string,
 ): React.ReactElement {
-  if (routeName === RouteEnum.History) {
+  if (routeName === Route.History) {
     return isFocused ? (
       <HouseFilledIcon size={ICON_SIZE} color={color} />
     ) : (
       <HouseOutlineIcon size={ICON_SIZE} color={color} />
     );
   }
-  if (routeName === RouteEnum.Send) {
+  if (routeName === Route.Send) {
     return isFocused ? (
       <SendFilledIcon size={SEND_SIZE} color={color} />
     ) : (

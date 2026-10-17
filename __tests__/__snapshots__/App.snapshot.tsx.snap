@@ -13,7 +13,6 @@ exports[`Component App - test App - snapshot 1`] = `
   }
 >
   <MockedNavigator
-    initialRouteName="LoadingApp"
     screenOptions={
       {
         "animation": "none",
@@ -22,14 +21,11 @@ exports[`Component App - test App - snapshot 1`] = `
     }
   >
     <MockedScreen
-      name="LoadingApp"
-    />
-    <MockedScreen
-      name="LoadedApp"
+      name="Loading"
     />
     <MockedScreen
       component={[Function]}
-      name="ScannerAddress"
+      name="Scanner"
       options={
         {
           "animation": "none",

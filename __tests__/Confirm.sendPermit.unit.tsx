@@ -26,7 +26,7 @@ import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
 } from '@app/context';
-import { RouteEnum } from '@app/AppState';
+import { Route } from '@app/AppState';
 import type { TranslateType } from '@app/AppState';
 import { AppDrawerParamList } from '@app/types';
 import { SendPermitInputs } from '@app/walletBackend/transforms/sendPermit';
@@ -42,21 +42,16 @@ const translate = (key: string): TranslateType => key;
 
 const online = mockOnline;
 
-function makeProps(): NativeStackScreenProps<
-  AppDrawerParamList,
-  RouteEnum.Confirm
-> {
+function makeProps(): NativeStackScreenProps<AppDrawerParamList, 'Confirm'> {
   return {
     navigation: mockNavigation,
     route: {
       key: 'Key-1',
-      name: RouteEnum.Confirm,
+      name: Route.Confirm,
       params: {
         calculatedFee: 0.00001,
         proposalPools: { source: ['ironwood'], destination: ['ironwood'] },
-        confirmSend: jest.fn(async () => {}),
         sendAllAmount: false,
-        calculateFeeWithPropose: jest.fn(async () => {}),
         sendPageState: mockSendPageState,
       },
     },

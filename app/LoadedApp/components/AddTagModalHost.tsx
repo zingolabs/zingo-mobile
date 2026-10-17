@@ -1,6 +1,5 @@
 import React, { forwardRef, useCallback, useContext } from 'react';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { NavigationProp, ParamListBase } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import {
@@ -27,8 +26,6 @@ type AddTagModalHostProps = {
   } | null;
   setAddressBook: (ab: AddressBookFileClass[]) => void;
   translate: (key: string) => TranslateType;
-  /** The sheet is portaled above the navigator, so the scanner opens through this. */
-  navigation?: NavigationProp<ParamListBase>;
 };
 
 // The sheet every "add to address book" button opens, with the address
@@ -36,7 +33,7 @@ type AddTagModalHostProps = {
 const AddTagModalHost = forwardRef<
   React.ComponentRef<typeof BottomSheetModal>,
   AddTagModalHostProps
->(({ target, setAddressBook, translate, navigation }, ref) => {
+>(({ target, setAddressBook, translate }, ref) => {
   const { addressBook, walletChainName, server, addLastSnackbar } =
     useContext(ContextAppLoaded);
   const insets = useSafeAreaInsets();
@@ -94,7 +91,6 @@ const AddTagModalHost = forwardRef<
           walletChain={walletChain}
           onSave={save}
           onCancel={dismiss}
-          navigation={navigation}
         />
       )}
     </AppSheetModal>

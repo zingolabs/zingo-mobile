@@ -17,6 +17,8 @@
   "biometrics-failure-declined": "The authentication was cancelled or failed.",
   "biometrics-failure-notserved": "The device refused the security check.",
   "biometrics-failure-nosecurity": "No screen lock or biometry is enrolled on this device.",
+  "link-view-only": "This is a view-only wallet, so it can't pay this link.",
+  "link-offline": "Zingo is offline. The payment link is in Send, ready once you pick a server.",
   "close": "Close",
   "cancel": "Cancel",
   "clear": "Clear",

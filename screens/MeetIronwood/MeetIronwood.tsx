@@ -1,4 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
+import { leaveFlow } from '@app/navigation/navigate';
 import React, {
   useCallback,
   useContext,
@@ -38,7 +39,7 @@ import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
 import SettingsFileImpl from '@app/services/SettingsFileImpl';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
-import { RouteEnum, SettingsNameEnum } from '@app/AppState';
+import { Route, SettingsNameEnum } from '@app/AppState';
 
 // Pool artwork palette — Orchard teal and Ironwood gold are one-off brand
 // accents for this onboarding, not part of the app theme.
@@ -343,7 +344,7 @@ const OptionTitle: React.FunctionComponent<{ children: string }> = ({
 
 type MeetIronwoodProps = NativeStackScreenProps<
   AppDrawerParamList,
-  RouteEnum.MeetIronwood
+  'MeetIronwood'
 >;
 
 const MeetIronwood: React.FunctionComponent<MeetIronwoodProps> = ({
@@ -418,7 +419,7 @@ const MeetIronwood: React.FunctionComponent<MeetIronwoodProps> = ({
     // modal somebody just dismissed is a nag, and the History banner is still
     // there as the way back in.
     markSeen();
-    navigation.reset({ index: 0, routes: [{ name: RouteEnum.HomeStack }] });
+    leaveFlow(navigation);
   }, [markSeen, navigation]);
 
   const onPrimary = useCallback(() => {
@@ -428,7 +429,7 @@ const MeetIronwood: React.FunctionComponent<MeetIronwoodProps> = ({
       // Last onboarding step continues into the migration flow rather than
       // closing. The migration screens end the flow (reset to Home) once the
       // user accepts or backs all the way out.
-      navigation.navigate(RouteEnum.MigrationStrategy);
+      navigation.navigate(Route.MigrationStrategy);
     }
   }, [index, goTo, navigation]);
 

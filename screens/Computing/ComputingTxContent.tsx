@@ -7,11 +7,7 @@ import React, {
   useState,
 } from 'react';
 import { TouchableOpacity, View } from 'react-native';
-import {
-  NavigationProp,
-  ParamListBase,
-  useNavigation,
-} from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '@app/theme';
 import BottomSheet, {
   BottomSheetFooter,
@@ -21,10 +17,10 @@ import ProgressState, { RING_RED } from '@ui/widgets/ProgressState';
 import RegText from '@ui/primitives/RegText';
 import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
 import AppSheet from '@ui/primitives/AppSheet';
-import { AppDrawerParamList } from '@app/types';
+import { AppDrawerParamList, WalletNavigation } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
 import Header from '@ui/widgets/Header';
-import { RouteEnum, ScreenEnum } from '@app/AppState';
+import { Route } from '@app/AppState';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
 
@@ -36,17 +32,16 @@ const PHASE1_DURATION_MS = 4000;
 
 type ComputingTxContentProps = NativeStackScreenProps<
   AppDrawerParamList,
-  RouteEnum.Computing
+  'Computing'
 >;
 
 const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
   route,
 }) => {
-  const navigation = useNavigation<NavigationProp<ParamListBase>>();
+  const navigation = useNavigation<WalletNavigation>();
   const context = useContext(ContextAppLoaded);
   const { translate } = context;
   const { colors } = useTheme();
-  const screenName = ScreenEnum.ComputingTxContext;
 
   const [containerH, setContainerH] = useState<number>(0);
   const [headerH, setHeaderH] = useState<number>(0);
@@ -74,8 +69,8 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
   }, [isTerminal]);
 
   const onContinue = useCallback(() => {
-    navigation.navigate(RouteEnum.HomeStack, {
-      screen: RouteEnum.History,
+    navigation.navigate(Route.Home, {
+      screen: Route.History,
     });
   }, [navigation]);
 
@@ -121,7 +116,6 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
       <View onLayout={e => setHeaderH(e.nativeEvent.layout.height)}>
         <Header
           title={''}
-          screenName={screenName}
           noBalance={true}
           noSyncingStatus={true}
           noDrawMenu={true}

@@ -9,7 +9,17 @@ import {
 import { useTheme } from '@app/theme';
 import { I18n } from 'i18n-js';
 import * as RNLocalize from 'react-native-localize';
-import { StackScreenProps } from '@react-navigation/stack';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { LoadingSession, useSession } from '@app/navigation/session';
+import { LoadingNavigator } from '@app/navigation/LoadingNavigator';
+import {
+  currentRoute,
+  focusedStackRouteNames,
+  goBack,
+  navigateOnboarding,
+  restartOnboarding,
+  returnTo,
+} from '@app/navigation/navigate';
 import NetInfo, {
   NetInfoSubscription,
   NetInfoState,
@@ -58,14 +68,14 @@ import {
   ChainNameEnum,
   SnackbarDurationEnum,
   SettingsNameEnum,
-  RouteEnum,
+  Route,
   AppStateStatusEnum,
   GlobalConst,
   EventListenerEnum,
   AppContextLoading,
+  OnboardingContext,
   ZecPriceType,
   RestoreFromTypeEnum,
-  ScreenEnum,
   LaunchingModeEnum,
   BlockExplorerEnum,
 } from '@app/AppState';
@@ -108,14 +118,7 @@ import {
 } from '@app/services/recoveryWalletInfo';
 
 // no lazy load because slowing down screens.
-import ImportUfvk from '@screens/ImportUfvk';
-import ImportChooser from '@screens/ImportChooser';
-import OnboardingStage from '@ui/widgets/OnboardingStage';
 import SeedSheet from '@ui/widgets/SeedSheet';
-import WalletProgress from '@screens/WalletProgress';
-import WalletError from '@screens/WalletError';
-import Server from '@screens/Server';
-import ServerList from '@screens/ServerList';
 import DeleteWalletSheet from '@ui/widgets/DeleteWalletSheet';
 import { DeleteWalletContext } from '@app/AppState/types/DeleteWalletContext';
 import { walletErrorKind } from './walletErrorKind';
@@ -124,10 +127,13 @@ import { duration as motionDuration } from '@app/theme/motion';
 
 import { sendEmail } from '@app/services/sendEmail';
 import { RPCWalletKindEnum } from '@app/walletBackend/enums/RPCWalletKindEnum';
-import StartMenu from '@screens/StartMenu';
 import { RPCUfvkType } from '@app/walletBackend/types/RPCUfvkType';
 import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
-import { AppStackParamList } from '@app/types';
+import {
+  RootParamList,
+  LoadedAppNavigationState,
+  OnboardingRoute,
+} from '@app/types';
 import { publishReport, reportState } from '@app/services/reportDiagnostics';
 
 const en = require('@app/translations/en.json');
@@ -136,12 +142,8 @@ const pt = require('@app/translations/pt.json');
 const ru = require('@app/translations/ru.json');
 const tr = require('@app/translations/tr.json');
 
-type LoadingAppProps = {
-  navigation: StackScreenProps<
-    AppStackParamList,
-    RouteEnum.LoadingApp
-  >['navigation'];
-  route: StackScreenProps<AppStackParamList, RouteEnum.LoadingApp>['route'];
+type LoadingAppProps = NativeStackScreenProps<RootParamList, 'Loading'> & {
+  session: LoadingSession;
 };
 
 const SERVER_DEFAULT_0: ServerType = remoteServer(
@@ -158,6 +160,7 @@ const activationHeight = {
 
 export default function LoadingApp(props: LoadingAppProps) {
   const theme = useTheme();
+  const { setSession } = useSession();
   const [language, setLanguage] = useState<LanguageEnum>(LanguageEnum.en);
   const [server, setServer] = useState<ServerType>(SERVER_DEFAULT_0);
   const [privacy, setPrivacy] = useState<boolean>(false);
@@ -326,7 +329,11 @@ export default function LoadingApp(props: LoadingAppProps) {
     return (
       <LoadingAppClass
         {...props}
-        navigationApp={props.navigation}
+        openWallet={params => setSession({ kind: 'wallet', params })}
+        openOnboarding={start => setSession({ kind: 'onboarding', start })}
+        openBoot={() =>
+          setSession({ kind: 'boot', startingApp: true, newWallet: false })
+        }
         theme={theme}
         translate={translate}
         language={language}
@@ -344,11 +351,10 @@ export default function LoadingApp(props: LoadingAppProps) {
 }
 
 type LoadingAppClassProps = {
-  navigationApp: StackScreenProps<
-    AppStackParamList,
-    RouteEnum.LoadingApp
-  >['navigation'];
-  route: StackScreenProps<AppStackParamList, RouteEnum.LoadingApp>['route'];
+  session: LoadingSession;
+  openWallet: (params: LoadedAppNavigationState) => void;
+  openOnboarding: (start: 'Welcome' | 'OpenError') => void;
+  openBoot: () => void;
   translate: (key: string) => TranslateType;
   theme: AppTheme;
   language: LanguageEnum;
@@ -362,7 +368,8 @@ type LoadingAppClassProps = {
   blockExplorer: BlockExplorerEnum;
 };
 
-type LoadingAppClassState = AppStateLoading & AppContextLoading;
+type LoadingAppClassState = AppStateLoading &
+  Omit<AppContextLoading, keyof OnboardingContext>;
 
 const RETRY_MIN_MS = 1400;
 const ERROR_RESOLVE_MS = 200;
@@ -378,7 +385,6 @@ export class LoadingAppClass extends Component<
   // Runs once the hold completes; set with the sheet's context.
   afterDelete: () => void = () => {};
   retryStartedAt = 0;
-  screenName = ScreenEnum.LoadingApp;
 
   constructor(props: LoadingAppClassProps) {
     super(props);
@@ -411,20 +417,16 @@ export class LoadingAppClass extends Component<
 
       // state
       appStateStatus: AppState.currentState,
-      screen:
-        !!props.route.params && props.route.params.screen !== undefined
-          ? props.route.params.screen
-          : RouteEnum.Launching,
       actionButtonsDisabled: false,
-      progressKind: 'import',
       walletExists: false,
-      // The gate outcome arrives with the navigation whole (see
-      // LoadingAppNavigationState), never from module state.
-      biometricGate: props.route.params?.biometricGate ?? { kind: 'passed' },
+      // The gate outcome arrives with the session whole, never from module
+      // state.
+      biometricGate:
+        props.session.kind === 'locked'
+          ? props.session.gate
+          : { kind: 'passed' },
       startingApp:
-        !!props.route.params && props.route.params.startingApp !== undefined
-          ? props.route.params.startingApp
-          : true,
+        props.session.kind === 'boot' ? props.session.startingApp : true,
       firstLaunchingMessage: props.firstLaunchingMessage,
       hasRecoveryWalletInfoSaved: false,
       recoveryWallet: null,
@@ -436,10 +438,7 @@ export class LoadingAppClass extends Component<
       serverBlockHeight: '',
       serverLatencies: {},
       serverLists: {},
-      serverListChain: ChainNameEnum.mainChainName,
-      serverTab: null,
       errorResolved: false,
-      serverReturn: RouteEnum.StartMenu,
     };
   }
 
@@ -450,29 +449,21 @@ export class LoadingAppClass extends Component<
   backSub: { remove: () => void } | null = null;
 
   // System back on Server, its list and the import chooser goes one screen
-  // up, as their back arrows do. Other screens leave it to the handlers
-  // below (open sheets) and the app shell.
+  // up, as their back arrows do. Every other screen of this section keeps
+  // its place.
   onHardwareBack = (): boolean => {
-    const { screen, actionButtonsDisabled } = this.state;
-    if (screen === RouteEnum.Server) {
+    const { actionButtonsDisabled } = this.state;
+    const route = currentRoute();
+    if (route === Route.Server) {
       if (!actionButtonsDisabled && !this.serverBackGuard.current?.()) {
         this.closeServer();
       }
-      return true;
-    }
-    if (screen === RouteEnum.ServerList) {
+    } else if (route === Route.ServerList || route === Route.ImportChooser) {
       if (!actionButtonsDisabled) {
-        this.setState({ screen: RouteEnum.Server });
+        goBack();
       }
-      return true;
     }
-    if (screen === RouteEnum.ImportChooser) {
-      if (!actionButtonsDisabled) {
-        this.setState({ screen: RouteEnum.StartMenu });
-      }
-      return true;
-    }
-    return false;
+    return true;
   };
 
   componentDidMount = async () => {
@@ -572,14 +563,8 @@ export class LoadingAppClass extends Component<
       await this.loadExistingWalletOnBoot();
     } else {
       // no wallet file -> go to the initial menu.
-      this.setState(state => ({
-        screen:
-          state.screen === RouteEnum.ImportUfvk
-            ? RouteEnum.ImportUfvk
-            : RouteEnum.StartMenu,
-        walletExists: false,
-        actionButtonsDisabled: false,
-      }));
+      this.setState({ walletExists: false, actionButtonsDisabled: false });
+      this.props.openOnboarding(Route.Welcome);
     }
 
     if (this.unmounted) {
@@ -843,8 +828,21 @@ export class LoadingAppClass extends Component<
       errorResolved: false,
       retrying: false,
       actionButtonsDisabled: false,
-      screen: RouteEnum.WalletError,
     });
+    this.openError();
+  };
+
+  // Puts the error screen on stage: opening from the welcome fails on stage,
+  // opening at boot opens the stage on the error.
+  openError = () => {
+    if (currentRoute() === Route.OpenError) {
+      return;
+    }
+    if (this.props.session.kind === 'onboarding') {
+      navigateOnboarding({ screen: Route.OpenError });
+    } else {
+      this.props.openOnboarding(Route.OpenError);
+    }
   };
 
   // Loads the wallet file found on disk. Also the retry after a file repair.
@@ -924,10 +922,7 @@ export class LoadingAppClass extends Component<
           // if the App is restoring another wallet backup...
           // needs to recalculate the Address Book.
           const newWallet =
-            !!this.props.route.params &&
-            this.props.route.params.newWallet !== undefined
-              ? this.props.route.params.newWallet
-              : false;
+            this.props.session.kind === 'boot' && this.props.session.newWallet;
           this.navigateToLoadedApp(
             readOnly,
             orchardPool,
@@ -1006,7 +1001,7 @@ export class LoadingAppClass extends Component<
   // for at least RETRY_MIN_MS so the attempt reads as one.
   showWalletError = (details: string) => {
     const kind = walletErrorKind(details);
-    const again = this.state.screen === RouteEnum.WalletError;
+    const again = currentRoute() === Route.OpenError;
     const apply = () => {
       if (again) {
         this.addLastSnackbar(
@@ -1023,8 +1018,8 @@ export class LoadingAppClass extends Component<
         retrying: false,
         errorShake: again ? state.errorShake + 1 : state.errorShake,
         actionButtonsDisabled: false,
-        screen: RouteEnum.WalletError,
       }));
+      this.openError();
     };
     const elapsed = Date.now() - this.retryStartedAt;
     const wait = this.state.retrying ? Math.max(0, RETRY_MIN_MS - elapsed) : 0;
@@ -1063,6 +1058,7 @@ export class LoadingAppClass extends Component<
           return;
         }
         this.setState({ walletExists: false, walletError: null });
+        restartOnboarding();
       }
       next();
     };
@@ -1070,6 +1066,11 @@ export class LoadingAppClass extends Component<
       this.deleteSheetRef.current?.present(),
     );
   };
+
+  deleteThenImport = () =>
+    this.confirmDelete('import', this.getwalletToRestore);
+
+  deleteThenCreate = () => this.confirmDelete('create', this.createNewWallet);
 
   createNewWalletChecked = () => {
     if (this.state.walletExists) {
@@ -1098,10 +1099,7 @@ export class LoadingAppClass extends Component<
   ) => {
     // Leaving the error screen after a retry worked: its badge shrinks and
     // the server dot turns green first.
-    if (
-      this.state.screen === RouteEnum.WalletError &&
-      !this.state.errorResolved
-    ) {
+    if (currentRoute() === Route.OpenError && !this.state.errorResolved) {
       this.setState({ errorResolved: true });
       setTimeout(
         () =>
@@ -1119,22 +1117,14 @@ export class LoadingAppClass extends Component<
       return;
     }
     this.setState(s => ({ wallet: { ...s.wallet, seed: '', ufvk: '' } }));
-    this.props.navigationApp.reset({
-      index: 0,
-      routes: [
-        {
-          name: RouteEnum.LoadedApp,
-          params: {
-            readOnly,
-            orchardPool,
-            saplingPool,
-            transparentPool,
-            newWallet,
-            firstLaunchingMessage,
-            walletChainName,
-          },
-        },
-      ],
+    this.props.openWallet({
+      readOnly,
+      orchardPool,
+      saplingPool,
+      transparentPool,
+      newWallet,
+      firstLaunchingMessage,
+      walletChainName,
     });
   };
 
@@ -1149,14 +1139,15 @@ export class LoadingAppClass extends Component<
       );
       return;
     }
-    this.setState({
-      actionButtonsDisabled: true,
-      progressKind: 'create',
-    });
+    this.setState({ actionButtonsDisabled: true });
     // The leaves part at once and the creating screen fades up in their
     // place; no button collapse first.
     const showProgress = setTimeout(
-      () => this.setState({ screen: RouteEnum.WalletProgress }),
+      () =>
+        navigateOnboarding({
+          screen: Route.Progress,
+          params: { kind: 'create' },
+        }),
       0,
     );
     // Pass "0" in both modes. Online, the Indexer supplies the chain tip.
@@ -1181,10 +1172,8 @@ export class LoadingAppClass extends Component<
         seedJSON = await JSON.parse(seed.value);
         if (seedJSON.error) {
           clearTimeout(showProgress);
-          this.setState({
-            actionButtonsDisabled: false,
-            screen: RouteEnum.StartMenu,
-          });
+          this.setState({ actionButtonsDisabled: false });
+          returnTo(Route.Welcome);
           createAlert(
             this.setBackgroundError,
             this.addLastSnackbar,
@@ -1199,10 +1188,8 @@ export class LoadingAppClass extends Component<
         }
       } catch (e: unknown) {
         clearTimeout(showProgress);
-        this.setState({
-          actionButtonsDisabled: false,
-          screen: RouteEnum.StartMenu,
-        });
+        this.setState({ actionButtonsDisabled: false });
+        returnTo(Route.Welcome);
         createAlert(
           this.setBackgroundError,
           this.addLastSnackbar,
@@ -1247,10 +1234,8 @@ export class LoadingAppClass extends Component<
       );
     } else {
       clearTimeout(showProgress);
-      this.setState({
-        actionButtonsDisabled: false,
-        screen: RouteEnum.StartMenu,
-      });
+      this.setState({ actionButtonsDisabled: false });
+      returnTo(Route.Welcome);
       createAlert(
         this.setBackgroundError,
         this.addLastSnackbar,
@@ -1265,26 +1250,19 @@ export class LoadingAppClass extends Component<
   };
 
   getwalletToRestore = async () => {
-    this.setState({
-      wallet: {} as WalletType,
+    this.setState({ wallet: {} as WalletType });
+    navigateOnboarding({
       screen: this.state.recoveryWallet
-        ? RouteEnum.ImportChooser
-        : RouteEnum.ImportUfvk,
+        ? Route.ImportChooser
+        : Route.ImportWallet,
     });
   };
 
-  leaveImport = () => {
-    this.setState({
-      screen: this.state.recoveryWallet
-        ? RouteEnum.ImportChooser
-        : RouteEnum.StartMenu,
-    });
-  };
-
+  // `origin` is the screen the restore started from; a failure returns there.
   doRestore = async (
     seedUfvk: string,
     birthday: number,
-    origin: RouteEnum = RouteEnum.ImportUfvk,
+    origin: OnboardingRoute = Route.ImportWallet,
   ) => {
     if (!seedUfvk) {
       // no reporting button, no needed.
@@ -1361,15 +1339,16 @@ export class LoadingAppClass extends Component<
       return;
     }
 
-    this.setState({
-      actionButtonsDisabled: true,
-      progressKind: 'import',
-    });
+    this.setState({ actionButtonsDisabled: true });
     // From the form, the Import button collapses first; from the Keychain
     // card, the leaves part at once.
     const showImporting = setTimeout(
-      () => this.setState({ screen: RouteEnum.WalletProgress }),
-      origin === RouteEnum.ImportUfvk ? motionDuration.emphasized : 0,
+      () =>
+        navigateOnboarding({
+          screen: Route.Progress,
+          params: { kind: 'import' },
+        }),
+      origin === Route.ImportWallet ? motionDuration.emphasized : 0,
     );
     let type: RestoreFromTypeEnum = RestoreFromTypeEnum.seedRestoreFrom;
     if (
@@ -1499,7 +1478,8 @@ export class LoadingAppClass extends Component<
     }
     if (error) {
       clearTimeout(showImporting);
-      this.setState({ actionButtonsDisabled: false, screen: origin });
+      this.setState({ actionButtonsDisabled: false });
+      returnTo(origin);
       createAlert(
         this.setBackgroundError,
         this.addLastSnackbar,
@@ -1524,31 +1504,25 @@ export class LoadingAppClass extends Component<
     this.setState({ backgroundError: { title, error } });
   };
 
-  openServer = (tab?: ChainNameEnum) => {
-    this.setState(
-      state => ({
-        serverReturn: state.screen,
-        serverTab: tab ?? null,
-        screen: RouteEnum.Server,
-      }),
-      () => this.probeCurrentServer(),
-    );
+  openServer = (chain?: ChainNameEnum) => {
+    navigateOnboarding({ screen: Route.Server, params: { chain } });
+    this.probeCurrentServer();
   };
 
   // Back on a chain error, the wallet opens by itself once the server is on
   // its network, or offline.
   closeServer = () => {
-    const { serverReturn, walletError, server } = this.state;
+    const { walletError, server } = this.state;
+    const below = focusedStackRouteNames().at(-2);
     const fixed =
-      serverReturn === RouteEnum.WalletError &&
+      below === Route.OpenError &&
       walletError?.kind === 'chain' &&
       (server.kind === 'offline' ||
         server.chainName === walletError.walletChain);
-    this.setState({ screen: serverReturn, serverTab: null }, () => {
-      if (fixed) {
-        this.retryOpenWallet();
-      }
-    });
+    goBack();
+    if (fixed) {
+      this.retryOpenWallet();
+    }
   };
 
   probeCurrentServer = async () => {
@@ -1702,6 +1676,7 @@ export class LoadingAppClass extends Component<
     await new Promise<void>(resolve => {
       this.setState({ biometricGate: { kind: 'passed' } }, resolve);
     });
+    this.props.openBoot();
     await this.componentDidMount();
   });
 
@@ -1722,7 +1697,7 @@ export class LoadingAppClass extends Component<
 
   // Importing the stored recovery info asks first, as viewing it does: the
   // start gate does not cover it when there is no wallet file.
-  importRecoveryWallet = async () => {
+  importRecoveryWallet = async (origin: OnboardingRoute) => {
     const wallet = this.state.recoveryWallet;
     if (!wallet) {
       return;
@@ -1780,7 +1755,7 @@ export class LoadingAppClass extends Component<
     await this.doRestore(
       wallet.seed || wallet.ufvk || '',
       wallet.birthday,
-      this.state.screen,
+      origin,
     );
   };
 
@@ -1819,7 +1794,6 @@ export class LoadingAppClass extends Component<
 
   render() {
     const {
-      screen,
       actionButtonsDisabled,
       walletExists,
       firstLaunchingMessage,
@@ -1851,6 +1825,44 @@ export class LoadingAppClass extends Component<
       selectServer: this.state.selectServer,
       performanceLevel: this.state.performanceLevel,
       blockExplorer: this.state.blockExplorer,
+
+      // the loading section
+      biometricGate,
+      retryGate: this.retryGate,
+      updating:
+        walletExists && firstLaunchingMessage === LaunchingModeEnum.updating,
+      busy: actionButtonsDisabled,
+      walletExists,
+      recoveryWallet: this.state.recoveryWallet,
+      freshInstall: firstLaunchingMessage === LaunchingModeEnum.installing,
+      walletError: this.state.walletError,
+      errorResolved: this.state.errorResolved,
+      retrying: this.state.retrying,
+      errorShake: this.state.errorShake,
+      serverStatus: this.state.serverStatus,
+      serverBlockHeight: this.state.serverBlockHeight,
+      serverLatencies: this.state.serverLatencies,
+      serverLists: this.state.serverLists,
+      serverBackGuard: this.serverBackGuard,
+      importRecoveryWallet: this.importRecoveryWallet,
+      viewRecoveryWallet: this.viewRecoveryWallet,
+      openServer: this.openServer,
+      closeServer: this.closeServer,
+      openCurrentWallet: this.openCurrentWallet,
+      createNewWallet: this.createNewWalletChecked,
+      getwalletToRestore: this.getwalletToRestore,
+      retryOpenWallet: this.retryOpenWallet,
+      deleteThenImport: this.deleteThenImport,
+      deleteThenCreate: this.deleteThenCreate,
+      switchToWalletChain: this.switchToWalletChain,
+      chooseAutomatic: this.chooseAutomatic,
+      pickServer: this.pickServer,
+      saveCustomServer: this.saveCustomServer,
+      setOffline: this.setOffline,
+      probeServers: this.probeServers,
+      serverUnreachable: this.serverUnreachable,
+      serversFor: this.serversFor,
+      doRestore: this.doRestore,
     };
 
     return (
@@ -1860,135 +1872,7 @@ export class LoadingAppClass extends Component<
             <BottomSheetModalProvider>
               <BottomSheetBackHandler />
               <ConfirmBottomSheet />
-              {screen === RouteEnum.Launching && (
-                <Launching
-                  translate={translate}
-                  // Optimizing is said only of a wallet that exists and is
-                  // being opened by a new version of the app.
-                  firstLaunchingMessage={
-                    walletExists &&
-                    firstLaunchingMessage === LaunchingModeEnum.updating
-                      ? LaunchingModeEnum.updating
-                      : LaunchingModeEnum.opening
-                  }
-                  biometricGate={biometricGate}
-                  tryAgain={this.retryGate}
-                />
-              )}
-              {screen !== RouteEnum.Launching && (
-                <OnboardingStage screen={screen}>
-                  {screen === RouteEnum.StartMenu && (
-                    <StartMenu
-                      actionButtonsDisabled={actionButtonsDisabled}
-                      recoveryWallet={this.state.recoveryWallet}
-                      freshInstall={
-                        firstLaunchingMessage === LaunchingModeEnum.installing
-                      }
-                      importRecoveryWallet={this.importRecoveryWallet}
-                      viewRecoveryWallet={this.viewRecoveryWallet}
-                      customServer={() => this.openServer()}
-                      walletExists={walletExists}
-                      openCurrentWallet={this.openCurrentWallet}
-                      createNewWallet={this.createNewWalletChecked}
-                      getwalletToRestore={this.getwalletToRestore}
-                    />
-                  )}
-                  {screen === RouteEnum.WalletProgress && (
-                    <WalletProgress kind={this.state.progressKind} />
-                  )}
-                  {screen === RouteEnum.ImportChooser && (
-                    <ImportChooser
-                      busy={actionButtonsDisabled}
-                      onPrevious={this.importRecoveryWallet}
-                      onSeed={() =>
-                        this.setState({ screen: RouteEnum.ImportUfvk })
-                      }
-                      onBack={() =>
-                        this.setState({ screen: RouteEnum.StartMenu })
-                      }
-                    />
-                  )}
-                  {screen === RouteEnum.WalletError &&
-                    this.state.walletError && (
-                      <WalletError
-                        kind={this.state.walletError.kind}
-                        details={this.state.walletError.details}
-                        walletChain={this.state.walletError.walletChain}
-                        resolved={this.state.errorResolved}
-                        busy={this.state.retrying}
-                        shake={this.state.errorShake}
-                        onRetry={this.retryOpenWallet}
-                        onImport={() =>
-                          this.confirmDelete('import', this.getwalletToRestore)
-                        }
-                        onCreate={() =>
-                          this.confirmDelete('create', this.createNewWallet)
-                        }
-                        onServer={() =>
-                          this.openServer(this.state.walletError?.walletChain)
-                        }
-                        onSwitchChain={this.switchToWalletChain}
-                      />
-                    )}
-                  {screen === RouteEnum.Server && (
-                    <Server
-                      translate={translate}
-                      initialChain={this.state.serverTab ?? undefined}
-                      server={this.state.server}
-                      selectServer={this.state.selectServer}
-                      status={this.state.serverStatus}
-                      blockHeight={this.state.serverBlockHeight}
-                      busy={actionButtonsDisabled}
-                      online={!!this.state.netInfo.isConnected}
-                      recommended={serverUris(translate).filter(
-                        s => s.recommended,
-                      )}
-                      latencies={this.state.serverLatencies}
-                      onAuto={this.chooseAutomatic}
-                      onPick={this.pickServer}
-                      onSaveCustom={this.saveCustomServer}
-                      onOffline={this.setOffline}
-                      onOther={chain =>
-                        this.setState({
-                          serverListChain: chain,
-                          screen: RouteEnum.ServerList,
-                        })
-                      }
-                      onProbe={this.probeServers}
-                      onUnreachable={this.serverUnreachable}
-                      onBack={this.closeServer}
-                      backGuard={this.serverBackGuard}
-                    />
-                  )}
-                  {screen === RouteEnum.ServerList && (
-                    <ServerList
-                      translate={translate}
-                      servers={this.serversFor(this.state.serverListChain)}
-                      loading={
-                        !this.state.serverLists[this.state.serverListChain]
-                      }
-                      latencies={this.state.serverLatencies}
-                      selectedUri={
-                        this.state.server.kind === 'remote' &&
-                        this.state.selectServer === SelectServerEnum.list
-                          ? this.state.server.uri
-                          : null
-                      }
-                      busy={actionButtonsDisabled}
-                      onPick={this.pickServer}
-                      onUnreachable={this.serverUnreachable}
-                      onBack={() => this.setState({ screen: RouteEnum.Server })}
-                    />
-                  )}
-                  {screen === RouteEnum.ImportUfvk && (
-                    <ImportUfvk
-                      busy={this.state.actionButtonsDisabled}
-                      onClickOK={(s: string, b: number) => this.doRestore(s, b)}
-                      onClickCancel={this.leaveImport}
-                    />
-                  )}
-                </OnboardingStage>
-              )}
+              <LoadingNavigator />
               <SeedSheet
                 ref={this.seedSheetRef}
                 wallet={this.state.recoveryWallet}

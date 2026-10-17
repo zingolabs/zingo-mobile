@@ -2,17 +2,15 @@
 import React, { useContext, useRef } from 'react';
 import { View, ScrollView, TouchableOpacity, Text } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
-import {
-  NavigationProp,
-  ParamListBase,
-  useNavigation,
-} from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
+import { WalletNavigation } from '@app/types';
 import { useTheme } from '@app/theme';
 
 import { ContextAppLoaded } from '@app/context';
+import { useResult } from '@app/navigation/results';
 import {
   AddressKindEnum,
-  RouteEnum,
+  Route,
   SnackbarDurationEnum,
   TransparentAddressClass,
   UnifiedAddressClass,
@@ -49,7 +47,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
   index,
   setIndex,
 }) => {
-  const navigation = useNavigation<NavigationProp<ParamListBase>>();
+  const navigation = useNavigation<WalletNavigation>();
   const context = useContext(ContextAppLoaded);
   const { translate, privacy, addLastSnackbar, addressBook } = context;
   const { colors } = useTheme();
@@ -75,10 +73,11 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
     );
   };
 
+  useResult('receive.addressIndex', i => setIndex(Number(i)));
   const doAddressList = () => {
-    navigation.navigate(RouteEnum.AddressList, {
+    navigation.navigate(Route.AddressList, {
       addressKind: address ? address.addressKind : AddressKindEnum.u,
-      setIndex: setIndex,
+      request: 'receive.addressIndex',
     });
   };
 

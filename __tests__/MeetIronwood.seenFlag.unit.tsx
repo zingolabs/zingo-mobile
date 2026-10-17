@@ -11,7 +11,7 @@ import {
   defaultAppContextLoaded,
   ContextAppLoadedProvider,
 } from '@app/context';
-import { RouteEnum, SettingsNameEnum } from '@app/AppState';
+import { Route, SettingsNameEnum } from '@app/AppState';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
@@ -98,7 +98,7 @@ function renderScreen() {
   const reset = jest.fn();
   const props: any = {
     navigation: { ...mockNavigation, navigate, reset },
-    route: { key: 'Key-1', name: RouteEnum.MeetIronwood, params: undefined },
+    route: { key: 'Key-1', name: Route.MeetIronwood, params: undefined },
   };
   const utils = render(
     <ContextAppLoadedProvider

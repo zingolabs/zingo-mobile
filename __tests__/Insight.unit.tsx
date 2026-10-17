@@ -8,7 +8,6 @@ import {
 import {
   AddressBookFileClass,
   ChainNameEnum,
-  RouteEnum,
   ValueTransferKindEnum,
 } from '@app/AppState';
 import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
@@ -56,7 +55,7 @@ const renderInsight = () =>
     >
       <Insight
         navigation={mockNavigation}
-        route={{ key: 'insight', name: RouteEnum.Insight, params: undefined }}
+        route={{ key: 'insight', name: 'Insight', params: undefined }}
       />
     </ContextAppLoadedProvider>,
   );

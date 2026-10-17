@@ -5,7 +5,7 @@ import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
 } from '@app/context';
-import { RouteEnum } from '@app/AppState';
+import { Route } from '@app/AppState';
 import { WalletSeedAction } from '@app/types';
 import { showConfirm } from '@app/services/showConfirm';
 import { copySensitive } from '@app/utils/sensitiveClipboard';
@@ -50,17 +50,17 @@ const renderScreen = (
         seedBackedUpAt,
         readOnly,
         birthday: 3512840,
+        changeWallet: onConfirm,
+        applyPendingServer: onConfirm,
       }}
     >
       <WalletSeed
         navigation={mockNavigation}
         route={{
           key: 'k',
-          name: RouteEnum.WalletSeed,
+          name: Route.WalletSeed,
           params: action ? { action } : undefined,
         }}
-        onConfirm={onConfirm}
-        onCancel={jest.fn(async () => {})}
       />
     </ContextAppLoadedProvider>,
   );
@@ -74,7 +74,7 @@ test('Tests that Back up pushes the backup flow when the seed is not backed up.'
   await act(async () => {});
   expect(screen.getByTestId('walletseed.no')).toBeTruthy();
   fireEvent.press(screen.getByTestId('walletseed.backup'));
-  expect(mockNavigation.navigate).toHaveBeenCalledWith(RouteEnum.SeedBackup, {
+  expect(mockNavigation.navigate).toHaveBeenCalledWith(Route.SeedBackup, {
     entry: { kind: 'push' },
   });
 });
@@ -84,7 +84,7 @@ test('Tests that Verify again opens the word check when the seed is backed up.',
   await act(async () => {});
   expect(screen.getByTestId('walletseed.ok')).toBeTruthy();
   fireEvent.press(screen.getByTestId('walletseed.actions.link'));
-  expect(mockNavigation.navigate).toHaveBeenCalledWith(RouteEnum.SeedBackup, {
+  expect(mockNavigation.navigate).toHaveBeenCalledWith(Route.SeedBackup, {
     entry: { kind: 'verify' },
   });
 });

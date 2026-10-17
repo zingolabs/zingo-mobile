@@ -9,7 +9,7 @@ import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
 } from '@app/context';
-import { RouteEnum } from '@app/AppState';
+import { Route } from '@app/AppState';
 import type { TranslateType } from '@app/AppState';
 import { errorKeyed } from '@app/AppState/types/Result';
 import { AppDrawerParamList } from '@app/types';
@@ -20,12 +20,12 @@ const translate = (key: string): TranslateType => `translated ${key}`;
 
 function makeProps(
   failure: SendFailureText,
-): NativeStackScreenProps<AppDrawerParamList, RouteEnum.Computing> {
+): NativeStackScreenProps<AppDrawerParamList, 'Computing'> {
   return {
     navigation: mockNavigation,
     route: {
       key: 'Key-1',
-      name: RouteEnum.Computing,
+      name: Route.Computing,
       params: { phase: 'failed', failure },
     },
   };

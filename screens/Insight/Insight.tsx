@@ -11,7 +11,6 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import { useTheme } from '@app/theme';
 import { ease } from '@app/theme/motion';
-import { ScreenEnum, RouteEnum } from '@app/AppState';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
 import Utils from '@app/utils';
@@ -54,10 +53,7 @@ const PRESETS: { weeks: number | 'all'; key: string }[] = [
   { weeks: 'all', key: 'insight.preset-all' },
 ];
 
-type InsightProps = NativeStackScreenProps<
-  AppDrawerParamList,
-  RouteEnum.Insight
->;
+type InsightProps = NativeStackScreenProps<AppDrawerParamList, 'Insight'>;
 
 // What the wallet sent and to whom: weekly activity, the share per recipient
 // and the ranked recipients, by amount or by number of sends.
@@ -238,7 +234,6 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
     >
       <Header
         title={''}
-        screenName={ScreenEnum.Insight}
         noBalance={true}
         noSyncingStatus={true}
         noDrawMenu={true}

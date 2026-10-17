@@ -7,7 +7,7 @@ import {
 } from '@app/context';
 import {
   ChainNameEnum,
-  RouteEnum,
+  Route,
   SelectServerEnum,
   TranslateType,
 } from '@app/AppState';
@@ -46,12 +46,12 @@ const mount = (setServerOption: jest.Mock) => {
         selectServer: SelectServerEnum.list,
         walletChainName: ChainNameEnum.mainChainName,
         netInfo: { ...defaultAppContextLoaded.netInfo, isConnected: true },
+        setServerOption,
       }}
     >
       <WalletServer
         navigation={navigation as never}
-        route={{ key: 'server', name: RouteEnum.Server } as never}
-        setServerOption={setServerOption}
+        route={{ key: 'server', name: Route.Server } as never}
       />
     </ContextAppLoadedProvider>,
   );
@@ -104,7 +104,7 @@ test('Tests that a server on another network goes to the recovery screen', async
     true,
     false,
   );
-  expect(navigation.navigate).toHaveBeenCalledWith(RouteEnum.WalletSeed, {
+  expect(navigation.navigate).toHaveBeenCalledWith(Route.WalletSeed, {
     action: 'server',
   });
 });

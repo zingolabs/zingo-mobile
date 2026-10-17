@@ -3,15 +3,19 @@ import React, { useEffect, useRef } from 'react';
 import { BackHandler, Platform, StyleSheet, View } from 'react-native';
 import Animated, {
   Easing,
+  ReduceMotion,
   useAnimatedStyle,
   useSharedValue,
   withDelay,
   withTiming,
 } from 'react-native-reanimated';
 import { useBottomSheetModal } from '@gorhom/bottom-sheet';
+import { useIsFocused } from '@react-navigation/native';
 
 import OptionsPanel, { OptionsPanelProps } from './OptionsPanel';
 import { useOptionsPanel } from '@app/context/optionsPanel';
+import { ease } from '@app/theme/motion';
+import { useTheme } from '@app/theme';
 
 const FADE_DURATION_MS = 125;
 // Open sequence (total ≈ 250ms = slide duration):
@@ -21,65 +25,95 @@ const FADE_DURATION_MS = 125;
 //   3) end:       panel at full opacity, sheet fully off-screen
 // Close path is untouched: panel just fades 1 → 0 immediately.
 const OPEN_FADE_DELAY_MS = 125;
+// A screen pushed from the panel dims it in place: the panel never moves,
+// so the screen pops straight back onto it.
+const PUSHED_DIM = 0.55;
+const PUSH_IN_MS = 380;
+const PUSH_OUT_MS = 320;
 
 type OptionsPanelHostProps = OptionsPanelProps & {
-  /** Active app surface (navigator). Stays fixed; only the sheet inside
-   *  each screen slides — see per-screen wiring. The header crossfades
-   *  via the shared `useOptionsPanel` state read by Header.tsx. */
+  /** The home tabs. They stay fixed; only the sheet inside each tab slides,
+   *  and the header crossfades through the shared `useOptionsPanel` state. */
   children: React.ReactNode;
 };
 
 /**
- * Mounts the OptionsPanel as a screen-filling overlay that fades in/out
- * with the panel state. The active app surface stays in place underneath
- * (the per-screen BottomSheet handles its own slide-down). When the panel
- * is closed the overlay is fully transparent and unmounted from the touch
- * tree via `pointerEvents`.
+ * Mounts the OptionsPanel as an overlay that fills the home route, so a
+ * screen pushed from the panel lands over it. The panel then waits under
+ * that screen, dimmed, and comes to the front again when the home
+ * regains the focus. Closed, the overlay is transparent and out of the
+ * touch tree.
  */
 const OptionsPanelHost: React.FC<OptionsPanelHostProps> = ({
   children,
   ...panelProps
 }) => {
-  const { isOpen, close } = useOptionsPanel();
+  const { kind, close, surface } = useOptionsPanel();
   const { dismissAll } = useBottomSheetModal();
+  const focused = useIsFocused();
+  const { colors } = useTheme();
   const opacity = useSharedValue(0);
+  const dim = useSharedValue(0);
+  const shown = kind !== 'closed';
+  const front = kind === 'open';
 
   useEffect(() => {
-    const tween = withTiming(isOpen ? 1 : 0, {
+    const tween = withTiming(shown ? 1 : 0, {
       duration: FADE_DURATION_MS,
       easing: Easing.out(Easing.cubic),
     });
-    opacity.value = isOpen ? withDelay(OPEN_FADE_DELAY_MS, tween) : tween;
-  }, [isOpen, opacity]);
+    opacity.value = shown ? withDelay(OPEN_FADE_DELAY_MS, tween) : tween;
+  }, [shown, opacity]);
+
+  useEffect(() => {
+    const under = kind === 'under';
+    dim.value = withTiming(under ? PUSHED_DIM : 0, {
+      duration: under ? PUSH_IN_MS : PUSH_OUT_MS,
+      easing: ease.emphasized,
+      reduceMotion: ReduceMotion.System,
+    });
+  }, [kind, dim]);
+
+  // The screen pushed over the panel has popped: the panel is in front again.
+  const wasFocused = useRef(focused);
+  useEffect(() => {
+    if (focused && !wasFocused.current) {
+      surface();
+    }
+    wasFocused.current = focused;
+  }, [focused, surface]);
 
   // Close any open BottomSheetModal in the screen behind when the panel
   // opens — defensive cleanup (kept from step 5).
-  const prevIsOpen = useRef(false);
+  const wasShown = useRef(false);
   useEffect(() => {
-    if (isOpen && !prevIsOpen.current) {
+    if (shown && !wasShown.current) {
       dismissAll();
     }
-    prevIsOpen.current = isOpen;
-  }, [isOpen, dismissAll]);
+    wasShown.current = shown;
+  }, [shown, dismissAll]);
 
-  // Android hardware/gesture back: while the panel is open, the back
+  // Android hardware/gesture back: while the panel is in front, the back
   // action just closes it (does NOT pop the underlying screen).
   useEffect(() => {
     if (Platform.OS !== 'android') {
       return;
     }
     const sub = BackHandler.addEventListener('hardwareBackPress', () => {
-      if (isOpen) {
+      if (front) {
         close();
         return true;
       }
       return false;
     });
     return () => sub.remove();
-  }, [isOpen, close]);
+  }, [front, close]);
 
   const overlayStyle = useAnimatedStyle(() => ({
     opacity: opacity.value,
+  }));
+  const dimStyle = useAnimatedStyle(() => ({
+    opacity: dim.value,
   }));
 
   return (
@@ -87,13 +121,22 @@ const OptionsPanelHost: React.FC<OptionsPanelHostProps> = ({
       {/* Active app surface — stays fixed. */}
       <View style={StyleSheet.absoluteFill}>{children}</View>
 
-      {/* Options panel — fades in over everything, ignores touches when
-          closed so the screen behind stays interactive. */}
+      {/* Options panel — fades in over the home, ignores touches unless it
+          is in front so the screen behind stays interactive. */}
       <Animated.View
-        pointerEvents={isOpen ? 'auto' : 'none'}
+        testID={`optionspanel.${kind}`}
+        pointerEvents={front ? 'auto' : 'none'}
         style={[StyleSheet.absoluteFill, overlayStyle]}
       >
         <OptionsPanel {...panelProps} />
+        <Animated.View
+          pointerEvents="none"
+          style={[
+            StyleSheet.absoluteFill,
+            { backgroundColor: colors.bgCanvas },
+            dimStyle,
+          ]}
+        />
       </Animated.View>
     </View>
   );

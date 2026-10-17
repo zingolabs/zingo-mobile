@@ -15,16 +15,18 @@ import { LanguageEnum } from './enums/LanguageEnum';
 import { SelectServerEnum } from './enums/SelectServerEnum';
 import { ChainNameEnum } from './enums/ChainNameEnum';
 import { SnackbarDurationEnum } from './enums/SnackbarDurationEnum';
-import { LoadedAppNavigationState } from '@app/types';
 import ValueTransferType from './types/ValueTransferType';
 import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
 import { RescanState } from '@app/walletBackend/utils/syncProgress';
 import TransparentAddressClass from './classes/TransparentAddressClass';
-import { ScreenEnum } from './enums/ScreenEnum';
 import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
 import { BlockExplorerEnum } from './enums/BlockExplorerEnum';
 import { MixnetView } from '@app/walletBackend/transforms/mixnetView';
-import type { SendPermit } from '@app/walletBackend/transforms/sendPermit';
+import type {
+  SendOutcome,
+  SendPermit,
+} from '@app/walletBackend/transforms/sendPermit';
+import { SetServerResult } from './types/SetServerResult';
 
 export default interface AppContextLoaded {
   netInfo: NetInfoType;
@@ -90,7 +92,39 @@ export default interface AppContextLoaded {
   addLastSnackbar: (message: string, duration?: SnackbarDurationEnum) => void;
 
   // if the App is stalled - restart is fired
-  restartApp: (s: LoadedAppNavigationState) => void;
+  restartApp: () => void;
+
+  // The header asks the lists to scroll; a list clears the request.
+  scrollToTop: boolean;
+  setScrollToTop: (value: boolean) => void;
+  scrollToBottom: boolean;
+  setScrollToBottom: (value: boolean) => void;
+  setShieldingAmount: (value: number) => void;
+
+  // Wallet actions the screens run; the provider owns the wallet backend.
+  sendTransaction: (
+    s: SendPageStateClass,
+    sendAll?: boolean,
+  ) => Promise<SendOutcome<string>>;
+  setServerOption: (
+    value: ServerType,
+    selectServer: SelectServerEnum,
+    toast: boolean,
+    sameServerChainName: boolean,
+  ) => Promise<SetServerResult>;
+  clearToAddr: () => void;
+  doRescan: () => Promise<void>;
+  setAddressBook: (ab: AddressBookFileClass[]) => void;
+  setLanguageOption: (value: LanguageEnum) => Promise<void>;
+  setBiometricsOption: (value: boolean) => Promise<void>;
+  setPerformanceLevelOption: (value: RPCPerformanceLevelEnum) => Promise<void>;
+  setBlockExplorerOption: (value: BlockExplorerEnum) => Promise<void>;
+  // The seed and viewing key screens confirm these; each leaves the wallet
+  // section or its server.
+  changeWallet: () => Promise<void>;
+  restoreBackup: () => Promise<void>;
+  applyPendingServer: () => Promise<void>;
+  cancelPendingServer: () => Promise<void>;
 
   // some ValueTransfer is pending?
   somePending: boolean;
@@ -114,7 +148,7 @@ export default interface AppContextLoaded {
   showSwipeableIcons: boolean;
 
   // refresh the different list in the App: history & messages
-  doRefresh: (s: ScreenEnum) => void;
+  doRefresh: (what: 'valueTransfers' | 'messages') => void;
 
   // fetch the ZEC price in USD
   setZecPrice: (p: number, d: number) => void;

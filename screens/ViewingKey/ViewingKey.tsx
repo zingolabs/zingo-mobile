@@ -21,7 +21,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@app/theme';
 import { ease } from '@app/theme/motion';
 import { ContextAppLoaded } from '@app/context';
-import { RouteEnum, ScreenEnum, SnackbarDurationEnum } from '@app/AppState';
+import { SnackbarDurationEnum } from '@app/AppState';
 import Header from '@ui/widgets/Header';
 import { AppDrawerParamList } from '@app/types';
 import {
@@ -41,16 +41,6 @@ import CardExpand from '@ui/widgets/CardExpand';
 import { CopyShowButtons } from '@screens/SeedBackup/components/SeedParts';
 import { SIDE } from '@screens/SeedBackup/components/StepParts';
 import KeyCard from './components/KeyCard';
-
-type ViewingKeyProps = NativeStackScreenProps<
-  AppDrawerParamList,
-  RouteEnum.ViewingKey
-> & {
-  // Moves the wallet to the chosen server on another network.
-  onConfirm: () => Promise<void>;
-  // Runs when the user backs out of that move.
-  onCancel: () => Promise<void>;
-};
 
 const QR = 196;
 const TILE_BG = '#0A1B33';
@@ -100,14 +90,20 @@ const Slide: React.FunctionComponent<{
 // The wallet's viewing key: a QR and its ends, hidden until Show. With
 // `switchTo`, the last look at it before the wallet moves to a server on
 // that network.
+type ViewingKeyProps = NativeStackScreenProps<AppDrawerParamList, 'ViewingKey'>;
+
 const ViewingKey: React.FunctionComponent<ViewingKeyProps> = ({
   navigation,
   route,
-  onConfirm,
-  onCancel,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, biometrics, addLastSnackbar } = context;
+  const {
+    translate,
+    biometrics,
+    addLastSnackbar,
+    applyPendingServer: onConfirm,
+    cancelPendingServer: onCancel,
+  } = context;
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const { entry, switchTo } = route.params;
@@ -204,7 +200,6 @@ const ViewingKey: React.FunctionComponent<ViewingKeyProps> = ({
     <View testID="viewingkey" style={{ flex: 1, paddingTop: 4 }}>
       <Header
         title={''}
-        screenName={ScreenEnum.ViewingKey}
         noBalance={true}
         noSyncingStatus={true}
         noDrawMenu={true}

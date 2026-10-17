@@ -13,7 +13,6 @@ import {
   AddressBookFileClass,
   AddressKindEnum,
   ReceiverEnum,
-  ScreenEnum,
   SnackbarDurationEnum,
 } from '@app/AppState';
 import RegText from '@ui/primitives/RegText';
@@ -37,7 +36,6 @@ type NewAddressProps = {
   addressKind: AddressKindEnum;
   closeSheet: () => void;
   setAddressBook: (ab: AddressBookFileClass[]) => void;
-  screenName: ScreenEnum;
 };
 const NewAddress: React.FunctionComponent<NewAddressProps> = ({
   addressKind,

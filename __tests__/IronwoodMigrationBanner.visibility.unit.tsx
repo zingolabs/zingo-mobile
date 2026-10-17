@@ -11,23 +11,19 @@ import {
   defaultAppContextLoaded,
   ContextAppLoadedProvider,
 } from '@app/context';
-import { InfoType, RouteEnum, TotalBalanceClass } from '@app/AppState';
+import { InfoType, Route, TotalBalanceClass } from '@app/AppState';
 import { mockValueTransfers } from '../__mocks__/dataMocks/mockValueTransfers';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockAddresses } from '../__mocks__/dataMocks/mockAddresses';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { AppDrawerParamList } from '@app/types';
+import { HomeTabScreenProps } from '@app/types';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
-function makeDrawerProps(): NativeStackScreenProps<
-  AppDrawerParamList,
-  RouteEnum.History
-> {
+function makeDrawerProps(): HomeTabScreenProps<'History'> {
   return {
     navigation: mockNavigation,
-    route: { key: 'Key-1', name: RouteEnum.History, params: undefined },
+    route: { key: 'Key-1', name: Route.History, params: undefined },
   };
 }
 
@@ -52,17 +48,9 @@ function renderHistory(overrides: {
     readOnly: overrides.readOnly ?? false,
   };
   const props = makeDrawerProps();
-  const onFunction = jest.fn();
   return render(
     <ContextAppLoadedProvider value={state}>
-      <History
-        {...props}
-        toggleMenuDrawer={onFunction}
-        setShieldingAmount={onFunction}
-        setScrollToTop={onFunction}
-        scrollToTop={false}
-        setScrollToBottom={onFunction}
-      />
+      <History {...props} />
     </ContextAppLoadedProvider>,
   );
 }

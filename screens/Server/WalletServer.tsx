@@ -14,12 +14,10 @@ import { useTheme } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
 import {
   ChainNameEnum,
-  RouteEnum,
-  ScreenEnum,
+  Route,
   SelectServerEnum,
   ServerType,
   ServerUrisType,
-  SetServerResult,
   SnackbarDurationEnum,
 } from '@app/AppState';
 import { offlineServer, remoteServer } from '@app/AppState/types/ServerType';
@@ -37,26 +35,14 @@ import ServerList from '@screens/ServerList';
 import Server from './Server';
 import Header from '@ui/widgets/Header';
 
-type WalletServerProps = NativeStackScreenProps<
-  AppDrawerParamList,
-  RouteEnum.Server
-> & {
-  setServerOption: (
-    value: ServerType,
-    selectServer: SelectServerEnum,
-    toast: boolean,
-    sameServerChainName: boolean,
-  ) => Promise<SetServerResult>;
-};
-
 // The Server screen inside the wallet: a choice reconnects the open wallet,
 // and a server on another network goes to the recovery screen.
-const WalletServer: React.FC<WalletServerProps> = ({
-  navigation,
-  setServerOption,
-}) => {
+type WalletServerProps = NativeStackScreenProps<AppDrawerParamList, 'Server'>;
+
+const WalletServer: React.FC<WalletServerProps> = ({ navigation }) => {
   const { colors } = useTheme();
   const {
+    setServerOption,
     translate,
     server,
     selectServer,
@@ -152,12 +138,12 @@ const WalletServer: React.FC<WalletServerProps> = ({
     if (result.kind === 'chain-changed') {
       leaving.current = true;
       if (readOnly) {
-        navigation.navigate(RouteEnum.ViewingKey, {
+        navigation.navigate(Route.ViewingKey, {
           entry: { kind: 'push' },
           switchTo: target.chainName,
         });
       } else {
-        navigation.navigate(RouteEnum.WalletSeed, { action: 'server' });
+        navigation.navigate(Route.WalletSeed, { action: 'server' });
       }
       return false;
     }
@@ -192,7 +178,7 @@ const WalletServer: React.FC<WalletServerProps> = ({
     if (navigation.canGoBack()) {
       navigation.goBack();
     } else {
-      navigation.navigate(RouteEnum.HomeStack);
+      navigation.navigate(Route.Home);
     }
   };
 
@@ -224,7 +210,6 @@ const WalletServer: React.FC<WalletServerProps> = ({
     <View style={{ flex: 1, backgroundColor: colors.bgCanvas, paddingTop: 4 }}>
       <Header
         title={''}
-        screenName={ScreenEnum.Server}
         noBalance={true}
         noSyncingStatus={true}
         noDrawMenu={true}

@@ -17,6 +17,8 @@
   "biometrics-failure-declined": "Kimlik doğrulama iptal edildi veya başarısız oldu.",
   "biometrics-failure-notserved": "Cihaz güvenlik denetimini reddetti.",
   "biometrics-failure-nosecurity": "Bu cihazda ekran kilidi veya biyometri tanımlı değil.",
+  "link-view-only": "Bu yalnızca görüntüleme cüzdanı, bu yüzden bu bağlantıyı ödeyemez.",
+  "link-offline": "Zingo çevrimdışı. Ödeme bağlantısı Gönder bölümünde, bir sunucu seçtiğinizde hazır.",
   "close": "Kapat",
   "cancel": "İptal et",
   "clear": "Temizle",

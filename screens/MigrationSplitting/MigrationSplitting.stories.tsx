@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
-import { RouteEnum } from '@app/AppState';
+import { Route } from '@app/AppState';
 import MigrationSplitting from './MigrationSplitting';
 import {
   screenProps,
@@ -14,7 +14,7 @@ const meta: Meta<typeof MigrationSplitting> = {
   title: 'Migration/Splitting',
   component: MigrationSplitting,
   decorators: [withAppContext(), withNavigation],
-  args: screenProps(RouteEnum.MigrationSplitting, { plan: splitPlan }),
+  args: screenProps(Route.MigrationSplitting, { plan: splitPlan }),
 };
 
 export default meta;

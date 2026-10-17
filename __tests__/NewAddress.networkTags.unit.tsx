@@ -19,7 +19,6 @@ import {
   AddressBookFileClass,
   AddressKindEnum,
   ChainNameEnum,
-  ScreenEnum,
   offlineServer,
   remoteServer,
 } from '@app/AppState';
@@ -162,9 +161,8 @@ async function saveTag(
     <ContextAppLoadedProvider value={context}>
       <NewAddress
         addressKind={kind}
-        closeSheet={closeSheet}
         setAddressBook={setAddressBook}
-        screenName={ScreenEnum.Receive}
+        closeSheet={closeSheet}
       />
     </ContextAppLoadedProvider>,
   );

@@ -21,8 +21,6 @@ import { useScrollToTop } from '@react-navigation/native';
 import { useTheme } from '@app/theme';
 import {
   AddressKindEnum,
-  RouteEnum,
-  ScreenEnum,
   TransparentAddressClass,
   UnifiedAddressClass,
 } from '@app/AppState';
@@ -33,6 +31,7 @@ import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
 import AppSheet from '@ui/primitives/AppSheet';
 import AlSummaryLine from './components/AlSummaryLine';
 import { ContextAppLoaded } from '@app/context';
+import { deliver } from '@app/navigation/results';
 import Header from '@ui/widgets/Header';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faAngleUp, faChevronLeft } from '@fortawesome/free-solid-svg-icons';
@@ -43,21 +42,22 @@ import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
 
 type AddressListProps = NativeStackScreenProps<
   AppDrawerParamList,
-  RouteEnum.AddressList
+  'AddressList'
 >;
 
 const AddressList: React.FunctionComponent<AddressListProps> = ({
   navigation,
   route,
 }) => {
-  const setIndex =
-    !!route.params && route.params.setIndex !== undefined
-      ? route.params.setIndex
-      : () => {};
+  // The chosen index goes back to the screen that asked for it.
+  const setIndex = (index: number) => {
+    if (route.params) {
+      deliver(route.params.request, String(index));
+    }
+  };
   const context = useContext(ContextAppLoaded);
   const { translate, addresses } = context;
   const { colors } = useTheme();
-  const screenName = ScreenEnum.AddressList;
 
   const [numAl, setNumAl] = useState<number>(50);
   const [loadMoreButton, setLoadMoreButton] = useState<boolean>(false);
@@ -241,7 +241,6 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
       <View onLayout={e => setHeaderH(e.nativeEvent.layout.height)}>
         <Header
           title={''}
-          screenName={screenName}
           noBalance={true}
           noSyncingStatus={true}
           noDrawMenu={true}

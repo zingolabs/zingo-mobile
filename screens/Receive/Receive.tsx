@@ -20,7 +20,7 @@ import SelectBottomSheet from '@ui/widgets/SelectBottomSheet';
 
 import Clipboard from '@react-native-clipboard/clipboard';
 import SingleAddress from '@ui/widgets/SingleAddress';
-import { AppDrawerParamList } from '@app/types';
+import { HomeTabScreenProps } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
 import Header from '@ui/widgets/Header';
 import BoldText from '@ui/primitives/BoldText';
@@ -32,10 +32,7 @@ import {
   ChainNameEnum,
   UnifiedAddressClass,
   TransparentAddressClass,
-  AddressBookFileClass,
-  ScreenEnum,
   SnackbarDurationEnum,
-  RouteEnum,
 } from '@app/AppState';
 import { RPCAddressScopeEnum } from '@app/walletBackend/enums/RPCAddressScopeEnum';
 import BottomSheet, { BottomSheetModal } from '@gorhom/bottom-sheet';
@@ -44,35 +41,18 @@ import VerifyAddress from './components/VerifyAddress';
 import NewAddressTag from '@ui/widgets/NewAddressTag';
 import TransparentWarning from './components/TransparentWarning';
 import ExpandedAddress from '@ui/widgets/ExpandedAddress';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
 import { useDismissSheetsOnBlur } from '@app/hooks/useDismissSheetsOnBlur';
 import { useOptionsPanelSheetSlide } from '@app/hooks/useOptionsPanelSheetSlide';
 import { usePriceSnapAutoClose } from '@app/hooks/usePriceSnapAutoClose';
 import { safeSnapToIndex } from '@app/utils/safeSnapToIndex';
 
-type ReceiveProps = NativeStackScreenProps<
-  AppDrawerParamList,
-  RouteEnum.Receive
-> & {
-  toggleMenuDrawer: () => void;
-  alone: boolean;
-  setAddressBook: (ab: AddressBookFileClass[]) => void;
-};
+type ReceiveProps = HomeTabScreenProps<'Receive'>;
 
-const Receive: React.FunctionComponent<ReceiveProps> = ({
-  // side menu
-  toggleMenuDrawer,
-  navigation,
-  // balance
-  // privacy
-  // shielding
-  // for receive
-  alone: _alone,
-  setAddressBook,
-}) => {
+const Receive: React.FunctionComponent<ReceiveProps> = () => {
   const context = useContext(ContextAppLoaded);
   const {
+    setAddressBook,
     translate,
     addresses,
     defaultUnifiedAddress,
@@ -80,7 +60,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
     setPrivacyOption,
   } = context;
   const { colors } = useTheme();
-  const screenName = ScreenEnum.Receive;
 
   const [index, setIndex] = useState<number>(0);
   const [sheetType, setSheetType] = useState<
@@ -449,8 +428,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
       >
         <Header
           title={''}
-          screenName={screenName}
-          toggleMenuDrawer={toggleMenuDrawer}
           setPrivacyOption={setPrivacyOption}
           addLastSnackbar={addLastSnackbar}
           showMessagesIcon={true}
@@ -501,7 +478,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
             addressKind={index === 0 ? AddressKindEnum.u : AddressKindEnum.t}
             closeSheet={hide}
             setAddressBook={setAddressBook}
-            screenName={screenName}
           />
         )}
         {sheetType === 'NAT' && (
@@ -517,13 +493,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
             setAddressBook={setAddressBook}
           />
         )}
-        {sheetType === 'VA' && (
-          <VerifyAddress
-            closeSheet={hide}
-            screenName={screenName}
-            navigation={navigation}
-          />
-        )}
+        {sheetType === 'VA' && <VerifyAddress closeSheet={hide} />}
         {sheetType === 'TW' && (
           <TransparentWarning
             closeSheet={hide}

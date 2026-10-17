@@ -7,9 +7,9 @@ import React from 'react';
 
 import { render } from '@testing-library/react-native';
 import { LoadedApp } from '@app/LoadedApp';
-import { StackScreenProps } from '@react-navigation/stack';
-import { AppStackParamList } from '@app/types';
-import { ChainNameEnum, LaunchingModeEnum, RouteEnum } from '@app/AppState';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { LoadedAppNavigationState, RootParamList } from '@app/types';
+import { ChainNameEnum, LaunchingModeEnum, Route } from '@app/AppState';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
 jest.mock('react-native-localize', () => ({
@@ -20,24 +20,24 @@ jest.mock('react-native-localize', () => ({
 
 jest.mock('i18n-js');
 
-function makeDrawerProps(): StackScreenProps<
-  AppStackParamList,
-  RouteEnum.LoadedApp
-> {
+function makeDrawerProps(): NativeStackScreenProps<RootParamList, 'Wallet'> & {
+  wallet: LoadedAppNavigationState;
+} {
   return {
     navigation: mockNavigation,
     route: {
       key: 'Key-1',
-      name: RouteEnum.LoadedApp,
-      params: {
-        readOnly: false,
-        orchardPool: true,
-        saplingPool: true,
-        transparentPool: true,
-        newWallet: false,
-        firstLaunchingMessage: LaunchingModeEnum.opening,
-        walletChainName: ChainNameEnum.mainChainName,
-      },
+      name: Route.Wallet,
+      params: undefined,
+    },
+    wallet: {
+      readOnly: false,
+      orchardPool: true,
+      saplingPool: true,
+      transparentPool: true,
+      newWallet: false,
+      firstLaunchingMessage: LaunchingModeEnum.opening,
+      walletChainName: ChainNameEnum.mainChainName,
     },
   };
 }

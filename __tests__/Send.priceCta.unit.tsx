@@ -34,7 +34,7 @@ import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
 } from '@app/context';
-import { RouteEnum } from '@app/AppState';
+import { Route } from '@app/AppState';
 import {
   usePriceFetcherStore,
   usePriceHealth,
@@ -46,8 +46,7 @@ import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import { mockServer } from '../__mocks__/dataMocks/mockServer';
 import mockSendPageState from '../__mocks__/dataMocks/mockSendPageState';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { AppDrawerParamList } from '@app/types';
+import { HomeTabScreenProps } from '@app/types';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
 const storeHook = usePriceFetcherStore as jest.MockedFunction<
@@ -55,21 +54,17 @@ const storeHook = usePriceFetcherStore as jest.MockedFunction<
 >;
 const healthHook = usePriceHealth as jest.MockedFunction<typeof usePriceHealth>;
 
-function makeDrawerProps(): NativeStackScreenProps<
-  AppDrawerParamList,
-  RouteEnum.Send
-> {
+function makeDrawerProps(): HomeTabScreenProps<'Send'> {
   return {
     navigation: mockNavigation,
     route: {
       key: 'Key-1',
-      name: RouteEnum.Send,
+      name: Route.Send,
       params: undefined,
     },
   };
 }
 
-const onFunction = jest.fn();
 const sendUi = (zecPrice: { zecPrice: number; date: number }) => {
   const state = { ...defaultAppContextLoaded };
   state.valueTransfers = mockValueTransfers;
@@ -82,16 +77,7 @@ const sendUi = (zecPrice: { zecPrice: number; date: number }) => {
   state.zecPrice = zecPrice;
   return (
     <ContextAppLoadedProvider value={state}>
-      <Send
-        {...makeDrawerProps()}
-        sendTransaction={onFunction}
-        clearToAddr={onFunction}
-        toggleMenuDrawer={onFunction}
-        setShieldingAmount={onFunction}
-        setScrollToTop={onFunction}
-        setScrollToBottom={onFunction}
-        setServerOption={onFunction}
-      />
+      <Send {...makeDrawerProps()} />
     </ContextAppLoadedProvider>
   );
 };
@@ -156,13 +142,11 @@ test('N7: the send-confirmation conversions dim on a stale price too', () => {
     navigation: mockNavigation,
     route: {
       key: 'Key-1',
-      name: RouteEnum.Confirm,
+      name: Route.Confirm,
       params: {
         calculatedFee: 0.00001,
         proposalPools: { source: ['ironwood'], destination: ['ironwood'] },
-        confirmSend: jest.fn(async () => {}),
         sendAllAmount: false,
-        calculateFeeWithPropose: jest.fn(async () => {}),
         sendPageState: mockSendPageState,
       },
     },

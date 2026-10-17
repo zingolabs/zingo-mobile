@@ -30,11 +30,7 @@ import {
   faXmark,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import {
-  NavigationProp,
-  ParamListBase,
-  useNavigation,
-} from '@react-navigation/native';
+import { useNavigation, useScrollToTop } from '@react-navigation/native';
 import { useTheme } from '@app/theme';
 import { ScanIcon } from '@ui/primitives/Icons/ScanIcon';
 import { getNumberFormatSettings } from 'react-native-localize';
@@ -47,7 +43,6 @@ import {
   sendGateOpen,
   shownStatusKey,
 } from '@app/walletBackend/transforms/mixnetView';
-import { SendOutcome } from '@app/walletBackend/transforms/sendPermit';
 import ErrorText from '@ui/primitives/ErrorText';
 import RegText from '@ui/primitives/RegText';
 import ZecAmount from '@ui/widgets/ZecAmount';
@@ -60,11 +55,8 @@ import {
   SendPageStateClass,
   ToAddrClass,
   GlobalConst,
-  ServerType,
-  SetServerResult,
   SelectServerEnum,
-  RouteEnum,
-  ScreenEnum,
+  Route,
   ProposalPoolsType,
 } from '@app/AppState';
 import { hasUnconfirmedFunds } from '@app/AppState/classes/TotalBalanceClass';
@@ -83,6 +75,7 @@ import {
   settleSend,
 } from '@app/walletBackend/transforms/sendSettlement';
 import Utils from '@app/utils';
+import { useResult } from '@app/navigation/results';
 import {
   fiatEligible,
   fiatQuote,
@@ -90,7 +83,7 @@ import {
   toZecText,
 } from '@app/price/fiatQuote';
 import { safeSnapToIndex } from '@app/utils/safeSnapToIndex';
-import { AppDrawerParamList } from '@app/types';
+import { HomeTabScreenProps, WalletNavigation } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
 import Header from '@ui/widgets/Header';
 import BottomSheet, { BottomSheetModal } from '@gorhom/bottom-sheet';
@@ -106,42 +99,19 @@ import SendErrorSheet from './components/SendErrorSheet';
 import { sendEmail } from '@app/services/sendEmail';
 import { retryServer } from '@app/services/retryServer';
 import { RPCSpendablebalanceType } from '@app/walletBackend/types/RPCSpendablebalanceType';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-type SendProps = NativeStackScreenProps<AppDrawerParamList, RouteEnum.Send> & {
-  // side menu
-  toggleMenuDrawer: () => void;
-  // privacy
-  // shielding
-  setShieldingAmount: (value: number) => void;
-  setScrollToTop: (value: boolean) => void;
-  setScrollToBottom: (value: boolean) => void;
-  // for send
-  sendTransaction: (
-    s: SendPageStateClass,
-    sendAll?: boolean,
-  ) => Promise<SendOutcome<string>>;
-  setServerOption: (
-    value: ServerType,
-    selectServer: SelectServerEnum,
-    toast: boolean,
-    sameServerChainName: boolean,
-  ) => Promise<SetServerResult>;
-  clearToAddr: () => void;
-};
+type SendProps = HomeTabScreenProps<'Send'>;
 
-const Send: React.FunctionComponent<SendProps> = ({
-  sendTransaction,
-  clearToAddr,
-  toggleMenuDrawer,
-  setShieldingAmount,
-  setScrollToTop,
-  setScrollToBottom,
-  setServerOption,
-}) => {
-  const navigation = useNavigation<NavigationProp<ParamListBase>>();
+const Send: React.FunctionComponent<SendProps> = () => {
+  const navigation = useNavigation<WalletNavigation>();
   const context = useContext(ContextAppLoaded);
   const {
+    sendTransaction,
+    clearToAddr,
+    setScrollToTop,
+    setScrollToBottom,
+    setServerOption,
+    setShieldingAmount,
     translate,
     info,
     totalBalance,
@@ -170,7 +140,6 @@ const Send: React.FunctionComponent<SendProps> = ({
   const showFiat = fiatEligible(server, server.chainName);
   const quote = fiatQuote(zecPrice, server, server.chainName);
 
-  const screenName = ScreenEnum.Send;
   const zecIconXml = `<?xml version="1.0" encoding="UTF-8"?>
   <svg viewBox="0 0 88.03 147.85">
     <polygon points="34.44 107.62 34.44 106.98 87.19 34.17 87.19 20.12 56.09 20.12 56.09 0 35.98 0 35.98 20.12 5.04 20.12 5.04 40.24 53.93 40.24 53.93 40.88 0 114.64 0 127.73 35.98 127.73 35.98 147.85 56.09 147.85 56.09 127.73 88.03 127.73 88.03 107.62 34.44 107.62"/>
@@ -235,6 +204,8 @@ const Send: React.FunctionComponent<SendProps> = ({
   const [priceRowH, setPriceRowH] = useState<number>(0);
 
   const scrollViewRef = useRef<ScrollView>(null);
+  // A press on the tab while it is open scrolls the form to the top.
+  useScrollToTop(scrollViewRef);
   // The user asked for the whole balance: MAX sets it, typing in the amount
   // field clears it. A send-all proposal can come back with less than the
   // figure MAX offered — the change output the send path always writes costs
@@ -922,8 +893,9 @@ const Send: React.FunctionComponent<SendProps> = ({
     }
   };
 
+  useResult('send.contact', a => pickFromBook(a));
   const openBook = () =>
-    navigation.navigate(RouteEnum.AddressBook, { pick: pickFromBook });
+    navigation.navigate(Route.AddressBook, { pick: 'send.contact' });
 
   const clearState = () => {
     feeCalculationGenRef.current += 1;
@@ -958,7 +930,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       return;
     }
 
-    navigation.navigate(RouteEnum.Computing);
+    navigation.navigate(Route.Computing);
 
     // The MAX send travels the send-all path all the way: quoted and sent by
     // the same proposal, so the amount confirmed is the amount broadcast.
@@ -980,7 +952,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       setScrollToTop(true);
       setScrollToBottom(true);
     }
-    navigation.navigate(RouteEnum.Computing, computingEnd(settlement));
+    navigation.navigate(Route.Computing, computingEnd(settlement));
   };
 
   const scanButton = useRef<View>(null);
@@ -993,22 +965,39 @@ const Send: React.FunctionComponent<SendProps> = ({
 
   // The shared scanner opens from the scan button and takes a Zcash
   // address or a zcash: URI; a bare address goes in as a URI.
+  useResult('send.address', a =>
+    updateToField(
+      a.toLowerCase().startsWith(GlobalConst.zcash) || a.includes(':')
+        ? a
+        : GlobalConst.zcash + a,
+      null,
+      null,
+      null,
+      null,
+    ),
+  );
+  // The confirmation screen, beneath which this form keeps its state, asks
+  // for the proposal on entry and for the send on its button.
+  useResult('send.propose', () =>
+    calculateFeeWithPropose(
+      amountText,
+      addressText,
+      memoText,
+      includeUAMemoBoolean,
+    ),
+  );
+  // The state Confirm was opened with, so the send matches what it shows.
+  const confirmedState = useRef<SendPageStateClass | undefined>(undefined);
+  useResult('send.confirm', () => {
+    if (confirmedState.current) {
+      confirmSend(confirmedState.current);
+    }
+  });
   const setQrcodeModalShow = () => {
     const open = (origin?: { x: number; y: number }) =>
-      navigation.navigate(RouteEnum.ScannerAddress, {
-        setAddress: (a: string) =>
-          updateToField(
-            a.toLowerCase().startsWith(GlobalConst.zcash) || a.includes(':')
-              ? a
-              : GlobalConst.zcash + a,
-            null,
-            null,
-            null,
-            null,
-          ),
-        accepts: async (v: string) =>
-          v.toLowerCase().startsWith(GlobalConst.zcash) ||
-          (await Utils.isValidAddress(v, server.chainName)).isValid,
+      navigation.navigate(Route.Scanner, {
+        request: 'send.address',
+        accepts: { kind: 'zcash', chain: server.chainName },
         texts: {
           title: translate('scanner.title') as string,
           hint: translate('scanner.hint-address') as string,
@@ -1068,13 +1057,13 @@ const Send: React.FunctionComponent<SendProps> = ({
   );
 
   const setConfirmModalShow = async () => {
-    navigation.navigate(RouteEnum.Confirm, {
+    const shown = buildSendState();
+    confirmedState.current = shown;
+    navigation.navigate(Route.Confirm, {
       calculatedFee: fee,
       proposalPools: proposalPools,
-      confirmSend: confirmSend,
       sendAllAmount: isSendAllAmount(amountText),
-      calculateFeeWithPropose: calculateFeeWithPropose,
-      sendPageState: buildSendState(),
+      sendPageState: shown,
     });
   };
 
@@ -1117,13 +1106,9 @@ const Send: React.FunctionComponent<SendProps> = ({
         >
           <Header
             title={''}
-            screenName={screenName}
-            toggleMenuDrawer={toggleMenuDrawer}
             setPrivacyOption={setPrivacyOption}
             addLastSnackbar={addLastSnackbar /* context */}
             setShieldingAmount={setShieldingAmount}
-            setScrollToTop={setScrollToTop}
-            setScrollToBottom={setScrollToBottom}
             setBackgroundError={setBackgroundError /* context */}
             showMessagesIcon={true}
             onUsdRowLayout={setUsdRowH}
@@ -1182,7 +1167,6 @@ const Send: React.FunctionComponent<SendProps> = ({
                     {validAddress === 1 && (
                       <AddressItem
                         address={addressText}
-                        screenName={screenName}
                         oneLine={true}
                         onlyContact={true}
                         // No add-to-book icon here: it would duplicate the one
@@ -1681,7 +1665,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                       <TouchableOpacity
                         style={{ alignSelf: 'flex-start' }}
                         onPress={() => {
-                          navigation.navigate(RouteEnum.Pools);
+                          navigation.navigate(Route.Pools);
                         }}
                       >
                         <View
@@ -1710,7 +1694,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                       <TouchableOpacity
                         style={{ alignSelf: 'flex-start' }}
                         onPress={() => {
-                          navigation.navigate(RouteEnum.Pools);
+                          navigation.navigate(Route.Pools);
                         }}
                       >
                         <View
