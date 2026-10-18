@@ -37,7 +37,7 @@ import ServerRow, {
 } from './ServerRow';
 import SegmentedSwitch from '@ui/widgets/SegmentedSwitch';
 import CustomServerBox from './CustomServerBox';
-import SaveSheet from './SaveSheet';
+import SaveSheet from '@ui/widgets/SaveSheet';
 import { LogLine } from './ServerLog';
 import { hostOf, useCustomServer } from './useCustomServer';
 
@@ -670,6 +670,7 @@ const Server: React.FunctionComponent<ServerProps> = ({
       />
       {asking && (
         <SaveSheet
+          testID="server.unsaved"
           title={t('unsaved-title')}
           body={
             t(draft.tested !== null ? 'unsaved-tested' : 'unsaved-untested', {

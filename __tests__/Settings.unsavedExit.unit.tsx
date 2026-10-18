@@ -10,10 +10,6 @@ import {
   ContextAppLoadedProvider,
 } from '@app/context';
 import { Route, SelectServerEnum } from '@app/AppState';
-import {
-  ConfirmOptions,
-  registerConfirmListener,
-} from '@app/services/showConfirm';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import { mockServer } from '../__mocks__/dataMocks/mockServer';
@@ -31,18 +27,14 @@ jest.mock('@app/RPCModule', () => {
 
 const guard = usePreventRemove as jest.Mock;
 
-// The action react-navigation held back; the screen dispatches this one
-// once the user has agreed to leave.
 const BACK: NavigationAction = { type: 'GO_BACK' };
 
 const setBiometricsOption = jest.fn(async () => {});
 
 afterEach(() => {
   jest.clearAllMocks();
-  registerConfirmListener(null);
 });
 
-/** What the guard was told on the screen's latest render. */
 const guardState = (): {
   preventRemove: boolean;
   onPrevented: (options: { data: { action: NavigationAction } }) => void;
@@ -78,73 +70,76 @@ const renderSettings = async () => {
   await screen.findByTestId('settings.securitytitle');
 };
 
-/** Turns the security switch on, which is an edit the Save button persists. */
 const editASetting = async () => {
   await act(async () => {
     fireEvent.press(screen.getByTestId('settings.biometrics'));
   });
 };
 
-test('Tests that a screen with nothing edited is not guarded, so leaving asks nothing.', async () => {
+const tryToLeave = () => {
+  act(() => {
+    guardState().onPrevented({ data: { action: BACK } });
+  });
+};
+
+test('Tests that leaving goes unguarded when nothing is edited.', async () => {
   await renderSettings();
 
   expect(guardState().preventRemove).toBe(false);
 });
 
-test('Tests that an unsaved edit guards the screen and leaving asks what to do with it.', async () => {
-  const confirms: ConfirmOptions[] = [];
-  registerConfirmListener(options => confirms.push(options));
+test('Tests that the save sheet names the edit when the user leaves with one unsaved edit.', async () => {
   await renderSettings();
   await editASetting();
 
   expect(guardState().preventRemove).toBe(true);
 
-  act(() => {
-    guardState().onPrevented({ data: { action: BACK } });
-  });
+  tryToLeave();
 
-  expect(confirms).toHaveLength(1);
-  expect(confirms[0].title).toBe('settings.unsaved-title');
-  expect(confirms[0].buttons.map(b => b.text)).toEqual([
-    'settings.unsaved-save',
-    'settings.unsaved-discard',
-    'cancel',
-  ]);
-  // Still on the screen: the question alone changes nothing.
+  expect(screen.getByTestId('settings.unsaved')).toBeOnTheScreen();
+  expect(screen.getByText('settings.unsaved-title')).toBeOnTheScreen();
+  expect(
+    screen.getByText('settings.unsaved-one settings.unsaved-keeps'),
+  ).toBeOnTheScreen();
+  expect(screen.getByText('server.save')).toBeOnTheScreen();
+  expect(screen.getByText('server.dont-save')).toBeOnTheScreen();
+  expect(screen.getByText('server.keep-editing')).toBeOnTheScreen();
   expect(mockNavigation.dispatch).not.toHaveBeenCalled();
   expect(setBiometricsOption).not.toHaveBeenCalled();
 });
 
-test('Tests that staying keeps the screen and its edit.', async () => {
-  const confirms: ConfirmOptions[] = [];
-  registerConfirmListener(options => confirms.push(options));
+test('Tests that the screen and its edit remain when the user keeps editing.', async () => {
   await renderSettings();
   await editASetting();
-  act(() => {
-    guardState().onPrevented({ data: { action: BACK } });
-  });
+  tryToLeave();
 
   await act(async () => {
-    confirms[0].buttons[2].onPress?.();
+    fireEvent.press(screen.getByTestId('settings.unsaved.keep'));
   });
 
+  expect(screen.queryByTestId('settings.unsaved')).not.toBeOnTheScreen();
   expect(mockNavigation.dispatch).not.toHaveBeenCalled();
   expect(setBiometricsOption).not.toHaveBeenCalled();
-  // The guard is still up, so the next attempt asks again.
   expect(guardState().preventRemove).toBe(true);
 });
 
-test('Tests that discarding leaves without saving, and the guard is down so the exit goes through.', async () => {
-  const confirms: ConfirmOptions[] = [];
-  registerConfirmListener(options => confirms.push(options));
+test('Tests that a second back closes the sheet when the sheet is up.', async () => {
   await renderSettings();
   await editASetting();
-  act(() => {
-    guardState().onPrevented({ data: { action: BACK } });
-  });
+  tryToLeave();
+  tryToLeave();
+
+  expect(screen.queryByTestId('settings.unsaved')).not.toBeOnTheScreen();
+  expect(mockNavigation.dispatch).not.toHaveBeenCalled();
+});
+
+test('Tests that the held exit goes through unsaved when the user picks Don’t Save.', async () => {
+  await renderSettings();
+  await editASetting();
+  tryToLeave();
 
   await act(async () => {
-    confirms[0].buttons[1].onPress?.();
+    fireEvent.press(screen.getByTestId('settings.unsaved.discard'));
   });
 
   expect(setBiometricsOption).not.toHaveBeenCalled();
@@ -152,20 +147,30 @@ test('Tests that discarding leaves without saving, and the guard is down so the 
   expect(guardState().preventRemove).toBe(false);
 });
 
-test('Tests that saving from the question persists the edit and then leaves.', async () => {
-  const confirms: ConfirmOptions[] = [];
-  registerConfirmListener(options => confirms.push(options));
+test('Tests that the edit persists before the held exit goes through when the user picks Save.', async () => {
   await renderSettings();
   await editASetting();
-  act(() => {
-    guardState().onPrevented({ data: { action: BACK } });
-  });
+  tryToLeave();
 
   await act(async () => {
-    confirms[0].buttons[0].onPress?.();
+    fireEvent.press(screen.getByTestId('settings.unsaved.save'));
   });
 
   expect(setBiometricsOption).toHaveBeenCalledWith(true);
   expect(mockNavigation.dispatch).toHaveBeenCalledWith(BACK);
   expect(guardState().preventRemove).toBe(false);
+});
+
+test('Tests that the screen remains open when the save fails.', async () => {
+  setBiometricsOption.mockRejectedValueOnce(new Error('declined'));
+  await renderSettings();
+  await editASetting();
+  tryToLeave();
+
+  await act(async () => {
+    fireEvent.press(screen.getByTestId('settings.unsaved.save'));
+  });
+
+  expect(mockNavigation.dispatch).not.toHaveBeenCalled();
+  expect(guardState().preventRemove).toBe(true);
 });

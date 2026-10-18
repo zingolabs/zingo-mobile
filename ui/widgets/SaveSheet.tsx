@@ -14,6 +14,7 @@ import RegText from '@ui/primitives/RegText';
 import BoldText from '@ui/primitives/BoldText';
 
 type SaveSheetProps = {
+  testID: string;
   title: string;
   body: string;
   saveLabel: string;
@@ -24,8 +25,9 @@ type SaveSheetProps = {
   onKeep: () => void;
 };
 
-// Asks before leaving the Server screen with a custom address not saved.
+// Asks whether to save an edit before the screen holding it goes.
 const SaveSheet: React.FC<SaveSheetProps> = ({
+  testID,
   title,
   body,
   saveLabel,
@@ -77,14 +79,14 @@ const SaveSheet: React.FC<SaveSheetProps> = ({
         }}
       >
         <Pressable
-          testID="server.unsaved.dim"
+          testID={`${testID}.dim`}
           style={{ flex: 1 }}
           onPress={onKeep}
           accessibilityLabel={keepLabel}
         />
       </Animated.View>
       <Animated.View
-        testID="server.unsaved"
+        testID={testID}
         entering={sheetIn}
         exiting={sheetOut}
         style={{
@@ -130,7 +132,7 @@ const SaveSheet: React.FC<SaveSheetProps> = ({
         </RegText>
         <View style={{ flexDirection: 'row', gap: 10 }}>
           <Pressable
-            testID="server.unsaved.discard"
+            testID={`${testID}.discard`}
             onPress={onDiscard}
             accessibilityRole="button"
             style={({ pressed }) => ({
@@ -147,7 +149,7 @@ const SaveSheet: React.FC<SaveSheetProps> = ({
             </BoldText>
           </Pressable>
           <Pressable
-            testID="server.unsaved.save"
+            testID={`${testID}.save`}
             onPress={onSave}
             accessibilityRole="button"
             style={({ pressed }) => ({
@@ -172,7 +174,7 @@ const SaveSheet: React.FC<SaveSheetProps> = ({
           </Pressable>
         </View>
         <Pressable
-          testID="server.unsaved.keep"
+          testID={`${testID}.keep`}
           onPress={onKeep}
           accessibilityRole="button"
           style={{

@@ -74,6 +74,7 @@ import {
 import { createAlert } from '@app/services/createAlert';
 import { showConfirm } from '@app/services/showConfirm';
 import { sendEmail } from '@app/services/sendEmail';
+import SaveSheet from '@ui/widgets/SaveSheet';
 import SwitchOff from '../../assets/img/switch-off.svg';
 import SettingSwitchOn from '../../assets/img/setting-switch-on.svg';
 
@@ -81,6 +82,16 @@ type Options = {
   value: string;
   text: string;
 };
+
+type SettingName =
+  | 'language'
+  | 'privacy'
+  | 'biometrics'
+  | 'performance'
+  | 'blockexplorer';
+
+const fill = (text: string, values: Record<string, string>) =>
+  Object.entries(values).reduce((s, [k, v]) => s.split(`{${k}}`).join(v), text);
 
 type SettingsProps = NativeStackScreenProps<AppDrawerParamList, 'Settings'>;
 
@@ -304,15 +315,39 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
   // the footer's onPress always invoke the current closure.
   const saveSettingsRef = useRef<() => Promise<void>>(async () => {});
 
-  // An edit that lives only in this screen's state: each local value
-  // against the one the context already holds, so a saved change stops
-  // counting and the guard below lets the screen go.
-  const unsaved =
-    languageContext !== language ||
-    privacyContext !== privacy ||
-    biometricsContext !== biometrics ||
-    performanceLevelContext !== performanceLevel ||
-    blockExplorerContext !== blockExplorer;
+  // Each local value against the one the context holds. A saved change
+  // drops out, and the guard below lets the screen go.
+  const edited: SettingName[] = (
+    [
+      ['language', languageContext !== language],
+      ['privacy', privacyContext !== privacy],
+      ['biometrics', biometricsContext !== biometrics],
+      ['performance', performanceLevelContext !== performanceLevel],
+      ['blockexplorer', blockExplorerContext !== blockExplorer],
+    ] as const
+  )
+    .filter(([, changed]) => changed)
+    .map(([name]) => name);
+  const unsaved = edited.length > 0;
+
+  // Names one or two edits and counts more, then says what leaving keeps.
+  const unsavedBody = (): string => {
+    const names = edited.map(
+      name => translate(`settings.unsaved-name-${name}`) as string,
+    );
+    const changes =
+      names.length === 1
+        ? fill(translate('settings.unsaved-one') as string, { a: names[0] })
+        : names.length === 2
+          ? fill(translate('settings.unsaved-two') as string, {
+              a: names[0],
+              b: names[1],
+            })
+          : fill(translate('settings.unsaved-many') as string, {
+              count: String(names.length),
+            });
+    return `${changes} ${translate('settings.unsaved-keeps') as string}`;
+  };
 
   // Where leaving goes. Settings is always pushed over the home; the
   // fallback keeps a screen opened any other way from going nowhere.
@@ -325,7 +360,9 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
   // the guard is down. State rather than a ref: the render that lowers the
   // guard has to land before the action goes out, or `beforeRemove` holds
   // the same action back a second time and the question repeats.
-  const [leaving, setLeaving] = useState<NavigationAction | null>(null);
+  const [leaving, setLeaving] = useState<NavigationAction>();
+  // The exit the guard held back while the sheet asks about it.
+  const [held, setHeld] = useState<NavigationAction>();
   useEffect(() => {
     if (leaving) {
       navigation.dispatch(leaving);
@@ -391,33 +428,28 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
   };
   saveSettingsRef.current = saveSettings;
 
-  // Every way out of this screen — the back arrow, Android's back, iOS's
-  // edge swipe — ends in the same question while an edit is unsaved, so
-  // none of them can drop it in silence.
-  usePreventRemove(unsaved && leaving === null, ({ data }) => {
-    showConfirm({
-      title: translate('settings.unsaved-title') as string,
-      message: translate('settings.unsaved-message') as string,
-      buttons: [
-        {
-          text: translate('settings.unsaved-save') as string,
-          onPress: async () => {
-            if (await persistSettings()) {
-              setLeaving(data.action);
-            }
-          },
-        },
-        {
-          text: translate('settings.unsaved-discard') as string,
-          style: 'destructive',
-          // The edits are state of a screen that is going: letting the
-          // action through is all the discarding they need.
-          onPress: () => setLeaving(data.action),
-        },
-        { text: translate('cancel') as string, style: 'cancel' },
-      ],
-    });
+  // The back arrow, Android's back and iOS's edge swipe all end in the
+  // save sheet while an edit is unsaved. A second back with the sheet up
+  // closes it.
+  usePreventRemove(unsaved && !leaving, ({ data }) => {
+    setHeld(current => (current ? undefined : data.action));
   });
+
+  const keepEditing = () => setHeld(undefined);
+
+  const discardEdits = () => {
+    setHeld(undefined);
+    setLeaving(held);
+  };
+
+  // A failed save keeps the screen open with its error.
+  const saveAndLeave = async () => {
+    const exit = held;
+    setHeld(undefined);
+    if (await persistSettings()) {
+      setLeaving(exit);
+    }
+  };
 
   // `goBack()` pops Settings off the stack — using `navigate(Home)`
   // would push Home on top while leaving the already-authenticated
@@ -1057,6 +1089,19 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
         value={blockExplorer}
         onChange={v => setBlockExplorer(v as BlockExplorerEnum)}
       />
+      {held && (
+        <SaveSheet
+          testID="settings.unsaved"
+          title={translate('settings.unsaved-title') as string}
+          body={unsavedBody()}
+          saveLabel={translate('server.save') as string}
+          discardLabel={translate('server.dont-save') as string}
+          keepLabel={translate('server.keep-editing') as string}
+          onSave={saveAndLeave}
+          onDiscard={discardEdits}
+          onKeep={keepEditing}
+        />
+      )}
     </KeyboardAvoidingView>
   );
 };
