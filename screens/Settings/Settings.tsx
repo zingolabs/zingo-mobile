@@ -84,11 +84,7 @@ type Options = {
 };
 
 type SettingName =
-  | 'language'
-  | 'privacy'
-  | 'biometrics'
-  | 'performance'
-  | 'blockexplorer';
+  'language' | 'privacy' | 'biometrics' | 'performance' | 'blockexplorer';
 
 const fill = (text: string, values: Record<string, string>) =>
   Object.entries(values).reduce((s, [k, v]) => s.split(`{${k}}`).join(v), text);
