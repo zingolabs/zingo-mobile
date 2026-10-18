@@ -72,7 +72,11 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
     const chain = swapChain ?? GlobalConst.zecSwapChain;
     openScanner({
       request: scanRequest,
-      accepts: { kind: 'chain', chain, network: server.chainName },
+      // A Zcash field takes an address or a payment URI, as when pasted.
+      accepts:
+        chain === GlobalConst.zecSwapChain
+          ? { kind: 'zcash', chain: server.chainName }
+          : { kind: 'chain', chain, network: server.chainName },
       texts: {
         title: translate('scanner.title') as string,
         hint: translate('scanner.hint-address') as string,

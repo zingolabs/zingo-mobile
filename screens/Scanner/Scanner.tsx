@@ -18,9 +18,13 @@ const acceptsFor = (
     case 'any':
       return () => true;
     case 'zcash':
-      return async (value: string) =>
-        value.toLowerCase().startsWith(GlobalConst.zcash) ||
-        (await Utils.isValidAddress(value, accepts.chain)).isValid;
+      return async (value: string) => {
+        const code = value.trim();
+        return (
+          code.toLowerCase().startsWith(GlobalConst.zcash) ||
+          (await Utils.isValidAddress(code, accepts.chain)).isValid
+        );
+      };
     case 'chain':
       return (value: string) =>
         validateAddressForChain(accepts.chain, value, accepts.network);
@@ -50,7 +54,7 @@ const Scanner: React.FunctionComponent<ScannerProps> = ({
       origin={params.origin ?? { x: width / 2, y: height / 2 }}
       texts={params.texts}
       accepts={acceptsFor(params.accepts)}
-      onRead={value => deliver(params.request, value)}
+      onRead={value => deliver(params.request, value.trim())}
       onClosed={() => {
         if (navigation.canGoBack()) {
           navigation.goBack();

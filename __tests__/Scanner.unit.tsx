@@ -79,16 +79,31 @@ test('Tests that a code the scan kind accepts shows the found pill', async () =>
   expect(screen.getByText('found')).toBeTruthy();
 });
 
-test('Tests that the address field scan keeps looking at a payment URI and accepts an address with trailing whitespace', async () => {
+test('Tests that a Zcash scan accepts a payment URI', async () => {
   jest.spyOn(Utils, 'isValidAddress').mockImplementation(async value => ({
     isValid: value === 'u1valid',
     shieldedOnlyUA: '',
   }));
-  mount({ kind: 'chain', chain: 'ZEC', network: ChainNameEnum.mainChainName });
+  mount({ kind: 'zcash', chain: ChainNameEnum.mainChainName });
 
   await scan('zcash:u1valid?amount=1');
-  expect(screen.getByText('miss')).toBeTruthy();
+  expect(screen.getByText('found')).toBeTruthy();
+});
+
+test('Tests that a Zcash scan accepts an address with trailing whitespace', async () => {
+  jest.spyOn(Utils, 'isValidAddress').mockImplementation(async value => ({
+    isValid: value === 'u1valid',
+    shieldedOnlyUA: '',
+  }));
+  mount({ kind: 'zcash', chain: ChainNameEnum.mainChainName });
 
   await scan('u1valid\n');
   expect(screen.getByText('found')).toBeTruthy();
+});
+
+test('Tests that a swap-chain scan keeps looking at a Zcash payment URI', async () => {
+  mount({ kind: 'chain', chain: 'BTC', network: ChainNameEnum.mainChainName });
+
+  await scan('zcash:u1valid?amount=1');
+  expect(screen.getByText('miss')).toBeTruthy();
 });
