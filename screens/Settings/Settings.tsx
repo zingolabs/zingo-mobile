@@ -66,6 +66,11 @@ import {
 } from '@app/services/recoveryWalletInfo';
 import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import {
+  CommonActions,
+  NavigationAction,
+  usePreventRemove,
+} from '@react-navigation/native';
 import { createAlert } from '@app/services/createAlert';
 import { showConfirm } from '@app/services/showConfirm';
 import { sendEmail } from '@app/services/sendEmail';
@@ -299,23 +304,48 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
   // the footer's onPress always invoke the current closure.
   const saveSettingsRef = useRef<() => Promise<void>>(async () => {});
 
-  const saveSettings = async () => {
+  // An edit that lives only in this screen's state: each local value
+  // against the one the context already holds, so a saved change stops
+  // counting and the guard below lets the screen go.
+  const unsaved =
+    languageContext !== language ||
+    privacyContext !== privacy ||
+    biometricsContext !== biometrics ||
+    performanceLevelContext !== performanceLevel ||
+    blockExplorerContext !== blockExplorer;
+
+  // Where leaving goes. Settings is always pushed over the home; the
+  // fallback keeps a screen opened any other way from going nowhere.
+  const exitAction = (): NavigationAction =>
+    navigation.canGoBack()
+      ? CommonActions.goBack()
+      : CommonActions.navigate(Route.Home);
+
+  // The exit the user has agreed to, dispatched by the effect below once
+  // the guard is down. State rather than a ref: the render that lowers the
+  // guard has to land before the action goes out, or `beforeRemove` holds
+  // the same action back a second time and the question repeats.
+  const [leaving, setLeaving] = useState<NavigationAction | null>(null);
+  useEffect(() => {
+    if (leaving) {
+      navigation.dispatch(leaving);
+    }
+  }, [leaving, navigation]);
+
+  // Writes the edits and says whether the screen may leave now. Kept apart
+  // from the navigation so the guard can persist first and then dispatch
+  // the very action it held back.
+  const persistSettings = async (): Promise<boolean> => {
     // ───────────────────────────────────────────────────────────────
     // Phase 1: Validate up-front (no I/O yet — purely synchronous guards).
     // ───────────────────────────────────────────────────────────────
-    if (
-      languageContext === language &&
-      privacyContext === privacy &&
-      biometricsContext === biometrics &&
-      performanceLevelContext === performanceLevel &&
-      blockExplorerContext === blockExplorer
-    ) {
+    if (!unsaved) {
       addLastSnackbar(translate('settings.nochanges') as string);
-      return;
+      return false;
     }
     if (!language) {
       addLastSnackbar(translate('settings.islanguage') as string);
-      return;
+      return false;
     }
 
     // ───────────────────────────────────────────────────────────────
@@ -347,34 +377,53 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
         `${translate('settings.save-error') as string}: ${(e as Error).message}`,
       );
       setDisabled(false);
-      return;
+      return false;
     }
     setDisabled(false);
+    return true;
+  };
 
-    // ───────────────────────────────────────────────────────────────
-    // Phase 3: Done — pop back to the previous screen.
-    // ───────────────────────────────────────────────────────────────
-    if (navigation.canGoBack()) {
-      navigation.goBack();
-    } else {
-      navigation.navigate(Route.Home);
+  // The Save button: write the edits, then pop back to the screen behind.
+  const saveSettings = async () => {
+    if (await persistSettings()) {
+      setLeaving(exitAction());
     }
   };
   saveSettingsRef.current = saveSettings;
 
-  const navigateToHome = useCallback((reset: boolean) => {
-    if (reset) {
-      // reset all settings - no save changes
-      setLanguage(languageContext);
-      setPrivacy(privacyContext);
-      setBiometrics(biometricsContext);
-      setPerformanceLevel(performanceLevelContext);
-      setBlockExplorer(blockExplorerContext);
-    }
-    // `goBack()` pops Settings off the stack — using `navigate(Home)`
-    // would push Home on top while leaving the already-authenticated
-    // Settings instance alive in the stack, allowing a back gesture to
-    // bypass the biometric gate.
+  // Every way out of this screen — the back arrow, Android's back, iOS's
+  // edge swipe — ends in the same question while an edit is unsaved, so
+  // none of them can drop it in silence.
+  usePreventRemove(unsaved && leaving === null, ({ data }) => {
+    showConfirm({
+      title: translate('settings.unsaved-title') as string,
+      message: translate('settings.unsaved-message') as string,
+      buttons: [
+        {
+          text: translate('settings.unsaved-save') as string,
+          onPress: async () => {
+            if (await persistSettings()) {
+              setLeaving(data.action);
+            }
+          },
+        },
+        {
+          text: translate('settings.unsaved-discard') as string,
+          style: 'destructive',
+          // The edits are state of a screen that is going: letting the
+          // action through is all the discarding they need.
+          onPress: () => setLeaving(data.action),
+        },
+        { text: translate('cancel') as string, style: 'cancel' },
+      ],
+    });
+  });
+
+  // `goBack()` pops Settings off the stack — using `navigate(Home)`
+  // would push Home on top while leaving the already-authenticated
+  // Settings instance alive in the stack, allowing a back gesture to
+  // bypass the biometric gate.
+  const navigateToHome = useCallback(() => {
     if (navigation.canGoBack()) {
       navigation.goBack();
     } else {
@@ -461,7 +510,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
         <TouchableOpacity
           onPress={() => {
             if (!disabled) {
-              navigateToHome(true);
+              navigateToHome();
             }
           }}
           hitSlop={8}
