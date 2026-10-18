@@ -8,10 +8,11 @@ import Animated, {
   ReduceMotion,
 } from 'react-native-reanimated';
 
-import { useTheme } from '@app/theme';
+import { radiusSheet, useTheme } from '@app/theme';
 import { ease } from '@app/theme/motion';
 import RegText from '@ui/primitives/RegText';
 import BoldText from '@ui/primitives/BoldText';
+import SheetRim from '@ui/primitives/SheetRim';
 
 type SaveSheetProps = {
   testID: string;
@@ -98,12 +99,11 @@ const SaveSheet: React.FC<SaveSheetProps> = ({
           paddingHorizontal: 24,
           paddingBottom: 30,
           backgroundColor: colors.bgSurface,
-          borderTopWidth: 1,
-          borderTopColor: colors.bottomSheetBorder,
-          borderTopLeftRadius: 26,
-          borderTopRightRadius: 26,
+          borderTopLeftRadius: radiusSheet,
+          borderTopRightRadius: radiusSheet,
         }}
       >
+        <SheetRim />
         <View
           style={{
             position: 'absolute',
