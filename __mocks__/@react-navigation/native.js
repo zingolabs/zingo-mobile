@@ -12,6 +12,9 @@ export const useNavigation = jest.fn(() => ({
   getState: jest.fn(),
 }));
 export const useFocusEffect = jest.fn();
+// Records (preventRemove, callback) so a test can read the guard's state and
+// run its callback without standing up a real navigator.
+export const usePreventRemove = jest.fn();
 export const useNavigationBuilder = jest.fn();
 export const StackRouter = jest.fn();
 export const CommonActions = {
