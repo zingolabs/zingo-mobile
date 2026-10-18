@@ -14,7 +14,7 @@ import {
   defaultAppContextLoaded,
   ContextAppLoadedProvider,
 } from '@app/context';
-import { ChainNameEnum, RouteEnum, SelectServerEnum } from '@app/AppState';
+import { ChainNameEnum, Route, SelectServerEnum } from '@app/AppState';
 import { remoteServer } from '@app/AppState/types/ServerType';
 import { mockValueTransfers } from '../__mocks__/dataMocks/mockValueTransfers';
 import { mockAddresses } from '../__mocks__/dataMocks/mockAddresses';
@@ -24,8 +24,7 @@ import { mockZecPrice } from '../__mocks__/dataMocks/mockZecPrice';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import mockSendPageState from '../__mocks__/dataMocks/mockSendPageState';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { AppDrawerParamList } from '@app/types';
+import { HomeTabScreenProps } from '@app/types';
 
 /**
  * The accessibility label of the nearest host ancestor that is an
@@ -46,13 +45,11 @@ function accessibleAncestor(element: ReactTestInstance): string | undefined {
   return undefined;
 }
 
-function drawerProps<R extends RouteEnum.Send | RouteEnum.Settings>(
-  name: R,
-): NativeStackScreenProps<AppDrawerParamList, R> {
+function tabProps(): HomeTabScreenProps<'Send'> {
   return {
     navigation: mockNavigation,
-    route: { key: 'Key-1', name, params: undefined },
-  } as unknown as NativeStackScreenProps<AppDrawerParamList, R>;
+    route: { key: 'Key-1', name: Route.Send, params: undefined },
+  } as unknown as HomeTabScreenProps<'Send'>;
 }
 
 function loadedState() {
@@ -80,16 +77,7 @@ describe('Maestro reaches each typed field on iOS', () => {
     state.sendPageState = mockSendPageState;
     const send = render(
       <ContextAppLoadedProvider value={state}>
-        <Send
-          {...drawerProps(RouteEnum.Send)}
-          sendTransaction={onFunction}
-          clearToAddr={onFunction}
-          toggleMenuDrawer={onFunction}
-          setShieldingAmount={onFunction}
-          setScrollToTop={onFunction}
-          setScrollToBottom={onFunction}
-          setServerOption={onFunction}
-        />
+        <Send {...tabProps()} />
       </ContextAppLoadedProvider>,
     );
     for (const id of [

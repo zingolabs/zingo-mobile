@@ -14,10 +14,15 @@ import {
   AddressBookFileClass,
   AddressKindEnum,
   ChainNameEnum,
-  RouteEnum,
 } from '@app/AppState';
+import { deliver } from '@app/navigation/results';
 import { RPCAddressScopeEnum } from '@app/walletBackend/enums/RPCAddressScopeEnum';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
+
+jest.mock('@app/navigation/results', () => ({
+  ...jest.requireActual('@app/navigation/results'),
+  deliver: jest.fn(),
+}));
 
 const NAMES = { unified: 'Unified', transparent: 'Transparent' };
 
@@ -93,7 +98,6 @@ describe('AddressBook as a picker', () => {
     'ZEC',
   );
   const goBack = jest.fn();
-  const pick = jest.fn();
 
   const picker = () =>
     render(
@@ -119,24 +123,23 @@ describe('AddressBook as a picker', () => {
           navigation={{ goBack } as never}
           route={{
             key: 'Key-1',
-            name: RouteEnum.AddressBook,
-            params: { pick },
+            name: 'AddressBook',
+            params: { pick: 'send.contact' },
           }}
-          setAddressBook={() => {}}
         />
       </ContextAppLoadedProvider>,
     );
 
   beforeEach(() => {
     goBack.mockClear();
-    pick.mockClear();
+    jest.mocked(deliver).mockClear();
   });
 
   test('Tests that tapping a contact hands its address back and leaves when the book is a picker.', () => {
     const screen = picker();
     expect(screen.queryByTestId('addressbook.new')).toBeNull();
     fireEvent.press(screen.getByTestId('addressbook.row.u1lolo.head'));
-    expect(pick).toHaveBeenCalledWith('u1lolo');
+    expect(deliver).toHaveBeenCalledWith('send.contact', 'u1lolo');
     expect(goBack).toHaveBeenCalledTimes(1);
   });
 
@@ -144,7 +147,7 @@ describe('AddressBook as a picker', () => {
     const screen = picker();
     fireEvent.press(screen.getByTestId('addressbook.tab.wallet'));
     fireEvent.press(screen.getByTestId('addressbook.mine.u1mine.head'));
-    expect(pick).toHaveBeenCalledWith('u1mine');
+    expect(deliver).toHaveBeenCalledWith('send.contact', 'u1mine');
     expect(goBack).toHaveBeenCalledTimes(1);
   });
 });

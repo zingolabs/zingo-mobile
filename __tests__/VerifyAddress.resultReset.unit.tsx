@@ -5,10 +5,9 @@ import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
 } from '@app/context';
-import { ChainNameEnum, ScreenEnum, remoteServer } from '@app/AppState';
+import { ChainNameEnum, remoteServer } from '@app/AppState';
 import RPCModule from '@app/RPCModule';
 import VerifyAddress from '@screens/Receive/components/VerifyAddress';
-import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
 jest.mock('@app/RPCModule', () =>
   require('../__mocks__/rpcModuleProxy').rpcModuleProxyMock(),
@@ -50,11 +49,7 @@ async function verified() {
   };
   const view = render(
     <ContextAppLoadedProvider value={context}>
-      <VerifyAddress
-        closeSheet={jest.fn()}
-        screenName={ScreenEnum.Receive}
-        navigation={mockNavigation}
-      />
+      <VerifyAddress closeSheet={jest.fn()} />
     </ContextAppLoadedProvider>,
   );
   await act(async () => {

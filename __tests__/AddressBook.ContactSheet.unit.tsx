@@ -37,8 +37,6 @@ const alice = new AddressBookFileClass(
   'ZEC',
 );
 
-const navigation = { navigate: jest.fn() } as never;
-
 const sheet = (onSave = jest.fn(), translate = mockTranslate) => {
   const state = { ...defaultAppContextLoaded, translate };
   return render(
@@ -49,7 +47,6 @@ const sheet = (onSave = jest.fn(), translate = mockTranslate) => {
         walletChain={ChainNameEnum.mainChainName}
         onSave={onSave}
         onCancel={() => {}}
-        navigation={navigation}
       />
     </ContextAppLoadedProvider>,
   );

@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
-import { RouteEnum } from '@app/AppState';
+import { Route } from '@app/AppState';
 import MigrationBatchSending from './MigrationBatchSending';
 import {
   screenProps,
@@ -19,7 +19,7 @@ const meta: Meta<typeof MigrationBatchSending> = {
   title: 'Migration/BatchSending',
   component: MigrationBatchSending,
   decorators: [withAppContext(), withNavigation],
-  args: screenProps(RouteEnum.MigrationBatchSending, {
+  args: screenProps(Route.MigrationBatchSending, {
     denominations: dueNowStatus.due_now?.denominations,
   }),
 };

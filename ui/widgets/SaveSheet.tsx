@@ -8,12 +8,14 @@ import Animated, {
   ReduceMotion,
 } from 'react-native-reanimated';
 
-import { useTheme } from '@app/theme';
+import { radiusSheet, useTheme } from '@app/theme';
 import { ease } from '@app/theme/motion';
 import RegText from '@ui/primitives/RegText';
 import BoldText from '@ui/primitives/BoldText';
+import SheetRim from '@ui/primitives/SheetRim';
 
 type SaveSheetProps = {
+  testID: string;
   title: string;
   body: string;
   saveLabel: string;
@@ -24,8 +26,9 @@ type SaveSheetProps = {
   onKeep: () => void;
 };
 
-// Asks before leaving the Server screen with a custom address not saved.
+// Asks whether to save an edit before the screen holding it goes.
 const SaveSheet: React.FC<SaveSheetProps> = ({
+  testID,
   title,
   body,
   saveLabel,
@@ -77,14 +80,14 @@ const SaveSheet: React.FC<SaveSheetProps> = ({
         }}
       >
         <Pressable
-          testID="server.unsaved.dim"
+          testID={`${testID}.dim`}
           style={{ flex: 1 }}
           onPress={onKeep}
           accessibilityLabel={keepLabel}
         />
       </Animated.View>
       <Animated.View
-        testID="server.unsaved"
+        testID={testID}
         entering={sheetIn}
         exiting={sheetOut}
         style={{
@@ -96,12 +99,11 @@ const SaveSheet: React.FC<SaveSheetProps> = ({
           paddingHorizontal: 24,
           paddingBottom: 30,
           backgroundColor: colors.bgSurface,
-          borderTopWidth: 1,
-          borderTopColor: colors.bottomSheetBorder,
-          borderTopLeftRadius: 26,
-          borderTopRightRadius: 26,
+          borderTopLeftRadius: radiusSheet,
+          borderTopRightRadius: radiusSheet,
         }}
       >
+        <SheetRim />
         <View
           style={{
             position: 'absolute',
@@ -130,7 +132,7 @@ const SaveSheet: React.FC<SaveSheetProps> = ({
         </RegText>
         <View style={{ flexDirection: 'row', gap: 10 }}>
           <Pressable
-            testID="server.unsaved.discard"
+            testID={`${testID}.discard`}
             onPress={onDiscard}
             accessibilityRole="button"
             style={({ pressed }) => ({
@@ -147,7 +149,7 @@ const SaveSheet: React.FC<SaveSheetProps> = ({
             </BoldText>
           </Pressable>
           <Pressable
-            testID="server.unsaved.save"
+            testID={`${testID}.save`}
             onPress={onSave}
             accessibilityRole="button"
             style={({ pressed }) => ({
@@ -172,7 +174,7 @@ const SaveSheet: React.FC<SaveSheetProps> = ({
           </Pressable>
         </View>
         <Pressable
-          testID="server.unsaved.keep"
+          testID={`${testID}.keep`}
           onPress={onKeep}
           accessibilityRole="button"
           style={{

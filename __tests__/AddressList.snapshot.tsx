@@ -13,22 +13,22 @@ import {
 import { AddressList } from '@screens/AddressList';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockAddresses } from '../__mocks__/dataMocks/mockAddresses';
-import { AddressKindEnum, RouteEnum } from '@app/AppState';
+import { AddressKindEnum, Route } from '@app/AppState';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AppDrawerParamList } from '@app/types';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
 function makeDrawerProps(
   ak: AddressKindEnum,
-): NativeStackScreenProps<AppDrawerParamList, RouteEnum.AddressList> {
+): NativeStackScreenProps<AppDrawerParamList, 'AddressList'> {
   return {
     navigation: mockNavigation,
     route: {
       key: 'Key-1',
-      name: RouteEnum.AddressList,
+      name: Route.AddressList,
       params: {
         addressKind: ak,
-        setIndex: jest.fn(),
+        request: 'receive.addressIndex',
       },
     },
   };

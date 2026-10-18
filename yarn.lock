@@ -2348,15 +2348,6 @@
   dependencies:
     nanoid "^3.3.11"
 
-"@react-navigation/stack@^7.12.0":
-  version "7.12.0"
-  resolved "https://registry.yarnpkg.com/@react-navigation/stack/-/stack-7.12.0.tgz#a436272ced73e91b2622a0cb613f3beb29907b8e"
-  integrity sha512-aMKl1+fi/BDu7nlMABrVi8rbaZfThhacV9Iwh4R62vr+rXL6Dp3LuYg0lCrbC35nRUaHHs5WHeFLwshn6x1sEg==
-  dependencies:
-    "@react-navigation/elements" "^2.9.44"
-    color "^4.2.3"
-    use-latest-callback "^0.2.4"
-
 "@rolldown/binding-android-arm-eabi@1.2.13":
   version "1.2.13"
   resolved "https://registry.yarnpkg.com/@rolldown/binding-android-arm-eabi/-/binding-android-arm-eabi-1.2.13.tgz#db571caa4f4cedec7bea5fb9d6750804fd21cfcb"

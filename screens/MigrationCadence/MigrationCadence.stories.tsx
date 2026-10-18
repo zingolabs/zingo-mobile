@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
-import { RouteEnum } from '@app/AppState';
+import { Route } from '@app/AppState';
 import MigrationCadence from './MigrationCadence';
 import {
   screenProps,
@@ -19,7 +19,7 @@ const meta: Meta<typeof MigrationCadence> = {
   title: 'Migration/Cadence',
   component: MigrationCadence,
   decorators: [withAppContext(), withNavigation],
-  args: screenProps(RouteEnum.MigrationCadence),
+  args: screenProps(Route.MigrationCadence),
 };
 
 export default meta;

@@ -1,4 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
+import { leaveFlow } from '@app/navigation/navigate';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { ActivityIndicator, ScrollView, Text, View } from 'react-native';
 import { useTheme } from '@app/theme';
@@ -10,7 +11,7 @@ import StepperHeader from '@ui/widgets/StepperHeader';
 import { AppDrawerParamList } from '@app/types';
 import { AppTheme } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
-import { RouteEnum } from '@app/AppState';
+import { Route } from '@app/AppState';
 import Utils from '@app/utils';
 import { planIronwoodMigration } from '@app/walletBackend';
 import {
@@ -20,7 +21,7 @@ import {
 
 type MigrationSplitPlanProps = NativeStackScreenProps<
   AppDrawerParamList,
-  RouteEnum.MigrationSplitPlan
+  'MigrationSplitPlan'
 >;
 
 const ZATS_PER_ZEC = 10 ** 8;
@@ -109,7 +110,7 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
   );
 
   const goHome = useCallback(() => {
-    navigation.reset({ index: 0, routes: [{ name: RouteEnum.HomeStack }] });
+    leaveFlow(navigation);
   }, [navigation]);
 
   // Fetch the split plan. Pure preview: nothing is signed or broadcast, and
@@ -151,10 +152,10 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
     }
     const hasSplits = (plan.split_rounds?.length ?? 0) > 0;
     if (!hasSplits && (plan.parts?.length ?? 0) > 0) {
-      navigation.navigate(RouteEnum.MigrationCadence);
+      navigation.navigate(Route.MigrationCadence);
       return;
     }
-    navigation.navigate(RouteEnum.MigrationSplitting, { plan });
+    navigation.navigate(Route.MigrationSplitting, { plan });
   }, [plan, navigation]);
 
   const splitRounds = plan?.split_rounds ?? [];

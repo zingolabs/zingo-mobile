@@ -46,9 +46,9 @@ jest.mock('@app/services/selectingServer', () => ({
 import 'react-native';
 import React from 'react';
 
-import { fireEvent, render, waitFor } from '@testing-library/react-native';
+import { act, fireEvent, render, waitFor } from '@testing-library/react-native';
+import { deliver } from '@app/navigation/results';
 import { useNavigation } from '@react-navigation/native';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import Send from '@screens/Send';
 import {
   ContextAppLoadedProvider,
@@ -56,7 +56,7 @@ import {
 } from '@app/context';
 import {
   ChainNameEnum,
-  RouteEnum,
+  Route,
   SendPageStateClass,
   ToAddrClass,
   offlineServer,
@@ -64,7 +64,7 @@ import {
 } from '@app/AppState';
 import type { TranslateType } from '@app/AppState';
 import { errorKeyed } from '@app/AppState/types/Result';
-import { AppDrawerParamList } from '@app/types';
+import { HomeTabScreenProps } from '@app/types';
 import { fetchServerList } from '@app/uris';
 import Utils from '@app/utils';
 import RPCModule from '@app/RPCModule';
@@ -91,15 +91,12 @@ const sendPageState = new SendPageStateClass(new ToAddrClass(0));
 sendPageState.toaddr.to = 'UA-12345678901234567890';
 sendPageState.toaddr.amount = '0.1';
 
-function makeDrawerProps(): NativeStackScreenProps<
-  AppDrawerParamList,
-  RouteEnum.Send
-> {
+function makeDrawerProps(): HomeTabScreenProps<'Send'> {
   return {
     navigation: mockNavigation,
     route: {
       key: 'Key-1',
-      name: RouteEnum.Send,
+      name: Route.Send,
       params: undefined,
     },
   };
@@ -131,41 +128,34 @@ const sendUi = (
   state.netInfo = inputs.netInfo;
   state.mixnetView = inputs.mixnetView;
   state.sendPermitNow = () => sendPermit(appState);
+  state.sendTransaction = sendTransaction;
+  state.setServerOption = setServerOption;
   return (
     <ContextAppLoadedProvider value={state}>
-      <Send
-        {...makeDrawerProps()}
-        sendTransaction={sendTransaction}
-        clearToAddr={jest.fn()}
-        toggleMenuDrawer={jest.fn()}
-        setShieldingAmount={jest.fn()}
-        setScrollToTop={jest.fn()}
-        setScrollToBottom={jest.fn()}
-        setServerOption={setServerOption}
-      />
+      <Send {...makeDrawerProps()} />
     </ContextAppLoadedProvider>
   );
 };
 
-// Presses Send on a valid form and returns the handler that the Confirm
-// screen received. The button enables only once the address check, the fee
-// proposal and the spendable balance settle, which on a cold CI runner can
-// take longer than waitFor's default second.
+// Presses Send on a valid form and returns what the Confirm screen's button
+// does: deliver the confirmation to the form beneath it. The button enables
+// only once the address check, the fee proposal and the spendable balance
+// settle, which on a cold CI runner can take longer than waitFor's default
+// second.
 const openConfirmScreen = async (view: ReturnType<typeof render>) => {
   const sendButton = await waitFor(() => view.getByTestId('send.button'), {
     timeout: 5000,
   });
   fireEvent.press(sendButton);
-  const confirmCall = await waitFor(() => {
-    const call = navigate.mock.calls.find(
-      ([route]) => route === RouteEnum.Confirm,
-    );
+  await waitFor(() => {
+    const call = navigate.mock.calls.find(([route]) => route === Route.Confirm);
     expect(call).toBeDefined();
-    return call;
   });
-  return confirmCall[1].confirmSend as (
-    state: SendPageStateClass,
-  ) => Promise<void>;
+  return async () => {
+    await act(async () => {
+      deliver('send.confirm', '');
+    });
+  };
 };
 
 beforeEach(() => {
@@ -200,7 +190,7 @@ describe('Send confirm send permit', () => {
         addLastSnackbar,
       ),
     );
-    await confirmSend(sendPageState);
+    await confirmSend();
 
     expect(sendTransaction).not.toHaveBeenCalled();
     expect(addLastSnackbar).toHaveBeenCalledWith('send.nym-blocked');
@@ -219,7 +209,7 @@ describe('Send confirm send permit', () => {
         addLastSnackbar,
       ),
     );
-    await confirmSend(sendPageState);
+    await confirmSend();
 
     expect(sendTransaction).not.toHaveBeenCalled();
     expect(addLastSnackbar).toHaveBeenCalledWith('loadedapp.connection-error');
@@ -238,7 +228,7 @@ describe('Send confirm send permit', () => {
         addLastSnackbar,
       ),
     );
-    await confirmSend(sendPageState);
+    await confirmSend();
 
     expect(sendTransaction).not.toHaveBeenCalled();
     expect(addLastSnackbar).toHaveBeenCalledWith('loadedapp.connection-error');
@@ -264,7 +254,7 @@ describe('Send confirm send permit', () => {
     );
     const confirmSend = await openConfirmScreen(view);
 
-    await confirmSend(sendPageState);
+    await confirmSend();
 
     expect(setServerOption).toHaveBeenCalledWith(
       remoteServer(other.uri, other.chainName),
@@ -276,7 +266,7 @@ describe('Send confirm send permit', () => {
     expect(setServerOption.mock.invocationCallOrder[0]).toBeLessThan(
       sendTransaction.mock.invocationCallOrder[1],
     );
-    expect(navigate).toHaveBeenLastCalledWith(RouteEnum.Computing, {
+    expect(navigate).toHaveBeenLastCalledWith(Route.Computing, {
       phase: 'failed',
       failure: errorKeyed('send.nym-blocked'),
     });
@@ -287,12 +277,29 @@ describe('Send confirm send permit', () => {
     const view = render(sendUi(online, sendTransaction, jest.fn()));
     const confirmSend = await openConfirmScreen(view);
 
-    await confirmSend(sendPageState);
+    await confirmSend();
 
     expect(sendTransaction).toHaveBeenCalledTimes(1);
-    expect(navigate).toHaveBeenLastCalledWith(RouteEnum.Computing, {
+    expect(navigate).toHaveBeenLastCalledWith(Route.Computing, {
       phase: 'created',
     });
+  });
+
+  test('Tests that confirming sends the state the Confirm screen shows when the form changes after it opened.', async () => {
+    const sendTransaction = jest.fn().mockResolvedValue(sent);
+    const view = render(sendUi(online, sendTransaction, jest.fn()));
+    const confirmSend = await openConfirmScreen(view);
+    const confirmCall = navigate.mock.calls.find(
+      ([route]) => route === Route.Confirm,
+    );
+
+    fireEvent.changeText(view.getByTestId('send.amount'), '0.0001');
+    await confirmSend();
+
+    expect(sendTransaction).toHaveBeenCalledTimes(1);
+    expect(sendTransaction.mock.calls[0][0]).toBe(
+      confirmCall?.[1].sendPageState,
+    );
   });
 
   test('Tests that confirming sends when the platform has no mixnet transport. The Send screen shows no blocked reason.', async () => {
@@ -302,7 +309,7 @@ describe('Send confirm send permit', () => {
     const confirmSend = await openConfirmScreen(view);
 
     expect(view.queryByTestId('send.mixnet-blocked')).toBeNull();
-    await confirmSend(sendPageState);
+    await confirmSend();
 
     expect(sendTransaction).toHaveBeenCalledTimes(1);
   });

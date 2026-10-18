@@ -39,8 +39,7 @@ import Header from '@ui/widgets/Header';
 import {
   LanguageEnum,
   GlobalConst,
-  RouteEnum,
-  ScreenEnum,
+  Route,
   BlockExplorerEnum,
   ChainNameEnum,
 } from '@app/AppState';
@@ -67,40 +66,39 @@ import {
 } from '@app/services/recoveryWalletInfo';
 import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import {
+  CommonActions,
+  NavigationAction,
+  usePreventRemove,
+} from '@react-navigation/native';
 import { createAlert } from '@app/services/createAlert';
 import { showConfirm } from '@app/services/showConfirm';
 import { sendEmail } from '@app/services/sendEmail';
+import SaveSheet from '@ui/widgets/SaveSheet';
 import SwitchOff from '../../assets/img/switch-off.svg';
 import SettingSwitchOn from '../../assets/img/setting-switch-on.svg';
-
-type SettingsProps = NativeStackScreenProps<
-  AppDrawerParamList,
-  RouteEnum.Settings
-> & {
-  setLanguageOption: (value: LanguageEnum) => Promise<void>;
-  setBiometricsOption: (value: boolean) => Promise<void>;
-  setPerformanceLevelOption: (value: RPCPerformanceLevelEnum) => Promise<void>;
-  setBlockExplorerOption: (value: BlockExplorerEnum) => Promise<void>;
-  toggleMenuDrawer: () => void;
-  onRestoreWalletBackup: () => Promise<void>;
-};
 
 type Options = {
   value: string;
   text: string;
 };
 
-const Settings: React.FunctionComponent<SettingsProps> = ({
-  navigation,
-  setLanguageOption,
-  setBiometricsOption,
-  setPerformanceLevelOption,
-  setBlockExplorerOption,
-  toggleMenuDrawer,
-  onRestoreWalletBackup,
-}) => {
+type SettingName =
+  'language' | 'privacy' | 'biometrics' | 'performance' | 'blockexplorer';
+
+const fill = (text: string, values: Record<string, string>) =>
+  Object.entries(values).reduce((s, [k, v]) => s.split(`{${k}}`).join(v), text);
+
+type SettingsProps = NativeStackScreenProps<AppDrawerParamList, 'Settings'>;
+
+const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
   const context = useContext(ContextAppLoaded);
   const {
+    setLanguageOption,
+    setBiometricsOption,
+    setPerformanceLevelOption,
+    setBlockExplorerOption,
+    restoreBackup,
     translate,
     language: languageContext,
     privacy: privacyContext,
@@ -144,7 +142,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   }
 
   const { colors } = useTheme();
-  const screenName = ScreenEnum.Settings;
 
   // The requirement is read once, at mount: this screen's own save
   // flips the switch, and that must not re-gate the open screen.
@@ -314,23 +311,74 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   // the footer's onPress always invoke the current closure.
   const saveSettingsRef = useRef<() => Promise<void>>(async () => {});
 
-  const saveSettings = async () => {
+  // Each local value against the one the context holds. A saved change
+  // drops out, and the guard below lets the screen go.
+  const edited: SettingName[] = (
+    [
+      ['language', languageContext !== language],
+      ['privacy', privacyContext !== privacy],
+      ['biometrics', biometricsContext !== biometrics],
+      ['performance', performanceLevelContext !== performanceLevel],
+      ['blockexplorer', blockExplorerContext !== blockExplorer],
+    ] as const
+  )
+    .filter(([, changed]) => changed)
+    .map(([name]) => name);
+  const unsaved = edited.length > 0;
+
+  // Names one or two edits and counts more, then says what leaving keeps.
+  const unsavedBody = (): string => {
+    const names = edited.map(
+      name => translate(`settings.unsaved-name-${name}`) as string,
+    );
+    const changes =
+      names.length === 1
+        ? fill(translate('settings.unsaved-one') as string, { a: names[0] })
+        : names.length === 2
+          ? fill(translate('settings.unsaved-two') as string, {
+              a: names[0],
+              b: names[1],
+            })
+          : fill(translate('settings.unsaved-many') as string, {
+              count: String(names.length),
+            });
+    return `${changes} ${translate('settings.unsaved-keeps') as string}`;
+  };
+
+  // Where leaving goes. Settings is always pushed over the home; the
+  // fallback keeps a screen opened any other way from going nowhere.
+  const exitAction = (): NavigationAction =>
+    navigation.canGoBack()
+      ? CommonActions.goBack()
+      : CommonActions.navigate(Route.Home);
+
+  // The exit the user has agreed to, dispatched by the effect below once
+  // the guard is down. State rather than a ref: the render that lowers the
+  // guard has to land before the action goes out, or `beforeRemove` holds
+  // the same action back a second time and the question repeats.
+  const [leaving, setLeaving] = useState<NavigationAction>();
+  // The exit the guard held back while the sheet asks about it.
+  const [held, setHeld] = useState<NavigationAction>();
+  useEffect(() => {
+    if (leaving) {
+      navigation.dispatch(leaving);
+    }
+  }, [leaving, navigation]);
+
+  // Writes the edits and says whether the screen may leave now. Kept apart
+  // from the navigation so the guard can persist first and then dispatch
+  // the very action it held back.
+  const persistSettings = async (): Promise<boolean> => {
     // ───────────────────────────────────────────────────────────────
     // Phase 1: Validate up-front (no I/O yet — purely synchronous guards).
     // ───────────────────────────────────────────────────────────────
-    if (
-      languageContext === language &&
-      privacyContext === privacy &&
-      biometricsContext === biometrics &&
-      performanceLevelContext === performanceLevel &&
-      blockExplorerContext === blockExplorer
-    ) {
+    if (!unsaved) {
       addLastSnackbar(translate('settings.nochanges') as string);
-      return;
+      return false;
     }
     if (!language) {
       addLastSnackbar(translate('settings.islanguage') as string);
-      return;
+      return false;
     }
 
     // ───────────────────────────────────────────────────────────────
@@ -362,38 +410,52 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         `${translate('settings.save-error') as string}: ${(e as Error).message}`,
       );
       setDisabled(false);
-      return;
+      return false;
     }
     setDisabled(false);
+    return true;
+  };
 
-    // ───────────────────────────────────────────────────────────────
-    // Phase 3: Done — pop back to the previous screen.
-    // ───────────────────────────────────────────────────────────────
-    if (navigation.canGoBack()) {
-      navigation.goBack();
-    } else {
-      navigation.navigate(RouteEnum.HomeStack);
+  // The Save button: write the edits, then pop back to the screen behind.
+  const saveSettings = async () => {
+    if (await persistSettings()) {
+      setLeaving(exitAction());
     }
   };
   saveSettingsRef.current = saveSettings;
 
-  const navigateToHome = useCallback((reset: boolean) => {
-    if (reset) {
-      // reset all settings - no save changes
-      setLanguage(languageContext);
-      setPrivacy(privacyContext);
-      setBiometrics(biometricsContext);
-      setPerformanceLevel(performanceLevelContext);
-      setBlockExplorer(blockExplorerContext);
+  // The back arrow, Android's back and iOS's edge swipe all end in the
+  // save sheet while an edit is unsaved. A second back with the sheet up
+  // closes it.
+  usePreventRemove(unsaved && !leaving, ({ data }) => {
+    setHeld(current => (current ? undefined : data.action));
+  });
+
+  const keepEditing = () => setHeld(undefined);
+
+  const discardEdits = () => {
+    setHeld(undefined);
+    setLeaving(held);
+  };
+
+  // A failed save keeps the screen open with its error.
+  const saveAndLeave = async () => {
+    const exit = held;
+    setHeld(undefined);
+    if (await persistSettings()) {
+      setLeaving(exit);
     }
-    // `goBack()` pops Settings off the stack — using `navigate(HomeStack)`
-    // would push HomeStack on top while leaving the already-authenticated
-    // Settings instance alive in the stack, allowing a back gesture to
-    // bypass the biometric gate.
+  };
+
+  // `goBack()` pops Settings off the stack — using `navigate(Home)`
+  // would push Home on top while leaving the already-authenticated
+  // Settings instance alive in the stack, allowing a back gesture to
+  // bypass the biometric gate.
+  const navigateToHome = useCallback(() => {
     if (navigation.canGoBack()) {
       navigation.goBack();
     } else {
-      navigation.navigate(RouteEnum.HomeStack);
+      navigation.navigate(Route.Home);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -476,7 +538,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         <TouchableOpacity
           onPress={() => {
             if (!disabled) {
-              navigateToHome(true);
+              navigateToHome();
             }
           }}
           hitSlop={8}
@@ -592,10 +654,9 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         <View onLayout={e => setHeaderH(e.nativeEvent.layout.height)}>
           <Header
             title={''}
-            screenName={screenName}
             noBalance={true}
             noSyncingStatus={true}
-            toggleMenuDrawer={toggleMenuDrawer}
+            noDrawMenu={true}
             noPrivacy={true}
           />
         </View>
@@ -764,7 +825,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
               {mixnetView.kind === 'transport' && (
                 <TouchableOpacity
                   testID="settings.mixnet"
-                  onPress={() => navigation.navigate(RouteEnum.MixnetDoctor)}
+                  onPress={() => navigation.navigate(Route.MixnetDoctor)}
                   style={{
                     flexDirection: 'row',
                     alignItems: 'center',
@@ -830,7 +891,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
               <TouchableOpacity
                 testID="settings.about"
                 disabled={disabled}
-                onPress={() => navigation.navigate(RouteEnum.About)}
+                onPress={() => navigation.navigate(Route.About)}
                 style={{
                   flexDirection: 'row',
                   alignItems: 'center',
@@ -983,7 +1044,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                                         ? 'settings.restorebackup-switch'
                                         : 'confirm',
                                     ) as string,
-                                    onPress: onRestoreWalletBackup,
+                                    onPress: restoreBackup,
                                   },
                                   {
                                     text: translate('cancel') as string,
@@ -1024,6 +1085,19 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         value={blockExplorer}
         onChange={v => setBlockExplorer(v as BlockExplorerEnum)}
       />
+      {held && (
+        <SaveSheet
+          testID="settings.unsaved"
+          title={translate('settings.unsaved-title') as string}
+          body={unsavedBody()}
+          saveLabel={translate('server.save') as string}
+          discardLabel={translate('server.dont-save') as string}
+          keepLabel={translate('server.keep-editing') as string}
+          onSave={saveAndLeave}
+          onDiscard={discardEdits}
+          onKeep={keepEditing}
+        />
+      )}
     </KeyboardAvoidingView>
   );
 };

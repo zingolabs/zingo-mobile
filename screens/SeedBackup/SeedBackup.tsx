@@ -31,7 +31,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useTheme } from '@app/theme';
 import { ease } from '@app/theme/motion';
 import { ContextAppLoaded } from '@app/context';
-import { RouteEnum, ScreenEnum, SnackbarDurationEnum } from '@app/AppState';
+import { SnackbarDurationEnum } from '@app/AppState';
 import Header from '@ui/widgets/Header';
 import { AppDrawerParamList, CardRect } from '@app/types';
 import { useSecureScreen } from '@app/hooks/useSecureScreen';
@@ -56,10 +56,7 @@ import DoneStep from './components/DoneStep';
 import ScreenshotSheet from './components/ScreenshotSheet';
 import { SIDE, StepActions } from './components/StepParts';
 
-type SeedBackupProps = NativeStackScreenProps<
-  AppDrawerParamList,
-  RouteEnum.SeedBackup
->;
+type SeedBackupProps = NativeStackScreenProps<AppDrawerParamList, 'SeedBackup'>;
 
 type Step = 'info' | 'words' | 'confirm' | 'done';
 type Move = { step: Step; dir: 1 | -1 };
@@ -523,7 +520,6 @@ ${translate('seedbackup.birthday') as string}: ${birthday}`;
           <View style={{ paddingTop: 4 }}>
             <Header
               title={''}
-              screenName={ScreenEnum.Seed}
               noBalance={true}
               noSyncingStatus={true}
               noDrawMenu={true}

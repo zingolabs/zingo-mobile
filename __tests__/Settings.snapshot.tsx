@@ -11,7 +11,7 @@ import {
   defaultAppContextLoaded,
   ContextAppLoadedProvider,
 } from '@app/context';
-import { LanguageEnum, RouteEnum, BlockExplorerEnum } from '@app/AppState';
+import { LanguageEnum, Route, BlockExplorerEnum } from '@app/AppState';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
@@ -22,13 +22,13 @@ import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
 function makeDrawerProps(): NativeStackScreenProps<
   AppDrawerParamList,
-  RouteEnum.Settings
+  'Settings'
 > {
   return {
     navigation: mockNavigation,
     route: {
       key: 'Key-1',
-      name: RouteEnum.Settings,
+      name: Route.Settings,
       params: undefined,
     },
   };
@@ -43,21 +43,11 @@ describe('Component Settings - test', () => {
   state.server = mockServer;
   state.language = LanguageEnum.en;
   state.blockExplorer = BlockExplorerEnum.Zcashexplorer;
-  const onSetOption = jest.fn();
-  const toggle = jest.fn();
   const props = makeDrawerProps();
   test('Settings - snapshot', () => {
     const settings = render(
       <ContextAppLoadedProvider value={state}>
-        <Settings
-          {...props}
-          setLanguageOption={onSetOption}
-          setBiometricsOption={onSetOption}
-          setPerformanceLevelOption={onSetOption}
-          setBlockExplorerOption={onSetOption}
-          toggleMenuDrawer={toggle}
-          onRestoreWalletBackup={onSetOption}
-        />
+        <Settings {...props} />
       </ContextAppLoadedProvider>,
     );
     expect(settings.toJSON()).toMatchSnapshot();

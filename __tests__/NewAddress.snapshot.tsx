@@ -11,7 +11,7 @@ import {
 } from '@app/context';
 
 import NewAddress from '@screens/Receive/components/NewAddress';
-import { AddressKindEnum, ScreenEnum } from '@app/AppState';
+import { AddressKindEnum } from '@app/AppState';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockAddressBook } from '../__mocks__/dataMocks/mockAddressBook';
 
@@ -30,7 +30,6 @@ describe('NewAddress - snapshots', () => {
             addressKind={AddressKindEnum.u}
             closeSheet={onFn}
             setAddressBook={onFn}
-            screenName={ScreenEnum.Receive}
           />
         </ContextAppLoadedProvider>,
       ).toJSON(),
@@ -45,7 +44,6 @@ describe('NewAddress - snapshots', () => {
             addressKind={AddressKindEnum.t}
             closeSheet={onFn}
             setAddressBook={onFn}
-            screenName={ScreenEnum.Receive}
           />
         </ContextAppLoadedProvider>,
       ).toJSON(),

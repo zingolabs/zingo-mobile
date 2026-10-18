@@ -1,4 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
+import { leaveFlow } from '@app/navigation/navigate';
 import React, {
   useCallback,
   useContext,
@@ -19,12 +20,12 @@ import { deriveNymGateState } from './components/nymGateState';
 import { AppDrawerParamList } from '@app/types';
 import { AppTheme } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
-import { RouteEnum } from '@app/AppState';
+import { Route } from '@app/AppState';
 import Utils from '@app/utils';
 
 type MigrationStrategyProps = NativeStackScreenProps<
   AppDrawerParamList,
-  RouteEnum.MigrationStrategy
+  'MigrationStrategy'
 > & {
   // Opens or closes the nym gate sheet from outside. Storybook sets it; the
   // app leaves it unset and the Start button drives the sheet.
@@ -224,14 +225,14 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
   // one-way onboarding/migration stack isn't left underneath to return to.
   // Migration is opt-in, so the X exits straight away without a confirm.
   const closeMigration = useCallback(() => {
-    navigation.reset({ index: 0, routes: [{ name: RouteEnum.HomeStack }] });
+    leaveFlow(navigation);
   }, [navigation]);
 
   const startMigration = useCallback(() => {
     navigation.navigate(
       selected === 'private'
-        ? RouteEnum.MigrationSplitPlan
-        : RouteEnum.MigrationTransactions,
+        ? Route.MigrationSplitPlan
+        : Route.MigrationTransactions,
     );
   }, [navigation, selected]);
 

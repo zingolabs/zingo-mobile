@@ -1,4 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
+import { leaveFlow } from '@app/navigation/navigate';
 import React, { useCallback, useContext, useRef, useState } from 'react';
 import { ActivityIndicator, ScrollView, Text, View } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
@@ -12,7 +13,7 @@ import StepperHeader from '@ui/widgets/StepperHeader';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
 import Utils from '@app/utils/Utils';
-import { RouteEnum, TARGET_BLOCK_SPACING_SECONDS } from '@app/AppState';
+import { Route, TARGET_BLOCK_SPACING_SECONDS } from '@app/AppState';
 import {
   cancelIronwoodMigration,
   migrationStatus,
@@ -25,7 +26,7 @@ import {
 
 type MigrationStatusProps = NativeStackScreenProps<
   AppDrawerParamList,
-  RouteEnum.MigrationStatus
+  'MigrationStatus'
 >;
 
 const ZATS_PER_ZEC = 10 ** 8;
@@ -109,7 +110,7 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
   );
 
   const goHome = useCallback(() => {
-    navigation.reset({ index: 0, routes: [{ name: RouteEnum.HomeStack }] });
+    leaveFlow(navigation);
   }, [navigation]);
 
   // Clearing the migration frees the wallet to plan again from the notes it
@@ -529,7 +530,7 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
             type={ButtonTypeEnum.Primary}
             title={translate('migrationstatus.send') as string}
             onPress={() =>
-              navigation.navigate(RouteEnum.MigrationBatchSending, {
+              navigation.navigate(Route.MigrationBatchSending, {
                 denominations: dueNow.denominations,
               })
             }

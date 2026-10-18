@@ -11,7 +11,7 @@ import {
 } from '@app/context';
 
 import ValueTransferLine from '@screens/History/components/ValueTransferLine';
-import { ScreenEnum, ValueTransferKindEnum } from '@app/AppState';
+import { ValueTransferKindEnum } from '@app/AppState';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockValueTransfers } from '../__mocks__/dataMocks/mockValueTransfers';
@@ -45,7 +45,6 @@ describe('ValueTransferLine - snapshots', () => {
             vt={vt}
             setValueTransferDetailModalShow={onFn}
             nextLineWithSameTxid={false}
-            screenName={ScreenEnum.History}
             registerSwipeable={registerSwipeable}
             closeAllSwipeables={onFn}
             closeOtherSwipeables={onFn}
@@ -66,7 +65,6 @@ describe('ValueTransferLine - snapshots', () => {
             vt={vt}
             setValueTransferDetailModalShow={onFn}
             nextLineWithSameTxid={true}
-            screenName={ScreenEnum.History}
             registerSwipeable={registerSwipeable}
             closeAllSwipeables={onFn}
             closeOtherSwipeables={onFn}
@@ -92,7 +90,6 @@ describe('ValueTransferLine - snapshots', () => {
             vt={vt}
             setValueTransferDetailModalShow={onFn}
             nextLineWithSameTxid={false}
-            screenName={ScreenEnum.History}
             registerSwipeable={registerSwipeable}
             closeAllSwipeables={onFn}
             closeOtherSwipeables={onFn}
@@ -117,7 +114,6 @@ describe('ValueTransferLine - snapshots', () => {
             vt={vt}
             setValueTransferDetailModalShow={onFn}
             nextLineWithSameTxid={false}
-            screenName={ScreenEnum.History}
             registerSwipeable={registerSwipeable}
             closeAllSwipeables={onFn}
             closeOtherSwipeables={onFn}

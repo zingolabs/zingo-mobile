@@ -1,12 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useContext, useEffect, useState } from 'react';
-import {
-  Pressable,
-  StyleSheet,
-  Text,
-  useWindowDimensions,
-  View,
-} from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Animated, {
   ReduceMotion,
   useAnimatedStyle,
@@ -19,7 +13,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@app/theme';
 import { ease } from '@app/theme/motion';
 import { ContextAppLoaded } from '@app/context';
-import { RouteEnum, ScreenEnum, SnackbarDurationEnum } from '@app/AppState';
+import { Route, SnackbarDurationEnum } from '@app/AppState';
 import Header from '@ui/widgets/Header';
 import { AppDrawerParamList, WalletSeedAction } from '@app/types';
 import { showConfirm } from '@app/services/showConfirm';
@@ -42,17 +36,6 @@ import { SIDE, StepActions } from '@screens/SeedBackup/components/StepParts';
 import ScreenshotSheet from '@screens/SeedBackup/components/ScreenshotSheet';
 import KeyCard from '@screens/ViewingKey/components/KeyCard';
 
-type WalletSeedProps = NativeStackScreenProps<
-  AppDrawerParamList,
-  RouteEnum.WalletSeed
-> & {
-  // Leaves this wallet or its server once the user confirms.
-  onConfirm: () => Promise<void>;
-  // Runs when the user backs out without leaving.
-  onCancel: () => Promise<void>;
-};
-
-const PUSHED_SHIFT = 0.28;
 const PUSHED_DIM = 0.55;
 const PUSH_IN_MS = 380;
 const PUSH_OUT_MS = 320;
@@ -84,11 +67,11 @@ const WARNING_VIEW_ONLY = 'walletseed.change-warning-vo';
 // The seed phrase with its backup status, birthday and viewing key. With an
 // action, the last look at them before leaving this wallet or its server.
 // A view-only wallet shows its viewing key in place of the words.
+type WalletSeedProps = NativeStackScreenProps<AppDrawerParamList, 'WalletSeed'>;
+
 const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
   navigation,
   route,
-  onConfirm,
-  onCancel,
 }) => {
   const action = route.params?.action;
   const context = useContext(ContextAppLoaded);
@@ -101,10 +84,25 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
     language,
     birthday: walletBirthday,
     readOnly,
+    changeWallet,
+    applyPendingServer,
+    cancelPendingServer,
   } = context;
+  // What confirming or backing out does depends on why the seed is shown.
+  const onConfirm = async () => {
+    if (action === 'change') {
+      await changeWallet();
+    } else if (action === 'server') {
+      await applyPendingServer();
+    }
+  };
+  const onCancel = async () => {
+    if (action === 'server') {
+      await cancelPendingServer();
+    }
+  };
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
-  const window = useWindowDimensions();
   const focused = useIsFocused();
   const secured = useSecureScreen();
   const gate = useBiometricGate({
@@ -155,17 +153,8 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
   );
 
   const covered = backingUp && !focused;
-  const behind = useAnimatedStyle(() => ({
-    transform: [
-      {
-        translateX: withTiming(covered ? -window.width * PUSHED_SHIFT : 0, {
-          duration: covered ? PUSH_IN_MS : PUSH_OUT_MS,
-          easing: ease.emphasized,
-          reduceMotion: ReduceMotion.System,
-        }),
-      },
-    ],
-  }));
+  // The backup flow dims this screen in place: it never moves, so the flow
+  // pops straight back onto it.
   const dim = useAnimatedStyle(() => ({
     opacity: withTiming(covered ? PUSHED_DIM : 0, {
       duration: covered ? PUSH_IN_MS : PUSH_OUT_MS,
@@ -177,7 +166,7 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
   const openFlow = (kind: 'push' | 'verify') => {
     setTip('none');
     setBackingUp(true);
-    navigation.navigate(RouteEnum.SeedBackup, { entry: { kind } });
+    navigation.navigate(Route.SeedBackup, { entry: { kind } });
   };
 
   const copyWords = () => {
@@ -256,11 +245,10 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
       <Animated.View
         testID="walletseed"
         onTouchStart={() => tip !== 'none' && setTip('none')}
-        style={[{ flex: 1, paddingTop: 4 }, behind]}
+        style={{ flex: 1, paddingTop: 4 }}
       >
         <Header
           title={''}
-          screenName={ScreenEnum.Seed}
           noBalance={true}
           noSyncingStatus={true}
           noDrawMenu={true}
@@ -552,7 +540,11 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
       </Animated.View>
       <Animated.View
         pointerEvents="none"
-        style={[StyleSheet.absoluteFill, { backgroundColor: '#000' }, dim]}
+        style={[
+          StyleSheet.absoluteFill,
+          { backgroundColor: colors.bgCanvas },
+          dim,
+        ]}
       />
       {shot !== 'none' && (
         <ScreenshotSheet

@@ -14,7 +14,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import { useTheme } from '@app/theme';
 import { ease } from '@app/theme/motion';
-import { ScreenEnum, RouteEnum, SnackbarDurationEnum } from '@app/AppState';
+import { SnackbarDurationEnum } from '@app/AppState';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
 import { useSyncStatus } from '@app/hooks/useSyncStatus';
@@ -119,12 +119,7 @@ const TL_W = 315;
 const TL_H = 88;
 const MAP_H = 63;
 
-type SyncReportProps = NativeStackScreenProps<
-  AppDrawerParamList,
-  RouteEnum.SyncReport
-> & {
-  doRescan: () => Promise<void>;
-};
+type SyncReportProps = NativeStackScreenProps<AppDrawerParamList, 'SyncReport'>;
 
 const nf = (n: number): string => n.toLocaleString('en-US');
 
@@ -138,9 +133,9 @@ const fill = (text: string, values: Record<string, string>): string =>
 // map and the last background sync, with the rescan in the header.
 const SyncReport: React.FunctionComponent<SyncReportProps> = ({
   navigation,
-  doRescan,
 }) => {
   const {
+    doRescan,
     syncingStatus,
     rescan: rescanState,
     birthday,
@@ -401,7 +396,6 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
     >
       <Header
         title={''}
-        screenName={ScreenEnum.SyncReport}
         noBalance={true}
         noSyncingStatus={true}
         noDrawMenu={true}

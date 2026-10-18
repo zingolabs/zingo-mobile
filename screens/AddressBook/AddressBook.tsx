@@ -1,12 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useRef, useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
-import {
-  NavigationProp,
-  ParamListBase,
-  useNavigation,
-  useScrollToTop,
-} from '@react-navigation/native';
+import { useScrollToTop } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -14,11 +9,10 @@ import Clipboard from '@react-native-clipboard/clipboard';
 
 import { useTheme } from '@app/theme';
 import {
-  ScreenEnum,
   AddressBookFileClass,
   AddressKindEnum,
   GlobalConst,
-  RouteEnum,
+  Route,
   SendPageStateClass,
   SnackbarDurationEnum,
   ToAddrClass,
@@ -28,6 +22,7 @@ import { ContextAppLoaded } from '@app/context';
 import AddressBookFileImpl from '@app/services/AddressBookFileImpl';
 import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
 import { showConfirm } from '@app/services/showConfirm';
+import { deliver } from '@app/navigation/results';
 import AppSheetModal from '@ui/primitives/AppSheetModal';
 import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
 import Header from '@ui/widgets/Header';
@@ -59,10 +54,8 @@ export type MineEntry = {
 
 type AddressBookProps = NativeStackScreenProps<
   AppDrawerParamList,
-  RouteEnum.AddressBook
-> & {
-  setAddressBook: (ab: AddressBookFileClass[]) => void;
-};
+  'AddressBook'
+>;
 
 /** Contacts the book lists: other people, on the wallet's own network. */
 export const listedContacts = (
@@ -137,10 +130,10 @@ export const mineEntries = (
 const AddressBook: React.FunctionComponent<AddressBookProps> = ({
   navigation,
   route,
-  setAddressBook,
 }) => {
   const {
     translate,
+    setAddressBook,
     addresses,
     addressBook,
     walletChainName,
@@ -152,8 +145,6 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const keyboardHeight = useKeyboardHeight();
-  /** The Send tab lives in another navigator, out of this route's typed params. */
-  const rootNavigation = useNavigation<NavigationProp<ParamListBase>>();
   const walletChain = walletChainName || server.chainName;
 
   const [query, setQuery] = useState('');
@@ -192,7 +183,9 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
       : [];
 
   const choose = (address: string) => {
-    pick?.(address);
+    if (pick) {
+      deliver(pick, address);
+    }
     navigation.goBack();
   };
 
@@ -235,7 +228,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
     const sendPageState = new SendPageStateClass(new ToAddrClass(0));
     sendPageState.toaddr.to = contact.address;
     setSendPageState(sendPageState);
-    rootNavigation.navigate(RouteEnum.HomeStack, { screen: RouteEnum.Send });
+    navigation.navigate(Route.Home, { screen: Route.Send });
   };
 
   const copy = (contact: AddressBookFileClass) => {
@@ -299,7 +292,6 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
     >
       <Header
         title={''}
-        screenName={ScreenEnum.AddressBook}
         noBalance={true}
         noSyncingStatus={true}
         noDrawMenu={true}
@@ -580,7 +572,6 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
           walletChain={walletChain}
           onSave={save}
           onCancel={() => contactSheet.current?.dismiss()}
-          navigation={navigation}
         />
       </AppSheetModal>
     </View>

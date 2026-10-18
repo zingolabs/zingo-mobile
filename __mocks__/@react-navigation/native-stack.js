@@ -3,4 +3,5 @@
 export const createNativeStackNavigator = jest.fn().mockReturnValue({
   Navigator: 'MockedNavigator',
   Screen: 'MockedScreen',
+  Group: 'MockedGroup',
 });

@@ -10,7 +10,7 @@ import {
 } from '@app/context';
 import {
   ChainNameEnum,
-  RouteEnum,
+  Route,
   SelectServerEnum,
   ServerType,
   remoteServer,
@@ -50,7 +50,7 @@ const renderSettings = async (
 ) => {
   const props: any = {
     navigation: mockNavigation,
-    route: { key: 'Key-1', name: RouteEnum.Settings, params: undefined },
+    route: { key: 'Key-1', name: Route.Settings, params: undefined },
   };
   render(
     <ContextAppLoadedProvider
@@ -63,17 +63,10 @@ const renderSettings = async (
         walletChainName,
         readOnly,
         selectServer: SelectServerEnum.auto,
+        restoreBackup: onRestoreWalletBackup,
       }}
     >
-      <Settings
-        {...props}
-        setLanguageOption={jest.fn()}
-        setBiometricsOption={jest.fn()}
-        setPerformanceLevelOption={jest.fn()}
-        setBlockExplorerOption={jest.fn()}
-        toggleMenuDrawer={jest.fn()}
-        onRestoreWalletBackup={onRestoreWalletBackup}
-      />
+      <Settings {...props} />
     </ContextAppLoadedProvider>,
   );
   const title = await screen.findByText('settings.privacy-title');
