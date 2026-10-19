@@ -27,7 +27,7 @@ export default class BackgroundFileImpl {
       const rStr = (await RNFS.readFile(fileName, GlobalConst.utf8)).toString();
       const r = JSON.parse(rStr) as BackgroundType;
       return r;
-    } catch (err) {
+    } catch {
       // File probably doesn't exist, so return nothing
       return { batches: 0, message: '', date: 0, dateEnd: 0 } as BackgroundType;
     }

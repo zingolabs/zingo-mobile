@@ -563,7 +563,7 @@ export async function isWalletAddress(address: string): Promise<boolean> {
   try {
     const parsed: { is_wallet_address?: boolean } = JSON.parse(check.value);
     return parsed.is_wallet_address === true;
-  } catch (error) {
+  } catch {
     return false;
   }
 }
@@ -727,7 +727,7 @@ export async function fetchWallet(
       }
 
       return wallet;
-    } catch (error) {
+    } catch {
       return null;
     }
   } else {
@@ -748,7 +748,7 @@ export async function fetchWallet(
       }
 
       return wallet;
-    } catch (error) {
+    } catch {
       return null;
     }
   }
