@@ -12,7 +12,7 @@ exports[`AlSummaryLine - snapshots AlSummaryLine address with contact label 1`] 
   <View
     style={
       {
-        "borderBottomColor": "#122033",
+        "borderBottomColor": "#FFFFFF0F",
         "borderBottomWidth": 1.5,
         "display": "flex",
         "flexDirection": "row",
@@ -220,7 +220,7 @@ exports[`AlSummaryLine - snapshots AlSummaryLine transparent address 1`] = `
   <View
     style={
       {
-        "borderBottomColor": "#122033",
+        "borderBottomColor": "#FFFFFF0F",
         "borderBottomWidth": 1.5,
         "display": "flex",
         "flexDirection": "row",
@@ -428,7 +428,7 @@ exports[`AlSummaryLine - snapshots AlSummaryLine unified address 1`] = `
   <View
     style={
       {
-        "borderBottomColor": "#122033",
+        "borderBottomColor": "#FFFFFF0F",
         "borderBottomWidth": 1.5,
         "display": "flex",
         "flexDirection": "row",

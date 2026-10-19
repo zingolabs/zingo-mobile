@@ -28,15 +28,16 @@ import { CopyIcon } from '@ui/primitives/Icons/CopyIcon';
 import { PencilIcon } from '@ui/primitives/Icons/PencilIcon';
 import { PlaneIcon } from '@ui/primitives/Icons/PlaneIcon';
 import { TrashCan, TrashLid } from '@ui/primitives/Icons/TrashIcon';
+import { themeTokens } from '@app/theme';
 
-export const ROW_LINE = '#0A1F3D';
-const INK_CODE = '#B9C6D6';
-const ACT_BG = '#020B18';
-const ACT_PRESSED = '#0A1F3D';
-const RED = '#F2878A';
-const SWIPE_BG = '#0E5A18';
-const SWIPE_INK = '#D7F5D2';
-const FLASH = 'rgba(20,157,5,0.16)';
+export const ROW_LINE = themeTokens.borderSubtle;
+const INK_CODE = themeTokens.fgDefault;
+const ACT_BG = themeTokens.bgCanvas;
+const ACT_PRESSED = themeTokens.bgMutedSubtle;
+const RED = themeTokens.fgDanger;
+const SWIPE_BG = themeTokens.bgAccentDisabled;
+const SWIPE_INK = themeTokens.fgDefault;
+const FLASH = themeTokens.bgAccentSubtle;
 
 const UNFOLD_MS = 260;
 const BUTTONS_MS = 200;
@@ -119,7 +120,7 @@ const Action: React.FunctionComponent<ActionProps> = ({
         <Text
           style={{
             color: red ? RED : INK_CODE,
-            fontSize: 11,
+            fontSize: 12,
             lineHeight: 15,
             fontWeight: '500',
           }}
@@ -291,7 +292,7 @@ const ContactRow: React.FunctionComponent<ContactRowProps> = ({
           ],
         }}
       >
-        <PlaneIcon size={26} color={SWIPE_INK} />
+        <PlaneIcon size={24} color={SWIPE_INK} />
       </RNAnimated.View>
     </View>
   );
@@ -434,7 +435,7 @@ const ContactRow: React.FunctionComponent<ContactRowProps> = ({
                   onPress={() => press('send')}
                 >
                   <Animated.View style={flyStyle}>
-                    <PlaneIcon size={22} color={colors.fgAccent} />
+                    <PlaneIcon size={24} color={colors.fgAccent} />
                   </Animated.View>
                 </Action>
               )}

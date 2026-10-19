@@ -25,6 +25,7 @@ import { showConfirm } from '@app/services/showConfirm';
 import { DatabaseIcon } from '@ui/primitives/Icons/DatabaseIcon';
 import { ChevronDown } from '@ui/primitives/Icons/Chevron';
 import { WalletIcon } from '@ui/primitives/Icons/WalletIcon';
+import { themeTokens } from '@app/theme';
 
 type WalletErrorProps = {
   kind: WalletErrorKind;
@@ -55,9 +56,17 @@ const DETAILS_CLOSE_MS = 180;
 const MONO = Platform.select({ ios: 'Menlo', default: 'monospace' });
 // The network pill on the wallet icon and the chips: amber for a network
 // other than Mainnet, green for Mainnet.
-const NET_AMBER = { bg: '#1C170A', border: '#8A6D1E', ink: '#E6C46A' };
-const NET_GREEN = { bg: '#0A2412', border: '#1E6B2A', ink: '#8FDC80' };
-const CHIP_LABEL = '#8DA0B8';
+const NET_AMBER = {
+  bg: themeTokens.bgWarning,
+  border: themeTokens.borderWarning,
+  ink: themeTokens.fgWarning,
+};
+const NET_GREEN = {
+  bg: themeTokens.bgAccentSubtle,
+  border: themeTokens.bgAccentDisabled,
+  ink: themeTokens.fgAccent,
+};
+const CHIP_LABEL = themeTokens.fgMuted;
 
 const badgeEnter = () =>
   new Keyframe({
@@ -279,11 +288,11 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
             justifyContent: 'center',
           }}
         >
-          <BoldText style={{ fontSize: 11.5, color: tone.ink }}>
+          <BoldText style={{ fontSize: 12, color: tone.ink }}>
             {netName(net)}
           </BoldText>
         </View>
-        <RegText style={{ fontSize: 10.5, color: CHIP_LABEL }}>{label}</RegText>
+        <RegText style={{ fontSize: 12, color: CHIP_LABEL }}>{label}</RegText>
       </View>
     );
   };
@@ -319,7 +328,7 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
   );
 
   return (
-    <View style={{ flex: 1, backgroundColor: 'transparent' }}>
+    <View style={{ flex: 1 }}>
       <Pressable
         testID="walleterror.server"
         onPress={onServer}
@@ -402,7 +411,7 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
             >
               <BoldText
                 numberOfLines={1}
-                style={{ fontSize: 9.5, lineHeight: 12, color: NET_AMBER.ink }}
+                style={{ fontSize: 12, lineHeight: 12, color: NET_AMBER.ink }}
               >
                 {netName(chain)}
               </BoldText>
@@ -425,7 +434,11 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
               }}
             >
               <BoldText
-                style={{ fontSize: 10, lineHeight: 12, color: '#FFFFFF' }}
+                style={{
+                  fontSize: 12,
+                  lineHeight: 12,
+                  color: colors.fgOnAccent,
+                }}
               >
                 !
               </BoldText>
@@ -443,16 +456,14 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
           alignItems: 'center',
         }}
       >
-        <BoldText
-          style={{ fontSize: 15.5, lineHeight: 22, textAlign: 'center' }}
-        >
+        <BoldText style={{ fontSize: 15, lineHeight: 22, textAlign: 'center' }}>
           {title}
         </BoldText>
         <RegText
           style={{
             marginTop: 6,
             maxWidth: 310,
-            fontSize: 11.5,
+            fontSize: 12,
             lineHeight: 19,
             textAlign: 'center',
             color: colors.fgMuted,
@@ -475,7 +486,7 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
               'walleterror.chip.wallet',
             )}
             <BoldText
-              style={{ fontSize: 14, color: '#5A6F8F', marginBottom: 16 }}
+              style={{ fontSize: 15, color: colors.fgMuted, marginBottom: 16 }}
             >
               ≠
             </BoldText>
@@ -501,7 +512,7 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
             gap: 6,
           }}
         >
-          <RegText style={{ fontSize: 10.5, color: colors.fgMuted }}>
+          <RegText style={{ fontSize: 12, color: colors.fgMuted }}>
             {translate('walleterror.details') as string}
           </RegText>
           <Animated.View style={chevronStyle}>
@@ -522,7 +533,7 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
             >
               <RegText
                 selectable
-                style={{ fontFamily: MONO, fontSize: 10.5, lineHeight: 16 }}
+                style={{ fontFamily: MONO, fontSize: 12, lineHeight: 16 }}
               >
                 {details}
               </RegText>

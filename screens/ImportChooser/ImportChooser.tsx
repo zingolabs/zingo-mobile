@@ -107,10 +107,10 @@ const Option: React.FC<OptionProps> = ({
           <OptionIcon size={16} color={iconColor} />
         </View>
         <View style={{ flex: 1 }}>
-          <BoldText style={{ fontSize: 14, lineHeight: 19 }}>{title}</BoldText>
+          <BoldText style={{ fontSize: 15, lineHeight: 19 }}>{title}</BoldText>
           <RegText
             style={{
-              fontSize: 11.5,
+              fontSize: 12,
               lineHeight: 17,
               marginTop: 1,
               color: subColor,
@@ -135,7 +135,7 @@ const ImportChooser: React.FunctionComponent<ImportChooserProps> = ({
   const { colors } = useTheme();
 
   return (
-    <View style={{ flex: 1, backgroundColor: 'transparent' }}>
+    <View style={{ flex: 1 }}>
       <BoldText
         style={{
           position: 'absolute',
@@ -188,7 +188,7 @@ const ImportChooser: React.FunctionComponent<ImportChooserProps> = ({
         <RegText
           style={{
             textAlign: 'center',
-            fontSize: 11,
+            fontSize: 12,
             lineHeight: 18,
             marginVertical: 9,
             color: colors.fgMuted,
@@ -223,7 +223,7 @@ const ImportChooser: React.FunctionComponent<ImportChooserProps> = ({
           borderRadius: 10,
           alignItems: 'center',
           justifyContent: 'center',
-          backgroundColor: pressed ? colors.bgSurface : 'transparent',
+          backgroundColor: pressed ? colors.bgSurface : undefined,
         })}
       >
         <ChevronLeft size={20} color={colors.fgAccent} />

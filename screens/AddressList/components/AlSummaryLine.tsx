@@ -68,7 +68,7 @@ const AlSummaryLine: React.FunctionComponent<AlSummaryLineProps> = ({
           marginTop: 15,
           paddingBottom: 15,
           borderBottomWidth: 1.5,
-          borderBottomColor: '#122033',
+          borderBottomColor: colors.borderSubtle,
           opacity: 1,
         }}
       >

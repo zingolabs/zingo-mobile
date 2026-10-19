@@ -231,8 +231,8 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
       <Text
         style={
           {
-            "color": "#8DA0B8",
-            "fontSize": 12.5,
+            "color": "#888888",
+            "fontSize": 13,
             "lineHeight": 19,
             "marginHorizontal": 10,
             "marginVertical": 26,
