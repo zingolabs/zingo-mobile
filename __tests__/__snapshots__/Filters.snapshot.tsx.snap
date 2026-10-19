@@ -459,7 +459,7 @@ exports[`Filters - snapshots Filters with active sent filter and memos 1`] = `
           accessibilityRole="button"
           accessibilityState={
             {
-              "busy": undefined,
+              "busy": false,
               "checked": undefined,
               "disabled": false,
               "expanded": undefined,
@@ -519,7 +519,7 @@ exports[`Filters - snapshots Filters with active sent filter and memos 1`] = `
           accessibilityRole="button"
           accessibilityState={
             {
-              "busy": undefined,
+              "busy": false,
               "checked": undefined,
               "disabled": false,
               "expanded": undefined,
@@ -1040,7 +1040,7 @@ exports[`Filters - snapshots Filters with no active filters 1`] = `
           accessibilityRole="button"
           accessibilityState={
             {
-              "busy": undefined,
+              "busy": false,
               "checked": undefined,
               "disabled": false,
               "expanded": undefined,
@@ -1100,7 +1100,7 @@ exports[`Filters - snapshots Filters with no active filters 1`] = `
           accessibilityRole="button"
           accessibilityState={
             {
-              "busy": undefined,
+              "busy": false,
               "checked": undefined,
               "disabled": false,
               "expanded": undefined,

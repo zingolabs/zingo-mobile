@@ -31,9 +31,9 @@ import ServerRow, {
   useLift,
   DoneButton,
   Latency,
-  ROW_DIVIDER,
   RowCard,
   ScreenHeader,
+  CARD_SIDE,
 } from './ServerRow';
 import SegmentedSwitch from '@ui/widgets/SegmentedSwitch';
 import CustomServerBox from './CustomServerBox';
@@ -79,7 +79,6 @@ const CHAINS: ChainNameEnum[] = [
   ChainNameEnum.testChainName,
   ChainNameEnum.regtestChainName,
 ];
-const WAIT = '#E6B43C';
 const LEAVE_AFTER_SAVE_MS = 1500;
 
 const fadeIn = () =>
@@ -119,7 +118,7 @@ const StatusDot: React.FC<StatusDotProps> = ({ status, offline }) => {
   const inner = offline
     ? colors.fgMuted
     : status === 'wait'
-      ? WAIT
+      ? colors.fgWarning
       : status === 'bad'
         ? colors.fgDanger
         : colors.fgAccent;
@@ -176,7 +175,7 @@ const Toggle: React.FC<ToggleProps> = ({ on, disabled, onToggle }) => {
         height: 26,
         borderRadius: 13,
         padding: 2,
-        backgroundColor: on ? colors.bgAccent : ROW_DIVIDER,
+        backgroundColor: on ? colors.bgAccent : colors.bgMutedSubtle,
       }}
     >
       <Animated.View
@@ -420,15 +419,15 @@ const Server: React.FunctionComponent<ServerProps> = ({
     <>
       <BoldText
         style={{
-          marginHorizontal: 21.5,
+          marginHorizontal: CARD_SIDE,
           marginTop: 8,
           marginBottom: 18,
-          fontSize: 12.5,
+          fontSize: 13,
         }}
       >
         {t('regtest-label')}
       </BoldText>
-      <View style={{ marginHorizontal: 21.5 }}>{customBlock}</View>
+      <View style={{ marginHorizontal: CARD_SIDE }}>{customBlock}</View>
     </>
   ) : (
     <>
@@ -505,10 +504,7 @@ const Server: React.FunctionComponent<ServerProps> = ({
   );
 
   return (
-    <View
-      style={{ flex: 1, backgroundColor: 'transparent' }}
-      onLayout={onLayout}
-    >
+    <View style={{ flex: 1 }} onLayout={onLayout}>
       <View
         testID="server.card"
         accessible
@@ -539,7 +535,7 @@ const Server: React.FunctionComponent<ServerProps> = ({
         >
           <RegText
             numberOfLines={1}
-            style={{ fontSize: 13.5, lineHeight: 19, fontWeight: '500' }}
+            style={{ fontSize: 15, lineHeight: 19, fontWeight: '500' }}
           >
             {cardName}
           </RegText>
@@ -547,7 +543,7 @@ const Server: React.FunctionComponent<ServerProps> = ({
             testID="server.card.sub"
             numberOfLines={1}
             style={{
-              fontSize: 11,
+              fontSize: 12,
               lineHeight: 16,
               marginTop: 1,
               color: colors.fgMuted,
@@ -616,7 +612,7 @@ const Server: React.FunctionComponent<ServerProps> = ({
           <Animated.View
             layout={layout()}
             style={{
-              marginHorizontal: 21.5,
+              marginHorizontal: CARD_SIDE,
               marginTop: 17,
               minHeight: 66,
               borderRadius: 14,
@@ -632,11 +628,11 @@ const Server: React.FunctionComponent<ServerProps> = ({
             }}
           >
             <View style={{ flex: 1 }}>
-              <BoldText style={{ fontSize: 13.5, lineHeight: 19 }}>
+              <BoldText style={{ fontSize: 15, lineHeight: 19 }}>
                 {t('offline')}
               </BoldText>
               <RegText
-                style={{ fontSize: 11, lineHeight: 17, color: colors.fgMuted }}
+                style={{ fontSize: 12, lineHeight: 17, color: colors.fgMuted }}
               >
                 {t('offline-sub')}
               </RegText>

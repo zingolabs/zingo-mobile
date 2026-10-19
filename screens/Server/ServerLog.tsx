@@ -7,7 +7,6 @@ import { useTheme } from '@app/theme';
 import { ChainNameEnum } from '@app/AppState';
 import RegText from '@ui/primitives/RegText';
 import BoldText from '@ui/primitives/BoldText';
-import { ROW_DIVIDER } from './ServerRow';
 import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
 import { XIcon } from '@ui/primitives/Icons/XIcon';
 import { ChevronRight } from '@ui/primitives/Icons/Chevron';
@@ -28,12 +27,9 @@ export type LogLine = {
 
 const MONO: TextStyle = {
   fontFamily: 'monospace',
-  fontSize: 10.5,
+  fontSize: 12,
   lineHeight: 16,
 };
-const OK_TEXT = '#6FD35C';
-const WARN_TEXT = '#E6C46A';
-const PINK = '#F07A86';
 const STEP_MS = 160;
 
 const lineIn = (index: number) =>
@@ -63,11 +59,11 @@ const ServerLog: React.FC<ServerLogProps> = ({
   }
   const finalColor = (tone: LogTone) =>
     tone === 'ok'
-      ? OK_TEXT
+      ? colors.fgAccent
       : tone === 'warn'
-        ? WARN_TEXT
+        ? colors.fgWarning
         : tone === 'bad'
-          ? PINK
+          ? colors.fgDanger
           : tone === 'mut'
             ? colors.fgMuted
             : colors.fgDefault;
@@ -96,7 +92,7 @@ const ServerLog: React.FC<ServerLogProps> = ({
                   marginTop: i === 0 ? 0 : 7,
                   paddingTop: i === 0 ? 0 : 7,
                   borderTopWidth: i === 0 ? 0 : 1,
-                  borderTopColor: ROW_DIVIDER,
+                  borderTopColor: colors.borderSubtle,
                 }
               : { marginTop: i === 0 ? 0 : 2 }
           }
@@ -105,7 +101,7 @@ const ServerLog: React.FC<ServerLogProps> = ({
             <Text
               testID={`server.custom.log.final.${line.tone || 'plain'}`}
               style={{
-                fontSize: 11.5,
+                fontSize: 12,
                 lineHeight: 17,
                 fontWeight: line.tone === 'mut' ? '500' : '600',
                 color: finalColor(line.tone),
@@ -119,7 +115,7 @@ const ServerLog: React.FC<ServerLogProps> = ({
                   accessibilityRole="link"
                   onPress={() => onSwitch(line.switchTo!.chain)}
                   style={{
-                    fontSize: 11,
+                    fontSize: 12,
                     fontWeight: 'bold',
                     color: colors.fgAccent,
                   }}
@@ -139,9 +135,9 @@ const ServerLog: React.FC<ServerLogProps> = ({
                 }}
               >
                 {line.tone === 'ok' ? (
-                  <CheckIcon size={16} color={OK_TEXT} />
+                  <CheckIcon size={16} color={colors.fgAccent} />
                 ) : line.tone === 'bad' ? (
-                  <XIcon size={16} color={PINK} />
+                  <XIcon size={16} color={colors.fgDanger} />
                 ) : (
                   <RegText style={{ ...MONO, color: colors.fgMuted }}>
                     ·
@@ -153,7 +149,7 @@ const ServerLog: React.FC<ServerLogProps> = ({
                 style={{
                   ...MONO,
                   flex: 1,
-                  color: line.tone === 'bad' ? PINK : colors.fgMuted,
+                  color: line.tone === 'bad' ? colors.fgDanger : colors.fgMuted,
                 }}
               >
                 {line.text}
@@ -181,7 +177,7 @@ const ServerLog: React.FC<ServerLogProps> = ({
                 >
                   <ChevronRight size={16} color={colors.fgAccent} />
                 </View>
-                <BoldText style={{ fontSize: 11, color: colors.fgAccent }}>
+                <BoldText style={{ fontSize: 12, color: colors.fgAccent }}>
                   {detailsLabel}
                 </BoldText>
               </Pressable>

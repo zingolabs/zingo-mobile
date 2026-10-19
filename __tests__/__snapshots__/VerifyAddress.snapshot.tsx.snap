@@ -159,7 +159,7 @@ exports[`VerifyAddress - snapshot VerifyAddress initial (empty, no result) 1`] =
           accessibilityRole="button"
           accessibilityState={
             {
-              "busy": undefined,
+              "busy": false,
               "checked": undefined,
               "disabled": false,
               "expanded": undefined,
@@ -219,7 +219,7 @@ exports[`VerifyAddress - snapshot VerifyAddress initial (empty, no result) 1`] =
           accessibilityRole="button"
           accessibilityState={
             {
-              "busy": undefined,
+              "busy": false,
               "checked": undefined,
               "disabled": true,
               "expanded": undefined,
