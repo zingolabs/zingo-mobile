@@ -12,8 +12,6 @@ import { useTheme } from '@app/theme';
 import { ease } from '@app/theme/motion';
 import RegText from '@ui/primitives/RegText';
 
-const THUMB_BG = '#0A2A1A';
-const THUMB_BORDER = '#1E6B2A';
 const THUMB_MS = 260;
 const HEIGHT = 37;
 /** The thumb sits inside the container's 1 pt border on each side. */
@@ -90,9 +88,9 @@ function SegmentedSwitch<K extends string>({
               left: 1,
               width: segment,
               borderRadius: 999,
-              backgroundColor: THUMB_BG,
+              backgroundColor: colors.bgAccentSubtle,
               borderWidth: 1,
-              borderColor: THUMB_BORDER,
+              borderColor: colors.borderAccent,
             },
             thumbStyle,
           ]}

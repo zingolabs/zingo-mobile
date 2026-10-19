@@ -62,7 +62,7 @@ const TransparentWarning = ({
             }}
           >
             <TriangleAlert
-              size={12}
+              size={16}
               style={{ marginRight: 8 }}
               color={colors.fgWarning}
             />

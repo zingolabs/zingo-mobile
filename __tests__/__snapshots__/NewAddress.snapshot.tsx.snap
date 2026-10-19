@@ -68,10 +68,9 @@ exports[`NewAddress - snapshots NewAddress transparent kind 1`] = `
           placeholderTextColor="#888888"
           style={
             {
-              "backgroundColor": "transparent",
               "color": "#c3c3c3",
               "flex": 1,
-              "fontSize": 14,
+              "fontSize": 15,
               "fontWeight": "600",
               "marginLeft": 5,
               "minHeight": 48,
@@ -460,10 +459,9 @@ exports[`NewAddress - snapshots NewAddress unified kind 1`] = `
           placeholderTextColor="#888888"
           style={
             {
-              "backgroundColor": "transparent",
               "color": "#c3c3c3",
               "flex": 1,
-              "fontSize": 14,
+              "fontSize": 15,
               "fontWeight": "600",
               "marginLeft": 5,
               "minHeight": 48,
@@ -540,14 +538,13 @@ exports[`NewAddress - snapshots NewAddress unified kind 1`] = `
           style={
             {
               "alignItems": "center",
-              "backgroundColor": "#303d4f",
-              "borderColor": "#c3c3c3",
-              "borderRadius": 5,
+              "backgroundColor": "#031124",
+              "borderColor": "#05234C",
+              "borderRadius": 12,
               "borderWidth": 1,
               "flexDirection": "row",
               "flexGrow": 1,
               "justifyContent": "space-between",
-              "maxHeight": 48,
               "minHeight": 48,
               "minWidth": 48,
             }
@@ -557,7 +554,6 @@ exports[`NewAddress - snapshots NewAddress unified kind 1`] = `
             maxFontSizeMultiplier={2}
             style={
               {
-                "backgroundColor": "transparent",
                 "color": "#c3c3c3",
                 "fontSize": 15,
                 "fontWeight": "600",

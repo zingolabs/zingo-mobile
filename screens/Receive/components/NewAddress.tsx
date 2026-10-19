@@ -7,7 +7,7 @@ import {
   Pressable,
   TouchableOpacity,
 } from 'react-native';
-import { useTheme } from '@app/theme';
+import { useTheme, fieldMinHeight, radiusMd } from '@app/theme';
 
 import {
   AddressBookFileClass,
@@ -169,11 +169,10 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
               style={{
                 color: colors.fgDefault,
                 fontWeight: '600',
-                fontSize: 14,
+                fontSize: 15,
                 flex: 1,
                 minHeight: 48,
                 marginLeft: 5,
-                backgroundColor: 'transparent',
               }}
               placeholder={translate('addressbook.label-placeholder') as string}
               placeholderTextColor={colors.fgMuted}
@@ -217,12 +216,11 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
                     flexGrow: 1,
                     flexDirection: 'row',
                     borderWidth: 1,
-                    borderRadius: 5,
-                    borderColor: colors.fgDefault,
-                    backgroundColor: '#303d4f',
+                    borderRadius: radiusMd,
+                    borderColor: fieldBorder(colors, false),
+                    backgroundColor: colors.bgSurface,
                     minWidth: 48,
-                    minHeight: 48,
-                    maxHeight: 48,
+                    minHeight: fieldMinHeight,
                     justifyContent: 'space-between',
                     alignItems: 'center',
                   }}
@@ -232,7 +230,6 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
                       color: colors.fgDefault,
                       fontWeight: '600',
                       marginLeft: 20,
-                      backgroundColor: 'transparent',
                     }}
                   >
                     {type === AddressUnifiedTypeEnum.orchard

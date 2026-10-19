@@ -50,7 +50,7 @@ const ChainTypeToggle: React.FunctionComponent<ChainTypeToggleProps> = ({
               flex: 1,
               paddingVertical: 8,
               alignItems: 'center',
-              backgroundColor: selected ? colors.bgAccent : 'transparent',
+              backgroundColor: selected ? colors.bgAccent : undefined,
               borderRadius: 8,
               borderWidth: selected ? 1 : 0,
               borderColor: colors.borderAccent,

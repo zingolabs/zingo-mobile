@@ -114,14 +114,14 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                 }}
               >
                 <TriangleAlert
-                  color="#F79700"
+                  color={colors.fgWarning}
                   size={20}
                   style={{ marginRight: 10 }}
                 />
                 <Text
                   style={{
-                    color: '#F79700',
-                    fontSize: 14,
+                    color: colors.fgWarning,
+                    fontSize: 13,
                     flexShrink: 1,
                   }}
                 >
