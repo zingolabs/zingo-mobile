@@ -144,7 +144,7 @@ _Avoid_: primary, brand color
 **Danger**:
 The one red, for errors and destructive actions only, never decoration.
 Something that is not an error yet (funds confirming, a server that does
-not answer) is **Warning**, orange.
+not answer) is **Warning**, orange. A field shows it as `borderDanger`.
 _Avoid_: emphasis (`fgDangerEmphasis` and `fgWarningEmphasis` are gone:
 each status role has a single value)
 

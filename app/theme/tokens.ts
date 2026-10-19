@@ -5,6 +5,7 @@ export type ThemeColors = {
   bgSurface: string;
   bgChrome: string;
   bottomSheetBorder: string;
+  /** Fields: blue at rest and in focus, accent when valid, danger when not. */
   borderFocus: string;
   /** Hairline between rows inside a card. */
   borderSubtle: string;
@@ -39,6 +40,7 @@ export type ThemeColors = {
 
   /** Errors and destructive actions only, never decoration. */
   fgDanger: string;
+  borderDanger: string;
   bgDanger: string;
   bgDangerSubtle: string;
 
@@ -86,7 +88,7 @@ export const themeTokens: ThemeColors = {
   bgSurface: surface,
   bgChrome: surface,
   bottomSheetBorder: '#05234C',
-  borderFocus: accent,
+  borderFocus: '#0B3A75',
   borderSubtle: '#FFFFFF0F',
   sheetHandle: '#1B3C6B',
 
@@ -116,6 +118,7 @@ export const themeTokens: ThemeColors = {
   bgWarningSubtle: '#F99D001F',
 
   fgDanger: danger,
+  borderDanger: danger,
   bgDanger: danger,
   bgDangerSubtle: '#E5484D1F',
 

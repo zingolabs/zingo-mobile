@@ -41,6 +41,7 @@ const colors: ThemeColors = {
   bgWarningSubtle: '#F99D001F',
 
   fgDanger: '#E5484D',
+  borderDanger: '#E5484D',
   bgDanger: '#E5484D',
   bgDangerSubtle: '#E5484D1F',
 
