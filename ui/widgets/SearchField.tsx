@@ -7,9 +7,6 @@ import { SearchIcon } from '@ui/primitives/Icons/SearchIcon';
 import { XIcon } from '@ui/primitives/Icons/XIcon';
 import { fieldBorder } from '@ui/primitives/fieldBorder';
 
-const ICON_INK = '#7D93B3';
-const PLACEHOLDER = '#6B80A0';
-
 type SearchFieldProps = {
   value: string;
   onChangeText: (text: string) => void;
@@ -42,7 +39,7 @@ const SearchField: React.FunctionComponent<SearchFieldProps> = ({
         backgroundColor: colors.bgSurface,
       }}
     >
-      <SearchIcon size={16} color={ICON_INK} />
+      <SearchIcon size={16} color={colors.fgMuted} />
       <TextInput
         testID={testID}
         value={value}
@@ -50,7 +47,7 @@ const SearchField: React.FunctionComponent<SearchFieldProps> = ({
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
         placeholder={placeholder}
-        placeholderTextColor={PLACEHOLDER}
+        placeholderTextColor={colors.fgMuted}
         autoCapitalize="none"
         autoCorrect={false}
         spellCheck={false}
@@ -59,7 +56,7 @@ const SearchField: React.FunctionComponent<SearchFieldProps> = ({
           minWidth: 0,
           paddingVertical: 0,
           color: colors.fgDefault,
-          fontSize: 13.5,
+          fontSize: 15,
         }}
       />
       {value.length > 0 && (
@@ -70,7 +67,7 @@ const SearchField: React.FunctionComponent<SearchFieldProps> = ({
           hitSlop={8}
           onPress={() => onChangeText('')}
         >
-          <XIcon size={16} color={ICON_INK} />
+          <XIcon size={16} color={colors.fgMuted} />
         </Pressable>
       )}
     </View>

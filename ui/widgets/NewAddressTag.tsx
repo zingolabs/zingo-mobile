@@ -67,7 +67,7 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
         style={{
           marginTop: 4,
           textAlign: 'center',
-          fontSize: 15.5,
+          fontSize: 15,
           lineHeight: 21,
         }}
       >
@@ -102,8 +102,7 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
               padding: 10,
               color: colors.fgDefault,
               fontWeight: '600',
-              fontSize: 14,
-              backgroundColor: 'transparent',
+              fontSize: 15,
             }}
           />
           {!!label && (
@@ -134,7 +133,7 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
         <View style={[box, { padding: 10, minHeight: 58 }]}>
           <RegText
             testID="addresstag.address"
-            style={{ fontWeight: '600', fontSize: 14 }}
+            style={{ fontWeight: '600', fontSize: 15 }}
           >
             {address}
           </RegText>

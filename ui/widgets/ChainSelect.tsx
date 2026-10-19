@@ -184,7 +184,7 @@ const ChainSelect: React.FunctionComponent<ChainSelectProps> = ({
             flex: 1,
             color: colors.fgDefault,
             fontWeight: '600',
-            fontSize: 14,
+            fontSize: 15,
           }}
         >
           {chainDisplayName(value)}
@@ -301,10 +301,10 @@ const ChainSelect: React.FunctionComponent<ChainSelectProps> = ({
                     columnGap: 12,
                     opacity: pressed ? 0.6 : 1,
                     borderBottomWidth: 1.5,
-                    borderBottomColor: '#122033',
+                    borderBottomColor: colors.borderSubtle,
                   })}
                 >
-                  <ChainLogo chain={chain} size={35} />
+                  <ChainLogo chain={chain} size={36} />
                   <View style={{ flex: 1 }}>
                     <RegText
                       style={{

@@ -1,6 +1,7 @@
 import React from 'react';
 import Svg, { G, Path, Rect } from 'react-native-svg';
 import { strokeFor } from './Icon';
+import { themeTokens } from '@app/theme';
 
 type SproutIconProps = {
   size?: number;
@@ -12,7 +13,7 @@ type SproutIconProps = {
 export function SproutIcon({
   size = 16,
   color,
-  potColor = '#5A3A1E',
+  potColor = themeTokens.bgSproutPot,
 }: SproutIconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">

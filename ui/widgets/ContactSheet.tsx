@@ -23,9 +23,6 @@ const ZEC = 'ZEC';
 const NAME_MAX = 32;
 const CHECK_AT = 250;
 const ZNS_AT = 500;
-const OK_INK = '#7FD96E';
-const WARN_INK = '#E6C46A';
-const ERR_INK = '#F2878A';
 
 type Field = 'none' | 'name' | 'address';
 
@@ -191,7 +188,11 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
             text: translate(kindKey(trimmedAddress)) as string,
           }
         : { tone: 'none' };
-  const noteInk = { ok: OK_INK, warn: WARN_INK, err: ERR_INK };
+  const noteInk = {
+    ok: colors.fgAccent,
+    warn: colors.fgTransparent,
+    err: colors.fgDanger,
+  };
 
   const border = (field: Field, bad: boolean, good: boolean): string =>
     fieldBorder(
@@ -241,7 +242,7 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
         style={{
           marginTop: 4,
           textAlign: 'center',
-          fontSize: 15.5,
+          fontSize: 15,
           lineHeight: 21,
         }}
       >
@@ -283,8 +284,7 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
               padding: 10,
               color: colors.fgDefault,
               fontWeight: '600',
-              fontSize: 14,
-              backgroundColor: 'transparent',
+              fontSize: 15,
             }}
           />
           {!!name && (
@@ -348,8 +348,7 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
               textAlignVertical: 'top',
               color: colors.fgDefault,
               fontWeight: '600',
-              fontSize: 14,
-              backgroundColor: 'transparent',
+              fontSize: 15,
             }}
           />
           <View style={{ alignItems: 'center', paddingVertical: 6, gap: 6 }}>
@@ -362,7 +361,7 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
             >
               <ScanIcon
                 style={{ marginRight: 5 }}
-                size={28}
+                size={24}
                 color={colors.fgMuted}
               />
             </TouchableOpacity>
@@ -398,11 +397,13 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
             gap: 6,
           }}
         >
-          {note.tone === 'ok' && <CheckIcon size={16} color={OK_INK} />}
+          {note.tone === 'ok' && (
+            <CheckIcon size={16} color={colors.fgAccent} />
+          )}
           {note.tone !== 'none' && (
             <RegText
               color={noteInk[note.tone]}
-              style={{ flex: 1, fontSize: 11, lineHeight: 16 }}
+              style={{ flex: 1, fontSize: 12, lineHeight: 16 }}
             >
               {note.text}
             </RegText>
