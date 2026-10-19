@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { forwardRef, useCallback } from 'react';
-import { Pressable, View } from 'react-native';
+import { View } from 'react-native';
 import { radiusSheet, useTheme } from '@app/theme';
 import { ease } from '@app/theme/motion';
 import {
@@ -14,6 +14,7 @@ import { TranslateType, WalletType } from '@app/AppState';
 import BoldText from '@ui/primitives/BoldText';
 import RegText from '@ui/primitives/RegText';
 import SheetRim from '@ui/primitives/SheetRim';
+import Button from '@ui/primitives/Button';
 
 const SeedHandle: React.FC = () => {
   const { colors } = useTheme();
@@ -162,29 +163,12 @@ const SeedSheet = forwardRef<BottomSheetModal, SeedSheetProps>(
               {(wallet?.birthday ?? 0).toLocaleString()}
             </BoldText>
           </View>
-          <Pressable
+          <Button
+            variant="primary"
+            title={translate('seedsheet.done') as string}
             onPress={dismiss}
-            accessibilityRole="button"
-            style={({ pressed }) => ({
-              marginTop: 20,
-              height: 44,
-              borderRadius: 22,
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: colors.bgAccent,
-              transform: [{ scale: pressed ? 0.97 : 1 }],
-            })}
-          >
-            <RegText
-              style={{
-                color: colors.bgCanvas,
-                fontSize: 16,
-                fontWeight: '700',
-              }}
-            >
-              {translate('seedsheet.done') as string}
-            </RegText>
-          </Pressable>
+            style={{ marginTop: 20 }}
+          />
         </BottomSheetView>
       </BottomSheetModal>
     );

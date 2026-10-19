@@ -55,6 +55,7 @@ import ConfirmStep, { useWordCheck } from './components/ConfirmStep';
 import DoneStep from './components/DoneStep';
 import ScreenshotSheet from './components/ScreenshotSheet';
 import { SIDE, StepActions } from './components/StepParts';
+import Button from '@ui/primitives/Button';
 
 type SeedBackupProps = NativeStackScreenProps<AppDrawerParamList, 'SeedBackup'>;
 
@@ -469,34 +470,17 @@ ${translate('seedbackup.birthday') as string}: ${birthday}`;
             <View
               style={{
                 position: 'absolute',
-                left: 52,
-                right: 52,
+                left: SIDE,
+                right: SIDE,
                 bottom: insets.bottom + 28,
               }}
             >
-              <Pressable
+              <Button
                 testID="seedbackup.done"
-                accessibilityRole="button"
+                variant="primary"
+                title={translate('seedbackup.done') as string}
                 onPress={finish}
-                style={({ pressed }) => ({
-                  height: 44,
-                  borderRadius: 22,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  backgroundColor: colors.bgAccent,
-                  transform: [{ scale: pressed ? 0.97 : 1 }],
-                })}
-              >
-                <Animated.Text
-                  style={{
-                    color: colors.bgCanvas,
-                    fontSize: 15,
-                    fontWeight: '700',
-                  }}
-                >
-                  {translate('seedbackup.done') as string}
-                </Animated.Text>
-              </Pressable>
+              />
             </View>
           </>
         );

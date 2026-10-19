@@ -2,11 +2,10 @@
 import React from 'react';
 import { View } from 'react-native';
 import { space12 } from '@app/theme';
-import type { ButtonProps } from './Button';
 
 type ButtonStackProps = {
-  /** The secondary action first, the primary second. */
-  children: React.ReactElement<ButtonProps>[];
+  /** The secondary actions first, the primary last: it shows on top. */
+  children: React.ReactNode;
 };
 
 /**

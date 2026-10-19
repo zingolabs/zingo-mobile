@@ -17,6 +17,10 @@ import { useTheme } from '@app/theme';
 import { ease } from '@app/theme/motion';
 import BoldText from '@ui/primitives/BoldText';
 import RegText from '@ui/primitives/RegText';
+import Button from '@ui/primitives/Button';
+
+/** The side margin of the cards, which the Done button lines up with. */
+export const CARD_SIDE = 21.5;
 
 export const ROW_DIVIDER = '#0A1F3D';
 const RADIO_OFF = '#3A5070';
@@ -199,7 +203,7 @@ export const RowCard: React.FC<{ children: React.ReactNode }> = ({
   return (
     <View
       style={{
-        marginHorizontal: 21.5,
+        marginHorizontal: CARD_SIDE,
         borderRadius: 14,
         backgroundColor: colors.bgSurface,
         borderWidth: 1,
@@ -298,34 +302,23 @@ export const DoneButton: React.FC<{
   onPress: () => void;
   disabled: boolean;
   testID: string;
-}> = ({ title, onPress, disabled, testID }) => {
-  const { colors } = useTheme();
-  return (
-    <Pressable
+}> = ({ title, onPress, disabled, testID }) => (
+  <View
+    style={{
+      position: 'absolute',
+      bottom: 44,
+      left: CARD_SIDE,
+      right: CARD_SIDE,
+    }}
+  >
+    <Button
       testID={testID}
+      variant="primary"
+      title={title}
       onPress={onPress}
       disabled={disabled}
-      accessibilityRole="button"
-      style={({ pressed }) => ({
-        position: 'absolute',
-        bottom: 44,
-        alignSelf: 'center',
-        width: 270,
-        height: 44,
-        borderRadius: 22,
-        backgroundColor: colors.bgAccent,
-        alignItems: 'center',
-        justifyContent: 'center',
-        transform: [{ scale: pressed ? 0.97 : 1 }],
-      })}
-    >
-      <RegText
-        style={{ fontSize: 16, color: colors.bgCanvas, fontWeight: '700' }}
-      >
-        {title}
-      </RegText>
-    </Pressable>
-  );
-};
+    />
+  </View>
+);
 
 export default ServerRow;
