@@ -90,7 +90,7 @@ const SeedSheet = forwardRef<BottomSheetModal, SeedSheetProps>(
           }}
         >
           <BoldText
-            style={{ fontSize: 14.5, lineHeight: 20, textAlign: 'center' }}
+            style={{ fontSize: 15, lineHeight: 20, textAlign: 'center' }}
           >
             {
               translate(
@@ -117,10 +117,10 @@ const SeedSheet = forwardRef<BottomSheetModal, SeedSheetProps>(
                         borderColor: colors.bottomSheetBorder,
                       }}
                     >
-                      <RegText style={{ fontSize: 10, color: colors.fgMuted }}>
+                      <RegText style={{ fontSize: 12, color: colors.fgMuted }}>
                         {String(r * 3 + c + 1)}
                       </RegText>
-                      <RegText style={{ fontSize: 12.5 }} selectable={false}>
+                      <RegText style={{ fontSize: 13 }} selectable={false}>
                         {word}
                       </RegText>
                     </View>
@@ -139,7 +139,7 @@ const SeedSheet = forwardRef<BottomSheetModal, SeedSheetProps>(
                 borderColor: colors.bottomSheetBorder,
               }}
             >
-              <RegText style={{ fontSize: 12.5 }}>{wallet?.ufvk ?? ''}</RegText>
+              <RegText style={{ fontSize: 13 }}>{wallet?.ufvk ?? ''}</RegText>
             </View>
           )}
           <View
@@ -156,10 +156,10 @@ const SeedSheet = forwardRef<BottomSheetModal, SeedSheetProps>(
               paddingHorizontal: 15,
             }}
           >
-            <RegText style={{ fontSize: 11, color: colors.fgMuted }}>
+            <RegText style={{ fontSize: 12, color: colors.fgMuted }}>
               {translate('seedsheet.birthday') as string}
             </RegText>
-            <BoldText style={{ fontSize: 12.5 }}>
+            <BoldText style={{ fontSize: 13 }}>
               {(wallet?.birthday ?? 0).toLocaleString()}
             </BoldText>
           </View>

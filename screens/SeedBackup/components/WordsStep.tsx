@@ -17,7 +17,6 @@ import { ContextAppLoaded } from '@app/context';
 import { SIDE, StepTitle } from './StepParts';
 import { CopyShowButtons, InfoRow, VEIL_MS, WordGrid } from './SeedParts';
 
-const BOX_BORDER = '#1E4A80';
 // Length of the tick path below, in viewBox units.
 const TICK_LENGTH = 21.3;
 
@@ -151,7 +150,7 @@ const WordsStep: React.FunctionComponent<WordsStepProps> = ({
                   justifyContent: 'center',
                   backgroundColor: checked ? colors.bgAccent : colors.bgSurface,
                 },
-                { borderColor: checked ? colors.bgAccent : BOX_BORDER },
+                { borderColor: checked ? colors.bgAccent : colors.borderMuted },
               ]}
             >
               {checked && <DrawnTick color={colors.bgCanvas} />}

@@ -31,7 +31,7 @@ export const StepTitle: React.FunctionComponent<{
         {title}
       </Text>
       {!!sub && (
-        <Text style={{ color: colors.fgMuted, fontSize: 14, lineHeight: 20 }}>
+        <Text style={{ color: colors.fgMuted, fontSize: 15, lineHeight: 20 }}>
           {sub}
         </Text>
       )}
