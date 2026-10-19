@@ -36,6 +36,40 @@ module.exports = [
     },
   },
   {
+    // The color lock: a color is named by its token in app/theme, never by
+    // value. Files that still hold loose colors are listed in
+    // eslint.colorLock.js and leave the list as each screen migrates.
+    files: ['app/**', 'screens/**', 'ui/**'],
+    ignores: ['app/theme/**', '**/*.stories.tsx'],
+    rules: {
+      'react-native/no-color-literals': 'error',
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector:
+            'Literal[value=/^#([0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/]',
+          message: 'Use a color token from app/theme, not a hex value.',
+        },
+        {
+          selector: 'Literal[value=/^rgba?[(]/]',
+          message: 'Use a color token from app/theme, not an rgb value.',
+        },
+        {
+          selector:
+            'TemplateElement[value.raw=/#[0-9a-fA-F]{3,8}([^0-9a-zA-Z]|$)|rgba?[(]/]',
+          message: 'Use a color token from app/theme, not a color in a string.',
+        },
+      ],
+    },
+  },
+  {
+    files: require('./eslint.colorLock'),
+    rules: {
+      'react-native/no-color-literals': 'off',
+      'no-restricted-syntax': 'off',
+    },
+  },
+  {
     // TODO: Undo once this string-based approach gets removed
     files: ['app/uris/**', 'app/walletBackend/**'],
     ignores: ['app/uris/serverUris.ts'],
