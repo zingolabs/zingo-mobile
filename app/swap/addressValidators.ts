@@ -177,7 +177,7 @@ export function isValidChainAddress(chain: string, address: string): boolean {
 /**
  * Returns true for a valid NEAR account ID outside the implicit, `.near` and `.tg` forms.
  */
-export const nearAccountNeedsConfirm = (address: string) => {
+export function nearAccountNeedsConfirm(address: string): boolean {
   const trimmed = address.trim();
   return (
     isNear(trimmed) &&
@@ -185,7 +185,7 @@ export const nearAccountNeedsConfirm = (address: string) => {
     !trimmed.endsWith('.near') &&
     !trimmed.endsWith('.tg')
   );
-};
+}
 
 /**
  * Chains the address book / swap can offer AND validate: every chain we model a
