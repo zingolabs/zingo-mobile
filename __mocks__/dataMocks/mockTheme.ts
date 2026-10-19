@@ -46,6 +46,7 @@ const colors: ThemeColors = {
   bgDangerSubtle: '#E5484D1F',
 
   fgViewOnly: '#8FB4E6',
+  bgViewOnlySubtle: '#8FB4E61F',
 
   bgNym: '#07FF94',
 

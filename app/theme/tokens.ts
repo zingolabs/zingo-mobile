@@ -46,6 +46,7 @@ export type ThemeColors = {
 
   /** View-only (watch-only) wallet marks: the snowflake and its tiles. */
   fgViewOnly: string;
+  bgViewOnlySubtle: string;
 
   /** Nym's own green, only on actions that go through the mixnet. */
   bgNym: string;
@@ -123,6 +124,7 @@ export const themeTokens: ThemeColors = {
   bgDangerSubtle: '#E5484D1F',
 
   fgViewOnly: '#8FB4E6',
+  bgViewOnlySubtle: '#8FB4E61F',
 
   bgNym: '#07FF94',
 
