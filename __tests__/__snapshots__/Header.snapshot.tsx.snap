@@ -74,6 +74,14 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
               accessible={true}
               collapsable={false}
               focusable={true}
+              hitSlop={
+                {
+                  "bottom": 14,
+                  "left": 14,
+                  "right": 14,
+                  "top": 14,
+                }
+              }
               onClick={[Function]}
               onResponderGrant={[Function]}
               onResponderMove={[Function]}
@@ -205,6 +213,14 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
           accessible={true}
           collapsable={false}
           focusable={true}
+          hitSlop={
+            {
+              "bottom": 12,
+              "left": 12,
+              "right": 12,
+              "top": 12,
+            }
+          }
           onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
@@ -282,6 +298,14 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
           accessible={true}
           collapsable={false}
           focusable={true}
+          hitSlop={
+            {
+              "bottom": 10,
+              "left": 10,
+              "right": 10,
+              "top": 10,
+            }
+          }
           onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
@@ -499,6 +523,14 @@ exports[`Component Header - test Header Simple - snapshot 1`] = `
       accessible={true}
       collapsable={false}
       focusable={true}
+      hitSlop={
+        {
+          "bottom": 10,
+          "left": 10,
+          "right": 10,
+          "top": 10,
+        }
+      }
       onClick={[Function]}
       onResponderGrant={[Function]}
       onResponderMove={[Function]}

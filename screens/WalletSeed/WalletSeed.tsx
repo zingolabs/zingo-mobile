@@ -10,7 +10,7 @@ import { useIsFocused } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { useTheme } from '@app/theme';
+import { useTheme, slopFor } from '@app/theme';
 import { ease } from '@app/theme/motion';
 import { ContextAppLoaded } from '@app/context';
 import { Route, SnackbarDurationEnum } from '@app/AppState';
@@ -435,6 +435,7 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
               value={vkShort}
               trailing={
                 <Pressable
+                  hitSlop={slopFor(16)}
                   testID="walletseed.vk-copy"
                   accessibilityRole="button"
                   accessibilityLabel={translate('walletseed.vk-copy') as string}

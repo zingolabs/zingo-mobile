@@ -205,6 +205,14 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
         accessible={true}
         collapsable={false}
         focusable={true}
+        hitSlop={
+          {
+            "bottom": 10,
+            "left": 10,
+            "right": 10,
+            "top": 10,
+          }
+        }
         onClick={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
@@ -253,6 +261,14 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
         accessible={true}
         collapsable={false}
         focusable={true}
+        hitSlop={
+          {
+            "bottom": 10,
+            "left": 10,
+            "right": 10,
+            "top": 10,
+          }
+        }
         onClick={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
@@ -1107,6 +1123,14 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
         accessible={true}
         collapsable={false}
         focusable={false}
+        hitSlop={
+          {
+            "bottom": 10,
+            "left": 10,
+            "right": 10,
+            "top": 10,
+          }
+        }
         onClick={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
@@ -1155,6 +1179,14 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
         accessible={true}
         collapsable={false}
         focusable={true}
+        hitSlop={
+          {
+            "bottom": 10,
+            "left": 10,
+            "right": 10,
+            "top": 10,
+          }
+        }
         onClick={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
@@ -1734,6 +1766,14 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
             accessible={true}
             collapsable={false}
             focusable={true}
+            hitSlop={
+              {
+                "bottom": 10,
+                "left": 10,
+                "right": 10,
+                "top": 10,
+              }
+            }
             onClick={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}

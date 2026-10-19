@@ -4,7 +4,7 @@ import { View, ScrollView, TouchableOpacity, Text } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import { useNavigation } from '@react-navigation/native';
 import { WalletNavigation } from '@app/types';
-import { useTheme } from '@app/theme';
+import { useTheme, slopFor } from '@app/theme';
 
 import { ContextAppLoaded } from '@app/context';
 import { useResult } from '@app/navigation/results';
@@ -320,7 +320,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                   marginBottom: 5,
                 }}
               >
-                <TouchableOpacity onPress={doCopy}>
+                <TouchableOpacity hitSlop={slopFor(20)} onPress={doCopy}>
                   <View
                     style={{
                       borderRadius: 30,
@@ -340,7 +340,10 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                 </TouchableOpacity>
                 {address && (
                   <>
-                    <TouchableOpacity onPress={() => show('VA')}>
+                    <TouchableOpacity
+                      hitSlop={slopFor(20)}
+                      onPress={() => show('VA')}
+                    >
                       <View
                         style={{
                           borderRadius: 30,
@@ -358,7 +361,10 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                       </View>
                     </TouchableOpacity>
                     {total > 1 && (
-                      <TouchableOpacity onPress={doAddressList}>
+                      <TouchableOpacity
+                        hitSlop={slopFor(20)}
+                        onPress={doAddressList}
+                      >
                         <View
                           style={{
                             borderRadius: 30,

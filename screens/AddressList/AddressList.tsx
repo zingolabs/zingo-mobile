@@ -18,7 +18,7 @@ import {
 } from 'react-native';
 
 import { useScrollToTop } from '@react-navigation/native';
-import { useTheme } from '@app/theme';
+import { useTheme, slopFor } from '@app/theme';
 import {
   AddressKindEnum,
   TransparentAddressClass,
@@ -349,6 +349,7 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
       </AppSheet>
       {!isAtTop && (
         <Pressable
+          hitSlop={slopFor(16)}
           onPress={handleScrollToTop}
           disabled={isScrollingToTop}
           style={({ pressed }) => ({

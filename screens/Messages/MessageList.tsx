@@ -22,7 +22,7 @@ import Animated from 'react-native-reanimated';
 import { useOptionsPanelSheetSlide } from '@app/hooks/useOptionsPanelSheetSlide';
 
 import { useNavigation } from '@react-navigation/native';
-import { useTheme } from '@app/theme';
+import { useTheme, slopFor } from '@app/theme';
 import BottomSheet from '@gorhom/bottom-sheet';
 
 import { Route, ValueTransferType } from '@app/AppState';
@@ -344,6 +344,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = () => {
         </AppSheet>
         {!isAtBottom && !loading && (
           <Pressable
+            hitSlop={slopFor(16)}
             onPress={handleScrollToBottom}
             style={({ pressed }) => ({
               position: 'absolute',

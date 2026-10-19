@@ -7,7 +7,7 @@ import {
   Pressable,
   TouchableOpacity,
 } from 'react-native';
-import { useTheme, fieldMinHeight, radiusMd } from '@app/theme';
+import { useTheme, fieldMinHeight, radiusMd, slopFor } from '@app/theme';
 
 import {
   AddressBookFileClass,
@@ -181,7 +181,10 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
               maxLength={50}
             />
             {label && (
-              <TouchableOpacity onPress={() => setLabel('')}>
+              <TouchableOpacity
+                hitSlop={slopFor(20)}
+                onPress={() => setLabel('')}
+              >
                 <XIcon
                   style={{ marginRight: 10 }}
                   size={20}

@@ -2,7 +2,7 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { Keyboard, TextInput, TouchableOpacity, View } from 'react-native';
 
-import { useTheme } from '@app/theme';
+import { useTheme, slopFor } from '@app/theme';
 import { AddressBookFileClass, ChainNameEnum } from '@app/AppState';
 import { ContextAppLoaded } from '@app/context';
 import { openScanner } from '@app/navigation/navigate';
@@ -288,7 +288,7 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
             }}
           />
           {!!name && (
-            <TouchableOpacity onPress={() => setName('')}>
+            <TouchableOpacity hitSlop={slopFor(20)} onPress={() => setName('')}>
               <XIcon
                 style={{ marginRight: 10 }}
                 size={20}
@@ -367,6 +367,7 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
             </TouchableOpacity>
             {!!address && (
               <TouchableOpacity
+                hitSlop={slopFor(20)}
                 testID="addressbook.address-clear"
                 onPress={() => setAddress('')}
               >

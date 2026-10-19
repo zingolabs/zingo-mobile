@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useState } from 'react';
 import { View, TouchableOpacity, TextInput } from 'react-native';
-import { useTheme } from '@app/theme';
+import { useTheme, slopFor } from '@app/theme';
 import { ScanIcon } from '@ui/primitives/Icons/ScanIcon';
 
 import { ContextAppLoaded } from '@app/context';
@@ -166,6 +166,7 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
             >
               {!!address && !disabled && (
                 <TouchableOpacity
+                  hitSlop={slopFor(20)}
                   onPress={() => {
                     setAddress('');
                   }}

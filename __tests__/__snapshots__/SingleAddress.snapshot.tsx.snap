@@ -146,6 +146,14 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
             accessible={true}
             collapsable={false}
             focusable={true}
+            hitSlop={
+              {
+                "bottom": 12,
+                "left": 12,
+                "right": 12,
+                "top": 12,
+              }
+            }
             onClick={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
@@ -192,6 +200,14 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
             accessible={true}
             collapsable={false}
             focusable={true}
+            hitSlop={
+              {
+                "bottom": 12,
+                "left": 12,
+                "right": 12,
+                "top": 12,
+              }
+            }
             onClick={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
@@ -452,6 +468,14 @@ exports[`Component SingleAddress UFVK - test SingleAddress UFVK - snapshot 1`] =
             accessible={true}
             collapsable={false}
             focusable={true}
+            hitSlop={
+              {
+                "bottom": 12,
+                "left": 12,
+                "right": 12,
+                "top": 12,
+              }
+            }
             onClick={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}

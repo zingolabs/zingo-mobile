@@ -122,6 +122,14 @@ exports[`ValueTransferLine - snapshots ValueTransferLine failed transaction 1`] 
               accessible={true}
               collapsable={false}
               focusable={true}
+              hitSlop={
+                {
+                  "bottom": 10,
+                  "left": 10,
+                  "right": 10,
+                  "top": 10,
+                }
+              }
               onClick={[Function]}
               onResponderGrant={[Function]}
               onResponderMove={[Function]}
@@ -168,6 +176,14 @@ exports[`ValueTransferLine - snapshots ValueTransferLine failed transaction 1`] 
               accessible={true}
               collapsable={false}
               focusable={true}
+              hitSlop={
+                {
+                  "bottom": 10,
+                  "left": 10,
+                  "right": 10,
+                  "top": 10,
+                }
+              }
               onClick={[Function]}
               onResponderGrant={[Function]}
               onResponderMove={[Function]}
@@ -591,6 +607,14 @@ exports[`ValueTransferLine - snapshots ValueTransferLine pending (0 confirmation
               accessible={true}
               collapsable={false}
               focusable={true}
+              hitSlop={
+                {
+                  "bottom": 10,
+                  "left": 10,
+                  "right": 10,
+                  "top": 10,
+                }
+              }
               onClick={[Function]}
               onResponderGrant={[Function]}
               onResponderMove={[Function]}
@@ -637,6 +661,14 @@ exports[`ValueTransferLine - snapshots ValueTransferLine pending (0 confirmation
               accessible={true}
               collapsable={false}
               focusable={true}
+              hitSlop={
+                {
+                  "bottom": 10,
+                  "left": 10,
+                  "right": 10,
+                  "top": 10,
+                }
+              }
               onClick={[Function]}
               onResponderGrant={[Function]}
               onResponderMove={[Function]}
@@ -1007,6 +1039,14 @@ exports[`ValueTransferLine - snapshots ValueTransferLine received, no month head
               accessible={true}
               collapsable={false}
               focusable={true}
+              hitSlop={
+                {
+                  "bottom": 10,
+                  "left": 10,
+                  "right": 10,
+                  "top": 10,
+                }
+              }
               onClick={[Function]}
               onResponderGrant={[Function]}
               onResponderMove={[Function]}
@@ -1373,6 +1413,14 @@ exports[`ValueTransferLine - snapshots ValueTransferLine sent confirmed 1`] = `
               accessible={true}
               collapsable={false}
               focusable={true}
+              hitSlop={
+                {
+                  "bottom": 10,
+                  "left": 10,
+                  "right": 10,
+                  "top": 10,
+                }
+              }
               onClick={[Function]}
               onResponderGrant={[Function]}
               onResponderMove={[Function]}
@@ -1419,6 +1467,14 @@ exports[`ValueTransferLine - snapshots ValueTransferLine sent confirmed 1`] = `
               accessible={true}
               collapsable={false}
               focusable={true}
+              hitSlop={
+                {
+                  "bottom": 10,
+                  "left": 10,
+                  "right": 10,
+                  "top": 10,
+                }
+              }
               onClick={[Function]}
               onResponderGrant={[Function]}
               onResponderMove={[Function]}

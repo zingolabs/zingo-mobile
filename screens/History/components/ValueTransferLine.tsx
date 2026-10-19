@@ -3,7 +3,7 @@ import React, { useCallback, useContext, useEffect, useRef } from 'react';
 import { Animated, View, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { WalletNavigation } from '@app/types';
-import { useTheme } from '@app/theme';
+import { useTheme, slopFor } from '@app/theme';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 
 import ZecAmount from '@ui/widgets/ZecAmount';
@@ -139,6 +139,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
               }}
             >
               <TouchableOpacity
+                hitSlop={slopFor(24)}
                 style={{ zIndex: 999, padding: 20 }}
                 onPress={() => {
                   setValueTransferDetailModalShow(index, vt);
@@ -161,6 +162,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                 }}
               >
                 <TouchableOpacity
+                  hitSlop={slopFor(24)}
                   style={{ zIndex: 999, padding: 20 }}
                   onPress={() => {
                     // enviar

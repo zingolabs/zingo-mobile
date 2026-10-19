@@ -158,6 +158,14 @@ exports[`AddressItem - snapshots AddressItem known contact from address book wit
     accessible={true}
     collapsable={false}
     focusable={true}
+    hitSlop={
+      {
+        "bottom": 10,
+        "left": 10,
+        "right": 10,
+        "top": 10,
+      }
+    }
     onClick={[Function]}
     onResponderGrant={[Function]}
     onResponderMove={[Function]}
