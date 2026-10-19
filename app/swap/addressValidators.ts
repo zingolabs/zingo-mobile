@@ -54,6 +54,7 @@ const SOL_RE = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
 // `.testnet` names and deterministic `0s…` accounts fail.
 const NEAR_ACCOUNT_RE = /^(([a-z\d]+[-_])*[a-z\d]+\.)*([a-z\d]+[-_])*[a-z\d]+$/;
 const NEAR_DETERMINISTIC_RE = /^0s[0-9a-f]{40}$/;
+const NEAR_IMPLICIT_RE = /^[0-9a-f]{64}$/;
 
 // Tron: base58check starting with `T`. Total length 34 chars.
 const TRX_RE = /^T[1-9A-HJ-NP-Za-km-z]{33}$/;
@@ -172,6 +173,19 @@ export function isValidChainAddress(chain: string, address: string): boolean {
   if (!v) return true;
   return v(trimmed);
 }
+
+/**
+ * Returns true for a valid NEAR account ID outside the implicit, `.near` and `.tg` forms.
+ */
+export const nearAccountNeedsConfirm = (address: string) => {
+  const trimmed = address.trim();
+  return (
+    isNear(trimmed) &&
+    !NEAR_IMPLICIT_RE.test(trimmed) &&
+    !trimmed.endsWith('.near') &&
+    !trimmed.endsWith('.tg')
+  );
+};
 
 /**
  * Chains the address book / swap can offer AND validate: every chain we model a
