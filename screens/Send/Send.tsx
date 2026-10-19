@@ -485,7 +485,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
               setProposeSendLastError('');
             }
           }
-        } catch (e) {
+        } catch {
           // snack with error
           setProposeSendLastError(runPropose.value);
         }

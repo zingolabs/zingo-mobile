@@ -909,7 +909,7 @@ export class LoadingAppClass extends Component<
               transparentPool,
               actionButtonsDisabled: false,
             });
-          } catch (e) {
+          } catch {
             this.setState({
               readOnly,
               orchardPool,
@@ -1443,7 +1443,7 @@ export class LoadingAppClass extends Component<
               transparentPool,
               actionButtonsDisabled: false,
             });
-          } catch (e) {
+          } catch {
             this.setState({
               readOnly,
               orchardPool,

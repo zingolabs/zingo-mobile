@@ -286,7 +286,7 @@ export default class Utils {
     let resultJSON = {} as RPCParseAddressType;
     try {
       resultJSON = await JSON.parse(result.value);
-    } catch (e) {
+    } catch {
       return { isValid, shieldedOnlyUA };
     }
 
@@ -328,7 +328,7 @@ export default class Utils {
     let resultJSON = {} as RPCParseAddressType;
     try {
       resultJSON = await JSON.parse(result.value);
-    } catch (e) {
+    } catch {
       return false;
     }
 

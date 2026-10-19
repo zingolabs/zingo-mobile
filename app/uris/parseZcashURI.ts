@@ -141,7 +141,7 @@ const parseZcashURI = async (
           }
           target.memoString = decoded;
           target.memoBase64 = Base64.encode(target.memoString);
-        } catch (e) {
+        } catch {
           return err('uris.base64', value);
         }
         break;

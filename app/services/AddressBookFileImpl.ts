@@ -150,7 +150,7 @@ export default class AddressBookFileImpl {
         (await RNFS.readFile(fileName, GlobalConst.utf8)).toString(),
       );
       return addressBook;
-    } catch (err) {
+    } catch {
       // The File doesn't exist, so return nothing
       return [] as AddressBookFileClass[];
     }
@@ -168,7 +168,7 @@ export default class AddressBookFileImpl {
         GlobalConst.utf8,
       );
       return newAddressBook;
-    } catch (err) {
+    } catch {
       return [] as AddressBookFileClass[];
     }
   }
