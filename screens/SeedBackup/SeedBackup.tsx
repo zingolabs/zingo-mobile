@@ -22,7 +22,6 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withDelay,
-  withSequence,
   withTiming,
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -123,8 +122,8 @@ const ConfirmPage: React.FunctionComponent<{
           link={translate('seedbackup.view-phrase') as string}
           onLink={onViewPhrase}
           primary={translate('seedbackup.confirm') as string}
-          off={!check.value}
-          onPrimary={() => (check.value ? check.submit() : check.nudge())}
+          disabled={!check.value}
+          onPrimary={check.submit}
         />
       </View>
     </>
@@ -174,14 +173,12 @@ const SeedBackup: React.FunctionComponent<SeedBackupProps> = ({
   const [loading, setLoading] = useState(false);
   const [hidden, setHidden] = useState(true);
   const [checked, setChecked] = useState(false);
-  const [nudge, setNudge] = useState(0);
   const [attempt, setAttempt] = useState(0);
   const closing = useRef(false);
 
   const grow = useSharedValue(0);
   const content = useSharedValue(1);
   const whole = useSharedValue(1);
-  const savedShake = useSharedValue(0);
   const slide = useSharedValue(pushed ? window.width : 0);
 
   const measured = screen.width > 0;
@@ -328,19 +325,6 @@ const SeedBackup: React.FunctionComponent<SeedBackupProps> = ({
   }, []);
 
   const saved = () => {
-    if (!checked) {
-      savedShake.value = withSequence(
-        withTiming(-4, motion(60, ease.standard)),
-        withTiming(4, motion(120, ease.standard)),
-        withTiming(0, motion(60, ease.standard)),
-      );
-      setNudge(n => n + 1);
-      addLastSnackbar(
-        translate('seedbackup.check-first') as string,
-        SnackbarDurationEnum.short,
-      );
-      return;
-    }
     setAttempt(a => a + 1);
     go('confirm', 1);
   };
@@ -396,9 +380,6 @@ ${translate('seedbackup.birthday') as string}: ${birthday}`;
   const sliding = useAnimatedStyle(() => ({
     transform: [{ translateX: slide.value }],
   }));
-  const savedNudge = useAnimatedStyle(() => ({
-    transform: [{ translateX: savedShake.value }],
-  }));
 
   const bottom = Math.max(insets.bottom + 16, keyboard + 12);
 
@@ -414,7 +395,7 @@ ${translate('seedbackup.birthday') as string}: ${birthday}`;
                 link={translate('seedbackup.not-now') as string}
                 onLink={close}
                 primary={translate('seedbackup.continue') as string}
-                off={loading}
+                disabled={loading}
                 onPrimary={toWords}
               />
             </View>
@@ -433,7 +414,6 @@ ${translate('seedbackup.birthday') as string}: ${birthday}`;
                 onCopy={copy}
                 checked={checked}
                 onCheck={() => setChecked(c => !c)}
-                nudge={nudge}
               />
             )}
             <View style={{ position: 'absolute', left: 0, right: 0, bottom }}>
@@ -442,8 +422,7 @@ ${translate('seedbackup.birthday') as string}: ${birthday}`;
                 link={translate('seedbackup.back') as string}
                 onLink={() => go('info', -1)}
                 primary={translate('seedbackup.saved') as string}
-                off={!checked}
-                primaryStyle={savedNudge}
+                disabled={!checked}
                 onPrimary={saved}
               />
             </View>

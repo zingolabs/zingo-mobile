@@ -44,8 +44,8 @@ type StepActionsProps = {
   onLink: () => void;
   primary: string;
   onPrimary: () => void;
-  // Dimmed look while the step is incomplete; the press still lands.
-  off?: boolean;
+  /** Until the step is complete. */
+  disabled?: boolean;
   primaryStyle?: AnimatedStyle<ViewStyle>;
   testID: string;
 };
@@ -56,11 +56,10 @@ export const StepActions: React.FunctionComponent<StepActionsProps> = ({
   onLink,
   primary,
   onPrimary,
-  off,
+  disabled,
   primaryStyle,
   testID,
 }) => {
-  const { colors } = useTheme();
   return (
     <View style={{ paddingHorizontal: SIDE }}>
       <ButtonStack>
@@ -76,10 +75,7 @@ export const StepActions: React.FunctionComponent<StepActionsProps> = ({
             variant="primary"
             title={primary}
             onPress={onPrimary}
-            /** Dimmed, not disabled: the press still lands and nudges. */
-            style={
-              off ? { backgroundColor: colors.bgAccentDisabled } : undefined
-            }
+            disabled={disabled}
           />
         </Animated.View>
       </ButtonStack>

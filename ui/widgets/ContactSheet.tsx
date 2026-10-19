@@ -1,18 +1,10 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { Keyboard, TextInput, TouchableOpacity, View } from 'react-native';
-import Animated, {
-  ReduceMotion,
-  useAnimatedStyle,
-  useSharedValue,
-  withSequence,
-  withTiming,
-} from 'react-native-reanimated';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCheck, faXmark } from '@fortawesome/free-solid-svg-icons';
 
 import { useTheme } from '@app/theme';
-import { ease } from '@app/theme/motion';
 import { AddressBookFileClass, ChainNameEnum } from '@app/AppState';
 import { ContextAppLoaded } from '@app/context';
 import { openScanner } from '@app/navigation/navigate';
@@ -31,8 +23,6 @@ const ZEC = 'ZEC';
 const NAME_MAX = 32;
 const CHECK_AT = 250;
 const ZNS_AT = 500;
-const SHAKE_MS = 60;
-const SAVE_OFF = 0.4;
 const OK_INK = '#7FD96E';
 const WARN_INK = '#E6C46A';
 const ERR_INK = '#F2878A';
@@ -98,10 +88,6 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
   const [saving, setSaving] = useState(false);
   const [focus, setFocus] = useState<Field>('none');
   const [touched, setTouched] = useState(false);
-  const shake = useSharedValue(0);
-  const shakeStyle = useAnimatedStyle(() => ({
-    transform: [{ translateX: shake.value }],
-  }));
   const scanButton = useRef<View>(null);
 
   const alias = isZnsAlias(address);
@@ -215,17 +201,6 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
     );
 
   const save = async () => {
-    if (!ready) {
-      setTouched(true);
-      const step = (x: number) =>
-        withTiming(x, {
-          duration: SHAKE_MS,
-          easing: ease.standard,
-          reduceMotion: ReduceMotion.System,
-        });
-      shake.value = withSequence(step(-4), step(4), step(-4), step(0));
-      return;
-    }
     Keyboard.dismiss();
     setSaving(true);
     await onSave(trimmedName, trimmedAddress);
@@ -439,19 +414,16 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
         </View>
       </View>
 
-      <Animated.View style={shakeStyle}>
-        <Button
-          testID="addressbook.save"
-          variant="primary"
-          title={translate('save') as string}
-          disabled={saving}
-          onPress={save}
-          style={{
-            marginTop: 20,
-            opacity: ready ? 1 : SAVE_OFF,
-          }}
-        />
-      </Animated.View>
+      <Button
+        testID="addressbook.save"
+        variant="primary"
+        title={translate('save') as string}
+        disabled={saving || !ready}
+        onPress={save}
+        style={{
+          marginTop: 20,
+        }}
+      />
       <Button
         testID="addressbook.cancel"
         variant="quiet"

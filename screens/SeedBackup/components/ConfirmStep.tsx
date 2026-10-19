@@ -61,7 +61,6 @@ export type WordCheck = {
   status: Status;
   type: (text: string) => void;
   submit: () => void;
-  nudge: () => void;
   shake: SharedValue<number>;
   slideX: SharedValue<number>;
   slideOpacity: SharedValue<number>;
@@ -152,16 +151,6 @@ export const useWordCheck = (
     }, NEXT_MS);
   };
 
-  const nudge = () => {
-    const step = (x: number) =>
-      withTiming(x, {
-        duration: 80,
-        easing: ease.standard,
-        reduceMotion: ReduceMotion.System,
-      });
-    shake.value = withSequence(step(-4), step(4), step(0));
-  };
-
   return {
     position,
     letters,
@@ -170,7 +159,6 @@ export const useWordCheck = (
     status,
     type,
     submit,
-    nudge,
     shake,
     slideX,
     slideOpacity,

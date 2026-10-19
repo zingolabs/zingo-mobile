@@ -931,70 +931,66 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
         />
       </View>
       <View
-        style={{}}
+        accessibilityRole="button"
+        accessibilityState={
+          {
+            "busy": undefined,
+            "checked": undefined,
+            "disabled": true,
+            "expanded": undefined,
+            "selected": undefined,
+          }
+        }
+        accessibilityValue={
+          {
+            "max": undefined,
+            "min": undefined,
+            "now": undefined,
+            "text": undefined,
+          }
+        }
+        accessible={true}
+        collapsable={false}
+        focusable={false}
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          {
+            "alignItems": "center",
+            "alignSelf": "stretch",
+            "backgroundColor": "#5a8c5a",
+            "borderRadius": 999,
+            "justifyContent": "center",
+            "marginTop": 20,
+            "maxWidth": "100%",
+            "minHeight": 44,
+            "opacity": 1,
+            "paddingHorizontal": 24,
+            "paddingVertical": 8,
+            "width": "100%",
+          }
+        }
+        testID="addressbook.save"
       >
-        <View
-          accessibilityRole="button"
-          accessibilityState={
-            {
-              "busy": undefined,
-              "checked": undefined,
-              "disabled": false,
-              "expanded": undefined,
-              "selected": undefined,
-            }
-          }
-          accessibilityValue={
-            {
-              "max": undefined,
-              "min": undefined,
-              "now": undefined,
-              "text": undefined,
-            }
-          }
-          accessible={true}
-          collapsable={false}
-          focusable={true}
-          onClick={[Function]}
-          onResponderGrant={[Function]}
-          onResponderMove={[Function]}
-          onResponderRelease={[Function]}
-          onResponderTerminate={[Function]}
-          onResponderTerminationRequest={[Function]}
-          onStartShouldSetResponder={[Function]}
+        <Text
+          maxFontSizeMultiplier={1.5}
           style={
             {
-              "alignItems": "center",
-              "alignSelf": "stretch",
-              "backgroundColor": "#18bd18",
-              "borderRadius": 999,
-              "justifyContent": "center",
-              "marginTop": 20,
-              "maxWidth": "100%",
-              "minHeight": 44,
-              "opacity": 0.4,
-              "paddingHorizontal": 24,
-              "paddingVertical": 8,
-              "width": "100%",
+              "color": "#060B12",
+              "fontSize": 16,
+              "fontWeight": "700",
+              "lineHeight": 20,
+              "textAlign": "center",
             }
           }
-          testID="addressbook.save"
         >
-          <Text
-            maxFontSizeMultiplier={1.5}
-            style={
-              {
-                "color": "#060B12",
-                "fontSize": 16,
-                "fontWeight": "700",
-                "lineHeight": 20,
-                "textAlign": "center",
-              }
-            }
-          >
-            text translated
-          </Text>
-        </View>
+          text translated
+        </Text>
       </View>
       <View
         accessibilityRole="button"
