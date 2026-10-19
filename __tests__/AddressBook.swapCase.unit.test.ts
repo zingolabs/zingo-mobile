@@ -1,3 +1,7 @@
+jest.mock('@app/RPCModule', () =>
+  require('../__mocks__/rpcModuleProxy').rpcModuleProxyMock(),
+);
+
 import { ChainNameEnum } from '@app/AppState';
 import AddressBookFileImpl from '@app/services/AddressBookFileImpl';
 
