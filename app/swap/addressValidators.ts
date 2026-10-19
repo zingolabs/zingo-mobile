@@ -48,11 +48,13 @@ const BCH_CASHADDR_RE = /^(bitcoincash:)?[qp][ac-hj-np-z02-9]{40,42}$/;
 // Solana: base58 32–44 chars (encoded ed25519 pubkey).
 const SOL_RE = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
 
-// NEAR: either an implicit account (64 lowercase hex chars = encoded ed25519
-// pubkey) or a named account ending in `.near`. Named accounts allow
-// `a-z0-9_-` and `.` as a separator; we only accept mainnet (no `.testnet`).
-const NEAR_IMPLICIT_RE = /^[a-f0-9]{64}$/;
-const NEAR_NAMED_RE = /^([a-z0-9_-]+\.)+near$/;
+// NEAR: an account ID in the docs.near.org format, 2–64 characters of
+// lowercase letters and digits joined by `.`, `-` or `_`. Implicit,
+// Ethereum-like (`0x…`), top-level and sub-accounts all match. Mainnet only:
+// `.testnet` names and deterministic `0s…` accounts fail.
+const NEAR_ACCOUNT_RE = /^(([a-z\d]+[-_])*[a-z\d]+\.)*([a-z\d]+[-_])*[a-z\d]+$/;
+const NEAR_DETERMINISTIC_RE = /^0s[0-9a-f]{40}$/;
+const NEAR_IMPLICIT_RE = /^[0-9a-f]{64}$/;
 
 // Tron: base58check starting with `T`. Total length 34 chars.
 const TRX_RE = /^T[1-9A-HJ-NP-Za-km-z]{33}$/;
@@ -95,7 +97,11 @@ const isBch: Validator = a =>
   BCH_LEGACY_RE.test(a) || isUniformCase(a, BCH_CASHADDR_RE);
 const isSol: Validator = a => SOL_RE.test(a);
 const isNear: Validator = a =>
-  NEAR_IMPLICIT_RE.test(a) || NEAR_NAMED_RE.test(a);
+  a.length >= 2 &&
+  a.length <= 64 &&
+  NEAR_ACCOUNT_RE.test(a) &&
+  !NEAR_DETERMINISTIC_RE.test(a) &&
+  !a.endsWith('.testnet');
 const isTrx: Validator = a => TRX_RE.test(a);
 const isAtom: Validator = a => isUniformCase(a, ATOM_RE);
 const isXrp: Validator = a => XRP_RE.test(a);
@@ -132,7 +138,6 @@ const VALIDATORS: Readonly<Record<string, Validator>> = {
   DOGE: isDoge,
   DASH: isDash,
   // Account-model and account-prefix chains.
-  NEAR: isNear,
   TRX: isTrx,
   ATOM: isAtom,
   XRP: isXrp,
@@ -141,6 +146,10 @@ const VALIDATORS: Readonly<Record<string, Validator>> = {
   DOT: isDot,
   SUI: isSui,
   TON: isTon,
+  // NEAR's format also matches lowercase bech32 bodies such as a Cosmos
+  // `cosmos1…` or a Cardano `addr1v…`. NEAR sits after the prefix-specific
+  // chains and before SOL.
+  NEAR: isNear,
   // SOL is intentionally LAST. Its format ("any base58, 32–44 chars") is a
   // superset of several prefix-specific chains — a TRON `T…` (34 chars), an XRP
   // `r…`, a Byron `Ae2…`, etc. all also satisfy the SOL regex. Chain detection
@@ -163,6 +172,19 @@ export function isValidChainAddress(chain: string, address: string): boolean {
   const v = VALIDATORS[chain.toUpperCase()];
   if (!v) return true;
   return v(trimmed);
+}
+
+/**
+ * Returns true for a valid NEAR account ID outside the implicit, `.near` and `.tg` forms.
+ */
+export function nearAccountNeedsConfirm(address: string): boolean {
+  const trimmed = address.trim();
+  return (
+    isNear(trimmed) &&
+    !NEAR_IMPLICIT_RE.test(trimmed) &&
+    !trimmed.endsWith('.near') &&
+    !trimmed.endsWith('.tg')
+  );
 }
 
 /**
