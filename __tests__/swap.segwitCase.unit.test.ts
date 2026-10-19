@@ -1,4 +1,7 @@
-import { isValidChainAddress } from '@app/swap/addressValidators';
+import {
+  isValidChainAddress,
+  normalizeChainAddress,
+} from '@app/swap/addressValidators';
 import { extractPlainAddress } from '@app/swap/extractPlainAddress';
 
 const segwit = [
@@ -117,5 +120,46 @@ test.each([segwit[0], segwit[3]])(
     const unicode = address.toUpperCase().replace('K', '\u212a');
     expect(unicode).toContain('\u212a');
     expect(isValidChainAddress(chain, unicode)).toBe(false);
+  },
+);
+
+test.each([...segwit, ...otherBech32])(
+  'Tests that %s stores an address in lowercase when every letter is uppercase: %s',
+  (chain, address) => {
+    expect(normalizeChainAddress(chain, address.toUpperCase())).toBe(address);
+  },
+);
+
+test.each([...segwit, ...otherBech32])(
+  'Tests that %s stores an address as typed when every letter is lowercase: %s',
+  (chain, address) => {
+    expect(normalizeChainAddress(chain, address)).toBe(address);
+  },
+);
+
+test.each(segwit)(
+  'Tests that %s stores a SegWit address as typed when the letters have mixed case: %s',
+  (chain, address) => {
+    const mixed = address[0].toUpperCase() + address.slice(1);
+    expect(normalizeChainAddress(chain, mixed)).toBe(mixed);
+  },
+);
+
+test.each([segwit[0], segwit[3]])(
+  'Tests that %s stores a SegWit address as typed when a Kelvin sign replaces an ASCII letter: %s',
+  (chain, address) => {
+    const unicode = address.toUpperCase().replace('K', '\u212a');
+    expect(normalizeChainAddress(chain, unicode)).toBe(unicode);
+  },
+);
+
+test.each([
+  ['BTC', '1BoatSLRHtKNngkdXEeobR76b53LETtpyT'],
+  ['ETH', '0x52908400098527886E0F7030069857D2E4169EE7'],
+  ['XLM', 'GA5XIGA5C7QTPTWXQHY6MCJRMTRZDOSHR6EFIBNDQTCQHG262N4GGKTM'],
+])(
+  'Tests that %s stores an address as typed when the address is Base58, hex or base32: %s',
+  (chain, address) => {
+    expect(normalizeChainAddress(chain, address)).toBe(address);
   },
 );

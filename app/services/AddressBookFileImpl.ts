@@ -2,6 +2,7 @@ import * as RNFS from 'react-native-fs';
 
 import { isWalletAddress } from '@app/walletBackend';
 import Utils from '@app/utils';
+import { normalizeChainAddress } from '@app/swap';
 
 import {
   AddressBookFileClass,
@@ -49,7 +50,7 @@ export default class AddressBookFileImpl {
   // Write only one item
   static async writeAddressBookItem(
     label: string,
-    address: string,
+    typedAddress: string,
     color: string,
     own: boolean,
     // Default to a mainnet Zcash contact — the common case and what the
@@ -58,6 +59,7 @@ export default class AddressBookFileImpl {
     chain: ChainNameEnum = ChainNameEnum.mainChainName,
     swapChain: string = GlobalConst.zecSwapChain,
   ): Promise<AddressBookFileClass[]> {
+    const address = normalizeChainAddress(swapChain, typedAddress);
     const addressBook = await this.readAddressBook();
     if (
       addressBook.filter(

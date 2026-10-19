@@ -178,3 +178,21 @@ export const SWAP_ADDRESS_CHAINS: readonly string[] = [
   ...PRIORITY_CHAINS,
   ...Object.keys(VALIDATORS).filter(c => !PRIORITY_CHAINS.includes(c)),
 ];
+
+const BECH32_FORMATS: Readonly<Record<string, RegExp>> = {
+  BTC: BTC_BECH32_RE,
+  LTC: LTC_BECH32_RE,
+  BCH: BCH_CASHADDR_RE,
+  ATOM: ATOM_RE,
+  ADA: ADA_SHELLEY_RE,
+};
+
+/**
+ * Returns an uppercase bech32 or CashAddr address of the chain in lowercase,
+ * and any other address as typed.
+ */
+export function normalizeChainAddress(chain: string, address: string): string {
+  const format = BECH32_FORMATS[chain.toUpperCase()];
+  if (!format || !isUniformCase(address, format)) return address;
+  return address.toLowerCase();
+}
