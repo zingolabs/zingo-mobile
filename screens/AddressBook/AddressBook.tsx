@@ -543,6 +543,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
       {!pick && (
         <View
           style={{
+            paddingHorizontal: SIDE,
             paddingTop: 12,
             paddingBottom: insets.bottom + 16,
             alignItems: 'center',

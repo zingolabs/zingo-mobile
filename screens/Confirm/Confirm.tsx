@@ -245,6 +245,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
       <BottomSheetFooter {...props} bottomInset={0}>
         <View
           style={{
+            paddingHorizontal: 16,
             backgroundColor: colors.bgSurface,
             paddingTop: 10,
             paddingBottom: 24,

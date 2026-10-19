@@ -556,6 +556,7 @@ const ValueTransferDetail: React.FunctionComponent<
                 <>
                   <View
                     style={{
+                      paddingHorizontal: 16,
                       flexGrow: 1,
                       flexDirection: 'row',
                       justifyContent: 'center',

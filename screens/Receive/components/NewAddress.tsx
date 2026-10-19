@@ -262,6 +262,7 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
             alignItems: 'center',
             marginVertical: 5,
             marginTop: 15,
+            paddingHorizontal: 10,
           }}
         >
           <ButtonRow>

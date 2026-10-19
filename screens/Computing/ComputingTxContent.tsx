@@ -83,6 +83,7 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
       <BottomSheetFooter {...props} bottomInset={0}>
         <View
           style={{
+            paddingHorizontal: 24,
             backgroundColor: colors.bgSurface,
             paddingTop: 10,
             paddingBottom: 24,

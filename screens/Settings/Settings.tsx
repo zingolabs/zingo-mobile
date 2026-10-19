@@ -571,6 +571,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
       <BottomSheetFooter {...props} bottomInset={0}>
         <View
           style={{
+            paddingHorizontal: 25,
             backgroundColor: colors.bgSurface,
             paddingTop: 10,
             paddingBottom: 24,

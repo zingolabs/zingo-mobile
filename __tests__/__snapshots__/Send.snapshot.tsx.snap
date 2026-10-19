@@ -1230,6 +1230,7 @@ exports[`Component Send - test Send privacy high - snapshot 1`] = `
                     "flexGrow": 1,
                     "justifyContent": "center",
                     "marginBottom": 20,
+                    "paddingHorizontal": 16,
                   }
                 }
               >
@@ -3031,6 +3032,7 @@ exports[`Component Send - test Send privacy normal - snapshot 1`] = `
                     "flexGrow": 1,
                     "justifyContent": "center",
                     "marginBottom": 20,
+                    "paddingHorizontal": 16,
                   }
                 }
               >
