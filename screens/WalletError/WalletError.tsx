@@ -200,7 +200,7 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
   const dotColor = resolved
     ? colors.fgAccent
     : !netInfo.isConnected || kind === 'server'
-      ? colors.fgDangerEmphasis
+      ? colors.fgDanger
       : offline
         ? colors.fgMuted
         : colors.fgAccent;
@@ -420,7 +420,7 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
                 width: BADGE,
                 height: BADGE,
                 borderRadius: BADGE / 2,
-                backgroundColor: colors.fgDangerEmphasis,
+                backgroundColor: colors.fgDanger,
                 borderWidth: 2,
                 borderColor: colors.bgCanvas,
                 alignItems: 'center',

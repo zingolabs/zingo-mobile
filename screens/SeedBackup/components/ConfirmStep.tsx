@@ -229,7 +229,7 @@ const Slot: React.FunctionComponent<{ letter: string; tone: SlotTone }> = ({
     tone === 'ok' || tone === 'cur'
       ? colors.fgAccent
       : tone === 'err'
-        ? colors.fgDangerEmphasis
+        ? colors.fgDanger
         : tone === 'fill'
           ? DASH_FILL
           : DASH_EMPTY;
@@ -292,7 +292,7 @@ const ConfirmStep: React.FunctionComponent<{ check: WordCheck }> = ({
     check.status === 'ok'
       ? colors.fgAccent
       : check.status === 'err'
-        ? colors.fgDangerEmphasis
+        ? colors.fgDanger
         : focused
           ? colors.borderFocus
           : colors.bottomSheetBorder;

@@ -380,7 +380,7 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
   const pulseStyle = useAnimatedStyle(() => ({ opacity: flash.value }));
 
   const borderColor = fieldError
-    ? colors.fgDangerEmphasis
+    ? colors.fgDanger
     : complete
       ? colors.borderAccent
       : focused

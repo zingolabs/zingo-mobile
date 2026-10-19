@@ -155,7 +155,7 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
             backgroundColor:
               vt.kind === ValueTransferKindEnum.Received
                 ? colors.bgAccentDisabled
-                : colors.bgSecondaryDisabled,
+                : colors.bgAccentSubtle,
             opacity: vt.status === RPCValueTransfersStatusEnum.failed ? 0.5 : 1,
           }}
         >
@@ -239,7 +239,7 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
             {vt.status === RPCValueTransfersStatusEnum.failed && (
               <FadeText
                 style={{
-                  color: colors.fgDangerEmphasis,
+                  color: colors.fgDanger,
                   alignSelf: 'center',
                   fontSize: 12,
                   opacity: 1,
@@ -295,7 +295,7 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
                     style={{ marginLeft: 5, marginRight: 1, marginTop: 2 }}
                     size={12}
                     icon={faCircleXmark}
-                    color={colors.fgDangerEmphasis}
+                    color={colors.fgDanger}
                   />
                 )}
                 {(vt.status === RPCValueTransfersStatusEnum.calculated ||

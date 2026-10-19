@@ -76,7 +76,7 @@ export const Latency: React.FC<LatencyProps> = ({ ms, notResponding }) => {
   }
   const bad = ms === null;
   const dot = bad
-    ? colors.fgDangerEmphasis
+    ? colors.fgDanger
     : ms < FAST_MS
       ? colors.fgAccent
       : colors.fgMuted;

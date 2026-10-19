@@ -385,7 +385,7 @@ exports[`MessageLine - snapshots MessageLine sent with memo, month header 1`] = 
       style={
         {
           "alignItems": "flex-start",
-          "backgroundColor": "#233623",
+          "backgroundColor": "#18bd181F",
           "borderBottomEndRadius": 0,
           "borderBottomStartRadius": 20,
           "borderRadius": 20,
