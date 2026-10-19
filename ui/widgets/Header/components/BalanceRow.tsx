@@ -236,7 +236,7 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
               <ZecAmount
                 currencyName={info.currencyName}
                 color={colors.fgAccent}
-                size={14}
+                size={13}
                 amtZec={
                   totalBalance.totalIronwoodBalance +
                   totalBalance.totalOrchardBalance +
@@ -280,15 +280,15 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
                   style={{ alignItems: 'center' }}
                   testID="header.shield-blocked"
                 >
-                  <FadeText style={{ fontSize: 8 }}>
+                  <FadeText style={{ fontSize: 12 }}>
                     {translate('send.nym-blocked') as string}
                   </FadeText>
-                  <FadeText style={{ fontSize: 8 }}>
+                  <FadeText style={{ fontSize: 12 }}>
                     {translate(shownStatusKey(mixnetView)) as string}
                   </FadeText>
                 </View>
               ) : (
-                <FadeText style={{ fontSize: 8 }}>
+                <FadeText style={{ fontSize: 12 }}>
                   {(translate(
                     `history.shield-legend-${calculatePoolsToShield()}`,
                   ) as string) +

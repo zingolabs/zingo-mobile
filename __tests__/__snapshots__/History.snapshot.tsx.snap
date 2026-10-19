@@ -448,7 +448,7 @@ exports[`Component History - test History privacy high - snapshot 1`] = `
           style={
             [
               {
-                "borderRadius": 14,
+                "borderRadius": 12,
                 "left": 0,
                 "overflow": "hidden",
                 "position": "absolute",
@@ -471,139 +471,173 @@ exports[`Component History - test History privacy high - snapshot 1`] = `
                 <View
                   style={
                     {
-                      "alignItems": "center",
-                      "backgroundColor": "#031124",
-                      "borderColor": "#05234C",
-                      "borderRadius": 14,
+                      "backgroundColor": "#262527",
+                      "borderColor": "#65491C",
+                      "borderRadius": 12,
                       "borderWidth": 1,
-                      "flexDirection": "row",
-                      "justifyContent": "space-between",
-                      "paddingHorizontal": 16,
-                      "paddingVertical": 14,
+                      "padding": 16,
                     }
                   }
                 >
                   <View
                     style={
-                      {
-                        "flex": 1,
-                        "marginRight": 12,
-                      }
+                      [
+                        {
+                          "flexDirection": "row",
+                          "gap": 12,
+                        },
+                        undefined,
+                      ]
                     }
                   >
                     <View
                       style={
                         {
                           "alignItems": "center",
-                          "flexDirection": "row",
-                          "marginBottom": 6,
+                          "backgroundColor": "#F99D001F",
+                          "borderRadius": 8,
+                          "height": 36,
+                          "justifyContent": "center",
+                          "width": 36,
+                        }
+                      }
+                    />
+                    <View
+                      style={
+                        {
+                          "flex": 1,
+                          "gap": 4,
                         }
                       }
                     >
                       <View
                         style={
                           {
-                            "backgroundColor": "#F99D00",
-                            "borderRadius": 5,
-                            "height": 9,
-                            "marginRight": 8,
-                            "width": 9,
+                            "alignItems": "center",
+                            "flexDirection": "row",
+                            "flexWrap": "wrap",
+                            "gap": 4,
                           }
                         }
-                      />
+                      >
+                        <Text
+                          maxFontSizeMultiplier={2}
+                          style={
+                            {
+                              "color": "#c3c3c3",
+                              "fontSize": 15,
+                              "fontWeight": "600",
+                              "lineHeight": 21,
+                            }
+                          }
+                        >
+                          text translated
+                        </Text>
+                      </View>
                       <Text
+                        maxFontSizeMultiplier={2}
                         style={
                           {
-                            "color": "#c3c3c3",
-                            "flexShrink": 1,
-                            "fontSize": 15,
-                            "fontWeight": "700",
+                            "color": "#888888",
+                            "fontSize": 13,
+                            "fontWeight": "400",
+                            "lineHeight": 18,
                           }
                         }
                       >
                         text translated
+                         
+                        <Text
+                          maxFontSizeMultiplier={2}
+                          style={
+                            {
+                              "color": "#c3c3c3",
+                              "fontSize": 13,
+                              "fontWeight": "700",
+                              "lineHeight": 18,
+                            }
+                          }
+                        >
+                          -.----
+                        </Text>
+                         
+                        ZEC
                       </Text>
-                    </View>
-                    <Text
-                      style={
-                        {
-                          "color": "#888888",
-                          "fontSize": 13,
-                        }
-                      }
-                    >
-                      text translated
-                       
-                      <Text
+                      <View
                         style={
                           {
-                            "color": "#c3c3c3",
-                            "fontWeight": "700",
+                            "marginTop": 4,
                           }
                         }
                       >
-                        -.----
-                      </Text>
-                       
-                      ZEC
-                    </Text>
-                  </View>
-                  <View
-                    accessibilityState={
-                      {
-                        "busy": undefined,
-                        "checked": undefined,
-                        "disabled": undefined,
-                        "expanded": undefined,
-                        "selected": undefined,
-                      }
-                    }
-                    accessibilityValue={
-                      {
-                        "max": undefined,
-                        "min": undefined,
-                        "now": undefined,
-                        "text": undefined,
-                      }
-                    }
-                    accessible={true}
-                    collapsable={false}
-                    focusable={true}
-                    onBlur={[Function]}
-                    onClick={[Function]}
-                    onFocus={[Function]}
-                    onResponderGrant={[Function]}
-                    onResponderMove={[Function]}
-                    onResponderRelease={[Function]}
-                    onResponderTerminate={[Function]}
-                    onResponderTerminationRequest={[Function]}
-                    onStartShouldSetResponder={[Function]}
-                    testID="ironwoodbanner.start"
-                  >
-                    <View
-                      style={
-                        [
-                          {
-                            "backgroundColor": "#18bd18",
-                            "borderRadius": 24,
-                            "paddingHorizontal": 22,
-                            "paddingVertical": 10,
-                          },
-                          {},
-                        ]
-                      }
-                    >
-                      <Text
-                        style={
-                          {
-                            "color": "#011401",
-                            "fontSize": 15,
-                            "fontWeight": "700",
+                        <View
+                          accessibilityRole="button"
+                          accessibilityState={
+                            {
+                              "busy": undefined,
+                              "checked": undefined,
+                              "disabled": false,
+                              "expanded": undefined,
+                              "selected": undefined,
+                            }
                           }
-                        }
-                      >
-                        text translated
-                      </Text>
+                          accessibilityValue={
+                            {
+                              "max": undefined,
+                              "min": undefined,
+                              "now": undefined,
+                              "text": undefined,
+                            }
+                          }
+                          accessible={true}
+                          collapsable={false}
+                          focusable={true}
+                          hitSlop={
+                            {
+                              "bottom": 6,
+                              "top": 6,
+                            }
+                          }
+                          onClick={[Function]}
+                          onResponderGrant={[Function]}
+                          onResponderMove={[Function]}
+                          onResponderRelease={[Function]}
+                          onResponderTerminate={[Function]}
+                          onResponderTerminationRequest={[Function]}
+                          onStartShouldSetResponder={[Function]}
+                          style={
+                            {
+                              "alignItems": "center",
+                              "alignSelf": "stretch",
+                              "backgroundColor": "#18bd18",
+                              "borderRadius": 999,
+                              "justifyContent": "center",
+                              "maxWidth": "100%",
+                              "minHeight": 32,
+                              "opacity": 1,
+                              "paddingHorizontal": 24,
+                              "paddingVertical": 0,
+                              "width": "100%",
+                            }
+                          }
+                          testID="ironwoodbanner.start"
+                        >
+                          <Text
+                            maxFontSizeMultiplier={1.5}
+                            style={
+                              {
+                                "color": "#060B12",
+                                "fontSize": 13,
+                                "fontWeight": "700",
+                                "lineHeight": 18,
+                                "textAlign": "center",
+                              }
+                            }
+                          >
+                            text translated
+                          </Text>
+                        </View>
+                      </View>
                     </View>
                   </View>
                 </View>
@@ -617,7 +651,7 @@ exports[`Component History - test History privacy high - snapshot 1`] = `
                 {
                   "backgroundColor": "#031124",
                   "borderColor": "#05234C",
-                  "borderRadius": 14,
+                  "borderRadius": 12,
                   "borderWidth": 1,
                   "bottom": 0,
                   "left": 0,
@@ -1455,7 +1489,7 @@ exports[`Component History - test History privacy normal - snapshot 1`] = `
           style={
             [
               {
-                "borderRadius": 14,
+                "borderRadius": 12,
                 "left": 0,
                 "overflow": "hidden",
                 "position": "absolute",
@@ -1478,139 +1512,173 @@ exports[`Component History - test History privacy normal - snapshot 1`] = `
                 <View
                   style={
                     {
-                      "alignItems": "center",
-                      "backgroundColor": "#031124",
-                      "borderColor": "#05234C",
-                      "borderRadius": 14,
+                      "backgroundColor": "#262527",
+                      "borderColor": "#65491C",
+                      "borderRadius": 12,
                       "borderWidth": 1,
-                      "flexDirection": "row",
-                      "justifyContent": "space-between",
-                      "paddingHorizontal": 16,
-                      "paddingVertical": 14,
+                      "padding": 16,
                     }
                   }
                 >
                   <View
                     style={
-                      {
-                        "flex": 1,
-                        "marginRight": 12,
-                      }
+                      [
+                        {
+                          "flexDirection": "row",
+                          "gap": 12,
+                        },
+                        undefined,
+                      ]
                     }
                   >
                     <View
                       style={
                         {
                           "alignItems": "center",
-                          "flexDirection": "row",
-                          "marginBottom": 6,
+                          "backgroundColor": "#F99D001F",
+                          "borderRadius": 8,
+                          "height": 36,
+                          "justifyContent": "center",
+                          "width": 36,
+                        }
+                      }
+                    />
+                    <View
+                      style={
+                        {
+                          "flex": 1,
+                          "gap": 4,
                         }
                       }
                     >
                       <View
                         style={
                           {
-                            "backgroundColor": "#F99D00",
-                            "borderRadius": 5,
-                            "height": 9,
-                            "marginRight": 8,
-                            "width": 9,
+                            "alignItems": "center",
+                            "flexDirection": "row",
+                            "flexWrap": "wrap",
+                            "gap": 4,
                           }
                         }
-                      />
+                      >
+                        <Text
+                          maxFontSizeMultiplier={2}
+                          style={
+                            {
+                              "color": "#c3c3c3",
+                              "fontSize": 15,
+                              "fontWeight": "600",
+                              "lineHeight": 21,
+                            }
+                          }
+                        >
+                          text translated
+                        </Text>
+                      </View>
                       <Text
+                        maxFontSizeMultiplier={2}
                         style={
                           {
-                            "color": "#c3c3c3",
-                            "flexShrink": 1,
-                            "fontSize": 15,
-                            "fontWeight": "700",
+                            "color": "#888888",
+                            "fontSize": 13,
+                            "fontWeight": "400",
+                            "lineHeight": 18,
                           }
                         }
                       >
                         text translated
+                         
+                        <Text
+                          maxFontSizeMultiplier={2}
+                          style={
+                            {
+                              "color": "#c3c3c3",
+                              "fontSize": 13,
+                              "fontWeight": "700",
+                              "lineHeight": 18,
+                            }
+                          }
+                        >
+                          0.6000
+                        </Text>
+                         
+                        ZEC
                       </Text>
-                    </View>
-                    <Text
-                      style={
-                        {
-                          "color": "#888888",
-                          "fontSize": 13,
-                        }
-                      }
-                    >
-                      text translated
-                       
-                      <Text
+                      <View
                         style={
                           {
-                            "color": "#c3c3c3",
-                            "fontWeight": "700",
+                            "marginTop": 4,
                           }
                         }
                       >
-                        0.6000
-                      </Text>
-                       
-                      ZEC
-                    </Text>
-                  </View>
-                  <View
-                    accessibilityState={
-                      {
-                        "busy": undefined,
-                        "checked": undefined,
-                        "disabled": undefined,
-                        "expanded": undefined,
-                        "selected": undefined,
-                      }
-                    }
-                    accessibilityValue={
-                      {
-                        "max": undefined,
-                        "min": undefined,
-                        "now": undefined,
-                        "text": undefined,
-                      }
-                    }
-                    accessible={true}
-                    collapsable={false}
-                    focusable={true}
-                    onBlur={[Function]}
-                    onClick={[Function]}
-                    onFocus={[Function]}
-                    onResponderGrant={[Function]}
-                    onResponderMove={[Function]}
-                    onResponderRelease={[Function]}
-                    onResponderTerminate={[Function]}
-                    onResponderTerminationRequest={[Function]}
-                    onStartShouldSetResponder={[Function]}
-                    testID="ironwoodbanner.start"
-                  >
-                    <View
-                      style={
-                        [
-                          {
-                            "backgroundColor": "#18bd18",
-                            "borderRadius": 24,
-                            "paddingHorizontal": 22,
-                            "paddingVertical": 10,
-                          },
-                          {},
-                        ]
-                      }
-                    >
-                      <Text
-                        style={
-                          {
-                            "color": "#011401",
-                            "fontSize": 15,
-                            "fontWeight": "700",
+                        <View
+                          accessibilityRole="button"
+                          accessibilityState={
+                            {
+                              "busy": undefined,
+                              "checked": undefined,
+                              "disabled": false,
+                              "expanded": undefined,
+                              "selected": undefined,
+                            }
                           }
-                        }
-                      >
-                        text translated
-                      </Text>
+                          accessibilityValue={
+                            {
+                              "max": undefined,
+                              "min": undefined,
+                              "now": undefined,
+                              "text": undefined,
+                            }
+                          }
+                          accessible={true}
+                          collapsable={false}
+                          focusable={true}
+                          hitSlop={
+                            {
+                              "bottom": 6,
+                              "top": 6,
+                            }
+                          }
+                          onClick={[Function]}
+                          onResponderGrant={[Function]}
+                          onResponderMove={[Function]}
+                          onResponderRelease={[Function]}
+                          onResponderTerminate={[Function]}
+                          onResponderTerminationRequest={[Function]}
+                          onStartShouldSetResponder={[Function]}
+                          style={
+                            {
+                              "alignItems": "center",
+                              "alignSelf": "stretch",
+                              "backgroundColor": "#18bd18",
+                              "borderRadius": 999,
+                              "justifyContent": "center",
+                              "maxWidth": "100%",
+                              "minHeight": 32,
+                              "opacity": 1,
+                              "paddingHorizontal": 24,
+                              "paddingVertical": 0,
+                              "width": "100%",
+                            }
+                          }
+                          testID="ironwoodbanner.start"
+                        >
+                          <Text
+                            maxFontSizeMultiplier={1.5}
+                            style={
+                              {
+                                "color": "#060B12",
+                                "fontSize": 13,
+                                "fontWeight": "700",
+                                "lineHeight": 18,
+                                "textAlign": "center",
+                              }
+                            }
+                          >
+                            text translated
+                          </Text>
+                        </View>
+                      </View>
                     </View>
                   </View>
                 </View>
@@ -1624,7 +1692,7 @@ exports[`Component History - test History privacy normal - snapshot 1`] = `
                 {
                   "backgroundColor": "#031124",
                   "borderColor": "#05234C",
-                  "borderRadius": 14,
+                  "borderRadius": 12,
                   "borderWidth": 1,
                   "bottom": 0,
                   "left": 0,

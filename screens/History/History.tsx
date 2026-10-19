@@ -933,11 +933,8 @@ const History: React.FunctionComponent<HistoryProps> = () => {
               borderRadius: 50,
               transform: [{ scale: pressed ? 0.9 : 1 }],
               opacity: isScrollingToTop ? 0.5 : 1,
-              shadowColor: '#000',
-              shadowOffset: { width: 0, height: 3 },
-              shadowOpacity: 0.8,
-              shadowRadius: 14,
-              elevation: 9,
+              borderWidth: 1,
+              borderColor: colors.bottomSheetBorder,
             })}
           >
             <RingBorder size={36} />

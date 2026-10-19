@@ -8,7 +8,7 @@ import {
   useRoute,
 } from '@react-navigation/native';
 import { WalletNavigation } from '@app/types';
-import { useTheme } from '@app/theme';
+import { useTheme, iconSize } from '@app/theme';
 import React, { useContext, useEffect, useRef } from 'react';
 import { Image, TouchableOpacity, View } from 'react-native';
 import Animated, {
@@ -326,7 +326,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                   onPress={ufvkShowModal}
                 >
                   <Animated.View ref={snowflake} style={snowStyle}>
-                    <SnowflakeIcon size={22} color={colors.fgViewOnly} />
+                    <SnowflakeIcon size={iconSize} color={colors.fgViewOnly} />
                   </Animated.View>
                 </TouchableOpacity>
               </Animated.View>
@@ -363,7 +363,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                 testID="header.messages"
                 onPress={() => navigation.navigate(Route.Messages)}
               >
-                <MessagesIcon size={22} color="#B1BBC5" />
+                <MessagesIcon size={iconSize} color={colors.fgMuted} />
               </TouchableOpacity>
             </View>
           ) : (
