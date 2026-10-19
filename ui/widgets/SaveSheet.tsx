@@ -78,7 +78,7 @@ const SaveSheet: React.FC<SaveSheetProps> = ({
           right: 0,
           top: 0,
           bottom: 0,
-          backgroundColor: 'rgba(2,6,12,0.62)',
+          backgroundColor: colors.bgScrim,
         }}
       >
         <Pressable

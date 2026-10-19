@@ -150,8 +150,8 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               "fontWeight": "400",
               "letterSpacing": 0.5,
               "marginBottom": 4,
-              "marginLeft": 25,
-              "marginRight": 25,
+              "marginLeft": 20,
+              "marginRight": 20,
               "marginTop": 24,
             }
           }
@@ -164,7 +164,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               "alignItems": "center",
               "flexDirection": "row",
               "justifyContent": "space-between",
-              "marginHorizontal": 25,
+              "marginHorizontal": 20,
               "marginVertical": 15,
             }
           }
@@ -250,8 +250,8 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               "fontWeight": "400",
               "letterSpacing": 0.5,
               "marginBottom": 4,
-              "marginLeft": 25,
-              "marginRight": 25,
+              "marginLeft": 20,
+              "marginRight": 20,
               "marginTop": 24,
             }
           }
@@ -261,7 +261,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
         <View
           style={
             {
-              "marginHorizontal": 25,
+              "marginHorizontal": 20,
               "marginVertical": 15,
             }
           }
@@ -458,8 +458,8 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
         <View
           style={
             {
-              "marginLeft": 25,
-              "marginRight": 25,
+              "marginLeft": 20,
+              "marginRight": 20,
               "marginVertical": 15,
             }
           }
@@ -538,8 +538,8 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               "fontWeight": "400",
               "letterSpacing": 0.5,
               "marginBottom": 4,
-              "marginLeft": 25,
-              "marginRight": 25,
+              "marginLeft": 20,
+              "marginRight": 20,
               "marginTop": 24,
             }
           }
@@ -552,8 +552,8 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               "alignItems": "center",
               "flexDirection": "row",
               "justifyContent": "space-between",
-              "marginLeft": 25,
-              "marginRight": 25,
+              "marginLeft": 20,
+              "marginRight": 20,
               "marginVertical": 15,
             }
           }
@@ -639,8 +639,8 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               "fontWeight": "400",
               "letterSpacing": 0.5,
               "marginBottom": 4,
-              "marginLeft": 25,
-              "marginRight": 25,
+              "marginLeft": 20,
+              "marginRight": 20,
               "marginTop": 24,
             }
           }
@@ -680,7 +680,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               "alignItems": "center",
               "flexDirection": "row",
               "justifyContent": "space-between",
-              "marginHorizontal": 25,
+              "marginHorizontal": 20,
               "marginVertical": 15,
               "opacity": 1,
             }

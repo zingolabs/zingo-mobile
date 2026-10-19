@@ -18,7 +18,7 @@ import {
 import Animated from 'react-native-reanimated';
 import { useOptionsPanelSheetSlide } from '@app/hooks/useOptionsPanelSheetSlide';
 
-import { useTheme } from '@app/theme';
+import { space20, space32, useTheme } from '@app/theme';
 
 import RegText from '@ui/primitives/RegText';
 import FadeText from '@ui/primitives/FadeText';
@@ -559,7 +559,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
       <BottomSheetFooter {...props} bottomInset={0}>
         <View
           style={{
-            paddingHorizontal: 25,
+            paddingHorizontal: space20,
             backgroundColor: colors.bgSurface,
             paddingTop: 10,
             paddingBottom: 24,
@@ -604,8 +604,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
   const sectionHeader = (key: string) => (
     <FadeText
       style={{
-        marginLeft: 25,
-        marginRight: 25,
+        marginLeft: space20,
+        marginRight: space20,
         marginTop: 24,
         marginBottom: 4,
         fontSize: 12,
@@ -690,7 +690,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
                   flexDirection: 'row',
                   alignItems: 'center',
                   justifyContent: 'space-between',
-                  marginHorizontal: 25,
+                  marginHorizontal: space20,
                   marginVertical: 15,
                 }}
               >
@@ -723,7 +723,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
               {/* SECTION: Privacy & Security */}
               {sectionHeader('settings.section-privacysecurity')}
 
-              <View style={{ marginHorizontal: 25, marginVertical: 15 }}>
+              <View style={{ marginHorizontal: space20, marginVertical: 15 }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                   <View style={{ flex: 1 }}>
                     <InfoTooltip
@@ -762,8 +762,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
 
               <View
                 style={{
-                  marginLeft: 25,
-                  marginRight: 25,
+                  marginLeft: space20,
+                  marginRight: space20,
                   marginVertical: 15,
                 }}
               >
@@ -815,11 +815,11 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
                     flexDirection: 'row',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    marginHorizontal: 25,
+                    marginHorizontal: space20,
                     marginVertical: 15,
                   }}
                 >
-                  <BoldText style={{ color: '#07FF94' }}>
+                  <BoldText style={{ color: colors.bgNym }}>
                     {translate('settings.nym-network') as string}
                   </BoldText>
                   <ChevronRight size={16} color={colors.fgMuted} />
@@ -831,8 +831,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
                   flexDirection: 'row',
                   alignItems: 'center',
                   justifyContent: 'space-between',
-                  marginLeft: 25,
-                  marginRight: 25,
+                  marginLeft: space20,
+                  marginRight: space20,
                   marginVertical: 15,
                 }}
               >
@@ -873,7 +873,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
                   flexDirection: 'row',
                   alignItems: 'center',
                   justifyContent: 'space-between',
-                  marginHorizontal: 25,
+                  marginHorizontal: space20,
                   marginVertical: 15,
                 }}
               >
@@ -882,7 +882,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
               </TouchableOpacity>
 
               {(!recoveryInfoStored || recoveryInfoSave) && (
-                <View style={{ marginHorizontal: 25, marginVertical: 15 }}>
+                <View style={{ marginHorizontal: space20, marginVertical: 15 }}>
                   {!recoveryInfoStored && (
                     <TouchableOpacity
                       testID="settings.recoveryinfo.save"
@@ -931,13 +931,15 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
                 <>
                   {sectionHeader('settings.section-developer')}
                   <View style={{ width: '100%', marginBottom: 20 }}>
-                    <View style={{ marginHorizontal: 25, marginVertical: 15 }}>
+                    <View
+                      style={{ marginHorizontal: space20, marginVertical: 15 }}
+                    >
                       <BoldText>
                         {translate('settings.performancelevel-title') as string}
                       </BoldText>
                     </View>
 
-                    <View style={{ marginLeft: 40, marginRight: 25 }}>
+                    <View style={{ marginLeft: space32, marginRight: space20 }}>
                       {optionsRadio(
                         PERFORMANCELEVELMENU,
                         setPerformanceLevel as React.Dispatch<
@@ -951,12 +953,15 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
                     {!!lastError && (
                       <>
                         <View
-                          style={{ marginHorizontal: 25, marginVertical: 15 }}
+                          style={{
+                            marginHorizontal: space20,
+                            marginVertical: 15,
+                          }}
                         >
                           <BoldText>{'LAST ERROR'}</BoldText>
                         </View>
 
-                        <View style={{ marginHorizontal: 25 }}>
+                        <View style={{ marginHorizontal: space20 }}>
                           <Button
                             variant="primary"
                             title={translate('view-error') as string}
@@ -970,7 +975,10 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
                     {hasWalletBackup && (
                       <>
                         <View
-                          style={{ marginHorizontal: 25, marginVertical: 15 }}
+                          style={{
+                            marginHorizontal: space20,
+                            marginVertical: 15,
+                          }}
                         >
                           <BoldText>
                             {
@@ -981,7 +989,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
                           </BoldText>
                         </View>
 
-                        <View style={{ marginHorizontal: 25 }}>
+                        <View style={{ marginHorizontal: space20 }}>
                           <Button
                             testID="settings.restorebackupwallet"
                             variant="text"

@@ -11,6 +11,8 @@ export type ThemeColors = {
   borderSubtle: string;
   /** The grab pill at the top of a bottom sheet. */
   sheetHandle: string;
+  /** The veil behind a sheet that asks before leaving. */
+  bgScrim: string;
 
   fgDefault: string;
 
@@ -97,6 +99,7 @@ export const themeTokens: ThemeColors = {
   borderFocus: '#0B3A75',
   borderSubtle: '#FFFFFF0F',
   sheetHandle: '#1B3C6B',
+  bgScrim: '#02060C9E',
 
   fgDefault: '#D3E2F8',
 

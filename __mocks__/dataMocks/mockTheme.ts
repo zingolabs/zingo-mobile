@@ -14,6 +14,7 @@ const colors: ThemeColors = {
   borderFocus: '#0B3A75',
   borderSubtle: '#FFFFFF0F',
   sheetHandle: '#1B3C6B',
+  bgScrim: '#02060C9E',
 
   fgDefault: '#c3c3c3',
 
