@@ -14,6 +14,10 @@ updates:
       # 4.28+ types native command refs as React.ComponentRef, which the
       # React Native 0.81 codegen rejects; lift this with React Native 0.82.
       - dependency-name: "react-native-screens"
+      # 15.16 imports TurboModuleRegistry, which react-native-web lacks, and
+      # breaks the Storybook build behind the visual review.
+      - dependency-name: "react-native-svg"
+        versions: [">=15.16.0"]
     open-pull-requests-limit: 10
 
   - package-ecosystem: "github-actions"
