@@ -48,7 +48,7 @@ exports[`NewAddress - snapshots NewAddress transparent kind 1`] = `
         style={
           {
             "alignItems": "center",
-            "borderColor": "#888888",
+            "borderColor": "#05234C",
             "borderRadius": 12,
             "borderWidth": 1,
             "flexDirection": "row",
@@ -61,7 +61,9 @@ exports[`NewAddress - snapshots NewAddress transparent kind 1`] = `
       >
         <TextInput
           maxLength={50}
+          onBlur={[Function]}
           onChangeText={[Function]}
+          onFocus={[Function]}
           placeholder="text translated"
           placeholderTextColor="#888888"
           style={
@@ -458,7 +460,7 @@ exports[`NewAddress - snapshots NewAddress unified kind 1`] = `
         style={
           {
             "alignItems": "center",
-            "borderColor": "#888888",
+            "borderColor": "#05234C",
             "borderRadius": 12,
             "borderWidth": 1,
             "flexDirection": "row",
@@ -471,7 +473,9 @@ exports[`NewAddress - snapshots NewAddress unified kind 1`] = `
       >
         <TextInput
           maxLength={50}
+          onBlur={[Function]}
           onChangeText={[Function]}
+          onFocus={[Function]}
           placeholder="text translated"
           placeholderTextColor="#888888"
           style={

@@ -21,7 +21,7 @@ exports[`TextInputAddress - snapshots TextInputAddress disabled without label 1`
     <View
       style={
         {
-          "borderColor": "#888888",
+          "borderColor": "#05234C",
           "borderRadius": 12,
           "borderWidth": 1,
           "marginTop": 5,
@@ -47,7 +47,9 @@ exports[`TextInputAddress - snapshots TextInputAddress disabled without label 1`
         >
           <TextInput
             editable={false}
+            onBlur={[Function]}
             onChangeText={[Function]}
+            onFocus={[Function]}
             placeholder="text translated"
             placeholderTextColor="#888888"
             style={
@@ -161,7 +163,7 @@ exports[`TextInputAddress - snapshots TextInputAddress empty, enabled, with labe
     <View
       style={
         {
-          "borderColor": "#888888",
+          "borderColor": "#05234C",
           "borderRadius": 12,
           "borderWidth": 1,
           "marginTop": 5,
@@ -187,7 +189,9 @@ exports[`TextInputAddress - snapshots TextInputAddress empty, enabled, with labe
         >
           <TextInput
             editable={true}
+            onBlur={[Function]}
             onChangeText={[Function]}
+            onFocus={[Function]}
             placeholder="text translated"
             placeholderTextColor="#888888"
             style={

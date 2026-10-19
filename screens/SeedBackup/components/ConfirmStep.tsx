@@ -18,6 +18,7 @@ import { ease } from '@app/theme/motion';
 import { ContextAppLoaded } from '@app/context';
 import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
 import { SIDE, StepTitle } from './StepParts';
+import { fieldBorder } from '@ui/primitives/fieldBorder';
 
 export const CONFIRM_COUNT = 3;
 const NEXT_MS = 420;
@@ -288,14 +289,15 @@ const ConfirmStep: React.FunctionComponent<{ check: WordCheck }> = ({
   }));
 
   const done = check.index + (check.status === 'ok' ? 1 : 0);
-  const border =
+  const border = fieldBorder(
+    colors,
+    focused,
     check.status === 'ok'
-      ? colors.fgAccent
+      ? 'valid'
       : check.status === 'err'
-        ? colors.fgDanger
-        : focused
-          ? colors.borderFocus
-          : colors.bottomSheetBorder;
+        ? 'invalid'
+        : 'unknown',
+  );
 
   return (
     <View>

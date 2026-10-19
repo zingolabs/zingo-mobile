@@ -41,6 +41,7 @@ import {
   suggestWords,
   tokenize,
 } from '@app/utils/seedPhrase';
+import { fieldBorder } from '@ui/primitives/fieldBorder';
 
 type SeedPhraseInputProps = {
   value: string;
@@ -379,13 +380,11 @@ const SeedPhraseInput: React.FunctionComponent<SeedPhraseInputProps> = ({
   }, [pulse, flash]);
   const pulseStyle = useAnimatedStyle(() => ({ opacity: flash.value }));
 
-  const borderColor = fieldError
-    ? colors.fgDanger
-    : complete
-      ? colors.borderAccent
-      : focused
-        ? colors.borderFocus
-        : colors.bottomSheetBorder;
+  const borderColor = fieldBorder(
+    colors,
+    focused,
+    fieldError ? 'invalid' : complete ? 'valid' : 'unknown',
+  );
   const counter = ufvk
     ? (translate(
         keyValid ? 'import.key-valid' : 'import.viewing-key',

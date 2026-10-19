@@ -31,6 +31,7 @@ import SheetRim from '@ui/primitives/SheetRim';
 import SearchField from '@ui/widgets/SearchField';
 import { chainDisplayName } from './chainDisplayName';
 import { getChainIcon } from './chainIcons';
+import { fieldBorder } from '@ui/primitives/fieldBorder';
 
 // Zcash has no entry in the bundled `chainIcons` map; use the app's own logo.
 const ZCASH_LOGO = require('../../assets/img/zcash-yellow.png');
@@ -176,7 +177,7 @@ const ChainSelect: React.FunctionComponent<ChainSelectProps> = ({
           paddingHorizontal: 10,
           borderWidth: 1,
           borderRadius: 12,
-          borderColor: colors.borderMuted,
+          borderColor: fieldBorder(colors, false),
           marginTop: 10,
         }}
       >

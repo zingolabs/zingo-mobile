@@ -580,7 +580,7 @@ exports[`Component Send - test Send privacy high - snapshot 1`] = `
               <View
                 style={
                   {
-                    "borderColor": "#888888",
+                    "borderColor": "#05234C",
                     "borderRadius": 12,
                     "borderWidth": 1,
                     "flex": 1,
@@ -610,7 +610,9 @@ exports[`Component Send - test Send privacy high - snapshot 1`] = `
                       accessibilityLabel="text translated"
                       accessible={true}
                       editable={true}
+                      onBlur={[Function]}
                       onChangeText={[Function]}
+                      onFocus={[Function]}
                       placeholder="text translated"
                       placeholderTextColor="#888888"
                       style={
@@ -874,7 +876,7 @@ exports[`Component Send - test Send privacy high - snapshot 1`] = `
                     style={
                       {
                         "alignItems": "center",
-                        "borderColor": "#888888",
+                        "borderColor": "#18bd18",
                         "borderRadius": 12,
                         "borderWidth": 1,
                         "flex": 1,
@@ -888,7 +890,9 @@ exports[`Component Send - test Send privacy high - snapshot 1`] = `
                       editable={true}
                       keyboardType="numeric"
                       maxLength={20}
+                      onBlur={[Function]}
                       onChangeText={[Function]}
+                      onFocus={[Function]}
                       placeholder="0.00000"
                       placeholderTextColor="#888888"
                       style={
@@ -1434,7 +1438,7 @@ exports[`Component Send - test Send privacy high - snapshot 1`] = `
       <View
         style={
           {
-            "borderColor": "#888888",
+            "borderColor": "#05234C",
             "borderRadius": 12,
             "borderWidth": 1,
             "flexDirection": "row",
@@ -1450,8 +1454,10 @@ exports[`Component Send - test Send privacy high - snapshot 1`] = `
           accessible={true}
           maxLength={511}
           multiline={true}
+          onBlur={[Function]}
           onChangeText={[Function]}
           onEndEditing={[Function]}
+          onFocus={[Function]}
           placeholder="text translated"
           placeholderTextColor="#888888"
           style={
@@ -2364,7 +2370,7 @@ exports[`Component Send - test Send privacy normal - snapshot 1`] = `
               <View
                 style={
                   {
-                    "borderColor": "#888888",
+                    "borderColor": "#05234C",
                     "borderRadius": 12,
                     "borderWidth": 1,
                     "flex": 1,
@@ -2394,7 +2400,9 @@ exports[`Component Send - test Send privacy normal - snapshot 1`] = `
                       accessibilityLabel="text translated"
                       accessible={true}
                       editable={true}
+                      onBlur={[Function]}
                       onChangeText={[Function]}
+                      onFocus={[Function]}
                       placeholder="text translated"
                       placeholderTextColor="#888888"
                       style={
@@ -2658,7 +2666,7 @@ exports[`Component Send - test Send privacy normal - snapshot 1`] = `
                     style={
                       {
                         "alignItems": "center",
-                        "borderColor": "#888888",
+                        "borderColor": "#18bd18",
                         "borderRadius": 12,
                         "borderWidth": 1,
                         "flex": 1,
@@ -2672,7 +2680,9 @@ exports[`Component Send - test Send privacy normal - snapshot 1`] = `
                       editable={true}
                       keyboardType="numeric"
                       maxLength={20}
+                      onBlur={[Function]}
                       onChangeText={[Function]}
+                      onFocus={[Function]}
                       placeholder="0.00000"
                       placeholderTextColor="#888888"
                       style={
@@ -3233,7 +3243,7 @@ exports[`Component Send - test Send privacy normal - snapshot 1`] = `
       <View
         style={
           {
-            "borderColor": "#888888",
+            "borderColor": "#05234C",
             "borderRadius": 12,
             "borderWidth": 1,
             "flexDirection": "row",
@@ -3249,8 +3259,10 @@ exports[`Component Send - test Send privacy normal - snapshot 1`] = `
           accessible={true}
           maxLength={511}
           multiline={true}
+          onBlur={[Function]}
           onChangeText={[Function]}
           onEndEditing={[Function]}
+          onFocus={[Function]}
           placeholder="text translated"
           placeholderTextColor="#888888"
           style={

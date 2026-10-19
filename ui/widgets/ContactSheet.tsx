@@ -25,6 +25,7 @@ import Button from '@ui/primitives/Button';
 import RegText from '@ui/primitives/RegText';
 import { ScanIcon } from '@ui/primitives/Icons/ScanIcon';
 import ChainSelect from '@ui/widgets/ChainSelect';
+import { fieldBorder } from '@ui/primitives/fieldBorder';
 
 const ZEC = 'ZEC';
 const NAME_MAX = 32;
@@ -32,7 +33,6 @@ const CHECK_AT = 250;
 const ZNS_AT = 500;
 const SHAKE_MS = 60;
 const SAVE_OFF = 0.4;
-const OK_BORDER = 'rgba(20,157,5,0.6)';
 const OK_INK = '#7FD96E';
 const WARN_INK = '#E6C46A';
 const ERR_INK = '#F2878A';
@@ -208,13 +208,11 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
   const noteInk = { ok: OK_INK, warn: WARN_INK, err: ERR_INK };
 
   const border = (field: Field, bad: boolean, good: boolean): string =>
-    bad
-      ? colors.bgDanger
-      : good
-        ? OK_BORDER
-        : focus === field
-          ? colors.borderFocus
-          : colors.bottomSheetBorder;
+    fieldBorder(
+      colors,
+      focus === field,
+      bad ? 'invalid' : good ? 'valid' : 'unknown',
+    );
 
   const save = async () => {
     if (!ready) {

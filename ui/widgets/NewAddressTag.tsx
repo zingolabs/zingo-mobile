@@ -21,6 +21,7 @@ import BoldText from '@ui/primitives/BoldText';
 import Button from '@ui/primitives/Button';
 import RegText from '@ui/primitives/RegText';
 import ChainSelect from '@ui/widgets/ChainSelect';
+import { fieldBorder } from '@ui/primitives/fieldBorder';
 
 const NAME_MAX = 32;
 const SHAKE_MS = 60;
@@ -107,9 +108,7 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
               flexDirection: 'row',
               alignItems: 'center',
               minHeight: 48,
-              borderColor: focused
-                ? colors.borderFocus
-                : colors.bottomSheetBorder,
+              borderColor: fieldBorder(colors, focused),
             },
           ]}
         >

@@ -5,6 +5,7 @@ import { Pressable, TextInput, View } from 'react-native';
 import { useTheme } from '@app/theme';
 import { SearchIcon } from '@ui/primitives/Icons/SearchIcon';
 import { XIcon } from '@ui/primitives/Icons/XIcon';
+import { fieldBorder } from '@ui/primitives/fieldBorder';
 
 const ICON_INK = '#7D93B3';
 const PLACEHOLDER = '#6B80A0';
@@ -37,7 +38,7 @@ const SearchField: React.FunctionComponent<SearchFieldProps> = ({
         paddingHorizontal: 13,
         borderRadius: 12,
         borderWidth: 1,
-        borderColor: focused ? colors.borderFocus : colors.bottomSheetBorder,
+        borderColor: fieldBorder(colors, focused),
         backgroundColor: colors.bgSurface,
       }}
     >

@@ -13,6 +13,7 @@ import ErrorText from '@ui/primitives/ErrorText';
 import RegText from '@ui/primitives/RegText';
 import { validateAddressForChain } from '@app/swap';
 import { GlobalConst } from '@app/AppState';
+import { fieldBorder } from '@ui/primitives/fieldBorder';
 
 type TextInputAddressProps = {
   address: string;
@@ -41,6 +42,7 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
   const { colors } = useTheme();
 
   const [validAddress, setValidAddress] = useState<number>(0); // 1 - OK, 0 - Empty, -1 - KO
+  const [focused, setFocused] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -116,7 +118,15 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
           style={{
             borderWidth: 1,
             borderRadius: 12,
-            borderColor: colors.borderMuted,
+            borderColor: fieldBorder(
+              colors,
+              focused,
+              validAddress === 1
+                ? 'valid'
+                : validAddress === -1
+                  ? 'invalid'
+                  : 'unknown',
+            ),
             marginTop: 5,
           }}
         >
@@ -131,6 +141,8 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
             >
               <TextInput
                 testID="send.addressplaceholder"
+                onFocus={() => setFocused(true)}
+                onBlur={() => setFocused(false)}
                 placeholder={translate('send.addressplaceholder') as string}
                 placeholderTextColor={colors.fgMuted}
                 style={{

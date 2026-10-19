@@ -19,6 +19,7 @@ import BoldText from '@ui/primitives/BoldText';
 import { LoadingDots } from '@ui/widgets/ProgressState';
 import ServerLog, { LogLine } from './ServerLog';
 import { DEFAULT_PORT, schemeFor } from './useCustomServer';
+import { fieldBorder } from '@ui/primitives/fieldBorder';
 
 const PLACEHOLDER = '#3F5677';
 const SAVE_OFF_BG = '#0F3A12';
@@ -127,14 +128,11 @@ const CustomServerBox: React.FC<CustomServerBoxProps> = ({
 
   const empty = !host.trim();
   const busy = working !== null;
-  const border =
-    result === true
-      ? colors.fgAccent
-      : result === false
-        ? colors.fgDanger
-        : focused
-          ? colors.borderFocus
-          : colors.bottomSheetBorder;
+  const border = fieldBorder(
+    colors,
+    focused,
+    result === true ? 'valid' : result === false ? 'invalid' : 'unknown',
+  );
   const blur = () => {
     hostInput.current?.blur();
     portInput.current?.blur();

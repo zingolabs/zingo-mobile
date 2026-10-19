@@ -405,7 +405,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
                 overflow: 'hidden',
               },
               birthdayBorder,
-              birthdayLow && { borderColor: colors.fgDanger },
+              birthdayLow && { borderColor: colors.borderDanger },
             ]}
           >
             <TextInput

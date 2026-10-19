@@ -28,7 +28,7 @@ exports[`VerifyAddress - snapshot VerifyAddress initial (empty, no result) 1`] =
       <View
         style={
           {
-            "borderColor": "#888888",
+            "borderColor": "#05234C",
             "borderRadius": 12,
             "borderWidth": 1,
             "marginTop": 5,
@@ -54,7 +54,9 @@ exports[`VerifyAddress - snapshot VerifyAddress initial (empty, no result) 1`] =
           >
             <TextInput
               editable={true}
+              onBlur={[Function]}
               onChangeText={[Function]}
+              onFocus={[Function]}
               placeholder="text translated"
               placeholderTextColor="#888888"
               style={
