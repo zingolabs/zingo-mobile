@@ -15,6 +15,7 @@ import { Route } from '@app/AppState';
 import Utils from '@app/utils';
 import { planOrchardDrain } from '@app/walletBackend';
 import { RPCDrainPlanType } from '@app/walletBackend/types/RPCDrainPlanType';
+import { themeTokens } from '@app/theme';
 
 type MigrationTransactionsProps = NativeStackScreenProps<
   AppDrawerParamList,
@@ -42,7 +43,7 @@ const Row: React.FunctionComponent<{
     <Text
       style={{
         color: bold ? colors.fgDefault : colors.fgMuted,
-        fontSize: 14,
+        fontSize: 15,
         fontWeight: bold ? '700' : '400',
         marginRight: 12,
       }}
@@ -54,7 +55,7 @@ const Row: React.FunctionComponent<{
         <Text
           style={{
             color: colors.fgDefault,
-            fontSize: 14,
+            fontSize: 15,
             fontWeight: bold ? '700' : '400',
             textAlign: 'right',
           }}
@@ -70,7 +71,7 @@ const Row: React.FunctionComponent<{
 
 // The transaction cards sit a shade darker than the summary, so the summary
 // reads as the surface and the detail recedes.
-const TX_CARD_BACKGROUND = '#020D1C';
+const TX_CARD_BACKGROUND = themeTokens.bgSurface;
 
 const Card: React.FunctionComponent<{
   colors: AppTheme['colors'];
@@ -211,7 +212,7 @@ const MigrationTransactions: React.FunctionComponent<
             <Text
               style={{
                 color: colors.fgDefault,
-                fontSize: 17,
+                fontSize: 18,
                 fontWeight: '700',
                 marginBottom: 10,
                 textAlign: 'center',
@@ -222,7 +223,7 @@ const MigrationTransactions: React.FunctionComponent<
             <Text
               style={{
                 color: colors.fgMuted,
-                fontSize: 14,
+                fontSize: 15,
                 textAlign: 'center',
               }}
             >
@@ -261,7 +262,7 @@ const MigrationTransactions: React.FunctionComponent<
             <Text
               style={{
                 color: colors.fgDefault,
-                fontSize: 17,
+                fontSize: 18,
                 fontWeight: '700',
                 marginBottom: 10,
                 textAlign: 'center',
@@ -272,7 +273,7 @@ const MigrationTransactions: React.FunctionComponent<
             <Text
               style={{
                 color: colors.fgMuted,
-                fontSize: 14,
+                fontSize: 15,
                 textAlign: 'center',
               }}
             >
@@ -322,7 +323,7 @@ const MigrationTransactions: React.FunctionComponent<
             <Text
               style={{
                 color: colors.fgDefault,
-                fontSize: 17,
+                fontSize: 18,
                 fontWeight: '700',
                 marginBottom: 10,
                 textAlign: 'center',
@@ -333,7 +334,7 @@ const MigrationTransactions: React.FunctionComponent<
             <Text
               style={{
                 color: colors.fgMuted,
-                fontSize: 14,
+                fontSize: 15,
                 textAlign: 'center',
               }}
             >

@@ -52,6 +52,7 @@ import {
   ChevronUp,
 } from '@ui/primitives/Icons/Chevron';
 import { TriangleAlert } from '@ui/primitives/Icons/TriangleAlert';
+import { themeTokens } from '@app/theme';
 // this is for https. (primary)
 //
 type ValueTransferDetailProps = NativeStackScreenProps<
@@ -422,7 +423,7 @@ const ValueTransferDetail: React.FunctionComponent<
               borderRadius: 10,
               borderColor:
                 valueTransfer.status === RPCValueTransfersStatusEnum.failed
-                  ? 'coral'
+                  ? themeTokens.fgDanger
                   : colors.borderMuted,
             }}
           >
@@ -525,7 +526,7 @@ const ValueTransferDetail: React.FunctionComponent<
                     : 1,
               }}
               currencyName={info.currencyName}
-              size={28}
+              size={22}
               amtZec={valueTransfer.amount}
               privacy={privacy}
               smallPrefix={true}
@@ -602,7 +603,7 @@ const ValueTransferDetail: React.FunctionComponent<
                       color:
                         valueTransfer.status ===
                         RPCValueTransfersStatusEnum.failed
-                          ? 'coral'
+                          ? themeTokens.fgDanger
                           : valueTransfer.status ===
                                 RPCValueTransfersStatusEnum.transmitted ||
                               valueTransfer.status ===
@@ -812,7 +813,7 @@ const ValueTransferDetail: React.FunctionComponent<
                           : 1,
                     }}
                     amtZec={valueTransfer.fee}
-                    size={14}
+                    size={15}
                     currencyName={info.currencyName}
                     privacy={privacy}
                   />
@@ -880,7 +881,7 @@ const ValueTransferDetail: React.FunctionComponent<
                         : 1,
                   }}
                   amtZec={valueTransfer.amount}
-                  size={14}
+                  size={15}
                   currencyName={info.currencyName}
                   privacy={privacy}
                 />
