@@ -4,18 +4,6 @@ import { Animated, View, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { WalletNavigation } from '@app/types';
 import { useTheme } from '@app/theme';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import {
-  faArrowDown,
-  faArrowUp,
-  faRefresh,
-  faComment,
-  faTriangleExclamation,
-  //faComments,
-  faFileLines,
-  faPaperPlane,
-  faRightLeft,
-} from '@fortawesome/free-solid-svg-icons';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 
 import ZecAmount from '@ui/widgets/ZecAmount';
@@ -33,6 +21,14 @@ import { ContextAppLoaded } from '@app/context';
 import AddressItem from '@ui/widgets/AddressItem';
 import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
 import Utils from '@app/utils';
+import { FileTextIcon } from '@ui/primitives/Icons/FileTextIcon';
+import { PlaneIcon } from '@ui/primitives/Icons/PlaneIcon';
+import { MessagesIcon } from '@ui/primitives/Icons/MessagesIcon';
+import { TriangleAlert } from '@ui/primitives/Icons/TriangleAlert';
+import { ArrowDownIcon } from '@ui/primitives/Icons/ArrowDownIcon';
+import { ArrowUpIcon } from '@ui/primitives/Icons/ArrowUpIcon';
+import { RefreshIcon } from '@ui/primitives/Icons/RefreshIcon';
+import { SwapIcon } from '@ui/primitives/Icons/SwapIcon';
 //import Utils from '@app/utils';
 
 type ValueTransferLineProps = {
@@ -98,17 +94,17 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
           ? colors.fgAccent
           : colors.fgDefault;
 
-  const icon =
+  const KindIcon =
     vt.confirmations >= 0 &&
     vt.confirmations < GlobalConst.minConfirmations &&
     vt.status !== RPCValueTransfersStatusEnum.failed
-      ? faRefresh
+      ? RefreshIcon
       : vt.kind === ValueTransferKindEnum.Migration
-        ? faRightLeft
+        ? SwapIcon
         : vt.kind === ValueTransferKindEnum.Received ||
             vt.kind === ValueTransferKindEnum.Shield
-          ? faArrowDown
-          : faArrowUp;
+          ? ArrowDownIcon
+          : ArrowUpIcon;
 
   const haveMemo = vt.memos && vt.memos.length > 0 && !!vt.memos.join('');
 
@@ -149,10 +145,9 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                   closeAllSwipeables();
                 }}
               >
-                <FontAwesomeIcon
+                <FileTextIcon
                   style={{ opacity: 0.8 }}
                   size={24}
-                  icon={faFileLines}
                   color={colors.fgDefault}
                 />
               </TouchableOpacity>
@@ -180,11 +175,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                     closeAllSwipeables();
                   }}
                 >
-                  <FontAwesomeIcon
-                    size={24}
-                    icon={faPaperPlane}
-                    color={colors.fgAccent}
-                  />
+                  <PlaneIcon size={24} color={colors.fgAccent} />
                 </TouchableOpacity>
               </View>
             )}
@@ -287,10 +278,9 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
               }}
             >
               <View style={{ display: 'flex' }}>
-                <FontAwesomeIcon
+                <KindIcon
                   style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
                   size={24}
-                  icon={icon}
                   color={
                     vt.status === RPCValueTransfersStatusEnum.transmitted ||
                     vt.status === RPCValueTransfersStatusEnum.calculated
@@ -444,10 +434,9 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                         : '--'}
                     </FadeText>
                     {haveMemo && (
-                      <FontAwesomeIcon
+                      <MessagesIcon
                         style={{ marginLeft: 10 }}
-                        size={12}
-                        icon={faComment}
+                        size={16}
                         color={
                           vt.status === RPCValueTransfersStatusEnum.failed
                             ? colors.fgMuted
@@ -490,11 +479,10 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
               >
                 {(vt.status === RPCValueTransfersStatusEnum.transmitted ||
                   vt.status === RPCValueTransfersStatusEnum.calculated) && (
-                  <FontAwesomeIcon
+                  <TriangleAlert
                     style={{ marginRight: 5 }}
-                    icon={faTriangleExclamation}
                     color={colors.fgSyncing}
-                    size={12}
+                    size={16}
                   />
                 )}
                 <FadeText

@@ -2,8 +2,6 @@
 import React, { forwardRef, useCallback } from 'react';
 import { Keyboard, Pressable, StyleSheet, View } from 'react-native';
 import { radiusSheet, useTheme } from '@app/theme';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faCircleInfo, faXmark } from '@fortawesome/free-solid-svg-icons';
 import {
   BottomSheetBackdrop,
   BottomSheetBackdropProps,
@@ -17,6 +15,8 @@ import FadeText from '@ui/primitives/FadeText';
 import RegText from '@ui/primitives/RegText';
 import Button from '@ui/primitives/Button';
 import SheetRim from '@ui/primitives/SheetRim';
+import { XIcon } from '@ui/primitives/Icons/XIcon';
+import { InfoIcon } from '@ui/primitives/Icons/InfoIcon';
 
 /**
  * Informational sheet that surfaces the raw error(s) returned by the fee
@@ -117,11 +117,7 @@ const SendErrorSheet = forwardRef<BottomSheetModal, SendErrorSheetProps>(
               hitSlop={8}
               style={{ padding: 14 }}
             >
-              <FontAwesomeIcon
-                icon={faXmark}
-                size={20}
-                color={colors.fgDefault}
-              />
+              <XIcon size={20} color={colors.fgDefault} />
             </Pressable>
           </View>
         </View>
@@ -142,11 +138,7 @@ const SendErrorSheet = forwardRef<BottomSheetModal, SendErrorSheetProps>(
               },
             ]}
           >
-            <FontAwesomeIcon
-              icon={faCircleInfo}
-              size={16}
-              color={colors.fgDanger}
-            />
+            <InfoIcon size={16} color={colors.fgDanger} />
             <RegText
               style={{
                 color: colors.fgDefault,

@@ -13,8 +13,6 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { TriangleAlert } from '@ui/primitives/Icons/TriangleAlert';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 import BottomSheet, {
   BottomSheetFooter,
   BottomSheetFooterProps,
@@ -46,6 +44,7 @@ import {
   ProposalPoolsType,
 } from '@app/AppState';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { ChevronLeft } from '@ui/primitives/Icons/Chevron';
 
 type ConfirmProps = NativeStackScreenProps<AppDrawerParamList, 'Confirm'>;
 
@@ -154,11 +153,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
           hitSlop={8}
           style={{ paddingHorizontal: 4, paddingVertical: 4 }}
         >
-          <FontAwesomeIcon
-            icon={faChevronLeft}
-            size={20}
-            color={colors.fgAccent}
-          />
+          <ChevronLeft size={20} color={colors.fgAccent} />
         </TouchableOpacity>
         <BoldText
           numberOfLines={1}

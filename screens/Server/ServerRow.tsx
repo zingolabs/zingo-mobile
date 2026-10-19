@@ -7,17 +7,13 @@ import Animated, {
   withSequence,
   withTiming,
 } from 'react-native-reanimated';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import {
-  faChevronLeft,
-  faChevronRight,
-} from '@fortawesome/free-solid-svg-icons';
 
 import { useTheme } from '@app/theme';
 import { ease } from '@app/theme/motion';
 import BoldText from '@ui/primitives/BoldText';
 import RegText from '@ui/primitives/RegText';
 import Button from '@ui/primitives/Button';
+import { ChevronLeft, ChevronRight } from '@ui/primitives/Icons/Chevron';
 
 /** The side margin of the cards, which the Done button lines up with. */
 export const CARD_SIDE = 21.5;
@@ -184,13 +180,7 @@ const ServerRow: React.FC<ServerRowProps> = ({
           )}
         </View>
         {right}
-        {chevron && (
-          <FontAwesomeIcon
-            icon={faChevronRight}
-            size={12}
-            color={colors.fgMuted}
-          />
-        )}
+        {chevron && <ChevronRight size={16} color={colors.fgMuted} />}
       </Pressable>
     </Animated.View>
   );
@@ -274,11 +264,7 @@ export const ScreenHeader: React.FC<{
           backgroundColor: pressed ? colors.bgSurface : 'transparent',
         })}
       >
-        <FontAwesomeIcon
-          icon={faChevronLeft}
-          size={18}
-          color={colors.fgAccent}
-        />
+        <ChevronLeft size={20} color={colors.fgAccent} />
       </Pressable>
       <BoldText
         style={{

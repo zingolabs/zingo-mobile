@@ -21,15 +21,6 @@ import {
   TextInputContentSizeChangeEventData,
 } from 'react-native';
 import Animated from 'react-native-reanimated';
-import {
-  faCheck,
-  faInfoCircle,
-  faAddressCard,
-  faUserPlus,
-  faMagnifyingGlassPlus,
-  faXmark,
-} from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useNavigation, useScrollToTop } from '@react-navigation/native';
 import { useTheme } from '@app/theme';
 import { ScanIcon } from '@ui/primitives/Icons/ScanIcon';
@@ -100,6 +91,12 @@ import { sendEmail } from '@app/services/sendEmail';
 import { retryServer } from '@app/services/retryServer';
 import { RPCSpendablebalanceType } from '@app/walletBackend/types/RPCSpendablebalanceType';
 import { fieldBorder } from '@ui/primitives/fieldBorder';
+import { XIcon } from '@ui/primitives/Icons/XIcon';
+import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
+import { UserPlusIcon } from '@ui/primitives/Icons/UserPlusIcon';
+import { ContactIcon } from '@ui/primitives/Icons/ContactIcon';
+import { InfoIcon } from '@ui/primitives/Icons/InfoIcon';
+import { ZoomInIcon } from '@ui/primitives/Icons/ZoomInIcon';
 
 type SendProps = HomeTabScreenProps<'Send'>;
 
@@ -1066,7 +1063,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
         hitSlop={8}
         style={{ paddingHorizontal: 14, paddingVertical: 4 }}
       >
-        <FontAwesomeIcon icon={faXmark} size={20} color={colors.fgMuted} />
+        <XIcon size={20} color={colors.fgMuted} />
       </Pressable>
     </View>
   );
@@ -1202,7 +1199,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
                   </View>
                   {validAddress === 1 && (
                     <View testID="send.address.check">
-                      <FontAwesomeIcon icon={faCheck} color={colors.fgAccent} />
+                      <CheckIcon size={16} color={colors.fgAccent} />
                     </View>
                   )}
                   {validAddress === -1 && (
@@ -1287,10 +1284,9 @@ const Send: React.FunctionComponent<SendProps> = () => {
                             updateToField('', null, null, null, null);
                           }}
                         >
-                          <FontAwesomeIcon
+                          <XIcon
                             style={{ marginRight: 5 }}
                             size={20}
-                            icon={faXmark}
                             color={colors.fgAccentDisabled}
                           />
                         </TouchableOpacity>
@@ -1318,10 +1314,9 @@ const Send: React.FunctionComponent<SendProps> = () => {
                                 )
                               }
                             >
-                              <FontAwesomeIcon
+                              <UserPlusIcon
                                 style={{ marginRight: 5 }}
-                                size={28}
-                                icon={faUserPlus}
+                                size={24}
                                 color={
                                   updatingToField
                                     ? colors.fgAccentDisabled
@@ -1336,18 +1331,16 @@ const Send: React.FunctionComponent<SendProps> = () => {
                             testID="send.address-book"
                             onPress={openBook}
                           >
-                            <FontAwesomeIcon
+                            <ContactIcon
                               style={{ marginRight: 5 }}
-                              size={28}
-                              icon={faAddressCard}
+                              size={24}
                               color={colors.fgAccent}
                             />
                           </TouchableOpacity>
                         ) : (
-                          <FontAwesomeIcon
+                          <ContactIcon
                             style={{ marginRight: 5 }}
-                            size={28}
-                            icon={faAddressCard}
+                            size={24}
                             color={colors.fgAccentDisabled}
                           />
                         );
@@ -1544,10 +1537,9 @@ const Send: React.FunctionComponent<SendProps> = () => {
                             }
                           }}
                         >
-                          <FontAwesomeIcon
+                          <XIcon
                             style={{ marginRight: 5 }}
                             size={20}
-                            icon={faXmark}
                             color={colors.fgAccentDisabled}
                           />
                         </TouchableOpacity>
@@ -1710,8 +1702,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
                             borderRadius: 10,
                           }}
                         >
-                          <FontAwesomeIcon
-                            icon={faInfoCircle}
+                          <InfoIcon
                             size={16}
                             color={colors.fgAccent}
                             style={{ marginRight: 5 }}
@@ -1739,8 +1730,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
                             borderRadius: 10,
                           }}
                         >
-                          <FontAwesomeIcon
-                            icon={faInfoCircle}
+                          <InfoIcon
                             size={16}
                             color={colors.fgAccent}
                             style={{ marginRight: 5 }}
@@ -1894,13 +1884,12 @@ const Send: React.FunctionComponent<SendProps> = () => {
                               updateToField(null, null, null, '', null);
                             }}
                           >
-                            <FontAwesomeIcon
+                            <XIcon
                               style={{
                                 marginTop: 7,
                                 marginRight: memoIcon ? 0 : 7,
                               }}
                               size={20}
-                              icon={faXmark}
                               color={colors.fgAccentDisabled}
                             />
                           </TouchableOpacity>
@@ -1911,10 +1900,9 @@ const Send: React.FunctionComponent<SendProps> = () => {
                               setMemoModalShow();
                             }}
                           >
-                            <FontAwesomeIcon
+                            <ZoomInIcon
                               style={{ margin: 7 }}
                               size={24}
-                              icon={faMagnifyingGlassPlus}
                               color={colors.fgMuted}
                             />
                           </TouchableOpacity>

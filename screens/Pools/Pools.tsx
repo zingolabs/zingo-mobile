@@ -11,13 +11,13 @@ import DetailLine from '@ui/widgets/DetailLine';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
 import Header from '@ui/widgets/Header';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import FadeText from '@ui/primitives/FadeText';
-import { faChevronLeft, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import BottomSheet, { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
+import { ChevronLeft } from '@ui/primitives/Icons/Chevron';
+import { InfoIcon } from '@ui/primitives/Icons/InfoIcon';
 
 type PoolsProps = NativeStackScreenProps<AppDrawerParamList, 'Pools'>;
 
@@ -70,11 +70,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
           hitSlop={8}
           style={{ paddingHorizontal: 4, paddingVertical: 4 }}
         >
-          <FontAwesomeIcon
-            icon={faChevronLeft}
-            size={20}
-            color={colors.fgAccent}
-          />
+          <ChevronLeft size={20} color={colors.fgAccent} />
         </TouchableOpacity>
         <BoldText
           numberOfLines={1}
@@ -371,8 +367,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
                         borderRadius: 10,
                       }}
                     >
-                      <FontAwesomeIcon
-                        icon={faInfoCircle}
+                      <InfoIcon
                         size={16}
                         color={colors.fgAccent}
                         style={{ marginRight: 5 }}
@@ -392,8 +387,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
                       borderRadius: 10,
                     }}
                   >
-                    <FontAwesomeIcon
-                      icon={faInfoCircle}
+                    <InfoIcon
                       size={16}
                       color={colors.fgAccent}
                       style={{ marginRight: 5 }}

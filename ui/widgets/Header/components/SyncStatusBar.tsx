@@ -4,13 +4,6 @@ import { Animated, TouchableOpacity, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { WalletNavigation } from '@app/types';
 import { useTheme } from '@app/theme';
-import {
-  faCheck,
-  faCloudDownload,
-  faPlay,
-  faWifi,
-} from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { NetInfoStateType } from '@react-native-community/netinfo/src/index';
 import {
   Route,
@@ -26,6 +19,10 @@ import {
 import FadeText from '@ui/primitives/FadeText';
 import MixnetIcon from '@ui/primitives/Icons/MixnetIcon';
 import PrivacyToggle from './PrivacyToggle';
+import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
+import { PlayIcon } from '@ui/primitives/Icons/PlayIcon';
+import { WifiIcon } from '@ui/primitives/Icons/WifiIcon';
+import { CloudDownloadIcon } from '@ui/primitives/Icons/CloudDownloadIcon';
 
 type SyncStatusBarProps = {
   noSyncingStatus: boolean | undefined;
@@ -112,11 +109,7 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
                         padding: 3,
                       }}
                     >
-                      <FontAwesomeIcon
-                        icon={faCheck}
-                        color={colors.fgAccent}
-                        size={16}
-                      />
+                      <CheckIcon color={colors.fgAccent} size={16} />
                       {viewSyncStatus && (
                         <FadeText style={{ fontSize: 10, marginLeft: 2 }}>
                           {translate('synced') as string}
@@ -160,11 +153,7 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
                             alignItems: 'center',
                           }}
                         >
-                          <FontAwesomeIcon
-                            icon={faPlay}
-                            color={colors.fgSyncing}
-                            size={16}
-                          />
+                          <PlayIcon color={colors.fgSyncing} size={16} />
                           {viewSyncStatus && (
                             <FadeText style={{ fontSize: 10, marginLeft: 2 }}>
                               {translate('syncing') as string}
@@ -215,11 +204,7 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
                           padding: 3,
                         }}
                       >
-                        <FontAwesomeIcon
-                          icon={faWifi}
-                          color={colors.fgAccentDisabled}
-                          size={16}
-                        />
+                        <WifiIcon color={colors.fgAccentDisabled} size={16} />
                       </View>
                     </TouchableOpacity>
                   </View>
@@ -242,8 +227,7 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
                     navigation.navigate(Route.SyncReport);
                   }}
                 >
-                  <FontAwesomeIcon
-                    icon={faCloudDownload}
+                  <CloudDownloadIcon
                     color={!netInfo.isConnected ? 'red' : 'yellow'}
                     size={16}
                   />
@@ -278,7 +262,7 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
                 paddingHorizontal: 3,
               }}
             >
-              <FontAwesomeIcon icon={faWifi} color={'red'} size={14} />
+              <WifiIcon color={'red'} size={16} />
               <FadeText style={{ fontSize: 10, marginLeft: 2 }}>
                 {translate('settings.server-offline') as string}
               </FadeText>

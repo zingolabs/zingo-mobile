@@ -280,7 +280,7 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
               backgroundColor: pressed ? 'rgba(255,255,255,0.06)' : undefined,
             })}
           >
-            <ChevronLeft size={22} color={colors.fgAccent} strokeWidth={2.2} />
+            <ChevronLeft size={22} color={colors.fgAccent} />
           </Pressable>
           <Text
             accessibilityRole="header"
@@ -342,11 +342,7 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
               }}
             >
               {seedBackedUp ? (
-                <ShieldCheckIcon
-                  size={17}
-                  color={colors.fgAccent}
-                  strokeWidth={1.9}
-                />
+                <ShieldCheckIcon size={17} color={colors.fgAccent} />
               ) : (
                 <TriangleAlert size={17} color={colors.fgWarning} />
               )}

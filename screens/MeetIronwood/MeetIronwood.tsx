@@ -30,8 +30,6 @@ import Animated, {
 import Svg, { Circle } from 'react-native-svg';
 import { useFocusEffect } from '@react-navigation/native';
 import { useTheme } from '@app/theme';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faArrowRightLong } from '@fortawesome/free-solid-svg-icons';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import BoldText from '@ui/primitives/BoldText';
@@ -41,6 +39,7 @@ import SettingsFileImpl from '@app/services/SettingsFileImpl';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
 import { Route, SettingsNameEnum } from '@app/AppState';
+import { ArrowRightIcon } from '@ui/primitives/Icons/ArrowRightIcon';
 
 // Pool artwork palette — Orchard teal and Ironwood gold are one-off brand
 // accents for this onboarding, not part of the app theme.
@@ -318,8 +317,7 @@ const Phase1Graphic: React.FunctionComponent<{
         ))}
       </View>
     )}
-    <FontAwesomeIcon
-      icon={faArrowRightLong}
+    <ArrowRightIcon
       size={24}
       color={arrowColor}
       style={{ marginHorizontal: 20 }}
@@ -511,9 +509,8 @@ const MeetIronwood: React.FunctionComponent<MeetIronwoodProps> = ({
           </PoolLabel>
           <PoolCard variant="orchard" />
         </View>
-        <FontAwesomeIcon
-          icon={faArrowRightLong}
-          size={26}
+        <ArrowRightIcon
+          size={24}
           color={colors.fgDefault}
           style={{ marginHorizontal: 22, marginTop: 25 }}
         />

@@ -265,7 +265,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
             backgroundColor: pressed ? 'rgba(255,255,255,0.06)' : undefined,
           })}
         >
-          <ChevronLeft size={22} color={colors.fgAccent} strokeWidth={2.2} />
+          <ChevronLeft size={22} color={colors.fgAccent} />
         </Pressable>
         <Text
           accessibilityRole="header"
@@ -354,11 +354,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
                   borderRadius: 8,
                 }}
               >
-                <ChevronLeft
-                  size={14}
-                  color={colors.fgAccent}
-                  strokeWidth={2.4}
-                />
+                <ChevronLeft size={14} color={colors.fgAccent} />
                 <Text
                   style={{
                     color: colors.fgAccent,
@@ -637,11 +633,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
                             : undefined,
                         })}
                       >
-                        <UserPlusIcon
-                          size={18}
-                          color="#3CC52A"
-                          strokeWidth={2}
-                        />
+                        <UserPlusIcon size={18} color="#3CC52A" />
                       </Pressable>
                     )}
                   </View>

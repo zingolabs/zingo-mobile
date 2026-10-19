@@ -42,7 +42,7 @@ const SearchField: React.FunctionComponent<SearchFieldProps> = ({
         backgroundColor: colors.bgSurface,
       }}
     >
-      <SearchIcon size={16} color={ICON_INK} strokeWidth={2.2} />
+      <SearchIcon size={16} color={ICON_INK} />
       <TextInput
         testID={testID}
         value={value}
@@ -70,7 +70,7 @@ const SearchField: React.FunctionComponent<SearchFieldProps> = ({
           hitSlop={8}
           onPress={() => onChangeText('')}
         >
-          <XIcon size={16} color={ICON_INK} strokeWidth={2.2} />
+          <XIcon size={16} color={ICON_INK} />
         </Pressable>
       )}
     </View>

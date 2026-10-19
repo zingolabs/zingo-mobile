@@ -314,7 +314,7 @@ export const CopyShowButtons: React.FunctionComponent<{
             entering={copied ? iconPop() : undefined}
           >
             {copied ? (
-              <CheckIcon size={15} color={colors.fgAccent} strokeWidth={2.6} />
+              <CheckIcon size={15} color={colors.fgAccent} />
             ) : (
               <CopyIcon size={15} color={colors.fgDefault} />
             )}

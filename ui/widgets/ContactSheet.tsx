@@ -1,8 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { Keyboard, TextInput, TouchableOpacity, View } from 'react-native';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faCheck, faXmark } from '@fortawesome/free-solid-svg-icons';
 
 import { useTheme } from '@app/theme';
 import { AddressBookFileClass, ChainNameEnum } from '@app/AppState';
@@ -18,6 +16,8 @@ import RegText from '@ui/primitives/RegText';
 import { ScanIcon } from '@ui/primitives/Icons/ScanIcon';
 import ChainSelect from '@ui/widgets/ChainSelect';
 import { fieldBorder } from '@ui/primitives/fieldBorder';
+import { XIcon } from '@ui/primitives/Icons/XIcon';
+import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
 
 const ZEC = 'ZEC';
 const NAME_MAX = 32;
@@ -289,10 +289,9 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
           />
           {!!name && (
             <TouchableOpacity onPress={() => setName('')}>
-              <FontAwesomeIcon
+              <XIcon
                 style={{ marginRight: 10 }}
                 size={20}
-                icon={faXmark}
                 color={colors.fgMuted}
               />
             </TouchableOpacity>
@@ -372,10 +371,9 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
                 testID="addressbook.address-clear"
                 onPress={() => setAddress('')}
               >
-                <FontAwesomeIcon
+                <XIcon
                   style={{ marginRight: 5 }}
                   size={20}
-                  icon={faXmark}
                   color={colors.fgMuted}
                 />
               </TouchableOpacity>
@@ -400,9 +398,7 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
             gap: 6,
           }}
         >
-          {note.tone === 'ok' && (
-            <FontAwesomeIcon icon={faCheck} size={11} color={OK_INK} />
-          )}
+          {note.tone === 'ok' && <CheckIcon size={16} color={OK_INK} />}
           {note.tone !== 'none' && (
             <RegText
               color={noteInk[note.tone]}

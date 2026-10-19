@@ -16,8 +16,6 @@ import {
   BottomSheetModal,
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
 
 import { radiusSheet, useTheme } from '@app/theme';
 import { duration, ease } from '@app/theme/motion';
@@ -27,6 +25,7 @@ import BoldText from '@ui/primitives/BoldText';
 import RegText from '@ui/primitives/RegText';
 import SheetRim from '@ui/primitives/SheetRim';
 import { BUTTON_HEIGHT } from '@ui/primitives/Button';
+import { TriangleAlert } from '@ui/primitives/Icons/TriangleAlert';
 
 type DeleteWalletSheetProps = {
   context: DeleteWalletContext;
@@ -190,11 +189,7 @@ const DeleteWalletSheet = forwardRef<BottomSheetModal, DeleteWalletSheetProps>(
               justifyContent: 'center',
             }}
           >
-            <FontAwesomeIcon
-              icon={faTriangleExclamation}
-              size={20}
-              color={ICON_FG}
-            />
+            <TriangleAlert size={20} color={ICON_FG} />
           </View>
           <BoldText
             style={{

@@ -80,7 +80,7 @@ const InfoStep: React.FunctionComponent<InfoStepProps> = ({ keychainNote }) => {
             }}
           >
             <Tile bg={TILE_BG}>
-              <Icon size={18} color={colors.fgAccent} strokeWidth={1.9} />
+              <Icon size={18} color={colors.fgAccent} />
             </Tile>
             <Text style={text}>
               {translate(`seedbackup.info-${key}`) as string}
@@ -105,7 +105,7 @@ const InfoStep: React.FunctionComponent<InfoStepProps> = ({ keychainNote }) => {
           }}
         >
           <Tile bg={NOTE_TILE_BG}>
-            <ShieldCheckIcon size={17} color={NOTE_INK} strokeWidth={1.9} />
+            <ShieldCheckIcon size={17} color={NOTE_INK} />
           </Tile>
           <Text style={text}>
             {

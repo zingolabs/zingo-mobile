@@ -38,14 +38,7 @@ import BoldText from '@ui/primitives/BoldText';
 import AppSheet from '@ui/primitives/AppSheet';
 import CurrencyAmount from '@ui/widgets/CurrencyAmount';
 import AddressItem from '@ui/widgets/AddressItem';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 // this is for http. (red)
-import {
-  faChevronLeft,
-  faTriangleExclamation,
-  faChevronDown,
-  faChevronUp,
-} from '@fortawesome/free-solid-svg-icons';
 import BottomSheet, { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
 import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
@@ -53,9 +46,14 @@ import Button from '@ui/primitives/Button';
 import { removeTransaction } from '@app/walletBackend';
 import { createAlert } from '@app/services/createAlert';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import {
+  ChevronDown,
+  ChevronLeft,
+  ChevronUp,
+} from '@ui/primitives/Icons/Chevron';
+import { TriangleAlert } from '@ui/primitives/Icons/TriangleAlert';
 // this is for https. (primary)
-//import { faLock } from '@fortawesome/free-solid-svg-icons';
-
+//
 type ValueTransferDetailProps = NativeStackScreenProps<
   AppDrawerParamList,
   'ValueTransferDetail'
@@ -141,11 +139,7 @@ const ValueTransferDetail: React.FunctionComponent<
           hitSlop={8}
           style={{ paddingHorizontal: 4, paddingVertical: 4 }}
         >
-          <FontAwesomeIcon
-            icon={faChevronLeft}
-            size={20}
-            color={colors.fgAccent}
-          />
+          <ChevronLeft size={20} color={colors.fgAccent} />
         </TouchableOpacity>
         <BoldText
           numberOfLines={1}
@@ -375,8 +369,7 @@ const ValueTransferDetail: React.FunctionComponent<
               style={{ marginRight: 25 }}
               disabled={valueTransferIndex === 0}
             >
-              <FontAwesomeIcon
-                icon={faChevronUp}
+              <ChevronUp
                 color={
                   valueTransferIndex === 0
                     ? colors.fgAccentDisabled
@@ -391,8 +384,7 @@ const ValueTransferDetail: React.FunctionComponent<
               style={{ marginLeft: 25 }}
               disabled={valueTransferIndex === valueTransfersSliced.length - 1}
             >
-              <FontAwesomeIcon
-                icon={faChevronDown}
+              <ChevronDown
                 color={
                   valueTransferIndex === valueTransfersSliced.length - 1
                     ? colors.fgAccentDisabled
@@ -591,11 +583,10 @@ const ValueTransferDetail: React.FunctionComponent<
                   RPCValueTransfersStatusEnum.transmitted ||
                   valueTransfer.status ===
                     RPCValueTransfersStatusEnum.calculated) && (
-                  <FontAwesomeIcon
+                  <TriangleAlert
                     style={{ marginRight: 5 }}
-                    icon={faTriangleExclamation}
                     color={colors.fgSyncing}
-                    size={12}
+                    size={16}
                   />
                 )}
                 {(valueTransfer.status ===
@@ -939,11 +930,7 @@ const ValueTransferDetail: React.FunctionComponent<
                   >
                     <RegText>{GlobalConst.replyTo}</RegText>
                     {!thisWalletAddress(memoUA) && (
-                      <FontAwesomeIcon
-                        icon={faTriangleExclamation}
-                        color={'red'}
-                        size={14}
-                      />
+                      <TriangleAlert color={'red'} size={16} />
                     )}
                     <RegText
                       style={{ opacity: thisWalletAddress(memoUA) ? 0.6 : 0.4 }}

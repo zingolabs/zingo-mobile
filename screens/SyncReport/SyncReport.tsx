@@ -310,7 +310,13 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
     bgEnd > 0 && timeOf(bgStart, 'yyyyMMdd') === timeOf(bgEnd, 'yyyyMMdd');
   const bgOutcome = backgroundOutcome(backgroundSyncInfo);
   const bgIcon: Record<BackgroundOutcome, React.ReactNode> = {
-    ok: <CheckCircleIcon size={BG_ICON} />,
+    ok: (
+      <CheckCircleIcon
+        size={BG_ICON}
+        color={colors.fgAccent}
+        checkColor={colors.fgOnAccent}
+      />
+    ),
     skipped: <BanIcon size={BG_ICON} color={SOFT_INK} />,
     failed: <TriangleAlert size={BG_ICON} color={RED_INK} />,
     interrupted: <TriangleAlert size={BG_ICON} color={AMBER} />,
@@ -332,7 +338,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
     <View style={{ marginTop: 10 }}>
       {[
         {
-          icon: <BlocksIcon />,
+          icon: <BlocksIcon color={colors.fgAccent} />,
           text: (
             <Text>
               {startBefore}
@@ -342,11 +348,11 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
           ),
         },
         {
-          icon: <ClockIcon />,
+          icon: <ClockIcon color={colors.fgAccent} />,
           text: translate('sync.sheet-time') as string,
         },
         {
-          icon: <HalfCircleIcon />,
+          icon: <HalfCircleIcon color={colors.fgAccent} />,
           text: translate('sync.sheet-incomplete') as string,
         },
       ].map((row, i) => (
@@ -428,7 +434,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
             backgroundColor: pressed ? 'rgba(255,255,255,0.06)' : undefined,
           })}
         >
-          <ChevronLeft size={22} color={colors.fgAccent} strokeWidth={2.2} />
+          <ChevronLeft size={22} color={colors.fgAccent} />
         </Pressable>
         <Text
           accessibilityRole="header"
@@ -480,7 +486,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
           <Animated.View
             style={[{ width: RESCAN_ICON, height: RESCAN_ICON }, rescanStyle]}
           >
-            <RescanCloud size={RESCAN_ICON} />
+            <RescanCloud size={RESCAN_ICON} color={colors.fgMuted} />
             <Animated.View
               style={[
                 {
@@ -493,7 +499,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                 arrowsStyle,
               ]}
             >
-              <RescanArrows size={RESCAN_ICON} />
+              <RescanArrows size={RESCAN_ICON} color={colors.fgAccent} />
             </Animated.View>
           </Animated.View>
         </Pressable>

@@ -28,7 +28,7 @@ const DoneStep: React.FunctionComponent = () => {
           marginBottom: 20,
         }}
       >
-        <CheckIcon size={34} color={colors.fgAccent} strokeWidth={2.6} />
+        <CheckIcon size={34} color={colors.fgAccent} />
       </View>
       <Text
         accessibilityRole="header"

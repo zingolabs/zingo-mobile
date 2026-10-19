@@ -33,12 +33,11 @@ import AlSummaryLine from './components/AlSummaryLine';
 import { ContextAppLoaded } from '@app/context';
 import { deliver } from '@app/navigation/results';
 import Header from '@ui/widgets/Header';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faAngleUp, faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 import BottomSheet from '@gorhom/bottom-sheet';
 import { RPCAddressScopeEnum } from '@app/walletBackend/enums/RPCAddressScopeEnum';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
+import { ChevronLeft, ChevronUp } from '@ui/primitives/Icons/Chevron';
 
 type AddressListProps = NativeStackScreenProps<
   AppDrawerParamList,
@@ -121,11 +120,7 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
           hitSlop={8}
           style={{ paddingHorizontal: 4, paddingVertical: 4 }}
         >
-          <FontAwesomeIcon
-            icon={faChevronLeft}
-            size={20}
-            color={colors.fgAccent}
-          />
+          <ChevronLeft size={20} color={colors.fgAccent} />
         </TouchableOpacity>
         <BoldText
           numberOfLines={1}
@@ -370,10 +365,9 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
             opacity: isScrollingToTop ? 0.5 : 1,
           })}
         >
-          <FontAwesomeIcon
+          <ChevronUp
             style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
             size={16}
-            icon={faAngleUp}
             color={colors.fgMuted}
           />
         </Pressable>

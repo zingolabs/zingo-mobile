@@ -8,12 +8,6 @@ import {
   View,
 } from 'react-native';
 import { radiusSheet, useTheme } from '@app/theme';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import {
-  faCheck,
-  faChevronDown,
-  faXmark,
-} from '@fortawesome/free-solid-svg-icons';
 import {
   BottomSheetBackdrop,
   BottomSheetBackdropProps,
@@ -32,6 +26,9 @@ import SearchField from '@ui/widgets/SearchField';
 import { chainDisplayName } from './chainDisplayName';
 import { getChainIcon } from './chainIcons';
 import { fieldBorder } from '@ui/primitives/fieldBorder';
+import { ChevronDown } from '@ui/primitives/Icons/Chevron';
+import { XIcon } from '@ui/primitives/Icons/XIcon';
+import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
 
 // Zcash has no entry in the bundled `chainIcons` map; use the app's own logo.
 const ZCASH_LOGO = require('../../assets/img/zcash-yellow.png');
@@ -198,13 +195,7 @@ const ChainSelect: React.FunctionComponent<ChainSelectProps> = ({
         >
           {(value || '').toUpperCase()}
         </FadeText>
-        {canPick ? (
-          <FontAwesomeIcon
-            icon={faChevronDown}
-            size={16}
-            color={colors.fgMuted}
-          />
-        ) : null}
+        {canPick ? <ChevronDown size={16} color={colors.fgMuted} /> : null}
       </TouchableOpacity>
 
       <BottomSheetModal
@@ -271,11 +262,7 @@ const ChainSelect: React.FunctionComponent<ChainSelectProps> = ({
                 hitSlop={8}
                 style={{ padding: 14 }}
               >
-                <FontAwesomeIcon
-                  icon={faXmark}
-                  size={20}
-                  color={colors.fgDefault}
-                />
+                <XIcon size={20} color={colors.fgDefault} />
               </Pressable>
             </View>
 
@@ -332,13 +319,7 @@ const ChainSelect: React.FunctionComponent<ChainSelectProps> = ({
                       {(chain || '').toUpperCase()}
                     </FadeText>
                   </View>
-                  {selected && (
-                    <FontAwesomeIcon
-                      icon={faCheck}
-                      size={16}
-                      color={colors.fgAccent}
-                    />
-                  )}
+                  {selected && <CheckIcon size={16} color={colors.fgAccent} />}
                 </Pressable>
               );
             })}

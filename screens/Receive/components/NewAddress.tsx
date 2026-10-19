@@ -20,8 +20,6 @@ import { ContextAppLoaded } from '@app/context';
 import Button from '@ui/primitives/Button';
 import ButtonStack from '@ui/primitives/ButtonStack';
 import { AddressUnifiedTypeEnum } from '@app/AppState';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faChevronDown, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import SelectBottomSheet from '@ui/widgets/SelectBottomSheet';
 import {
@@ -33,6 +31,8 @@ import { RPCTransparentAddressType } from '@app/walletBackend/types/RPCTranspare
 import Utils from '@app/utils';
 import AddressBookFileImpl from '@app/services/AddressBookFileImpl';
 import { fieldBorder } from '@ui/primitives/fieldBorder';
+import { XIcon } from '@ui/primitives/Icons/XIcon';
+import { ChevronDown } from '@ui/primitives/Icons/Chevron';
 
 type NewAddressProps = {
   addressKind: AddressKindEnum;
@@ -183,10 +183,9 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
             />
             {label && (
               <TouchableOpacity onPress={() => setLabel('')}>
-                <FontAwesomeIcon
+                <XIcon
                   style={{ marginRight: 10 }}
                   size={20}
-                  icon={faXmark}
                   color={colors.fgAccentDisabled}
                 />
               </TouchableOpacity>
@@ -246,9 +245,8 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
                           ? (translate('receive.shielded-sapling') as string)
                           : ''}
                   </RegText>
-                  <FontAwesomeIcon
-                    size={12}
-                    icon={faChevronDown}
+                  <ChevronDown
+                    size={16}
                     color={colors.fgDefault}
                     style={{ marginRight: 20 }}
                   />

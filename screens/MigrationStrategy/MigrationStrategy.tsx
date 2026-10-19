@@ -10,8 +10,6 @@ import React, {
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { useTheme } from '@app/theme';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import BoldText from '@ui/primitives/BoldText';
 import Button from '@ui/primitives/Button';
@@ -23,6 +21,7 @@ import { AppTheme } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
 import { Route } from '@app/AppState';
 import Utils from '@app/utils';
+import { XIcon } from '@ui/primitives/Icons/XIcon';
 
 type MigrationStrategyProps = NativeStackScreenProps<
   AppDrawerParamList,
@@ -288,7 +287,7 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
             justifyContent: 'center',
           }}
         >
-          <FontAwesomeIcon icon={faXmark} size={22} color={colors.fgMuted} />
+          <XIcon size={20} color={colors.fgMuted} />
         </TouchableOpacity>
         <ScrollView
           style={{ flex: 1 }}

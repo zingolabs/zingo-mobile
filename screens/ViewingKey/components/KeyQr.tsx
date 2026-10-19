@@ -125,7 +125,7 @@ const KeyQr: React.FunctionComponent<KeyQrProps> = ({
           justifyContent: 'center',
         }}
       >
-        <SnowflakeIcon size={22} color={colors.fgViewOnly} strokeWidth={2} />
+        <SnowflakeIcon size={22} color={colors.fgViewOnly} />
       </View>
     </View>
   );

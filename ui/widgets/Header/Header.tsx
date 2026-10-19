@@ -1,9 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
-import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 import { SnowflakeIcon } from '@ui/primitives/Icons/SnowflakeIcon';
 import { REVEAL_OPEN_MS } from '@ui/widgets/CircularReveal';
 import { ease } from '@app/theme/motion';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
   StackActions,
   useNavigation,
@@ -41,6 +39,7 @@ import BalanceRow from './components/BalanceRow';
 import PriceRow from './components/PriceRow';
 import { MessagesIcon } from '@ui/primitives/Icons/MessagesIcon';
 import { MenuMorphIcon } from '@ui/widgets/MenuMorphIcon';
+import { ChevronLeft } from '@ui/primitives/Icons/Chevron';
 
 type HeaderProps = {
   // general
@@ -327,11 +326,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                   onPress={ufvkShowModal}
                 >
                   <Animated.View ref={snowflake} style={snowStyle}>
-                    <SnowflakeIcon
-                      size={22}
-                      color={colors.fgViewOnly}
-                      strokeWidth={1.8}
-                    />
+                    <SnowflakeIcon size={22} color={colors.fgViewOnly} />
                   </Animated.View>
                 </TouchableOpacity>
               </Animated.View>
@@ -400,10 +395,9 @@ const Header: React.FunctionComponent<HeaderProps> = ({
           {closeScreen ? (
             <>
               <TouchableOpacity onPress={closeScreen}>
-                <FontAwesomeIcon
+                <ChevronLeft
                   style={{ marginHorizontal: 10 }}
                   size={24}
-                  icon={faChevronLeft}
                   color={colors.fgAccent}
                 />
               </TouchableOpacity>

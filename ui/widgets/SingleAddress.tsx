@@ -23,11 +23,10 @@ import { EyeIcon } from '@ui/primitives/Icons/EyeIcon';
 import { TriangleAlert } from '@ui/primitives/Icons/TriangleAlert';
 import { ShieldIcon } from '@ui/primitives/Icons/ShieldIcon';
 import { ListIcon } from '@ui/primitives/Icons/ListIcon';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faCircleCheck } from '@fortawesome/free-regular-svg-icons';
 import Address from './Address/Address';
 import { getZingoLogo } from '@app/utils/ZingoAppData';
 import { useTimedReveal } from '@app/hooks/useTimedReveal';
+import { CheckCircleLineIcon } from '@ui/primitives/Icons/CheckCircleLineIcon';
 
 type SingleAddressProps = {
   address?: UnifiedAddressClass | TransparentAddressClass;
@@ -351,10 +350,9 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                           marginHorizontal: 10,
                         }}
                       >
-                        <FontAwesomeIcon
+                        <CheckCircleLineIcon
                           style={{ margin: 5, opacity: 0.9 }}
                           size={20}
-                          icon={faCircleCheck}
                           color={colors.fgDefault}
                         />
                       </View>

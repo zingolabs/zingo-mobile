@@ -323,7 +323,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
             backgroundColor: pressed ? 'rgba(255,255,255,0.06)' : undefined,
           })}
         >
-          <ChevronLeft size={22} color={colors.fgAccent} strokeWidth={2.2} />
+          <ChevronLeft size={22} color={colors.fgAccent} />
         </Pressable>
         <Text
           accessibilityRole="header"
@@ -465,7 +465,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
                   marginBottom: 10,
                 }}
               >
-                <ChevronDown size={18} color={HINT_ICON} strokeWidth={2.2} />
+                <ChevronDown size={18} color={HINT_ICON} />
                 <Text
                   style={{
                     flexShrink: 1,

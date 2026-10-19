@@ -2,8 +2,6 @@
 import React, { forwardRef, useCallback } from 'react';
 import { Keyboard, Pressable, View } from 'react-native';
 import { radiusSheet, useTheme } from '@app/theme';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import {
   BottomSheetBackdrop,
   BottomSheetBackdropProps,
@@ -14,6 +12,7 @@ import {
 import BoldText from '@ui/primitives/BoldText';
 import RegText from '@ui/primitives/RegText';
 import SheetRim from '@ui/primitives/SheetRim';
+import { XIcon } from '@ui/primitives/Icons/XIcon';
 
 export type ActionMenuBottomSheetAction = {
   label: string;
@@ -86,7 +85,7 @@ const ActionMenuBottomSheet = forwardRef<
             hitSlop={8}
             style={{ paddingHorizontal: 14, paddingVertical: 4 }}
           >
-            <FontAwesomeIcon icon={faXmark} size={20} color={colors.fgMuted} />
+            <XIcon size={20} color={colors.fgMuted} />
           </Pressable>
         </View>
       </View>
