@@ -49,6 +49,10 @@ const colors: ThemeColors = {
   bgViewOnlySubtle: '#8FB4E61F',
 
   bgNym: '#07FF94',
+  bgNymSubtle: '#07FF941F',
+
+  fgPriceUp: '#3CC52A',
+  fgPriceDown: '#F2878A',
 
   fgOrchard: '#4E8E96',
   borderOrchard: '#2E5E66',

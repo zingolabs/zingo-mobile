@@ -26,7 +26,7 @@ import ZecAmount from '@ui/widgets/ZecAmount';
 import CurrencyAmount from '@ui/widgets/CurrencyAmount';
 import Button from '@ui/primitives/Button';
 import AppSheet from '@ui/primitives/AppSheet';
-import { useTheme } from '@app/theme';
+import { space20, useTheme } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
 import Header from '@ui/widgets/Header';
 import AddressItem from '@ui/widgets/AddressItem';
@@ -240,7 +240,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
       <BottomSheetFooter {...props} bottomInset={0}>
         <View
           style={{
-            paddingHorizontal: 16,
+            paddingHorizontal: space20,
             backgroundColor: colors.bgSurface,
             paddingTop: 10,
             paddingBottom: 24,
@@ -315,6 +315,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
               flexDirection: 'column',
               alignItems: 'stretch',
               justifyContent: 'flex-start',
+              paddingHorizontal: space20,
               paddingBottom: 80,
             }}
           >
@@ -322,11 +323,11 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                margin: 25,
+                marginVertical: 25,
                 padding: 10,
                 borderWidth: 1,
                 borderRadius: 10,
-                borderColor: '#07FF94',
+                borderColor: colors.bgNym,
               }}
             >
               <RegText
@@ -339,7 +340,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                 currencyName={info.currencyName}
                 amtZec={sendingTotal}
                 privacy={false}
-                size={28}
+                size={22}
                 smallPrefix={true}
               />
               {quote.kind === 'quote' && (
@@ -354,7 +355,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
             <View
               style={{ flexDirection: 'row', justifyContent: 'space-between' }}
             >
-              <View style={{ margin: 10 }}>
+              <View style={{ marginVertical: 10 }}>
                 <FadeText>
                   {translate('send.confirm-privacy-level') as string}
                 </FadeText>
@@ -371,26 +372,25 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                   ) : (
                     <RegText>{privacyLevel}</RegText>
                   )}
-                  <RegText style={{ color: '#07FF94' }}>
+                  <RegText style={{ color: colors.bgNym }}>
                     {translate('send.nym-enhanced') as string}
                   </RegText>
                 </View>
               </View>
             </View>
 
-            <FadeText style={{ marginTop: 0, marginLeft: 10 }}>
+            <FadeText style={{ marginTop: 0 }}>
               {translate('send.fee') as string}
             </FadeText>
             <View
               style={{
                 flexDirection: 'row',
                 justifyContent: 'space-between',
-                marginHorizontal: 10,
               }}
             >
               <ZecAmount
                 currencyName={info.currencyName}
-                size={14}
+                size={15}
                 amtZec={calculatedFee}
                 privacy={false}
               />
@@ -407,7 +407,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
 
             {[sendPageState.toaddr].map(to => {
               return (
-                <View key={`${to.id}-${to.to}`} style={{ margin: 10 }}>
+                <View key={`${to.id}-${to.to}`} style={{ marginVertical: 10 }}>
                   <FadeText>{translate('send.to') as string}</FadeText>
                   <AddressItem
                     address={to.to}
@@ -427,7 +427,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                   >
                     <ZecAmount
                       currencyName={info.currencyName}
-                      size={14}
+                      size={15}
                       amtZec={Utils.parseStringLocaleToNumberFloat(to.amount)}
                       privacy={false}
                     />
@@ -456,22 +456,22 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
             })}
             <View
               style={{
-                margin: 10,
+                marginVertical: 10,
                 padding: 10,
                 borderWidth: 1,
                 borderRadius: 10,
-                borderColor: '#07FF94',
-                backgroundColor: '#07252B',
+                borderColor: colors.bgNym,
+                backgroundColor: colors.bgNymSubtle,
                 flexDirection: 'row',
                 alignItems: 'center',
               }}
             >
               <TriangleAlert
                 size={20}
-                color={'#07FF94'}
+                color={colors.bgNym}
                 style={{ marginRight: 6 }}
               />
-              <RegText style={{ flex: 1, fontSize: 13, color: '#87919B' }}>
+              <RegText style={{ flex: 1, fontSize: 13, color: colors.fgMuted }}>
                 {translate('send.nym-warning') as string}
               </RegText>
             </View>

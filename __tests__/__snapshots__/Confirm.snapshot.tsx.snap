@@ -127,7 +127,7 @@ exports[`Confirm - snapshots Confirm privacy off 1`] = `
             "borderRadius": 10,
             "borderWidth": 1,
             "display": "flex",
-            "margin": 25,
+            "marginVertical": 25,
             "padding": 10,
           }
         }
@@ -203,7 +203,7 @@ exports[`Confirm - snapshots Confirm privacy off 1`] = `
                 style={
                   {
                     "color": "#c3c3c3",
-                    "fontSize": 28,
+                    "fontSize": 22,
                     "fontWeight": "700",
                     "margin": 0,
                     "padding": 0,
@@ -217,9 +217,9 @@ exports[`Confirm - snapshots Confirm privacy off 1`] = `
                 style={
                   {
                     "color": "#c3c3c3",
-                    "fontSize": 19.599999999999998,
+                    "fontSize": 15.399999999999999,
                     "margin": 0,
-                    "marginBottom": 1.8666666666666667,
+                    "marginBottom": 1.4666666666666666,
                     "padding": 0,
                   }
                 }
@@ -242,7 +242,7 @@ exports[`Confirm - snapshots Confirm privacy off 1`] = `
         <View
           style={
             {
-              "margin": 10,
+              "marginVertical": 10,
             }
           }
         >
@@ -305,7 +305,6 @@ exports[`Confirm - snapshots Confirm privacy off 1`] = `
             "fontSize": 15,
             "fontWeight": "400",
             "lineHeight": 21,
-            "marginLeft": 10,
             "marginTop": 0,
           }
         }
@@ -317,7 +316,6 @@ exports[`Confirm - snapshots Confirm privacy off 1`] = `
           {
             "flexDirection": "row",
             "justifyContent": "space-between",
-            "marginHorizontal": 10,
           }
         }
       >
@@ -377,7 +375,7 @@ exports[`Confirm - snapshots Confirm privacy off 1`] = `
                 style={
                   {
                     "color": "#c3c3c3",
-                    "fontSize": 14,
+                    "fontSize": 15,
                     "fontWeight": "700",
                     "margin": 0,
                     "padding": 0,
@@ -391,9 +389,9 @@ exports[`Confirm - snapshots Confirm privacy off 1`] = `
                 style={
                   {
                     "color": "#c3c3c3",
-                    "fontSize": 9.799999999999999,
+                    "fontSize": 10.5,
                     "margin": 0,
-                    "marginBottom": 0.9333333333333333,
+                    "marginBottom": 1,
                     "padding": 0,
                   }
                 }
@@ -408,7 +406,7 @@ exports[`Confirm - snapshots Confirm privacy off 1`] = `
       <View
         style={
           {
-            "margin": 10,
+            "marginVertical": 10,
           }
         }
       >
@@ -618,7 +616,7 @@ exports[`Confirm - snapshots Confirm privacy off 1`] = `
                   style={
                     {
                       "color": "#c3c3c3",
-                      "fontSize": 14,
+                      "fontSize": 15,
                       "fontWeight": "700",
                       "margin": 0,
                       "padding": 0,
@@ -632,9 +630,9 @@ exports[`Confirm - snapshots Confirm privacy off 1`] = `
                   style={
                     {
                       "color": "#c3c3c3",
-                      "fontSize": 9.799999999999999,
+                      "fontSize": 10.5,
                       "margin": 0,
-                      "marginBottom": 0.9333333333333333,
+                      "marginBottom": 1,
                       "padding": 0,
                     }
                   }
@@ -689,12 +687,12 @@ memo10
         style={
           {
             "alignItems": "center",
-            "backgroundColor": "#07252B",
+            "backgroundColor": "#07FF941F",
             "borderColor": "#07FF94",
             "borderRadius": 10,
             "borderWidth": 1,
             "flexDirection": "row",
-            "margin": 10,
+            "marginVertical": 10,
             "padding": 10,
           }
         }
@@ -703,7 +701,7 @@ memo10
           maxFontSizeMultiplier={2}
           style={
             {
-              "color": "#87919B",
+              "color": "#888888",
               "flex": 1,
               "fontSize": 13,
               "fontWeight": "400",
@@ -852,7 +850,7 @@ exports[`Confirm - snapshots Confirm privacy on 1`] = `
             "borderRadius": 10,
             "borderWidth": 1,
             "display": "flex",
-            "margin": 25,
+            "marginVertical": 25,
             "padding": 10,
           }
         }
@@ -928,7 +926,7 @@ exports[`Confirm - snapshots Confirm privacy on 1`] = `
                 style={
                   {
                     "color": "#c3c3c3",
-                    "fontSize": 28,
+                    "fontSize": 22,
                     "fontWeight": "700",
                     "margin": 0,
                     "padding": 0,
@@ -942,9 +940,9 @@ exports[`Confirm - snapshots Confirm privacy on 1`] = `
                 style={
                   {
                     "color": "#c3c3c3",
-                    "fontSize": 19.599999999999998,
+                    "fontSize": 15.399999999999999,
                     "margin": 0,
-                    "marginBottom": 1.8666666666666667,
+                    "marginBottom": 1.4666666666666666,
                     "padding": 0,
                   }
                 }
@@ -967,7 +965,7 @@ exports[`Confirm - snapshots Confirm privacy on 1`] = `
         <View
           style={
             {
-              "margin": 10,
+              "marginVertical": 10,
             }
           }
         >
@@ -1030,7 +1028,6 @@ exports[`Confirm - snapshots Confirm privacy on 1`] = `
             "fontSize": 15,
             "fontWeight": "400",
             "lineHeight": 21,
-            "marginLeft": 10,
             "marginTop": 0,
           }
         }
@@ -1042,7 +1039,6 @@ exports[`Confirm - snapshots Confirm privacy on 1`] = `
           {
             "flexDirection": "row",
             "justifyContent": "space-between",
-            "marginHorizontal": 10,
           }
         }
       >
@@ -1102,7 +1098,7 @@ exports[`Confirm - snapshots Confirm privacy on 1`] = `
                 style={
                   {
                     "color": "#c3c3c3",
-                    "fontSize": 14,
+                    "fontSize": 15,
                     "fontWeight": "700",
                     "margin": 0,
                     "padding": 0,
@@ -1116,9 +1112,9 @@ exports[`Confirm - snapshots Confirm privacy on 1`] = `
                 style={
                   {
                     "color": "#c3c3c3",
-                    "fontSize": 9.799999999999999,
+                    "fontSize": 10.5,
                     "margin": 0,
-                    "marginBottom": 0.9333333333333333,
+                    "marginBottom": 1,
                     "padding": 0,
                   }
                 }
@@ -1133,7 +1129,7 @@ exports[`Confirm - snapshots Confirm privacy on 1`] = `
       <View
         style={
           {
-            "margin": 10,
+            "marginVertical": 10,
           }
         }
       >
@@ -1343,7 +1339,7 @@ exports[`Confirm - snapshots Confirm privacy on 1`] = `
                   style={
                     {
                       "color": "#c3c3c3",
-                      "fontSize": 14,
+                      "fontSize": 15,
                       "fontWeight": "700",
                       "margin": 0,
                       "padding": 0,
@@ -1357,9 +1353,9 @@ exports[`Confirm - snapshots Confirm privacy on 1`] = `
                   style={
                     {
                       "color": "#c3c3c3",
-                      "fontSize": 9.799999999999999,
+                      "fontSize": 10.5,
                       "margin": 0,
-                      "marginBottom": 0.9333333333333333,
+                      "marginBottom": 1,
                       "padding": 0,
                     }
                   }
@@ -1414,12 +1410,12 @@ memo10
         style={
           {
             "alignItems": "center",
-            "backgroundColor": "#07252B",
+            "backgroundColor": "#07FF941F",
             "borderColor": "#07FF94",
             "borderRadius": 10,
             "borderWidth": 1,
             "flexDirection": "row",
-            "margin": 10,
+            "marginVertical": 10,
             "padding": 10,
           }
         }
@@ -1428,7 +1424,7 @@ memo10
           maxFontSizeMultiplier={2}
           style={
             {
-              "color": "#87919B",
+              "color": "#888888",
               "flex": 1,
               "fontSize": 13,
               "fontWeight": "400",
