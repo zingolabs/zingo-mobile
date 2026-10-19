@@ -102,7 +102,7 @@
     "@react-native-community/datetimepicker": "^9.2.1",
     "@react-native-community/slider": "^5.2.1",
     "@react-native/babel-preset": "0.81.6",
-    "@react-native/eslint-config": "^0.81.6",
+    "@react-native/eslint-config": "^0.88.0",
     "@react-native/metro-config": "0.81.6",
     "@react-native/typescript-config": "0.81.6",
     "@storybook/addon-ondevice-actions": "^9.1.4",
