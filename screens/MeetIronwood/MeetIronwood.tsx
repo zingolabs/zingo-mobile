@@ -36,7 +36,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import BoldText from '@ui/primitives/BoldText';
 import Button from '@ui/primitives/Button';
-import ButtonRow from '@ui/primitives/ButtonRow';
+import ButtonStack from '@ui/primitives/ButtonStack';
 import SettingsFileImpl from '@app/services/SettingsFileImpl';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
@@ -672,7 +672,6 @@ const MeetIronwood: React.FunctionComponent<MeetIronwoodProps> = ({
         {index === 0 ? (
           <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
             <Button
-              fullWidth
               testID="meetironwood.primary"
               variant="primary"
               title={translate('meetironwood.next') as string}
@@ -687,7 +686,7 @@ const MeetIronwood: React.FunctionComponent<MeetIronwoodProps> = ({
               alignItems: 'center',
             }}
           >
-            <ButtonRow>
+            <ButtonStack>
               <Button
                 testID="meetironwood.back"
                 variant="text"
@@ -700,7 +699,7 @@ const MeetIronwood: React.FunctionComponent<MeetIronwoodProps> = ({
                 title={translate('meetironwood.next') as string}
                 onPress={onPrimary}
               />
-            </ButtonRow>
+            </ButtonStack>
           </View>
         )}
       </Animated.View>

@@ -7,7 +7,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import BoldText from '@ui/primitives/BoldText';
 import Button from '@ui/primitives/Button';
-import ButtonRow from '@ui/primitives/ButtonRow';
+import ButtonStack from '@ui/primitives/ButtonStack';
 import { AppDrawerParamList } from '@app/types';
 import { AppTheme } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
@@ -239,7 +239,6 @@ const MigrationTransactions: React.FunctionComponent<
           }}
         >
           <Button
-            fullWidth
             variant="text"
             title={translate('migrationtransactions.back') as string}
             onPress={() => navigation.goBack()}
@@ -290,7 +289,7 @@ const MigrationTransactions: React.FunctionComponent<
             paddingHorizontal: 24,
           }}
         >
-          <ButtonRow>
+          <ButtonStack>
             <Button
               testID="migrationtransactions.pending-back"
               variant="text"
@@ -303,7 +302,7 @@ const MigrationTransactions: React.FunctionComponent<
               title={translate('migrationtransactions.retry') as string}
               onPress={fetchPlan}
             />
-          </ButtonRow>
+          </ButtonStack>
         </View>
       </View>
     );
@@ -351,7 +350,6 @@ const MigrationTransactions: React.FunctionComponent<
           }}
         >
           <Button
-            fullWidth
             variant="primary"
             title={translate('migrationtransactions.close') as string}
             onPress={goHome}
@@ -492,7 +490,7 @@ const MigrationTransactions: React.FunctionComponent<
           paddingHorizontal: 24,
         }}
       >
-        <ButtonRow>
+        <ButtonStack>
           <Button
             testID="migrationtransactions.back"
             variant="text"
@@ -505,7 +503,7 @@ const MigrationTransactions: React.FunctionComponent<
             title={translate('migrationtransactions.accept') as string}
             onPress={onAccept}
           />
-        </ButtonRow>
+        </ButtonStack>
       </View>
     </View>
   );

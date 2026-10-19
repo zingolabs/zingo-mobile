@@ -275,7 +275,6 @@ const MigrationSending: React.FunctionComponent<MigrationSendingProps> = ({
           }}
         >
           <Button
-            fullWidth
             variant="primary"
             title={translate('migrationsending.close') as string}
             onPress={goHome}

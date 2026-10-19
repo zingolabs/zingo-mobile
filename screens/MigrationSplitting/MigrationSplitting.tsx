@@ -23,7 +23,7 @@ import { faCheck } from '@fortawesome/free-solid-svg-icons';
 
 import BoldText from '@ui/primitives/BoldText';
 import Button from '@ui/primitives/Button';
-import ButtonRow from '@ui/primitives/ButtonRow';
+import ButtonStack from '@ui/primitives/ButtonStack';
 import ProgressBar from '@ui/primitives/ProgressBar';
 import StepperHeader from '@ui/widgets/StepperHeader';
 import { AppDrawerParamList } from '@app/types';
@@ -395,7 +395,7 @@ const MigrationSplitting: React.FunctionComponent<MigrationSplittingProps> = ({
             paddingHorizontal: 24,
           }}
         >
-          <ButtonRow>
+          <ButtonStack>
             <Button
               variant="quiet"
               title={translate('migrationsplitting.close') as string}
@@ -406,7 +406,7 @@ const MigrationSplitting: React.FunctionComponent<MigrationSplittingProps> = ({
               title={translate('migrationsplitting.retry') as string}
               onPress={onRetry}
             />
-          </ButtonRow>
+          </ButtonStack>
         </View>
       </View>
     );
@@ -499,7 +499,6 @@ const MigrationSplitting: React.FunctionComponent<MigrationSplittingProps> = ({
           }}
         >
           <Button
-            fullWidth
             testID="migrationsplitting.continue"
             variant="primary"
             title={translate('migrationsplitting.continue') as string}

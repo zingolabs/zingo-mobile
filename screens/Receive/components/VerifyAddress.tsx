@@ -6,7 +6,7 @@ import { useTheme } from '@app/theme';
 import { GlobalConst, SnackbarDurationEnum } from '@app/AppState';
 import { ContextAppLoaded } from '@app/context';
 import Button from '@ui/primitives/Button';
-import ButtonRow from '@ui/primitives/ButtonRow';
+import ButtonStack from '@ui/primitives/ButtonStack';
 import { checkMyAddress } from '@app/walletBackend';
 import { parseZcashURI } from '@app/uris';
 import Utils from '@app/utils';
@@ -173,7 +173,7 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
             marginTop: 15,
           }}
         >
-          <ButtonRow>
+          <ButtonStack>
             <Button
               variant="quiet"
               title={translate('cancel') as string}
@@ -194,7 +194,7 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
               }}
               disabled={!address || !!errorAddress}
             />
-          </ButtonRow>
+          </ButtonStack>
         </View>
       </View>
     </View>

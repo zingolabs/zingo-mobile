@@ -319,6 +319,7 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'flex-start',
+                paddingHorizontal: 16,
                 marginTop: 5,
                 marginBottom: 30,
               }}

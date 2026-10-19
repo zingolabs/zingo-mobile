@@ -448,7 +448,6 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
           title={translate('save') as string}
           disabled={saving}
           onPress={save}
-          fullWidth
           style={{
             marginTop: 20,
             opacity: ready ? 1 : SAVE_OFF,
@@ -463,7 +462,6 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
           Keyboard.dismiss();
           onCancel();
         }}
-        fullWidth
         style={{ marginTop: 8 }}
       />
     </View>

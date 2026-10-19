@@ -93,11 +93,10 @@ exports[`NewAddress - snapshots NewAddress transparent kind 1`] = `
       }
     >
       <View
-        onLayout={[Function]}
         style={
           {
             "alignSelf": "stretch",
-            "flexDirection": "row",
+            "flexDirection": "column-reverse",
             "flexGrow": 1,
             "gap": 12,
           }
@@ -135,22 +134,21 @@ exports[`NewAddress - snapshots NewAddress transparent kind 1`] = `
           style={
             {
               "alignItems": "center",
+              "alignSelf": "stretch",
               "backgroundColor": undefined,
               "borderRadius": 999,
-              "flex": 1,
               "justifyContent": "center",
               "maxWidth": "100%",
               "minHeight": 44,
-              "minWidth": 120,
               "opacity": 1,
               "paddingHorizontal": 24,
               "paddingVertical": 8,
+              "width": "100%",
             }
           }
         >
           <Text
             maxFontSizeMultiplier={1.5}
-            onTextLayout={[Function]}
             style={
               {
                 "color": "#888888",
@@ -196,22 +194,21 @@ exports[`NewAddress - snapshots NewAddress transparent kind 1`] = `
           style={
             {
               "alignItems": "center",
+              "alignSelf": "stretch",
               "backgroundColor": "#18bd18",
               "borderRadius": 999,
-              "flex": 1,
               "justifyContent": "center",
               "maxWidth": "100%",
               "minHeight": 44,
-              "minWidth": 120,
               "opacity": 1,
               "paddingHorizontal": 24,
               "paddingVertical": 8,
+              "width": "100%",
             }
           }
         >
           <Text
             maxFontSizeMultiplier={1.5}
-            onTextLayout={[Function]}
             style={
               {
                 "color": "#060B12",
@@ -626,11 +623,10 @@ exports[`NewAddress - snapshots NewAddress unified kind 1`] = `
       }
     >
       <View
-        onLayout={[Function]}
         style={
           {
             "alignSelf": "stretch",
-            "flexDirection": "row",
+            "flexDirection": "column-reverse",
             "flexGrow": 1,
             "gap": 12,
           }
@@ -668,22 +664,21 @@ exports[`NewAddress - snapshots NewAddress unified kind 1`] = `
           style={
             {
               "alignItems": "center",
+              "alignSelf": "stretch",
               "backgroundColor": undefined,
               "borderRadius": 999,
-              "flex": 1,
               "justifyContent": "center",
               "maxWidth": "100%",
               "minHeight": 44,
-              "minWidth": 120,
               "opacity": 1,
               "paddingHorizontal": 24,
               "paddingVertical": 8,
+              "width": "100%",
             }
           }
         >
           <Text
             maxFontSizeMultiplier={1.5}
-            onTextLayout={[Function]}
             style={
               {
                 "color": "#888888",
@@ -729,22 +724,21 @@ exports[`NewAddress - snapshots NewAddress unified kind 1`] = `
           style={
             {
               "alignItems": "center",
+              "alignSelf": "stretch",
               "backgroundColor": "#18bd18",
               "borderRadius": 999,
-              "flex": 1,
               "justifyContent": "center",
               "maxWidth": "100%",
               "minHeight": 44,
-              "minWidth": 120,
               "opacity": 1,
               "paddingHorizontal": 24,
               "paddingVertical": 8,
+              "width": "100%",
             }
           }
         >
           <Text
             maxFontSizeMultiplier={1.5}
-            onTextLayout={[Function]}
             style={
               {
                 "color": "#060B12",

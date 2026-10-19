@@ -303,6 +303,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = () => {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'flex-start',
+                      paddingHorizontal: 16,
                       marginTop: 20,
                       marginBottom: 10,
                     }}

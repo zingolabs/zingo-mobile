@@ -581,7 +581,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
           }}
         >
           <Button
-            fullWidth
             testID="settings.button.save"
             disabled={disabled || disabledButton}
             variant="primary"
@@ -985,7 +984,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
                           <BoldText>{'LAST ERROR'}</BoldText>
                         </View>
 
-                        <View style={{ marginLeft: 40, marginRight: 25 }}>
+                        <View style={{ marginHorizontal: 25 }}>
                           <Button
                             variant="primary"
                             title={translate('view-error') as string}
@@ -1010,7 +1009,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
                           </BoldText>
                         </View>
 
-                        <View style={{ marginLeft: 40, marginRight: 25 }}>
+                        <View style={{ marginHorizontal: 25 }}>
                           <Button
                             testID="settings.restorebackupwallet"
                             variant="text"

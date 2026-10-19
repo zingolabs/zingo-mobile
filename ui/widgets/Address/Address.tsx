@@ -28,6 +28,7 @@ const Address: React.FunctionComponent<AddressProps> = ({
 
   return (
     <Button
+      inline
       variant="text"
       onPress={onPress ? onPress : () => console.log('onPress')}
       title={shortAddress}

@@ -153,7 +153,6 @@ const Memo: React.FunctionComponent<MemoProps> = ({
           }}
         >
           <Button
-            fullWidth
             variant="primary"
             title={translate('save') as string}
             onPress={doSave}

@@ -261,7 +261,6 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
             </View>
           )}
           <Button
-            fullWidth
             testID="send.confirm.button"
             variant="nym"
             title={

@@ -33,15 +33,16 @@ exports[`Component Button - test Button Primary - snapshot 1`] = `
   style={
     {
       "alignItems": "center",
+      "alignSelf": "stretch",
       "backgroundColor": "#18bd18",
       "borderRadius": 999,
       "justifyContent": "center",
       "maxWidth": "100%",
       "minHeight": 44,
-      "minWidth": 120,
       "opacity": 1,
       "paddingHorizontal": 24,
       "paddingVertical": 8,
+      "width": "100%",
     }
   }
 >
@@ -95,15 +96,16 @@ exports[`Component Button - test Button Text - snapshot 1`] = `
   style={
     {
       "alignItems": "center",
+      "alignSelf": "stretch",
       "backgroundColor": undefined,
       "borderRadius": 999,
       "justifyContent": "center",
       "maxWidth": "100%",
       "minHeight": 44,
-      "minWidth": 120,
       "opacity": 1,
       "paddingHorizontal": 24,
       "paddingVertical": 8,
+      "width": "100%",
     }
   }
 >

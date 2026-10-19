@@ -3,7 +3,7 @@ import React from 'react';
 import { View } from 'react-native';
 import type { Meta, StoryObj } from '@storybook/react-native';
 import Button from './Button';
-import ButtonRow from './ButtonRow';
+import ButtonStack from './ButtonStack';
 
 const meta: Meta<typeof Button> = {
   title: 'Components/Button',
@@ -34,21 +34,21 @@ export const Danger: Story = {
 export const Nym: Story = { args: { variant: 'nym', title: 'Send via Nym' } };
 export const Small: Story = { args: { size: 'small', title: 'Back up' } };
 export const Disabled: Story = { args: { disabled: true } };
-export const FullWidth: Story = { args: { fullWidth: true } };
+export const Inline: Story = { args: { inline: true, variant: 'text' } };
 
-const Row = () => (
+const Stack = () => (
   <View style={{ width: 328 }}>
-    <ButtonRow>
+    <ButtonStack>
       <Button variant="text" title="Back" onPress={() => {}} />
       <Button variant="primary" title="Try again" onPress={() => {}} />
-    </ButtonRow>
+    </ButtonStack>
   </View>
 );
-export const TwoInARow: Story = { render: Row };
+export const TwoStacked: Story = { render: Stack };
 
-/** The OS text at 200%: labels cap at 1.5× and the row stacks. */
+/** The OS text at 200%: labels cap at 1.5× and wrap; the button grows. */
 export const Primary200: Story = { parameters: { textScale: 2 } };
-export const TwoInARow200: Story = {
-  render: Row,
+export const TwoStacked200: Story = {
+  render: Stack,
   parameters: { textScale: 2 },
 };

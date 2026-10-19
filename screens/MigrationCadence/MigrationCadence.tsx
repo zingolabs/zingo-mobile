@@ -331,7 +331,6 @@ const MigrationCadence: React.FunctionComponent<MigrationCadenceProps> = ({
           }}
         >
           <Button
-            fullWidth
             testID={dust ? 'migrationcadence.back' : 'migrationcadence.retry'}
             variant="primary"
             title={
@@ -437,7 +436,6 @@ const MigrationCadence: React.FunctionComponent<MigrationCadenceProps> = ({
         }}
       >
         <Button
-          fullWidth
           testID="migrationcadence.review"
           variant="primary"
           title={translate('migrationcadence.review') as string}

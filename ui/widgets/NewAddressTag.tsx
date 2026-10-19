@@ -175,7 +175,6 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
           title={translate('save') as string}
           disabled={saving}
           onPress={save}
-          fullWidth
           style={{
             marginTop: 20,
             opacity: ready ? 1 : SAVE_OFF,
@@ -190,7 +189,6 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
           Keyboard.dismiss();
           closeSheet();
         }}
-        fullWidth
         style={{ marginTop: 8 }}
       />
     </View>

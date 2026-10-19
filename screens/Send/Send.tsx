@@ -1951,7 +1951,6 @@ const Send: React.FunctionComponent<SendProps> = () => {
                 >
                   {showCalcError ? (
                     <Button
-                      fullWidth
                       variant="text"
                       title={`${translate('send.calc-error') as string} ⓘ`}
                       onPress={() => sendErrorSheetRef.current?.present()}
@@ -1959,7 +1958,6 @@ const Send: React.FunctionComponent<SendProps> = () => {
                     />
                   ) : (
                     <Button
-                      fullWidth
                       testID={
                         sendButtonEnabled
                           ? 'send.button'

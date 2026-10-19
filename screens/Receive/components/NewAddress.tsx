@@ -18,7 +18,7 @@ import {
 import RegText from '@ui/primitives/RegText';
 import { ContextAppLoaded } from '@app/context';
 import Button from '@ui/primitives/Button';
-import ButtonRow from '@ui/primitives/ButtonRow';
+import ButtonStack from '@ui/primitives/ButtonStack';
 import { AddressUnifiedTypeEnum } from '@app/AppState';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faChevronDown, faXmark } from '@fortawesome/free-solid-svg-icons';
@@ -265,7 +265,7 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
             paddingHorizontal: 10,
           }}
         >
-          <ButtonRow>
+          <ButtonStack>
             <Button
               variant="quiet"
               title={translate('cancel') as string}
@@ -284,7 +284,7 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
                 createAddress();
               }}
             />
-          </ButtonRow>
+          </ButtonStack>
         </View>
       </View>
       <SelectBottomSheet

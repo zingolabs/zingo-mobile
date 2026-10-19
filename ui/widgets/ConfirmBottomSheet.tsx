@@ -109,7 +109,6 @@ const ConfirmBottomSheet: React.FC = () => {
             }
             title={b.text}
             onPress={() => handleButton(b)}
-            fullWidth
           />
         ))}
       </View>
@@ -119,7 +118,6 @@ const ConfirmBottomSheet: React.FC = () => {
           variant="quiet"
           title={cancel.text}
           onPress={() => handleButton(cancel)}
-          fullWidth
           style={{ marginTop: 8 }}
         />
       )}

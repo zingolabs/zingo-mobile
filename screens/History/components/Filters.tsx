@@ -6,7 +6,7 @@ import { useTheme } from '@app/theme';
 import { FilterEnum } from '@app/AppState';
 import { ContextAppLoaded } from '@app/context';
 import Button from '@ui/primitives/Button';
-import ButtonRow from '@ui/primitives/ButtonRow';
+import ButtonStack from '@ui/primitives/ButtonStack';
 import FadeText from '@ui/primitives/FadeText';
 
 type FiltersProps = {
@@ -297,7 +297,7 @@ const Filters: React.FunctionComponent<FiltersProps> = ({
             marginTop: 30,
           }}
         >
-          <ButtonRow>
+          <ButtonStack>
             <Button
               variant="text"
               title={translate('clear') as string}
@@ -322,7 +322,7 @@ const Filters: React.FunctionComponent<FiltersProps> = ({
                 closeSheet();
               }}
             />
-          </ButtonRow>
+          </ButtonStack>
         </View>
       </View>
     </View>

@@ -565,7 +565,6 @@ const ValueTransferDetail: React.FunctionComponent<
                     }}
                   >
                     <Button
-                      fullWidth
                       variant="primary"
                       title={translate('history.remove') as string}
                       onPress={() => {

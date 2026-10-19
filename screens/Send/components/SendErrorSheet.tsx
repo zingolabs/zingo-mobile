@@ -201,7 +201,6 @@ const SendErrorSheet = forwardRef<BottomSheetModal, SendErrorSheetProps>(
 
           <View style={{ alignItems: 'center', marginTop: 4 }}>
             <Button
-              fullWidth
               variant="primary"
               title={t('support', 'Support')}
               onPress={onSupportPress}

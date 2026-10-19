@@ -550,7 +550,6 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
           }}
         >
           <Button
-            fullWidth
             testID="addressbook.new"
             variant="primary"
             title={translate('addressbook.new-contact') as string}

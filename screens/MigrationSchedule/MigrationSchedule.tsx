@@ -12,7 +12,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import BoldText from '@ui/primitives/BoldText';
 import Button from '@ui/primitives/Button';
-import ButtonRow from '@ui/primitives/ButtonRow';
+import ButtonStack from '@ui/primitives/ButtonStack';
 import StepperHeader from '@ui/widgets/StepperHeader';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
@@ -380,7 +380,7 @@ const MigrationSchedule: React.FunctionComponent<MigrationScheduleProps> = ({
           paddingHorizontal: 24,
         }}
       >
-        <ButtonRow>
+        <ButtonStack>
           <Button
             testID="migrationschedule.back"
             variant="text"
@@ -394,7 +394,7 @@ const MigrationSchedule: React.FunctionComponent<MigrationScheduleProps> = ({
             onPress={onConfirm}
             disabled={confirming}
           />
-        </ButtonRow>
+        </ButtonStack>
       </View>
     </View>
   );

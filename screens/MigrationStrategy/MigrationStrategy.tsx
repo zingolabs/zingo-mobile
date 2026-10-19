@@ -15,7 +15,7 @@ import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import BoldText from '@ui/primitives/BoldText';
 import Button from '@ui/primitives/Button';
-import ButtonRow from '@ui/primitives/ButtonRow';
+import ButtonStack from '@ui/primitives/ButtonStack';
 import NymGateSheet from './components/NymGateSheet';
 import { deriveNymGateState } from './components/nymGateState';
 import { AppDrawerParamList } from '@app/types';
@@ -350,7 +350,7 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
             paddingHorizontal: 24,
           }}
         >
-          <ButtonRow>
+          <ButtonStack>
             <Button
               testID="migrationstrategy.back"
               variant="text"
@@ -374,7 +374,7 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
                 nymSheetRef.current?.present();
               }}
             />
-          </ButtonRow>
+          </ButtonStack>
         </View>
       </View>
 

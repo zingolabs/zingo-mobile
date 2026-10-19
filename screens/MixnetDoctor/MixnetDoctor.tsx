@@ -356,7 +356,6 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
                     : (translate('mixnetdoctor.run') as string)
                 }
                 disabled={running || restingOff}
-                style={{ alignSelf: 'center' }}
                 onPress={() => runDoctor()}
               />
             </Animated.View>
@@ -372,7 +371,6 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
                 testID="mixnetdoctor.reenable"
                 variant="text"
                 title={translate('mixnet.reenable') as string}
-                style={{ alignSelf: 'center' }}
                 onPress={restartMixnet}
               />
             </Animated.View>
@@ -388,7 +386,6 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
                 testID="mixnetdoctor.copy"
                 variant="text"
                 title={translate('mixnetdoctor.copy-report') as string}
-                style={{ alignSelf: 'center' }}
                 onPress={() => copyReport(run)}
               />
             </Animated.View>

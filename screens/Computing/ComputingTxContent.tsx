@@ -95,7 +95,6 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
         >
           {isTerminal && (
             <Button
-              fullWidth
               variant="primary"
               title={translate('loadedapp.continue') as string}
               onPress={onContinue}

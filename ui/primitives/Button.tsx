@@ -37,13 +37,12 @@ export type ButtonProps = {
   accessible?: boolean;
   accessibilityLabel?: string;
   testID?: string;
-  /** Spans the whole row: bottom sheets and screen footers. */
-  fullWidth?: boolean;
-  /** How many lines the label took; `ButtonRow` stacks when one wraps. */
-  onLabelLines?: (lines: number) => void;
+  /**
+   * Takes its label's width instead of its container's: only for a button
+   * that reads as a link inside a line of text.
+   */
+  inline?: boolean;
 };
-
-const MIN_WIDTH = 120;
 
 const Button: React.FunctionComponent<ButtonProps> = ({
   variant,
@@ -56,8 +55,7 @@ const Button: React.FunctionComponent<ButtonProps> = ({
   accessible,
   accessibilityLabel,
   testID,
-  fullWidth,
-  onLabelLines,
+  inline,
 }) => {
   const { colors } = useTheme();
   const small = size === 'small';
@@ -94,13 +92,13 @@ const Button: React.FunctionComponent<ButtonProps> = ({
           fill !== undefined && disabled ? colors.bgAccentDisabled : fill,
         borderRadius: radiusPill,
         minHeight,
-        minWidth: MIN_WIDTH,
         maxWidth: '100%',
         paddingHorizontal: space24,
         paddingVertical: small ? 0 : space8,
         alignItems: 'center',
         justifyContent: 'center',
-        ...(fullWidth ? { alignSelf: 'stretch', width: '100%' } : {}),
+        /** Every action spans its form or container; the container sets the gutter. */
+        ...(inline ? {} : { alignSelf: 'stretch', width: '100%' }),
         ...style,
       }}
       disabled={disabled}
@@ -110,11 +108,6 @@ const Button: React.FunctionComponent<ButtonProps> = ({
         variant={small ? 'bodySmall' : 'button'}
         maxFontSizeMultiplier={fontScaleTitle}
         color={label}
-        onTextLayout={
-          onLabelLines
-            ? e => onLabelLines(e.nativeEvent.lines.length)
-            : undefined
-        }
         style={{
           textAlign: 'center',
           ...(small ? { fontWeight: '700' } : {}),

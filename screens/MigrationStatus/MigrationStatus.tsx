@@ -8,7 +8,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import BoldText from '@ui/primitives/BoldText';
 import Button from '@ui/primitives/Button';
-import ButtonRow from '@ui/primitives/ButtonRow';
+import ButtonStack from '@ui/primitives/ButtonStack';
 import SegmentedBar from '@ui/primitives/SegmentedBar';
 import StepperHeader from '@ui/widgets/StepperHeader';
 import { AppDrawerParamList } from '@app/types';
@@ -216,7 +216,7 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
             paddingHorizontal: 24,
           }}
         >
-          <ButtonRow>
+          <ButtonStack>
             <Button
               testID="migrationstatus.home"
               variant="text"
@@ -230,7 +230,7 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
               onPress={onStartOver}
               disabled={clearing}
             />
-          </ButtonRow>
+          </ButtonStack>
         </View>
       </View>
     );
@@ -519,7 +519,7 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
             paddingHorizontal: 24,
           }}
         >
-          <ButtonRow>
+          <ButtonStack>
             <Button
               testID="migrationstatus.home"
               variant="text"
@@ -536,7 +536,7 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
                 })
               }
             />
-          </ButtonRow>
+          </ButtonStack>
         </View>
       ) : (
         <View
@@ -548,7 +548,6 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
           }}
         >
           <Button
-            fullWidth
             testID="migrationstatus.home"
             variant="primary"
             title={translate('migrationstatus.back') as string}

@@ -7,7 +7,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import BoldText from '@ui/primitives/BoldText';
 import Button from '@ui/primitives/Button';
-import ButtonRow from '@ui/primitives/ButtonRow';
+import ButtonStack from '@ui/primitives/ButtonStack';
 import StepperHeader from '@ui/widgets/StepperHeader';
 import { AppDrawerParamList } from '@app/types';
 import { AppTheme } from '@app/theme';
@@ -246,7 +246,6 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
           }}
         >
           <Button
-            fullWidth
             variant="text"
             title={translate('migrationsplitplan.back') as string}
             onPress={() => navigation.goBack()}
@@ -298,7 +297,7 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
             paddingHorizontal: 24,
           }}
         >
-          <ButtonRow>
+          <ButtonStack>
             <Button
               testID="migrationsplitplan.pending-back"
               variant="text"
@@ -311,7 +310,7 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
               title={translate('migrationsplitplan.retry') as string}
               onPress={fetchPlan}
             />
-          </ButtonRow>
+          </ButtonStack>
         </View>
       </View>
     );
@@ -360,7 +359,6 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
           }}
         >
           <Button
-            fullWidth
             variant="primary"
             title={translate('migrationsplitplan.close') as string}
             onPress={goHome}
@@ -445,7 +443,7 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
             paddingHorizontal: 24,
           }}
         >
-          <ButtonRow>
+          <ButtonStack>
             <Button
               testID="migrationsplitplan.back"
               variant="text"
@@ -458,7 +456,7 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
               title={translate('migrationsplitplan.continue') as string}
               onPress={onAccept}
             />
-          </ButtonRow>
+          </ButtonStack>
         </View>
       </View>
     );
@@ -665,7 +663,7 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
           paddingHorizontal: 24,
         }}
       >
-        <ButtonRow>
+        <ButtonStack>
           <Button
             testID="migrationsplitplan.back"
             variant="text"
@@ -679,7 +677,7 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
             onPress={onAccept}
             disabled={!plan}
           />
-        </ButtonRow>
+        </ButtonStack>
       </View>
     </View>
   );
