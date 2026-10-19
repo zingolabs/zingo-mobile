@@ -434,6 +434,8 @@
     "lastupdate": "Son güncelleme:"
   },
   "info": {
+    "error-price-fetch": "ZEC fiyatı alınamadı.",
+    "error-price-payload": "ZEC fiyatı hatalı biçimde geldi.",
     "version": "Versiyon",
     "serverversion": "Sunucu versiyonu",
     "zainod": "Sunucu URL",
