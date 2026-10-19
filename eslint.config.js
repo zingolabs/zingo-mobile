@@ -18,13 +18,18 @@ module.exports = [
   {
     // Imports that leave the current folder go through the @app, @screens
     // and @ui aliases. assets/ and .storybook/ have no alias and stay
-    // relative.
+    // relative. Icons are own components, never FontAwesome.
     files: ['app/**', 'screens/**', 'ui/**'],
     rules: {
       'no-restricted-imports': [
         'error',
         {
           patterns: [
+            {
+              group: ['@fortawesome/*'],
+              message:
+                'Draw icons on ui/primitives/Icons/Icon, not with FontAwesome.',
+            },
             {
               regex: '^(\\.\\./)+(?!\\.\\./|assets/|\\.storybook/)',
               message:
