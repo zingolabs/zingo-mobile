@@ -17,7 +17,8 @@ import {
 } from '@app/AppState';
 import RegText from '@ui/primitives/RegText';
 import { ContextAppLoaded } from '@app/context';
-import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
+import Button from '@ui/primitives/Button';
+import ButtonRow from '@ui/primitives/ButtonRow';
 import { AddressUnifiedTypeEnum } from '@app/AppState';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faChevronDown, faXmark } from '@fortawesome/free-solid-svg-icons';
@@ -263,27 +264,26 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
             marginTop: 15,
           }}
         >
-          <Button
-            type={ButtonTypeEnum.Link}
-            title={translate('cancel') as string}
-            onPress={() => {
-              setLabel('');
-              Keyboard.dismiss();
-              setTimeout(() => {
-                closeSheet();
-              }, 100);
-            }}
-            twoButtons={true}
-          />
-          <Button
-            type={ButtonTypeEnum.Primary}
-            title={translate('save') as string}
-            style={{ marginLeft: 10 }}
-            onPress={() => {
-              createAddress();
-            }}
-            twoButtons={true}
-          />
+          <ButtonRow>
+            <Button
+              variant="quiet"
+              title={translate('cancel') as string}
+              onPress={() => {
+                setLabel('');
+                Keyboard.dismiss();
+                setTimeout(() => {
+                  closeSheet();
+                }, 100);
+              }}
+            />
+            <Button
+              variant="primary"
+              title={translate('save') as string}
+              onPress={() => {
+                createAddress();
+              }}
+            />
+          </ButtonRow>
         </View>
       </View>
       <SelectBottomSheet

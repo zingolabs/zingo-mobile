@@ -31,7 +31,7 @@ import { Route, ValueTransferType } from '@app/AppState';
 import { AppDrawerParamList, WalletNavigation } from '@app/types';
 import FadeText from '@ui/primitives/FadeText';
 import BoldText from '@ui/primitives/BoldText';
-import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
+import Button from '@ui/primitives/Button';
 import AppSheet from '@ui/primitives/AppSheet';
 import MessageLine from './components/MessageLine';
 import { ContextAppLoaded } from '@app/context';
@@ -308,7 +308,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = () => {
                     }}
                   >
                     <Button
-                      type={ButtonTypeEnum.Secondary}
+                      variant="text"
                       title={translate('history.loadmore') as string}
                       onPress={loadMoreClicked}
                     />

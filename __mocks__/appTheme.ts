@@ -15,3 +15,4 @@ export const themeTokens = mockTheme.colors;
 export * from '@app/theme/radii';
 export * from '@app/theme/spacing';
 export * from '@app/theme/sizes';
+export * from '@app/theme/typography';

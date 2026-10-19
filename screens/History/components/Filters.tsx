@@ -5,7 +5,8 @@ import { useTheme } from '@app/theme';
 
 import { FilterEnum } from '@app/AppState';
 import { ContextAppLoaded } from '@app/context';
-import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
+import Button from '@ui/primitives/Button';
+import ButtonRow from '@ui/primitives/ButtonRow';
 import FadeText from '@ui/primitives/FadeText';
 
 type FiltersProps = {
@@ -296,33 +297,32 @@ const Filters: React.FunctionComponent<FiltersProps> = ({
             marginTop: 30,
           }}
         >
-          <Button
-            type={ButtonTypeEnum.Secondary}
-            title={translate('clear') as string}
-            onPress={() => {
-              setFilterWithFunds(false);
-              setFilterKind(null);
-              setFilterFailed(false);
-              setFilterMemos(false);
-              clearLocal();
-              closeSheet();
-            }}
-            twoButtons={true}
-          />
-          <Button
-            type={ButtonTypeEnum.Primary}
-            title={translate('save') as string}
-            style={{ marginLeft: 10 }}
-            onPress={() => {
-              setFilterWithFunds(filterWithFundsLocal);
-              setFilterKind(filterKindLocal);
-              setFilterFailed(filterFailedLocal);
-              setFilterMemos(filterMemosLocal);
-              clearLocal();
-              closeSheet();
-            }}
-            twoButtons={true}
-          />
+          <ButtonRow>
+            <Button
+              variant="text"
+              title={translate('clear') as string}
+              onPress={() => {
+                setFilterWithFunds(false);
+                setFilterKind(null);
+                setFilterFailed(false);
+                setFilterMemos(false);
+                clearLocal();
+                closeSheet();
+              }}
+            />
+            <Button
+              variant="primary"
+              title={translate('save') as string}
+              onPress={() => {
+                setFilterWithFunds(filterWithFundsLocal);
+                setFilterKind(filterKindLocal);
+                setFilterFailed(filterFailedLocal);
+                setFilterMemos(filterMemosLocal);
+                clearLocal();
+                closeSheet();
+              }}
+            />
+          </ButtonRow>
         </View>
       </View>
     </View>

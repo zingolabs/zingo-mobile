@@ -26,7 +26,7 @@ import RegText from '@ui/primitives/RegText';
 import BoldText from '@ui/primitives/BoldText';
 import ZecAmount from '@ui/widgets/ZecAmount';
 import CurrencyAmount from '@ui/widgets/CurrencyAmount';
-import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
+import Button from '@ui/primitives/Button';
 import AppSheet from '@ui/primitives/AppSheet';
 import { useTheme } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
@@ -260,8 +260,9 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
             </View>
           )}
           <Button
+            fullWidth
             testID="send.confirm.button"
-            type={ButtonTypeEnum.Nym}
+            variant="nym"
             title={
               sendAllAmount
                 ? (translate('send.confirm-button-all') as string)

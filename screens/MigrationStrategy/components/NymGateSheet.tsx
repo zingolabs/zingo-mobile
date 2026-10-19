@@ -8,7 +8,7 @@ import {
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
 
-import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
+import Button from '@ui/primitives/Button';
 import SheetRim from '@ui/primitives/SheetRim';
 import MixnetIcon from '@ui/primitives/Icons/MixnetIcon';
 import { ContextAppLoaded } from '@app/context';
@@ -125,15 +125,17 @@ const NymGateSheet = forwardRef<BottomSheetModal, NymGateSheetProps>(
             </Text>
           ) : null}
           <Button
+            fullWidth
             testID="migrationstrategy.nym-continue"
-            type={ButtonTypeEnum.Ghost}
+            variant="text"
             title={translate('migrationstrategy.nym-gate-continue') as string}
             onPress={onContinue}
             style={{ marginBottom: 10 }}
           />
           <Button
+            fullWidth
             testID="migrationstrategy.nym-enable"
-            type={ButtonTypeEnum.Primary}
+            variant="primary"
             title={
               gate.kind === 'connecting'
                 ? (translate('migrationstrategy.nym-gate-connecting') as string)
@@ -141,7 +143,6 @@ const NymGateSheet = forwardRef<BottomSheetModal, NymGateSheetProps>(
             }
             disabled={gate.kind === 'connecting'}
             onPress={onEnable}
-            style={{ width: '100%' }}
           />
         </BottomSheetView>
       </BottomSheetModal>

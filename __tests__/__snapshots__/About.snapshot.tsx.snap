@@ -113,10 +113,13 @@ exports[`Component About - test About - snapshot 1`] = `
     }
   >
     <Text
+      maxFontSizeMultiplier={2}
       style={
         {
-          "color": "#c3c3c3",
-          "opacity": 0.65,
+          "color": "#888888",
+          "fontSize": 15,
+          "fontWeight": "400",
+          "lineHeight": 21,
         }
       }
     />
@@ -129,10 +132,13 @@ exports[`Component About - test About - snapshot 1`] = `
       }
     >
       <Text
+        maxFontSizeMultiplier={2}
         style={
           {
-            "color": "#c3c3c3",
-            "opacity": 0.65,
+            "color": "#888888",
+            "fontSize": 15,
+            "fontWeight": "400",
+            "lineHeight": 21,
           }
         }
       >

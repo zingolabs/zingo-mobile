@@ -21,7 +21,7 @@ import { isZnsAlias, resolveZnsName } from '@app/uris/resolveZnsName';
 import Utils from '@app/utils';
 import { isWalletAddress } from '@app/walletBackend';
 import BoldText from '@ui/primitives/BoldText';
-import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
+import Button from '@ui/primitives/Button';
 import RegText from '@ui/primitives/RegText';
 import { ScanIcon } from '@ui/primitives/Icons/ScanIcon';
 import ChainSelect from '@ui/widgets/ChainSelect';
@@ -444,7 +444,7 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
       <Animated.View style={shakeStyle}>
         <Button
           testID="addressbook.save"
-          type={ButtonTypeEnum.Primary}
+          variant="primary"
           title={translate('save') as string}
           disabled={saving}
           onPress={save}
@@ -453,12 +453,11 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
             marginTop: 20,
             opacity: ready ? 1 : SAVE_OFF,
           }}
-          textStyle={{ fontSize: 15 }}
         />
       </Animated.View>
       <Button
         testID="addressbook.cancel"
-        type={ButtonTypeEnum.Link}
+        variant="quiet"
         title={translate('cancel') as string}
         onPress={() => {
           Keyboard.dismiss();

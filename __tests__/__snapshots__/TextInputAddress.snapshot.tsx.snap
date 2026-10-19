@@ -145,12 +145,13 @@ exports[`TextInputAddress - snapshots TextInputAddress empty, enabled, with labe
       }
     >
       <Text
+        maxFontSizeMultiplier={2}
         style={
           {
             "color": "#c3c3c3",
             "fontSize": 15,
             "fontWeight": "400",
-            "opacity": 1,
+            "lineHeight": 21,
           }
         }
       >

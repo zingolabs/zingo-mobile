@@ -27,7 +27,7 @@ import {
 import { AppDrawerParamList } from '@app/types';
 import FadeText from '@ui/primitives/FadeText';
 import BoldText from '@ui/primitives/BoldText';
-import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
+import Button from '@ui/primitives/Button';
 import AppSheet from '@ui/primitives/AppSheet';
 import AlSummaryLine from './components/AlSummaryLine';
 import { ContextAppLoaded } from '@app/context';
@@ -324,7 +324,7 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
               }}
             >
               <Button
-                type={ButtonTypeEnum.Secondary}
+                variant="text"
                 title={translate('addressbook.loadmore') as string}
                 onPress={loadMoreClicked}
               />

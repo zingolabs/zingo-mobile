@@ -927,10 +927,13 @@ exports[`Component History - test History privacy high - snapshot 1`] = `
                   }
                 >
                   <Text
+                    maxFontSizeMultiplier={2}
                     style={
                       {
                         "color": "#18bd18",
-                        "opacity": 0.65,
+                        "fontSize": 15,
+                        "fontWeight": "400",
+                        "lineHeight": 21,
                       }
                     }
                   >
@@ -981,15 +984,15 @@ exports[`Component History - test History privacy high - snapshot 1`] = `
         }
       />
       <Text
+        maxFontSizeMultiplier={2}
         numberOfLines={1}
         style={
           {
             "color": "#c3c3c3",
             "flex": 1,
             "fontSize": 16,
-            "fontWeight": "bold",
+            "fontWeight": "600",
             "lineHeight": 28,
-            "opacity": 0.87,
             "textAlign": "center",
           }
         }
@@ -2019,10 +2022,13 @@ exports[`Component History - test History privacy normal - snapshot 1`] = `
                   }
                 >
                   <Text
+                    maxFontSizeMultiplier={2}
                     style={
                       {
                         "color": "#18bd18",
-                        "opacity": 0.65,
+                        "fontSize": 15,
+                        "fontWeight": "400",
+                        "lineHeight": 21,
                       }
                     }
                   >
@@ -2073,15 +2079,15 @@ exports[`Component History - test History privacy normal - snapshot 1`] = `
         }
       />
       <Text
+        maxFontSizeMultiplier={2}
         numberOfLines={1}
         style={
           {
             "color": "#c3c3c3",
             "flex": 1,
             "fontSize": 16,
-            "fontWeight": "bold",
+            "fontWeight": "600",
             "lineHeight": 28,
-            "opacity": 0.87,
             "textAlign": "center",
           }
         }

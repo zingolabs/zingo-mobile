@@ -15,7 +15,7 @@ import BottomSheet, {
 } from '@gorhom/bottom-sheet';
 import ProgressState, { RING_RED } from '@ui/widgets/ProgressState';
 import RegText from '@ui/primitives/RegText';
-import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
+import Button from '@ui/primitives/Button';
 import AppSheet from '@ui/primitives/AppSheet';
 import { AppDrawerParamList, WalletNavigation } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
@@ -94,7 +94,8 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
         >
           {isTerminal && (
             <Button
-              type={ButtonTypeEnum.Primary}
+              fullWidth
+              variant="primary"
               title={translate('loadedapp.continue') as string}
               onPress={onContinue}
             />

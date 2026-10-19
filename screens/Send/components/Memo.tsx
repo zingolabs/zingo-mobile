@@ -16,7 +16,7 @@ import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import { GlobalConst, TranslateType } from '@app/AppState';
 import Utils from '@app/utils';
 import FadeText from '@ui/primitives/FadeText';
-import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
+import Button from '@ui/primitives/Button';
 
 type MemoProps = {
   closeSheet: () => void;
@@ -153,7 +153,8 @@ const Memo: React.FunctionComponent<MemoProps> = ({
           }}
         >
           <Button
-            type={ButtonTypeEnum.Primary}
+            fullWidth
+            variant="primary"
             title={translate('save') as string}
             onPress={doSave}
             disabled={memoDisabled}

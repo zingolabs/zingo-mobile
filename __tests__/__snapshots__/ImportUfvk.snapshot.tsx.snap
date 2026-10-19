@@ -10,14 +10,14 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
   }
 >
   <Text
+    maxFontSizeMultiplier={2}
     style={
       {
         "color": "#c3c3c3",
         "fontSize": 16,
-        "fontWeight": "bold",
+        "fontWeight": "600",
         "left": 0,
         "lineHeight": 22,
-        "opacity": 0.87,
         "position": "absolute",
         "right": 0,
         "textAlign": "center",
@@ -36,13 +36,13 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
     }
   >
     <Text
+      maxFontSizeMultiplier={2}
       style={
         {
           "color": "#c3c3c3",
           "fontSize": 12.5,
-          "fontWeight": "bold",
+          "fontWeight": "600",
           "lineHeight": 16,
-          "opacity": 0.87,
         }
       }
     />
@@ -287,13 +287,13 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
         }
       >
         <Text
+          maxFontSizeMultiplier={2}
           style={
             {
               "color": "#c3c3c3",
               "fontSize": 12.5,
-              "fontWeight": "bold",
+              "fontWeight": "600",
               "lineHeight": 18,
-              "opacity": 0.87,
             }
           }
         />
@@ -447,6 +447,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
       }
     />
     <Text
+      maxFontSizeMultiplier={2}
       style={
         {
           "color": "#c3c3c3",
@@ -454,7 +455,6 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
           "fontSize": 9.5,
           "fontWeight": "400",
           "lineHeight": 13,
-          "opacity": 1,
         }
       }
     />

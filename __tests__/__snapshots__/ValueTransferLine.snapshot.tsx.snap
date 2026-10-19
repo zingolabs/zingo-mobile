@@ -385,12 +385,13 @@ exports[`ValueTransferLine - snapshots ValueTransferLine failed transaction 1`] 
                         }
                       >
                         <Text
+                          maxFontSizeMultiplier={2}
                           style={
                             {
                               "color": "#c3c3c3",
                               "fontSize": 15,
                               "fontWeight": "400",
-                              "opacity": 1,
+                              "lineHeight": 21,
                             }
                           }
                         >
@@ -411,6 +412,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine failed transaction 1`] 
                 }
               >
                 <Text
+                  maxFontSizeMultiplier={2}
                   style={
                     {
                       "color": "#888888",
@@ -432,10 +434,13 @@ exports[`ValueTransferLine - snapshots ValueTransferLine failed transaction 1`] 
                   }
                 >
                   <Text
+                    maxFontSizeMultiplier={2}
                     style={
                       {
-                        "color": "#c3c3c3",
-                        "opacity": 0.65,
+                        "color": "#888888",
+                        "fontSize": 15,
+                        "fontWeight": "400",
+                        "lineHeight": 21,
                       }
                     }
                   >
@@ -898,6 +903,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine pending (0 confirmation
                 }
               >
                 <Text
+                  maxFontSizeMultiplier={2}
                   style={
                     {
                       "color": "#c3c3c3",
@@ -919,10 +925,13 @@ exports[`ValueTransferLine - snapshots ValueTransferLine pending (0 confirmation
                   }
                 >
                   <Text
+                    maxFontSizeMultiplier={2}
                     style={
                       {
-                        "color": "#c3c3c3",
-                        "opacity": 0.65,
+                        "color": "#888888",
+                        "fontSize": 15,
+                        "fontWeight": "400",
+                        "lineHeight": 21,
                       }
                     }
                   >
@@ -1057,6 +1066,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine pending (0 confirmation
             }
           >
             <Text
+              maxFontSizeMultiplier={2}
               style={
                 {
                   "color": "#5a8c5a",
@@ -1344,6 +1354,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine received, no month head
                 }
               >
                 <Text
+                  maxFontSizeMultiplier={2}
                   style={
                     {
                       "color": "#18bd18",
@@ -1365,10 +1376,13 @@ exports[`ValueTransferLine - snapshots ValueTransferLine received, no month head
                   }
                 >
                   <Text
+                    maxFontSizeMultiplier={2}
                     style={
                       {
-                        "color": "#c3c3c3",
-                        "opacity": 0.65,
+                        "color": "#888888",
+                        "fontSize": 15,
+                        "fontWeight": "400",
+                        "lineHeight": 21,
                       }
                     }
                   >
@@ -1519,10 +1533,13 @@ exports[`ValueTransferLine - snapshots ValueTransferLine sent confirmed 1`] = `
     }
   >
     <Text
+      maxFontSizeMultiplier={2}
       style={
         {
-          "color": "#c3c3c3",
-          "opacity": 0.65,
+          "color": "#888888",
+          "fontSize": 15,
+          "fontWeight": "400",
+          "lineHeight": 21,
         }
       }
     >
@@ -1904,12 +1921,13 @@ exports[`ValueTransferLine - snapshots ValueTransferLine sent confirmed 1`] = `
                         }
                       >
                         <Text
+                          maxFontSizeMultiplier={2}
                           style={
                             {
                               "color": "#c3c3c3",
                               "fontSize": 15,
                               "fontWeight": "400",
-                              "opacity": 1,
+                              "lineHeight": 21,
                             }
                           }
                         >
@@ -1930,6 +1948,7 @@ exports[`ValueTransferLine - snapshots ValueTransferLine sent confirmed 1`] = `
                 }
               >
                 <Text
+                  maxFontSizeMultiplier={2}
                   style={
                     {
                       "color": "#c3c3c3",
@@ -1951,10 +1970,13 @@ exports[`ValueTransferLine - snapshots ValueTransferLine sent confirmed 1`] = `
                   }
                 >
                   <Text
+                    maxFontSizeMultiplier={2}
                     style={
                       {
-                        "color": "#c3c3c3",
-                        "opacity": 0.65,
+                        "color": "#888888",
+                        "fontSize": 15,
+                        "fontWeight": "400",
+                        "lineHeight": 21,
                       }
                     }
                   >

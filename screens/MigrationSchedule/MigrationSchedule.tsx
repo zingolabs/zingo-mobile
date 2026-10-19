@@ -11,7 +11,8 @@ import { useTheme } from '@app/theme';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import BoldText from '@ui/primitives/BoldText';
-import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
+import Button from '@ui/primitives/Button';
+import ButtonRow from '@ui/primitives/ButtonRow';
 import StepperHeader from '@ui/widgets/StepperHeader';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
@@ -379,21 +380,21 @@ const MigrationSchedule: React.FunctionComponent<MigrationScheduleProps> = ({
           paddingHorizontal: 24,
         }}
       >
-        <Button
-          testID="migrationschedule.back"
-          type={ButtonTypeEnum.Ghost}
-          title={translate('migrationschedule.back') as string}
-          onPress={() => navigation.goBack()}
-          twoButtons={true}
-        />
-        <Button
-          testID="migrationschedule.confirm"
-          type={ButtonTypeEnum.Primary}
-          title={translate('migrationschedule.confirm') as string}
-          onPress={onConfirm}
-          twoButtons={true}
-          disabled={confirming}
-        />
+        <ButtonRow>
+          <Button
+            testID="migrationschedule.back"
+            variant="text"
+            title={translate('migrationschedule.back') as string}
+            onPress={() => navigation.goBack()}
+          />
+          <Button
+            testID="migrationschedule.confirm"
+            variant="primary"
+            title={translate('migrationschedule.confirm') as string}
+            onPress={onConfirm}
+            disabled={confirming}
+          />
+        </ButtonRow>
       </View>
     </View>
   );

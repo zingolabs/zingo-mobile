@@ -48,7 +48,7 @@ import RegText from '@ui/primitives/RegText';
 import ZecAmount from '@ui/widgets/ZecAmount';
 import CurrencyAmount from '@ui/widgets/CurrencyAmount';
 import { usePriceHealth } from '@ui/widgets/priceFetcherStore';
-import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
+import Button from '@ui/primitives/Button';
 import AppSheet from '@ui/primitives/AppSheet';
 import AppSheetModal from '@ui/primitives/AppSheetModal';
 import {
@@ -1195,10 +1195,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
                     </View>
                   )}
                   {validAddress === -1 && (
-                    <ErrorText
-                      testID="send.address.error"
-                      style={{ color: colors.fgDanger }}
-                    >
+                    <ErrorText testID="send.address.error">
                       {
                         translate(
                           znsNotFound
@@ -1380,12 +1377,12 @@ const Send: React.FunctionComponent<SendProps> = () => {
                     </View>
                   </View>
                   {validAmount === -1 && (
-                    <ErrorText style={{ color: colors.fgDanger }}>
+                    <ErrorText>
                       {translate('send.invalidnumber') as string}
                     </ErrorText>
                   )}
                   {validAmount === -2 && (
-                    <ErrorText style={{ color: colors.fgDanger }}>
+                    <ErrorText>
                       {translate('send.invalidamount') as string}
                     </ErrorText>
                   )}
@@ -1953,13 +1950,15 @@ const Send: React.FunctionComponent<SendProps> = () => {
                 >
                   {showCalcError ? (
                     <Button
-                      type={ButtonTypeEnum.Secondary}
+                      fullWidth
+                      variant="text"
                       title={`${translate('send.calc-error') as string} ⓘ`}
                       onPress={() => sendErrorSheetRef.current?.present()}
                       testID="send.calc-error"
                     />
                   ) : (
                     <Button
+                      fullWidth
                       testID={
                         sendButtonEnabled
                           ? 'send.button'
@@ -1968,7 +1967,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
                       accessible={true}
                       accessibilityLabel={'title ' + translate('send.button')}
                       // NYM feature hidden for now — will be enabled in the future
-                      type={ButtonTypeEnum.Primary}
+                      variant="primary"
                       title={
                         validAmount === 1 &&
                         amountText &&

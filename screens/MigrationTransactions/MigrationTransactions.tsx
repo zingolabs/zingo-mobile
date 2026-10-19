@@ -6,7 +6,8 @@ import { useTheme } from '@app/theme';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import BoldText from '@ui/primitives/BoldText';
-import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
+import Button from '@ui/primitives/Button';
+import ButtonRow from '@ui/primitives/ButtonRow';
 import { AppDrawerParamList } from '@app/types';
 import { AppTheme } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
@@ -238,7 +239,8 @@ const MigrationTransactions: React.FunctionComponent<
           }}
         >
           <Button
-            type={ButtonTypeEnum.Ghost}
+            fullWidth
+            variant="text"
             title={translate('migrationtransactions.back') as string}
             onPress={() => navigation.goBack()}
           />
@@ -288,20 +290,20 @@ const MigrationTransactions: React.FunctionComponent<
             paddingHorizontal: 24,
           }}
         >
-          <Button
-            testID="migrationtransactions.pending-back"
-            type={ButtonTypeEnum.Ghost}
-            title={translate('migrationtransactions.back') as string}
-            onPress={() => navigation.goBack()}
-            twoButtons={true}
-          />
-          <Button
-            testID="migrationtransactions.retry"
-            type={ButtonTypeEnum.Primary}
-            title={translate('migrationtransactions.retry') as string}
-            onPress={fetchPlan}
-            twoButtons={true}
-          />
+          <ButtonRow>
+            <Button
+              testID="migrationtransactions.pending-back"
+              variant="text"
+              title={translate('migrationtransactions.back') as string}
+              onPress={() => navigation.goBack()}
+            />
+            <Button
+              testID="migrationtransactions.retry"
+              variant="primary"
+              title={translate('migrationtransactions.retry') as string}
+              onPress={fetchPlan}
+            />
+          </ButtonRow>
         </View>
       </View>
     );
@@ -349,7 +351,8 @@ const MigrationTransactions: React.FunctionComponent<
           }}
         >
           <Button
-            type={ButtonTypeEnum.Primary}
+            fullWidth
+            variant="primary"
             title={translate('migrationtransactions.close') as string}
             onPress={goHome}
           />
@@ -489,20 +492,20 @@ const MigrationTransactions: React.FunctionComponent<
           paddingHorizontal: 24,
         }}
       >
-        <Button
-          testID="migrationtransactions.back"
-          type={ButtonTypeEnum.Ghost}
-          title={translate('migrationtransactions.back') as string}
-          onPress={() => navigation.goBack()}
-          twoButtons={true}
-        />
-        <Button
-          testID="migrationtransactions.accept"
-          type={ButtonTypeEnum.Primary}
-          title={translate('migrationtransactions.accept') as string}
-          onPress={onAccept}
-          twoButtons={true}
-        />
+        <ButtonRow>
+          <Button
+            testID="migrationtransactions.back"
+            variant="text"
+            title={translate('migrationtransactions.back') as string}
+            onPress={() => navigation.goBack()}
+          />
+          <Button
+            testID="migrationtransactions.accept"
+            variant="primary"
+            title={translate('migrationtransactions.accept') as string}
+            onPress={onAccept}
+          />
+        </ButtonRow>
       </View>
     </View>
   );

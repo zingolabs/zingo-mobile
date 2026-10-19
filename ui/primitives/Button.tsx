@@ -1,154 +1,85 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import { TouchableOpacity, Text, View, TextStyle } from 'react-native';
-import { useTheme } from '@app/theme';
+import { TouchableOpacity, ViewStyle, TextStyle } from 'react-native';
+import {
+  buttonMinHeight,
+  fontScaleTitle,
+  buttonMinHeightSmall,
+  radiusPill,
+  space24,
+  space8,
+  touchTarget,
+  useTheme,
+} from '@app/theme';
+import Text from './Text';
 
-/** The height of every filled action button in the app. */
-export const BUTTON_HEIGHT = 44;
-const LINK_HEIGHT = 38;
+/** The minimum height of every regular button in the app. */
+export const BUTTON_HEIGHT = buttonMinHeight;
 
-export enum ButtonTypeEnum {
-  Primary = 'Primary',
-  Secondary = 'Secondary',
-  Ghost = 'Ghost',
-  Warning = 'Warning',
-  Nym = 'Nym',
-  // A destructive action: red fill, white text.
-  Danger = 'Danger',
-  // A quiet text action, such as Cancel under a sheet's main button.
-  Link = 'Link',
-}
+/**
+ * primary: the one main action of a view · text: green, Back, Skip and
+ * secondary moves · quiet: gray, only Cancel and a Close that leaves a flow ·
+ * danger: deletes or cannot be undone · nym: only actions through the mixnet.
+ */
+export type ButtonVariant = 'primary' | 'text' | 'quiet' | 'danger' | 'nym';
 
-type ButtonProps = {
-  type: ButtonTypeEnum;
+/** small: inside banners and rows only. */
+export type ButtonSize = 'regular' | 'small';
+
+export type ButtonProps = {
+  variant: ButtonVariant;
   title: string;
   disabled?: boolean;
   onPress: () => void;
-  style?: TextStyle;
+  size?: ButtonSize;
+  style?: ViewStyle;
   textStyle?: TextStyle;
   accessible?: boolean;
   accessibilityLabel?: string;
   testID?: string;
-  twoButtons?: boolean;
-  // Spans the whole row.
+  /** Spans the whole row: bottom sheets and screen footers. */
   fullWidth?: boolean;
+  /** How many lines the label took; `ButtonRow` stacks when one wraps. */
+  onLabelLines?: (lines: number) => void;
 };
 
+const MIN_WIDTH = 120;
+
 const Button: React.FunctionComponent<ButtonProps> = ({
-  type,
+  variant,
   title,
   disabled,
   onPress,
+  size = 'regular',
   style,
   textStyle,
   accessible,
   accessibilityLabel,
   testID,
-  twoButtons,
   fullWidth,
+  onLabelLines,
 }) => {
   const { colors } = useTheme();
+  const small = size === 'small';
+  const minHeight = small ? buttonMinHeightSmall : buttonMinHeight;
+  /** A small button still takes a full `touchTarget`. */
+  const slop = (touchTarget - minHeight) / 2;
 
-  const styleButton: TextStyle =
-    type === ButtonTypeEnum.Primary
-      ? {
-          backgroundColor: disabled ? colors.bgAccentDisabled : colors.bgAccent,
-          borderColor: disabled
-            ? colors.borderAccentDisabled
-            : colors.borderAccent,
-          borderWidth: 2,
-          width: twoButtons ? '40%' : '80%',
-        }
-      : type === ButtonTypeEnum.Secondary
-        ? {
-            // A borderless text button, as in the prototype screens.
-            backgroundColor: 'transparent',
-            width: twoButtons ? '40%' : '80%',
-          }
-        : type === ButtonTypeEnum.Ghost
-          ? {
-              backgroundColor: 'transparent',
-              color: colors.fgDefault,
-            }
-          : type === ButtonTypeEnum.Danger
-            ? {
-                backgroundColor: colors.bgDanger,
-                width: twoButtons ? '40%' : '80%',
-              }
-            : type === ButtonTypeEnum.Link
-              ? {
-                  backgroundColor: 'transparent',
-                  minHeight: LINK_HEIGHT,
-                  width: twoButtons ? '40%' : undefined,
-                }
-              : type === ButtonTypeEnum.Nym
-                ? {
-                    backgroundColor: disabled ? '#4DAF7C' : '#07FF94',
-                    borderColor: disabled ? '#4DAF7C' : '#07FF94',
-                    borderWidth: 2,
-                    width: twoButtons ? '40%' : '80%',
-                  }
-                : {
-                    // error
-                    backgroundColor: colors.bgAccent,
-                    width: twoButtons ? '40%' : '80%',
-                  };
-
-  const styleButtonCommon: TextStyle = {
-    padding: 0,
-    paddingLeft: 20,
-    paddingRight: 20,
-    borderRadius: 24,
-    maxWidth: '90%',
-    minWidth: '30%',
-    minHeight: BUTTON_HEIGHT,
-    alignItems: 'center',
-    justifyContent: 'center',
-  };
-
-  const styleText: TextStyle =
-    type === ButtonTypeEnum.Primary
-      ? {
-          color: colors.bgCanvas,
-          fontWeight: '700',
-        }
-      : type === ButtonTypeEnum.Secondary
-        ? {
-            color: disabled ? colors.fgAccentDisabled : colors.fgAccent,
-            fontWeight: '700',
-          }
-        : type === ButtonTypeEnum.Ghost
-          ? {
-              // Ghost carries brand-green (primary) text as its formal
-              // style; instances no longer override the color per call.
-              color: colors.fgAccent,
-              textTransform: 'none',
-            }
-          : type === ButtonTypeEnum.Danger
-            ? {
-                color: '#ffffff',
-                fontWeight: '700',
-              }
-            : type === ButtonTypeEnum.Link
-              ? {
-                  color: colors.fgMuted,
-                  fontSize: 13,
-                  fontWeight: '500',
-                }
-              : type === ButtonTypeEnum.Nym
-                ? {
-                    color: colors.bgCanvas,
-                  }
-                : {
-                    // error
-                    color: colors.bgCanvas,
-                  };
-  const styleTextCommon: TextStyle = {
-    fontWeight: '600',
-    textTransform: 'none',
-    fontSize: 16,
-    textAlign: 'center',
-  };
+  const fill = {
+    primary: colors.bgAccent,
+    danger: colors.bgDanger,
+    nym: colors.bgNym,
+    text: undefined,
+    quiet: undefined,
+  }[variant];
+  const label =
+    fill !== undefined
+      ? colors.fgOnAccent
+      : variant === 'quiet'
+        ? colors.fgMuted
+        : disabled
+          ? colors.fgAccentDisabled
+          : colors.fgAccent;
 
   return (
     <TouchableOpacity
@@ -156,38 +87,42 @@ const Button: React.FunctionComponent<ButtonProps> = ({
       accessible={accessible}
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel}
+      accessibilityState={{ disabled: !!disabled }}
+      hitSlop={slop > 0 ? { top: slop, bottom: slop } : undefined}
       style={{
-        ...styleButton,
-        ...styleButtonCommon,
-        ...(type === ButtonTypeEnum.Link ? { minHeight: LINK_HEIGHT } : {}),
-        ...(fullWidth ? { width: '100%', maxWidth: '100%' } : {}),
+        backgroundColor:
+          fill !== undefined && disabled ? colors.bgAccentDisabled : fill,
+        borderRadius: radiusPill,
+        minHeight,
+        minWidth: MIN_WIDTH,
+        maxWidth: '100%',
+        paddingHorizontal: space24,
+        paddingVertical: small ? 0 : space8,
+        alignItems: 'center',
+        justifyContent: 'center',
+        ...(fullWidth ? { alignSelf: 'stretch', width: '100%' } : {}),
         ...style,
       }}
       disabled={disabled}
       onPress={() => onPress()}
     >
-      <View
+      <Text
+        variant={small ? 'bodySmall' : 'button'}
+        maxFontSizeMultiplier={fontScaleTitle}
+        color={label}
+        onTextLayout={
+          onLabelLines
+            ? e => onLabelLines(e.nativeEvent.lines.length)
+            : undefined
+        }
         style={{
-          display: 'flex',
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'center',
-          margin: 0,
-          padding: 0,
-          minWidth: 48,
-          minHeight: type === ButtonTypeEnum.Link ? LINK_HEIGHT : BUTTON_HEIGHT,
+          textAlign: 'center',
+          ...(small ? { fontWeight: '700' } : {}),
+          ...textStyle,
         }}
       >
-        <Text
-          style={{
-            ...styleTextCommon,
-            ...styleText,
-            ...textStyle,
-          }}
-        >
-          {title}
-        </Text>
-      </View>
+        {title}
+      </Text>
     </TouchableOpacity>
   );
 };

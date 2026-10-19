@@ -18,7 +18,7 @@ import { ContextAppLoaded } from '@app/context';
 import AddressBookFileImpl from '@app/services/AddressBookFileImpl';
 import Utils from '@app/utils';
 import BoldText from '@ui/primitives/BoldText';
-import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
+import Button from '@ui/primitives/Button';
 import RegText from '@ui/primitives/RegText';
 import ChainSelect from '@ui/widgets/ChainSelect';
 
@@ -171,7 +171,7 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
       <Animated.View style={shakeStyle}>
         <Button
           testID="addresstag.save"
-          type={ButtonTypeEnum.Primary}
+          variant="primary"
           title={translate('save') as string}
           disabled={saving}
           onPress={save}
@@ -180,12 +180,11 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
             marginTop: 20,
             opacity: ready ? 1 : SAVE_OFF,
           }}
-          textStyle={{ fontSize: 15 }}
         />
       </Animated.View>
       <Button
         testID="addresstag.cancel"
-        type={ButtonTypeEnum.Link}
+        variant="quiet"
         title={translate('cancel') as string}
         onPress={() => {
           Keyboard.dismiss();

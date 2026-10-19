@@ -256,10 +256,13 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
         />
       </View>
       <Text
+        maxFontSizeMultiplier={2}
         style={
           {
-            "color": "#c3c3c3",
-            "opacity": 0.65,
+            "color": "#888888",
+            "fontSize": 15,
+            "fontWeight": "400",
+            "lineHeight": 21,
           }
         }
       >
@@ -334,12 +337,13 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
       }
     >
       <Text
+        maxFontSizeMultiplier={2}
         style={
           {
             "color": "#18bd18",
-            "fontSize": 16,
-            "fontWeight": "bold",
-            "opacity": 0.87,
+            "fontSize": 15,
+            "fontWeight": "600",
+            "lineHeight": 21,
             "textAlign": "center",
             "textTransform": "capitalize",
           }
@@ -521,21 +525,26 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
           }
         >
           <Text
+            maxFontSizeMultiplier={2}
             style={
               {
-                "color": "#c3c3c3",
-                "opacity": 0.65,
+                "color": "#888888",
+                "fontSize": 15,
+                "fontWeight": "400",
+                "lineHeight": 21,
               }
             }
           >
             text translated
           </Text>
           <Text
+            maxFontSizeMultiplier={2}
             style={
               {
                 "color": "#c3c3c3",
                 "fontSize": 15,
                 "fontWeight": "400",
+                "lineHeight": 21,
                 "opacity": 1,
               }
             }
@@ -552,21 +561,26 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
           }
         >
           <Text
+            maxFontSizeMultiplier={2}
             style={
               {
-                "color": "#c3c3c3",
-                "opacity": 0.65,
+                "color": "#888888",
+                "fontSize": 15,
+                "fontWeight": "400",
+                "lineHeight": 21,
               }
             }
           >
             text translated
           </Text>
           <Text
+            maxFontSizeMultiplier={2}
             style={
               {
                 "color": "#c3c3c3",
                 "fontSize": 15,
                 "fontWeight": "400",
+                "lineHeight": 21,
                 "opacity": 1,
               }
             }
@@ -586,10 +600,13 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
         }
       >
         <Text
+          maxFontSizeMultiplier={2}
           style={
             {
-              "color": "#c3c3c3",
-              "opacity": 0.65,
+              "color": "#888888",
+              "fontSize": 15,
+              "fontWeight": "400",
+              "lineHeight": 21,
             }
           }
         >
@@ -630,11 +647,13 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
           }
         >
           <Text
+            maxFontSizeMultiplier={2}
             style={
               {
                 "color": "#c3c3c3",
                 "fontSize": 15,
                 "fontWeight": "400",
+                "lineHeight": 21,
                 "opacity": 1,
               }
             }
@@ -654,21 +673,26 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
         }
       >
         <Text
+          maxFontSizeMultiplier={2}
           style={
             {
-              "color": "#c3c3c3",
-              "opacity": 0.65,
+              "color": "#888888",
+              "fontSize": 15,
+              "fontWeight": "400",
+              "lineHeight": 21,
             }
           }
         >
           text translated
         </Text>
         <Text
+          maxFontSizeMultiplier={2}
           style={
             {
               "color": "#c3c3c3",
               "fontSize": 15,
               "fontWeight": "400",
+              "lineHeight": 21,
               "opacity": 1,
             }
           }
@@ -684,10 +708,13 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
         }
       >
         <Text
+          maxFontSizeMultiplier={2}
           style={
             {
-              "color": "#c3c3c3",
-              "opacity": 0.65,
+              "color": "#888888",
+              "fontSize": 15,
+              "fontWeight": "400",
+              "lineHeight": 21,
             }
           }
         >
@@ -860,10 +887,13 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
         }
       >
         <Text
+          maxFontSizeMultiplier={2}
           style={
             {
-              "color": "#c3c3c3",
-              "opacity": 0.65,
+              "color": "#888888",
+              "fontSize": 15,
+              "fontWeight": "400",
+              "lineHeight": 21,
             }
           }
         >
@@ -904,13 +934,14 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
           }
         >
           <Text
+            maxFontSizeMultiplier={2}
             selectable={true}
             style={
               {
                 "color": "#c3c3c3",
                 "fontSize": 15,
                 "fontWeight": "400",
-                "opacity": 1,
+                "lineHeight": 21,
               }
             }
           >
@@ -1181,10 +1212,13 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
         />
       </View>
       <Text
+        maxFontSizeMultiplier={2}
         style={
           {
-            "color": "#c3c3c3",
-            "opacity": 0.65,
+            "color": "#888888",
+            "fontSize": 15,
+            "fontWeight": "400",
+            "lineHeight": 21,
           }
         }
       >
@@ -1259,12 +1293,13 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
       }
     >
       <Text
+        maxFontSizeMultiplier={2}
         style={
           {
             "color": "#c3c3c3",
-            "fontSize": 16,
-            "fontWeight": "bold",
-            "opacity": 0.87,
+            "fontSize": 15,
+            "fontWeight": "600",
+            "lineHeight": 21,
             "textAlign": "center",
             "textTransform": "capitalize",
           }
@@ -1446,21 +1481,26 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
           }
         >
           <Text
+            maxFontSizeMultiplier={2}
             style={
               {
-                "color": "#c3c3c3",
-                "opacity": 0.65,
+                "color": "#888888",
+                "fontSize": 15,
+                "fontWeight": "400",
+                "lineHeight": 21,
               }
             }
           >
             text translated
           </Text>
           <Text
+            maxFontSizeMultiplier={2}
             style={
               {
                 "color": "#c3c3c3",
                 "fontSize": 15,
                 "fontWeight": "400",
+                "lineHeight": 21,
                 "opacity": 1,
               }
             }
@@ -1477,21 +1517,26 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
           }
         >
           <Text
+            maxFontSizeMultiplier={2}
             style={
               {
-                "color": "#c3c3c3",
-                "opacity": 0.65,
+                "color": "#888888",
+                "fontSize": 15,
+                "fontWeight": "400",
+                "lineHeight": 21,
               }
             }
           >
             text translated
           </Text>
           <Text
+            maxFontSizeMultiplier={2}
             style={
               {
                 "color": "#c3c3c3",
                 "fontSize": 15,
                 "fontWeight": "400",
+                "lineHeight": 21,
                 "opacity": 1,
               }
             }
@@ -1511,10 +1556,13 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
         }
       >
         <Text
+          maxFontSizeMultiplier={2}
           style={
             {
-              "color": "#c3c3c3",
-              "opacity": 0.65,
+              "color": "#888888",
+              "fontSize": 15,
+              "fontWeight": "400",
+              "lineHeight": 21,
             }
           }
         >
@@ -1555,11 +1603,13 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
           }
         >
           <Text
+            maxFontSizeMultiplier={2}
             style={
               {
                 "color": "#c3c3c3",
                 "fontSize": 15,
                 "fontWeight": "400",
+                "lineHeight": 21,
                 "opacity": 1,
               }
             }
@@ -1577,10 +1627,13 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
         }
       >
         <Text
+          maxFontSizeMultiplier={2}
           style={
             {
-              "color": "#c3c3c3",
-              "opacity": 0.65,
+              "color": "#888888",
+              "fontSize": 15,
+              "fontWeight": "400",
+              "lineHeight": 21,
             }
           }
         >
@@ -1678,10 +1731,13 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
         }
       >
         <Text
+          maxFontSizeMultiplier={2}
           style={
             {
-              "color": "#c3c3c3",
-              "opacity": 0.65,
+              "color": "#888888",
+              "fontSize": 15,
+              "fontWeight": "400",
+              "lineHeight": 21,
             }
           }
         >
@@ -1750,12 +1806,13 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
                 }
               >
                 <Text
+                  maxFontSizeMultiplier={2}
                   style={
                     {
                       "color": "#c3c3c3",
                       "fontSize": 15,
                       "fontWeight": "400",
-                      "opacity": 1,
+                      "lineHeight": 21,
                     }
                   }
                 >
@@ -1832,10 +1889,13 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
         }
       >
         <Text
+          maxFontSizeMultiplier={2}
           style={
             {
-              "color": "#c3c3c3",
-              "opacity": 0.65,
+              "color": "#888888",
+              "fontSize": 15,
+              "fontWeight": "400",
+              "lineHeight": 21,
             }
           }
         >
@@ -2008,10 +2068,13 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
         }
       >
         <Text
+          maxFontSizeMultiplier={2}
           style={
             {
-              "color": "#c3c3c3",
-              "opacity": 0.65,
+              "color": "#888888",
+              "fontSize": 15,
+              "fontWeight": "400",
+              "lineHeight": 21,
             }
           }
         >
@@ -2052,13 +2115,14 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
           }
         >
           <Text
+            maxFontSizeMultiplier={2}
             selectable={true}
             style={
               {
                 "color": "#c3c3c3",
                 "fontSize": 15,
                 "fontWeight": "400",
-                "opacity": 1,
+                "lineHeight": 21,
               }
             }
           >

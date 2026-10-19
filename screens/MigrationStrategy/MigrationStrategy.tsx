@@ -14,7 +14,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import BoldText from '@ui/primitives/BoldText';
-import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
+import Button from '@ui/primitives/Button';
+import ButtonRow from '@ui/primitives/ButtonRow';
 import NymGateSheet from './components/NymGateSheet';
 import { deriveNymGateState } from './components/nymGateState';
 import { AppDrawerParamList } from '@app/types';
@@ -349,31 +350,31 @@ const MigrationStrategy: React.FunctionComponent<MigrationStrategyProps> = ({
             paddingHorizontal: 24,
           }}
         >
-          <Button
-            testID="migrationstrategy.back"
-            type={ButtonTypeEnum.Ghost}
-            title={translate('migrationstrategy.back') as string}
-            onPress={() => navigation.goBack()}
-            twoButtons={true}
-          />
-          <Button
-            testID="migrationstrategy.start"
-            type={ButtonTypeEnum.Primary}
-            title={translate('migrationstrategy.start') as string}
-            onPress={() => {
-              if (selected === 'none') {
-                closeMigration();
-                return;
-              }
-              if (nymGate.kind === 'ready') {
-                startMigration();
-                return;
-              }
-              setEnabling(true);
-              nymSheetRef.current?.present();
-            }}
-            twoButtons={true}
-          />
+          <ButtonRow>
+            <Button
+              testID="migrationstrategy.back"
+              variant="text"
+              title={translate('migrationstrategy.back') as string}
+              onPress={() => navigation.goBack()}
+            />
+            <Button
+              testID="migrationstrategy.start"
+              variant="primary"
+              title={translate('migrationstrategy.start') as string}
+              onPress={() => {
+                if (selected === 'none') {
+                  closeMigration();
+                  return;
+                }
+                if (nymGate.kind === 'ready') {
+                  startMigration();
+                  return;
+                }
+                setEnabling(true);
+                nymSheetRef.current?.present();
+              }}
+            />
+          </ButtonRow>
         </View>
       </View>
 

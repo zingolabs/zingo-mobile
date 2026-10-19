@@ -8,7 +8,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useKeepAwake } from '@sayem314/react-native-keep-awake';
 
 import BoldText from '@ui/primitives/BoldText';
-import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
+import Button from '@ui/primitives/Button';
 import ProgressBar from '@ui/primitives/ProgressBar';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
@@ -275,7 +275,8 @@ const MigrationSending: React.FunctionComponent<MigrationSendingProps> = ({
           }}
         >
           <Button
-            type={ButtonTypeEnum.Primary}
+            fullWidth
+            variant="primary"
             title={translate('migrationsending.close') as string}
             onPress={goHome}
           />

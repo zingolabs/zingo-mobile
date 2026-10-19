@@ -35,7 +35,8 @@ import { faArrowRightLong } from '@fortawesome/free-solid-svg-icons';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import BoldText from '@ui/primitives/BoldText';
-import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
+import Button from '@ui/primitives/Button';
+import ButtonRow from '@ui/primitives/ButtonRow';
 import SettingsFileImpl from '@app/services/SettingsFileImpl';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
@@ -671,8 +672,9 @@ const MeetIronwood: React.FunctionComponent<MeetIronwoodProps> = ({
         {index === 0 ? (
           <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
             <Button
+              fullWidth
               testID="meetironwood.primary"
-              type={ButtonTypeEnum.Primary}
+              variant="primary"
               title={translate('meetironwood.next') as string}
               onPress={onPrimary}
             />
@@ -685,20 +687,20 @@ const MeetIronwood: React.FunctionComponent<MeetIronwoodProps> = ({
               alignItems: 'center',
             }}
           >
-            <Button
-              testID="meetironwood.back"
-              type={ButtonTypeEnum.Ghost}
-              title={translate('meetironwood.back') as string}
-              onPress={() => goTo(index - 1)}
-              twoButtons={true}
-            />
-            <Button
-              testID="meetironwood.primary"
-              type={ButtonTypeEnum.Primary}
-              title={translate('meetironwood.next') as string}
-              onPress={onPrimary}
-              twoButtons={true}
-            />
+            <ButtonRow>
+              <Button
+                testID="meetironwood.back"
+                variant="text"
+                title={translate('meetironwood.back') as string}
+                onPress={() => goTo(index - 1)}
+              />
+              <Button
+                testID="meetironwood.primary"
+                variant="primary"
+                title={translate('meetironwood.next') as string}
+                onPress={onPrimary}
+              />
+            </ButtonRow>
           </View>
         )}
       </Animated.View>

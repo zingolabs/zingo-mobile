@@ -11,7 +11,7 @@ import { useTheme } from '@app/theme';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import BoldText from '@ui/primitives/BoldText';
-import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
+import Button from '@ui/primitives/Button';
 import StepperHeader from '@ui/widgets/StepperHeader';
 import { AppDrawerParamList } from '@app/types';
 import { AppTheme } from '@app/theme';
@@ -331,8 +331,9 @@ const MigrationCadence: React.FunctionComponent<MigrationCadenceProps> = ({
           }}
         >
           <Button
+            fullWidth
             testID={dust ? 'migrationcadence.back' : 'migrationcadence.retry'}
-            type={ButtonTypeEnum.Primary}
+            variant="primary"
             title={
               translate(
                 dust ? 'migrationcadence.back' : 'migrationcadence.retry',
@@ -436,8 +437,9 @@ const MigrationCadence: React.FunctionComponent<MigrationCadenceProps> = ({
         }}
       >
         <Button
+          fullWidth
           testID="migrationcadence.review"
-          type={ButtonTypeEnum.Primary}
+          variant="primary"
           title={translate('migrationcadence.review') as string}
           onPress={onReview}
           disabled={submitting}

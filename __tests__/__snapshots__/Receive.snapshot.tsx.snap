@@ -552,15 +552,15 @@ exports[`Component Receive - test Receive - snapshot 1`] = `
         }
       />
       <Text
+        maxFontSizeMultiplier={2}
         numberOfLines={1}
         style={
           {
             "color": "#c3c3c3",
             "flex": 1,
             "fontSize": 16,
-            "fontWeight": "bold",
+            "fontWeight": "600",
             "lineHeight": 28,
-            "opacity": 0.87,
             "textAlign": "center",
           }
         }
@@ -687,12 +687,12 @@ exports[`Component Receive - test Receive - snapshot 1`] = `
     }
   >
     <Text
+      maxFontSizeMultiplier={2}
       style={
         {
           "color": "#18bd18",
           "fontSize": 16,
           "fontWeight": "600",
-          "opacity": 1,
         }
       }
     >
@@ -761,12 +761,12 @@ exports[`Component Receive - test Receive - snapshot 1`] = `
     }
   >
     <Text
+      maxFontSizeMultiplier={2}
       style={
         {
           "color": "#c3c3c3",
           "fontSize": 16,
           "fontWeight": "400",
-          "opacity": 1,
         }
       }
     >
