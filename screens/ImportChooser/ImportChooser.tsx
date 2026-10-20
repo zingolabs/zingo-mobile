@@ -182,7 +182,7 @@ const ImportChooser: React.FunctionComponent<ImportChooserProps> = ({
         <Option
           testID="import.chooser.previous"
           icon={faClockRotateLeft}
-          iconBg="#0A2A1E"
+          iconBg={colors.bgAccentSubtle}
           iconColor={colors.fgAccent}
           title={translate('import.chooser-previous') as string}
           sub={(translate('import.chooser-previous-sub') as string).replace(
@@ -207,11 +207,11 @@ const ImportChooser: React.FunctionComponent<ImportChooserProps> = ({
         <Option
           testID="import.chooser.seed"
           icon={faKeyboard}
-          iconBg="#2A1820"
-          iconColor={colors.fgDanger}
+          iconBg={colors.bgAccentSubtle}
+          iconColor={colors.fgAccent}
           title={translate('import.chooser-seed') as string}
           sub={translate('import.chooser-seed-sub') as string}
-          subColor={colors.fgDanger}
+          subColor={colors.fgWarning}
           disabled={busy}
           onPress={onSeed}
         />

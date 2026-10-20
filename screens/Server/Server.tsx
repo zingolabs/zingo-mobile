@@ -121,7 +121,7 @@ const StatusDot: React.FC<StatusDotProps> = ({ status, offline }) => {
     : status === 'wait'
       ? WAIT
       : status === 'bad'
-        ? colors.fgDangerEmphasis
+        ? colors.fgDanger
         : colors.fgAccent;
   return (
     <View

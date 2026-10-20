@@ -38,7 +38,7 @@ const ServerIcon: React.FC<ServerIconProps> = ({
   const { colors } = useTheme();
   const dot =
     noInternet || (unreachable && !offline)
-      ? colors.fgDangerEmphasis
+      ? colors.fgDanger
       : offline
         ? colors.fgMuted
         : colors.fgAccent;

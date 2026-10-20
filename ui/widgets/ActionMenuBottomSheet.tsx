@@ -143,9 +143,7 @@ const ActionMenuBottomSheet = forwardRef<
             <RegText
               style={{
                 fontSize: 16,
-                color: action.destructive
-                  ? colors.fgDangerEmphasis
-                  : colors.fgDefault,
+                color: action.destructive ? colors.fgDanger : colors.fgDefault,
                 fontWeight: '400',
               }}
             >

@@ -150,7 +150,7 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
               }}
             >
               <VerifyXIcon
-                color={colors.fgDangerEmphasis}
+                color={colors.fgDanger}
                 style={{ marginRight: 10 }}
               />
               <FadeText style={{ color: colors.fgDefault }}>

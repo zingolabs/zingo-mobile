@@ -75,8 +75,9 @@ export const Latency: React.FC<LatencyProps> = ({ ms, notResponding }) => {
     return null;
   }
   const bad = ms === null;
+  /** Not responding is a state, not an error: another server can be picked. */
   const dot = bad
-    ? colors.fgDangerEmphasis
+    ? colors.fgWarning
     : ms < FAST_MS
       ? colors.fgAccent
       : colors.fgMuted;
@@ -88,7 +89,7 @@ export const Latency: React.FC<LatencyProps> = ({ ms, notResponding }) => {
       <RegText
         style={{
           fontSize: 11.5,
-          color: bad ? colors.fgDanger : colors.fgMuted,
+          color: bad ? colors.fgWarning : colors.fgMuted,
         }}
       >
         {bad ? notResponding : `${ms} ms`}

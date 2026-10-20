@@ -1042,7 +1042,7 @@ exports[`Component Send - test Send privacy high - snapshot 1`] = `
                       <View
                         style={
                           {
-                            "borderBottomColor": "#FFB972",
+                            "borderBottomColor": "#F99D00",
                             "borderBottomWidth": 1,
                             "marginRight": 5,
                           }
@@ -1105,7 +1105,7 @@ exports[`Component Send - test Send privacy high - snapshot 1`] = `
                               <Text
                                 style={
                                   {
-                                    "color": "#FFB972",
+                                    "color": "#F99D00",
                                     "fontSize": 14,
                                     "fontWeight": "700",
                                     "margin": 0,
@@ -2864,7 +2864,7 @@ exports[`Component Send - test Send privacy normal - snapshot 1`] = `
                       <View
                         style={
                           {
-                            "borderBottomColor": "#FFB972",
+                            "borderBottomColor": "#F99D00",
                             "borderBottomWidth": 1,
                             "marginRight": 5,
                           }
@@ -2927,7 +2927,7 @@ exports[`Component Send - test Send privacy normal - snapshot 1`] = `
                               <Text
                                 style={
                                   {
-                                    "color": "#FFB972",
+                                    "color": "#F99D00",
                                     "fontSize": 14,
                                     "fontWeight": "700",
                                     "margin": 0,
@@ -2941,7 +2941,7 @@ exports[`Component Send - test Send privacy normal - snapshot 1`] = `
                               <Text
                                 style={
                                   {
-                                    "color": "#FFB972",
+                                    "color": "#F99D00",
                                     "fontSize": 9.799999999999999,
                                     "margin": 0,
                                     "marginBottom": 0.9333333333333333,

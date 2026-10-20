@@ -131,7 +131,7 @@ const CustomServerBox: React.FC<CustomServerBoxProps> = ({
     result === true
       ? colors.fgAccent
       : result === false
-        ? colors.fgDangerEmphasis
+        ? colors.fgDanger
         : focused
           ? colors.borderFocus
           : colors.bottomSheetBorder;

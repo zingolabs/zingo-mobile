@@ -203,7 +203,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
         borderRadius: 15,
         borderWidth: 1,
         borderColor: ok ? colors.borderAccent : colors.bottomSheetBorder,
-        backgroundColor: ok ? colors.bgSecondaryDisabled : colors.bgSurface,
+        backgroundColor: ok ? colors.bgAccentSubtle : colors.bgSurface,
       }}
     >
       {icon}
@@ -243,7 +243,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
               style={{
                 fontSize: 11.5,
                 fontWeight: '600',
-                color: colors.fgWarningEmphasis,
+                color: colors.fgWarning,
               }}
             >
               {netLabel}
@@ -294,7 +294,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
                   <FontAwesomeIcon
                     icon={faWifi}
                     size={12}
-                    color={colors.fgDangerEmphasis}
+                    color={colors.fgDanger}
                   />,
                 )}
           </Animated.View>

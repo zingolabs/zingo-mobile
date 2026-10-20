@@ -203,7 +203,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                     }}
                   >
                     <EyeIcon
-                      color={colors.fgWarningDark}
+                      color={colors.fgWarning}
                       size={20}
                       style={{ marginRight: 10 }}
                     />
