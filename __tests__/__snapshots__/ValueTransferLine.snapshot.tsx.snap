@@ -226,8 +226,6 @@ exports[`ValueTransferLine - snapshots ValueTransferLine failed transaction 1`] 
         <View
           style={
             {
-              "borderBottomColor": "#FFFFFF0F",
-              "borderBottomWidth": 1,
               "paddingBottom": 0,
             }
           }
@@ -476,6 +474,15 @@ exports[`ValueTransferLine - snapshots ValueTransferLine failed transaction 1`] 
               </View>
             </View>
           </View>
+          <View
+            style={
+              {
+                "backgroundColor": "#FFFFFF0F",
+                "height": 1,
+                "marginHorizontal": 16,
+              }
+            }
+          />
         </View>
       </View>
     </View>
@@ -709,8 +716,6 @@ exports[`ValueTransferLine - snapshots ValueTransferLine pending (0 confirmation
         <View
           style={
             {
-              "borderBottomColor": "#FFFFFF0F",
-              "borderBottomWidth": 1,
               "paddingBottom": 8,
             }
           }
@@ -905,6 +910,15 @@ exports[`ValueTransferLine - snapshots ValueTransferLine pending (0 confirmation
               text translated
             </Text>
           </View>
+          <View
+            style={
+              {
+                "backgroundColor": "#FFFFFF0F",
+                "height": 1,
+                "marginHorizontal": 16,
+              }
+            }
+          />
         </View>
       </View>
     </View>
@@ -1084,8 +1098,6 @@ exports[`ValueTransferLine - snapshots ValueTransferLine received, no month head
         <View
           style={
             {
-              "borderBottomColor": "#FFFFFF0F",
-              "borderBottomWidth": 0,
               "paddingBottom": 0,
             }
           }
@@ -1512,8 +1524,6 @@ exports[`ValueTransferLine - snapshots ValueTransferLine sent confirmed 1`] = `
         <View
           style={
             {
-              "borderBottomColor": "#FFFFFF0F",
-              "borderBottomWidth": 1,
               "paddingBottom": 0,
             }
           }
@@ -1762,6 +1772,15 @@ exports[`ValueTransferLine - snapshots ValueTransferLine sent confirmed 1`] = `
               </View>
             </View>
           </View>
+          <View
+            style={
+              {
+                "backgroundColor": "#FFFFFF0F",
+                "height": 1,
+                "marginHorizontal": 16,
+              }
+            }
+          />
         </View>
       </View>
     </View>

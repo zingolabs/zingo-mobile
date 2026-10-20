@@ -313,16 +313,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
           overshootFriction={1}
           renderLeftActions={handleRenderLeftActions}
         >
-          <View
-            style={{
-              // Lines that belong to the same TXID render flush against
-              // each other — no separator. The separator only marks the
-              // boundary between distinct transactions.
-              borderBottomWidth: nextLineWithSameTxid ? 0 : 1,
-              borderBottomColor: colors.borderSubtle,
-              paddingBottom: vt.confirmations === 0 ? space8 : 0,
-            }}
-          >
+          <View style={{ paddingBottom: vt.confirmations === 0 ? space8 : 0 }}>
             <ListRow
               leading={
                 <KindIcon
@@ -406,6 +397,18 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                   {translate(`history.${vt.status}`) as string}
                 </Text>
               </View>
+            )}
+            {/* Lines of the same TXID render flush against each other; the
+                separator only marks the boundary between transactions, and
+                stops at the row's gutter like its content. */}
+            {!nextLineWithSameTxid && (
+              <View
+                style={{
+                  height: 1,
+                  marginHorizontal: space16,
+                  backgroundColor: colors.borderSubtle,
+                }}
+              />
             )}
           </View>
         </Swipeable>
