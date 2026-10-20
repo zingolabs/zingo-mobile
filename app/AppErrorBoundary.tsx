@@ -129,7 +129,7 @@ class AppErrorBoundary extends Component<React.PropsWithChildren, State> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#06172d',
+    backgroundColor: themeTokens.bgCanvas,
     alignItems: 'center',
     justifyContent: 'center',
     padding: 24,
@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
   detailsBox: {
     alignSelf: 'stretch',
     maxHeight: 240,
-    backgroundColor: '#0d2645',
+    backgroundColor: themeTokens.bgSurface,
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 10,
@@ -175,7 +175,7 @@ const styles = StyleSheet.create({
   },
   detailsStack: {
     color: themeTokens.fgMuted,
-    fontSize: 11,
+    fontSize: 12,
     fontFamily: 'monospace',
     lineHeight: 14,
   },
@@ -194,7 +194,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   buttonSecondary: {
-    backgroundColor: '#37548a',
+    backgroundColor: themeTokens.bgMutedSubtle,
   },
   buttonText: {
     color: themeTokens.fgDefault,

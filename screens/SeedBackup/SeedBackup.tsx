@@ -22,7 +22,6 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withDelay,
-  withSequence,
   withTiming,
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -55,6 +54,7 @@ import ConfirmStep, { useWordCheck } from './components/ConfirmStep';
 import DoneStep from './components/DoneStep';
 import ScreenshotSheet from './components/ScreenshotSheet';
 import { SIDE, StepActions } from './components/StepParts';
+import Button from '@ui/primitives/Button';
 
 type SeedBackupProps = NativeStackScreenProps<AppDrawerParamList, 'SeedBackup'>;
 
@@ -122,8 +122,8 @@ const ConfirmPage: React.FunctionComponent<{
           link={translate('seedbackup.view-phrase') as string}
           onLink={onViewPhrase}
           primary={translate('seedbackup.confirm') as string}
-          off={!check.value}
-          onPrimary={() => (check.value ? check.submit() : check.nudge())}
+          disabled={!check.value}
+          onPrimary={check.submit}
         />
       </View>
     </>
@@ -173,14 +173,12 @@ const SeedBackup: React.FunctionComponent<SeedBackupProps> = ({
   const [loading, setLoading] = useState(false);
   const [hidden, setHidden] = useState(true);
   const [checked, setChecked] = useState(false);
-  const [nudge, setNudge] = useState(0);
   const [attempt, setAttempt] = useState(0);
   const closing = useRef(false);
 
   const grow = useSharedValue(0);
   const content = useSharedValue(1);
   const whole = useSharedValue(1);
-  const savedShake = useSharedValue(0);
   const slide = useSharedValue(pushed ? window.width : 0);
 
   const measured = screen.width > 0;
@@ -327,19 +325,6 @@ const SeedBackup: React.FunctionComponent<SeedBackupProps> = ({
   }, []);
 
   const saved = () => {
-    if (!checked) {
-      savedShake.value = withSequence(
-        withTiming(-4, motion(60, ease.standard)),
-        withTiming(4, motion(120, ease.standard)),
-        withTiming(0, motion(60, ease.standard)),
-      );
-      setNudge(n => n + 1);
-      addLastSnackbar(
-        translate('seedbackup.check-first') as string,
-        SnackbarDurationEnum.short,
-      );
-      return;
-    }
     setAttempt(a => a + 1);
     go('confirm', 1);
   };
@@ -395,9 +380,6 @@ ${translate('seedbackup.birthday') as string}: ${birthday}`;
   const sliding = useAnimatedStyle(() => ({
     transform: [{ translateX: slide.value }],
   }));
-  const savedNudge = useAnimatedStyle(() => ({
-    transform: [{ translateX: savedShake.value }],
-  }));
 
   const bottom = Math.max(insets.bottom + 16, keyboard + 12);
 
@@ -413,7 +395,7 @@ ${translate('seedbackup.birthday') as string}: ${birthday}`;
                 link={translate('seedbackup.not-now') as string}
                 onLink={close}
                 primary={translate('seedbackup.continue') as string}
-                off={loading}
+                disabled={loading}
                 onPrimary={toWords}
               />
             </View>
@@ -432,7 +414,6 @@ ${translate('seedbackup.birthday') as string}: ${birthday}`;
                 onCopy={copy}
                 checked={checked}
                 onCheck={() => setChecked(c => !c)}
-                nudge={nudge}
               />
             )}
             <View style={{ position: 'absolute', left: 0, right: 0, bottom }}>
@@ -441,8 +422,7 @@ ${translate('seedbackup.birthday') as string}: ${birthday}`;
                 link={translate('seedbackup.back') as string}
                 onLink={() => go('info', -1)}
                 primary={translate('seedbackup.saved') as string}
-                off={!checked}
-                primaryStyle={savedNudge}
+                disabled={!checked}
                 onPrimary={saved}
               />
             </View>
@@ -469,34 +449,17 @@ ${translate('seedbackup.birthday') as string}: ${birthday}`;
             <View
               style={{
                 position: 'absolute',
-                left: 52,
-                right: 52,
+                left: SIDE,
+                right: SIDE,
                 bottom: insets.bottom + 28,
               }}
             >
-              <Pressable
+              <Button
                 testID="seedbackup.done"
-                accessibilityRole="button"
+                variant="primary"
+                title={translate('seedbackup.done') as string}
                 onPress={finish}
-                style={({ pressed }) => ({
-                  height: 44,
-                  borderRadius: 22,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  backgroundColor: colors.bgAccent,
-                  transform: [{ scale: pressed ? 0.97 : 1 }],
-                })}
-              >
-                <Animated.Text
-                  style={{
-                    color: colors.bgCanvas,
-                    fontSize: 15,
-                    fontWeight: '700',
-                  }}
-                >
-                  {translate('seedbackup.done') as string}
-                </Animated.Text>
-              </Pressable>
+              />
             </View>
           </>
         );
@@ -565,12 +528,10 @@ ${translate('seedbackup.birthday') as string}: ${birthday}`;
                     borderRadius: 12,
                     alignItems: 'center',
                     justifyContent: 'center',
-                    backgroundColor: pressed
-                      ? 'rgba(255,255,255,0.06)'
-                      : undefined,
+                    backgroundColor: pressed ? colors.bgMutedSubtle : undefined,
                   })}
                 >
-                  <XIcon size={18} color={colors.fgMuted} strokeWidth={1.8} />
+                  <XIcon size={20} color={colors.fgMuted} />
                 </Pressable>
               </Animated.View>
             )}

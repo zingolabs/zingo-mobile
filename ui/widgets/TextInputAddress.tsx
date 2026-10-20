@@ -1,10 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useState } from 'react';
 import { View, TouchableOpacity, TextInput } from 'react-native';
-import { useTheme } from '@app/theme';
+import { useTheme, slopFor } from '@app/theme';
 import { ScanIcon } from '@ui/primitives/Icons/ScanIcon';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faCheck, faXmark } from '@fortawesome/free-solid-svg-icons';
 
 import { ContextAppLoaded } from '@app/context';
 import { Request, useResult } from '@app/navigation/results';
@@ -13,6 +11,9 @@ import ErrorText from '@ui/primitives/ErrorText';
 import RegText from '@ui/primitives/RegText';
 import { validateAddressForChain } from '@app/swap';
 import { GlobalConst } from '@app/AppState';
+import { fieldBorder } from '@ui/primitives/fieldBorder';
+import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
+import { XIcon } from '@ui/primitives/Icons/XIcon';
 
 type TextInputAddressProps = {
   address: string;
@@ -41,6 +42,7 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
   const { colors } = useTheme();
 
   const [validAddress, setValidAddress] = useState<number>(0); // 1 - OK, 0 - Empty, -1 - KO
+  const [focused, setFocused] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -103,7 +105,7 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
           >
             <RegText>{translate('send.toaddress') as string}</RegText>
             {validAddress === 1 && (
-              <FontAwesomeIcon icon={faCheck} color={colors.fgAccent} />
+              <CheckIcon size={16} color={colors.fgAccent} />
             )}
             {validAddress === -1 && (
               <ErrorText>
@@ -116,7 +118,15 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
           style={{
             borderWidth: 1,
             borderRadius: 12,
-            borderColor: colors.borderMuted,
+            borderColor: fieldBorder(
+              colors,
+              focused,
+              validAddress === 1
+                ? 'valid'
+                : validAddress === -1
+                  ? 'invalid'
+                  : 'unknown',
+            ),
             marginTop: 5,
           }}
         >
@@ -131,14 +141,15 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
             >
               <TextInput
                 testID="send.addressplaceholder"
+                onFocus={() => setFocused(true)}
+                onBlur={() => setFocused(false)}
                 placeholder={translate('send.addressplaceholder') as string}
                 placeholderTextColor={colors.fgMuted}
                 style={{
                   color: colors.fgDefault,
                   fontWeight: '600',
-                  fontSize: 14,
+                  fontSize: 15,
                   padding: 10,
-                  backgroundColor: 'transparent',
                 }}
                 value={address}
                 onChangeText={(text: string) => setAddress(text)}
@@ -155,14 +166,14 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
             >
               {!!address && !disabled && (
                 <TouchableOpacity
+                  hitSlop={slopFor(20)}
                   onPress={() => {
                     setAddress('');
                   }}
                 >
-                  <FontAwesomeIcon
+                  <XIcon
                     style={{ marginRight: 5 }}
                     size={20}
-                    icon={faXmark}
                     color={colors.fgAccentDisabled}
                   />
                 </TouchableOpacity>
@@ -179,7 +190,7 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
               >
                 <ScanIcon
                   style={{ marginRight: 5 }}
-                  size={28}
+                  size={24}
                   color={colors.fgMuted}
                 />
               </TouchableOpacity>

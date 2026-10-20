@@ -1,18 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { Keyboard, TextInput, TouchableOpacity, View } from 'react-native';
-import Animated, {
-  ReduceMotion,
-  useAnimatedStyle,
-  useSharedValue,
-  withSequence,
-  withTiming,
-} from 'react-native-reanimated';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faCheck, faXmark } from '@fortawesome/free-solid-svg-icons';
 
-import { useTheme } from '@app/theme';
-import { ease } from '@app/theme/motion';
+import { useTheme, slopFor } from '@app/theme';
 import { AddressBookFileClass, ChainNameEnum } from '@app/AppState';
 import { ContextAppLoaded } from '@app/context';
 import { openScanner } from '@app/navigation/navigate';
@@ -21,21 +11,18 @@ import { isZnsAlias, resolveZnsName } from '@app/uris/resolveZnsName';
 import Utils from '@app/utils';
 import { isWalletAddress } from '@app/walletBackend';
 import BoldText from '@ui/primitives/BoldText';
-import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
+import Button from '@ui/primitives/Button';
 import RegText from '@ui/primitives/RegText';
 import { ScanIcon } from '@ui/primitives/Icons/ScanIcon';
 import ChainSelect from '@ui/widgets/ChainSelect';
+import { fieldBorder } from '@ui/primitives/fieldBorder';
+import { XIcon } from '@ui/primitives/Icons/XIcon';
+import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
 
 const ZEC = 'ZEC';
 const NAME_MAX = 32;
 const CHECK_AT = 250;
 const ZNS_AT = 500;
-const SHAKE_MS = 60;
-const SAVE_OFF = 0.4;
-const OK_BORDER = 'rgba(20,157,5,0.6)';
-const OK_INK = '#7FD96E';
-const WARN_INK = '#E6C46A';
-const ERR_INK = '#F2878A';
 
 type Field = 'none' | 'name' | 'address';
 
@@ -98,10 +85,6 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
   const [saving, setSaving] = useState(false);
   const [focus, setFocus] = useState<Field>('none');
   const [touched, setTouched] = useState(false);
-  const shake = useSharedValue(0);
-  const shakeStyle = useAnimatedStyle(() => ({
-    transform: [{ translateX: shake.value }],
-  }));
   const scanButton = useRef<View>(null);
 
   const alias = isZnsAlias(address);
@@ -205,29 +188,20 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
             text: translate(kindKey(trimmedAddress)) as string,
           }
         : { tone: 'none' };
-  const noteInk = { ok: OK_INK, warn: WARN_INK, err: ERR_INK };
+  const noteInk = {
+    ok: colors.fgAccent,
+    warn: colors.fgTransparent,
+    err: colors.fgDanger,
+  };
 
   const border = (field: Field, bad: boolean, good: boolean): string =>
-    bad
-      ? colors.bgDanger
-      : good
-        ? OK_BORDER
-        : focus === field
-          ? colors.borderFocus
-          : colors.bottomSheetBorder;
+    fieldBorder(
+      colors,
+      focus === field,
+      bad ? 'invalid' : good ? 'valid' : 'unknown',
+    );
 
   const save = async () => {
-    if (!ready) {
-      setTouched(true);
-      const step = (x: number) =>
-        withTiming(x, {
-          duration: SHAKE_MS,
-          easing: ease.standard,
-          reduceMotion: ReduceMotion.System,
-        });
-      shake.value = withSequence(step(-4), step(4), step(-4), step(0));
-      return;
-    }
     Keyboard.dismiss();
     setSaving(true);
     await onSave(trimmedName, trimmedAddress);
@@ -268,7 +242,7 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
         style={{
           marginTop: 4,
           textAlign: 'center',
-          fontSize: 15.5,
+          fontSize: 15,
           lineHeight: 21,
         }}
       >
@@ -310,16 +284,14 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
               padding: 10,
               color: colors.fgDefault,
               fontWeight: '600',
-              fontSize: 14,
-              backgroundColor: 'transparent',
+              fontSize: 15,
             }}
           />
           {!!name && (
-            <TouchableOpacity onPress={() => setName('')}>
-              <FontAwesomeIcon
+            <TouchableOpacity hitSlop={slopFor(20)} onPress={() => setName('')}>
+              <XIcon
                 style={{ marginRight: 10 }}
                 size={20}
-                icon={faXmark}
                 color={colors.fgMuted}
               />
             </TouchableOpacity>
@@ -376,8 +348,7 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
               textAlignVertical: 'top',
               color: colors.fgDefault,
               fontWeight: '600',
-              fontSize: 14,
-              backgroundColor: 'transparent',
+              fontSize: 15,
             }}
           />
           <View style={{ alignItems: 'center', paddingVertical: 6, gap: 6 }}>
@@ -390,19 +361,19 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
             >
               <ScanIcon
                 style={{ marginRight: 5 }}
-                size={28}
+                size={24}
                 color={colors.fgMuted}
               />
             </TouchableOpacity>
             {!!address && (
               <TouchableOpacity
+                hitSlop={slopFor(20)}
                 testID="addressbook.address-clear"
                 onPress={() => setAddress('')}
               >
-                <FontAwesomeIcon
+                <XIcon
                   style={{ marginRight: 5 }}
                   size={20}
-                  icon={faXmark}
                   color={colors.fgMuted}
                 />
               </TouchableOpacity>
@@ -428,12 +399,12 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
           }}
         >
           {note.tone === 'ok' && (
-            <FontAwesomeIcon icon={faCheck} size={11} color={OK_INK} />
+            <CheckIcon size={16} color={colors.fgAccent} />
           )}
           {note.tone !== 'none' && (
             <RegText
               color={noteInk[note.tone]}
-              style={{ flex: 1, fontSize: 11, lineHeight: 16 }}
+              style={{ flex: 1, fontSize: 12, lineHeight: 16 }}
             >
               {note.text}
             </RegText>
@@ -441,30 +412,24 @@ const ContactSheet: React.FunctionComponent<ContactSheetProps> = ({
         </View>
       </View>
 
-      <Animated.View style={shakeStyle}>
-        <Button
-          testID="addressbook.save"
-          type={ButtonTypeEnum.Primary}
-          title={translate('save') as string}
-          disabled={saving}
-          onPress={save}
-          fullWidth
-          style={{
-            marginTop: 20,
-            opacity: ready ? 1 : SAVE_OFF,
-          }}
-          textStyle={{ fontSize: 15 }}
-        />
-      </Animated.View>
+      <Button
+        testID="addressbook.save"
+        variant="primary"
+        title={translate('save') as string}
+        disabled={saving || !ready}
+        onPress={save}
+        style={{
+          marginTop: 20,
+        }}
+      />
       <Button
         testID="addressbook.cancel"
-        type={ButtonTypeEnum.Link}
+        variant="quiet"
         title={translate('cancel') as string}
         onPress={() => {
           Keyboard.dismiss();
           onCancel();
         }}
-        fullWidth
         style={{ marginTop: 8 }}
       />
     </View>

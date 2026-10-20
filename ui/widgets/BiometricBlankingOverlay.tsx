@@ -8,9 +8,10 @@ import {
 } from 'react-native';
 
 import { BIOMETRIC_BLANKING_EVENT } from '@app/services/gateController';
+import { themeTokens } from '@app/theme';
 
 const styles = StyleSheet.create({
-  overlay: { flex: 1, backgroundColor: 'black' },
+  overlay: { flex: 1, backgroundColor: themeTokens.bgCanvas },
 });
 
 const BiometricBlankingOverlay: React.FunctionComponent = () => {

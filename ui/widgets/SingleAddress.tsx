@@ -4,7 +4,7 @@ import { View, ScrollView, TouchableOpacity, Text } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import { useNavigation } from '@react-navigation/native';
 import { WalletNavigation } from '@app/types';
-import { useTheme } from '@app/theme';
+import { useTheme, slopFor } from '@app/theme';
 
 import { ContextAppLoaded } from '@app/context';
 import { useResult } from '@app/navigation/results';
@@ -23,11 +23,10 @@ import { EyeIcon } from '@ui/primitives/Icons/EyeIcon';
 import { TriangleAlert } from '@ui/primitives/Icons/TriangleAlert';
 import { ShieldIcon } from '@ui/primitives/Icons/ShieldIcon';
 import { ListIcon } from '@ui/primitives/Icons/ListIcon';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faCircleCheck } from '@fortawesome/free-regular-svg-icons';
 import Address from './Address/Address';
 import { getZingoLogo } from '@app/utils/ZingoAppData';
 import { useTimedReveal } from '@app/hooks/useTimedReveal';
+import { CheckCircleLineIcon } from '@ui/primitives/Icons/CheckCircleLineIcon';
 
 type SingleAddressProps = {
   address?: UnifiedAddressClass | TransparentAddressClass;
@@ -115,14 +114,14 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                 }}
               >
                 <TriangleAlert
-                  color="#F79700"
+                  color={colors.fgWarning}
                   size={20}
                   style={{ marginRight: 10 }}
                 />
                 <Text
                   style={{
-                    color: '#F79700',
-                    fontSize: 14,
+                    color: colors.fgWarning,
+                    fontSize: 13,
                     flexShrink: 1,
                   }}
                 >
@@ -203,7 +202,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                     }}
                   >
                     <EyeIcon
-                      color={colors.fgWarningDark}
+                      color={colors.fgWarning}
                       size={20}
                       style={{ marginRight: 10 }}
                     />
@@ -321,7 +320,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                   marginBottom: 5,
                 }}
               >
-                <TouchableOpacity onPress={doCopy}>
+                <TouchableOpacity hitSlop={slopFor(20)} onPress={doCopy}>
                   <View
                     style={{
                       borderRadius: 30,
@@ -341,7 +340,10 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                 </TouchableOpacity>
                 {address && (
                   <>
-                    <TouchableOpacity onPress={() => show('VA')}>
+                    <TouchableOpacity
+                      hitSlop={slopFor(20)}
+                      onPress={() => show('VA')}
+                    >
                       <View
                         style={{
                           borderRadius: 30,
@@ -351,16 +353,18 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                           marginHorizontal: 10,
                         }}
                       >
-                        <FontAwesomeIcon
+                        <CheckCircleLineIcon
                           style={{ margin: 5, opacity: 0.9 }}
                           size={20}
-                          icon={faCircleCheck}
                           color={colors.fgDefault}
                         />
                       </View>
                     </TouchableOpacity>
                     {total > 1 && (
-                      <TouchableOpacity onPress={doAddressList}>
+                      <TouchableOpacity
+                        hitSlop={slopFor(20)}
+                        onPress={doAddressList}
+                      >
                         <View
                           style={{
                             borderRadius: 30,

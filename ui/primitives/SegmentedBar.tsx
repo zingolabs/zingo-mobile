@@ -26,7 +26,6 @@ const FLASH_OUT_MS = 420;
 const FLASH_PEAK = 0.5;
 // Both highlights are white laid over the fill, so brighter means the same
 // colour with more light in it rather than a second colour.
-const HIGHLIGHT = '#ffffff';
 const GAP = 3;
 
 type SegmentedBarProps = {
@@ -80,6 +79,7 @@ const Segment: React.FunctionComponent<SegmentProps> = ({
   radius,
   gap,
 }) => {
+  const { colors } = useTheme();
   const opacity = useRef(new Animated.Value(level)).current;
   const flash = useRef(new Animated.Value(0)).current;
   const wasConfirmed = useRef(confirmed);
@@ -153,7 +153,7 @@ const Segment: React.FunctionComponent<SegmentProps> = ({
       <Animated.View
         style={[
           StyleSheet.absoluteFillObject,
-          { backgroundColor: HIGHLIGHT, opacity: glow },
+          { backgroundColor: colors.fgDefault, opacity: glow },
         ]}
       />
     </View>

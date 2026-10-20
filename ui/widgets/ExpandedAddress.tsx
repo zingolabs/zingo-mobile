@@ -1,7 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text } from 'react-native';
 import { useTheme } from '@app/theme';
+import Button from '@ui/primitives/Button';
 
 type ExpandedAddressProps = {
   address: string;
@@ -36,26 +37,19 @@ const ExpandedAddress: React.FunctionComponent<ExpandedAddressProps> = ({
         }}
       >
         <View style={{ alignItems: 'flex-start' }}>
-          <Text style={{ color: '#cbd5e1', fontSize: 16, marginBottom: 20 }}>
+          <Text
+            style={{ color: colors.fgDefault, fontSize: 16, marginBottom: 20 }}
+          >
             {address}
           </Text>
-          <TouchableOpacity
+          <Button
+            variant="text"
+            title={button ?? ''}
             onPress={() => {
               onCopy && onCopy();
               closeSheet();
             }}
-            style={{
-              borderColor: '#3B4B5F',
-              backgroundColor: '#2A394D',
-              paddingHorizontal: 8,
-              paddingVertical: 4,
-              borderRadius: 5,
-              borderWidth: 1,
-              alignSelf: 'center',
-            }}
-          >
-            <Text style={{ color: '#ccc', fontSize: 16 }}>{button}</Text>
-          </TouchableOpacity>
+          />
         </View>
       </View>
     </View>

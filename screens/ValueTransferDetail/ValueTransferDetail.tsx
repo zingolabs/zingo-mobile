@@ -12,7 +12,7 @@ import { showConfirm } from '@app/services/showConfirm';
 import Clipboard from '@react-native-clipboard/clipboard';
 
 import { useNavigation } from '@react-navigation/native';
-import { useTheme } from '@app/theme';
+import { useTheme, slopFor } from '@app/theme';
 
 import {
   AddressBookFileClass,
@@ -38,24 +38,23 @@ import BoldText from '@ui/primitives/BoldText';
 import AppSheet from '@ui/primitives/AppSheet';
 import CurrencyAmount from '@ui/widgets/CurrencyAmount';
 import AddressItem from '@ui/widgets/AddressItem';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 // this is for http. (red)
-import {
-  faChevronLeft,
-  faTriangleExclamation,
-  faChevronDown,
-  faChevronUp,
-} from '@fortawesome/free-solid-svg-icons';
 import BottomSheet, { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
 import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
-import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
+import Button from '@ui/primitives/Button';
 import { removeTransaction } from '@app/walletBackend';
 import { createAlert } from '@app/services/createAlert';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import {
+  ChevronDown,
+  ChevronLeft,
+  ChevronUp,
+} from '@ui/primitives/Icons/Chevron';
+import { TriangleAlert } from '@ui/primitives/Icons/TriangleAlert';
+import { themeTokens } from '@app/theme';
 // this is for https. (primary)
-//import { faLock } from '@fortawesome/free-solid-svg-icons';
-
+//
 type ValueTransferDetailProps = NativeStackScreenProps<
   AppDrawerParamList,
   'ValueTransferDetail'
@@ -141,11 +140,7 @@ const ValueTransferDetail: React.FunctionComponent<
           hitSlop={8}
           style={{ paddingHorizontal: 4, paddingVertical: 4 }}
         >
-          <FontAwesomeIcon
-            icon={faChevronLeft}
-            size={20}
-            color={colors.fgAccent}
-          />
+          <ChevronLeft size={20} color={colors.fgAccent} />
         </TouchableOpacity>
         <BoldText
           numberOfLines={1}
@@ -371,12 +366,12 @@ const ValueTransferDetail: React.FunctionComponent<
             }}
           >
             <TouchableOpacity
+              hitSlop={slopFor(24)}
               onPress={() => moveValueTransferDetail(valueTransferIndex, -1)}
               style={{ marginRight: 25 }}
               disabled={valueTransferIndex === 0}
             >
-              <FontAwesomeIcon
-                icon={faChevronUp}
+              <ChevronUp
                 color={
                   valueTransferIndex === 0
                     ? colors.fgAccentDisabled
@@ -387,12 +382,12 @@ const ValueTransferDetail: React.FunctionComponent<
             </TouchableOpacity>
             <FadeText>{(valueTransferIndex + 1).toString()}</FadeText>
             <TouchableOpacity
+              hitSlop={slopFor(24)}
               onPress={() => moveValueTransferDetail(valueTransferIndex, 1)}
               style={{ marginLeft: 25 }}
               disabled={valueTransferIndex === valueTransfersSliced.length - 1}
             >
-              <FontAwesomeIcon
-                icon={faChevronDown}
+              <ChevronDown
                 color={
                   valueTransferIndex === valueTransfersSliced.length - 1
                     ? colors.fgAccentDisabled
@@ -430,7 +425,7 @@ const ValueTransferDetail: React.FunctionComponent<
               borderRadius: 10,
               borderColor:
                 valueTransfer.status === RPCValueTransfersStatusEnum.failed
-                  ? 'coral'
+                  ? themeTokens.fgDanger
                   : colors.borderMuted,
             }}
           >
@@ -533,7 +528,7 @@ const ValueTransferDetail: React.FunctionComponent<
                     : 1,
               }}
               currencyName={info.currencyName}
-              size={28}
+              size={22}
               amtZec={valueTransfer.amount}
               privacy={privacy}
               smallPrefix={true}
@@ -556,6 +551,7 @@ const ValueTransferDetail: React.FunctionComponent<
                 <>
                   <View
                     style={{
+                      paddingHorizontal: 16,
                       flexGrow: 1,
                       flexDirection: 'row',
                       justifyContent: 'center',
@@ -564,7 +560,7 @@ const ValueTransferDetail: React.FunctionComponent<
                     }}
                   >
                     <Button
-                      type={ButtonTypeEnum.Primary}
+                      variant="primary"
                       title={translate('history.remove') as string}
                       onPress={() => {
                         actionOnPress(TransactionActionEnum.remove);
@@ -590,11 +586,10 @@ const ValueTransferDetail: React.FunctionComponent<
                   RPCValueTransfersStatusEnum.transmitted ||
                   valueTransfer.status ===
                     RPCValueTransfersStatusEnum.calculated) && (
-                  <FontAwesomeIcon
+                  <TriangleAlert
                     style={{ marginRight: 5 }}
-                    icon={faTriangleExclamation}
                     color={colors.fgSyncing}
-                    size={12}
+                    size={16}
                   />
                 )}
                 {(valueTransfer.status ===
@@ -610,7 +605,7 @@ const ValueTransferDetail: React.FunctionComponent<
                       color:
                         valueTransfer.status ===
                         RPCValueTransfersStatusEnum.failed
-                          ? 'coral'
+                          ? themeTokens.fgDanger
                           : valueTransfer.status ===
                                 RPCValueTransfersStatusEnum.transmitted ||
                               valueTransfer.status ===
@@ -820,7 +815,7 @@ const ValueTransferDetail: React.FunctionComponent<
                           : 1,
                     }}
                     amtZec={valueTransfer.fee}
-                    size={14}
+                    size={15}
                     currencyName={info.currencyName}
                     privacy={privacy}
                   />
@@ -888,7 +883,7 @@ const ValueTransferDetail: React.FunctionComponent<
                         : 1,
                   }}
                   amtZec={valueTransfer.amount}
-                  size={14}
+                  size={15}
                   currencyName={info.currencyName}
                   privacy={privacy}
                 />
@@ -938,11 +933,7 @@ const ValueTransferDetail: React.FunctionComponent<
                   >
                     <RegText>{GlobalConst.replyTo}</RegText>
                     {!thisWalletAddress(memoUA) && (
-                      <FontAwesomeIcon
-                        icon={faTriangleExclamation}
-                        color={'red'}
-                        size={14}
-                      />
+                      <TriangleAlert color={'red'} size={16} />
                     )}
                     <RegText
                       style={{ opacity: thisWalletAddress(memoUA) ? 0.6 : 0.4 }}

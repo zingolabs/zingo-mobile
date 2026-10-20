@@ -18,7 +18,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import FadeText from '@ui/primitives/FadeText';
 import RegText from '@ui/primitives/RegText';
-import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
+import Button from '@ui/primitives/Button';
 import Header from '@ui/widgets/Header';
 import { AppDrawerParamList } from '@app/types';
 import { useTheme } from '@app/theme';
@@ -349,14 +349,13 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
             <Animated.View layout={boxMorph()}>
               <Button
                 testID="mixnetdoctor.run"
-                type={ButtonTypeEnum.Primary}
+                variant="primary"
                 title={
                   running
                     ? (translate('mixnetdoctor.running') as string)
                     : (translate('mixnetdoctor.run') as string)
                 }
                 disabled={running || restingOff}
-                style={{ alignSelf: 'center' }}
                 onPress={() => runDoctor()}
               />
             </Animated.View>
@@ -370,9 +369,8 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
             >
               <Button
                 testID="mixnetdoctor.reenable"
-                type={ButtonTypeEnum.Secondary}
+                variant="text"
                 title={translate('mixnet.reenable') as string}
-                style={{ alignSelf: 'center' }}
                 onPress={restartMixnet}
               />
             </Animated.View>
@@ -386,9 +384,8 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
             >
               <Button
                 testID="mixnetdoctor.copy"
-                type={ButtonTypeEnum.Ghost}
+                variant="text"
                 title={translate('mixnetdoctor.copy-report') as string}
-                style={{ alignSelf: 'center' }}
                 onPress={() => copyReport(run)}
               />
             </Animated.View>

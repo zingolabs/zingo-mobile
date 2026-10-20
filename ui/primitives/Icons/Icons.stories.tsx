@@ -6,7 +6,7 @@ import { useTheme } from '@app/theme';
 
 import { BiohazardIcon } from './BiohazardIcon';
 import { CheckIcon } from './CheckIcon';
-import { ChevronDown, ChevronUp } from './Chevron';
+import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp } from './Chevron';
 import { CopyIcon } from './CopyIcon';
 import { EyeIcon } from './EyeIcon';
 import { EyeOffIcon } from './EyeOffIcon';
@@ -29,11 +29,36 @@ import { TriangleAlert } from './TriangleAlert';
 import { VerifyCheckIcon } from './VerifyCheckIcon';
 import { VerifyXIcon } from './VerifyXIcon';
 import { XIcon } from './XIcon';
+import { ArrowDownIcon } from './ArrowDownIcon';
+import { ArrowRightIcon } from './ArrowRightIcon';
+import { ArrowUpIcon } from './ArrowUpIcon';
+import { CheckCircleLineIcon } from './CheckCircleLineIcon';
+import { CloudDownloadIcon } from './CloudDownloadIcon';
+import { ContactIcon } from './ContactIcon';
+import { DatabaseIcon } from './DatabaseIcon';
+import { FileTextIcon } from './FileTextIcon';
+import { HistoryIcon } from './HistoryIcon';
+import { InfoIcon } from './InfoIcon';
+import { KeyboardIcon } from './KeyboardIcon';
+import { LockIcon } from './LockIcon';
+import { LockOpenIcon } from './LockOpenIcon';
+import { PlayIcon } from './PlayIcon';
+import { PlusIcon } from './PlusIcon';
+import { QrCodeIcon } from './QrCodeIcon';
+import { RadioOffIcon } from './RadioOffIcon';
+import { RadioOnIcon } from './RadioOnIcon';
+import { RefreshIcon } from './RefreshIcon';
+import { SwapIcon } from './SwapIcon';
+import { TagsIcon } from './TagsIcon';
+import { WifiIcon } from './WifiIcon';
+import { ZoomInIcon } from './ZoomInIcon';
 
 const icons = {
   Biohazard: BiohazardIcon,
   Check: CheckIcon,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   ChevronUp,
   Copy: CopyIcon,
   Eye: EyeIcon,
@@ -57,6 +82,29 @@ const icons = {
   VerifyCheck: VerifyCheckIcon,
   VerifyX: VerifyXIcon,
   X: XIcon,
+  ArrowDown: ArrowDownIcon,
+  ArrowRight: ArrowRightIcon,
+  ArrowUp: ArrowUpIcon,
+  CheckCircleLine: CheckCircleLineIcon,
+  CloudDownload: CloudDownloadIcon,
+  Contact: ContactIcon,
+  Database: DatabaseIcon,
+  FileText: FileTextIcon,
+  History: HistoryIcon,
+  Info: InfoIcon,
+  Keyboard: KeyboardIcon,
+  Lock: LockIcon,
+  LockOpen: LockOpenIcon,
+  Play: PlayIcon,
+  Plus: PlusIcon,
+  QrCode: QrCodeIcon,
+  RadioOff: RadioOffIcon,
+  RadioOn: RadioOnIcon,
+  Refresh: RefreshIcon,
+  Swap: SwapIcon,
+  Tags: TagsIcon,
+  Wifi: WifiIcon,
+  ZoomIn: ZoomInIcon,
 };
 
 const Gallery: React.FunctionComponent<{ size: number }> = ({ size }) => {
@@ -83,11 +131,13 @@ const Gallery: React.FunctionComponent<{ size: number }> = ({ size }) => {
 const meta: Meta<typeof Gallery> = {
   title: 'Icons/Gallery',
   component: Gallery,
-  args: { size: 28 },
+  args: { size: 24 },
 };
 
 export default meta;
 type Story = StoryObj<typeof Gallery>;
 
+/** The three sizes. The stroke reads the same at each one. */
 export const All: Story = {};
-export const Large: Story = { args: { size: 48 } };
+export const Medium: Story = { args: { size: 20 } };
+export const Small: Story = { args: { size: 16 } };

@@ -153,6 +153,23 @@ describe('fetchWallet returns null on any failure', () => {
     });
   });
 
+  it('Tests that a birthday of 0 is kept when the wallet has one', async () => {
+    bridge.getSeedInfo.mockResolvedValueOnce(
+      '{"seed_phrase":"a b c","birthday":0}',
+    );
+    bridge.getUfvkInfo.mockResolvedValueOnce(
+      '{"ufvk":"uview1...","birthday":0}',
+    );
+    await expect(fetchWallet(false)).resolves.toEqual({
+      seed: 'a b c',
+      birthday: 0,
+    });
+    await expect(fetchWallet(true)).resolves.toEqual({
+      ufvk: 'uview1...',
+      birthday: 0,
+    });
+  });
+
   it.each([
     ['a typed rejection', typedRejection('Read', 'boom')],
     ['an unparseable body', Promise.resolve('not json')],

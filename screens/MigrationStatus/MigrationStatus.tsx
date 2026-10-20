@@ -7,7 +7,8 @@ import { useTheme } from '@app/theme';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import BoldText from '@ui/primitives/BoldText';
-import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
+import Button from '@ui/primitives/Button';
+import ButtonStack from '@ui/primitives/ButtonStack';
 import SegmentedBar from '@ui/primitives/SegmentedBar';
 import StepperHeader from '@ui/widgets/StepperHeader';
 import { AppDrawerParamList } from '@app/types';
@@ -215,21 +216,21 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
             paddingHorizontal: 24,
           }}
         >
-          <Button
-            testID="migrationstatus.home"
-            type={ButtonTypeEnum.Ghost}
-            title={translate('migrationstatus.back') as string}
-            onPress={goHome}
-            twoButtons={true}
-          />
-          <Button
-            testID="migrationstatus.start-over"
-            type={ButtonTypeEnum.Primary}
-            title={translate('migrationstatus.start-over') as string}
-            onPress={onStartOver}
-            disabled={clearing}
-            twoButtons={true}
-          />
+          <ButtonStack>
+            <Button
+              testID="migrationstatus.home"
+              variant="text"
+              title={translate('migrationstatus.back') as string}
+              onPress={goHome}
+            />
+            <Button
+              testID="migrationstatus.start-over"
+              variant="primary"
+              title={translate('migrationstatus.start-over') as string}
+              onPress={onStartOver}
+              disabled={clearing}
+            />
+          </ButtonStack>
         </View>
       </View>
     );
@@ -518,24 +519,24 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
             paddingHorizontal: 24,
           }}
         >
-          <Button
-            testID="migrationstatus.home"
-            type={ButtonTypeEnum.Ghost}
-            title={translate('migrationstatus.back') as string}
-            onPress={goHome}
-            twoButtons={true}
-          />
-          <Button
-            testID="migrationstatus.send"
-            type={ButtonTypeEnum.Primary}
-            title={translate('migrationstatus.send') as string}
-            onPress={() =>
-              navigation.navigate(Route.MigrationBatchSending, {
-                denominations: dueNow.denominations,
-              })
-            }
-            twoButtons={true}
-          />
+          <ButtonStack>
+            <Button
+              testID="migrationstatus.home"
+              variant="text"
+              title={translate('migrationstatus.back') as string}
+              onPress={goHome}
+            />
+            <Button
+              testID="migrationstatus.send"
+              variant="primary"
+              title={translate('migrationstatus.send') as string}
+              onPress={() =>
+                navigation.navigate(Route.MigrationBatchSending, {
+                  denominations: dueNow.denominations,
+                })
+              }
+            />
+          </ButtonStack>
         </View>
       ) : (
         <View
@@ -548,7 +549,7 @@ const MigrationStatus: React.FunctionComponent<MigrationStatusProps> = ({
         >
           <Button
             testID="migrationstatus.home"
-            type={ButtonTypeEnum.Primary}
+            variant="primary"
             title={translate('migrationstatus.back') as string}
             onPress={goHome}
           />
