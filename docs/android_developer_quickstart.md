@@ -1,7 +1,7 @@
 # Android
 ## Prerequisites
 1. Yarn
-2. NodeJS (recommended version 22.18.0 or higher)
+2. NodeJS at the version pinned in `.nvmrc` (`nvm install` reads the file and installs it)
 3. Rust (https://www.rust-lang.org/tools/install)
 4. Podman or Docker. The Binding Layer build runs in zingo-mobile's Android
    builder image, and it tries Podman first.

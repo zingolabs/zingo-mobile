@@ -174,7 +174,7 @@ jobs:
       - name: Setup Node.js for the descriptor
         uses: actions/setup-node@v4
         with:
-          node-version: 22.18.0
+          node-version-file: .nvmrc
 
       # The two XCFrameworks and the Swift sources of the ZingoBindings
       # package, which the Xcode project takes from the zingolib submodule. The
