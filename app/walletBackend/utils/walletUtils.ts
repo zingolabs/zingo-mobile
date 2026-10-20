@@ -17,7 +17,6 @@ import {
   errorKeyed,
   ChainNameEnum,
 } from '@app/AppState';
-import { isNumber } from 'lodash';
 import RPCModule from '@app/RPCModule';
 import { callFfi, FfiResult } from '@app/walletBackend/ffi';
 import { serverUris } from '@app/uris';
@@ -720,7 +719,7 @@ export async function fetchWallet(
       const RPCufvk: WalletType = JSON.parse(result.value);
 
       const wallet: WalletType = {} as WalletType;
-      if (isNumber(RPCufvk.birthday)) {
+      if (RPCufvk.birthday) {
         wallet.birthday = RPCufvk.birthday;
       }
       if (RPCufvk.ufvk) {
@@ -744,7 +743,7 @@ export async function fetchWallet(
       if (RPCseed.seed_phrase) {
         wallet.seed = RPCseed.seed_phrase;
       }
-      if (isNumber(RPCseed.birthday)) {
+      if (RPCseed.birthday) {
         wallet.birthday = RPCseed.birthday;
       }
 
