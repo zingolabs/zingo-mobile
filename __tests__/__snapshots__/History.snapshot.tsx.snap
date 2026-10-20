@@ -503,8 +503,8 @@ exports[`Component History - test History privacy high - snapshot 1`] = `
                 <View
                   style={
                     {
-                      "backgroundColor": "#262527",
-                      "borderColor": "#65491C",
+                      "backgroundColor": "#031124",
+                      "borderColor": "#05234C",
                       "borderRadius": 12,
                       "borderWidth": 1,
                       "padding": 16,
@@ -1568,8 +1568,8 @@ exports[`Component History - test History privacy normal - snapshot 1`] = `
                 <View
                   style={
                     {
-                      "backgroundColor": "#262527",
-                      "borderColor": "#65491C",
+                      "backgroundColor": "#031124",
+                      "borderColor": "#05234C",
                       "borderRadius": 12,
                       "borderWidth": 1,
                       "padding": 16,

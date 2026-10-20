@@ -322,15 +322,24 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                 />
               }
               title={
-                <Text variant="bodyStrong" color={titleColor}>
-                  {kindLabel}
-                </Text>
-              }
-              subtitle={
-                <View>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    flexWrap: 'wrap',
+                    columnGap: space8,
+                  }}
+                >
+                  <Text variant="bodyStrong" color={titleColor}>
+                    {kindLabel}
+                  </Text>
                   {!!vt.address && !pending && (
                     <AddressItem address={vt.address} oneLine={true} />
                   )}
+                </View>
+              }
+              subtitle={
+                <View>
                   <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <Text variant="bodySmall" tone="muted">
                       {vt.time
