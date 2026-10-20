@@ -34,11 +34,13 @@ const ViewOnlyNotice: React.FunctionComponent<ViewOnlyNoticeProps> = ({
       onDismiss={onDismiss}
       dismissLabel={translate('viewonly.dismiss-acc') as string}
       dismissTestID="viewonly.dismiss"
+      actionBeside
       action={
         <Button
           testID="viewonly.viewkey"
           variant="text"
           size="small"
+          inline
           title={translate('viewonly.button') as string}
           onPress={open}
         />
