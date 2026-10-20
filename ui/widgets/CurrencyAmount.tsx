@@ -30,8 +30,6 @@ type CurrencyAmountProps = {
 
 export type PriceTint = 'none' | 'up' | 'down';
 
-const TINT_UP = '#3CC52A';
-const TINT_DOWN = '#F2878A';
 const TINT_MS = 500;
 
 // The amount eases to green or red for the direction of a price move.
@@ -42,11 +40,14 @@ const TintedText: React.FunctionComponent<{
   selectable?: boolean;
   children: string;
 }> = ({ tint, base, style, selectable, children }) => {
+  const { colors } = useTheme();
+  const up = colors.fgPriceUp;
+  const down = colors.fgPriceDown;
   const tinted = useAnimatedStyle(() => ({
-    color: withTiming(
-      tint === 'up' ? TINT_UP : tint === 'down' ? TINT_DOWN : base,
-      { duration: TINT_MS, reduceMotion: ReduceMotion.Never },
-    ),
+    color: withTiming(tint === 'up' ? up : tint === 'down' ? down : base, {
+      duration: TINT_MS,
+      reduceMotion: ReduceMotion.Never,
+    }),
   }));
   return (
     <Animated.Text

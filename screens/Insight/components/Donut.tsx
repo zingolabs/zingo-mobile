@@ -11,6 +11,7 @@ import Animated, {
 import Svg, { Circle, Path, Text as SvgText } from 'react-native-svg';
 
 import { ease } from '@app/theme/motion';
+import { themeTokens } from '@app/theme';
 
 const BASE_R = 86;
 const SW = 28;
@@ -26,9 +27,9 @@ const DIM = 0.3;
 const HIT = SW / 2 + 6;
 const IN_MS = 720;
 const IN_AT = 260;
-const TRACK = '#0A1F3D';
-const DARK_INK = '#07121F';
-const SOFT_INK = '#8DA0B8';
+const TRACK = themeTokens.bgMutedSubtle;
+const DARK_INK = themeTokens.fgOnAccent;
+const SOFT_INK = themeTokens.fgMuted;
 
 export type Slice = { g: number; value: number; color: string };
 
@@ -157,7 +158,7 @@ const SliceLayer: React.FunctionComponent<SliceLayerProps> = ({
           y={C + Math.sin(mid) * R + 4}
           fontSize={10}
           fontWeight="700"
-          fill={light(arc.color) ? DARK_INK : '#fff'}
+          fill={light(arc.color) ? DARK_INK : themeTokens.fgDefault}
           textAnchor="middle"
         >
           {label}
@@ -292,7 +293,7 @@ const Donut: React.FunctionComponent<DonutProps> = ({
             style={{
               marginTop: 2,
               color: SOFT_INK,
-              fontSize: 11.5,
+              fontSize: 12,
               lineHeight: 15,
               textAlign: 'center',
             }}

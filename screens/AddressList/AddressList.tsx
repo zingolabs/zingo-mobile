@@ -18,7 +18,7 @@ import {
 } from 'react-native';
 
 import { useScrollToTop } from '@react-navigation/native';
-import { useTheme } from '@app/theme';
+import { useTheme, slopFor } from '@app/theme';
 import {
   AddressKindEnum,
   TransparentAddressClass,
@@ -27,18 +27,17 @@ import {
 import { AppDrawerParamList } from '@app/types';
 import FadeText from '@ui/primitives/FadeText';
 import BoldText from '@ui/primitives/BoldText';
-import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
+import Button from '@ui/primitives/Button';
 import AppSheet from '@ui/primitives/AppSheet';
 import AlSummaryLine from './components/AlSummaryLine';
 import { ContextAppLoaded } from '@app/context';
 import { deliver } from '@app/navigation/results';
 import Header from '@ui/widgets/Header';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faAngleUp, faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 import BottomSheet from '@gorhom/bottom-sheet';
 import { RPCAddressScopeEnum } from '@app/walletBackend/enums/RPCAddressScopeEnum';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
+import { ChevronLeft, ChevronUp } from '@ui/primitives/Icons/Chevron';
 
 type AddressListProps = NativeStackScreenProps<
   AppDrawerParamList,
@@ -121,11 +120,7 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
           hitSlop={8}
           style={{ paddingHorizontal: 4, paddingVertical: 4 }}
         >
-          <FontAwesomeIcon
-            icon={faChevronLeft}
-            size={20}
-            color={colors.fgAccent}
-          />
+          <ChevronLeft size={20} color={colors.fgAccent} />
         </TouchableOpacity>
         <BoldText
           numberOfLines={1}
@@ -319,12 +314,13 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'flex-start',
+                paddingHorizontal: 16,
                 marginTop: 5,
                 marginBottom: 30,
               }}
             >
               <Button
-                type={ButtonTypeEnum.Secondary}
+                variant="text"
                 title={translate('addressbook.loadmore') as string}
                 onPress={loadMoreClicked}
               />
@@ -353,6 +349,7 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
       </AppSheet>
       {!isAtTop && (
         <Pressable
+          hitSlop={slopFor(16)}
           onPress={handleScrollToTop}
           disabled={isScrollingToTop}
           style={({ pressed }) => ({
@@ -369,10 +366,9 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
             opacity: isScrollingToTop ? 0.5 : 1,
           })}
         >
-          <FontAwesomeIcon
+          <ChevronUp
             style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
             size={16}
-            icon={faAngleUp}
             color={colors.fgMuted}
           />
         </Pressable>

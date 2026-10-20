@@ -13,7 +13,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useKeepAwake } from '@sayem314/react-native-keep-awake';
 
 import BoldText from '@ui/primitives/BoldText';
-import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
+import Button from '@ui/primitives/Button';
 import SegmentedBar from '@ui/primitives/SegmentedBar';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
@@ -194,7 +194,7 @@ const MigrationBatchSending: React.FunctionComponent<
         <View style={{ alignItems: 'center' }}>
           <Button
             testID="migrationbatchsending.slid-back"
-            type={ButtonTypeEnum.Primary}
+            variant="primary"
             title={translate('migrationbatchsending.back') as string}
             onPress={goStatus}
           />
@@ -232,7 +232,7 @@ const MigrationBatchSending: React.FunctionComponent<
         <View style={{ alignItems: 'center' }}>
           <Button
             testID="migrationbatchsending.back"
-            type={ButtonTypeEnum.Primary}
+            variant="primary"
             title={translate('migrationbatchsending.back') as string}
             onPress={goStatus}
           />

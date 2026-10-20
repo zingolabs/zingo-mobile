@@ -22,9 +22,9 @@ import {
 } from '@app/AppState';
 import { useNavigation } from '@react-navigation/native';
 import { WalletNavigation } from '@app/types';
-import { useTheme } from '@app/theme';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faUserPlus, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
+import { useTheme, slopFor } from '@app/theme';
+import { UserPlusIcon } from '@ui/primitives/Icons/UserPlusIcon';
+import { PlaneIcon } from '@ui/primitives/Icons/PlaneIcon';
 
 type AddressItemProps = {
   address: string;
@@ -176,6 +176,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
       </View>
       {withIcon && !contact && oneLine && (
         <TouchableOpacity
+          hitSlop={slopFor(20)}
           testID="addressitem.add-contact"
           onPress={() => launchAddTagModal(address, undefined, znsAlias)}
         >
@@ -188,10 +189,9 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
               paddingBottom: 2,
             }}
           >
-            <FontAwesomeIcon
+            <UserPlusIcon
               style={{ marginTop: 3 }}
               size={20}
-              icon={faUserPlus}
               color={colors.fgAccent}
             />
           </View>
@@ -199,19 +199,20 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
       )}
       {withIcon && !contact && !oneLine && (
         <TouchableOpacity
+          hitSlop={slopFor(24)}
           testID="addressitem.add-contact"
           onPress={() => launchAddTagModal(address, undefined, znsAlias)}
         >
-          <FontAwesomeIcon
+          <UserPlusIcon
             style={{ marginTop: 3 }}
             size={24}
-            icon={faUserPlus}
             color={colors.fgAccent}
           />
         </TouchableOpacity>
       )}
       {withSendIcon && !!contact && !readOnly && server.kind !== 'offline' && (
         <TouchableOpacity
+          hitSlop={slopFor(24)}
           style={{ marginLeft: 10 }}
           onPress={() => {
             // enviar
@@ -223,10 +224,9 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
             });
           }}
         >
-          <FontAwesomeIcon
+          <PlaneIcon
             style={{ marginTop: 3 }}
             size={24}
-            icon={faPaperPlane}
             color={colors.fgAccent}
           />
         </TouchableOpacity>

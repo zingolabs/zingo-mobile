@@ -6,7 +6,8 @@ import { useTheme } from '@app/theme';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import BoldText from '@ui/primitives/BoldText';
-import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
+import Button from '@ui/primitives/Button';
+import ButtonStack from '@ui/primitives/ButtonStack';
 import StepperHeader from '@ui/widgets/StepperHeader';
 import { AppDrawerParamList } from '@app/types';
 import { AppTheme } from '@app/theme';
@@ -245,7 +246,7 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
           }}
         >
           <Button
-            type={ButtonTypeEnum.Ghost}
+            variant="text"
             title={translate('migrationsplitplan.back') as string}
             onPress={() => navigation.goBack()}
           />
@@ -296,20 +297,20 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
             paddingHorizontal: 24,
           }}
         >
-          <Button
-            testID="migrationsplitplan.pending-back"
-            type={ButtonTypeEnum.Ghost}
-            title={translate('migrationsplitplan.back') as string}
-            onPress={() => navigation.goBack()}
-            twoButtons={true}
-          />
-          <Button
-            testID="migrationsplitplan.retry"
-            type={ButtonTypeEnum.Primary}
-            title={translate('migrationsplitplan.retry') as string}
-            onPress={fetchPlan}
-            twoButtons={true}
-          />
+          <ButtonStack>
+            <Button
+              testID="migrationsplitplan.pending-back"
+              variant="text"
+              title={translate('migrationsplitplan.back') as string}
+              onPress={() => navigation.goBack()}
+            />
+            <Button
+              testID="migrationsplitplan.retry"
+              variant="primary"
+              title={translate('migrationsplitplan.retry') as string}
+              onPress={fetchPlan}
+            />
+          </ButtonStack>
         </View>
       </View>
     );
@@ -358,7 +359,7 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
           }}
         >
           <Button
-            type={ButtonTypeEnum.Primary}
+            variant="primary"
             title={translate('migrationsplitplan.close') as string}
             onPress={goHome}
           />
@@ -442,20 +443,20 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
             paddingHorizontal: 24,
           }}
         >
-          <Button
-            testID="migrationsplitplan.back"
-            type={ButtonTypeEnum.Ghost}
-            title={translate('migrationsplitplan.back') as string}
-            onPress={() => navigation.goBack()}
-            twoButtons={true}
-          />
-          <Button
-            testID="migrationsplitplan.continue"
-            type={ButtonTypeEnum.Primary}
-            title={translate('migrationsplitplan.continue') as string}
-            onPress={onAccept}
-            twoButtons={true}
-          />
+          <ButtonStack>
+            <Button
+              testID="migrationsplitplan.back"
+              variant="text"
+              title={translate('migrationsplitplan.back') as string}
+              onPress={() => navigation.goBack()}
+            />
+            <Button
+              testID="migrationsplitplan.continue"
+              variant="primary"
+              title={translate('migrationsplitplan.continue') as string}
+              onPress={onAccept}
+            />
+          </ButtonStack>
         </View>
       </View>
     );
@@ -662,21 +663,21 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
           paddingHorizontal: 24,
         }}
       >
-        <Button
-          testID="migrationsplitplan.back"
-          type={ButtonTypeEnum.Ghost}
-          title={translate('migrationsplitplan.back') as string}
-          onPress={() => navigation.goBack()}
-          twoButtons={true}
-        />
-        <Button
-          testID="migrationsplitplan.accept"
-          type={ButtonTypeEnum.Primary}
-          title={translate('migrationsplitplan.accept') as string}
-          onPress={onAccept}
-          twoButtons={true}
-          disabled={!plan}
-        />
+        <ButtonStack>
+          <Button
+            testID="migrationsplitplan.back"
+            variant="text"
+            title={translate('migrationsplitplan.back') as string}
+            onPress={() => navigation.goBack()}
+          />
+          <Button
+            testID="migrationsplitplan.accept"
+            variant="primary"
+            title={translate('migrationsplitplan.accept') as string}
+            onPress={onAccept}
+            disabled={!plan}
+          />
+        </ButtonStack>
       </View>
     </View>
   );

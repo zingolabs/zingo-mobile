@@ -18,9 +18,7 @@ import {
 } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { useIsFocused, useNavigation } from '@react-navigation/native';
-import { useTheme } from '@app/theme';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faAngleUp, faXmark } from '@fortawesome/free-solid-svg-icons';
+import { useTheme, slopFor } from '@app/theme';
 
 import {
   ChainNameEnum,
@@ -66,6 +64,8 @@ import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTr
 import BottomSheet, { BottomSheetModal } from '@gorhom/bottom-sheet';
 import Filters from './components/Filters';
 import { FiltersIcon } from '@ui/primitives/Icons/FiltersIcon';
+import { XIcon } from '@ui/primitives/Icons/XIcon';
+import { ChevronUp } from '@ui/primitives/Icons/Chevron';
 
 const ViewTypes = {
   WITH_MONTH: 0,
@@ -749,7 +749,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
           paddingVertical: 4,
         }}
       >
-        <FontAwesomeIcon icon={faXmark} size={20} color={colors.fgMuted} />
+        <XIcon size={20} color={colors.fgMuted} />
       </Pressable>
     </View>
   );
@@ -916,6 +916,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
             platforms. */}
         {!isAtTop && (
           <Pressable
+            hitSlop={slopFor(36)}
             onPress={handleScrollToTop}
             disabled={isScrollingToTop}
             style={({ pressed }) => ({
@@ -933,19 +934,12 @@ const History: React.FunctionComponent<HistoryProps> = () => {
               borderRadius: 50,
               transform: [{ scale: pressed ? 0.9 : 1 }],
               opacity: isScrollingToTop ? 0.5 : 1,
-              shadowColor: '#000',
-              shadowOffset: { width: 0, height: 3 },
-              shadowOpacity: 0.8,
-              shadowRadius: 14,
-              elevation: 9,
+              borderWidth: 1,
+              borderColor: colors.bottomSheetBorder,
             })}
           >
             <RingBorder size={36} />
-            <FontAwesomeIcon
-              size={16}
-              icon={faAngleUp}
-              color={colors.fgMuted}
-            />
+            <ChevronUp size={16} color={colors.fgMuted} />
           </Pressable>
         )}
       </Animated.View>

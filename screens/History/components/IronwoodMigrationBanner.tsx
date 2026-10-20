@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useContext, useState } from 'react';
-import { Pressable, Text, View, ViewStyle } from 'react-native';
+import { Pressable, View, ViewStyle } from 'react-native';
 import { getNumberFormatSettings } from 'react-native-localize';
 import Animated, {
   Easing,
@@ -11,12 +11,20 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { useFocusEffect } from '@react-navigation/native';
-import { useTheme } from '@app/theme';
+import {
+  fontScaleBody,
+  radiusMd,
+  space12,
+  space16,
+  useTheme,
+} from '@app/theme';
+import Text from '@ui/primitives/Text';
+import Button from '@ui/primitives/Button';
+import Banner from '@ui/widgets/Banner';
 
 import SegmentedBar from '@ui/primitives/SegmentedBar';
 import { ContextAppLoaded } from '@app/context';
 import Utils from '@app/utils';
-import { NOTICE_RADIUS } from '@ui/widgets/NoticeStack';
 import { Route } from '@app/AppState';
 import { migrationStatus, reconcileMigration } from '@app/walletBackend';
 import {
@@ -122,7 +130,10 @@ const StatusPill: React.FunctionComponent<{ color: string; label: string }> = ({
         tint,
       ]}
     >
-      <Animated.Text style={[{ fontSize: 12, fontWeight: '700' }, ink]}>
+      <Animated.Text
+        maxFontSizeMultiplier={fontScaleBody}
+        style={[{ fontSize: 12, fontWeight: '700' }, ink]}
+      >
         {label}
       </Animated.Text>
     </Animated.View>
@@ -327,9 +338,9 @@ const IronwoodMigrationBanner: React.FunctionComponent<
               backgroundColor: colors.bgSurface,
               borderColor: colors.bottomSheetBorder,
               borderWidth: 1,
-              borderRadius: NOTICE_RADIUS,
-              paddingHorizontal: 18,
-              paddingVertical: 12,
+              borderRadius: radiusMd,
+              paddingHorizontal: space16,
+              paddingVertical: space12,
             }}
           >
             {/* Header: title + Details link */}
@@ -342,22 +353,16 @@ const IronwoodMigrationBanner: React.FunctionComponent<
               }}
             >
               <Text
-                style={{
-                  flexShrink: 1,
-                  marginRight: 12,
-                  color: colors.fgMuted,
-                  fontSize: 14,
-                  fontWeight: '700',
-                }}
+                variant="bodyStrong"
+                tone="muted"
+                style={{ flexShrink: 1, marginRight: space12 }}
               >
                 {translate('ironwoodbanner.inflight-title') as string}
               </Text>
               <Text
-                style={{
-                  color: colors.fgMuted,
-                  fontSize: 12,
-                  textDecorationLine: 'underline',
-                }}
+                variant="caption"
+                tone="muted"
+                style={{ textDecorationLine: 'underline' }}
               >
                 {translate('ironwoodbanner.details') as string}
               </Text>
@@ -383,13 +388,7 @@ const IronwoodMigrationBanner: React.FunctionComponent<
                   height={8}
                 />
               </View>
-              <Text
-                style={{
-                  color: colors.fgAccent,
-                  fontSize: 17,
-                  fontWeight: '800',
-                }}
-              >
+              <Text variant="subtitle" tone="accent">
                 {pct}%
               </Text>
             </View>
@@ -412,12 +411,9 @@ const IronwoodMigrationBanner: React.FunctionComponent<
               }}
             >
               <Text
-                style={{
-                  flexShrink: 1,
-                  marginRight: 12,
-                  color: colors.fgMuted,
-                  fontSize: 13,
-                }}
+                variant="bodySmall"
+                tone="muted"
+                style={{ flexShrink: 1, marginRight: space12 }}
               >
                 {translate('ironwoodbanner.next-action-label') as string}
               </Text>
@@ -441,20 +437,11 @@ const IronwoodMigrationBanner: React.FunctionComponent<
                 }}
               >
                 <StatusDot color={statusColor} size={10} />
-                <Text
-                  style={{
-                    flexShrink: 1,
-                    color: colors.fgDefault,
-                    fontSize: 14,
-                    fontWeight: '700',
-                  }}
-                >
+                <Text variant="bodyStrong" style={{ flexShrink: 1 }}>
                   {statusLabel}
                 </Text>
               </View>
-              <Text style={{ color: colors.fgDefault, fontSize: 14 }}>
-                {orchardLeftStr}
-              </Text>
+              <Text variant="body">{orchardLeftStr}</Text>
             </View>
           </PressScale>
         </Animated.View>
@@ -464,84 +451,32 @@ const IronwoodMigrationBanner: React.FunctionComponent<
 
   // ----- Default variant -----
   return (
-    <>
-      <Animated.View key="default" entering={variantEnter()}>
-        {/* Orchard pool card with the Start action */}
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            backgroundColor: colors.bgSurface,
-            borderColor: colors.bottomSheetBorder,
-            borderWidth: 1,
-            borderRadius: NOTICE_RADIUS,
-            paddingHorizontal: 16,
-            paddingVertical: 14,
-          }}
-        >
-          <View style={{ flex: 1, marginRight: 12 }}>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                marginBottom: 6,
-              }}
-            >
-              <View
-                style={{
-                  width: 9,
-                  height: 9,
-                  borderRadius: 5,
-                  backgroundColor: colors.fgWarning,
-                  marginRight: 8,
-                }}
-              />
-              <Text
-                style={{
-                  flexShrink: 1,
-                  color: colors.fgDefault,
-                  fontSize: 15,
-                  fontWeight: '700',
-                }}
-              >
-                {translate('ironwoodbanner.pool') as string}
-              </Text>
-            </View>
-            <Text style={{ color: colors.fgMuted, fontSize: 13 }}>
-              {translate('ironwoodbanner.balance') as string}{' '}
-              <Text style={{ color: colors.fgDefault, fontWeight: '700' }}>
-                {privacy
-                  ? masked
-                  : Utils.parseNumberFloatToStringLocale(amount, 4)}
-              </Text>{' '}
-              {currencyName}
-            </Text>
-          </View>
-
-          <PressScale
+    <Animated.View key="default" entering={variantEnter()}>
+      <Banner
+        tone="warning"
+        plain
+        title={translate('ironwoodbanner.pool') as string}
+        actionBeside
+        action={
+          <Button
             testID="ironwoodbanner.start"
+            variant="primary"
+            inline
+            /** The pill it had beside the pool text. */
+            style={{ minHeight: 0, paddingHorizontal: 22, paddingVertical: 10 }}
+            textStyle={{ fontSize: 15 }}
+            title={translate('ironwoodbanner.start') as string}
             onPress={onStart}
-            style={{
-              backgroundColor: colors.bgAccent,
-              borderRadius: 24,
-              paddingHorizontal: 22,
-              paddingVertical: 10,
-            }}
-          >
-            <Text
-              style={{
-                color: colors.bgCanvas,
-                fontSize: 15,
-                fontWeight: '700',
-              }}
-            >
-              {translate('ironwoodbanner.start') as string}
-            </Text>
-          </PressScale>
-        </View>
-      </Animated.View>
-    </>
+          />
+        }
+      >
+        {translate('ironwoodbanner.balance') as string}{' '}
+        <Text variant="bodySmall" style={{ fontWeight: '700' }}>
+          {privacy ? masked : Utils.parseNumberFloatToStringLocale(amount, 4)}
+        </Text>{' '}
+        {currencyName}
+      </Banner>
+    </Animated.View>
   );
 };
 

@@ -6,7 +6,7 @@ exports[`ContactRow Tests that an open row offers Send, Copy, Edit and Delete wh
   style={
     [
       {
-        "borderTopColor": "#0A1F3D",
+        "borderTopColor": "#FFFFFF0F",
         "borderTopWidth": 0,
         "overflow": "hidden",
       },
@@ -51,7 +51,7 @@ exports[`ContactRow Tests that an open row offers Send, Copy, Edit and Delete wh
         style={
           {
             "alignItems": "flex-end",
-            "backgroundColor": "#0E5A18",
+            "backgroundColor": "#5a8c5a",
             "justifyContent": "center",
             "paddingRight": 31,
             "width": 0,
@@ -112,7 +112,7 @@ exports[`ContactRow Tests that an open row offers Send, Copy, Edit and Delete wh
                 "top": 0,
               },
               {
-                "backgroundColor": "rgba(20,157,5,0.16)",
+                "backgroundColor": "#18bd181F",
               },
               {},
             ]
@@ -177,7 +177,7 @@ exports[`ContactRow Tests that an open row offers Send, Copy, Edit and Delete wh
               style={
                 {
                   "color": "#e35f36",
-                  "fontSize": 14,
+                  "fontSize": 15,
                   "fontWeight": "700",
                 }
               }
@@ -240,7 +240,7 @@ exports[`ContactRow Tests that an open row offers Send, Copy, Edit and Delete wh
                   {
                     "color": "#c3c3c3",
                     "flexShrink": 1,
-                    "fontSize": 13.5,
+                    "fontSize": 13,
                     "fontWeight": "600",
                     "lineHeight": 18,
                   }
@@ -251,8 +251,8 @@ exports[`ContactRow Tests that an open row offers Send, Copy, Edit and Delete wh
               <Text
                 style={
                   {
-                    "color": "#8DA0B8",
-                    "fontSize": 10,
+                    "color": "#888888",
+                    "fontSize": 12,
                     "fontWeight": "600",
                     "letterSpacing": 0.5,
                     "marginLeft": 8,
@@ -275,9 +275,9 @@ exports[`ContactRow Tests that an open row offers Send, Copy, Edit and Delete wh
               <Text
                 style={
                   {
-                    "color": "#B9C6D6",
+                    "color": "#c3c3c3",
                     "fontFamily": "Menlo",
-                    "fontSize": 11.5,
+                    "fontSize": 12,
                     "fontWeight": "500",
                   }
                 }
@@ -356,7 +356,7 @@ exports[`ContactRow Tests that an open row offers Send, Copy, Edit and Delete wh
                 style={
                   {
                     "alignItems": "center",
-                    "backgroundColor": "#020B18",
+                    "backgroundColor": "#011401",
                     "borderRadius": 26,
                     "height": 52,
                     "justifyContent": "center",
@@ -371,8 +371,8 @@ exports[`ContactRow Tests that an open row offers Send, Copy, Edit and Delete wh
               <Text
                 style={
                   {
-                    "color": "#B9C6D6",
-                    "fontSize": 11,
+                    "color": "#c3c3c3",
+                    "fontSize": 12,
                     "fontWeight": "500",
                     "lineHeight": 15,
                   }
@@ -426,7 +426,7 @@ exports[`ContactRow Tests that an open row offers Send, Copy, Edit and Delete wh
                 style={
                   {
                     "alignItems": "center",
-                    "backgroundColor": "#020B18",
+                    "backgroundColor": "#011401",
                     "borderRadius": 26,
                     "height": 52,
                     "justifyContent": "center",
@@ -441,8 +441,8 @@ exports[`ContactRow Tests that an open row offers Send, Copy, Edit and Delete wh
               <Text
                 style={
                   {
-                    "color": "#B9C6D6",
-                    "fontSize": 11,
+                    "color": "#c3c3c3",
+                    "fontSize": 12,
                     "fontWeight": "500",
                     "lineHeight": 15,
                   }
@@ -496,7 +496,7 @@ exports[`ContactRow Tests that an open row offers Send, Copy, Edit and Delete wh
                 style={
                   {
                     "alignItems": "center",
-                    "backgroundColor": "#020B18",
+                    "backgroundColor": "#011401",
                     "borderRadius": 26,
                     "height": 52,
                     "justifyContent": "center",
@@ -511,7 +511,7 @@ exports[`ContactRow Tests that an open row offers Send, Copy, Edit and Delete wh
                   style={
                     [
                       {
-                        "backgroundColor": "#B9C6D6",
+                        "backgroundColor": "#c3c3c3",
                         "borderRadius": 1,
                         "bottom": 15,
                         "height": 2,
@@ -528,8 +528,8 @@ exports[`ContactRow Tests that an open row offers Send, Copy, Edit and Delete wh
               <Text
                 style={
                   {
-                    "color": "#B9C6D6",
-                    "fontSize": 11,
+                    "color": "#c3c3c3",
+                    "fontSize": 12,
                     "fontWeight": "500",
                     "lineHeight": 15,
                   }
@@ -583,7 +583,7 @@ exports[`ContactRow Tests that an open row offers Send, Copy, Edit and Delete wh
                 style={
                   {
                     "alignItems": "center",
-                    "backgroundColor": "#020B18",
+                    "backgroundColor": "#011401",
                     "borderRadius": 26,
                     "height": 52,
                     "justifyContent": "center",
@@ -621,8 +621,8 @@ exports[`ContactRow Tests that an open row offers Send, Copy, Edit and Delete wh
               <Text
                 style={
                   {
-                    "color": "#F2878A",
-                    "fontSize": 11,
+                    "color": "#E5484D",
+                    "fontSize": 12,
                     "fontWeight": "500",
                     "lineHeight": 15,
                   }

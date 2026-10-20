@@ -8,14 +8,16 @@ import {
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
 
-import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
+import Button from '@ui/primitives/Button';
+import ButtonStack from '@ui/primitives/ButtonStack';
 import SheetRim from '@ui/primitives/SheetRim';
 import MixnetIcon from '@ui/primitives/Icons/MixnetIcon';
 import { ContextAppLoaded } from '@app/context';
 import { radiusSheet, useTheme } from '@app/theme';
 import { NymGateState } from './nymGateState';
+import { themeTokens } from '@app/theme';
 
-const NYM_GREEN = '#07FF94';
+const NYM_GREEN = themeTokens.bgNym;
 
 type NymGateSheetProps = {
   // The one gate state to present: connecting waits, failed shows its key.
@@ -77,7 +79,7 @@ const NymGateSheet = forwardRef<BottomSheetModal, NymGateSheetProps>(
           />
           <Text
             style={{
-              fontSize: 24,
+              fontSize: 22,
               fontWeight: '700',
               textAlign: 'center',
               color: colors.fgDefault,
@@ -124,25 +126,27 @@ const NymGateSheet = forwardRef<BottomSheetModal, NymGateSheetProps>(
               {translate(gate.failureKey) as string}
             </Text>
           ) : null}
-          <Button
-            testID="migrationstrategy.nym-continue"
-            type={ButtonTypeEnum.Ghost}
-            title={translate('migrationstrategy.nym-gate-continue') as string}
-            onPress={onContinue}
-            style={{ marginBottom: 10 }}
-          />
-          <Button
-            testID="migrationstrategy.nym-enable"
-            type={ButtonTypeEnum.Primary}
-            title={
-              gate.kind === 'connecting'
-                ? (translate('migrationstrategy.nym-gate-connecting') as string)
-                : (translate('migrationstrategy.nym-gate-enable') as string)
-            }
-            disabled={gate.kind === 'connecting'}
-            onPress={onEnable}
-            style={{ width: '100%' }}
-          />
+          <ButtonStack>
+            <Button
+              testID="migrationstrategy.nym-continue"
+              variant="text"
+              title={translate('migrationstrategy.nym-gate-continue') as string}
+              onPress={onContinue}
+            />
+            <Button
+              testID="migrationstrategy.nym-enable"
+              variant="primary"
+              title={
+                gate.kind === 'connecting'
+                  ? (translate(
+                      'migrationstrategy.nym-gate-connecting',
+                    ) as string)
+                  : (translate('migrationstrategy.nym-gate-enable') as string)
+              }
+              disabled={gate.kind === 'connecting'}
+              onPress={onEnable}
+            />
+          </ButtonStack>
         </BottomSheetView>
       </BottomSheetModal>
     );

@@ -7,13 +7,6 @@ import {
   Platform,
 } from 'react-native';
 import { useTheme } from '@app/theme';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import {
-  faTriangleExclamation,
-  faCircleCheck as faCircleCheckSolid,
-  faCircleXmark,
-} from '@fortawesome/free-solid-svg-icons';
-import { faCircleCheck as faCircleCheckRegular } from '@fortawesome/free-regular-svg-icons';
 
 import Clipboard from '@react-native-clipboard/clipboard';
 
@@ -34,6 +27,10 @@ import AddressItem from '@ui/widgets/AddressItem';
 import RegText from '@ui/primitives/RegText';
 import Utils from '@app/utils';
 import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
+import { TriangleAlert } from '@ui/primitives/Icons/TriangleAlert';
+import { VerifyXIcon } from '@ui/primitives/Icons/VerifyXIcon';
+import { CheckCircleLineIcon } from '@ui/primitives/Icons/CheckCircleLineIcon';
+import { CheckCircleIcon } from '@ui/primitives/Icons/CheckCircleIcon';
 
 type MessageLineProps = {
   index: number;
@@ -155,7 +152,7 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
             backgroundColor:
               vt.kind === ValueTransferKindEnum.Received
                 ? colors.bgAccentDisabled
-                : colors.bgSecondaryDisabled,
+                : colors.bgAccentSubtle,
             opacity: vt.status === RPCValueTransfersStatusEnum.failed ? 0.5 : 1,
           }}
         >
@@ -200,11 +197,7 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
                   {!thisWalletAddress(memoUA) && memoUA !== messageAddress && (
                     <>
                       <RegText>{GlobalConst.replyTo}</RegText>
-                      <FontAwesomeIcon
-                        icon={faTriangleExclamation}
-                        color={'red'}
-                        size={14}
-                      />
+                      <TriangleAlert color={'red'} size={16} />
                       <RegText
                         style={{
                           opacity: thisWalletAddress(memoUA) ? 0.6 : 0.4,
@@ -239,7 +232,7 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
             {vt.status === RPCValueTransfersStatusEnum.failed && (
               <FadeText
                 style={{
-                  color: colors.fgDangerEmphasis,
+                  color: colors.fgDanger,
                   alignSelf: 'center',
                   fontSize: 12,
                   opacity: 1,
@@ -291,46 +284,43 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
                 }}
               >
                 {vt.status === RPCValueTransfersStatusEnum.failed && (
-                  <FontAwesomeIcon
+                  <VerifyXIcon
                     style={{ marginLeft: 5, marginRight: 1, marginTop: 2 }}
-                    size={12}
-                    icon={faCircleXmark}
-                    color={colors.fgDangerEmphasis}
+                    size={16}
+                    color={colors.fgDanger}
                   />
                 )}
                 {(vt.status === RPCValueTransfersStatusEnum.calculated ||
                   vt.status === RPCValueTransfersStatusEnum.transmitted) && (
-                  <FontAwesomeIcon
+                  <CheckCircleLineIcon
                     style={{ marginLeft: 5, marginRight: 1, marginTop: 2 }}
-                    size={12}
-                    icon={faCircleCheckRegular}
+                    size={16}
                     color={colors.fgAccent}
                   />
                 )}
                 {(vt.status === RPCValueTransfersStatusEnum.mempool ||
                   vt.status === RPCValueTransfersStatusEnum.confirmed) && (
-                  <FontAwesomeIcon
+                  <CheckCircleIcon
                     style={{ marginLeft: 5, marginRight: 1, marginTop: 2 }}
-                    size={12}
-                    icon={faCircleCheckSolid}
+                    size={16}
                     color={colors.fgAccent}
+                    checkColor={colors.fgOnAccent}
                   />
                 )}
                 {vt.status !== RPCValueTransfersStatusEnum.confirmed &&
                   vt.status !== RPCValueTransfersStatusEnum.failed && (
-                    <FontAwesomeIcon
+                    <CheckCircleLineIcon
                       style={{ marginLeft: 1, marginRight: 0, marginTop: 2 }}
-                      size={12}
-                      icon={faCircleCheckRegular}
+                      size={16}
                       color={colors.fgAccent}
                     />
                   )}
                 {vt.status === RPCValueTransfersStatusEnum.confirmed && (
-                  <FontAwesomeIcon
+                  <CheckCircleIcon
                     style={{ marginLeft: 1, marginRight: 0, marginTop: 2 }}
-                    size={12}
-                    icon={faCircleCheckSolid}
+                    size={16}
                     color={colors.fgAccent}
+                    checkColor={colors.fgOnAccent}
                   />
                 )}
                 {vt.status !== RPCValueTransfersStatusEnum.confirmed &&

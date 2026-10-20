@@ -56,7 +56,7 @@ const palette = styled
       muted: T.fgMuted,
       figcap: T.fgMuted,
       accent: T.fgAccent,
-      passBg: T.bgSecondaryDisabled,
+      passBg: T.bgAccentDisabled,
       passFg: T.fgAccent,
       newBg: T.bottomSheetBorder,
       newFg: T.fgDefault,

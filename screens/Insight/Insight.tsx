@@ -29,17 +29,18 @@ import {
   metricOf,
   weekEnd,
 } from '@screens/Insight/insightModel';
+import { themeTokens } from '@app/theme';
 
 const SIDE = 21.5;
-const SOFT_INK = '#8DA0B8';
-const HINT_INK = '#7D93B3';
-const CODE_INK = '#B9C6D6';
-const ROW_LINE = '#0A1F3D';
-const SELECTED = 'rgba(143,180,230,0.08)';
-const THUMB_BG = '#0A2A1A';
-const THUMB_LINE = '#1E6B2A';
-const PRESET_ON_BG = '#0A1B33';
-const PRESET_ON_LINE = '#1D4C7F';
+const SOFT_INK = themeTokens.fgMuted;
+const HINT_INK = themeTokens.fgMuted;
+const CODE_INK = themeTokens.fgDefault;
+const ROW_LINE = themeTokens.borderSubtle;
+const SELECTED = themeTokens.bgViewOnlySubtle;
+const THUMB_BG = themeTokens.bgAccentSubtle;
+const THUMB_LINE = themeTokens.borderAccent;
+const PRESET_ON_BG = themeTokens.bgViewOnlySubtle;
+const PRESET_ON_LINE = themeTokens.borderMuted;
 const MONO = Platform.select({ ios: 'Menlo', default: 'monospace' });
 const SWEEP_MS = 460;
 const DEFAULT_WEEKS = 13;
@@ -170,7 +171,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
             price={price}
             amtZec={centerAmount}
             privacy={privacy}
-            style={{ fontSize: 12.5, fontWeight: '600', color: CODE_INK }}
+            style={{ fontSize: 13, fontWeight: '600', color: CODE_INK }}
           />
         )}
       </>
@@ -262,10 +263,10 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
             borderRadius: 12,
             alignItems: 'center',
             justifyContent: 'center',
-            backgroundColor: pressed ? 'rgba(255,255,255,0.06)' : undefined,
+            backgroundColor: pressed ? themeTokens.bgMutedSubtle : undefined,
           })}
         >
-          <ChevronLeft size={22} color={colors.fgAccent} strokeWidth={2.2} />
+          <ChevronLeft size={24} color={colors.fgAccent} />
         </Pressable>
         <Text
           accessibilityRole="header"
@@ -354,15 +355,11 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
                   borderRadius: 8,
                 }}
               >
-                <ChevronLeft
-                  size={14}
-                  color={colors.fgAccent}
-                  strokeWidth={2.4}
-                />
+                <ChevronLeft size={16} color={colors.fgAccent} />
                 <Text
                   style={{
                     color: colors.fgAccent,
-                    fontSize: 12.5,
+                    fontSize: 13,
                     fontWeight: '600',
                   }}
                 >
@@ -422,13 +419,13 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
                     alignItems: 'center',
                     justifyContent: 'center',
                     borderColor: on ? PRESET_ON_LINE : colors.bottomSheetBorder,
-                    backgroundColor: on ? PRESET_ON_BG : 'transparent',
+                    backgroundColor: on ? PRESET_ON_BG : undefined,
                   }}
                 >
                   <Text
                     style={{
                       color: on ? colors.fgDefault : SOFT_INK,
-                      fontSize: 11.5,
+                      fontSize: 12,
                       fontWeight: '600',
                     }}
                   >
@@ -454,7 +451,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
         <View style={[card, { paddingBottom: 22 }]}>
           {cardHead(
             translate('insight.recipients') as string,
-            <Text style={{ color: HINT_INK, fontSize: 11 }}>
+            <Text style={{ color: HINT_INK, fontSize: 12 }}>
               {translate('insight.recipients-hint') as string}
             </Text>,
           )}
@@ -466,7 +463,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
                 marginHorizontal: 10,
                 textAlign: 'center',
                 color: SOFT_INK,
-                fontSize: 12.5,
+                fontSize: 13,
               }}
             >
               {translate('insight.empty') as string}
@@ -494,7 +491,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
                     borderTopRightRadius: i === 0 ? 12 : 0,
                     borderTopWidth: i === 0 ? 0 : 1,
                     borderTopColor: ROW_LINE,
-                    backgroundColor: on ? SELECTED : 'transparent',
+                    backgroundColor: on ? SELECTED : undefined,
                   }}
                 >
                   <View
@@ -517,7 +514,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
                       <Text
                         style={{
                           color: group.color,
-                          fontSize: 14,
+                          fontSize: 15,
                           fontWeight: '700',
                         }}
                       >
@@ -597,7 +594,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
                         <Text
                           style={{
                             color: SOFT_INK,
-                            fontSize: 11.5,
+                            fontSize: 12,
                             lineHeight: 16,
                           }}
                         >
@@ -609,7 +606,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
                             amtZec={t.amount}
                             privacy={privacy}
                             style={{
-                              fontSize: 11.5,
+                              fontSize: 12,
                               fontWeight: '400',
                               color: SOFT_INK,
                             }}
@@ -633,15 +630,11 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
                           alignItems: 'center',
                           justifyContent: 'center',
                           backgroundColor: pressed
-                            ? 'rgba(20,157,5,0.12)'
+                            ? themeTokens.bgAccentSubtle
                             : undefined,
                         })}
                       >
-                        <UserPlusIcon
-                          size={18}
-                          color="#3CC52A"
-                          strokeWidth={2}
-                        />
+                        <UserPlusIcon size={20} color={themeTokens.fgAccent} />
                       </Pressable>
                     )}
                   </View>
@@ -652,7 +645,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ navigation }) => {
                         marginTop: 8,
                         marginLeft: 48,
                         color: SOFT_INK,
-                        fontSize: 11.5,
+                        fontSize: 12,
                         lineHeight: 17,
                       }}
                     >

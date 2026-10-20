@@ -11,13 +11,14 @@ import DetailLine from '@ui/widgets/DetailLine';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
 import Header from '@ui/widgets/Header';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import FadeText from '@ui/primitives/FadeText';
-import { faChevronLeft, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import BottomSheet, { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
+import { ChevronLeft } from '@ui/primitives/Icons/Chevron';
+import { InfoIcon } from '@ui/primitives/Icons/InfoIcon';
+import { themeTokens } from '@app/theme';
 
 type PoolsProps = NativeStackScreenProps<AppDrawerParamList, 'Pools'>;
 
@@ -70,11 +71,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
           hitSlop={8}
           style={{ paddingHorizontal: 4, paddingVertical: 4 }}
         >
-          <FontAwesomeIcon
-            icon={faChevronLeft}
-            size={20}
-            color={colors.fgAccent}
-          />
+          <ChevronLeft size={20} color={colors.fgAccent} />
         </TouchableOpacity>
         <BoldText
           numberOfLines={1}
@@ -152,7 +149,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
                       <ZecAmount
                         testID="ironwood-total-balance"
                         amtZec={totalBalance.totalIronwoodBalance}
-                        size={14}
+                        size={15}
                         currencyName={info.currencyName}
                         style={{
                           opacity:
@@ -173,14 +170,14 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
                       <ZecAmount
                         testID="ironwood-confirmed-balance"
                         amtZec={totalBalance.confirmedIronwoodBalance}
-                        size={14}
+                        size={15}
                         currencyName={info.currencyName}
                         color={
                           totalBalance.confirmedIronwoodBalance > 0 &&
                           totalBalance.confirmedIronwoodBalance ===
                             totalBalance.totalIronwoodBalance
                             ? colors.fgAccent
-                            : 'red'
+                            : themeTokens.fgWarning
                         }
                         privacy={privacy}
                       />
@@ -191,7 +188,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
                     style={{
                       height: 1,
                       width: '100%',
-                      backgroundColor: 'white',
+                      backgroundColor: themeTokens.borderSubtle,
                       marginTop: 15,
                       marginBottom: 10,
                     }}
@@ -211,7 +208,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
                         <ZecAmount
                           testID="orchard-total-balance"
                           amtZec={totalBalance.totalOrchardBalance}
-                          size={14}
+                          size={15}
                           currencyName={info.currencyName}
                           style={{
                             opacity:
@@ -232,14 +229,14 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
                         <ZecAmount
                           testID="orchard-confirmed-balance"
                           amtZec={totalBalance.confirmedOrchardBalance}
-                          size={14}
+                          size={15}
                           currencyName={info.currencyName}
                           color={
                             totalBalance.confirmedOrchardBalance > 0 &&
                             totalBalance.confirmedOrchardBalance ===
                               totalBalance.totalOrchardBalance
                               ? colors.fgAccent
-                              : 'red'
+                              : themeTokens.fgWarning
                           }
                           privacy={privacy}
                         />
@@ -250,7 +247,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
                       style={{
                         height: 1,
                         width: '100%',
-                        backgroundColor: 'white',
+                        backgroundColor: themeTokens.borderSubtle,
                         marginTop: 15,
                         marginBottom: 10,
                       }}
@@ -271,7 +268,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
                         <ZecAmount
                           testID="sapling-total-balance"
                           amtZec={totalBalance.totalSaplingBalance}
-                          size={14}
+                          size={15}
                           currencyName={info.currencyName}
                           style={{
                             opacity:
@@ -292,14 +289,14 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
                         <ZecAmount
                           testID="sapling-confirmed-balance"
                           amtZec={totalBalance.confirmedSaplingBalance}
-                          size={14}
+                          size={15}
                           currencyName={info.currencyName}
                           color={
                             totalBalance.confirmedSaplingBalance > 0 &&
                             totalBalance.confirmedSaplingBalance ===
                               totalBalance.totalSaplingBalance
                               ? colors.fgSyncing
-                              : 'red'
+                              : themeTokens.fgWarning
                           }
                           privacy={privacy}
                         />
@@ -310,7 +307,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
                       style={{
                         height: 1,
                         width: '100%',
-                        backgroundColor: 'white',
+                        backgroundColor: themeTokens.borderSubtle,
                         marginTop: 15,
                         marginBottom: 10,
                       }}
@@ -331,9 +328,9 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
                         <ZecAmount
                           testID="transparent-balance"
                           amtZec={totalBalance.totalTransparentBalance}
-                          size={14}
+                          size={15}
                           currencyName={info.currencyName}
-                          color={'red'}
+                          color={themeTokens.fgWarning}
                           privacy={privacy}
                         />
                       </DetailLine>
@@ -347,9 +344,9 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
                         <ZecAmount
                           testID="transparent-confirmed-balance"
                           amtZec={totalBalance.confirmedTransparentBalance}
-                          size={14}
+                          size={15}
                           currencyName={info.currencyName}
-                          color={'red'}
+                          color={themeTokens.fgWarning}
                           privacy={privacy}
                         />
                       </DetailLine>
@@ -371,8 +368,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
                         borderRadius: 10,
                       }}
                     >
-                      <FontAwesomeIcon
-                        icon={faInfoCircle}
+                      <InfoIcon
                         size={16}
                         color={colors.fgAccent}
                         style={{ marginRight: 5 }}
@@ -392,8 +388,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ navigation }) => {
                       borderRadius: 10,
                     }}
                   >
-                    <FontAwesomeIcon
-                      icon={faInfoCircle}
+                    <InfoIcon
                       size={16}
                       color={colors.fgAccent}
                       style={{ marginRight: 5 }}

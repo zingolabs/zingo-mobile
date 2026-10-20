@@ -10,9 +10,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useNavigation } from '@react-navigation/native';
 import { WalletNavigation } from '@app/types';
-import { useTheme } from '@app/theme';
-import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { useTheme, slopFor } from '@app/theme';
 import {
   Route,
   ServerType,
@@ -29,7 +27,7 @@ import {
   shownStatusKey,
 } from '@app/walletBackend/transforms/mixnetView';
 import Utils from '@app/utils';
-import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
+import Button from '@ui/primitives/Button';
 import CurrencyAmount, { PriceTint } from '@ui/widgets/CurrencyAmount';
 import FadeText from '@ui/primitives/FadeText';
 import PriceFetcher, { usePriceRing } from '@ui/widgets/PriceFetcher';
@@ -37,6 +35,7 @@ import RegText from '@ui/primitives/RegText';
 import ZecAmount from '@ui/widgets/ZecAmount';
 import PrivacyToggle from './PrivacyToggle';
 import { poolsWorthALook } from './poolsWorthALook';
+import { InfoIcon } from '@ui/primitives/Icons/InfoIcon';
 
 const BALANCE_BOTTOM_GAP = 20;
 const TINT_HOLD_MS = 900;
@@ -191,6 +190,7 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
             />
             {totalBalance && poolsWorthALook(totalBalance) && (
               <TouchableOpacity
+                hitSlop={slopFor(20)}
                 onPress={() => {
                   navigation.navigate(Route.Pools);
                 }}
@@ -210,11 +210,7 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
                     minHeight: 25,
                   }}
                 >
-                  <FontAwesomeIcon
-                    icon={faInfoCircle}
-                    size={20}
-                    color={colors.fgAccent}
-                  />
+                  <InfoIcon size={20} color={colors.fgAccent} />
                 </View>
               </TouchableOpacity>
             )}
@@ -241,7 +237,7 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
               <ZecAmount
                 currencyName={info.currencyName}
                 color={colors.fgAccent}
-                size={14}
+                size={13}
                 amtZec={
                   totalBalance.totalIronwoodBalance +
                   totalBalance.totalOrchardBalance +
@@ -285,15 +281,15 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
                   style={{ alignItems: 'center' }}
                   testID="header.shield-blocked"
                 >
-                  <FadeText style={{ fontSize: 8 }}>
+                  <FadeText style={{ fontSize: 12 }}>
                     {translate('send.nym-blocked') as string}
                   </FadeText>
-                  <FadeText style={{ fontSize: 8 }}>
+                  <FadeText style={{ fontSize: 12 }}>
                     {translate(shownStatusKey(mixnetView)) as string}
                   </FadeText>
                 </View>
               ) : (
-                <FadeText style={{ fontSize: 8 }}>
+                <FadeText style={{ fontSize: 12 }}>
                   {(translate(
                     `history.shield-legend-${calculatePoolsToShield()}`,
                   ) as string) +
@@ -307,7 +303,7 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
               <View style={{ margin: 5, flexDirection: 'row' }}>
                 <Button
                   testID="header.shield"
-                  type={ButtonTypeEnum.Primary}
+                  variant="primary"
                   title={
                     translate(
                       `history.shield-${calculatePoolsToShield()}`,

@@ -128,7 +128,8 @@ The screen's base plane (`bgCanvas`).
 _Avoid_: background (ambiguous — every `bg` token is a background)
 
 **Chrome**:
-Navigation furniture — tab bar, side menu (`bgChrome`).
+Navigation furniture — tab bar, side menu (`bgChrome`). Same value as
+`bgSurface`, so the tab bar reads as a raised surface.
 
 **Muted**:
 The de-emphasized neutral for secondary text, subtle borders, and quiet
@@ -140,20 +141,34 @@ The brand green. One value across its three surface tokens today; the
 split exists so text and fill can diverge later.
 _Avoid_: primary, brand color
 
-**Emphasis**:
-The stronger sibling of a status role: `fgDangerEmphasis` is the red for
-destructive actions, while bare `fgDanger` is the orange of danger body
-copy. Named by traffic, deliberately against design-system convention —
-here the bare name is the common case, not the loud one.
+**Danger**:
+The one red, for errors and destructive actions only, never decoration.
+Something that is not an error yet (funds confirming, a server that does
+not answer) is **Warning**, orange. A field shows it as `borderDanger`.
+_Avoid_: emphasis (`fgDangerEmphasis` and `fgWarningEmphasis` are gone:
+each status role has a single value)
+
+**Subtle**:
+A role's 12% tint, for selected cards and chips, tags and icon tiles:
+`bgAccentSubtle`, `bgWarningSubtle`. `borderSubtle` is the hairline
+between rows.
+
+**On**:
+Text and icons on a filled role: `fgOnAccent` sits on `bgAccent`,
+`bgDanger` and `bgNym`.
+
+**Pool**:
+The family of a Zcash pool (Orchard, Sapling, Ironwood, Transparent), used
+the same on every screen and always next to the pool's name.
+
+**Category**:
+`fgCategory1` to `fgCategory5` and their tiles: contact avatars and chart
+series. A contact keeps its category for life.
 
 **Component token**:
 A token named after a component instead of a role. Exactly one exists,
 `bottomSheetBorder`; a second one needs a reason the map's role set cannot
 express.
-
-**Overlay**:
-The slice of the palette layered over the shared **base**: the accent and
-accent-disabled families, `bgSecondaryDisabled`, and the muted trio.
 
 **Legacy name**:
 The pre-migration vocabulary: `primary`, `secondary`, `text`, `money`,

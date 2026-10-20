@@ -204,7 +204,12 @@ export default function LoadedApp(props: LoadedAppProps) {
     }),
     [],
   );
-  const i18n = useMemo(() => new I18n(file), [file]);
+  const i18n = useMemo(() => {
+    const instance = new I18n(file);
+    /** A key missing in a locale shows the English text, never `[missing … translation]`. */
+    instance.enableFallback = true;
+    return instance;
+  }, [file]);
 
   // `translate` carries `language` in its memo deps so its identity changes
   // when the user switches language. Memoized children that include

@@ -108,13 +108,14 @@ exports[`MessageLine - snapshots MessageLine received with messageAddress, no mo
           }
         >
           <Text
+            maxFontSizeMultiplier={2}
             selectable={true}
             style={
               {
                 "color": "#c3c3c3",
                 "fontSize": 15,
                 "fontWeight": "400",
-                "opacity": 1,
+                "lineHeight": 21,
               }
             }
           >
@@ -221,10 +222,13 @@ hello
         </View>
         <View>
           <Text
+            maxFontSizeMultiplier={2}
             style={
               {
-                "color": "#c3c3c3",
-                "opacity": 0.65,
+                "color": "#888888",
+                "fontSize": 15,
+                "fontWeight": "400",
+                "lineHeight": 21,
               }
             }
           >
@@ -248,62 +252,7 @@ hello
                 "justifyContent": "center",
               }
             }
-          >
-            <
-              color="#18bd18"
-              icon={
-                {
-                  "icon": [
-                    512,
-                    512,
-                    [
-                      61533,
-                      "check-circle",
-                    ],
-                    "f058",
-                    "M256 512a256 256 0 1 1 0-512 256 256 0 1 1 0 512zM374 145.7c-10.7-7.8-25.7-5.4-33.5 5.3L221.1 315.2 169 263.1c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9l72 72c5 5 11.8 7.5 18.8 7s13.4-4.1 17.5-9.8L379.3 179.2c7.8-10.7 5.4-25.7-5.3-33.5z",
-                  ],
-                  "iconName": "circle-check",
-                  "prefix": "fas",
-                }
-              }
-              size={12}
-              style={
-                {
-                  "marginLeft": 5,
-                  "marginRight": 1,
-                  "marginTop": 2,
-                }
-              }
-            />
-            <
-              color="#18bd18"
-              icon={
-                {
-                  "icon": [
-                    512,
-                    512,
-                    [
-                      61533,
-                      "check-circle",
-                    ],
-                    "f058",
-                    "M256 512a256 256 0 1 1 0-512 256 256 0 1 1 0 512zM374 145.7c-10.7-7.8-25.7-5.4-33.5 5.3L221.1 315.2 169 263.1c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9l72 72c5 5 11.8 7.5 18.8 7s13.4-4.1 17.5-9.8L379.3 179.2c7.8-10.7 5.4-25.7-5.3-33.5z",
-                  ],
-                  "iconName": "circle-check",
-                  "prefix": "fas",
-                }
-              }
-              size={12}
-              style={
-                {
-                  "marginLeft": 1,
-                  "marginRight": 0,
-                  "marginTop": 2,
-                }
-              }
-            />
-          </View>
+          />
         </View>
       </View>
     </View>
@@ -336,10 +285,13 @@ exports[`MessageLine - snapshots MessageLine sent with memo, month header 1`] = 
     }
   >
     <Text
+      maxFontSizeMultiplier={2}
       style={
         {
-          "color": "#c3c3c3",
-          "opacity": 0.65,
+          "color": "#888888",
+          "fontSize": 15,
+          "fontWeight": "400",
+          "lineHeight": 21,
         }
       }
     >
@@ -385,7 +337,7 @@ exports[`MessageLine - snapshots MessageLine sent with memo, month header 1`] = 
       style={
         {
           "alignItems": "flex-start",
-          "backgroundColor": "#233623",
+          "backgroundColor": "#18bd181F",
           "borderBottomEndRadius": 0,
           "borderBottomStartRadius": 20,
           "borderRadius": 20,
@@ -472,12 +424,13 @@ exports[`MessageLine - snapshots MessageLine sent with memo, month header 1`] = 
                 }
               >
                 <Text
+                  maxFontSizeMultiplier={2}
                   style={
                     {
                       "color": "#c3c3c3",
                       "fontSize": 15,
                       "fontWeight": "400",
-                      "opacity": 1,
+                      "lineHeight": 21,
                     }
                   }
                 >
@@ -531,13 +484,14 @@ exports[`MessageLine - snapshots MessageLine sent with memo, month header 1`] = 
           }
         >
           <Text
+            maxFontSizeMultiplier={2}
             selectable={true}
             style={
               {
                 "color": "#c3c3c3",
                 "fontSize": 15,
                 "fontWeight": "400",
-                "opacity": 1,
+                "lineHeight": 21,
               }
             }
           >
@@ -644,10 +598,13 @@ hello
         </View>
         <View>
           <Text
+            maxFontSizeMultiplier={2}
             style={
               {
-                "color": "#c3c3c3",
-                "opacity": 0.65,
+                "color": "#888888",
+                "fontSize": 15,
+                "fontWeight": "400",
+                "lineHeight": 21,
               }
             }
           >
@@ -671,62 +628,7 @@ hello
                 "justifyContent": "center",
               }
             }
-          >
-            <
-              color="#18bd18"
-              icon={
-                {
-                  "icon": [
-                    512,
-                    512,
-                    [
-                      61533,
-                      "check-circle",
-                    ],
-                    "f058",
-                    "M256 512a256 256 0 1 1 0-512 256 256 0 1 1 0 512zM374 145.7c-10.7-7.8-25.7-5.4-33.5 5.3L221.1 315.2 169 263.1c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9l72 72c5 5 11.8 7.5 18.8 7s13.4-4.1 17.5-9.8L379.3 179.2c7.8-10.7 5.4-25.7-5.3-33.5z",
-                  ],
-                  "iconName": "circle-check",
-                  "prefix": "fas",
-                }
-              }
-              size={12}
-              style={
-                {
-                  "marginLeft": 5,
-                  "marginRight": 1,
-                  "marginTop": 2,
-                }
-              }
-            />
-            <
-              color="#18bd18"
-              icon={
-                {
-                  "icon": [
-                    512,
-                    512,
-                    [
-                      61533,
-                      "check-circle",
-                    ],
-                    "f058",
-                    "M256 512a256 256 0 1 1 0-512 256 256 0 1 1 0 512zM374 145.7c-10.7-7.8-25.7-5.4-33.5 5.3L221.1 315.2 169 263.1c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9l72 72c5 5 11.8 7.5 18.8 7s13.4-4.1 17.5-9.8L379.3 179.2c7.8-10.7 5.4-25.7-5.3-33.5z",
-                  ],
-                  "iconName": "circle-check",
-                  "prefix": "fas",
-                }
-              }
-              size={12}
-              style={
-                {
-                  "marginLeft": 1,
-                  "marginRight": 0,
-                  "marginTop": 2,
-                }
-              }
-            />
-          </View>
+          />
         </View>
       </View>
     </View>
