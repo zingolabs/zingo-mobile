@@ -326,15 +326,18 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                   style={{
                     flexDirection: 'row',
                     alignItems: 'center',
-                    flexWrap: 'wrap',
                     columnGap: space8,
                   }}
                 >
                   <Text variant="bodyStrong" color={titleColor}>
                     {kindLabel}
                   </Text>
+                  {/* One line in every row: the address takes what is
+                      left and is clipped, so no row grows a second line. */}
                   {!!vt.address && !pending && (
-                    <AddressItem address={vt.address} oneLine={true} />
+                    <View style={{ flexShrink: 1, overflow: 'hidden' }}>
+                      <AddressItem address={vt.address} oneLine={true} />
+                    </View>
                   )}
                 </View>
               }

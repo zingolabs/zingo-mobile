@@ -269,7 +269,6 @@ exports[`ValueTransferLine - snapshots ValueTransferLine failed transaction 1`] 
                       "alignItems": "center",
                       "columnGap": 8,
                       "flexDirection": "row",
-                      "flexWrap": "wrap",
                     }
                   }
                 >
@@ -289,9 +288,8 @@ exports[`ValueTransferLine - snapshots ValueTransferLine failed transaction 1`] 
                   <View
                     style={
                       {
-                        "alignItems": "flex-start",
-                        "display": "flex",
-                        "flexDirection": "row",
+                        "flexShrink": 1,
+                        "overflow": "hidden",
                       }
                     }
                   >
@@ -300,67 +298,77 @@ exports[`ValueTransferLine - snapshots ValueTransferLine failed transaction 1`] 
                         {
                           "alignItems": "flex-start",
                           "display": "flex",
-                          "flexDirection": "column",
-                          "marginRight": 10,
+                          "flexDirection": "row",
                         }
                       }
                     >
                       <View
-                        accessibilityState={
-                          {
-                            "busy": undefined,
-                            "checked": undefined,
-                            "disabled": undefined,
-                            "expanded": undefined,
-                            "selected": undefined,
-                          }
-                        }
-                        accessibilityValue={
-                          {
-                            "max": undefined,
-                            "min": undefined,
-                            "now": undefined,
-                            "text": undefined,
-                          }
-                        }
-                        accessible={true}
-                        collapsable={false}
-                        focusable={true}
-                        onClick={[Function]}
-                        onResponderGrant={[Function]}
-                        onResponderMove={[Function]}
-                        onResponderRelease={[Function]}
-                        onResponderTerminate={[Function]}
-                        onResponderTerminationRequest={[Function]}
-                        onStartShouldSetResponder={[Function]}
                         style={
                           {
-                            "opacity": 1,
+                            "alignItems": "flex-start",
+                            "display": "flex",
+                            "flexDirection": "column",
+                            "marginRight": 10,
                           }
                         }
                       >
                         <View
+                          accessibilityState={
+                            {
+                              "busy": undefined,
+                              "checked": undefined,
+                              "disabled": undefined,
+                              "expanded": undefined,
+                              "selected": undefined,
+                            }
+                          }
+                          accessibilityValue={
+                            {
+                              "max": undefined,
+                              "min": undefined,
+                              "now": undefined,
+                              "text": undefined,
+                            }
+                          }
+                          accessible={true}
+                          collapsable={false}
+                          focusable={true}
+                          onClick={[Function]}
+                          onResponderGrant={[Function]}
+                          onResponderMove={[Function]}
+                          onResponderRelease={[Function]}
+                          onResponderTerminate={[Function]}
+                          onResponderTerminationRequest={[Function]}
+                          onStartShouldSetResponder={[Function]}
                           style={
                             {
-                              "display": "flex",
-                              "flexDirection": "column",
-                              "flexWrap": "wrap",
+                              "opacity": 1,
                             }
                           }
                         >
-                          <Text
-                            maxFontSizeMultiplier={2}
+                          <View
                             style={
                               {
-                                "color": "#c3c3c3",
-                                "fontSize": 15,
-                                "fontWeight": "400",
-                                "lineHeight": 21,
+                                "display": "flex",
+                                "flexDirection": "column",
+                                "flexWrap": "wrap",
                               }
                             }
                           >
-                            sent-ad...4567890
-                          </Text>
+                            <Text
+                              maxFontSizeMultiplier={2}
+                              style={
+                                {
+                                  "color": "#c3c3c3",
+                                  "fontSize": 15,
+                                  "fontWeight": "400",
+                                  "lineHeight": 21,
+                                }
+                              }
+                            >
+                              sent-ad...4567890
+                            </Text>
+                          </View>
                         </View>
                       </View>
                     </View>
@@ -770,7 +778,6 @@ exports[`ValueTransferLine - snapshots ValueTransferLine pending (0 confirmation
                       "alignItems": "center",
                       "columnGap": 8,
                       "flexDirection": "row",
-                      "flexWrap": "wrap",
                     }
                   }
                 >
@@ -1163,7 +1170,6 @@ exports[`ValueTransferLine - snapshots ValueTransferLine received, no month head
                       "alignItems": "center",
                       "columnGap": 8,
                       "flexDirection": "row",
-                      "flexWrap": "wrap",
                     }
                   }
                 >
@@ -1600,7 +1606,6 @@ exports[`ValueTransferLine - snapshots ValueTransferLine sent confirmed 1`] = `
                       "alignItems": "center",
                       "columnGap": 8,
                       "flexDirection": "row",
-                      "flexWrap": "wrap",
                     }
                   }
                 >
@@ -1620,9 +1625,8 @@ exports[`ValueTransferLine - snapshots ValueTransferLine sent confirmed 1`] = `
                   <View
                     style={
                       {
-                        "alignItems": "flex-start",
-                        "display": "flex",
-                        "flexDirection": "row",
+                        "flexShrink": 1,
+                        "overflow": "hidden",
                       }
                     }
                   >
@@ -1631,67 +1635,77 @@ exports[`ValueTransferLine - snapshots ValueTransferLine sent confirmed 1`] = `
                         {
                           "alignItems": "flex-start",
                           "display": "flex",
-                          "flexDirection": "column",
-                          "marginRight": 10,
+                          "flexDirection": "row",
                         }
                       }
                     >
                       <View
-                        accessibilityState={
-                          {
-                            "busy": undefined,
-                            "checked": undefined,
-                            "disabled": undefined,
-                            "expanded": undefined,
-                            "selected": undefined,
-                          }
-                        }
-                        accessibilityValue={
-                          {
-                            "max": undefined,
-                            "min": undefined,
-                            "now": undefined,
-                            "text": undefined,
-                          }
-                        }
-                        accessible={true}
-                        collapsable={false}
-                        focusable={true}
-                        onClick={[Function]}
-                        onResponderGrant={[Function]}
-                        onResponderMove={[Function]}
-                        onResponderRelease={[Function]}
-                        onResponderTerminate={[Function]}
-                        onResponderTerminationRequest={[Function]}
-                        onStartShouldSetResponder={[Function]}
                         style={
                           {
-                            "opacity": 1,
+                            "alignItems": "flex-start",
+                            "display": "flex",
+                            "flexDirection": "column",
+                            "marginRight": 10,
                           }
                         }
                       >
                         <View
+                          accessibilityState={
+                            {
+                              "busy": undefined,
+                              "checked": undefined,
+                              "disabled": undefined,
+                              "expanded": undefined,
+                              "selected": undefined,
+                            }
+                          }
+                          accessibilityValue={
+                            {
+                              "max": undefined,
+                              "min": undefined,
+                              "now": undefined,
+                              "text": undefined,
+                            }
+                          }
+                          accessible={true}
+                          collapsable={false}
+                          focusable={true}
+                          onClick={[Function]}
+                          onResponderGrant={[Function]}
+                          onResponderMove={[Function]}
+                          onResponderRelease={[Function]}
+                          onResponderTerminate={[Function]}
+                          onResponderTerminationRequest={[Function]}
+                          onStartShouldSetResponder={[Function]}
                           style={
                             {
-                              "display": "flex",
-                              "flexDirection": "column",
-                              "flexWrap": "wrap",
+                              "opacity": 1,
                             }
                           }
                         >
-                          <Text
-                            maxFontSizeMultiplier={2}
+                          <View
                             style={
                               {
-                                "color": "#c3c3c3",
-                                "fontSize": 15,
-                                "fontWeight": "400",
-                                "lineHeight": 21,
+                                "display": "flex",
+                                "flexDirection": "column",
+                                "flexWrap": "wrap",
                               }
                             }
                           >
-                            sent-ad...4567890
-                          </Text>
+                            <Text
+                              maxFontSizeMultiplier={2}
+                              style={
+                                {
+                                  "color": "#c3c3c3",
+                                  "fontSize": 15,
+                                  "fontWeight": "400",
+                                  "lineHeight": 21,
+                                }
+                              }
+                            >
+                              sent-ad...4567890
+                            </Text>
+                          </View>
                         </View>
                       </View>
                     </View>
