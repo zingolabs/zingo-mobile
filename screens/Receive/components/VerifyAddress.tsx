@@ -111,7 +111,7 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
             marginVertical: 5,
           }}
         >
-          <FadeText style={{ color: colors.fgAccent }}>{errorAddress}</FadeText>
+          <FadeText style={{ color: colors.fgDanger }}>{errorAddress}</FadeText>
         </View>
       )}
       {verifyOK !== null && (

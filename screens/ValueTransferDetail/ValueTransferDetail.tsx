@@ -933,7 +933,7 @@ const ValueTransferDetail: React.FunctionComponent<
                   >
                     <RegText>{GlobalConst.replyTo}</RegText>
                     {!thisWalletAddress(memoUA) && (
-                      <TriangleAlert color={'red'} size={16} />
+                      <TriangleAlert color={colors.fgWarning} size={16} />
                     )}
                     <RegText
                       style={{ opacity: thisWalletAddress(memoUA) ? 0.6 : 0.4 }}
