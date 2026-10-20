@@ -14,3 +14,9 @@ export const iconSizeMd = 20;
 export const iconSize = 24;
 /** The visible stroke of every icon, the same at 16, 20 and 24: the weight of regular text. */
 export const iconStroke = 1.75;
+
+/** The hitSlop that grows an icon-only button of `size` to `touchTarget`. */
+export const slopFor = (size: number) => {
+  const d = Math.max(0, Math.ceil((touchTarget - size) / 2));
+  return { top: d, bottom: d, left: d, right: d };
+};

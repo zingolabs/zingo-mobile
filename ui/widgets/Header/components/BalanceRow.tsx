@@ -10,7 +10,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useNavigation } from '@react-navigation/native';
 import { WalletNavigation } from '@app/types';
-import { useTheme } from '@app/theme';
+import { useTheme, slopFor } from '@app/theme';
 import {
   Route,
   ServerType,
@@ -190,6 +190,7 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
             />
             {totalBalance && poolsWorthALook(totalBalance) && (
               <TouchableOpacity
+                hitSlop={slopFor(20)}
                 onPress={() => {
                   navigation.navigate(Route.Pools);
                 }}

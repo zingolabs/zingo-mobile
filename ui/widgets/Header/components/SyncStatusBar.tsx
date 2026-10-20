@@ -3,7 +3,7 @@ import React from 'react';
 import { Animated, TouchableOpacity, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { WalletNavigation } from '@app/types';
-import { useTheme } from '@app/theme';
+import { useTheme, slopFor } from '@app/theme';
 import { NetInfoStateType } from '@react-native-community/netinfo/src/index';
 import {
   Route,
@@ -191,6 +191,7 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
                     }}
                   >
                     <TouchableOpacity
+                      hitSlop={slopFor(16)}
                       onPress={() => {
                         navigation.navigate(Route.SyncReport);
                       }}
@@ -223,6 +224,7 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
                 }}
               >
                 <TouchableOpacity
+                  hitSlop={slopFor(16)}
                   onPress={() => {
                     navigation.navigate(Route.SyncReport);
                   }}
@@ -280,6 +282,7 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
             transport that might still be up. */}
         {phase !== 'absent' && (
           <TouchableOpacity
+            hitSlop={slopFor(24)}
             testID="header.mixnet-status"
             accessibilityLabel={translate('settings.nym-diagnostics') as string}
             onPress={() => navigation.navigate(Route.MixnetDoctor)}

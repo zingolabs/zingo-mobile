@@ -18,7 +18,7 @@ import {
 } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { useIsFocused, useNavigation } from '@react-navigation/native';
-import { useTheme } from '@app/theme';
+import { useTheme, slopFor } from '@app/theme';
 
 import {
   ChainNameEnum,
@@ -916,6 +916,7 @@ const History: React.FunctionComponent<HistoryProps> = () => {
             platforms. */}
         {!isAtTop && (
           <Pressable
+            hitSlop={slopFor(36)}
             onPress={handleScrollToTop}
             disabled={isScrollingToTop}
             style={({ pressed }) => ({

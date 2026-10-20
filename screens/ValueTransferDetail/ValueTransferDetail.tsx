@@ -12,7 +12,7 @@ import { showConfirm } from '@app/services/showConfirm';
 import Clipboard from '@react-native-clipboard/clipboard';
 
 import { useNavigation } from '@react-navigation/native';
-import { useTheme } from '@app/theme';
+import { useTheme, slopFor } from '@app/theme';
 
 import {
   AddressBookFileClass,
@@ -366,6 +366,7 @@ const ValueTransferDetail: React.FunctionComponent<
             }}
           >
             <TouchableOpacity
+              hitSlop={slopFor(24)}
               onPress={() => moveValueTransferDetail(valueTransferIndex, -1)}
               style={{ marginRight: 25 }}
               disabled={valueTransferIndex === 0}
@@ -381,6 +382,7 @@ const ValueTransferDetail: React.FunctionComponent<
             </TouchableOpacity>
             <FadeText>{(valueTransferIndex + 1).toString()}</FadeText>
             <TouchableOpacity
+              hitSlop={slopFor(24)}
               onPress={() => moveValueTransferDetail(valueTransferIndex, 1)}
               style={{ marginLeft: 25 }}
               disabled={valueTransferIndex === valueTransfersSliced.length - 1}

@@ -2,7 +2,7 @@
 import React, { useContext, useState } from 'react';
 import { Keyboard, TextInput, TouchableOpacity, View } from 'react-native';
 
-import { useTheme } from '@app/theme';
+import { useTheme, slopFor } from '@app/theme';
 import { AddressBookFileClass, GlobalConst } from '@app/AppState';
 import { ContextAppLoaded } from '@app/context';
 import AddressBookFileImpl from '@app/services/AddressBookFileImpl';
@@ -106,7 +106,10 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
             }}
           />
           {!!label && (
-            <TouchableOpacity onPress={() => setLabel('')}>
+            <TouchableOpacity
+              hitSlop={slopFor(20)}
+              onPress={() => setLabel('')}
+            >
               <XIcon
                 style={{ marginRight: 10 }}
                 size={20}

@@ -8,7 +8,7 @@ import {
   useRoute,
 } from '@react-navigation/native';
 import { WalletNavigation } from '@app/types';
-import { useTheme, iconSize } from '@app/theme';
+import { useTheme, iconSize, slopFor } from '@app/theme';
 import React, { useContext, useEffect, useRef } from 'react';
 import { Image, TouchableOpacity, View } from 'react-native';
 import Animated, {
@@ -291,6 +291,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
           <View style={{ alignItems: 'center', flexDirection: 'row', gap: 14 }}>
             {!noDrawMenu && (
               <TouchableOpacity
+                hitSlop={slopFor(24)}
                 testID="header.drawmenu"
                 accessible={true}
                 accessibilityLabel={translate('menudrawer-acc') as string}
@@ -320,6 +321,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             {readOnly && !noUfvkIcon && (
               <Animated.View style={headerAnimatedStyle}>
                 <TouchableOpacity
+                  hitSlop={slopFor(24)}
                   testID="header.snowflake"
                   accessibilityRole="button"
                   accessibilityLabel={translate('viewingkey.title') as string}
@@ -359,6 +361,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                   4.5 below. The nudge rides on the icon alone, leaving the
                   logo this corner falls back to where it already sat. */}
               <TouchableOpacity
+                hitSlop={slopFor(24)}
                 style={{ marginRight: 5, marginTop: 4.5 }}
                 testID="header.messages"
                 onPress={() => navigation.navigate(Route.Messages)}
@@ -394,7 +397,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         >
           {closeScreen ? (
             <>
-              <TouchableOpacity onPress={closeScreen}>
+              <TouchableOpacity hitSlop={slopFor(24)} onPress={closeScreen}>
                 <ChevronLeft
                   style={{ marginHorizontal: 10 }}
                   size={24}

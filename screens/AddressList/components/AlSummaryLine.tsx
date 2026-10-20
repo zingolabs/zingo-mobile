@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
 import { View, TouchableOpacity } from 'react-native';
-import { useTheme } from '@app/theme';
+import { useTheme, slopFor } from '@app/theme';
 import Clipboard from '@react-native-clipboard/clipboard';
 
 import FadeText from '@ui/primitives/FadeText';
@@ -121,6 +121,7 @@ const AlSummaryLine: React.FunctionComponent<AlSummaryLineProps> = ({
           style={{ width: 50, justifyContent: 'center', alignItems: 'center' }}
         >
           <TouchableOpacity
+            hitSlop={slopFor(20)}
             style={{ zIndex: 999, padding: 10 }}
             onPress={() => {
               doCopy();
@@ -137,6 +138,7 @@ const AlSummaryLine: React.FunctionComponent<AlSummaryLineProps> = ({
           style={{ width: 50, justifyContent: 'center', alignItems: 'center' }}
         >
           <TouchableOpacity
+            hitSlop={slopFor(24)}
             style={{ zIndex: 999, padding: 10 }}
             onPress={() => {
               doQr();

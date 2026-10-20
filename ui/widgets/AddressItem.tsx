@@ -22,7 +22,7 @@ import {
 } from '@app/AppState';
 import { useNavigation } from '@react-navigation/native';
 import { WalletNavigation } from '@app/types';
-import { useTheme } from '@app/theme';
+import { useTheme, slopFor } from '@app/theme';
 import { UserPlusIcon } from '@ui/primitives/Icons/UserPlusIcon';
 import { PlaneIcon } from '@ui/primitives/Icons/PlaneIcon';
 
@@ -176,6 +176,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
       </View>
       {withIcon && !contact && oneLine && (
         <TouchableOpacity
+          hitSlop={slopFor(20)}
           testID="addressitem.add-contact"
           onPress={() => launchAddTagModal(address, undefined, znsAlias)}
         >
@@ -198,6 +199,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
       )}
       {withIcon && !contact && !oneLine && (
         <TouchableOpacity
+          hitSlop={slopFor(24)}
           testID="addressitem.add-contact"
           onPress={() => launchAddTagModal(address, undefined, znsAlias)}
         >
@@ -210,6 +212,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
       )}
       {withSendIcon && !!contact && !readOnly && server.kind !== 'offline' && (
         <TouchableOpacity
+          hitSlop={slopFor(24)}
           style={{ marginLeft: 10 }}
           onPress={() => {
             // enviar

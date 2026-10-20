@@ -22,7 +22,7 @@ import {
 } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { useNavigation, useScrollToTop } from '@react-navigation/native';
-import { useTheme, space20 } from '@app/theme';
+import { useTheme, space20, slopFor } from '@app/theme';
 import { ScanIcon } from '@ui/primitives/Icons/ScanIcon';
 import { getNumberFormatSettings } from 'react-native-localize';
 
@@ -1278,6 +1278,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
                     >
                       {addressText && (
                         <TouchableOpacity
+                          hitSlop={slopFor(20)}
                           testID="send.address.clear"
                           onPress={() => {
                             updateToField('', null, null, null, null);
@@ -1298,6 +1299,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
                         if (validAddress === 1 && !addressIsSaved) {
                           return (
                             <TouchableOpacity
+                              hitSlop={slopFor(24)}
                               testID="send.add-address"
                               disabled={updatingToField}
                               onPress={() =>
@@ -1327,6 +1329,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
                         }
                         return !updatingToField ? (
                           <TouchableOpacity
+                            hitSlop={slopFor(24)}
                             testID="send.address-book"
                             onPress={openBook}
                           >
@@ -1345,6 +1348,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
                         );
                       })()}
                       <TouchableOpacity
+                        hitSlop={slopFor(24)}
                         ref={scanButton}
                         testID="send.scan-button"
                         accessible={true}
@@ -1524,6 +1528,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
                       )}
                       {(inputZec ? amountText : amountCurrencyText) ? (
                         <TouchableOpacity
+                          hitSlop={slopFor(20)}
                           onPress={() => {
                             // clearing the amount drops the MAX intent
                             sendAllRef.current = false;
@@ -1876,6 +1881,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
                         />
                         {memoText && (
                           <TouchableOpacity
+                            hitSlop={slopFor(20)}
                             onPress={() => {
                               updateToField(null, null, null, '', null);
                             }}
@@ -1892,6 +1898,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
                         )}
                         {memoIcon && (
                           <TouchableOpacity
+                            hitSlop={slopFor(24)}
                             onPress={() => {
                               setMemoModalShow();
                             }}
