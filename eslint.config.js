@@ -42,8 +42,7 @@ module.exports = [
   },
   {
     // The color lock: a color is named by its token in app/theme, never by
-    // value. Files that still hold loose colors are listed in
-    // eslint.colorLock.js and leave the list as each screen migrates.
+    // value.
     files: ['app/**', 'screens/**', 'ui/**'],
     ignores: ['app/theme/**', '**/*.stories.tsx'],
     rules: {
@@ -65,13 +64,6 @@ module.exports = [
           message: 'Use a color token from app/theme, not a color in a string.',
         },
       ],
-    },
-  },
-  {
-    files: require('./eslint.colorLock'),
-    rules: {
-      'react-native/no-color-literals': 'off',
-      'no-restricted-syntax': 'off',
     },
   },
   {

@@ -15,8 +15,9 @@ import MixnetIcon from '@ui/primitives/Icons/MixnetIcon';
 import { ContextAppLoaded } from '@app/context';
 import { radiusSheet, useTheme } from '@app/theme';
 import { NymGateState } from './nymGateState';
+import { themeTokens } from '@app/theme';
 
-const NYM_GREEN = '#07FF94';
+const NYM_GREEN = themeTokens.bgNym;
 
 type NymGateSheetProps = {
   // The one gate state to present: connecting waits, failed shows its key.
@@ -78,7 +79,7 @@ const NymGateSheet = forwardRef<BottomSheetModal, NymGateSheetProps>(
           />
           <Text
             style={{
-              fontSize: 24,
+              fontSize: 22,
               fontWeight: '700',
               textAlign: 'center',
               color: colors.fgDefault,

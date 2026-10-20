@@ -21,9 +21,9 @@ const BUBBLE_V_MARGIN = 4;
 const TAB_H_PADDING = 30;
 const TAB_V_PADDING = 10;
 const PILL_BG = themeTokens.bgChrome;
-const PILL_BORDER = '#071A35';
+const PILL_BORDER = themeTokens.bottomSheetBorder;
 const WRAPPER_PADDING_BOTTOM = 25;
-const FADE_COLORS = ['transparent', 'rgba(0,0,0,0.3)'];
+const FADE_COLORS = ['transparent', themeTokens.bgScrim];
 
 function renderNavIcon(
   routeName: string,
@@ -161,7 +161,7 @@ const CustomTabBar = ({
         <View style={styles.pill}>
           {state.routes.map((route, index) => {
             const isFocused = index === state.index;
-            const color = isFocused ? PILL_BG : '#FFFFFF';
+            const color = isFocused ? PILL_BG : themeTokens.fgDefault;
             return (
               <Pressable
                 key={route.key}

@@ -40,18 +40,19 @@ import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
 import { Route, SettingsNameEnum } from '@app/AppState';
 import { ArrowRightIcon } from '@ui/primitives/Icons/ArrowRightIcon';
+import { themeTokens } from '@app/theme';
 
 // Pool artwork palette — Orchard teal and Ironwood gold are one-off brand
 // accents for this onboarding, not part of the app theme.
-const ORCHARD_ACCENT = '#4E8E96';
-const ORCHARD_BORDER = '#2E5E66';
-const ORCHARD_BG = '#0B1D26';
-const IRONWOOD_ACCENT = '#E4C28F';
-const IRONWOOD_BORDER = '#5A4630';
-const IRONWOOD_BG = '#241A12';
-const RING_DARK = '#3A2A1A';
+const ORCHARD_ACCENT = themeTokens.fgOrchard;
+const ORCHARD_BORDER = themeTokens.borderOrchard;
+const ORCHARD_BG = themeTokens.bgOrchard;
+const IRONWOOD_ACCENT = themeTokens.fgIronwood;
+const IRONWOOD_BORDER = themeTokens.borderIronwood;
+const IRONWOOD_BG = themeTokens.bgIronwood;
+const RING_DARK = themeTokens.borderIronwood;
 // Hairline that separates the option sections.
-const SECTION_DIVIDER = 'rgba(255, 255, 255, 0.08)';
+const SECTION_DIVIDER = themeTokens.borderSubtle;
 
 const STEP_COUNT = 2;
 
@@ -222,7 +223,7 @@ const BodyText: React.FunctionComponent<BodyTextProps> = ({
   <Text
     style={{
       color: dimColor,
-      fontSize: 17,
+      fontSize: 18,
       lineHeight: 26,
       marginBottom,
     }}
@@ -262,7 +263,7 @@ const MiniCard: React.FunctionComponent<{
   size: number;
   color: string;
   fill?: string;
-}> = ({ size, color, fill = 'transparent' }) => (
+}> = ({ size, color, fill = 'none' }) => (
   <View
     style={{
       width: size,
@@ -339,7 +340,7 @@ const Phase1Graphic: React.FunctionComponent<{
 // The bold heading for each migration option.
 const OptionTitle: React.FunctionComponent<{ children: string }> = ({
   children,
-}) => <BoldText style={{ fontSize: 17, marginBottom: 8 }}>{children}</BoldText>;
+}) => <BoldText style={{ fontSize: 18, marginBottom: 8 }}>{children}</BoldText>;
 
 type MeetIronwoodProps = NativeStackScreenProps<
   AppDrawerParamList,
