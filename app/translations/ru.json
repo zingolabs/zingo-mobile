@@ -434,6 +434,8 @@
     "lastupdate": "Последнее обновление:"
   },
   "info": {
+    "error-price-fetch": "Не удалось получить цену ZEC.",
+    "error-price-payload": "Цена ZEC пришла в неверном формате.",
     "version": "Версия",
     "serverversion": "Версия сервера",
     "zainod": "URL-адрес сервера",

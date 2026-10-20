@@ -192,7 +192,12 @@ export default function LoadingApp(props: LoadingAppProps) {
     }),
     [],
   );
-  const i18n = useMemo(() => new I18n(file), [file]);
+  const i18n = useMemo(() => {
+    const instance = new I18n(file);
+    /** A key missing in a locale shows the English text, never `[missing … translation]`. */
+    instance.enableFallback = true;
+    return instance;
+  }, [file]);
 
   const translate: (key: string) => TranslateType = (key: string) =>
     substituteZingoName(i18n.t(key) as TranslateType);
