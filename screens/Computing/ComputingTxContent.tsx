@@ -13,7 +13,7 @@ import BottomSheet, {
   BottomSheetFooter,
   BottomSheetFooterProps,
 } from '@gorhom/bottom-sheet';
-import ProgressState, { RING_RED } from '@ui/widgets/ProgressState';
+import ProgressState from '@ui/widgets/ProgressState';
 import RegText from '@ui/primitives/RegText';
 import Button from '@ui/primitives/Button';
 import AppSheet from '@ui/primitives/AppSheet';
@@ -167,7 +167,7 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({
             >
               <RegText
                 style={{
-                  color: RING_RED,
+                  color: colors.fgDanger,
                   textDecorationLine: 'underline',
                 }}
               >

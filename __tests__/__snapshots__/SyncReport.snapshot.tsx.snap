@@ -236,33 +236,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
           >
             <View
               style={{}}
-            >
-              <View
-                style={
-                  {
-                    "alignItems": "center",
-                    "backgroundColor": "#A8B3C4",
-                    "borderRadius": 7,
-                    "height": 14,
-                    "justifyContent": "center",
-                    "width": 14,
-                  }
-                }
-              >
-                <Text
-                  style={
-                    {
-                      "color": "#060B12",
-                      "fontSize": 9.5,
-                      "fontWeight": "700",
-                      "lineHeight": 14,
-                    }
-                  }
-                >
-                  i
-                </Text>
-              </View>
-            </View>
+            />
           </View>
         </View>
       </View>

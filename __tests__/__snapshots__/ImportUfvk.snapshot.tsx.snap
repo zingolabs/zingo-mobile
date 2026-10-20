@@ -290,7 +290,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
           style={
             {
               "color": "#c3c3c3",
-              "fontSize": 12.5,
+              "fontSize": 13,
               "fontWeight": "600",
               "lineHeight": 18,
             }
@@ -333,33 +333,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
         >
           <View
             style={{}}
-          >
-            <View
-              style={
-                {
-                  "alignItems": "center",
-                  "backgroundColor": "#A8B3C4",
-                  "borderRadius": 7,
-                  "height": 14,
-                  "justifyContent": "center",
-                  "width": 14,
-                }
-              }
-            >
-              <Text
-                style={
-                  {
-                    "color": "#060B12",
-                    "fontSize": 9.5,
-                    "fontWeight": "700",
-                    "lineHeight": 14,
-                  }
-                }
-              >
-                i
-              </Text>
-            </View>
-          </View>
+          />
         </View>
       </View>
     </View>

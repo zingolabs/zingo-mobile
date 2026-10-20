@@ -146,7 +146,7 @@ exports[`Filters - snapshots Filters with active sent filter and memos 1`] = `
               {
                 "alignItems": "center",
                 "backgroundColor": undefined,
-                "borderColor": "#888888",
+                "borderColor": "#4A6487",
                 "borderRadius": 999,
                 "borderWidth": 1,
                 "justifyContent": "center",
@@ -211,7 +211,7 @@ exports[`Filters - snapshots Filters with active sent filter and memos 1`] = `
               {
                 "alignItems": "center",
                 "backgroundColor": undefined,
-                "borderColor": "#888888",
+                "borderColor": "#4A6487",
                 "borderRadius": 999,
                 "borderWidth": 1,
                 "justifyContent": "center",
@@ -662,7 +662,7 @@ exports[`Filters - snapshots Filters with no active filters 1`] = `
               {
                 "alignItems": "center",
                 "backgroundColor": undefined,
-                "borderColor": "#888888",
+                "borderColor": "#4A6487",
                 "borderRadius": 999,
                 "borderWidth": 1,
                 "justifyContent": "center",
@@ -727,7 +727,7 @@ exports[`Filters - snapshots Filters with no active filters 1`] = `
               {
                 "alignItems": "center",
                 "backgroundColor": undefined,
-                "borderColor": "#888888",
+                "borderColor": "#4A6487",
                 "borderRadius": 999,
                 "borderWidth": 1,
                 "justifyContent": "center",
@@ -792,7 +792,7 @@ exports[`Filters - snapshots Filters with no active filters 1`] = `
               {
                 "alignItems": "center",
                 "backgroundColor": undefined,
-                "borderColor": "#888888",
+                "borderColor": "#4A6487",
                 "borderRadius": 999,
                 "borderWidth": 1,
                 "justifyContent": "center",
@@ -857,7 +857,7 @@ exports[`Filters - snapshots Filters with no active filters 1`] = `
               {
                 "alignItems": "center",
                 "backgroundColor": undefined,
-                "borderColor": "#888888",
+                "borderColor": "#4A6487",
                 "borderRadius": 999,
                 "borderWidth": 1,
                 "justifyContent": "center",
@@ -922,7 +922,7 @@ exports[`Filters - snapshots Filters with no active filters 1`] = `
               {
                 "alignItems": "center",
                 "backgroundColor": undefined,
-                "borderColor": "#888888",
+                "borderColor": "#4A6487",
                 "borderRadius": 999,
                 "borderWidth": 1,
                 "justifyContent": "center",
@@ -987,7 +987,7 @@ exports[`Filters - snapshots Filters with no active filters 1`] = `
               {
                 "alignItems": "center",
                 "backgroundColor": undefined,
-                "borderColor": "#888888",
+                "borderColor": "#4A6487",
                 "borderRadius": 999,
                 "borderWidth": 1,
                 "justifyContent": "center",

@@ -68,6 +68,8 @@ export type ThemeColors = {
   borderIronwood: string;
   bgIronwood: string;
   fgTransparent: string;
+  /** The brown pot of the sprout mark, part of the brand. */
+  bgSproutPot: string;
   bgTransparent: string;
 
   /** Contact avatars and chart series; a contact keeps its category for life. */
@@ -150,6 +152,7 @@ export const themeTokens: ThemeColors = {
   borderIronwood: '#5A4630',
   bgIronwood: '#241A12',
   fgTransparent: '#E6C46A',
+  bgSproutPot: '#5A3A1E',
   bgTransparent: '#E6C46A1F',
 
   fgCategory1: accent,

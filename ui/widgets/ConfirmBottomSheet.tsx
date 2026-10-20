@@ -15,8 +15,6 @@ import {
   registerConfirmListener,
 } from '@app/services/showConfirm';
 
-const SOFT_INK = '#8DA0B8';
-
 // The confirmation sheet behind showConfirm: title, message, the actions as
 // full-width pills (red when destructive) and Cancel as a link under them.
 const ConfirmBottomSheet: React.FC = () => {
@@ -74,7 +72,7 @@ const ConfirmBottomSheet: React.FC = () => {
         style={{
           marginTop: 4,
           textAlign: 'center',
-          fontSize: 15.5,
+          fontSize: 15,
           lineHeight: 21,
         }}
       >
@@ -83,7 +81,9 @@ const ConfirmBottomSheet: React.FC = () => {
       {!!options?.message && (
         <RegText
           testID="confirm.message"
-          color={options.messageTone === 'danger' ? colors.fgDanger : SOFT_INK}
+          color={
+            options.messageTone === 'danger' ? colors.fgDanger : colors.fgMuted
+          }
           style={{
             marginTop: 6,
             fontSize: 12,

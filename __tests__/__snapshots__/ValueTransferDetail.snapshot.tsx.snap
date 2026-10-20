@@ -272,7 +272,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail received transactio
       style={
         {
           "alignItems": "center",
-          "borderColor": "#888888",
+          "borderColor": "#4A6487",
           "borderRadius": 10,
           "borderWidth": 1,
           "display": "flex",
@@ -1174,7 +1174,7 @@ exports[`ValueTransferDetail - snapshots ValueTransferDetail sent transaction 1`
       style={
         {
           "alignItems": "center",
-          "borderColor": "#888888",
+          "borderColor": "#4A6487",
           "borderRadius": 10,
           "borderWidth": 1,
           "display": "flex",

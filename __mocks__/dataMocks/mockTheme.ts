@@ -4,8 +4,9 @@ import type { ThemeColors } from '@app/theme';
 // The drifted values (`#18bd18` for the accent, `#c3c3c3` for text) predate the
 // token layer and stay wrong on purpose: the 43 snapshot suites are baselined
 // on them. Reconciling them with the real palette is out of the migration's
-// scope. Danger is the exception: it changed meaning (orange to the one red),
-// so the mock follows the real value.
+// scope. Danger and borderMuted are the exceptions: they changed meaning (orange
+// to the one red; muted text to a field edge of its own), so the mock
+// follows the real values.
 const colors: ThemeColors = {
   bgCanvas: '#011401',
   bgSurface: '#031124',
@@ -19,7 +20,7 @@ const colors: ThemeColors = {
   fgDefault: '#c3c3c3',
 
   fgMuted: '#888888',
-  borderMuted: '#888888',
+  borderMuted: '#4A6487',
   bgMuted: '#888888',
   bgMutedSubtle: '#8888881F',
 
@@ -65,6 +66,7 @@ const colors: ThemeColors = {
   borderIronwood: '#5A4630',
   bgIronwood: '#241A12',
   fgTransparent: '#E6C46A',
+  bgSproutPot: '#5A3A1E',
   bgTransparent: '#E6C46A1F',
 
   fgCategory1: '#18bd18',

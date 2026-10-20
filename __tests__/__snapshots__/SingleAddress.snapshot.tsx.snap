@@ -162,7 +162,7 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
             <View
               style={
                 {
-                  "borderColor": "#888888",
+                  "borderColor": "#4A6487",
                   "borderRadius": 30,
                   "marginHorizontal": 10,
                   "paddingHorizontal": 5,
@@ -208,7 +208,7 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
             <View
               style={
                 {
-                  "borderColor": "#888888",
+                  "borderColor": "#4A6487",
                   "borderRadius": 30,
                   "marginHorizontal": 10,
                   "paddingHorizontal": 5,
@@ -468,7 +468,7 @@ exports[`Component SingleAddress UFVK - test SingleAddress UFVK - snapshot 1`] =
             <View
               style={
                 {
-                  "borderColor": "#888888",
+                  "borderColor": "#4A6487",
                   "borderRadius": 30,
                   "marginHorizontal": 10,
                   "paddingHorizontal": 5,

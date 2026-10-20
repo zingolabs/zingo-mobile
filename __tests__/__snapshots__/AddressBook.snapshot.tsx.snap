@@ -195,13 +195,13 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
         onChangeText={[Function]}
         onFocus={[Function]}
         placeholder="text translated"
-        placeholderTextColor="#6B80A0"
+        placeholderTextColor="#888888"
         spellCheck={false}
         style={
           {
             "color": "#c3c3c3",
             "flex": 1,
-            "fontSize": 13.5,
+            "fontSize": 15,
             "minWidth": 0,
             "paddingVertical": 0,
           }
@@ -347,7 +347,7 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
         style={
           {
             "color": "#c3c3c3",
-            "fontSize": 15.5,
+            "fontSize": 15,
             "fontWeight": "600",
             "lineHeight": 21,
             "marginTop": 4,
@@ -402,10 +402,9 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
             placeholderTextColor="#888888"
             style={
               {
-                "backgroundColor": "transparent",
                 "color": "#c3c3c3",
                 "flex": 1,
-                "fontSize": 14,
+                "fontSize": 15,
                 "fontWeight": "600",
                 "padding": 10,
               }
@@ -501,7 +500,7 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
                 {
                   "color": "#c3c3c3",
                   "flex": 1,
-                  "fontSize": 14,
+                  "fontSize": 15,
                   "fontWeight": "600",
                 }
               }
@@ -647,13 +646,13 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
                   onChangeText={[Function]}
                   onFocus={[Function]}
                   placeholder="text translated"
-                  placeholderTextColor="#6B80A0"
+                  placeholderTextColor="#888888"
                   spellCheck={false}
                   style={
                     {
                       "color": "#c3c3c3",
                       "flex": 1,
-                      "fontSize": 13.5,
+                      "fontSize": 15,
                       "minWidth": 0,
                       "paddingVertical": 0,
                     }
@@ -703,7 +702,7 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
               style={
                 {
                   "alignItems": "center",
-                  "borderBottomColor": "#122033",
+                  "borderBottomColor": "#FFFFFF0F",
                   "borderBottomWidth": 1.5,
                   "columnGap": 12,
                   "flexDirection": "row",
@@ -722,9 +721,9 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
                 }
                 style={
                   {
-                    "borderRadius": 17.5,
-                    "height": 35,
-                    "width": 35,
+                    "borderRadius": 18,
+                    "height": 36,
+                    "width": 36,
                   }
                 }
               />
@@ -808,10 +807,9 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
             spellCheck={false}
             style={
               {
-                "backgroundColor": "transparent",
                 "color": "#c3c3c3",
                 "flex": 1,
-                "fontSize": 14,
+                "fontSize": 15,
                 "fontWeight": "600",
                 "minHeight": 58,
                 "padding": 10,
