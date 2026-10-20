@@ -454,6 +454,7 @@ const IronwoodMigrationBanner: React.FunctionComponent<
     <Animated.View key="default" entering={variantEnter()}>
       <Banner
         tone="warning"
+        plain
         title={translate('ironwoodbanner.pool') as string}
         actionBeside
         action={

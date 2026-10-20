@@ -37,6 +37,11 @@ type BannerProps = {
    * is built around (Back up, Start), with an `inline` button.
    */
   actionBeside?: boolean;
+  /**
+   * The plain card surface and edge instead of the tone's fill; the tone
+   * stays in the icon tile. For a prompt that is not an alert.
+   */
+  plain?: boolean;
   onDismiss?: () => void;
   dismissLabel?: string;
   dismissTestID?: string;
@@ -66,6 +71,7 @@ const Banner = forwardRef<View, BannerProps>(function Banner(
     dismissTestID,
     contentStyle,
     actionBeside = false,
+    plain = false,
     testID,
   },
   ref,
@@ -106,8 +112,8 @@ const Banner = forwardRef<View, BannerProps>(function Banner(
         padding: space16,
         borderRadius: radiusMd,
         borderWidth: 1,
-        borderColor: paint.edge,
-        backgroundColor: paint.bg,
+        borderColor: plain ? colors.bottomSheetBorder : paint.edge,
+        backgroundColor: plain ? colors.bgSurface : paint.bg,
       }}
     >
       <Animated.View
