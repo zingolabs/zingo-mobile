@@ -13,6 +13,7 @@ import {
   SelectServerEnum,
 } from '@app/AppState';
 import { remoteServer } from '@app/AppState/types/ServerType';
+import RPCModule from '@app/RPCModule';
 import {
   ConfirmOptions,
   registerConfirmListener,
@@ -114,3 +115,24 @@ test('Tests that a saved viewing key of the server network restores', async () =
     expect.anything(),
   );
 });
+
+test.each([
+  ['a birthday of 0, as an empty field or an old saved entry gives', 0],
+  ['a height below Sapling activation', 1000],
+])(
+  'Tests that the restore starts at Sapling activation when it gets %s',
+  async (_case, birthday) => {
+    jest.useFakeTimers();
+    const { app } = appWithSaved(birthday);
+    jest.mocked(app.doRestore).mockRestore();
+    jest.spyOn(app, 'setState').mockImplementation(() => {});
+    const restore = jest.mocked(RPCModule.restoreWalletFromSeed);
+    restore.mockRejectedValue(new Error('stop here'));
+
+    await app.doRestore('abandon ability able', birthday);
+
+    expect(restore.mock.calls[0][1]).toBe('419200');
+    jest.clearAllTimers();
+    jest.useRealTimers();
+  },
+);
