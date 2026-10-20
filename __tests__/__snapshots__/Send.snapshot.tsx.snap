@@ -1062,7 +1062,7 @@ exports[`Component Send - test Send privacy high - snapshot 1`] = `
                   accessibilityRole="button"
                   accessibilityState={
                     {
-                      "busy": undefined,
+                      "busy": false,
                       "checked": undefined,
                       "disabled": true,
                       "expanded": undefined,
@@ -1389,7 +1389,7 @@ memo10"
             accessibilityRole="button"
             accessibilityState={
               {
-                "busy": undefined,
+                "busy": false,
                 "checked": undefined,
                 "disabled": false,
                 "expanded": undefined,
@@ -1473,7 +1473,7 @@ memo10"
       accessibilityRole="button"
       accessibilityState={
         {
-          "busy": undefined,
+          "busy": false,
           "checked": undefined,
           "disabled": false,
           "expanded": undefined,
@@ -2626,7 +2626,7 @@ exports[`Component Send - test Send privacy normal - snapshot 1`] = `
                   accessibilityRole="button"
                   accessibilityState={
                     {
-                      "busy": undefined,
+                      "busy": false,
                       "checked": undefined,
                       "disabled": true,
                       "expanded": undefined,
@@ -2953,7 +2953,7 @@ memo10"
             accessibilityRole="button"
             accessibilityState={
               {
-                "busy": undefined,
+                "busy": false,
                 "checked": undefined,
                 "disabled": false,
                 "expanded": undefined,
@@ -3037,7 +3037,7 @@ memo10"
       accessibilityRole="button"
       accessibilityState={
         {
-          "busy": undefined,
+          "busy": false,
           "checked": undefined,
           "disabled": false,
           "expanded": undefined,

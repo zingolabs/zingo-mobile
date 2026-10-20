@@ -8,7 +8,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-import { useTheme } from '@app/theme';
+import { space20, useTheme } from '@app/theme';
 import { ease } from '@app/theme/motion';
 import BoldText from '@ui/primitives/BoldText';
 import RegText from '@ui/primitives/RegText';
@@ -16,10 +16,8 @@ import Button from '@ui/primitives/Button';
 import { ChevronLeft, ChevronRight } from '@ui/primitives/Icons/Chevron';
 
 /** The side margin of the cards, which the Done button lines up with. */
-export const CARD_SIDE = 21.5;
+export const CARD_SIDE = space20;
 
-export const ROW_DIVIDER = '#0A1F3D';
-const RADIO_OFF = '#3A5070';
 const FAST_MS = 150;
 
 type RadioProps = { selected: boolean };
@@ -43,7 +41,7 @@ const Radio: React.FC<RadioProps> = ({ selected }) => {
         height: 18,
         borderRadius: 9,
         borderWidth: selected ? 2 : 1.5,
-        borderColor: selected ? colors.fgAccent : RADIO_OFF,
+        borderColor: selected ? colors.fgAccent : colors.borderMuted,
         alignItems: 'center',
         justifyContent: 'center',
       }}
@@ -88,7 +86,7 @@ export const Latency: React.FC<LatencyProps> = ({ ms, notResponding }) => {
       />
       <RegText
         style={{
-          fontSize: 11.5,
+          fontSize: 12,
           color: bad ? colors.fgWarning : colors.fgMuted,
         }}
       >
@@ -159,21 +157,21 @@ const ServerRow: React.FC<ServerRowProps> = ({
           paddingLeft: 14.5,
           paddingRight: 16,
           borderTopWidth: first ? 0 : 1,
-          borderTopColor: ROW_DIVIDER,
-          backgroundColor: pressed ? 'rgba(255,255,255,0.02)' : 'transparent',
+          borderTopColor: colors.borderSubtle,
+          opacity: pressed ? 0.7 : 1,
         })}
       >
         <Radio selected={selected} />
         <View style={{ flex: 1, minWidth: 0 }}>
           <RegText
             numberOfLines={1}
-            style={{ fontSize: 13.5, lineHeight: 19, fontWeight: '500' }}
+            style={{ fontSize: 15, lineHeight: 19, fontWeight: '500' }}
           >
             {title}
           </RegText>
           {!!sub && (
             <RegText
-              style={{ fontSize: 11, lineHeight: 16, color: colors.fgMuted }}
+              style={{ fontSize: 12, lineHeight: 16, color: colors.fgMuted }}
             >
               {sub}
             </RegText>

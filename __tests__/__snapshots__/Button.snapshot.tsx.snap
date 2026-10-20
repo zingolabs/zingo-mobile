@@ -5,7 +5,7 @@ exports[`Component Button - test Button Primary - snapshot 1`] = `
   accessibilityRole="button"
   accessibilityState={
     {
-      "busy": undefined,
+      "busy": false,
       "checked": undefined,
       "disabled": false,
       "expanded": undefined,
@@ -68,7 +68,7 @@ exports[`Component Button - test Button Text - snapshot 1`] = `
   accessibilityRole="button"
   accessibilityState={
     {
-      "busy": undefined,
+      "busy": false,
       "checked": undefined,
       "disabled": false,
       "expanded": undefined,

@@ -59,7 +59,7 @@ const TILE = 36;
  * A notice at the top of a screen. One at a time: when several are pending,
  * the most important shows first.
  */
-const Banner = forwardRef<View, BannerProps>(function Banner(
+const Banner = forwardRef<View, BannerProps>(function BannerCard(
   {
     tone,
     title,

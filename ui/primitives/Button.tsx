@@ -1,6 +1,11 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import { TouchableOpacity, ViewStyle, TextStyle } from 'react-native';
+import {
+  ActivityIndicator,
+  TouchableOpacity,
+  ViewStyle,
+  TextStyle,
+} from 'react-native';
 import {
   buttonMinHeight,
   fontScaleTitle,
@@ -43,6 +48,8 @@ export type ButtonProps = {
    * that reads as a link inside a line of text.
    */
   inline?: boolean;
+  /** Working: a spinner takes the label's place and presses wait. */
+  busy?: boolean;
 };
 
 const Button: React.FunctionComponent<ButtonProps> = ({
@@ -57,6 +64,7 @@ const Button: React.FunctionComponent<ButtonProps> = ({
   accessibilityLabel,
   testID,
   inline,
+  busy = false,
 }) => {
   const { colors } = useTheme();
   const small = size === 'small';
@@ -86,7 +94,7 @@ const Button: React.FunctionComponent<ButtonProps> = ({
       accessible={accessible}
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel}
-      accessibilityState={{ disabled: !!disabled }}
+      accessibilityState={{ disabled: !!disabled, busy }}
       hitSlop={slop > 0 ? { top: slop, bottom: slop } : undefined}
       style={{
         backgroundColor:
@@ -102,21 +110,25 @@ const Button: React.FunctionComponent<ButtonProps> = ({
         ...(inline ? {} : { alignSelf: 'stretch', width: '100%' }),
         ...style,
       }}
-      disabled={disabled}
+      disabled={disabled || busy}
       onPress={() => onPress()}
     >
-      <Text
-        variant={small ? 'bodySmall' : 'button'}
-        maxFontSizeMultiplier={fontScaleTitle}
-        color={label}
-        style={{
-          textAlign: 'center',
-          ...(small ? { fontWeight: '700' } : {}),
-          ...textStyle,
-        }}
-      >
-        {title}
-      </Text>
+      {busy ? (
+        <ActivityIndicator size="small" color={label} />
+      ) : (
+        <Text
+          variant={small ? 'bodySmall' : 'button'}
+          maxFontSizeMultiplier={fontScaleTitle}
+          color={label}
+          style={{
+            textAlign: 'center',
+            ...(small ? { fontWeight: '700' } : {}),
+            ...textStyle,
+          }}
+        >
+          {title}
+        </Text>
+      )}
     </TouchableOpacity>
   );
 };

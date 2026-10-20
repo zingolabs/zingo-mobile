@@ -491,7 +491,7 @@ exports[`NewAddressTag - snapshot NewAddressTag renders correctly 1`] = `
     accessibilityRole="button"
     accessibilityState={
       {
-        "busy": undefined,
+        "busy": false,
         "checked": undefined,
         "disabled": true,
         "expanded": undefined,
@@ -553,7 +553,7 @@ exports[`NewAddressTag - snapshot NewAddressTag renders correctly 1`] = `
     accessibilityRole="button"
     accessibilityState={
       {
-        "busy": undefined,
+        "busy": false,
         "checked": undefined,
         "disabled": false,
         "expanded": undefined,

@@ -259,7 +259,7 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
       accessibilityRole="button"
       accessibilityState={
         {
-          "busy": undefined,
+          "busy": false,
           "checked": undefined,
           "disabled": false,
           "expanded": undefined,
@@ -886,7 +886,7 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
         accessibilityRole="button"
         accessibilityState={
           {
-            "busy": undefined,
+            "busy": false,
             "checked": undefined,
             "disabled": true,
             "expanded": undefined,
@@ -948,7 +948,7 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
         accessibilityRole="button"
         accessibilityState={
           {
-            "busy": undefined,
+            "busy": false,
             "checked": undefined,
             "disabled": false,
             "expanded": undefined,

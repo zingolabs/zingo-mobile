@@ -107,7 +107,7 @@ exports[`NewAddress - snapshots NewAddress transparent kind 1`] = `
           accessibilityRole="button"
           accessibilityState={
             {
-              "busy": undefined,
+              "busy": false,
               "checked": undefined,
               "disabled": false,
               "expanded": undefined,
@@ -167,7 +167,7 @@ exports[`NewAddress - snapshots NewAddress transparent kind 1`] = `
           accessibilityRole="button"
           accessibilityState={
             {
-              "busy": undefined,
+              "busy": false,
               "checked": undefined,
               "disabled": false,
               "expanded": undefined,
@@ -594,7 +594,7 @@ exports[`NewAddress - snapshots NewAddress unified kind 1`] = `
           accessibilityRole="button"
           accessibilityState={
             {
-              "busy": undefined,
+              "busy": false,
               "checked": undefined,
               "disabled": false,
               "expanded": undefined,
@@ -654,7 +654,7 @@ exports[`NewAddress - snapshots NewAddress unified kind 1`] = `
           accessibilityRole="button"
           accessibilityState={
             {
-              "busy": undefined,
+              "busy": false,
               "checked": undefined,
               "disabled": false,
               "expanded": undefined,
