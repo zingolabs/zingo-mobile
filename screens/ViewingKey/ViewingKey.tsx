@@ -42,9 +42,10 @@ import { CopyShowButtons } from '@screens/SeedBackup/components/SeedParts';
 import { SIDE } from '@screens/SeedBackup/components/StepParts';
 import KeyCard from './components/KeyCard';
 import Button from '@ui/primitives/Button';
+import { themeTokens } from '@app/theme';
 
 const QR = 196;
-const TILE_BG = '#0A1B33';
+const TILE_BG = themeTokens.bgViewOnlySubtle;
 const PUSH_IN_MS = 380;
 const PUSH_OUT_MS = 320;
 
@@ -231,10 +232,10 @@ const ViewingKey: React.FunctionComponent<ViewingKeyProps> = ({
               borderRadius: 12,
               alignItems: 'center',
               justifyContent: 'center',
-              backgroundColor: pressed ? 'rgba(255,255,255,0.06)' : undefined,
+              backgroundColor: pressed ? colors.bgMutedSubtle : undefined,
             })}
           >
-            <ChevronLeft size={22} color={colors.fgAccent} />
+            <ChevronLeft size={24} color={colors.fgAccent} />
           </Pressable>
           <Text
             accessibilityRole="header"
@@ -257,7 +258,7 @@ const ViewingKey: React.FunctionComponent<ViewingKeyProps> = ({
         <Text
           style={{
             color: colors.fgMuted,
-            fontSize: 14,
+            fontSize: 15,
             lineHeight: 20,
             textAlign: 'center',
             marginHorizontal: SIDE,

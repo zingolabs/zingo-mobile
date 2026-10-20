@@ -33,10 +33,11 @@ import AddressRowHead from './components/AddressRowHead';
 import SegmentedSwitch from '@ui/widgets/SegmentedSwitch';
 import { RPCAddressScopeEnum } from '@app/walletBackend/enums/RPCAddressScopeEnum';
 import ContactSheet, { ContactEdit } from '@ui/widgets/ContactSheet';
+import { themeTokens } from '@app/theme';
 
 const SIDE = 22;
-const SOFT_INK = '#8DA0B8';
-const HINT_ICON = '#7D93B3';
+const SOFT_INK = themeTokens.fgMuted;
+const HINT_ICON = themeTokens.fgMuted;
 const FLASH_MS = 1400;
 
 type Victim =
@@ -320,10 +321,10 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
             borderRadius: 12,
             alignItems: 'center',
             justifyContent: 'center',
-            backgroundColor: pressed ? 'rgba(255,255,255,0.06)' : undefined,
+            backgroundColor: pressed ? colors.bgMutedSubtle : undefined,
           })}
         >
-          <ChevronLeft size={22} color={colors.fgAccent} />
+          <ChevronLeft size={24} color={colors.fgAccent} />
         </Pressable>
         <Text
           accessibilityRole="header"
@@ -428,7 +429,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
                   marginTop: 12,
                   marginHorizontal: 2,
                   color: SOFT_INK,
-                  fontSize: 11.5,
+                  fontSize: 12,
                   lineHeight: 17,
                 }}
               >
@@ -443,7 +444,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
                 marginHorizontal: 10,
                 textAlign: 'center',
                 color: SOFT_INK,
-                fontSize: 12.5,
+                fontSize: 13,
                 lineHeight: 19,
               }}
             >
@@ -465,13 +466,13 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
                   marginBottom: 10,
                 }}
               >
-                <ChevronDown size={18} color={HINT_ICON} />
+                <ChevronDown size={20} color={HINT_ICON} />
                 <Text
                   style={{
                     flexShrink: 1,
                     marginTop: 1,
                     color: SOFT_INK,
-                    fontSize: 11.5,
+                    fontSize: 12,
                     lineHeight: 16,
                   }}
                 >
@@ -531,7 +532,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
               marginHorizontal: 10,
               textAlign: 'center',
               color: SOFT_INK,
-              fontSize: 12.5,
+              fontSize: 13,
               lineHeight: 19,
             }}
           >

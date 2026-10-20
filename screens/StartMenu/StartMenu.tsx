@@ -203,13 +203,13 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
       }}
     >
       {icon}
-      <RegText style={{ fontSize: 11.5, fontWeight: '500' }}>{label}</RegText>
+      <RegText style={{ fontSize: 12, fontWeight: '500' }}>{label}</RegText>
     </View>
   );
 
   return (
     <View
-      style={{ flex: 1, backgroundColor: 'transparent' }}
+      style={{ flex: 1 }}
       onLayout={e => setContainerH(e.nativeEvent.layout.height)}
     >
       <Animated.View
@@ -237,7 +237,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
           >
             <RegText
               style={{
-                fontSize: 11.5,
+                fontSize: 12,
                 fontWeight: '600',
                 color: colors.fgWarning,
               }}
@@ -301,7 +301,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
       >
         <Animated.Text
           entering={titleEnter()}
-          style={{ color: colors.fgDefault, fontSize: 35 }}
+          style={{ color: colors.fgDefault, fontSize: 36 }}
         >
           {translate('loadingapp.welcome') as string}
         </Animated.Text>
@@ -320,7 +320,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
           entering={tagEnter()}
           style={{
             color: colors.fgMuted,
-            fontSize: 13.5,
+            fontSize: 13,
             marginTop: 20,
             textAlign: 'center',
             paddingHorizontal: 32,
@@ -334,7 +334,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
             exiting={offlineExit()}
             style={{
               color: colors.fgMuted,
-              fontSize: 10,
+              fontSize: 12,
               lineHeight: 15,
               marginTop: 10,
               textAlign: 'center',
@@ -365,7 +365,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
         >
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 7 }}>
             <TriangleAlert size={16} color={colors.fgDefault} />
-            <BoldText style={{ fontSize: 11, lineHeight: 16 }}>
+            <BoldText style={{ fontSize: 12, lineHeight: 16 }}>
               {
                 translate(
                   freshInstall
@@ -378,14 +378,14 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
           <RegText
             style={{
               marginTop: 6,
-              fontSize: 10.5,
+              fontSize: 12,
               lineHeight: 14,
               color: colors.fgMuted,
             }}
           >
             {translate('loadingapp.previous-install-body') as string}
           </RegText>
-          <RegText style={{ marginTop: 9, fontSize: 10.5, lineHeight: 16 }}>
+          <RegText style={{ marginTop: 9, fontSize: 12, lineHeight: 16 }}>
             {`${
               translate(
                 recoveryWallet.seed
@@ -474,7 +474,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
         <RegText
           style={{
             color: colors.fgMuted,
-            fontSize: 11,
+            fontSize: 12,
             marginTop: 18,
             textAlign: 'center',
           }}

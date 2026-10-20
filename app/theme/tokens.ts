@@ -70,6 +70,9 @@ export type ThemeColors = {
   fgTransparent: string;
   /** The brown pot of the sprout mark, part of the brand. */
   bgSproutPot: string;
+  /** A QR code needs dark on white to scan, whatever the theme. */
+  fgQrInk: string;
+  bgQrPaper: string;
   bgTransparent: string;
 
   /** Contact avatars and chart series; a contact keeps its category for life. */
@@ -153,6 +156,8 @@ export const themeTokens: ThemeColors = {
   bgIronwood: '#241A12',
   fgTransparent: '#E6C46A',
   bgSproutPot: '#5A3A1E',
+  fgQrInk: '#060B12',
+  bgQrPaper: '#FFFFFF',
   bgTransparent: '#E6C46A1F',
 
   fgCategory1: accent,

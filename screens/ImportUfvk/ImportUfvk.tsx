@@ -282,7 +282,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
   const buttonBottom = keyboardHeight > 0 ? keyboardHeight + 12 : BUTTON_BOTTOM;
 
   return (
-    <View style={{ flex: 1, backgroundColor: 'transparent' }}>
+    <View style={{ flex: 1 }}>
       <BoldText
         style={{
           position: 'absolute',
@@ -330,7 +330,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
             marginBottom: 20,
           }}
         >
-          <BoldText style={{ fontSize: 12.5, lineHeight: 16 }}>
+          <BoldText style={{ fontSize: 13, lineHeight: 16 }}>
             {translate('import.seed-label') as string}
           </BoldText>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
@@ -353,12 +353,10 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
                 borderRadius: 9,
                 alignItems: 'center',
                 justifyContent: 'center',
-                backgroundColor: pressed
-                  ? 'rgba(211,226,248,0.08)'
-                  : 'transparent',
+                backgroundColor: pressed ? colors.bgMutedSubtle : undefined,
               })}
             >
-              <ScanIcon size={22} color={colors.fgMuted} />
+              <ScanIcon size={24} color={colors.fgMuted} />
             </Pressable>
           </View>
         </View>
@@ -416,7 +414,6 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
                 height: 42,
                 paddingHorizontal: 15,
                 paddingVertical: 0,
-                backgroundColor: 'transparent',
               }}
               value={birthday}
               onChangeText={(text: string) => {
@@ -468,7 +465,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
             color={colors.fgAccent}
             style={{ marginTop: 1 }}
           />
-          <RegText style={{ flex: 1, fontSize: 9.5, lineHeight: 13 }}>
+          <RegText style={{ flex: 1, fontSize: 12, lineHeight: 13 }}>
             {translate('import.text') as string}
           </RegText>
         </View>
@@ -520,7 +517,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
             justifyContent: 'center',
             zIndex: 3,
             opacity: busy ? 0.4 : 1,
-            backgroundColor: pressed ? colors.bgSurface : 'transparent',
+            backgroundColor: pressed ? colors.bgSurface : undefined,
           })}
         >
           <ChevronLeft size={20} color={colors.fgAccent} />
