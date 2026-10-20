@@ -148,9 +148,8 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
                 style={{
                   color: colors.fgDefault,
                   fontWeight: '600',
-                  fontSize: 14,
+                  fontSize: 15,
                   padding: 10,
-                  backgroundColor: 'transparent',
                 }}
                 value={address}
                 onChangeText={(text: string) => setAddress(text)}
@@ -190,7 +189,7 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
               >
                 <ScanIcon
                   style={{ marginRight: 5 }}
-                  size={28}
+                  size={24}
                   color={colors.fgMuted}
                 />
               </TouchableOpacity>

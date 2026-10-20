@@ -22,7 +22,7 @@ import {
 } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { useNavigation, useScrollToTop } from '@react-navigation/native';
-import { useTheme } from '@app/theme';
+import { useTheme, space20 } from '@app/theme';
 import { ScanIcon } from '@ui/primitives/Icons/ScanIcon';
 import { getNumberFormatSettings } from 'react-native-localize';
 
@@ -1159,7 +1159,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
               <View
                 style={{
                   display: 'flex',
-                  paddingHorizontal: 16,
+                  paddingHorizontal: space20,
                   paddingTop: 5,
                   paddingBottom: 10,
                   marginTop: 0,
@@ -1260,7 +1260,6 @@ const Send: React.FunctionComponent<SendProps> = () => {
                           fontWeight: '600',
                           fontSize: 15,
                           padding: 12,
-                          backgroundColor: 'transparent',
                         }}
                         value={addressText}
                         onChangeText={(text: string) => {
@@ -1358,7 +1357,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
                       >
                         <ScanIcon
                           style={{ marginRight: 5 }}
-                          size={28}
+                          size={24}
                           color={colors.fgMuted}
                         />
                       </TouchableOpacity>
@@ -1473,7 +1472,6 @@ const Send: React.FunctionComponent<SendProps> = () => {
                             fontSize: 16,
                             minHeight: 48,
                             marginLeft: 5,
-                            backgroundColor: 'transparent',
                           }}
                           value={amountText}
                           onChangeText={(text: string) => {
@@ -1507,7 +1505,6 @@ const Send: React.FunctionComponent<SendProps> = () => {
                             fontSize: 16,
                             minHeight: 48,
                             marginLeft: 5,
-                            backgroundColor: 'transparent',
                           }}
                           value={amountCurrencyText}
                           onChangeText={(text: string) => {
@@ -1561,8 +1558,8 @@ const Send: React.FunctionComponent<SendProps> = () => {
                           testID="send.swap-entry"
                         >
                           <Swap
-                            width={28}
-                            height={28}
+                            width={24}
+                            height={24}
                             color={
                               quote.kind === 'none'
                                 ? colors.fgAccentDisabled
@@ -1648,7 +1645,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
                       >
                         <RegText
                           style={{
-                            fontSize: 14,
+                            fontSize: 15,
                             color: spendableBalanceLastError
                               ? colors.fgDanger
                               : colors.fgDefault,
@@ -1668,7 +1665,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
                               style={{ marginLeft: 0, marginRight: 0 }}
                               currencyName={info.currencyName}
                               color={spendableColor}
-                              size={14}
+                              size={15}
                               amtZec={maxAmount}
                               privacy={privacy}
                             />
@@ -1802,7 +1799,6 @@ const Send: React.FunctionComponent<SendProps> = () => {
                             minWidth: 48,
                             minHeight: 48,
                             marginLeft: 5,
-                            backgroundColor: 'transparent',
                             textAlignVertical: 'top',
                           }}
                           value={memoText}
@@ -1921,7 +1917,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
                           style={{
                             marginTop: 0,
                             fontWeight: 'bold',
-                            fontSize: 12.5,
+                            fontSize: 13,
                             color: colors.fgDanger,
                           }}
                         >{`${Utils.countMemoBytes(memoText, includeUAMemoBoolean, defaultUnifiedAddress)} `}</FadeText>
@@ -1968,7 +1964,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
                 )}
                 <View
                   style={{
-                    paddingHorizontal: 16,
+                    paddingHorizontal: space20,
                     flexGrow: 1,
                     flexDirection: 'row',
                     justifyContent: 'center',

@@ -104,7 +104,6 @@ const Memo: React.FunctionComponent<MemoProps> = ({
             minWidth: 48,
             minHeight: 48,
             margin: 5,
-            backgroundColor: 'transparent',
             textAlignVertical: 'top',
           }}
           value={memo}
@@ -136,7 +135,7 @@ const Memo: React.FunctionComponent<MemoProps> = ({
           style={{
             marginTop: 0,
             fontWeight: 'bold',
-            color: memoDisabled ? 'red' : colors.fgDefault,
+            color: memoDisabled ? colors.fgDanger : colors.fgDefault,
             opacity: 1,
           }}
         >{`${Utils.countMemoBytes(memo, includeUAMemoBoolean, defaultUnifiedAddress)} `}</FadeText>

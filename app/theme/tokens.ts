@@ -50,6 +50,11 @@ export type ThemeColors = {
 
   /** Nym's own green, only on actions that go through the mixnet. */
   bgNym: string;
+  bgNymSubtle: string;
+
+  /** A price move: up and down are not success and error. */
+  fgPriceUp: string;
+  fgPriceDown: string;
 
   fgOrchard: string;
   borderOrchard: string;
@@ -127,6 +132,10 @@ export const themeTokens: ThemeColors = {
   bgViewOnlySubtle: '#8FB4E61F',
 
   bgNym: '#07FF94',
+  bgNymSubtle: '#07FF941F',
+
+  fgPriceUp: '#3CC52A',
+  fgPriceDown: '#F2878A',
 
   fgOrchard: '#4E8E96',
   borderOrchard: '#2E5E66',
