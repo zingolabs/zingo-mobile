@@ -1,12 +1,19 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useCallback, useMemo, useState } from 'react';
-import { Linking, Pressable, ScrollView, View } from 'react-native';
+import React, { useCallback, useContext, useMemo, useState } from 'react';
+import {
+  Linking,
+  Pressable,
+  ScrollView,
+  View,
+  useWindowDimensions,
+} from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { useTheme } from '@app/theme';
 
 import BoldText from '@ui/primitives/BoldText';
 import FadeText from '@ui/primitives/FadeText';
 import RegText from '@ui/primitives/RegText';
+import { TextScaleContext } from '@ui/primitives/Text';
 
 import { MenuMorphIcon } from '@ui/widgets/MenuMorphIcon';
 import { MessagesIcon as BoltIcon } from '@ui/primitives/Icons/BoltIcon';
@@ -70,6 +77,13 @@ const OptionsPanel: React.FC<OptionsPanelProps> = ({
   onSettings,
 }) => {
   const { colors } = useTheme();
+  /**
+   * Four cells fit 12 pt labels in two lines; past 1.3× text (or its
+   * simulation in the visual review) the words outgrow them, so two.
+   */
+  const { fontScale } = useWindowDimensions();
+  const simulated = useContext(TextScaleContext);
+  const columns = Math.max(fontScale, simulated) > 1.3 ? 2 : 4;
   // Caption under the social row — set when the user taps X / GitHub so
   // they can read (and re-copy) the URL just placed on the clipboard.
   // Cleared when a different social with no URL is tapped (e.g. mail).
@@ -169,7 +183,7 @@ const OptionsPanel: React.FC<OptionsPanelProps> = ({
               testID={action.testID}
               onPress={action.disabled ? undefined : action.onPress}
               style={({ pressed }) => ({
-                width: '25%',
+                width: columns === 4 ? '25%' : '50%',
                 alignItems: 'center',
                 paddingVertical: 12,
                 opacity: action.disabled ? 0.35 : pressed ? 0.6 : 1,
@@ -207,7 +221,7 @@ const OptionsPanel: React.FC<OptionsPanelProps> = ({
                 )}
               </View>
               <RegText
-                numberOfLines={2}
+                numberOfLines={columns === 4 ? 2 : 3}
                 style={{
                   fontSize: 12,
                   textAlign: 'center',
