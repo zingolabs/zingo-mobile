@@ -111,7 +111,7 @@ const AddressRowHead: React.FunctionComponent<AddressRowHeadProps> = ({
             </View>
           </>
         ) : (
-          <WalletIcon size={18} color={WALLET_INK} strokeWidth={1.7} />
+          <WalletIcon size={18} color={WALLET_INK} />
         )}
       </View>
       <View style={{ flex: 1, minWidth: 0 }}>

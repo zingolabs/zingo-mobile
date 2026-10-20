@@ -19,13 +19,6 @@ import Animated from 'react-native-reanimated';
 import { useOptionsPanelSheetSlide } from '@app/hooks/useOptionsPanelSheetSlide';
 
 import { useTheme } from '@app/theme';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import {
-  faDotCircle,
-  faChevronLeft,
-  faChevronRight,
-} from '@fortawesome/free-solid-svg-icons';
-import { faCircle as farCircle } from '@fortawesome/free-regular-svg-icons';
 
 import RegText from '@ui/primitives/RegText';
 import FadeText from '@ui/primitives/FadeText';
@@ -77,6 +70,9 @@ import { sendEmail } from '@app/services/sendEmail';
 import SaveSheet from '@ui/widgets/SaveSheet';
 import SwitchOff from '../../assets/img/switch-off.svg';
 import SettingSwitchOn from '../../assets/img/setting-switch-on.svg';
+import { ChevronLeft, ChevronRight } from '@ui/primitives/Icons/Chevron';
+import { RadioOffIcon } from '@ui/primitives/Icons/RadioOffIcon';
+import { RadioOnIcon } from '@ui/primitives/Icons/RadioOnIcon';
 
 type Options = {
   value: string;
@@ -494,15 +490,11 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
                 style={{ flexDirection: 'row', alignItems: 'center' }}
                 onPress={() => setOption(typeOption(item.value))}
               >
-                <FontAwesomeIcon
-                  icon={
-                    typeOption(item.value) === valueOption
-                      ? faDotCircle
-                      : farCircle
-                  }
-                  size={16}
-                  color={colors.fgMuted}
-                />
+                {typeOption(item.value) === valueOption ? (
+                  <RadioOnIcon size={16} color={colors.fgMuted} />
+                ) : (
+                  <RadioOffIcon size={16} color={colors.fgMuted} />
+                )}
                 <RegText style={{ marginLeft: 10 }}>
                   {translate(`settings.value-${label}-${item.value}`) as string}
                 </RegText>
@@ -544,11 +536,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
           hitSlop={8}
           style={{ paddingHorizontal: 4, paddingVertical: 4 }}
         >
-          <FontAwesomeIcon
-            icon={faChevronLeft}
-            size={20}
-            color={colors.fgAccent}
-          />
+          <ChevronLeft size={20} color={colors.fgAccent} />
         </TouchableOpacity>
         <BoldText
           numberOfLines={1}
@@ -727,11 +715,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
                         ) as string
                       }
                     </RegText>
-                    <FontAwesomeIcon
-                      icon={faChevronRight}
-                      size={12}
-                      color={colors.fgMuted}
-                    />
+                    <ChevronRight size={16} color={colors.fgMuted} />
                   </View>
                 </TouchableOpacity>
               </View>
@@ -838,11 +822,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
                   <BoldText style={{ color: '#07FF94' }}>
                     {translate('settings.nym-network') as string}
                   </BoldText>
-                  <FontAwesomeIcon
-                    icon={faChevronRight}
-                    size={12}
-                    color={colors.fgMuted}
-                  />
+                  <ChevronRight size={16} color={colors.fgMuted} />
                 </TouchableOpacity>
               )}
 
@@ -877,11 +857,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
                         ) as string
                       }
                     </RegText>
-                    <FontAwesomeIcon
-                      icon={faChevronRight}
-                      size={12}
-                      color={colors.fgMuted}
-                    />
+                    <ChevronRight size={16} color={colors.fgMuted} />
                   </View>
                 </TouchableOpacity>
               </View>
@@ -902,11 +878,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
                 }}
               >
                 <BoldText>{translate('loadedapp.about') as string}</BoldText>
-                <FontAwesomeIcon
-                  icon={faChevronRight}
-                  size={12}
-                  color={colors.fgMuted}
-                />
+                <ChevronRight size={16} color={colors.fgMuted} />
               </TouchableOpacity>
 
               {(!recoveryInfoStored || recoveryInfoSave) && (

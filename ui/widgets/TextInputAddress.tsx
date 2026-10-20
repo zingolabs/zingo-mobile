@@ -3,8 +3,6 @@ import React, { useContext, useEffect, useState } from 'react';
 import { View, TouchableOpacity, TextInput } from 'react-native';
 import { useTheme } from '@app/theme';
 import { ScanIcon } from '@ui/primitives/Icons/ScanIcon';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faCheck, faXmark } from '@fortawesome/free-solid-svg-icons';
 
 import { ContextAppLoaded } from '@app/context';
 import { Request, useResult } from '@app/navigation/results';
@@ -14,6 +12,8 @@ import RegText from '@ui/primitives/RegText';
 import { validateAddressForChain } from '@app/swap';
 import { GlobalConst } from '@app/AppState';
 import { fieldBorder } from '@ui/primitives/fieldBorder';
+import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
+import { XIcon } from '@ui/primitives/Icons/XIcon';
 
 type TextInputAddressProps = {
   address: string;
@@ -105,7 +105,7 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
           >
             <RegText>{translate('send.toaddress') as string}</RegText>
             {validAddress === 1 && (
-              <FontAwesomeIcon icon={faCheck} color={colors.fgAccent} />
+              <CheckIcon size={16} color={colors.fgAccent} />
             )}
             {validAddress === -1 && (
               <ErrorText>
@@ -171,10 +171,9 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
                     setAddress('');
                   }}
                 >
-                  <FontAwesomeIcon
+                  <XIcon
                     style={{ marginRight: 5 }}
                     size={20}
-                    icon={faXmark}
                     color={colors.fgAccentDisabled}
                   />
                 </TouchableOpacity>

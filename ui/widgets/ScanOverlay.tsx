@@ -295,11 +295,7 @@ const ScanOverlay: React.FunctionComponent<ScanOverlayProps> = ({
               hitSlop={8}
               style={{ position: 'absolute', left: 10, padding: 10 }}
             >
-              <ChevronLeft
-                size={22}
-                color={colors.fgAccent}
-                strokeWidth={2.2}
-              />
+              <ChevronLeft size={22} color={colors.fgAccent} />
             </Pressable>
             <Text
               accessibilityRole="header"
@@ -331,7 +327,7 @@ const ScanOverlay: React.FunctionComponent<ScanOverlayProps> = ({
                   backgroundColor: 'rgba(6,32,10,0.9)',
                 }}
               >
-                <CheckIcon size={14} color={colors.fgAccent} strokeWidth={3} />
+                <CheckIcon size={14} color={colors.fgAccent} />
                 <Text
                   style={{
                     color: colors.fgAccent,

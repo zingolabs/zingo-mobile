@@ -23,8 +23,6 @@ import { useOptionsPanelSheetSlide } from '@app/hooks/useOptionsPanelSheetSlide'
 
 import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '@app/theme';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faChevronLeft, faAngleDown } from '@fortawesome/free-solid-svg-icons';
 import BottomSheet from '@gorhom/bottom-sheet';
 
 import { Route, ValueTransferType } from '@app/AppState';
@@ -39,6 +37,7 @@ import Header from '@ui/widgets/Header';
 import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
 import Utils from '@app/utils';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { ChevronDown, ChevronLeft } from '@ui/primitives/Icons/Chevron';
 
 type MessageListProps = NativeStackScreenProps<AppDrawerParamList, 'Messages'>;
 
@@ -94,11 +93,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = () => {
           hitSlop={8}
           style={{ paddingHorizontal: 4, paddingVertical: 4 }}
         >
-          <FontAwesomeIcon
-            icon={faChevronLeft}
-            size={20}
-            color={colors.fgAccent}
-          />
+          <ChevronLeft size={20} color={colors.fgAccent} />
         </TouchableOpacity>
         <BoldText
           numberOfLines={1}
@@ -363,10 +358,9 @@ const MessageList: React.FunctionComponent<MessageListProps> = () => {
               borderColor: colors.borderMuted,
             })}
           >
-            <FontAwesomeIcon
+            <ChevronDown
               style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
               size={16}
-              icon={faAngleDown}
               color={colors.fgMuted}
             />
           </Pressable>

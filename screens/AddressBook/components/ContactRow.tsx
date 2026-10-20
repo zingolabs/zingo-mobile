@@ -291,7 +291,7 @@ const ContactRow: React.FunctionComponent<ContactRowProps> = ({
           ],
         }}
       >
-        <PlaneIcon size={26} color={SWIPE_INK} strokeWidth={1.9} />
+        <PlaneIcon size={26} color={SWIPE_INK} />
       </RNAnimated.View>
     </View>
   );
@@ -434,11 +434,7 @@ const ContactRow: React.FunctionComponent<ContactRowProps> = ({
                   onPress={() => press('send')}
                 >
                   <Animated.View style={flyStyle}>
-                    <PlaneIcon
-                      size={22}
-                      color={colors.fgAccent}
-                      strokeWidth={1.9}
-                    />
+                    <PlaneIcon size={22} color={colors.fgAccent} />
                   </Animated.View>
                 </Action>
               )}
@@ -451,13 +447,9 @@ const ContactRow: React.FunctionComponent<ContactRowProps> = ({
               >
                 <Animated.View style={copyStyle}>
                   {copied ? (
-                    <CheckIcon
-                      size={20}
-                      color={colors.fgAccent}
-                      strokeWidth={2.6}
-                    />
+                    <CheckIcon size={20} color={colors.fgAccent} />
                   ) : (
-                    <CopyIcon size={20} color={INK_CODE} strokeWidth={1.9} />
+                    <CopyIcon size={20} color={INK_CODE} />
                   )}
                 </Animated.View>
               </Action>
@@ -468,7 +460,7 @@ const ContactRow: React.FunctionComponent<ContactRowProps> = ({
                   onPress={() => press('edit')}
                 >
                   <Animated.View style={penStyle}>
-                    <PencilIcon size={20} color={INK_CODE} strokeWidth={1.9} />
+                    <PencilIcon size={20} color={INK_CODE} />
                   </Animated.View>
                   <Animated.View
                     style={[
@@ -497,7 +489,6 @@ const ContactRow: React.FunctionComponent<ContactRowProps> = ({
                   <TrashCan
                     size={20}
                     color={RED}
-                    strokeWidth={1.9}
                     style={StyleSheet.absoluteFill}
                   />
                   <Animated.View
@@ -507,7 +498,7 @@ const ContactRow: React.FunctionComponent<ContactRowProps> = ({
                       lidStyle,
                     ]}
                   >
-                    <TrashLid size={20} color={RED} strokeWidth={1.9} />
+                    <TrashLid size={20} color={RED} />
                   </Animated.View>
                 </View>
               </Action>

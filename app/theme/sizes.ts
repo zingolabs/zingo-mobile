@@ -12,3 +12,5 @@ export const iconSizeSm = 16;
 export const iconSizeMd = 20;
 /** Navigation icons and the drawing grid of every icon. */
 export const iconSize = 24;
+/** The visible stroke of every icon, the same at 16, 20 and 24: the weight of regular text. */
+export const iconStroke = 1.75;

@@ -12,12 +12,6 @@ import Animated, {
   withSequence,
   withTiming,
 } from 'react-native-reanimated';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import {
-  faChevronDown,
-  faDatabase,
-  faWallet,
-} from '@fortawesome/free-solid-svg-icons';
 
 import { useTheme } from '@app/theme';
 import { duration, ease } from '@app/theme/motion';
@@ -28,6 +22,9 @@ import { LoadingDots } from '@ui/widgets/ProgressState';
 import { WalletErrorKind } from '@app/AppState/types/WalletErrorInfo';
 import { ChainNameEnum } from '@app/AppState';
 import { showConfirm } from '@app/services/showConfirm';
+import { DatabaseIcon } from '@ui/primitives/Icons/DatabaseIcon';
+import { ChevronDown } from '@ui/primitives/Icons/Chevron';
+import { WalletIcon } from '@ui/primitives/Icons/WalletIcon';
 
 type WalletErrorProps = {
   kind: WalletErrorKind;
@@ -339,7 +336,7 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
           justifyContent: 'center',
         }}
       >
-        <FontAwesomeIcon icon={faDatabase} color={colors.fgMuted} size={22} />
+        <DatabaseIcon color={colors.fgMuted} size={20} />
         <View
           style={{
             position: 'absolute',
@@ -374,11 +371,11 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
           iconStyle,
         ]}
       >
-        <FontAwesomeIcon
-          icon={kind === 'server' ? faDatabase : faWallet}
-          color={colors.fgDefault}
-          size={28}
-        />
+        {kind === 'server' ? (
+          <DatabaseIcon color={colors.fgDefault} size={24} />
+        ) : (
+          <WalletIcon color={colors.fgDefault} size={24} />
+        )}
         <Animated.View
           pointerEvents="none"
           style={[
@@ -508,11 +505,7 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
             {translate('walleterror.details') as string}
           </RegText>
           <Animated.View style={chevronStyle}>
-            <FontAwesomeIcon
-              icon={faChevronDown}
-              size={10}
-              color={colors.fgMuted}
-            />
+            <ChevronDown size={16} color={colors.fgMuted} />
           </Animated.View>
         </Pressable>
         <View style={{ alignSelf: 'stretch' }}>

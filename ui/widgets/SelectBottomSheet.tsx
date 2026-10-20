@@ -2,8 +2,6 @@
 import React, { forwardRef, useCallback, useMemo, useState } from 'react';
 import { Keyboard, Pressable, View } from 'react-native';
 import { radiusSheet, useTheme } from '@app/theme';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faCheck, faXmark } from '@fortawesome/free-solid-svg-icons';
 import {
   BottomSheetBackdrop,
   BottomSheetBackdropProps,
@@ -16,6 +14,8 @@ import RegText from '@ui/primitives/RegText';
 import SheetRim from '@ui/primitives/SheetRim';
 import SearchField from '@ui/widgets/SearchField';
 import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
+import { XIcon } from '@ui/primitives/Icons/XIcon';
+import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
 
 export type SelectBottomSheetItem = {
   label: string;
@@ -128,11 +128,7 @@ const SelectBottomSheet = forwardRef<BottomSheetModal, SelectBottomSheetProps>(
               hitSlop={8}
               style={{ paddingHorizontal: 14, paddingVertical: 4 }}
             >
-              <FontAwesomeIcon
-                icon={faXmark}
-                size={20}
-                color={colors.fgMuted}
-              />
+              <XIcon size={20} color={colors.fgMuted} />
             </Pressable>
           </View>
         </View>
@@ -176,13 +172,7 @@ const SelectBottomSheet = forwardRef<BottomSheetModal, SelectBottomSheetProps>(
               >
                 {item.label}
               </RegText>
-              {selected && (
-                <FontAwesomeIcon
-                  icon={faCheck}
-                  size={16}
-                  color={colors.fgAccent}
-                />
-              )}
+              {selected && <CheckIcon size={16} color={colors.fgAccent} />}
             </Pressable>
           );
         })}
@@ -257,11 +247,7 @@ const SelectBottomSheet = forwardRef<BottomSheetModal, SelectBottomSheetProps>(
                   hitSlop={8}
                   style={{ padding: 14 }}
                 >
-                  <FontAwesomeIcon
-                    icon={faXmark}
-                    size={20}
-                    color={colors.fgDefault}
-                  />
+                  <XIcon size={20} color={colors.fgDefault} />
                 </Pressable>
               </View>
 

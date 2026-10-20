@@ -23,8 +23,8 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { WalletNavigation } from '@app/types';
 import { useTheme } from '@app/theme';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faUserPlus, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
+import { UserPlusIcon } from '@ui/primitives/Icons/UserPlusIcon';
+import { PlaneIcon } from '@ui/primitives/Icons/PlaneIcon';
 
 type AddressItemProps = {
   address: string;
@@ -188,10 +188,9 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
               paddingBottom: 2,
             }}
           >
-            <FontAwesomeIcon
+            <UserPlusIcon
               style={{ marginTop: 3 }}
               size={20}
-              icon={faUserPlus}
               color={colors.fgAccent}
             />
           </View>
@@ -202,10 +201,9 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
           testID="addressitem.add-contact"
           onPress={() => launchAddTagModal(address, undefined, znsAlias)}
         >
-          <FontAwesomeIcon
+          <UserPlusIcon
             style={{ marginTop: 3 }}
             size={24}
-            icon={faUserPlus}
             color={colors.fgAccent}
           />
         </TouchableOpacity>
@@ -223,10 +221,9 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
             });
           }}
         >
-          <FontAwesomeIcon
+          <PlaneIcon
             style={{ marginTop: 3 }}
             size={24}
-            icon={faPaperPlane}
             color={colors.fgAccent}
           />
         </TouchableOpacity>

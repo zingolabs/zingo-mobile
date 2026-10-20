@@ -2,18 +2,15 @@
 import React, { useState } from 'react';
 import { Pressable, Text, TextStyle, View } from 'react-native';
 import Animated, { FadeIn, ReduceMotion } from 'react-native-reanimated';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import {
-  faCheck,
-  faChevronRight,
-  faXmark,
-} from '@fortawesome/free-solid-svg-icons';
 
 import { useTheme } from '@app/theme';
 import { ChainNameEnum } from '@app/AppState';
 import RegText from '@ui/primitives/RegText';
 import BoldText from '@ui/primitives/BoldText';
 import { ROW_DIVIDER } from './ServerRow';
+import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
+import { XIcon } from '@ui/primitives/Icons/XIcon';
+import { ChevronRight } from '@ui/primitives/Icons/Chevron';
 
 export type LogTone = 'ok' | 'bad' | 'warn' | 'mut' | '';
 
@@ -142,9 +139,9 @@ const ServerLog: React.FC<ServerLogProps> = ({
                 }}
               >
                 {line.tone === 'ok' ? (
-                  <FontAwesomeIcon icon={faCheck} size={10} color={OK_TEXT} />
+                  <CheckIcon size={16} color={OK_TEXT} />
                 ) : line.tone === 'bad' ? (
-                  <FontAwesomeIcon icon={faXmark} size={10} color={PINK} />
+                  <XIcon size={16} color={PINK} />
                 ) : (
                   <RegText style={{ ...MONO, color: colors.fgMuted }}>
                     ·
@@ -182,11 +179,7 @@ const ServerLog: React.FC<ServerLogProps> = ({
                     transform: [{ rotate: open[i] ? '90deg' : '0deg' }],
                   }}
                 >
-                  <FontAwesomeIcon
-                    icon={faChevronRight}
-                    size={9}
-                    color={colors.fgAccent}
-                  />
+                  <ChevronRight size={16} color={colors.fgAccent} />
                 </View>
                 <BoldText style={{ fontSize: 11, color: colors.fgAccent }}>
                   {detailsLabel}

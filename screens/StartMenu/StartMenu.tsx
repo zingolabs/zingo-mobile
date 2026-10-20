@@ -9,13 +9,6 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useTheme } from '@app/theme';
 
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import {
-  faCheck,
-  faTriangleExclamation,
-  faWifi,
-} from '@fortawesome/free-solid-svg-icons';
-
 import { ContextAppLoading } from '@app/context';
 import { WalletType } from '@app/AppState';
 import { getZingoName, getZingoVersion } from '@app/utils/ZingoAppData';
@@ -24,6 +17,9 @@ import BoldText from '@ui/primitives/BoldText';
 import BusyButton from '@ui/widgets/BusyButton';
 import ServerIcon from '@ui/widgets/ServerIcon';
 import { ease } from '@app/theme/motion';
+import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
+import { WifiIcon } from '@ui/primitives/Icons/WifiIcon';
+import { TriangleAlert } from '@ui/primitives/Icons/TriangleAlert';
 
 // Vertical positions from the 402 x 874 design, as fractions of the height.
 const TITLE_TOP = 294 / 874;
@@ -282,20 +278,12 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
               ? chip(
                   translate('loadingapp.back-online') as string,
                   true,
-                  <FontAwesomeIcon
-                    icon={faCheck}
-                    size={12}
-                    color={colors.fgAccent}
-                  />,
+                  <CheckIcon size={16} color={colors.fgAccent} />,
                 )
               : chip(
                   translate('loadingapp.no-internet') as string,
                   false,
-                  <FontAwesomeIcon
-                    icon={faWifi}
-                    size={12}
-                    color={colors.fgDanger}
-                  />,
+                  <WifiIcon size={16} color={colors.fgDanger} />,
                 )}
           </Animated.View>
         </Animated.View>
@@ -376,11 +364,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
           }}
         >
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 7 }}>
-            <FontAwesomeIcon
-              icon={faTriangleExclamation}
-              size={11}
-              color={colors.fgDefault}
-            />
+            <TriangleAlert size={16} color={colors.fgDefault} />
             <BoldText style={{ fontSize: 11, lineHeight: 16 }}>
               {
                 translate(

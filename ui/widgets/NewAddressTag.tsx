@@ -1,8 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState } from 'react';
 import { Keyboard, TextInput, TouchableOpacity, View } from 'react-native';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faXmark } from '@fortawesome/free-solid-svg-icons';
 
 import { useTheme } from '@app/theme';
 import { AddressBookFileClass, GlobalConst } from '@app/AppState';
@@ -14,6 +12,7 @@ import Button from '@ui/primitives/Button';
 import RegText from '@ui/primitives/RegText';
 import ChainSelect from '@ui/widgets/ChainSelect';
 import { fieldBorder } from '@ui/primitives/fieldBorder';
+import { XIcon } from '@ui/primitives/Icons/XIcon';
 
 const NAME_MAX = 32;
 
@@ -109,10 +108,9 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
           />
           {!!label && (
             <TouchableOpacity onPress={() => setLabel('')}>
-              <FontAwesomeIcon
+              <XIcon
                 style={{ marginRight: 10 }}
                 size={20}
-                icon={faXmark}
                 color={colors.fgMuted}
               />
             </TouchableOpacity>

@@ -18,8 +18,6 @@ import { useFocusEffect } from '@react-navigation/native';
 import { useTheme } from '@app/theme';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useKeepAwake } from '@sayem314/react-native-keep-awake';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faCheck } from '@fortawesome/free-solid-svg-icons';
 
 import BoldText from '@ui/primitives/BoldText';
 import Button from '@ui/primitives/Button';
@@ -33,6 +31,7 @@ import useTrickleProgress from '@app/hooks/useTrickleProgress';
 import { planIronwoodMigration, quickSplit } from '@app/walletBackend';
 import { RPCSplitOutcomeType } from '@app/walletBackend/types/RPCSplitOutcomeType';
 import { RPCMigrationPlanType } from '@app/walletBackend/types/RPCMigrationPlanType';
+import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
 
 type MigrationSplittingProps = NativeStackScreenProps<
   AppDrawerParamList,
@@ -453,11 +452,7 @@ const MigrationSplitting: React.FunctionComponent<MigrationSplittingProps> = ({
                 marginBottom: 14,
               }}
             >
-              <FontAwesomeIcon
-                icon={faCheck}
-                size={16}
-                color={colors.fgAccent}
-              />
+              <CheckIcon size={16} color={colors.fgAccent} />
               <Text
                 style={{
                   color: colors.fgDefault,

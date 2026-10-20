@@ -2,11 +2,10 @@
 import React, { useContext } from 'react';
 import { Text, View } from 'react-native';
 import { useTheme } from '@app/theme';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faCheck } from '@fortawesome/free-solid-svg-icons';
 
 import { AppTheme } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
+import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
 
 type StepCircleProps = {
   label: string;
@@ -36,7 +35,7 @@ const StepCircle: React.FunctionComponent<StepCircleProps> = ({
       }}
     >
       {done ? (
-        <FontAwesomeIcon icon={faCheck} size={14} color={fgColor} />
+        <CheckIcon size={16} color={fgColor} />
       ) : (
         <Text style={{ color: fgColor, fontSize: 14, fontWeight: '700' }}>
           {label}

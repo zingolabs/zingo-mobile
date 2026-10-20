@@ -60,7 +60,7 @@ const ViewOnlyNotice: React.FunctionComponent<ViewOnlyNoticeProps> = ({
           justifyContent: 'center',
         }}
       >
-        <SnowflakeIcon size={16} color={colors.fgViewOnly} strokeWidth={1.9} />
+        <SnowflakeIcon size={16} color={colors.fgViewOnly} />
       </View>
       <View style={{ flex: 1 }}>
         <Text
@@ -114,7 +114,7 @@ const ViewOnlyNotice: React.FunctionComponent<ViewOnlyNoticeProps> = ({
           backgroundColor: pressed ? 'rgba(211,226,248,0.08)' : undefined,
         })}
       >
-        <XIcon size={14} color={colors.fgMuted} strokeWidth={2} />
+        <XIcon size={14} color={colors.fgMuted} />
       </Pressable>
     </View>
   );

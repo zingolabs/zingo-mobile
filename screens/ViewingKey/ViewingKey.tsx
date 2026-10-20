@@ -234,7 +234,7 @@ const ViewingKey: React.FunctionComponent<ViewingKeyProps> = ({
               backgroundColor: pressed ? 'rgba(255,255,255,0.06)' : undefined,
             })}
           >
-            <ChevronLeft size={22} color={colors.fgAccent} strokeWidth={2.2} />
+            <ChevronLeft size={22} color={colors.fgAccent} />
           </Pressable>
           <Text
             accessibilityRole="header"
@@ -305,7 +305,7 @@ const ViewingKey: React.FunctionComponent<ViewingKeyProps> = ({
                   justifyContent: 'center',
                 }}
               >
-                <Icon size={16} color={colors.fgViewOnly} strokeWidth={1.9} />
+                <Icon size={16} color={colors.fgViewOnly} />
               </View>
               <Text
                 style={{

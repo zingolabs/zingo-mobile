@@ -7,20 +7,16 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import {
-  IconDefinition,
-  faChevronLeft,
-  faChevronRight,
-  faClockRotateLeft,
-  faKeyboard,
-} from '@fortawesome/free-solid-svg-icons';
 
 import { useTheme } from '@app/theme';
 import { ease } from '@app/theme/motion';
 import { ContextAppLoading } from '@app/context';
 import RegText from '@ui/primitives/RegText';
 import BoldText from '@ui/primitives/BoldText';
+import { ChevronLeft, ChevronRight } from '@ui/primitives/Icons/Chevron';
+import { HistoryIcon } from '@ui/primitives/Icons/HistoryIcon';
+import { Icon } from '@ui/primitives/Icons/Icon';
+import { KeyboardIcon } from '@ui/primitives/Icons/KeyboardIcon';
 
 type ImportChooserProps = {
   busy: boolean;
@@ -38,7 +34,7 @@ const PRESS_MS = 100;
 const PRESS_SCALE = 0.985;
 
 type OptionProps = {
-  icon: IconDefinition;
+  icon: React.ComponentType<React.ComponentProps<typeof Icon>>;
   iconBg: string;
   iconColor: string;
   title: string;
@@ -50,7 +46,7 @@ type OptionProps = {
 };
 
 const Option: React.FC<OptionProps> = ({
-  icon,
+  icon: OptionIcon,
   iconBg,
   iconColor,
   title,
@@ -108,7 +104,7 @@ const Option: React.FC<OptionProps> = ({
             justifyContent: 'center',
           }}
         >
-          <FontAwesomeIcon icon={icon} size={17} color={iconColor} />
+          <OptionIcon size={16} color={iconColor} />
         </View>
         <View style={{ flex: 1 }}>
           <BoldText style={{ fontSize: 14, lineHeight: 19 }}>{title}</BoldText>
@@ -123,11 +119,7 @@ const Option: React.FC<OptionProps> = ({
             {sub}
           </RegText>
         </View>
-        <FontAwesomeIcon
-          icon={faChevronRight}
-          size={12}
-          color={colors.fgMuted}
-        />
+        <ChevronRight size={16} color={colors.fgMuted} />
       </Animated.View>
     </Pressable>
   );
@@ -181,7 +173,7 @@ const ImportChooser: React.FunctionComponent<ImportChooserProps> = ({
       >
         <Option
           testID="import.chooser.previous"
-          icon={faClockRotateLeft}
+          icon={HistoryIcon}
           iconBg={colors.bgAccentSubtle}
           iconColor={colors.fgAccent}
           title={translate('import.chooser-previous') as string}
@@ -206,7 +198,7 @@ const ImportChooser: React.FunctionComponent<ImportChooserProps> = ({
         </RegText>
         <Option
           testID="import.chooser.seed"
-          icon={faKeyboard}
+          icon={KeyboardIcon}
           iconBg={colors.bgAccentSubtle}
           iconColor={colors.fgAccent}
           title={translate('import.chooser-seed') as string}
@@ -234,11 +226,7 @@ const ImportChooser: React.FunctionComponent<ImportChooserProps> = ({
           backgroundColor: pressed ? colors.bgSurface : 'transparent',
         })}
       >
-        <FontAwesomeIcon
-          icon={faChevronLeft}
-          size={18}
-          color={colors.fgAccent}
-        />
+        <ChevronLeft size={20} color={colors.fgAccent} />
       </Pressable>
     </View>
   );

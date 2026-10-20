@@ -8,8 +8,6 @@ import Animated, {
   withSequence,
   withTiming,
 } from 'react-native-reanimated';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faCheck } from '@fortawesome/free-solid-svg-icons';
 
 import { useTheme } from '@app/theme';
 import { ease } from '@app/theme/motion';
@@ -20,6 +18,7 @@ import { LoadingDots } from '@ui/widgets/ProgressState';
 import ServerLog, { LogLine } from './ServerLog';
 import { DEFAULT_PORT, schemeFor } from './useCustomServer';
 import { fieldBorder } from '@ui/primitives/fieldBorder';
+import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
 
 const PLACEHOLDER = '#3F5677';
 const SAVE_OFF_BG = '#0F3A12';
@@ -308,7 +307,7 @@ const CustomServerBox: React.FC<CustomServerBoxProps> = ({
               <LoadingDots size={6} gap={5} color={colors.bgCanvas} />
             ) : saved ? (
               <>
-                <FontAwesomeIcon icon={faCheck} size={11} color={OK_TEXT} />
+                <CheckIcon size={16} color={OK_TEXT} />
                 <BoldText style={{ fontSize: 12.5, color: OK_TEXT }}>
                   {labels.saved}
                 </BoldText>

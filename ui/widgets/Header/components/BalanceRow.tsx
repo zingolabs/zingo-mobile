@@ -11,8 +11,6 @@ import Animated, {
 import { useNavigation } from '@react-navigation/native';
 import { WalletNavigation } from '@app/types';
 import { useTheme } from '@app/theme';
-import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
   Route,
   ServerType,
@@ -37,6 +35,7 @@ import RegText from '@ui/primitives/RegText';
 import ZecAmount from '@ui/widgets/ZecAmount';
 import PrivacyToggle from './PrivacyToggle';
 import { poolsWorthALook } from './poolsWorthALook';
+import { InfoIcon } from '@ui/primitives/Icons/InfoIcon';
 
 const BALANCE_BOTTOM_GAP = 20;
 const TINT_HOLD_MS = 900;
@@ -210,11 +209,7 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
                     minHeight: 25,
                   }}
                 >
-                  <FontAwesomeIcon
-                    icon={faInfoCircle}
-                    size={20}
-                    color={colors.fgAccent}
-                  />
+                  <InfoIcon size={20} color={colors.fgAccent} />
                 </View>
               </TouchableOpacity>
             )}

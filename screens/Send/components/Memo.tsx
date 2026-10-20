@@ -10,14 +10,13 @@ import {
   NativeSyntheticEvent,
 } from 'react-native';
 import { useTheme } from '@app/theme';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faXmark } from '@fortawesome/free-solid-svg-icons';
 
 import { GlobalConst, TranslateType } from '@app/AppState';
 import Utils from '@app/utils';
 import FadeText from '@ui/primitives/FadeText';
 import Button from '@ui/primitives/Button';
 import { fieldBorder } from '@ui/primitives/fieldBorder';
+import { XIcon } from '@ui/primitives/Icons/XIcon';
 
 type MemoProps = {
   closeSheet: () => void;
@@ -117,10 +116,9 @@ const Memo: React.FunctionComponent<MemoProps> = ({
         />
         {memo ? (
           <TouchableOpacity onPress={() => setMemo('')}>
-            <FontAwesomeIcon
+            <XIcon
               style={{ margin: 10 }}
               size={20}
-              icon={faXmark}
               color={colors.fgAccentDisabled}
             />
           </TouchableOpacity>

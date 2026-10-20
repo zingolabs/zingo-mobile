@@ -533,7 +533,7 @@ ${translate('seedbackup.birthday') as string}: ${birthday}`;
                       : undefined,
                   })}
                 >
-                  <XIcon size={18} color={colors.fgMuted} strokeWidth={1.8} />
+                  <XIcon size={18} color={colors.fgMuted} />
                 </Pressable>
               </Animated.View>
             )}
