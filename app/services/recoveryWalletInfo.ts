@@ -1,4 +1,5 @@
 import * as Keychain from 'react-native-keychain';
+import { defaultTo } from 'lodash';
 import { GlobalConst, WalletType } from '@app/AppState';
 import {
   buildBaseOptions,
@@ -121,11 +122,16 @@ export const saveRecoveryWalletInfo = async (
   return result;
 };
 
+/**
+ * Earlier releases dropped a birthday of 0 when saving, so an entry can
+ * hold the phrase without one.
+ */
 export const getRecoveryWalletInfo = async (): Promise<WalletType> => {
   const password = await readRecoveryWalletInfo();
   if (password) {
     try {
-      return JSON.parse(password) as WalletType;
+      const saved: WalletType = JSON.parse(password);
+      return { ...saved, birthday: defaultTo(saved.birthday, 0) };
     } catch (error) {
       console.log('Error parsing recovery keys:', error);
     }
