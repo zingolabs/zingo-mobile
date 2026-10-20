@@ -54,40 +54,24 @@ const parseServerURI = (uri: string): ParseServerUriResult => {
   }
 
   let port = parsedUri.port;
-
   if (!port) {
-    // I need to verify if the URI have a standard port like `443` or `80`
     if (
       parsedUri.protocol === GlobalConst.http &&
       authority(uri).endsWith(':' + GlobalConst.port80)
     ) {
-      // looking for 80
       port = GlobalConst.port80;
     }
     if (
       parsedUri.protocol === GlobalConst.https &&
       authority(uri).endsWith(':' + GlobalConst.port443)
     ) {
-      // looking for 443
       port = GlobalConst.port443;
-    }
-    // by default              -> 9067
-    // for some `lightwalletd` ->  443
-    // for `zec.rocks`         ->  443
-    if (!port) {
-      const hostname = parsedUri.hostname.replace(/\.$/, '');
-      port =
-        /^(na|sa|eu|ai)\.lightwalletd\.com$/.test(hostname) ||
-        hostname === 'zec.rocks' ||
-        hostname.endsWith('.zec.rocks')
-          ? GlobalConst.port443
-          : GlobalConst.port9067;
     }
   }
 
   return {
     kind: 'canonicalUri',
-    uri: `${parsedUri.protocol}//${parsedUri.hostname}:${port}`,
+    uri: `${parsedUri.protocol}//${parsedUri.hostname}${port ? `:${port}` : ''}`,
   };
 };
 

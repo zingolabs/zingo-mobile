@@ -25,8 +25,8 @@ const CHAINS: string[] = [
   ChainNameEnum.regtestChainName,
 ];
 const HOST = /^[a-z0-9.-]+$/i;
-// The port a server gets when its box is left empty.
-export const DEFAULT_PORT = '443';
+export const addressOf = (host: string, port: string) =>
+  port ? `${host}:${port}` : host;
 
 export const schemeFor = (chain: ChainNameEnum) =>
   chain === ChainNameEnum.regtestChainName ? 'http://' : 'https://';
@@ -101,7 +101,7 @@ export const useCustomServer = ({
   // The address in the field, as Zingo stores it; null while it is not one.
   const uriOf = (chain: ChainNameEnum, d: Draft = draft(chain)) => {
     const parsed = parseServerURI(
-      `${schemeFor(chain)}${d.host.trim()}:${d.port.trim() || DEFAULT_PORT}`,
+      `${schemeFor(chain)}${addressOf(d.host.trim(), d.port.trim())}`,
     );
     return parsed.kind === 'error' ? null : parsed.uri;
   };
@@ -158,7 +158,7 @@ export const useCustomServer = ({
   ): Promise<boolean> => {
     const d = draft(chain);
     const host = d.host.trim();
-    const port = d.port.trim() || DEFAULT_PORT;
+    const port = d.port.trim();
     update(chain, x => ({ ...x, log: [], shown: 0, tested: null }));
     if (!host) {
       return fail(chain, [final('bad', t('need-host'))]);
@@ -166,12 +166,16 @@ export const useCustomServer = ({
     if (!HOST.test(host)) {
       return fail(chain, [final('bad', t('host-only'))]);
     }
-    const parsed = parseServerURI(`${schemeFor(chain)}${host}:${port}`);
+    const parsed = parseServerURI(
+      `${schemeFor(chain)}${addressOf(host, port)}`,
+    );
     if (parsed.kind === 'error') {
       return fail(chain, [final('bad', translate(parsed.errorKey) as string)]);
     }
     setWorking(fromSave ? 'save' : 'test');
-    append(chain, [step('', t('log-testing', { host, port }))]);
+    append(chain, [
+      step('', t('log-testing', { address: addressOf(host, port) })),
+    ]);
     if (!online) {
       setWorking(null);
       return fail(chain, [
@@ -202,14 +206,17 @@ export const useCustomServer = ({
     if (probe.outcome === 'unreachable') {
       return fail(chain, [
         reached,
-        step('bad', t('fail-connect', { host, port }), probe.cause),
+        step('bad', t('fail-connect', { host, port: probe.port }), probe.cause),
         final('bad', t('fix-noanswer')),
       ]);
     }
     if (probe.outcome === 'noAnswer') {
       return fail(chain, [
         reached,
-        step('bad', t('fail-noanswer', { port, seconds: probe.afterSeconds })),
+        step(
+          'bad',
+          t('fail-noanswer', { port: probe.port, seconds: probe.afterSeconds }),
+        ),
         final('bad', t('fix-noanswer')),
       ]);
     }

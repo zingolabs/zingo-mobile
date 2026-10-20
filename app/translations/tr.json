@@ -716,7 +716,7 @@
     "port": "Port",
     "need-host": "Önce sunucu adresini girin.",
     "host-only": "Buraya yalnızca adresi yazın, örneğin your-node.example.",
-    "log-testing": "{host}:{port} test ediliyor…",
+    "log-testing": "{address} test ediliyor…",
     "log-dns": "DNS çözümlendi: {ip}",
     "log-literal": "Adres kullanılıyor: {ip}",
     "log-info": "GetLightdInfo {ms} ms içinde yanıt verdi",

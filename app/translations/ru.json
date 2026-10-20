@@ -716,7 +716,7 @@
     "port": "Порт",
     "need-host": "Сначала введите хост сервера.",
     "host-only": "Введите здесь только хост, например your-node.example.",
-    "log-testing": "Проверка {host}:{port}…",
+    "log-testing": "Проверка {address}…",
     "log-dns": "DNS: {ip}",
     "log-literal": "Адрес {ip}",
     "log-info": "GetLightdInfo ответил за {ms} мс",
