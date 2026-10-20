@@ -563,80 +563,72 @@ exports[`Component History - test History privacy high - snapshot 1`] = `
                          
                         ZEC
                       </Text>
+                    </View>
+                    <View
+                      style={
+                        {
+                          "alignSelf": "center",
+                        }
+                      }
+                    >
                       <View
-                        style={
+                        accessibilityRole="button"
+                        accessibilityState={
                           {
-                            "marginTop": 4,
+                            "busy": undefined,
+                            "checked": undefined,
+                            "disabled": false,
+                            "expanded": undefined,
+                            "selected": undefined,
                           }
                         }
+                        accessibilityValue={
+                          {
+                            "max": undefined,
+                            "min": undefined,
+                            "now": undefined,
+                            "text": undefined,
+                          }
+                        }
+                        accessible={true}
+                        collapsable={false}
+                        focusable={true}
+                        onClick={[Function]}
+                        onResponderGrant={[Function]}
+                        onResponderMove={[Function]}
+                        onResponderRelease={[Function]}
+                        onResponderTerminate={[Function]}
+                        onResponderTerminationRequest={[Function]}
+                        onStartShouldSetResponder={[Function]}
+                        style={
+                          {
+                            "alignItems": "center",
+                            "backgroundColor": "#18bd18",
+                            "borderRadius": 999,
+                            "justifyContent": "center",
+                            "maxWidth": "100%",
+                            "minHeight": 44,
+                            "opacity": 1,
+                            "paddingHorizontal": 24,
+                            "paddingVertical": 8,
+                          }
+                        }
+                        testID="ironwoodbanner.start"
                       >
-                        <View
-                          accessibilityRole="button"
-                          accessibilityState={
-                            {
-                              "busy": undefined,
-                              "checked": undefined,
-                              "disabled": false,
-                              "expanded": undefined,
-                              "selected": undefined,
-                            }
-                          }
-                          accessibilityValue={
-                            {
-                              "max": undefined,
-                              "min": undefined,
-                              "now": undefined,
-                              "text": undefined,
-                            }
-                          }
-                          accessible={true}
-                          collapsable={false}
-                          focusable={true}
-                          hitSlop={
-                            {
-                              "bottom": 6,
-                              "top": 6,
-                            }
-                          }
-                          onClick={[Function]}
-                          onResponderGrant={[Function]}
-                          onResponderMove={[Function]}
-                          onResponderRelease={[Function]}
-                          onResponderTerminate={[Function]}
-                          onResponderTerminationRequest={[Function]}
-                          onStartShouldSetResponder={[Function]}
+                        <Text
+                          maxFontSizeMultiplier={1.5}
                           style={
                             {
-                              "alignItems": "center",
-                              "alignSelf": "stretch",
-                              "backgroundColor": "#18bd18",
-                              "borderRadius": 999,
-                              "justifyContent": "center",
-                              "maxWidth": "100%",
-                              "minHeight": 32,
-                              "opacity": 1,
-                              "paddingHorizontal": 24,
-                              "paddingVertical": 0,
-                              "width": "100%",
+                              "color": "#060B12",
+                              "fontSize": 16,
+                              "fontWeight": "700",
+                              "lineHeight": 20,
+                              "textAlign": "center",
                             }
                           }
-                          testID="ironwoodbanner.start"
                         >
-                          <Text
-                            maxFontSizeMultiplier={1.5}
-                            style={
-                              {
-                                "color": "#060B12",
-                                "fontSize": 13,
-                                "fontWeight": "700",
-                                "lineHeight": 18,
-                                "textAlign": "center",
-                              }
-                            }
-                          >
-                            text translated
-                          </Text>
-                        </View>
+                          text translated
+                        </Text>
                       </View>
                     </View>
                   </View>
@@ -1604,80 +1596,72 @@ exports[`Component History - test History privacy normal - snapshot 1`] = `
                          
                         ZEC
                       </Text>
+                    </View>
+                    <View
+                      style={
+                        {
+                          "alignSelf": "center",
+                        }
+                      }
+                    >
                       <View
-                        style={
+                        accessibilityRole="button"
+                        accessibilityState={
                           {
-                            "marginTop": 4,
+                            "busy": undefined,
+                            "checked": undefined,
+                            "disabled": false,
+                            "expanded": undefined,
+                            "selected": undefined,
                           }
                         }
+                        accessibilityValue={
+                          {
+                            "max": undefined,
+                            "min": undefined,
+                            "now": undefined,
+                            "text": undefined,
+                          }
+                        }
+                        accessible={true}
+                        collapsable={false}
+                        focusable={true}
+                        onClick={[Function]}
+                        onResponderGrant={[Function]}
+                        onResponderMove={[Function]}
+                        onResponderRelease={[Function]}
+                        onResponderTerminate={[Function]}
+                        onResponderTerminationRequest={[Function]}
+                        onStartShouldSetResponder={[Function]}
+                        style={
+                          {
+                            "alignItems": "center",
+                            "backgroundColor": "#18bd18",
+                            "borderRadius": 999,
+                            "justifyContent": "center",
+                            "maxWidth": "100%",
+                            "minHeight": 44,
+                            "opacity": 1,
+                            "paddingHorizontal": 24,
+                            "paddingVertical": 8,
+                          }
+                        }
+                        testID="ironwoodbanner.start"
                       >
-                        <View
-                          accessibilityRole="button"
-                          accessibilityState={
-                            {
-                              "busy": undefined,
-                              "checked": undefined,
-                              "disabled": false,
-                              "expanded": undefined,
-                              "selected": undefined,
-                            }
-                          }
-                          accessibilityValue={
-                            {
-                              "max": undefined,
-                              "min": undefined,
-                              "now": undefined,
-                              "text": undefined,
-                            }
-                          }
-                          accessible={true}
-                          collapsable={false}
-                          focusable={true}
-                          hitSlop={
-                            {
-                              "bottom": 6,
-                              "top": 6,
-                            }
-                          }
-                          onClick={[Function]}
-                          onResponderGrant={[Function]}
-                          onResponderMove={[Function]}
-                          onResponderRelease={[Function]}
-                          onResponderTerminate={[Function]}
-                          onResponderTerminationRequest={[Function]}
-                          onStartShouldSetResponder={[Function]}
+                        <Text
+                          maxFontSizeMultiplier={1.5}
                           style={
                             {
-                              "alignItems": "center",
-                              "alignSelf": "stretch",
-                              "backgroundColor": "#18bd18",
-                              "borderRadius": 999,
-                              "justifyContent": "center",
-                              "maxWidth": "100%",
-                              "minHeight": 32,
-                              "opacity": 1,
-                              "paddingHorizontal": 24,
-                              "paddingVertical": 0,
-                              "width": "100%",
+                              "color": "#060B12",
+                              "fontSize": 16,
+                              "fontWeight": "700",
+                              "lineHeight": 20,
+                              "textAlign": "center",
                             }
                           }
-                          testID="ironwoodbanner.start"
                         >
-                          <Text
-                            maxFontSizeMultiplier={1.5}
-                            style={
-                              {
-                                "color": "#060B12",
-                                "fontSize": 13,
-                                "fontWeight": "700",
-                                "lineHeight": 18,
-                                "textAlign": "center",
-                              }
-                            }
-                          >
-                            text translated
-                          </Text>
-                        </View>
+                          text translated
+                        </Text>
                       </View>
                     </View>
                   </View>

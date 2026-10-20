@@ -455,11 +455,12 @@ const IronwoodMigrationBanner: React.FunctionComponent<
       <Banner
         tone="warning"
         title={translate('ironwoodbanner.pool') as string}
+        actionBeside
         action={
           <Button
             testID="ironwoodbanner.start"
             variant="primary"
-            size="small"
+            inline
             title={translate('ironwoodbanner.start') as string}
             onPress={onStart}
           />

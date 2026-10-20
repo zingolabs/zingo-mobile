@@ -53,11 +53,13 @@ const SeedBackupNotice: React.FunctionComponent<SeedBackupNoticeProps> = ({
         <Tag tone="warning">{translate('seednotice.pending') as string}</Tag>
       }
       contentStyle={contents}
+      actionBeside
       action={
         <Button
           testID="seedbackup.start"
           variant="primary"
           size="small"
+          inline
           title={translate('seednotice.button') as string}
           onPress={open}
         />

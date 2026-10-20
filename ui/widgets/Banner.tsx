@@ -32,6 +32,11 @@ type BannerProps = {
   tag?: React.ReactNode;
   /** A `Button` with `size="small"`. */
   action?: React.ReactNode;
+  /**
+   * Beside the text, centered, instead of under it: a call to act the card
+   * is built around (Back up, Start), with an `inline` button.
+   */
+  actionBeside?: boolean;
   onDismiss?: () => void;
   dismissLabel?: string;
   dismissTestID?: string;
@@ -60,6 +65,7 @@ const Banner = forwardRef<View, BannerProps>(function Banner(
     dismissLabel,
     dismissTestID,
     contentStyle,
+    actionBeside = false,
     testID,
   },
   ref,
@@ -136,10 +142,13 @@ const Banner = forwardRef<View, BannerProps>(function Banner(
               {children}
             </Text>
           )}
-          {action !== undefined && (
+          {action !== undefined && !actionBeside && (
             <View style={{ marginTop: space4 }}>{action}</View>
           )}
         </View>
+        {action !== undefined && actionBeside && (
+          <View style={{ alignSelf: 'center' }}>{action}</View>
+        )}
         {onDismiss && (
           <Pressable
             testID={dismissTestID}
