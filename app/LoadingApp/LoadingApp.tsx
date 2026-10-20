@@ -100,7 +100,7 @@ import {
   probeUri,
   recommendedServers,
 } from '@app/services/serverPicking';
-import { isEqual } from 'lodash';
+import { defaultTo, isEqual, max } from 'lodash';
 import {
   createUpdateRecoveryWalletInfo,
   getRecoveryWalletInfo,
@@ -1337,29 +1337,17 @@ export class LoadingAppClass extends Component<
       }
     }
 
-    let walletBirthday = birthday.toString() || '0';
-    if (parseInt(walletBirthday, 10) < 0) {
-      walletBirthday = '0';
-    }
-    if (isNaN(parseInt(walletBirthday, 10))) {
-      walletBirthday = '0';
-    }
-
-    // birthday cannot be lower than sapling activation height
-    if (
-      Number(walletBirthday) < activationHeight[this.state.server.chainName]
-    ) {
-      // no reporting button, no needed.
-      createAlert(
-        this.setBackgroundError,
-        this.addLastSnackbar,
-        this.state.translate('loadingapp.invalidbirthday-label') as string,
-        this.state.translate('loadingapp.invalidbirthday-error') as string,
-        false,
-        this.state.translate,
-      );
-      return;
-    }
+    /**
+     * zingolib refuses a birthday below Sapling activation, and no shielded
+     * note exists below it, so an empty field, a saved 0 or a lower height
+     * all start at activation.
+     */
+    const walletBirthday = String(
+      max([
+        Math.trunc(defaultTo(birthday, 0)),
+        activationHeight[this.state.server.chainName],
+      ]),
+    );
 
     this.setState({
       actionButtonsDisabled: true,
