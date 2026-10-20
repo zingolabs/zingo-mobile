@@ -528,12 +528,10 @@ ${translate('seedbackup.birthday') as string}: ${birthday}`;
                     borderRadius: 12,
                     alignItems: 'center',
                     justifyContent: 'center',
-                    backgroundColor: pressed
-                      ? 'rgba(255,255,255,0.06)'
-                      : undefined,
+                    backgroundColor: pressed ? colors.bgMutedSubtle : undefined,
                   })}
                 >
-                  <XIcon size={18} color={colors.fgMuted} />
+                  <XIcon size={20} color={colors.fgMuted} />
                 </Pressable>
               </Animated.View>
             )}

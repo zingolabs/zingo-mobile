@@ -6,9 +6,6 @@ import { useTheme } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
 import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
 
-const CIRCLE_BG = '#081F10';
-const CIRCLE_BORDER = '#0E5E0A';
-
 // The phrase was confirmed.
 const DoneStep: React.FunctionComponent = () => {
   const { translate } = useContext(ContextAppLoaded);
@@ -20,9 +17,9 @@ const DoneStep: React.FunctionComponent = () => {
           width: 75,
           height: 75,
           borderRadius: 38,
-          backgroundColor: CIRCLE_BG,
+          backgroundColor: colors.bgAccentSubtle,
           borderWidth: 1,
-          borderColor: CIRCLE_BORDER,
+          borderColor: colors.borderAccent,
           alignItems: 'center',
           justifyContent: 'center',
           marginBottom: 20,
@@ -34,7 +31,7 @@ const DoneStep: React.FunctionComponent = () => {
         accessibilityRole="header"
         style={{
           color: colors.fgDefault,
-          fontSize: 21,
+          fontSize: 22,
           lineHeight: 27,
           fontWeight: '700',
           textAlign: 'center',
@@ -46,7 +43,7 @@ const DoneStep: React.FunctionComponent = () => {
       <Text
         style={{
           color: colors.fgMuted,
-          fontSize: 14,
+          fontSize: 15,
           lineHeight: 21,
           textAlign: 'center',
         }}

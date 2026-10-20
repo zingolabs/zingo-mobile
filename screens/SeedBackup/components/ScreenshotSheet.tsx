@@ -18,11 +18,6 @@ import { ContextAppLoaded } from '@app/context';
 import { TriangleAlert } from '@ui/primitives/Icons/TriangleAlert';
 import Button from '@ui/primitives/Button';
 
-const DIM = 'rgba(0,5,12,0.93)';
-const TILE_BG = '#242627';
-const TILE_BORDER = '#76592F';
-const ALERT_INK = '#F0A63C';
-const BODY_INK = '#8DA0B8';
 const OFFSCREEN = 600;
 
 // Fades in and rises 8 pt once, delay ms after it mounts.
@@ -142,7 +137,11 @@ const ScreenshotSheet: React.FunctionComponent<ScreenshotSheetProps> = ({
       testID="seedbackup.shot"
     >
       <Animated.View
-        style={[StyleSheet.absoluteFill, { backgroundColor: DIM }, dimStyle]}
+        style={[
+          StyleSheet.absoluteFill,
+          { backgroundColor: colors.bgCanvas },
+          dimStyle,
+        ]}
       />
       <Animated.View
         style={[
@@ -170,9 +169,9 @@ const ScreenshotSheet: React.FunctionComponent<ScreenshotSheetProps> = ({
               width: 52,
               height: 52,
               borderRadius: 14,
-              backgroundColor: TILE_BG,
+              backgroundColor: colors.bgWarning,
               borderWidth: 1,
-              borderColor: TILE_BORDER,
+              borderColor: colors.borderWarning,
               alignItems: 'center',
               justifyContent: 'center',
               marginBottom: 18,
@@ -181,7 +180,7 @@ const ScreenshotSheet: React.FunctionComponent<ScreenshotSheetProps> = ({
           ]}
         >
           <Animated.View style={wiggleStyle}>
-            <TriangleAlert size={24} color={ALERT_INK} />
+            <TriangleAlert size={24} color={colors.fgWarning} />
           </Animated.View>
         </Animated.View>
         <Rise delay={260}>
@@ -201,8 +200,8 @@ const ScreenshotSheet: React.FunctionComponent<ScreenshotSheetProps> = ({
         <Rise delay={300}>
           <Text
             style={{
-              color: BODY_INK,
-              fontSize: 14,
+              color: colors.fgMuted,
+              fontSize: 15,
               lineHeight: 20,
               textAlign: 'center',
               marginBottom: 24,

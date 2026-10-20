@@ -43,11 +43,6 @@ const VK_HEAD = 10;
 const VK_TAIL = 6;
 const KEY_QR = 190;
 
-const STRIP = {
-  ok: { border: '#0E4A12', bg: '#04160B', tile: '#052520' },
-  no: { border: '#5A3A12', bg: '#17120B', tile: '#2A1F10' },
-};
-
 type Tip = 'none' | 'birthday' | 'vk';
 
 const TITLE: Record<WalletSeedAction, string> = {
@@ -228,7 +223,17 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
         }),
       )
     : (translate('walletseed.ok-restored') as string);
-  const strip = seedBackedUp ? STRIP.ok : STRIP.no;
+  const strip = seedBackedUp
+    ? {
+        border: colors.bgAccentDisabled,
+        bg: colors.bgAccentSubtle,
+        tile: colors.bgAccentSubtle,
+      }
+    : {
+        border: colors.borderWarning,
+        bg: colors.bgWarning,
+        tile: colors.bgWarningSubtle,
+      };
   const ready = readOnly ? !!vk : words.length > 0;
   const veiled = hidden || shot !== 'none' || captured;
   const vkShort =
@@ -277,10 +282,10 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
               borderRadius: 12,
               alignItems: 'center',
               justifyContent: 'center',
-              backgroundColor: pressed ? 'rgba(255,255,255,0.06)' : undefined,
+              backgroundColor: pressed ? colors.bgMutedSubtle : undefined,
             })}
           >
-            <ChevronLeft size={22} color={colors.fgAccent} />
+            <ChevronLeft size={24} color={colors.fgAccent} />
           </Pressable>
           <Text
             accessibilityRole="header"
@@ -302,7 +307,7 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
               marginBottom: 16,
               textAlign: 'center',
               color: colors.fgMuted,
-              fontSize: 14,
+              fontSize: 15,
               lineHeight: 20,
             }}
           >
@@ -342,16 +347,16 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
               }}
             >
               {seedBackedUp ? (
-                <ShieldCheckIcon size={17} color={colors.fgAccent} />
+                <ShieldCheckIcon size={16} color={colors.fgAccent} />
               ) : (
-                <TriangleAlert size={17} color={colors.fgWarning} />
+                <TriangleAlert size={16} color={colors.fgWarning} />
               )}
             </View>
             <View style={{ flex: 1 }}>
               <Text
                 style={{
                   color: seedBackedUp ? colors.fgAccent : colors.fgWarning,
-                  fontSize: 14,
+                  fontSize: 15,
                   fontWeight: '700',
                 }}
               >
@@ -442,12 +447,10 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
                     borderRadius: 8,
                     alignItems: 'center',
                     justifyContent: 'center',
-                    backgroundColor: pressed
-                      ? 'rgba(211,226,248,0.08)'
-                      : undefined,
+                    backgroundColor: pressed ? colors.bgMutedSubtle : undefined,
                   })}
                 >
-                  <CopyIcon size={15} color={colors.fgDefault} />
+                  <CopyIcon size={16} color={colors.fgDefault} />
                 </Pressable>
               }
             />
