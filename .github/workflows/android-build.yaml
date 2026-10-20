@@ -139,7 +139,7 @@ jobs:
       - name: Setup Node.js for the descriptor
         uses: actions/setup-node@v4
         with:
-          node-version: 22.18.0
+          node-version-file: .nvmrc
 
       # The builder finds the zingolib root from its own crate directory, so
       # it runs from the zingo-mobile root.
