@@ -99,7 +99,7 @@ exports[`Component ChainTypeToggle - test ChainTypeToggle - snapshot 1`] = `
     style={
       {
         "alignItems": "center",
-        "backgroundColor": "transparent",
+        "backgroundColor": undefined,
         "borderColor": "#18bd18",
         "borderRadius": 8,
         "borderWidth": 0,
@@ -154,7 +154,7 @@ exports[`Component ChainTypeToggle - test ChainTypeToggle - snapshot 1`] = `
     style={
       {
         "alignItems": "center",
-        "backgroundColor": "transparent",
+        "backgroundColor": undefined,
         "borderColor": "#18bd18",
         "borderRadius": 8,
         "borderWidth": 0,
