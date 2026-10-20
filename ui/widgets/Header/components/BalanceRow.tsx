@@ -29,7 +29,7 @@ import {
   shownStatusKey,
 } from '@app/walletBackend/transforms/mixnetView';
 import Utils from '@app/utils';
-import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
+import Button from '@ui/primitives/Button';
 import CurrencyAmount, { PriceTint } from '@ui/widgets/CurrencyAmount';
 import FadeText from '@ui/primitives/FadeText';
 import PriceFetcher, { usePriceRing } from '@ui/widgets/PriceFetcher';
@@ -307,7 +307,7 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
               <View style={{ margin: 5, flexDirection: 'row' }}>
                 <Button
                   testID="header.shield"
-                  type={ButtonTypeEnum.Primary}
+                  variant="primary"
                   title={
                     translate(
                       `history.shield-${calculatePoolsToShield()}`,

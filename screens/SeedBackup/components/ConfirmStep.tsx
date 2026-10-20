@@ -18,6 +18,7 @@ import { ease } from '@app/theme/motion';
 import { ContextAppLoaded } from '@app/context';
 import { CheckIcon } from '@ui/primitives/Icons/CheckIcon';
 import { SIDE, StepTitle } from './StepParts';
+import { fieldBorder } from '@ui/primitives/fieldBorder';
 
 export const CONFIRM_COUNT = 3;
 const NEXT_MS = 420;
@@ -60,7 +61,6 @@ export type WordCheck = {
   status: Status;
   type: (text: string) => void;
   submit: () => void;
-  nudge: () => void;
   shake: SharedValue<number>;
   slideX: SharedValue<number>;
   slideOpacity: SharedValue<number>;
@@ -151,16 +151,6 @@ export const useWordCheck = (
     }, NEXT_MS);
   };
 
-  const nudge = () => {
-    const step = (x: number) =>
-      withTiming(x, {
-        duration: 80,
-        easing: ease.standard,
-        reduceMotion: ReduceMotion.System,
-      });
-    shake.value = withSequence(step(-4), step(4), step(0));
-  };
-
   return {
     position,
     letters,
@@ -169,7 +159,6 @@ export const useWordCheck = (
     status,
     type,
     submit,
-    nudge,
     shake,
     slideX,
     slideOpacity,
@@ -288,14 +277,15 @@ const ConfirmStep: React.FunctionComponent<{ check: WordCheck }> = ({
   }));
 
   const done = check.index + (check.status === 'ok' ? 1 : 0);
-  const border =
+  const border = fieldBorder(
+    colors,
+    focused,
     check.status === 'ok'
-      ? colors.fgAccent
+      ? 'valid'
       : check.status === 'err'
-        ? colors.fgDanger
-        : focused
-          ? colors.borderFocus
-          : colors.bottomSheetBorder;
+        ? 'invalid'
+        : 'unknown',
+  );
 
   return (
     <View>

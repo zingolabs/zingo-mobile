@@ -31,7 +31,7 @@ import RegText from '@ui/primitives/RegText';
 import FadeText from '@ui/primitives/FadeText';
 import BoldText from '@ui/primitives/BoldText';
 import AppSheet from '@ui/primitives/AppSheet';
-import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
+import Button from '@ui/primitives/Button';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
 
@@ -571,6 +571,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
       <BottomSheetFooter {...props} bottomInset={0}>
         <View
           style={{
+            paddingHorizontal: 25,
             backgroundColor: colors.bgSurface,
             paddingTop: 10,
             paddingBottom: 24,
@@ -582,7 +583,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
           <Button
             testID="settings.button.save"
             disabled={disabled || disabledButton}
-            type={ButtonTypeEnum.Primary}
+            variant="primary"
             title={translate('settings.save') as string}
             onPress={() => {
               setTimeout(async () => {
@@ -983,14 +984,13 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
                           <BoldText>{'LAST ERROR'}</BoldText>
                         </View>
 
-                        <View style={{ marginLeft: 40, marginRight: 25 }}>
+                        <View style={{ marginHorizontal: 25 }}>
                           <Button
-                            type={ButtonTypeEnum.Primary}
+                            variant="primary"
                             title={translate('view-error') as string}
                             onPress={() => {
                               reportError(lastError);
                             }}
-                            twoButtons={true}
                           />
                         </View>
                       </>
@@ -1009,10 +1009,10 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
                           </BoldText>
                         </View>
 
-                        <View style={{ marginLeft: 40, marginRight: 25 }}>
+                        <View style={{ marginHorizontal: 25 }}>
                           <Button
                             testID="settings.restorebackupwallet"
-                            type={ButtonTypeEnum.Secondary}
+                            variant="text"
                             title={
                               translate('settings.restorebackup') as string
                             }
@@ -1053,7 +1053,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ navigation }) => {
                                 ],
                               })
                             }
-                            twoButtons={true}
                           />
                         </View>
                       </>

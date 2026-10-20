@@ -5,7 +5,8 @@ import { useTheme } from '@app/theme';
 
 import { GlobalConst, SnackbarDurationEnum } from '@app/AppState';
 import { ContextAppLoaded } from '@app/context';
-import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
+import Button from '@ui/primitives/Button';
+import ButtonStack from '@ui/primitives/ButtonStack';
 import { checkMyAddress } from '@app/walletBackend';
 import { parseZcashURI } from '@app/uris';
 import Utils from '@app/utils';
@@ -172,28 +173,28 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
             marginTop: 15,
           }}
         >
-          <Button
-            type={ButtonTypeEnum.Link}
-            title={translate('cancel') as string}
-            onPress={() => {
-              setAddress('');
-              setVerifyOK(null);
-              Keyboard.dismiss();
-              setTimeout(() => {
-                closeSheet();
-              }, 100);
-            }}
-            twoButtons={true}
-          />
-          <Button
-            type={ButtonTypeEnum.Primary}
-            title={translate('verify') as string}
-            onPress={() => {
-              verifyAddress();
-            }}
-            twoButtons={true}
-            disabled={!address || !!errorAddress}
-          />
+          <ButtonStack>
+            <Button
+              variant="quiet"
+              title={translate('cancel') as string}
+              onPress={() => {
+                setAddress('');
+                setVerifyOK(null);
+                Keyboard.dismiss();
+                setTimeout(() => {
+                  closeSheet();
+                }, 100);
+              }}
+            />
+            <Button
+              variant="primary"
+              title={translate('verify') as string}
+              onPress={() => {
+                verifyAddress();
+              }}
+              disabled={!address || !!errorAddress}
+            />
+          </ButtonStack>
         </View>
       </View>
     </View>

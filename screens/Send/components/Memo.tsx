@@ -16,7 +16,8 @@ import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import { GlobalConst, TranslateType } from '@app/AppState';
 import Utils from '@app/utils';
 import FadeText from '@ui/primitives/FadeText';
-import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
+import Button from '@ui/primitives/Button';
+import { fieldBorder } from '@ui/primitives/fieldBorder';
 
 type MemoProps = {
   closeSheet: () => void;
@@ -43,6 +44,7 @@ const Memo: React.FunctionComponent<MemoProps> = ({
   // value each time the sheet is presented). The X close discards the draft,
   // the Save button commits it via setMemoText.
   const [memo, setMemo] = useState<string>(initialMemo);
+  const [focused, setFocused] = useState(false);
 
   // The sheet is opened while the user is mid-typing in the inline memo field
   // (keyboard already up). Focus this field on mount so the keyboard stays and
@@ -74,7 +76,11 @@ const Memo: React.FunctionComponent<MemoProps> = ({
           flexGrow: 1,
           borderWidth: 1,
           borderRadius: 12,
-          borderColor: colors.borderMuted,
+          borderColor: fieldBorder(
+            colors,
+            focused,
+            memoDisabled ? 'invalid' : 'unknown',
+          ),
           minWidth: 48,
           minHeight: 48,
           maxHeight: Dimensions.get('window').height * 0.4,
@@ -83,6 +89,8 @@ const Memo: React.FunctionComponent<MemoProps> = ({
       >
         <TextInput
           ref={inputRef}
+          onFocus={() => setFocused(true)}
+          onBlur={() => setFocused(false)}
           testID="send.memo-field"
           accessible={true}
           accessibilityLabel={translate('send.memo-acc') as string}
@@ -153,7 +161,7 @@ const Memo: React.FunctionComponent<MemoProps> = ({
           }}
         >
           <Button
-            type={ButtonTypeEnum.Primary}
+            variant="primary"
             title={translate('save') as string}
             onPress={doSave}
             disabled={memoDisabled}

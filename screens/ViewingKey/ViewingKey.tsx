@@ -41,6 +41,7 @@ import CardExpand from '@ui/widgets/CardExpand';
 import { CopyShowButtons } from '@screens/SeedBackup/components/SeedParts';
 import { SIDE } from '@screens/SeedBackup/components/StepParts';
 import KeyCard from './components/KeyCard';
+import Button from '@ui/primitives/Button';
 
 const QR = 196;
 const TILE_BG = '#0A1B33';
@@ -320,34 +321,26 @@ const ViewingKey: React.FunctionComponent<ViewingKeyProps> = ({
           ))}
         </View>
 
-        <Pressable
-          testID="viewingkey.done"
-          accessibilityRole="button"
-          disabled={!!switchTo && !key}
-          onPress={switchTo ? confirmSwitch : close}
-          style={({ pressed }) => ({
+        <View
+          style={{
             position: 'absolute',
-            left: 52,
-            right: 52,
+            left: SIDE,
+            right: SIDE,
             bottom: insets.bottom + 24,
-            height: 44,
-            borderRadius: 22,
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: colors.bgAccent,
-            transform: [{ scale: pressed ? 0.97 : 1 }],
-          })}
+          }}
         >
-          <Text
-            style={{ color: colors.bgCanvas, fontSize: 15, fontWeight: '700' }}
-          >
-            {
+          <Button
+            testID="viewingkey.done"
+            variant="primary"
+            disabled={!!switchTo && !key}
+            onPress={switchTo ? confirmSwitch : close}
+            title={
               translate(
                 switchTo ? 'viewingkey.switch' : 'seedbackup.done',
               ) as string
             }
-          </Text>
-        </Pressable>
+          />
+        </View>
       </View>
     </View>
   );

@@ -22,7 +22,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
 
 import BoldText from '@ui/primitives/BoldText';
-import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
+import Button from '@ui/primitives/Button';
+import ButtonStack from '@ui/primitives/ButtonStack';
 import ProgressBar from '@ui/primitives/ProgressBar';
 import StepperHeader from '@ui/widgets/StepperHeader';
 import { AppDrawerParamList } from '@app/types';
@@ -394,18 +395,18 @@ const MigrationSplitting: React.FunctionComponent<MigrationSplittingProps> = ({
             paddingHorizontal: 24,
           }}
         >
-          <Button
-            type={ButtonTypeEnum.Ghost}
-            title={translate('migrationsplitting.close') as string}
-            onPress={goHome}
-            twoButtons={true}
-          />
-          <Button
-            type={ButtonTypeEnum.Primary}
-            title={translate('migrationsplitting.retry') as string}
-            onPress={onRetry}
-            twoButtons={true}
-          />
+          <ButtonStack>
+            <Button
+              variant="quiet"
+              title={translate('migrationsplitting.close') as string}
+              onPress={goHome}
+            />
+            <Button
+              variant="primary"
+              title={translate('migrationsplitting.retry') as string}
+              onPress={onRetry}
+            />
+          </ButtonStack>
         </View>
       </View>
     );
@@ -499,7 +500,7 @@ const MigrationSplitting: React.FunctionComponent<MigrationSplittingProps> = ({
         >
           <Button
             testID="migrationsplitting.continue"
-            type={ButtonTypeEnum.Primary}
+            variant="primary"
             title={translate('migrationsplitting.continue') as string}
             onPress={() => navigation.navigate(Route.MigrationCadence)}
           />

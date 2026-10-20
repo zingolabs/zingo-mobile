@@ -108,13 +108,14 @@ exports[`MessageLine - snapshots MessageLine received with messageAddress, no mo
           }
         >
           <Text
+            maxFontSizeMultiplier={2}
             selectable={true}
             style={
               {
                 "color": "#c3c3c3",
                 "fontSize": 15,
                 "fontWeight": "400",
-                "opacity": 1,
+                "lineHeight": 21,
               }
             }
           >
@@ -221,10 +222,13 @@ hello
         </View>
         <View>
           <Text
+            maxFontSizeMultiplier={2}
             style={
               {
-                "color": "#c3c3c3",
-                "opacity": 0.65,
+                "color": "#888888",
+                "fontSize": 15,
+                "fontWeight": "400",
+                "lineHeight": 21,
               }
             }
           >
@@ -336,10 +340,13 @@ exports[`MessageLine - snapshots MessageLine sent with memo, month header 1`] = 
     }
   >
     <Text
+      maxFontSizeMultiplier={2}
       style={
         {
-          "color": "#c3c3c3",
-          "opacity": 0.65,
+          "color": "#888888",
+          "fontSize": 15,
+          "fontWeight": "400",
+          "lineHeight": 21,
         }
       }
     >
@@ -472,12 +479,13 @@ exports[`MessageLine - snapshots MessageLine sent with memo, month header 1`] = 
                 }
               >
                 <Text
+                  maxFontSizeMultiplier={2}
                   style={
                     {
                       "color": "#c3c3c3",
                       "fontSize": 15,
                       "fontWeight": "400",
-                      "opacity": 1,
+                      "lineHeight": 21,
                     }
                   }
                 >
@@ -531,13 +539,14 @@ exports[`MessageLine - snapshots MessageLine sent with memo, month header 1`] = 
           }
         >
           <Text
+            maxFontSizeMultiplier={2}
             selectable={true}
             style={
               {
                 "color": "#c3c3c3",
                 "fontSize": 15,
                 "fontWeight": "400",
-                "opacity": 1,
+                "lineHeight": 21,
               }
             }
           >
@@ -644,10 +653,13 @@ hello
         </View>
         <View>
           <Text
+            maxFontSizeMultiplier={2}
             style={
               {
-                "color": "#c3c3c3",
-                "opacity": 0.65,
+                "color": "#888888",
+                "fontSize": 15,
+                "fontWeight": "400",
+                "lineHeight": 21,
               }
             }
           >

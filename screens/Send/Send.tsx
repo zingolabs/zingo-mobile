@@ -48,7 +48,7 @@ import RegText from '@ui/primitives/RegText';
 import ZecAmount from '@ui/widgets/ZecAmount';
 import CurrencyAmount from '@ui/widgets/CurrencyAmount';
 import { usePriceHealth } from '@ui/widgets/priceFetcherStore';
-import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
+import Button from '@ui/primitives/Button';
 import AppSheet from '@ui/primitives/AppSheet';
 import AppSheetModal from '@ui/primitives/AppSheetModal';
 import {
@@ -99,6 +99,7 @@ import SendErrorSheet from './components/SendErrorSheet';
 import { sendEmail } from '@app/services/sendEmail';
 import { retryServer } from '@app/services/retryServer';
 import { RPCSpendablebalanceType } from '@app/walletBackend/types/RPCSpendablebalanceType';
+import { fieldBorder } from '@ui/primitives/fieldBorder';
 
 type SendProps = HomeTabScreenProps<'Send'>;
 
@@ -159,6 +160,10 @@ const Send: React.FunctionComponent<SendProps> = () => {
     null,
   );
   const [validAmount, setValidAmount] = useState<number>(0); // 1 - OK, 0 - Empty, -1 - Invalid number, -2 - Invalid Amount
+  /** The field that has focus, for its blue edge. */
+  const [focusedField, setFocusedField] = useState<
+    'none' | 'address' | 'amount' | 'memo'
+  >('none');
   const [validMemo, setValidMemo] = useState<number>(0); // 1 - OK, 0 - Empty, -1 - KO
   const [sendButtonEnabled, setSendButtonEnabled] = useState<boolean>(false);
   const [memoIcon, setMemoIcon] = useState<boolean>(false);
@@ -237,6 +242,12 @@ const Send: React.FunctionComponent<SendProps> = () => {
     : stillConfirming
       ? colors.fgWarning
       : colors.fgDefault;
+  const memoTooLong =
+    Utils.countMemoBytes(
+      memoText,
+      includeUAMemoBoolean,
+      defaultUnifiedAddress,
+    ) > GlobalConst.memoMaxLength;
   const feeCalculationGenRef = useRef<number>(0);
   const { decimalSeparator } = getNumberFormatSettings();
   const keyboardHeight = useKeyboardHeight();
@@ -1195,10 +1206,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
                     </View>
                   )}
                   {validAddress === -1 && (
-                    <ErrorText
-                      testID="send.address.error"
-                      style={{ color: colors.fgDanger }}
-                    >
+                    <ErrorText testID="send.address.error">
                       {
                         translate(
                           znsNotFound
@@ -1214,7 +1222,15 @@ const Send: React.FunctionComponent<SendProps> = () => {
                     flex: 1,
                     borderWidth: 1,
                     borderRadius: 12,
-                    borderColor: colors.borderMuted,
+                    borderColor: fieldBorder(
+                      colors,
+                      focusedField === 'address',
+                      validAddress === 1
+                        ? 'valid'
+                        : validAddress === -1
+                          ? 'invalid'
+                          : 'unknown',
+                    ),
                     marginTop: 5,
                     minHeight: 48,
                     justifyContent: 'center',
@@ -1229,6 +1245,8 @@ const Send: React.FunctionComponent<SendProps> = () => {
                     >
                       <TextInput
                         testID="send.addressplaceholder"
+                        onFocus={() => setFocusedField('address')}
+                        onBlur={() => setFocusedField('none')}
                         accessible={true}
                         accessibilityLabel={
                           translate('send.address-acc') as string
@@ -1380,12 +1398,12 @@ const Send: React.FunctionComponent<SendProps> = () => {
                     </View>
                   </View>
                   {validAmount === -1 && (
-                    <ErrorText style={{ color: colors.fgDanger }}>
+                    <ErrorText>
                       {translate('send.invalidnumber') as string}
                     </ErrorText>
                   )}
                   {validAmount === -2 && (
-                    <ErrorText style={{ color: colors.fgDanger }}>
+                    <ErrorText>
                       {translate('send.invalidamount') as string}
                     </ErrorText>
                   )}
@@ -1412,7 +1430,15 @@ const Send: React.FunctionComponent<SendProps> = () => {
                         alignItems: 'center',
                         borderWidth: 1,
                         borderRadius: 12,
-                        borderColor: colors.borderMuted,
+                        borderColor: fieldBorder(
+                          colors,
+                          focusedField === 'amount',
+                          validAmount === 1
+                            ? 'valid'
+                            : validAmount < 0
+                              ? 'invalid'
+                              : 'unknown',
+                        ),
                         minWidth: 48,
                         minHeight: 48,
                       }}
@@ -1439,6 +1465,8 @@ const Send: React.FunctionComponent<SendProps> = () => {
                       {inputZec ? (
                         <TextInput
                           testID="send.amount"
+                          onFocus={() => setFocusedField('amount')}
+                          onBlur={() => setFocusedField('none')}
                           placeholder={`0${decimalSeparator}00000`}
                           placeholderTextColor={colors.fgMuted}
                           keyboardType="numeric"
@@ -1471,6 +1499,8 @@ const Send: React.FunctionComponent<SendProps> = () => {
                         />
                       ) : (
                         <TextInput
+                          onFocus={() => setFocusedField('amount')}
+                          onBlur={() => setFocusedField('none')}
                           placeholder={`0${decimalSeparator}00`}
                           placeholderTextColor={colors.fgMuted}
                           keyboardType="numeric"
@@ -1750,7 +1780,11 @@ const Send: React.FunctionComponent<SendProps> = () => {
                           flexDirection: 'row',
                           borderWidth: 1,
                           borderRadius: 12,
-                          borderColor: colors.borderMuted,
+                          borderColor: fieldBorder(
+                            colors,
+                            focusedField === 'memo',
+                            memoTooLong ? 'invalid' : 'unknown',
+                          ),
                           minWidth: 48,
                           minHeight: 48,
                           maxHeight: 130,
@@ -1832,7 +1866,9 @@ const Send: React.FunctionComponent<SendProps> = () => {
                             }
                           }}
                           maxLength={GlobalConst.memoMaxLength}
+                          onBlur={() => setFocusedField('none')}
                           onFocus={() => {
+                            setFocusedField('memo');
                             // Expand the Send sheet to its top snap so the memo
                             // field (and the rest of the form) is fully visible
                             // above the keyboard.
@@ -1944,6 +1980,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
                 )}
                 <View
                   style={{
+                    paddingHorizontal: 16,
                     flexGrow: 1,
                     flexDirection: 'row',
                     justifyContent: 'center',
@@ -1953,7 +1990,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
                 >
                   {showCalcError ? (
                     <Button
-                      type={ButtonTypeEnum.Secondary}
+                      variant="text"
                       title={`${translate('send.calc-error') as string} ⓘ`}
                       onPress={() => sendErrorSheetRef.current?.present()}
                       testID="send.calc-error"
@@ -1968,7 +2005,7 @@ const Send: React.FunctionComponent<SendProps> = () => {
                       accessible={true}
                       accessibilityLabel={'title ' + translate('send.button')}
                       // NYM feature hidden for now — will be enabled in the future
-                      type={ButtonTypeEnum.Primary}
+                      variant="primary"
                       title={
                         validAmount === 1 &&
                         amountText &&

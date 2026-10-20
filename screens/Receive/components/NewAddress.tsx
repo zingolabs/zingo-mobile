@@ -17,7 +17,8 @@ import {
 } from '@app/AppState';
 import RegText from '@ui/primitives/RegText';
 import { ContextAppLoaded } from '@app/context';
-import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
+import Button from '@ui/primitives/Button';
+import ButtonStack from '@ui/primitives/ButtonStack';
 import { AddressUnifiedTypeEnum } from '@app/AppState';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faChevronDown, faXmark } from '@fortawesome/free-solid-svg-icons';
@@ -31,6 +32,7 @@ import { RPCUnifiedAddressType } from '@app/walletBackend/types/RPCUnifiedAddres
 import { RPCTransparentAddressType } from '@app/walletBackend/types/RPCTransparentAddressType';
 import Utils from '@app/utils';
 import AddressBookFileImpl from '@app/services/AddressBookFileImpl';
+import { fieldBorder } from '@ui/primitives/fieldBorder';
 
 type NewAddressProps = {
   addressKind: AddressKindEnum;
@@ -47,6 +49,7 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
   const { colors } = useTheme();
 
   const [label, setLabel] = useState<string>('');
+  const [focused, setFocused] = useState(false);
   const [type, setType] = useState<AddressUnifiedTypeEnum>(
     AddressUnifiedTypeEnum.orchard,
   );
@@ -152,7 +155,7 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
               flexGrow: 1,
               borderWidth: 1,
               borderRadius: 12,
-              borderColor: colors.borderMuted,
+              borderColor: fieldBorder(colors, focused),
               minWidth: 48,
               minHeight: 48,
               maxHeight: 150,
@@ -161,6 +164,8 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
             }}
           >
             <TextInput
+              onFocus={() => setFocused(true)}
+              onBlur={() => setFocused(false)}
               style={{
                 color: colors.fgDefault,
                 fontWeight: '600',
@@ -261,29 +266,29 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
             alignItems: 'center',
             marginVertical: 5,
             marginTop: 15,
+            paddingHorizontal: 10,
           }}
         >
-          <Button
-            type={ButtonTypeEnum.Link}
-            title={translate('cancel') as string}
-            onPress={() => {
-              setLabel('');
-              Keyboard.dismiss();
-              setTimeout(() => {
-                closeSheet();
-              }, 100);
-            }}
-            twoButtons={true}
-          />
-          <Button
-            type={ButtonTypeEnum.Primary}
-            title={translate('save') as string}
-            style={{ marginLeft: 10 }}
-            onPress={() => {
-              createAddress();
-            }}
-            twoButtons={true}
-          />
+          <ButtonStack>
+            <Button
+              variant="quiet"
+              title={translate('cancel') as string}
+              onPress={() => {
+                setLabel('');
+                Keyboard.dismiss();
+                setTimeout(() => {
+                  closeSheet();
+                }, 100);
+              }}
+            />
+            <Button
+              variant="primary"
+              title={translate('save') as string}
+              onPress={() => {
+                createAddress();
+              }}
+            />
+          </ButtonStack>
         </View>
       </View>
       <SelectBottomSheet

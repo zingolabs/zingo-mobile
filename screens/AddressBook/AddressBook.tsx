@@ -24,7 +24,7 @@ import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
 import { showConfirm } from '@app/services/showConfirm';
 import { deliver } from '@app/navigation/results';
 import AppSheetModal from '@ui/primitives/AppSheetModal';
-import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
+import Button from '@ui/primitives/Button';
 import Header from '@ui/widgets/Header';
 import SearchField from '@ui/widgets/SearchField';
 import { ChevronDown, ChevronLeft } from '@ui/primitives/Icons/Chevron';
@@ -543,6 +543,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
       {!pick && (
         <View
           style={{
+            paddingHorizontal: SIDE,
             paddingTop: 12,
             paddingBottom: insets.bottom + 16,
             alignItems: 'center',
@@ -550,7 +551,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
         >
           <Button
             testID="addressbook.new"
-            type={ButtonTypeEnum.Primary}
+            variant="primary"
             title={translate('addressbook.new-contact') as string}
             onPress={() => openContact({ kind: 'new', preset: '', label: '' })}
           />

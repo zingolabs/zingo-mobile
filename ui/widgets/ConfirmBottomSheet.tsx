@@ -8,7 +8,7 @@ import { useTheme } from '@app/theme';
 import AppSheetModal from '@ui/primitives/AppSheetModal';
 import BoldText from '@ui/primitives/BoldText';
 import RegText from '@ui/primitives/RegText';
-import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
+import Button from '@ui/primitives/Button';
 import {
   ConfirmButton,
   ConfirmOptions,
@@ -100,27 +100,24 @@ const ConfirmBottomSheet: React.FC = () => {
           <Button
             key={`${i}-${b.text}`}
             testID={`confirm.action.${i}`}
-            type={
+            variant={
               b.style === 'destructive'
-                ? ButtonTypeEnum.Danger
+                ? 'danger'
                 : b.style === 'ghost'
-                  ? ButtonTypeEnum.Link
-                  : ButtonTypeEnum.Primary
+                  ? 'text'
+                  : 'primary'
             }
             title={b.text}
             onPress={() => handleButton(b)}
-            fullWidth
-            textStyle={{ fontSize: 15 }}
           />
         ))}
       </View>
       {!!cancel && (
         <Button
           testID="confirm.cancel"
-          type={ButtonTypeEnum.Link}
+          variant="quiet"
           title={cancel.text}
           onPress={() => handleButton(cancel)}
-          fullWidth
           style={{ marginTop: 8 }}
         />
       )}

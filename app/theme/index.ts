@@ -6,3 +6,4 @@ export type { ThemeColors } from './tokens';
 export * from './radii';
 export * from './spacing';
 export * from './sizes';
+export * from './typography';

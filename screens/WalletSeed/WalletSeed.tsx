@@ -482,7 +482,7 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
               onPress={() => confirm(action)}
               style={({ pressed }) => ({
                 height: 44,
-                marginHorizontal: 52,
+                marginHorizontal: SIDE,
                 borderRadius: 22,
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -517,7 +517,7 @@ const WalletSeed: React.FunctionComponent<WalletSeedProps> = ({
               onPress={() => navigation.goBack()}
               style={({ pressed }) => ({
                 height: 44,
-                marginHorizontal: 52,
+                marginHorizontal: SIDE,
                 borderRadius: 22,
                 alignItems: 'center',
                 justifyContent: 'center',

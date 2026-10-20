@@ -15,7 +15,7 @@ import { TranslateType } from '@app/AppState';
 import BoldText from '@ui/primitives/BoldText';
 import FadeText from '@ui/primitives/FadeText';
 import RegText from '@ui/primitives/RegText';
-import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
+import Button from '@ui/primitives/Button';
 import SheetRim from '@ui/primitives/SheetRim';
 
 /**
@@ -201,7 +201,7 @@ const SendErrorSheet = forwardRef<BottomSheetModal, SendErrorSheetProps>(
 
           <View style={{ alignItems: 'center', marginTop: 4 }}>
             <Button
-              type={ButtonTypeEnum.Primary}
+              variant="primary"
               title={t('support', 'Support')}
               onPress={onSupportPress}
               testID="send.error.support"

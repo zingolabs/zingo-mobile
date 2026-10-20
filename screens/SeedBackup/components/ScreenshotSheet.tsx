@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import Animated, {
   ReduceMotion,
   runOnJS,
@@ -16,6 +16,7 @@ import { radiusSheet, useTheme } from '@app/theme';
 import { duration, ease } from '@app/theme/motion';
 import { ContextAppLoaded } from '@app/context';
 import { TriangleAlert } from '@ui/primitives/Icons/TriangleAlert';
+import Button from '@ui/primitives/Button';
 
 const DIM = 'rgba(0,5,12,0.93)';
 const TILE_BG = '#242627';
@@ -211,30 +212,12 @@ const ScreenshotSheet: React.FunctionComponent<ScreenshotSheetProps> = ({
           </Text>
         </Rise>
         <Rise delay={340} stretch>
-          <Pressable
+          <Button
             testID="seedbackup.shot.ok"
-            accessibilityRole="button"
+            variant="primary"
+            title={translate('seedbackup.shot-ok') as string}
             onPress={onGotIt}
-            style={({ pressed }) => ({
-              height: 44,
-              marginHorizontal: 12,
-              borderRadius: 22,
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: colors.bgAccent,
-              transform: [{ scale: pressed ? 0.97 : 1 }],
-            })}
-          >
-            <Text
-              style={{
-                color: colors.bgCanvas,
-                fontSize: 15,
-                fontWeight: '700',
-              }}
-            >
-              {translate('seedbackup.shot-ok') as string}
-            </Text>
-          </Pressable>
+          />
         </Rise>
       </Animated.View>
     </View>

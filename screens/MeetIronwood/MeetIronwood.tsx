@@ -35,7 +35,8 @@ import { faArrowRightLong } from '@fortawesome/free-solid-svg-icons';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import BoldText from '@ui/primitives/BoldText';
-import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
+import Button from '@ui/primitives/Button';
+import ButtonStack from '@ui/primitives/ButtonStack';
 import SettingsFileImpl from '@app/services/SettingsFileImpl';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
@@ -672,7 +673,7 @@ const MeetIronwood: React.FunctionComponent<MeetIronwoodProps> = ({
           <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
             <Button
               testID="meetironwood.primary"
-              type={ButtonTypeEnum.Primary}
+              variant="primary"
               title={translate('meetironwood.next') as string}
               onPress={onPrimary}
             />
@@ -685,20 +686,20 @@ const MeetIronwood: React.FunctionComponent<MeetIronwoodProps> = ({
               alignItems: 'center',
             }}
           >
-            <Button
-              testID="meetironwood.back"
-              type={ButtonTypeEnum.Ghost}
-              title={translate('meetironwood.back') as string}
-              onPress={() => goTo(index - 1)}
-              twoButtons={true}
-            />
-            <Button
-              testID="meetironwood.primary"
-              type={ButtonTypeEnum.Primary}
-              title={translate('meetironwood.next') as string}
-              onPress={onPrimary}
-              twoButtons={true}
-            />
+            <ButtonStack>
+              <Button
+                testID="meetironwood.back"
+                variant="text"
+                title={translate('meetironwood.back') as string}
+                onPress={() => goTo(index - 1)}
+              />
+              <Button
+                testID="meetironwood.primary"
+                variant="primary"
+                title={translate('meetironwood.next') as string}
+                onPress={onPrimary}
+              />
+            </ButtonStack>
           </View>
         )}
       </Animated.View>

@@ -561,8 +561,8 @@ const WalletError: React.FunctionComponent<WalletErrorProps> = ({
         style={({ pressed }) => ({
           position: 'absolute',
           bottom: 80,
-          alignSelf: 'center',
-          width: 270,
+          left: 24,
+          right: 24,
           height: 44,
           borderRadius: 22,
           backgroundColor: colors.bgAccent,
