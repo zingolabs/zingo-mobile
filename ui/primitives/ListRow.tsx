@@ -12,8 +12,9 @@ import Text from './Text';
 import { ChevronRight } from './Icons/Chevron';
 
 type ListRowProps = {
-  title: string;
-  subtitle?: string;
+  /** A string takes the row's title style; a node is drawn as given. */
+  title: string | React.ReactElement;
+  subtitle?: string | React.ReactElement;
   /** An `Icon` at 20 or an `Avatar`. */
   leading?: React.ReactNode;
   /** An amount, a `Tag` or a small action. */
@@ -54,11 +55,17 @@ const ListRow: React.FunctionComponent<ListRowProps> = ({
         }}
       >
         <View style={{ flexGrow: 1, flexShrink: 1 }}>
-          <Text variant="bodyStrong">{title}</Text>
-          {subtitle !== undefined && (
+          {typeof title === 'string' ? (
+            <Text variant="bodyStrong">{title}</Text>
+          ) : (
+            title
+          )}
+          {typeof subtitle === 'string' ? (
             <Text variant="bodySmall" tone="muted">
               {subtitle}
             </Text>
+          ) : (
+            subtitle
           )}
         </View>
         {trailing !== undefined && (
