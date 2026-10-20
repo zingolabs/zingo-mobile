@@ -31,6 +31,10 @@ ignores:
   # Spawned by path in visual/diff.mts (node_modules/.bin/reg-cli), which
   # depcheck does not trace.
   - 'reg-cli'
+  # Never imported on purpose: its preinstall script fails, so if the
+  # ignore-scripts entry in .yarnrc is ever lost the install fails loudly
+  # instead of silently running every dependency's lifecycle script.
+  - '@lavamoat/preinstall-always-fail'
 
 # Phantom-dependency detection stays off until the three currently
 # transitive tools (@eslint/eslintrc, jest-environment-node,

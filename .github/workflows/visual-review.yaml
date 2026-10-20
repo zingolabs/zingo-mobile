@@ -42,7 +42,7 @@ jobs:
           node-version: 22.18.0
           cache: yarn
 
-      - run: yarn
+      - run: yarn setup
 
       - name: Cache Playwright browsers
         uses: actions/cache@v6

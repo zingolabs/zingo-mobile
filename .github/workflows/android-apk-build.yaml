@@ -114,7 +114,7 @@ jobs:
           cache: yarn
 
       - name: Yarn install
-        run: yarn
+        run: yarn setup
 
       - name: Run Build
         working-directory: android

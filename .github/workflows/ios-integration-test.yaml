@@ -81,7 +81,7 @@ jobs:
           cache: yarn
 
       - name: Yarn
-        run: yarn
+        run: yarn setup
 
       - name: Pod Install
         uses: nick-fields/retry@v4
