@@ -396,9 +396,9 @@ final class ExecuteVersionFromSeed: XCTestCase {
         do {
             let version = try getVersion()
             print("\nVersion:\n\(version)")
-            let part = "[0-9A-Za-z.+-]+(_[0-9a-f]{5})?(_dirty)?"
+            let zingolibPart = "[0-9A-Za-z.+-]+_[0-9a-f]{16}(_dirty)?"
             // The zm_ part is the app build's, joined by RPCModule.
-            XCTAssertNotNil(version.range(of: "^zl_\(part)$", options: .regularExpression), version)
+            XCTAssertNotNil(version.range(of: "^zl_\(zingolibPart)$", options: .regularExpression), version)
         } catch {
           XCTFail("\nVersion error:\n\(error.localizedDescription)")
           return

@@ -58,7 +58,9 @@ and the archive packages whatever is already there.
 
 The **zingolib** line of the About screen reads
 `<zingolib descriptor>-zm_<tag>`, or `-zm_<version>_<hash5>` off a tag, with
-`_dirty` for an uncommitted tree. `get_version()` returns the zingolib half.
+`_dirty` for an uncommitted tree. `get_version()` returns the zingolib half,
+`zl_<version>_<sixteen commit characters>`, on a release as on any other
+commit.
 The app build computes the `zm_` half with `scripts/zm_descriptor.mjs`, and
 `RPCModule` joins the two:
 
