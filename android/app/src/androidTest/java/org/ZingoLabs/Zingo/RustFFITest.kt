@@ -378,9 +378,10 @@ class BuildDescriptorTest {
             .targetContext.getString(R.string.zm_descriptor)
         println("\nBuild descriptor:")
         println("$zingolib-$mobile")
-        val part = """[0-9A-Za-z.+-]+(_[0-9a-f]{5})?(_dirty)?"""
-        assertThat(zingolib).matches("zl_$part")
-        assertThat(mobile).matches("zm_$part")
+        val zingolibPart = """[0-9A-Za-z.+-]+_[0-9a-f]{16}(_dirty)?"""
+        val mobilePart = """[0-9A-Za-z.+-]+(_[0-9a-f]{5})?(_dirty)?"""
+        assertThat(zingolib).matches("zl_$zingolibPart")
+        assertThat(mobile).matches("zm_$mobilePart")
         assertThat(mobile).isNotEqualTo(UNDESCRIBED_BUILD)
     }
 }
