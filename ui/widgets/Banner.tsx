@@ -1,6 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
-import React from 'react';
-import { Pressable, View } from 'react-native';
+import React, { forwardRef } from 'react';
+import { Pressable, StyleProp, View, ViewStyle } from 'react-native';
+import Animated, { AnimatedStyle } from 'react-native-reanimated';
 import {
   iconSizeMd,
   iconSizeSm,
@@ -26,13 +27,29 @@ type BannerProps = {
   tone: BannerTone;
   title: string;
   /** The short text, already translated. */
-  children?: string;
+  children?: React.ReactNode;
   /** A `Tag` beside the title. */
   tag?: React.ReactNode;
   /** A `Button` with `size="small"`. */
   action?: React.ReactNode;
+  /**
+   * Beside the text, centered, instead of under it: a call to act the card
+   * is built around (Back up, Start), with an `inline` button.
+   */
+  actionBeside?: boolean;
+  /**
+   * The plain card surface and edge instead of the tone's fill; the tone
+   * stays in the icon tile. For a prompt that is not an alert.
+   */
+  plain?: boolean;
   onDismiss?: () => void;
   dismissLabel?: string;
+  dismissTestID?: string;
+  /**
+   * Fades or moves the contents while the card stays, as when a flow opens
+   * over it with a container transform.
+   */
+  contentStyle?: StyleProp<AnimatedStyle<StyleProp<ViewStyle>>>;
   testID?: string;
 };
 
@@ -42,16 +59,23 @@ const TILE = 36;
  * A notice at the top of a screen. One at a time: when several are pending,
  * the most important shows first.
  */
-const Banner: React.FunctionComponent<BannerProps> = ({
-  tone,
-  title,
-  children,
-  tag,
-  action,
-  onDismiss,
-  dismissLabel,
-  testID,
-}) => {
+const Banner = forwardRef<View, BannerProps>(function Banner(
+  {
+    tone,
+    title,
+    children,
+    tag,
+    action,
+    onDismiss,
+    dismissLabel,
+    dismissTestID,
+    contentStyle,
+    actionBeside = false,
+    plain = false,
+    testID,
+  },
+  ref,
+) {
   const { colors } = useTheme();
   const paint = {
     seed: {
@@ -82,69 +106,76 @@ const Banner: React.FunctionComponent<BannerProps> = ({
 
   return (
     <View
+      ref={ref}
       testID={testID}
       style={{
-        flexDirection: 'row',
-        gap: space12,
         padding: space16,
         borderRadius: radiusMd,
         borderWidth: 1,
-        borderColor: paint.edge,
-        backgroundColor: paint.bg,
+        borderColor: plain ? colors.bottomSheetBorder : paint.edge,
+        backgroundColor: plain ? colors.bgSurface : paint.bg,
       }}
     >
-      <View
-        style={{
-          width: TILE,
-          height: TILE,
-          borderRadius: radiusSm,
-          backgroundColor: paint.tile,
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
+      <Animated.View
+        style={[{ flexDirection: 'row', gap: space12 }, contentStyle]}
       >
-        {paint.icon}
-      </View>
-      <View style={{ flex: 1, gap: space4 }}>
         <View
           style={{
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            alignItems: 'center',
-            gap: space4,
-          }}
-        >
-          <Text variant="bodyStrong">{title}</Text>
-          {tag}
-        </View>
-        {children !== undefined && (
-          <Text variant="bodySmall" tone="muted">
-            {children}
-          </Text>
-        )}
-        {action !== undefined && (
-          <View style={{ marginTop: space4 }}>{action}</View>
-        )}
-      </View>
-      {onDismiss && (
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel={dismissLabel}
-          onPress={onDismiss}
-          style={{
-            width: touchTarget,
-            height: touchTarget,
-            marginTop: -space12,
-            marginRight: -space12,
+            width: TILE,
+            height: TILE,
+            borderRadius: radiusSm,
+            backgroundColor: paint.tile,
             alignItems: 'center',
             justifyContent: 'center',
           }}
         >
-          <XIcon size={iconSizeSm} color={colors.fgMuted} />
-        </Pressable>
-      )}
+          {paint.icon}
+        </View>
+        <View style={{ flex: 1, gap: space4 }}>
+          <View
+            style={{
+              flexDirection: 'row',
+              flexWrap: 'wrap',
+              alignItems: 'center',
+              gap: space4,
+            }}
+          >
+            <Text variant="bodyStrong">{title}</Text>
+            {tag}
+          </View>
+          {children !== undefined && (
+            <Text variant="bodySmall" tone="muted">
+              {children}
+            </Text>
+          )}
+          {action !== undefined && !actionBeside && (
+            <View style={{ marginTop: space4 }}>{action}</View>
+          )}
+        </View>
+        {action !== undefined && actionBeside && (
+          <View style={{ alignSelf: 'center' }}>{action}</View>
+        )}
+        {onDismiss && (
+          <Pressable
+            testID={dismissTestID}
+            accessibilityRole="button"
+            accessibilityLabel={dismissLabel}
+            onPress={onDismiss}
+            style={{
+              width: touchTarget,
+              height: touchTarget,
+              marginTop: -space12,
+              marginRight: -space12,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <XIcon size={iconSizeSm} color={colors.fgMuted} />
+          </Pressable>
+        )}
+      </Animated.View>
     </View>
   );
-};
+});
 
 export default Banner;

@@ -265,7 +265,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
               // each other — no separator. The separator only marks the
               // boundary between distinct transactions.
               borderBottomWidth: nextLineWithSameTxid ? 0 : 1.5,
-              borderBottomColor: '#122033',
+              borderBottomColor: colors.borderSubtle,
               borderStyle: 'solid',
             }}
           >
@@ -456,7 +456,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                   opacity:
                     vt.status === RPCValueTransfersStatusEnum.failed ? 0.7 : 1,
                 }}
-                size={14}
+                size={15}
                 currencyName={info.currencyName}
                 color={
                   vt.status === RPCValueTransfersStatusEnum.failed
@@ -489,7 +489,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                   style={{
                     color:
                       vt.status === RPCValueTransfersStatusEnum.failed
-                        ? 'coral'
+                        ? colors.fgDanger
                         : vt.status ===
                               RPCValueTransfersStatusEnum.transmitted ||
                             vt.status === RPCValueTransfersStatusEnum.calculated

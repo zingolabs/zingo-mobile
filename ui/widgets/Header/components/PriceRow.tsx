@@ -74,21 +74,21 @@ export const PriceCard: React.FC<PriceCardProps> = React.memo(
           style={{ width: 32, height: 32, resizeMode: 'contain' }}
         />
         <View style={{ flex: 1 }}>
-          <BoldText style={{ color: colors.fgDefault, fontSize: 14 }}>
+          <BoldText style={{ color: colors.fgDefault, fontSize: 15 }}>
             Zcash
           </BoldText>
           <FadeText style={{ fontSize: 12 }}>ZEC</FadeText>
         </View>
         <View style={{ alignItems: 'flex-end' }}>
           <CurrencyAmount
-            style={{ fontSize: 14 }}
+            style={{ fontSize: 15 }}
             priceDate={quote.date}
             price={quote.price}
             amtZec={1}
             privacy={false}
           />
           {!!lastUpdate && (
-            <FadeText style={{ fontSize: 10 }}>
+            <FadeText style={{ fontSize: 12 }}>
               {(translate('header.lastupdate') as string) + ' ' + lastUpdate}
             </FadeText>
           )}

@@ -111,7 +111,7 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
                     >
                       <CheckIcon color={colors.fgAccent} size={16} />
                       {viewSyncStatus && (
-                        <FadeText style={{ fontSize: 10, marginLeft: 2 }}>
+                        <FadeText style={{ fontSize: 12, marginLeft: 2 }}>
                           {translate('synced') as string}
                         </FadeText>
                       )}
@@ -155,18 +155,18 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
                         >
                           <PlayIcon color={colors.fgSyncing} size={16} />
                           {viewSyncStatus && (
-                            <FadeText style={{ fontSize: 10, marginLeft: 2 }}>
+                            <FadeText style={{ fontSize: 12, marginLeft: 2 }}>
                               {translate('syncing') as string}
                             </FadeText>
                           )}
                           {viewSyncStatus && percentageOutputsScanned > 0 && (
-                            <FadeText style={{ fontSize: 10, marginLeft: 2 }}>
+                            <FadeText style={{ fontSize: 12, marginLeft: 2 }}>
                               {' - '}
                             </FadeText>
                           )}
                           {percentageOutputsScanned > 0 && (
                             <FadeText
-                              style={{ fontSize: 10, marginLeft: 2 }}
+                              style={{ fontSize: 12, marginLeft: 2 }}
                             >{` ${percentageOutputsScanned}%`}</FadeText>
                           )}
                         </View>
@@ -263,7 +263,7 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
               }}
             >
               <WifiIcon color={'red'} size={16} />
-              <FadeText style={{ fontSize: 10, marginLeft: 2 }}>
+              <FadeText style={{ fontSize: 12, marginLeft: 2 }}>
                 {translate('settings.server-offline') as string}
               </FadeText>
             </View>
