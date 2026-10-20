@@ -218,6 +218,7 @@
     "messages-menu": "Messages",
     "syncing": "Stopping the Synchronization to be able to reset the wallet... Can take a few seconds.",
     "connection-error": "This option requires an internet connection to be executed.",
+    "birthday-adjusted": "Your wallet predates Sapling. Scanning starts at block {height}.",
     "tryingnewserver": "Trying to connect to the new Server... Can take a few seconds.",
     "tryingnewserver-error": "After 15 seconds the new server doesn't respond.",
     "readingwallet": "Reading successfully the wallet with the server:",
@@ -780,7 +781,6 @@
     "seed-checksum": "These 24 words are not a valid seed phrase. Check each one, the last word above all.",
     "key-wrong-chain": "This viewing key is for {key}, and the selected network is {server}.",
     "need-words": "Enter all 24 words, or a viewing key.",
-    "need-birthday": "Enter a block height inside the range, or leave it empty.",
     "importing-title": "Importing your wallet",
     "screen-title": "Import wallet",
     "chooser-sub": "Choose what to restore from",
@@ -793,8 +793,7 @@
     "submit": "Import",
     "birthday-placeholder": "Enter block height",
     "birthday-tip-title": "Block height of your first transaction.",
-    "birthday-tip-body": "It's fine if you don't know it.",
-    "birthday-tip-range": "Range: {from} – {to}"
+    "birthday-tip-body": "It's fine if you don't know it."
   },
   "about": {
     "copyright": [

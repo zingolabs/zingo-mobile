@@ -218,6 +218,7 @@
     "messages-menu": "Mensagens",
     "syncing": "Parando a sincronização para poder redefinir a carteira... Pode levar alguns segundos.",
     "connection-error": "Esta opção requer uma conexão com a Internet para ser executada.",
+    "birthday-adjusted": "Sua carteira é anterior a Sapling. A varredura começa no bloco {height}.",
     "tryingnewserver": "Tentando conectar-se ao novo servidor... Pode levar alguns segundos.",
     "tryingnewserver-error": "Após 15 segundos o novo servidor não responde.",
     "readingwallet": "Lendo com sucesso a carteira atual com o servidor:",
@@ -780,7 +781,6 @@
     "seed-checksum": "Estas 24 palavras não formam uma frase de recuperação válida. Confira cada uma, principalmente a última.",
     "key-wrong-chain": "Esta chave de visualização é de {key}, e a rede selecionada é {server}.",
     "need-words": "Insira as 24 palavras, ou uma chave de visualização.",
-    "need-birthday": "Insira uma altura de bloco dentro do intervalo, ou deixe em branco.",
     "importing-title": "Importando sua carteira",
     "screen-title": "Importar carteira",
     "chooser-sub": "Escolha de onde restaurar",
@@ -793,8 +793,7 @@
     "submit": "Importar",
     "birthday-placeholder": "Insira a altura do bloco",
     "birthday-tip-title": "Altura do bloco da sua primeira transação.",
-    "birthday-tip-body": "Tudo bem se você não souber.",
-    "birthday-tip-range": "Intervalo: {from} – {to}"
+    "birthday-tip-body": "Tudo bem se você não souber."
   },
   "about": {
     "copyright": [

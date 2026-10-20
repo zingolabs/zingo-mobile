@@ -110,7 +110,7 @@ import {
   probeUri,
   recommendedServers,
 } from '@app/services/serverPicking';
-import { defaultTo, isEqual, max } from 'lodash';
+import { defaultTo, isEqual } from 'lodash';
 import {
   createUpdateRecoveryWalletInfo,
   getRecoveryWalletInfo,
@@ -150,13 +150,6 @@ const SERVER_DEFAULT_0: ServerType = remoteServer(
   serverUris(() => {})[0].uri,
   serverUris(() => {})[0].chainName,
 );
-
-const activationHeight = {
-  main: 419200,
-  test: 280000,
-  regtest: 1,
-  '': 1,
-};
 
 export default function LoadingApp(props: LoadingAppProps) {
   const theme = useTheme();
@@ -1320,17 +1313,7 @@ export class LoadingAppClass extends Component<
       }
     }
 
-    /**
-     * zingolib refuses a birthday below Sapling activation, and no shielded
-     * note exists below it, so an empty field, a saved 0 or a lower height
-     * all start at activation.
-     */
-    const walletBirthday = String(
-      max([
-        Math.trunc(defaultTo(birthday, 0)),
-        activationHeight[this.state.server.chainName],
-      ]),
-    );
+    const walletBirthday = String(defaultTo(birthday, 0));
 
     this.setState({ actionButtonsDisabled: true });
     // From the form, the Import button collapses first; from the Keychain
@@ -1357,7 +1340,7 @@ export class LoadingAppClass extends Component<
     if (type === RestoreFromTypeEnum.seedRestoreFrom) {
       result = await restoreWalletFromSeed(
         seedUfvk.toLowerCase(),
-        walletBirthday || '0',
+        walletBirthday,
         nativeUri(this.state.server),
         this.state.server.chainName,
         this.state.performanceLevel,
@@ -1366,7 +1349,7 @@ export class LoadingAppClass extends Component<
     } else {
       result = await restoreWalletFromUfvk(
         seedUfvk.toLowerCase(),
-        walletBirthday || '0',
+        walletBirthday,
         nativeUri(this.state.server),
         this.state.server.chainName,
         this.state.performanceLevel,

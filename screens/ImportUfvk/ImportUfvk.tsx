@@ -45,13 +45,6 @@ import { XIcon } from '@ui/primitives/Icons/XIcon';
 import { InfoIcon } from '@ui/primitives/Icons/InfoIcon';
 import { ChevronLeft } from '@ui/primitives/Icons/Chevron';
 
-const activationHeight = {
-  main: 419200,
-  test: 280000,
-  regtest: 1,
-  '': 1,
-};
-
 // Positions from the 402 x 874 design.
 const BODY_TOP = 112;
 const SIDE = 28;
@@ -91,7 +84,6 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
   const [pulse, setPulse] = useState(0);
   const keyboardHeight = useKeyboardHeight();
 
-  const activation = activationHeight[server.chainName];
   const status = seedStatus(seedufvkText);
   const typedKey = status.kind === 'ufvk' ? status.key : '';
   // The check of the key in the field; unknown while it runs, or when the
@@ -160,8 +152,6 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
     const timer = setTimeout(() => setKeyPaused(true), KEY_PAUSE_MS);
     return () => clearTimeout(timer);
   }, [typedKey]);
-  const birthdayLow = !!birthday && Number(birthday) < activation;
-  const ready = keyReady && !birthdayLow;
 
   const birthdayFocus = useSharedValue(0);
   const birthdayBorder = useAnimatedStyle(() => ({
@@ -185,14 +175,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
     });
   };
 
-  const tipBody =
-    (translate('import.birthday-tip-body') as string) +
-    (server.kind === 'offline'
-      ? ''
-      : '\n' +
-        (translate('import.birthday-tip-range') as string)
-          .replace('{from}', activation.toLocaleString())
-          .replace('{to}', latestBlock ? latestBlock.toLocaleString() : '--'));
+  const tipBody = translate('import.birthday-tip-body') as string;
 
   useEffect(() => {
     // Both conditions must hold: a session with no server has nothing to ask,
@@ -396,7 +379,6 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
                 overflow: 'hidden',
               },
               birthdayBorder,
-              birthdayLow && { borderColor: colors.borderDanger },
             ]}
           >
             <TextInput
@@ -483,17 +465,13 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
           <BusyButton
             testID="import.button.ok"
             title={translate('import.submit') as string}
-            enabled={ready}
+            enabled={keyReady}
             busy={busy}
             onPress={() => {
               okButton();
             }}
             onDisabledPress={() =>
-              addLastSnackbar(
-                translate(
-                  keyReady ? 'import.need-birthday' : 'import.need-words',
-                ) as string,
-              )
+              addLastSnackbar(translate('import.need-words') as string)
             }
           />
         </View>
