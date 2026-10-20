@@ -1,6 +1,6 @@
 export enum BlockExplorerEnum {
   Zcashexplorer = 'Zcashexplorer',
-  Cipherscan = 'Cipherscan',
+  ZecBlock = 'ZecBlock',
   Zexplorer = 'Zexplorer',
   None = 'None',
 }

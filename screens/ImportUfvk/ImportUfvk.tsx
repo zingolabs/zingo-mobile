@@ -1,47 +1,52 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-  useRef,
-} from 'react';
-import { View, TouchableOpacity, TextInput, Keyboard } from 'react-native';
-
+import { BUTTON_HEIGHT } from '@ui/primitives/Button';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import {
-  NavigationProp,
-  ParamListBase,
-  useNavigation,
-} from '@react-navigation/native';
+  View,
+  TouchableOpacity,
+  TextInput,
+  Keyboard,
+  Pressable,
+} from 'react-native';
+import Animated, {
+  interpolateColor,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
+
 import { useTheme } from '@app/theme';
 import {
   faChevronLeft,
-  faQrcode,
+  faCircleInfo,
   faXmark,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import BottomSheet, {
-  BottomSheetFooter,
-  BottomSheetFooterProps,
-  BottomSheetScrollView,
-} from '@gorhom/bottom-sheet';
 
-import FadeText from '@ui/primitives/FadeText';
 import RegText from '@ui/primitives/RegText';
 import BoldText from '@ui/primitives/BoldText';
-import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
-import AppSheet from '@ui/primitives/AppSheet';
 import { ContextAppLoading } from '@app/context';
-import Header from '@ui/widgets/Header';
-import { getLatestBlockServerInfo } from '@app/walletBackend';
+import SeedPhraseInput from '@ui/widgets/SeedPhraseInput';
+import BusyButton from '@ui/widgets/BusyButton';
+import InfoTooltip from '@ui/widgets/InfoTooltip';
+import { RevealOrigin } from '@ui/widgets/CircularReveal';
+import { ScanIcon } from '@ui/primitives/Icons/ScanIcon';
+import ScanOverlay from '@ui/widgets/ScanOverlay';
 import {
-  GlobalConst,
-  RouteEnum,
-  ScreenEnum,
-  SelectServerEnum,
-} from '@app/AppState';
-import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
+  UfvkCheck,
+  checkUfvk,
+  getLatestBlockServerInfo,
+} from '@app/walletBackend';
+import { ChainNameEnum, GlobalConst } from '@app/AppState';
 import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
+import {
+  isViewingKey,
+  scannedSeedPhrase,
+  seedStatus,
+  viewingKeyProblem,
+} from '@app/utils/seedPhrase';
+import { duration, ease } from '@app/theme/motion';
 
 const activationHeight = {
   main: 419200,
@@ -50,31 +55,153 @@ const activationHeight = {
   '': 1,
 };
 
+// Positions from the 402 x 874 design.
+const BODY_TOP = 112;
+const SIDE = 28;
+const FIELD_WIDTH = 270;
+const BUTTON_WIDTH = 301;
+const BUTTON_BOTTOM = 31;
+const NOTE_BOTTOM = 96;
+
 type ImportUfvkProps = {
+  busy: boolean;
   onClickCancel: () => void;
   onClickOK: (keyText: string, birthday: number) => void;
 };
+// Waits for typing to pause before decoding the key.
+const KEY_CHECK_DELAY_MS = 300;
+// A key the decode rejects reads as incomplete only once typing pauses
+// this long, so it does not turn red on every keystroke.
+const KEY_PAUSE_MS = 1200;
+
 const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
+  busy,
   onClickCancel,
   onClickOK,
 }) => {
-  const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const context = useContext(ContextAppLoading);
-  const { translate, netInfo, server, mode, addLastSnackbar, selectServer } =
-    context;
+  const { translate, netInfo, server, addLastSnackbar } = context;
   const { colors } = useTheme();
-  const screenName = ScreenEnum.ImportUfvk;
 
   const [seedufvkText, setSeedufvkText] = useState<string>('');
   const [birthday, setBirthday] = useState<string>('');
   const [latestBlock, setLatestBlock] = useState<number>(0);
-  const [containerH, setContainerH] = useState<number>(0);
-  const [headerH, setHeaderH] = useState<number>(0);
-  const importUfvkSheetRef = useRef<BottomSheet>(null);
+  const [tipOpen, setTipOpen] = useState<boolean>(false);
+  const scanButton = useRef<View>(null);
+  const [scan, setScan] = useState<
+    { kind: 'closed' } | { kind: 'open'; origin: RevealOrigin }
+  >({ kind: 'closed' });
+  const [pulse, setPulse] = useState(0);
   const keyboardHeight = useKeyboardHeight();
 
+  const activation = activationHeight[server.chainName];
+  const status = seedStatus(seedufvkText);
+  const typedKey = status.kind === 'ufvk' ? status.key : '';
+  // The check of the key in the field; unknown while it runs, or when the
+  // native call failed and the restore itself will report.
+  const [keyCheck, setKeyCheck] = useState<{ key: string; check: UfvkCheck }>({
+    key: '',
+    check: { kind: 'unknown' },
+  });
+  const check: UfvkCheck =
+    keyCheck.key === typedKey ? keyCheck.check : { kind: 'unknown' };
+  const keyChainMismatch =
+    check.kind === 'ufvk' &&
+    server.chainName !== ChainNameEnum.noneChainName &&
+    check.chainName !== server.chainName;
+  const chainLabel = (chain: ChainNameEnum) =>
+    translate(`settings.value-chainname-${chain}`) as string;
+  const problem = viewingKeyProblem(typedKey);
+  // Set once typing pauses or the key loses focus.
+  const [keyPaused, setKeyPaused] = useState(false);
+  const keyError =
+    problem.kind === 'prefix'
+      ? (translate('import.key-prefix') as string)
+      : problem.kind === 'char'
+        ? (translate('import.key-char') as string).replace(
+            '{char}',
+            problem.char,
+          )
+        : check.kind === 'ufvk' && keyChainMismatch
+          ? (translate('import.key-wrong-chain') as string)
+              .replace('{key}', chainLabel(check.chainName))
+              .replace('{server}', chainLabel(server.chainName))
+          : check.kind === 'invalid' && keyPaused
+            ? (translate('import.key-incomplete') as string)
+            : undefined;
+  const keyValid =
+    problem.kind === 'none' && check.kind === 'ufvk' && !keyChainMismatch;
+  // A key whose decode could not run passes on; the restore reports.
+  const keyReady =
+    (status.kind === 'ufvk' &&
+      keyCheck.key === typedKey &&
+      (keyValid || (problem.kind === 'none' && check.kind === 'unknown'))) ||
+    (status.kind === 'seed' && status.complete);
+
   useEffect(() => {
-    if (!netInfo.isConnected || selectServer !== SelectServerEnum.offline) {
+    if (!typedKey) {
+      return;
+    }
+    let live = true;
+    const timer = setTimeout(async () => {
+      const result = await checkUfvk(typedKey);
+      if (live) {
+        setKeyCheck({ key: typedKey, check: result });
+      }
+    }, KEY_CHECK_DELAY_MS);
+    return () => {
+      live = false;
+      clearTimeout(timer);
+    };
+  }, [typedKey]);
+
+  useEffect(() => {
+    setKeyPaused(false);
+    if (!typedKey) {
+      return;
+    }
+    const timer = setTimeout(() => setKeyPaused(true), KEY_PAUSE_MS);
+    return () => clearTimeout(timer);
+  }, [typedKey]);
+  const birthdayLow = !!birthday && Number(birthday) < activation;
+  const ready = keyReady && !birthdayLow;
+
+  const birthdayFocus = useSharedValue(0);
+  const birthdayBorder = useAnimatedStyle(() => ({
+    borderColor: interpolateColor(
+      birthdayFocus.value,
+      [0, 1],
+      [colors.bottomSheetBorder, colors.borderFocus],
+    ),
+  }));
+  /** A birthday that came with the phrase fills the field when the user left it empty. */
+  const fillBirthday = (height: number) => {
+    if (!birthday) {
+      setBirthday(String(height));
+    }
+  };
+
+  const setBirthdayFocused = (focused: boolean) => {
+    birthdayFocus.value = withTiming(focused ? 1 : 0, {
+      duration: duration.base,
+      easing: ease.standard,
+    });
+  };
+
+  const tipBody =
+    (translate('import.birthday-tip-body') as string) +
+    (server.kind === 'offline'
+      ? ''
+      : '\n' +
+        (translate('import.birthday-tip-range') as string)
+          .replace('{from}', activation.toLocaleString())
+          .replace('{to}', latestBlock ? latestBlock.toLocaleString() : '--'));
+
+  useEffect(() => {
+    // Both conditions must hold: a session with no server has nothing to ask,
+    // and a device with no network has nobody to ask. The disjunction this
+    // replaces entered on a downed radio in Offline mode.
+    if (netInfo.isConnected && server.kind !== 'offline') {
       (async () => {
         const resp = await getLatestBlockServerInfo(server.uri);
         if (resp.ok && resp.value) {
@@ -82,7 +209,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
         }
       })();
     }
-  }, [server, selectServer, netInfo.isConnected]);
+  }, [server, netInfo.isConnected]);
 
   useEffect(() => {
     if (seedufvkText) {
@@ -137,9 +264,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
     // wallet, a seed/UFVK can be restored locally and will simply sync once a
     // server is chosen. So only block when the device is genuinely offline AND
     // the user is NOT in explicit Offline mode — mirroring createNewWallet.
-    // (Previously this also blocked whenever Offline mode was selected, which
-    // rejected restores even with a working internet connection.)
-    if (!netInfo.isConnected && selectServer !== SelectServerEnum.offline) {
+    if (!netInfo.isConnected && server.kind !== 'offline') {
       addLastSnackbar(translate('loadedapp.connection-error') as string);
       return;
     }
@@ -147,284 +272,309 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({
     Keyboard.dismiss();
   };
 
-  const showQrcodeModalVisible = () => {
-    navigation.navigate(RouteEnum.ScannerUfvk, {
-      setUfvkText: (k: string) => setSeedufvkText(k),
-      active: true,
-    });
+  const openScanner = () => {
+    Keyboard.dismiss();
+    scanButton.current?.measureInWindow((x, y, width, height) =>
+      setScan({
+        kind: 'open',
+        origin: { x: x + width / 2, y: y + height / 2 },
+      }),
+    );
   };
 
-  const importUfvkSnapPoints = useFullSheetSnapPoints(containerH, headerH);
-
-  const importUfvkHeader = (
-    <View
-      style={{
-        paddingTop: 12,
-        paddingBottom: 8,
-        paddingHorizontal: 16,
-      }}
-    >
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-        }}
-      >
-        <TouchableOpacity
-          onPress={onClickCancel}
-          hitSlop={8}
-          style={{ paddingHorizontal: 4, paddingVertical: 4 }}
-        >
-          <FontAwesomeIcon
-            icon={faChevronLeft}
-            size={20}
-            color={colors.fgAccent}
-          />
-        </TouchableOpacity>
-        <BoldText
-          numberOfLines={1}
-          style={{
-            flex: 1,
-            fontSize: 16,
-            lineHeight: 28,
-            textAlign: 'center',
-          }}
-        >
-          {translate('import.title') as string}
-        </BoldText>
-        <View style={{ width: 28 }} />
-      </View>
-    </View>
-  );
-
-  const renderImportUfvkFooter = useCallback(
-    (props: BottomSheetFooterProps) => (
-      <BottomSheetFooter {...props} bottomInset={keyboardHeight}>
-        <View
-          style={{
-            backgroundColor: colors.bgSurface,
-            paddingTop: 10,
-            paddingBottom: 24,
-            flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-        >
-          <Button
-            testID="import.button.ok"
-            type={ButtonTypeEnum.Primary}
-            title={translate('import.button') as string}
-            onPress={() => {
-              okButton();
-            }}
-          />
-        </View>
-      </BottomSheetFooter>
-    ),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [colors, translate, seedufvkText, birthday, keyboardHeight],
-  );
+  const buttonBottom = keyboardHeight > 0 ? keyboardHeight + 12 : BUTTON_BOTTOM;
 
   return (
-    <View
-      style={{
-        flex: 1,
-        backgroundColor: colors.bgCanvas,
-      }}
-      onLayout={e => setContainerH(e.nativeEvent.layout.height)}
-    >
-      <View onLayout={e => setHeaderH(e.nativeEvent.layout.height)}>
-        <Header
-          title={''}
-          screenName={screenName}
-          noBalance={true}
-          noSyncingStatus={true}
-          noDrawMenu={true}
-          noPrivacy={true}
-          noUfvkIcon={true}
-          translate={translate}
-          netInfo={netInfo}
-          mode={mode}
-        />
-      </View>
-      <AppSheet
-        ref={importUfvkSheetRef}
-        snapPoints={importUfvkSnapPoints}
-        header={importUfvkHeader}
-        renderFooter={renderImportUfvkFooter}
+    <View style={{ flex: 1, backgroundColor: 'transparent' }}>
+      <BoldText
+        style={{
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          top: 14,
+          fontSize: 16,
+          lineHeight: 22,
+          textAlign: 'center',
+        }}
       >
-        <BottomSheetScrollView
-          keyboardShouldPersistTaps="handled"
-          bounces={false}
-          alwaysBounceVertical={false}
+        {translate('import.screen-title') as string}
+      </BoldText>
+
+      <KeyboardAwareScrollView
+        keyboardShouldPersistTaps="handled"
+        bottomOffset={BUTTON_HEIGHT + 12 + 16}
+        bounces={false}
+        onScrollBeginDrag={() => setTipOpen(false)}
+        style={{ flex: 1 }}
+        contentContainerStyle={{
+          paddingTop: BODY_TOP,
+          paddingHorizontal: SIDE,
+          paddingBottom: 200,
+        }}
+      >
+        {tipOpen && (
+          <Pressable
+            onPress={() => setTipOpen(false)}
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              zIndex: 1,
+            }}
+          />
+        )}
+        <View
           style={{
-            flex: 1,
-          }}
-          contentContainerStyle={{
-            flexDirection: 'column',
-            alignItems: 'stretch',
-            justifyContent: 'flex-start',
-            paddingBottom: keyboardHeight > 0 ? keyboardHeight + 80 : 80,
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginBottom: 20,
           }}
         >
-          <FadeText style={{ marginTop: 0, padding: 20, textAlign: 'center' }}>
-            {translate('import.key-label') as string}
-          </FadeText>
-          <View
-            style={{
-              margin: 10,
-              padding: 10,
-              borderWidth: 1,
-              borderRadius: 12,
-              borderColor: colors.borderMuted,
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-            }}
-          >
-            <View
-              accessible={true}
-              accessibilityLabel={translate('seed.seed-acc') as string}
-              style={{
-                marginRight: 5,
-                width: 'auto',
-                flex: 1,
-                justifyContent: 'center',
-              }}
-            >
-              <TextInput
-                testID="import.seedufvkinput"
-                multiline
-                autoCorrect={false}
-                autoComplete="off"
-                spellCheck={false}
-                textContentType="none"
-                keyboardType="visible-password"
-                style={{
-                  color: colors.fgDefault,
-                  fontWeight: '600',
-                  fontSize: 16,
-                  minHeight: 100,
-                  marginHorizontal: 5,
-                  backgroundColor: 'transparent',
-                  textAlignVertical: 'top',
-                }}
-                value={seedufvkText}
-                onChangeText={setSeedufvkText}
-              />
-            </View>
-            {seedufvkText && (
-              <TouchableOpacity
-                onPress={() => {
-                  setSeedufvkText('');
-                }}
-              >
+          <BoldText style={{ fontSize: 12.5, lineHeight: 16 }}>
+            {translate('import.seed-label') as string}
+          </BoldText>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+            {!!seedufvkText && (
+              <TouchableOpacity onPress={() => setSeedufvkText('')} hitSlop={8}>
                 <FontAwesomeIcon
-                  style={{ margin: 0 }}
-                  size={20}
+                  size={16}
                   icon={faXmark}
-                  color={colors.fgAccentDisabled}
+                  color={colors.fgMuted}
                 />
               </TouchableOpacity>
             )}
-            <TouchableOpacity
-              onPress={() => {
-                showQrcodeModalVisible();
-              }}
+            <Pressable
+              ref={scanButton}
+              testID="import.scan"
+              accessibilityRole="button"
+              accessibilityLabel={translate('scanner.title') as string}
+              onPress={openScanner}
+              style={({ pressed }) => ({
+                width: 34,
+                height: 34,
+                marginVertical: -9,
+                marginRight: -6,
+                borderRadius: 9,
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: pressed
+                  ? 'rgba(211,226,248,0.08)'
+                  : 'transparent',
+              })}
             >
-              <FontAwesomeIcon
-                size={28}
-                icon={faQrcode}
-                color={colors.fgMuted}
-              />
-            </TouchableOpacity>
+              <ScanIcon size={22} color={colors.fgMuted} />
+            </Pressable>
           </View>
+        </View>
+        <SeedPhraseInput
+          testID="import.seedufvkinput"
+          accessibilityLabel={translate('seed.seed-acc') as string}
+          value={seedufvkText}
+          onChangeValue={setSeedufvkText}
+          translate={translate}
+          keyError={keyError}
+          keyValid={keyValid}
+          onKeyBlur={() => setKeyPaused(true)}
+          pulse={pulse}
+          onBirthday={fillBirthday}
+        />
 
-          <View style={{ marginTop: 10, alignItems: 'center' }}>
-            <FadeText>{translate('import.birthday') as string}</FadeText>
-            {selectServer !== SelectServerEnum.offline && (
-              <FadeText style={{ textAlign: 'center' }}>
-                {translate('seed.birthday-no-readonly') +
-                  ` (${activationHeight[server.chainName]}, ` +
-                  (latestBlock ? latestBlock.toString() : '--') +
-                  ')'}
-              </FadeText>
-            )}
-            <View
-              accessible={true}
-              accessibilityLabel={translate('import.birthday-acc') as string}
-              style={{
-                margin: 10,
+        <View style={{ marginTop: 39, alignItems: 'center' }}>
+          <InfoTooltip
+            testID="import.birthdayinfo"
+            label={translate('import.birthday') as string}
+            title={translate('import.birthday-tip-title') as string}
+            text={tipBody}
+            open={tipOpen}
+            onToggle={setTipOpen}
+          />
+          <Animated.View
+            style={[
+              {
+                marginTop: 14,
+                width: FIELD_WIDTH,
+                height: 42,
                 borderWidth: 1,
-                borderRadius: 12,
-                borderColor: colors.borderMuted,
-                width: '30%',
-                maxWidth: '40%',
-                maxHeight: 48,
-                minWidth: '20%',
-                minHeight: 48,
+                borderRadius: 10,
+                backgroundColor: colors.bgSurface,
                 flexDirection: 'row',
                 alignItems: 'center',
+                overflow: 'hidden',
+              },
+              birthdayBorder,
+              birthdayLow && { borderColor: colors.fgDangerEmphasis },
+            ]}
+          >
+            <TextInput
+              testID="import.birthdayinput"
+              accessible={true}
+              accessibilityLabel={translate('import.birthday-acc') as string}
+              placeholder={translate('import.birthday-placeholder') as string}
+              placeholderTextColor={colors.fgMuted}
+              onFocus={() => setBirthdayFocused(true)}
+              onBlur={() => setBirthdayFocused(false)}
+              style={{
+                color: colors.fgDefault,
+                fontSize: 13,
+                flex: 1,
+                height: 42,
+                paddingHorizontal: 15,
+                paddingVertical: 0,
+                backgroundColor: 'transparent',
               }}
-            >
-              <TextInput
-                testID="import.birthdayinput"
-                placeholder={'#'}
-                placeholderTextColor={colors.fgMuted}
-                style={{
-                  color: colors.fgDefault,
-                  fontWeight: '600',
-                  fontSize: 18,
-                  flex: 1,
-                  minHeight: 48,
-                  marginLeft: 5,
-                  backgroundColor: 'transparent',
-                }}
-                value={birthday}
-                onChangeText={(text: string) => {
-                  if (isNaN(Number(text))) {
-                    setBirthday('');
-                  } else if (
-                    Number(text) <= 0 ||
-                    (Number(text) > latestBlock &&
-                      selectServer !== SelectServerEnum.offline)
-                  ) {
-                    setBirthday('');
-                  } else {
-                    setBirthday(
-                      Number(text.replace('.', '').replace(',', '')).toFixed(0),
-                    );
-                  }
-                }}
-                editable={
-                  latestBlock
-                    ? true
-                    : selectServer !== SelectServerEnum.offline
-                      ? false
-                      : true
+              value={birthday}
+              onChangeText={(text: string) => {
+                if (isNaN(Number(text))) {
+                  setBirthday('');
+                } else if (
+                  Number(text) <= 0 ||
+                  (Number(text) > latestBlock && server.kind !== 'offline')
+                ) {
+                  setBirthday('');
+                } else {
+                  setBirthday(
+                    Number(text.replace('.', '').replace(',', '')).toFixed(0),
+                  );
                 }
-                keyboardType="numeric"
-              />
-              {!!birthday &&
-                (!!latestBlock ||
-                  selectServer === SelectServerEnum.offline) && (
-                  <TouchableOpacity onPress={() => setBirthday('')}>
-                    <FontAwesomeIcon
-                      style={{ marginRight: 5 }}
-                      size={20}
-                      icon={faXmark}
-                      color={colors.fgAccentDisabled}
-                    />
-                  </TouchableOpacity>
-                )}
-            </View>
+              }}
+              editable={
+                latestBlock ? true : server.kind !== 'offline' ? false : true
+              }
+              keyboardType="numeric"
+            />
+            {!!birthday && (!!latestBlock || server.kind === 'offline') && (
+              <TouchableOpacity
+                onPress={() => setBirthday('')}
+                hitSlop={8}
+                style={{ paddingRight: 12 }}
+              >
+                <FontAwesomeIcon
+                  size={14}
+                  icon={faXmark}
+                  color={colors.fgMuted}
+                />
+              </TouchableOpacity>
+            )}
+          </Animated.View>
+        </View>
+      </KeyboardAwareScrollView>
 
-            <RegText style={{ margin: 20, marginBottom: 30 }}>
-              {translate('import.text') as string}
-            </RegText>
-          </View>
-        </BottomSheetScrollView>
-      </AppSheet>
+      {keyboardHeight === 0 && (
+        <View
+          pointerEvents="none"
+          style={{
+            position: 'absolute',
+            left: 37,
+            right: 40,
+            bottom: NOTE_BOTTOM,
+            flexDirection: 'row',
+            gap: 11,
+          }}
+        >
+          <FontAwesomeIcon
+            icon={faCircleInfo}
+            size={13}
+            color={colors.fgAccent}
+            style={{ marginTop: 1 }}
+          />
+          <RegText style={{ flex: 1, fontSize: 9.5, lineHeight: 13 }}>
+            {translate('import.text') as string}
+          </RegText>
+        </View>
+      )}
+      <View
+        style={{
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          bottom: buttonBottom,
+          alignItems: 'center',
+        }}
+      >
+        <View style={{ width: BUTTON_WIDTH }}>
+          <BusyButton
+            testID="import.button.ok"
+            title={translate('import.submit') as string}
+            enabled={ready}
+            busy={busy}
+            onPress={() => {
+              okButton();
+            }}
+            onDisabledPress={() =>
+              addLastSnackbar(
+                translate(
+                  keyReady ? 'import.need-birthday' : 'import.need-words',
+                ) as string,
+              )
+            }
+          />
+        </View>
+      </View>
+      {/* The scanner has its own back; this one sits above it (zIndex). */}
+      {scan.kind !== 'open' && (
+        <Pressable
+          testID="import.back"
+          onPress={onClickCancel}
+          disabled={busy}
+          hitSlop={14}
+          accessibilityRole="button"
+          style={({ pressed }) => ({
+            position: 'absolute',
+            left: 17,
+            top: 2,
+            width: 44,
+            height: 44,
+            borderRadius: 10,
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 3,
+            opacity: busy ? 0.4 : 1,
+            backgroundColor: pressed ? colors.bgSurface : 'transparent',
+          })}
+        >
+          <FontAwesomeIcon
+            icon={faChevronLeft}
+            size={18}
+            color={colors.fgAccent}
+          />
+        </Pressable>
+      )}
+      {scan.kind === 'open' && (
+        <ScanOverlay
+          testID="import.scanner"
+          origin={scan.origin}
+          texts={{
+            title: translate('scanner.title') as string,
+            hint: translate('import.scan-hint') as string,
+            miss: translate('import.scan-miss') as string,
+            found: value =>
+              translate(
+                isViewingKey(value)
+                  ? 'import.scan-found'
+                  : 'import.scan-found-seed',
+              ) as string,
+            back: translate('scanner.back') as string,
+            torch: translate('scanner.torch') as string,
+          }}
+          accepts={value => isViewingKey(value) || !!scannedSeedPhrase(value)}
+          onRead={value => {
+            const seed = scannedSeedPhrase(value);
+            if (seed) {
+              setSeedufvkText(seed.words.join(' '));
+              if (seed.birthday) {
+                fillBirthday(seed.birthday);
+              }
+            } else {
+              setSeedufvkText(value);
+            }
+            setPulse(p => p + 1);
+          }}
+          onClosed={() => setScan({ kind: 'closed' })}
+        />
+      )}
     </View>
   );
 };

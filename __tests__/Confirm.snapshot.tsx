@@ -11,15 +11,15 @@ import {
 } from '@app/context';
 
 import Confirm from '@screens/Confirm';
-import { ModeEnum, RouteEnum } from '@app/AppState';
+import { RouteEnum } from '@app/AppState';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import { mockZecPrice } from '../__mocks__/dataMocks/mockZecPrice';
 import { mockServer } from '../__mocks__/dataMocks/mockServer';
-import { mockSecurity } from '../__mocks__/dataMocks/mockSecurity';
 import mockSendPageState from '../__mocks__/dataMocks/mockSendPageState';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { NetInfoStateType } from '@react-native-community/netinfo/src/index';
 import { AppDrawerParamList } from '@app/types';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
@@ -51,11 +51,15 @@ describe('Confirm - snapshots', () => {
   state.totalBalance = mockTotalBalance;
   state.zecPrice = mockZecPrice;
   state.server = mockServer;
+  state.netInfo = {
+    isConnected: true,
+    type: NetInfoStateType.wifi,
+    isConnectionExpensive: false,
+  };
   // sendConfirm disabled here so the on-mount biometric gate in Confirm.tsx
   // stays inactive and the snapshot captures the actual Confirm UI rather
   // than the auth placeholder.
-  state.security = { ...mockSecurity, sendConfirm: false };
-  state.mode = ModeEnum.advanced;
+  state.biometrics = false;
   state.defaultUnifiedAddress = 'u1abc123def456abc123def456abc123def456abc123';
 
   test('Confirm privacy off', () => {

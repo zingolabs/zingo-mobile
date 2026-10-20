@@ -9,9 +9,9 @@ import {
 const service = GlobalConst.serviceKeyChain;
 
 // SILENT_SECURE profile — encryption-at-rest only, no prompt. Rationale:
-//   - The recovery seed/UFVK is gated at the SCREEN level (Seed.tsx /
-//     ShowUfvk.tsx ask the gate controller on mount when the user enables
-//     security.seedUfvkScreen). That is the user-visible authorisation.
+//   - The recovery seed/UFVK is gated at the SCREEN level (WalletSeed.tsx /
+//     ViewingKey.tsx ask the gate controller when the user enables
+//     the biometrics switch). That is the user-visible authorisation.
 //   - Stacking a second bio gate at the keychain item caused
 //     startup-save failures on Android (the gate auth window expired
 //     before the post-wallet-load save ran, so the AES_GCM auth-required
@@ -42,20 +42,35 @@ const getOptions: Keychain.GetOptions = buildGetOptions(
   'SILENT_SECURE',
 );
 
-export const saveRecoveryWalletInfo = async (
-  keys: WalletType,
-): Promise<void> => {
-  if (!keys.seed && !keys.ufvk) {
-    console.log('no seed or ufvk to store');
-    return;
+// The raw stored password, or null when there is none or it can't be read.
+const readRecoveryWalletInfo = async (): Promise<string | null> => {
+  try {
+    const credentials = await Keychain.getGenericPassword(getOptions);
+    if (
+      credentials &&
+      credentials.username === GlobalConst.keyKeyChain &&
+      credentials.service === service
+    ) {
+      return credentials.password;
+    }
+    console.log('no recovery keys stored');
+  } catch (error) {
+    console.log('Error getting recovery keys:', error);
   }
-  const password = JSON.stringify(keys);
+  return null;
+};
+
+// The error that kept the entry from being written, or null when it was.
+const writeRecoveryWalletInfo = async (
+  password: string,
+): Promise<string | null> => {
   try {
     await Keychain.setGenericPassword(
       GlobalConst.keyKeyChain,
       password,
       setOptions,
     );
+    return null;
   } catch (error) {
     // An existing entry from a previous app version may use an
     // incompatible cipher (e.g. the old auth-required AES_GCM or RSA).
@@ -69,55 +84,73 @@ export const saveRecoveryWalletInfo = async (
         password,
         baseOptions,
       );
+      return null;
     } catch (retryError) {
       console.log('Error saving keys after reset:', retryError);
+      return retryError instanceof Error
+        ? retryError.message
+        : String(retryError);
     }
   }
 };
 
-export const getRecoveryWalletInfo = async (): Promise<WalletType> => {
-  try {
-    const credentials = await Keychain.getGenericPassword(getOptions);
-    if (credentials) {
-      if (
-        credentials.username === GlobalConst.keyKeyChain &&
-        credentials.service === service
-      ) {
-        return JSON.parse(credentials.password) as WalletType;
-      } else {
-        console.log('no match the key');
-      }
-    } else {
-      console.log('no recovery keys stored');
+// Why recovery info did not end up on the device, or none when it did.
+export type RecoveryInfoSaveResult =
+  | { kind: 'saved' }
+  | { kind: 'no-keys' }
+  | { kind: 'write-failed'; error: string }
+  | { kind: 'mismatch' };
+
+// Only recovery info known to be right stays on the device: it is written
+// and read back, and anything else is removed. That covers a wallet that
+// couldn't be read (`null`), one without a seed or a UFVK, and a write or
+// read that failed, so the entry never holds another wallet's keys.
+export const saveRecoveryWalletInfo = async (
+  keys: WalletType | null,
+): Promise<RecoveryInfoSaveResult> => {
+  let result: RecoveryInfoSaveResult = { kind: 'no-keys' };
+  if (keys && (keys.seed || keys.ufvk)) {
+    const password = JSON.stringify(keys);
+    const error = await writeRecoveryWalletInfo(password);
+    if ((await readRecoveryWalletInfo()) === password) {
+      return { kind: 'saved' };
     }
-  } catch (error) {
-    // Leave the entry intact on any error — saveRecoveryWalletInfo has
-    // its own reset+retry for genuine cipher incompatibilities, and a
-    // wipe-on-read makes the seed unrecoverable until the next save.
-    console.log('Error getting recovery keys (entry left intact):', error);
+    result = error ? { kind: 'write-failed', error } : { kind: 'mismatch' };
+  }
+  await removeRecoveryWalletInfo();
+  return result;
+};
+
+export const getRecoveryWalletInfo = async (): Promise<WalletType> => {
+  const password = await readRecoveryWalletInfo();
+  if (password) {
+    try {
+      return JSON.parse(password) as WalletType;
+    } catch (error) {
+      console.log('Error parsing recovery keys:', error);
+    }
   }
   return {} as WalletType;
 };
 
 export const hasRecoveryWalletInfo = async (): Promise<boolean> => {
-  return await Keychain.hasGenericPassword(baseOptions);
+  try {
+    return await Keychain.hasGenericPassword(baseOptions);
+  } catch (error) {
+    console.log('Error checking recovery keys:', error);
+    return false;
+  }
 };
 
 export const createUpdateRecoveryWalletInfo = async (
-  keys: WalletType,
-): Promise<void> => {
-  await saveRecoveryWalletInfo(keys);
-};
+  keys: WalletType | null,
+): Promise<RecoveryInfoSaveResult> => saveRecoveryWalletInfo(keys);
 
 export const removeRecoveryWalletInfo = async (): Promise<void> => {
-  if (await hasRecoveryWalletInfo()) {
+  try {
     const removed = await Keychain.resetGenericPassword(baseOptions);
-    if (!removed) {
-      console.log('error removing keys');
-    } else {
-      console.log('keys removed');
-    }
-  } else {
-    console.log('no keys to remove');
+    console.log(removed ? 'keys removed' : 'error removing keys');
+  } catch (error) {
+    console.log('Error removing keys:', error);
   }
 };

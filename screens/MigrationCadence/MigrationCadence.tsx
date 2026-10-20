@@ -138,7 +138,7 @@ const PresetCard: React.FunctionComponent<PresetCardProps> = ({
 // per-bucket cadence, binding the parts and scheduling them, then hands off to
 // the schedule review screen that arms the reminders. There is no migration
 // state yet, so the part count and the fresh consent hash come from a live
-// plan_ironwood_migration read (ADR 0016), and the bucket cadence params from
+// plan_ironwood_migration read (zingolib/0016), and the bucket cadence params from
 // migration_status's provisional values.
 const MigrationCadence: React.FunctionComponent<MigrationCadenceProps> = ({
   navigation,

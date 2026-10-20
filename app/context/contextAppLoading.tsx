@@ -6,10 +6,9 @@ import {
   ZecPriceType,
   BackgroundType,
   NetInfoType,
-  ServerType,
-  SecurityType,
+  ChainNameEnum,
+  remoteServer,
   LanguageEnum,
-  ModeEnum,
   SelectServerEnum,
   BlockExplorerEnum,
 } from '@app/AppState';
@@ -17,7 +16,7 @@ import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformance
 
 export const defaultAppContextLoading: AppContextLoading = {
   netInfo: {} as NetInfoType,
-  server: {} as ServerType,
+  server: remoteServer('', ChainNameEnum.noneChainName),
   language: LanguageEnum.en,
   zecPrice: {
     zecPrice: 0,
@@ -37,11 +36,9 @@ export const defaultAppContextLoading: AppContextLoading = {
   orchardPool: true,
   saplingPool: true,
   transparentPool: true,
-  mode: ModeEnum.advanced,
   addLastSnackbar: () => {},
-  security: {} as SecurityType,
+  biometrics: false,
   selectServer: SelectServerEnum.auto,
-  recoveryWalletInfoOnDevice: false,
   zingolibVersion: '',
   performanceLevel: RPCPerformanceLevelEnum.Medium,
   setPrivacyOption: async () => {},

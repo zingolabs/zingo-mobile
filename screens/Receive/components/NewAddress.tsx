@@ -113,6 +113,7 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
           newAddress,
           randomColors[0],
           true,
+          context.walletChainName || context.server.chainName,
         );
         //console.log(ab);
         setAddressBook(ab);
@@ -265,7 +266,7 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
           }}
         >
           <Button
-            type={ButtonTypeEnum.Secondary}
+            type={ButtonTypeEnum.Link}
             title={translate('cancel') as string}
             onPress={() => {
               setLabel('');

@@ -40,23 +40,24 @@ interface RPCModuleAPI {
     performanceLevel: string,
     minConfirmations: string,
   ): Promise<string>;
-  restoreExistingWalletBackup(): Promise<string>;
+  restoreExistingWalletBackup(): Promise<string | boolean>;
+  replaceWalletWithBackup(): Promise<string | boolean>;
   // Android only (2.0.21 double-wrap incident): per-file classification of
   // the wallet files, and the unwrap repair. Absent on iOS.
   walletFileDiagnosisInfo(): Promise<string>;
   repairDoubleWrappedWalletProcess(): Promise<string>;
   walletFileRecoveryInfo(): Promise<string>;
+  walletChainInfo(): Promise<string>;
   deleteExistingWallet(): Promise<string>;
-  deleteExistingWalletBackup(): Promise<string>;
   // The save results are trimodal across the bridges: Android resolves a
   // boolean, iOS resolves "true"/"false", and both resolve "Error: ..."
   // prose from their catch blocks (zingo-mobile#1151). Classify with
   // nativeSaveSucceeded, never by inspecting content ad hoc.
   doSave(): Promise<boolean | string>;
-  doSaveBackup(): Promise<boolean | string>;
 
   // Server / network
   getLatestBlockServerInfo(serverUri: string): Promise<string>;
+  probeServerInfo(serverUri: string): Promise<string>;
   getLatestBlockWalletInfo(): Promise<string>;
   changeServerProcess(serverUri: string): Promise<string>;
   infoServerInfo(): Promise<string>;
@@ -123,7 +124,7 @@ interface RPCModuleAPI {
     perBucket: string,
   ): Promise<string>;
   continueNoteSplittingProcess(): Promise<string>;
-  // Phase 1 splitting, stateless and send-shaped (ADR 0016). One call per
+  // Phase 1 splitting, stateless and send-shaped (zingolib/0016). One call per
   // round; loop until the outcome is `complete`, then startIronwoodMigration.
   quickSplitProcess(): Promise<string>;
   // Live progress of the in-flight splitting round; safe to poll concurrently
@@ -153,15 +154,14 @@ interface RPCModuleAPI {
     performanceLevel: string,
     minConfirmations: string,
   ): Promise<string>;
-  setCryptoDefaultProvider(): Promise<string>;
 
   setBroadcastCandidates(candidatesJson: string): Promise<string>;
 
   attachMixnet(socks5Addr: string, exitNode: string): Promise<string>;
   enableMixnet(proxyPath: string): Promise<string>;
+  disableMixnet(): Promise<string>;
   mixnetIndicatorInfo(): Promise<string>;
   mixnetBootstrapDetailInfo(): Promise<string>;
-  setTransmitPolicy(policy: string): Promise<string>;
 }
 
 export default NativeModules.RPCModule as RPCModuleAPI;

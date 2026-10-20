@@ -1,5 +1,6 @@
 import java.util.Properties
 import java.io.FileInputStream
+import kotlin.time.Duration.Companion.seconds
 
 plugins {
     id("com.android.application")
@@ -27,7 +28,7 @@ react {
     //   The list of variants to that are debuggable. For those we're going to
     //   skip the bundling of the JS bundle and the assets. By default is just 'debug'.
     //   If you add flavors like lite, prod, etc. you'll have to list your debuggableVariants.
-    // debuggableVariants = ["liteDebug", "prodDebug"]
+    debuggableVariants = listOf("prodDebug", "betaDebug")
 
     /* Bundling */
     //   A list containing the node command and its flags. Default is just 'node'.
@@ -88,6 +89,16 @@ val jscFlavor = "io.github.react-native-community:jsc-android:2026004.+"
  * e.g. ./gradlew assembleRelease -PsplitApk=true -PincludeUniversalApk=true
  */
 val splitApk = (project.findProperty("splitApk") as? String)?.toBoolean() ?: false
+
+// The limit that the instrumentation runner gives one instrumented test.
+val instrumentedTestTimeout = 60.seconds
+// The zingo-mobile part of the build descriptor, which RPCModule joins to the
+// zingolib part that get_version() returns.
+val zmDescriptor: String = runCatching {
+    providers.exec {
+        commandLine("node", rootProject.file("../scripts/zm_descriptor.mjs").path)
+    }.standardOutput.asText.get().trim()
+}.getOrDefault("").ifEmpty { "zm_unknown" }
 val includeUniversalApk = (project.findProperty("includeUniversalApk") as? String)?.toBoolean() ?: false
 
 val keystoreProperties = Properties()
@@ -121,10 +132,15 @@ android {
         applicationId = "org.ZingoLabs.Zingo" // Real
         minSdk = rootProject.extra["minSdkVersion"] as Int
         targetSdk = rootProject.extra["targetSdkVersion"] as Int
-        versionCode = 320 // Real (prod baseline; beta flavor overrides below)
-        versionName = "2.0.24" // Real
+        versionCode = 322 // Real (prod baseline; beta flavor overrides below)
+        versionName = "2.1.0" // Real
         testBuildType = System.getProperty("testBuildType", "debug")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        resValue("string", "zm_descriptor", zmDescriptor)
+        testInstrumentationRunnerArguments["timeout_msec"] =
+            instrumentedTestTimeout.inWholeMilliseconds.toString()
+        // The orchestrator clears the app's data between tests.
+        testInstrumentationRunnerArguments["clearPackageData"] = "true"
         externalNativeBuild {
             ndkBuild {
                 arguments(
@@ -155,7 +171,7 @@ android {
         create("beta") {
             dimension = "channel"
             applicationIdSuffix = ".Beta"
-            versionCode = 331 // beta override
+            versionCode = 341 // beta override
             versionName = "2.0.23" // beta override
             resValue("string", "app_name", "Zingo Beta")
         }
@@ -237,21 +253,30 @@ android {
     }
 
     sourceSets {
+        getByName("main") {
+            // The Binding Layer AAR carries the native libraries. A build from
+            // before the zingolib submodule left copies under the gitignored
+            // src/main/jniLibs, and packaging them beside the AAR's copies
+            // fails the merge or ships the stale library.
+            jniLibs.setSrcDirs(emptyList<String>())
+        }
         getByName("test") {
             // The nym proxy shim's Kotlin wire-contract test, read from the
             // crate itself. No copy lives under src/test.
-            java.srcDir("../../rust/nym-proxy-ffi/contract-tests/kotlin")
+            java.srcDir("../../zingolib/zingo-netutils/nym-proxy-ffi/contract-tests/kotlin")
         }
     }
 
     testOptions {
+        // Each instrumented test runs in its own process.
+        execution = "ANDROIDX_TEST_ORCHESTRATOR"
         unitTests.all {
             // The golden wire-contract pins for GoldenWireContractTest, read
             // from the crate itself.
             it.systemProperty(
                 "zingo.golden.dir",
                 layout.projectDirectory
-                    .dir("../../rust/nym-proxy-ffi/test-data/golden")
+                    .dir("../../zingolib/zingo-netutils/nym-proxy-ffi/test-data/golden")
                     .asFile.absolutePath
             )
         }
@@ -320,30 +345,11 @@ androidComponents {
     }
 }
 
-// change this to build.sh script
-androidComponents {
-    onVariants { variant ->
-//        val t = tasks.register("generate${variant.name.replaceFirstChar { it.uppercase() }}UniFFIBindings", Exec::class) {
-//            workingDir("${rootProject.projectDir}/../rust")
-//            commandLine("cargo", "run", "--release", "--features=uniffi/cli", "--bin", "uniffi-bindgen",
-//            "generate", "../rust/lib/src/zingo.udl", "--language", "kotlin",
-//            "--out-dir", "${layout.buildDirectory.get()}/generated/source/uniffi/${variant.name}/java")
-//        }
-        // UniFFI bindings are generated by `node rust/android/build_android.mjs` into
-        // build/generated/source/uniffi/{debug,release}/java. They depend only on the
-        // build type, not on the product flavor, so we key on buildType to keep all
-        // flavors (prod/beta) pointing at the same generated source.
-        variant.sources.java?.addStaticSourceDirectory(
-            layout.buildDirectory.dir("generated/source/uniffi/${variant.buildType}/java").get().asFile.absolutePath
-        )
-    }
-}
 
 dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
 
-    androidTestImplementation("com.wix:detox:20.51.4")
     implementation("androidx.appcompat:appcompat:1.7.0")
     // DeviceAuthModule's BiometricPrompt (react-native-keychain only pulls
     // this transitively; direct use declares it).
@@ -355,11 +361,6 @@ dependencies {
         exclude(group = "com.android.installreferrer")
     }
     implementation("com.facebook.soloader:soloader:0.10.5")
-
-
-    // Detox tests getAttributes() reaches this by reflection at runtime, so
-    // it is runtime-only: no source references exist for compile analysis.
-    debugRuntimeOnly("com.google.android.material:material:1.12.0")
 
     // Hermes is always enabled in RN 0.74+
     implementation("com.facebook.react:hermes-android")
@@ -402,15 +403,14 @@ dependencies {
     // JVM unit tests for pure logic (no device or emulator)
     testImplementation("junit:junit:4.13.2")
 
-    // JUnit test runners; the instrumented sources use the JUnit 4 API and
-    // the androidx.test runner/rules directly.
-    androidTestImplementation("androidx.test.ext:junit:1.2.1")
+    // The instrumented sources use the JUnit 4 API, and the androidx.test
+    // runner executes them.
     androidTestImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test:rules:1.7.0")
     androidTestImplementation("androidx.test:runner:1.7.0")
+    androidTestUtil("androidx.test:orchestrator:1.6.1")
 
-    // uniffi needs this
-    implementation("net.java.dev.jna:jna:5.18.1@aar")
+    // The Binding Layer from the zingolib submodule. It brings JNA with it.
+    implementation("org.zingolabs:zingo-binding-layer")
 
     // encrypted file storage
     implementation("androidx.security:security-crypto:1.0.0")

@@ -1,12 +1,12 @@
-import { useEffect, useReducer, useSyncExternalStore } from 'react';
+import { useSyncExternalStore } from 'react';
 import { AppState, NativeEventSubscription } from 'react-native';
-import { getZecPrice } from '@app/walletBackend';
+import { errorKeyed } from '@app/AppState';
+import { getZecPrice, ZecPriceOutcome } from '@app/walletBackend';
 import { MixnetStatusKey } from '@app/walletBackend/transforms/mixnetView';
 
 export const PRICE_REFRESH_MIN_MS = 45_000;
 export const PRICE_REFRESH_MAX_MS = 75_000;
 const PRICE_FETCH_TIMEOUT_MS = 30_000;
-export const PRICE_STALE_MS = PRICE_REFRESH_MAX_MS + PRICE_FETCH_TIMEOUT_MS;
 const FETCH_BURST_COOLDOWN_MS = 5_000;
 const NATIVE_CALL_TTL_MS = 2 * PRICE_REFRESH_MAX_MS;
 
@@ -21,6 +21,8 @@ type PriceSurfaceSnapshot = {
   nextFetchAt: number;
   nextFetchDelayMs: number;
   surfaceActive: boolean;
+  // The last fetch ended without a price.
+  failed: boolean;
 };
 
 type Cadence =
@@ -37,9 +39,13 @@ type NativeFlight =
   | { state: 'none' }
   | {
       state: 'inFlight';
-      call: Promise<{ price: number; error: string }>;
+      call: Promise<ZecPriceOutcome>;
       startedAt: number;
     };
+
+type PriceAttempt = ZecPriceOutcome | { kind: 'timeout' };
+
+const TIMED_OUT: PriceAttempt = { kind: 'timeout' };
 
 let loading = false;
 let entryPending = false;
@@ -52,6 +58,7 @@ let appAway = false;
 let lastFetchStartAt = 0;
 let lastSuccessAt = 0;
 let lastReturnFetchAt = 0;
+let lastFetchFailed = false;
 let nativeFlight: NativeFlight = { state: 'none' };
 const listeners = new Set<() => void>();
 
@@ -60,6 +67,7 @@ let snapshotCache: PriceSurfaceSnapshot = {
   nextFetchAt: 0,
   nextFetchDelayMs: 0,
   surfaceActive: false,
+  failed: false,
 };
 
 function emit(): void {
@@ -105,34 +113,32 @@ function scheduleAuto(): void {
 }
 
 // A wedged native call is reused until its TTL, then replaced.
-function startNativeCall(): Promise<{ price: number; error: string }> {
+function startNativeCall(): Promise<ZecPriceOutcome> {
   if (
     nativeFlight.state === 'inFlight' &&
     Date.now() - nativeFlight.startedAt <= NATIVE_CALL_TTL_MS
   ) {
     return nativeFlight.call;
   }
-  const launched: Promise<{ price: number; error: string }> =
-    getZecPrice().finally(() => {
-      if (nativeFlight.state === 'inFlight' && nativeFlight.call === launched) {
-        nativeFlight = { state: 'none' };
-      }
-    });
+  const launched: Promise<ZecPriceOutcome> = getZecPrice().finally(() => {
+    if (nativeFlight.state === 'inFlight' && nativeFlight.call === launched) {
+      nativeFlight = { state: 'none' };
+    }
+  });
   nativeFlight = { state: 'inFlight', call: launched, startedAt: Date.now() };
   return launched;
 }
 
-// Resolves -3 on timeout and -2 on a rejected native call.
-async function boundedPrice(): Promise<number> {
+// A rejected native call becomes an error outcome; a slow one times out.
+async function boundedAttempt(): Promise<PriceAttempt> {
   let bound: ReturnType<typeof setTimeout> | undefined;
-  const expiry = new Promise<{ price: number }>(resolve => {
-    bound = setTimeout(() => resolve({ price: -3 }), PRICE_FETCH_TIMEOUT_MS);
+  const expiry = new Promise<PriceAttempt>(resolve => {
+    bound = setTimeout(() => resolve(TIMED_OUT), PRICE_FETCH_TIMEOUT_MS);
   });
   try {
-    const { price } = await Promise.race([startNativeCall(), expiry]);
-    return price;
-  } catch {
-    return -2;
+    return await Promise.race<PriceAttempt>([startNativeCall(), expiry]);
+  } catch (thrown: unknown) {
+    return errorKeyed('info.error-price-fetch', String(thrown));
   } finally {
     clearTimeout(bound);
   }
@@ -149,23 +155,23 @@ async function doFetch(): Promise<void> {
   lastFetchStartAt = Date.now();
   emit();
   try {
-    let price = await boundedPrice();
+    let attempt = await boundedAttempt();
     if (
-      price <= 0 &&
-      price !== -3 &&
+      attempt.kind === 'error' &&
       epoch === sessionEpoch &&
       surfaceMayFetch()
     ) {
-      price = await boundedPrice();
+      attempt = await boundedAttempt();
     }
 
     if (epoch !== sessionEpoch) {
       return;
     }
-    if (price > 0) {
+    lastFetchFailed = attempt.kind !== 'zecPrice';
+    if (attempt.kind === 'zecPrice') {
       entryPending = false;
       lastSuccessAt = Date.now();
-      d.setZecPrice(price, lastSuccessAt);
+      d.setZecPrice(attempt.usd, lastSuccessAt);
     }
   } finally {
     if (epoch === sessionEpoch) {
@@ -234,6 +240,7 @@ export const priceFetcherStore = {
         lastFetchStartAt = 0;
         lastSuccessAt = 0;
         lastReturnFetchAt = 0;
+        lastFetchFailed = false;
         nativeFlight = { state: 'none' };
         deps = undefined;
         clearAuto();
@@ -264,12 +271,14 @@ export const priceFetcherStore = {
       nextFetchAt: cadence.state === 'idle' ? 0 : cadence.deadline,
       nextFetchDelayMs: cadence.state === 'idle' ? 0 : cadence.delayMs,
       surfaceActive: surfaceMayFetch(),
+      failed: lastFetchFailed,
     };
     if (
       next.loading !== snapshotCache.loading ||
       next.nextFetchAt !== snapshotCache.nextFetchAt ||
       next.nextFetchDelayMs !== snapshotCache.nextFetchDelayMs ||
-      next.surfaceActive !== snapshotCache.surfaceActive
+      next.surfaceActive !== snapshotCache.surfaceActive ||
+      next.failed !== snapshotCache.failed
     ) {
       snapshotCache = next;
     }
@@ -279,6 +288,7 @@ export const priceFetcherStore = {
     lastFetchStartAt = 0;
     lastSuccessAt = 0;
     lastReturnFetchAt = 0;
+    lastFetchFailed = false;
     entryPending = false;
     nativeFlight = { state: 'none' };
     loading = false;
@@ -299,29 +309,14 @@ export function usePriceFetcherStore(): PriceSurfaceSnapshot {
   );
 }
 
-export function usePriceStale(priceDate: number): boolean {
-  const [, force] = useReducer((n: number) => n + 1, 0);
-  useEffect(() => {
-    if (priceDate <= 0) {
-      return;
-    }
-    const untilStale = priceDate + PRICE_STALE_MS - Date.now();
-    if (untilStale <= 0) {
-      return;
-    }
-    const timer = setTimeout(force, untilStale + 50);
-    return () => clearTimeout(timer);
-  }, [priceDate]);
-  return priceDate > 0 && Date.now() - priceDate > PRICE_STALE_MS;
-}
-
 export type PriceHealth = 'live' | 'stale' | 'absent';
 
-// An omitted date is a historical conversion and reads live.
+// A live price mutes when the last fetch failed, not by its age. An
+// omitted date is a historical conversion and reads live.
 export function usePriceHealth(priceDate: number | undefined): PriceHealth {
-  const stale = usePriceStale(priceDate ?? 0);
+  const { failed } = usePriceFetcherStore();
   if (priceDate === 0) {
     return 'absent';
   }
-  return stale ? 'stale' : 'live';
+  return priceDate !== undefined && failed ? 'stale' : 'live';
 }

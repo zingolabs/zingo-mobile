@@ -4,16 +4,26 @@ const serverUris = (
   translate: (key: string) => TranslateType | void,
 ): ServerUrisType[] => {
   return [
-    // default server
+    // default server, and a recommended Zaino server. It stays first: the
+    // apps take entry 0 as the server before any setting is read.
     {
-      uri: 'https://zec.rocks:443', // this will be the default server.
-      region: translate('settings.usa') as string,
+      uri: 'https://mainnet.zainod.zingolabs.dev:443',
+      region: translate('settings.na') as string,
       chainName: ChainNameEnum.mainChainName,
       default: true,
       latency: null,
       obsolete: false,
+      recommended: true,
     },
     // new servers (not default)
+    {
+      uri: 'https://zec.rocks:443',
+      region: translate('settings.usa') as string,
+      chainName: ChainNameEnum.mainChainName,
+      default: false,
+      latency: null,
+      obsolete: false,
+    },
     {
       uri: 'https://na.zec.rocks:443',
       region: translate('settings.na') as string,

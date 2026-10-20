@@ -1,9 +1,15 @@
-/* eslint-disable react-native/no-inline-styles */
 import React, { useEffect, useRef, useState } from 'react';
 import { StyleProp, View, ViewStyle } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faRotateRight } from '@fortawesome/free-solid-svg-icons';
+import Animated, {
+  cancelAnimation,
+  Easing,
+  ReduceMotion,
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withTiming,
+} from 'react-native-reanimated';
 
 // One coarse wall-clock tick per second, re-rendered only when the arc
 // would visibly move: a per-frame Animated.timing on the JS driver cost
@@ -11,29 +17,30 @@ import { faRotateRight } from '@fortawesome/free-solid-svg-icons';
 // a pixel.
 const RING_TICK_MS = 1_000;
 const RING_ARC_STEP = 1 / 64;
+const SPIN_MS = 900;
+const FETCH_ARC = 0.25;
 
 /**
- * Display-only countdown ring: a refresh glyph wrapped in a ring that
- * fills clockwise to full over `durationMs` and restarts whenever
- * `resetKey` changes. It offers no tap: the surface has no manual
- * fetch, so the ring only reports the cadence that is running.
+ * Display-only countdown ring: the arc empties over `durationMs` and
+ * refills whenever `resetKey` changes. While `fetching`, a short arc
+ * spins instead. It has no tap target and stays out of the
+ * accessibility tree: the price beside it carries the announcement.
  */
 type QuoteRefreshRingProps = {
   size: number;
-  /** Centre refresh-glyph colour. */
+  /** Remaining-time arc colour. */
   color: string;
-  /** Progress-arc (fill) colour. Falls back to `color` when omitted. */
-  ringColor?: string;
-  /** Faint unfilled-track colour. */
+  /** Spinning arc colour while a request runs. */
+  fetchColor: string;
+  /** Faint track colour. */
   trackColor: string;
-  /** Time for the ring to go empty → full (matches the refresh interval). */
+  /** Time for the ring to go full → empty (matches the refresh interval). */
   durationMs: number;
-  /** Change this to restart the fill (e.g. the quote's receivedAtMs). */
+  /** Change this to refill the ring (e.g. the next deadline). */
   resetKey: number | string;
-  /** Fill fraction a restart begins at, for a ring mounted mid-cycle. */
+  /** Elapsed fraction a refill begins at, for a ring mounted mid-cycle. */
   startProgress?: number;
-  /** What a screen reader announces for this ring. */
-  accessibilityLabel?: string;
+  fetching?: boolean;
   style?: StyleProp<ViewStyle>;
   testID?: string;
 };
@@ -41,16 +48,16 @@ type QuoteRefreshRingProps = {
 export default function QuoteRefreshRing({
   size,
   color,
-  ringColor,
+  fetchColor,
   trackColor,
   durationMs,
   resetKey,
   startProgress,
-  accessibilityLabel,
+  fetching,
   style,
   testID,
 }: QuoteRefreshRingProps) {
-  // A ref, so a re-render's fresher phase never restarts the fill:
+  // A ref, so a re-render's fresher phase never restarts the countdown:
   // only resetKey (and a changed duration) may.
   const startProgressRef = useRef(0);
   startProgressRef.current = Math.min(Math.max(startProgress ?? 0, 0), 1);
@@ -77,61 +84,68 @@ export default function QuoteRefreshRing({
     return () => clearInterval(tick);
   }, [resetKey, durationMs]);
 
-  // Full offset = empty ring; 0 = full ring.
-  const strokeDashoffset = circumference * (1 - progress);
+  const turn = useSharedValue(0);
+  useEffect(() => {
+    if (fetching) {
+      turn.value = 0;
+      turn.value = withRepeat(
+        withTiming(360, {
+          duration: SPIN_MS,
+          easing: Easing.linear,
+          reduceMotion: ReduceMotion.System,
+        }),
+        -1,
+      );
+    } else {
+      cancelAnimation(turn);
+      turn.value = 0;
+    }
+  }, [fetching, turn]);
+  const spin = useAnimatedStyle(() => ({
+    transform: [{ rotate: `${turn.value}deg` }],
+  }));
 
-  const face = (
-    <>
-      <Svg width={size} height={size} style={{ position: 'absolute' }}>
-        <Circle
-          cx={center}
-          cy={center}
-          r={radius}
-          stroke={trackColor}
-          strokeWidth={strokeWidth}
-          fill="none"
-        />
-        <Circle
-          cx={center}
-          cy={center}
-          r={radius}
-          stroke={ringColor ?? color}
-          strokeWidth={strokeWidth}
-          fill="none"
-          strokeLinecap="round"
-          strokeDasharray={circumference}
-          strokeDashoffset={strokeDashoffset}
-          // Start the fill at 12 o'clock instead of 3 o'clock.
-          rotation={-90}
-          originX={center}
-          originY={center}
-        />
-      </Svg>
-      <FontAwesomeIcon
-        icon={faRotateRight}
-        size={Math.round(size * 0.48)}
-        color={color}
-      />
-    </>
-  );
+  // Offset 0 = full ring; the full circumference = empty ring.
+  const strokeDashoffset = fetching
+    ? circumference * (1 - FETCH_ARC)
+    : circumference * progress;
 
-  const frame: ViewStyle = {
-    width: size,
-    height: size,
-    alignItems: 'center',
-    justifyContent: 'center',
-  };
-
-  // Display-only: no tap stop, no disabled state, just a labeled image.
   return (
     <View
-      accessible={!!accessibilityLabel}
-      accessibilityRole="image"
-      accessibilityLabel={accessibilityLabel}
+      accessible={false}
+      accessibilityElementsHidden
+      importantForAccessibility="no-hide-descendants"
+      pointerEvents="none"
       testID={testID}
-      style={[frame, style]}
+      style={[{ width: size, height: size }, style]}
     >
-      {face}
+      <Animated.View style={[{ width: size, height: size }, spin]}>
+        <Svg width={size} height={size}>
+          <Circle
+            cx={center}
+            cy={center}
+            r={radius}
+            stroke={trackColor}
+            strokeWidth={strokeWidth}
+            fill="none"
+          />
+          <Circle
+            cx={center}
+            cy={center}
+            r={radius}
+            stroke={fetching ? fetchColor : color}
+            strokeWidth={strokeWidth}
+            fill="none"
+            strokeLinecap="round"
+            strokeDasharray={circumference}
+            strokeDashoffset={strokeDashoffset}
+            // The arc starts at 12 o'clock instead of 3 o'clock.
+            rotation={-90}
+            originX={center}
+            originY={center}
+          />
+        </Svg>
+      </Animated.View>
     </View>
   );
 }

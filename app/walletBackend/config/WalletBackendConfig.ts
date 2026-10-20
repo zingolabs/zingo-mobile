@@ -8,8 +8,11 @@ import {
 } from '@app/AppState';
 import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
 import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
-import { StartMixnetTransport } from '@app/walletBackend/modules/MixnetCoordinator';
-import { MixnetView } from '@app/walletBackend/transforms/mixnetView';
+import {
+  StartMixnetTransport,
+  StopMixnetTransport,
+} from '@app/walletBackend/modules/MixnetCoordinator';
+import { MixnetTransportView } from '@app/walletBackend/transforms/mixnetView';
 
 // Every sub-service shares one reference to this config.
 export type WalletBackendConfig = {
@@ -26,8 +29,9 @@ export type WalletBackendConfig = {
   onError: (error: string) => void;
   // Called after several consecutive sync-launch failures.
   onPersistentSyncFailure?: () => void;
-  onMixnetViewChanged: (view: MixnetView) => void;
+  onMixnetViewChanged: (view: MixnetTransportView) => void;
   startMixnetTransport: StartMixnetTransport;
+  stopMixnetTransport: StopMixnetTransport;
   // Tests inject false to keep the coordinator unstarted.
   mixnetSupported: boolean;
   keepAwake: (keep: boolean) => void;
@@ -35,3 +39,8 @@ export type WalletBackendConfig = {
   server: ServerType;
   performanceLevel: RPCPerformanceLevelEnum;
 };
+
+// Offline is the server choice with no indexer.
+export function isOffline(config: WalletBackendConfig): boolean {
+  return config.server.kind === 'offline';
+}

@@ -12,9 +12,9 @@ const ThemedQuoteRefreshRing = (
   return (
     <QuoteRefreshRing
       {...args}
-      color={colors.fgDefault}
-      ringColor={colors.bgAccent}
-      trackColor={colors.bottomSheetBorder}
+      color={colors.fgMuted}
+      fetchColor={colors.fgAccent}
+      trackColor="#13263F"
     />
   );
 };
@@ -26,7 +26,8 @@ const meta: Meta<typeof QuoteRefreshRing> = {
   args: {
     size: 48,
     color: '#ffffff',
-    trackColor: '#333333',
+    fetchColor: '#43a637',
+    trackColor: '#13263F',
     durationMs: 8000,
     resetKey: 'story',
   },
@@ -37,3 +38,4 @@ type Story = StoryObj<typeof QuoteRefreshRing>;
 
 export const Default: Story = {};
 export const MidCycle: Story = { args: { startProgress: 0.5 } };
+export const Fetching: Story = { args: { fetching: true } };

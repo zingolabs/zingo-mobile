@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useState, useEffect, useRef } from 'react';
+import React, { useContext, useRef } from 'react';
 import { View, ScrollView, TouchableOpacity, Text } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import {
@@ -12,7 +12,6 @@ import { useTheme } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
 import {
   AddressKindEnum,
-  ModeEnum,
   RouteEnum,
   SnackbarDurationEnum,
   TransparentAddressClass,
@@ -30,6 +29,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCircleCheck } from '@fortawesome/free-regular-svg-icons';
 import Address from './Address/Address';
 import { getZingoLogo } from '@app/utils/ZingoAppData';
+import { useTimedReveal } from '@app/hooks/useTimedReveal';
 
 type SingleAddressProps = {
   address?: UnifiedAddressClass | TransparentAddressClass;
@@ -51,28 +51,14 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
 }) => {
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const context = useContext(ContextAppLoaded);
-  const { translate, privacy, addLastSnackbar, mode, addressBook } = context;
+  const { translate, privacy, addLastSnackbar, addressBook } = context;
   const { colors } = useTheme();
 
-  const [expandQRAddress, setExpandQRAddress] = useState<boolean>(true);
+  const { visible: expandQRAddress, reveal: revealQRAddress } =
+    useTimedReveal(privacy);
   const scrollViewRef = useRef<ScrollView>(null);
 
-  const isBasic = ModeEnum.basic === mode;
   const isUnified = address?.addressKind === AddressKindEnum.u;
-
-  useEffect(() => {
-    if (privacy) {
-      setExpandQRAddress(false);
-    } else {
-      setExpandQRAddress(true);
-    }
-  }, [privacy]);
-
-  useEffect(() => {
-    if (!expandQRAddress && !privacy) {
-      setExpandQRAddress(true);
-    }
-  }, [expandQRAddress, privacy]);
 
   function contactFromAddress() {
     const contact = addressBook.find(c => c.address === address?.address);
@@ -112,7 +98,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
         (address &&
           address.address !== (translate('receive.noaddress') as string)) ? (
           <>
-            {address && !isBasic && !isUnified && (
+            {address && !isUnified && (
               <View
                 style={{
                   alignSelf: 'center',
@@ -154,7 +140,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                 marginBottom: 5,
               }}
             >
-              {!isBasic && address && isUnified && (
+              {address && isUnified && (
                 <View
                   style={{
                     flexDirection: 'row',
@@ -201,7 +187,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                   </View>
                 </View>
               )}
-              {address && !isBasic && !isUnified && (
+              {address && !isUnified && (
                 <View
                   style={{
                     flexDirection: 'row',
@@ -289,14 +275,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                         borderColor: colors.fgDefault,
                       }}
                     >
-                      <TouchableOpacity
-                        onPress={() => {
-                          setExpandQRAddress(true);
-                          setTimeout(() => {
-                            setExpandQRAddress(false);
-                          }, 5 * 1000);
-                        }}
-                      >
+                      <TouchableOpacity onPress={revealQRAddress}>
                         <Text
                           style={{
                             color: colors.fgMuted,
@@ -361,7 +340,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                     />
                   </View>
                 </TouchableOpacity>
-                {address && !isBasic && (
+                {address && (
                   <>
                     <TouchableOpacity onPress={() => show('VA')}>
                       <View

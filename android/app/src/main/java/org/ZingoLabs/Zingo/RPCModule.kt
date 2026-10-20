@@ -51,6 +51,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         // init: a stray save of the in-memory wallet must not resurrect a
         // file the user replaced.
         @Volatile
+        @JvmField
         internal var walletFileClosed = false
     }
 
@@ -90,7 +91,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     // The full zingolib parse behind every destructive file decision.
     private fun isIntactWallet(bytes: ByteArray): Boolean = try {
-        uniffi.zingo.validateWalletBytes(bytes)
+        uniffi.zingo.validateWalletBytes(walletBytes = bytes)
         true
     } catch (e: Exception) {
         Log.w("MAIN", "[Native] wallet bytes failed validation: $e")
@@ -99,7 +100,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     // Writes validated plain wallet bytes.
     private fun writeWalletBytes(fileName: String, bytes: ByteArray) {
-        uniffi.zingo.validateWalletBytes(bytes)
+        uniffi.zingo.validateWalletBytes(walletBytes = bytes)
         PlainWalletFile.write(applicationContext.filesDir, fileName, bytes)
     }
 
@@ -164,7 +165,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 )
         }
         try {
-            uniffi.zingo.validateWalletBytes(plain)
+            uniffi.zingo.validateWalletBytes(walletBytes = plain)
             if (PlainWalletFile.migrateIfStillLegacy(filesDir, fileName, plain)) {
                 Log.i("MAIN", "[$fileName] migrated to plain wallet bytes")
             }
@@ -183,28 +184,27 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             PlainWalletFile.digest(readWalletBytes(fileName))
         }
 
-    // Restores a wallet file from its legacy "$fileName.write.tmp" stash
+    // Restores the wallet file from its legacy "$fileName.write.tmp" stash
     // when the file fails the full parse, and drops the orphan once the
     // file passes.
     fun completePendingWrite() {
-        for (fileName in listOf(WalletFileName.value, WalletBackupFileName.value)) {
-            val tempName = "$fileName.write.tmp"
-            if (!fileExists(tempName)) continue
-            try {
-                val targetIntact = fileExists(fileName) && try {
-                    isIntactWallet(readWalletBytes(fileName))
-                } catch (_: Exception) {
-                    false
-                }
-                if (!targetIntact) {
-                    writeWalletBytes(fileName, readWalletBytes(tempName))
-                    Log.i("MAIN", "[Native] completePendingWrite: restored $fileName from $tempName")
-                }
-                deleteFile(tempName)
-            } catch (e: Exception) {
-                Log.e("MAIN", "[Native] completePendingWrite for $fileName failed: $e", e)
-                // Leave temp in place for diagnosis / next attempt.
+        val fileName = WalletFileName.value
+        val tempName = "$fileName.write.tmp"
+        if (!fileExists(tempName)) return
+        try {
+            val targetIntact = fileExists(fileName) && try {
+                isIntactWallet(readWalletBytes(fileName))
+            } catch (_: Exception) {
+                false
             }
+            if (!targetIntact) {
+                writeWalletBytes(fileName, readWalletBytes(tempName))
+                Log.i("MAIN", "[Native] completePendingWrite: restored $fileName from $tempName")
+            }
+            deleteFile(tempName)
+        } catch (e: Exception) {
+            Log.e("MAIN", "[Native] completePendingWrite for $fileName failed: $e", e)
+            // Leave temp in place for diagnosis / next attempt.
         }
     }
 
@@ -263,9 +263,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         // `.migrating` copy answers "exists". Write recovery runs before
         // swap recovery: a half-written save can leave main missing, which
         // would make a pending swap unable to read main.
-        for (fileName in listOf(WalletFileName.value, WalletBackupFileName.value)) {
-            PlainWalletFile.resolveInterruptedMigration(applicationContext.filesDir, fileName, ::isIntactWallet)
-        }
+        PlainWalletFile.resolveInterruptedMigration(applicationContext.filesDir, WalletFileName.value, ::isIntactWallet)
         completePendingWrite()
         completePendingSwap()
     }
@@ -312,20 +310,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         }
     }
 
-    private fun saveWalletBackupFile(): Boolean {
-        return try {
-            if (walletFileClosed) {
-                Log.w("MAIN", "[Native] wallet file closed, backup save refused")
-                return false
-            }
-            writeWalletBytes(WalletBackupFileName.value, readWalletBytes(WalletFileName.value))
-            true
-        } catch (e: Exception) {
-            Log.e("MAIN", "[Native] Couldn't save the wallet backup: $e")
-            false
-        }
-    }
-
     // Wallet-file diagnosis and the double-wrap repair. Support tooling for
     // the 2.0.21 incident: the migration of that release re-wrapped an
     // already encrypted file after a transient Keystore failure, and
@@ -333,7 +317,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     // Includes each .migrating twin, a plain copy that flags an interrupted migration, but not the encrypted .prerepair/.broken copies that would only read as undecryptable.
     private fun walletFileNames(): List<String> =
-        listOf(WalletFileName.value, WalletBackupFileName.value).flatMap {
+        WalletFileName.value.let {
             listOf(it, "$it.write.tmp", "$it.migrating")
         } + WalletTempSwapFileName.value
 
@@ -466,7 +450,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         if (WalletFileEnvelope.classify(payload) != WalletFileEnvelope.PayloadKind.TINK_ENVELOPE) return "skipped"
         val unwrapped = unwrapToPlainWallet(fileName, payload) ?: return "failed"
         return try {
-            uniffi.zingo.validateWalletBytes(unwrapped.first)
+            uniffi.zingo.validateWalletBytes(walletBytes = unwrapped.first)
             file.copyTo(File(filesDir, "$fileName.prerepair"), overwrite = true)
             PlainWalletFile.write(filesDir, fileName, unwrapped.first)
             val verified = PlainWalletFile.readIfPlain(filesDir, fileName) != null
@@ -482,7 +466,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     // file and keeps the damaged bytes at "$fileName.broken".
     internal fun walletFileRecoveryInfoNative(): String {
         val file = File(applicationContext.filesDir, WalletFileName.value)
-        val salvaged = uniffi.zingo.readWalletRecoveryInfo(file.readBytes())
+        val salvaged = uniffi.zingo.readWalletRecoveryInfo(walletBytes = file.readBytes())
         file.copyTo(File(applicationContext.filesDir, "${WalletFileName.value}.broken"), overwrite = true)
         return salvaged
     }
@@ -495,14 +479,21 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         }
     }
 
+    // The chain the wallet file was written for: main, test or regtest.
+    @ReactMethod
+    fun walletChainInfo(promise: Promise) {
+        FfiOutcome.settling(promise, "read_wallet_chain") {
+            uniffi.zingo.initLogging()
+            uniffi.zingo.readWalletChain(walletBytes = readWalletBytes(WalletFileName.value))
+        }
+    }
+
     @ReactMethod
     fun repairDoubleWrappedWalletProcess(promise: Promise) {
         FfiOutcome.settling(promise, "repair_double_wrapped_wallet") {
-            val outcome = JSONObject()
-            for (name in listOf(WalletFileName.value, WalletBackupFileName.value)) {
-                outcome.put(name, repairDoubleWrappedFile(name))
-            }
-            outcome.toString()
+            JSONObject()
+                .put(WalletFileName.value, repairDoubleWrappedFile(WalletFileName.value))
+                .toString()
         }
     }
 
@@ -518,6 +509,12 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         }
     }
 
+    private fun syncSettings(performancelevel: String, minconfirmations: String) =
+        uniffi.zingo.SyncSettings(performanceLevel = performancelevel, minConfirmations = minconfirmations.toUInt())
+
+    private fun connection(serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String) =
+        uniffi.zingo.IndexerConnection(serverUri = serveruri, chainHint = chainhint, sync = syncSettings(performancelevel, minconfirmations))
+
     @ReactMethod
     fun createNewWallet(serveruri: String, birthday: String, chainhint: String, performancelevel: String, minconfirmations: String, promise: Promise) {
         FfiOutcome.settling(promise, "init_new") {
@@ -527,7 +524,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             // implies the wallet exists. Offline (empty serveruri) uses
             // `birthday` in place of the chain tip; online it is ignored
             // (pass "0").
-            val resp = uniffi.zingo.initNew(serveruri, birthday.toUInt(), chainhint, performancelevel, minconfirmations.toUInt())
+            val resp = uniffi.zingo.initNew(connection = connection(serveruri, chainhint, performancelevel, minconfirmations), birthday = birthday.toUInt())
             walletFileClosed = false
             saveWalletFile()
             resp
@@ -539,7 +536,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         FfiOutcome.settling(promise, "init_from_seed") {
             uniffi.zingo.initLogging()
 
-            val resp = uniffi.zingo.initFromSeed(seed, birthday.toUInt(), serveruri, chainhint, performancelevel, minconfirmations.toUInt())
+            val resp = uniffi.zingo.initFromSeed(seed = seed, birthday = birthday.toUInt(), connection = connection(serveruri, chainhint, performancelevel, minconfirmations))
             walletFileClosed = false
             saveWalletFile()
             resp
@@ -551,7 +548,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         FfiOutcome.settling(promise, "init_from_ufvk") {
             uniffi.zingo.initLogging()
 
-            val resp = uniffi.zingo.initFromUfvk(ufvk, birthday.toUInt(), serveruri, chainhint, performancelevel, minconfirmations.toUInt())
+            val resp = uniffi.zingo.initFromUfvk(ufvk = ufvk, birthday = birthday.toUInt(), connection = connection(serveruri, chainhint, performancelevel, minconfirmations))
             walletFileClosed = false
             saveWalletFile()
             resp
@@ -573,22 +570,9 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         val walletBytes = readWalletBytes(WalletFileName.value)
         Log.i("MAIN", "file size: ${walletBytes.size} bytes")
 
-        val resp = uniffi.zingo.initFromBytes(walletBytes, serveruri, chainhint, performancelevel, minconfirmations.toUInt())
+        val resp = uniffi.zingo.initFromBytes(walletBytes = walletBytes, connection = connection(serveruri, chainhint, performancelevel, minconfirmations))
         walletFileClosed = false
-        migrateRetainedWallet()
         return resp
-    }
-
-    // Best-effort after a successful load: reading the retained wallet
-    // migrates a legacy encrypted file to plain.
-    private fun migrateRetainedWallet() {
-        if (!fileExists(WalletBackupFileName.value)) return
-        if (PlainWalletFile.readsPlain(applicationContext.filesDir, WalletBackupFileName.value)) return
-        try {
-            readWalletBytes(WalletBackupFileName.value)
-        } catch (e: Exception) {
-            Log.w("MAIN", "[Native] retained wallet migration failed: $e")
-        }
     }
 
     @ReactMethod
@@ -645,6 +629,37 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         }
     }
 
+    // The backup takes the main wallet's place and the backup file goes:
+    // for a wallet that is never backed up (not mainnet), which is lost.
+    // A crash between the write and the delete leaves the same wallet in
+    // both files, which is harmless.
+    @ReactMethod
+    fun replaceWalletWithBackup(promise: Promise) {
+        try {
+            val backup = readWalletBytes(WalletBackupFileName.value)
+            if (!isIntactWallet(backup)) {
+                Log.e("MAIN", "[Native] backup replace: content failed validation")
+                promise.resolve(false)
+                return
+            }
+            // Closed until the reload after the replace.
+            walletFileClosed = true
+            completePendingSwap()
+            writeWalletBytes(WalletFileName.value, backup)
+            PlainWalletFile.locked {
+                deleteFile(WalletBackupFileName.value)
+                deleteWalletSidecars(WalletBackupFileName.value)
+            }
+            promise.resolve(true)
+        } catch (e: FileNotFoundException) {
+            Log.e("MAIN", "[Native] file not found during backup replace", e)
+            promise.resolve(false)
+        } catch (e: Exception) {
+            Log.e("MAIN", "[Native] Unexpected error during backup replace: $e")
+            promise.resolve(false)
+        }
+    }
+
     // Deletes every sidecar the recovery paths could rename or copy back
     // onto the wallet path.
     private fun deleteWalletSidecars(fileName: String) {
@@ -654,7 +669,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     // A swap temp that `completePendingSwap` could not consume can hold
-    // the only copy of a wallet, and it survives both delete methods.
+    // the only copy of a wallet, and it survives the delete.
     @ReactMethod
     fun deleteExistingWallet(promise: Promise) {
         completePendingSwap()
@@ -670,22 +685,9 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         promise.resolve(deleted)
     }
 
-    @ReactMethod
-    fun deleteExistingWalletBackup(promise: Promise) {
-        completePendingSwap()
-        val deleted = PlainWalletFile.locked {
-            val gone = fileExists(WalletBackupFileName.value) && deleteFile(WalletBackupFileName.value)
-            if (!fileExists(WalletBackupFileName.value)) {
-                deleteWalletSidecars(WalletBackupFileName.value)
-            }
-            gone
-        }
-        promise.resolve(deleted)
-    }
-
-    // saveWalletFile/saveWalletBackupFile still contain their own failures
+    // saveWalletFile still contains its own failures
     // as a resolved false (the init flows depend on a save failure not
-    // failing the whole init), so these shells resolve that boolean
+    // failing the whole init), so this shell resolves that boolean
     // verbatim; only an escaping exception rejects. No outcome is ever
     // re-encoded as prose in the success channel (zingo-mobile#1151).
     @ReactMethod
@@ -697,18 +699,18 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
-    fun doSaveBackup(promise: Promise) {
-        FfiOutcome.settling(promise, "save_wallet_backup") {
+    fun getLatestBlockServerInfo(serveruri: String, promise: Promise) {
+        FfiOutcome.settling(promise, "get_latest_block_server") {
             uniffi.zingo.initLogging()
-            saveWalletBackupFile()
+            uniffi.zingo.getLatestBlockServer(serveruri = serveruri)
         }
     }
 
     @ReactMethod
-    fun getLatestBlockServerInfo(serveruri: String, promise: Promise) {
-        FfiOutcome.settling(promise, "get_latest_block_server") {
+    fun probeServerInfo(serveruri: String, promise: Promise) {
+        FfiOutcome.settling(promise, "probe_server") {
             uniffi.zingo.initLogging()
-            uniffi.zingo.getLatestBlockServer(serveruri)
+            uniffi.zingo.probeServer(serverUri = serveruri)
         }
     }
 
@@ -741,14 +743,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         FfiOutcome.settling(promise, "get_value_transfers") {
             uniffi.zingo.initLogging()
             uniffi.zingo.getValueTransfers()
-        }
-    }
-
-    @ReactMethod
-    fun setCryptoDefaultProvider(promise: Promise) {
-        FfiOutcome.settling(promise, "set_crypto_default_provider_to_ring") {
-            uniffi.zingo.initLogging()
-            uniffi.zingo.setCryptoDefaultProviderToRing()
         }
     }
 
@@ -827,7 +821,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun changeServerProcess(serveruri: String, promise: Promise) {
         FfiOutcome.settling(promise, "change_server") {
             uniffi.zingo.initLogging()
-            uniffi.zingo.changeServer(serveruri)
+            uniffi.zingo.changeServer(serveruri = serveruri)
         }
     }
 
@@ -843,7 +837,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun parseAddressInfo(address: String, promise: Promise) {
         FfiOutcome.settling(promise, "parse_address") {
             uniffi.zingo.initLogging()
-            uniffi.zingo.parseAddress(address)
+            uniffi.zingo.parseAddress(address = address)
         }
     }
 
@@ -851,7 +845,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun parseUfvkInfo(ufvk: String, promise: Promise) {
         FfiOutcome.settling(promise, "parse_ufvk") {
             uniffi.zingo.initLogging()
-            uniffi.zingo.parseUfvk(ufvk)
+            uniffi.zingo.parseUfvk(ufvk = ufvk)
         }
     }
 
@@ -859,7 +853,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun getVersionInfo(promise: Promise) {
         FfiOutcome.settling(promise, "get_version") {
             uniffi.zingo.initLogging()
-            uniffi.zingo.getVersion()
+            "${uniffi.zingo.getVersion()}-${applicationContext.getString(R.string.zm_descriptor)}"
         }
     }
 
@@ -867,7 +861,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun getMessagesInfo(address: String, promise: Promise) {
         FfiOutcome.settling(promise, "get_messages") {
             uniffi.zingo.initLogging()
-            uniffi.zingo.getMessages(address)
+            uniffi.zingo.getMessages(address = address)
         }
     }
 
@@ -915,7 +909,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun removeTransactionProcess(txid: String, promise: Promise) {
         FfiOutcome.settling(promise, "remove_transaction") {
             uniffi.zingo.initLogging()
-            uniffi.zingo.removeTransaction(txid)
+            uniffi.zingo.removeTransaction(txid = txid)
         }
     }
 
@@ -927,7 +921,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     @ReactMethod
     fun setBroadcastCandidates(candidatesJson: String, promise: Promise) {
         FfiOutcome.settling(promise, "set_broadcast_candidates") {
-            uniffi.zingo.setBroadcastCandidates(candidatesJson)
+            uniffi.zingo.setBroadcastCandidates(candidatesJson = candidatesJson)
         }
     }
 
@@ -935,7 +929,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun attachMixnet(socks5Addr: String, exitNode: String, promise: Promise) {
         FfiOutcome.settling(promise, "attach_mixnet") {
             uniffi.zingo.initLogging()
-            uniffi.zingo.attachMixnet(socks5Addr, exitNode)
+            uniffi.zingo.attachMixnet(socks5Addr = socks5Addr, exitNode = exitNode)
         }
     }
 
@@ -943,7 +937,15 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun enableMixnet(proxyPath: String, promise: Promise) {
         FfiOutcome.settling(promise, "enable_mixnet") {
             uniffi.zingo.initLogging()
-            uniffi.zingo.enableMixnet(proxyPath)
+            uniffi.zingo.enableMixnet(proxyPath = proxyPath)
+        }
+    }
+
+    @ReactMethod
+    fun disableMixnet(promise: Promise) {
+        FfiOutcome.settling(promise, "disable_mixnet") {
+            uniffi.zingo.initLogging()
+            uniffi.zingo.disableMixnet()
         }
     }
 
@@ -964,18 +966,10 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
-    fun setTransmitPolicy(policy: String, promise: Promise) {
-        FfiOutcome.settling(promise, "set_transmit_policy") {
-            uniffi.zingo.initLogging()
-            uniffi.zingo.setTransmitPolicy(policy)
-        }
-    }
-
-    @ReactMethod
     fun getSpendableBalanceWithAddressInfo(address: String, promise: Promise) {
         FfiOutcome.settling(promise, "get_spendable_balance_with_address") {
             uniffi.zingo.initLogging()
-            uniffi.zingo.getSpendableBalanceWithAddress(address)
+            uniffi.zingo.getSpendableBalanceWithAddress(address = address)
         }
     }
 
@@ -1023,7 +1017,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun createNewUnifiedAddressProcess(receivers: String, promise: Promise) {
         FfiOutcome.settling(promise, "create_new_unified_address") {
             uniffi.zingo.initLogging()
-            uniffi.zingo.createNewUnifiedAddress(receivers)
+            uniffi.zingo.createNewUnifiedAddress(receivers = receivers)
         }
     }
 
@@ -1039,7 +1033,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun checkMyAddressInfo(address: String, promise: Promise) {
         FfiOutcome.settling(promise, "check_my_address") {
             uniffi.zingo.initLogging()
-            uniffi.zingo.checkMyAddress(address)
+            uniffi.zingo.checkMyAddress(address = address)
         }
     }
 
@@ -1055,7 +1049,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun setConfigWalletToProdProcess(performancelevel: String, minconfirmations: String, promise: Promise) {
         FfiOutcome.settling(promise, "set_config_wallet_to_prod") {
             uniffi.zingo.initLogging()
-            uniffi.zingo.setConfigWalletToProd(performancelevel, minconfirmations.toUInt())
+            uniffi.zingo.setConfigWalletToProd(settings = syncSettings(performancelevel, minconfirmations))
         }
     }
     
@@ -1079,7 +1073,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun sendProcess(send_json: String, promise: Promise) {
         FfiOutcome.settling(promise, "send") {
             uniffi.zingo.initLogging()
-            uniffi.zingo.send(send_json)
+            uniffi.zingo.send(sendJson = send_json)
         }
     }
 
@@ -1087,7 +1081,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun sendAllProcess(address: String, memo: String, promise: Promise) {
         FfiOutcome.settling(promise, "send_all") {
             uniffi.zingo.initLogging()
-            uniffi.zingo.sendAll(address, memo)
+            uniffi.zingo.sendAll(address = address, memo = memo)
         }
     }
 
@@ -1149,10 +1143,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun startIronwoodMigrationProcess(planHashHex: String, perBucket: String, promise: Promise) {
         FfiOutcome.settling(promise, "start_ironwood_migration") {
             uniffi.zingo.initLogging()
-            uniffi.zingo.startIronwoodMigration(
-                planHashHex,
-                FfiArgs.optionalU32(perBucket, "per_bucket")
-            )
+            uniffi.zingo.startIronwoodMigration(planHashHex = planHashHex, perBucket = FfiArgs.optionalU32(perBucket, "per_bucket"))
         }
     }
 
@@ -1167,7 +1158,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         }
     }
 
-    // Phase 1 splitting round (ADR 0016). Proves and broadcasts, so like the
+    // Phase 1 splitting round (zingolib/0016). Proves and broadcasts, so like the
     // drain it runs long and holds the lightclient; settling launches on
     // Dispatchers.IO, which keeps it off the main queue and lets status polls
     // through.
@@ -1193,7 +1184,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun reschedulePartsProcess(perBucket: String, promise: Promise) {
         FfiOutcome.settling(promise, "reschedule_parts") {
             uniffi.zingo.initLogging()
-            uniffi.zingo.rescheduleParts(FfiArgs.requiredU32(perBucket, "per_bucket"))
+            uniffi.zingo.rescheduleParts(perBucket = FfiArgs.requiredU32(perBucket, "per_bucket"))
         }
     }
 
@@ -1228,7 +1219,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun executeDuePartsProcess(spacingMs: String, promise: Promise) {
         FfiOutcome.settling(promise, "execute_due_parts") {
             uniffi.zingo.initLogging()
-            uniffi.zingo.executeDueParts(FfiArgs.requiredU64(spacingMs, "spacing_ms"))
+            uniffi.zingo.executeDueParts(spacingMs = FfiArgs.requiredU64(spacingMs, "spacing_ms"))
         }
     }
 

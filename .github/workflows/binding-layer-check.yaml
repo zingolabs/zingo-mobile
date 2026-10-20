@@ -1,0 +1,143 @@
+name: Binding Layer host tests
+
+on:
+  workflow_call:
+    inputs:
+      # Fail-all (see CONTEXT.md): when true, a failure here cancels the
+      # whole run. PR CI opts in; ci-nightly does not.
+      fail-all:
+        required: false
+        type: boolean
+        default: false
+
+# The builders select stable over zingolib's toolchain pin, and these jobs
+# test with the toolchain that builds the shipped libraries.
+env:
+  RUSTUP_TOOLCHAIN: stable
+
+jobs:
+  # The wallet crate's host-side unit tests: the error funnel, the
+  # consent-hash parser, the channel contracts and the lock discipline.
+  wallet-crate-tests:
+    name: wallet crate tests
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Check out zingolib
+        uses: ./.github/actions/zingolib-submodule
+
+      - name: Install protobuf-compiler
+        run: sudo apt-get update && sudo apt-get install -y protobuf-compiler
+
+      - name: Cache the wallet crate build
+        uses: actions/cache@v6
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            zingolib/zingo-ffi/target
+          key: binding-layer-wallet-tests-${{ runner.os }}-${{ hashFiles('zingolib/zingo-ffi/Cargo.lock') }}
+
+      - name: Install cargo-nextest
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-nextest@0.9.98
+
+      - name: Tests
+        working-directory: ./zingolib/zingo-ffi
+        run: cargo nextest run --locked --package zingo
+
+      - name: Cancel the run on failure (fail-all)
+        if: ${{ failure() && inputs.fail-all }}
+        uses: actions/github-script@v9
+        with:
+          script: |
+            await github.rest.actions.cancelWorkflowRun({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.runId,
+            });
+
+  # The proxy crate's host-side tests, which include the golden wire format
+  # that the Kotlin and Swift bindings decode.
+  proxy-crate-tests:
+    name: proxy crate tests
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Check out zingolib
+        uses: ./.github/actions/zingolib-submodule
+
+      # zingo-netutils reaches lightwallet-protocol, whose build script
+      # generates its prost bindings with protoc.
+      - name: Install protobuf-compiler
+        run: sudo apt-get update && sudo apt-get install -y protobuf-compiler
+
+      - name: Cache the proxy crate build
+        uses: actions/cache@v6
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            zingolib/zingo-netutils/nym-proxy-ffi/target
+          key: binding-layer-proxy-tests-${{ runner.os }}-${{ hashFiles('zingolib/zingo-netutils/nym-proxy-ffi/Cargo.lock') }}
+
+      - name: Install cargo-nextest
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-nextest@0.9.98
+
+      - name: Tests
+        working-directory: ./zingolib/zingo-netutils/nym-proxy-ffi
+        run: cargo nextest run --locked --workspace
+
+      - name: Cancel the run on failure (fail-all)
+        if: ${{ failure() && inputs.fail-all }}
+        uses: actions/github-script@v9
+        with:
+          script: |
+            await github.rest.actions.cancelWorkflowRun({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.runId,
+            });
+
+  # Starts the real proxy against the mixnet, handshakes its SOCKS5 listener,
+  # and stops it. A failure here fails the run and leaves the other jobs
+  # running.
+  proxy-crate-live:
+    name: live mixnet start
+    needs: proxy-crate-tests
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Check out zingolib
+        uses: ./.github/actions/zingolib-submodule
+
+      - name: Install protobuf-compiler
+        run: sudo apt-get update && sudo apt-get install -y protobuf-compiler
+
+      - name: Cache the proxy crate build
+        uses: actions/cache@v6
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            zingolib/zingo-netutils/nym-proxy-ffi/target
+          key: binding-layer-proxy-tests-${{ runner.os }}-${{ hashFiles('zingolib/zingo-netutils/nym-proxy-ffi/Cargo.lock') }}
+
+      - name: Install cargo-nextest
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-nextest@0.9.98
+
+      # The proxy crate's .config/nextest.toml serializes the live binary.
+      - name: Live mixnet start
+        working-directory: ./zingolib/zingo-netutils/nym-proxy-ffi
+        run: cargo nextest run --locked --features live-mixnet --test live_mixnet

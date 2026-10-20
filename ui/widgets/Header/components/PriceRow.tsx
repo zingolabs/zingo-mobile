@@ -1,9 +1,10 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import { Image, View } from 'react-native';
+import { Image, View, ViewStyle } from 'react-native';
 import { useTheme } from '@app/theme';
 
-import { ChainNameEnum, SelectServerEnum, TranslateType } from '@app/AppState';
+import { ServerType, TranslateType } from '@app/AppState';
+import { fiatQuote } from '@app/price/fiatQuote';
 import InfoType from '@app/AppState/types/InfoType';
 import ZecPriceType from '@app/AppState/types/ZecPriceType';
 import BoldText from '@ui/primitives/BoldText';
@@ -12,13 +13,16 @@ import FadeText from '@ui/primitives/FadeText';
 
 const zcashLogo = require('../../../../assets/img/zcash-yellow.png');
 
-type PriceRowProps = {
+type PriceCardProps = {
   translate: (key: string) => TranslateType;
   zecPrice: ZecPriceType;
   info: InfoType;
-  selectServer: SelectServerEnum;
+  server: ServerType;
+  style?: ViewStyle;
   onLayout?: (height: number) => void;
 };
+
+type PriceRowProps = Omit<PriceCardProps, 'style'>;
 
 // Vertical margins on the card. Reported back via onLayout so the parent
 // can size its bottom-sheet snap points to cover the whole price block
@@ -37,31 +41,24 @@ const formatLastUpdate = (date: number): string => {
   });
 };
 
-const PriceRow: React.FC<PriceRowProps> = React.memo(
-  ({ translate, zecPrice, info, selectServer, onLayout }) => {
+// The ZEC price with its last update time, or nothing without a quote.
+export const PriceCard: React.FC<PriceCardProps> = React.memo(
+  ({ translate, zecPrice, info, server, style, onLayout }) => {
     const { colors } = useTheme();
 
-    if (
-      zecPrice.zecPrice <= 0 ||
-      selectServer === SelectServerEnum.offline ||
-      info.chainName !== ChainNameEnum.mainChainName
-    ) {
+    const quote = fiatQuote(zecPrice, server, info.chainName);
+    if (quote.kind === 'none') {
       return null;
     }
 
-    const lastUpdate = formatLastUpdate(zecPrice.date);
+    const lastUpdate = formatLastUpdate(quote.date);
 
     return (
       <View
-        onLayout={e =>
-          onLayout?.(e.nativeEvent.layout.height + CARD_VERTICAL_MARGINS)
-        }
+        onLayout={e => onLayout?.(e.nativeEvent.layout.height)}
         style={{
           flexDirection: 'row',
           alignItems: 'center',
-          marginHorizontal: 20,
-          marginTop: CARD_MARGIN_TOP,
-          marginBottom: CARD_MARGIN_BOTTOM,
           paddingHorizontal: 12,
           paddingVertical: 6,
           borderRadius: 10,
@@ -69,6 +66,7 @@ const PriceRow: React.FC<PriceRowProps> = React.memo(
           borderWidth: 1,
           borderColor: colors.bottomSheetBorder,
           gap: 12,
+          ...style,
         }}
       >
         <Image
@@ -84,8 +82,8 @@ const PriceRow: React.FC<PriceRowProps> = React.memo(
         <View style={{ alignItems: 'flex-end' }}>
           <CurrencyAmount
             style={{ fontSize: 14 }}
-            priceDate={zecPrice.date}
-            price={zecPrice.zecPrice}
+            priceDate={quote.date}
+            price={quote.price}
             amtZec={1}
             privacy={false}
           />
@@ -98,6 +96,20 @@ const PriceRow: React.FC<PriceRowProps> = React.memo(
       </View>
     );
   },
+);
+
+const PriceRow: React.FC<PriceRowProps> = React.memo(
+  ({ onLayout, ...card }) => (
+    <PriceCard
+      {...card}
+      onLayout={h => onLayout?.(h + CARD_VERTICAL_MARGINS)}
+      style={{
+        marginHorizontal: 20,
+        marginTop: CARD_MARGIN_TOP,
+        marginBottom: CARD_MARGIN_BOTTOM,
+      }}
+    />
+  ),
 );
 
 export default PriceRow;

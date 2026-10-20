@@ -1,4 +1,8 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
 import {
+  OWNED_MIXNET_MARKER,
   SendFailureClass,
   classifySendFailure,
   retryOnAnotherServer,
@@ -126,14 +130,14 @@ describe('retryOnAnotherServer is exhaustive over the enumeration', () => {
 describe('sendFailureText', () => {
   it('carries a catalog key for the wallet verdicts', () => {
     expect(sendFailureText(classifySendFailure('64: dust'))).toEqual({
-      kind: 'key',
+      kind: 'error',
       errorKey: 'send.dust-error',
     });
     expect(
       sendFailureText(
         classifySendFailure('18: bad-txns-orchard-duplicate-nullifier'),
       ),
-    ).toEqual({ kind: 'key', errorKey: 'send.duplicate-nullifier-error' });
+    ).toEqual({ kind: 'error', errorKey: 'send.duplicate-nullifier-error' });
   });
 
   it('carries a mixnet refusal verbatim, untranslated', () => {
@@ -169,6 +173,18 @@ describe('the mobile-owned refusal marker (#1229)', () => {
     const failure = classifySendFailure(reworded);
     expect(failure.kind).toBe('mixnetRefusal');
     expect(retryOnAnotherServer(failure)).toBe(false);
+  });
+
+  /**
+   * Tests that the marker equals the display prefix of `ZingolibError::Mixnet`
+   * when the zingolib submodule sits at its pinned commit.
+   */
+  it('matches the display prefix that the pinned zingolib mints', () => {
+    const ffi = readFileSync(
+      join(__dirname, '..', 'zingolib', 'zingo-ffi', 'lib', 'src', 'lib.rs'),
+      'utf8',
+    );
+    expect(ffi).toContain(`#[error("${OWNED_MIXNET_MARKER} {0}")]`);
   });
 
   it('the excluded-indexer exhaustion is a deliberate serverSuspect: switching servers changes eligibility', () => {

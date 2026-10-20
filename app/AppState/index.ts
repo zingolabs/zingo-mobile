@@ -16,12 +16,12 @@ import type BackgroundType from './types/BackgroundType';
 import type BackgroundErrorType from './types/BackgroundErrorType';
 import type ServerType from './types/ServerType';
 import type ZecPriceType from './types/ZecPriceType';
-import type SecurityType from './types/SecurityType';
 import type ServerUrisType from './types/ServerUrisType';
 import type { SetServerResult } from './types/SetServerResult';
 import type { ErrorKeyed, Done } from './types/Result';
 import type { GateFailure, GateFailureKey } from './types/GateFailure';
 import { DONE, errorKeyed } from './types/Result';
+import { nativeUri, offlineServer, remoteServer } from './types/ServerType';
 import type ValueTransferType from './types/ValueTransferType';
 import type ProposalPoolsType from './types/ProposalPoolsType';
 import type TransactionType from './types/TransactionType';
@@ -30,7 +30,6 @@ import type TxDetailType from './types/TxDetailType';
 import { AddressBookActionEnum } from './enums/AddressBookActionEnum';
 import { MenuItemEnum } from './enums/MenuItemEnum';
 import { LanguageEnum } from './enums/LanguageEnum';
-import { ModeEnum } from './enums/ModeEnum';
 import { SelectServerEnum } from './enums/SelectServerEnum';
 import { ChainNameEnum } from './enums/ChainNameEnum';
 import { SnackbarDurationEnum } from './enums/SnackbarDurationEnum';
@@ -38,15 +37,12 @@ import { TransactionTypeEnum } from './enums/TransactionTypeEnum';
 import { PoolEnum } from './enums/PoolEnum';
 import { RestoreFromTypeEnum } from './enums/RestoreFromTypeEnum';
 import { PoolToShieldEnum } from './enums/PoolToShieldEnum';
-import { SeedActionEnum } from './enums/SeedActionEnum';
-import { UfvkActionEnum } from './enums/UfvkActionEnum';
 import { SettingsNameEnum } from './enums/SettingsNameEnum';
 import { RouteEnum } from './enums/RouteEnum';
 import { AppStateStatusEnum } from './enums/AppStateStatusEnum';
 import { CurrencyNameEnum } from './enums/CurrencyNameEnum';
 import { AddressKindEnum } from './enums/AddressKindEnum';
 import { ReceiverEnum } from './enums/ReceiverEnum';
-import { SecurityTypeEnum } from './enums/SecurityTypeEnum';
 import { EventListenerEnum } from './enums/EventListenerEnum';
 import { ValueTransferKindEnum } from './enums/ValueTransferKindEnum';
 import { FilterEnum } from './enums/FilterEnum';
@@ -83,10 +79,12 @@ export {
   AddressBookFileClassObsolete,
   DONE,
   errorKeyed,
+  nativeUri,
+  offlineServer,
+  remoteServer,
   AddressBookActionEnum,
   MenuItemEnum,
   LanguageEnum,
-  ModeEnum,
   SelectServerEnum,
   ChainNameEnum,
   SnackbarDurationEnum,
@@ -94,15 +92,12 @@ export {
   PoolEnum,
   RestoreFromTypeEnum,
   PoolToShieldEnum,
-  SeedActionEnum,
-  UfvkActionEnum,
   SettingsNameEnum,
   RouteEnum,
   AppStateStatusEnum,
   CurrencyNameEnum,
   AddressKindEnum,
   ReceiverEnum,
-  SecurityTypeEnum,
   EventListenerEnum,
   ValueTransferKindEnum,
   FilterEnum,
@@ -135,7 +130,6 @@ export type {
   TranslateType,
   NetInfoType,
   ServerType,
-  SecurityType,
   ServerUrisType,
   SetServerResult,
   ErrorKeyed,

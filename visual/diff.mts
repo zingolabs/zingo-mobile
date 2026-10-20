@@ -12,7 +12,7 @@ import {
 } from 'node:fs';
 import { join, dirname, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { advancedTokens } from '@app/theme/tokens';
+import { themeTokens } from '@app/theme/tokens';
 
 type Sample = { t: number; offset: number };
 type Timeline = { story: string; step: number; samples: Sample[] };
@@ -46,7 +46,7 @@ mkdirSync(reportDir, { recursive: true });
 // visual:styled` sets this; the default gating report stays plain. The palette
 // feeds both the CSS vars (report.css) and the generated SVG colours below.
 const styled = process.env.VISUAL_STYLE === 'tokens';
-const T = advancedTokens;
+const T = themeTokens;
 const palette = styled
   ? {
       bg: T.bgCanvas,

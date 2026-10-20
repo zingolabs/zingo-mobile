@@ -6,26 +6,27 @@ jest.mock('@app/walletBackend', () => ({
 import 'react-native';
 import type { AppStateStatus } from 'react-native';
 import React from 'react';
-import { render, renderHook } from '@testing-library/react-native';
+import { render } from '@testing-library/react-native';
 import PriceFetcher, { PriceTrafficDriver } from '@ui/widgets/PriceFetcher';
 import QuoteRefreshRing from '@ui/primitives/QuoteRefreshRing';
-import {
-  PRICE_REFRESH_MAX_MS,
-  priceFetcherStore,
-  usePriceStale,
-} from '@ui/widgets/priceFetcherStore';
+import { priceFetcherStore } from '@ui/widgets/priceFetcherStore';
 import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
 } from '@app/context';
-import { SelectServerEnum } from '@app/AppState';
-import { getZecPrice } from '@app/walletBackend';
+import { ChainNameEnum, SelectServerEnum, offlineServer } from '@app/AppState';
+import { getZecPrice, ZecPriceOutcome } from '@app/walletBackend';
+import {
+  mockZecQuote,
+  mockZecRefusal,
+} from '../__mocks__/dataMocks/mockZecPriceOutcome';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
-import { MixnetView } from '@app/walletBackend/transforms/mixnetView';
+import { MixnetTransportView } from '@app/walletBackend/transforms/mixnetView';
 
 const price = getZecPrice as jest.MockedFunction<typeof getZecPrice>;
 
-const READY_VIEW: MixnetView = {
+const READY_VIEW: MixnetTransportView = {
+  kind: 'transport',
   statusKey: 'mixnet.status.ready',
   socks5Addr: '127.0.0.1:1080',
   narration: null,
@@ -33,7 +34,8 @@ const READY_VIEW: MixnetView = {
   recovery: 'none',
   reconnecting: false,
 };
-const DIED_VIEW: MixnetView = {
+const DIED_VIEW: MixnetTransportView = {
+  kind: 'transport',
   statusKey: 'mixnet.status.died',
   socks5Addr: null,
   narration: null,
@@ -89,14 +91,14 @@ afterEach(() => {
 
 test('a market-less surface renders no ring at all', async () => {
   jest.useFakeTimers();
-  price.mockResolvedValue({ price: 42, error: '' });
+  price.mockResolvedValue(mockZecQuote);
   const setZecPrice = jest.fn();
 
   const view = render(
     surfaceUi(
       makeCtx({
         mixnetView: READY_VIEW,
-        selectServer: SelectServerEnum.offline,
+        server: offlineServer(ChainNameEnum.noneChainName),
       }),
       setZecPrice,
     ),
@@ -125,7 +127,7 @@ test('a session detached mid-flight leaves no loading behind', async () => {
   jest.useFakeTimers();
   price
     .mockImplementationOnce(() => new Promise(() => {}))
-    .mockResolvedValue({ price: 42, error: '' });
+    .mockResolvedValue(mockZecQuote);
   const setZecPrice = jest.fn();
 
   const view = render(surfaceUi(makeCtx(), setZecPrice));
@@ -142,7 +144,7 @@ test('a session detached mid-flight leaves no loading behind', async () => {
 
 test('a price landing while the app is away is recorded', async () => {
   jest.useFakeTimers();
-  let land: (v: { price: number; error: string }) => void = () => {};
+  let land: (v: ZecPriceOutcome) => void = () => {};
   price.mockImplementationOnce(
     () =>
       new Promise(resolve => {
@@ -156,7 +158,7 @@ test('a price landing while the app is away is recorded', async () => {
   expect(price).toHaveBeenCalledTimes(1);
 
   fireAppState('background');
-  land({ price: 42, error: '' });
+  land(mockZecQuote);
   await jest.advanceTimersByTimeAsync(0);
 
   expect(setZecPrice).toHaveBeenCalledWith(42, expect.any(Number));
@@ -164,7 +166,7 @@ test('a price landing while the app is away is recorded', async () => {
 
 test('a parked return the landing declines is consumed, not doubled', async () => {
   jest.useFakeTimers();
-  let land: (v: { price: number; error: string }) => void = () => {};
+  let land: (v: ZecPriceOutcome) => void = () => {};
   price
     .mockImplementationOnce(
       () =>
@@ -172,7 +174,7 @@ test('a parked return the landing declines is consumed, not doubled', async () =
           land = resolve;
         }),
     )
-    .mockResolvedValue({ price: -1, error: 'refused' });
+    .mockResolvedValue(mockZecRefusal('refused'));
   const setZecPrice = jest.fn();
 
   const view = render(
@@ -183,7 +185,7 @@ test('a parked return the landing declines is consumed, not doubled', async () =
 
   priceFetcherStore.foregroundReturned();
   view.rerender(surfaceUi(makeCtx({ mixnetView: DIED_VIEW }), setZecPrice));
-  land({ price: -1, error: 'refused' });
+  land(mockZecRefusal('refused'));
   await jest.advanceTimersByTimeAsync(0);
 
   await jest.advanceTimersByTimeAsync(6_000);
@@ -205,16 +207,6 @@ test('the boot fetch renders nothing before the first price', async () => {
   expect(view.queryByTestId('pricefetcher.ring')).toBeNull();
 });
 
-test('the cadence plus fetch latency does not dim', () => {
-  const withinHeadroom = Date.now() - (PRICE_REFRESH_MAX_MS + 10_000);
-  const { result: healthy } = renderHook(() => usePriceStale(withinHeadroom));
-  expect(healthy.current).toBe(false);
-
-  const pastHeadroom = Date.now() - (PRICE_REFRESH_MAX_MS + 31_000);
-  const { result: slipped } = renderHook(() => usePriceStale(pastHeadroom));
-  expect(slipped.current).toBe(true);
-});
-
 test('the ring fills from coarse ticks, not a per-frame animation', async () => {
   jest.useFakeTimers();
   const { Animated } = require('react-native');
@@ -224,10 +216,10 @@ test('the ring fills from coarse ticks, not a per-frame animation', async () => 
     <QuoteRefreshRing
       size={22}
       color="#ffffff"
+      fetchColor="#00ff00"
       trackColor="rgba(255,255,255,0.12)"
       durationMs={60_000}
       resetKey={1}
-      accessibilityLabel="ring"
       testID="ring"
     />,
   );

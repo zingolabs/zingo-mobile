@@ -59,6 +59,7 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
   };
 
   const updateAddress = async (addr: string) => {
+    setVerifyOK(null);
     if (!addr) {
       setAddress('');
       return;
@@ -180,10 +181,11 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
           }}
         >
           <Button
-            type={ButtonTypeEnum.Secondary}
+            type={ButtonTypeEnum.Link}
             title={translate('cancel') as string}
             onPress={() => {
               setAddress('');
+              setVerifyOK(null);
               Keyboard.dismiss();
               setTimeout(() => {
                 closeSheet();

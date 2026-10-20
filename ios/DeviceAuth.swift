@@ -93,14 +93,25 @@ class DeviceAuth: NSObject {
     _ resolve: @escaping RCTPromiseResolveBlock,
     reject: @escaping RCTPromiseRejectBlock
   ) {
-    let context = LAContext()
-    var error: NSError?
-    let available = context.canEvaluatePolicy(
-      .deviceOwnerAuthentication, error: &error)
-    resolve([
-      "available": available,
-      "code": error.map { String($0.code) } ?? "",
-    ])
+    #if targetEnvironment(simulator)
+      // A simulator has no device owner to authenticate. It still answers
+      // `canEvaluatePolicy` with true and then presents the passcode alert,
+      // which on an unattended simulator nobody ever answers: the prompt
+      // never ends, so the reply block never runs and the shutter never
+      // settles. Reporting the truth here — no device auth — puts the gate
+      // on its fail-open path, the same one the Android half takes on an
+      // emulator with no device credential. Compiled out of device builds.
+      resolve(["available": false, "code": "simulator"])
+    #else
+      let context = LAContext()
+      var error: NSError?
+      let available = context.canEvaluatePolicy(
+        .deviceOwnerAuthentication, error: &error)
+      resolve([
+        "available": available,
+        "code": error.map { String($0.code) } ?? "",
+      ])
+    #endif
   }
 
   @objc(authenticate:cancel:resolve:reject:)
@@ -110,39 +121,46 @@ class DeviceAuth: NSObject {
     resolve: @escaping RCTPromiseResolveBlock,
     reject: @escaping RCTPromiseRejectBlock
   ) {
-    // `LAContext.h` makes localizedReason mandatory and raises
-    // NSInvalidArgumentException on an empty one. A catalog key resolving
-    // before the translations load returns "".
-    if title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-      resolve(outcome("unavailable", "empty-title"))
-      return
-    }
-
-    // A second call must never present a second prompt: it joins the live
-    // ceremony and shares the answer the person is about to give.
-    lock.lock()
-    waiters.append(resolve)
-    if activeContext != nil {
-      lock.unlock()
-      return
-    }
-    let context = LAContext()
-    context.localizedCancelTitle = cancel
-    activeContext = context
-    lock.unlock()
-
-    context.evaluatePolicy(
-      .deviceOwnerAuthentication, localizedReason: title
-      // `self` is captured strongly on purpose: the settlement guarantee
-      // outranks the transient cycle (self → activeContext → evaluation →
-      // this block → self), which `settle` breaks by clearing the slot.
-    ) { success, error in
-      if success {
-        self.settle("authenticated", "")
+    #if targetEnvironment(simulator)
+      // No device owner, so no ceremony to run: answering here keeps the
+      // prompt that never settles off an unattended simulator even when a
+      // caller reaches this without probing first. See `canAuthenticate`.
+      resolve(outcome("unavailable", "simulator"))
+    #else
+      // `LAContext.h` makes localizedReason mandatory and raises
+      // NSInvalidArgumentException on an empty one. A catalog key resolving
+      // before the translations load returns "".
+      if title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+        resolve(outcome("unavailable", "empty-title"))
         return
       }
-      let (name, code) = self.classify(error)
-      self.settle(name, code)
-    }
+
+      // A second call must never present a second prompt: it joins the live
+      // ceremony and shares the answer the person is about to give.
+      lock.lock()
+      waiters.append(resolve)
+      if activeContext != nil {
+        lock.unlock()
+        return
+      }
+      let context = LAContext()
+      context.localizedCancelTitle = cancel
+      activeContext = context
+      lock.unlock()
+
+      context.evaluatePolicy(
+        .deviceOwnerAuthentication, localizedReason: title
+        // `self` is captured strongly on purpose: the settlement guarantee
+        // outranks the transient cycle (self → activeContext → evaluation →
+        // this block → self), which `settle` breaks by clearing the slot.
+      ) { success, error in
+        if success {
+          self.settle("authenticated", "")
+          return
+        }
+        let (name, code) = self.classify(error)
+        self.settle(name, code)
+      }
+    #endif
   }
 }

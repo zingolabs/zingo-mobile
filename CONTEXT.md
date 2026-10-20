@@ -132,13 +132,12 @@ Navigation furniture — tab bar, side menu (`bgChrome`).
 
 **Muted**:
 The de-emphasized neutral for secondary text, subtle borders, and quiet
-fills. Mode-dependent.
+fills.
 _Avoid_: grey, placeholder, zingo (dead legacy names)
 
 **Accent**:
-The brand color a mode selects — green in advanced, steel blue in basic.
-One value across its three surface tokens today; the split exists so text
-and fill can diverge later.
+The brand green. One value across its three surface tokens today; the
+split exists so text and fill can diverge later.
 _Avoid_: primary, brand color
 
 **Emphasis**:
@@ -152,16 +151,9 @@ A token named after a component instead of a role. Exactly one exists,
 `bottomSheetBorder`; a second one needs a reason the map's role set cannot
 express.
 
-**Mode**:
-`advanced` or `basic`. One theme exists; the mode selects the accent and
-the muted neutral, and gates feature visibility.
-_Avoid_: theme (for a mode), dark/light (no light mode exists)
-
 **Overlay**:
-The mode-dependent slice of the palette (the accent and accent-disabled
-families, `bgSecondaryDisabled`, and the muted trio). Everything else is
-the shared **base**. "Edit the overlay" means a per-mode change; "edit the
-base" changes both modes at once.
+The slice of the palette layered over the shared **base**: the accent and
+accent-disabled families, `bgSecondaryDisabled`, and the muted trio.
 
 **Legacy name**:
 The pre-migration vocabulary: `primary`, `secondary`, `text`, `money`,
@@ -205,24 +197,54 @@ IO, alerts, email, biometrics. Home: `app/services`.
 
 ## CI
 
-**Blocking check** — a PR CI job whose failure fails the pull request.
-Jest, rust-shear, js-depcheck, andr-dependency-analysis, the Android
-Kotlin compile, the Android JVM unit tests, the Android build chain, and
-the Android integration buckets are blocking checks.
+**Blocking check** — a PR CI job that runs under fail-all and that
+branch protection requires; its failure withholds the merge verdict.
+Jest, the Binding Layer crate tests,
+js-depcheck, the JS static checks, andr-dependency-analysis, the Android
+Kotlin compile, the Android JVM unit tests, the Android build chain for
+every ABI, the offline device tests, the iOS Binding Layer build, and
+the iOS integration test are blocking checks.
 
 **Advisory stage** — a PR CI job that records its result without
 affecting the pull request verdict. No PR stage currently runs in
-advisory mode: every job's failure fails its run. ci-nightly remains
-the enforced gate for the device ABIs and iOS.
+advisory mode: every job's failure fails its run.
+
+**Merge verdict** — the moment every status check that branch protection
+requires has passed and the pull request can land.
+
+**Run verdict** — the conclusion of the whole PR CI run, trailing stages
+included. It arrives after the merge verdict.
 
 **Verdict path** — the longest chain of blocking checks; its wall-clock
-length is the time from push to PR verdict. Advisory stages are never on
-the verdict path.
+length, queue waits included, is the time from push to merge verdict.
+Advisory stages and trailing stages are never on the verdict path.
 
-**Bucket** — a group of Android integration tests that share one CI job,
-so runner setup and emulator boot amortize across the group instead of
-being paid once per test. Unrelated to the migration API's `per_bucket`
-windowing sense, which UI copy avoids entirely.
+**Hit path** — the verdict path of a run whose Binding Layer caches
+already hold every ABI. The native builds are absent from it.
+
+**Miss path** — the verdict path of a run that must build the Binding
+Layer. It runs through the native build and the device tests.
+
+**Trailing stage** — a PR CI job that starts only after every blocking
+check has passed. Its failure fails the run and leaves the merge verdict
+unchanged. No PR CI job currently runs as a trailing stage.
+
+**Offline device test** — an instrumented test that runs on a device or
+emulator with an empty server URI and no chain. It exercises the Binding
+Layer and the platform alone.
+
+**Static-chain test** — an instrumented test that only reads a chain that
+exists before the test starts.
+
+**Live-chain test** — an instrumented test that broadcasts a transaction
+or needs a block mined while it runs.
+
+**Public-chain test** — a test that reads a chain the project does not
+control, such as mainnet or testnet.
+
+**Fixture wallet** — a wallet on a public chain whose seed, birthday, and
+transaction history are published for tests to read. A refresh replaces it
+with a new seed and a new history.
 
 **Fail-all** — the policy that the first failure of any blocking check
 cancels the entire run at once, rather than letting the surviving checks
@@ -267,13 +289,39 @@ persisted user opt-in, default off and sticky.
 **Indicator**:
 The state Mixnet Mode reports: `off`, `bootstrapping`, `ready`, or `died`.
 It crosses the FFI as the `mixnet_indicator` payload key and reaches the app
-as `RPCMixnetIndicatorEnum`.
+as `RPCMixnetIndicatorEnum`. `off` is the deliberate switch-off — the session
+went Offline, so there is no transport and nothing to recover — while `died`
+is an unconsented loss, which the app reconnects out of. The header's icon
+reports this state and this state alone: it is never hidden, because hiding it
+would hide a tunnel that might still be up.
 _Avoid_: mode (names the feature, not the state it reports)
+
+**Go-online moment**:
+Where a session decides its connectivity, and therefore how long the transport
+lives: `WalletBackend.configure`, which runs at launch and after every server
+change. Offline — the empty server URI — holds no tunnel and rests at `off`;
+going back Online arms one then and there. zingo-cli gates its own driver call
+the same way, on `Communications::Online`.
+_Avoid_: app start (the transport does not follow the app's lifetime)
+
+**Draw**:
+The entry gateway and Exit Node a transport binds when it is born. The shim
+draws them, so only a fresh `startMixnetTransport` redraws — the wallet's
+readiness gate retries its probe over the same draw. A draw that never
+answers is common enough to plan for, so the app gives one
+`BOOTSTRAP_DEADLINE_MILLIS` to prove itself and then draws again.
+_Avoid_: retry (names the probe, not the pair it runs over)
 
 **Route**:
 The network path a mixnet-only surface resolves to, either the Standing
 Client's tunnel or clearnet. zingolib derives it from the indicator, and the
 app never sees it.
+
+**Mixnet refusal**:
+The typed error a mixnet-only surface raises when the indicator is not
+`ready`. The surface refuses, and it does not fall back to clearnet.
+_Avoid_: refusal test (two tests check a mixnet refusal: the price refusal
+test and the transmission refusal test)
 
 ## Price surface
 
@@ -318,9 +366,9 @@ One OS authentication prompt, run by the gate controller. One ceremony
 answers every trigger waiting on it, including a cancel.
 
 **Trigger**:
-A surface that asks the gate controller (app foreground, screen entry, a
-security toggle flipping on). Each trigger owns its own decline
-consequence; none owns a prompt.
+A surface that asks the gate controller (app start, app foreground, screen
+entry). The biometrics switch enables every trigger at once. Each trigger
+owns its own decline consequence; none owns a prompt.
 
 **Freshness window**:
 The period after a successful ceremony during which any trigger passes
@@ -346,3 +394,33 @@ selects a mechanism, a policy, or a retry path.
 The decline consequence of an app-level trigger: the locked launch screen,
 whose retry asks the gate controller unconditionally. A lock exists only
 while the app runs; a cold start begins unlocked unless a trigger asks.
+
+## Decision records
+
+**zingo-adrs**:
+The `zingolabs/zingo-adrs` repository: the one append-only home of
+architecture decision records for every zingolabs code repository. A code
+repository checks in a submodule pointer to it and none of its content.
+_Avoid_: "the ledger", "the ADR repo"
+
+**Org-scoped record**:
+A record that binds every zingolabs code repository. It lives at the top
+level of zingo-adrs.
+_Avoid_: global ADR, shared ADR
+
+**Repo-scoped record**:
+A record that binds exactly one code repository. It lives in that
+repository's subdirectory of zingo-adrs (`zingo-mobile/` for zingo-mobile).
+_Avoid_: local ADR, project ADR
+
+**Record citation**:
+A reference to a zingo-adrs record, in the form its medium requires. The
+[zingo-adrs README](https://github.com/zingolabs/zingo-adrs#citing-a-record) defines each form.
+_Avoid_: bare numbers across scopes, checkout paths, "zingolib ADR NNNN" in new text
+
+**Record status**:
+The first line under a record's `## Status` heading, one of `proposed`,
+`accepted`, or `superseded by <record citation>`. Prose after that line
+may narrow a partial supersession; the line itself is the whole record's
+standing.
+_Avoid_: draft, deprecated, retired, "no longer applies"

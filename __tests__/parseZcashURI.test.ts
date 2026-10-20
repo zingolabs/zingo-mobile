@@ -1,5 +1,5 @@
 import { Base64 } from 'js-base64';
-import { ChainNameEnum, ServerType } from '@app/AppState';
+import { ChainNameEnum, ServerType, remoteServer } from '@app/AppState';
 
 // Mock Utils so the parser's `Utils.isValidAddress` call resolves to a
 // controllable result without dragging the native RPC bridge into Jest.
@@ -15,10 +15,10 @@ import Utils from '@app/utils';
 
 const mockIsValidAddress = Utils.isValidAddress as jest.Mock;
 
-const mainnetServer: ServerType = {
-  uri: 'https://mainnet.lightwalletd.com:9067',
-  chainName: ChainNameEnum.mainChainName,
-};
+const mainnetServer: ServerType = remoteServer(
+  'https://mainnet.lightwalletd.com:9067',
+  ChainNameEnum.mainChainName,
+);
 
 const VALID_ADDR = 't1validAddrPlaceholderForUnitTestsOnly';
 const INVALID_ADDR = 'not-an-address';

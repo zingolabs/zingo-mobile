@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import {
   Text,
   View,
@@ -13,6 +13,7 @@ import { getNumberFormatSettings } from 'react-native-localize';
 import Utils from '@app/utils';
 import { SvgXml } from 'react-native-svg';
 import { CurrencyNameEnum, GlobalConst } from '@app/AppState';
+import { useTimedReveal } from '@app/hooks/useTimedReveal';
 
 type ZecAmountProps = {
   color?: string;
@@ -35,20 +36,11 @@ const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({
   smallPrefix,
   testID,
 }) => {
-  const [privacyHigh, setPrivacyHigh] = useState<boolean>(privacy || false);
+  const { visible, reveal } = useTimedReveal(!!privacy);
+  const privacyHigh: boolean = !visible;
   const splits = Utils.splitZecAmountIntoBigSmall(amtZec);
   const { colors } = useTheme();
   const { decimalSeparator } = getNumberFormatSettings();
-
-  useEffect(() => {
-    setPrivacyHigh(privacy || false);
-  }, [privacy]);
-
-  useEffect(() => {
-    if (privacyHigh && !privacy) {
-      setPrivacyHigh(false);
-    }
-  }, [privacyHigh, privacy]);
 
   if (!size) {
     size = 24;
@@ -62,11 +54,6 @@ const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({
     smallPrefix = false;
   }
 
-  const onPress = () => {
-    setPrivacyHigh(false);
-    setTimeout(() => setPrivacyHigh(true), 5 * 1000);
-  };
-
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
   <svg viewBox="0 0 282.84 147.85">
     <polygon points="34.44 107.62 34.44 106.98 87.19 34.17 87.19 20.12 56.09 20.12 56.09 0 35.98 0 35.98 20.12 5.04 20.12 5.04 40.24 53.93 40.24 53.93 40.88 0 114.64 0 127.73 35.98 127.73 35.98 147.85 56.09 147.85 56.09 127.73 88.03 127.73 88.03 107.62 34.44 107.62"/>
@@ -76,7 +63,7 @@ const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({
 
   return (
     <View style={{ ...style, flexDirection: 'row', marginHorizontal: 5 }}>
-      <TouchableOpacity disabled={!privacyHigh} onPress={onPress}>
+      <TouchableOpacity disabled={!privacyHigh} onPress={reveal}>
         <View
           testID={testID}
           style={{

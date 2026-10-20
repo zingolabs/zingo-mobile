@@ -22,12 +22,14 @@ import {
 } from '@app/context';
 import { SelectServerEnum } from '@app/AppState';
 import { getZecPrice } from '@app/walletBackend';
+import { mockZecQuote } from '../__mocks__/dataMocks/mockZecPriceOutcome';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
-import { MixnetView } from '@app/walletBackend/transforms/mixnetView';
+import { MixnetTransportView } from '@app/walletBackend/transforms/mixnetView';
 
 const price = getZecPrice as jest.MockedFunction<typeof getZecPrice>;
 
-const READY_VIEW: MixnetView = {
+const READY_VIEW: MixnetTransportView = {
+  kind: 'transport',
   statusKey: 'mixnet.status.ready',
   socks5Addr: '127.0.0.1:1080',
   narration: null,
@@ -86,9 +88,9 @@ afterEach(() => {
   jest.useRealTimers();
 });
 
-test('a switched-off transport mutes the ring and stops its fill', async () => {
+test('a died transport mutes the ring and stops its fill', async () => {
   jest.useFakeTimers();
-  price.mockResolvedValue({ price: 42, error: '' });
+  price.mockResolvedValue(mockZecQuote);
   const setZecPrice = jest.fn();
   const priceDate = Date.now();
 
@@ -110,10 +112,11 @@ test('a switched-off transport mutes the ring and stops its fill', async () => {
     surfaceUi(
       makeCtx({
         mixnetView: {
-          statusKey: 'mixnet.status.off',
+          kind: 'transport',
+          statusKey: 'mixnet.status.died',
           socks5Addr: null,
           narration: null,
-          sendBlocked: false,
+          sendBlocked: true,
           recovery: 'reenable',
           reconnecting: false,
         },
@@ -123,9 +126,9 @@ test('a switched-off transport mutes the ring and stops its fill', async () => {
     ),
   );
   await jest.advanceTimersByTimeAsync(0);
-  const off = view.UNSAFE_getByType(QuoteRefreshRing).props;
-  expect(off.durationMs).toBe(0);
-  expect(off.color).not.toBe(live.color);
+  const muted = view.UNSAFE_getByType(QuoteRefreshRing).props;
+  expect(muted.durationMs).toBe(0);
+  expect(muted.color).not.toBe(live.color);
 });
 
 test('an entry flight with no armed deadline never reads full', async () => {
@@ -147,7 +150,7 @@ test('an entry flight with no armed deadline never reads full', async () => {
 
 test('the driver writes deps when an input moves, not per render', async () => {
   jest.useFakeTimers();
-  price.mockResolvedValue({ price: 42, error: '' });
+  price.mockResolvedValue(mockZecQuote);
   const setDepsSpy = jest.spyOn(priceFetcherStore, 'setDeps');
   const setZecPrice = jest.fn();
   const ctx = makeCtx({ mixnetView: READY_VIEW });
@@ -163,8 +166,9 @@ test('the driver writes deps when an input moves, not per render', async () => {
   setDepsSpy.mockRestore();
 });
 
-test('the snapshot carries exactly its four read fields', () => {
+test('the snapshot carries exactly its five read fields', () => {
   expect(Object.keys(priceFetcherStore.snapshot()).sort()).toEqual([
+    'failed',
     'loading',
     'nextFetchAt',
     'nextFetchDelayMs',
@@ -215,12 +219,15 @@ test('the ring is display-only', () => {
     <QuoteRefreshRing
       size={22}
       color="#ffffff"
+      fetchColor="#00ff00"
       trackColor="#333333"
       durationMs={60_000}
       resetKey={1}
-      accessibilityLabel="ring"
       testID="h10.ring"
     />,
   );
-  expect(view.getByTestId('h10.ring').props.accessibilityRole).toBe('image');
+  expect(
+    view.getByTestId('h10.ring', { includeHiddenElements: true }).props
+      .accessibilityElementsHidden,
+  ).toBe(true);
 });

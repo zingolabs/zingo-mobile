@@ -1,3 +1,6 @@
+import { ErrorKeyed, errorKeyed } from '@app/AppState/types/Result';
+import type { SendRefusalKey } from './sendPermit';
+
 /**
  * Why a confirmed send failed, enumerated over the real error families the
  * send path produces, as a compile-time-enforced classification.
@@ -35,11 +38,10 @@ const DUPLICATE_NULLIFIER_MARKERS = [
 ] as const;
 
 /**
- * The mobile-owned refusal marker (#1229): the display prefix of our own
- * `ZingolibError::Mixnet`, minted in rust/lib/src/lib.rs. It survives any
- * zingolib rewording, because both sides of it live in this repository.
+ * The display prefix of `ZingolibError::Mixnet`, which a jest test compares
+ * with zingolib/zingo-ffi/lib/src/lib.rs at the pinned commit.
  */
-const OWNED_MIXNET_MARKER = 'Error: mixnet:';
+export const OWNED_MIXNET_MARKER = 'Error: mixnet:';
 
 /**
  * Both fail-closed refusal texts (bootstrapping and died) carry this phrase;
@@ -102,10 +104,9 @@ export function retryOnAnotherServer(failure: SendFailureClass): boolean {
  * What the failed screen shows for a classified failure.
  */
 export type SendFailureText =
-  | {
-      readonly kind: 'key';
-      readonly errorKey: 'send.duplicate-nullifier-error' | 'send.dust-error';
-    }
+  | ErrorKeyed<
+      'send.duplicate-nullifier-error' | 'send.dust-error' | SendRefusalKey
+    >
   | { readonly kind: 'verbatim'; readonly text: string };
 
 /**
@@ -115,9 +116,9 @@ export type SendFailureText =
 export function sendFailureText(failure: SendFailureClass): SendFailureText {
   switch (failure.kind) {
     case 'duplicateNullifier':
-      return { kind: 'key', errorKey: 'send.duplicate-nullifier-error' };
+      return errorKeyed('send.duplicate-nullifier-error');
     case 'dust':
-      return { kind: 'key', errorKey: 'send.dust-error' };
+      return errorKeyed('send.dust-error');
     case 'mixnetRefusal':
     case 'internalRpcFailure':
     case 'serverSuspect':

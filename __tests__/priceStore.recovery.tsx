@@ -7,27 +7,27 @@ import * as fs from 'fs';
 import * as path from 'path';
 import 'react-native';
 import React from 'react';
-import { act, render, renderHook } from '@testing-library/react-native';
+import { render, renderHook } from '@testing-library/react-native';
 import PriceFetcher, { PriceTrafficDriver } from '@ui/widgets/PriceFetcher';
 import {
   PRICE_REFRESH_MAX_MS,
-  PRICE_STALE_MS,
   priceFetcherStore,
   usePriceHealth,
-  usePriceStale,
 } from '@ui/widgets/priceFetcherStore';
 import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
 } from '@app/context';
-import { SelectServerEnum } from '@app/AppState';
+import { ChainNameEnum, SelectServerEnum, offlineServer } from '@app/AppState';
 import { getZecPrice } from '@app/walletBackend';
+import { mockZecQuote } from '../__mocks__/dataMocks/mockZecPriceOutcome';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
-import { MixnetView } from '@app/walletBackend/transforms/mixnetView';
+import { MixnetTransportView } from '@app/walletBackend/transforms/mixnetView';
 
 const price = getZecPrice as jest.MockedFunction<typeof getZecPrice>;
 
-const READY_VIEW: MixnetView = {
+const READY_VIEW: MixnetTransportView = {
+  kind: 'transport',
   statusKey: 'mixnet.status.ready',
   socks5Addr: '127.0.0.1:1080',
   narration: null,
@@ -35,7 +35,8 @@ const READY_VIEW: MixnetView = {
   recovery: 'none',
   reconnecting: false,
 };
-const DIED_VIEW: MixnetView = {
+const DIED_VIEW: MixnetTransportView = {
+  kind: 'transport',
   statusKey: 'mixnet.status.died',
   socks5Addr: null,
   narration: null,
@@ -80,7 +81,7 @@ afterEach(() => {
 
 test('a lost market takes the cadence down now, and publishes it', async () => {
   jest.useFakeTimers();
-  price.mockResolvedValue({ price: 42, error: '' });
+  price.mockResolvedValue(mockZecQuote);
   const setZecPrice = jest.fn();
 
   const view = render(
@@ -95,7 +96,7 @@ test('a lost market takes the cadence down now, and publishes it', async () => {
     surfaceUi(
       makeCtx({
         mixnetView: READY_VIEW,
-        selectServer: SelectServerEnum.offline,
+        server: offlineServer(ChainNameEnum.noneChainName),
       }),
       setZecPrice,
     ),
@@ -108,7 +109,7 @@ test('a lost market takes the cadence down now, and publishes it', async () => {
 
 test('no wedged deadline across an outage, and the recovery entry fires', async () => {
   jest.useFakeTimers();
-  price.mockResolvedValue({ price: 42, error: '' });
+  price.mockResolvedValue(mockZecQuote);
   const setZecPrice = jest.fn();
 
   const view = render(
@@ -121,7 +122,7 @@ test('no wedged deadline across an outage, and the recovery entry fires', async 
     surfaceUi(
       makeCtx({
         mixnetView: READY_VIEW,
-        selectServer: SelectServerEnum.offline,
+        server: offlineServer(ChainNameEnum.noneChainName),
       }),
       setZecPrice,
     ),
@@ -138,7 +139,7 @@ test('no wedged deadline across an outage, and the recovery entry fires', async 
 
 test('a flapping transport rides the cadence, one fetch per window', async () => {
   jest.useFakeTimers();
-  price.mockResolvedValue({ price: 42, error: '' });
+  price.mockResolvedValue(mockZecQuote);
   const setZecPrice = jest.fn();
 
   const view = render(
@@ -172,29 +173,6 @@ test('a rejected native call reads as a refusal, not a vanish', async () => {
   expect(price).toHaveBeenCalledTimes(4);
 });
 
-test('no stale crossing outlives its consumers', () => {
-  jest.useFakeTimers();
-  const timersBefore = jest.getTimerCount();
-  const fresh = renderHook(() => usePriceStale(Date.now() - 1_000));
-  fresh.unmount();
-  expect(jest.getTimerCount()).toBe(timersBefore);
-});
-
-test('two prices each keep their own stale crossing', () => {
-  jest.useFakeTimers();
-  const older = Date.now() - PRICE_STALE_MS + 5_000;
-  const newer = Date.now() - 1_000;
-
-  const first = renderHook(() => usePriceStale(older));
-  renderHook(() => usePriceStale(newer));
-  expect(first.result.current).toBe(false);
-
-  act(() => {
-    jest.advanceTimersByTime(6_000);
-  });
-  expect(first.result.current).toBe(true);
-});
-
 test('the muting rule has one spelling, usePriceHealth', () => {
   const sites = [
     '../ui/widgets/PriceFetcher.tsx',
@@ -214,8 +192,24 @@ test('the muting rule has one spelling, usePriceHealth', () => {
   expect(renderHook(() => usePriceHealth(Date.now())).result.current).toBe(
     'live',
   );
+  // Age alone never mutes: only a failed fetch does.
   expect(
-    renderHook(() => usePriceHealth(Date.now() - PRICE_STALE_MS - 60_000))
-      .result.current,
-  ).toBe('stale');
+    renderHook(() => usePriceHealth(Date.now() - 24 * 3_600_000)).result
+      .current,
+  ).toBe('live');
+});
+
+test('a failed fetch mutes the price until one succeeds', async () => {
+  jest.useFakeTimers();
+  price.mockRejectedValue(new Error('down'));
+  const date = Date.now();
+  const health = renderHook(() => usePriceHealth(date));
+
+  render(surfaceUi(makeCtx(), jest.fn()));
+  await jest.advanceTimersByTimeAsync(0);
+  expect(health.result.current).toBe('stale');
+
+  price.mockResolvedValue(mockZecQuote);
+  await jest.advanceTimersByTimeAsync(PRICE_REFRESH_MAX_MS + 1_000);
+  expect(health.result.current).toBe('live');
 });

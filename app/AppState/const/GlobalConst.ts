@@ -15,7 +15,6 @@ export const GlobalConst = {
   memoMaxLength: 511,
   platformOSios: 'ios',
   platformOSandroid: 'android',
-  blocksPerBatch: 100,
   yes: 'yes',
   no: 'no',
   background: '@background',

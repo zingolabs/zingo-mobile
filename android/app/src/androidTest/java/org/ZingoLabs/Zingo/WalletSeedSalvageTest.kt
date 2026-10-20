@@ -16,6 +16,7 @@ import java.io.File
  * Run: ./gradlew :app:connectedProdDebugAndroidTest \
  *   -Pandroid.testInstrumentationRunnerArguments.class=org.ZingoLabs.Zingo.WalletSeedSalvageTest
  */
+@OfflineDeviceTest
 class WalletSeedSalvageTest {
     private val fileName = Constants.WalletFileName.value
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
@@ -30,8 +31,7 @@ class WalletSeedSalvageTest {
         walletFile().delete()
         brokenFile().delete()
         uniffi.zingo.initLogging()
-        uniffi.zingo.setCryptoDefaultProviderToRing()
-        uniffi.zingo.initFromSeed(Seeds.HOSPITAL, 2000000u, "", "main", "Medium", 1u)
+        uniffi.zingo.initFromSeed(seed = Seeds.HOSPITAL, birthday = 2000000u, connection = testConnection("", "main"))
         plainWallet = uniffi.zingo.saveWalletBytes()!!
     }
 

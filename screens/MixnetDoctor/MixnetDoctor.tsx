@@ -29,7 +29,7 @@ import {
   getMixnetStatus,
 } from '@app/walletBackend/utils/mixnetUtils';
 import { RPCMixnetIndicatorEnum } from '@app/walletBackend/enums/RPCMixnetIndicatorEnum';
-import { mixnetPhase } from '@app/walletBackend/transforms/mixnetView';
+import { viewPhase } from '@app/walletBackend/transforms/mixnetView';
 import {
   MixnetDoctorRow,
   MixnetDoctorRun,
@@ -137,8 +137,7 @@ const runIsTerminal = (
 ): boolean =>
   !attachInFlight &&
   (finished.status.kind === 'failure' ||
-    finished.status.indicator === RPCMixnetIndicatorEnum.died ||
-    finished.status.indicator === RPCMixnetIndicatorEnum.off);
+    finished.status.indicator === RPCMixnetIndicatorEnum.died);
 
 const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
   navigation,
@@ -150,11 +149,19 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
 
   // The coordinator's own view of the session, which the probes cannot see:
   // it knows an attach is under way while the library still answers `died`.
-  const phase =
-    mixnetView !== null
-      ? mixnetPhase(mixnetView.statusKey, mixnetView.reconnecting)
-      : null;
+  const phase = viewPhase(mixnetView);
   const attachInFlight = phase === 'connecting' || phase === 'reconnecting';
+  // Nym rests at `off` because the session is Offline or the device has no
+  // network. The probes have nothing to reach: they would time a local FFI
+  // call and report the state the header already shows, so the screen says
+  // why instead of measuring nothing and offering it for copying.
+  const restingOff = phase === 'off';
+  // Off on a remote server means the device has no network: the transport
+  // rests as in Offline and comes back by itself with the network.
+  const offReason =
+    server.kind === 'remote'
+      ? 'mixnetdoctor.nonetwork'
+      : 'mixnetdoctor.offline';
 
   const [run, setRun] = useState<MixnetDoctorRun | null>(null);
   const [running, setRunning] = useState<boolean>(false);
@@ -184,7 +191,7 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
       const detail = await getMixnetBootstrapDetail();
       const detailMillis = Date.now() - detailStart;
       setRun({
-        serverUri: server.uri,
+        serverUri: server.kind === 'remote' ? server.uri : 'offline',
         chainName: server.chainName,
         status,
         statusMillis,
@@ -193,12 +200,16 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
       });
       setRunning(false);
     },
-    [server.chainName, server.uri],
+    [server],
   );
 
   // The screen is opened because something looks wrong, so it answers without
-  // being asked twice: the first run starts on entry.
+  // being asked twice: the first run starts on entry — unless nym is resting,
+  // where there is nothing to ask.
   useEffect(() => {
+    if (restingOff) {
+      return;
+    }
     runDoctor();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -218,7 +229,14 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
 
   // The settling itself is worth a run: the moment the transport lands, or
   // gives up, the report says so rather than showing the state before it.
+  // Reaching `off` is the exception: the report belonged to a transport this
+  // session no longer has, so it goes rather than lingering as stale numbers.
   useEffect(() => {
+    if (restingOff) {
+      setRun(null);
+      setRunning(false);
+      return;
+    }
     runDoctor(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase]);
@@ -268,9 +286,11 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
             gap: 20,
           }}
         >
-          <FadeText>{translate('mixnetdoctor.intro') as string}</FadeText>
+          <FadeText>
+            {translate(restingOff ? offReason : 'mixnetdoctor.intro') as string}
+          </FadeText>
 
-          {(running || run !== null) && (
+          {!restingOff && (running || run !== null) && (
             <Animated.View
               entering={contentEnter()}
               layout={boxMorph()}
@@ -329,7 +349,7 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
                     ? (translate('mixnetdoctor.running') as string)
                     : (translate('mixnetdoctor.run') as string)
                 }
-                disabled={running}
+                disabled={running || restingOff}
                 style={{ alignSelf: 'center' }}
                 onPress={() => runDoctor()}
               />
@@ -352,7 +372,7 @@ const MixnetDoctor: React.FunctionComponent<MixnetDoctorProps> = ({
             </Animated.View>
           )}
 
-          {!running && run !== null && (
+          {!restingOff && !running && run !== null && (
             <Animated.View
               layout={boxMorph()}
               entering={contentEnter()}

@@ -20,6 +20,7 @@ import java.io.File
  * Run: ./gradlew :app:connectedProdDebugAndroidTest \
  *   -Pandroid.testInstrumentationRunnerArguments.class=org.ZingoLabs.Zingo.WalletFileMemoryTest
  */
+@OfflineDeviceTest
 class WalletFileMemoryTest {
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
     private val dir get() = context.filesDir
@@ -125,15 +126,6 @@ class WalletFileMemoryTest {
             val temp = Base64.encodeToString(File(dir, swapName).readBytes(), Base64.NO_WRAP)
             assertThat(temp == Base64.encodeToString(File(dir, mainName).readBytes(), Base64.NO_WRAP)).isFalse()
             assertThat(temp == Base64.encodeToString(File(dir, backupName).readBytes(), Base64.NO_WRAP)).isFalse()
-        }
-    }
-
-    @Test
-    fun theRetainedWalletCheckReadsOnlyTheHeader() {
-        File(dir, backupName).writeBytes(wallet(walletSize, 11))
-
-        guarded("retained.check") {
-            assertThat(PlainWalletFile.readsPlain(dir, backupName)).isTrue()
         }
     }
 }

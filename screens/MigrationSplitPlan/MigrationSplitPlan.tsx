@@ -83,7 +83,7 @@ const Card: React.FunctionComponent<{
 
 // The Phase 1 disclosure screen of the private migration: renders the exact
 // note-splitting plan (plus the fees and stranded value the whole migration
-// implies). Phase 1 splitting carries no consent hash (ADR 0016) — the plan is
+// implies). Phase 1 splitting carries no consent hash (zingolib/0016) — the plan is
 // the disclosure surface, and Accept simply proceeds to MigrationSplitting,
 // which drives the stateless quick_split rounds. Phase 2 (the schedule) captures
 // its own consent later, at the cadence screen.
@@ -140,7 +140,7 @@ const MigrationSplitPlan: React.FunctionComponent<MigrationSplitPlanProps> = ({
     fetchPlan();
   }, [fetchPlan]);
 
-  // Accept: Phase 1 has no consent hash (ADR 0016), so this just proceeds to
+  // Accept: Phase 1 has no consent hash (zingolib/0016), so this just proceeds to
   // the stateless splitting rounds. The plan is passed through for the row
   // labels. Cadence captures the Phase 2 schedule consent afterwards. When the
   // notes are already part-ready (no rounds) Phase 1 is a no-op, so skip the

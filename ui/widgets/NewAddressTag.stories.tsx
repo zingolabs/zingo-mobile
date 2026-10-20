@@ -13,7 +13,6 @@ const meta: Meta<typeof NewAddressTag> = {
   decorators: [withBottomSheet, withAppContext()],
   args: {
     address: uAddress,
-    own: false,
     closeSheet: () => {},
     setAddressBook: () => {},
   },
@@ -22,5 +21,4 @@ const meta: Meta<typeof NewAddressTag> = {
 export default meta;
 type Story = StoryObj<typeof NewAddressTag>;
 
-export const Contact: Story = {};
-export const OwnAddress: Story = { args: { own: true } };
+export const OwnAddress: Story = {};

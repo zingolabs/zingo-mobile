@@ -43,7 +43,6 @@ describe('Component Settings - test', () => {
   state.server = mockServer;
   state.language = LanguageEnum.en;
   state.blockExplorer = BlockExplorerEnum.Zcashexplorer;
-  state.recoveryWalletInfoOnDevice = true;
   const onSetOption = jest.fn();
   const toggle = jest.fn();
   const props = makeDrawerProps();
@@ -52,14 +51,12 @@ describe('Component Settings - test', () => {
       <ContextAppLoadedProvider value={state}>
         <Settings
           {...props}
-          setServerOption={onSetOption}
           setLanguageOption={onSetOption}
-          setSecurityOption={onSetOption}
-          setSelectServerOption={onSetOption}
-          setRecoveryWalletInfoOnDeviceOption={onSetOption}
+          setBiometricsOption={onSetOption}
           setPerformanceLevelOption={onSetOption}
           setBlockExplorerOption={onSetOption}
           toggleMenuDrawer={toggle}
+          onRestoreWalletBackup={onSetOption}
         />
       </ContextAppLoadedProvider>,
     );

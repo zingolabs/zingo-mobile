@@ -31,14 +31,14 @@ export async function enableMixnet(
   return statusCall(() => RPCModule.enableMixnet(proxyPath));
 }
 
-export async function getMixnetStatus(): Promise<MixnetStatusReport> {
-  return statusCall(() => RPCModule.mixnetIndicatorInfo());
+// The wallet's half of the go-offline moment: vacates the slot and lands the
+// deliberate `off` indicator, which no reconnect ever chases.
+export async function disableMixnet(): Promise<MixnetStatusReport> {
+  return statusCall(() => RPCModule.disableMixnet());
 }
 
-export type TransmitPolicy = 'mixnet' | 'clearnet';
-
-export async function setTransmitPolicy(policy: TransmitPolicy): Promise<void> {
-  await RPCModule.setTransmitPolicy(policy);
+export async function getMixnetStatus(): Promise<MixnetStatusReport> {
+  return statusCall(() => RPCModule.mixnetIndicatorInfo());
 }
 
 export async function getMixnetBootstrapDetail(): Promise<MixnetDetailReport> {

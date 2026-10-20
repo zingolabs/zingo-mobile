@@ -1,13 +1,20 @@
 jest.mock('@app/walletBackend', () => ({
   __esModule: true,
-  getZecPrice: jest.fn().mockResolvedValue({ price: -1, error: 'refused' }),
+  getZecPrice: jest.fn().mockResolvedValue({
+    kind: 'error',
+    errorKey: 'info.error-price-fetch',
+    param: 'refused',
+  }),
 }));
 
 import 'react-native';
 import React from 'react';
 import { ReactTestRendererJSON } from 'react-test-renderer';
 import { render, waitFor } from '@testing-library/react-native';
-import PriceFetcher, { PriceTrafficDriver } from '@ui/widgets/PriceFetcher';
+import PriceFetcher, {
+  PriceTrafficDriver,
+  usePriceRing,
+} from '@ui/widgets/PriceFetcher';
 import QuoteRefreshRing from '@ui/primitives/QuoteRefreshRing';
 import {
   PRICE_REFRESH_MAX_MS,
@@ -19,13 +26,14 @@ import {
 } from '@app/context';
 import { SelectServerEnum } from '@app/AppState';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
-import { MixnetView } from '@app/walletBackend/transforms/mixnetView';
+import { MixnetTransportView } from '@app/walletBackend/transforms/mixnetView';
 
 beforeEach(() => {
   priceFetcherStore.resetForTests();
 });
 
-const READY_VIEW: MixnetView = {
+const READY_VIEW: MixnetTransportView = {
+  kind: 'transport',
   statusKey: 'mixnet.status.ready',
   socks5Addr: '127.0.0.1:1080',
   narration: null,
@@ -45,10 +53,18 @@ const makeCtx = (over?: Partial<Ctx>): Ctx => ({
   ...over,
 });
 
+// The fiat row announces what the hidden ring shows.
+const Announced = () =>
+  React.createElement('View', {
+    accessible: true,
+    accessibilityLabel: usePriceRing().labelKey,
+  });
+
 const fetcherUi = (ctx: Ctx) => (
   <ContextAppLoadedProvider value={{ ...ctx, setZecPrice: jest.fn() }}>
     {PriceTrafficDriver ? <PriceTrafficDriver /> : <></>}
     <PriceFetcher />
+    <Announced />
   </ContextAppLoadedProvider>
 );
 
@@ -74,7 +90,7 @@ test('the stale arc keeps a color of its own, distinct from the track', () => {
   const view = render(fetcherUi(staleCtx));
 
   const ring = view.UNSAFE_getByType(QuoteRefreshRing);
-  expect(ring.props.ringColor).not.toBe(ring.props.trackColor);
+  expect(ring.props.color).not.toBe(ring.props.trackColor);
 });
 
 test('the display-only ring exposes no disabled tap stop', () => {
@@ -92,12 +108,14 @@ test('the display-only ring exposes no disabled tap stop', () => {
   expect(disabledStops).toEqual([]);
 });
 
-test('a stale price reaches screen readers as a label', () => {
-  const staleCtx = makeCtx({
-    zecPrice: { zecPrice: 33.33, date: Date.now() - 11 * 60_000 },
+test('a failed fetch reaches screen readers as a stale label', async () => {
+  const ctx = makeCtx({
+    zecPrice: { zecPrice: 33.33, date: Date.now() },
   });
-  const view = render(fetcherUi(staleCtx));
-  expect(view.getByLabelText('price-ring-stale')).toBeTruthy();
+  const view = render(fetcherUi(ctx));
+  await waitFor(() =>
+    expect(view.getByLabelText('price-ring-stale')).toBeTruthy(),
+  );
 });
 
 test('a current price reaches screen readers as a label too', () => {
@@ -139,29 +157,12 @@ test('a price that never arrived renders no ring', async () => {
   );
 });
 
-test('a switched-off transport shows no ring', () => {
+test('a refusing transport shows no ring', () => {
   const view = render(
     fetcherUi(
       makeCtx({
         mixnetView: {
-          statusKey: 'mixnet.status.off',
-          socks5Addr: null,
-          narration: null,
-          sendBlocked: false,
-          recovery: 'reenable',
-          reconnecting: false,
-        },
-      }),
-    ),
-  );
-  expect(view.queryByTestId('pricefetcher.ring')).toBeNull();
-});
-
-test('a refusing transport hides the ring for the same reason', () => {
-  const view = render(
-    fetcherUi(
-      makeCtx({
-        mixnetView: {
+          kind: 'transport',
           statusKey: 'mixnet.status.died',
           socks5Addr: null,
           narration: null,

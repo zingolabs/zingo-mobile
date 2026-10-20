@@ -19,12 +19,17 @@ import {
 } from '@app/context';
 import { SelectServerEnum } from '@app/AppState';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
-import { getZecPrice } from '@app/walletBackend';
-import { MixnetView } from '@app/walletBackend/transforms/mixnetView';
+import { getZecPrice, ZecPriceOutcome } from '@app/walletBackend';
+import {
+  mockZecQuote,
+  mockZecRefusal,
+} from '../__mocks__/dataMocks/mockZecPriceOutcome';
+import { MixnetTransportView } from '@app/walletBackend/transforms/mixnetView';
 
 const price = getZecPrice as jest.MockedFunction<typeof getZecPrice>;
 
-const READY_VIEW: MixnetView = {
+const READY_VIEW: MixnetTransportView = {
+  kind: 'transport',
   statusKey: 'mixnet.status.ready',
   socks5Addr: '127.0.0.1:1080',
   narration: null,
@@ -56,7 +61,7 @@ const foregroundReturned = () => priceFetcherStore.foregroundReturned();
 const seedDeps = (setZecPrice: (p: number, d: number) => void) => {
   priceFetcherStore.setDeps({
     setZecPrice,
-    mixnetStatusKey: 'mixnet.status.off',
+    mixnetStatusKey: 'mixnet.status.unknown',
     priceFetchable: true,
   });
 };
@@ -94,7 +99,7 @@ afterEach(() => {
 });
 
 test('a cold start with no price fetches once the surface mounts', async () => {
-  price.mockResolvedValue({ price: 42, error: '' });
+  price.mockResolvedValue(mockZecQuote);
   const setZecPrice = jest.fn();
 
   render(fetcherUi(makeCtx(), setZecPrice));
@@ -109,7 +114,7 @@ test('a cold start with no price fetches once the surface mounts', async () => {
 
 test('observing the store snapshot never starts price traffic', async () => {
   jest.useFakeTimers();
-  price.mockResolvedValue({ price: 42, error: '' });
+  price.mockResolvedValue(mockZecQuote);
   seedDeps(jest.fn());
 
   renderHook(() => usePriceFetcherStore());
@@ -119,7 +124,7 @@ test('observing the store snapshot never starts price traffic', async () => {
 });
 
 test('an ios interruption neither refetches nor disturbs the surface', async () => {
-  price.mockResolvedValue({ price: 42, error: '' });
+  price.mockResolvedValue(mockZecQuote);
   const setZecPrice = jest.fn();
   seedDeps(setZecPrice);
 
@@ -133,7 +138,7 @@ test('an ios interruption neither refetches nor disturbs the surface', async () 
 });
 
 test('the AppState subscription dies with the last mounted fetcher', async () => {
-  price.mockResolvedValue({ price: 42, error: '' });
+  price.mockResolvedValue(mockZecQuote);
   const setZecPrice = jest.fn();
   seedDeps(setZecPrice);
 
@@ -148,7 +153,7 @@ test('a throwing fetch neither pins loading nor kills the timer', async () => {
   jest.useFakeTimers();
   price
     .mockRejectedValueOnce(new Error('ffi never settled'))
-    .mockResolvedValue({ price: 42, error: '' });
+    .mockResolvedValue(mockZecQuote);
   const setZecPrice = jest.fn();
   seedDeps(setZecPrice);
 
@@ -161,7 +166,7 @@ test('a throwing fetch neither pins loading nor kills the timer', async () => {
 
 test('a remounted surface with no price fetches instead of waiting a tick', async () => {
   jest.useFakeTimers();
-  price.mockResolvedValue({ price: 42, error: '' });
+  price.mockResolvedValue(mockZecQuote);
   const setZecPrice = jest.fn();
   seedDeps(setZecPrice);
 
@@ -179,7 +184,7 @@ test('a remounted surface with no price fetches instead of waiting a tick', asyn
 
 test('a hung fetch releases the surface and recovers once it settles', async () => {
   jest.useFakeTimers();
-  let settleLate: (v: { price: number; error: string }) => void = () => {};
+  let settleLate: (v: ZecPriceOutcome) => void = () => {};
   price
     .mockImplementationOnce(
       () =>
@@ -187,7 +192,7 @@ test('a hung fetch releases the surface and recovers once it settles', async () 
           settleLate = resolve;
         }),
     )
-    .mockResolvedValue({ price: 42, error: '' });
+    .mockResolvedValue(mockZecQuote);
   const setZecPrice = jest.fn();
   seedDeps(setZecPrice);
 
@@ -195,14 +200,14 @@ test('a hung fetch releases the surface and recovers once it settles', async () 
   await jest.advanceTimersByTimeAsync(61_000);
   expect(priceFetcherStore.snapshot().loading).toBe(false);
 
-  settleLate({ price: -1, error: 'late' });
+  settleLate(mockZecRefusal('late'));
   await jest.advanceTimersByTimeAsync(0);
   await jest.advanceTimersByTimeAsync(PRICE_REFRESH_MAX_MS + 1_000);
   expect(setZecPrice).toHaveBeenCalledWith(42, expect.any(Number));
 });
 
 test('a return landing inside a flight still produces the return fetch', async () => {
-  let land: (v: { price: number; error: string }) => void = () => {};
+  let land: (v: ZecPriceOutcome) => void = () => {};
   price
     .mockImplementationOnce(
       () =>
@@ -210,7 +215,7 @@ test('a return landing inside a flight still produces the return fetch', async (
           land = resolve;
         }),
     )
-    .mockResolvedValue({ price: -1, error: 'refused' });
+    .mockResolvedValue(mockZecRefusal('refused'));
   const setZecPrice = jest.fn();
   seedDeps(setZecPrice);
 
@@ -220,7 +225,7 @@ test('a return landing inside a flight still produces the return fetch', async (
   fireAppState('background');
   fireAppState('active');
   foregroundReturned();
-  land({ price: -1, error: 'refused' });
+  land(mockZecRefusal('refused'));
   await flush();
   await flush();
 
@@ -228,7 +233,7 @@ test('a return landing inside a flight still produces the return fetch', async (
 });
 
 test('a detach mid-flight stops the retry and the write', async () => {
-  let land: (v: { price: number; error: string }) => void = () => {};
+  let land: (v: ZecPriceOutcome) => void = () => {};
   price
     .mockImplementationOnce(
       () =>
@@ -236,7 +241,7 @@ test('a detach mid-flight stops the retry and the write', async () => {
           land = resolve;
         }),
     )
-    .mockResolvedValue({ price: 42, error: '' });
+    .mockResolvedValue(mockZecQuote);
   const setZecPrice = jest.fn();
   seedDeps(setZecPrice);
 
@@ -244,7 +249,7 @@ test('a detach mid-flight stops the retry and the write', async () => {
   await waitFor(() => expect(price).toHaveBeenCalledTimes(1));
 
   view.unmount();
-  land({ price: 42, error: '' });
+  land(mockZecQuote);
   await flush();
 
   expect(price).toHaveBeenCalledTimes(1);
@@ -252,7 +257,7 @@ test('a detach mid-flight stops the retry and the write', async () => {
 });
 
 test('rapid app hops inside the cooldown do not multiply fetches', async () => {
-  price.mockResolvedValue({ price: 42, error: '' });
+  price.mockResolvedValue(mockZecQuote);
   const setZecPrice = jest.fn();
   seedDeps(setZecPrice);
 

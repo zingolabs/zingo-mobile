@@ -1,0 +1,12 @@
+appId: org.ZingoLabs.Zingo
+tags:
+  - screen-awake
+---
+# The default nightly run excludes this flow. The Android job runs it on
+# its own, and it ends with the wallet loaded and syncing in the
+# foreground, where the app holds a keep-awake lock. The job then sets a
+# ten-second screen-off timeout, waits twenty seconds with no input, and
+# reads the power state through adb.
+- runFlow:
+    file: common/restore_wallet.yaml
+

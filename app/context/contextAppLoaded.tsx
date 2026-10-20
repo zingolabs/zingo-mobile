@@ -1,5 +1,7 @@
 import React, { ReactNode } from 'react';
 import { useShallowMemo } from './useShallowMemo';
+import { PERMITTED } from '@app/walletBackend/transforms/sendPermit';
+import { ABSENT_MIXNET_VIEW } from '@app/walletBackend/transforms/mixnetView';
 
 import {
   InfoType,
@@ -8,11 +10,9 @@ import {
   SendPageStateClass,
   ToAddrClass,
   NetInfoType,
-  ServerType,
+  remoteServer,
   AddressBookFileClass,
-  SecurityType,
   LanguageEnum,
-  ModeEnum,
   SelectServerEnum,
   ChainNameEnum,
   AppContextLoaded,
@@ -25,6 +25,7 @@ import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformance
 export const defaultAppContextLoaded: AppContextLoaded = {
   netInfo: {} as NetInfoType,
   syncingStatus: {} as RPCSyncStatusType,
+  rescan: 'none',
   totalBalance: null,
   addresses: null,
   valueTransfers: null,
@@ -36,7 +37,7 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   info: {} as InfoType,
   birthday: 0,
   defaultUnifiedAddress: '',
-  server: {} as ServerType,
+  server: remoteServer('', ChainNameEnum.noneChainName),
   language: LanguageEnum.en,
   zecPrice: {
     zecPrice: 0,
@@ -51,7 +52,6 @@ export const defaultAppContextLoaded: AppContextLoaded = {
     date: 0,
     dateEnd: 0,
   } as BackgroundType,
-  setBackgroundSyncErrorInfo: () => {},
   backgroundError: { title: '', error: '' },
   setBackgroundError: () => {},
   lastError: '',
@@ -59,16 +59,14 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   orchardPool: true,
   saplingPool: true,
   transparentPool: true,
-  mode: ModeEnum.advanced,
   addLastSnackbar: () => {},
   restartApp: () => {},
   somePending: false,
   addressBook: [] as AddressBookFileClass[],
   launchAddTagModal: () => {},
-  security: {} as SecurityType,
+  biometrics: false,
   selectServer: SelectServerEnum.auto,
   walletChainName: ChainNameEnum.noneChainName,
-  recoveryWalletInfoOnDevice: false,
   shieldingAmount: 0,
   showSwipeableIcons: true,
   doRefresh: () => {},
@@ -76,11 +74,15 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   zingolibVersion: '',
   performanceLevel: RPCPerformanceLevelEnum.Medium,
   setPrivacyOption: async () => {},
+  seedBackedUp: true,
+  seedBackedUpAt: 0,
+  setSeedBackedUp: async () => {},
+  viewOnlyNoticeDismissed: false,
+  dismissViewOnlyNotice: async () => {},
   blockExplorer: BlockExplorerEnum.Zcashexplorer,
-  mixnetView: null,
+  mixnetView: ABSENT_MIXNET_VIEW,
   reenableMixnet: async () => {},
-  setModeOption: async () => {},
-  foregroundEpoch: 0,
+  sendPermitNow: () => PERMITTED,
 };
 
 export const ContextAppLoaded = React.createContext(defaultAppContextLoaded);

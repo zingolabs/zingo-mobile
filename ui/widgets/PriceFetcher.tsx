@@ -1,8 +1,7 @@
 import React, { useContext, useEffect } from 'react';
-import { View, ViewStyle } from 'react-native';
 import { useTheme } from '@app/theme';
 import { ContextAppLoaded } from '@app/context';
-import { ChainNameEnum, SelectServerEnum } from '@app/AppState';
+import { fiatEligible } from '@app/price/fiatQuote';
 import QuoteRefreshRing from '@ui/primitives/QuoteRefreshRing';
 import {
   PRICE_REFRESH_MAX_MS,
@@ -14,14 +13,13 @@ import {
 // LoadedApp mounts exactly one driver, which owns the session's price traffic.
 export const PriceTrafficDriver: React.FunctionComponent = () => {
   const context = useContext(ContextAppLoaded);
-  const { mixnetView, setZecPrice, selectServer, info } = context;
+  const { mixnetView, setZecPrice, server, info } = context;
 
-  const mixnetStatusKey = mixnetView
-    ? mixnetView.statusKey
-    : 'mixnet.status.unknown';
-  const priceFetchable =
-    selectServer !== SelectServerEnum.offline &&
-    info.chainName === ChainNameEnum.mainChainName;
+  const mixnetStatusKey =
+    mixnetView.kind === 'transport'
+      ? mixnetView.statusKey
+      : 'mixnet.status.unknown';
+  const priceFetchable = fiatEligible(server, info.chainName);
 
   useEffect(() => {
     priceFetcherStore.setDeps({
@@ -36,35 +34,22 @@ export const PriceTrafficDriver: React.FunctionComponent = () => {
   return null;
 };
 
-type PriceFetcherProps = {
-  backgroundColor?: string;
+export type PriceRingState = {
+  shown: boolean;
+  muted: boolean;
+  fetching: boolean;
+  cadenceMs: number;
+  resetKey: number;
+  elapsedFraction: number;
+  labelKey: 'price-ring-live' | 'price-ring-stale' | 'price-ring-paused';
 };
 
-const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
-  backgroundColor,
-}) => {
-  const context = useContext(ContextAppLoaded);
-  const { translate, zecPrice } = context;
-  const { colors } = useTheme();
-  const bg = backgroundColor ?? colors.bgCanvas;
-
-  const { nextFetchAt, nextFetchDelayMs, surfaceActive } =
+/** The countdown the ring draws and the state the price beside it announces. */
+export const usePriceRing = (): PriceRingState => {
+  const { zecPrice } = useContext(ContextAppLoaded);
+  const { nextFetchAt, nextFetchDelayMs, surfaceActive, loading } =
     usePriceFetcherStore();
   const health = usePriceHealth(zecPrice.date);
-
-  if (!zecPrice.date) {
-    return null;
-  }
-
-  const containerStyle: ViewStyle = {
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: bg,
-    margin: 0,
-    padding: 5,
-    minWidth: 40,
-    minHeight: 40,
-  };
 
   // A ring with no running cadence stays static and muted.
   const muted = health !== 'live' || !surfaceActive;
@@ -73,28 +58,46 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({
     nextFetchAt > 0
       ? Math.min(Math.max(1 - (nextFetchAt - Date.now()) / cadenceMs, 0), 1)
       : 0;
+  return {
+    shown: !!zecPrice.date,
+    muted,
+    fetching: loading && surfaceActive,
+    cadenceMs: surfaceActive ? cadenceMs : 0,
+    resetKey: nextFetchAt,
+    elapsedFraction,
+    labelKey:
+      health === 'stale'
+        ? 'price-ring-stale'
+        : surfaceActive
+          ? 'price-ring-live'
+          : 'price-ring-paused',
+  };
+};
+
+const RING_SIZE = 16;
+const RING_TRACK = '#13263F';
+
+// The countdown ring next to the fiat balance.
+const PriceFetcher: React.FunctionComponent = () => {
+  const { colors } = useTheme();
+  const ring = usePriceRing();
+
+  if (!ring.shown) {
+    return null;
+  }
+
   return (
-    <View style={containerStyle}>
-      <QuoteRefreshRing
-        size={22}
-        color={muted ? colors.fgMuted : colors.fgAccent}
-        ringColor={muted ? 'rgba(255,255,255,0.30)' : 'rgba(255,255,255,0.55)'}
-        trackColor={'rgba(255,255,255,0.12)'}
-        durationMs={surfaceActive ? cadenceMs : 0}
-        resetKey={nextFetchAt}
-        startProgress={elapsedFraction}
-        accessibilityLabel={
-          translate(
-            health === 'stale'
-              ? 'price-ring-stale'
-              : surfaceActive
-                ? 'price-ring-live'
-                : 'price-ring-paused',
-          ) as string
-        }
-        testID="pricefetcher.ring"
-      />
-    </View>
+    <QuoteRefreshRing
+      size={RING_SIZE}
+      color={ring.muted ? 'rgba(255,255,255,0.30)' : colors.fgMuted}
+      fetchColor={colors.fgAccent}
+      trackColor={RING_TRACK}
+      durationMs={ring.cadenceMs}
+      resetKey={ring.resetKey}
+      startProgress={ring.elapsedFraction}
+      fetching={ring.fetching}
+      testID="pricefetcher.ring"
+    />
   );
 };
 

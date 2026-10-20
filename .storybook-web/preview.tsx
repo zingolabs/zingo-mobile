@@ -4,7 +4,7 @@ import { View } from 'react-native';
 import type { Preview } from '@storybook/react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-import { ThemeProvider, useTheme, advancedTokens } from '@app/theme';
+import { ThemeProvider, useTheme, themeTokens } from '@app/theme';
 
 // On web, Storybook's story container sizes to content, so a `flex: 1`
 // View collapses and the white iframe body shows through. Paint the page
@@ -13,7 +13,7 @@ const css = `
   html, body, #storybook-root {
     height: 100%;
     margin: 0;
-    background: ${advancedTokens.bgCanvas};
+    background: ${themeTokens.bgCanvas};
   }
 `;
 if (typeof document !== 'undefined') {

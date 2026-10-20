@@ -1,14 +1,11 @@
-/* eslint-disable react-native/no-inline-styles */
 import React, { Component, useState, useMemo, useEffect } from 'react';
 import {
-  View,
   I18nManager,
   EmitterSubscription,
   AppState,
   NativeEventSubscription,
   Linking,
   Platform,
-  ActivityIndicator,
 } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useTheme } from '@app/theme';
@@ -26,7 +23,7 @@ import {
   deactivateKeepAwake,
 } from '@sayem314/react-native-keep-awake';
 
-import WalletBackend, { fetchWallet } from '@app/walletBackend';
+import WalletBackend from '@app/walletBackend';
 import {
   changeServer,
   doSave,
@@ -46,17 +43,16 @@ import {
   BackgroundType,
   TranslateType,
   ServerType,
+  nativeUri,
+  offlineServer,
+  remoteServer,
   ServerUrisType,
   SetServerResult,
   AddressBookFileClass,
-  SecurityType,
   MenuItemEnum,
   LanguageEnum,
-  ModeEnum,
   SelectServerEnum,
   ChainNameEnum,
-  SeedActionEnum,
-  UfvkActionEnum,
   SettingsNameEnum,
   RouteEnum,
   AppStateStatusEnum,
@@ -84,6 +80,7 @@ import { PriceTrafficDriver } from '@ui/widgets/PriceFetcher';
 import { priceFetcherStore } from '@ui/widgets/priceFetcherStore';
 import { ContextAppLoadedProvider } from '@app/context';
 import { parseZcashURI, serverUris, fetchServerList } from '@app/uris';
+import { otherServers, staticAlternatives } from '@app/uris/serverChoice';
 import selectingServer from '@app/services/selectingServer';
 import BackgroundFileImpl from '@app/services/BackgroundFileImpl';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -101,16 +98,12 @@ import {
   resolveTriggerGate,
 } from '@app/services/gateController';
 import ShowAddressAlertAsync from '@app/services/showAddressAlertAsync';
-import {
-  createUpdateRecoveryWalletInfo,
-  removeRecoveryWalletInfo,
-} from '@app/services/recoveryWalletInfo';
 
 import History from '@screens/History';
 import Send from '@screens/Send';
 import Receive from '@screens/Receive';
 import Settings from '@screens/Settings';
-import CustomTabBar, { FadeOnlyTabBar } from '@app/navigation/CustomTabBar';
+import CustomTabBar from '@app/navigation/CustomTabBar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import {
   BottomSheetModal,
@@ -119,8 +112,10 @@ import {
 import AddTagModalHost from './components/AddTagModalHost';
 import { BottomSheetBackHandler } from '@app/hooks/useBottomSheetBackHandler';
 import ConfirmBottomSheet from '@ui/widgets/ConfirmBottomSheet';
+import FadeInOnMount from '@ui/widgets/FadeInOnMount';
 import { showConfirm } from '@app/services/showConfirm';
 import RootNavigator from '@app/navigation/RootNavigator';
+import WalletServer from '@screens/Server/WalletServer';
 import {
   OptionsPanelProvider,
   toggleOptionsPanel,
@@ -128,27 +123,40 @@ import {
 import LoadedAppOptionsPanelHost from './LoadedAppOptionsPanelHost';
 import { MessageList } from '@screens/Messages';
 import { RPCSyncStatusType } from '@app/walletBackend/types/RPCSyncStatusType';
+import { rescanStep } from '@app/walletBackend/utils/syncProgress';
 import { RPCUfvkType } from '@app/walletBackend/types/RPCUfvkType';
 import {
   INITIAL_MIXNET_VIEW,
   MixnetView,
 } from '@app/walletBackend/transforms/mixnetView';
-import { startMixnetTransport } from '@app/walletBackend/utils/nymTransport';
+import {
+  SendOutcome,
+  SendPermit,
+  sendPermit,
+  sendWhenPermitted,
+} from '@app/walletBackend/transforms/sendPermit';
+import {
+  startMixnetTransport,
+  stopMixnetTransport,
+} from '@app/walletBackend/utils/nymTransport';
 import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
 import { AddressList } from '@screens/AddressList';
 import ValueTransferDetail from '@screens/ValueTransferDetail';
 import Confirm from '@screens/Confirm';
 import { AppStackParamList } from '@app/types';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { NavigationProp, ParamListBase } from '@react-navigation/native';
 import { RPCValueTransfersStatusEnum } from '@app/walletBackend/enums/RPCValueTransfersStatusEnum';
+import { publishReport } from '@app/services/reportDiagnostics';
 
 const About = React.lazy(() => import('@screens/About'));
 const MixnetDoctor = React.lazy(() => import('@screens/MixnetDoctor'));
-const Seed = React.lazy(() => import('@screens/Seed'));
 const SyncReport = React.lazy(() => import('@screens/SyncReport'));
-const Rescan = React.lazy(() => import('@screens/Rescan'));
 const Pools = React.lazy(() => import('@screens/Pools'));
 const MeetIronwood = React.lazy(() => import('@screens/MeetIronwood'));
+const SeedBackup = React.lazy(() => import('@screens/SeedBackup'));
+const WalletSeed = React.lazy(() => import('@screens/WalletSeed'));
+const ViewingKey = React.lazy(() => import('@screens/ViewingKey'));
 const MigrationStrategy = React.lazy(
   () => import('@screens/MigrationStrategy'),
 );
@@ -171,7 +179,6 @@ const MigrationBatchSending = React.lazy(
   () => import('@screens/MigrationBatchSending'),
 );
 const Insight = React.lazy(() => import('@screens/Insight'));
-const ShowUfvk = React.lazy(() => import('@screens/Ufvk/ShowUfvk'));
 const ComputingTxContent = React.lazy(() => import('@screens/Computing'));
 
 const en = require('@app/translations/en.json');
@@ -205,20 +212,21 @@ type LoadedAppProps = {
     RouteEnum.LoadedApp
   >['navigation'];
   route: StackScreenProps<AppStackParamList, RouteEnum.LoadedApp>['route'];
-  toggleTheme: (mode: ModeEnum) => void;
 };
 
-const SERVER_DEFAULT_0: ServerType = {
-  uri: serverUris(() => {})[0].uri,
-  chainName: serverUris(() => {})[0].chainName,
-} as ServerType;
+// The wallet fades in over the loading screen as it opens.
+const HOME_FADE_MS = 300;
+
+const SERVER_DEFAULT_0: ServerType = remoteServer(
+  serverUris(() => {})[0].uri,
+  serverUris(() => {})[0].chainName,
+);
 
 export default function LoadedApp(props: LoadedAppProps) {
   const theme = useTheme();
   const [language, setLanguage] = useState<LanguageEnum>(LanguageEnum.en);
   const [server, setServer] = useState<ServerType>(SERVER_DEFAULT_0);
   const [privacy, setPrivacy] = useState<boolean>(false);
-  const [mode, setMode] = useState<ModeEnum>(ModeEnum.advanced); // by default advanced
   const [backgroundSyncInfo, setBackgroundSyncInfo] = useState<BackgroundType>({
     batches: 0,
     message: '',
@@ -227,21 +235,14 @@ export default function LoadedApp(props: LoadedAppProps) {
   });
   const [addressBook, setAddressBook] = useState<AddressBookFileClass[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [security, setSecurity] = useState<SecurityType>({
-    startApp: true,
-    foregroundApp: true,
-    sendConfirm: true,
-    seedUfvkScreen: true,
-    rescanScreen: true,
-    settingsScreen: true,
-    changeWalletScreen: true,
-    restoreWalletBackupScreen: true,
-  });
+  const [biometrics, setBiometrics] = useState<boolean>(true);
+  const [seedBackedUp, setSeedBackedUp] = useState<boolean>(true);
+  const [seedBackedUpAt, setSeedBackedUpAt] = useState<number>(0);
+  const [viewOnlyNoticeDismissed, setViewOnlyNoticeDismissed] =
+    useState<boolean>(false);
   const [selectServer, setSelectServer] = useState<SelectServerEnum>(
     SelectServerEnum.auto,
   );
-  const [recoveryWalletInfoOnDevice, setRecoveryWalletInfoOnDevice] =
-    useState<boolean>(false);
   const [performanceLevel, setPerformanceLevel] =
     useState<RPCPerformanceLevelEnum>(RPCPerformanceLevelEnum.Medium);
   const [blockExplorer, setBlockExplorer] = useState<BlockExplorerEnum>(
@@ -360,71 +361,45 @@ export default function LoadedApp(props: LoadedAppProps) {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.language, lang);
       }
       if (settings.server) {
-        // Offline (empty uri) has no chain. Normalize any residual chainName to
-        // the empty sentinel so a stale value never reaches the wallet open (the
-        // real chain is derived from the wallet). Persist it only when we
-        // actually cleared a residual, so we don't rewrite on every boot.
-        const normalizedServer: ServerType = settings.server.uri
-          ? settings.server
-          : { uri: '', chainName: ChainNameEnum.noneChainName };
+        // Offline has no chain. Normalize any residual chainName to the empty
+        // sentinel so a stale value never reaches the wallet open (the real
+        // chain is derived from the wallet). Persist it only when we actually
+        // cleared a residual, so we don't rewrite on every boot.
+        const residual =
+          settings.server.kind === 'offline' &&
+          settings.server.chainName !== ChainNameEnum.noneChainName;
+        const normalizedServer = residual
+          ? offlineServer(ChainNameEnum.noneChainName)
+          : settings.server;
         setServer(normalizedServer);
-        if (
-          !settings.server.uri &&
-          settings.server.chainName !== ChainNameEnum.noneChainName
-        ) {
-          await SettingsFileImpl.writeSettings(
-            SettingsNameEnum.server,
+        setSelectServer(settings.selectServer);
+        if (residual) {
+          await SettingsFileImpl.writeServer(
             normalizedServer,
+            settings.selectServer,
           );
         }
       } else {
-        await SettingsFileImpl.writeSettings(SettingsNameEnum.server, server);
+        await SettingsFileImpl.writeServer(server, selectServer);
       }
       if (settings.privacy === true || settings.privacy === false) {
         setPrivacy(settings.privacy);
       } else {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.privacy, privacy);
       }
-      if (
-        settings.mode === ModeEnum.basic ||
-        settings.mode === ModeEnum.advanced
-      ) {
-        setMode(settings.mode);
-        props.toggleTheme(settings.mode);
-      } else {
-        await SettingsFileImpl.writeSettings(SettingsNameEnum.mode, mode);
-        props.toggleTheme(mode);
-      }
-      if (settings.security) {
-        setSecurity(settings.security);
+      setSeedBackedUp(settings.seedBackedUp === true);
+      setViewOnlyNoticeDismissed(settings.viewOnlyNoticeDismissed === true);
+      setSeedBackedUpAt(
+        typeof settings.seedBackedUpAt === 'number'
+          ? settings.seedBackedUpAt
+          : 0,
+      );
+      if (settings.biometrics === true || settings.biometrics === false) {
+        setBiometrics(settings.biometrics);
       } else {
         await SettingsFileImpl.writeSettings(
-          SettingsNameEnum.security,
-          security,
-        );
-      }
-      if (
-        settings.selectServer === SelectServerEnum.auto ||
-        settings.selectServer === SelectServerEnum.custom ||
-        settings.selectServer === SelectServerEnum.list ||
-        settings.selectServer === SelectServerEnum.offline
-      ) {
-        setSelectServer(settings.selectServer);
-      } else {
-        await SettingsFileImpl.writeSettings(
-          SettingsNameEnum.selectServer,
-          selectServer,
-        );
-      }
-      if (
-        settings.recoveryWalletInfoOnDevice === true ||
-        settings.recoveryWalletInfoOnDevice === false
-      ) {
-        setRecoveryWalletInfoOnDevice(settings.recoveryWalletInfoOnDevice);
-      } else {
-        await SettingsFileImpl.writeSettings(
-          SettingsNameEnum.recoveryWalletInfoOnDevice,
-          recoveryWalletInfoOnDevice,
+          SettingsNameEnum.biometrics,
+          biometrics,
         );
       }
       if (
@@ -441,7 +416,7 @@ export default function LoadedApp(props: LoadedAppProps) {
         );
       }
       if (
-        settings.blockExplorer === BlockExplorerEnum.Cipherscan ||
+        settings.blockExplorer === BlockExplorerEnum.ZecBlock ||
         settings.blockExplorer === BlockExplorerEnum.Zcashexplorer ||
         settings.blockExplorer === BlockExplorerEnum.Zexplorer ||
         settings.blockExplorer === BlockExplorerEnum.None
@@ -624,17 +599,18 @@ export default function LoadedApp(props: LoadedAppProps) {
         language={language}
         server={server}
         privacy={privacy}
-        mode={mode}
         backgroundSyncInfo={backgroundSyncInfo}
         readOnly={readOnly}
         orchardPool={orchardPool}
         saplingPool={saplingPool}
         transparentPool={transparentPool}
         addressBook={addressBook}
-        security={security}
+        biometrics={biometrics}
+        seedBackedUp={seedBackedUp}
+        seedBackedUpAt={seedBackedUpAt}
+        viewOnlyNoticeDismissed={viewOnlyNoticeDismissed}
         selectServer={selectServer}
         walletChainName={walletChainName}
-        recoveryWalletInfoOnDevice={recoveryWalletInfoOnDevice}
         firstLaunchingMessage={firstLaunchingMessage}
         performanceLevel={performanceLevel}
         blockExplorer={blockExplorer}
@@ -643,34 +619,12 @@ export default function LoadedApp(props: LoadedAppProps) {
   }
 }
 
-type LoadingProps = {
-  backgroundColor: string;
-  spinColor: string;
-};
-
-const Loading: React.FC<LoadingProps> = ({ backgroundColor, spinColor }) => {
-  return (
-    <View
-      style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: backgroundColor,
-        height: '100%',
-      }}
-    >
-      <ActivityIndicator size="large" color={spinColor} />
-    </View>
-  );
-};
-
 type LoadedAppClassProps = {
   navigationApp: StackScreenProps<
     AppStackParamList,
     RouteEnum.LoadedApp
   >['navigation'];
   route: StackScreenProps<AppStackParamList, RouteEnum.LoadedApp>['route'];
-  toggleTheme: (mode: ModeEnum) => void;
   translate: (key: string) => TranslateType;
   // Mutates the i18n instance's active locale. Needed so language changes
   // applied without remounting LoadedApp (reset=false in setLanguageOption)
@@ -681,17 +635,18 @@ type LoadedAppClassProps = {
   language: LanguageEnum;
   server: ServerType;
   privacy: boolean;
-  mode: ModeEnum;
   backgroundSyncInfo: BackgroundType;
   readOnly: boolean;
   orchardPool: boolean;
   saplingPool: boolean;
   transparentPool: boolean;
   addressBook: AddressBookFileClass[];
-  security: SecurityType;
+  biometrics: boolean;
+  seedBackedUp: boolean;
+  seedBackedUpAt: number;
+  viewOnlyNoticeDismissed: boolean;
   selectServer: SelectServerEnum;
   walletChainName: ChainNameEnum;
-  recoveryWalletInfoOnDevice: boolean;
   firstLaunchingMessage: LaunchingModeEnum;
   performanceLevel: RPCPerformanceLevelEnum;
   blockExplorer: BlockExplorerEnum;
@@ -702,8 +657,6 @@ type LoadedAppClassState = AppStateLoaded & AppContextLoaded;
 const renderTabBar = (
   props: import('@react-navigation/bottom-tabs').BottomTabBarProps,
 ) => <CustomTabBar {...props} />;
-
-const renderFadeOnlyTabBar = () => <FadeOnlyTabBar />;
 
 export class LoadedAppClass extends Component<
   LoadedAppClassProps,
@@ -734,8 +687,17 @@ export class LoadedAppClass extends Component<
       messagesTotal: null,
       sendPageState: new SendPageStateClass(new ToAddrClass(0)),
       setSendPageState: this.setSendPageState,
-      info: {} as InfoType,
+      // The currency is the wallet's from the start: when no server answers
+      // (no network) the info never arrives, and amounts read "---".
+      info: {
+        currencyName:
+          (props.walletChainName || props.server.chainName) ===
+          ChainNameEnum.mainChainName
+            ? CurrencyNameEnum.ZEC
+            : CurrencyNameEnum.TAZ,
+      } as InfoType,
       syncingStatus: {} as RPCSyncStatusType,
+      rescan: 'none',
       birthday: 0,
       defaultUnifiedAddress: '',
       zecPrice: {
@@ -745,7 +707,6 @@ export class LoadedAppClass extends Component<
       translate: props.translate,
       readOnly: props.readOnly,
       backgroundSyncInfo: props.backgroundSyncInfo,
-      setBackgroundSyncErrorInfo: this.setBackgroundSyncErrorInfo,
       backgroundError: { title: '', error: '' },
       setBackgroundError: this.setBackgroundError,
       lastError: '',
@@ -764,38 +725,35 @@ export class LoadedAppClass extends Component<
       setZecPrice: this.setZecPrice,
       zingolibVersion: '',
       setPrivacyOption: this.setPrivacyOption,
-      setModeOption: this.setModeOption,
+      seedBackedUp: props.seedBackedUp,
+      seedBackedUpAt: props.seedBackedUpAt,
+      setSeedBackedUp: this.setSeedBackedUp,
+      viewOnlyNoticeDismissed: props.viewOnlyNoticeDismissed,
+      dismissViewOnlyNotice: this.dismissViewOnlyNotice,
 
       // context settings
       server: props.server,
       language: props.language,
       privacy: props.privacy,
-      mode: props.mode,
-      security: props.security,
+      biometrics: props.biometrics,
       selectServer: props.selectServer,
       walletChainName: props.walletChainName,
-      recoveryWalletInfoOnDevice: props.recoveryWalletInfoOnDevice,
       performanceLevel: props.performanceLevel,
       blockExplorer: props.blockExplorer,
 
       mixnetView: INITIAL_MIXNET_VIEW,
       reenableMixnet: this.reenableMixnet,
+      sendPermitNow: this.sendPermitNow,
 
       // state
       appStateStatus:
         Platform.OS === GlobalConst.platformOSios
           ? AppStateStatusEnum.active
           : AppState.currentState,
-      newServer: {} as ServerType,
-      newSelectServer: null,
+      pendingServer: { kind: 'none' },
       scrollToTop: false,
       scrollToBottom: false,
-      isSeedViewModalOpen: false,
       addTagModalTarget: null,
-      // Bumped each time the app returns from background → active so
-      // protected screens currently mounted can re-fire their gate
-      // when security.foregroundApp is OFF.
-      foregroundEpoch: 0,
     };
 
     this.rpc = new WalletBackend({
@@ -812,6 +770,7 @@ export class LoadedAppClass extends Component<
       onPersistentSyncFailure: this.recoverServer,
       onMixnetViewChanged: this.setMixnetView,
       startMixnetTransport: startMixnetTransport,
+      stopMixnetTransport: stopMixnetTransport,
       mixnetSupported: true,
       readOnly: props.readOnly,
       server: props.server,
@@ -825,6 +784,7 @@ export class LoadedAppClass extends Component<
   }
 
   componentDidMount = async () => {
+    this.publishReportState();
     const netInfoState = await NetInfo.fetch();
     this.setState({
       netInfo: {
@@ -834,6 +794,10 @@ export class LoadedAppClass extends Component<
           netInfoState.details && netInfoState.details.isConnectionExpensive,
       },
     });
+    // A launch without network must not start drawing the mixnet.
+    if (netInfoState.isConnected === false) {
+      await this.rpc.networkChanged(false);
+    }
 
     // not for fresh installing
     if (this.props.firstLaunchingMessage !== LaunchingModeEnum.installing) {
@@ -907,14 +871,6 @@ export class LoadedAppClass extends Component<
           if (Platform.OS === GlobalConst.platformOSios) {
             this.setState({ appStateStatus: nextAppState });
           }
-          // Bump the foreground epoch so any currently-mounted
-          // protected screen (Seed/Ufvk/Settings/Rescan/Confirm) can
-          // re-fire its biometric gate when security.foregroundApp is
-          // OFF. Done before the foregroundApp askGate so the
-          // screen-level effects don't race against the app-level one.
-          this.setState(state => ({
-            foregroundEpoch: state.foregroundEpoch + 1,
-          }));
           // A parked earlier pass resumes with this same event and acts
           // once; a second concurrent actor would double-run the restore
           // work or the navigation reset.
@@ -1000,8 +956,11 @@ export class LoadedAppClass extends Component<
             },
           });
           if (isConnected !== state.isConnected) {
-            if (!state.isConnected) {
-            } else {
+            // Only a definite answer counts: null is "not known yet".
+            if (state.isConnected === false) {
+              await this.rpc.networkChanged(false);
+            } else if (state.isConnected) {
+              await this.rpc.networkChanged(true);
               // restart the interval process again...
               await this.rpc.clearTimers();
               await this.rpc.configure();
@@ -1023,6 +982,23 @@ export class LoadedAppClass extends Component<
     if (prevProps.translate !== this.props.translate) {
       this.setState({ translate: this.props.translate });
     }
+    this.publishReportState();
+  };
+
+  publishReportState = (): void => {
+    const { server, selectServer, readOnly, lastError, mixnetView } =
+      this.state;
+    publishReport({
+      served: { kind: 'chosen', server, selectServer },
+      session: {
+        kind: 'open',
+        chain: this.state.walletChainName,
+        readOnly,
+        sync: this.state.syncingStatus,
+        lastError,
+        mixnetView,
+      },
+    });
   };
 
   foregroundGateBusy = false;
@@ -1033,7 +1009,7 @@ export class LoadedAppClass extends Component<
   runForegroundGate = async () => {
     const foregroundGate: GateAnswer = await resolveTriggerGate(
       undefined,
-      this.state.security.foregroundApp,
+      this.state.biometrics,
       { translate: this.state.translate },
     );
     const proceed = enactGateAnswer(
@@ -1078,6 +1054,7 @@ export class LoadedAppClass extends Component<
   };
 
   componentWillUnmount = async () => {
+    publishReport({ session: { kind: 'closed' } });
     await this.rpc.clearTimers();
     this.rpc.stopMixnetPolling();
     const safeRemove = (listener: unknown, name: string) => {
@@ -1178,12 +1155,6 @@ export class LoadedAppClass extends Component<
     }
   };
 
-  setBackgroundSyncErrorInfo = async (error: string) => {
-    const newBackgroundSyncInfo = { ...this.state.backgroundSyncInfo, error };
-    this.setState({ backgroundSyncInfo: newBackgroundSyncInfo });
-    await BackgroundFileImpl.writeBackground(newBackgroundSyncInfo);
-  };
-
   setShieldingAmount = (value: number) => {
     //const start = Date.now();
     this.setState({ shieldingAmount: value });
@@ -1207,12 +1178,10 @@ export class LoadedAppClass extends Component<
       //const start = Date.now();
       this.setState({ syncingStatus });
     }
-  };
-
-  setIsSeedViewModalOpen = (value: boolean) => {
-    this.setState({
-      isSeedViewModalOpen: value,
-    });
+    const rescan = rescanStep(this.state.rescan, syncingStatus);
+    if (rescan !== this.state.rescan) {
+      this.setState({ rescan });
+    }
   };
 
   setMixnetView = (mixnetView: MixnetView) => {
@@ -1225,38 +1194,12 @@ export class LoadedAppClass extends Component<
     await this.rpc.reenableMixnet();
   };
 
+  sendPermitNow = (): SendPermit => sendPermit(this.state);
+
   setValueTransfersList = async (
     valueTransfers: ValueTransferType[],
     valueTransfersTotal: number,
   ) => {
-    const basicFirstViewSeed = (await SettingsFileImpl.readSettings())
-      .basicFirstViewSeed;
-    // only for basic mode
-    if (this.state.mode === ModeEnum.basic) {
-      // only if the user doesn't see the seed the first time
-      if (!basicFirstViewSeed) {
-        // only if the App are in foreground
-        const background = await AsyncStorage.getItem(GlobalConst.background);
-        // only if the wallet have some ValueTransfers
-        if (background === GlobalConst.no && valueTransfersTotal > 0) {
-          // I need to check this out in the seed screen.
-          if (!this.state.isSeedViewModalOpen) {
-            this.setIsSeedViewModalOpen(true);
-            this.drawerNav?.navigate(RouteEnum.Seed, {
-              action: SeedActionEnum.view,
-            });
-          }
-        }
-      }
-    } else {
-      // for advanced mode
-      if (!basicFirstViewSeed) {
-        await SettingsFileImpl.writeSettings(
-          SettingsNameEnum.basicFirstViewSeed,
-          true,
-        );
-      }
-    }
     if (
       !isEqual(this.state.valueTransfers, valueTransfers) ||
       this.state.valueTransfersTotal !== valueTransfersTotal
@@ -1524,7 +1467,7 @@ export class LoadedAppClass extends Component<
         newInfo.chainName = fallbackChain;
       }
       if (!newInfo.serverUri) {
-        newInfo.serverUri = this.state.server.uri;
+        newInfo.serverUri = nativeUri(this.state.server);
       }
       //const start = Date.now();
       this.setState({ info: newInfo });
@@ -1538,25 +1481,17 @@ export class LoadedAppClass extends Component<
     }
   };
 
-  sendTransaction = async (
+  sendTransaction = (
     sendPageState: SendPageStateClass,
     sendAll: boolean = false,
-  ): Promise<String> => {
-    try {
-      // Construct a sendJson from the sendPage state
-      const { defaultUnifiedAddress } = this.state;
+  ): Promise<SendOutcome<string>> =>
+    sendWhenPermitted(this.sendPermitNow, async () => {
       const sendJson = await Utils.getSendManyJSON(
         sendPageState,
-        defaultUnifiedAddress,
+        this.state.defaultUnifiedAddress,
       );
-      //const start = Date.now();
-      const txid = await this.rpc.sendTransaction(sendJson, sendAll);
-
-      return txid;
-    } catch (err) {
-      throw err;
-    }
-  };
+      return this.rpc.sendTransaction(sendJson, sendAll);
+    });
 
   doRefresh = (screen: ScreenEnum) => {
     if (screen === ScreenEnum.History) {
@@ -1572,6 +1507,7 @@ export class LoadedAppClass extends Component<
     // in the rescan case if the shield button is visible
     // we need to hide it fast.
     this.setShieldingAmount(0);
+    this.setState({ rescan: 'started' });
     await this.rpc.refreshSync(true);
   };
 
@@ -1587,9 +1523,6 @@ export class LoadedAppClass extends Component<
     if (item === MenuItemEnum.About) {
       this.drawerNav?.navigate(RouteEnum.About);
       return;
-    } else if (item === MenuItemEnum.Rescan) {
-      this.drawerNav?.navigate(RouteEnum.Rescan);
-      return;
     } else if (item === MenuItemEnum.SyncReport) {
       this.drawerNav?.navigate(RouteEnum.SyncReport);
       return;
@@ -1601,54 +1534,16 @@ export class LoadedAppClass extends Component<
       return;
     } else if (item === MenuItemEnum.WalletSeedUfvk) {
       if (this.state.readOnly) {
-        this.drawerNav?.navigate(RouteEnum.Ufvk, {
-          action: UfvkActionEnum.view,
+        this.drawerNav?.navigate(RouteEnum.ViewingKey, {
+          entry: { kind: 'push' },
         });
       } else {
-        this.drawerNav?.navigate(RouteEnum.Seed, {
-          action: SeedActionEnum.view,
-        });
+        this.drawerNav?.navigate(RouteEnum.WalletSeed);
       }
       return;
     } else if (item === MenuItemEnum.ChangeWallet) {
-      if (this.state.readOnly) {
-        this.drawerNav?.navigate(RouteEnum.Ufvk, {
-          action: UfvkActionEnum.change,
-        });
-      } else {
-        this.drawerNav?.navigate(RouteEnum.Seed, {
-          action: SeedActionEnum.change,
-        });
-      }
+      this.drawerNav?.navigate(RouteEnum.WalletSeed, { action: 'change' });
       return;
-    } else if (item === MenuItemEnum.RestoreWalletBackup) {
-      if (this.state.readOnly) {
-        this.drawerNav?.navigate(RouteEnum.Ufvk, {
-          action: UfvkActionEnum.backup,
-        });
-      } else {
-        this.drawerNav?.navigate(RouteEnum.Seed, {
-          action: SeedActionEnum.backup,
-        });
-      }
-      return;
-    } else if (item === MenuItemEnum.LoadWalletFromSeed) {
-      const { translate } = this.state;
-      showConfirm({
-        title: translate('loadedapp.restorewallet-title') as string,
-        message: translate('loadedapp.restorewallet-alert') as string,
-        buttons: [
-          {
-            text: translate('confirm') as string,
-            onPress: async () =>
-              await this.onClickOKChangeWallet({
-                screen: RouteEnum.ImportUfvk,
-                startingApp: false,
-              }),
-          },
-          { text: translate('cancel') as string, style: 'cancel' },
-        ],
-      });
     } else if (item === MenuItemEnum.Settings) {
       // Bio gate for settingsScreen lives at the Settings screen entry
       // (screens/Settings/Settings.tsx).
@@ -1656,6 +1551,9 @@ export class LoadedAppClass extends Component<
       return;
     } else if (item === MenuItemEnum.AddressBook) {
       this.drawerNav?.navigate(RouteEnum.AddressBook);
+      return;
+    } else if (item === MenuItemEnum.Server) {
+      this.drawerNav?.navigate(RouteEnum.Server);
       return;
     } else if (item === MenuItemEnum.Support) {
       this.setShowSwipeableIcons(false);
@@ -1684,16 +1582,15 @@ export class LoadedAppClass extends Component<
     // navigate from here — navigation policy lives in the caller now.
     if (!sameServerChainName) {
       const oldSettings = await SettingsFileImpl.readSettings();
-      await changeServer(oldSettings.server.uri);
+      await changeServer(nativeUri(oldSettings.server));
       this.setState({
-        newServer: value as ServerType,
-        newSelectServer: selectServer,
+        pendingServer: { kind: 'pending', server: value, selectServer },
         server: oldSettings.server,
         selectServer: oldSettings.selectServer,
       });
       if (toast) {
         this.addLastSnackbar(
-          `${this.state.translate('loadedapp.readingwallet-error')} ${value.uri}`,
+          `${this.state.translate('loadedapp.readingwallet-error')} ${nativeUri(value)}`,
         );
       }
       return { kind: 'chain-changed' };
@@ -1701,7 +1598,7 @@ export class LoadedAppClass extends Component<
 
     // Same chain — try to open the wallet on the new server.
     const result = await loadExistingWallet(
-      value.uri,
+      nativeUri(value),
       value.chainName,
       this.state.performanceLevel,
       GlobalConst.minConfirmations.toString(),
@@ -1727,16 +1624,12 @@ export class LoadedAppClass extends Component<
 
     if (openError === null) {
       // Success path.
-      if (toast && selectServer !== SelectServerEnum.offline) {
+      if (toast && value.kind === 'remote') {
         this.addLastSnackbar(
           `${this.state.translate('loadedapp.readingwallet')} ${value.uri}`,
         );
       }
-      await SettingsFileImpl.writeSettings(SettingsNameEnum.server, value);
-      await SettingsFileImpl.writeSettings(
-        SettingsNameEnum.selectServer,
-        selectServer,
-      );
+      await SettingsFileImpl.writeServer(value, selectServer);
       this.setState({
         server: value,
         selectServer: selectServer,
@@ -1755,14 +1648,14 @@ export class LoadedAppClass extends Component<
     // Seed/Ufvk on any RPC blip was the root cause of the "Settings save
     // sometimes doesn't apply" reports.
     const oldSettings = await SettingsFileImpl.readSettings();
-    await changeServer(oldSettings.server.uri);
+    await changeServer(nativeUri(oldSettings.server));
     this.setState({
       server: oldSettings.server,
       selectServer: oldSettings.selectServer,
     });
     if (toast) {
       this.addLastSnackbar(
-        `${this.state.translate('loadedapp.readingwallet-error')} ${value.uri}`,
+        `${this.state.translate('loadedapp.readingwallet-error')} ${nativeUri(value)}`,
       );
     }
     return {
@@ -1779,14 +1672,11 @@ export class LoadedAppClass extends Component<
       if (!candidate.uri) {
         continue;
       }
-      const next: ServerType = {
-        uri: candidate.uri,
-        chainName: candidate.chainName,
-      };
+      const next = remoteServer(candidate.uri, candidate.chainName);
       // Cap each dial: a dead candidate's changeServer can otherwise block for
       // minutes (see checkServerURI), stalling the whole rotation.
       const changed = await Promise.race([
-        changeServer(next.uri).then(result => result.ok),
+        changeServer(candidate.uri).then(result => result.ok),
         new Promise<boolean>(resolve =>
           setTimeout(() => resolve(false), 15_000),
         ),
@@ -1794,15 +1684,13 @@ export class LoadedAppClass extends Component<
       if (!changed) {
         continue;
       }
-      await SettingsFileImpl.writeSettings(SettingsNameEnum.server, next);
+      await SettingsFileImpl.writeServer(next, this.state.selectServer);
       this.setState({ server: next });
       this.rpc.setServer(next);
-      if (this.state.mode === ModeEnum.advanced) {
-        this.addLastSnackbar(
-          `${this.state.translate('loadedapp.selectingserverbest') as string} ${next.uri}`,
-          SnackbarDurationEnum.long,
-        );
-      }
+      this.addLastSnackbar(
+        `${this.state.translate('loadedapp.selectingserverbest') as string} ${candidate.uri}`,
+        SnackbarDurationEnum.long,
+      );
       return true;
     }
     return false;
@@ -1814,9 +1702,11 @@ export class LoadedAppClass extends Component<
   // Custom and offline modes are exempt: custom users opted out of automatic
   // selection (Audit Issue S) and offline has no server at all.
   recoverServer = async (): Promise<void> => {
+    const current = this.state.server;
     if (
       this.recoveringServer ||
       !this.state.netInfo.isConnected ||
+      current.kind === 'offline' ||
       (this.state.selectServer !== SelectServerEnum.auto &&
         this.state.selectServer !== SelectServerEnum.list)
     ) {
@@ -1824,20 +1714,15 @@ export class LoadedAppClass extends Component<
     }
     this.recoveringServer = true;
     try {
-      const current = this.state.server;
-      const live = (await fetchServerList(current.chainName)).filter(
-        (s: ServerUrisType) => s.uri !== current.uri,
+      const live = otherServers(
+        await fetchServerList(current.chainName),
+        current,
       );
       if (await this.activateReachableServer(live)) {
         return;
       }
       const fallback = await selectingServer(
-        serverUris(this.state.translate).filter(
-          (s: ServerUrisType) =>
-            !s.obsolete &&
-            s.chainName === current.chainName &&
-            s.uri !== current.uri,
-        ),
+        staticAlternatives(serverUris(this.state.translate), current),
       );
       if (fallback) {
         await this.activateReachableServer([fallback]);
@@ -1867,48 +1752,24 @@ export class LoadedAppClass extends Component<
     });
   };
 
-  setModeOption = async (value: string): Promise<void> => {
-    await SettingsFileImpl.writeSettings(SettingsNameEnum.mode, value);
-    this.setState({
-      mode: value as ModeEnum,
-    });
-    // this function change the Theme in the App component.
-    this.props.toggleTheme(value as ModeEnum);
+  setSeedBackedUp = async (value: boolean): Promise<void> => {
+    const at = value ? Date.now() : 0;
+    await SettingsFileImpl.writeSettings(SettingsNameEnum.seedBackedUp, value);
+    await SettingsFileImpl.writeSettings(SettingsNameEnum.seedBackedUpAt, at);
+    this.setState({ seedBackedUp: value, seedBackedUpAt: at });
   };
 
-  setSecurityOption = async (value: SecurityType): Promise<void> => {
-    await SettingsFileImpl.writeSettings(SettingsNameEnum.security, value);
-    this.setState({
-      security: value as SecurityType,
-    });
-  };
-
-  setSelectServerOption = async (value: string): Promise<void> => {
-    await SettingsFileImpl.writeSettings(SettingsNameEnum.selectServer, value);
-    this.setState({
-      selectServer: value as SelectServerEnum,
-    });
-  };
-
-  setRecoveryWalletInfoOnDeviceOption = async (
-    value: boolean,
-  ): Promise<void> => {
+  dismissViewOnlyNotice = async (): Promise<void> => {
     await SettingsFileImpl.writeSettings(
-      SettingsNameEnum.recoveryWalletInfoOnDevice,
-      value,
+      SettingsNameEnum.viewOnlyNoticeDismissed,
+      true,
     );
-    this.setState({
-      recoveryWalletInfoOnDevice: value as boolean,
-    });
+    this.setState({ viewOnlyNoticeDismissed: true });
+  };
 
-    if (!value) {
-      await removeRecoveryWalletInfo();
-    } else {
-      const wallet = await fetchWallet(this.state.readOnly);
-      if (wallet) {
-        await createUpdateRecoveryWalletInfo(wallet);
-      }
-    }
+  setBiometricsOption = async (value: boolean): Promise<void> => {
+    await SettingsFileImpl.writeSettings(SettingsNameEnum.biometrics, value);
+    this.setState({ biometrics: value });
   };
 
   setPerformanceLevelOption = async (
@@ -1952,9 +1813,6 @@ export class LoadedAppClass extends Component<
 
   navigateToLoadingApp = async (state: LoadingAppNavigationState) => {
     await this.rpc.clearTimers();
-    if (state.screen === RouteEnum.ImportUfvk) {
-      await this.setModeOption(ModeEnum.advanced);
-    }
     this.props.navigationApp.reset({
       index: 0,
       routes: [
@@ -1967,14 +1825,7 @@ export class LoadedAppClass extends Component<
   };
 
   onClickOKChangeWallet = async (state: LoadingAppNavigationState) => {
-    // Back up any MAINNET wallet being abandoned. The decision keys on the
-    // WALLET's own chain (walletChainName), not the server's — Offline has no
-    // server chain, yet a mainnet wallet must still be backed up when it is
-    // left. Testnet/regtest are never backed up.
-    const changed =
-      this.state.walletChainName === ChainNameEnum.mainChainName
-        ? await this.rpc.changeWallet() // backup
-        : await this.rpc.changeWalletNoBackup(); // no backup
+    const changed = await this.rpc.changeWallet();
 
     if (changed.kind === 'error') {
       createAlert(
@@ -1994,8 +1845,31 @@ export class LoadedAppClass extends Component<
     this.navigateToLoadingApp(state);
   };
 
+  // Runs from a confirm button, where a throw would vanish: every failure
+  // ends in the alert.
   onClickOKRestoreBackup = async () => {
-    const restored = await this.rpc.restoreBackup();
+    try {
+      await this.restoreBackupAndRestart();
+    } catch (e) {
+      createAlert(
+        this.setBackgroundError,
+        this.addLastSnackbar,
+        this.state.translate('loadedapp.restoringwallet-label') as string,
+        `${this.state.translate('rpc.restorebackup-error') as string} ${e}`,
+        false,
+        this.state.translate,
+        sendEmail,
+        this.state.zingolibVersion,
+      );
+    }
+  };
+
+  restoreBackupAndRestart = async () => {
+    // Only mainnet wallets are backed up: any other wallet is replaced by
+    // the backup instead of swapping places with it.
+    const restored = await this.rpc.restoreBackup(
+      this.state.walletChainName !== ChainNameEnum.mainChainName,
+    );
 
     if (restored.kind === 'error') {
       createAlert(
@@ -2011,16 +1885,42 @@ export class LoadedAppClass extends Component<
       return;
     }
 
+    // The swapped-in wallet is a restore, which counts as backed up. The
+    // previous wallet's flag must not carry over.
+    await SettingsFileImpl.writeSettings(SettingsNameEnum.seedBackedUp, true);
+    await SettingsFileImpl.writeSettings(SettingsNameEnum.seedBackedUpAt, 0);
+    await SettingsFileImpl.writeSettings(
+      SettingsNameEnum.viewOnlyNoticeDismissed,
+      false,
+    );
+    // Only mainnet wallets were ever backed up, so another network's server
+    // could not open it: the restart picks the best mainnet server instead.
+    const { server } = this.state;
+    if (
+      server.kind !== 'offline' &&
+      server.chainName !== ChainNameEnum.mainChainName
+    ) {
+      const mainnet = serverUris(this.state.translate).find(
+        s => s.chainName === ChainNameEnum.mainChainName && s.default,
+      );
+      if (mainnet) {
+        await SettingsFileImpl.writeServer(
+          remoteServer(mainnet.uri, mainnet.chainName),
+          SelectServerEnum.auto,
+        );
+      }
+    }
     this.keepAwake(false);
     this.navigateToLoadingApp({ startingApp: false, newWallet: true });
   };
 
   onClickOKServerWallet = async () => {
-    if (this.state.newServer && this.state.newSelectServer) {
+    const { pendingServer } = this.state;
+    if (pendingServer.kind === 'pending') {
       // No `await` here so Promise.race can actually enforce the 15s cap.
       // With `await` the RPC call resolves before the race starts and the
       // timer becomes a no-op (a failing server then blocks ~minutes).
-      const resultServerPromise = changeServer(this.state.newServer.uri);
+      const resultServerPromise = changeServer(nativeUri(pendingServer.server));
       const timeoutServerPromise = new Promise<never>((_, reject) => {
         setTimeout(() => {
           reject(new Error('Promise changeserver Timeout 15 seconds'));
@@ -2039,33 +1939,22 @@ export class LoadedAppClass extends Component<
         return;
       }
 
-      await SettingsFileImpl.writeSettings(
-        SettingsNameEnum.server,
-        this.state.newServer,
-      );
-      await SettingsFileImpl.writeSettings(
-        SettingsNameEnum.selectServer,
-        this.state.newSelectServer,
+      await SettingsFileImpl.writeServer(
+        pendingServer.server,
+        pendingServer.selectServer,
       );
       this.setState({
-        server: this.state.newServer,
-        selectServer: this.state.newSelectServer,
-        newServer: {} as ServerType,
-        newSelectServer: null,
+        server: pendingServer.server,
+        selectServer: pendingServer.selectServer,
+        pendingServer: { kind: 'none' },
       });
       // Propagate to WalletBackend's shared config so sub-services pick up
       // the new URI without needing the instance to be recreated.
-      this.rpc.setServer(this.state.newServer);
+      this.rpc.setServer(pendingServer.server);
 
       await this.rpc.fetchInfoAndServerHeight();
 
-      // Back up any MAINNET wallet being abandoned — keyed on the WALLET's own
-      // chain (walletChainName), not the server's, so a mainnet wallet left
-      // while Offline still gets backed up. Testnet/regtest are not backed up.
-      const changed =
-        this.state.walletChainName === ChainNameEnum.mainChainName
-          ? await this.rpc.changeWallet() // backup
-          : await this.rpc.changeWalletNoBackup(); // no backup
+      const changed = await this.rpc.changeWallet();
 
       if (changed.kind === 'error') {
         createAlert(
@@ -2130,18 +2019,19 @@ export class LoadedAppClass extends Component<
   // Determines `own` via RPC, then opens the shared modal so the user can
   // attach a label without leaving their current screen. Used from AddressItem
   // anywhere an address is displayed with a tappable "+ contact" icon.
-  launchAddTagModal = (
+  /**
+   * The add button next to an address opens the New contact sheet, or the own
+   * tag sheet when the address is one of this wallet's: a self-send shows one,
+   * and the contact sheet refuses it.
+   */
+  launchAddTagModal = async (
     address: string,
     swapChain: string = GlobalConst.zecSwapChain,
     initialLabel?: string,
   ) => {
-    // Every launcher (Send, address rows) saves a recipient/destination,
-    // i.e. a contact — never a label for one of the wallet's own addresses.
-    // Tagging an own address is the Receive flow, which renders NewAddressTag
-    // with own={true} directly. So this modal is always a contact (own=false),
-    // "Add contact", not "Add tag".
+    const own = await isWalletAddress(address);
     this.setState(
-      { addTagModalTarget: { address, own: false, swapChain, initialLabel } },
+      { addTagModalTarget: { address, own, swapChain, initialLabel } },
       () => {
         this.addTagModalRef.current?.present();
       },
@@ -2169,18 +2059,7 @@ export class LoadedAppClass extends Component<
   };
 
   render() {
-    const {
-      mode,
-      valueTransfersTotal,
-      readOnly,
-      totalBalance,
-      scrollToTop,
-      scrollToBottom,
-      addresses,
-      somePending,
-      selectServer,
-    } = this.state;
-    const { colors } = this.props.theme;
+    const { readOnly, scrollToTop, scrollToBottom, server } = this.state;
 
     const context = {
       //context
@@ -2193,6 +2072,7 @@ export class LoadedAppClass extends Component<
       messages: this.state.messages,
       messagesTotal: this.state.messagesTotal,
       syncingStatus: this.state.syncingStatus,
+      rescan: this.state.rescan,
       info: this.state.info,
       zecPrice: this.state.zecPrice,
       defaultUnifiedAddress: this.state.defaultUnifiedAddress,
@@ -2200,7 +2080,6 @@ export class LoadedAppClass extends Component<
       setSendPageState: this.state.setSendPageState,
       translate: this.state.translate,
       backgroundSyncInfo: this.state.backgroundSyncInfo,
-      setBackgroundSyncErrorInfo: this.state.setBackgroundSyncErrorInfo,
       backgroundError: this.state.backgroundError,
       setBackgroundError: this.state.setBackgroundError,
       readOnly: this.state.readOnly,
@@ -2220,22 +2099,24 @@ export class LoadedAppClass extends Component<
       setZecPrice: this.state.setZecPrice,
       zingolibVersion: this.state.zingolibVersion,
       setPrivacyOption: this.setPrivacyOption,
-      setModeOption: this.setModeOption,
+      seedBackedUp: this.state.seedBackedUp,
+      seedBackedUpAt: this.state.seedBackedUpAt,
+      setSeedBackedUp: this.setSeedBackedUp,
+      viewOnlyNoticeDismissed: this.state.viewOnlyNoticeDismissed,
+      dismissViewOnlyNotice: this.dismissViewOnlyNotice,
 
       // context settings
       server: this.state.server,
       language: this.state.language,
       privacy: this.state.privacy,
-      mode: this.state.mode,
-      security: this.state.security,
+      biometrics: this.state.biometrics,
       selectServer: this.state.selectServer,
       walletChainName: this.state.walletChainName,
-      recoveryWalletInfoOnDevice: this.state.recoveryWalletInfoOnDevice,
       performanceLevel: this.state.performanceLevel,
       blockExplorer: this.state.blockExplorer,
       mixnetView: this.state.mixnetView,
       reenableMixnet: this.reenableMixnet,
-      foregroundEpoch: this.state.foregroundEpoch,
+      sendPermitNow: this.sendPermitNow,
     };
 
     return (
@@ -2249,25 +2130,17 @@ export class LoadedAppClass extends Component<
               <OptionsPanelProvider>
                 <LoadedAppOptionsPanelHost
                   onMenuItemSelected={this.onMenuItemSelected}
-                  setModeOption={this.setModeOption}
                   zingolibVersion={this.state.zingolibVersion}
                 >
-                  <RootNavigator initialRouteName={RouteEnum.HomeStack}>
-                    <RootNavigator.Screen name={RouteEnum.HomeStack}>
-                      {props => {
-                        useEffect(() => {
-                          this.setNavigationHome(props.navigation);
-                        });
-                        return (
-                          <>
-                            {mode === ModeEnum.advanced ||
-                            (valueTransfersTotal !== null &&
-                              valueTransfersTotal > 0) ||
-                            (!readOnly &&
-                              !!totalBalance &&
-                              totalBalance.confirmedOrchardBalance +
-                                totalBalance.confirmedSaplingBalance >
-                                0) ? (
+                  <FadeInOnMount duration={HOME_FADE_MS}>
+                    <RootNavigator initialRouteName={RouteEnum.HomeStack}>
+                      <RootNavigator.Screen name={RouteEnum.HomeStack}>
+                        {props => {
+                          useEffect(() => {
+                            this.setNavigationHome(props.navigation);
+                          });
+                          return (
+                            <>
                               <Tab.Navigator
                                 detachInactiveScreens={true}
                                 initialRouteName={RouteEnum.History}
@@ -2299,60 +2172,39 @@ export class LoadedAppClass extends Component<
                                     />
                                   )}
                                 </Tab.Screen>
-                                {!readOnly &&
-                                  selectServer !== SelectServerEnum.offline &&
-                                  (mode === ModeEnum.advanced ||
-                                    (!!totalBalance &&
-                                      totalBalance.confirmedIronwoodBalance +
-                                        totalBalance.confirmedOrchardBalance +
-                                        totalBalance.confirmedSaplingBalance >
-                                        0) ||
-                                    (!!totalBalance &&
-                                      ((totalBalance.totalIronwoodBalance > 0 &&
-                                        totalBalance.confirmedIronwoodBalance ===
-                                          0) ||
-                                        (totalBalance.totalOrchardBalance > 0 &&
-                                          totalBalance.confirmedOrchardBalance ===
-                                            0) ||
-                                        (totalBalance.totalSaplingBalance > 0 &&
-                                          totalBalance.confirmedSaplingBalance ===
-                                            0)) &&
-                                      somePending)) && (
-                                    <Tab.Screen name={RouteEnum.Send}>
-                                      {propsTab => (
-                                        <Send
-                                          {...propsTab}
-                                          toggleMenuDrawer={
-                                            () =>
-                                              toggleOptionsPanel() /* header */
-                                          }
-                                          setShieldingAmount={
-                                            this.setShieldingAmount /* header */
-                                          }
-                                          setScrollToTop={
-                                            this
-                                              .setScrollToTop /* header & send */
-                                          }
-                                          setScrollToBottom={
-                                            this
-                                              .setScrollToBottom /* header & send */
-                                          }
-                                          sendTransaction={
-                                            this.sendTransaction /* send */
-                                          }
-                                          setServerOption={
-                                            this.setServerOption /* send */
-                                          }
-                                          clearToAddr={
-                                            this.clearToAddr /* send */
-                                          }
-                                          setSecurityOption={
-                                            this.setSecurityOption /* send */
-                                          }
-                                        />
-                                      )}
-                                    </Tab.Screen>
-                                  )}
+                                {!readOnly && server.kind === 'remote' && (
+                                  <Tab.Screen name={RouteEnum.Send}>
+                                    {propsTab => (
+                                      <Send
+                                        {...propsTab}
+                                        toggleMenuDrawer={
+                                          () =>
+                                            toggleOptionsPanel() /* header */
+                                        }
+                                        setShieldingAmount={
+                                          this.setShieldingAmount /* header */
+                                        }
+                                        setScrollToTop={
+                                          this
+                                            .setScrollToTop /* header & send */
+                                        }
+                                        setScrollToBottom={
+                                          this
+                                            .setScrollToBottom /* header & send */
+                                        }
+                                        sendTransaction={
+                                          this.sendTransaction /* send */
+                                        }
+                                        setServerOption={
+                                          this.setServerOption /* send */
+                                        }
+                                        clearToAddr={
+                                          this.clearToAddr /* send */
+                                        }
+                                      />
+                                    )}
+                                  </Tab.Screen>
+                                )}
                                 <Tab.Screen name={RouteEnum.Receive}>
                                   {propsTab => (
                                     <Receive
@@ -2361,306 +2213,226 @@ export class LoadedAppClass extends Component<
                                         () => toggleOptionsPanel() /* header */
                                       }
                                       alone={false /* receive */}
-                                      setSecurityOption={this.setSecurityOption}
                                       setAddressBook={this.setAddressBook}
                                     />
                                   )}
                                 </Tab.Screen>
                               </Tab.Navigator>
-                            ) : (
-                              <>
-                                {addresses === null ? (
-                                  <Loading
-                                    backgroundColor={colors.bgCanvas}
-                                    spinColor={colors.fgAccent}
-                                  />
-                                ) : (
-                                  <Tab.Navigator
-                                    initialRouteName={RouteEnum.Receive}
-                                    tabBar={renderFadeOnlyTabBar}
-                                    screenOptions={{
-                                      headerShown: false,
-                                    }}
-                                  >
-                                    <Tab.Screen name={RouteEnum.Receive}>
-                                      {propsTab => (
-                                        <Receive
-                                          {...propsTab}
-                                          toggleMenuDrawer={
-                                            () =>
-                                              toggleOptionsPanel() /* header */
-                                          }
-                                          alone={true /* receive */}
-                                          setSecurityOption={
-                                            this.setSecurityOption
-                                          }
-                                          setAddressBook={this.setAddressBook}
-                                        />
-                                      )}
-                                    </Tab.Screen>
-                                  </Tab.Navigator>
-                                )}
-                              </>
-                            )}
-                          </>
-                        );
-                      }}
-                    </RootNavigator.Screen>
-                    <RootNavigator.Screen name={RouteEnum.Settings}>
-                      {props => (
-                        <Settings
-                          {...props}
-                          setServerOption={this.setServerOption}
-                          setLanguageOption={this.setLanguageOption}
-                          setSecurityOption={this.setSecurityOption}
-                          setSelectServerOption={this.setSelectServerOption}
-                          setRecoveryWalletInfoOnDeviceOption={
-                            this.setRecoveryWalletInfoOnDeviceOption
-                          }
-                          setPerformanceLevelOption={
-                            this.setPerformanceLevelOption
-                          }
-                          setBlockExplorerOption={this.setBlockExplorerOption}
-                          toggleMenuDrawer={
-                            () => toggleOptionsPanel() /* header */
-                          }
-                        />
-                      )}
-                    </RootNavigator.Screen>
-                    <RootNavigator.Screen
-                      name={RouteEnum.About}
-                      component={About}
-                    />
-                    <RootNavigator.Screen
-                      name={RouteEnum.MixnetDoctor}
-                      component={MixnetDoctor}
-                    />
-                    <RootNavigator.Screen name={RouteEnum.Rescan}>
-                      {props => <Rescan {...props} doRescan={this.doRescan} />}
-                    </RootNavigator.Screen>
-                    <RootNavigator.Screen
-                      name={RouteEnum.Insight}
-                      component={Insight}
-                    />
-                    <RootNavigator.Screen name={RouteEnum.Ufvk}>
-                      {props => {
-                        const action =
-                          !!props.route.params &&
-                          props.route.params.action !== undefined
-                            ? props.route.params.action
-                            : UfvkActionEnum.view;
-                        if (action === UfvkActionEnum.view) {
-                          return (
-                            <ShowUfvk
-                              {...props}
-                              onClickOK={() => {}}
-                              onClickCancel={() => {}}
-                            />
+                            </>
                           );
-                        } else if (action === UfvkActionEnum.change) {
+                        }}
+                      </RootNavigator.Screen>
+                      <RootNavigator.Screen name={RouteEnum.Settings}>
+                        {props => (
+                          <Settings
+                            {...props}
+                            setLanguageOption={this.setLanguageOption}
+                            setBiometricsOption={this.setBiometricsOption}
+                            setPerformanceLevelOption={
+                              this.setPerformanceLevelOption
+                            }
+                            setBlockExplorerOption={this.setBlockExplorerOption}
+                            toggleMenuDrawer={
+                              () => toggleOptionsPanel() /* header */
+                            }
+                            onRestoreWalletBackup={this.onClickOKRestoreBackup}
+                          />
+                        )}
+                      </RootNavigator.Screen>
+                      <RootNavigator.Screen
+                        name={RouteEnum.Server}
+                        options={{ animation: 'slide_from_right' }}
+                      >
+                        {props => (
+                          <WalletServer
+                            {...props}
+                            setServerOption={this.setServerOption}
+                          />
+                        )}
+                      </RootNavigator.Screen>
+                      <RootNavigator.Screen
+                        name={RouteEnum.About}
+                        component={About}
+                      />
+                      <RootNavigator.Screen
+                        name={RouteEnum.MixnetDoctor}
+                        component={MixnetDoctor}
+                      />
+                      <RootNavigator.Screen
+                        name={RouteEnum.Insight}
+                        component={Insight}
+                      />
+                      <RootNavigator.Screen name={RouteEnum.SyncReport}>
+                        {props => (
+                          <SyncReport {...props} doRescan={this.doRescan} />
+                        )}
+                      </RootNavigator.Screen>
+                      <RootNavigator.Screen
+                        name={RouteEnum.Pools}
+                        component={Pools}
+                      />
+                      <RootNavigator.Screen
+                        name={RouteEnum.MeetIronwood}
+                        component={MeetIronwood}
+                        // One-way onboarding: no swipe-back to the screen behind
+                        // it; the screen closes by resetting the stack to Home.
+                        options={{ gestureEnabled: false }}
+                      />
+                      <RootNavigator.Screen
+                        name={RouteEnum.SeedBackup}
+                        component={SeedBackup}
+                        // Draws its own container transform out of the notice
+                        // card over the screen behind it.
+                        options={{
+                          presentation: 'transparentModal',
+                          animation: 'none',
+                          gestureEnabled: false,
+                        }}
+                      />
+                      <RootNavigator.Screen
+                        name={RouteEnum.ViewingKey}
+                        // Draws its own entrance: a circle out of the
+                        // snowflake, the view-only card growing, or a push.
+                        options={{
+                          presentation: 'transparentModal',
+                          animation: 'none',
+                          gestureEnabled: false,
+                        }}
+                      >
+                        {props => (
+                          <ViewingKey
+                            {...props}
+                            onConfirm={this.onClickOKServerWallet}
+                            onCancel={async () => {
+                              // restart all the tasks again, nothing happen.
+                              await this.rpc.clearTimers();
+                              await this.rpc.configure();
+                            }}
+                          />
+                        )}
+                      </RootNavigator.Screen>
+                      <RootNavigator.Screen
+                        name={RouteEnum.WalletSeed}
+                        options={{ animation: 'slide_from_right' }}
+                      >
+                        {props => {
+                          const action = props.route.params?.action;
                           return (
-                            <ShowUfvk
+                            <WalletSeed
                               {...props}
-                              onClickOK={async () =>
-                                await this.onClickOKChangeWallet({
-                                  startingApp: false,
-                                })
-                              }
-                              onClickCancel={() => {}}
-                            />
-                          );
-                        } else if (action === UfvkActionEnum.backup) {
-                          return (
-                            <ShowUfvk
-                              {...props}
-                              onClickOK={async () =>
-                                await this.onClickOKRestoreBackup()
-                              }
-                              onClickCancel={() => {}}
-                            />
-                          );
-                        } else if (action === UfvkActionEnum.server) {
-                          return (
-                            <ShowUfvk
-                              {...props}
-                              onClickOK={async () =>
-                                await this.onClickOKServerWallet()
-                              }
-                              onClickCancel={async () => {
-                                // restart all the tasks again, nothing happen.
-                                await this.rpc.clearTimers();
-                                await this.rpc.configure();
+                              onConfirm={async () => {
+                                if (action === 'change') {
+                                  await this.onClickOKChangeWallet({
+                                    startingApp: false,
+                                  });
+                                } else if (action === 'server') {
+                                  await this.onClickOKServerWallet();
+                                }
+                              }}
+                              onCancel={async () => {
+                                if (action === 'server') {
+                                  // restart all the tasks again, nothing happen.
+                                  await this.rpc.clearTimers();
+                                  await this.rpc.configure();
+                                }
                               }}
                             />
                           );
-                        }
-                      }}
-                    </RootNavigator.Screen>
-                    <RootNavigator.Screen name={RouteEnum.Seed}>
-                      {props => {
-                        const action =
-                          !!props.route.params &&
-                          props.route.params.action !== undefined
-                            ? props.route.params.action
-                            : SeedActionEnum.view;
-                        if (action === SeedActionEnum.view) {
-                          return (
-                            <Seed
-                              {...props}
-                              onClickOK={() => {}}
-                              onClickCancel={() => {}}
-                              keepAwake={this.keepAwake}
-                              setIsSeedViewModalOpen={
-                                this.setIsSeedViewModalOpen
-                              }
-                            />
-                          );
-                        } else if (action === SeedActionEnum.change) {
-                          return (
-                            <Seed
-                              {...props}
-                              onClickOK={async () =>
-                                await this.onClickOKChangeWallet({
-                                  startingApp: false,
-                                })
-                              }
-                              onClickCancel={() => {}}
-                            />
-                          );
-                        } else if (action === SeedActionEnum.backup) {
-                          return (
-                            <Seed
-                              {...props}
-                              onClickOK={async () =>
-                                await this.onClickOKRestoreBackup()
-                              }
-                              onClickCancel={() => {}}
-                            />
-                          );
-                        } else if (action === SeedActionEnum.server) {
-                          return (
-                            <Seed
-                              {...props}
-                              onClickOK={async () =>
-                                await this.onClickOKServerWallet()
-                              }
-                              onClickCancel={async () => {
-                                // restart all the tasks again, nothing happen.
-                                await this.rpc.clearTimers();
-                                await this.rpc.configure();
-                              }}
-                            />
-                          );
-                        }
-                      }}
-                    </RootNavigator.Screen>
-                    <RootNavigator.Screen
-                      name={RouteEnum.SyncReport}
-                      component={SyncReport}
-                    />
-                    <RootNavigator.Screen
-                      name={RouteEnum.Pools}
-                      component={Pools}
-                    />
-                    <RootNavigator.Screen
-                      name={RouteEnum.MeetIronwood}
-                      component={MeetIronwood}
-                      // One-way onboarding: no swipe-back to the screen behind
-                      // it; the screen closes by resetting the stack to Home.
-                      options={{ gestureEnabled: false }}
-                    />
-                    <RootNavigator.Screen
-                      name={RouteEnum.MigrationStrategy}
-                      component={MigrationStrategy}
-                      // Continues the one-way onboarding flow; back is handled
-                      // in-screen, not by swipe.
-                      options={{ gestureEnabled: false }}
-                    />
-                    <RootNavigator.Screen
-                      name={RouteEnum.MigrationTransactions}
-                      component={MigrationTransactions}
-                      options={{ gestureEnabled: false }}
-                    />
-                    <RootNavigator.Screen
-                      name={RouteEnum.MigrationSending}
-                      component={MigrationSending}
-                      // The drain broadcasts here and can't be interrupted;
-                      // swipe-back is off and hardware-back is blocked in-screen.
-                      options={{ gestureEnabled: false }}
-                    />
-                    <RootNavigator.Screen
-                      name={RouteEnum.MigrationSplitPlan}
-                      component={MigrationSplitPlan}
-                      options={{ gestureEnabled: false }}
-                    />
-                    <RootNavigator.Screen
-                      name={RouteEnum.MigrationSplitting}
-                      component={MigrationSplitting}
-                      // Splitting rounds broadcast here and can't be
-                      // interrupted; swipe-back off, hardware-back blocked
-                      // in-screen.
-                      options={{ gestureEnabled: false }}
-                    />
-                    <RootNavigator.Screen
-                      name={RouteEnum.MigrationCadence}
-                      component={MigrationCadence}
-                      options={{ gestureEnabled: false }}
-                    />
-                    <RootNavigator.Screen
-                      name={RouteEnum.MigrationSchedule}
-                      component={MigrationSchedule}
-                      options={{ gestureEnabled: false }}
-                    />
-                    <RootNavigator.Screen
-                      name={RouteEnum.MigrationStatus}
-                      component={MigrationStatus}
-                      // Reached by reset (post-confirm) and by the banner; its
-                      // own "Back to wallet" resets home, so swipe-back off.
-                      options={{ gestureEnabled: false }}
-                    />
-                    <RootNavigator.Screen
-                      name={RouteEnum.MigrationBatchSending}
-                      component={MigrationBatchSending}
-                      // The batch broadcasts here and can't be interrupted;
-                      // swipe-back is off and hardware-back is blocked in-screen.
-                      options={{ gestureEnabled: false }}
-                    />
-                    <RootNavigator.Screen name={RouteEnum.AddressBook}>
-                      {props => (
-                        <AddressBook
-                          {...props}
-                          setAddressBook={this.setAddressBook}
-                        />
-                      )}
-                    </RootNavigator.Screen>
-                    <RootNavigator.Screen
-                      name={RouteEnum.ValueTransferDetail}
-                      component={ValueTransferDetail}
-                    />
-                    <RootNavigator.Screen
-                      name={RouteEnum.AddressList}
-                      component={AddressList}
-                    />
-                    <RootNavigator.Screen name={RouteEnum.Messages}>
-                      {props => (
-                        <MessageList
-                          {...props}
-                          toggleMenuDrawer={() => toggleOptionsPanel()}
-                          closeScreen={() => props.navigation.goBack()}
-                          setScrollToBottom={this.setScrollToBottom}
-                          scrollToBottom={scrollToBottom}
-                        />
-                      )}
-                    </RootNavigator.Screen>
-                    <RootNavigator.Screen
-                      name={RouteEnum.Confirm}
-                      component={Confirm}
-                    />
-                    <RootNavigator.Screen
-                      name={RouteEnum.Computing}
-                      component={ComputingTxContent}
-                    />
-                  </RootNavigator>
+                        }}
+                      </RootNavigator.Screen>
+                      <RootNavigator.Screen
+                        name={RouteEnum.MigrationStrategy}
+                        component={MigrationStrategy}
+                        // Continues the one-way onboarding flow; back is handled
+                        // in-screen, not by swipe.
+                        options={{ gestureEnabled: false }}
+                      />
+                      <RootNavigator.Screen
+                        name={RouteEnum.MigrationTransactions}
+                        component={MigrationTransactions}
+                        options={{ gestureEnabled: false }}
+                      />
+                      <RootNavigator.Screen
+                        name={RouteEnum.MigrationSending}
+                        component={MigrationSending}
+                        // The drain broadcasts here and can't be interrupted;
+                        // swipe-back is off and hardware-back is blocked in-screen.
+                        options={{ gestureEnabled: false }}
+                      />
+                      <RootNavigator.Screen
+                        name={RouteEnum.MigrationSplitPlan}
+                        component={MigrationSplitPlan}
+                        options={{ gestureEnabled: false }}
+                      />
+                      <RootNavigator.Screen
+                        name={RouteEnum.MigrationSplitting}
+                        component={MigrationSplitting}
+                        // Splitting rounds broadcast here and can't be
+                        // interrupted; swipe-back off, hardware-back blocked
+                        // in-screen.
+                        options={{ gestureEnabled: false }}
+                      />
+                      <RootNavigator.Screen
+                        name={RouteEnum.MigrationCadence}
+                        component={MigrationCadence}
+                        options={{ gestureEnabled: false }}
+                      />
+                      <RootNavigator.Screen
+                        name={RouteEnum.MigrationSchedule}
+                        component={MigrationSchedule}
+                        options={{ gestureEnabled: false }}
+                      />
+                      <RootNavigator.Screen
+                        name={RouteEnum.MigrationStatus}
+                        component={MigrationStatus}
+                        // Reached by reset (post-confirm) and by the banner; its
+                        // own "Back to wallet" resets home, so swipe-back off.
+                        options={{ gestureEnabled: false }}
+                      />
+                      <RootNavigator.Screen
+                        name={RouteEnum.MigrationBatchSending}
+                        component={MigrationBatchSending}
+                        // The batch broadcasts here and can't be interrupted;
+                        // swipe-back is off and hardware-back is blocked in-screen.
+                        options={{ gestureEnabled: false }}
+                      />
+                      <RootNavigator.Screen name={RouteEnum.AddressBook}>
+                        {props => (
+                          <AddressBook
+                            {...props}
+                            setAddressBook={this.setAddressBook}
+                          />
+                        )}
+                      </RootNavigator.Screen>
+                      <RootNavigator.Screen
+                        name={RouteEnum.ValueTransferDetail}
+                        component={ValueTransferDetail}
+                      />
+                      <RootNavigator.Screen
+                        name={RouteEnum.AddressList}
+                        component={AddressList}
+                      />
+                      <RootNavigator.Screen name={RouteEnum.Messages}>
+                        {props => (
+                          <MessageList
+                            {...props}
+                            toggleMenuDrawer={() => toggleOptionsPanel()}
+                            closeScreen={() => props.navigation.goBack()}
+                            setScrollToBottom={this.setScrollToBottom}
+                            scrollToBottom={scrollToBottom}
+                          />
+                        )}
+                      </RootNavigator.Screen>
+                      <RootNavigator.Screen
+                        name={RouteEnum.Confirm}
+                        component={Confirm}
+                      />
+                      <RootNavigator.Screen
+                        name={RouteEnum.Computing}
+                        component={ComputingTxContent}
+                      />
+                    </RootNavigator>
+                  </FadeInOnMount>
                 </LoadedAppOptionsPanelHost>
               </OptionsPanelProvider>
               <AddTagModalHost
@@ -2668,6 +2440,10 @@ export class LoadedAppClass extends Component<
                 target={this.state.addTagModalTarget}
                 setAddressBook={this.setAddressBook}
                 translate={this.state.translate}
+                navigation={
+                  (this.drawerNav ?? undefined) as
+                    NavigationProp<ParamListBase> | undefined
+                }
               />
             </BottomSheetModalProvider>
           </GestureHandlerRootView>

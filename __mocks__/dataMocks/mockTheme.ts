@@ -10,6 +10,7 @@ const colors: ThemeColors = {
   bgSurface: '#031124',
   bgChrome: '#040C17',
   bottomSheetBorder: '#05234C',
+  borderFocus: '#0B3A75',
 
   fgDefault: '#c3c3c3',
 
@@ -37,11 +38,13 @@ const colors: ThemeColors = {
 
   fgDanger: '#FFB972',
   fgDangerEmphasis: '#dc2626',
+  bgDanger: '#E5484D',
+  sheetHandle: '#1B3C6B',
+  fgViewOnly: '#8FB4E6',
 };
 
 export const mockTheme = {
   ...DefaultTheme,
   dark: true,
   colors,
-  toggleTheme: () => {},
 };

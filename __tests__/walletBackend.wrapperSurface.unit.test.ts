@@ -43,7 +43,6 @@ import {
   sendAllPropose,
   sendPropose,
   setConfigWalletToProd,
-  setCryptoDefaultProvider,
   shieldConfirm,
   shieldPropose,
 } from '@app/walletBackend/utils/walletUtils';
@@ -62,11 +61,6 @@ const wrappers: Array<[string, string, () => Promise<FfiResult<string>>]> = [
     'setConfigWalletToProdProcess',
     'setConfigWalletToProd',
     () => setConfigWalletToProd('Medium', '1'),
-  ],
-  [
-    'setCryptoDefaultProvider',
-    'setCryptoDefaultProvider',
-    () => setCryptoDefaultProvider(),
   ],
   ['getBalanceInfo', 'getBalanceInfo', () => getBalanceInfo()],
   ['getVersionInfo', 'getVersionInfo', () => getVersionInfo()],

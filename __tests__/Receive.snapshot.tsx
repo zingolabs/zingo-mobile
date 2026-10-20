@@ -51,7 +51,6 @@ describe('Component Receive - test', () => {
           {...props}
           toggleMenuDrawer={onFunction}
           alone={false}
-          setSecurityOption={onFunction}
           setAddressBook={onFunction}
         />
       </ContextAppLoadedProvider>,

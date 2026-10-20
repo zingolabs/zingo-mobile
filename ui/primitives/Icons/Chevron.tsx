@@ -17,3 +17,11 @@ export function ChevronDown(props: React.ComponentProps<typeof Icon>) {
     </Icon>
   );
 }
+
+export function ChevronLeft(props: React.ComponentProps<typeof Icon>) {
+  return (
+    <Icon {...props}>
+      <Path d="m15 18-6-6 6-6" />
+    </Icon>
+  );
+}

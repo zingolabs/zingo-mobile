@@ -3,16 +3,16 @@ export enum SettingsNameEnum {
   server = 'server',
   language = 'language',
   privacy = 'privacy',
-  mode = 'mode',
-  security = 'security',
+  biometrics = 'biometrics',
   selectServer = 'selectServer',
-  recoveryWalletInfoOnDevice = 'recoveryWalletInfoOnDevice',
   performanceLevel = 'performanceLevel',
   blockExplorer = 'blockExplorer',
 
   // internal management
   firstInstall = 'firstInstall',
-  basicFirstViewSeed = 'basicFirstViewSeed',
   version = 'version',
   ironwoodOnboardSeen = 'ironwoodOnboardSeen',
+  seedBackedUp = 'seedBackedUp',
+  seedBackedUpAt = 'seedBackedUpAt',
+  viewOnlyNoticeDismissed = 'viewOnlyNoticeDismissed',
 }

@@ -15,6 +15,7 @@ import java.io.File
  * Run: ./gradlew :app:connectedProdDebugAndroidTest \
  *   -Pandroid.testInstrumentationRunnerArguments.class=org.ZingoLabs.Zingo.WalletDeleteTest
  */
+@OfflineDeviceTest
 class WalletDeleteTest {
     private val mainName = Constants.WalletFileName.value
     private val backupName = Constants.WalletBackupFileName.value
@@ -63,8 +64,7 @@ class WalletDeleteTest {
         file(swapName).delete()
         RPCModule.walletFileClosed = false
         uniffi.zingo.initLogging()
-        uniffi.zingo.setCryptoDefaultProviderToRing()
-        uniffi.zingo.initFromSeed(Seeds.HOSPITAL, 2000000u, "", "main", "Medium", 1u)
+        uniffi.zingo.initFromSeed(seed = Seeds.HOSPITAL, birthday = 2000000u, connection = testConnection("", "main"))
         plainWallet = uniffi.zingo.saveWalletBytes()!!
         file(mainName).writeBytes(plainWallet)
     }
@@ -100,21 +100,6 @@ class WalletDeleteTest {
 
         assertThat(walletExists()).isEqualTo(false)
         assertThat(file("$mainName.write.tmp").exists()).isFalse()
-    }
-
-    @Test
-    fun aSwapTempDoesNotResurrectTheDeletedBackup() {
-        file(backupName).writeBytes(plainWallet)
-        file(swapName).writeBytes(plainWallet)
-
-        val promise = CapturingPromise()
-        rpcModule.deleteExistingWalletBackup(promise)
-        assertThat(promise.resolved).containsExactly(true)
-
-        val exists = CapturingPromise()
-        rpcModule.walletBackupExists(exists)
-        assertThat(exists.resolved).containsExactly(false)
-        assertThat(file(swapName).exists()).isFalse()
     }
 
     @Test

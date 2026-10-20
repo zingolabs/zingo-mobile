@@ -29,6 +29,9 @@ export const Failed: Story = {
   tags: ['static'],
   args: screenProps(RouteEnum.Computing, {
     phase: 'failed',
-    errorMessage: 'Insufficient balance to cover the fee.',
+    failure: {
+      kind: 'verbatim',
+      text: 'Insufficient balance to cover the fee.',
+    },
   }),
 };

@@ -22,7 +22,6 @@ import {
 } from 'react-native';
 import Animated from 'react-native-reanimated';
 import {
-  faQrcode,
   faCheck,
   faInfoCircle,
   faAddressCard,
@@ -37,14 +36,18 @@ import {
   useNavigation,
 } from '@react-navigation/native';
 import { useTheme } from '@app/theme';
+import { ScanIcon } from '@ui/primitives/Icons/ScanIcon';
 import { getNumberFormatSettings } from 'react-native-localize';
-import SelectBottomSheet from '@ui/widgets/SelectBottomSheet';
 
 import { SvgXml } from 'react-native-svg';
 import FadeText from '@ui/primitives/FadeText';
 import BoldText from '@ui/primitives/BoldText';
 import Swap from '../../assets/img/swap.svg';
-import { sendGateOpen } from '@app/walletBackend/transforms/mixnetView';
+import {
+  sendGateOpen,
+  shownStatusKey,
+} from '@app/walletBackend/transforms/mixnetView';
+import { SendOutcome } from '@app/walletBackend/transforms/sendPermit';
 import ErrorText from '@ui/primitives/ErrorText';
 import RegText from '@ui/primitives/RegText';
 import ZecAmount from '@ui/widgets/ZecAmount';
@@ -54,23 +57,18 @@ import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
 import AppSheet from '@ui/primitives/AppSheet';
 import AppSheetModal from '@ui/primitives/AppSheetModal';
 import {
-  AddressBookFileClass,
   SendPageStateClass,
   ToAddrClass,
-  ModeEnum,
-  ChainNameEnum,
   GlobalConst,
-  ServerUrisType,
   ServerType,
   SetServerResult,
   SelectServerEnum,
   RouteEnum,
-  SecurityType,
   ScreenEnum,
   ProposalPoolsType,
 } from '@app/AppState';
 import { hasUnconfirmedFunds } from '@app/AppState/classes/TotalBalanceClass';
-import { parseZcashURI, serverUris, fetchServerList } from '@app/uris';
+import { parseZcashURI } from '@app/uris';
 // Imported straight from the module rather than through the `uris` barrel, so
 // the ZNS SDK stays out of the module graph of everything else that barrel
 // serves (the wallet backend among them).
@@ -81,15 +79,19 @@ import {
   sendPropose,
 } from '@app/walletBackend';
 import {
-  classifySendFailure,
-  retryOnAnotherServer,
-  sendFailureText,
-} from '@app/walletBackend/transforms/sendFailureTransform';
+  computingEnd,
+  settleSend,
+} from '@app/walletBackend/transforms/sendSettlement';
 import Utils from '@app/utils';
+import {
+  fiatEligible,
+  fiatQuote,
+  toFiatText,
+  toZecText,
+} from '@app/price/fiatQuote';
 import { safeSnapToIndex } from '@app/utils/safeSnapToIndex';
 import { AppDrawerParamList } from '@app/types';
 import { ContextAppLoaded } from '@app/context';
-import PriceFetcher from '@ui/widgets/PriceFetcher';
 import Header from '@ui/widgets/Header';
 import BottomSheet, { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useKeyboardHeight } from '@app/hooks/useKeyboardHeight';
@@ -102,7 +104,7 @@ import ShowAddressAlertAsync from '@app/services/showAddressAlertAsync';
 import Memo from './components/Memo';
 import SendErrorSheet from './components/SendErrorSheet';
 import { sendEmail } from '@app/services/sendEmail';
-import selectingServer from '@app/services/selectingServer';
+import { retryServer } from '@app/services/retryServer';
 import { RPCSpendablebalanceType } from '@app/walletBackend/types/RPCSpendablebalanceType';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
@@ -118,7 +120,7 @@ type SendProps = NativeStackScreenProps<AppDrawerParamList, RouteEnum.Send> & {
   sendTransaction: (
     s: SendPageStateClass,
     sendAll?: boolean,
-  ) => Promise<String>;
+  ) => Promise<SendOutcome<string>>;
   setServerOption: (
     value: ServerType,
     selectServer: SelectServerEnum,
@@ -126,7 +128,6 @@ type SendProps = NativeStackScreenProps<AppDrawerParamList, RouteEnum.Send> & {
     sameServerChainName: boolean,
   ) => Promise<SetServerResult>;
   clearToAddr: () => void;
-  setSecurityOption: (s: SecurityType) => Promise<void>;
 };
 
 const Send: React.FunctionComponent<SendProps> = ({
@@ -137,7 +138,6 @@ const Send: React.FunctionComponent<SendProps> = ({
   setScrollToTop,
   setScrollToBottom,
   setServerOption,
-  //setSecurityOption,
 }) => {
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const context = useContext(ContextAppLoaded);
@@ -150,25 +150,25 @@ const Send: React.FunctionComponent<SendProps> = ({
     netInfo,
     privacy,
     server,
-    walletChainName,
     setBackgroundError,
     addLastSnackbar,
-    mode,
     somePending,
     addressBook,
     launchAddTagModal,
     defaultUnifiedAddress,
     shieldingAmount,
     selectServer,
-    //security,
     zingolibVersion,
     setPrivacyOption,
     mixnetView,
+    sendPermitNow,
   } = context;
   const { colors } = useTheme();
   // USD entry derives the ZEC actually sent from the price, so that
   // figure carries the same stale/absent dim as the USD conversions.
   const priceMuted = usePriceHealth(zecPrice.date) !== 'live';
+  const showFiat = fiatEligible(server, server.chainName);
+  const quote = fiatQuote(zecPrice, server, server.chainName);
 
   const screenName = ScreenEnum.Send;
   const zecIconXml = `<?xml version="1.0" encoding="UTF-8"?>
@@ -192,9 +192,6 @@ const Send: React.FunctionComponent<SendProps> = ({
   const [validAmount, setValidAmount] = useState<number>(0); // 1 - OK, 0 - Empty, -1 - Invalid number, -2 - Invalid Amount
   const [validMemo, setValidMemo] = useState<number>(0); // 1 - OK, 0 - Empty, -1 - KO
   const [sendButtonEnabled, setSendButtonEnabled] = useState<boolean>(false);
-  const [itemsPicker, setItemsPicker] = useState<
-    { label: string; value: string }[]
-  >([]);
   const [memoIcon, setMemoIcon] = useState<boolean>(false);
   const [maxAmount, setMaxAmount] = useState<number>(0);
   const [spendable, setSpendable] = useState<number>(0);
@@ -253,17 +250,18 @@ const Send: React.FunctionComponent<SendProps> = ({
   // `sendSnapPoints`, declared later in this component.
   const prevHasPriceSnapRef = useRef<boolean>(false);
   const memoBottomSheetRef = useRef<BottomSheetModal>(null);
-  const addressBookSelectRef = useRef<BottomSheetModal>(null);
   const sendErrorSheetRef = useRef<BottomSheetModal>(null);
 
   // Fee (`sendPropose`) and/or spendable-balance RPC error → the CTA turns into
   // a tappable "calculation error" button that opens SendErrorSheet, which
   // lists BOTH errors (they are often the same failure, shown under each label
-  // so that is explicit). Advanced-only, matching the existing raw-error
-  // surfaces (basic mode keeps RPC internals hidden; the CTA stays disabled).
-  const showCalcError =
-    !!(spendableBalanceLastError || proposeSendLastError) &&
-    mode === ModeEnum.advanced;
+  // so that is explicit).
+  const showCalcError = !!(spendableBalanceLastError || proposeSendLastError);
+  // Nothing to spend, a balance still confirming or a failed read turn the
+  // spendable red, in ZEC and in the currency alike.
+  const spendableWarn =
+    stillConfirming || negativeMaxAmount || !!spendableBalanceLastError;
+  const spendableColor = spendableWarn ? colors.fgDanger : colors.fgDefault;
   const feeCalculationGenRef = useRef<number>(0);
   const { decimalSeparator } = getNumberFormatSettings();
   const keyboardHeight = useKeyboardHeight();
@@ -278,16 +276,14 @@ const Send: React.FunctionComponent<SendProps> = ({
   const BALANCE_SNAP_BUMP = 10;
 
   useEffect(() => {
-    const isMainChain = server.chainName === ChainNameEnum.mainChainName;
-    if (!isMainChain) {
+    if (!showFiat) {
       setUsdRowH(0);
     }
-  }, [server.chainName]);
+  }, [showFiat]);
 
   const sendSnapPoints = useMemo(() => {
-    const isMainChain = server.chainName === ChainNameEnum.mainChainName;
     if (containerH <= 0 || headerH <= 0) {
-      return isMainChain ? ['85%', '89%', '93%'] : ['89%', '93%'];
+      return showFiat ? ['85%', '89%', '93%'] : ['89%', '93%'];
     }
     const snapBase = containerH - headerH - SNAP_GAP;
     const snapPrice = Math.max(snapBase + BALANCE_SNAP_BUMP, 100);
@@ -302,12 +298,12 @@ const Send: React.FunctionComponent<SendProps> = ({
       points.push(snapPrice);
     }
     points.push(snapLow);
-    if (isMainChain && usdRowH > 0) {
+    if (showFiat && usdRowH > 0) {
       points.push(snapMid);
     }
     points.push(snapMax);
     return points;
-  }, [server.chainName, containerH, headerH, usdRowH, priceRowH]);
+  }, [showFiat, containerH, headerH, usdRowH, priceRowH]);
 
   const priceSnapIndex = priceRowH > 0 ? 0 : null;
   const onPriceSnapChange = usePriceSnapAutoClose(
@@ -655,37 +651,13 @@ const Send: React.FunctionComponent<SendProps> = ({
 
     if (amountPar !== null) {
       const amountTemp = amountPar.substring(0, 20);
-      if (isNaN(Utils.parseStringLocaleToNumberFloat(amountTemp))) {
-        setAmountCurrencyText('');
-      } else if (amountTemp && zecPrice && zecPrice.zecPrice > 0) {
-        setAmountCurrencyText(
-          Utils.parseNumberFloatToStringLocale(
-            Utils.parseStringLocaleToNumberFloat(amountTemp) *
-              zecPrice.zecPrice,
-            2,
-          ),
-        );
-      } else {
-        setAmountCurrencyText('');
-      }
+      setAmountCurrencyText(toFiatText(amountTemp, zecPrice.zecPrice));
       setAmountText(amountTemp);
     }
 
     if (amountCurrencyPar !== null) {
       const amountCurrencyTemp = amountCurrencyPar.substring(0, 15);
-      if (isNaN(Utils.parseStringLocaleToNumberFloat(amountCurrencyTemp))) {
-        setAmountText('');
-      } else if (amountCurrencyTemp && zecPrice && zecPrice.zecPrice > 0) {
-        setAmountText(
-          Utils.parseNumberFloatToStringLocale(
-            Utils.parseStringLocaleToNumberFloat(amountCurrencyTemp) /
-              zecPrice.zecPrice,
-            8,
-          ),
-        );
-      } else {
-        setAmountText('');
-      }
+      setAmountText(toZecText(amountCurrencyTemp, zecPrice.zecPrice));
       setAmountCurrencyText(amountCurrencyTemp);
     }
 
@@ -900,24 +872,6 @@ const Send: React.FunctionComponent<SendProps> = ({
   ]);
 
   useEffect(() => {
-    // Send always targets ZEC on the wallet's own network, so only offer ZEC
-    // contacts for that chain — never non-ZEC swap contacts, nor ZEC contacts
-    // saved on a different Zcash network.
-    const walletChain = walletChainName || server.chainName;
-    const items = addressBook
-      .filter(
-        (item: AddressBookFileClass) =>
-          item.swapChain === GlobalConst.zecSwapChain &&
-          item.chain === walletChain,
-      )
-      .map((item: AddressBookFileClass) => ({
-        label: item.label,
-        value: item.address,
-      }));
-    setItemsPicker(items);
-  }, [addressBook, walletChainName, server.chainName]);
-
-  useEffect(() => {
     setAddressText(sendPageState.toaddr.to);
     setAmountText(sendPageState.toaddr.amount);
     setAmountCurrencyText(sendPageState.toaddr.amountCurrency);
@@ -943,6 +897,33 @@ const Send: React.FunctionComponent<SendProps> = ({
       });
     }
   };
+
+  /** A contact or own address chosen in the book; replacing a valid address asks first. */
+  const pickFromBook = async (itemValue: string) => {
+    if (
+      validAddress === 1 &&
+      addressText &&
+      itemValue &&
+      addressText !== itemValue
+    ) {
+      setUpdatingToField(true);
+      await ShowAddressAlertAsync(translate)
+        .then(() => {
+          updateToField(itemValue, null, null, null, null);
+        })
+        .catch(() => {
+          updateToField(addressText, null, null, null, null);
+        });
+      setTimeout(() => {
+        setUpdatingToField(false);
+      }, 500);
+    } else if (addressText !== itemValue) {
+      updateToField(itemValue, null, null, null, null);
+    }
+  };
+
+  const openBook = () =>
+    navigation.navigate(RouteEnum.AddressBook, { pick: pickFromBook });
 
   const clearState = () => {
     feeCalculationGenRef.current += 1;
@@ -971,104 +952,38 @@ const Send: React.FunctionComponent<SendProps> = ({
   };
 
   const confirmSend = async (sendPageStatePar: SendPageStateClass) => {
-    // The MAX send travels the send-all path all the way: quoted and sent by
-    // the same proposal, so the amount confirmed is the amount broadcast.
-    const sendAllSend = isSendAllAmount(sendPageStatePar.toaddr.amount);
-    if (!netInfo.isConnected || selectServer === SelectServerEnum.offline) {
-      addLastSnackbar(translate('loadedapp.connection-error') as string);
+    const permit = sendPermitNow();
+    if (permit.kind === 'error') {
+      addLastSnackbar(translate(permit.errorKey) as string);
       return;
     }
 
     navigation.navigate(RouteEnum.Computing);
 
-    try {
-      await sendTransaction(sendPageStatePar, sendAllSend);
+    // The MAX send travels the send-all path all the way: quoted and sent by
+    // the same proposal, so the amount confirmed is the amount broadcast.
+    const sendAllSend = isSendAllAmount(sendPageStatePar.toaddr.amount);
+    const settlement = await settleSend(
+      () => sendTransaction(sendPageStatePar, sendAllSend),
+      async () => {
+        const target = await retryServer(server, translate);
+        if (target !== server) {
+          await setServerOption(target, selectServer, false, true);
+        }
+      },
+      // A `custom` server is the user's own choice, and the retry keeps it.
+      selectServer !== SelectServerEnum.custom && server.kind !== 'offline',
+    );
 
-      // Clear the fields
+    if (settlement.kind === 'sent') {
       clearState();
-
-      // scroll to top in history, just in case.
       setScrollToTop(true);
       setScrollToBottom(true);
-
-      // the app send successfully on the first attemp.
-      navigation.navigate(RouteEnum.Computing, { phase: 'created' });
-      return;
-    } catch (err1) {
-      let failure = classifySendFailure(err1 as string);
-
-      // The transform decides which families a server switch can plausibly
-      // help; the wallet's own verdicts (dust, duplicate nullifier, a
-      // fail-closed mixnet refusal) are excluded there. If the user selected
-      // a `custom` server, we cannot change it regardless.
-      if (
-        retryOnAnotherServer(failure) &&
-        selectServer !== SelectServerEnum.custom
-      ) {
-        // Pick a working server, same pattern as boot/recovery: the live
-        // registry first (best, excluding the failed server, no probe), then
-        // the static list ranked by latency (also excluding the failed one).
-        let fasterServer: ServerType = {} as ServerType;
-        const live = await fetchServerList(server.chainName);
-        const liveCandidates = live.filter(
-          (s: ServerUrisType) => s.uri !== server.uri,
-        );
-        if (liveCandidates.length > 0) {
-          fasterServer = {
-            uri: liveCandidates[0].uri,
-            chainName: liveCandidates[0].chainName,
-          };
-        } else {
-          const serverChecked = await selectingServer(
-            serverUris(translate).filter(
-              (s: ServerUrisType) =>
-                !s.obsolete &&
-                s.chainName === server.chainName &&
-                s.uri !== server.uri,
-            ),
-          );
-          if (serverChecked && serverChecked.latency) {
-            fasterServer = {
-              uri: serverChecked.uri,
-              chainName: serverChecked.chainName,
-            };
-          } else {
-            fasterServer = server;
-            // likely a connection problem — all servers unreachable / timeout.
-          }
-        }
-        if (fasterServer.uri !== server.uri) {
-          await setServerOption(fasterServer, selectServer, false, true);
-        }
-
-        try {
-          await sendTransaction(sendPageStatePar, sendAllSend);
-
-          // Clear the fields
-          clearState();
-
-          // scroll to top in history, just in case.
-          setScrollToTop(true);
-          setScrollToBottom(true);
-
-          // the app send successfully on the second attemp.
-          navigation.navigate(RouteEnum.Computing, { phase: 'created' });
-          return;
-        } catch (err2) {
-          failure = classifySendFailure(err2 as string);
-        }
-      }
-
-      const failureText = sendFailureText(failure);
-      navigation.navigate(RouteEnum.Computing, {
-        phase: 'failed',
-        errorMessage:
-          failureText.kind === 'key'
-            ? (translate(failureText.errorKey) as string)
-            : failureText.text,
-      });
     }
+    navigation.navigate(RouteEnum.Computing, computingEnd(settlement));
   };
+
+  const scanButton = useRef<View>(null);
 
   const scrollToEnd = () => {
     if (scrollViewRef.current) {
@@ -1076,11 +991,41 @@ const Send: React.FunctionComponent<SendProps> = ({
     }
   };
 
+  // The shared scanner opens from the scan button and takes a Zcash
+  // address or a zcash: URI; a bare address goes in as a URI.
   const setQrcodeModalShow = () => {
-    navigation.navigate(RouteEnum.ScannerAddress, {
-      setAddress: (a: string) => updateToField(a, null, null, null, null),
-      active: true,
-    });
+    const open = (origin?: { x: number; y: number }) =>
+      navigation.navigate(RouteEnum.ScannerAddress, {
+        setAddress: (a: string) =>
+          updateToField(
+            a.toLowerCase().startsWith(GlobalConst.zcash) || a.includes(':')
+              ? a
+              : GlobalConst.zcash + a,
+            null,
+            null,
+            null,
+            null,
+          ),
+        accepts: async (v: string) =>
+          v.toLowerCase().startsWith(GlobalConst.zcash) ||
+          (await Utils.isValidAddress(v, server.chainName)).isValid,
+        texts: {
+          title: translate('scanner.title') as string,
+          hint: translate('scanner.hint-address') as string,
+          miss: translate('scanner.miss-address') as string,
+          found: translate('scanner.found') as string,
+          back: translate('scanner.back') as string,
+          torch: translate('scanner.torch') as string,
+        },
+        origin,
+      });
+    if (scanButton.current) {
+      scanButton.current.measureInWindow((x, y, width, height) =>
+        open({ x: x + width / 2, y: y + height / 2 }),
+      );
+    } else {
+      open();
+    }
   };
 
   const setMemoModalShow = () => {
@@ -1127,7 +1072,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       calculatedFee: fee,
       proposalPools: proposalPools,
       confirmSend: confirmSend,
-      sendAllAmount: mode !== ModeEnum.basic && isSendAllAmount(amountText),
+      sendAllAmount: isSendAllAmount(amountText),
       calculateFeeWithPropose: calculateFeeWithPropose,
       sendPageState: buildSendState(),
     });
@@ -1289,10 +1234,6 @@ const Send: React.FunctionComponent<SendProps> = ({
                 >
                   <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <View
-                      accessible={true}
-                      accessibilityLabel={
-                        translate('send.address-acc') as string
-                      }
                       style={{
                         flex: 1,
                         justifyContent: 'center',
@@ -1300,6 +1241,10 @@ const Send: React.FunctionComponent<SendProps> = ({
                     >
                       <TextInput
                         testID="send.addressplaceholder"
+                        accessible={true}
+                        accessibilityLabel={
+                          translate('send.address-acc') as string
+                        }
                         placeholder={
                           translate('send.addressplaceholder') as string
                         }
@@ -1331,6 +1276,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                     >
                       {addressText && (
                         <TouchableOpacity
+                          testID="send.address.clear"
                           onPress={() => {
                             updateToField('', null, null, null, null);
                           }}
@@ -1379,32 +1325,29 @@ const Send: React.FunctionComponent<SendProps> = ({
                             </TouchableOpacity>
                           );
                         }
-                        if (itemsPicker.length > 0) {
-                          return !updatingToField ? (
-                            <TouchableOpacity
-                              onPress={() =>
-                                addressBookSelectRef.current?.present()
-                              }
-                            >
-                              <FontAwesomeIcon
-                                style={{ marginRight: 5 }}
-                                size={28}
-                                icon={faAddressCard}
-                                color={colors.fgAccent}
-                              />
-                            </TouchableOpacity>
-                          ) : (
+                        return !updatingToField ? (
+                          <TouchableOpacity
+                            testID="send.address-book"
+                            onPress={openBook}
+                          >
                             <FontAwesomeIcon
                               style={{ marginRight: 5 }}
                               size={28}
                               icon={faAddressCard}
-                              color={colors.fgAccentDisabled}
+                              color={colors.fgAccent}
                             />
-                          );
-                        }
-                        return null;
+                          </TouchableOpacity>
+                        ) : (
+                          <FontAwesomeIcon
+                            style={{ marginRight: 5 }}
+                            size={28}
+                            icon={faAddressCard}
+                            color={colors.fgAccentDisabled}
+                          />
+                        );
                       })()}
                       <TouchableOpacity
+                        ref={scanButton}
                         testID="send.scan-button"
                         accessible={true}
                         accessibilityLabel={
@@ -1414,10 +1357,9 @@ const Send: React.FunctionComponent<SendProps> = ({
                           setQrcodeModalShow();
                         }}
                       >
-                        <FontAwesomeIcon
+                        <ScanIcon
                           style={{ marginRight: 5 }}
                           size={28}
-                          icon={faQrcode}
                           color={colors.fgMuted}
                         />
                       </TouchableOpacity>
@@ -1592,72 +1534,19 @@ const Send: React.FunctionComponent<SendProps> = ({
                           />
                         </TouchableOpacity>
                       ) : null}
-                      {mode !== ModeEnum.basic && (
-                        <TouchableOpacity
-                          testID="send.max"
-                          onPress={() => {
-                            const maxStr = Utils.parseNumberFloatToStringLocale(
-                              maxAmount,
-                              8,
-                            );
-                            sendAllRef.current = true;
-                            updateToField(null, maxStr, null, null, null);
-                            calculateFeeWithPropose(
-                              maxStr,
-                              addressText,
-                              memoText,
-                              includeUAMemoBoolean,
-                            );
-                          }}
-                          style={{
-                            paddingLeft: 0,
-                            paddingRight: 8,
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                          }}
-                        >
-                          <BoldText
-                            style={{
-                              color: colors.fgAccent,
-                              fontSize: 20,
-                              lineHeight: 20,
-                              letterSpacing: -1.5,
-                              transform: [{ scaleX: 0.8 }],
-                            }}
-                          >
-                            {translate('send.max') as string}
-                          </BoldText>
-                        </TouchableOpacity>
-                      )}
                     </View>
-                    {server.chainName === ChainNameEnum.mainChainName && (
+                    {showFiat && (
                       <>
                         <TouchableOpacity
                           onPress={() => {
-                            if (
-                              inputZec &&
-                              !amountCurrencyText &&
-                              amountText &&
-                              zecPrice.zecPrice > 0
-                            ) {
-                              const zecVal =
-                                Utils.parseStringLocaleToNumberFloat(
-                                  amountText,
-                                );
-                              if (!isNaN(zecVal)) {
-                                setAmountCurrencyText(
-                                  Utils.parseNumberFloatToStringLocale(
-                                    zecVal * zecPrice.zecPrice,
-                                    2,
-                                  ),
-                                );
-                              }
+                            if (inputZec && !amountCurrencyText) {
+                              setAmountCurrencyText(
+                                toFiatText(amountText, zecPrice.zecPrice),
+                              );
                             }
                             setInputZec(!inputZec);
                           }}
-                          disabled={
-                            !zecPrice.zecPrice || zecPrice.zecPrice <= 0
-                          }
+                          disabled={quote.kind === 'none'}
                           style={{ marginHorizontal: 8 }}
                           testID="send.swap-entry"
                         >
@@ -1665,28 +1554,30 @@ const Send: React.FunctionComponent<SendProps> = ({
                             width={28}
                             height={28}
                             color={
-                              !zecPrice.zecPrice || zecPrice.zecPrice <= 0
+                              quote.kind === 'none'
                                 ? colors.fgAccentDisabled
                                 : colors.fgAccent
                             }
                           />
                         </TouchableOpacity>
                         {inputZec ? (
-                          zecPrice.date > 0 && (
+                          quote.kind === 'quote' && (
                             <CurrencyAmount
                               style={{
                                 marginTop: 0,
                                 marginBottom: 0,
                                 fontSize: 16,
                               }}
-                              priceDate={zecPrice.date}
-                              price={zecPrice.zecPrice}
+                              priceDate={quote.date}
+                              price={quote.price}
                               amtZec={
                                 Utils.parseStringLocaleToNumberFloat(
                                   amountText,
                                 ) || 0
                               }
-                              privacy={privacy}
+                              // The amount being typed is shown whole in
+                              // both currencies; privacy hides balances.
+                              privacy={false}
                             />
                           )
                         ) : (
@@ -1703,13 +1594,8 @@ const Send: React.FunctionComponent<SendProps> = ({
                                 amountText,
                               ) || 0
                             }
-                            privacy={privacy}
+                            privacy={false}
                           />
-                        )}
-                        {zecPrice.date > 0 && (
-                          <View style={{ marginLeft: inputZec ? 5 : 2 }}>
-                            <PriceFetcher backgroundColor={colors.bgSurface} />
-                          </View>
                         )}
                       </>
                     )}
@@ -1717,14 +1603,28 @@ const Send: React.FunctionComponent<SendProps> = ({
 
                   <View style={{ display: 'flex', flexDirection: 'column' }}>
                     <TouchableOpacity
+                      testID="send.max"
                       style={{ alignSelf: 'flex-start' }}
                       onPress={() => {
-                        if (
-                          (spendableBalanceLastError || proposeSendLastError) &&
-                          mode === ModeEnum.advanced
-                        ) {
+                        if (spendableBalanceLastError || proposeSendLastError) {
                           sendErrorSheetRef.current?.present();
+                          return;
                         }
+                        if (maxAmount <= 0) {
+                          return;
+                        }
+                        const maxStr = Utils.parseNumberFloatToStringLocale(
+                          maxAmount,
+                          8,
+                        );
+                        sendAllRef.current = true;
+                        updateToField(null, maxStr, null, null, null);
+                        calculateFeeWithPropose(
+                          maxStr,
+                          addressText,
+                          memoText,
+                          includeUAMemoBoolean,
+                        );
                       }}
                     >
                       <View
@@ -1739,41 +1639,42 @@ const Send: React.FunctionComponent<SendProps> = ({
                         <RegText
                           style={{
                             fontSize: 14,
-                            color:
-                              spendableBalanceLastError &&
-                              mode === ModeEnum.advanced
-                                ? colors.fgDanger
-                                : colors.fgDefault,
+                            color: spendableBalanceLastError
+                              ? colors.fgDanger
+                              : colors.fgDefault,
                           }}
                         >
                           {translate('send.spendable') as string}
                         </RegText>
-                        {inputZec ||
-                        server.chainName !== ChainNameEnum.mainChainName ? (
-                          <ZecAmount
-                            style={{ marginLeft: 0 }}
-                            currencyName={info.currencyName}
-                            color={
-                              stillConfirming ||
-                              negativeMaxAmount ||
-                              (spendableBalanceLastError &&
-                                mode === ModeEnum.advanced)
-                                ? colors.fgDanger
-                                : colors.fgDefault
-                            }
-                            size={14}
-                            amtZec={maxAmount}
-                            privacy={privacy}
-                          />
-                        ) : (
-                          <CurrencyAmount
-                            style={{ fontSize: 14 }}
-                            priceDate={zecPrice.date}
-                            price={zecPrice.zecPrice}
-                            amtZec={maxAmount}
-                            privacy={privacy}
-                          />
-                        )}
+                        <View
+                          style={{
+                            marginRight: 5,
+                            borderBottomWidth: 1,
+                            borderBottomColor: spendableColor,
+                          }}
+                        >
+                          {inputZec || quote.kind === 'none' ? (
+                            <ZecAmount
+                              style={{ marginLeft: 0, marginRight: 0 }}
+                              currencyName={info.currencyName}
+                              color={spendableColor}
+                              size={14}
+                              amtZec={maxAmount}
+                              privacy={privacy}
+                            />
+                          ) : (
+                            <CurrencyAmount
+                              style={{ fontSize: 14 }}
+                              priceDate={quote.date}
+                              price={quote.price}
+                              amtZec={maxAmount}
+                              privacy={privacy}
+                              color={
+                                spendableWarn ? colors.fgDanger : undefined
+                              }
+                            />
+                          )}
+                        </View>
                       </View>
                     </TouchableOpacity>
                     {stillConfirming && (
@@ -1805,7 +1706,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                         </View>
                       </TouchableOpacity>
                     )}
-                    {showShieldInfo && mode === ModeEnum.advanced && (
+                    {showShieldInfo && (
                       <TouchableOpacity
                         style={{ alignSelf: 'flex-start' }}
                         onPress={() => {
@@ -1858,10 +1759,6 @@ const Send: React.FunctionComponent<SendProps> = ({
                       }}
                     >
                       <View
-                        accessible={true}
-                        accessibilityLabel={
-                          translate('send.memo-acc') as string
-                        }
                         style={{
                           flexGrow: 1,
                           flexDirection: 'row',
@@ -1875,6 +1772,10 @@ const Send: React.FunctionComponent<SendProps> = ({
                       >
                         <TextInput
                           testID="send.memo-field"
+                          accessible={true}
+                          accessibilityLabel={
+                            translate('send.memo-acc') as string
+                          }
                           placeholder={
                             translate('send.memo-placeholder') as string
                           }
@@ -2038,7 +1939,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                     transaction, and with no switch left to flip the user is
                     owed the reason: why the wait exists, and what the
                     transport is doing right now. */}
-                {mixnetView !== null && mixnetView.sendBlocked && (
+                {mixnetView.kind === 'transport' && mixnetView.sendBlocked && (
                   <View
                     style={{
                       alignItems: 'center',
@@ -2051,13 +1952,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                       {translate('send.nym-blocked') as string}
                     </FadeText>
                     <RegText color={colors.fgDefault} style={{ fontSize: 13 }}>
-                      {
-                        translate(
-                          mixnetView.reconnecting
-                            ? 'mixnet.reconnecting'
-                            : mixnetView.statusKey,
-                        ) as string
-                      }
+                      {translate(shownStatusKey(mixnetView)) as string}
                     </RegText>
                   </View>
                 )}
@@ -2091,7 +1986,6 @@ const Send: React.FunctionComponent<SendProps> = ({
                       title={
                         validAmount === 1 &&
                         amountText &&
-                        mode !== ModeEnum.basic &&
                         isSendAllAmount(amountText)
                           ? (translate('send.button-all') as string)
                           : (translate('send.button') as string)
@@ -2100,10 +1994,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                       onPress={async () => {
                         setSendButtonEnabled(false);
                         updateToField(null, null, null, memoText, null);
-                        if (
-                          !netInfo.isConnected ||
-                          selectServer === SelectServerEnum.offline
-                        ) {
+                        if (!netInfo.isConnected || server.kind === 'offline') {
                           addLastSnackbar(
                             translate('loadedapp.connection-error') as string,
                           );
@@ -2112,7 +2003,6 @@ const Send: React.FunctionComponent<SendProps> = ({
                         if (
                           validAmount === 1 &&
                           amountText &&
-                          mode !== ModeEnum.basic &&
                           isSendAllAmount(amountText)
                         ) {
                           addLastSnackbar(
@@ -2155,38 +2045,6 @@ const Send: React.FunctionComponent<SendProps> = ({
           translate={translate}
         />
       </AppSheetModal>
-      <SelectBottomSheet
-        ref={addressBookSelectRef}
-        title={translate('addressbook.select-placeholder') as string}
-        searchable={true}
-        searchPlaceholder={
-          translate('addressbook.search-placeholder') as string
-        }
-        items={itemsPicker}
-        value={addressText ?? ''}
-        onChange={async itemValue => {
-          if (
-            validAddress === 1 &&
-            addressText &&
-            itemValue &&
-            addressText !== itemValue
-          ) {
-            setUpdatingToField(true);
-            await ShowAddressAlertAsync(translate)
-              .then(() => {
-                updateToField(itemValue, null, null, null, null);
-              })
-              .catch(() => {
-                updateToField(addressText, null, null, null, null);
-              });
-            setTimeout(() => {
-              setUpdatingToField(false);
-            }, 500);
-          } else if (addressText !== itemValue) {
-            updateToField(itemValue, null, null, null, null);
-          }
-        }}
-      />
       <SendErrorSheet
         ref={sendErrorSheetRef}
         title={translate('send.calc-error') as string}

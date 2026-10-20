@@ -30,8 +30,6 @@ import AppSheetModal from '@ui/primitives/AppSheetModal';
 import {
   AddressKindEnum,
   ChainNameEnum,
-  ModeEnum,
-  SecurityType,
   UnifiedAddressClass,
   TransparentAddressClass,
   AddressBookFileClass,
@@ -59,7 +57,6 @@ type ReceiveProps = NativeStackScreenProps<
 > & {
   toggleMenuDrawer: () => void;
   alone: boolean;
-  setSecurityOption: (s: SecurityType) => Promise<void>;
   setAddressBook: (ab: AddressBookFileClass[]) => void;
 };
 
@@ -79,7 +76,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
     translate,
     addresses,
     defaultUnifiedAddress,
-    mode,
     addLastSnackbar,
     setPrivacyOption,
   } = context;
@@ -256,8 +252,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
     }
   }, [addresses]);
 
-  const isAdvanced = mode !== ModeEnum.basic;
-  const canPickScope = isAdvanced && tAddr && tAddr.length > 0;
+  const canPickScope = tAddr && tAddr.length > 0;
 
   const scopeItems = useMemo(
     () => [
@@ -422,20 +417,16 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
             </BoldText>
           )}
         </View>
-        {isAdvanced ? (
-          <Pressable
-            onPress={() => show('NA')}
-            hitSlop={8}
-            style={{
-              paddingHorizontal: 14,
-              paddingVertical: 4,
-            }}
-          >
-            <FontAwesomeIcon icon={faPlus} size={18} color={colors.fgMuted} />
-          </Pressable>
-        ) : (
-          <View style={{ width: 46 }} />
-        )}
+        <Pressable
+          onPress={() => show('NA')}
+          hitSlop={8}
+          style={{
+            paddingHorizontal: 14,
+            paddingVertical: 4,
+          }}
+        >
+          <FontAwesomeIcon icon={faPlus} size={18} color={colors.fgMuted} />
+        </Pressable>
       </View>
     </View>
   );
@@ -499,7 +490,8 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
       </Animated.View>
       <AppSheetModal
         ref={bottomSheetRef}
-        header={xHeader}
+        header={sheetType === 'NAT' ? undefined : xHeader}
+        handle={sheetType === 'NAT'}
         contentStyle={{
           paddingBottom: keyboardHeight > 0 ? keyboardHeight + 20 : 30,
         }}
@@ -521,7 +513,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                   ? tAddr[tAddrIndex].address
                   : ''
             }
-            own={true}
             closeSheet={hide}
             setAddressBook={setAddressBook}
           />

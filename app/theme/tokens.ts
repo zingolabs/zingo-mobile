@@ -5,6 +5,7 @@ export type ThemeColors = {
   bgSurface: string;
   bgChrome: string;
   bottomSheetBorder: string;
+  borderFocus: string;
 
   fgDefault: string;
 
@@ -31,7 +32,14 @@ export type ThemeColors = {
   bgWarning: string;
 
   fgDanger: string;
+
+  // View-only (watch-only) wallet marks: the snowflake and its tiles.
+  fgViewOnly: string;
   fgDangerEmphasis: string;
+  // Fill of a destructive action.
+  bgDanger: string;
+  // The grab pill at the top of a bottom sheet.
+  sheetHandle: string;
 };
 
 const base = {
@@ -39,6 +47,7 @@ const base = {
   bgSurface: '#05101E',
   bgChrome: '#040C17',
   bottomSheetBorder: '#05234C',
+  borderFocus: '#0B3A75',
   fgDefault: '#c0cbdc',
 
   fgSyncing: '#ebff5a',
@@ -51,10 +60,14 @@ const base = {
   bgWarning: '#262527',
 
   fgDanger: '#FFB972',
+
+  fgViewOnly: '#8FB4E6',
   fgDangerEmphasis: '#dc2626',
+  bgDanger: '#E5484D',
+  sheetHandle: '#1B3C6B',
 } as const;
 
-export const advancedTokens: ThemeColors = {
+export const themeTokens: ThemeColors = {
   ...base,
   fgAccent: '#43a637',
   borderAccent: '#43a637',
@@ -67,18 +80,4 @@ export const advancedTokens: ThemeColors = {
   fgMuted: '#7c8494',
   borderMuted: '#7c8494',
   bgMuted: '#7c8494',
-};
-
-export const basicTokens: ThemeColors = {
-  ...base,
-  fgAccent: '#60849c',
-  borderAccent: '#60849c',
-  bgAccent: '#60849c',
-  fgAccentDisabled: '#15576f',
-  borderAccentDisabled: '#15576f',
-  bgAccentDisabled: '#15576f',
-  bgSecondaryDisabled: '#123a53',
-  fgMuted: '#84848a',
-  borderMuted: '#84848a',
-  bgMuted: '#84848a',
 };

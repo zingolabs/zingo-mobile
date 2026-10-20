@@ -1,0 +1,33 @@
+appId: org.ZingoLabs.Zingo
+---
+# The wallet is created from the start menu and opens straight away.
+# A screen that is still moving when its element first shows can take a
+# tap at a place the element has left, and the tap then changes nothing
+# (see 02_options_menu.yaml). The wait lets the screen settle, and a tap
+# that changes nothing is tapped again.
+- extendedWaitUntil:
+    visible:
+      id: "loadingapp.createnewwallet"
+    timeout: 120000
+- waitForAnimationToEnd:
+    timeout: 5000
+- tapOn:
+    id: "loadingapp.createnewwallet"
+    retryTapIfNoChange: true
+
+# A recovery phrase left in the Keychain, by the wallet a flow just left
+# or by an earlier install on iOS, makes Create ask first: the button is
+# held until it fills.
+- waitForAnimationToEnd:
+    timeout: 5000
+- runFlow:
+    when:
+      visible:
+        id: "deletesheet.hold"
+    commands:
+      - longPressOn:
+          id: "deletesheet.hold"
+- extendedWaitUntil:
+    visible:
+      id: "header.drawmenu"
+    timeout: 120000

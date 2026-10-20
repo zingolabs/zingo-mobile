@@ -3,6 +3,7 @@ import { Keyboard, StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 import {
   BottomSheetBackdrop,
   BottomSheetBackdropProps,
+  BottomSheetBackgroundProps,
   BottomSheetFooterProps,
   BottomSheetModal,
   BottomSheetView,
@@ -21,6 +22,29 @@ type AppSheetModalProps = {
   dismissable?: boolean;
   accessible?: boolean;
   renderFooter?: (props: BottomSheetFooterProps) => React.ReactElement;
+  // Shows the grab pill at the top, drawn by the library.
+  handle?: boolean;
+};
+
+// The sheet's fill with its rim on top, for sheets whose handle sits above the content.
+const HandledBackground: React.FunctionComponent<
+  BottomSheetBackgroundProps
+> = ({ style }) => {
+  const { colors } = useTheme();
+  return (
+    <View
+      style={[
+        style,
+        {
+          backgroundColor: colors.bgSurface,
+          borderTopLeftRadius: radiusSheet,
+          borderTopRightRadius: radiusSheet,
+        },
+      ]}
+    >
+      <SheetRim />
+    </View>
+  );
 };
 
 const AppSheetModal = React.forwardRef<BottomSheetModal, AppSheetModalProps>(
@@ -34,8 +58,12 @@ const AppSheetModal = React.forwardRef<BottomSheetModal, AppSheetModalProps>(
       onChange,
       enablePanDownToClose = true,
       dismissable = true,
-      accessible,
+      // Defaults off for the same reason AppSheet does: an accessible
+      // container collapses its contents out of the iOS accessibility
+      // tree. The call sites passing false explicitly predate this.
+      accessible = false,
       renderFooter,
+      handle,
     },
     ref,
   ) => {
@@ -69,12 +97,18 @@ const AppSheetModal = React.forwardRef<BottomSheetModal, AppSheetModalProps>(
         }}
         onChange={onChange}
         onDismiss={onDismiss}
-        handleComponent={null}
+        handleComponent={handle ? undefined : null}
+        handleStyle={styles.handle}
+        handleIndicatorStyle={[
+          styles.indicator,
+          { backgroundColor: colors.sheetHandle },
+        ]}
         backgroundStyle={{
           backgroundColor: colors.bgSurface,
           borderTopLeftRadius: radiusSheet,
           borderTopRightRadius: radiusSheet,
         }}
+        backgroundComponent={handle ? HandledBackground : undefined}
         backdropComponent={renderBackdrop}
         footerComponent={renderFooter}
       >
@@ -89,7 +123,7 @@ const AppSheetModal = React.forwardRef<BottomSheetModal, AppSheetModalProps>(
             {header}
             {children}
           </View>
-          <SheetRim />
+          {!handle && <SheetRim />}
         </BottomSheetView>
       </BottomSheetModal>
     );
@@ -108,6 +142,8 @@ const styles = StyleSheet.create({
   fill: { flex: 1 },
   mask: roundedClip,
   maskFill: { flex: 1, ...roundedClip },
+  handle: { paddingTop: 10, paddingBottom: 6 },
+  indicator: { width: 36, height: 4, borderRadius: 2 },
 });
 
 export default AppSheetModal;

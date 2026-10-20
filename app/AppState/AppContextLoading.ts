@@ -4,10 +4,8 @@ import { TranslateType } from './types/TranslateType';
 import NetInfoType from './types/NetInfoType';
 import BackgroundErrorType from './types/BackgroundErrorType';
 import ServerType from './types/ServerType';
-import SecurityType from './types/SecurityType';
 
 import { LanguageEnum } from './enums/LanguageEnum';
-import { ModeEnum } from './enums/ModeEnum';
 import { SelectServerEnum } from './enums/SelectServerEnum';
 import { SnackbarDurationEnum } from './enums/SnackbarDurationEnum';
 import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
@@ -33,10 +31,8 @@ export default interface AppContextLoading {
   server: ServerType;
   language: LanguageEnum;
   privacy: boolean;
-  mode: ModeEnum;
-  security: SecurityType;
+  biometrics: boolean;
   selectServer: SelectServerEnum;
-  recoveryWalletInfoOnDevice: boolean;
   performanceLevel: RPCPerformanceLevelEnum;
   blockExplorer: BlockExplorerEnum;
 }

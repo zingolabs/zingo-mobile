@@ -31,6 +31,7 @@ const FFI_ERROR_CODES = [
   'MigrationSplit',
   'Migration',
   'Mixnet',
+  'WalletChainMismatch',
 ] as const;
 
 export type FfiErrorCode = (typeof FFI_ERROR_CODES)[number] | 'Unknown';

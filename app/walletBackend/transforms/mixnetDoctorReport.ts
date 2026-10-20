@@ -40,8 +40,6 @@ export function failureCause(failure: MixnetFailure): string {
       return `malformed payload: ${failure.payload}`;
     case 'unrecognizedIndicator':
       return `unrecognized indicator: ${failure.claimed}`;
-    case 'unconsentedOff':
-      return 'reported off without this session consent';
   }
 }
 

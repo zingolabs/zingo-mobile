@@ -37,8 +37,9 @@ import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
 
 import { AppDrawerParamList } from '@app/types';
 import Utils from '@app/utils';
+import { fiatQuote } from '@app/price/fiatQuote';
+import { sendPermit } from '@app/walletBackend/transforms/sendPermit';
 import {
-  ChainNameEnum,
   GlobalConst,
   ScreenEnum,
   RouteEnum,
@@ -85,29 +86,26 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     translate,
     zecPrice,
     defaultUnifiedAddress,
-    privacy,
     addLastSnackbar,
     server,
-    security,
-    foregroundEpoch,
+    biometrics,
   } = context;
   const { colors } = useTheme();
   const screenName = ScreenEnum.Confirm;
-  const isMainChain = server.chainName === ChainNameEnum.mainChainName;
+  const quote = fiatQuote(zecPrice, server, server.chainName);
+  const permit = sendPermit(context);
 
-  // Audit Issue D — bio gate for security.sendConfirm lives at the
+  // Audit Issue D — the biometric gate lives at the
   // Confirm screen entry. Mirrors Seed / Ufvk / Settings / Rescan via
   // the shared hook. Trade-off vs. the previous bio-on-press model: a
   // brief window after auth where the Confirm button can be pressed
   // without re-authenticating. Native stack remounts the screen on each
   // navigation, so leaving and coming back forces a fresh prompt.
   const screenGate = useBiometricGate({
-    needsAuth: !!security?.sendConfirm,
+    needsAuth: biometrics,
     translate,
     addLastSnackbar,
     onCancel: () => navigation.goBack(),
-    foregroundAppEnabled: !!security?.foregroundApp,
-    foregroundEpoch,
   });
   const authPassed = screenGate.kind === 'passed';
 
@@ -268,12 +266,19 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
             backgroundColor: colors.bgSurface,
             paddingTop: 10,
             paddingBottom: 24,
-            flexDirection: 'row',
             justifyContent: 'center',
             alignItems: 'center',
           }}
         >
+          {permit.kind === 'error' && (
+            <View style={{ marginBottom: 10 }} testID="send.confirm.refusal">
+              <FadeText style={{ textAlign: 'center', fontSize: 12 }}>
+                {translate(permit.errorKey) as string}
+              </FadeText>
+            </View>
+          )}
           <Button
+            testID="send.confirm.button"
             type={ButtonTypeEnum.Nym}
             title={
               sendAllAmount
@@ -281,12 +286,13 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                 : (translate('confirm') as string)
             }
             onPress={async () => await confirmSend(sendPageState)}
+            disabled={permit.kind === 'error'}
           />
         </View>
       </BottomSheetFooter>
     ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [colors, sendAllAmount, translate],
+    [colors, sendAllAmount, translate, permit],
   );
 
   if (!authPassed) {
@@ -360,11 +366,11 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                 size={28}
                 smallPrefix={true}
               />
-              {isMainChain && (
+              {quote.kind === 'quote' && (
                 <CurrencyAmount
                   amtZec={sendingTotal}
-                  price={zecPrice.zecPrice}
-                  priceDate={zecPrice.date}
+                  price={quote.price}
+                  priceDate={quote.date}
                   privacy={false}
                 />
               )}
@@ -410,15 +416,15 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                 currencyName={info.currencyName}
                 size={14}
                 amtZec={calculatedFee}
-                privacy={privacy}
+                privacy={false}
               />
-              {isMainChain && (
+              {quote.kind === 'quote' && (
                 <CurrencyAmount
                   style={{ fontSize: 18 }}
                   amtZec={calculatedFee}
-                  price={zecPrice.zecPrice}
-                  priceDate={zecPrice.date}
-                  privacy={privacy}
+                  price={quote.price}
+                  priceDate={quote.date}
+                  privacy={false}
                 />
               )}
             </View>
@@ -448,15 +454,15 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                       currencyName={info.currencyName}
                       size={14}
                       amtZec={Utils.parseStringLocaleToNumberFloat(to.amount)}
-                      privacy={privacy}
+                      privacy={false}
                     />
-                    {isMainChain && (
+                    {quote.kind === 'quote' && (
                       <CurrencyAmount
                         style={{ fontSize: 18 }}
                         amtZec={Utils.parseStringLocaleToNumberFloat(to.amount)}
-                        price={zecPrice.zecPrice}
-                        priceDate={zecPrice.date}
-                        privacy={privacy}
+                        price={quote.price}
+                        priceDate={quote.date}
+                        privacy={false}
                       />
                     )}
                   </View>

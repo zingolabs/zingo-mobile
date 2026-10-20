@@ -34,7 +34,7 @@ import {
   ContextAppLoadedProvider,
   defaultAppContextLoaded,
 } from '@app/context';
-import { ModeEnum, RouteEnum } from '@app/AppState';
+import { RouteEnum } from '@app/AppState';
 import {
   usePriceFetcherStore,
   usePriceHealth,
@@ -79,7 +79,6 @@ const sendUi = (zecPrice: { zecPrice: number; date: number }) => {
   state.server = mockServer;
   state.totalBalance = mockTotalBalance;
   state.sendPageState = mockSendPageState;
-  state.mode = ModeEnum.advanced;
   state.zecPrice = zecPrice;
   return (
     <ContextAppLoadedProvider value={state}>
@@ -92,7 +91,6 @@ const sendUi = (zecPrice: { zecPrice: number; date: number }) => {
         setScrollToTop={onFunction}
         setScrollToBottom={onFunction}
         setServerOption={onFunction}
-        setSecurityOption={onFunction}
       />
     </ContextAppLoadedProvider>
   );
@@ -104,6 +102,7 @@ beforeEach(() => {
     nextFetchAt: 0,
     nextFetchDelayMs: 0,
     surfaceActive: false,
+    failed: false,
   });
   healthHook.mockImplementation(priceDate =>
     priceDate === 0
@@ -151,9 +150,8 @@ test('N7: the send-confirmation conversions dim on a stale price too', () => {
   state.totalBalance = mockTotalBalance;
   state.server = mockServer;
   state.sendPageState = mockSendPageState;
-  state.mode = ModeEnum.advanced;
   state.zecPrice = { zecPrice: 33.33, date: Date.now() - 40 * 60_000 };
-  state.security = { ...state.security, sendConfirm: false };
+  state.biometrics = false;
   const confirmProps: React.ComponentProps<typeof Confirm> = {
     navigation: mockNavigation,
     route: {
@@ -194,4 +192,21 @@ test('H3: the USD-entry derived ZEC amount dims on a stale price', () => {
     .find(z => z.props.testID === 'send.zec-derived');
   expect(derived).toBeTruthy();
   expect(derived?.props.color).toBe('#888888');
+});
+
+test('the amount being typed shows in both currencies with privacy on', () => {
+  const ui = sendUi({ zecPrice: 33.33, date: Date.now() });
+  const view = render(
+    <ContextAppLoadedProvider value={{ ...ui.props.value, privacy: true }}>
+      {ui.props.children}
+    </ContextAppLoadedProvider>,
+  );
+
+  const { StyleSheet } = require('react-native');
+  // A masked amount reads "$ -.--"; a shown one starts with a digit.
+  const derived = view
+    .queryAllByText(/^\$ \d/)
+    .map(t => StyleSheet.flatten(t.props.style))
+    .filter((s: { fontSize?: number }) => s.fontSize === 16);
+  expect(derived.length).toBeGreaterThan(0);
 });

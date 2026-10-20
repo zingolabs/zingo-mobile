@@ -3,7 +3,7 @@ import { View, Text, Pressable, ScrollView, StyleSheet } from 'react-native';
 import RNRestart from 'react-native-restart';
 
 import RPCModule from './RPCModule';
-import { advancedTokens } from './theme';
+import { themeTokens } from './theme';
 import { sendEmail } from './services/sendEmail';
 import { TranslateType } from './AppState';
 import { sanitizePaths } from './utils/sanitizePaths';
@@ -135,13 +135,13 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   title: {
-    color: advancedTokens.fgDefault,
+    color: themeTokens.fgDefault,
     fontSize: 22,
     fontWeight: 'bold',
     marginBottom: 12,
   },
   message: {
-    color: advancedTokens.fgMuted,
+    color: themeTokens.fgMuted,
     fontSize: 15,
     textAlign: 'center',
     marginBottom: 8,
@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   versionLine: {
-    color: advancedTokens.fgMuted,
+    color: themeTokens.fgMuted,
     fontSize: 13,
   },
   detailsBox: {
@@ -168,13 +168,13 @@ const styles = StyleSheet.create({
     paddingBottom: 4,
   },
   detailsHeader: {
-    color: advancedTokens.fgDefault,
+    color: themeTokens.fgDefault,
     fontSize: 13,
     fontFamily: 'monospace',
     marginBottom: 6,
   },
   detailsStack: {
-    color: advancedTokens.fgMuted,
+    color: themeTokens.fgMuted,
     fontSize: 11,
     fontFamily: 'monospace',
     lineHeight: 14,
@@ -188,7 +188,7 @@ const styles = StyleSheet.create({
   button: {
     // The boundary renders when the tree (and its providers) may be broken, so
     // it reads the advanced accent statically instead of following the mode.
-    backgroundColor: advancedTokens.bgAccent,
+    backgroundColor: themeTokens.bgAccent,
     paddingHorizontal: 18,
     paddingVertical: 14,
     borderRadius: 8,
@@ -197,7 +197,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#37548a',
   },
   buttonText: {
-    color: advancedTokens.fgDefault,
+    color: themeTokens.fgDefault,
     fontSize: 16,
     fontWeight: 'bold',
   },

@@ -5,8 +5,6 @@ import { getNumberFormatSettings } from 'react-native-localize';
 import Animated, {
   Easing,
   FadeIn,
-  FadeOut,
-  LinearTransition,
   ReduceMotion,
   useAnimatedStyle,
   useSharedValue,
@@ -18,6 +16,7 @@ import { useTheme } from '@app/theme';
 import SegmentedBar from '@ui/primitives/SegmentedBar';
 import { ContextAppLoaded } from '@app/context';
 import Utils from '@app/utils';
+import { NOTICE_RADIUS } from '@ui/widgets/NoticeStack';
 import { RouteEnum } from '@app/AppState';
 import { migrationStatus, reconcileMigration } from '@app/walletBackend';
 import {
@@ -31,11 +30,8 @@ const PRESS_SCALE = 0.97;
 const PRESS_MS = 160;
 const STATUS_FADE_MS = 200;
 
-// Colour and opacity are what reduced motion keeps, so the fades run either
-// way. The height change between the two variants is movement, and does not.
-const bannerLayout = () =>
-  LinearTransition.duration(260).reduceMotion(ReduceMotion.System);
-const bannerExit = () => FadeOut.duration(140).reduceMotion(ReduceMotion.Never);
+// Colour and opacity are what reduced motion keeps, so the fade runs either
+// way.
 const variantEnter = () =>
   FadeIn.duration(200).reduceMotion(ReduceMotion.Never);
 
@@ -322,13 +318,9 @@ const IronwoodMigrationBanner: React.FunctionComponent<
         : colors.fgWarning;
 
     return (
-      <Animated.View
-        style={{ paddingHorizontal: 12, paddingTop: 6, paddingBottom: 12 }}
-        layout={bannerLayout()}
-        exiting={bannerExit()}
-      >
+      <>
         {/* Keyed so the swap between variants remounts the card and fades it
-            in, while the wrapper above persists and eases the height gap. */}
+            in. The notice stack eases the height change. */}
         <Animated.View key="inflight" entering={variantEnter()}>
           <PressScale
             testID="ironwoodbanner.resume"
@@ -337,7 +329,7 @@ const IronwoodMigrationBanner: React.FunctionComponent<
               backgroundColor: colors.bgSurface,
               borderColor: colors.bottomSheetBorder,
               borderWidth: 1,
-              borderRadius: 16,
+              borderRadius: NOTICE_RADIUS,
               paddingHorizontal: 18,
               paddingVertical: 12,
             }}
@@ -353,6 +345,8 @@ const IronwoodMigrationBanner: React.FunctionComponent<
             >
               <Text
                 style={{
+                  flexShrink: 1,
+                  marginRight: 12,
                   color: colors.fgMuted,
                   fontSize: 14,
                   fontWeight: '700',
@@ -419,7 +413,14 @@ const IronwoodMigrationBanner: React.FunctionComponent<
                 marginBottom: 8,
               }}
             >
-              <Text style={{ color: colors.fgMuted, fontSize: 13 }}>
+              <Text
+                style={{
+                  flexShrink: 1,
+                  marginRight: 12,
+                  color: colors.fgMuted,
+                  fontSize: 13,
+                }}
+              >
                 {translate('ironwoodbanner.next-action-label') as string}
               </Text>
               <StatusPill color={nextActionColor} label={nextActionText} />
@@ -433,10 +434,18 @@ const IronwoodMigrationBanner: React.FunctionComponent<
                 justifyContent: 'space-between',
               }}
             >
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  flexShrink: 1,
+                  marginRight: 12,
+                }}
+              >
                 <StatusDot color={statusColor} size={10} />
                 <Text
                   style={{
+                    flexShrink: 1,
                     color: colors.fgDefault,
                     fontSize: 14,
                     fontWeight: '700',
@@ -451,17 +460,13 @@ const IronwoodMigrationBanner: React.FunctionComponent<
             </View>
           </PressScale>
         </Animated.View>
-      </Animated.View>
+      </>
     );
   }
 
   // ----- Default variant -----
   return (
-    <Animated.View
-      style={{ paddingHorizontal: 12, paddingTop: 0, paddingBottom: 18 }}
-      layout={bannerLayout()}
-      exiting={bannerExit()}
-    >
+    <>
       <Animated.View key="default" entering={variantEnter()}>
         {/* Orchard pool card with the Start action */}
         <View
@@ -472,7 +477,7 @@ const IronwoodMigrationBanner: React.FunctionComponent<
             backgroundColor: colors.bgSurface,
             borderColor: colors.bottomSheetBorder,
             borderWidth: 1,
-            borderRadius: 12,
+            borderRadius: NOTICE_RADIUS,
             paddingHorizontal: 16,
             paddingVertical: 14,
           }}
@@ -496,6 +501,7 @@ const IronwoodMigrationBanner: React.FunctionComponent<
               />
               <Text
                 style={{
+                  flexShrink: 1,
                   color: colors.fgDefault,
                   fontSize: 15,
                   fontWeight: '700',
@@ -537,7 +543,7 @@ const IronwoodMigrationBanner: React.FunctionComponent<
           </PressScale>
         </View>
       </Animated.View>
-    </Animated.View>
+    </>
   );
 };
 

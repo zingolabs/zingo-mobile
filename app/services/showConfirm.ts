@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react';
+
 /**
  * Imperative confirmation-sheet trigger. Mirrors `Alert.alert`'s shape so
  * migrating call sites is mechanical, but the dialog is rendered as a
@@ -17,6 +19,10 @@ export type ConfirmOptions = {
   title: string;
   message?: string;
   messageAlign?: 'left' | 'center' | 'right';
+  // 'danger' sets the message in the warning red.
+  messageTone?: 'default' | 'danger';
+  // Shown under the message, before the buttons.
+  content?: ReactNode;
   buttons: ConfirmButton[];
 };
 

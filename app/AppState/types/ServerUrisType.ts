@@ -7,4 +7,7 @@ export default interface ServerUrisType {
   default: boolean;
   latency: number | null;
   obsolete: boolean;
+  // A Zaino server Zingo recommends: shown on the Server screen itself, and
+  // the only kind Automatic picks while one of them answers.
+  recommended?: boolean;
 }

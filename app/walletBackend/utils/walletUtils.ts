@@ -10,52 +10,44 @@
  * rejection channel (typed FFI errors); resolved values are data, never
  * inspected for an error sentinel.
  */
-import { WalletType, GlobalConst } from '@app/AppState';
+import {
+  WalletType,
+  GlobalConst,
+  ErrorKeyed,
+  errorKeyed,
+  ChainNameEnum,
+} from '@app/AppState';
 import RPCModule from '@app/RPCModule';
 import { callFfi, FfiResult } from '@app/walletBackend/ffi';
 import { serverUris } from '@app/uris';
 import { RPCZecPriceType } from '@app/walletBackend/types/RPCZecPriceType';
 import { RPCSeedType } from '@app/walletBackend/types/RPCSeedType';
 
-/**
- * Fetches the current ZEC/USD price from the zingolib price oracle.
- *
- * Price sentinel values:
- *   0   — initial/default (no price data yet)
- *  -1   — error inside zingolib (a typed FFI rejection, or an oracle error)
- *  -2   — malformed/empty success payload
- *  > 0  — real USD price
- */
-export async function getZecPrice(): Promise<{
-  price: number;
-  error: string;
-}> {
-  const result = await callFfi(RPCModule.zecPriceInfo());
-  if (!result.ok) {
-    return { price: -1, error: result.error.message };
-  }
-  if (!result.value) {
-    return { price: -2, error: 'Internal Error fetching price' };
-  }
+export type ZecPriceErrorKey =
+  'info.error-price-fetch' | 'info.error-price-payload';
+
+export type ZecPriceOutcome =
+  { kind: 'zecPrice'; usd: number } | ErrorKeyed<ZecPriceErrorKey>;
+
+/** Reads a price body as a quote only when its current_price is a positive, finite number. */
+export function parseZecQuote(body: string): ZecPriceOutcome {
+  let usd: unknown;
   try {
-    const resultJSON: RPCZecPriceType = JSON.parse(result.value);
-    if (resultJSON.error) {
-      return { price: -1, error: resultJSON.error };
-    }
-    if (!resultJSON.current_price) {
-      // if no exists the field or is empty
-      return { price: 0, error: '' };
-    }
-    if (isNaN(resultJSON.current_price)) {
-      return {
-        price: -1,
-        error: `Error fetching price ${resultJSON.current_price}`,
-      };
-    }
-    return { price: resultJSON.current_price, error: '' };
-  } catch (error) {
-    return { price: -2, error: `Critical Error fetching price ${error}` };
+    usd = (JSON.parse(body) as RPCZecPriceType).current_price;
+  } catch (error: unknown) {
+    return errorKeyed('info.error-price-payload', String(error));
   }
+  return typeof usd === 'number' && Number.isFinite(usd) && usd > 0
+    ? { kind: 'zecPrice', usd }
+    : errorKeyed('info.error-price-payload', String(usd));
+}
+
+/** Fetches the current ZEC/USD price, which zingolib carries over the mixnet. */
+export async function getZecPrice(): Promise<ZecPriceOutcome> {
+  const result = await callFfi(RPCModule.zecPriceInfo());
+  return result.ok
+    ? parseZecQuote(result.value)
+    : errorKeyed('info.error-price-fetch', result.error.message);
 }
 
 // ---------------------------------------------------------------------------
@@ -189,17 +181,13 @@ export async function loadExistingWallet(
   );
 }
 
-// Restores the wallet from its on-device backup file (the `.migrating`
-// twin EncryptedFile manages). The success value is the native "true"/"false"
-// data protocol.
-export async function restoreExistingWalletBackup(): Promise<
-  FfiResult<string>
-> {
-  return callFfi(RPCModule.restoreExistingWalletBackup());
+// Removes the wallet file from the device; the keys stay in the Keychain.
+export async function deleteExistingWallet(): Promise<FfiResult<string>> {
+  return callFfi(RPCModule.deleteExistingWallet());
 }
 
 /**
- * Whether a native save/backup resolution reports success. The bridges are
+ * Whether a native save resolution reports success. The bridges are
  * trimodal (zingo-mobile#1151): Android resolves boolean true/false, iOS
  * resolves "true"/"false", and both resolve "Error: ..." prose from their
  * catch blocks. Success is knowable only from the two success shapes; any
@@ -219,19 +207,6 @@ export async function doSave(): Promise<boolean> {
     return nativeSaveSucceeded(await RPCModule.doSave());
   } catch (error) {
     console.log(`Critical Error doSave ${error}`);
-    return false;
-  }
-}
-
-// Snapshots the wallet file to its on-device backup twin. Same contract as
-// doSave: the trimodal native resolution is classified at this seam and a
-// rejection is contained as false, so no caller ever awaits doSaveBackup
-// without failure handling (audit Issue P, scenario three).
-export async function doSaveBackup(): Promise<boolean> {
-  try {
-    return nativeSaveSucceeded(await RPCModule.doSaveBackup());
-  } catch (error) {
-    console.log(`Critical Error doSaveBackup ${error}`);
     return false;
   }
 }
@@ -263,11 +238,6 @@ export async function setConfigWalletToProd(
   return callFfi(
     RPCModule.setConfigWalletToProdProcess(performanceLevel, minConfirmations),
   );
-}
-
-// Tells zingolib which crypto provider (e.g. ring) to use. One-shot at boot.
-export async function setCryptoDefaultProvider(): Promise<FfiResult<string>> {
-  return callFfi(RPCModule.setCryptoDefaultProvider());
 }
 
 // ---------------------------------------------------------------------------
@@ -347,7 +317,7 @@ export async function planIronwoodMigration(): Promise<FfiResult<string>> {
 }
 
 // Phase 2 of the private migration. Called once quickSplit reports `complete`
-// (ADR 0016): the notes are fully split by then, so this binds the parts to
+// (zingolib/0016): the notes are fully split by then, so this binds the parts to
 // their notes and schedules them at once. Consent is captured post-split, so
 // `planHashHex` is the hash of a fresh planIronwoodMigration read taken here,
 // not the pre-split one. `perBucket` null keeps zingolib's default cadence
@@ -376,7 +346,7 @@ export async function continueNoteSplitting(): Promise<FfiResult<string>> {
 }
 
 // Phase 1 note splitting, the send-shaped replacement for the stateful
-// startIronwoodMigration + continueNoteSplitting driver (ADR 0016). One call
+// startIronwoodMigration + continueNoteSplitting driver (zingolib/0016). One call
 // does one round: it pauses sync, plans against current notes, builds and
 // broadcasts the round, and persists no migration state. Long-running like
 // drainOrchard (Halo2 proving), dispatched on the concurrent pool. Loop it —
@@ -481,6 +451,52 @@ export async function parseAddress(
   return callFfi(RPCModule.parseAddressInfo(address));
 }
 
+export type UfvkCheck =
+  | { kind: 'ufvk'; chainName: ChainNameEnum }
+  | { kind: 'invalid' }
+  | { kind: 'unknown' };
+
+const KEY_CHAINS: readonly string[] = [
+  ChainNameEnum.mainChainName,
+  ChainNameEnum.testChainName,
+  ChainNameEnum.regtestChainName,
+];
+
+// The chain the wallet file on this device was written for.
+export async function readWalletChain(): Promise<FfiResult<ChainNameEnum>> {
+  const result = await callFfi(RPCModule.walletChainInfo());
+  if (!result.ok) {
+    return result;
+  }
+  return KEY_CHAINS.includes(result.value)
+    ? { ok: true, value: result.value as ChainNameEnum }
+    : {
+        ok: false,
+        error: {
+          code: 'Unknown',
+          message: `unexpected wallet chain: ${result.value}`,
+        },
+      };
+}
+
+// Decodes a viewing key on the device, checksum included: a key with its
+// network, text that is not a key, or unknown when the native call failed.
+export async function checkUfvk(ufvk: string): Promise<UfvkCheck> {
+  const result = await callFfi(RPCModule.parseUfvkInfo(ufvk));
+  if (!result.ok) {
+    return { kind: 'unknown' };
+  }
+  try {
+    const info = JSON.parse(result.value);
+    if (info.status === 'success' && KEY_CHAINS.includes(info.chain_name)) {
+      return { kind: 'ufvk', chainName: info.chain_name as ChainNameEnum };
+    }
+    return { kind: 'invalid' };
+  } catch {
+    return { kind: 'unknown' };
+  }
+}
+
 // Aggregated lifetime spending metrics, used by the Insight pie chart.
 // Each helper's success value is a raw JSON map keyed by recipient address;
 // the caller parses it into { [address]: number }. The three flavors return:
@@ -566,6 +582,107 @@ export async function getLatestBlockServerInfo(
   serverUri: string,
 ): Promise<FfiResult<string>> {
   return callFfi(RPCModule.getLatestBlockServerInfo(serverUri));
+}
+
+// Where a probe sent its requests: the host as typed, the port, and the
+// addresses it resolved to (the host itself when it is an IP literal).
+export type ProbeTarget = {
+  host: string;
+  port: number;
+  resolved: string[];
+  literal: boolean;
+};
+
+// How far a wallet-less check of a server got (zingolib probe_server).
+export type ServerProbe =
+  | (ProbeTarget & {
+      outcome: 'verified';
+      latencyMs: number;
+      chainName: string;
+      blockHeight: number;
+      // The whole LightdInfo the server answered, for the Details view.
+      details: string;
+    })
+  | { outcome: 'unresolved'; host: string; port: number; cause: string }
+  | (ProbeTarget & { outcome: 'unreachable'; cause: string })
+  | (ProbeTarget & { outcome: 'noAnswer'; afterSeconds: number })
+  | (ProbeTarget & { outcome: 'refused'; cause: string });
+
+function probeTarget(report: Record<string, unknown>): ProbeTarget {
+  return {
+    host: String(report.host ?? ''),
+    port: Number(report.port ?? 0),
+    resolved: Array.isArray(report.resolved) ? report.resolved.map(String) : [],
+    literal: report.literal === true,
+  };
+}
+
+/** zingolib reports the LightdInfo as a JSON object; String() of it read "[object Object]". */
+function detailsText(details: unknown): string {
+  if (details === undefined || details === null) {
+    return '';
+  }
+  return typeof details === 'string'
+    ? details
+    : JSON.stringify(details, null, 2);
+}
+
+function toServerProbe(report: Record<string, unknown>): ServerProbe | null {
+  const cause = String(report.cause ?? '');
+  switch (report.outcome) {
+    case 'verified':
+      return {
+        ...probeTarget(report),
+        outcome: 'verified',
+        latencyMs: Number(report.latency_ms ?? 0),
+        chainName: String(report.chain_name ?? ''),
+        blockHeight: Number(report.block_height ?? 0),
+        details: detailsText(report.details),
+      };
+    case 'unresolved':
+      return {
+        outcome: 'unresolved',
+        host: String(report.host ?? ''),
+        port: Number(report.port ?? 0),
+        cause,
+      };
+    case 'unreachable':
+      return { ...probeTarget(report), outcome: 'unreachable', cause };
+    case 'noAnswer':
+      return {
+        ...probeTarget(report),
+        outcome: 'noAnswer',
+        afterSeconds: Number(report.after_seconds ?? 0),
+      };
+    case 'refused':
+      return { ...probeTarget(report), outcome: 'refused', cause };
+    default:
+      return null;
+  }
+}
+
+// Checks a server without a wallet: resolves its host, connects and asks for
+// its LightdInfo. A URI zingolib cannot use arrives as an InvalidInput error.
+export async function probeServer(
+  serverUri: string,
+): Promise<FfiResult<ServerProbe>> {
+  const result = await callFfi(RPCModule.probeServerInfo(serverUri));
+  if (!result.ok) {
+    return result;
+  }
+  try {
+    const probe = toServerProbe(JSON.parse(result.value));
+    if (probe) {
+      return { ok: true, value: probe };
+    }
+  } catch {}
+  return {
+    ok: false,
+    error: {
+      code: 'Unknown',
+      message: `unexpected probe report: ${result.value}`,
+    },
+  };
 }
 
 // Pre-calculates the shielding fee and shieldable amount without broadcasting.

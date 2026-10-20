@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { TouchableOpacity, View } from 'react-native';
 import Animated, {
   Easing,
@@ -17,26 +17,48 @@ import { useTheme } from '@app/theme';
 import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
-  ChainNameEnum,
-  ModeEnum,
   RouteEnum,
-  SelectServerEnum,
+  ServerType,
   SnackbarDurationEnum,
   TranslateType,
 } from '@app/AppState';
 import TotalBalanceClass from '@app/AppState/classes/TotalBalanceClass';
 import InfoType from '@app/AppState/types/InfoType';
+import { fiatQuote } from '@app/price/fiatQuote';
 import ZecPriceType from '@app/AppState/types/ZecPriceType';
+import {
+  MixnetView,
+  sendGateOpen,
+  shownStatusKey,
+} from '@app/walletBackend/transforms/mixnetView';
 import Utils from '@app/utils';
 import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
-import CurrencyAmount from '@ui/widgets/CurrencyAmount';
+import CurrencyAmount, { PriceTint } from '@ui/widgets/CurrencyAmount';
 import FadeText from '@ui/primitives/FadeText';
-import PriceFetcher from '@ui/widgets/PriceFetcher';
+import PriceFetcher, { usePriceRing } from '@ui/widgets/PriceFetcher';
 import RegText from '@ui/primitives/RegText';
 import ZecAmount from '@ui/widgets/ZecAmount';
 import PrivacyToggle from './PrivacyToggle';
 
 const BALANCE_BOTTOM_GAP = 20;
+const TINT_HOLD_MS = 900;
+
+// Green or red for a moment after the price moves, by its direction.
+const usePriceTint = (price: number): PriceTint => {
+  const [tint, setTint] = useState<PriceTint>('none');
+  const last = useRef(price);
+  useEffect(() => {
+    const before = last.current;
+    last.current = price;
+    if (before <= 0 || price <= 0 || price === before) {
+      return;
+    }
+    setTint(price > before ? 'up' : 'down');
+    const t = setTimeout(() => setTint('none'), TINT_HOLD_MS);
+    return () => clearTimeout(t);
+  }, [price]);
+  return tint;
+};
 const REVEAL_MS = 220;
 const REVEAL_EASE = Easing.bezier(0.23, 1, 0.32, 1);
 
@@ -55,7 +77,6 @@ const materialize: EntryExitAnimationFunction = () => {
 
 type BalanceRowProps = {
   noBalance: boolean | undefined;
-  mode: ModeEnum;
   noPrivacy: boolean | undefined;
   setPrivacyOption: ((value: boolean) => Promise<void>) | undefined;
   addLastSnackbar:
@@ -65,7 +86,7 @@ type BalanceRowProps = {
   totalBalance: TotalBalanceClass | null;
   info: InfoType;
   zecPrice: ZecPriceType;
-  selectServer: SelectServerEnum;
+  server: ServerType;
   showShieldButton: boolean;
   shieldingFee: number;
   valueTransfersTotal: number | null;
@@ -74,13 +95,13 @@ type BalanceRowProps = {
   calculateDisableButtonToShield: () => boolean;
   onPressShieldFunds: () => void;
   receivedLegend: boolean | undefined;
+  mixnetView: MixnetView;
   onUsdRowLayout?: (height: number) => void;
 };
 
 const BalanceRow: React.FC<BalanceRowProps> = React.memo(
   ({
     noBalance,
-    mode,
     noPrivacy,
     setPrivacyOption,
     addLastSnackbar,
@@ -89,7 +110,7 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
     totalBalance,
     info,
     zecPrice,
-    selectServer,
+    server,
     showShieldButton,
     shieldingFee,
     valueTransfersTotal,
@@ -98,16 +119,41 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
     calculateDisableButtonToShield,
     onPressShieldFunds,
     receivedLegend,
+    mixnetView,
     onUsdRowLayout,
   }) => {
     const navigation = useNavigation<NavigationProp<ParamListBase>>();
     const { colors } = useTheme();
     const reducedMotion = useReducedMotion();
-    const showFiat =
-      !noBalance &&
-      selectServer !== SelectServerEnum.offline &&
-      info.chainName === ChainNameEnum.mainChainName &&
-      zecPrice.date > 0;
+    const quote = fiatQuote(zecPrice, server, info.chainName);
+    const showFiat = !noBalance && quote.kind === 'quote';
+    const ring = usePriceRing();
+    const tint = usePriceTint(quote.kind === 'quote' ? quote.price : 0);
+    const fiatTotal = totalBalance
+      ? totalBalance.totalIronwoodBalance +
+        totalBalance.totalOrchardBalance +
+        totalBalance.totalSaplingBalance +
+        totalBalance.totalTransparentBalance
+      : 0;
+    const updatedAt =
+      quote.kind === 'quote' && quote.date
+        ? new Date(quote.date).toLocaleTimeString([], {
+            hour: 'numeric',
+            minute: '2-digit',
+          })
+        : '';
+    const fiatLabel = [
+      privacy || quote.kind !== 'quote'
+        ? ''
+        : '$ ' +
+          Utils.parseNumberFloatToStringLocale(quote.price * fiatTotal, 2),
+      translate(ring.labelKey) as string,
+      updatedAt
+        ? (translate('header.lastupdate') as string) + ' ' + updatedAt
+        : '',
+    ]
+      .filter(part => !!part)
+      .join('. ');
 
     return (
       <>
@@ -122,17 +168,14 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
               marginBottom: showFiat ? 0 : BALANCE_BOTTOM_GAP,
             }}
           >
-            {mode !== ModeEnum.basic &&
-              !noPrivacy &&
-              setPrivacyOption &&
-              addLastSnackbar && (
-                <PrivacyToggle
-                  privacy={privacy}
-                  setPrivacyOption={setPrivacyOption}
-                  addLastSnackbar={addLastSnackbar}
-                  translate={translate}
-                />
-              )}
+            {!noPrivacy && setPrivacyOption && addLastSnackbar && (
+              <PrivacyToggle
+                privacy={privacy}
+                setPrivacyOption={setPrivacyOption}
+                addLastSnackbar={addLastSnackbar}
+                translate={translate}
+              />
+            )}
             <ZecAmount
               currencyName={info.currencyName}
               color={colors.fgDefault}
@@ -148,8 +191,7 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
               privacy={privacy}
               smallPrefix={true}
             />
-            {mode !== ModeEnum.basic &&
-              totalBalance &&
+            {totalBalance &&
               (totalBalance.totalOrchardBalance !==
                 totalBalance.confirmedOrchardBalance ||
                 totalBalance.totalIronwoodBalance > 0 ||
@@ -222,23 +264,19 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
           <Animated.View
             entering={reducedMotion ? FadeIn.duration(REVEAL_MS) : materialize}
             onLayout={e => onUsdRowLayout?.(e.nativeEvent.layout.height)}
+            accessible
+            accessibilityLabel={fiatLabel}
             style={{ flexDirection: 'row', alignItems: 'center' }}
           >
             <CurrencyAmount
               style={{ marginTop: 0, marginBottom: 0 }}
-              priceDate={zecPrice.date}
-              price={zecPrice.zecPrice}
-              amtZec={
-                totalBalance
-                  ? totalBalance.totalIronwoodBalance +
-                    totalBalance.totalOrchardBalance +
-                    totalBalance.totalSaplingBalance +
-                    totalBalance.totalTransparentBalance
-                  : 0
-              }
+              priceDate={quote.date}
+              price={quote.price}
+              amtZec={fiatTotal}
               privacy={privacy}
+              tint={tint}
             />
-            <View style={{ marginLeft: 5 }}>
+            <View style={{ marginLeft: 11 }}>
               <PriceFetcher />
             </View>
           </Animated.View>
@@ -249,16 +287,30 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
           !calculateDisableButtonToShield() &&
           valueTransfersTotal !== null && (
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-              <FadeText style={{ fontSize: 8 }}>
-                {(translate(
-                  `history.shield-legend-${calculatePoolsToShield()}`,
-                ) as string) +
-                  ` ${calculateAmountToShield()} ` +
-                  (translate('send.fee') as string) +
-                  ': ' +
-                  Utils.parseNumberFloatToStringLocale(shieldingFee, 8) +
-                  ' '}
-              </FadeText>
+              {mixnetView.kind === 'transport' && mixnetView.sendBlocked ? (
+                <View
+                  style={{ alignItems: 'center' }}
+                  testID="header.shield-blocked"
+                >
+                  <FadeText style={{ fontSize: 8 }}>
+                    {translate('send.nym-blocked') as string}
+                  </FadeText>
+                  <FadeText style={{ fontSize: 8 }}>
+                    {translate(shownStatusKey(mixnetView)) as string}
+                  </FadeText>
+                </View>
+              ) : (
+                <FadeText style={{ fontSize: 8 }}>
+                  {(translate(
+                    `history.shield-legend-${calculatePoolsToShield()}`,
+                  ) as string) +
+                    ` ${calculateAmountToShield()} ` +
+                    (translate('send.fee') as string) +
+                    ': ' +
+                    Utils.parseNumberFloatToStringLocale(shieldingFee, 8) +
+                    ' '}
+                </FadeText>
+              )}
               <View style={{ margin: 5, flexDirection: 'row' }}>
                 <Button
                   testID="header.shield"
@@ -269,7 +321,7 @@ const BalanceRow: React.FC<BalanceRowProps> = React.memo(
                     ) as string
                   }
                   onPress={onPressShieldFunds}
-                  disabled={calculateDisableButtonToShield()}
+                  disabled={!sendGateOpen(mixnetView)}
                 />
               </View>
             </View>

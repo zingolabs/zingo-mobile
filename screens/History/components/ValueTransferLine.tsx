@@ -30,7 +30,6 @@ import {
   SendPageStateClass,
   ToAddrClass,
   RouteEnum,
-  SelectServerEnum,
   ScreenEnum,
 } from '@app/AppState';
 
@@ -73,7 +72,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
     info,
     showSwipeableIcons,
     readOnly,
-    selectServer,
+    server,
     setSendPageState,
   } = context;
   const { colors } = useTheme();
@@ -164,39 +163,37 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                 />
               </TouchableOpacity>
             </View>
-            {!!vt.address &&
-              !readOnly &&
-              selectServer !== SelectServerEnum.offline && (
-                <View
-                  style={{
-                    width: 67,
-                    justifyContent: 'center',
-                    alignItems: 'center',
+            {!!vt.address && !readOnly && server.kind !== 'offline' && (
+              <View
+                style={{
+                  width: 67,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+              >
+                <TouchableOpacity
+                  style={{ zIndex: 999, padding: 20 }}
+                  onPress={() => {
+                    // enviar
+                    const sendPageState = new SendPageStateClass(
+                      new ToAddrClass(0),
+                    );
+                    sendPageState.toaddr.to = vt.address ? vt.address : '';
+                    setSendPageState(sendPageState);
+                    navigation.navigate(RouteEnum.HomeStack, {
+                      screen: RouteEnum.Send,
+                    });
+                    closeAllSwipeables();
                   }}
                 >
-                  <TouchableOpacity
-                    style={{ zIndex: 999, padding: 20 }}
-                    onPress={() => {
-                      // enviar
-                      const sendPageState = new SendPageStateClass(
-                        new ToAddrClass(0),
-                      );
-                      sendPageState.toaddr.to = vt.address ? vt.address : '';
-                      setSendPageState(sendPageState);
-                      navigation.navigate(RouteEnum.HomeStack, {
-                        screen: RouteEnum.Send,
-                      });
-                      closeAllSwipeables();
-                    }}
-                  >
-                    <FontAwesomeIcon
-                      size={24}
-                      icon={faPaperPlane}
-                      color={colors.fgAccent}
-                    />
-                  </TouchableOpacity>
-                </View>
-              )}
+                  <FontAwesomeIcon
+                    size={24}
+                    icon={faPaperPlane}
+                    color={colors.fgAccent}
+                  />
+                </TouchableOpacity>
+              </View>
+            )}
           </Animated.View>
         )}
       </>

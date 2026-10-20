@@ -17,6 +17,7 @@ import java.io.File
  * `encryptedLegacy`, the double wrap repairs back to plain bytes, and a
  * restore over an undecryptable main keeps the raw evidence aside.
  */
+@OfflineDeviceTest
 class WalletFileRepairTest {
     private val fileName = Constants.WalletFileName.value
     private val backupName = Constants.WalletBackupFileName.value
@@ -77,8 +78,7 @@ class WalletFileRepairTest {
         File(context.filesDir, backupName).delete()
         File(context.filesDir, swapName).delete()
         uniffi.zingo.initLogging()
-        uniffi.zingo.setCryptoDefaultProviderToRing()
-        uniffi.zingo.initFromSeed(Seeds.HOSPITAL, 2000000u, "", "main", "Medium", 1u)
+        uniffi.zingo.initFromSeed(seed = Seeds.HOSPITAL, birthday = 2000000u, connection = testConnection("", "main"))
         plainWallet = uniffi.zingo.saveWalletBytes()!!
         walletFile().writeBytes(plainWallet)
         assertThat(state(fileName)).isEqualTo("plainWallet")

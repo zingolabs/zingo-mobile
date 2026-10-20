@@ -12,7 +12,7 @@ import {
 } from '@app/context';
 
 import AddressItem from '@ui/widgets/AddressItem';
-import { ModeEnum, ScreenEnum } from '@app/AppState';
+import { ScreenEnum } from '@app/AppState';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockAddressBook } from '../__mocks__/dataMocks/mockAddressBook';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
@@ -24,7 +24,6 @@ const baseState = () => {
   state.translate = mockTranslate;
   state.addressBook = mockAddressBook;
   state.totalBalance = mockTotalBalance;
-  state.mode = ModeEnum.advanced;
   return state;
 };
 

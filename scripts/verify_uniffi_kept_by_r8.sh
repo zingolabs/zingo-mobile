@@ -20,7 +20,7 @@
 set -euo pipefail
 
 gbd=$(git rev-parse --show-toplevel)
-generated_root="${gbd}/android/app/build/generated/source/uniffi"
+generated_root="${gbd}/zingolib/bindings/android/build/binding-layer/kotlin"
 
 if [[ $# -eq 0 ]]; then
   echo "usage: $(basename "$0") <apk> [<apk> ...]" >&2
@@ -38,11 +38,11 @@ while IFS= read -r kt; do
   [[ -n "${seen_pkg[${pkg}]:-}" ]] && continue
   seen_pkg[${pkg}]=1
   bindings+=("${kt}")
-done < <(find "${generated_root}" -type f -path '*/java/uniffi/*' -name '*.kt' | sort -u)
+done < <(find "${generated_root}" -type f -path '*/uniffi/*' -name '*.kt' | sort -u)
 
 if [[ ${#bindings[@]} -eq 0 ]]; then
   echo "no generated uniffi bindings under ${generated_root}" >&2
-  echo "run the uniffi generation step before this check" >&2
+  echo "build the app first; the zingo-binding-layer build writes them" >&2
   exit 1
 fi
 

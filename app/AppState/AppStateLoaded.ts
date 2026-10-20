@@ -7,17 +7,15 @@ export default interface AppStateLoaded {
   appStateStatus: AppStateStatus;
 
   // change server helper
-  newServer: ServerType;
-  newSelectServer: SelectServerEnum | null;
+  pendingServer:
+    | { kind: 'none' }
+    | { kind: 'pending'; server: ServerType; selectServer: SelectServerEnum };
 
   // to do scroll to top in history
   scrollToTop: boolean;
 
   // to do scroll to bottom in messages
   scrollToBottom: boolean;
-
-  // to know if the modal is open or not
-  isSeedViewModalOpen: boolean;
 
   // Address+ownership pair for the shared "Add Tag/Contact" BottomSheetModal
   // hosted at LoadedApp level. `null` while hidden.

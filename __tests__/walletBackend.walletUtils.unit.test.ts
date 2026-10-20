@@ -1,10 +1,8 @@
 /**
  * The rewritten walletUtils seams (zingo-mobile#1151): the boolean
- * collapses, the price sentinels, and the backup-restore path. The
- * regression pinned hardest here: a rejected restoreExistingWalletBackup
- * must read as failure — before the typed surface, the rejection became
- * "Error: ..." prose that the caller's truthiness check misread as
- * success and opened a wallet that was never restored.
+ * collapses and the price sentinels. A rejection must read as failure —
+ * before the typed surface, it became "Error: ..." prose that a caller's
+ * truthiness check misread as success.
  */
 // Every member of the mocked bridge is a lazily created jest.fn, so a future
 // import-time touch of some other RPCModule member cannot break this suite.
@@ -23,8 +21,8 @@ import {
   fetchWallet,
   getZecPrice,
   isWalletAddress,
+  parseZecQuote,
   resolvedTrue,
-  restoreExistingWalletBackup,
   walletBackupExists,
   walletExists,
 } from '@app/walletBackend/utils/walletUtils';
@@ -56,27 +54,6 @@ describe('resolvedTrue collapses the native "true"/"false" protocol', () => {
   });
 });
 
-describe('the backup-restore regression (the latent bug)', () => {
-  it('a rejected restore crosses as ok:false, never as resolved prose', async () => {
-    bridge.restoreExistingWalletBackup.mockReturnValueOnce(
-      typedRejection('Unknown', 'Error: could not read the backup'),
-    );
-    const result = await restoreExistingWalletBackup();
-    expect(result.ok).toBe(false);
-    expect(resolvedTrue(result)).toBe(false);
-  });
-
-  it('a "false" restore resolution reads as failure', async () => {
-    bridge.restoreExistingWalletBackup.mockResolvedValueOnce('false');
-    expect(resolvedTrue(await restoreExistingWalletBackup())).toBe(false);
-  });
-
-  it('only a "true" restore resolution reads as success', async () => {
-    bridge.restoreExistingWalletBackup.mockResolvedValueOnce('true');
-    expect(resolvedTrue(await restoreExistingWalletBackup())).toBe(true);
-  });
-});
-
 describe('the existence probes contain rejections as false', () => {
   it.each([
     ['walletExists', 'walletExists', walletExists],
@@ -91,22 +68,48 @@ describe('the existence probes contain rejections as false', () => {
   });
 });
 
-describe('getZecPrice maps outcomes to its documented sentinels', () => {
-  it.each([
-    ['a typed rejection', typedRejection('Indexer', 'oracle down'), -1],
-    ['an empty resolution', Promise.resolve(''), -2],
-    ['an { error } body', Promise.resolve('{"error":"no feed"}'), -1],
-    ['a body without a price', Promise.resolve('{}'), 0],
-    ['an unparseable body', Promise.resolve('not json'), -2],
-  ])('%s', async (_case, native, sentinel) => {
-    bridge.zecPriceInfo.mockReturnValueOnce(native);
-    const { price } = await getZecPrice();
-    expect(price).toBe(sentinel);
+describe('parseZecQuote reads only a positive, finite price as a quote', () => {
+  it('reads a real price as a quote', () => {
+    expect(parseZecQuote('{"current_price": 42.5}')).toEqual({
+      kind: 'zecPrice',
+      usd: 42.5,
+    });
   });
 
-  it('a real price crosses the data channel', async () => {
+  it.each([
+    ['an empty body', ''],
+    ['an unparseable body', 'not json'],
+    ['a null body', 'null'],
+    ['a body without a price', '{}'],
+    ['a null price', '{"current_price": null}'],
+    ['a zero price', '{"current_price": 0}'],
+    ['a negative price', '{"current_price": -1}'],
+    ['a price written as a string', '{"current_price": "42.5"}'],
+  ])('reads %s as a malformed payload', (_case, body) => {
+    expect(parseZecQuote(body)).toMatchObject({
+      kind: 'error',
+      errorKey: 'info.error-price-payload',
+    });
+  });
+});
+
+describe('getZecPrice answers on one typed outcome channel', () => {
+  it('a typed rejection fails under the fetch key', async () => {
+    bridge.zecPriceInfo.mockReturnValueOnce(
+      typedRejection('Indexer', 'oracle down'),
+    );
+    await expect(getZecPrice()).resolves.toEqual({
+      kind: 'error',
+      errorKey: 'info.error-price-fetch',
+      param: 'oracle down',
+    });
+  });
+
+  it('a resolved body is read by parseZecQuote', async () => {
     bridge.zecPriceInfo.mockResolvedValueOnce('{"current_price": 42.5}');
-    await expect(getZecPrice()).resolves.toEqual({ price: 42.5, error: '' });
+    await expect(getZecPrice()).resolves.toEqual(
+      parseZecQuote('{"current_price": 42.5}'),
+    );
   });
 });
 

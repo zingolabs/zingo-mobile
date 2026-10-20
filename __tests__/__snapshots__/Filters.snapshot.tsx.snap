@@ -446,13 +446,11 @@ exports[`Filters - snapshots Filters with active sent filter and memos 1`] = `
         style={
           {
             "alignItems": "center",
-            "backgroundColor": "#031124",
-            "borderColor": "#18bd18",
+            "backgroundColor": "transparent",
             "borderRadius": 24,
-            "borderWidth": 2,
             "justifyContent": "center",
             "maxWidth": "90%",
-            "minHeight": 48,
+            "minHeight": 44,
             "minWidth": "30%",
             "opacity": 1,
             "padding": 0,
@@ -470,7 +468,7 @@ exports[`Filters - snapshots Filters with active sent filter and memos 1`] = `
               "flexDirection": "row",
               "justifyContent": "center",
               "margin": 0,
-              "minHeight": 48,
+              "minHeight": 44,
               "minWidth": 48,
               "padding": 0,
             }
@@ -481,7 +479,7 @@ exports[`Filters - snapshots Filters with active sent filter and memos 1`] = `
               {
                 "color": "#18bd18",
                 "fontSize": 16,
-                "fontWeight": "600",
+                "fontWeight": "700",
                 "textAlign": "center",
                 "textTransform": "none",
               }
@@ -530,7 +528,7 @@ exports[`Filters - snapshots Filters with active sent filter and memos 1`] = `
             "justifyContent": "center",
             "marginLeft": 10,
             "maxWidth": "90%",
-            "minHeight": 48,
+            "minHeight": 44,
             "minWidth": "30%",
             "opacity": 1,
             "padding": 0,
@@ -548,7 +546,7 @@ exports[`Filters - snapshots Filters with active sent filter and memos 1`] = `
               "flexDirection": "row",
               "justifyContent": "center",
               "margin": 0,
-              "minHeight": 48,
+              "minHeight": 44,
               "minWidth": 48,
               "padding": 0,
             }
@@ -559,7 +557,7 @@ exports[`Filters - snapshots Filters with active sent filter and memos 1`] = `
               {
                 "color": "#011401",
                 "fontSize": 16,
-                "fontWeight": "600",
+                "fontWeight": "700",
                 "textAlign": "center",
                 "textTransform": "none",
               }
@@ -1020,13 +1018,11 @@ exports[`Filters - snapshots Filters with no active filters 1`] = `
         style={
           {
             "alignItems": "center",
-            "backgroundColor": "#031124",
-            "borderColor": "#18bd18",
+            "backgroundColor": "transparent",
             "borderRadius": 24,
-            "borderWidth": 2,
             "justifyContent": "center",
             "maxWidth": "90%",
-            "minHeight": 48,
+            "minHeight": 44,
             "minWidth": "30%",
             "opacity": 1,
             "padding": 0,
@@ -1044,7 +1040,7 @@ exports[`Filters - snapshots Filters with no active filters 1`] = `
               "flexDirection": "row",
               "justifyContent": "center",
               "margin": 0,
-              "minHeight": 48,
+              "minHeight": 44,
               "minWidth": 48,
               "padding": 0,
             }
@@ -1055,7 +1051,7 @@ exports[`Filters - snapshots Filters with no active filters 1`] = `
               {
                 "color": "#18bd18",
                 "fontSize": 16,
-                "fontWeight": "600",
+                "fontWeight": "700",
                 "textAlign": "center",
                 "textTransform": "none",
               }
@@ -1104,7 +1100,7 @@ exports[`Filters - snapshots Filters with no active filters 1`] = `
             "justifyContent": "center",
             "marginLeft": 10,
             "maxWidth": "90%",
-            "minHeight": 48,
+            "minHeight": 44,
             "minWidth": "30%",
             "opacity": 1,
             "padding": 0,
@@ -1122,7 +1118,7 @@ exports[`Filters - snapshots Filters with no active filters 1`] = `
               "flexDirection": "row",
               "justifyContent": "center",
               "margin": 0,
-              "minHeight": 48,
+              "minHeight": 44,
               "minWidth": 48,
               "padding": 0,
             }
@@ -1133,7 +1129,7 @@ exports[`Filters - snapshots Filters with no active filters 1`] = `
               {
                 "color": "#011401",
                 "fontSize": 16,
-                "fontWeight": "600",
+                "fontWeight": "700",
                 "textAlign": "center",
                 "textTransform": "none",
               }

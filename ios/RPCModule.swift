@@ -7,6 +7,7 @@
 
 import Foundation
 import React
+import ZingoBindings
 
 /// The outcome of an FFI call, classified by channel alone
 /// (zingo-mobile#1151): the value a call returns is resolved verbatim —
@@ -48,6 +49,7 @@ enum FfiOutcome {
     case .MigrationSplit(let message): return ("MigrationSplit", message)
     case .Migration(let message): return ("Migration", message)
     case .Mixnet(let message): return ("Mixnet", message)
+    case .WalletChainMismatch(let message): return ("WalletChainMismatch", message)
     }
   }
 
@@ -205,22 +207,20 @@ class RPCModule: NSObject {
     try FileManager.default.removeItem(atPath: getFileName(fileName))
   }
 
-  // Moves existing wallet files to the resting protection this build
+  // Moves the existing wallet file to the resting protection this build
   // writes: class C plus backup exclusion. Old builds wrote class A, and
   // a synced wallet can open without a save.
   func applyWalletFileProtection() {
     let fm = FileManager.default
-    for name in [Constants.WalletFileName.rawValue, Constants.WalletBackupFileName.rawValue] {
-      guard let path = try? getFileName(name), fm.fileExists(atPath: path) else { continue }
-      var fileURL = URL(fileURLWithPath: path)
-      var resourceValues = URLResourceValues()
-      resourceValues.isExcludedFromBackup = true
-      try? fileURL.setResourceValues(resourceValues)
-      try? fm.setAttributes(
-        [.protectionKey: FileProtectionType.completeUntilFirstUserAuthentication],
-        ofItemAtPath: path
-      )
-    }
+    guard let path = try? getFileName(Constants.WalletFileName.rawValue), fm.fileExists(atPath: path) else { return }
+    var fileURL = URL(fileURLWithPath: path)
+    var resourceValues = URLResourceValues()
+    resourceValues.isExcludedFromBackup = true
+    try? fileURL.setResourceValues(resourceValues)
+    try? fm.setAttributes(
+      [.protectionKey: FileProtectionType.completeUntilFirstUserAuthentication],
+      ofItemAtPath: path
+    )
   }
 
   // Audit Issue P (b) — wallet ↔ backup swap recovery.
@@ -321,14 +321,6 @@ class RPCModule: NSObject {
     }
   }
   
-  func saveWalletBackupFile(_ walletBytes: Data) throws {
-    do {
-      try writeFile(Constants.WalletBackupFileName.rawValue, walletBytes: walletBytes)
-    } catch {
-      throw FileError.writeFileError("Error: [Native] writting wallet backup file error: \(error.localizedDescription)")
-    }
-  }
-
   // The background sync state is written from BGAppRefreshTask paths in
   // AppDelegate while the device may be locked. It stays at the iOS
   // default protection class (`completeUntilFirstUserAuthentication`
@@ -414,36 +406,6 @@ class RPCModule: NSObject {
     }
   }
   
-  func fnDeleteExistingWalletBackup() throws {
-    completePendingSwap()
-    do {
-      try deleteFile(Constants.WalletBackupFileName.rawValue)
-    } catch {
-      throw FileError.deleteFileError("Error: [Native] deleting wallet backup error: \(error.localizedDescription)")
-    }
-  }
-
-  @objc(deleteExistingWalletBackup:reject:)
-  func deleteExistingWalletBackup(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-    do {
-      if try fileExists(Constants.WalletBackupFileName.rawValue) == "true" {
-        try self.fnDeleteExistingWalletBackup()
-        DispatchQueue.main.async {
-          resolve("true")
-        }
-      } else {
-        DispatchQueue.main.async {
-          resolve("false")
-        }
-      }
-    } catch {
-      NSLog("Error: [Native] deleting wallet backup\(error.localizedDescription)")
-      DispatchQueue.main.async {
-        resolve("false")
-      }
-    }
-  }
-
   // The FFI contract is structural (zingo-mobile#1151; audit Issue Q):
   // nil means no save was needed, bytes are the wallet export, and failure
   // throws. Nothing here classifies content — a malformed export is
@@ -489,8 +451,20 @@ class RPCModule: NSObject {
     }
   }
 
-  func saveWalletBackupInternal() throws {
-    try self.saveWalletBackupFile(try readWalletBytes())
+  private func syncSettings(performancelevel: String, minconfirmations: String) -> SyncSettings {
+    SyncSettings(performanceLevel: performancelevel, minConfirmations: UInt32(minconfirmations) ?? 0)
+  }
+
+  private func connection(
+    serveruri: String,
+    chainhint: String,
+    performancelevel: String,
+    minconfirmations: String
+  ) -> IndexerConnection {
+    IndexerConnection(
+      serverUri: serveruri,
+      chainHint: chainhint,
+      sync: syncSettings(performancelevel: performancelevel, minconfirmations: minconfirmations))
   }
 
   func fnCreateNewWallet(
@@ -503,7 +477,7 @@ class RPCModule: NSObject {
     // initNew throws on failure, so reaching the save implies the wallet
     // exists. Offline (empty serveruri) uses `birthday` in place of the
     // chain tip; online it is ignored (pass "0").
-    let seed = try initNew(serveruri: serveruri, birthday: UInt32(birthday) ?? 0, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: UInt32(minconfirmations) ?? 0)
+    let seed = try initNew(connection: connection(serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: minconfirmations), birthday: UInt32(birthday) ?? 0)
     reopenWalletFile()
     let seedStr = String(seed)
     try self.saveWalletInternal()
@@ -534,7 +508,7 @@ class RPCModule: NSObject {
     minconfirmations: String
   ) throws -> String {
     // initFromSeed throws on failure, so reaching the save implies the wallet exists.
-    let seed = try initFromSeed(seed: restoreSeed, birthday: UInt32(birthday) ?? 0, serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: UInt32(minconfirmations) ?? 0)
+    let seed = try initFromSeed(seed: restoreSeed, birthday: UInt32(birthday) ?? 0, connection: connection(serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: minconfirmations))
     let seedStr = String(seed)
     reopenWalletFile()
     try self.saveWalletInternal()
@@ -566,7 +540,7 @@ class RPCModule: NSObject {
     minconfirmations: String
   ) throws -> String {
     // initFromUfvk throws on failure, so reaching the save implies the wallet exists.
-    let ufvk = try initFromUfvk(ufvk: restoreUfvk, birthday: UInt32(birthday) ?? 0, serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: UInt32(minconfirmations) ?? 0)
+    let ufvk = try initFromUfvk(ufvk: restoreUfvk, birthday: UInt32(birthday) ?? 0, connection: connection(serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: minconfirmations))
     let ufvkStr = String(ufvk)
     reopenWalletFile()
     try self.saveWalletInternal()
@@ -595,7 +569,7 @@ class RPCModule: NSObject {
     performancelevel: String, 
     minconfirmations: String
   ) throws -> String {
-    let seed = try initFromBytes(walletBytes: try self.readWalletBytes(), serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: UInt32(minconfirmations) ?? 0)
+    let seed = try initFromBytes(walletBytes: try self.readWalletBytes(), connection: connection(serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: minconfirmations))
     reopenWalletFile()
     let seedStr = String(seed)
     return seedStr
@@ -673,6 +647,49 @@ class RPCModule: NSObject {
     }
   }
 
+  // The backup takes the main wallet's place and the backup file goes:
+  // for a wallet that is never backed up (not mainnet), which is lost.
+  // A crash between the write and the delete leaves the same wallet in
+  // both files, which is harmless.
+  @objc(replaceWalletWithBackup:reject:)
+  func replaceWalletWithBackup(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+    do {
+      let backupBytes = try self.readWalletBackupBytes()
+      guard (try? validateWalletBytes(walletBytes: backupBytes)) != nil else {
+        NSLog("Error: [Native] Couldn't replace the wallet with the backup. The content is not a wallet. Size: \(backupBytes.count)")
+        DispatchQueue.main.async {
+          resolve("false")
+        }
+        return
+      }
+      // Closed until the reload after the replace.
+      RPCModule.walletFileHold.lock()
+      RPCModule.walletFileClosed = true
+      RPCModule.walletFileHold.unlock()
+      self.completePendingSwap()
+      try self.saveWalletFile(backupBytes)
+      try? FileManager.default.removeItem(atPath: try getFileName(Constants.WalletBackupFileName.rawValue))
+      DispatchQueue.main.async {
+        resolve("true")
+      }
+    } catch {
+      NSLog("Error: [Native] Replacing the wallet with the backup error: \(error.localizedDescription)")
+      DispatchQueue.main.async {
+        resolve("false")
+      }
+    }
+  }
+
+  // The chain the wallet file was written for: main, test or regtest.
+  @objc(walletChainInfo:reject:)
+  func walletChainInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+    DispatchQueue.global(qos: .userInitiated).async {
+      FfiOutcome.of {
+        try readWalletChain(walletBytes: try self.readWalletBytes())
+      }.settle(resolve: resolve, reject: reject)
+    }
+  }
+
   // Salvages seed and birthday from the closed wallet file and keeps the
   // damaged file aside as ".broken".
   @objc(walletFileRecoveryInfo:reject:)
@@ -718,7 +735,6 @@ class RPCModule: NSObject {
     let fm = FileManager.default
     var files: [[String: Any]] = []
     for name in [Constants.WalletFileName.rawValue,
-                 Constants.WalletBackupFileName.rawValue,
                  Constants.WalletTempSwapFileName.rawValue] {
       var entry: [String: Any] = [
         "name": name,
@@ -772,21 +788,20 @@ class RPCModule: NSObject {
     }
   }
 
-  @objc(doSaveBackup:reject:)
-  func doSaveBackup(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-    DispatchQueue.global(qos: .userInitiated).async {
-      FfiOutcome.of {
-        try self.saveWalletBackupInternal()
-        return "true"
-      }.settle(resolve: resolve, reject: reject)
-    }
-  }
-
   @objc(getLatestBlockServerInfo:resolve:reject:)
   func getLatestBlockServerInfo(_ serveruri: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
       DispatchQueue.global(qos: .userInitiated).async {
         FfiOutcome.of {
           try getLatestBlockServer(serveruri: serveruri)
+        }.settle(resolve: resolve, reject: reject)
+      }
+  }
+
+  @objc(probeServerInfo:resolve:reject:)
+  func probeServerInfo(_ serveruri: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      DispatchQueue.global(qos: .userInitiated).async {
+        FfiOutcome.of {
+          try probeServer(serverUri: serveruri)
         }.settle(resolve: resolve, reject: reject)
       }
   }
@@ -827,15 +842,6 @@ class RPCModule: NSObject {
       }
   }
 
-  @objc(setCryptoDefaultProvider:reject:)
-  func setCryptoDefaultProvider(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      DispatchQueue.global(qos: .userInitiated).async {
-        FfiOutcome.of {
-          try setCryptoDefaultProviderToRing()
-        }.settle(resolve: resolve, reject: reject)
-      }
-  }
-
   // The app-supplied migration broadcast candidate pool (its indexer
   // registry); zingolib embeds no default set.
   @objc(setBroadcastCandidates:resolve:reject:)
@@ -867,6 +873,15 @@ class RPCModule: NSObject {
       }
   }
 
+  @objc(disableMixnet:reject:)
+  func disableMixnetProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      DispatchQueue.global(qos: .userInitiated).async {
+        FfiOutcome.of {
+          try disableMixnet()
+        }.settle(resolve: resolve, reject: reject)
+      }
+  }
+
   @objc(mixnetIndicatorInfo:reject:)
   func mixnetIndicatorInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
       DispatchQueue.global(qos: .userInitiated).async {
@@ -881,15 +896,6 @@ class RPCModule: NSObject {
       DispatchQueue.global(qos: .userInitiated).async {
         FfiOutcome.of {
           try mixnetBootstrapDetail()
-        }.settle(resolve: resolve, reject: reject)
-      }
-  }
-
-  @objc(setTransmitPolicy:resolve:reject:)
-  func setTransmitPolicyProcess(_ policy: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      DispatchQueue.global(qos: .userInitiated).async {
-        FfiOutcome.of {
-          try setTransmitPolicy(policy: policy)
         }.settle(resolve: resolve, reject: reject)
       }
   }
@@ -1011,9 +1017,16 @@ class RPCModule: NSObject {
   func getVersionInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
       DispatchQueue.global(qos: .userInitiated).async {
         FfiOutcome.of {
-          try getVersion()
+          "\(try getVersion())-\(RPCModule.zmDescriptor)"
         }.settle(resolve: resolve, reject: reject)
       }
+  }
+
+  // The zingo-mobile part of the build descriptor, which the app build writes
+  // into Info.plist; zm_unknown in a bundle the build did not describe.
+  static var zmDescriptor: String {
+    let value = Bundle.main.object(forInfoDictionaryKey: "ZingoMobileDescriptor") as? String ?? ""
+    return value.isEmpty ? "zm_unknown" : value
   }
 
   @objc(getMessagesInfo:resolve:reject:)
@@ -1173,7 +1186,7 @@ class RPCModule: NSObject {
   func setConfigWalletToProdProcess(_ performancelevel: String, minconfirmations: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
       DispatchQueue.global(qos: .userInitiated).async {
         FfiOutcome.of {
-          try setConfigWalletToProd(performancelevel: performancelevel, minconfirmations: UInt32(minconfirmations) ?? 0)
+          try setConfigWalletToProd(settings: self.syncSettings(performancelevel: performancelevel, minconfirmations: minconfirmations))
         }.settle(resolve: resolve, reject: reject)
       }
   }
@@ -1298,7 +1311,7 @@ class RPCModule: NSObject {
       }
   }
 
-  // Proves and broadcasts one Phase 1 splitting round (ADR 0016), so like the
+  // Proves and broadcasts one Phase 1 splitting round (zingolib/0016), so like the
   // drain it runs long; the global concurrent queue keeps it off the main
   // thread.
   @objc(quickSplitProcess:reject:)

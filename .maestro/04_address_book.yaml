@@ -1,0 +1,25 @@
+appId: org.ZingoLabs.Zingo
+---
+# Every flow starts from a clean install. Maestro does not run them in
+# file order — a nightly ran 04, 01, 02, 03 — so a flow that inherited
+# whatever the previous one left behind would pass or fail on luck.
+# A fresh install lands on the start menu, so each flow creates its own
+# wallet before it has an app to drive.
+- runFlow:
+    file: common/create_wallet.yaml
+
+# Open the options panel and navigate to Address Book
+- tapOn:
+    id: "header.drawmenu"
+- tapOn:
+    id: "menu.addressbook"
+- extendedWaitUntil:
+    visible:
+      id: "addressbook.scroll-view"
+    timeout: 10000
+
+# Verify the add-new-contact button is present
+- assertVisible:
+    id: "addressbook.button.new"
+
+- back

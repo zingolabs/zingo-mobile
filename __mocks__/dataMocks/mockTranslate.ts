@@ -16,8 +16,7 @@ export const mockTranslate = (p: string) => {
         "change": ["change"],
         "server": ["server"],
         "view": ["view"],
-        "restore": ["restore"],
-        "backup": ["backup"]
+        "restore": ["restore"]
       }`;
   } else if (p === 'settings.languages') {
     return [
@@ -42,17 +41,6 @@ export const mockTranslate = (p: string) => {
         text: 'text tr',
       },
     ];
-  } else if (p === 'settings.recoverywalletinfoondevices') {
-    return [
-      {
-        value: true,
-        text: 'text true',
-      },
-      {
-        value: false,
-        text: 'text false',
-      },
-    ];
   } else if (p === 'settings.performancelevels') {
     return [
       {
@@ -75,8 +63,8 @@ export const mockTranslate = (p: string) => {
   } else if (p === 'settings.blockexplorers') {
     return [
       {
-        value: BlockExplorerEnum.Cipherscan,
-        text: 'text Cipherscan',
+        value: BlockExplorerEnum.ZecBlock,
+        text: 'text ZecBlock',
       },
       {
         value: BlockExplorerEnum.Zcashexplorer,

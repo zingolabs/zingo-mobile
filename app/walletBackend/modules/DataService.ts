@@ -35,9 +35,21 @@ import { RPCWalletSaveRequiredType } from '@app/walletBackend/types/RPCWalletSav
 import { RPCConfigWalletPerformanceType } from '@app/walletBackend/types/RPCConfigWalletPerformanceType';
 import { RPCPerformanceLevelEnum } from '@app/walletBackend/enums/RPCPerformanceLevelEnum';
 import { RPCWalletVersionType } from '@app/walletBackend/types/RPCWalletVersionType';
-import { WalletBackendConfig } from '@app/walletBackend/config/WalletBackendConfig';
+import {
+  WalletBackendConfig,
+  isOffline,
+} from '@app/walletBackend/config/WalletBackendConfig';
 import { transformValueTransfer } from '@app/walletBackend/transforms/valueTransferTransform';
 import { fetchWallet } from '@app/walletBackend/utils/walletUtils';
+
+// The info a session publishes when no server answered.
+function emptyInfo(): InfoType {
+  return {
+    latestBlock: 0,
+    serverUri: '',
+    version: '',
+  } as InfoType;
+}
 
 export class DataService {
   config: WalletBackendConfig;
@@ -243,13 +255,25 @@ export class DataService {
     }
   }
 
+  private publishNoServerInfo(): void {
+    this.config.onInfoChanged(emptyInfo());
+    this.lastServerBlockHeight = 0;
+  }
+
   async fetchInfoAndServerHeight(): Promise<void> {
     if (this.fetchInfoAndServerHeightLock) {
       return;
     }
     this.fetchInfoAndServerHeightLock = true;
     try {
-      let infoError: boolean = false;
+      // No server, no info. The empty shape is what an unreadable answer
+      // already publishes; rejecting instead would reach the catch, and the
+      // catch calls onSyncError, which reconfigures — a loop with nothing at
+      // the end of it.
+      if (isOffline(this.config)) {
+        this.publishNoServerInfo();
+        return;
+      }
       const start = Date.now();
       const infoStr: string = await RPCModule.infoServerInfo();
       if (Date.now() - start > 4000) {
@@ -263,16 +287,7 @@ export class DataService {
       // — a programming error — is classified here.
       if (!infoStr) {
         console.log('Internal Error info & server block height');
-        infoError = true;
-      }
-
-      if (infoError) {
-        this.config.onInfoChanged({
-          latestBlock: 0,
-          serverUri: '',
-          version: '',
-        } as InfoType);
-        this.lastServerBlockHeight = 0;
+        this.publishNoServerInfo();
         return;
       }
 
@@ -388,15 +403,19 @@ export class DataService {
     }
   }
 
-  async fetchTandZandOValueTransfers() {
-    if (this.fetchTandZandOValueTransfersLock) {
+  // History waits for the first value-transfer publication, and the list is
+  // a wallet-local read. A failed height request keeps the last known height
+  // and lets the list publish. The transform falls back to the wallet height.
+  private async fetchServerHeight() {
+    const { server } = this.config;
+    if (server.kind === 'offline') {
+      this.lastServerBlockHeight = 0;
       return;
     }
-    this.fetchTandZandOValueTransfersLock = true;
     try {
       const start = Date.now();
       const heightStr: string = await RPCModule.getLatestBlockServerInfo(
-        this.config.server.uri,
+        server.uri,
       );
       if (Date.now() - start > 4000) {
         console.log(
@@ -409,6 +428,18 @@ export class DataService {
       } else {
         console.log('Internal Error server height');
       }
+    } catch (error) {
+      this.config.onError(`Error server height: ${error}`);
+    }
+  }
+
+  async fetchTandZandOValueTransfers() {
+    if (this.fetchTandZandOValueTransfersLock) {
+      return;
+    }
+    this.fetchTandZandOValueTransfersLock = true;
+    try {
+      await this.fetchServerHeight();
 
       const start2 = Date.now();
       const valueTransfersStr: string = await RPCModule.getValueTransfersList();

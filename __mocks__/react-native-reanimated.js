@@ -55,11 +55,17 @@ class AnimationBuilder {
   }
 }
 
+class Keyframe extends AnimationBuilder {}
+
 const FadeIn = new AnimationBuilder();
 const FadeInUp = new AnimationBuilder();
 const FadeInDown = new AnimationBuilder();
 const FadeOut = new AnimationBuilder();
+const FadeOutUp = new AnimationBuilder();
+const FadeOutDown = new AnimationBuilder();
 const LinearTransition = new AnimationBuilder();
+const ZoomIn = new AnimationBuilder();
+const ZoomOut = new AnimationBuilder();
 const Layout = new AnimationBuilder();
 
 const ReduceMotion = { System: 'system', Always: 'always', Never: 'never' };
@@ -72,6 +78,7 @@ const Extrapolation = {
 // Styles stay empty: the callbacks are worklets, and running them here would
 // only exercise the mock's own stand-ins.
 const useAnimatedStyle = jest.fn(() => ({}));
+const useAnimatedProps = jest.fn(() => ({}));
 const useSharedValue = jest.fn(v => ({ value: v }));
 const useDerivedValue = jest.fn(fn => ({ value: fn() }));
 const useAnimatedGestureHandler = jest.fn(() => ({}));
@@ -108,14 +115,18 @@ export {
   FadeInDown,
   FadeInUp,
   FadeOut,
+  FadeOutDown,
+  FadeOutUp,
   interpolate,
   interpolateColor,
+  Keyframe,
   Layout,
   LinearTransition,
   ReduceMotion,
   runOnJS,
   runOnUI,
   useAnimatedGestureHandler,
+  useAnimatedProps,
   useAnimatedReaction,
   useAnimatedRef,
   useAnimatedStyle,
@@ -127,4 +138,6 @@ export {
   withSequence,
   withSpring,
   withTiming,
+  ZoomIn,
+  ZoomOut,
 };

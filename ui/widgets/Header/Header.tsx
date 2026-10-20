@@ -1,5 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
-import { faChevronLeft, faSnowflake } from '@fortawesome/free-solid-svg-icons';
+import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
+import { SnowflakeIcon } from '@ui/primitives/Icons/SnowflakeIcon';
+import { REVEAL_OPEN_MS } from '@ui/widgets/CircularReveal';
+import { ease } from '@app/theme/motion';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
   NavigationProp,
@@ -7,10 +10,11 @@ import {
   useNavigation,
 } from '@react-navigation/native';
 import { useTheme } from '@app/theme';
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useRef } from 'react';
 import { Image, TouchableOpacity, View } from 'react-native';
 import Animated, {
   Easing,
+  ReduceMotion,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
@@ -21,13 +25,11 @@ import { useOptionsPanel } from '@app/context/optionsPanel';
 // with the panel that's appearing over it.
 const HEADER_FADE_MS = 320;
 import {
-  ModeEnum,
   NetInfoType,
   RouteEnum,
   ScreenEnum,
   SnackbarDurationEnum,
   TranslateType,
-  UfvkActionEnum,
 } from '@app/AppState';
 import { ContextAppLoaded } from '@app/context';
 import { getZingoLogo } from '@app/utils/ZingoAppData';
@@ -66,7 +68,6 @@ type HeaderProps = {
   // seed screen - shared between AppLoading & AppLoaded - different contexts
   translate?: (key: string) => TranslateType;
   netInfo?: NetInfoType;
-  mode?: ModeEnum;
   privacy?: boolean;
   // store the error if the App is in background
   setBackgroundError?: (title: string, error: string) => void;
@@ -78,6 +79,8 @@ type HeaderProps = {
   onUsdRowLayout?: (height: number) => void;
   // optional layout reporting for the pull-down PriceRow snap point
   onPriceRowLayout?: (height: number) => void;
+  // History shows the price card in its notice stack
+  noPriceRow?: boolean;
 };
 
 const Header: React.FunctionComponent<HeaderProps> = ({
@@ -89,7 +92,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   testID,
   translate: translateProp,
   netInfo: netInfoProp,
-  mode: modeProp,
   privacy: privacyProp,
   setBackgroundError,
   noPrivacy,
@@ -105,6 +107,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   showMessagesIcon,
   onUsdRowLayout,
   onPriceRowLayout,
+  noPriceRow,
 }) => {
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const context = useContext(ContextAppLoaded);
@@ -117,13 +120,14 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     valueTransfersTotal,
     somePending,
     shieldingAmount,
-    selectServer,
+    server,
     mixnetView,
+    sendPermitNow,
+    seedBackedUp,
   } = context;
 
   const translate = translateProp ?? context.translate;
   const netInfo = netInfoProp ?? context.netInfo;
-  const mode = modeProp ?? context.mode;
   const privacy = privacyProp !== undefined ? privacyProp : context.privacy;
 
   const { colors } = useTheme();
@@ -157,24 +161,40 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   } = useShieldFunds({
     readOnly,
     setShieldingAmount,
-    selectServer,
+    server,
     somePending,
     totalBalance,
     shieldingAmount,
     translate,
-    netInfo,
     addLastSnackbar,
     setBackgroundError,
     setScrollToTop,
     setScrollToBottom,
+    sendPermitNow,
   });
 
-  // Audit Issue D — bio gate for seedUfvkScreen lives at the Ufvk screen
-  // entry (components/Ufvk/ShowUfvk.tsx). Caller only navigates.
+  // The viewing key opens as a circle out of the snowflake, which turns 60°
+  // on the same curve and duration.
+  const snowflake = useRef<View>(null);
+  const snowTurn = useSharedValue(0);
+  const snowStyle = useAnimatedStyle(() => ({
+    transform: [{ rotate: `${snowTurn.value}deg` }],
+  }));
   const ufvkShowModal = () => {
-    navigation.navigate(RouteEnum.Ufvk, {
-      action: UfvkActionEnum.view,
+    snowTurn.value = 0;
+    snowTurn.value = withTiming(60, {
+      duration: REVEAL_OPEN_MS,
+      easing: ease.standard,
+      reduceMotion: ReduceMotion.System,
     });
+    snowflake.current?.measureInWindow((x, y, width, height) =>
+      navigation.navigate(RouteEnum.ViewingKey, {
+        entry: {
+          kind: 'circle',
+          origin: { x: x + width / 2, y: y + height / 2 },
+        },
+      }),
+    );
   };
 
   return (
@@ -196,9 +216,8 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         >
           <SyncStatusBar
             noSyncingStatus={noSyncingStatus}
-            selectServer={selectServer}
+            server={server}
             netInfo={netInfo}
-            mode={mode}
             percentageOutputsScanned={percentageOutputsScanned}
             syncInProgress={syncInProgress}
             viewSyncStatus={viewSyncStatus}
@@ -214,7 +233,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
 
           <BalanceRow
             noBalance={noBalance}
-            mode={mode}
             noPrivacy={noPrivacy}
             setPrivacyOption={setPrivacyOption}
             addLastSnackbar={addLastSnackbar}
@@ -223,7 +241,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             totalBalance={totalBalance}
             info={info}
             zecPrice={zecPrice}
-            selectServer={selectServer}
+            server={server}
             showShieldButton={showShieldButton}
             shieldingFee={shieldingFee}
             valueTransfersTotal={valueTransfersTotal}
@@ -232,15 +250,16 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             calculateDisableButtonToShield={calculateDisableButtonToShield}
             onPressShieldFunds={onPressShieldFunds}
             receivedLegend={receivedLegend}
+            mixnetView={mixnetView}
             onUsdRowLayout={onUsdRowLayout}
           />
 
-          {!noBalance && (
+          {!noBalance && !noPriceRow && (
             <PriceRow
               translate={translate}
               zecPrice={zecPrice}
               info={info}
-              selectServer={selectServer}
+              server={server}
               onLayout={onPriceRowLayout}
             />
           )}
@@ -266,37 +285,42 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                 onPress={toggleMenuDrawer}
               >
                 <MenuMorphIcon />
+                {!readOnly && !seedBackedUp && (
+                  <View
+                    testID="header.menudot"
+                    pointerEvents="none"
+                    style={{
+                      position: 'absolute',
+                      top: -1,
+                      right: -2,
+                      width: 9,
+                      height: 9,
+                      borderRadius: 5,
+                      borderWidth: 2,
+                      borderColor: colors.bgCanvas,
+                      backgroundColor: colors.fgWarning,
+                      boxSizing: 'content-box',
+                    }}
+                  />
+                )}
               </TouchableOpacity>
             )}
             {readOnly && !noUfvkIcon && (
               <Animated.View style={headerAnimatedStyle}>
-                {!(
-                  mode === ModeEnum.basic &&
-                  valueTransfersTotal !== null &&
-                  valueTransfersTotal <= 0
-                ) &&
-                !(
-                  mode === ModeEnum.basic &&
-                  totalBalance &&
-                  totalBalance.totalIronwoodBalance +
-                    totalBalance.totalOrchardBalance +
-                    totalBalance.totalSaplingBalance <=
-                    0
-                ) ? (
-                  <TouchableOpacity onPress={ufvkShowModal}>
-                    <FontAwesomeIcon
-                      icon={faSnowflake}
-                      size={20}
-                      color={colors.fgMuted}
+                <TouchableOpacity
+                  testID="header.snowflake"
+                  accessibilityRole="button"
+                  accessibilityLabel={translate('viewingkey.title') as string}
+                  onPress={ufvkShowModal}
+                >
+                  <Animated.View ref={snowflake} style={snowStyle}>
+                    <SnowflakeIcon
+                      size={22}
+                      color={colors.fgViewOnly}
+                      strokeWidth={1.8}
                     />
-                  </TouchableOpacity>
-                ) : (
-                  <FontAwesomeIcon
-                    icon={faSnowflake}
-                    size={20}
-                    color={colors.fgMuted}
-                  />
-                )}
+                  </Animated.View>
+                </TouchableOpacity>
               </Animated.View>
             )}
           </View>

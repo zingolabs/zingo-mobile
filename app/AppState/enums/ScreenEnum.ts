@@ -5,7 +5,6 @@ export enum ScreenEnum {
   // Launching
   // StartMenu
   ImportUfvk = 'ImportUfvk',
-  ScannerUfvk = 'ScannerUfvk',
   //
   LoadedApp = 'LoadedApp',
   ComputingTxContext = 'ComputingTxContext',
@@ -25,8 +24,8 @@ export enum ScreenEnum {
   Pools = 'Pools',
   SyncReport = 'SyncReport',
   Seed = 'Seed',
-  Rescan = 'Rescan',
+  ViewingKey = 'ViewingKey',
+  Server = 'Server',
   Insight = 'Insight',
-  ShowUfvk = 'ShowUfvk',
   Memo = 'Memo',
 }

@@ -1,13 +1,13 @@
 /**
- * The Mixnet Mode indicator reported by zingolib: `off` is the user's deliberate
- * per-session clearnet consent, `bootstrapping` is enabled-but-not-yet-
- * reachable, `ready` carries the send and price surfaces over the mixnet,
- * and `died` is an unconsented proxy loss — sends refuse until the user
- * re-enables the mixnet.
+ * The Mixnet Mode indicator reported by zingolib, where `died` blocks sends until the user re-enables the mixnet.
+ *
+ * `off` is the deliberate switch-off — the session went Offline, so there is
+ * no transport and nothing to recover. It blocks sends like the rest, but it
+ * is the one state the app never reconnects out of on its own.
  */
 export enum RPCMixnetIndicatorEnum {
-  off = 'off',
   bootstrapping = 'bootstrapping',
   ready = 'ready',
+  off = 'off',
   died = 'died',
 }

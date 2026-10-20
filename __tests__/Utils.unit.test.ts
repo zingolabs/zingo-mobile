@@ -169,24 +169,24 @@ describe('Utils.getBlockExplorerTxIDURL', () => {
     ).toBe(`https://testnet.zcashexplorer.app/transactions/${txid}`);
   });
 
-  test('Cipherscan mainnet', () => {
+  test('ZecBlock mainnet', () => {
     expect(
       Utils.getBlockExplorerTxIDURL(
         txid,
         ChainNameEnum.mainChainName,
-        BlockExplorerEnum.Cipherscan,
+        BlockExplorerEnum.ZecBlock,
       ),
-    ).toBe(`https://cipherscan.app/tx/${txid}`);
+    ).toBe(`https://zecblock.com/tx/${txid}`);
   });
 
-  test('Cipherscan testnet', () => {
+  test('ZecBlock testnet', () => {
     expect(
       Utils.getBlockExplorerTxIDURL(
         txid,
         ChainNameEnum.testChainName,
-        BlockExplorerEnum.Cipherscan,
+        BlockExplorerEnum.ZecBlock,
       ),
-    ).toBe(`https://testnet.cipherscan.app/tx/${txid}`);
+    ).toBe(`https://testnet.zecblock.com/tx/${txid}`);
   });
 
   test('Zexplorer mainnet', () => {

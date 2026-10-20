@@ -11,7 +11,7 @@ import {
 } from '@app/context';
 
 import ValueTransferLine from '@screens/History/components/ValueTransferLine';
-import { ModeEnum, ScreenEnum, ValueTransferKindEnum } from '@app/AppState';
+import { ScreenEnum, ValueTransferKindEnum } from '@app/AppState';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockValueTransfers } from '../__mocks__/dataMocks/mockValueTransfers';
@@ -29,7 +29,6 @@ describe('ValueTransferLine - snapshots', () => {
   state.translate = mockTranslate;
   state.info = mockInfo;
   state.addressBook = mockAddressBook;
-  state.mode = ModeEnum.advanced;
   state.showSwipeableIcons = true;
 
   const onFn = jest.fn();

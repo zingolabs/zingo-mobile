@@ -15,6 +15,7 @@ import java.io.File
  * Run: ./gradlew :app:connectedProdDebugAndroidTest \
  *   -Pandroid.testInstrumentationRunnerArguments.class=org.ZingoLabs.Zingo.WalletSwapRecoveryTest
  */
+@OfflineDeviceTest
 class WalletSwapRecoveryTest {
     private val mainName = Constants.WalletFileName.value
     private val backupName = Constants.WalletBackupFileName.value
@@ -44,7 +45,7 @@ class WalletSwapRecoveryTest {
     private fun file(name: String) = File(context.filesDir, name)
 
     private fun offlineWallet(birthday: UInt): ByteArray {
-        uniffi.zingo.initFromSeed(Seeds.HOSPITAL, birthday, "", "main", "Medium", 1u)
+        uniffi.zingo.initFromSeed(seed = Seeds.HOSPITAL, birthday = birthday, connection = testConnection("", "main"))
         return uniffi.zingo.saveWalletBytes()!!
     }
 
@@ -57,7 +58,6 @@ class WalletSwapRecoveryTest {
         file(swapName).delete()
         RPCModule.walletFileClosed = false
         uniffi.zingo.initLogging()
-        uniffi.zingo.setCryptoDefaultProviderToRing()
         walletA = offlineWallet(2000000u)
         walletB = offlineWallet(2100000u)
         assertThat(walletA).isNotEqualTo(walletB)
@@ -125,6 +125,20 @@ class WalletSwapRecoveryTest {
         assertThat(promise.resolved).containsExactly(true)
         assertThat(file(mainName).readBytes()).isEqualTo(walletB)
         assertThat(file(backupName).readBytes()).isEqualTo(walletA)
+        assertThat(file(swapName).exists()).isFalse()
+    }
+
+    @Test
+    fun theReplaceTakesTheBackupAndDropsTheBackupFile() {
+        file(mainName).writeBytes(walletA)
+        file(backupName).writeBytes(walletB)
+
+        val promise = CapturingPromise()
+        rpcModule.replaceWalletWithBackup(promise)
+
+        assertThat(promise.resolved).containsExactly(true)
+        assertThat(file(mainName).readBytes()).isEqualTo(walletB)
+        assertThat(file(backupName).exists()).isFalse()
         assertThat(file(swapName).exists()).isFalse()
     }
 }

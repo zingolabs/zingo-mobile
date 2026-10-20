@@ -10,15 +10,19 @@
 5. CocoaPods (`sudo gem install cocoapods`)
 
 ## Building
-A single command produces `ios/Zingolib.xcframework`, a bundle that contains both
-the device slice (arm64) and the simulator slice (arm64 + x86_64). Xcode picks
-the right slice automatically based on the build destination — there is no
-separate "device build" vs "simulator build".
+A single command builds the Binding Layer from the `zingolib` submodule into
+`zingolib/bindings/swift/build`: two XCFrameworks (`Zingolib`,
+`ZingoNymProxyFFI`) and the Swift sources of the `ZingoBindings` package. Each
+XCFramework contains both the device slice (arm64) and the simulator slice
+(arm64 + x86_64). Xcode picks the right slice automatically based on the build
+destination — there is no separate "device build" vs "simulator build".
 
-1. Clone the repository.
+1. Clone the repository with its submodules:
+   `git clone --recurse-submodules https://github.com/zingolabs/zingo-mobile.git`.
+   In an existing clone, run `git submodule update --init zingolib`.
 2. Go to the cloned repo `cd zingo-mobile`.
 3. From the root of the project, install JS deps: `yarn`
-4. Build the Rust XCFramework: `yarn rust:ios` — may take a long time on first run.
+4. Build the Binding Layer: `yarn rust:ios` — may take a long time on first run.
 5. In the `ios` directory, run: `pod install`
 
 ## Launching the app

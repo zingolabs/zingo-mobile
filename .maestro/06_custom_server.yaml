@@ -1,0 +1,106 @@
+appId: org.ZingoLabs.Zingo
+---
+- runFlow:
+    file: common/create_wallet.yaml
+
+# The Server screen is the last item of the options panel.
+- tapOn:
+    id: "header.drawmenu"
+- tapOn:
+    id: "menu.server"
+- extendedWaitUntil:
+    visible:
+      id: "server.card"
+    timeout: 10000
+# The screen is still moving when the card first shows. A tap resolved
+# during that animation lands where the row no longer is (see
+# 02_options_menu.yaml).
+- waitForAnimationToEnd:
+    timeout: 5000
+
+- tapOn:
+    id: "server.custom"
+- extendedWaitUntil:
+    visible:
+      id: "server.custom.host"
+    timeout: 5000
+
+# The driver can drop characters while it types, and a save then targets
+# a host that does not exist. Each box is read back and typed again when
+# the text differs. Both boxes select their text when they take focus, so
+# moving the focus away and back makes the next entry replace what is
+# there instead of adding to it.
+- retry:
+    maxRetries: 3
+    commands:
+      - tapOn:
+          id: "server.custom.port"
+      - tapOn:
+          id: "server.custom.host"
+      - inputText: "na.zec.rocks"
+      - assertVisible:
+          id: "server.custom.host"
+          text: "na\\.zec\\.rocks"
+- retry:
+    maxRetries: 3
+    commands:
+      - tapOn:
+          id: "server.custom.host"
+      - tapOn:
+          id: "server.custom.port"
+      - inputText: "443"
+      - assertVisible:
+          id: "server.custom.port"
+          text: "443"
+- hideKeyboard
+
+# Save tests the server first, then reconnects the wallet to it. The
+# message box ends in a green line once Zingo uses it.
+- tapOn:
+    id: "server.custom.save"
+- extendedWaitUntil:
+    visible:
+      id: "server.custom.log.final.ok"
+    timeout: 120000
+
+# Back on History, the check icon renders once the sync on the saved
+# server is not in progress.
+- tapOn:
+    id: "server.back"
+- extendedWaitUntil:
+    visible:
+      id: "header.checkicon"
+    timeout: 300000
+
+# The Server screen opens on the saved server, and the card names it.
+- tapOn:
+    id: "header.drawmenu"
+- tapOn:
+    id: "menu.server"
+- extendedWaitUntil:
+    visible:
+      id: "server.card"
+    timeout: 10000
+# On Android the name and the status are two texts inside the card. On
+# iOS the card is one element whose text joins them.
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - assertVisible:
+          text: "na\\.zec\\.rocks"
+          childOf:
+            id: "server.card"
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - assertVisible:
+          id: "server.card"
+          text: "na\\.zec\\.rocks, .*"
+# The custom box opens on the saved address, and its message box says
+# Zingo uses it once the card has checked the server.
+- extendedWaitUntil:
+    visible:
+      id: "server.custom.log.final.ok"
+    timeout: 30000

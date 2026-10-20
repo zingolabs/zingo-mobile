@@ -25,11 +25,12 @@ import Button, { ButtonTypeEnum } from '@ui/primitives/Button';
 import AppSheet from '@ui/primitives/AppSheet';
 import { ContextAppLoading } from '@app/context';
 import WalletType from '@app/AppState/types/WalletType';
-import { ModeEnum, SnackbarDurationEnum, ScreenEnum } from '@app/AppState';
+import { SnackbarDurationEnum, ScreenEnum } from '@app/AppState';
 import Header from '@ui/widgets/Header';
 import Utils from '@app/utils';
 import { useFullSheetSnapPoints } from '@app/hooks/useFullSheetSnapPoints';
 import { useSecureScreen } from '@app/hooks/useSecureScreen';
+import { useTimedReveal } from '@app/hooks/useTimedReveal';
 import { showConfirm } from '@app/services/showConfirm';
 
 type TextsType = {
@@ -50,14 +51,8 @@ const NewSeed: React.FunctionComponent<NewSeedProps> = ({
   onClickOK,
 }) => {
   const context = useContext(ContextAppLoading);
-  const {
-    translate,
-    netInfo,
-    privacy,
-    mode,
-    addLastSnackbar,
-    setPrivacyOption,
-  } = context;
+  const { translate, netInfo, privacy, addLastSnackbar, setPrivacyOption } =
+    context;
   const { colors } = useTheme();
   const screenName = ScreenEnum.Seed;
 
@@ -67,8 +62,9 @@ const NewSeed: React.FunctionComponent<NewSeedProps> = ({
   const secured = useSecureScreen();
 
   const [texts, setTexts] = useState<TextsType>({} as TextsType);
-  const [expandSeed, setExpandSeed] = useState<boolean>(true);
-  const [expandBirthday, setExpandBithday] = useState<boolean>(true);
+  const { visible: expandSeed, reveal: revealSeed } = useTimedReveal(privacy);
+  const { visible: expandBirthday, reveal: revealBirthday } =
+    useTimedReveal(privacy);
   const [containerH, setContainerH] = useState<number>(0);
   const [headerH, setHeaderH] = useState<number>(0);
   const newSeedSheetRef = useRef<BottomSheet>(null);
@@ -118,10 +114,7 @@ const NewSeed: React.FunctionComponent<NewSeedProps> = ({
               );
             }
             if (expandOnCopy) {
-              setExpandSeed(true);
-              if (privacy) {
-                setTimeout(() => setExpandSeed(false), 5 * 1000);
-              }
+              revealSeed();
             }
             clipboardTimer.current = setTimeout(() => {
               Clipboard.setString('');
@@ -142,28 +135,6 @@ const NewSeed: React.FunctionComponent<NewSeedProps> = ({
       ],
     });
   };
-
-  useEffect(() => {
-    if (privacy) {
-      setExpandSeed(false);
-      setExpandBithday(false);
-    } else {
-      setExpandSeed(true);
-      setExpandBithday(true);
-    }
-  }, [privacy]);
-
-  useEffect(() => {
-    if (!expandSeed && !privacy) {
-      setExpandSeed(true);
-    }
-  }, [expandSeed, privacy]);
-
-  useEffect(() => {
-    if (!expandBirthday && !privacy) {
-      setExpandBithday(true);
-    }
-  }, [expandBirthday, privacy]);
 
   useEffect(() => {
     const buttonTextsArray = translate('seed.buttontexts');
@@ -239,36 +210,27 @@ const NewSeed: React.FunctionComponent<NewSeedProps> = ({
           }}
         >
           <Button
-            type={
-              mode === ModeEnum.basic
-                ? ButtonTypeEnum.Secondary
-                : ButtonTypeEnum.Primary
-            }
-            title={
-              mode === ModeEnum.basic
-                ? (translate('cancel') as string)
-                : !!texts && !!texts.new
-                  ? texts.new[0]
-                  : ''
-            }
+            testID="newseed.button.ok"
+            type={ButtonTypeEnum.Primary}
+            title={!!texts && !!texts.new ? texts.new[0] : ''}
             onPress={() => onClickOKHide()}
           />
         </View>
       </BottomSheetFooter>
     ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [colors, mode, texts, translate],
+    [colors, texts],
   );
 
   if (!secured) {
-    return <View style={{ flex: 1, backgroundColor: colors.bgCanvas }} />;
+    return <View style={{ flex: 1, backgroundColor: 'transparent' }} />;
   }
 
   return (
     <View
       style={{
         flex: 1,
-        backgroundColor: colors.bgCanvas,
+        backgroundColor: 'transparent',
       }}
       onLayout={e => setContainerH(e.nativeEvent.layout.height)}
     >
@@ -284,7 +246,6 @@ const NewSeed: React.FunctionComponent<NewSeedProps> = ({
           addLastSnackbar={addLastSnackbar}
           translate={translate}
           netInfo={netInfo}
-          mode={mode}
           privacy={privacy}
         />
       </View>
@@ -373,12 +334,7 @@ const NewSeed: React.FunctionComponent<NewSeedProps> = ({
                       SnackbarDurationEnum.short,
                     );
                   }
-                  setExpandBithday(true);
-                  if (privacy) {
-                    setTimeout(() => {
-                      setExpandBithday(false);
-                    }, 5 * 1000);
-                  }
+                  revealBirthday();
                 }
               }}
             >

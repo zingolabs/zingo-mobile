@@ -1,0 +1,105 @@
+name: PR close release
+
+# A closed PR, merged or not, releases the CI resources that it still holds.
+# A merge cancels no run, and no later run can read a cache of the merge ref.
+
+on:
+  pull_request_target:
+    types: [closed]
+
+permissions:
+  actions: write
+  contents: read
+  pull-requests: read
+
+concurrency:
+  group: pr-close-release-${{ github.event.number }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Cancel runs and delete caches
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REPO: ${{ github.repository }}
+      PR: ${{ github.event.number }}
+    steps:
+      - name: Read the PR's state
+        id: pr
+        run: |
+          set -euo pipefail
+          state=$(gh pr view "$PR" --repo "$REPO" --json state --jq .state)
+          echo "state=${state}" >> "$GITHUB_OUTPUT"
+
+      - name: Cancel the PR's unfinished workflow runs
+        if: steps.pr.outputs.state != 'OPEN'
+        env:
+          HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+          HEAD_OWNER: ${{ github.event.pull_request.head.repo.owner.login }}
+          HEAD_BRANCH: ${{ github.event.pull_request.head.ref }}
+          CLOSE_WORKFLOW: .github/workflows/visual-review-cleanup.yaml
+        run: |
+          set -euo pipefail
+          if [ -z "$HEAD_REPO" ]; then
+            echo "The head repository of PR ${PR} is deleted. No run is selected."
+            exit 0
+          fi
+
+          sharing=$(gh api --method GET "repos/${REPO}/pulls" \
+            -f state=open -f head="${HEAD_OWNER}:${HEAD_BRANCH}" --jq length)
+          if [ "$sharing" -gt 0 ]; then
+            echo "${sharing} open PR(s) share the head ${HEAD_OWNER}:${HEAD_BRANCH}. No run is cancelled."
+            exit 0
+          fi
+
+          ids=""
+          for status in queued in_progress waiting requested pending; do
+            found=$(gh api --method GET --paginate "repos/${REPO}/actions/runs" \
+              -f branch="$HEAD_BRANCH" -f event=pull_request \
+              -f status="$status" -f per_page=100 \
+              | jq --raw-output --arg repo "$HEAD_REPO" --arg kept "$CLOSE_WORKFLOW" \
+                '.workflow_runs[]
+                 | select(.head_repository.full_name == $repo)
+                 | select(.path != $kept)
+                 | .id')
+            ids="${ids} ${found}"
+          done
+
+          cancelled=0
+          refused=0
+          for id in $ids; do
+            if gh run cancel "$id" --repo "$REPO"; then
+              cancelled=$((cancelled + 1))
+            elif [ "$(gh run view "$id" --repo "$REPO" --json status --jq .status)" != completed ]; then
+              refused=$((refused + 1))
+            fi
+          done
+          echo "Cancelled ${cancelled} run(s) of ${HEAD_REPO}:${HEAD_BRANCH}."
+          if [ "$refused" -gt 0 ]; then
+            echo "::error::${refused} run(s) refused the cancel"
+            exit 1
+          fi
+
+          for id in $ids; do
+            gh run watch "$id" --repo "$REPO" --interval 10 > /dev/null
+          done
+
+      - name: Delete the PR's Actions caches
+        if: steps.pr.outputs.state != 'OPEN'
+        env:
+          MERGE_REF: refs/pull/${{ github.event.number }}/merge
+        run: |
+          set -euo pipefail
+          deleted=0
+          while true; do
+            ids=$(gh cache list --repo "$REPO" --ref "$MERGE_REF" --limit 100 \
+              --json id --jq '.[].id')
+            [ -n "$ids" ] || break
+            for id in $ids; do
+              gh cache delete "$id" --repo "$REPO"
+              deleted=$((deleted + 1))
+            done
+          done
+          echo "Deleted ${deleted} cache(s) of ${MERGE_REF}."

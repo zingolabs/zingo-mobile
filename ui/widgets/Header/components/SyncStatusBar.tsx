@@ -16,16 +16,15 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { NetInfoStateType } from '@react-native-community/netinfo/src/index';
 import {
-  ModeEnum,
   RouteEnum,
-  SelectServerEnum,
+  ServerType,
   SnackbarDurationEnum,
   TranslateType,
 } from '@app/AppState';
 import NetInfoType from '@app/AppState/types/NetInfoType';
 import {
   MixnetView,
-  mixnetPhase,
+  viewPhase,
 } from '@app/walletBackend/transforms/mixnetView';
 import FadeText from '@ui/primitives/FadeText';
 import MixnetIcon from '@ui/primitives/Icons/MixnetIcon';
@@ -33,14 +32,13 @@ import PrivacyToggle from './PrivacyToggle';
 
 type SyncStatusBarProps = {
   noSyncingStatus: boolean | undefined;
-  selectServer: SelectServerEnum;
+  server: ServerType;
   netInfo: NetInfoType;
-  mode: ModeEnum;
   percentageOutputsScanned: number;
   syncInProgress: boolean;
   viewSyncStatus: boolean;
   opacityValue: Animated.Value;
-  mixnetView: MixnetView | null;
+  mixnetView: MixnetView;
   translate: (key: string) => TranslateType;
   privacy: boolean;
   noPrivacy: boolean | undefined;
@@ -53,9 +51,8 @@ type SyncStatusBarProps = {
 const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
   ({
     noSyncingStatus,
-    selectServer,
+    server,
     netInfo,
-    mode,
     percentageOutputsScanned,
     syncInProgress,
     viewSyncStatus,
@@ -70,10 +67,7 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
   }) => {
     const navigation = useNavigation<NavigationProp<ParamListBase>>();
     const { colors } = useTheme();
-    const phase =
-      mixnetView !== null
-        ? mixnetPhase(mixnetView.statusKey, mixnetView.reconnecting)
-        : null;
+    const phase = viewPhase(mixnetView);
 
     return (
       <View
@@ -88,7 +82,7 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
           gap: 8,
         }}
       >
-        {!noSyncingStatus && selectServer !== SelectServerEnum.offline && (
+        {!noSyncingStatus && server.kind !== 'offline' && (
           <View
             style={{
               minHeight: 29,
@@ -156,7 +150,12 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
                         padding: 3,
                       }}
                     >
-                      {mode === ModeEnum.basic ? (
+                      <TouchableOpacity
+                        testID="header.playicon"
+                        onPress={() => {
+                          navigation.navigate(RouteEnum.SyncReport);
+                        }}
+                      >
                         <View
                           style={{
                             flexDirection: 'row',
@@ -185,50 +184,14 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
                             >{` ${percentageOutputsScanned}%`}</FadeText>
                           )}
                         </View>
-                      ) : (
-                        <TouchableOpacity
-                          testID="header.playicon"
-                          onPress={() => {
-                            navigation.navigate(RouteEnum.SyncReport);
-                          }}
-                        >
-                          <View
-                            style={{
-                              flexDirection: 'row',
-                              justifyContent: 'center',
-                              alignItems: 'center',
-                            }}
-                          >
-                            <FontAwesomeIcon
-                              icon={faPlay}
-                              color={colors.fgSyncing}
-                              size={16}
-                            />
-                            {viewSyncStatus && (
-                              <FadeText style={{ fontSize: 10, marginLeft: 2 }}>
-                                {translate('syncing') as string}
-                              </FadeText>
-                            )}
-                            {viewSyncStatus && percentageOutputsScanned > 0 && (
-                              <FadeText style={{ fontSize: 10, marginLeft: 2 }}>
-                                {' - '}
-                              </FadeText>
-                            )}
-                            {percentageOutputsScanned > 0 && (
-                              <FadeText
-                                style={{ fontSize: 10, marginLeft: 2 }}
-                              >{` ${percentageOutputsScanned}%`}</FadeText>
-                            )}
-                          </View>
-                        </TouchableOpacity>
-                      )}
+                      </TouchableOpacity>
                     </Animated.View>
                   </View>
                 )}
               </>
             ) : (
               <>
-                {netInfo.isConnected && mode === ModeEnum.advanced && (
+                {netInfo.isConnected && (
                   <View
                     style={{
                       alignItems: 'center',
@@ -277,31 +240,23 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
                   minHeight: 25,
                 }}
               >
-                {mode === ModeEnum.basic ? (
+                <TouchableOpacity
+                  onPress={() => {
+                    navigation.navigate(RouteEnum.SyncReport);
+                  }}
+                >
                   <FontAwesomeIcon
                     icon={faCloudDownload}
                     color={!netInfo.isConnected ? 'red' : 'yellow'}
                     size={16}
                   />
-                ) : (
-                  <TouchableOpacity
-                    onPress={() => {
-                      navigation.navigate(RouteEnum.SyncReport);
-                    }}
-                  >
-                    <FontAwesomeIcon
-                      icon={faCloudDownload}
-                      color={!netInfo.isConnected ? 'red' : 'yellow'}
-                      size={16}
-                    />
-                  </TouchableOpacity>
-                )}
+                </TouchableOpacity>
               </View>
             )}
           </View>
         )}
 
-        {selectServer === SelectServerEnum.offline && (
+        {server.kind === 'offline' && (
           <View
             style={{
               alignItems: 'center',
@@ -336,12 +291,13 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
 
         {/* Mixnet transport status, icon-only, and the way into the
             diagnostics: the icon that reports the trouble is the one that
-            opens the screen explaining it. Rendered only where the policy
-            runs (mixnetView is null on platforms whose transport has not
-            landed) and never in the `off` state (phase is null). A pulsing
-            green halo means connecting, a bare icon means ready, a coral
-            halo means lost, a traveling yellow arc means reconnecting. */}
-        {mixnetView !== null && phase !== null && (
+            opens the screen explaining it. Rendered only where the platform
+            has a transport. A pulsing green halo means connecting, a bare
+            icon means ready, a coral halo means lost, a traveling yellow arc
+            means reconnecting, and the off glyph means the session went Offline —
+            the icon reports nym's own state, so it is never hidden to hide a
+            transport that might still be up. */}
+        {phase !== 'absent' && (
           <TouchableOpacity
             testID="header.mixnet-status"
             accessibilityLabel={translate('settings.nym-diagnostics') as string}
@@ -362,18 +318,14 @@ const SyncStatusBar: React.FC<SyncStatusBarProps> = React.memo(
           </TouchableOpacity>
         )}
 
-        {mode !== ModeEnum.basic &&
-          !noPrivacy &&
-          setPrivacyOption &&
-          addLastSnackbar &&
-          noBalance && (
-            <PrivacyToggle
-              privacy={privacy}
-              setPrivacyOption={setPrivacyOption}
-              addLastSnackbar={addLastSnackbar}
-              translate={translate}
-            />
-          )}
+        {!noPrivacy && setPrivacyOption && addLastSnackbar && noBalance && (
+          <PrivacyToggle
+            privacy={privacy}
+            setPrivacyOption={setPrivacyOption}
+            addLastSnackbar={addLastSnackbar}
+            translate={translate}
+          />
+        )}
       </View>
     );
   },

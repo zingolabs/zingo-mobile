@@ -1,0 +1,27 @@
+name: Gradle cache
+description: >
+  Sets up Gradle with the one Gradle cache entry that every Gradle job
+  shares. Each job restores the entry, and the job that passes writer saves
+  it. The one writer is the APK build of a push to the default branch,
+  which ci.yaml selects.
+
+inputs:
+  writer:
+    description: Whether this job saves the Gradle cache.
+    required: false
+    default: 'false'
+
+runs:
+  using: composite
+  steps:
+    # setup-gradle names each entry after the job that saved it and restores
+    # a job's own entry first. This variable replaces the job's name in the
+    # key.
+    - name: Name the shared entry
+      shell: bash
+      run: echo "GRADLE_BUILD_ACTION_CACHE_KEY_JOB=shared" >> "$GITHUB_ENV"
+
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v6
+      with:
+        cache-read-only: ${{ inputs.writer != 'true' }}

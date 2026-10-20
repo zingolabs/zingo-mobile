@@ -1,0 +1,11 @@
+appId: org.ZingoLabs.Zingo
+---
+# The clear button empties the address field wherever the cursor is. An
+# erase removes only the text before the cursor. The button shows only
+# while the field holds text.
+- tapOn:
+    id: "send.address.clear"
+- assertNotVisible:
+    id: "send.address.clear"
+- tapOn:
+    id: "send.addressplaceholder"

@@ -11,6 +11,7 @@ import BackgroundTasks
 import Network
 import React_RCTAppDelegate
 import ReactAppDependencyProvider
+import ZingoBindings
 
 struct ScanRanges: Decodable {
     let priority: String
@@ -389,30 +390,6 @@ extension AppDelegate {
           return
         }
 
-        do {
-          let setCrytoProvider = try setCryptoDefaultProviderToRing()
-          NSLog("BGTask syncingProcessBackgroundTask - Crypto provider default \(setCrytoProvider)")
-        } catch {
-          NSLog("BGTask syncingProcessBackgroundTask - Crypto provider default error: \(error.localizedDescription)")
-
-          // save the background file
-          let timeStampError = Date().timeIntervalSince1970
-          let timeStampStrError = String(format: "%.0f", timeStampError)
-          let jsonBackgroundError = self.buildBackgroundJSON(message: "Crypto provider default KO.", dateEnd: timeStampStrError, error: "Crypto provider default KO. \(error.localizedDescription)")
-          do {
-            try rpcmodule.saveBackgroundFile(jsonBackgroundError)
-            NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundError)")
-          } catch {
-            NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundError) error: \(error.localizedDescription)")
-          }
-          
-          if let task = self.bgTask {
-            task.setTaskCompleted(success: false)
-          }
-          bgTask = nil
-          return
-        }
-
         var exists: String = "false"
         do {
             exists = try rpcmodule.fileExists(Constants.WalletFileName.rawValue)
@@ -445,7 +422,9 @@ extension AppDelegate {
                 return
             }
 
-            if case .offline = walletLoad {
+            // Nothing to sync without an indexer: recorded as skipped, not as
+            // an error.
+            let skipOffline = {
                 NSLog("BGTask syncingProcessBackgroundTask - Offline mode, sync skipped")
                 let timeStampOffline = Date().timeIntervalSince1970
                 let timeStampStrOffline = String(format: "%.0f", timeStampOffline)
@@ -459,7 +438,11 @@ extension AppDelegate {
                 if let task = self.bgTask {
                   task.setTaskCompleted(success: true)
                 }
-                bgTask = nil
+                self.bgTask = nil
+            }
+
+            if case .offline = walletLoad {
+                skipOffline()
                 return
             }
 
@@ -468,6 +451,10 @@ extension AppDelegate {
               let syncing = try runSync()
               let syncingStr = String(syncing)
               NSLog("BGTask syncingProcessBackgroundTask - sync LAUNCH \(syncingStr)")
+            } catch ZingolibError.Offline(_) {
+              // The wallet opened without an indexer: the same as Offline mode.
+              skipOffline()
+              return
             } catch {
               NSLog("BGTask syncingProcessBackgroundTask - run Sync error: \(error.localizedDescription)")
 
