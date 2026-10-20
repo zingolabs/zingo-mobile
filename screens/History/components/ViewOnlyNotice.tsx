@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useRef } from 'react';
 import { View } from 'react-native';
 
@@ -41,6 +42,8 @@ const ViewOnlyNotice: React.FunctionComponent<ViewOnlyNoticeProps> = ({
           variant="text"
           size="small"
           inline
+          /** The compact pill it had beside the notice text. */
+          style={{ minHeight: 28, paddingHorizontal: 12, paddingVertical: 0 }}
           title={translate('viewonly.button') as string}
           onPress={open}
         />

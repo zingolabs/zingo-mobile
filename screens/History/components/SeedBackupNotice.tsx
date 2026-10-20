@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useRef } from 'react';
 import { View } from 'react-native';
 import {
@@ -60,6 +61,8 @@ const SeedBackupNotice: React.FunctionComponent<SeedBackupNoticeProps> = ({
           variant="primary"
           size="small"
           inline
+          /** The compact pill it had beside the notice text. */
+          style={{ minHeight: 0, paddingHorizontal: 16, paddingVertical: 7 }}
           title={translate('seednotice.button') as string}
           onPress={open}
         />

@@ -639,10 +639,10 @@ exports[`Component History - test History privacy high - snapshot 1`] = `
                             "borderRadius": 999,
                             "justifyContent": "center",
                             "maxWidth": "100%",
-                            "minHeight": 44,
+                            "minHeight": 0,
                             "opacity": 1,
-                            "paddingHorizontal": 24,
-                            "paddingVertical": 8,
+                            "paddingHorizontal": 22,
+                            "paddingVertical": 10,
                           }
                         }
                         testID="ironwoodbanner.start"
@@ -652,9 +652,8 @@ exports[`Component History - test History privacy high - snapshot 1`] = `
                           style={
                             {
                               "color": "#060B12",
-                              "fontSize": 16,
+                              "fontSize": 15,
                               "fontWeight": "700",
-                              "lineHeight": 20,
                               "textAlign": "center",
                             }
                           }
@@ -1704,10 +1703,10 @@ exports[`Component History - test History privacy normal - snapshot 1`] = `
                             "borderRadius": 999,
                             "justifyContent": "center",
                             "maxWidth": "100%",
-                            "minHeight": 44,
+                            "minHeight": 0,
                             "opacity": 1,
-                            "paddingHorizontal": 24,
-                            "paddingVertical": 8,
+                            "paddingHorizontal": 22,
+                            "paddingVertical": 10,
                           }
                         }
                         testID="ironwoodbanner.start"
@@ -1717,9 +1716,8 @@ exports[`Component History - test History privacy normal - snapshot 1`] = `
                           style={
                             {
                               "color": "#060B12",
-                              "fontSize": 16,
+                              "fontSize": 15,
                               "fontWeight": "700",
-                              "lineHeight": 20,
                               "textAlign": "center",
                             }
                           }

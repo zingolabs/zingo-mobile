@@ -462,6 +462,9 @@ const IronwoodMigrationBanner: React.FunctionComponent<
             testID="ironwoodbanner.start"
             variant="primary"
             inline
+            /** The pill it had beside the pool text. */
+            style={{ minHeight: 0, paddingHorizontal: 22, paddingVertical: 10 }}
+            textStyle={{ fontSize: 15 }}
             title={translate('ironwoodbanner.start') as string}
             onPress={onStart}
           />
